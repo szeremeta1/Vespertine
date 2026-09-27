@@ -13,8 +13,17 @@ public enum FormatPlanner {
     /// DSD bit rate → carrier PCM rate for DSD-over-PCM (16 DSD bits per 24-bit frame).
     public static func dopCarrierRate(_ dsdRate: Double) -> Double { dsdRate / 16 }
 
-    public static func plan(source: SourceFormat, device: DeviceCapabilities, policy: RatePolicy = .matchSource) -> OutputPlan {
-        let channels = max(1, min(source.channels, max(device.outputChannels, 1)))
+    public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource) -> OutputPlan {
+        let channels = max(1, min(source.channels, max(rawDevice.outputChannels, 1)))
+        // Ignore rates whose only formats carry fewer channels than we need
+        // (e.g. AirPods' 24 kHz mono hands-free mode).
+        var device = rawDevice
+        if !rawDevice.physicalFormats.isEmpty {
+            let usable = rawDevice.sampleRates.filter { rate in
+                rawDevice.physicalFormats.contains { $0.supports(rate: rate) && $0.channels >= channels }
+            }
+            if !usable.isEmpty { device.sampleRates = usable }
+        }
 
         // DSD: native DoP when the user has confirmed the DAC understands it and the carrier rate exists.
         if source.encoding == .dsd {
