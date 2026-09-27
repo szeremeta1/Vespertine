@@ -38,20 +38,21 @@ public struct DeviceProfile: Sendable, Hashable {
         let name = device.name.lowercased()
         let isAirPodsMax = name.contains("airpods max")
 
+        // macOS keeps AirPods Max on their Bluetooth device object even when audio runs over the USB-C cable
+        // (Bluetooth stays the control link). The tell is Apple's USB audio interface being attached.
+        let usbAudioActive = isAirPodsMax && USBRegistry.isConnected(productContaining: "AirPods Max USB Audio")
+
         switch device.transport {
-        case .usb where isAirPodsMax:
+        case .usb where isAirPodsMax, .bluetooth where usbAudioActive, .bluetoothLE where usbAudioActive:
             return DeviceProfile(
                 kind: .airPodsMaxUSB, tag: "USB-C · LOSSLESS",
-                note: "AirPods Max take lossless 24-bit / 48 kHz over USB-C. Other rates are converted to 48 kHz; 48 kHz material plays bit-perfect.",
+                note: "AirPods Max take lossless 24-bit / 48 kHz over USB-C. Other rates are converted to 48 kHz; 48 kHz material plays bit-perfect. (macOS still lists them as Bluetooth; that's only the control link.)",
                 canBeBitPerfect: true, symbol: "headphones")
         case .bluetooth, .bluetoothLE:
             if isAirPodsMax {
-                let cabled = USBRegistry.isConnected(productContaining: "AirPods Max")
                 return DeviceProfile(
-                    kind: .airPodsMaxBluetooth, tag: cabled ? "BLUETOOTH · CABLE IDLE" : "BLUETOOTH · AAC",
-                    note: cabled
-                        ? "The USB-C cable is connected, but macOS is still sending audio over Bluetooth (AAC, lossy). Disconnect the AirPods from Bluetooth, or quit apps using their microphone, and the lossless USB output will appear."
-                        : "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz.",
+                    kind: .airPodsMaxBluetooth, tag: "BLUETOOTH · AAC",
+                    note: "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz.",
                     canBeBitPerfect: false, symbol: "headphones")
             }
             return DeviceProfile(

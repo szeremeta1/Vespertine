@@ -106,6 +106,19 @@ struct FormatPlannerTests {
         #expect(!a.isDeviceCompatible(with: c))
     }
 
+    @Test("AirPods' 24 kHz mono hands-free mode is never used for stereo")
+    func ignoresMonoOnlyRates() {
+        let airPodsReal = DeviceCapabilities(
+            sampleRates: [24_000, 48_000],
+            physicalFormats: [
+                PhysicalFormat(minRate: 24_000, maxRate: 24_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+                PhysicalFormat(minRate: 48_000, maxRate: 48_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2),
+            ],
+            outputChannels: 2, supportsDoP: false)
+        #expect(FormatPlanner.plan(source: pcm(22_050, 16), device: airPodsReal).deviceSampleRate == 48_000)
+        #expect(FormatPlanner.plan(source: pcm(44_100, 16), device: airPodsReal).deviceSampleRate == 48_000)
+    }
+
     @Test("Rate formatting")
     func formatting() {
         #expect(SampleRate.format(44_100) == "44.1")
