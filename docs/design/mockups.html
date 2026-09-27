@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nocturne Mockups</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ───────────────────────── Nocturne · Obsidian & Brass tokens ───────────────────────── */
+:root {
+  --bg:        #09090A;
+  --win:       #0D0D0F;
+  --s1:        #111114;   /* sidebar */
+  --s2:        #16161A;   /* cards / fields */
+  --s3:        #1C1C21;   /* raised / hover */
+  --hair:      rgba(236,230,218,.07);
+  --hair-2:    rgba(236,230,218,.12);
+  --text:      #ECE6DA;
+  --text-2:    #A29B8F;
+  --text-3:    #69645C;
+  --brass:     #C8A66A;
+  --brass-hi:  #E7CD98;
+  --brass-lo:  #7C6541;
+  --copper:    #C98B5B;
+  --serif: ui-serif, "New York", "New York Medium", "Iowan Old Style", "Charter", Georgia, serif;
+  --sans:  -apple-system, "SF Pro Text", "SF Pro", system-ui, "Helvetica Neue", sans-serif;
+  --mono:  ui-monospace, "SF Mono", "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1a1a1c; color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; padding: 48px 40px 80px; }
+h1.page { font-family: var(--serif); font-weight: 400; font-size: 34px; letter-spacing: -.01em; color: #d9d2c4; }
+p.lede { color: #8b857b; font-size: 13px; margin: 6px 0 28px; max-width: 860px; line-height: 1.5; }
+.frame-label { font: 600 10.5px/1 var(--mono); letter-spacing: .14em; color: #7a7469; text-transform: uppercase; margin: 44px 0 14px; }
+
+/* ─── Window chrome ─── */
+.window { width: 1440px; height: 900px; background: var(--win); border-radius: 12px; overflow: hidden; position: relative;
+  box-shadow: 0 0 0 .5px rgba(255,255,255,.14), 0 40px 90px rgba(0,0,0,.6), 0 12px 30px rgba(0,0,0,.4);
+  display: grid; grid-template-columns: 232px 1fr 344px; grid-template-rows: 1fr 76px; }
+.traffic { position: absolute; top: 18px; left: 20px; display: flex; gap: 8px; z-index: 5; }
+.traffic i { width: 12px; height: 12px; border-radius: 50%; background: #3a3a3e; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.4); }
+.traffic i:nth-child(1){background:#ff5f57}.traffic i:nth-child(2){background:#febc2e}.traffic i:nth-child(3){background:#28c840}
+
+/* ─── Sidebar ─── */
+.sidebar { background: linear-gradient(180deg, #121215, #0f0f12); border-right: 1px solid var(--hair); padding: 58px 12px 16px; grid-row: 1 / 2; overflow: hidden; }
+.sb-sec { font: 600 10.5px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); margin: 18px 10px 8px; }
+.sb-item { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 10px; border-radius: 7px; font-size: 13px; color: var(--text-2); }
+.sb-item svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.5; opacity: .9; flex: none; }
+.sb-item.active { background: rgba(200,166,106,.12); color: var(--brass-hi); }
+.sb-item .count { margin-left: auto; font: 11px var(--mono); color: var(--text-3); }
+.sb-item .off { margin-left: auto; font: 600 9px/1 var(--mono); letter-spacing: .08em; color: var(--text-3); border: 1px solid var(--hair-2); padding: 3px 5px; border-radius: 4px; }
+.sb-item .dot { width: 6px; height: 6px; border-radius: 50%; margin-left: auto; background: var(--brass); box-shadow: 0 0 8px rgba(200,166,106,.7); }
+
+/* ─── Main content ─── */
+.main { grid-row: 1 / 2; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.toolbar { height: 58px; display: flex; align-items: center; gap: 14px; padding: 0 24px; border-bottom: 1px solid var(--hair); }
+.toolbar h2 { font-family: var(--serif); font-weight: 500; font-size: 22px; letter-spacing: -.005em; }
+.toolbar .meta { font: 11px var(--mono); color: var(--text-3); margin-top: 3px; }
+.seg { display: flex; background: var(--s2); border: 1px solid var(--hair); border-radius: 7px; padding: 2px; margin-left: auto; }
+.seg span { font-size: 12px; color: var(--text-2); padding: 4px 11px; border-radius: 5px; }
+.seg span.on { background: var(--s3); color: var(--text); box-shadow: 0 1px 0 rgba(255,255,255,.04) inset; }
+.search { width: 220px; height: 28px; border-radius: 7px; background: var(--s2); border: 1px solid var(--hair); display: flex; align-items: center; gap: 7px; padding: 0 9px; color: var(--text-3); font-size: 12.5px; }
+.search svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+.filters { display: flex; gap: 8px; padding: 14px 24px 4px; }
+.chip { font-size: 11.5px; color: var(--text-2); border: 1px solid var(--hair-2); border-radius: 999px; padding: 4px 10px; }
+.chip.on { color: var(--brass-hi); border-color: rgba(200,166,106,.45); background: rgba(200,166,106,.08); }
+.grid { overflow: hidden; display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px 22px; padding: 18px 24px 24px; }
+.card .art { aspect-ratio: 1; border-radius: 6px; position: relative; overflow: hidden; box-shadow: 0 0 0 .5px rgba(255,255,255,.08), 0 10px 26px rgba(0,0,0,.45); }
+.card .t { font-family: var(--serif); font-size: 14px; margin-top: 10px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .a { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.card .f { font: 10px var(--mono); color: var(--text-3); margin-top: 5px; letter-spacing: .03em; }
+.card .f b { color: var(--brass); font-weight: 500; }
+.card.playing .art::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1.5px var(--brass); border-radius: 6px; }
+.eq { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 2px; align-items: flex-end; height: 14px; padding: 5px; background: rgba(8,8,10,.7); border-radius: 5px; backdrop-filter: blur(8px); box-sizing: content-box; }
+.eq i { width: 2.5px; background: var(--brass-hi); border-radius: 1px; }
+
+/* Fictional generative artwork */
+.a1 { background: radial-gradient(120% 90% at 20% 15%, #3b4c63 0, #16202e 45%, #07090d 100%); }
+.a1::before { content:""; position:absolute; inset: 22% 22%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #e7d2a6, #9a7a45 55%, #3b2c17 100%); box-shadow: 0 0 60px rgba(231,205,152,.25); }
+.a2 { background: linear-gradient(160deg, #2a1414, #6b2a22 45%, #d0784d 100%); }
+.a2::before { content:""; position:absolute; left:0; right:0; top:58%; height:1px; background: rgba(255,230,200,.6); }
+.a3 { background: repeating-linear-gradient(90deg, #121212 0 14px, #1b1b1b 14px 15px), #111; }
+.a3::before { content:"III"; position:absolute; left:14px; bottom:10px; font: 400 54px var(--serif); color:#d8cfbe; }
+.a4 { background: conic-gradient(from 210deg at 70% 70%, #0d2a2b, #1f5a52, #b8c9a4, #0d2a2b); }
+.a5 { background: linear-gradient(180deg, #e9e2d3 0 62%, #1d1d1f 62%); }
+.a5::before { content:""; position:absolute; width:46%; aspect-ratio:1; border-radius:50%; left:27%; top:30%; background:#b3342a; }
+.a6 { background: radial-gradient(80% 80% at 70% 30%, #4a3b6b, #1a1428 60%, #0b0910); }
+.a6::before { content:""; position:absolute; inset:0; background: repeating-radial-gradient(circle at 70% 30%, transparent 0 9px, rgba(255,255,255,.05) 9px 10px); }
+.a7 { background: linear-gradient(135deg, #c9b38a, #8c6c3e 50%, #2e2213); }
+.a7::before { content:"Ø"; position:absolute; inset:0; display:grid; place-items:center; font: 300 86px var(--sans); color: rgba(20,14,6,.75); }
+.a8 { background: linear-gradient(0deg, #0b1a10, #1f3b24 40%, #6f8f5c 100%); }
+.a8::before { content:""; position:absolute; left:10%; right:10%; bottom:18%; height:28%; background: #0b1a10; clip-path: polygon(0 100%, 18% 30%, 32% 70%, 50% 0, 70% 60%, 84% 25%, 100% 100%); }
+.a9 { background: #101012; }
+.a9::before { content:""; position:absolute; inset:18%; border:1.5px solid #cfc6b5; transform: rotate(45deg); }
+.a10 { background: linear-gradient(200deg, #f0c27b, #4b1248); }
+.a11 { background: radial-gradient(circle at 50% 120%, #ff9a5a, #7a2e3b 45%, #150a1c 80%); }
+.a12 { background: linear-gradient(90deg, #1b2a3a 0 50%, #26394d 50%); }
+.a12::before { content:""; position:absolute; left:50%; top:15%; bottom:15%; width:1px; background: #d9c8a4; box-shadow: 0 0 20px #d9c8a4; }
+.a13 { background: repeating-linear-gradient(0deg, #2b2b2e 0 3px, #1a1a1c 3px 6px); }
+.a13::before { content:"B"; position:absolute; right:14px; top:6px; font: italic 400 64px var(--serif); color: var(--brass-hi); }
+.a14 { background: radial-gradient(60% 60% at 30% 70%, #9fb7c9, #3f5a73 50%, #121a24 100%); }
+.a15 { background: linear-gradient(45deg, #231a12, #5a4631, #231a12); }
+.a15::before { content:""; position:absolute; inset:30%; background: #e2d4b8; border-radius: 2px; transform: rotate(8deg); }
+
+/* ─── Now Playing panel ─── */
+.np { grid-row: 1 / 2; border-left: 1px solid var(--hair); background: #0c0c0e; position: relative; overflow: hidden; padding: 58px 24px 20px; }
+.np .glow { position: absolute; top: -40px; left: -60px; right: -60px; height: 520px; background: radial-gradient(55% 45% at 50% 40%, rgba(60,80,110,.38), transparent 70%), radial-gradient(40% 30% at 50% 45%, rgba(231,205,152,.10), transparent 70%); filter: blur(10px); pointer-events: none; }
+.np-h { position: relative; font: 600 10.5px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); display:flex; justify-content: space-between; }
+.np .art { position: relative; margin-top: 16px; width: 296px; height: 296px; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 .5px rgba(255,255,255,.1), 0 24px 60px rgba(0,0,0,.65); }
+.np .title { position: relative; font-family: var(--serif); font-size: 24px; line-height: 1.15; margin-top: 20px; letter-spacing: -.01em; }
+.np .artist { position: relative; font-size: 13.5px; color: var(--brass-hi); margin-top: 6px; }
+.np .album { position: relative; font-size: 12.5px; color: var(--text-2); margin-top: 2px; }
+.badges { position: relative; display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font: 600 10px/1 var(--mono); letter-spacing: .1em; padding: 6px 8px; border-radius: 5px; }
+.badge.bp { color: var(--brass-hi); background: rgba(200,166,106,.10); box-shadow: inset 0 0 0 1px rgba(200,166,106,.35); }
+.badge.bp i { width: 6px; height: 6px; border-radius: 50%; background: var(--brass-hi); box-shadow: 0 0 8px var(--brass); }
+.badge.ex { color: var(--text-2); box-shadow: inset 0 0 0 1px var(--hair-2); }
+.badge.src { color: var(--copper); box-shadow: inset 0 0 0 1px rgba(201,139,91,.45); background: rgba(201,139,91,.08); }
+.badge.src i { width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--copper); }
+.path { position: relative; margin-top: 20px; border-top: 1px solid var(--hair); padding-top: 14px; }
+.path h4 { font: 600 10.5px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; }
+.step { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: start; padding: 5px 0; position: relative; }
+.step .n { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--brass); margin: 4px 0 0 3px; background: var(--win); z-index: 1; }
+.step:not(:last-child)::before { content:""; position: absolute; left: 6.5px; top: 15px; bottom: -6px; width: 1px; background: linear-gradient(var(--brass-lo), rgba(124,101,65,.3)); }
+.step .k { font-size: 12px; color: var(--text); }
+.step .d { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.step .v { font: 11px var(--mono); color: var(--text-2); text-align: right; }
+.step .v.b { color: var(--brass-hi); }
+.step .v.c { color: var(--copper); }
+.meter { position: relative; margin-top: 14px; display: flex; gap: 2px; align-items: flex-end; height: 34px; }
+.meter i { flex: 1; background: linear-gradient(0deg, var(--brass-lo), var(--brass-hi)); border-radius: 1px; opacity: .85; }
+
+/* ─── Transport ─── */
+.transport { grid-column: 1 / 4; grid-row: 2; border-top: 1px solid var(--hair); background: linear-gradient(180deg, #121215, #0e0e10); display: grid; grid-template-columns: 340px 1fr 340px; align-items: center; padding: 0 20px; }
+.tp-now { display: flex; gap: 12px; align-items: center; }
+.tp-now .art { width: 46px; height: 46px; border-radius: 5px; position: relative; overflow: hidden; box-shadow: 0 0 0 .5px rgba(255,255,255,.1); }
+.tp-now .t { font-family: var(--serif); font-size: 14px; }
+.tp-now .a { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.tp-mid { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ctrls { display: flex; align-items: center; gap: 26px; color: var(--text-2); }
+.ctrls svg { width: 16px; height: 16px; fill: currentColor; }
+.ctrls .small svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+.play { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(180deg, var(--brass-hi), var(--brass)); color: #1a140a; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 6px 18px rgba(200,166,106,.28), inset 0 1px 0 rgba(255,255,255,.5); }
+.play svg { width: 14px; height: 14px; fill: currentColor; }
+.scrub { display: flex; align-items: center; gap: 10px; width: 560px; font: 10.5px var(--mono); color: var(--text-3); }
+.bar { flex: 1; height: 3px; background: rgba(236,230,218,.1); border-radius: 2px; position: relative; }
+.bar b { position: absolute; left: 0; top: 0; bottom: 0; width: 34%; background: var(--brass); border-radius: 2px; }
+.bar b::after { content:""; position:absolute; right:-5px; top:-3.5px; width:10px; height:10px; border-radius:50%; background: var(--brass-hi); box-shadow: 0 0 0 3px rgba(200,166,106,.18); }
+.tp-right { display: flex; justify-content: flex-end; align-items: center; gap: 14px; color: var(--text-2); }
+.device { display: flex; align-items: center; gap: 9px; padding: 6px 10px 6px 9px; border-radius: 8px; border: 1px solid var(--hair-2); background: var(--s2); }
+.device svg { width: 15px; height: 15px; stroke: var(--brass-hi); fill: none; stroke-width: 1.5; }
+.device .dn { white-space: nowrap; font-size: 12px; color: var(--text); }
+.device .df { white-space: nowrap; font: 10px var(--mono); color: var(--brass-hi); letter-spacing: .04em; }
+.device .led { width: 6px; height: 6px; border-radius: 50%; background: var(--brass-hi); box-shadow: 0 0 8px var(--brass); }
+.vol { display: flex; align-items: center; gap: 8px; font: 10px var(--mono); color: var(--text-3); }
+.vol .bar { width: 84px; flex: none; }
+.vol .bar b { width: 62%; background: var(--text-2); }
+.vol .bar b::after { display: none; }
+.icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+/* ─── Frame 2: album + inspector ─── */
+.w2 { grid-template-columns: 232px 1fr 380px; }
+.hero { display: grid; grid-template-columns: 236px 1fr; gap: 28px; padding: 26px 28px 20px; border-bottom: 1px solid var(--hair); position: relative; }
+.hero .art { width: 236px; height: 236px; border-radius: 7px; position: relative; overflow: hidden; box-shadow: 0 0 0 .5px rgba(255,255,255,.1), 0 22px 50px rgba(0,0,0,.55); }
+.hero .kicker { font: 600 10.5px/1 var(--mono); letter-spacing: .14em; color: var(--brass); margin-top: 58px; }
+.hero h1 { font-family: var(--serif); font-weight: 400; font-size: 40px; letter-spacing: -.015em; margin-top: 10px; line-height: 1.05; }
+.hero .by { font-size: 15px; color: var(--brass-hi); margin-top: 8px; }
+.hero .sub { font-size: 12.5px; color: var(--text-2); margin-top: 6px; }
+.hero .btns { display: flex; gap: 10px; margin-top: 18px; }
+.btn { height: 30px; padding: 0 14px; border-radius: 7px; display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; }
+.btn svg { width: 11px; height: 11px; fill: currentColor; }
+.btn.pri { background: linear-gradient(180deg, var(--brass-hi), var(--brass)); color: #1a140a; box-shadow: inset 0 1px 0 rgba(255,255,255,.45); }
+.btn.sec { border: 1px solid var(--hair-2); color: var(--text); background: var(--s2); }
+table.tracks { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.tracks th { font: 600 10px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--hair); }
+.tracks td { font-size: 13px; padding: 0 12px; height: 38px; border-bottom: 1px solid rgba(236,230,218,.035); color: var(--text); }
+.tracks td.n, .tracks td.fmt, .tracks td.dur { font: 11.5px var(--mono); color: var(--text-3); }
+.tracks td.fmt { color: var(--text-2); }
+.tracks tr.sel td { background: rgba(200,166,106,.10); }
+.tracks tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--brass); }
+.tracks tr.now td.t { color: var(--brass-hi); }
+.tracks .tag { font: 600 9px/1 var(--mono); letter-spacing: .08em; padding: 3px 5px; border-radius: 3px; margin-left: 8px; vertical-align: 1px; }
+.tracks .tag.warn { color: var(--copper); box-shadow: inset 0 0 0 1px rgba(201,139,91,.5); }
+.tracks .tag.ok { color: var(--brass); box-shadow: inset 0 0 0 1px rgba(200,166,106,.35); }
+.insp { grid-row: 1 / 2; border-left: 1px solid var(--hair); background: #0c0c0e; padding: 58px 0 0; display: flex; flex-direction: column; }
+.insp-tabs { display: flex; gap: 18px; padding: 0 22px; border-bottom: 1px solid var(--hair); }
+.insp-tabs span { font-size: 12.5px; color: var(--text-3); padding: 10px 0; }
+.insp-tabs span.on { color: var(--text); box-shadow: inset 0 -1.5px 0 var(--brass); }
+.insp-body { padding: 16px 22px; overflow: hidden; }
+.insp-art { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.insp-art .art { width: 84px; height: 84px; border-radius: 5px; position: relative; overflow: hidden; box-shadow: 0 0 0 .5px rgba(255,255,255,.1); }
+.insp-art .info { font-size: 11.5px; color: var(--text-2); line-height: 1.55; }
+.insp-art .info b { font: 11px var(--mono); color: var(--text); font-weight: 400; }
+.fld { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; margin-bottom: 7px; }
+.fld label { font-size: 11.5px; color: var(--text-3); text-align: right; }
+.fld .in { height: 26px; border-radius: 6px; background: var(--s2); border: 1px solid var(--hair); display: flex; align-items: center; padding: 0 9px; font-size: 12.5px; color: var(--text); }
+.fld .in.mixed { color: var(--text-3); font-style: italic; }
+.fld .in.focus { border-color: rgba(200,166,106,.6); box-shadow: 0 0 0 3px rgba(200,166,106,.14); }
+.fld .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sep { border-top: 1px solid var(--hair); margin: 12px 0; }
+.insp-foot { margin-top: auto; border-top: 1px solid var(--hair); padding: 12px 22px; display: flex; align-items: center; gap: 10px; }
+.insp-foot .note { font-size: 11px; color: var(--text-3); line-height: 1.4; flex: 1; }
+.mb-row { display:flex; gap:10px; align-items:center; padding: 10px 12px; border-radius: 7px; background: rgba(200,166,106,.06); box-shadow: inset 0 0 0 1px rgba(200,166,106,.22); margin-bottom: 14px; }
+.mb-row .mbt { font-size: 12px; color: var(--text); }
+.mb-row .mbd { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.mb-row .btn { margin-left: auto; height: 26px; font-size: 11.5px; }
+
+/* ─── Frame 3: compact surfaces ─── */
+.row3 { display: flex; gap: 36px; align-items: flex-start; }
+.desk { width: 1440px; height: 620px; border-radius: 12px; position: relative; overflow: hidden;
+  background: radial-gradient(90% 90% at 20% 10%, #27303b, #121418 60%, #0a0b0d); box-shadow: 0 0 0 .5px rgba(255,255,255,.1), 0 30px 80px rgba(0,0,0,.5); }
+.menubar { height: 30px; background: rgba(20,20,24,.55); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: flex-end; gap: 18px; padding: 0 16px; font-size: 13px; color: #e8e4dc; }
+.menubar .nx { display:flex; align-items:center; gap:7px; padding: 3px 8px; border-radius: 5px; background: rgba(255,255,255,.14); }
+.menubar .nx svg { width: 14px; height: 14px; }
+.menubar .nx span { font: 11px var(--mono); }
+.popover { position: absolute; top: 38px; right: 150px; width: 340px; border-radius: 14px; background: rgba(18,18,21,.92); backdrop-filter: blur(30px); box-shadow: 0 0 0 .5px rgba(255,255,255,.16), 0 24px 60px rgba(0,0,0,.6); padding: 16px; }
+.pop-now { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; }
+.pop-now .art { width: 64px; height: 64px; border-radius: 6px; position: relative; overflow: hidden; }
+.pop-now .t { font-family: var(--serif); font-size: 16px; }
+.pop-now .a { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.pop-sec { font: 600 10px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; color: var(--text-3); margin: 16px 0 8px; }
+.dev { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 8px 8px; border-radius: 8px; }
+.dev.on { background: rgba(200,166,106,.10); }
+.dev svg { width: 18px; height: 18px; stroke: var(--text-2); fill: none; stroke-width: 1.5; }
+.dev.on svg { stroke: var(--brass-hi); }
+.dev .dn { font-size: 12.5px; }
+.dev .dd { font: 10px var(--mono); color: var(--text-3); margin-top: 2px; }
+.dev .ck { color: var(--brass-hi); font-size: 13px; }
+.mini { position: absolute; left: 60px; bottom: 60px; width: 420px; height: 132px; border-radius: 16px; overflow: hidden; background: rgba(14,14,17,.9); backdrop-filter: blur(30px); box-shadow: 0 0 0 .5px rgba(255,255,255,.15), 0 30px 70px rgba(0,0,0,.6); display: grid; grid-template-columns: 132px 1fr; }
+.mini .art { position: relative; overflow: hidden; }
+.mini .body { padding: 14px 16px; display: flex; flex-direction: column; }
+.mini .t { font-family: var(--serif); font-size: 16px; }
+.mini .a { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.mini .ctl { margin-top: auto; display: flex; align-items: center; gap: 18px; color: var(--text-2); }
+.mini .ctl svg { width: 14px; height: 14px; fill: currentColor; }
+.mini .ctl .play { width: 30px; height: 30px; }
+.mini .ctl .play svg { width: 11px; height: 11px; }
+.mini .fmt { margin-left: auto; font: 10px var(--mono); color: var(--copper); }
+.mini .bar { position: absolute; left: 132px; right: 0; bottom: 0; height: 2px; border-radius: 0; }
+.mini .bar b { width: 58%; border-radius: 0; }
+.mini .bar b::after { display: none; }
+.sp { position: absolute; left: 540px; bottom: 60px; width: 420px; border-radius: 14px; background: rgba(16,16,19,.94); box-shadow: 0 0 0 .5px rgba(255,255,255,.15), 0 30px 70px rgba(0,0,0,.6); padding: 18px 20px; }
+.sp h3 { font-family: var(--serif); font-weight: 400; font-size: 18px; }
+.sp .sub { font-size: 11.5px; color: var(--text-3); margin-top: 3px; margin-bottom: 12px; }
+.sp .explain { font-size: 11.5px; color: var(--text-2); line-height: 1.5; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hair); }
+.sp .explain b { color: var(--copper); font-weight: 500; }
+.notes { width: 1440px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 22px; }
+.note-card { background: #141416; border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 16px 18px; font-size: 12.5px; line-height: 1.55; color: #a39c90; }
+.note-card h5 { font: 600 10.5px/1 var(--mono); letter-spacing: .12em; color: var(--brass); margin-bottom: 8px; text-transform: uppercase; }
+.swatches { display:flex; gap: 8px; margin-top: 10px; }
+.swatches i { width: 32px; height: 32px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+</style>
+</head>
+<body>
+
+<h1 class="page">Nocturne — Obsidian &amp; Brass</h1>
+<p class="lede">Design mockups for v1. Dark only. Titles set in New York, interface text in SF Pro, and technical readouts in SF Mono. Brass is the only accent. A signal-path state is shown only where it changes what you hear: <span style="color:#E7CD98">brass = bit-perfect</span>, <span style="color:#C98B5B">copper = converted</span>. All artwork and artist names are fictional placeholders.</p>
+
+<!-- ═════════════════════════════ FRAME 1 ═════════════════════════════ -->
+<div class="frame-label">01 · Library — Albums · playing bit-perfect to FiiO K11</div>
+<div class="window">
+  <div class="traffic"><i></i><i></i><i></i></div>
+
+  <aside class="sidebar">
+    <div class="sb-sec">Library</div>
+    <div class="sb-item active"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Albums<span class="count">412</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.8"/><path d="M2.5 14c.8-3 3-4.4 5.5-4.4s4.7 1.4 5.5 4.4"/></svg>Artists<span class="count">188</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M6 12.5V3.5l7-1.5v9"/><circle cx="4.3" cy="12.5" r="1.8"/><circle cx="11.3" cy="11" r="1.8"/></svg>Songs<span class="count">5,236</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M3 13V3M3 3h8l-2 3 2 3H3"/></svg>Composers</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>Recently Added</div>
+
+    <div class="sb-sec">Playlists</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>Late Evening</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>Reference Tracks</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M8 2l1.7 3.9 4.1.4-3.1 2.7.9 4.1L8 11l-3.6 2.1.9-4.1L2.2 6.3l4.1-.4z"/></svg>Hi-Res ≥ 96 kHz<span class="count">⚙︎</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M8 2l1.7 3.9 4.1.4-3.1 2.7.9 4.1L8 11l-3.6 2.1.9-4.1L2.2 6.3l4.1-.4z"/></svg>Suspect Upsamples<span class="count">⚙︎</span></div>
+
+    <div class="sb-sec">Sources</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M2 4.5h4l1.5 1.5H14v7H2z"/></svg>~/Music/Lossless<span class="dot"></span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="8" rx="1.5"/><circle cx="11.5" cy="8" r=".8"/></svg>Archive SSD</div>
+    <div class="sb-item" style="opacity:.55"><svg viewBox="0 0 16 16"><rect x="2" y="4" width="12" height="8" rx="1.5"/><circle cx="11.5" cy="8" r=".8"/></svg>NAS · DSD<span class="off">OFFLINE</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <div><h2>Albums</h2><div class="meta">412 albums · 5,236 tracks · 1.94 TB</div></div>
+      <div class="seg"><span class="on">Grid</span><span>List</span></div>
+      <div class="seg" style="margin-left:0"><span class="on">Artist</span><span>Year</span><span>Added</span></div>
+      <div class="search"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search library</div>
+    </div>
+    <div class="filters">
+      <span class="chip on">All formats</span><span class="chip">FLAC</span><span class="chip">WAV / AIFF</span><span class="chip">ALAC</span><span class="chip">DSD</span><span class="chip">≥ 24-bit</span><span class="chip">≥ 96 kHz</span>
+    </div>
+    <div class="grid">
+      <div class="card playing"><div class="art a1"><div class="eq"><i style="height:6px"></i><i style="height:13px"></i><i style="height:9px"></i><i style="height:11px"></i></div></div><div class="t">Nocturnes in Graphite</div><div class="a">Elena Voss</div><div class="f"><b>FLAC</b> · 24/192</div></div>
+      <div class="card"><div class="art a2"></div><div class="t">Horizon Line</div><div class="a">The Amber Quartet</div><div class="f">FLAC · 24/96</div></div>
+      <div class="card"><div class="art a3"></div><div class="t">Sessions III</div><div class="a">Marlowe Trio</div><div class="f">WAV · 24/88.2</div></div>
+      <div class="card"><div class="art a4"></div><div class="t">Tidewater</div><div class="a">Keiko Aran</div><div class="f">ALAC · 16/44.1</div></div>
+      <div class="card"><div class="art a5"></div><div class="t">Rising Sun Suite</div><div class="a">Oslo Chamber Players</div><div class="f"><b>DSD128</b> · 5.6 MHz</div></div>
+      <div class="card"><div class="art a6"></div><div class="t">Violet Hours</div><div class="a">Nadia Kerr</div><div class="f">FLAC · 24/48</div></div>
+      <div class="card"><div class="art a7"></div><div class="t">Null Set</div><div class="a">Øresund</div><div class="f">AIFF · 24/96</div></div>
+      <div class="card"><div class="art a8"></div><div class="t">Evergreen Ridge</div><div class="a">Harlan Moss</div><div class="f">FLAC · 16/44.1</div></div>
+      <div class="card"><div class="art a9"></div><div class="t">Rhombus</div><div class="a">Pale Geometry</div><div class="f">WavPack · 24/192</div></div>
+      <div class="card"><div class="art a10"></div><div class="t">Coastal Drive</div><div class="a">Sunset Arcade</div><div class="f">FLAC · 24/44.1</div></div>
+      <div class="card"><div class="art a11"></div><div class="t">Ember Season</div><div class="a">Lior Adams</div><div class="f">FLAC · 24/96</div></div>
+      <div class="card"><div class="art a12"></div><div class="t">Meridian Split</div><div class="a">Two Rooms</div><div class="f">ALAC · 24/48</div></div>
+      <div class="card"><div class="art a13"></div><div class="t">Baritone Studies</div><div class="a">Colm Hart</div><div class="f"><b>DSD64</b> · 2.8 MHz</div></div>
+      <div class="card"><div class="art a14"></div><div class="t">Glass Harbour</div><div class="a">Ines Moreau</div><div class="f">FLAC · 24/176.4</div></div>
+      <div class="card"><div class="art a15"></div><div class="t">Paper Letters</div><div class="a">The Quiet Hours</div><div class="f">MP3 · 320k</div></div>
+    </div>
+  </main>
+
+  <aside class="np">
+    <div class="glow"></div>
+    <div class="np-h"><span>Now Playing</span><span>2 of 7</span></div>
+    <div class="art a1"></div>
+    <div class="title">Étude for a Sleeping City</div>
+    <div class="artist">Elena Voss</div>
+    <div class="album">Nocturnes in Graphite · 2023</div>
+    <div class="badges">
+      <span class="badge bp"><i></i>BIT-PERFECT</span>
+      <span class="badge ex">EXCLUSIVE</span>
+      <span class="badge ex">24 / 192</span>
+    </div>
+    <div class="path">
+      <h4>Signal Path</h4>
+      <div class="step"><span class="n"></span><div><div class="k">Source</div><div class="d">FLAC · lossless · stereo</div></div><div class="v">24-bit · 192 kHz</div></div>
+      <div class="step"><span class="n"></span><div><div class="k">Decoder</div><div class="d">libFLAC 1.5 · integer → 32f</div></div><div class="v">lossless</div></div>
+      <div class="step"><span class="n"></span><div><div class="k">Sample rate</div><div class="d">Device switched to match source</div></div><div class="v b">192 kHz · native</div></div>
+      <div class="step"><span class="n"></span><div><div class="k">Volume</div><div class="d">DAC hardware control</div></div><div class="v b">unity · 0.0 dB</div></div>
+      <div class="step"><span class="n"></span><div><div class="k">FiiO K11</div><div class="d">USB · exclusive (hog) · int 24</div></div><div class="v b">24-bit · 192 kHz</div></div>
+    </div>
+    <div class="meter">
+      <i style="height:40%"></i><i style="height:62%"></i><i style="height:78%"></i><i style="height:88%"></i><i style="height:72%"></i><i style="height:80%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:61%"></i><i style="height:52%"></i><i style="height:47%"></i><i style="height:50%"></i><i style="height:41%"></i><i style="height:36%"></i><i style="height:33%"></i><i style="height:28%"></i><i style="height:24%"></i><i style="height:22%"></i><i style="height:18%"></i><i style="height:15%"></i><i style="height:12%"></i><i style="height:10%"></i><i style="height:8%"></i><i style="height:7%"></i><i style="height:6%"></i><i style="height:5%"></i><i style="height:4%"></i><i style="height:4%"></i>
+    </div>
+  </aside>
+
+  <footer class="transport">
+    <div class="tp-now"><div class="art a1"></div><div><div class="t">Étude for a Sleeping City</div><div class="a">Elena Voss — Nocturnes in Graphite</div></div></div>
+    <div class="tp-mid">
+      <div class="ctrls">
+        <span class="small"><svg viewBox="0 0 16 16"><path d="M2 5h3l6 6h3M2 11h3l6-6h3M12 3l2 2-2 2M12 9l2 2-2 2"/></svg></span>
+        <svg viewBox="0 0 16 16"><path d="M3 3h1.5v10H3zM14 3v10L5.5 8z"/></svg>
+        <span class="play"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx=".6"/><rect x="9.5" y="2.5" width="3" height="11" rx=".6"/></svg></span>
+        <svg viewBox="0 0 16 16"><path d="M13 3h-1.5v10H13zM2 3v10l8.5-5z"/></svg>
+        <span class="small"><svg viewBox="0 0 16 16"><path d="M3 6.5V5a1.5 1.5 0 0 1 1.5-1.5H13M11 1.5l2 2-2 2M13 9.5V11a1.5 1.5 0 0 1-1.5 1.5H3M5 14.5l-2-2 2-2"/></svg></span>
+      </div>
+      <div class="scrub"><span>2:41</span><div class="bar"><b></b></div><span>−5:12</span></div>
+    </div>
+    <div class="tp-right">
+      <div class="device"><svg viewBox="0 0 16 16"><rect x="2" y="5" width="12" height="7" rx="1.5"/><circle cx="11" cy="8.5" r="1.6"/><path d="M4.5 8.5h3"/></svg><div><div class="dn">FiiO K11</div><div class="df">24/192 · EXCL</div></div><span class="led"></span></div>
+      <div class="vol"><svg viewBox="0 0 16 16" width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:1.5"><path d="M2.5 6h2.5L8.5 3v10L5 10H2.5z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg><div class="bar"><b></b></div><span>HW</span></div>
+      <span class="icon-btn"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7M12 10.5v4M10 12.5h4"/></svg></span>
+      <span class="icon-btn"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><rect x="8" y="8" width="5" height="4" rx=".8"/></svg></span>
+    </div>
+  </footer>
+</div>
+
+<!-- ═════════════════════════════ FRAME 2 ═════════════════════════════ -->
+<div class="frame-label">02 · Album detail + metadata inspector · 3 tracks selected (batch edit)</div>
+<div class="window w2">
+  <div class="traffic"><i></i><i></i><i></i></div>
+  <aside class="sidebar">
+    <div class="sb-sec">Library</div>
+    <div class="sb-item active"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Albums<span class="count">412</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><circle cx="8" cy="5.5" r="2.8"/><path d="M2.5 14c.8-3 3-4.4 5.5-4.4s4.7 1.4 5.5 4.4"/></svg>Artists<span class="count">188</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M6 12.5V3.5l7-1.5v9"/><circle cx="4.3" cy="12.5" r="1.8"/><circle cx="11.3" cy="11" r="1.8"/></svg>Songs<span class="count">5,236</span></div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M3 13V3M3 3h8l-2 3 2 3H3"/></svg>Composers</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>Recently Added</div>
+    <div class="sb-sec">Playlists</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>Late Evening</div>
+    <div class="sb-item"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7"/></svg>Reference Tracks</div>
+  </aside>
+  <main class="main">
+    <div class="toolbar"><div><h2 style="font-size:15px;font-family:var(--sans);font-weight:500;color:var(--text-2)">‹ Albums</h2></div><div class="search" style="margin-left:auto"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>Search library</div></div>
+    <div class="hero">
+      <div class="art a2"></div>
+      <div>
+        <div class="kicker">ALBUM · 2021 · 7 TRACKS · 48 MIN</div>
+        <h1>Horizon Line</h1>
+        <div class="by">The Amber Quartet</div>
+        <div class="sub">Chamber Jazz · FLAC 24-bit / 96 kHz · 1.21 GB · ~/Music/Lossless</div>
+        <div class="btns"><span class="btn pri"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>Play</span><span class="btn sec">Shuffle</span><span class="btn sec">Look up on MusicBrainz</span></div>
+      </div>
+    </div>
+    <div style="padding: 0 16px">
+    <table class="tracks">
+      <tr><th style="width:40px">#</th><th>Title</th><th>Format</th><th style="text-align:right;width:70px">Time</th></tr>
+      <tr><td class="n">1</td><td class="t">First Light</td><td class="fmt">FLAC 24/96</td><td class="dur" style="text-align:right">6:12</td></tr>
+      <tr class="sel"><td class="n">2</td><td class="t">Salt Air</td><td class="fmt">FLAC 24/96 <span class="tag ok">TRUE 24</span></td><td class="dur" style="text-align:right">7:48</td></tr>
+      <tr class="sel"><td class="n">3</td><td class="t">Long Exposure</td><td class="fmt">FLAC 24/96</td><td class="dur" style="text-align:right">5:31</td></tr>
+      <tr class="sel"><td class="n">4</td><td class="t">Undertow</td><td class="fmt">FLAC 24/96 <span class="tag warn">16-BIT PADDED</span></td><td class="dur" style="text-align:right">8:05</td></tr>
+      <tr class="now"><td class="n" style="color:var(--brass)">▶</td><td class="t">Horizon Line</td><td class="fmt">FLAC 24/96</td><td class="dur" style="text-align:right">9:14</td></tr>
+      <tr><td class="n">6</td><td class="t">Marine Layer</td><td class="fmt">FLAC 24/96</td><td class="dur" style="text-align:right">4:57</td></tr>
+      <tr><td class="n">7</td><td class="t">Last Ferry</td><td class="fmt">FLAC 24/96</td><td class="dur" style="text-align:right">6:40</td></tr>
+    </table>
+    </div>
+  </main>
+  <aside class="insp">
+    <div class="insp-tabs"><span class="on">Details</span><span>Artwork</span><span>File</span><span>Analysis</span><span>Lyrics</span></div>
+    <div class="insp-body">
+      <div class="insp-art"><div class="art a2"></div><div class="info"><b>3 tracks selected</b><br>FLAC · 24-bit · 96 kHz · stereo<br>Front cover · 1400×1400 JPEG<br>Mixed values shown in italics</div></div>
+      <div class="mb-row"><div><div class="mbt">MusicBrainz match · 98%</div><div class="mbd">Horizon Line — 2021 · 7 tracks · CD+Digital</div></div><span class="btn sec">Review</span></div>
+      <div class="fld"><label>Title</label><div class="in mixed">Mixed</div></div>
+      <div class="fld"><label>Artist</label><div class="in focus">The Amber Quartet</div></div>
+      <div class="fld"><label>Album</label><div class="in">Horizon Line</div></div>
+      <div class="fld"><label>Album Artist</label><div class="in">The Amber Quartet</div></div>
+      <div class="fld"><label>Composer</label><div class="in">R. Adeyemi</div></div>
+      <div class="fld"><label>Genre</label><div class="in">Chamber Jazz</div></div>
+      <div class="fld"><label>Year</label><div class="in">2021</div></div>
+      <div class="fld"><label>Label</label><div class="in">Tessellate Records</div></div>
+      <div class="fld"><label>Track</label><div class="row2"><div class="in mixed">Mixed</div><div class="in">of 7</div></div></div>
+      <div class="fld"><label>Disc</label><div class="row2"><div class="in">1</div><div class="in">of 1</div></div></div>
+      <div class="sep"></div>
+      <div class="fld"><label>ReplayGain</label><div class="in" style="font-family:var(--mono);font-size:11.5px;color:var(--text-2)">album −6.84 dB · peak 0.981</div></div>
+      <div class="fld"><label>Custom</label><div class="in" style="font-family:var(--mono);font-size:11.5px;color:var(--text-2)">RECORDING_LOCATION = Oslo</div></div>
+    </div>
+    <div class="insp-foot"><div class="note">Writes Vorbis comments to 3 files · backup kept 30 days</div><span class="btn sec">Revert</span><span class="btn pri">Save</span></div>
+  </aside>
+  <footer class="transport">
+    <div class="tp-now"><div class="art a2"></div><div><div class="t">Horizon Line</div><div class="a">The Amber Quartet — Horizon Line</div></div></div>
+    <div class="tp-mid">
+      <div class="ctrls">
+        <span class="small"><svg viewBox="0 0 16 16"><path d="M2 5h3l6 6h3M2 11h3l6-6h3M12 3l2 2-2 2M12 9l2 2-2 2"/></svg></span>
+        <svg viewBox="0 0 16 16"><path d="M3 3h1.5v10H3zM14 3v10L5.5 8z"/></svg>
+        <span class="play"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx=".6"/><rect x="9.5" y="2.5" width="3" height="11" rx=".6"/></svg></span>
+        <svg viewBox="0 0 16 16"><path d="M13 3h-1.5v10H13zM2 3v10l8.5-5z"/></svg>
+        <span class="small"><svg viewBox="0 0 16 16"><path d="M3 6.5V5a1.5 1.5 0 0 1 1.5-1.5H13M11 1.5l2 2-2 2M13 9.5V11a1.5 1.5 0 0 1-1.5 1.5H3M5 14.5l-2-2 2-2"/></svg></span>
+      </div>
+      <div class="scrub"><span>4:02</span><div class="bar"><b style="width:44%"></b></div><span>−5:12</span></div>
+    </div>
+    <div class="tp-right">
+      <div class="device"><svg viewBox="0 0 16 16"><rect x="2" y="5" width="12" height="7" rx="1.5"/><circle cx="11" cy="8.5" r="1.6"/><path d="M4.5 8.5h3"/></svg><div><div class="dn">FiiO K11</div><div class="df">24/96 · EXCL</div></div><span class="led"></span></div>
+      <div class="vol"><svg viewBox="0 0 16 16" width="14" height="14" style="stroke:currentColor;fill:none;stroke-width:1.5"><path d="M2.5 6h2.5L8.5 3v10L5 10H2.5z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/></svg><div class="bar"><b></b></div><span>HW</span></div>
+      <span class="icon-btn"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h7M12 10.5v4M10 12.5h4"/></svg></span>
+      <span class="icon-btn"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><rect x="8" y="8" width="5" height="4" rx=".8"/></svg></span>
+    </div>
+  </footer>
+</div>
+
+<!-- ═════════════════════════════ FRAME 3 ═════════════════════════════ -->
+<div class="frame-label">03 · Menu bar extra · Mini player · Signal path when resampling to AirPods Max over USB-C</div>
+<div class="desk">
+  <div class="menubar">
+    <span class="nx"><svg viewBox="0 0 16 16" fill="none" stroke="#E7CD98" stroke-width="1.5"><path d="M3 11V5M6 13V3M9 10V6M12 12V4"/></svg><span>24/48</span></span>
+    <span style="opacity:.8">Wi‑Fi</span><span style="opacity:.8">Control Center</span><span>Sun 27 Sep  21:14</span>
+  </div>
+  <div class="popover">
+    <div class="pop-now"><div class="art a4"></div><div><div class="t">Low Tide, Early</div><div class="a">Keiko Aran — Tidewater</div></div></div>
+    <div class="scrub" style="width:auto;margin-top:12px"><span>1:08</span><div class="bar"><b style="width:26%"></b></div><span>−3:19</span></div>
+    <div class="ctrls" style="justify-content:center;margin-top:10px">
+      <svg viewBox="0 0 16 16"><path d="M3 3h1.5v10H3zM14 3v10L5.5 8z"/></svg>
+      <span class="play"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx=".6"/><rect x="9.5" y="2.5" width="3" height="11" rx=".6"/></svg></span>
+      <svg viewBox="0 0 16 16"><path d="M13 3h-1.5v10H13zM2 3v10l8.5-5z"/></svg>
+    </div>
+    <div class="pop-sec">Output</div>
+    <div class="dev on"><svg viewBox="0 0 20 20"><path d="M4 11V9a6 6 0 0 1 12 0v2"/><rect x="2.5" y="10.5" width="4" height="6" rx="1.5"/><rect x="13.5" y="10.5" width="4" height="6" rx="1.5"/></svg><div><div class="dn">AirPods Max</div><div class="dd">USB-C · LOSSLESS · 24/48 only</div></div><span class="ck">✓</span></div>
+    <div class="dev"><svg viewBox="0 0 20 20"><rect x="3" y="6" width="14" height="9" rx="2"/><circle cx="13" cy="10.5" r="2"/></svg><div><div class="dn">FiiO K11</div><div class="dd">USB · up to 32/384 · DSD via DoP</div></div><span></span></div>
+    <div class="dev"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="10" rx="1.5"/><path d="M7 17h6"/></svg><div><div class="dn">MacBook Pro Speakers</div><div class="dd">BUILT-IN · 44.1–96 kHz</div></div><span></span></div>
+  </div>
+
+  <div class="mini">
+    <div class="art a4"></div>
+    <div class="body">
+      <div class="t">Low Tide, Early</div>
+      <div class="a">Keiko Aran</div>
+      <div class="ctl">
+        <svg viewBox="0 0 16 16"><path d="M3 3h1.5v10H3zM14 3v10L5.5 8z"/></svg>
+        <span class="play"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx=".6"/><rect x="9.5" y="2.5" width="3" height="11" rx=".6"/></svg></span>
+        <svg viewBox="0 0 16 16"><path d="M13 3h-1.5v10H13zM2 3v10l8.5-5z"/></svg>
+        <span class="fmt">44.1 → 48 kHz</span>
+      </div>
+    </div>
+    <div class="bar"><b></b></div>
+  </div>
+
+  <div class="sp">
+    <h3>Signal Path</h3>
+    <div class="sub">AirPods Max · USB-C lossless</div>
+    <div class="badges" style="margin:0 0 12px"><span class="badge src"><i></i>RESAMPLED</span><span class="badge ex">EXCLUSIVE</span><span class="badge ex">24 / 48</span></div>
+    <div class="step"><span class="n"></span><div><div class="k">Source</div><div class="d">ALAC · lossless · stereo</div></div><div class="v">16-bit · 44.1 kHz</div></div>
+    <div class="step"><span class="n"></span><div><div class="k">Sample rate converter</div><div class="d">Mastering-grade · linear phase</div></div><div class="v c">44.1 → 48 kHz</div></div>
+    <div class="step"><span class="n"></span><div><div class="k">Word length</div><div class="d">16 → 24-bit, zero-padded (lossless)</div></div><div class="v">24-bit</div></div>
+    <div class="step"><span class="n"></span><div><div class="k">AirPods Max</div><div class="d">USB-C · exclusive · device volume</div></div><div class="v b">24-bit · 48 kHz</div></div>
+    <div class="explain">AirPods Max accept only <b>24-bit / 48 kHz</b> over USB-C, so 44.1 kHz material has to be converted. Tracks already at 48 kHz play bit-perfect.</div>
+  </div>
+</div>
+
+<div class="notes">
+  <div class="note-card"><h5>Palette</h5>Obsidian surfaces are layered from #09090A up to #1C1C21 and separated by 7% warm hairlines. Text is warm ivory, never pure white. Brass is used only for active state, playback and bit-perfect status.
+    <div class="swatches"><i style="background:#09090A"></i><i style="background:#111114"></i><i style="background:#1C1C21"></i><i style="background:#ECE6DA"></i><i style="background:#A29B8F"></i><i style="background:#C8A66A"></i><i style="background:#E7CD98"></i><i style="background:#C98B5B"></i></div></div>
+  <div class="note-card"><h5>Type</h5>New York for anything with a name: albums, tracks, artists in the hero. SF Pro for interface text. SF Mono for every number that describes the signal (sample rate, bit depth, gain) so the digits line up and read like instrument markings.</div>
+  <div class="note-card"><h5>Truthful status</h5>The BIT-PERFECT badge appears only when source rate = device rate, volume is at unity or on the hardware, there is no DSP, and the device is held exclusively. Every other state says in copper exactly what was changed.</div>
+</div>
+
+</body>
+</html>
