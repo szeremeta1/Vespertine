@@ -51,6 +51,9 @@ public struct SignalPath: Sendable, Hashable {
     /// One-line state for badges and the menu bar.
     public var statusLine: String {
         if isBitPerfect { return plan.mode == .dop ? "NATIVE DSD · DoP" : "BIT-PERFECT" }
+        if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
+            return deviceProfile.kind == .airPlay ? "AIRPLAY" : "BLUETOOTH · LOSSY"
+        }
         if plan.dsdConvertedToPCM { return "DSD → PCM" }
         if isResampling { return "RESAMPLED" }
         if source.encoding == .lossy { return "LOSSY SOURCE" }

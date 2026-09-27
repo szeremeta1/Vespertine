@@ -87,6 +87,8 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
     public var summary: String
     /// Long-term average spectrum, 256 log-spaced points 20 Hz…Nyquist, dBFS.
     public var spectrum: [Float]
+    /// How much audio was actually decoded and inspected.
+    public var secondsAnalyzed: Double = 0
 }
 
 public enum FileAnalyzer {
@@ -207,7 +209,8 @@ public enum FileAnalyzer {
 
         return FileAnalysis(claimedBitDepth: format.bitDepth, effectiveBitDepth: effective, sampleRate: format.sampleRate,
                             bandwidthHz: bandwidth, peakDBFS: peak > 0 ? 20 * log10(Double(peak)) : -.infinity,
-                            clippedSamples: clipped, verdict: verdict, summary: summary, spectrum: spectrum)
+                            clippedSamples: clipped, verdict: verdict, summary: summary, spectrum: spectrum,
+                            secondsAnalyzed: framesDone / format.sampleRate)
     }
 
     /// Highest frequency whose smoothed level is clearly above the top-band noise floor.

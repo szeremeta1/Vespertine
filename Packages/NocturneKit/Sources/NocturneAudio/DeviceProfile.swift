@@ -24,8 +24,16 @@ public struct DeviceProfile: Sendable, Hashable {
     /// Whether a bit-perfect path to the transducer is possible at all.
     public var canBeBitPerfect: Bool
     public var symbol: String
+    /// Plain-language connection, e.g. "USB", "USB-C (lossless)", "Bluetooth".
+    public var connection: String = ""
 
     public static func detect(_ device: OutputDevice) -> DeviceProfile {
+        var profile = classify(device)
+        profile.connection = profile.kind == .airPodsMaxUSB ? "USB-C (lossless)" : device.transport.label
+        return profile
+    }
+
+    private static func classify(_ device: OutputDevice) -> DeviceProfile {
         let name = device.name.lowercased()
         let isAirPodsMax = name.contains("airpods max")
 
