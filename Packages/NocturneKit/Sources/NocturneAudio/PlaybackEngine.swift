@@ -272,9 +272,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 if let item { parked = (item, position) }
                 state = parked == nil ? .stopped : .paused
                 emit(.deviceLost(device.name))
-            } else if settings.deviceUID == nil, let def = DeviceQuery.defaultOutputDeviceID(), def != device.id, state != .stopped {
-                restartFromCurrentPosition() // following the system default
             }
+            // Deliberately *not* following system-default changes mid-playback: hogging the default device makes
+            // macOS move the default elsewhere, and chasing it would restart playback in a loop. The new default
+            // is picked up at the next play.
         }
     }
 
@@ -283,6 +284,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func resolveDevice() -> OutputDevice? {
         let devices = DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
         if let uid = settings.deviceUID, let chosen = devices.first(where: { $0.uid == uid }) { return chosen }
+        // Following the default: stay on the device we already hold (our hog moved the system default away from it).
+        if settings.deviceUID == nil, let current = sessionDevice, let alive = devices.first(where: { $0.id == current.id }) { return alive }
         return devices.first(where: \.isDefault) ?? devices.first
     }
 

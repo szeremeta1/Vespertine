@@ -57,6 +57,24 @@ To launch against an isolated test library, so your real one is untouched:
 build/DD/Build/Products/Release/Nocturne.app/Contents/MacOS/Nocturne -NocturneDataDirectory /tmp/nocturne-test -NocturneAddSource ~/Desktop/NocturneDemo
 ```
 
+### Hardware verification
+
+`nocturne-probe` drives the real engine against a device and reads back what Core Audio actually did (nominal rate, physical format, hog owner):
+
+```bash
+cd Packages/NocturneKit && swift build -c release --product nocturne-probe
+```
+
+```bash
+.build/release/nocturne-probe list
+```
+
+```bash
+.build/release/nocturne-probe play "FiiO K11" 3 ~/Music/a.flac ~/Music/b.flac
+```
+
+`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the bit-depth and bandwidth analysis.
+
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
 ## Layout

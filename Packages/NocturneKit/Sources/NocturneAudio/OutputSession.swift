@@ -167,8 +167,18 @@ public enum DeviceControl {
                 let same = current.map { $0.mSampleRate == best.mSampleRate && $0.mBitsPerChannel == best.mBitsPerChannel
                     && $0.mFormatFlags == best.mFormatFlags && $0.mChannelsPerFrame == best.mChannelsPerFrame } ?? false
                 if !same {
-                    do { try HAL.set(stream, .global(kAudioStreamPropertyPhysicalFormat), best) }
-                    catch { log.error("physical format change refused: \(String(describing: error))") }
+                    do {
+                        try HAL.set(stream, .global(kAudioStreamPropertyPhysicalFormat), best)
+                        // Physical format changes are asynchronous: wait until the hardware reports it.
+                        let deadline = Date().addingTimeInterval(2)
+                        while Date() < deadline {
+                            let now = try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription())
+                            if let now, now.mBitsPerChannel == best.mBitsPerChannel, abs(now.mSampleRate - rate) < 0.5 { break }
+                            usleep(10_000)
+                        }
+                    } catch {
+                        log.error("physical format change refused: \(String(describing: error))")
+                    }
                 }
             }
         }

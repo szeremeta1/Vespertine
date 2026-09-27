@@ -163,7 +163,7 @@ struct SignalPathView: View {
         }
         let a = path.applied
         s.append(Step(title: path.deviceName,
-                      detail: "\(path.deviceProfile.tag.capitalized) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)",
+                      detail: "\(path.deviceProfile.connection) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)",
                       value: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz",
                       tone: path.isBitPerfect ? .good : .plain))
         return s

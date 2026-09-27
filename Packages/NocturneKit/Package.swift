@@ -53,6 +53,8 @@ let package = Package(
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
             ]
         ),
+        // Hardware verification: drives the real engine against a device and reads back what Core Audio did.
+        .executableTarget(name: "nocturne-probe", dependencies: ["NocturneAudio"]),
         .testTarget(name: "NocturneAudioTests", dependencies: ["NocturneAudio", "CNocturneRT"]),
         .testTarget(name: "NocturneLibraryTests", dependencies: ["NocturneLibrary"]),
     ],
