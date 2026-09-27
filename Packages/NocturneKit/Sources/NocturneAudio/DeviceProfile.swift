@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import IOKit
 
 public struct DeviceProfile: Sendable, Hashable {
     public enum Kind: String, Sendable {
@@ -45,9 +46,12 @@ public struct DeviceProfile: Sendable, Hashable {
                 canBeBitPerfect: true, symbol: "headphones")
         case .bluetooth, .bluetoothLE:
             if isAirPodsMax {
+                let cabled = USBRegistry.isConnected(productContaining: "AirPods Max")
                 return DeviceProfile(
-                    kind: .airPodsMaxBluetooth, tag: "BLUETOOTH · AAC",
-                    note: "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz.",
+                    kind: .airPodsMaxBluetooth, tag: cabled ? "BLUETOOTH · CABLE IDLE" : "BLUETOOTH · AAC",
+                    note: cabled
+                        ? "The USB-C cable is connected, but macOS is still sending audio over Bluetooth (AAC, lossy). Disconnect the AirPods from Bluetooth, or quit apps using their microphone, and the lossless USB output will appear."
+                        : "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz.",
                     canBeBitPerfect: false, symbol: "headphones")
             }
             return DeviceProfile(
@@ -68,5 +72,22 @@ public struct DeviceProfile: Sendable, Hashable {
             return DeviceProfile(kind: .other, tag: device.transport.label.uppercased(), note: nil, canBeBitPerfect: true,
                                  symbol: "speaker.wave.2")
         }
+    }
+}
+
+/// Minimal IOKit lookup: is a USB device with this product name attached?
+enum USBRegistry {
+    static func isConnected(productContaining name: String) -> Bool {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOUSBHostDevice"), &iterator) == KERN_SUCCESS else { return false }
+        defer { IOObjectRelease(iterator) }
+        while case let service = IOIteratorNext(iterator), service != 0 {
+            defer { IOObjectRelease(service) }
+            if let product = IORegistryEntryCreateCFProperty(service, "USB Product Name" as CFString, kCFAllocatorDefault, 0)?
+                .takeRetainedValue() as? String, product.localizedCaseInsensitiveContains(name) {
+                return true
+            }
+        }
+        return false
     }
 }
