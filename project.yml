@@ -1,0 +1,62 @@
+name: Nocturne
+options:
+  bundleIdPrefix: org.nocturne
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+packages:
+  NocturneKit:
+    path: Packages/NocturneKit
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEAD_CODE_STRIPPING: YES
+targets:
+  Nocturne:
+    type: application
+    platform: macOS
+    sources:
+      - path: App/Sources
+      - path: App/Resources
+    dependencies:
+      - package: NocturneKit
+        product: NocturneAudio
+      - package: NocturneKit
+        product: NocturneLibrary
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleName: Nocturne
+        CFBundleDisplayName: Nocturne
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.music
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSHumanReadableCopyright: "Copyright © 2026 Nocturne contributors. Free software under the GNU GPL v3."
+        NSAppleEventsUsageDescription: "Nocturne responds to media keys and Now Playing controls."
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Audio File
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [public.audio, org.xiph.flac, com.microsoft.waveform-audio, public.aiff-audio, public.mp3, com.apple.m4a-audio]
+    entitlements:
+      path: App/Nocturne.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nocturne.Nocturne
+        PRODUCT_NAME: Nocturne
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_STRICT_CONCURRENCY: complete
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+        COMBINE_HIDPI_IMAGES: YES

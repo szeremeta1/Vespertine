@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "design-mockups",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/szeremeta/Desktop/Projects/Nocturne/docs/design"],
+      "port": 8765
+    }
+  ]
+}
