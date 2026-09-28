@@ -60,6 +60,8 @@ final class PlayerController {
     private(set) var position: TimeInterval = 0
     private(set) var duration: TimeInterval = 0
     private(set) var signalPath: SignalPath?
+    /// Set while macOS renders the track itself (Dolby Atmos).
+    private(set) var systemRendering: SystemRendering?
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
@@ -332,6 +334,7 @@ final class PlayerController {
         }
         if stateChanged { updateNowPlayingInfo() }
         if signalPath != snap.signalPath { signalPath = snap.signalPath }
+        if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
         }

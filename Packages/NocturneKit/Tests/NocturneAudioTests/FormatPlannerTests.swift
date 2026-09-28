@@ -126,3 +126,39 @@ struct FormatPlannerTests {
         #expect(SampleRate.format(352_800) == "352.8")
     }
 }
+
+@Suite("Bitstream planning")
+struct BitstreamPlanningTests {
+    private func lossy(_ codec: String, _ rate: Double, channels: Int = 6) -> SourceFormat {
+        SourceFormat(encoding: .lossy, codec: codec, sampleRate: rate, bitDepth: nil, channels: channels)
+    }
+    /// An HDMI output to a receiver: 32–192 kHz, 16/24-bit, 8 channels.
+    private let hdmi = DeviceCapabilities(sampleRates: [32_000, 44_100, 48_000, 88_200, 96_000, 176_400, 192_000],
+                                          physicalFormats: [16, 24].map { PhysicalFormat(minRate: 32_000, maxRate: 192_000, bitDepth: $0, isInteger: true, isMixable: true, channels: 8) },
+                                          outputChannels: 8, supportsDoP: false)
+    /// S/PDIF (optical): up to 96 kHz, stereo.
+    private let spdif = DeviceCapabilities(sampleRates: [44_100, 48_000, 96_000],
+                                           physicalFormats: [PhysicalFormat(minRate: 44_100, maxRate: 96_000, bitDepth: 24, isInteger: true, isMixable: true, channels: 2)],
+                                           outputChannels: 2, supportsDoP: false)
+
+    @Test("Dolby and DTS go out untouched to a receiver, at the carrier rate", arguments: [
+        ("Dolby Digital", 48_000.0, 48_000.0), ("Dolby Digital Plus", 48_000, 192_000), ("Dolby Atmos", 48_000, 192_000), ("DTS", 44_100, 44_100),
+    ])
+    func toReceiver(codec: String, rate: Double, carrier: Double) {
+        let plan = FormatPlanner.plan(source: lossy(codec, rate), device: hdmi, spatial: .headTracked, bitstream: true)
+        #expect(plan.mode == .bitstream)
+        #expect(plan.deviceSampleRate == carrier && plan.channels == 2 && plan.spatial == .off && plan.isPassthrough)
+    }
+
+    @Test("Dolby Digital Plus needs 192 kHz: over S/PDIF it's decoded instead")
+    func eac3NeedsHDMI() {
+        #expect(FormatPlanner.plan(source: lossy("Dolby Digital Plus", 48_000), device: spdif, bitstream: true).mode == .pcm)
+        #expect(FormatPlanner.plan(source: lossy("Dolby Digital", 48_000), device: spdif, bitstream: true).mode == .bitstream)
+    }
+
+    @Test("Without the receiver setting, or for other formats, nothing changes")
+    func onlyWhenAsked() {
+        #expect(FormatPlanner.plan(source: lossy("Dolby Digital", 48_000), device: hdmi).mode == .pcm)
+        #expect(FormatPlanner.plan(source: lossy("AAC", 48_000, channels: 2), device: hdmi, bitstream: true).mode == .pcm)
+    }
+}

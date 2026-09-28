@@ -31,6 +31,10 @@ public struct EngineSnapshot: Sendable {
     public var isBuffering = false
     /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
     public var waitingForDevice: String?
+    /// The track being decoded is read live from a network share (not yet from its local copy).
+    public var readingFromShare = false
+    /// Set while macOS itself renders the track (Dolby Atmos); there's no Nocturne signal path then.
+    public var systemRendering: SystemRendering?
 }
 
 public enum EngineEvent: Sendable {
@@ -56,6 +60,14 @@ public struct EngineSettings: Sendable, Equatable {
     public var digitalVolumeDB: Double?
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
+    /// Dolby Atmos: let macOS render the objects (true), or play the Dolby Digital Plus channel bed
+    /// through Nocturne's own path (false).
+    public var atmosBySystem = true
+    /// Outputs with an AV receiver that decodes Dolby and DTS: those are sent untouched (IEC 61937).
+    public var bitstreamDeviceUIDs: Set<String> = []
+    /// Integer mode for devices that offer it (exclusive access only): PCM that needs no processing goes
+    /// to the DAC as 32-bit integers with no float step, so 32-bit sources arrive exact.
+    public var integerMode = false
 
     public init() {}
 
@@ -116,8 +128,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         let item: PlayableItem
         /// Read live from a network share (not a local cached copy): may stall and need rebuffering.
         var streaming = false
-        let probed: ProbedSource
-        let decoder: PCMDecoding
+        /// Streaming, and can't move to the local copy (lossy, DSD converted to PCM, or the copy didn't match).
+        var staysOnShare = false
+        /// Both are replaced when playback moves from the share to a finished local copy.
+        var probed: ProbedSource
+        var decoder: PCMDecoding
         let converter: AVAudioConverter
         let input: AVAudioPCMBuffer
         let output: AVAudioPCMBuffer
@@ -134,8 +149,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             self.probed = probed
             self.decoder = decoder
             self.path = path
-            guard let outFormat = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels,
-                                                       interleaved: true, layout: layout),
+            // Integer mode: straight to 32-bit integers (the device takes them as they are).
+            let float = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
+            let integer = float.flatMap { f in
+                AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
+                              ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
+            }
+            guard let outFormat = path.applied.integerMode ? integer : float,
                   let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat) else {
                 throw SourceOpenerError.unsupported(item.url)
             }
@@ -177,6 +197,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var sessionDevice: OutputDevice?
     private var decoding: Decoding?
     private var pending: (item: PlayableItem, probed: ProbedSource, plan: OutputPlan, device: OutputDevice)?
+    /// The next track, for macOS's renderer (Dolby Atmos), once this one has played out.
+    private var pendingSystem: PlayableItem?
     private var segments: [Segment] = []
     private var state: PlaybackState = .stopped
     private var settings = EngineSettings()
@@ -190,18 +212,19 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// Network stalls: the output callback holds in silence when a streamed track's ring runs dry
-    /// (even while the decoder is blocked in a read) and resumes once two seconds are buffered.
+    /// (even while the decoder is blocked in a read) and resumes once five seconds are buffered
+    /// (enough that one slow read doesn't turn into a string of stops).
     /// Nothing is skipped, so the position stays exact. Off once the file is fully read.
     private func updateRebuffering() {
         guard let session else { buffering = false; rebuffer = nil; return }
         let active = decoding.map { $0.streaming && !$0.finished } ?? false
-        let want = active && !draining ? UInt32(session.applied.sampleRate * 2) : 0
+        let want = active && !draining ? UInt32(session.applied.sampleRate * 5) : 0
         if rebuffer?.context != session.context || rebuffer?.frames != want {
             nrt_context_set_rebuffer(session.context, want)
             rebuffer = (session.context, want)
         }
         let starved = nrt_context_is_starved(session.context)
-        if starved, !buffering { log.notice("Network read stalled; holding until 2 s are buffered") }
+        if starved, !buffering { log.notice("Network read stalled; holding until 5 s are buffered") }
         buffering = starved
     }
 
@@ -212,6 +235,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var drainedAt: Date?
     private var pausedAt: Date?
     private var parked: (item: PlayableItem, position: TimeInterval)?
+    /// Dolby Atmos being rendered by macOS (instead of `session`).
+    private var atmos: SystemRendererSession?
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
     private var awaitingDevice: (uid: String, until: Date, checkedAt: Date)?
     /// How long playback waits for a missing output (AirPods take several seconds to reconnect).
@@ -323,7 +348,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             for command in commands { handle(command) }
 
             var didWork = false
-            if state == .playing {
+            if state == .playing, let atmos {
+                checkSystemRenderer(atmos)
+            } else if state == .playing {
+                switchToLocalCopyIfReady()
                 didWork = fill()
                 checkTransitions()
                 updateRebuffering()
@@ -353,11 +381,14 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .pause:
             awaitingDevice = nil
             guard state == .playing else { return }
+            atmos?.pause()
             session?.stop()
             state = .paused
             pausedAt = Date()
         case .resume:
-            if state == .paused, let session {
+            if state == .paused, let atmos {
+                atmos.play(); state = .playing; pausedAt = nil
+            } else if state == .paused, let session {
                 do { try session.start(); state = .playing; pausedAt = nil }
                 catch { restartFromCurrentPosition() }
             } else if state == .paused || state == .stopped, let parked {
@@ -371,7 +402,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             state = .stopped
             lastAudibleSegmentID = nil
         case .seek(let seconds):
-            guard let current = audibleSegment()?.item ?? parked?.item else { return }
+            guard let current = currentItem() else { return }
             let resume = state == .playing || awaitingDevice != nil
             teardownDecoding()
             session?.flush()
@@ -383,6 +414,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             applyGain()
             let deviceChanged = old.deviceUID != new.deviceUID || old.exclusive != new.exclusive
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
+                || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
+                || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
             if deviceChanged, state != .stopped { restartFromCurrentPosition() }
         case .queueChanged(let reloadCurrent):
             guard state != .stopped else { return }
@@ -393,7 +426,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             let alive = DeviceQuery.allDeviceIDs().contains(device.id)
             if !alive {
                 let position = currentPosition()
-                let item = audibleSegment()?.item
+                let item = currentItem()
                 let wasPlaying = state == .playing
                 teardown(releaseHog: false)
                 if let item { parked = (item, position) }
@@ -463,6 +496,11 @@ public final class PlaybackEngine: @unchecked Sendable {
             attempts += 1
             do {
                 try begin(current, at: offset)
+                if let atmos {
+                    if autoplay { atmos.play(); state = .playing } else { state = .paused; pausedAt = Date() }
+                    emit(.trackStarted(atmos.item))
+                    return
+                }
                 if autoplay {
                     do { try session?.start() } catch {
                         if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
@@ -503,9 +541,17 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func begin(_ item: PlayableItem, at seconds: TimeInterval) throws {
         guard let device = try resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
         let probed = try SourceOpener.probe(resolve(item))
-        let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
+        let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+        if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
+            try beginSystemRendering(item, url: resolve(item), device: device, at: seconds)
+            return
+        }
+        atmos?.stop()
+        atmos = nil
+        var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: settings.ratePolicies[device.uid] ?? .matchSource,
-                                      spatial: settings.spatialMode(for: device))
+                                      spatial: settings.spatialMode(for: device), bitstream: bitstream)
+        plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: item, device: device)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
                 if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
@@ -543,7 +589,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.unlock()
         old?.invalidate(releaseHog: true)
         // DSD over DoP only survives untouched with sole access, so it always takes the device.
-        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive || plan.mode == .dop)
+        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive || plan.isPassthrough)
         sessionLock.lock()
         session = new
         sessionDevice = device
@@ -562,14 +608,16 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func applyGain() {
+        atmos?.setVolume(Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1))
         guard let session else { return }
-        let db = session.plan.mode == .dop ? 0 : (settings.digitalVolumeDB ?? 0)
+        let db = session.plan.isPassthrough ? 0 : (settings.digitalVolumeDB ?? 0)
         nrt_context_set_gain(session.context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(session.applied.physicalBitDepth))
     }
 
     private func teardownDecoding() {
         decoding = nil
         pending = nil
+        pendingSystem = nil
         segments.removeAll()
         draining = false
         drainedAt = nil
@@ -578,6 +626,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func teardown(releaseHog: Bool) {
         teardownDecoding()
+        atmos?.stop()
+        atmos = nil
         sessionLock.lock()
         let old = session
         session = nil
@@ -589,13 +639,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Frees the device after a long pause but remembers where we were.
     private func park() {
         let position = currentPosition()
-        if let item = audibleSegment()?.item { parked = (item, position) }
+        if let item = currentItem() { parked = (item, position) }
         teardown(releaseHog: true)
         pausedAt = nil
     }
 
     private func restartFromCurrentPosition() {
-        guard let item = audibleSegment()?.item ?? parked?.item else { return }
+        guard let item = currentItem() else { return }
         let position = parked?.position ?? currentPosition()
         let wasPlaying = state == .playing || awaitingDevice != nil
         teardown(releaseHog: true)
@@ -627,7 +677,94 @@ public final class PlaybackEngine: @unchecked Sendable {
         advance(after: audible.item, produced: 1)
     }
 
+    /// Integer mode applies only where nothing would change the samples: plain PCM at its own rate and
+    /// channel count, no Spatial Audio, digital volume or ReplayGain, on a device with a non-mixable Int32 format.
+    private func wantsIntegerMode(_ plan: OutputPlan, source: SourceFormat, item: PlayableItem, device: OutputDevice) -> Bool {
+        settings.integerMode && settings.exclusive && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+            && plan.channels == source.channels && source.encoding == .pcm && settings.digitalVolumeDB == nil
+            && (item.replayGainDB ?? 0) == 0
+            && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
+    }
+
+    /// The item playing (or paused), whichever path plays it.
+    private func currentItem() -> PlayableItem? { audibleSegment()?.item ?? atmos?.item ?? parked?.item }
+
+    // MARK: Dolby Atmos (rendered by macOS)
+
+    private func beginSystemRendering(_ item: PlayableItem, url: URL, device: OutputDevice, at seconds: TimeInterval) throws {
+        // macOS's renderer needs the device to itself: drop Nocturne's own session first.
+        teardown(releaseHog: true)
+        let volume = Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1)
+        let session = try SystemRendererSession(item: item, url: url, deviceUID: device.uid,
+                                                spatial: settings.spatialMode(for: device) != .off,
+                                                volume: volume)
+        try session.prepare(at: seconds)
+        sessionLock.lock()
+        atmos = session
+        sessionDevice = device
+        sessionLock.unlock()
+        lastAudibleSegmentID = nil
+    }
+
+    /// Moves on when macOS has played the Atmos track out (or couldn't).
+    private func checkSystemRenderer(_ session: SystemRendererSession) {
+        if let failure = session.failure {
+            emit(.failed(session.item, failure.localizedDescription))
+        } else if !session.finished {
+            return
+        }
+        let finished = session.item
+        teardown(releaseHog: true)
+        if let next = nextItemProvider?(finished) { start(next, at: 0, autoplay: true) } else { finishQueue() }
+    }
+
     // MARK: Decoding
+
+    private var localCopyCheckedAt = Date.distantPast
+
+    /// A track streaming from a network share moves to its local copy as soon as the copy is complete
+    /// (the cache downloads the playing track first), continuing from the exact frame it had reached:
+    /// the rest of the track no longer depends on the network or the server's disks. Only for decoders
+    /// whose output after a seek is identical to continuous decoding (lossless PCM and DoP).
+    private func switchToLocalCopyIfReady() {
+        guard let decoding, decoding.streaming, !decoding.staysOnShare, !decoding.finished, !decoding.inputExhausted,
+              Date().timeIntervalSince(localCopyCheckedAt) >= 1 else { return }
+        localCopyCheckedAt = Date()
+        let local = resolve(decoding.item)
+        guard local != decoding.item.url else { return }
+        do {
+            guard let (probed, decoder) = try Self.reopen(decoding.probed, decoder: decoding.decoder, at: local,
+                                                          plan: decoding.path.plan, item: decoding.item) else {
+                decoding.staysOnShare = true      // lossy, DSD converted to PCM, or a copy that doesn't match
+                return
+            }
+            decoding.probed = probed
+            decoding.decoder = decoder
+            decoding.streaming = false
+            log.notice("Streaming track moved to its local copy at frame \(decoder.position, privacy: .public)")
+        } catch {
+            decoding.staysOnShare = true
+            log.error("Couldn't move to the local copy: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Opens the same audio from `url` (a complete local copy) positioned exactly where `decoder` is, so
+    /// decoding continues seamlessly. Nil when that can't be guaranteed to be sample-identical: lossy
+    /// decoders and DSD→PCM conversion carry state across a seek, and the copy must match the original.
+    static func reopen(_ probed: ProbedSource, decoder current: PCMDecoding, at url: URL, plan: OutputPlan,
+                       item: PlayableItem) throws -> (ProbedSource, PCMDecoding)? {
+        guard probed.format.encoding == .pcm || (probed.format.encoding == .dsd && plan.mode == .dop),
+              current.supportsSeeking else { return nil }
+        let local = try SourceOpener.probe(url)
+        guard local.format == probed.format else { return nil }
+        let decoder = try SourceOpener.decoder(for: local, plan: plan, item: item)
+        let position = current.position
+        guard decoder.length == current.length, position >= 0, position <= decoder.length else { return nil }
+        try decoder.seek(to: position)
+        guard decoder.position == position else { return nil }
+        return (local, decoder)
+    }
+
 
     private func prefill() {
         guard let session else { return }
@@ -680,10 +817,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
 
         let frames = decoding.output.frameLength
-        if frames > 0, let data = decoding.output.floatChannelData?[0] {
+        let raw = decoding.output.floatChannelData?[0]
+            ?? decoding.output.int32ChannelData.map { UnsafeMutableRawPointer($0[0]).assumingMemoryBound(to: Float.self) }
+        if frames > 0, let data = raw {
             decoding.framesProduced += UInt64(frames)
             emptyTransitions = 0
-            if decoding.gain != 1 {
+            if decoding.gain != 1, !decoding.path.applied.integerMode {
                 var g = decoding.gain
                 vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(decoding.path.plan.channels))
             }
@@ -716,9 +855,18 @@ public final class PlaybackEngine: @unchecked Sendable {
             attempts += 1
             do {
                 let probed = try SourceOpener.probe(resolve(next))
-                let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
+                let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+                if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
+                    // macOS renders Atmos: let this track play out, then hand the next one over.
+                    pendingSystem = next
+                    draining = true
+                    nrt_context_set_draining(session.context, true)
+                    return
+                }
+                var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                               policy: settings.ratePolicies[device.uid] ?? .matchSource,
-                                              spatial: settings.spatialMode(for: device))
+                                              spatial: settings.spatialMode(for: device), bitstream: bitstream)
+                plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: next, device: device)
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
@@ -764,6 +912,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         let tail = Double(session.applied.bufferFrames * 3) / session.applied.sampleRate + 0.05
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
+        if let next = pendingSystem {
+            teardown(releaseHog: true)
+            start(next, at: 0, autoplay: true)
+            return
+        }
         if let pending {
             self.pending = nil
             do {
@@ -808,6 +961,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func currentPosition() -> TimeInterval {
+        if let atmos { return atmos.position }
         guard let session, let segment = audibleSegment() else { return parked?.position ?? 0 }
         let read = session.totalRead
         let played = read > segment.startRingFrame ? Double(read - segment.startRingFrame) / session.applied.sampleRate : 0
@@ -837,15 +991,19 @@ public final class PlaybackEngine: @unchecked Sendable {
         let underruns = underrunTotal
         let parkedItem = parked
         let waiting = awaitingDevice.map { deviceName($0.uid) }
+        let fromShare = decoding?.streaming == true
+        let system = atmos
         shared.withLock { s in
             s.snapshot.state = st
-            s.snapshot.item = segment?.item ?? parkedItem?.item
-            s.snapshot.position = segment == nil ? (parkedItem?.position ?? 0) : position
-            s.snapshot.duration = segment?.durationSeconds ?? s.snapshot.duration
+            s.snapshot.item = segment?.item ?? system?.item ?? parkedItem?.item
+            s.snapshot.position = segment == nil && system == nil ? (parkedItem?.position ?? 0) : position
+            s.snapshot.duration = segment?.durationSeconds ?? system?.duration ?? s.snapshot.duration
+            s.snapshot.systemRendering = system?.rendering
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
             s.snapshot.waitingForDevice = waiting
+            s.snapshot.readingFromShare = fromShare
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }
         }

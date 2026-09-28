@@ -157,6 +157,10 @@ struct PlaybackSettings: View {
                      ? "Nocturne takes sole control of the device; other apps are silent on it while Nocturne plays. macOS then won't let it be the Mac's sound output, so volume keys and the AirPods Max Digital Crown adjust a different device."
                      : "Off: Nocturne still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
                     .font(.caption).foregroundStyle(.secondary)
+                Toggle("Integer mode", isOn: $s.integerMode)
+                    .disabled(!s.exclusiveMode)
+                Text("With exclusive access, on DACs that offer it (such as the FiiO K11): music that needs no processing goes to the DAC as 32-bit integers, with no floating-point step, so 32-bit recordings arrive exact. Anything with volume, ReplayGain, resampling or Spatial Audio still uses the floating-point path.")
+                    .font(.caption).foregroundStyle(.secondary)
                 Picker("Release device after pausing for", selection: $s.releaseAfterPause) {
                     Text("10 seconds").tag(10.0)
                     Text("30 seconds").tag(30.0)
@@ -168,6 +172,16 @@ struct PlaybackSettings: View {
                     ForEach(DeviceOnQuit.allCases) { Text($0.label).tag($0) }
                 }
                 Text("\u{201C}Put it back as it was\u{201D} restores each device Nocturne switched to the sample rate and bit depth it had before, so other apps (and tools like LosslessSwitcher) take over from where they left off.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Section("Surround formats") {
+                Picker("Dolby Atmos", selection: $s.atmosBySystem) {
+                    Text("Rendered by macOS (objects)").tag(true)
+                    Text("Channel bed through Nocturne").tag(false)
+                }
+                Text(s.atmosBySystem
+                     ? "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Nocturne's own signal path and meters don't apply to these tracks."
+                     : "Nocturne decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {
@@ -189,6 +203,8 @@ struct PlaybackSettings: View {
         }
         .formStyle(.grouped)
         .onChange(of: s.exclusiveMode) { model.syncEngine() }
+        .onChange(of: s.atmosBySystem) { model.syncEngine() }
+        .onChange(of: s.integerMode) { model.syncEngine() }
         .onChange(of: s.releaseAfterPause) { model.syncEngine() }
         .onChange(of: s.allowDigitalVolume) { model.syncEngine() }
         .onChange(of: s.replayGain) { model.player.refreshReplayGain() }

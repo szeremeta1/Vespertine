@@ -157,6 +157,12 @@ final class NetworkShareManager {
                     // Server answers, but is the mount itself still alive? (It can outlive a server
                     // restart or a dropped connection and then fail every read.) Two strikes, then remount.
                     if await NetworkVolume.isResponsive(share.root(at: mount)) { unresponsive[id] = 0; continue }
+                    // Slow isn't dead: a busy server can take many seconds to list a folder while it's
+                    // still delivering music. Remounting then would cut off what's playing.
+                    if Date().timeIntervalSince(cache.lastTransferAt) < 30 {
+                        shareLog.notice("share \(id, privacy: .public): slow to answer, but still transferring")
+                        continue
+                    }
                     unresponsive[id, default: 0] += 1
                     shareLog.notice("share \(id, privacy: .public): mount not responding (\(self.unresponsive[id] ?? 0, privacy: .public))")
                     guard (unresponsive[id] ?? 0) >= 2 else { continue }
@@ -294,7 +300,9 @@ final class NetworkShareManager {
             .filter { isNetwork($0) && isReachable($0) }
         guard !wanted.isEmpty else { return }
         prefetchTask = Task { @MainActor [weak self] in
-            if streaming { try? await Task.sleep(for: .seconds(10)) }
+            // Let the track's first reads go first, then copy it: once the copy is complete, playback
+            // moves to it mid-track and no longer depends on the share.
+            if streaming { try? await Task.sleep(for: .seconds(2)) }
             guard !Task.isCancelled, let self else { return }
             self.cache.request(wanted)
             self.cache.prioritize(wanted)

@@ -14,7 +14,16 @@ public enum FormatPlanner {
     public static func dopCarrierRate(_ dsdRate: Double) -> Double { dsdRate / 16 }
 
     public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource,
-                            spatial: SpatialMode = .off) -> OutputPlan {
+                            spatial: SpatialMode = .off, bitstream: Bool = false) -> OutputPlan {
+        if bitstream, let kind = BitstreamFormat(codec: source.codec) {
+            // A receiver on this output decodes Dolby and DTS itself: send the frames untouched.
+            let carrier = kind.carrierRate(for: source.sampleRate)
+            if rawDevice.supports(rate: carrier), rawDevice.outputChannels >= 2, rawDevice.bestIntegerBitDepth(at: carrier) >= 16 {
+                return OutputPlan(mode: .bitstream, deviceSampleRate: carrier, decodedSampleRate: carrier,
+                                  physicalBitDepth: rawDevice.bestIntegerBitDepth(at: carrier), channels: 2, dsdConvertedToPCM: false,
+                                  reason: "\(kind.name) sent untouched to the receiver (IEC 61937 at \(SampleRate.format(carrier)) kHz)")
+            }
+        }
         var plan = basePlan(source: source, device: rawDevice, policy: policy)
         // Multichannel music: Spatial Audio on headphones, every channel on multichannel outputs,
         // otherwise a standard downmix (the converter mixes by channel layout).

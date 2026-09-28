@@ -438,7 +438,11 @@ public actor LibraryScanner {
                     track.playCount = existing.playCount
                     track.lastPlayedAt = existing.lastPlayedAt
                     if track.rating == nil { track.rating = existing.rating }
-                    if preserveAnalysis {
+                    // Re-read but unchanged (a forced re-read, a tag-only look): its analysis still holds.
+                    let analysisStillValid = try Bool.fetchOne(db, sql: """
+                        SELECT EXISTS (SELECT 1 FROM analysis WHERE trackId = ? AND fileSize = ? AND modifiedAt = ?)
+                        """, arguments: [existing.id, track.fileSize, track.modifiedAt]) == true && existing.codec == track.codec
+                    if preserveAnalysis || analysisStillValid {
                         track.effectiveBitDepth = existing.effectiveBitDepth
                         track.bandwidthHz = existing.bandwidthHz
                         track.analysisVerdict = existing.analysisVerdict

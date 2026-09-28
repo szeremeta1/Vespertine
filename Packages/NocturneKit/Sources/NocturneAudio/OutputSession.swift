@@ -25,6 +25,8 @@ public struct AppliedFormat: Sendable, Hashable {
     public var speakerNames: [String] = []
     /// Separate hardware streams the channels are spread across (aggregates, some interfaces).
     public var streamCount: Int = 1
+    /// Integer mode in effect: the device takes 32-bit integers directly (non-mixable), no float step.
+    public var integerMode = false
 }
 
 final class OutputSession: @unchecked Sendable {
@@ -42,7 +44,19 @@ final class OutputSession: @unchecked Sendable {
     private(set) var isRunning = false
 
     /// Configures the device for `plan` and prepares (but does not start) I/O.
-    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, ringSeconds: Double = 5) throws {
+    /// Ring size in frames: about 30 s of audio, so a network share that stalls for many seconds (a busy
+    /// server's disks) is never heard, within a memory budget (fewer seconds for many channels at high
+    /// rates), and never less than 5 s. A power of two, as the ring requires.
+    static func ringFrames(rate: Double, channels: Int, seconds: Double = 30, budgetBytes: Int = 96 << 20) -> UInt32 {
+        let perSecond = max(rate, 44_100)
+        let budgetFrames = budgetBytes / (max(1, channels) * MemoryLayout<Float>.size)
+        var frames = 1
+        while frames * 2 <= min(Int(perSecond * seconds), budgetFrames) { frames *= 2 }
+        while Double(frames) < perSecond * 5 { frames *= 2 }
+        return UInt32(frames)
+    }
+
+    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool) throws {
         self.deviceID = deviceID
         self.plan = plan
 
@@ -60,6 +74,8 @@ final class OutputSession: @unchecked Sendable {
         let rate = (try? HAL.get(deviceID, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? plan.deviceSampleRate
         let streams = DeviceQuery.outputStreams(deviceID)
         let physicals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
+        // Integer mode needs the device to ourselves and a non-mixable Int32 virtual format.
+        let integerMode = plan.integerSamples && hogged && plan.mode == .pcm && DeviceControl.setIntegerFormat(on: deviceID, plan: plan, rate: rate)
         let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
         // The shallowest stream decides what the device as a whole can carry.
         let physical = physicals.min { $0.mBitsPerChannel < $1.mBitsPerChannel }
@@ -67,8 +83,9 @@ final class OutputSession: @unchecked Sendable {
         let totalChannels = virtuals.reduce(0) { $0 + Int($1.mChannelsPerFrame) }
 
         let floatStreams = !virtuals.isEmpty && virtuals.count == streams.count && virtuals.allSatisfy {
-            $0.mFormatID == kAudioFormatLinearPCM && $0.mFormatFlags & kAudioFormatFlagIsFloat != 0 && $0.mBitsPerChannel == 32
-                && abs($0.mSampleRate - rate) < 0.5
+            $0.mFormatID == kAudioFormatLinearPCM && $0.mBitsPerChannel == 32 && abs($0.mSampleRate - rate) < 0.5
+                && (integerMode ? $0.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 && $0.mBytesPerFrame == 4 * $0.mChannelsPerFrame
+                                : $0.mFormatFlags & kAudioFormatFlagIsFloat != 0)
         }
         guard floatStreams, totalChannels >= plan.deviceChannels, rate.isFinite, rate > 0, rate <= 3_072_000 else {
             if hogged { DeviceControl.releaseHog(deviceID) }
@@ -77,10 +94,11 @@ final class OutputSession: @unchecked Sendable {
                                     ? "open \(plan.deviceChannels) channels (the device offers \(totalChannels))"
                                     : "set the device to Float32 at \(SampleRate.format(plan.deviceSampleRate)) kHz")
         }
-        if plan.mode == .dop, (!hogged || (physical?.mBitsPerChannel ?? 0) < 24
+        if plan.isPassthrough, (!hogged || (physical?.mBitsPerChannel ?? 0) < (plan.mode == .dop ? 24 : 16)
             || abs(rate - plan.deviceSampleRate) >= 0.5) {
             if hogged { DeviceControl.releaseHog(deviceID) }
-            throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "DoP requires exclusive, bit-transparent output")
+            throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
+                                 plan.mode == .dop ? "DoP requires exclusive, bit-transparent output" : "Bitstream requires exclusive, bit-transparent output")
         }
 
         // Multichannel routing: the standard bed for Spatial Audio, the device's speaker layout for
@@ -104,10 +122,10 @@ final class OutputSession: @unchecked Sendable {
             bufferFrames: Int(bufferFrames),
             channelNames: routeLayout?.shortNames ?? (plan.channels == 1 ? ["M"] : ["L", "R"]),
             speakerNames: speakers.flatMap { $0.hasSpeakerPositions ? $0.shortNames : nil } ?? [],
-            streamCount: streams.count)
+            streamCount: streams.count,
+            integerMode: integerMode)
 
-        let frames = UInt32(max(rate, 44_100) * ringSeconds)
-        guard let ring = nrt_ring_create(frames, UInt32(plan.channels)) else {
+        guard let ring = nrt_ring_create(Self.ringFrames(rate: rate, channels: plan.channels), UInt32(plan.channels)) else {
             if hogged { DeviceControl.releaseHog(deviceID) }
             throw CoreAudioError(-1, "allocate ring buffer")
         }
@@ -118,7 +136,8 @@ final class OutputSession: @unchecked Sendable {
         }
         self.ring = ring
         self.context = ctx
-        nrt_context_set_passthrough(ctx, plan.mode == .dop)
+        nrt_context_set_passthrough(ctx, plan.isPassthrough)
+        nrt_context_set_integer(ctx, integerMode)
 
         // Multichannel routing.
         decodedLayout = routeLayout
@@ -173,6 +192,10 @@ final class OutputSession: @unchecked Sendable {
         ioProcID = nil
         nrt_context_destroy(context)
         nrt_ring_destroy(ring)
+        // Leave the device on an ordinary (mixable Float32) format for whoever uses it next.
+        if applied.integerMode { try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
+            decodedSampleRate: applied.sampleRate, physicalBitDepth: applied.physicalBitDepth, channels: plan.deviceChannels,
+            dsdConvertedToPCM: false, reason: ""), to: deviceID) }
         if releaseHog, applied.exclusive { DeviceControl.releaseHog(deviceID) }
     }
 
@@ -273,6 +296,40 @@ public enum DeviceControl {
                 throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "set a Float32 format at \(SampleRate.format(rate)) kHz")
             }
         }
+    }
+
+    /// Switches a single-stream device to non-mixable 32-bit integer (integer mode). Only possible while
+    /// hogged. Devices take it through the physical format (the virtual format follows); setting only the
+    /// virtual format is accepted but ignored by some (e.g. USB Audio Class DACs). Returns whether it took.
+    static func setIntegerFormat(on device: AudioObjectID, plan: OutputPlan, rate: Double) -> Bool {
+        let streams = DeviceQuery.outputStreams(device)
+        guard streams.count == 1, let stream = streams.first else { return false }
+        func isInteger32NonMixable(_ f: AudioStreamBasicDescription) -> Bool {
+            f.mFormatID == kAudioFormatLinearPCM && f.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0
+                && f.mFormatFlags & kAudioFormatFlagIsNonMixable != 0 && f.mFormatFlags & kAudioFormatFlagIsFloat == 0
+                && f.mBitsPerChannel == 32 && f.mBytesPerFrame == 4 * f.mChannelsPerFrame
+        }
+        func current() -> AudioStreamBasicDescription? {
+            try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription())
+        }
+        func took() -> Bool { current().map { isInteger32NonMixable($0) && abs($0.mSampleRate - rate) < 0.5 } ?? false }
+        func matching(_ list: [AudioStreamRangedDescription]) -> AudioStreamBasicDescription? {
+            guard var f = list.first(where: {
+                isInteger32NonMixable($0.mFormat) && Int($0.mFormat.mChannelsPerFrame) >= plan.deviceChannels
+                    && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
+            })?.mFormat else { return nil }
+            f.mSampleRate = rate
+            return f
+        }
+        let physical = matching(DeviceQuery.physicalFormats(stream))
+        let virtual = matching((try? HAL.getArray(stream, .global(kAudioStreamPropertyAvailableVirtualFormats), of: AudioStreamRangedDescription.self)) ?? [])
+        for (selector, format) in [(kAudioStreamPropertyPhysicalFormat, physical), (kAudioStreamPropertyVirtualFormat, virtual)] {
+            guard let format, (try? HAL.set(stream, .global(selector), format)) != nil else { continue }
+            // Format changes are asynchronous: wait (bounded) for the device to report it.
+            let deadline = Date().addingTimeInterval(1.5)
+            while Date() < deadline { if took() { return true }; usleep(10_000) }
+        }
+        return took()
     }
 
     static func setNominalRate(_ rate: Double, on device: AudioObjectID) throws {

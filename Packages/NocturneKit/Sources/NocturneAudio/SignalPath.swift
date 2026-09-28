@@ -40,12 +40,15 @@ public struct SignalPath: Sendable, Hashable {
         switch plan.mode {
         case .dop:
             return applied.physicalBitDepth >= 24 && abs(applied.sampleRate - plan.deviceSampleRate) < 0.5
+        case .bitstream:
+            return applied.physicalIsInteger && applied.physicalBitDepth >= 16 && abs(applied.sampleRate - plan.deviceSampleRate) < 0.5
         case .pcm:
             guard source.encoding == .pcm, !plan.dsdConvertedToPCM, !isResampling else { return false }
             guard abs(applied.sampleRate - source.sampleRate) < 0.5 else { return false }
-            // Our pipeline is Float32, which carries 24 significant bits exactly; wider sources are rounded.
+            // The Float32 pipeline carries 24 significant bits exactly; wider sources are rounded, unless
+            // integer mode sends 32-bit integers straight to the DAC.
             let bits = source.bitDepth ?? 32
-            guard bits <= 24 else { return false }
+            guard bits <= (applied.integerMode ? 32 : 24) else { return false }
             // Integer DACs need at least the source word length; float devices need full Float32.
             return applied.physicalIsInteger ? applied.physicalBitDepth >= bits : applied.physicalBitDepth >= 32
         }
@@ -53,7 +56,13 @@ public struct SignalPath: Sendable, Hashable {
 
     /// One-line state for badges and the menu bar.
     public var statusLine: String {
-        if isBitPerfect { return plan.mode == .dop ? "NATIVE DSD · DoP" : "BIT-PERFECT" }
+        if isBitPerfect {
+            switch plan.mode {
+            case .dop: return "NATIVE DSD · DoP"
+            case .bitstream: return "BITSTREAM · \((BitstreamFormat(codec: source.codec)?.name ?? source.codec).uppercased())"
+            case .pcm: return "BIT-PERFECT"
+            }
+        }
         if plan.spatial != .off { return plan.spatial == .headTracked ? "SPATIAL · HEAD TRACKED" : "SPATIAL AUDIO" }
         if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {

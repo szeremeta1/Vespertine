@@ -66,6 +66,9 @@ public enum Genres {
         "bande originale": "soundtrack", "colonna sonora": "soundtrack", "banda sonora": "soundtrack",
         "bandes originales de films": "soundtrack", "bande originale de film": "soundtrack", "soundtracks": "soundtrack",
         "electronique": "electronic", "elettronica": "electronic", "electronica": "electronic",
+        "classique": "classical", "classica": "classical", "klassische musik": "classical",
+        "hardrock": "hard rock", "pop/rock": "pop rock", "hip hop/rap/rap": "hip hop/rap",
+        "rap/hip hop/hip hop": "hip hop/rap", "hip hop/rap/r&b": "hip hop/rap",
     ]
 
     /// Display names for genres merged from several names, so a group never shows up under a translation.

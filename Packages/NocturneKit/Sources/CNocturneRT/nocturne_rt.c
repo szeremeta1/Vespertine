@@ -119,6 +119,7 @@ struct NRTRenderContext {
     _Atomic uint32_t ditherBits;
     _Atomic bool passthrough;
     _Atomic bool draining;
+    _Atomic bool integer;
     _Atomic uint32_t underruns;
     _Atomic uint64_t framesRendered;
 
@@ -154,6 +155,7 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->ditherBits, 24);
     atomic_init(&ctx->passthrough, false);
     atomic_init(&ctx->draining, false);
+    atomic_init(&ctx->integer, false);
     atomic_init(&ctx->underruns, 0);
     atomic_init(&ctx->framesRendered, 0);
     atomic_init(&ctx->resumeFrames, 0);
@@ -195,6 +197,7 @@ void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBit
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
+void nrt_context_set_integer(NRTRenderContext *ctx, bool i) { atomic_store(&ctx->integer, i); if (i) atomic_store(&ctx->passthrough, true); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
 void nrt_context_set_rebuffer(NRTRenderContext *ctx, uint32_t resumeFrames) {
     const uint32_t limit = nrt_ring_capacity(ctx->ring) / 4 * 3;
@@ -261,9 +264,10 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
         if (!atomic_load_explicit(&ctx->draining, memory_order_relaxed))
             atomic_fetch_add_explicit(&ctx->underruns, 1, memory_order_relaxed);
     }
-    if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed)) return;
+    const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
+    if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed) && !integer) return;
 
-    const double gain = atomic_load_explicit(&ctx->gain, memory_order_relaxed);
+    const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
     if (gain != 1.0) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
@@ -281,11 +285,17 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
     uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
     for (uint32_t f = 0; f < got; f++) {
         const float *frame = ctx->scratch + (size_t)f * ch;
+        float values[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];
+        for (uint32_t c = 0; c < metered || c < 2; c++) {
+            const uint32_t src = c < ch ? c : 0;
+            if (integer) { int32_t v; memcpy(&v, &frame[src], sizeof v); values[c] = (float)((double)v / 2147483648.0); }
+            else values[c] = frame[src];
+        }
         for (uint32_t c = 0; c < metered; c++) {
-            const float a = fabsf(frame[c]);
+            const float a = fabsf(values[c]);
             if (a > peaks[c]) peaks[c] = a;
         }
-        const float l = frame[0], r = ch > 1 ? frame[1] : l;
+        const float l = values[0], r = ch > 1 ? values[1] : l;
         atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
     }
@@ -308,10 +318,19 @@ void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t 
             src = ctx->processed;
             srcCh = ctx->processedChannels;
         }
-        for (uint32_t f = 0; f < n; f++) {
-            float *o = out + (size_t)(done + f) * outChannels;
-            const float *s = src + (size_t)f * srcCh;
-            for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0.f;
+        if (atomic_load_explicit(&ctx->integer, memory_order_relaxed)) {
+            // Integer samples: copy the 32-bit words as integers so no bit pattern is touched.
+            for (uint32_t f = 0; f < n; f++) {
+                uint32_t *o = (uint32_t *)(out + (size_t)(done + f) * outChannels);
+                const uint32_t *s = (const uint32_t *)(src + (size_t)f * srcCh);
+                for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0u;
+            }
+        } else {
+            for (uint32_t f = 0; f < n; f++) {
+                float *o = out + (size_t)(done + f) * outChannels;
+                const float *s = src + (size_t)f * srcCh;
+                for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0.f;
+            }
         }
         done += n;
     }
@@ -362,7 +381,9 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
             for (uint32_t f = 0; f < n && done + f < capacity; f++) {
                 for (uint32_t c = 0; c < bch; c++) {
                     const uint32_t from = deviceChannel + c;
-                    o[(size_t)(done + f) * bch + c] = from < srcCh ? src[(size_t)f * srcCh + from] : 0.f;
+                    // memcpy keeps integer-mode words bit-exact (floats are copied the same way).
+                    const float zero = 0.f;
+                    memcpy(&o[(size_t)(done + f) * bch + c], from < srcCh ? &src[(size_t)f * srcCh + from] : &zero, sizeof(float));
                 }
             }
             deviceChannel += bch;

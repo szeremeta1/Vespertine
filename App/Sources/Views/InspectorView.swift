@@ -72,6 +72,8 @@ struct NowPlayingPanel: View {
                         if path.plan.channels > 2 || path.source.channels > 2 {
                             ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
                         }
+                    } else if let system = player.systemRendering {
+                        SystemRenderingView(rendering: system, device: player.outputDevice?.name).padding(.top, 16)
                     } else {
                         Text("Preparing output…").font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
@@ -150,11 +152,16 @@ struct SignalPathView: View {
         }
         let kind = src.encoding == .lossy ? "lossy" : (src.encoding == .dsd ? "1-bit" : "lossless")
         s.append(Step(title: "Source", detail: "\(src.codec) · \(kind) · \(channelName(src.channels))", value: srcValue))
-        s.append(Step(title: "Decoder", detail: path.decoderName, value: src.encoding == .lossy ? "decoded" : "lossless"))
+        if path.plan.mode != .bitstream {
+            s.append(Step(title: "Decoder", detail: path.decoderName, value: src.encoding == .lossy ? "decoded" : "lossless"))
+        }
 
         switch path.plan.mode {
         case .dop:
             s.append(Step(title: "DSD over PCM", detail: "DSD packed into 24-bit frames with DoP markers", value: "native DSD", tone: .good))
+        case .bitstream:
+            s.append(Step(title: "Bitstream", detail: "\(src.codec) frames untouched in IEC 61937 bursts; the receiver decodes",
+                          value: "\(SampleRate.format(path.plan.deviceSampleRate)) kHz carrier", tone: .good))
         case .pcm:
             if path.plan.dsdConvertedToPCM {
                 s.append(Step(title: "DSD → PCM", detail: "Decimated to \(SampleRate.format(path.plan.decodedSampleRate)) kHz, 32-bit float",
@@ -193,11 +200,30 @@ struct SignalPathView: View {
         }
         let a = path.applied
         s.append(Step(title: path.deviceName,
-                      detail: "\(path.deviceProfile.connection) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)",
+                      detail: "\(path.deviceProfile.connection) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)\(a.integerMode ? " · integer mode" : "")",
                       value: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz",
                       tone: path.isBitPerfect ? .good : .plain))
         return s
     }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SignalSteps(steps: steps)
+            if let note = path.deviceProfile.note, path.isResampling || !path.deviceProfile.canBeBitPerfect {
+                Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
+            }
+        }
+    }
+
+    private func channelName(_ n: Int) -> String {
+        n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? "mono" : "stereo")
+    }
+}
+
+/// The steps of a signal path, top to bottom, joined by a line.
+struct SignalSteps: View {
+    let steps: [SignalPathView.Step]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -226,15 +252,34 @@ struct SignalPathView: View {
                 }
                 .padding(.bottom, 9)
             }
-            if let note = path.deviceProfile.note, path.isResampling || !path.deviceProfile.canBeBitPerfect {
-                Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 4)
-            }
         }
     }
+}
 
-    private func channelName(_ n: Int) -> String {
-        n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? "mono" : "stereo")
+/// Dolby Atmos rendered by macOS: its objects become what the device can play.
+struct SystemRenderingView: View {
+    let rendering: SystemRendering
+    let device: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                StatusBadge(text: "DOLBY ATMOS", kind: .perfect)
+                StatusBadge(text: "RENDERED BY MACOS")
+            }
+            Hairline().padding(.top, 18)
+            SignalSteps(steps: [
+                .init(title: "Source", detail: "Dolby Digital Plus with Atmos objects (JOC) · lossy",
+                      value: rendering.objectLayout.map { "up to \($0)" } ?? "objects"),
+                .init(title: "Dolby Atmos renderer", detail: "macOS renders the objects for this output (the same renderer Apple Music uses)",
+                      value: "objects → speakers", tone: .good),
+                .init(title: rendering.spatial ? "Spatial Audio" : "Output",
+                      detail: rendering.spatial ? "Head tracking and personalized profile as set in Control Center" : "The output's own speaker layout",
+                      value: rendering.spatial ? "on" : "channels", tone: rendering.spatial ? .changed : .plain),
+                .init(title: device ?? "Output", detail: "Frames go to macOS untouched; Nocturne's meters don't apply", value: "system"),
+            ])
+            .padding(.top, 14)
+        }
     }
 }
 

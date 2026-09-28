@@ -279,6 +279,20 @@ struct DeviceSettings: View {
                 }
                 .toggleStyle(.switch).controlSize(.mini)
             }
+            if [.hdmi, .displayPort, .usb, .thunderbolt, .pci, .fireWire].contains(device.transport) {
+                Toggle(isOn: Binding(get: { settings.bitstreamDeviceUIDs.contains(device.uid) },
+                                     set: { on in
+                                         if on { settings.bitstreamDeviceUIDs.insert(device.uid) } else { settings.bitstreamDeviceUIDs.remove(device.uid) }
+                                         model.syncEngine()
+                                     })) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Send Dolby and DTS to a receiver (bitstream)").font(Typeface.ui(12))
+                        Text("For an AV receiver or soundbar on HDMI or optical: it decodes Dolby Digital, Dolby Digital Plus (Atmos included, HDMI only) and DTS itself. Only turn this on if one is connected; anything else plays the bitstream as loud noise.")
+                            .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3)
+                    }
+                }
+                .toggleStyle(.switch).controlSize(.mini)
+            }
         }
         .padding(.horizontal, 8)
     }
