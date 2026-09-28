@@ -17,12 +17,20 @@ final class AnalysisQueue {
 
     private var pending: [Track] = []
     private(set) var active: Set<String> = []     // file paths being analyzed
+    private var activeNetwork = 0
     private(set) var completed = 0
     private(set) var batchTotal = 0
     private(set) var failures = 0
     /// Bumped after every saved result so views reload what they show.
     private(set) var revision = 0
-    private let width = 2
+    /// Local files are limited by the processor; two at a time leaves room for everything else.
+    private let localWidth = 2
+    /// Network reads are limited by round trips, so more of them in flight finish sooner (about 1.5×
+    /// faster at 6 than at 2 over a remote share). Back to 2 while music streams from a share.
+    private let networkWidth = 6
+    private let busyNetworkWidth = 2
+    /// Set by the app: whether playback is currently streaming from a network share.
+    var isStreamingPlayback: @MainActor () -> Bool = { false }
 
     init(library: LibraryStore, settings: AppSettings, shares: NetworkShareManager) {
         self.library = library
@@ -67,17 +75,20 @@ final class AnalysisQueue {
     }
 
     private func pump() {
-        while active.count < width, let next = pending.first {
-            pending.removeFirst()
+        while let index = nextStartable() {
+            let next = pending.remove(at: index)
+            let network = shares.isNetwork(next)
             // Offline shares: skip for now; they'll be picked up by the next pass.
-            if shares.isNetwork(next), !shares.isReachable(next) { completed += 1; continue }
+            if network, !shares.isReachable(next) { completed += 1; continue }
             active.insert(next.filePath)
+            if network { activeNetwork += 1 }
             let url = next.fileURL, path = next.filePath
-            let resolved = shares.isNetwork(next) ? (shares.cache.localURL(forKey: NetworkCache.key(for: next)) ?? url) : url
+            let resolved = network ? (shares.cache.localURL(forKey: NetworkCache.key(for: next)) ?? url) : url
             Task {
                 let result = await Task.detached(priority: .utility) { try? FileAnalyzer.analyze(url: resolved) }.value
                 if let result { try? library.database.saveAnalysis(result, filePath: path) } else { failures += 1 }
                 active.remove(path)
+                if network { activeNetwork -= 1 }
                 completed += 1
                 revision += 1
                 library.analysisSaved()
@@ -85,5 +96,14 @@ final class AnalysisQueue {
                 pump()
             }
         }
+    }
+
+    /// The first pending track that fits: network and local files have separate limits.
+    private func nextStartable() -> Int? {
+        let localActive = active.count - activeNetwork
+        let networkLimit = isStreamingPlayback() ? busyNetworkWidth : networkWidth
+        let networkFree = activeNetwork < networkLimit, localFree = localActive < localWidth
+        guard networkFree || localFree else { return nil }
+        return pending.firstIndex { shares.isNetwork($0) ? networkFree : localFree }
     }
 }

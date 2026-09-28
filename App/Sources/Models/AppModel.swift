@@ -113,6 +113,10 @@ final class AppModel {
         shares = NetworkShareManager(library: library, settings: settings)
         player = PlayerController(library: library, settings: settings, shares: shares)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
+        analysis.isStreamingPlayback = { [weak player = self.player, weak shares = self.shares] in
+            guard let player, let shares, player.state == .playing, let track = player.current?.track else { return false }
+            return shares.isNetwork(track)
+        }
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
