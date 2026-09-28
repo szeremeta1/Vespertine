@@ -328,6 +328,20 @@ public enum DeviceControl {
                                           UInt32(MemoryLayout<AudioObjectID>.size), &id) == noErr
     }
 
+    /// Whether any other process is currently sending audio to `device` (shared mode mixes it in).
+    public static func otherProcessesPlaying(to device: AudioObjectID) -> Bool {
+        let me = getpid()
+        let processes = (try? HAL.getArray(AudioObjectID(kAudioObjectSystemObject),
+                                           .global(kAudioHardwarePropertyProcessObjectList), of: AudioObjectID.self)) ?? []
+        for process in processes {
+            guard let pid = try? HAL.get(process, .global(kAudioProcessPropertyPID), initial: pid_t(0)), pid != me,
+                  (try? HAL.get(process, .global(kAudioProcessPropertyIsRunningOutput), initial: UInt32(0))) == 1 else { continue }
+            let devices = (try? HAL.getArray(process, .output(kAudioProcessPropertyDevices), of: AudioObjectID.self)) ?? []
+            if devices.contains(device) { return true }
+        }
+        return false
+    }
+
     public static func hardwareVolumeDecibels(_ device: AudioObjectID) -> Float? {
         guard let element = DeviceQuery.volumeElements(device).first else { return nil }
         return try? HAL.get(device, .output(kAudioDevicePropertyVolumeDecibels, element: element), initial: Float32(0))

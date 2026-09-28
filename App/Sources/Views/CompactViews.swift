@@ -153,7 +153,9 @@ struct PlaybackSettings: View {
         Form {
             Section("Output") {
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
-                Text("Nocturne takes sole control of the DAC and sets its format for each track. Other apps are silent on that device while Nocturne plays.")
+                Text(s.exclusiveMode
+                     ? "Nocturne takes sole control of the device; other apps are silent on it while Nocturne plays. macOS then won't let it be the Mac's sound output, so volume keys and the AirPods Max Digital Crown adjust a different device."
+                     : "Off: Nocturne still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
                     .font(.caption).foregroundStyle(.secondary)
                 Picker("Release device after pausing for", selection: $s.releaseAfterPause) {
                     Text("10 seconds").tag(10.0)
@@ -161,9 +163,11 @@ struct PlaybackSettings: View {
                     Text("2 minutes").tag(120.0)
                     Text("10 minutes").tag(600.0)
                 }
+                .disabled(!s.exclusiveMode)
             }
             Section("Volume") {
                 Toggle("Mac sound output follows Nocturne while playing", isOn: $s.systemOutputFollowsPlayback)
+                    .disabled(s.exclusiveMode)
                 Text("Volume keys and headphone controls, such as the AirPods Max Digital Crown, act on the Mac's sound output. With this on, they adjust the device Nocturne is playing to instead of another one selected in Control Center.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Allow digital volume when the device has no hardware control", isOn: $s.allowDigitalVolume)

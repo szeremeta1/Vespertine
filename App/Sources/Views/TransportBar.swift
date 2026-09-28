@@ -244,7 +244,7 @@ struct DeviceSettings: View {
             Toggle(isOn: Binding(get: { settings.exclusiveMode }, set: { settings.exclusiveMode = $0; model.syncEngine() })) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Exclusive access").font(Typeface.ui(12))
-                    Text("Other apps can't mix into or resample this device while Nocturne plays.").font(Typeface.ui(10.5)).foregroundStyle(Palette.text3)
+                    Text("Other apps are silenced on this device. Volume keys and the AirPods Max crown can't reach it.").font(Typeface.ui(10.5)).foregroundStyle(Palette.text3)
                 }
             }
             .toggleStyle(.switch).controlSize(.mini)
