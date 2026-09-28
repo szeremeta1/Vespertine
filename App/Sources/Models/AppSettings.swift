@@ -65,6 +65,11 @@ final class AppSettings {
     var miniPlayerFloats: Bool { didSet { defaults.set(miniPlayerFloats, forKey: "miniPlayerFloats") } }
     /// Leave voice recordings, telephony audio and short clips out of the library.
     var skipNonMusic: Bool { didSet { defaults.set(skipNonMusic, forKey: "skipNonMusic") } }
+    /// Keep local copies of what plays from network shares (and the next few tracks).
+    var networkCache: Bool { didSet { defaults.set(networkCache, forKey: "networkCache") } }
+    var networkCacheLimitGB: Double { didSet { defaults.set(networkCacheLimitGB, forKey: "networkCacheLimitGB") } }
+    /// Upcoming tracks copied ahead of playback when the cache is on.
+    var networkPrefetch: Int { didSet { defaults.set(networkPrefetch, forKey: "networkPrefetch") } }
 
     /// Library location. Overridable with `-NocturneDataDirectory <path>` for testing.
     let dataDirectory: URL
@@ -74,6 +79,7 @@ final class AppSettings {
             "exclusiveMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
+            "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
@@ -92,6 +98,9 @@ final class AppSettings {
         scrobble = defaults.bool(forKey: "scrobble")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
         skipNonMusic = defaults.bool(forKey: "skipNonMusic")
+        networkCache = defaults.bool(forKey: "networkCache")
+        networkCacheLimitGB = defaults.double(forKey: "networkCacheLimitGB")
+        networkPrefetch = defaults.integer(forKey: "networkPrefetch")
 
         if let override = defaults.string(forKey: "NocturneDataDirectory") {
             dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
@@ -99,6 +108,8 @@ final class AppSettings {
             dataDirectory = LibraryDatabase.defaultURL.deletingLastPathComponent()
         }
     }
+
+    var networkCacheLimitBytes: Int64 { Int64(networkCacheLimitGB * 1_000_000_000) }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
     func setRateChoice(_ choice: RateChoice, for uid: String) { rateChoices[uid] = choice.code }

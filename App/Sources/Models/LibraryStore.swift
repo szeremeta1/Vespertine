@@ -175,7 +175,8 @@ final class LibraryStore {
     }
 
     private func updateWatcher() {
-        let paths = sources.filter(\.isOnline).map(\.path)
+        // File-system events don't cross the network; shares are re-checked by NetworkShareManager.
+        let paths = sources.filter { $0.isOnline && !$0.isNetwork }.map(\.path)
         if watcher == nil {
             watcher = FolderWatcher { [weak self] changed in
                 Task { @MainActor in

@@ -72,7 +72,9 @@ struct SidebarView: View {
                             HStack {
                                 Text(source.displayName).lineLimit(1).truncationMode(.middle)
                                 Spacer(minLength: 4)
-                                if !source.isOnline {
+                                if source.isNetwork, model.shares.status(of: source) == .connecting {
+                                    ProgressView().controlSize(.mini)
+                                } else if !source.isOnline {
                                     Text("OFFLINE")
                                         .font(Typeface.mono(8.5, weight: .semibold))
                                         .foregroundStyle(Palette.text3)
@@ -83,18 +85,23 @@ struct SidebarView: View {
                                 }
                             }
                         } icon: {
-                            Image(systemName: source.path.hasPrefix("/Volumes/") ? "externaldrive" : (source.mode == .managed ? "tray.full" : "folder"))
+                            Image(systemName: source.isNetwork ? "server.rack"
+                                  : source.path.hasPrefix("/Volumes/") ? "externaldrive" : (source.mode == .managed ? "tray.full" : "folder"))
                         }
                         .opacity(source.isOnline ? 1 : 0.55)
-                        .help(source.path)
+                        .help(sourceHelp(source))
                         .tag(SidebarItem.source(id))
                         .contextMenu {
+                            if source.isNetwork {
+                                Button("Reconnect") { Task { await model.shares.connect(source) } }
+                            }
                             Button("Rescan") { Task { await model.library.scan(source) } }
                             Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }
+                                .disabled(!source.isOnline)
                             Divider()
                             Button("Remove from Library", role: .destructive) {
                                 if model.sidebar == .source(id) { model.sidebar = .albums }
-                                model.library.removeSource(source)
+                                if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
                             }
                         }
                     }
@@ -105,6 +112,7 @@ struct SidebarView: View {
                     Spacer()
                     Menu {
                         Button("Find Music on This Mac…") { model.showFindMusic = true }
+                        Button("Connect to Server…") { model.showConnectServer = true }
                         Divider()
                         Button("Add Folder (Reference in Place)…") { model.presentImporter(.reference) }
                         Button("Import & Organize (Copy)…") { model.presentImporter(.copyAndOrganize) }
@@ -146,6 +154,14 @@ struct SidebarView: View {
         .tag(item)
     }
 
+    private func sourceHelp(_ source: LibrarySource) -> String {
+        guard let share = source.networkShare else { return source.path }
+        if case .offline(let reason) = model.shares.status(of: source), !reason.isEmpty {
+            return "\(share.displayString)\n\(reason)"
+        }
+        return share.displayString
+    }
+
     private func newPlaylist(smart: Bool) {
         let rules: SmartRules? = smart ? SmartRules(rules: [SmartRule(field: .genre, op: .contains, value: "")]) : nil
         if let p = model.library.createPlaylist(name: smart ? "New Smart Playlist" : "New Playlist", rules: rules), let id = p.id {
@@ -162,13 +178,19 @@ struct ScanStatusView: View {
         if let p = model.library.scanProgress {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text("Scanning").font(Typeface.ui(11, weight: .medium)).foregroundStyle(Palette.text2)
+                    Text(p.phase == .listing ? "Finding files" : "Reading tags")
+                        .font(Typeface.ui(11, weight: .medium)).foregroundStyle(Palette.text2)
                     Spacer()
-                    Text(p.total > 0 ? "\(p.processed)/\(p.total)" : "…").font(Typeface.mono(10)).foregroundStyle(Palette.text3)
+                    Text(p.phase == .listing ? "\(p.processed) found" : p.total > 0 ? "\(p.processed)/\(p.total)" : "…")
+                        .font(Typeface.mono(10)).foregroundStyle(Palette.text3)
                 }
-                ProgressView(value: p.total > 0 ? Double(p.processed) / Double(p.total) : 0)
-                    .progressViewStyle(.linear)
-                    .tint(Palette.brass)
+                if p.phase == .listing {
+                    ProgressView().progressViewStyle(.linear).tint(Palette.brass)
+                } else {
+                    ProgressView(value: p.total > 0 ? Double(p.processed) / Double(p.total) : 0)
+                        .progressViewStyle(.linear)
+                        .tint(Palette.brass)
+                }
             }
             .padding(12)
             .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))

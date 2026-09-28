@@ -8,13 +8,16 @@ import GRDB
 import NocturneAudio
 
 public struct ScanProgress: Sendable {
+    public enum Phase: String, Sendable { case listing = "Listing", reading = "Reading" }
+    public var phase: Phase
     public var sourcePath: String
     public var processed: Int
     public var total: Int
     public var added: Int
     public var updated: Int
 
-    public init(sourcePath: String, processed: Int, total: Int, added: Int, updated: Int) {
+    public init(phase: Phase = .reading, sourcePath: String, processed: Int, total: Int, added: Int, updated: Int) {
+        self.phase = phase
         self.sourcePath = sourcePath
         self.processed = processed
         self.total = total
@@ -29,6 +32,8 @@ public struct ScanSummary: Sendable {
     public var missing = 0
     public var skipped = 0
     public var failed: [String] = []
+    /// The source went away mid-scan (a network share dropped); nothing was marked missing.
+    public var interrupted = false
 }
 
 public actor LibraryScanner {
@@ -38,6 +43,22 @@ public actor LibraryScanner {
     public var skipsNonMusic = true
 
     public func setSkipsNonMusic(_ value: Bool) { skipsNonMusic = value }
+
+    /// Files read concurrently. Local disks gain little past 6; network shares hide
+    /// round-trip latency with more requests in flight.
+    /// Blocking file I/O runs here, not on Swift's cooperative pool (sized to the CPU count, so a
+    /// few blocked reads would stall the rest). GCD adds threads while they wait on the network.
+    static let ioQueue = DispatchQueue(label: "org.nocturne.scan-io", qos: .utility, attributes: .concurrent)
+
+    static func onIOQueue<T: Sendable>(_ work: @escaping @Sendable () -> T) async -> T {
+        await withCheckedContinuation { continuation in
+            ioQueue.async { continuation.resume(returning: work()) }
+        }
+    }
+
+    public static func readWidth(for root: URL) -> Int {
+        return NetworkVolume.isNetwork(root) ? 32 : 6
+    }
 
     public init(database: LibraryDatabase, artwork: ArtworkStore) {
         self.database = database
@@ -55,15 +76,16 @@ public actor LibraryScanner {
         var summary = ScanSummary()
         let root = source.url
 
-        var isDir: ObjCBool = false
-        let online = FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir) && isDir.boolValue
+        let online = Self.isReachable(root)
         try await database.writer.write { db in
             try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, sourceID])
         }
-        guard online else { return summary }
+        guard online else { summary.interrupted = true; return summary }
 
-        let (audioFiles, cueFiles) = Self.enumerate(root)
-        let cueByAudio = Self.cueSheets(cueFiles)
+        let listing = await Self.list(root) { count in
+            progress?(ScanProgress(phase: .listing, sourcePath: source.path, processed: count, total: 0, added: 0, updated: 0))
+        }
+        let cueByAudio = Self.cueSheets(listing.cue)
 
         struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool }
         let known: [String: Known] = try await database.writer.read { db in
@@ -74,13 +96,14 @@ public actor LibraryScanner {
             return map
         }
 
-        // Decide what needs reading.
+        // Decide what needs reading. Size and date come from the listing (no per-file stat).
         var toRead: [URL] = []
+        var listed: [String: ListedFile] = [:]
+        let remote = NetworkVolume.isNetwork(root)
         var seen = Set<String>()
-        for url in audioFiles {
-            let values = try? url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
-            let size = Int64(values?.fileSize ?? -1)
-            let modified = values?.contentModificationDate ?? .distantPast
+        for file in listing.audio {
+            let url = file.url, size = file.size, modified = file.modified
+            if remote { listed[url.path] = file }
             if let cue = cueByAudio[url.path] {
                 let locations = cue.tracks.map { "\(url.path)#\($0.number)" }
                 locations.forEach { seen.insert($0) }
@@ -93,19 +116,23 @@ public actor LibraryScanner {
             }
         }
 
+        // On a network share, macOS looks up never-seen files in a folder one at a time, so keep
+        // the reads in flight spread across folders (round-robin) rather than one album at a time.
+        if remote { toRead = Self.interleavedByFolder(toRead) }
+
         let total = toRead.count
         var processed = 0
         let artwork = self.artwork
+        let folderArt = FolderArtCache()
         var batch: [Track] = []
         let database = self.database
 
         try await withThrowingTaskGroup(of: (URL, [Track]?).self) { group in
             var iterator = toRead.makeIterator()
-            let width = 6
-            for _ in 0..<width {
+            for _ in 0..<Self.readWidth(for: root) {
                 guard let url = iterator.next() else { break }
-                let cue = cueByAudio[url.path]
-                group.addTask { (url, Self.readTracks(url, cue: cue, artwork: artwork)) }
+                let cue = cueByAudio[url.path], file = listed[url.path]
+                group.addTask { (url, await Self.onIOQueue { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
             }
             let skipping = self.skipsNonMusic
             while let (url, tracks) = try await group.next() {
@@ -126,14 +153,23 @@ public actor LibraryScanner {
                     progress?(ScanProgress(sourcePath: source.path, processed: processed, total: total, added: summary.added, updated: summary.updated))
                 }
                 if let next = iterator.next() {
-                    let cue = cueByAudio[next.path]
-                    group.addTask { (next, Self.readTracks(next, cue: cue, artwork: artwork)) }
+                    let cue = cueByAudio[next.path], file = listed[next.path]
+                    group.addTask { (next, await Self.onIOQueue { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
                 }
             }
         }
         let (a, u) = try await Self.upsert(batch, sourceID: sourceID, database: database)
         summary.added += a
         summary.updated += u
+
+        // A share that dropped mid-scan lists (and reads) nothing: never mistake that for deletions.
+        guard Self.isReachable(root) else {
+            summary.interrupted = true
+            try await database.writer.write { db in
+                try db.execute(sql: "UPDATE source SET isOnline = 0 WHERE id = ?", arguments: [sourceID])
+            }
+            return summary
+        }
 
         // Flag files that disappeared (kept so playlists and play counts survive a re-plug).
         let missing = known.filter { !seen.contains($0.key) && !$0.value.isMissing }.map(\.value.id)
@@ -146,7 +182,77 @@ public actor LibraryScanner {
         return summary
     }
 
-    static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
+    static func interleavedByFolder(_ urls: [URL]) -> [URL] {
+        var groups: [String: [URL]] = [:], order: [String] = []
+        for url in urls {
+            let dir = url.deletingLastPathComponent().path
+            if groups[dir] == nil { order.append(dir) }
+            groups[dir, default: []].append(url)
+        }
+        var result: [URL] = []
+        result.reserveCapacity(urls.count)
+        var round = 0
+        while result.count < urls.count {
+            for dir in order where round < groups[dir]!.count { result.append(groups[dir]![round]) }
+            round += 1
+        }
+        return result
+    }
+
+    /// True when the folder exists and can be listed (a dead network mount fails here, not with an empty folder).
+    static func isReachable(_ root: URL) -> Bool {
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir), isDir.boolValue else { return false }
+        return (try? FileManager.default.contentsOfDirectory(atPath: root.path)) != nil
+    }
+
+    public struct ListedFile: Sendable { public var url: URL; public var size: Int64; public var modified: Date }
+
+    /// Lists audio and CUE files with their size and date. Folders are listed concurrently so a
+    /// high-latency share costs one round trip per folder level, not per folder.
+    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async -> (audio: [ListedFile], cue: [URL]) {
+        let exts = audioExtensions
+        let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .fileSizeKey, .contentModificationDateKey]
+        let width = NetworkVolume.isNetwork(root) ? 12 : 4
+        var audio: [ListedFile] = [], cue: [URL] = []
+        var pending: [URL] = [root]
+        await withTaskGroup(of: (files: [ListedFile], cues: [URL], dirs: [URL]).self) { group in
+            var running = 0
+            func start(_ dir: URL) {
+                running += 1
+                group.addTask { await onIOQueue {
+                    var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = []
+                    let items = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])) ?? []
+                    for url in items {
+                        guard let v = try? url.resourceValues(forKeys: Set(keys)) else { continue }
+                        if v.isDirectory == true {
+                            if v.isPackage != true { dirs.append(url) }
+                            continue
+                        }
+                        guard v.isRegularFile == true else { continue }
+                        let ext = url.pathExtension.lowercased()
+                        if ext == "cue" { cues.append(url) }
+                        else if exts.contains(ext) {
+                            files.append(ListedFile(url: url, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast))
+                        }
+                    }
+                    return (files, cues, dirs)
+                } }
+            }
+            while running < width, let dir = pending.popLast() { start(dir) }
+            while let result = await group.next() {
+                running -= 1
+                audio.append(contentsOf: result.files)
+                cue.append(contentsOf: result.cues)
+                pending.append(contentsOf: result.dirs)
+                found?(audio.count)
+                while running < width, let dir = pending.popLast() { start(dir) }
+            }
+        }
+        return (audio.sorted { $0.url.path < $1.url.path }, cue)
+    }
+
+    public static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
         let exts = audioExtensions
         var audio: [URL] = []
         var cue: [URL] = []
@@ -174,8 +280,15 @@ public actor LibraryScanner {
         return map
     }
 
-    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry])?, artwork: ArtworkStore) -> [Track]? {
-        guard let base = try? MetadataReader.read(url: url, artwork: artwork) else { return nil }
+    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry])?, artwork: ArtworkStore,
+                           folderArt: FolderArtCache? = nil, remote: ListedFile? = nil) -> [Track]? {
+        let read: Track?
+        if let remote {
+            read = try? RemoteMetadata.readTrack(url: url, size: remote.size, modified: remote.modified, artwork: artwork, folderArt: folderArt)
+        } else {
+            read = try? MetadataReader.read(url: url, artwork: artwork, folderArt: folderArt)
+        }
+        guard let base = read else { return nil }
         guard let cue else { return [base] }
         let rate = base.sampleRate
         let totalFrames = Int64(base.duration * rate)

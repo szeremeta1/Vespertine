@@ -17,10 +17,18 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
     public var addedAt: Date
     public var lastScannedAt: Date?
     public var isOnline: Bool
+    /// Network shares: the server URL (no password), e.g. smb://user@host/share/folder.
+    public var remoteURL: String?
+    /// User-chosen name (network shares default to the share or folder name).
+    public var name: String?
+    /// Network shares: mounted read-write (tags can be edited) instead of read-only.
+    public var isWritable: Bool
 
     public static let databaseTableName = "source"
 
-    public init(id: Int64? = nil, path: String, bookmark: Data? = nil, mode: Mode, addedAt: Date = .now, lastScannedAt: Date? = nil, isOnline: Bool = true) {
+    public var isNetwork: Bool { remoteURL != nil }
+
+    public init(id: Int64? = nil, path: String, bookmark: Data? = nil, mode: Mode, addedAt: Date = .now, lastScannedAt: Date? = nil, isOnline: Bool = true, remoteURL: String? = nil, name: String? = nil, isWritable: Bool = false) {
         self.id = id
         self.path = path
         self.bookmark = bookmark
@@ -28,13 +36,21 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
         self.addedAt = addedAt
         self.lastScannedAt = lastScannedAt
         self.isOnline = isOnline
+        self.remoteURL = remoteURL
+        self.name = name
+        self.isWritable = isWritable
     }
+
+    /// The share this source indexes, for network sources.
+    public var networkShare: NetworkShare? { remoteURL.flatMap(NetworkShare.init(string:)) }
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 
     public var url: URL { URL(fileURLWithPath: path) }
     /// Short name for the sidebar: the volume name for external drives, else the folder name.
     public var displayName: String {
+        if let name, !name.isEmpty { return name }
+        if let remoteURL, let share = NetworkShare(string: remoteURL) { return share.defaultName }
         let components = url.pathComponents
         if path.hasPrefix("/Volumes/"), components.count == 3 { return components[2] }
         return url.lastPathComponent

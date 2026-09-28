@@ -30,7 +30,7 @@ final class OutputSession: @unchecked Sendable {
     private(set) var isRunning = false
 
     /// Configures the device for `plan` and prepares (but does not start) I/O.
-    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, ringSeconds: Double = 1.5) throws {
+    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, ringSeconds: Double = 5) throws {
         self.deviceID = deviceID
         self.plan = plan
 

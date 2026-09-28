@@ -85,3 +85,22 @@ public final class ArtworkStore: Sendable {
         return images.count == 1 ? try? Data(contentsOf: images[0]) : nil
     }
 }
+
+/// Remembers each folder's cover during a scan, so an album's folder image is listed and read once,
+/// not once per track (which matters on a network share).
+public final class FolderArtCache: @unchecked Sendable {
+    private let lock = NSLock()
+    private var keys: [String: String?] = [:]
+
+    public init() {}
+
+    func artworkKey(near file: URL, store: ArtworkStore) -> String? {
+        let dir = file.deletingLastPathComponent().path
+        lock.lock()
+        if let cached = keys[dir] { lock.unlock(); return cached }
+        lock.unlock()
+        let key = ArtworkStore.folderImage(near: file).map { store.store($0) } ?? nil
+        lock.lock(); keys[dir] = .some(key); lock.unlock()
+        return key
+    }
+}
