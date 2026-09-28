@@ -114,9 +114,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             self.probed = probed
             self.decoder = decoder
             self.path = path
-            let outFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: path.plan.deviceSampleRate,
-                                          channels: AVAudioChannelCount(path.plan.channels), interleaved: true)!
-            guard let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat) else {
+            guard let outFormat = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true),
+                  let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat) else {
                 throw SourceOpenerError.unsupported(item.url)
             }
             converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
@@ -125,8 +124,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             converter.dither = false
             self.converter = converter
             let inCapacity = AVAudioFrameCount(Double(chunk) * decoder.processingFormat.sampleRate / path.plan.deviceSampleRate) + 1024
-            input = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity)!
-            output = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk)!
+            guard let inBuffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity),
+                  let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
+                throw SourceOpenerError.unsupported(item.url)
+            }
+            input = inBuffer
+            output = outBuffer
             if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm {
                 gain = Float(pow(10, db / 20))
             } else {

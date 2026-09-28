@@ -50,6 +50,7 @@ public struct NetworkShare: Sendable, Hashable, Codable {
               let host = c.host, !host.isEmpty else { return nil }
         let parts = c.path.split(separator: "/").map { String($0).removingPercentEncoding ?? String($0) }
         let user = c.user?.removingPercentEncoding
+        guard host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else { return nil }
         switch scheme {
         case "smb", "cifs":
             guard let share = parts.first else { return nil }
@@ -91,7 +92,8 @@ public struct NetworkShare: Sendable, Hashable, Codable {
     }
 
     /// What NetFS mounts (the share itself; the subfolder is walked afterwards).
-    public var mountURL: URL { URL(string: "\(scheme)://\(authority)/\(encodedShare)")! }
+    /// What NetFS mounts. An address that can't form a URL mounts nothing (and fails to connect) rather than crashing.
+    public var mountURL: URL { URL(string: "\(scheme)://\(authority)/\(encodedShare)") ?? URL(string: "\(scheme)://invalid.invalid/")! }
 
     /// Stored in the library: the share plus the indexed folder. Never contains a password.
     public var urlString: String {

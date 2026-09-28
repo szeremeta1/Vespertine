@@ -42,6 +42,27 @@ struct ForensicsTests {
         #expect(v == c.expected, "\(c.name): got \(v)")
     }
 
+    @Test("Multichannel (5.1) files are analyzed instead of crashing")
+    func multichannel() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-51-\(UUID().uuidString).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        do {
+            let layout = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_MPEG_5_1_A)!
+            let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48_000, interleaved: false, channelLayout: layout)
+            let file = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 48_000.0,
+                                                                   AVNumberOfChannelsKey: 6, AVLinearPCMBitDepthKey: 24,
+                                                                   AVLinearPCMIsFloatKey: false, AVChannelLayoutKey: Data(bytes: layout.layout, count: MemoryLayout<AudioChannelLayout>.size)],
+                                       commonFormat: .pcmFormatFloat32, interleaved: false)
+            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 96_000)!
+            buffer.frameLength = 96_000
+            for c in 0..<6 { for i in 0..<96_000 { buffer.floatChannelData![c][i] = 0.1 * sin(Float(i) * Float(c + 1) * 0.01) } }
+            try file.write(from: buffer)
+        }
+        let result = try FileAnalyzer.analyze(url: url)
+        #expect(result.sampleRate == 48_000)
+        #expect(AudioFormats.float32(sampleRate: 96_000, channels: 8, interleaved: true)?.channelCount == 8)
+    }
+
     @Test("Zero padding is exact and wins over spectral findings")
     func padding() {
         let v = FileAnalyzer.judge(forensics: Self.m(cliff: 16_000, drop: 40, cons: 1), claimedBits: 24, effectiveBits: 16, sampleRate: 48_000)
