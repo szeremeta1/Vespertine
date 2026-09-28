@@ -74,6 +74,20 @@ if args.count >= 3, args[1] == "forensics" {
     exit(0)
 }
 
+if args.count >= 3, args[1] == "analyze-json" {
+    // One JSON line per file (compare with `nocturne-analyze file`).
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+    encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "inf", negativeInfinity: "-inf", nan: "nan")
+    for path in args[2...] {
+        do {
+            let r = try FileAnalyzer.analyze(url: URL(fileURLWithPath: path))
+            print("{\"path\":" + String(decoding: try encoder.encode(path), as: UTF8.self) + ",\"analysis\":" + String(decoding: try encoder.encode(r), as: UTF8.self) + "}")
+        } catch { FileHandle.standardError.write(Data("\(path): \(error)\n".utf8)) }
+    }
+    exit(0)
+}
+
 if args.count >= 3, args[1] == "analyze" {
     for path in args[2...] {
         let url = URL(fileURLWithPath: path)

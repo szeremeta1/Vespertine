@@ -65,6 +65,25 @@ case "import":
     let source = try db.addSource(LibrarySource(path: root.standardizedFileURL.path, mode: .managed))
     let summary = try await scanner.scan(source)
     print("scan: \(summary.added) added, \(summary.updated) updated, \(summary.skipped) skipped, \(summary.failed.count) failed")
+case "import-server-analysis":
+    // nocturne-library import-server-analysis --library <data-dir>
+    // Imports results from each network share's `.nocturne/analysis.jsonl` (written by nocturne-analyze).
+    guard let li = args.firstIndex(of: "--library"), li + 1 < args.count else { print("needs --library"); exit(2) }
+    let dataDir = URL(fileURLWithPath: (args[li + 1] as NSString).expandingTildeInPath)
+    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let importer = ServerAnalysisImporter()
+    for source in try db.sources() where source.remoteURL != nil {
+        let start = Date()
+        let root = ServerAnalysisImporter.indexRoot(for: source)
+        let n = try importer.importNew(for: source, into: db)
+        let status = root.flatMap(ServerAnalysisImporter.status(at:))
+        print(String(format: "%@: index %@, imported %d in %.1f s; server %@ %d/%d", source.name ?? "share",
+                     root == nil ? "not found" : "found", n, Date().timeIntervalSince(start),
+                     status?.state ?? "?", status?.done ?? 0, status?.total ?? 0))
+        let again = try importer.importNew(for: source, into: db)
+        print("  second pass (incremental): imported \(again)")
+    }
+
 case "scan":
     // nocturne-library scan --library <data-dir> <folder>   (adds the folder by reference, then indexes it)
     guard let li = args.firstIndex(of: "--library"), li + 1 < args.count else { print("scan needs --library"); exit(2) }

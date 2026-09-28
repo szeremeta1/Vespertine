@@ -114,8 +114,9 @@ final class AppModel {
         player = PlayerController(library: library, settings: settings, shares: shares)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         analysis.isStreamingPlayback = { [weak player = self.player, weak shares = self.shares] in
-            guard let player, let shares, player.state == .playing, let track = player.current?.track else { return false }
-            return shares.isNetwork(track)
+            // Playing from a share, or just asked to (still loading): the network belongs to playback.
+            guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
+            return player.state == .playing || (player.state != .paused && Date().timeIntervalSince(player.trackStartedAt) < 20)
         }
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
@@ -125,6 +126,7 @@ final class AppModel {
         }
         syncEngine()
         shares.start()
+        analysis.start()
         library.onScanFinished = { [weak self] in
             guard let self, self.settings.autoAnalyze else { return }
             self.analysis.analyzeLibrary()
@@ -132,6 +134,8 @@ final class AppModel {
         if settings.autoAnalyze {
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(5))
+                // Server results first, so nothing the server already analyzed is read over the network.
+                await self?.analysis.syncServerResults()
                 self?.analysis.analyzeLibrary()
             }
         }

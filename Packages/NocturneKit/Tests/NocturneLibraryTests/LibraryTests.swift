@@ -9,7 +9,7 @@ import NocturneAudio
 import Testing
 @testable import NocturneLibrary
 
-private func makeWAV(_ url: URL, rate: Double = 48_000, bits: Int = 24, seconds: Double = 0.5) throws {
+func makeWAV(_ url: URL, rate: Double = 48_000, bits: Int = 24, seconds: Double = 0.5) throws {
     let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: rate, AVNumberOfChannelsKey: 2,
                                    AVLinearPCMBitDepthKey: bits, AVLinearPCMIsFloatKey: false]
     let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
@@ -20,7 +20,7 @@ private func makeWAV(_ url: URL, rate: Double = 48_000, bits: Int = 24, seconds:
     try file.write(from: buf)
 }
 
-private func tempDir() throws -> URL {
+func tempDir() throws -> URL {
     let dir = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-lib-\(UUID().uuidString)")
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     return dir

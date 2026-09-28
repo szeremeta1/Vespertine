@@ -11,10 +11,21 @@
 // their only steep edge is the converter's anti-alias filter just below Nyquist.
 //
 
-import Accelerate
 import Foundation
 
 public struct SpectralForensics: Sendable, Hashable, Codable {
+    public init(cliffHz: Double?, cliffDropDB: Double, cliffConsistency: Double, belowDB: Double, aboveDB: Double, floorDB: Double,
+                extensionHz: Double, extensionSlope: Double, holeRatio: Double, contentHz: Double, framesAnalyzed: Int,
+                shelfHz: Double? = nil, shelfStepDB: Double = 0, shelfEndHz: Double = 0, shelfSlope: Double = 0,
+                shelfAboveFloorDB: Double = 0, shelfConsistency: Double = 0) {
+        self.cliffHz = cliffHz; self.cliffDropDB = cliffDropDB; self.cliffConsistency = cliffConsistency
+        self.belowDB = belowDB; self.aboveDB = aboveDB; self.floorDB = floorDB
+        self.extensionHz = extensionHz; self.extensionSlope = extensionSlope; self.holeRatio = holeRatio
+        self.contentHz = contentHz; self.framesAnalyzed = framesAnalyzed
+        self.shelfHz = shelfHz; self.shelfStepDB = shelfStepDB; self.shelfEndHz = shelfEndHz; self.shelfSlope = shelfSlope
+        self.shelfAboveFloorDB = shelfAboveFloorDB; self.shelfConsistency = shelfConsistency
+    }
+
     /// Frequency of the steepest spectral cliff, if one was found.
     public var cliffHz: Double?
     /// Level difference across the cliff (±400 Hz), dB.
@@ -54,13 +65,13 @@ final class ForensicsAccumulator {
     private(set) var holes: [[Float]] = []       // hole fraction per 1 kHz region per frame (-1 = no content)
     private let binHz: Double
 
-    init(sampleRate: Double) {
+    init(sampleRate: Double, forcePortableFFT: Bool = false) {
         self.sampleRate = sampleRate
         // ~85 ms frames: 4096 at 44.1/48 kHz, 8192 at 88.2/96, 16384 at 176.4/192.
         var size = 4096
         while Double(size) / sampleRate < 0.07 { size *= 2 }
         fftSize = size
-        analyzer = SpectrumAnalyzer(size: size)
+        analyzer = SpectrumAnalyzer(size: size, forcePortable: forcePortableFFT)
         binHz = sampleRate / Double(size)
         bandCount = Int((sampleRate / 2) / bandHz)
     }

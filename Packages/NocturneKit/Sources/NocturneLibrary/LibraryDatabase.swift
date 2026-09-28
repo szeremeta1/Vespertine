@@ -468,6 +468,27 @@ public extension LibraryDatabase {
         }
     }
 
+    /// Saves many results in one transaction (e.g. imported from a server's analysis index).
+    public func saveAnalyses(_ items: [(FileAnalysis, String)]) throws {
+        guard !items.isEmpty else { return }
+        let encoder = JSONEncoder()
+        let encoded = try items.map { (try encoder.encode($0.0), $0.0, $0.1) }
+        let now = Date()
+        try writer.write { db in
+            for (data, analysis, filePath) in encoded {
+                for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) {
+                    guard let id = track.id else { continue }
+                    try db.execute(sql: """
+                        INSERT OR REPLACE INTO analysis (trackId, fileSize, modifiedAt, version, analyzedAt, data)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                        """, arguments: [id, track.fileSize, track.modifiedAt, analysis.version, now, data])
+                    try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
+                                   arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
+                }
+            }
+        }
+    }
+
     public func storedAnalysis(for track: Track) throws -> StoredAnalysis? {
         guard let id = track.id else { return nil }
         return try writer.read { db in

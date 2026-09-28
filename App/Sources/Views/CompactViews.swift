@@ -248,10 +248,15 @@ struct LibrarySettings: View {
                         Text("\(model.analysis.completed) of \(model.analysis.batchTotal)").font(.caption).foregroundStyle(.secondary).monospacedDigit()
                     }
                 }
+                ForEach(model.shares.sources.filter { $0.id.map(model.analysis.serverIndexed.contains) ?? false }, id: \.id) { source in
+                    LabeledContent("\(source.name ?? "Network share") (analyzed on the server)") {
+                        Text(serverLine(source)).foregroundStyle(.secondary).monospacedDigit()
+                    }
+                }
             } header: {
                 Text("Analysis")
             } footer: {
-                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full.")
+                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full, except shares whose server runs nocturne-analyze: their results come from the server, without reading the music over the network.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Library data") {
@@ -264,6 +269,13 @@ struct LibrarySettings: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private func serverLine(_ source: LibrarySource) -> String {
+        guard let id = source.id, let st = model.analysis.serverStatus[id] else { return "Results found" }
+        let updated = st.updated.formatted(.relative(presentation: .named))
+        if st.isRunning { return "Running · \(st.done.formatted()) of \(st.total.formatted()) · \(updated)" }
+        return st.failures > 0 ? "Up to date · \(st.failures) couldn't be read · \(updated)" : "Up to date · \(updated)"
     }
 }
 
