@@ -45,7 +45,17 @@ public final class NetworkCache: @unchecked Sendable {
     private var queue: [Job] = []
     private var active: Set<String> = []
     private var limit: Int64
-    private let concurrentDownloads = 2
+    private var concurrentDownloads = 2
+
+    /// How many files download at once. One while music streams from a share, so the song being
+    /// played keeps most of the connection.
+    public var maxConcurrentDownloads: Int {
+        get { lock.lock(); defer { lock.unlock() }; return concurrentDownloads }
+        set {
+            lock.lock(); concurrentDownloads = max(1, newValue); lock.unlock()
+            pump()
+        }
+    }
 
     /// Called (on any thread) when usage or download state changes.
     public var onChange: (@Sendable () -> Void)?
