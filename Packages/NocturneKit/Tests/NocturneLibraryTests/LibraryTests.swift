@@ -5,6 +5,7 @@
 import AVFAudio
 import Foundation
 import GRDB
+import NocturneAudio
 import Testing
 @testable import NocturneLibrary
 
@@ -82,6 +83,7 @@ struct DatabaseTests {
         let db = try LibraryDatabase.inMemory()
         let art = ArtworkStore(directory: dir.appendingPathComponent(".art"))
         let scanner = LibraryScanner(database: db, artwork: art)
+        await scanner.setSkipsNonMusic(false)
         let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
         let summary = try await scanner.scan(source)
         #expect(summary.added == 4)
@@ -118,6 +120,7 @@ struct DatabaseTests {
         try makeWAV(dir.appendingPathComponent("Plain.wav"), rate: 44_100, bits: 16)
         let db = try LibraryDatabase.inMemory()
         let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
         let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
         try await scanner.scan(source)
 
@@ -148,6 +151,7 @@ struct DatabaseTests {
         }
         let db = try LibraryDatabase.inMemory()
         let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
         let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
         try await scanner.scan(source)
         let track = try #require(try db.allTracks().first)
@@ -164,5 +168,103 @@ struct DatabaseTests {
         let reverted = try #require(try db.tracks(ids: [track.id!]).first)
         #expect(reverted.title == "song")
         #expect(reverted.artist == nil)
+    }
+}
+
+
+@Suite("Finding and enriching music")
+struct FindAndEnrichTests {
+    @Test("File names are parsed into tags", arguments: [
+        ("american poetry club - we are beautiful, even when we are broken! - 01 forklift.wav",
+         "american poetry club", "we are beautiful, even when we are broken!", 1, "forklift"),
+        ("Wilbur Soot - Maybe I Was Boring - 04 It's All Futile! It's All Pointless!.wav",
+         "Wilbur Soot", "Maybe I Was Boring", 4, "It's All Futile! It's All Pointless!"),
+        ("Childish_Gambino_-_Do_Ya_Like_ft_Adele_Enhanced_24bit_48kHz.flac", "Childish Gambino", nil, nil, "Do Ya Like ft Adele"),
+        ("04-Under My Thumb.flac", nil, nil, 4, "Under My Thumb"),
+        ("13. Otto Klemperer Feat. Lucia Popp - Die Zauberflöte.flac", "Otto Klemperer Feat. Lucia Popp", nil, 13, "Die Zauberflöte"),
+        ("Yarin Primak - Special Vibe [nDZIyPILowE].wav", "Yarin Primak", nil, nil, "Special Vibe"),
+    ] as [(String, String?, String?, Int?, String)])
+    func parse(name: String, artist: String?, album: String?, number: Int?, title: String) {
+        let t = FilenameParser.parse(URL(fileURLWithPath: "/tmp/" + name))
+        #expect(t.artist == artist)
+        #expect(t.album == album)
+        #expect(t.trackNumber == number)
+        #expect(t.title == title)
+    }
+
+    @Test("Voice recordings and short clips are not music")
+    func classification() {
+        #expect(MusicFinder.kind(sampleRate: 8_000, channels: 1, duration: 300, isDSD: false) == .recording)
+        #expect(MusicFinder.kind(sampleRate: 16_000, channels: 2, duration: 300, isDSD: false) == .recording)
+        #expect(MusicFinder.kind(sampleRate: 22_050, channels: 1, duration: 300, isDSD: false) == .recording)
+        #expect(MusicFinder.kind(sampleRate: 44_100, channels: 2, duration: 12, isDSD: false) == .clip)
+        #expect(MusicFinder.kind(sampleRate: 44_100, channels: 1, duration: 200, isDSD: false) == .music)
+        #expect(MusicFinder.kind(sampleRate: 96_000, channels: 2, duration: 200, isDSD: false) == .music)
+        #expect(MusicFinder.kind(sampleRate: 2_822_400, channels: 2, duration: 200, isDSD: true) == .music)
+    }
+
+    @Test("Finder groups music by folder, flags hi-res, and leaves out recordings")
+    func finder() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let album = dir.appendingPathComponent("Album"); try FileManager.default.createDirectory(at: album, withIntermediateDirectories: true)
+        try makeWAV(album.appendingPathComponent("01 One.wav"), rate: 96_000, bits: 24, seconds: 50)
+        try makeWAV(album.appendingPathComponent("02 Two.wav"), rate: 44_100, bits: 16, seconds: 50)
+        try makeWAV(album.appendingPathComponent("prompt.wav"), rate: 44_100, bits: 16, seconds: 3)
+        let folders = await MusicFinder.find(roots: [dir])
+        let found = try #require(folders.first)
+        #expect(found.music.count == 2)
+        #expect(found.hiRes.count == 1)
+        #expect(found.excludedCount == 1)
+    }
+
+    @Test("Import clones files into an organized tree and tags the copies from their names; originals untouched")
+    func importTagsCopies() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let src = dir.appendingPathComponent("src"); try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+        let a = src.appendingPathComponent("Test Artist - Test Album - 01 First Song.wav")
+        try makeWAV(a, rate: 48_000, bits: 24, seconds: 50)
+        try makeWAV(src.appendingPathComponent("Test Artist - Test Album - 02 Second Song.wav"), rate: 48_000, bits: 24, seconds: 50)
+        try makeWAV(src.appendingPathComponent("voicemail.wav"), rate: 8_000, bits: 16, seconds: 60)
+        let before = try Data(contentsOf: a)
+
+        let root = dir.appendingPathComponent("Managed")
+        let written = try Importer.copyAndOrganize([src], into: root) {
+            (try? SourceInspector.inspectWithDuration($0)).map { MusicFinder.kind(sampleRate: $0.format.sampleRate, channels: $0.format.channels, duration: $0.duration, isDSD: false) == .music } ?? false
+        }
+        #expect(written.map { $0.path.replacingOccurrences(of: root.path, with: "") }.sorted()
+                == ["/Test Artist/Test Album/01 First Song.wav", "/Test Artist/Test Album/02 Second Song.wav"])
+
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        try await scanner.scan(try db.addSource(LibrarySource(path: root.path, mode: .managed)))
+        let tracks = try db.allTracks().sorted { ($0.trackNumber ?? 0) < ($1.trackNumber ?? 0) }
+        #expect(tracks.map(\.title) == ["First Song", "Second Song"])
+        #expect(tracks.allSatisfy { $0.artist == "Test Artist" && $0.album == "Test Album" && $0.albumArtist == "Test Artist" })
+        #expect(try Data(contentsOf: a) == before)
+    }
+
+    @Test("Enrichment fills tags of referenced files from their names")
+    func enrichFromNames() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("Test Artist - Test Album - 01 First Song.wav"), rate: 48_000, bits: 24, seconds: 50)
+        try makeWAV(dir.appendingPathComponent("Test Artist - Test Album - 02 Second Song.wav"), rate: 48_000, bits: 24, seconds: 50)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        try await scanner.scan(try db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let tracks = try db.allTracks()
+        #expect(MetadataEnricher.needsEnrichment(tracks))
+
+        let proposal = try #require(await MetadataEnricher(database: db).propose(albumKey: tracks[0].albumKey, tracks: tracks, lookUpOnline: false))
+        #expect(proposal.sources == [.fileNames])
+        #expect(proposal.isHighConfidence)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".bak"))
+        _ = try await writer.apply(proposal, tracks: tracks)
+        let enriched = try db.allTracks().sorted { ($0.trackNumber ?? 0) < ($1.trackNumber ?? 0) }
+        #expect(enriched.map(\.title) == ["First Song", "Second Song"])
+        #expect(enriched.allSatisfy { $0.artist == "Test Artist" && $0.album == "Test Album" && $0.albumArtist == "Test Artist" })
+        #expect(enriched.map(\.trackNumber) == [1, 2])
     }
 }

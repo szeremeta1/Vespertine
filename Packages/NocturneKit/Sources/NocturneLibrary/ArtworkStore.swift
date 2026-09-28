@@ -5,6 +5,7 @@
 
 import CryptoKit
 import Foundation
+import SFBAudioEngine
 import ImageIO
 import UniformTypeIdentifiers
 
@@ -63,6 +64,12 @@ public final class ArtworkStore: Sendable {
     }
 
     public func originalData(_ key: String) -> Data? { try? Data(contentsOf: originalURL(key)) }
+
+    /// True when the file carries an embedded picture.
+    public static func hasEmbeddedArt(_ url: URL) -> Bool {
+        guard let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else { return false }
+        return !file.metadata.attachedPictures.isEmpty
+    }
 
     /// cover.jpg / folder.png … next to the audio file.
     public static func folderImage(near file: URL) -> Data? {

@@ -63,6 +63,8 @@ struct NocturneCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .newItem) {
+            Button("Find Music on This Mac…") { model.showFindMusic = true }
+                .keyboardShortcut("f", modifiers: [.command, .shift])
             Button("Add Folder to Library…") { model.presentImporter(.reference) }
                 .keyboardShortcut("o", modifiers: [.command])
             Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
@@ -70,6 +72,8 @@ struct NocturneCommands: Commands {
             Divider()
             Button("Rescan Library") { Task { await model.library.rescanAll() } }
                 .keyboardShortcut("r", modifiers: [.command, .option])
+            Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
         }
         CommandMenu("Controls") {
             // Space is handled by the main window so it never steals spaces from text fields.

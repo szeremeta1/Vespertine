@@ -46,6 +46,7 @@ final class LibraryStore {
     let artwork: ArtworkStore
     let scanner: LibraryScanner
     let tagWriter: TagWriter
+    let enricher: MetadataEnricher
 
     private(set) var albums: [Album] = []
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
@@ -71,6 +72,7 @@ final class LibraryStore {
         scanner = LibraryScanner(database: database, artwork: artwork)
         tagWriter = TagWriter(database: database, scanner: scanner,
                               backupDirectory: dataDirectory.appendingPathComponent("Tag Backups", isDirectory: true))
+        enricher = MetadataEnricher(database: database)
         ArtworkCache.shared.store = artwork
         observe()
         Task { await tagWriter.purgeBackups() }
@@ -190,6 +192,70 @@ final class LibraryStore {
     }
 
     func clearError() { lastError = nil }
+
+    // MARK: Finding music and enriching metadata
+
+    /// Music on this Mac that isn't in the library yet.
+    func findMusic(progress: @escaping @Sendable (MusicFinder.Progress) -> Void) async -> [FoundFolder] {
+        await MusicFinder.find(excludingRoots: sources.map(\.url), progress: progress)
+    }
+
+    /// Adds found music. Import copies (APFS clones) just the chosen files; reference adds their folders.
+    /// Returns the album keys that were added, for a follow-up enrichment pass.
+    func add(found files: [URL], mode: ImportMode, managedRoot: URL) async -> [String] {
+        let before = Set(albums.map(\.key))
+        do {
+            switch mode {
+            case .copyAndOrganize:
+                try FileManager.default.createDirectory(at: managedRoot, withIntermediateDirectories: true)
+                let source = try database.addSource(LibrarySource(path: managedRoot.standardizedFileURL.path, mode: .managed))
+                let chosen = files
+                _ = try await Task.detached { try Importer.copyAndOrganize(chosen, into: managedRoot) }.value
+                await scan(source)
+            case .reference:
+                let folders = Set(files.map { $0.deletingLastPathComponent().standardizedFileURL })
+                for folder in folders.sorted(by: { $0.path < $1.path }) {
+                    let bookmark = try? folder.bookmarkData(options: [.withSecurityScope], includingResourceValuesForKeys: nil, relativeTo: nil)
+                    let source = try database.addSource(LibrarySource(path: folder.path, bookmark: bookmark, mode: .reference))
+                    await scan(source)
+                }
+            }
+        } catch {
+            lastError = error.localizedDescription
+        }
+        let after = (try? database.albums()) ?? []
+        return after.map(\.key).filter { !before.contains($0) }
+    }
+
+    /// Proposals for the given albums (or every album missing something).
+    func enrichmentProposals(albumKeys: [String]?, correctExisting: Bool,
+                             progress: @escaping @MainActor (Int, Int) -> Void) async -> (proposals: [EnrichmentProposal], complete: Int) {
+        await enricher.setCorrectExisting(correctExisting)
+        let keys = albumKeys ?? ((try? database.albums()) ?? []).map(\.key)
+        var proposals: [EnrichmentProposal] = []
+        var complete = 0
+        for (i, key) in keys.enumerated() {
+            progress(i, keys.count)
+            let tracks = self.tracks(albumKey: key)
+            guard MetadataEnricher.needsEnrichment(tracks) || correctExisting else { complete += 1; continue }
+            if let p = await enricher.propose(albumKey: key, tracks: tracks) { proposals.append(p) } else { complete += 1 }
+        }
+        progress(keys.count, keys.count)
+        return (proposals, complete)
+    }
+
+    func apply(_ proposals: [EnrichmentProposal]) async -> (written: Int, failed: Int) {
+        var written = 0, failed = 0
+        for p in proposals {
+            let tracks = self.tracks(albumKey: p.albumKey)
+            if let r = try? await tagWriter.apply(p, tracks: tracks) { written += r.written + r.databaseOnly; failed += r.failures.count }
+            else { failed += tracks.count }
+        }
+        revision += 1
+        return (written, failed)
+    }
+
+    func setSkipsNonMusic(_ value: Bool) { Task { await scanner.setSkipsNonMusic(value) } }
 
     // MARK: Queries (synchronous, small)
 

@@ -51,7 +51,7 @@ public enum MetadataReader {
             title: title,
             artist: md.artist.flatMap(nonEmpty), album: md.albumTitle.flatMap(nonEmpty),
             albumArtist: md.albumArtist.flatMap(nonEmpty), composer: md.composer.flatMap(nonEmpty),
-            genre: md.genre.flatMap(nonEmpty), releaseDate: md.releaseDate.flatMap(nonEmpty),
+            genre: md.genre.flatMap(nonEmpty), releaseDate: md.releaseDate.flatMap(nonEmpty).map(displayDate),
             year: md.releaseDate.flatMap(year(from:)),
             trackNumber: md.trackNumber, trackTotal: md.trackTotal,
             discNumber: md.discNumber, discTotal: md.discTotal,
@@ -73,6 +73,12 @@ public enum MetadataReader {
     static func nonEmpty(_ s: String) -> String? {
         let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
         return t.isEmpty ? nil : t
+    }
+
+    /// "2018-08-27T12:00:00Z" (written for ID3v2, see TagWriter.id3Timestamp) → "2018-08-27".
+    static func displayDate(_ date: String) -> String {
+        for suffix in ["T12:00:00Z", "T00:00:00Z"] where date.hasSuffix(suffix) { return String(date.dropLast(suffix.count)) }
+        return date
     }
 
     static func year(from date: String) -> Int? {

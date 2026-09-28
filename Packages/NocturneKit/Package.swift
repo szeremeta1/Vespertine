@@ -55,7 +55,9 @@ let package = Package(
         ),
         // Hardware verification: drives the real engine against a device and reads back what Core Audio did.
         .executableTarget(name: "nocturne-probe", dependencies: ["NocturneAudio"]),
-        .testTarget(name: "NocturneAudioTests", dependencies: ["NocturneAudio", "CNocturneRT"]),
+        // Library operations from the command line (find music, import, enrich) — same code the app uses.
+        .executableTarget(name: "nocturne-library", dependencies: ["NocturneLibrary"]),
+        .testTarget(name: "NocturneAudioTests", dependencies: ["NocturneAudio", "CNocturneRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")]),
         .testTarget(name: "NocturneLibraryTests", dependencies: ["NocturneLibrary"]),
     ],
     swiftLanguageModes: [.v6]

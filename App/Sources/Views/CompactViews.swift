@@ -214,6 +214,9 @@ struct LibrarySettings: View {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
                 Toggle("Watch folders for changes", isOn: $s.watchFolders)
+                Toggle("Skip voice recordings and short clips", isOn: $s.skipNonMusic)
+                    .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
+                Button("Find Music on This Mac…") { model.showFindMusic = true }
             }
             Section("Library data") {
                 LabeledContent("Location") {

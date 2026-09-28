@@ -4,6 +4,7 @@
 //
 
 import CoreServices
+import Darwin
 import Foundation
 import SFBAudioEngine
 
@@ -12,41 +13,88 @@ public enum ImportMode: String, Sendable, CaseIterable {
 }
 
 public enum Importer {
-    /// Copies audio files (and their CUE sheets and cover images) into `root/Album Artist/Album/NN Title.ext`.
-    /// Returns the destination folders touched. Existing files are never overwritten.
-    public static func copyAndOrganize(_ urls: [URL], into root: URL) throws -> [URL] {
-        var touched = Set<URL>()
+    /// Copies audio files into `root/Album Artist/Album/NN Title.ext` (plus cover images found beside them).
+    /// Folders are expanded; `include` filters individual files (e.g. music only, hi-res only).
+    /// On APFS the copies are clones: instant and taking no extra space until modified.
+    /// Existing files are never overwritten. Returns the destination files.
+    @discardableResult
+    public static func copyAndOrganize(_ urls: [URL], into root: URL, include: (URL) -> Bool = { _ in true }) throws -> [URL] {
         let audioExts = LibraryScanner.audioExtensions
         let files = urls.flatMap { url -> [URL] in
             var isDir: ObjCBool = false
             guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else { return [] }
             return isDir.boolValue ? LibraryScanner.enumerate(url).audio : [url]
-        }.filter { audioExts.contains($0.pathExtension.lowercased()) }
+        }.filter { audioExts.contains($0.pathExtension.lowercased()) && include($0) }
 
+        // A source folder's cover image is only meaningful when that folder holds a single album.
+        var albumsPerSourceFolder: [URL: Set<URL>] = [:]
+        var written: [URL] = []
         for file in files {
             let md = (try? AudioFile(readingPropertiesAndMetadataFrom: file))?.metadata
-            let artist = sanitize(md?.albumArtist ?? md?.artist ?? "Unknown Artist")
-            let album = sanitize(md?.albumTitle ?? "Unknown Album")
-            var name = file.deletingPathExtension().lastPathComponent
-            if let title = md?.title, !title.isEmpty {
-                let number = md?.trackNumber.map { String(format: "%02d ", $0) } ?? ""
-                let disc = (md?.discTotal ?? 1) > 1 ? md?.discNumber.map { "\($0)-" } ?? "" : ""
-                name = disc + number + title
-            }
+            let inferred = FilenameParser.parse(file)
+            let artist = sanitize(md?.albumArtist.flatMap(nonEmpty) ?? md?.artist.flatMap(nonEmpty) ?? inferred.artist ?? "Unknown Artist")
+            let album = sanitize(md?.albumTitle.flatMap(nonEmpty) ?? inferred.album ?? "Singles")
+            let title = md?.title.flatMap(nonEmpty) ?? inferred.title
+            let number = md?.trackNumber ?? inferred.trackNumber
+            let disc = (md?.discTotal ?? 1) > 1 ? md?.discNumber.map { "\($0)-" } ?? "" : ""
+            let name = disc + (number.map { String(format: "%02d ", $0) } ?? "") + title
+
             let folder = root.appendingPathComponent(artist, isDirectory: true).appendingPathComponent(album, isDirectory: true)
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
             let dest = uniqueURL(folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased()))
-            try FileManager.default.copyItem(at: file, to: dest)
-            touched.insert(folder)
+            try cloneOrCopy(file, to: dest)
+            written.append(dest)
+            // The copy is ours: record what the file name told us, where the tags are empty.
+            fillMissingTags(at: dest, from: inferred, existing: md)
 
-            // Bring along companions that live next to the source.
-            let siblings = (try? FileManager.default.contentsOfDirectory(at: file.deletingLastPathComponent(), includingPropertiesForKeys: nil)) ?? []
-            for sibling in siblings where ["jpg", "jpeg", "png", "cue", "log"].contains(sibling.pathExtension.lowercased()) {
-                let target = folder.appendingPathComponent(sibling.lastPathComponent)
-                if !FileManager.default.fileExists(atPath: target.path) { try? FileManager.default.copyItem(at: sibling, to: target) }
+            albumsPerSourceFolder[file.deletingLastPathComponent(), default: []].insert(folder)
+        }
+
+        // Bring cover images from single-album source folders (never from mixed folders).
+        for (sourceFolder, albums) in albumsPerSourceFolder where albums.count == 1 {
+            let allAudio = LibraryScanner.enumerate(sourceFolder).audio.filter { $0.deletingLastPathComponent() == sourceFolder }
+            let imported = files.filter { $0.deletingLastPathComponent() == sourceFolder }
+            // Skip when the folder also holds audio we didn't import (it may belong to other albums).
+            guard Set(allAudio.map(\.standardizedFileURL)).isSubset(of: Set(imported.map(\.standardizedFileURL))) else { continue }
+            let siblings = (try? FileManager.default.contentsOfDirectory(at: sourceFolder, includingPropertiesForKeys: nil)) ?? []
+            for sibling in siblings where ["cover", "folder", "front"].contains(sibling.deletingPathExtension().lastPathComponent.lowercased())
+                && ["jpg", "jpeg", "png"].contains(sibling.pathExtension.lowercased()) {
+                let target = albums.first!.appendingPathComponent(sibling.lastPathComponent)
+                if !FileManager.default.fileExists(atPath: target.path) { try? cloneOrCopy(sibling, to: target) }
             }
         }
-        return Array(touched)
+        return written
+    }
+
+    static func fillMissingTags(at url: URL, from inferred: InferredTags, existing md: AudioMetadata?) {
+        let needsTitle = md?.title.flatMap(nonEmpty) == nil
+        let needsArtist = md?.artist.flatMap(nonEmpty) == nil && inferred.artist != nil
+        let needsAlbum = md?.albumTitle.flatMap(nonEmpty) == nil && inferred.album != nil
+        let needsNumber = md?.trackNumber == nil && inferred.trackNumber != nil
+        guard needsTitle || needsArtist || needsAlbum || needsNumber,
+              let file = try? AudioFile(readingPropertiesAndMetadataFrom: url) else { return }
+        let m = file.metadata
+        if needsTitle { m.title = inferred.title }
+        if needsArtist { m.artist = inferred.artist; if m.albumArtist == nil { m.albumArtist = inferred.artist } }
+        if needsAlbum { m.albumTitle = inferred.album }
+        if needsNumber { m.trackNumber = inferred.trackNumber }
+        TagWriter.protectDate(in: file)
+        try? file.writeMetadata()
+    }
+
+    /// APFS clone when possible (same volume), full copy otherwise. Metadata and timestamps are preserved.
+    static func cloneOrCopy(_ source: URL, to dest: URL) throws {
+        let status = source.withUnsafeFileSystemRepresentation { src in
+            dest.withUnsafeFileSystemRepresentation { dst in
+                copyfile(src!, dst!, nil, copyfile_flags_t(COPYFILE_ALL | COPYFILE_CLONE))
+            }
+        }
+        if status != 0 { try FileManager.default.copyItem(at: source, to: dest) }
+    }
+
+    static func nonEmpty(_ s: String) -> String? {
+        let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
     }
 
     static func sanitize(_ s: String) -> String {

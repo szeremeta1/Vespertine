@@ -450,7 +450,7 @@ struct MusicBrainzSheet: View {
         Task {
             do {
                 release = try await MusicBrainzClient.shared.release(id: id)
-                if model.settings.fetchArtworkOnline { cover = try? await MusicBrainzClient.shared.frontCover(releaseID: id) }
+                if model.settings.fetchArtworkOnline { cover = try? await MusicBrainzClient.shared.frontCover(releaseID: id, releaseGroupID: release?.releaseGroupID) }
             } catch { self.error = "Couldn't load the release: \(error.localizedDescription)" }
             busy = false
         }

@@ -4,6 +4,7 @@
 
 import AVFAudio
 import Foundation
+import SFBAudioEngine
 import Testing
 @testable import NocturneAudio
 
@@ -99,5 +100,27 @@ struct DecodeAndAnalysisTests {
         let result = try FileAnalyzer.analyze(url: url)
         #expect(result.verdict == .upsampled, "bandwidth \(result.bandwidthHz)")
         #expect(result.bandwidthHz > 17_000 && result.bandwidthHz < 24_500)
+    }
+}
+
+@Suite("Concurrency")
+struct ConcurrencyTests {
+    @Test("Opening many MP3 decoders concurrently doesn't crash (mpg123 init race)")
+    func concurrentMP3Opens() async throws {
+        let wav = try writeWAV("mp3src", rate: 44_100, bits: 16, seconds: 2) { c, i in Float(sin(Double(i) * 0.03 + Double(c))) * 0.3 }
+        defer { try? FileManager.default.removeItem(at: wav) }
+        let mp3 = wav.deletingPathExtension().appendingPathExtension("mp3")
+        try? FileManager.default.removeItem(at: mp3)
+        try SFBAudioEngine.AudioConverter.convert(wav, to: mp3)
+        defer { try? FileManager.default.removeItem(at: mp3) }
+
+        let results = await withTaskGroup(of: Bool.self) { group -> [Bool] in
+            for _ in 0..<200 { group.addTask { (try? SourceInspector.inspectWithDuration(mp3))?.format.codec == "MP3" } }
+            var all: [Bool] = []
+            for await r in group { all.append(r) }
+            return all
+        }
+        #expect(results.count == 200)
+        #expect(results.allSatisfy { $0 })
     }
 }

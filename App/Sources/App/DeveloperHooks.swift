@@ -20,7 +20,8 @@ enum DeveloperHooks {
         if let path = d.string(forKey: "NocturneSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "NocturneSnapshotDelay"), repeats: max(1, d.integer(forKey: "NocturneSnapshotCount"))) }
         }
-        guard open != nil || play != nil || d.object(forKey: "NocturneInspectorTab") != nil || d.bool(forKey: "NocturneOpenMini") else { return }
+        guard open != nil || play != nil || d.object(forKey: "NocturneInspectorTab") != nil || d.bool(forKey: "NocturneOpenMini")
+                || d.string(forKey: "NocturneOpenSheet") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -59,6 +60,11 @@ enum DeveloperHooks {
             model.inspectorTab = InspectorTab.allCases.first { $0.rawValue.lowercased().hasPrefix(tab.lowercased()) } ?? .nowPlaying
         }
         if let query = d.string(forKey: "NocturneSearch") { model.searchText = query }
+        switch d.string(forKey: "NocturneOpenSheet") {
+        case "findMusic": model.showFindMusic = true
+        case "enrich": model.enrichAlbumKeys = []
+        default: break
+        }
     }
 
     /// Renders every visible window (including its title bar) to `<dir>/<n>-<title>.png`.

@@ -15,8 +15,10 @@ Nocturne plays FLAC, ALAC, WAV, AIFF, DSD (DSF/DSDIFF), APE, WavPack, TTA, Opus,
 - **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, the device is held exclusively and the word length fits. Every other state is shown in copper with the reason.
 - **Gapless playback** across tracks that share a device format, including CUE-sheet albums split from a single file.
 - **Volume.** Nocturne uses the DAC's hardware volume when it has one. Optionally, a 64-bit dithered digital volume can be enabled; it's clearly marked as not bit-perfect.
-- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into a managed folder. It keeps albums, artists, songs, full-text search (accent-insensitive), playlists and smart playlists. Files on unplugged drives stay in the library and show as offline.
+- **Find Music on This Mac.** Spotlight searches every drive. Each file's true format is checked, and hi-res, lossless or all music can be picked by folder or by file. Recordings, prompts, clips and duplicate copies are left out.
+- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Nocturne`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs, full-text search (accent-insensitive), playlists and smart playlists. Files on unplugged drives stay in the library and show as offline.
 - **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert.
+- **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
 - **Analysis.** Finds a file's true bit depth (catches 16-bit audio padded into 24-bit files) and its bandwidth (catches upsampled "hi-res" and lossy-origin files). A *Suspect Hi-Res* smart playlist collects the results.
 - **Live spectrum** of exactly what the DAC receives, plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
@@ -72,6 +74,13 @@ cd Packages/NocturneKit && swift build -c release --product nocturne-probe
 ```bash
 .build/release/nocturne-probe play "FiiO K11" 3 ~/Music/a.flac ~/Music/b.flac
 ```
+
+`nocturne-library` runs the same library code from the command line:
+- `find` lists folders with music;
+- `hires` lists every hi-res file;
+- `search <term>` searches tags;
+- `import --library <dir> --into <dir> <files…>` imports;
+- `enrich --library <dir> [--apply high|all]` enriches.
 
 `gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the bit-depth and bandwidth analysis.
 
