@@ -14,8 +14,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.5.5"
-    CURRENT_PROJECT_VERSION: "12"
+    MARKETING_VERSION: "0.5.6"
+    CURRENT_PROJECT_VERSION: "13"
     DEAD_CODE_STRIPPING: YES
 targets:
   Nocturne:
@@ -97,4 +97,4 @@ schemes:
     test:
       targets: [NocturneAppTests]
       commandLineArguments:
-        '-NocturneDataDirectory "$(PROJECT_DIR)/build/audit/host-test-library"': true
+        '-NocturneDataDirectory "/tmp/nocturne-test-host-library"': true

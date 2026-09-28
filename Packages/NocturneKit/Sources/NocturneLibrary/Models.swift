@@ -228,6 +228,15 @@ public struct Album: Sendable, Hashable, Identifiable {
     /// Most channels on any track (2 for stereo albums).
     public var maxChannels: Int = 2
     public var isMultichannel: Bool { maxChannels > 2 }
+
+    public init(key: String, title: String, artist: String, year: Int?, genre: String?, trackCount: Int, duration: Double,
+                artworkKey: String?, formatSummary: String, codec: String, maxBitDepth: Int?, maxSampleRate: Double, isHiRes: Bool,
+                isDSD: Bool, addedAt: Date, totalSize: Int64, sourcePath: String?, maxChannels: Int = 2) {
+        self.key = key; self.title = title; self.artist = artist; self.year = year; self.genre = genre
+        self.trackCount = trackCount; self.duration = duration; self.artworkKey = artworkKey; self.formatSummary = formatSummary
+        self.codec = codec; self.maxBitDepth = maxBitDepth; self.maxSampleRate = maxSampleRate; self.isHiRes = isHiRes
+        self.isDSD = isDSD; self.addedAt = addedAt; self.totalSize = totalSize; self.sourcePath = sourcePath; self.maxChannels = maxChannels
+    }
 }
 
 // Only descriptive fields are overlaid: rescans still refresh file availability and CUE boundaries.

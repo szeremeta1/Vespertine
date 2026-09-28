@@ -48,6 +48,7 @@ enum DeveloperHooks {
             switch sidebar {
             case "artists": model.sidebar = .artists
             case "songs": model.sidebar = .songs
+            case "genres": model.sidebar = .genres
             case "recent": model.sidebar = .recentlyAdded
             default: if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
             }
@@ -75,6 +76,7 @@ enum DeveloperHooks {
             model.inspectorTab = InspectorTab.allCases.first { $0.rawValue.lowercased().hasPrefix(tab.lowercased()) } ?? .nowPlaying
         }
         if let query = d.string(forKey: "NocturneSearch") { model.searchText = query }
+        if let genre = d.string(forKey: "NocturneGenreFilter") { model.library.genreFilter = Genres.key(genre) }
         switch d.string(forKey: "NocturneOpenSheet") {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []

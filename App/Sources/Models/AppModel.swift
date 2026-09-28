@@ -11,7 +11,7 @@ import Observation
 import SwiftUI
 
 enum SidebarItem: Hashable {
-    case albums, artists, songs, recentlyAdded
+    case albums, artists, songs, genres, recentlyAdded
     case playlist(Int64)
     case source(Int64)
 }
@@ -19,6 +19,7 @@ enum SidebarItem: Hashable {
 enum DetailRoute: Hashable {
     case album(String)
     case artist(String)
+    case genre(String)
 }
 
 enum InspectorTab: String, CaseIterable, Identifiable {
@@ -127,6 +128,15 @@ final class AppModel {
         syncEngine()
         shares.start()
         analysis.start()
+        // Hand the DAC back when Nocturne quits: stop, release exclusive access, then restore or
+        // standardize its format as chosen in Settings.
+        NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.player.engine.stopAndWait()
+                DeviceRestore.finish(self.settings.deviceOnQuit)
+            }
+        }
         library.onScanFinished = { [weak self] in
             guard let self, self.settings.autoAnalyze else { return }
             self.analysis.analyzeLibrary()
