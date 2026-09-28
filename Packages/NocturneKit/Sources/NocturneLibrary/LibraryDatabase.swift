@@ -181,6 +181,12 @@ public final class LibraryDatabase: Sendable {
                 t.add(column: "isWritable", .boolean).notNull().defaults(to: false)
             }
         }
+        m.registerMigration("v6-multichannel-analysis") { db in
+            // Before 0.5.3, analysis read multichannel files as silence and called them genuine.
+            // Forget those results so the tracks are analyzed again, channel for channel.
+            try db.execute(sql: "DELETE FROM analysis WHERE trackId IN (SELECT id FROM track WHERE channels > 2)")
+            try db.execute(sql: "UPDATE track SET analysisVerdict = NULL, effectiveBitDepth = NULL, bandwidthHz = NULL WHERE channels > 2")
+        }
         return m
     }
 }

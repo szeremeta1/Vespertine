@@ -42,7 +42,7 @@ struct ForensicsTests {
         #expect(v == c.expected, "\(c.name): got \(v)")
     }
 
-    @Test("Multichannel (5.1) files are analyzed instead of crashing")
+    @Test("Multichannel (5.1) files are analyzed channel for channel, not read as silence")
     func multichannel() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-51-\(UUID().uuidString).wav")
         defer { try? FileManager.default.removeItem(at: url) }
@@ -55,11 +55,16 @@ struct ForensicsTests {
                                        commonFormat: .pcmFormatFloat32, interleaved: false)
             let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 96_000)!
             buffer.frameLength = 96_000
-            for c in 0..<6 { for i in 0..<96_000 { buffer.floatChannelData![c][i] = 0.1 * sin(Float(i) * Float(c + 1) * 0.01) } }
+            // The loudest signal is in the left surround only, so the peak proves every channel is read.
+            for c in 0..<6 { for i in 0..<96_000 { buffer.floatChannelData![c][i] = (c == 4 ? 0.5 : 0.1) * sin(Float(i) * Float(c + 1) * 0.01) } }
             try file.write(from: buffer)
         }
         let result = try FileAnalyzer.analyze(url: url)
         #expect(result.sampleRate == 48_000)
+        // Before 0.5.3 the converter matched channels by speaker label and read a labelled 5.1 file as silence.
+        #expect(abs(result.peakDBFS - (-6.02)) < 0.2, "peak \(result.peakDBFS)")
+        #expect(result.effectiveBitDepth == 24)
+        #expect(result.verdict != .notApplicable)
         #expect(AudioFormats.float32(sampleRate: 96_000, channels: 8, interleaved: true)?.channelCount == 8)
     }
 
