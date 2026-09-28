@@ -34,7 +34,7 @@ app=build/Release/Nocturne.app
 if ! $resume; then
   xcodegen generate >/dev/null
   xcodebuild -project Nocturne.xcodeproj -scheme Nocturne -configuration Release -derivedDataPath build/DDR \
-    -destination 'platform=macOS,arch=arm64' CODE_SIGN_IDENTITY=- build > build/release-log.txt 2>&1 \
+    -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY=- build > build/release-log.txt 2>&1 \
     || { grep -E "error:" build/release-log.txt; exit 1; }
 
   app=build/Release/Nocturne.app
