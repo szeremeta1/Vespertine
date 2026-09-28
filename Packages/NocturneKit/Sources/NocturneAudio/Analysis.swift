@@ -127,6 +127,9 @@ public enum FileAnalyzer {
               let output = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
             throw SourceOpenerError.unsupported(url)
         }
+        // Channel for channel. Left alone, the converter matches channels by speaker label, and a 5.1
+        // file's L/R/C/LFE/Ls/Rs match none of the plain numbered outputs, so every channel read silent.
+        converter.channelMap = (0..<channels).map { NSNumber(value: $0) }
 
         let fftSize = 8192
         let analyzer = SpectrumAnalyzer(size: fftSize)
@@ -222,6 +225,14 @@ public enum FileAnalyzer {
         }
 
         let measured = forensics.result()
+        if peak == 0 {
+            // Nothing but digital silence decoded: no evidence either way, so never call it genuine.
+            return FileAnalysis(claimedBitDepth: format.bitDepth, effectiveBitDepth: nil, sampleRate: format.sampleRate,
+                                bandwidthHz: 0, peakDBFS: -.infinity, clippedSamples: 0, verdict: .notApplicable,
+                                summary: "The file decoded as digital silence, so there's nothing to analyze.", spectrum: spectrum,
+                                secondsAnalyzed: framesDone / format.sampleRate, forensics: measured,
+                                version: FileAnalysis.currentVersion, confidence: 0)
+        }
         let judged = Self.judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: format.sampleRate)
         let verdict = judged.verdict, summary = judged.summary
         // The display bandwidth follows the forensic measurement (robust to faint sparse junk above a cutoff).
