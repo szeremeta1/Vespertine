@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import CryptoKit
 import GRDB
 import NocturneAudio
 
@@ -33,6 +34,7 @@ public struct ScanSummary: Sendable {
 public actor LibraryScanner {
     let database: LibraryDatabase
     let artwork: ArtworkStore
+    private var activeScans: [Int64: Task<ScanSummary, Error>] = [:]
 
     public init(database: LibraryDatabase, artwork: ArtworkStore) {
         self.database = database
@@ -47,18 +49,35 @@ public actor LibraryScanner {
     @discardableResult
     public func scan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {
         guard let sourceID = source.id else { return ScanSummary() }
+        if let active = activeScans[sourceID] { return try await active.value }
+        let task = Task { try await self.performScan(source, progress: progress) }
+        activeScans[sourceID] = task
+        defer { activeScans[sourceID] = nil }
+        return try await task.value
+    }
+
+    private func performScan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)?) async throws -> ScanSummary {
+        guard let sourceID = source.id else { return ScanSummary() }
         var summary = ScanSummary()
         let root = source.url
 
         var isDir: ObjCBool = false
-        let online = FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir) && isDir.boolValue
+        let online = FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir)
+            && (isDir.boolValue || Self.audioExtensions.contains(root.pathExtension.lowercased()))
         try await database.writer.write { db in
             try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, sourceID])
         }
         guard online else { return summary }
 
-        let (audioFiles, cueFiles) = Self.enumerate(root)
+        let (audioFiles, cueFiles) = try Self.enumerateChecked(root)
         let cueByAudio = Self.cueSheets(cueFiles)
+        let priorCues: [String: String] = try await database.writer.read { db in
+            var signatures: [String: String] = [:]
+            for row in try Row.fetchAll(db, sql: "SELECT filePath, signature FROM cueScanState WHERE sourceId = ?", arguments: [sourceID]) {
+                signatures[row["filePath"]] = row["signature"]
+            }
+            return signatures
+        }
 
         struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool }
         let known: [String: Known] = try await database.writer.read { db in
@@ -79,11 +98,14 @@ public actor LibraryScanner {
             if let cue = cueByAudio[url.path] {
                 let locations = cue.tracks.map { "\(url.path)#\($0.number)" }
                 locations.forEach { seen.insert($0) }
-                if let first = locations.first, let k = known[first], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 1, !k.isMissing { continue }
+                if priorCues[url.path] == cue.signature, locations.allSatisfy({ location in
+                    guard let k = known[location] else { return false }
+                    return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing
+                }) { continue }
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 1, !k.isMissing { continue }
+                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing { continue }
                 toRead.append(url)
             }
         }
@@ -104,7 +126,14 @@ public actor LibraryScanner {
             }
             while let (url, tracks) = try await group.next() {
                 processed += 1
-                if let tracks { batch.append(contentsOf: tracks) } else { summary.failed.append(url.path) }
+                if let tracks {
+                    // An invalid CUE may fall back to the whole file. Track what was actually indexed.
+                    if let cue = cueByAudio[url.path] {
+                        for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
+                    }
+                    for track in tracks { seen.insert(track.location) }
+                    batch.append(contentsOf: tracks)
+                } else { summary.failed.append(url.path) }
                 if batch.count >= 200 {
                     let pending = batch
                     batch.removeAll()
@@ -128,7 +157,12 @@ public actor LibraryScanner {
         // Flag files that disappeared (kept so playlists and play counts survive a re-plug).
         let missing = known.filter { !seen.contains($0.key) && !$0.value.isMissing }.map(\.value.id)
         summary.missing = missing.count
+        let failedPaths = Set(summary.failed)
         try await database.writer.write { db in
+            for (path, cue) in cueByAudio where !failedPaths.contains(path) {
+                try db.execute(sql: "INSERT OR REPLACE INTO cueScanState (sourceId, filePath, signature) VALUES (?, ?, ?)",
+                               arguments: [sourceID, path, cue.signature])
+            }
             for id in missing { try db.execute(sql: "UPDATE track SET isMissing = 1 WHERE id = ?", arguments: [id]) }
             try db.execute(sql: "UPDATE source SET lastScannedAt = ? WHERE id = ?", arguments: [Date(), sourceID])
         }
@@ -137,38 +171,63 @@ public actor LibraryScanner {
     }
 
     static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
+        (try? enumerateChecked(root)) ?? ([], [])
+    }
+
+    static func enumerateChecked(_ root: URL) throws -> (audio: [URL], cue: [URL]) {
         let exts = audioExtensions
+        if try root.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true {
+            let siblings = try FileManager.default.contentsOfDirectory(at: root.deletingLastPathComponent(), includingPropertiesForKeys: nil)
+            return ([root.resolvingSymlinksInPath()], siblings.filter { $0.pathExtension.lowercased() == "cue" })
+        }
         var audio: [URL] = []
         var cue: [URL] = []
         let keys: [URLResourceKey] = [.isRegularFileKey, .isHiddenKey]
+        var enumerationError: Error?
         guard let e = FileManager.default.enumerator(at: root, includingPropertiesForKeys: keys,
-                                                     options: [.skipsHiddenFiles, .skipsPackageDescendants]) else { return ([], []) }
+                options: [.skipsHiddenFiles, .skipsPackageDescendants], errorHandler: { _, error in
+                    enumerationError = error; return false
+                }) else { throw CocoaError(.fileReadNoPermission) }
         for case let url as URL in e {
+            let values = try url.resourceValues(forKeys: [.isRegularFileKey])
+            guard values.isRegularFile == true else { continue }
             let ext = url.pathExtension.lowercased()
-            if ext == "cue" { cue.append(url) }
-            else if exts.contains(ext) { audio.append(url) }
+            if ext == "cue" { cue.append(url.resolvingSymlinksInPath()) }
+            else if exts.contains(ext) { audio.append(url.resolvingSymlinksInPath()) }
         }
+        if let enumerationError { throw enumerationError }
         return (audio.sorted { $0.path < $1.path }, cue)
     }
 
     /// Maps an audio file path to the CUE file (and its tracks) that splits it.
-    static func cueSheets(_ cueFiles: [URL]) -> [String: (sheet: CueSheet, tracks: [CueSheet.Entry])] {
-        var map: [String: (CueSheet, [CueSheet.Entry])] = [:]
-        for cueURL in cueFiles {
+    static func cueSheets(_ cueFiles: [URL]) -> [String: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)] {
+        var map: [String: (CueSheet, [CueSheet.Entry], String)] = [:]
+        for cueURL in cueFiles.sorted(by: { $0.path < $1.path }) {
             guard let sheet = CueSheet.load(cueURL) else { continue }
             // Only single-file sheets with more than one track are split.
             guard sheet.files.count == 1, let file = sheet.files.first, file.tracks.count > 1 else { continue }
             let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name)
-            if FileManager.default.fileExists(atPath: audio.path) { map[audio.path] = (sheet, file.tracks) }
+            let starts = file.tracks.map(\.startCDFrames)
+            guard Set(file.tracks.map(\.number)).count == file.tracks.count,
+                  file.tracks.allSatisfy({ $0.number > 0 }),
+                  zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }),
+                  let data = try? Data(contentsOf: cueURL) else { continue }
+            if FileManager.default.fileExists(atPath: audio.path) {
+                map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
+            }
         }
         return map
     }
 
-    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry])?, artwork: ArtworkStore) -> [Track]? {
+    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)?, artwork: ArtworkStore) -> [Track]? {
         guard let base = try? MetadataReader.read(url: url, artwork: artwork) else { return nil }
         guard let cue else { return [base] }
         let rate = base.sampleRate
-        let totalFrames = Int64(base.duration * rate)
+        let frameCount = base.duration * rate
+        guard rate.isFinite, rate > 0, frameCount.isFinite, frameCount > 0,
+              frameCount < Double(Int64.max) else { return [base] }
+        let totalFrames = Int64(frameCount)
+        guard cue.tracks.allSatisfy({ CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate) < totalFrames }) else { return [base] }
         return cue.tracks.enumerated().map { index, entry in
             var t = base
             let start = CueSheet.sampleFrame(cdFrames: entry.startCDFrames, sampleRate: rate)
@@ -194,7 +253,7 @@ public actor LibraryScanner {
     }
 
     /// Inserts new tracks; updates changed ones while keeping library state (play counts, ratings, date added).
-    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase) async throws -> (added: Int, updated: Int) {
+    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase, preserveAnalysis: Bool = false) async throws -> (added: Int, updated: Int) {
         guard !tracks.isEmpty else { return (0, 0) }
         return try await database.writer.write { db in
             var added = 0, updated = 0
@@ -206,6 +265,15 @@ public actor LibraryScanner {
                     track.playCount = existing.playCount
                     track.lastPlayedAt = existing.lastPlayedAt
                     if track.rating == nil { track.rating = existing.rating }
+                    if preserveAnalysis {
+                        track.effectiveBitDepth = existing.effectiveBitDepth
+                        track.bandwidthHz = existing.bandwidthHz
+                        track.analysisVerdict = existing.analysisVerdict
+                    }
+                    if track.cueStartFrame != nil, let data = try Data.fetchOne(db,
+                        sql: "SELECT metadata FROM cueTagOverride WHERE trackId = ?", arguments: [existing.id]) {
+                        track.copyMetadata(from: try JSONDecoder().decode(Track.self, from: data))
+                    }
                     track.isMissing = false
                     try track.update(db)
                     updated += 1
@@ -228,7 +296,7 @@ public actor LibraryScanner {
             let cue = group.contains { $0.cueStartFrame != nil }
                 ? Self.cueSheets(Self.enumerate(url.deletingLastPathComponent()).cue)[path] : nil
             if let fresh = Self.readTracks(url, cue: cue, artwork: artwork) {
-                _ = try await Self.upsert(fresh, sourceID: sourceID, database: database)
+                _ = try await Self.upsert(fresh, sourceID: sourceID, database: database, preserveAnalysis: true)
             }
         }
     }

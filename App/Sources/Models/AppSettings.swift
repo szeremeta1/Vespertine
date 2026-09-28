@@ -25,7 +25,7 @@ enum RateChoice: Hashable, Identifiable {
 
     init(code: String) {
         if code == "max" { self = .maximum }
-        else if code.hasPrefix("fixed:"), let r = Double(code.dropFirst(6)) { self = .fixed(r) }
+        else if code.hasPrefix("fixed:"), let r = Double(code.dropFirst(6)), r.isFinite, r >= 8000, r <= 3_072_000 { self = .fixed(r) }
         else { self = .match }
     }
 
@@ -45,7 +45,7 @@ enum RateChoice: Hashable, Identifiable {
 @Observable
 @MainActor
 final class AppSettings {
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
 
     var exclusiveMode: Bool { didSet { defaults.set(exclusiveMode, forKey: "exclusiveMode") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
@@ -67,7 +67,8 @@ final class AppSettings {
     /// Library location. Overridable with `-NocturneDataDirectory <path>` for testing.
     let dataDirectory: URL
 
-    init() {
+    init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
+        self.defaults = defaults
         defaults.register(defaults: [
             "exclusiveMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
@@ -90,10 +91,12 @@ final class AppSettings {
         scrobble = defaults.bool(forKey: "scrobble")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
 
-        if let override = defaults.string(forKey: "NocturneDataDirectory") {
-            dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
+        if let dataDirectory {
+            self.dataDirectory = dataDirectory
+        } else if let override = defaults.string(forKey: "NocturneDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
+            self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
         } else {
-            dataDirectory = LibraryDatabase.defaultURL.deletingLastPathComponent()
+            self.dataDirectory = LibraryDatabase.defaultURL.deletingLastPathComponent()
         }
     }
 

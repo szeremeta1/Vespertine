@@ -160,8 +160,7 @@ struct FormatLabel: View {
 
     var body: some View {
         let parts = summary.components(separatedBy: " · ")
-        (Text(parts.first ?? "").foregroundStyle(highlight ? Palette.brass : Palette.text3)
-            + Text(parts.count > 1 ? " · " + parts.dropFirst().joined(separator: " · ") : "").foregroundStyle(Palette.text3))
+        Text("\(Text(parts.first ?? "").foregroundStyle(highlight ? Palette.brass : Palette.text3))\(Text(parts.count > 1 ? " · " + parts.dropFirst().joined(separator: " · ") : "").foregroundStyle(Palette.text3))")
             .font(Typeface.mono(10))
             .tracking(0.3)
     }

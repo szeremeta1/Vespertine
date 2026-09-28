@@ -23,7 +23,11 @@ public enum Importer {
             return isDir.boolValue ? LibraryScanner.enumerate(url).audio : [url]
         }.filter { audioExts.contains($0.pathExtension.lowercased()) }
 
-        for file in files {
+        var destinations: [String: URL] = [:]
+        for file in files where destinations[file.standardizedFileURL.path] == nil {
+            let managed = root.resolvingSymlinksInPath().path
+            let input = file.resolvingSymlinksInPath().path
+            if input.hasPrefix(managed + "/") { continue }
             let md = (try? AudioFile(readingPropertiesAndMetadataFrom: file))?.metadata
             let artist = sanitize(md?.albumArtist ?? md?.artist ?? "Unknown Artist")
             let album = sanitize(md?.albumTitle ?? "Unknown Album")
@@ -38,12 +42,41 @@ public enum Importer {
             let dest = uniqueURL(folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased()))
             try FileManager.default.copyItem(at: file, to: dest)
             touched.insert(folder)
+            destinations[file.standardizedFileURL.path] = dest
 
             // Bring along companions that live next to the source.
             let siblings = (try? FileManager.default.contentsOfDirectory(at: file.deletingLastPathComponent(), includingPropertiesForKeys: nil)) ?? []
-            for sibling in siblings where ["jpg", "jpeg", "png", "cue", "log"].contains(sibling.pathExtension.lowercased()) {
+            for sibling in siblings where ["jpg", "jpeg", "png", "log"].contains(sibling.pathExtension.lowercased()) {
                 let target = folder.appendingPathComponent(sibling.lastPathComponent)
                 if !FileManager.default.fileExists(atPath: target.path) { try? FileManager.default.copyItem(at: sibling, to: target) }
+            }
+        }
+        // Rewrite FILE references after every destination is known, including collision suffixes.
+        let parents = Set(files.map { $0.deletingLastPathComponent() })
+        for parent in parents {
+            let siblings = try FileManager.default.contentsOfDirectory(at: parent, includingPropertiesForKeys: nil)
+            for sheetURL in siblings where sheetURL.pathExtension.lowercased() == "cue" {
+                guard let sheet = CueSheet.load(sheetURL), !sheet.files.isEmpty else { continue }
+                let mapped = sheet.files.compactMap { destinations[parent.appendingPathComponent($0.name).standardizedFileURL.path] }
+                guard mapped.count == sheet.files.count, let folder = mapped.first?.deletingLastPathComponent() else { continue }
+                let data = try Data(contentsOf: sheetURL)
+                guard var text = [String.Encoding.utf8, .windowsCP1252, .isoLatin1, .shiftJIS]
+                    .compactMap({ String(data: data, encoding: $0) }).first else { continue }
+                for (source, dest) in zip(sheet.files, mapped) {
+                    let from = folder.standardizedFileURL.pathComponents
+                    let to = dest.standardizedFileURL.pathComponents
+                    let common = zip(from, to).prefix(while: { $0 == $1 }).count
+                    let relative = (Array(repeating: "..", count: from.count - common) + to.dropFirst(common)).joined(separator: "/")
+                    let pattern = "(?im)^(\\s*FILE\\s+)(?:\"" + NSRegularExpression.escapedPattern(for: source.name)
+                        + "\"|" + NSRegularExpression.escapedPattern(for: source.name) + ")(?=\\s)"
+                    let regex = try NSRegularExpression(pattern: pattern)
+                    let matches = regex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+                    for match in matches.reversed() {
+                        guard let range = Range(match.range, in: text), let prefix = Range(match.range(at: 1), in: text) else { continue }
+                        text.replaceSubrange(range, with: String(text[prefix]) + "\"" + relative + "\"")
+                    }
+                }
+                try text.write(to: uniqueURL(folder.appendingPathComponent(sheetURL.lastPathComponent)), atomically: true, encoding: .utf8)
             }
         }
         return Array(touched)
@@ -72,6 +105,7 @@ public enum Importer {
 public final class FolderWatcher: @unchecked Sendable {
     private var stream: FSEventStreamRef?
     private let queue = DispatchQueue(label: "org.nocturne.fsevents")
+    private let queueKey = DispatchSpecificKey<Bool>()
     private let onChange: @Sendable ([String]) -> Void
     private var pending = Set<String>()
     private var roots: [String] = []
@@ -79,6 +113,7 @@ public final class FolderWatcher: @unchecked Sendable {
 
     public init(onChange: @escaping @Sendable ([String]) -> Void) {
         self.onChange = onChange
+        queue.setSpecific(key: queueKey, value: true)
     }
 
     deinit { stop() }
@@ -95,7 +130,14 @@ public final class FolderWatcher: @unchecked Sendable {
                 let array = unsafeBitCast(paths, to: NSArray.self) as? [String] ?? []
                 watcher.received(Array(array.prefix(count)))
             }
-            stream = FSEventStreamCreate(nil, callback, &context, paths as CFArray, FSEventStreamEventId(kFSEventStreamEventIdSinceNow), 2.0,
+            let watchedPaths = paths.map { path in
+                var isDirectory: ObjCBool = false
+                if FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), !isDirectory.boolValue {
+                    return URL(fileURLWithPath: path).deletingLastPathComponent().path
+                }
+                return path
+            }
+            stream = FSEventStreamCreate(nil, callback, &context, watchedPaths as CFArray, FSEventStreamEventId(kFSEventStreamEventIdSinceNow), 2.0,
                                          FSEventStreamCreateFlags(kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagIgnoreSelf))
             if let stream {
                 FSEventStreamSetDispatchQueue(stream, queue)
@@ -104,9 +146,15 @@ public final class FolderWatcher: @unchecked Sendable {
         }
     }
 
-    public func stop() { queue.sync { stopLocked() } }
+    public func stop() {
+        if DispatchQueue.getSpecific(key: queueKey) == true { stopLocked() }
+        else { queue.sync { stopLocked() } }
+    }
 
     private func stopLocked() {
+        debounce?.cancel()
+        debounce = nil
+        pending.removeAll()
         guard let stream else { return }
         FSEventStreamStop(stream)
         FSEventStreamInvalidate(stream)
@@ -116,10 +164,13 @@ public final class FolderWatcher: @unchecked Sendable {
 
     private func received(_ paths: [String]) {
         for path in paths {
-            if let root = roots.first(where: { path.hasPrefix($0) }) { pending.insert(root) }
+            for root in roots where path == root || path.hasPrefix(root == "/" ? "/" : root + "/") {
+                pending.insert(root)
+            }
         }
         debounce?.cancel()
-        let work = DispatchWorkItem { [self] in
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
             let changed = Array(pending)
             pending.removeAll()
             if !changed.isEmpty { onChange(changed) }

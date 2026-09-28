@@ -178,6 +178,8 @@ struct PlaybackSettings: View {
         .onChange(of: s.exclusiveMode) { model.syncEngine() }
         .onChange(of: s.releaseAfterPause) { model.syncEngine() }
         .onChange(of: s.allowDigitalVolume) { model.syncEngine() }
+        .onChange(of: s.replayGain) { model.player.refreshReplayGain() }
+        .onChange(of: s.replayGainPreampDB) { model.player.refreshReplayGain() }
     }
 }
 
@@ -213,7 +215,9 @@ struct LibrarySettings: View {
                 LabeledContent("Managed folder") {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
-                Toggle("Watch folders for changes", isOn: $s.watchFolders)
+                Toggle("Watch folders for changes", isOn: Binding(get: { s.watchFolders }, set: {
+                    s.watchFolders = $0; model.library.updateWatcher()
+                }))
             }
             Section("Library data") {
                 LabeledContent("Location") {

@@ -75,14 +75,20 @@ public struct CueSheet: Sendable, Hashable {
 
     /// "mm:ss:ff" → CD frames.
     static func cdFrames(_ time: String) -> Int? {
-        let parts = time.split(separator: ":").compactMap { Int($0) }
-        guard parts.count == 3 else { return nil }
-        return (parts[0] * 60 + parts[1]) * 75 + parts[2]
+        let parts = time.split(separator: ":", omittingEmptySubsequences: false)
+        guard parts.count == 3, let minutes = Int(parts[0]), let seconds = Int(parts[1]),
+              let frames = Int(parts[2]), minutes >= 0, (0..<60).contains(seconds), (0..<75).contains(frames) else { return nil }
+        let (m, overflow1) = minutes.multipliedReportingOverflow(by: 4500)
+        let (total, overflow2) = m.addingReportingOverflow(seconds * 75 + frames)
+        return overflow1 || overflow2 ? nil : total
     }
 
     /// Converts CD frames to sample frames at `sampleRate`.
     public static func sampleFrame(cdFrames: Int, sampleRate: Double) -> Int64 {
-        Int64((Double(cdFrames) * sampleRate / 75).rounded())
+        let frame = (Double(cdFrames) * sampleRate / 75).rounded()
+        guard cdFrames >= 0, sampleRate.isFinite, sampleRate > 0, frame.isFinite,
+              frame >= 0, frame < Double(Int64.max) else { return 0 }
+        return Int64(frame)
     }
 
     private static func split(_ s: String) -> (String, String) {

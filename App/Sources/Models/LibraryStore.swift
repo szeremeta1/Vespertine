@@ -61,8 +61,8 @@ final class LibraryStore {
     private(set) var scanProgress: ScanProgress?
     private(set) var lastError: String?
 
-    private var albumTask: Task<Void, Never>?
-    private var tasks: [Task<Void, Never>] = []
+    @ObservationIgnored private var albumTask: Task<Void, Never>?
+    @ObservationIgnored private var tasks: [Task<Void, Never>] = []
     private var watcher: FolderWatcher?
 
     init(dataDirectory: URL) throws {
@@ -74,6 +74,11 @@ final class LibraryStore {
         ArtworkCache.shared.store = artwork
         observe()
         Task { await tagWriter.purgeBackups() }
+    }
+
+    deinit {
+        albumTask?.cancel()
+        for task in tasks { task.cancel() }
     }
 
     var filteredAlbums: [Album] { formatFilter == .all ? albums : albums.filter(formatFilter.matches) }
@@ -110,7 +115,7 @@ final class LibraryStore {
             let obs = ValueObservation.tracking { db in
                 try Row.fetchOne(db, sql: """
                     SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                           coalesce(sum(fileSize), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
+                           coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
                     """).map { LibraryDatabase.Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
             }
             do { for try await value in obs.values(in: writer) { if let value { self?.stats = value } } } catch {}
@@ -141,7 +146,8 @@ final class LibraryStore {
             case .copyAndOrganize:
                 try FileManager.default.createDirectory(at: managedRoot, withIntermediateDirectories: true)
                 let source = try database.addSource(LibrarySource(path: managedRoot.standardizedFileURL.path, mode: .managed))
-                _ = try await Task.detached { try Importer.copyAndOrganize(urls, into: managedRoot) }.value
+                do { _ = try await Task.detached { try Importer.copyAndOrganize(urls, into: managedRoot) }.value }
+                catch { await scan(source); throw error }
                 await scan(source)
             }
         } catch {
@@ -152,9 +158,10 @@ final class LibraryStore {
     func scan(_ source: LibrarySource) async {
         scanProgress = ScanProgress(sourcePath: source.path, processed: 0, total: 0, added: 0, updated: 0)
         do {
-            _ = try await scanner.scan(source) { progress in
+            let summary = try await scanner.scan(source) { [weak self] progress in
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
+            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
         } catch {
             lastError = error.localizedDescription
         }
@@ -172,8 +179,8 @@ final class LibraryStore {
         revision += 1
     }
 
-    private func updateWatcher() {
-        let paths = sources.filter(\.isOnline).map(\.path)
+    func updateWatcher() {
+        let paths = sources.map(\.path)
         if watcher == nil {
             watcher = FolderWatcher { [weak self] changed in
                 Task { @MainActor in
@@ -216,9 +223,16 @@ final class LibraryStore {
         }
     }
 
-    func revert(_ tracks: [Track]) async {
-        for t in tracks { if let id = t.id { _ = try? await tagWriter.revertLastEdit(trackID: id) } }
+    @discardableResult
+    func revert(_ tracks: [Track]) async -> Int {
+        var restored = 0
+        for t in tracks {
+            guard let id = t.id else { continue }
+            do { if try await tagWriter.revertLastEdit(trackID: id) { restored += 1 } }
+            catch { lastError = error.localizedDescription }
+        }
         revision += 1
+        return restored
     }
 
     func createPlaylist(name: String, rules: SmartRules? = nil, trackIDs: [Int64] = []) -> Playlist? {

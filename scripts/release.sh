@@ -32,6 +32,16 @@ done
 if $notarize && [[ $identity == "-" ]]; then print -u2 "Notarization needs a Developer ID identity."; exit 2; fi
 out=${NOCTURNE_OUT:-build/Release}
 derived=${NOCTURNE_DERIVED:-build/DDR}
+# Refuse destructive output roots before building or removing anything.
+resolved_out=${out:A}
+resolved_project=${PWD:A}
+if [[ $resolved_out == / || $resolved_out == $HOME || $resolved_out == $resolved_project || $resolved_out == /Applications ]]; then
+  print -u2 "Refusing unsafe release output folder: $out"; exit 2
+fi
+if [[ $resolved_project == $resolved_out/* ]]; then
+  print -u2 "Release output must not contain the project: $out"; exit 2
+fi
+mkdir -p "${out:h}"
 keychain=(); [[ -n ${NOCTURNE_SIGN_KEYCHAIN:-} ]] && keychain=(--keychain "$NOCTURNE_SIGN_KEYCHAIN")
 
 app="$out/Nocturne.app"
@@ -43,8 +53,11 @@ make_dmg() {
   [[ -x build/.venv/bin/dmgbuild ]] || { python3 -m venv build/.venv && build/.venv/bin/pip install -q dmgbuild; }
   swift scripts/make-dmg-background.swift "$version" "$art" >/dev/null
   rm -f "$dest"
-  build/.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$app" -D background="$art/background.png" \
-    "Nocturne $version" "$dest" 2>&1 | grep -v deprecated || true
+  if ! build/.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$app" -D background="$art/background.png" \
+      "Nocturne $version" "$dest" > "$out/dmgbuild.log" 2>&1; then
+    cat "$out/dmgbuild.log" >&2
+    print -u2 "dmgbuild failed"; exit 1
+  fi
   [[ -f $dest ]] || { print -u2 "dmgbuild failed"; exit 1; }
 }
 
@@ -66,7 +79,11 @@ if ! $resume; then
     || { grep -E "error:" "$out".log; exit 1; }
 
   app="$out/Nocturne.app"
-  rm -rf "$out" && mkdir -p "$out" && ditto "$derived"/Build/Products/Release/Nocturne.app "$app"
+  mkdir -p "$out"
+  staged="$out/.Nocturne-build-$$.app"
+  ditto "$derived"/Build/Products/Release/Nocturne.app "$staged"
+  rm -rf "$app"
+  mv "$staged" "$app"
 
   # Inside-out: frameworks first, then the app.
   if [[ $identity == "-" ]]; then
@@ -127,7 +144,15 @@ fi
 
 if $install; then
   pkill -x Nocturne 2>/dev/null || true
-  rm -rf /Applications/Nocturne.app
-  ditto "$app" /Applications/Nocturne.app
+  staged_install="/Applications/.Nocturne-install-$$.app"
+  ditto "$app" "$staged_install"
+  codesign --verify --deep --strict "$staged_install"
+  prior_install="/Applications/.Nocturne-previous-$$.app"
+  if [[ -e /Applications/Nocturne.app ]]; then mv /Applications/Nocturne.app "$prior_install"; fi
+  if ! mv "$staged_install" /Applications/Nocturne.app; then
+    [[ ! -e "$prior_install" ]] || mv "$prior_install" /Applications/Nocturne.app
+    print -u2 "Installation failed; previous app restored."; exit 1
+  fi
+  rm -rf "$prior_install"
   echo "Installed /Applications/Nocturne.app"
 fi

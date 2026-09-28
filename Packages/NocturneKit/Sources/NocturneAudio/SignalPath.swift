@@ -33,7 +33,8 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.exclusive, !modifiesSamples else { return false }
+        guard deviceProfile.canBeBitPerfect, applied.exclusive, !modifiesSamples,
+              plan.channels == source.channels, applied.virtualChannels >= source.channels else { return false }
         switch plan.mode {
         case .dop:
             return applied.physicalBitDepth >= 24 && abs(applied.sampleRate - plan.deviceSampleRate) < 0.5
