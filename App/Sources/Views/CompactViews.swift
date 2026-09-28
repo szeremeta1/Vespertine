@@ -137,6 +137,7 @@ struct SettingsView: View {
             PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }
+            UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 560, height: 460)
@@ -254,6 +255,30 @@ struct OnlineSettings: View {
                     if let validation { Text(validation).font(.caption).foregroundStyle(.secondary) }
                 }
                 Text("Your token is stored in the macOS Keychain. Find it at listenbrainz.org → Settings.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+struct UpdateSettings: View {
+    @Environment(AppUpdater.self) private var updater
+
+    var body: some View {
+        @Bindable var updater = updater
+        Form {
+            Section("Software Update") {
+                Toggle("Automatically check for updates", isOn: $updater.automaticallyChecks)
+                Toggle("Automatically download and install updates", isOn: $updater.automaticallyDownloads)
+                    .disabled(!updater.automaticallyChecks)
+                HStack {
+                    Button("Check Now") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
+                    if let last = updater.lastCheck {
+                        Text("Last checked \(last.formatted(.relative(presentation: .named)))").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Text("Updates come from Nocturne's GitHub releases. Each one is signed by the developer and verified before it is installed.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }

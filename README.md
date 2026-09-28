@@ -77,6 +77,28 @@ cd Packages/NocturneKit && swift build -c release --product nocturne-probe
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
+## Releasing
+
+```bash
+scripts/release.sh --notarize --install
+```
+
+```bash
+scripts/publish.sh docs/releases/<version>.md
+```
+
+The first command builds a universal app and signs it (and every embedded framework and Sparkle helper) with the Developer ID. It then notarizes and staples both the app and a designed installer DMG. If Apple takes longer than two hours, rerun it with `--resume` instead of `--notarize`.
+
+The second command publishes the GitHub release: it signs the Sparkle appcast entry with the `nocturne` EdDSA key from the login keychain and uploads `appcast.xml` next to the DMG. Installed copies read the feed from `releases/latest/download/appcast.xml`.
+
+**Back up the Sparkle signing key.** Without it, no future update can be published to existing installs:
+
+```bash
+build/DDR/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys --account nocturne -x nocturne-sparkle-key.txt
+```
+
+Store that file somewhere safe (it is a secret), then delete it.
+
 ## Layout
 
 | Path | What |
