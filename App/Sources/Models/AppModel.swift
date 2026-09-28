@@ -116,10 +116,15 @@ final class AppModel {
         shares = NetworkShareManager(library: library, settings: settings)
         player = PlayerController(library: library, settings: settings, shares: shares)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
-        analysis.isStreamingPlayback = { [weak player = self.player, weak shares = self.shares] in
+        let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
             guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
             return player.state == .playing || (player.state != .paused && Date().timeIntervalSince(player.trackStartedAt) < 20)
+        }
+        analysis.isStreamingPlayback = streaming
+        shares.isStreamingPlayback = streaming
+        analysis.onServerStatus = { [weak shares = self.shares] id, status in
+            Task { await shares?.serverReported(status, for: id) }
         }
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
