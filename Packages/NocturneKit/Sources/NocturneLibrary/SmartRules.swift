@@ -165,5 +165,6 @@ public extension SmartRules {
         SmartRule(field: .verdict, op: .equals, value: "upsampled"),
         SmartRule(field: .verdict, op: .equals, value: "paddedBitDepth"),
         SmartRule(field: .verdict, op: .equals, value: "possibleLossyOrigin"),
+        SmartRule(field: .verdict, op: .equals, value: "bandwidthExtended"),
     ])
 }

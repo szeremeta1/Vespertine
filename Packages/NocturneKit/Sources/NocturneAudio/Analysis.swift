@@ -76,8 +76,12 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
         case paddedBitDepth     // e.g. 16-bit content in a 24-bit container
         case upsampled          // band-limited far below Nyquist
         case possibleLossyOrigin
+        case bandwidthExtended  // high frequencies synthesized above a lossy cutoff (SBR, AI "enhanced")
         case notApplicable      // lossy / DSD source
     }
+
+    /// Bumped when the analysis learns something new, so older results can be refreshed.
+    public static let currentVersion = 2
 
     public var claimedBitDepth: Int?
     public var effectiveBitDepth: Int?
@@ -92,6 +96,10 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
     public var spectrum: [Float]
     /// How much audio was actually decoded and inspected.
     public var secondsAnalyzed: Double = 0
+    public var forensics: SpectralForensics?
+    public var version: Int = 1
+    /// How sure the verdict is, 0…1 (1 for exact findings such as zero padding).
+    public var confidence: Double = 0
 }
 
 public enum FileAnalyzer {
@@ -137,6 +145,11 @@ public enum FileAnalyzer {
         var exhausted = false
         var framesSinceFFT = 0
         let fftStride = Int(format.sampleRate / 4) // four spectra per second
+        let forensics = ForensicsAccumulator(sampleRate: format.sampleRate)
+        var forensicMono = [Float](repeating: 0, count: forensics.fftSize)
+        let historyLimit = 2 * max(fftSize, forensics.fftSize)
+        var history: [Float] = []
+        history.reserveCapacity(historyLimit + Int(chunk))
 
         while !exhausted && framesDone < limit {
             output.frameLength = 0
@@ -170,15 +183,19 @@ public enum FileAnalyzer {
                     orBits |= Int32(max(Double(Int32.min), min(Double(Int32.max), integer.rounded())))
                 }
             }
-            // Mono mix for spectrum, sampled across the file.
+            // Mono mix into a rolling history, so frames never depend on how the decoder chunks audio.
+            for i in 0..<n {
+                var sum: Float = 0
+                for c in 0..<channels { sum += data[c][i] }
+                history.append(sum / Float(channels))
+            }
+            if history.count > historyLimit { history.removeFirst(history.count - historyLimit) }
             framesSinceFFT += n
-            if framesSinceFFT >= fftStride, n >= fftSize {
+            if framesSinceFFT >= fftStride, history.count >= max(fftSize, forensics.fftSize) {
                 framesSinceFFT = 0
-                for i in 0..<fftSize {
-                    var sum: Float = 0
-                    for c in 0..<channels { sum += data[c][i] }
-                    mono[i] = sum / Float(channels)
-                }
+                forensicMono = Array(history.suffix(forensics.fftSize))
+                forensics.add(forensicMono)
+                mono = Array(history.suffix(fftSize))
                 let mags = analyzer.magnitudes(mono)
                 for i in 0..<mags.count { spectrumSum[i] += pow(10, Double(mags[i]) / 10) }
                 spectrumFrames += 1
@@ -205,23 +222,75 @@ public enum FileAnalyzer {
             return Float(avgDB[bin])
         }
 
-        var verdict = FileAnalysis.Verdict.genuine
-        var summary = "Uses the full \(claimed)-bit word length; content reaches \(Int(bandwidth / 1000)) kHz."
-        if let effective, effective > 0, effective < claimed - 1 {
-            verdict = .paddedBitDepth
-            summary = "\(claimed)-bit file, but only \(effective) bits carry audio (zero-padded)."
-        } else if format.sampleRate >= 88_200, bandwidth > 0, bandwidth < 24_500 {
-            verdict = .upsampled
-            summary = "Content stops at ~\(String(format: "%.1f", bandwidth / 1000)) kHz, which suggests an upsampled 44.1/48 kHz master."
-        } else if format.sampleRate <= 48_000, bandwidth > 0, bandwidth < 19_500 {
-            verdict = .possibleLossyOrigin
-            summary = "Sharp cutoff at ~\(String(format: "%.1f", bandwidth / 1000)) kHz; may have been made from a lossy file."
-        }
+        let measured = forensics.result()
+        let judged = Self.judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: format.sampleRate)
+        let verdict = judged.verdict, summary = judged.summary
+        // The display bandwidth follows the forensic measurement (robust to faint sparse junk above a cutoff).
+        let shownBandwidth = judged.bandwidth ?? bandwidth
 
         return FileAnalysis(claimedBitDepth: format.bitDepth, effectiveBitDepth: effective, sampleRate: format.sampleRate,
-                            bandwidthHz: bandwidth, peakDBFS: peak > 0 ? 20 * log10(Double(peak)) : -.infinity,
+                            bandwidthHz: shownBandwidth, peakDBFS: peak > 0 ? 20 * log10(Double(peak)) : -.infinity,
                             clippedSamples: clipped, verdict: verdict, summary: summary, spectrum: spectrum,
-                            secondsAnalyzed: framesDone / format.sampleRate)
+                            secondsAnalyzed: framesDone / format.sampleRate, forensics: measured,
+                            version: FileAnalysis.currentVersion, confidence: judged.confidence)
+    }
+
+    /// Verdict from the measurements. Thresholds are calibrated on genuine CD and hi-res masters
+    /// against the same audio passed through MP3 (128/320/V0), AAC (128/256), Opus (96/160),
+    /// HE-AAC (SBR), 44.1 kHz upsampling and 16-bit padding (see docs/ANALYSIS.md). Genuine CD
+    /// masters show anti-alias walls at 20.4–21.3 kHz (steep ones, up to ~39 dB, at 21.1 kHz and
+    /// above), so only walls below 20.7 kHz count against a CD-rate file.
+    static func judge(forensics f: SpectralForensics, claimedBits: Int, effectiveBits: Int?, sampleRate: Double)
+        -> (verdict: FileAnalysis.Verdict, summary: String, confidence: Double, bandwidth: Double?) {
+        func khz(_ hz: Double) -> String { String(format: "%.1f", hz / 1000) }
+        if let effectiveBits, effectiveBits > 0, effectiveBits < claimedBits - 1 {
+            return (.paddedBitDepth, "\(claimedBits)-bit file, but only \(effectiveBits) bits carry audio (zero-padded).", 1, nil)
+        }
+        // Codec wall: a steep, frame-to-frame low-pass below the anti-alias zone. A lower step counts
+        // too when a steeper wall sits above it (a lossy file later upsampled or extended).
+        var wall: Double?
+        var wallConfidence = 0.0
+        let hiRes = sampleRate >= 88_200
+        if let hz = f.cliffHz, hz < 19_600, f.cliffDropDB >= 15, f.cliffConsistency >= 0.5 {
+            wall = hz
+            wallConfidence = min(1, 0.5 + (f.cliffDropDB - 15) / 40 + (f.cliffConsistency - 0.5) / 2)
+        } else if let hz = f.shelfHz, hz < 19_600, f.shelfStepDB >= 15, f.shelfConsistency >= 0.6 {
+            wall = hz
+            wallConfidence = min(1, 0.5 + (f.shelfStepDB - 15) / 40 + (f.shelfConsistency - 0.6) / 2)
+        } else if !hiRes, let hz = f.cliffHz, hz >= 19_600, hz < 20_700, f.cliffDropDB >= 22, f.cliffConsistency >= 0.85 {
+            // Lossy encoders' 20 kHz-class low-passes sit at 19.9–20.6 kHz (MP3 320 ≈ 20.0, Opus 20.3,
+            // HE-AAC 20.4–20.6); steep genuine CD mastering filters measured at 21.1 kHz and up.
+            // In hi-res files this zone means "made from a 44.1/48 kHz file" (reported as upsampled below).
+            wall = hz
+            wallConfidence = min(1, 0.5 + (f.cliffDropDB - 22) / 40 + (f.cliffConsistency - 0.85))
+        }
+        // Synthetic high frequencies: a flat shelf of real content above a lower step.
+        if let shelf = f.shelfHz, shelf <= 20_500, f.shelfStepDB >= 10, f.shelfSlope >= -2.5, f.shelfAboveFloorDB >= 10,
+           f.shelfConsistency >= 0.8, f.shelfEndHz - shelf >= 1_500,
+           wall != nil || (shelf < 19_600 && f.shelfStepDB >= 15) {
+            // A hard wall closing the shelf (where the generator stopped) is strong corroboration.
+            let closedByWall = f.cliffHz.map { $0 > shelf + 1_000 && f.cliffDropDB >= 22 && f.cliffConsistency >= 0.85 } ?? false
+            let conf = min(1, 0.55 + (f.shelfConsistency - 0.8) + min(0.3, (f.shelfStepDB - 10) / 60) + (closedByWall ? 0.15 : 0))
+            return (.bandwidthExtended,
+                    "Made from a lossy source that stopped at ~\(khz(shelf)) kHz. The content from \(khz(shelf)) to \(khz(f.shelfEndHz)) kHz is a flat, uniform shelf generated afterwards (SBR or AI \u{201C}enhancement\u{201D}), not recorded detail.",
+                    conf, shelf)
+        }
+        if let wall {
+            return (.possibleLossyOrigin,
+                    "Brick-wall cutoff at ~\(khz(wall)) kHz in \(Int((f.cliffConsistency * 100).rounded()))% of the music (\(Int(f.cliffDropDB.rounded())) dB drop): the signature of an MP3, AAC or Opus encode converted to a lossless file.",
+                    wallConfidence, wall)
+        }
+        if hiRes, let hz = f.cliffHz, hz >= 19_600, hz <= 24_500, f.cliffDropDB >= 18, f.cliffConsistency >= 0.9 {
+            return (.upsampled,
+                    "Hard cutoff at ~\(khz(hz)) kHz with nothing recorded above it: a 44.1/48 kHz master upsampled to \(SampleRate.format(sampleRate)) kHz.",
+                    min(1, 0.6 + (f.cliffDropDB - 18) / 40), hz)
+        }
+        let reach = f.contentHz
+        var note = "Uses the full \(claimedBits)-bit word length; no codec cutoff, synthetic shelf or upsampling wall."
+        if sampleRate >= 88_200, reach > 0, reach < 26_000 {
+            note += " Little recorded above ~\(khz(reach)) kHz, which is normal for analog-era masters."
+        }
+        return (.genuine, note, 0.8, reach > 0 ? reach : nil)
     }
 
     /// Highest frequency whose smoothed level is clearly above the top-band noise floor.

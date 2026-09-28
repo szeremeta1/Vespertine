@@ -78,6 +78,10 @@ struct NocturneCommands: Commands {
                 .keyboardShortcut("r", modifiers: [.command, .option])
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
+            Button(model.analysis.isRunning ? "Stop Analyzing" : "Analyze Library") {
+                if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
+            }
+            .keyboardShortcut("a", modifiers: [.command, .option])
         }
         CommandMenu("Controls") {
             // Space is handled by the main window so it never steals spaces from text fields.

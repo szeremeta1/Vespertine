@@ -5,6 +5,7 @@
 
 import Foundation
 import GRDB
+import NocturneAudio
 
 public final class LibraryDatabase: Sendable {
     public let writer: any DatabaseWriter
@@ -149,6 +150,28 @@ public final class LibraryDatabase: Sendable {
                 t.belongsTo("track", onDelete: .cascade).notNull()
                 t.primaryKey(["trackId"])
                 t.column("metadata", .blob).notNull()
+            }
+        }
+        m.registerMigration("v5-analysis-store") { db in
+            try db.create(table: "analysis") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("fileSize", .integer).notNull()
+                t.column("modifiedAt", .datetime).notNull()
+                t.column("version", .integer).notNull()
+                t.column("analyzedAt", .datetime).notNull()
+                t.column("data", .blob).notNull()
+            }
+            // Verdicts from the first analyzer flagged natural roll-offs as lossy and missed synthetic
+            // high frequencies; clear them so tracks are re-analyzed with the calibrated forensics.
+            try db.execute(sql: "UPDATE track SET analysisVerdict = NULL, effectiveBitDepth = NULL, bandwidthHz = NULL")
+            let old = SmartRules(match: .any, rules: [
+                SmartRule(field: .verdict, op: .equals, value: "upsampled"),
+                SmartRule(field: .verdict, op: .equals, value: "paddedBitDepth"),
+                SmartRule(field: .verdict, op: .equals, value: "possibleLossyOrigin"),
+            ])
+            for var playlist in try Playlist.filter(Column("name") == "Suspect Hi-Res").fetchAll(db) where playlist.smartRules == old {
+                playlist.smartRules = .suspect
+                try playlist.update(db)
             }
         }
         m.registerMigration("v2-network-shares") { db in
@@ -410,6 +433,56 @@ public extension LibraryDatabase {
     func setRating(_ rating: Int?, trackIDs: [Int64]) throws {
         try writer.write { db in
             for id in trackIDs { try db.execute(sql: "UPDATE track SET rating = ? WHERE id = ?", arguments: [rating, id]) }
+        }
+    }
+
+    /// A saved analysis and whether it still describes the file (same file, same analyzer).
+    public struct StoredAnalysis: Sendable {
+        public var analysis: FileAnalysis
+        public var analyzedAt: Date
+        public var isCurrent: Bool
+    }
+
+    /// Saves a full analysis for every track that plays from `filePath` (CUE tracks share a file).
+    public func saveAnalysis(_ analysis: FileAnalysis, filePath: String) throws {
+        let data = try JSONEncoder().encode(analysis)
+        try writer.write { db in
+            for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) {
+                guard let id = track.id else { continue }
+                try db.execute(sql: """
+                    INSERT OR REPLACE INTO analysis (trackId, fileSize, modifiedAt, version, analyzedAt, data)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """, arguments: [id, track.fileSize, track.modifiedAt, analysis.version, Date(), data])
+                try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
+                               arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
+            }
+        }
+    }
+
+    public func storedAnalysis(for track: Track) throws -> StoredAnalysis? {
+        guard let id = track.id else { return nil }
+        return try writer.read { db in
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM analysis WHERE trackId = ?", arguments: [id]),
+                  let analysis = try? JSONDecoder().decode(FileAnalysis.self, from: row["data"] as Data) else { return nil }
+            let size: Int64 = row["fileSize"], modified: Date = row["modifiedAt"], version: Int = row["version"]
+            let current = version >= FileAnalysis.currentVersion && size == track.fileSize
+                && abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001
+            return StoredAnalysis(analysis: analysis, analyzedAt: row["analyzedAt"], isCurrent: current)
+        }
+    }
+
+    /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
+    /// analyzed by an older version). One track per file.
+    public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = []) throws -> [Track] {
+        try writer.read { db in
+            let rows = try Track.fetchAll(db, sql: """
+                SELECT t.* FROM track t LEFT JOIN analysis a ON a.trackId = t.id
+                WHERE t.isMissing = 0 AND t.isLossless = 1 AND t.isDSD = 0
+                  AND (a.trackId IS NULL OR a.version < ? OR a.fileSize != t.fileSize OR a.modifiedAt != t.modifiedAt)
+                ORDER BY t.addedAt DESC
+                """, arguments: [FileAnalysis.currentVersion])
+            var seen = Set<String>()
+            return rows.filter { !excluded.contains($0.sourceId ?? -1) && seen.insert($0.filePath).inserted }
         }
     }
 

@@ -202,6 +202,12 @@ struct AlbumMenu: View {
             model.showInspector = true
         }
         Button("Enrich Metadata…") { model.enrichAlbumKeys = [album.key] }
+        Button("Analyze") {
+            model.analysis.analyzeNow(tracks)
+            model.selectedTrackIDs = Set(tracks.prefix(1).compactMap(\.id))
+            model.inspectorTab = .analysis
+            model.showInspector = true
+        }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) }
         let network = tracks.filter(model.shares.isNetwork)

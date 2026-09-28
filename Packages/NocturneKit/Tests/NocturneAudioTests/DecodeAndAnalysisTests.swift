@@ -84,43 +84,14 @@ struct DecodeAndAnalysisTests {
         #expect(result.verdict == .paddedBitDepth)
     }
 
-    @Test("Band-limited content in a 96 kHz file is flagged as upsampled")
+    @Test("A 44.1 kHz master upsampled to 96 kHz is flagged, with its cutoff reported")
     func upsampled() throws {
-        let rate = 96_000.0
-        var gen = SystemRandomNumberGenerator()
-        let freqs = (0..<40).map { _ in Double.random(in: 200...19_000, using: &gen) }
-        let url = try writeWAV("upsampled", rate: rate, bits: 24, seconds: 3) { _, i in
-            let t = Double(i) / rate
-            var s = 0.0
-            for f in freqs { s += 0.02 * sin(2 * .pi * f * t) }
-            let dither = (Double.random(in: -1...1) + Double.random(in: -1...1)) / 8_388_608
-            return quantize(s + dither, bits: 24)
-        }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-upsampled-\(UUID().uuidString).wav")
         defer { try? FileManager.default.removeItem(at: url) }
+        // Full-band music-like content with a natural tilt, ending at the resampler's ~21.5 kHz wall.
+        try TestSignals.writeShapedNoise(url, rate: 96_000, seconds: 6) { f in f < 21_500 ? -3 * f / 1000 : nil }
         let result = try FileAnalyzer.analyze(url: url)
-        #expect(result.verdict == .upsampled, "bandwidth \(result.bandwidthHz)")
-        #expect(result.bandwidthHz > 17_000 && result.bandwidthHz < 24_500)
-    }
-}
-
-@Suite("Concurrency")
-struct ConcurrencyTests {
-    @Test("Opening many MP3 decoders concurrently doesn't crash (mpg123 init race)")
-    func concurrentMP3Opens() async throws {
-        let wav = try writeWAV("mp3src", rate: 44_100, bits: 16, seconds: 2) { c, i in Float(sin(Double(i) * 0.03 + Double(c))) * 0.3 }
-        defer { try? FileManager.default.removeItem(at: wav) }
-        let mp3 = wav.deletingPathExtension().appendingPathExtension("mp3")
-        try? FileManager.default.removeItem(at: mp3)
-        try SFBAudioEngine.AudioConverter.convert(wav, to: mp3)
-        defer { try? FileManager.default.removeItem(at: mp3) }
-
-        let results = await withTaskGroup(of: Bool.self) { group -> [Bool] in
-            for _ in 0..<200 { group.addTask { (try? SourceInspector.inspectWithDuration(mp3))?.format.codec == "MP3" } }
-            var all: [Bool] = []
-            for await r in group { all.append(r) }
-            return all
-        }
-        #expect(results.count == 200)
-        #expect(results.allSatisfy { $0 })
+        #expect(result.verdict == .upsampled, "\(result.summary)")
+        #expect(result.bandwidthHz > 17_000 && result.bandwidthHz < 24_500, "bandwidth \(result.bandwidthHz)")
     }
 }

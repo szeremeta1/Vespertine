@@ -63,6 +63,8 @@ final class PlayerController {
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
     private(set) var lastError: String?
+    /// When the current track started (the Analysis tab follows whichever changed last).
+    private(set) var trackStartedAt: Date = .distantPast
     /// Set while the user drags the scrubber.
     var scrubbing: Double?
 
@@ -249,6 +251,7 @@ final class PlayerController {
         switch event {
         case .trackStarted(let item):
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
+            trackStartedAt = .now
             scrobbledEntry = nil
             prefetchNetworkTracks()
             updateNowPlayingInfo()
