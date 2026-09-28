@@ -54,6 +54,12 @@ struct MainWindow: View {
             MusicBrainzSheet(tracks: request.tracks)
                 .environment(model)
         }
+        .sheet(isPresented: $model.showFindMusic) {
+            FindMusicSheet().environment(model)
+        }
+        .sheet(isPresented: Binding(get: { model.enrichAlbumKeys != nil }, set: { if !$0 { model.enrichAlbumKeys = nil } })) {
+            EnrichSheet(albumKeys: model.enrichAlbumKeys ?? []).environment(model)
+        }
         .sheet(item: $model.smartEditorPlaylist) { playlist in
             SmartPlaylistEditor(playlist: playlist)
                 .environment(model)
@@ -137,14 +143,16 @@ struct EmptyLibraryView: View {
             Text("Your library is empty")
                 .font(Typeface.serif(30))
                 .foregroundStyle(Palette.text)
-            Text("Add the folders where your music lives. Nocturne reads them in place and never moves your files,\nor you can copy music into an organized folder instead.")
+            Text("Nocturne can look through this Mac for music, check each file's real format, and bring in\nyour hi-res and lossless albums. You can also add folders yourself.")
                 .font(Typeface.ui(13))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Palette.text2)
                 .lineSpacing(3)
             HStack(spacing: 12) {
-                Button("Add Folder…") { model.presentImporter(.reference) }
+                Button { model.showFindMusic = true } label: { Label("Find Music on This Mac…", systemImage: "sparkle.magnifyingglass") }
                     .buttonStyle(BrassButtonStyle())
+                Button("Add Folder…") { model.presentImporter(.reference) }
+                    .buttonStyle(QuietButtonStyle())
                 Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
                     .buttonStyle(QuietButtonStyle())
             }

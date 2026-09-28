@@ -94,6 +94,9 @@ final class AppModel {
     var pendingImportMode: ImportMode = .reference
     var lookupTracks: [Track]?     // MusicBrainz sheet
     var smartEditorPlaylist: Playlist?
+    var showFindMusic = false
+    /// nil = not shown; [] = whole library; otherwise these albums.
+    var enrichAlbumKeys: [String]?
 
     init() {
         let settings = AppSettings()
@@ -106,6 +109,7 @@ final class AppModel {
         devices = DeviceStore()
         player = PlayerController(library: library, settings: settings)
         devices.dopUIDs = settings.dopDeviceUIDs
+        library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
             self?.player.engine.devicesChanged()
             self?.syncEngine()

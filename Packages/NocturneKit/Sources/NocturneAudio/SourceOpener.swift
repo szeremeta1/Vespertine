@@ -53,6 +53,8 @@ final class ProbedSource: @unchecked Sendable {
     }
 }
 
+private let mpegOpenLock = NSLock()
+
 enum SourceOpener {
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions)
@@ -71,7 +73,13 @@ enum SourceOpener {
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
         let decoder = try AudioDecoder(url: url)
-        try decoder.open()
+        if String(describing: type(of: decoder)).contains("MPEG") {
+            // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
+            // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
+            try mpegOpenLock.withLock { try decoder.open() }
+        } else {
+            try decoder.open()
+        }
         let processing = decoder.processingFormat.streamDescription.pointee
         let source = decoder.sourceFormat.streamDescription.pointee
         let lossless = decoder.decodingIsLossless
@@ -170,5 +178,20 @@ public enum SourceInspector {
     public static func inspect(_ url: URL) throws -> (format: SourceFormat, decoderName: String) {
         let probed = try SourceOpener.probe(url)
         return (probed.format, probed.decoderName)
+    }
+
+    /// Format plus duration in seconds (from the decoder's frame/packet count).
+    public static func inspectWithDuration(_ url: URL) throws -> (format: SourceFormat, duration: Double) {
+        let probed = try SourceOpener.probe(url)
+        var seconds = 0.0
+        if let pcm = probed.pcm {
+            let rate = pcm.processingFormat.sampleRate
+            if rate > 0, pcm.length > 0 { seconds = Double(pcm.length) / rate }
+        } else if let dsd = probed.dsd {
+            // One DSD packet carries 8 one-bit frames per channel.
+            let rate = dsd.processingFormat.sampleRate
+            if rate > 0 { seconds = Double(dsd.count) * 8 / rate }
+        }
+        return (probed.format, seconds)
     }
 }

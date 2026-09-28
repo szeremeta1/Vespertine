@@ -27,12 +27,17 @@ public struct ScanSummary: Sendable {
     public var added = 0
     public var updated = 0
     public var missing = 0
+    public var skipped = 0
     public var failed: [String] = []
 }
 
 public actor LibraryScanner {
     let database: LibraryDatabase
     let artwork: ArtworkStore
+    /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder).
+    public var skipsNonMusic = true
+
+    public func setSkipsNonMusic(_ value: Bool) { skipsNonMusic = value }
 
     public init(database: LibraryDatabase, artwork: ArtworkStore) {
         self.database = database
@@ -102,9 +107,14 @@ public actor LibraryScanner {
                 let cue = cueByAudio[url.path]
                 group.addTask { (url, Self.readTracks(url, cue: cue, artwork: artwork)) }
             }
+            let skipping = self.skipsNonMusic
             while let (url, tracks) = try await group.next() {
                 processed += 1
-                if let tracks { batch.append(contentsOf: tracks) } else { summary.failed.append(url.path) }
+                if let tracks {
+                    let kept = skipping ? tracks.filter { MusicFinder.kind(sampleRate: $0.sampleRate, channels: $0.channels, duration: $0.duration, isDSD: $0.isDSD) == .music || $0.cueStartFrame != nil } : tracks
+                    summary.skipped += tracks.count - kept.count
+                    batch.append(contentsOf: kept)
+                } else { summary.failed.append(url.path) }
                 if batch.count >= 200 {
                     let pending = batch
                     batch.removeAll()

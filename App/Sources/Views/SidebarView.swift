@@ -104,6 +104,8 @@ struct SidebarView: View {
                     Text("Sources")
                     Spacer()
                     Menu {
+                        Button("Find Music on This Mac…") { model.showFindMusic = true }
+                        Divider()
                         Button("Add Folder (Reference in Place)…") { model.presentImporter(.reference) }
                         Button("Import & Organize (Copy)…") { model.presentImporter(.copyAndOrganize) }
                     } label: {

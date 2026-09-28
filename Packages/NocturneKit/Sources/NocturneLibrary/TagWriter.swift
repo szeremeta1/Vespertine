@@ -170,7 +170,13 @@ public actor TagWriter {
                 let previous = Self.snapshot(file.metadata)
                 let backup = makeBackup(of: url)
 
-                for (field, value) in edit.fields { field.apply(value, to: file.metadata) }
+                for (field, value) in edit.fields {
+                    if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
+                        field.apply(TagWriter.id3Timestamp(value), to: file.metadata)
+                    } else {
+                        field.apply(value, to: file.metadata)
+                    }
+                }
                 if !edit.custom.isEmpty {
                     var extra = (file.metadata.additionalMetadata as? [String: Any]) ?? [:]
                     for (k, v) in edit.custom { extra[k.uppercased()] = v }
@@ -185,6 +191,7 @@ public actor TagWriter {
                 case nil:
                     break
                 }
+                TagWriter.protectDate(in: file)
                 try file.writeMetadata()
 
                 try await database.writer.write { db in
@@ -222,6 +229,7 @@ public actor TagWriter {
         file.metadata.removeAllMetadata()
         file.metadata.copyMetadata(from: restored)
         pictures.forEach { file.metadata.attachPicture($0) }
+        TagWriter.protectDate(in: file)
         try file.writeMetadata()
         _ = try await database.writer.write { db in try TagHistoryEntry.deleteOne(db, key: entry.id) }
         try await scanner.refresh(trackIDs: [trackID])
@@ -255,6 +263,31 @@ public actor TagWriter {
         try await database.writer.write { db in try updated.update(db) }
     }
 
+    /// Every write re-serialises all tags, and SFBAudioEngine drops ID3v2 dates that aren't full timestamps
+    /// (a year read back from ID3v2.3 is just "2012"). Normalise before each write so no edit erases the year.
+    public static func protectDate(in file: AudioFile) {
+        guard usesID3v2(file.url), let date = file.metadata.releaseDate, !date.isEmpty else { return }
+        file.metadata.releaseDate = id3Timestamp(date)
+    }
+
+    /// Formats whose tags SFBAudioEngine writes as ID3v2.
+    static func usesID3v2(_ url: URL) -> Bool {
+        ["mp3", "wav", "wave", "aif", "aiff", "aifc", "dsf", "dff", "tta"].contains(url.pathExtension.lowercased())
+    }
+
+    /// SFBAudioEngine 0.14 validates ID3v2 dates with a default NSISO8601DateFormatter, which only accepts
+    /// full timestamps; "2012" or "2018-08-27" are silently dropped (and the old date removed). It then takes
+    /// the year in the *local* time zone, so midnight UTC on 1 January becomes the previous year west of UTC.
+    /// Noon UTC stays on the same calendar day from UTC−12 to UTC+11. (TagLib saves WAV/AIFF as ID3v2.3,
+    /// so only the year is kept there; MP3 keeps the full date.)
+    static func id3Timestamp(_ date: String) -> String {
+        let d = date.trimmingCharacters(in: .whitespaces)
+        if d.range(of: #"^\d{4}$"#, options: .regularExpression) != nil { return d + "-01-01T12:00:00Z" }
+        if d.range(of: #"^\d{4}-\d{2}$"#, options: .regularExpression) != nil { return d + "-01T12:00:00Z" }
+        if d.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil { return d + "T12:00:00Z" }
+        return d
+    }
+
     /// String snapshot of every tag (pictures excluded) for undo.
     static func snapshot(_ md: AudioMetadata) -> [String: String] {
         var out: [String: String] = [:]
@@ -285,5 +318,23 @@ public actor TagWriter {
             let created = (try? dir.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? .now
             if created < cutoff { try? FileManager.default.removeItem(at: dir) }
         }
+    }
+}
+
+public extension TagWriter {
+    /// Writes an enrichment proposal: its field edits, plus the cover on every track that has no artwork.
+    func apply(_ proposal: EnrichmentProposal, tracks: [Track]) async throws -> TagWriteResult {
+        var total = TagWriteResult(written: 0, databaseOnly: 0, failures: [])
+        for track in tracks {
+            guard let id = track.id else { continue }
+            var edit = proposal.edits[id] ?? TagEdit()
+            if let cover = proposal.cover, track.artworkKey == nil { edit.artwork = .replace(cover) }
+            guard !edit.isEmpty else { continue }
+            let r = try await apply(edit, to: [track])
+            total.written += r.written
+            total.databaseOnly += r.databaseOnly
+            total.failures += r.failures
+        }
+        return total
     }
 }

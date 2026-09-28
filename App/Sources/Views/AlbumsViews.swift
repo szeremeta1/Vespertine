@@ -202,6 +202,7 @@ struct AlbumMenu: View {
             model.inspectorTab = .details
             model.showInspector = true
         }
+        Button("Enrich Metadata…") { model.enrichAlbumKeys = [album.key] }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) }
     }

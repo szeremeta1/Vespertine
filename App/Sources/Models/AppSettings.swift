@@ -63,6 +63,8 @@ final class AppSettings {
     var fetchArtworkOnline: Bool { didSet { defaults.set(fetchArtworkOnline, forKey: "fetchArtworkOnline") } }
     var scrobble: Bool { didSet { defaults.set(scrobble, forKey: "scrobble") } }
     var miniPlayerFloats: Bool { didSet { defaults.set(miniPlayerFloats, forKey: "miniPlayerFloats") } }
+    /// Leave voice recordings, telephony audio and short clips out of the library.
+    var skipNonMusic: Bool { didSet { defaults.set(skipNonMusic, forKey: "skipNonMusic") } }
 
     /// Library location. Overridable with `-NocturneDataDirectory <path>` for testing.
     let dataDirectory: URL
@@ -71,7 +73,7 @@ final class AppSettings {
         defaults.register(defaults: [
             "exclusiveMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
-            "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true,
+            "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
@@ -89,6 +91,7 @@ final class AppSettings {
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
+        skipNonMusic = defaults.bool(forKey: "skipNonMusic")
 
         if let override = defaults.string(forKey: "NocturneDataDirectory") {
             dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
