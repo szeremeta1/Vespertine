@@ -70,3 +70,24 @@ targets:
         SWIFT_STRICT_CONCURRENCY: complete
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         COMBINE_HIDPI_IMAGES: YES
+
+  NocturneAppTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [App/Tests]
+    dependencies:
+      - target: Nocturne
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  Nocturne:
+    build:
+      targets:
+        Nocturne: all
+    test:
+      targets: [NocturneAppTests]
+      commandLineArguments:
+        '-NocturneDataDirectory "$(PROJECT_DIR)/build/audit/host-test-library"': true

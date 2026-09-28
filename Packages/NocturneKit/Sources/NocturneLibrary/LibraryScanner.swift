@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import CryptoKit
 import GRDB
 import NocturneAudio
 
@@ -41,11 +42,10 @@ public actor LibraryScanner {
     let artwork: ArtworkStore
     /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder).
     public var skipsNonMusic = true
+    private var activeScans: [Int64: Task<ScanSummary, Error>] = [:]
 
     public func setSkipsNonMusic(_ value: Bool) { skipsNonMusic = value }
 
-    /// Files read concurrently. Local disks gain little past 6; network shares hide
-    /// round-trip latency with more requests in flight.
     /// Blocking file I/O runs here, not on Swift's cooperative pool (sized to the CPU count, so a
     /// few blocked reads would stall the rest). GCD adds threads while they wait on the network.
     static let ioQueue = DispatchQueue(label: "org.nocturne.scan-io", qos: .utility, attributes: .concurrent)
@@ -56,8 +56,10 @@ public actor LibraryScanner {
         }
     }
 
+    /// Files read concurrently. Local disks gain little past 6; network shares hide
+    /// round-trip latency with more requests in flight.
     public static func readWidth(for root: URL) -> Int {
-        return NetworkVolume.isNetwork(root) ? 32 : 6
+        NetworkVolume.isNetwork(root) ? 32 : 6
     }
 
     public init(database: LibraryDatabase, artwork: ArtworkStore) {
@@ -73,6 +75,15 @@ public actor LibraryScanner {
     @discardableResult
     public func scan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {
         guard let sourceID = source.id else { return ScanSummary() }
+        if let active = activeScans[sourceID] { return try await active.value }
+        let task = Task { try await self.performScan(source, progress: progress) }
+        activeScans[sourceID] = task
+        defer { activeScans[sourceID] = nil }
+        return try await task.value
+    }
+
+    private func performScan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)?) async throws -> ScanSummary {
+        guard let sourceID = source.id else { return ScanSummary() }
         var summary = ScanSummary()
         let root = source.url
 
@@ -82,10 +93,17 @@ public actor LibraryScanner {
         }
         guard online else { summary.interrupted = true; return summary }
 
-        let listing = await Self.list(root) { count in
+        let listing = try await Self.list(root) { count in
             progress?(ScanProgress(phase: .listing, sourcePath: source.path, processed: count, total: 0, added: 0, updated: 0))
         }
         let cueByAudio = Self.cueSheets(listing.cue)
+        let priorCues: [String: String] = try await database.writer.read { db in
+            var signatures: [String: String] = [:]
+            for row in try Row.fetchAll(db, sql: "SELECT filePath, signature FROM cueScanState WHERE sourceId = ?", arguments: [sourceID]) {
+                signatures[row["filePath"]] = row["signature"]
+            }
+            return signatures
+        }
 
         struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool }
         let known: [String: Known] = try await database.writer.read { db in
@@ -107,11 +125,14 @@ public actor LibraryScanner {
             if let cue = cueByAudio[url.path] {
                 let locations = cue.tracks.map { "\(url.path)#\($0.number)" }
                 locations.forEach { seen.insert($0) }
-                if let first = locations.first, let k = known[first], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 1, !k.isMissing { continue }
+                if priorCues[url.path] == cue.signature, locations.allSatisfy({ location in
+                    guard let k = known[location] else { return false }
+                    return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing
+                }) { continue }
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 1, !k.isMissing { continue }
+                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing { continue }
                 toRead.append(url)
             }
         }
@@ -138,6 +159,11 @@ public actor LibraryScanner {
             while let (url, tracks) = try await group.next() {
                 processed += 1
                 if let tracks {
+                    // An invalid CUE may fall back to the whole file. Track what was actually indexed.
+                    if let cue = cueByAudio[url.path] {
+                        for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
+                    }
+                    for track in tracks { seen.insert(track.location) }
                     let kept = skipping ? tracks.filter { MusicFinder.kind(sampleRate: $0.sampleRate, channels: $0.channels, duration: $0.duration, isDSD: $0.isDSD) == .music || $0.cueStartFrame != nil } : tracks
                     summary.skipped += tracks.count - kept.count
                     batch.append(contentsOf: kept)
@@ -174,7 +200,12 @@ public actor LibraryScanner {
         // Flag files that disappeared (kept so playlists and play counts survive a re-plug).
         let missing = known.filter { !seen.contains($0.key) && !$0.value.isMissing }.map(\.value.id)
         summary.missing = missing.count
+        let failedPaths = Set(summary.failed)
         try await database.writer.write { db in
+            for (path, cue) in cueByAudio where !failedPaths.contains(path) {
+                try db.execute(sql: "INSERT OR REPLACE INTO cueScanState (sourceId, filePath, signature) VALUES (?, ?, ?)",
+                               arguments: [sourceID, path, cue.signature])
+            }
             for id in missing { try db.execute(sql: "UPDATE track SET isMissing = 1 WHERE id = ?", arguments: [id]) }
             try db.execute(sql: "UPDATE source SET lastScannedAt = ? WHERE id = ?", arguments: [Date(), sourceID])
         }
@@ -199,88 +230,151 @@ public actor LibraryScanner {
         return result
     }
 
-    /// True when the folder exists and can be listed (a dead network mount fails here, not with an empty folder).
+    /// True when the folder (or single-file source) exists and can be read. A dead network mount
+    /// fails here rather than looking like an empty folder.
     static func isReachable(_ root: URL) -> Bool {
         var isDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir), isDir.boolValue else { return false }
+        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir) else { return false }
+        if !isDir.boolValue { return audioExtensions.contains(root.pathExtension.lowercased()) }
         return (try? FileManager.default.contentsOfDirectory(atPath: root.path)) != nil
     }
 
     public struct ListedFile: Sendable { public var url: URL; public var size: Int64; public var modified: Date }
 
     /// Lists audio and CUE files with their size and date. Folders are listed concurrently so a
-    /// high-latency share costs one round trip per folder level, not per folder.
-    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async -> (audio: [ListedFile], cue: [URL]) {
+    /// high-latency share costs one round trip per folder level, not per folder. Any folder that
+    /// can't be listed fails the whole listing, so its files are never mistaken for deleted ones.
+    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws -> (audio: [ListedFile], cue: [URL]) {
         let exts = audioExtensions
-        let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .fileSizeKey, .contentModificationDateKey]
-        let width = NetworkVolume.isNetwork(root) ? 12 : 4
+        let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
+        let start = root.resolvingSymlinksInPath()
+        // A single-file source: the file plus any CUE sheets beside it.
+        if try start.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true {
+            let v = try start.resourceValues(forKeys: Set(keys))
+            let siblings = try FileManager.default.contentsOfDirectory(at: start.deletingLastPathComponent(), includingPropertiesForKeys: nil)
+            return ([ListedFile(url: start, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast)],
+                    siblings.filter { $0.pathExtension.lowercased() == "cue" })
+        }
+        typealias Listed = Result<(files: [ListedFile], cues: [URL], dirs: [URL]), Error>
+        let width = NetworkVolume.isNetwork(start) ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = []
-        var pending: [URL] = [root]
-        await withTaskGroup(of: (files: [ListedFile], cues: [URL], dirs: [URL]).self) { group in
+        var pending: [URL] = [start]
+        var failure: Error?
+        await withTaskGroup(of: Listed.self) { group in
             var running = 0
-            func start(_ dir: URL) {
+            func begin(_ dir: URL) {
                 running += 1
                 group.addTask { await onIOQueue {
-                    var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = []
-                    let items = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])) ?? []
-                    for url in items {
-                        guard let v = try? url.resourceValues(forKeys: Set(keys)) else { continue }
-                        if v.isDirectory == true {
-                            if v.isPackage != true { dirs.append(url) }
-                            continue
+                    Result {
+                        var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = []
+                        let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
+                        for item in items {
+                            var url = item
+                            var v = try url.resourceValues(forKeys: Set(keys))
+                            if v.isSymbolicLink == true {
+                                url = url.resolvingSymlinksInPath()
+                                guard let resolved = try? url.resourceValues(forKeys: Set(keys)) else { continue }
+                                v = resolved
+                            }
+                            if v.isDirectory == true {
+                                if v.isPackage != true { dirs.append(url) }
+                                continue
+                            }
+                            guard v.isRegularFile == true else { continue }
+                            let ext = url.pathExtension.lowercased()
+                            if ext == "cue" { cues.append(url) }
+                            else if exts.contains(ext) {
+                                files.append(ListedFile(url: url, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast))
+                            }
                         }
-                        guard v.isRegularFile == true else { continue }
-                        let ext = url.pathExtension.lowercased()
-                        if ext == "cue" { cues.append(url) }
-                        else if exts.contains(ext) {
-                            files.append(ListedFile(url: url, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast))
-                        }
+                        return (files, cues, dirs)
                     }
-                    return (files, cues, dirs)
                 } }
             }
-            while running < width, let dir = pending.popLast() { start(dir) }
+            while running < width, let dir = pending.popLast() { begin(dir) }
             while let result = await group.next() {
                 running -= 1
-                audio.append(contentsOf: result.files)
-                cue.append(contentsOf: result.cues)
-                pending.append(contentsOf: result.dirs)
-                found?(audio.count)
-                while running < width, let dir = pending.popLast() { start(dir) }
+                switch result {
+                case .success(let r):
+                    audio.append(contentsOf: r.files)
+                    cue.append(contentsOf: r.cues)
+                    pending.append(contentsOf: r.dirs)
+                    found?(audio.count)
+                case .failure(let error):
+                    failure = failure ?? error
+                    pending.removeAll()
+                }
+                while failure == nil, running < width, let dir = pending.popLast() { begin(dir) }
             }
         }
-        return (audio.sorted { $0.url.path < $1.url.path }, cue)
+        if let failure { throw failure }
+        // Same canonical paths as the rest of the library (resolvingSymlinksInPath, which also
+        // drops a leading /private), rewritten by prefix: resolving every file would cost a
+        // network round trip each on a share.
+        let physical = start.withUnsafeFileSystemRepresentation { $0.flatMap { realpath($0, nil) } }.map { p in
+            defer { free(p) }
+            return String(cString: p)
+        } ?? start.path
+        let canonical = start.path
+        func canon(_ url: URL) -> URL {
+            let path = url.path
+            guard physical != canonical, path.hasPrefix(physical + "/") else { return url }
+            return URL(fileURLWithPath: canonical + path.dropFirst(physical.count))
+        }
+        let files = audio.map { ListedFile(url: canon($0.url), size: $0.size, modified: $0.modified) }
+        return (files.sorted { $0.url.path < $1.url.path }, cue.map(canon))
     }
 
     public static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
+        (try? enumerateChecked(root)) ?? ([], [])
+    }
+
+    static func enumerateChecked(_ root: URL) throws -> (audio: [URL], cue: [URL]) {
         let exts = audioExtensions
+        if try root.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true {
+            let siblings = try FileManager.default.contentsOfDirectory(at: root.deletingLastPathComponent(), includingPropertiesForKeys: nil)
+            return ([root.resolvingSymlinksInPath()], siblings.filter { $0.pathExtension.lowercased() == "cue" })
+        }
         var audio: [URL] = []
         var cue: [URL] = []
         let keys: [URLResourceKey] = [.isRegularFileKey, .isHiddenKey]
+        var enumerationError: Error?
         guard let e = FileManager.default.enumerator(at: root, includingPropertiesForKeys: keys,
-                                                     options: [.skipsHiddenFiles, .skipsPackageDescendants]) else { return ([], []) }
+                options: [.skipsHiddenFiles, .skipsPackageDescendants], errorHandler: { _, error in
+                    enumerationError = error; return false
+                }) else { throw CocoaError(.fileReadNoPermission) }
         for case let url as URL in e {
+            let values = try url.resourceValues(forKeys: [.isRegularFileKey])
+            guard values.isRegularFile == true else { continue }
             let ext = url.pathExtension.lowercased()
-            if ext == "cue" { cue.append(url) }
-            else if exts.contains(ext) { audio.append(url) }
+            if ext == "cue" { cue.append(url.resolvingSymlinksInPath()) }
+            else if exts.contains(ext) { audio.append(url.resolvingSymlinksInPath()) }
         }
+        if let enumerationError { throw enumerationError }
         return (audio.sorted { $0.path < $1.path }, cue)
     }
 
     /// Maps an audio file path to the CUE file (and its tracks) that splits it.
-    static func cueSheets(_ cueFiles: [URL]) -> [String: (sheet: CueSheet, tracks: [CueSheet.Entry])] {
-        var map: [String: (CueSheet, [CueSheet.Entry])] = [:]
-        for cueURL in cueFiles {
+    static func cueSheets(_ cueFiles: [URL]) -> [String: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)] {
+        var map: [String: (CueSheet, [CueSheet.Entry], String)] = [:]
+        for cueURL in cueFiles.sorted(by: { $0.path < $1.path }) {
             guard let sheet = CueSheet.load(cueURL) else { continue }
             // Only single-file sheets with more than one track are split.
             guard sheet.files.count == 1, let file = sheet.files.first, file.tracks.count > 1 else { continue }
             let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name)
-            if FileManager.default.fileExists(atPath: audio.path) { map[audio.path] = (sheet, file.tracks) }
+            let starts = file.tracks.map(\.startCDFrames)
+            guard Set(file.tracks.map(\.number)).count == file.tracks.count,
+                  file.tracks.allSatisfy({ $0.number > 0 }),
+                  zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }),
+                  let data = try? Data(contentsOf: cueURL) else { continue }
+            if FileManager.default.fileExists(atPath: audio.path) {
+                map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
+            }
         }
         return map
     }
 
-    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry])?, artwork: ArtworkStore,
+    static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)?, artwork: ArtworkStore,
                            folderArt: FolderArtCache? = nil, remote: ListedFile? = nil) -> [Track]? {
         let read: Track?
         if let remote {
@@ -291,7 +385,11 @@ public actor LibraryScanner {
         guard let base = read else { return nil }
         guard let cue else { return [base] }
         let rate = base.sampleRate
-        let totalFrames = Int64(base.duration * rate)
+        let frameCount = base.duration * rate
+        guard rate.isFinite, rate > 0, frameCount.isFinite, frameCount > 0,
+              frameCount < Double(Int64.max) else { return [base] }
+        let totalFrames = Int64(frameCount)
+        guard cue.tracks.allSatisfy({ CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate) < totalFrames }) else { return [base] }
         return cue.tracks.enumerated().map { index, entry in
             var t = base
             let start = CueSheet.sampleFrame(cdFrames: entry.startCDFrames, sampleRate: rate)
@@ -317,7 +415,7 @@ public actor LibraryScanner {
     }
 
     /// Inserts new tracks; updates changed ones while keeping library state (play counts, ratings, date added).
-    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase) async throws -> (added: Int, updated: Int) {
+    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase, preserveAnalysis: Bool = false) async throws -> (added: Int, updated: Int) {
         guard !tracks.isEmpty else { return (0, 0) }
         return try await database.writer.write { db in
             var added = 0, updated = 0
@@ -329,6 +427,15 @@ public actor LibraryScanner {
                     track.playCount = existing.playCount
                     track.lastPlayedAt = existing.lastPlayedAt
                     if track.rating == nil { track.rating = existing.rating }
+                    if preserveAnalysis {
+                        track.effectiveBitDepth = existing.effectiveBitDepth
+                        track.bandwidthHz = existing.bandwidthHz
+                        track.analysisVerdict = existing.analysisVerdict
+                    }
+                    if track.cueStartFrame != nil, let data = try Data.fetchOne(db,
+                        sql: "SELECT metadata FROM cueTagOverride WHERE trackId = ?", arguments: [existing.id]) {
+                        track.copyMetadata(from: try JSONDecoder().decode(Track.self, from: data))
+                    }
                     track.isMissing = false
                     try track.update(db)
                     updated += 1
@@ -351,7 +458,7 @@ public actor LibraryScanner {
             let cue = group.contains { $0.cueStartFrame != nil }
                 ? Self.cueSheets(Self.enumerate(url.deletingLastPathComponent()).cue)[path] : nil
             if let fresh = Self.readTracks(url, cue: cue, artwork: artwork) {
-                _ = try await Self.upsert(fresh, sourceID: sourceID, database: database)
+                _ = try await Self.upsert(fresh, sourceID: sourceID, database: database, preserveAnalysis: true)
             }
         }
     }

@@ -35,11 +35,12 @@ final class NetworkShareManager {
     private var observers: [NSObjectProtocol] = []
     private var networkWasUp = true
 
-    init(library: LibraryStore, settings: AppSettings) {
+    init(library: LibraryStore, settings: AppSettings, dataDirectory: URL? = nil) {
         self.library = library
         self.settings = settings
-        mountBase = settings.dataDirectory.appendingPathComponent("Shares", isDirectory: true)
-        cache = NetworkCache(directory: settings.dataDirectory.appendingPathComponent("Network Cache", isDirectory: true),
+        let data = dataDirectory ?? settings.dataDirectory
+        mountBase = data.appendingPathComponent("Shares", isDirectory: true)
+        cache = NetworkCache(directory: data.appendingPathComponent("Network Cache", isDirectory: true),
                              limitBytes: settings.networkCacheLimitBytes)
         cache.onChange = { @Sendable [weak self] in
             Task { @MainActor in self?.refreshUsage() }

@@ -51,21 +51,35 @@ public struct EngineSettings: Sendable, Equatable {
 
 public final class PlaybackEngine: @unchecked Sendable {
     /// Called on the engine thread when the current item has been fully decoded; return the next item for gapless playback.
-    public var nextItemProvider: (@Sendable (PlayableItem) -> PlayableItem?)?
+    public var nextItemProvider: (@Sendable (PlayableItem) -> PlayableItem?)? {
+        get { callbacks.withLock { $0.next } }
+        set { callbacks.withLock { $0.next = newValue } }
+    }
     /// Maps an item to the file to open, called on the engine thread each time an item is opened
     /// (e.g. a local cached copy of a file on a network share). nil opens `item.url`.
-    public var urlResolver: (@Sendable (PlayableItem) -> URL)?
+    public var urlResolver: (@Sendable (PlayableItem) -> URL)? {
+        get { callbacks.withLock { $0.resolver } }
+        set { callbacks.withLock { $0.resolver = newValue } }
+    }
     private func resolve(_ item: PlayableItem) -> URL { urlResolver?(item) ?? item.url }
-
     /// Delivered on the main queue.
-    public var eventHandler: (@Sendable @MainActor (EngineEvent) -> Void)?
+    public var eventHandler: (@Sendable @MainActor (EngineEvent) -> Void)? {
+        get { callbacks.withLock { $0.event } }
+        set { callbacks.withLock { $0.event = newValue } }
+    }
+    private struct Callbacks {
+        var next: (@Sendable (PlayableItem) -> PlayableItem?)?
+        var event: (@Sendable @MainActor (EngineEvent) -> Void)?
+        var resolver: (@Sendable (PlayableItem) -> URL)?
+    }
+    private let callbacks = Mutex(Callbacks())
 
     private enum Command {
         case play(PlayableItem)
         case pause, resume, stop
         case seek(TimeInterval)
         case settingsChanged(EngineSettings)
-        case devicesChanged
+        case devicesChanged, queueChanged
     }
 
     private struct Shared {
@@ -92,6 +106,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let gain: Float
         var inputExhausted = false
         var finished = false
+        var framesProduced: UInt64 = 0
         var error: Error?
 
         init(item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, path: SignalPath, chunk: AVAudioFrameCount) throws {
@@ -126,6 +141,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private struct Segment {
+        let id = UUID()
         let item: PlayableItem
         let path: SignalPath
         let startRingFrame: UInt64
@@ -144,16 +160,27 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var drainedAt: Date?
     private var pausedAt: Date?
     private var parked: (item: PlayableItem, position: TimeInterval)?
-    private var lastAudibleItemID: UUID?
+    private var lastAudibleSegmentID: UUID?
     private var underrunTotal = 0
+    private var emptyTransitions = 0
     private let chunkFrames: AVAudioFrameCount = 4096
 
     public init() {
-        let thread = Thread { [unowned self] in self.run() }
+        let thread = Thread { [weak self] in
+            while !Thread.current.isCancelled {
+                guard let self else { return }
+                self.runIteration()
+            }
+        }
         thread.name = "Nocturne Engine"
         thread.qualityOfService = .userInteractive
         self.thread = thread
         thread.start()
+    }
+
+    deinit {
+        thread?.cancel()
+        teardown(releaseHog: true)
     }
 
     // MARK: Public API
@@ -162,7 +189,12 @@ public final class PlaybackEngine: @unchecked Sendable {
     public func pause() { post(.pause) }
     public func resume() { post(.resume) }
     public func stop() { post(.stop) }
-    public func seek(to seconds: TimeInterval) { post(.seek(max(0, seconds))) }
+    public func seek(to seconds: TimeInterval) {
+        guard seconds.isFinite else { return }
+        post(.seek(max(0, seconds)))
+    }
+    /// Discards decoded look-ahead after the play order changes.
+    public func queueChanged() { post(.queueChanged) }
     public func devicesChanged() { post(.devicesChanged) }
 
     public func update(settings: EngineSettings) {
@@ -186,7 +218,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Copies the latest mono samples sent to the DAC. Returns the device sample rate, or nil when idle.
     public func copyTap(into buffer: inout [Float]) -> Double? {
         sessionLock.lock(); defer { sessionLock.unlock() }
-        guard let session else { return nil }
+        guard let session, !buffer.isEmpty else { return nil }
         let n = UInt32(min(buffer.count, Int(NRT_TAP_SIZE)))
         buffer.withUnsafeMutableBufferPointer { _ = nrt_context_copy_tap(session.context, $0.baseAddress!, n) }
         return session.applied.sampleRate
@@ -204,8 +236,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Engine thread
 
-    private func run() {
-        while true {
+    private func runIteration() {
+        do {
             let commands = shared.withLock { s -> [Command] in
                 defer { s.commands.removeAll() }
                 return s.commands
@@ -252,7 +284,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             teardown(releaseHog: true)
             parked = nil
             state = .stopped
-            lastAudibleItemID = nil
+            lastAudibleSegmentID = nil
         case .seek(let seconds):
             guard let current = audibleSegment()?.item ?? parked?.item else { return }
             let resume = state == .playing
@@ -267,6 +299,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             let deviceChanged = old.deviceUID != new.deviceUID || old.exclusive != new.exclusive
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
             if deviceChanged, state != .stopped { restartFromCurrentPosition() }
+        case .queueChanged:
+            if state != .stopped { restartFromCurrentPosition() }
         case .devicesChanged:
             guard let device = sessionDevice else { return }
             let alive = DeviceQuery.allDeviceIDs().contains(device.id)
@@ -335,29 +369,31 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         guard let session else { return }
         let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
-        if seconds > 0, decoder.supportsSeeking {
-            let frame = AVAudioFramePosition(seconds * decoder.processingFormat.sampleRate)
-            try decoder.seek(to: min(frame, max(0, decoder.length - 1)))
+        var actualOffset = 0.0
+        if seconds > 0, decoder.supportsSeeking, decoder.length > 0 {
+            let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
+            let frame = AVAudioFramePosition(bounded)
+            try decoder.seek(to: frame)
+            actualOffset = Double(frame) / decoder.processingFormat.sampleRate
         }
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames)
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
-                            startOffsetSeconds: seconds, durationSeconds: decoding.durationSeconds)]
+                            startOffsetSeconds: actualOffset, durationSeconds: decoding.durationSeconds)]
         draining = false
         nrt_context_set_draining(session.context, false)
-        lastAudibleItemID = nil
+        lastAudibleSegmentID = nil
         prefill()
     }
 
     private func replaceSession(device: OutputDevice, plan: OutputPlan) throws {
-        let sameDevice = sessionDevice?.id == device.id
         sessionLock.lock()
         let old = session
         session = nil
         sessionLock.unlock()
-        old?.invalidate(releaseHog: !sameDevice || !settings.exclusive)
+        old?.invalidate(releaseHog: true)
         let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive)
         sessionLock.lock()
         session = new
@@ -422,7 +458,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func prefill() {
         guard let session else { return }
         let target = min(Int(session.applied.sampleRate * 0.3), Int(nrt_ring_capacity(session.ring)) / 2)
-        while session.readableFrames < target, fill() {}
+        // Bound work so a repeating empty/corrupt track cannot monopolize the engine thread.
+        for _ in 0..<256 {
+            if session.readableFrames >= target || !fill() { break }
+        }
     }
 
     /// Decodes one chunk into the ring. Returns true when it did any work.
@@ -465,6 +504,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
         let frames = decoding.output.frameLength
         if frames > 0, let data = decoding.output.floatChannelData?[0] {
+            decoding.framesProduced += UInt64(frames)
+            emptyTransitions = 0
             if decoding.gain != 1 {
                 var g = decoding.gain
                 vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(decoding.path.plan.channels))
@@ -484,6 +525,14 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func advance(after finished: Decoding) {
         decoding = nil
         guard let session, let device = sessionDevice else { return }
+        if finished.framesProduced == 0 {
+            emptyTransitions += 1
+            if emptyTransitions >= 8 {
+                draining = true
+                nrt_context_set_draining(session.context, true)
+                return
+            }
+        }
         var candidate = nextItemProvider?(finished.item)
         var attempts = 0
         while let next = candidate, attempts < 8 {
@@ -520,8 +569,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard let session else { return }
         underrunTotal += Int(nrt_context_take_underruns(session.context))
 
-        if let segment = audibleSegment(), segment.item.id != lastAudibleItemID {
-            lastAudibleItemID = segment.item.id
+        if let segment = audibleSegment(), segment.id != lastAudibleSegmentID {
+            lastAudibleSegmentID = segment.id
             emit(.trackStarted(segment.item))
             // Drop segments that are fully in the past.
             let read = session.totalRead
@@ -565,7 +614,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func finishQueue() {
         teardown(releaseHog: true)
         state = .stopped
-        lastAudibleItemID = nil
+        lastAudibleSegmentID = nil
         emit(.queueEnded)
     }
 
@@ -587,6 +636,11 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func publishSnapshot() {
         let segment = audibleSegment()
         let position = currentPosition()
+        var path = segment?.path
+        if path?.plan.mode == .pcm {
+            if let db = settings.digitalVolumeDB { path?.volume = .digital(dB: db) }
+            else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
+        }
         let device = sessionDevice
         let st = state
         let underruns = underrunTotal
@@ -596,7 +650,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.item = segment?.item ?? parkedItem?.item
             s.snapshot.position = segment == nil ? (parkedItem?.position ?? 0) : position
             s.snapshot.duration = segment?.durationSeconds ?? s.snapshot.duration
-            s.snapshot.signalPath = segment?.path
+            s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }

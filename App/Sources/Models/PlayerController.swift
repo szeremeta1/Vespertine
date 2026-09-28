@@ -67,7 +67,7 @@ final class PlayerController {
     var scrubbing: Double?
 
     private var scrobbledEntry: UUID?
-    private var pollTask: Task<Void, Never>?
+    @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
     var isPlaying: Bool { state == .playing }
@@ -88,12 +88,14 @@ final class PlayerController {
         engine.eventHandler = { [weak self] event in self?.handle(event) }
         setupRemoteCommands()
         pollTask = Task { [weak self] in
-            while !Task.isCancelled {
+            while !Task.isCancelled, self != nil {
                 self?.poll()
                 try? await Task.sleep(for: .milliseconds(66))
             }
         }
     }
+
+    deinit { pollTask?.cancel() }
 
     // MARK: Queue
 
@@ -137,12 +139,15 @@ final class PlayerController {
         var upcoming = Array(queue[(c + 1)...])
         upcoming.move(fromOffsets: source, toOffset: destination)
         queue = Array(queue[...c]) + upcoming
+        originalOrder = queue
         syncMirror()
     }
 
     func clearUpcoming() {
         guard let c = currentIndex else { return }
         queue = Array(queue[...c])
+        let retained = Set(queue.map(\.id))
+        originalOrder.removeAll { !retained.contains($0.id) }
         syncMirror()
     }
 
@@ -174,10 +179,17 @@ final class PlayerController {
 
     private func syncMirror() {
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
+        engine.queueChanged()
     }
 
-    private func makeItem(_ track: Track) -> PlayableItem {
-        PlayableItem(url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
+    func refreshReplayGain() {
+        queue = queue.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
+        originalOrder = originalOrder.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
+        syncMirror()
+    }
+
+    private func makeItem(_ track: Track, id: UUID = UUID()) -> PlayableItem {
+        PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
                      regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
                      cacheKey: shares.isNetwork(track) ? NetworkCache.key(for: track) : nil)
     }
@@ -258,9 +270,15 @@ final class PlayerController {
 
     private func poll() {
         let snap = engine.snapshot
-        if state != snap.state { state = snap.state; updateNowPlayingInfo() }
+        let stateChanged = state != snap.state
+        state = snap.state
         if abs(position - snap.position) > 0.02 { position = snap.position }
         if duration != snap.duration { duration = snap.duration }
+        if let id = snap.item?.id, let i = queue.firstIndex(where: { $0.id == id }), currentIndex != i {
+            currentIndex = i
+            updateNowPlayingInfo()
+        }
+        if stateChanged { updateNowPlayingInfo() }
         if signalPath != snap.signalPath { signalPath = snap.signalPath }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
@@ -305,7 +323,6 @@ final class PlayerController {
 
     /// MediaPlayer calls the request handler on its own queue, so it must not be main-actor isolated.
     nonisolated private static func artwork(_ image: NSImage) -> MPMediaItemArtwork {
-        nonisolated(unsafe) let image = image
         return MPMediaItemArtwork(boundsSize: image.size) { @Sendable _ in image }
     }
 
