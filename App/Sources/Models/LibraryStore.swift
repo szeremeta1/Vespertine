@@ -54,6 +54,17 @@ final class LibraryStore {
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
     private(set) var playlists: [Playlist] = []
     private(set) var sources: [LibrarySource] = []
+
+    /// A location as people should see it: files on a network share read "High-Res Music › Artist/Album"
+    /// (never the mount folder, which carries the server's address); local files use ~ paths.
+    func displayPath(_ path: String) -> String {
+        if let share = sources.first(where: { $0.remoteURL != nil && (path == $0.path || path.hasPrefix($0.path + "/")) }) {
+            let rest = String(path.dropFirst(share.path.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            let name = share.name ?? "Network share"
+            return rest.isEmpty ? name : "\(name) › \(rest)"
+        }
+        return (path as NSString).abbreviatingWithTildeInPath
+    }
     private(set) var stats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
     /// Bumped whenever tracks change, so detail views can reload.
     private(set) var revision = 0
