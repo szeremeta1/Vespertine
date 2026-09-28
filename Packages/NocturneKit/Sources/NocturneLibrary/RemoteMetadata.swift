@@ -186,7 +186,7 @@ public enum RemoteMetadata {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-shadow-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        let shadow = dir.appendingPathComponent(url.lastPathComponent)
+        let shadow = dir.appendingPathComponent(url.lastPathComponent, isDirectory: false)
         var track: Track
         do {
             try makeShadow(of: url, size: size, at: shadow)

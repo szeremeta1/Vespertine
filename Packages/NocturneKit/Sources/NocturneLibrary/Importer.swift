@@ -181,7 +181,7 @@ public final class FolderWatcher: @unchecked Sendable {
             let watchedPaths = paths.map { path in
                 var isDirectory: ObjCBool = false
                 if FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory), !isDirectory.boolValue {
-                    return URL(fileURLWithPath: path).deletingLastPathComponent().path
+                    return (path as NSString).deletingLastPathComponent
                 }
                 return path
             }

@@ -140,7 +140,7 @@ public enum MusicFinder {
         for i in 0..<MDQueryGetResultCount(query) {
             guard let raw = MDQueryGetResultAtIndex(query, i) else { continue }
             let item = Unmanaged<MDItem>.fromOpaque(raw).takeUnretainedValue()
-            if let path = MDItemCopyAttribute(item, kMDItemPath) as? String { urls.append(URL(fileURLWithPath: path)) }
+            if let path = MDItemCopyAttribute(item, kMDItemPath) as? String { urls.append(URL(fileURLWithPath: path, isDirectory: false)) }
         }
         return urls
     }

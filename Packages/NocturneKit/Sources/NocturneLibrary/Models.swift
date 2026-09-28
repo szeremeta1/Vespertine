@@ -46,7 +46,11 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 
-    public var url: URL { URL(fileURLWithPath: path) }
+    /// Decided from the name, never by touching the disk (a source may be on a share that's gone).
+    public var url: URL {
+        let isFile = LibraryScanner.audioExtensions.contains((path as NSString).pathExtension.lowercased())
+        return URL(fileURLWithPath: path, isDirectory: !isFile)
+    }
     /// Short name for the sidebar: the volume name for external drives, else the folder name.
     public var displayName: String {
         if let name, !name.isEmpty { return name }
@@ -130,7 +134,9 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 
-    public var fileURL: URL { URL(fileURLWithPath: filePath) }
+    /// Never touches the disk (without `isDirectory`, Foundation lstat()s the path — a network round
+    /// trip for tracks on a share, and a hang if the share has gone away).
+    public var fileURL: URL { URL(fileURLWithPath: filePath, isDirectory: false) }
     public var displayArtist: String { artist ?? albumArtist ?? "Unknown Artist" }
     public var displayAlbumArtist: String { albumArtist ?? artist ?? "Unknown Artist" }
     public var displayAlbum: String { album ?? "Unknown Album" }

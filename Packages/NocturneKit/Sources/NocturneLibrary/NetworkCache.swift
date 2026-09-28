@@ -127,7 +127,7 @@ public final class NetworkCache: @unchecked Sendable {
                 if offline { pinAfterDownload.insert(key) }
                 continue
             }
-            queue.append(Job(key: key, remote: URL(fileURLWithPath: t.filePath), size: t.fileSize, pinned: offline))
+            queue.append(Job(key: key, remote: URL(fileURLWithPath: t.filePath, isDirectory: false), size: t.fileSize, pinned: offline))
         }
         lock.unlock()
         save()
