@@ -47,6 +47,7 @@ final class PlayerController {
     private let mirror = QueueMirror()
     private let library: LibraryStore
     private let settings: AppSettings
+    private let shares: NetworkShareManager
 
     private(set) var queue: [QueueEntry] = []
     private var originalOrder: [QueueEntry] = []
@@ -75,11 +76,15 @@ final class PlayerController {
         return queue[(i + 1)...]
     }
 
-    init(library: LibraryStore, settings: AppSettings) {
+    init(library: LibraryStore, settings: AppSettings, shares: NetworkShareManager) {
         self.library = library
         self.settings = settings
+        self.shares = shares
         let mirror = self.mirror
+        let cache = shares.cache
         engine.nextItemProvider = { finished in mirror.item(after: finished.id) }
+        // Network files play from their local copy whenever one is complete (cached or kept offline).
+        engine.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
         engine.eventHandler = { [weak self] event in self?.handle(event) }
         setupRemoteCommands()
         pollTask = Task { [weak self] in
@@ -162,13 +167,19 @@ final class PlayerController {
         syncMirror()
     }
 
+    /// Starts copying the current and next network tracks locally (when the cache is on).
+    private func prefetchNetworkTracks() {
+        shares.prefetch(current: current?.track, upcoming: upcoming.map(\.track))
+    }
+
     private func syncMirror() {
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
     }
 
     private func makeItem(_ track: Track) -> PlayableItem {
         PlayableItem(url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
-                     regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track))
+                     regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
+                     cacheKey: shares.isNetwork(track) ? NetworkCache.key(for: track) : nil)
     }
 
     /// ReplayGain adjustment with peak protection (never pushes the peak over 0 dBFS).
@@ -227,6 +238,7 @@ final class PlayerController {
         case .trackStarted(let item):
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
             scrobbledEntry = nil
+            prefetchNetworkTracks()
             updateNowPlayingInfo()
             if settings.scrobble, let track = current?.track {
                 Task { try? await ListenBrainzClient.shared.submit(track, kind: .playingNow) }
@@ -234,7 +246,11 @@ final class PlayerController {
         case .queueEnded:
             updateNowPlayingInfo()
         case .failed(_, let message):
-            lastError = message
+            if let track = current?.track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
+                lastError = "“\(track.title)” is on a network share that isn’t connected. Nocturne reconnects automatically when the server is reachable."
+            } else {
+                lastError = message
+            }
         case .deviceLost(let name):
             lastError = "\(name) was disconnected. Playback paused."
         }

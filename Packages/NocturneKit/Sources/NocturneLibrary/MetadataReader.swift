@@ -10,8 +10,10 @@ import SFBAudioEngine
 public enum MetadataReader {
     static let lossyCodecs: Set<String> = ["MP3", "AAC", "Vorbis", "Opus", "Musepack", "Speex"]
 
-    /// Reads one file. `artwork` receives the embedded (or folder) cover.
-    public static func read(url: URL, artwork: ArtworkStore?) throws -> Track {
+    /// Reads one file. `artwork` receives the embedded (or folder) cover. `original` is the real
+    /// file when `url` is a local stand-in for it (see RemoteMetadata); folder art is looked up there.
+    public static func read(url: URL, artwork: ArtworkStore?, folderArt: FolderArtCache? = nil, original: URL? = nil) throws -> Track {
+        let home = original ?? url
         let values = try url.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
         let file = try AudioFile(readingPropertiesAndMetadataFrom: url)
         let props = file.properties
@@ -34,7 +36,8 @@ public enum MetadataReader {
             let pictures = md.attachedPictures
             let front = pictures.first { $0.type == .frontCover } ?? pictures.first
             if let data = front?.imageData { artworkKey = artwork.store(data) }
-            else if let data = ArtworkStore.folderImage(near: url) { artworkKey = artwork.store(data) }
+            else if let folderArt { artworkKey = folderArt.artworkKey(near: home, store: artwork) }
+            else if let data = ArtworkStore.folderImage(near: home) { artworkKey = artwork.store(data) }
         }
 
         let title = md.title.flatMap(nonEmpty) ?? url.deletingPathExtension().lastPathComponent

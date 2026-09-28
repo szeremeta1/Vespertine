@@ -2,6 +2,8 @@
 // nocturne-probe — verifies device handling on real hardware.
 //   nocturne-probe list
 //   nocturne-probe play <device-name-or-uid> <seconds> <file> [file…]   (plays files in sequence, gapless where possible)
+//   nocturne-probe watch <seconds>          prints every device's volume and the system output whenever they change
+//   nocturne-probe pausetest <device> <file> <volume 0…1> <pause seconds> <release-after seconds>
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -88,6 +90,63 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
     engine.play(items[0])
     while !ended.withLock({ $0 }) && Date().timeIntervalSince(start) < 600 { RunLoop.main.run(until: Date().addingTimeInterval(0.1)) }
     engine.stop()
+    exit(0)
+}
+
+func volumes() -> String {
+    OutputDevices.list().map { d in
+        let v = DeviceControl.hardwareVolume(d.id).map { String(format: "%.3f", $0) } ?? "-"
+        return "\(d.name)=\(v)\(d.isDefault ? "*" : "")"
+    }.joined(separator: "  ")
+}
+
+if args.count >= 3, args[1] == "watch" {
+    let end = Date().addingTimeInterval(Double(args[2]) ?? 30)
+    var last = ""
+    let start = Date()
+    while Date() < end {
+        let now = volumes()
+        if now != last { print(String(format: "%6.2fs  ", Date().timeIntervalSince(start)) + now + "   (* = Mac's sound output)"); last = now }
+        Thread.sleep(forTimeInterval: 0.1)
+    }
+    exit(0)
+}
+
+if args.count >= 7, args[1] == "pausetest" {
+    guard let device = devices.first(where: { $0.uid == args[2] || $0.name.localizedCaseInsensitiveContains(args[2]) }) else { print("no device"); exit(1) }
+    let target = Float(args[4]) ?? 0.3, pause = Double(args[5]) ?? 10, release = Double(args[6]) ?? 5
+    let engine = PlaybackEngine()
+    var settings = EngineSettings()
+    settings.deviceUID = device.uid
+    settings.exclusive = true
+    settings.releaseExclusiveAfterPause = release
+    engine.update(settings: settings)
+    func report(_ label: String) {
+        let hw = readback(device.id)
+        print(String(format: "%-28@ volume %@  hog=%@  state=%@", label, DeviceControl.hardwareVolume(device.id).map { String(format: "%.3f", $0) } ?? "-",
+                     hw.hogPID == getpid() ? "us" : String(hw.hogPID), engine.snapshot.state.rawValue))
+    }
+    report("before")
+    engine.play(PlayableItem(url: URL(fileURLWithPath: args[3])))
+    Thread.sleep(forTimeInterval: 1.5)
+    report("playing")
+    DeviceControl.setHardwareVolume(device.id, target)
+    Thread.sleep(forTimeInterval: 0.5)
+    report("set to \(target)")
+    Thread.sleep(forTimeInterval: 2)
+    engine.pause()
+    Thread.sleep(forTimeInterval: 0.5)
+    report("paused")
+    var t = 0.0
+    while t < pause { Thread.sleep(forTimeInterval: 1); t += 1; if Int(t) % 3 == 0 { report(String(format: "paused %.0fs", t)) } }
+    engine.resume()
+    Thread.sleep(forTimeInterval: 1.5)
+    report("resumed")
+    Thread.sleep(forTimeInterval: 2)
+    report("resumed +2s")
+    engine.stop()
+    Thread.sleep(forTimeInterval: 0.6)
+    report("stopped")
     exit(0)
 }
 

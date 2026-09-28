@@ -83,6 +83,7 @@ final class AppModel {
     let library: LibraryStore
     let player: PlayerController
     let devices: DeviceStore
+    let shares: NetworkShareManager
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = [] } } }
     var path: [DetailRoute] = []
@@ -95,6 +96,7 @@ final class AppModel {
     var lookupTracks: [Track]?     // MusicBrainz sheet
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
+    var showConnectServer = false
     /// nil = not shown; [] = whole library; otherwise these albums.
     var enrichAlbumKeys: [String]?
 
@@ -107,7 +109,8 @@ final class AppModel {
             fatalError("Could not open the library at \(settings.dataDirectory.path): \(error)")
         }
         devices = DeviceStore()
-        player = PlayerController(library: library, settings: settings)
+        shares = NetworkShareManager(library: library, settings: settings)
+        player = PlayerController(library: library, settings: settings, shares: shares)
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
@@ -115,6 +118,7 @@ final class AppModel {
             self?.syncEngine()
         }
         syncEngine()
+        shares.start()
 
         // Developer aid: `-NocturneAddSource <folder>` adds and scans a reference source on launch.
         if let path = UserDefaults.standard.string(forKey: "NocturneAddSource") {

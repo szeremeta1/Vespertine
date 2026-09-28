@@ -136,6 +136,7 @@ struct SettingsView: View {
         TabView {
             PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }
+            NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }
@@ -190,19 +191,23 @@ struct LibrarySettings: View {
             Section("Sources") {
                 ForEach(model.library.sources) { source in
                     HStack {
-                        Image(systemName: source.mode == .managed ? "tray.full" : "folder")
+                        Image(systemName: source.isNetwork ? "server.rack" : (source.mode == .managed ? "tray.full" : "folder"))
                         VStack(alignment: .leading) {
                             Text(source.displayName)
-                            Text(source.mode == .managed ? "Managed" : "Referenced in place").font(.caption).foregroundStyle(.secondary)
+                            Text(source.isNetwork ? "Network share" : (source.mode == .managed ? "Managed" : "Referenced in place"))
+                                .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
                         Button("Rescan") { Task { await model.library.scan(source) } }
-                        Button("Remove") { model.library.removeSource(source) }
+                        Button("Remove") {
+                            if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
+                        }
                     }
                 }
                 HStack {
                     Button("Add Folder…") { model.presentImporter(.reference) }
                     Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
+                    Button("Connect to Server…") { model.showConnectServer = true }
                 }
             }
             Section("Importing") {

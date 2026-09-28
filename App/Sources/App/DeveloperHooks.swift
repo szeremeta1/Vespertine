@@ -17,6 +17,21 @@ enum DeveloperHooks {
         let d = UserDefaults.standard
         let open = d.string(forKey: "NocturneOpenAlbum")
         let play = d.string(forKey: "NocturnePlayAlbum")
+        if let address = d.string(forKey: "NocturneAddShare") {
+            // Adds a network share using the keychain's saved password (never one passed on the command line).
+            Task {
+                guard let share = NetworkShare(string: address) else { print("[qa] add share: invalid address"); return }
+                do {
+                    try await model.shares.add(share, password: nil, remember: false, name: d.string(forKey: "NocturneShareName"), writable: false)
+                    print("[qa] add share: ok")
+                } catch {
+                    print("[qa] add share failed: \(error.localizedDescription)")
+                }
+            }
+        }
+        if d.bool(forKey: "NocturneOpenSettings") {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
         if let path = d.string(forKey: "NocturneSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "NocturneSnapshotDelay"), repeats: max(1, d.integer(forKey: "NocturneSnapshotCount"))) }
         }
@@ -63,6 +78,7 @@ enum DeveloperHooks {
         switch d.string(forKey: "NocturneOpenSheet") {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []
+        case "connectServer": model.showConnectServer = true
         default: break
         }
     }

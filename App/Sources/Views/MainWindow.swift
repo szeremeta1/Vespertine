@@ -54,6 +54,9 @@ struct MainWindow: View {
             MusicBrainzSheet(tracks: request.tracks)
                 .environment(model)
         }
+        .sheet(isPresented: $model.showConnectServer) {
+            ConnectServerSheet().environment(model)
+        }
         .sheet(isPresented: $model.showFindMusic) {
             FindMusicSheet().environment(model)
         }
@@ -152,6 +155,8 @@ struct EmptyLibraryView: View {
                 Button { model.showFindMusic = true } label: { Label("Find Music on This Mac…", systemImage: "sparkle.magnifyingglass") }
                     .buttonStyle(BrassButtonStyle())
                 Button("Add Folder…") { model.presentImporter(.reference) }
+                    .buttonStyle(QuietButtonStyle())
+                Button("Connect to Server…") { model.showConnectServer = true }
                     .buttonStyle(QuietButtonStyle())
                 Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
                     .buttonStyle(QuietButtonStyle())

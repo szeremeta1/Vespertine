@@ -1,6 +1,8 @@
 //
 // nocturne-library — library operations from the command line.
 //   nocturne-library find [folder…]        list folders with music (read-only)
+//   nocturne-library scan --library <dir> <folder>   index a folder (local or a mounted network share)
+//   nocturne-library verify-remote <folder> [n]      check the fast network tag path against direct reads
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -62,6 +64,88 @@ case "import":
     let source = try db.addSource(LibrarySource(path: root.standardizedFileURL.path, mode: .managed))
     let summary = try await scanner.scan(source)
     print("scan: \(summary.added) added, \(summary.updated) updated, \(summary.skipped) skipped, \(summary.failed.count) failed")
+case "scan":
+    // nocturne-library scan --library <data-dir> <folder>   (adds the folder by reference, then indexes it)
+    guard let li = args.firstIndex(of: "--library"), li + 1 < args.count else { print("scan needs --library"); exit(2) }
+    let dataDir = URL(fileURLWithPath: (args[li + 1] as NSString).expandingTildeInPath)
+    let folders = args.dropFirst().enumerated().filter { $0.offset + 1 != li && $0.offset + 1 != li + 1 }.map(\.element)
+    guard let folder = folders.first else { print("scan needs a folder"); exit(2) }
+    try FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
+    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dataDir.appendingPathComponent("Artwork")))
+    let root = URL(fileURLWithPath: (folder as NSString).expandingTildeInPath).standardizedFileURL
+    let source = try db.addSource(LibrarySource(path: root.path, mode: .reference))
+    let start = Date()
+    let summary = try await scanner.scan(source) { p in
+        let rate = Double(p.processed) / max(0.001, Date().timeIntervalSince(start))
+        FileHandle.standardError.write(String(format: "\r%@ %d/%d files · %.0f/s   ", p.phase.rawValue, p.processed, p.total, rate).data(using: .utf8)!)
+    }
+    FileHandle.standardError.write("\n".data(using: .utf8)!)
+    print(String(format: "scan: %d added, %d updated, %d skipped, %d missing, %d failed in %.1fs", summary.added, summary.updated, summary.skipped, summary.missing, summary.failed.count, Date().timeIntervalSince(start)))
+    for f in summary.failed.prefix(10) { print("   failed: \(f)") }
+case "verify-remote":
+    // nocturne-library verify-remote <folder> [count]
+    // Checks the fast network tag path against a direct read, field by field.
+    guard args.count > 1 else { print("verify-remote needs a folder"); exit(2) }
+    let root = URL(fileURLWithPath: (args[1] as NSString).expandingTildeInPath)
+    let limit = args.count > 2 ? Int(args[2]) ?? 50 : 50
+    let files = LibraryScanner.enumerate(root).audio
+    // Spread the sample across formats and folders.
+    let byExt = Dictionary(grouping: files) { $0.pathExtension.lowercased() }
+    var sample: [URL] = []
+    while sample.count < min(limit, files.count) {
+        var added = false
+        for (_, group) in byExt.sorted(by: { $0.key < $1.key }) where sample.count < limit {
+            let pick = group[(sample.count * 7919) % group.count]
+            if !sample.contains(pick) { sample.append(pick); added = true }
+        }
+        if !added { break }
+    }
+    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-verify-\(getpid())")
+    try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: tmp) }
+    let art = ArtworkStore(directory: tmp.appendingPathComponent("Artwork"))
+    var mismatches = 0, totalRequests = 0, fastTime = 0.0, directTime = 0.0
+    for url in sample {
+        let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
+        let shadow = tmp.appendingPathComponent(url.lastPathComponent)
+        var t = Date()
+        let requests = (try? RemoteMetadata.makeShadow(of: url, size: size, at: shadow)) ?? -1
+        let fast = try? MetadataReader.read(url: shadow, artwork: art, original: url)
+        fastTime += Date().timeIntervalSince(t)
+        t = Date()
+        let direct = try? MetadataReader.read(url: url, artwork: art)
+        directTime += Date().timeIntervalSince(t)
+        try? FileManager.default.removeItem(at: shadow)
+        totalRequests += max(0, requests)
+        guard let fast, let direct else {
+            mismatches += 1
+            print("✗ \(url.lastPathComponent): fast=\(fast != nil) direct=\(direct != nil)")
+            continue
+        }
+        let pairs: [(String, String, String)] = [
+            ("title", fast.title, direct.title), ("artist", fast.artist ?? "", direct.artist ?? ""),
+            ("album", fast.album ?? "", direct.album ?? ""), ("albumArtist", fast.albumArtist ?? "", direct.albumArtist ?? ""),
+            ("track", "\(fast.trackNumber ?? 0)/\(fast.trackTotal ?? 0)", "\(direct.trackNumber ?? 0)/\(direct.trackTotal ?? 0)"),
+            ("disc", "\(fast.discNumber ?? 0)", "\(direct.discNumber ?? 0)"), ("date", fast.releaseDate ?? "", direct.releaseDate ?? ""),
+            ("genre", fast.genre ?? "", direct.genre ?? ""), ("codec", fast.codec, direct.codec),
+            ("rate", "\(fast.sampleRate)", "\(direct.sampleRate)"), ("bits", "\(fast.bitDepth ?? 0)", "\(direct.bitDepth ?? 0)"),
+            ("channels", "\(fast.channels)", "\(direct.channels)"),
+            ("duration", String(format: "%.1f", fast.duration), String(format: "%.1f", direct.duration)),
+            ("mbid", fast.musicBrainzReleaseID ?? "", direct.musicBrainzReleaseID ?? ""),
+            ("rg", "\(fast.rgTrackGain ?? 0)", "\(direct.rgTrackGain ?? 0)"),
+            ("art", fast.artworkKey ?? "-", direct.artworkKey ?? "-"),
+        ]
+        let diff = pairs.filter { $0.1 != $0.2 }
+        if diff.isEmpty { print("✓ \(url.pathExtension.lowercased()) \(requests) reads  \(url.lastPathComponent)") }
+        else {
+            mismatches += 1
+            print("✗ \(url.lastPathComponent): " + diff.map { "\($0.0) fast=\($0.1) direct=\($0.2)" }.joined(separator: "; "))
+        }
+    }
+    print(String(format: "%d files, %d mismatches · fast %.2fs/file (%.1f reads/file) · direct %.2fs/file",
+                 sample.count, mismatches, fastTime / Double(max(1, sample.count)), Double(totalRequests) / Double(max(1, sample.count)),
+                 directTime / Double(max(1, sample.count))))
 case "enrich":
     // nocturne-library enrich --library <data-dir> [--apply high|all]
     guard let li = args.firstIndex(of: "--library") else { print("enrich needs --library"); exit(2) }
@@ -94,5 +178,6 @@ case "tags":
         print("   title=\(t.title) | artist=\(t.artist ?? "-") | album=\(t.album ?? "-") | albumArtist=\(t.albumArtist ?? "-") | year=\(t.year.map(String.init) ?? "-") | track=\(t.trackNumber.map(String.init) ?? "-")/\(t.trackTotal.map(String.init) ?? "-") | genre=\(t.genre ?? "-") | art=\(ArtworkStore.hasEmbeddedArt(url) ? "yes" : "no")")
     }
 default:
-    print("usage: nocturne-library find [folder…] | hires | tags <file…> | search <term> | import --library <dir> --into <dir> <files…> | enrich --library <dir> [--apply high|all]")
+    print("usage: nocturne-library find [folder…] | hires | tags <file…> | search <term> | scan --library <dir> <folder> | verify-remote <folder> [count] | import --library <dir> --into <dir> <files…> | enrich --library <dir> [--apply high|all]")
 }
+

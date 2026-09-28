@@ -69,6 +69,8 @@ struct NocturneCommands: Commands {
                 .keyboardShortcut("o", modifiers: [.command])
             Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
+            Button("Connect to Server…") { model.showConnectServer = true }
+                .keyboardShortcut("k", modifiers: [.command])
             Divider()
             Button("Rescan Library") { Task { await model.library.rescanAll() } }
                 .keyboardShortcut("r", modifiers: [.command, .option])

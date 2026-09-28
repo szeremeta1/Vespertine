@@ -17,9 +17,12 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public let regionFrameLength: Int64?
     /// ReplayGain adjustment the app decided on (dB), nil = none.
     public let replayGainDB: Double?
+    /// Identifies a local copy of a network file (see the engine's urlResolver); nil = always open `url`.
+    public let cacheKey: String?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
-                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil) {
+                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil) {
+        self.cacheKey = cacheKey
         self.id = id
         self.url = url
         self.trackID = trackID

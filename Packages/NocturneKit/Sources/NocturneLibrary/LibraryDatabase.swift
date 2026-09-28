@@ -136,6 +136,13 @@ public final class LibraryDatabase: Sendable {
             var suspect = Playlist(name: "Suspect Hi-Res", smartRules: .suspect, sortIndex: 1)
             try suspect.insert(db)
         }
+        m.registerMigration("v2-network-shares") { db in
+            try db.alter(table: "source") { t in
+                t.add(column: "remoteURL", .text)
+                t.add(column: "name", .text)
+                t.add(column: "isWritable", .boolean).notNull().defaults(to: false)
+            }
+        }
         return m
     }
 }
@@ -344,6 +351,24 @@ public extension LibraryDatabase {
             try s.insert(db)
             return s
         }
+    }
+
+    /// Points a source (and every track in it) at a new local root, e.g. when a share
+    /// comes back mounted somewhere else. Library state (plays, ratings, playlists) is kept.
+    public func relinkSource(_ id: Int64, to newPath: String) throws {
+        try writer.write { db in
+            guard let source = try LibrarySource.fetchOne(db, key: id), source.path != newPath else { return }
+            let old = source.path
+            try db.execute(sql: """
+                UPDATE track SET location = ? || substr(location, ?), filePath = ? || substr(filePath, ?)
+                WHERE sourceId = ? AND substr(filePath, 1, ?) = ?
+                """, arguments: [newPath, old.unicodeScalars.count + 1, newPath, old.unicodeScalars.count + 1, id, old.unicodeScalars.count, old])
+            try db.execute(sql: "UPDATE source SET path = ? WHERE id = ?", arguments: [newPath, id])
+        }
+    }
+
+    public func setSourceOnline(_ id: Int64, _ online: Bool) throws {
+        try writer.write { db in try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, id]) }
     }
 
     func removeSource(_ id: Int64) throws {

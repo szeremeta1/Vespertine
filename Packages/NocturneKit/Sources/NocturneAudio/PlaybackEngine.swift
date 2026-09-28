@@ -52,6 +52,11 @@ public struct EngineSettings: Sendable, Equatable {
 public final class PlaybackEngine: @unchecked Sendable {
     /// Called on the engine thread when the current item has been fully decoded; return the next item for gapless playback.
     public var nextItemProvider: (@Sendable (PlayableItem) -> PlayableItem?)?
+    /// Maps an item to the file to open, called on the engine thread each time an item is opened
+    /// (e.g. a local cached copy of a file on a network share). nil opens `item.url`.
+    public var urlResolver: (@Sendable (PlayableItem) -> URL)?
+    private func resolve(_ item: PlayableItem) -> URL { urlResolver?(item) ?? item.url }
+
     /// Delivered on the main queue.
     public var eventHandler: (@Sendable @MainActor (EngineEvent) -> Void)?
 
@@ -320,7 +325,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Opens `item`, (re)configures the device if needed, positions and prefills.
     private func begin(_ item: PlayableItem, at seconds: TimeInterval) throws {
         guard let device = resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
-        let probed = try SourceOpener.probe(item.url)
+        let probed = try SourceOpener.probe(resolve(item))
         let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: settings.ratePolicies[device.uid] ?? .matchSource)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
@@ -484,7 +489,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         while let next = candidate, attempts < 8 {
             attempts += 1
             do {
-                let probed = try SourceOpener.probe(next.url)
+                let probed = try SourceOpener.probe(resolve(next))
                 let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                               policy: settings.ratePolicies[device.uid] ?? .matchSource)
                 if session.plan.isDeviceCompatible(with: plan) {

@@ -205,6 +205,16 @@ struct AlbumMenu: View {
         Button("Enrich Metadata…") { model.enrichAlbumKeys = [album.key] }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) }
+        let network = tracks.filter(model.shares.isNetwork)
+        if !network.isEmpty {
+            Divider()
+            if network.allSatisfy(model.shares.cache.isOffline) {
+                Button("Remove Offline Copy") { model.shares.setOffline(false, tracks: network) }
+            } else {
+                Button("Keep Offline") { model.shares.setOffline(true, tracks: network) }
+                    .disabled(!network.contains(where: model.shares.isReachable))
+            }
+        }
     }
 }
 

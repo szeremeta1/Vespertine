@@ -43,7 +43,8 @@ let package = Package(
                 "NocturneAudio",
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
-            ]
+            ],
+            linkerSettings: [.linkedFramework("NetFS")]
         ),
         // Generates a demo library of original, synthesized music with artwork (for development and screenshots).
         .executableTarget(
