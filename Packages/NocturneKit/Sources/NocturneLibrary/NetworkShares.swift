@@ -10,6 +10,9 @@ import Foundation
 import NetFS
 import Network
 import Security
+import os
+
+private let networkLog = Logger(subsystem: "org.nocturne.player", category: "shares")
 
 /// A folder on a file server, e.g. smb://music@nas.local/Music/Hi-Res.
 public struct NetworkShare: Sendable, Hashable, Codable {
@@ -131,6 +134,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
     case authenticationFailed
     /// No saved password could be found for the account (so nothing was sent to the server).
     case passwordMissing(account: String)
+    /// macOS refused the mount itself (a privacy rule or permission), not the server.
+    case notPermitted
     case shareNotFound(String)
     case folderNotFound(String)
     case cancelled
@@ -144,6 +149,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
             "Can’t reach \(host). Check that the server is on, and if you reach it through Tailscale or another VPN, that it’s connected."
         case .authenticationFailed:
             "The server didn’t accept that name and password."
+        case .notPermitted:
+            "macOS didn’t allow Nocturne to mount the share (operation not permitted). Try Reconnect; if it keeps happening, check System Settings → Privacy & Security → Files & Folders for Nocturne."
         case .passwordMissing(let account):
             "No saved password for \(account) was found. Right-click the share and choose Enter Password…; Nocturne saves it in your keychain."
         case .shareNotFound(let share):
@@ -164,7 +171,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
 
     static func from(code: Int32, share: NetworkShare) -> NetworkShareError {
         switch code {
-        case EAUTH, EPERM, EACCES, -6003, -5045: .authenticationFailed
+        case EAUTH, -6003, -5045: .authenticationFailed
+        case EPERM, EACCES: .notPermitted
         case ENOENT: .shareNotFound(share.share)
         case ECANCELED, -128, -5999: .cancelled
         case ETIMEDOUT, EHOSTUNREACH, ENETUNREACH, EHOSTDOWN, ECONNREFUSED, -5998: .unreachable(host: share.host)
@@ -252,34 +260,45 @@ public enum NetworkVolume {
 
     /// Mounts the share (or finds it already mounted) and returns the mount point.
     /// Mounts are soft (I/O fails instead of hanging when the server goes away), hidden from
-    /// the Finder sidebar, and read-only unless `readOnly` is false.
+    /// the Finder sidebar, and read-only unless `readOnly` is false. They go where macOS puts
+    /// network volumes (/Volumes): current macOS refuses to mount inside an app's Application
+    /// Support folder ("TCC-protected app data"), so a share mounted there once could never be
+    /// remounted by the app itself. `base` is only used to recognize mounts older versions made.
     public static func mount(_ share: NetworkShare, password: String?, in base: URL, readOnly: Bool = true, timeout: TimeInterval = 6) async throws -> URL {
         if let existing = existingMount(for: share) { return existing }
         guard await isReachable(share, timeout: timeout) else { throw NetworkShareError.unreachable(host: share.host) }
 
-        let dir = share.mountDirectory(in: base)
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let url = share.mountURL
         let user = share.user, guest = share.user == nil && password == nil && share.kind == .smb
-        let code: Int32 = await Task.detached(priority: .userInitiated) {
+        let (code, point): (Int32, String?) = await Task.detached(priority: .userInitiated) {
             let open = NSMutableDictionary()
             open[kNAUIOptionKey] = kNAUIOptionNoUI
             if guest { open[kNetFSUseGuestKey] = true }
             let mount = NSMutableDictionary()
-            mount[kNetFSMountAtMountDirKey] = true
             mount[kNetFSSoftMountKey] = true
             mount[kNetFSMountFlagsKey] = (readOnly ? MNT_RDONLY : 0) | MNT_DONTBROWSE | MNT_NOSUID | MNT_NODEV
             var points: Unmanaged<CFArray>?
-            let rc = NetFSMountURLSync(url as CFURL, dir as CFURL, user as CFString?, password as CFString?, open, mount, &points)
-            points?.release()
-            return rc
+            let rc = NetFSMountURLSync(url as CFURL, nil, user as CFString?, password as CFString?, open, mount, &points)
+            let first = (points?.takeRetainedValue() as? [String])?.first
+            return (rc, first)
         }.value
         if code == EEXIST, let existing = existingMount(for: share) { return existing }
         guard code == 0 else {
-            try? FileManager.default.removeItem(at: dir) // only removes it if empty (not a mount)
+            networkLog.error("mount \(share.host, privacy: .public)/\(share.share, privacy: .public) failed: code \(code, privacy: .public) (\(NetworkShareError.describe(code), privacy: .public)); user \(user != nil, privacy: .public), password \(password != nil, privacy: .public)")
             throw NetworkShareError.from(code: code, share: share)
         }
-        return existingMount(for: share) ?? dir
+        if let point { return URL(fileURLWithPath: point, isDirectory: true) }
+        if let existing = existingMount(for: share) { return existing }
+        throw NetworkShareError.failed(code: ENOENT)
+    }
+
+    /// Mounts Nocturne made: hidden from Finder (MNT_DONTBROWSE), or in the folder older versions used.
+    /// A share you mounted yourself in Finder is never unmounted by Nocturne.
+    public static func isOwnMount(_ mountPoint: URL, legacyBase base: URL) -> Bool {
+        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { return true }
+        var s = statfs()
+        guard statfs(mountPoint.path, &s) == 0 else { return false }
+        return s.f_flags & UInt32(MNT_DONTBROWSE) != 0
     }
 
     /// Whether a mounted share still answers: lists its root on a background thread, within `timeout`.
@@ -299,16 +318,16 @@ public enum NetworkVolume {
 
     /// Drops a dead mount even if it's wedged (forced), so it can be mounted again.
     public static func forceUnmount(_ mountPoint: URL, ownedBy base: URL) {
-        guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) else { return }
+        guard isOwnMount(mountPoint, legacyBase: base) else { return }
         _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
-        try? FileManager.default.removeItem(at: mountPoint)
+        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
     }
 
     /// Unmounts a share Nocturne mounted. Other mounts (Finder's) are left alone.
     public static func unmount(_ mountPoint: URL, ownedBy base: URL) async {
-        guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) else { return }
+        guard isOwnMount(mountPoint, legacyBase: base) else { return }
         try? await FileManager.default.unmountVolume(at: mountPoint, options: [.withoutUI])
-        try? FileManager.default.removeItem(at: mountPoint)
+        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
     }
 }
 
