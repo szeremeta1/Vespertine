@@ -163,6 +163,9 @@ struct PlaybackSettings: View {
                 }
             }
             Section("Volume") {
+                Toggle("Mac sound output follows Nocturne while playing", isOn: $s.systemOutputFollowsPlayback)
+                Text("Volume keys and headphone controls, such as the AirPods Max Digital Crown, act on the Mac's sound output. With this on, they adjust the device Nocturne is playing to instead of another one selected in Control Center.")
+                    .font(.caption).foregroundStyle(.secondary)
                 Toggle("Allow digital volume when the device has no hardware control", isOn: $s.allowDigitalVolume)
                 Text("Applied in 64-bit with TPDF dither at the DAC's word length. At anything below 100% the output is no longer bit-perfect, and Nocturne says so.")
                     .font(.caption).foregroundStyle(.secondary)

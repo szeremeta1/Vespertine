@@ -174,6 +174,16 @@ final class PlayerController {
         syncMirror()
     }
 
+    /// Volume keys and headphone controls (the AirPods Max crown sends volume keys) act on the Mac's
+    /// sound output, not on the device Nocturne plays to. Point the sound output at Nocturne's device
+    /// while it plays so they adjust what you hear, and never change some other device's volume.
+    private var lastFollowed: AudioObjectID?
+    private func followSystemOutput(to device: OutputDevice) {
+        guard settings.systemOutputFollowsPlayback, lastFollowed != device.id else { return }
+        lastFollowed = device.id
+        if DeviceControl.systemOutputDevice() != device.id { DeviceControl.setSystemOutputDevice(device.id) }
+    }
+
     /// Starts copying the current and next network tracks locally (when the cache is on).
     private func prefetchNetworkTracks() {
         shares.prefetch(current: current?.track, upcoming: upcoming.map(\.track))
@@ -286,6 +296,7 @@ final class PlayerController {
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
         }
+        if state == .playing, let device = snap.outputDevice { followSystemOutput(to: device) } else if state != .playing { lastFollowed = nil }
         if underruns != snap.underruns { underruns = snap.underruns }
 
         // Count a play (and scrobble) at half the track or four minutes, whichever comes first.
