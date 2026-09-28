@@ -218,14 +218,24 @@ final class NetworkShareManager {
     // MARK: Cache
 
     /// Copies the playing track and the next few ahead of time (when the cache is on).
+    /// Caches the current and next tracks. Waits until the song has been playing a little, so its
+    /// first seconds get the whole connection, and downloads one file at a time while it streams.
     func prefetch(current: Track?, upcoming: [Track]) {
+        prefetchTask?.cancel()
         guard settings.networkCache else { return }
+        let streaming = current.map { isNetwork($0) && cache.localURL(forKey: NetworkCache.key(for: $0)) == nil } ?? false
+        cache.maxConcurrentDownloads = streaming ? 1 : 2
         let wanted = ([current].compactMap { $0 } + upcoming.prefix(max(0, settings.networkPrefetch)))
             .filter { isNetwork($0) && isReachable($0) }
         guard !wanted.isEmpty else { return }
-        cache.request(wanted)
-        cache.prioritize(wanted)
+        prefetchTask = Task { @MainActor [weak self] in
+            if streaming { try? await Task.sleep(for: .seconds(10)) }
+            guard !Task.isCancelled, let self else { return }
+            self.cache.request(wanted)
+            self.cache.prioritize(wanted)
+        }
     }
+    private var prefetchTask: Task<Void, Never>?
 
     func setOffline(_ offline: Bool, tracks: [Track]) {
         cache.setOffline(offline, for: tracks.filter(isNetwork))
