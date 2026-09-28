@@ -23,6 +23,12 @@ When the current item has been fully decoded, the engine asks `nextItemProvider`
 
 Track changes are reported when the new segment becomes *audible*, not when it is decoded.
 
+A queue change (shuffle, repeat, edits) never touches the audible track. If the next track has already been decoded into the ring, `nrt_ring_rewind` takes that look-ahead back, but only when it is still well ahead of the reader (the larger of 250 ms and four I/O buffers). The engine then asks `nextItemProvider` again. When the look-ahead is too close to be taken back safely, it plays, and the new order applies from the track after it.
+
+## Output device
+
+With a specific output chosen (`EngineSettings.deviceUID`), the engine never substitutes another device. If that device isn't listed, or won't start, when playback begins, the item is parked and the engine waits for it (`waitingForDevice` in the snapshot) for up to 60 s. It re-checks on every Core Audio device-list change and twice a second, and starts playback as soon as the device is back. If the device disappears mid-song, it waits the same way. This covers AirPods Max, whose Core Audio device is removed while they're off your head and re-published a few seconds after they're back on, often after their "play" command has already arrived. Pause cancels the wait. With *System Output* chosen, the engine follows the Mac's default output as before.
+
 ## Bit-perfect definition (`SignalPath.isBitPerfect`)
 
 A path is marked bit-perfect only when all of these hold:
@@ -41,6 +47,7 @@ The library is SQLite via GRDB:
 - The `track` table has generated sort and grouping columns, FTS5 search (accent-insensitive) and JSON columns for custom tags.
 - Albums are aggregated in SQL rather than stored.
 - `LibraryScanner` is incremental (it compares size and modification time), splits single-file CUE albums into region tracks, and flags vanished files as missing instead of deleting them: they disappear from every list, playlists included, and come back with their analyses if the files return. A scan interrupted by a dropped share marks nothing missing.
+- Moved and renamed files (a library manager such as Lidarr reorganizing a share) are recognized at the end of each scan. `reconcileMovedTracks` pairs each missing track with a new one of the same size, duration and title (the same file, moved). For a file whose tags were rewritten on the way, it instead uses the same title, artist, track, disc, format and duration. A pair must be unambiguous on both sides. The new entry takes over the old one's playlist entries, play count, rating, date added, tag history and, for an unchanged file, its analysis. The stale entry is dropped, and the play queue is repointed at the new files. When a song fails to play because its file is gone, its source is rescanned at once (at most every two minutes), even during playback.
 - Genres are normalized in `Genres` (case, accents, hyphens, slash order, ID3 numbers, localized Apple names) for browsing, filters and search.
 - Smart playlist rules compile to SQL; sample rates are entered in kHz, and a rule without a usable value matches nothing.
 - `TagWriter` writes tags with TagLib through SFBAudioEngine. Beforehand it takes an APFS clone of the file (free on the same volume) and stores the previous tags in `tagHistory` for revert.

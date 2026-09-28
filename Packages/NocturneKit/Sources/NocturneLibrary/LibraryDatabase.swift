@@ -556,3 +556,82 @@ private struct SourceOverlapError: LocalizedError {
         "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership."
     }
 }
+
+// MARK: - Moved and renamed files
+
+extension LibraryDatabase {
+    /// Files that were moved or renamed (e.g. by a library manager reorganizing a share) show up as a
+    /// missing track plus a new one. Folds each missing track into its new copy so playlists, play counts,
+    /// ratings, the date it was added and its analysis carry over, then drops the stale entry.
+    ///
+    /// A match is the same size, duration and title (the file itself moved), or, for files whose tags were
+    /// rewritten on the way, the same title, artist, track, disc, format and duration. Either must be
+    /// unambiguous on both sides. Returns the old track ID → new track ID of each match.
+    @discardableResult
+    static func reconcileMovedTracks(_ db: Database, sourceID: Int64) throws -> [Int64: Int64] {
+        let columns = "id, fileSize, duration, cueStartFrame, title, artist, trackNumber, discNumber, sampleRate, channels"
+        let missing = try Row.fetchAll(db, sql: "SELECT \(columns) FROM track WHERE sourceId = ? AND isMissing = 1", arguments: [sourceID])
+        guard !missing.isEmpty else { return [:] }
+        let present = try Row.fetchAll(db, sql: "SELECT \(columns) FROM track WHERE sourceId = ? AND isMissing = 0", arguments: [sourceID])
+
+        func exactKey(_ r: Row) -> String {
+            let size: Int64 = r["fileSize"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"]
+            let title: String = r["title"] ?? ""
+            return "\(size)|\(Int((duration * 1000).rounded()))|\(cue ?? -1)|\(title.lowercased())"
+        }
+        func tagKey(_ r: Row) -> String? {
+            guard let title: String = r["title"], !title.isEmpty else { return nil }
+            let artist: String = r["artist"] ?? "", track: Int = r["trackNumber"] ?? 0, disc: Int = r["discNumber"] ?? 0
+            let rate: Double = r["sampleRate"], channels: Int = r["channels"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"]
+            return [title.lowercased(), artist.lowercased(), "\(track)", "\(disc)", "\(Int(rate))", "\(channels)",
+                    "\(Int(duration.rounded()))", "\(cue ?? -1)"].joined(separator: "|")
+        }
+        var used = Set<Int64>()
+        var pairs: [(old: Int64, new: Int64, sameFile: Bool)] = []
+        for (key, sameFile) in [(exactKey as (Row) -> String?, true), (tagKey, false)] {
+            var olds: [String: [Int64]] = [:], news: [String: [Int64]] = [:]
+            for r in missing { let id: Int64 = r["id"]; if !used.contains(id), let k = key(r) { olds[k, default: []].append(id) } }
+            for r in present { let id: Int64 = r["id"]; if !used.contains(id), let k = key(r) { news[k, default: []].append(id) } }
+            for (k, o) in olds where o.count == 1 {
+                guard let n = news[k], n.count == 1 else { continue }
+                pairs.append((o[0], n[0], sameFile))
+                used.insert(o[0]); used.insert(n[0])
+            }
+        }
+        for (old, new, sameFile) in pairs {
+            try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [new, old])
+            try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
+            try db.execute(sql: """
+                UPDATE track SET
+                  playCount = playCount + (SELECT playCount FROM track WHERE id = :old),
+                  lastPlayedAt = max(coalesce(lastPlayedAt, 0), coalesce((SELECT lastPlayedAt FROM track WHERE id = :old), 0)),
+                  rating = coalesce(rating, (SELECT rating FROM track WHERE id = :old)),
+                  addedAt = min(addedAt, (SELECT addedAt FROM track WHERE id = :old))
+                WHERE id = :new
+                """, arguments: ["old": old, "new": new])
+            try db.execute(sql: "UPDATE track SET lastPlayedAt = NULL WHERE id = ? AND lastPlayedAt = 0", arguments: [new])
+            if sameFile, try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM analysis WHERE trackId = ?)", arguments: [new]) == true {
+                // Same bytes, so the analysis still holds.
+                try db.execute(sql: """
+                    UPDATE analysis SET trackId = :new, modifiedAt = (SELECT modifiedAt FROM track WHERE id = :new)
+                    WHERE trackId = :old AND fileSize = (SELECT fileSize FROM track WHERE id = :new)
+                    """, arguments: ["old": old, "new": new])
+                try db.execute(sql: """
+                    UPDATE track SET
+                      analysisVerdict = (SELECT analysisVerdict FROM track WHERE id = :old),
+                      bandwidthHz = (SELECT bandwidthHz FROM track WHERE id = :old),
+                      effectiveBitDepth = (SELECT effectiveBitDepth FROM track WHERE id = :old)
+                    WHERE id = :new AND analysisVerdict IS NULL
+                    """, arguments: ["old": old, "new": new])
+            }
+            try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])
+        }
+        return Dictionary(uniqueKeysWithValues: pairs.map { ($0.old, $0.new) })
+    }
+
+    /// Runs `reconcileMovedTracks` for one source. Returns the old track ID → new track ID of each match.
+    @discardableResult
+    public func reconcileMovedTracks(sourceID: Int64) throws -> [Int64: Int64] {
+        try writer.write { db in try Self.reconcileMovedTracks(db, sourceID: sourceID) }
+    }
+}

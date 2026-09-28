@@ -144,6 +144,7 @@ final class AppModel {
                 DeviceRestore.finish(self.settings.deviceOnQuit)
             }
         }
+        library.onTracksMoved = { [weak self] moves in self?.player.tracksMoved(moves) }
         library.onScanFinished = { [weak self] in
             guard let self, self.settings.autoAnalyze else { return }
             self.analysis.analyzeLibrary()

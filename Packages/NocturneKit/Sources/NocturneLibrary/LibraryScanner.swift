@@ -31,6 +31,9 @@ public struct ScanSummary: Sendable {
     public var added = 0
     public var updated = 0
     public var missing = 0
+    /// Missing files found again under a new name or folder (folded into the new entry): old ID → new ID.
+    public var movedTracks: [Int64: Int64] = [:]
+    public var moved: Int { movedTracks.count }
     public var skipped = 0
     public var failed: [String] = []
     /// The source went away mid-scan (a network share dropped); nothing was marked missing.
@@ -201,14 +204,19 @@ public actor LibraryScanner {
         let missing = known.filter { !seen.contains($0.key) && !$0.value.isMissing }.map(\.value.id)
         summary.missing = missing.count
         let failedPaths = Set(summary.failed)
-        try await database.writer.write { db in
+        let moved = try await database.writer.write { db -> [Int64: Int64] in
             for (path, cue) in cueByAudio where !failedPaths.contains(path) {
                 try db.execute(sql: "INSERT OR REPLACE INTO cueScanState (sourceId, filePath, signature) VALUES (?, ?, ?)",
                                arguments: [sourceID, path, cue.signature])
             }
             for id in missing { try db.execute(sql: "UPDATE track SET isMissing = 1 WHERE id = ?", arguments: [id]) }
+            // Moved or renamed files: the new copy takes over the old entry's playlists, plays and analysis.
+            let moved = try LibraryDatabase.reconcileMovedTracks(db, sourceID: sourceID)
             try db.execute(sql: "UPDATE source SET lastScannedAt = ? WHERE id = ?", arguments: [Date(), sourceID])
+            return moved
         }
+        summary.movedTracks = moved
+        summary.missing -= min(summary.missing, moved.count)
         progress?(ScanProgress(sourcePath: source.path, processed: total, total: total, added: summary.added, updated: summary.updated))
         return summary
     }

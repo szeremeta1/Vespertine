@@ -193,6 +193,7 @@ final class LibraryStore {
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
             if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
+            if !summary.movedTracks.isEmpty { onTracksMoved?(summary.movedTracks) }
         } catch {
             lastError = error.localizedDescription
         }
@@ -203,6 +204,21 @@ final class LibraryStore {
 
     /// Called after every scan (e.g. to analyze newly added music).
     var onScanFinished: (() -> Void)?
+    /// Called when a scan found files that were moved or renamed: old track ID → new track ID.
+    var onTracksMoved: (([Int64: Int64]) -> Void)?
+
+    private var missingRescanAt: [Int64: Date] = [:]
+
+    /// A file the library lists is gone (moved or deleted, e.g. by a library manager reorganizing a share):
+    /// rescan its source now, so moved files are found again. At most every two minutes per source.
+    @discardableResult
+    func rescanForMissingFile(_ track: Track) -> Bool {
+        guard let id = track.sourceId, let source = sources.first(where: { $0.id == id }), scanProgress == nil,
+              Date().timeIntervalSince(missingRescanAt[id] ?? .distantPast) > 120 else { return false }
+        missingRescanAt[id] = Date()
+        Task { await scan(source) }
+        return true
+    }
 
     func rescanAll() async {
         for source in sources { await scan(source) }

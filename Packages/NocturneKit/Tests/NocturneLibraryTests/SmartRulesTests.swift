@@ -5,6 +5,7 @@
 
 import Foundation
 import Testing
+import NocturneAudio
 @testable import NocturneLibrary
 
 @Suite("Smart playlist rules")
@@ -83,5 +84,59 @@ struct SmartRulesTests {
         try FileManager.default.moveItem(at: aside, to: dir.appendingPathComponent("gone.wav"))
         try await scanner.scan(source)
         #expect(try db.tracks(in: playlist).count == 2)
+    }
+
+    @Test("Moved or renamed files keep their playlists, plays, rating, date added and analysis")
+    func moves() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let oldFolder = dir.appendingPathComponent("Artist - Album (1973) [FLAC]")
+        try FileManager.default.createDirectory(at: oldFolder, withIntermediateDirectories: true)
+        try makeWAV(oldFolder.appendingPathComponent("01 Song.wav"))
+        try makeWAV(oldFolder.appendingPathComponent("02 Other.wav"))     // same size and length as 01
+        try makeWAV(oldFolder.appendingPathComponent("03 Deleted.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".bak"))
+        for (n, title) in [(1, "Song"), (2, "Other")] {
+            let t = try #require(try db.allTracks().first { $0.filePath.hasSuffix("0\(n) \(title).wav") })
+            _ = try await writer.apply(TagEdit(fields: [.title: title, .artist: "Artist", .trackNumber: "\(n)"]), to: [t])
+        }
+        let before = try db.allTracks()
+        let song = try #require(before.first { $0.title == "Song" })
+        let songID = try #require(song.id)
+        let playlist = try db.createPlaylist(name: "Mix")
+        try db.append(trackIDs: before.compactMap(\.id), to: try #require(playlist.id))
+        try db.markPlayed(songID)
+        try db.setRating(4, trackIDs: [songID])
+        let reread = try #require(try db.tracks(ids: [songID]).first)
+        let analysis = try FileAnalyzer.analyze(url: URL(fileURLWithPath: reread.filePath))
+        try db.saveAnalysis(analysis, filePath: reread.filePath)
+
+        // A library manager reorganizes everything: Artist/Album (1973)/CD 01/Artist - Album - 01 - Song.wav,
+        // and one file is deleted outright.
+        let newFolder = dir.appendingPathComponent("Artist/Album (1973)/CD 01")
+        try FileManager.default.createDirectory(at: newFolder, withIntermediateDirectories: true)
+        for name in ["01 Song", "02 Other"] {
+            try FileManager.default.moveItem(at: oldFolder.appendingPathComponent("\(name).wav"),
+                                             to: newFolder.appendingPathComponent("Artist - Album - \(name).wav"))
+        }
+        try FileManager.default.removeItem(at: oldFolder.appendingPathComponent("03 Deleted.wav"))
+        let summary = try await scanner.scan(source)
+        #expect(summary.moved == 2)
+        #expect(summary.missing == 1)
+
+        let listed = try db.tracks(in: playlist)
+        #expect(listed.map(\.title) == ["Song", "Other"])
+        #expect(listed.allSatisfy { $0.filePath.contains("/CD 01/") })
+        let moved = try #require(listed.first)
+        #expect(moved.playCount == 1 && moved.rating == 4)
+        #expect(moved.addedAt == song.addedAt)
+        #expect(moved.analysisVerdict == analysis.verdict.rawValue)
+        #expect(try db.tracksNeedingAnalysis().allSatisfy { $0.id != moved.id })   // the analysis still counts
+        #expect(try db.allTracks().count == 2)                                  // no duplicates left behind
     }
 }

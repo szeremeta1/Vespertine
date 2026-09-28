@@ -78,7 +78,7 @@ struct TransportControls: View {
                 Button { player.previous() } label: { Image(systemName: "backward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
                 Button { player.togglePlayPause() } label: {
-                    Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                    Image(systemName: player.isPlaying || player.waitingForDevice != nil ? "pause.fill" : "play.fill")
                         .font(.system(size: compact ? 12 : 14))
                         .foregroundStyle(Color(hex: 0x1A140A))
                         .frame(width: compact ? 30 : 38, height: compact ? 30 : 38)
