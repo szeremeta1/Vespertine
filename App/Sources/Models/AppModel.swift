@@ -86,7 +86,7 @@ final class AppModel {
     let shares: NetworkShareManager
     let analysis: AnalysisQueue
 
-    var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = [] } } }
+    var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = []
     var searchText = ""
     var selectedTrackIDs: Set<Int64> = [] { didSet { if selectedTrackIDs != oldValue { selectionChangedAt = .now } } }

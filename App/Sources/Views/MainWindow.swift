@@ -34,7 +34,9 @@ struct MainWindow: View {
         }
         .background(Palette.window)
         .tint(Palette.brass)
-        .searchable(text: $model.searchText, placement: .toolbar, prompt: "Search library")
+        .searchable(text: $model.searchText, placement: .toolbar, prompt: "Search albums, artists and songs")
+        // Typing a search shows its results (on top of any album or artist page you were on).
+        .onChange(of: model.searchText) { model.path = [] }
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button { _ = model.path.popLast() } label: { Label("Back", systemImage: "chevron.left") }
@@ -81,33 +83,62 @@ struct LookupRequest: Identifiable {
     var id: String { tracks.compactMap(\.id).map(String.init).joined(separator: ",") }
 }
 
-/// Picks the content for the current sidebar item or search.
+/// Picks the content for the current sidebar item, search and album/artist pages. Pages you
+/// navigate away from stay alive underneath (hidden), so going back returns to exactly where you
+/// were: scroll position, sort and filters.
 struct ContentRouter: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
+        let searching = !model.searchText.trimmingCharacters(in: .whitespaces).isEmpty
+        let path = model.path
         Group {
-            if !model.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
-                SearchResultsView(query: model.searchText)
-            } else if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty {
+            if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty && !searching {
                 EmptyLibraryView()
-            } else if let route = model.path.last {
-                switch route {
-                case .album(let key): AlbumDetailView(albumKey: key).id(key)
-                case .artist(let name): ArtistDetailView(name: name).id(name)
-                }
             } else {
-                switch model.sidebar {
-                case .albums: AlbumsGridView()
-                case .artists: ArtistsView()
-                case .songs: SongsView(title: "Songs", tracks: nil)
-                case .recentlyAdded: AlbumsGridView(title: "Recently Added", forcedSort: .recentlyAdded)
-                case .playlist(let id): PlaylistView(playlistID: id)
-                case .source(let id): SourceView(sourceID: id)
+                ZStack {
+                    RouteLayer(visible: !searching && path.isEmpty) { root.id(model.sidebar) }
+                    if searching {
+                        RouteLayer(visible: path.isEmpty) { SearchResultsView(query: model.searchText) }
+                    }
+                    ForEach(Array(path.enumerated()), id: \.offset) { index, route in
+                        RouteLayer(visible: index == path.count - 1) { page(route) }
+                    }
                 }
             }
         }
         .background(Palette.window)
+    }
+
+    @ViewBuilder private var root: some View {
+        switch model.sidebar {
+        case .albums: AlbumsGridView()
+        case .artists: ArtistsView()
+        case .songs: SongsView(title: "Songs", tracks: nil)
+        case .recentlyAdded: AlbumsGridView(title: "Recently Added", forcedSort: .recentlyAdded)
+        case .playlist(let id): PlaylistView(playlistID: id)
+        case .source(let id): SourceView(sourceID: id)
+        }
+    }
+
+    @ViewBuilder private func page(_ route: DetailRoute) -> some View {
+        switch route {
+        case .album(let key): AlbumDetailView(albumKey: key).id(key)
+        case .artist(let name): ArtistDetailView(name: name).id(name)
+        }
+    }
+}
+
+/// One page in the navigation stack: shown on top, or kept (hidden) underneath with its state.
+private struct RouteLayer<Content: View>: View {
+    let visible: Bool
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .opacity(visible ? 1 : 0)
+            .allowsHitTesting(visible)
+            .accessibilityHidden(!visible)
     }
 }
 
