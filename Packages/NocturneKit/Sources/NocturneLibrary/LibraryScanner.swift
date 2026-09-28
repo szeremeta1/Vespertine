@@ -319,10 +319,13 @@ public actor LibraryScanner {
         func canon(_ url: URL) -> URL {
             let path = url.path
             guard physical != canonical, path.hasPrefix(physical + "/") else { return url }
-            return URL(fileURLWithPath: canonical + path.dropFirst(physical.count))
+            // isDirectory stated: without it Foundation lstat()s every path (a round trip each on a share).
+            return URL(fileURLWithPath: canonical + path.dropFirst(physical.count), isDirectory: false)
         }
+        // URL.path decodes the whole path on every call; compute each once before sorting 10k+ files.
         let files = audio.map { ListedFile(url: canon($0.url), size: $0.size, modified: $0.modified) }
-        return (files.sorted { $0.url.path < $1.url.path }, cue.map(canon))
+            .map { ($0.url.path, $0) }.sorted { $0.0 < $1.0 }.map(\.1)
+        return (files, cue.map(canon))
     }
 
     public static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
@@ -361,7 +364,7 @@ public actor LibraryScanner {
             guard let sheet = CueSheet.load(cueURL) else { continue }
             // Only single-file sheets with more than one track are split.
             guard sheet.files.count == 1, let file = sheet.files.first, file.tracks.count > 1 else { continue }
-            let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name)
+            let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name, isDirectory: false)
             let starts = file.tracks.map(\.startCDFrames)
             guard Set(file.tracks.map(\.number)).count == file.tracks.count,
                   file.tracks.allSatisfy({ $0.number > 0 }),
@@ -454,7 +457,7 @@ public actor LibraryScanner {
         let files = Dictionary(grouping: tracks, by: \.filePath)
         for (path, group) in files {
             guard let sourceID = group.first?.sourceId else { continue }
-            let url = URL(fileURLWithPath: path)
+            let url = URL(fileURLWithPath: path, isDirectory: false)
             let cue = group.contains { $0.cueStartFrame != nil }
                 ? Self.cueSheets(Self.enumerate(url.deletingLastPathComponent()).cue)[path] : nil
             if let fresh = Self.readTracks(url, cue: cue, artwork: artwork) {

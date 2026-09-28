@@ -236,7 +236,7 @@ public extension LibraryDatabase {
                      trackCount: row["trackCount"], duration: row["duration"], artworkKey: row["artworkKey"],
                      formatSummary: summary, codec: codec, maxBitDepth: bits, maxSampleRate: rate, isHiRes: isDSD || (lossless && ((bits ?? 16) > 16 || rate > 48_000)),
                      isDSD: isDSD, addedAt: row["addedAt"], totalSize: row["totalSize"],
-                     sourcePath: (row["anyPath"] as String?).map { URL(fileURLWithPath: $0).deletingLastPathComponent().path })
+                     sourcePath: (row["anyPath"] as String?).map { ($0 as NSString).deletingLastPathComponent })
     }
 
     func albums(sort: AlbumSort = .artist) throws -> [Album] {
@@ -380,7 +380,7 @@ public extension LibraryDatabase {
         }
     }
 
-    func sources() throws -> [LibrarySource] {
+    public func sources() throws -> [LibrarySource] {
         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
     }
 

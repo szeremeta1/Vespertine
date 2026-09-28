@@ -48,16 +48,21 @@ final class NetworkShareManager {
         refreshUsage()
     }
 
-    var sources: [LibrarySource] { library.sources.filter(\.isNetwork) }
+    /// Read from the database, not the store's observed copy, which may not have loaded yet at launch.
+    var sources: [LibrarySource] {
+        let observed = library.sources // observed, so views refresh when shares are added or removed
+        return (observed.isEmpty ? (try? library.database.sources()) ?? [] : observed).filter(\.isNetwork)
+    }
 
     func isNetwork(_ track: Track) -> Bool {
         guard let id = track.sourceId else { return false }
         return library.sources.first { $0.id == id }?.isNetwork ?? false
     }
 
+    /// A share counts as connected only once this session has mounted (or adopted) it.
     func status(of source: LibrarySource) -> Status {
         guard let id = source.id else { return .offline("") }
-        return status[id] ?? (source.isOnline ? .connected : .offline("Not connected yet."))
+        return status[id] ?? .offline("Not connected yet.")
     }
 
     func isReachable(_ track: Track) -> Bool {
@@ -126,6 +131,8 @@ final class NetworkShareManager {
         for source in sources {
             guard let id = source.id, let share = source.networkShare, !connecting.contains(id) else { continue }
             if status(of: source).isConnected {
+                // Mount gone (unmounted elsewhere, or the system dropped it): mount again.
+                if NetworkVolume.existingMount(for: share) == nil { await connect(source); continue }
                 if await NetworkVolume.isReachable(share, timeout: 4) { continue }
                 status[id] = .offline(NetworkShareError.unreachable(host: share.host).localizedDescription)
                 try? library.database.setSourceOnline(id, false)
@@ -157,7 +164,10 @@ final class NetworkShareManager {
             try library.database.relinkSource(id, to: root.path)
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
-            if scanIfNew, source.lastScannedAt == nil, var fresh = library.sources.first(where: { $0.id == id }) {
+            // File-system events don't cross the network: index new shares, and look for changes on
+            // shares not checked for a day (incremental, so only new or changed files are read).
+            let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > 86_400 } ?? true
+            if scanIfNew, stale, library.scanProgress == nil, var fresh = sources.first(where: { $0.id == id }) {
                 fresh.path = root.path
                 await library.scan(fresh)
             }

@@ -266,10 +266,10 @@ public actor TagWriter {
             // Restore the complete file: artwork and structured custom tags are not in the legacy string snapshot.
             if let expected = entry.previous["__fileSHA256"] {
                 guard try Self.fileHash(track.fileURL) == expected else { throw TagWriteError.fileChanged }
-                try Self.restore(URL(fileURLWithPath: path), to: track.fileURL)
+                try Self.restore(URL(fileURLWithPath: path, isDirectory: false), to: track.fileURL)
             } else {
                 // Legacy edits did not record a fingerprint. Restore metadata from the backup without replacing audio.
-                let backup = try AudioFile(readingPropertiesAndMetadataFrom: URL(fileURLWithPath: path))
+                let backup = try AudioFile(readingPropertiesAndMetadataFrom: URL(fileURLWithPath: path, isDirectory: false))
                 let current = try AudioFile(readingPropertiesAndMetadataFrom: track.fileURL)
                 current.metadata.removeAllMetadata()
                 current.metadata.removeAllAttachedPictures()
