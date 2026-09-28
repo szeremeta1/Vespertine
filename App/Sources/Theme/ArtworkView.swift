@@ -68,7 +68,11 @@ struct ArtworkView: View {
         .task(id: key) {
             guard let key else { image = nil; return }
             image = ArtworkCache.shared.cached(key, size: size)
-            if image == nil { image = await ArtworkCache.shared.image(key, size: size) }
+            if image == nil {
+                let loaded = await ArtworkCache.shared.image(key, size: size)
+                guard !Task.isCancelled else { return }
+                image = loaded
+            }
         }
     }
 

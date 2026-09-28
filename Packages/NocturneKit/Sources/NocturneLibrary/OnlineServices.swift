@@ -61,8 +61,13 @@ public actor MusicBrainzClient {
     private func get(_ url: URL) async throws -> Data {
         var attempt = 0
         while true {
-            let wait = 1.1 - Date().timeIntervalSince(lastRequest)
-            if wait > 0 { try await Task.sleep(for: .seconds(wait)) }
+            // Recheck after suspension: another actor call may have taken this slot while we slept.
+            while true {
+                let wait = 1.1 - Date().timeIntervalSince(lastRequest)
+                if wait <= 0 { break }
+                try await Task.sleep(for: .seconds(wait))
+            }
+            try Task.checkCancellation()
             lastRequest = .now
             var request = URLRequest(url: url)
             request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
@@ -72,7 +77,7 @@ public actor MusicBrainzClient {
                 let status = (response as? HTTPURLResponse)?.statusCode ?? 0
                 if (200..<300).contains(status) { return data }
                 guard status == 503 || status == 429 || status >= 500, attempt < 4 else { throw URLError(.badServerResponse) }
-            } catch let error as URLError where error.code != .badServerResponse && attempt < 4 {
+            } catch let error as URLError where error.code != .badServerResponse && error.code != .cancelled && attempt < 4 {
                 // transient network error: retry
             }
             attempt += 1
@@ -119,6 +124,7 @@ public actor MusicBrainzClient {
     }
 
     public func release(id: String) async throws -> MBRelease {
+        guard UUID(uuidString: id) != nil else { throw URLError(.badURL) }
         var comps = URLComponents(string: "https://musicbrainz.org/ws/2/release/\(id)")!
         comps.queryItems = [.init(name: "inc", value: "recordings+artist-credits+labels+genres+release-groups"), .init(name: "fmt", value: "json")]
         guard let r = try JSONSerialization.jsonObject(with: try await get(comps.url!)) as? [String: Any] else { throw URLError(.cannotParseResponse) }
@@ -152,8 +158,9 @@ public actor MusicBrainzClient {
     /// Front cover from the Cover Art Archive (1200 px): this release's, else its release group's
     /// (covers are often uploaded for just one edition of an album).
     public func frontCover(releaseID: String, releaseGroupID: String? = nil) async throws -> Data? {
+        guard UUID(uuidString: releaseID) != nil else { throw URLError(.badURL) }
         if let data = try await fetchCover(path: "release/\(releaseID)") { return data }
-        if let group = releaseGroupID { return try await fetchCover(path: "release-group/\(group)") }
+        if let group = releaseGroupID, UUID(uuidString: group) != nil { return try await fetchCover(path: "release-group/\(group)") }
         return nil
     }
 
@@ -176,7 +183,7 @@ public extension MBRelease {
     /// Tag edits for `track`, matched by disc/track number (falling back to order).
     func edit(for track: Track, index: Int) -> TagEdit? {
         let match = tracks.first { $0.disc == (track.discNumber ?? 1) && $0.position == track.trackNumber }
-            ?? (index < tracks.count ? tracks[index] : nil)
+            ?? (tracks.indices.contains(index) ? tracks[index] : nil)
         guard let match else { return nil }
         var fields: [TagField: String?] = [
             .title: match.title, .artist: match.artist, .album: title, .albumArtist: artist,

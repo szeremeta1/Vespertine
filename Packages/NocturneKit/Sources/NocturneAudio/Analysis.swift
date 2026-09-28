@@ -52,13 +52,16 @@ public final class SpectrumAnalyzer: @unchecked Sendable {
 
     /// `count` log-spaced bands between `lowHz` and `highHz`, each 0…1 over a 90 dB range.
     public func bands(_ samples: [Float], sampleRate: Double, count: Int, lowHz: Double = 25, highHz: Double = 20_000) -> [Float] {
+        guard count > 0, sampleRate.isFinite, sampleRate > 0, lowHz.isFinite, lowHz > 0,
+              highHz.isFinite, highHz > 0 else { return [] }
         let db = magnitudes(samples)
         let binHz = sampleRate / Double(size)
         let top = min(highHz, sampleRate / 2)
         return (0..<count).map { i in
             let f0 = lowHz * pow(top / lowHz, Double(i) / Double(count))
             let f1 = lowHz * pow(top / lowHz, Double(i + 1) / Double(count))
-            let b0 = max(1, Int(f0 / binHz)), b1 = max(b0 + 1, min(db.count, Int(f1 / binHz)))
+            let b0 = min(db.count - 1, max(1, Int(f0 / binHz)))
+            let b1 = min(db.count, max(b0 + 1, Int(f1 / binHz)))
             let peak = db[b0..<b1].max() ?? -160
             return Float(max(0, min(1, (Double(peak) + 90) / 90)))
         }
@@ -94,6 +97,7 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
 public enum FileAnalyzer {
     /// Decodes up to `maxSeconds` of the file at its native rate and inspects the samples.
     public static func analyze(url: URL, maxSeconds: Double = 600) throws -> FileAnalysis {
+        guard maxSeconds.isFinite, maxSeconds > 0 else { throw SourceOpenerError.unsupported(url) }
         let probed = try SourceOpener.probe(url)
         let format = probed.format
         guard format.encoding == .pcm, let decoderPCM = try? SourceOpener.decoder(
@@ -124,7 +128,7 @@ public enum FileAnalyzer {
         var mono = [Float](repeating: 0, count: fftSize)
 
         let claimed = format.bitDepth ?? 24
-        let scale = Float(1 << (min(claimed, 24) - 1))
+        let scale = Float(1 << (max(1, min(claimed, 24)) - 1))
         var orBits: Int32 = 0
         var peak: Float = 0
         var clipped = 0
@@ -137,26 +141,33 @@ public enum FileAnalyzer {
         while !exhausted && framesDone < limit {
             output.frameLength = 0
             var error: NSError?
+            var decodeError: Error?
             let status = converter.convert(to: output, error: &error) { requested, inputStatus in
                 input.frameLength = 0
                 do { try decoderPCM.decode(into: input, length: min(requested, input.frameCapacity)) } catch {
+                    decodeError = error
                     inputStatus.pointee = .endOfStream; return nil
                 }
                 if input.frameLength == 0 { inputStatus.pointee = .endOfStream; return nil }
                 inputStatus.pointee = .haveData
                 return input
             }
-            let n = Int(output.frameLength)
+            if let decodeError { throw decodeError }
+            if let error { throw error }
+            if status == .error { throw SourceOpenerError.unsupported(url) }
+            let n = min(Int(output.frameLength), max(0, Int(min(Double(chunk), limit - framesDone))))
             if n == 0 || status == .endOfStream || status == .error { exhausted = n == 0 || status != .haveData }
             guard n > 0, let data = output.floatChannelData else { continue }
             for c in 0..<channels {
                 let p = data[c]
                 for i in 0..<n {
                     let s = p[i]
+                    guard s.isFinite else { throw SourceOpenerError.unsupported(url) }
                     let a = abs(s)
                     if a > peak { peak = a }
                     if a >= 0.99999 { clipped += 1 }
-                    orBits |= Int32((s * scale).rounded())
+                    let integer = Double(s) * Double(scale)
+                    orBits |= Int32(max(Double(Int32.min), min(Double(Int32.max), integer.rounded())))
                 }
             }
             // Mono mix for spectrum, sampled across the file.
@@ -215,7 +226,7 @@ public enum FileAnalyzer {
 
     /// Highest frequency whose smoothed level is clearly above the top-band noise floor.
     static func estimateBandwidth(_ db: [Double], binHz: Double) -> Double {
-        guard db.count > 64 else { return 0 }
+        guard db.count > 64, binHz.isFinite, binHz > 0 else { return 0 }
         let window = max(3, db.count / 256)
         var smoothed = [Double](repeating: -200, count: db.count)
         for i in 0..<db.count {
@@ -226,7 +237,10 @@ public enum FileAnalyzer {
         let floor = floorSlice[floorSlice.count / 2]
         let threshold = floor + 12
         // Reference level in the midrange: bail out on silence.
-        let mid = smoothed[Int(1_000 / binHz)..<min(smoothed.count, Int(4_000 / binHz) + 1)].max() ?? -200
+        let lo = min(smoothed.count - 1, Int(min(Double(smoothed.count - 1), 1_000 / binHz)))
+        let hi = min(smoothed.count, max(lo + 1, Int(min(Double(smoothed.count), 4_000 / binHz)) + 1))
+        let mid = smoothed[lo..<hi].max() ?? -200
+        guard mid > -180 else { return 0 }
         guard mid > floor + 20 else { return Double(db.count) * binHz }
         for i in stride(from: smoothed.count - 1, through: 1, by: -1) where smoothed[i] > threshold {
             return Double(i) * binHz

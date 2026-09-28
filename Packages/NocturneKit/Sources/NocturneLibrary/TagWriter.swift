@@ -4,6 +4,7 @@
 //
 
 import Darwin
+import CryptoKit
 import Foundation
 import GRDB
 import SFBAudioEngine
@@ -140,6 +141,17 @@ public actor TagWriter {
     let database: LibraryDatabase
     let scanner: LibraryScanner
     public let backupDirectory: URL
+    private var mutationActive = false
+    private var mutationWaiters: [CheckedContinuation<Void, Never>] = []
+
+    private func acquireMutation() async {
+        if mutationActive { await withCheckedContinuation { mutationWaiters.append($0) } }
+        mutationActive = true
+    }
+    private func releaseMutation() {
+        if mutationWaiters.isEmpty { mutationActive = false }
+        else { mutationWaiters.removeFirst().resume() }
+    }
 
     public init(database: LibraryDatabase, scanner: LibraryScanner, backupDirectory: URL = TagWriter.defaultBackupDirectory) {
         self.database = database
@@ -153,7 +165,19 @@ public actor TagWriter {
 
     /// Applies `edit` to every track. Whole files get their tags rewritten; CUE sub-tracks are edited in the library only.
     public func apply(_ edit: TagEdit, to tracks: [Track]) async throws -> TagWriteResult {
+        await acquireMutation()
+        defer { releaseMutation() }
+        try Task.checkCancellation()
         var result = TagWriteResult(written: 0, databaseOnly: 0, failures: [])
+        guard !edit.isEmpty else { return result }
+        let numeric: Set<TagField> = [.trackNumber, .trackTotal, .discNumber, .discTotal, .bpm, .rating]
+        for (field, value) in edit.fields where numeric.contains(field) {
+            if let value, !value.isEmpty {
+                guard let number = Int(value.trimmingCharacters(in: .whitespaces)), number >= 0 else {
+                    throw TagWriteError.invalidNumber(field.label)
+                }
+            }
+        }
         var refreshIDs: [Int64] = []
 
         for track in tracks {
@@ -167,8 +191,8 @@ public actor TagWriter {
             do {
                 let file = try AudioFile(url: url)
                 try file.readPropertiesAndMetadata()
-                let previous = Self.snapshot(file.metadata)
-                let backup = makeBackup(of: url)
+                var previous = Self.snapshot(file.metadata)
+                let backup = try makeBackup(of: url)
 
                 for (field, value) in edit.fields {
                     if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
@@ -191,12 +215,18 @@ public actor TagWriter {
                 case nil:
                     break
                 }
-                TagWriter.protectDate(in: file)
-                try file.writeMetadata()
-
-                try await database.writer.write { db in
-                    var entry = TagHistoryEntry(id: nil, trackId: id, editedAt: .now, previous: previous, fileBackupPath: backup?.path)
-                    try entry.insert(db)
+                do {
+                    TagWriter.protectDate(in: file)
+                    try file.writeMetadata()
+                    previous["__fileSHA256"] = try Self.fileHash(url)
+                    let history = previous
+                    try await database.writer.write { db in
+                        var entry = TagHistoryEntry(id: nil, trackId: id, editedAt: .now, previous: history, fileBackupPath: backup.path)
+                        try entry.insert(db)
+                    }
+                } catch {
+                    try Self.restore(backup, to: url)
+                    throw error
                 }
                 refreshIDs.append(id)
                 result.written += 1
@@ -210,17 +240,54 @@ public actor TagWriter {
 
     /// Restores the tags saved before the most recent edit of `trackID`.
     public func revertLastEdit(trackID: Int64) async throws -> Bool {
+        await acquireMutation()
+        defer { releaseMutation() }
+        try Task.checkCancellation()
         let entry = try await database.writer.read { db in
             try TagHistoryEntry.filter(Column("trackId") == trackID).order(Column("editedAt").desc).fetchOne(db)
         }
         guard let entry, let track = try database.tracks(ids: [trackID]).first else { return false }
+        if let encoded = entry.previous["__cueTrack"], let data = Data(base64Encoded: encoded) {
+            let previous = try JSONDecoder().decode(Track.self, from: data)
+            try await database.writer.write { db in
+                guard var current = try Track.fetchOne(db, key: trackID) else { return }
+                current.copyMetadata(from: previous)
+                try current.update(db)
+                if let encoded = entry.previous["__cueOverride"], !encoded.isEmpty, let override = Data(base64Encoded: encoded) {
+                    try db.execute(sql: "INSERT OR REPLACE INTO cueTagOverride (trackId, metadata) VALUES (?, ?)", arguments: [trackID, override])
+                } else {
+                    try db.execute(sql: "DELETE FROM cueTagOverride WHERE trackId = ?", arguments: [trackID])
+                }
+                try TagHistoryEntry.deleteOne(db, key: entry.id)
+            }
+            return true
+        }
+        if let path = entry.fileBackupPath {
+            // Restore the complete file: artwork and structured custom tags are not in the legacy string snapshot.
+            if let expected = entry.previous["__fileSHA256"] {
+                guard try Self.fileHash(track.fileURL) == expected else { throw TagWriteError.fileChanged }
+                try Self.restore(URL(fileURLWithPath: path), to: track.fileURL)
+            } else {
+                // Legacy edits did not record a fingerprint. Restore metadata from the backup without replacing audio.
+                let backup = try AudioFile(readingPropertiesAndMetadataFrom: URL(fileURLWithPath: path))
+                let current = try AudioFile(readingPropertiesAndMetadataFrom: track.fileURL)
+                current.metadata.removeAllMetadata()
+                current.metadata.removeAllAttachedPictures()
+                current.metadata.copyMetadata(from: backup.metadata)
+                for picture in backup.metadata.attachedPictures { current.metadata.attachPicture(picture) }
+                try current.writeMetadata()
+            }
+            try await scanner.refresh(trackIDs: [trackID])
+            _ = try await database.writer.write { db in try TagHistoryEntry.deleteOne(db, key: entry.id) }
+            return true
+        }
         let file = try AudioFile(url: track.fileURL)
         try file.readPropertiesAndMetadata()
         let pictures = file.metadata.attachedPictures
         let numericKeys: Set<AudioMetadata.Key> = [.trackNumber, .trackTotal, .discNumber, .discTotal, .BPM, .rating,
             .compilation, .replayGainReferenceLoudness, .replayGainTrackGain, .replayGainTrackPeak, .replayGainAlbumGain, .replayGainAlbumPeak]
         var dictionary: [AudioMetadata.Key: Any] = [:]
-        for (raw, value) in entry.previous {
+        for (raw, value) in entry.previous where !raw.hasPrefix("__") {
             let key = AudioMetadata.Key(rawValue: raw)
             if numericKeys.contains(key), let number = Double(value) { dictionary[key] = NSNumber(value: number) }
             else { dictionary[key] = value }
@@ -237,30 +304,59 @@ public actor TagWriter {
     }
 
     private func updateDatabaseOnly(_ track: Track, edit: TagEdit) async throws {
-        var t = track
-        for (field, value) in edit.fields {
-            let s = value.flatMap { $0.isEmpty ? nil : $0 }
-            let n = s.flatMap { Int($0) }
-            switch field {
-            case .title: t.title = s ?? t.title
-            case .artist: t.artist = s
-            case .album: t.album = s
-            case .albumArtist: t.albumArtist = s
-            case .composer: t.composer = s
-            case .genre: t.genre = s
-            case .releaseDate: t.releaseDate = s; t.year = s.flatMap(MetadataReader.year(from:))
-            case .trackNumber: t.trackNumber = n
-            case .trackTotal: t.trackTotal = n
-            case .discNumber: t.discNumber = n
-            case .discTotal: t.discTotal = n
-            case .comment: t.comment = s
-            case .grouping: t.grouping = s
-            case .label: t.label = s
-            default: break
+        let cover: String?
+        if case .replace(let data) = edit.artwork {
+            guard let key = scanner.artwork.store(data) else { throw CocoaError(.fileReadCorruptFile) }
+            cover = key
+        } else { cover = nil }
+        try await database.writer.write { db in
+            guard let id = track.id, var t = try Track.fetchOne(db, key: id) else { return }
+            let previous = try JSONEncoder().encode(t).base64EncodedString()
+            let previousOverride = try Data.fetchOne(db, sql: "SELECT metadata FROM cueTagOverride WHERE trackId = ?", arguments: [id])
+            for (field, value) in edit.fields {
+                let s = value.flatMap { $0.isEmpty ? nil : $0 }
+                let n = s.flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+                switch field {
+                case .title: t.title = s ?? "Track \(t.trackNumber ?? 1)"
+                case .artist: t.artist = s
+                case .album: t.album = s
+                case .albumArtist: t.albumArtist = s
+                case .composer: t.composer = s
+                case .genre: t.genre = s
+                case .releaseDate: t.releaseDate = s; t.year = s.flatMap(MetadataReader.year(from:))
+                case .trackNumber: t.trackNumber = n
+                case .trackTotal: t.trackTotal = n
+                case .discNumber: t.discNumber = n
+                case .discTotal: t.discTotal = n
+                case .compilation: t.compilation = s.map { ["1", "true", "yes"].contains($0.lowercased()) } ?? false
+                case .comment: t.comment = s
+                case .grouping: t.grouping = s
+                case .label: t.label = s
+                case .lyrics: t.lyrics = s
+                case .bpm: t.bpm = n
+                case .rating: t.rating = n
+                case .isrc: t.isrc = s
+                case .titleSort: t.titleSort = s
+                case .artistSort: t.artistSort = s
+                case .albumSort: t.albumSort = s
+                case .albumArtistSort: t.albumArtistSort = s
+                case .musicBrainzReleaseID: t.musicBrainzReleaseID = s
+                case .musicBrainzRecordingID: t.musicBrainzRecordingID = s
+                }
             }
+            for (key, value) in edit.custom { t.extraTags[key.uppercased()] = value }
+            switch edit.artwork {
+            case .replace: t.artworkKey = cover
+            case .remove: t.artworkKey = nil
+            case nil: break
+            }
+            var history = TagHistoryEntry(id: nil, trackId: id, editedAt: .now,
+                previous: ["__cueTrack": previous, "__cueOverride": previousOverride?.base64EncodedString() ?? ""], fileBackupPath: nil)
+            try history.insert(db)
+            try t.update(db)
+            try db.execute(sql: "INSERT OR REPLACE INTO cueTagOverride (trackId, metadata) VALUES (?, ?)",
+                           arguments: [id, try JSONEncoder().encode(t)])
         }
-        let updated = t
-        try await database.writer.write { db in try updated.update(db) }
     }
 
     /// Every write re-serialises all tags, and SFBAudioEngine drops ID3v2 dates that aren't full timestamps
@@ -299,22 +395,43 @@ public actor TagWriter {
     }
 
     /// APFS clone of the file before writing (free on the same volume). Returns nil across volumes.
-    private func makeBackup(of url: URL) -> URL? {
+    private func makeBackup(of url: URL) throws -> URL {
         let day = ISO8601DateFormatter.string(from: .now, timeZone: .current, formatOptions: [.withFullDate])
         let dir = backupDirectory.appendingPathComponent(day, isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let dest = dir.appendingPathComponent("\(UUID().uuidString.prefix(8))-\(url.lastPathComponent)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let dest = dir.appendingPathComponent("\(UUID().uuidString)-\(url.lastPathComponent)")
         let status = url.withUnsafeFileSystemRepresentation { src in
             dest.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, 0) }
         }
-        return status == 0 ? dest : nil
+        if status != 0 { try FileManager.default.copyItem(at: url, to: dest) }
+        return dest
+    }
+
+    private static func fileHash(_ url: URL) throws -> String {
+        let file = try FileHandle(forReadingFrom: url)
+        defer { try? file.close() }
+        var hash = SHA256()
+        while let data = try file.read(upToCount: 1_048_576), !data.isEmpty { hash.update(data: data) }
+        return hash.finalize().map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func restore(_ backup: URL, to url: URL) throws {
+        let temporary = url.deletingLastPathComponent().appendingPathComponent(".nocturne-restore-\(UUID())")
+        defer { try? FileManager.default.removeItem(at: temporary) }
+        try FileManager.default.copyItem(at: backup, to: temporary)
+        _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
     }
 
     /// Deletes backups older than `days`.
     public func purgeBackups(olderThan days: Int = 30) {
         let cutoff = Date().addingTimeInterval(-Double(days) * 86_400)
         guard let dirs = try? FileManager.default.contentsOfDirectory(at: backupDirectory, includingPropertiesForKeys: [.creationDateKey]) else { return }
+        let referenced = (try? database.writer.read { db in
+            try String.fetchAll(db, sql: "SELECT fileBackupPath FROM tagHistory WHERE fileBackupPath IS NOT NULL")
+        })
+        guard let referenced else { return }
         for dir in dirs {
+            if referenced.contains(where: { $0.hasPrefix(dir.path + "/") }) { continue }
             let created = (try? dir.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? .now
             if created < cutoff { try? FileManager.default.removeItem(at: dir) }
         }
@@ -336,5 +453,15 @@ public extension TagWriter {
             total.failures += r.failures
         }
         return total
+    }
+}
+
+private enum TagWriteError: LocalizedError {
+    case invalidNumber(String), fileChanged
+    var errorDescription: String? {
+        switch self {
+        case .invalidNumber(let field): "\(field) must be a nonnegative whole number or blank."
+        case .fileChanged: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available."
+        }
     }
 }

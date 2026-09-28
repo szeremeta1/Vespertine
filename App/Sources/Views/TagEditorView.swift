@@ -274,7 +274,7 @@ struct TagEditorView: View {
         case "APE", "WavPack", "Musepack": "APEv2 tags"
         default: "tags"
         }
-        return "Writes \(kind) to \(files) file\(files == 1 ? "" : "s") · backup kept 30 days"
+        return "Writes \(kind) to \(files) file\(files == 1 ? "" : "s") · backup retained for undo"
     }
 
     private func load(_ ids: Set<Int64>) {
@@ -293,10 +293,10 @@ struct TagEditorView: View {
 
     private func save() {
         var fields: [TagField: String?] = [:]
-        for f in edited { fields[f] = draft[f].flatMap { $0.isEmpty ? nil : $0 } }
+        for f in edited { fields.updateValue(draft[f].flatMap { $0.isEmpty ? nil : $0 }, forKey: f) }
         var customEdits: [String: String?] = [:]
         for tag in custom where !tag.key.isEmpty && tag.value != (tag.original ?? "") {
-            customEdits[tag.key] = tag.value.isEmpty ? nil : tag.value
+            customEdits.updateValue(tag.value.isEmpty ? nil : tag.value, forKey: tag.key)
         }
         let edit = TagEdit(fields: fields, custom: customEdits, artwork: artwork)
         let targets = tracks
@@ -310,8 +310,10 @@ struct TagEditorView: View {
                 if !result.failures.isEmpty { parts.append("\(result.failures.count) failed: \(result.failures[0].message)") }
                 status = parts.joined(separator: " · ")
             }
-            edited = []
-            artwork = nil
+            if let result, result.failures.isEmpty {
+                edited = []
+                artwork = nil
+            }
         }
     }
 
@@ -321,8 +323,8 @@ struct TagEditorView: View {
         } else {
             let targets = tracks
             Task {
-                await model.library.revert(targets)
-                status = "Restored previous tags"
+                let restored = await model.library.revert(targets)
+                status = "Restored previous tags for \(restored) track(s)"
             }
         }
     }
@@ -449,9 +451,18 @@ struct MusicBrainzSheet: View {
         busy = true; release = nil; cover = nil
         Task {
             do {
-                release = try await MusicBrainzClient.shared.release(id: id)
-                if model.settings.fetchArtworkOnline { cover = try? await MusicBrainzClient.shared.frontCover(releaseID: id, releaseGroupID: release?.releaseGroupID) }
-            } catch { self.error = "Couldn't load the release: \(error.localizedDescription)" }
+                let loaded = try await MusicBrainzClient.shared.release(id: id)
+                guard selected == id else { return }
+                release = loaded
+                if model.settings.fetchArtworkOnline {
+                    let artwork = try? await MusicBrainzClient.shared.frontCover(releaseID: id, releaseGroupID: loaded.releaseGroupID)
+                    guard selected == id else { return }
+                    cover = artwork
+                }
+            } catch {
+                guard selected == id else { return }
+                self.error = "Couldn't load the release: \(error.localizedDescription)"
+            }
             busy = false
         }
     }
@@ -460,13 +471,16 @@ struct MusicBrainzSheet: View {
         guard let release else { return }
         busy = true
         Task {
+            var failures = 0
             for (i, t) in tracks.enumerated() {
                 guard var edit = release.edit(for: t, index: i) else { continue }
                 if useCover, let cover { edit.artwork = .replace(cover) }
-                _ = await model.library.apply(edit, to: [t])
+                if let result = await model.library.apply(edit, to: [t]) { failures += result.failures.count }
+                else { failures += 1 }
             }
             busy = false
-            dismiss()
+            if failures == 0 { dismiss() }
+            else { error = "Could not update \(failures) track(s). Review the library error and try again." }
         }
     }
 }

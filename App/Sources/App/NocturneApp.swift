@@ -9,21 +9,23 @@ import SwiftUI
 
 @main
 struct NocturneApp: App {
-    @State private var model = AppModel()
+    @State private var startup = LibraryStartup()
     @State private var updater = AppUpdater()
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
         Window("Nocturne", id: "main") {
-            MainWindow()
-                .environment(model)
-                .frame(minWidth: 1080, minHeight: 680)
-                .preferredColorScheme(.dark)
+            LibraryContent(startup: startup) { model in
+                MainWindow()
+                    .environment(model)
+                    .frame(minWidth: 1080, minHeight: 680)
+                    .preferredColorScheme(.dark)
+            }
         }
         .defaultSize(width: 1440, height: 900)
         .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
-            NocturneCommands(model: model)
+            if let model = startup.model { NocturneCommands(model: model) }
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates…") { updater.checkForUpdates() }
                     .disabled(!updater.canCheckForUpdates)
@@ -31,28 +33,28 @@ struct NocturneApp: App {
         }
 
         Window("Mini Player", id: "mini") {
-            MiniPlayerView()
-                .environment(model)
-                .preferredColorScheme(.dark)
+            LibraryContent(startup: startup) { model in
+                MiniPlayerView().environment(model).preferredColorScheme(.dark)
+            }
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultPosition(.bottomLeading)
 
         MenuBarExtra {
-            MenuBarView()
-                .environment(model)
-                .preferredColorScheme(.dark)
+            LibraryContent(startup: startup) { model in
+                MenuBarView().environment(model).preferredColorScheme(.dark)
+            }
         } label: {
-            MenuBarLabel().environment(model)
+            if let model = startup.model { MenuBarLabel().environment(model) }
+            else { Image(systemName: "exclamationmark.triangle") }
         }
         .menuBarExtraStyle(.window)
 
         Settings {
-            SettingsView()
-                .environment(model)
-                .environment(updater)
-                .preferredColorScheme(.dark)
+            LibraryContent(startup: startup) { model in
+                SettingsView().environment(model).environment(updater).preferredColorScheme(.dark)
+            }
         }
     }
 }

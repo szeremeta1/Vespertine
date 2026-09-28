@@ -136,6 +136,21 @@ public final class LibraryDatabase: Sendable {
             var suspect = Playlist(name: "Suspect Hi-Res", smartRules: .suspect, sortIndex: 1)
             try suspect.insert(db)
         }
+        m.registerMigration("v2-cue-state") { db in
+            try db.create(table: "cueScanState") { t in
+                t.belongsTo("source", onDelete: .cascade).notNull()
+                t.column("filePath", .text).notNull()
+                t.column("signature", .text).notNull()
+                t.primaryKey(["sourceId", "filePath"])
+            }
+        }
+        m.registerMigration("v3-cue-overrides") { db in
+            try db.create(table: "cueTagOverride") { t in
+                t.belongsTo("track", onDelete: .cascade).notNull()
+                t.primaryKey(["trackId"])
+                t.column("metadata", .blob).notNull()
+            }
+        }
         m.registerMigration("v2-network-shares") { db in
             try db.alter(table: "source") { t in
                 t.add(column: "remoteURL", .text)
@@ -207,7 +222,7 @@ public extension LibraryDatabase {
 
     func tracks(albumKey: String) throws -> [Track] {
         try writer.read { db in
-            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? ORDER BY discNumber, trackNumber, location", arguments: [albumKey])
+            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY discNumber, trackNumber, location", arguments: [albumKey])
         }
     }
 
@@ -219,8 +234,11 @@ public extension LibraryDatabase {
     }
 
     func albums(underPath path: String) throws -> [Album] {
-        try writer.read { db in
-            try Row.fetchAll(db, sql: Self.albumsSQL(sort: .artist, filter: "filePath LIKE ? || '%'"), arguments: [path]).map(Self.album(from:))
+        let folder = URL(fileURLWithPath: path).resolvingSymlinksInPath().path
+        let prefix = folder == "/" ? "/" : folder + "/"
+        return try writer.read { db in
+            try Row.fetchAll(db, sql: Self.albumsSQL(sort: .artist, filter: "substr(filePath, 1, length(?)) = ?"),
+                             arguments: [prefix, prefix]).map(Self.album(from:))
         }
     }
 
@@ -346,7 +364,15 @@ public extension LibraryDatabase {
     @discardableResult
     func addSource(_ source: LibrarySource) throws -> LibrarySource {
         try writer.write { db in
-            if let existing = try LibrarySource.filter(Column("path") == source.path).fetchOne(db) { return existing }
+            let canonical = source.url.resolvingSymlinksInPath().path
+            let sources = try LibrarySource.fetchAll(db)
+            for existing in sources {
+                let path = existing.url.resolvingSymlinksInPath().path
+                if canonical == path || canonical.hasPrefix(path == "/" ? "/" : path + "/") { return existing }
+                if path.hasPrefix(canonical == "/" ? "/" : canonical + "/") {
+                    throw SourceOverlapError(path: existing.path)
+                }
+            }
             var s = source
             try s.insert(db)
             return s
@@ -414,9 +440,16 @@ public extension LibraryDatabase {
         try writer.read { db in
             let row = try Row.fetchOne(db, sql: """
                 SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                       coalesce(sum(fileSize), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
+                       coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
                 """)!
             return Stats(albums: row["a"], tracks: row["t"], artists: row["ar"], bytes: row["b"], duration: row["d"])
         }
+    }
+}
+
+private struct SourceOverlapError: LocalizedError {
+    let path: String
+    var errorDescription: String? {
+        "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership."
     }
 }

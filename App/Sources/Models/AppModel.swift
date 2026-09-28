@@ -100,14 +100,10 @@ final class AppModel {
     /// nil = not shown; [] = whole library; otherwise these albums.
     var enrichAlbumKeys: [String]?
 
-    init() {
-        let settings = AppSettings()
+    init(dataDirectory: URL? = nil) throws {
+        let settings = AppSettings(dataDirectory: dataDirectory)
         self.settings = settings
-        do {
-            library = try LibraryStore(dataDirectory: settings.dataDirectory)
-        } catch {
-            fatalError("Could not open the library at \(settings.dataDirectory.path): \(error)")
-        }
+        library = try LibraryStore(dataDirectory: settings.dataDirectory)
         devices = DeviceStore()
         shares = NetworkShareManager(library: library, settings: settings)
         player = PlayerController(library: library, settings: settings, shares: shares)
@@ -173,6 +169,16 @@ final class AppModel {
     func presentImporter(_ mode: ImportMode) {
         pendingImportMode = mode
         showImporter = true
+    }
+
+    func openAudio(_ url: URL) {
+        guard url.isFileURL else { return }
+        Task {
+            await library.addFolders([url], mode: .reference, managedRoot: url.deletingLastPathComponent())
+            let path = url.resolvingSymlinksInPath().path
+            let tracks = library.allTracks().filter { $0.filePath == path }
+            if !tracks.isEmpty { player.play(tracks) }
+        }
     }
 
     func importFolders(_ urls: [URL]) {

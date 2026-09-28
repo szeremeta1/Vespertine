@@ -29,8 +29,10 @@ final class AppUpdater: NSObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.checkInBackground() }
         }
         observations.append(controller.updater.observe(\.canCheckForUpdates, options: [.initial, .new]) { [weak self] updater, _ in
-            let value = updater.canCheckForUpdates
-            Task { @MainActor in self?.canCheckForUpdates = value }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.canCheckForUpdates = self.controller?.updater.canCheckForUpdates ?? false
+            }
         })
     }
 

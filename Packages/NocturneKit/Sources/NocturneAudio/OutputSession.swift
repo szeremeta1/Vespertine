@@ -51,11 +51,24 @@ final class OutputSession: @unchecked Sendable {
         let virtual = stream.flatMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
         let bufferFrames = (try? HAL.get(deviceID, .global(kAudioDevicePropertyBufferFrameSize), initial: UInt32(512))) ?? 512
 
+        guard let virtual, virtual.mFormatID == kAudioFormatLinearPCM,
+              virtual.mFormatFlags & kAudioFormatFlagIsFloat != 0, virtual.mBitsPerChannel == 32,
+              virtual.mChannelsPerFrame >= plan.channels, abs(virtual.mSampleRate - rate) < 0.5,
+              rate.isFinite, rate > 0, rate <= 3_072_000 else {
+            if hogged { DeviceControl.releaseHog(deviceID) }
+            throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "verify Float32 output format")
+        }
+        if plan.mode == .dop, (!hogged || (physical?.mBitsPerChannel ?? 0) < 24
+            || abs(rate - plan.deviceSampleRate) >= 0.5) {
+            if hogged { DeviceControl.releaseHog(deviceID) }
+            throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "DoP requires exclusive, bit-transparent output")
+        }
+
         applied = AppliedFormat(
             sampleRate: rate,
             physicalBitDepth: Int(physical?.mBitsPerChannel ?? UInt32(plan.physicalBitDepth)),
             physicalIsInteger: (physical?.mFormatFlags ?? kAudioFormatFlagIsSignedInteger) & kAudioFormatFlagIsSignedInteger != 0,
-            virtualChannels: Int(virtual?.mChannelsPerFrame ?? UInt32(plan.channels)),
+            virtualChannels: Int(virtual.mChannelsPerFrame),
             exclusive: hogged,
             bufferFrames: Int(bufferFrames))
 
@@ -151,6 +164,7 @@ public enum DeviceControl {
             let candidates = DeviceQuery.physicalFormats(stream).filter {
                 $0.mFormat.mFormatID == kAudioFormatLinearPCM
                     && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
+                    && $0.mFormat.mChannelsPerFrame >= plan.channels
             }
             let wantedChannels = current?.mChannelsPerFrame ?? UInt32(plan.channels)
             func score(_ r: AudioStreamRangedDescription) -> Int {
@@ -193,6 +207,7 @@ public enum DeviceControl {
             if var float = available.first(where: {
                 $0.mFormat.mFormatFlags & kAudioFormatFlagIsFloat != 0 && $0.mFormat.mBitsPerChannel == 32
                     && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
+                    && $0.mFormat.mChannelsPerFrame >= plan.channels
             })?.mFormat {
                 float.mSampleRate = rate
                 try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), float)
