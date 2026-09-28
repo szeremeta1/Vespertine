@@ -88,9 +88,16 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
     /// All records in the index, reading only the part appended since the last call when the
     /// file was just appended to (the server rewrites it only when compacting).
     private func readIndex(_ url: URL) throws -> [String: Record] {
-        let values = try url.resourceValues(forKeys: [.fileSizeKey, .creationDateKey, .fileResourceIdentifierKey])
+        let values = try url.resourceValues(forKeys: [.fileSizeKey])
         let size = UInt64(values.fileSize ?? 0)
-        let identity = "\(values.creationDate?.timeIntervalSince1970 ?? 0)"
+        // The file's first line identifies it: appending never changes it, and the server's compaction
+        // (sorted, rewritten) does, so a rewrite is always read in full, whatever its size.
+        let identity: String = {
+            guard let h = try? FileHandle(forReadingFrom: url) else { return "" }
+            defer { try? h.close() }
+            let head = (try? h.read(upToCount: 4096)) ?? Data()
+            return String(decoding: head.prefix { $0 != UInt8(ascii: "\n") }, as: UTF8.self)
+        }()
         lock.lock()
         var cursor = cursors[url.path] ?? Cursor(identity: identity, offset: 0, records: [:])
         lock.unlock()

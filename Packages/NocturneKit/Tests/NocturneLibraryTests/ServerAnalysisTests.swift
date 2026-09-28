@@ -64,5 +64,15 @@ struct ServerAnalysisTests {
         try handle.close()
         #expect(try importer.importNew(for: source, into: db) == 1)
         #expect(try db.storedAnalysis(for: b)?.analysis.summary == "from the server")
+
+        // The server compacts: the file is rewritten (sorted) and, here, not smaller than what was read.
+        // It must be read in full, not from the old offset.
+        var compacted = try line(path: "Album/b.wav", size: b.fileSize, mtime: b.modifiedAt.timeIntervalSince1970, verdict: .paddedBitDepth)
+        compacted += try line(path: "Album/Caf\u{00E9}.wav", size: cafe.fileSize, mtime: cafe.modifiedAt.timeIntervalSince1970, verdict: .genuine)
+        compacted += String(repeating: " ", count: 20_000) + "\n"   // bigger than what was read before
+        try compacted.write(to: file, atomically: true, encoding: .utf8)
+        try await db.writer.write { try $0.execute(sql: "DELETE FROM analysis") }
+        #expect(try importer.importNew(for: source, into: db) == 2)
+        #expect(try db.storedAnalysis(for: b)?.analysis.verdict == .paddedBitDepth)
     }
 }
