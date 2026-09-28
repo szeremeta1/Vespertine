@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct NocturneApp: App {
     @State private var model = AppModel()
+    @State private var updater = AppUpdater()
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
@@ -21,7 +22,13 @@ struct NocturneApp: App {
         }
         .defaultSize(width: 1440, height: 900)
         .windowToolbarStyle(.unified(showsTitle: false))
-        .commands { NocturneCommands(model: model) }
+        .commands {
+            NocturneCommands(model: model)
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") { updater.checkForUpdates() }
+                    .disabled(!updater.canCheckForUpdates)
+            }
+        }
 
         Window("Mini Player", id: "mini") {
             MiniPlayerView()
@@ -44,6 +51,7 @@ struct NocturneApp: App {
         Settings {
             SettingsView()
                 .environment(model)
+                .environment(updater)
                 .preferredColorScheme(.dark)
         }
     }

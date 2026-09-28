@@ -8,11 +8,14 @@ options:
 packages:
   NocturneKit:
     path: Packages/NocturneKit
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.10.0
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.1.1"
-    CURRENT_PROJECT_VERSION: "2"
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "3"
     DEAD_CODE_STRIPPING: YES
 targets:
   Nocturne:
@@ -26,6 +29,7 @@ targets:
         product: NocturneAudio
       - package: NocturneKit
         product: NocturneLibrary
+      - package: Sparkle
     info:
       path: App/Info.plist
       properties:
@@ -37,6 +41,12 @@ targets:
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
         NSHumanReadableCopyright: "Copyright © 2026 Nocturne contributors. Free software under the GNU GPL v3."
         NSAppleEventsUsageDescription: "Nocturne responds to media keys and Now Playing controls."
+        # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.
+        SUFeedURL: https://github.com/szeremeta1/Nocturne/releases/latest/download/appcast.xml
+        SUPublicEDKey: 5KxX9Zdz/fXEO1SpPUjZWxkNWiIzSMzMXava8UpHeNw=
+        SUEnableAutomaticChecks: true
+        SUScheduledCheckInterval: 86400
+        SUAllowsAutomaticUpdates: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: Audio File
             CFBundleTypeRole: Viewer
