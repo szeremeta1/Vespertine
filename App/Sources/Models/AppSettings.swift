@@ -68,6 +68,9 @@ final class AppSettings {
     /// Keep local copies of what plays from network shares (and the next few tracks).
     var networkCache: Bool { didSet { defaults.set(networkCache, forKey: "networkCache") } }
     var networkCacheLimitGB: Double { didSet { defaults.set(networkCacheLimitGB, forKey: "networkCacheLimitGB") } }
+    /// While playing, make the Mac's sound output follow Nocturne's device, so volume keys and
+    /// headphone controls (e.g. the AirPods Max Digital Crown) adjust what you're listening to.
+    var systemOutputFollowsPlayback: Bool { didSet { defaults.set(systemOutputFollowsPlayback, forKey: "systemOutputFollowsPlayback") } }
     /// Analyze new and changed music in the background after it's added.
     var autoAnalyze: Bool { didSet { defaults.set(autoAnalyze, forKey: "autoAnalyze") } }
     /// Include network shares in automatic analysis (reads every file in full over the network).
@@ -85,7 +88,7 @@ final class AppSettings {
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
-            "autoAnalyze": false, "analyzeNetworkShares": false,
+            "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
@@ -104,6 +107,7 @@ final class AppSettings {
         scrobble = defaults.bool(forKey: "scrobble")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
         skipNonMusic = defaults.bool(forKey: "skipNonMusic")
+        systemOutputFollowsPlayback = defaults.bool(forKey: "systemOutputFollowsPlayback")
         autoAnalyze = defaults.bool(forKey: "autoAnalyze")
         analyzeNetworkShares = defaults.bool(forKey: "analyzeNetworkShares")
         networkCache = defaults.bool(forKey: "networkCache")

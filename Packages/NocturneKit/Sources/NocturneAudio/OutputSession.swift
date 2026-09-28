@@ -249,6 +249,28 @@ public enum DeviceControl {
         }
     }
 
+    // MARK: The Mac's sound output
+
+    /// The device macOS sends system sound to, and applies volume keys / headphone controls to.
+    public static func systemOutputDevice() -> AudioObjectID? {
+        var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+                                                 mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+        var id = AudioObjectID(kAudioObjectUnknown)
+        var size = UInt32(MemoryLayout<AudioObjectID>.size)
+        let status = AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &id)
+        return status == noErr && id != kAudioObjectUnknown ? id : nil
+    }
+
+    /// Makes `device` the Mac's sound output (what choosing it in Control Center does).
+    @discardableResult
+    public static func setSystemOutputDevice(_ device: AudioObjectID) -> Bool {
+        var address = AudioObjectPropertyAddress(mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+                                                 mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+        var id = device
+        return AudioObjectSetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil,
+                                          UInt32(MemoryLayout<AudioObjectID>.size), &id) == noErr
+    }
+
     public static func hardwareVolumeDecibels(_ device: AudioObjectID) -> Float? {
         guard let element = DeviceQuery.volumeElements(device).first else { return nil }
         return try? HAL.get(device, .output(kAudioDevicePropertyVolumeDecibels, element: element), initial: Float32(0))
