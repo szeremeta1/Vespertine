@@ -26,7 +26,9 @@ public struct SmartRules: Codable, Sendable, Hashable {
 
     /// WHERE clause + arguments for the `track` table.
     public func sql() -> (clause: String, arguments: StatementArguments) {
-        let parts = rules.compactMap { $0.sql() }
+        // A rule that can't be understood (no value, a value that isn't a number…) matches nothing,
+        // rather than being dropped: dropping it would make "match all" match more than asked for.
+        let parts = rules.map { $0.sql() ?? ("0", StatementArguments()) }
         guard !parts.isEmpty else { return ("1", []) }
         let joiner = match == .all ? " AND " : " OR "
         let clause = parts.map { "(\($0.0))" }.joined(separator: joiner)
@@ -61,7 +63,7 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             case .genre: "Genre"
             case .codec: "Format"
             case .year: "Year"
-            case .sampleRate: "Sample Rate (Hz)"
+            case .sampleRate: "Sample Rate (kHz)"
             case .bitDepth: "Bit Depth"
             case .isDSD: "Is DSD"
             case .isLossless: "Is Lossless"
@@ -81,6 +83,31 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
         }
 
         var isBoolean: Bool { self == .isDSD || self == .isLossless }
+
+        /// The comparisons that make sense for this field (the editor offers only these).
+        public var operators: [Operator] {
+            if isBoolean { return [.isTrue, .isFalse] }
+            switch self {
+            case .addedDaysAgo: return [.lessOrEqual, .greaterOrEqual]
+            case .verdict: return [.equals, .notEquals]
+            default: return isNumeric ? [.equals, .notEquals, .greaterOrEqual, .lessOrEqual] : [.contains, .notContains, .equals, .notEquals]
+            }
+        }
+
+        /// Hint for the value field.
+        public var placeholder: String {
+            switch self {
+            case .sampleRate: "kHz, e.g. 48 or 44.1"
+            case .bitDepth: "bits, e.g. 24"
+            case .year: "e.g. 1977"
+            case .channels: "e.g. 6 for 5.1"
+            case .addedDaysAgo: "days"
+            case .rating: "0–5"
+            case .playCount: "plays"
+            case .codec: "e.g. FLAC"
+            default: "value"
+            }
+        }
     }
 
     public enum Operator: String, Codable, Sendable, CaseIterable {
@@ -111,6 +138,16 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
         self.value = value
     }
 
+    /// A number from what people type: "48", "44.1", "48k", "48 kHz", "24-bit", "1,000".
+    static func number(_ text: String) -> Double? {
+        let cleaned = text.trimmingCharacters(in: .whitespaces).lowercased()
+            .replacingOccurrences(of: ",", with: "")
+            .replacingOccurrences(of: "khz", with: "").replacingOccurrences(of: "hz", with: "")
+            .replacingOccurrences(of: "-bit", with: "").replacingOccurrences(of: "bit", with: "")
+            .trimmingCharacters(in: CharacterSet(charactersIn: " k"))
+        return Double(cleaned)
+    }
+
     func sql() -> (String, StatementArguments)? {
         let column: String
         switch field {
@@ -134,12 +171,19 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             }
         }
         if field.isNumeric {
-            guard let number = Double(value) else { return nil }
+            guard var number = Self.number(value) else { return nil }
+            // Sample rates are shown in kHz everywhere, so "48" or "44.1" means kHz; values of 1000
+            // and up are hertz (rules saved by older versions). Compare within half a hertz.
+            var tolerance = 0.0
+            if field == .sampleRate {
+                if number < 1000 { number = (number * 1000).rounded() }
+                tolerance = 0.5
+            }
             switch op {
-            case .equals: return ("\(column) = ?", [number])
-            case .notEquals: return ("\(column) IS NOT ?", [number])
-            case .greaterOrEqual: return ("\(column) >= ?", [number])
-            case .lessOrEqual: return ("\(column) <= ?", [number])
+            case .equals: return tolerance > 0 ? ("\(column) BETWEEN ? AND ?", [number - tolerance, number + tolerance]) : ("\(column) = ?", [number])
+            case .notEquals: return tolerance > 0 ? ("(\(column) IS NULL OR \(column) NOT BETWEEN ? AND ?)", [number - tolerance, number + tolerance]) : ("\(column) IS NOT ?", [number])
+            case .greaterOrEqual: return ("\(column) >= ?", [number - tolerance])
+            case .lessOrEqual: return ("\(column) <= ?", [number + tolerance])
             default: return nil
             }
         }

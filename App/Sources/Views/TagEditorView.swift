@@ -513,10 +513,22 @@ struct SmartPlaylistEditor: View {
                 HStack {
                     Picker("", selection: $rule.field) { ForEach(SmartRule.Field.allCases, id: \.self) { Text($0.label).tag($0) } }
                         .labelsHidden().frame(width: 170)
-                    Picker("", selection: $rule.op) { ForEach(SmartRule.Operator.allCases, id: \.self) { Text($0.label).tag($0) } }
+                        .onChange(of: rule.field) {
+                            // Keep the comparison valid for the new field (e.g. no "contains" for a sample rate).
+                            if !rule.field.operators.contains(rule.op) { rule.op = rule.field.operators[0] }
+                            if rule.field == .verdict, FileAnalysis.Verdict(rawValue: rule.value) == nil { rule.value = FileAnalysis.Verdict.upsampled.rawValue }
+                        }
+                    Picker("", selection: $rule.op) { ForEach(rule.field.operators, id: \.self) { Text($0.label).tag($0) } }
                         .labelsHidden().frame(width: 140)
-                    if rule.op != .isTrue && rule.op != .isFalse {
-                        TextField("value", text: $rule.value).textFieldStyle(.roundedBorder)
+                    if rule.field == .verdict {
+                        Picker("", selection: $rule.value) {
+                            ForEach([FileAnalysis.Verdict.genuine, .possibleLossyOrigin, .upsampled, .paddedBitDepth, .bandwidthExtended, .notApplicable], id: \.self) {
+                                Text(AnalysisVerdictText.badge($0).capitalized).tag($0.rawValue)
+                            }
+                        }
+                        .labelsHidden()
+                    } else if rule.op != .isTrue && rule.op != .isFalse {
+                        TextField(rule.field.placeholder, text: $rule.value).textFieldStyle(.roundedBorder)
                     } else { Spacer() }
                     Button { rules.rules.removeAll { $0.id == rule.id } } label: { Image(systemName: "minus.circle") }.buttonStyle(.plain)
                 }
