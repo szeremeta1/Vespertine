@@ -68,7 +68,7 @@ enum DeveloperHooks {
         if let select = d.string(forKey: "NocturneSelectTracks"), let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {
             // "1,3,4" = track numbers within the album
             let numbers = Set(select.split(separator: ",").compactMap { Int($0) })
-            let tracks = model.library.tracks(albumKey: album.key).filter { numbers.contains($0.trackNumber ?? -1) }
+            let tracks = model.library.tracks(albumKey: album.key).filter { select == "all" || numbers.contains($0.trackNumber ?? -1) }
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
         }
         if let tab = d.string(forKey: "NocturneInspectorTab") {

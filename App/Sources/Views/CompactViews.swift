@@ -227,6 +227,26 @@ struct LibrarySettings: View {
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
                 Button("Find Music on This Mac…") { model.showFindMusic = true }
             }
+            Section {
+                Toggle("Analyze new music automatically", isOn: $s.autoAnalyze)
+                    .onChange(of: s.autoAnalyze) { if s.autoAnalyze { model.analysis.analyzeLibrary() } }
+                Toggle("Include network shares", isOn: $s.analyzeNetworkShares)
+                    .disabled(!s.autoAnalyze)
+                HStack {
+                    Button(model.analysis.isRunning ? "Stop" : "Analyze Library Now") {
+                        if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
+                    }
+                    if model.analysis.isRunning {
+                        ProgressView(value: Double(model.analysis.completed), total: Double(max(1, model.analysis.batchTotal))).frame(width: 120)
+                        Text("\(model.analysis.completed) of \(model.analysis.batchTotal)").font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                    }
+                }
+            } header: {
+                Text("Analysis")
+            } footer: {
+                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Section("Library data") {
                 LabeledContent("Location") {
                     Button((s.dataDirectory.path as NSString).abbreviatingWithTildeInPath) {

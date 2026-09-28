@@ -292,83 +292,178 @@ struct SpectrumView: View {
 
 struct AnalysisPanel: View {
     @Environment(AppModel.self) private var model
-    @State private var result: FileAnalysis?
-    @State private var running = false
-    @State private var analyzedID: Int64?
+    /// nil = automatic (whichever changed last); otherwise pinned to the selection or playback.
+    @State private var pinned: Subject?
+    @State private var stored: LibraryDatabase.StoredAnalysis?
+
+    enum Subject { case selection, playing }
+
+    private var selected: Track? { model.selectedTracks.first }
+    private var playing: Track? { model.player.current?.track }
+
+    private var subject: Subject? {
+        switch (selected, playing) {
+        case (nil, nil): return nil
+        case (_?, nil): return .selection
+        case (nil, _?): return .playing
+        case (_?, _?):
+            if let pinned { return pinned }
+            return model.selectionChangedAt > model.player.trackStartedAt ? .selection : .playing
+        }
+    }
+    private var track: Track? { subject == .selection ? selected : subject == .playing ? playing : nil }
 
     var body: some View {
-        let track = model.selectedTracks.first ?? model.player.current?.track
+        let track = self.track
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                if let selected, let playing, selected.id != playing.id {
+                    Picker("", selection: Binding(get: { subject ?? .playing }, set: { pinned = $0 })) {
+                        Text("Playing").tag(Subject.playing)
+                        Text("Selected").tag(Subject.selection)
+                    }
+                    .pickerStyle(.segmented).labelsHidden().fixedSize()
+                }
                 if let track {
                     Text(track.title).font(Typeface.serif(20)).foregroundStyle(Palette.text)
                     Text("\(track.formatSummary) · \(track.displayArtist)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
-                    Text("Decodes the file at its native rate and looks for padding, upsampling and lossy origins. Nothing is modified.")
-                        .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
-                    Button(running ? "Analyzing…" : "Analyze") { run(track) }
-                        .buttonStyle(BrassButtonStyle())
-                        .disabled(running || track.isDSD || !track.isLossless)
-                    if running { ProgressView().controlSize(.small).tint(Palette.brass) }
-                    if let result, analyzedID == track.id {
-                        results(result)
-                    }
+                    content(for: track)
                 } else {
-                    Text("Select a track to analyze.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)
+                    Text("Select or play a track to analyze it.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)
                 }
+                if model.analysis.batchTotal > 1 { batchProgress }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(20)
         }
         .scrollContentBackground(.hidden)
-        .task(id: track?.id) {
-            if UserDefaults.standard.bool(forKey: "NocturneRunAnalysis"), let track, result == nil { run(track) }
+        .onChange(of: selected?.id) { pinned = nil }
+        .onChange(of: playing?.id) { pinned = nil }
+        .task(id: "\(track?.id ?? -1)-\(model.analysis.revision)") {
+            stored = track.flatMap { model.library.storedAnalysis(for: $0) }
+            if UserDefaults.standard.bool(forKey: "NocturneRunAnalysis"), let track, stored?.isCurrent != true,
+               !model.analysis.isAnalyzing(track) { model.analysis.analyzeNow([track]) }
         }
     }
 
-    private func run(_ track: Track) {
-        running = true
-        let url = track.fileURL
-        Task {
-            let r = try? await Task.detached(priority: .userInitiated) { try FileAnalyzer.analyze(url: url) }.value
-            running = false
-            result = r
-            analyzedID = track.id
-            if let r, let id = track.id { model.library.saveAnalysis(r, trackID: id) }
+    @ViewBuilder
+    private func content(for track: Track) -> some View {
+        let busy = model.analysis.isAnalyzing(track)
+        if track.isDSD || !track.isLossless {
+            Text(track.isDSD ? "DSD sources don't have a PCM word length to check." : "Lossy files are what they say they are; analysis is for lossless files.")
+                .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+        } else if let stored {
+            results(stored.analysis)
+            HStack(spacing: 10) {
+                Text(stored.isCurrent ? "Analyzed \(stored.analyzedAt.formatted(.relative(presentation: .named)))"
+                                      : "From an older analysis or an earlier version of the file")
+                    .font(Typeface.ui(10.5)).foregroundStyle(stored.isCurrent ? Palette.text3 : Palette.copper)
+                Spacer()
+                if busy { ProgressView().controlSize(.small).tint(Palette.brass) }
+                Button(stored.isCurrent ? "Re-analyze" : "Update") { model.analysis.analyzeNow([track]) }
+                    .buttonStyle(QuietButtonStyle(compact: true)).disabled(busy)
+            }
+        } else {
+            Text("Decodes the file at its native rate and checks for zero-padded bits, upsampling, lossy origins and synthesized high frequencies. Nothing is modified.")
+                .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 10) {
+                Button(busy ? "Analyzing…" : "Analyze") { model.analysis.analyzeNow([track]) }
+                    .buttonStyle(BrassButtonStyle()).disabled(busy)
+                if busy { ProgressView().controlSize(.small).tint(Palette.brass) }
+            }
         }
+    }
+
+    private var batchProgress: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("Analyzing library").font(Typeface.ui(11, weight: .medium)).foregroundStyle(Palette.text2)
+                Spacer()
+                Text("\(model.analysis.completed)/\(model.analysis.batchTotal)").font(Typeface.mono(10)).foregroundStyle(Palette.text3)
+                Button("Stop") { model.analysis.cancel() }.buttonStyle(QuietButtonStyle(compact: true))
+            }
+            ProgressView(value: Double(model.analysis.completed), total: Double(max(1, model.analysis.batchTotal)))
+                .progressViewStyle(.linear).tint(Palette.brass)
+        }
+        .padding(12)
+        .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
     private func results(_ r: FileAnalysis) -> some View {
         let ok = r.verdict == .genuine
-        StatusBadge(text: verdictLabel(r.verdict), kind: ok ? .perfect : .converted)
+        // Two badges side by side when they fit the inspector, stacked otherwise.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) { verdictBadges(r, ok: ok) }
+            VStack(alignment: .leading, spacing: 6) { verdictBadges(r, ok: ok) }
+        }
         Text(r.summary).font(Typeface.ui(12.5)).foregroundStyle(Palette.text).fixedSize(horizontal: false, vertical: true)
         Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
             GridRow { k("Claimed"); v(r.claimedBitDepth.map { "\($0)-bit" } ?? "—") }
             GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "—") }
-            GridRow { k("Bandwidth"); v(String(format: "%.1f kHz of %@ kHz", r.bandwidthHz / 1000, SampleRate.format(r.sampleRate / 2))) }
+            GridRow { k("Recorded to"); v(String(format: "%.1f kHz of %@ kHz", r.bandwidthHz / 1000, SampleRate.format(r.sampleRate / 2))) }
+            if let f = r.forensics {
+                if let hz = f.cliffHz, f.cliffDropDB >= 12 {
+                    GridRow { k("Cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
+                }
+                if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
+                    GridRow { k("Synthetic"); v(String(format: "%.1f–%.1f kHz, flat (%.1f dB/kHz)", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope)) }
+                }
+            }
             GridRow { k("Peak"); v(r.peakDBFS.isFinite ? String(format: "%.2f dBFS", r.peakDBFS) : "silent") }
             GridRow { k("Clipped samples"); v("\(r.clippedSamples)") }
+            GridRow { k("Decoded"); v(String(format: "%.0f s", r.secondsAnalyzed)) }
         }
         SectionLabel(text: "Long-term spectrum").padding(.top, 6)
-        SpectrumPlot(values: r.spectrum, nyquist: r.sampleRate / 2).frame(height: 140)
+        SpectrumPlot(values: r.spectrum, nyquist: r.sampleRate / 2,
+                     markers: markers(r)).frame(height: 140)
     }
 
-    private func verdictLabel(_ v: FileAnalysis.Verdict) -> String {
-        switch v {
-        case .genuine: "GENUINE"
-        case .paddedBitDepth: "PADDED BIT DEPTH"
-        case .upsampled: "LIKELY UPSAMPLED"
-        case .possibleLossyOrigin: "POSSIBLE LOSSY ORIGIN"
-        case .notApplicable: "N/A"
+    @ViewBuilder
+    private func verdictBadges(_ r: FileAnalysis, ok: Bool) -> some View {
+        StatusBadge(text: AnalysisVerdictText.badge(r.verdict), kind: ok ? .perfect : .converted)
+        if r.version >= 2, r.verdict != .notApplicable {
+            StatusBadge(text: r.confidence >= 0.8 ? "HIGH CONFIDENCE" : r.confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
         }
+    }
+
+    private func markers(_ r: FileAnalysis) -> [SpectrumPlot.Marker] {
+        guard let f = r.forensics, r.verdict != .genuine else { return [] }
+        var m: [SpectrumPlot.Marker] = []
+        if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
+            m.append(.init(hz: shelf, label: "cutoff"))
+            if f.shelfEndHz > shelf { m.append(.init(hz: f.shelfEndHz, label: "")) }
+        } else if let hz = f.cliffHz {
+            m.append(.init(hz: hz, label: "cutoff"))
+        }
+        return m
     }
 
     private func k(_ s: String) -> some View { Text(s).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
-    private func v(_ s: String) -> some View { Text(s).font(Typeface.mono(11)).foregroundStyle(Palette.text2) }
+    private func v(_ s: String) -> some View {
+        Text(s).font(Typeface.mono(11)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// Verdict wording shared by the inspector, track tags and filters.
+enum AnalysisVerdictText {
+    static func badge(_ v: FileAnalysis.Verdict) -> String {
+        switch v {
+        case .genuine: "GENUINE"
+        case .paddedBitDepth: "PADDED BIT DEPTH"
+        case .upsampled: "UPSAMPLED"
+        case .possibleLossyOrigin: "LOSSY ORIGIN"
+        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES"
+        case .notApplicable: "N/A"
+        }
+    }
 }
 
 struct SpectrumPlot: View {
+    struct Marker { var hz: Double; var label: String }
     let values: [Float]
     let nyquist: Double
+    var markers: [Marker] = []
 
     var body: some View {
         Canvas { ctx, size in
@@ -395,6 +490,15 @@ struct SpectrumPlot: View {
             ctx.fill(fill, with: .linearGradient(Gradient(colors: [Palette.brass.opacity(0.35), .clear]),
                                                  startPoint: .zero, endPoint: CGPoint(x: 0, y: size.height)))
             ctx.stroke(line, with: .color(Palette.brassHi), lineWidth: 1.2)
+            for m in markers where m.hz > 20 && m.hz < nyquist {
+                let x = size.width * CGFloat(log(m.hz / 20) / log(nyquist / 20))
+                ctx.stroke(Path { $0.move(to: CGPoint(x: x, y: 0)); $0.addLine(to: CGPoint(x: x, y: size.height)) },
+                           with: .color(Palette.copper), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                if !m.label.isEmpty {
+                    ctx.draw(Text(m.label).font(Typeface.mono(8.5)).foregroundStyle(Palette.copper),
+                             at: CGPoint(x: x - 3, y: 8), anchor: .trailing)
+                }
+            }
         }
         .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
         .clipShape(RoundedRectangle(cornerRadius: 6))

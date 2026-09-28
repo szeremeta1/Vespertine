@@ -84,11 +84,14 @@ final class AppModel {
     let player: PlayerController
     let devices: DeviceStore
     let shares: NetworkShareManager
+    let analysis: AnalysisQueue
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = [] } } }
     var path: [DetailRoute] = []
     var searchText = ""
-    var selectedTrackIDs: Set<Int64> = []
+    var selectedTrackIDs: Set<Int64> = [] { didSet { if selectedTrackIDs != oldValue { selectionChangedAt = .now } } }
+    /// When the selection last changed; the Analysis tab shows whichever changed last, selection or playback.
+    private(set) var selectionChangedAt: Date = .distantPast
     var inspectorTab: InspectorTab = .nowPlaying
     var showInspector = true
     var showImporter = false
@@ -107,6 +110,7 @@ final class AppModel {
         devices = DeviceStore()
         shares = NetworkShareManager(library: library, settings: settings)
         player = PlayerController(library: library, settings: settings, shares: shares)
+        analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
@@ -115,6 +119,16 @@ final class AppModel {
         }
         syncEngine()
         shares.start()
+        library.onScanFinished = { [weak self] in
+            guard let self, self.settings.autoAnalyze else { return }
+            self.analysis.analyzeLibrary()
+        }
+        if settings.autoAnalyze {
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(5))
+                self?.analysis.analyzeLibrary()
+            }
+        }
 
         // Developer aid: `-NocturneAddSource <folder>` adds and scans a reference source on launch.
         if let path = UserDefaults.standard.string(forKey: "NocturneAddSource") {

@@ -67,10 +67,11 @@ struct TrackTable: View {
             TableColumn("Format", value: \.track.sampleRate) { row in
                 HStack(spacing: 8) {
                     Text(row.track.formatSummary).font(Typeface.mono(11)).foregroundStyle(Palette.text2)
-                    AnalysisTag(track: row.track)
+                        .lineLimit(1).fixedSize()
+                    AnalysisTag(track: row.track).fixedSize()
                 }
             }
-            .width(min: 120, ideal: 200)
+            .width(min: 150, ideal: 250)
 
             TableColumn("Time", value: \.track.duration) { row in
                 Text(row.track.duration.clock).font(Typeface.mono(11.5)).foregroundStyle(Palette.text3)
@@ -116,9 +117,11 @@ struct AnalysisTag: View {
         case "paddedBitDepth":
             tag("\(track.effectiveBitDepth ?? 16)-BIT", color: Palette.copper).help("Only \(track.effectiveBitDepth ?? 16) of \(track.bitDepth ?? 24) bits carry audio (zero-padded)")
         case "upsampled":
-            tag("UPSAMPLED", color: Palette.copper)
+            tag("UPSAMPLED", color: Palette.copper).help("A 44.1/48 kHz master upsampled to a hi-res rate")
         case "possibleLossyOrigin":
-            tag("LOSSY ORIGIN?", color: Palette.copper)
+            tag("LOSSY ORIGIN", color: Palette.copper).help("Made from an MP3, AAC or Opus file")
+        case "bandwidthExtended":
+            tag("SYNTHETIC HF", color: Palette.copper).help("Made from a lossy file; its high frequencies were generated afterwards (SBR or AI “enhancement”)")
         case "genuine" where (track.bitDepth ?? 0) >= 24:
             tag("TRUE \(track.bitDepth ?? 24)", color: Palette.brass)
         default:
@@ -177,20 +180,68 @@ struct TrackMenu: View {
 
 // MARK: - Songs / search / playlists
 
+/// Filters tracks by what analysis found.
+enum AnalysisFilter: String, CaseIterable, Identifiable {
+    case all, genuine, anyIssue, lossy, synthetic, upsampled, padded, notAnalyzed
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .all: "All tracks"
+        case .genuine: "Genuine"
+        case .anyIssue: "Any issue"
+        case .lossy: "Lossy origin"
+        case .synthetic: "Synthetic high frequencies"
+        case .upsampled: "Upsampled"
+        case .padded: "Padded bit depth"
+        case .notAnalyzed: "Not analyzed"
+        }
+    }
+    func matches(_ t: Track) -> Bool {
+        let v = t.analysisVerdict
+        switch self {
+        case .all: return true
+        case .genuine: return v == "genuine"
+        case .anyIssue: return ["possibleLossyOrigin", "bandwidthExtended", "upsampled", "paddedBitDepth"].contains(v ?? "")
+        case .lossy: return v == "possibleLossyOrigin"
+        case .synthetic: return v == "bandwidthExtended"
+        case .upsampled: return v == "upsampled"
+        case .padded: return v == "paddedBitDepth"
+        case .notAnalyzed: return v == nil && t.isLossless && !t.isDSD
+        }
+    }
+}
+
 struct SongsView: View {
     @Environment(AppModel.self) private var model
     let title: String
     let tracks: [Track]?
     @State private var loaded: [Track] = []
+    @State private var filter: AnalysisFilter = .all
 
     var body: some View {
+        let shown = filter == .all ? loaded : loaded.filter(filter.matches)
         VStack(spacing: 0) {
-            PageHeader(title: title, meta: "\(loaded.count.formatted()) tracks · \(loaded.reduce(0) { $0 + $1.duration }.longDuration)") {
-                Button { model.player.play(loaded) } label: { Label("Play", systemImage: "play.fill") }
+            PageHeader(title: title, meta: "\(shown.count.formatted()) tracks · \(shown.reduce(0) { $0 + $1.duration }.longDuration)") {
+                Menu {
+                    Picker("Analysis", selection: $filter) {
+                        ForEach(AnalysisFilter.allCases) { f in
+                            Text(f == .all ? f.label : "\(f.label) (\(loaded.filter(f.matches).count))").tag(f)
+                        }
+                    }
+                    .pickerStyle(.inline)
+                    Divider()
+                    Button("Analyze Tracks Without Results") { model.analysis.analyzeNow(loaded.filter(AnalysisFilter.notAnalyzed.matches)) }
+                } label: {
+                    Label(filter == .all ? "Analysis" : filter.label, systemImage: filter == .all ? "waveform.badge.magnifyingglass" : "line.3.horizontal.decrease.circle.fill")
+                }
+                .menuStyle(.button)
+                .buttonStyle(QuietButtonStyle())
+                .fixedSize()
+                Button { model.player.play(shown) } label: { Label("Play", systemImage: "play.fill") }
                     .buttonStyle(BrassButtonStyle())
-                    .disabled(loaded.isEmpty)
+                    .disabled(shown.isEmpty)
             }
-            TrackTable(tracks: loaded)
+            TrackTable(tracks: shown)
         }
         .background(Palette.window)
         .task(id: model.library.revision) { loaded = tracks ?? model.library.allTracks() }

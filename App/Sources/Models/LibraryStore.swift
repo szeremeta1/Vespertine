@@ -169,7 +169,11 @@ final class LibraryStore {
         }
         scanProgress = nil
         revision += 1
+        onScanFinished?()
     }
+
+    /// Called after every scan (e.g. to analyze newly added music).
+    var onScanFinished: (() -> Void)?
 
     func rescanAll() async {
         for source in sources { await scan(source) }
@@ -328,9 +332,19 @@ final class LibraryStore {
 
     func markPlayed(_ trackID: Int64) { try? database.markPlayed(trackID) }
 
-    func saveAnalysis(_ analysis: FileAnalysis, trackID: Int64) {
-        try? database.saveAnalysis(trackID: trackID, effectiveBitDepth: analysis.effectiveBitDepth,
-                                   bandwidthHz: analysis.bandwidthHz, verdict: analysis.verdict.rawValue)
-        revision += 1
+    /// A saved analysis changes verdict tags in lists; refresh them at most every couple of seconds.
+    func analysisSaved() {
+        guard !analysisRefreshPending else { return }
+        analysisRefreshPending = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            analysisRefreshPending = false
+            revision += 1
+        }
+    }
+    private var analysisRefreshPending = false
+
+    func storedAnalysis(for track: Track) -> LibraryDatabase.StoredAnalysis? {
+        try? database.storedAnalysis(for: track)
     }
 }
