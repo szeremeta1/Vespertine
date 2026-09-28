@@ -47,6 +47,19 @@ if args.count < 2 || args[1] == "list" {
     exit(0)
 }
 
+if args.count >= 3, args[1] == "channels" {
+    // Decoder format and channel layout per file.
+    for path in args[2...] {
+        let url = URL(fileURLWithPath: path)
+        do {
+            let (format, decoder) = try SourceInspector.inspect(url)
+            let layout = try SourceInspector.probeLayout(url)
+            print("\(url.lastPathComponent): \(format.channels) ch · \(decoder) · layout \(layout)")
+        } catch { print("\(url.lastPathComponent): \(error.localizedDescription)") }
+    }
+    exit(0)
+}
+
 if args.count >= 3, args[1] == "forensics" {
     // Tab-separated measurements for calibration: one row per file.
     print("file\trate\tverdict\tconf\tcliff\tdrop\tconsist\tbelow\tabove\tfloor\text\tslope\tholes\tcontent\tbits\tshelf\tsstep\tsend\tsslope\tsabove\tscons")
@@ -169,11 +182,14 @@ guard let device = devices.first(where: { $0.uid == args[2] || $0.name.localized
     print("no device matching \(args[2])"); exit(1)
 }
 let seconds = Double(args[3]) ?? 3
+// NOCTURNE_SPATIAL=off|fixed|headTracked forces the multichannel mode for this device.
+let forcedSpatial = ProcessInfo.processInfo.environment["NOCTURNE_SPATIAL"].flatMap(SpatialMode.init(rawValue:))
 let items = args[4...].map { PlayableItem(url: URL(fileURLWithPath: $0)) }
 let engine = PlaybackEngine()
 var settings = EngineSettings()
 settings.deviceUID = device.uid
 settings.exclusive = true
+if let forcedSpatial { settings.spatialModes[device.uid] = forcedSpatial }
 engine.update(settings: settings)
 let queue = items
 engine.nextItemProvider = { finished in

@@ -248,6 +248,24 @@ struct DeviceSettings: View {
                 }
             }
             .toggleStyle(.switch).controlSize(.mini)
+            // Multichannel music (5.1, 7.1…): Spatial Audio on headphones, all channels or a downmix elsewhere.
+            HStack {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Spatial Audio").font(Typeface.ui(12))
+                    Text(device.capabilities.outputChannels > 2
+                         ? "For multichannel music. Off sends every channel to this device's speakers."
+                         : "For multichannel music. Off plays a standard stereo downmix.")
+                        .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+                Picker("", selection: Binding(get: { model.engineSpatialMode(for: device) },
+                                              set: { settings.spatialModes[device.uid] = $0.rawValue; model.syncEngine() })) {
+                    ForEach(SpatialMode.allCases) { Text($0.label).tag($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            .font(Typeface.ui(12))
             if device.transport == .usb || device.transport == .thunderbolt {
                 Toggle(isOn: Binding(get: { settings.dopDeviceUIDs.contains(device.uid) },
                                      set: { on in

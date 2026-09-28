@@ -4,6 +4,7 @@
 //
 
 import CNocturneRT
+import AVFAudio
 import CoreAudio
 import Foundation
 import os
@@ -26,6 +27,11 @@ final class OutputSession: @unchecked Sendable {
     let context: OpaquePointer
     let applied: AppliedFormat
     let plan: OutputPlan
+    /// Layout the decoded stream is converted to: the standard bed for Spatial Audio, the device's
+    /// speaker layout for discrete multichannel output, nil for mono/stereo.
+    let decodedLayout: AVAudioChannelLayout?
+    /// Apple's spatial mixer, run on the I/O thread (Spatial Audio plans only).
+    private(set) var spatial: SpatialRenderer?
     private var ioProcID: AudioDeviceIOProcID?
     private(set) var isRunning = false
 
@@ -53,7 +59,7 @@ final class OutputSession: @unchecked Sendable {
 
         guard let virtual, virtual.mFormatID == kAudioFormatLinearPCM,
               virtual.mFormatFlags & kAudioFormatFlagIsFloat != 0, virtual.mBitsPerChannel == 32,
-              virtual.mChannelsPerFrame >= plan.channels, abs(virtual.mSampleRate - rate) < 0.5,
+              virtual.mChannelsPerFrame >= plan.deviceChannels, abs(virtual.mSampleRate - rate) < 0.5,
               rate.isFinite, rate > 0, rate <= 3_072_000 else {
             if hogged { DeviceControl.releaseHog(deviceID) }
             throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "verify Float32 output format")
@@ -85,6 +91,28 @@ final class OutputSession: @unchecked Sendable {
         self.ring = ring
         self.context = ctx
         nrt_context_set_passthrough(ctx, plan.mode == .dop)
+
+        // Multichannel routing.
+        if plan.spatial != .off {
+            let bed = ChannelLayouts.layout(channels: plan.channels)
+            decodedLayout = bed
+            do {
+                guard let bed else { throw SpatialError.unavailable(-1, "layout") }
+                let renderer = try SpatialRenderer(inputLayout: bed, channels: plan.channels, sampleRate: rate,
+                                                   maxFrames: max(bufferFrames * 2, 4096), mode: plan.spatial)
+                guard renderer.attach(to: ctx) else { throw SpatialError.unavailable(-1, "attach") }
+                spatial = renderer
+            } catch {
+                nrt_context_destroy(ctx)
+                nrt_ring_destroy(ring)
+                if hogged { DeviceControl.releaseHog(deviceID) }
+                throw error
+            }
+        } else if plan.channels > 2 {
+            decodedLayout = DeviceQuery.preferredLayout(deviceID, channels: plan.channels) ?? ChannelLayouts.layout(channels: plan.channels)
+        } else {
+            decodedLayout = nil
+        }
 
         var procID: AudioDeviceIOProcID?
         let status = AudioDeviceCreateIOProcID(deviceID, nrt_device_ioproc, UnsafeMutableRawPointer(ctx), &procID)
@@ -164,9 +192,9 @@ public enum DeviceControl {
             let candidates = DeviceQuery.physicalFormats(stream).filter {
                 $0.mFormat.mFormatID == kAudioFormatLinearPCM
                     && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
-                    && $0.mFormat.mChannelsPerFrame >= plan.channels
+                    && $0.mFormat.mChannelsPerFrame >= plan.deviceChannels
             }
-            let wantedChannels = current?.mChannelsPerFrame ?? UInt32(plan.channels)
+            let wantedChannels = max(current?.mChannelsPerFrame ?? 0, UInt32(plan.deviceChannels))
             func score(_ r: AudioStreamRangedDescription) -> Int {
                 var s = 0
                 if r.mFormat.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 { s += 1000 }
@@ -207,7 +235,7 @@ public enum DeviceControl {
             if var float = available.first(where: {
                 $0.mFormat.mFormatFlags & kAudioFormatFlagIsFloat != 0 && $0.mFormat.mBitsPerChannel == 32
                     && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
-                    && $0.mFormat.mChannelsPerFrame >= plan.channels
+                    && $0.mFormat.mChannelsPerFrame >= plan.deviceChannels
             })?.mFormat {
                 float.mSampleRate = rate
                 try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), float)

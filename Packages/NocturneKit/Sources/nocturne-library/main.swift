@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import NocturneAudio
 import NocturneLibrary
 
 let args = Array(CommandLine.arguments.dropFirst())
@@ -83,6 +84,16 @@ case "scan":
     FileHandle.standardError.write("\n".data(using: .utf8)!)
     print(String(format: "scan: %d added, %d updated, %d skipped, %d missing, %d failed in %.1fs", summary.added, summary.updated, summary.skipped, summary.missing, summary.failed.count, Date().timeIntervalSince(start)))
     for f in summary.failed.prefix(10) { print("   failed: \(f)") }
+case "export-spatial":
+    // nocturne-library export-spatial <file> <output.m4a> [binaural|multichannel]
+    guard args.count >= 3 else { print("export-spatial needs a file and an output path"); exit(2) }
+    let kind: MultichannelExport.Kind = args.count > 3 && args[3] == "multichannel" ? .multichannelALAC : .spatialStereo
+    let started = Date()
+    let written = try MultichannelExport.export(PlayableItem(url: URL(fileURLWithPath: args[1], isDirectory: false)), kind: kind,
+                                                to: URL(fileURLWithPath: args[2], isDirectory: false)) { f in
+        FileHandle.standardError.write(String(format: "\r%3.0f%%", f * 100).data(using: .utf8)!)
+    }
+    print(String(format: "\nwrote %d channels in %.1f s → %@", written, Date().timeIntervalSince(started), args[2]))
 case "verify-remote":
     // nocturne-library verify-remote <folder> [count]
     // Checks the fast network tag path against a direct read, field by field.

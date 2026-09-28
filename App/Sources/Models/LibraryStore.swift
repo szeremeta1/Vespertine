@@ -10,7 +10,7 @@ import NocturneLibrary
 import Observation
 
 enum FormatFilter: String, CaseIterable, Identifiable {
-    case all, flac, pcm, alac, dsd, lossy, bits24, rate96
+    case all, flac, pcm, alac, dsd, lossy, bits24, rate96, multichannel
     var id: String { rawValue }
     var label: String {
         switch self {
@@ -22,6 +22,7 @@ enum FormatFilter: String, CaseIterable, Identifiable {
         case .lossy: "Lossy"
         case .bits24: "≥ 24-bit"
         case .rate96: "≥ 88.2 kHz"
+        case .multichannel: "Multichannel"
         }
     }
 
@@ -35,6 +36,7 @@ enum FormatFilter: String, CaseIterable, Identifiable {
         case .lossy: ["MP3", "AAC", "Vorbis", "Opus", "Musepack"].contains(a.codec)
         case .bits24: (a.maxBitDepth ?? 0) >= 24 || a.isDSD
         case .rate96: a.maxSampleRate >= 88_200 || a.isDSD
+        case .multichannel: a.isMultichannel
         }
     }
 }

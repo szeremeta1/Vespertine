@@ -51,6 +51,8 @@ final class AppSettings {
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
+    /// Spatial Audio for multichannel music, per device (unset = head tracked on AirPods/Beats, off elsewhere).
+    var spatialModes: [String: String] { didSet { defaults.set(spatialModes, forKey: "spatialModes") } }
     var rateChoices: [String: String] { didSet { defaults.set(rateChoices, forKey: "rateChoices") } }
     var replayGain: ReplayGainMode { didSet { defaults.set(replayGain.rawValue, forKey: "replayGain") } }
     var replayGainPreampDB: Double { didSet { defaults.set(replayGainPreampDB, forKey: "replayGainPreamp") } }
@@ -94,6 +96,7 @@ final class AppSettings {
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
         selectedDeviceUID = defaults.string(forKey: "selectedDeviceUID")
         dopDeviceUIDs = Set(defaults.stringArray(forKey: "dopDeviceUIDs") ?? [])
+        spatialModes = defaults.dictionary(forKey: "spatialModes") as? [String: String] ?? [:]
         rateChoices = defaults.dictionary(forKey: "rateChoices") as? [String: String] ?? [:]
         replayGain = ReplayGainMode(rawValue: defaults.string(forKey: "replayGain") ?? "off") ?? .off
         replayGainPreampDB = defaults.double(forKey: "replayGainPreamp")
@@ -119,7 +122,10 @@ final class AppSettings {
         } else if let override = defaults.string(forKey: "NocturneDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
             self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
         } else {
-            self.dataDirectory = LibraryDatabase.defaultURL.deletingLastPathComponent()
+            let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
+            // Development builds keep their own library beside the real one.
+            self.dataDirectory = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+                ? standard.deletingLastPathComponent().appendingPathComponent("Nocturne Dev", isDirectory: true) : standard
         }
     }
 
@@ -141,6 +147,7 @@ final class AppSettings {
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
         s.dopDeviceUIDs = dopDeviceUIDs
+        s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
         s.digitalVolumeDB = deviceHasHardwareVolume ? nil : digitalVolumeDB

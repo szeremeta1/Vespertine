@@ -22,7 +22,7 @@ let package = Package(
         // thread never touches the Swift runtime, locks or the allocator.
         .target(
             name: "CNocturneRT",
-            linkerSettings: [.linkedFramework("CoreAudio")]
+            linkerSettings: [.linkedFramework("CoreAudio"), .linkedFramework("AudioToolbox")]
         ),
         .target(
             name: "NocturneAudio",

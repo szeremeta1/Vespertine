@@ -321,8 +321,11 @@ public enum FileAnalyzer {
 /// channels (5.1, 7.1, …) unless a channel layout is given, so a multichannel file must never be
 /// able to crash analysis or playback.
 public enum AudioFormats {
-    public static func float32(sampleRate: Double, channels: Int, interleaved: Bool) -> AVAudioFormat? {
+    public static func float32(sampleRate: Double, channels: Int, interleaved: Bool, layout: AVAudioChannelLayout? = nil) -> AVAudioFormat? {
         guard sampleRate.isFinite, sampleRate > 0, channels > 0, channels <= 64 else { return nil }
+        if let layout, Int(layout.channelCount) == channels {
+            return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: interleaved, channelLayout: layout)
+        }
         if channels <= 2 {
             return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate,
                                  channels: AVAudioChannelCount(channels), interleaved: interleaved)
