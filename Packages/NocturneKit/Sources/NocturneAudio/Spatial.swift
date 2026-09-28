@@ -172,3 +172,79 @@ public final class SpatialRenderer: @unchecked Sendable {
         return output
     }
 }
+
+// MARK: - Speaker labels
+
+extension AVAudioChannelLayout {
+    /// Speaker label of each channel, in order (expanding a layout tag when needed).
+    public var channelLabels: [AudioChannelLabel] {
+        let n = Int(channelCount)
+        var result: [AudioChannelLabel] = []
+        if layoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
+            result = Self.labels(in: layout)
+        } else {
+            var tag = layoutTag
+            var size: UInt32 = 0
+            if AudioFormatGetPropertyInfo(kAudioFormatProperty_ChannelLayoutForTag, UInt32(MemoryLayout<AudioChannelLayoutTag>.size), &tag, &size) == noErr,
+               size >= UInt32(MemoryLayout<AudioChannelLayout>.size) {
+                let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
+                defer { raw.deallocate() }
+                if AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForTag, UInt32(MemoryLayout<AudioChannelLayoutTag>.size), &tag, &size, raw) == noErr {
+                    result = Self.labels(in: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+                }
+            }
+        }
+        if result.count < n { result += Array(repeating: kAudioChannelLabel_Unknown, count: n - result.count) }
+        return Array(result.prefix(n))
+    }
+
+    /// Reads the variable-length description array in place (copying `pointee` keeps only the first).
+    static func labels(in layout: UnsafePointer<AudioChannelLayout>) -> [AudioChannelLabel] {
+        let count = Int(layout.pointee.mNumberChannelDescriptions)
+        let base = UnsafeRawPointer(layout) + MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!
+        let d = base.assumingMemoryBound(to: AudioChannelDescription.self)
+        return (0..<count).map { d[$0].mChannelLabel }
+    }
+
+    /// True when channels carry real speaker positions (not just "channel 1, 2, …").
+    public var hasSpeakerPositions: Bool {
+        let labels = channelLabels
+        let positional = labels.filter { $0 != kAudioChannelLabel_Unknown && $0 != kAudioChannelLabel_Unused
+            && !($0 >= kAudioChannelLabel_Discrete && $0 <= kAudioChannelLabel_Discrete_65535) }
+        return channelCount >= 2 && positional.count == labels.count
+    }
+
+    /// "L R C LFE Ls Rs"
+    public var shortNames: [String] { channelLabels.map(ChannelLayouts.shortName) }
+}
+
+extension ChannelLayouts {
+    public static func shortName(_ label: AudioChannelLabel) -> String {
+        switch label {
+        case kAudioChannelLabel_Left: "L"
+        case kAudioChannelLabel_Right: "R"
+        case kAudioChannelLabel_Center: "C"
+        case kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2: "LFE"
+        case kAudioChannelLabel_LeftSurround: "Ls"
+        case kAudioChannelLabel_RightSurround: "Rs"
+        case kAudioChannelLabel_LeftSurroundDirect: "Lsd"
+        case kAudioChannelLabel_RightSurroundDirect: "Rsd"
+        case kAudioChannelLabel_CenterSurround: "Cs"
+        case kAudioChannelLabel_RearSurroundLeft: "Lrs"
+        case kAudioChannelLabel_RearSurroundRight: "Rrs"
+        case kAudioChannelLabel_LeftCenter: "Lc"
+        case kAudioChannelLabel_RightCenter: "Rc"
+        case kAudioChannelLabel_LeftWide: "Lw"
+        case kAudioChannelLabel_RightWide: "Rw"
+        case kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_LeftTopFront: "Ltf"
+        case kAudioChannelLabel_VerticalHeightRight, kAudioChannelLabel_RightTopFront: "Rtf"
+        case kAudioChannelLabel_VerticalHeightCenter, kAudioChannelLabel_CenterTopFront: "Ctf"
+        case kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_LeftTopRear: "Ltr"
+        case kAudioChannelLabel_TopBackRight, kAudioChannelLabel_RightTopRear: "Rtr"
+        case kAudioChannelLabel_TopCenterSurround: "Top"
+        case kAudioChannelLabel_Mono: "M"
+        default:
+            label >= kAudioChannelLabel_Discrete_0 && label <= kAudioChannelLabel_Discrete_65535 ? "\(label - kAudioChannelLabel_Discrete_0 + 1)" : "·"
+        }
+    }
+}

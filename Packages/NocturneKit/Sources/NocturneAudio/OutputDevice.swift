@@ -61,6 +61,12 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 
+    /// The configured speaker layout ("L", "R", "C", "LFE"…), empty when not set up or unlabeled.
+    public var speakerNames: [String] {
+        guard let layout = DeviceQuery.speakerLayout(id), layout.hasSpeakerPositions else { return [] }
+        return layout.shortNames
+    }
+
     /// AirPods and Beats: headphones Apple's Spatial Audio (with head tracking) is made for.
     public var isAppleHeadphones: Bool {
         let n = name.lowercased()
@@ -79,6 +85,18 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 }
 
 enum DeviceQuery {
+    /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers), any channel count.
+    public static func speakerLayout(_ device: AudioObjectID) -> AVAudioChannelLayout? {
+        var address = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyPreferredChannelLayout,
+                                                 mScope: kAudioObjectPropertyScopeOutput, mElement: kAudioObjectPropertyElementMain)
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(device, &address, 0, nil, &size) == noErr, size >= UInt32(MemoryLayout<AudioChannelLayout>.size) else { return nil }
+        let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
+        defer { raw.deallocate() }
+        guard AudioObjectGetPropertyData(device, &address, 0, nil, &size, raw) == noErr else { return nil }
+        return AVAudioChannelLayout(layout: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+    }
+
     /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers) for `channels` channels.
     static func preferredLayout(_ device: AudioObjectID, channels: Int) -> AVAudioChannelLayout? {
         var address = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyPreferredChannelLayout,
@@ -152,8 +170,22 @@ enum DeviceQuery {
                     channels: Int(f.mChannelsPerFrame)))
             }
         }
+        // Capacity, not the current setting: an HDMI receiver left in 2-channel mode still offers 8.
+        let streams = outputStreams(device).map { stream in
+            (widest: physicalFormats(stream).map { Int($0.mFormat.mChannelsPerFrame) }.max() ?? 0,
+             current: (try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()))
+                .map { Int($0.mChannelsPerFrame) } ?? 0)
+        }
+        let channels = channelCapacity(streams: streams, configured: outputChannelCount(device))
         return DeviceCapabilities(sampleRates: nominalRates(device), physicalFormats: Array(Set(formats)),
-                                  outputChannels: outputChannelCount(device), supportsDoP: supportsDoP)
+                                  outputChannels: channels, supportsDoP: supportsDoP,
+                                  speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil })
+    }
+
+    /// Channels the device can carry: per stream, the widest format it offers (or its current one,
+    /// if wider), summed across streams; never less than what's configured right now.
+    static func channelCapacity(streams: [(widest: Int, current: Int)], configured: Int) -> Int {
+        max(configured, streams.reduce(0) { $0 + max($1.widest, $1.current) })
     }
 
     static func volumeElements(_ device: AudioObjectID) -> [UInt32] {

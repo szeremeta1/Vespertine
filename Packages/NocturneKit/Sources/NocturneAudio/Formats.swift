@@ -74,12 +74,17 @@ public struct DeviceCapabilities: Sendable, Hashable, Codable {
     public var outputChannels: Int
     /// User opted in: the DAC decodes DSD-over-PCM markers.
     public var supportsDoP: Bool
+    /// Channels in the device's configured speaker layout (Audio MIDI Setup → Configure Speakers),
+    /// when those channels carry real speaker positions. nil when unconfigured or just numbered.
+    public var speakerLayoutChannels: Int?
 
-    public init(sampleRates: [Double], physicalFormats: [PhysicalFormat], outputChannels: Int, supportsDoP: Bool) {
+    public init(sampleRates: [Double], physicalFormats: [PhysicalFormat], outputChannels: Int, supportsDoP: Bool,
+                speakerLayoutChannels: Int? = nil) {
         self.sampleRates = sampleRates.sorted()
         self.physicalFormats = physicalFormats
         self.outputChannels = outputChannels
         self.supportsDoP = supportsDoP
+        self.speakerLayoutChannels = speakerLayoutChannels
     }
 
     public func supports(rate: Double) -> Bool {
