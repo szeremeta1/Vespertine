@@ -149,6 +149,13 @@ struct AlbumCard: View {
         .contentShape(Rectangle())
         .onHover { h in withAnimation(.easeOut(duration: 0.15)) { hovering = h } }
         .onTapGesture { model.openAlbum(album.key) }
+        // VoiceOver (and other assistive tech) can open the album and play it.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(album.title), \(album.artist)")
+        .accessibilityValue(album.formatSummary)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { model.openAlbum(album.key) }
+        .accessibilityAction(named: "Play") { model.player.play(model.library.tracks(albumKey: album.key)) }
         .contextMenu { AlbumMenu(album: album) }
         .draggable(model.library.tracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
     }
@@ -354,17 +361,7 @@ struct ArtistsView: View {
                 PageHeader(title: "Artists", meta: "\(model.library.artists.count) artists") { EmptyView() }
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
                     ForEach(model.library.artists) { artist in
-                        Button { model.path.append(.artist(artist.name)) } label: {
-                            VStack(alignment: .leading, spacing: 0) {
-                                ArtworkView(key: artist.artworkKey, size: 160, cornerRadius: 999)
-                                    .shadow(color: .black.opacity(0.4), radius: 10, y: 8)
-                                Text(artist.name).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
-                                Text("\(artist.albumCount) album\(artist.albumCount == 1 ? "" : "s") · \(artist.trackCount) tracks")
-                                    .font(Typeface.mono(10)).foregroundStyle(Palette.text3).padding(.top, 3)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
+                        ArtistTile(artist: artist)
                     }
                 }
                 .padding(.horizontal, 24)
@@ -375,14 +372,33 @@ struct ArtistsView: View {
     }
 }
 
+struct ArtistTile: View {
+    @Environment(AppModel.self) private var model
+    let artist: LibraryDatabase.ArtistSummary
+
+    var body: some View {
+        Button { model.path.append(.artist(artist.name)) } label: {
+            VStack(alignment: .leading, spacing: 0) {
+                ArtworkView(key: artist.artworkKey, size: 160, cornerRadius: 999)
+                    .shadow(color: .black.opacity(0.4), radius: 10, y: 8)
+                Text(artist.name).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
+                Text("\(artist.albumCount) album\(artist.albumCount == 1 ? "" : "s") · \(artist.trackCount) tracks")
+                    .font(Typeface.mono(10)).foregroundStyle(Palette.text3).padding(.top, 3)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct ArtistDetailView: View {
     @Environment(AppModel.self) private var model
     let name: String
 
     var body: some View {
-        let albums = model.library.albums(artist: name)
-        AlbumsGridView(title: name, albumsOverride: albums)
-            .id(model.library.revision)
+        // Refreshes in place when the library changes (no new identity, so the scroll position stays).
+        let _ = model.library.revision
+        AlbumsGridView(title: name, albumsOverride: model.library.albums(artist: name))
             .navigationTitle(name)
     }
 }

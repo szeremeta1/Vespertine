@@ -252,21 +252,72 @@ struct SearchResultsView: View {
     @Environment(AppModel.self) private var model
     let query: String
     @State private var results: [Track] = []
+    @State private var albums: [Album] = []
+    @State private var artists: [LibraryDatabase.ArtistSummary] = []
 
     var body: some View {
-        VStack(spacing: 0) {
-            PageHeader(title: "“\(query)”", meta: "\(results.count) matching tracks") { EmptyView() }
-            if results.isEmpty {
-                Text("No tracks match.").font(Typeface.ui(13)).foregroundStyle(Palette.text3)
+        VStack(alignment: .leading, spacing: 0) {
+            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta) { EmptyView() }
+            if results.isEmpty && albums.isEmpty && artists.isEmpty {
+                Text("Nothing matches.").font(Typeface.ui(13)).foregroundStyle(Palette.text3)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                TrackTable(tracks: results)
+                if !artists.isEmpty {
+                    shelf("Artists", count: artists.count) {
+                        ForEach(artists) { ArtistTile(artist: $0).frame(width: 136) }
+                    }
+                }
+                if !albums.isEmpty {
+                    shelf("Albums", count: albums.count) {
+                        ForEach(albums) { AlbumCard(album: $0).frame(width: 150) }
+                    }
+                }
+                if !results.isEmpty {
+                    sectionTitle("Songs", count: results.count).padding(.top, 6)
+                    TrackTable(tracks: results)
+                } else {
+                    Spacer(minLength: 0)
+                }
             }
         }
         .background(Palette.window)
         .task(id: "\(query)#\(model.library.revision)") {
             try? await Task.sleep(for: .milliseconds(120))
             results = model.library.search(query)
+            let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
+            func matches(_ text: String) -> Bool { words.allSatisfy { text.localizedStandardContains($0) } }
+            func startsWith(_ text: String) -> Int { text.localizedStandardRange(of: query)?.lowerBound == text.startIndex ? 0 : 1 }
+            albums = model.library.albums
+                .filter { matches("\($0.title) \($0.artist)") }
+                .sorted { (startsWith($0.title), $0.title) < (startsWith($1.title), $1.title) }
+            artists = model.library.artists
+                .filter { matches($0.name) }
+                .sorted { (startsWith($0.name), -$0.trackCount) < (startsWith($1.name), -$1.trackCount) }
+        }
+    }
+
+    private var meta: String {
+        func n(_ c: Int, _ word: String) -> String { "\(c) \(word)\(c == 1 ? "" : "s")" }
+        return [n(artists.count, "artist"), n(albums.count, "album"), n(results.count, "song")].joined(separator: " · ")
+    }
+
+    private func sectionTitle(_ title: String, count: Int) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(title).font(Typeface.serif(18)).foregroundStyle(Palette.text)
+            Text("\(count)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 10)
+    }
+
+    private func shelf<Content: View>(_ title: String, count: Int, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionTitle(title, count: count)
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(alignment: .top, spacing: 20) { content() }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+            }
         }
     }
 }
