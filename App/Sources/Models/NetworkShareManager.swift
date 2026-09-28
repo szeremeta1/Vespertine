@@ -9,6 +9,9 @@ import AppKit
 import Network
 import NocturneLibrary
 import Observation
+import os
+
+private let shareLog = Logger(subsystem: "org.nocturne.player", category: "shares")
 
 @Observable
 @MainActor
@@ -22,6 +25,8 @@ final class NetworkShareManager {
     }
 
     private(set) var status: [Int64: Status] = [:]
+    /// Consecutive health checks in which a mounted share didn't answer.
+    private var unresponsive: [Int64: Int] = [:]
     private(set) var cacheUsage = NetworkCache.Usage()
     let cache: NetworkCache
     /// Where Nocturne mounts shares (private, so library paths stay stable).
@@ -132,8 +137,23 @@ final class NetworkShareManager {
             guard let id = source.id, let share = source.networkShare, !connecting.contains(id) else { continue }
             if status(of: source).isConnected {
                 // Mount gone (unmounted elsewhere, or the system dropped it): mount again.
-                if NetworkVolume.existingMount(for: share) == nil { await connect(source); continue }
-                if await NetworkVolume.isReachable(share, timeout: 4) { continue }
+                guard let mount = NetworkVolume.existingMount(for: share) else {
+                    shareLog.notice("share \(id, privacy: .public): mount disappeared; remounting")
+                    await connect(source); continue
+                }
+                if await NetworkVolume.isReachable(share, timeout: 4) {
+                    // Server answers, but is the mount itself still alive? (It can outlive a server
+                    // restart or a dropped connection and then fail every read.) Two strikes, then remount.
+                    if await NetworkVolume.isResponsive(share.root(at: mount)) { unresponsive[id] = 0; continue }
+                    unresponsive[id, default: 0] += 1
+                    shareLog.notice("share \(id, privacy: .public): mount not responding (\(self.unresponsive[id] ?? 0, privacy: .public))")
+                    guard (unresponsive[id] ?? 0) >= 2 else { continue }
+                    unresponsive[id] = 0
+                    NetworkVolume.forceUnmount(mount, ownedBy: mountBase)
+                    status[id] = .offline("Reconnecting…")
+                    await connect(source)
+                    continue
+                }
                 status[id] = .offline(NetworkShareError.unreachable(host: share.host).localizedDescription)
                 try? library.database.setSourceOnline(id, false)
             } else {
@@ -157,7 +177,16 @@ final class NetworkShareManager {
         defer { connecting.remove(id) }
         if !status(of: source).isConnected { status[id] = .connecting }
         do {
-            let password = share.user == nil ? nil : NetworkCredentials.password(for: share)
+            var password: String?
+            if let user = share.user, NetworkVolume.existingMount(for: share) == nil {
+                let found = NetworkCredentials.lookup(share)
+                password = found.password
+                // Without a password NetFS fails locally with an authentication error; say what's really wrong.
+                guard password != nil else {
+                    shareLog.error("share \(id, privacy: .public): no saved password (keychain: \(found.status, privacy: .public))")
+                    throw NetworkShareError.passwordMissing(account: "\(user)@\(share.host)")
+                }
+            }
             let mount = try await NetworkVolume.mount(share, password: password, in: mountBase, readOnly: !source.isWritable)
             let root = share.root(at: mount).standardizedFileURL
             guard Self.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
@@ -173,6 +202,7 @@ final class NetworkShareManager {
             }
             return true
         } catch {
+            shareLog.error("share \(id, privacy: .public): connect failed: \(String(describing: error), privacy: .public)")
             status[id] = .offline(error.localizedDescription)
             try? library.database.setSourceOnline(id, false)
             return false

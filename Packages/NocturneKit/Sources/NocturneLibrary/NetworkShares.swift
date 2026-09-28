@@ -129,6 +129,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
     case invalidAddress
     case unreachable(host: String)
     case authenticationFailed
+    /// No saved password could be found for the account (so nothing was sent to the server).
+    case passwordMissing(account: String)
     case shareNotFound(String)
     case folderNotFound(String)
     case cancelled
@@ -142,6 +144,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
             "Can’t reach \(host). Check that the server is on, and if you reach it through Tailscale or another VPN, that it’s connected."
         case .authenticationFailed:
             "The server didn’t accept that name and password."
+        case .passwordMissing(let account):
+            "No saved password for \(account) was found. Right-click the share and choose Enter Password…; Nocturne saves it in your keychain."
         case .shareNotFound(let share):
             "The server has no share named “\(share)”."
         case .folderNotFound(let folder):
@@ -278,6 +282,28 @@ public enum NetworkVolume {
         return existingMount(for: share) ?? dir
     }
 
+    /// Whether a mounted share still answers: lists its root on a background thread, within `timeout`.
+    /// A mount can stay listed after the server rebooted or the connection died; it then errors or stalls.
+    public static func isResponsive(_ root: URL, timeout: TimeInterval = 8) async -> Bool {
+        let once = ResumeOnce()
+        return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+            DispatchQueue.global(qos: .utility).async {
+                let ok = (try? FileManager.default.contentsOfDirectory(atPath: root.path)) != nil
+                if once.claim() { continuation.resume(returning: ok) }
+            }
+            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
+                if once.claim() { continuation.resume(returning: false) }
+            }
+        }
+    }
+
+    /// Drops a dead mount even if it's wedged (forced), so it can be mounted again.
+    public static func forceUnmount(_ mountPoint: URL, ownedBy base: URL) {
+        guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) else { return }
+        _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
+        try? FileManager.default.removeItem(at: mountPoint)
+    }
+
     /// Unmounts a share Nocturne mounted. Other mounts (Finder's) are left alone.
     public static func unmount(_ mountPoint: URL, ownedBy base: URL) async {
         guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) else { return }
@@ -287,9 +313,12 @@ public enum NetworkVolume {
 }
 
 /// Share passwords live in the login keychain as the same internet-password items Finder
-/// uses, so a password saved by either is found by both.
+/// uses, so a password saved by either is found by both. Every query names the keychain
+/// explicitly: on recent macOS an app's plain SecItem calls go to the data-protection keychain,
+/// where Finder's (and older Nocturne's) share passwords never are, so a share would silently
+/// mount with no password and be refused.
 public enum NetworkCredentials {
-    private static func query(_ share: NetworkShare) -> [String: Any]? {
+    private static func query(_ share: NetworkShare, dataProtection: Bool) -> [String: Any]? {
         guard let user = share.user else { return nil }
         let proto: CFString
         switch share.kind {
@@ -300,29 +329,43 @@ public enum NetworkCredentials {
         return [kSecClass as String: kSecClassInternetPassword,
                 kSecAttrServer as String: share.host,
                 kSecAttrAccount as String: user,
-                kSecAttrProtocol as String: proto]
+                kSecAttrProtocol as String: proto,
+                kSecUseDataProtectionKeychain as String: dataProtection]
     }
 
-    public static func password(for share: NetworkShare) -> String? {
-        guard var q = query(share) else { return nil }
-        q[kSecReturnData as String] = true
-        q[kSecMatchLimit as String] = kSecMatchLimitOne
-        var out: CFTypeRef?
-        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let data = out as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
+    /// The saved password: the login keychain first (Finder's and NetAuth's), then the data-protection one.
+    public static func password(for share: NetworkShare) -> String? { lookup(share).password }
+
+    /// Password plus the keychain result codes, for diagnosing a failed mount.
+    public static func lookup(_ share: NetworkShare) -> (password: String?, status: String) {
+        var codes: [String] = []
+        for dp in [false, true] {
+            guard var q = query(share, dataProtection: dp) else { return (nil, "no account") }
+            q[kSecReturnData as String] = true
+            q[kSecMatchLimit as String] = kSecMatchLimitOne
+            var out: CFTypeRef?
+            let rc = SecItemCopyMatching(q as CFDictionary, &out)
+            codes.append("\(dp ? "data-protection" : "login") \(rc)")
+            if rc == errSecSuccess, let data = out as? Data, let text = String(data: data, encoding: .utf8) { return (text, codes.joined(separator: ", ")) }
+        }
+        return (nil, codes.joined(separator: ", "))
     }
 
     /// Whether a password is saved, without reading it (so no keychain access prompt).
     public static func hasPassword(for share: NetworkShare) -> Bool {
-        guard var q = query(share) else { return false }
-        q[kSecReturnAttributes as String] = true
-        q[kSecMatchLimit as String] = kSecMatchLimitOne
-        var out: CFTypeRef?
-        return SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess
+        for dp in [false, true] {
+            guard var q = query(share, dataProtection: dp) else { return false }
+            q[kSecReturnAttributes as String] = true
+            q[kSecMatchLimit as String] = kSecMatchLimitOne
+            var out: CFTypeRef?
+            if SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess { return true }
+        }
+        return false
     }
 
+    /// Saves to the login keychain (where Finder and macOS's network-auth agent look too).
     public static func save(_ password: String, for share: NetworkShare) {
-        guard let q = query(share) else { return }
+        guard let q = query(share, dataProtection: false) else { return }
         let data = Data(password.utf8)
         if SecItemUpdate(q as CFDictionary, [kSecValueData as String: data] as CFDictionary) == errSecItemNotFound {
             var add = q
@@ -334,8 +377,9 @@ public enum NetworkCredentials {
     }
 
     public static func delete(for share: NetworkShare) {
-        guard let q = query(share) else { return }
-        SecItemDelete(q as CFDictionary)
+        for dp in [false, true] {
+            if let q = query(share, dataProtection: dp) { SecItemDelete(q as CFDictionary) }
+        }
     }
 }
 
