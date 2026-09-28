@@ -46,6 +46,21 @@ Upsampled, padded, lossy-origin and "AI-enhanced" files are detected, with the e
 
 ![The Analysis tab flagging a track as having synthetic high frequencies, with its long-term spectrum](docs/screenshots/fake-hi-res-detection.png)
 
+### Browse like Apple Music
+Albums, artists, songs and **genres**, with Genre, Decade and format filters. Messy tags are handled: "Hip-Hop" and "hip hop" are one genre, multi-genre tags count under each, and localized genre names are merged.
+
+![The Genres page: a tile per genre with a mosaic of its covers](docs/screenshots/genres.png)
+
+### Search finds everything
+Artists, albums (by title, artist, genre or year) and songs, in one place. Every word you type has to match, ignoring case and accents.
+
+![Searching "fleetwood": the artist, 18 albums and 265 songs](docs/screenshots/search.png)
+
+### Smart playlists that speak your language
+Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 48 kHz track" is one rule away. Here that playlist plays bit-perfect on AirPods Max.
+
+![A smart playlist of every 24-bit / 48 kHz track, playing bit-perfect on AirPods Max](docs/screenshots/smart-playlist.png)
+
 ### A mini player that still tells the truth
 
 <p align="center"><img src="docs/screenshots/mini-player.png" width="520" alt="Nocturne's mini player"></p>
@@ -54,18 +69,19 @@ Upsampled, padded, lossy-origin and "AI-enhanced" files are detected, with the e
 
 - **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8…). If the device can't run at that rate, Nocturne converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (384 → 192). Per-device overrides: *match source*, *device maximum* or a fixed rate.
 - **Shared or exclusive.** By default Nocturne shares the device and makes it the Mac's sound output while it plays, so volume keys, Control Center and the AirPods Max Digital Crown control what you hear. Playback is still bit-perfect unless another app plays through the same device at the same time, and Nocturne says so when that happens. **Exclusive (hog) mode** is one switch away if you'd rather silence other apps on the device (macOS then sends volume keys elsewhere); the device is released after a configurable pause.
+- **Hands your DAC back.** When Nocturne quits, each device it switched goes back to the sample rate and bit depth it had before (so other apps, and tools like LosslessSwitcher, carry on where they left off), or to 44.1 kHz · 16-bit or 48 kHz · 24-bit if you prefer.
 - **AirPods Max / AirPods Max 2 over USB-C.** These are recognized as lossless 24-bit / 48 kHz devices. 48 kHz material plays bit-perfect and everything else is converted to 48 kHz. Over Bluetooth, Nocturne tells you the link is AAC.
 - **DSD.** DSD goes to the DAC as DoP on DACs you mark as DoP-capable (off by default, because DoP sent to a non-DoP DAC is noise). Otherwise it's converted to high-rate PCM.
 - **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, no other app is mixing into the device and the word length fits. Every other state is shown in copper with the reason.
 - **Gapless playback** across tracks that share a device format, including CUE-sheet albums split from a single file.
 - **Volume.** Nocturne uses the DAC's hardware volume when it has one. Optionally, a 64-bit dithered digital volume can be enabled; it's clearly marked as not bit-perfect.
 - **Find Music on This Mac.** Spotlight searches every drive. Each file's true format is checked, and hi-res, lossless or all music can be picked by folder or by file. Recordings, prompts, clips and duplicate copies are left out.
-- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Nocturne`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs, full-text search (accent-insensitive), playlists and smart playlists. Files on unplugged drives stay in the library and show as offline.
+- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Nocturne`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs and genres, with Genre, Decade and format filters; search across artists, albums (title, artist, genre, year) and songs (accent-insensitive); playlists; and smart playlists whose rules use the same units as the rest of the app. Files on unplugged drives stay in the library and show as offline; files you delete disappear from every list on the next scan (and come back if you restore them).
 - **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert.
 - **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
 - **Multichannel and Spatial Audio.** 5.0, 5.1, 7.1 and other multichannel files play everywhere: rendered with Apple's Spatial Audio (head tracked or fixed, with your personalized profile) on AirPods and Beats, sent channel-for-channel to multichannel interfaces and AV receivers (following your speaker setup, even when HDMI is left in 2-channel mode), or downmixed by layout on stereo DACs. The signal path always says which, with a live meter for every channel. **Export for Spatial Audio** turns them into binaural stereo that sounds spatial on any headphones, or multichannel ALAC for Apple devices.
-- **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default, reconnects by itself, indexes quickly over slow links, rides out slow reads without stuttering, and caches what you play (with **Keep Offline** for whole albums).
+- **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default and mounted where macOS keeps network volumes (hidden from the Finder sidebar). They heal themselves: Nocturne reconnects after sleep, network changes and server restarts, and remounts a share that has stopped answering. Shares are rescanned every half hour (never while you're playing from them), so music added to or deleted from the server shows up by itself. Indexing is quick over slow links, playback rides out slow reads without stuttering, and what you play is cached (with **Keep Offline** for whole albums). Passwords live in the login keychain alongside Finder's.
 - **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). Every verdict shows its evidence; results are saved, can run automatically on import, and filter the Songs view. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `nocturne-analyze` runs the same analysis next to the files and Nocturne imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
 - **Live spectrum** of exactly what the DAC receives, plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
@@ -85,11 +101,17 @@ Or build from the command line:
 xcodebuild -project Nocturne.xcodeproj -scheme Nocturne -configuration Release -derivedDataPath build/DD build
 ```
 
-Run the engine and library tests:
+Run the engine and library tests, and the analysis core's (it also builds on Linux):
 
 ```bash
 cd Packages/NocturneKit && swift test
 ```
+
+```bash
+cd Packages/NocturneAnalysis && swift test
+```
+
+`scripts/audit.sh` runs everything above plus the app tests, sanitizer builds of the real-time C code and a release build.
 
 ## Try it without your own music
 
@@ -126,9 +148,10 @@ cd Packages/NocturneKit && swift build -c release --product nocturne-probe
 - `hires` lists every hi-res file;
 - `search <term>` searches tags;
 - `import --library <dir> --into <dir> <files…>` imports;
-- `enrich --library <dir> [--apply high|all]` enriches.
+- `enrich --library <dir> [--apply high|all]` enriches;
+- `import-server-analysis --library <dir>` imports a share's server analysis results.
 
-`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis; `forensics <files…>` prints its raw measurements as a table.
+`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis (`analyze-json` prints it as JSON, for comparing with `nocturne-analyze file`); `forensics <files…>` prints its raw measurements as a table; `restore-test <device>` checks the quit options that hand a device back.
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
@@ -159,8 +182,9 @@ Store that file somewhere safe (it is a secret), then delete it.
 | Path | What |
 |---|---|
 | `Packages/NocturneKit/Sources/CNocturneRT` | Real-time C: lock-free ring buffer, HAL IOProc, dithered gain, meters, spectrum tap |
-| `Packages/NocturneKit/Sources/NocturneAudio` | Device discovery, exclusive mode, format switching, `FormatPlanner`, `PlaybackEngine`, analysis |
-| `Packages/NocturneKit/Sources/NocturneLibrary` | GRDB/SQLite library, scanner, CUE, tag writer, smart playlists, MusicBrainz/ListenBrainz |
+| `Packages/NocturneKit/Sources/NocturneAudio` | Device discovery, shared/exclusive output, format switching, `FormatPlanner`, `PlaybackEngine`, Spatial Audio, decoding for analysis |
+| `Packages/NocturneKit/Sources/NocturneLibrary` | GRDB/SQLite library, scanner, CUE, tag writer, genres, smart playlists, network shares, server-analysis import, MusicBrainz/ListenBrainz |
+| `Packages/NocturneAnalysis` | The analysis core (spectra, forensics, verdicts) in plain Swift, plus `nocturne-analyze` for Linux servers |
 | `App/` | SwiftUI app (Obsidian & Brass design) |
 | `docs/` | Architecture notes, design mockups, screenshots |
 
