@@ -14,8 +14,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.5.10"
-    CURRENT_PROJECT_VERSION: "17"
+    MARKETING_VERSION: "0.5.13"
+    CURRENT_PROJECT_VERSION: "20"
     DEAD_CODE_STRIPPING: YES
 targets:
   Nocturne:

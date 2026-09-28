@@ -32,6 +32,30 @@ struct RingBufferTests {
         #expect(nrt_ring_writable(ring) == 0)
     }
 
+    @Test("Rewinding takes back look-ahead exactly, and never frames the reader is close to")
+    func rewind() {
+        let ring = nrt_ring_create(64, 1)!
+        defer { nrt_ring_destroy(ring) }
+        let current = (1...20).map(Float.init)                    // the song that's playing
+        let lookAhead = [Float](repeating: -1, count: 30)          // the next one, decoded early
+        #expect(nrt_ring_write(ring, current, 20) == 20)
+        #expect(nrt_ring_write(ring, lookAhead, 30) == 30)
+        var out = [Float](repeating: 0, count: 64)
+        #expect(nrt_ring_read(ring, &out, 5) == 5)
+
+        // Too close to the reader, or beyond what was written: refused, nothing changes.
+        #expect(!nrt_ring_rewind(ring, 20, 16))
+        #expect(!nrt_ring_rewind(ring, 51, 1))
+        #expect(nrt_ring_total_written(ring) == 50)
+
+        #expect(nrt_ring_rewind(ring, 20, 8))
+        #expect(nrt_ring_total_written(ring) == 20 && nrt_ring_readable(ring) == 15)
+        let replacement = [Float](repeating: 7, count: 10)
+        #expect(nrt_ring_write(ring, replacement, 10) == 10)
+        #expect(nrt_ring_read(ring, &out, 64) == 25)
+        #expect(Array(out[0..<25]) == Array(current[5...]) + replacement)
+    }
+
     @Test("Unity gain is bit-transparent for every 24-bit value pattern")
     func unityIsTransparent() {
         let ring = nrt_ring_create(4096, 2)!

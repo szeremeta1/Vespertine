@@ -43,6 +43,11 @@ uint64_t nrt_ring_total_read(const NRTRing *_Nonnull ring);
 /// Discards all content. Only call while neither side is running.
 void nrt_ring_reset(NRTRing *_Nonnull ring);
 
+/// Producer side, safe while the consumer runs: takes back everything written after `totalWritten`
+/// (look-ahead that is no longer wanted), but only when that point is at least `margin` frames ahead
+/// of the reader, so the consumer can never be reading the frames being taken back. Returns whether it did.
+bool nrt_ring_rewind(NRTRing *_Nonnull ring, uint64_t totalWritten, uint32_t margin);
+
 // MARK: - Render context driven by a HAL IOProc
 
 #define NRT_TAP_SIZE 8192u

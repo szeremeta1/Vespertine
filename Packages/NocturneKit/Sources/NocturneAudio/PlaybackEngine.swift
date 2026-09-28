@@ -29,6 +29,8 @@ public struct EngineSnapshot: Sendable {
     public var lastError: String?
     /// Output is paused while a stalled network read catches up (playback resumes by itself).
     public var isBuffering = false
+    /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
+    public var waitingForDevice: String?
 }
 
 public enum EngineEvent: Sendable {
@@ -37,6 +39,11 @@ public enum EngineEvent: Sendable {
     case queueEnded
     case failed(PlayableItem?, String)
     case deviceLost(String)
+    /// The chosen output isn't there (e.g. AirPods just put back on and not reconnected yet):
+    /// playback waits for it instead of switching to another device.
+    case waitingForDevice(String)
+    /// The chosen output didn't come back in time; playback stays paused.
+    case deviceUnavailable(String)
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -87,7 +94,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         case pause, resume, stop
         case seek(TimeInterval)
         case settingsChanged(EngineSettings)
-        case devicesChanged, queueChanged
+        case devicesChanged
+        case queueChanged(reloadCurrent: Bool)
         case barrier(DispatchSemaphore)
     }
 
@@ -204,12 +212,21 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var drainedAt: Date?
     private var pausedAt: Date?
     private var parked: (item: PlayableItem, position: TimeInterval)?
+    /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
+    private var awaitingDevice: (uid: String, until: Date, checkedAt: Date)?
+    /// How long playback waits for a missing output (AirPods take several seconds to reconnect).
+    private let deviceWait: TimeInterval
+    /// Names of outputs seen, for messages about ones that are gone.
+    private var deviceNames: [String: String] = [:]
     private var lastAudibleSegmentID: UUID?
     private var underrunTotal = 0
     private var emptyTransitions = 0
     private let chunkFrames: AVAudioFrameCount = 4096
 
-    public init() {
+    public convenience init() { self.init(deviceWait: 60) }
+
+    init(deviceWait: TimeInterval) {
+        self.deviceWait = deviceWait
         let thread = Thread { [weak self] in
             while !Thread.current.isCancelled {
                 guard let self else { return }
@@ -245,7 +262,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         post(.seek(max(0, seconds)))
     }
     /// Discards decoded look-ahead after the play order changes.
-    public func queueChanged() { post(.queueChanged) }
+    /// The queue changed. `reloadCurrent` reopens the song that's playing (e.g. its gain changed);
+    /// otherwise it plays on without a break and only what follows it is re-planned.
+    public func queueChanged(reloadCurrent: Bool = false) { post(.queueChanged(reloadCurrent: reloadCurrent)) }
     public func devicesChanged() { post(.devicesChanged) }
 
     public func update(settings: EngineSettings) {
@@ -308,6 +327,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 didWork = fill()
                 checkTransitions()
                 updateRebuffering()
+            } else if awaitingDevice != nil {
+                checkAwaitedDevice()
             } else if state == .paused, let pausedAt, session?.applied.exclusive == true,
                       Date().timeIntervalSince(pausedAt) > settings.releaseExclusiveAfterPause {
                 park()
@@ -330,6 +351,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             parked = nil
             start(item, at: 0, autoplay: true)
         case .pause:
+            awaitingDevice = nil
             guard state == .playing else { return }
             session?.stop()
             state = .paused
@@ -345,11 +367,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .stop:
             teardown(releaseHog: true)
             parked = nil
+            awaitingDevice = nil
             state = .stopped
             lastAudibleSegmentID = nil
         case .seek(let seconds):
             guard let current = audibleSegment()?.item ?? parked?.item else { return }
-            let resume = state == .playing
+            let resume = state == .playing || awaitingDevice != nil
             teardownDecoding()
             session?.flush()
             parked = nil
@@ -361,18 +384,28 @@ public final class PlaybackEngine: @unchecked Sendable {
             let deviceChanged = old.deviceUID != new.deviceUID || old.exclusive != new.exclusive
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
             if deviceChanged, state != .stopped { restartFromCurrentPosition() }
-        case .queueChanged:
-            if state != .stopped { restartFromCurrentPosition() }
+        case .queueChanged(let reloadCurrent):
+            guard state != .stopped else { return }
+            if reloadCurrent { restartFromCurrentPosition() } else { replanUpcoming() }
         case .devicesChanged:
+            if awaitingDevice != nil { checkAwaitedDevice(force: true); return }
             guard let device = sessionDevice else { return }
             let alive = DeviceQuery.allDeviceIDs().contains(device.id)
             if !alive {
                 let position = currentPosition()
                 let item = audibleSegment()?.item
+                let wasPlaying = state == .playing
                 teardown(releaseHog: false)
                 if let item { parked = (item, position) }
                 state = parked == nil ? .stopped : .paused
-                emit(.deviceLost(device.name))
+                if wasPlaying, parked != nil, let uid = settings.deviceUID, uid == device.uid {
+                    // The chosen output dropped out mid-song (a DAC re-enumerating, AirPods reconnecting):
+                    // carry on when it's back rather than on some other device.
+                    awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date())
+                    emit(.waitingForDevice(device.name))
+                } else if wasPlaying {
+                    emit(.deviceLost(device.name))
+                }
             }
             // Deliberately *not* following system-default changes mid-playback: hogging the default device makes
             // macOS move the default elsewhere, and chasing it would restart playback in a loop. The new default
@@ -382,15 +415,47 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Starting and stopping
 
-    private func resolveDevice() -> OutputDevice? {
+    /// The output to play to. A chosen output that isn't there is never swapped for another one
+    /// (AirPods taken off and put back on would otherwise start playing out of the speakers).
+    private func resolveDevice() throws -> OutputDevice? {
         let devices = DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
-        if let uid = settings.deviceUID, let chosen = devices.first(where: { $0.uid == uid }) { return chosen }
+        for device in devices { deviceNames[device.uid] = device.name }
+        if let uid = settings.deviceUID {
+            if let chosen = devices.first(where: { $0.uid == uid }) { return chosen }
+            throw ChosenDeviceMissing(uid: uid)
+        }
         // Following the default: stay on the device we already hold (our hog moved the system default away from it).
         if settings.deviceUID == nil, let current = sessionDevice, let alive = devices.first(where: { $0.id == current.id }) { return alive }
         return devices.first(where: \.isDefault) ?? devices.first
     }
 
+    private struct ChosenDeviceMissing: Error { let uid: String }
+    /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
+    private struct ChosenDeviceNotReady: Error { let uid: String }
+
+    private func deviceName(_ uid: String) -> String { deviceNames[uid] ?? "The selected output" }
+
+    /// While waiting for the chosen output: start as soon as it's back, or give up after `deviceWait`.
+    private func checkAwaitedDevice(force: Bool = false) {
+        guard let awaiting = awaitingDevice else { return }
+        guard awaiting.uid == settings.deviceUID else { awaitingDevice = nil; return }
+        let now = Date()
+        guard force || now.timeIntervalSince(awaiting.checkedAt) >= 0.5 else { return }
+        awaitingDevice?.checkedAt = now
+        if DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs).contains(where: { $0.uid == awaiting.uid }) {
+            // start() keeps the original deadline if the output isn't ready yet and it has to wait again.
+            guard let parked else { awaitingDevice = nil; return }
+            self.parked = nil
+            start(parked.item, at: parked.position, autoplay: true)
+        } else if now > awaiting.until {
+            awaitingDevice = nil
+            emit(.deviceUnavailable(deviceName(awaiting.uid)))
+        }
+    }
+
     private func start(_ item: PlayableItem, at seconds: TimeInterval, autoplay: Bool) {
+        let previousWait = awaitingDevice
+        awaitingDevice = nil
         var candidate: PlayableItem? = item
         var offset = seconds
         var attempts = 0
@@ -399,11 +464,27 @@ public final class PlaybackEngine: @unchecked Sendable {
             do {
                 try begin(current, at: offset)
                 if autoplay {
-                    try session?.start()
+                    do { try session?.start() } catch {
+                        if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
+                        throw error
+                    }
                     state = .playing
                 } else {
                     state = .paused
                     pausedAt = Date()
+                }
+                return
+            } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
+                // Hold the song where it was and wait for the output to come back (or to be ready).
+                let uid = (error as? ChosenDeviceMissing)?.uid ?? (error as? ChosenDeviceNotReady)?.uid ?? ""
+                teardown(releaseHog: true)
+                parked = (current, offset)
+                state = .paused
+                pausedAt = nil
+                if autoplay || previousWait != nil {
+                    let now = Date()
+                    awaitingDevice = (uid, previousWait?.until ?? now.addingTimeInterval(deviceWait), now)
+                    if previousWait == nil { emit(.waitingForDevice(deviceName(uid))) }
                 }
                 return
             } catch {
@@ -420,13 +501,16 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Opens `item`, (re)configures the device if needed, positions and prefills.
     private func begin(_ item: PlayableItem, at seconds: TimeInterval) throws {
-        guard let device = resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
+        guard let device = try resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
         let probed = try SourceOpener.probe(resolve(item))
         let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: settings.ratePolicies[device.uid] ?? .matchSource,
                                       spatial: settings.spatialMode(for: device))
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
-            try replaceSession(device: device, plan: plan)
+            do { try replaceSession(device: device, plan: plan) } catch {
+                if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
+                throw error
+            }
         } else {
             session?.flush()
         }
@@ -513,10 +597,34 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func restartFromCurrentPosition() {
         guard let item = audibleSegment()?.item ?? parked?.item else { return }
         let position = parked?.position ?? currentPosition()
-        let wasPlaying = state == .playing
+        let wasPlaying = state == .playing || awaitingDevice != nil
         teardown(releaseHog: true)
         parked = nil
         start(item, at: position, autoplay: wasPlaying)
+    }
+
+    /// The queue changed (shuffle, repeat, edits). The song that's playing carries on untouched; only what
+    /// was already lined up after it is taken back and chosen again from the new queue.
+    private func replanUpcoming() {
+        // Parked or not started: the next start reads the new queue anyway.
+        guard let session, let audible = audibleSegment() else { return }
+        let read = session.totalRead
+        if let next = segments.first(where: { $0.startRingFrame > read }) {
+            // The next song is already partly decoded into the ring. Take it back, unless it's about to be
+            // heard (then it plays, and the new order applies from the song after it).
+            let margin = max(UInt32(session.applied.sampleRate / 4), UInt32(session.applied.bufferFrames * 4))
+            guard nrt_ring_rewind(session.ring, next.startRingFrame, margin) else { return }
+            segments.removeAll { $0.startRingFrame >= next.startRingFrame }
+        } else if !draining {
+            // Still decoding the song that's playing: the next one is picked from the new queue when it ends.
+            return
+        }
+        decoding = nil
+        pending = nil
+        draining = false
+        drainedAt = nil
+        nrt_context_set_draining(session.context, false)
+        advance(after: audible.item, produced: 1)
     }
 
     // MARK: Decoding
@@ -541,7 +649,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             return false
         }
         if decoding.finished {
-            advance(after: decoding)
+            advance(after: decoding.item, produced: decoding.framesProduced)
             return true
         }
         guard session.writableFrames >= Int(chunkFrames) else { return false }
@@ -591,10 +699,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// The current item is fully decoded: line up the next one gaplessly, or wait for a device change.
-    private func advance(after finished: Decoding) {
+    private func advance(after finished: PlayableItem, produced: UInt64) {
         decoding = nil
         guard let session, let device = sessionDevice else { return }
-        if finished.framesProduced == 0 {
+        if produced == 0 {
             emptyTransitions += 1
             if emptyTransitions >= 8 {
                 draining = true
@@ -602,7 +710,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             }
         }
-        var candidate = nextItemProvider?(finished.item)
+        var candidate = nextItemProvider?(finished)
         var attempts = 0
         while let next = candidate, attempts < 8 {
             attempts += 1
@@ -728,6 +836,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let st = state
         let underruns = underrunTotal
         let parkedItem = parked
+        let waiting = awaitingDevice.map { deviceName($0.uid) }
         shared.withLock { s in
             s.snapshot.state = st
             s.snapshot.item = segment?.item ?? parkedItem?.item
@@ -736,6 +845,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
+            s.snapshot.waitingForDevice = waiting
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }
         }

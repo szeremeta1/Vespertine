@@ -67,6 +67,8 @@ final class PlayerController {
     /// Live level (0…1, linear peak with decay) of every channel Nocturne sends, for multichannel meters.
     private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
+    /// The chosen output playback is waiting for (it starts by itself when the output is back).
+    private(set) var waitingForDevice: String?
     /// When the current track started (the Analysis tab follows whichever changed last).
     private(set) var trackStartedAt: Date = .distantPast
     /// Set while the user drags the scrubber.
@@ -112,7 +114,8 @@ final class PlayerController {
         queue = entries
         currentIndex = min(max(0, index), entries.count - 1)
         if shuffle { applyShuffle(keepingCurrent: true) }
-        syncMirror()
+        // The engine is about to start over, so there's nothing to re-plan.
+        mirror.update(queue.map(\.item), repeatMode: repeatMode)
         if let current { engine.play(current.item) }
     }
 
@@ -194,15 +197,31 @@ final class PlayerController {
         shares.prefetch(current: current?.track, upcoming: upcoming.map(\.track))
     }
 
-    private func syncMirror() {
+    private func syncMirror(reloadCurrent: Bool = false) {
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
-        engine.queueChanged()
+        engine.queueChanged(reloadCurrent: reloadCurrent)
+    }
+
+    /// Files in the queue were moved or renamed (found by a rescan): point their entries at the new
+    /// files so the rest of the queue keeps playing. The song that's playing isn't interrupted.
+    func tracksMoved(_ moves: [Int64: Int64]) {
+        let moved = library.tracks(ids: Array(Set(moves.values)))
+        let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
+        func remap(_ entry: QueueEntry) -> QueueEntry {
+            guard let old = entry.track.id, let new = moves[old], let track = byID[new] else { return entry }
+            return QueueEntry(item: makeItem(track, id: entry.id), track: track)
+        }
+        let remapped = queue.map(remap)
+        guard remapped != queue else { return }
+        queue = remapped
+        originalOrder = originalOrder.map(remap)
+        syncMirror()
     }
 
     func refreshReplayGain() {
         queue = queue.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
         originalOrder = originalOrder.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
-        syncMirror()
+        syncMirror(reloadCurrent: true)
     }
 
     private func makeItem(_ track: Track, id: UUID = UUID()) -> PlayableItem {
@@ -229,6 +248,8 @@ final class PlayerController {
     // MARK: Transport
 
     func togglePlayPause() {
+        // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
+        if waitingForDevice != nil { engine.pause(); return }
         switch state {
         case .playing: engine.pause()
         case .paused: engine.resume()
@@ -275,14 +296,23 @@ final class PlayerController {
             }
         case .queueEnded:
             updateNowPlayingInfo()
-        case .failed(_, let message):
-            if let track = current?.track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
+        case .failed(let item, let message):
+            let track = queue.first { $0.id == item?.id }?.track ?? current?.track
+            if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = "“\(track.title)” is on a network share that isn’t connected. Nocturne reconnects automatically when the server is reachable."
+            } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
+                // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
+                library.rescanForMissingFile(track)
+                lastError = "“\(track.title)” was moved or deleted. Updating the library to find it…"
             } else {
                 lastError = message
             }
         case .deviceLost(let name):
             lastError = "\(name) was disconnected. Playback paused."
+        case .waitingForDevice(let name):
+            lastError = "Waiting for \(name) to reconnect. Playback continues as soon as it’s back."
+        case .deviceUnavailable(let name):
+            lastError = "\(name) didn’t come back. Choose another output, or press play once it’s connected."
         }
     }
 
@@ -292,6 +322,10 @@ final class PlayerController {
         state = snap.state
         if abs(position - snap.position) > 0.02 { position = snap.position }
         if duration != snap.duration { duration = snap.duration }
+        if waitingForDevice != snap.waitingForDevice {
+            waitingForDevice = snap.waitingForDevice
+            if waitingForDevice == nil, lastError?.hasPrefix("Waiting for ") == true { lastError = nil }
+        }
         if let id = snap.item?.id, let i = queue.firstIndex(where: { $0.id == id }), currentIndex != i {
             currentIndex = i
             updateNowPlayingInfo()
@@ -330,7 +364,9 @@ final class PlayerController {
 
     private func setupRemoteCommands() {
         let center = MPRemoteCommandCenter.shared()
-        Self.register(center.playCommand) { [weak self] _ in Task { @MainActor in if self?.state != .playing { self?.togglePlayPause() } } }
+        Self.register(center.playCommand) { [weak self] _ in
+            Task { @MainActor in if self?.state != .playing, self?.waitingForDevice == nil { self?.togglePlayPause() } }
+        }
         Self.register(center.pauseCommand) { [weak self] _ in Task { @MainActor in self?.engine.pause() } }
         Self.register(center.togglePlayPauseCommand) { [weak self] _ in Task { @MainActor in self?.togglePlayPause() } }
         Self.register(center.nextTrackCommand) { [weak self] _ in Task { @MainActor in self?.next() } }

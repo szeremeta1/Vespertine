@@ -95,6 +95,14 @@ uint32_t nrt_ring_read(NRTRing *ring, float *dst, uint32_t frames) {
 uint64_t nrt_ring_total_written(const NRTRing *ring) { return atomic_load_explicit(&ring->writePos, memory_order_acquire); }
 uint64_t nrt_ring_total_read(const NRTRing *ring) { return atomic_load_explicit(&ring->readPos, memory_order_acquire); }
 
+bool nrt_ring_rewind(NRTRing *ring, uint64_t totalWritten, uint32_t margin) {
+    uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_relaxed);
+    uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_acquire);
+    if (totalWritten > w || totalWritten < r + margin) return false;
+    atomic_store_explicit(&ring->writePos, totalWritten, memory_order_release);
+    return true;
+}
+
 void nrt_ring_reset(NRTRing *ring) {
     atomic_store(&ring->writePos, 0);
     atomic_store(&ring->readPos, 0);
