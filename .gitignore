@@ -7,3 +7,4 @@ build/
 *.xcworkspace/xcuserdata/
 xcuserdata/
 Packages/NocturneKit/Package.resolved.bak
+.build-x86/
