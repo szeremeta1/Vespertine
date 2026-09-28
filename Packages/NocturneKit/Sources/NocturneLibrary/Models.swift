@@ -197,3 +197,17 @@ public struct Album: Sendable, Hashable, Identifiable {
     public var totalSize: Int64
     public var sourcePath: String?
 }
+
+// Only descriptive fields are overlaid: rescans still refresh file availability and CUE boundaries.
+extension Track {
+    mutating func copyMetadata(from t: Track) {
+        title = t.title; artist = t.artist; album = t.album; albumArtist = t.albumArtist
+        composer = t.composer; genre = t.genre; releaseDate = t.releaseDate; year = t.year
+        trackNumber = t.trackNumber; trackTotal = t.trackTotal; discNumber = t.discNumber; discTotal = t.discTotal
+        compilation = t.compilation; grouping = t.grouping; comment = t.comment; lyrics = t.lyrics
+        bpm = t.bpm; rating = t.rating; isrc = t.isrc; label = t.label
+        musicBrainzReleaseID = t.musicBrainzReleaseID; musicBrainzRecordingID = t.musicBrainzRecordingID
+        titleSort = t.titleSort; artistSort = t.artistSort; albumSort = t.albumSort; albumArtistSort = t.albumArtistSort
+        extraTags = t.extraTags; artworkKey = t.artworkKey
+    }
+}

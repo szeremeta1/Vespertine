@@ -56,8 +56,13 @@ public actor MusicBrainzClient {
 
     /// MusicBrainz asks for at most one request per second.
     private func get(_ url: URL) async throws -> Data {
-        let wait = 1.1 - Date().timeIntervalSince(lastRequest)
-        if wait > 0 { try await Task.sleep(for: .seconds(wait)) }
+        // Recheck after suspension: another actor call may have acquired this slot while we slept.
+        while true {
+            let wait = 1.1 - Date().timeIntervalSince(lastRequest)
+            if wait <= 0 { break }
+            try await Task.sleep(for: .seconds(wait))
+        }
+        try Task.checkCancellation()
         lastRequest = .now
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
@@ -91,6 +96,7 @@ public actor MusicBrainzClient {
     }
 
     public func release(id: String) async throws -> MBRelease {
+        guard UUID(uuidString: id) != nil else { throw URLError(.badURL) }
         var comps = URLComponents(string: "https://musicbrainz.org/ws/2/release/\(id)")!
         comps.queryItems = [.init(name: "inc", value: "recordings+artist-credits+labels+genres+release-groups"), .init(name: "fmt", value: "json")]
         guard let r = try JSONSerialization.jsonObject(with: try await get(comps.url!)) as? [String: Any] else { throw URLError(.cannotParseResponse) }
@@ -119,6 +125,7 @@ public actor MusicBrainzClient {
 
     /// Front cover from the Cover Art Archive (1200 px).
     public func frontCover(releaseID: String) async throws -> Data? {
+        guard UUID(uuidString: releaseID) != nil else { throw URLError(.badURL) }
         let url = URL(string: "https://coverartarchive.org/release/\(releaseID)/front-1200")!
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
@@ -137,7 +144,7 @@ public extension MBRelease {
     /// Tag edits for `track`, matched by disc/track number (falling back to order).
     func edit(for track: Track, index: Int) -> TagEdit? {
         let match = tracks.first { $0.disc == (track.discNumber ?? 1) && $0.position == track.trackNumber }
-            ?? (index < tracks.count ? tracks[index] : nil)
+            ?? (tracks.indices.contains(index) ? tracks[index] : nil)
         guard let match else { return nil }
         var fields: [TagField: String?] = [
             .title: match.title, .artist: match.artist, .album: title, .albumArtist: artist,

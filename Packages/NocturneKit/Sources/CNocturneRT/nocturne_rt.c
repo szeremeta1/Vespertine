@@ -30,8 +30,9 @@ static uint32_t next_pow2(uint32_t v) {
 
 NRTRing *nrt_ring_create(uint32_t minimumFrames, uint32_t channels) {
     if (channels == 0 || minimumFrames == 0 || minimumFrames > (1u << 30)) return NULL;
-    NRTRing *ring = calloc(1, sizeof(NRTRing));
-    if (!ring) return NULL;
+    NRTRing *ring = NULL;
+    if (posix_memalign((void **)&ring, _Alignof(NRTRing), sizeof(NRTRing))) return NULL;
+    memset(ring, 0, sizeof(*ring));
     ring->channels = channels;
     ring->capacity = next_pow2(minimumFrames);
     ring->mask = ring->capacity - 1;
@@ -115,13 +116,14 @@ struct NRTRenderContext {
 
     _Atomic float peak[2];
 
-    float tap[NRT_TAP_SIZE];
+    _Atomic float tap[NRT_TAP_SIZE];
     _Atomic uint32_t tapWrite;
 
     uint64_t rng; // render-thread only
 };
 
 NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
+    if (!ring) return NULL;
     NRTRenderContext *ctx = calloc(1, sizeof(NRTRenderContext));
     if (!ctx) return NULL;
     ctx->ring = ring;
@@ -137,6 +139,7 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->peak[0], 0.f);
     atomic_init(&ctx->peak[1], 0.f);
     atomic_init(&ctx->tapWrite, 0);
+    for (uint32_t i = 0; i < NRT_TAP_SIZE; i++) atomic_init(&ctx->tap[i], 0.f);
     ctx->rng = 0x9E3779B97F4A7C15ull;
     return ctx;
 }
@@ -149,7 +152,7 @@ void nrt_context_destroy(NRTRenderContext *ctx) {
 
 void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBits) {
     atomic_store(&ctx->ditherBits, ditherBits);
-    atomic_store(&ctx->gain, gain);
+    atomic_store(&ctx->gain, isfinite(gain) && gain >= 0 ? gain : 0.0);
 }
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
@@ -166,7 +169,7 @@ uint32_t nrt_context_copy_tap(const NRTRenderContext *ctx, float *out, uint32_t 
     if (count > NRT_TAP_SIZE) count = NRT_TAP_SIZE;
     uint32_t w = atomic_load_explicit(&ctx->tapWrite, memory_order_acquire);
     uint32_t start = (w - count) & (NRT_TAP_SIZE - 1);
-    for (uint32_t i = 0; i < count; i++) out[i] = ctx->tap[(start + i) & (NRT_TAP_SIZE - 1)];
+    for (uint32_t i = 0; i < count; i++) out[i] = atomic_load_explicit(&ctx->tap[(start + i) & (NRT_TAP_SIZE - 1)], memory_order_relaxed);
     return count;
 }
 
@@ -217,7 +220,7 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
         const float al = fabsf(l), ar = fabsf(r);
         if (al > p0) p0 = al;
         if (ar > p1) p1 = ar;
-        ctx->tap[tw & (NRT_TAP_SIZE - 1)] = 0.5f * (l + r);
+        atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
     }
     atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
@@ -226,6 +229,7 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
 }
 
 void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t frames, uint32_t outChannels) {
+    if (!out || outChannels == 0) return;
     const uint32_t ch = nrt_ring_channels(ctx->ring);
     uint32_t done = 0;
     while (done < frames) {
@@ -273,9 +277,10 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
         for (uint32_t bi = 0; bi < outOutputData->mNumberBuffers; bi++) {
             AudioBuffer *b = &outOutputData->mBuffers[bi];
             const uint32_t bch = b->mNumberChannels ? b->mNumberChannels : 1;
+            const uint32_t capacity = b->mDataByteSize / (uint32_t)(sizeof(float) * bch);
             float *o = (float *)b->mData;
             if (!o) { deviceChannel += bch; continue; }
-            for (uint32_t f = 0; f < n; f++) {
+            for (uint32_t f = 0; f < n && done + f < capacity; f++) {
                 for (uint32_t c = 0; c < bch; c++) {
                     const uint32_t src = deviceChannel + c;
                     o[(size_t)(done + f) * bch + c] = src < ch ? ctx->scratch[(size_t)f * ch + src] : 0.f;

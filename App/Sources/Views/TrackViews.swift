@@ -9,7 +9,7 @@ import SwiftUI
 struct TrackRow: Identifiable, Hashable {
     let track: Track
     let index: Int
-    var id: Int64 { track.id ?? -Int64(index) }
+    var id: Int64 { Int64(index) }
 }
 
 struct TrackTable: View {
@@ -82,19 +82,22 @@ struct TrackTable: View {
         .scrollContentBackground(.hidden)
         .background(Palette.window)
         .contextMenu(forSelectionType: Int64.self) { ids in
-            let chosen = tracks.filter { ids.contains($0.id ?? -1) }
-            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: tracks) }
+            let chosenRows = rows.filter { ids.contains($0.id) }
+            let chosen = chosenRows.map(\.track)
+            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: tracks, positions: Set(chosenRows.map(\.index))) }
         } primaryAction: { ids in
             guard let first = ids.first, let index = rows.firstIndex(where: { $0.id == first }) else { return }
             model.player.play(rows.map(\.track), startAt: index)
         }
-        .onAppear { selection = model.selectedTrackIDs.intersection(rows.map(\.id)) }
+        .onAppear { selection = Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id)) }
         .onChange(of: model.selectedTrackIDs) { _, new in
-            let visible = new.intersection(rows.map(\.id))
+            let selectedTracks = Set(rows.filter { selection.contains($0.id) }.compactMap { $0.track.id })
+            guard selectedTracks != new else { return }
+            let visible = Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id))
             if visible != selection { selection = visible }
         }
         .onChange(of: selection) { _, new in
-            model.selectedTrackIDs = new
+            model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
         .onKeyPress(.return) {
@@ -138,6 +141,7 @@ struct TrackMenu: View {
     let tracks: [Track]
     var playlist: Playlist? = nil
     var all: [Track] = []
+    var positions: Set<Int>? = nil
 
     var body: some View {
         Button("Play") { model.player.play(tracks) }
@@ -161,7 +165,11 @@ struct TrackMenu: View {
             Divider()
             Button("Remove from Playlist", role: .destructive) {
                 let remove = Set(tracks.compactMap(\.id))
-                model.library.setPlaylistOrder(all.compactMap(\.id).filter { !remove.contains($0) }, playlist: playlist)
+                let remaining = all.enumerated().filter { index, track in
+                    if let positions { return !positions.contains(index) }
+                    return !remove.contains(track.id ?? -1)
+                }.compactMap { $0.element.id }
+                model.library.setPlaylistOrder(remaining, playlist: playlist)
             }
         }
     }

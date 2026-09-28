@@ -28,7 +28,7 @@ public enum FormatPlanner {
         // DSD: native DoP when the user has confirmed the DAC understands it and the carrier rate exists.
         if source.encoding == .dsd {
             let carrier = dopCarrierRate(source.sampleRate)
-            if device.supportsDoP, device.supports(rate: carrier), device.bestIntegerBitDepth(at: carrier) >= 24 {
+            if channels == source.channels, device.supportsDoP, device.supports(rate: carrier), device.bestIntegerBitDepth(at: carrier) >= 24 {
                 return OutputPlan(mode: .dop, deviceSampleRate: carrier, decodedSampleRate: carrier,
                                   physicalBitDepth: device.bestIntegerBitDepth(at: carrier), channels: channels,
                                   dsdConvertedToPCM: false,

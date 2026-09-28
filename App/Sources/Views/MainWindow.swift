@@ -60,6 +60,7 @@ struct MainWindow: View {
         }
         .overlay(alignment: .top) { ErrorBanner() }
         .task { model.runDeveloperHooks(openWindow: openWindow) }
+        .onOpenURL { model.openAudio($0) }
     }
 }
 
@@ -115,7 +116,7 @@ struct ErrorBanner: View {
             .padding(.top, 12)
             .transition(.move(edge: .top).combined(with: .opacity))
             .task(id: message) {
-                try? await Task.sleep(for: .seconds(8))
+                do { try await Task.sleep(for: .seconds(8)) } catch { return }
                 dismiss()
             }
         }
