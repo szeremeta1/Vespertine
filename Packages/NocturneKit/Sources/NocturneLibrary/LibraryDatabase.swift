@@ -338,7 +338,7 @@ public extension LibraryDatabase {
             guard let id = playlist.id else { return [] }
             return try Track.fetchAll(db, sql: """
                 SELECT track.* FROM playlistItem JOIN track ON track.id = playlistItem.trackId
-                WHERE playlistItem.playlistId = ? ORDER BY playlistItem.position
+                WHERE playlistItem.playlistId = ? AND track.isMissing = 0 ORDER BY playlistItem.position
                 """, arguments: [id])
         }
     }

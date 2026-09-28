@@ -37,6 +37,12 @@ final class NetworkShareManager {
     private let pathMonitor = NWPathMonitor()
     private var connecting: Set<Int64> = []
     private var healthTask: Task<Void, Never>?
+    private var freshnessTask: Task<Void, Never>?
+    /// Set by the app: whether music is playing (or starting) from a share. Rescans wait for it.
+    var isStreamingPlayback: @MainActor () -> Bool = { false }
+    /// How old a share's last scan may get before it's rescanned (file-system events don't cross
+    /// the network, so this is how additions and deletions on the server show up).
+    static let rescanInterval: TimeInterval = 30 * 60
     private var observers: [NSObjectProtocol] = []
     private var networkWasUp = true
 
@@ -100,6 +106,12 @@ final class NetworkShareManager {
             Task { @MainActor in self?.volumeUnmounted(volume) }
         })
 
+        freshnessTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(300))
+                await self?.rescanStale()
+            }
+        }
         healthTask = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(45))
@@ -162,6 +174,29 @@ final class NetworkShareManager {
         }
     }
 
+    /// Rescans connected shares whose last scan is older than `rescanInterval` (incremental: only
+    /// new or changed files are read; files gone from the server are marked missing).
+    func rescanStale() async {
+        for source in sources where status(of: source).isConnected {
+            let age = source.lastScannedAt.map { Date().timeIntervalSince($0) } ?? .infinity
+            guard age > Self.rescanInterval else { continue }
+            await rescanWhenIdle(source)
+        }
+    }
+
+    /// The server's analysis run (nocturne-analyze) finished after our last scan: its files changed
+    /// or were re-checked, so rescan now rather than waiting.
+    func serverReported(_ status: ServerAnalysisStatus, for sourceID: Int64) async {
+        guard !status.isRunning, let source = sources.first(where: { $0.id == sourceID }), self.status(of: source).isConnected,
+              (source.lastScannedAt ?? .distantPast) < status.updated else { return }
+        await rescanWhenIdle(source)
+    }
+
+    private func rescanWhenIdle(_ source: LibrarySource) async {
+        guard library.scanProgress == nil, !isStreamingPlayback() else { return }
+        await library.scan(source)
+    }
+
     func reconnectAll() async {
         for source in sources { await connect(source) }
     }
@@ -194,8 +229,8 @@ final class NetworkShareManager {
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
             // File-system events don't cross the network: index new shares, and look for changes on
-            // shares not checked for a day (incremental, so only new or changed files are read).
-            let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > 86_400 } ?? true
+            // shares not checked for half an hour (incremental, so only new or changed files are read).
+            let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
             if scanIfNew, stale, library.scanProgress == nil, var fresh = sources.first(where: { $0.id == id }) {
                 fresh.path = root.path
                 await library.scan(fresh)

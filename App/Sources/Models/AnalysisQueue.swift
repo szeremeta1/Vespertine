@@ -30,6 +30,8 @@ final class AnalysisQueue {
     private let networkWidth = 3
     /// Set by the app: whether playback is playing or starting a track from a network share.
     var isStreamingPlayback: @MainActor () -> Bool = { false }
+    /// Called with each share's server status after a sync (the app rescans when the server ran after our last scan).
+    var onServerStatus: @MainActor (Int64, ServerAnalysisStatus) -> Void = { _, _ in }
 
     /// Network sources whose server publishes analysis results (`.nocturne/analysis.jsonl`).
     private(set) var serverIndexed: Set<Int64> = []
@@ -121,6 +123,7 @@ final class AnalysisQueue {
         }
         serverIndexed = indexed
         serverStatus = statuses
+        for (id, status) in statuses { onServerStatus(id, status) }
         if imported > 0 {
             serverImported += imported
             revision += 1

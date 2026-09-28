@@ -57,4 +57,31 @@ struct SmartRulesTests {
         #expect(SmartRule.Field.isDSD.operators == [.isTrue, .isFalse])
         #expect(SmartRule.number("24-bit") == 24 && SmartRule.number("1,000") == 1000)
     }
+
+    @Test("Files deleted from a source disappear from playlists after a rescan, and come back if restored")
+    func deletions() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("keep.wav"))
+        try makeWAV(dir.appendingPathComponent("gone.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let playlist = try db.createPlaylist(name: "Mix")
+        try db.append(trackIDs: try db.allTracks().compactMap(\.id), to: try #require(playlist.id))
+        #expect(try db.tracks(in: playlist).count == 2)
+
+        let aside = dir.deletingLastPathComponent().appendingPathComponent("aside-\(UUID()).wav")
+        try FileManager.default.moveItem(at: dir.appendingPathComponent("gone.wav"), to: aside)
+        let summary = try await scanner.scan(source)
+        #expect(summary.missing == 1)
+        #expect(try db.tracks(in: playlist).map { ($0.filePath as NSString).lastPathComponent } == ["keep.wav"])
+        #expect(try db.allTracks().count == 1)
+
+        try FileManager.default.moveItem(at: aside, to: dir.appendingPathComponent("gone.wav"))
+        try await scanner.scan(source)
+        #expect(try db.tracks(in: playlist).count == 2)
+    }
 }
