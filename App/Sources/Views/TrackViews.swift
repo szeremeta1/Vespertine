@@ -217,9 +217,12 @@ struct SongsView: View {
     let tracks: [Track]?
     @State private var loaded: [Track] = []
     @State private var filter: AnalysisFilter = .all
+    @State private var genre: String?
 
     var body: some View {
-        let shown = filter == .all ? loaded : loaded.filter(filter.matches)
+        let shown = loaded.filter { t in
+            (filter == .all || filter.matches(t)) && (genre.map { Genres.keys(t.genre).contains($0) } ?? true)
+        }
         VStack(spacing: 0) {
             PageHeader(title: title, meta: "\(shown.count.formatted()) tracks · \(shown.reduce(0) { $0 + $1.duration }.longDuration)") {
                 Menu {
@@ -233,6 +236,19 @@ struct SongsView: View {
                     Button("Analyze Tracks Without Results") { model.analysis.analyzeNow(loaded.filter(AnalysisFilter.notAnalyzed.matches)) }
                 } label: {
                     Label(filter == .all ? "Analysis" : filter.label, systemImage: filter == .all ? "waveform.badge.magnifyingglass" : "line.3.horizontal.decrease.circle.fill")
+                }
+                .menuStyle(.button)
+                .buttonStyle(QuietButtonStyle())
+                .fixedSize()
+                Menu {
+                    Picker("Genre", selection: $genre) {
+                        Text("All Genres").tag(String?.none)
+                        ForEach(model.library.genres) { g in Text(g.name).tag(Optional(g.key)) }
+                    }
+                    .pickerStyle(.inline)
+                } label: {
+                    Label(genre.flatMap { k in model.library.genres.first { $0.key == k }?.name } ?? "Genre",
+                          systemImage: genre == nil ? "guitars" : "line.3.horizontal.decrease.circle.fill")
                 }
                 .menuStyle(.button)
                 .buttonStyle(QuietButtonStyle())
@@ -254,14 +270,20 @@ struct SearchResultsView: View {
     @State private var results: [Track] = []
     @State private var albums: [Album] = []
     @State private var artists: [LibraryDatabase.ArtistSummary] = []
+    @State private var genres: [GenreSummary] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta) { EmptyView() }
-            if results.isEmpty && albums.isEmpty && artists.isEmpty {
+            if results.isEmpty && albums.isEmpty && artists.isEmpty && genres.isEmpty {
                 Text("Nothing matches.").font(Typeface.ui(13)).foregroundStyle(Palette.text3)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
+                if !genres.isEmpty {
+                    shelf("Genres", count: genres.count) {
+                        ForEach(genres) { GenreTile(genre: $0).frame(width: 120) }
+                    }
+                }
                 if !artists.isEmpty {
                     shelf("Artists", count: artists.count) {
                         ForEach(artists) { ArtistTile(artist: $0).frame(width: 136) }
@@ -287,9 +309,11 @@ struct SearchResultsView: View {
             let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
             func matches(_ text: String) -> Bool { words.allSatisfy { text.localizedStandardContains($0) } }
             func startsWith(_ text: String) -> Int { text.localizedStandardRange(of: query)?.lowerBound == text.startIndex ? 0 : 1 }
+            // Albums match on title, artist, genre and year ("jazz", "1977", "miles 1959").
             albums = model.library.albums
-                .filter { matches("\($0.title) \($0.artist)") }
+                .filter { matches("\($0.title) \($0.artist) \(Genres.split($0.genre).joined(separator: " ")) \($0.year.map(String.init) ?? "")") }
                 .sorted { (startsWith($0.title), $0.title) < (startsWith($1.title), $1.title) }
+            genres = model.library.genres.filter { matches($0.name) || Genres.key($0.name).contains(Genres.key(query)) }
             artists = model.library.artists
                 .filter { matches($0.name) }
                 .sorted { (startsWith($0.name), -$0.trackCount) < (startsWith($1.name), -$1.trackCount) }
@@ -298,7 +322,9 @@ struct SearchResultsView: View {
 
     private var meta: String {
         func n(_ c: Int, _ word: String) -> String { "\(c) \(word)\(c == 1 ? "" : "s")" }
-        return [n(artists.count, "artist"), n(albums.count, "album"), n(results.count, "song")].joined(separator: " · ")
+        let parts: [String] = (genres.isEmpty ? [] : [n(genres.count, "genre")])
+            + [n(artists.count, "artist"), n(albums.count, "album"), n(results.count, "song")]
+        return parts.joined(separator: " · ")
     }
 
     private func sectionTitle(_ title: String, count: Int) -> some View {

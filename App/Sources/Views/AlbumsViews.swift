@@ -46,6 +46,28 @@ struct AlbumsGridView: View {
             VStack(alignment: .leading, spacing: 0) {
                 PageHeader(title: title, meta: meta(albums)) {
                     if albumsOverride == nil && forcedSort == nil {
+                        Menu {
+                            Picker("Genre", selection: $library.genreFilter) {
+                                Text("All Genres").tag(String?.none)
+                                ForEach(library.genres) { g in Text("\(g.name)  (\(g.albumCount))").tag(Optional(g.key)) }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            Label(library.genreFilter.flatMap { k in library.genres.first { $0.key == k }?.name } ?? "Genre",
+                                  systemImage: library.genreFilter == nil ? "guitars" : "line.3.horizontal.decrease.circle.fill")
+                        }
+                        .menuStyle(.button).buttonStyle(QuietButtonStyle()).fixedSize()
+                        Menu {
+                            Picker("Decade", selection: $library.decadeFilter) {
+                                Text("All Years").tag(Int?.none)
+                                ForEach(library.decades, id: \.self) { d in Text("\(String(d))s").tag(Optional(d)) }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            Label(library.decadeFilter.map { "\(String($0))s" } ?? "Decade",
+                                  systemImage: library.decadeFilter == nil ? "calendar" : "line.3.horizontal.decrease.circle.fill")
+                        }
+                        .menuStyle(.button).buttonStyle(QuietButtonStyle()).fixedSize()
                         Picker("Sort", selection: $library.albumSort) {
                             Text("Artist").tag(AlbumSort.artist)
                             Text("Title").tag(AlbumSort.title)
@@ -93,6 +115,10 @@ struct AlbumsGridView: View {
     private func meta(_ albums: [Album]) -> String {
         let s = model.library.stats
         if albumsOverride != nil || forcedSort != nil { return "\(albums.count) albums" }
+        let lib = model.library
+        if lib.formatFilter != .all || lib.genreFilter != nil || lib.decadeFilter != nil {
+            return "\(albums.count.formatted()) of \(s.albums.formatted()) albums"
+        }
         return "\(s.albums.formatted()) albums · \(s.tracks.formatted()) tracks · \(s.bytes.byteString)"
     }
 }
@@ -338,7 +364,8 @@ struct AlbumDetailView: View {
 
     private func subline(_ a: Album) -> String {
         var parts: [String] = []
-        if let g = a.genre { parts.append(g) }
+        let genres = Genres.split(a.genre)
+        if !genres.isEmpty { parts.append(genres.joined(separator: ", ")) }
         // "FLAC · 24/88.2 · 5.1" → "FLAC · 24-bit / 88.2 kHz · 5.1"
         let channelText = a.isMultichannel ? " · " + ChannelLayouts.name(channels: a.maxChannels) : ""
         let base = channelText.isEmpty ? a.formatSummary : String(a.formatSummary.dropLast(channelText.count))

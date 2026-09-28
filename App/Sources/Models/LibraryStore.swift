@@ -50,7 +50,9 @@ final class LibraryStore {
     let tagWriter: TagWriter
     let enricher: MetadataEnricher
 
-    private(set) var albums: [Album] = []
+    private(set) var albums: [Album] = [] { didSet { genres = Genres.summarize(albums) } }
+    /// Every genre in the library (normalized), for the Genres page and filters.
+    private(set) var genres: [GenreSummary] = []
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
     private(set) var playlists: [Playlist] = []
     private(set) var sources: [LibrarySource] = []
@@ -71,6 +73,9 @@ final class LibraryStore {
 
     var albumSort: AlbumSort = .artist { didSet { observeAlbums() } }
     var formatFilter: FormatFilter = .all
+    /// Albums page filters (nil = all): a genre key (see `Genres.key`) and a decade (1970 = the 1970s).
+    var genreFilter: String?
+    var decadeFilter: Int?
 
     private(set) var scanProgress: ScanProgress?
     private(set) var lastError: String?
@@ -96,7 +101,18 @@ final class LibraryStore {
         for task in tasks { task.cancel() }
     }
 
-    var filteredAlbums: [Album] { formatFilter == .all ? albums : albums.filter(formatFilter.matches) }
+    var filteredAlbums: [Album] {
+        albums.filter { a in
+            (formatFilter == .all || formatFilter.matches(a))
+                && (genreFilter.map { Genres.keys(a.genre).contains($0) } ?? true)
+                && (decadeFilter.map { Genres.decade(a.year) == $0 } ?? true)
+        }
+    }
+
+    func albums(genre key: String) -> [Album] { albums.filter { Genres.keys($0.genre).contains(key) } }
+
+    /// Decades present in the library, newest first.
+    var decades: [Int] { Array(Set(albums.compactMap { Genres.decade($0.year) })).sorted(by: >) }
 
     // MARK: Observation
 

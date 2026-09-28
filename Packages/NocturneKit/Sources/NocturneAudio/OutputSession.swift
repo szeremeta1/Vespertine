@@ -212,6 +212,7 @@ public enum DeviceControl {
     /// match `plan`. Multi-stream devices (aggregates, many interfaces and receivers) keep each
     /// stream's channel layout; channels are spread across the streams in order.
     static func apply(plan: OutputPlan, to device: AudioObjectID) throws {
+        DeviceRestore.remember(device)
         let rate = plan.deviceSampleRate
         let streams = DeviceQuery.outputStreams(device)
         if streams.count == 1, let stream = streams.first {

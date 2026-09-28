@@ -164,6 +164,11 @@ struct PlaybackSettings: View {
                     Text("10 minutes").tag(600.0)
                 }
                 .disabled(!s.exclusiveMode)
+                Picker("When Nocturne quits, set the device to", selection: $s.deviceOnQuit) {
+                    ForEach(DeviceOnQuit.allCases) { Text($0.label).tag($0) }
+                }
+                Text("\u{201C}Put it back as it was\u{201D} restores each device Nocturne switched to the sample rate and bit depth it had before, so other apps (and tools like LosslessSwitcher) take over from where they left off.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {
                 Toggle("Mac sound output follows Nocturne while playing", isOn: $s.systemOutputFollowsPlayback)

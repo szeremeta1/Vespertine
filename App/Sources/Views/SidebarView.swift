@@ -18,6 +18,7 @@ struct SidebarView: View {
                 row(.albums, "Albums", "square.grid.2x2", count: model.library.stats.albums)
                 row(.artists, "Artists", "person", count: model.library.stats.artists)
                 row(.songs, "Songs", "music.note", count: model.library.stats.tracks)
+                row(.genres, "Genres", "guitars", count: model.library.genres.count)
                 row(.recentlyAdded, "Recently Added", "clock", count: nil)
             }
 

@@ -209,7 +209,7 @@ public extension LibraryDatabase {
         SELECT albumKey AS key,
                coalesce(album, 'Unknown Album') AS title,
                coalesce(albumArtist, artist, 'Unknown Artist') AS artist,
-               max(year) AS year, max(genre) AS genre,
+               max(year) AS year, group_concat(DISTINCT genre) AS genre,
                count(*) AS trackCount, sum(duration) AS duration,
                max(artworkKey) AS artworkKey,
                max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,

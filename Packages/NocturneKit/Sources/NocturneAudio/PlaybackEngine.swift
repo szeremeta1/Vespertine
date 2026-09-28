@@ -88,6 +88,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case seek(TimeInterval)
         case settingsChanged(EngineSettings)
         case devicesChanged, queueChanged
+        case barrier(DispatchSemaphore)
     }
 
     private struct Shared {
@@ -232,6 +233,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     public func pause() { post(.pause) }
     public func resume() { post(.resume) }
     public func stop() { post(.stop) }
+    /// Stops and releases the device, waiting (up to `timeout`) until it's done. For quitting.
+    public func stopAndWait(timeout: TimeInterval = 2) {
+        let done = DispatchSemaphore(value: 0)
+        post(.stop)
+        post(.barrier(done))
+        _ = done.wait(timeout: .now() + timeout)
+    }
     public func seek(to seconds: TimeInterval) {
         guard seconds.isFinite else { return }
         post(.seek(max(0, seconds)))
@@ -314,6 +322,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func handle(_ command: Command) {
         switch command {
+        case .barrier(let done):
+            done.signal()
         case .play(let item):
             teardownDecoding()
             session?.flush()

@@ -74,6 +74,15 @@ if args.count >= 3, args[1] == "forensics" {
     exit(0)
 }
 
+if args.count >= 3, args[1] == "restore-test" {
+    // restore-test <device name>: switches the device the way playback does (no audio), then checks
+    // each quit option (44.1/16, 48/24, restore) puts it where it should.
+    guard let d = OutputDevices.list(dopEnabledUIDs: []).first(where: { $0.name.localizedCaseInsensitiveContains(args[2]) }) else { print("no such device"); exit(1) }
+    let steps = DeviceRestore.exercise(d)
+    for s in steps { print("\(d.name): \(s.step) → \(s.rate) Hz / \(s.bits)-bit") }
+    exit(steps.first?.rate == steps.last?.rate && steps.first?.bits == steps.last?.bits ? 0 : 1)
+}
+
 if args.count >= 3, args[1] == "analyze-json" {
     // One JSON line per file (compare with `nocturne-analyze file`).
     let encoder = JSONEncoder()
