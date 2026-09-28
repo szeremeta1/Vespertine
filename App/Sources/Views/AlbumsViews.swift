@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import NocturneAudio
 import NocturneLibrary
 import SwiftUI
 
@@ -202,6 +203,9 @@ struct AlbumMenu: View {
             model.showInspector = true
         }
         Button("Enrich Metadata…") { model.enrichAlbumKeys = [album.key] }
+        if tracks.contains(where: \.isMultichannel) {
+            Button("Export for Spatial Audio…") { model.spatialExportTracks = tracks }
+        }
         Button("Analyze") {
             model.analysis.analyzeNow(tracks)
             model.selectedTrackIDs = Set(tracks.prefix(1).compactMap(\.id))
@@ -328,7 +332,10 @@ struct AlbumDetailView: View {
     private func subline(_ a: Album) -> String {
         var parts: [String] = []
         if let g = a.genre { parts.append(g) }
-        parts.append(a.formatSummary.replacingOccurrences(of: "/", with: "-bit / ").appending(a.isDSD || !a.formatSummary.contains("/") ? "" : " kHz"))
+        // "FLAC · 24/88.2 · 5.1" → "FLAC · 24-bit / 88.2 kHz · 5.1"
+        let channelText = a.isMultichannel ? " · " + ChannelLayouts.name(channels: a.maxChannels) : ""
+        let base = channelText.isEmpty ? a.formatSummary : String(a.formatSummary.dropLast(channelText.count))
+        parts.append(base.replacingOccurrences(of: "/", with: "-bit / ").appending(a.isDSD || !base.contains("/") ? "" : " kHz") + channelText)
         parts.append(a.totalSize.byteString)
         if let p = a.sourcePath { parts.append((p as NSString).abbreviatingWithTildeInPath) }
         return parts.joined(separator: " · ")

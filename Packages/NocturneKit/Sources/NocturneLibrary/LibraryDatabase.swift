@@ -206,7 +206,7 @@ public extension LibraryDatabase {
                max(year) AS year, max(genre) AS genre,
                count(*) AS trackCount, sum(duration) AS duration,
                max(artworkKey) AS artworkKey,
-               max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits,
+               max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,
                max(codec) AS codec, min(isLossless) AS lossless, max(bitrate) AS bitrate,
                max(addedAt) AS addedAt, sum(fileSize) AS totalSize, min(filePath) AS anyPath,
                min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey
@@ -222,6 +222,7 @@ public extension LibraryDatabase {
         let codec: String = row["codec"]
         let lossless: Bool = row["lossless"]
         let bitrate: Double? = row["bitrate"]
+        let maxChannels: Int = row["maxChannels"] ?? 2
         let rateText = rate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(rate / 1000)) : String(format: "%.1f", rate / 1000)
         let summary: String = if isDSD {
             "DSD\(Int((rate / 44_100).rounded()))"
@@ -232,11 +233,13 @@ public extension LibraryDatabase {
         } else {
             "\(codec) · \(rateText) kHz"
         }
+        let channelText = maxChannels > 2 ? " · " + ChannelLayouts.name(channels: maxChannels) : ""
         return Album(key: row["key"], title: row["title"], artist: row["artist"], year: row["year"], genre: row["genre"],
                      trackCount: row["trackCount"], duration: row["duration"], artworkKey: row["artworkKey"],
-                     formatSummary: summary, codec: codec, maxBitDepth: bits, maxSampleRate: rate, isHiRes: isDSD || (lossless && ((bits ?? 16) > 16 || rate > 48_000)),
+                     formatSummary: summary + channelText, codec: codec, maxBitDepth: bits, maxSampleRate: rate, isHiRes: isDSD || (lossless && ((bits ?? 16) > 16 || rate > 48_000)),
                      isDSD: isDSD, addedAt: row["addedAt"], totalSize: row["totalSize"],
-                     sourcePath: (row["anyPath"] as String?).map { ($0 as NSString).deletingLastPathComponent })
+                     sourcePath: (row["anyPath"] as String?).map { ($0 as NSString).deletingLastPathComponent },
+                     maxChannels: maxChannels)
     }
 
     func albums(sort: AlbumSort = .artist) throws -> [Album] {

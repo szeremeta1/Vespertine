@@ -9,6 +9,7 @@
 #ifndef CNOCTURNE_RT_H
 #define CNOCTURNE_RT_H
 
+#include <AudioToolbox/AudioToolbox.h>
 #include <CoreAudio/CoreAudio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -80,6 +81,31 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice,
                            AudioBufferList *_Nonnull outOutputData,
                            const AudioTimeStamp *_Nonnull inOutputTime,
                            void *_Nullable inClientData);
+
+// MARK: - Output processor (spatial audio), run on the I/O thread after gain and meters
+
+/// Turns `frames` of `inChannels` interleaved samples into `outChannels` interleaved samples.
+typedef void (*NRTProcessFn)(void *_Nullable user, const float *_Nonnull in, uint32_t inChannels,
+                             float *_Nonnull out, uint32_t outChannels, uint32_t frames);
+
+/// Installs (or removes, with fn == NULL) a processor. Call only while the device is stopped.
+/// `outChannels` is how many channels the processor writes per frame. Returns false if out of memory.
+bool nrt_context_set_processor(NRTRenderContext *_Nonnull ctx, NRTProcessFn _Nullable fn,
+                               void *_Nullable user, uint32_t outChannels);
+
+// MARK: - Spatial audio bridge: pulls an AUSpatialMixer from the I/O thread
+
+typedef struct NRTSpatial NRTSpatial;
+
+/// `au` must be an initialized AUSpatialMixer with a non-interleaved Float32 input of `inChannels`
+/// channels on bus 0 and a non-interleaved stereo Float32 output; `maxFrames` ≥ any slice rendered.
+NRTSpatial *_Nullable nrt_spatial_create(AudioUnit _Nonnull au, uint32_t inChannels, uint32_t maxFrames);
+void nrt_spatial_destroy(NRTSpatial *_Nullable spatial);
+/// Sets the mixer's input render callback to feed it from the bridge.
+OSStatus nrt_spatial_install(NRTSpatial *_Nonnull spatial);
+/// NRTProcessFn: pass with the NRTSpatial as `user`.
+void nrt_spatial_process(void *_Nullable user, const float *_Nonnull in, uint32_t inChannels,
+                         float *_Nonnull out, uint32_t outChannels, uint32_t frames);
 
 /// Renders `frames` into a caller buffer exactly as the IOProc would (used by tests).
 void nrt_context_render_interleaved(NRTRenderContext *_Nonnull ctx, float *_Nonnull out,

@@ -79,6 +79,10 @@ enum DeveloperHooks {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []
         case "connectServer": model.showConnectServer = true
+        case "spatialExport":
+            if let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {
+                model.spatialExportTracks = model.library.tracks(albumKey: album.key)
+            }
         default: break
         }
     }

@@ -198,3 +198,21 @@ public enum SourceInspector {
         return (probed.format, seconds)
     }
 }
+
+extension SourceInspector {
+    /// Describes the decoder's channel layout (diagnostics).
+    public static func probeLayout(_ url: URL) throws -> String {
+        let probed = try SourceOpener.probe(url)
+        guard let pcm = probed.pcm else { return "n/a (not PCM)" }
+        guard let layout = pcm.processingFormat.channelLayout else { return "none (count only)" }
+        let tag = layout.layoutTag
+        if tag == kAudioChannelLayoutTag_UseChannelDescriptions {
+            let n = Int(layout.layout.pointee.mNumberChannelDescriptions)
+            let labels = withUnsafePointer(to: layout.layout.pointee.mChannelDescriptions) { p in
+                UnsafeBufferPointer(start: UnsafeRawPointer(p).assumingMemoryBound(to: AudioChannelDescription.self), count: n).map { $0.mChannelLabel }
+            }
+            return "descriptions \(labels)"
+        }
+        return String(format: "tag 0x%08X (%d ch)", tag, Int(tag & 0xFFFF))
+    }
+}

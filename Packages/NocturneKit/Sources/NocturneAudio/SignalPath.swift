@@ -33,7 +33,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.exclusive, !modifiesSamples,
+        guard deviceProfile.canBeBitPerfect, applied.exclusive, !modifiesSamples, plan.spatial == .off,
               plan.channels == source.channels, applied.virtualChannels >= source.channels else { return false }
         switch plan.mode {
         case .dop:
@@ -52,6 +52,8 @@ public struct SignalPath: Sendable, Hashable {
     /// One-line state for badges and the menu bar.
     public var statusLine: String {
         if isBitPerfect { return plan.mode == .dop ? "NATIVE DSD · DoP" : "BIT-PERFECT" }
+        if plan.spatial != .off { return plan.spatial == .headTracked ? "SPATIAL · HEAD TRACKED" : "SPATIAL AUDIO" }
+        if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
             return deviceProfile.kind == .airPlay ? "AIRPLAY" : "BLUETOOTH · LOSSY"
         }

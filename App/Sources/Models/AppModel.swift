@@ -100,6 +100,8 @@ final class AppModel {
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
     var showConnectServer = false
+    /// Tracks to export for Spatial Audio (sheet shown while non-nil).
+    var spatialExportTracks: [Track]?
     /// nil = not shown; [] = whole library; otherwise these albums.
     var enrichAlbumKeys: [String]?
 
@@ -163,6 +165,11 @@ final class AppModel {
         let device = devices.device(uid: settings.selectedDeviceUID)
         player.engine.update(settings: settings.engineSettings(deviceHasHardwareVolume: device?.hasHardwareVolume ?? false))
         devices.watchVolume(of: device)
+    }
+
+    /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).
+    func engineSpatialMode(for device: OutputDevice) -> SpatialMode {
+        settings.engineSettings(deviceHasHardwareVolume: device.hasHardwareVolume).spatialMode(for: device)
     }
 
     func selectDevice(_ uid: String?) {

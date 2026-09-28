@@ -5,6 +5,7 @@
 
 import Foundation
 import GRDB
+import NocturneAudio
 
 /// A folder or volume the library indexes.
 public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, FetchableRecord, MutablePersistableRecord {
@@ -145,7 +146,13 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var albumKey: String { "\(displayAlbumArtist.lowercased())\u{1F}\(displayAlbum.lowercased())" }
 
     /// "FLAC · 24/96", "DSD128", "MP3 · 320k"
-    public var formatSummary: String {
+    /// " · 5.1" for multichannel tracks, empty for mono/stereo.
+    public var channelSuffix: String { channels > 2 ? " · " + ChannelLayouts.name(channels: channels) : "" }
+    public var isMultichannel: Bool { channels > 2 }
+
+    public var formatSummary: String { baseFormatSummary + channelSuffix }
+
+    private var baseFormatSummary: String {
         if isDSD { return "DSD\(Int((sampleRate / 44_100).rounded()))" }
         let rate = sampleRate.truncatingRemainder(dividingBy: 1000) == 0
             ? String(Int(sampleRate / 1000)) : String(format: "%.1f", sampleRate / 1000)
@@ -218,6 +225,9 @@ public struct Album: Sendable, Hashable, Identifiable {
     public var addedAt: Date
     public var totalSize: Int64
     public var sourcePath: String?
+    /// Most channels on any track (2 for stereo albums).
+    public var maxChannels: Int = 2
+    public var isMultichannel: Bool { maxChannels > 2 }
 }
 
 // Only descriptive fields are overlaid: rescans still refresh file availability and CUE boundaries.

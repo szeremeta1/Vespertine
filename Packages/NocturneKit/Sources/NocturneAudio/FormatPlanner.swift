@@ -13,7 +13,25 @@ public enum FormatPlanner {
     /// DSD bit rate → carrier PCM rate for DSD-over-PCM (16 DSD bits per 24-bit frame).
     public static func dopCarrierRate(_ dsdRate: Double) -> Double { dsdRate / 16 }
 
-    public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource) -> OutputPlan {
+    public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource,
+                            spatial: SpatialMode = .off) -> OutputPlan {
+        var plan = basePlan(source: source, device: rawDevice, policy: policy)
+        // Multichannel music: Spatial Audio on headphones, every channel on multichannel outputs,
+        // otherwise a standard downmix (the converter mixes by channel layout).
+        guard plan.mode == .pcm, source.channels > 2 else { return plan }
+        let name = ChannelLayouts.name(channels: source.channels)
+        if spatial != .off, rawDevice.outputChannels >= 2 {
+            plan.channels = source.channels
+            plan.deviceChannelCount = 2
+            plan.spatial = spatial
+            plan.reason = "\(name) rendered with Spatial Audio (\(spatial == .headTracked ? "head tracked" : "fixed")). " + plan.reason
+        } else if plan.channels < source.channels {
+            plan.reason = "\(name) downmixed to \(ChannelLayouts.name(channels: plan.channels)). " + plan.reason
+        }
+        return plan
+    }
+
+    static func basePlan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy) -> OutputPlan {
         let channels = max(1, min(source.channels, max(rawDevice.outputChannels, 1)))
         // Ignore rates whose only formats carry fewer channels than we need
         // (e.g. AirPods' 24 kHz mono hands-free mode).

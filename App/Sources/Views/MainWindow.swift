@@ -54,6 +54,9 @@ struct MainWindow: View {
             MusicBrainzSheet(tracks: request.tracks)
                 .environment(model)
         }
+        .sheet(isPresented: Binding(get: { model.spatialExportTracks != nil }, set: { if !$0 { model.spatialExportTracks = nil } })) {
+            SpatialExportSheet(tracks: model.spatialExportTracks ?? []).environment(model)
+        }
         .sheet(isPresented: $model.showConnectServer) {
             ConnectServerSheet().environment(model)
         }

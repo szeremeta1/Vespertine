@@ -149,6 +149,17 @@ struct SignalPathView: View {
                               value: "\(SampleRate.format(path.applied.sampleRate)) kHz · native", tone: .good))
             }
         }
+        if path.plan.spatial != .off {
+            s.append(Step(title: "Spatial Audio",
+                          detail: "\(ChannelLayouts.name(channels: src.channels)) as virtual speakers · Apple spatial renderer, personalized profile if set up",
+                          value: path.plan.spatial == .headTracked ? "head tracked" : "fixed", tone: .changed))
+        } else if path.plan.channels < src.channels {
+            s.append(Step(title: "Downmix", detail: "Standard channel-layout mix (centre and surrounds folded in)",
+                          value: "\(ChannelLayouts.name(channels: src.channels)) → \(ChannelLayouts.name(channels: path.plan.channels))", tone: .changed))
+        } else if src.channels > 2 {
+            s.append(Step(title: "Channels", detail: "Every channel to its speaker (device layout)",
+                          value: "\(ChannelLayouts.name(channels: src.channels)) discrete", tone: .good))
+        }
         if let rg = path.replayGainDB, rg != 0 {
             s.append(Step(title: "ReplayGain", detail: "Loudness normalisation", value: String(format: "%+.1f dB", rg), tone: .changed))
         }
@@ -204,7 +215,7 @@ struct SignalPathView: View {
     }
 
     private func channelName(_ n: Int) -> String {
-        switch n { case 1: "mono"; case 2: "stereo"; default: "\(n) ch" }
+        n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? "mono" : "stereo")
     }
 }
 

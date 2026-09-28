@@ -116,11 +116,19 @@ public struct OutputPlan: Sendable, Hashable {
     public var resamples: Bool { abs(decodedSampleRate - deviceSampleRate) > 0.5 }
     public var dsdConvertedToPCM: Bool
     public var reason: String
+    /// Channels the device receives when they differ from `channels` (Spatial Audio renders to 2).
+    public var deviceChannelCount: Int? = nil
+    /// Multichannel rendered for headphones with Spatial Audio.
+    public var spatial: SpatialMode = .off
+
+    /// Channels the decoded stream (and ring) carries: `channels`. Channels written to the device:
+    public var deviceChannels: Int { deviceChannelCount ?? channels }
 
     /// Two plans can be joined gaplessly when the device does not need to be touched.
     public func isDeviceCompatible(with other: OutputPlan) -> Bool {
         mode == other.mode && abs(deviceSampleRate - other.deviceSampleRate) < 0.5
             && physicalBitDepth == other.physicalBitDepth && channels == other.channels
+            && deviceChannels == other.deviceChannels && spatial == other.spatial
     }
 }
 

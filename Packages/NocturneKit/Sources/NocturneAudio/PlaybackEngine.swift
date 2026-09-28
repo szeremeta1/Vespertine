@@ -45,8 +45,14 @@ public struct EngineSettings: Sendable, Equatable {
     public var releaseExclusiveAfterPause: TimeInterval = 30
     /// nil = no software volume (hardware or fixed).
     public var digitalVolumeDB: Double?
+    /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
+    public var spatialModes: [String: SpatialMode] = [:]
 
     public init() {}
+
+    public func spatialMode(for device: OutputDevice) -> SpatialMode {
+        spatialModes[device.uid] ?? (device.isAppleHeadphones ? .headTracked : .off)
+    }
 }
 
 public final class PlaybackEngine: @unchecked Sendable {
@@ -109,12 +115,14 @@ public final class PlaybackEngine: @unchecked Sendable {
         var framesProduced: UInt64 = 0
         var error: Error?
 
-        init(item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, path: SignalPath, chunk: AVAudioFrameCount) throws {
+        init(item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, path: SignalPath, chunk: AVAudioFrameCount,
+             layout: AVAudioChannelLayout? = nil) throws {
             self.item = item
             self.probed = probed
             self.decoder = decoder
             self.path = path
-            guard let outFormat = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true),
+            guard let outFormat = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels,
+                                                       interleaved: true, layout: layout),
                   let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat) else {
                 throw SourceOpenerError.unsupported(item.url)
             }
@@ -364,7 +372,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard let device = resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
         let probed = try SourceOpener.probe(resolve(item))
         let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                      policy: settings.ratePolicies[device.uid] ?? .matchSource)
+                                      policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                      spatial: settings.spatialMode(for: device))
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             try replaceSession(device: device, plan: plan)
         } else {
@@ -381,7 +390,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
-                                    chunk: chunkFrames)
+                                    chunk: chunkFrames, layout: session.decodedLayout)
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
                             startOffsetSeconds: actualOffset, durationSeconds: decoding.durationSeconds)]
@@ -460,7 +469,11 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func prefill() {
         guard let session else { return }
-        let target = min(Int(session.applied.sampleRate * 0.3), Int(nrt_ring_capacity(session.ring)) / 2)
+        // Network files (streamed, not yet cached) start with more in hand: a slow first read from
+        // a share must not become an audible gap.
+        let streaming = decoding.map { $0.item.cacheKey != nil && resolve($0.item) == $0.item.url } ?? false
+        let seconds = streaming ? 1.5 : 0.3
+        let target = min(Int(session.applied.sampleRate * seconds), Int(nrt_ring_capacity(session.ring)) / 2)
         // Bound work so a repeating empty/corrupt track cannot monopolize the engine thread.
         for _ in 0..<256 {
             if session.readableFrames >= target || !fill() { break }
@@ -543,12 +556,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             do {
                 let probed = try SourceOpener.probe(resolve(next))
                 let plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                              policy: settings.ratePolicies[device.uid] ?? .matchSource)
+                                              policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                              spatial: settings.spatialMode(for: device))
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
-                                         chunk: chunkFrames)
+                                         chunk: chunkFrames, layout: session.decodedLayout)
                     decoding = d
                     segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten,
                                             startOffsetSeconds: 0, durationSeconds: d.durationSeconds))
@@ -597,7 +611,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 let d = try Decoding(item: pending.item, probed: pending.probed, decoder: decoder,
                                      path: makePath(probed: pending.probed, plan: pending.plan, device: pending.device,
                                                     session: session, item: pending.item),
-                                     chunk: chunkFrames)
+                                     chunk: chunkFrames, layout: session.decodedLayout)
                 decoding = d
                 segments = [Segment(item: pending.item, path: d.path, startRingFrame: session.totalWritten,
                                     startOffsetSeconds: 0, durationSeconds: d.durationSeconds)]

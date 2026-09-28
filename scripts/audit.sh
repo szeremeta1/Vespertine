@@ -11,7 +11,7 @@ swift test --package-path Packages/NocturneKit -c release > "$out/release-tests.
 for sanitizer in address,undefined thread; do
   binary="$out/rt-${sanitizer//,/}-audit"
   clang -std=c11 -g -O1 -fsanitize="$sanitizer" -I Packages/NocturneKit/Sources/CNocturneRT/include \
-    tests/rt-audit.c Packages/NocturneKit/Sources/CNocturneRT/nocturne_rt.c -framework CoreAudio -o "$binary"
+    tests/rt-audit.c Packages/NocturneKit/Sources/CNocturneRT/nocturne_rt.c -framework CoreAudio -framework AudioToolbox -o "$binary"
   "$binary" > "$binary.log" 2>&1
 done
 clang --analyze -std=c11 -I Packages/NocturneKit/Sources/CNocturneRT/include \

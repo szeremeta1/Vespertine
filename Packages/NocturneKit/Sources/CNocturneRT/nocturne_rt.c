@@ -120,6 +120,12 @@ struct NRTRenderContext {
     _Atomic uint32_t tapWrite;
 
     uint64_t rng; // render-thread only
+
+    // Optional processor (set while stopped): scratch (ring channels) → processed (processedChannels).
+    NRTProcessFn processor;
+    void *processorUser;
+    uint32_t processedChannels;
+    float *processed;
 };
 
 NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
@@ -144,8 +150,24 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     return ctx;
 }
 
+bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *user, uint32_t outChannels) {
+    free(ctx->processed);
+    ctx->processed = NULL;
+    ctx->processor = NULL;
+    ctx->processorUser = NULL;
+    ctx->processedChannels = 0;
+    if (!fn || outChannels == 0) return true;
+    ctx->processed = calloc((size_t)ctx->scratchFrames * outChannels, sizeof(float));
+    if (!ctx->processed) return false;
+    ctx->processedChannels = outChannels;
+    ctx->processorUser = user;
+    ctx->processor = fn;
+    return true;
+}
+
 void nrt_context_destroy(NRTRenderContext *ctx) {
     if (!ctx) return;
+    free(ctx->processed);
     free(ctx->scratch);
     free(ctx);
 }
@@ -236,10 +258,17 @@ void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t 
         uint32_t n = frames - done;
         if (n > ctx->scratchFrames) n = ctx->scratchFrames;
         pull(ctx, n);
+        const float *src = ctx->scratch;
+        uint32_t srcCh = ch;
+        if (ctx->processor) {
+            ctx->processor(ctx->processorUser, ctx->scratch, ch, ctx->processed, ctx->processedChannels, n);
+            src = ctx->processed;
+            srcCh = ctx->processedChannels;
+        }
         for (uint32_t f = 0; f < n; f++) {
             float *o = out + (size_t)(done + f) * outChannels;
-            const float *s = ctx->scratch + (size_t)f * ch;
-            for (uint32_t c = 0; c < outChannels; c++) o[c] = c < ch ? s[c] : 0.f;
+            const float *s = src + (size_t)f * srcCh;
+            for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0.f;
         }
         done += n;
     }
@@ -273,6 +302,13 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
         uint32_t n = frames - done;
         if (n > ctx->scratchFrames) n = ctx->scratchFrames;
         pull(ctx, n);
+        const float *src = ctx->scratch;
+        uint32_t srcCh = ch;
+        if (ctx->processor) {
+            ctx->processor(ctx->processorUser, ctx->scratch, ch, ctx->processed, ctx->processedChannels, n);
+            src = ctx->processed;
+            srcCh = ctx->processedChannels;
+        }
         uint32_t deviceChannel = 0;
         for (uint32_t bi = 0; bi < outOutputData->mNumberBuffers; bi++) {
             AudioBuffer *b = &outOutputData->mBuffers[bi];
@@ -282,8 +318,8 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
             if (!o) { deviceChannel += bch; continue; }
             for (uint32_t f = 0; f < n && done + f < capacity; f++) {
                 for (uint32_t c = 0; c < bch; c++) {
-                    const uint32_t src = deviceChannel + c;
-                    o[(size_t)(done + f) * bch + c] = src < ch ? ctx->scratch[(size_t)f * ch + src] : 0.f;
+                    const uint32_t from = deviceChannel + c;
+                    o[(size_t)(done + f) * bch + c] = from < srcCh ? src[(size_t)f * srcCh + from] : 0.f;
                 }
             }
             deviceChannel += bch;
@@ -292,4 +328,93 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
     }
     atomic_fetch_add_explicit(&ctx->framesRendered, frames, memory_order_relaxed);
     return noErr;
+}
+
+// MARK: - Spatial audio bridge
+
+struct NRTSpatial {
+    AudioUnit au;
+    uint32_t inChannels;
+    uint32_t maxFrames;
+    float *in;            // inChannels planes of maxFrames
+    float *outL, *outR;   // maxFrames each
+    AudioBufferList *outList;
+    AudioTimeStamp time;
+};
+
+NRTSpatial *nrt_spatial_create(AudioUnit au, uint32_t inChannels, uint32_t maxFrames) {
+    if (!au || inChannels == 0 || maxFrames == 0) return NULL;
+    NRTSpatial *s = calloc(1, sizeof(NRTSpatial));
+    if (!s) return NULL;
+    s->au = au;
+    s->inChannels = inChannels;
+    s->maxFrames = maxFrames;
+    s->in = calloc((size_t)inChannels * maxFrames, sizeof(float));
+    s->outL = calloc(maxFrames, sizeof(float));
+    s->outR = calloc(maxFrames, sizeof(float));
+    s->outList = calloc(1, offsetof(AudioBufferList, mBuffers) + 2 * sizeof(AudioBuffer));
+    if (!s->in || !s->outL || !s->outR || !s->outList) { nrt_spatial_destroy(s); return NULL; }
+    s->outList->mNumberBuffers = 2;
+    s->time.mFlags = kAudioTimeStampSampleTimeValid;
+    s->time.mSampleTime = 0;
+    return s;
+}
+
+void nrt_spatial_destroy(NRTSpatial *s) {
+    if (!s) return;
+    free(s->in); free(s->outL); free(s->outR); free(s->outList);
+    free(s);
+}
+
+// The mixer pulls its input here: copy the planes the bridge prepared for this slice.
+static OSStatus spatial_input(void *refCon, AudioUnitRenderActionFlags *flags, const AudioTimeStamp *time,
+                              UInt32 bus, UInt32 frames, AudioBufferList *io) {
+    (void)flags; (void)time; (void)bus;
+    NRTSpatial *s = (NRTSpatial *)refCon;
+    if (!s || !io) return noErr;
+    const uint32_t n = frames <= s->maxFrames ? frames : s->maxFrames;
+    for (UInt32 b = 0; b < io->mNumberBuffers; b++) {
+        float *plane = b < s->inChannels ? s->in + (size_t)b * s->maxFrames : NULL;
+        AudioBuffer *buf = &io->mBuffers[b];
+        if (buf->mData && plane) memcpy(buf->mData, plane, (size_t)n * sizeof(float));
+        else if (buf->mData) memset(buf->mData, 0, (size_t)n * sizeof(float));
+        else buf->mData = plane;
+        buf->mDataByteSize = (UInt32)(n * sizeof(float));
+    }
+    return noErr;
+}
+
+OSStatus nrt_spatial_install(NRTSpatial *s) {
+    AURenderCallbackStruct cb = { .inputProc = spatial_input, .inputProcRefCon = s };
+    return AudioUnitSetProperty(s->au, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &cb, sizeof(cb));
+}
+
+void nrt_spatial_process(void *user, const float *in, uint32_t inChannels, float *out, uint32_t outChannels, uint32_t frames) {
+    NRTSpatial *s = (NRTSpatial *)user;
+    if (!s || frames == 0) return;
+    uint32_t done = 0;
+    while (done < frames) {
+        uint32_t n = frames - done;
+        if (n > s->maxFrames) n = s->maxFrames;
+        // De-interleave this slice into the mixer's input planes.
+        for (uint32_t c = 0; c < s->inChannels; c++) {
+            float *plane = s->in + (size_t)c * s->maxFrames;
+            if (c < inChannels) for (uint32_t f = 0; f < n; f++) plane[f] = in[(size_t)(done + f) * inChannels + c];
+            else memset(plane, 0, (size_t)n * sizeof(float));
+        }
+        s->outList->mBuffers[0] = (AudioBuffer){ 1, (UInt32)(n * sizeof(float)), s->outL };
+        s->outList->mBuffers[1] = (AudioBuffer){ 1, (UInt32)(n * sizeof(float)), s->outR };
+        AudioUnitRenderActionFlags flags = 0;
+        OSStatus err = AudioUnitRender(s->au, &flags, &s->time, 0, n, s->outList);
+        s->time.mSampleTime += n;
+        const float *l = (const float *)s->outList->mBuffers[0].mData;
+        const float *r = (const float *)s->outList->mBuffers[1].mData;
+        for (uint32_t f = 0; f < n; f++) {
+            float *o = out + (size_t)(done + f) * outChannels;
+            o[0] = err == noErr && l ? l[f] : 0.f;
+            if (outChannels > 1) o[1] = err == noErr && r ? r[f] : 0.f;
+            for (uint32_t c = 2; c < outChannels; c++) o[c] = 0.f;
+        }
+        done += n;
+    }
 }

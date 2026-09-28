@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AVFAudio
 import CoreAudio
 import Foundation
 
@@ -60,6 +61,13 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 
+    /// AirPods and Beats: headphones Apple's Spatial Audio (with head tracking) is made for.
+    public var isAppleHeadphones: Bool {
+        let n = name.lowercased()
+        return profile.kind == .airPodsMaxUSB || profile.kind == .airPodsMaxBluetooth
+            || n.contains("airpods") || n.contains("beats") || n.contains("powerbeats")
+    }
+
     /// "44.1–384 kHz · 16/24/32-bit"
     public var rangeSummary: String {
         guard let lo = capabilities.sampleRates.first, let hi = capabilities.sampleRates.last else { return "—" }
@@ -71,6 +79,19 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 }
 
 enum DeviceQuery {
+    /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers) for `channels` channels.
+    static func preferredLayout(_ device: AudioObjectID, channels: Int) -> AVAudioChannelLayout? {
+        var address = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyPreferredChannelLayout,
+                                                 mScope: kAudioObjectPropertyScopeOutput, mElement: kAudioObjectPropertyElementMain)
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(device, &address, 0, nil, &size) == noErr, size >= UInt32(MemoryLayout<AudioChannelLayout>.size) else { return nil }
+        let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
+        defer { raw.deallocate() }
+        guard AudioObjectGetPropertyData(device, &address, 0, nil, &size, raw) == noErr else { return nil }
+        let layout = AVAudioChannelLayout(layout: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+        return Int(layout.channelCount) == channels ? layout : nil
+    }
+
     static let standardRates: [Double] = [
         8_000, 11_025, 16_000, 22_050, 32_000, 44_100, 48_000, 88_200, 96_000,
         176_400, 192_000, 352_800, 384_000, 705_600, 768_000,

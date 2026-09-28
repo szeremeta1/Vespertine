@@ -49,7 +49,7 @@ public struct SmartRules: Codable, Sendable, Hashable {
 public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
     public enum Field: String, Codable, Sendable, CaseIterable {
         case title, artist, album, albumArtist, composer, genre, codec, year
-        case sampleRate, bitDepth, isDSD, isLossless, playCount, rating, addedDaysAgo, verdict
+        case sampleRate, bitDepth, isDSD, isLossless, playCount, rating, addedDaysAgo, verdict, channels
 
         public var label: String {
             switch self {
@@ -69,12 +69,13 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             case .rating: "Rating"
             case .addedDaysAgo: "Added (days ago)"
             case .verdict: "Analysis Verdict"
+            case .channels: "Channels"
             }
         }
 
         var isNumeric: Bool {
             switch self {
-            case .year, .sampleRate, .bitDepth, .playCount, .rating, .addedDaysAgo: true
+            case .year, .sampleRate, .bitDepth, .playCount, .rating, .addedDaysAgo, .channels: true
             default: false
             }
         }

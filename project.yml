@@ -14,8 +14,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.4.1"
-    CURRENT_PROJECT_VERSION: "6"
+    MARKETING_VERSION: "0.5.0"
+    CURRENT_PROJECT_VERSION: "7"
     DEAD_CODE_STRIPPING: YES
 targets:
   Nocturne:
@@ -33,8 +33,8 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleName: Nocturne
-        CFBundleDisplayName: Nocturne
+        CFBundleName: $(NOCTURNE_DISPLAY_NAME)
+        CFBundleDisplayName: $(NOCTURNE_DISPLAY_NAME)
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.music
@@ -60,6 +60,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.nocturne.Nocturne
         PRODUCT_NAME: Nocturne
+        NOCTURNE_DISPLAY_NAME: Nocturne
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual
@@ -70,6 +71,12 @@ targets:
         SWIFT_STRICT_CONCURRENCY: complete
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         COMBINE_HIDPI_IMAGES: YES
+      configs:
+        # Development builds are a separate app: own settings, own library, "Nocturne Dev" in the Dock,
+        # so they never collide with (or touch) the installed Nocturne.
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: org.nocturne.Nocturne.dev
+          NOCTURNE_DISPLAY_NAME: Nocturne Dev
 
   NocturneAppTests:
     type: bundle.unit-test
