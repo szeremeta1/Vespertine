@@ -21,6 +21,8 @@ public struct SignalPath: Sendable, Hashable {
     public var deviceProfile: DeviceProfile
     public var volume: VolumeStage
     public var replayGainDB: Double?
+    /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
+    public var otherAppsPlaying = false
 
     public var isResampling: Bool { plan.resamples }
 
@@ -33,7 +35,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.exclusive, !modifiesSamples, plan.spatial == .off,
+        guard deviceProfile.canBeBitPerfect, applied.exclusive || !otherAppsPlaying, !modifiesSamples, plan.spatial == .off,
               plan.channels == source.channels, applied.virtualChannels >= source.channels else { return false }
         switch plan.mode {
         case .dop:
@@ -60,7 +62,7 @@ public struct SignalPath: Sendable, Hashable {
         if plan.dsdConvertedToPCM { return "DSD → PCM" }
         if isResampling { return "RESAMPLED" }
         if source.encoding == .lossy { return "LOSSY SOURCE" }
-        if !applied.exclusive { return "SHARED" }
+        if !applied.exclusive, otherAppsPlaying { return "MIXED WITH OTHER APPS" }
         if modifiesSamples { return "DIGITAL GAIN" }
         return "CONVERTED"
     }

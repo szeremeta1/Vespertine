@@ -13,6 +13,22 @@ import Testing
             deviceName: "Test", deviceUID: "Test", deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "speaker"), volume: .fixed)
         #expect(!path.isBitPerfect)
     }
+    @Test("Shared mode is bit-perfect only while no other app plays through the device")
+    func sharedModeBitPerfect() {
+        let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 48000, bitDepth: 24, channels: 2)
+        let device = DeviceCapabilities(sampleRates: [48000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        let plan = FormatPlanner.plan(source: source, device: device)
+        var path = SignalPath(source: source, decoderName: "Test", plan: plan,
+            applied: AppliedFormat(sampleRate: 48000, physicalBitDepth: 32, physicalIsInteger: false, virtualChannels: 2, exclusive: false, bufferFrames: 512),
+            deviceName: "AirPods Max", deviceUID: "Test", deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB-C", canBeBitPerfect: true, symbol: "airpodsmax"), volume: .hardware)
+        #expect(path.isBitPerfect && path.statusLine == "BIT-PERFECT")
+        path.otherAppsPlaying = true
+        #expect(!path.isBitPerfect && path.statusLine == "MIXED WITH OTHER APPS")
+    }
+    @Test("Other-app detection answers without error for every output device")
+    func otherProcessesQuery() {
+        for device in OutputDevices.list(dopEnabledUIDs: []) { _ = DeviceControl.otherProcessesPlaying(to: device.id) }
+    }
     @Test func multichannelDSDCannotDownmixDoP() {
         let source = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2822400, bitDepth: 1, channels: 6)
         let device = DeviceCapabilities(sampleRates: [176400,352800], physicalFormats: [], outputChannels: 2, supportsDoP: true)

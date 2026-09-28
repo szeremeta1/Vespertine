@@ -196,6 +196,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         buffering = starved
     }
 
+    /// Shared mode: whether another app is sending sound to the same device (checked about once a second).
+    private var othersPlaying = false
+    private var othersCheckedAt = Date.distantPast
+    private var othersDevice: AudioObjectID?
     private var drainedAt: Date?
     private var pausedAt: Date?
     private var parked: (item: PlayableItem, position: TimeInterval)?
@@ -444,7 +448,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         session = nil
         sessionLock.unlock()
         old?.invalidate(releaseHog: true)
-        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive)
+        // DSD over DoP only survives untouched with sole access, so it always takes the device.
+        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive || plan.mode == .dop)
         sessionLock.lock()
         session = new
         sessionDevice = device
@@ -699,6 +704,16 @@ public final class PlaybackEngine: @unchecked Sendable {
             if let db = settings.digitalVolumeDB { path?.volume = .digital(dB: db) }
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
         }
+        if let path, !path.applied.exclusive, let device = sessionDevice {
+            if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {
+                othersPlaying = DeviceControl.otherProcessesPlaying(to: device.id)
+                othersCheckedAt = Date()
+                othersDevice = device.id
+            }
+        } else {
+            othersPlaying = false
+        }
+        path?.otherAppsPlaying = othersPlaying
         let device = sessionDevice
         let st = state
         let underruns = underrunTotal
