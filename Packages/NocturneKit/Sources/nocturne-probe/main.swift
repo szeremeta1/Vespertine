@@ -177,10 +177,32 @@ if args.count >= 7, args[1] == "pausetest" {
     exit(0)
 }
 
+/// NOCTURNE_AGGREGATE=uid1,uid2,… makes a private aggregate of those devices (a multichannel output
+/// for testing without a receiver); it disappears when the probe exits.
+var aggregateID: AudioObjectID = 0
+if let list = ProcessInfo.processInfo.environment["NOCTURNE_AGGREGATE"], args.count >= 5, args[1] == "play" {
+    let uids = list.split(separator: ",").map(String.init)
+    let desc: [String: Any] = [
+        kAudioAggregateDeviceNameKey: "Nocturne Test Aggregate",
+        kAudioAggregateDeviceUIDKey: "org.nocturne.test-aggregate.\(getpid())",
+        kAudioAggregateDeviceIsPrivateKey: 1,
+        kAudioAggregateDeviceMainSubDeviceKey: uids[0],
+        kAudioAggregateDeviceSubDeviceListKey: uids.enumerated().map { i, uid in
+            [kAudioSubDeviceUIDKey: uid, kAudioSubDeviceDriftCompensationKey: i == 0 ? 0 : 1] as [String: Any]
+        },
+    ]
+    let status = AudioHardwareCreateAggregateDevice(desc as CFDictionary, &aggregateID)
+    print("aggregate: status \(status) id \(aggregateID)")
+    Thread.sleep(forTimeInterval: 1.5)
+    atexit { if aggregateID != 0 { AudioHardwareDestroyAggregateDevice(aggregateID) } }
+}
+let devicesNow = aggregateID != 0 ? OutputDevices.list() : devices
+
 guard args.count >= 5, args[1] == "play" else { print("usage: nocturne-probe play <device> <seconds> <file>…"); exit(2) }
-guard let device = devices.first(where: { $0.uid == args[2] || $0.name.localizedCaseInsensitiveContains(args[2]) }) else {
+guard let device = devicesNow.first(where: { $0.uid == args[2] || $0.name.localizedCaseInsensitiveContains(args[2]) }) else {
     print("no device matching \(args[2])"); exit(1)
 }
+print("device: \(device.name) · \(device.capabilities.outputChannels) output channels · speaker layout \(device.capabilities.speakerLayoutChannels.map(String.init) ?? "none")")
 let seconds = Double(args[3]) ?? 3
 // NOCTURNE_SPATIAL=off|fixed|headTracked forces the multichannel mode for this device.
 let forcedSpatial = ProcessInfo.processInfo.environment["NOCTURNE_SPATIAL"].flatMap(SpatialMode.init(rawValue:))

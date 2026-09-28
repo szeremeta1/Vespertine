@@ -207,11 +207,7 @@ extension SourceInspector {
         guard let layout = pcm.processingFormat.channelLayout else { return "none (count only)" }
         let tag = layout.layoutTag
         if tag == kAudioChannelLayoutTag_UseChannelDescriptions {
-            let n = Int(layout.layout.pointee.mNumberChannelDescriptions)
-            let labels = withUnsafePointer(to: layout.layout.pointee.mChannelDescriptions) { p in
-                UnsafeBufferPointer(start: UnsafeRawPointer(p).assumingMemoryBound(to: AudioChannelDescription.self), count: n).map { $0.mChannelLabel }
-            }
-            return "descriptions \(labels)"
+            return "descriptions \(layout.shortNames)"
         }
         return String(format: "tag 0x%08X (%d ch)", tag, Int(tag & 0xFFFF))
     }

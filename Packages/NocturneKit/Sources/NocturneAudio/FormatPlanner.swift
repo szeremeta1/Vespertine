@@ -25,8 +25,17 @@ public enum FormatPlanner {
             plan.deviceChannelCount = 2
             plan.spatial = spatial
             plan.reason = "\(name) rendered with Spatial Audio (\(spatial == .headTracked ? "head tracked" : "fixed")). " + plan.reason
+        } else if let speakers = rawDevice.speakerLayoutChannels, speakers >= 3, speakers <= rawDevice.outputChannels {
+            // A configured speaker layout: channels are placed by speaker position (5.1 into a 7.1 room,
+            // 7.1 folded into a 5.1 room), so every source channel reaches the right speaker.
+            plan.channels = speakers
+            plan.reason = speakers == source.channels
+                ? "\(name) to \(name) speakers. " + plan.reason
+                : "\(name) placed on the \(ChannelLayouts.name(channels: speakers)) speaker setup. " + plan.reason
         } else if plan.channels < source.channels {
             plan.reason = "\(name) downmixed to \(ChannelLayouts.name(channels: plan.channels)). " + plan.reason
+        } else {
+            plan.reason = "\(name) to \(source.channels) outputs in standard order (L R C LFE Ls Rs…). " + plan.reason
         }
         return plan
     }

@@ -27,6 +27,8 @@ public struct EngineSnapshot: Sendable {
     public var underruns: Int = 0
     public var outputDevice: OutputDevice?
     public var lastError: String?
+    /// Output is paused while a stalled network read catches up (playback resumes by itself).
+    public var isBuffering = false
 }
 
 public enum EngineEvent: Sendable {
@@ -103,6 +105,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private final class Decoding {
         let item: PlayableItem
+        /// Read live from a network share (not a local cached copy): may stall and need rebuffering.
+        var streaming = false
         let probed: ProbedSource
         let decoder: PCMDecoding
         let converter: AVAudioConverter
@@ -168,6 +172,30 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var state: PlaybackState = .stopped
     private var settings = EngineSettings()
     private var draining = false
+    /// Output paused while a stalled network read refills the ring.
+    private var buffering = false
+    private var rebuffer: (context: OpaquePointer, frames: UInt32)?
+
+    private func isStreaming(_ item: PlayableItem) -> Bool {
+        item.cacheKey != nil && resolve(item) == item.url
+    }
+
+    /// Network stalls: the output callback holds in silence when a streamed track's ring runs dry
+    /// (even while the decoder is blocked in a read) and resumes once two seconds are buffered.
+    /// Nothing is skipped, so the position stays exact. Off once the file is fully read.
+    private func updateRebuffering() {
+        guard let session else { buffering = false; rebuffer = nil; return }
+        let active = decoding.map { $0.streaming && !$0.finished } ?? false
+        let want = active && !draining ? UInt32(session.applied.sampleRate * 2) : 0
+        if rebuffer?.context != session.context || rebuffer?.frames != want {
+            nrt_context_set_rebuffer(session.context, want)
+            rebuffer = (session.context, want)
+        }
+        let starved = nrt_context_is_starved(session.context)
+        if starved, !buffering { log.notice("Network read stalled; holding until 2 s are buffered") }
+        buffering = starved
+    }
+
     private var drainedAt: Date?
     private var pausedAt: Date?
     private var parked: (item: PlayableItem, position: TimeInterval)?
@@ -221,9 +249,17 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Peak levels (linear) since the previous call.
     public func takePeaks() -> (left: Float, right: Float) {
+        let all = takeChannelPeaks()
+        return (all.first ?? 0, all.count > 1 ? all[1] : (all.first ?? 0))
+    }
+
+    /// Peak level (linear) of every decoded channel since the previous call, in the stream's channel
+    /// order (see `SignalPath.channelLabels`). Up to 16 channels.
+    public func takeChannelPeaks() -> [Float] {
         sessionLock.lock(); defer { sessionLock.unlock() }
-        guard let ctx = session?.context else { return (0, 0) }
-        return (nrt_context_take_peak(ctx, 0), nrt_context_take_peak(ctx, 1))
+        guard let session else { return [] }
+        let n = min(session.plan.channels, Int(NRT_METER_CHANNELS))
+        return (0..<n).map { nrt_context_take_peak(session.context, UInt32($0)) }
     }
 
     /// Copies the latest mono samples sent to the DAC. Returns the device sample rate, or nil when idle.
@@ -259,6 +295,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             if state == .playing {
                 didWork = fill()
                 checkTransitions()
+                updateRebuffering()
             } else if state == .paused, let pausedAt, session?.applied.exclusive == true,
                       Date().timeIntervalSince(pausedAt) > settings.releaseExclusiveAfterPause {
                 park()
@@ -391,6 +428,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
+        decoding.streaming = isStreaming(item)
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
                             startOffsetSeconds: actualOffset, durationSeconds: decoding.durationSeconds)]
@@ -436,6 +474,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         segments.removeAll()
         draining = false
         drainedAt = nil
+        buffering = false
     }
 
     private func teardown(releaseHog: Bool) {
@@ -471,8 +510,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard let session else { return }
         // Network files (streamed, not yet cached) start with more in hand: a slow first read from
         // a share must not become an audible gap.
-        let streaming = decoding.map { $0.item.cacheKey != nil && resolve($0.item) == $0.item.url } ?? false
-        let seconds = streaming ? 1.5 : 0.3
+        let seconds = decoding?.streaming == true ? 1.5 : 0.3
         let target = min(Int(session.applied.sampleRate * seconds), Int(nrt_ring_capacity(session.ring)) / 2)
         // Bound work so a repeating empty/corrupt track cannot monopolize the engine thread.
         for _ in 0..<256 {
@@ -563,6 +601,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
+                    d.streaming = isStreaming(next)
                     decoding = d
                     segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten,
                                             startOffsetSeconds: 0, durationSeconds: d.durationSeconds))
@@ -612,7 +651,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                                      path: makePath(probed: pending.probed, plan: pending.plan, device: pending.device,
                                                     session: session, item: pending.item),
                                      chunk: chunkFrames, layout: session.decodedLayout)
+                d.streaming = isStreaming(pending.item)
                 decoding = d
+                buffering = false
                 segments = [Segment(item: pending.item, path: d.path, startRingFrame: session.totalWritten,
                                     startOffsetSeconds: 0, durationSeconds: d.durationSeconds)]
                 draining = false
@@ -669,6 +710,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.duration = segment?.durationSeconds ?? s.snapshot.duration
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
+            s.snapshot.isBuffering = buffering
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }
         }

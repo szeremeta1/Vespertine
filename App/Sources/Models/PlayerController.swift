@@ -62,6 +62,10 @@ final class PlayerController {
     private(set) var signalPath: SignalPath?
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
+    /// A network read stalled; output is paused until enough is buffered (resumes by itself).
+    private(set) var buffering = false
+    /// Live level (0…1, linear peak with decay) of every channel Nocturne sends, for multichannel meters.
+    private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
     /// When the current track started (the Analysis tab follows whichever changed last).
     private(set) var trackStartedAt: Date = .distantPast
@@ -298,6 +302,15 @@ final class PlayerController {
         }
         if state == .playing, let device = snap.outputDevice { followSystemOutput(to: device) } else if state != .playing { lastFollowed = nil }
         if underruns != snap.underruns { underruns = snap.underruns }
+        if buffering != snap.isBuffering { buffering = snap.isBuffering }
+        // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
+        if state == .playing, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
+            let peaks = engine.takeChannelPeaks()
+            if channelLevels.count != peaks.count { channelLevels = peaks }
+            else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }
+        } else if !channelLevels.isEmpty, state != .playing {
+            channelLevels = []
+        }
 
         // Count a play (and scrobble) at half the track or four minutes, whichever comes first.
         if state == .playing, let entry = current, scrobbledEntry != entry.id, duration > 30,

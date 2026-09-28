@@ -6,7 +6,8 @@
 import CoreAudio
 import Foundation
 
-public struct CoreAudioError: Error, CustomStringConvertible, Sendable {
+public struct CoreAudioError: LocalizedError, CustomStringConvertible, Sendable {
+    public var errorDescription: String? { description }
     public let status: OSStatus
     public let operation: String
 

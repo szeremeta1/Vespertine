@@ -63,8 +63,16 @@ void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthroug
 /// When set, running dry is the expected end of the stream and is not counted as an underrun.
 void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);
 uint32_t nrt_context_take_underruns(NRTRenderContext *_Nonnull ctx);
+/// Network streams: hold in silence (consuming nothing) when the ring can't fill a slice, and resume
+/// once `resumeFrames` are buffered. 0 turns it off. Clamped to ¾ of the ring.
+void nrt_context_set_rebuffer(NRTRenderContext *_Nonnull ctx, uint32_t resumeFrames);
+bool nrt_context_is_starved(const NRTRenderContext *_Nonnull ctx);
+/// Times playback had to hold for data since the last call.
+uint32_t nrt_context_take_stalls(NRTRenderContext *_Nonnull ctx);
 
-/// Peak (absolute, linear) since the last call, per channel (0 or 1).
+#define NRT_METER_CHANNELS 16u
+
+/// Peak (absolute, linear) since the last call, per decoded channel (0 … NRT_METER_CHANNELS-1).
 float nrt_context_take_peak(NRTRenderContext *_Nonnull ctx, uint32_t channel);
 
 /// Copies the most recent `count` mono samples (≤ NRT_TAP_SIZE) oldest-first.

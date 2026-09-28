@@ -114,7 +114,13 @@ struct NRTRenderContext {
     _Atomic uint32_t underruns;
     _Atomic uint64_t framesRendered;
 
-    _Atomic float peak[2];
+    // Rebuffering (network streams): when the ring can't fill a slice, hold in silence without
+    // consuming anything until `resumeFrames` are buffered. 0 = off (plain underruns).
+    _Atomic uint32_t resumeFrames;
+    _Atomic bool starved;
+    _Atomic uint32_t stalls;
+
+    _Atomic float peak[NRT_METER_CHANNELS];
 
     _Atomic float tap[NRT_TAP_SIZE];
     _Atomic uint32_t tapWrite;
@@ -142,8 +148,10 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->draining, false);
     atomic_init(&ctx->underruns, 0);
     atomic_init(&ctx->framesRendered, 0);
-    atomic_init(&ctx->peak[0], 0.f);
-    atomic_init(&ctx->peak[1], 0.f);
+    atomic_init(&ctx->resumeFrames, 0);
+    atomic_init(&ctx->starved, false);
+    atomic_init(&ctx->stalls, 0);
+    for (uint32_t i = 0; i < NRT_METER_CHANNELS; i++) atomic_init(&ctx->peak[i], 0.f);
     atomic_init(&ctx->tapWrite, 0);
     for (uint32_t i = 0; i < NRT_TAP_SIZE; i++) atomic_init(&ctx->tap[i], 0.f);
     ctx->rng = 0x9E3779B97F4A7C15ull;
@@ -180,10 +188,17 @@ double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
+void nrt_context_set_rebuffer(NRTRenderContext *ctx, uint32_t resumeFrames) {
+    const uint32_t limit = nrt_ring_capacity(ctx->ring) / 4 * 3;
+    atomic_store(&ctx->resumeFrames, resumeFrames > limit ? limit : resumeFrames);
+    if (resumeFrames == 0) atomic_store(&ctx->starved, false);
+}
+bool nrt_context_is_starved(const NRTRenderContext *ctx) { return atomic_load(&ctx->starved); }
+uint32_t nrt_context_take_stalls(NRTRenderContext *ctx) { return atomic_exchange(&ctx->stalls, 0); }
 uint64_t nrt_context_frames_rendered(const NRTRenderContext *ctx) { return atomic_load(&ctx->framesRendered); }
 
 float nrt_context_take_peak(NRTRenderContext *ctx, uint32_t channel) {
-    if (channel > 1) return 0.f;
+    if (channel >= NRT_METER_CHANNELS) return 0.f;
     return atomic_exchange(&ctx->peak[channel], 0.f);
 }
 
@@ -213,6 +228,25 @@ static inline void store_peak_max(_Atomic float *slot, float v) {
 // Pulls `frames` source frames into ctx->scratch (zero-filled if dry) and applies gain/meters.
 static void pull(NRTRenderContext *ctx, uint32_t frames) {
     const uint32_t ch = nrt_ring_channels(ctx->ring);
+    const uint32_t resume = atomic_load_explicit(&ctx->resumeFrames, memory_order_relaxed);
+    if (resume > 0 && !atomic_load_explicit(&ctx->draining, memory_order_relaxed)) {
+        const uint32_t readable = nrt_ring_readable(ctx->ring);
+        bool starved = atomic_load_explicit(&ctx->starved, memory_order_relaxed);
+        if (starved && readable >= resume) {
+            atomic_store_explicit(&ctx->starved, false, memory_order_relaxed);
+            starved = false;
+        } else if (!starved && readable < frames) {
+            atomic_store_explicit(&ctx->starved, true, memory_order_relaxed);
+            atomic_fetch_add_explicit(&ctx->stalls, 1, memory_order_relaxed);
+            starved = true;
+        }
+        if (starved) {
+            // Hold: silence, nothing consumed, so playback resumes exactly where it stopped.
+            memset(ctx->scratch, 0, (size_t)frames * ch * sizeof(float));
+            for (uint32_t c = 0; c < ch && c < NRT_METER_CHANNELS; c++) atomic_store_explicit(&ctx->peak[c], 0.f, memory_order_relaxed);
+            return;
+        }
+    }
     uint32_t got = nrt_ring_read(ctx->ring, ctx->scratch, frames);
     if (got < frames) {
         memset(ctx->scratch + (size_t)got * ch, 0, (size_t)(frames - got) * ch * sizeof(float));
@@ -233,21 +267,22 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
         }
     }
 
-    // Meters and spectrum tap (post-gain, what the DAC receives).
-    float p0 = 0.f, p1 = 0.f;
+    // Meters (every decoded channel, up to NRT_METER_CHANNELS) and spectrum tap (L/R), post-gain.
+    float peaks[NRT_METER_CHANNELS] = {0};
+    const uint32_t metered = ch < NRT_METER_CHANNELS ? ch : NRT_METER_CHANNELS;
     uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
     for (uint32_t f = 0; f < got; f++) {
-        const float l = ctx->scratch[(size_t)f * ch];
-        const float r = ch > 1 ? ctx->scratch[(size_t)f * ch + 1] : l;
-        const float al = fabsf(l), ar = fabsf(r);
-        if (al > p0) p0 = al;
-        if (ar > p1) p1 = ar;
+        const float *frame = ctx->scratch + (size_t)f * ch;
+        for (uint32_t c = 0; c < metered; c++) {
+            const float a = fabsf(frame[c]);
+            if (a > peaks[c]) peaks[c] = a;
+        }
+        const float l = frame[0], r = ch > 1 ? frame[1] : l;
         atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
     }
     atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
-    store_peak_max(&ctx->peak[0], p0);
-    store_peak_max(&ctx->peak[1], p1);
+    for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
 }
 
 void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t frames, uint32_t outChannels) {

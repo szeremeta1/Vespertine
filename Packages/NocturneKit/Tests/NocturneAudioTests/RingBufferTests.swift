@@ -60,6 +60,45 @@ struct RingBufferTests {
         #expect(nrt_context_take_underruns(ctx) == 0)
     }
 
+    @Test("Rebuffering holds in silence without consuming, then resumes exactly where it stopped")
+    func rebuffer() {
+        let ring = nrt_ring_create(256, 2)!
+        let ctx = nrt_context_create(ring, 64)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_rebuffer(ctx, 100)
+        let data = (0..<400).map { Float($0 + 1) / 1000 }     // 200 stereo frames, never zero
+        var written = 0
+        func write(_ frames: Int) {
+            data[written * 2 ..< (written + frames) * 2].withUnsafeBufferPointer { _ = nrt_ring_write(ring, $0.baseAddress!, UInt32(frames)) }
+            written += frames
+        }
+        var out = [Float](repeating: 1, count: 32)
+
+        write(10)                                              // a stall: less than one slice left
+        nrt_context_render_interleaved(ctx, &out, 16, 2)
+        #expect(out.allSatisfy { $0 == 0 })
+        #expect(nrt_context_is_starved(ctx))
+        #expect(nrt_ring_readable(ring) == 10)                 // nothing consumed
+        #expect(nrt_context_take_stalls(ctx) == 1 && nrt_context_take_underruns(ctx) == 0)
+
+        write(50)                                              // 60 < 100: still holding
+        nrt_context_render_interleaved(ctx, &out, 16, 2)
+        #expect(out.allSatisfy { $0 == 0 } && nrt_context_is_starved(ctx))
+
+        write(50)                                              // 110 ≥ 100: resume from the first held frame
+        nrt_context_render_interleaved(ctx, &out, 16, 2)
+        #expect(!nrt_context_is_starved(ctx))
+        #expect(out == Array(data[0..<32]))
+        #expect(nrt_context_take_stalls(ctx) == 0)
+
+        nrt_context_set_rebuffer(ctx, 0)                       // off: back to plain underruns
+        _ = nrt_ring_read(ring, &out, 16)
+        var rest = [Float](repeating: 0, count: 400)
+        _ = nrt_ring_read(ring, &rest, 200)
+        nrt_context_render_interleaved(ctx, &out, 16, 2)
+        #expect(!nrt_context_is_starved(ctx) && nrt_context_take_underruns(ctx) == 1)
+    }
+
     @Test("Digital gain attenuates and meters report the post-gain peak")
     func gain() {
         let ring = nrt_ring_create(64, 2)!

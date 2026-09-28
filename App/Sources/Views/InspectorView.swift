@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AppKit
 import NocturneAudio
 import NocturneLibrary
 import SwiftUI
@@ -40,6 +41,7 @@ struct NowPlayingPanel: View {
 
     var body: some View {
         let player = model.player
+        ScrollViewReader { scroller in
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 if let entry = player.current {
@@ -67,10 +69,20 @@ struct NowPlayingPanel: View {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path).padding(.top, 14)
+                        if path.plan.channels > 2 || path.source.channels > 2 {
+                            ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
+                        }
                     } else {
                         Text("Preparing output…").font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
-                    SpectrumView().frame(height: 44).padding(.top, 16)
+                    SpectrumView().frame(height: 44).padding(.top, 16).id("spectrum")
+                    if player.buffering {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.mini)
+                            Text("Buffering from the network…").font(Typeface.mono(10)).foregroundStyle(Palette.text2)
+                        }
+                        .padding(.top, 8)
+                    }
                     if player.underruns > 0 {
                         Text("\(player.underruns) buffer underrun\(player.underruns == 1 ? "" : "s") this session")
                             .font(Typeface.mono(10)).foregroundStyle(Palette.copper).padding(.top, 8)
@@ -82,6 +94,13 @@ struct NowPlayingPanel: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
+        .task(id: player.signalPath != nil) {
+            // QA: `-NocturneScrollInspector YES` scrolls to the meters for snapshots.
+            guard player.signalPath != nil, UserDefaults.standard.bool(forKey: "NocturneScrollInspector") else { return }
+            try? await Task.sleep(for: .milliseconds(300))
+            scroller.scrollTo("spectrum", anchor: .bottom)
+        }
+        }
         .background(alignment: .top) {
             RadialGradient(colors: [glow.opacity(0.38), .clear], center: .init(x: 0.5, y: 0.25), startRadius: 0, endRadius: 320)
                 .frame(height: 560)
@@ -219,6 +238,79 @@ struct SignalPathView: View {
     }
 }
 
+/// Live level of every channel Nocturne sends, labelled by speaker, plus where they go.
+struct ChannelMetersView: View {
+    let path: SignalPath
+    let levels: [Float]
+
+    var body: some View {
+        let names = path.applied.channelNames
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: path.plan.spatial != .off ? "Channels · Spatial Audio" : "Channels")
+            HStack(alignment: .bottom, spacing: 6) {
+                ForEach(Array(names.enumerated()), id: \.offset) { i, name in
+                    VStack(spacing: 4) {
+                        GeometryReader { geo in
+                            let level = i < levels.count ? levels[i] : 0
+                            let db = level > 0 ? 20 * log10(Double(level)) : -120
+                            let fraction = max(0, min(1, (db + 60) / 60))
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 2).fill(Palette.surface)
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(LinearGradient(colors: [Palette.brassLo, Palette.brass, Palette.brassHi], startPoint: .bottom, endPoint: .top))
+                                    .frame(height: geo.size.height * fraction)
+                            }
+                        }
+                        .frame(width: 14, height: 70)
+                        Text(name).font(Typeface.mono(8.5)).foregroundStyle(Palette.text3).fixedSize()
+                    }
+                }
+            }
+            Text(summary).font(Typeface.ui(11)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var summary: String {
+        let src = ChannelLayouts.name(channels: path.source.channels)
+        if path.plan.spatial != .off {
+            return "\(src) placed as virtual speakers around you and rendered for \(path.deviceName)."
+        }
+        if path.plan.channels < path.source.channels {
+            return "\(src) folded into \(ChannelLayouts.name(channels: path.plan.channels)) by speaker position."
+        }
+        let speakers = path.applied.speakerNames
+        var text = "\(path.plan.channels) channels to \(path.deviceName)"
+        if path.applied.streamCount > 1 { text += " across \(path.applied.streamCount) outputs" }
+        if !speakers.isEmpty {
+            let used = Set(path.applied.channelNames)
+            let silent = speakers.filter { !used.contains($0) }
+            text += ", each on its matching speaker" + (silent.isEmpty ? "." : "; \(silent.joined(separator: " ")) stay silent.")
+        } else {
+            text += " in standard order (1 L, 2 R, 3 C, 4 LFE, 5 Ls, 6 Rs…). Set up speakers in Audio MIDI Setup to place them by position."
+        }
+        return text
+    }
+}
+
+/// Points multichannel users at Audio MIDI Setup when no speaker layout is configured.
+struct SpeakerSetupHint: View {
+    let configured: Bool
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: configured ? "hifispeaker.2.fill" : "exclamationmark.circle").foregroundStyle(configured ? Palette.brass : Palette.copper)
+            Text(configured
+                 ? "Multichannel music goes to each speaker by position."
+                 : "No speaker layout is set up, so channels go out in standard order. Set one up to place each channel on its speaker.")
+                .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+            Button(configured ? "Speakers…" : "Configure Speakers…") {
+                NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/Utilities/Audio MIDI Setup.app"))
+            }
+            .buttonStyle(QuietButtonStyle(compact: true))
+        }
+    }
+}
+
 /// Shown when nothing is playing: what the current device can do.
 struct IdleDevicePanel: View {
     @Environment(AppModel.self) private var model
@@ -238,12 +330,22 @@ struct IdleDevicePanel: View {
                     GridRow { key("Sample rates"); val(d.capabilities.sampleRates.map { SampleRate.format($0) }.joined(separator: " · ") + " kHz") }
                     GridRow { key("Bit depths"); val(bitDepths(d)) }
                     GridRow { key("Channels"); val("\(d.capabilities.outputChannels)") }
+                    if d.capabilities.outputChannels > 2 {
+                        let speakers = d.speakerNames
+                        GridRow {
+                            key("Speakers")
+                            val(speakers.isEmpty ? "Not set up" : "\(ChannelLayouts.name(channels: speakers.count)) · \(speakers.joined(separator: " "))")
+                        }
+                    }
                     GridRow { key("Current rate"); val("\(SampleRate.format(d.nominalSampleRate)) kHz") }
                     GridRow { key("Volume"); val(d.hasHardwareVolume ? "Hardware" : "Fixed") }
                     GridRow { key("DoP"); val(d.capabilities.supportsDoP ? "Enabled" : "Off") }
                 }
                 if let note = d.profile.note {
                     Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+                }
+                if d.capabilities.outputChannels > 2 {
+                    SpeakerSetupHint(configured: !d.speakerNames.isEmpty)
                 }
             }
             Text("Choose something to play. Nocturne will switch this device to each file's native format.")
