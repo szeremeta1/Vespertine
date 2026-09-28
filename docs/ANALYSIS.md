@@ -74,3 +74,50 @@ Two fan releases labelled "Enhanced 24-bit" were correctly identified as synthet
 ## Reproducing
 
 `nocturne-probe forensics <files…>` prints every measurement and the verdict as a tab-separated row.
+
+## Analyzing on the server (`nocturne-analyze`)
+
+Analysis reads every file in full. For music on a network share, especially a remote one, it's far faster
+to analyze next to the files and let Nocturne import the results. `nocturne-analyze` runs the same analysis
+code as the app (`Packages/NocturneAnalysis`, plain Swift + Foundation), decoding with ffmpeg. Results
+match the app's: same verdicts, bit depths and cutoffs (the portable FFT is tested against Accelerate's).
+
+Build a static Linux binary (from any machine with a Swift 6.4 toolchain and the matching
+[static Linux SDK](https://www.swift.org/documentation/articles/static-linux-getting-started.html)):
+
+```bash
+swift build --package-path Packages/NocturneAnalysis -c release --swift-sdk x86_64-swift-linux-musl --product nocturne-analyze
+```
+
+On the server, install `ffmpeg`, copy the binary to `/usr/local/bin`, and point it at the folder the share
+exports:
+
+```bash
+nocturne-analyze index "/srv/music"
+```
+
+It writes `/srv/music/.nocturne/analysis.jsonl` (one JSON record per file; appended as it goes, so an
+interrupted run loses nothing) and `status.json` (progress). Later runs analyze only new or changed files.
+The music itself is only ever read. Run it nightly at low priority, for example with systemd:
+
+```ini
+# /etc/systemd/system/nocturne-analyze.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/nocturne-analyze index "/srv/music" --jobs 2
+Nice=19
+CPUWeight=10
+IOWeight=10
+IOSchedulingClass=idle
+
+# /etc/systemd/system/nocturne-analyze.timer
+[Timer]
+OnCalendar=*-*-* 01:00
+Persistent=true
+[Install]
+WantedBy=timers.target
+```
+
+Nocturne looks for `.nocturne/analysis.jsonl` at the root of each connected share, imports matching results
+(same path, size and modification time) every few minutes, reading only what was appended since last time,
+and stops reading that share's files for background analysis. Settings → Library shows the server's progress.

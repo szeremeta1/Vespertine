@@ -16,6 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
         .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.0"),
+        .package(path: "../NocturneAnalysis"),
     ],
     targets: [
         // Real-time pieces (ring buffer, IOProc, meters) in plain C so the render
@@ -29,6 +30,7 @@ let package = Package(
             dependencies: [
                 "CNocturneRT",
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
+                .product(name: "NocturneAnalysisCore", package: "NocturneAnalysis"),
             ],
             linkerSettings: [
                 .linkedFramework("CoreAudio"),

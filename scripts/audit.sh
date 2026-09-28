@@ -8,6 +8,8 @@ mkdir -p "$out"
 print "Audit evidence: $out"
 swift test --package-path Packages/NocturneKit > "$out/debug-tests.log" 2>&1
 swift test --package-path Packages/NocturneKit -c release > "$out/release-tests.log" 2>&1
+# The analysis core also runs on Linux servers (nocturne-analyze): its own parity/chunking tests.
+swift test --package-path Packages/NocturneAnalysis > "$out/analysis-tests.log" 2>&1
 for sanitizer in address,undefined thread; do
   binary="$out/rt-${sanitizer//,/}-audit"
   clang -std=c11 -g -O1 -fsanitize="$sanitizer" -I Packages/NocturneKit/Sources/CNocturneRT/include \
