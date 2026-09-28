@@ -20,7 +20,8 @@ Nocturne plays FLAC, ALAC, WAV, AIFF, DSD (DSF/DSDIFF), APE, WavPack, TTA, Opus,
 - **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert.
 - **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
-- **Analysis.** Finds a file's true bit depth (catches 16-bit audio padded into 24-bit files) and its bandwidth (catches upsampled "hi-res" and lossy-origin files). A *Suspect Hi-Res* smart playlist collects the results.
+- **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default, reconnects by itself, indexes quickly over slow links, and caches what you play (with **Keep Offline** for whole albums).
+- **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). Every verdict shows its evidence; results are saved, can run automatically on import, and filter the Songs view. A *Suspect Hi-Res* smart playlist collects them. [How it works](docs/ANALYSIS.md).
 - **Live spectrum** of exactly what the DAC receives, plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
 ## Build
@@ -82,7 +83,7 @@ cd Packages/NocturneKit && swift build -c release --product nocturne-probe
 - `import --library <dir> --into <dir> <files…>` imports;
 - `enrich --library <dir> [--apply high|all]` enriches.
 
-`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the bit-depth and bandwidth analysis.
+`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis; `forensics <files…>` prints its raw measurements as a table.
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
