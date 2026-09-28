@@ -120,14 +120,13 @@ public enum FileAnalyzer {
         }
 
         let channels = max(1, format.channels)
-        let outFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: format.sampleRate,
-                                      channels: AVAudioChannelCount(channels), interleaved: false)!
-        guard let converter = AVAudioConverter(from: decoderPCM.processingFormat, to: outFormat) else {
+        let chunk: AVAudioFrameCount = 16_384
+        guard let outFormat = AudioFormats.float32(sampleRate: format.sampleRate, channels: channels, interleaved: false),
+              let converter = AVAudioConverter(from: decoderPCM.processingFormat, to: outFormat),
+              let input = AVAudioPCMBuffer(pcmFormat: decoderPCM.processingFormat, frameCapacity: chunk),
+              let output = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
             throw SourceOpenerError.unsupported(url)
         }
-        let chunk: AVAudioFrameCount = 16_384
-        let input = AVAudioPCMBuffer(pcmFormat: decoderPCM.processingFormat, frameCapacity: chunk)!
-        let output = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk)!
 
         let fftSize = 8192
         let analyzer = SpectrumAnalyzer(size: fftSize)
@@ -315,5 +314,20 @@ public enum FileAnalyzer {
             return Double(i) * binHz
         }
         return 0
+    }
+}
+
+/// Float32 formats for any channel count. AVAudioFormat's plain initializer returns nil above two
+/// channels (5.1, 7.1, …) unless a channel layout is given, so a multichannel file must never be
+/// able to crash analysis or playback.
+public enum AudioFormats {
+    public static func float32(sampleRate: Double, channels: Int, interleaved: Bool) -> AVAudioFormat? {
+        guard sampleRate.isFinite, sampleRate > 0, channels > 0, channels <= 64 else { return nil }
+        if channels <= 2 {
+            return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate,
+                                 channels: AVAudioChannelCount(channels), interleaved: interleaved)
+        }
+        guard let layout = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels)) else { return nil }
+        return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: interleaved, channelLayout: layout)
     }
 }
