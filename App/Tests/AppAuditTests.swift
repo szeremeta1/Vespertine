@@ -4,6 +4,13 @@ import NocturneLibrary
 import Testing
 @testable import Nocturne
 
+/// A suite named by absolute path keeps its plist in `dir`. Named suites leak into `defaults domains`:
+/// cfprefsd rewrites an empty ~/Library/Preferences/<suite>.plist seconds after `removePersistentDomain`.
+private func scratchDefaults(in dir: URL) throws -> (defaults: UserDefaults, suite: String) {
+    let suite = dir.appendingPathComponent("defaults.plist").path
+    return (try #require(UserDefaults(suiteName: suite)), suite)
+}
+
 @Suite("App audit", .serialized) @MainActor
 struct AppAuditTests {
     @Test func malformedRatePreferencesFallBack() {
@@ -29,8 +36,7 @@ struct AppAuditTests {
         // Nonexistent paths exercise queue logic without playing anything on the user's DAC.
         try FileManager.default.removeItem(at: url)
         let tracks = (0..<4).map { i in var t = original; t.id = Int64(i+1); t.title = "Track \(i)"; return t }
-        let suite = "nocturne-audit-\(UUID())"
-        let defaults = try #require(UserDefaults(suiteName: suite))
+        let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults)
         let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
@@ -53,8 +59,10 @@ struct AppAuditTests {
         player.stop()
     }
     @Test func recoveryDirectoryOverridesLaunchArgument() throws {
-        let suite = "nocturne-recovery-\(UUID())"
-        let defaults = try #require(UserDefaults(suiteName: suite))
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-recovery-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         defaults.set("/bad/library", forKey: "NocturneDataDirectory")
         let chosen = URL(fileURLWithPath: "/chosen/library")
