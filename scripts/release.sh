@@ -72,9 +72,9 @@ if $notarize; then
   fi
   print "Submission $id"
   xcrun notarytool wait "$id" --keychain-profile "$profile" --timeout 2h
-  status=$(xcrun notarytool info "$id" --keychain-profile "$profile" --output-format json | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["status"])')
-  if [[ $status != Accepted ]]; then
-    print -u2 "Notarization status: $status"
+  verdict=$(xcrun notarytool info "$id" --keychain-profile "$profile" --output-format json | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["status"])')
+  if [[ $verdict != Accepted ]]; then
+    print -u2 "Notarization status: $verdict"
     xcrun notarytool log "$id" --keychain-profile "$profile" || true
     print -u2 "Re-run with --resume once it finishes."
     exit 1
