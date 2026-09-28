@@ -8,3 +8,8 @@ build/
 xcuserdata/
 Packages/NocturneKit/Package.resolved.bak
 .build-x86/
+
+# Agent handbooks (machine-specific; kept local on purpose)
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
