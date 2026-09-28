@@ -110,6 +110,12 @@ struct ConnectServerSheet: View {
         }
         .frame(width: 560)
         .background(Palette.panel)
+        .onAppear {
+            if let prefill = model.connectPrefill {
+                address = prefill
+                model.connectPrefill = nil
+            }
+        }
     }
 
     private func connect() {

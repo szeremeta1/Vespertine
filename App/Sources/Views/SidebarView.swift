@@ -95,6 +95,10 @@ struct SidebarView: View {
                         .contextMenu {
                             if source.isNetwork {
                                 Button("Reconnect") { Task { await model.shares.connect(source) } }
+                                Button("Enter Password…") {
+                                    model.connectPrefill = source.remoteURL
+                                    model.showConnectServer = true
+                                }
                             }
                             Button("Rescan") { Task { await model.library.scan(source) } }
                             Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }
