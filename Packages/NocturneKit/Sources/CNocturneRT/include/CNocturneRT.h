@@ -67,6 +67,9 @@ void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthroug
 
 /// When set, running dry is the expected end of the stream and is not counted as an underrun.
 void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);
+/// Integer mode: the ring carries 32-bit integer samples (bit patterns in the float slots) for a device set
+/// to a non-mixable Int32 format. They're copied untouched (implies passthrough); meters read them as integers.
+void nrt_context_set_integer(NRTRenderContext *_Nonnull ctx, bool integer);
 uint32_t nrt_context_take_underruns(NRTRenderContext *_Nonnull ctx);
 /// Network streams: hold in silence (consuming nothing) when the ring can't fill a slice, and resume
 /// once `resumeFrames` are buffered. 0 turns it off. Clamped to ¾ of the ring.

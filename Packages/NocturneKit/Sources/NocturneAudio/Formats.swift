@@ -110,7 +110,11 @@ public enum RatePolicy: Sendable, Hashable, Codable {
 
 /// Everything the engine will do between file and DAC.
 public struct OutputPlan: Sendable, Hashable {
-    public enum Mode: String, Sendable { case pcm, dop }
+    /// `pcm`: decoded audio. `dop`: DSD in DoP frames. `bitstream`: Dolby/DTS frames in IEC 61937 bursts
+    /// for a receiver to decode. The last two must reach the device untouched.
+    public enum Mode: String, Sendable { case pcm, dop, bitstream }
+    /// Passed through untouched (no gain, dither or resampling), with the device held exclusively.
+    public var isPassthrough: Bool { mode != .pcm }
 
     public var mode: Mode
     public var deviceSampleRate: Double
@@ -125,13 +129,16 @@ public struct OutputPlan: Sendable, Hashable {
     public var deviceChannelCount: Int? = nil
     /// Multichannel rendered for headphones with Spatial Audio.
     public var spatial: SpatialMode = .off
+    /// Integer mode requested: decoded straight to 32-bit integers and sent to a non-mixable Int32 device
+    /// format untouched (32-bit sources exact). Only for plain PCM with nothing to change the samples.
+    public var integerSamples = false
 
     /// Channels the decoded stream (and ring) carries: `channels`. Channels written to the device:
     public var deviceChannels: Int { deviceChannelCount ?? channels }
 
     /// Two plans can be joined gaplessly when the device does not need to be touched.
     public func isDeviceCompatible(with other: OutputPlan) -> Bool {
-        mode == other.mode && abs(deviceSampleRate - other.deviceSampleRate) < 0.5
+        mode == other.mode && integerSamples == other.integerSamples && abs(deviceSampleRate - other.deviceSampleRate) < 0.5
             && physicalBitDepth == other.physicalBitDepth && channels == other.channels
             && deviceChannels == other.deviceChannels && spatial == other.spatial
     }

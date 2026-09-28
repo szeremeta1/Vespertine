@@ -51,3 +51,14 @@ struct GenreTests {
         #expect(indie.map(\.name) == ["Alternative & Indie"] && indie.first?.albumCount == 3)
     }
 }
+
+@Test("More spellings of the same genre are merged")
+func moreGenreAliases() {
+    #expect(Genres.key("Hardrock") == Genres.key("Hard Rock"))
+    #expect(Genres.key("Pop/Rock") == Genres.key("Pop Rock"))
+    #expect(Genres.key("Pop rock") == Genres.key("Pop Rock"))
+    #expect(Genres.key("Classique") == Genres.key("Classical"))
+    #expect(Genres.key("Classica") == Genres.key("Classical"))
+    #expect(Genres.key("Rap/Hip-Hop") == Genres.key("Hip-Hop/Rap"))
+    #expect(Genres.split("Soul, Funk, R&B") == ["Soul", "Funk", "R&B"])
+}

@@ -139,4 +139,25 @@ struct SmartRulesTests {
         #expect(try db.tracksNeedingAnalysis().allSatisfy { $0.id != moved.id })   // the analysis still counts
         #expect(try db.allTracks().count == 2)                                  // no duplicates left behind
     }
+
+    @Test("Re-reading an unchanged file keeps its analysis verdict")
+    func rereadKeepsAnalysis() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("a.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        let analysis = try FileAnalyzer.analyze(url: track.fileURL)
+        try db.saveAnalysis(analysis, filePath: track.filePath)
+        try await db.writer.write { try $0.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'") }
+        let summary = try await scanner.scan(source)
+        #expect(summary.updated == 1)
+        let reread = try #require(try db.allTracks().first)
+        #expect(reread.analysisVerdict == analysis.verdict.rawValue)
+        #expect(try db.tracksNeedingAnalysis().isEmpty)
+    }
 }

@@ -60,8 +60,13 @@ private let mpegOpenLock = NSLock()
 
 enum SourceOpener {
     static var supportedExtensions: Set<String> {
-        AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions)
+        AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
+            .union(FFmpegDecoder.extensions)
     }
+
+    /// Dolby Digital / Dolby Digital Plus elementary streams. macOS decodes them (licensed); the MP3
+    /// decoder would otherwise claim `.ac3` by its extension.
+    static let dolbyExtensions: Set<String> = ["ac3", "ec3", "eac3"]
 
     static func probe(_ url: URL) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
@@ -74,14 +79,32 @@ enum SourceOpener {
                                       channels: Int(asbd.mChannelsPerFrame))
             return ProbedSource(url: url, format: format, decoderName: "Native DSD reader", pcm: nil, dsd: decoder)
         }
+        if FFmpegDecoder.extensions.contains(ext) {
+            // DTS / DTS-HD MA / Dolby TrueHD: FFmpeg.
+            let decoder = FFmpegDecoder(url: url)
+            try decoder.open()
+            let d = decoder.describe
+            let format = SourceFormat(encoding: d.lossless ? .pcm : .lossy, codec: d.codec, sampleRate: d.sampleRate,
+                                      bitDepth: d.bits, channels: d.channels)
+            return ProbedSource(url: url, format: format, decoderName: "FFmpeg \(d.codec)", pcm: decoder, dsd: nil)
+        }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
-        let decoder = try AudioDecoder(url: url)
+        let decoder = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
         if String(describing: type(of: decoder)).contains("MPEG") {
             // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
             // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
             try mpegOpenLock.withLock { try decoder.open() }
         } else {
             try decoder.open()
+        }
+        // A DTS CD / DTS-WAV: 16-bit stereo "PCM" that is really a DTS bitstream (noise if played as PCM).
+        if DTSDecoder.carriesDTS(decoder) {
+            let dts = DTSDecoder(carrier: decoder)
+            try dts.open()
+            let f = dts.processingFormat
+            let format = SourceFormat(encoding: .lossy, codec: "DTS", sampleRate: f.sampleRate, bitDepth: nil,
+                                      channels: Int(f.channelCount))
+            return ProbedSource(url: url, format: format, decoderName: "FFmpeg DTS (DCA)", pcm: dts, dsd: nil)
         }
         let processing = decoder.processingFormat.streamDescription.pointee
         let source = decoder.sourceFormat.streamDescription.pointee
@@ -102,8 +125,10 @@ enum SourceOpener {
                 }
             }
         }
+        var codec = codecName(ext: ext, formatID: source.mFormatID)
+        if source.mFormatID == kAudioFormatEnhancedAC3, DolbyAtmos.hasObjects(url) { codec = DolbyAtmos.codecName }
         let format = SourceFormat(encoding: lossless ? .pcm : .lossy,
-                                  codec: codecName(ext: ext, formatID: source.mFormatID),
+                                  codec: codec,
                                   sampleRate: processing.mSampleRate, bitDepth: bits,
                                   channels: Int(processing.mChannelsPerFrame))
         return ProbedSource(url: url, format: format, decoderName: decoderName(for: decoder), pcm: decoder, dsd: nil)
@@ -112,7 +137,15 @@ enum SourceOpener {
     /// Wraps the probed decoder for the plan (DoP / DSD→PCM) and applies a CUE region.
     static func decoder(for probed: ProbedSource, plan: OutputPlan, item: PlayableItem) throws -> PCMDecoding {
         var decoder: PCMDecoding
-        if let dsd = probed.dsd {
+        if plan.mode == .bitstream {
+            // A receiver decodes: DTS CDs go out as stored; Dolby frames are wrapped in IEC 61937 bursts.
+            if let dts = probed.pcm as? DTSDecoder {
+                decoder = dts.carrier
+                try decoder.seek(to: 0)
+            } else {
+                decoder = try BitstreamDecoder.open(url: probed.url)
+            }
+        } else if let dsd = probed.dsd {
             if plan.mode == .dop {
                 decoder = try DoPDecoder(decoder: dsd)
             } else {
@@ -140,6 +173,8 @@ enum SourceOpener {
         case kAudioFormatMPEG4AAC, kAudioFormatMPEG4AAC_HE, kAudioFormatMPEG4AAC_HE_V2, kAudioFormatMPEG4AAC_LD: return "AAC"
         case kAudioFormatMPEGLayer3: return "MP3"
         case kAudioFormatOpus: return "Opus"
+        case kAudioFormatAC3: return "Dolby Digital"
+        case kAudioFormatEnhancedAC3: return "Dolby Digital Plus"
         default: break
         }
         switch ext {
@@ -176,6 +211,26 @@ enum SourceOpener {
 /// Public, read-only inspection used by the library scanner.
 public enum SourceInspector {
     public static var supportedExtensions: Set<String> { SourceOpener.supportedExtensions }
+    /// Formats with no tag container of their own (read from the decoder and the file name).
+    public static var untaggedExtensions: Set<String> { SourceOpener.dolbyExtensions.union(FFmpegDecoder.extensions) }
+
+    /// Whether this file can go to a receiver untouched: Dolby streams, and DTS CDs (the stored bitstream).
+    public static func canBitstream(_ url: URL, codec: String) -> Bool {
+        guard let kind = BitstreamFormat(codec: codec) else { return false }
+        return kind != .dts || !FFmpegDecoder.extensions.contains(url.pathExtension.lowercased())
+    }
+
+    /// Container tags for files the tag reader doesn't know (Matroska …): title, artist, album, date, track.
+    public static func containerTags(_ url: URL) -> [String: String] {
+        guard FFmpegDecoder.extensions.contains(url.pathExtension.lowercased()) else { return [:] }
+        let d = FFmpegDecoder(url: url)
+        guard (try? d.open()) != nil else { return [:] }
+        var out: [String: String] = [:]
+        for key in ["title", "artist", "album_artist", "album", "date", "track", "disc", "genre", "composer"] {
+            if let v = d.tag(key), !v.isEmpty { out[key] = v }
+        }
+        return out
+    }
 
     /// Opens the file just far enough to learn its true format and decoder.
     public static func inspect(_ url: URL) throws -> (format: SourceFormat, decoderName: String) {

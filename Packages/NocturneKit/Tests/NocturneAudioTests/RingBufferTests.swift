@@ -56,6 +56,24 @@ struct RingBufferTests {
         #expect(Array(out[0..<25]) == Array(current[5...]) + replacement)
     }
 
+    @Test("Integer mode copies every 32-bit word untouched (including ones that look like NaNs as floats) and meters them")
+    func integerModeIsBitExact() {
+        let ring = nrt_ring_create(4096, 2)!
+        defer { nrt_ring_destroy(ring) }
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx) }
+        nrt_context_set_integer(ctx, true)
+        nrt_context_set_gain(ctx, 0.5, 24)                     // ignored in integer mode
+        var words: [UInt32] = [0x7FFF_FFFF, 0x8000_0000, 0x7FA0_0001 /* signalling NaN as float */, 0xFFC0_0000, 0x0000_0001, 0x4000_0000]
+        words += (0..<506).map { UInt32(truncatingIfNeeded: $0 &* 2_654_435_761) }
+        let floats = words.map { Float(bitPattern: $0) }
+        #expect(nrt_ring_write(ring, floats, UInt32(words.count / 2)) == UInt32(words.count / 2))
+        var out = [Float](repeating: 0, count: words.count)
+        out.withUnsafeMutableBufferPointer { nrt_context_render_interleaved(ctx, $0.baseAddress!, UInt32(words.count / 2), 2) }
+        #expect(out.map(\.bitPattern) == words)
+        #expect(abs(nrt_context_take_peak(ctx, 0) - 1) < 1e-6)   // full scale, read as an integer
+    }
+
     @Test("Unity gain is bit-transparent for every 24-bit value pattern")
     func unityIsTransparent() {
         let ring = nrt_ring_create(4096, 2)!

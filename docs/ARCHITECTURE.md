@@ -25,6 +25,26 @@ Track changes are reported when the new segment becomes *audible*, not when it i
 
 A queue change (shuffle, repeat, edits) never touches the audible track. If the next track has already been decoded into the ring, `nrt_ring_rewind` takes that look-ahead back, but only when it is still well ahead of the reader (the larger of 250 ms and four I/O buffers). The engine then asks `nextItemProvider` again. When the look-ahead is too close to be taken back safely, it plays, and the new order applies from the track after it.
 
+## DTS CDs
+
+A DTS CD (or DTS-WAV) stores a DTS bitstream as 16-bit stereo PCM, usually in 14-bit words. Played as PCM, it is full-scale noise. When `SourceOpener.probe` opens a 16-bit stereo 44.1/48 kHz lossless file, it looks for a DTS sync word in the first 8,192 frames (`ndts_find_sync`). If it finds one, it wraps the file's decoder in `DTSDecoder`. That decoder feeds the words, as stored, to FFmpeg's `dca` parser and decoder (the `CNocturneDTS` shim over `Vendor/FFmpegDCA.xcframework`, built by `scripts/build-dts-decoder.sh` with only that decoder). Output is Float32 in the stream's own channel order, with a layout from its channel mask.
+
+Positions stay in the carrier's frames: a DTS CD holds one 512-sample frame per 512 carrier frames. So CUE indexes, seeks and durations are unchanged. Carrier frames before the first sync word are silence. A seek re-syncs a little before the target and drops the surplus decoded frames. The source is reported as lossy "DTS" with its real channel count, so the planner routes it as surround or Spatial Audio. A test checks the decode of a real DTS CD against FFmpeg's, bit for bit.
+
+## Dolby, TrueHD and DTS-HD
+
+- **Dolby Digital / Dolby Digital Plus** decode through macOS's licensed decoders (`.ac3`/`.ec3` are routed to the Core Audio decoder, which the MP3 decoder would otherwise claim by extension). A Dolby Digital Plus file carries Atmos objects (JOC) when Core Audio lists `ec+3` formats for it (5.1.2 up to 9.1.6). The codec is then "Dolby Atmos".
+- **Dolby Atmos.** macOS doesn't expose object rendering through its public decode APIs: AudioConverter, ExtAudioFile and AVAssetReader all give the 5.1 bed with silent heights, which was checked on Apple's Atmos sample stream. So by default `SystemRendererSession` hands the untouched Dolby Digital Plus frames (AVAssetReader, compressed) to `AVSampleBufferAudioRenderer` on the chosen device, with a render synchronizer for position, pause and seek. macOS renders the objects for the output, as Apple Music does. With `atmosBySystem` off, the bed plays through Nocturne's own engine.
+- **DTS / DTS-HD MA / Dolby TrueHD** in `.dts`, `.dtshd`, `.thd`, `.mlp` and `.mka` decode through FFmpeg (`CNocturneFF`, `FFmpegDecoder`). Lossless ones are reported as PCM with their bit depth. A test checks TrueHD decodes identically to the 24-bit source it was encoded from.
+
+## Bitstream (IEC 61937)
+
+On outputs marked as having a receiver (`bitstreamDeviceUIDs`), Dolby and DTS-CD sources plan as mode `.bitstream`: exclusive, exact rate, integer ≥ 16-bit, no gain. `BitstreamDecoder` wraps Dolby Digital frames in 1536-frame bursts at the stream's rate (Pd in bits). It groups Dolby Digital Plus frames into six-block bursts of 6144 frames at four times the rate (Pd in bytes, so HDMI only). DTS CDs go out as stored. The carriers are checked with FFmpeg's S/PDIF demuxer, which decodes them identically to the original files. A gapless transition into an Atmos track that macOS renders drains the ring first, then hands over.
+
+## Integer mode
+
+With `integerMode` and exclusive access, plain PCM that needs no processing plans with `integerSamples`: no resampling, Spatial Audio, downmix, digital volume or ReplayGain, on a device with a non-mixable Int32 physical format. `OutputSession` switches the physical format to non-mixable Int32; setting only the virtual format is accepted but ignored by USB Audio Class DACs such as the FiiO K11. The converter then decodes straight to Int32. The ring carries those words in its float slots, and the IOProc copies them as integers, including ones that would be NaN as floats, while meters read them as integers. So 32-bit sources are bit-perfect. The device is put back on mixable Float32 when the session ends.
+
 ## Output device
 
 With a specific output chosen (`EngineSettings.deviceUID`), the engine never substitutes another device. If that device isn't listed, or won't start, when playback begins, the item is parked and the engine waits for it (`waitingForDevice` in the snapshot) for up to 60 s. It re-checks on every Core Audio device-list change and twice a second, and starts playback as soon as the device is back. If the device disappears mid-song, it waits the same way. This covers AirPods Max, whose Core Audio device is removed while they're off your head and re-published a few seconds after they're back on, often after their "play" command has already arrived. Pause cancels the wait. With *System Output* chosen, the engine follows the Mac's default output as before.
@@ -61,7 +81,9 @@ The library is SQLite via GRDB:
 - `NetworkVolume` mounts with NetFS: soft, read-only by default, hidden from the Finder sidebar, in `/Volumes`. Current macOS refuses mounts inside an app's Application Support folder (protected app data), so mounting there would work once and never again.
 - Passwords are internet-password items in the **login** keychain (queried explicitly: an app's plain SecItem calls go to the data-protection keychain, where Finder's share passwords never are).
 - `NetworkShareManager` heals connections: it reconnects on launch, wake and network changes, remounts a share that disappeared, force-remounts one that is still listed but no longer answers, and rescans connected shares every 30 minutes (and after the server's analysis run), never while music plays from them. File-system events don't cross the network; these rescans are how additions and deletions on the server appear.
-- Playback from a share buffers more before starting, holds in silence and resumes exactly where it stopped if reads stall, and gets priority over caching and analysis.
+- Playback from a share buffers more before starting, holds in silence and resumes exactly where it stopped if reads stall (after 5 s are buffered again), and gets priority over caching and analysis.
+- The output ring holds about 20–30 s of audio: `OutputSession.ringFrames` is a power of two within a 96 MB budget, never under 5 s. A share whose server is busy (on a loaded HDD pool, a single read can wait several seconds) never drains it. The cache copies the playing track first, 2 s after it starts. Once the copy is complete, `PlaybackEngine.reopen` opens it at exactly the decoder's frame and swaps it in under the converter, so the rest of the track is read locally. A unit test checks the result is byte-identical to continuous decoding for FLAC and WAV. This happens only where a seek can't change the output (lossless PCM and DoP). Lossy decoders and DSD→PCM carry state across a seek, so those tracks finish from the share. `EngineSnapshot.readingFromShare` shows which source is in use.
+- The share health check doesn't count a slow answer as a dead mount while the cache is still receiving data (a remount would cut off what's playing).
 
 ## File analysis
 

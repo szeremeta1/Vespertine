@@ -1,0 +1,9 @@
+module FFmpegDCA {
+    header "libavcodec/avcodec.h"
+    header "libavformat/avformat.h"
+    header "libavutil/channel_layout.h"
+    header "libavutil/frame.h"
+    header "libavutil/mem.h"
+    link "ffmpegdca"
+    export *
+}

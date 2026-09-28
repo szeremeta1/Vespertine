@@ -184,6 +184,10 @@ public final class NetworkCache: @unchecked Sendable {
     // MARK: Downloading
 
     private var pinAfterDownload: Set<String> = []
+    private var lastTransfer = Date.distantPast
+
+    /// When a download last received data from the share (a slow share that still delivers isn't dead).
+    public var lastTransferAt: Date { lock.withLock { lastTransfer } }
 
     private func pump() {
         lock.lock()
@@ -241,6 +245,7 @@ public final class NetworkCache: @unchecked Sendable {
             if n < 0 { if errno == EINTR { continue }; ok = false; break }
             if write(output, buffer, n) != n { ok = false; break }
             total += Int64(n)
+            lock.withLock { lastTransfer = .now }
         }
         close(output)
         guard ok, total == job.size, rename(partial.path, final.path) == 0 else {

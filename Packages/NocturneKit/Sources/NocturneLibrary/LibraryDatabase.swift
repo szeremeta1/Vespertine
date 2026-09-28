@@ -187,6 +187,41 @@ public final class LibraryDatabase: Sendable {
             try db.execute(sql: "DELETE FROM analysis WHERE trackId IN (SELECT id FROM track WHERE channels > 2)")
             try db.execute(sql: "UPDATE track SET analysisVerdict = NULL, effectiveBitDepth = NULL, bandwidthHz = NULL WHERE channels > 2")
         }
+        m.registerMigration("v7-dts-recheck") { db in
+            // Before 0.5.15, DTS CDs (a DTS bitstream stored as 16-bit stereo PCM) were read as stereo PCM.
+            // Re-read the likely ones on the next scan (a changed date forces it); files scanned from now on
+            // are checked as they're read.
+            try db.execute(sql: """
+                UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'
+                WHERE channels = 2 AND bitDepth = 16 AND sampleRate IN (44100, 48000) AND isLossless = 1
+                  AND (codec = 'WAV' OR filePath LIKE '%DTS%' OR album LIKE '%DTS%')
+                """)
+            // Analyses of those files treated the bitstream as audio.
+            try db.execute(sql: """
+                DELETE FROM analysis WHERE trackId IN (SELECT id FROM track WHERE modifiedAt = '1970-01-01 00:00:00.000')
+                """)
+        }
+        m.registerMigration("v8-original-year") { db in
+            // Before 0.5.15 the year came from DATE, which reissues and remasters set to their own date.
+            // Prefer the original release date already read into extraTags.
+            try db.execute(sql: """
+                UPDATE track SET year = (
+                    SELECT CAST(substr(o, 1, 4) AS INTEGER) FROM (SELECT coalesce(
+                        json_extract(extraTags, '$.ORIGINALDATE'), json_extract(extraTags, '$.ORIGINALYEAR'),
+                        json_extract(extraTags, '$."ORIGINAL DATE"'), json_extract(extraTags, '$."ORIGINAL YEAR"')) AS o))
+                WHERE json_valid(extraTags) AND coalesce(
+                        json_extract(extraTags, '$.ORIGINALDATE'), json_extract(extraTags, '$.ORIGINALYEAR'),
+                        json_extract(extraTags, '$."ORIGINAL DATE"'), json_extract(extraTags, '$."ORIGINAL YEAR"')) GLOB '[12][0-9][0-9][0-9]*'
+                  AND (year IS NULL OR CAST(substr(coalesce(
+                        json_extract(extraTags, '$.ORIGINALDATE'), json_extract(extraTags, '$.ORIGINALYEAR'),
+                        json_extract(extraTags, '$."ORIGINAL DATE"'), json_extract(extraTags, '$."ORIGINAL YEAR"')), 1, 4) AS INTEGER) <= year)
+                """)
+        }
+        m.registerMigration("v9-artwork-recheck") { db in
+            // 0.5.16 also finds art stored as a METADATA_BLOCK_PICTURE comment and covers next to disc
+            // folders ("Album/CD 01"): re-read the tracks that have none on the next scan.
+            try db.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000' WHERE artworkKey IS NULL AND isMissing = 0")
+        }
         return m
     }
 }

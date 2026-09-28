@@ -25,10 +25,14 @@ let package = Package(
             name: "CNocturneRT",
             linkerSettings: [.linkedFramework("CoreAudio"), .linkedFramework("AudioToolbox")]
         ),
+        // DTS CDs / DTS-in-WAV: FFmpeg's DTS decoder only (scripts/build-dts-decoder.sh).
+        .binaryTarget(name: "FFmpegDCA", path: "Vendor/FFmpegDCA.xcframework"),
+        .target(name: "CNocturneDTS", dependencies: ["FFmpegDCA"]),
         .target(
             name: "NocturneAudio",
             dependencies: [
                 "CNocturneRT",
+                "CNocturneDTS",
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
                 .product(name: "NocturneAnalysisCore", package: "NocturneAnalysis"),
             ],
@@ -60,7 +64,8 @@ let package = Package(
         .executableTarget(name: "nocturne-probe", dependencies: ["NocturneAudio"]),
         // Library operations from the command line (find music, import, enrich) — same code the app uses.
         .executableTarget(name: "nocturne-library", dependencies: ["NocturneLibrary"]),
-        .testTarget(name: "NocturneAudioTests", dependencies: ["NocturneAudio", "CNocturneRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")]),
+        .testTarget(name: "NocturneAudioTests", dependencies: ["NocturneAudio", "CNocturneRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                    resources: [.copy("Fixtures")]),
         .testTarget(name: "NocturneLibraryTests", dependencies: ["NocturneLibrary"]),
     ],
     swiftLanguageModes: [.v6]

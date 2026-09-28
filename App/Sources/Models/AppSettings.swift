@@ -48,9 +48,15 @@ final class AppSettings {
     private let defaults: UserDefaults
 
     var exclusiveMode: Bool { didSet { defaults.set(exclusiveMode, forKey: "exclusiveMode") } }
+    /// Integer mode (exclusive access only): PCM needing no processing goes to the DAC as 32-bit integers.
+    var integerMode: Bool { didSet { defaults.set(integerMode, forKey: "integerMode") } }
+    /// Dolby Atmos: rendered by macOS (objects), or its channel bed played through Nocturne.
+    var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
+    /// Outputs with an AV receiver: Dolby and DTS are sent to them untouched.
+    var bitstreamDeviceUIDs: Set<String> { didSet { defaults.set(Array(bitstreamDeviceUIDs), forKey: "bitstreamDeviceUIDs") } }
     /// Spatial Audio for multichannel music, per device (unset = head tracked on AirPods/Beats, off elsewhere).
     var spatialModes: [String: String] { didSet { defaults.set(spatialModes, forKey: "spatialModes") } }
     var rateChoices: [String: String] { didSet { defaults.set(rateChoices, forKey: "rateChoices") } }
@@ -88,16 +94,19 @@ final class AppSettings {
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
         self.defaults = defaults
         defaults.register(defaults: [
-            "exclusiveMode": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
+            "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "deviceOnQuit": "restore",
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
+        atmosBySystem = defaults.bool(forKey: "atmosBySystem")
+        integerMode = defaults.bool(forKey: "integerMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
         selectedDeviceUID = defaults.string(forKey: "selectedDeviceUID")
         dopDeviceUIDs = Set(defaults.stringArray(forKey: "dopDeviceUIDs") ?? [])
+        bitstreamDeviceUIDs = Set(defaults.stringArray(forKey: "bitstreamDeviceUIDs") ?? [])
         spatialModes = defaults.dictionary(forKey: "spatialModes") as? [String: String] ?? [:]
         rateChoices = defaults.dictionary(forKey: "rateChoices") as? [String: String] ?? [:]
         replayGain = ReplayGainMode(rawValue: defaults.string(forKey: "replayGain") ?? "off") ?? .off
@@ -150,10 +159,13 @@ final class AppSettings {
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
         s.dopDeviceUIDs = dopDeviceUIDs
+        s.bitstreamDeviceUIDs = bitstreamDeviceUIDs
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
         s.digitalVolumeDB = deviceHasHardwareVolume ? nil : digitalVolumeDB
+        s.atmosBySystem = atmosBySystem
+        s.integerMode = integerMode
         return s
     }
 }
