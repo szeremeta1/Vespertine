@@ -337,7 +337,7 @@ struct AlbumDetailView: View {
         let base = channelText.isEmpty ? a.formatSummary : String(a.formatSummary.dropLast(channelText.count))
         parts.append(base.replacingOccurrences(of: "/", with: "-bit / ").appending(a.isDSD || !base.contains("/") ? "" : " kHz") + channelText)
         parts.append(a.totalSize.byteString)
-        if let p = a.sourcePath { parts.append((p as NSString).abbreviatingWithTildeInPath) }
+        if let p = a.sourcePath { parts.append(model.library.displayPath(p)) }
         return parts.joined(separator: " · ")
     }
 }

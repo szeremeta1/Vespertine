@@ -220,7 +220,7 @@ struct TagEditorView: View {
                     if t.cueStartFrame != nil { row("CUE", "Virtual track; edits stay in the library") }
                     row("Plays", "\(t.playCount)")
                 }
-                Text(t.filePath).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3)
+                Text(model.library.displayPath(t.filePath)).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3)
             } else {
                 Text("\(tracks.count) files · \(tracks.reduce(Int64(0)) { $0 + $1.fileSize }.byteString)")
                     .font(Typeface.mono(11)).foregroundStyle(Palette.text2)
