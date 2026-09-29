@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest something Vespertine should do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The problem or situation, rather than the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How do you do it today?
+      description: Another app, a workaround, or not at all.

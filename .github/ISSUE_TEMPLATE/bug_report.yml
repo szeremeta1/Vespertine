@@ -1,0 +1,49 @@
+name: Bug report
+description: Something doesn't play, sounds wrong, or the app misbehaves.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Vespertine version
+      description: Vespertine → About Vespertine.
+      placeholder: "0.6.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac
+      placeholder: "macOS 26.1, MacBook Pro M3"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Output device
+      description: DAC, headphones or receiver, and how it's connected.
+      placeholder: "FiiO K11 over USB-C / AirPods Max over USB-C / Denon receiver over HDMI"
+  - type: input
+    id: format
+    attributes:
+      label: File format
+      description: As shown in the track list, for example FLAC · 24/96, DSD64 · 5.1 or DTS · 44.1 kHz.
+  - type: textarea
+    id: signal
+    attributes:
+      label: Signal path
+      description: For sound problems, a screenshot of Now Playing with the signal path helps most.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
