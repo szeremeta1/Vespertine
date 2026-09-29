@@ -82,11 +82,15 @@ struct HeroScene: View {
         ZStack(alignment: .topLeading) {
             morphGlass(g, s)
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose,
-                      inspectorOverlay: AnyView(SignalPulse(t: t, start: s + b * 4.4)))
+                      inspectorOverlay: AnyView(SignalPulse(t: t, start: s + b * beat(g, 4.4, tall: 2.7))))
             copy(g, s)
         }
         .frame(width: g.W, height: g.H)
     }
+
+    /// When things happen, in beats from the start of the scene. A vertical frame is too narrow for the sidebar
+    /// lifting off a whole window to read, so there the camera pushes into Now Playing right after the window appears.
+    func beat(_ g: Geo, _ wide: Double, tall: Double) -> Double { g.tall ? tall : wide }
 
     func startScale(_ g: Geo) -> CGFloat { g.pick(0.74, square: 0.6, tall: 0.345) * g.u }
     func startCenter(_ g: Geo) -> CGPoint { g.at((0.5, 0.5), tall: (0.5, 0.46)) }
@@ -95,7 +99,7 @@ struct HeroScene: View {
         let appear = smooth(progress(t, s - 0.4, s - 0.12))
         let settle = spring(t, start: s - 0.1, response: 1.2, damping: 0.9)
         let explode = spring(t, start: s + b * 1.0, response: 0.95, damping: 0.8)
-        let push = easeInOutQuint(progress(t, s + b * 3.6, s + b * 5.0))
+        let push = easeInOutQuint(progress(t, s + b * beat(g, 3.6, tall: 0.9), s + b * beat(g, 5.0, tall: 2.4)))
         let dolly = progress(t, s, s + b * 8)
 
         // Before the push: the whole window, slowly growing. After: the lifted Now Playing panel, big.
@@ -106,27 +110,21 @@ struct HeroScene: View {
         let pushTarget = g.at((0.71, 0.53), square: (0.66, 0.57), tall: (0.5, 0.6))
         let pushCenter = windowCenter(placing: inspectorCenter, at: pushTarget, scale: pushScale)
 
-        // A vertical frame is too narrow to show the sidebar lifting off a whole window, so once the window
-        // has appeared the camera moves in on the sidebar, then travels across the track list to Now Playing.
-        let focus = g.tall ? easeInOutCubic(progress(t, s + b * 0.8, s + b * 2.3)) : 0
-        let focusScale = 0.6 * g.u * CGFloat(1 + 0.02 * dolly)
-        let focusCenter = windowCenter(placing: CGPoint(x: 350, y: 440), at: g.at((0.5, 0.5), tall: (0.5, 0.48)), scale: focusScale)
-
         return RigPose(
-            center: mix(mix(startCenter(g), focusCenter, focus), pushCenter, push),
-            scale: mix(mix(scale0, focusScale, focus), pushScale, push),
+            center: mix(startCenter(g), pushCenter, push),
+            scale: mix(scale0, pushScale, push),
             tiltX: 0,
             tiltY: (-5 * explode + 8 * smooth(progress(t, s + b * 1.6, s + b * 3.8))) * (1 - push) - g.pick(8, square: 6, tall: 0) * push,
             opacity: appear,
             explode: explode,
-            sidebarLift: CGSize(width: mix(g.pick(-92, square: -80, tall: -40), g.pick(-420, square: -520, tall: -900), push), height: -6),
+            sidebarLift: CGSize(width: mix(g.pick(-92, square: -80, tall: -60), g.pick(-420, square: -520, tall: -900), push), height: -6),
             inspectorLift: lift,
             contentDim: mix(0.3 * explode, 0.8, push),
             contentBlur: CGFloat(8 * push),
             inspectorScale: 1.07,
             sidebarScale: 1.05,
             shadow: 1,
-            sidebarTiltY: g.tall ? 9 : 14,
+            sidebarTiltY: g.tall ? 0 : 14,
             inspectorTiltY: g.tall ? 0 : -10 * (1 - push)
         )
     }
@@ -155,11 +153,11 @@ struct HeroScene: View {
     @ViewBuilder func copy(_ g: Geo, _ s: Double) -> some View {
         let at = g.at((0.07, 0.43), square: (0.07, 0.46), tall: (0.5, 0.19))
         VStack(alignment: g.tall ? .center : .leading, spacing: 24 * g.u) {
-            Tagline(text: g.tall ? "Every sample,\nuntouched." : "Every sample,\nuntouched.", size: g.pick(g.W * 0.05, square: g.W * 0.062, tall: g.W * 0.085), t: t, start: s + b * 4.1,
+            Tagline(text: "Every sample,\nuntouched.", size: g.pick(g.W * 0.05, square: g.W * 0.062, tall: g.W * 0.085), t: t, start: s + b * beat(g, 4.1, tall: 2.0),
                     alignment: g.tall ? .center : .leading, width: g.pick(g.W * 0.36, square: g.W * 0.42, tall: g.W * 0.86))
             BrandLabel(text: g.wide ? "Bit-perfect · 24-bit · 192 kHz · exclusive" : "Bit-perfect · 24-bit · 192 kHz",
                        size: g.pick(g.W * 0.0098, square: g.W * 0.014, tall: g.W * 0.022), brass: true, dot: true)
-                .arrive(t, at: s + b * 5.2)
+                .arrive(t, at: s + b * beat(g, 5.2, tall: 3.1))
         }
         .frame(width: g.pick(g.W * 0.4, square: g.W * 0.45, tall: g.W * 0.9), alignment: g.tall ? .center : .leading)
         .fixedSize(horizontal: false, vertical: true)
@@ -173,9 +171,12 @@ struct SignalPulse: View {
     let t: Double
     let start: Double
 
-    static let nodeX: CGFloat = 1117 - AppWindow.inspector.minX
-    static let nodes: [CGFloat] = [543, 582, 621, 674, 713].map { $0 - AppWindow.inspector.minY }
-    static let badge = CGRect(x: 1112 - AppWindow.inspector.minX, y: 452 - AppWindow.inspector.minY, width: 108, height: 23)
+    // Measured in the recording (window points): the centres of the signal path's 7.5 pt rings, and the
+    // centre line of the BIT-PERFECT badge's 1 pt border, so the light lands exactly on the app's own shapes.
+    static let nodeX: CGFloat = 1116.75 - AppWindow.inspector.minX
+    static let nodes: [CGFloat] = [538.75, 577.75, 616.75, 669.75, 708.75].map { $0 - AppWindow.inspector.minY }
+    static let ring: CGFloat = 7.5
+    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 452.25 - AppWindow.inspector.minY, width: 106, height: 22)
 
     var body: some View {
         let travel = easeInOutCubic(progress(t, start, start + b * 1.9))
@@ -192,21 +193,22 @@ struct SignalPulse: View {
             ForEach(Array(SignalPulse.nodes.enumerated()), id: \.offset) { _, ny in
                 let lit = t > start && y >= ny - 1
                 let near = lit ? max(0, 1 - Double(abs(y - ny)) / 50) : 0
-                Circle().fill(Brand.brassHi).frame(width: 8, height: 8)
+                Circle().fill(Brand.brassHi).frame(width: SignalPulse.ring, height: SignalPulse.ring)
                     .shadow(color: Brand.brass, radius: 8 + 16 * CGFloat(near))
                     .scaleEffect(1 + 0.9 * near)
                     .opacity(lit ? 1 : 0)
-                    .offset(x: SignalPulse.nodeX - 4, y: ny - 4)
+                    .offset(x: SignalPulse.nodeX - SignalPulse.ring / 2, y: ny - SignalPulse.ring / 2)
             }
             if running {
                 Circle().fill(Color.white).frame(width: 11, height: 11)
                     .shadow(color: Brand.brassHi, radius: 12).shadow(color: Brand.brass, radius: 28)
                     .offset(x: SignalPulse.nodeX - 5.5, y: y - 5.5)
             }
-            RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(Brand.brassHi, lineWidth: 1.6)
+            // The badge's own border lights up and fades; it stays on the border rather than rippling outward.
+            RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(Brand.brassHi, lineWidth: 1.4)
                 .frame(width: SignalPulse.badge.width, height: SignalPulse.badge.height)
-                .shadow(color: Brand.brass, radius: 18)
-                .scaleEffect(1 + 0.3 * (1 - flare))
+                .shadow(color: Brand.brass, radius: 6)
+                .shadow(color: Brand.brass.opacity(0.8), radius: 18)
                 .opacity(flare)
                 .offset(x: SignalPulse.badge.minX, y: SignalPulse.badge.minY)
         }
@@ -368,7 +370,7 @@ struct SpatialScene: View {
                         label: "Spatial · head tracked · 6 channels", copper: true, right: true)
             // The meters lift out of Now Playing…
             Lift(image: frame, region: Meters.region, pose: pose, to: ringCenter, toScale: 2.0 * g.u, p: lift,
-                 fade: 1 - smooth(progress(t, s + b * 1.0, s + b * 1.4)))
+                 fade: 1 - smooth(progress(t, s + b * 1.02, s + b * 1.3)))
             // …and become speakers placed around the listener.
             ring(center: ringCenter, radius: ringR, g: g, appear: burst)
         }
@@ -395,20 +397,24 @@ struct SpatialScene: View {
                 let origin = CGPoint(x: center.x + (Meters.columns[i] - Meters.region.midX) * 2 * g.u,
                                      y: center.y + ((Meters.top + Meters.bottom) / 2 - Meters.region.midY) * 2 * g.u)
                 let d = orb * (spk.label == "LFE" ? 0.8 : 1)
-                VStack(spacing: 8 * g.u) {
-                    ZStack {
-                        Circle().fill(Brand.brass.opacity(0.18 + 0.5 * level))
-                            .frame(width: d * CGFloat(0.3 + 0.55 * level), height: d * CGFloat(0.3 + 0.55 * level))
-                            .blur(radius: d * 0.12)
-                        Circle().fill(.clear).frame(width: d, height: d)
-                            .glassEffect(.regular.tint(Brand.brass.opacity(0.06 + 0.22 * level)), in: Circle())
-                        Circle().strokeBorder(Brand.brassHi.opacity(0.25 + 0.5 * level), lineWidth: 1).frame(width: d, height: d)
-                    }
-                    .scaleEffect(1 + 0.12 * CGFloat(level))
-                    Text(spk.label).font(Font(BrandFont.mono(11 * g.u, 500))).kerning(1.2 * g.u).foregroundStyle(Brand.ash)
+                // Each speaker leaves its meter as a disc exactly as wide as the bar (14 pt, lifted at 2×),
+                // then grows on its way out; its name appears once it has nearly arrived.
+                let grow = mix(14 * 2 * g.u / d, 1, clamp01(appear))
+                let at = mix(origin, home, appear)
+                ZStack {
+                    Circle().fill(Brand.brass.opacity(0.18 + 0.5 * level))
+                        .frame(width: d * CGFloat(0.3 + 0.55 * level), height: d * CGFloat(0.3 + 0.55 * level))
+                        .blur(radius: d * 0.12)
+                    Circle().fill(.clear).frame(width: d, height: d)
+                        .glassEffect(.regular.tint(Brand.brass.opacity(0.06 + 0.22 * level)), in: Circle())
+                    Circle().strokeBorder(Brand.brassHi.opacity(0.25 + 0.5 * level), lineWidth: 1).frame(width: d, height: d)
                 }
-                .position(mix(origin, home, appear))
-                .opacity(clamp01(appear * 3))
+                .scaleEffect(grow * (1 + 0.12 * CGFloat(level)))
+                .position(at)
+                .opacity(clamp01(appear * 4))
+                Text(spk.label).font(Font(BrandFont.mono(11 * g.u, 500))).kerning(1.2 * g.u).foregroundStyle(Brand.ash)
+                    .position(x: at.x, y: at.y + d / 2 + 14.5 * g.u)
+                    .opacity(smooth(clamp01((appear - 0.6) / 0.35)))
             }
         }
     }
@@ -452,30 +458,34 @@ struct AnalysisScene: View {
 struct CutoffSweep: View {
     let t: Double
     let start: Double
-    static let cutoffX: CGFloat = 1404 - AnalysisScene.spectrum.minX
-    static let plotTop: CGFloat = 548 - AnalysisScene.spectrum.minY
-    static let plotBottom: CGFloat = 690 - AnalysisScene.spectrum.minY
+    // Measured in the recording (window points): the spectrum's plot panel and the app's dashed cutoff line.
+    // Everything here stays inside the panel and is clipped to its rounded corners.
+    static let plot = CGRect(x: 1112 - AnalysisScene.spectrum.minX, y: 551 - AnalysisScene.spectrum.minY, width: 308, height: 139.5)
+    static let cutoffX: CGFloat = 1403.25 - 1112
+    static let corner: CGFloat = 6
 
     var body: some View {
         let scan = easeInOutCubic(progress(t, start, start + b * 1.3))
-        let x = mix(8, CutoffSweep.cutoffX, scan)
+        let x = mix(0, CutoffSweep.cutoffX, scan)
         let settled = smooth(progress(t, start + b * 1.3, start + b * 1.8))
-        let h = CutoffSweep.plotBottom - CutoffSweep.plotTop
+        let plot = CutoffSweep.plot
         ZStack(alignment: .topLeading) {
             Rectangle().fill(LinearGradient(colors: [Brand.copper.opacity(0), Brand.copper.opacity(0.3)], startPoint: .leading, endPoint: .trailing))
-                .frame(width: max(0, x - 8), height: h)
-                .offset(x: 8, y: CutoffSweep.plotTop)
+                .frame(width: max(0, x), height: plot.height)
                 .opacity(t > start ? 0.55 * (1 - settled) : 0)
             Rectangle().fill(Brand.copper.opacity(0.28))
-                .frame(width: AnalysisScene.spectrum.width - CutoffSweep.cutoffX, height: h)
-                .offset(x: CutoffSweep.cutoffX, y: CutoffSweep.plotTop)
+                .frame(width: plot.width - CutoffSweep.cutoffX, height: plot.height)
+                .offset(x: CutoffSweep.cutoffX)
                 .opacity(settled)
-            Capsule().fill(Brand.copper)
-                .frame(width: 1.6, height: h)
+            Rectangle().fill(Brand.copper)
+                .frame(width: 1.6, height: plot.height)
                 .shadow(color: Brand.copper, radius: 6)
-                .offset(x: x - 0.8, y: CutoffSweep.plotTop)
+                .offset(x: x - 0.8)
                 .opacity(t > start ? 1 : 0)
         }
+        .frame(width: plot.width, height: plot.height, alignment: .topLeading)
+        .clipShape(RoundedRectangle(cornerRadius: CutoffSweep.corner, style: .continuous))
+        .offset(x: plot.minX, y: plot.minY)
         .frame(width: AnalysisScene.spectrum.width, height: AnalysisScene.spectrum.height, alignment: .topLeading)
     }
 }
@@ -506,32 +516,47 @@ struct LibraryScene: View {
         let cue = Cue.for(.library)!
         return ZStack(alignment: .topLeading) {
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose,
-                      windowOverlay: AnyView(covers(s)))
+                      windowOverlay: AnyView(covers(s, dim: pose.contentDim)))
             FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Your whole\nlibrary.",
                         label: "FLAC · ALAC · WAV · AIFF", label2: "DSD · Dolby · DTS", right: true)
         }
         .frame(width: g.W, height: g.H)
     }
 
-    /// Each album card rises out of the grid in a wave, catches the light, and settles back.
-    func covers(_ s: Double) -> some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(0..<(LibraryScene.rows.count * LibraryScene.columns.count), id: \.self) { i in
-                let r = i / LibraryScene.columns.count, c = i % LibraryScene.columns.count
-                let rect = CGRect(x: LibraryScene.columns[c], y: LibraryScene.rows[r], width: LibraryScene.card.width, height: LibraryScene.card.height)
-                let start = s + b * 0.5 + Double(c) * 0.07 + Double(r) * 0.14
-                let up = spring(t, start: start, response: 0.7, damping: 0.62)
-                let down = spring(t, start: start + b * 1.9, response: 0.9, damping: 0.9)
-                let lift = CGFloat(max(0, up - down))
-                if let frame {
-                    Image(decorative: crop(frame, rect), scale: 2).resizable()
-                        .frame(width: rect.width, height: rect.height)
-                        .overlay(Glint(p: progress(t, start + b * 0.6, start + b * 1.4)).clipped())
+    /// Each album card rises out of the grid in a wave, catches the light, and settles back. The card leaves a
+    /// recess where it was, so the grid's own title and format lines don't show twice under the lifted card.
+    func covers(_ s: Double, dim: Double) -> some View {
+        let cards = (0..<(LibraryScene.rows.count * LibraryScene.columns.count)).map { i -> (rect: CGRect, start: Double, lift: CGFloat) in
+            let r = i / LibraryScene.columns.count, c = i % LibraryScene.columns.count
+            let rect = CGRect(x: LibraryScene.columns[c], y: LibraryScene.rows[r], width: LibraryScene.card.width, height: LibraryScene.card.height)
+            let start = s + b * 0.5 + Double(c) * 0.07 + Double(r) * 0.14
+            let up = spring(t, start: start, response: 0.7, damping: 0.62)
+            let down = spring(t, start: start + b * 1.9, response: 0.9, damping: 0.9)
+            return (rect, start, CGFloat(max(0, up - down)))
+        }
+        // The overlay sits above the window's dimming, so the recess is darkened by the same amount.
+        let shade = 1 - 0.45 * dim
+        return ZStack(alignment: .topLeading) {
+            ForEach(Array(cards.enumerated()), id: \.offset) { _, card in
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(red: 6 / 255 * shade, green: 6 / 255 * shade, blue: 7 / 255 * shade))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Color.white.opacity(0.05 * shade), lineWidth: 1))
+                    .frame(width: card.rect.width + 6, height: card.rect.height + 6)
+                    .offset(x: card.rect.minX - 3, y: card.rect.minY - 3)
+                    .opacity(smooth(Double(card.lift) * 4))
+            }
+            if let frame {
+                ForEach(Array(cards.enumerated()), id: \.offset) { _, card in
+                    Image(decorative: crop(frame, card.rect), scale: 2).resizable()
+                        .frame(width: card.rect.width, height: card.rect.height)
+                        .overlay(Glint(p: progress(t, card.start + b * 0.6, card.start + b * 1.4)).clipped())
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .shadow(color: .black.opacity(0.7 * Double(lift)), radius: 30 * lift, y: 20 * lift)
-                        .scaleEffect(1 + 0.22 * lift)
-                        .offset(x: rect.minX, y: rect.minY - 34 * lift)
-                        .opacity(lift > 0.01 ? 1 : 0)
+                        .shadow(color: .black.opacity(0.7 * Double(card.lift)), radius: 30 * card.lift, y: 20 * card.lift)
+                        // At most 1.11× (1.13 at the spring's overshoot) so a card never covers its neighbours:
+                        // the grid's gutters are 22 pt wide.
+                        .scaleEffect(1 + 0.11 * card.lift)
+                        .offset(x: card.rect.minX, y: card.rect.minY - 38 * card.lift)
+                        .opacity(card.lift > 0.01 ? 1 : 0)
                 }
             }
         }
@@ -554,8 +579,8 @@ struct EndScene: View {
         let logoW = g.pick(g.W * 0.46, square: g.W * 0.64, tall: g.W * 0.8)
         let small = g.pick(g.W * 0.0165, square: g.W * 0.026, tall: g.W * 0.038)
         ZStack {
-            RadialGradient(colors: [Brand.brass.opacity(0.1 + 0.05 * sin((t - s) * 1.3)), .clear], center: .center, startRadius: 0, endRadius: g.W * 0.45)
-                .offset(y: -g.H * 0.07)
+            // The glow sits behind the logo; its centre moves up, not the view, which would leave its bottom edge in frame.
+            RadialGradient(colors: [Brand.brass.opacity(0.1 + 0.05 * sin((t - s) * 1.3)), .clear], center: UnitPoint(x: 0.5, y: 0.43), startRadius: 0, endRadius: g.W * 0.45)
             Image(decorative: assets.logo, scale: 1).resizable().aspectRatio(contentMode: .fit)
                 .frame(width: logoW)
                 .scaleEffect(CGFloat(mix(0.94, 1, logoIn)))
