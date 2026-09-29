@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname $0)/../.."
 bin=$(mktemp -d)/brand
-swiftc -O scripts/brand/BrandKit.swift scripts/brand/main.swift -o "$bin"
+swiftc -O "$PWD/scripts/brand/BrandKit.swift" "$PWD/scripts/brand/main.swift" -o "$bin"
 "$bin"
-swiftc -O scripts/brand/BrandKit.swift scripts/brand/keyart/main.swift -o "$bin-keyart"
+swiftc -O "$PWD/scripts/brand/BrandKit.swift" "$PWD/scripts/brand/keyart/main.swift" -o "$bin-keyart"
 "$bin-keyart"

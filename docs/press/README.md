@@ -9,3 +9,12 @@ Each image covers one feature at three sizes:
 | `-producthunt` | 1270×760 | Product Hunt gallery |
 
 The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd` and `fake-hi-res`. They're built from `docs/screenshots` by `scripts/brand/build.sh`, and follow the [brand guide](../brand/brand-guide.pdf).
+
+## Launch trailer
+
+A 36.6 s trailer in 16:9 and 1:1, cut to "Starlight Lounge" from iMovie's royalty-free music (Apple licenses it for use in your own projects).
+- **Scenes:** `scripts/brand/trailer/main.swift` renders them as ProRes with half-second handles. They're built from window-only screen recordings of the app on the maker's library: ScreenCaptureKit, only the Vespertine window, no other windows or notifications.
+- **Edit:** assembled in Final Cut Pro from an FCPXML, with cuts on the bar lines and 16-frame dissolves.
+- **Delivery:** H.264 at −14 LUFS.
+
+The video files aren't kept in the repo.
