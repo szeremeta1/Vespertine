@@ -249,7 +249,9 @@ public extension LibraryDatabase {
                max(artworkKey) AS artworkKey,
                max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,
                max(codec) AS codec, min(isLossless) AS lossless, max(bitrate) AS bitrate,
-               max(addedAt) AS addedAt, sum(fileSize) AS totalSize, min(filePath) AS anyPath,
+               max(addedAt) AS addedAt,
+               -- a CUE-split file counts once (with its first track), not once per track
+               sum(CASE WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
                min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey
         FROM track WHERE isMissing = 0 AND (\(filter))
         GROUP BY albumKey ORDER BY \(order)
