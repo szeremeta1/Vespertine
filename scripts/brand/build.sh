@@ -5,3 +5,5 @@ cd "$(dirname $0)/../.."
 bin=$(mktemp -d)/brand
 swiftc -O scripts/brand/BrandKit.swift scripts/brand/main.swift -o "$bin"
 "$bin"
+swiftc -O scripts/brand/BrandKit.swift scripts/brand/keyart/main.swift -o "$bin-keyart"
+"$bin-keyart"
