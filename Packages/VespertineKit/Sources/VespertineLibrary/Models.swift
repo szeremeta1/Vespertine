@@ -52,9 +52,11 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
         let isFile = LibraryScanner.audioExtensions.contains((path as NSString).pathExtension.lowercased())
         return URL(fileURLWithPath: path, isDirectory: !isFile)
     }
-    /// Short name for the sidebar: the volume name for external drives, else the folder name.
+    /// Short name for the sidebar: the name the user gave it, "Imported Music" for the folder the app
+    /// imports into, the volume name for external drives, else the folder name.
     public var displayName: String {
         if let name, !name.isEmpty { return name }
+        if mode == .managed { return "Imported Music" }
         if let remoteURL, let share = NetworkShare(string: remoteURL) { return share.defaultName }
         let components = url.pathComponents
         if path.hasPrefix("/Volumes/"), components.count == 3 { return components[2] }

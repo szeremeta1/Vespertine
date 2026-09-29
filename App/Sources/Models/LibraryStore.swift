@@ -250,6 +250,12 @@ final class LibraryStore {
         for source in sources { await scan(source) }
     }
 
+    func renameSource(_ source: LibrarySource, to name: String) {
+        guard let id = source.id else { return }
+        try? database.renameSource(id, to: name)
+        revision += 1
+    }
+
     func removeSource(_ source: LibrarySource) {
         guard let id = source.id else { return }
         try? database.removeSource(id)

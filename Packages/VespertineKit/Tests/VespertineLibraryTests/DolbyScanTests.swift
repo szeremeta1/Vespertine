@@ -35,7 +35,7 @@ struct DolbyScanTests {
         #expect(track.isLossless == lossless)
         #expect(track.channels == 6)
         #expect(abs(track.duration - 1) < 0.1, "duration \(track.duration)")
-        if let title { #expect(track.title == title && track.artist == "Vespertine Test" && track.album == "Fixtures") }
+        if let title { #expect(track.title == title && track.artist == "Nocturne Test" && track.album == "Fixtures") }
     }
 
     @Test("A DTS CD shows no bitrate: the file's 1411k belongs to the PCM carrier")
