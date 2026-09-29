@@ -8,8 +8,11 @@ import AppKit
 
 let args = CommandLine.arguments
 let clipsDir = URL(fileURLWithPath: args[1]), outDir = URL(fileURLWithPath: args[2])
-let square = args.count > 3 && args[3] == "square"
-let W = square ? 1080 : 1920, H = 1080
+let mode = args.count > 3 ? args[3] : "wide"          // wide 1920×1080, square 1080×1080, vertical 1080×1920
+let square = mode != "wide", vertical = mode == "vertical"
+let W = square ? 1080 : 1920, H = vertical ? 1920 : 1080
+/// Vertical cuts keep text clear of Shorts/Reels/TikTok controls: nothing in the top 250 or bottom 400 px.
+let safeBottom: CGFloat = vertical ? 420 : 0
 let fps: Int32 = 30, handle = 0.5, bar = 60.0 / 64 * 4   // Starlight Lounge, 64 BPM: one scene per bar
 try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
@@ -106,6 +109,16 @@ func scrimMask(width: CGFloat, fadeFrom: CGFloat) -> CGImage {
     return ctx.makeImage()!
 }
 
+func wrapLines(_ s: String, _ font: CTFont, width: CGFloat, tracking: CGFloat = 0) -> [String] {
+    var lines: [String] = [], line = ""
+    for word in s.split(separator: " ") {
+        let c = line.isEmpty ? String(word) : line + " " + word
+        if Brand.textPath(c, font: font, tracking: tracking).width > width, !line.isEmpty { lines.append(line); line = String(word) } else { line = c }
+    }
+    if !line.isEmpty { lines.append(line) }
+    return lines
+}
+
 // MARK: Scenes
 
 struct AppScene {
@@ -145,9 +158,11 @@ func renderApp(_ s: AppScene) async throws {
         let img = maskIndicator(source.frame(at: t))
         let iw = CGFloat(img.width), ih = CGFloat(img.height)
         // Camera: from the whole window (with a margin) towards the focus region, eased over the whole take.
-        let fitAll = min(w / iw, h / ih) * (square ? 0.98 : 0.9)
+        // Vertical: start on a taller window (sides cropped) and finish centred on the readout, which a narrow frame
+        // would otherwise cut off.
+        let fitAll = vertical ? h * 0.5 / ih : min(w / iw, h / ih) * (square ? 0.98 : 0.9)
         let fitFocus = min(w / s.focus.width, h / s.focus.height) * 0.92
-        let p = ease(CGFloat(t / total)) * s.zoom
+        let p = ease(CGFloat(t / (vertical ? total * 0.65 : total))) * (vertical && s.zoom >= 0.5 ? 1 : s.zoom)
         let scale = fitAll + (fitFocus - fitAll) * p
         let center = CGPoint(x: iw / 2 + (s.focus.midX - iw / 2) * p, y: ih / 2 + (s.focus.midY - ih / 2) * p)
         writer.append { ctx in
@@ -171,15 +186,24 @@ func renderApp(_ s: AppScene) async throws {
             let capW = max(Brand.textPath(s.headline, font: Brand.serif(hs0, weight: 300), tracking: -0.015).width,
                            Brand.textPath(s.detail, font: Brand.mono(square ? 17 : 19, weight: 500), tracking: 0.14).width) + (square ? 64 : 96)
             ctx.saveGState()
-            ctx.clip(to: CGRect(x: 0, y: 0, width: w, height: h), mask: scrimMask(width: capW + 180, fadeFrom: capW))
+            ctx.clip(to: CGRect(x: 0, y: 0, width: w, height: h), mask: scrimMask(width: vertical ? w * 2 : capW + 180, fadeFrom: vertical ? w * 2 : capW))
             let scrim = CGGradient(colorsSpace: nil, colors: [Brand.color(Brand.base, 0.96 * a), Brand.color(Brand.base, 0.8 * a), Brand.color(Brand.base, 0)] as CFArray,
                                    locations: [0, 0.5, 1])!
-            ctx.drawLinearGradient(scrim, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: 250), options: [])
+            ctx.drawLinearGradient(scrim, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: safeBottom + (vertical ? 420 : 250)), options: [])
             ctx.restoreGState()
             let rise = (1 - ramp(local, captionIn, captionIn + 0.7)) * 14
-            let hs: CGFloat = square ? 60 : 72, x: CGFloat = square ? 64 : 96
-            fillText(ctx, s.headline, Brand.serif(hs, weight: 300), Brand.text, a, x: x, baseline: 128 - rise, tracking: -0.015)
-            fillText(ctx, s.detail, Brand.mono(square ? 17 : 19, weight: 500), Brand.brass, a, x: x + 3, baseline: 80 - rise, tracking: 0.14)
+            let hs: CGFloat = vertical ? 66 : square ? 60 : 72, x: CGFloat = square ? 64 : 96
+            let hf = Brand.serif(hs, weight: 300), df = Brand.mono(square ? 17 : 19, weight: 500)
+            let lines = vertical ? wrapLines(s.headline, hf, width: w - 2 * x) : [s.headline]
+            let details = vertical ? wrapLines(s.detail, df, width: w - 2 * x, tracking: 0.14) : [s.detail]
+            // Stack from the bottom: detail lines, then the headline above them (wide and square keep one line each).
+            let detailBase = safeBottom + 80, headBase = detailBase + CGFloat(details.count - 1) * 30 + 48
+            for (k, d) in details.enumerated() {
+                fillText(ctx, d, df, Brand.brass, a, x: x + 3, baseline: detailBase + CGFloat(details.count - 1 - k) * 30 - rise, tracking: 0.14)
+            }
+            for (k, l) in lines.enumerated() {
+                fillText(ctx, l, hf, Brand.text, a, x: x, baseline: headBase + CGFloat(lines.count - 1 - k) * hs * 1.12 - rise, tracking: -0.015)
+            }
         }
     }
     await writer.finish()
@@ -230,7 +254,7 @@ func renderEnd() async throws {
                             : ["AirPods is a trademark of Apple Inc. Dolby is a trademark of Dolby Laboratories. DTS is a trademark of DTS, Inc. Vespertine is not affiliated with them.",
                                "Albums shown are from the maker’s own library and belong to their owners."]
             for (k, line) in tm.enumerated() {
-                fillText(ctx, line, Brand.sans(square ? 13 : 15), Brand.text3, ramp(t, 1.6, 2.4), x: w / 2, baseline: 70 - CGFloat(k) * 24, center: true)
+                fillText(ctx, line, Brand.sans(square ? 13 : 15), Brand.text3, ramp(t, 1.6, 2.4), x: w / 2, baseline: safeBottom + 70 - CGFloat(k) * 24, center: true)
             }
         }
     }
