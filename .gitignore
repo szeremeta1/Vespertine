@@ -22,7 +22,7 @@ Packages/VespertineKit/Package.resolved.bak
 *.p12
 *.p8
 vespertine-sparkle-key.txt
-.claude/settings.local.json
+.claude/
 
 # Maintainer and agent notes (machine-specific or private; kept local on purpose)
 CLAUDE.md
