@@ -1,12 +1,12 @@
 //
-// Nocturne — play queue, transport and system integration (Now Playing, media keys, scrobbling).
+// Vespertine — play queue, transport and system integration (Now Playing, media keys, scrobbling).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
 import MediaPlayer
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import Observation
 import Synchronization
 
@@ -68,7 +68,7 @@ final class PlayerController {
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
     private(set) var buffering = false
-    /// Live level (0…1, linear peak with decay) of every channel Nocturne sends, for multichannel meters.
+    /// Live level (0…1, linear peak with decay) of every channel Vespertine sends, for multichannel meters.
     private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
     /// The chosen output playback is waiting for (it starts by itself when the output is back).
@@ -228,7 +228,7 @@ final class PlayerController {
     }
 
     /// Volume keys and headphone controls (the AirPods Max crown sends volume keys) act on the Mac's
-    /// sound output, not on the device Nocturne plays to. Point the sound output at Nocturne's device
+    /// sound output, not on the device Vespertine plays to. Point the sound output at Vespertine's device
     /// while it plays so they adjust what you hear, and never change some other device's volume.
     /// (macOS never makes a device another app holds exclusively the sound output, so this needs shared mode.)
     private var lastFollowed: AudioObjectID?
@@ -365,7 +365,7 @@ final class PlayerController {
             requested = nil
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
-                lastError = "“\(track.title)” is on a network share that isn’t connected. Nocturne reconnects automatically when the server is reachable."
+                lastError = "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable."
             } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
                 // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
                 library.rescanForMissingFile(track)

@@ -1,9 +1,9 @@
 //
-// Nocturne — browsing by genre: a tile per genre, and each genre's albums.
+// Vespertine — browsing by genre: a tile per genre, and each genre's albums.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 struct GenresView: View {

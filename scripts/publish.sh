@@ -6,16 +6,16 @@
 #
 # The appcast lives on every release as `appcast.xml`; the app's SUFeedURL points at
 # .../releases/latest/download/appcast.xml, so the newest release always serves the feed.
-# Each entry is EdDSA-signed with the `nocturne` key in the login keychain (generate_keys --account nocturne).
+# Each entry is EdDSA-signed with the Sparkle key stored in the login keychain under the account `nocturne` (kept from before the rename so the EdDSA key never changes).
 set -euo pipefail
 cd "$(dirname $0)/.."
 
-repo=szeremeta1/Nocturne
-out=${NOCTURNE_OUT:-build/Release}
+repo=szeremeta1/Vespertine
+out=${VESPERTINE_OUT:-build/Release}
 notes=${1:?usage: scripts/publish.sh <release-notes.md>}
-app="$out/Nocturne.app"
+app="$out/Vespertine.app"
 version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app/Contents/Info.plist")
-dmg="$out/Nocturne-$version.dmg"
+dmg="$out/Vespertine-$version.dmg"
 tools=$(dirname "$(find build -path '*artifacts/sparkle/Sparkle/bin/generate_appcast' | head -1)")
 
 [[ -f $dmg ]] || { print -u2 "Missing $dmg; run scripts/release.sh --notarize first."; exit 1; }
@@ -28,7 +28,7 @@ cp "$dmg" "$feed/"
 gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/null || print "No existing appcast; starting a new one."
 
 # Sparkle shows HTML release notes placed beside the archive.
-/usr/bin/python3 - "$notes" "$feed/Nocturne-$version.html" <<'PY'
+/usr/bin/python3 - "$notes" "$feed/Vespertine-$version.html" <<'PY'
 import html, re, sys
 lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
 out, in_list, in_code = [], False, False
@@ -63,8 +63,8 @@ PY
 grep -q "sparkle:edSignature" "$feed/appcast.xml" || { print -u2 "appcast entry is not EdDSA-signed"; exit 1; }
 
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-  git tag -s "v$version" -m "Nocturne $version"
+  git tag -s "v$version" -m "Vespertine $version"
 fi
 git push -q origin "v$version"
 gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
-  --title "Nocturne $version" --notes-file "$notes"
+  --title "Vespertine $version" --notes-file "$notes"

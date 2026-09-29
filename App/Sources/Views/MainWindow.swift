@@ -1,9 +1,9 @@
 //
-// Nocturne — main window layout.
+// Vespertine — main window layout.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -184,7 +184,7 @@ struct EmptyLibraryView: View {
             Text("Your library is empty")
                 .font(Typeface.serif(30))
                 .foregroundStyle(Palette.text)
-            Text("Nocturne can look through this Mac for music, check each file's real format, and bring in\nyour hi-res and lossless albums. You can also add folders yourself.")
+            Text("Vespertine can look through this Mac for music, check each file's real format, and bring in\nyour hi-res and lossless albums. You can also add folders yourself.")
                 .font(Typeface.ui(13))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Palette.text2)

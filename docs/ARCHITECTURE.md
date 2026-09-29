@@ -10,11 +10,11 @@ file ─▶ SFBAudioEngine / FFmpeg ─▶ [DoP / DSD→PCM wrapper] ─▶ [CUE
 
 1. **Probe.** `SourceOpener.probe` opens the file and reports its true `SourceFormat`: codec, lossless/lossy/DSD, rate, bit depth and channels.
 2. **Plan.** `FormatPlanner.plan` (pure and unit-tested) combines the source with the device's `DeviceCapabilities` (discrete nominal rates, physical formats, DoP opt-in) and the per-device `RatePolicy`. It produces an `OutputPlan`: device rate, physical bit depth, PCM or DoP, and whether SRC or DSD→PCM conversion is needed.
-3. **Configure.** `OutputSession` takes hog mode only in exclusive mode (shared is the default, so the device can stay the Mac's sound output), sets the stream's physical format (preferring integer at the planned depth), sets and verifies the nominal rate, ensures a Float32 virtual format, and installs `nrt_device_ioproc`. `DeviceRestore` remembers each device's format before the first change, so it can be put back when Nocturne quits.
+3. **Configure.** `OutputSession` takes hog mode only in exclusive mode (shared is the default, so the device can stay the Mac's sound output), sets the stream's physical format (preferring integer at the planned depth), sets and verifies the nominal rate, ensures a Float32 virtual format, and installs `nrt_device_ioproc`. `DeviceRestore` remembers each device's format before the first change, so it can be put back when Vespertine quits.
 4. **Decode.** The engine thread pulls decoded audio through `AVAudioConverter`. With equal rates the converter only changes the sample format; integer PCM up to 24 bits maps exactly into Float32, which a unit test verifies sample-for-sample. With different rates it uses `AVSampleRateConverterAlgorithm_Mastering` at maximum quality.
 5. **Render.** The IOProc copies from the ring buffer into the device buffer. Gain of exactly 1.0 is a straight copy. Any other gain is applied in double precision with TPDF dither at the DAC's word length. DoP is always passthrough.
 
-Every decoder is wrapped in `GuardedDecoder`, which calls it through `CNocturneGuard` (Objective-C++). A C++ or Objective-C exception thrown inside a codec library, such as Monkey's Audio seeking in a truncated file, becomes an ordinary "won't play" error instead of ending the process.
+Every decoder is wrapped in `GuardedDecoder`, which calls it through `CVespertineGuard` (Objective-C++). A C++ or Objective-C exception thrown inside a codec library, such as Monkey's Audio seeking in a truncated file, becomes an ordinary "won't play" error instead of ending the process.
 
 ## DSD
 
@@ -24,7 +24,7 @@ DoP frames are passthrough, so meters and the spectrum can't read them as PCM. W
 
 ## Format badges
 
-`FormatMark` (NocturneLibrary) names a track's or album's format for badges: Dolby Atmos (with what carries it), Dolby TrueHD, Dolby Digital Plus, Dolby Digital, DTS-HD Master Audio, DTS:X, DTS, DSD64–DSD512, Hi-Res Lossless or Lossless. The badge is plain text in the app's own style. Dolby's and DTS's logos are trademarks licensed only with certified products, and Nocturne's TrueHD and DTS decoders (FFmpeg) are not licensed, so the logos aren't used.
+`FormatMark` (VespertineLibrary) names a track's or album's format for badges: Dolby Atmos (with what carries it), Dolby TrueHD, Dolby Digital Plus, Dolby Digital, DTS-HD Master Audio, DTS:X, DTS, DSD64–DSD512, Hi-Res Lossless or Lossless. The badge is plain text in the app's own style. Dolby's and DTS's logos are trademarks licensed only with certified products, and Vespertine's TrueHD and DTS decoders (FFmpeg) are not licensed, so the logos aren't used.
 
 ## Gapless and format changes
 
@@ -39,15 +39,15 @@ A queue change (shuffle, repeat, edits) never touches the audible track. If the 
 
 ## DTS CDs
 
-A DTS CD (or DTS-WAV) stores a DTS bitstream as 16-bit stereo PCM, usually in 14-bit words. Played as PCM, it is full-scale noise. When `SourceOpener.probe` opens a 16-bit stereo 44.1/48 kHz lossless file, it looks for a DTS sync word in the first 8,192 frames (`ndts_find_sync`). If it finds one, it wraps the file's decoder in `DTSDecoder`. That decoder feeds the words, as stored, to FFmpeg's `dca` parser and decoder (the `CNocturneDTS` shim over `Vendor/FFmpegDCA.xcframework`, built by `scripts/build-dts-decoder.sh` with only that decoder). Output is Float32 in the stream's own channel order, with a layout from its channel mask.
+A DTS CD (or DTS-WAV) stores a DTS bitstream as 16-bit stereo PCM, usually in 14-bit words. Played as PCM, it is full-scale noise. When `SourceOpener.probe` opens a 16-bit stereo 44.1/48 kHz lossless file, it looks for a DTS sync word in the first 8,192 frames (`ndts_find_sync`). If it finds one, it wraps the file's decoder in `DTSDecoder`. That decoder feeds the words, as stored, to FFmpeg's `dca` parser and decoder (the `CVespertineDTS` shim over `Vendor/FFmpegDCA.xcframework`, built by `scripts/build-dts-decoder.sh` with only that decoder). Output is Float32 in the stream's own channel order, with a layout from its channel mask.
 
 Positions stay in the carrier's frames: a DTS CD holds one 512-sample frame per 512 carrier frames. So CUE indexes, seeks and durations are unchanged. Carrier frames before the first sync word are silence. A seek re-syncs a little before the target and drops the surplus decoded frames. The source is reported as lossy "DTS" with its real channel count, so the planner routes it as surround or Spatial Audio. A test checks the decode of a real DTS CD against FFmpeg's, bit for bit.
 
 ## Dolby, TrueHD and DTS-HD
 
 - **Dolby Digital / Dolby Digital Plus** decode through macOS's licensed decoders (`.ac3`/`.ec3` are routed to the Core Audio decoder, which the MP3 decoder would otherwise claim by extension). A Dolby Digital Plus file carries Atmos objects (JOC) when Core Audio lists `ec+3` formats for it (5.1.2 up to 9.1.6). The codec is then "Dolby Atmos".
-- **Dolby Atmos.** macOS doesn't expose object rendering through its public decode APIs: AudioConverter, ExtAudioFile and AVAssetReader all give the 5.1 bed with silent heights, which was checked on Apple's Atmos sample stream. So by default `SystemRendererSession` hands the untouched Dolby Digital Plus frames (AVAssetReader, compressed) to `AVSampleBufferAudioRenderer` on the chosen device, with a render synchronizer for position, pause and seek. macOS renders the objects for the output, as Apple Music does. With `atmosBySystem` off, the bed plays through Nocturne's own engine.
-- **DTS / DTS-HD MA / Dolby TrueHD** in `.dts`, `.dtshd`, `.thd`, `.mlp` and `.mka` decode through FFmpeg (`CNocturneFF`, `FFmpegDecoder`). Lossless ones are reported as PCM with their bit depth. A test checks TrueHD decodes identically to the 24-bit source it was encoded from.
+- **Dolby Atmos.** macOS doesn't expose object rendering through its public decode APIs: AudioConverter, ExtAudioFile and AVAssetReader all give the 5.1 bed with silent heights, which was checked on Apple's Atmos sample stream. So by default `SystemRendererSession` hands the untouched Dolby Digital Plus frames (AVAssetReader, compressed) to `AVSampleBufferAudioRenderer` on the chosen device, with a render synchronizer for position, pause and seek. macOS renders the objects for the output, as Apple Music does. With `atmosBySystem` off, the bed plays through Vespertine's own engine.
+- **DTS / DTS-HD MA / Dolby TrueHD** in `.dts`, `.dtshd`, `.thd`, `.mlp` and `.mka` decode through FFmpeg (`CVespertineFF`, `FFmpegDecoder`). Lossless ones are reported as PCM with their bit depth. A test checks TrueHD decodes identically to the 24-bit source it was encoded from.
 
 ## Bitstream (IEC 61937)
 
@@ -106,22 +106,22 @@ The library is SQLite via GRDB:
 
 ## File analysis
 
-The analysis core lives in `Packages/NocturneAnalysis` (plain Swift and Foundation): spectra (Accelerate on Apple platforms, a portable FFT elsewhere, tested to agree), the forensic measurements, a chunk-independent sample accumulator and the verdicts. The app decodes with SFBAudioEngine and feeds it. On a server, `nocturne-analyze` decodes with ffmpeg and feeds the same core, writing `<share>/.nocturne/analysis.jsonl`; the app imports matching records (path, size, modification time) and leaves that share's files to the server. See [ANALYSIS.md](ANALYSIS.md).
+The analysis core lives in `Packages/VespertineAnalysis` (plain Swift and Foundation): spectra (Accelerate on Apple platforms, a portable FFT elsewhere, tested to agree), the forensic measurements, a chunk-independent sample accumulator and the verdicts. The app decodes with SFBAudioEngine and feeds it. On a server, `vespertine-analyze` decodes with ffmpeg and feeds the same core, writing `<share>/.vespertine/analysis.jsonl`; the app imports matching records (path, size, modification time) and leaves that share's files to the server. See [ANALYSIS.md](ANALYSIS.md).
 
 ## Threading
 
 | Thread | Owns |
 |---|---|
 | Core Audio I/O | C only: ring read, gain, meters, tap |
-| `Nocturne Engine` | decoders, converters, device configuration, segments |
+| `Vespertine Engine` | decoders, converters, device configuration, segments |
 | Main actor | UI and stores. The engine is controlled via posted commands and observed via a snapshot polled at ~15 Hz |
 | GRDB | database reads and writes, with `ValueObservation` streaming changes to the UI |
 
 ## Known limits and roadmap
 
-- **Integer mode** needs exclusive access and a DAC with a non-mixable Int32 format. Elsewhere Nocturne renders Float32, which is exact up to 24 bits.
+- **Integer mode** needs exclusive access and a DAC with a non-mixable Int32 format. Elsewhere Vespertine renders Float32, which is exact up to 24 bits.
 - **Object audio.** Atmos in Dolby Digital Plus is rendered by macOS. Atmos in TrueHD and DTS:X play their lossless channel bed; their objects need a receiver, and macOS gives apps no way to send TrueHD or DTS-HD MA over HDMI (no high-bit-rate passthrough).
 - **DSD in WavPack** isn't supported.
 - **Resampler.** SRC uses Apple's mastering-quality converter. libsoxr is a candidate alternative.
 - **DoP support** can't be detected from the device, so it is opt-in per device.
-- **AirPods Max over USB-C.** macOS keeps the AirPods on their *Bluetooth* Core Audio device even when audio flows over the cable. Bluetooth stays connected as the control link, and the cable can't be used without it. The HAL exposes no "USB" property for this, so Nocturne treats the path as USB-C lossless when the AirPods' `AirPods Max USB Audio` interface is present in the IORegistry. (Measured on hardware: output latency is 480 frames / 10 ms, as expected of USB.) The device also lists a 24 kHz rate, but that is the mono hands-free format, and the planner ignores rates that can't carry the source's channel count. AirPods Max 2 match as long as their name contains "AirPods Max".
+- **AirPods Max over USB-C.** macOS keeps the AirPods on their *Bluetooth* Core Audio device even when audio flows over the cable. Bluetooth stays connected as the control link, and the cable can't be used without it. The HAL exposes no "USB" property for this, so Vespertine treats the path as USB-C lossless when the AirPods' `AirPods Max USB Audio` interface is present in the IORegistry. (Measured on hardware: output latency is 480 frames / 10 ms, as expected of USB.) The device also lists a 24 kHz rate, but that is the mono hands-free format, and the planner ignores rates that can't carry the source's channel count. AirPods Max 2 match as long as their name contains "AirPods Max".

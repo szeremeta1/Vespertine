@@ -1,5 +1,5 @@
 //
-// Nocturne — automatic updates via Sparkle (EdDSA-signed appcast on GitHub Releases).
+// Vespertine — automatic updates via Sparkle (EdDSA-signed appcast on GitHub Releases).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -17,15 +17,15 @@ final class AppUpdater: NSObject {
 
     override init() {
         // Isolated test libraries (QA runs) never phone home.
-        isEnabled = UserDefaults.standard.string(forKey: "NocturneDataDirectory") == nil
-            || UserDefaults.standard.string(forKey: "NocturneUpdateFeedOverride") != nil
+        isEnabled = UserDefaults.standard.string(forKey: "VespertineDataDirectory") == nil
+            || UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride") != nil
         super.init()
         guard isEnabled else { return }
         let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
         self.controller = controller
         automaticallyChecks = controller.updater.automaticallyChecksForUpdates
         automaticallyDownloads = controller.updater.automaticallyDownloadsUpdates
-        if UserDefaults.standard.bool(forKey: "NocturneCheckForUpdatesInBackground") {
+        if UserDefaults.standard.bool(forKey: "VespertineCheckForUpdatesInBackground") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.checkInBackground() }
         }
         observations.append(controller.updater.observe(\.canCheckForUpdates, options: [.initial, .new]) { [weak self] updater, _ in
@@ -46,15 +46,15 @@ final class AppUpdater: NSObject {
         didSet { controller?.updater.automaticallyDownloadsUpdates = automaticallyDownloads }
     }
 
-    /// Testing aid for `-NocturneCheckForUpdatesInBackground YES`.
+    /// Testing aid for `-VespertineCheckForUpdatesInBackground YES`.
     func checkInBackground() { controller?.updater.checkForUpdatesInBackground() }
 
     var lastCheck: Date? { controller?.updater.lastUpdateCheckDate }
 }
 
 extension AppUpdater: SPUUpdaterDelegate {
-    /// Testing aid: `-NocturneUpdateFeedOverride <url>` points the updater at another appcast.
+    /// Testing aid: `-VespertineUpdateFeedOverride <url>` points the updater at another appcast.
     nonisolated func feedURLString(for updater: SPUUpdater) -> String? {
-        UserDefaults.standard.string(forKey: "NocturneUpdateFeedOverride")
+        UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride")
     }
 }

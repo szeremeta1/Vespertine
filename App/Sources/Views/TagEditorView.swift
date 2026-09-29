@@ -1,10 +1,10 @@
 //
-// Nocturne — rich metadata editing (single and batch), MusicBrainz lookup, smart playlist rules.
+// Vespertine — rich metadata editing (single and batch), MusicBrainz lookup, smart playlist rules.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -269,7 +269,7 @@ struct TagEditorView: View {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
         // One file answers for the lot: they share a source, and each check is a round trip on a share.
         if let first = tracks.first(where: { $0.cueStartFrame == nil }), !TagWriter.isWritable(first.fileURL) {
-            return "Read-only location · saved in Nocturne's library; the files aren't changed"
+            return "Read-only location · saved in Vespertine's library; the files aren't changed"
         }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
         case "FLAC", "Vorbis", "Opus": "Vorbis comments"

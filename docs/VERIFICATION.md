@@ -1,0 +1,122 @@
+# Checking that Vespertine is bit-perfect on your hardware
+
+“Bit-perfect” is a claim you can check, not something to take on trust. This page covers:
+
+- what Vespertine means by it,
+- what the app reads back from macOS to decide it,
+- the automated tests behind it,
+- and three ways to confirm it on your own DAC, the last of which needs no software from us at all.
+
+## What the claim covers
+
+Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered. That requires all of the following, checked on each track (`SignalPath.isBitPerfect` in `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift`):
+
+- **The source is PCM** and plays at its own sample rate. Nothing is resampled and no DSD is converted to PCM.
+- **The device runs at that rate.** Vespertine switches the device's nominal rate and reads it back from Core Audio. It doesn't trust its own request.
+- **The device's physical format holds the whole sample.**
+  - An integer DAC needs at least the file's bit depth.
+  - A float device needs a full 32-bit float.
+  - In the normal float pipeline, up to 24 bits pass through exactly. 32-bit integer files need **integer mode**, which sends 32-bit integers to DACs that offer an integer format.
+- **No gain is applied anywhere in software.**
+  - Volume is either the DAC's own hardware control or fixed.
+  - Digital volume must be off or at exactly 0 dB.
+  - ReplayGain must be off or at 0 dB.
+- **No spatial or channel processing is applied.** The device has at least as many channels as the file.
+- **Nothing else is mixed in.**
+  - Either Vespertine has the device to itself (exclusive "hog" mode),
+  - or no other app is playing to it at the same moment.
+- **The device class can be bit-perfect at all.**
+  - Bluetooth devices (AirPods included) never can, because macOS re-encodes the audio for the radio link.
+  - AirPlay can't either.
+  - For these, Vespertine says what it does instead: resampled, spatialised, and so on.
+
+If any condition fails, the badge says what changed instead of BIT-PERFECT. DSD over DoP and Dolby/DTS bitstream have their own badges and their own conditions (`NATIVE DSD · DoP`, `BITSTREAM · …`).
+
+## 1. What the app reads back
+
+Open the inspector's **Now Playing** panel. Its **Signal Path** section lists each step from file to device. The device values are read from Core Audio after playback starts:
+
+- **Nominal rate.** The device's current sample rate (`kAudioDevicePropertyNominalSampleRate`).
+- **Physical format.** What the device's output stream is really running: integer or float, bit depth, channel count and rate (`kAudioStreamPropertyPhysicalFormat`).
+- **Exclusive or shared.** Exclusive means Vespertine holds the device in hog mode (`kAudioDevicePropertyHogMode`). The probe prints the owning process ID, which should be Vespertine's own.
+- **Volume stage.** Hardware, fixed, or digital. Digital shows its dB.
+
+The same readback is printed by the command-line probe (see below). You can also compare it with **Audio MIDI Setup** while a track plays: the device's format there should match the file's rate.
+
+## 2. The automated tests
+
+Run `swift test` in `Packages/VespertineKit`. The tests that bear on bit-perfection play generated signals through the real engine code and compare the output sample for sample. They don't compare levels or spectra.
+
+| Test | What it proves |
+|---|---|
+| `RingBufferTests` “Unity gain is bit-transparent for every 24-bit value pattern” | the float path carries every possible 24-bit sample unchanged at unity gain |
+| `RingBufferTests` “Integer mode copies every 32-bit word untouched…” | integer mode passes each 32-bit word through, including patterns that would be NaN as floats |
+| `IntegerModeTests` “A 32-bit integer source reaches the output word for word”, “A 24-bit source arrives as its samples in the top 24 bits, nothing added” | the integer path end to end, from decoder to output buffer |
+| `DSDTests` “DoP from the raw stream carries the DSD bits exactly, with alternating markers” | DSF and DSDIFF DSD bits survive DoP packing exactly, and the markers a DAC looks for alternate correctly |
+| `BitstreamTests` “The carrier for a file holds its frames exactly, at the right rate” | Dolby/DTS frames go out byte for byte inside the IEC 61937 carrier |
+| `StreamingTests` “Moving to the local copy mid-track continues sample for sample” | switching from the network share to the cached copy mid-track doesn't drop or repeat a sample |
+| `RingBufferTests` “Muted, the output is silent at once…” and “Rebuffering holds in silence without consuming…” | mute and rebuffering never alter or skip music; they only insert silence where playback is actually held |
+
+Tests that use real hardware are opt-in, because they open your audio devices (`HardwareAuditTests`):
+
+```sh
+VESPERTINE_HARDWARE_TESTS=1 swift test --filter HardwareAuditTests
+VESPERTINE_HARDWARE_TESTS=1 VESPERTINE_INTEGER_DEVICE="<part of your DAC's name>" swift test --filter HardwareAuditTests
+```
+
+The integer-device test plays a 32-bit source to your DAC. It passes only if the device's physical format reads back as 32-bit integer and the signal path reports BIT-PERFECT. The hardware tests play silence or near-silence, so they're safe to run with speakers connected.
+
+## 3. The probe
+
+`vespertine-probe` builds with the package (`swift run vespertine-probe …` in `Packages/VespertineKit`).
+
+```sh
+vespertine-probe list
+vespertine-probe play "<device name or UID>" 20 <file> [file…]
+vespertine-probe watch 30
+```
+
+- **`list`** shows every output device with:
+  - transport (USB, built-in, Bluetooth…),
+  - whether its class can be bit-perfect,
+  - the sample rates and physical formats it offers.
+- **`play`** plays the files on the device for the given number of seconds. It then prints the signal path Vespertine computed, next to an independent Core Audio readback of nominal rate, physical format and hog owner, so you can check that the two agree.
+- **`watch`** prints every device's volume and the system output whenever they change. Use it to catch another app or macOS changing the device mid-play.
+
+## 4. Checking it outside Vespertine
+
+These methods don't depend on anything Vespertine reports.
+
+**DTS-CD or DoP indicator test (no extra hardware beyond what you own).**
+
+- A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if every bit arrives intact. One changed bit and the receiver plays white noise, or refuses the stream.
+- To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, that path was bit-perfect for that file.
+- The same principle works with DSD: a DAC lights its DSD indicator for DoP only when the marker bytes and DSD bits are untouched. Any gain or resampling destroys them.
+
+**Digital loopback null test (the rigorous one).**
+
+1. Connect a digital output (S/PDIF optical or coaxial, or an audio interface's digital out) to a digital input. That can be a second interface or the same interface's own input.
+2. Play a test file from Vespertine to the output while recording the input at the same sample rate and bit depth, for example in Audacity or with `sox`.
+3. Trim the recording to the start of the file and subtract it from the original: invert one and mix, or use `sox -m -v -1`.
+
+A bit-perfect path nulls to digital silence, every sample exactly zero. Any residual means something in the chain changed the audio. Remember the S/PDIF link itself carries at most 24 bits.
+
+**Hash comparison (same setup).**
+
+1. Record the loopback to a WAV at the file's format.
+2. Cut both to the same sample range.
+3. Compare checksums of the raw sample data (for example with `ffmpeg -i x.wav -f s24le - | shasum`). Equal hashes mean identical samples.
+
+## What bit-perfect doesn't cover
+
+- **It is a statement about the samples, not the sound.** It says nothing about the DAC's analogue output quality.
+- **macOS limits.**
+  - Bluetooth, AirPlay and spatial audio are never bit-perfect, and Vespertine says so.
+  - In shared mode, another app playing to the same device gets mixed in. Vespertine detects this and drops the badge. Exclusive mode prevents it.
+- **The float path.** Files wider than 24 bits are rounded unless integer mode is on and the DAC offers a 32-bit integer format.
+
+If your measurement disagrees with what Vespertine shows, please open an issue with:
+
+- the `vespertine-probe play` output,
+- your device,
+- the file's format.

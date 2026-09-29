@@ -1,12 +1,12 @@
 //
-// Nocturne — format badges ("DOLBY | ATMOS", "DSD | 256").
+// Vespertine — format badges ("DOLBY | ATMOS", "DSD | 256").
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
-/// The format's name in Nocturne's own badge style ("DOLBY ATMOS", "DSD256"), plus what carries it.
+/// The format's name in Vespertine's own badge style ("DOLBY ATMOS", "DSD256"), plus what carries it.
 /// Deliberately plain: the same mono type and outline as every other badge, never a company's logo or
 /// lettering, so it reads as a description of the file and not a certification mark.
 struct FormatMarkView: View {

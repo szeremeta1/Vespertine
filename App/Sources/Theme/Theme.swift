@@ -1,5 +1,5 @@
 //
-// Nocturne — Obsidian & Brass design tokens and shared components.
+// Vespertine — Obsidian & Brass design tokens and shared components.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

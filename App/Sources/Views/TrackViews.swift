@@ -1,9 +1,9 @@
 //
-// Nocturne — track tables: album tracklists, songs, playlists, search.
+// Vespertine — track tables: album tracklists, songs, playlists, search.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 struct TrackRow: Identifiable, Hashable {
@@ -77,7 +77,7 @@ struct TrackTable: View {
                             .padding(.horizontal, 5).padding(.vertical, 2)
                             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                             .fixedSize()
-                            .help("This song is also on the album in another version; Nocturne plays the one that suits your output")
+                            .help("This song is also on the album in another version; Vespertine plays the one that suits your output")
                     }
                 }
             }

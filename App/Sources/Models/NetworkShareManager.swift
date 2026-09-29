@@ -1,5 +1,5 @@
 //
-// Nocturne — keeps network-share sources connected: connects at launch, after sleep, when the
+// Vespertine — keeps network-share sources connected: connects at launch, after sleep, when the
 // network (or a VPN such as Tailscale) comes and goes, and when a share is unmounted; owns the
 // local cache of network files.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -7,11 +7,11 @@
 
 import AppKit
 import Network
-import NocturneLibrary
+import VespertineLibrary
 import Observation
 import os
 
-private let shareLog = Logger(subsystem: "org.nocturne.player", category: "shares")
+private let shareLog = Logger(subsystem: "org.szeremeta.vespertine.player", category: "shares")
 
 @Observable
 @MainActor
@@ -29,7 +29,7 @@ final class NetworkShareManager {
     private var unresponsive: [Int64: Int] = [:]
     private(set) var cacheUsage = NetworkCache.Usage()
     let cache: NetworkCache
-    /// Where Nocturne mounts shares (private, so library paths stay stable).
+    /// Where Vespertine mounts shares (private, so library paths stay stable).
     let mountBase: URL
 
     private let library: LibraryStore
@@ -92,7 +92,7 @@ final class NetworkShareManager {
             let up = path.status == .satisfied
             Task { @MainActor in self?.networkChanged(up: up) }
         }
-        pathMonitor.start(queue: DispatchQueue(label: "org.nocturne.network-path"))
+        pathMonitor.start(queue: DispatchQueue(label: "org.szeremeta.vespertine.network-path"))
 
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { @Sendable [weak self] _ in
@@ -190,7 +190,7 @@ final class NetworkShareManager {
         }
     }
 
-    /// The server's analysis run (nocturne-analyze) finished after our last scan: its files changed
+    /// The server's analysis run (vespertine-analyze) finished after our last scan: its files changed
     /// or were re-checked, so rescan now rather than waiting.
     func serverReported(_ status: ServerAnalysisStatus, for sourceID: Int64) async {
         guard !status.isRunning, let source = sources.first(where: { $0.id == sourceID }), self.status(of: source).isConnected,
@@ -251,7 +251,7 @@ final class NetworkShareManager {
     }
 
     /// Connects to a share for the first time and adds it to the library.
-    /// A blank password uses the one saved in the keychain (by Nocturne or by Finder).
+    /// A blank password uses the one saved in the keychain (by Vespertine or by Finder).
     func add(_ share: NetworkShare, password: String?, remember: Bool, name: String?, writable: Bool) async throws {
         let typed = password.flatMap { $0.isEmpty ? nil : $0 }
         let secret = typed ?? (share.user == nil ? nil : NetworkCredentials.password(for: share))
@@ -272,7 +272,7 @@ final class NetworkShareManager {
         await library.scan(source)
     }
 
-    /// Removes the share from the library and unmounts it if Nocturne mounted it.
+    /// Removes the share from the library and unmounts it if Vespertine mounted it.
     func remove(_ source: LibrarySource) async {
         library.removeSource(source)
         if let id = source.id { status[id] = nil }

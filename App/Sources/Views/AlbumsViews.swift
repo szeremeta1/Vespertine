@@ -1,10 +1,10 @@
 //
-// Nocturne — album grid, album detail, artists.
+// Vespertine — album grid, album detail, artists.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 
 // MARK: - Shared header

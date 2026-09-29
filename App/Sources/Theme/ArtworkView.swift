@@ -1,10 +1,10 @@
 //
-// Nocturne — artwork loading with an in-memory cache.
+// Vespertine — artwork loading with an in-memory cache.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 @MainActor

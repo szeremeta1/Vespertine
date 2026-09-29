@@ -1,10 +1,10 @@
 //
-// Nocturne — "Find Music on This Mac" and "Enrich Metadata" sheets.
+// Vespertine — "Find Music on This Mac" and "Enrich Metadata" sheets.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 
 // MARK: - Find Music
@@ -49,7 +49,7 @@ struct FindMusicSheet: View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Find Music on This Mac").font(Typeface.serif(24)).foregroundStyle(Palette.text)
-                Text("Nocturne searched your drives with Spotlight and checked every file's real format. Voice recordings, prompts and short clips are left out.")
+                Text("Vespertine searched your drives with Spotlight and checked every file's real format. Voice recordings, prompts and short clips are left out.")
                     .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             }
             .padding([.horizontal, .top], 22)
@@ -158,7 +158,7 @@ struct FindMusicSheet: View {
                 }
                 .pickerStyle(.segmented).labelsHidden().fixedSize()
                 Text(mode == .copyAndOrganize
-                     ? "Copies the selected files into ~/Music/Nocturne as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed."
+                     ? "Copies the selected files into ~/Music/Vespertine as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed."
                      : "Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }

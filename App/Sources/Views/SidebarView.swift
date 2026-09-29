@@ -1,9 +1,9 @@
 //
-// Nocturne — sidebar: library, playlists, sources.
+// Vespertine — sidebar: library, playlists, sources.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 struct SidebarView: View {

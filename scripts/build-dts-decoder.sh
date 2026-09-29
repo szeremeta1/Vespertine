@@ -1,8 +1,8 @@
 #!/bin/zsh
-# Builds the FFmpeg pieces Nocturne uses for formats macOS can't decode: the DTS decoder (DTS CDs,
+# Builds the FFmpeg pieces Vespertine uses for formats macOS can't decode: the DTS decoder (DTS CDs,
 # DTS-WAV, DTS-HD Master Audio), Dolby TrueHD, and the containers they come in (.dts, .dtshd,
 # .thd/.mlp, Matroska) and DSD at any rate (.dsf/.dff: FFmpeg's DSD to PCM conversion). Only those decoders, parsers and demuxers (LGPL-2.1+), static, universal
-# (arm64 + x86_64), packaged as Packages/NocturneKit/Vendor/FFmpegDCA.xcframework.
+# (arm64 + x86_64), packaged as Packages/VespertineKit/Vendor/FFmpegDCA.xcframework.
 #
 #   scripts/build-dts-decoder.sh [path/to/ffmpeg-X.Y.Z.tar.xz]
 #
@@ -12,7 +12,7 @@ cd "$(dirname $0)/.."
 
 version=9.0.2
 sha256=8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
-out=Packages/NocturneKit/Vendor/FFmpegDCA.xcframework
+out=Packages/VespertineKit/Vendor/FFmpegDCA.xcframework
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 

@@ -1,12 +1,12 @@
 //
-// Nocturne — app-wide state: navigation, selection, devices, and wiring between stores.
+// Vespertine — app-wide state: navigation, selection, devices, and wiring between stores.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
 import CoreAudio
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import Observation
 import SwiftUI
 
@@ -136,7 +136,7 @@ final class AppModel {
         syncEngine()
         shares.start()
         analysis.start()
-        // Hand the DAC back when Nocturne quits: stop, release exclusive access, then restore or
+        // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in
             MainActor.assumeIsolated {
@@ -159,15 +159,15 @@ final class AppModel {
             }
         }
 
-        // Developer aid: `-NocturneAddSource <folder>` adds and scans a reference source on launch.
-        if let path = UserDefaults.standard.string(forKey: "NocturneAddSource") {
+        // Developer aid: `-VespertineAddSource <folder>` adds and scans a reference source on launch.
+        if let path = UserDefaults.standard.string(forKey: "VespertineAddSource") {
             let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
             if !library.sources.contains(where: { $0.path == url.path }) {
                 let library = self.library
                 Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
             }
         }
-        if !UserDefaults.standard.bool(forKey: "NocturneOpenMini") {
+        if !UserDefaults.standard.bool(forKey: "VespertineOpenMini") {
             Task { @MainActor [weak self] in self?.runDeveloperHooks(openWindow: nil) }
         }
     }
