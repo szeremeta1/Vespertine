@@ -66,9 +66,25 @@ let ctx = CGContext(data: nil, width: W, height: H, bitsPerComponent: 8, bytesPe
 ctx.interpolationQuality = .high
 let scale = CGFloat(W) / 1200
 
+// Artwork uses open fonts (docs/design/fonts): Apple's licence covers New York and SF only for interface mock-ups.
+for file in ["Newsreader[opsz,wght].ttf", "Inter[opsz,wght].ttf", "JetBrainsMono[wght].ttf"] {
+    CTFontManagerRegisterFontsForURL(root.appendingPathComponent("docs/design/fonts/\(file)") as CFURL, .process, nil)
+}
+
+/// A variable font at a weight, with its optical size following the point size where it has one.
+func openFont(_ family: String, _ size: CGFloat, weight: CGFloat) -> NSFont {
+    let points = size * scale
+    let axes: [NSNumber: CGFloat] = [NSNumber(value: 0x7767_6874): weight,                       // 'wght'
+                                     NSNumber(value: 0x6F70_737A): min(max(points, 6), 72)]      // 'opsz'
+    let descriptor = NSFontDescriptor(fontAttributes: [.family: family, .variation: axes])
+    guard let font = NSFont(descriptor: descriptor, size: points), font.familyName == family else {
+        fatalError("\(family) isn't available; see docs/design/fonts")
+    }
+    return font
+}
+
 func serif(_ size: CGFloat, _ weight: NSFont.Weight = .regular) -> NSFont {
-    let base = NSFont.systemFont(ofSize: size * scale, weight: weight)
-    return NSFont(descriptor: base.fontDescriptor.withDesign(.serif)!, size: size * scale)!
+    openFont("Newsreader", size, weight: weight == .medium ? 500 : 400)
 }
 
 func draw(_ text: String, font: NSFont, color c: CGColor, centerX: CGFloat, baselineFromTop y: CGFloat, kern: CGFloat = 0) -> CGFloat {
@@ -128,9 +144,9 @@ func drawEndCard(alpha: CGFloat) {
     ctx.restoreGState()
     _ = draw("Vespertine", font: serif(76, .medium), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 400 * scale, kern: -1 * scale)
     _ = draw("The free, bit-perfect music player for Mac", font: serif(30), color: color(0xE7CD98), centerX: CGFloat(W) / 2, baselineFromTop: 462 * scale)
-    let mono = NSFont.monospacedSystemFont(ofSize: 17 * scale, weight: .regular)
+    let mono = openFont("JetBrains Mono", 17, weight: 400)
     _ = draw("OPEN SOURCE · GPL-3.0 · MACOS 26+", font: mono, color: color(0xA29B8F), centerX: CGFloat(W) / 2, baselineFromTop: 540 * scale, kern: 2 * scale)
-    _ = draw("github.com/szeremeta1/Vespertine", font: NSFont.systemFont(ofSize: 20 * scale, weight: .medium), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)
+    _ = draw("github.com/szeremeta1/Vespertine", font: openFont("Inter", 20, weight: 500), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)
     ctx.restoreGState()
 }
 
