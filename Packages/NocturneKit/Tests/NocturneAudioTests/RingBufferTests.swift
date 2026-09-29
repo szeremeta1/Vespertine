@@ -74,6 +74,52 @@ struct RingBufferTests {
         #expect(abs(nrt_context_take_peak(ctx, 0) - 1) < 1e-6)   // full scale, read as an integer
     }
 
+    @Test("DoP frames go out untouched, and meters and the spectrum tap read their DSD bits", arguments: [false, true])
+    func dopIsMeteredButUntouched(integer: Bool) {
+        let ring = nrt_ring_create(4096, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_passthrough(ctx, true)
+        nrt_context_set_integer(ctx, integer)
+        nrt_context_set_dop(ctx, true)
+        // Left: all ones (full positive); right: half ones (silence). Alternating 0x05/0xFA markers.
+        var frames: [Float] = []
+        for i in 0..<256 {
+            let marker: UInt32 = i % 2 == 0 ? 0x05 : 0xFA
+            for bits: UInt32 in [0xFFFF, 0x5555] {
+                let word = marker << 16 | bits
+                frames.append(integer ? Float(bitPattern: word << 8) : Float(Int32(bitPattern: word << 8) >> 8) / 8_388_608)
+            }
+        }
+        #expect(nrt_ring_write(ring, frames, 256) == 256)
+        var out = [Float](repeating: 0, count: frames.count)
+        out.withUnsafeMutableBufferPointer { nrt_context_render_interleaved(ctx, $0.baseAddress!, 256, 2) }
+        #expect(out.map(\.bitPattern) == frames.map(\.bitPattern))
+        #expect(abs(nrt_context_take_peak(ctx, 0) - 1) < 1e-6)
+        #expect(nrt_context_take_peak(ctx, 1) < 1e-6)
+        var tap = [Float](repeating: 9, count: 256)
+        _ = nrt_context_copy_tap(ctx, &tap, 256)
+        #expect(tap.allSatisfy { abs($0 - 0.5) < 1e-6 })
+    }
+
+    @Test("Muted, the output is silent at once and nothing is taken from the ring; unmuted, it carries on")
+    func muteHoldsTheRing() {
+        let ring = nrt_ring_create(4096, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        let input = (0..<1024).map { Float($0 + 1) / 2048 }
+        #expect(nrt_ring_write(ring, input, 512) == 512)
+        nrt_context_set_muted(ctx, true)
+        var out = [Float](repeating: 1, count: 256)
+        nrt_context_render_interleaved(ctx, &out, 128, 2)
+        #expect(out.allSatisfy { $0 == 0 })
+        #expect(nrt_ring_readable(ring) == 512)
+        #expect(nrt_context_take_underruns(ctx) == 0)
+        nrt_context_set_muted(ctx, false)
+        nrt_context_render_interleaved(ctx, &out, 128, 2)
+        #expect(out == Array(input[0..<256]))
+    }
+
     @Test("Unity gain is bit-transparent for every 24-bit value pattern")
     func unityIsTransparent() {
         let ring = nrt_ring_create(4096, 2)!

@@ -161,3 +161,37 @@ struct SmartRulesTests {
         #expect(try db.tracksNeedingAnalysis().isEmpty)
     }
 }
+
+@Suite struct AlbumOrderTests {
+    @Test("An album spread over several folders still plays in track order")
+    func spreadAlbumKeepsTrackOrder() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        try db.writer.write { db in
+            for (folder, n) in [("Vinyl 01", 1), ("Vinyl 01", 12), ("Vinyl 02", 7), ("Extras", 6), ("Vinyl 01", 2)] {
+                var t = Track.stub(path: "/m/Fleetwood Mac/Rumours/\(folder)/\(n).flac")
+                t.sourceId = source.id; t.album = "Rumours"; t.albumArtist = "Fleetwood Mac"; t.trackNumber = n; t.discNumber = 1
+                try t.insert(db)
+            }
+        }
+        let key = try db.allTracks()[0].albumKey
+        #expect(try db.tracks(albumKey: key).compactMap(\.trackNumber) == [1, 2, 6, 7, 12])
+    }
+
+    @Test("Two folders of one album with the same disc number list one after the other, not interleaved")
+    func layersListInTurn() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        func track(_ folder: String, _ n: Int) -> Track {
+            var t = Track.stub(path: "/m/Pink Floyd/DSOTM/\(folder)/\(n).dsf")
+            t.sourceId = source.id; t.album = "DSOTM"; t.albumArtist = "Pink Floyd"; t.trackNumber = n; t.discNumber = 1
+            return t
+        }
+        try db.writer.write { db in
+            for var t in [track("Stereo", 1), track("Multichannel 5.1", 2), track("Stereo", 2), track("Multichannel 5.1", 1)] { try t.insert(db) }
+        }
+        let key = try db.allTracks()[0].albumKey
+        #expect(try db.tracks(albumKey: key).map { "\(($0.filePath as NSString).deletingLastPathComponent.split(separator: "/").last!) \($0.trackNumber!)" }
+                == ["Multichannel 5.1 1", "Multichannel 5.1 2", "Stereo 1", "Stereo 2"])
+    }
+}

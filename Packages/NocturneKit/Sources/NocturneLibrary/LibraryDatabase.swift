@@ -222,6 +222,14 @@ public final class LibraryDatabase: Sendable {
             // folders ("Album/CD 01"): re-read the tracks that have none on the next scan.
             try db.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000' WHERE artworkKey IS NULL AND isMissing = 0")
         }
+        m.registerMigration("v11-dsf-dates") { db in
+            // 0.5.19 reads DSF release and original dates from the ID3 tag (the tag reader dropped them).
+            try db.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000' WHERE lower(filePath) LIKE '%.dsf' AND isMissing = 0")
+        }
+        m.registerMigration("v10-dts-carrier-bitrate") { db in
+            // 0.5.19: a DTS CD's bitrate was the PCM carrier's 1411k; it isn't the DTS stream's, so don't show one.
+            try db.execute(sql: "UPDATE track SET bitrate = NULL WHERE codec = 'DTS' AND (lower(filePath) LIKE '%.wav' OR lower(filePath) LIKE '%.flac')")
+        }
         return m
     }
 }
@@ -248,7 +256,7 @@ public extension LibraryDatabase {
                count(*) AS trackCount, sum(duration) AS duration,
                max(artworkKey) AS artworkKey,
                max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,
-               max(codec) AS codec, min(isLossless) AS lossless, max(bitrate) AS bitrate,
+               max(codec) AS codec, count(DISTINCT codec) AS codecCount, min(isLossless) AS lossless, max(bitrate) AS bitrate,
                max(addedAt) AS addedAt,
                -- a CUE-split file counts once (with its first track), not once per track
                sum(CASE WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
@@ -262,13 +270,17 @@ public extension LibraryDatabase {
         let isDSD: Bool = row["isDSD"]
         let rate: Double = row["maxRate"]
         let bits: Int? = row["maxBits"]
-        let codec: String = row["codec"]
+        let codecCount: Int = row["codecCount"] ?? 1
+        // An album in several formats ("Gypsy" as FLAC, MP3 and AAC) names none of them.
+        let codec: String = codecCount > 1 ? Album.mixedCodec : row["codec"]
         let lossless: Bool = row["lossless"]
         let bitrate: Double? = row["bitrate"]
         let maxChannels: Int = row["maxChannels"] ?? 2
         let rateText = rate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(rate / 1000)) : String(format: "%.1f", rate / 1000)
         let summary: String = if isDSD {
             "DSD\(Int((rate / 44_100).rounded()))"
+        } else if codecCount > 1 {
+            bits.map { "\(codec) · up to \($0)/\(rateText)" } ?? "\(codec) · up to \(rateText) kHz"
         } else if !lossless, let bitrate {
             "\(codec) · \(Int(bitrate))k"
         } else if let bits {
@@ -291,7 +303,17 @@ public extension LibraryDatabase {
 
     func tracks(albumKey: String) throws -> [Track] {
         try writer.read { db in
-            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY discNumber, trackNumber, location", arguments: [albumKey])
+            let tracks = try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY discNumber, trackNumber, location",
+                                            arguments: [albumKey])
+            // Track numbers that repeat on one disc (an SACD rip's "Multichannel 5.1" and "Stereo" folders, a CD
+            // and a vinyl copy) list folder by folder instead of interleaved. Otherwise the numbers decide, even
+            // when an album's files are spread over several folders.
+            let numbers = tracks.compactMap { t in t.trackNumber.map { "\(t.discNumber ?? 1)-\($0)" } }
+            guard Set(numbers).count < numbers.count else { return tracks }
+            func folder(_ t: Track) -> String { (t.filePath as NSString).deletingLastPathComponent }
+            return tracks.sorted {
+                (($0.discNumber ?? 0), folder($0), ($0.trackNumber ?? 0), $0.location) < (($1.discNumber ?? 0), folder($1), ($1.trackNumber ?? 0), $1.location)
+            }
         }
     }
 

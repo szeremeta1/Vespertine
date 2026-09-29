@@ -70,6 +70,15 @@ enum SourceOpener {
 
     static func probe(_ url: URL) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
+        if FFmpegDecoder.dsdExtensions.contains(ext) {
+            // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.
+            let decoder = FFmpegDecoder(url: url)
+            try decoder.open()
+            guard decoder.isDSD else { throw SourceOpenerError.unsupported(url) }
+            let format = SourceFormat(encoding: .dsd, codec: ext == "dsf" ? "DSF" : "DSDIFF", sampleRate: decoder.dsdRate,
+                                      bitDepth: 1, channels: Int(decoder.processingFormat.channelCount))
+            return ProbedSource(url: url, format: format, decoderName: "DSD (FFmpeg)", pcm: decoder, dsd: nil)
+        }
         if DSDDecoder.handlesPaths(withExtension: ext) {
             let decoder = try DSDDecoder(url: url)
             try decoder.open()
@@ -86,11 +95,19 @@ enum SourceOpener {
             let d = decoder.describe
             let format = SourceFormat(encoding: d.lossless ? .pcm : .lossy, codec: d.codec, sampleRate: d.sampleRate,
                                       bitDepth: d.bits, channels: d.channels)
-            return ProbedSource(url: url, format: format, decoderName: "FFmpeg \(d.codec)", pcm: decoder, dsd: nil)
+            // FFmpeg decodes the channel bed of Atmos-in-TrueHD and DTS:X; say so rather than imply the objects.
+            let name: String = switch d.codec {
+            case "Dolby Atmos (TrueHD)": "FFmpeg TrueHD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered"
+            case "DTS:X": "FFmpeg DTS-HD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered"
+            default: "FFmpeg \(d.codec)"
+            }
+            return ProbedSource(url: url, format: format, decoderName: name, pcm: decoder, dsd: nil)
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
-        let decoder = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
-        if String(describing: type(of: decoder)).contains("MPEG") {
+        let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
+        // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
+        let decoder = GuardedDecoder(raw)
+        if String(describing: type(of: raw)).contains("MPEG") {
             // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
             // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
             try mpegOpenLock.withLock { try decoder.open() }
@@ -131,7 +148,7 @@ enum SourceOpener {
                                   codec: codec,
                                   sampleRate: processing.mSampleRate, bitDepth: bits,
                                   channels: Int(processing.mChannelsPerFrame))
-        return ProbedSource(url: url, format: format, decoderName: decoderName(for: decoder), pcm: decoder, dsd: nil)
+        return ProbedSource(url: url, format: format, decoderName: decoderName(for: raw), pcm: decoder, dsd: nil)
     }
 
     /// Wraps the probed decoder for the plan (DoP / DSD→PCM) and applies a CUE region.
@@ -145,6 +162,9 @@ enum SourceOpener {
             } else {
                 decoder = try BitstreamDecoder.open(url: probed.url)
             }
+        } else if probed.format.encoding == .dsd, probed.pcm is FFmpegDecoder {
+            // DSD at any rate: DoP from the raw stream, or FFmpeg's DSD→PCM conversion (at the DSD rate / 8).
+            decoder = plan.mode == .dop ? try RawDoPDecoder(url: probed.url) : probed.pcm!
         } else if let dsd = probed.dsd {
             if plan.mode == .dop {
                 decoder = try DoPDecoder(decoder: dsd)

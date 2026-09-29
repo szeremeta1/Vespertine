@@ -183,6 +183,14 @@ struct PlaybackSettings: View {
                      ? "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Nocturne's own signal path and meters don't apply to these tracks."
                      : "Nocturne decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio.")
                     .font(.caption).foregroundStyle(.secondary)
+                Picker("Stereo and surround versions", selection: $s.versionPreference) {
+                    Text("Match the output").tag(TrackVersions.Preference.matchOutput)
+                    Text("Always stereo").tag(TrackVersions.Preference.stereo)
+                    Text("Always surround").tag(TrackVersions.Preference.multichannel)
+                }
+                .onChange(of: s.versionPreference) { model.player.resolveVersions() }
+                Text("For albums that have each song in stereo and in surround, such as an SACD's two layers. Matching the output plays surround on a multichannel device or with Spatial Audio on, and stereo on a stereo DAC or with Spatial Audio off. Upcoming songs switch when you change outputs.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {
                 Toggle("Mac sound output follows Nocturne while playing", isOn: $s.systemOutputFollowsPlayback)

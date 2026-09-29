@@ -28,11 +28,14 @@ let package = Package(
         // DTS CDs / DTS-in-WAV: FFmpeg's DTS decoder only (scripts/build-dts-decoder.sh).
         .binaryTarget(name: "FFmpegDCA", path: "Vendor/FFmpegDCA.xcframework"),
         .target(name: "CNocturneDTS", dependencies: ["FFmpegDCA"]),
+        // Decoder calls with C++/Objective-C exceptions caught (a damaged file must not crash the app).
+        .target(name: "CNocturneGuard", linkerSettings: [.linkedFramework("AVFAudio"), .linkedLibrary("c++")]),
         .target(
             name: "NocturneAudio",
             dependencies: [
                 "CNocturneRT",
                 "CNocturneDTS",
+                "CNocturneGuard",
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
                 .product(name: "NocturneAnalysisCore", package: "NocturneAnalysis"),
             ],

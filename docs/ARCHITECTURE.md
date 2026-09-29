@@ -3,7 +3,7 @@
 ## From file to DAC
 
 ```
-file ─▶ SFBAudioEngine decoder ─▶ [DoP / DSD→PCM wrapper] ─▶ [CUE region] ─▶ AVAudioConverter ─▶ ring buffer ─▶ HAL IOProc ─▶ DAC
+file ─▶ SFBAudioEngine / FFmpeg ─▶ [DoP / DSD→PCM wrapper] ─▶ [CUE region] ─▶ AVAudioConverter ─▶ ring buffer ─▶ HAL IOProc ─▶ DAC
          (libFLAC, TagLib…)                                                  Float32, SRC only        lock-free     C, no locks,
                                                                              when rates differ        SPSC          no allocation
 ```
@@ -13,6 +13,18 @@ file ─▶ SFBAudioEngine decoder ─▶ [DoP / DSD→PCM wrapper] ─▶ [CUE 
 3. **Configure.** `OutputSession` takes hog mode only in exclusive mode (shared is the default, so the device can stay the Mac's sound output), sets the stream's physical format (preferring integer at the planned depth), sets and verifies the nominal rate, ensures a Float32 virtual format, and installs `nrt_device_ioproc`. `DeviceRestore` remembers each device's format before the first change, so it can be put back when Nocturne quits.
 4. **Decode.** The engine thread pulls decoded audio through `AVAudioConverter`. With equal rates the converter only changes the sample format; integer PCM up to 24 bits maps exactly into Float32, which a unit test verifies sample-for-sample. With different rates it uses `AVSampleRateConverterAlgorithm_Mastering` at maximum quality.
 5. **Render.** The IOProc copies from the ring buffer into the device buffer. Gain of exactly 1.0 is a straight copy. Any other gain is applied in double precision with TPDF dither at the DAC's word length. DoP is always passthrough.
+
+Every decoder is wrapped in `GuardedDecoder`, which calls it through `CNocturneGuard` (Objective-C++). A C++ or Objective-C exception thrown inside a codec library, such as Monkey's Audio seeking in a truncated file, becomes an ordinary "won't play" error instead of ending the process.
+
+## DSD
+
+DSF and DSDIFF open through FFmpeg at any rate from DSD64 to DSD512 (SFBAudioEngine's readers stop at DSD128, and its DSD→PCM at DSD64). For DoP, `RawDoPDecoder` reads the raw DSD bytes (`nff_read_dsd`; DSF is planar and LSB-first, DSDIFF interleaved and MSB-first) and packs 16 bits per channel into each 24-bit frame with alternating 0x05/0xFA markers, so the DAC runs at a sixteenth of the DSD rate (176.4 kHz for DSD64). DoP is planned only when the DAC is marked DoP-capable and supports that carrier rate; otherwise FFmpeg converts DSD to PCM at an eighth of the DSD rate and the planner resamples as needed.
+
+DoP frames are passthrough, so meters and the spectrum can't read them as PCM. With `nrt_context_set_dop`, the render context reads the DSD bits in each frame instead: a triangular window over the current and previous frame's 16 bits (a sinc² decimation by 16) gives a level for the meters and the spectrum tap, and the inspector's spectrum stops at 20 kHz for DoP. The frames themselves are never modified; a test checks they come out bit-identical.
+
+## Format badges
+
+`FormatMark` (NocturneLibrary) names a track's or album's format for badges: Dolby Atmos (with what carries it), Dolby TrueHD, Dolby Digital Plus, Dolby Digital, DTS-HD Master Audio, DTS:X, DTS, DSD64–DSD512, Hi-Res Lossless or Lossless. The badge is plain text in the app's own style. Dolby's and DTS's logos are trademarks licensed only with certified products, and Nocturne's TrueHD and DTS decoders (FFmpeg) are not licensed, so the logos aren't used.
 
 ## Gapless and format changes
 
@@ -48,6 +60,13 @@ With `integerMode` and exclusive access, plain PCM that needs no processing plan
 ## Output device
 
 With a specific output chosen (`EngineSettings.deviceUID`), the engine never substitutes another device. If that device isn't listed, or won't start, when playback begins, the item is parked and the engine waits for it (`waitingForDevice` in the snapshot) for up to 60 s. It re-checks on every Core Audio device-list change and twice a second, and starts playback as soon as the device is back. If the device disappears mid-song, it waits the same way. This covers AirPods Max, whose Core Audio device is removed while they're off your head and re-published a few seconds after they're back on, often after their "play" command has already arrived. Pause cancels the wait. With *System Output* chosen, the engine follows the Mac's default output as before.
+
+### Switching and skipping
+
+- **Instant silence.** Skip, seek, pause, stop and a change of output set `nrt_context_set_muted` from the caller's thread: the IOProc plays silence and takes nothing from the ring. The old song stops at once even while the engine thread is busy (a network read can take seconds, and the ring holds 20–30 s). The engine clears the mute when it starts or resumes playing; because nothing was consumed, a pause or output change resumes exactly where it went quiet.
+- **Output changes keep the file open.** `restartFromCurrentPosition` hands the song's open decoder to the restart (`carried`), which seeks it back to the playback position when the new output needs the same kind of decoding (PCM stays PCM). Only the output session and converter are rebuilt, so a switch takes a few hundred milliseconds even on a busy share, instead of reopening and re-analysing the file.
+- **Commands go first.** The start-up prefill stops as soon as another command is waiting, several output changes in one batch restart playback once, and a retry for an output that isn't ready reuses the file already probed.
+- **Probing is small.** FFmpeg-opened files (DTS, TrueHD, Matroska, DSD) are analysed from their first 256 KB / 0.1 s; their headers and first frames describe them fully.
 
 ## Bit-perfect definition (`SignalPath.isBitPerfect`)
 
@@ -100,7 +119,9 @@ The analysis core lives in `Packages/NocturneAnalysis` (plain Swift and Foundati
 
 ## Known limits and roadmap
 
-- **Integer mode.** Nocturne renders Float32 into the HAL, which is exact for sources up to 24 bits. 32-bit integer sources are rounded to Float32. A non-mixable integer virtual format ("integer mode") is on the roadmap for devices that expose one.
+- **Integer mode** needs exclusive access and a DAC with a non-mixable Int32 format. Elsewhere Nocturne renders Float32, which is exact up to 24 bits.
+- **Object audio.** Atmos in Dolby Digital Plus is rendered by macOS. Atmos in TrueHD and DTS:X play their lossless channel bed; their objects need a receiver, and macOS gives apps no way to send TrueHD or DTS-HD MA over HDMI (no high-bit-rate passthrough).
+- **DSD in WavPack** isn't supported.
 - **Resampler.** SRC uses Apple's mastering-quality converter. libsoxr is a candidate alternative.
 - **DoP support** can't be detected from the device, so it is opt-in per device.
 - **AirPods Max over USB-C.** macOS keeps the AirPods on their *Bluetooth* Core Audio device even when audio flows over the cable. Bluetooth stays connected as the control link, and the cable can't be used without it. The HAL exposes no "USB" property for this, so Nocturne treats the path as USB-C lossless when the AirPods' `AirPods Max USB Audio` interface is present in the IORegistry. (Measured on hardware: output latency is 480 frames / 10 ms, as expected of USB.) The device also lists a 24 kHz rate, but that is the mono hands-free format, and the planner ignores rates that can't carry the source's channel count. AirPods Max 2 match as long as their name contains "AirPods Max".

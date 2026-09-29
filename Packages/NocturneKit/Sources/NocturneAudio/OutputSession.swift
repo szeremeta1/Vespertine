@@ -137,6 +137,7 @@ final class OutputSession: @unchecked Sendable {
         self.ring = ring
         self.context = ctx
         nrt_context_set_passthrough(ctx, plan.isPassthrough)
+        nrt_context_set_dop(ctx, plan.mode == .dop)
         nrt_context_set_integer(ctx, integerMode)
 
         // Multichannel routing.

@@ -36,6 +36,7 @@ enum DeveloperHooks {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "NocturneSnapshotDelay"), repeats: max(1, d.integer(forKey: "NocturneSnapshotCount"))) }
         }
         guard open != nil || play != nil || d.object(forKey: "NocturneInspectorTab") != nil || d.bool(forKey: "NocturneOpenMini")
+                || d.string(forKey: "NocturneFormatFilter") != nil || d.string(forKey: "NocturneSidebar") != nil
                 || d.string(forKey: "NocturneOpenSheet") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
@@ -77,6 +78,23 @@ enum DeveloperHooks {
         }
         if let query = d.string(forKey: "NocturneSearch") { model.searchText = query }
         if let genre = d.string(forKey: "NocturneGenreFilter") { model.library.genreFilter = Genres.key(genre) }
+        // `-NocturneCycleDevices "FiiO|AirPods" -NocturneCycleEvery 6 -NocturneCycleCount 8`: switch outputs the way
+        // the picker does, on a timer, to reproduce switching problems (see the org.nocturne.player log).
+        if let cycle = d.string(forKey: "NocturneCycleDevices") {
+            let names = cycle.split(separator: "|").map(String.init)
+            let every = max(1, d.double(forKey: "NocturneCycleEvery") == 0 ? 6 : d.double(forKey: "NocturneCycleEvery"))
+            let count = d.integer(forKey: "NocturneCycleCount") == 0 ? 8 : d.integer(forKey: "NocturneCycleCount")
+            Task {
+                for i in 0..<count {
+                    try? await Task.sleep(for: .seconds(every))
+                    let name = names[i % names.count]
+                    let device = model.devices.devices.first { $0.name.localizedCaseInsensitiveContains(name) }
+                    print("[qa] switch \(i + 1): \(name) → \(device?.name ?? "not listed") at \(Date())")
+                    if let device { model.selectDevice(device.uid) }
+                }
+            }
+        }
+        if let format = d.string(forKey: "NocturneFormatFilter"), let filter = FormatFilter(rawValue: format) { model.library.formatFilter = filter }
         switch d.string(forKey: "NocturneOpenSheet") {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []

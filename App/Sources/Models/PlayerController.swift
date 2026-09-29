@@ -13,6 +13,8 @@ import Synchronization
 struct QueueEntry: Identifiable, Hashable {
     let item: PlayableItem
     let track: Track
+    /// Every version of this song on its album (stereo and 5.1…), `track` among them; empty when there's one.
+    var versions: [Track] = []
     var id: UUID { item.id }
 }
 
@@ -109,20 +111,62 @@ final class PlayerController {
 
     // MARK: Queue
 
+    /// Whether the output wants a song's multichannel version over its stereo one (nil: can't tell now,
+    /// e.g. the chosen output is reconnecting). Set by the app model.
+    var wantsMultichannel: () -> Bool? = { nil }
+
+    /// Queue entries for `tracks`, each playing the version of its song that suits the output.
+    /// A song whose versions all arrive together (a whole SACD album) is queued once.
+    private func entries(_ tracks: [Track]) -> [QueueEntry] {
+        let versions = library.versions(of: tracks)
+        let wanted = wantsMultichannel()
+        var queued = Set<String>()
+        return zip(tracks, versions).compactMap { track, versions in
+            if versions.count > 1 {
+                let key = versions.map(\.location).sorted().joined(separator: "\u{1F}")
+                guard queued.insert(key).inserted else { return nil }
+            }
+            let chosen = wanted.flatMap { TrackVersions.choose(versions, multichannel: $0) } ?? track
+            return QueueEntry(item: makeItem(chosen), track: chosen, versions: versions.count > 1 ? versions : [])
+        }
+    }
+
+    /// The output changed (another device, Spatial Audio on or off): upcoming songs switch to the version
+    /// that suits it. The song that's playing carries on as it is.
+    func resolveVersions() {
+        guard let wanted = wantsMultichannel() else { return }
+        let start = (currentIndex ?? -1) + 1
+        var changed = false
+        func resolve(_ entry: QueueEntry) -> QueueEntry {
+            guard entry.versions.count > 1, let chosen = TrackVersions.choose(entry.versions, multichannel: wanted),
+                  chosen.id != entry.track.id else { return entry }
+            changed = true
+            return QueueEntry(item: makeItem(chosen, id: entry.id), track: chosen, versions: entry.versions)
+        }
+        let upcomingIDs = Set(queue.indices.filter { $0 >= start }.map { queue[$0].id })
+        queue = queue.enumerated().map { $0.offset >= start ? resolve($0.element) : $0.element }
+        originalOrder = originalOrder.map { upcomingIDs.contains($0.id) ? resolve($0) : $0 }
+        if changed { syncMirror() }
+    }
+
     func play(_ tracks: [Track], startAt index: Int = 0) {
         guard !tracks.isEmpty else { return }
-        let entries = tracks.map { QueueEntry(item: makeItem($0), track: $0) }
+        let entries = entries(tracks)
+        guard !entries.isEmpty else { return }
         originalOrder = entries
         queue = entries
-        currentIndex = min(max(0, index), entries.count - 1)
+        // Start at the song that was asked for, whichever of its versions it was.
+        let asked = tracks[min(max(0, index), tracks.count - 1)]
+        currentIndex = entries.firstIndex { $0.track.location == asked.location || $0.versions.contains { $0.location == asked.location } }
+            ?? min(max(0, index), entries.count - 1)
         if shuffle { applyShuffle(keepingCurrent: true) }
         // The engine is about to start over, so there's nothing to re-plan.
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
-        if let current { engine.play(current.item) }
+        if let current { start(current) }
     }
 
     func playNext(_ tracks: [Track]) {
-        let entries = tracks.map { QueueEntry(item: makeItem($0), track: $0) }
+        let entries = entries(tracks)
         guard let i = currentIndex else { play(tracks); return }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
@@ -130,7 +174,7 @@ final class PlayerController {
     }
 
     func addToQueue(_ tracks: [Track]) {
-        let entries = tracks.map { QueueEntry(item: makeItem($0), track: $0) }
+        let entries = entries(tracks)
         guard currentIndex != nil else { play(tracks); return }
         queue.append(contentsOf: entries)
         originalOrder.append(contentsOf: entries)
@@ -165,7 +209,7 @@ final class PlayerController {
     func jump(to id: UUID) {
         guard let i = queue.firstIndex(where: { $0.id == id }) else { return }
         currentIndex = i
-        engine.play(queue[i].item)
+        start(queue[i])
     }
 
     private func applyShuffle(keepingCurrent: Bool = true) {
@@ -211,7 +255,7 @@ final class PlayerController {
         let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         func remap(_ entry: QueueEntry) -> QueueEntry {
             guard let old = entry.track.id, let new = moves[old], let track = byID[new] else { return entry }
-            return QueueEntry(item: makeItem(track, id: entry.id), track: track)
+            return QueueEntry(item: makeItem(track, id: entry.id), track: track, versions: entry.versions)
         }
         let remapped = queue.map(remap)
         guard remapped != queue else { return }
@@ -221,8 +265,8 @@ final class PlayerController {
     }
 
     func refreshReplayGain() {
-        queue = queue.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
-        originalOrder = originalOrder.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track) }
+        queue = queue.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track, versions: $0.versions) }
+        originalOrder = originalOrder.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track, versions: $0.versions) }
         syncMirror(reloadCurrent: true)
     }
 
@@ -249,6 +293,22 @@ final class PlayerController {
 
     // MARK: Transport
 
+    /// The song you asked for, until the engine reports it playing. Meanwhile the engine still describes the
+    /// previous one (it may be opening a file on a share), and its position must not show under the new title.
+    private var requested: UUID?
+    /// Position and time of the last Now Playing update, for drift checks.
+    private var nowPlayingAnchor: (position: TimeInterval, at: Date)?
+    /// A seek in flight: the position you dragged to, until the engine gets there.
+    private var requestedPosition: (seconds: TimeInterval, at: Date)?
+
+    private func start(_ entry: QueueEntry) {
+        requested = entry.id
+        requestedPosition = nil
+        position = 0
+        duration = entry.track.duration
+        engine.play(entry.item)
+    }
+
     func togglePlayPause() {
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
@@ -256,30 +316,31 @@ final class PlayerController {
         case .playing: engine.pause()
         case .paused: engine.resume()
         case .stopped:
-            if let current { engine.play(current.item) }
-            else if let first = queue.first { currentIndex = 0; engine.play(first.item) }
+            if let current { start(current) }
+            else if let first = queue.first { currentIndex = 0; start(first) }
         }
     }
 
     func next() {
         guard let i = currentIndex else { return }
-        if i + 1 < queue.count { currentIndex = i + 1; engine.play(queue[i + 1].item) }
-        else if repeatMode == .all, let first = queue.first { currentIndex = 0; engine.play(first.item) }
+        if i + 1 < queue.count { currentIndex = i + 1; start(queue[i + 1]) }
+        else if repeatMode == .all, let first = queue.first { currentIndex = 0; start(first) }
     }
 
     func previous() {
         guard let i = currentIndex else { return }
-        if position > 3 || i == 0 { engine.seek(to: 0); return }
+        if position > 3 || i == 0 { seek(to: 0); return }
         currentIndex = i - 1
-        engine.play(queue[i - 1].item)
+        start(queue[i - 1])
     }
 
     func seek(to seconds: TimeInterval) {
         engine.seek(to: seconds)
         position = seconds
+        requestedPosition = (seconds, .now)
     }
 
-    func stop() { engine.stop() }
+    func stop() { requested = nil; requestedPosition = nil; engine.stop() }
 
     func clearError() { lastError = nil }
 
@@ -288,7 +349,9 @@ final class PlayerController {
     private func handle(_ event: EngineEvent) {
         switch event {
         case .trackStarted(let item):
+            if requested == item.id { requested = nil }
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
+            resolveVersions()
             trackStartedAt = .now
             scrobbledEntry = nil
             prefetchNetworkTracks()
@@ -299,6 +362,7 @@ final class PlayerController {
         case .queueEnded:
             updateNowPlayingInfo()
         case .failed(let item, let message):
+            requested = nil
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = "“\(track.title)” is on a network share that isn’t connected. Nocturne reconnects automatically when the server is reachable."
@@ -322,13 +386,23 @@ final class PlayerController {
         let snap = engine.snapshot
         let stateChanged = state != snap.state
         state = snap.state
-        if abs(position - snap.position) > 0.02 { position = snap.position }
-        if duration != snap.duration { duration = snap.duration }
+        // Until the engine reports the song you asked for, what it says is about the previous one.
+        if let requested {
+            if snap.item?.id == requested || snap.state == .stopped && snap.lastError != nil { self.requested = nil }
+        }
+        if let target = requestedPosition {
+            // A seek lands when the engine's position gets there (or after a few seconds, whatever it says).
+            if abs(snap.position - target.seconds) < 1.5 || Date().timeIntervalSince(target.at) > 4 { requestedPosition = nil }
+        }
+        if requested == nil, requestedPosition == nil {
+            if abs(position - snap.position) > 0.02 { position = snap.position }
+            if duration != snap.duration, snap.duration > 0 || snap.item == nil { duration = snap.duration }
+        }
         if waitingForDevice != snap.waitingForDevice {
             waitingForDevice = snap.waitingForDevice
             if waitingForDevice == nil, lastError?.hasPrefix("Waiting for ") == true { lastError = nil }
         }
-        if let id = snap.item?.id, let i = queue.firstIndex(where: { $0.id == id }), currentIndex != i {
+        if requested == nil, let id = snap.item?.id, let i = queue.firstIndex(where: { $0.id == id }), currentIndex != i {
             currentIndex = i
             updateNowPlayingInfo()
         }
@@ -360,7 +434,9 @@ final class PlayerController {
                 Task { try? await ListenBrainzClient.shared.submit(track, kind: .single) }
             }
         }
-        if state == .playing { MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = position }
+        // macOS extrapolates the elapsed time from the rate; tell it again only when that drifts (a seek, a stall).
+        if state == .playing, let anchor = nowPlayingAnchor,
+           abs(anchor.position + Date().timeIntervalSince(anchor.at) - position) > 1 { updateNowPlayingInfo() }
     }
 
     // MARK: System Now Playing
@@ -412,6 +488,7 @@ final class PlayerController {
             info[MPMediaItemPropertyArtwork] = Self.artwork(image)
         }
         center.nowPlayingInfo = info
+        nowPlayingAnchor = state == .playing ? (position, .now) : nil
         center.playbackState = state == .playing ? .playing : .paused
     }
 }

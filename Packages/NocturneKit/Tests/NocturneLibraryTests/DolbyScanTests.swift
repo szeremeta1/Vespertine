@@ -37,4 +37,11 @@ struct DolbyScanTests {
         #expect(abs(track.duration - 1) < 0.1, "duration \(track.duration)")
         if let title { #expect(track.title == title && track.artist == "Nocturne Test" && track.album == "Fixtures") }
     }
+
+    @Test("A DTS CD shows no bitrate: the file's 1411k belongs to the PCM carrier")
+    func dtsCDHasNoCarrierBitrate() throws {
+        let track = try MetadataReader.read(url: fixtures.appendingPathComponent("dts-cd-tones.wav"), artwork: nil)
+        #expect(track.codec == "DTS" && track.bitrate == nil)
+        #expect(track.formatSummary == "DTS · 44.1 kHz · 5.1")
+    }
 }

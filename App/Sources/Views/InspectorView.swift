@@ -41,6 +41,10 @@ struct NowPlayingPanel: View {
 
     var body: some View {
         let player = model.player
+        GeometryReader { geo in
+        // The cover gives way so the title, badges and signal path fit the panel without scrolling
+        // (about 560 pt of them); on a tall window it grows back to the full width.
+        let artSide = min(geo.size.width - 40, max(160, geo.size.height - 560))
         ScrollViewReader { scroller in
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
@@ -54,7 +58,9 @@ struct NowPlayingPanel: View {
                         }
                     }
                     ArtworkView(key: track.artworkKey, size: 600, cornerRadius: 8)
+                        .frame(width: artSide, height: artSide)
                         .shadow(color: .black.opacity(0.65), radius: 30, y: 24)
+                        .frame(maxWidth: .infinity)
                         .padding(.top, 14)
                     Text(track.title)
                         .font(Typeface.serif(24))
@@ -64,6 +70,9 @@ struct NowPlayingPanel: View {
                     Text(track.displayArtist).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
                     Text([track.displayAlbum, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
                         .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2)
+                    if let mark = track.formatMark {
+                        FormatMarkView(mark: mark).padding(.top, 14)
+                    }
 
                     if let path = player.signalPath {
                         StatusBadges(path: path).padding(.top, 16)
@@ -103,6 +112,7 @@ struct NowPlayingPanel: View {
             scroller.scrollTo("spectrum", anchor: .bottom)
         }
         }
+        }
         .background(alignment: .top) {
             RadialGradient(colors: [glow.opacity(0.38), .clear], center: .init(x: 0.5, y: 0.25), startRadius: 0, endRadius: 320)
                 .frame(height: 560)
@@ -120,11 +130,16 @@ struct NowPlayingPanel: View {
 struct StatusBadges: View {
     let path: SignalPath
     var body: some View {
-        HStack(spacing: 8) {
-            StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted)
-            StatusBadge(text: path.applied.exclusive ? "EXCLUSIVE" : "SHARED")
-            StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")
+        // One row when it fits the inspector; a long status ("SPATIAL · HEAD TRACKED") takes a row of its own.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) { status; details }
+            VStack(alignment: .leading, spacing: 8) { status; HStack(spacing: 8) { details } }
         }
+    }
+    private var status: some View { StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted) }
+    @ViewBuilder private var details: some View {
+        StatusBadge(text: path.applied.exclusive ? "EXCLUSIVE" : "SHARED")
+        StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")
     }
 }
 
@@ -263,9 +278,12 @@ struct SystemRenderingView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
-                StatusBadge(text: "DOLBY ATMOS", kind: .perfect)
-                StatusBadge(text: "RENDERED BY MACOS")
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    StatusBadge(text: "OBJECTS RENDERED BY MACOS", kind: .perfect)
+                    if rendering.spatial { StatusBadge(text: "SPATIAL") }
+                }
+                StatusBadge(text: "OBJECTS RENDERED BY MACOS", kind: .perfect)
             }
             Hairline().padding(.top, 18)
             SignalSteps(steps: [
@@ -436,12 +454,13 @@ struct SpectrumView: View {
     }
 
     private func update() {
-        guard let path = model.player.signalPath, path.plan.mode == .pcm,
+        guard let path = model.player.signalPath, path.plan.mode != .bitstream,
               let rate = model.player.engine.copyTap(into: &buffer) else {
             bands = bands.map { $0 * 0.85 }
             return
         }
-        let fresh = analyzer.bands(buffer, sampleRate: rate, count: bands.count, highHz: min(rate / 2, 40_000))
+        // DoP levels come from the DSD bits: past 20 kHz they're mostly the modulator's noise, not music.
+        let fresh = analyzer.bands(buffer, sampleRate: rate, count: bands.count, highHz: min(rate / 2, path.plan.mode == .dop ? 20_000 : 40_000))
         bands = zip(bands, fresh).map { old, new in new > old ? new : old * 0.82 + new * 0.18 }
     }
 }

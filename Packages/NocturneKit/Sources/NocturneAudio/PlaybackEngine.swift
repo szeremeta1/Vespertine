@@ -271,10 +271,24 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Public API
 
-    public func play(_ item: PlayableItem) { post(.play(item)) }
-    public func pause() { post(.pause) }
+    // Skip, seek, pause, stop and a change of output silence the old audio right away, on the caller's
+    // thread: the engine thread may be busy (a network read) and the buffer holds 20–30 s. It clears the
+    // mute when it starts (or resumes) playing.
+    public func play(_ item: PlayableItem) { silenceNow(); post(.play(item)) }
+    public func pause() { silenceNow(); post(.pause) }
     public func resume() { post(.resume) }
-    public func stop() { post(.stop) }
+    public func stop() { silenceNow(); post(.stop) }
+
+    private func silenceNow() {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        if let session { nrt_context_set_muted(session.context, true) }
+    }
+
+    /// The engine thread is about to play: let the audio through again.
+    private func unmute() {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        if let session { nrt_context_set_muted(session.context, false) }
+    }
     /// Stops and releases the device, waiting (up to `timeout`) until it's done. For quitting.
     public func stopAndWait(timeout: TimeInterval = 2) {
         let done = DispatchSemaphore(value: 0)
@@ -284,6 +298,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
     public func seek(to seconds: TimeInterval) {
         guard seconds.isFinite else { return }
+        silenceNow()
         post(.seek(max(0, seconds)))
     }
     /// Discards decoded look-ahead after the play order changes.
@@ -293,11 +308,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     public func devicesChanged() { post(.devicesChanged) }
 
     public func update(settings: EngineSettings) {
-        let changed = shared.withLock { s -> Bool in
-            guard s.settings != settings else { return false }
+        let (changed, newOutput) = shared.withLock { s -> (Bool, Bool) in
+            guard s.settings != settings else { return (false, false) }
+            let newOutput = s.settings.deviceUID != settings.deviceUID
             s.settings = settings
-            return true
+            return (true, newOutput)
         }
+        if newOutput { silenceNow() }   // the old output stops now, not when the new one is ready
         if changed { post(.settingsChanged(settings)) }
     }
 
@@ -327,6 +344,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         return session.applied.sampleRate
     }
 
+    /// A probed file whose start failed before its decoder was used (the output wasn't ready).
+    private var unusedProbe: (item: UUID, probed: ProbedSource)?
+    /// The open decoder of the song that's restarting on another output. Opening the file again is the slow
+    /// part of a switch on a busy share (seconds, while the cache copies the same file); the decoder can
+    /// simply seek back to where playback is, if the new output needs the same kind of decoding.
+    private var carried: (item: UUID, probed: ProbedSource, decoder: PCMDecoding, mode: OutputPlan.Mode)?
+
+    private var hasPendingCommands: Bool { shared.withLock { !$0.commands.isEmpty } }
+
     private func post(_ command: Command) {
         shared.withLock { $0.commands.append(command) }
         wake.signal()
@@ -345,7 +371,20 @@ public final class PlaybackEngine: @unchecked Sendable {
                 defer { s.commands.removeAll() }
                 return s.commands
             }
-            for command in commands { handle(command) }
+            // Several output changes waiting (quick clicks while busy): only the last one restarts playback.
+            // Each carries the complete settings, and each comes with a queue update (other versions of
+            // upcoming songs), so those collapse into one too.
+            let lastSettings = commands.lastIndex { if case .settingsChanged = $0 { true } else { false } }
+            let lastQueue = commands.lastIndex { if case .queueChanged = $0 { true } else { false } }
+            let reload = commands.contains { if case .queueChanged(true) = $0 { true } else { false } }
+            let coalesced: [Command] = commands.enumerated().compactMap { i, command in
+                switch command {
+                case .settingsChanged: i == lastSettings ? command : nil
+                case .queueChanged: i == lastQueue ? .queueChanged(reloadCurrent: reload) : nil
+                default: command
+                }
+            }
+            for command in coalesced { handle(command) }
 
             var didWork = false
             if state == .playing, let atmos {
@@ -374,6 +413,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .barrier(let done):
             done.signal()
         case .play(let item):
+            carried = nil
             teardownDecoding()
             session?.flush()
             parked = nil
@@ -389,13 +429,14 @@ public final class PlaybackEngine: @unchecked Sendable {
             if state == .paused, let atmos {
                 atmos.play(); state = .playing; pausedAt = nil
             } else if state == .paused, let session {
-                do { try session.start(); state = .playing; pausedAt = nil }
+                do { try session.start(); unmute(); state = .playing; pausedAt = nil }
                 catch { restartFromCurrentPosition() }
             } else if state == .paused || state == .stopped, let parked {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true)
             }
         case .stop:
+            carried = nil
             teardown(releaseHog: true)
             parked = nil
             awaitingDevice = nil
@@ -416,7 +457,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
-            if deviceChanged, state != .stopped { restartFromCurrentPosition() }
+            if deviceChanged, state != .stopped {
+                log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
+                restartFromCurrentPosition()
+            }
         case .queueChanged(let reloadCurrent):
             guard state != .stopped else { return }
             if reloadCurrent { restartFromCurrentPosition() } else { replanUpcoming() }
@@ -425,6 +469,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             guard let device = sessionDevice else { return }
             let alive = DeviceQuery.allDeviceIDs().contains(device.id)
             if !alive {
+                log.notice("\(device.name, privacy: .public) disappeared while in use")
                 let position = currentPosition()
                 let item = currentItem()
                 let wasPlaying = state == .playing
@@ -464,7 +509,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private struct ChosenDeviceMissing: Error { let uid: String }
     /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
-    private struct ChosenDeviceNotReady: Error { let uid: String }
+    private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
 
     private func deviceName(_ uid: String) -> String { deviceNames[uid] ?? "The selected output" }
 
@@ -492,6 +537,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var candidate: PlayableItem? = item
         var offset = seconds
         var attempts = 0
+        let startedAt = Date()
         while let current = candidate, attempts < 8 {
             attempts += 1
             do {
@@ -503,9 +549,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 if autoplay {
                     do { try session?.start() } catch {
-                        if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
+                        if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "start: \(error.localizedDescription)") }
                         throw error
                     }
+                    log.notice("Playing on \(self.sessionDevice?.name ?? "?", privacy: .public) from \(String(format: "%.1f", offset), privacy: .public) s after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
+                    unmute()
                     state = .playing
                 } else {
                     state = .paused
@@ -515,6 +563,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
                 let uid = (error as? ChosenDeviceMissing)?.uid ?? (error as? ChosenDeviceNotReady)?.uid ?? ""
+                log.notice("\(self.deviceName(uid), privacy: .public) \(error is ChosenDeviceMissing ? "isn't listed" : "won't start (\((error as? ChosenDeviceNotReady)?.reason ?? "?"))", privacy: .public); waiting for it")
                 teardown(releaseHog: true)
                 parked = (current, offset)
                 state = .paused
@@ -539,8 +588,25 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Opens `item`, (re)configures the device if needed, positions and prefills.
     private func begin(_ item: PlayableItem, at seconds: TimeInterval) throws {
+        var marks: [(String, Date)] = [("start", Date())]
+        func mark(_ name: String) { marks.append((name, Date())) }
+        defer {
+            let steps = zip(marks, marks.dropFirst()).map { "\($1.0) \(Int($1.1.timeIntervalSince($0.1) * 1000))" }.joined(separator: ", ")
+            log.info("Opening \(item.url.lastPathComponent, privacy: .public) (ms): \(steps, privacy: .public)")
+        }
         guard let device = try resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
-        let probed = try SourceOpener.probe(resolve(item))
+        mark("device")
+        // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
+        // costs seconds each time, and only the device needs another try.
+        let url = resolve(item)
+        let probed: ProbedSource
+        let carry = carried.flatMap { $0.item == item.id && $0.probed.url == url ? $0 : nil }
+        if carried != nil, carry == nil { carried = nil }
+        if let carry { probed = carry.probed }
+        else if let reuse = unusedProbe, reuse.item == item.id, reuse.probed.url == url { probed = reuse.probed }
+        else { probed = try SourceOpener.probe(url) }
+        unusedProbe = (item.id, probed)
+        mark("probe")
         let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
         if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
             try beginSystemRendering(item, url: resolve(item), device: device, at: seconds)
@@ -554,16 +620,21 @@ public final class PlaybackEngine: @unchecked Sendable {
         plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: item, device: device)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
-                if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid) }
+                if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)") }
                 throw error
             }
         } else {
             session?.flush()
         }
+        mark("output")
         guard let session else { return }
-        let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
+        unusedProbe = nil   // its decoder is about to be used
+        let reused = carry.flatMap { $0.mode == plan.mode ? $0.decoder : nil }
+        carried = nil
+        let decoder = try reused ?? SourceOpener.decoder(for: probed, plan: plan, item: item)
+        mark(reused == nil ? "decoder" : "decoder (kept open)")
         var actualOffset = 0.0
-        if seconds > 0, decoder.supportsSeeking, decoder.length > 0 {
+        if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
             let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
             let frame = AVAudioFramePosition(bounded)
             try decoder.seek(to: frame)
@@ -572,6 +643,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
+        mark("seek+converter")
         decoding.streaming = isStreaming(item)
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
@@ -580,6 +652,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         nrt_context_set_draining(session.context, false)
         lastAudibleSegmentID = nil
         prefill()
+        mark("prefill")
     }
 
     private func replaceSession(device: OutputDevice, plan: OutputPlan) throws {
@@ -648,6 +721,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard let item = currentItem() else { return }
         let position = parked?.position ?? currentPosition()
         let wasPlaying = state == .playing || awaitingDevice != nil
+        if let d = decoding, d.item.id == item.id, d.decoder.supportsSeeking, d.path.plan.mode != .bitstream {
+            carried = (item.id, d.probed, d.decoder, d.path.plan.mode)
+        }
         teardown(releaseHog: true)
         parked = nil
         start(item, at: position, autoplay: wasPlaying)
@@ -774,7 +850,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         let target = min(Int(session.applied.sampleRate * seconds), Int(nrt_ring_capacity(session.ring)) / 2)
         // Bound work so a repeating empty/corrupt track cannot monopolize the engine thread.
         for _ in 0..<256 {
-            if session.readableFrames >= target || !fill() { break }
+            // A command waiting (another output, pause, skip) goes first: it would throw this work away,
+            // and on a slow share the rest of the prefill can take seconds. Playback rebuffers as usual.
+            if session.readableFrames >= target || hasPendingCommands || !fill() { break }
         }
     }
 

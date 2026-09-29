@@ -25,6 +25,7 @@ struct MainWindow: View {
                         Hairline(vertical: true)
                         InspectorView()
                             .frame(width: 348)
+                            .clipped()   // nothing inside may spill over the list beside it
                             .transition(.move(edge: .trailing))
                     }
                 }

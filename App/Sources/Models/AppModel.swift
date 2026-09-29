@@ -132,6 +132,7 @@ final class AppModel {
             self?.player.engine.devicesChanged()
             self?.syncEngine()
         }
+        player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
         syncEngine()
         shares.start()
         analysis.start()
@@ -191,6 +192,23 @@ final class AppModel {
         let device = devices.device(uid: settings.selectedDeviceUID)
         player.engine.update(settings: settings.engineSettings(deviceHasHardwareVolume: device?.hasHardwareVolume ?? false))
         devices.watchVolume(of: device)
+        player.resolveVersions()
+    }
+
+    /// Whether songs with a stereo and a multichannel version should play the multichannel one: on an output
+    /// with more than two channels (an interface, a receiver's speaker layout) or with Spatial Audio on
+    /// (AirPods, Beats). nil while the chosen output is missing (reconnecting AirPods): keep what's queued.
+    func outputWantsMultichannel() -> Bool? {
+        switch settings.versionPreference {
+        case .stereo: return false
+        case .multichannel: return true
+        case .matchOutput: break
+        }
+        let device: OutputDevice? = if let uid = settings.selectedDeviceUID { devices.devices.first { $0.uid == uid } }
+                                    else { devices.device(uid: nil) }
+        guard let device else { return nil }
+        let caps = device.capabilities
+        return caps.outputChannels > 2 || (caps.speakerLayoutChannels ?? 0) >= 3 || engineSpatialMode(for: device) != .off
     }
 
     /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).

@@ -182,7 +182,9 @@ public actor TagWriter {
 
         for track in tracks {
             guard let id = track.id else { continue }
-            if track.cueStartFrame != nil {
+            // CUE tracks share one file, and a read-only share can't be written: those edits live in the library
+            // (and survive rescans). Checked first, so no backup is copied for a write that would fail.
+            if track.cueStartFrame != nil || !Self.isWritable(track.fileURL) {
                 try await updateDatabaseOnly(track, edit: edit)
                 result.databaseOnly += 1
                 continue
@@ -395,6 +397,11 @@ public actor TagWriter {
     }
 
     /// APFS clone of the file before writing (free on the same volume). Returns nil across volumes.
+    /// Whether the file itself can be rewritten (false on a share mounted read-only).
+    public static func isWritable(_ url: URL) -> Bool {
+        url.withUnsafeFileSystemRepresentation { $0.map { access($0, W_OK) == 0 } ?? false }
+    }
+
     private func makeBackup(of url: URL) throws -> URL {
         let day = ISO8601DateFormatter.string(from: .now, timeZone: .current, formatOptions: [.withFullDate])
         let dir = backupDirectory.appendingPathComponent(day, isDirectory: true)

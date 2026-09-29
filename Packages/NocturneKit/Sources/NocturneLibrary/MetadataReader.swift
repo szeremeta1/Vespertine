@@ -36,6 +36,11 @@ public enum MetadataReader {
         if url.pathExtension.lowercased() == "mp3" || home.pathExtension.lowercased() == "mp3" {
             for (k, v) in ID3Extras.read(url) where extra[k] == nil { extra[k] = v }
         }
+        if url.pathExtension.lowercased() == "dsf" || home.pathExtension.lowercased() == "dsf" {
+            for (k, v) in ID3Extras.readDSF(url) where extra[k] == nil { extra[k] = v }
+        }
+        // Readers that drop the ID3 date (DSF) still have it here; a date with no year in it counts as none.
+        let releaseDate = md.releaseDate.flatMap(nonEmpty).flatMap { year(from: $0) != nil ? $0 : nil } ?? extra["DATE"]
         let label = extra["LABEL"] ?? extra["ORGANIZATION"] ?? extra["PUBLISHER"]
 
         var artworkKey: String?
@@ -47,7 +52,14 @@ public enum MetadataReader {
             else if let data = ArtworkStore.folderImage(near: home) { artworkKey = artwork.store(data) }
         }
 
-        let title = md.title.flatMap(nonEmpty) ?? url.deletingPathExtension().lastPathComponent
+        // Files that can't hold tags (bare Dolby, DTS and TrueHD streams): the file name gives the title, and the
+        // artist and number when it has them; the folder gives the album, so they don't all pile into one
+        // "Unknown Album". Taggable files that nobody tagged stay as they are so enrichment offers to tag them.
+        let untagged = file == nil && md.title.flatMap(nonEmpty) == nil && md.albumTitle.flatMap(nonEmpty) == nil
+        let inferred = untagged ? FilenameParser.parse(home) : nil
+        // DTS CDs sit in a PCM file whose bitrate (1411k) is the carrier's, not the DTS stream's.
+        let dtsInPCM = codec == "DTS" && ["wav", "flac"].contains(home.pathExtension.lowercased())
+        let title = md.title.flatMap(nonEmpty) ?? inferred.flatMap { nonEmpty($0.title) } ?? url.deletingPathExtension().lastPathComponent
         return Track(
             id: nil, sourceId: nil,
             location: url.path, filePath: url.path,
@@ -56,14 +68,15 @@ public enum MetadataReader {
             sampleRate: format?.sampleRate ?? props?.sampleRate ?? 0,
             bitDepth: isDSD ? nil : (format?.bitDepth ?? (isLossless ? props?.bitDepth : nil)),
             channels: format?.channels ?? Int(props?.channelCount ?? 2),
-            duration: props?.duration ?? inspected?.duration ?? 0, bitrate: props?.bitrate,
+            duration: props?.duration ?? inspected?.duration ?? 0, bitrate: dtsInPCM ? nil : props?.bitrate,
             cueStartFrame: nil, cueFrameLength: nil,
             title: title,
-            artist: md.artist.flatMap(nonEmpty), album: md.albumTitle.flatMap(nonEmpty),
+            artist: md.artist.flatMap(nonEmpty) ?? inferred?.artist,
+            album: md.albumTitle.flatMap(nonEmpty) ?? inferred?.album ?? (untagged ? albumFolder(of: home) : nil),
             albumArtist: md.albumArtist.flatMap(nonEmpty), composer: md.composer.flatMap(nonEmpty),
-            genre: md.genre.flatMap(nonEmpty), releaseDate: md.releaseDate.flatMap(nonEmpty).map(displayDate),
-            year: originalYear(extra, releaseYear: md.releaseDate.flatMap(year(from:))),
-            trackNumber: md.trackNumber, trackTotal: md.trackTotal,
+            genre: md.genre.flatMap(nonEmpty), releaseDate: releaseDate.map(displayDate),
+            year: originalYear(extra, releaseYear: releaseDate.flatMap(year(from:))),
+            trackNumber: md.trackNumber ?? inferred?.trackNumber, trackTotal: md.trackTotal,
             discNumber: md.discNumber, discTotal: md.discTotal,
             compilation: md.isCompilation ?? false,
             grouping: md.grouping.flatMap(nonEmpty), comment: md.comment.flatMap(nonEmpty),
@@ -78,6 +91,14 @@ public enum MetadataReader {
             rgAlbumGain: md.replayGainAlbumGain, rgAlbumPeak: md.replayGainAlbumPeak,
             artworkKey: artworkKey, playCount: 0, lastPlayedAt: nil, isMissing: false,
             effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
+    }
+
+    /// The folder a file sits in, or the one above for a disc folder ("CD 2").
+    static func albumFolder(of url: URL) -> String? {
+        var dir = url.deletingLastPathComponent()
+        if ArtworkStore.isDiscFolder(dir.lastPathComponent) { dir = dir.deletingLastPathComponent() }
+        let name = dir.lastPathComponent
+        return name.isEmpty || name == "/" ? nil : name
     }
 
     static func nonEmpty(_ s: String) -> String? {

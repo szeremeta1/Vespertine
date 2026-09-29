@@ -49,3 +49,28 @@ struct ID3ExtrasTests {
         #expect(extra["LABEL"] == "Apple Records")
     }
 }
+
+@Suite struct DSFDateTests {
+    @Test("A DSF's release and original dates are read from the ID3 tag its header points to")
+    func dsfDates() throws {
+        func frame(_ id: String, _ text: String) -> [UInt8] {
+            let body = [UInt8(3)] + Array(text.utf8)
+            let n = body.count
+            return Array(id.utf8) + [UInt8(n >> 21 & 0x7F), UInt8(n >> 14 & 0x7F), UInt8(n >> 7 & 0x7F), UInt8(n & 0x7F), 0, 0] + body
+        }
+        let frames = frame("TDRC", "2003-05-03") + frame("TDOR", "1973")
+        let n = frames.count
+        let id3 = Array("ID3".utf8) + [4, 0, 0, UInt8(n >> 21 & 0x7F), UInt8(n >> 14 & 0x7F), UInt8(n >> 7 & 0x7F), UInt8(n & 0x7F)] + frames
+        func le64(_ v: UInt64) -> [UInt8] { (0..<8).map { UInt8(v >> (8 * UInt64($0)) & 0xFF) } }
+        let audio = [UInt8](repeating: 0x69, count: 64)
+        let pointer = UInt64(28 + audio.count)
+        let file = Array("DSD ".utf8) + le64(28) + le64(pointer + UInt64(id3.count)) + le64(pointer) + audio + id3
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("dates-\(UUID().uuidString).dsf")
+        try Data(file).write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let tags = ID3Extras.readDSF(url)
+        #expect(tags["DATE"] == "2003-05-03")
+        #expect(tags["ORIGINALDATE"] == "1973")
+        #expect(MetadataReader.originalYear(tags, releaseYear: 2003) == 1973)
+    }
+}
