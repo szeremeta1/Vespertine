@@ -65,6 +65,15 @@ double nrt_context_gain(const NRTRenderContext *_Nonnull ctx);
 /// When set (DoP), samples are never modified and meters are not computed.
 void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthrough);
 
+/// Muted: the output plays silence and nothing is taken from the ring. Set from any thread the moment a
+/// skip, seek, pause or output change is asked for, so the old song stops at once instead of playing on
+/// from the buffer until the engine thread gets to the request (it may be waiting on a network read).
+void nrt_context_set_muted(NRTRenderContext *_Nonnull ctx, bool muted);
+
+/// DoP: samples still go out untouched, but meters and the spectrum tap read the DSD bits in each frame
+/// (a 16-bit bit count, display only).
+void nrt_context_set_dop(NRTRenderContext *_Nonnull ctx, bool dop);
+
 /// When set, running dry is the expected end of the stream and is not counted as an underrun.
 void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);
 /// Integer mode: the ring carries 32-bit integer samples (bit patterns in the float slots) for a device set

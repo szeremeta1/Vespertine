@@ -14,6 +14,7 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
 
     let url: URL
     private var handle: OpaquePointer?
+    var rawHandle: OpaquePointer? { handle }
     private(set) var isOpen = false
     private var format: AVAudioFormat?
 
@@ -105,5 +106,78 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
 
     func seek(to frame: AVAudioFramePosition) throws {
         guard let handle, nff_seek(handle, frame) else { throw DTSError.decoding }
+    }
+}
+
+extension FFmpegDecoder {
+    /// DSF / DSDIFF: DSD at any rate (DSD64 to DSD1024), converted to PCM by FFmpeg (at the DSD rate / 8).
+    static let dsdExtensions: Set<String> = ["dsf", "dff", "dsdiff"]
+
+    var isDSD: Bool { handle.map { nff_is_dsd($0) } ?? false }
+    /// The DSD bit rate (FFmpeg reports bytes per second per channel).
+    var dsdRate: Double { handle.map { Double(nff_sample_rate($0)) * 8 } ?? 0 }
+}
+
+/// DSD over PCM from the raw 1-bit stream (any DSD rate): 16 DSD bits per channel per frame, behind the
+/// alternating 0x05 / 0xFA marker, as 24-bit samples (carried exactly in Float32). Positions are DoP frames.
+final class RawDoPDecoder: NSObject, PCMDecoding {
+    private let source: FFmpegDecoder
+    private var handle: OpaquePointer? { source.rawHandle }
+    private var frame: AVAudioFramePosition = 0
+    private let format: AVAudioFormat
+    private var bytes: [[UInt8]] = []
+
+    init(url: URL) throws {
+        source = FFmpegDecoder(url: url)
+        try source.open()
+        guard source.isDSD, let h = source.rawHandle else { throw DTSError.unsupported("not DSD") }
+        let channels = Int(nff_channels(h)), carrier = source.dsdRate / 16
+        let layout = channels <= 2 ? nil : ChannelLayouts.layout(channels: channels)
+        let f: AVAudioFormat? = if let layout { AVAudioFormat(standardFormatWithSampleRate: carrier, channelLayout: layout) }
+                                else { AVAudioFormat(standardFormatWithSampleRate: carrier, channels: AVAudioChannelCount(channels)) }
+        guard let f else { throw DTSError.unsupported("DoP format") }
+        format = f
+    }
+
+    var inputSource: InputSource { source.inputSource }
+    var sourceFormat: AVAudioFormat { format }
+    var processingFormat: AVAudioFormat { format }
+    var decodingIsLossless: Bool { true }
+    var properties: [AudioDecodingPropertiesKey: Any] { [:] }
+    var isOpen: Bool { source.isOpen }
+    var supportsSeeking: Bool { true }
+    var position: AVAudioFramePosition { frame }
+    var length: AVAudioFramePosition { source.length / 2 }
+    func open() throws {}
+    func close() throws { try source.close() }
+    func decode(into buffer: AVAudioBuffer) throws {
+        guard let pcm = buffer as? AVAudioPCMBuffer else { return }
+        try decode(into: pcm, length: pcm.frameCapacity)
+    }
+
+    func decode(into buffer: AVAudioPCMBuffer, length: AVAudioFrameCount) throws {
+        buffer.frameLength = 0
+        guard let h = handle, let out = buffer.floatChannelData else { throw DTSError.decoding }
+        let channels = Int(format.channelCount), want = Int(min(length, buffer.frameCapacity))
+        if bytes.count != channels || bytes[0].count < want * 2 { bytes = Array(repeating: [UInt8](repeating: 0, count: want * 2), count: channels) }
+        var pointers = (0..<channels).map { c in bytes[c].withUnsafeMutableBufferPointer { $0.baseAddress! } }
+        let got = pointers.withUnsafeMutableBufferPointer { nff_read_dsd(h, $0.baseAddress!, Int32(want * 2)) }
+        guard got >= 0 else { throw DTSError.decoding }
+        let frames = Int(got) / 2
+        for c in 0..<channels {
+            let src = bytes[c]
+            for i in 0..<frames {
+                let marker: UInt32 = (frame + AVAudioFramePosition(i)) & 1 == 0 ? 0x05 : 0xFA
+                let word = marker << 16 | UInt32(src[2 * i]) << 8 | UInt32(src[2 * i + 1])
+                out[c][i] = Float(Int32(bitPattern: word << 8)) / 2_147_483_648
+            }
+        }
+        buffer.frameLength = AVAudioFrameCount(frames)
+        frame += AVAudioFramePosition(frames)
+    }
+
+    func seek(to target: AVAudioFramePosition) throws {
+        guard let h = handle, nff_seek_dsd(h, max(0, target) * 2) else { throw DTSError.decoding }
+        frame = max(0, target)
     }
 }

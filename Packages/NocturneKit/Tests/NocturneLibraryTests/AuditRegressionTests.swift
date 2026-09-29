@@ -83,6 +83,34 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try Data(contentsOf: url) == original)
     }
+    @Test("A read-only file is edited in the library only: no backup, the file untouched, and a rescan keeps the edit")
+    func readOnlyFileEditsStayInLibrary() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("song.wav"); try audio(url)
+        try FileManager.default.setAttributes([.posixPermissions: 0o444], ofItemAtPath: url.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: url.path) }
+        let original = try Data(contentsOf: url)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        let backups = dir.appendingPathComponent(".backups")
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: backups)
+        let result = try await writer.apply(TagEdit(fields: [.title: "Edited", .album: "Library Only"]), to: [track])
+        #expect(result.databaseOnly == 1 && result.written == 0 && result.failures.isEmpty)
+        #expect(try Data(contentsOf: url) == original)
+        #expect((try? FileManager.default.contentsOfDirectory(atPath: backups.path))?.isEmpty ?? true)
+        // Make the next scan read the file again (as if it had changed on the share).
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(60)], ofItemAtPath: url.path)
+        try await scanner.scan(source)
+        let rescanned = try #require(try db.allTracks().first)
+        #expect(rescanned.title == "Edited" && rescanned.album == "Library Only")
+        #expect(try await writer.revertLastEdit(trackID: track.id!))
+        #expect(try db.allTracks().first?.title == track.title)
+    }
+
     @Test func failedBackupDoesNotModifyOriginal() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("song.wav"); try audio(url)

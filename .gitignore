@@ -1,15 +1,31 @@
+# macOS and editors
 .DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Build products
 .build/
+.build-x86/
 .swiftpm/
 DerivedData/
 build/
+*.dmg
 *.xcodeproj/
 *.xcworkspace/xcuserdata/
 xcuserdata/
 Packages/NocturneKit/Package.resolved.bak
-.build-x86/
 
-# Agent handbooks (machine-specific; kept local on purpose)
+# Secrets and local settings (never commit keys, tokens or passwords)
+.env
+.env.*
+*.p12
+*.p8
+nocturne-sparkle-key.txt
+.claude/settings.local.json
+
+# Maintainer and agent notes (machine-specific or private; kept local on purpose)
 CLAUDE.md
 CLAUDE.local.md
 AGENTS.md
+PROMOTION.md

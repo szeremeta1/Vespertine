@@ -108,11 +108,11 @@ public actor LibraryScanner {
             return signatures
         }
 
-        struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool }
+        struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool; var hasArt: Bool }
         let known: [String: Known] = try await database.writer.read { db in
             var map: [String: Known] = [:]
-            for row in try Row.fetchAll(db, sql: "SELECT id, location, fileSize, modifiedAt, isMissing FROM track WHERE sourceId = ?", arguments: [sourceID]) {
-                map[row["location"]] = Known(id: row["id"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"])
+            for row in try Row.fetchAll(db, sql: "SELECT id, location, fileSize, modifiedAt, isMissing, artworkKey IS NOT NULL AS hasArt FROM track WHERE sourceId = ?", arguments: [sourceID]) {
+                map[row["location"]] = Known(id: row["id"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"], hasArt: row["hasArt"])
             }
             return map
         }
@@ -122,6 +122,13 @@ public actor LibraryScanner {
         var listed: [String: ListedFile] = [:]
         let remote = NetworkVolume.isNetwork(root)
         var seen = Set<String>()
+        // A track without a cover is read again once an image turns up in its folder (or above its disc folder).
+        func coverAppeared(_ k: Known, _ url: URL) -> Bool {
+            guard !k.hasArt, !listing.imageDirs.isEmpty else { return false }
+            let dir = url.deletingLastPathComponent()
+            return listing.imageDirs.contains(dir.path)
+                || (ArtworkStore.isDiscFolder(dir.lastPathComponent) && listing.imageDirs.contains(dir.deletingLastPathComponent().path))
+        }
         for file in listing.audio {
             let url = file.url, size = file.size, modified = file.modified
             if remote { listed[url.path] = file }
@@ -130,12 +137,12 @@ public actor LibraryScanner {
                 locations.forEach { seen.insert($0) }
                 if priorCues[url.path] == cue.signature, locations.allSatisfy({ location in
                     guard let k = known[location] else { return false }
-                    return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing
+                    return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing && !coverAppeared(k, url)
                 }) { continue }
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing { continue }
+                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url) { continue }
                 toRead.append(url)
             }
         }
@@ -252,7 +259,7 @@ public actor LibraryScanner {
     /// Lists audio and CUE files with their size and date. Folders are listed concurrently so a
     /// high-latency share costs one round trip per folder level, not per folder. Any folder that
     /// can't be listed fails the whole listing, so its files are never mistaken for deleted ones.
-    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws -> (audio: [ListedFile], cue: [URL]) {
+    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>) {
         let exts = audioExtensions
         let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
         let start = root.resolvingSymlinksInPath()
@@ -261,11 +268,11 @@ public actor LibraryScanner {
             let v = try start.resourceValues(forKeys: Set(keys))
             let siblings = try FileManager.default.contentsOfDirectory(at: start.deletingLastPathComponent(), includingPropertiesForKeys: nil)
             return ([ListedFile(url: start, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast)],
-                    siblings.filter { $0.pathExtension.lowercased() == "cue" })
+                    siblings.filter { $0.pathExtension.lowercased() == "cue" }, [])
         }
-        typealias Listed = Result<(files: [ListedFile], cues: [URL], dirs: [URL]), Error>
+        typealias Listed = Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>
         let width = NetworkVolume.isNetwork(start) ? 12 : 4
-        var audio: [ListedFile] = [], cue: [URL] = []
+        var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = []
         var pending: [URL] = [start]
         var failure: Error?
         await withTaskGroup(of: Listed.self) { group in
@@ -274,7 +281,7 @@ public actor LibraryScanner {
                 running += 1
                 group.addTask { await onIOQueue {
                     Result {
-                        var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = []
+                        var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
                         for item in items {
                             var url = item
@@ -291,11 +298,12 @@ public actor LibraryScanner {
                             guard v.isRegularFile == true else { continue }
                             let ext = url.pathExtension.lowercased()
                             if ext == "cue" { cues.append(url) }
+                            else if ArtworkStore.imageExtensions.contains(ext) { images.append(url) }
                             else if exts.contains(ext) {
                                 files.append(ListedFile(url: url, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast))
                             }
                         }
-                        return (files, cues, dirs)
+                        return (files, cues, dirs, ArtworkStore.pickCover(images) != nil ? dir : nil)
                     }
                 } }
             }
@@ -307,6 +315,7 @@ public actor LibraryScanner {
                     audio.append(contentsOf: r.files)
                     cue.append(contentsOf: r.cues)
                     pending.append(contentsOf: r.dirs)
+                    if let dir = r.hasImage { imageDirs.append(dir) }
                     found?(audio.count)
                 case .failure(let error):
                     failure = failure ?? error
@@ -333,7 +342,7 @@ public actor LibraryScanner {
         // URL.path decodes the whole path on every call; compute each once before sorting 10k+ files.
         let files = audio.map { ListedFile(url: canon($0.url), size: $0.size, modified: $0.modified) }
             .map { ($0.url.path, $0) }.sorted { $0.0 < $1.0 }.map(\.1)
-        return (files, cue.map(canon))
+        return (files, cue.map(canon), Set(imageDirs.map { canon($0).path }))
     }
 
     public static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {
@@ -447,7 +456,8 @@ public actor LibraryScanner {
                         track.bandwidthHz = existing.bandwidthHz
                         track.analysisVerdict = existing.analysisVerdict
                     }
-                    if track.cueStartFrame != nil, let data = try Data.fetchOne(db,
+                    // Library-only edits (CUE tracks, files on read-only shares) outlast the file's own tags.
+                    if let data = try Data.fetchOne(db,
                         sql: "SELECT metadata FROM cueTagOverride WHERE trackId = ?", arguments: [existing.id]) {
                         track.copyMetadata(from: try JSONDecoder().decode(Track.self, from: data))
                     }

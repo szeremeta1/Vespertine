@@ -286,12 +286,22 @@ struct AlbumDetailView: View {
 
     var body: some View {
         let album = model.library.album(key: albumKey)
+        // A song in several versions (an SACD's stereo and 5.1 layers) shows once: the version your output plays.
+        let groups = TrackVersions.group(tracks)
+        let wanted = model.outputWantsMultichannel() ?? true
+        let shown = groups.map { TrackVersions.choose($0, multichannel: wanted) ?? $0[0] }
+        let others: [Int64: String] = Dictionary(uniqueKeysWithValues: zip(groups, shown).compactMap { group, chosen in
+            guard group.count > 1, let id = chosen.id else { return nil }
+            let names = group.filter { $0.id != chosen.id }.map { $0.isMultichannel ? ChannelLayouts.name(channels: $0.channels) : "STEREO" }
+            return (id, "+ " + Array(Set(names)).sorted().joined(separator: " · "))
+        })
         VStack(spacing: 0) {
             if let album {
-                hero(album)
+                hero(album, shown: shown)
                 Hairline()
             }
-            TrackTable(tracks: tracks, showAlbum: false, showArtist: tracks.contains { $0.artist != album?.artist && $0.artist != nil })
+            TrackTable(tracks: shown, showAlbum: false, showArtist: shown.contains { $0.artist != album?.artist && $0.artist != nil },
+                       otherVersions: others)
         }
         .background(Palette.window)
         .navigationTitle(album?.title ?? "Album")
@@ -300,14 +310,14 @@ struct AlbumDetailView: View {
         }
     }
 
-    private func hero(_ album: Album) -> some View {
+    private func hero(_ album: Album, shown: [Track]) -> some View {
         HStack(alignment: .top, spacing: 28) {
             ArtworkView(key: album.artworkKey, size: 600, cornerRadius: 7)
                 .frame(width: 220, height: 220)
                 .shadow(color: .black.opacity(0.55), radius: 25, y: 18)
             VStack(alignment: .leading, spacing: 0) {
                 Spacer(minLength: 0)
-                Text(kicker(album))
+                Text(kicker(album, shown: shown))
                     .font(Typeface.mono(10.5, weight: .semibold))
                     .tracking(1.4)
                     .foregroundStyle(Palette.brass)
@@ -328,10 +338,13 @@ struct AlbumDetailView: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .padding(.top, 6)
+                if let mark = album.formatMark, mark.family != .lossless {
+                    FormatMarkView(mark: mark, size: 9.5, showsCarrier: false).padding(.top, 10)
+                }
                 HStack(spacing: 10) {
-                    Button { model.player.play(tracks) } label: { Label("Play", systemImage: "play.fill") }
+                    Button { model.player.play(shown) } label: { Label("Play", systemImage: "play.fill") }
                         .buttonStyle(BrassButtonStyle())
-                    Button { model.player.shuffle = true; model.player.play(tracks) } label: { Label("Shuffle", systemImage: "shuffle") }
+                    Button { model.player.shuffle = true; model.player.play(shown) } label: { Label("Shuffle", systemImage: "shuffle") }
                         .buttonStyle(QuietButtonStyle())
                     Button("Look Up on MusicBrainz") { model.lookupTracks = tracks }
                         .buttonStyle(QuietButtonStyle())
@@ -354,11 +367,13 @@ struct AlbumDetailView: View {
         .padding(.vertical, 24)
     }
 
-    private func kicker(_ a: Album) -> String {
+    private func kicker(_ a: Album, shown: [Track]) -> String {
         var parts = ["ALBUM"]
         if let y = a.year { parts.append(String(y)) }
-        parts.append("\(a.trackCount) TRACK\(a.trackCount == 1 ? "" : "S")")
-        parts.append(a.duration.longDuration)
+        // Counted once per song, however many versions it has.
+        let count = shown.isEmpty ? a.trackCount : shown.count
+        parts.append("\(count) TRACK\(count == 1 ? "" : "S")")
+        parts.append((shown.isEmpty ? a.duration : shown.reduce(0) { $0 + $1.duration }).longDuration)
         return parts.joined(separator: " · ")
     }
 
@@ -371,7 +386,7 @@ struct AlbumDetailView: View {
         let base = channelText.isEmpty ? a.formatSummary : String(a.formatSummary.dropLast(channelText.count))
         parts.append(base.replacingOccurrences(of: "/", with: "-bit / ").appending(a.isDSD || !base.contains("/") ? "" : " kHz") + channelText)
         parts.append(a.totalSize.byteString)
-        if let p = a.sourcePath { parts.append(model.library.displayPath(p)) }
+        if let p = a.sourcePath { parts.append(model.library.albumLocation(p)) }
         return parts.joined(separator: " · ")
     }
 }

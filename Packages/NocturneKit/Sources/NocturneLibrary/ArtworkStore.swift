@@ -80,21 +80,27 @@ public final class ArtworkStore: Sendable {
     }
 
     /// "CD 01", "Disc 2", "Disk1", "Digital Media 01", "12\" Vinyl 02", "Vinyl 1", "SACD 01", "DVD 01", "Side A"…
+    /// and an SACD's layers: "Multichannel 5.1", "Stereo", "SACD Surround", "5.1".
     static func isDiscFolder(_ name: String) -> Bool {
         name.range(of: #"^((cd|disc|disk|digital media|(\d+"? ?)?vinyl|sacd|dvd(-audio)?|blu-ray)\s*\d{1,3}|side\s*[a-z0-9])$"#,
                    options: [.regularExpression, .caseInsensitive]) != nil
+            || name.range(of: #"^((sacd|dsd)\s+)?(multi-?channel|stereo|surround|2ch|mch)(\s*[2-7]\.[01])?$|^[2-7]\.[01]$"#,
+                          options: [.regularExpression, .caseInsensitive]) != nil
     }
 
+    static let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "webp", "heic"]
+
     private static func image(in dir: URL) -> Data? {
-        let names = ["cover", "folder", "front", "album", "artwork"]
         guard let items = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else { return nil }
-        let images = items.filter { ["jpg", "jpeg", "png", "webp", "heic"].contains($0.pathExtension.lowercased()) }
-        for name in names {
-            if let match = images.first(where: { $0.deletingPathExtension().lastPathComponent.lowercased() == name }) {
-                return try? Data(contentsOf: match)
-            }
+        return pickCover(items.filter { imageExtensions.contains($0.pathExtension.lowercased()) }).flatMap { try? Data(contentsOf: $0) }
+    }
+
+    /// The folder's cover among its images: cover/folder/front/album/artwork, or the only image there is.
+    static func pickCover(_ images: [URL]) -> URL? {
+        for name in ["cover", "folder", "front", "album", "artwork"] {
+            if let match = images.first(where: { $0.deletingPathExtension().lastPathComponent.lowercased() == name }) { return match }
         }
-        return images.count == 1 ? try? Data(contentsOf: images[0]) : nil
+        return images.count == 1 ? images[0] : nil
     }
 }
 

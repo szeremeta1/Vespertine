@@ -267,6 +267,10 @@ struct TagEditorView: View {
 
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
+        // One file answers for the lot: they share a source, and each check is a round trip on a share.
+        if let first = tracks.first(where: { $0.cueStartFrame == nil }), !TagWriter.isWritable(first.fileURL) {
+            return "Read-only location · saved in Nocturne's library; the files aren't changed"
+        }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
         case "FLAC", "Vorbis", "Opus": "Vorbis comments"
         case "MP3", "AIFF", "WAV", "DSF": "ID3v2 tags"
@@ -345,6 +349,7 @@ struct MusicBrainzSheet: View {
     @State private var cover: Data?
     @State private var useCover = true
     @State private var busy = false
+    @State private var progress: Int?
     @State private var error: String?
 
     var body: some View {
@@ -406,6 +411,10 @@ struct MusicBrainzSheet: View {
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3)
                 Spacer()
                 Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
+                if let progress {
+                    ProgressView(value: Double(progress), total: Double(max(tracks.count, 1))).frame(width: 120)
+                    Text("\(progress + 1) of \(tracks.count)").font(Typeface.mono(11)).foregroundStyle(Palette.text2)
+                }
                 Button("Apply to \(tracks.count) Track\(tracks.count == 1 ? "" : "s")") { apply() }
                     .buttonStyle(BrassButtonStyle()).disabled(release == nil || busy)
             }
@@ -470,17 +479,20 @@ struct MusicBrainzSheet: View {
     private func apply() {
         guard let release else { return }
         busy = true
+        progress = 0
         Task {
             var failures = 0
             for (i, t) in tracks.enumerated() {
+                progress = i
                 guard var edit = release.edit(for: t, index: i) else { continue }
                 if useCover, let cover { edit.artwork = .replace(cover) }
                 if let result = await model.library.apply(edit, to: [t]) { failures += result.failures.count }
                 else { failures += 1 }
             }
             busy = false
+            progress = nil
             if failures == 0 { dismiss() }
-            else { error = "Could not update \(failures) track(s). Review the library error and try again." }
+            else { error = "Could not update \(failures) track(s): \(model.library.lastError ?? "unknown error")" }
         }
     }
 }

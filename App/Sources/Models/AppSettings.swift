@@ -52,6 +52,8 @@ final class AppSettings {
     var integerMode: Bool { didSet { defaults.set(integerMode, forKey: "integerMode") } }
     /// Dolby Atmos: rendered by macOS (objects), or its channel bed played through Nocturne.
     var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
+    /// Songs with a stereo and a multichannel version: which to play.
+    var versionPreference: TrackVersions.Preference { didSet { defaults.set(versionPreference.rawValue, forKey: "versionPreference") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
@@ -102,6 +104,7 @@ final class AppSettings {
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
+        versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
         integerMode = defaults.bool(forKey: "integerMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
         selectedDeviceUID = defaults.string(forKey: "selectedDeviceUID")

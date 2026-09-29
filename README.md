@@ -6,7 +6,8 @@
 
 <p align="center">
   <strong>A free, open-source, bit-perfect music player for macOS.</strong><br>
-  Native sample rates on your DAC, Spatial Audio on AirPods, and an honest signal path, from 16/44.1 to 24/192, DSD and 7.1.
+  Native sample rates on your DAC, Spatial Audio on AirPods, and an honest signal path:<br>
+  from 16/44.1 to 32/768, DSD512, Dolby Atmos and DTS-HD Master Audio.
 </p>
 
 <p align="center">
@@ -23,23 +24,33 @@
 <br>
 
 <p align="center">
-  <img src="docs/screenshots/spatial-audio-airpods-max.png" alt="Nocturne playing Fleetwood Mac's Rumours in 5.1 as head-tracked Spatial Audio on AirPods Max, with a live meter for each of the six channels">
+  <img src="docs/screenshots/spatial-audio-airpods-max.png" alt="Nocturne playing Dire Straits' Brothers in Arms from a DTS 5.1 CD, decoded and rendered as head-tracked Spatial Audio on AirPods Max, with a live meter for each of the six channels">
 </p>
-<p align="center"><sub><em>Rumours</em> in 5.1, rendered as head-tracked Spatial Audio on AirPods Max, with a live meter for every channel.</sub></p>
+<p align="center"><sub><em>Brothers in Arms</em> from a DTS 5.1 CD, decoded and rendered as head-tracked Spatial Audio on AirPods Max, with a live meter for every channel.</sub></p>
 
-Nocturne plays FLAC, ALAC, WAV, AIFF, DSD (DSF/DSDIFF), APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3, AAC and more. It switches your DAC (a FiiO K11, an AirPods Max on USB-C, a receiver, anything class-compliant) to each file's native sample rate and bit depth, and it tells you exactly what happens to the signal on the way there.
+Nocturne plays almost anything you have: FLAC, ALAC, WAV and AIFF up to 32-bit / 768 kHz, DSD from DSD64 to DSD512, Dolby Atmos, Dolby TrueHD, Dolby Digital (Plus), DTS-HD Master Audio, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC. It switches your DAC (a FiiO K11, AirPods Max on USB-C, a receiver, anything class-compliant) to each file's native format, and it tells you exactly what happens to the signal on the way there.
 
 ## Highlights
 
-### Bit-perfect, all the way to 24/192
-The device follows every track's native format, and **BIT-PERFECT** appears only when nothing touches the samples. Here a 24-bit / 192 kHz FLAC plays untouched on a FiiO K11.
+### Bit-perfect, all the way up
+The device follows every track's native format, and **BIT-PERFECT** appears only when nothing touches the samples. Here a 24-bit / 192 kHz FLAC plays untouched on a FiiO K11. With exclusive access, **integer mode** sends 32-bit integers straight to the DAC, so even 32-bit recordings arrive exactly as stored.
 
 ![Coldplay's X&Y at 24-bit / 192 kHz playing bit-perfect on a FiiO K11](docs/screenshots/bit-perfect-fiio-24-192.png)
 
-### Lossless on AirPods Max over USB-C
-AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. 48 kHz music plays bit-perfect, and the Digital Crown and volume keys control them directly.
+### Native DSD, at any rate
+DSD64, DSD128, DSD256 and DSD512, in DSF or DSDIFF. On a DAC that takes DoP, the DSD goes out untouched in DoP frames, and the meters and spectrum still show the music. Anywhere else it's converted to high-rate PCM, and the signal path says so.
 
-![Ariana Grande's eternal sunshine at 24-bit / 48 kHz playing bit-perfect on AirPods Max over USB-C](docs/screenshots/bit-perfect-airpods-max-usb-c.png)
+![Michael Jackson's Thriller as DSD64 over DoP to a FiiO K11, with a DSD 64 badge](docs/screenshots/dsd-native-dop.png)
+
+### Surround, Dolby and DTS, wherever you listen
+5.1 and 7.1 in FLAC, DSD, Dolby TrueHD, DTS-HD Master Audio and even DTS CDs (which other players turn into full-scale noise) play as head-tracked Spatial Audio on AirPods, channel for channel on a multichannel interface or receiver, or folded down on a stereo DAC. **Dolby Atmos** in Dolby Digital Plus is rendered by macOS's own Atmos renderer, just as in Apple Music. The Albums page filters by format (FLAC, WAV/AIFF, ALAC, DSD, **Dolby & DTS**, lossy, 24-bit, 88.2 kHz and up, multichannel), so every surround album is one click away.
+
+![The Albums page filtered to multichannel: SACD rips, DTS CDs and 5.1 FLAC](docs/screenshots/multichannel-albums.png)
+
+### Stereo or surround, whichever your output can play
+When an album has every song in stereo and in 5.1, like an SACD's two layers, Nocturne lists each song once. It plays the 5.1 version on a multichannel output or with Spatial Audio on, and the stereo one on a stereo DAC. Switch from your DAC to AirPods mid-album and the next songs follow.
+
+![Pink Floyd's Dark Side of the Moon SACD: each song listed once as DSD64 5.1, marked "+ STEREO", playing as Spatial Audio on AirPods Max](docs/screenshots/stereo-and-surround-versions.png)
 
 ### Catches fake hi-res
 Upsampled, padded, lossy-origin and "AI-enhanced" files are detected, with the evidence shown. Here a 24/48 file turns out to be a lossy source cut at 16.3 kHz, with a synthetic shelf generated above it.
@@ -56,40 +67,59 @@ Artists, albums (by title, artist, genre or year) and songs, in one place. Every
 
 ![Searching "fleetwood": the artist, 18 albums and 265 songs](docs/screenshots/search.png)
 
-### Smart playlists that speak your language
-Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 48 kHz track" is one rule away. Here that playlist plays bit-perfect on AirPods Max.
+### Smart playlists, lossless on AirPods Max
+Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 48 kHz track" is one rule away. AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device, so that playlist plays bit-perfect on them, and the Digital Crown and volume keys still work.
 
-![A smart playlist of every 24-bit / 48 kHz track, playing bit-perfect on AirPods Max](docs/screenshots/smart-playlist.png)
+![A smart playlist of every 24-bit / 48 kHz track, with Ariana Grande's eternal sunshine playing bit-perfect on AirPods Max over USB-C](docs/screenshots/smart-playlist.png)
 
 ### A mini player that still tells the truth
 
 <p align="center"><img src="docs/screenshots/mini-player.png" width="520" alt="Nocturne's mini player"></p>
 
+## Formats
+
+| Format | Files | How it plays |
+|---|---|---|
+| FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate and depth, up to 32-bit / 768 kHz; bit-perfect when the DAC can run the rate |
+| DSD64 – DSD512 | `.dsf` `.dff` | DoP on DACs marked DoP-capable that support the carrier rate; otherwise DSD → PCM |
+| Dolby Atmos | Dolby Digital Plus with Atmos in `.ec3` `.m4a` `.mp4` | Rendered by macOS (Spatial Audio on AirPods, heights on a multichannel output), or its 5.1/7.1 bed through Nocturne |
+| Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless, can be bit-perfect; Atmos in TrueHD plays its lossless bed |
+| Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` / `.mp4` | Decoded by macOS, or sent to a receiver untouched |
+| DTS-HD Master Audio, DTS-HD High Resolution, DTS | `.dts` `.dtshd` `.mka` | Decoded by FFmpeg; Master Audio is lossless; DTS:X plays its bed |
+| DTS CDs, DTS-WAV | `.wav` `.flac` (+ `.cue`) | Recognized and decoded to 5.1, or sent to a receiver untouched |
+| APE, WavPack, TTA | `.ape` `.wv` `.tta` | Lossless |
+| Opus, Vorbis, Musepack, MP3, AAC | `.opus` `.ogg` `.mpc` `.mp3` `.m4a` | Decoded, marked lossy |
+
+Every format here decodes in the format test matrix, and every family was played end to end on real hardware (a FiiO K11, AirPods Max over USB-C and a MacBook Pro's speakers) for this release. DTS and TrueHD are checked sample for sample against FFmpeg and their sources, and the bitstream bursts against FFmpeg's S/PDIF reader. Not supported: DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
+
 ## What it does
 
-- **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8…). If the device can't run at that rate, Nocturne converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (384 → 192). Per-device overrides: *match source*, *device maximum* or a fixed rate.
+- **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8, 768…). If the device can't run at that rate, Nocturne converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (768 → 384). Per-device overrides: *match source*, *device maximum* or a fixed rate.
 - **Shared or exclusive.** By default Nocturne shares the device and makes it the Mac's sound output while it plays, so volume keys, Control Center and the AirPods Max Digital Crown control what you hear. Playback is still bit-perfect unless another app plays through the same device at the same time, and Nocturne says so when that happens. **Exclusive (hog) mode** is one switch away if you'd rather silence other apps on the device (macOS then sends volume keys elsewhere); the device is released after a configurable pause.
+- **Integer mode.** With exclusive access, on DACs that offer it (the FiiO K11 does), music that needs no processing reaches the DAC as 32-bit integers with no floating-point step, so 32-bit recordings are bit-perfect too.
 - **Stays on the output you chose.** Nocturne never switches your music to another device on its own. If the chosen output is missing when playback starts (AirPods Max still reconnecting after you put them back on, a DAC being replugged), it waits for it for up to a minute and plays the moment it's back. If it drops out mid-song, playback continues where it left off once it returns.
 - **Hands your DAC back.** When Nocturne quits, each device it switched goes back to the sample rate and bit depth it had before (so other apps, and tools like LosslessSwitcher, carry on where they left off), or to 44.1 kHz · 16-bit or 48 kHz · 24-bit if you prefer.
 - **AirPods Max / AirPods Max 2 over USB-C.** These are recognized as lossless 24-bit / 48 kHz devices. 48 kHz material plays bit-perfect and everything else is converted to 48 kHz. Over Bluetooth, Nocturne tells you the link is AAC.
+- **DSD at every rate.** DSD64 to DSD512 in DSF and DSDIFF. DoP goes to DACs you mark as DoP-capable (off by default, because DoP sent to a non-DoP DAC is noise) at any rate the DAC can carry; anything else is converted to high-rate PCM.
 - **Dolby Atmos.** Dolby Digital Plus with Atmos (the format Apple Music and streaming services use) is rendered by macOS's own Atmos renderer on the output you chose: head-tracked Spatial Audio on AirPods, height channels on a multichannel output. Or, if you prefer, its 5.1/7.1 bed plays through Nocturne's own path.
-- **Dolby Digital, Dolby Digital Plus, Dolby TrueHD, DTS-HD Master Audio.** `.ac3`, `.ec3`, Dolby audio in M4A/MP4, `.dts`, `.dtshd`, `.thd` and Matroska audio (`.mka`) all play, each channel in its place. TrueHD and DTS-HD MA are lossless and can be bit-perfect. With DTS:X and TrueHD Atmos, Nocturne plays the channel bed; the objects need a receiver.
+- **Dolby Digital, Dolby Digital Plus, Dolby TrueHD, DTS-HD Master Audio.** `.ac3`, `.ec3`, Dolby audio in M4A/MP4, `.dts`, `.dtshd`, `.thd` and Matroska audio (`.mka`) all play, each channel in its place. TrueHD and DTS-HD MA are lossless and can be bit-perfect. With DTS:X and TrueHD Atmos, Nocturne plays the lossless channel bed and says so; the objects need a receiver.
+- **DTS CDs.** DTS 5.1 discs and DTS-WAV files (a DTS bitstream disguised as 16-bit stereo PCM) are recognized and decoded to 5.1, including albums split by a CUE sheet, so they play in surround or as Spatial Audio on AirPods.
 - **Bitstream to an AV receiver.** Per output, Dolby Digital, Dolby Digital Plus (Atmos included, over HDMI) and DTS CDs can be sent untouched, in IEC 61937 bursts, for a receiver or soundbar to decode.
-- **Integer mode.** With exclusive access, on DACs that offer it (the FiiO K11 does), music that needs no processing reaches the DAC as 32-bit integers with no floating-point step, so 32-bit recordings are bit-perfect too.
-- **DTS CDs.** DTS 5.1 discs and DTS-WAV files (a DTS bitstream disguised as 16-bit stereo PCM, which other players blast out as full-scale noise) are recognized and decoded to 5.1, including albums split by a CUE sheet, so they play in surround or as Spatial Audio on AirPods.
-- **DSD.** DSD goes to the DAC as DoP on DACs you mark as DoP-capable (off by default, because DoP sent to a non-DoP DAC is noise). Otherwise it's converted to high-rate PCM.
+- **Stereo and surround versions.** Albums with each song in stereo and in multichannel (SACD layers, Blu-ray mixes) list each song once and play the version that suits the output: surround on multichannel outputs and with Spatial Audio, stereo on stereo DACs. Or pin it to either in Settings.
+- **Format badges.** Now Playing and album pages name the format: Dolby Atmos, Dolby TrueHD, DTS-HD Master Audio, DSD 256, Hi-Res Lossless and so on.
+- **Multichannel and Spatial Audio.** 5.0, 5.1, 7.1 and other multichannel files play everywhere: rendered with Apple's Spatial Audio (head tracked or fixed, with your personalized profile) on AirPods and Beats, sent channel-for-channel to multichannel interfaces and AV receivers (following your speaker setup, even when HDMI is left in 2-channel mode), or downmixed by layout on stereo DACs. The signal path always says which, with a live meter for every channel. **Export for Spatial Audio** turns them into binaural stereo that sounds spatial on any headphones, or multichannel ALAC for Apple devices.
 - **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, no other app is mixing into the device and the word length fits. Every other state is shown in copper with the reason.
 - **Gapless playback** across tracks that share a device format, including CUE-sheet albums split from a single file.
 - **Volume.** Nocturne uses the DAC's hardware volume when it has one. Optionally, a 64-bit dithered digital volume can be enabled; it's clearly marked as not bit-perfect.
+- **Damaged files can't take it down.** Errors thrown inside codec libraries are caught; a broken file just won't play, with a message saying why.
 - **Find Music on This Mac.** Spotlight searches every drive. Each file's true format is checked, and hi-res, lossless or all music can be picked by folder or by file. Recordings, prompts, clips and duplicate copies are left out.
-- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Nocturne`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs and genres, with Genre, Decade and format filters (albums are dated by their original release, not the reissue you have); search across artists, albums (title, artist, genre, year) and songs (accent-insensitive); playlists; and smart playlists whose rules use the same units as the rest of the app. Files on unplugged drives stay in the library and show as offline; files you delete disappear from every list on the next scan (and come back if you restore them). Files that are moved or renamed, for example by Lidarr reorganizing a share, are recognized as the same songs, so playlists, play counts and analysis stay with them.
-- **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert.
+- **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Nocturne`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs and genres, with Genre, Decade and format filters (albums are dated by their original release, not the reissue you have); search across artists, albums (title, artist, genre, year) and songs (accent-insensitive); playlists; and smart playlists whose rules use the same units as the rest of the app. Covers come from the files, from the album folder (including one above a "CD 1" folder), and are picked up when you add one later. Files on unplugged drives stay in the library and show as offline; files you delete disappear from every list on the next scan (and come back if you restore them). Files that are moved or renamed, for example by Lidarr reorganizing a share, are recognized as the same songs, so playlists, play counts and analysis stay with them.
+- **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert. Files Nocturne can't write (a read-only share, one file of a CUE image) keep their edits in the library instead, through rescans.
 - **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
-- **Multichannel and Spatial Audio.** 5.0, 5.1, 7.1 and other multichannel files play everywhere: rendered with Apple's Spatial Audio (head tracked or fixed, with your personalized profile) on AirPods and Beats, sent channel-for-channel to multichannel interfaces and AV receivers (following your speaker setup, even when HDMI is left in 2-channel mode), or downmixed by layout on stereo DACs. The signal path always says which, with a live meter for every channel. **Export for Spatial Audio** turns them into binaural stereo that sounds spatial on any headphones, or multichannel ALAC for Apple devices.
 - **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default and mounted where macOS keeps network volumes (hidden from the Finder sidebar). They heal themselves: Nocturne reconnects after sleep, network changes and server restarts, and remounts a share that has stopped answering. Shares are rescanned every half hour (never while you're playing from them), so music added to or deleted from the server shows up by itself. Indexing is quick over slow links, and playback is built for slow or busy servers. It keeps up to half a minute of audio in hand, copies the playing track to the Mac straight away, and moves playback to that copy mid-song, sample for sample, the moment it's complete, so the rest of the song no longer depends on the network. What you play is cached, with **Keep Offline** for whole albums. Passwords live in the login keychain alongside Finder's.
 - **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). Every verdict shows its evidence; results are saved, can run automatically on import, and filter the Songs view. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `nocturne-analyze` runs the same analysis next to the files and Nocturne imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
-- **Live spectrum** of exactly what the DAC receives, plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
+- **Live spectrum** of exactly what the DAC receives (DSD over DoP included), plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
 ## Build
 
@@ -119,6 +149,12 @@ cd Packages/NocturneAnalysis && swift test
 
 `scripts/audit.sh` runs everything above plus the app tests, sanitizer builds of the real-time C code and a release build.
 
+The FFmpeg decoders for DTS, TrueHD and DSD ship prebuilt in `Packages/NocturneKit/Vendor/FFmpegDCA.xcframework`. To rebuild them from FFmpeg's release tarball (checksum-verified, only those decoders enabled):
+
+```bash
+scripts/build-dts-decoder.sh
+```
+
 ## Try it without your own music
 
 `nocturne-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album, a deliberately fake 24-bit track and an upsampled "hi-res" album:
@@ -132,6 +168,8 @@ To launch against an isolated test library, so your real one is untouched:
 ```bash
 build/DD/Build/Products/Release/Nocturne.app/Contents/MacOS/Nocturne -NocturneDataDirectory /tmp/nocturne-test -NocturneAddSource ~/Desktop/NocturneDemo
 ```
+
+For Dolby, DTS and TrueHD samples, [FFmpeg's FATE suite](https://fate-suite.ffmpeg.org/) has short clips of each (`ac3/`, `eac3/`, `dts/`, `dca/`, `truehd/`), and `Packages/NocturneKit/Tests/NocturneAudioTests/Fixtures` has tone files made with FFmpeg's encoders.
 
 ### Hardware verification
 
@@ -159,7 +197,7 @@ cd Packages/NocturneKit && swift build -c release --product nocturne-probe
 
 `gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis (`analyze-json` prints it as JSON, for comparing with `nocturne-analyze file`); `forensics <files…>` prints its raw measurements as a table; `restore-test <device>` checks the quit options that hand a device back.
 
-`scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, select inspector tabs and render windows to PNG, which works even while the screen is locked.
+`scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, start playback, pick a format filter, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
 ## Releasing
 
@@ -187,15 +225,22 @@ Store that file somewhere safe (it is a secret), then delete it.
 
 | Path | What |
 |---|---|
-| `Packages/NocturneKit/Sources/CNocturneRT` | Real-time C: lock-free ring buffer, HAL IOProc, dithered gain, meters, spectrum tap |
-| `Packages/NocturneKit/Sources/NocturneAudio` | Device discovery, shared/exclusive output, format switching, `FormatPlanner`, `PlaybackEngine`, Spatial Audio, decoding for analysis |
-| `Packages/NocturneKit/Sources/NocturneLibrary` | GRDB/SQLite library, scanner, CUE, tag writer, genres, smart playlists, network shares, server-analysis import, MusicBrainz/ListenBrainz |
+| `Packages/NocturneKit/Sources/CNocturneRT` | Real-time C: lock-free ring buffer, HAL IOProc, dithered gain, integer mode, meters, spectrum tap (DoP included) |
+| `Packages/NocturneKit/Sources/CNocturneDTS` | C shims over FFmpeg: DTS CDs, DTS-HD, TrueHD, Matroska and DSD |
+| `Packages/NocturneKit/Sources/CNocturneGuard` | Objective-C++ guard that turns exceptions from codec libraries into errors |
+| `Packages/NocturneKit/Sources/NocturneAudio` | Device discovery, shared/exclusive output, format switching, `FormatPlanner`, `PlaybackEngine`, Spatial Audio, Dolby Atmos, bitstream, decoders |
+| `Packages/NocturneKit/Sources/NocturneLibrary` | GRDB/SQLite library, scanner, CUE, tag reader and writer, format badges, genres, smart playlists, network shares, server-analysis import, MusicBrainz/ListenBrainz |
+| `Packages/NocturneKit/Vendor` | FFmpeg's DTS, TrueHD and DSD decoders, prebuilt (see `scripts/build-dts-decoder.sh`) |
 | `Packages/NocturneAnalysis` | The analysis core (spectra, forensics, verdicts) in plain Swift, plus `nocturne-analyze` for Linux servers |
 | `App/` | SwiftUI app (Obsidian & Brass design) |
-| `docs/` | Architecture notes, design mockups, screenshots |
+| `docs/` | Architecture notes, design mockups, screenshots, release notes |
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how audio gets from file to DAC.
 
 ## License
 
-GPL-3.0-or-later. See [LICENSE](LICENSE). Third-party components: SFBAudioEngine (MIT), GRDB (MIT), TagLib (LGPL/MPL), libFLAC (BSD), WavPack (BSD), Monkey's Audio (BSD), libopus/libvorbis/libogg (BSD), mpg123 (LGPL), libsndfile (LGPL), LAME (LGPL), DUMB (zlib-like), TTA (LGPL), FFmpeg's DTS and TrueHD decoders and DTS/TrueHD/Matroska demuxers (LGPL-2.1+, built from source by `scripts/build-dts-decoder.sh`).
+GPL-3.0-or-later. See [LICENSE](LICENSE). Third-party components: SFBAudioEngine (MIT), GRDB (MIT), TagLib (LGPL/MPL), libFLAC (BSD), WavPack (BSD), Monkey's Audio (BSD), libopus/libvorbis/libogg (BSD), mpg123 (LGPL), libsndfile (LGPL), LAME (LGPL), DUMB (zlib-like), TTA (LGPL), and FFmpeg's DTS, TrueHD/MLP and DSD decoders with its DTS, TrueHD, Matroska, DSF and DSDIFF demuxers (LGPL-2.1+, built from source by `scripts/build-dts-decoder.sh`).
+
+## Trademarks
+
+Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus and Dolby TrueHD are trademarks of Dolby Laboratories. DTS, DTS-HD Master Audio and DTS:X are trademarks of DTS, Inc. Apple, AirPods, AirPods Max and Spatial Audio are trademarks of Apple Inc. Nocturne names these formats and products only to describe what it plays and where. It is not certified, licensed or endorsed by Dolby, DTS or Apple, and it doesn't use their logos.

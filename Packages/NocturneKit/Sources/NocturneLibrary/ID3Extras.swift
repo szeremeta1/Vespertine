@@ -1,6 +1,7 @@
 //
 // Nocturne — ID3v2 frames the tag reader doesn't pass on (it only maps the common fields for MP3):
-// original release date (TDOR / TORY), label (TPUB) and TXXX user fields (e.g. "originalyear").
+// release and original dates (TDRC / TYER, TDOR / TORY), label (TPUB) and TXXX user fields
+// (e.g. "originalyear"). Also DSF, whose reader drops the dates.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -12,6 +13,20 @@ enum ID3Extras {
     static func read(_ url: URL) -> [String: String] {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return [:] }
         defer { try? handle.close() }
+        return read(handle)
+    }
+
+    /// DSF keeps its ID3v2 tag at the end, where the header's metadata pointer says (0 = none).
+    static func readDSF(_ url: URL) -> [String: String] {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return [:] }
+        defer { try? handle.close() }
+        guard let header = try? handle.read(upToCount: 28), header.count == 28, header.starts(with: Array("DSD ".utf8)) else { return [:] }
+        let pointer = header[20..<28].reversed().reduce(UInt64(0)) { $0 << 8 | UInt64($1) }
+        guard pointer >= 28, (try? handle.seek(toOffset: pointer)) != nil else { return [:] }
+        return read(handle)
+    }
+
+    private static func read(_ handle: FileHandle) -> [String: String] {
         guard let header = try? handle.read(upToCount: 10), header.count == 10,
               header.starts(with: Array("ID3".utf8)) else { return [:] }
         let h = [UInt8](header)
@@ -37,6 +52,7 @@ enum ID3Extras {
             let data = Array(b[start..<end])
             switch id {
             case "TDOR": if let v = text(data) { out["ORIGINALDATE"] = v }
+            case "TDRC", "TYER": if let v = text(data), out["DATE"] == nil { out["DATE"] = v }
             case "TORY": if let v = text(data), out["ORIGINALDATE"] == nil { out["ORIGINALYEAR"] = v }
             case "TPUB": if let v = text(data) { out["LABEL"] = v }
             case "TXXX":

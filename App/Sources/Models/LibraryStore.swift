@@ -10,7 +10,7 @@ import NocturneLibrary
 import Observation
 
 enum FormatFilter: String, CaseIterable, Identifiable {
-    case all, flac, pcm, alac, dsd, lossy, bits24, rate96, multichannel
+    case all, flac, pcm, alac, dsd, surround, lossy, bits24, rate96, multichannel
     var id: String { rawValue }
     var label: String {
         switch self {
@@ -19,6 +19,7 @@ enum FormatFilter: String, CaseIterable, Identifiable {
         case .pcm: "WAV / AIFF"
         case .alac: "ALAC"
         case .dsd: "DSD"
+        case .surround: "Dolby & DTS"
         case .lossy: "Lossy"
         case .bits24: "≥ 24-bit"
         case .rate96: "≥ 88.2 kHz"
@@ -33,6 +34,7 @@ enum FormatFilter: String, CaseIterable, Identifiable {
         case .pcm: a.codec == "WAV" || a.codec == "AIFF"
         case .alac: a.codec == "ALAC"
         case .dsd: a.isDSD
+        case .surround: a.formatMark.map { $0.family == .dolby || $0.family == .dts } ?? false
         case .lossy: ["MP3", "AAC", "Vorbis", "Opus", "Musepack"].contains(a.codec)
         case .bits24: (a.maxBitDepth ?? 0) >= 24 || a.isDSD
         case .rate96: a.maxSampleRate >= 88_200 || a.isDSD
@@ -67,6 +69,30 @@ final class LibraryStore {
         }
         return (path as NSString).abbreviatingWithTildeInPath
     }
+    /// For each track, every version of its song on its album (stereo and multichannel), or just the track.
+    /// Albums with only one channel layout are skipped without grouping.
+    func versions(of tracks: [Track]) -> [[Track]] {
+        var albums: [String: [Track]] = [:]
+        return tracks.map { t in
+            let album = albums[t.albumKey] ?? { let a = self.tracks(albumKey: t.albumKey); albums[t.albumKey] = a; return a }()
+            guard album.contains(where: \.isMultichannel), album.contains(where: { !$0.isMultichannel }) else { return [t] }
+            return TrackVersions.versions(of: t, in: album)
+        }
+    }
+
+    /// Where an album lives, broadly: its source and the folder under it ("High-Res Music › Pink Floyd").
+    /// A grouping folder like "_Spatial Extras" brings the next one along ("… › _Spatial Extras › Eagles").
+    func albumLocation(_ path: String) -> String {
+        guard let source = sources.filter({ path == $0.path || path.hasPrefix($0.path + "/") }).max(by: { $0.path.count < $1.path.count }) else {
+            return ((path as NSString).abbreviatingWithTildeInPath as NSString).lastPathComponent
+        }
+        let name = source.displayName   // same as the sidebar
+        var folders = String(path.dropFirst(source.path.count)).split(separator: "/").map(String.init)
+        guard let first = folders.first else { return name }
+        folders = first.hasPrefix("_") && folders.count > 1 ? [first, folders[1]] : [first]
+        return ([name] + folders).joined(separator: " › ")
+    }
+
     private(set) var stats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
     /// Bumped whenever tracks change, so detail views can reload.
     private(set) var revision = 0

@@ -25,6 +25,10 @@ struct NFFDecoder {
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
     char profile[64];
+    // Raw DSD reading
+    uint8_t *dsd;             // per-channel planes, dsdCapacity bytes each
+    int dsdBytes, dsdCapacity;
+    int64_t dsdDiscard;
 };
 
 static void fail(char *error, int size, const char *msg, int code) {
@@ -37,7 +41,14 @@ static void fail(char *error, int size, const char *msg, int code) {
 NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     NFFDecoder *d = calloc(1, sizeof *d);
     if (!d) return NULL;
-    int r = avformat_open_input(&d->fmt, path, NULL, NULL);
+    // Every format opened here describes itself in its header or first frames (DSF/DSDIFF headers, DTS and
+    // TrueHD frames carry their layout). FFmpeg's default analysis reads up to 5 MB / 5 s first, which on a
+    // busy network share takes many seconds, every time a song starts or moves to another output.
+    AVDictionary *options = NULL;
+    av_dict_set(&options, "probesize", "262144", 0);
+    av_dict_set(&options, "analyzeduration", "100000", 0);   // microseconds
+    int r = avformat_open_input(&d->fmt, path, NULL, &options);
+    av_dict_free(&options);
     if (r < 0) { fail(error, errorSize, "open", r); free(d); return NULL; }
     if ((r = avformat_find_stream_info(d->fmt, NULL)) < 0) { fail(error, errorSize, "read stream info", r); nff_close(d); return NULL; }
     const AVCodec *codec = NULL;
@@ -81,6 +92,7 @@ void nff_close(NFFDecoder *d) {
     av_frame_free(&d->frame);
     if (d->fmt) avformat_close_input(&d->fmt);
     free(d->fifo);
+    free(d->dsd);
     free(d);
 }
 
@@ -194,4 +206,87 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
     while (d->discard > 0) { if (!pump(d)) break; }
     d->position = target;
     return true;
+}
+
+// MARK: - Raw DSD
+
+bool nff_is_dsd(const NFFDecoder *d) {
+    enum AVCodecID id = d->ctx->codec_id;
+    return id == AV_CODEC_ID_DSD_LSBF || id == AV_CODEC_ID_DSD_MSBF || id == AV_CODEC_ID_DSD_LSBF_PLANAR || id == AV_CODEC_ID_DSD_MSBF_PLANAR;
+}
+
+static uint8_t reverse_bits(uint8_t b) {
+    b = (uint8_t)((b & 0xF0) >> 4 | (b & 0x0F) << 4);
+    b = (uint8_t)((b & 0xCC) >> 2 | (b & 0x33) << 2);
+    return (uint8_t)((b & 0xAA) >> 1 | (b & 0x55) << 1);
+}
+
+/// Appends one packet's DSD to the per-channel planes (deinterleaving, and MSB-first).
+static bool append_dsd(NFFDecoder *d, const AVPacket *p) {
+    int ch = d->channels;
+    if (ch <= 0 || p->size <= 0) return true;
+    enum AVCodecID id = d->ctx->codec_id;
+    bool planar = id == AV_CODEC_ID_DSD_LSBF_PLANAR || id == AV_CODEC_ID_DSD_MSBF_PLANAR;
+    bool lsbf = id == AV_CODEC_ID_DSD_LSBF || id == AV_CODEC_ID_DSD_LSBF_PLANAR;
+    int per = p->size / ch;
+    int skip = 0;
+    if (d->dsdDiscard > 0) { skip = d->dsdDiscard < per ? (int)d->dsdDiscard : per; d->dsdDiscard -= skip; }
+    int keep = per - skip;
+    if (keep <= 0) return true;
+    if (d->dsdBytes + keep > d->dsdCapacity) {
+        int cap = (d->dsdBytes + keep) * 2;
+        uint8_t *grown = malloc((size_t)cap * ch);
+        if (!grown) return false;
+        for (int c = 0; c < ch; c++) if (d->dsd) memcpy(grown + (size_t)c * cap, d->dsd + (size_t)c * d->dsdCapacity, (size_t)d->dsdBytes);
+        free(d->dsd); d->dsd = grown; d->dsdCapacity = cap;
+    }
+    // DSF packets hold whole blocks per channel (planar); DSDIFF interleaves one byte per channel.
+    int blockAlign = d->fmt->streams[d->stream]->codecpar->block_align;
+    // FFmpeg's DSF reader packs the last (short) packet as each channel's remaining bytes back to back.
+    int blockPer = planar && blockAlign > 0 && p->size >= blockAlign ? blockAlign / ch : per;
+    for (int i = 0; i < keep; i++) {
+        int k = i + skip;
+        for (int c = 0; c < ch; c++) {
+            uint8_t b = planar ? p->data[(k / blockPer) * blockPer * ch + c * blockPer + (k % blockPer)] : p->data[k * ch + c];
+            d->dsd[(size_t)c * d->dsdCapacity + d->dsdBytes + i] = lsbf ? reverse_bits(b) : b;
+        }
+    }
+    d->dsdBytes += keep;
+    return true;
+}
+
+int nff_read_dsd(NFFDecoder *d, uint8_t *const *planes, int bytes) {
+    while (d->dsdBytes < bytes && !d->eof) {
+        int r = av_read_frame(d->fmt, d->packet);
+        if (r < 0) { d->eof = true; break; }
+        bool ok = d->packet->stream_index != d->stream || append_dsd(d, d->packet);
+        av_packet_unref(d->packet);
+        if (!ok) return -1;
+    }
+    int n = bytes < d->dsdBytes ? bytes : d->dsdBytes;
+    for (int c = 0; c < d->channels; c++) {
+        uint8_t *plane = d->dsd + (size_t)c * d->dsdCapacity;
+        memcpy(planes[c], plane, (size_t)n);
+        memmove(plane, plane + n, (size_t)(d->dsdBytes - n));
+    }
+    d->dsdBytes -= n;
+    d->position += n;
+    return n;
+}
+
+bool nff_seek_dsd(NFFDecoder *d, int64_t offset) {
+    if (offset < 0) offset = 0;
+    AVStream *st = d->fmt->streams[d->stream];
+    int64_t ts = av_rescale_q(offset, (AVRational){1, d->rate}, st->time_base);
+    if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0) return false;
+    d->dsdBytes = 0; d->eof = false;
+    // Find where the next packet starts, and drop up to the target.
+    int r = av_read_frame(d->fmt, d->packet);
+    if (r < 0) { d->eof = true; return false; }
+    int64_t start = d->packet->pts == AV_NOPTS_VALUE ? 0 : av_rescale_q(d->packet->pts, st->time_base, (AVRational){1, d->rate});
+    d->dsdDiscard = offset > start ? offset - start : 0;
+    bool ok = d->packet->stream_index != d->stream || append_dsd(d, d->packet);
+    av_packet_unref(d->packet);
+    d->position = offset;
+    return ok;
 }

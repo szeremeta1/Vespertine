@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AppKit
+import AVFoundation
 import Foundation
 import Testing
 @testable import NocturneLibrary
@@ -84,5 +86,36 @@ struct FolderArtTests {
         let other = album.appendingPathComponent("Bonus Material")
         try FileManager.default.createDirectory(at: other, withIntermediateDirectories: true)
         #expect(ArtworkStore.folderImage(near: other.appendingPathComponent("x.flac")) == nil)
+    }
+}
+
+@Suite struct CoverAppearsTests {
+    @Test("A cover added later to an album's folder is picked up by the next rescan")
+    func rescanFindsNewCover() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("cover-appears-\(UUID().uuidString)")
+        let album = dir.appendingPathComponent("Artist/Album")
+        try FileManager.default.createDirectory(at: album, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let wav = album.appendingPathComponent("01 Song.wav")
+        let format = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 2)!
+        do {
+            let file = try AVAudioFile(forWriting: wav, settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 44_100,
+                                                                   AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 16])
+            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 44_100)!
+            buffer.frameLength = 44_100
+            try file.write(from: buffer)
+        }
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        #expect(try db.allTracks().first?.artworkKey == nil)
+
+        let png = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 8, pixelsHigh: 8, bitsPerSample: 8, samplesPerPixel: 3,
+                                   hasAlpha: false, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        try png.representation(using: .png, properties: [:])!.write(to: album.appendingPathComponent("cover.png"))
+        try await scanner.scan(source)
+        #expect(try db.allTracks().first?.artworkKey != nil)
     }
 }

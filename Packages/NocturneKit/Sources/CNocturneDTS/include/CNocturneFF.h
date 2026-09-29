@@ -34,3 +34,13 @@ int nff_read(NFFDecoder *_Nonnull d, float *_Nonnull const *_Nonnull planes, int
 bool nff_seek(NFFDecoder *_Nonnull d, int64_t frame);
 /// Current frame position.
 int64_t nff_position(const NFFDecoder *_Nonnull d);
+
+// MARK: Raw DSD (for DoP): the 1-bit stream itself, per channel, most significant bit first in time.
+
+/// Whether the stream is DSD (DSF / DSDIFF). Its "sample rate" is then bytes per second per channel (DSD rate / 8).
+bool nff_is_dsd(const NFFDecoder *_Nonnull d);
+/// Reads up to `bytes` DSD bytes per channel into `planes` (one buffer per channel), MSB = earliest bit.
+/// Returns bytes per channel written, 0 at the end. Don't mix with nff_read on the same decoder.
+int nff_read_dsd(NFFDecoder *_Nonnull d, uint8_t *_Nonnull const *_Nonnull planes, int bytes);
+/// Positions raw reading at byte `offset` (per channel).
+bool nff_seek_dsd(NFFDecoder *_Nonnull d, int64_t offset);

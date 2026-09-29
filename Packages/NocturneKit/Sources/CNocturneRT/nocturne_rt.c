@@ -118,6 +118,10 @@ struct NRTRenderContext {
     _Atomic double gain;
     _Atomic uint32_t ditherBits;
     _Atomic bool passthrough;
+    _Atomic bool dop;
+    _Atomic bool muted;
+    uint16_t dopPrevious[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];   // render thread only
+    _Atomic bool dopPrimed;
     _Atomic bool draining;
     _Atomic bool integer;
     _Atomic uint32_t underruns;
@@ -154,6 +158,8 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->gain, 1.0);
     atomic_init(&ctx->ditherBits, 24);
     atomic_init(&ctx->passthrough, false);
+    atomic_init(&ctx->dop, false);
+    atomic_init(&ctx->muted, false);
     atomic_init(&ctx->draining, false);
     atomic_init(&ctx->integer, false);
     atomic_init(&ctx->underruns, 0);
@@ -196,6 +202,8 @@ void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBit
 }
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
+void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
+void nrt_context_set_dop(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->dopPrimed, false); atomic_store(&ctx->dop, d); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
 void nrt_context_set_integer(NRTRenderContext *ctx, bool i) { atomic_store(&ctx->integer, i); if (i) atomic_store(&ctx->passthrough, true); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
@@ -236,9 +244,58 @@ static inline void store_peak_max(_Atomic float *slot, float v) {
     while (v > cur && !atomic_compare_exchange_weak_explicit(slot, &cur, v, memory_order_relaxed, memory_order_relaxed)) {}
 }
 
+// DoP frames carry a marker byte and 16 DSD bits per channel (oldest bit first). A triangular window over
+// this frame's bits and the previous frame's (a sinc² decimation by 16) turns them into a level good enough
+// for meters and the spectrum: it keeps most of DSD's ultrasonic noise from folding into the audio band.
+// Reads only; the frames go out as they are.
+static float dop_level(uint16_t previous, uint16_t current) {
+    uint32_t sum = 0;
+    for (uint32_t i = 0; i < 16; i++) {
+        sum += ((previous >> (15 - i)) & 1u) * (i + 1);     // rising half
+        sum += ((current >> (15 - i)) & 1u) * (16 - i);     // falling half
+    }
+    return ((float)sum * 2.f - 272.f) / 272.f;
+}
+
+static void meter_dop(NRTRenderContext *ctx, uint32_t got, uint32_t ch, bool integer) {
+    float peaks[NRT_METER_CHANNELS] = {0};
+    const uint32_t metered = ch < NRT_METER_CHANNELS ? ch : NRT_METER_CHANNELS;
+    uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
+    bool primed = atomic_load_explicit(&ctx->dopPrimed, memory_order_relaxed);
+    for (uint32_t f = 0; f < got; f++) {
+        const float *frame = ctx->scratch + (size_t)f * ch;
+        float values[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];
+        for (uint32_t c = 0; c < metered || c < 2; c++) {
+            const uint32_t src = c < ch ? c : 0;
+            uint32_t bits;
+            if (integer) { int32_t v; memcpy(&v, &frame[src], sizeof v); bits = ((uint32_t)v >> 8) & 0xFFFF; }
+            else bits = (uint32_t)lrintf(frame[src] * 8388608.f) & 0xFFFF;
+            if (!primed) ctx->dopPrevious[c] = (uint16_t)bits;     // start the window on real data, not zeros
+            values[c] = dop_level(ctx->dopPrevious[c], (uint16_t)bits);
+            ctx->dopPrevious[c] = (uint16_t)bits;
+        }
+        for (uint32_t c = 0; c < metered; c++) {
+            const float a = fabsf(values[c]);
+            if (a > peaks[c]) peaks[c] = a;
+        }
+        const float l = values[0], r = ch > 1 ? values[1] : l;
+        atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
+        tw++;
+        primed = true;
+    }
+    if (got > 0) atomic_store_explicit(&ctx->dopPrimed, true, memory_order_relaxed);
+    atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
+    for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
+}
+
 // Pulls `frames` source frames into ctx->scratch (zero-filled if dry) and applies gain/meters.
 static void pull(NRTRenderContext *ctx, uint32_t frames) {
     const uint32_t ch = nrt_ring_channels(ctx->ring);
+    if (atomic_load_explicit(&ctx->muted, memory_order_relaxed)) {
+        memset(ctx->scratch, 0, (size_t)frames * ch * sizeof(float));
+        for (uint32_t c = 0; c < ch && c < NRT_METER_CHANNELS; c++) atomic_store_explicit(&ctx->peak[c], 0.f, memory_order_relaxed);
+        return;
+    }
     const uint32_t resume = atomic_load_explicit(&ctx->resumeFrames, memory_order_relaxed);
     if (resume > 0 && !atomic_load_explicit(&ctx->draining, memory_order_relaxed)) {
         const uint32_t readable = nrt_ring_readable(ctx->ring);
@@ -265,6 +322,7 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
             atomic_fetch_add_explicit(&ctx->underruns, 1, memory_order_relaxed);
     }
     const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
+    if (atomic_load_explicit(&ctx->dop, memory_order_relaxed)) { meter_dop(ctx, got, ch, integer); return; }
     if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed) && !integer) return;
 
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);

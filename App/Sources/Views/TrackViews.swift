@@ -18,6 +18,8 @@ struct TrackTable: View {
     var showAlbum = true
     var showArtist = true
     var reorderable: Playlist? = nil
+    /// Songs that also exist in another version on the album: track ID → "+ STEREO", "+ 5.1".
+    var otherVersions: [Int64: String] = [:]
 
     @State private var selection = Set<Int64>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
@@ -30,6 +32,7 @@ struct TrackTable: View {
     var body: some View {
         let rows = self.rows
         Table(rows, selection: $selection, sortOrder: $sortOrder) {
+            // Ideal widths add up to about 810 pt: what's left beside the sidebar and inspector in a 1440 pt window.
             TableColumn("#", value: \.index) { row in
                 if model.player.current?.track.id == row.track.id, model.player.state != .stopped {
                     Image(systemName: model.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
@@ -49,19 +52,19 @@ struct TrackTable: View {
                     .foregroundStyle(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
                     .opacity(row.track.isMissing ? 0.45 : 1)
             }
-            .width(min: 160, ideal: 280)
+            .width(min: 160, ideal: 240)
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
                     Text(row.track.displayArtist).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
-                .width(min: 100, ideal: 170)
+                .width(min: 100, ideal: 140)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
                     Text(row.track.displayAlbum).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
-                .width(min: 100, ideal: 190)
+                .width(min: 100, ideal: 150)
             }
 
             TableColumn("Format", value: \.track.sampleRate) { row in
@@ -69,9 +72,16 @@ struct TrackTable: View {
                     Text(row.track.formatSummary).font(Typeface.mono(11)).foregroundStyle(Palette.text2)
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
+                    if let other = row.track.id.flatMap({ otherVersions[$0] }) {
+                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).tracking(0.6).foregroundStyle(Palette.text2)
+                            .padding(.horizontal, 5).padding(.vertical, 2)
+                            .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
+                            .fixedSize()
+                            .help("This song is also on the album in another version; Nocturne plays the one that suits your output")
+                    }
                 }
             }
-            .width(min: 150, ideal: 250)
+            .width(min: 150, ideal: 190)
 
             TableColumn("Time", value: \.track.duration) { row in
                 Text(row.track.duration.clock).font(Typeface.mono(11.5)).foregroundStyle(Palette.text3)
