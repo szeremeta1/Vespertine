@@ -5,7 +5,7 @@ import AppKit
 import CoreText
 
 enum Brand {
-    static let base: UInt32 = 0x09090A, window: UInt32 = 0x0D0D0F, surface: UInt32 = 0x16161A, raised: UInt32 = 0x1C1C21
+    static let base: UInt32 = 0x09090A, window: UInt32 = 0x0D0D0F, panel: UInt32 = 0x0C0C0E, surface: UInt32 = 0x16161A, raised: UInt32 = 0x1C1C21
     static let text: UInt32 = 0xECE6DA, text2: UInt32 = 0xA29B8F, text3: UInt32 = 0x69645C
     static let brass: UInt32 = 0xC8A66A, brassHi: UInt32 = 0xE7CD98, brassLo: UInt32 = 0x7C6541, copper: UInt32 = 0xC98B5B
     static let onBrass: UInt32 = 0x1A140A
