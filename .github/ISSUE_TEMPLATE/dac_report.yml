@@ -1,0 +1,46 @@
+name: DAC or device report
+description: Tell us how Vespertine works with your DAC, receiver or headphones, good or bad.
+labels: [device-report]
+body:
+  - type: markdown
+    attributes:
+      value: Every report widens the list of hardware Vespertine is known to work with. Reports that everything works are just as useful as problem reports.
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: "Topping E70, RME ADI-2 DAC, Denon AVR-X2800H…"
+    validations:
+      required: true
+  - type: input
+    id: connection
+    attributes:
+      label: Connection
+      placeholder: "USB, HDMI, optical via an interface, AirPods over USB-C…"
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Vespertine version, macOS version and Mac
+      placeholder: "0.6.0, macOS 26.1, Mac mini M4"
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What works
+      options:
+        - label: The device switches to each file's sample rate
+        - label: The signal path shows BIT-PERFECT for lossless files at supported rates
+        - label: Exclusive (hog) mode
+        - label: Integer mode
+        - label: DSD over DoP (only tick if the DAC is DoP-capable and you enabled it)
+        - label: Multichannel (5.1 / 7.1)
+        - label: Bitstream to a receiver (Dolby Digital, DD+, DTS)
+        - label: Hardware volume
+  - type: textarea
+    id: details
+    attributes:
+      label: Rates, formats and anything odd
+      description: Which rates and formats you tried, and anything that didn't behave. If your DAC shows the incoming format or has a bit-perfect test, what it reported.

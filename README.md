@@ -18,15 +18,37 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/szeremeta1/Nocturne/releases/latest"><strong>Download Nocturne</strong></a> · signed, notarized, and it keeps itself up to date
+  <a href="https://github.com/szeremeta1/Nocturne/releases/latest"><strong>Download Nocturne</strong></a> · <a href="https://szeremeta1.github.io/Nocturne/">Website</a> · signed, notarized, and it keeps itself up to date<br>
+  or <code>brew install --cask szeremeta1/tap/nocturne</code>
 </p>
 
 <br>
 
 <p align="center">
-  <img src="docs/screenshots/spatial-audio-airpods-max.png" alt="Nocturne playing Dire Straits' Brothers in Arms from a DTS 5.1 CD, decoded and rendered as head-tracked Spatial Audio on AirPods Max, with a live meter for each of the six channels">
+  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Nocturne: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; an SACD album listing stereo and 5.1 versions once; a DTS 5.1 CD as head-tracked Spatial Audio on AirPods Max; and a file flagged for synthetic high frequencies">
 </p>
-<p align="center"><sub><em>Brothers in Arms</em> from a DTS 5.1 CD, decoded and rendered as head-tracked Spatial Audio on AirPods Max, with a live meter for every channel.</sub></p>
+
+<p align="center"><sub>Vespertine was called Nocturne until version 0.6.0.</sub></p>
+
+## Why Nocturne
+
+Free Mac players tend to be either pretty but indifferent to what reaches the DAC, or careful about the signal but cumbersome to live with. Nocturne is meant to be both: a native Mac app that switches your DAC to each track's native format, shows **BIT-PERFECT** only when that's literally true, and says what happened to the signal whenever it isn't. It also does a few things no other Mac music player does: it plays DTS CDs, TrueHD, DTS-HD Master Audio and Dolby Atmos files, renders surround as head-tracked Spatial Audio on AirPods, recognizes AirPods Max on USB-C as a lossless device, and catches "hi-res" files that aren't.
+
+| | Nocturne | Apple Music | Audirvana Studio | Roon |
+|---|---|---|---|---|
+| Price | **Free, open source** | Included with macOS | $79.99 a year | $149.88 a year |
+| Plays FLAC | Yes | No | Yes | Yes |
+| Switches the DAC to each track's sample rate | Yes | No | Yes | Yes |
+| Exclusive (hog) mode | Yes | No | Yes | Yes |
+| Says when playback is bit-perfect | Yes | No | Shows the DAC format | Yes |
+| DSD | DSD64–512 | No | Yes | Yes |
+| Local multichannel | Yes | No | Yes | Yes |
+| Local Dolby Atmos files | Yes | Catalog only | No | No |
+| Fake hi-res detection | Yes | No | No | No |
+| Streaming (Qobuz, TIDAL) | No | Apple Music | Yes | Yes |
+| EQ and room correction | No | Basic EQ | Yes | Yes |
+
+<sub>Checked September 2026 from each product's own pricing and support pages. If you stream or need room correction, the paid apps are worth it; if you own your music, Nocturne is the one to try.</sub>
 
 Nocturne plays almost anything you have: FLAC, ALAC, WAV and AIFF up to 32-bit / 768 kHz, DSD from DSD64 to DSD512, Dolby Atmos, Dolby TrueHD, Dolby Digital (Plus), DTS-HD Master Audio, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC. It switches your DAC (a FiiO K11, AirPods Max on USB-C, a receiver, anything class-compliant) to each file's native format, and it tells you exactly what happens to the signal on the way there.
 
@@ -236,6 +258,10 @@ Store that file somewhere safe (it is a secret), then delete it.
 | `docs/` | Architecture notes, design mockups, screenshots, release notes |
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how audio gets from file to DAC.
+
+## How it's made
+
+Nocturne is designed and maintained by Alexander Szeremeta. Most of the code was written with AI coding agents (Claude Code and Codex) under his direction, as the commit history shows: he sets the behavior, the design and the acceptance tests, and every feature is verified on real hardware before it ships (a FiiO K11 at every rate up to 384 kHz, AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers). Reports from other DACs, receivers and multichannel interfaces are very welcome: [open a device report](https://github.com/szeremeta1/Nocturne/issues/new?template=dac_report.yml).
 
 ## License
 
