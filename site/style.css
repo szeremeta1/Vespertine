@@ -178,3 +178,31 @@ footer a { color: var(--text2); }
 
 /* Keep signal-path terms like BIT-PERFECT on one line. */
 .lede .mono, .faq .mono { white-space: nowrap; }
+
+/* Press kit */
+.press { padding: 72px 0 96px; }
+.press h1 { font: 300 clamp(38px, 5.4vw, 60px)/1.06 var(--serif); letter-spacing: -0.02em; margin: 14px 0 0; max-width: 820px; }
+.press .lead { color: var(--text2); font-size: 18px; max-width: 760px; margin: 22px 0 0; }
+.press-block { padding: 64px 0 0; }
+.press-block h2 { font-size: clamp(26px, 3vw, 34px); margin: 0 0 18px; }
+.press-block > p { color: var(--text2); margin: 0 0 22px; max-width: 760px; }
+.facts { width: 100%; border-collapse: collapse; border: 1px solid var(--hair); border-radius: 16px; overflow: hidden; font-size: 15px; }
+.facts th, .facts td { text-align: left; padding: 13px 18px; border-top: 1px solid var(--hair); vertical-align: top; }
+.facts tr:first-child th, .facts tr:first-child td { border-top: 0; }
+.facts th { width: 190px; font-weight: 500; color: var(--text); background: var(--window); }
+.facts td { color: var(--text2); }
+.press-list { margin: 0; padding: 0; list-style: none; max-width: 820px; }
+.press-list li { padding: 12px 0; border-top: 1px solid var(--hair); color: var(--text2); }
+.press-list b { color: var(--text); font-weight: 500; }
+.grid { display: grid; gap: 22px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid figure { margin: 0; }
+.grid img { width: 100%; border-radius: 12px; box-shadow: 0 0 0 1px var(--hair2); background: var(--base); }
+.grid figcaption { color: var(--text3); font-size: 13.5px; margin-top: 10px; }
+@media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .facts th { width: 110px; } .facts th, .facts td { padding: 11px 12px; } .press { padding-top: 48px; } }
+.logo-tile { aspect-ratio: 16 / 9; display: grid; place-items: center; background: var(--base); border-radius: 12px; box-shadow: 0 0 0 1px var(--hair2); }
+.grid .logo-tile img { width: 78%; border-radius: 0; box-shadow: none; background: none; }
+.grid .logo-tile img.stacked { width: 56%; }
+.keyart figure:first-child { grid-column: 1 / -1; }
