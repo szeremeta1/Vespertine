@@ -1,8 +1,10 @@
 #!/bin/zsh
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Renders docs/design/social-preview.html to site/assets/og.png (1280x640), the image GitHub,
-# Open Graph and Twitter/X cards show. Re-run it whenever docs/screenshots change, then upload
-# the result in the repo's Settings → General → Social preview.
+# Renders docs/design/social-preview.html twice:
+#   site/assets/og.png       1280x640 (2:1), for the repo's Settings → General → Social preview;
+#   site/assets/og-wide.png  1200x630 (1.91:1), the website's Open Graph / Twitter image, the shape
+#                            Facebook, LinkedIn, iMessage, Reddit and X crop to.
+# Re-run it whenever docs/screenshots change, and re-upload og.png on GitHub.
 set -euo pipefail
 root=${0:A:h:h}
 work=$(mktemp -d)
@@ -16,6 +18,12 @@ sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/sc
   "$root/docs/design/social-preview.html" > "$work/index.html"
 
 swift "$root/scripts/snapshot-html.swift" "$work/index.html" "$work/og.png" 1280 1 0 640 >/dev/null
-# The snapshot comes out at the screen's scale; social cards want exactly 1280x640.
+# The 1.91:1 card is the same design scaled to 1200 wide, with the card 32 px taller (before scaling)
+# so its background fills the canvas, and the content moved down by half of that.
+sed -e 's#</style>#  html, body { width: 1200px; height: 630px; } .card { height: 672px; transform: scale(0.9375); transform-origin: 0 0; } .copy { top: 80px; } .window { top: 62px; } .panel { top: 96px; } .foot { bottom: 58px; }\n</style>#' \
+  "$work/index.html" > "$work/wide.html"
+swift "$root/scripts/snapshot-html.swift" "$work/wide.html" "$work/og-wide.png" 1200 1 0 630 >/dev/null
+# Snapshots come out at the screen's scale; social cards want these exact sizes.
 sips -z 640 1280 "$work/og.png" --out "$root/site/assets/og.png" >/dev/null
-print "wrote site/assets/og.png ($(stat -f %z "$root/site/assets/og.png") bytes)"
+sips -z 630 1200 "$work/og-wide.png" --out "$root/site/assets/og-wide.png" >/dev/null
+for f in og.png og-wide.png; do print "wrote site/assets/$f ($(stat -f %z "$root/site/assets/$f") bytes)"; done
