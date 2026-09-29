@@ -3,6 +3,7 @@
 // Layout contract (points, top-left origin) — must match scripts/dmg-settings.py:
 //   window 660×420, icons 128 pt, app centred at (180, 212), Applications at (480, 212)
 import AppKit
+import CoreText
 
 let args = CommandLine.arguments
 let version = args.count > 1 ? args[1] : "0.0.0"
@@ -16,9 +17,41 @@ func color(_ hex: UInt32, _ a: CGFloat = 1) -> NSColor {
 let brass = color(0xC8A66A), brassHi = color(0xE7CD98), brassLo = color(0x7C6541)
 let ivory = color(0xECE6DA), text2 = color(0xA29B8F), text3 = color(0x69645C)
 
-func font(_ size: CGFloat, _ weight: NSFont.Weight = .regular, design: NSFontDescriptor.SystemDesign = .default) -> NSFont {
-    let base = NSFont.systemFont(ofSize: size, weight: weight)
-    return base.fontDescriptor.withDesign(design).flatMap { NSFont(descriptor: $0, size: size) } ?? base
+// Brand fonts (OFL, shipped with the website): Newsreader for the wordmark, Inter for text, JetBrains Mono for
+// numbers. Apple's system fonts are licensed for app UI only, not for distributed artwork like this.
+let fontDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("site/assets/fonts")
+func brandFont(_ file: String, _ size: CGFloat, weight: CGFloat, opticalSize: CGFloat? = nil) -> NSFont {
+    let d = (CTFontManagerCreateFontDescriptorsFromURL(fontDir.appendingPathComponent("\(file).woff2") as CFURL) as! [CTFontDescriptor])[0]
+    let base = CTFontCreateWithFontDescriptor(d, size, nil)
+    var variation: [NSNumber: NSNumber] = [:]
+    for axis in (CTFontCopyVariationAxes(base) as? [[String: Any]]) ?? [] {
+        guard let id = axis[kCTFontVariationAxisIdentifierKey as String] as? NSNumber, let name = axis[kCTFontVariationAxisNameKey as String] as? String else { continue }
+        if name == "Weight" { variation[id] = NSNumber(value: Double(weight)) }
+        if name == "Optical Size", let o = opticalSize { variation[id] = NSNumber(value: Double(o)) }
+    }
+    return CTFontCreateCopyWithAttributes(base, size, nil, CTFontDescriptorCreateWithAttributes([kCTFontVariationAttribute: variation] as CFDictionary)) as NSFont
+}
+enum Face { case sans, mono }
+func font(_ size: CGFloat, _ weight: CGFloat = 400, _ face: Face = .sans) -> NSFont {
+    face == .mono ? brandFont("JetBrainsMono", size, weight: weight) : brandFont("Inter", size, weight: weight)
+}
+
+/// The brand lockup (docs/brand, scripts/brand): brass crescent + "vespertine" in Newsreader Light, centred.
+func drawLockup(centerX: CGFloat, top: CGFloat, size: CGFloat) {
+    let f = brandFont("Newsreader", size, weight: 300, opticalSize: min(72, size))
+    let attr = NSAttributedString(string: "vespertine", attributes: [.font: f, .foregroundColor: ivory, .kern: -0.01 * size])
+    let textW = attr.size().width, m = size * 0.92, gap = size * 0.34, total = m + gap + textW
+    let x0 = centerX - total / 2, baseline = H - top - CTFontGetAscent(f)
+    // Crescent: disc minus an offset bite (same geometry as the app icon), brass gradient.
+    let r = m / 2, c = CGPoint(x: x0 + r, y: baseline - m * 0.18 + r), br = r * 0.86
+    let disc = CGPath(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: m, height: m), transform: nil)
+    let crescent = disc.subtracting(CGPath(ellipseIn: CGRect(x: c.x + r * 0.42 - br, y: c.y + r * 0.22 - br, width: 2 * br, height: 2 * br), transform: nil))
+    let ctx = NSGraphicsContext.current!.cgContext
+    ctx.saveGState(); ctx.addPath(crescent); ctx.clip()
+    NSGradient(colors: [color(0xF0DAAA), brass, brassLo], atLocations: [0, 0.55, 1], colorSpace: .sRGB)!
+        .draw(in: NSRect(x: c.x - r, y: c.y - r, width: m, height: m), angle: -45)
+    ctx.restoreGState()
+    attr.draw(at: CGPoint(x: x0 + m + gap, y: baseline - CTFontGetDescent(f)))
 }
 
 func drawText(_ s: String, _ f: NSFont, _ c: NSColor, centerX: CGFloat, top: CGFloat, kern: CGFloat = 0) {
@@ -50,8 +83,8 @@ func render(scale: CGFloat) -> Data {
     }
 
     // Wordmark.
-    drawText("Vespertine", font(30, .regular, design: .serif), ivory, centerX: W / 2, top: 38)
-    drawText("HI-RES AUDIO PLAYER", font(9.5, .semibold, design: .monospaced), brass, centerX: W / 2, top: 80, kern: 2.6)
+    drawLockup(centerX: W / 2, top: 34, size: 34)
+    drawText("HI-RES AUDIO PLAYER", font(9.5, 600, .mono), brass, centerX: W / 2, top: 84, kern: 2.6)
 
     // Stages: soft spotlight under each icon (no strokes, so nothing collides with Finder's labels).
     for c in [appCenter, appsCenter] {
@@ -98,8 +131,8 @@ func render(scale: CGFloat) -> Data {
     ctx.restoreGState()
 
     // Instructions and provenance.
-    drawText("Drag Vespertine into Applications to install", font(12.5, .regular), text2, centerX: W / 2, top: 336)
-    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, .medium, design: .monospaced), text3, centerX: W / 2, top: 362, kern: 1.4)
+    drawText("Drag Vespertine into Applications to install", font(12.5), text2, centerX: W / 2, top: 336)
+    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, 500, .mono), text3, centerX: W / 2, top: 362, kern: 1.4)
 
     // Hairline frame.
     color(0xECE6DA, 0.06).setStroke()
