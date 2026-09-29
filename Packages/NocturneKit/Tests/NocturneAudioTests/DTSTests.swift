@@ -96,6 +96,17 @@ struct DTSTests {
         #expect(dominant(Array(audio[2][4096..<8192]), rate: 44_100, candidates: [440, 550, 660, 60, 770, 880]) == 660)
     }
 
+    @Test("A CUE track that runs a few frames past the end of the file still opens (clamped)")
+    func overlongLastTrack() throws {
+        let probed = try SourceOpener.probe(fixture)
+        let plan = OutputPlan(mode: .pcm, deviceSampleRate: 44_100, decodedSampleRate: 44_100, physicalBitDepth: 32,
+                              channels: 6, dsdConvertedToPCM: false, reason: "")
+        let region = try SourceOpener.decoder(for: probed, plan: plan,
+                                              item: PlayableItem(url: fixture, regionStartFrame: 100_000, regionFrameLength: 10_609))
+        #expect(region.length == 10_592)
+        #expect(try decode(region, frames: 20_000)[0].count == 10_592)
+    }
+
     @Test("Ordinary 16-bit stereo PCM is left alone")
     func plainPCM() throws {
         let url = try writeWAV("not-dts", rate: 44_100, bits: 16, seconds: 1) { c, i in Float(sin(Double(i) * 0.05 + Double(c))) * 0.5 }
@@ -138,4 +149,29 @@ func realDTSMatchesFFmpeg() throws {
     print("real DTS: \(probed.format.codec) \(channels) ch, \(done) of \(frames) frames, max difference \(worst), peak \(peak)")
     #expect(done == frames)
     #expect(worst == 0)
+}
+
+/// Diagnostic: opens CUE regions of a real DTS CD (NOCTURNE_DTS_CUE_FILE, NOCTURNE_DTS_REGIONS="start:length,…").
+@Test(.enabled(if: ProcessInfo.processInfo.environment["NOCTURNE_DTS_CUE_FILE"] != nil))
+func realDTSRegions() throws {
+    let env = ProcessInfo.processInfo.environment
+    let url = URL(fileURLWithPath: env["NOCTURNE_DTS_CUE_FILE"]!)
+    for region in env["NOCTURNE_DTS_REGIONS"]!.split(separator: ",") {
+        let parts = region.split(separator: ":").compactMap { Int64($0) }
+        do {
+            let probed = try SourceOpener.probe(url)
+            let plan = OutputPlan(mode: .pcm, deviceSampleRate: 44_100, decodedSampleRate: 44_100, physicalBitDepth: 32,
+                                  channels: probed.format.channels, dsdConvertedToPCM: false, reason: "")
+            let decoder = try SourceOpener.decoder(for: probed, plan: plan,
+                                                   item: PlayableItem(url: url, regionStartFrame: parts[0], regionFrameLength: parts[1]))
+            let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 4096)!
+            var n = 0
+            for _ in 0..<20 { try decoder.decode(into: buffer, length: 4096); n += Int(buffer.frameLength) }
+            try decoder.seek(to: parts[1] / 2)
+            try decoder.decode(into: buffer, length: 4096)
+            print("region \(parts[0]) ok: decoded \(n), after seek \(buffer.frameLength), length \(decoder.length)")
+        } catch {
+            print("region \(parts[0]) FAILED: \(error) / \((error as NSError).domain) \((error as NSError).code)")
+        }
+    }
 }

@@ -158,7 +158,10 @@ enum SourceOpener {
             throw SourceOpenerError.unsupported(probed.url)
         }
         if let start = item.regionStartFrame {
-            let length = item.regionFrameLength ?? max(0, decoder.length - start)
+            // A CUE track can't run past the audio actually there: the last track's length comes from
+            // rounded durations and may overshoot the file by a few frames, which the region decoder refuses.
+            let available = decoder.length > 0 ? max(0, decoder.length - start) : Int64.max
+            let length = min(item.regionFrameLength ?? available, available)
             let region = try AudioRegionDecoder(decoder: decoder, startFrame: start, frameLength: length)
             try region.open()
             decoder = region

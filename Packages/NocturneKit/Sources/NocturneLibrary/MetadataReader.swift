@@ -32,6 +32,10 @@ public enum MetadataReader {
         if let additional = md.additionalMetadata as? [String: Any] {
             for (k, v) in additional { extra[k.uppercased()] = "\(v)" }
         }
+        // MP3: the tag reader passes on only the common ID3 fields; read the others ourselves.
+        if url.pathExtension.lowercased() == "mp3" || home.pathExtension.lowercased() == "mp3" {
+            for (k, v) in ID3Extras.read(url) where extra[k] == nil { extra[k] = v }
+        }
         let label = extra["LABEL"] ?? extra["ORGANIZATION"] ?? extra["PUBLISHER"]
 
         var artworkKey: String?
