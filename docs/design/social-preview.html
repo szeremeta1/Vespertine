@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <style>
   /* Open fonts only (docs/design/fonts): Apple's New York and SF are licensed for interface mock-ups, not artwork. */
-  @font-face { font-family: "Newsreader"; font-weight: 400 500; src: url(../../site/assets/fonts/Newsreader.woff2) format("woff2"); }
+  @font-face { font-family: "Newsreader"; font-weight: 300 500; src: url(../../site/assets/fonts/Newsreader.woff2) format("woff2"); }
   @font-face { font-family: "Inter"; font-weight: 400 600; src: url(../../site/assets/fonts/Inter.woff2) format("woff2"); }
   @font-face { font-family: "JetBrains Mono"; font-weight: 400 500; src: url(../../site/assets/fonts/JetBrainsMono.woff2) format("woff2"); }
   :root {
@@ -24,14 +24,12 @@
   }
 
   /* Left: name and promise */
-  .copy { position: absolute; left: 76px; top: 64px; width: 500px; }
-  .icon { width: 88px; height: 88px; display: block; margin: 0 0 28px; border-radius: 20px;
-          box-shadow: 0 0 0 1px rgba(236,230,218,.10), 0 18px 34px rgba(0,0,0,.6); }
-  h1 { font-family: "Newsreader", serif; font-weight: 500; font-size: 88px;
-       letter-spacing: -1.8px; margin: 0; line-height: 1; }
+  .copy { position: absolute; left: 76px; top: 106px; width: 500px; }
+  /* The brand lockup (docs/brand/logo.svg): crescent + "vespertine" in Newsreader Light, outlined. */
+  .lockup { display: block; height: 138px; margin: 0 0 0 -34px; } /* the SVG carries clear space; -34 px puts the crescent on the text edge */
   .lede { font-family: "Newsreader", serif; font-size: 32px; line-height: 1.22;
-          margin: 16px 0 0; max-width: 470px; }
-  .lede em { font-style: normal; color: var(--brassHi); }
+          margin: 14px 0 0; max-width: 470px; }
+  .lede em { font-style: normal; }
   .chips { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 9px; width: 470px; }
   .chip {
     font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: 1.5px;
@@ -61,8 +59,7 @@
 <body>
   <div class="card">
     <div class="copy">
-      <img class="icon" src="../../site/assets/icon-512.png" alt="">
-      <h1>Vespertine</h1>
+      <img class="lockup" src="../brand/logo.svg" alt="vespertine">
       <p class="lede">The free, bit-perfect music player for Mac that <em>tells you the truth</em> about your&nbsp;files.</p>
       <div class="chips">
         <span class="chip">DSD512</span>

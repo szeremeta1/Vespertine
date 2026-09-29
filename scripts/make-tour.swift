@@ -46,7 +46,7 @@ let shots: [Shot] = [
          caption: "Catches upsampled, lossy-sourced and “AI-enhanced” files"),
 ]
 let images = shots.map { image($0.file) }
-let icon = image("site/assets/icon-512.png")
+let lockup = image("docs/brand/logo.png")   // crescent + "vespertine", with its clear space
 
 let hold = 4.2, fade = 0.5, endHold = 3.4
 let shotStep = hold - fade
@@ -136,14 +136,9 @@ func drawEndCard(alpha: CGFloat) {
     let glow = CGGradient(colorsSpace: space, colors: [color(0xC8A66A, 0.16), color(0xC8A66A, 0)] as CFArray, locations: [0, 1])!
     ctx.drawRadialGradient(glow, startCenter: CGPoint(x: W / 2, y: Int(Double(H) * 0.58)), startRadius: 0,
                            endCenter: CGPoint(x: W / 2, y: Int(Double(H) * 0.58)), endRadius: 460 * scale, options: [])
-    let side = 132 * scale
-    let iconRect = CGRect(x: (CGFloat(W) - side) / 2, y: CGFloat(H) - 150 * scale - side, width: side, height: side)
-    ctx.saveGState()
-    ctx.addPath(CGPath(roundedRect: iconRect, cornerWidth: side * 0.225, cornerHeight: side * 0.225, transform: nil))
-    ctx.clip(); ctx.draw(icon, in: iconRect)
-    ctx.restoreGState()
-    _ = draw("Vespertine", font: serif(76, .medium), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 400 * scale, kern: -1 * scale)
-    _ = draw("The free, bit-perfect music player for Mac", font: serif(30), color: color(0xE7CD98), centerX: CGFloat(W) / 2, baselineFromTop: 462 * scale)
+    let lockupW = 640 * scale, lockupH = lockupW * CGFloat(lockup.height) / CGFloat(lockup.width)
+    ctx.draw(lockup, in: CGRect(x: (CGFloat(W) - lockupW) / 2, y: CGFloat(H) - 196 * scale - lockupH, width: lockupW, height: lockupH))
+    _ = draw("The free, bit-perfect music player for Mac", font: serif(30), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 470 * scale)
     let mono = openFont("JetBrains Mono", 17, weight: 400)
     _ = draw("OPEN SOURCE · GPL-3.0 · MACOS 26+", font: mono, color: color(0xA29B8F), centerX: CGFloat(W) / 2, baselineFromTop: 540 * scale, kern: 2 * scale)
     _ = draw("github.com/szeremeta1/Vespertine", font: openFont("Inter", 20, weight: 500), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)

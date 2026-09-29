@@ -11,17 +11,17 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 # WebKit only reads files under the page's folder, so stage the page next to what it uses.
-mkdir -p "$work/site/assets/fonts" "$work/docs/screenshots"
-cp "$root/site/assets/icon-512.png" "$work/site/assets/"
+mkdir -p "$work/site/assets/fonts" "$work/docs/screenshots" "$work/docs/brand"
+cp "$root/docs/brand/logo.svg" "$work/docs/brand/"
 cp "$root"/site/assets/fonts/*.woff2 "$work/site/assets/fonts/"
 cp "$root/docs/screenshots/bit-perfect-fiio-24-192.png" "$work/docs/screenshots/"
-sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' \
+sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' -e 's#\.\./brand/#docs/brand/#g' \
   "$root/docs/design/social-preview.html" > "$work/index.html"
 
 swift "$root/scripts/snapshot-html.swift" "$work/index.html" "$work/og.png" 1280 1 0 640 >/dev/null
 # The 1.91:1 card is the same design scaled to 1200 wide, with the card 32 px taller (before scaling)
 # so its background fills the canvas, and the content moved down by half of that.
-sed -e 's#</style>#  html, body { width: 1200px; height: 630px; } .card { height: 672px; transform: scale(0.9375); transform-origin: 0 0; } .copy { top: 80px; } .window { top: 62px; } .panel { top: 96px; } .foot { bottom: 58px; }\n</style>#' \
+sed -e 's#</style>#  html, body { width: 1200px; height: 630px; } .card { height: 672px; transform: scale(0.9375); transform-origin: 0 0; } .copy { top: 122px; } .window { top: 62px; } .panel { top: 96px; } .foot { bottom: 58px; }\n</style>#' \
   "$work/index.html" > "$work/wide.html"
 swift "$root/scripts/snapshot-html.swift" "$work/wide.html" "$work/og-wide.png" 1200 1 0 630 >/dev/null
 # Snapshots come out at the screen's scale; social cards want these exact sizes.

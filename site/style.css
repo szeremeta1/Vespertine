@@ -1,7 +1,7 @@
 /* Vespertine site. The brand fonts (Newsreader, Inter, JetBrains Mono; SIL Open Font License) are self-hosted,
    so the site looks the same everywhere and makes no third-party requests apart from GitHub's API for the
    latest version. */
-@font-face { font-family: "Newsreader"; font-weight: 400 500; font-display: swap; src: url(assets/fonts/Newsreader.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Newsreader"; font-weight: 300 500; font-display: swap; src: url(assets/fonts/Newsreader.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Inter"; font-weight: 400 600; font-display: swap; src: url(assets/fonts/Inter.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "JetBrains Mono"; font-weight: 400 500; font-display: swap; src: url(assets/fonts/JetBrainsMono.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 
@@ -37,8 +37,9 @@ header.nav {
   background: rgba(9, 9, 10, 0.72); border-bottom: 1px solid var(--hair);
 }
 .nav .wrap { display: flex; align-items: center; gap: 28px; height: 58px; }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--text); font: 500 19px/1 var(--serif); }
-.brand img { width: 28px; height: 28px; border-radius: 7px; }
+.brand { display: flex; align-items: center; }
+/* The brand lockup; its SVG carries clear space, so pull it back to the column edge. */
+.brand img { height: 44px; width: auto; margin-left: -11px; }
 .brand:hover { text-decoration: none; }
 .nav nav { display: flex; gap: 22px; margin-left: auto; font-size: 14.5px; }
 .nav nav a { color: var(--text2); }
@@ -63,9 +64,9 @@ header.nav {
 }
 .hero-icon { width: 104px; height: 104px; margin: 0 auto 30px; border-radius: 23px; box-shadow: 0 0 0 1px var(--hair2), 0 24px 48px rgba(0,0,0,.6); }
 .hero h1 {
-  position: relative; font: 500 clamp(44px, 7.4vw, 82px)/1.02 var(--serif); letter-spacing: -0.02em; margin: 0 auto; max-width: 900px;
+  position: relative; font: 300 clamp(46px, 7.8vw, 88px)/1.02 var(--serif); letter-spacing: -0.02em; margin: 0 auto; max-width: 920px;
 }
-.hero h1 em { font-style: normal; color: var(--brassHi); }
+.hero h1 em { font-style: normal; color: var(--text); }
 .hero .lede { position: relative; max-width: 700px; margin: 24px auto 0; color: var(--text2); font-size: clamp(17px, 2vw, 19.5px); }
 .cta { position: relative; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
 .fine { position: relative; margin-top: 16px; color: var(--text3); font-size: 13.5px; }
