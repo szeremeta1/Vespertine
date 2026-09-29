@@ -1,0 +1,62 @@
+<!doctype html>
+<!-- Social preview (GitHub, Open Graph): render with
+     swift scripts/snapshot-html.swift docs/design/social-preview.html site/assets/og.png 1280 1 -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --base: #09090A; --surface: #16161A; --text: #ECE6DA; --text2: #A29B8F; --text3: #69645C;
+    --brass: #C8A66A; --brassHi: #E7CD98; --hair: rgba(236, 230, 218, 0.07);
+  }
+  html, body { margin: 0; background: var(--base); }
+  .card {
+    position: relative; width: 1280px; height: 640px; overflow: hidden;
+    background:
+      radial-gradient(900px 520px at 78% 38%, rgba(200, 166, 106, 0.16), transparent 62%),
+      radial-gradient(700px 500px at 0% 100%, rgba(201, 139, 91, 0.08), transparent 60%),
+      var(--base);
+    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; color: var(--text);
+  }
+  .copy { position: absolute; left: 76px; top: 62px; width: 520px; }
+  .icon { width: 92px; height: 92px; display: block; margin: 0 0 26px 0; border-radius: 21px; box-shadow: 0 0 0 1px rgba(236,230,218,.10), 0 18px 34px rgba(0,0,0,.6); }
+  h1 { font-family: ui-serif, "New York", Georgia, serif; font-weight: 500; font-size: 80px; letter-spacing: -1.5px; margin: 0; line-height: 1; }
+  .lede { font-family: ui-serif, "New York", Georgia, serif; font-size: 29px; line-height: 1.24; margin: 18px 0 0; color: var(--text); }
+  .lede em { font-style: normal; color: var(--brassHi); }
+  .chips { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; width: 500px; }
+  .chip {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13.5px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text2); border: 1px solid rgba(236, 230, 218, 0.14); border-radius: 7px; padding: 6px 11px;
+  }
+  .chip.brass { color: var(--brass); border-color: rgba(200, 166, 106, 0.55); }
+  .chip.brass::before { content: "●"; font-size: 10px; margin-right: 8px; vertical-align: 2px; }
+  .foot { position: absolute; left: 76px; bottom: 44px; font-size: 18px; color: var(--text3); letter-spacing: .2px; }
+  .foot b { color: var(--text2); font-weight: 500; }
+  .shot {
+    position: absolute; left: 612px; top: 56px; width: 700px; height: 528px; overflow: hidden;
+    border-radius: 14px 0 0 14px;
+    box-shadow: 0 0 0 1px rgba(236,230,218,.10), 0 40px 90px rgba(0,0,0,.7);
+  }
+  /* The window from the end of the sidebar to the inspector, where BIT-PERFECT shows. */
+  .shot img { position: absolute; height: 528px; left: -163px; top: 0; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="copy">
+      <img class="icon" src="../../site/assets/icon-512.png" alt="">
+      <h1>Vespertine</h1>
+      <p class="lede">The free, bit-perfect music player for Mac that <em>tells you the truth</em> about your&nbsp;files.</p>
+      <div class="chips">
+        <span class="chip brass">Bit-perfect</span>
+        <span class="chip">DSD512</span>
+        <span class="chip">Atmos · DTS</span>
+        <span class="chip">Spatial Audio</span>
+        <span class="chip">Fake hi-res check</span>
+      </div>
+    </div>
+    <div class="foot"><b>Open source</b> · GPL-3.0 · macOS 26+ · Apple silicon &amp; Intel</div>
+    <div class="shot"><img src="../../site/assets/bit-perfect-fiio-24-192.jpg" alt=""></div>
+  </div>
+</body>
+</html>
