@@ -19,8 +19,10 @@ final class Snapper: NSObject, WKNavigationDelegate {
         web.loadFileURL(input, allowingReadAccessTo: input.deletingLastPathComponent())
     }
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        webView.evaluateJavaScript("document.documentElement.scrollHeight") { value, _ in
-            let height = (value as? Double) ?? 1000
+        // Wait for web fonts, so a page is never captured in its fallback font.
+        webView.callAsyncJavaScript("await document.fonts.ready; return document.documentElement.scrollHeight",
+                                    arguments: [:], in: nil, in: .page) { result in
+            let height = (try? result.get() as? Double) ?? 1000
             webView.setFrameSize(NSSize(width: width, height: height))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 let cfg = WKSnapshotConfiguration()

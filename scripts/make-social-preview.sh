@@ -11,8 +11,9 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 # WebKit only reads files under the page's folder, so stage the page next to what it uses.
-mkdir -p "$work/site/assets" "$work/docs/screenshots"
+mkdir -p "$work/site/assets/fonts" "$work/docs/screenshots"
 cp "$root/site/assets/icon-512.png" "$work/site/assets/"
+cp "$root"/site/assets/fonts/*.woff2 "$work/site/assets/fonts/"
 cp "$root/docs/screenshots/bit-perfect-fiio-24-192.png" "$work/docs/screenshots/"
 sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' \
   "$root/docs/design/social-preview.html" > "$work/index.html"

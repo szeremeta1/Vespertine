@@ -5,6 +5,10 @@
 <head>
 <meta charset="utf-8">
 <style>
+  /* Open fonts only (docs/design/fonts): Apple's New York and SF are licensed for interface mock-ups, not artwork. */
+  @font-face { font-family: "Newsreader"; font-weight: 400 500; src: url(../../site/assets/fonts/Newsreader.woff2) format("woff2"); }
+  @font-face { font-family: "Inter"; font-weight: 400 600; src: url(../../site/assets/fonts/Inter.woff2) format("woff2"); }
+  @font-face { font-family: "JetBrains Mono"; font-weight: 400 500; src: url(../../site/assets/fonts/JetBrainsMono.woff2) format("woff2"); }
   :root {
     --base: #09090A; --text: #ECE6DA; --text2: #A29B8F; --text3: #69645C;
     --brass: #C8A66A; --brassHi: #E7CD98;
@@ -16,21 +20,21 @@
       radial-gradient(760px 520px at 80% 46%, rgba(200, 166, 106, 0.17), transparent 64%),
       radial-gradient(700px 500px at 0% 100%, rgba(201, 139, 91, 0.07), transparent 60%),
       var(--base);
-    font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; color: var(--text);
+    font-family: "Inter", sans-serif; color: var(--text);
   }
 
   /* Left: name and promise */
   .copy { position: absolute; left: 76px; top: 64px; width: 500px; }
   .icon { width: 88px; height: 88px; display: block; margin: 0 0 28px; border-radius: 20px;
           box-shadow: 0 0 0 1px rgba(236,230,218,.10), 0 18px 34px rgba(0,0,0,.6); }
-  h1 { font-family: ui-serif, "New York", Georgia, serif; font-weight: 500; font-size: 78px;
-       letter-spacing: -1.5px; margin: 0; line-height: 1; }
-  .lede { font-family: ui-serif, "New York", Georgia, serif; font-size: 28px; line-height: 1.25;
-          margin: 18px 0 0; }
+  h1 { font-family: "Newsreader", serif; font-weight: 500; font-size: 88px;
+       letter-spacing: -1.8px; margin: 0; line-height: 1; }
+  .lede { font-family: "Newsreader", serif; font-size: 32px; line-height: 1.22;
+          margin: 16px 0 0; max-width: 470px; }
   .lede em { font-style: normal; color: var(--brassHi); }
   .chips { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 9px; width: 470px; }
   .chip {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; letter-spacing: 1.5px;
+    font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: 1.5px;
     text-transform: uppercase; color: var(--text2); border: 1px solid rgba(236,230,218,.14);
     border-radius: 7px; padding: 6px 10px;
   }
