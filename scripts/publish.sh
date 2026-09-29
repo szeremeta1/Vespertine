@@ -31,12 +31,16 @@ gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/nu
 /usr/bin/python3 - "$notes" "$feed/Vespertine-$version.html" <<'PY'
 import html, re, sys
 lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
-out, in_list, in_code = [], False, False
+out, depth, in_code = [], 0, False   # depth = open <ul> levels (bullets indented by 2 spaces nest)
 def inline(t):
     t = html.escape(t)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    t = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<i>\1</i>", t)
     t = re.sub(r"`(.+?)`", r"<code>\1</code>", t)
     return re.sub(r"\[(.+?)\]\((.+?)\)", r'<a href="\2">\1</a>', t)
+def close_to(level):
+    global depth
+    while depth > level: out.append("</ul>"); depth -= 1
 for line in lines:
     if line.startswith("```"):
         in_code = not in_code
@@ -44,13 +48,16 @@ for line in lines:
         continue
     if in_code:
         out.append(html.escape(line)); continue
-    if line.startswith("- "):
-        if not in_list: out.append("<ul>"); in_list = True
-        out.append(f"<li>{inline(line[2:])}</li>"); continue
-    if in_list: out.append("</ul>"); in_list = False
+    m = re.match(r"^( *)- (.*)$", line)
+    if m:
+        level = len(m.group(1)) // 2 + 1
+        close_to(level)
+        while depth < level: out.append("<ul>"); depth += 1
+        out.append(f"<li>{inline(m.group(2))}</li>"); continue
+    close_to(0)
     if line.startswith("### "): out.append(f"<h3>{inline(line[4:])}</h3>")
     elif line.strip(): out.append(f"<p>{inline(line)}</p>")
-if in_list: out.append("</ul>")
+close_to(0)
 open(sys.argv[2], "w", encoding="utf-8").write(
     "<!doctype html><meta charset=utf-8><style>body{font:13px -apple-system;}code{font:12px ui-monospace}</style>\n"
     + "\n".join(out))
@@ -65,6 +72,8 @@ first_vespertine_build=27
   --link "https://github.com/$repo/releases/latest" --embed-release-notes --maximum-deltas 0 \
   --informational-update-versions "<$first_vespertine_build" \
   -o "$feed/appcast.xml" "$feed"
+# The channel title was carried over from the feed's Nocturne days.
+/usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
 grep -q "sparkle:edSignature" "$feed/appcast.xml" || { print -u2 "appcast entry is not EdDSA-signed"; exit 1; }
 
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
