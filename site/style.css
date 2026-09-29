@@ -175,4 +175,4 @@ footer a { color: var(--text2); }
 @media (max-width: 560px) { .doc { padding: 48px 16px 72px; } }
 
 /* Keep signal-path terms like BIT-PERFECT on one line. */
-.mono { white-space: nowrap; }
+.lede .mono, .faq .mono { white-space: nowrap; }
