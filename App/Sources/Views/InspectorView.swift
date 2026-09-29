@@ -1,11 +1,11 @@
 //
-// Nocturne — inspector: Now Playing + signal path, metadata editor, file analysis.
+// Vespertine — inspector: Now Playing + signal path, metadata editor, file analysis.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -106,8 +106,8 @@ struct NowPlayingPanel: View {
         }
         .scrollContentBackground(.hidden)
         .task(id: player.signalPath != nil) {
-            // QA: `-NocturneScrollInspector YES` scrolls to the meters for snapshots.
-            guard player.signalPath != nil, UserDefaults.standard.bool(forKey: "NocturneScrollInspector") else { return }
+            // QA: `-VespertineScrollInspector YES` scrolls to the meters for snapshots.
+            guard player.signalPath != nil, UserDefaults.standard.bool(forKey: "VespertineScrollInspector") else { return }
             try? await Task.sleep(for: .milliseconds(300))
             scroller.scrollTo("spectrum", anchor: .bottom)
         }
@@ -294,14 +294,14 @@ struct SystemRenderingView: View {
                 .init(title: rendering.spatial ? "Spatial Audio" : "Output",
                       detail: rendering.spatial ? "Head tracking and personalized profile as set in Control Center" : "The output's own speaker layout",
                       value: rendering.spatial ? "on" : "channels", tone: rendering.spatial ? .changed : .plain),
-                .init(title: device ?? "Output", detail: "Frames go to macOS untouched; Nocturne's meters don't apply", value: "system"),
+                .init(title: device ?? "Output", detail: "Frames go to macOS untouched; Vespertine's meters don't apply", value: "system"),
             ])
             .padding(.top, 14)
         }
     }
 }
 
-/// Live level of every channel Nocturne sends, labelled by speaker, plus where they go.
+/// Live level of every channel Vespertine sends, labelled by speaker, plus where they go.
 struct ChannelMetersView: View {
     let path: SignalPath
     let levels: [Float]
@@ -411,7 +411,7 @@ struct IdleDevicePanel: View {
                     SpeakerSetupHint(configured: !d.speakerNames.isEmpty)
                 }
             }
-            Text("Choose something to play. Nocturne will switch this device to each file's native format.")
+            Text("Choose something to play. Vespertine will switch this device to each file's native format.")
                 .font(Typeface.ui(12)).foregroundStyle(Palette.text3).padding(.top, 8)
         }
     }
@@ -518,7 +518,7 @@ struct AnalysisPanel: View {
         .onChange(of: playing?.id) { pinned = nil }
         .task(id: "\(track?.id ?? -1)-\(model.analysis.revision)") {
             stored = track.flatMap { model.library.storedAnalysis(for: $0) }
-            if UserDefaults.standard.bool(forKey: "NocturneRunAnalysis"), let track, stored?.isCurrent != true,
+            if UserDefaults.standard.bool(forKey: "VespertineRunAnalysis"), let track, stored?.isCurrent != true,
                !model.analysis.isAnalyzing(track) { model.analysis.analyzeNow([track]) }
         }
     }

@@ -1,8 +1,8 @@
 import AVFAudio
 import Foundation
-import NocturneLibrary
+import VespertineLibrary
 import Testing
-@testable import Nocturne
+@testable import Vespertine
 
 /// A suite named by absolute path keeps its plist in `dir`. Named suites leak into `defaults domains`:
 /// cfprefsd rewrites an empty ~/Library/Preferences/<suite>.plist seconds after `removePersistentDomain`.
@@ -20,7 +20,7 @@ struct AppAuditTests {
         #expect(RateChoice(code: "fixed:96000") == .fixed(96000))
     }
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-app-audit-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let url = root.appendingPathComponent("sample.wav")
@@ -59,17 +59,17 @@ struct AppAuditTests {
         player.stop()
     }
     @Test func recoveryDirectoryOverridesLaunchArgument() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-recovery-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-recovery-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
-        defaults.set("/bad/library", forKey: "NocturneDataDirectory")
+        defaults.set("/bad/library", forKey: "VespertineDataDirectory")
         let chosen = URL(fileURLWithPath: "/chosen/library")
         #expect(AppSettings(defaults: defaults, dataDirectory: chosen).dataDirectory == chosen)
     }
     @Test func corruptDatabaseProducesRecoverableError() throws {
-        let root = FileManager.default.temporaryDirectory.appendingPathComponent("nocturne-corrupt-\(UUID())")
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-corrupt-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let data = Data("This is not SQLite".utf8)

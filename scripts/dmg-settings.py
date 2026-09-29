@@ -1,6 +1,6 @@
-# dmgbuild layout for Nocturne's installer disk image.
+# dmgbuild layout for Vespertine's installer disk image.
 # Coordinates must match scripts/make-dmg-background.swift (window 660×420 pt, icon centres).
-#   dmgbuild -s scripts/dmg-settings.py -D app=<path/Nocturne.app> -D background=<dir/background.png> "Nocturne X" out.dmg
+#   dmgbuild -s scripts/dmg-settings.py -D app=<path/Vespertine.app> -D background=<dir/background.png> "Vespertine X" out.dmg
 import os
 
 app = defines["app"]            # noqa: F821  (injected by dmgbuild)
@@ -11,7 +11,7 @@ filesystem = "APFS"
 compression_level = 9
 files = [app]
 symlinks = {"Applications": "/Applications"}
-hide_extensions = ["Nocturne.app"]
+hide_extensions = ["Vespertine.app"]
 
 # Finder window
 background = background

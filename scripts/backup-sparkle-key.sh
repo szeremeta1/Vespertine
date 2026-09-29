@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Backs up Nocturne's Sparkle EdDSA update-signing key (keychain account "nocturne")
+# Backs up Vespertine's Sparkle EdDSA update-signing key (keychain account "nocturne", kept from before the rename)
 # into an AES-256 encrypted disk image, copied to iCloud Drive and ~/Documents.
 # You choose the image password interactively; the plaintext key only ever exists
 # in a private temporary folder that is removed afterwards.
@@ -15,8 +15,8 @@ public=$("$tools/generate_keys" --account nocturne -p)
 
 stamp=$(date +%Y-%m-%d)
 image="Nocturne-Sparkle-Key-$stamp.dmg"
-icloud="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Nocturne Backups"
-local_copy="$HOME/Documents/Nocturne Backups"
+icloud="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Vespertine Backups"
+local_copy="$HOME/Documents/Vespertine Backups"
 
 work=$(mktemp -d)
 chmod 700 "$work"
@@ -25,7 +25,7 @@ mkdir "$work/payload"
 
 "$tools/generate_keys" --account nocturne -x "$work/payload/nocturne-sparkle-private-key.txt"
 cat > "$work/payload/README.txt" <<EOF
-Nocturne — Sparkle EdDSA update-signing key
+Vespertine — Sparkle EdDSA update-signing key
 Backed up: $stamp
 Keychain account: nocturne
 Public key (must match SUPublicEDKey in project.yml): $public
@@ -34,7 +34,7 @@ Restore:
   generate_keys --account nocturne -f nocturne-sparkle-private-key.txt
 (generate_keys ships with Sparkle: build/DDR/SourcePackages/artifacts/sparkle/Sparkle/bin/)
 
-Anyone with this key can sign updates that installed copies of Nocturne will accept.
+Anyone with this key can sign updates that installed copies of Vespertine will accept.
 Keep this image and its password private.
 EOF
 

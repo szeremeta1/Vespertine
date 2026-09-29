@@ -1,12 +1,12 @@
 //
-// Nocturne — background file analysis: one pass per file, a couple at a time, results saved to the library.
-// Shares whose server runs `nocturne-analyze` get their results from the server's index instead.
+// Vespertine — background file analysis: one pass per file, a couple at a time, results saved to the library.
+// Shares whose server runs `vespertine-analyze` get their results from the server's index instead.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import Foundation
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import Observation
 
 @Observable
@@ -33,7 +33,7 @@ final class AnalysisQueue {
     /// Called with each share's server status after a sync (the app rescans when the server ran after our last scan).
     var onServerStatus: @MainActor (Int64, ServerAnalysisStatus) -> Void = { _, _ in }
 
-    /// Network sources whose server publishes analysis results (`.nocturne/analysis.jsonl`).
+    /// Network sources whose server publishes analysis results (`.vespertine/analysis.jsonl`).
     private(set) var serverIndexed: Set<Int64> = []
     /// The server's own progress, per source.
     private(set) var serverStatus: [Int64: ServerAnalysisStatus] = [:]

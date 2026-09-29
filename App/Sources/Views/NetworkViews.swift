@@ -1,9 +1,9 @@
 //
-// Nocturne — connecting to network shares, and the Network settings tab.
+// Vespertine — connecting to network shares, and the Network settings tab.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 // MARK: - Connect to Server
@@ -12,7 +12,7 @@ struct ConnectServerSheet: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
 
-    @State private var address = UserDefaults.standard.string(forKey: "NocturneConnectAddress") ?? ""
+    @State private var address = UserDefaults.standard.string(forKey: "VespertineConnectAddress") ?? ""
     @State private var asGuest = false
     @State private var user = ""
     @State private var password = ""
@@ -44,7 +44,7 @@ struct ConnectServerSheet: View {
                     .frame(width: 34)
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Connect to a Server").font(Typeface.serif(24)).foregroundStyle(Palette.text)
-                    Text("Play music from a NAS, a file server or another Mac, at home or from anywhere over Tailscale or a VPN. Nocturne keeps the share connected and indexes it in the background.")
+                    Text("Play music from a NAS, a file server or another Mac, at home or from anywhere over Tailscale or a VPN. Vespertine keeps the share connected and indexes it in the background.")
                         .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -57,7 +57,7 @@ struct ConnectServerSheet: View {
                     TextField("Server address", text: $address, prompt: Text("smb://server/share/folder"))
                         .textContentType(.URL)
                         .onSubmit(connect)
-                    Text("Also accepts \\\\server\\share, nfs://server/export and https://server/path (WebDAV). A folder after the share name limits Nocturne to that folder.")
+                    Text("Also accepts \\\\server\\share, nfs://server/export and https://server/path (WebDAV). A folder after the share name limits Vespertine to that folder.")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if share?.kind != .nfs {
@@ -80,7 +80,7 @@ struct ConnectServerSheet: View {
                     TextField("Name in library", text: $name, prompt: Text(share?.defaultName ?? "Optional"))
                     Toggle("Read-only (recommended)", isOn: $readOnly)
                     Text(readOnly
-                         ? "Nocturne never changes files on the share. Tag edits stay in the library."
+                         ? "Vespertine never changes files on the share. Tag edits stay in the library."
                          : "Tag edits are written to the files on the server.")
                         .font(.caption).foregroundStyle(.secondary)
                 }

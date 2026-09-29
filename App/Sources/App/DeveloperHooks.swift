@@ -1,43 +1,43 @@
 //
-// Nocturne — launch-argument hooks for reproducible visual QA and screenshots.
+// Vespertine — launch-argument hooks for reproducible visual QA and screenshots.
 // None of these run unless the argument is passed, e.g.:
-//   Nocturne.app/Contents/MacOS/Nocturne -NocturneDataDirectory /tmp/lib -NocturneAddSource ~/Demo \
-//       -NocturneOpenAlbum "Horizon Line" -NocturnePlayAlbum "Horizon Line" -NocturnePlayTrack 2 -NocturnePauseAfter 4
+//   Vespertine.app/Contents/MacOS/Vespertine -VespertineDataDirectory /tmp/lib -VespertineAddSource ~/Demo \
+//       -VespertineOpenAlbum "Horizon Line" -VespertinePlayAlbum "Horizon Line" -VespertinePlayTrack 2 -VespertinePauseAfter 4
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
 import Foundation
-import NocturneLibrary
+import VespertineLibrary
 import SwiftUI
 
 @MainActor
 enum DeveloperHooks {
     static func run(_ model: AppModel, openWindow: OpenWindowAction?) async {
         let d = UserDefaults.standard
-        let open = d.string(forKey: "NocturneOpenAlbum")
-        let play = d.string(forKey: "NocturnePlayAlbum")
-        if let address = d.string(forKey: "NocturneAddShare") {
+        let open = d.string(forKey: "VespertineOpenAlbum")
+        let play = d.string(forKey: "VespertinePlayAlbum")
+        if let address = d.string(forKey: "VespertineAddShare") {
             // Adds a network share using the keychain's saved password (never one passed on the command line).
             Task {
                 guard let share = NetworkShare(string: address) else { print("[qa] add share: invalid address"); return }
                 do {
-                    try await model.shares.add(share, password: nil, remember: false, name: d.string(forKey: "NocturneShareName"), writable: false)
+                    try await model.shares.add(share, password: nil, remember: false, name: d.string(forKey: "VespertineShareName"), writable: false)
                     print("[qa] add share: ok")
                 } catch {
                     print("[qa] add share failed: \(error.localizedDescription)")
                 }
             }
         }
-        if d.bool(forKey: "NocturneOpenSettings") {
+        if d.bool(forKey: "VespertineOpenSettings") {
             NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         }
-        if let path = d.string(forKey: "NocturneSnapshot") {
-            Task { await snapshotLoop(to: path, delay: d.double(forKey: "NocturneSnapshotDelay"), repeats: max(1, d.integer(forKey: "NocturneSnapshotCount"))) }
+        if let path = d.string(forKey: "VespertineSnapshot") {
+            Task { await snapshotLoop(to: path, delay: d.double(forKey: "VespertineSnapshotDelay"), repeats: max(1, d.integer(forKey: "VespertineSnapshotCount"))) }
         }
-        guard open != nil || play != nil || d.object(forKey: "NocturneInspectorTab") != nil || d.bool(forKey: "NocturneOpenMini")
-                || d.string(forKey: "NocturneFormatFilter") != nil || d.string(forKey: "NocturneSidebar") != nil
-                || d.string(forKey: "NocturneOpenSheet") != nil else { return }
+        guard open != nil || play != nil || d.object(forKey: "VespertineInspectorTab") != nil || d.bool(forKey: "VespertineOpenMini")
+                || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
+                || d.string(forKey: "VespertineOpenSheet") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -45,7 +45,7 @@ enum DeveloperHooks {
             if wanted == nil || model.library.albums.contains(where: { $0.title == wanted }) { break }
             try? await Task.sleep(for: .milliseconds(250))
         }
-        if let sidebar = d.string(forKey: "NocturneSidebar") {
+        if let sidebar = d.string(forKey: "VespertineSidebar") {
             switch sidebar {
             case "artists": model.sidebar = .artists
             case "songs": model.sidebar = .songs
@@ -54,36 +54,36 @@ enum DeveloperHooks {
             default: if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
             }
         }
-        if d.object(forKey: "NocturneShowInspector") != nil { model.showInspector = d.bool(forKey: "NocturneShowInspector") }
+        if d.object(forKey: "VespertineShowInspector") != nil { model.showInspector = d.bool(forKey: "VespertineShowInspector") }
         if let open, let album = model.library.albums.first(where: { $0.title == open }) {
             model.openAlbum(album.key)
         }
-        if d.bool(forKey: "NocturneOpenMini") { openWindow?(id: "mini") }
+        if d.bool(forKey: "VespertineOpenMini") { openWindow?(id: "mini") }
         if let play, let album = model.library.albums.first(where: { $0.title == play }) {
             let tracks = model.library.tracks(albumKey: album.key)
-            model.player.play(tracks, startAt: d.integer(forKey: "NocturnePlayTrack"))
-            if d.double(forKey: "NocturnePauseAfter") > 0 {
-                try? await Task.sleep(for: .seconds(d.double(forKey: "NocturnePauseAfter")))
+            model.player.play(tracks, startAt: d.integer(forKey: "VespertinePlayTrack"))
+            if d.double(forKey: "VespertinePauseAfter") > 0 {
+                try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
                 model.player.engine.pause()
             }
         }
-        if let select = d.string(forKey: "NocturneSelectTracks"), let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {
+        if let select = d.string(forKey: "VespertineSelectTracks"), let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {
             // "1,3,4" = track numbers within the album
             let numbers = Set(select.split(separator: ",").compactMap { Int($0) })
             let tracks = model.library.tracks(albumKey: album.key).filter { select == "all" || numbers.contains($0.trackNumber ?? -1) }
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
         }
-        if let tab = d.string(forKey: "NocturneInspectorTab") {
+        if let tab = d.string(forKey: "VespertineInspectorTab") {
             model.inspectorTab = InspectorTab.allCases.first { $0.rawValue.lowercased().hasPrefix(tab.lowercased()) } ?? .nowPlaying
         }
-        if let query = d.string(forKey: "NocturneSearch") { model.searchText = query }
-        if let genre = d.string(forKey: "NocturneGenreFilter") { model.library.genreFilter = Genres.key(genre) }
-        // `-NocturneCycleDevices "FiiO|AirPods" -NocturneCycleEvery 6 -NocturneCycleCount 8`: switch outputs the way
-        // the picker does, on a timer, to reproduce switching problems (see the org.nocturne.player log).
-        if let cycle = d.string(forKey: "NocturneCycleDevices") {
+        if let query = d.string(forKey: "VespertineSearch") { model.searchText = query }
+        if let genre = d.string(forKey: "VespertineGenreFilter") { model.library.genreFilter = Genres.key(genre) }
+        // `-VespertineCycleDevices "FiiO|AirPods" -VespertineCycleEvery 6 -VespertineCycleCount 8`: switch outputs the way
+        // the picker does, on a timer, to reproduce switching problems (see the org.szeremeta.vespertine.player log).
+        if let cycle = d.string(forKey: "VespertineCycleDevices") {
             let names = cycle.split(separator: "|").map(String.init)
-            let every = max(1, d.double(forKey: "NocturneCycleEvery") == 0 ? 6 : d.double(forKey: "NocturneCycleEvery"))
-            let count = d.integer(forKey: "NocturneCycleCount") == 0 ? 8 : d.integer(forKey: "NocturneCycleCount")
+            let every = max(1, d.double(forKey: "VespertineCycleEvery") == 0 ? 6 : d.double(forKey: "VespertineCycleEvery"))
+            let count = d.integer(forKey: "VespertineCycleCount") == 0 ? 8 : d.integer(forKey: "VespertineCycleCount")
             Task {
                 for i in 0..<count {
                     try? await Task.sleep(for: .seconds(every))
@@ -94,8 +94,8 @@ enum DeveloperHooks {
                 }
             }
         }
-        if let format = d.string(forKey: "NocturneFormatFilter"), let filter = FormatFilter(rawValue: format) { model.library.formatFilter = filter }
-        switch d.string(forKey: "NocturneOpenSheet") {
+        if let format = d.string(forKey: "VespertineFormatFilter"), let filter = FormatFilter(rawValue: format) { model.library.formatFilter = filter }
+        switch d.string(forKey: "VespertineOpenSheet") {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []
         case "connectServer": model.showConnectServer = true
@@ -123,6 +123,6 @@ enum DeveloperHooks {
             }
         }
         print("[qa] snapshot done")
-        if UserDefaults.standard.bool(forKey: "NocturneQuitAfterSnapshot") { NSApp.terminate(nil) }
+        if UserDefaults.standard.bool(forKey: "VespertineQuitAfterSnapshot") { NSApp.terminate(nil) }
     }
 }

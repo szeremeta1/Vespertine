@@ -14,14 +14,14 @@ build/
 *.xcodeproj/
 *.xcworkspace/xcuserdata/
 xcuserdata/
-Packages/NocturneKit/Package.resolved.bak
+Packages/VespertineKit/Package.resolved.bak
 
 # Secrets and local settings (never commit keys, tokens or passwords)
 .env
 .env.*
 *.p12
 *.p8
-nocturne-sparkle-key.txt
+vespertine-sparkle-key.txt
 .claude/settings.local.json
 
 # Maintainer and agent notes (machine-specific or private; kept local on purpose)
@@ -29,3 +29,5 @@ CLAUDE.md
 CLAUDE.local.md
 AGENTS.md
 PROMOTION.md
+nocturne-sparkle-key.txt
+*sparkle-private-key*

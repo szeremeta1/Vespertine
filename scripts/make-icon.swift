@@ -1,4 +1,4 @@
-// Draws the Nocturne app icon (obsidian field, brass crescent, waveform) at every macOS size.
+// Draws the Vespertine app icon (obsidian field, brass crescent, waveform) at every macOS size.
 // Usage: swift scripts/make-icon.swift App/Resources/Assets.xcassets/AppIcon.appiconset
 import AppKit
 

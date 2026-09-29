@@ -1,11 +1,11 @@
 //
-// Nocturne — exporting multichannel music for Spatial Audio listening elsewhere.
+// Vespertine — exporting multichannel music for Spatial Audio listening elsewhere.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 
 struct SpatialExportSheet: View {
@@ -15,7 +15,7 @@ struct SpatialExportSheet: View {
 
     @State private var kind: MultichannelExport.Kind = .spatialStereo
     @State private var folder = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
-        .appendingPathComponent("Nocturne Spatial", isDirectory: true)
+        .appendingPathComponent("Vespertine Spatial", isDirectory: true)
     @State private var running = false
     @State private var current = 0
     @State private var fraction = 0.0

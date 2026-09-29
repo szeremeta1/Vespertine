@@ -50,7 +50,7 @@ func render(scale: CGFloat) -> Data {
     }
 
     // Wordmark.
-    drawText("Nocturne", font(30, .regular, design: .serif), ivory, centerX: W / 2, top: 38)
+    drawText("Vespertine", font(30, .regular, design: .serif), ivory, centerX: W / 2, top: 38)
     drawText("HI-RES AUDIO PLAYER", font(9.5, .semibold, design: .monospaced), brass, centerX: W / 2, top: 80, kern: 2.6)
 
     // Stages: soft spotlight under each icon (no strokes, so nothing collides with Finder's labels).
@@ -98,7 +98,7 @@ func render(scale: CGFloat) -> Data {
     ctx.restoreGState()
 
     // Instructions and provenance.
-    drawText("Drag Nocturne into Applications to install", font(12.5, .regular), text2, centerX: W / 2, top: 336)
+    drawText("Drag Vespertine into Applications to install", font(12.5, .regular), text2, centerX: W / 2, top: 336)
     drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, .medium, design: .monospaced), text3, centerX: W / 2, top: 362, kern: 1.4)
 
     // Hairline frame.

@@ -1,10 +1,10 @@
 //
-// Nocturne — transport bar, output device picker, queue.
+// Vespertine — transport bar, output device picker, queue.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 
 struct TransportBar: View {
@@ -317,7 +317,7 @@ struct VolumeControl: View {
                 Text("DIG").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper).help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
             } else {
                 Text("FIXED · USE DAC").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3)
-                    .help("This device has no volume control Nocturne can use. Adjust volume on your DAC or amplifier, or enable digital volume in Settings.")
+                    .help("This device has no volume control Vespertine can use. Adjust volume on your DAC or amplifier, or enable digital volume in Settings.")
             }
         }
     }

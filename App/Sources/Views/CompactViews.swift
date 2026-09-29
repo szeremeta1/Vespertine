@@ -1,11 +1,11 @@
 //
-// Nocturne — mini player, menu bar extra, settings.
+// Vespertine — mini player, menu bar extra, settings.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import AppKit
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import SwiftUI
 
 // MARK: - Mini player
@@ -98,7 +98,7 @@ struct MenuBarView: View {
                 ArtworkView(key: player.current?.track.artworkKey, size: 160, cornerRadius: 6).frame(width: 64, height: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).lineLimit(1)
-                    Text(player.current.map { "\($0.track.displayArtist) — \($0.track.displayAlbum)" } ?? "Nocturne")
+                    Text(player.current.map { "\($0.track.displayArtist) — \($0.track.displayAlbum)" } ?? "Vespertine")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
                         Text(player.buffering ? "BUFFERING…" : "\(path.statusLine) · \(path.deviceFormatShort)").font(Typeface.mono(9.5))
@@ -113,7 +113,7 @@ struct MenuBarView: View {
                 .padding(-12)
             Hairline()
             HStack {
-                Button("Open Nocturne") {
+                Button("Open Vespertine") {
                     NSApp.activate()
                     openWindow(id: "main")
                 }
@@ -154,8 +154,8 @@ struct PlaybackSettings: View {
             Section("Output") {
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
                 Text(s.exclusiveMode
-                     ? "Nocturne takes sole control of the device; other apps are silent on it while Nocturne plays. macOS then won't let it be the Mac's sound output, so volume keys and the AirPods Max Digital Crown adjust a different device."
-                     : "Off: Nocturne still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
+                     ? "Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so volume keys and the AirPods Max Digital Crown adjust a different device."
+                     : "Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Integer mode", isOn: $s.integerMode)
                     .disabled(!s.exclusiveMode)
@@ -168,20 +168,20 @@ struct PlaybackSettings: View {
                     Text("10 minutes").tag(600.0)
                 }
                 .disabled(!s.exclusiveMode)
-                Picker("When Nocturne quits, set the device to", selection: $s.deviceOnQuit) {
+                Picker("When Vespertine quits, set the device to", selection: $s.deviceOnQuit) {
                     ForEach(DeviceOnQuit.allCases) { Text($0.label).tag($0) }
                 }
-                Text("\u{201C}Put it back as it was\u{201D} restores each device Nocturne switched to the sample rate and bit depth it had before, so other apps (and tools like LosslessSwitcher) take over from where they left off.")
+                Text("\u{201C}Put it back as it was\u{201D} restores each device Vespertine switched to the sample rate and bit depth it had before, so other apps (and tools like LosslessSwitcher) take over from where they left off.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
                     Text("Rendered by macOS (objects)").tag(true)
-                    Text("Channel bed through Nocturne").tag(false)
+                    Text("Channel bed through Vespertine").tag(false)
                 }
                 Text(s.atmosBySystem
-                     ? "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Nocturne's own signal path and meters don't apply to these tracks."
-                     : "Nocturne decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio.")
+                     ? "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path and meters don't apply to these tracks."
+                     : "Vespertine decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio.")
                     .font(.caption).foregroundStyle(.secondary)
                 Picker("Stereo and surround versions", selection: $s.versionPreference) {
                     Text("Match the output").tag(TrackVersions.Preference.matchOutput)
@@ -193,12 +193,12 @@ struct PlaybackSettings: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {
-                Toggle("Mac sound output follows Nocturne while playing", isOn: $s.systemOutputFollowsPlayback)
+                Toggle("Mac sound output follows Vespertine while playing", isOn: $s.systemOutputFollowsPlayback)
                     .disabled(s.exclusiveMode)
-                Text("Volume keys and headphone controls, such as the AirPods Max Digital Crown, act on the Mac's sound output. With this on, they adjust the device Nocturne is playing to instead of another one selected in Control Center.")
+                Text("Volume keys and headphone controls, such as the AirPods Max Digital Crown, act on the Mac's sound output. With this on, they adjust the device Vespertine is playing to instead of another one selected in Control Center.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Allow digital volume when the device has no hardware control", isOn: $s.allowDigitalVolume)
-                Text("Applied in 64-bit with TPDF dither at the DAC's word length. At anything below 100% the output is no longer bit-perfect, and Nocturne says so.")
+                Text("Applied in 64-bit with TPDF dither at the DAC's word length. At anything below 100% the output is no longer bit-perfect, and Vespertine says so.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("ReplayGain") {
@@ -285,7 +285,7 @@ struct LibrarySettings: View {
             } header: {
                 Text("Analysis")
             } footer: {
-                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full, except shares whose server runs nocturne-analyze: their results come from the server, without reading the music over the network.")
+                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full, except shares whose server runs vespertine-analyze: their results come from the server, without reading the music over the network.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Library data") {
@@ -358,7 +358,7 @@ struct UpdateSettings: View {
                         Text("Last checked \(last.formatted(.relative(presentation: .named)))").font(.caption).foregroundStyle(.secondary)
                     }
                 }
-                Text("Updates come from Nocturne's GitHub releases. Each one is signed by the developer and verified before it is installed.")
+                Text("Updates come from Vespertine's GitHub releases. Each one is signed by the developer and verified before it is installed.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -370,7 +370,7 @@ struct AboutSettings: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 96, height: 96)
-            Text("Nocturne").font(Typeface.serif(28))
+            Text("Vespertine").font(Typeface.serif(28))
             Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")")
                 .font(Typeface.mono(11)).foregroundStyle(.secondary)
             Text("Free software under the GNU General Public License v3.\nDecoding by SFBAudioEngine (MIT), libFLAC, WavPack, Monkey's Audio, libopus, libvorbis, mpg123, TagLib.\nDatabase by GRDB (MIT).")

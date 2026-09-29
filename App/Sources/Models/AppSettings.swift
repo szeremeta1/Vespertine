@@ -1,11 +1,11 @@
 //
-// Nocturne — user preferences (UserDefaults-backed).
+// Vespertine — user preferences (UserDefaults-backed).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import Foundation
-import NocturneAudio
-import NocturneLibrary
+import VespertineAudio
+import VespertineLibrary
 import Observation
 
 enum ReplayGainMode: String, CaseIterable, Identifiable {
@@ -50,7 +50,7 @@ final class AppSettings {
     var exclusiveMode: Bool { didSet { defaults.set(exclusiveMode, forKey: "exclusiveMode") } }
     /// Integer mode (exclusive access only): PCM needing no processing goes to the DAC as 32-bit integers.
     var integerMode: Bool { didSet { defaults.set(integerMode, forKey: "integerMode") } }
-    /// Dolby Atmos: rendered by macOS (objects), or its channel bed played through Nocturne.
+    /// Dolby Atmos: rendered by macOS (objects), or its channel bed played through Vespertine.
     var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
     /// Songs with a stereo and a multichannel version: which to play.
     var versionPreference: TrackVersions.Preference { didSet { defaults.set(versionPreference.rawValue, forKey: "versionPreference") } }
@@ -78,10 +78,10 @@ final class AppSettings {
     /// Keep local copies of what plays from network shares (and the next few tracks).
     var networkCache: Bool { didSet { defaults.set(networkCache, forKey: "networkCache") } }
     var networkCacheLimitGB: Double { didSet { defaults.set(networkCacheLimitGB, forKey: "networkCacheLimitGB") } }
-    /// While playing, make the Mac's sound output follow Nocturne's device, so volume keys and
+    /// While playing, make the Mac's sound output follow Vespertine's device, so volume keys and
     /// headphone controls (e.g. the AirPods Max Digital Crown) adjust what you're listening to.
     var systemOutputFollowsPlayback: Bool { didSet { defaults.set(systemOutputFollowsPlayback, forKey: "systemOutputFollowsPlayback") } }
-    /// What happens to devices Nocturne changed when it quits.
+    /// What happens to devices Vespertine changed when it quits.
     var deviceOnQuit: DeviceOnQuit { didSet { defaults.set(deviceOnQuit.rawValue, forKey: "deviceOnQuit") } }
     /// Analyze new and changed music in the background after it's added.
     var autoAnalyze: Bool { didSet { defaults.set(autoAnalyze, forKey: "autoAnalyze") } }
@@ -90,7 +90,7 @@ final class AppSettings {
     /// Upcoming tracks copied ahead of playback when the cache is on.
     var networkPrefetch: Int { didSet { defaults.set(networkPrefetch, forKey: "networkPrefetch") } }
 
-    /// Library location. Overridable with `-NocturneDataDirectory <path>` for testing.
+    /// Library location. Overridable with `-VespertineDataDirectory <path>` for testing.
     let dataDirectory: URL
 
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
@@ -118,7 +118,7 @@ final class AppSettings {
         digitalVolume = defaults.double(forKey: "digitalVolume")
         defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .reference
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
-        managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Nocturne").path
+        managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
         watchFolders = defaults.bool(forKey: "watchFolders")
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
@@ -134,13 +134,13 @@ final class AppSettings {
 
         if let dataDirectory {
             self.dataDirectory = dataDirectory
-        } else if let override = defaults.string(forKey: "NocturneDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
+        } else if let override = defaults.string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
             self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
         } else {
             let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
             // Development builds keep their own library beside the real one.
             self.dataDirectory = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
-                ? standard.deletingLastPathComponent().appendingPathComponent("Nocturne Dev", isDirectory: true) : standard
+                ? standard.deletingLastPathComponent().appendingPathComponent("Vespertine Dev", isDirectory: true) : standard
         }
     }
 

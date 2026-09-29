@@ -1,25 +1,26 @@
 #!/bin/zsh
-# Builds a Release Nocturne.app and signs it (and every embedded framework) with a Developer ID.
+# Builds a Release Vespertine.app and signs it (and every embedded framework) with a Developer ID.
 #
 #   scripts/release.sh [--notarize] [--install]
 #
 #   --notarize  submits the app to Apple's notary service, staples the ticket, then builds,
-#               signs, notarizes and staples build/Release/Nocturne-<version>.dmg for distribution.
+#               signs, notarizes and staples build/Release/Vespertine-<version>.dmg for distribution.
 #   --install   copies the (stapled) app to /Applications.
 #   --resume    skips the build and continues a notarization that timed out (uses <out>/.notary-id).
 #
 # Environment:
-#   NOCTURNE_SIGN_IDENTITY   identity name or SHA-1 (default: "Developer ID Application");
+#   VESPERTINE_SIGN_IDENTITY   identity name or SHA-1 (default: "Developer ID Application"; name the exact one when the
+#                            keychain holds more than one Developer ID);
 #                            "-" makes a local-only ad-hoc build (no hardened runtime, runs on this Mac only)
-#   NOCTURNE_OUT / NOCTURNE_DERIVED     output and derived-data folders (default build/Release, build/DDR)
-#   NOCTURNE_VERSION / NOCTURNE_BUILD   override marketing version / build number (e.g. for update tests)
-#   NOCTURNE_NOTARY_PROFILE  notarytool keychain profile (default: nocturne-notary), created once with:
-#                            xcrun notarytool store-credentials nocturne-notary --apple-id <you@example.com> --team-id 36XY8752RX
-#   NOCTURNE_SIGN_KEYCHAIN   keychain holding it (default: search list), e.g. ~/Library/Keychains/old-mac-login.keychain-db
+#   VESPERTINE_OUT / VESPERTINE_DERIVED     output and derived-data folders (default build/Release, build/DDR)
+#   VESPERTINE_VERSION / VESPERTINE_BUILD   override marketing version / build number (e.g. for update tests)
+#   VESPERTINE_NOTARY_PROFILE  notarytool keychain profile (default: vespertine-notary), created once with:
+#                            xcrun notarytool store-credentials vespertine-notary --apple-id <you@example.com> --team-id <your Developer ID team ID>
+#   VESPERTINE_SIGN_KEYCHAIN   keychain holding it (default: search list), e.g. ~/Library/Keychains/old-mac-login.keychain-db
 set -euo pipefail
 cd "$(dirname $0)/.."
-identity=${NOCTURNE_SIGN_IDENTITY:-"Developer ID Application"}
-profile=${NOCTURNE_NOTARY_PROFILE:-nocturne-notary}
+identity=${VESPERTINE_SIGN_IDENTITY:-"Developer ID Application"}
+profile=${VESPERTINE_NOTARY_PROFILE:-vespertine-notary}
 notarize=false; install=false; resume=false
 for arg in "$@"; do
   case $arg in
@@ -30,8 +31,8 @@ for arg in "$@"; do
   esac
 done
 if $notarize && [[ $identity == "-" ]]; then print -u2 "Notarization needs a Developer ID identity."; exit 2; fi
-out=${NOCTURNE_OUT:-build/Release}
-derived=${NOCTURNE_DERIVED:-build/DDR}
+out=${VESPERTINE_OUT:-build/Release}
+derived=${VESPERTINE_DERIVED:-build/DDR}
 # Refuse destructive output roots before building or removing anything.
 resolved_out=${out:A}
 resolved_project=${PWD:A}
@@ -42,9 +43,9 @@ if [[ $resolved_project == $resolved_out/* ]]; then
   print -u2 "Release output must not contain the project: $out"; exit 2
 fi
 mkdir -p "${out:h}"
-keychain=(); [[ -n ${NOCTURNE_SIGN_KEYCHAIN:-} ]] && keychain=(--keychain "$NOCTURNE_SIGN_KEYCHAIN")
+keychain=(); [[ -n ${VESPERTINE_SIGN_KEYCHAIN:-} ]] && keychain=(--keychain "$VESPERTINE_SIGN_KEYCHAIN")
 
-app="$out/Nocturne.app"
+app="$out/Vespertine.app"
 
 # Designed installer window (layout in scripts/dmg-settings.py, artwork in scripts/make-dmg-background.swift).
 make_dmg() {
@@ -54,7 +55,7 @@ make_dmg() {
   swift scripts/make-dmg-background.swift "$version" "$art" >/dev/null
   rm -f "$dest"
   if ! build/.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$app" -D background="$art/background.png" \
-      "Nocturne $version" "$dest" > "$out/dmgbuild.log" 2>&1; then
+      "Vespertine $version" "$dest" > "$out/dmgbuild.log" 2>&1; then
     cat "$out/dmgbuild.log" >&2
     print -u2 "dmgbuild failed"; exit 1
   fi
@@ -73,15 +74,15 @@ sign_sparkle() {
 
 if ! $resume; then
   xcodegen generate >/dev/null
-  xcodebuild -project Nocturne.xcodeproj -scheme Nocturne -configuration Release -derivedDataPath "$derived" \
+  xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -derivedDataPath "$derived" \
     -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY=- \
-    ${NOCTURNE_VERSION:+MARKETING_VERSION=$NOCTURNE_VERSION} ${NOCTURNE_BUILD:+CURRENT_PROJECT_VERSION=$NOCTURNE_BUILD} build > "$out".log 2>&1 \
+    ${VESPERTINE_VERSION:+MARKETING_VERSION=$VESPERTINE_VERSION} ${VESPERTINE_BUILD:+CURRENT_PROJECT_VERSION=$VESPERTINE_BUILD} build > "$out".log 2>&1 \
     || { grep -E "error:" "$out".log; exit 1; }
 
-  app="$out/Nocturne.app"
+  app="$out/Vespertine.app"
   mkdir -p "$out"
-  staged="$out/.Nocturne-build-$$.app"
-  ditto "$derived"/Build/Products/Release/Nocturne.app "$staged"
+  staged="$out/.Vespertine-build-$$.app"
+  ditto "$derived"/Build/Products/Release/Vespertine.app "$staged"
   rm -rf "$app"
   mv "$staged" "$app"
 
@@ -91,14 +92,14 @@ if ! $resume; then
     # embedded frameworks. Local-only builds therefore skip the hardened runtime.
     sign_sparkle --sign -
     for fw in "$app"/Contents/Frameworks/*.framework; do codesign --force --sign - "$fw"; done
-    codesign --force --sign - --entitlements App/Nocturne.entitlements "$app"
+    codesign --force --sign - --entitlements App/Vespertine.entitlements "$app"
   else
     sign_sparkle --timestamp --options runtime "${keychain[@]}" --sign "$identity"
     for fw in "$app"/Contents/Frameworks/*.framework; do
       codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$fw"
     done
     codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" \
-      --entitlements App/Nocturne.entitlements "$app"
+      --entitlements App/Vespertine.entitlements "$app"
   fi
 
   codesign --verify --deep --strict --verbose=2 "$app"
@@ -107,15 +108,15 @@ fi
 
 if $notarize; then
   version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app/Contents/Info.plist")
-  print "Notarizing Nocturne.app $version (this usually takes a few minutes)…"
+  print "Notarizing Vespertine.app $version (this usually takes a few minutes)…"
   # Submit (or resume) and wait; Apple occasionally takes longer than an hour.
   if $resume && [[ -f "$out/.notary-id" ]]; then
     id=$(<"$out/.notary-id")
   else
-    ditto -c -k --keepParent "$app" "$out/Nocturne-notarize.zip"
-    id=$(xcrun notarytool submit "$out/Nocturne-notarize.zip" --keychain-profile "$profile" --output-format json | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')
+    ditto -c -k --keepParent "$app" "$out/Vespertine-notarize.zip"
+    id=$(xcrun notarytool submit "$out/Vespertine-notarize.zip" --keychain-profile "$profile" --output-format json | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')
     print "$id" > "$out/.notary-id"
-    rm -f "$out/Nocturne-notarize.zip"
+    rm -f "$out/Vespertine-notarize.zip"
   fi
   print "Submission $id"
   xcrun notarytool wait "$id" --keychain-profile "$profile" --timeout 2h
@@ -130,7 +131,7 @@ if $notarize; then
   xcrun stapler staple "$app"
   xcrun stapler validate "$app"
 
-  dmg=$out/Nocturne-$version.dmg
+  dmg=$out/Vespertine-$version.dmg
   make_dmg "$version" "$dmg"
   codesign --force --timestamp "${keychain[@]}" --sign "$identity" "$dmg"
   print "Notarizing $dmg…"
@@ -143,16 +144,16 @@ if $notarize; then
 fi
 
 if $install; then
-  pkill -x Nocturne 2>/dev/null || true
-  staged_install="/Applications/.Nocturne-install-$$.app"
+  pkill -x Vespertine 2>/dev/null || true
+  staged_install="/Applications/.Vespertine-install-$$.app"
   ditto "$app" "$staged_install"
   codesign --verify --deep --strict "$staged_install"
-  prior_install="/Applications/.Nocturne-previous-$$.app"
-  if [[ -e /Applications/Nocturne.app ]]; then mv /Applications/Nocturne.app "$prior_install"; fi
-  if ! mv "$staged_install" /Applications/Nocturne.app; then
-    [[ ! -e "$prior_install" ]] || mv "$prior_install" /Applications/Nocturne.app
+  prior_install="/Applications/.Vespertine-previous-$$.app"
+  if [[ -e /Applications/Vespertine.app ]]; then mv /Applications/Vespertine.app "$prior_install"; fi
+  if ! mv "$staged_install" /Applications/Vespertine.app; then
+    [[ ! -e "$prior_install" ]] || mv "$prior_install" /Applications/Vespertine.app
     print -u2 "Installation failed; previous app restored."; exit 1
   fi
   rm -rf "$prior_install"
-  echo "Installed /Applications/Nocturne.app"
+  echo "Installed /Applications/Vespertine.app"
 fi
