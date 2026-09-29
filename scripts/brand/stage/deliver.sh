@@ -3,7 +3,7 @@
 # Encodes the trailer's deliverables from the ProRes masters (made by render.sh) into ~/Movies/Vespertine/Trailer/deliver:
 #   16x9 4K     YouTube (3840×2160; YouTube gives 4K uploads a higher bitrate at every size)
 #   16x9        X, the press kit, the release (1920×1080)
-#   16x9 web    the website (1280×720, small enough to stream on a phone)
+#   16x9 web    the website's player (1920×1080 at a lighter bitrate, so launch traffic stays within GitHub Pages' limits)
 #   1x1         X, Bluesky, Mastodon (1080×1080)
 #   9x16        Shorts, Reels, TikTok (1080×1920)
 # All 60 fps H.264 High with AAC; the music is already at −14 LUFS in the masters. The 10-bit masters are dithered
@@ -27,10 +27,19 @@ encode() {  # master, output name, width, height, crf, maxrate, audio bitrate
 
 encode wide "16x9 4K" 3840 2160 14 60M 320k
 encode wide "16x9" 1920 1080 17 16M 256k
-encode wide "16x9 web" 1280 720 23 4M 160k
+encode wide "16x9 web" 1920 1080 24 5M 160k
 encode square "1x1" 1080 1080 17 14M 256k
 encode vertical "9x16" 1080 1920 17 16M 256k
 
-# The website's poster: the end card, where the wordmark sits alone.
-ffmpeg -loglevel error -y -ss 31.5 -i "$src/Vespertine trailer wide.mov" -frames:v 1 -vf "scale=1920:1080:flags=lanczos" "$out/Vespertine trailer poster.png"
-print "$out/Vespertine trailer poster.png"
+# The player's poster: the bit-perfect moment, with the tagline and the lit signal path.
+ffmpeg -loglevel error -y -ss 9.9 -i "$src/Vespertine trailer wide.mov" -frames:v 1 -vf "scale=1920:1080:flags=lanczos" "$out/Vespertine trailer poster.png"
+ffmpeg -loglevel error -y -i "$out/Vespertine trailer poster.png" -q:v 3 "$out/Vespertine trailer poster.jpg"
+print "$out/Vespertine trailer poster.jpg"
+
+# The website and press kit serve the web cut in their player and offer the 1080p file for download.
+site=${0:A:h:h:h:h}/site/assets/trailer
+mkdir -p "$site"
+cp "$out/Vespertine trailer 16x9 web.mp4" "$site/vespertine-trailer.mp4"
+cp "$out/Vespertine trailer 16x9.mp4" "$site/vespertine-trailer-1080p.mp4"
+cp "$out/Vespertine trailer poster.jpg" "$site/poster.jpg"
+print "site: $(du -sh "$site" | cut -f1) in $site"
