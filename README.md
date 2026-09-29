@@ -1,8 +1,9 @@
 <p align="center">
-  <img src="docs/logo.png" width="128" height="128" alt="Vespertine app icon">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/logo.svg">
+    <img src="docs/brand/logo-on-light.svg" width="440" alt="Vespertine">
+  </picture>
 </p>
-
-<h1 align="center">Vespertine</h1>
 
 <p align="center">
   <strong>A free, open-source, bit-perfect music player for macOS.</strong><br>
