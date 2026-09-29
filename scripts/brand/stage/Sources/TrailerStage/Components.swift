@@ -95,8 +95,14 @@ struct WindowRig: View {
             // Window body.
             ZStack(alignment: .topLeading) {
                 if let frame { Image(decorative: frame, scale: 2).resizable().frame(width: size.width, height: size.height) }
-                // Where lifted layers came from: a recess in the window.
-                recess(AppWindow.sidebar).opacity(smooth(e * 2.5))
+                // Where lifted layers came from: a recess in the window. The recording's own sidebar (with macOS's
+                // capture indicator where the window buttons go) is covered the moment the sidebar starts to lift,
+                // so it never shows through the glass as a second copy.
+                if e > 0.001 {
+                    sidebarColor.frame(width: AppWindow.sidebar.width, height: AppWindow.sidebar.height)
+                        .offset(x: AppWindow.sidebar.minX, y: AppWindow.sidebar.minY)
+                    recess(AppWindow.sidebar)
+                }
                 recess(AppWindow.inspector).opacity(smooth(e * 2.5))
                 Color.black.opacity(0.45 * pose.contentDim)
                 windowOverlay
@@ -110,13 +116,13 @@ struct WindowRig: View {
             // Sidebar on real Liquid Glass.
             if let sidebar {
                 ZStack(alignment: .topLeading) {
+                    // Opaque while it sits in the window, turning to Liquid Glass as it lifts.
                     if e > 0.001 {
                         RoundedRectangle(cornerRadius: 26, style: .continuous).fill(.clear)
                             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
                             .opacity(smooth(e * 2))
-                    } else {
-                        sidebarColor
                     }
+                    sidebarColor.opacity(1 - smooth(e * 2))
                     Image(decorative: sidebar, scale: 2).resizable().frame(width: AppWindow.sidebar.width, height: AppWindow.sidebar.height)
                     TrafficLights().offset(y: AppWindow.indicator.minY)
                 }
