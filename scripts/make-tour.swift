@@ -28,16 +28,14 @@ func image(_ name: String) -> CGImage {
 struct Shot { let file: String; let from: CGRect; let to: CGRect; let caption: String }
 
 let full = CGRect(x: 0, y: 0, width: 2400, height: 1500)
-/// The window without its sidebar, for shots whose sidebar would distract.
-let content = CGRect(x: 392, y: 0, width: 2008, height: 1255)
 let shots: [Shot] = [
-    Shot(file: "docs/screenshots/multichannel-albums.png", from: content,
+    Shot(file: "docs/screenshots/multichannel-albums.png", from: full,
          to: CGRect(x: 520, y: 150, width: 1600, height: 1000),
          caption: "Your library, every format: SACD, DTS CDs, 5.1 FLAC, DSD"),
-    Shot(file: "docs/screenshots/bit-perfect-fiio-24-192.png", from: content,
-         to: CGRect(x: 1400, y: 690, width: 1000, height: 625),
+    Shot(file: "docs/screenshots/bit-perfect-fiio-24-192.png", from: full,
+         to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "BIT-PERFECT appears only when it's literally true"),
-    Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: content,
+    Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
          to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
     Shot(file: "docs/screenshots/spatial-audio-airpods-max.png", from: CGRect(x: 600, y: 375, width: 1800, height: 1125),
