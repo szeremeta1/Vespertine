@@ -82,3 +82,16 @@ fi
 git push -q origin "v$version"
 gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
   --title "Vespertine $version" --notes-file "$notes"
+
+# Homebrew: point the cask in szeremeta1/homebrew-tap at this release (a commit through GitHub's API).
+tap=szeremeta1/homebrew-tap cask=Casks/vespertine.rb
+sha=$(shasum -a 256 "$dmg" | cut -d' ' -f1)
+if current=$(gh api "repos/$tap/contents/$cask" 2>/dev/null); then
+  blob=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["sha"])')
+  body=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys,base64; print(base64.b64decode(json.load(sys.stdin)["content"]).decode(), end="")' \
+    | /usr/bin/sed -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/")
+  gh api -X PUT "repos/$tap/contents/$cask" -f message="vespertine $version" -f sha="$blob" \
+    -f content="$(print -r -- "$body" | base64)" >/dev/null && print "Homebrew cask updated to $version."
+else
+  print -u2 "Homebrew cask not found in $tap; update it by hand."
+fi
