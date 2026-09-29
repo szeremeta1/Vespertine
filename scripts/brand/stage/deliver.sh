@@ -6,7 +6,8 @@
 #   16x9 web    the website (1280×720, small enough to stream on a phone)
 #   1x1         X, Bluesky, Mastodon (1080×1080)
 #   9x16        Shorts, Reels, TikTok (1080×1920)
-# All 60 fps H.264 High with AAC; the music is already at −14 LUFS in the masters.
+# All 60 fps H.264 High with AAC; the music is already at −14 LUFS in the masters. The 10-bit masters are dithered
+# down to 8 bits and x264's dark-biased adaptive quantization keeps the glows from banding again.
 set -euo pipefail
 src=~/Movies/Vespertine/Trailer/masters
 out=~/Movies/Vespertine/Trailer/deliver
@@ -15,8 +16,9 @@ mkdir -p "$out"
 encode() {  # master, output name, width, height, crf, maxrate, audio bitrate
   local master="$src/Vespertine trailer $1.mov" file="$out/Vespertine trailer $2.mp4"
   ffmpeg -loglevel error -y -i "$master" \
-    -vf "scale=${3}:${4}:flags=lanczos:in_range=tv:out_range=tv,format=yuv420p" \
+    -vf "scale=${3}:${4}:flags=lanczos:in_range=tv:out_range=tv:sws_dither=ed,format=yuv420p" \
     -c:v libx264 -preset slow -profile:v high -crf ${5} -maxrate ${6} -bufsize $(( ${6%M} * 2 ))M -r 60 -g 60 \
+    -x264-params aq-mode=3 \
     -color_primaries bt709 -color_trc bt709 -colorspace bt709 \
     -c:a aac -b:a ${7} -ar 48000 -movflags +faststart "${file:r}.partial.mp4"
   mv "${file:r}.partial.mp4" "$file"

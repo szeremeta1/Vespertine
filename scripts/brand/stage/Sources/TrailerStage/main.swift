@@ -2,15 +2,17 @@
 // trailer-stage: renders the Vespertine launch trailer.
 //
 // The trailer is a SwiftUI scene in an on-screen window, so Liquid Glass is the real system material,
-// not an imitation. The clock is stepped one frame at a time; after each step the window server
-// composites the frame and ScreenCaptureKit grabs just this window at 2×. Motion is a pure function
-// of time, so renders are repeatable and any range can be re-rendered on its own.
+// not an imitation. The clock is stepped one frame at a time; the window server composites each frame
+// and a ScreenCaptureKit stream of just this window hands it over at 2× (see Capture.swift). Motion is a
+// pure function of time, so renders are repeatable and any range can be re-rendered on its own.
 //
 //   trailer-stage --repo <repo> --raw <recordings dir> --out <file.mov>
-//                 [--aspect wide|square|vertical] [--from s] [--to s] [--fps 60] [--step n]
+//                 [--aspect wide|square|vertical] [--from s] [--to s] [--fps 60] [--step n] [--behind]
+//                 [--stills t1,t2,…]
 //
-// wide renders 3200×1800, square 2000×2000 and vertical 1080×1920. Keep the screen unlocked and
-// don't cover the window while it renders; only this window is captured.
+// wide renders 3200×1800, square 2000×2000 and vertical 1080×1920. Keep the screen unlocked. With
+// --behind the window sits behind every other window and never takes focus; being covered doesn't
+// change what is captured. Run one render at a time: concurrent captures stall each other in replayd.
 import AppKit
 import AVFoundation
 import ScreenCaptureKit
@@ -26,6 +28,7 @@ struct Options {
     var fps = 60.0
     var step = 1              // render every nth frame (for quick previews)
     var stills: [Double] = [] // render single frames as PNGs instead of a movie
+    var behind = false        // keep the stage window behind other windows and never take focus
 
     init(_ args: [String]) {
         var i = 1
@@ -41,6 +44,7 @@ struct Options {
             case "--fps": fps = Double(next())!
             case "--step": step = Int(next())!
             case "--stills": stills = next().split(separator: ",").map { Double($0)! }
+            case "--behind": behind = true
             default: print("unknown argument \(args[i])"); exit(2)
             }
             i += 1
@@ -66,6 +70,8 @@ final class Frame: ObservableObject {
     @Published var video: [String: CGImage] = [:]
     /// The Spatial Audio recording's channel meters, with a meter-like release.
     @Published var meters: [Double] = Array(repeating: 0, count: 6)
+    /// The frame number shown under the stage for the streamed capture (see Capture.swift).
+    @Published var stamp: Int = Stamp.none
 }
 
 @MainActor
@@ -85,28 +91,43 @@ final class Renderer {
 
     func openWindow() {
         let app = NSApplication.shared
-        app.setActivationPolicy(.regular)
+        // In the background the stage never appears in the Dock or takes focus from whatever the user is doing.
+        app.setActivationPolicy(options.behind ? .accessory : .regular)
         let size = options.aspect.size
         guard let screen = NSScreen.screens.first(where: { $0.backingScaleFactor == 2 }) else { fatalError("needs a Retina display") }
         // Dark appearance, so Liquid Glass renders as it does over the app's own dark interface.
         app.appearance = NSAppearance(named: .darkAqua)
-        let stage = StageView(frame: frame, assets: assets, size: size).environment(\.colorScheme, .dark)
+        let stage = VStack(spacing: 0) {
+            StageView(frame: frame, assets: assets, size: size)
+            FrameStamp(frame: frame, width: size.width)
+        }
+        .environment(\.colorScheme, .dark)
         let host = NSHostingView(rootView: stage)
-        let origin = CGPoint(x: screen.visibleFrame.minX + 24, y: screen.visibleFrame.maxY - size.height - 24)
-        window = NSWindow(contentRect: CGRect(origin: origin, size: size), styleMask: [.borderless], backing: .buffered, defer: false, screen: screen)
+        let windowSize = CGSize(width: size.width, height: size.height + Stamp.height)
+        let origin = CGPoint(x: screen.visibleFrame.minX + 24, y: screen.visibleFrame.maxY - windowSize.height - 24)
+        window = NSWindow(contentRect: CGRect(origin: origin, size: windowSize), styleMask: [.borderless], backing: .buffered, defer: false, screen: screen)
         window.contentView = host
         window.appearance = NSAppearance(named: .darkAqua)
         window.isOpaque = true
         window.backgroundColor = .black
         window.hasShadow = false
-        // Stay above other apps while rendering, so nothing covers the frames being captured.
-        window.level = .floating
-        window.makeKeyAndOrderFront(nil)
-        app.activate(ignoringOtherApps: true)
+        // On every Space, full-screen ones included, so switching Spaces never takes it off screen (the window
+        // server stops compositing windows that aren't on the active Space).
+        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .ignoresCycle]
+        if options.behind {
+            // Behind every other window: the capture is of this window alone, so being covered doesn't matter.
+            window.level = .normal
+            window.orderBack(nil)
+        } else {
+            // Stay above other apps while rendering, so nothing covers the frames being captured.
+            window.level = .floating
+            window.makeKeyAndOrderFront(nil)
+            app.activate(ignoringOtherApps: true)
+        }
     }
 
-    /// Feeds each visible scene its recording frame for time `t`.
-    func prepare(_ t: Double) {
+    /// Feeds each visible scene its recording frame for time `t`, and stamps the frame number under the stage.
+    func prepare(_ t: Double, stamp: Int = Stamp.none) {
         var video: [String: CGImage] = [:]
         for cue in Cue.all where cue.isVisible(at: t) {
             let local = cue.sourceStart + (t - cue.scene.range.lowerBound)
@@ -127,6 +148,7 @@ final class Renderer {
             frame.video = video
             frame.meters = meters
             frame.t = t
+            frame.stamp = stamp
         }
     }
     var sourceStarts: [String: Double] = [:]
@@ -136,8 +158,11 @@ final class Renderer {
         guard let scWindow = content.windows.first(where: { $0.windowID == CGWindowID(window.windowNumber) }) else { fatalError("stage window not visible") }
         let filter = SCContentFilter(desktopIndependentWindow: scWindow)
         let config = SCStreamConfiguration()
-        let px = CGSize(width: options.aspect.size.width * 2, height: options.aspect.size.height * 2)
-        config.width = Int(px.width); config.height = Int(px.height)
+        config.width = Int(options.aspect.size.width * 2)
+        config.height = Int((options.aspect.size.height + Stamp.height) * 2)
+        config.pixelFormat = kCVPixelFormatType_32BGRA
+        config.minimumFrameInterval = CMTime(value: 1, timescale: 240)
+        config.queueDepth = 6
         config.showsCursor = false
         config.captureResolution = .best
         config.ignoreShadowsSingleWindow = true
@@ -146,11 +171,34 @@ final class Renderer {
         return (filter, config)
     }
 
-    func settle() async {
+    /// Pushes the new frame to the window server now rather than at the end of this run-loop turn.
+    func commit() {
         window.contentView?.layoutSubtreeIfNeeded()
         window.displayIfNeeded()
         CATransaction.flush()
-        try? await Task.sleep(nanoseconds: 32_000_000)   // two refreshes at 120 Hz, then the window server has composited
+    }
+
+    /// For single stills: commit, then give the window server time to composite before a screenshot.
+    func settle() async {
+        commit()
+        try? await Task.sleep(nanoseconds: 32_000_000)   // two refreshes at 120 Hz
+    }
+
+    var stageRows: Int { Int(options.aspect.size.height * 2) }
+
+    /// The captured image of frame `n`. If the window server pauses the window (a Space switch, say) and no
+    /// image arrives, the frame is shown again by toggling only its stamp (the scene isn't prepared twice, so
+    /// state such as the meters' release stays exact), up to three times.
+    func image(of n: Int, from capture: StreamCapture) async throws -> CVPixelBuffer {
+        for attempt in 0... {
+            do { return try await capture.image() } catch let error as StreamCapture.TimedOut where attempt < 3 {
+                print("no image of frame \(error.frame); showing it again")
+                frame.stamp = Stamp.none; commit()
+                capture.expect(n)
+                frame.stamp = n; commit()
+            }
+        }
+        fatalError("unreachable")
     }
 
     func run() async throws {
@@ -161,7 +209,8 @@ final class Renderer {
         if !options.stills.isEmpty {
             for t in options.stills {
                 prepare(t); await settle()
-                let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
+                let window = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
+                let image = window.cropping(to: CGRect(x: 0, y: 0, width: window.width, height: stageRows))!
                 let url = options.out.deletingPathExtension().appendingPathExtension(String(format: "%06.3f.png", t))
                 try NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])!.write(to: url)
                 print("still \(t) → \(url.lastPathComponent)")
@@ -169,21 +218,31 @@ final class Renderer {
             return
         }
 
-        let writer = try MovieWriter(url: options.out, width: config.width, height: config.height, fps: options.fps / Double(options.step))
+        let writer = try MovieWriter(url: options.out, width: config.width, height: stageRows, fps: options.fps / Double(options.step))
+        let capture = try StreamCapture(filter: filter, configuration: config, stageRows: stageRows)
+        try await capture.start()
         let first = Int((options.from * options.fps).rounded()), last = Int((options.to * options.fps).rounded())
         let started = Date()
+        var spent = [0.0, 0.0, 0.0, 0.0]   // prepare, commit, capture, write
+        func lap(_ i: Int, _ since: inout Date) { let now = Date(); spent[i] += now.timeIntervalSince(since); since = now }
         for f in stride(from: first, to: last, by: options.step) {
             let t = Double(f) / options.fps
-            prepare(t)
-            await settle()
-            let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
-            writer.append(image)
+            var mark = Date()
+            capture.expect(f)
+            prepare(t, stamp: f); lap(0, &mark)
+            commit(); lap(1, &mark)
+            let buffer = try await image(of: f, from: capture); lap(2, &mark)
+            writer.append(buffer, rows: stageRows); lap(3, &mark)
             if (f - first) / options.step % 60 == 0 {
                 let done = Double(f - first) / Double(last - first)
                 print(String(format: "%5.1f%%  t=%6.3f  %.0f s elapsed", done * 100, t, Date().timeIntervalSince(started)))
             }
         }
+        await capture.stop()
         await writer.finish()
+        let n = Double(max(1, (last - first) / options.step))
+        print(String(format: "per frame: prepare %.0f ms, commit %.0f ms, capture %.0f ms, write %.0f ms",
+                     spent[0] / n * 1000, spent[1] / n * 1000, spent[2] / n * 1000, spent[3] / n * 1000))
         print("wrote \(options.out.path) in \(Int(Date().timeIntervalSince(started))) s")
     }
 }
@@ -229,6 +288,22 @@ final class MovieWriter {
         count += 1
     }
 
+    /// Copies the top `rows` of a captured window image (the stage, without the frame stamp) into the movie.
+    func append(_ source: CVPixelBuffer, rows: Int) {
+        var buffer: CVPixelBuffer?
+        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
+        guard let buffer else { return }
+        CVPixelBufferLockBaseAddress(source, .readOnly); CVPixelBufferLockBaseAddress(buffer, [])
+        let from = CVPixelBufferGetBaseAddress(source)!, to = CVPixelBufferGetBaseAddress(buffer)!
+        let fromRow = CVPixelBufferGetBytesPerRow(source), toRow = CVPixelBufferGetBytesPerRow(buffer)
+        let bytes = min(fromRow, toRow, CVPixelBufferGetWidth(buffer) * 4)
+        for y in 0..<min(rows, CVPixelBufferGetHeight(buffer)) { memcpy(to + y * toRow, from + y * fromRow, bytes) }
+        CVPixelBufferUnlockBaseAddress(buffer, []); CVPixelBufferUnlockBaseAddress(source, .readOnly)
+        while !input.isReadyForMoreMediaData { usleep(500) }
+        adaptor.append(buffer, withPresentationTime: CMTime(value: count, timescale: CMTimeScale(fps.rounded())))
+        count += 1
+    }
+
     func finish() async {
         input.markAsFinished()
         await writer.finishWriting()
@@ -238,6 +313,7 @@ final class MovieWriter {
 @main
 struct TrailerStageMain {
     static func main() {
+        setvbuf(stdout, nil, _IOLBF, 0)   // progress lines show up even when output goes to a log file
         let options = Options(CommandLine.arguments)
         Task { @MainActor in
             do {
