@@ -56,9 +56,14 @@ open(sys.argv[2], "w", encoding="utf-8").write(
     + "\n".join(out))
 PY
 
+# Copies installed before the rename (Nocturne, bundle ID org.nocturne.Nocturne, builds up to 26) can't
+# install Vespertine: Sparkle only replaces an app with one of the same bundle ID. For them every new entry is
+# informational: they're told about it and offered the download page instead of a failing install.
+first_vespertine_build=27
 "$tools/generate_appcast" --account nocturne \
   --download-url-prefix "https://github.com/$repo/releases/download/v$version/" \
-  --link "https://github.com/$repo" --embed-release-notes --maximum-deltas 0 \
+  --link "https://github.com/$repo/releases/latest" --embed-release-notes --maximum-deltas 0 \
+  --informational-update-versions "<$first_vespertine_build" \
   -o "$feed/appcast.xml" "$feed"
 grep -q "sparkle:edSignature" "$feed/appcast.xml" || { print -u2 "appcast entry is not EdDSA-signed"; exit 1; }
 

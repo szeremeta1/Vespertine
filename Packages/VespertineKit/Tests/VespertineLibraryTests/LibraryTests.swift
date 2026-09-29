@@ -268,3 +268,19 @@ struct FindAndEnrichTests {
         #expect(enriched.map(\.trackNumber) == [1, 2])
     }
 }
+
+@Suite("Source names")
+struct SourceNameTests {
+    @Test("The import folder is called Imported Music whatever its folder is named; a given name wins and can be cleared")
+    func names() throws {
+        let db = try LibraryDatabase.inMemory()
+        let managed = try db.addSource(LibrarySource(path: "/Users/someone/Music/Nocturne", mode: .managed))
+        let folder = try db.addSource(LibrarySource(path: "/Users/someone/Records", mode: .reference))
+        #expect(managed.displayName == "Imported Music")
+        #expect(folder.displayName == "Records")
+        try db.renameSource(try #require(folder.id), to: "  Vinyl rips ")
+        #expect(try db.sources().first { $0.id == folder.id }?.displayName == "Vinyl rips")
+        try db.renameSource(try #require(folder.id), to: "")
+        #expect(try db.sources().first { $0.id == folder.id }?.displayName == "Records")
+    }
+}

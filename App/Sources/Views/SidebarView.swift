@@ -9,6 +9,7 @@ import SwiftUI
 struct SidebarView: View {
     @Environment(AppModel.self) private var model
     @State private var renaming: Playlist?
+    @State private var renamingSource: LibrarySource?
     @State private var newName = ""
 
     var body: some View {
@@ -100,6 +101,7 @@ struct SidebarView: View {
                                     model.showConnectServer = true
                                 }
                             }
+                            Button("Rename…") { newName = source.displayName; renamingSource = source }
                             Button("Rescan") { Task { await model.library.scan(source) } }
                             Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }
                                 .disabled(!source.isOnline)
@@ -135,6 +137,13 @@ struct SidebarView: View {
         .listStyle(.sidebar)
         .tint(Palette.brass)
         .safeAreaInset(edge: .bottom) { ScanStatusView() }
+        .alert("Rename Source", isPresented: Binding(get: { renamingSource != nil }, set: { if !$0 { renamingSource = nil } })) {
+            TextField("Name", text: $newName)
+            Button("Rename") { if let s = renamingSource { model.library.renameSource(s, to: newName) }; renamingSource = nil }
+            Button("Cancel", role: .cancel) { renamingSource = nil }
+        } message: {
+            Text("Only the name in the sidebar changes; the folder stays as it is. Leave it empty for the default name.")
+        }
         .alert("Rename Playlist", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
             Button("Rename") { if let p = renaming { model.library.renamePlaylist(p, to: newName) }; renaming = nil }

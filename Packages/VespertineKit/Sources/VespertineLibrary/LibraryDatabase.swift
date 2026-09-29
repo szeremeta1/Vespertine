@@ -484,6 +484,14 @@ public extension LibraryDatabase {
         }
     }
 
+    /// The sidebar name; nil or empty goes back to the default.
+    public func renameSource(_ id: Int64, to name: String?) throws {
+        let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines)
+        try writer.write { db in
+            try db.execute(sql: "UPDATE source SET name = ? WHERE id = ?", arguments: [trimmed?.isEmpty == false ? trimmed : nil, id])
+        }
+    }
+
     public func setSourceOnline(_ id: Int64, _ online: Bool) throws {
         try writer.write { db in try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, id]) }
     }
