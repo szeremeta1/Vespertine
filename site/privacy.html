@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Vespertine</title>
+<meta name="description" content="Vespertine collects nothing. What the app and this website connect to, and why.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#09090A">
+<link rel="icon" type="image/png" href="assets/favicon-64.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="assets/favicon-64.png" alt="">Vespertine</a>
+    <nav><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
+    <a class="btn btn-brass btn-small" href="https://github.com/szeremeta1/Vespertine/releases/latest">Download</a>
+  </div>
+</header>
+<main class="doc">
+  <div class="eyebrow">Privacy</div>
+  <h1>Vespertine collects nothing.</h1>
+  <p class="updated">Effective 29 September 2026</p>
+
+  <p>Vespertine is a free, open-source music player. It has no accounts, no analytics, no telemetry, no crash reporting and no advertising. The developer receives no information about you or your music. Because the source code is public, you can check every statement on this page.</p>
+
+  <h2>What stays on your Mac</h2>
+  <p>Your library database, playlists, play counts, file analysis results, artwork cache and settings are stored in your user Library on your Mac. Passwords for network shares and your ListenBrainz token, if you add one, are stored in the macOS Keychain. None of it is uploaded anywhere.</p>
+
+  <h2>When the app goes online</h2>
+  <ul>
+    <li><strong>Update checks.</strong> Vespertine asks GitHub for its update feed about once a day, and when you choose Check for Updates. GitHub sees your IP address, as with any download. You can turn automatic checks off in Settings.</li>
+    <li><strong>MusicBrainz and Cover Art Archive.</strong> Only when you use Look Up on MusicBrainz or Enrich Metadata, Vespertine sends the album, artist and track names it's looking for to musicbrainz.org and downloads covers from coverartarchive.org. Both are run by the MetaBrainz Foundation.</li>
+    <li><strong>ListenBrainz.</strong> Only if you turn on scrobbling and enter your token, Vespertine sends the songs you play (title, artist, album and time) to listenbrainz.org.</li>
+    <li><strong>Network shares.</strong> Vespertine connects to the servers you add, and nowhere else, to read your music.</li>
+  </ul>
+
+  <h2>This website</h2>
+  <p>This site is hosted on GitHub Pages, which may log visitors' IP addresses; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. The page asks GitHub's API for the latest version number to label the download button. It sets no cookies, loads its fonts from this site, and uses no analytics.</p>
+
+  <h2>Changes and contact</h2>
+  <p>If this ever changes, this page and the release notes will say so first. Questions are welcome as a <a href="https://github.com/szeremeta1/Vespertine/issues">GitHub issue</a>.</p>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="row"><a href="./">Home</a><a href="terms.html">Terms</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></div>
+  </div>
+</footer>
+</body>
+</html>

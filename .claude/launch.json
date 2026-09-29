@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/szeremeta/Desktop/Projects/Nocturne/docs/design"],
       "port": 8765
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "/Users/szeremeta/Desktop/Projects/Nocturne/site"],
+      "port": 8766
     }
   ]
 }
