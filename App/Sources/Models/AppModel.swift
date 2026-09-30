@@ -27,30 +27,69 @@ enum InspectorTab: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// Output devices and the chosen one's hardware volume.
+///
+/// Core Audio calls never run on the main thread (after the first read at launch): while a device switches rate or
+/// is taken exclusively, and whenever coreaudiod is slow, HAL property reads wait on its locks for seconds. Reading
+/// every device's formats on the main thread at each change (macOS reports one every time exclusive access moves
+/// the Mac's default output) froze the window at the start of a song. Reads go to a serial queue, bursts of change
+/// notices collapse into one read, and the result is published on the main thread.
 @Observable
 @MainActor
 final class DeviceStore {
     private(set) var devices: [OutputDevice] = []
     private(set) var hardwareVolume: Float?
     private var monitor: DeviceMonitor?
+    /// Called on the main thread once a changed device list has been read.
     var onDevicesChanged: (() -> Void)?
 
+    /// All HAL work of this store, in order.
+    nonisolated private let hal = DispatchQueue(label: "org.szeremeta.vespertine.device-store", qos: .userInitiated)
+    private var refreshQueued = false
+    private var refreshAgain = false
+    private var volumeDevice: AudioObjectID?
+
     init() {
-        refresh()
+        devices = OutputDevices.list() // at launch, before anything plays: the HAL is idle
         monitor = DeviceMonitor { [weak self] change in
             Task { @MainActor in
                 switch change {
-                case .devices: self?.refresh(); self?.onDevicesChanged?()
+                case .devices: self?.refresh(notify: true)
                 case .volume: self?.readVolume()
                 }
             }
         }
     }
 
-    var dopUIDs: Set<String> = [] { didSet { refresh() } }
+    var dopUIDs: Set<String> = [] { didSet { if dopUIDs != oldValue { refresh() } } }
 
-    func refresh() {
-        devices = OutputDevices.list(dopEnabledUIDs: dopUIDs)
+    /// Reads the device list off the main thread. Requests that arrive while a read is under way cause exactly one
+    /// more read, so a burst of change notices costs at most two.
+    func refresh(notify: Bool = false) {
+        pendingNotify = pendingNotify || notify
+        guard !refreshQueued else { refreshAgain = true; return }
+        refreshQueued = true
+        let dop = dopUIDs
+        hal.async { [weak self] in
+            let list = OutputDevices.list(dopEnabledUIDs: dop)
+            Task { @MainActor in self?.finishRefresh(list) }
+        }
+    }
+
+    private var pendingNotify = false
+
+    private func finishRefresh(_ list: [OutputDevice]) {
+        refreshQueued = false
+        if devices != list { devices = list }
+        if refreshAgain {
+            refreshAgain = false
+            refresh()
+            return
+        }
+        if pendingNotify {
+            pendingNotify = false
+            onDevicesChanged?()
+        }
     }
 
     func device(uid: String?) -> OutputDevice? {
@@ -59,21 +98,30 @@ final class DeviceStore {
     }
 
     func watchVolume(of device: OutputDevice?) {
-        monitor?.watchVolume(of: device?.id)
-        volumeDevice = device?.id
+        let id = device?.id
+        guard id != volumeDevice || monitor == nil else { return }
+        volumeDevice = id
+        let monitor = self.monitor
+        hal.async { monitor?.watchVolume(of: id) }
         readVolume()
     }
 
-    private var volumeDevice: AudioObjectID?
-
     private func readVolume() {
-        hardwareVolume = volumeDevice.flatMap { DeviceControl.hardwareVolume($0) }
+        guard let id = volumeDevice else { hardwareVolume = nil; return }
+        hal.async { [weak self] in
+            let value = DeviceControl.hardwareVolume(id)
+            Task { @MainActor in
+                guard let self, self.volumeDevice == id else { return }
+                self.hardwareVolume = value
+            }
+        }
     }
 
+    /// Shows the new value at once; the device is set in order on the HAL queue.
     func setHardwareVolume(_ value: Float) {
-        guard let volumeDevice else { return }
-        DeviceControl.setHardwareVolume(volumeDevice, value)
+        guard let id = volumeDevice else { return }
         hardwareVolume = value
+        hal.async { DeviceControl.setHardwareVolume(id, value) }
     }
 }
 

@@ -232,10 +232,13 @@ final class PlayerController {
     /// while it plays so they adjust what you hear, and never change some other device's volume.
     /// (macOS never makes a device another app holds exclusively the sound output, so this needs shared mode.)
     private var lastFollowed: AudioObjectID?
+    nonisolated private static let halQueue = DispatchQueue(label: "org.szeremeta.vespertine.system-output", qos: .userInitiated)
     private func followSystemOutput(to device: OutputDevice) {
         guard settings.systemOutputFollowsPlayback, signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
         lastFollowed = device.id
-        if DeviceControl.systemOutputDevice() != device.id { DeviceControl.setSystemOutputDevice(device.id) }
+        // Off the main thread: this runs as playback starts, while the HAL is busy with the device.
+        let id = device.id
+        Self.halQueue.async { if DeviceControl.systemOutputDevice() != id { DeviceControl.setSystemOutputDevice(id) } }
     }
 
     /// Starts copying the current and next network tracks locally (when the cache is on).
@@ -366,6 +369,16 @@ final class PlayerController {
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable."
+            } else if let track, shares.isNetwork(track) {
+                // On a share, even asking whether the file exists can block for seconds: ask off the main thread.
+                lastError = message
+                let path = track.filePath
+                Task { [weak self] in
+                    let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
+                    guard let self, !exists else { return }
+                    self.library.rescanForMissingFile(track)
+                    self.lastError = "“\(track.title)” was moved or deleted. Updating the library to find it…"
+                }
             } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
                 // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
                 library.rescanForMissingFile(track)
