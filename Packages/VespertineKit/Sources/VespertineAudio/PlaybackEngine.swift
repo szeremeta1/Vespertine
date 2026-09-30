@@ -138,6 +138,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         let output: AVAudioPCMBuffer
         let path: SignalPath
         let gain: Float
+        /// Spatial Audio on the source's own speakers: the converter keeps the file's channel order and this
+        /// places each channel on the bed (`routed` is what reaches the ring).
+        let router: BedRouter?
+        let routed: AVAudioPCMBuffer?
         var inputExhausted = false
         var finished = false
         var framesProduced: UInt64 = 0
@@ -149,8 +153,17 @@ public final class PlaybackEngine: @unchecked Sendable {
             self.probed = probed
             self.decoder = decoder
             self.path = path
+            let own = decoder.processingFormat.channelLayout
+            var router: BedRouter?
+            let channels = Int(decoder.processingFormat.channelCount)
+            if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
+               let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.standardLabels(channels: channels) {
+                router = BedRouter(source: speakers, bed: bed)
+            }
+            self.router = router
             // Integer mode: straight to 32-bit integers (the device takes them as they are).
-            let float = AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
+            let float = router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
+                ?? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
             let integer = float.flatMap { f in
                 AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
                               ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
@@ -171,6 +184,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             }
             input = inBuffer
             output = outBuffer
+            routed = router.flatMap { r in
+                AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: r.bedChannels, interleaved: true, layout: layout)
+                    .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
+            }
             if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm {
                 gain = Float(pow(10, db / 20))
             } else {
@@ -895,8 +912,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
 
         let frames = decoding.output.frameLength
-        let raw = decoding.output.floatChannelData?[0]
+        var raw = decoding.output.floatChannelData?[0]
             ?? decoding.output.int32ChannelData.map { UnsafeMutableRawPointer($0[0]).assumingMemoryBound(to: Float.self) }
+        if let router = decoding.router, let routed = decoding.routed, let source = raw, let bed = routed.floatChannelData?[0] {
+            router.route(source, into: bed, frames: Int(frames))
+            raw = bed
+        }
         if frames > 0, let data = raw {
             decoding.framesProduced += UInt64(frames)
             emptyTransitions = 0

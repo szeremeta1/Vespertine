@@ -51,7 +51,7 @@ struct ForensicsTests {
             let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48_000, interleaved: false, channelLayout: layout)
             let file = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 48_000.0,
                                                                    AVNumberOfChannelsKey: 6, AVLinearPCMBitDepthKey: 24,
-                                                                   AVLinearPCMIsFloatKey: false, AVChannelLayoutKey: Data(bytes: layout.layout, count: MemoryLayout<AudioChannelLayout>.size)],
+                                                                   AVLinearPCMIsFloatKey: false, AVChannelLayoutKey: Data(bytes: layout.layout, count: layout.byteSize)],
                                        commonFormat: .pcmFormatFloat32, interleaved: false)
             let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 96_000)!
             buffer.frameLength = 96_000

@@ -20,13 +20,16 @@ public struct SourceFormat: Sendable, Hashable, Codable {
     /// Bits per sample for integer PCM; nil for lossy / float / DSD.
     public var bitDepth: Int?
     public var channels: Int
+    /// The speaker of each channel (Core Audio channel labels), when the file says and it is multichannel.
+    public var channelLabels: [UInt32]?
 
-    public init(encoding: Encoding, codec: String, sampleRate: Double, bitDepth: Int?, channels: Int) {
+    public init(encoding: Encoding, codec: String, sampleRate: Double, bitDepth: Int?, channels: Int, channelLabels: [UInt32]? = nil) {
         self.encoding = encoding
         self.codec = codec
         self.sampleRate = sampleRate
         self.bitDepth = bitDepth
         self.channels = channels
+        self.channelLabels = channelLabels
     }
 
     /// "DSD64", "DSD128" … for DSD sources.
@@ -129,6 +132,10 @@ public struct OutputPlan: Sendable, Hashable {
     public var deviceChannelCount: Int? = nil
     /// Multichannel rendered for headphones with Spatial Audio.
     public var spatial: SpatialMode = .off
+    /// The layout (a Core Audio layout tag) Spatial Audio places the channels on: one holding every speaker of
+    /// the source, so a 3.1 keeps its LFE, an LCRS its centres, a 7.1.4 its heights. nil: the standard layout of
+    /// `channels`. The decoded stream is converted to it, so `channels` is its channel count.
+    public var spatialBed: UInt32? = nil
     /// Integer mode requested: decoded straight to 32-bit integers and sent to a non-mixable Int32 device
     /// format untouched (32-bit sources exact). Only for plain PCM with nothing to change the samples.
     public var integerSamples = false
@@ -140,7 +147,7 @@ public struct OutputPlan: Sendable, Hashable {
     public func isDeviceCompatible(with other: OutputPlan) -> Bool {
         mode == other.mode && integerSamples == other.integerSamples && abs(deviceSampleRate - other.deviceSampleRate) < 0.5
             && physicalBitDepth == other.physicalBitDepth && channels == other.channels
-            && deviceChannels == other.deviceChannels && spatial == other.spatial
+            && deviceChannels == other.deviceChannels && spatial == other.spatial && spatialBed == other.spatialBed
     }
 }
 
