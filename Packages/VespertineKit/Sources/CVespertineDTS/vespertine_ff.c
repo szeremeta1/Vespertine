@@ -53,7 +53,7 @@ NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     if ((r = avformat_find_stream_info(d->fmt, NULL)) < 0) { fail(error, errorSize, "read stream info", r); nff_close(d); return NULL; }
     const AVCodec *codec = NULL;
     d->stream = av_find_best_stream(d->fmt, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
-    if (d->stream < 0 || !codec) { fail(error, errorSize, "no DTS or TrueHD audio stream", d->stream); nff_close(d); return NULL; }
+    if (d->stream < 0 || !codec) { fail(error, errorSize, "no audio stream FFmpeg can decode here", d->stream); nff_close(d); return NULL; }
     AVStream *st = d->fmt->streams[d->stream];
     for (unsigned i = 0; i < d->fmt->nb_streams; i++) if ((int)i != d->stream) d->fmt->streams[i]->discard = AVDISCARD_ALL;
     d->ctx = avcodec_alloc_context3(codec);
@@ -62,7 +62,12 @@ NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     if (!d->ctx || !d->packet || !d->frame) { fail(error, errorSize, "allocate", 0); nff_close(d); return NULL; }
     avcodec_parameters_to_context(d->ctx, st->codecpar);
     d->ctx->pkt_timebase = st->time_base;
-    if ((r = avcodec_open2(d->ctx, codec, NULL)) < 0) { fail(error, errorSize, "open decoder", r); nff_close(d); return NULL; }
+    // Dolby Digital: FFmpeg applies the stream's dynamic range compression unless told not to. Full range, as mastered.
+    AVDictionary *codecOptions = NULL;
+    if (codec->id == AV_CODEC_ID_AC3 || codec->id == AV_CODEC_ID_EAC3) av_dict_set(&codecOptions, "drc_scale", "0", 0);
+    r = avcodec_open2(d->ctx, codec, &codecOptions);
+    av_dict_free(&codecOptions);
+    if (r < 0) { fail(error, errorSize, "open decoder", r); nff_close(d); return NULL; }
     d->channels = d->ctx->ch_layout.nb_channels;
     d->rate = d->ctx->sample_rate;
     d->mask = d->ctx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE ? d->ctx->ch_layout.u.mask : 0;

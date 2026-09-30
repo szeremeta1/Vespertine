@@ -1,6 +1,6 @@
 //
-// Vespertine — DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp, .mka),
-// decoded with FFmpeg: formats macOS can't decode.
+// Vespertine — DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp, .mka), and the
+// Dolby Digital modes macOS decodes wrongly (DolbyModes), decoded with FFmpeg.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -37,7 +37,9 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
         let bits = Int(nff_bits(handle))
         var d = Description(codec: "DTS", lossless: false, bits: nil, channels: Int(nff_channels(handle)),
                             sampleRate: Double(nff_sample_rate(handle)), hasObjects: false)
-        if codec == "truehd" || codec == "mlp" {
+        if codec == "ac3" || codec == "eac3" {
+            d.codec = codec == "ac3" ? "Dolby Digital" : "Dolby Digital Plus"
+        } else if codec == "truehd" || codec == "mlp" {
             d.lossless = true
             d.hasObjects = profile.localizedCaseInsensitiveContains("atmos")
             d.codec = d.hasObjects ? "Dolby Atmos (TrueHD)" : (codec == "mlp" ? "MLP Lossless" : "Dolby TrueHD")

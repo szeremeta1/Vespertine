@@ -253,6 +253,14 @@ struct SpatialProbe {
     }
 }
 
+/// FFmpeg names a custom layout by a standard one with the same channels ("FL+FR+LFE+SL+SR" reads back as "4.1(side)"?)
+/// or as "N channels (FL+FR+…)".
+enum ChannelLayoutName {
+    static func same(_ stored: String, _ channels: [String]) -> Bool {
+        FFmpegTool.layouts.first { $0.name == stored }?.channels == channels
+    }
+}
+
 @Suite("Spatial Audio for every layout and format")
 struct SpatialMatrixTests {
     /// Codec name, file extension, FFmpeg arguments.
@@ -275,8 +283,6 @@ struct SpatialMatrixTests {
 
     /// Failures that belong to macOS's own decoders, not to Vespertine (codec, layouts).
     static let knownLimits: [(codec: String, layouts: Set<String>, why: String)] = [
-        ("AC-3", ["3.0(back)", "3.1", "4.1"], "macOS's Dolby decoder scrambles these rare modes (2/1, 3/1, 3/1+LFE); FFmpeg decodes them right"),
-        ("E-AC-3", ["3.0(back)", "3.1", "4.1"], "macOS's Dolby decoder scrambles these rare modes (2/1, 3/1, 3/1+LFE); FFmpeg decodes them right"),
         ("AAC", ["2.1", "3.0(back)", "3.1", "4.1", "7.0", "octagonal"], "macOS's AAC decoder can't open layouts described by a program config element"),
         ("AAC", ["7.1(wide)"], "macOS's AAC decoder mislabels channel configuration 7"),
         ("AIFF", ["6.0", "6.0(front)", "3.1.2", "hexagonal", "6.1", "6.1(back)", "6.1(front)", "7.0", "7.0(front)", "7.1(wide)", "5.1.2",
@@ -294,7 +300,9 @@ struct SpatialMatrixTests {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         let only = ProcessInfo.processInfo.environment["VESPERTINE_SPATIAL_MATRIX"].flatMap { $0 == "1" ? nil : Set($0.split(separator: ",").map(String.init)) }
+        // FFmpeg's named layouts, plus the Dolby Digital channel modes that have no name there (2/1 and 2/2 with LFE).
         let layouts = FFmpegTool.layouts.filter { $0.channels.count > 2 && !$0.name.hasPrefix("binaural") && !$0.name.hasPrefix("downmix") }
+            + [("FL+FR+LFE+BC", ["FL", "FR", "LFE", "BC"]), ("FL+FR+LFE+SL+SR", ["FL", "FR", "LFE", "SL", "SR"])]
         var failures: [String] = [], skipped: [String: [String]] = [:], passed = 0
         var limits: [String: [String]] = [:], nearby: [String] = []
         for layout in layouts {
@@ -308,7 +316,7 @@ struct SpatialMatrixTests {
                 // Only files that say what they hold: FFmpeg must read back the layout it was given.
                 let stored = FFmpegTool.run(ffprobe, ["-v", "error", "-show_entries", "stream=channel_layout", "-of", "default=nw=1:nk=1", url.path])
                     .output.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard stored == layout.name else {
+                guard stored == layout.name || stored.hasSuffix("(\(layout.name))") || ChannelLayoutName.same(stored, layout.channels) else {
                     skipped[codec.name, default: []].append("\(layout.name)→\(stored.isEmpty ? "?" : stored)")
                     continue
                 }
