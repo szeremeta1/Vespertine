@@ -261,7 +261,16 @@ for (index, item) in items.enumerated() {
     } else {
         print("    no signal path (state \(snap.state.rawValue)) error: \(snap.lastError ?? "-")")
     }
-    Thread.sleep(forTimeInterval: max(0, seconds - 1.2))
+    if forcedSpatial != nil, let path, path.plan.spatial != .off {
+        // Which speaker of the bed each decoded channel reached (meters sit before the spatial mixer).
+        _ = engine.takeChannelPeaks()
+        Thread.sleep(forTimeInterval: 0.5)
+        let peaks = engine.takeChannelPeaks()
+        let names = path.applied.channelNames
+        let lit = peaks.enumerated().filter { $0.element > 0.003 }.map { "\($0.offset < names.count ? names[$0.offset] : "\($0.offset + 1)") \(String(format: "%.0f", 20 * log10($0.element))) dB" }
+        print("    bed \(names.joined(separator: " ")) · sounding: \(lit.isEmpty ? "nothing" : lit.joined(separator: ", "))")
+    }
+    Thread.sleep(forTimeInterval: max(0, seconds - 1.7))
     let after = engine.snapshot
     print(String(format: "    position %.2fs, state %@, underruns %d", after.position, after.state.rawValue, after.underruns))
 }

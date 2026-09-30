@@ -40,6 +40,52 @@ struct SpatialTests {
         #expect(c.left > c.right, "L: L \(c.left) R \(c.right)")
     }
 
+    @Test("Every bed Vespertine may choose is one Apple's spatial mixer takes")
+    func bedsAccepted() throws {
+        for bed in ChannelLayouts.spatialBeds {
+            let layout = try #require(AVAudioChannelLayout(layoutTag: bed.tag))
+            #expect(throws: Never.self, "0x\(String(bed.tag, radix: 16)) \(layout.shortNames)") {
+                _ = try SpatialRenderer(inputLayout: layout, channels: bed.labels.count, sampleRate: 48_000, maxFrames: 4096, mode: .fixed)
+            }
+        }
+    }
+
+    /// The bed chosen for these speakers, and where each source channel lands on it.
+    func placement(_ source: [AudioChannelLabel]) throws -> (bed: [String], routes: [String]) {
+        let bed = try #require(ChannelLayouts.spatialBed(for: source))
+        let labels = try #require(AVAudioChannelLayout(layoutTag: bed.tag)).channelLabels
+        let router = try #require(BedRouter(source: source, bed: labels))
+        return (labels.map(ChannelLayouts.shortName), router.routes.map { $0.map { ChannelLayouts.shortName(labels[$0.bed]) }.joined(separator: "+") })
+    }
+
+    @Test("Each channel keeps its own speaker: 3.1 keeps its LFE, LCRS its centres, 7.1.4 its heights")
+    func beds() throws {
+        let threeOne = try placement([kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center, kAudioChannelLabel_LFEScreen])
+        #expect(threeOne.routes == ["L", "R", "C", "LFE"], "\(threeOne)")
+        let lcrs = try placement([kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center, kAudioChannelLabel_CenterSurround])
+        #expect(lcrs.routes == ["L", "R", "C", "Cs"], "\(lcrs)")
+        let atmos = try placement(AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_Atmos_7_1_4)!.channelLabels)
+        #expect(atmos.bed.count == 12 && atmos.routes == atmos.bed, "\(atmos)")
+        // WAVE speaker masks: back pair Ls/Rs, side pair Lsd/Rsd. The sides must stay beside, the backs behind.
+        let wave71 = try placement([kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center, kAudioChannelLabel_LFEScreen,
+                                    kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround,
+                                    kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect])
+        #expect(wave71.routes == ["L", "R", "C", "LFE", "Lrs", "Rrs", "Ls", "Rs"], "\(wave71)")
+    }
+
+    @Test("The plan carries the bed; tracks on different beds are never joined gaplessly")
+    func planBed() {
+        let airPods = DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        let threeOne = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 48_000, bitDepth: 24, channels: 4,
+                                    channelLabels: [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center, kAudioChannelLabel_LFEScreen])
+        let quad = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 48_000, bitDepth: 24, channels: 4)
+        let a = FormatPlanner.plan(source: threeOne, device: airPods, spatial: .headTracked)
+        let b = FormatPlanner.plan(source: quad, device: airPods, spatial: .headTracked)
+        #expect(a.spatialBed != nil && a.channels == 4 && a.reason.hasPrefix("3.1 rendered"), "\(a.reason)")
+        #expect(b.reason.hasPrefix("Quad rendered"), "\(b.reason)")
+        #expect(!a.isDeviceCompatible(with: b))
+    }
+
     @Test("Standard layouts for common channel counts")
     func layouts() {
         #expect(ChannelLayouts.name(channels: 6) == "5.1")
@@ -179,7 +225,7 @@ struct MultichannelExportTests {
             let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 48_000, interleaved: false, channelLayout: layout)
             let file = try AVAudioFile(forWriting: source, settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 48_000.0,
                                                                       AVNumberOfChannelsKey: 6, AVLinearPCMBitDepthKey: 24, AVLinearPCMIsFloatKey: false,
-                                                                      AVChannelLayoutKey: Data(bytes: layout.layout, count: MemoryLayout<AudioChannelLayout>.size)],
+                                                                      AVChannelLayoutKey: Data(bytes: layout.layout, count: layout.byteSize)],
                                        commonFormat: .pcmFormatFloat32, interleaved: false)
             let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 96_000)!
             buffer.frameLength = 96_000

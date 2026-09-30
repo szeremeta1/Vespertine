@@ -63,7 +63,7 @@ public enum MultichannelExport {
         let fileSettings: [String: Any] = [
             AVFormatIDKey: kAudioFormatAppleLossless, AVSampleRateKey: rate, AVNumberOfChannelsKey: outChannels,
             AVEncoderBitDepthHintKey: 24,
-            AVChannelLayoutKey: Data(bytes: outLayout.layout, count: MemoryLayout<AudioChannelLayout>.size),
+            AVChannelLayoutKey: Data(bytes: outLayout.layout, count: outLayout.byteSize),
         ]
         try? FileManager.default.removeItem(at: destination)
         let partial = destination.deletingPathExtension().appendingPathExtension("partial.m4a")

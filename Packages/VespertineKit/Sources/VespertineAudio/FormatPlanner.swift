@@ -28,9 +28,15 @@ public enum FormatPlanner {
         // Multichannel music: Spatial Audio on headphones, every channel on multichannel outputs,
         // otherwise a standard downmix (the converter mixes by channel layout).
         guard plan.mode == .pcm, source.channels > 2 else { return plan }
-        let name = ChannelLayouts.name(channels: source.channels)
+        let name = ChannelLayouts.name(labels: source.channelLabels, channels: source.channels)
         if spatial != .off, rawDevice.outputChannels >= 2 {
             plan.channels = source.channels
+            // The source's own speakers; unlabeled channels are taken in the standard order for their count.
+            let labels = source.channelLabels.flatMap { $0.count == source.channels ? $0 : nil } ?? ChannelLayouts.standardLabels(channels: source.channels)
+            if let labels, let bed = ChannelLayouts.spatialBed(for: labels) {
+                plan.spatialBed = bed.tag
+                plan.channels = bed.channels
+            }
             plan.deviceChannelCount = 2
             plan.spatial = spatial
             plan.reason = "\(name) rendered with Spatial Audio (\(spatial == .headTracked ? "head tracked" : "fixed")). " + plan.reason

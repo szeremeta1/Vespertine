@@ -10,7 +10,13 @@ import SFBAudioEngine
 
 final class GuardedDecoder: NSObject, PCMDecoding {
     let inner: PCMDecoding
-    init(_ inner: PCMDecoding) { self.inner = inner }
+    /// libtta (SFBAudioEngine 0.14.0) writes one byte past the frames it returns for 24-bit audio, which
+    /// overruns a buffer it fills to the last frame and corrupts the heap: that frame is left free.
+    private let reservesLastFrame: Bool
+    init(_ inner: PCMDecoding) {
+        self.inner = inner
+        reservesLastFrame = String(describing: type(of: inner)).contains("TrueAudio")
+    }
 
     var inputSource: InputSource { inner.inputSource }
     var sourceFormat: AVAudioFormat { inner.sourceFormat }
@@ -29,6 +35,7 @@ final class GuardedDecoder: NSObject, PCMDecoding {
         try decode(into: pcm, length: pcm.frameCapacity)
     }
     func decode(into buffer: AVAudioPCMBuffer, length: AVAudioFrameCount) throws {
+        let length = reservesLastFrame && buffer.frameCapacity > 1 ? min(length, buffer.frameCapacity - 1) : length
         try Self.check { nguard_decode(inner, buffer, length, $0) }
     }
     func seek(to frame: AVAudioFramePosition) throws { try Self.check { nguard_seek(inner, frame, $0) } }

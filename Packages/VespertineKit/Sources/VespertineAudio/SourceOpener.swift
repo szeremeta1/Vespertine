@@ -49,6 +49,10 @@ final class ProbedSource: @unchecked Sendable {
 
     fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?) {
         self.url = url
+        var format = format
+        if format.channelLabels == nil {
+            format.channelLabels = ChannelLayouts.speakerLabels(pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout)
+        }
         self.format = format
         self.decoderName = decoderName
         self.pcm = pcm

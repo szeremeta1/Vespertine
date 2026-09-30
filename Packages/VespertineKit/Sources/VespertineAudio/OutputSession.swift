@@ -43,6 +43,17 @@ final class OutputSession: @unchecked Sendable {
     private var ioProcID: AudioDeviceIOProcID?
     private(set) var isRunning = false
 
+    /// Multichannel routing: the source's own speakers for Spatial Audio (the standard bed when it doesn't
+    /// name them), the device's speaker layout for discrete output (placed by position), nil for mono/stereo.
+    static func routeLayout(plan: OutputPlan, speakers: AVAudioChannelLayout?) -> AVAudioChannelLayout? {
+        if plan.spatial != .off {
+            return plan.spatialBed.flatMap { AVAudioChannelLayout(layoutTag: $0) } ?? ChannelLayouts.layout(channels: plan.channels)
+        }
+        guard plan.channels > 2 else { return nil }
+        return speakers.flatMap { Int($0.channelCount) == plan.channels && $0.hasSpeakerPositions ? $0 : nil }
+            ?? ChannelLayouts.layout(channels: plan.channels)
+    }
+
     /// Configures the device for `plan` and prepares (but does not start) I/O.
     /// Ring size in frames: about 30 s of audio, so a network share that stalls for many seconds (a busy
     /// server's disks) is never heard, within a memory budget (fewer seconds for many channels at high
@@ -101,18 +112,8 @@ final class OutputSession: @unchecked Sendable {
                                  plan.mode == .dop ? "DoP requires exclusive, bit-transparent output" : "Bitstream requires exclusive, bit-transparent output")
         }
 
-        // Multichannel routing: the standard bed for Spatial Audio, the device's speaker layout for
-        // discrete output (placed by position), nil for mono/stereo.
         let speakers = DeviceQuery.speakerLayout(deviceID)
-        let routeLayout: AVAudioChannelLayout?
-        if plan.spatial != .off {
-            routeLayout = ChannelLayouts.layout(channels: plan.channels)
-        } else if plan.channels > 2 {
-            routeLayout = speakers.flatMap { Int($0.channelCount) == plan.channels && $0.hasSpeakerPositions ? $0 : nil }
-                ?? ChannelLayouts.layout(channels: plan.channels)
-        } else {
-            routeLayout = nil
-        }
+        let routeLayout = Self.routeLayout(plan: plan, speakers: speakers)
         applied = AppliedFormat(
             sampleRate: rate,
             physicalBitDepth: Int(physical?.mBitsPerChannel ?? UInt32(plan.physicalBitDepth)),

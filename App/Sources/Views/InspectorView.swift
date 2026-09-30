@@ -192,7 +192,7 @@ struct SignalPathView: View {
         }
         if path.plan.spatial != .off {
             s.append(Step(title: "Spatial Audio",
-                          detail: "\(ChannelLayouts.name(channels: src.channels)) as virtual speakers · Apple spatial renderer, personalized profile if set up",
+                          detail: "\(ChannelLayouts.name(labels: src.channelLabels, channels: src.channels)) as virtual speakers · Apple spatial renderer, personalized profile if set up",
                           value: path.plan.spatial == .headTracked ? "head tracked" : "fixed", tone: .changed))
         } else if path.plan.channels < src.channels {
             s.append(Step(title: "Downmix", detail: "Standard channel-layout mix (centre and surrounds folded in)",
@@ -334,7 +334,7 @@ struct ChannelMetersView: View {
     }
 
     private var summary: String {
-        let src = ChannelLayouts.name(channels: path.source.channels)
+        let src = ChannelLayouts.name(labels: path.source.channelLabels, channels: path.source.channels)
         if path.plan.spatial != .off {
             return "\(src) placed as virtual speakers around you and rendered for \(path.deviceName)."
         }
