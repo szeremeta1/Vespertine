@@ -107,6 +107,15 @@ enum SourceOpener {
             }
             return ProbedSource(url: url, format: format, decoderName: name, pcm: decoder, dsd: nil)
         }
+        if dolbyExtensions.contains(ext), let mode = DolbyModes.mode(of: url), DolbyModes.needsFFmpeg(mode) {
+            // A Dolby Digital mode macOS's decoder scrambles (2/1, 3/0+LFE, 3/1+LFE): FFmpeg decodes it.
+            let decoder = FFmpegDecoder(url: url)
+            try decoder.open()
+            let d = decoder.describe
+            let format = SourceFormat(encoding: .lossy, codec: d.codec, sampleRate: d.sampleRate, bitDepth: nil, channels: d.channels)
+            return ProbedSource(url: url, format: format, decoderName: "FFmpeg \(d.codec) · \(DolbyModes.name(mode)), which macOS decodes wrongly",
+                                pcm: decoder, dsd: nil)
+        }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
         let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
         // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.

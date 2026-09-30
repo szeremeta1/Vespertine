@@ -60,3 +60,22 @@ struct DolbyTests {
         }
     }
 }
+
+@Suite("Dolby Digital modes macOS decodes wrongly")
+struct DolbyModeTests {
+    /// The start of an AC-3 frame: sync, crc1, fscod/frmsizecod, bsid 8 / bsmod 0, then acmod and the fields after it.
+    func frame(_ modeByte: UInt8) -> [UInt8] { [0x0B, 0x77, 0, 0, 0, 0x40, modeByte, 0, 0, 0] + [UInt8](repeating: 0, count: 16) }
+
+    @Test("2/1, 3/0+LFE and 3/1+LFE go to FFmpeg; the usual modes stay with macOS")
+    func routing() throws {
+        let twoOneLFE = try #require(DolbyModes.mode(in: frame(0b100_00_1_00)))   // acmod 4, surmixlev, lfeon
+        #expect(twoOneLFE == .init(acmod: 4, lfe: true, enhanced: false, extended: false) && DolbyModes.needsFFmpeg(twoOneLFE))
+        let threeLFE = try #require(DolbyModes.mode(in: frame(0b011_00_1_00)))    // acmod 3, cmixlev, lfeon
+        #expect(threeLFE.acmod == 3 && threeLFE.lfe && DolbyModes.needsFFmpeg(threeLFE) && DolbyModes.name(threeLFE) == "3/0+LFE")
+        let fiveOne = try #require(DolbyModes.mode(in: frame(0b111_00_00_1)))     // acmod 7, cmixlev, surmixlev, lfeon
+        #expect(fiveOne.acmod == 7 && fiveOne.lfe && !DolbyModes.needsFFmpeg(fiveOne))
+        let stereo = try #require(DolbyModes.mode(in: frame(0b010_00_0_00)))      // acmod 2, dsurmod, lfeon off
+        #expect(stereo.acmod == 2 && !stereo.lfe && !DolbyModes.needsFFmpeg(stereo))
+        #expect(!DolbyModes.needsFFmpeg(.init(acmod: 4, lfe: false, enhanced: true, extended: true)), "7.1 E-AC-3 stays with macOS")
+    }
+}

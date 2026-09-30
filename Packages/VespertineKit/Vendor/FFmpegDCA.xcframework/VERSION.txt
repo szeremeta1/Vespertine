@@ -1,1 +1,1 @@
-FFmpeg 9.0.2 (dca, truehd, mlp and DSD decoders; dca, mlp parsers; dts, dtshd, truehd, mlp, matroska, dsf, iff demuxers), built 2026-09-29
+FFmpeg 9.0.2 (dca, truehd, mlp, ac3, eac3 and DSD decoders; dca, mlp, ac3 parsers; dts, dtshd, truehd, mlp, ac3, eac3, matroska, dsf, iff demuxers), built 2026-09-30
