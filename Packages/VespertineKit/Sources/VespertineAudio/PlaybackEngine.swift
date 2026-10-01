@@ -103,7 +103,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
     private let callbacks = Mutex(Callbacks())
 
-    private enum Command {
+    enum Command {
         case play(PlayableItem)
         case pause, resume, stop
         case seek(TimeInterval)
@@ -390,20 +390,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 defer { s.commands.removeAll() }
                 return s.commands
             }
-            // Several output changes waiting (quick clicks while busy): only the last one restarts playback.
-            // Each carries the complete settings, and each comes with a queue update (other versions of
-            // upcoming songs), so those collapse into one too.
-            let lastSettings = commands.lastIndex { if case .settingsChanged = $0 { true } else { false } }
-            let lastQueue = commands.lastIndex { if case .queueChanged = $0 { true } else { false } }
-            let reload = commands.contains { if case .queueChanged(true) = $0 { true } else { false } }
-            let coalesced: [Command] = commands.enumerated().compactMap { i, command in
-                switch command {
-                case .settingsChanged: i == lastSettings ? command : nil
-                case .queueChanged: i == lastQueue ? .queueChanged(reloadCurrent: reload) : nil
-                default: command
-                }
-            }
-            for command in coalesced { handle(command) }
+            for command in Self.coalesce(commands) { handle(command) }
 
             var didWork = false
             if state == .playing, let atmos {
@@ -427,11 +414,47 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
+    /// Commands that piled up while the engine was busy (opening a file on a slow share), reduced to the
+    /// ones that still matter, in order:
+    /// - Skips: only the last song asked for is opened. A play or stop makes every earlier play, seek,
+    ///   pause and resume moot; opening each skipped song in turn took seconds apiece on a share.
+    /// - Seeks: only the last one before the next play or stop.
+    /// - Output changes (quick clicks): only the last one restarts playback. Each carries the complete
+    ///   settings, and each comes with a queue update (other versions of upcoming songs), so those
+    ///   collapse into one too.
+    static func coalesce(_ commands: [Command]) -> [Command] {
+        let lastStart = commands.lastIndex { switch $0 { case .play, .stop: true; default: false } }
+        let lastSettings = commands.lastIndex { if case .settingsChanged = $0 { true } else { false } }
+        let lastQueue = commands.lastIndex { if case .queueChanged = $0 { true } else { false } }
+        let reload = commands.contains { if case .queueChanged(true) = $0 { true } else { false } }
+        return commands.enumerated().compactMap { i, command in
+            switch command {
+            case .play, .pause, .resume:
+                if let lastStart, i < lastStart { return nil }
+                return command
+            case .seek:
+                if let lastStart, i < lastStart { return nil }
+                let later = commands[(i + 1)...].contains { if case .seek = $0 { true } else { false } }
+                return later ? nil : command
+            case .settingsChanged: return i == lastSettings ? command : nil
+            case .queueChanged: return i == lastQueue ? .queueChanged(reloadCurrent: reload) : nil
+            default: return command
+            }
+        }
+    }
+
+    /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
+    private var superseded: Bool {
+        shared.withLock { $0.commands.contains { switch $0 { case .play, .stop: true; default: false } } }
+    }
+    private struct Superseded: Error {}
+
     private func handle(_ command: Command) {
         switch command {
         case .barrier(let done):
             done.signal()
         case .play(let item):
+            shared.withLock { $0.snapshot.lastError = nil }
             carried = nil
             teardownDecoding()
             session?.flush()
@@ -579,6 +602,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                     pausedAt = Date()
                 }
                 return
+            } catch is Superseded {
+                // The next command starts what was asked for instead.
+                log.info("Skipped past \(current.url.lastPathComponent, privacy: .public) while it opened")
+                teardownDecoding()
+                return
             } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
                 let uid = (error as? ChosenDeviceMissing)?.uid ?? (error as? ChosenDeviceNotReady)?.uid ?? ""
@@ -633,6 +661,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         else { probed = try SourceOpener.probe(url) }
         unusedProbe = (item.id, probed)
         mark("probe")
+        // Opening the file is the slow part on a busy share: if you've skipped on meanwhile, stop here,
+        // before the output is reconfigured for a song that won't play.
+        if superseded { throw Superseded() }
         let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
         if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
             try beginSystemRendering(item, url: resolve(item), device: device, at: seconds)

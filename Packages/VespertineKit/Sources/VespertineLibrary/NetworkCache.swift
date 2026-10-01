@@ -43,7 +43,10 @@ public final class NetworkCache: @unchecked Sendable {
     private let lock = NSLock()
     private var entries: [String: Entry] = [:]
     private var queue: [Job] = []
-    private var active: Set<String> = []
+    /// Downloads in progress, by key.
+    private var active: [String: Job] = [:]
+    /// Downloads in progress that are no longer wanted: they stop at their next read.
+    private var cancelled: Set<String> = []
     private var limit: Int64
     private var concurrentDownloads = 2
 
@@ -95,7 +98,7 @@ public final class NetworkCache: @unchecked Sendable {
 
     public func isPending(_ track: Track) -> Bool {
         let key = Self.key(for: track)
-        return lock.withLock { active.contains(key) || queue.contains { $0.key == key } }
+        return lock.withLock { active[key] != nil || queue.contains { $0.key == key } }
     }
 
     public func usage() -> Usage {
@@ -133,8 +136,9 @@ public final class NetworkCache: @unchecked Sendable {
                 if offline { queue[i].pinned = true }
                 continue
             }
-            if active.contains(key) {
+            if active[key] != nil {
                 if offline { pinAfterDownload.insert(key) }
+                cancelled.remove(key)
                 continue
             }
             queue.append(Job(key: key, remote: URL(fileURLWithPath: t.filePath, isDirectory: false), size: t.fileSize, pinned: offline))
@@ -152,6 +156,23 @@ public final class NetworkCache: @unchecked Sendable {
             let first = queue.filter { keys.contains($0.key) }.sorted { keys.firstIndex(of: $0.key)! < keys.firstIndex(of: $1.key)! }
             queue = first + queue.filter { !keys.contains($0.key) }
         }
+    }
+
+    /// Copies for other tracks are no longer wanted (you skipped past them): queued ones are dropped and
+    /// ones in progress stop, so the share serves what you're about to hear. Keep Offline copies carry on.
+    public func keepOnly(_ tracks: [Track]) {
+        let keys = Set(tracks.map(Self.key(for:)))
+        let changed = lock.withLock {
+            let before = queue.count + cancelled.count
+            queue.removeAll { !$0.pinned && !keys.contains($0.key) }
+            for (key, job) in active where !job.pinned && !pinAfterDownload.contains(key) && !keys.contains(key) {
+                cancelled.insert(key)
+            }
+            return queue.count + cancelled.count != before
+        }
+        guard changed else { return }
+        save()
+        onChange?()
     }
 
     public func setOffline(_ offline: Bool, for tracks: [Track]) {
@@ -194,7 +215,7 @@ public final class NetworkCache: @unchecked Sendable {
         var started: [Job] = []
         while active.count < concurrentDownloads, !queue.isEmpty {
             let job = queue.removeFirst()
-            active.insert(job.key)
+            active[job.key] = job
             started.append(job)
         }
         lock.unlock()
@@ -207,7 +228,8 @@ public final class NetworkCache: @unchecked Sendable {
 
     private func finish(_ job: Job, ok: Bool) {
         lock.lock()
-        active.remove(job.key)
+        active[job.key] = nil
+        cancelled.remove(job.key)
         if ok {
             let pinned = job.pinned || pinAfterDownload.remove(job.key) != nil
             entries[job.key] = Entry(key: job.key, remotePath: job.remote.path, fileName: fileName(job),
@@ -240,6 +262,7 @@ public final class NetworkCache: @unchecked Sendable {
         defer { buffer.deallocate() }
         var ok = true
         while true {
+            if lock.withLock({ cancelled.contains(job.key) }) { ok = false; break }
             let n = read(input, buffer, chunk)
             if n == 0 { break }
             if n < 0 { if errno == EINTR { continue }; ok = false; break }
