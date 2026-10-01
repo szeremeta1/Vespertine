@@ -1,4 +1,5 @@
 import AVFAudio
+import CoreAudio
 import Foundation
 import Testing
 @testable import VespertineAudio
@@ -258,6 +259,51 @@ struct HardwareAuditTests {
         let virtual = try HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription())
         #expect(virtual.mFormatFlags & kAudioFormatFlagIsFloat != 0 && virtual.mFormatFlags & kAudioFormatFlagIsNonMixable == 0)
         #expect(DeviceControl.hogOwner(device.id) == -1)
+    }
+
+    /// Skipping between songs at different rates in integer mode, with the volume relay following the held device
+    /// as the app does (VESPERTINE_INTEGER_DEVICE = part of the DAC's name). Every song must start: releasing and
+    /// retaking the device between songs used to leave the FiiO K11 paused for good after one or two skips.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"
+                   && ProcessInfo.processInfo.environment["VESPERTINE_INTEGER_DEVICE"] != nil))
+    func integerModeSkipsAcrossRates() async throws {
+        let name = ProcessInfo.processInfo.environment["VESPERTINE_INTEGER_DEVICE"]!
+        let device = try #require(OutputDevices.list().first { $0.name.localizedCaseInsensitiveContains(name) })
+        let rates = [192_000.0, 96_000, 44_100, 192_000, 88_200, 48_000, 176_400, 44_100, 96_000, 96_000]
+        let urls = try rates.map { try writeWAV("skip-silence-\(Int($0))", rate: $0, bits: 24, seconds: 6) { _, _ in 0 } }
+        defer { urls.forEach { try? FileManager.default.removeItem(at: $0) } }
+        let engine = PlaybackEngine()
+        let relay = VolumeRelay()
+        defer { relay.stop(); engine.stop() }
+        var settings = EngineSettings(); settings.deviceUID = device.uid; settings.exclusive = true; settings.integerMode = true
+        engine.update(settings: settings)
+        let following = Task {
+            var followed: AudioObjectID?
+            while !Task.isCancelled {
+                let id = engine.snapshot.outputDevice?.id
+                if id != followed { followed = id; relay.follow(id) }
+                try? await Task.sleep(for: .milliseconds(66))
+            }
+        }
+        defer { following.cancel() }
+        for (url, rate) in zip(urls, rates) {
+            let t = Date()
+            var item = PlayableItem(url: url)
+            engine.play(item)
+            if rate == 96_000 || rate == 48_000 {   // a quick double skip lands mid-configuration
+                try await Task.sleep(for: .milliseconds(150))
+                item = PlayableItem(url: url)
+                engine.play(item)
+            }
+            let deadline = Date().addingTimeInterval(12)
+            while !(engine.snapshot.item?.id == item.id && engine.snapshot.state == .playing && engine.snapshot.position > 0.2), Date() < deadline {
+                try await Task.sleep(for: .milliseconds(20))
+            }
+            let snap = engine.snapshot
+            print("skip to \(Int(rate)): \(snap.state) after \(String(format: "%.2f", Date().timeIntervalSince(t))) s, integer \(snap.signalPath?.applied.integerMode as Any), waiting \(snap.waitingForDevice as Any)")
+            #expect(snap.item?.id == item.id && snap.state == .playing && snap.waitingForDevice == nil, "\(Int(rate)) Hz didn't start: \(snap.lastError ?? "-")")
+        }
+        engine.stopAndWait()
     }
 
     private func wait(_ predicate: () -> Bool) async throws {

@@ -137,6 +137,7 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
         case .deviceLost(let n): print("\(t) device lost \(n)")
         case .waitingForDevice(let n): print("\(t) waiting for \(n)")
         case .deviceUnavailable(let n): print("\(t) \(n) unavailable")
+        case .deviceNotResponding(let n): print("\(t) \(n) not responding")
         }
     }
     engine.play(items[0])

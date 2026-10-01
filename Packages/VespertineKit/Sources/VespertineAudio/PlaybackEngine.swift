@@ -48,6 +48,8 @@ public enum EngineEvent: Sendable {
     case waitingForDevice(String)
     /// The chosen output didn't come back in time; playback stays paused.
     case deviceUnavailable(String)
+    /// The chosen output is connected but still won't start after the wait; playback stays paused.
+    case deviceNotResponding(String)
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -587,7 +589,14 @@ public final class PlaybackEngine: @unchecked Sendable {
                 pausedAt = nil
                 if autoplay || previousWait != nil {
                     let now = Date()
-                    awaitingDevice = (uid, previousWait?.until ?? now.addingTimeInterval(deviceWait), now)
+                    let until = previousWait?.until ?? now.addingTimeInterval(deviceWait)
+                    if error is ChosenDeviceNotReady, now > until {
+                        // Connected all along and still won't start: stop trying (each try can block the engine
+                        // for seconds, so pause and skip would barely respond) and say so.
+                        emit(.deviceNotResponding(deviceName(uid)))
+                        return
+                    }
+                    awaitingDevice = (uid, until, now)
                     if previousWait == nil { emit(.waitingForDevice(deviceName(uid))) }
                 }
                 return
@@ -677,10 +686,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         let old = session
         session = nil
         sessionLock.unlock()
-        old?.invalidate(releaseHog: true)
         // DSD over DoP only survives untouched with sole access, so it always takes the device.
-        let new = try OutputSession(deviceID: device.id, plan: plan,
-                                    exclusive: (settings.exclusive && !device.alwaysShared) || plan.isPassthrough)
+        let exclusive = (settings.exclusive && !device.alwaysShared) || plan.isPassthrough
+        // A new format on the device already held (a skip to another rate): keep holding it and leave its format
+        // to the new session. Letting go and taking it back reconfigures the device several times in a row, and
+        // macOS can lose track of its own pause/resume pairs then: the device stays paused for this process and
+        // never starts again (AudioDeviceStart times out with error 35) until the app quits.
+        let keep = old.map { $0.deviceID == device.id && $0.applied.exclusive && exclusive } ?? false
+        old?.invalidate(releaseHog: !keep, restoreFormat: !keep)
+        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive)
         sessionLock.lock()
         session = new
         sessionDevice = device
@@ -1019,6 +1033,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         if let pending {
             self.pending = nil
+            let startedAt = Date()
             do {
                 try replaceSession(device: pending.device, plan: pending.plan)
                 guard let session = self.session else { return }
@@ -1035,7 +1050,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                 draining = false
                 prefill()
                 try session.start()
+                log.notice("Next song plays on \(pending.device.name, privacy: .public) at \(SampleRate.format(session.applied.sampleRate), privacy: .public) kHz after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
             } catch {
+                log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
                 emit(.failed(pending.item, error.localizedDescription))
                 if let next = nextItemProvider?(pending.item) { start(next, at: 0, autoplay: true) }
                 else { finishQueue() }
