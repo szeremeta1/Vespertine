@@ -29,8 +29,17 @@ struct TrackTable: View {
         return sortOrder.isEmpty ? base : base.sorted(using: sortOrder)
     }
 
+    /// Album pages of multi-disc albums number tracks "2·1", "2·2"…, so disc 2 doesn't look like the list restarting.
+    private var numbersDiscs: Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
+
+    private func number(_ track: Track, discs: Bool) -> String {
+        guard let n = track.trackNumber else { return "–" }
+        return discs ? "\(track.discNumber ?? 1)·\(n)" : "\(n)"
+    }
+
     var body: some View {
         let rows = self.rows
+        let discs = numbersDiscs
         Table(rows, selection: $selection, sortOrder: $sortOrder) {
             // Ideal widths add up to about 810 pt: what's left beside the sidebar and inspector in a 1440 pt window.
             TableColumn("#", value: \.index) { row in
@@ -39,12 +48,12 @@ struct TrackTable: View {
                         .font(.system(size: 10))
                         .foregroundStyle(Palette.brass)
                 } else {
-                    Text(showAlbum ? "\(row.index + 1)" : (row.track.trackNumber.map(String.init) ?? "–"))
+                    Text(showAlbum ? "\(row.index + 1)" : number(row.track, discs: discs))
                         .font(Typeface.mono(11.5))
                         .foregroundStyle(Palette.text3)
                 }
             }
-            .width(36)
+            .width(discs ? 44 : 36)
 
             TableColumn("Title", value: \.track.title) { row in
                 Text(row.track.title)
