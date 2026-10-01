@@ -174,7 +174,7 @@ public actor LibraryScanner {
                         for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
                     }
                     for track in tracks { seen.insert(track.location) }
-                    let kept = skipping ? tracks.filter { MusicFinder.kind(sampleRate: $0.sampleRate, channels: $0.channels, duration: $0.duration, isDSD: $0.isDSD) == .music || $0.cueStartFrame != nil } : tracks
+                    let kept = skipping ? tracks.filter(MusicFinder.keepsInLibrary) : tracks
                     summary.skipped += tracks.count - kept.count
                     batch.append(contentsOf: kept)
                 } else { summary.failed.append(url.path) }

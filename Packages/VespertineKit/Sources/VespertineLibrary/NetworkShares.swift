@@ -301,33 +301,56 @@ public enum NetworkVolume {
         return s.f_flags & UInt32(MNT_DONTBROWSE) != 0
     }
 
-    /// Whether a mounted share still answers: lists its root on a background thread, within `timeout`.
-    /// A mount can stay listed after the server rebooted or the connection died; it then errors or stalls.
-    public static func isResponsive(_ root: URL, timeout: TimeInterval = 8) async -> Bool {
+    /// Runs file-system work that can block on a network mount (stat, list, open, unmount) on a GCD thread, never
+    /// the caller's: not the main thread, and not the Swift concurrency pool, whose few threads would all stall on a
+    /// wedged share. Waits at most `timeout`, then returns `fallback`; work that's still blocked finishes (or stays
+    /// stuck) on its own thread and its result is dropped.
+    public static func blocking<T: Sendable>(timeout: TimeInterval, otherwise fallback: T,
+                                             _ work: @escaping @Sendable () -> T) async -> T {
         let once = ResumeOnce()
-        return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+        return await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
             DispatchQueue.global(qos: .utility).async {
-                let ok = (try? FileManager.default.contentsOfDirectory(atPath: root.path)) != nil
-                if once.claim() { continuation.resume(returning: ok) }
+                let value = work()
+                if once.claim() { continuation.resume(returning: value) }
             }
             DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                if once.claim() { continuation.resume(returning: false) }
+                if once.claim() { continuation.resume(returning: fallback) }
             }
         }
     }
 
-    /// Drops a dead mount even if it's wedged (forced), so it can be mounted again.
-    public static func forceUnmount(_ mountPoint: URL, ownedBy base: URL) {
-        guard isOwnMount(mountPoint, legacyBase: base) else { return }
-        _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
-        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
+    /// Whether a mounted share still answers: lists its root on a background thread, within `timeout`.
+    /// A mount can stay listed after the server rebooted or the connection died; it then errors or stalls.
+    public static func isResponsive(_ root: URL, timeout: TimeInterval = 8) async -> Bool {
+        await blocking(timeout: timeout, otherwise: false) { (try? FileManager.default.contentsOfDirectory(atPath: root.path)) != nil }
+    }
+
+    /// Whether `url` is a folder, asked off the calling thread: on a dead mount even a stat can hang.
+    public static func isDirectory(_ url: URL, timeout: TimeInterval = 8) async -> Bool {
+        await blocking(timeout: timeout, otherwise: false) {
+            var isDir: ObjCBool = false
+            return FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue
+        }
+    }
+
+    /// Drops a dead mount even if it's wedged (forced), so it can be mounted again. On a wedged mount the statfs
+    /// and the unmount itself can block for minutes, so they run on their own thread and the caller waits at most
+    /// `timeout` (a forced unmount usually takes well under a second).
+    public static func forceUnmount(_ mountPoint: URL, ownedBy base: URL, timeout: TimeInterval = 15) async {
+        await blocking(timeout: timeout, otherwise: ()) {
+            guard isOwnMount(mountPoint, legacyBase: base) else { return }
+            _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
+            if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
+        }
     }
 
     /// Unmounts a share Vespertine mounted. Other mounts (Finder's) are left alone.
     public static func unmount(_ mountPoint: URL, ownedBy base: URL) async {
-        guard isOwnMount(mountPoint, legacyBase: base) else { return }
+        guard await blocking(timeout: 8, otherwise: false, { isOwnMount(mountPoint, legacyBase: base) }) else { return }
         try? await FileManager.default.unmountVolume(at: mountPoint, options: [.withoutUI])
-        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
+        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) {
+            await blocking(timeout: 8, otherwise: ()) { try? FileManager.default.removeItem(at: mountPoint) }
+        }
     }
 }
 

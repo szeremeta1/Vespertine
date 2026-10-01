@@ -203,6 +203,24 @@ struct FindAndEnrichTests {
         #expect(MusicFinder.kind(sampleRate: 2_822_400, channels: 2, duration: 200, isDSD: true) == .music)
     }
 
+    @Test("Short tracks tagged as part of an album stay in the library; untagged clips and singles don't")
+    func shortAlbumTracks() {
+        func track(_ seconds: Double, album: String? = nil, number: Int? = nil, of total: Int? = nil, rate: Double = 2_822_400) -> Track {
+            var t = Track.stub(path: "/m/Oasis/Morning Glory/06.dsf")
+            t.duration = seconds; t.album = album; t.trackNumber = number; t.trackTotal = total
+            t.sampleRate = rate; t.isDSD = rate > 1_000_000
+            return t
+        }
+        // Morning Glory's "The Swamp Song (Version 1)", 44 s, track 6 of 12.
+        #expect(MusicFinder.keepsInLibrary(track(44, album: "(What's the Story) Morning Glory?", number: 6, of: 12)))
+        #expect(MusicFinder.keepsInLibrary(track(31, album: "Morning Glory", number: 11)))
+        #expect(!MusicFinder.keepsInLibrary(track(12)), "an untagged prompt or sample")
+        #expect(!MusicFinder.keepsInLibrary(track(12, album: "Morning Glory")), "no track number")
+        #expect(!MusicFinder.keepsInLibrary(track(20, album: "Station ID", number: 1, of: 1)), "a one-track jingle")
+        #expect(!MusicFinder.keepsInLibrary(track(300, album: "Calls", number: 3, rate: 8_000)), "voice recordings stay out")
+        #expect(MusicFinder.keepsInLibrary(track(200)))
+    }
+
     @Test("Finder groups music by folder, flags hi-res, and leaves out recordings")
     func finder() async throws {
         let dir = try tempDir()

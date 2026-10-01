@@ -112,11 +112,13 @@ final class AnalysisQueue {
         var indexed: Set<Int64> = [], statuses: [Int64: ServerAnalysisStatus] = [:], imported = 0
         for source in sources {
             guard let id = source.id else { continue }
-            let result = await Task.detached(priority: .utility) { () -> (Bool, ServerAnalysisStatus?, Int) in
+            // Reads the index over the network: on a GCD thread, so a stalled share can't hold one of the few
+            // threads Swift concurrency runs everything else on. A read that outlasts the deadline is skipped.
+            let result = await NetworkVolume.blocking(timeout: 120, otherwise: (false, nil, 0)) { () -> (Bool, ServerAnalysisStatus?, Int) in
                 guard let root = ServerAnalysisImporter.indexRoot(for: source) else { return (false, nil, 0) }
                 let n = (try? importer.importNew(for: source, into: database)) ?? 0
                 return (true, ServerAnalysisImporter.status(at: root), n)
-            }.value
+            }
             if result.0 { indexed.insert(id) }
             if let status = result.1 { statuses[id] = status }
             imported += result.2
