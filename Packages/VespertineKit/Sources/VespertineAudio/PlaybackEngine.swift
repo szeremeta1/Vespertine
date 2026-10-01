@@ -679,7 +679,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.unlock()
         old?.invalidate(releaseHog: true)
         // DSD over DoP only survives untouched with sole access, so it always takes the device.
-        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: settings.exclusive || plan.isPassthrough)
+        let new = try OutputSession(deviceID: device.id, plan: plan,
+                                    exclusive: (settings.exclusive && !device.alwaysShared) || plan.isPassthrough)
         sessionLock.lock()
         session = new
         sessionDevice = device
@@ -773,7 +774,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Integer mode applies only where nothing would change the samples: plain PCM at its own rate and
     /// channel count, no Spatial Audio, digital volume or ReplayGain, on a device with a non-mixable Int32 format.
     private func wantsIntegerMode(_ plan: OutputPlan, source: SourceFormat, item: PlayableItem, device: OutputDevice) -> Bool {
-        settings.integerMode && settings.exclusive && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+        settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && settings.digitalVolumeDB == nil
             && (item.replayGainDB ?? 0) == 0
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }

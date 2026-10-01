@@ -245,7 +245,10 @@ struct DeviceSettings: View {
             Toggle(isOn: Binding(get: { settings.exclusiveMode }, set: { settings.exclusiveMode = $0; model.syncEngine() })) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Exclusive access").font(Typeface.ui(12))
-                    Text("Other apps are silenced on this device. Volume keys and the AirPods Max crown can't reach it.").font(Typeface.ui(10.5)).foregroundStyle(Palette.text3)
+                    Text(device.alwaysShared
+                         ? "Not on the Mac's own speakers and headphone jack: they always play shared, so the volume keys keep working."
+                         : "Other apps are silenced on this device. Volume keys and the AirPods Max crown can't reach it.")
+                        .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
             }
             .toggleStyle(.switch).controlSize(.mini)
