@@ -189,6 +189,7 @@ final class AppModel {
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                self.player.volumeRelay.stop()
                 self.player.engine.stopAndWait()
                 DeviceRestore.finish(self.settings.deviceOnQuit)
             }

@@ -160,7 +160,7 @@ struct PlaybackSettings: View {
             Section("Output") {
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
                 Text(s.exclusiveMode
-                     ? "Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so volume keys and the AirPods Max Digital Crown adjust a different device. The Mac's own speakers and headphone jack always play shared, so the volume keys keep working there."
+                     ? "Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so Vespertine passes the volume keys, Control Center and the AirPods Max Digital Crown on to it. The Mac's own speakers and headphone jack always play shared."
                      : "Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Integer mode", isOn: $s.integerMode)
