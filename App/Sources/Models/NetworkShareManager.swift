@@ -167,7 +167,7 @@ final class NetworkShareManager {
                     shareLog.notice("share \(id, privacy: .public): mount not responding (\(self.unresponsive[id] ?? 0, privacy: .public))")
                     guard (unresponsive[id] ?? 0) >= 2 else { continue }
                     unresponsive[id] = 0
-                    NetworkVolume.forceUnmount(mount, ownedBy: mountBase)
+                    await NetworkVolume.forceUnmount(mount, ownedBy: mountBase)
                     status[id] = .offline("Reconnecting…")
                     await connect(source)
                     continue
@@ -230,7 +230,7 @@ final class NetworkShareManager {
             }
             let mount = try await NetworkVolume.mount(share, password: password, in: mountBase, readOnly: !source.isWritable)
             let root = share.root(at: mount).standardizedFileURL
-            guard Self.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
+            guard await NetworkVolume.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
             try library.database.relinkSource(id, to: root.path)
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
@@ -257,7 +257,7 @@ final class NetworkShareManager {
         let secret = typed ?? (share.user == nil ? nil : NetworkCredentials.password(for: share))
         let mount = try await NetworkVolume.mount(share, password: secret, in: mountBase, readOnly: !writable)
         let root = share.root(at: mount).standardizedFileURL
-        guard Self.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
+        guard await NetworkVolume.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
         if remember, let typed { NetworkCredentials.save(typed, for: share) }
 
         if let existing = sources.first(where: { $0.remoteURL == share.urlString }) {
@@ -279,11 +279,6 @@ final class NetworkShareManager {
         if let share = source.networkShare, let mount = NetworkVolume.existingMount(for: share) {
             await NetworkVolume.unmount(mount, ownedBy: mountBase)
         }
-    }
-
-    private static func isDirectory(_ url: URL) -> Bool {
-        var isDir: ObjCBool = false
-        return FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue
     }
 
     // MARK: Cache

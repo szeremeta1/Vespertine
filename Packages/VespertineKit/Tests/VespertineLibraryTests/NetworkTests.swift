@@ -36,6 +36,22 @@ struct NetworkTests {
         #expect(NetworkShare(string: "ftp://host/x") == nil)
     }
 
+    @Test("Blocking share work never holds the caller past its deadline")
+    func blockingDeadline() async {
+        // A wedged mount: the work doesn't return for seconds. The caller gets the fallback at the deadline.
+        let start = Date()
+        let stuck = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
+        #expect(stuck == "fallback")
+        #expect(Date().timeIntervalSince(start) < 1.5)
+        // Work that finishes in time returns its own result.
+        #expect(await NetworkVolume.blocking(timeout: 5, otherwise: 0) { 42 } == 42)
+        // Main-actor callers aren't blocked meanwhile: the work runs on a GCD thread.
+        let onMain = await MainActor.run { Thread.isMainThread }
+        #expect(onMain)
+        let workerIsMain = await NetworkVolume.blocking(timeout: 5, otherwise: true) { Thread.isMainThread }
+        #expect(!workerIsMain)
+    }
+
     @Test("Network reads are spread across folders")
     func interleaving() {
         let urls = ["/a/1", "/a/2", "/a/3", "/b/1", "/c/1", "/c/2"].map { URL(fileURLWithPath: $0) }

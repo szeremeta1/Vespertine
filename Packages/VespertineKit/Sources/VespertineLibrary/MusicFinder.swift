@@ -131,6 +131,20 @@ public enum MusicFinder {
         return .music
     }
 
+    /// Whether the scanner keeps a track while skipping non-music: music, CUE tracks, and short tracks tagged as part
+    /// of an album (interludes, intros, hidden-track stubs like Morning Glory's two "Swamp Song" excerpts). Prompts,
+    /// stings and samples don't carry album and track tags; a one-track "album" under 45 s is a jingle, not a song.
+    public static func keepsInLibrary(_ track: Track) -> Bool {
+        if track.cueStartFrame != nil { return true }
+        switch kind(sampleRate: track.sampleRate, channels: track.channels, duration: track.duration, isDSD: track.isDSD) {
+        case .music: return true
+        case .recording: return false
+        case .clip:
+            let album = track.album?.trimmingCharacters(in: .whitespaces) ?? ""
+            return !album.isEmpty && track.trackNumber != nil && track.trackTotal != 1
+        }
+    }
+
     static func spotlightAudioFiles() -> [URL] {
         let query = MDQueryCreate(kCFAllocatorDefault, "kMDItemContentTypeTree == 'public.audio'" as CFString, nil, nil)
         guard let query else { return [] }
