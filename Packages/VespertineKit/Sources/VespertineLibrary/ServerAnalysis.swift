@@ -79,12 +79,24 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
         guard !records.isEmpty, let sourceID = source.id else { return 0 }
 
         let base = root.standardizedFileURL.path.hasSuffix("/") ? root.standardizedFileURL.path : root.standardizedFileURL.path + "/"
+        // A folder whose name SMB can't carry ("Morning Glory?", "Mozart: Requiem") reaches the Mac under a mangled
+        // name ("_3018I~A"), so its path isn't in the server's index. Those files are found by size and date (within
+        // 2 ms) instead, among records no track claims by path, when exactly one fits.
+        // Only records that belong to no track by path are candidates.
+        let known = Set(try database.writer.read { db in
+            try String.fetchAll(db, sql: "SELECT filePath FROM track WHERE sourceId = ?", arguments: [sourceID])
+        }.compactMap { $0.hasPrefix(base) ? String($0.dropFirst(base.count)).precomposedStringWithCanonicalMapping : nil })
+        var bySize: [Int64: [Record]] = [:]
+        for (path, r) in records where !known.contains(path) { bySize[r.size, default: []].append(r) }
         var matched: [(FileAnalysis, String)] = []
         for track in try database.tracksNeedingAnalysis() where track.sourceId == sourceID {
             guard track.filePath.hasPrefix(base) else { continue }
             let rel = String(track.filePath.dropFirst(base.count)).precomposedStringWithCanonicalMapping
-            guard let r = records[rel], r.size == track.fileSize,
-                  abs(r.mtime - track.modifiedAt.timeIntervalSince1970) < 2,
+            let byPath = records[rel].flatMap { r in
+                r.size == track.fileSize && abs(r.mtime - track.modifiedAt.timeIntervalSince1970) < 2 ? r : nil
+            }
+            let candidates = (bySize[track.fileSize] ?? []).filter { abs($0.mtime - track.modifiedAt.timeIntervalSince1970) < 0.002 }
+            guard let r = byPath ?? (candidates.count == 1 ? candidates[0] : nil),
                   r.analysis.version >= FileAnalysis.currentVersion else { continue }
             matched.append((r.analysis, track.filePath))
         }

@@ -76,6 +76,31 @@ struct ServerAnalysisTests {
         #expect(try db.storedAnalysis(for: b)?.analysis.verdict == .paddedBitDepth)
     }
 
+    @Test("A folder SMB shows under a mangled name is matched by size and date")
+    func mangledFolderNames() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let mangled = dir.appendingPathComponent("_3018I~A")      // the server's "Morning Glory? (30th Anniversary)"
+        try FileManager.default.createDirectory(at: mangled, withIntermediateDirectories: true)
+        try makeWAV(mangled.appendingPathComponent("01 Hello.wav"), rate: 96_000, seconds: 0.7)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        var share = LibrarySource(path: dir.path, mode: .reference)
+        share.remoteURL = "smb://server/music"
+        let source = try db.addSource(share)
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        let index = dir.appendingPathComponent(".vespertine")
+        try FileManager.default.createDirectory(at: index, withIntermediateDirectories: true)
+        let text = try line(path: "Oasis/Morning Glory? (30th Anniversary)/01 Hello.wav", size: track.fileSize,
+                            mtime: track.modifiedAt.timeIntervalSince1970 + 0.0004, verdict: .genuine)
+            + line(path: "Oasis/Other/02 Roll With It.wav", size: track.fileSize, mtime: track.modifiedAt.timeIntervalSince1970 + 60, verdict: .upsampled)
+        try text.write(to: index.appendingPathComponent("analysis.jsonl"), atomically: true, encoding: .utf8)
+        #expect(try ServerAnalysisImporter().importNew(for: source, into: db) == 1)
+        #expect(try db.storedAnalysis(for: track)?.analysis.verdict == .genuine)
+    }
+
     @Test("Servers set up before the rename keep working: .nocturne/ is read when .vespertine/ is absent")
     func legacyIndexFolder() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("legacy-index-\(UUID())")
