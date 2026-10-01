@@ -61,6 +61,11 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 
+    /// Built-in outputs (the Mac's speakers and headphone jack) always play shared, whatever the Exclusive access
+    /// setting: macOS won't make a device another app holds exclusively the sound output, so the volume keys would
+    /// stop reaching them, and they take float formats only, so exclusive access gains nothing (no integer mode).
+    public var alwaysShared: Bool { transport == .builtIn }
+
     /// The configured speaker layout ("L", "R", "C", "LFE"…), empty when not set up or unlabeled.
     public var speakerNames: [String] {
         guard let layout = DeviceQuery.speakerLayout(id), layout.hasSpeakerPositions else { return [] }
