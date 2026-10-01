@@ -11,7 +11,7 @@ import Observation
 import SwiftUI
 
 enum SidebarItem: Hashable {
-    case albums, artists, songs, genres, recentlyAdded
+    case albums, artists, songs, genres, recentlyAdded, favorites
     case playlist(Int64)
     case source(Int64)
 }
@@ -270,6 +270,27 @@ final class AppModel {
     }
 
     var selectedTracks: [Track] { library.tracks(ids: Array(selectedTrackIDs)) }
+
+    /// Adds songs to Favorites, or removes them when every one already is a favorite. Undoable in the
+    /// window you're in (⌘Z brings back a heart clicked by mistake); SwiftUI's own undo manager is nil in
+    /// these windows, so it's the AppKit window's.
+    func toggleFavorite(_ tracks: [Track]) {
+        let ids = tracks.compactMap(\.id)
+        guard !ids.isEmpty else { return }
+        let favorite = !ids.allSatisfy(library.favoriteIDs.contains)
+        // Only the songs that change, so undo restores exactly what was there.
+        let changed = ids.filter { library.favoriteIDs.contains($0) != favorite }
+        setFavorite(favorite, trackIDs: changed, undoManager: NSApp.keyWindow?.undoManager ?? NSApp.mainWindow?.undoManager)
+    }
+
+    private func setFavorite(_ favorite: Bool, trackIDs: [Int64], undoManager: UndoManager?) {
+        library.setFavorite(favorite, trackIDs: trackIDs)
+        guard let undoManager else { return }
+        undoManager.registerUndo(withTarget: self) { model in
+            MainActor.assumeIsolated { model.setFavorite(!favorite, trackIDs: trackIDs, undoManager: undoManager) }
+        }
+        undoManager.setActionName(favorite ? "Add to Favorites" : "Remove from Favorites")
+    }
 
     func openAlbum(_ key: String) {
         path.append(.album(key))

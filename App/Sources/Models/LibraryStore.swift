@@ -57,6 +57,10 @@ final class LibraryStore {
     private(set) var genres: [GenreSummary] = []
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
     private(set) var playlists: [Playlist] = []
+    /// Every favorite song's track ID (missing files included, so their heart stays filled).
+    private(set) var favoriteIDs: Set<Int64> = []
+    /// Favorites whose files are present: the number in the sidebar.
+    private(set) var favoriteCount = 0
     private(set) var sources: [LibrarySource] = []
 
     /// A location as people should see it: files on a network share read "High-Res Music › Artist/Album"
@@ -158,6 +162,18 @@ final class LibraryStore {
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db) }
             do { for try await value in obs.values(in: writer) { self?.playlists = value } } catch {}
+        })
+        tasks.append(Task { [weak self] in
+            let obs = ValueObservation.tracking { db in
+                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing FROM favorite JOIN track ON track.id = favorite.trackId")
+                    .map { (id: $0["id"] as Int64, missing: $0["missing"] as Bool) }
+            }
+            do {
+                for try await value in obs.values(in: writer) {
+                    self?.favoriteIDs = Set(value.map(\.id))
+                    self?.favoriteCount = value.count { !$0.missing }
+                }
+            } catch {}
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in try LibrarySource.order(Column("path")).fetchAll(db) }
@@ -405,6 +421,16 @@ final class LibraryStore {
     func renamePlaylist(_ playlist: Playlist, to name: String) { if let id = playlist.id { try? database.renamePlaylist(id, to: name) } }
     func updateRules(_ playlist: Playlist, _ rules: SmartRules) {
         if let id = playlist.id { try? database.updateSmartRules(id, rules); revision += 1 }
+    }
+
+    // MARK: Favorites
+
+    func isFavorite(_ track: Track?) -> Bool { track?.id.map(favoriteIDs.contains) ?? false }
+    func favoriteTracks() -> [Track] { (try? database.favoriteTracks()) ?? [] }
+
+    /// Library state only: favorites are never written into the files.
+    func setFavorite(_ favorite: Bool, trackIDs: [Int64]) {
+        do { try database.setFavorite(favorite, trackIDs: trackIDs) } catch { lastError = error.localizedDescription }
     }
 
     func markPlayed(_ trackID: Int64) { try? database.markPlayed(trackID) }

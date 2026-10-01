@@ -51,7 +51,7 @@ public struct SmartRules: Codable, Sendable, Hashable {
 public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
     public enum Field: String, Codable, Sendable, CaseIterable {
         case title, artist, album, albumArtist, composer, genre, codec, year
-        case sampleRate, bitDepth, isDSD, isLossless, playCount, rating, addedDaysAgo, verdict, channels
+        case sampleRate, bitDepth, isDSD, isLossless, playCount, rating, addedDaysAgo, verdict, channels, isFavorite
 
         public var label: String {
             switch self {
@@ -72,6 +72,7 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             case .addedDaysAgo: "Added (days ago)"
             case .verdict: "Analysis Verdict"
             case .channels: "Channels"
+            case .isFavorite: "Is Favorite"
             }
         }
 
@@ -82,7 +83,7 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             }
         }
 
-        var isBoolean: Bool { self == .isDSD || self == .isLossless }
+        var isBoolean: Bool { self == .isDSD || self == .isLossless || self == .isFavorite }
 
         /// The comparisons that make sense for this field (the editor offers only these).
         public var operators: [Operator] {
@@ -162,6 +163,13 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
             }
         case .verdict: column = "analysisVerdict"
         default: column = field.rawValue
+        }
+        if field == .isFavorite {
+            switch op {
+            case .isTrue: return ("id IN (SELECT trackId FROM favorite)", [])
+            case .isFalse: return ("id NOT IN (SELECT trackId FROM favorite)", [])
+            default: return nil
+            }
         }
         if field.isBoolean {
             switch op {

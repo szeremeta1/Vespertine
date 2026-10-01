@@ -83,6 +83,12 @@ struct TrackTable: View {
             }
             .width(min: 150, ideal: 190)
 
+            TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3)) { row in
+                FavoriteCell(model: model, track: row.track,
+                             emphasized: selection.contains(row.id) || model.player.current?.track.id == row.track.id)
+            }
+            .width(22)
+
             TableColumn("Time", value: \.track.duration) { row in
                 Text(row.track.duration.clock).font(Typeface.mono(11.5)).foregroundStyle(Palette.text3)
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -161,6 +167,9 @@ struct TrackMenu: View {
         Button("Play Next") { model.player.playNext(tracks) }
         Button("Add to Queue") { model.player.addToQueue(tracks) }
         AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
+        Button(tracks.allSatisfy(model.library.isFavorite) ? "Remove from Favorites" : "Add to Favorites") {
+            model.toggleFavorite(tracks)
+        }
         Divider()
         Button("Get Info") {
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
@@ -391,8 +400,13 @@ struct PlaylistView: View {
             }
         }
         .background(Palette.window)
-        .task(id: "\(playlistID)#\(model.library.revision)#\(playlist?.smartRules.hashValue ?? 0)") {
+        .task(id: "\(playlistID)#\(model.library.revision)#\(playlist?.smartRules.hashValue ?? 0)#\(favoritesKey(playlist))") {
             if let playlist { tracks = model.library.tracks(in: playlist) }
         }
+    }
+
+    /// Smart playlists with an "Is Favorite" rule follow favorites as they change.
+    private func favoritesKey(_ playlist: Playlist?) -> Int {
+        playlist?.smartRules?.rules.contains { $0.field == .isFavorite } == true ? model.library.favoriteIDs.hashValue : 0
     }
 }

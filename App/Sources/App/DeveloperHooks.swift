@@ -51,6 +51,7 @@ enum DeveloperHooks {
             case "songs": model.sidebar = .songs
             case "genres": model.sidebar = .genres
             case "recent": model.sidebar = .recentlyAdded
+            case "favorites": model.sidebar = .favorites
             default: if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
             }
         }
