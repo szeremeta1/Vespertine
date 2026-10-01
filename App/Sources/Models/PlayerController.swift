@@ -235,6 +235,9 @@ final class PlayerController {
     /// while it plays so they adjust what you hear, and never change some other device's volume.
     /// (macOS never makes a device another app holds exclusively the sound output, so this needs shared mode.)
     private var lastFollowed: AudioObjectID?
+    /// With exclusive access the device can't be the sound output; the relay carries the keys to it instead.
+    let volumeRelay = VolumeRelay()
+    private var relayedDevice: AudioObjectID?
     nonisolated private static let halQueue = DispatchQueue(label: "org.szeremeta.vespertine.system-output", qos: .userInitiated)
     private func followSystemOutput(to device: OutputDevice) {
         guard settings.systemOutputFollowsPlayback, signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
@@ -429,6 +432,10 @@ final class PlayerController {
             outputDevice = snap.outputDevice
         }
         if state == .playing, let device = snap.outputDevice { followSystemOutput(to: device) } else if state != .playing { lastFollowed = nil }
+        if relayedDevice != snap.outputDevice?.id {
+            relayedDevice = snap.outputDevice?.id
+            volumeRelay.follow(relayedDevice)
+        }
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
