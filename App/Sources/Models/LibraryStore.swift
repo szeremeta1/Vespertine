@@ -73,14 +73,13 @@ final class LibraryStore {
         }
         return (path as NSString).abbreviatingWithTildeInPath
     }
-    /// For each track, every version of its song on its album (stereo and multichannel), or just the track.
-    /// Albums with only one channel layout are skipped without grouping.
+    /// For each track, every version and copy of its song on its album (stereo and multichannel, the same song
+    /// in two places), or just the track.
     func versions(of tracks: [Track]) -> [[Track]] {
-        var albums: [String: [Track]] = [:]
+        var albums: [String: [[Track]]] = [:]
         return tracks.map { t in
-            let album = albums[t.albumKey] ?? { let a = self.tracks(albumKey: t.albumKey); albums[t.albumKey] = a; return a }()
-            guard album.contains(where: \.isMultichannel), album.contains(where: { !$0.isMultichannel }) else { return [t] }
-            return TrackVersions.versions(of: t, in: album)
+            let songs = albums[t.albumKey] ?? { let g = TrackVersions.group(self.tracks(albumKey: t.albumKey)); albums[t.albumKey] = g; return g }()
+            return songs.first { $0.contains { $0.id == t.id && $0.location == t.location } } ?? [t]
         }
     }
 

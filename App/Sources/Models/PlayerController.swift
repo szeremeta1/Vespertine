@@ -126,7 +126,9 @@ final class PlayerController {
                 let key = versions.map(\.location).sorted().joined(separator: "\u{1F}")
                 guard queued.insert(key).inserted else { return nil }
             }
-            let chosen = wanted.flatMap { TrackVersions.choose(versions, multichannel: $0) } ?? track
+            // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
+            let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
+            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal) ?? track : track
             return QueueEntry(item: makeItem(chosen), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }
@@ -138,7 +140,8 @@ final class PlayerController {
         let start = (currentIndex ?? -1) + 1
         var changed = false
         func resolve(_ entry: QueueEntry) -> QueueEntry {
-            guard entry.versions.count > 1, let chosen = TrackVersions.choose(entry.versions, multichannel: wanted),
+            guard entry.versions.count > 1,
+                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
                   chosen.id != entry.track.id else { return entry }
             changed = true
             return QueueEntry(item: makeItem(chosen, id: entry.id), track: chosen, versions: entry.versions)

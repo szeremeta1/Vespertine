@@ -3,6 +3,7 @@
 //   vespertine-library find [folder…]        list folders with music (read-only)
 //   vespertine-library scan --library <dir> <folder>   index a folder (local or a mounted network share)
 //   vespertine-library verify-remote <folder> [n]      check the fast network tag path against direct reads
+//   vespertine-library audit [--library <dir>]         albums split or merged, duplicate files, missing numbers (read-only)
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -15,6 +16,23 @@ let args = Array(CommandLine.arguments.dropFirst())
 func minutes(_ s: Double) -> String { String(format: "%d:%02d", Int(s) / 60, Int(s) % 60) }
 
 switch args.first {
+case "audit":
+    // Read-only, without migrating: safe while Vespertine has the library open. Run it after importing music.
+    let dir = args.firstIndex(of: "--library").map { (args[$0 + 1] as NSString).expandingTildeInPath }
+        ?? LibraryDatabase.defaultURL.deletingLastPathComponent().path
+    let database = try LibraryDatabase.readOnly(url: URL(fileURLWithPath: dir).appendingPathComponent("Library.sqlite"))
+    let findings = LibraryAudit.run(try database.auditTracks())
+    if findings.isEmpty { print("Nothing to fix."); exit(0) }
+    for kind in LibraryAudit.Finding.Kind.allCases {
+        let these = findings.filter { $0.kind == kind }
+        guard !these.isEmpty else { continue }
+        print("\n\(kind.rawValue) (\(these.count))")
+        for f in these {
+            print("  • \(f.albums.joined(separator: "  |  "))  — \(f.detail)")
+            for p in f.paths.prefix(4) { print("      \(p)") }
+        }
+    }
+    exit(1)
 case "find":
     let roots = args.count > 1 ? args.dropFirst().map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath) } : nil
     let folders = await MusicFinder.find(roots: roots) { p in

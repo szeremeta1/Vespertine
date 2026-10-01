@@ -27,9 +27,9 @@ public final class LibraryDatabase: Sendable {
         return try LibraryDatabase(writer: DatabaseQueue(configuration: config))
     }
 
-    init(writer: any DatabaseWriter) throws {
+    init(writer: any DatabaseWriter, migrate: Bool = true) throws {
         self.writer = writer
-        try Self.migrator.migrate(writer)
+        if migrate { try Self.migrator.migrate(writer) }
     }
 
     public static var defaultURL: URL {
@@ -237,6 +237,16 @@ public final class LibraryDatabase: Sendable {
                 t.column("favoritedAt", .datetime).notNull().indexed()
             }
         }
+        m.registerMigration("v13-numbers-from-names") { db in
+            // 0.6.2 reads a missing or zero track number from the file name and a missing disc number from a "CD 02"
+            // folder: re-read those tracks on the next scan.
+            try db.execute(sql: """
+                UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'
+                WHERE isMissing = 0 AND cueStartFrame IS NULL AND (trackNumber IS NULL OR trackNumber = 0 OR (discNumber IS NULL AND (
+                    filePath LIKE '%/CD %/%' OR filePath LIKE '%/Disc %/%' OR filePath LIKE '%/Disk %/%' OR filePath LIKE '%Vinyl %/%'
+                    OR filePath LIKE '%/Digital Media %/%' OR filePath LIKE '%CD 0%/%')))
+                """)
+        }
         return m
     }
 }
@@ -310,7 +320,7 @@ public extension LibraryDatabase {
 
     func tracks(albumKey: String) throws -> [Track] {
         try writer.read { db in
-            let tracks = try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY discNumber, trackNumber, location",
+            let tracks = try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY coalesce(discNumber, 1), trackNumber, location",
                                             arguments: [albumKey])
             // Track numbers that repeat on one disc (an SACD rip's "Multichannel 5.1" and "Stereo" folders, a CD
             // and a vinyl copy) list folder by folder instead of interleaved. Otherwise the numbers decide, even
@@ -319,7 +329,7 @@ public extension LibraryDatabase {
             guard Set(numbers).count < numbers.count else { return tracks }
             func folder(_ t: Track) -> String { (t.filePath as NSString).deletingLastPathComponent }
             return tracks.sorted {
-                (($0.discNumber ?? 0), folder($0), ($0.trackNumber ?? 0), $0.location) < (($1.discNumber ?? 0), folder($1), ($1.trackNumber ?? 0), $1.location)
+                (($0.discNumber ?? 1), folder($0), ($0.trackNumber ?? 0), $0.location) < (($1.discNumber ?? 1), folder($1), ($1.trackNumber ?? 0), $1.location)
             }
         }
     }
