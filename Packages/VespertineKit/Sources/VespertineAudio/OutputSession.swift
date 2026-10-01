@@ -188,14 +188,15 @@ final class OutputSession: @unchecked Sendable {
         nrt_ring_reset(ring)
     }
 
-    func invalidate(releaseHog: Bool) {
+    /// `restoreFormat` false: the next session configures the same device straight away (it keeps the hold).
+    func invalidate(releaseHog: Bool, restoreFormat: Bool = true) {
         stop()
         if let ioProcID { AudioDeviceDestroyIOProcID(deviceID, ioProcID) }
         ioProcID = nil
         nrt_context_destroy(context)
         nrt_ring_destroy(ring)
         // Leave the device on an ordinary (mixable Float32) format for whoever uses it next.
-        if applied.integerMode { try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
+        if applied.integerMode, restoreFormat { try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
             decodedSampleRate: applied.sampleRate, physicalBitDepth: applied.physicalBitDepth, channels: plan.deviceChannels,
             dsdConvertedToPCM: false, reason: ""), to: deviceID) }
         if releaseHog, applied.exclusive { DeviceControl.releaseHog(deviceID) }
@@ -271,6 +272,7 @@ public enum DeviceControl {
                             if let now, now.mBitsPerChannel == best.mBitsPerChannel, abs(now.mSampleRate - rate) < 0.5 { break }
                             usleep(10_000)
                         }
+                        settle()
                     } catch {
                         log.error("physical format change refused: \(String(describing: error))")
                     }
@@ -294,6 +296,7 @@ public enum DeviceControl {
             })?.mFormat {
                 float.mSampleRate = rate
                 try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), float)
+                settle()
             } else {
                 throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "set a Float32 format at \(SampleRate.format(rate)) kHz")
             }
@@ -315,6 +318,7 @@ public enum DeviceControl {
             try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription())
         }
         func took() -> Bool { current().map { isInteger32NonMixable($0) && abs($0.mSampleRate - rate) < 0.5 } ?? false }
+        if took() { return true }   // kept from the previous song
         func matching(_ list: [AudioStreamRangedDescription]) -> AudioStreamBasicDescription? {
             guard var f = list.first(where: {
                 isInteger32NonMixable($0.mFormat) && Int($0.mFormat.mChannelsPerFrame) >= plan.deviceChannels
@@ -329,7 +333,7 @@ public enum DeviceControl {
             guard let format, (try? HAL.set(stream, .global(selector), format)) != nil else { continue }
             // Format changes are asynchronous: wait (bounded) for the device to report it.
             let deadline = Date().addingTimeInterval(1.5)
-            while Date() < deadline { if took() { return true }; usleep(10_000) }
+            while Date() < deadline { if took() { settle(); return true }; usleep(10_000) }
         }
         return took()
     }
@@ -342,11 +346,16 @@ public enum DeviceControl {
         let deadline = Date().addingTimeInterval(3)
         while Date() < deadline {
             let now = (try? HAL.get(device, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
-            if abs(now - rate) < 0.5 { return }
+            if abs(now - rate) < 0.5 { settle(); return }
             usleep(10_000)
         }
         throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "device did not switch to \(rate) Hz")
     }
+
+    /// A format or rate change reads back before macOS has finished telling this process about it (it pauses and
+    /// resumes the device's I/O around each one). Starting the next change, or the device, while that is still going
+    /// on is how the device ended up paused for good; a short pause lets each change finish first.
+    private static func settle() { usleep(60_000) }
 
     // MARK: Hardware volume
 

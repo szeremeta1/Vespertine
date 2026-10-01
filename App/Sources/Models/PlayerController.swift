@@ -395,9 +395,11 @@ final class PlayerController {
         case .deviceLost(let name):
             lastError = "\(name) was disconnected. Playback paused."
         case .waitingForDevice(let name):
-            lastError = "Waiting for \(name) to reconnect. Playback continues as soon as it’s back."
+            lastError = "Waiting for \(name). Playback continues as soon as it’s ready."
         case .deviceUnavailable(let name):
             lastError = "\(name) didn’t come back. Choose another output, or press play once it’s connected."
+        case .deviceNotResponding(let name):
+            lastError = "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play."
         }
     }
 
