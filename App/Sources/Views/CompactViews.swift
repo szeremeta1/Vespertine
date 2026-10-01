@@ -22,7 +22,11 @@ struct MiniPlayerView: View {
                 ArtworkView(key: player.current?.track.artworkKey, size: 600, cornerRadius: 0)
                     .frame(width: geo.size.height, height: geo.size.height)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).foregroundStyle(Palette.text).lineLimit(1)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).foregroundStyle(Palette.text).lineLimit(1)
+                        Spacer(minLength: 0)
+                        if let track = player.current?.track { FavoriteButton(track: track, size: 12) }
+                    }
                     Text(player.current?.track.displayArtist ?? " ").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     Spacer()
                     HStack(spacing: 14) {
@@ -105,6 +109,8 @@ struct MenuBarView: View {
                             .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
                     }
                 }
+                Spacer(minLength: 0)
+                if let track = player.current?.track { FavoriteButton(track: track) }
             }
             Scrubber()
             HStack { Spacer(); TransportControls(compact: true); Spacer() }

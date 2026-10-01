@@ -56,6 +56,7 @@ struct TransportBar: View {
                     model.sidebar = .albums
                     model.path = [.album(track.albumKey)]
                 }
+                FavoriteButton(track: track)
             } else {
                 Text("Not Playing").font(Typeface.serif(14)).foregroundStyle(Palette.text3)
             }

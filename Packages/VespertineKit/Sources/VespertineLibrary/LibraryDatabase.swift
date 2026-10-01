@@ -230,6 +230,13 @@ public final class LibraryDatabase: Sendable {
             // 0.5.19: a DTS CD's bitrate was the PCM carrier's 1411k; it isn't the DTS stream's, so don't show one.
             try db.execute(sql: "UPDATE track SET bitrate = NULL WHERE codec = 'DTS' AND (lower(filePath) LIKE '%.wav' OR lower(filePath) LIKE '%.flac')")
         }
+        m.registerMigration("v12-favorites") { db in
+            // Favorite songs: library state like plays and playlists, never written to the files.
+            try db.create(table: "favorite") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("favoritedAt", .datetime).notNull().indexed()
+            }
+        }
         return m
     }
 }
@@ -448,6 +455,34 @@ public extension LibraryDatabase {
         }
     }
 
+    // MARK: Favorites
+
+    /// Favorite songs, the most recently favorited first. Missing files are left out, as in playlists.
+    func favoriteTracks() throws -> [Track] {
+        try writer.read { db in
+            try Track.fetchAll(db, sql: """
+                SELECT track.* FROM favorite JOIN track ON track.id = favorite.trackId
+                WHERE track.isMissing = 0 ORDER BY favorite.favoritedAt DESC, track.id
+                """)
+        }
+    }
+
+    /// Adds or removes favorites. Songs that already are favorites keep the date they were first favorited.
+    func setFavorite(_ favorite: Bool, trackIDs: [Int64], at date: Date = .now) throws {
+        guard !trackIDs.isEmpty else { return }
+        try writer.write { db in
+            for id in trackIDs {
+                if favorite {
+                    try db.execute(sql: """
+                        INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT id, ? FROM track WHERE id = ?
+                        """, arguments: [date, id])
+                } else {
+                    try db.execute(sql: "DELETE FROM favorite WHERE trackId = ?", arguments: [id])
+                }
+            }
+        }
+    }
+
     public func sources() throws -> [LibrarySource] {
         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
     }
@@ -628,8 +663,8 @@ private struct SourceOverlapError: LocalizedError {
 
 extension LibraryDatabase {
     /// Files that were moved or renamed (e.g. by a library manager reorganizing a share) show up as a
-    /// missing track plus a new one. Folds each missing track into its new copy so playlists, play counts,
-    /// ratings, the date it was added and its analysis carry over, then drops the stale entry.
+    /// missing track plus a new one. Folds each missing track into its new copy so playlists, favorites, play
+    /// counts, ratings, the date it was added and its analysis carry over, then drops the stale entry.
     ///
     /// A match is the same size, duration and title (the file itself moved), or, for files whose tags were
     /// rewritten on the way, the same title, artist, track, disc, format and duration. Either must be
@@ -668,6 +703,9 @@ extension LibraryDatabase {
         for (old, new, sameFile) in pairs {
             try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT ?, favoritedAt FROM favorite WHERE trackId = ?
+                """, arguments: [new, old])
             try db.execute(sql: """
                 UPDATE track SET
                   playCount = playCount + (SELECT playCount FROM track WHERE id = :old),

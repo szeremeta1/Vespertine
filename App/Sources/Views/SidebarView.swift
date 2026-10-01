@@ -21,6 +21,12 @@ struct SidebarView: View {
                 row(.songs, "Songs", "music.note", count: model.library.stats.tracks)
                 row(.genres, "Genres", "guitars", count: model.library.genres.count)
                 row(.recentlyAdded, "Recently Added", "clock", count: nil)
+                row(.favorites, "Favorites", "heart", count: model.library.favoriteCount)
+                    .dropDestination(for: String.self) { items, _ in
+                        let ids = items.flatMap { $0.split(separator: ",") }.compactMap { Int64($0) }
+                        model.library.setFavorite(true, trackIDs: ids)
+                        return !ids.isEmpty
+                    }
             }
 
             Section {

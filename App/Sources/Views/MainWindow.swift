@@ -118,6 +118,7 @@ struct ContentRouter: View {
         case .songs: SongsView(title: "Songs", tracks: nil)
         case .genres: GenresView()
         case .recentlyAdded: AlbumsGridView(title: "Recently Added", forcedSort: .recentlyAdded)
+        case .favorites: FavoritesView()
         case .playlist(let id): PlaylistView(playlistID: id)
         case .source(let id): SourceView(sourceID: id)
         }

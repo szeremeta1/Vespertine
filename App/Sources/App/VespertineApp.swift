@@ -92,6 +92,13 @@ struct VespertineCommands: Commands {
             Button("Previous") { model.player.previous() }
                 .keyboardShortcut(.leftArrow, modifiers: [.command])
             Divider()
+            let current = model.player.current?.track
+            Button(model.library.isFavorite(current) ? "Remove Current Song from Favorites" : "Add Current Song to Favorites") {
+                if let current { model.toggleFavorite([current]) }
+            }
+            .keyboardShortcut("l", modifiers: [.command])
+            .disabled(current == nil)
+            Divider()
             Toggle("Shuffle", isOn: Bindable(model.player).shuffle)
                 .keyboardShortcut("s", modifiers: [.command, .option])
             Picker("Repeat", selection: Bindable(model.player).repeatMode) {
