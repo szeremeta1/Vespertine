@@ -247,6 +247,19 @@ public final class LibraryDatabase: Sendable {
                     OR filePath LIKE '%/Digital Media %/%' OR filePath LIKE '%CD 0%/%')))
                 """)
         }
+        m.registerMigration("v14-verdicts-from-analysis") { db in
+            // Some tracks kept a current stored analysis but lost the verdict on the track itself (no badge, and
+            // never fetched again because the analysis is current). Restore verdicts from the stored analyses.
+            try db.execute(sql: """
+                UPDATE track SET
+                  analysisVerdict = (SELECT json_extract(CAST(a.data AS TEXT), '$.verdict') FROM analysis a WHERE a.trackId = track.id),
+                  effectiveBitDepth = (SELECT json_extract(CAST(a.data AS TEXT), '$.effectiveBitDepth') FROM analysis a WHERE a.trackId = track.id),
+                  bandwidthHz = (SELECT json_extract(CAST(a.data AS TEXT), '$.bandwidthHz') FROM analysis a WHERE a.trackId = track.id)
+                WHERE analysisVerdict IS NULL AND EXISTS (
+                  SELECT 1 FROM analysis a WHERE a.trackId = track.id AND a.fileSize = track.fileSize AND a.modifiedAt = track.modifiedAt
+                    AND json_valid(CAST(a.data AS TEXT)))
+                """)
+        }
         return m
     }
 }

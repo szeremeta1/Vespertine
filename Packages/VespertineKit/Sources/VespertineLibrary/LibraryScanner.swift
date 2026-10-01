@@ -448,10 +448,16 @@ public actor LibraryScanner {
                     track.lastPlayedAt = existing.lastPlayedAt
                     if track.rating == nil { track.rating = existing.rating }
                     // Re-read but unchanged (a forced re-read, a tag-only look): its analysis still holds.
-                    let analysisStillValid = try Bool.fetchOne(db, sql: """
-                        SELECT EXISTS (SELECT 1 FROM analysis WHERE trackId = ? AND fileSize = ? AND modifiedAt = ?)
-                        """, arguments: [existing.id, track.fileSize, track.modifiedAt]) == true && existing.codec == track.codec
-                    if preserveAnalysis || analysisStillValid {
+                    let stored = existing.codec == track.codec ? try Data.fetchOne(db, sql: """
+                        SELECT data FROM analysis WHERE trackId = ? AND fileSize = ? AND modifiedAt = ?
+                        """, arguments: [existing.id, track.fileSize, track.modifiedAt]) : nil
+                    // The stored analysis still describes the file: take the verdict from it, not from the old row
+                    // (which may have lost it), so a re-read can never drop a badge.
+                    if let stored, let analysis = try? JSONDecoder().decode(FileAnalysis.self, from: stored) {
+                        track.effectiveBitDepth = analysis.effectiveBitDepth
+                        track.bandwidthHz = analysis.bandwidthHz
+                        track.analysisVerdict = analysis.verdict.rawValue
+                    } else if preserveAnalysis {
                         track.effectiveBitDepth = existing.effectiveBitDepth
                         track.bandwidthHz = existing.bandwidthHz
                         track.analysisVerdict = existing.analysisVerdict

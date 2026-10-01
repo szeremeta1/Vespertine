@@ -160,6 +160,27 @@ struct SmartRulesTests {
         #expect(reread.analysisVerdict == analysis.verdict.rawValue)
         #expect(try db.tracksNeedingAnalysis().isEmpty)
     }
+
+    @Test("A re-read restores a verdict the track lost while its stored analysis still holds")
+    func rereadRestoresLostVerdict() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("a.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        let analysis = try FileAnalyzer.analyze(url: track.fileURL)
+        try db.saveAnalysis(analysis, filePath: track.filePath)
+        // The state 68 tracks were found in: a current stored analysis, no verdict on the track.
+        try await db.writer.write { try $0.execute(sql: "UPDATE track SET analysisVerdict = NULL, effectiveBitDepth = NULL, bandwidthHz = NULL") }
+        #expect(try db.tracksNeedingAnalysis().isEmpty, "a current analysis is never fetched again, so the badge would stay lost")
+        try await db.writer.write { try $0.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'") }
+        try await scanner.scan(source)
+        #expect(try db.allTracks().first?.analysisVerdict == analysis.verdict.rawValue)
+    }
 }
 
 @Suite struct AlbumOrderTests {
