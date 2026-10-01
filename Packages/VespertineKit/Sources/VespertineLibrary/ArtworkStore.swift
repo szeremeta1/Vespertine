@@ -88,6 +88,15 @@ public final class ArtworkStore: Sendable {
                           options: [.regularExpression, .caseInsensitive]) != nil
     }
 
+    /// The disc a numbered disc folder stands for: "CD 01" → 1, "Disc 2" → 2, "SHM-CD 02" → 2, "12\" Vinyl 03" → 3.
+    /// Layer folders ("Stereo", "Multichannel 5.1") and sides aren't numbered discs.
+    static func discNumber(fromFolder name: String) -> Int? {
+        guard let r = name.range(of: #"^((shm-|blu-spec |hq)?cd|disc|disk|digital media|(\d+"? ?)?vinyl|sacd|dvd(-audio)?|blu-ray)\s*(\d{1,3})$"#,
+                                 options: [.regularExpression, .caseInsensitive]),
+              let digits = name[r].split(whereSeparator: { !$0.isNumber }).last, let n = Int(digits), n > 0 else { return nil }
+        return n
+    }
+
     static let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "webp", "heic"]
 
     private static func image(in dir: URL) -> Data? {

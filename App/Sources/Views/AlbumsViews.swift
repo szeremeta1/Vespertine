@@ -286,13 +286,15 @@ struct AlbumDetailView: View {
 
     var body: some View {
         let album = model.library.album(key: albumKey)
-        // A song in several versions (an SACD's stereo and 5.1 layers) shows once: the version your output plays.
+        // A song in several versions (an SACD's stereo and 5.1 layers) or copies (the same file in two places, two
+        // editions with one title) shows once: the one that plays, with the others named beside it.
         let groups = TrackVersions.group(tracks)
         let wanted = model.outputWantsMultichannel() ?? true
-        let shown = groups.map { TrackVersions.choose($0, multichannel: wanted) ?? $0[0] }
+        let shares = model.shares
+        let shown = groups.map { TrackVersions.choose($0, multichannel: wanted, isLocal: { !shares.isNetwork($0) }) ?? $0[0] }
         let others: [Int64: String] = Dictionary(uniqueKeysWithValues: zip(groups, shown).compactMap { group, chosen in
             guard group.count > 1, let id = chosen.id else { return nil }
-            let names = group.filter { $0.id != chosen.id }.map { $0.isMultichannel ? ChannelLayouts.name(channels: $0.channels) : "STEREO" }
+            let names = group.filter { $0.id != chosen.id }.map { Self.versionName($0, beside: chosen) }
             return (id, "+ " + Array(Set(names)).sorted().joined(separator: " · "))
         })
         VStack(spacing: 0) {
@@ -308,6 +310,19 @@ struct AlbumDetailView: View {
         .task(id: "\(albumKey)#\(model.library.revision)") {
             tracks = model.library.tracks(albumKey: albumKey)
         }
+    }
+
+    /// How another version of a song is named beside the one that plays: its layout ("STEREO", "5.1"), or for a
+    /// copy in the same layout its format ("DSD64", "16/44.1", "MP3"), or "COPY" when it's the same file.
+    static func versionName(_ other: Track, beside chosen: Track) -> String {
+        if other.isMultichannel != chosen.isMultichannel {
+            return other.isMultichannel ? ChannelLayouts.name(channels: other.channels) : "STEREO"
+        }
+        if other.fileSize == chosen.fileSize && abs(other.duration - chosen.duration) < 0.01 { return "COPY" }
+        if other.isDSD { return "DSD\(Int((other.sampleRate / 44_100).rounded()))" }
+        if !other.isLossless { return other.codec.uppercased() }
+        let rate = other.sampleRate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(other.sampleRate / 1000)) : String(format: "%.1f", other.sampleRate / 1000)
+        return "\(other.bitDepth ?? 16)/\(rate)"
     }
 
     private func hero(_ album: Album, shown: [Track]) -> some View {

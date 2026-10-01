@@ -76,8 +76,12 @@ public enum MetadataReader {
             albumArtist: md.albumArtist.flatMap(nonEmpty), composer: md.composer.flatMap(nonEmpty),
             genre: md.genre.flatMap(nonEmpty), releaseDate: releaseDate.map(displayDate),
             year: originalYear(extra, releaseYear: releaseDate.flatMap(year(from:))),
-            trackNumber: md.trackNumber ?? inferred?.trackNumber, trackTotal: md.trackTotal,
-            discNumber: md.discNumber, discTotal: md.discTotal,
+            // A number of 0 is no number. Missing numbers come from the file name ("… - 05 - Title", "05 Title"),
+            // a missing disc from a numbered disc folder ("CD 02"), so albums with incomplete tags still list in order.
+            trackNumber: md.trackNumber.flatMap { $0 > 0 ? $0 : nil } ?? inferred?.trackNumber ?? Self.trackNumber(fromFileName: home),
+            trackTotal: md.trackTotal,
+            discNumber: md.discNumber.flatMap { $0 > 0 ? $0 : nil } ?? ArtworkStore.discNumber(fromFolder: home.deletingLastPathComponent().lastPathComponent),
+            discTotal: md.discTotal,
             compilation: md.isCompilation ?? false,
             grouping: md.grouping.flatMap(nonEmpty), comment: md.comment.flatMap(nonEmpty),
             lyrics: md.lyrics.flatMap(nonEmpty), bpm: md.bpm, rating: md.rating,
@@ -91,6 +95,18 @@ public enum MetadataReader {
             rgAlbumGain: md.replayGainAlbumGain, rgAlbumPeak: md.replayGainAlbumPeak,
             artworkKey: artworkKey, playCount: 0, lastPlayedAt: nil, isMissing: false,
             effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
+    }
+
+    /// A track number written into a file name in a way that can't be mistaken for part of a name: zero-padded
+    /// ("05 Title", "05. Title"), followed by a separator ("5. Title", "5 - Title"), or between dashes
+    /// ("Artist - Album - 05 - Title"). "50 Cent - In da Club" has none.
+    static func trackNumber(fromFileName url: URL) -> Int? {
+        let name = url.deletingPathExtension().lastPathComponent
+        for pattern in [#"^0(\d{1,2})(?=\D)"#, #"^(\d{1,3})(?=\.\s| - |\.\D)"#, #" - (\d{1,3}) - "#] {
+            guard let r = name.range(of: pattern, options: .regularExpression) else { continue }
+            if let n = Int(name[r].filter(\.isNumber)), n > 0 { return n }
+        }
+        return nil
     }
 
     /// The folder a file sits in, or the one above for a disc folder ("CD 2").
