@@ -147,6 +147,51 @@ struct NetworkTests {
         #expect(cache.usage() == NetworkCache.Usage())
     }
 
+    @Test("Copies of songs skipped past stop; queued ones are dropped; Keep Offline copies carry on")
+    func cacheKeepOnly() async throws {
+        signal(SIGPIPE, SIG_IGN)
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-cache-\(UUID().uuidString)")
+        let remote = dir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var tracks: [Track] = []
+        for i in 0..<4 {
+            let url = remote.appendingPathComponent("\(i).flac")
+            try Data(repeating: UInt8(i), count: 100_000).write(to: url)
+            var t = Track.stub(path: url.path)
+            t.fileSize = 100_000
+            tracks.append(t)
+        }
+        // A file that arrives only as fast as the test writes it: a slow share.
+        let pipe = remote.appendingPathComponent("slow.flac")
+        #expect(mkfifo(pipe.path, 0o600) == 0)
+        var slow = Track.stub(path: pipe.path)
+        slow.fileSize = 8_000_000
+        let cache = NetworkCache(directory: dir.appendingPathComponent("cache"), limitBytes: 100_000_000)
+        cache.maxConcurrentDownloads = 1
+        cache.request([slow, tracks[0], tracks[1]])
+        cache.request([tracks[3]], offline: true)
+        let path = pipe.path
+        let writer = await Task.detached { open(path, O_WRONLY) }.value
+        #expect(writer >= 0)
+        defer { close(writer) }
+        let chunk = [UInt8](repeating: 7, count: 65_536)
+        #expect(write(writer, chunk, chunk.count) == chunk.count)
+        #expect(cache.usage().downloading == 1 && cache.usage().queued == 3)
+
+        // Skipped on: only tracks[1] is still wanted (and the offline copy, which isn't the player's to drop).
+        cache.keepOnly([tracks[1]])
+        #expect(cache.usage().queued == 2)
+        _ = write(writer, chunk, chunk.count)   // a stalled read returns and sees it (or it already stopped: EPIPE)
+        for _ in 0..<200 where cache.usage().downloading + cache.usage().queued > 0 { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.localURL(forKey: NetworkCache.key(for: slow)) == nil)
+        #expect(cache.localURL(forKey: NetworkCache.key(for: tracks[0])) == nil)
+        #expect(cache.localURL(forKey: NetworkCache.key(for: tracks[1])) != nil)
+        #expect(cache.isOffline(tracks[3]))
+        let leftovers = try FileManager.default.contentsOfDirectory(atPath: dir.appendingPathComponent("cache").path)
+        #expect(!leftovers.contains { $0.hasSuffix(".partial") })
+    }
+
     static func writeAudio(_ url: URL, seconds: Double) throws {
         var settings: [String: Any] = [AVSampleRateKey: 96_000.0, AVNumberOfChannelsKey: 2]
         switch url.pathExtension {

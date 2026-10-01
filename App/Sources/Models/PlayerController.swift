@@ -315,7 +315,13 @@ final class PlayerController {
         requestedPosition = nil
         position = 0
         duration = entry.track.duration
+        // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
+        signalPath = nil
+        systemRendering = nil
+        channelLevels = []
+        shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
         engine.play(entry.item)
+        updateNowPlayingInfo()
     }
 
     func togglePlayPause() {
@@ -358,7 +364,10 @@ final class PlayerController {
     private func handle(_ event: EngineEvent) {
         switch event {
         case .trackStarted(let item):
-            if requested == item.id { requested = nil }
+            // A song you've already skipped past (the engine reached it before your later skips): ignore it.
+            // Following it would move the queue back to it, and the next skip would continue from there.
+            if let requested, requested != item.id { return }
+            requested = nil
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
             resolveVersions()
             trackStartedAt = .now
@@ -371,6 +380,7 @@ final class PlayerController {
         case .queueEnded:
             updateNowPlayingInfo()
         case .failed(let item, let message):
+            if let requested, let item, requested != item.id { return }   // about a song skipped past
             requested = nil
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
@@ -428,8 +438,11 @@ final class PlayerController {
             updateNowPlayingInfo()
         }
         if stateChanged { updateNowPlayingInfo() }
-        if signalPath != snap.signalPath { signalPath = snap.signalPath }
-        if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
+        // Until the requested song plays, the engine's signal path is the previous song's.
+        if requested == nil {
+            if signalPath != snap.signalPath { signalPath = snap.signalPath }
+            if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
+        }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
         }
@@ -441,7 +454,7 @@ final class PlayerController {
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
-        if state == .playing, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
+        if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
             let peaks = engine.takeChannelPeaks()
             if channelLevels.count != peaks.count { channelLevels = peaks }
             else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }

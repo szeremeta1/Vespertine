@@ -288,11 +288,11 @@ final class NetworkShareManager {
     /// first seconds get the whole connection, and downloads one file at a time while it streams.
     func prefetch(current: Track?, upcoming: [Track]) {
         prefetchTask?.cancel()
+        let wanted = prefetchable(current: current, upcoming: upcoming)
+        cache.keepOnly(wanted)
         guard settings.networkCache else { return }
         let streaming = current.map { isNetwork($0) && cache.localURL(forKey: NetworkCache.key(for: $0)) == nil } ?? false
         cache.maxConcurrentDownloads = streaming ? 1 : 2
-        let wanted = ([current].compactMap { $0 } + upcoming.prefix(max(0, settings.networkPrefetch)))
-            .filter { isNetwork($0) && isReachable($0) }
         guard !wanted.isEmpty else { return }
         prefetchTask = Task { @MainActor [weak self] in
             // Let the track's first reads go first, then copy it: once the copy is complete, playback
@@ -304,6 +304,19 @@ final class NetworkShareManager {
         }
     }
     private var prefetchTask: Task<Void, Never>?
+
+    /// You skipped to `current`: copies of songs skipped past stop now (on a busy share they'd slow the
+    /// one you want). New copies start once it plays (`prefetch`), not for every song skipped through.
+    func skipped(to current: Track?, upcoming: [Track]) {
+        prefetchTask?.cancel()
+        cache.keepOnly(prefetchable(current: current, upcoming: upcoming))
+    }
+
+    private func prefetchable(current: Track?, upcoming: [Track]) -> [Track] {
+        guard settings.networkCache else { return [] }
+        return ([current].compactMap { $0 } + upcoming.prefix(max(0, settings.networkPrefetch)))
+            .filter { isNetwork($0) && isReachable($0) }
+    }
 
     func setOffline(_ offline: Bool, tracks: [Track]) {
         cache.setOffline(offline, for: tracks.filter(isNetwork))

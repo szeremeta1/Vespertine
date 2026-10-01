@@ -8,6 +8,7 @@
 
 import AppKit
 import Foundation
+import VespertineAudio
 import VespertineLibrary
 import SwiftUI
 
@@ -93,6 +94,32 @@ enum DeveloperHooks {
                     print("[qa] switch \(i + 1): \(name) → \(device?.name ?? "not listed") at \(Date())")
                     if let device { model.selectDevice(device.uid) }
                 }
+            }
+        }
+        // `-VespertineSkipBurst 8 -VespertineSkipEvery 0.15 -VespertineSkipAfter 4`: press Next quickly, the way you
+        // skip through a shuffle, then report what plays (queue, engine and signal path should agree on the last one).
+        if d.integer(forKey: "VespertineSkipBurst") > 0 {
+            let count = d.integer(forKey: "VespertineSkipBurst")
+            let every = d.double(forKey: "VespertineSkipEvery") == 0 ? 0.15 : d.double(forKey: "VespertineSkipEvery")
+            let after = d.double(forKey: "VespertineSkipAfter") == 0 ? 4 : d.double(forKey: "VespertineSkipAfter")
+            setvbuf(stdout, nil, _IOLBF, 0)   // lines reach a log file even if the run is killed
+            Task {
+                let player = model.player
+                try? await Task.sleep(for: .seconds(after))
+                let start = Date()
+                for i in 0..<count {
+                    player.next()
+                    print("[qa] skip \(i + 1) at \(String(format: "%.2f", Date().timeIntervalSince(start))) s → \(player.current?.track.title ?? "-")")
+                    try? await Task.sleep(for: .seconds(every))
+                }
+                for _ in 0..<24 {
+                    try? await Task.sleep(for: .milliseconds(500))
+                    let rate = player.signalPath.map { SampleRate.format($0.source.sampleRate) } ?? "-"
+                    let playing = player.engine.snapshot.item.flatMap { item in player.queue.first { $0.id == item.id } }?.track.title ?? "-"
+                    print("[qa] \(String(format: "%5.1f", Date().timeIntervalSince(start))) s: queue \(player.current?.track.title ?? "-") · engine \(playing) · path \(rate) kHz · \(player.state)")
+                }
+                player.stop()
+                print("[qa] skip burst done")
             }
         }
         if let format = d.string(forKey: "VespertineFormatFilter"), let filter = FormatFilter(rawValue: format) { model.library.formatFilter = filter }
