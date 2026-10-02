@@ -63,7 +63,7 @@ VESPERTINE_HARDWARE_TESTS=1 swift test --filter HardwareAuditTests
 VESPERTINE_HARDWARE_TESTS=1 VESPERTINE_INTEGER_DEVICE="<part of your DAC's name>" swift test --filter HardwareAuditTests
 ```
 
-The integer-device test plays a 32-bit source to your DAC. It passes only if the device's physical format reads back as 32-bit integer and the signal path reports BIT-PERFECT. The hardware tests play silence or near-silence, so they're safe to run with speakers connected.
+The integer-device test plays a 32-bit source to your DAC. It passes only if the device's physical format reads back as 32-bit integer and the signal path reports BIT-PERFECT. The rate-change test plays a 96 kHz file in shared mode, switches the device to 48 kHz behind the engine's back (as Audio MIDI Setup does), and passes only if the song keeps its speed and the signal path names the rate the device really runs at; it uses the DAC named in `VESPERTINE_INTEGER_DEVICE`, or the built-in output. The hardware tests play silence or near-silence, so they're safe to run with speakers connected; quit Vespertine first, since a device it holds exclusively can't be opened or switched by the tests.
 
 ## 3. The probe
 

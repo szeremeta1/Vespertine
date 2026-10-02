@@ -42,6 +42,11 @@ final class OutputSession: @unchecked Sendable {
     private(set) var spatial: SpatialRenderer?
     private var ioProcID: AudioDeviceIOProcID?
     private(set) var isRunning = false
+    /// Set by Core Audio when the device's rate or a stream's format changes; read by `formatChanged()`.
+    private let formatNotice = OSAllocatedUnfairLock(initialState: false)
+    private var formatListener: AudioObjectPropertyListenerBlock?
+    private var watchedFormats: [(object: AudioObjectID, address: AudioObjectPropertyAddress)] = []
+    private static let formatQueue = DispatchQueue(label: "org.szeremeta.vespertine.format-changes")
 
     /// Multichannel routing: the source's own speakers for Spatial Audio (the standard bed when it doesn't
     /// name them), the device's speaker layout for discrete output (placed by position), nil for mono/stereo.
@@ -168,6 +173,43 @@ final class OutputSession: @unchecked Sendable {
             throw CoreAudioError(status, "AudioDeviceCreateIOProcID")
         }
         ioProcID = procID
+
+        // Installed once the device is configured; late notices of our own changes read back as no change.
+        let block: AudioObjectPropertyListenerBlock = { [formatNotice] _, _ in formatNotice.withLock { $0 = true } }
+        formatListener = block
+        let addresses = [(deviceID, AudioObjectPropertyAddress.global(kAudioDevicePropertyNominalSampleRate))]
+            + streams.flatMap { [($0, AudioObjectPropertyAddress.global(kAudioStreamPropertyPhysicalFormat)),
+                                 ($0, AudioObjectPropertyAddress.global(kAudioStreamPropertyVirtualFormat))] }
+        for (object, address) in addresses {
+            var a = address
+            if AudioObjectAddPropertyListenerBlock(object, &a, Self.formatQueue, block) == noErr { watchedFormats.append((object, address)) }
+        }
+    }
+
+    /// Whether the device has left the format this session set up under it: another app, Audio MIDI Setup or an
+    /// AirPods microphone switch changed its rate, a stream's physical format (the bit depth the signal path names)
+    /// or the format the I/O proc is handed. The I/O proc would go on sending samples made for the old rate, so the
+    /// song plays too fast or too slow while the signal path still names the old format. Reads the device only after
+    /// Core Audio said something changed.
+    func formatChanged() -> Bool {
+        guard formatNotice.withLock({ noticed in defer { noticed = false }; return noticed }) else { return false }
+        let rate = (try? HAL.get(deviceID, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+        if abs(rate - applied.sampleRate) >= 0.5 { return true }
+        let streams = DeviceQuery.outputStreams(deviceID)
+        let physicals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
+        if let shallowest = physicals.map(\.mBitsPerChannel).min(), Int(shallowest) != applied.physicalBitDepth { return true }
+        let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
+        return virtuals.contains { abs($0.mSampleRate - rate) >= 0.5 || $0.mBitsPerChannel != 32 }
+    }
+
+    private func unwatchFormats() {
+        guard let formatListener else { return }
+        for (object, address) in watchedFormats {
+            var a = address
+            AudioObjectRemovePropertyListenerBlock(object, &a, Self.formatQueue, formatListener)
+        }
+        watchedFormats = []
+        self.formatListener = nil
     }
 
     func start() throws {
@@ -190,6 +232,7 @@ final class OutputSession: @unchecked Sendable {
 
     /// `restoreFormat` false: the next session configures the same device straight away (it keeps the hold).
     func invalidate(releaseHog: Bool, restoreFormat: Bool = true) {
+        unwatchFormats()
         stop()
         if let ioProcID { AudioDeviceDestroyIOProcID(deviceID, ioProcID) }
         ioProcID = nil
