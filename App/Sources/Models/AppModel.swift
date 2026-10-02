@@ -261,7 +261,7 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.dopDeviceUIDs
         let device = devices.device(uid: settings.selectedDeviceUID)
-        player.engine.update(settings: settings.engineSettings(deviceHasHardwareVolume: device?.hasHardwareVolume ?? false))
+        player.engine.update(settings: settings.engineSettings())
         devices.watchVolume(of: device)
         player.resolveVersions()
     }
@@ -284,7 +284,7 @@ final class AppModel {
 
     /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).
     func engineSpatialMode(for device: OutputDevice) -> SpatialMode {
-        settings.engineSettings(deviceHasHardwareVolume: device.hasHardwareVolume).spatialMode(for: device)
+        settings.engineSettings().spatialMode(for: device)
     }
 
     func selectDevice(_ uid: String?) {
