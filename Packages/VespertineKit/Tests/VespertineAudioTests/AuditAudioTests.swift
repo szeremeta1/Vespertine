@@ -4,6 +4,17 @@ import Testing
 @testable import VespertineAudio
 
 @Suite("Audio audit regressions") struct AuditAudioTests {
+    @Test("A damaged ReplayGain tag can't blast: the adjustment stays between -30 and +15 dB")
+    func replayGainIsClamped() {
+        let url = URL(fileURLWithPath: "/tmp/x.flac")
+        #expect(PlayableItem(url: url, replayGainDB: 60).replayGainDB == 15)
+        #expect(PlayableItem(url: url, replayGainDB: -80).replayGainDB == -30)
+        #expect(PlayableItem(url: url, replayGainDB: -6.5).replayGainDB == -6.5)
+        #expect(PlayableItem(url: url, replayGainDB: .nan).replayGainDB == nil)
+        #expect(PlayableItem(url: url, replayGainDB: .infinity).replayGainDB == nil)
+        #expect(PlayableItem(url: url).replayGainDB == nil)
+    }
+
     @Test func downmixIsNotBitPerfect() {
         let source = SourceFormat(encoding: .pcm, codec: "WAV", sampleRate: 48000, bitDepth: 16, channels: 6)
         let device = DeviceCapabilities(sampleRates: [48000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
