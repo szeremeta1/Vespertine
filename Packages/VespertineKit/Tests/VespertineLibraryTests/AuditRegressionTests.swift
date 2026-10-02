@@ -66,6 +66,29 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         let enumerated = LibraryScanner.enumerate(try #require(folders.first))
         #expect(LibraryScanner.cueSheets(enumerated.cue).count == 1)
     }
+    /// Importing the same folder twice copies nothing the second time (it used to leave a "… 2" of every file),
+    /// even after the first copy's tags were filled in; a different file that wants the same name still gets one.
+    @Test func importingTwiceCopiesNothingNew() throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")
+        try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+        try audio(src.appendingPathComponent("set.wav")); try cue(at: src.appendingPathComponent("set.cue"))
+        let first = try Importer.copyAndOrganize([src], into: dst)
+        let copy = try #require(first.first)
+        #expect(first.count == 1)
+        let edited = try AudioFile(readingPropertiesAndMetadataFrom: copy)
+        edited.metadata.comment = "edited after import"; try edited.writeMetadata()
+
+        #expect(try Importer.copyAndOrganize([src], into: dst).isEmpty)
+        let folder = copy.deletingLastPathComponent()
+        #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).filter { !$0.hasPrefix(".") }.sorted() == ["set.cue", "set.wav"])
+
+        // A different file that wants the same name is new music: it gets a numbered name.
+        let other = dir.appendingPathComponent("other")
+        try FileManager.default.createDirectory(at: other, withIntermediateDirectories: true)
+        try audio(other.appendingPathComponent("set.wav"))
+        #expect(try Importer.copyAndOrganize([other], into: dst).map(\.lastPathComponent) == ["set 2.wav"])
+    }
     @Test func tagUndoRestoresCustomTagsAndExactFile() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("song.wav"); try audio(url)

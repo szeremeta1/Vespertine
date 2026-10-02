@@ -12,11 +12,27 @@ public enum ImportMode: String, Sendable, CaseIterable {
     case reference, copyAndOrganize
 }
 
+public enum ImportError: LocalizedError, Equatable {
+    case notEnoughSpace(ImportSpace)
+
+    public var errorDescription: String? {
+        switch self {
+        case .notEnoughSpace(let space):
+            let needed = ByteCountFormatter.string(fromByteCount: space.bytesToCopy, countStyle: .file)
+            let free = space.freeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "less"
+            let spare = ByteCountFormatter.string(fromByteCount: ImportSpace.reserve, countStyle: .file)
+            return "Nothing was imported: the copies need \(needed) and the Mac has \(free) free (Vespertine keeps \(spare) spare). Free up some space, or use Add Folder to play the music where it is."
+        }
+    }
+}
+
 public enum Importer {
     /// Copies audio files into `root/Album Artist/Album/NN Title.ext` (plus cover images found beside them).
     /// Folders are expanded; `include` filters individual files (e.g. music only, hi-res only).
     /// On APFS the copies are clones: instant and taking no extra space until modified.
-    /// Existing files are never overwritten. Returns the destination files.
+    /// Existing files are never overwritten, and a file imported before is not copied again (importing the same folder
+    /// twice used to leave a "… 2" of everything). Nothing is copied unless it all fits with `ImportSpace.reserve`
+    /// to spare. Returns the files written.
     @discardableResult
     public static func copyAndOrganize(_ urls: [URL], into root: URL, include: (URL) -> Bool = { _ in true }) throws -> [URL] {
         let audioExts = LibraryScanner.audioExtensions
@@ -30,6 +46,7 @@ public enum Importer {
         var albumsPerSourceFolder: [URL: Set<URL>] = [:]
         var written: [URL] = []
         var destinations: [String: URL] = [:]
+        var planned: [(file: URL, wanted: URL, inferred: InferredTags, md: AudioMetadata?)] = []
         let managed = root.resolvingSymlinksInPath().path
         for file in files where destinations[file.standardizedFileURL.path] == nil {
             // Never re-import files that already live in the managed folder.
@@ -44,15 +61,27 @@ public enum Importer {
             let name = disc + (number.map { String(format: "%02d ", $0) } ?? "") + title
 
             let folder = root.appendingPathComponent(artist, isDirectory: true).appendingPathComponent(album, isDirectory: true)
-            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-            let dest = uniqueURL(folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased()))
-            try cloneOrCopy(file, to: dest)
-            written.append(dest)
-            destinations[file.standardizedFileURL.path] = dest
-            // The copy is ours: record what the file name told us, where the tags are empty.
-            fillMissingTags(at: dest, from: inferred, existing: md)
-
+            let wanted = folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased())
             albumsPerSourceFolder[file.deletingLastPathComponent(), default: []].insert(folder)
+            if let earlier = earlierCopy(of: file, at: wanted) {
+                destinations[file.standardizedFileURL.path] = earlier
+            } else {
+                planned.append((file, wanted, inferred, md))
+                destinations[file.standardizedFileURL.path] = wanted   // the final name is chosen when it's copied
+            }
+        }
+
+        let space = ImportSpace.measure(files: planned.map { ($0.file, fileSize($0.file)) }, destination: root)
+        guard space.fits else { throw ImportError.notEnoughSpace(space) }
+        for item in planned {
+            try FileManager.default.createDirectory(at: item.wanted.deletingLastPathComponent(), withIntermediateDirectories: true)
+            let dest = uniqueURL(item.wanted)
+            try cloneOrCopy(item.file, to: dest)
+            written.append(dest)
+            destinations[item.file.standardizedFileURL.path] = dest
+            // The copy is ours: record what the file name told us, where the tags are empty.
+            fillMissingTags(at: dest, from: item.inferred, existing: item.md)
+            stamp(dest, from: item.file)
         }
 
         // Bring cover images from single-album source folders (never from mixed folders).
@@ -94,7 +123,10 @@ public enum Importer {
                         text.replaceSubrange(range, with: String(text[prefix]) + "\"" + relative + "\"")
                     }
                 }
-                try text.write(to: uniqueURL(folder.appendingPathComponent(sheetURL.lastPathComponent)), atomically: true, encoding: .utf8)
+                // Imported before: the same sheet is already there.
+                let existing = folder.appendingPathComponent(sheetURL.lastPathComponent)
+                if (try? Data(contentsOf: existing)).flatMap(CueSheet.text(of:)) == text { continue }
+                try text.write(to: uniqueURL(existing), atomically: true, encoding: .utf8)
             }
         }
         return written
@@ -124,6 +156,42 @@ public enum Importer {
             }
         }
         if status != 0 { try FileManager.default.copyItem(at: source, to: dest) }
+    }
+
+    /// Every copy carries the size and modification date of the file it came from, so importing that file again finds
+    /// the copy (whatever was written into its tags since) instead of making a "… 2".
+    private static let stampName = "org.szeremeta.vespertine.imported-from"
+
+    static func identity(of url: URL) -> String? {
+        var st = stat()
+        guard stat(url.path, &st) == 0 else { return nil }
+        return "\(st.st_size) \(st.st_mtimespec.tv_sec).\(st.st_mtimespec.tv_nsec)"
+    }
+
+    static func stamp(_ copy: URL, from source: URL) {
+        guard let identity = identity(of: source) else { return }
+        _ = identity.withCString { setxattr(copy.path, stampName, $0, strlen($0), 0, 0) }
+    }
+
+    /// An earlier copy of `source` at `wanted` or at one of its "… 2", "… 3" names: stamped with the source's size and
+    /// date, or (copies made before stamping) an untouched copy, which keeps both.
+    static func earlierCopy(of source: URL, at wanted: URL) -> URL? {
+        guard let identity = identity(of: source) else { return nil }
+        let base = wanted.deletingPathExtension().lastPathComponent, ext = wanted.pathExtension
+        for i in 1...1000 {
+            let candidate = i == 1 ? wanted : wanted.deletingLastPathComponent().appendingPathComponent("\(base) \(i)").appendingPathExtension(ext)
+            guard FileManager.default.fileExists(atPath: candidate.path) else { return nil }
+            var buffer = [UInt8](repeating: 0, count: 128)
+            let length = getxattr(candidate.path, stampName, &buffer, buffer.count, 0, 0)
+            let stamped = length > 0 ? String(decoding: buffer.prefix(length), as: UTF8.self) : nil
+            if (stamped ?? self.identity(of: candidate)) == identity { return candidate }
+        }
+        return nil
+    }
+
+    private static func fileSize(_ url: URL) -> Int64 {
+        var st = stat()
+        return stat(url.path, &st) == 0 ? Int64(st.st_size) : 0
     }
 
     static func nonEmpty(_ s: String) -> String? {
