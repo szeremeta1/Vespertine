@@ -244,7 +244,8 @@ final class NetworkShareManager {
             // File-system events don't cross the network: index new shares, and look for changes on
             // shares not checked for half an hour (incremental, so only new or changed files are read).
             let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
-            if scanIfNew, stale, library.scanProgress == nil, var fresh = sources.first(where: { $0.id == id }) {
+            // Never while music plays from a share: the half-hourly check (rescanStale) catches up once it's quiet.
+            if scanIfNew, stale, library.scanProgress == nil, !isStreamingPlayback(), var fresh = sources.first(where: { $0.id == id }) {
                 fresh.path = root.path
                 await library.scan(fresh)
             }

@@ -296,9 +296,10 @@ final class LibraryStore {
     }
 
     /// Proposals for the given albums (or every album missing something).
-    func enrichmentProposals(albumKeys: [String]?, correctExisting: Bool,
+    func enrichmentProposals(albumKeys: [String]?, correctExisting: Bool, fetchCovers: Bool,
                              progress: @escaping @MainActor (Int, Int) -> Void) async -> (proposals: [EnrichmentProposal], complete: Int) {
         await enricher.setCorrectExisting(correctExisting)
+        await enricher.setFetchCovers(fetchCovers)
         let keys = albumKeys ?? ((try? database.albums()) ?? []).map(\.key)
         var proposals: [EnrichmentProposal] = []
         var complete = 0
