@@ -183,15 +183,28 @@ public final class AnalysisAccumulator {
         }
 
         let measured = forensics.result()
-        let seconds = framesDone / sampleRate
-        if peak == 0 {
+        return FileAnalyzer.conclude(forensics: measured, claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective,
+                                     sampleRate: sampleRate, peakDBFS: peak == 0 ? -.infinity : 20 * log10(Double(peak)),
+                                     clippedSamples: clipped, bandwidth: bandwidth, spectrum: spectrum,
+                                     secondsAnalyzed: framesDone / sampleRate)
+    }
+}
+
+public enum FileAnalyzer {
+    /// A result from these measurements, as the current version judges them. Fresh analyses and stored ones
+    /// brought up to date (`rejudged`) both come through here.
+    static func conclude(forensics measured: SpectralForensics, claimedBitDepth: Int?, effectiveBitDepth effective: Int?,
+                         sampleRate: Double, peakDBFS: Double, clippedSamples clipped: Int, bandwidth: Double,
+                         spectrum: [Float], secondsAnalyzed seconds: Double) -> FileAnalysis {
+        let claimed = claimedBitDepth ?? 24
+        if !peakDBFS.isFinite {
             // Nothing but digital silence decoded: no evidence either way, so never call it genuine.
             return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: nil, sampleRate: sampleRate,
                                 bandwidthHz: 0, peakDBFS: -.infinity, clippedSamples: 0, verdict: .notApplicable,
                                 summary: "The file decoded as digital silence, so there's nothing to analyze.", spectrum: spectrum,
                                 secondsAnalyzed: seconds, forensics: measured, version: FileAnalysis.currentVersion, confidence: 0)
         }
-        let judged = FileAnalyzer.judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: sampleRate)
+        let judged = judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: sampleRate)
         // Too little to judge the spectrum on: a very short file, or nothing that stands out from the floor (very quiet,
         // or channels that cancel when mixed to mono). Zero padding is exact and still reported; nothing else is.
         let minimumFrames = 6
@@ -206,20 +219,38 @@ public final class AnalysisAccumulator {
                 bits = " Word length not checked."
             }
             return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective, sampleRate: sampleRate,
-                                bandwidthHz: 0, peakDBFS: 20 * log10(Double(peak)), clippedSamples: clipped, verdict: .notApplicable,
+                                bandwidthHz: 0, peakDBFS: peakDBFS, clippedSamples: clipped, verdict: .notApplicable,
                                 summary: reason + bits, spectrum: spectrum, secondsAnalyzed: seconds, forensics: measured,
                                 version: FileAnalysis.currentVersion, confidence: 0)
         }
         // The display bandwidth follows the forensic measurement (robust to faint sparse junk above a cutoff).
         return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective, sampleRate: sampleRate,
-                            bandwidthHz: judged.bandwidth ?? bandwidth, peakDBFS: 20 * log10(Double(peak)),
+                            bandwidthHz: judged.bandwidth ?? bandwidth, peakDBFS: peakDBFS,
                             clippedSamples: clipped, verdict: judged.verdict, summary: judged.summary, spectrum: spectrum,
                             secondsAnalyzed: seconds, forensics: measured,
                             version: FileAnalysis.currentVersion, confidence: judged.confidence)
     }
-}
 
-public enum FileAnalyzer {
+    /// A stored result brought up to the current version without reading the file again: the verdict is decided anew
+    /// from its measurements, which are the same since version 2. Shelf tracking, measured from version 3 on, is
+    /// missing from older results, so their shelves are judged as before (with the current caps and wording).
+    /// Results that can't be (version 1, which kept no measurements) come back unchanged, for a fresh analysis.
+    public static func rejudged(_ a: FileAnalysis) -> FileAnalysis {
+        guard a.version < FileAnalysis.currentVersion, a.version >= 2 else { return a }
+        guard let f = a.forensics else {
+            // Not analyzed (a lossy or DTS source): nothing about that has changed.
+            guard a.verdict == .notApplicable else { return a }
+            var same = a
+            same.version = FileAnalysis.currentVersion
+            return same
+        }
+        // A word length only counts when it was checked against a known one of at most 24 bits.
+        let effective = a.claimedBitDepth.map { $0 <= 24 } == true ? a.effectiveBitDepth : nil
+        return conclude(forensics: f, claimedBitDepth: a.claimedBitDepth, effectiveBitDepth: effective, sampleRate: a.sampleRate,
+                        peakDBFS: a.peakDBFS, clippedSamples: a.clippedSamples, bandwidth: a.bandwidthHz, spectrum: a.spectrum,
+                        secondsAnalyzed: a.secondsAnalyzed)
+    }
+
     /// The most a spectral verdict's confidence can reach. The steep low-pass that marks a codec is also left by
     /// steep mastering and anti-alias filters, FM sources and band-limited historical masters, so a spectrum
     /// alone never earns the "high confidence" of an exact finding such as zero padding.
