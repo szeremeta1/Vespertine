@@ -58,12 +58,12 @@ Vespertine plays almost anything you have: FLAC, ALAC, WAV and AIFF up to 32-bit
 ### Bit-perfect, all the way up
 The device follows every track's native format, and **BIT-PERFECT** appears only when nothing touches the samples. Here a 24-bit / 192 kHz FLAC plays untouched on a FiiO K11. With exclusive access, **integer mode** sends 32-bit integers straight to the DAC, so even 32-bit recordings arrive exactly as stored.
 
-![Coldplay's X&Y at 24-bit / 192 kHz playing bit-perfect on a FiiO K11](docs/screenshots/bit-perfect-fiio-24-192.png)
+![Elton John's Regimental Sgt. Zippo at 24-bit / 192 kHz playing bit-perfect on a FiiO K11, with its signal path](docs/screenshots/bit-perfect-fiio-24-192.png)
 
 ### Native DSD, at any rate
 DSD64, DSD128, DSD256 and DSD512, in DSF or DSDIFF. On a DAC that takes DoP, the DSD goes out untouched in DoP frames, and the meters and spectrum still show the music. Anywhere else it's converted to high-rate PCM, and the signal path says so.
 
-![Michael Jackson's Thriller as DSD64 over DoP to a FiiO K11, with a DSD 64 badge](docs/screenshots/dsd-native-dop.png)
+![Oasis's (What's the Story) Morning Glory? from its SACD as DSD64 over DoP to a FiiO K11, with a DSD 64 badge](docs/screenshots/dsd-native-dop.png)
 
 ### Surround, Dolby and DTS, wherever you listen
 5.1 and 7.1 in FLAC, DSD, Dolby TrueHD, DTS-HD Master Audio and even DTS CDs (which players that don't recognize them turn into full-scale noise) play as head-tracked Spatial Audio on AirPods, channel for channel on a multichannel interface or receiver, or folded down on a stereo DAC. **Dolby Atmos** in Dolby Digital Plus is rendered by macOS's own Atmos renderer, just as in Apple Music. The Albums page filters by format (FLAC, WAV/AIFF, ALAC, DSD, **Dolby & DTS**, lossy, 24-bit, 88.2 kHz and up, multichannel), so every surround album is one click away.
@@ -80,6 +80,8 @@ Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the ev
 
 ![The Analysis tab flagging a track as having synthetic high frequencies, with its long-term spectrum](docs/screenshots/fake-hi-res-detection.png)
 
+<sub>The file in this screenshot is an unofficial “enhanced” 24/48 copy from the developer's own collection, not an official release. To see a verdict on files you can regenerate, [make a fake of your own](docs/ANALYSIS.md#reproducing).</sub>
+
 ### Browse like Apple Music
 Albums, artists, songs and **genres**, with Genre, Decade and format filters. Messy tags are handled: "Hip-Hop" and "hip hop" are one genre, multi-genre tags count under each, and localized genre names are merged.
 
@@ -88,7 +90,7 @@ Albums, artists, songs and **genres**, with Genre, Decade and format filters. Me
 ### Search finds everything
 Artists, albums (by title, artist, genre or year) and songs, in one place. Every word you type has to match, ignoring case and accents.
 
-![Searching "fleetwood": the artist, 18 albums and 265 songs](docs/screenshots/search.png)
+![Searching "elton": the artist, 35 albums and 475 songs](docs/screenshots/search.png)
 
 ### Smart playlists, lossless on AirPods Max
 Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 48 kHz track" is one rule away. AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device, so that playlist plays bit-perfect on them, and the Digital Crown and volume keys still work.

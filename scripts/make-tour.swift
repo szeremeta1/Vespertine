@@ -34,7 +34,10 @@ let shots: [Shot] = [
          caption: "Your library, every format: SACD, DTS CDs, 5.1 FLAC, DSD"),
     Shot(file: "docs/screenshots/bit-perfect-fiio-24-192.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
-         caption: "BIT-PERFECT appears only when it's literally true"),
+         caption: "BIT-PERFECT appears only when its conditions are met"),
+    Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
+         to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
+         caption: "DSD64 to DSD512, native over DoP on DACs that accept it"),
     Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
          to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
@@ -43,7 +46,7 @@ let shots: [Shot] = [
          caption: "A DTS 5.1 CD as head-tracked Spatial Audio on AirPods Max"),
     Shot(file: "docs/screenshots/fake-hi-res-detection.png", from: CGRect(x: 1340, y: 170, width: 1060, height: 662.5),
          to: CGRect(x: 1340, y: 560, width: 1060, height: 662.5),
-         caption: "Catches upsampled, lossy-sourced and “AI-enhanced” files"),
+         caption: "Flags upsampled, lossy-sourced and “AI-enhanced” files"),
 ]
 let images = shots.map { image($0.file) }
 let lockup = image("docs/brand/logo.png")   // crescent + "vespertine", with its clear space
