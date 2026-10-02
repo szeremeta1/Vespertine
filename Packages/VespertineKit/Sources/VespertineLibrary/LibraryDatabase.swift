@@ -266,6 +266,12 @@ public final class LibraryDatabase: Sendable {
                     AND json_valid(CAST(a.data AS TEXT)))
                 """)
         }
+        m.registerMigration("v15-compilations-together") { db in
+            // Compilations without an Album Artist were split into one album per track artist. The scanner now files
+            // them under Various Artists (in the library only); do the same for tracks already scanned.
+            try db.execute(sql: "UPDATE track SET albumArtist = ? WHERE compilation = 1 AND (albumArtist IS NULL OR trim(albumArtist) = '')",
+                           arguments: [Track.variousArtists])
+        }
         return m
     }
 }
