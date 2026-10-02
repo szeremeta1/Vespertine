@@ -61,7 +61,8 @@ final class AnalysisQueue {
         loops.append(Task { [weak self] in
             try? await Task.sleep(for: .seconds(8))
             while !Task.isCancelled {
-                await self?.syncServerResults()
+                // Out of use, the server's index waits: reading it could wake the NAS's disks.
+                if self?.shares.isInUse ?? false { await self?.syncServerResults() }
                 try? await Task.sleep(for: .seconds(300))
             }
         })

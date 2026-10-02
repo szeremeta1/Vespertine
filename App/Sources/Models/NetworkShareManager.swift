@@ -33,6 +33,13 @@ final class NetworkShareManager {
     /// Reconnect and Enter Password… try at once; any successful connection clears it.
     private var credentialFailedAt: [Int64: Date] = [:]
     static let credentialRetryInterval: TimeInterval = 30 * 60
+    /// Shares someone unmounted while their server still answered (ejected in Finder, say). They stay disconnected
+    /// until Reconnect (or the next launch) instead of being mounted again behind the user's back.
+    private var ejected: Set<Int64> = []
+    /// Mount points Vespertine is unmounting itself: their unmount notifications aren't the user's.
+    private var unmountingOurselves: Set<String> = []
+    /// The last wake or network change. An unmount soon after one is the system dropping the share, not the user.
+    private var lastDisruption = Date.distantPast
     private(set) var cacheUsage = NetworkCache.Usage()
     let cache: NetworkCache
     /// Where Vespertine mounts shares (private, so library paths stay stable).
@@ -49,6 +56,9 @@ final class NetworkShareManager {
     /// How old a share's last scan may get before it's rescanned (file-system events don't cross
     /// the network, so this is how additions and deletions on the server show up).
     static let rescanInterval: TimeInterval = 30 * 60
+    /// Seconds between health checks while Vespertine is in use, and while it isn't.
+    static let checkInterval: TimeInterval = 45
+    static let idleCheckInterval: TimeInterval = 10 * 60
     private var observers: [NSObjectProtocol] = []
     private var networkWasUp = true
 
@@ -89,6 +99,11 @@ final class NetworkShareManager {
 
     func refreshUsage() { cacheUsage = cache.usage() }
 
+    /// In front, or playing from a share. While Vespertine isn't in use it leaves the shares alone: no rescans, no
+    /// listings, no index reads, only an occasional check that the server answers (which doesn't touch its disks),
+    /// so a NAS's disks can spin down.
+    var isInUse: Bool { NSApp.isActive || isStreamingPlayback() }
+
     // MARK: Lifecycle
 
     func start() {
@@ -103,6 +118,7 @@ final class NetworkShareManager {
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { @Sendable [weak self] _ in
             Task { @MainActor in
+                self?.lastDisruption = .now
                 try? await Task.sleep(for: .seconds(4)) // let Wi-Fi and VPNs come back first
                 await self?.checkAll()
             }
@@ -112,6 +128,11 @@ final class NetworkShareManager {
             Task { @MainActor in self?.volumeUnmounted(volume) }
         })
 
+        // Coming back to Vespertine is when new music on a share should show up.
+        observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { @Sendable [weak self] _ in
+            Task { @MainActor in await self?.rescanStale() }
+        })
+
         freshnessTask = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(300))
@@ -119,9 +140,14 @@ final class NetworkShareManager {
             }
         }
         healthTask = Task { [weak self] in
+            var lastCheck = Date.now
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(45))
-                await self?.checkAll()
+                try? await Task.sleep(for: .seconds(NetworkShareManager.checkInterval))
+                guard let self else { return }
+                let inUse = self.isInUse
+                guard inUse || Date().timeIntervalSince(lastCheck) >= NetworkShareManager.idleCheckInterval else { continue }
+                lastCheck = .now
+                await self.checkAll(listing: inUse)
             }
         }
     }
@@ -129,6 +155,7 @@ final class NetworkShareManager {
     private func networkChanged(up: Bool) {
         defer { networkWasUp = up }
         guard up != networkWasUp || up else { return }
+        lastDisruption = .now
         // Interfaces changed (Wi-Fi, Ethernet, a VPN such as Tailscale connecting): re-check soon.
         Task {
             try? await Task.sleep(for: .seconds(up ? 2 : 0))
@@ -137,22 +164,42 @@ final class NetworkShareManager {
     }
 
     private func volumeUnmounted(_ volume: String?) {
-        guard let volume else { return }
+        guard let volume, !unmountingOurselves.contains(volume) else { return }
         for source in sources where source.path == volume || source.path.hasPrefix(volume + "/") {
-            guard let id = source.id else { continue }
+            guard let id = source.id, let share = source.networkShare else { continue }
             status[id] = .offline("The share was disconnected.")
             try? library.database.setSourceOnline(id, false)
+            ejected.insert(id) // until it's clear which it was, health checks don't mount it again
             Task {
+                // The server still answers and nothing just woke or changed networks: someone unmounted it on
+                // purpose, so it stays disconnected. Otherwise the connection dropped, and it's mounted again.
+                let dropped = Date().timeIntervalSince(lastDisruption) < 60
+                if !dropped, await NetworkVolume.isReachable(share, timeout: 3) {
+                    status[id] = .offline("Disconnected. Choose Reconnect to use it again.")
+                    return
+                }
                 try? await Task.sleep(for: .seconds(2))
                 await connect(source)
             }
         }
     }
 
-    /// Connected shares: confirm the server still answers. Offline ones: try to reconnect.
-    func checkAll() async {
+    /// Unmounts one of the shares' mounts, without its notification counting as the user's.
+    private func unmountOurselves(_ mount: URL, force: Bool) async {
+        let path = mount.standardizedFileURL.path
+        unmountingOurselves.insert(path)
+        if force { await NetworkVolume.forceUnmount(mount, ownedBy: mountBase) } else { await NetworkVolume.unmount(mount, ownedBy: mountBase) }
+        Task {
+            try? await Task.sleep(for: .seconds(10)) // the notification follows the unmount
+            unmountingOurselves.remove(path)
+        }
+    }
+
+    /// Connected shares: confirm the server still answers (and, with `listing`, that the mount still lists its
+    /// folder, which can wake a NAS's disks). Offline ones: try to reconnect. Ejected ones are left alone.
+    func checkAll(listing: Bool = true) async {
         for source in sources {
-            guard let id = source.id, let share = source.networkShare, !connecting.contains(id) else { continue }
+            guard let id = source.id, let share = source.networkShare, !connecting.contains(id), !ejected.contains(id) else { continue }
             if status(of: source).isConnected {
                 // Mount gone (unmounted elsewhere, or the system dropped it): mount again.
                 guard let mount = NetworkVolume.existingMount(for: share) else {
@@ -162,6 +209,7 @@ final class NetworkShareManager {
                 if await NetworkVolume.isReachable(share, timeout: 4) {
                     // Server answers, but is the mount itself still alive? (It can outlive a server
                     // restart or a dropped connection and then fail every read.) Two strikes, then remount.
+                    if !listing { continue }
                     if await NetworkVolume.isResponsive(share.root(at: mount)) { unresponsive[id] = 0; continue }
                     // Slow isn't dead: a busy server can take many seconds to list a folder while it's
                     // still delivering music. Remounting then would cut off what's playing.
@@ -173,7 +221,7 @@ final class NetworkShareManager {
                     shareLog.notice("share \(id, privacy: .public): mount not responding (\(self.unresponsive[id] ?? 0, privacy: .public))")
                     guard (unresponsive[id] ?? 0) >= 2 else { continue }
                     unresponsive[id] = 0
-                    await NetworkVolume.forceUnmount(mount, ownedBy: mountBase)
+                    await unmountOurselves(mount, force: true)
                     status[id] = .offline("Reconnecting…")
                     await connect(source)
                     continue
@@ -187,8 +235,10 @@ final class NetworkShareManager {
     }
 
     /// Rescans connected shares whose last scan is older than `rescanInterval` (incremental: only
-    /// new or changed files are read; files gone from the server are marked missing).
+    /// new or changed files are read; files gone from the server are marked missing). Only while Vespertine is in
+    /// front: in the background, a NAS's disks are left to sleep.
     func rescanStale() async {
+        guard NSApp.isActive else { return }
         for source in sources where status(of: source).isConnected {
             let age = source.lastScannedAt.map { Date().timeIntervalSince($0) } ?? .infinity
             guard age > Self.rescanInterval else { continue }
@@ -220,6 +270,7 @@ final class NetworkShareManager {
     @discardableResult
     func connect(_ source: LibrarySource, scanIfNew: Bool = true) async -> Bool {
         guard let id = source.id, let share = source.networkShare, !connecting.contains(id) else { return false }
+        ejected.remove(id)
         connecting.insert(id)
         defer { connecting.remove(id) }
         if !status(of: source).isConnected { status[id] = .connecting }
@@ -240,9 +291,11 @@ final class NetworkShareManager {
             credentialFailedAt[id] = nil
             // File-system events don't cross the network: index new shares, and look for changes on
             // shares not checked for half an hour (incremental, so only new or changed files are read).
+            // A known share waits until Vespertine is in front, so waking the Mac doesn't wake the NAS's disks.
             let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
             // Never while music plays from a share: the half-hourly check (rescanStale) catches up once it's quiet.
-            if scanIfNew, stale, library.scanProgress == nil, !isStreamingPlayback(), var fresh = sources.first(where: { $0.id == id }) {
+            if scanIfNew, stale, source.lastScannedAt == nil || NSApp.isActive, library.scanProgress == nil, !isStreamingPlayback(),
+               var fresh = sources.first(where: { $0.id == id }) {
                 fresh.path = root.path
                 await library.scan(fresh)
             }
@@ -269,7 +322,7 @@ final class NetworkShareManager {
         let root = share.root(at: mount).standardizedFileURL
         if await NetworkVolume.isDirectory(root) { return root }
         guard let adopted, await !NetworkVolume.isResponsive(adopted) else { throw NetworkShareError.folderNotFound(share.subpath) }
-        await NetworkVolume.forceUnmount(adopted, ownedBy: mountBase)
+        await unmountOurselves(adopted, force: true)
         guard NetworkVolume.existingMount(for: share) == nil else { throw NetworkShareError.mountNotResponding }
         shareLog.notice("\(share.host, privacy: .public)/\(share.share, privacy: .public): the old mount didn't answer; mounting again")
         let fresh = share.root(at: try await NetworkVolume.mount(share, password: password(), in: mountBase, readOnly: readOnly)).standardizedFileURL
@@ -300,9 +353,9 @@ final class NetworkShareManager {
     /// Removes the share from the library and unmounts it if Vespertine mounted it.
     func remove(_ source: LibrarySource) async {
         library.removeSource(source)
-        if let id = source.id { status[id] = nil; credentialFailedAt[id] = nil }
+        if let id = source.id { status[id] = nil; credentialFailedAt[id] = nil; ejected.remove(id) }
         if let share = source.networkShare, let mount = NetworkVolume.existingMount(for: share) {
-            await NetworkVolume.unmount(mount, ownedBy: mountBase)
+            await unmountOurselves(mount, force: false)
         }
     }
 
