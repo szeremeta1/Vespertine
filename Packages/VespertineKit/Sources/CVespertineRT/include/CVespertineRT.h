@@ -70,9 +70,23 @@ void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthroug
 /// from the buffer until the engine thread gets to the request (it may be waiting on a network read).
 void nrt_context_set_muted(NRTRenderContext *_Nonnull ctx, bool muted);
 
+/// The DSD idle pattern (01101001: as many ones as zeros, so a DAC reads it as silence). DSD silence is this, not
+/// all-zero bits.
+#define NRT_DOP_IDLE 0x69u
+
 /// DoP: samples still go out untouched, but meters and the spectrum tap read the DSD bits in each frame
-/// (a 16-bit bit count, display only).
+/// (a 16-bit bit count, display only). Every frame that carries no music (muted, holding for data, run dry) is a DoP
+/// idle frame instead of zeros: two NRT_DOP_IDLE bytes behind the marker that continues the 0x05 / 0xFA alternation,
+/// so the DAC stays locked in DSD. The markers never repeat: where the next frame from the ring carries the marker of
+/// the frame before it (after idle frames, or at a join that broke the sequence), one idle frame goes first.
 void nrt_context_set_dop(NRTRenderContext *_Nonnull ctx, bool dop);
+
+/// Producer side, safe while the device runs: asks the I/O thread to drop everything written so far, on its next
+/// cycle, muted or not, so a seek or skip can keep a DoP stream going instead of stopping the device. Frames written
+/// after the call are kept. Returns the ring position the drop reaches: it's done once nrt_ring_total_read() gets there.
+uint64_t nrt_context_discard(NRTRenderContext *_Nonnull ctx);
+/// Withdraws a discard the I/O thread hasn't done. Only while the device is stopped (before nrt_ring_reset).
+void nrt_context_cancel_discard(NRTRenderContext *_Nonnull ctx);
 
 /// When set, running dry is the expected end of the stream and is not counted as an underrun.
 void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);

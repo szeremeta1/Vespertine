@@ -226,15 +226,49 @@ final class OutputSession: @unchecked Sendable {
         isRunning = true
     }
 
+    /// DSD over PCM: a DAC stays in DSD only while every frame carries the DoP marker. While muted, holding for data or
+    /// run dry, the I/O proc sends DSD silence behind the markers (see `nrt_context_set_dop`), so a DoP output keeps
+    /// running through pauses, seeks and skips: stopping it makes the DAC drop out of DSD and lock again with a pop.
+    var isDoP: Bool { plan.mode == .dop }
+
     func stop() {
         guard isRunning, let ioProcID else { return }
+        // DoP: the last frames the DAC gets are DSD silence, not a cut in the middle of the music.
+        if isDoP { idleOut() }
         AudioDeviceStop(deviceID, ioProcID)
         isRunning = false
     }
 
-    /// Stops I/O and discards buffered audio (used for seeks).
+    /// Mutes and waits a few I/O cycles, so idle frames reach the device before it stops.
+    private func idleOut() {
+        nrt_context_set_muted(context, true)
+        let seconds = Self.idleOutSeconds(bufferFrames: applied.bufferFrames, sampleRate: applied.sampleRate)
+        if seconds > 0 { usleep(useconds_t(seconds * 1_000_000)) }
+    }
+
+    /// Three I/O buffers (one being played, one queued, one more), at most 50 ms.
+    static func idleOutSeconds(bufferFrames: Int, sampleRate: Double) -> Double {
+        guard sampleRate.isFinite, sampleRate > 0 else { return 0 }
+        return min(0.05, Double(max(bufferFrames, 1) * 3) / sampleRate)
+    }
+
+    /// How long a flush waits for the I/O proc to drop what's buffered before stopping the device instead.
+    static let discardWait: TimeInterval = 0.25
+
+    /// Discards buffered audio (seeks, skips). A DoP output that's running keeps running, muted: the I/O proc drops what's
+    /// buffered on its next cycle and sends DSD silence until playback is unmuted, so the DAC stays locked in DSD.
+    /// Anything else stops the device, as does a DoP output whose I/O proc doesn't get to it in time.
     func flush() {
+        if isRunning, isDoP {
+            nrt_context_set_muted(context, true)
+            let target = nrt_context_discard(context)
+            let deadline = Date().addingTimeInterval(Self.discardWait)
+            while totalRead < target, Date() < deadline { usleep(1_000) }
+            if totalRead >= target { return }
+            log.notice("The DoP output didn't drop its buffer in time; stopping it")
+        }
         stop()
+        nrt_context_cancel_discard(context)
         nrt_ring_reset(ring)
     }
 

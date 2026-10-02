@@ -122,6 +122,8 @@ struct NRTRenderContext {
     _Atomic bool muted;
     uint16_t dopPrevious[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];   // render thread only
     _Atomic bool dopPrimed;
+    _Atomic uint32_t dopLast;      // DoP: marker of the last frame sent, music or idle (0 before the first)
+    _Atomic uint64_t discardTo;    // ring position the I/O thread drops everything before (0: none asked)
     _Atomic bool draining;
     _Atomic bool integer;
     _Atomic uint32_t underruns;
@@ -160,6 +162,9 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->passthrough, false);
     atomic_init(&ctx->dop, false);
     atomic_init(&ctx->muted, false);
+    atomic_init(&ctx->dopPrimed, false);
+    atomic_init(&ctx->dopLast, 0);
+    atomic_init(&ctx->discardTo, 0);
     atomic_init(&ctx->draining, false);
     atomic_init(&ctx->integer, false);
     atomic_init(&ctx->underruns, 0);
@@ -203,7 +208,17 @@ void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBit
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
-void nrt_context_set_dop(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->dopPrimed, false); atomic_store(&ctx->dop, d); }
+void nrt_context_set_dop(NRTRenderContext *ctx, bool d) {
+    atomic_store(&ctx->dopPrimed, false);
+    atomic_store(&ctx->dopLast, 0);
+    atomic_store(&ctx->dop, d);
+}
+uint64_t nrt_context_discard(NRTRenderContext *ctx) {
+    const uint64_t to = nrt_ring_total_written(ctx->ring);
+    if (to > 0) atomic_store_explicit(&ctx->discardTo, to, memory_order_release);
+    return to;
+}
+void nrt_context_cancel_discard(NRTRenderContext *ctx) { atomic_store(&ctx->discardTo, 0); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
 void nrt_context_set_integer(NRTRenderContext *ctx, bool i) { atomic_store(&ctx->integer, i); if (i) atomic_store(&ctx->passthrough, true); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
@@ -288,12 +303,117 @@ static void meter_dop(NRTRenderContext *ctx, uint32_t got, uint32_t ch, bool int
     for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
 }
 
-// Pulls `frames` source frames into ctx->scratch (zero-filled if dry) and applies gain/meters.
+// MARK: DoP markers and idle frames
+//
+// A DAC stays in DSD only while every frame carries the marker, alternating 0x05 / 0xFA frame by frame. Zeros (or a
+// repeated marker) make it drop to PCM and lock again when DoP comes back: a pop and a few hundred ms of nothing. So
+// in DoP, a frame without music is an idle frame (DSD silence behind the next marker), and a frame from the ring that
+// would repeat the marker before it gets one idle frame in front. The frames from the ring still go out untouched.
+
+#define NRT_DOP_MARKER_A 0x05u
+#define NRT_DOP_MARKER_B 0xFAu
+
+// The marker byte of a DoP sample (the top byte of its 24-bit word; in integer mode, of the 32-bit word).
+static inline uint32_t dop_marker(float sample, bool integer) {
+    if (integer) { uint32_t v; memcpy(&v, &sample, sizeof v); return v >> 24; }
+    return ((uint32_t)lrintf(sample * 8388608.f) >> 16) & 0xFFu;
+}
+
+// An idle sample behind `marker`, in the ring's representation (the decoder's: the 24-bit word over 2^23, exact in
+// a float; in integer mode the 32-bit word's bit pattern).
+static inline float dop_idle_sample(uint32_t marker, bool integer) {
+    const uint32_t word = marker << 24 | NRT_DOP_IDLE << 16 | NRT_DOP_IDLE << 8;
+    float f;
+    if (integer) { memcpy(&f, &word, sizeof f); return f; }
+    int32_t s;
+    memcpy(&s, &word, sizeof s);
+    return (float)s / 2147483648.f;
+}
+
+static inline uint32_t dop_next_marker(uint32_t last) { return last == NRT_DOP_MARKER_A ? NRT_DOP_MARKER_B : NRT_DOP_MARKER_A; }
+
+// Idle frames into scratch[from, to), carrying on the marker sequence.
+static void dop_fill_idle(NRTRenderContext *ctx, uint32_t from, uint32_t to, uint32_t ch, bool integer) {
+    uint32_t last = atomic_load_explicit(&ctx->dopLast, memory_order_relaxed);
+    const float a = dop_idle_sample(NRT_DOP_MARKER_A, integer), b = dop_idle_sample(NRT_DOP_MARKER_B, integer);
+    for (uint32_t f = from; f < to; f++) {
+        last = dop_next_marker(last);
+        const float s = last == NRT_DOP_MARKER_A ? a : b;
+        float *frame = ctx->scratch + (size_t)f * ch;
+        for (uint32_t c = 0; c < ch; c++) frame[c] = s;
+    }
+    atomic_store_explicit(&ctx->dopLast, last, memory_order_relaxed);
+}
+
+// How many of the next `limit` frames at the reader keep the markers alternating after `last`: stops before a frame
+// that repeats the marker before it. Looks at the ring without taking anything (only frames the writer has published,
+// `limit` ≤ readable, which it can't be overwriting).
+static uint32_t dop_run(const NRTRing *ring, uint32_t limit, uint32_t last, bool integer) {
+    const uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_relaxed);   // the reader's own position
+    for (uint32_t i = 0; i < limit; i++) {
+        const uint32_t m = dop_marker(ring->data[(size_t)((r + i) & ring->mask) * ring->channels], integer);
+        if (m == last && (m == NRT_DOP_MARKER_A || m == NRT_DOP_MARKER_B)) return i;
+        last = m;
+    }
+    return limit;
+}
+
+// A discard the producer asked for (nrt_context_discard): the reader skips to that point. Only the reader moves the
+// read position, so this is safe while the producer writes on, and what it wrote after asking is kept.
+static void take_discard(NRTRenderContext *ctx) {
+    uint64_t to = atomic_load_explicit(&ctx->discardTo, memory_order_acquire);
+    if (to == 0) return;
+    NRTRing *ring = ctx->ring;
+    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_acquire);
+    const uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_relaxed);
+    const uint64_t target = to < w ? to : w;
+    if (target > r) atomic_store_explicit(&ring->readPos, target, memory_order_release);
+    // Cleared unless a newer discard came in meanwhile (that one is taken next cycle).
+    atomic_compare_exchange_strong_explicit(&ctx->discardTo, &to, 0, memory_order_relaxed, memory_order_relaxed);
+}
+
+// Silence while holding (muted, or waiting for data): zeros, or in DoP idle frames that keep the DAC locked.
+static void hold_silence(NRTRenderContext *ctx, uint32_t frames, uint32_t ch, bool dop, bool integer) {
+    if (dop) dop_fill_idle(ctx, 0, frames, ch, integer);
+    else memset(ctx->scratch, 0, (size_t)frames * ch * sizeof(float));
+    for (uint32_t c = 0; c < ch && c < NRT_METER_CHANNELS; c++) atomic_store_explicit(&ctx->peak[c], 0.f, memory_order_relaxed);
+}
+
+// DoP: frames from the ring as they are, idle frames where there are none, the markers alternating throughout.
+static void pull_dop(NRTRenderContext *ctx, uint32_t frames, uint32_t ch, bool integer) {
+    uint32_t done = 0, music = 0;
+    while (done < frames) {
+        const uint32_t readable = nrt_ring_readable(ctx->ring);
+        if (readable == 0) break;
+        const uint32_t want = readable < frames - done ? readable : frames - done;
+        const uint32_t run = dop_run(ctx->ring, want, atomic_load_explicit(&ctx->dopLast, memory_order_relaxed), integer);
+        if (run == 0) {
+            // The next frame repeats the last marker: one idle frame turns the sequence (the next run is then ≥ 1).
+            dop_fill_idle(ctx, done, done + 1, ch, integer);
+            done++;
+            continue;
+        }
+        nrt_ring_read(ctx->ring, ctx->scratch + (size_t)done * ch, run);
+        done += run;
+        music = done;
+        atomic_store_explicit(&ctx->dopLast, dop_marker(ctx->scratch[(size_t)(done - 1) * ch], integer), memory_order_relaxed);
+    }
+    if (done < frames) {
+        dop_fill_idle(ctx, done, frames, ch, integer);
+        if (!atomic_load_explicit(&ctx->draining, memory_order_relaxed))
+            atomic_fetch_add_explicit(&ctx->underruns, 1, memory_order_relaxed);
+    }
+    meter_dop(ctx, music, ch, integer);
+}
+
+// Pulls `frames` source frames into ctx->scratch (silence if dry: zeros, or DoP idle frames) and applies gain/meters.
 static void pull(NRTRenderContext *ctx, uint32_t frames) {
     const uint32_t ch = nrt_ring_channels(ctx->ring);
+    take_discard(ctx);
+    const bool dop = atomic_load_explicit(&ctx->dop, memory_order_relaxed);
+    const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
     if (atomic_load_explicit(&ctx->muted, memory_order_relaxed)) {
-        memset(ctx->scratch, 0, (size_t)frames * ch * sizeof(float));
-        for (uint32_t c = 0; c < ch && c < NRT_METER_CHANNELS; c++) atomic_store_explicit(&ctx->peak[c], 0.f, memory_order_relaxed);
+        hold_silence(ctx, frames, ch, dop, integer);
         return;
     }
     const uint32_t resume = atomic_load_explicit(&ctx->resumeFrames, memory_order_relaxed);
@@ -310,19 +430,17 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
         }
         if (starved) {
             // Hold: silence, nothing consumed, so playback resumes exactly where it stopped.
-            memset(ctx->scratch, 0, (size_t)frames * ch * sizeof(float));
-            for (uint32_t c = 0; c < ch && c < NRT_METER_CHANNELS; c++) atomic_store_explicit(&ctx->peak[c], 0.f, memory_order_relaxed);
+            hold_silence(ctx, frames, ch, dop, integer);
             return;
         }
     }
+    if (dop) { pull_dop(ctx, frames, ch, integer); return; }
     uint32_t got = nrt_ring_read(ctx->ring, ctx->scratch, frames);
     if (got < frames) {
         memset(ctx->scratch + (size_t)got * ch, 0, (size_t)(frames - got) * ch * sizeof(float));
         if (!atomic_load_explicit(&ctx->draining, memory_order_relaxed))
             atomic_fetch_add_explicit(&ctx->underruns, 1, memory_order_relaxed);
     }
-    const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
-    if (atomic_load_explicit(&ctx->dop, memory_order_relaxed)) { meter_dop(ctx, got, ch, integer); return; }
     if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed) && !integer) return;
 
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
