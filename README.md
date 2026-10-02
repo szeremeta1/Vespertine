@@ -37,16 +37,16 @@ Free Mac players tend to be either pretty but indifferent to what reaches the DA
 
 | | Vespertine | Apple Music | Audirvana Studio | Roon |
 |---|---|---|---|---|
-| Price | **Free, open source** | Included with macOS | $79.99 a year | $149.88 a year |
+| Price | **Free, open source** | App free with macOS; streaming by subscription | $79.99 a year | $149.88 a year |
 | Plays FLAC | Yes | No | Yes | Yes |
 | Switches the DAC to each track's sample rate | Yes | No | Yes | Yes |
 | Exclusive (hog) mode | Yes | No | Yes | Yes |
 | Says when playback is bit-perfect | Yes | No | Shows the DAC format | Yes |
 | DSD | DSD64–512 | No | Yes | Yes |
-| Local multichannel | Yes | No | Yes | Yes |
-| Local Dolby Atmos files | Yes | Catalog only | No | No |
+| Local multichannel | Yes | Multichannel ALAC | Yes | Yes |
+| Local Dolby Atmos files | Yes | Subscription catalog | No | No |
 | Fake hi-res detection | Yes | No | AudioScan (no DSD or multichannel) | No |
-| Streaming (Qobuz, TIDAL) | No | Apple Music | Yes | Yes |
+| Streaming (Qobuz, TIDAL) | No | Apple Music (paid) | Yes | Yes |
 | EQ and room correction | No | Basic EQ | Yes | Yes |
 
 <sub>Checked September 2026 from each product's own pricing and support pages. If you stream or need room correction, the paid apps are worth it; if you own your music, Vespertine is the one to try.</sub>
