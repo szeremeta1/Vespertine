@@ -52,6 +52,19 @@ struct NetworkTests {
         #expect(!workerIsMain)
     }
 
+    @Test("A deadline fires on time even when stuck work has used up GCD's shared threads")
+    func deadlineWithAFullPool() async {
+        // Wedged mounts hold GCD threads: fill the shared pool the way they would, then ask for a deadline.
+        for _ in 0..<160 {
+            DispatchQueue.global(qos: .utility).async { Thread.sleep(forTimeInterval: 2.5) }
+            DispatchQueue.global().async { Thread.sleep(forTimeInterval: 2.5) }
+        }
+        let start = Date()
+        let value = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
+        #expect(value == "fallback")
+        #expect(Date().timeIntervalSince(start) < 1.0)
+    }
+
     @Test("Network reads are spread across folders")
     func interleaving() {
         let urls = ["/a/1", "/a/2", "/a/3", "/b/1", "/c/1", "/c/2"].map { URL(fileURLWithPath: $0) }

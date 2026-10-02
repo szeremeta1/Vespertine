@@ -190,6 +190,11 @@ public enum NetworkShareError: LocalizedError, Equatable {
 }
 
 public enum NetworkVolume {
+    /// Where deadlines fire. GCD's shared pool has a thread limit, and work stuck on a wedged mount holds its
+    /// threads, so a deadline queued there can wait seconds for one: late because of the very work it guards
+    /// against. A queue of its own always gets a thread.
+    private static let deadlines = DispatchQueue(label: "org.szeremeta.vespertine.share-deadlines", qos: .userInitiated)
+
     /// True for SMB, NFS, WebDAV, AFP… volumes (anything macOS doesn't mark local).
     public static func isNetwork(_ url: URL) -> Bool {
         var s = statfs()
@@ -262,7 +267,7 @@ public enum NetworkVolume {
                 }
             }
             connection.start(queue: .global(qos: .utility))
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) { finish(false) }
+            deadlines.asyncAfter(deadline: .now() + timeout) { finish(false) }
         }
     }
 
@@ -321,7 +326,7 @@ public enum NetworkVolume {
                 let value = work()
                 if once.claim() { continuation.resume(returning: value) }
             }
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
+            deadlines.asyncAfter(deadline: .now() + timeout) {
                 if once.claim() { continuation.resume(returning: fallback) }
             }
         }
