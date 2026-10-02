@@ -27,6 +27,12 @@ final class NetworkShareManager {
     private(set) var status: [Int64: Status] = [:]
     /// Consecutive health checks in which a mounted share didn't answer.
     private var unresponsive: [Int64: Int] = [:]
+    /// When a share last failed on its name or password. Health checks leave it alone for `credentialRetryInterval`:
+    /// a stale password tried every 45 s can lock the account (Windows locks one after 10 failures in 10 minutes)
+    /// or get the Mac blocked by the NAS, and an unanswered keychain prompt would keep coming back.
+    /// Reconnect and Enter Password… try at once; any successful connection clears it.
+    private var credentialFailedAt: [Int64: Date] = [:]
+    static let credentialRetryInterval: TimeInterval = 30 * 60
     private(set) var cacheUsage = NetworkCache.Usage()
     let cache: NetworkCache
     /// Where Vespertine mounts shares (private, so library paths stay stable).
@@ -174,7 +180,7 @@ final class NetworkShareManager {
                 }
                 status[id] = .offline(NetworkShareError.unreachable(host: share.host).localizedDescription)
                 try? library.database.setSourceOnline(id, false)
-            } else {
+            } else if credentialFailedAt[id].map({ Date().timeIntervalSince($0) >= Self.credentialRetryInterval }) ?? true {
                 await connect(source)
             }
         }
@@ -234,6 +240,7 @@ final class NetworkShareManager {
             try library.database.relinkSource(id, to: root.path)
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
+            credentialFailedAt[id] = nil
             // File-system events don't cross the network: index new shares, and look for changes on
             // shares not checked for half an hour (incremental, so only new or changed files are read).
             let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
@@ -244,7 +251,12 @@ final class NetworkShareManager {
             return true
         } catch {
             shareLog.error("share \(id, privacy: .public): connect failed: \(String(describing: error), privacy: .public)")
-            status[id] = .offline(error.localizedDescription)
+            if (error as? NetworkShareError)?.isCredentialProblem == true {
+                credentialFailedAt[id] = .now
+                status[id] = .offline(error.localizedDescription + " Vespertine tries again in 30 minutes, or when you choose Reconnect.")
+            } else {
+                status[id] = .offline(error.localizedDescription)
+            }
             try? library.database.setSourceOnline(id, false)
             return false
         }
@@ -275,7 +287,7 @@ final class NetworkShareManager {
     /// Removes the share from the library and unmounts it if Vespertine mounted it.
     func remove(_ source: LibrarySource) async {
         library.removeSource(source)
-        if let id = source.id { status[id] = nil }
+        if let id = source.id { status[id] = nil; credentialFailedAt[id] = nil }
         if let share = source.networkShare, let mount = NetworkVolume.existingMount(for: share) {
             await NetworkVolume.unmount(mount, ownedBy: mountBase)
         }

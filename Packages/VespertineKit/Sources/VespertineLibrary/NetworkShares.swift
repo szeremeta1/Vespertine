@@ -164,6 +164,14 @@ public enum NetworkShareError: LocalizedError, Equatable {
         }
     }
 
+    /// The server refused the name and password, or none could be read: trying again won't help until it changes.
+    public var isCredentialProblem: Bool {
+        switch self {
+        case .authenticationFailed, .passwordMissing: true
+        default: false
+        }
+    }
+
     static func describe(_ code: Int32) -> String {
         let text = String(cString: strerror(code))
         return text.hasPrefix("Unknown") ? "error \(code)" : text

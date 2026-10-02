@@ -270,7 +270,8 @@ struct TagEditorView: View {
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
         // One file answers for the lot: they share a source, and each check is a round trip on a share.
-        if let first = tracks.first(where: { $0.cueStartFrame == nil }), !TagWriter.isWritable(first.fileURL) {
+        if let first = tracks.first(where: { $0.cueStartFrame == nil }),
+           !TagWriter.isWritable(first.fileURL) || first.sourceId.map(TagWriter.readOnlyShares(model.library.sources).contains) == true {
             return "Read-only location · saved in Vespertine's library; the files aren't changed"
         }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
