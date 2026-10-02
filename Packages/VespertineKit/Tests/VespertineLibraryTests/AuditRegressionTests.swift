@@ -282,6 +282,30 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try db.allTracks().first?.title != "Edited")
     }
+    @Test func cueWrittenForTheWAVSplitsTheFLACItWasCompressedTo() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let wav = dir.appendingPathComponent("rip.wav"); try audio(wav)
+        try SFBAudioEngine.AudioConverter.convert(wav, to: dir.appendingPathComponent("set.flac"))
+        try FileManager.default.removeItem(at: wav)
+        try cue(at: dir.appendingPathComponent("set.cue"))          // FILE "set.wav", as the ripper wrote it
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        #expect(try db.allTracks().count == 2)
+        #expect(try db.allTracks().contains { $0.title == "Second" })
+    }
+    @Test func cueSheetsInLegacyEncodingsReadAsWritten() throws {
+        func sheet(_ title: String, _ encoding: String.Encoding) throws -> String? {
+            let text = "PERFORMER \"\(title)\"\nFILE \"a.flac\" WAVE\n  TRACK 01 AUDIO\n    TITLE \"\(title)\"\n    INDEX 01 00:00:00\n"
+            return CueSheet.text(of: try #require(text.data(using: encoding))).map { CueSheet.parse($0).files.first?.tracks.first?.title } ?? nil
+        }
+        #expect(try sheet("交響曲第9番 ニ短調", .shiftJIS) == "交響曲第9番 ニ短調")
+        #expect(try sheet("Группа крови", .windowsCP1251) == "Группа крови")
+        #expect(try sheet("Mötley Crüe, Café Tacvba", .windowsCP1252) == "Mötley Crüe, Café Tacvba")
+        #expect(try sheet("Ångström Größe", .windowsCP1252) == "Ångström Größe")
+        #expect(CueSheet.text(of: Data([0xEF, 0xBB, 0xBF]) + Data("TITLE \"Édith\"".utf8)) == "TITLE \"Édith\"")
+    }
     @Test func numericCueOverflowIsRejected() {
         #expect(CueSheet.cdFrames("9223372036854775807:59:74") == nil)
         #expect(CueSheet.sampleFrame(cdFrames: Int.max, sampleRate: .infinity) == 0)

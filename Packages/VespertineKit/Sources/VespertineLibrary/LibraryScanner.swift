@@ -383,15 +383,13 @@ public actor LibraryScanner {
             guard let sheet = CueSheet.load(cueURL) else { continue }
             // Only single-file sheets with more than one track are split.
             guard sheet.files.count == 1, let file = sheet.files.first, file.tracks.count > 1 else { continue }
-            let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name, isDirectory: false)
+            guard let audio = CueSheet.audioFile(named: file.name, besideSheet: cueURL) else { continue }
             let starts = file.tracks.map(\.startCDFrames)
             guard Set(file.tracks.map(\.number)).count == file.tracks.count,
                   file.tracks.allSatisfy({ $0.number > 0 }),
                   zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }),
                   let data = try? Data(contentsOf: cueURL) else { continue }
-            if FileManager.default.fileExists(atPath: audio.path) {
-                map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
-            }
+            map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
         }
         return map
     }

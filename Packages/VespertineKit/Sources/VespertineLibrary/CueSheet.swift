@@ -102,11 +102,47 @@ public struct CueSheet: Sendable, Hashable {
         return t
     }
 
-    /// Reads a .cue file, trying UTF-8 then common legacy encodings.
+    /// Reads a .cue file (see `text(of:)` for its encoding).
     public static func load(_ url: URL) -> CueSheet? {
-        guard let data = try? Data(contentsOf: url) else { return nil }
-        for encoding in [String.Encoding.utf8, .windowsCP1252, .isoLatin1, .shiftJIS] {
-            if let text = String(data: data, encoding: encoding) { return parse(text) }
+        guard let data = try? Data(contentsOf: url), let text = text(of: data) else { return nil }
+        return parse(text)
+    }
+
+    /// The text of a .cue file: UTF-8 when it's valid, otherwise the legacy encoding it was most likely written in:
+    /// Shift-JIS for a Japanese sheet, Windows-1251 for a Cyrillic one, Windows-1252 for a Western one. Windows-1252
+    /// and Latin-1 accept almost any bytes, so they come last, or every other sheet would read as mojibake.
+    public static func text(of data: Data) -> String? {
+        let bytes = data.starts(with: [0xEF, 0xBB, 0xBF]) ? data.dropFirst(3) : data[...]
+        if let text = String(data: bytes, encoding: .utf8) { return text }
+        // Japanese: it decodes as Shift-JIS and says something in kana or kanji. (Western text that happens to decode
+        // gives half-width katakana and stray kanji, never real words.)
+        if let text = String(data: bytes, encoding: .shiftJIS) {
+            let scalars = text.unicodeScalars
+            let japanese = scalars.filter { (0x3040...0x30FF).contains($0.value) || (0x4E00...0x9FFF).contains($0.value) }.count
+            let halfWidth = scalars.filter { (0xFF61...0xFF9F).contains($0.value) }.count
+            if japanese >= 2 && halfWidth == 0 { return text }
+        }
+        // Cyrillic: whole words of high bytes, where a Western sheet has an accented letter here and there.
+        let high = bytes.indices.filter { bytes[$0] >= 0xC0 }
+        let inWords = high.filter { i in (i > bytes.startIndex && bytes[i - 1] >= 0xC0) || (i + 1 < bytes.endIndex && bytes[i + 1] >= 0xC0) }
+        if high.count >= 4, Double(inWords.count) / Double(high.count) > 0.6, let text = String(data: bytes, encoding: .windowsCP1251) {
+            return text
+        }
+        return String(data: bytes, encoding: .windowsCP1252) ?? String(data: bytes, encoding: .isoLatin1)
+    }
+
+    /// The audio file a sheet's FILE line names: as written or, as rips often end up, the same name with another
+    /// extension (a sheet written for "Album.wav" beside the "Album.flac" it was compressed to), or else the one audio
+    /// file named like the sheet itself.
+    public static func audioFile(named name: String, besideSheet sheet: URL) -> URL? {
+        let folder = sheet.deletingLastPathComponent()
+        let named = folder.appendingPathComponent(name, isDirectory: false)
+        if FileManager.default.fileExists(atPath: named.path) { return named }
+        let extensions = ["flac", "wav", "ape", "wv", "tta", "tak", "aiff", "aif", "m4a", "dsf", "dff"]
+        for base in [named.deletingPathExtension().lastPathComponent, sheet.deletingPathExtension().lastPathComponent] {
+            let found = extensions.map { folder.appendingPathComponent(base, isDirectory: false).appendingPathExtension($0) }
+                .filter { FileManager.default.fileExists(atPath: $0.path) }
+            if found.count == 1 { return found[0] }
         }
         return nil
     }
