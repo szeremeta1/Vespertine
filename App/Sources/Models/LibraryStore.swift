@@ -9,40 +9,6 @@ import VespertineAudio
 import VespertineLibrary
 import Observation
 
-enum FormatFilter: String, CaseIterable, Identifiable {
-    case all, flac, pcm, alac, dsd, surround, lossy, bits24, rate96, multichannel
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .all: "All formats"
-        case .flac: "FLAC"
-        case .pcm: "WAV / AIFF"
-        case .alac: "ALAC"
-        case .dsd: "DSD"
-        case .surround: "Dolby & DTS"
-        case .lossy: "Lossy"
-        case .bits24: "≥ 24-bit"
-        case .rate96: "≥ 88.2 kHz"
-        case .multichannel: "Multichannel"
-        }
-    }
-
-    func matches(_ a: Album) -> Bool {
-        switch self {
-        case .all: true
-        case .flac: a.codec == "FLAC"
-        case .pcm: a.codec == "WAV" || a.codec == "AIFF"
-        case .alac: a.codec == "ALAC"
-        case .dsd: a.isDSD
-        case .surround: a.formatMark.map { $0.family == .dolby || $0.family == .dts } ?? false
-        case .lossy: ["MP3", "AAC", "Vorbis", "Opus", "Musepack"].contains(a.codec)
-        case .bits24: (a.maxBitDepth ?? 0) >= 24 || a.isDSD
-        case .rate96: a.maxSampleRate >= 88_200 || a.isDSD
-        case .multichannel: a.isMultichannel
-        }
-    }
-}
-
 @Observable
 @MainActor
 final class LibraryStore {
@@ -52,7 +18,14 @@ final class LibraryStore {
     let tagWriter: TagWriter
     let enricher: MetadataEnricher
 
-    private(set) var albums: [Album] = [] { didSet { genres = Genres.summarize(albums) } }
+    private(set) var albums: [Album] = [] {
+        didSet {
+            genres = Genres.summarize(albums)
+            albumsByKey = Dictionary(albums.map { ($0.key, $0) }, uniquingKeysWith: { a, _ in a })
+        }
+    }
+    /// The same albums by key.
+    private(set) var albumsByKey: [String: Album] = [:]
     /// Every genre in the library (normalized), for the Genres page and filters.
     private(set) var genres: [GenreSummary] = []
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
@@ -61,6 +34,8 @@ final class LibraryStore {
     private(set) var favoriteIDs: Set<Int64> = []
     /// Favorites whose files are present: the number in the sidebar.
     private(set) var favoriteCount = 0
+    /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
+    private(set) var favoriteAlbumKeys: Set<String> = []
     private(set) var sources: [LibrarySource] = []
 
     /// A location as people should see it: files on a network share read "High-Res Music › Artist/Album"
@@ -74,13 +49,14 @@ final class LibraryStore {
         return (path as NSString).abbreviatingWithTildeInPath
     }
     /// For each track, every version and copy of its song on its album (stereo and multichannel, the same song
-    /// in two places), or just the track.
+    /// in two places), or just the track. The albums are read at once, so a whole library queues in one read.
     func versions(of tracks: [Track]) -> [[Track]] {
-        var albums: [String: [[Track]]] = [:]
-        return tracks.map { t in
-            let songs = albums[t.albumKey] ?? { let g = TrackVersions.group(self.tracks(albumKey: t.albumKey)); albums[t.albumKey] = g; return g }()
-            return songs.first { $0.contains { $0.id == t.id && $0.location == t.location } } ?? [t]
+        let albumTracks = self.tracks(albumKeys: Array(Set(tracks.map(\.albumKey))))
+        var songByLocation: [String: [Track]] = [:]
+        for songs in Dictionary(grouping: albumTracks, by: \.albumKey).values.map(TrackVersions.group) {
+            for song in songs { for t in song { songByLocation[t.location] = song } }
         }
+        return tracks.map { songByLocation[$0.location] ?? [$0] }
     }
 
     /// Where an album lives, broadly: its source and the folder under it ("High-Res Music › Pink Floyd").
@@ -101,10 +77,6 @@ final class LibraryStore {
     private(set) var revision = 0
 
     var albumSort: AlbumSort = .artist { didSet { observeAlbums() } }
-    var formatFilter: FormatFilter = .all
-    /// Albums page filters (nil = all): a genre key (see `Genres.key`) and a decade (1970 = the 1970s).
-    var genreFilter: String?
-    var decadeFilter: Int?
 
     private(set) var scanProgress: ScanProgress?
     private(set) var lastError: String?
@@ -130,18 +102,7 @@ final class LibraryStore {
         for task in tasks { task.cancel() }
     }
 
-    var filteredAlbums: [Album] {
-        albums.filter { a in
-            (formatFilter == .all || formatFilter.matches(a))
-                && (genreFilter.map { Genres.keys(a.genre).contains($0) } ?? true)
-                && (decadeFilter.map { Genres.decade(a.year) == $0 } ?? true)
-        }
-    }
-
-    func albums(genre key: String) -> [Album] { albums.filter { Genres.keys($0.genre).contains(key) } }
-
-    /// Decades present in the library, newest first.
-    var decades: [Int] { Array(Set(albums.compactMap { Genres.decade($0.year) })).sorted(by: >) }
+    func albums(genre key: String) -> [Album] { albums.filter { $0.facts.genres.contains(key) } }
 
     // MARK: Observation
 
@@ -164,13 +125,14 @@ final class LibraryStore {
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in
-                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing FROM favorite JOIN track ON track.id = favorite.trackId")
-                    .map { (id: $0["id"] as Int64, missing: $0["missing"] as Bool) }
+                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing, track.albumKey AS album FROM favorite JOIN track ON track.id = favorite.trackId")
+                    .map { (id: $0["id"] as Int64, missing: $0["missing"] as Bool, album: $0["album"] as String?) }
             }
             do {
                 for try await value in obs.values(in: writer) {
                     self?.favoriteIDs = Set(value.map(\.id))
                     self?.favoriteCount = value.count { !$0.missing }
+                    self?.favoriteAlbumKeys = Set(value.filter { !$0.missing }.compactMap(\.album))
                 }
             } catch {}
         })
@@ -366,6 +328,7 @@ final class LibraryStore {
     // MARK: Queries (synchronous, small)
 
     func tracks(albumKey: String) -> [Track] { (try? database.tracks(albumKey: albumKey)) ?? [] }
+    func tracks(albumKeys: [String]) -> [Track] { (try? database.tracks(albumKeys: albumKeys)) ?? [] }
     func tracks(in playlist: Playlist) -> [Track] { (try? database.tracks(in: playlist)) ?? [] }
     func tracks(ids: [Int64]) -> [Track] { (try? database.tracks(ids: ids)) ?? [] }
     func allTracks() -> [Track] { (try? database.allTracks()) ?? [] }
@@ -373,7 +336,7 @@ final class LibraryStore {
     func albums(artist: String) -> [Album] { (try? database.albums(artist: artist)) ?? [] }
     func albums(underPath path: String) -> [Album] { (try? database.albums(underPath: path)) ?? [] }
 
-    func album(key: String) -> Album? { albums.first { $0.key == key } }
+    func album(key: String) -> Album? { albumsByKey[key] }
 
     // MARK: Editing
 

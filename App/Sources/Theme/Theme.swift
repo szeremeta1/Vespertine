@@ -150,17 +150,22 @@ struct TransportIconStyle: ButtonStyle {
 /// Selectable filter chip.
 struct Chip: View {
     let title: String
+    var symbol: String? = nil
     let isOn: Bool
     let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(Typeface.ui(11.5))
-                .foregroundStyle(isOn ? Palette.brassHi : Palette.text2)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(isOn ? Palette.brass.opacity(0.08) : .clear, in: Capsule())
-                .overlay(Capsule().strokeBorder(isOn ? Palette.brass.opacity(0.45) : Palette.hairlineStrong, lineWidth: 1))
+            HStack(spacing: 4) {
+                if let symbol { Image(systemName: symbol).font(.system(size: 9.5)) }
+                Text(title)
+            }
+            .font(Typeface.ui(11.5))
+            .foregroundStyle(isOn ? Palette.brassHi : Palette.text2)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(isOn ? Palette.brass.opacity(0.08) : .clear, in: Capsule())
+            .overlay(Capsule().strokeBorder(isOn ? Palette.brass.opacity(0.45) : Palette.hairlineStrong, lineWidth: 1))
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }

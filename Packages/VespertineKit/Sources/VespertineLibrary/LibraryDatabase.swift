@@ -290,7 +290,14 @@ public extension LibraryDatabase {
                max(addedAt) AS addedAt,
                -- a CUE-split file counts once (with its first track), not once per track
                sum(CASE WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
-               min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey
+               min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey,
+               -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')
+               group_concat(DISTINCT replace(codec, ',', ' ') || ':' || isLossless || isDSD) AS kinds,
+               group_concat(DISTINCT CAST(round(sampleRate) AS INTEGER)) AS rates,
+               group_concat(DISTINCT coalesce(bitDepth, CASE WHEN isDSD THEN 1 END)) AS depths,
+               group_concat(DISTINCT channels) AS channelCounts,
+               group_concat(DISTINCT coalesce(analysisVerdict, CASE WHEN isLossless AND NOT isDSD THEN 'none' END)) AS verdicts,
+               group_concat(DISTINCT sourceId) AS sourceIds
         FROM track WHERE isMissing = 0 AND (\(filter))
         GROUP BY albumKey ORDER BY \(order)
         """
@@ -319,12 +326,36 @@ public extension LibraryDatabase {
             "\(codec) · \(rateText) kHz"
         }
         let channelText = maxChannels > 2 ? " · " + ChannelLayouts.name(channels: maxChannels) : ""
-        return Album(key: row["key"], title: row["title"], artist: row["artist"], year: row["year"], genre: row["genre"],
-                     trackCount: row["trackCount"], duration: row["duration"], artworkKey: row["artworkKey"],
-                     formatSummary: summary + channelText, codec: codec, maxBitDepth: bits, maxSampleRate: rate, isHiRes: isDSD || (lossless && ((bits ?? 16) > 16 || rate > 48_000)),
-                     isDSD: isDSD, addedAt: row["addedAt"], totalSize: row["totalSize"],
-                     sourcePath: (row["anyPath"] as String?).map { ($0 as NSString).deletingLastPathComponent },
-                     maxChannels: maxChannels)
+        var album = Album(key: row["key"], title: row["title"], artist: row["artist"], year: row["year"], genre: row["genre"],
+                          trackCount: row["trackCount"], duration: row["duration"], artworkKey: row["artworkKey"],
+                          formatSummary: summary + channelText, codec: codec, maxBitDepth: bits, maxSampleRate: rate, isHiRes: isDSD || (lossless && ((bits ?? 16) > 16 || rate > 48_000)),
+                          isDSD: isDSD, addedAt: row["addedAt"], totalSize: row["totalSize"],
+                          sourcePath: (row["anyPath"] as String?).map { ($0 as NSString).deletingLastPathComponent },
+                          maxChannels: maxChannels)
+        album.facts = facts(from: row, album: album)
+        return album
+    }
+
+    /// An album's filter facts from the aggregates of `albumsSQL`.
+    private static func facts(from row: Row, album: Album) -> FilterFacts {
+        func list(_ column: String) -> [String] {
+            ((row[column] as String?) ?? "").split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        }
+        var f = FilterFacts()
+        // "FLAC:10" = codec, lossless, DSD
+        f.formats = Set(list("kinds").map { entry in
+            let flags = entry.suffix(2)
+            return FormatKind.of(codec: String(entry.dropLast(3)), lossless: flags.first == "1", dsd: flags.last == "1")
+        })
+        f.sampleRates = Set(list("rates").compactMap { Int($0) })
+        f.bitDepths = Set(list("depths").compactMap { Int($0) })
+        f.channels = Set(list("channelCounts").compactMap { Int($0) })
+        f.verdicts = Set(list("verdicts"))
+        f.sources = Set(list("sourceIds").compactMap { Int64($0) })
+        f.genres = Genres.keys(album.genre)
+        f.decade = Genres.decade(album.year)
+        f.artist = album.artist.lowercased()
+        return f
     }
 
     func albums(sort: AlbumSort = .artist) throws -> [Album] {
@@ -333,17 +364,42 @@ public extension LibraryDatabase {
 
     func tracks(albumKey: String) throws -> [Track] {
         try writer.read { db in
-            let tracks = try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 ORDER BY coalesce(discNumber, 1), trackNumber, location",
-                                            arguments: [albumKey])
-            // Track numbers that repeat on one disc (an SACD rip's "Multichannel 5.1" and "Stereo" folders, a CD
-            // and a vinyl copy) list folder by folder instead of interleaved. Otherwise the numbers decide, even
-            // when an album's files are spread over several folders.
-            let numbers = tracks.compactMap { t in t.trackNumber.map { "\(t.discNumber ?? 1)-\($0)" } }
-            guard Set(numbers).count < numbers.count else { return tracks }
-            func folder(_ t: Track) -> String { (t.filePath as NSString).deletingLastPathComponent }
+            Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0", arguments: [albumKey]))
+        }
+    }
+
+    /// The tracks of several albums in one read: album after album as given, each in its own order.
+    func tracks(albumKeys: [String]) throws -> [Track] {
+        guard !albumKeys.isEmpty else { return [] }
+        let byAlbum = try writer.read { db in
+            var found: [Track] = []
+            // A long list is read in parts (SQLite caps the number of arguments).
+            for start in stride(from: 0, to: albumKeys.count, by: 900) {
+                let part = Array(albumKeys[start..<min(start + 900, albumKeys.count)])
+                let marks = Array(repeating: "?", count: part.count).joined(separator: ",")
+                found += try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND albumKey IN (\(marks))",
+                                            arguments: StatementArguments(part))
+            }
+            return Dictionary(grouping: found, by: \.albumKey)
+        }
+        var seen = Set<String>()
+        return albumKeys.flatMap { key in seen.insert(key).inserted ? Self.albumOrder(byAlbum[key] ?? []) : [] }
+    }
+
+    /// An album's tracks in disc and track order. Track numbers that repeat on one disc (an SACD rip's
+    /// "Multichannel 5.1" and "Stereo" folders, a CD and a vinyl copy) list folder by folder instead of
+    /// interleaved. Otherwise the numbers decide, even when an album's files are spread over several folders.
+    static func albumOrder(_ tracks: [Track]) -> [Track] {
+        func folder(_ t: Track) -> String { (t.filePath as NSString).deletingLastPathComponent }
+        let numbers = tracks.compactMap { t in t.trackNumber.map { "\(t.discNumber ?? 1)-\($0)" } }
+        if Set(numbers).count < numbers.count {
             return tracks.sorted {
                 (($0.discNumber ?? 1), folder($0), ($0.trackNumber ?? 0), $0.location) < (($1.discNumber ?? 1), folder($1), ($1.trackNumber ?? 0), $1.location)
             }
+        }
+        // SQL's order was disc, number, location, with songs without a number first on their disc.
+        return tracks.sorted {
+            (($0.discNumber ?? 1), $0.trackNumber ?? Int.min, $0.location) < (($1.discNumber ?? 1), $1.trackNumber ?? Int.min, $1.location)
         }
     }
 

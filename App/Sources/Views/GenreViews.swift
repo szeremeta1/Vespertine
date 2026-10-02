@@ -8,18 +8,29 @@ import SwiftUI
 
 struct GenresView: View {
     @Environment(AppModel.self) private var model
+    private let scope = FilterScope.sidebar(.genres)
     private let columns = [GridItem(.adaptive(minimum: 164, maximum: 220), spacing: 22, alignment: .top)]
 
     var body: some View {
-        let genres = model.library.genres
+        let filter = model.filter(scope)
+        let genres = model.genres(filter)
+        let total = model.library.genres.count
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: "Genres", meta: "\(genres.count) genres") { EmptyView() }
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
-                    ForEach(genres) { GenreTile(genre: $0) }
+                PageHeader(title: "Genres", meta: filter.isEmpty ? "\(total) genres" : "\(genres.count) of \(total) genres") {
+                    PlayShuffleButtons(showsPlay: false, disabled: genres.isEmpty) { model.play(scope, shuffled: $0) }
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
+                FilterBar(scope: scope, items: .albums(model.baseAlbums(scope), model: model))
+                    .padding(.bottom, 6)
+                if genres.isEmpty && total > 0 {
+                    NoMatchesView(unit: "genre") { model.setFilter(LibraryFilter(), for: scope) }
+                } else {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
+                        ForEach(genres) { GenreTile(genre: $0, filter: filter) }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                }
             }
         }
         .scrollContentBackground(.hidden)
@@ -30,6 +41,8 @@ struct GenresView: View {
 struct GenreTile: View {
     @Environment(AppModel.self) private var model
     let genre: GenreSummary
+    /// The filter of the page it's on: its counts, and what its menu plays.
+    var filter = LibraryFilter()
 
     var body: some View {
         Button { model.path.append(.genre(genre.key)) } label: {
@@ -44,6 +57,9 @@ struct GenreTile: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(genre.name), \(genre.albumCount) albums")
+        .contextMenu {
+            AlbumsPlayMenu(scope: .route(.genre(genre.key)), filter: filter.removing([.genre]))
+        }
     }
 }
 
@@ -76,8 +92,7 @@ struct GenreDetailView: View {
     let genreKey: String
 
     var body: some View {
-        let _ = model.library.revision
         let name = model.library.genres.first { $0.key == genreKey }?.name ?? genreKey
-        AlbumsGridView(title: name, albumsOverride: model.library.albums(genre: genreKey))
+        AlbumsGridView(scope: .route(.genre(genreKey)), title: name)
     }
 }

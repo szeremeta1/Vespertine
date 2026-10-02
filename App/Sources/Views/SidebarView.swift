@@ -17,11 +17,17 @@ struct SidebarView: View {
         List(selection: Binding(get: { model.sidebar }, set: { if let v = $0 { model.sidebar = v } })) {
             Section("Library") {
                 row(.albums, "Albums", "square.grid.2x2", count: model.library.stats.albums)
+                    .contextMenu { playMenu(.albums) }
                 row(.artists, "Artists", "person", count: model.library.stats.artists)
+                    .contextMenu { playMenu(.artists, play: false) }
                 row(.songs, "Songs", "music.note", count: model.library.stats.tracks)
+                    .contextMenu { playMenu(.songs) }
                 row(.genres, "Genres", "guitars", count: model.library.genres.count)
+                    .contextMenu { playMenu(.genres, play: false) }
                 row(.recentlyAdded, "Recently Added", "clock", count: nil)
+                    .contextMenu { playMenu(.recentlyAdded) }
                 row(.favorites, "Favorites", "heart", count: model.library.favoriteCount)
+                    .contextMenu { playMenu(.favorites) }
                     .dropDestination(for: String.self) { items, _ in
                         let ids = items.flatMap { $0.split(separator: ",") }.compactMap { Int64($0) }
                         model.library.setFavorite(true, trackIDs: ids)
@@ -46,7 +52,7 @@ struct SidebarView: View {
                         .contextMenu {
                             if playlist.isSmart { Button("Edit Rules…") { model.smartEditorPlaylist = playlist } }
                             Button("Rename…") { newName = playlist.name; renaming = playlist }
-                            Button("Play") { model.player.play(model.library.tracks(in: playlist)) }
+                            playMenu(.playlist(id))
                             Divider()
                             Button("Delete Playlist", role: .destructive) {
                                 if model.sidebar == .playlist(id) { model.sidebar = .albums }
@@ -157,11 +163,27 @@ struct SidebarView: View {
         }
     }
 
+    /// Plays what the page lists, through its filter (a filtered page plays what it shows).
+    @ViewBuilder private func playMenu(_ item: SidebarItem, play: Bool = true) -> some View {
+        let scope = FilterScope.sidebar(item)
+        if play { Button("Play") { model.play(scope, shuffled: false) } }
+        Button("Shuffle") { model.play(scope, shuffled: true) }
+        if !model.filter(scope).isEmpty {
+            Button("Clear Filters") { model.setFilter(LibraryFilter(), for: scope) }
+        }
+    }
+
     private func row(_ item: SidebarItem, _ title: String, _ symbol: String, count: Int?) -> some View {
         Label {
             HStack {
                 Text(title)
                 Spacer()
+                if !model.filter(.sidebar(item)).isEmpty {
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Palette.brass)
+                        .help("Filtered")
+                }
                 if let count, count > 0 {
                     Text(count.formatted())
                         .font(Typeface.mono(10.5))

@@ -38,12 +38,14 @@ enum DeveloperHooks {
         }
         guard open != nil || play != nil || d.object(forKey: "VespertineInspectorTab") != nil || d.bool(forKey: "VespertineOpenMini")
                 || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
-                || d.string(forKey: "VespertineOpenSheet") != nil else { return }
+                || d.string(forKey: "VespertineOpenSheet") != nil || d.string(forKey: "VespertineFilter") != nil
+                || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
         for _ in 0..<120 {
-            if wanted == nil || model.library.albums.contains(where: { $0.title == wanted }) { break }
+            // (a page by name needs the playlists and sources read too, which come with the first albums)
+            if wanted == nil ? !model.library.albums.isEmpty : model.library.albums.contains(where: { $0.title == wanted }) { break }
             try? await Task.sleep(for: .milliseconds(250))
         }
         if let sidebar = d.string(forKey: "VespertineSidebar") {
@@ -53,12 +55,50 @@ enum DeveloperHooks {
             case "genres": model.sidebar = .genres
             case "recent": model.sidebar = .recentlyAdded
             case "favorites": model.sidebar = .favorites
-            default: if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
+            default:
+                if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
+                else if let s = model.library.sources.first(where: { $0.displayName == sidebar }), let id = s.id { model.sidebar = .source(id) }
             }
         }
         if d.object(forKey: "VespertineShowInspector") != nil { model.showInspector = d.bool(forKey: "VespertineShowInspector") }
         if let open, let album = model.library.albums.first(where: { $0.title == open }) {
             model.openAlbum(album.key)
+        }
+        // Filters and pages of one artist or genre: -VespertineFilter "genre=Jazz|Blues;decade=1970;sampleRate=96000;flags=bits24"
+        // applies to the page on screen (after -VespertineSidebar), before -VespertineOpenArtist/-OpenGenre carry it on.
+        if let spec = d.string(forKey: "VespertineFilter") { model.setFilter(filter(spec), for: model.visibleScope) }
+        if let chips = d.string(forKey: "VespertineFormatFilter") {
+            for chip in chips.split(separator: ",").compactMap({ QuickChip(rawValue: String($0)) }) {
+                model.updateFilter(model.visibleScope) { chip.toggle(&$0) }
+            }
+        }
+        if let genre = d.string(forKey: "VespertineGenreFilter") { model.updateFilter(model.visibleScope) { $0[.genre].insert(Genres.key(genre)) } }
+        if let artist = d.string(forKey: "VespertineOpenArtist") {
+            model.path.append(.artist(model.library.artists.first { $0.name.localizedCaseInsensitiveCompare(artist) == .orderedSame }?.name ?? artist))
+        }
+        if let genre = d.string(forKey: "VespertineOpenGenre") { model.path.append(.genre(Genres.key(genre))) }
+        if let facet = d.string(forKey: "VespertineOpenFilters") {
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                model.filterPanelRequest = FilterPanelRequest(scope: model.visibleScope, facet: Facet(rawValue: facet))
+            }
+        }
+        // `-VespertineShuffle YES`: shuffle the page on screen and list what's queued (use a silent output).
+        if d.bool(forKey: "VespertineShuffle") {
+            setvbuf(stdout, nil, _IOLBF, 0)
+            for _ in 0..<120 where model.library.albums.isEmpty { try? await Task.sleep(for: .milliseconds(250)) }
+            let scope = model.visibleScope
+            let started = Date()
+            model.play(scope, shuffled: true)
+            print("[qa] shuffle \(scope): \(model.player.queue.count) queued in \(String(format: "%.2f", Date().timeIntervalSince(started))) s, shuffle \(model.player.shuffle)")
+            for entry in model.player.queue.prefix(12) {
+                let t = entry.track
+                print("[qa]   \(t.displayAlbumArtist) — \(t.displayAlbum) — \(t.title) · \(t.formatSummary) · \(t.genre ?? "-") · \(t.year.map(String.init) ?? "-")")
+            }
+            if d.double(forKey: "VespertinePauseAfter") > 0 {
+                try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
+                model.player.engine.pause()
+            }
         }
         if d.bool(forKey: "VespertineOpenMini") { openWindow?(id: "mini") }
         if let play, let album = model.library.albums.first(where: { $0.title == play }) {
@@ -79,7 +119,6 @@ enum DeveloperHooks {
             model.inspectorTab = InspectorTab.allCases.first { $0.rawValue.lowercased().hasPrefix(tab.lowercased()) } ?? .nowPlaying
         }
         if let query = d.string(forKey: "VespertineSearch") { model.searchText = query }
-        if let genre = d.string(forKey: "VespertineGenreFilter") { model.library.genreFilter = Genres.key(genre) }
         // `-VespertineCycleDevices "FiiO|AirPods" -VespertineCycleEvery 6 -VespertineCycleCount 8`: switch outputs the way
         // the picker does, on a timer, to reproduce switching problems (see the org.szeremeta.vespertine.player log).
         if let cycle = d.string(forKey: "VespertineCycleDevices") {
@@ -122,7 +161,6 @@ enum DeveloperHooks {
                 print("[qa] skip burst done")
             }
         }
-        if let format = d.string(forKey: "VespertineFormatFilter"), let filter = FormatFilter(rawValue: format) { model.library.formatFilter = filter }
         switch d.string(forKey: "VespertineOpenSheet") {
         case "findMusic": model.showFindMusic = true
         case "enrich": model.enrichAlbumKeys = []
@@ -133,6 +171,22 @@ enum DeveloperHooks {
             }
         default: break
         }
+    }
+
+    /// "genre=Jazz|Blues;decade=1970;sampleRate=96000;format=flac|dsd;flags=bits24,favorite" → a filter.
+    static func filter(_ spec: String) -> LibraryFilter {
+        var f = LibraryFilter()
+        for part in spec.split(separator: ";") {
+            let pair = part.split(separator: "=", maxSplits: 1).map(String.init)
+            guard pair.count == 2 else { continue }
+            let values = pair[1].split(separator: "|").map(String.init)
+            if pair[0] == "flags" {
+                f.flags = Set(pair[1].split(separator: ",").compactMap { FilterFlag(rawValue: String($0)) })
+            } else if let facet = Facet(rawValue: pair[0]) {
+                f[facet] = Set(values.map { facet == .genre ? Genres.key($0) : facet == .artist ? $0.lowercased() : $0 })
+            }
+        }
+        return f
     }
 
     /// Renders every visible window (including its title bar) to `<dir>/<n>-<title>.png`.

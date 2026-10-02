@@ -66,34 +66,26 @@ struct FavoriteCell: View {
 /// Every favorite song, the most recently favorited first.
 struct FavoritesView: View {
     @Environment(AppModel.self) private var model
-    @State private var tracks: [Track] = []
+    @State private var list = SongList()
 
     var body: some View {
-        VStack(spacing: 0) {
-            PageHeader(title: "Favorites",
-                       meta: "\(tracks.count) \(tracks.count == 1 ? "song" : "songs") · \(tracks.reduce(0) { $0 + $1.duration }.longDuration)") {
-                Button { model.player.shuffle = true; model.player.play(tracks) } label: { Label("Shuffle", systemImage: "shuffle") }
-                    .buttonStyle(QuietButtonStyle()).disabled(tracks.isEmpty)
-                Button { model.player.play(tracks) } label: { Label("Play", systemImage: "play.fill") }
-                    .buttonStyle(BrassButtonStyle()).disabled(tracks.isEmpty)
+        SongsPage(scope: .sidebar(.favorites), title: "Favorites", list: list, word: "song") {
+            EmptyView()
+        } empty: {
+            VStack(spacing: 10) {
+                Image(systemName: "heart")
+                    .font(.system(size: 30, weight: .ultraLight))
+                    .foregroundStyle(Palette.brass)
+                Text("No favorites yet").font(Typeface.serif(18)).foregroundStyle(Palette.text2)
+                Text("Click \(Image(systemName: "heart")) beside a song while it plays, or choose Add to Favorites from any song’s menu.")
+                    .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 320)
             }
-            if tracks.isEmpty {
-                VStack(spacing: 10) {
-                    Image(systemName: "heart")
-                        .font(.system(size: 30, weight: .ultraLight))
-                        .foregroundStyle(Palette.brass)
-                    Text("No favorites yet").font(Typeface.serif(18)).foregroundStyle(Palette.text2)
-                    Text("Click \(Image(systemName: "heart")) beside a song while it plays, or choose Add to Favorites from any song’s menu.")
-                        .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: 320)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                TrackTable(tracks: tracks)
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .background(Palette.window)
-        .task(id: "\(model.library.favoriteIDs.hashValue)#\(model.library.revision)") { tracks = model.library.favoriteTracks() }
+        .task(id: "\(model.library.favoriteIDs.hashValue)#\(model.library.revision)") {
+            list = SongList(model.library.favoriteTracks(), model: model)
+        }
     }
 }
