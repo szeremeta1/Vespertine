@@ -43,7 +43,8 @@ public struct ScanSummary: Sendable {
 public actor LibraryScanner {
     let database: LibraryDatabase
     let artwork: ArtworkStore
-    /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder).
+    /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder) found in folders the
+    /// library only references. The managed folder holds only what was imported on purpose, so it keeps everything.
     public var skipsNonMusic = true
     private var activeScans: [Int64: Task<ScanSummary, Error>] = [:]
 
@@ -165,7 +166,7 @@ public actor LibraryScanner {
                 let cue = cueByAudio[url.path], file = listed[url.path]
                 group.addTask { (url, await Self.onIOQueue { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
             }
-            let skipping = self.skipsNonMusic
+            let skipping = self.skipsNonMusic && source.mode != .managed
             while let (url, tracks) = try await group.next() {
                 processed += 1
                 if let tracks {
