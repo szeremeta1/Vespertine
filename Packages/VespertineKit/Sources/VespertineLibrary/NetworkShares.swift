@@ -320,15 +320,21 @@ public enum NetworkVolume {
     /// stuck) on its own thread and its result is dropped.
     public static func blocking<T: Sendable>(timeout: TimeInterval, otherwise fallback: T,
                                              _ work: @escaping @Sendable () -> T) async -> T {
+        await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
+            blocking(timeout: timeout, otherwise: fallback, work) { continuation.resume(returning: $0) }
+        }
+    }
+
+    /// The same, handing the result to `then` (exactly once) on the thread that has it: the work's, or the deadline's.
+    static func blocking<T: Sendable>(timeout: TimeInterval, otherwise fallback: T, _ work: @escaping @Sendable () -> T,
+                                      then deliver: @escaping @Sendable (T) -> Void) {
         let once = ResumeOnce()
-        return await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
-            DispatchQueue.global(qos: .utility).async {
-                let value = work()
-                if once.claim() { continuation.resume(returning: value) }
-            }
-            deadlines.asyncAfter(deadline: .now() + timeout) {
-                if once.claim() { continuation.resume(returning: fallback) }
-            }
+        DispatchQueue.global(qos: .utility).async {
+            let value = work()
+            if once.claim() { deliver(value) }
+        }
+        deadlines.asyncAfter(deadline: .now() + timeout) {
+            if once.claim() { deliver(fallback) }
         }
     }
 
