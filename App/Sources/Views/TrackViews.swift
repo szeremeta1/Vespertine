@@ -123,6 +123,13 @@ struct TrackTable: View {
             let visible = Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id))
             if visible != selection { selection = visible }
         }
+        .onChange(of: tracks) {
+            // Rows are numbered by their place in the list: when the list changes (a scan adds a song above), select the
+            // same songs again rather than the same places, or Play and Return would act on whatever moved there.
+            let wanted = model.selectedTrackIDs
+            let same = Set(rows.filter { wanted.contains($0.track.id ?? -1) }.map(\.id))
+            if same != selection { selection = same }
+        }
         .onChange(of: selection) { _, new in
             model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
