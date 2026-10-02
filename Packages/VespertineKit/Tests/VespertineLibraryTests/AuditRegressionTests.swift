@@ -277,7 +277,7 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         // Asking for the whole budget again makes room by deleting the oldest backups, referenced or not.
         await writer.pruneBackups(making: TagWriter.backupBudget)
         #expect(backupFiles().isEmpty)
-        #expect(try db.writer.read { try Int.fetchOne($0, sql: "SELECT count(*) FROM tagHistory WHERE fileBackupPath IS NOT NULL") } == 0)
+        #expect(try await db.writer.read { try Int.fetchOne($0, sql: "SELECT count(*) FROM tagHistory WHERE fileBackupPath IS NOT NULL") } == 0)
         // The edit is still recorded, so it can be undone from its tags.
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try db.allTracks().first?.title != "Edited")
