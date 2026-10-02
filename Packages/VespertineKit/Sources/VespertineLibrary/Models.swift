@@ -230,6 +230,8 @@ public struct Album: Sendable, Hashable, Identifiable {
     /// Most channels on any track (2 for stereo albums).
     public var maxChannels: Int = 2
     public var isMultichannel: Bool { maxChannels > 2 }
+    /// Every format, rate, depth, layout, verdict and source among its tracks, for filters.
+    public var facts = FilterFacts()
 
     public init(key: String, title: String, artist: String, year: Int?, genre: String?, trackCount: Int, duration: Double,
                 artworkKey: String?, formatSummary: String, codec: String, maxBitDepth: Int?, maxSampleRate: Double, isHiRes: Bool,

@@ -113,11 +113,11 @@ struct ContentRouter: View {
 
     @ViewBuilder private var root: some View {
         switch model.sidebar {
-        case .albums: AlbumsGridView()
+        case .albums: AlbumsGridView(scope: .sidebar(.albums), isLibrary: true)
         case .artists: ArtistsView()
-        case .songs: SongsView(title: "Songs", tracks: nil)
+        case .songs: SongsView()
         case .genres: GenresView()
-        case .recentlyAdded: AlbumsGridView(title: "Recently Added", forcedSort: .recentlyAdded)
+        case .recentlyAdded: AlbumsGridView(scope: .sidebar(.recentlyAdded), title: "Recently Added")
         case .favorites: FavoritesView()
         case .playlist(let id): PlaylistView(playlistID: id)
         case .source(let id): SourceView(sourceID: id)

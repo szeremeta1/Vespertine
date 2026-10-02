@@ -136,8 +136,12 @@ final class AppModel {
     let analysis: AnalysisQueue
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
-    var path: [DetailRoute] = []
+    var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
     var searchText = ""
+    /// Each page's filter (see Browsing.swift). Kept while the app runs, so going back finds it as it was.
+    var filters: [FilterScope: LibraryFilter] = [:]
+    /// Asks the filter bar of a page to open its panel (on a facet, when given).
+    var filterPanelRequest: FilterPanelRequest?
     var selectedTrackIDs: Set<Int64> = [] { didSet { if selectedTrackIDs != oldValue { selectionChangedAt = .now } } }
     /// When the selection last changed; the Analysis tab shows whichever changed last, selection or playback.
     private(set) var selectionChangedAt: Date = .distantPast

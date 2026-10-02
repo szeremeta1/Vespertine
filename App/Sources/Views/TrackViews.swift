@@ -20,12 +20,15 @@ struct TrackTable: View {
     var reorderable: Playlist? = nil
     /// Songs that also exist in another version on the album: track ID → "+ STEREO", "+ 5.1".
     var otherVersions: [Int64: String] = [:]
+    /// A filtered playlist: each row's place in the whole playlist, and the whole (so edits keep what's hidden).
+    var positions: [Int]? = nil
+    var allTracks: [Track]? = nil
 
     @State private var selection = Set<Int64>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
 
     private var rows: [TrackRow] {
-        let base = tracks.enumerated().map { TrackRow(track: $1, index: $0) }
+        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
         return sortOrder.isEmpty ? base : base.sorted(using: sortOrder)
     }
 
@@ -110,7 +113,7 @@ struct TrackTable: View {
         .contextMenu(forSelectionType: Int64.self) { ids in
             let chosenRows = rows.filter { ids.contains($0.id) }
             let chosen = chosenRows.map(\.track)
-            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: tracks, positions: Set(chosenRows.map(\.index))) }
+            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.index))) }
         } primaryAction: { ids in
             guard let first = ids.first, let index = rows.firstIndex(where: { $0.id == first }) else { return }
             model.player.play(rows.map(\.track), startAt: index)
@@ -172,7 +175,7 @@ struct TrackMenu: View {
     var positions: Set<Int>? = nil
 
     var body: some View {
-        Button("Play") { model.player.play(tracks) }
+        Button("Play") { model.player.play(tracks, shuffled: false) }
         Button("Play Next") { model.player.playNext(tracks) }
         Button("Add to Queue") { model.player.addToQueue(tracks) }
         AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
@@ -208,113 +211,129 @@ struct TrackMenu: View {
 
 // MARK: - Songs / search / playlists
 
-/// Filters tracks by what analysis found.
-enum AnalysisFilter: String, CaseIterable, Identifiable {
-    case all, genuine, anyIssue, lossy, synthetic, upsampled, padded, notAnalyzed
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .all: "All tracks"
-        case .genuine: "Genuine"
-        case .anyIssue: "Any issue"
-        case .lossy: "Lossy origin"
-        case .synthetic: "Synthetic high frequencies"
-        case .upsampled: "Upsampled"
-        case .padded: "Padded bit depth"
-        case .notAnalyzed: "Not analyzed"
-        }
+/// Songs with their filter facts, loaded together.
+struct SongList {
+    var tracks: [Track] = []
+    var facts: [FilterFacts] = []
+
+    init() {}
+    @MainActor init(_ tracks: [Track], model: AppModel) {
+        self.tracks = tracks
+        facts = model.trackFacts(tracks)
     }
-    func matches(_ t: Track) -> Bool {
-        let v = t.analysisVerdict
-        switch self {
-        case .all: return true
-        case .genuine: return v == "genuine"
-        case .anyIssue: return ["possibleLossyOrigin", "bandwidthExtended", "upsampled", "paddedBitDepth"].contains(v ?? "")
-        case .lossy: return v == "possibleLossyOrigin"
-        case .synthetic: return v == "bandwidthExtended"
-        case .upsampled: return v == "upsampled"
-        case .padded: return v == "paddedBitDepth"
-        case .notAnalyzed: return v == nil && t.isLossless && !t.isDSD
+}
+
+/// A page of songs with its filter bar: Songs, Favorites, a playlist.
+struct SongsPage<Extra: View, Empty: View>: View {
+    @Environment(AppModel.self) private var model
+    let scope: FilterScope
+    let title: String
+    let list: SongList
+    /// What the subtitle calls them ("tracks", "songs").
+    var word = "track"
+    var kicker = ""
+    var playlist: Playlist? = nil
+    @ViewBuilder var extra: Extra
+    @ViewBuilder var empty: Empty
+
+    var body: some View {
+        let filter = model.filter(scope)
+        let favorites = model.library.favoriteIDs
+        let indices = filter.isEmpty || list.facts.count != list.tracks.count ? Array(list.tracks.indices)
+            : list.tracks.indices.filter { filter.matches(list.facts[$0], favorite: favorites.contains(list.tracks[$0].id ?? -1)) }
+        let shown = indices.map { list.tracks[$0] }
+        VStack(spacing: 0) {
+            PageHeader(title: title, meta: meta(shown, filtered: !filter.isEmpty)) {
+                extra
+                PlayShuffleButtons(disabled: shown.isEmpty) { shuffled in
+                    model.player.play(shown, shuffled: shuffled, allowing: model.allowing(filter, perAlbum: false))
+                }
+            }
+            if list.tracks.isEmpty {
+                empty
+            } else {
+                FilterBar(scope: scope, items: .songs(list.tracks, facts: list.facts, model: model))
+                    .padding(.bottom, 10)
+                if shown.isEmpty {
+                    NoMatchesView(unit: "song") { model.setFilter(LibraryFilter(), for: scope) }
+                    Spacer(minLength: 0)
+                } else {
+                    // A filtered playlist keeps its own numbers, and edits through it keep the songs out of view.
+                    let partial = !filter.isEmpty && playlist?.isSmart == false
+                    TrackTable(tracks: shown, reorderable: playlist,
+                               positions: partial ? indices : nil, allTracks: partial ? list.tracks : nil)
+                }
+            }
         }
+        .background(Palette.window)
+    }
+
+    private func meta(_ shown: [Track], filtered: Bool) -> String {
+        let n = shown.count
+        let count = filtered ? "\(n.formatted()) of \(list.tracks.count.formatted()) \(word)s" : "\(n.formatted()) \(word)\(n == 1 ? "" : "s")"
+        return "\(kicker)\(count) · \(shown.reduce(0) { $0 + $1.duration }.longDuration)"
     }
 }
 
 struct SongsView: View {
     @Environment(AppModel.self) private var model
-    let title: String
-    let tracks: [Track]?
-    @State private var loaded: [Track] = []
-    @State private var filter: AnalysisFilter = .all
-    @State private var genre: String?
+    @State private var list = SongList()
 
     var body: some View {
-        let shown = loaded.filter { t in
-            (filter == .all || filter.matches(t)) && (genre.map { Genres.keys(t.genre).contains($0) } ?? true)
-        }
-        VStack(spacing: 0) {
-            PageHeader(title: title, meta: "\(shown.count.formatted()) tracks · \(shown.reduce(0) { $0 + $1.duration }.longDuration)") {
-                Menu {
-                    Picker("Analysis", selection: $filter) {
-                        ForEach(AnalysisFilter.allCases) { f in
-                            Text(f == .all ? f.label : "\(f.label) (\(loaded.filter(f.matches).count))").tag(f)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                    Divider()
-                    Button("Analyze Tracks Without Results") { model.analysis.analyzeNow(loaded.filter(AnalysisFilter.notAnalyzed.matches)) }
-                } label: {
-                    Label(filter == .all ? "Analysis" : filter.label, systemImage: filter == .all ? "waveform.badge.magnifyingglass" : "line.3.horizontal.decrease.circle.fill")
-                }
-                .menuStyle(.button)
-                .buttonStyle(QuietButtonStyle())
-                .fixedSize()
-                Menu {
-                    Picker("Genre", selection: $genre) {
-                        Text("All Genres").tag(String?.none)
-                        ForEach(model.library.genres) { g in Text(g.name).tag(Optional(g.key)) }
-                    }
-                    .pickerStyle(.inline)
-                } label: {
-                    Label(genre.flatMap { k in model.library.genres.first { $0.key == k }?.name } ?? "Genre",
-                          systemImage: genre == nil ? "guitars" : "line.3.horizontal.decrease.circle.fill")
-                }
-                .menuStyle(.button)
-                .buttonStyle(QuietButtonStyle())
-                .fixedSize()
-                Button { model.player.play(shown) } label: { Label("Play", systemImage: "play.fill") }
-                    .buttonStyle(BrassButtonStyle())
-                    .disabled(shown.isEmpty)
-            }
-            TrackTable(tracks: shown)
-        }
-        .background(Palette.window)
-        .task(id: model.library.revision) { loaded = tracks ?? model.library.allTracks() }
+        SongsPage(scope: .sidebar(.songs), title: "Songs", list: list) { EmptyView() } empty: { Spacer() }
+            .task(id: model.library.revision) { list = SongList(model.library.allTracks(), model: model) }
     }
 }
 
 struct SearchResultsView: View {
     @Environment(AppModel.self) private var model
     let query: String
-    @State private var results: [Track] = []
+    @State private var results = SongList()
     @State private var albums: [Album] = []
     @State private var artists: [LibraryDatabase.ArtistSummary] = []
     @State private var genres: [GenreSummary] = []
+    private let scope = FilterScope.search
 
     var body: some View {
+        let filter = model.filter(scope)
+        let favorites = model.library.favoriteIDs
+        let songs = filter.isEmpty || results.facts.count != results.tracks.count ? results.tracks
+            : results.tracks.indices.filter { filter.matches(results.facts[$0], favorite: favorites.contains(results.tracks[$0].id ?? -1)) }.map { results.tracks[$0] }
+        // Albums by their own facts; artists and genres when one of their albums passes.
+        let albums = model.filtered(self.albums, by: filter)
+        let artists = filter.isEmpty ? self.artists : {
+            let keep = Set(model.artists(filter).map { $0.name.lowercased() })
+            return self.artists.filter { keep.contains($0.name.lowercased()) }
+        }()
+        let genres = filter.isEmpty ? self.genres : {
+            let keep = Set(model.genres(filter).map(\.key))
+            return self.genres.filter { keep.contains($0.key) }
+        }()
+        let found = !(results.tracks.isEmpty && self.albums.isEmpty && self.artists.isEmpty && self.genres.isEmpty)
         VStack(alignment: .leading, spacing: 0) {
-            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta) { EmptyView() }
-            if results.isEmpty && albums.isEmpty && artists.isEmpty && genres.isEmpty {
+            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta(genres: genres.count, artists: artists.count, albums: albums.count, songs: songs.count)) {
+                PlayShuffleButtons(disabled: songs.isEmpty) { shuffled in
+                    model.player.play(songs, shuffled: shuffled, allowing: model.allowing(filter, perAlbum: false))
+                }
+            }
+            if !found {
                 Text("Nothing matches.").font(Typeface.ui(13)).foregroundStyle(Palette.text3)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
+                FilterBar(scope: scope, items: .songs(results.tracks, facts: results.facts, model: model, alsoOffering: self.albums.map(\.facts)))
+                    .padding(.bottom, 12)
+                if songs.isEmpty && albums.isEmpty && artists.isEmpty && genres.isEmpty {
+                    NoMatchesView(unit: "result") { model.setFilter(LibraryFilter(), for: scope) }
+                    Spacer(minLength: 0)
+                }
                 if !genres.isEmpty {
                     shelf("Genres", count: genres.count) {
-                        ForEach(genres) { GenreTile(genre: $0).frame(width: 120) }
+                        ForEach(genres) { GenreTile(genre: $0, filter: filter).frame(width: 120) }
                     }
                 }
                 if !artists.isEmpty {
                     shelf("Artists", count: artists.count) {
-                        ForEach(artists) { ArtistTile(artist: $0).frame(width: 136) }
+                        ForEach(artists) { ArtistTile(artist: $0, filter: filter).frame(width: 136) }
                     }
                 }
                 if !albums.isEmpty {
@@ -322,9 +341,9 @@ struct SearchResultsView: View {
                         ForEach(albums) { AlbumCard(album: $0).frame(width: 150) }
                     }
                 }
-                if !results.isEmpty {
-                    sectionTitle("Songs", count: results.count).padding(.top, 6)
-                    TrackTable(tracks: results)
+                if !songs.isEmpty {
+                    sectionTitle("Songs", count: songs.count).padding(.top, 6)
+                    TrackTable(tracks: songs)
                 } else {
                     Spacer(minLength: 0)
                 }
@@ -333,25 +352,25 @@ struct SearchResultsView: View {
         .background(Palette.window)
         .task(id: "\(query)#\(model.library.revision)") {
             try? await Task.sleep(for: .milliseconds(120))
-            results = model.library.search(query)
+            results = SongList(model.library.search(query), model: model)
             let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
             func matches(_ text: String) -> Bool { words.allSatisfy { text.localizedStandardContains($0) } }
             func startsWith(_ text: String) -> Int { text.localizedStandardRange(of: query)?.lowerBound == text.startIndex ? 0 : 1 }
             // Albums match on title, artist, genre and year ("jazz", "1977", "miles 1959").
-            albums = model.library.albums
+            self.albums = model.library.albums
                 .filter { matches("\($0.title) \($0.artist) \(Genres.split($0.genre).joined(separator: " ")) \($0.year.map(String.init) ?? "")") }
                 .sorted { (startsWith($0.title), $0.title) < (startsWith($1.title), $1.title) }
-            genres = model.library.genres.filter { matches($0.name) || Genres.key($0.name).contains(Genres.key(query)) }
-            artists = model.library.artists
+            self.genres = model.library.genres.filter { matches($0.name) || Genres.key($0.name).contains(Genres.key(query)) }
+            self.artists = model.library.artists
                 .filter { matches($0.name) }
                 .sorted { (startsWith($0.name), -$0.trackCount) < (startsWith($1.name), -$1.trackCount) }
         }
     }
 
-    private var meta: String {
+    private func meta(genres: Int, artists: Int, albums: Int, songs: Int) -> String {
         func n(_ c: Int, _ word: String) -> String { "\(c) \(word)\(c == 1 ? "" : "s")" }
-        let parts: [String] = (genres.isEmpty ? [] : [n(genres.count, "genre")])
-            + [n(artists.count, "artist"), n(albums.count, "album"), n(results.count, "song")]
+        let parts: [String] = (genres == 0 ? [] : [n(genres, "genre")])
+            + [n(artists, "artist"), n(albums, "album"), n(songs, "song")]
         return parts.joined(separator: " · ")
     }
 
@@ -379,23 +398,18 @@ struct SearchResultsView: View {
 struct PlaylistView: View {
     @Environment(AppModel.self) private var model
     let playlistID: Int64
-    @State private var tracks: [Track] = []
+    @State private var list = SongList()
 
     var body: some View {
         let playlist = model.library.playlists.first { $0.id == playlistID }
-        VStack(spacing: 0) {
+        Group {
             if let playlist {
-                PageHeader(title: playlist.name,
-                           meta: "\(playlist.isSmart ? "SMART · " : "")\(tracks.count) tracks · \(tracks.reduce(0) { $0 + $1.duration }.longDuration)") {
+                SongsPage(scope: .sidebar(.playlist(playlistID)), title: playlist.name, list: list,
+                          kicker: playlist.isSmart ? "SMART · " : "", playlist: playlist) {
                     if playlist.isSmart {
                         Button("Edit Rules…") { model.smartEditorPlaylist = playlist }.buttonStyle(QuietButtonStyle())
                     }
-                    Button { model.player.shuffle = true; model.player.play(tracks) } label: { Label("Shuffle", systemImage: "shuffle") }
-                        .buttonStyle(QuietButtonStyle()).disabled(tracks.isEmpty)
-                    Button { model.player.play(tracks) } label: { Label("Play", systemImage: "play.fill") }
-                        .buttonStyle(BrassButtonStyle()).disabled(tracks.isEmpty)
-                }
-                if tracks.isEmpty {
+                } empty: {
                     VStack(spacing: 8) {
                         Text(playlist.isSmart ? "No tracks match these rules yet." : "Drag albums or tracks here.")
                             .font(Typeface.serif(18)).foregroundStyle(Palette.text2)
@@ -403,14 +417,12 @@ struct PlaylistView: View {
                             .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    TrackTable(tracks: tracks, reorderable: playlist)
                 }
             }
         }
         .background(Palette.window)
         .task(id: "\(playlistID)#\(model.library.revision)#\(playlist?.smartRules.hashValue ?? 0)#\(favoritesKey(playlist))") {
-            if let playlist { tracks = model.library.tracks(in: playlist) }
+            if let playlist { list = SongList(model.library.tracks(in: playlist), model: model) }
         }
     }
 

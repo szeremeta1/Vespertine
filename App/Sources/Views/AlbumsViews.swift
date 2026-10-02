@@ -31,43 +31,25 @@ struct PageHeader<Trailing: View>: View {
 
 // MARK: - Album grid
 
+/// A grid of albums with its filter bar: Albums, Recently Added, a source, an artist, a genre.
 struct AlbumsGridView: View {
     @Environment(AppModel.self) private var model
+    let scope: FilterScope
     var title = "Albums"
-    var forcedSort: AlbumSort? = nil
-    var albumsOverride: [Album]? = nil
+    /// The Albums page: a sort order, and the library's size in the subtitle.
+    var isLibrary = false
 
     private let columns = [GridItem(.adaptive(minimum: 164, maximum: 220), spacing: 22, alignment: .top)]
 
     var body: some View {
         @Bindable var library = model.library
-        let albums = albumsOverride ?? source(library)
+        let base = model.baseAlbums(scope)
+        let filter = model.filter(scope)
+        let albums = model.filtered(base, by: filter)
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: title, meta: meta(albums)) {
-                    if albumsOverride == nil && forcedSort == nil {
-                        Menu {
-                            Picker("Genre", selection: $library.genreFilter) {
-                                Text("All Genres").tag(String?.none)
-                                ForEach(library.genres) { g in Text("\(g.name)  (\(g.albumCount))").tag(Optional(g.key)) }
-                            }
-                            .pickerStyle(.inline)
-                        } label: {
-                            Label(library.genreFilter.flatMap { k in library.genres.first { $0.key == k }?.name } ?? "Genre",
-                                  systemImage: library.genreFilter == nil ? "guitars" : "line.3.horizontal.decrease.circle.fill")
-                        }
-                        .menuStyle(.button).buttonStyle(QuietButtonStyle()).fixedSize()
-                        Menu {
-                            Picker("Decade", selection: $library.decadeFilter) {
-                                Text("All Years").tag(Int?.none)
-                                ForEach(library.decades, id: \.self) { d in Text("\(String(d))s").tag(Optional(d)) }
-                            }
-                            .pickerStyle(.inline)
-                        } label: {
-                            Label(library.decadeFilter.map { "\(String($0))s" } ?? "Decade",
-                                  systemImage: library.decadeFilter == nil ? "calendar" : "line.3.horizontal.decrease.circle.fill")
-                        }
-                        .menuStyle(.button).buttonStyle(QuietButtonStyle()).fixedSize()
+                PageHeader(title: title, meta: meta(albums, base: base, filter: filter)) {
+                    if isLibrary {
                         Picker("Sort", selection: $library.albumSort) {
                             Text("Artist").tag(AlbumSort.artist)
                             Text("Title").tag(AlbumSort.title)
@@ -78,47 +60,31 @@ struct AlbumsGridView: View {
                         .labelsHidden()
                         .fixedSize()
                     }
+                    PlayShuffleButtons(disabled: albums.isEmpty) { model.play(scope, shuffled: $0) }
                 }
-                if albumsOverride == nil {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(FormatFilter.allCases) { f in
-                                Chip(title: f.label, isOn: library.formatFilter == f) { library.formatFilter = f }
-                            }
-                        }
-                        .padding(.horizontal, 24)
-                    }
+                FilterBar(scope: scope, items: .albums(base, model: model))
                     .padding(.bottom, 6)
-                }
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 28) {
-                    ForEach(albums) { album in
-                        AlbumCard(album: album)
+                if albums.isEmpty && !base.isEmpty {
+                    NoMatchesView(unit: "album") { model.setFilter(LibraryFilter(), for: scope) }
+                } else {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 28) {
+                        ForEach(albums) { album in
+                            AlbumCard(album: album)
+                        }
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
             }
         }
         .scrollContentBackground(.hidden)
         .background(Palette.window)
     }
 
-    private func source(_ library: LibraryStore) -> [Album] {
-        var list = library.filteredAlbums
-        if forcedSort == .recentlyAdded {
-            list.sort { $0.addedAt > $1.addedAt }
-            list = Array(list.prefix(60))
-        }
-        return list
-    }
-
-    private func meta(_ albums: [Album]) -> String {
+    private func meta(_ albums: [Album], base: [Album], filter: LibraryFilter) -> String {
+        if !filter.isEmpty { return "\(albums.count.formatted()) of \(base.count.formatted()) albums" }
+        guard isLibrary else { return "\(albums.count) album\(albums.count == 1 ? "" : "s")" }
         let s = model.library.stats
-        if albumsOverride != nil || forcedSort != nil { return "\(albums.count) albums" }
-        let lib = model.library
-        if lib.formatFilter != .all || lib.genreFilter != nil || lib.decadeFilter != nil {
-            return "\(albums.count.formatted()) of \(s.albums.formatted()) albums"
-        }
         return "\(s.albums.formatted()) albums · \(s.tracks.formatted()) tracks · \(s.bytes.byteString)"
     }
 }
@@ -145,7 +111,7 @@ struct AlbumCard: View {
                         .padding(8)
                 } else if hovering {
                     Button {
-                        model.player.play(model.library.tracks(albumKey: album.key))
+                        model.player.play(model.library.tracks(albumKey: album.key), shuffled: false)
                     } label: {
                         Image(systemName: "play.fill")
                             .font(.system(size: 13))
@@ -181,7 +147,7 @@ struct AlbumCard: View {
         .accessibilityValue(album.formatSummary)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbum(album.key) }
-        .accessibilityAction(named: "Play") { model.player.play(model.library.tracks(albumKey: album.key)) }
+        .accessibilityAction(named: "Play") { model.player.play(model.library.tracks(albumKey: album.key), shuffled: false) }
         .contextMenu { AlbumMenu(album: album) }
         .draggable(model.library.tracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
     }
@@ -225,7 +191,8 @@ struct AlbumMenu: View {
 
     var body: some View {
         let tracks = model.library.tracks(albumKey: album.key)
-        Button("Play") { model.player.play(tracks) }
+        Button("Play") { model.player.play(tracks, shuffled: false) }
+        Button("Shuffle") { model.player.play(tracks, shuffled: true) }
         Button("Play Next") { model.player.playNext(tracks) }
         Button("Add to Queue") { model.player.addToQueue(tracks) }
         AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
@@ -357,9 +324,9 @@ struct AlbumDetailView: View {
                     FormatMarkView(mark: mark, size: 9.5, showsCarrier: false).padding(.top, 10)
                 }
                 HStack(spacing: 10) {
-                    Button { model.player.play(shown) } label: { Label("Play", systemImage: "play.fill") }
+                    Button { model.player.play(shown, shuffled: false) } label: { Label("Play", systemImage: "play.fill") }
                         .buttonStyle(BrassButtonStyle())
-                    Button { model.player.shuffle = true; model.player.play(shown) } label: { Label("Shuffle", systemImage: "shuffle") }
+                    Button { model.player.play(shown, shuffled: true) } label: { Label("Shuffle", systemImage: "shuffle") }
                         .buttonStyle(QuietButtonStyle())
                     Button("Look Up on MusicBrainz") { model.lookupTracks = tracks }
                         .buttonStyle(QuietButtonStyle())
@@ -410,19 +377,31 @@ struct AlbumDetailView: View {
 
 struct ArtistsView: View {
     @Environment(AppModel.self) private var model
+    private let scope = FilterScope.sidebar(.artists)
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: 190), spacing: 22, alignment: .top)]
 
     var body: some View {
+        let filter = model.filter(scope)
+        let artists = model.artists(filter)
+        let total = model.library.artists.count
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: "Artists", meta: "\(model.library.artists.count) artists") { EmptyView() }
-                LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
-                    ForEach(model.library.artists) { artist in
-                        ArtistTile(artist: artist)
-                    }
+                PageHeader(title: "Artists", meta: filter.isEmpty ? "\(total.formatted()) artists" : "\(artists.count.formatted()) of \(total.formatted()) artists") {
+                    PlayShuffleButtons(showsPlay: false, disabled: artists.isEmpty) { model.play(scope, shuffled: $0) }
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
+                FilterBar(scope: scope, items: .albums(model.baseAlbums(scope), model: model))
+                    .padding(.bottom, 6)
+                if artists.isEmpty && total > 0 {
+                    NoMatchesView(unit: "artist") { model.setFilter(LibraryFilter(), for: scope) }
+                } else {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
+                        ForEach(artists) { artist in
+                            ArtistTile(artist: artist, filter: filter)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                }
             }
         }
         .background(Palette.window)
@@ -432,6 +411,8 @@ struct ArtistsView: View {
 struct ArtistTile: View {
     @Environment(AppModel.self) private var model
     let artist: LibraryDatabase.ArtistSummary
+    /// The filter of the page it's on: its counts, and what its menu plays.
+    var filter = LibraryFilter()
 
     var body: some View {
         Button { model.path.append(.artist(artist.name)) } label: {
@@ -445,7 +426,26 @@ struct ArtistTile: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            AlbumsPlayMenu(scope: .route(.artist(artist.name)), filter: filter.removing([.artist]))
+        }
     }
+}
+
+/// Play, Shuffle, Play Next and Add to Queue for the albums of an artist or a genre, through a filter.
+struct AlbumsPlayMenu: View {
+    @Environment(AppModel.self) private var model
+    let scope: FilterScope
+    let filter: LibraryFilter
+
+    var body: some View {
+        Button("Play") { model.play(albums: albums, filter: filter, shuffled: false) }
+        Button("Shuffle") { model.play(albums: albums, filter: filter, shuffled: true) }
+        Button("Play Next") { model.enqueue(albums: albums, filter: filter, next: true) }
+        Button("Add to Queue") { model.enqueue(albums: albums, filter: filter, next: false) }
+    }
+
+    private var albums: [Album] { model.filtered(model.baseAlbums(scope), by: filter) }
 }
 
 struct ArtistDetailView: View {
@@ -453,9 +453,7 @@ struct ArtistDetailView: View {
     let name: String
 
     var body: some View {
-        // Refreshes in place when the library changes (no new identity, so the scroll position stays).
-        let _ = model.library.revision
-        AlbumsGridView(title: name, albumsOverride: model.library.albums(artist: name))
+        AlbumsGridView(scope: .route(.artist(name)), title: name)
             .navigationTitle(name)
     }
 }
@@ -482,8 +480,7 @@ struct SourceView: View {
                 }
                 .padding(24)
                 Hairline()
-                AlbumsGridView(title: "Albums in this source", albumsOverride: model.library.albums(underPath: source.path))
-                    .id(model.library.revision)
+                AlbumsGridView(scope: .sidebar(.source(sourceID)), title: "Albums in this source")
             }
             .background(Palette.window)
         }
