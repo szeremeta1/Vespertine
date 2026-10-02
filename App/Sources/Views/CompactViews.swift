@@ -228,6 +228,7 @@ struct PlaybackSettings: View {
 
 struct LibrarySettings: View {
     @Environment(AppModel.self) private var model
+    @State private var removingSource: LibrarySource?
 
     var body: some View {
         @Bindable var s = model.settings
@@ -243,9 +244,7 @@ struct LibrarySettings: View {
                         }
                         Spacer()
                         Button("Rescan") { Task { await model.library.scan(source) } }
-                        Button("Remove") {
-                            if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
-                        }
+                        Button("Remove") { removingSource = source }
                     }
                 }
                 HStack {
@@ -259,6 +258,8 @@ struct LibrarySettings: View {
                     Text("Reference files in place").tag(ImportMode.reference)
                     Text("Copy & organize into managed folder").tag(ImportMode.copyAndOrganize)
                 }
+                Text("What Find Music on This Mac starts with. Add Folder always references files in place, and Import & Organize always copies.")
+                    .font(.caption).foregroundStyle(.secondary)
                 LabeledContent("Managed folder") {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
@@ -304,6 +305,7 @@ struct LibrarySettings: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(RemoveSourceAlert(source: $removingSource))
     }
 
     private func serverLine(_ source: LibrarySource) -> String {

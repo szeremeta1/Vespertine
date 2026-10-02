@@ -10,6 +10,8 @@ struct SidebarView: View {
     @Environment(AppModel.self) private var model
     @State private var renaming: Playlist?
     @State private var renamingSource: LibrarySource?
+    @State private var removingSource: LibrarySource?
+    @State private var deletingPlaylist: Playlist?
     @State private var newName = ""
 
     var body: some View {
@@ -54,11 +56,7 @@ struct SidebarView: View {
                             Button("Rename…") { newName = playlist.name; renaming = playlist }
                             playMenu(.playlist(id))
                             Divider()
-                            Button("Delete Playlist", role: .destructive) {
-                                if model.sidebar == .playlist(id) { model.sidebar = .albums }
-                                model.setFilter(LibraryFilter(), for: .sidebar(.playlist(id)))
-                                model.library.deletePlaylist(playlist)
-                            }
+                            Button("Delete Playlist", role: .destructive) { deletingPlaylist = playlist }
                         }
                     }
                 }
@@ -119,11 +117,7 @@ struct SidebarView: View {
                             Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }
                                 .disabled(!source.isOnline)
                             Divider()
-                            Button("Remove from Library", role: .destructive) {
-                                if model.sidebar == .source(id) { model.sidebar = .albums }
-                                model.setFilter(LibraryFilter(), for: .sidebar(.source(id)))
-                                if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
-                            }
+                            Button("Remove from Library", role: .destructive) { removingSource = source }
                         }
                     }
                 }
@@ -163,6 +157,24 @@ struct SidebarView: View {
             Button("Rename") { if let p = renaming { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
             Button("Cancel", role: .cancel) { renaming = nil }
         }
+        .alert(deleteTitle, isPresented: Binding(get: { deletingPlaylist != nil }, set: { if !$0 { deletingPlaylist = nil } }),
+               presenting: deletingPlaylist) { playlist in
+            Button("Delete", role: .destructive) { delete(playlist) }
+            Button("Cancel", role: .cancel) {}
+        } message: { playlist in
+            Text(playlist.isSmart ? "Its rules are deleted. The songs stay in your library, and no files are deleted."
+                                  : "Its list of songs and their order are deleted. The songs stay in your library, and no files are deleted.")
+        }
+        .modifier(RemoveSourceAlert(source: $removingSource))
+    }
+
+    private var deleteTitle: String { deletingPlaylist.map { "Delete the playlist “\($0.name)”?" } ?? "" }
+
+    private func delete(_ playlist: Playlist) {
+        guard let id = playlist.id else { return }
+        if model.sidebar == .playlist(id) { model.sidebar = .albums }
+        model.setFilter(LibraryFilter(), for: .sidebar(.playlist(id)))
+        model.library.deletePlaylist(playlist)
     }
 
     /// Plays what the page lists, through its filter (a filtered page plays what it shows).
@@ -212,6 +224,32 @@ struct SidebarView: View {
             model.sidebar = .playlist(id)
             if smart { model.smartEditorPlaylist = p } else { newName = p.name; renaming = p }
         }
+    }
+}
+
+/// Asks before a source leaves the library (from the sidebar or Settings). Its songs' library state goes with
+/// them, for good: adding the folder or share again starts them afresh. The files themselves stay where they are.
+struct RemoveSourceAlert: ViewModifier {
+    @Environment(AppModel.self) private var model
+    @Binding var source: LibrarySource?
+
+    private var title: String { source.map { "Remove “\($0.displayName)” from the library?" } ?? "" }
+
+    func body(content: Content) -> some View {
+        content.alert(title, isPresented: Binding(get: { source != nil }, set: { if !$0 { source = nil } }),
+                      presenting: source) { source in
+            Button("Remove", role: .destructive) { remove(source) }
+            Button("Cancel", role: .cancel) {}
+        } message: { source in
+            Text("Its songs leave the library, and with them their play counts, favorites, places in playlists, analyses and tag-edit history. Adding it again doesn’t bring these back. \(source.isNetwork ? "Nothing on the server is changed." : "The music files themselves aren’t deleted.")")
+        }
+    }
+
+    private func remove(_ source: LibrarySource) {
+        guard let id = source.id else { return }
+        if model.sidebar == .source(id) { model.sidebar = .albums }
+        model.setFilter(LibraryFilter(), for: .sidebar(.source(id)))
+        if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
     }
 }
 
