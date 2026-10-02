@@ -111,7 +111,7 @@ struct NowPlayingPanel: View {
         .scrollContentBackground(.hidden)
         .task(id: player.signalPath != nil) {
             // QA: `-VespertineScrollInspector YES` scrolls to the meters for snapshots.
-            guard player.signalPath != nil, UserDefaults.standard.bool(forKey: "VespertineScrollInspector") else { return }
+            guard player.signalPath != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
             try? await Task.sleep(for: .milliseconds(300))
             scroller.scrollTo("spectrum", anchor: .bottom)
         }
@@ -522,7 +522,7 @@ struct AnalysisPanel: View {
         .onChange(of: playing?.id) { pinned = nil }
         .task(id: "\(track?.id ?? -1)-\(model.analysis.revision)") {
             stored = track.flatMap { model.library.storedAnalysis(for: $0) }
-            if UserDefaults.standard.bool(forKey: "VespertineRunAnalysis"), let track, stored?.isCurrent != true,
+            if LaunchArguments().bool(forKey: "VespertineRunAnalysis"), let track, stored?.isCurrent != true,
                !model.analysis.isAnalyzing(track) { model.analysis.analyzeNow([track]) }
         }
     }

@@ -264,7 +264,7 @@ final class LibraryStore {
     /// Music on this Mac that isn't in the library yet.
     func findMusic(progress: @escaping @Sendable (MusicFinder.Progress) -> Void) async -> [FoundFolder] {
         // QA hook: -VespertineFindMusicRoot <dir> searches that folder instead of asking Spotlight.
-        let roots = UserDefaults.standard.string(forKey: "VespertineFindMusicRoot").map { [URL(fileURLWithPath: $0, isDirectory: true)] }
+        let roots = LaunchArguments().string(forKey: "VespertineFindMusicRoot").map { [URL(fileURLWithPath: $0, isDirectory: true)] }
         return await MusicFinder.find(roots: roots, excludingRoots: sources.map(\.url), progress: progress)
     }
 
