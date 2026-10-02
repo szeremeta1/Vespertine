@@ -12,10 +12,28 @@ import VespertineAudio
 import VespertineLibrary
 import SwiftUI
 
+/// The launch arguments (`-Key value`) and nothing else. QA hooks read only these: UserDefaults also answers from
+/// the app's saved settings, so a value left there by `defaults write` would apply at every launch, unseen (a test
+/// library in place of the real one, or no software updates). Conversions follow UserDefaults (`YES`, `true`, `1`).
+nonisolated struct LaunchArguments: Sendable {
+    private let values: [String: String]
+
+    init() {
+        values = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
+            .compactMapValues { ($0 as? String) ?? ($0 as? NSNumber)?.stringValue }
+    }
+
+    func object(forKey key: String) -> String? { values[key] }
+    func string(forKey key: String) -> String? { values[key] }
+    func bool(forKey key: String) -> Bool { values[key].map { ($0 as NSString).boolValue } ?? false }
+    func integer(forKey key: String) -> Int { values[key].map { ($0 as NSString).integerValue } ?? 0 }
+    func double(forKey key: String) -> Double { values[key].map { ($0 as NSString).doubleValue } ?? 0 }
+}
+
 @MainActor
 enum DeveloperHooks {
     static func run(_ model: AppModel, openWindow: OpenWindowAction?) async {
-        let d = UserDefaults.standard
+        let d = LaunchArguments()
         let open = d.string(forKey: "VespertineOpenAlbum")
         let play = d.string(forKey: "VespertinePlayAlbum")
         if let address = d.string(forKey: "VespertineAddShare") {
@@ -125,12 +143,11 @@ enum DeveloperHooks {
         if let query = d.string(forKey: "VespertineSearch") { model.searchText = query }
         // `-VespertineCycleDevices "FiiO|AirPods" -VespertineCycleEvery 6 -VespertineCycleCount 8`: switch outputs the way
         // the picker does, on a timer, to reproduce switching problems (see the org.szeremeta.vespertine.player log).
-        if let cycle = d.string(forKey: "VespertineCycleDevices") {
-            let names = cycle.split(separator: "|").map(String.init)
+        if let names = d.string(forKey: "VespertineCycleDevices")?.split(separator: "|").map(String.init), !names.isEmpty {
             let every = max(1, d.double(forKey: "VespertineCycleEvery") == 0 ? 6 : d.double(forKey: "VespertineCycleEvery"))
             let count = d.integer(forKey: "VespertineCycleCount") == 0 ? 8 : d.integer(forKey: "VespertineCycleCount")
             Task {
-                for i in 0..<count {
+                for i in 0..<max(0, count) {
                     try? await Task.sleep(for: .seconds(every))
                     let name = names[i % names.count]
                     let device = model.devices.devices.first { $0.name.localizedCaseInsensitiveContains(name) }
@@ -209,6 +226,6 @@ enum DeveloperHooks {
             }
         }
         print("[qa] snapshot done")
-        if UserDefaults.standard.bool(forKey: "VespertineQuitAfterSnapshot") { NSApp.terminate(nil) }
+        if LaunchArguments().bool(forKey: "VespertineQuitAfterSnapshot") { NSApp.terminate(nil) }
     }
 }

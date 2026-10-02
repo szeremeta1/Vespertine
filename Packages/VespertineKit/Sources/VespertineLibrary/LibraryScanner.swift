@@ -43,7 +43,8 @@ public struct ScanSummary: Sendable {
 public actor LibraryScanner {
     let database: LibraryDatabase
     let artwork: ArtworkStore
-    /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder).
+    /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder) found in folders the
+    /// library only references. The managed folder holds only what was imported on purpose, so it keeps everything.
     public var skipsNonMusic = true
     private var activeScans: [Int64: Task<ScanSummary, Error>] = [:]
 
@@ -165,7 +166,7 @@ public actor LibraryScanner {
                 let cue = cueByAudio[url.path], file = listed[url.path]
                 group.addTask { (url, await Self.onIOQueue { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
             }
-            let skipping = self.skipsNonMusic
+            let skipping = self.skipsNonMusic && source.mode != .managed
             while let (url, tracks) = try await group.next() {
                 processed += 1
                 if let tracks {
@@ -274,6 +275,8 @@ public actor LibraryScanner {
         let width = NetworkVolume.isNetwork(start) ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = []
         var pending: [URL] = [start]
+        // Folders already listed, by path (symlinked ones resolved): a link back up the tree would loop forever.
+        var visited: Set<String> = [start.path]
         var failure: Error?
         await withTaskGroup(of: Listed.self) { group in
             var running = 0
@@ -314,7 +317,7 @@ public actor LibraryScanner {
                 case .success(let r):
                     audio.append(contentsOf: r.files)
                     cue.append(contentsOf: r.cues)
-                    pending.append(contentsOf: r.dirs)
+                    pending.append(contentsOf: r.dirs.filter { visited.insert($0.path).inserted })
                     if let dir = r.hasImage { imageDirs.append(dir) }
                     found?(audio.count)
                 case .failure(let error):
@@ -381,15 +384,13 @@ public actor LibraryScanner {
             guard let sheet = CueSheet.load(cueURL) else { continue }
             // Only single-file sheets with more than one track are split.
             guard sheet.files.count == 1, let file = sheet.files.first, file.tracks.count > 1 else { continue }
-            let audio = cueURL.deletingLastPathComponent().appendingPathComponent(file.name, isDirectory: false)
+            guard let audio = CueSheet.audioFile(named: file.name, besideSheet: cueURL) else { continue }
             let starts = file.tracks.map(\.startCDFrames)
             guard Set(file.tracks.map(\.number)).count == file.tracks.count,
                   file.tracks.allSatisfy({ $0.number > 0 }),
                   zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }),
                   let data = try? Data(contentsOf: cueURL) else { continue }
-            if FileManager.default.fileExists(atPath: audio.path) {
-                map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
-            }
+            map[audio.resolvingSymlinksInPath().path] = (sheet, file.tracks, SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
         }
         return map
     }

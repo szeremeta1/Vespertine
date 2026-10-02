@@ -5,6 +5,7 @@
 
 import Darwin
 import CryptoKit
+import CVespertineTags
 import Foundation
 import GRDB
 import SFBAudioEngine
@@ -43,6 +44,35 @@ public enum TagField: String, CaseIterable, Sendable, Hashable {
         case .albumArtistSort: "Sort Album Artist"
         case .musicBrainzReleaseID: "MusicBrainz Release"
         case .musicBrainzRecordingID: "MusicBrainz Recording"
+        }
+    }
+
+    /// The names TagLib's property map gives this field, in every tag format (a few have more than one).
+    var propertyNames: [String] {
+        switch self {
+        case .title: ["TITLE"]
+        case .artist: ["ARTIST"]
+        case .album: ["ALBUM"]
+        case .albumArtist: ["ALBUMARTIST"]
+        case .composer: ["COMPOSER"]
+        case .genre: ["GENRE"]
+        case .releaseDate: ["DATE"]
+        case .trackNumber, .trackTotal: ["TRACKNUMBER", "TRACKTOTAL", "TOTALTRACKS"]
+        case .discNumber, .discTotal: ["DISCNUMBER", "DISCTOTAL", "TOTALDISCS"]
+        case .compilation: ["COMPILATION"]
+        case .grouping: ["GROUPING", "CONTENTGROUP", "WORK"]
+        case .comment: ["COMMENT", "DESCRIPTION"]
+        case .lyrics: ["LYRICS", "UNSYNCEDLYRICS"]
+        case .bpm: ["BPM"]
+        case .rating: ["RATING"]
+        case .isrc: ["ISRC"]
+        case .label: ["LABEL", "ORGANIZATION", "PUBLISHER"]
+        case .titleSort: ["TITLESORT"]
+        case .artistSort: ["ARTISTSORT"]
+        case .albumSort: ["ALBUMSORT"]
+        case .albumArtistSort: ["ALBUMARTISTSORT"]
+        case .musicBrainzReleaseID: ["MUSICBRAINZ_ALBUMID"]
+        case .musicBrainzRecordingID: ["MUSICBRAINZ_TRACKID"]
         }
     }
 
@@ -179,22 +209,33 @@ public actor TagWriter {
             }
         }
         var refreshIDs: [Int64] = []
+        let readOnly = try Self.readOnlyShares(database.sources())
 
         for track in tracks {
             guard let id = track.id else { continue }
             // CUE tracks share one file, and a read-only share can't be written: those edits live in the library
             // (and survive rescans). Checked first, so no backup is copied for a write that would fail.
-            if track.cueStartFrame != nil || !Self.isWritable(track.fileURL) {
+            // A share added read-only is never written, even when it's mounted read-write (by Finder, say).
+            if track.cueStartFrame != nil || track.sourceId.map(readOnly.contains) == true || !Self.isWritable(track.fileURL) {
                 try await updateDatabaseOnly(track, edit: edit)
                 result.databaseOnly += 1
                 continue
             }
             let url = track.fileURL
             do {
-                let file = try AudioFile(url: url)
+                let backup = try makeBackup(of: url)
+                // The tags are written into a clone of the file, which then takes its place in one step (see
+                // `editingClone`); where that isn't possible, into the file itself, with the backup to fall back on.
+                let target = Self.editingClone(of: url) ?? url
+                defer { if target != url { try? FileManager.default.removeItem(at: target) } }
+                var replaced = target == url
+                let file = try AudioFile(url: target)
                 try file.readPropertiesAndMetadata()
                 var previous = Self.snapshot(file.metadata)
-                let backup = try makeBackup(of: url)
+                // SFBAudioEngine writes one value per field, so the save would keep only the first of several artists,
+                // genres or MusicBrainz IDs, edited or not. Read them now, and put back each one the save cut down.
+                let multiValued = target.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
+                defer { nvt_multivalued_free(multiValued) }
 
                 for (field, value) in edit.fields {
                     if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
@@ -220,6 +261,8 @@ public actor TagWriter {
                 do {
                     TagWriter.protectDate(in: file)
                     try file.writeMetadata()
+                    try Self.keepEveryValue(multiValued, of: target, edit: edit)
+                    if !replaced { try Self.move(target, over: url); replaced = true }
                     previous["__fileSHA256"] = try Self.fileHash(url)
                     let history = previous
                     try await database.writer.write { db in
@@ -227,7 +270,7 @@ public actor TagWriter {
                         try entry.insert(db)
                     }
                 } catch {
-                    try Self.restore(backup, to: url)
+                    if replaced { try Self.restore(backup, to: url) }   // otherwise the file was never touched
                     throw error
                 }
                 refreshIDs.append(id)
@@ -402,6 +445,33 @@ public actor TagWriter {
         url.withUnsafeFileSystemRepresentation { $0.map { access($0, W_OK) == 0 } ?? false }
     }
 
+    /// Network shares added read-only. Their files are never rewritten, however the share is mounted: Vespertine
+    /// reuses a mount that's already there (Finder's, or one shared with a writable source), which may be read-write.
+    public static func readOnlyShares(_ sources: [LibrarySource]) -> Set<Int64> {
+        Set(sources.filter { $0.isNetwork && !$0.isWritable }.compactMap(\.id))
+    }
+
+    /// After SFBAudioEngine's save: puts back the values of multi-valued fields it cut to one (fields the edit set
+    /// are left as edited), and removes custom tags the edit deleted, which its writer leaves in the file.
+    static func keepEveryValue(_ multiValued: OpaquePointer?, of url: URL, edit: TagEdit) throws {
+        let edited = edit.fields.keys.flatMap(\.propertyNames) + edit.custom.keys.map { $0.uppercased() }
+        let removed = edit.custom.filter { $0.value == nil }.map { $0.key.uppercased() }
+        try url.withUnsafeFileSystemRepresentation { path in
+            guard let path else { return }
+            if let multiValued, nvt_multivalued_count(multiValued) > 0 {
+                let restored = withCStrings(edited) { nvt_multivalued_restore(multiValued, path, $0, Int32(edited.count)) }
+                guard restored >= 0 else { throw TagWriteError.valuesNotKept }
+            }
+            for key in removed where nvt_property_set(path, key, nil, 0) != 0 { throw TagWriteError.valuesNotKept }
+        }
+    }
+
+    private static func withCStrings<R>(_ strings: [String], _ body: (UnsafePointer<UnsafePointer<CChar>>?) -> R) -> R {
+        let copies = strings.compactMap { strdup($0) }
+        defer { copies.forEach { free($0) } }
+        return copies.map { UnsafePointer($0) }.withUnsafeBufferPointer { body($0.baseAddress) }
+    }
+
     private func makeBackup(of url: URL) throws -> URL {
         let day = ISO8601DateFormatter.string(from: .now, timeZone: .current, formatOptions: [.withFullDate])
         let dir = backupDirectory.appendingPathComponent(day, isDirectory: true)
@@ -410,8 +480,22 @@ public actor TagWriter {
         let status = url.withUnsafeFileSystemRepresentation { src in
             dest.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, 0) }
         }
-        if status != 0 { try FileManager.default.copyItem(at: url, to: dest) }
+        if status != 0 {
+            // Not a free clone (another volume, a share): a full copy. Make room within the budget, and never let
+            // backups take the last of the disk.
+            let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0)
+            pruneBackups(making: size)
+            guard freeSpace(at: backupDirectory) >= size + Self.backupFreeSpaceReserve else { throw TagWriteError.noRoomForBackup }
+            try FileManager.default.copyItem(at: url, to: dest)
+        }
         return dest
+    }
+
+    private func freeSpace(at url: URL) -> Int64 {
+        let values = try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeAvailableCapacityKey])
+        // "Important usage" can read 0 on some volumes; fall back to the plain figure.
+        if let important = values?.volumeAvailableCapacityForImportantUsage, important > 0 { return important }
+        return Int64(values?.volumeAvailableCapacity ?? 0)
     }
 
     private static func fileHash(_ url: URL) throws -> String {
@@ -422,6 +506,34 @@ public actor TagWriter {
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
+    /// A clone of `url` beside it to write the tags into, or nil where the volume can't clone (shares, non-APFS disks):
+    /// those are written in place, since copying a large file for every edit would be slow. Writing into a clone
+    /// means a crash or a full disk mid-write leaves the original whole, and a song that's playing goes on reading the
+    /// file it opened instead of one being rewritten under it.
+    static func editingClone(of url: URL) -> URL? {
+        let clone = url.deletingLastPathComponent().appendingPathComponent(".vespertine-edit-\(UUID().uuidString).\(url.pathExtension)")
+        let status = url.withUnsafeFileSystemRepresentation { src in
+            clone.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, UInt32(CLONE_NOFOLLOW)) }
+        }
+        guard status == 0 else { return nil }
+        // The clone gets the file's dates and permissions, but its creation date is today's: keep the file's own.
+        if let created = try? url.resourceValues(forKeys: [.creationDateKey]).creationDate {
+            var values = URLResourceValues()
+            values.creationDate = created
+            var target = clone
+            try? target.setResourceValues(values)
+        }
+        return clone
+    }
+
+    /// Puts the edited clone in the file's place, in one step.
+    private static func move(_ clone: URL, over url: URL) throws {
+        let status = clone.withUnsafeFileSystemRepresentation { src in
+            url.withUnsafeFileSystemRepresentation { dst in rename(src!, dst!) }
+        }
+        guard status == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+    }
+
     private static func restore(_ backup: URL, to url: URL) throws {
         let temporary = url.deletingLastPathComponent().appendingPathComponent(".vespertine-restore-\(UUID())")
         defer { try? FileManager.default.removeItem(at: temporary) }
@@ -429,18 +541,51 @@ public actor TagWriter {
         _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
     }
 
-    /// Deletes backups older than `days`.
-    public func purgeBackups(olderThan days: Int = 30) {
+    /// The most space tag backups may take. Past it the oldest go first; an edit whose backup is gone can still be
+    /// undone from the tags recorded with it (all but artwork and custom tags).
+    public static let backupBudget: Int64 = 5 * 1_073_741_824
+    /// Free space a full-copy backup must leave on its volume.
+    static let backupFreeSpaceReserve: Int64 = 2 * 1_073_741_824
+
+    /// Deletes backups no edit refers to once they're older than `days`, then the oldest of the rest until they fit
+    /// in `backupBudget` with room for `making` more bytes. An edit whose backup goes keeps its recorded tags.
+    public func pruneBackups(olderThan days: Int = 30, making needed: Int64 = 0) {
         let cutoff = Date().addingTimeInterval(-Double(days) * 86_400)
-        guard let dirs = try? FileManager.default.contentsOfDirectory(at: backupDirectory, includingPropertiesForKeys: [.creationDateKey]) else { return }
-        let referenced = (try? database.writer.read { db in
-            try String.fetchAll(db, sql: "SELECT fileBackupPath FROM tagHistory WHERE fileBackupPath IS NOT NULL")
-        })
-        guard let referenced else { return }
-        for dir in dirs {
-            if referenced.contains(where: { $0.hasPrefix(dir.path + "/") }) { continue }
-            let created = (try? dir.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? .now
-            if created < cutoff { try? FileManager.default.removeItem(at: dir) }
+        let keys: [URLResourceKey] = [.creationDateKey, .totalFileAllocatedSizeKey, .isRegularFileKey]
+        guard let walker = FileManager.default.enumerator(at: backupDirectory, includingPropertiesForKeys: keys),
+              let recorded = try? database.writer.read({ db in
+                  try String.fetchAll(db, sql: "SELECT fileBackupPath FROM tagHistory WHERE fileBackupPath IS NOT NULL")
+              })
+        else { return }
+        // By resolved path, as recorded (the enumerator may spell a path through /private, say).
+        let resolved = { (path: String) in URL(fileURLWithPath: path).resolvingSymlinksInPath().path }
+        let referenced = Dictionary(recorded.map { (resolved($0), $0) }, uniquingKeysWith: { first, _ in first })
+        var files: [(url: URL, created: Date, size: Int64, recordedAs: String?)] = []
+        for case let url as URL in walker {
+            guard let v = try? url.resourceValues(forKeys: Set(keys)), v.isRegularFile == true else { continue }
+            files.append((url, v.creationDate ?? .now, Int64(v.totalFileAllocatedSize ?? 0), referenced[resolved(url.path)]))
+        }
+        files.sort { $0.created < $1.created }
+        var total = files.reduce(0) { $0 + $1.size }
+        var orphaned: [String] = []
+        for file in files {
+            let stale = file.recordedAs == nil && file.created < cutoff
+            guard stale || total + needed > Self.backupBudget else { continue }
+            guard (try? FileManager.default.removeItem(at: file.url)) != nil else { continue }
+            total -= file.size
+            if let path = file.recordedAs { orphaned.append(path) }
+        }
+        if !orphaned.isEmpty {
+            _ = try? database.writer.write { db in
+                for path in orphaned {
+                    try db.execute(sql: "UPDATE tagHistory SET fileBackupPath = NULL WHERE fileBackupPath = ?", arguments: [path])
+                }
+            }
+        }
+        // Day folders left empty.
+        for dir in (try? FileManager.default.contentsOfDirectory(at: backupDirectory, includingPropertiesForKeys: nil)) ?? []
+        where (try? FileManager.default.contentsOfDirectory(atPath: dir.path))?.isEmpty == true {
+            try? FileManager.default.removeItem(at: dir)
         }
     }
 }
@@ -464,10 +609,12 @@ public extension TagWriter {
 }
 
 private enum TagWriteError: LocalizedError {
-    case invalidNumber(String), fileChanged
+    case invalidNumber(String), fileChanged, valuesNotKept, noRoomForBackup
     var errorDescription: String? {
         switch self {
         case .invalidNumber(let field): "\(field) must be a nonnegative whole number or blank."
+        case .noRoomForBackup: "There isn't enough free space for a backup of this file, so its tags weren't changed. Free some space and try again."
+        case .valuesNotKept: "The tags couldn't be saved with every value of fields that have several (artists, genres), so the file was left as it was."
         case .fileChanged: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available."
         }
     }

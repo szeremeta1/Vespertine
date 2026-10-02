@@ -68,8 +68,8 @@ struct Probe {
     var isDSD: Bool
 }
 
-let losslessCodecs: Set<String> = ["flac", "alac", "ape", "wavpack", "tta", "tak", "mlp", "truehd", "shorten", "als"]
-let audioExtensions: Set<String> = ["flac", "wav", "wave", "aif", "aiff", "aifc", "m4a", "mp4", "caf", "ape", "wv", "tta", "tak", "dsf", "dff"]
+let losslessCodecs: Set<String> = ["flac", "alac", "ape", "wavpack", "tta", "tak", "mlp", "truehd", "shorten", "als", "mp4als"]
+let audioExtensions: Set<String> = ["flac", "wav", "wave", "aif", "aiff", "aifc", "m4a", "mp4", "caf", "ape", "wv", "tta", "tak", "shn", "dsf", "dff"]
 
 func run(_ tool: String, _ args: [String]) throws -> Data {
     let p = Process()
@@ -187,10 +187,28 @@ func compact(_ a: FileAnalysis) -> FileAnalysis {
 
 // MARK: - Index
 
+/// A file in the index folder that can't be used safely (or at all).
+struct IndexError: Error, CustomStringConvertible {
+    var path: String
+    /// nil: it's there, but isn't a plain file of its own.
+    var code: Int32?
+    var description: String {
+        switch code {
+        case nil: "\(path) isn't a plain file (a hard link, a folder…); refusing to use it"
+        case ELOOP?: "\(path) is a symbolic link; refusing to use it"
+        case ENOTDIR?: "\(path) isn't a folder (a symbolic link to one is refused too)"
+        case let code?: "\(path): \(String(cString: strerror(code)))"
+        }
+    }
+}
+
+/// The index lives in `<folder>/.vespertine`, inside a tree that whoever adds music can usually write to, while this
+/// tool often runs as root. So the folder is held open and every file in it is opened relative to it, never through
+/// a symbolic link: a link planted there (to /etc/shadow, say) can't turn a write or a chmod into one on another file.
 final class Index: @unchecked Sendable {
     let root: URL
     let dir: URL
-    let file: URL
+    private let dirFD: Int32
     private let lock = NSLock()
     private var records: [String: IndexRecord] = [:]
     private var handle: FileHandle?
@@ -209,19 +227,72 @@ final class Index: @unchecked Sendable {
     init(root: URL) throws {
         self.root = root
         dir = root.appendingPathComponent(".vespertine", isDirectory: true)
-        file = dir.appendingPathComponent("analysis.jsonl")
         // An index written before the rename (`.nocturne/`) is taken over as is, so nothing is analyzed twice.
         let legacy = root.appendingPathComponent(".nocturne", isDirectory: true)
         if !FileManager.default.fileExists(atPath: dir.path), FileManager.default.fileExists(atPath: legacy.path) {
             try FileManager.default.moveItem(at: legacy, to: dir)
         }
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o755])
-        if let data = try? Data(contentsOf: file) {
+        let created = mkdir(dir.path, 0o755) == 0
+        let mkdirError = errno
+        guard created || mkdirError == EEXIST else { throw IndexError(path: dir.path, code: mkdirError) }
+        dirFD = open(dir.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        let openError = errno
+        guard dirFD >= 0 else { throw IndexError(path: dir.path, code: openError) }
+        if created { fchmod(dirFD, 0o755) } // readable by the Mac whatever the umask
+        if let data = try readExisting("analysis.jsonl") {
             for line in data.split(separator: UInt8(ascii: "\n")) where !line.isEmpty {
                 if let r = try? Self.decoder.decode(IndexRecord.self, from: line) { records[r.path] = r }
             }
         }
     }
+
+    deinit { close(dirFD) }
+
+    /// Opens `name` in the index folder: never through a symbolic link, and only a plain file with no other name.
+    private func openFile(_ name: String, _ flags: Int32) throws -> Int32 {
+        let fd = openat(dirFD, name, flags | O_NOFOLLOW | O_CLOEXEC, 0o644)
+        let code = errno
+        guard fd >= 0 else { throw IndexError(path: dir.path + "/" + name, code: code) }
+        var st = stat()
+        guard fstat(fd, &st) == 0, st.st_mode & mode_t(S_IFMT) == mode_t(S_IFREG), st.st_nlink == 1 else {
+            close(fd)
+            throw IndexError(path: dir.path + "/" + name, code: nil)
+        }
+        return fd
+    }
+
+    private func readExisting(_ name: String) throws -> Data? {
+        let fd: Int32
+        do { fd = try openFile(name, O_RDONLY) } catch let error as IndexError where error.code == ENOENT { return nil }
+        return try FileHandle(fileDescriptor: fd, closeOnDealloc: true).readToEnd()
+    }
+
+    /// Writes `data` to a new file beside `name`, then renames it over `name`: the Mac never reads a half-written
+    /// file, and a link planted at either name is replaced, not followed.
+    private func replace(_ name: String, with data: Data) throws {
+        let temporary = ".\(name).tmp"
+        unlinkat(dirFD, temporary, 0) // left by an interrupted run
+        let fd = openat(dirFD, temporary, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o644)
+        let code = errno
+        guard fd >= 0 else { throw IndexError(path: dir.path + "/" + temporary, code: code) }
+        let file = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        do {
+            try file.write(contentsOf: data)
+            fchmod(fd, 0o644)
+            try file.close()
+        } catch {
+            unlinkat(dirFD, temporary, 0)
+            throw error
+        }
+        guard renameat(dirFD, temporary, dirFD, name) == 0 else {
+            let code = errno
+            unlinkat(dirFD, temporary, 0)
+            throw IndexError(path: dir.path + "/" + name, code: code)
+        }
+    }
+
+    /// The lock file that keeps runs from overlapping.
+    func openLock() throws -> Int32 { try openFile(".lock", O_RDWR | O_CREAT) }
 
     func current(_ path: String, size: Int64, mtime: Double) -> Bool {
         lock.lock(); defer { lock.unlock() }
@@ -233,11 +304,9 @@ final class Index: @unchecked Sendable {
         let line = try encoder.encode(record) + Data("\n".utf8)
         lock.lock(); defer { lock.unlock() }
         if handle == nil {
-            if !FileManager.default.fileExists(atPath: file.path) {
-                FileManager.default.createFile(atPath: file.path, contents: nil, attributes: [.posixPermissions: 0o644])
-            }
-            handle = try FileHandle(forWritingTo: file)
-            try handle?.seekToEnd()
+            let fd = try openFile("analysis.jsonl", O_WRONLY | O_CREAT | O_APPEND)
+            fchmod(fd, 0o644)
+            handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
         }
         try handle?.write(contentsOf: line)
         records[record.path] = record
@@ -252,11 +321,7 @@ final class Index: @unchecked Sendable {
         for path in records.keys.sorted() where present.contains(path) {
             out += try encoder.encode(records[path]!) + Data("\n".utf8)
         }
-        let tmp = dir.appendingPathComponent(".analysis.jsonl.tmp")
-        try out.write(to: tmp)
-        chmod(tmp.path, 0o644)
-        _ = try FileManager.default.replaceItemAt(file, withItemAt: tmp)
-        chmod(file.path, 0o644)
+        try replace("analysis.jsonl", with: out)
     }
 
     func writeStatus(_ status: Status) {
@@ -264,9 +329,8 @@ final class Index: @unchecked Sendable {
         e.dateEncodingStrategy = .iso8601
         e.outputFormatting = [.prettyPrinted, .sortedKeys]
         guard let data = try? e.encode(status) else { return }
-        let url = dir.appendingPathComponent("status.json")
-        try? data.write(to: url, options: .atomic)
-        chmod(url.path, 0o644)
+        lock.lock(); defer { lock.unlock() } // workers report at once; they share the temporary file's name
+        try? replace("status.json", with: data)
     }
 }
 
@@ -353,9 +417,9 @@ case "index":
     do { index = try Index(root: root) } catch { stderr("can't open index: \(error)"); exit(1) }
 
     // One run at a time.
-    let lockPath = index.dir.appendingPathComponent(".lock").path
-    let lockFD = open(lockPath, O_CREAT | O_RDWR, 0o644)
-    guard lockFD >= 0, flock(lockFD, LOCK_EX | LOCK_NB) == 0 else { stderr("another vespertine-analyze is running"); exit(0) }
+    let lockFD: Int32
+    do { lockFD = try index.openLock() } catch { stderr("can't open index lock: \(error)"); exit(1) }
+    guard flock(lockFD, LOCK_EX | LOCK_NB) == 0 else { stderr("another vespertine-analyze is running"); exit(0) }
 
     let all = listAudio(under: root)
     let present = Set(all.map(nfc))

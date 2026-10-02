@@ -306,6 +306,43 @@ struct HardwareAuditTests {
         engine.stopAndWait()
     }
 
+    /// Another app (Audio MIDI Setup, LosslessSwitcher, an AirPods microphone switch) changes the device's rate
+    /// under shared-mode playback: the song must keep its speed and the signal path must name the rate the device
+    /// runs at. VESPERTINE_INTEGER_DEVICE picks the DAC (part of its name); otherwise the built-in output.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))
+    func rateChangedByAnotherAppIsFollowed() async throws {
+        let name = ProcessInfo.processInfo.environment["VESPERTINE_INTEGER_DEVICE"]
+        let device = try #require(OutputDevices.list().first { name.map($0.name.localizedCaseInsensitiveContains) ?? ($0.transport == .builtIn) })
+        let rates = device.capabilities.sampleRates
+        let source = rates.contains(96_000) ? 96_000.0 : try #require(rates.last)
+        let other = try #require(source != 48_000 && rates.contains(48_000) ? 48_000.0 : rates.first { $0 != source })
+        let original = device.nominalSampleRate
+        defer { try? HAL.set(device.id, .global(kAudioDevicePropertyNominalSampleRate), Float64(original)) }
+        let url = try writeWAV("hardware-rate-change", rate: source, bits: 24, seconds: 12) { _, _ in 0 }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = PlaybackEngine()
+        defer { engine.stop() }
+        var settings = EngineSettings(); settings.deviceUID = device.uid; settings.exclusive = false
+        engine.update(settings: settings)
+        engine.play(PlayableItem(url: url))
+        try await wait { engine.snapshot.state == .playing && engine.snapshot.position > 0.3 }
+        #expect(engine.snapshot.signalPath?.applied.sampleRate == source)
+
+        // What Audio MIDI Setup does.
+        try HAL.set(device.id, .global(kAudioDevicePropertyNominalSampleRate), Float64(other))
+        try await Task.sleep(for: .milliseconds(1500))
+        let t0 = Date(), p0 = engine.snapshot.position
+        try await Task.sleep(for: .seconds(2))
+        let speed = (engine.snapshot.position - p0) / Date().timeIntervalSince(t0)
+        let nominal = try HAL.get(device.id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))
+        let applied = engine.snapshot.signalPath?.applied.sampleRate ?? 0
+        print("rate change on \(device.name), \(Int(source)) → \(Int(other)) Hz: device now at \(Int(nominal)), path says \(Int(applied)), speed \(String(format: "%.2f", speed))×")
+        #expect(engine.snapshot.state == .playing)
+        #expect(abs(speed - 1) < 0.1, "playing at \(speed)× speed")
+        #expect(abs(applied - nominal) < 0.5, "the path says \(applied) Hz; the device runs at \(nominal) Hz")
+        engine.stop()
+    }
+
     private func wait(_ predicate: () -> Bool) async throws {
         let deadline = Date().addingTimeInterval(8)
         while !predicate(), Date() < deadline { try await Task.sleep(for: .milliseconds(20)) }

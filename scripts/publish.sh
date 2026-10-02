@@ -5,7 +5,8 @@
 #   scripts/publish.sh <release-notes.md>
 #
 # The appcast lives on every release as `appcast.xml`; the app's SUFeedURL points at
-# .../releases/latest/download/appcast.xml, so the newest release always serves the feed.
+# .../releases/latest/download/appcast.xml, so the newest release always serves the feed. Any other release must be
+# created with --latest=false: a Latest release without appcast.xml breaks every installed copy's update check.
 # Each entry is EdDSA-signed with the Sparkle key stored in the login keychain under the account `nocturne` (kept from before the rename so the EdDSA key never changes).
 set -euo pipefail
 cd "$(dirname $0)/.."
@@ -74,11 +75,28 @@ first_vespertine_build=27
   -o "$feed/appcast.xml" "$feed"
 # The channel title was carried over from the feed's Nocturne days.
 /usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
-grep -q "sparkle:edSignature" "$feed/appcast.xml" || { print -u2 "appcast entry is not EdDSA-signed"; exit 1; }
+# generate_appcast only warns (and exits 0) when it can't sign, and the entries carried over from older
+# releases are always signed, so check this release's own entry, and that the keychain key is the one
+# installed copies trust. Either failure would publish an update every installed copy refuses.
+trusted_key=$(/usr/libexec/PlistBuddy -c "Print SUPublicEDKey" "$app/Contents/Info.plist")
+[[ "$("$tools/generate_keys" --account nocturne -p)" == "$trusted_key" ]] \
+  || { print -u2 "The Sparkle key in the keychain doesn't match SUPublicEDKey; installed copies would reject this update."; exit 1; }
+/usr/bin/python3 - "$feed/appcast.xml" "Vespertine-$version.dmg" <<'PY' || { print -u2 "The appcast entry for $version is not EdDSA-signed."; exit 1; }
+import sys, xml.etree.ElementTree as ET
+signature = "{http://www.andymatuschak.org/xml-namespaces/sparkle}edSignature"
+signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
+             for e in ET.parse(sys.argv[1]).iter("enclosure"))
+sys.exit(0 if signed else 1)
+PY
 
+# The tag goes on the commit the app was built from (release.sh records it), whatever HEAD is now.
+built=$(cat "$out/built-from" 2>/dev/null || true)
+[[ -n $built ]] || { print -u2 "$out/built-from is missing: build with scripts/release.sh first."; exit 1; }
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-  git tag -s "v$version" -m "Vespertine $version"
+  git tag -s "v$version" -m "Vespertine $version" "$built"
 fi
+[[ "$(git rev-parse "v$version^{commit}")" == "$built" ]] \
+  || { print -u2 "Tag v$version doesn't point at the commit this app was built from ($built)."; exit 1; }
 git push -q origin "v$version"
 gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
   --title "Vespertine $version" --notes-file "$notes"

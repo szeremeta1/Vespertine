@@ -29,7 +29,12 @@ public final class LibraryDatabase: Sendable {
 
     init(writer: any DatabaseWriter, migrate: Bool = true) throws {
         self.writer = writer
-        if migrate { try Self.migrator.migrate(writer) }
+        if migrate {
+            try Self.migrator.migrate(writer)
+            // Before anything asks what needs analyzing: after an analyzer update, stored results are judged anew
+            // from their measurements instead of every file (network shares' too) being read again.
+            try rejudgeStoredAnalyses()
+        }
     }
 
     public static var defaultURL: URL {
@@ -94,6 +99,7 @@ public final class LibraryDatabase: Sendable {
                     .generatedAs(sql: "lower(coalesce(albumArtistSort, albumArtist, artistSort, artist, 'Unknown Artist'))", .virtual)
                 t.column("albumSortKey", .text)
                     .generatedAs(sql: "lower(coalesce(albumSort, album, 'Unknown Album'))", .virtual)
+                // `Track.albumKey` computes the same bytes in Swift; keep the two in step.
                 t.column("albumKey", .text)
                     .generatedAs(sql: "lower(coalesce(albumArtist, artist, 'Unknown Artist')) || char(31) || lower(coalesce(album, 'Unknown Album'))", .stored)
             }
@@ -259,6 +265,12 @@ public final class LibraryDatabase: Sendable {
                   SELECT 1 FROM analysis a WHERE a.trackId = track.id AND a.fileSize = track.fileSize AND a.modifiedAt = track.modifiedAt
                     AND json_valid(CAST(a.data AS TEXT)))
                 """)
+        }
+        m.registerMigration("v15-compilations-together") { db in
+            // Compilations without an Album Artist were split into one album per track artist. The scanner now files
+            // them under Various Artists (in the library only); do the same for tracks already scanned.
+            try db.execute(sql: "UPDATE track SET albumArtist = ? WHERE compilation = 1 AND (albumArtist IS NULL OR trim(albumArtist) = '')",
+                           arguments: [Track.variousArtists])
         }
         return m
     }
@@ -508,11 +520,34 @@ public extension LibraryDatabase {
         }
     }
 
-    /// Rewrites a manual playlist's order.
+    /// Rewrites a manual playlist's order. `trackIDs` is the playlist as shown, which leaves out songs whose files are
+    /// missing: those entries stay, each after the song (or the nearest earlier one still listed) that it followed before.
     func setPlaylistTracks(_ trackIDs: [Int64], playlistID: Int64) throws {
         try writer.write { db in
+            let old = try Row.fetchAll(db, sql: """
+                SELECT playlistItem.trackId AS id, track.isMissing AS missing FROM playlistItem JOIN track ON track.id = playlistItem.trackId
+                WHERE playlistItem.playlistId = ? ORDER BY playlistItem.position
+                """, arguments: [playlistID])
+            let shown = Dictionary(trackIDs.map { ($0, 1) }, uniquingKeysWith: +)
+            // Kept entries by the occurrence they follow ("id#n": the nth time that song is listed; "" = the start).
+            var kept: [String: [Int64]] = [:], counts: [Int64: Int] = [:], anchor = ""
+            for row in old {
+                let id: Int64 = row["id"], missing: Bool = row["missing"]
+                if missing && shown[id] == nil { kept[anchor, default: []].append(id); continue }
+                let n = counts[id, default: 0]
+                counts[id] = n + 1
+                if n < (shown[id] ?? 0) { anchor = "\(id)#\(n)" }
+            }
+            var order = kept[""] ?? []
+            counts = [:]
+            for id in trackIDs {
+                let n = counts[id, default: 0]
+                counts[id] = n + 1
+                order.append(id)
+                order += kept["\(id)#\(n)"] ?? []
+            }
             try db.execute(sql: "DELETE FROM playlistItem WHERE playlistId = ?", arguments: [playlistID])
-            for (i, id) in trackIDs.enumerated() {
+            for (i, id) in order.enumerated() {
                 try PlaylistItem(playlistId: playlistID, trackId: id, position: i).insert(db)
             }
         }
@@ -566,20 +601,33 @@ public extension LibraryDatabase {
         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
     }
 
+    /// Adds a folder (or a single file) to the library, or returns the source that already covers it. A local folder
+    /// takes in the local sources inside it (a song opened with Open With, a subfolder added earlier): their tracks
+    /// move to it with their plays, ratings, playlists and analyses. Network shares and the managed library always
+    /// keep their own source, so a folder that contains one is refused.
     @discardableResult
     func addSource(_ source: LibrarySource) throws -> LibrarySource {
         try writer.write { db in
             let canonical = source.url.resolvingSymlinksInPath().path
             let sources = try LibrarySource.fetchAll(db)
+            var inside: [LibrarySource] = []
             for existing in sources {
                 let path = existing.url.resolvingSymlinksInPath().path
                 if canonical == path || canonical.hasPrefix(path == "/" ? "/" : path + "/") { return existing }
                 if path.hasPrefix(canonical == "/" ? "/" : canonical + "/") {
-                    throw SourceOverlapError(path: existing.path)
+                    guard source.mode == .reference, !source.isNetwork, existing.mode == .reference, !existing.isNetwork else {
+                        throw SourceOverlapError(path: existing.path)
+                    }
+                    inside.append(existing)
                 }
             }
             var s = source
             try s.insert(db)
+            for old in inside {
+                try db.execute(sql: "UPDATE track SET sourceId = ? WHERE sourceId = ?", arguments: [s.id, old.id])
+                try db.execute(sql: "UPDATE cueScanState SET sourceId = ? WHERE sourceId = ?", arguments: [s.id, old.id])
+                try LibrarySource.deleteOne(db, key: old.id)
+            }
             return s
         }
     }
@@ -679,6 +727,30 @@ public extension LibraryDatabase {
             let current = version >= FileAnalysis.currentVersion && size == track.fileSize
                 && abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001
             return StoredAnalysis(analysis: analysis, analyzedAt: row["analyzedAt"], isCurrent: current)
+        }
+    }
+
+    /// Brings stored analyses from older versions up to the current judgement from their measurements
+    /// (`FileAnalyzer.rejudged`). Those that can't be (version 1 kept no measurements) stay as they are, for a fresh
+    /// analysis. Returns how many were brought up to date; nothing to do costs one query.
+    @discardableResult
+    public func rejudgeStoredAnalyses() throws -> Int {
+        try writer.write { db in
+            let rows = try Row.fetchAll(db, sql: "SELECT trackId, data FROM analysis WHERE version >= 2 AND version < ?",
+                                        arguments: [FileAnalysis.currentVersion])
+            let decoder = JSONDecoder(), encoder = JSONEncoder()
+            var updated = 0
+            for row in rows {
+                guard let stored = try? decoder.decode(FileAnalysis.self, from: row["data"] as Data) else { continue }
+                let analysis = FileAnalyzer.rejudged(stored)
+                guard analysis.version >= FileAnalysis.currentVersion, let data = try? encoder.encode(analysis) else { continue }
+                let id: Int64 = row["trackId"]
+                try db.execute(sql: "UPDATE analysis SET version = ?, data = ? WHERE trackId = ?", arguments: [analysis.version, data, id])
+                try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
+                               arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
+                updated += 1
+            }
+            return updated
         }
     }
 

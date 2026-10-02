@@ -27,7 +27,9 @@ int main(void) {
     concurrent_ring = nrt_ring_create(256, 1);
     assert(concurrent_ring);
     pthread_t thread;
-    assert(!pthread_create(&thread, NULL, producer, NULL));
+    // Not inside assert(): with -DNDEBUG the thread would never start.
+    int started = pthread_create(&thread, NULL, producer, NULL);
+    assert(!started); (void)started;
     for (unsigned i = 0; i < 200000; i++) {
         float sample;
         while (!nrt_ring_read(concurrent_ring, &sample, 1)) {}
@@ -39,7 +41,8 @@ int main(void) {
     NRTRing *ring = nrt_ring_create(1024, 2);
     NRTRenderContext *ctx = nrt_context_create(ring, 512);
     concurrent_context = ctx;
-    assert(!pthread_create(&thread, NULL, tap_reader, NULL));
+    started = pthread_create(&thread, NULL, tap_reader, NULL);
+    assert(!started);
     float data[2048] = {0}, output[2048];
     for (int i = 0; i < 10000; i++) {
         nrt_ring_write(ring, data, 1024);

@@ -15,8 +15,11 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     /// Region in source frames (CUE tracks). nil = whole file.
     public let regionStartFrame: Int64?
     public let regionFrameLength: Int64?
-    /// ReplayGain adjustment the app decided on (dB), nil = none.
+    /// ReplayGain adjustment the app decided on (dB), nil = none. Kept within `replayGainRange`.
     public let replayGainDB: Double?
+    /// A damaged tag can claim +60 dB with a peak small enough to allow it, which plays as full-scale noise. No real
+    /// album needs more than about +15 dB, and a cut past −30 dB is a bad tag too.
+    public static let replayGainRange: ClosedRange<Double> = -30...15
     /// Identifies a local copy of a network file (see the engine's urlResolver); nil = always open `url`.
     public let cacheKey: String?
 
@@ -28,7 +31,7 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
         self.trackID = trackID
         self.regionStartFrame = regionStartFrame
         self.regionFrameLength = regionFrameLength
-        self.replayGainDB = replayGainDB
+        self.replayGainDB = replayGainDB.flatMap { $0.isFinite ? min(max($0, Self.replayGainRange.lowerBound), Self.replayGainRange.upperBound) : nil }
     }
 }
 
@@ -57,6 +60,16 @@ final class ProbedSource: @unchecked Sendable {
         self.decoderName = decoderName
         self.pcm = pcm
         self.dsd = dsd
+    }
+
+    /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
+    /// not a float file, and no wider than a Float32 decoder carries (24 bits).
+    var exactAsIntegers: Bool {
+        guard let pcm else { return false }
+        if let source = (pcm as? GuardedDecoder)?.sourceFormat.streamDescription.pointee,
+           source.mFormatID == kAudioFormatLinearPCM, source.mFormatFlags & kAudioFormatFlagIsFloat != 0 { return false }
+        let decoded = pcm.processingFormat.streamDescription.pointee
+        return decoded.mFormatFlags & kAudioFormatFlagIsFloat == 0 || decoded.mBitsPerChannel > 32 || (format.bitDepth ?? 32) <= 24
     }
 }
 
@@ -117,25 +130,37 @@ enum SourceOpener {
                                 pcm: decoder, dsd: nil)
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
-        let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
-        // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
-        let decoder = GuardedDecoder(raw)
-        if String(describing: type(of: raw)).contains("MPEG") {
-            // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
-            // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
-            try mpegOpenLock.withLock { try decoder.open() }
-        } else {
-            try decoder.open()
+        func openDecoder() throws -> (raw: AudioDecoder, decoder: GuardedDecoder) {
+            let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
+            // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
+            let decoder = GuardedDecoder(raw)
+            if String(describing: type(of: raw)).contains("MPEG") {
+                // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
+                // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
+                try mpegOpenLock.withLock { try decoder.open() }
+            } else {
+                try decoder.open()
+            }
+            return (raw, decoder)
         }
+        var (raw, decoder) = try openDecoder()
         // A DTS CD / DTS-WAV: 16-bit stereo "PCM" that is really a DTS bitstream (noise if played as PCM).
         if DTSDecoder.carriesDTS(decoder) {
             let dts = DTSDecoder(carrier: decoder)
-            try dts.open()
-            let f = dts.processingFormat
-            let format = SourceFormat(encoding: .lossy, codec: "DTS", sampleRate: f.sampleRate, bitDepth: nil,
-                                      channels: Int(f.channelCount))
-            return ProbedSource(url: url, format: format, decoderName: "FFmpeg DTS (DCA)", pcm: dts, dsd: nil)
+            do {
+                try dts.open()
+                let f = dts.processingFormat
+                let format = SourceFormat(encoding: .lossy, codec: "DTS", sampleRate: f.sampleRate, bitDepth: nil,
+                                          channels: Int(f.channelCount))
+                return ProbedSource(url: url, format: format, decoderName: "FFmpeg DTS (DCA)", pcm: dts, dsd: nil)
+            } catch DTSError.noStream {
+                // FFmpeg found no DTS frames after all: the file is the ordinary PCM it looks like.
+                try? decoder.seek(to: 0)
+            }
         }
+        // The DTS check reads the first frames. A decoder that can't seek back to the start (Shorten without
+        // a seek table) is opened again, so playback doesn't begin a fraction of a second in.
+        if decoder.position != 0 { (raw, decoder) = try openDecoder() }
         let processing = decoder.processingFormat.streamDescription.pointee
         let source = decoder.sourceFormat.streamDescription.pointee
         let lossless = decoder.decodingIsLossless

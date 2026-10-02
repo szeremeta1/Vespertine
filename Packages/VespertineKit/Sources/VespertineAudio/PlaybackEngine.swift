@@ -60,6 +60,9 @@ public struct EngineSettings: Sendable, Equatable {
     public var releaseExclusiveAfterPause: TimeInterval = 30
     /// nil = no software volume (hardware or fixed).
     public var digitalVolumeDB: Double?
+    /// Outputs with their own volume control get no digital volume. Decided for the output that's actually
+    /// playing (see `digitalVolume(for:)`), so a change of the Mac's default output can't take it off a DAC.
+    public var preferHardwareVolume = false
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
     /// Dolby Atmos: let macOS render the objects (true), or play the Dolby Digital Plus channel bed
@@ -75,6 +78,11 @@ public struct EngineSettings: Sendable, Equatable {
 
     public func spatialMode(for device: OutputDevice) -> SpatialMode {
         spatialModes[device.uid] ?? (device.isAppleHeadphones ? .headTracked : .off)
+    }
+
+    /// The digital volume (dB) applied on `device`; nil = none.
+    public func digitalVolume(for device: OutputDevice?) -> Double? {
+        preferHardwareVolume && device?.hasHardwareVolume == true ? nil : digitalVolumeDB
     }
 }
 
@@ -258,6 +266,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var atmos: SystemRendererSession?
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
     private var awaitingDevice: (uid: String, until: Date, checkedAt: Date)?
+    /// Reopenings that followed another app's change to the device's format, in the last half minute.
+    private var followedFormatChanges: [Date] = []
+    /// The device's own rate, kept for a while after something else kept changing it (no tug of war over it).
+    private var heldRate: (uid: String, rate: Double, until: Date)?
     /// How long playback waits for a missing output (AirPods take several seconds to reconnect).
     private let deviceWait: TimeInterval
     /// Names of outputs seen, for messages about ones that are gone.
@@ -395,6 +407,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             var didWork = false
             if state == .playing, let atmos {
                 checkSystemRenderer(atmos)
+            } else if state == .playing, session?.formatChanged() == true {
+                followFormatChange()
             } else if state == .playing {
                 switchToLocalCopyIfReady()
                 didWork = fill()
@@ -470,9 +484,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .resume:
             if state == .paused, let atmos {
                 atmos.play(); state = .playing; pausedAt = nil
+            } else if state == .paused, let session, session.formatChanged() {
+                followFormatChange(autoplay: true)
             } else if state == .paused, let session {
                 do { try session.start(); unmute(); state = .playing; pausedAt = nil }
-                catch { restartFromCurrentPosition() }
+                catch { restartFromCurrentPosition(autoplay: true) }   // reopened to play, as asked, not paused again
             } else if state == .paused || state == .stopped, let parked {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true)
@@ -499,7 +515,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
-            if deviceChanged, state != .stopped {
+            // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
+            // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
+            let leavesInteger = session?.applied.integerMode == true && new.digitalVolume(for: sessionDevice) != nil
+            if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
             }
@@ -672,9 +691,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         atmos?.stop()
         atmos = nil
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                      policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                      policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream)
-        plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: item, device: device)
+        plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
                 if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)") }
@@ -697,6 +716,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             try decoder.seek(to: frame)
             actualOffset = Double(frame) / decoder.processingFormat.sampleRate
         }
+        Self.alignDoPMarkers(decoder, at: session.totalWritten)
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
@@ -735,7 +755,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func makePath(probed: ProbedSource, plan: OutputPlan, device: OutputDevice, session: OutputSession, item: PlayableItem) -> SignalPath {
         let volume: SignalPath.VolumeStage
-        if let db = settings.digitalVolumeDB, plan.mode == .pcm { volume = .digital(dB: db) }
+        if let db = settings.digitalVolume(for: device), plan.mode == .pcm { volume = .digital(dB: db) }
         else if device.hasHardwareVolume { volume = .hardware }
         else { volume = .fixed }
         return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
@@ -744,9 +764,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func applyGain() {
-        atmos?.setVolume(Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1))
+        let digital = settings.digitalVolume(for: sessionDevice)
+        atmos?.setVolume(Float(digital.map { pow(10, $0 / 20) } ?? 1))
         guard let session else { return }
-        let db = session.plan.isPassthrough ? 0 : (settings.digitalVolumeDB ?? 0)
+        let db = session.plan.isPassthrough ? 0 : (digital ?? 0)
         nrt_context_set_gain(session.context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(session.applied.physicalBitDepth))
     }
 
@@ -780,16 +801,38 @@ public final class PlaybackEngine: @unchecked Sendable {
         pausedAt = nil
     }
 
-    private func restartFromCurrentPosition() {
+    private func restartFromCurrentPosition(autoplay: Bool? = nil) {
         guard let item = currentItem() else { return }
         let position = parked?.position ?? currentPosition()
-        let wasPlaying = state == .playing || awaitingDevice != nil
+        let wasPlaying = autoplay ?? (state == .playing || awaitingDevice != nil)
         if let d = decoding, d.item.id == item.id, d.decoder.supportsSeeking, d.path.plan.mode != .bitstream {
             carried = (item.id, d.probed, d.decoder, d.path.plan.mode)
         }
         teardown(releaseHog: true)
         parked = nil
         start(item, at: position, autoplay: wasPlaying)
+    }
+
+    /// The device left the format playback set up (see `OutputSession.formatChanged()`): reopened at the current
+    /// position, planned afresh from what the device offers now, so it plays at the right speed and the signal path
+    /// names what the device really does. Something that keeps changing it back (another player, LosslessSwitcher)
+    /// gets its way for a minute rather than a tug of war, and the song is converted to that rate meanwhile.
+    private func followFormatChange(autoplay: Bool? = nil) {
+        guard let device = sessionDevice, let session else { return }
+        let now = Date()
+        let rate = (try? HAL.get(device.id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+        followedFormatChanges = followedFormatChanges.filter { now.timeIntervalSince($0) < 30 } + [now]
+        if followedFormatChanges.count >= 3, rate > 0 {
+            heldRate = (device.uid, rate, now.addingTimeInterval(60))
+            log.notice("\(device.name, privacy: .public) keeps being changed by something else; keeping it at \(rate, privacy: .public) Hz for a minute")
+        }
+        log.notice("\(device.name, privacy: .public) changed under playback (\(session.applied.sampleRate, privacy: .public) → \(rate, privacy: .public) Hz); reopening at the current position")
+        restartFromCurrentPosition(autoplay: autoplay)
+    }
+
+    private func ratePolicy(for device: OutputDevice) -> RatePolicy {
+        if let held = heldRate, held.uid == device.uid, Date() < held.until { return .fixed(held.rate) }
+        return settings.ratePolicies[device.uid] ?? .matchSource
     }
 
     /// The queue changed (shuffle, repeat, edits). The song that's playing carries on untouched; only what
@@ -810,6 +853,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         decoding = nil
         pending = nil
+        pendingSystem = nil       // an Atmos track lined up for macOS's renderer is chosen again too
         draining = false
         drainedAt = nil
         nrt_context_set_draining(session.context, false)
@@ -818,10 +862,12 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Integer mode applies only where nothing would change the samples: plain PCM at its own rate and
     /// channel count, no Spatial Audio, digital volume or ReplayGain, on a device with a non-mixable Int32 format.
-    private func wantsIntegerMode(_ plan: OutputPlan, source: SourceFormat, item: PlayableItem, device: OutputDevice) -> Bool {
-        settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
-            && plan.channels == source.channels && source.encoding == .pcm && settings.digitalVolumeDB == nil
-            && (item.replayGainDB ?? 0) == 0
+    /// Float files aren't integers, so they'd be changed on the way: they keep the float path (and its label).
+    private func wantsIntegerMode(_ plan: OutputPlan, source probed: ProbedSource, item: PlayableItem, device: OutputDevice) -> Bool {
+        let source = probed.format
+        return settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+            && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
+            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
@@ -833,7 +879,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func beginSystemRendering(_ item: PlayableItem, url: URL, device: OutputDevice, at seconds: TimeInterval) throws {
         // macOS's renderer needs the device to itself: drop Vespertine's own session first.
         teardown(releaseHog: true)
-        let volume = Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1)
+        let volume = Float(settings.digitalVolume(for: device).map { pow(10, $0 / 20) } ?? 1)
         let session = try SystemRendererSession(item: item, url: url, deviceUID: device.uid,
                                                 spatial: settings.spatialMode(for: device) != .off,
                                                 volume: volume)
@@ -901,7 +947,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard decoder.length == current.length, position >= 0, position <= decoder.length else { return nil }
         try decoder.seek(to: position)
         guard decoder.position == position else { return nil }
+        if let dop = decoder as? RawDoPDecoder, let was = current as? RawDoPDecoder { dop.nextMarker = was.nextMarker }
         return (local, decoder)
+    }
+
+    /// DoP markers alternate frame by frame through the whole output buffer (one decoded frame is one buffer
+    /// frame): a DoP track starting at `ringFrame` takes up that sequence, so a gapless join never sends two
+    /// 0x05 in a row (a DAC drops out of DSD for a moment, a click). A fresh buffer starts on 0x05.
+    private static func alignDoPMarkers(_ decoder: PCMDecoding, at ringFrame: UInt64) {
+        (decoder as? RawDoPDecoder)?.nextMarker = AVAudioFramePosition(ringFrame & 1)
     }
 
 
@@ -1009,11 +1063,12 @@ public final class PlaybackEngine: @unchecked Sendable {
                     return
                 }
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                              policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                              policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream)
-                plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: next, device: device)
+                plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
+                    Self.alignDoPMarkers(decoder, at: session.totalWritten)
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
@@ -1054,7 +1109,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard draining, session.readableFrames == 0 else { drainedAt = nil; return }
         // Let the device play out its own buffer before touching it.
         if drainedAt == nil { drainedAt = Date() }
-        let tail = Double(session.applied.bufferFrames * 3) / session.applied.sampleRate + 0.05
+        let tail = Double(session.applied.bufferFrames * 3 + session.latencyFrames) / session.applied.sampleRate + 0.05
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
         if let next = pendingSystem {
@@ -1121,7 +1176,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let position = currentPosition()
         var path = segment?.path
         if path?.plan.mode == .pcm {
-            if let db = settings.digitalVolumeDB { path?.volume = .digital(dB: db) }
+            if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {

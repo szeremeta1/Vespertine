@@ -14,7 +14,8 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # A deployment cut off halfway can leave the site half-published.
+  cancel-in-progress: false
 
 jobs:
   deploy:

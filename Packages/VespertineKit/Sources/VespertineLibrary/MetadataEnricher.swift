@@ -98,6 +98,8 @@ public actor MetadataEnricher {
     let musicBrainz: MusicBrainzClient
     /// Replace existing tags when MusicBrainz is confident (off = fill gaps only).
     public var correctExisting = false
+    /// Look up covers on the Cover Art Archive for albums without one (Settings › "Fetch cover art").
+    public var fetchCovers = true
 
     public init(database: LibraryDatabase, musicBrainz: MusicBrainzClient = .shared) {
         self.database = database
@@ -105,6 +107,7 @@ public actor MetadataEnricher {
     }
 
     public func setCorrectExisting(_ value: Bool) { correctExisting = value }
+    public func setFetchCovers(_ value: Bool) { fetchCovers = value }
 
     /// Albums (or loose tracks) that are missing something worth fixing.
     public nonisolated static func needsEnrichment(_ tracks: [Track]) -> Bool {
@@ -216,7 +219,7 @@ public actor MetadataEnricher {
                         set(.musicBrainzRecordingID, match.recordingID, on: track)
                     }
                 }
-                if working.contains(where: { $0.artworkKey == nil }) {
+                if fetchCovers, working.contains(where: { $0.artworkKey == nil }) {
                     cover = try? await musicBrainz.frontCover(releaseID: release.id, releaseGroupID: release.releaseGroupID)
                 }
                 // Confident when the release scores highly and every track we have matches one on it by title

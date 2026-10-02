@@ -66,7 +66,12 @@ public struct SignalPath: Sendable, Hashable {
         if plan.spatial != .off { return plan.spatial == .headTracked ? "SPATIAL · HEAD TRACKED" : "SPATIAL AUDIO" }
         if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
-            return deviceProfile.kind == .airPlay ? "AIRPLAY" : "BLUETOOTH · LOSSY"
+            switch deviceProfile.kind {
+            case .airPlay: return "AIRPLAY"
+            case .speakers: return "SPEAKER PROCESSING"
+            case .virtualDevice: return deviceProfile.tag == "AGGREGATE" ? "AGGREGATE DEVICE" : "VIRTUAL DEVICE"
+            default: return "BLUETOOTH · LOSSY"
+            }
         }
         if plan.dsdConvertedToPCM { return "DSD → PCM" }
         if isResampling { return "RESAMPLED" }

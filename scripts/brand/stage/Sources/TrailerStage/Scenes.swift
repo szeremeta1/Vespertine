@@ -431,8 +431,8 @@ struct AnalysisScene: View {
     let assets: Assets
     let frame: CGImage?
 
-    static let badges = CGRect(x: 1106, y: 178, width: 228, height: 60)
-    static let spectrum = CGRect(x: 1106, y: 524, width: 318, height: 172)
+    static let badges = CGRect(x: 1106, y: 176, width: 202, height: 35)
+    static let spectrum = CGRect(x: 1106, y: 476, width: 318, height: 172)
 
     var body: some View {
         let g = Geo(size: size)
@@ -463,8 +463,8 @@ struct CutoffSweep: View {
     let start: Double
     // Measured in the recording (window points): the spectrum's plot panel and the app's dashed cutoff line.
     // Everything here stays inside the panel and is clipped to its rounded corners.
-    static let plot = CGRect(x: 1112 - AnalysisScene.spectrum.minX, y: 551 - AnalysisScene.spectrum.minY, width: 308, height: 139.5)
-    static let cutoffX: CGFloat = 1403.25 - 1112
+    static let plot = CGRect(x: 1112 - AnalysisScene.spectrum.minX, y: 503 - AnalysisScene.spectrum.minY, width: 308, height: 139.5)
+    static let cutoffX: CGFloat = 1361.25 - 1112
     static let corner: CGFloat = 6
 
     var body: some View {

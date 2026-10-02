@@ -16,7 +16,10 @@ final class AnalysisQueue {
     private let settings: AppSettings
     private let shares: NetworkShareManager
 
-    private var pending: [Track] = []
+    private var pending: [Track] = [] { didSet { pendingPaths = Set(pending.map(\.filePath)) } }
+    /// The paths in `pending`, so asking whether a track is queued doesn't walk the queue: done for every track a
+    /// scan offers, that was minutes on the main thread with a large library waiting to be analyzed.
+    @ObservationIgnored private var pendingPaths: Set<String> = []
     private(set) var active: Set<String> = []     // file paths being analyzed
     private var activeNetwork = 0
     private(set) var completed = 0
@@ -58,7 +61,8 @@ final class AnalysisQueue {
         loops.append(Task { [weak self] in
             try? await Task.sleep(for: .seconds(8))
             while !Task.isCancelled {
-                await self?.syncServerResults()
+                // Out of use, the server's index waits: reading it could wake the NAS's disks.
+                if self?.shares.isInUse ?? false { await self?.syncServerResults() }
                 try? await Task.sleep(for: .seconds(300))
             }
         })
@@ -74,13 +78,14 @@ final class AnalysisQueue {
     var remaining: Int { pending.count + active.count }
 
     func isAnalyzing(_ track: Track) -> Bool {
-        active.contains(track.filePath) || pending.contains { $0.filePath == track.filePath }
+        active.contains(track.filePath) || pendingPaths.contains(track.filePath)
     }
 
     /// Analyzes these tracks next (e.g. the one shown in the inspector), ahead of background work.
     func analyzeNow(_ tracks: [Track]) {
         let files = tracks.filter { $0.isLossless && !$0.isDSD }
-        pending.removeAll { t in files.contains { $0.filePath == t.filePath } }
+        let paths = Set(files.map(\.filePath))
+        pending.removeAll { paths.contains($0.filePath) }
         pending.insert(contentsOf: files.filter { !active.contains($0.filePath) }, at: 0)
         start(adding: files.count)
     }

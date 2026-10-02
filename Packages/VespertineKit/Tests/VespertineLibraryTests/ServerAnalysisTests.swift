@@ -20,6 +20,60 @@ struct ServerAnalysisTests {
         return String(decoding: try JSONSerialization.data(withJSONObject: record), as: UTF8.self) + "\n"
     }
 
+    /// As an analyzer from before version 3 stored a genuine 32 kHz master: called lossy, with its measurements.
+    static func olderResult() -> FileAnalysis {
+        let f = SpectralForensics(cliffHz: 15_200, cliffDropDB: 30, cliffConsistency: 1, belowDB: -80, aboveDB: -120, floorDB: -140,
+                                  extensionHz: 0, extensionSlope: 0, holeRatio: 0, contentHz: 15_000, framesAnalyzed: 400)
+        return FileAnalysis(claimedBitDepth: 24, effectiveBitDepth: 24, sampleRate: 32_000, bandwidthHz: 15_200, peakDBFS: -1,
+                            clippedSamples: 0, verdict: .possibleLossyOrigin, summary: "Made from an MP3, AAC or Opus file.",
+                            spectrum: [-60, -70], secondsAnalyzed: 300, forensics: f, version: 2, confidence: 1)
+    }
+
+    @Test("Stored results from an older analyzer are judged anew, not queued to be read again")
+    func olderResultsAreRejudged() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("a.wav"), rate: 96_000)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+        try db.saveAnalysis(Self.olderResult(), filePath: track.filePath)
+        #expect(try db.storedAnalysis(for: track)?.isCurrent == false)
+        #expect(try db.rejudgeStoredAnalyses() == 1)
+        let stored = try #require(try db.storedAnalysis(for: track))
+        #expect(stored.isCurrent && stored.analysis.verdict == .genuine)
+        #expect(try db.tracksNeedingAnalysis().isEmpty)
+        #expect(try db.allTracks().first?.analysisVerdict == "genuine")
+        #expect(try db.rejudgeStoredAnalyses() == 0)
+    }
+
+    @Test("A server still on an older analyzer has its results judged anew on import")
+    func olderServerRecordsAreRejudged() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("a.wav"), rate: 96_000)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        var share = LibrarySource(path: dir.path, mode: .reference)
+        share.remoteURL = "smb://server/music"
+        let source = try db.addSource(share)
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        // An index from before the rename, written by an analyzer older than this app's.
+        let index = dir.appendingPathComponent(".nocturne")
+        try FileManager.default.createDirectory(at: index, withIntermediateDirectories: true)
+        let record: [String: Any] = ["path": "a.wav", "size": track.fileSize, "mtime": track.modifiedAt.timeIntervalSince1970,
+                                     "analysis": try JSONSerialization.jsonObject(with: JSONEncoder().encode(Self.olderResult()))]
+        try (String(decoding: try JSONSerialization.data(withJSONObject: record), as: UTF8.self) + "\n")
+            .write(to: index.appendingPathComponent("analysis.jsonl"), atomically: true, encoding: .utf8)
+        #expect(try ServerAnalysisImporter().importNew(for: source, into: db) == 1)
+        let stored = try #require(try db.storedAnalysis(for: track))
+        #expect(stored.isCurrent && stored.analysis.verdict == .genuine && stored.analysis.version == FileAnalysis.currentVersion)
+    }
+
     @Test("Matching records are imported (paths compared as NFC), mismatched sizes are not, and later lines are read incrementally")
     func importsIncrementally() async throws {
         let dir = try tempDir()

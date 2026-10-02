@@ -9,7 +9,7 @@
   color-scheme: dark;
   --base: #09090A; --window: #0D0D0F; --sidebar: #111114; --surface: #16161A; --raised: #1C1C21;
   --hair: rgba(236, 230, 218, 0.07); --hair2: rgba(236, 230, 218, 0.12);
-  --text: #ECE6DA; --text2: #A29B8F; --text3: #69645C;
+  --text: #ECE6DA; --text2: #A29B8F; --text3: #888177; /* text3 is at least 4.5:1 on every background it sits on */
   --brass: #C8A66A; --brassHi: #E7CD98; --brassLo: #7C6541; --copper: #C98B5B;
   --serif: "Newsreader", ui-serif, Georgia, serif;
   --sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -44,6 +44,17 @@ header.nav {
 .nav nav { display: flex; gap: 22px; margin-left: auto; font-size: 14.5px; }
 .nav nav a { color: var(--text2); }
 .nav nav a:hover { color: var(--text); text-decoration: none; }
+/* The menu button stands in for the links below 900 px. It stays hidden (by its hidden attribute) until the
+   page's script runs, so without JavaScript the header is just the logo and Download. */
+.nav-toggle {
+  display: none; align-items: center; justify-content: center; width: 36px; height: 30px; padding: 0; flex: none;
+  border: 1px solid var(--hair2); border-radius: 8px; background: rgba(236,230,218,.03); color: var(--text); cursor: pointer;
+  transition: background .15s ease;
+}
+.nav-toggle:hover, .nav-toggle[aria-expanded="true"] { background: rgba(236,230,218,.08); }
+.nav-toggle svg { width: 18px; height: 18px; }
+.nav-toggle .icon-close, .nav-toggle[aria-expanded="true"] .icon-menu { display: none; }
+.nav-toggle[aria-expanded="true"] .icon-close { display: inline; }
 .btn {
   display: inline-flex; align-items: center; gap: 9px; border-radius: 10px; padding: 11px 18px;
   font: 600 15.5px/1 var(--sans); white-space: nowrap; transition: filter .15s ease, background .15s ease;
@@ -84,6 +95,8 @@ header.nav {
 .badge.brass { color: var(--brass); border-color: rgba(200,166,106,.55); }
 .badge.copper { color: var(--copper); border-color: rgba(201,139,91,.5); }
 .badge.brass::before, .badge.copper::before { content: "●"; font-size: 9px; margin-right: 8px; vertical-align: 1px; }
+/* Units keep their case inside uppercase labels: kHz, not KHZ. */
+.unit { text-transform: none; }
 
 section { padding: 110px 0 0; }
 
@@ -126,8 +139,25 @@ h2 { font: 500 clamp(32px, 4.4vw, 48px)/1.08 var(--serif); letter-spacing: -0.01
 .formats td .mono { color: var(--text3); font-size: 13px; }
 
 /* Comparison */
-.compare { margin-top: 48px; overflow-x: auto; border: 1px solid var(--hair); border-radius: 16px; }
+.compare-wrap { position: relative; margin-top: 48px; }
+.compare { overflow-x: auto; border: 1px solid var(--hair); border-radius: 16px; }
+.compare:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 .compare table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14.5px; }
+/* When the table is wider than the screen, the row labels stay put, the edge with more columns fades out,
+   and a hint sits above the top-right corner (in the margin, so nothing moves when it appears). */
+.compare thead th:first-child, .compare tbody th { position: sticky; left: 0; z-index: 1; }
+.compare-wrap.more-left .compare thead th:first-child, .compare-wrap.more-left .compare tbody th { box-shadow: 12px 0 14px -12px rgba(0,0,0,.9); }
+.compare-wrap::after {
+  content: ""; position: absolute; top: 1px; right: 1px; bottom: 1px; width: 44px; pointer-events: none;
+  border-radius: 0 15px 15px 0; background: linear-gradient(to right, rgba(9,9,10,0), var(--base));
+  opacity: 0; transition: opacity .2s ease;
+}
+.compare-wrap.more-right::after { opacity: 1; }
+.compare-hint {
+  position: absolute; right: 0; bottom: 100%; margin: 0 0 12px; font: 500 12px/1 var(--mono); letter-spacing: 1px;
+  color: var(--text3); opacity: 0; transition: opacity .2s ease; pointer-events: none;
+}
+.compare-wrap.more-right .compare-hint { opacity: 1; }
 .compare th, .compare td { padding: 13px 16px; border-top: 1px solid var(--hair); text-align: center; }
 .compare thead th { border-top: 0; font: 500 15px/1.25 var(--serif); color: var(--text); background: var(--window); vertical-align: bottom; }
 .compare thead th small { display: block; font: 400 12px/1.4 var(--sans); color: var(--text3); margin-top: 3px; }
@@ -141,7 +171,7 @@ h2 { font: 500 clamp(32px, 4.4vw, 48px)/1.08 var(--serif); letter-spacing: -0.01
 /* FAQ */
 .faq { margin-top: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
 .faq div { border-top: 1px solid var(--hair); padding: 22px 0 24px; }
-.faq h4 { margin: 0; font: 500 19px/1.3 var(--serif); }
+.faq h3 { margin: 0; font: 500 19px/1.3 var(--serif); }
 .faq p { margin: 10px 0 0; color: var(--text2); font-size: 15.5px; }
 
 /* Closing */
@@ -153,8 +183,18 @@ footer .row { display: flex; gap: 18px; flex-wrap: wrap; }
 footer a { color: var(--text2); }
 
 @media (max-width: 900px) {
+  .nav .wrap { gap: 10px; }
+  .nav-toggle { display: inline-flex; margin-left: auto; }
+  .nav-toggle[hidden] { display: none; }
+  .nav-toggle[hidden] ~ .btn { margin-left: auto; }
   .nav nav { display: none; }
-  .nav .wrap { justify-content: space-between; }
+  /* The open menu drops below the header bar, over the page, so nothing beneath it moves. */
+  .nav nav.open {
+    display: flex; flex-direction: column; gap: 0; position: absolute; top: calc(100% + 1px); left: 0; right: 0; margin: 0;
+    padding: 6px 0 12px; background: var(--base); border-bottom: 1px solid var(--hair2); font-size: 16px;
+    box-shadow: 0 24px 40px rgba(0,0,0,.5);
+  }
+  .nav nav.open a { padding: 12px 24px; }
   .pillars { grid-template-columns: 1fr 1fr; }
   .feature, .feature.flip { grid-template-columns: 1fr; gap: 28px; margin-top: 80px; }
   .feature.flip .copy { order: 0; }
@@ -170,6 +210,11 @@ footer a { color: var(--text2); }
   .formats th, .formats td { display: block; width: 100%; }
   .formats td { border-top: 0; padding-top: 0; background: var(--window); }
   .btn { padding: 12px 16px; }
+  .nav-toggle { width: 40px; height: 38px; }
+  .nav nav.open a { padding: 12px 16px; }
+  .compare table { min-width: 620px; font-size: 14px; }
+  .compare th, .compare td { padding: 12px 12px; }
+  .compare thead th:first-child, .compare tbody th { width: 140px; }
 }
 
 /* Privacy policy and terms */

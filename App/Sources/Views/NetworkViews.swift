@@ -12,7 +12,7 @@ struct ConnectServerSheet: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
 
-    @State private var address = UserDefaults.standard.string(forKey: "VespertineConnectAddress") ?? ""
+    @State private var address = LaunchArguments().string(forKey: "VespertineConnectAddress") ?? ""
     @State private var asGuest = false
     @State private var user = ""
     @State private var password = ""
@@ -145,6 +145,8 @@ struct ConnectServerSheet: View {
 
 struct NetworkSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
+    @State private var removingSource: LibrarySource?
 
     private static let limits: [Double] = [5, 10, 20, 50, 100, 250, 500]
 
@@ -158,9 +160,9 @@ struct NetworkSettings: View {
                         .font(.callout).foregroundStyle(.secondary)
                 }
                 ForEach(model.shares.sources) { source in
-                    ShareRow(source: source)
+                    ShareRow(source: source, removing: $removingSource)
                 }
-                Button("Connect to Server…") { model.showConnectServer = true }
+                Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }   // its sheet is on the main window
             }
             Section {
                 Toggle("Keep local copies of music played from shares", isOn: $s.networkCache)
@@ -194,6 +196,7 @@ struct NetworkSettings: View {
         .formStyle(.grouped)
         .onChange(of: s.networkCacheLimitGB) { model.shares.applyCacheLimit() }
         .onAppear { model.shares.refreshUsage() }
+        .modifier(RemoveSourceAlert(source: $removingSource))
     }
 
     private func usageText(_ u: NetworkCache.Usage) -> String {
@@ -209,6 +212,8 @@ struct NetworkSettings: View {
 struct ShareRow: View {
     @Environment(AppModel.self) private var model
     let source: LibrarySource
+    /// The share whose removal is being confirmed (the alert belongs to the settings page).
+    @Binding var removing: LibrarySource?
 
     var body: some View {
         let status = model.shares.status(of: source)
@@ -226,7 +231,7 @@ struct ShareRow: View {
             } else {
                 Button("Rescan") { Task { await model.library.scan(source) } }.disabled(!status.isConnected)
             }
-            Button("Remove") { Task { await model.shares.remove(source) } }
+            Button("Remove") { removing = source }
         }
     }
 }

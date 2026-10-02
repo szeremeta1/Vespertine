@@ -27,6 +27,7 @@ struct FindMusicSheet: View {
     @State private var filter: MusicFilter = .hiRes
     @State private var selected = Set<URL>()
     @State private var expanded = Set<URL>()
+    /// Starts as Settings › Library › "When adding music" says (see `onAppear`).
     @State private var mode: ImportMode = .copyAndOrganize
     @State private var enrichAfter = true
     @State private var adding = false
@@ -95,6 +96,7 @@ struct FindMusicSheet: View {
         }
         .frame(width: 720, height: 600)
         .background(Palette.panel)
+        .onAppear { mode = model.settings.defaultImportMode }
         .task { await scan() }
         .onChange(of: filter) { selectDefaults() }
     }
@@ -366,7 +368,8 @@ struct EnrichSheet: View {
         loading = true
         result = nil
         let keys = albumKeys.isEmpty ? nil : albumKeys
-        let r = await model.library.enrichmentProposals(albumKeys: keys, correctExisting: correctExisting) { done, total in progress = (done, total) }
+        let r = await model.library.enrichmentProposals(albumKeys: keys, correctExisting: correctExisting,
+                                                        fetchCovers: model.settings.fetchArtworkOnline) { done, total in progress = (done, total) }
         proposals = r.proposals
         complete = r.complete
         chosen = Set(r.proposals.filter(\.isHighConfidence).map(\.id))

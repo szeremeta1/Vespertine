@@ -215,4 +215,50 @@ struct SmartRulesTests {
         #expect(try db.tracks(albumKey: key).map { "\(($0.filePath as NSString).deletingLastPathComponent.split(separator: "/").last!) \($0.trackNumber!)" }
                 == ["Multichannel 5.1 1", "Multichannel 5.1 2", "Stereo 1", "Stereo 2"])
     }
+
+    @Test("Album keys are the database's own for names with capitals outside ASCII, so those albums play")
+    func nonASCIIAlbumKeys() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        try db.writer.write { db in
+            for (artist, album) in [("Édith Piaf", "La Vie en Rose"), ("MØ", "Forever Neverland"), ("Кино", "Группа крови")] {
+                var t = Track.stub(path: "/m/\(artist)/\(album)/1.flac")
+                t.sourceId = source.id; t.album = album; t.albumArtist = artist; t.trackNumber = 1
+                try t.insert(db)
+            }
+        }
+        let tracks = try db.allTracks()
+        #expect(try Set(tracks.map(\.albumKey)) == Set(db.albums().map(\.key)))
+        for t in tracks { #expect(try db.tracks(albumKeys: [t.albumKey]).map(\.filePath) == [t.filePath]) }
+    }
+}
+
+@Suite struct PlaylistOrderTests {
+    @Test("Removing a song from a playlist keeps the entries of missing files, each after the song it followed")
+    func removalKeepsMissingEntries() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        let ids = try db.writer.write { db in
+            try ["gone1", "a", "b", "gone2", "c"].map { name -> Int64 in
+                var t = Track.stub(path: "/m/\(name).flac")
+                t.sourceId = source.id; t.isMissing = name.hasPrefix("gone")
+                try t.insert(db)
+                return t.id!
+            }
+        }
+        let (gone1, a, b, gone2, c) = (ids[0], ids[1], ids[2], ids[3], ids[4])
+        let playlist = try db.createPlaylist(name: "Mix")
+        let pid = try #require(playlist.id)
+        try db.append(trackIDs: ids, to: pid)
+        func entries() throws -> [Int64] {
+            try db.writer.read { db in try Int64.fetchAll(db, sql: "SELECT trackId FROM playlistItem WHERE playlistId = ? ORDER BY position", arguments: [pid]) }
+        }
+        #expect(try db.tracks(in: playlist).compactMap(\.id) == [a, b, c])
+        // "Remove from Playlist" rewrites the playlist from the songs shown, which leave out missing files.
+        try db.setPlaylistTracks([a, c], playlistID: pid)
+        #expect(try entries() == [gone1, a, gone2, c])
+        try db.setPlaylistTracks([c, a], playlistID: pid)
+        #expect(try entries() == [gone1, c, a, gone2])
+        #expect(try db.tracks(in: playlist).compactMap(\.id) == [c, a])
+    }
 }

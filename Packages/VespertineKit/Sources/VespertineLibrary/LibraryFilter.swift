@@ -135,10 +135,11 @@ public struct FilterFacts: Sendable, Hashable {
 
     public init() {}
 
-    static let verdictOrder = ["genuine", "possibleLossyOrigin", "bandwidthExtended", "upsampled", "paddedBitDepth", "none"]
+    static let verdictOrder = ["genuine", "possibleLossyOrigin", "bandwidthExtended", "upsampled", "paddedBitDepth", "notApplicable", "none"]
+    // The spectral verdicts are questions (the same spectrum has innocent explanations), so they're named as such.
     static let verdictNames = [
-        "genuine": "Genuine", "possibleLossyOrigin": "Lossy origin", "bandwidthExtended": "Synthetic high frequencies",
-        "upsampled": "Upsampled", "paddedBitDepth": "Padded bit depth", "none": "Not analyzed",
+        "genuine": "Genuine", "possibleLossyOrigin": "Lossy origin?", "bandwidthExtended": "Synthetic high frequencies?",
+        "upsampled": "Upsampled?", "paddedBitDepth": "Padded bit depth", "notApplicable": "Inconclusive", "none": "Not analyzed",
     ]
 
     /// A song's facts. Songs without a genre or year of their own take their album's.

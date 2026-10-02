@@ -97,7 +97,7 @@ final class AppSettings {
         self.defaults = defaults
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
-            "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
+            "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "deviceOnQuit": "restore",
@@ -116,7 +116,7 @@ final class AppSettings {
         replayGainPreampDB = defaults.double(forKey: "replayGainPreamp")
         allowDigitalVolume = defaults.bool(forKey: "allowDigitalVolume")
         digitalVolume = defaults.double(forKey: "digitalVolume")
-        defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .reference
+        defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
         managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
         watchFolders = defaults.bool(forKey: "watchFolders")
@@ -134,7 +134,7 @@ final class AppSettings {
 
         if let dataDirectory {
             self.dataDirectory = dataDirectory
-        } else if let override = defaults.string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
+        } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
             self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
         } else {
             let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
@@ -157,7 +157,8 @@ final class AppSettings {
         return 60 * (pow(digitalVolume, 0.5) - 1)
     }
 
-    func engineSettings(deviceHasHardwareVolume: Bool) -> EngineSettings {
+    /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
+    func engineSettings() -> EngineSettings {
         var s = EngineSettings()
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
@@ -166,7 +167,8 @@ final class AppSettings {
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
-        s.digitalVolumeDB = deviceHasHardwareVolume ? nil : digitalVolumeDB
+        s.digitalVolumeDB = digitalVolumeDB
+        s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem
         s.integerMode = integerMode
         return s

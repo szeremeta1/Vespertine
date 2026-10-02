@@ -58,6 +58,15 @@ struct AppAuditTests {
         #expect(duplicateRows[0].id != duplicateRows[1].id)
         player.stop()
     }
+    @Test func launchArgumentsIgnoreOtherDefaultsDomains() {
+        // A value UserDefaults knows from elsewhere (registered here: in memory, never saved, like one left in the
+        // app's settings) is not a launch argument, so no QA hook acts on it.
+        let key = "VespertineAuditProbe-\(UUID().uuidString)"
+        UserDefaults.standard.register(defaults: [key: "YES"])
+        #expect(UserDefaults.standard.bool(forKey: key))
+        #expect(LaunchArguments().string(forKey: key) == nil)
+        #expect(!LaunchArguments().bool(forKey: key))
+    }
     @Test func recoveryDirectoryOverridesLaunchArgument() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-recovery-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

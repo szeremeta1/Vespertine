@@ -26,11 +26,9 @@ struct TrackTable: View {
 
     @State private var selection = Set<Int64>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
+    @State private var sorted = SortedRows()
 
-    private var rows: [TrackRow] {
-        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
-        return sortOrder.isEmpty ? base : base.sorted(using: sortOrder)
-    }
+    private var rows: [TrackRow] { sorted.rows(tracks: tracks, positions: positions, order: sortOrder) }
 
     /// Album pages of multi-disc albums number tracks "2·1", "2·2"…, so disc 2 doesn't look like the list restarting.
     private var numbersDiscs: Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
@@ -125,6 +123,13 @@ struct TrackTable: View {
             let visible = Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id))
             if visible != selection { selection = visible }
         }
+        .onChange(of: tracks) {
+            // Rows are numbered by their place in the list: when the list changes (a scan adds a song above), select the
+            // same songs again rather than the same places, or Play and Return would act on whatever moved there.
+            let wanted = model.selectedTrackIDs
+            let same = Set(rows.filter { wanted.contains($0.track.id ?? -1) }.map(\.id))
+            if same != selection { selection = same }
+        }
         .onChange(of: selection) { _, new in
             model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
@@ -137,6 +142,22 @@ struct TrackTable: View {
     }
 }
 
+/// The table's rows in their sort order, kept between evaluations of the table: one click re-evaluates it several times
+/// (the selection, the inspector), and sorting a whole library each time was most of what a click cost.
+final class SortedRows {
+    private var key: (tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>])?
+    private var cached: [TrackRow] = []
+
+    func rows(tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>]) -> [TrackRow] {
+        // Usually the very same array as last time, which compares equal at once.
+        if let key, key.order == order, key.positions == positions, key.tracks == tracks { return cached }
+        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
+        cached = order.isEmpty ? base : base.sorted(using: order)
+        key = (tracks, positions, order)
+        return cached
+    }
+}
+
 /// Shows the result of a file analysis inline, only when it's worth attention.
 struct AnalysisTag: View {
     let track: Track
@@ -145,13 +166,14 @@ struct AnalysisTag: View {
         case "paddedBitDepth":
             tag("\(track.effectiveBitDepth ?? 16)-BIT", color: Palette.copper).help("Only \(track.effectiveBitDepth ?? 16) of \(track.bitDepth ?? 24) bits carry audio (zero-padded)")
         case "upsampled":
-            tag("UPSAMPLED", color: Palette.copper).help("A 44.1/48 kHz master upsampled to a hi-res rate")
+            tag("UPSAMPLED?", color: Palette.copper).help("A steep cutoff far below this file’s limit, as a 44.1/48 kHz master upsampled to a hi-res rate shows. A steep mastering low-pass or a DSD conversion filter can look the same.")
         case "possibleLossyOrigin":
-            tag("LOSSY ORIGIN", color: Palette.copper).help("Made from an MP3, AAC or Opus file")
+            tag("LOSSY ORIGIN?", color: Palette.copper).help("A steep, consistent cutoff, as MP3, AAC and Opus encodes show. Steep mastering or anti-alias filters, FM broadcast sources and historical remasters can look the same.")
         case "bandwidthExtended":
-            tag("SYNTHETIC HF", color: Palette.copper).help("Made from a lossy file; its high frequencies were generated afterwards (SBR or AI “enhancement”)")
-        case "genuine" where (track.bitDepth ?? 0) >= 24:
-            tag("TRUE \(track.bitDepth ?? 24)", color: Palette.brass)
+            tag("SYNTHETIC HF?", color: Palette.copper).help("A step at a lossy-looking cutoff with a flat shelf above it that follows the music, as SBR or AI “enhancement” leaves. An exciter or noise reduction on a band-limited recording can look similar.")
+        case "genuine" where (track.bitDepth ?? 0) >= 24 && track.effectiveBitDepth == track.bitDepth:
+            // Only when the word length was checked (float and 32-bit files aren't).
+            tag("TRUE \(track.bitDepth ?? 24)", color: Palette.brass).help("No zero padding: all \(track.bitDepth ?? 24) bits are in use")
         default:
             EmptyView()
         }
@@ -281,7 +303,15 @@ struct SongsView: View {
 
     var body: some View {
         SongsPage(scope: .sidebar(.songs), title: "Songs", list: list) { EmptyView() } empty: { Spacer() }
-            .task(id: model.library.revision) { list = SongList(model.library.allTracks(), model: model) }
+            .task(id: model.library.revision) {
+                // A scan changes the library many times a second: read it once things settle, and off the main thread.
+                if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
+                guard !Task.isCancelled else { return }
+                let database = model.library.database
+                let tracks = await Task.detached(priority: .userInitiated) { (try? database.allTracks()) ?? [] }.value
+                guard !Task.isCancelled else { return }
+                list = SongList(tracks, model: model)
+            }
     }
 }
 

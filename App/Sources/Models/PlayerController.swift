@@ -81,6 +81,11 @@ final class PlayerController {
     var scrubbing: Double?
 
     private var scrobbledEntry: UUID?
+    /// Time actually listened to the current song, for counting a play: seeking doesn't add to it.
+    @ObservationIgnored private var listened: TimeInterval = 0
+    @ObservationIgnored private var lastListenTick: Date?
+    /// A seek restarts the engine's segment, which reports the song as started again: still the same play.
+    @ObservationIgnored private var seekRestart: (id: UUID, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
@@ -367,6 +372,7 @@ final class PlayerController {
     }
 
     func seek(to seconds: TimeInterval) {
+        if let id = current?.id { seekRestart = (id, .now) }
         engine.seek(to: seconds)
         position = seconds
         requestedPosition = (seconds, .now)
@@ -386,9 +392,16 @@ final class PlayerController {
             if let requested, requested != item.id { return }
             requested = nil
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
+            if let restart = seekRestart, restart.id == item.id, Date().timeIntervalSince(restart.at) < 5 {
+                seekRestart = nil
+                updateNowPlayingInfo()
+                return
+            }
+            seekRestart = nil
             resolveVersions()
             trackStartedAt = .now
             scrobbledEntry = nil
+            listened = 0
             prefetchNetworkTracks()
             updateNowPlayingInfo()
             if settings.scrobble, let track = current?.track {
@@ -479,9 +492,13 @@ final class PlayerController {
             channelLevels = []
         }
 
-        // Count a play (and scrobble) at half the track or four minutes, whichever comes first.
+        // Count a play (and scrobble) after half the track or four minutes of listening, whichever comes first
+        // (ListenBrainz's rule): time actually played, so seeking to the middle isn't a listen.
+        let now = Date()
+        if state == .playing, let last = lastListenTick { listened += min(now.timeIntervalSince(last), 1) }
+        lastListenTick = state == .playing ? now : nil
         if state == .playing, let entry = current, scrobbledEntry != entry.id, duration > 30,
-           position >= min(duration / 2, 240) {
+           listened >= min(duration / 2, 240) {
             scrobbledEntry = entry.id
             if let id = entry.track.id { library.markPlayed(id) }
             if settings.scrobble {
