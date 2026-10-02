@@ -1,6 +1,7 @@
 //
 // Vespertine — puts devices back when Vespertine quits: as they were before Vespertine changed them,
-// or at a standard format (44.1 kHz / 16-bit, 48 kHz / 24-bit), or left as they are.
+// or at a standard format (44.1 kHz / 16-bit, 48 kHz / 24-bit), or left as they are. After a crash,
+// puts back what the volume relay changed.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -60,6 +61,22 @@ public enum DeviceRestore {
             case .leave: break
             }
         }
+    }
+
+    /// Puts back what the volume relay changed when Vespertine last ended while relaying (a crash, a forced quit): the
+    /// stand-in's own volume and mute, and the alert volume, each only if it is still what the relay left. Call at
+    /// launch, before anything plays. Quick, unless there is something to put back.
+    public static func afterCrash() {
+        guard let left = RelayChanges.load() else { return }
+        RelayChanges.store(nil)
+        let device = DeviceQuery.allDeviceIDs().first { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) == left.standIn }
+        let back = left.putBack(volume: device.flatMap { try? HAL.get($0, VolumeRelay.volume, initial: Float32(0)) },
+                                mute: device.flatMap { try? HAL.get($0, VolumeRelay.mute, initial: UInt32(0)) },
+                                alert: left.alertSet == nil ? nil : AlertVolume.get())
+        if let device, let v = back.volume { try? HAL.set(device, VolumeRelay.volume, v) }
+        if let device, let m = back.mute { try? HAL.set(device, VolumeRelay.mute, m) }
+        if let a = back.alert, let set = left.alertSet { AlertVolume.set(a, ifStill: set) }
+        log.notice("Vespertine last quit while relaying the volume keys; put back volume \(back.volume != nil), mute \(back.mute != nil), alert volume \(back.alert != nil)")
     }
 
     private static func restore(_ device: AudioObjectID, to original: Original) {

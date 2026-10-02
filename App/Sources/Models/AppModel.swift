@@ -184,6 +184,9 @@ final class AppModel {
         library = try LibraryStore(dataDirectory: settings.dataDirectory)
         devices = DeviceStore()
         shares = NetworkShareManager(library: library, settings: settings)
+        // If Vespertine last ended while relaying the volume keys, put the sound output and alert volume back before
+        // the relay can take them as they are.
+        DeviceRestore.afterCrash()
         player = PlayerController(library: library, settings: settings, shares: shares)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
