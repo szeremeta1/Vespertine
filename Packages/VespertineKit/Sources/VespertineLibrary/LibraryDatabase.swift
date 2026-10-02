@@ -595,20 +595,33 @@ public extension LibraryDatabase {
         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
     }
 
+    /// Adds a folder (or a single file) to the library, or returns the source that already covers it. A local folder
+    /// takes in the local sources inside it (a song opened with Open With, a subfolder added earlier): their tracks
+    /// move to it with their plays, ratings, playlists and analyses. Network shares and the managed library always
+    /// keep their own source, so a folder that contains one is refused.
     @discardableResult
     func addSource(_ source: LibrarySource) throws -> LibrarySource {
         try writer.write { db in
             let canonical = source.url.resolvingSymlinksInPath().path
             let sources = try LibrarySource.fetchAll(db)
+            var inside: [LibrarySource] = []
             for existing in sources {
                 let path = existing.url.resolvingSymlinksInPath().path
                 if canonical == path || canonical.hasPrefix(path == "/" ? "/" : path + "/") { return existing }
                 if path.hasPrefix(canonical == "/" ? "/" : canonical + "/") {
-                    throw SourceOverlapError(path: existing.path)
+                    guard source.mode == .reference, !source.isNetwork, existing.mode == .reference, !existing.isNetwork else {
+                        throw SourceOverlapError(path: existing.path)
+                    }
+                    inside.append(existing)
                 }
             }
             var s = source
             try s.insert(db)
+            for old in inside {
+                try db.execute(sql: "UPDATE track SET sourceId = ? WHERE sourceId = ?", arguments: [s.id, old.id])
+                try db.execute(sql: "UPDATE cueScanState SET sourceId = ? WHERE sourceId = ?", arguments: [s.id, old.id])
+                try LibrarySource.deleteOne(db, key: old.id)
+            }
             return s
         }
     }
