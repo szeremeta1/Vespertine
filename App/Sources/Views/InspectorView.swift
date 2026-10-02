@@ -655,12 +655,17 @@ struct SpectrumPlot: View {
             guard values.count > 1 else { return }
             let lo: Float = -150, hi: Float = -20
             func y(_ v: Float) -> CGFloat { size.height * (1 - CGFloat((max(lo, min(hi, v)) - lo) / (hi - lo))) }
-            // Frequency gridlines.
-            for f in [100.0, 1_000, 10_000, 20_000] where f < nyquist {
+            // Frequency gridlines (on to 40 and 80 kHz in hi-res files, so the empty range above a cutoff reads).
+            // A label is left out where it would run into a marker or off the plot.
+            let markerXs = markers.filter { $0.hz > 20 && $0.hz < nyquist }.map { size.width * CGFloat(log($0.hz / 20) / log(nyquist / 20)) }
+            for f in [100.0, 1_000, 10_000, 20_000, 40_000, 80_000] where f < nyquist {
                 let x = size.width * CGFloat(log(f / 20) / log(nyquist / 20))
                 ctx.stroke(Path { $0.move(to: CGPoint(x: x, y: 0)); $0.addLine(to: CGPoint(x: x, y: size.height)) },
                            with: .color(Palette.hairlineStrong), lineWidth: 1)
-                ctx.draw(Text(f >= 1000 ? "\(Int(f / 1000))k" : "\(Int(f))").font(Typeface.mono(8.5)).foregroundStyle(Palette.text3),
+                let label = f >= 1000 ? "\(Int(f / 1000))k" : "\(Int(f))"
+                let end = x + 3 + CGFloat(label.count) * 5.5
+                guard end < size.width - 2, !markerXs.contains(where: { $0 > x - 3 && $0 < end + 3 }) else { continue }
+                ctx.draw(Text(label).font(Typeface.mono(8.5)).foregroundStyle(Palette.text3),
                          at: CGPoint(x: x + 3, y: size.height - 6), anchor: .leading)
             }
             var line = Path()
