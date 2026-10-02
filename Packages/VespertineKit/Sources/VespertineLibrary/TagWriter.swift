@@ -179,12 +179,14 @@ public actor TagWriter {
             }
         }
         var refreshIDs: [Int64] = []
+        let readOnly = try Self.readOnlyShares(database.sources())
 
         for track in tracks {
             guard let id = track.id else { continue }
             // CUE tracks share one file, and a read-only share can't be written: those edits live in the library
             // (and survive rescans). Checked first, so no backup is copied for a write that would fail.
-            if track.cueStartFrame != nil || !Self.isWritable(track.fileURL) {
+            // A share added read-only is never written, even when it's mounted read-write (by Finder, say).
+            if track.cueStartFrame != nil || track.sourceId.map(readOnly.contains) == true || !Self.isWritable(track.fileURL) {
                 try await updateDatabaseOnly(track, edit: edit)
                 result.databaseOnly += 1
                 continue
@@ -400,6 +402,12 @@ public actor TagWriter {
     /// Whether the file itself can be rewritten (false on a share mounted read-only).
     public static func isWritable(_ url: URL) -> Bool {
         url.withUnsafeFileSystemRepresentation { $0.map { access($0, W_OK) == 0 } ?? false }
+    }
+
+    /// Network shares added read-only. Their files are never rewritten, however the share is mounted: Vespertine
+    /// reuses a mount that's already there (Finder's, or one shared with a writable source), which may be read-write.
+    public static func readOnlyShares(_ sources: [LibrarySource]) -> Set<Int64> {
+        Set(sources.filter { $0.isNetwork && !$0.isWritable }.compactMap(\.id))
     }
 
     private func makeBackup(of url: URL) throws -> URL {
