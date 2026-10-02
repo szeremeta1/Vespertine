@@ -94,6 +94,7 @@ public final class LibraryDatabase: Sendable {
                     .generatedAs(sql: "lower(coalesce(albumArtistSort, albumArtist, artistSort, artist, 'Unknown Artist'))", .virtual)
                 t.column("albumSortKey", .text)
                     .generatedAs(sql: "lower(coalesce(albumSort, album, 'Unknown Album'))", .virtual)
+                // `Track.albumKey` computes the same bytes in Swift; keep the two in step.
                 t.column("albumKey", .text)
                     .generatedAs(sql: "lower(coalesce(albumArtist, artist, 'Unknown Artist')) || char(31) || lower(coalesce(album, 'Unknown Album'))", .stored)
             }
@@ -508,11 +509,34 @@ public extension LibraryDatabase {
         }
     }
 
-    /// Rewrites a manual playlist's order.
+    /// Rewrites a manual playlist's order. `trackIDs` is the playlist as shown, which leaves out songs whose files are
+    /// missing: those entries stay, each after the song (or the nearest earlier one still listed) that it followed before.
     func setPlaylistTracks(_ trackIDs: [Int64], playlistID: Int64) throws {
         try writer.write { db in
+            let old = try Row.fetchAll(db, sql: """
+                SELECT playlistItem.trackId AS id, track.isMissing AS missing FROM playlistItem JOIN track ON track.id = playlistItem.trackId
+                WHERE playlistItem.playlistId = ? ORDER BY playlistItem.position
+                """, arguments: [playlistID])
+            let shown = Dictionary(trackIDs.map { ($0, 1) }, uniquingKeysWith: +)
+            // Kept entries by the occurrence they follow ("id#n": the nth time that song is listed; "" = the start).
+            var kept: [String: [Int64]] = [:], counts: [Int64: Int] = [:], anchor = ""
+            for row in old {
+                let id: Int64 = row["id"], missing: Bool = row["missing"]
+                if missing && shown[id] == nil { kept[anchor, default: []].append(id); continue }
+                let n = counts[id, default: 0]
+                counts[id] = n + 1
+                if n < (shown[id] ?? 0) { anchor = "\(id)#\(n)" }
+            }
+            var order = kept[""] ?? []
+            counts = [:]
+            for id in trackIDs {
+                let n = counts[id, default: 0]
+                counts[id] = n + 1
+                order.append(id)
+                order += kept["\(id)#\(n)"] ?? []
+            }
             try db.execute(sql: "DELETE FROM playlistItem WHERE playlistId = ?", arguments: [playlistID])
-            for (i, id) in trackIDs.enumerated() {
+            for (i, id) in order.enumerated() {
                 try PlaylistItem(playlistId: playlistID, trackId: id, position: i).insert(db)
             }
         }

@@ -274,6 +274,8 @@ public actor LibraryScanner {
         let width = NetworkVolume.isNetwork(start) ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = []
         var pending: [URL] = [start]
+        // Folders already listed, by path (symlinked ones resolved): a link back up the tree would loop forever.
+        var visited: Set<String> = [start.path]
         var failure: Error?
         await withTaskGroup(of: Listed.self) { group in
             var running = 0
@@ -314,7 +316,7 @@ public actor LibraryScanner {
                 case .success(let r):
                     audio.append(contentsOf: r.files)
                     cue.append(contentsOf: r.cues)
-                    pending.append(contentsOf: r.dirs)
+                    pending.append(contentsOf: r.dirs.filter { visited.insert($0.path).inserted })
                     if let dir = r.hasImage { imageDirs.append(dir) }
                     found?(audio.count)
                 case .failure(let error):

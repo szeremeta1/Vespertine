@@ -190,6 +190,19 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         _ = try await (first, second)
         #expect(try db.allTracks().map(\.title) == ["selected"])
     }
+    @Test func symlinkBackUpTheTreeIsListedOnce() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let album = dir.appendingPathComponent("Album", isDirectory: true)
+        try FileManager.default.createDirectory(at: album, withIntermediateDirectories: true)
+        try audio(album.appendingPathComponent("one.wav"))
+        try FileManager.default.createSymbolicLink(atPath: album.appendingPathComponent("Up").path, withDestinationPath: "..")
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        #expect(try db.allTracks().map(\.title) == ["one"])
+    }
     @Test func richFLACUndoRestoresArtworkAndCustomTags() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let wav = dir.appendingPathComponent("source.wav"); try audio(wav)

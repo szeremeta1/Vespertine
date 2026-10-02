@@ -38,11 +38,14 @@ public enum MultichannelExport {
         }
     }
 
-    /// Renders `item` (a whole file or a CUE region) to a 24-bit ALAC .m4a at `destination`.
-    /// `progress` receives 0…1. Returns the channel count written.
+    /// Renders `item` (a whole file or a CUE region) to a 24-bit ALAC .m4a at `destination`, which must not exist yet
+    /// (an existing file, the source included, is never replaced). `progress` receives 0…1. Returns the channel count written.
     @discardableResult
     public static func export(_ item: PlayableItem, kind: Kind, to destination: URL,
                               progress: ((Double) -> Void)? = nil) throws -> Int {
+        guard !FileManager.default.fileExists(atPath: destination.path) else {
+            throw ExportError.unsupported("\(destination.lastPathComponent) already exists")
+        }
         let probed = try SourceOpener.probe(item.url)
         let format = probed.format
         guard format.encoding == .pcm, format.channels > 2 else { throw ExportError.notMultichannel }
@@ -65,9 +68,10 @@ public enum MultichannelExport {
             AVEncoderBitDepthHintKey: 24,
             AVChannelLayoutKey: Data(bytes: outLayout.layout, count: outLayout.byteSize),
         ]
-        try? FileManager.default.removeItem(at: destination)
-        let partial = destination.deletingPathExtension().appendingPathExtension("partial.m4a")
-        try? FileManager.default.removeItem(at: partial)
+        // Written under a new hidden name beside the destination, and removed again if the export fails.
+        let partial = destination.deletingLastPathComponent().appendingPathComponent(".\(UUID().uuidString).partial.m4a")
+        var moved = false
+        defer { if !moved { try? FileManager.default.removeItem(at: partial) } }
         do {
             let file = try AVAudioFile(forWriting: partial, settings: fileSettings, commonFormat: .pcmFormatFloat32, interleaved: false)
             let chunk: AVAudioFrameCount = 16_384
@@ -115,7 +119,8 @@ public enum MultichannelExport {
                 finished = status == .endOfStream || status == .error || n == 0
             }
         } // the writer finalizes the file when it goes away
-        try FileManager.default.moveItem(at: partial, to: destination)
+        try FileManager.default.moveItem(at: partial, to: destination)   // never replaces: fails if something appeared there
+        moved = true
         progress?(1)
         return outChannels
     }
