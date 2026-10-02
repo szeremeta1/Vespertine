@@ -50,6 +50,33 @@ struct VerdictTests {
         #expect(j.confidence < 0.8, "\(c.name): confidence \(j.confidence)")
     }
 
+    @Test("Stored version 2 results are judged anew from their measurements, without the file")
+    func rejudgedFromStoredMeasurements() {
+        // As version 2 stored them: an old, certain verdict and wording, and no shelf tracking.
+        func stored(_ f: SpectralForensics, rate: Double, verdict: FileAnalysis.Verdict, effective: Int?, claimed: Int? = 24) -> FileAnalysis {
+            FileAnalysis(claimedBitDepth: claimed, effectiveBitDepth: effective, sampleRate: rate, bandwidthHz: 20_000, peakDBFS: -0.3,
+                         clippedSamples: 0, verdict: verdict, summary: "Made from an MP3, AAC or Opus file.", spectrum: [],
+                         secondsAnalyzed: 300, forensics: f, version: 2, confidence: 1)
+        }
+        // A genuine 32 kHz master v2 called lossy: now genuine, and current.
+        let low = FileAnalyzer.rejudged(stored(Self.m(cliff: 15_200, drop: 30, cons: 1, content: 15_000), rate: 32_000,
+                                               verdict: .possibleLossyOrigin, effective: 24))
+        #expect(low.version == FileAnalysis.currentVersion && low.verdict == .genuine)
+        // An MP3-sourced file stays flagged, as a question at no more than the spectral cap, with the hedged wording.
+        let lossy = FileAnalyzer.rejudged(stored(Self.m(cliff: 19_900, drop: 28, cons: 1, content: 19_800), rate: 48_000,
+                                                 verdict: .possibleLossyOrigin, effective: 24))
+        #expect(lossy.verdict == .possibleLossyOrigin && lossy.confidence <= FileAnalyzer.spectralConfidenceCap)
+        #expect(lossy.summary.contains("mastering"))
+        // A 32-bit file's word length was never really checked: not reported as checked any more.
+        let wide = FileAnalyzer.rejudged(stored(Self.m(cliff: 21_100, drop: 38.6, cons: 0.99, content: 21_000), rate: 44_100,
+                                                verdict: .genuine, effective: 32, claimed: 32))
+        #expect(wide.verdict == .genuine && wide.effectiveBitDepth == nil && wide.summary.contains("not checked"))
+        // Version 1 kept no measurements: left alone, for a fresh analysis.
+        var v1 = stored(Self.calibration[0].f, rate: 44_100, verdict: .genuine, effective: 24)
+        v1.version = 1; v1.forensics = nil
+        #expect(FileAnalyzer.rejudged(v1) == v1)
+    }
+
     @Test("Zero padding is exact and wins over spectral findings")
     func padding() {
         let v = FileAnalyzer.judge(forensics: Self.m(cliff: 16_000, drop: 40, cons: 1), claimedBits: 24, effectiveBits: 16, sampleRate: 48_000)

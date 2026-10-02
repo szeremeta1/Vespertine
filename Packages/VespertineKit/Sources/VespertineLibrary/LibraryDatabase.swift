@@ -29,7 +29,12 @@ public final class LibraryDatabase: Sendable {
 
     init(writer: any DatabaseWriter, migrate: Bool = true) throws {
         self.writer = writer
-        if migrate { try Self.migrator.migrate(writer) }
+        if migrate {
+            try Self.migrator.migrate(writer)
+            // Before anything asks what needs analyzing: after an analyzer update, stored results are judged anew
+            // from their measurements instead of every file (network shares' too) being read again.
+            try rejudgeStoredAnalyses()
+        }
     }
 
     public static var defaultURL: URL {
@@ -703,6 +708,30 @@ public extension LibraryDatabase {
             let current = version >= FileAnalysis.currentVersion && size == track.fileSize
                 && abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001
             return StoredAnalysis(analysis: analysis, analyzedAt: row["analyzedAt"], isCurrent: current)
+        }
+    }
+
+    /// Brings stored analyses from older versions up to the current judgement from their measurements
+    /// (`FileAnalyzer.rejudged`). Those that can't be (version 1 kept no measurements) stay as they are, for a fresh
+    /// analysis. Returns how many were brought up to date; nothing to do costs one query.
+    @discardableResult
+    public func rejudgeStoredAnalyses() throws -> Int {
+        try writer.write { db in
+            let rows = try Row.fetchAll(db, sql: "SELECT trackId, data FROM analysis WHERE version >= 2 AND version < ?",
+                                        arguments: [FileAnalysis.currentVersion])
+            let decoder = JSONDecoder(), encoder = JSONEncoder()
+            var updated = 0
+            for row in rows {
+                guard let stored = try? decoder.decode(FileAnalysis.self, from: row["data"] as Data) else { continue }
+                let analysis = FileAnalyzer.rejudged(stored)
+                guard analysis.version >= FileAnalysis.currentVersion, let data = try? encoder.encode(analysis) else { continue }
+                let id: Int64 = row["trackId"]
+                try db.execute(sql: "UPDATE analysis SET version = ?, data = ? WHERE trackId = ?", arguments: [analysis.version, data, id])
+                try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
+                               arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
+                updated += 1
+            }
+            return updated
         }
     }
 
