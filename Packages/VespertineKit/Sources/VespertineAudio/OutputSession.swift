@@ -42,6 +42,10 @@ final class OutputSession: @unchecked Sendable {
     private(set) var spatial: SpatialRenderer?
     private var ioProcID: AudioDeviceIOProcID?
     private(set) var isRunning = false
+    /// What the device still holds after the I/O proc's last buffer: its latency, safety offset and stream latency.
+    /// A few milliseconds on a USB DAC; hundreds on Bluetooth and AirPlay, whose end of the last song was cut off
+    /// when the device was stopped as soon as the ring ran dry.
+    let latencyFrames: Int
     /// Set by Core Audio when the device's rate or a stream's format changes; read by `formatChanged()`.
     private let formatNotice = OSAllocatedUnfairLock(initialState: false)
     private var formatListener: AudioObjectPropertyListenerBlock?
@@ -96,6 +100,10 @@ final class OutputSession: @unchecked Sendable {
         // The shallowest stream decides what the device as a whole can carry.
         let physical = physicals.min { $0.mBitsPerChannel < $1.mBitsPerChannel }
         let bufferFrames = (try? HAL.get(deviceID, .global(kAudioDevicePropertyBufferFrameSize), initial: UInt32(512))) ?? 512
+        let deviceLatency = (try? HAL.get(deviceID, .output(kAudioDevicePropertyLatency), initial: UInt32(0))) ?? 0
+        let safetyOffset = (try? HAL.get(deviceID, .output(kAudioDevicePropertySafetyOffset), initial: UInt32(0))) ?? 0
+        let streamLatency = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyLatency), initial: UInt32(0)) }.max() ?? 0
+        latencyFrames = Int(deviceLatency) + Int(safetyOffset) + Int(streamLatency)
         let totalChannels = virtuals.reduce(0) { $0 + Int($1.mChannelsPerFrame) }
 
         let floatStreams = !virtuals.isEmpty && virtuals.count == streams.count && virtuals.allSatisfy {

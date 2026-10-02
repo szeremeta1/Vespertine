@@ -515,7 +515,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
-            if deviceChanged, state != .stopped {
+            // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
+            // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
+            let leavesInteger = session?.applied.integerMode == true && new.digitalVolume(for: sessionDevice) != nil
+            if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
             }
@@ -1106,7 +1109,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard draining, session.readableFrames == 0 else { drainedAt = nil; return }
         // Let the device play out its own buffer before touching it.
         if drainedAt == nil { drainedAt = Date() }
-        let tail = Double(session.applied.bufferFrames * 3) / session.applied.sampleRate + 0.05
+        let tail = Double(session.applied.bufferFrames * 3 + session.latencyFrames) / session.applied.sampleRate + 0.05
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
         if let next = pendingSystem {
