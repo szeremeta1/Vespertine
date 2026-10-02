@@ -8,7 +8,7 @@
 <p align="center">
   <strong>A free, open-source, bit-perfect music player for macOS.</strong><br>
   Native sample rates on your DAC, Spatial Audio on AirPods, and an honest signal path:<br>
-  from 16/44.1 to 32/768, DSD512, Dolby Atmos and DTS-HD Master Audio.
+  every rate and depth your DAC can run, DSD512, Dolby Atmos and DTS-HD Master Audio.
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@
 
 ## Why Vespertine
 
-Free Mac players tend to be either pretty but indifferent to what reaches the DAC, or careful about the signal but cumbersome to live with. Vespertine is meant to be both: a native Mac app that switches your DAC to each track's native format, shows **BIT-PERFECT** only when that's literally true, and says what happened to the signal whenever it isn't ([check it on your own hardware](docs/VERIFICATION.md)). It also does a few things no other Mac music player does: it plays DTS CDs, TrueHD, DTS-HD Master Audio and Dolby Atmos files, renders surround as head-tracked Spatial Audio on AirPods, recognizes AirPods Max on USB-C as a lossless device, and catches "hi-res" files that aren't.
+Free Mac players tend to be either pretty but indifferent to what reaches the DAC, or careful about the signal but cumbersome to live with. Vespertine is meant to be both: a native Mac app that switches your DAC to each track's native format, shows **BIT-PERFECT** only when the conditions for it are met, and says what happened to the signal whenever they aren't ([check it on your own hardware](docs/VERIFICATION.md)). It also plays DTS CDs, TrueHD, DTS-HD Master Audio and Dolby Atmos files from the same library as your FLAC, renders surround as head-tracked Spatial Audio on AirPods, recognizes AirPods Max on USB-C as a lossless device, and flags "hi-res" files that aren't.
 
 | | Vespertine | Apple Music | Audirvana Studio | Roon |
 |---|---|---|---|---|
@@ -45,13 +45,13 @@ Free Mac players tend to be either pretty but indifferent to what reaches the DA
 | DSD | DSD64–512 | No | Yes | Yes |
 | Local multichannel | Yes | No | Yes | Yes |
 | Local Dolby Atmos files | Yes | Catalog only | No | No |
-| Fake hi-res detection | Yes | No | No | No |
+| Fake hi-res detection | Yes | No | AudioScan (no DSD or multichannel) | No |
 | Streaming (Qobuz, TIDAL) | No | Apple Music | Yes | Yes |
 | EQ and room correction | No | Basic EQ | Yes | Yes |
 
 <sub>Checked September 2026 from each product's own pricing and support pages. If you stream or need room correction, the paid apps are worth it; if you own your music, Vespertine is the one to try.</sub>
 
-Vespertine plays almost anything you have: FLAC, ALAC, WAV and AIFF up to 32-bit / 768 kHz, DSD from DSD64 to DSD512, Dolby Atmos, Dolby TrueHD, Dolby Digital (Plus), DTS-HD Master Audio, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC. It switches your DAC (a FiiO K11, AirPods Max on USB-C, a receiver, anything class-compliant) to each file's native format, and it tells you exactly what happens to the signal on the way there.
+Vespertine plays almost anything you have: FLAC, ALAC, WAV and AIFF up to 32-bit and whatever rate your DAC runs (tested to 384 kHz), DSD from DSD64 to DSD512, Dolby Atmos, Dolby TrueHD, Dolby Digital (Plus), DTS-HD Master Audio, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC. It switches your DAC to each file's native format and tells you exactly what happens to the signal on the way there. It has been tested on a FiiO K11 and AirPods Max on USB-C; other class-compliant DACs should work, and [reports are welcome](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
 
 ## Highlights
 
@@ -66,7 +66,7 @@ DSD64, DSD128, DSD256 and DSD512, in DSF or DSDIFF. On a DAC that takes DoP, the
 ![Michael Jackson's Thriller as DSD64 over DoP to a FiiO K11, with a DSD 64 badge](docs/screenshots/dsd-native-dop.png)
 
 ### Surround, Dolby and DTS, wherever you listen
-5.1 and 7.1 in FLAC, DSD, Dolby TrueHD, DTS-HD Master Audio and even DTS CDs (which other players turn into full-scale noise) play as head-tracked Spatial Audio on AirPods, channel for channel on a multichannel interface or receiver, or folded down on a stereo DAC. **Dolby Atmos** in Dolby Digital Plus is rendered by macOS's own Atmos renderer, just as in Apple Music. The Albums page filters by format (FLAC, WAV/AIFF, ALAC, DSD, **Dolby & DTS**, lossy, 24-bit, 88.2 kHz and up, multichannel), so every surround album is one click away.
+5.1 and 7.1 in FLAC, DSD, Dolby TrueHD, DTS-HD Master Audio and even DTS CDs (which players that don't recognize them turn into full-scale noise) play as head-tracked Spatial Audio on AirPods, channel for channel on a multichannel interface or receiver, or folded down on a stereo DAC. **Dolby Atmos** in Dolby Digital Plus is rendered by macOS's own Atmos renderer, just as in Apple Music. The Albums page filters by format (FLAC, WAV/AIFF, ALAC, DSD, **Dolby & DTS**, lossy, 24-bit, 88.2 kHz and up, multichannel), so every surround album is one click away.
 
 ![The Albums page filtered to multichannel: SACD rips, DTS CDs and 5.1 FLAC](docs/screenshots/multichannel-albums.png)
 
@@ -75,8 +75,8 @@ When an album has every song in stereo and in 5.1, like an SACD's two layers, Ve
 
 ![Pink Floyd's Dark Side of the Moon SACD: each song listed once as DSD64 5.1, marked "+ STEREO", playing as Spatial Audio on AirPods Max](docs/screenshots/stereo-and-surround-versions.png)
 
-### Catches fake hi-res
-Upsampled, padded, lossy-origin and "AI-enhanced" files are detected, with the evidence shown. Here a 24/48 file turns out to be a lossy source cut at 16.3 kHz, with a synthetic shelf generated above it.
+### Flags fake hi-res
+Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the evidence shown. It's a measurement, not a proof: some high-bitrate lossy files can pass as genuine ([how it works, and where it misses](docs/ANALYSIS.md#limits)). Here a 24/48 file turns out to be a lossy source cut at 16.3 kHz, with a synthetic shelf generated above it.
 
 ![The Analysis tab flagging a track as having synthetic high frequencies, with its long-term spectrum](docs/screenshots/fake-hi-res-detection.png)
 
@@ -103,7 +103,7 @@ Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 4
 
 | Format | Files | How it plays |
 |---|---|---|
-| FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate and depth, up to 32-bit / 768 kHz; bit-perfect when the DAC can run the rate |
+| FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate and depth, up to 32-bit and the rate your DAC runs (tested to 384 kHz); bit-perfect when the DAC can run the rate |
 | DSD64 – DSD512 | `.dsf` `.dff` | DoP on DACs marked DoP-capable that support the carrier rate; otherwise DSD → PCM |
 | Dolby Atmos | Dolby Digital Plus with Atmos in `.ec3` `.m4a` `.mp4` | Rendered by macOS (Spatial Audio on AirPods, heights on a multichannel output), or its 5.1/7.1 bed through Vespertine |
 | Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless, can be bit-perfect; Atmos in TrueHD plays its lossless bed |
@@ -113,25 +113,25 @@ Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 4
 | APE, WavPack, TTA | `.ape` `.wv` `.tta` | Lossless |
 | Opus, Vorbis, Musepack, MP3, AAC | `.opus` `.ogg` `.mpc` `.mp3` `.m4a` | Decoded, marked lossy |
 
-Every format here decodes in the format test matrix, and every family was played end to end on real hardware (a FiiO K11, AirPods Max over USB-C and a MacBook Pro's speakers) for this release. DTS and TrueHD are checked sample for sample against FFmpeg and their sources, and the bitstream bursts against FFmpeg's S/PDIF reader. Not supported: DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
+The decoders have automated tests with generated fixtures: TrueHD output is compared sample for sample with its source, and DTS output with FFmpeg's own decoder on a real disc rip. Playback has been tested on a FiiO K11 (every rate up to 384 kHz), AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers. No multichannel DAC or AV receiver has been available yet: channel routing is covered by tests and a six-channel aggregate device, and the bitstream bursts to a receiver were checked only against FFmpeg's S/PDIF reader. Not supported: DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
 
 ## What it does
 
-- **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8, 768…). If the device can't run at that rate, Vespertine converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (768 → 384). Per-device overrides: *match source*, *device maximum* or a fixed rate.
+- **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8, 384…). If the device can't run at that rate, Vespertine converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (768 → 384). Per-device overrides: *match source*, *device maximum* or a fixed rate.
 - **Shared or exclusive.** By default Vespertine shares the device and makes it the Mac's sound output while it plays, so volume keys, Control Center and the AirPods Max Digital Crown control what you hear. Playback is still bit-perfect unless another app plays through the same device at the same time, and Vespertine says so when that happens. **Exclusive (hog) mode** is one switch away if you'd rather silence other apps on the device. The volume keys, Control Center and the Digital Crown still reach it, and the device is released after a configurable pause. The Mac's own speakers and headphone jack always play shared: exclusive access gains nothing there.
 - **Integer mode.** With exclusive access, on DACs that offer it (the FiiO K11 does), music that needs no processing reaches the DAC as 32-bit integers with no floating-point step, so 32-bit recordings are bit-perfect too.
 - **Stays on the output you chose.** Vespertine never switches your music to another device on its own. If the chosen output is missing when playback starts (AirPods Max still reconnecting after you put them back on, a DAC being replugged), it waits for it for up to a minute and plays the moment it's back. If it drops out mid-song, playback continues where it left off once it returns.
 - **Hands your DAC back.** When Vespertine quits, each device it switched goes back to the sample rate and bit depth it had before (so other apps, and tools like LosslessSwitcher, carry on where they left off), or to 44.1 kHz · 16-bit or 48 kHz · 24-bit if you prefer.
-- **AirPods Max / AirPods Max 2 over USB-C.** These are recognized as lossless 24-bit / 48 kHz devices. 48 kHz material plays bit-perfect and everything else is converted to 48 kHz. Over Bluetooth, Vespertine tells you the link is AAC.
+- **AirPods Max over USB-C.** These are recognized as lossless 24-bit / 48 kHz devices (macOS still lists them as Bluetooth, so Vespertine detects the cable itself). 48 kHz material plays bit-perfect and everything else is converted to 48 kHz. Over Bluetooth, Vespertine tells you the link is AAC. AirPods Max 2 is recognized the same way, by name, but hasn't been tested.
 - **DSD at every rate.** DSD64 to DSD512 in DSF and DSDIFF. DoP goes to DACs you mark as DoP-capable (off by default, because DoP sent to a non-DoP DAC is noise) at any rate the DAC can carry; anything else is converted to high-rate PCM.
 - **Dolby Atmos.** Dolby Digital Plus with Atmos (the format Apple Music and streaming services use) is rendered by macOS's own Atmos renderer on the output you chose: head-tracked Spatial Audio on AirPods, height channels on a multichannel output. Or, if you prefer, its 5.1/7.1 bed plays through Vespertine's own path.
 - **Dolby Digital, Dolby Digital Plus, Dolby TrueHD, DTS-HD Master Audio.** `.ac3`, `.ec3`, Dolby audio in M4A/MP4, `.dts`, `.dtshd`, `.thd` and Matroska audio (`.mka`) all play, each channel in its place. TrueHD and DTS-HD MA are lossless and can be bit-perfect. With DTS:X and TrueHD Atmos, Vespertine plays the lossless channel bed and says so; the objects need a receiver.
 - **DTS CDs.** DTS 5.1 discs and DTS-WAV files (a DTS bitstream disguised as 16-bit stereo PCM) are recognized and decoded to 5.1, including albums split by a CUE sheet, so they play in surround or as Spatial Audio on AirPods.
-- **Bitstream to an AV receiver.** Per output, Dolby Digital, Dolby Digital Plus (Atmos included, over HDMI) and DTS CDs can be sent untouched, in IEC 61937 bursts, for a receiver or soundbar to decode.
+- **Bitstream to an AV receiver.** Per output, Dolby Digital, Dolby Digital Plus (Atmos included, over HDMI) and DTS CDs can be sent untouched, in IEC 61937 bursts, for a receiver or soundbar to decode. This hasn't been tested on a real receiver yet; the bursts are validated against FFmpeg's S/PDIF reader.
 - **Stereo and surround versions.** Albums with each song in stereo and in multichannel (SACD layers, Blu-ray mixes) list each song once and play the version that suits the output: surround on multichannel outputs and with Spatial Audio, stereo on stereo DACs. Or pin it to either in Settings.
 - **Format badges.** Now Playing and album pages name the format: Dolby Atmos, Dolby TrueHD, DTS-HD Master Audio, DSD 256, Hi-Res Lossless and so on.
-- **Multichannel and Spatial Audio.** 5.0, 5.1, 7.1 and other multichannel files play everywhere: rendered with Apple's Spatial Audio (head tracked or fixed, with your personalized profile) on AirPods and Beats, sent channel-for-channel to multichannel interfaces and AV receivers (following your speaker setup, even when HDMI is left in 2-channel mode), or downmixed by layout on stereo DACs. The signal path always says which, with a live meter for every channel. **Export for Spatial Audio** turns them into binaural stereo that sounds spatial on any headphones, or multichannel ALAC for Apple devices.
-- **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, no other app is mixing into the device and the word length fits. Every other state is shown in copper with the reason.
+- **Multichannel and Spatial Audio.** 5.0, 5.1, 7.1 and other multichannel files play everywhere: rendered with Apple's Spatial Audio (head tracked or fixed, with your personalized profile) on AirPods and Beats, sent channel-for-channel to multichannel interfaces and AV receivers (following your speaker setup, even when HDMI is left in 2-channel mode), or downmixed by layout on stereo DACs. The signal path always says which, with a live meter for every channel. No multichannel DAC or receiver has been available for testing yet; routing is covered by automated tests. **Export for Spatial Audio** turns them into binaural stereo that sounds spatial on any headphones, or multichannel ALAC for Apple devices.
+- **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, no other app is mixing into the device and the word length fits. Every other state is shown in copper with the reason. In shared mode, other apps are detected by polling about once a second, and processing inside the DAC itself is outside what macOS reports ([what it checks, and what it can't see](docs/VERIFICATION.md#what-bit-perfect-doesnt-cover)).
 - **Gapless playback** across tracks that share a device format, including CUE-sheet albums split from a single file.
 - **Volume.** Vespertine uses the DAC's hardware volume when it has one. Optionally, a 64-bit dithered digital volume can be enabled; it's clearly marked as not bit-perfect.
 - **Damaged files can't take it down.** Errors thrown inside codec libraries are caught; a broken file just won't play, with a message saying why.
@@ -141,7 +141,7 @@ Every format here decodes in the format test matrix, and every family was played
 - **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
 - **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default and mounted where macOS keeps network volumes (hidden from the Finder sidebar). They heal themselves: Vespertine reconnects after sleep, network changes and server restarts, and remounts a share that has stopped answering. Shares are rescanned every half hour (never while you're playing from them), so music added to or deleted from the server shows up by itself. Indexing is quick over slow links, and playback is built for slow or busy servers. It keeps up to half a minute of audio in hand, copies the playing track to the Mac straight away, and moves playback to that copy mid-song, sample for sample, the moment it's complete, so the rest of the song no longer depends on the network. What you play is cached, with **Keep Offline** for whole albums. Passwords live in the login keychain alongside Finder's.
-- **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). Every verdict shows its evidence; results are saved, can run automatically on import, and filter the Songs view. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `vespertine-analyze` runs the same analysis next to the files and Vespertine imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
+- **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). It's a heuristic: every verdict shows its evidence, and some high-bitrate lossy files can pass as genuine ([limits](docs/ANALYSIS.md#limits)). Results are saved, can run automatically on import, and filter the Songs view. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `vespertine-analyze` runs the same analysis next to the files and Vespertine imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
 - **Live spectrum** of exactly what the DAC receives (DSD over DoP included), plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
 ## Build
@@ -262,7 +262,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how audio gets from file to
 
 ## How it's made
 
-Vespertine is designed and maintained by Alexander Szeremeta. Most of the code was written with AI coding agents (Claude Code and Codex) under his direction, as the commit history shows: he sets the behavior, the design and the acceptance tests, and every feature is verified on real hardware before it ships (a FiiO K11 at every rate up to 384 kHz, AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers). Reports from other DACs, receivers and multichannel interfaces are very welcome: [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
+Vespertine is designed and maintained by Alexander Szeremeta. Most of the code was written with AI coding agents (Claude Code and Codex) under his direction, as the commit history shows: he sets the behavior, the design and the acceptance tests, and checks the audio paths on real hardware (a FiiO K11 at every rate up to 384 kHz, AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers). No multichannel DAC or AV receiver has been available, so reports from other DACs, receivers and multichannel interfaces are especially welcome: [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
 
 ## License
 
