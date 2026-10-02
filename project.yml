@@ -24,6 +24,11 @@ targets:
     sources:
       - path: App/Sources
       - path: App/Resources
+      # The license texts travel inside the app (Contents/Resources), as the GPL and the bundled components' licenses ask.
+      - path: LICENSE
+        buildPhase: resources
+      - path: THIRD-PARTY-NOTICES.md
+        buildPhase: resources
     dependencies:
       - package: VespertineKit
         product: VespertineAudio
@@ -39,8 +44,10 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.music
         LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
-        NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL v3."
-        NSAppleEventsUsageDescription: "Vespertine responds to media keys and Now Playing controls."
+        NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
+        # Network shares are probed and mounted over the local network (or a VPN); without this string
+        # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
+        NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
         # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.
         SUFeedURL: https://github.com/szeremeta1/Vespertine/releases/latest/download/appcast.xml
         SUPublicEDKey: 5KxX9Zdz/fXEO1SpPUjZWxkNWiIzSMzMXava8UpHeNw=
