@@ -3,8 +3,8 @@
 # Renders the launch trailer in every aspect and makes the masters:
 #   1. trailer-stage renders each aspect at 60 fps (real Liquid Glass, streamed from a window that stays
 #      behind your other windows, so the Mac stays usable while it runs);
-#   2. the master smooths the capture's 8-bit gradient steps, adds the music bed at −14 LUFS and is
-#      encoded on the hardware ProRes engine.
+#   2. the master smooths the capture's 8-bit gradient steps, adds the score (score.py: original music, synthesized,
+#      at −14 LUFS) and is encoded on the hardware ProRes engine.
 # Usage: render.sh [--masters-only] [aspect…]   (default: wide square vertical). The screen must be unlocked.
 #   --masters-only remakes the masters from existing renders.
 set -euo pipefail
@@ -12,7 +12,6 @@ here=${0:A:h}
 repo=${here:h:h:h}
 out=~/Movies/Vespertine/Trailer
 raw=${VESPERTINE_TRAILER_RAW:-$out/raw}
-music="$out/Starlight Lounge (bed).wav"
 render=1
 if [[ ${1:-} == --masters-only ]]; then render=0; shift; fi
 if (( $# )); then aspects=($@); else aspects=(wide square vertical); fi
@@ -20,10 +19,12 @@ mkdir -p "$out/renders" "$out/masters" "$out/picture"
 
 (( render )) && (cd "$here" && swift build -c release >/dev/null)
 
-# The bed at −14 LUFS integrated (it measures −12.1; true peak stays under −3 dBTP).
-bed="$out/renders/music-14LUFS.wav"
-if [[ ! -e $bed ]]; then
-  ffmpeg -loglevel error -y -i "$music" -af "volume=-1.9dB" -c:a pcm_s24le "$bed"
+# The score: Vespertine's own music, synthesized by score.py in time with this cut, already at −14 LUFS integrated
+# with true peaks under −1 dBTP. Remade whenever score.py changes. It needs numpy, scipy, soundfile and pyloudnorm
+# (VESPERTINE_PYTHON can name a Python that has them).
+bed="$out/renders/score.wav"
+if [[ ! -e $bed || $here/score.py -nt $bed ]]; then
+  "${VESPERTINE_PYTHON:-python3}" "$here/score.py" "$bed"
 fi
 
 # The capture is 8-bit, so the dark brass glows step in single levels and show as rings. Two passes of

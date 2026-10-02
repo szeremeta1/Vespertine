@@ -12,7 +12,7 @@ The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-
 
 ## Launch trailer
 
-A 36.6 s trailer in 16:9 and 1:1, cut to "Starlight Lounge" from iMovie's royalty-free music (Apple licenses it for use in your own projects).
+A 36.6 s trailer in 16:9 and 1:1, with an original score: synthesized from scratch by `scripts/brand/stage/score.py` (no samples or loops), so it's Vespertine's own and free to use with the trailer anywhere.
 - **Scenes:** `scripts/brand/stage` (`render.sh`, `patch.sh`, `deliver.sh`) renders them as ProRes with half-second handles. They're built from window-only screen recordings of the app on the maker's library: ScreenCaptureKit, only the Vespertine window, no other windows or notifications.
 - **Edit:** assembled in Final Cut Pro from an FCPXML, with cuts on the bar lines and 16-frame dissolves.
 - **Delivery:** H.264 at −14 LUFS.
