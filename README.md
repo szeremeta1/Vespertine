@@ -26,7 +26,7 @@
 <br>
 
 <p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; DSD64 over DoP from an SACD; an SACD album listing stereo and 5.1 versions once; a 5.1 SACD as head-tracked Spatial Audio on AirPods Max; and a file flagged for synthetic high frequencies">
+  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; DSD64 over DoP from an SACD; an SACD album listing stereo and 5.1 versions once; a 5.1 SACD as head-tracked Spatial Audio on AirPods Max; and a 24-bit / 192 kHz “remaster” flagged as a likely lossy origin">
 </p>
 
 <p align="center"><sub>Vespertine was called Nocturne until version 0.6.0.</sub></p>
@@ -76,11 +76,11 @@ When an album has every song in stereo and in 5.1, like an SACD's two layers, Ve
 ![Pink Floyd's Dark Side of the Moon SACD: each song listed once as DSD64 5.1, marked "+ STEREO", playing as Spatial Audio on AirPods Max](docs/screenshots/stereo-and-surround-versions.png)
 
 ### Flags fake hi-res
-Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the evidence shown. Only zero padding is exact; the rest is read from the spectrum and flagged as a question, with what else could explain it: some high-bitrate lossy files pass as genuine, and steep mastering filters, FM sources and tape or vinyl transfers can look suspicious ([how it works, and where it misses](docs/ANALYSIS.md#limits)). Here a 24/48 file shows a steep step at 16.3 kHz with a flat shelf above it that follows the music, the pattern of high frequencies synthesized over a lossy source.
+Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the evidence shown. Only zero padding is exact; the rest is read from the spectrum and flagged as a question, with what else could explain it: some high-bitrate lossy files pass as genuine, and steep mastering filters, FM sources and tape or vinyl transfers can look suspicious ([how it works, and where it misses](docs/ANALYSIS.md#limits)). Here a 24-bit / 192 kHz “remaster” stops dead at 19 kHz, with next to nothing in the 77 kHz above it: the steep cutoff of an MP3 or AAC encode.
 
-![The Analysis tab flagging a track as having synthetic high frequencies, with its long-term spectrum](docs/screenshots/fake-hi-res-detection.png)
+![The Analysis tab flagging a 24-bit / 192 kHz “remaster” as a likely lossy origin: its long-term spectrum stops at 19 kHz](docs/screenshots/fake-hi-res-detection.png)
 
-<sub>The file in this screenshot is an unofficial “enhanced” 24/48 copy from the developer's own collection, not an official release. To see a verdict on files you can regenerate, [make a fake of your own](docs/ANALYSIS.md#reproducing).</sub>
+<sub>The file in this screenshot is a deliberate fake: the trailer's own music, encoded to MP3 and upsampled to 24/192 under a made-up band name. To see a verdict on files you can regenerate, [make a fake of your own](docs/ANALYSIS.md#reproducing).</sub>
 
 ### Browse like Apple Music, filter like an audiophile
 Albums, artists, songs and **genres**, with the same filters on every page: the format chips combine ("FLAC, 24-bit, 88.2 kHz and up"), and the Filters panel adds genre, year, artist, exact sample rate, bit depth, channels, analysis verdict and source, each with how many albums or songs it leaves. Artists and genres follow the filter, each page remembers its own, and every page plays or **shuffles** what it shows: a genre, an artist, the 1970s, your 5.1 albums. Messy tags are handled: "Hip-Hop" and "hip hop" are one genre, multi-genre tags count under each, and localized genre names are merged.
@@ -183,7 +183,7 @@ scripts/build-dts-decoder.sh
 
 ## Try it without your own music
 
-`vespertine-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album, a deliberately fake 24-bit track and an upsampled "hi-res" album:
+`vespertine-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album and a 24-bit album with one track that is really 16-bit:
 
 ```bash
 cd Packages/VespertineKit && swift run -c release vespertine-demo ~/Desktop/VespertineDemo

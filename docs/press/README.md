@@ -10,6 +10,8 @@ Each image covers one feature at three sizes:
 
 The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd` and `fake-hi-res`. They're built from `docs/screenshots` by `scripts/brand/build.sh`, and follow the [brand guide](../brand/brand-guide.pdf).
 
+The fake hi-res screenshot and trailer scene show a deliberate fake, so no real release is called one: the trailer's own score, encoded to MP3 at 192 kb/s, decoded and upsampled to 24-bit / 192 kHz, and credited to a made-up band (The Lantern Lounge Orchestra, *After Midnight (24/192 Remaster)*).
+
 ## Launch trailer
 
 A 36.6 s trailer in 16:9 and 1:1, with an original score: synthesized from scratch by `scripts/brand/stage/score.py` (no samples or loops), so it's Vespertine's own and free to use with the trailer anywhere.
