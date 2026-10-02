@@ -48,7 +48,10 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top"><img src="assets/logo.svg" alt="Vespertine" width="149" height="44"></a>
-    <nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" hidden>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path class="icon-menu" d="M3 5.5h12M3 9h12M3 12.5h12"/><path class="icon-close" d="M4.5 4.5l9 9M13.5 4.5l-9 9"/></svg>
+    </button>
+    <nav id="site-nav">
       <a href="#trailer">Trailer</a>
       <a href="#features">Features</a>
       <a href="#formats">Formats</a>
@@ -242,31 +245,34 @@
         <h2>How it stacks up.</h2>
         <p>Against the player your Mac came with and the two paid audiophile favourites. Vespertine doesn't stream or do room correction; if you need those, the paid apps are worth it. If you own your music, it's the one to try.</p>
       </div>
-      <div class="compare">
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th class="us">Vespertine<small>Free · open source</small></th>
-              <th>Apple Music<small>Included with macOS</small></th>
-              <th>Audirvana Studio<small>$79.99 a year</small></th>
-              <th>Roon<small>$149.88 a year</small></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><th>Plays FLAC</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Switches the DAC to each track's sample rate</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Exclusive (hog) mode</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Says when playback is bit-perfect</th><td class="us y">Yes</td><td>No</td><td class="p">Shows the DAC format</td><td class="y">Yes</td></tr>
-            <tr><th>DSD</th><td class="us y">DSD64–512</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Local multichannel</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Local Dolby Atmos files</th><td class="us y">Yes</td><td class="p">Catalog only</td><td>No</td><td>No</td></tr>
-            <tr><th>Fake hi-res detection</th><td class="us y">Yes</td><td>No</td><td class="p">AudioScan (no DSD or multichannel)</td><td>No</td></tr>
-            <tr><th>Streaming (Qobuz, TIDAL)</th><td class="us">No</td><td class="p">Apple Music</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>EQ and room correction</th><td class="us">No</td><td class="p">Basic EQ</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-            <tr><th>Source code</th><td class="us y">Open (GPL-3.0)</td><td>Closed</td><td>Closed</td><td>Closed</td></tr>
-          </tbody>
-        </table>
+      <div class="compare-wrap">
+        <p class="compare-hint" aria-hidden="true">Scroll for more →</p>
+        <div class="compare" role="region" aria-label="Comparison table" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th class="us">Vespertine<small>Free · open source</small></th>
+                <th>Apple Music<small>Included with macOS</small></th>
+                <th>Audirvana Studio<small>$79.99 a year</small></th>
+                <th>Roon<small>$149.88 a year</small></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Plays FLAC</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Switches the DAC to each track's sample rate</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Exclusive (hog) mode</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Says when playback is bit-perfect</th><td class="us y">Yes</td><td>No</td><td class="p">Shows the DAC format</td><td class="y">Yes</td></tr>
+              <tr><th>DSD</th><td class="us y">DSD64–512</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Local multichannel</th><td class="us y">Yes</td><td>No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Local Dolby Atmos files</th><td class="us y">Yes</td><td class="p">Catalog only</td><td>No</td><td>No</td></tr>
+              <tr><th>Fake hi-res detection</th><td class="us y">Yes</td><td>No</td><td class="p">AudioScan (no DSD or multichannel)</td><td>No</td></tr>
+              <tr><th>Streaming (Qobuz, TIDAL)</th><td class="us">No</td><td class="p">Apple Music</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>EQ and room correction</th><td class="us">No</td><td class="p">Basic EQ</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+              <tr><th>Source code</th><td class="us y">Open (GPL-3.0)</td><td>Closed</td><td>Closed</td><td>Closed</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <p class="compare-note">Checked September 2026 from each product's own pricing and support pages. Spotted something out of date? <a href="https://github.com/szeremeta1/Vespertine/issues">Open an issue</a>.</p>
     </div>
@@ -356,6 +362,34 @@
       document.querySelectorAll(".js-version").forEach(s => { s.textContent = "v" + version + " · " + mb + " MB · GPL-3.0"; });
     })
     .catch(() => {});
+</script>
+<script>
+  // Mobile menu: below 900 px the button shows and hides the nav links. A link, Escape or a click elsewhere closes it.
+  (() => {
+    const button = document.querySelector(".nav-toggle"), nav = document.getElementById("site-nav");
+    const setOpen = open => { button.setAttribute("aria-expanded", open); nav.classList.toggle("open", open); };
+    button.hidden = false;
+    button.addEventListener("click", () => setOpen(button.getAttribute("aria-expanded") !== "true"));
+    nav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", e => { if (!e.target.closest("header.nav")) setOpen(false); });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && button.getAttribute("aria-expanded") === "true") { setOpen(false); button.focus(); }
+    });
+  })();
+</script>
+<script>
+  // Comparison table: when it's wider than the screen, mark which edges have more columns (for the fade, the
+  // shadow on the row labels and the scroll hint).
+  (() => {
+    const wrap = document.querySelector(".compare-wrap"), table = wrap.querySelector(".compare");
+    const update = () => {
+      const max = table.scrollWidth - table.clientWidth;
+      wrap.classList.toggle("more-left", max > 1 && table.scrollLeft > 1);
+      wrap.classList.toggle("more-right", max > 1 && table.scrollLeft < max - 1);
+    };
+    table.addEventListener("scroll", update, { passive: true });
+    new ResizeObserver(update).observe(table);
+  })();
 </script>
 </body>
 </html>

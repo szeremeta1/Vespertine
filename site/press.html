@@ -26,7 +26,10 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="./"><img src="assets/logo.svg" alt="Vespertine" width="149" height="44"></a>
-    <nav><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" hidden>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path class="icon-menu" d="M3 5.5h12M3 9h12M3 12.5h12"/><path class="icon-close" d="M4.5 4.5l9 9M13.5 4.5l-9 9"/></svg>
+    </button>
+    <nav id="site-nav"><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
     <a class="btn btn-brass btn-small js-download" href="https://github.com/szeremeta1/Vespertine/releases/latest">Download</a>
   </div>
 </header>
@@ -182,6 +185,20 @@
       if (dmg) document.querySelectorAll(".js-download").forEach(a => { a.href = dmg.browser_download_url; });
     })
     .catch(() => {});
+</script>
+<script>
+  // Mobile menu: below 900 px the button shows and hides the nav links. A link, Escape or a click elsewhere closes it.
+  (() => {
+    const button = document.querySelector(".nav-toggle"), nav = document.getElementById("site-nav");
+    const setOpen = open => { button.setAttribute("aria-expanded", open); nav.classList.toggle("open", open); };
+    button.hidden = false;
+    button.addEventListener("click", () => setOpen(button.getAttribute("aria-expanded") !== "true"));
+    nav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", e => { if (!e.target.closest("header.nav")) setOpen(false); });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && button.getAttribute("aria-expanded") === "true") { setOpen(false); button.focus(); }
+    });
+  })();
 </script>
 </body>
 </html>
