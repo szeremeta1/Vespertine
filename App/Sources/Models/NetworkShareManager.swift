@@ -224,19 +224,16 @@ final class NetworkShareManager {
         defer { connecting.remove(id) }
         if !status(of: source).isConnected { status[id] = .connecting }
         do {
-            var password: String?
-            if let user = share.user, NetworkVolume.existingMount(for: share) == nil {
+            let root = try await mountedRoot(share, readOnly: !source.isWritable) {
+                guard let user = share.user else { return nil }
                 let found = NetworkCredentials.lookup(share)
-                password = found.password
                 // Without a password NetFS fails locally with an authentication error; say what's really wrong.
-                guard password != nil else {
+                guard let password = found.password else {
                     shareLog.error("share \(id, privacy: .public): no saved password (keychain: \(found.status, privacy: .public))")
                     throw NetworkShareError.passwordMissing(account: "\(user)@\(share.host)")
                 }
+                return password
             }
-            let mount = try await NetworkVolume.mount(share, password: password, in: mountBase, readOnly: !source.isWritable)
-            let root = share.root(at: mount).standardizedFileURL
-            guard await NetworkVolume.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
             try library.database.relinkSource(id, to: root.path)
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
@@ -263,14 +260,29 @@ final class NetworkShareManager {
         }
     }
 
+    /// Mounts `share` (or adopts its existing mount) and returns the folder to index. An adopted mount that no longer
+    /// answers outlived a server restart or a dropped connection; reusing it would fail the same way at every try, so
+    /// Vespertine's own is dropped and mounted afresh, once. One Vespertine didn't make (Finder's) is left alone.
+    private func mountedRoot(_ share: NetworkShare, readOnly: Bool, password: () throws -> String?) async throws -> URL {
+        let adopted = NetworkVolume.existingMount(for: share)
+        let mount = try await NetworkVolume.mount(share, password: adopted == nil ? password() : nil, in: mountBase, readOnly: readOnly)
+        let root = share.root(at: mount).standardizedFileURL
+        if await NetworkVolume.isDirectory(root) { return root }
+        guard let adopted, await !NetworkVolume.isResponsive(adopted) else { throw NetworkShareError.folderNotFound(share.subpath) }
+        await NetworkVolume.forceUnmount(adopted, ownedBy: mountBase)
+        guard NetworkVolume.existingMount(for: share) == nil else { throw NetworkShareError.mountNotResponding }
+        shareLog.notice("\(share.host, privacy: .public)/\(share.share, privacy: .public): the old mount didn't answer; mounting again")
+        let fresh = share.root(at: try await NetworkVolume.mount(share, password: password(), in: mountBase, readOnly: readOnly)).standardizedFileURL
+        guard await NetworkVolume.isDirectory(fresh) else { throw NetworkShareError.folderNotFound(share.subpath) }
+        return fresh
+    }
+
     /// Connects to a share for the first time and adds it to the library.
     /// A blank password uses the one saved in the keychain (by Vespertine or by Finder).
     func add(_ share: NetworkShare, password: String?, remember: Bool, name: String?, writable: Bool) async throws {
         let typed = password.flatMap { $0.isEmpty ? nil : $0 }
         let secret = typed ?? (share.user == nil ? nil : NetworkCredentials.password(for: share))
-        let mount = try await NetworkVolume.mount(share, password: secret, in: mountBase, readOnly: !writable)
-        let root = share.root(at: mount).standardizedFileURL
-        guard await NetworkVolume.isDirectory(root) else { throw NetworkShareError.folderNotFound(share.subpath) }
+        let root = try await mountedRoot(share, readOnly: !writable) { secret }
         if remember, let typed { NetworkCredentials.save(typed, for: share) }
 
         if let existing = sources.first(where: { $0.remoteURL == share.urlString }) {
