@@ -26,9 +26,8 @@ Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the 
   - Either Vespertine has the device to itself (exclusive "hog" mode),
   - or no other app is playing to it at the same moment.
 - **The device class can be bit-perfect at all.**
-  - Bluetooth devices (AirPods included) never can, because macOS re-encodes the audio for the radio link.
-  - AirPlay can't either.
-  - For these, Vespertine says what it does instead: resampled, spatialised, and so on.
+  - Bluetooth devices never can, because macOS re-encodes the audio for the radio link. AirPlay can't either. For these, Vespertine says what it does instead: resampled, spatialised, and so on.
+  - The one exception is AirPods Max with the USB-C cable connected. macOS keeps listing them as a Bluetooth device, but the audio runs over the cable as lossless 24-bit / 48 kHz. Vespertine detects the cable through the IORegistry (`DeviceProfile.swift`) and treats 48 kHz files as bit-perfect on that device. This is the one claim on this page that a loopback test can't confirm, because AirPods have no digital output: it rests on Apple's description of the USB-C path, and on what the app reads back.
 
 If any condition fails, the badge says what changed instead of BIT-PERFECT. DSD over DoP and Dolby/DTS bitstream have their own badges and their own conditions (`NATIVE DSD · DoP`, `BITSTREAM · …`).
 
@@ -111,8 +110,9 @@ A bit-perfect path nulls to digital silence, every sample exactly zero. Any resi
 
 - **It is a statement about the samples, not the sound.** It says nothing about the DAC's analogue output quality.
 - **macOS limits.**
-  - Bluetooth, AirPlay and spatial audio are never bit-perfect, and Vespertine says so.
-  - In shared mode, another app playing to the same device gets mixed in. Vespertine detects this and drops the badge. Exclusive mode prevents it.
+  - Bluetooth links, AirPlay and spatial audio are never bit-perfect, and Vespertine says so. (AirPods Max on the USB-C cable are not on the Bluetooth link; see above.)
+  - In shared mode, another app playing to the same device gets mixed in. Vespertine looks for this about once a second, through Core Audio's list of processes that are playing to the device (`DeviceControl.otherProcessesPlaying`), and drops the badge when it finds one. A sound shorter than that can slip past, and so can anything Core Audio doesn't list. Exclusive mode prevents mixing altogether.
+- **What happens inside the device.** macOS tells an app the format it sends to a device, not what the device does with it. A DAC's own hardware volume is not counted as changing the samples (that is the point of using it), and any DSP in the DAC, the headphones or the speakers is invisible to Vespertine.
 - **The float path.** Files wider than 24 bits are rounded unless integer mode is on and the DAC offers a 32-bit integer format.
 
 If your measurement disagrees with what Vespertine shows, please open an issue with:
