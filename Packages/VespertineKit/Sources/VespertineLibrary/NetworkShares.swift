@@ -138,6 +138,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
     case notPermitted
     case shareNotFound(String)
     case folderNotFound(String)
+    /// Mounted, but the mount no longer answers, and it isn't one Vespertine made (so it isn't dropped).
+    case mountNotResponding
     case cancelled
     case failed(code: Int32)
 
@@ -156,7 +158,9 @@ public enum NetworkShareError: LocalizedError, Equatable {
         case .shareNotFound(let share):
             "The server has no share named “\(share)”."
         case .folderNotFound(let folder):
-            "Connected, but there’s no folder “\(folder)” in that share."
+            folder.isEmpty ? "Connected, but the share’s contents can’t be read." : "Connected, but there’s no folder “\(folder)” in that share."
+        case .mountNotResponding:
+            "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect."
         case .cancelled:
             "Connecting was cancelled."
         case .failed(let code):
