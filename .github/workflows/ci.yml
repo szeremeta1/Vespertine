@@ -75,7 +75,8 @@ jobs:
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
             -derivedDataPath build/CI ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build
           app=build/CI/Build/Products/Release/Vespertine.app
-          lipo -verify_arch "$app/Contents/MacOS/Vespertine" arm64 x86_64
+          # Current lipo verifies one architecture per call (two make it read the second as an input file).
+          for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/Vespertine" -verify_arch $arch; done
           test -f "$app/Contents/Resources/LICENSE" && test -f "$app/Contents/Resources/THIRD-PARTY-NOTICES.md"
 
   realtime-c:
