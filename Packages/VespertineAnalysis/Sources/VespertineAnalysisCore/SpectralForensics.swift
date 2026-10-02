@@ -17,13 +17,13 @@ public struct SpectralForensics: Sendable, Hashable, Codable {
     public init(cliffHz: Double?, cliffDropDB: Double, cliffConsistency: Double, belowDB: Double, aboveDB: Double, floorDB: Double,
                 extensionHz: Double, extensionSlope: Double, holeRatio: Double, contentHz: Double, framesAnalyzed: Int,
                 shelfHz: Double? = nil, shelfStepDB: Double = 0, shelfEndHz: Double = 0, shelfSlope: Double = 0,
-                shelfAboveFloorDB: Double = 0, shelfConsistency: Double = 0) {
+                shelfAboveFloorDB: Double = 0, shelfConsistency: Double = 0, shelfTracking: Double? = nil) {
         self.cliffHz = cliffHz; self.cliffDropDB = cliffDropDB; self.cliffConsistency = cliffConsistency
         self.belowDB = belowDB; self.aboveDB = aboveDB; self.floorDB = floorDB
         self.extensionHz = extensionHz; self.extensionSlope = extensionSlope; self.holeRatio = holeRatio
         self.contentHz = contentHz; self.framesAnalyzed = framesAnalyzed
         self.shelfHz = shelfHz; self.shelfStepDB = shelfStepDB; self.shelfEndHz = shelfEndHz; self.shelfSlope = shelfSlope
-        self.shelfAboveFloorDB = shelfAboveFloorDB; self.shelfConsistency = shelfConsistency
+        self.shelfAboveFloorDB = shelfAboveFloorDB; self.shelfConsistency = shelfConsistency; self.shelfTracking = shelfTracking
     }
 
     /// Frequency of the steepest spectral cliff, if one was found.
@@ -52,6 +52,10 @@ public struct SpectralForensics: Sendable, Hashable, Codable {
     public var shelfSlope: Double = 0
     public var shelfAboveFloorDB: Double = 0
     public var shelfConsistency: Double = 0
+    /// Frame-to-frame correlation of the shelf's level with the music just below the step (−1…1).
+    /// Generated highs (SBR, AI) follow the music; tape hiss or vinyl noise added later stays put.
+    /// nil when not measured (no shelf, or results from before it existed).
+    public var shelfTracking: Double? = nil
 }
 
 /// Accumulates per-frame spectra while a file is decoded, then measures it.
@@ -235,6 +239,30 @@ final class ForensicsAccumulator {
                              slope: den > 0 ? num / den : 0, above: my - floor, consistency: stepConsistency(c))
             if shelf == nil || candidate.step > shelf!.step { shelf = candidate }
         }
+        // Does the shelf rise and fall with the music below the step? Pearson correlation of the two levels
+        // over the frames with content below it. A shelf that doesn't move (hiss, surface noise) scores ~0.
+        var tracking: Double?
+        if let shelf {
+            let c = Int((shelf.hz / bandHz).rounded()), end = Int((shelf.end / bandHz).rounded())
+            var xs: [Double] = [], ys: [Double] = []
+            for i in use {
+                let f = frames[i]
+                func fm(_ a: Int, _ b: Int) -> Double {
+                    let lo = max(0, a), hi = min(bandCount, b)
+                    return hi > lo ? Double(f[lo..<hi].reduce(0, +)) / Double(hi - lo) : -160
+                }
+                guard fm(c - 6, c - 2) > floor + 15 else { continue }
+                xs.append(fm(c - 20, c - 2))
+                ys.append(fm(c + 3, end - 2))
+            }
+            tracking = 0 // too few frames to show that it follows the music
+            if xs.count >= 8 {
+                let mx = xs.reduce(0, +) / Double(xs.count), my = ys.reduce(0, +) / Double(ys.count)
+                var sxy = 0.0, sxx = 0.0, syy = 0.0
+                for (x, y) in zip(xs, ys) { sxy += (x - mx) * (y - my); sxx += (x - mx) * (x - mx); syy += (y - my) * (y - my) }
+                tracking = sxx > 0 && syy > 0 ? sxy / (sxx * syy).squareRoot() : 0
+            }
+        }
 
         // Highest frequency with meaningful content.
         var content = 0.0
@@ -245,6 +273,7 @@ final class ForensicsAccumulator {
                                  floorDB: floor, extensionHz: extensionHz, extensionSlope: slope, holeRatio: holeRatio,
                                  contentHz: content, framesAnalyzed: frames.count,
                                  shelfHz: shelf?.hz, shelfStepDB: shelf?.step ?? 0, shelfEndHz: shelf?.end ?? 0,
-                                 shelfSlope: shelf?.slope ?? 0, shelfAboveFloorDB: shelf?.above ?? 0, shelfConsistency: shelf?.consistency ?? 0)
+                                 shelfSlope: shelf?.slope ?? 0, shelfAboveFloorDB: shelf?.above ?? 0, shelfConsistency: shelf?.consistency ?? 0,
+                                 shelfTracking: tracking)
     }
 }

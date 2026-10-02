@@ -12,11 +12,12 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
         case upsampled          // band-limited far below Nyquist
         case possibleLossyOrigin
         case bandwidthExtended  // high frequencies synthesized above a lossy cutoff (SBR, AI "enhanced")
-        case notApplicable      // lossy / DSD source
+        case notApplicable      // lossy / DSD source, or nothing to judge (silence, too short, nothing measurable)
     }
 
     /// Bumped when the analysis learns something new, so older results can be refreshed.
-    public static let currentVersion = 2
+    /// 3: shelves must follow the music to count as synthetic, hedged wording, capped spectral confidence.
+    public static let currentVersion = 3
 
     public var claimedBitDepth: Int?
     public var effectiveBitDepth: Int?
@@ -75,6 +76,7 @@ public final class AnalysisAccumulator {
     public let claimedBitDepth: Int?
     private let claimed: Int
     private let scale: Double
+    private let clipLevel: Float
     private let limit: Double
 
     private let fftSize = 8192
@@ -99,6 +101,8 @@ public final class AnalysisAccumulator {
         self.claimedBitDepth = claimedBitDepth
         claimed = claimedBitDepth ?? 24
         scale = Double(1 << (max(1, min(claimed, 24)) - 1))
+        // Positive full scale is one step below 1 (32767/32768 in a 16-bit file), so count from there.
+        clipLevel = Float(min(0.99999, 1 - 1 / scale))
         limit = max(0, maxSeconds) * sampleRate
         analyzer = SpectrumAnalyzer(size: fftSize, forcePortable: forcePortableFFT)
         spectrumSum = [Double](repeating: 0, count: fftSize / 2)
@@ -137,7 +141,7 @@ public final class AnalysisAccumulator {
                     guard s.isFinite else { throw AnalysisError.invalidSample }
                     let a = abs(s)
                     if a > peak { peak = a }
-                    if a >= 0.99999 { clipped += 1 }
+                    if a >= clipLevel { clipped += 1 }
                     let integer = Double(s) * scale
                     orBits |= Int32(max(Double(Int32.min), min(Double(Int32.max), integer.rounded())))
                     sum += s
@@ -160,12 +164,11 @@ public final class AnalysisAccumulator {
 
     /// Measures everything added so far and judges it.
     public func finish() -> FileAnalysis {
-        // Effective bit depth: trailing zero bits shared by every sample.
+        // Effective bit depth: trailing zero bits shared by every sample. Only against a known word length:
+        // judged against an assumed one, a 16-bit file would read as padded.
         var effective: Int? = nil
-        if claimed <= 24, orBits != 0 {
-            effective = min(claimed, 24) - Int(orBits.trailingZeroBitCount)
-        } else if claimed <= 24 {
-            effective = 0
+        if claimedBitDepth != nil, claimed <= 24 {
+            effective = orBits != 0 ? min(claimed, 24) - Int(orBits.trailingZeroBitCount) : 0
         }
 
         // Long-term spectrum and bandwidth.
@@ -189,6 +192,24 @@ public final class AnalysisAccumulator {
                                 secondsAnalyzed: seconds, forensics: measured, version: FileAnalysis.currentVersion, confidence: 0)
         }
         let judged = FileAnalyzer.judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: sampleRate)
+        // Too little to judge the spectrum on: a very short file, or nothing that stands out from the floor (very quiet,
+        // or channels that cancel when mixed to mono). Zero padding is exact and still reported; nothing else is.
+        let minimumFrames = 6
+        if judged.verdict != .paddedBitDepth, measured.framesAnalyzed < minimumFrames || measured.contentHz == 0 {
+            let reason = measured.framesAnalyzed < minimumFrames
+                ? "Too short for the spectral checks (they need a couple of seconds of audio), so the result is inconclusive."
+                : "Nothing in the spectrum stands out from the noise floor (very quiet, or the channels cancel when mixed to mono), so the spectral checks are inconclusive."
+            let bits: String
+            if let effective, effective > 0 {
+                bits = effective >= claimed ? " No zero padding: all \(claimed) bits are in use." : " No zero padding: \(effective) of \(claimed) bits are in use."
+            } else {
+                bits = " Word length not checked."
+            }
+            return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective, sampleRate: sampleRate,
+                                bandwidthHz: 0, peakDBFS: 20 * log10(Double(peak)), clippedSamples: clipped, verdict: .notApplicable,
+                                summary: reason + bits, spectrum: spectrum, secondsAnalyzed: seconds, forensics: measured,
+                                version: FileAnalysis.currentVersion, confidence: 0)
+        }
         // The display bandwidth follows the forensic measurement (robust to faint sparse junk above a cutoff).
         return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective, sampleRate: sampleRate,
                             bandwidthHz: judged.bandwidth ?? bandwidth, peakDBFS: 20 * log10(Double(peak)),
@@ -199,6 +220,13 @@ public final class AnalysisAccumulator {
 }
 
 public enum FileAnalyzer {
+    /// The most a spectral verdict's confidence can reach. The steep low-pass that marks a codec is also left by
+    /// steep mastering and anti-alias filters, FM sources and band-limited historical masters, so a spectrum
+    /// alone never earns the "high confidence" of an exact finding such as zero padding.
+    public static let spectralConfidenceCap = 0.75
+    /// A shelf counts as generated only when its level follows the music below the step this closely.
+    public static let shelfTrackingThreshold = 0.5
+
     /// Verdict from the measurements. Thresholds are calibrated on genuine CD and hi-res masters
     /// against the same audio passed through MP3 (128/320/V0), AAC (128/256), Opus (96/160),
     /// HE-AAC (SBR), 44.1 kHz upsampling and 16-bit padding (see docs/ANALYSIS.md). Genuine CD
@@ -207,54 +235,82 @@ public enum FileAnalyzer {
     public static func judge(forensics f: SpectralForensics, claimedBits: Int, effectiveBits: Int?, sampleRate: Double)
         -> (verdict: FileAnalysis.Verdict, summary: String, confidence: Double, bandwidth: Double?) {
         func khz(_ hz: Double) -> String { String(format: "%.1f", hz / 1000) }
+        func percent(_ x: Double) -> String { "\(Int((x * 100).rounded()))%" }
         if let effectiveBits, effectiveBits > 0, effectiveBits < claimedBits - 1 {
             return (.paddedBitDepth, "\(claimedBits)-bit file, but only \(effectiveBits) bits carry audio (zero-padded).", 1, nil)
         }
+        // Below 44.1 kHz a file's own anti-alias filter falls in the codec zone: the top tenth of its band is that
+        // filter, not a codec wall (a genuine 32 kHz master cuts off near 15 kHz).
+        func ownFilter(_ hz: Double) -> Bool { sampleRate < 44_100 && hz >= 0.9 * sampleRate / 2 }
         // Codec wall: a steep, frame-to-frame low-pass below the anti-alias zone. A lower step counts
         // too when a steeper wall sits above it (a lossy file later upsampled or extended).
-        var wall: Double?
+        var wall: (hz: Double, drop: Double, consistency: Double)?
         var wallConfidence = 0.0
+        var cdZoneWall = false
         let hiRes = sampleRate >= 88_200
-        if let hz = f.cliffHz, hz < 19_600, f.cliffDropDB >= 15, f.cliffConsistency >= 0.5 {
-            wall = hz
-            wallConfidence = min(1, 0.5 + (f.cliffDropDB - 15) / 40 + (f.cliffConsistency - 0.5) / 2)
-        } else if let hz = f.shelfHz, hz < 19_600, f.shelfStepDB >= 15, f.shelfConsistency >= 0.6 {
-            wall = hz
-            wallConfidence = min(1, 0.5 + (f.shelfStepDB - 15) / 40 + (f.shelfConsistency - 0.6) / 2)
+        if let hz = f.cliffHz, hz < 19_600, !ownFilter(hz), f.cliffDropDB >= 15, f.cliffConsistency >= 0.5 {
+            wall = (hz, f.cliffDropDB, f.cliffConsistency)
+            wallConfidence = min(spectralConfidenceCap, 0.5 + (f.cliffDropDB - 15) / 40 + (f.cliffConsistency - 0.5) / 2)
+        } else if let hz = f.shelfHz, hz < 19_600, !ownFilter(hz), f.shelfStepDB >= 15, f.shelfConsistency >= 0.6 {
+            wall = (hz, f.shelfStepDB, f.shelfConsistency)
+            wallConfidence = min(spectralConfidenceCap, 0.5 + (f.shelfStepDB - 15) / 40 + (f.shelfConsistency - 0.6) / 2)
         } else if !hiRes, let hz = f.cliffHz, hz >= 19_600, hz < 20_700, f.cliffDropDB >= 22, f.cliffConsistency >= 0.85 {
             // Lossy encoders' 20 kHz-class low-passes sit at 19.9–20.6 kHz (MP3 320 ≈ 20.0, Opus 20.3,
             // HE-AAC 20.4–20.6); steep genuine CD mastering filters measured at 21.1 kHz and up.
             // In hi-res files this zone means "made from a 44.1/48 kHz file" (reported as upsampled below).
-            wall = hz
-            wallConfidence = min(1, 0.5 + (f.cliffDropDB - 22) / 40 + (f.cliffConsistency - 0.85))
+            // A genuine CD's own filter can sit here too (calibration: 20.4–21.3 kHz), so this is never more than possible.
+            wall = (hz, f.cliffDropDB, f.cliffConsistency)
+            wallConfidence = min(0.55, 0.5 + (f.cliffDropDB - 22) / 40 + (f.cliffConsistency - 0.85))
+            cdZoneWall = true
         }
-        // Synthetic high frequencies: a flat shelf of real content above a lower step.
-        if let shelf = f.shelfHz, shelf <= 20_500, f.shelfStepDB >= 10, f.shelfSlope >= -2.5, f.shelfAboveFloorDB >= 10,
-           f.shelfConsistency >= 0.8, f.shelfEndHz - shelf >= 1_500,
-           wall != nil || (shelf < 19_600 && f.shelfStepDB >= 15) {
+        // Synthetic high frequencies: a flat shelf of real content above a lower step, whose level rises and falls
+        // with the music (generated highs follow it; hiss or surface noise added after a band-limited source doesn't).
+        // Measurements from before tracking was measured (nil) are judged as they were.
+        let follows = f.shelfTracking.map { $0 >= shelfTrackingThreshold } ?? true
+        // At 44.1 kHz a 19.6–20.7 kHz wall may be the file's own steep anti-alias filter, so it doesn't vouch for a weak step.
+        let wallVouches = wall != nil && !(cdZoneWall && sampleRate < 46_000)
+        if let shelf = f.shelfHz, shelf <= 20_500, !ownFilter(shelf), f.shelfStepDB >= 10, f.shelfSlope >= -2.5, f.shelfAboveFloorDB >= 10,
+           f.shelfConsistency >= 0.8, f.shelfEndHz - shelf >= 1_500, follows,
+           wallVouches || (shelf < 19_600 && f.shelfStepDB >= 15) {
             // A hard wall closing the shelf (where the generator stopped) is strong corroboration.
             let closedByWall = f.cliffHz.map { $0 > shelf + 1_000 && f.cliffDropDB >= 22 && f.cliffConsistency >= 0.85 } ?? false
-            let conf = min(1, 0.55 + (f.shelfConsistency - 0.8) + min(0.3, (f.shelfStepDB - 10) / 60) + (closedByWall ? 0.15 : 0))
+            let conf = min(spectralConfidenceCap,
+                           0.55 + (f.shelfConsistency - 0.8) + min(0.3, (f.shelfStepDB - 10) / 60) + (closedByWall ? 0.15 : 0))
+            let moving = f.shelfTracking == nil ? "" : " that rises and falls with the music"
             return (.bandwidthExtended,
-                    "Made from a lossy source that stopped at ~\(khz(shelf)) kHz. The content from \(khz(shelf)) to \(khz(f.shelfEndHz)) kHz is a flat, uniform shelf generated afterwards (SBR or AI \u{201C}enhancement\u{201D}), not recorded detail.",
+                    "Steep step at ~\(khz(shelf)) kHz in \(percent(f.shelfConsistency)) of the music (\(Int(f.shelfStepDB.rounded())) dB), then a flat shelf of content up to ~\(khz(f.shelfEndHz)) kHz\(moving). High frequencies synthesized over a lossy source (HE-AAC SBR, AI \u{201C}enhancement\u{201D}) look like this; so can an exciter or noise reduction used on a band-limited recording.",
                     conf, shelf)
         }
         if let wall {
-            return (.possibleLossyOrigin,
-                    "Brick-wall cutoff at ~\(khz(wall)) kHz in \(Int((f.cliffConsistency * 100).rounded()))% of the music (\(Int(f.cliffDropDB.rounded())) dB drop): the signature of an MP3, AAC or Opus encode converted to a lossless file.",
-                    wallConfidence, wall)
+            var text = "Steep cutoff at ~\(khz(wall.hz)) kHz in \(percent(wall.consistency)) of the music (\(Int(wall.drop.rounded())) dB drop). MP3, AAC and Opus encodes look like this, but so do steep mastering or anti-alias filters, FM broadcast sources and band-limited historical masters."
+            if let tracking = f.shelfTracking, tracking < shelfTrackingThreshold, let shelf = f.shelfHz, abs(shelf - wall.hz) <= 1_000,
+               f.shelfEndHz - shelf >= 1_500, f.shelfAboveFloorDB >= 10 {
+                text += " Above it, steady noise-like content that doesn't follow the music, as analog tape hiss or vinyl surface noise added after the cutoff would be."
+            }
+            return (.possibleLossyOrigin, text, wallConfidence, wall.hz)
         }
         if hiRes, let hz = f.cliffHz, hz >= 19_600, hz <= 24_500, f.cliffDropDB >= 18, f.cliffConsistency >= 0.9 {
             return (.upsampled,
-                    "Hard cutoff at ~\(khz(hz)) kHz with nothing recorded above it: a 44.1/48 kHz master upsampled to \(rateText(sampleRate)) kHz.",
-                    min(1, 0.6 + (f.cliffDropDB - 18) / 40), hz)
+                    "Steep cutoff at ~\(khz(hz)) kHz in \(percent(f.cliffConsistency)) of the music (\(Int(f.cliffDropDB.rounded())) dB drop), far below this \(rateText(sampleRate)) kHz file's \(rateText(sampleRate / 2)) kHz limit. A 44.1 or 48 kHz master (or a lossy file) upsampled to \(rateText(sampleRate)) kHz looks like this; so does a steep low-pass applied in mastering or in a DSD-to-PCM conversion.",
+                    min(spectralConfidenceCap, 0.6 + (f.cliffDropDB - 18) / 40), hz)
         }
         let reach = f.contentHz
-        var note = "Uses the full \(claimedBits)-bit word length; no codec cutoff, synthetic shelf or upsampling wall."
+        var note: String
+        if let effectiveBits, effectiveBits > 0 {
+            note = effectiveBits >= claimedBits ? "No zero padding: all \(claimedBits) bits are in use."
+                                                 : "No zero padding: \(effectiveBits) of \(claimedBits) bits are in use."
+        } else {
+            note = claimedBits > 24 ? "Word length not checked (padding is only tested up to 24 bits)." : "Word length not checked."
+        }
+        note += " No codec-like cutoff, synthetic-looking shelf or upsampling wall found."
+        if let hz = f.cliffHz, ownFilter(hz), f.cliffDropDB >= 15 {
+            note += " The steep cutoff at ~\(khz(hz)) kHz is this \(rateText(sampleRate)) kHz file's own anti-alias filter."
+        }
         if sampleRate >= 88_200, reach > 0, reach < 26_000 {
             note += " Little recorded above ~\(khz(reach)) kHz, which is normal for analog-era masters."
         }
-        return (.genuine, note, 0.8, reach > 0 ? reach : nil)
+        // No flag isn't proof: some high-bitrate lossy files pass, and an unchecked word length proves nothing.
+        return (.genuine, note, effectiveBits.map { $0 > 0 } == true ? 0.7 : 0.5, reach > 0 ? reach : nil)
     }
 
     /// "44.1", "48", "192", "352.8"

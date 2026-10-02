@@ -145,13 +145,14 @@ struct AnalysisTag: View {
         case "paddedBitDepth":
             tag("\(track.effectiveBitDepth ?? 16)-BIT", color: Palette.copper).help("Only \(track.effectiveBitDepth ?? 16) of \(track.bitDepth ?? 24) bits carry audio (zero-padded)")
         case "upsampled":
-            tag("UPSAMPLED", color: Palette.copper).help("A 44.1/48 kHz master upsampled to a hi-res rate")
+            tag("UPSAMPLED?", color: Palette.copper).help("A steep cutoff far below this file’s limit, as a 44.1/48 kHz master upsampled to a hi-res rate shows. A steep mastering low-pass or a DSD conversion filter can look the same.")
         case "possibleLossyOrigin":
-            tag("LOSSY ORIGIN", color: Palette.copper).help("Made from an MP3, AAC or Opus file")
+            tag("LOSSY ORIGIN?", color: Palette.copper).help("A steep, consistent cutoff, as MP3, AAC and Opus encodes show. Steep mastering or anti-alias filters, FM broadcast sources and historical remasters can look the same.")
         case "bandwidthExtended":
-            tag("SYNTHETIC HF", color: Palette.copper).help("Made from a lossy file; its high frequencies were generated afterwards (SBR or AI “enhancement”)")
-        case "genuine" where (track.bitDepth ?? 0) >= 24:
-            tag("TRUE \(track.bitDepth ?? 24)", color: Palette.brass)
+            tag("SYNTHETIC HF?", color: Palette.copper).help("A step at a lossy-looking cutoff with a flat shelf above it that follows the music, as SBR or AI “enhancement” leaves. An exciter or noise reduction on a band-limited recording can look similar.")
+        case "genuine" where (track.bitDepth ?? 0) >= 24 && track.effectiveBitDepth == track.bitDepth:
+            // Only when the word length was checked (float and 32-bit files aren't).
+            tag("TRUE \(track.bitDepth ?? 24)", color: Palette.brass).help("No zero padding: all \(track.bitDepth ?? 24) bits are in use")
         default:
             EmptyView()
         }
