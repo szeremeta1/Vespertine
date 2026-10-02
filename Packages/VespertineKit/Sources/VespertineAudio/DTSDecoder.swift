@@ -50,8 +50,10 @@ final class DTSDecoder: NSObject, PCMDecoding {
 
     // MARK: Detection
 
-    /// Whether the first frames of this 16-bit stereo lossless PCM decoder hold a DTS bitstream.
-    /// Leaves the decoder at frame 0.
+    /// Whether the first frames of this 16-bit stereo lossless PCM decoder hold a DTS bitstream: two
+    /// consecutive frames with valid headers, each where the one before it says (a sync word alone is just
+    /// two sample values, which ordinary music has now and then). Seeks the decoder back to frame 0; one
+    /// that can't seek stays where the check stopped, so the caller looks at its position.
     static func carriesDTS(_ decoder: PCMDecoding) -> Bool {
         let asbd = decoder.processingFormat.streamDescription.pointee
         guard decoder.processingFormat.channelCount == 2, asbd.mFormatFlags & kAudioFormatFlagIsFloat == 0,
@@ -59,11 +61,13 @@ final class DTSDecoder: NSObject, PCMDecoding {
         else { return false }
         let rate = decoder.processingFormat.sampleRate
         guard rate == 44_100 || rate == 48_000 else { return false }
-        guard let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 8192) else { return false }
+        // Long enough for a stream starting anywhere in the first 8,192 frames to show its next frame too.
+        let probe: AVAudioFrameCount = 16_384
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: probe) else { return false }
         defer { try? decoder.seek(to: 0) }
-        guard (try? decoder.decode(into: buffer, length: 8192)) != nil, buffer.frameLength > 0 else { return false }
+        guard (try? decoder.decode(into: buffer, length: probe)) != nil, buffer.frameLength > 0 else { return false }
         let words = interleavedWords(buffer)
-        return words.withUnsafeBufferPointer { ndts_find_sync($0.baseAddress!, Int64($0.count)) >= 0 }
+        return words.withUnsafeBufferPointer { ndts_find_stream($0.baseAddress!, Int64($0.count)) >= 0 }
     }
 
     /// The buffer's samples as 16-bit little-endian words, interleaved (the bitstream as stored).
@@ -111,10 +115,16 @@ final class DTSDecoder: NSObject, PCMDecoding {
         carrierBuffer = AVAudioPCMBuffer(pcmFormat: carrier.processingFormat, frameCapacity: step)
         try carrier.seek(to: 0)
         reset(at: 0)
-        // Decode until the stream's layout is known.
-        while ndts_channels(d) == 0, !carrierDone { try pump() }
+        // Decode until the stream's layout is known. Detection found frames at the start, so a few seconds
+        // without one ends the search instead of reading the whole file.
+        var steps = 0
+        while ndts_channels(d) == 0, !carrierDone, steps < 64 { try pump(); steps += 1 }
         let channels = Int(ndts_channels(d)), rate = Double(ndts_sample_rate(d))
-        guard channels > 0, rate > 0 else { throw DTSError.noStream }
+        guard channels > 0, rate > 0 else {
+            // Frames FFmpeg found but couldn't decode are DTS all the same: playing them as PCM would be
+            // full-scale noise. Only when there were none is the file ordinary PCM after all.
+            throw ndts_frames_found(d) >= 2 ? DTSError.decoding : DTSError.noStream
+        }
         format = Self.format(rate: rate, channels: channels, mask: ndts_channel_mask(d))
         try carrier.seek(to: 0)
         reset(at: 0)
