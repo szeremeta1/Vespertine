@@ -21,6 +21,13 @@ Packages/VespertineKit/Package.resolved.bak
 .env.*
 *.p12
 *.p8
+*.cer
+*.pem
+*.key
+*.keychain
+*.keychain-db
+*.provisionprofile
+*.xcarchive
 vespertine-sparkle-key.txt
 .claude/
 
