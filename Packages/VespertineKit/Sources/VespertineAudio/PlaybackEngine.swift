@@ -705,6 +705,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             try decoder.seek(to: frame)
             actualOffset = Double(frame) / decoder.processingFormat.sampleRate
         }
+        Self.alignDoPMarkers(decoder, at: session.totalWritten)
         let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
@@ -912,7 +913,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard decoder.length == current.length, position >= 0, position <= decoder.length else { return nil }
         try decoder.seek(to: position)
         guard decoder.position == position else { return nil }
+        if let dop = decoder as? RawDoPDecoder, let was = current as? RawDoPDecoder { dop.nextMarker = was.nextMarker }
         return (local, decoder)
+    }
+
+    /// DoP markers alternate frame by frame through the whole output buffer (one decoded frame is one buffer
+    /// frame): a DoP track starting at `ringFrame` takes up that sequence, so a gapless join never sends two
+    /// 0x05 in a row (a DAC drops out of DSD for a moment, a click). A fresh buffer starts on 0x05.
+    private static func alignDoPMarkers(_ decoder: PCMDecoding, at ringFrame: UInt64) {
+        (decoder as? RawDoPDecoder)?.nextMarker = AVAudioFramePosition(ringFrame & 1)
     }
 
 
@@ -1025,6 +1034,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
+                    Self.alignDoPMarkers(decoder, at: session.totalWritten)
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
