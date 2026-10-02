@@ -26,7 +26,7 @@
 <br>
 
 <p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; an SACD album listing stereo and 5.1 versions once; a DTS 5.1 CD as head-tracked Spatial Audio on AirPods Max; and a file flagged for synthetic high frequencies">
+  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; DSD64 over DoP from an SACD; an SACD album listing stereo and 5.1 versions once; a 5.1 SACD as head-tracked Spatial Audio on AirPods Max; and a file flagged for synthetic high frequencies">
 </p>
 
 <p align="center"><sub>Vespertine was called Nocturne until version 0.6.0.</sub></p>
@@ -95,7 +95,7 @@ Artists, albums (by title, artist, genre or year) and songs, in one place. Every
 ### Smart playlists, lossless on AirPods Max
 Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 48 kHz track" is one rule away. AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device, so that playlist plays bit-perfect on them, and the Digital Crown and volume keys still work.
 
-![A smart playlist of every 24-bit / 48 kHz track, with Ariana Grande's eternal sunshine playing bit-perfect on AirPods Max over USB-C](docs/screenshots/smart-playlist.png)
+![A smart playlist of 24-bit / 48 kHz tracks (narrowed to Oasis here), with Wonderwall from the 24-bit remaster playing bit-perfect on AirPods Max over USB-C](docs/screenshots/smart-playlist.png)
 
 ### A mini player that still tells the truth
 
