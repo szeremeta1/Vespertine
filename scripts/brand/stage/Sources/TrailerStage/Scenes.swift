@@ -173,10 +173,13 @@ struct SignalPulse: View {
 
     // Measured in the recording (window points): the centres of the signal path's 7.5 pt rings, and the
     // centre line of the BIT-PERFECT badge's 1 pt border, so the light lands exactly on the app's own shapes.
+    // Re-measured on the 2026-10-01 recording of Elton John's Regimental Sgt. Zippo: its album line wraps to two lines, so
+    // everything below it sits 16 pt lower than in the first recording (rings 538.75 ... 708.75, badge 452.25). Measured the
+    // same way on both clips (brass pixels in the ring column): every ring and the badge moved by exactly 16.0 pt, x by 0.
     static let nodeX: CGFloat = 1116.75 - AppWindow.inspector.minX
-    static let nodes: [CGFloat] = [538.75, 577.75, 616.75, 669.75, 708.75].map { $0 - AppWindow.inspector.minY }
+    static let nodes: [CGFloat] = [554.75, 593.75, 632.75, 685.75, 724.75].map { $0 - AppWindow.inspector.minY }
     static let ring: CGFloat = 7.5
-    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 452.25 - AppWindow.inspector.minY, width: 106, height: 22)
+    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 468.25 - AppWindow.inspector.minY, width: 106, height: 22)
 
     var body: some View {
         let travel = easeInOutCubic(progress(t, start, start + b * 1.9))
