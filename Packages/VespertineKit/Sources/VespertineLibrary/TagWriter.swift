@@ -223,13 +223,18 @@ public actor TagWriter {
             }
             let url = track.fileURL
             do {
-                let file = try AudioFile(url: url)
+                let backup = try makeBackup(of: url)
+                // The tags are written into a clone of the file, which then takes its place in one step (see
+                // `editingClone`); where that isn't possible, into the file itself, with the backup to fall back on.
+                let target = Self.editingClone(of: url) ?? url
+                defer { if target != url { try? FileManager.default.removeItem(at: target) } }
+                var replaced = target == url
+                let file = try AudioFile(url: target)
                 try file.readPropertiesAndMetadata()
                 var previous = Self.snapshot(file.metadata)
-                let backup = try makeBackup(of: url)
                 // SFBAudioEngine writes one value per field, so the save would keep only the first of several artists,
                 // genres or MusicBrainz IDs, edited or not. Read them now, and put back each one the save cut down.
-                let multiValued = url.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
+                let multiValued = target.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
                 defer { nvt_multivalued_free(multiValued) }
 
                 for (field, value) in edit.fields {
@@ -256,7 +261,8 @@ public actor TagWriter {
                 do {
                     TagWriter.protectDate(in: file)
                     try file.writeMetadata()
-                    try Self.keepEveryValue(multiValued, of: url, edit: edit)
+                    try Self.keepEveryValue(multiValued, of: target, edit: edit)
+                    if !replaced { try Self.move(target, over: url); replaced = true }
                     previous["__fileSHA256"] = try Self.fileHash(url)
                     let history = previous
                     try await database.writer.write { db in
@@ -264,7 +270,7 @@ public actor TagWriter {
                         try entry.insert(db)
                     }
                 } catch {
-                    try Self.restore(backup, to: url)
+                    if replaced { try Self.restore(backup, to: url) }   // otherwise the file was never touched
                     throw error
                 }
                 refreshIDs.append(id)
@@ -498,6 +504,34 @@ public actor TagWriter {
         var hash = SHA256()
         while let data = try file.read(upToCount: 1_048_576), !data.isEmpty { hash.update(data: data) }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
+    }
+
+    /// A clone of `url` beside it to write the tags into, or nil where the volume can't clone (shares, non-APFS disks):
+    /// those are written in place, since copying a large file for every edit would be slow. Writing into a clone
+    /// means a crash or a full disk mid-write leaves the original whole, and a song that's playing goes on reading the
+    /// file it opened instead of one being rewritten under it.
+    static func editingClone(of url: URL) -> URL? {
+        let clone = url.deletingLastPathComponent().appendingPathComponent(".vespertine-edit-\(UUID().uuidString).\(url.pathExtension)")
+        let status = url.withUnsafeFileSystemRepresentation { src in
+            clone.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, UInt32(CLONE_NOFOLLOW)) }
+        }
+        guard status == 0 else { return nil }
+        // The clone gets the file's dates and permissions, but its creation date is today's: keep the file's own.
+        if let created = try? url.resourceValues(forKeys: [.creationDateKey]).creationDate {
+            var values = URLResourceValues()
+            values.creationDate = created
+            var target = clone
+            try? target.setResourceValues(values)
+        }
+        return clone
+    }
+
+    /// Puts the edited clone in the file's place, in one step.
+    private static func move(_ clone: URL, over url: URL) throws {
+        let status = clone.withUnsafeFileSystemRepresentation { src in
+            url.withUnsafeFileSystemRepresentation { dst in rename(src!, dst!) }
+        }
+        guard status == 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
     }
 
     private static func restore(_ backup: URL, to url: URL) throws {

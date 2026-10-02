@@ -297,6 +297,36 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try Data(contentsOf: url) == original)
     }
+    /// A tag edit doesn't rewrite the file under whatever has it open (the song that's playing): the edited copy takes
+    /// its place in one step, the open file reads on unchanged, and no copy is left behind. Creation dates are kept.
+    @Test func editingAPlayingFileLeavesWhatItsReadingAlone() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let wav = dir.appendingPathComponent("source.wav"); try audio(wav)
+        let url = dir.appendingPathComponent("song.flac"); try SFBAudioEngine.AudioConverter.convert(wav, to: url)
+        try FileManager.default.removeItem(at: wav)
+        var dated = url
+        var values = URLResourceValues(); values.creationDate = Date(timeIntervalSince1970: 1_000_000_000)
+        try dated.setResourceValues(values)
+        let original = try Data(contentsOf: url)
+        let playing = try FileHandle(forReadingFrom: url)       // what a decoder holds while it plays
+        defer { try? playing.close() }
+
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".backups"))
+        let result = try await writer.apply(TagEdit(fields: [.title: "Edited while playing"]), to: [track])
+        #expect(result.written == 1 && result.failures.isEmpty)
+
+        #expect(try playing.readToEnd() == original)              // the open file is the one it opened, whole
+        #expect(try AudioFile(readingPropertiesAndMetadataFrom: url).metadata.title == "Edited while playing")
+        #expect(try url.resourceValues(forKeys: [.creationDateKey]).creationDate == Date(timeIntervalSince1970: 1_000_000_000))
+        #expect(try FileManager.default.contentsOfDirectory(atPath: dir.path).filter { $0.hasPrefix(".vespertine-edit-") }.isEmpty)
+        #expect(try await writer.revertLastEdit(trackID: try #require(track.id)))
+        #expect(try AudioFile(readingPropertiesAndMetadataFrom: url).metadata.title != "Edited while playing")
+    }
     @Test func editingSomeFieldsKeepsEveryValueOfTheOthers() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let wav = dir.appendingPathComponent("source.wav"); try audio(wav)
