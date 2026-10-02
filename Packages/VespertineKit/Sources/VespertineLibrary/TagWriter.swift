@@ -5,6 +5,7 @@
 
 import Darwin
 import CryptoKit
+import CVespertineTags
 import Foundation
 import GRDB
 import SFBAudioEngine
@@ -43,6 +44,35 @@ public enum TagField: String, CaseIterable, Sendable, Hashable {
         case .albumArtistSort: "Sort Album Artist"
         case .musicBrainzReleaseID: "MusicBrainz Release"
         case .musicBrainzRecordingID: "MusicBrainz Recording"
+        }
+    }
+
+    /// The names TagLib's property map gives this field, in every tag format (a few have more than one).
+    var propertyNames: [String] {
+        switch self {
+        case .title: ["TITLE"]
+        case .artist: ["ARTIST"]
+        case .album: ["ALBUM"]
+        case .albumArtist: ["ALBUMARTIST"]
+        case .composer: ["COMPOSER"]
+        case .genre: ["GENRE"]
+        case .releaseDate: ["DATE"]
+        case .trackNumber, .trackTotal: ["TRACKNUMBER", "TRACKTOTAL", "TOTALTRACKS"]
+        case .discNumber, .discTotal: ["DISCNUMBER", "DISCTOTAL", "TOTALDISCS"]
+        case .compilation: ["COMPILATION"]
+        case .grouping: ["GROUPING", "CONTENTGROUP", "WORK"]
+        case .comment: ["COMMENT", "DESCRIPTION"]
+        case .lyrics: ["LYRICS", "UNSYNCEDLYRICS"]
+        case .bpm: ["BPM"]
+        case .rating: ["RATING"]
+        case .isrc: ["ISRC"]
+        case .label: ["LABEL", "ORGANIZATION", "PUBLISHER"]
+        case .titleSort: ["TITLESORT"]
+        case .artistSort: ["ARTISTSORT"]
+        case .albumSort: ["ALBUMSORT"]
+        case .albumArtistSort: ["ALBUMARTISTSORT"]
+        case .musicBrainzReleaseID: ["MUSICBRAINZ_ALBUMID"]
+        case .musicBrainzRecordingID: ["MUSICBRAINZ_TRACKID"]
         }
     }
 
@@ -197,6 +227,10 @@ public actor TagWriter {
                 try file.readPropertiesAndMetadata()
                 var previous = Self.snapshot(file.metadata)
                 let backup = try makeBackup(of: url)
+                // SFBAudioEngine writes one value per field, so the save would keep only the first of several artists,
+                // genres or MusicBrainz IDs, edited or not. Read them now, and put back each one the save cut down.
+                let multiValued = url.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
+                defer { nvt_multivalued_free(multiValued) }
 
                 for (field, value) in edit.fields {
                     if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
@@ -222,6 +256,7 @@ public actor TagWriter {
                 do {
                     TagWriter.protectDate(in: file)
                     try file.writeMetadata()
+                    try Self.keepEveryValue(multiValued, of: url, edit: edit)
                     previous["__fileSHA256"] = try Self.fileHash(url)
                     let history = previous
                     try await database.writer.write { db in
@@ -410,6 +445,27 @@ public actor TagWriter {
         Set(sources.filter { $0.isNetwork && !$0.isWritable }.compactMap(\.id))
     }
 
+    /// After SFBAudioEngine's save: puts back the values of multi-valued fields it cut to one (fields the edit set
+    /// are left as edited), and removes custom tags the edit deleted, which its writer leaves in the file.
+    static func keepEveryValue(_ multiValued: OpaquePointer?, of url: URL, edit: TagEdit) throws {
+        let edited = edit.fields.keys.flatMap(\.propertyNames) + edit.custom.keys.map { $0.uppercased() }
+        let removed = edit.custom.filter { $0.value == nil }.map { $0.key.uppercased() }
+        try url.withUnsafeFileSystemRepresentation { path in
+            guard let path else { return }
+            if let multiValued, nvt_multivalued_count(multiValued) > 0 {
+                let restored = withCStrings(edited) { nvt_multivalued_restore(multiValued, path, $0, Int32(edited.count)) }
+                guard restored >= 0 else { throw TagWriteError.valuesNotKept }
+            }
+            for key in removed where nvt_property_set(path, key, nil, 0) != 0 { throw TagWriteError.valuesNotKept }
+        }
+    }
+
+    private static func withCStrings<R>(_ strings: [String], _ body: (UnsafePointer<UnsafePointer<CChar>>?) -> R) -> R {
+        let copies = strings.compactMap { strdup($0) }
+        defer { copies.forEach { free($0) } }
+        return copies.map { UnsafePointer($0) }.withUnsafeBufferPointer { body($0.baseAddress) }
+    }
+
     private func makeBackup(of url: URL) throws -> URL {
         let day = ISO8601DateFormatter.string(from: .now, timeZone: .current, formatOptions: [.withFullDate])
         let dir = backupDirectory.appendingPathComponent(day, isDirectory: true)
@@ -472,10 +528,11 @@ public extension TagWriter {
 }
 
 private enum TagWriteError: LocalizedError {
-    case invalidNumber(String), fileChanged
+    case invalidNumber(String), fileChanged, valuesNotKept
     var errorDescription: String? {
         switch self {
         case .invalidNumber(let field): "\(field) must be a nonnegative whole number or blank."
+        case .valuesNotKept: "The tags couldn't be saved with every value of fields that have several (artists, genres), so the file was left as it was."
         case .fileChanged: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available."
         }
     }

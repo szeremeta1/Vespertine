@@ -15,6 +15,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
+        // TagLib itself (the copy SFBAudioEngine already builds), for the property map its writer doesn't use.
+        .package(url: "https://github.com/sbooth/CXXTagLib", from: "2.3.2"),
         .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.0"),
         .package(path: "../VespertineAnalysis"),
     ],
@@ -30,6 +32,8 @@ let package = Package(
         .target(name: "CVespertineDTS", dependencies: ["FFmpegDCA"]),
         // Decoder calls with C++/Objective-C exceptions caught (a damaged file must not crash the app).
         .target(name: "CVespertineGuard", linkerSettings: [.linkedFramework("AVFAudio"), .linkedLibrary("c++")]),
+        // Every value of multi-valued tags (several artists, genres, MusicBrainz IDs), which SFBAudioEngine's writer cuts to one.
+        .target(name: "CVespertineTags", dependencies: [.product(name: "taglib", package: "CXXTagLib")]),
         .target(
             name: "VespertineAudio",
             dependencies: [
@@ -50,6 +54,7 @@ let package = Package(
             name: "VespertineLibrary",
             dependencies: [
                 "VespertineAudio",
+                "CVespertineTags",
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
             ],
@@ -69,7 +74,8 @@ let package = Package(
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
-        .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary"]),
+        .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags"]),
     ],
-    swiftLanguageModes: [.v6]
+    swiftLanguageModes: [.v6],
+    cxxLanguageStandard: .cxx17
 )
