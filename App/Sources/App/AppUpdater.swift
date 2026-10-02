@@ -16,10 +16,12 @@ final class AppUpdater: NSObject {
     let isEnabled: Bool
 
     override init() {
-        // Isolated test libraries (QA runs) never phone home.
-        // Launch arguments only: a value saved in the settings must never switch updates off for good.
+        // Isolated test libraries (QA runs) never phone home, and nor does Vespertine Dev: it's a separate app, and the
+        // release feed's updates aren't its to install. A feed given for testing (launch arguments only: a value saved
+        // in the settings must never switch updates off for good) turns them on.
         let arguments = LaunchArguments()
-        isEnabled = arguments.string(forKey: "VespertineDataDirectory") == nil
+        let development = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+        isEnabled = (arguments.string(forKey: "VespertineDataDirectory") == nil && !development)
             || arguments.string(forKey: "VespertineUpdateFeedOverride") != nil
         super.init()
         guard isEnabled else { return }
