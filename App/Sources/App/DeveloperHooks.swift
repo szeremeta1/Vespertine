@@ -115,6 +115,10 @@ enum DeveloperHooks {
             let tracks = model.library.tracks(albumKey: album.key).filter { select == "all" || numbers.contains($0.trackNumber ?? -1) }
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
         }
+        // `-VespertineSelectSong "<title>"`: select songs by title (shows their details or analysis without playing).
+        if let title = d.string(forKey: "VespertineSelectSong") {
+            model.selectedTrackIDs = Set(model.library.allTracks().filter { $0.title == title }.compactMap(\.id))
+        }
         if let tab = d.string(forKey: "VespertineInspectorTab") {
             model.inspectorTab = InspectorTab.allCases.first { $0.rawValue.lowercased().hasPrefix(tab.lowercased()) } ?? .nowPlaying
         }
