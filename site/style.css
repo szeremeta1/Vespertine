@@ -95,6 +95,8 @@ header.nav {
 .badge.brass { color: var(--brass); border-color: rgba(200,166,106,.55); }
 .badge.copper { color: var(--copper); border-color: rgba(201,139,91,.5); }
 .badge.brass::before, .badge.copper::before { content: "●"; font-size: 9px; margin-right: 8px; vertical-align: 1px; }
+/* Units keep their case inside uppercase labels: kHz, not KHZ. */
+.unit { text-transform: none; }
 
 section { padding: 110px 0 0; }
 
@@ -169,7 +171,7 @@ h2 { font: 500 clamp(32px, 4.4vw, 48px)/1.08 var(--serif); letter-spacing: -0.01
 /* FAQ */
 .faq { margin-top: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
 .faq div { border-top: 1px solid var(--hair); padding: 22px 0 24px; }
-.faq h4 { margin: 0; font: 500 19px/1.3 var(--serif); }
+.faq h3 { margin: 0; font: 500 19px/1.3 var(--serif); }
 .faq p { margin: 10px 0 0; color: var(--text2); font-size: 15.5px; }
 
 /* Closing */

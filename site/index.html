@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vespertine — bit-perfect music player for Mac</title>
-<meta name="description" content="A free, open-source music player for macOS. It switches your DAC to every track's native format, shows BIT-PERFECT only when it's true, plays DSD, Dolby Atmos and DTS, renders surround as Spatial Audio on AirPods, and flags fake hi-res files.">
+<meta name="description" content="Free, open-source Mac music player: native-rate playback, BIT-PERFECT only when true, DSD, Atmos and DTS, Spatial Audio on AirPods, fake hi-res detection.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#09090A">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -89,8 +89,8 @@
       <span class="badge brass">Bit-perfect</span>
       <span class="badge">Exclusive</span>
       <span class="badge">32 / 192</span>
-      <span class="badge copper">44.1 → 48 kHz</span>
-      <span class="badge">DSD 256 · DoP</span>
+      <span class="badge copper">44.1 → 48 <span class="unit">kHz</span></span>
+      <span class="badge">DSD 256 · <span class="unit">DoP</span></span>
       <span class="badge">Spatial · head tracked</span>
       <span class="badge copper">Synthetic high frequencies?</span>
     </div>
@@ -162,7 +162,7 @@
         <div class="copy">
           <div class="eyebrow">Fake hi-res detection</div>
           <h3>Find out which “hi-res” files aren't.</h3>
-          <p>Every file can be analysed for its real bit depth, its real bandwidth and the fingerprints of lossy encoders and resamplers. Verdicts come with their evidence and name what else could explain it, and a <em>Suspect Hi-Res</em> playlist collects them. Only zero padding is exact: the spectral verdicts are flagged as questions, because some high-bitrate lossy files pass as genuine and steep mastering filters, FM sources and tape or vinyl transfers can look suspicious.</p>
+          <p>Every file can be analyzed for its real bit depth, its real bandwidth and the fingerprints of lossy encoders and resamplers. Verdicts come with their evidence and name what else could explain it, and a <em>Suspect Hi-Res</em> playlist collects them. Only zero padding is exact: the spectral verdicts are flagged as questions, because some high-bitrate lossy files pass as genuine and steep mastering filters, FM sources and tape or vinyl transfers can look suspicious.</p>
           <ul>
             <li><b>16-bit padded</b> into 24-bit containers</li>
             <li><b>Likely upsampled</b> CD-quality masters sold as 96 or 192 kHz</li>
@@ -193,7 +193,7 @@
         <div class="copy">
           <div class="eyebrow">AirPods Max over USB-C</div>
           <h3>Lossless on AirPods Max, and it says so.</h3>
-          <p>Connected with the USB-C cable, AirPods Max are recognised as a 24-bit / 48 kHz lossless device: 48 kHz music plays bit-perfect and everything else is converted with Apple's mastering-quality resampler, in plain view. Over Bluetooth, Vespertine tells you the link is AAC.</p>
+          <p>Connected with the USB-C cable, AirPods Max are recognized as a 24-bit / 48 kHz lossless device: 48 kHz music plays bit-perfect and everything else is converted with Apple's mastering-quality resampler, in plain view. Over Bluetooth, Vespertine tells you the link is AAC.</p>
         </div>
         <img class="shot" src="assets/smart-playlist-detail.jpg" alt="A smart playlist of 24-bit / 48 kHz tracks, narrowed to Oasis, playing bit-perfect on AirPods Max over USB-C" loading="lazy" width="1300" height="1100">
       </div>
@@ -230,7 +230,7 @@
           <tr><th>Dolby Atmos</th><td>Dolby Digital Plus with Atmos, rendered by macOS <span class="mono">.ec3 .m4a .mp4</span></td></tr>
           <tr><th>Dolby TrueHD, DTS-HD Master Audio</th><td>Lossless, can be bit-perfect; DTS:X and TrueHD Atmos play their bed <span class="mono">.thd .dts .dtshd .mka</span></td></tr>
           <tr><th>Dolby Digital (Plus), DTS</th><td>Decoded, or sent to a receiver untouched <span class="mono">.ac3 .ec3 .dts</span></td></tr>
-          <tr><th>DTS CDs and DTS-WAV</th><td>Recognised and decoded to 5.1, including CUE-split albums <span class="mono">.wav .flac</span></td></tr>
+          <tr><th>DTS CDs and DTS-WAV</th><td>Recognized and decoded to 5.1, including CUE-split albums <span class="mono">.wav .flac</span></td></tr>
           <tr><th>APE, WavPack, TTA</th><td>Lossless <span class="mono">.ape .wv .tta</span></td></tr>
           <tr><th>Opus, Vorbis, Musepack, MP3, AAC</th><td>Decoded and marked lossy <span class="mono">.opus .ogg .mpc .mp3 .m4a</span></td></tr>
         </table>
@@ -243,7 +243,7 @@
       <div class="section-head">
         <div class="eyebrow">Compare</div>
         <h2>How it stacks up.</h2>
-        <p>Against the player your Mac came with and the two paid audiophile favourites. Vespertine doesn't stream or do room correction; if you need those, the paid apps are worth it. If you own your music, it's the one to try.</p>
+        <p>Against the player your Mac came with and the two paid audiophile favorites. Vespertine doesn't stream or do room correction; if you need those, the paid apps are worth it. If you own your music, it's the one to try.</p>
       </div>
       <div class="compare-wrap">
         <p class="compare-hint" aria-hidden="true">Scroll for more →</p>
@@ -286,35 +286,35 @@
       </div>
       <div class="faq">
         <div>
-          <h4>Is it really free?</h4>
+          <h3>Is it really free?</h3>
           <p>Yes. Vespertine is free and open source under the GPL-3.0. There's no account, no subscription, no ads and no telemetry (<a href="privacy.html">privacy</a>). It only goes online to check for updates, and to reach MusicBrainz, the Cover Art Archive or ListenBrainz when you ask it to.</p>
         </div>
         <div>
-          <h4>What do I need?</h4>
+          <h3>What do I need?</h3>
           <p>A Mac with macOS 26 Tahoe or later, Apple silicon or Intel. The built-in speakers and AirPods work, and so should any class-compliant USB DAC. Receivers over HDMI haven't been tested yet.</p>
         </div>
         <div>
-          <h4>Does it stream from Qobuz, TIDAL or Apple Music?</h4>
+          <h3>Does it stream from Qobuz, TIDAL or Apple Music?</h3>
           <p>No. Vespertine plays music you own, on your Mac, on external drives or on a network share. Apple Music downloads are DRM-protected and can't be played by any other app.</p>
         </div>
         <div>
-          <h4>How do I know it's actually bit-perfect?</h4>
+          <h3>How do I know it's actually bit-perfect?</h3>
           <p>The signal path reads back what Core Audio actually did: the device's nominal rate, its physical format and who holds it. The decoders have automated tests (TrueHD against its source, DTS against FFmpeg's own decoder), and <span class="mono">vespertine-probe</span> lets you check your own hardware. <a href="https://github.com/szeremeta1/Vespertine/blob/main/docs/VERIFICATION.md">How to verify it yourself →</a></p>
         </div>
         <div>
-          <h4>Will it change my files?</h4>
+          <h3>Will it change my files?</h3>
           <p>Only when you edit tags, and then each file is backed up first and can be reverted in one step. Folders are referenced in place; importing makes APFS clones that take no extra space.</p>
         </div>
         <div>
-          <h4>Which hardware has it been tested on?</h4>
+          <h3>Which hardware has it been tested on?</h3>
           <p>It has been tested on a FiiO K11 (every rate up to 384 kHz, DSD, integer mode), AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers. The Intel half of the app has been run under Rosetta, not on an Intel Mac, and no multichannel DAC or AV receiver has been available yet. Any class-compliant DAC should work; if yours misbehaves, <a href="https://github.com/szeremeta1/Vespertine/issues">please report it</a>.</p>
         </div>
         <div>
-          <h4>Who makes it?</h4>
+          <h3>Who makes it?</h3>
           <p>Vespertine is designed and maintained by Alexander Szeremeta. Most of the code was written with AI coding agents (Claude Code and Codex) under his direction, and he checks the audio paths on real hardware. The source is open for anyone to review.</p>
         </div>
         <div>
-          <h4>Why macOS 26 only?</h4>
+          <h3>Why macOS 26 only?</h3>
           <p>Vespertine is a native SwiftUI app that uses the current system's design, Spatial Audio rendering and audio APIs. Supporting older systems would mean giving those up.</p>
         </div>
       </div>
