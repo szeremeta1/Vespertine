@@ -8,16 +8,24 @@ first downbeat at 3.657 s, the end card from bar 8, 36.633 s in all. A lounge pr
 (Dbmaj9, Bbm9, Gbmaj9, Ab13sus4) on a Rhodes-like FM piano, a warm pad, sub bass and soft half-time drums,
 mastered to -14 LUFS with true peaks under -1 dBTP.
 
-    python3 score.py out.wav          (needs numpy, scipy, soundfile, pyloudnorm)
+    python3 score.py out.wav                             the trailer's bed (48 kHz, 24-bit)
+    python3 score.py --rate 384000 --bits 32 out.wav     the hi-res edition: synthesized at that rate, not upsampled,
+                                                         so the hats, clicks and saturation really reach 192 kHz
+(needs numpy, scipy, soundfile, pyloudnorm)
 """
-import sys
+import argparse
 
 import numpy as np
 import pyloudnorm
 import soundfile
 from scipy import ndimage, signal
 
-SR = 48_000
+OPTIONS = argparse.ArgumentParser(description="Synthesizes the trailer's score.")
+OPTIONS.add_argument("out", nargs="?", default="vespertine-score.wav")
+OPTIONS.add_argument("--rate", type=int, default=48_000, help="sample rate (the trailer uses 48000)")
+OPTIONS.add_argument("--bits", type=int, choices=(16, 24, 32), default=24, help="PCM word length")
+OPTIONS = OPTIONS.parse_args()
+SR = OPTIONS.rate
 BEAT = 60 / 130
 MBAR = 4 * BEAT
 FIRST_DOWNBEAT = 3.657            # Music.firstDownbeat: musical bar 2
@@ -250,7 +258,9 @@ def limit(x, ceiling, lookahead=0.004, release=0.12):
 
 meter = pyloudnorm.Meter(SR)
 mix *= 10 ** ((-14 - meter.integrated_loudness(mix.T)) / 20)
-true_peak = lambda x: np.max(np.abs(signal.resample_poly(x, 4, 1, axis=1)))
+# Inter-sample peaks: 4x oversampled at 48 kHz; at 192 kHz and up the samples are already that close together.
+OVERSAMPLE = max(1, 192_000 // SR)
+true_peak = lambda x: np.max(np.abs(signal.resample_poly(x, OVERSAMPLE, 1, axis=1) if OVERSAMPLE > 1 else x))
 ceiling = 10 ** (-1.2 / 20)
 for _ in range(4):
     if true_peak(mix) <= 10 ** (-1 / 20):
@@ -259,7 +269,7 @@ for _ in range(4):
     ceiling *= 10 ** (-0.3 / 20)
 
 if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv) > 1 else "vespertine-score.wav"
-    soundfile.write(out, mix.T, SR, subtype="PCM_24")
+    out = OPTIONS.out
+    soundfile.write(out, mix.T, SR, subtype=f"PCM_{OPTIONS.bits}")
     final_peak = 20 * np.log10(true_peak(mix))
-    print(f"{out}: {DURATION:.3f} s, {meter.integrated_loudness(mix.T):.1f} LUFS, true peak {final_peak:.1f} dBTP")
+    print(f"{out}: {OPTIONS.bits}-bit / {SR / 1000:g} kHz, {DURATION:.3f} s, {meter.integrated_loudness(mix.T):.1f} LUFS, true peak {final_peak:.1f} dBTP")
