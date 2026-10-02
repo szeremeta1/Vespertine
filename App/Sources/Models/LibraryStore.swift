@@ -94,7 +94,7 @@ final class LibraryStore {
         enricher = MetadataEnricher(database: database)
         ArtworkCache.shared.store = artwork
         observe()
-        Task { await tagWriter.purgeBackups() }
+        Task { await tagWriter.pruneBackups() }
     }
 
     deinit {

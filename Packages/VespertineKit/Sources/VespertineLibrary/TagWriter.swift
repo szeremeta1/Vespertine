@@ -474,8 +474,22 @@ public actor TagWriter {
         let status = url.withUnsafeFileSystemRepresentation { src in
             dest.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, 0) }
         }
-        if status != 0 { try FileManager.default.copyItem(at: url, to: dest) }
+        if status != 0 {
+            // Not a free clone (another volume, a share): a full copy. Make room within the budget, and never let
+            // backups take the last of the disk.
+            let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0)
+            pruneBackups(making: size)
+            guard freeSpace(at: backupDirectory) >= size + Self.backupFreeSpaceReserve else { throw TagWriteError.noRoomForBackup }
+            try FileManager.default.copyItem(at: url, to: dest)
+        }
         return dest
+    }
+
+    private func freeSpace(at url: URL) -> Int64 {
+        let values = try? url.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeAvailableCapacityKey])
+        // "Important usage" can read 0 on some volumes; fall back to the plain figure.
+        if let important = values?.volumeAvailableCapacityForImportantUsage, important > 0 { return important }
+        return Int64(values?.volumeAvailableCapacity ?? 0)
     }
 
     private static func fileHash(_ url: URL) throws -> String {
@@ -493,18 +507,51 @@ public actor TagWriter {
         _ = try FileManager.default.replaceItemAt(url, withItemAt: temporary)
     }
 
-    /// Deletes backups older than `days`.
-    public func purgeBackups(olderThan days: Int = 30) {
+    /// The most space tag backups may take. Past it the oldest go first; an edit whose backup is gone can still be
+    /// undone from the tags recorded with it (all but artwork and custom tags).
+    public static let backupBudget: Int64 = 5 * 1_073_741_824
+    /// Free space a full-copy backup must leave on its volume.
+    static let backupFreeSpaceReserve: Int64 = 2 * 1_073_741_824
+
+    /// Deletes backups no edit refers to once they're older than `days`, then the oldest of the rest until they fit
+    /// in `backupBudget` with room for `making` more bytes. An edit whose backup goes keeps its recorded tags.
+    public func pruneBackups(olderThan days: Int = 30, making needed: Int64 = 0) {
         let cutoff = Date().addingTimeInterval(-Double(days) * 86_400)
-        guard let dirs = try? FileManager.default.contentsOfDirectory(at: backupDirectory, includingPropertiesForKeys: [.creationDateKey]) else { return }
-        let referenced = (try? database.writer.read { db in
-            try String.fetchAll(db, sql: "SELECT fileBackupPath FROM tagHistory WHERE fileBackupPath IS NOT NULL")
-        })
-        guard let referenced else { return }
-        for dir in dirs {
-            if referenced.contains(where: { $0.hasPrefix(dir.path + "/") }) { continue }
-            let created = (try? dir.resourceValues(forKeys: [.creationDateKey]))?.creationDate ?? .now
-            if created < cutoff { try? FileManager.default.removeItem(at: dir) }
+        let keys: [URLResourceKey] = [.creationDateKey, .totalFileAllocatedSizeKey, .isRegularFileKey]
+        guard let walker = FileManager.default.enumerator(at: backupDirectory, includingPropertiesForKeys: keys),
+              let recorded = try? database.writer.read({ db in
+                  try String.fetchAll(db, sql: "SELECT fileBackupPath FROM tagHistory WHERE fileBackupPath IS NOT NULL")
+              })
+        else { return }
+        // By resolved path, as recorded (the enumerator may spell a path through /private, say).
+        let resolved = { (path: String) in URL(fileURLWithPath: path).resolvingSymlinksInPath().path }
+        let referenced = Dictionary(recorded.map { (resolved($0), $0) }, uniquingKeysWith: { first, _ in first })
+        var files: [(url: URL, created: Date, size: Int64, recordedAs: String?)] = []
+        for case let url as URL in walker {
+            guard let v = try? url.resourceValues(forKeys: Set(keys)), v.isRegularFile == true else { continue }
+            files.append((url, v.creationDate ?? .now, Int64(v.totalFileAllocatedSize ?? 0), referenced[resolved(url.path)]))
+        }
+        files.sort { $0.created < $1.created }
+        var total = files.reduce(0) { $0 + $1.size }
+        var orphaned: [String] = []
+        for file in files {
+            let stale = file.recordedAs == nil && file.created < cutoff
+            guard stale || total + needed > Self.backupBudget else { continue }
+            guard (try? FileManager.default.removeItem(at: file.url)) != nil else { continue }
+            total -= file.size
+            if let path = file.recordedAs { orphaned.append(path) }
+        }
+        if !orphaned.isEmpty {
+            _ = try? database.writer.write { db in
+                for path in orphaned {
+                    try db.execute(sql: "UPDATE tagHistory SET fileBackupPath = NULL WHERE fileBackupPath = ?", arguments: [path])
+                }
+            }
+        }
+        // Day folders left empty.
+        for dir in (try? FileManager.default.contentsOfDirectory(at: backupDirectory, includingPropertiesForKeys: nil)) ?? []
+        where (try? FileManager.default.contentsOfDirectory(atPath: dir.path))?.isEmpty == true {
+            try? FileManager.default.removeItem(at: dir)
         }
     }
 }
@@ -528,10 +575,11 @@ public extension TagWriter {
 }
 
 private enum TagWriteError: LocalizedError {
-    case invalidNumber(String), fileChanged, valuesNotKept
+    case invalidNumber(String), fileChanged, valuesNotKept, noRoomForBackup
     var errorDescription: String? {
         switch self {
         case .invalidNumber(let field): "\(field) must be a nonnegative whole number or blank."
+        case .noRoomForBackup: "There isn't enough free space for a backup of this file, so its tags weren't changed. Free some space and try again."
         case .valuesNotKept: "The tags couldn't be saved with every value of fields that have several (artists, genres), so the file was left as it was."
         case .fileChanged: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available."
         }
