@@ -47,7 +47,12 @@ public actor MusicBrainzClient {
 
     private let session: URLSession
     private var lastRequest = Date.distantPast
-    private let userAgent = "Vespertine/0.1 (open-source macOS audio player)"
+    /// MusicBrainz asks for "Application/version (contact URL or email)" so it can reach the author
+    /// instead of blocking everyone when a client misbehaves.
+    private let userAgent: String = {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+        return "Vespertine/\(version) (https://github.com/szeremeta1/Vespertine)"
+    }()
 
     public init() {
         let config = URLSessionConfiguration.default
