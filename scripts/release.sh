@@ -73,8 +73,10 @@ sign_sparkle() {
 }
 
 # A release is built from committed sources, and records which commit (publish.sh tags that one, not whatever HEAD is
-# by then). VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes.
-if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=no)" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
+# by then). VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. Package.resolved doesn't count:
+# Xcode and SwiftPM each rewrite it after every build (Xcode adds the app's own packages to it, `swift test` takes them
+# out again), so it's never clean for long.
+if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=no -- . ':(exclude)*Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
   print -u2 "The working tree has uncommitted changes: commit them first (or set VESPERTINE_ALLOW_DIRTY=1 for a test build)."
   exit 2
 fi
