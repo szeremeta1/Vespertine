@@ -11,7 +11,8 @@ filesystem = "APFS"
 compression_level = 9
 files = [app]
 symlinks = {"Applications": "/Applications"}
-hide_extensions = ["Vespertine.app"]
+# Don't set hide_extensions: it stamps a Finder-info flag onto the .app inside the image, and `codesign --verify --strict`
+# then fails on every copy of the app ("Disallowed xattr com.apple.FinderInfo"). Finder hides ".app" by default anyway.
 
 # Finder window
 background = background
