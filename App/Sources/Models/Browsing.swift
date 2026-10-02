@@ -34,6 +34,66 @@ enum FilterScope: Hashable {
     var offersFavorites: Bool { self != .sidebar(.favorites) }
 }
 
+extension FilterScope {
+    /// The name a page's filter is saved under. Only the sidebar's pages keep theirs across launches: a search
+    /// starts afresh, and artist and genre pages take the filter of the page they're opened from.
+    var storageKey: String? {
+        guard case .sidebar(let item) = self else { return nil }
+        return switch item {
+        case .albums: "albums"
+        case .artists: "artists"
+        case .songs: "songs"
+        case .genres: "genres"
+        case .recentlyAdded: "recentlyAdded"
+        case .favorites: "favorites"
+        case .playlist(let id): "playlist:\(id)"
+        case .source(let id): "source:\(id)"
+        }
+    }
+
+    init?(storageKey key: String) {
+        let parts = key.split(separator: ":", maxSplits: 1).map(String.init)
+        switch (parts.first, parts.count > 1 ? Int64(parts[1]) : nil) {
+        case ("albums", _): self = .sidebar(.albums)
+        case ("artists", _): self = .sidebar(.artists)
+        case ("songs", _): self = .sidebar(.songs)
+        case ("genres", _): self = .sidebar(.genres)
+        case ("recentlyAdded", _): self = .sidebar(.recentlyAdded)
+        case ("favorites", _): self = .sidebar(.favorites)
+        case ("playlist", let id?): self = .sidebar(.playlist(id))
+        case ("source", let id?): self = .sidebar(.source(id))
+        default: return nil
+        }
+    }
+}
+
+/// Page filters kept with the library they belong to (they name its playlists, sources and genres), in
+/// `<data directory>/Page Filters.json`.
+enum FilterStore {
+    static func url(in dataDirectory: URL) -> URL { dataDirectory.appendingPathComponent("Page Filters.json") }
+
+    static func load(from url: URL) -> [FilterScope: LibraryFilter] {
+        guard let data = try? Data(contentsOf: url),
+              let saved = try? JSONDecoder().decode([String: LibraryFilter].self, from: data) else { return [:] }
+        var filters: [FilterScope: LibraryFilter] = [:]
+        for (key, filter) in saved where !filter.isEmpty {
+            if let scope = FilterScope(storageKey: key) { filters[scope] = filter }
+        }
+        return filters
+    }
+
+    static func save(_ filters: [FilterScope: LibraryFilter], to url: URL) {
+        var saved: [String: LibraryFilter] = [:]
+        for (scope, filter) in filters where !filter.isEmpty {
+            if let key = scope.storageKey { saved[key] = filter }
+        }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        if saved.isEmpty { try? FileManager.default.removeItem(at: url); return }
+        if let data = try? encoder.encode(saved) { try? data.write(to: url, options: .atomic) }
+    }
+}
+
 struct FilterPanelRequest: Equatable {
     let scope: FilterScope
     let facet: Facet?

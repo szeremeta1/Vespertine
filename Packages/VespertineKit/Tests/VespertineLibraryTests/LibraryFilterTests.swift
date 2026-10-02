@@ -126,6 +126,21 @@ struct LibraryFilterTests {
         #expect(albums.filter { f.matches($0.facts) }.map(\.title) == ["DSOTM"])
     }
 
+    @Test("A filter survives being saved, and what a later version adds is skipped")
+    func savedFilters() throws {
+        var f = LibraryFilter()
+        f[.genre] = [Genres.key("Jazz"), Genres.key("Soul")]
+        f[.sampleRate] = ["96000"]
+        f.toggle(.bits24)
+        f.toggle(.favorite)
+        let data = try JSONEncoder().encode(f)
+        #expect(try JSONDecoder().decode(LibraryFilter.self, from: data) == f)
+        let later = #"{"facets": {"genre": ["jazz"], "mood": ["calm"]}, "flags": ["bits24", "loud"]}"#
+        let read = try JSONDecoder().decode(LibraryFilter.self, from: Data(later.utf8))
+        #expect(read[.genre] == ["jazz"] && read.flags == [.bits24] && read.activeFacets == [.genre])
+        #expect(try JSONDecoder().decode(LibraryFilter.self, from: Data("{}".utf8)).isEmpty)
+    }
+
     @Test("Tracks of several albums come album after album, each in its own order")
     func tracksOfAlbums() throws {
         let db = try LibraryDatabase.inMemory()
