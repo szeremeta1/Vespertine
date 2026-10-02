@@ -5,12 +5,15 @@ Vespertine's own and free to use anywhere the trailer goes.
 
 Timed to the cut in Sources/TrailerStage/Timeline.swift: 130 BPM (two bars to each of the trailer's 65 BPM bars),
 first downbeat at 3.657 s, the end card from bar 8, 36.633 s in all. A lounge progression in D-flat
-(Dbmaj9, Bbm9, Gbmaj9, Ab13sus4) on a Rhodes-like FM piano, a warm pad, sub bass and soft half-time drums,
-mastered to -14 LUFS with true peaks under -1 dBTP.
+(Dbmaj9, Bbm9, Gbmaj9, Ab13sus4) on a Rhodes-like FM piano, a warm pad, sub bass and soft half-time drums.
+Mastered gently: a light 1.5:1 bus compressor and a soft tanh saturation with headroom (it warms, never clips),
+then -14 LUFS integrated with true peaks under -1.5 dBTP, the limiter only shaving the odd peak by a fraction of a dB.
 
     python3 score.py out.wav                             the trailer's bed (48 kHz, 24-bit)
-    python3 score.py --rate 384000 --bits 32 out.wav     the hi-res edition: synthesized at that rate, not upsampled,
-                                                         so the hats, clicks and saturation really reach 192 kHz
+    python3 score.py --rate 384000 --bits 32 out.wav     the hi-res edition: synthesized at that rate, not upsampled.
+                                                         Its noise has the same density at any rate, so the balance
+                                                         matches, and the hats, clicks and swells roll off above 20 kHz
+                                                         (about 12 dB per octave) like real cymbals, on to 192 kHz.
 (needs numpy, scipy, soundfile, pyloudnorm)
 """
 import argparse
@@ -72,17 +75,32 @@ def place(bus, sound, start):
         bus[:, i:i + n] += sound[:, j0:j0 + n]
 
 
+def butter(order, freq, kind):
+    return signal.butter(order, freq, kind, fs=SR, output="sos")
+
+
+def noise(shape):
+    """White noise with the same spectral density at any rate, so the hi-res edition keeps the 48 kHz balance."""
+    return RNG.standard_normal(shape) * np.sqrt(SR / 48_000)
+
+
+def onset(t, rise):
+    """A soft edge for a noise burst, so it starts without a click."""
+    return 1 - np.exp(-t / rise)
+
+
 # MARK: - Instruments
 
 def rhodes(note, length, velocity=0.6):
-    """Two-operator FM electric piano: a bright attack that mellows, a tine click, and a gentle release."""
+    """Two-operator FM electric piano: a bright attack that mellows, a soft tine, and a gentle release."""
     f = midi(note)
     n = int((length + 1.2) * SR)
     t = np.arange(n) / SR
     index = (1.6 * velocity + 0.4) * np.exp(-t / 0.45) + 0.25
     tone = np.sin(2 * np.pi * f * t + index * np.sin(2 * np.pi * f * t))
-    tine = 0.12 * velocity * np.sin(2 * np.pi * f * 14.0 * t) * np.exp(-t / 0.03)
-    env = (1 - np.exp(-t / 0.002)) * np.exp(-t / (2.4 - 0.012 * (note - 48)))
+    # The tine's ping, 14 partials up, eased off for the higher notes so it never pings at 8-12 kHz.
+    tine = 0.09 * velocity / np.sqrt(1 + (14 * f / 5000) ** 2) * np.sin(2 * np.pi * f * 14.0 * t) * np.exp(-t / 0.03)
+    env = onset(t, 0.003) * np.exp(-t / (2.4 - 0.012 * (note - 48)))
     env *= np.where(t < length, 1.0, np.exp(-(t - length) / 0.22))
     return (tone + tine) * env * velocity
 
@@ -119,35 +137,44 @@ def kick(velocity=1.0):
     t = np.arange(int(0.5 * SR)) / SR
     pitch = 46 + 74 * np.exp(-t / 0.035)
     body = np.sin(2 * np.pi * np.cumsum(pitch) / SR) * np.exp(-t / 0.32)
-    click = signal.lfilter(*signal.butter(2, 3500 / (SR / 2), "high"), RNG.standard_normal(len(t))) * np.exp(-t / 0.004)
+    # The beater: a soft knock of 1.5-5 kHz noise rather than a white click.
+    click = signal.sosfilt(butter(2, [1500, 5000], "band"), noise(len(t))) * onset(t, 0.0004) * np.exp(-t / 0.004)
     return (body + 0.12 * click) * velocity
 
 
 def clap(velocity=1.0):
+    """Three quick slaps and a short tail of 0.7-2.5 kHz noise, each with a soft edge."""
     t = np.arange(int(0.6 * SR)) / SR
-    noise = signal.lfilter(*signal.butter(2, [900 / (SR / 2), 5000 / (SR / 2)], "band"), RNG.standard_normal(len(t)))
-    bursts = sum(np.exp(-np.clip(t - d, 0, None) / 0.006) * (t >= d) for d in (0.0, 0.011, 0.022))
-    return noise * (0.6 * bursts + np.exp(-t / 0.16) * (t >= 0.022)) * velocity
+    body = signal.sosfilt(butter(2, [700, 2500], "band"), noise(len(t)))
+
+    def slap(delay, decay, level):
+        s = np.clip(t - delay, 0, None)
+        return level * onset(s, 0.0008) * np.exp(-s / decay)
+
+    env = sum(slap(d, 0.006, 0.6) for d in (0.0, 0.011, 0.022)) + slap(0.022, 0.16, np.exp(-0.022 / 0.16))
+    return body * env * velocity
 
 
 def hat(velocity=0.5, open_=False):
+    """7-10 kHz noise, rolling off above at 12 dB/oct like a real cymbal (on to 192 kHz in the hi-res edition)."""
     t = np.arange(int((0.35 if open_ else 0.08) * SR)) / SR
-    noise = signal.lfilter(*signal.butter(4, 7000 / (SR / 2), "high"), RNG.standard_normal(len(t)))
-    return noise * np.exp(-t / (0.12 if open_ else 0.022)) * velocity
+    sizzle = signal.sosfilt(np.vstack([butter(4, 7000, "high"), butter(2, 10000, "low")]), noise(len(t)))
+    return sizzle * onset(t, 0.0003) * np.exp(-t / (0.12 if open_ else 0.022)) * velocity
 
 
 def swell(length, low=300.0, high=7000.0, reverse=False):
-    """Filtered noise rising into a cut (a riser, or a short reverse swell)."""
+    """Filtered noise rising into a cut (a riser, or a short reverse swell). The band glides every 5 ms and the
+    filter keeps its state as it does, so the sweep is seamless."""
     n = int(length * SR)
     t = np.arange(n) / SR
-    noise = RNG.standard_normal((2, n))
+    source = noise((2, n))
     out = np.zeros((2, n))
-    block = 512
+    block = int(0.005 * SR)
+    state = np.zeros((2, 2, 2))
     for i in range(0, n, block):
-        x = i / n
-        f = low * (high / low) ** x
-        b, a = signal.butter(2, [max(f / 1.6, 40) / (SR / 2), min(f * 1.6, SR / 2.1) / (SR / 2)], "band")
-        out[:, i:i + block] = signal.lfilter(b, a, noise[:, i:i + block])
+        f = low * (high / low) ** (i / n)
+        sos = butter(2, [max(f / 1.6, 40), min(f * 1.6, SR / 2.1)], "band")
+        out[:, i:i + block], state = signal.sosfilt(sos, source[:, i:i + block], zi=state)
     env = (t / length) ** (3 if reverse else 2)
     return out * env
 
@@ -155,8 +182,8 @@ def swell(length, low=300.0, high=7000.0, reverse=False):
 def impact(length=2.4):
     t = np.arange(int(length * SR)) / SR
     drop = np.sin(2 * np.pi * np.cumsum(38 + 40 * np.exp(-t / 0.25)) / SR) * np.exp(-t / 0.9)
-    wash = signal.lfilter(*signal.butter(2, [3000 / (SR / 2), 12000 / (SR / 2)], "band"), RNG.standard_normal((2, len(t))))
-    return np.stack([drop, drop]) * 0.7 + wash * np.exp(-t / 1.1) * 0.12
+    wash = signal.sosfilt(butter(2, [2500, 9000], "band"), noise((2, len(t))))
+    return np.stack([drop, drop]) * 0.7 + wash * onset(t, 0.002) * np.exp(-t / 1.1) * 0.1
 
 
 # MARK: - Arrangement
@@ -204,16 +231,16 @@ for bar, (root, notes) in enumerate(CHORDS):
         place(wet, stereo(clap(0.55), pan=0.05), at(bar, 2))
         for eighth in range(8):
             open_ = eighth == 7
-            velocity = (0.32 if eighth % 2 else 0.2) * (0.8 + 0.4 * RNG.random())
+            velocity = (0.12 if eighth % 2 else 0.078) * (0.8 + 0.4 * RNG.random())
             place(wet, stereo(hat(velocity, open_), pan=0.35), at(bar, eighth / 2) + RNG.normal(0, 0.004))
 
 # FX: a riser into the first downbeat with an impact on it, a short swell into each scene cut, the end card's crash.
-place(wet, swell(at(2) - at(1, 1)) * 0.25, at(1, 1))
-place(wet, impact() * 0.9, at(2))
+place(wet, swell(at(2) - at(1, 1), high=6000) * 0.12, at(1, 1))
+place(wet, impact() * 0.75, at(2))
 for bar in range(4, END_BAR, 2):
-    place(wet, swell(BEAT * 1.5, 900, 9000, reverse=True) * 0.07, at(bar) - BEAT * 1.5)
-place(wet, swell(BEAT * 2, 500, 9000, reverse=True) * 0.12, at(END_BAR) - BEAT * 2)
-place(wet, impact(4.0) * 0.55, at(END_BAR))
+    place(wet, swell(BEAT * 1.5, 900, 7000, reverse=True) * 0.07, at(bar) - BEAT * 1.5)
+place(wet, swell(BEAT * 2, 500, 7000, reverse=True) * 0.1, at(END_BAR) - BEAT * 2)
+place(wet, impact(4.0) * 0.5, at(END_BAR))
 
 # MARK: - Mix
 
@@ -228,48 +255,92 @@ def reverb(x, seconds=2.6, predelay=0.024):
     t = np.arange(n) / SR
     out = np.zeros_like(x)
     for ch in range(2):
-        noise = RNG.standard_normal(n) * np.exp(-6.91 * t / seconds)
-        early = signal.lfilter(*signal.butter(1, 9000 / (SR / 2)), noise)
-        late = signal.lfilter(*signal.butter(1, 2500 / (SR / 2)), noise)
+        tail = RNG.standard_normal(n) * np.exp(-6.91 * t / seconds)
+        early = signal.sosfilt(butter(1, 9000, "low"), tail)
+        late = signal.sosfilt(butter(1, 2500, "low"), tail)
         ir = np.concatenate([np.zeros(int(predelay * SR)), early * np.exp(-t / 0.4) + late * (1 - np.exp(-t / 0.4))])
-        ir /= np.sqrt(np.sum(ir ** 2))
+        # Unit energy across the 48 kHz band at any rate (so the hi-res edition's hall is as loud as the trailer's).
+        audible = np.fft.rfftfreq(len(ir), 1 / SR) < 24_000
+        ir /= np.sqrt(2 * np.sum(np.abs(np.fft.rfft(ir)[audible]) ** 2) / len(ir) * SR / 48_000)
         out[ch] = signal.fftconvolve(x[ch], ir)[:x.shape[1]]
     return out
 
 
 mix = dry + bass * 0.55 + wet + reverb(wet) * 0.32
-mix = signal.sosfilt(signal.butter(2, 28 / (SR / 2), "high", output="sos"), mix)
+mix = signal.sosfilt(butter(2, 28, "high"), mix)
 # Fade out with the end card's own fade (Music.duration - 1.5 to - 0.15).
 t = np.arange(N) / SR
 mix *= np.clip((DURATION - 0.15 - t) / 1.35, 0, 1) ** 1.5
-mix = np.tanh(mix * 1.15) / 1.15
-
-# -14 LUFS integrated, then a look-ahead limiter keeps true peaks (4x oversampled) under -1 dBTP.
-def limit(x, ceiling, lookahead=0.004, release=0.12):
-    need = np.minimum(1.0, ceiling / np.maximum(np.abs(x).max(axis=0), 1e-12))
-    need = ndimage.minimum_filter1d(need, size=2 * int(lookahead * SR) + 1)   # duck before each peak arrives
-    k = np.exp(-1 / (release * SR))
-    gain, current = np.empty_like(need), 1.0
-    for i, g in enumerate(need):
-        current = g if g < current else k * current + (1 - k) * g
-        gain[i] = current
-    return x * gain
-
 
 meter = pyloudnorm.Meter(SR)
-mix *= 10 ** ((-14 - meter.integrated_loudness(mix.T)) / 20)
 # Inter-sample peaks: 4x oversampled at 48 kHz; at 192 kHz and up the samples are already that close together.
 OVERSAMPLE = max(1, 192_000 // SR)
-true_peak = lambda x: np.max(np.abs(signal.resample_poly(x, OVERSAMPLE, 1, axis=1) if OVERSAMPLE > 1 else x))
-ceiling = 10 ** (-1.2 / 20)
+
+
+def upsampled(x):
+    return signal.resample_poly(x, OVERSAMPLE, 1, axis=-1) if OVERSAMPLE > 1 else x
+
+
+def true_peak(x):
+    return np.max(np.abs(upsampled(x)))
+
+
+def compress(x, threshold, ratio=1.5, knee=6.0, attack=0.015, release=0.35):
+    """A gentle, stereo-linked bus compressor with a soft knee. Its detector skips the lows (so the kick and bass don't
+    pump it) and runs in 1 ms steps; the gain is interpolated to the audio rate."""
+    hop = SR // 1000
+    k = x.shape[1] // hop
+    key = signal.sosfilt(butter(2, 150, "high"), x)
+    power = np.mean(key[:, :k * hop] ** 2, axis=0).reshape(k, hop).mean(axis=1)
+    level = 10 * np.log10(ndimage.uniform_filter1d(power, 10) + 1e-12)               # 10 ms RMS
+    over = level - threshold
+    over = np.where(over > knee / 2, over, np.clip(over + knee / 2, 0, None) ** 2 / (2 * knee))
+    target = -over * (1 - 1 / ratio)
+    fall, rise = np.exp(-1 / (attack * 1000)), np.exp(-1 / (release * 1000))
+    gain, current = np.empty(k), 0.0
+    for i, g in enumerate(target):
+        c = fall if g < current else rise
+        current = c * current + (1 - c) * g
+        gain[i] = current
+    gain = np.interp(np.arange(x.shape[1]), np.arange(k) * hop + hop / 2, gain)
+    return x * 10 ** (gain / 20), gain
+
+
+def limit(x, ceiling, lookahead=0.0008, recovery=20.0):
+    """A look-ahead true-peak limiter: the gain eases down over ~1.6 ms before a peak (a ramp, never a step) and
+    recovers at `recovery` dB per second."""
+    peak = np.abs(upsampled(x)).max(axis=0)
+    if OVERSAMPLE > 1:
+        peak = peak.reshape(-1, OVERSAMPLE).max(axis=1)
+    need = np.minimum(1.0, ceiling / np.maximum(peak, 1e-12))
+    m = max(1, int(lookahead * SR))
+    need = ndimage.uniform_filter1d(ndimage.minimum_filter1d(need, 4 * m + 1), 2 * m + 1)
+    need = 20 * np.log10(np.maximum(need, 1e-6))
+    slope = recovery / SR * np.arange(len(need))
+    gain = np.minimum.accumulate(need - slope) + slope
+    return x * 10 ** (gain / 20), gain
+
+
+# The bus is set to -20 LUFS and eased by the compressor, then meets the tanh with headroom: a little warmth (its
+# harmonics sit ~38 dB down, what they alias at 48 kHz ~100 dB down) and the loudest peaks rounded by under a dB.
+mix *= 10 ** ((-20 - meter.integrated_loudness(mix.T)) / 20)
+mix, compression = compress(mix, threshold=-24)
+mix = np.tanh(mix * 1.15) / 1.15
+
+# -14 LUFS integrated, then the limiter keeps true peaks (4x oversampled) under -1.5 dBTP.
+mix *= 10 ** ((-14 - meter.integrated_loudness(mix.T)) / 20)
+ceiling = 10 ** (-1.6 / 20)
+limiting = np.zeros(N)
 for _ in range(4):
-    if true_peak(mix) <= 10 ** (-1 / 20):
+    mix, gain = limit(mix, ceiling)
+    limiting += gain
+    if true_peak(mix) <= 10 ** (-1.5 / 20):
         break
-    mix = limit(mix, ceiling)
-    ceiling *= 10 ** (-0.3 / 20)
+    ceiling *= 10 ** (-0.1 / 20)
 
 if __name__ == "__main__":
     out = OPTIONS.out
     soundfile.write(out, mix.T, SR, subtype=f"PCM_{OPTIONS.bits}")
     final_peak = 20 * np.log10(true_peak(mix))
-    print(f"{out}: {OPTIONS.bits}-bit / {SR / 1000:g} kHz, {DURATION:.3f} s, {meter.integrated_loudness(mix.T):.1f} LUFS, true peak {final_peak:.1f} dBTP")
+    print(f"{out}: {OPTIONS.bits}-bit / {SR / 1000:g} kHz, {DURATION:.3f} s, {meter.integrated_loudness(mix.T):.1f} LUFS, "
+          f"true peak {final_peak:.1f} dBTP, limiter at most {-limiting.min():.1f} dB")
