@@ -301,7 +301,9 @@ final class LibraryStore {
 
     /// Music on this Mac that isn't in the library yet.
     func findMusic(progress: @escaping @Sendable (MusicFinder.Progress) -> Void) async -> [FoundFolder] {
-        await MusicFinder.find(excludingRoots: sources.map(\.url), progress: progress)
+        // QA hook: -VespertineFindMusicRoot <dir> searches that folder instead of asking Spotlight.
+        let roots = UserDefaults.standard.string(forKey: "VespertineFindMusicRoot").map { [URL(fileURLWithPath: $0, isDirectory: true)] }
+        return await MusicFinder.find(roots: roots, excludingRoots: sources.map(\.url), progress: progress)
     }
 
     /// Adds found music. Import copies (APFS clones) just the chosen files; reference adds their folders.
