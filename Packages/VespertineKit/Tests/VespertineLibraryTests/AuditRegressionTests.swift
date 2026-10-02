@@ -1,4 +1,5 @@
 import AVFAudio
+import CVespertineTags
 import Foundation
 import GRDB
 import SFBAudioEngine
@@ -223,6 +224,38 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         _ = try await writer.apply(TagEdit(custom: ["TEST_CUSTOM": "changed"], artwork: .remove), to: [track])
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try Data(contentsOf: url) == original)
+    }
+    @Test func editingSomeFieldsKeepsEveryValueOfTheOthers() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let wav = dir.appendingPathComponent("source.wav"); try audio(wav)
+        let url = dir.appendingPathComponent("song.flac"); try SFBAudioEngine.AudioConverter.convert(wav, to: url)
+        try FileManager.default.removeItem(at: wav)
+        func set(_ key: String, _ values: [String]) {
+            let copies = values.compactMap { strdup($0) }
+            defer { copies.forEach { free($0) } }
+            let status = copies.map { UnsafePointer($0) }.withUnsafeBufferPointer { nvt_property_set(url.path, key, $0.baseAddress, Int32(values.count)) }
+            #expect(status == 0)
+        }
+        func values(_ key: String) -> [String] {
+            var buffer = [CChar](repeating: 0, count: 4096)
+            let count = nvt_property_get(url.path, key, &buffer, Int32(buffer.count))
+            return count > 0 ? String(cString: buffer).components(separatedBy: "\n") : []
+        }
+        let ids = ["5d3b3f2c-0000-4000-8000-000000000001", "5d3b3f2c-0000-4000-8000-000000000002"]
+        set("ARTIST", ["Simon", "Garfunkel"]); set("GENRE", ["Folk", "Rock"]); set("MUSICBRAINZ_ARTISTID", ids); set("TEST_GONE", ["x"])
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".backups"))
+        let result = try await writer.apply(TagEdit(fields: [.title: "Edited", .genre: "Pop"], custom: ["TEST_GONE": nil]), to: [track])
+        #expect(result.written == 1 && result.failures.isEmpty)
+        #expect(values("ARTIST") == ["Simon", "Garfunkel"])     // untouched: every value kept
+        #expect(values("MUSICBRAINZ_ARTISTID") == ids)
+        #expect(values("GENRE") == ["Pop"])                     // edited: as edited
+        #expect(values("TITLE") == ["Edited"])
+        #expect(values("TEST_GONE").isEmpty)                    // a deleted custom tag leaves the file
     }
     @Test func numericCueOverflowIsRejected() {
         #expect(CueSheet.cdFrames("9223372036854775807:59:74") == nil)
