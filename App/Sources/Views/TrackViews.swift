@@ -25,6 +25,9 @@ struct TrackTable: View {
     var allTracks: [Track]? = nil
 
     @State private var selection = Set<Int64>()
+    /// The selected songs, each with which of its copies in the list it is (a playlist can hold a song twice), so a
+    /// change to the list selects the same entries again, not every copy of them.
+    @State private var selectedEntries: [Int64: Set<Int>] = [:]
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
     @State private var sorted = SortedRows()
 
@@ -125,12 +128,12 @@ struct TrackTable: View {
         }
         .onChange(of: tracks) {
             // Rows are numbered by their place in the list: when the list changes (a scan adds a song above), select the
-            // same songs again rather than the same places, or Play and Return would act on whatever moved there.
-            let wanted = model.selectedTrackIDs
-            let same = Set(rows.filter { wanted.contains($0.track.id ?? -1) }.map(\.id))
+            // same entries again rather than the same places, or Play, Return and Remove would act on whatever moved there.
+            let same = Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) })
             if same != selection { selection = same }
         }
         .onChange(of: selection) { _, new in
+            selectedEntries = Self.entries(new, in: rows.map { ($0.id, $0.track.id) })
             model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
@@ -139,6 +142,33 @@ struct TrackTable: View {
             model.player.play(rows.map(\.track), startAt: index)
             return .handled
         }
+    }
+}
+
+extension TrackTable {
+    /// Each selected row (of rows in the order shown, with their songs' IDs) as its song and which copy of it it is.
+    static func entries(_ selected: Set<Int64>, in rows: [(row: Int64, song: Int64?)]) -> [Int64: Set<Int>] {
+        var copies: [Int64: Int] = [:], entries: [Int64: Set<Int>] = [:]
+        for (row, song) in rows {
+            guard let id = song else { continue }
+            let copy = copies[id, default: 0]
+            copies[id] = copy + 1
+            if selected.contains(row) { entries[id, default: []].insert(copy) }
+        }
+        return entries
+    }
+
+    /// The rows that hold `entries` now.
+    static func rows(for entries: [Int64: Set<Int>], in rows: [(row: Int64, song: Int64?)]) -> Set<Int64> {
+        guard !entries.isEmpty else { return [] }
+        var copies: [Int64: Int] = [:], selected = Set<Int64>()
+        for (row, song) in rows {
+            guard let id = song, let wanted = entries[id] else { continue }
+            let copy = copies[id, default: 0]
+            copies[id] = copy + 1
+            if wanted.contains(copy) { selected.insert(row) }
+        }
+        return selected
     }
 }
 

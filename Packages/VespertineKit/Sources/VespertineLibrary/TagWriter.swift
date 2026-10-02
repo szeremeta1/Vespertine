@@ -279,6 +279,9 @@ public actor TagWriter {
                 result.failures.append((url.path, error.localizedDescription))
             }
         }
+        // A clone backup costs nothing when it's made, but it keeps the file's old blocks once the edit replaces them,
+        // so clones count against the budget too: trim it after every edit, not only before a full copy.
+        if result.written > 0 { pruneBackups() }
         if !refreshIDs.isEmpty { try await scanner.refresh(trackIDs: refreshIDs) }
         return result
     }
@@ -485,6 +488,8 @@ public actor TagWriter {
             // backups take the last of the disk.
             let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0)
             pruneBackups(making: size)
+            // Pruning removes day folders left empty, today's (made above, still empty) among them.
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             guard freeSpace(at: backupDirectory) >= size + Self.backupFreeSpaceReserve else { throw TagWriteError.noRoomForBackup }
             try FileManager.default.copyItem(at: url, to: dest)
         }

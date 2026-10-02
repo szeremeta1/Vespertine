@@ -84,8 +84,10 @@ final class PlayerController {
     /// Time actually listened to the current song, for counting a play: seeking doesn't add to it.
     @ObservationIgnored private var listened: TimeInterval = 0
     @ObservationIgnored private var lastListenTick: Date?
-    /// A seek restarts the engine's segment, which reports the song as started again: still the same play.
-    @ObservationIgnored private var seekRestart: (id: UUID, at: Date)?
+    /// A seek restarts the engine's segment, which reports the song as started again (once it plays, so after
+    /// resuming if it was paused): still the same play. Cleared by that report, or by playing something else or stopping,
+    /// never by a clock, so a song seeked while paused and resumed minutes later isn't counted twice.
+    @ObservationIgnored private var seekRestart: UUID?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
@@ -334,6 +336,7 @@ final class PlayerController {
 
     private func start(_ entry: QueueEntry) {
         requested = entry.id
+        seekRestart = nil
         requestedPosition = nil
         position = 0
         duration = entry.track.duration
@@ -372,13 +375,13 @@ final class PlayerController {
     }
 
     func seek(to seconds: TimeInterval) {
-        if let id = current?.id { seekRestart = (id, .now) }
+        if let id = current?.id { seekRestart = id }
         engine.seek(to: seconds)
         position = seconds
         requestedPosition = (seconds, .now)
     }
 
-    func stop() { requested = nil; requestedPosition = nil; engine.stop() }
+    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; engine.stop() }
 
     func clearError() { lastError = nil }
 
@@ -390,9 +393,10 @@ final class PlayerController {
             // A song you've already skipped past (the engine reached it before your later skips): ignore it.
             // Following it would move the queue back to it, and the next skip would continue from there.
             if let requested, requested != item.id { return }
+            let fresh = requested != nil   // the song just chosen: a new play, even if it was seeked while opening
             requested = nil
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
-            if let restart = seekRestart, restart.id == item.id, Date().timeIntervalSince(restart.at) < 5 {
+            if !fresh, seekRestart == item.id {
                 seekRestart = nil
                 updateNowPlayingInfo()
                 return
@@ -408,6 +412,7 @@ final class PlayerController {
                 Task { try? await ListenBrainzClient.shared.submit(track, kind: .playingNow) }
             }
         case .queueEnded:
+            seekRestart = nil
             updateNowPlayingInfo()
         case .failed(let item, let message):
             if let requested, let item, requested != item.id { return }   // about a song skipped past
@@ -495,8 +500,10 @@ final class PlayerController {
         // Count a play (and scrobble) after half the track or four minutes of listening, whichever comes first
         // (ListenBrainz's rule): time actually played, so seeking to the middle isn't a listen.
         let now = Date()
-        if state == .playing, let last = lastListenTick { listened += min(now.timeIntervalSince(last), 1) }
-        lastListenTick = state == .playing ? now : nil
+        // Waiting on a network share to refill the buffer isn't listening.
+        let listening = state == .playing && !buffering
+        if listening, let last = lastListenTick { listened += min(now.timeIntervalSince(last), 1) }
+        lastListenTick = listening ? now : nil
         if state == .playing, let entry = current, scrobbledEntry != entry.id, duration > 30,
            listened >= min(duration / 2, 240) {
             scrobbledEntry = entry.id

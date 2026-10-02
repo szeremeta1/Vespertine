@@ -73,11 +73,13 @@ sign_sparkle() {
 }
 
 # A release is built from committed sources, and records which commit (publish.sh tags that one, not whatever HEAD is
-# by then). VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. Package.resolved doesn't count:
-# Xcode and SwiftPM each rewrite it after every build (Xcode adds the app's own packages to it, `swift test` takes them
-# out again), so it's never clean for long.
-if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=no -- . ':(exclude)*Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
-  print -u2 "The working tree has uncommitted changes: commit them first (or set VESPERTINE_ALLOW_DIRTY=1 for a test build)."
+# by then). Untracked files count too: XcodeGen builds every file in the source folders, committed or not.
+# VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. Package.resolved doesn't count: Xcode and
+# SwiftPM each rewrite it after every build (Xcode adds the app's own packages to it, `swift test` takes them out
+# again), so it's never clean for long.
+if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=all -- . ':(exclude)*Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
+  print -u2 "The working tree has uncommitted or untracked files: commit or remove them first (or set VESPERTINE_ALLOW_DIRTY=1 for a test build)."
+  git status --short --untracked-files=all -- . ':(exclude)*Package.resolved' >&2
   exit 2
 fi
 
@@ -150,6 +152,9 @@ if $notarize; then
   xcrun stapler validate "$dmg"
   spctl --assess --type execute -vv "$app"
   spctl --assess --type open --context context:primary-signature -vv "$dmg"
+  # What publish.sh tags and uploads: this DMG and the commit its app was built from. built-from alone follows the
+  # last build, which a later test build moves on.
+  print "$(<"$out/built-from") $(shasum -a 256 "$dmg" | cut -d' ' -f1)" > "$dmg.built-from"
   print "Distributable: $dmg"
 fi
 

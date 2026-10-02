@@ -106,11 +106,8 @@ final class OutputSession: @unchecked Sendable {
         latencyFrames = Int(deviceLatency) + Int(safetyOffset) + Int(streamLatency)
         let totalChannels = virtuals.reduce(0) { $0 + Int($1.mChannelsPerFrame) }
 
-        let floatStreams = !virtuals.isEmpty && virtuals.count == streams.count && virtuals.allSatisfy {
-            $0.mFormatID == kAudioFormatLinearPCM && $0.mBitsPerChannel == 32 && abs($0.mSampleRate - rate) < 0.5
-                && (integerMode ? $0.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 && $0.mBytesPerFrame == 4 * $0.mChannelsPerFrame
-                                : $0.mFormatFlags & kAudioFormatFlagIsFloat != 0)
-        }
+        let floatStreams = !virtuals.isEmpty && virtuals.count == streams.count
+            && virtuals.allSatisfy { Self.renders(into: $0, rate: rate, integer: integerMode) }
         guard floatStreams, totalChannels >= plan.deviceChannels, rate.isFinite, rate > 0, rate <= 3_072_000 else {
             if hogged { DeviceControl.releaseHog(deviceID) }
             throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
@@ -207,7 +204,20 @@ final class OutputSession: @unchecked Sendable {
         let physicals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
         if let shallowest = physicals.map(\.mBitsPerChannel).min(), Int(shallowest) != applied.physicalBitDepth { return true }
         let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
-        return virtuals.contains { abs($0.mSampleRate - rate) >= 0.5 || $0.mBitsPerChannel != 32 }
+        // Same rate and depth can still hide a switch between Float32 and Int32, or a different channel count,
+        // either of which the render context would write wrongly.
+        if virtuals.count != applied.streamCount
+            || virtuals.reduce(0, { $0 + Int($1.mChannelsPerFrame) }) != applied.virtualChannels { return true }
+        return !virtuals.allSatisfy { Self.renders(into: $0, rate: rate, integer: applied.integerMode) }
+    }
+
+    /// Whether the render context can write `virtual` as set up: 32-bit linear PCM at `rate`, float, or
+    /// packed signed integers in integer mode.
+    static func renders(into virtual: AudioStreamBasicDescription, rate: Double, integer: Bool) -> Bool {
+        virtual.mFormatID == kAudioFormatLinearPCM && virtual.mBitsPerChannel == 32 && abs(virtual.mSampleRate - rate) < 0.5
+            && (integer ? virtual.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 && virtual.mFormatFlags & kAudioFormatFlagIsFloat == 0
+                            && virtual.mBytesPerFrame == 4 * virtual.mChannelsPerFrame
+                        : virtual.mFormatFlags & kAudioFormatFlagIsFloat != 0)
     }
 
     private func unwatchFormats() {

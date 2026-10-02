@@ -195,6 +195,25 @@ struct VolumeRelayAlertTests {
         #expect(RelayChanges.load(from: defaults) == left)
         RelayChanges.store(nil, in: defaults)
         #expect(RelayChanges.load(from: defaults) == nil)
+        RelayChanges.storeLeftovers([left], in: defaults)
+        RelayChanges.store(nil, in: defaults)
+        #expect(RelayChanges.leftovers(from: defaults) == [left], "relaying again doesn't touch what's left over")
+        RelayChanges.storeLeftovers([], in: defaults)
+        #expect(RelayChanges.leftovers(from: defaults).isEmpty)
+    }
+
+    @Test("What couldn't be put back after a crash waits for the next launch")
+    func remaining() {
+        let left = RelayChanges(standIn: "USBSpeakers", volume: 0.3, mute: 0, relayedVolume: 0.8, relayedMute: 0,
+                                alert: 75, alertSet: 9)
+        #expect(left.remaining(volume: true, mute: true, alert: true) == nil)
+        let unplugged = left.remaining(volume: false, mute: false, alert: true)
+        #expect(unplugged?.volume == 0.3 && unplugged?.relayedVolume == 0.8 && unplugged?.mute == 0)
+        #expect(unplugged?.alert == nil && unplugged?.alertSet == nil)
+        let unreadable = left.remaining(volume: true, mute: true, alert: false)
+        #expect(unreadable?.volume == nil && unreadable?.alert == 75 && unreadable?.alertSet == 9)
+        // A field the relay never changed is nothing to wait for.
+        #expect(RelayChanges(standIn: "USBSpeakers", volume: 0.3, mute: 0).remaining(volume: false, mute: false, alert: false) == nil)
     }
 }
 

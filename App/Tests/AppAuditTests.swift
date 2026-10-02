@@ -87,4 +87,15 @@ struct AppAuditTests {
         #expect(throws: (any Error).self) { try LibraryStore(dataDirectory: root) }
         #expect(try Data(contentsOf: url) == data)
     }
+
+    /// A playlist can hold a song twice: when the list changes, the entry that was selected stays selected, not every
+    /// copy of the song (or Remove from Playlist would take both).
+    @Test func selectionFollowsTheEntryNotEveryCopy() {
+        let before: [(row: Int64, song: Int64?)] = [(0, 7), (1, 8), (2, 7), (3, 9)]
+        let entries = TrackTable.entries([2], in: before)               // the second copy of song 7
+        #expect(entries == [7: [1]])
+        let after: [(row: Int64, song: Int64?)] = [(0, 5), (1, 7), (2, 8), (3, 7), (4, 9)] // a song added above
+        #expect(TrackTable.rows(for: entries, in: after) == [3])
+        #expect(TrackTable.rows(for: TrackTable.entries([2, 3], in: after), in: before) == [1, 2])
+    }
 }

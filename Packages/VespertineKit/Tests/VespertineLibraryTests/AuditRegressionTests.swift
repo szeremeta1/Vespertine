@@ -88,6 +88,19 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         try FileManager.default.createDirectory(at: other, withIntermediateDirectories: true)
         try audio(other.appendingPathComponent("set.wav"))
         #expect(try Importer.copyAndOrganize([other], into: dst).map(\.lastPathComponent) == ["set 2.wav"])
+
+        // So is one with the same size and date as the first, but different music.
+        let twin = dir.appendingPathComponent("twin")
+        try FileManager.default.createDirectory(at: twin, withIntermediateDirectories: true)
+        let twinFile = twin.appendingPathComponent("set.wav")
+        try FileManager.default.copyItem(at: src.appendingPathComponent("set.wav"), to: twinFile)
+        let handle = try FileHandle(forUpdating: twinFile)
+        try handle.seek(toOffset: try handle.seekToEnd() - 4); try handle.write(contentsOf: Data([1, 2, 3, 4])); try handle.close()
+        var st = stat(); #expect(stat(src.appendingPathComponent("set.wav").path, &st) == 0)
+        var times = [st.st_atimespec, st.st_mtimespec]
+        #expect(utimensat(AT_FDCWD, twinFile.path, &times, 0) == 0)
+        #expect(Importer.identity(of: twinFile) == Importer.identity(of: src.appendingPathComponent("set.wav")))
+        #expect(try Importer.copyAndOrganize([twin], into: dst).map(\.lastPathComponent) == ["set 3.wav"])
     }
     /// A compilation tagged without an Album Artist is one album, not one per artist; the files keep their tags.
     @Test func compilationWithoutAlbumArtistIsOneAlbum() async throws {
