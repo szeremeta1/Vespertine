@@ -13,6 +13,12 @@ import Foundation
 /// Vespertine's device, and the sound output takes the device's level, so the keys step from where it really is.
 /// When Vespertine lets the device go, the sound output gets its own volume and mute back.
 ///
+/// Meanwhile the sound output plays everything else at that level too, often far above its own. Muting or parking it
+/// would break the keys and what they show, so its level stays and the alert volume moves the other way instead: alerts
+/// and notification sounds keep the loudness they had. Other apps' ordinary audio (a browser tab, an Electron app's
+/// chime) plays at the new level. What the relay changes is kept in the defaults while it relays, so the next launch
+/// can put it back after a crash (`DeviceRestore.afterCrash`).
+///
 /// Each copy comes back as a change notification from the other side, and that notification can still carry the level
 /// from before the copy. Copied back, it pulled nearly every step of the AirPods Max crown to the old level. So for a
 /// moment after a write, a side showing the level it had just before or just after it is taken as an echo.
@@ -29,7 +35,21 @@ public final class VolumeRelay: @unchecked Sendable {
     private static let echoWindow = 0.5
     /// Closer than a volume key step (1/16, or 1/64 with Option-Shift), wider than a device's rounding of a copied
     /// level (AirPods Max: 1/127).
-    private static let echoTolerance: Float32 = 0.01
+    static let echoTolerance: Float32 = 0.01
+    private var alerts = Alerts.unread
+    private var alertUpdate: DispatchWorkItem?
+    /// What the relay has changed, mirrored to the defaults for the next launch after a crash.
+    private var changes: RelayChanges? {
+        didSet { RelayChanges.store(changes) }
+    }
+
+    /// The alert volume as the relay found it and as it set it; or left alone until the relay lets go, because someone
+    /// else changed it meanwhile (it's theirs now) or it can't be read.
+    private enum Alerts: Equatable {
+        case unread
+        case kept(own: Int, set: Int)
+        case leftAlone
+    }
 
     private struct Levels {
         var volume: Float32?
@@ -43,8 +63,8 @@ public final class VolumeRelay: @unchecked Sendable {
         }
     }
 
-    private static let volume = AudioObjectPropertyAddress.output(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
-    private static let mute = AudioObjectPropertyAddress.output(kAudioDevicePropertyMute)
+    static let volume = AudioObjectPropertyAddress.output(kAudioHardwareServiceDeviceProperty_VirtualMainVolume)
+    static let mute = AudioObjectPropertyAddress.output(kAudioDevicePropertyMute)
 
     public init() {}
 
@@ -97,9 +117,16 @@ public final class VolumeRelay: @unchecked Sendable {
         guard standIn?.id != output else { return }
         release()
         standIn = (output, try? HAL.get(output, Self.volume, initial: Float32(0)), try? HAL.get(output, Self.mute, initial: UInt32(0)))
+        changes = HAL.getString(output, .global(kAudioDevicePropertyDeviceUID)).map {
+            RelayChanges(standIn: $0, volume: standIn?.volume, mute: standIn?.muted)
+        }
+        updateAlerts()   // first, so alerts are down before the stand-in goes up
         copyLevels(from: target, to: output)
         listen(&standInListeners, output, Self.volume) { [weak self] in self?.changed(on: output) }
         listen(&standInListeners, output, Self.mute) { [weak self] in self?.changed(on: output) }
+        listen(&standInListeners, AudioObjectID(kAudioObjectSystemObject), .global(kAudioHardwarePropertyDefaultSystemOutputDevice)) { [weak self] in
+            self?.updateAlerts()
+        }
         log.notice("Volume keys now adjust the exclusively held output (through device \(output))")
     }
 
@@ -111,23 +138,37 @@ public final class VolumeRelay: @unchecked Sendable {
         written[device] = recent
         let levels = levels(of: device)
         if recent.contains(where: { $0.levels.matches(levels) }) { return }
+        if device == standIn.id {
+            changes?.relayedVolume = levels.volume
+            changes?.relayedMute = levels.mute
+        }
         copyLevels(from: device, to: device == target ? standIn.id : target)
+        // Alerts follow once the level settles: a held key or a turning knob moves it many times a second, and each
+        // update runs osascript.
+        alertUpdate?.cancel()
+        let update = DispatchWorkItem { [weak self] in self?.updateAlerts() }
+        alertUpdate = update
+        queue.asyncAfter(deadline: .now() + 0.3, execute: update)
     }
 
     private func levels(of device: AudioObjectID) -> Levels {
         Levels(volume: try? HAL.get(device, Self.volume, initial: Float32(0)), mute: try? HAL.get(device, Self.mute, initial: UInt32(0)))
     }
 
-    /// Copies volume and mute from one side to the other. Unchanged values aren't written.
+    /// Copies volume and mute from one side to the other. Unchanged values aren't written. What the stand-in is given
+    /// is noted before it is written, so a crash in between leaves nothing behind the next launch doesn't know about.
     private func copyLevels(from: AudioObjectID, to: AudioObjectID) {
         let before = levels(of: to)
         var after = before
+        let toStandIn = to == standIn?.id
         if let v = try? HAL.get(from, Self.volume, initial: Float32(0)), let current = before.volume, abs(v - current) > 0.0005 {
+            if toStandIn { changes?.relayedVolume = v }
             try? HAL.set(to, Self.volume, v)
             after.volume = v
         }
         if let m = try? HAL.get(from, Self.mute, initial: UInt32(0)), HAL.isSettable(to, Self.mute),
            let current = before.mute, m != current {
+            if toStandIn { changes?.relayedMute = m }
             try? HAL.set(to, Self.mute, m)
             after.mute = m
         }
@@ -135,7 +176,7 @@ public final class VolumeRelay: @unchecked Sendable {
         written[to, default: []] += [(before, .now()), (after, .now())]
     }
 
-    /// Ends relaying: the stand-in gets its own volume and mute back.
+    /// Ends relaying: the stand-in gets its own volume and mute back, and the alert volume its own value.
     private func release() {
         removeListeners(&standInListeners)
         written = [:]
@@ -143,7 +184,64 @@ public final class VolumeRelay: @unchecked Sendable {
         self.standIn = nil
         if let v = standIn.volume { try? HAL.set(standIn.id, Self.volume, v) }
         if let m = standIn.muted, HAL.isSettable(standIn.id, Self.mute) { try? HAL.set(standIn.id, Self.mute, m) }
+        restoreAlerts()
+        changes = nil
         log.notice("Volume keys back on the Mac's sound output")
+    }
+
+    /// Alerts play from the stand-in at its level times the alert volume; this sets the alert volume so they sound as
+    /// loud as they did at the stand-in's own level. Only while they play there (Sound › Play sound effects through),
+    /// and not again once someone else changed the alert volume. The level is read on the held device, which the
+    /// stand-in follows, so it is right even before the stand-in has taken it.
+    private func updateAlerts() {
+        alertUpdate?.cancel()
+        alertUpdate = nil
+        guard let target, let standIn, alerts != .leftAlone else { return }
+        let effects = try? HAL.get(AudioObjectID(kAudioObjectSystemObject), .global(kAudioHardwarePropertyDefaultSystemOutputDevice),
+                                   initial: AudioObjectID(0))
+        guard effects == standIn.id, let own = standIn.volume, let level = try? HAL.get(target, Self.volume, initial: Float32(0)) else {
+            restoreAlerts()
+            return
+        }
+        if alerts == .unread {
+            guard let alert = AlertVolume.get() else {
+                alerts = .leftAlone
+                return
+            }
+            alerts = .kept(own: alert, set: alert)
+        }
+        guard case let .kept(ownAlert, set) = alerts else { return }
+        // Muted on its own, the stand-in played no alerts at all.
+        let wanted = standIn.muted == 1 ? 0 : AlertVolume.compensated(ownAlert, before: Self.decibels(own, on: standIn.id),
+                                                                     now: Self.decibels(level, on: standIn.id))
+        guard wanted != set else { return }
+        changes?.alert = ownAlert
+        changes?.alertSet = wanted
+        if AlertVolume.set(wanted, ifStill: set) == set {
+            alerts = .kept(own: ownAlert, set: wanted)
+        } else {
+            alerts = .leftAlone
+            changes?.alert = nil
+            changes?.alertSet = nil
+        }
+    }
+
+    /// Gives the alert volume its own value back, unless someone changed it since the relay set it.
+    private func restoreAlerts() {
+        alertUpdate?.cancel()
+        alertUpdate = nil
+        if case let .kept(own, set) = alerts, own != set { AlertVolume.set(own, ifStill: set) }
+        alerts = .unread
+        changes?.alert = nil
+        changes?.alertSet = nil
+    }
+
+    /// A level of a device in decibels, on its own volume curve where it has one.
+    private static func decibels(_ level: Float32, on device: AudioObjectID) -> Float32 {
+        guard let element = DeviceQuery.volumeElements(device).first,
+              let db = try? HAL.get(device, .output(kAudioDevicePropertyVolumeScalarToDecibels, element: element), initial: level)
+        else { return AlertVolume.decibels(level) }
+        return db
     }
 
     private func listen(_ list: inout [(object: AudioObjectID, address: AudioObjectPropertyAddress, block: AudioObjectPropertyListenerBlock)],
@@ -160,5 +258,43 @@ public final class VolumeRelay: @unchecked Sendable {
             AudioObjectRemovePropertyListenerBlock(l.object, &a, queue, l.block)
         }
         list = []
+    }
+}
+
+/// What the relay changed, and what to put back. Kept in the defaults while it relays; after a crash the next launch
+/// puts back whatever nobody has changed since.
+struct RelayChanges: Codable, Equatable {
+    /// The stand-in's UID, and its own volume and mute.
+    var standIn: String
+    var volume: Float32?
+    var mute: UInt32?
+    /// The volume and mute it was last given while relaying, by the relay or the keys.
+    var relayedVolume: Float32?
+    var relayedMute: UInt32?
+    /// The alert volume as the relay found it, and as it set it.
+    var alert: Int?
+    var alertSet: Int?
+
+    /// What to put back, given what the stand-in and the alert volume show now: each only where it is still what the
+    /// relay left, so nothing someone changed since is undone.
+    func putBack(volume nowVolume: Float32?, mute nowMute: UInt32?, alert nowAlert: Int?) -> (volume: Float32?, mute: UInt32?, alert: Int?) {
+        let volumeLeft = nowVolume.flatMap { now in relayedVolume.map { abs(now - $0) < VolumeRelay.echoTolerance } } ?? false
+        return (volumeLeft ? volume : nil,
+                nowMute != nil && nowMute == relayedMute ? mute : nil,
+                nowAlert != nil && nowAlert == alertSet ? alert : nil)
+    }
+
+    private static let key = "VespertineVolumeRelayChanges"
+
+    static func load(from defaults: UserDefaults = .standard) -> RelayChanges? {
+        defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(RelayChanges.self, from: $0) }
+    }
+
+    static func store(_ changes: RelayChanges?, in defaults: UserDefaults = .standard) {
+        if let changes, let data = try? JSONEncoder().encode(changes) {
+            defaults.set(data, forKey: key)
+        } else {
+            defaults.removeObject(forKey: key)
+        }
     }
 }
