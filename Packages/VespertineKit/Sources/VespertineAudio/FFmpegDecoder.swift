@@ -126,8 +126,17 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
     private let source: FFmpegDecoder
     private var handle: OpaquePointer? { source.rawHandle }
     private var frame: AVAudioFramePosition = 0
+    /// 1 swaps which frames carry 0x05 and which 0xFA (see `nextMarker`).
+    private var markerOffset: AVAudioFramePosition = 0
     private let format: AVAudioFormat
     private var bytes: [[UInt8]] = []
+
+    /// The next frame's marker: 0 for 0x05, 1 for 0xFA. Set when this track continues another one in the same
+    /// output buffer, so the markers keep alternating across the join: two 0x05 in a row make a DAC drop out of DSD.
+    var nextMarker: AVAudioFramePosition {
+        get { (frame + markerOffset) & 1 }
+        set { markerOffset = (newValue - frame) & 1 }
+    }
 
     init(url: URL) throws {
         source = FFmpegDecoder(url: url)
@@ -169,7 +178,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
         for c in 0..<channels {
             let src = bytes[c]
             for i in 0..<frames {
-                let marker: UInt32 = (frame + AVAudioFramePosition(i)) & 1 == 0 ? 0x05 : 0xFA
+                let marker: UInt32 = (frame + markerOffset + AVAudioFramePosition(i)) & 1 == 0 ? 0x05 : 0xFA
                 let word = marker << 16 | UInt32(src[2 * i]) << 8 | UInt32(src[2 * i + 1])
                 out[c][i] = Float(Int32(bitPattern: word << 8)) / 2_147_483_648
             }

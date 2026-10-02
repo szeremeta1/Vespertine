@@ -118,6 +118,24 @@ struct DSDTests {
         #expect(word >> 16 == 0xFA && UInt8(word >> 8 & 0xFF) == planes[0][24_690])
     }
 
+    @Test("A DoP track that continues another one takes up its marker sequence (never two 0x05 in a row)")
+    func dopMarkersContinue() throws {
+        let planes = DSDFiles.modulate(rate: 2_822_400, seconds: 0.5)
+        let url = tmp("64.dsf")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try DSDFiles.writeDSF(planes, rate: 2_822_400, to: url)
+        let decoder = try #require(try dop(url) as? RawDoPDecoder)
+        #expect(decoder.nextMarker == 0)
+        decoder.nextMarker = 1                  // the track before ended on 0x05
+        let frames = try read(decoder, frames: 4)
+        for i in 0..<4 {
+            let word = UInt32(bitPattern: Int32(frames[0][i] * 2_147_483_648)) >> 8
+            #expect(word >> 16 == (i % 2 == 0 ? 0xFA : 0x05))
+            #expect(UInt8(word >> 8 & 0xFF) == planes[0][2 * i] && UInt8(word & 0xFF) == planes[0][2 * i + 1])
+        }
+        #expect(decoder.nextMarker == 1)
+    }
+
     @Test("Every DSD rate converts to PCM with the music intact", arguments: [1.0, 2, 4, 8])
     func toPCM(multiple: Double) throws {
         let rate = 2_822_400 * multiple
