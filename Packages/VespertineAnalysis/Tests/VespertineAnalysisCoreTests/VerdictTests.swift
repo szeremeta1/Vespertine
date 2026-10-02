@@ -11,12 +11,13 @@ import Testing
 @Suite("Verdicts")
 struct VerdictTests {
     static func m(cliff: Double?, drop: Double, cons: Double, content: Double = 0, tracking: Double? = nil,
-                  shelf: (hz: Double, step: Double, end: Double, slope: Double, above: Double, cons: Double)? = nil) -> SpectralForensics {
+                  shelf: (hz: Double, step: Double, end: Double, slope: Double, above: Double, cons: Double)? = nil,
+                  mirror: (hz: Double, r: Double, frames: Int)? = nil) -> SpectralForensics {
         SpectralForensics(cliffHz: cliff, cliffDropDB: drop, cliffConsistency: cons, belowDB: -80, aboveDB: -120, floorDB: -140,
                           extensionHz: 0, extensionSlope: 0, holeRatio: 0, contentHz: content, framesAnalyzed: 400,
                           shelfHz: shelf?.hz, shelfStepDB: shelf?.step ?? 0, shelfEndHz: shelf?.end ?? 0,
                           shelfSlope: shelf?.slope ?? 0, shelfAboveFloorDB: shelf?.above ?? 0, shelfConsistency: shelf?.cons ?? 0,
-                          shelfTracking: tracking)
+                          shelfTracking: tracking, mirrorHz: mirror?.hz, mirrorCorrelation: mirror?.r, mirrorFrames: mirror?.frames)
     }
 
     /// The same measurements as VespertineKit's ForensicsTests (from real files, see docs/ANALYSIS.md).
@@ -39,6 +40,10 @@ struct VerdictTests {
          m(cliff: 22_100, drop: 28.6, cons: 1.00, shelf: (16_200, 24.3, 22_100, -3.5, 20, 0.78)), .possibleLossyOrigin),
         ("48 kHz session sold as 24/96", 96_000, m(cliff: 24_000, drop: 50.3, cons: 1.00), .upsampled),
         ("CD master sold as 24/96", 96_000, m(cliff: 21_100, drop: 24.7, cons: 0.91), .upsampled),
+        // Version 3 called this one synthetic. Step, its consistency and the shelf's end as the app measured them on the
+        // Mac; the wall, slope, level and tracking from the same shape generated here (mp3TopBand below).
+        ("MP3 128 (LAME) of a 48 kHz master, upsampled to 96 kHz", 96_000,
+         m(cliff: 18_300, drop: 41.4, cons: 1.00, tracking: 0.89, shelf: (16_600, 36, 18_200, -0.49, 41.4, 0.98)), .possibleLossyOrigin),
     ]
 
     @Test("Calibrated verdicts", arguments: calibration.indices)
@@ -75,6 +80,59 @@ struct VerdictTests {
         var v1 = stored(Self.calibration[0].f, rate: 44_100, verdict: .genuine, effective: 24)
         v1.version = 1; v1.forensics = nil
         #expect(FileAnalyzer.rejudged(v1) == v1)
+    }
+
+    @Test("Stored version 3 results: hi-res files that would pass are read again for the mirror test, the rest judged anew")
+    func rejudgedFromVersion3() {
+        func stored(_ f: SpectralForensics, rate: Double, verdict: FileAnalysis.Verdict) -> FileAnalysis {
+            var f = f
+            f.contentHz = max(f.contentHz, 20_000) // something stood out from the floor
+            return FileAnalysis(claimedBitDepth: 24, effectiveBitDepth: 24, sampleRate: rate, bandwidthHz: 24_000, peakDBFS: -0.3,
+                                clippedSamples: 0, verdict: verdict, summary: "As version 3 worded it.", spectrum: [],
+                                secondsAnalyzed: 300, forensics: f, version: 3, confidence: 0.7)
+        }
+        // ffmpeg's default upsampling of a 48 kHz master, as version 3 measured it: it would pass again without the mirror
+        // test, so it's left as it is, and the library analyzes the file afresh.
+        let ffmpeg = stored(Self.m(cliff: 27_900, drop: 22.5, cons: 1, content: 48_000), rate: 96_000, verdict: .genuine)
+        #expect(FileAnalyzer.rejudged(ffmpeg) == ffmpeg)
+        // Already flagged hi-res files, CD-rate files and lossy origins don't need the file: judged anew, and current.
+        let flagged = FileAnalyzer.rejudged(stored(Self.calibration[12].f, rate: 96_000, verdict: .upsampled))
+        #expect(flagged.version == FileAnalysis.currentVersion && flagged.verdict == .upsampled)
+        let promo = FileAnalyzer.rejudged(stored(Self.calibration[11].f, rate: 192_000, verdict: .possibleLossyOrigin))
+        #expect(promo.version == FileAnalysis.currentVersion && promo.verdict == .possibleLossyOrigin)
+        let cd = FileAnalyzer.rejudged(stored(Self.calibration[0].f, rate: 44_100, verdict: .genuine))
+        #expect(cd.version == FileAnalysis.currentVersion && cd.verdict == .genuine)
+        // The MP3 whose top band version 3 called synthetic is a lossy origin now.
+        let mp3 = FileAnalyzer.rejudged(stored(Self.calibration[14].f, rate: 96_000, verdict: .bandwidthExtended))
+        #expect(mp3.version == FileAnalysis.currentVersion && mp3.verdict == .possibleLossyOrigin)
+        #expect(mp3.summary.contains("narrow band") && mp3.summary.contains("16.6"), "\(mp3.summary)")
+    }
+
+    @Test("A mirror image counts in hi-res files, when it's close and seen in enough frames, after lossy evidence")
+    func mirrorRule() {
+        // ffmpeg's default upsampling of a 48 kHz master to 96 kHz, as the app measured it on the Mac: the wall that ends
+        // the images is at 27.9 kHz, above the zone a clean filter's falls in, so version 3 called it genuine.
+        func judged(_ mirror: (hz: Double, r: Double, frames: Int)?, rate: Double = 96_000) -> (verdict: FileAnalysis.Verdict, summary: String,
+                                                                                                  confidence: Double, bandwidth: Double?) {
+            FileAnalyzer.judge(forensics: Self.m(cliff: 27_900, drop: 22.5, cons: 1, content: 48_000, mirror: mirror),
+                               claimedBits: 24, effectiveBits: 24, sampleRate: rate)
+        }
+        #expect(judged(nil).verdict == .genuine)
+        let caught = judged((24_000, 0.99, 400))
+        #expect(caught.verdict == .upsampled && caught.confidence <= FileAnalyzer.spectralConfidenceCap && caught.bandwidth == 24_000)
+        #expect(caught.summary.hasPrefix("Above 24 kHz, the spectrum mirrors the music just below it"), "\(caught.summary)")
+        #expect(caught.summary.contains("48 kHz master upsampled to 96 kHz") && caught.summary.contains("parts recorded or processed"))
+        let cd = judged((22_050, 0.95, 300), rate: 88_200).summary
+        #expect(cd.hasPrefix("Above 22.05 kHz") && cd.contains("44.1 kHz master upsampled to 88.2 kHz"), "\(cd)")
+        // Sustained tones whose partials sit on their own reflection measured 0.21 at most; recordings about 0.
+        let tones = judged((24_000, 0.21, 400))
+        #expect(tones.verdict == .genuine && tones.summary.contains("isn't a mirror image"))
+        // Too few frames to tell.
+        #expect(judged((24_000, 0.99, FileAnalyzer.mirrorMinimumFrames - 1)).verdict == .genuine)
+        // A lossy origin is the stronger finding: an MP3 later upsampled stays one.
+        var promo = Self.calibration[11].f
+        promo.mirrorHz = 24_000; promo.mirrorCorrelation = 0.9; promo.mirrorFrames = 400
+        #expect(FileAnalyzer.judge(forensics: promo, claimedBits: 24, effectiveBits: 24, sampleRate: 192_000).verdict == .possibleLossyOrigin)
     }
 
     @Test("Zero padding is exact and wins over spectral findings")
@@ -171,6 +229,118 @@ struct VerdictTests {
         let b = try Self.run(Self.quantize(TestNoise.normalized(zip(music, hiss).map { $0 + $1 }), bits: 24), rate: rate, bits: 24)
         #expect(b.verdict == .possibleLossyOrigin, "\(b.summary)")
         #expect((b.forensics?.shelfTracking ?? 1) < 0.5)
+    }
+
+    // MARK: - Upsampling, end to end
+
+    /// Music-like noise that reaches the top of a 44.1/48 kHz band, with a natural tilt (≈ −12 dB per octave above 4 kHz).
+    static func fullBand(rate: Double, seconds: Double = 5, seed: UInt64) -> [Double] {
+        TestNoise.shaped(rate: rate, seconds: seconds, seed: seed) { f in -12 * log2(1 + f / 4_000) }
+    }
+
+    /// Doubles the sample rate the way a sample-rate converter does: zeros between the samples, then a Kaiser-windowed
+    /// sinc low-pass centred on `cutoff` × the old Nyquist, reaching `halfLength` input samples to each side.
+    /// halfLength 16, cutoff 0.97, β 9 is about ffmpeg's default (swr, filter_size 32): from a 48 kHz source its images
+    /// end in a wall at ~27 kHz (ffmpeg's own output: ~28 kHz). A long filter closing below the old Nyquist leaves none.
+    static func upsample2(_ x: [Double], cutoff: Double, halfLength: Int, beta: Double) -> [Double] {
+        func i0(_ v: Double) -> Double {
+            var sum = 1.0, term = 1.0, k = 1.0
+            while term > 1e-12 * sum { term *= (v / (2 * k)) * (v / (2 * k)); sum += term; k += 1 }
+            return sum
+        }
+        let reach = 2 * halfLength  // in output samples
+        let taps = (-reach...reach).map { t -> Double in
+            let r = Double(t) / Double(reach)
+            let window = i0(beta * (1 - r * r).squareRoot()) / i0(beta)
+            let a = Double.pi * cutoff * Double(t) / 2
+            return cutoff * (t == 0 ? 1 : sin(a) / a) * window  // gain 2 for the zeros in between
+        }
+        var y = [Double](repeating: 0, count: 2 * x.count)
+        x.withUnsafeBufferPointer { xs in
+            taps.withUnsafeBufferPointer { h in
+                for m in 0..<y.count {
+                    // Input sample j sits at output 2j; tap index m - 2j + reach.
+                    let lo = max(0, (m - reach + 1) / 2), hi = min(xs.count - 1, (m + reach) / 2)
+                    guard lo <= hi else { continue }
+                    var sum = 0.0
+                    for j in lo...hi { sum += xs[j] * h[m - 2 * j + reach] }
+                    y[m] = sum
+                }
+            }
+        }
+        return y
+    }
+
+    static let imagingCases: [(name: String, source: Double, halfLength: Int, cutoff: Double)] = [
+        ("48 kHz master, ffmpeg-like default filter", 48_000, 16, 0.97),
+        ("44.1 kHz master, ffmpeg-like default filter", 44_100, 16, 0.97),
+        // Its wall lands just above the zone (24.6 kHz; ffmpeg's filter_size=128 put it at 24.8 kHz on the Mac).
+        ("48 kHz master, a longer filter", 48_000, 64, 0.99),
+    ]
+
+    @Test("A 44.1 or 48 kHz master upsampled with a filter that leaves images is caught by its mirror image",
+          arguments: imagingCases.indices)
+    func imaging(index: Int) throws {
+        let c = Self.imagingCases[index]
+        let x = Self.fullBand(rate: c.source, seed: 11)
+        let up = Self.upsample2(x, cutoff: c.cutoff, halfLength: c.halfLength, beta: 9)
+        let a = try Self.run(Self.quantize(TestNoise.normalized(up), bits: 24), rate: 2 * c.source, bits: 24)
+        let f = try #require(a.forensics)
+        #expect(a.verdict == .upsampled, "\(c.name): \(a.summary)")
+        #expect(f.mirrorHz == c.source / 2 && (f.mirrorCorrelation ?? 0) > 0.8, "\(c.name): \(f)")
+        // The wall that ends the images sits above the zone a clean filter's would (19.6–24.5 kHz): without the
+        // mirror, this file would pass as genuine.
+        #expect((f.cliffHz ?? 0) > 24_500, "\(c.name): \(f)")
+        #expect(a.confidence <= FileAnalyzer.spectralConfidenceCap)
+        #expect(a.summary.contains("mirror") && a.summary.contains("\(FileAnalyzer.rateText(c.source)) kHz master"))
+        #expect(a.bandwidthHz == c.source / 2)
+    }
+
+    @Test("A master upsampled with a long, clean filter is caught by its wall instead")
+    func cleanUpsampling() throws {
+        let x = Self.fullBand(rate: 48_000, seed: 12)
+        let a = try Self.run(Self.quantize(TestNoise.normalized(Self.upsample2(x, cutoff: 0.94, halfLength: 64, beta: 12)), bits: 24),
+                             rate: 96_000, bits: 24)
+        let f = try #require(a.forensics)
+        #expect(a.verdict == .upsampled && a.summary.hasPrefix("Steep cutoff"), "\(a.summary)")
+        #expect((f.cliffHz ?? 0) >= 19_600 && (f.cliffHz ?? .infinity) <= 24_500, "\(f)")
+    }
+
+    @Test("Genuine hi-res: content to 48 kHz, and a DSD-style conversion low-passed at 30 kHz, don't mirror")
+    func genuineHiRes() throws {
+        // Recorded at 96 kHz: content falling naturally up to the converter's own filter at 44 kHz.
+        let x = TestNoise.shaped(rate: 96_000, seconds: 5, seed: 13) { f in f < 44_000 ? -12 * log2(1 + f / 4_000) : nil }
+        let a = try Self.run(Self.quantize(TestNoise.normalized(x), bits: 24), rate: 96_000, bits: 24)
+        let f = try #require(a.forensics)
+        #expect(a.verdict == .genuine, "\(a.summary)")
+        #expect((f.mirrorFrames ?? 0) >= FileAnalyzer.mirrorMinimumFrames && abs(f.mirrorCorrelation ?? 1) < 0.2, "\(f)")
+        // A DSD transfer: music, the steady noise DSD's noise shaping adds above ~20 kHz, then the conversion's steep
+        // low-pass at 30 kHz. Genuine: its wall is above any 44.1/48 kHz source's, and what's above 24 kHz is real.
+        let music = TestNoise.shaped(rate: 96_000, seconds: 5, seed: 14) { f in f < 30_000 ? -12 * log2(1 + f / 4_000) : nil }
+        let shaping = TestNoise.shaped(rate: 96_000, seconds: 5, seed: 15, steady: true) { f in
+            f > 18_000 && f < 30_000 ? -75 + 60 * log10(f / 30_000) : nil
+        }
+        let d = try Self.run(Self.quantize(TestNoise.normalized(zip(music, shaping).map { $0 + $1 }), bits: 24), rate: 96_000, bits: 24)
+        let g = try #require(d.forensics)
+        #expect(d.verdict == .genuine, "\(d.summary)")
+        #expect((g.cliffHz ?? 0) > 29_000 && g.cliffDropDB >= 18, "\(g)")
+        #expect(abs(g.mirrorCorrelation ?? 1) < 0.2, "\(g)")
+    }
+
+    @Test("An MP3's narrow top band that follows the music is a lossy origin, not synthetic highs")
+    func mp3TopBand() throws {
+        // LAME at 128 kb/s, decoded and upsampled to 96 kHz: a step at 16.6 kHz, then real, quieter content to 18.2 kHz.
+        let tilt: (Double) -> Double = { -3 * $0 / 1000 }
+        let x = TestNoise.shaped(rate: 96_000, seconds: 5, seed: 16) { f in
+            f < 16_600 ? tilt(f) : f < 18_200 ? tilt(16_600) - 36 : nil
+        }
+        let a = try Self.run(Self.quantize(TestNoise.normalized(x), bits: 24), rate: 96_000, bits: 24)
+        let f = try #require(a.forensics)
+        // Everything version 3 called synthetic is there: a steep, consistent step, a flat shelf that follows the music.
+        #expect(abs((f.shelfHz ?? 0) - 16_600) <= 200 && abs(f.shelfEndHz - 18_200) <= 200 && f.shelfStepDB >= 30, "\(f)")
+        #expect(f.shelfConsistency >= 0.9 && f.shelfSlope >= -2.5 && (f.shelfTracking ?? 0) >= FileAnalyzer.shelfTrackingThreshold, "\(f)")
+        #expect(a.verdict == .possibleLossyOrigin, "\(a.summary)")
+        #expect(a.summary.contains("narrow band"), "\(a.summary)")
     }
 
     @Test("Positive full scale counts as clipped in 16-bit files")

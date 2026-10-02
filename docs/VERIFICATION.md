@@ -73,6 +73,7 @@ The integer-device test plays a 32-bit source to your DAC. It passes only if the
 vespertine-probe list
 vespertine-probe play "<device name or UID>" 20 <file> [file…]
 vespertine-probe watch 30
+vespertine-probe doptest "<DoP DAC name>"
 ```
 
 - **`list`** shows every output device with:
@@ -81,6 +82,7 @@ vespertine-probe watch 30
   - the sample rates and physical formats it offers.
 - **`play`** plays the files on the device for the given number of seconds. It then prints the signal path Vespertine computed, next to an independent Core Audio readback of nominal rate, physical format and hog owner, so you can check that the two agree.
 - **`watch`** prints every device's volume and the system output whenever they change. Use it to catch another app or macOS changing the device mid-play.
+- **`doptest`** plays DSD over DoP on the device (it turns DoP on for it, and writes two DSD64 test files of soft pings if you give it none). It pauses, seeks and skips on a schedule, prints what to listen for at each step, and checks that the device keeps running through them. The DAC should stay in DSD the whole time: no click, no missing ping. Only the resume after the last, long pause (the device is let go after `VESPERTINE_RELEASE_AFTER` seconds, 15 by default) and the stop may click.
 
 ## 4. Checking it outside Vespertine
 

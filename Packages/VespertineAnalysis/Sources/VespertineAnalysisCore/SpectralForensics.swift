@@ -10,6 +10,11 @@
 // flat, uniform shelf, often ending in a second wall. Natural recordings roll off gradually, and
 // their only steep edge is the converter's anti-alias filter just below Nyquist.
 //
+// Upsampling a 44.1/48 kHz file leaves either a steep wall at its old Nyquist (a long, clean filter) or,
+// with the short filters common converters use by default, an attenuated mirror image of the music just
+// below the old Nyquist reflected above it (imaging). The mirror is exact, bin for bin and moment for moment,
+// which no recording made at the higher rate does.
+//
 
 import Foundation
 
@@ -17,13 +22,15 @@ public struct SpectralForensics: Sendable, Hashable, Codable {
     public init(cliffHz: Double?, cliffDropDB: Double, cliffConsistency: Double, belowDB: Double, aboveDB: Double, floorDB: Double,
                 extensionHz: Double, extensionSlope: Double, holeRatio: Double, contentHz: Double, framesAnalyzed: Int,
                 shelfHz: Double? = nil, shelfStepDB: Double = 0, shelfEndHz: Double = 0, shelfSlope: Double = 0,
-                shelfAboveFloorDB: Double = 0, shelfConsistency: Double = 0, shelfTracking: Double? = nil) {
+                shelfAboveFloorDB: Double = 0, shelfConsistency: Double = 0, shelfTracking: Double? = nil,
+                mirrorHz: Double? = nil, mirrorCorrelation: Double? = nil, mirrorFrames: Int? = nil) {
         self.cliffHz = cliffHz; self.cliffDropDB = cliffDropDB; self.cliffConsistency = cliffConsistency
         self.belowDB = belowDB; self.aboveDB = aboveDB; self.floorDB = floorDB
         self.extensionHz = extensionHz; self.extensionSlope = extensionSlope; self.holeRatio = holeRatio
         self.contentHz = contentHz; self.framesAnalyzed = framesAnalyzed
         self.shelfHz = shelfHz; self.shelfStepDB = shelfStepDB; self.shelfEndHz = shelfEndHz; self.shelfSlope = shelfSlope
         self.shelfAboveFloorDB = shelfAboveFloorDB; self.shelfConsistency = shelfConsistency; self.shelfTracking = shelfTracking
+        self.mirrorHz = mirrorHz; self.mirrorCorrelation = mirrorCorrelation; self.mirrorFrames = mirrorFrames
     }
 
     /// Frequency of the steepest spectral cliff, if one was found.
@@ -56,6 +63,14 @@ public struct SpectralForensics: Sendable, Hashable, Codable {
     /// Generated highs (SBR, AI) follow the music; tape hiss or vinyl noise added later stays put.
     /// nil when not measured (no shelf, or results from before it existed).
     public var shelfTracking: Double? = nil
+    /// Imaging: the old Nyquist (22.05 or 24 kHz) around which content was compared with its reflection, how closely
+    /// the content just above it mirrors the music just below (mean correlation of the frame-to-frame changes in
+    /// the spectrum's fine structure, −1…1; an upsampler's images score near 1, recordings near 0), and in how many
+    /// frames. Measured in files at 88.2 kHz and up, from version 4; nil when not measured or nothing above the old
+    /// Nyquist stood out from the floor.
+    public var mirrorHz: Double? = nil
+    public var mirrorCorrelation: Double? = nil
+    public var mirrorFrames: Int? = nil
 }
 
 /// Accumulates per-frame spectra while a file is decoded, then measures it.
@@ -69,6 +84,24 @@ final class ForensicsAccumulator {
     private(set) var holes: [[Float]] = []       // hole fraction per 1 kHz region per frame (-1 = no content)
     private let binHz: Double
 
+    // Imaging, in files at 88.2 kHz and up. For each old Nyquist a 44.1/48 kHz source would have had, and each of
+    // `mirrorSpanCount` stretches of `mirrorSpanHz` starting `mirrorStartHz` from it: the correlation between how the
+    // spectrum's fine structure (bin level minus its ±`mirrorSmoothing`-bin average) changed since the previous frame
+    // just below the old Nyquist and, reflected, just above it. Changes, not levels: a sustained tone whose partials
+    // happen to sit on their own reflection (a test tone, a note dividing 48 kHz) stays put and cancels, and genuine
+    // partials gliding in pitch move the same way on both sides, while an image moves the opposite way, exactly.
+    static let mirrorCenters: [Double] = [22_050, 24_000]
+    static let mirrorStartHz = 150.0, mirrorSpanHz = 800.0, mirrorSpanCount = 5
+    private let mirrorSmoothing = 8
+    struct MirrorSpan {
+        var correlation: Float  // .nan when not measured (first frame)
+        var belowDB: Float      // levels of the two stretches in this frame (as band levels are: mean power, dB)
+        var aboveDB: Float
+    }
+    /// Per frame (empty below 88.2 kHz): every center's spans in order.
+    private(set) var mirror: [[MirrorSpan]] = []
+    private var mirrorPrevious: [[Double]] = []
+
     init(sampleRate: Double, forcePortableFFT: Bool = false) {
         self.sampleRate = sampleRate
         // ~85 ms frames: 4096 at 44.1/48 kHz, 8192 at 88.2/96, 16384 at 176.4/192.
@@ -78,6 +111,60 @@ final class ForensicsAccumulator {
         analyzer = SpectrumAnalyzer(size: size, forcePortable: forcePortableFFT)
         binHz = sampleRate / Double(size)
         bandCount = Int((sampleRate / 2) / bandHz)
+    }
+
+    /// The mirror spans of one frame's spectrum (dBFS per bin), updating the previous frame's fine structure.
+    private func measureMirror(_ db: [Float]) -> [MirrorSpan] {
+        guard sampleRate >= 88_200 else { return [] }
+        let reach = Self.mirrorStartHz + Double(Self.mirrorSpanCount) * Self.mirrorSpanHz, w = mirrorSmoothing
+        var spans: [MirrorSpan] = []
+        spans.reserveCapacity(Self.mirrorCenters.count * Self.mirrorSpanCount)
+        var fineStructures: [[Double]] = []
+        for (ci, c) in Self.mirrorCenters.enumerated() {
+            let lo = Int(((c - reach) / binHz).rounded(.down)) - 1, hi = Int(((c + reach) / binHz).rounded(.up)) + 1
+            guard lo - w >= 0, hi + w < db.count else { return [] }
+            // Fine structure over lo...hi: each bin minus the average of the bins around it.
+            var prefix = [Double](repeating: 0, count: hi - lo + 2 * w + 2)
+            for k in (lo - w)...(hi + w) { prefix[k - lo + w + 1] = prefix[k - lo + w] + Double(db[k]) }
+            let width = Double(2 * w + 1)
+            let fine: [Double] = (lo...hi).map { (k: Int) -> Double in
+                let sum: Double = prefix[k - lo + 2 * w + 1] - prefix[k - lo]
+                return Double(db[k]) - sum / width
+            }
+            fineStructures.append(fine)
+            let previous = ci < mirrorPrevious.count ? mirrorPrevious[ci] : nil
+            for j in 0..<Self.mirrorSpanCount {
+                let d0 = Self.mirrorStartHz + Double(j) * Self.mirrorSpanHz, d1 = d0 + Self.mirrorSpanHz
+                let below = Int(((c - d1) / binHz).rounded(.up))...Int(((c - d0) / binHz).rounded(.down))
+                var xs: [Double] = [], ys: [Double] = []
+                var powerBelow = 0.0, powerAbove = 0.0
+                for k in below {
+                    // The reflection of bin k around c, between two bins unless c falls on the bin grid.
+                    let m = 2 * c / binHz - Double(k), m0 = Int(m.rounded(.down)), t = m - Double(m0)
+                    func at(_ v: (Int) -> Double) -> Double { v(m0) * (1 - t) + v(m0 + 1) * t }
+                    powerBelow += pow(10, Double(db[k]) / 10)
+                    powerAbove += pow(10, at { Double(db[$0]) } / 10)
+                    if let previous {
+                        xs.append(fine[k - lo] - previous[k - lo])
+                        ys.append(at { fine[$0 - lo] - previous[$0 - lo] })
+                    }
+                }
+                let n = Double(below.count)
+                spans.append(MirrorSpan(correlation: previous == nil ? .nan : Float(Self.pearson(xs, ys)),
+                                        belowDB: Float(10 * log10(max(powerBelow / n, 1e-16))),
+                                        aboveDB: Float(10 * log10(max(powerAbove / n, 1e-16)))))
+            }
+        }
+        mirrorPrevious = fineStructures
+        return spans
+    }
+
+    static func pearson(_ xs: [Double], _ ys: [Double]) -> Double {
+        guard xs.count >= 3, xs.count == ys.count else { return 0 }
+        let mx = xs.reduce(0, +) / Double(xs.count), my = ys.reduce(0, +) / Double(ys.count)
+        var sxy = 0.0, sxx = 0.0, syy = 0.0
+        for (x, y) in zip(xs, ys) { sxy += (x - mx) * (y - my); sxx += (x - mx) * (x - mx); syy += (y - my) * (y - my) }
+        return sxx > 0 && syy > 0 ? sxy / (sxx * syy).squareRoot() : 0
     }
 
     func add(_ mono: [Float]) {
@@ -105,6 +192,7 @@ final class ForensicsAccumulator {
             frameHoles[r] = Float(empty) / Float(slice.count)
         }
         holes.append(frameHoles)
+        mirror.append(measureMirror(db))
     }
 
     func result() -> SpectralForensics {
@@ -269,11 +357,43 @@ final class ForensicsAccumulator {
         for b in stride(from: bandCount - 1, through: 0, by: -1) where s[b] > floor + 10 {
             content = min(nyquist, Double(b + 1) * bandHz); break
         }
+        let mirrored = mirrorResult(use: use, floor: floor)
         return SpectralForensics(cliffHz: cliffHz, cliffDropDB: drop, cliffConsistency: consistency, belowDB: below, aboveDB: above,
                                  floorDB: floor, extensionHz: extensionHz, extensionSlope: slope, holeRatio: holeRatio,
                                  contentHz: content, framesAnalyzed: frames.count,
                                  shelfHz: shelf?.hz, shelfStepDB: shelf?.step ?? 0, shelfEndHz: shelf?.end ?? 0,
                                  shelfSlope: shelf?.slope ?? 0, shelfAboveFloorDB: shelf?.above ?? 0, shelfConsistency: shelf?.consistency ?? 0,
-                                 shelfTracking: tracking)
+                                 shelfTracking: tracking,
+                                 mirrorHz: mirrored?.hz, mirrorCorrelation: mirrored?.correlation, mirrorFrames: mirrored?.frames)
+    }
+
+    /// Imaging: the old Nyquist whose surroundings mirror best, from the music frames where both sides stand out from
+    /// the floor (the image above it by 10 dB, the music below by 15). The best-correlated one compared in enough frames
+    /// wins; failing that, the one compared in the most. nil when nothing above an old Nyquist stood out.
+    private func mirrorResult(use: [Int], floor: Double) -> (hz: Double, correlation: Double, frames: Int)? {
+        var best: (hz: Double, correlation: Double, frames: Int)?
+        let enough = FileAnalyzer.mirrorMinimumFrames
+        for (ci, c) in Self.mirrorCenters.enumerated() {
+            var sum = 0.0, n = 0, compared = 0
+            for i in use where i < mirror.count && mirror[i].count == Self.mirrorCenters.count * Self.mirrorSpanCount {
+                var seen = false
+                for span in mirror[i][(ci * Self.mirrorSpanCount)..<((ci + 1) * Self.mirrorSpanCount)]
+                where !span.correlation.isNaN && Double(span.aboveDB) > floor + 10 && Double(span.belowDB) > floor + 15 {
+                    sum += Double(span.correlation); n += 1; seen = true
+                }
+                if seen { compared += 1 }
+            }
+            guard n > 0 else { continue }
+            let candidate = (hz: c, correlation: sum / Double(n), frames: compared)
+            if let b = best {
+                let better = candidate.frames >= enough
+                    ? b.frames < enough || candidate.correlation > b.correlation
+                    : b.frames < enough && candidate.frames > b.frames
+                if better { best = candidate }
+            } else {
+                best = candidate
+            }
+        }
+        return best
     }
 }

@@ -416,8 +416,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                 updateRebuffering()
             } else if awaitingDevice != nil {
                 checkAwaitedDevice()
-            } else if state == .paused, let pausedAt, session?.applied.exclusive == true,
-                      Date().timeIntervalSince(pausedAt) > settings.releaseExclusiveAfterPause {
+            } else if state == .paused, let pausedAt, let session, session.applied.exclusive || session.isRunning,
+                      Date().timeIntervalSince(pausedAt) > Self.pauseHold(release: settings.releaseExclusiveAfterPause,
+                                                                           running: session.isRunning) {
                 park()
             }
             publishSnapshot()
@@ -478,7 +479,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             awaitingDevice = nil
             guard state == .playing else { return }
             atmos?.pause()
-            session?.stop()
+            if let session, session.isDoP {
+                // DoP keeps running, muted: the DAC gets DSD silence and stays locked in DSD, so resuming doesn't pop.
+                // It stops after `pauseHold` like any held output.
+                nrt_context_set_muted(session.context, true)
+            } else {
+                session?.stop()
+            }
             state = .paused
             pausedAt = Date()
         case .resume:
@@ -792,6 +799,16 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.unlock()
         old?.invalidate(releaseHog: releaseHog)
     }
+
+    /// How long a pause keeps the output. A held (exclusive) output is let go after the "Release device after pausing
+    /// for" setting (10 s to 10 min, 30 s unless changed), so other apps get it back. A DoP output still running through
+    /// the pause (sending DSD silence, so the DAC stays locked) stops then too, and after `maxRunningPause` whatever the
+    /// setting: running I/O keeps the Mac from idle sleep and the DAC busy, and after that long one re-lock click on
+    /// resume is no loss.
+    static func pauseHold(release: TimeInterval, running: Bool) -> TimeInterval {
+        running ? min(release, maxRunningPause) : release
+    }
+    static let maxRunningPause: TimeInterval = 600
 
     /// Frees the device after a long pause but remembers where we were.
     private func park() {
