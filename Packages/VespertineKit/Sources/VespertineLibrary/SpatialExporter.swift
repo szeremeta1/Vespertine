@@ -27,7 +27,8 @@ public enum SpatialExporter {
             let disc = (track.discTotal ?? 1) > 1 ? track.discNumber.map { "\($0)-" } ?? "" : ""
             let number = track.trackNumber.map { String(format: "%02d ", $0) } ?? ""
             let name = Importer.sanitize(disc + number + track.title + kind.fileSuffix)
-            let dest = dir.appendingPathComponent(name, isDirectory: false).appendingPathExtension("m4a")
+            // A free name ("01 Title 2.m4a"), never a file that's already there: it may be the source, or someone's music.
+            let dest = Importer.uniqueURL(dir.appendingPathComponent(name, isDirectory: false).appendingPathExtension("m4a"))
             do {
                 try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                 let item = PlayableItem(url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
