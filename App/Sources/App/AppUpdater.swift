@@ -17,15 +17,17 @@ final class AppUpdater: NSObject {
 
     override init() {
         // Isolated test libraries (QA runs) never phone home.
-        isEnabled = UserDefaults.standard.string(forKey: "VespertineDataDirectory") == nil
-            || UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride") != nil
+        // Launch arguments only: a value saved in the settings must never switch updates off for good.
+        let arguments = LaunchArguments()
+        isEnabled = arguments.string(forKey: "VespertineDataDirectory") == nil
+            || arguments.string(forKey: "VespertineUpdateFeedOverride") != nil
         super.init()
         guard isEnabled else { return }
         let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
         self.controller = controller
         automaticallyChecks = controller.updater.automaticallyChecksForUpdates
         automaticallyDownloads = controller.updater.automaticallyDownloadsUpdates
-        if UserDefaults.standard.bool(forKey: "VespertineCheckForUpdatesInBackground") {
+        if LaunchArguments().bool(forKey: "VespertineCheckForUpdatesInBackground") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.checkInBackground() }
         }
         observations.append(controller.updater.observe(\.canCheckForUpdates, options: [.initial, .new]) { [weak self] updater, _ in
@@ -55,6 +57,6 @@ final class AppUpdater: NSObject {
 extension AppUpdater: SPUUpdaterDelegate {
     /// Testing aid: `-VespertineUpdateFeedOverride <url>` points the updater at another appcast.
     nonisolated func feedURLString(for updater: SPUUpdater) -> String? {
-        UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride")
+        LaunchArguments().string(forKey: "VespertineUpdateFeedOverride")
     }
 }
