@@ -26,11 +26,9 @@ struct TrackTable: View {
 
     @State private var selection = Set<Int64>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
+    @State private var sorted = SortedRows()
 
-    private var rows: [TrackRow] {
-        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
-        return sortOrder.isEmpty ? base : base.sorted(using: sortOrder)
-    }
+    private var rows: [TrackRow] { sorted.rows(tracks: tracks, positions: positions, order: sortOrder) }
 
     /// Album pages of multi-disc albums number tracks "2·1", "2·2"…, so disc 2 doesn't look like the list restarting.
     private var numbersDiscs: Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
@@ -134,6 +132,22 @@ struct TrackTable: View {
             model.player.play(rows.map(\.track), startAt: index)
             return .handled
         }
+    }
+}
+
+/// The table's rows in their sort order, kept between evaluations of the table: one click re-evaluates it several times
+/// (the selection, the inspector), and sorting a whole library each time was most of what a click cost.
+final class SortedRows {
+    private var key: (tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>])?
+    private var cached: [TrackRow] = []
+
+    func rows(tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>]) -> [TrackRow] {
+        // Usually the very same array as last time, which compares equal at once.
+        if let key, key.order == order, key.positions == positions, key.tracks == tracks { return cached }
+        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
+        cached = order.isEmpty ? base : base.sorted(using: order)
+        key = (tracks, positions, order)
+        return cached
     }
 }
 
@@ -282,7 +296,15 @@ struct SongsView: View {
 
     var body: some View {
         SongsPage(scope: .sidebar(.songs), title: "Songs", list: list) { EmptyView() } empty: { Spacer() }
-            .task(id: model.library.revision) { list = SongList(model.library.allTracks(), model: model) }
+            .task(id: model.library.revision) {
+                // A scan changes the library many times a second: read it once things settle, and off the main thread.
+                if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
+                guard !Task.isCancelled else { return }
+                let database = model.library.database
+                let tracks = await Task.detached(priority: .userInitiated) { (try? database.allTracks()) ?? [] }.value
+                guard !Task.isCancelled else { return }
+                list = SongList(tracks, model: model)
+            }
     }
 }
 
