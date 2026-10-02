@@ -581,14 +581,15 @@ struct AnalysisPanel: View {
         Text(r.summary).font(Typeface.ui(12.5)).foregroundStyle(Palette.text).fixedSize(horizontal: false, vertical: true)
         Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
             GridRow { k("Claimed"); v(r.claimedBitDepth.map { "\($0)-bit" } ?? "—") }
-            GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "—") }
+            GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "not checked") }
             GridRow { k("Recorded to"); v(String(format: "%.1f kHz of %@ kHz", r.bandwidthHz / 1000, SampleRate.format(r.sampleRate / 2))) }
             if let f = r.forensics {
                 if let hz = f.cliffHz, f.cliffDropDB >= 12 {
-                    GridRow { k("Cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
+                    GridRow { k("Steepest cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
                 }
                 if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
-                    GridRow { k("Synthetic"); v(String(format: "%.1f–%.1f kHz, flat (%.1f dB/kHz)", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope)) }
+                    let follows = f.shelfTracking.map { String(format: ", follows the music (r %.2f)", $0) } ?? ""
+                    GridRow { k("Shelf"); v(String(format: "%.1f–%.1f kHz, %.1f dB/kHz", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope) + follows) }
                 }
             }
             GridRow { k("Peak"); v(r.peakDBFS.isFinite ? String(format: "%.2f dBFS", r.peakDBFS) : "silent") }
@@ -604,7 +605,9 @@ struct AnalysisPanel: View {
     private func verdictBadges(_ r: FileAnalysis, ok: Bool) -> some View {
         StatusBadge(text: AnalysisVerdictText.badge(r.verdict), kind: ok ? .perfect : .converted)
         if r.version >= 2, r.verdict != .notApplicable {
-            StatusBadge(text: r.confidence >= 0.8 ? "HIGH CONFIDENCE" : r.confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
+            // Results from before version 3 weren't capped: a spectrum alone is never shown as high confidence.
+            let confidence = r.version < 3 && r.verdict != .paddedBitDepth ? min(r.confidence, FileAnalyzer.spectralConfidenceCap) : r.confidence
+            StatusBadge(text: confidence >= 0.8 ? "HIGH CONFIDENCE" : confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
         }
     }
 
@@ -626,16 +629,17 @@ struct AnalysisPanel: View {
     }
 }
 
-/// Verdict wording shared by the inspector, track tags and filters.
+/// Verdict wording shared by the inspector, track tags and filters. Spectral verdicts are questions: the
+/// same evidence has innocent explanations, which each summary names.
 enum AnalysisVerdictText {
     static func badge(_ v: FileAnalysis.Verdict) -> String {
         switch v {
         case .genuine: "GENUINE"
         case .paddedBitDepth: "PADDED BIT DEPTH"
-        case .upsampled: "UPSAMPLED"
-        case .possibleLossyOrigin: "LOSSY ORIGIN"
-        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES"
-        case .notApplicable: "N/A"
+        case .upsampled: "UPSAMPLED?"
+        case .possibleLossyOrigin: "LOSSY ORIGIN?"
+        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES?"
+        case .notApplicable: "INCONCLUSIVE"
         }
     }
 }
