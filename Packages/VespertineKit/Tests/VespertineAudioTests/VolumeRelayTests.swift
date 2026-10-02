@@ -60,12 +60,39 @@ struct VolumeRelayTests {
         settle()
         #expect(abs(level(standIn) - 0.55) < 0.01)
 
+        // A quick turn of a crown or knob on the held device: no step may be pulled back to an older level by the
+        // stand-in's echo (on the AirPods Max nearly every step was), and both end where the turn stopped.
+        let steps = (1...16).map { 0.55 + Float32($0) * 0.01 }
+        let seen = Seen()
+        var address = Self.volume
+        let watch = DispatchQueue(label: "test")
+        let block: AudioObjectPropertyListenerBlock = { _, _ in seen.add((try? HAL.get(held, Self.volume, initial: Float32(-1))) ?? -1) }
+        AudioObjectAddPropertyListenerBlock(held, &address, watch, block)
+        for step in steps {
+            try HAL.set(held, Self.volume, step)
+            Thread.sleep(forTimeInterval: 0.03)
+        }
+        settle(); settle()
+        AudioObjectRemovePropertyListenerBlock(held, &address, watch, block)
+        let values = seen.values
+        let pulledBack = zip(values, values.dropFirst()).filter { $1 < $0 - 0.005 }
+        #expect(pulledBack.isEmpty, "steps pulled back: \(pulledBack) in \(values)")
+        #expect(abs(level(held) - 0.71) < 0.01)
+        #expect(abs(level(standIn) - 0.71) < 0.01)
+
         DeviceControl.releaseHog(held)                      // pause long enough, or a shared device
         settle()
         #expect(abs(level(standIn) - standInVolume) < 0.01, "the stand-in gets its own volume back")
         try HAL.set(standIn, Self.volume, Float32(0.10))
         settle()
-        #expect(abs(level(held) - 0.55) < 0.01, "no relay without the hold")
+        #expect(abs(level(held) - 0.71) < 0.01, "no relay without the hold")
         relay.stop()
     }
+}
+
+private final class Seen: @unchecked Sendable {
+    private let lock = NSLock()
+    private var list: [Float32] = []
+    func add(_ v: Float32) { lock.lock(); list.append(v); lock.unlock() }
+    var values: [Float32] { lock.lock(); defer { lock.unlock() }; return list }
 }
