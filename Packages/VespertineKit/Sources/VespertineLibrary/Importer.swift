@@ -74,11 +74,12 @@ public enum Importer {
             let siblings = (try? FileManager.default.contentsOfDirectory(at: parent, includingPropertiesForKeys: nil)) ?? []
             for sheetURL in siblings where sheetURL.pathExtension.lowercased() == "cue" {
                 guard let sheet = CueSheet.load(sheetURL), !sheet.files.isEmpty else { continue }
-                let mapped = sheet.files.compactMap { destinations[parent.appendingPathComponent($0.name).standardizedFileURL.path] }
+                let mapped = sheet.files.compactMap { file in
+                    CueSheet.audioFile(named: file.name, besideSheet: sheetURL).flatMap { destinations[$0.standardizedFileURL.path] }
+                }
                 guard mapped.count == sheet.files.count, let folder = mapped.first?.deletingLastPathComponent() else { continue }
                 let data = try Data(contentsOf: sheetURL)
-                guard var text = [String.Encoding.utf8, .windowsCP1252, .isoLatin1, .shiftJIS]
-                    .compactMap({ String(data: data, encoding: $0) }).first else { continue }
+                guard var text = CueSheet.text(of: data) else { continue }
                 for (source, dest) in zip(sheet.files, mapped) {
                     let from = folder.standardizedFileURL.pathComponents
                     let to = dest.standardizedFileURL.pathComponents
