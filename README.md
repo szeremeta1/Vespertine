@@ -237,7 +237,7 @@ scripts/publish.sh docs/releases/<version>.md
 
 The first command builds a universal app and signs it (and every embedded framework and Sparkle helper) with the Developer ID. It then notarizes and staples both the app and a designed installer DMG. If Apple takes longer than two hours, rerun it with `--resume` instead of `--notarize`.
 
-The second command publishes the GitHub release: it signs the Sparkle appcast entry with the EdDSA key in the login keychain (account `nocturne`, kept from before the rename so the key never changes) and uploads `appcast.xml` next to the DMG. Installed copies read the feed from `releases/latest/download/appcast.xml`.
+The second command publishes the GitHub release: it signs the Sparkle appcast entry with the EdDSA key in the login keychain (account `nocturne`, kept from before the rename so the key never changes) and uploads `appcast.xml` next to the DMG. Installed copies read the feed from `releases/latest/download/appcast.xml`, so the release GitHub marks *Latest* must always carry `appcast.xml`: any other release (a build of the analyzer, say) goes up with `gh release create --latest=false`, or every installed copy's update check fails until the next app release.
 
 **Back up the Sparkle signing key.** Without it, no future update can be published to existing installs:
 

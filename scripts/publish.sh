@@ -5,7 +5,8 @@
 #   scripts/publish.sh <release-notes.md>
 #
 # The appcast lives on every release as `appcast.xml`; the app's SUFeedURL points at
-# .../releases/latest/download/appcast.xml, so the newest release always serves the feed.
+# .../releases/latest/download/appcast.xml, so the newest release always serves the feed. Any other release must be
+# created with --latest=false: a Latest release without appcast.xml breaks every installed copy's update check.
 # Each entry is EdDSA-signed with the Sparkle key stored in the login keychain under the account `nocturne` (kept from before the rename so the EdDSA key never changes).
 set -euo pipefail
 cd "$(dirname $0)/.."
