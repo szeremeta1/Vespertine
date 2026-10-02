@@ -117,12 +117,14 @@ vespertine-analyze index "/srv/music"
 
 It writes `/srv/music/.vespertine/analysis.jsonl` (one JSON record per file; appended as it goes, so an
 interrupted run loses nothing) and `status.json` (progress). Later runs analyze only new or changed files.
-The music itself is only ever read. Run it nightly at low priority, for example with systemd:
+The music itself is only ever read. Run it nightly at low priority as an ordinary user that can read the
+music and write `.vespertine` (never as root), for example with systemd:
 
 ```ini
 # /etc/systemd/system/vespertine-analyze.service
 [Service]
 Type=oneshot
+User=media
 ExecStart=/usr/local/bin/vespertine-analyze index "/srv/music" --jobs 2
 Nice=19
 CPUWeight=10

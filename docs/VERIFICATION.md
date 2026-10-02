@@ -88,9 +88,9 @@ These methods don't depend on anything Vespertine reports.
 
 **DTS-CD or DoP indicator test (no extra hardware beyond what you own).**
 
-- A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if every bit arrives intact. One changed bit and the receiver plays white noise, or refuses the stream.
-- To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, that path was bit-perfect for that file.
-- The same principle works with DSD: a DAC lights its DSD indicator for DoP only when the marker bytes and DSD bits are untouched. Any gain or resampling destroys them.
+- A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if the stream arrives unprocessed. Any gain change, dither, resampling or mixing scrambles it, and the receiver plays white noise or refuses the stream.
+- To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, nothing on that path processed the samples. (It's a test for processing, not proof against every possible bit error: the null test below is the rigorous one.)
+- The same principle works with DSD: a DAC lights its DSD indicator for DoP only when the DoP marker bytes arrive untouched. Any gain or resampling destroys them, so a lit indicator rules out processing (the DAC checks the markers, not every DSD bit).
 
 **Digital loopback null test (the rigorous one).**
 
