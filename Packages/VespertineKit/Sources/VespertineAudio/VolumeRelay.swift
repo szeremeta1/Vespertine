@@ -284,7 +284,34 @@ struct RelayChanges: Codable, Equatable {
                 nowAlert != nil && nowAlert == alertSet ? alert : nil)
     }
 
+    /// What is still to put back after an attempt: a field that couldn't be read or set (the stand-in unplugged, the
+    /// alert volume unreadable) stays; one put back, or changed by someone since, goes. Nil once nothing is left.
+    func remaining(volume volumeSettled: Bool, mute muteSettled: Bool, alert alertSettled: Bool) -> RelayChanges? {
+        var rest = self
+        if volumeSettled { rest.volume = nil; rest.relayedVolume = nil }
+        if muteSettled { rest.mute = nil; rest.relayedMute = nil }
+        if alertSettled { rest.alert = nil; rest.alertSet = nil }
+        let left = (rest.volume != nil && rest.relayedVolume != nil) || (rest.mute != nil && rest.relayedMute != nil)
+            || (rest.alert != nil && rest.alertSet != nil)
+        return left ? rest : nil
+    }
+
     private static let key = "VespertineVolumeRelayChanges"
+    private static let leftoversKey = "VespertineVolumeRelayLeftovers"
+
+    /// What earlier launches couldn't put back yet, oldest first: kept apart from the record the relay writes, so
+    /// relaying again (through another stand-in, say) doesn't overwrite it.
+    static func leftovers(from defaults: UserDefaults = .standard) -> [RelayChanges] {
+        defaults.data(forKey: leftoversKey).flatMap { try? JSONDecoder().decode([RelayChanges].self, from: $0) } ?? []
+    }
+
+    static func storeLeftovers(_ list: [RelayChanges], in defaults: UserDefaults = .standard) {
+        if !list.isEmpty, let data = try? JSONEncoder().encode(list) {
+            defaults.set(data, forKey: leftoversKey)
+        } else {
+            defaults.removeObject(forKey: leftoversKey)
+        }
+    }
 
     static func load(from defaults: UserDefaults = .standard) -> RelayChanges? {
         defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(RelayChanges.self, from: $0) }

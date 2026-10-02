@@ -64,19 +64,34 @@ public enum DeviceRestore {
     }
 
     /// Puts back what the volume relay changed when Vespertine last ended while relaying (a crash, a forced quit): the
-    /// stand-in's own volume and mute, and the alert volume, each only if it is still what the relay left. Call at
-    /// launch, before anything plays. Quick, unless there is something to put back.
+    /// stand-in's own volume and mute, and the alert volume, each only if it is still what the relay left. What can't
+    /// be put back yet (the stand-in isn't plugged in) is kept for the next launch. Call at launch, before anything
+    /// plays. Quick, unless there is something to put back.
     public static func afterCrash() {
-        guard let left = RelayChanges.load() else { return }
+        var pending = RelayChanges.leftovers()
+        if let left = RelayChanges.load() { pending.append(left) }
+        guard !pending.isEmpty else { return }
+        // Newest first: an older record is checked against what the newer one put back.
+        let still = pending.reversed().compactMap(putBack).reversed()
+        RelayChanges.storeLeftovers(Array(still))
         RelayChanges.store(nil)
+    }
+
+    /// Puts back what it can of `left`, and returns the rest.
+    private static func putBack(_ left: RelayChanges) -> RelayChanges? {
         let device = DeviceQuery.allDeviceIDs().first { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) == left.standIn }
-        let back = left.putBack(volume: device.flatMap { try? HAL.get($0, VolumeRelay.volume, initial: Float32(0)) },
-                                mute: device.flatMap { try? HAL.get($0, VolumeRelay.mute, initial: UInt32(0)) },
-                                alert: left.alertSet == nil ? nil : AlertVolume.get())
-        if let device, let v = back.volume { try? HAL.set(device, VolumeRelay.volume, v) }
-        if let device, let m = back.mute { try? HAL.set(device, VolumeRelay.mute, m) }
-        if let a = back.alert, let set = left.alertSet { AlertVolume.set(a, ifStill: set) }
-        log.notice("Vespertine last quit while relaying the volume keys; put back volume \(back.volume != nil), mute \(back.mute != nil), alert volume \(back.alert != nil)")
+        let nowVolume = device.flatMap { try? HAL.get($0, VolumeRelay.volume, initial: Float32(0)) }
+        let nowMute = device.flatMap { try? HAL.get($0, VolumeRelay.mute, initial: UInt32(0)) }
+        let nowAlert = left.alertSet == nil ? nil : AlertVolume.get()
+        let back = left.putBack(volume: nowVolume, mute: nowMute, alert: nowAlert)
+        // Read means settled (left as it is, or put back below), unless putting it back fails.
+        var settled = (volume: nowVolume != nil, mute: nowMute != nil, alert: nowAlert != nil)
+        if let device, let v = back.volume { settled.volume = (try? HAL.set(device, VolumeRelay.volume, v)) != nil }
+        if let device, let m = back.mute { settled.mute = (try? HAL.set(device, VolumeRelay.mute, m)) != nil }
+        if let a = back.alert, let set = left.alertSet { settled.alert = AlertVolume.set(a, ifStill: set) != nil }
+        let rest = left.remaining(volume: settled.volume, mute: settled.mute, alert: settled.alert)
+        log.notice("Vespertine last quit while relaying the volume keys; put back volume \(back.volume != nil), mute \(back.mute != nil), alert volume \(back.alert != nil); \(rest == nil ? "nothing left" : "the rest waits for the next launch")")
+        return rest
     }
 
     private static func restore(_ device: AudioObjectID, to original: Original) {

@@ -21,6 +21,13 @@ tools=$(dirname "$(find build -path '*artifacts/sparkle/Sparkle/bin/generate_app
 
 [[ -f $dmg ]] || { print -u2 "Missing $dmg; run scripts/release.sh --notarize first."; exit 1; }
 xcrun stapler validate "$dmg" >/dev/null || { print -u2 "$dmg is not notarized and stapled."; exit 1; }
+# The tag goes on the commit this DMG's app was built from, which release.sh records with the DMG's hash when it
+# finishes the DMG: not whatever HEAD is now, nor whatever a later test build recorded.
+provenance=( $(cat "$dmg.built-from" 2>/dev/null || true) )
+built=${provenance[1]:-} dmg_sha=${provenance[2]:-}
+[[ -n $built && -n $dmg_sha ]] || { print -u2 "$dmg.built-from is missing: build the release with scripts/release.sh --notarize first."; exit 1; }
+[[ "$(shasum -a 256 "$dmg" | cut -d' ' -f1)" == "$dmg_sha" ]] \
+  || { print -u2 "$dmg isn't the DMG release.sh made from $built; build the release again."; exit 1; }
 
 feed="$out/appcast"
 rm -rf "$feed" && mkdir -p "$feed"
@@ -89,9 +96,6 @@ signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
 sys.exit(0 if signed else 1)
 PY
 
-# The tag goes on the commit the app was built from (release.sh records it), whatever HEAD is now.
-built=$(cat "$out/built-from" 2>/dev/null || true)
-[[ -n $built ]] || { print -u2 "$out/built-from is missing: build with scripts/release.sh first."; exit 1; }
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
   git tag -s "v$version" -m "Vespertine $version" "$built"
 fi

@@ -4,6 +4,7 @@
 //
 
 import CoreServices
+import CryptoKit
 import Darwin
 import Foundation
 import SFBAudioEngine
@@ -158,8 +159,10 @@ public enum Importer {
         if status != 0 { try FileManager.default.copyItem(at: source, to: dest) }
     }
 
-    /// Every copy carries the size and modification date of the file it came from, so importing that file again finds
-    /// the copy (whatever was written into its tags since) instead of making a "… 2".
+    /// Every copy carries the size, modification date and a content fingerprint of the file it came from, so importing
+    /// that file again finds the copy (whatever was written into its tags since) instead of making a "… 2", while a
+    /// different file that only shares its size and date (a WAV of the same length, a card that keeps whole seconds)
+    /// is still imported.
     private static let stampName = "org.szeremeta.vespertine.imported-from"
 
     static func identity(of url: URL) -> String? {
@@ -168,23 +171,51 @@ public enum Importer {
         return "\(st.st_size) \(st.st_mtimespec.tv_sec).\(st.st_mtimespec.tv_nsec)"
     }
 
-    static func stamp(_ copy: URL, from source: URL) {
-        guard let identity = identity(of: source) else { return }
-        _ = identity.withCString { setxattr(copy.path, stampName, $0, strlen($0), 0, 0) }
+    /// The first and last MiB of the file (all of a small one), hashed: two reads, not the whole file, and any two
+    /// different recordings differ there.
+    static func fingerprint(of url: URL) -> String? {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? file.close() }
+        let span: UInt64 = 1 << 20
+        var hash = SHA256()
+        do {
+            let end = try file.seekToEnd()
+            let whole = end <= 2 * span
+            for offset in whole ? [0] : [0, end - span] {
+                try file.seek(toOffset: offset)
+                hash.update(data: try file.read(upToCount: Int(whole ? end : span)) ?? Data())
+            }
+        } catch { return nil }
+        return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
-    /// An earlier copy of `source` at `wanted` or at one of its "… 2", "… 3" names: stamped with the source's size and
-    /// date, or (copies made before stamping) an untouched copy, which keeps both.
+    static func stamp(_ copy: URL, from source: URL) {
+        guard let identity = identity(of: source), let print = fingerprint(of: source) else { return }
+        _ = "\(identity) \(print)".withCString { setxattr(copy.path, stampName, $0, strlen($0), 0, 0) }
+    }
+
+    /// An earlier copy of `source` at `wanted` or at one of its "… 2", "… 3" names: stamped with the source's size,
+    /// date and fingerprint, or (copies made before stamping) an untouched copy, which keeps all three.
     static func earlierCopy(of source: URL, at wanted: URL) -> URL? {
         guard let identity = identity(of: source) else { return nil }
+        var sourcePrint: String??
+        func printOfSource() -> String? {
+            if sourcePrint == nil { sourcePrint = .some(fingerprint(of: source)) }
+            return sourcePrint!
+        }
         let base = wanted.deletingPathExtension().lastPathComponent, ext = wanted.pathExtension
         for i in 1...1000 {
             let candidate = i == 1 ? wanted : wanted.deletingLastPathComponent().appendingPathComponent("\(base) \(i)").appendingPathExtension(ext)
             guard FileManager.default.fileExists(atPath: candidate.path) else { return nil }
-            var buffer = [UInt8](repeating: 0, count: 128)
+            var buffer = [UInt8](repeating: 0, count: 256)
             let length = getxattr(candidate.path, stampName, &buffer, buffer.count, 0, 0)
-            let stamped = length > 0 ? String(decoding: buffer.prefix(length), as: UTF8.self) : nil
-            if (stamped ?? self.identity(of: candidate)) == identity { return candidate }
+            let stamped = length > 0 ? String(decoding: buffer.prefix(length), as: UTF8.self).split(separator: " ").map(String.init) : []
+            // Size and date first (cheap), then the content, which only a match makes it worth reading.
+            if stamped.count == 3 {
+                if stamped[0...1].joined(separator: " ") == identity, let print = printOfSource(), stamped[2] == print { return candidate }
+            } else if self.identity(of: candidate) == identity, let print = printOfSource(), fingerprint(of: candidate) == print {
+                return candidate
+            }
         }
         return nil
     }
