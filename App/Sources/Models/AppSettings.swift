@@ -157,7 +157,8 @@ final class AppSettings {
         return 60 * (pow(digitalVolume, 0.5) - 1)
     }
 
-    func engineSettings(deviceHasHardwareVolume: Bool) -> EngineSettings {
+    /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
+    func engineSettings() -> EngineSettings {
         var s = EngineSettings()
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
@@ -166,7 +167,8 @@ final class AppSettings {
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
-        s.digitalVolumeDB = deviceHasHardwareVolume ? nil : digitalVolumeDB
+        s.digitalVolumeDB = digitalVolumeDB
+        s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem
         s.integerMode = integerMode
         return s

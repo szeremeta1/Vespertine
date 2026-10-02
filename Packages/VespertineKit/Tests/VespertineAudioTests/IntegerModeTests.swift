@@ -81,4 +81,23 @@ struct IntegerModeTests {
             }
         }
     }
+
+    @Test("A 32-bit float file never goes out as integers (its samples would change); a 32-bit integer file can")
+    func floatFileStaysFloat() throws {
+        let float = FileManager.default.temporaryDirectory.appendingPathComponent("float32-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: float) }
+        do {
+            let f = try AVAudioFile(forWriting: float, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
+                AVSampleRateKey: 96_000.0, AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 32, AVLinearPCMIsFloatKey: true])
+            let buffer = try #require(AVAudioPCMBuffer(pcmFormat: f.processingFormat, frameCapacity: 960))
+            buffer.frameLength = 960
+            for c in 0..<2 { for i in 0..<960 { buffer.floatChannelData![c][i] = 0.25 } }
+            try f.write(from: buffer)
+        }
+        #expect(try SourceOpener.probe(float).exactAsIntegers == false)
+        let int = FileManager.default.temporaryDirectory.appendingPathComponent("int32-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: int) }
+        _ = try write32(int, frames: 960)
+        #expect(try SourceOpener.probe(int).exactAsIntegers)
+    }
 }

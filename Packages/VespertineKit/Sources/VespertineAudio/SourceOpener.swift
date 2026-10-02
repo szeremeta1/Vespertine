@@ -58,6 +58,16 @@ final class ProbedSource: @unchecked Sendable {
         self.pcm = pcm
         self.dsd = dsd
     }
+
+    /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
+    /// not a float file, and no wider than a Float32 decoder carries (24 bits).
+    var exactAsIntegers: Bool {
+        guard let pcm else { return false }
+        if let source = (pcm as? GuardedDecoder)?.sourceFormat.streamDescription.pointee,
+           source.mFormatID == kAudioFormatLinearPCM, source.mFormatFlags & kAudioFormatFlagIsFloat != 0 { return false }
+        let decoded = pcm.processingFormat.streamDescription.pointee
+        return decoded.mFormatFlags & kAudioFormatFlagIsFloat == 0 || decoded.mBitsPerChannel > 32 || (format.bitDepth ?? 32) <= 24
+    }
 }
 
 private let mpegOpenLock = NSLock()

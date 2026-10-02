@@ -60,6 +60,9 @@ public struct EngineSettings: Sendable, Equatable {
     public var releaseExclusiveAfterPause: TimeInterval = 30
     /// nil = no software volume (hardware or fixed).
     public var digitalVolumeDB: Double?
+    /// Outputs with their own volume control get no digital volume. Decided for the output that's actually
+    /// playing (see `digitalVolume(for:)`), so a change of the Mac's default output can't take it off a DAC.
+    public var preferHardwareVolume = false
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
     /// Dolby Atmos: let macOS render the objects (true), or play the Dolby Digital Plus channel bed
@@ -75,6 +78,11 @@ public struct EngineSettings: Sendable, Equatable {
 
     public func spatialMode(for device: OutputDevice) -> SpatialMode {
         spatialModes[device.uid] ?? (device.isAppleHeadphones ? .headTracked : .off)
+    }
+
+    /// The digital volume (dB) applied on `device`; nil = none.
+    public func digitalVolume(for device: OutputDevice?) -> Double? {
+        preferHardwareVolume && device?.hasHardwareVolume == true ? nil : digitalVolumeDB
     }
 }
 
@@ -674,7 +682,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: settings.ratePolicies[device.uid] ?? .matchSource,
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream)
-        plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: item, device: device)
+        plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
                 if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)") }
@@ -735,7 +743,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func makePath(probed: ProbedSource, plan: OutputPlan, device: OutputDevice, session: OutputSession, item: PlayableItem) -> SignalPath {
         let volume: SignalPath.VolumeStage
-        if let db = settings.digitalVolumeDB, plan.mode == .pcm { volume = .digital(dB: db) }
+        if let db = settings.digitalVolume(for: device), plan.mode == .pcm { volume = .digital(dB: db) }
         else if device.hasHardwareVolume { volume = .hardware }
         else { volume = .fixed }
         return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
@@ -744,9 +752,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func applyGain() {
-        atmos?.setVolume(Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1))
+        let digital = settings.digitalVolume(for: sessionDevice)
+        atmos?.setVolume(Float(digital.map { pow(10, $0 / 20) } ?? 1))
         guard let session else { return }
-        let db = session.plan.isPassthrough ? 0 : (settings.digitalVolumeDB ?? 0)
+        let db = session.plan.isPassthrough ? 0 : (digital ?? 0)
         nrt_context_set_gain(session.context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(session.applied.physicalBitDepth))
     }
 
@@ -818,10 +827,12 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Integer mode applies only where nothing would change the samples: plain PCM at its own rate and
     /// channel count, no Spatial Audio, digital volume or ReplayGain, on a device with a non-mixable Int32 format.
-    private func wantsIntegerMode(_ plan: OutputPlan, source: SourceFormat, item: PlayableItem, device: OutputDevice) -> Bool {
-        settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
-            && plan.channels == source.channels && source.encoding == .pcm && settings.digitalVolumeDB == nil
-            && (item.replayGainDB ?? 0) == 0
+    /// Float files aren't integers, so they'd be changed on the way: they keep the float path (and its label).
+    private func wantsIntegerMode(_ plan: OutputPlan, source probed: ProbedSource, item: PlayableItem, device: OutputDevice) -> Bool {
+        let source = probed.format
+        return settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+            && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
+            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
@@ -833,7 +844,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func beginSystemRendering(_ item: PlayableItem, url: URL, device: OutputDevice, at seconds: TimeInterval) throws {
         // macOS's renderer needs the device to itself: drop Vespertine's own session first.
         teardown(releaseHog: true)
-        let volume = Float(settings.digitalVolumeDB.map { pow(10, $0 / 20) } ?? 1)
+        let volume = Float(settings.digitalVolume(for: device).map { pow(10, $0 / 20) } ?? 1)
         let session = try SystemRendererSession(item: item, url: url, deviceUID: device.uid,
                                                 spatial: settings.spatialMode(for: device) != .off,
                                                 volume: volume)
@@ -1011,7 +1022,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                               policy: settings.ratePolicies[device.uid] ?? .matchSource,
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream)
-                plan.integerSamples = wantsIntegerMode(plan, source: probed.format, item: next, device: device)
+                plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     let d = try Decoding(item: next, probed: probed, decoder: decoder,
@@ -1121,7 +1132,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let position = currentPosition()
         var path = segment?.path
         if path?.plan.mode == .pcm {
-            if let db = settings.digitalVolumeDB { path?.volume = .digital(dB: db) }
+            if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
