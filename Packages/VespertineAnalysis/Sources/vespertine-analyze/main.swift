@@ -294,10 +294,12 @@ final class Index: @unchecked Sendable {
     /// The lock file that keeps runs from overlapping.
     func openLock() throws -> Int32 { try openFile(".lock", O_RDWR | O_CREAT) }
 
+    /// The file's record is up to date, or one an analyzer update judges anew from its measurements (as Vespertine
+    /// does on import), so after an update only the files that need reading again are analyzed again.
     func current(_ path: String, size: Int64, mtime: Double) -> Bool {
         lock.lock(); defer { lock.unlock() }
         guard let r = records[path] else { return false }
-        return r.size == size && abs(r.mtime - mtime) < 1 && r.analysis.version >= FileAnalysis.currentVersion
+        return r.size == size && abs(r.mtime - mtime) < 1 && FileAnalyzer.rejudged(r.analysis).version >= FileAnalysis.currentVersion
     }
 
     func append(_ record: IndexRecord) throws {

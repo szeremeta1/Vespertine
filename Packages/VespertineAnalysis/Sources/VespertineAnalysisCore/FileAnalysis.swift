@@ -17,7 +17,9 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
 
     /// Bumped when the analysis learns something new, so older results can be refreshed.
     /// 3: shelves must follow the music to count as synthetic, hedged wording, capped spectral confidence.
-    public static let currentVersion = 3
+    /// 4: imaging (a mirror image above 22.05/24 kHz) counts as upsampling; a narrow shelf ending below 19.6 kHz is an
+    ///    encoder's low-pass, not synthetic highs.
+    public static let currentVersion = 4
 
     public var claimedBitDepth: Int?
     public var effectiveBitDepth: Int?
@@ -234,7 +236,10 @@ public enum FileAnalyzer {
     /// A stored result brought up to the current version without reading the file again: the verdict is decided anew
     /// from its measurements, which are the same since version 2. Shelf tracking, measured from version 3 on, is
     /// missing from older results, so their shelves are judged as before (with the current caps and wording).
-    /// Results that can't be (version 1, which kept no measurements) come back unchanged, for a fresh analysis.
+    /// Results that can't be come back unchanged, for a fresh analysis: version 1, which kept no measurements, and
+    /// hi-res files that would come out genuine without the imaging test (measured from version 4 on), which is what
+    /// catches 44.1/48 kHz masters upsampled with a short filter. Every other verdict stands without it: a file at a
+    /// CD rate isn't tested for imaging, and a lossy-origin, synthetic or upsampled finding doesn't depend on it.
     public static func rejudged(_ a: FileAnalysis) -> FileAnalysis {
         guard a.version < FileAnalysis.currentVersion, a.version >= 2 else { return a }
         guard let f = a.forensics else {
@@ -246,9 +251,11 @@ public enum FileAnalyzer {
         }
         // A word length only counts when it was checked against a known one of at most 24 bits.
         let effective = a.claimedBitDepth.map { $0 <= 24 } == true ? a.effectiveBitDepth : nil
-        return conclude(forensics: f, claimedBitDepth: a.claimedBitDepth, effectiveBitDepth: effective, sampleRate: a.sampleRate,
-                        peakDBFS: a.peakDBFS, clippedSamples: a.clippedSamples, bandwidth: a.bandwidthHz, spectrum: a.spectrum,
-                        secondsAnalyzed: a.secondsAnalyzed)
+        let judged = conclude(forensics: f, claimedBitDepth: a.claimedBitDepth, effectiveBitDepth: effective, sampleRate: a.sampleRate,
+                              peakDBFS: a.peakDBFS, clippedSamples: a.clippedSamples, bandwidth: a.bandwidthHz, spectrum: a.spectrum,
+                              secondsAnalyzed: a.secondsAnalyzed)
+        if a.version < 4, a.sampleRate >= 88_200, judged.verdict == .genuine { return a }
+        return judged
     }
 
     /// The most a spectral verdict's confidence can reach. The steep low-pass that marks a codec is also left by
@@ -257,6 +264,14 @@ public enum FileAnalyzer {
     public static let spectralConfidenceCap = 0.75
     /// A shelf counts as generated only when its level follows the music below the step this closely.
     public static let shelfTrackingThreshold = 0.5
+    /// Content above an old Nyquist counts as an upsampler's image when it mirrors the music below this closely, in at
+    /// least `mirrorMinimumFrames` frames. Measured on synthetic masters (see docs/ANALYSIS.md): images 0.63–1.00
+    /// (ffmpeg's default and shorter filters 0.87–1.00, longer ones 0.65–0.88, linear interpolation 1.00; 44.1 and
+    /// 48 kHz sources, 16 and 24 bits, 88.2–192 kHz); music made at hi-res rates −0.03–0.02, DSD-style conversions
+    /// low-passed at 24.5, 30 and 40 kHz among it, and 0.21 at most with sustained tones whose partials sit on their
+    /// own reflection.
+    public static let mirrorThreshold = 0.5
+    public static let mirrorMinimumFrames = 8
 
     /// Verdict from the measurements. Thresholds are calibrated on genuine CD and hi-res masters
     /// against the same audio passed through MP3 (128/320/V0), AAC (128/256), Opus (96/160),
@@ -300,8 +315,12 @@ public enum FileAnalyzer {
         let follows = f.shelfTracking.map { $0 >= shelfTrackingThreshold } ?? true
         // At 44.1 kHz a 19.6–20.7 kHz wall may be the file's own steep anti-alias filter, so it doesn't vouch for a weak step.
         let wallVouches = wall != nil && !(cdZoneWall && sampleRate < 46_000)
+        // A narrow band that stops well short of 20 kHz is an encoder's low-pass transition (LAME's top band at 128 kb/s:
+        // a step at ~16.6 kHz, then real, quieter content to ~18.2 kHz), which follows the music because it is the music.
+        // Generated shelves reach for the full band: 4.5–4.7 kHz wide, ending at 20.3–21.0 kHz in calibration.
+        let encoderBand = f.shelfHz.map { f.shelfEndHz - $0 < 3_000 && f.shelfEndHz < 19_600 } ?? false
         if let shelf = f.shelfHz, shelf <= 20_500, !ownFilter(shelf), f.shelfStepDB >= 10, f.shelfSlope >= -2.5, f.shelfAboveFloorDB >= 10,
-           f.shelfConsistency >= 0.8, f.shelfEndHz - shelf >= 1_500, follows,
+           f.shelfConsistency >= 0.8, f.shelfEndHz - shelf >= 1_500, follows, !encoderBand,
            wallVouches || (shelf < 19_600 && f.shelfStepDB >= 15) {
             // A hard wall closing the shelf (where the generator stopped) is strong corroboration.
             let closedByWall = f.cliffHz.map { $0 > shelf + 1_000 && f.cliffDropDB >= 22 && f.cliffConsistency >= 0.85 } ?? false
@@ -317,8 +336,20 @@ public enum FileAnalyzer {
             if let tracking = f.shelfTracking, tracking < shelfTrackingThreshold, let shelf = f.shelfHz, abs(shelf - wall.hz) <= 1_000,
                f.shelfEndHz - shelf >= 1_500, f.shelfAboveFloorDB >= 10 {
                 text += " Above it, steady noise-like content that doesn't follow the music, as analog tape hiss or vinyl surface noise added after the cutoff would be."
+            } else if encoderBand, follows, let shelf = f.shelfHz, f.shelfEndHz - shelf >= 1_500, f.shelfAboveFloorDB >= 10 {
+                text += " Between ~\(khz(shelf)) and ~\(khz(f.shelfEndHz)) kHz, a narrow band of quieter content that follows the music, as a lossy encoder's low-pass transition leaves."
             }
             return (.possibleLossyOrigin, text, wallConfidence, wall.hz)
+        }
+        // "22.05" or "24": where a mirror is.
+        func nyquistText(_ hz: Double) -> String { abs(hz - 22_050) < 1 ? "22.05" : rateText(hz) }
+        // Imaging: above the old Nyquist of a 44.1/48 kHz source, a mirror image of the music just below it, which an
+        // upsampler's filter leaves when it's short (ffmpeg's default; its wall lands at ~28 kHz, outside the zone below).
+        if hiRes, let old = f.mirrorHz, let r = f.mirrorCorrelation, r >= mirrorThreshold, (f.mirrorFrames ?? 0) >= mirrorMinimumFrames {
+            let source = rateText(2 * old)
+            return (.upsampled,
+                    "Above \(nyquistText(old)) kHz, the spectrum mirrors the music just below it, moment by moment (r \(String(format: "%.2f", r)) in \(f.mirrorFrames ?? 0) frames): the image a sample-rate converter leaves behind. A \(source) kHz master upsampled to \(rateText(sampleRate)) kHz looks like this; so does a mix with parts recorded or processed at \(source) kHz.",
+                    min(spectralConfidenceCap, 0.6 + (r - mirrorThreshold) / 2), old)
         }
         if hiRes, let hz = f.cliffHz, hz >= 19_600, hz <= 24_500, f.cliffDropDB >= 18, f.cliffConsistency >= 0.9 {
             return (.upsampled,
@@ -336,6 +367,9 @@ public enum FileAnalyzer {
         note += " No codec-like cutoff, synthetic-looking shelf or upsampling wall found."
         if let hz = f.cliffHz, ownFilter(hz), f.cliffDropDB >= 15 {
             note += " The steep cutoff at ~\(khz(hz)) kHz is this \(rateText(sampleRate)) kHz file's own anti-alias filter."
+        }
+        if hiRes, let old = f.mirrorHz, let r = f.mirrorCorrelation, (f.mirrorFrames ?? 0) >= mirrorMinimumFrames, r < mirrorThreshold {
+            note += " What's above \(nyquistText(old)) kHz isn't a mirror image of the music below it, as an upsampler's would be."
         }
         if sampleRate >= 88_200, reach > 0, reach < 26_000 {
             note += " Little recorded above ~\(khz(reach)) kHz, which is normal for analog-era masters."
