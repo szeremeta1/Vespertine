@@ -68,12 +68,31 @@ Two fan releases labelled "Enhanced 24-bit" were correctly identified as synthet
   genuine file.
 - A lossy file whose highs were regenerated so well that no step or shelf remains would not be
   detected. None of the tools tested produce that.
+- The results table scores the same corpus the thresholds were set on, so it shows that the detector
+  separates that data, not a measured error rate on unseen files. The 79 real files above are the only
+  out-of-sample check, and that is a small one.
 - Verdicts are evidence, not proof. The inspector shows the measurements (cutoff, drop, consistency,
   shelf) and marks them on the spectrum so you can judge for yourself.
 
 ## Reproducing
 
-`vespertine-probe forensics <files…>` prints every measurement and the verdict as a tab-separated row.
+`vespertine-probe forensics <files…>` prints every measurement and the verdict as a tab-separated row,
+and `vespertine-probe analyze <files…>` prints the verdict with its explanation.
+
+To see a verdict on files you can regenerate, make a fake with macOS's own tools. This encodes a track as
+HE-AAC (which adds synthetic highs above its cutoff) and converts it back to a 24-bit FLAC, which is how
+fake "hi-res" is made:
+
+```sh
+afconvert -f m4af -d aach -b 64000 original.flac he.m4a
+ffmpeg -i he.m4a -ar 48000 -c:a flac -sample_fmt s32 fake.flac
+vespertine-probe analyze original.flac fake.flac
+```
+
+On a track from the `vespertine-demo` library this reports the original as genuine and the copy as
+a lossy origin (a brick-wall cutoff at about 20.5 kHz). Use real, full-bandwidth music for other tests:
+the demo's synthetic tracks have almost nothing above 3 kHz, so an ordinary AAC re-encode of one has no
+cutoff to find and passes as genuine.
 
 ## Analyzing on the server (`vespertine-analyze`)
 

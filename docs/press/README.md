@@ -13,8 +13,8 @@ The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-
 ## Launch trailer
 
 A 36.6 s trailer in 16:9 and 1:1, cut to "Starlight Lounge" from iMovie's royalty-free music (Apple licenses it for use in your own projects).
-- **Scenes:** `scripts/brand/trailer/main.swift` renders them as ProRes with half-second handles. They're built from window-only screen recordings of the app on the maker's library: ScreenCaptureKit, only the Vespertine window, no other windows or notifications.
+- **Scenes:** `scripts/brand/stage` (`render.sh`, `patch.sh`, `deliver.sh`) renders them as ProRes with half-second handles. They're built from window-only screen recordings of the app on the maker's library: ScreenCaptureKit, only the Vespertine window, no other windows or notifications.
 - **Edit:** assembled in Final Cut Pro from an FCPXML, with cuts on the bar lines and 16-frame dissolves.
 - **Delivery:** H.264 at −14 LUFS.
 
-The video files aren't kept in the repo.
+The 16:9 trailer (web and 1080p versions) is in `site/assets/trailer`. The ProRes masters and the 1:1 and 9:16 versions aren't kept in the repo.
