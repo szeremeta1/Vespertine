@@ -63,14 +63,18 @@ if args.count >= 3, args[1] == "channels" {
 
 if args.count >= 3, args[1] == "forensics" {
     // Tab-separated measurements for calibration: one row per file.
-    print("file\trate\tverdict\tconf\tcliff\tdrop\tconsist\tbelow\tabove\tfloor\text\tslope\tholes\tcontent\tbits\tshelf\tsstep\tsend\tsslope\tsabove\tscons")
+    print("file\trate\tverdict\tconf\tcliff\tdrop\tconsist\tbelow\tabove\tfloor\text\tslope\tholes\tcontent\tbits\tshelf\tsstep\tsend\tsslope\tsabove\tscons\tstrack\tmirror\tmcorr\tmframes")
     for path in args[2...] {
         let url = URL(fileURLWithPath: path)
         guard let r = try? FileAnalyzer.analyze(url: url, maxSeconds: 120), let f = r.forensics else { print("\(url.lastPathComponent)\terror"); continue }
+        let tracking = f.shelfTracking.map { String(format: "%.2f", $0) } ?? "-"
+        let mirror = [f.mirrorHz.map { String(format: "%.0f", $0) } ?? "-", f.mirrorCorrelation.map { String(format: "%.2f", $0) } ?? "-",
+                      f.mirrorFrames.map(String.init) ?? "-"].joined(separator: "\t")
         print(String(format: "%@\t%.0f\t%@\t%.2f\t%.0f\t%.1f\t%.2f\t%.1f\t%.1f\t%.1f\t%.0f\t%.2f\t%.3f\t%.0f\t%@\t%.0f\t%.1f\t%.0f\t%.2f\t%.1f\t%.2f",
                      url.lastPathComponent, r.sampleRate, r.verdict.rawValue, r.confidence, f.cliffHz ?? 0, f.cliffDropDB, f.cliffConsistency,
                      f.belowDB, f.aboveDB, f.floorDB, f.extensionHz, f.extensionSlope, f.holeRatio, f.contentHz,
-                     r.effectiveBitDepth.map(String.init) ?? "-", f.shelfHz ?? 0, f.shelfStepDB, f.shelfEndHz, f.shelfSlope, f.shelfAboveFloorDB, f.shelfConsistency))
+                     r.effectiveBitDepth.map(String.init) ?? "-", f.shelfHz ?? 0, f.shelfStepDB, f.shelfEndHz, f.shelfSlope, f.shelfAboveFloorDB, f.shelfConsistency)
+              + "\t" + tracking + "\t" + mirror)
     }
     exit(0)
 }

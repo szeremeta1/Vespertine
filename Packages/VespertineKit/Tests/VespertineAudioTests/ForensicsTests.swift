@@ -33,6 +33,9 @@ struct ForensicsTests {
          m(cliff: 22_100, drop: 28.6, cons: 1.00, shelf: (16_200, 24.3, 22_100, -3.5, 20, 0.78)), .possibleLossyOrigin),
         ("48 kHz session sold as 24/96", 96_000, m(cliff: 24_000, drop: 50.3, cons: 1.00), .upsampled),
         ("CD master sold as 24/96", 96_000, m(cliff: 21_100, drop: 24.7, cons: 0.91), .upsampled),
+        // A narrow top band ending below 19.6 kHz is the encoder's low-pass, not synthetic highs (version 4).
+        ("MP3 128 (LAME) of a 48 kHz master, upsampled to 96 kHz", 96_000,
+         m(cliff: 18_300, drop: 41.4, cons: 1.00, shelf: (16_600, 36, 18_200, -0.49, 41.4, 0.98)), .possibleLossyOrigin),
     ]
 
     @Test("Calibrated verdicts on measurements from real files", arguments: cases.indices)
