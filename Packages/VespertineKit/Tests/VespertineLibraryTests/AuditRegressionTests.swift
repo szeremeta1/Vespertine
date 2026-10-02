@@ -443,6 +443,24 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(LibraryScanner.enumerate(dir).audio.count == 1)
     }
 
+    @Test("A short track imported on purpose stays; the same clip in a referenced folder is skipped")
+    func importedShortTrackIsKept() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let managed = dir.appendingPathComponent("managed"), referenced = dir.appendingPathComponent("referenced")
+        for folder in [managed, referenced] {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try audio(folder.appendingPathComponent("jingle.wav"))   // 2 s, untagged: a clip
+        }
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        #expect(await scanner.skipsNonMusic)
+        let kept = try await scanner.scan(db.addSource(LibrarySource(path: managed.path, mode: .managed)))
+        let skipped = try await scanner.scan(db.addSource(LibrarySource(path: referenced.path, mode: .reference)))
+        #expect(kept.added == 1 && kept.skipped == 0)
+        #expect(skipped.added == 0 && skipped.skipped == 1)
+        #expect(try db.allTracks().map { $0.fileURL.deletingLastPathComponent().lastPathComponent } == ["managed"])
+    }
+
     @Test func undoRefusesToOverwriteExternalChanges() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("song.wav"); try audio(url)
