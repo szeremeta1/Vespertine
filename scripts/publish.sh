@@ -88,9 +88,14 @@ signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
 sys.exit(0 if signed else 1)
 PY
 
+# The tag goes on the commit the app was built from (release.sh records it), whatever HEAD is now.
+built=$(cat "$out/built-from" 2>/dev/null || true)
+[[ -n $built ]] || { print -u2 "$out/built-from is missing: build with scripts/release.sh first."; exit 1; }
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-  git tag -s "v$version" -m "Vespertine $version"
+  git tag -s "v$version" -m "Vespertine $version" "$built"
 fi
+[[ "$(git rev-parse "v$version^{commit}")" == "$built" ]] \
+  || { print -u2 "Tag v$version doesn't point at the commit this app was built from ($built)."; exit 1; }
 git push -q origin "v$version"
 gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
   --title "Vespertine $version" --notes-file "$notes"
