@@ -44,6 +44,13 @@ struct FindMusicSheet: View {
     private var selectedFiles: [URL] {
         visible.flatMap { $0.music.filter(filter.includes).map(\.url) }.filter(selected.contains)
     }
+    /// What Import & Organize would write: files on another drive are copied in full, files on the
+    /// Mac's own volume are APFS clones that take no space.
+    private var space: ImportSpace {
+        let files = visible.flatMap { $0.music.filter(filter.includes) }.filter { selected.contains($0.url) }
+        return ImportSpace.measure(files: files.map { ($0.url, $0.fileSize) },
+                                   destination: URL(fileURLWithPath: model.settings.managedFolderPath, isDirectory: true))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -162,6 +169,11 @@ struct FindMusicSheet: View {
                      : "Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
+            if mode == .copyAndOrganize, space.bytesToCopy > 0 {
+                Text(copyNote(space))
+                    .font(Typeface.ui(11)).foregroundStyle(space.fits ? Palette.text3 : Palette.copper)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             HStack {
                 Toggle("Look up missing details and cover art on MusicBrainz afterwards", isOn: $enrichAfter)
                     .toggleStyle(.checkbox).font(Typeface.ui(12))
@@ -169,11 +181,18 @@ struct FindMusicSheet: View {
                 Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
                 Button(adding ? "Adding…" : "Add \(selectedFiles.count) Track\(selectedFiles.count == 1 ? "" : "s")") { add() }
                     .buttonStyle(BrassButtonStyle())
-                    .disabled(selectedFiles.isEmpty || adding || scanning)
+                    .disabled(selectedFiles.isEmpty || adding || scanning || (mode == .copyAndOrganize && !space.fits))
                     .keyboardShortcut(.defaultAction)
             }
         }
         .padding(.horizontal, 22).padding(.vertical, 16)
+    }
+
+    private func copyNote(_ space: ImportSpace) -> String {
+        let needed = space.bytesToCopy.byteString
+        guard let free = space.freeBytes else { return "Copies \(needed) from other drives." }
+        if space.fits { return "Copies \(needed) from other drives. \(free.byteString) is free on this Mac." }
+        return "That needs \(needed), but only \(free.byteString) is free on this Mac, and Vespertine keeps 2 GB spare. Choose fewer files, or switch to Reference in Place."
     }
 
     private func toggleExpanded(_ url: URL) { if expanded.contains(url) { expanded.remove(url) } else { expanded.insert(url) } }
