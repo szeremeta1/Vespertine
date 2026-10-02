@@ -56,6 +56,7 @@ struct SidebarView: View {
                             Divider()
                             Button("Delete Playlist", role: .destructive) {
                                 if model.sidebar == .playlist(id) { model.sidebar = .albums }
+                                model.setFilter(LibraryFilter(), for: .sidebar(.playlist(id)))
                                 model.library.deletePlaylist(playlist)
                             }
                         }
@@ -120,6 +121,7 @@ struct SidebarView: View {
                             Divider()
                             Button("Remove from Library", role: .destructive) {
                                 if model.sidebar == .source(id) { model.sidebar = .albums }
+                                model.setFilter(LibraryFilter(), for: .sidebar(.source(id)))
                                 if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
                             }
                         }

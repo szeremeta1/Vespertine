@@ -138,8 +138,22 @@ final class AppModel {
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
     var searchText = ""
-    /// Each page's filter (see Browsing.swift). Kept while the app runs, so going back finds it as it was.
-    var filters: [FilterScope: LibraryFilter] = [:]
+    /// Each page's filter (see Browsing.swift). The sidebar's pages keep theirs across launches.
+    var filters: [FilterScope: LibraryFilter] = [:] { didSet { if filters != oldValue { saveFilters() } } }
+    /// Where filters are saved; nil for QA runs on a test library (`-VespertineDataDirectory`), so screenshots
+    /// always start from the filters their launch arguments set (`-VespertinePersistFilters YES` keeps them).
+    @ObservationIgnored private let filtersURL: URL?
+    @ObservationIgnored private var filterSave: Task<Void, Never>?
+
+    private func saveFilters() {
+        guard let filtersURL else { return }
+        filterSave?.cancel()
+        filterSave = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(400))
+            guard !Task.isCancelled, let self else { return }
+            FilterStore.save(self.filters, to: filtersURL)
+        }
+    }
     /// Asks the filter bar of a page to open its panel (on a facet, when given).
     var filterPanelRequest: FilterPanelRequest?
     var selectedTrackIDs: Set<Int64> = [] { didSet { if selectedTrackIDs != oldValue { selectionChangedAt = .now } } }
@@ -163,6 +177,10 @@ final class AppModel {
     init(dataDirectory: URL? = nil) throws {
         let settings = AppSettings(dataDirectory: dataDirectory)
         self.settings = settings
+        let defaults = UserDefaults.standard
+        let isolated = defaults.string(forKey: "VespertineDataDirectory") != nil && !defaults.bool(forKey: "VespertinePersistFilters")
+        filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
+        if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory)
         devices = DeviceStore()
         shares = NetworkShareManager(library: library, settings: settings)

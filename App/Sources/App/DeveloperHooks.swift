@@ -69,7 +69,7 @@ enum DeveloperHooks {
         if let spec = d.string(forKey: "VespertineFilter") { model.setFilter(filter(spec), for: model.visibleScope) }
         if let chips = d.string(forKey: "VespertineFormatFilter") {
             for chip in chips.split(separator: ",").compactMap({ QuickChip(rawValue: String($0)) }) {
-                model.updateFilter(model.visibleScope) { chip.toggle(&$0) }
+                model.updateFilter(model.visibleScope) { if !chip.isOn($0) { chip.toggle(&$0) } }
             }
         }
         if let genre = d.string(forKey: "VespertineGenreFilter") { model.updateFilter(model.visibleScope) { $0[.genre].insert(Genres.key(genre)) } }

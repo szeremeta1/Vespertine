@@ -273,3 +273,23 @@ public struct LibraryFilter: Sendable, Hashable {
         return facet.sorted(keys)
     }
 }
+
+/// Saved as `{"facets": {"genre": ["jazz"]}, "flags": ["bits24"]}`. Facets and flags a later version doesn't know
+/// are skipped, so an older filter file never stops the app from reading the rest.
+extension LibraryFilter: Codable {
+    private enum CodingKeys: String, CodingKey { case facets, flags }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let facets = try c.decodeIfPresent([String: [String]].self, forKey: .facets) ?? [:]
+        let flags = try c.decodeIfPresent([String].self, forKey: .flags) ?? []
+        self.init(selections: Dictionary(uniqueKeysWithValues: facets.compactMap { k, v in Facet(rawValue: k).map { ($0, Set(v)) } }),
+                  flags: Set(flags.compactMap(FilterFlag.init(rawValue:))))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(Dictionary(uniqueKeysWithValues: selections.filter { !$0.value.isEmpty }.map { ($0.key.rawValue, $0.value.sorted()) }), forKey: .facets)
+        try c.encode(flags.map(\.rawValue).sorted(), forKey: .flags)
+    }
+}
