@@ -54,15 +54,13 @@ struct NetworkTests {
 
     @Test("A deadline fires on time even when stuck work has used up GCD's shared threads")
     func deadlineWithAFullPool() async {
-        // Wedged mounts hold GCD threads: fill the shared pool the way they would, then ask for a deadline.
-        for _ in 0..<160 {
-            DispatchQueue.global(qos: .utility).async { Thread.sleep(forTimeInterval: 2.5) }
-            DispatchQueue.global().async { Thread.sleep(forTimeInterval: 2.5) }
-        }
+        // Wedged mounts hold GCD threads: fill the shared pool the way they would (it peaks around 64 to 90 threads),
+        // briefly, so other tests running alongside are held up for well under a second, then ask for a deadline.
+        for _ in 0..<120 { DispatchQueue.global().async { Thread.sleep(forTimeInterval: 0.8) } }
         let start = Date()
-        let value = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
+        let value = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 2); return "late" }
         #expect(value == "fallback")
-        #expect(Date().timeIntervalSince(start) < 1.0)
+        #expect(Date().timeIntervalSince(start) < 0.6)
     }
 
     @Test("Network reads are spread across folders")
