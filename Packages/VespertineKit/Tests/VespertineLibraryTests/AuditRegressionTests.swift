@@ -191,6 +191,33 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         _ = try await (first, second)
         #expect(try db.allTracks().map(\.title) == ["selected"])
     }
+    /// A song opened with Open With becomes a source of its own; adding its folder later takes it in instead of
+    /// failing with an overlap error, and the song keeps its identity (plays, playlists, favorites).
+    @Test func addingTheFolderOfAnOpenedSongTakesItIn() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let opened = dir.appendingPathComponent("opened.wav"); try audio(opened)
+        try audio(dir.appendingPathComponent("other.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        let single = try db.addSource(LibrarySource(path: opened.path, mode: .reference))
+        try await scanner.scan(single)
+        let song = try #require(try db.allTracks().first)
+        try db.markPlayed(try #require(song.id))
+
+        let folder = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(folder)
+        #expect(try db.sources().map(\.id) == [folder.id])
+        let tracks = try db.allTracks()
+        #expect(tracks.map(\.title).sorted() == ["opened", "other"])
+        let kept = try #require(tracks.first { $0.title == "opened" })
+        #expect(kept.id == song.id && kept.playCount == 1 && kept.sourceId == folder.id)
+
+        // A share or the managed library inside a folder still isn't taken over.
+        let db2 = try LibraryDatabase.inMemory()
+        try db2.addSource(LibrarySource(path: dir.appendingPathComponent("Share").path, mode: .reference, remoteURL: "smb://nas/Music"))
+        #expect(throws: (any Error).self) { try db2.addSource(LibrarySource(path: dir.path, mode: .reference)) }
+    }
     @Test func symlinkBackUpTheTreeIsListedOnce() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let album = dir.appendingPathComponent("Album", isDirectory: true)
@@ -311,12 +338,19 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(CueSheet.sampleFrame(cdFrames: Int.max, sampleRate: .infinity) == 0)
     }
 
-    @Test func overlappingSourcesCannotStealTrackOwnership() throws {
+    /// Sources never overlap, so every track has one owner: a folder inside a source is that source, and a folder
+    /// around local sources takes them in (their tracks move to it). The managed library is never taken in.
+    @Test func overlappingSourcesKeepOneOwner() throws {
         let db = try LibraryDatabase.inMemory()
         let child = try db.addSource(LibrarySource(path: "/audit-music/album", mode: .reference))
         #expect(try db.addSource(LibrarySource(path: "/audit-music/album/song.wav", mode: .reference)).id == child.id)
-        #expect(throws: (any Error).self) { try db.addSource(LibrarySource(path: "/audit-music", mode: .reference)) }
-        #expect(try db.sources().count == 1)
+        let parent = try db.addSource(LibrarySource(path: "/audit-music", mode: .reference))
+        #expect(try db.sources().map(\.id) == [parent.id])
+
+        let managed = try LibraryDatabase.inMemory()
+        try managed.addSource(LibrarySource(path: "/audit-music/Vespertine", mode: .managed))
+        #expect(throws: (any Error).self) { try managed.addSource(LibrarySource(path: "/audit-music", mode: .reference)) }
+        #expect(try managed.sources().count == 1)
     }
     @Test func cueStatisticsCountPhysicalFileOnce() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
