@@ -134,6 +134,21 @@ struct RingBufferTests {
         #expect(nrt_context_take_underruns(ctx) == 0)
     }
 
+    @Test("A mono source plays on both left and right, bit for bit, and nothing reaches the other channels")
+    func monoPlaysOnBothSides() {
+        let ring = nrt_ring_create(64, 1)!
+        let ctx = nrt_context_create(ring, 64)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        let input: [Float] = [0.25, -0.5, 0.75, 0.1]
+        #expect(nrt_ring_write(ring, input, 4) == 4)
+        var out = [Float](repeating: 9, count: 16)
+        nrt_context_render_interleaved(ctx, &out, 4, 4)
+        for f in 0..<4 {
+            #expect(out[f * 4] == input[f] && out[f * 4 + 1] == input[f])
+            #expect(out[f * 4 + 2] == 0 && out[f * 4 + 3] == 0)
+        }
+    }
+
     @Test("Running dry fills silence and counts an underrun unless draining")
     func underrun() {
         let ring = nrt_ring_create(64, 2)!
