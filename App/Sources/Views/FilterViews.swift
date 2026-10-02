@@ -70,7 +70,9 @@ struct FilterBar: View {
                         }
                     }
                     .padding(.vertical, 1)
+                    .padding(.trailing, Self.fade)
                 }
+                .mask(Self.edgeFade)
             }
             if !tokens.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -93,7 +95,9 @@ struct FilterBar: View {
                             .padding(.leading, 4)
                     }
                     .padding(.vertical, 1)
+                    .padding(.trailing, Self.fade)
                 }
+                .mask(Self.edgeFade)
                 .transition(.opacity)
             }
         }
@@ -104,6 +108,15 @@ struct FilterBar: View {
             panelFacet = request.facet
             showPanel = true
             model.filterPanelRequest = nil
+        }
+    }
+
+    /// Rows wider than the page fade out at the right edge instead of cutting a chip in half (they scroll).
+    private static let fade: CGFloat = 28
+    private static var edgeFade: some View {
+        HStack(spacing: 0) {
+            Color.black
+            LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing).frame(width: fade)
         }
     }
 
