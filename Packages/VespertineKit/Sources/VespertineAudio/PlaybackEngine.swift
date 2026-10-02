@@ -488,7 +488,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 followFormatChange(autoplay: true)
             } else if state == .paused, let session {
                 do { try session.start(); unmute(); state = .playing; pausedAt = nil }
-                catch { restartFromCurrentPosition() }
+                catch { restartFromCurrentPosition(autoplay: true) }   // reopened to play, as asked, not paused again
             } else if state == .paused || state == .stopped, let parked {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true)
@@ -850,6 +850,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         decoding = nil
         pending = nil
+        pendingSystem = nil       // an Atmos track lined up for macOS's renderer is chosen again too
         draining = false
         drainedAt = nil
         nrt_context_set_draining(session.context, false)
