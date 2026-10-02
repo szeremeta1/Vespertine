@@ -18,7 +18,7 @@ let features = [
     Feature(id: "bit-perfect", shot: "bit-perfect-fiio-24-192",
             headline: "Every sample, untouched.",
             sub: "Vespertine plays your music bit-perfect, switches your DAC to each file’s own sample rate, and shows you the proof.",
-            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 192 kHz", .plain)], focus: CGRect(x: 1826, y: 800, width: 564, height: 590)),
+            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 192 kHz", .plain)], focus: CGRect(x: 1826, y: 826, width: 564, height: 590)),
     Feature(id: "stereo-and-surround", shot: "stereo-and-surround-versions",
             headline: "Stereo or surround, on its own.",
             sub: "When an album comes in both, Vespertine plays the version your output can carry: 5.1 for surround and Spatial Audio, stereo for a stereo DAC.",
