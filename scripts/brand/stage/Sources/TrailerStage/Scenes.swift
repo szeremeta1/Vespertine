@@ -502,7 +502,7 @@ struct LibraryScene: View {
     let frame: CGImage?
 
     static let columns: [CGFloat] = [256, 450, 644, 838, 1032, 1227]
-    static let rows: [CGFloat] = [174, 436]
+    static let rows: [CGFloat] = [176, 438]   // 0.6.4: the filter bar sits 2 pt lower
     static let card = CGSize(width: 172, height: 236)   // cover, title, artist and format
 
     var body: some View {
