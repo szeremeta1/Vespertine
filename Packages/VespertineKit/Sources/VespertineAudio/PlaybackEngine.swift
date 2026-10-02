@@ -266,6 +266,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var atmos: SystemRendererSession?
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
     private var awaitingDevice: (uid: String, until: Date, checkedAt: Date)?
+    /// Reopenings that followed another app's change to the device's format, in the last half minute.
+    private var followedFormatChanges: [Date] = []
+    /// The device's own rate, kept for a while after something else kept changing it (no tug of war over it).
+    private var heldRate: (uid: String, rate: Double, until: Date)?
     /// How long playback waits for a missing output (AirPods take several seconds to reconnect).
     private let deviceWait: TimeInterval
     /// Names of outputs seen, for messages about ones that are gone.
@@ -403,6 +407,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             var didWork = false
             if state == .playing, let atmos {
                 checkSystemRenderer(atmos)
+            } else if state == .playing, session?.formatChanged() == true {
+                followFormatChange()
             } else if state == .playing {
                 switchToLocalCopyIfReady()
                 didWork = fill()
@@ -478,6 +484,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .resume:
             if state == .paused, let atmos {
                 atmos.play(); state = .playing; pausedAt = nil
+            } else if state == .paused, let session, session.formatChanged() {
+                followFormatChange(autoplay: true)
             } else if state == .paused, let session {
                 do { try session.start(); unmute(); state = .playing; pausedAt = nil }
                 catch { restartFromCurrentPosition() }
@@ -680,7 +688,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         atmos?.stop()
         atmos = nil
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                      policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                      policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream)
         plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
@@ -790,16 +798,38 @@ public final class PlaybackEngine: @unchecked Sendable {
         pausedAt = nil
     }
 
-    private func restartFromCurrentPosition() {
+    private func restartFromCurrentPosition(autoplay: Bool? = nil) {
         guard let item = currentItem() else { return }
         let position = parked?.position ?? currentPosition()
-        let wasPlaying = state == .playing || awaitingDevice != nil
+        let wasPlaying = autoplay ?? (state == .playing || awaitingDevice != nil)
         if let d = decoding, d.item.id == item.id, d.decoder.supportsSeeking, d.path.plan.mode != .bitstream {
             carried = (item.id, d.probed, d.decoder, d.path.plan.mode)
         }
         teardown(releaseHog: true)
         parked = nil
         start(item, at: position, autoplay: wasPlaying)
+    }
+
+    /// The device left the format playback set up (see `OutputSession.formatChanged()`): reopened at the current
+    /// position, planned afresh from what the device offers now, so it plays at the right speed and the signal path
+    /// names what the device really does. Something that keeps changing it back (another player, LosslessSwitcher)
+    /// gets its way for a minute rather than a tug of war, and the song is converted to that rate meanwhile.
+    private func followFormatChange(autoplay: Bool? = nil) {
+        guard let device = sessionDevice, let session else { return }
+        let now = Date()
+        let rate = (try? HAL.get(device.id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+        followedFormatChanges = followedFormatChanges.filter { now.timeIntervalSince($0) < 30 } + [now]
+        if followedFormatChanges.count >= 3, rate > 0 {
+            heldRate = (device.uid, rate, now.addingTimeInterval(60))
+            log.notice("\(device.name, privacy: .public) keeps being changed by something else; keeping it at \(rate, privacy: .public) Hz for a minute")
+        }
+        log.notice("\(device.name, privacy: .public) changed under playback (\(session.applied.sampleRate, privacy: .public) → \(rate, privacy: .public) Hz); reopening at the current position")
+        restartFromCurrentPosition(autoplay: autoplay)
+    }
+
+    private func ratePolicy(for device: OutputDevice) -> RatePolicy {
+        if let held = heldRate, held.uid == device.uid, Date() < held.until { return .fixed(held.rate) }
+        return settings.ratePolicies[device.uid] ?? .matchSource
     }
 
     /// The queue changed (shuffle, repeat, edits). The song that's playing carries on untouched; only what
@@ -1029,7 +1059,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                     return
                 }
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
-                                              policy: settings.ratePolicies[device.uid] ?? .matchSource,
+                                              policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 if session.plan.isDeviceCompatible(with: plan) {
