@@ -73,7 +73,10 @@ public enum MetadataReader {
             title: title,
             artist: md.artist.flatMap(nonEmpty) ?? inferred?.artist,
             album: md.albumTitle.flatMap(nonEmpty) ?? inferred?.album ?? (untagged ? albumFolder(of: home) : nil),
-            albumArtist: md.albumArtist.flatMap(nonEmpty), composer: md.composer.flatMap(nonEmpty),
+            // A compilation with no Album Artist would split into one album per track artist: the library files it under
+            // Various Artists, as Music and most players do (the file isn't changed).
+            albumArtist: md.albumArtist.flatMap(nonEmpty) ?? ((md.isCompilation ?? false) ? Track.variousArtists : nil),
+            composer: md.composer.flatMap(nonEmpty),
             genre: md.genre.flatMap(nonEmpty), releaseDate: releaseDate.map(displayDate),
             year: originalYear(extra, releaseYear: releaseDate.flatMap(year(from:))),
             // A number of 0 is no number. Missing numbers come from the file name ("… - 05 - Title", "05 Title"),

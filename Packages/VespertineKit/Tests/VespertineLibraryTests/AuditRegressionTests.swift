@@ -89,6 +89,28 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         try audio(other.appendingPathComponent("set.wav"))
         #expect(try Importer.copyAndOrganize([other], into: dst).map(\.lastPathComponent) == ["set 2.wav"])
     }
+    /// A compilation tagged without an Album Artist is one album, not one per artist; the files keep their tags.
+    @Test func compilationWithoutAlbumArtistIsOneAlbum() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        for (i, artist) in ["First Artist", "Second Artist"].enumerated() {
+            let wav = dir.appendingPathComponent("\(i).wav"); try audio(wav)
+            let flac = dir.appendingPathComponent("0\(i + 1) Song.flac"); try SFBAudioEngine.AudioConverter.convert(wav, to: flac)
+            try FileManager.default.removeItem(at: wav)
+            let file = try AudioFile(readingPropertiesAndMetadataFrom: flac)
+            file.metadata.artist = artist; file.metadata.albumTitle = "Hits"; file.metadata.isCompilation = true
+            try file.writeMetadata()
+        }
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(try db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let tracks = try db.allTracks()
+        #expect(tracks.count == 2 && Set(tracks.map(\.albumKey)).count == 1)
+        #expect(tracks.allSatisfy { $0.albumArtist == Track.variousArtists })
+        #expect(Set(tracks.compactMap(\.artist)) == ["First Artist", "Second Artist"])
+        let onDisk = try AudioFile(readingPropertiesAndMetadataFrom: try #require(tracks.first).fileURL)
+        #expect(onDisk.metadata.albumArtist == nil)
+    }
     @Test func tagUndoRestoresCustomTagsAndExactFile() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("song.wav"); try audio(url)

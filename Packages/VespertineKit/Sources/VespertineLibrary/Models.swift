@@ -142,6 +142,8 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var fileURL: URL { URL(fileURLWithPath: filePath, isDirectory: false) }
     public var displayArtist: String { artist ?? albumArtist ?? "Unknown Artist" }
     public var displayAlbumArtist: String { albumArtist ?? artist ?? "Unknown Artist" }
+    /// The library's album artist for compilations whose files name none.
+    public static let variousArtists = "Various Artists"
     public var displayAlbum: String { album ?? "Unknown Album" }
 
     /// Key used to group tracks into albums: byte for byte the `albumKey` column. SQLite's `lower()` folds ASCII
