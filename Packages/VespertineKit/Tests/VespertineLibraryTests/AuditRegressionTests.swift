@@ -257,6 +257,31 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(values("TITLE") == ["Edited"])
         #expect(values("TEST_GONE").isEmpty)                    // a deleted custom tag leaves the file
     }
+    @Test func backupsOverTheBudgetGoOldestFirstAndTheEditCanStillBeUndone() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let wav = dir.appendingPathComponent("source.wav"); try audio(wav)
+        let url = dir.appendingPathComponent("song.flac"); try SFBAudioEngine.AudioConverter.convert(wav, to: url)
+        try FileManager.default.removeItem(at: wav)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+        let backups = dir.appendingPathComponent(".backups")
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: backups)
+        _ = try await writer.apply(TagEdit(fields: [.title: "Edited"]), to: [track])
+        func backupFiles() -> [String] {
+            (FileManager.default.enumerator(atPath: backups.path)?.allObjects as? [String] ?? []).filter { $0.hasSuffix(".flac") }
+        }
+        #expect(backupFiles().count == 1)
+        // Asking for the whole budget again makes room by deleting the oldest backups, referenced or not.
+        await writer.pruneBackups(making: TagWriter.backupBudget)
+        #expect(backupFiles().isEmpty)
+        #expect(try db.writer.read { try Int.fetchOne($0, sql: "SELECT count(*) FROM tagHistory WHERE fileBackupPath IS NOT NULL") } == 0)
+        // The edit is still recorded, so it can be undone from its tags.
+        #expect(try await writer.revertLastEdit(trackID: track.id!))
+        #expect(try db.allTracks().first?.title != "Edited")
+    }
     @Test func numericCueOverflowIsRejected() {
         #expect(CueSheet.cdFrames("9223372036854775807:59:74") == nil)
         #expect(CueSheet.sampleFrame(cdFrames: Int.max, sampleRate: .infinity) == 0)
