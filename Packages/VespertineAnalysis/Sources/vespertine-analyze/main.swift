@@ -68,8 +68,8 @@ struct Probe {
     var isDSD: Bool
 }
 
-let losslessCodecs: Set<String> = ["flac", "alac", "ape", "wavpack", "tta", "tak", "mlp", "truehd", "shorten", "als"]
-let audioExtensions: Set<String> = ["flac", "wav", "wave", "aif", "aiff", "aifc", "m4a", "mp4", "caf", "ape", "wv", "tta", "tak", "dsf", "dff"]
+let losslessCodecs: Set<String> = ["flac", "alac", "ape", "wavpack", "tta", "tak", "mlp", "truehd", "shorten", "als", "mp4als"]
+let audioExtensions: Set<String> = ["flac", "wav", "wave", "aif", "aiff", "aifc", "m4a", "mp4", "caf", "ape", "wv", "tta", "tak", "shn", "dsf", "dff"]
 
 func run(_ tool: String, _ args: [String]) throws -> Data {
     let p = Process()
