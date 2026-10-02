@@ -15,8 +15,11 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     /// Region in source frames (CUE tracks). nil = whole file.
     public let regionStartFrame: Int64?
     public let regionFrameLength: Int64?
-    /// ReplayGain adjustment the app decided on (dB), nil = none.
+    /// ReplayGain adjustment the app decided on (dB), nil = none. Kept within `replayGainRange`.
     public let replayGainDB: Double?
+    /// A damaged tag can claim +60 dB with a peak small enough to allow it, which plays as full-scale noise. No real
+    /// album needs more than about +15 dB, and a cut past −30 dB is a bad tag too.
+    public static let replayGainRange: ClosedRange<Double> = -30...15
     /// Identifies a local copy of a network file (see the engine's urlResolver); nil = always open `url`.
     public let cacheKey: String?
 
@@ -28,7 +31,7 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
         self.trackID = trackID
         self.regionStartFrame = regionStartFrame
         self.regionFrameLength = regionFrameLength
-        self.replayGainDB = replayGainDB
+        self.replayGainDB = replayGainDB.flatMap { $0.isFinite ? min(max($0, Self.replayGainRange.lowerBound), Self.replayGainRange.upperBound) : nil }
     }
 }
 
