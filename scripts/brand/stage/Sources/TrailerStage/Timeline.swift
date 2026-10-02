@@ -4,8 +4,8 @@
 import Foundation
 import CoreGraphics
 
-/// "Starlight Lounge" (iMovie jingle): 65 BPM, measured with a spectral-flux fit over the whole bed.
-/// The first downbeat after the one-bar intro is at 3.657 s; the strongest onsets all land on bar lines.
+/// The cut's musical grid: 65 BPM bars, the first downbeat after the one-bar intro at 3.657 s. The score (score.py)
+/// is written to it: two of its 130 BPM bars to each of these, with every change of chord and scene on a bar line.
 enum Music {
     static let beat = 60.0 / 65.0            // 0.923 s
     static let bar = beat * 4                // 3.692 s
