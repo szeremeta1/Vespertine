@@ -228,6 +228,7 @@ struct PlaybackSettings: View {
 
 struct LibrarySettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
     @State private var removingSource: LibrarySource?
 
     var body: some View {
@@ -247,10 +248,11 @@ struct LibrarySettings: View {
                         Button("Remove") { removingSource = source }
                     }
                 }
+                // Their panels belong to the main window: bring it forward, or they open behind Settings.
                 HStack {
-                    Button("Add Folder…") { model.presentImporter(.reference) }
-                    Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
-                    Button("Connect to Server…") { model.showConnectServer = true }
+                    Button("Add Folder…") { openWindow(id: "main"); model.presentImporter(.reference) }
+                    Button("Import & Organize…") { openWindow(id: "main"); model.presentImporter(.copyAndOrganize) }
+                    Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }
                 }
             }
             Section("Importing") {
@@ -268,7 +270,7 @@ struct LibrarySettings: View {
                 }))
                 Toggle("Skip voice recordings and short clips", isOn: $s.skipNonMusic)
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
-                Button("Find Music on This Mac…") { model.showFindMusic = true }
+                Button("Find Music on This Mac…") { openWindow(id: "main"); model.showFindMusic = true }
             }
             Section {
                 Toggle("Analyze new music automatically", isOn: $s.autoAnalyze)

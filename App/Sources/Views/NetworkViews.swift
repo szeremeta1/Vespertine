@@ -145,6 +145,7 @@ struct ConnectServerSheet: View {
 
 struct NetworkSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
     @State private var removingSource: LibrarySource?
 
     private static let limits: [Double] = [5, 10, 20, 50, 100, 250, 500]
@@ -161,7 +162,7 @@ struct NetworkSettings: View {
                 ForEach(model.shares.sources) { source in
                     ShareRow(source: source, removing: $removingSource)
                 }
-                Button("Connect to Server…") { model.showConnectServer = true }
+                Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }   // its sheet is on the main window
             }
             Section {
                 Toggle("Keep local copies of music played from shares", isOn: $s.networkCache)
