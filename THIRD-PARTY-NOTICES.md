@@ -5,19 +5,25 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 | Component | License | Used for | Source |
 |---|---|---|---|
 | SFBAudioEngine 0.14.0 | MIT | Decoders, DSD/DoP, metadata reading, ReplayGain | https://github.com/sbooth/SFBAudioEngine |
-| GRDB.swift | MIT | The library database | https://github.com/groue/GRDB.swift |
-| Sparkle | MIT, with bundled BSD-style components | Software updates | https://github.com/sparkle-project/Sparkle |
-| TagLib | LGPL / MPL | Reading and writing tags | https://taglib.org |
-| libFLAC, libogg, libvorbis, libopus | BSD | FLAC, Ogg Vorbis and Opus | https://xiph.org |
-| WavPack | BSD | WavPack | https://www.wavpack.com |
-| Monkey's Audio | BSD-style | APE | https://monkeysaudio.com |
-| Musepack decoder | BSD | Musepack | https://www.musepack.net |
-| mpg123 | LGPL | MP3 | https://www.mpg123.de |
-| libsndfile | LGPL | WAV, AIFF and other PCM containers | https://libsndfile.github.io/libsndfile/ |
-| LAME | LGPL | MP3, from SFBAudioEngine's bundled libraries | https://lame.sourceforge.io |
-| TTA | LGPL | True Audio | https://sourceforge.net/projects/tta/ |
-| DUMB | DUMB license (zlib-like) | Tracker formats | https://github.com/kode54/dumb |
+| dsd2pcm (in SFBAudioEngine) | BSD-2-Clause | DSD to PCM conversion | https://github.com/sbooth/SFBAudioEngine |
+| EBU R128 loudness analyzer (in SFBAudioEngine) | Apache-2.0 | Loudness analysis | https://github.com/sbooth/SFBAudioEngine |
+| AVFAudioExtensions 0.5.1, CXXAudioRingBuffer 0.2.0, CXXDispatchSemaphore 0.4.1, CXXMessageQueue 0.2.2, CXXQueue 0.1.1, CXXUnfairLock 0.3.1 | MIT | SFBAudioEngine's helper packages | https://github.com/sbooth |
+| GRDB.swift 7.11.1 | MIT | The library database | https://github.com/groue/GRDB.swift |
+| Sparkle 2.10.0 | MIT, with bundled BSD-style components | Software updates | https://github.com/sparkle-project/Sparkle |
+| TagLib (CXXTagLib 2.3.2) | LGPL-2.1 / MPL-1.1 | Reading and writing tags | https://taglib.org |
+| libFLAC, libogg, libvorbis, libopus, opusfile | BSD-3-Clause | FLAC, Ogg Vorbis and Opus | https://xiph.org |
+| Speex (CSpeex 1.2.1) | BSD-3-Clause | Speex | https://www.speex.org |
+| WavPack | BSD-3-Clause | WavPack | https://www.wavpack.com |
+| Monkey's Audio (CXXMonkeysAudio 12.13.0) | BSD-3-Clause | APE | https://monkeysaudio.com |
+| Musepack decoder | BSD-3-Clause | Musepack | https://www.musepack.net |
+| mpg123 | LGPL-2.1 | MP3 | https://www.mpg123.de |
+| libsndfile | LGPL-2.1 | WAV, AIFF and other PCM containers | https://libsndfile.github.io/libsndfile/ |
+| LAME | LGPL-2.0 | MP3, from SFBAudioEngine's bundled libraries | https://lame.sourceforge.io |
+| TTA | LGPL-3.0 | True Audio | https://sourceforge.net/projects/tta/ |
+| DUMB (CDUMB 2.0.3) | DUMB license (zlib-like) | Tracker formats | https://github.com/kode54/dumb |
 | FFmpeg 9.0.2 (a subset) | LGPL-2.1-or-later | DTS, DTS-HD, TrueHD/MLP, Dolby Digital modes macOS gets wrong, Matroska, DSD | https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz |
+
+Versions are the ones in [`Packages/VespertineKit/Package.resolved`](Packages/VespertineKit/Package.resolved). The full license and copyright texts of SFBAudioEngine's components are in its [`ACKNOWLEDGMENTS.md`](https://github.com/sbooth/SFBAudioEngine/blob/main/ACKNOWLEDGMENTS.md); the LGPL libraries' sources are linked above, and the prebuilt ones come from SFBAudioEngine's `*-binary-xcframework` packages, whose repositories hold the build scripts.
 
 The SFBAudioEngine dependencies ship as prebuilt xcframeworks and are embedded in `Contents/Frameworks`. Each is signed with Vespertine's identity.
 

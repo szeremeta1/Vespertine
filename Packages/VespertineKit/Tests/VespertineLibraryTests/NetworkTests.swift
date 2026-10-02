@@ -36,13 +36,24 @@ struct NetworkTests {
         #expect(NetworkShare(string: "ftp://host/x") == nil)
     }
 
+    /// When `blocking` hands over its result, measured on the thread that delivers it. Measuring after the `await`
+    /// would add however long the awaiting task waits for a turn on Swift's few shared threads, seconds when every
+    /// test in the package runs at once on a small CI machine.
+    private func delivery<T: Sendable>(timeout: TimeInterval, otherwise fallback: T,
+                                       _ work: @escaping @Sendable () -> T) async -> (value: T, after: TimeInterval) {
+        let start = Date()
+        return await withCheckedContinuation { continuation in
+            NetworkVolume.blocking(timeout: timeout, otherwise: fallback, work) { continuation.resume(returning: ($0, Date().timeIntervalSince(start))) }
+        }
+    }
+
     @Test("Blocking share work never holds the caller past its deadline")
     func blockingDeadline() async {
         // A wedged mount: the work doesn't return for seconds. The caller gets the fallback at the deadline.
-        let start = Date()
-        let stuck = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
-        #expect(stuck == "fallback")
-        #expect(Date().timeIntervalSince(start) < 1.5)
+        let stuck = await delivery(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
+        #expect(stuck.value == "fallback")
+        #expect(stuck.after < 1.5)
+        #expect(await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" } == "fallback")
         // Work that finishes in time returns its own result.
         #expect(await NetworkVolume.blocking(timeout: 5, otherwise: 0) { 42 } == 42)
         // Main-actor callers aren't blocked meanwhile: the work runs on a GCD thread.
@@ -50,6 +61,16 @@ struct NetworkTests {
         #expect(onMain)
         let workerIsMain = await NetworkVolume.blocking(timeout: 5, otherwise: true) { Thread.isMainThread }
         #expect(!workerIsMain)
+    }
+
+    @Test("A deadline fires on time even when stuck work has used up GCD's shared threads")
+    func deadlineWithAFullPool() async {
+        // Wedged mounts hold GCD threads: fill the shared pool the way they would (it peaks around 64 to 90 threads),
+        // briefly, so other tests running alongside are held up for well under a second, then ask for a deadline.
+        for _ in 0..<120 { DispatchQueue.global().async { Thread.sleep(forTimeInterval: 0.8) } }
+        let result = await delivery(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 2); return "late" }
+        #expect(result.value == "fallback")
+        #expect(result.after < 0.6)
     }
 
     @Test("Network reads are spread across folders")

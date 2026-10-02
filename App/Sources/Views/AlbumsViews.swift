@@ -275,7 +275,14 @@ struct AlbumDetailView: View {
         .background(Palette.window)
         .navigationTitle(album?.title ?? "Album")
         .task(id: "\(albumKey)#\(model.library.revision)") {
-            tracks = model.library.tracks(albumKey: albumKey)
+            let found = model.library.tracks(albumKey: albumKey)
+            // Editing the album's title or Album Artist gives it a new key: follow its songs there instead of going blank.
+            if found.isEmpty, let moved = model.library.tracks(ids: tracks.compactMap(\.id)).first?.albumKey, moved != albumKey,
+               let i = model.path.lastIndex(of: .album(albumKey)) {
+                model.path[i] = .album(moved)
+                return
+            }
+            tracks = found
         }
     }
 

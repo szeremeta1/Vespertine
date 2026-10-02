@@ -39,7 +39,7 @@ A queue change (shuffle, repeat, edits) never touches the audible track. If the 
 
 ## DTS CDs
 
-A DTS CD (or DTS-WAV) stores a DTS bitstream as 16-bit stereo PCM, usually in 14-bit words. Played as PCM, it is full-scale noise. When `SourceOpener.probe` opens a 16-bit stereo 44.1/48 kHz lossless file, it looks for a DTS sync word in the first 8,192 frames (`ndts_find_sync`). If it finds one, it wraps the file's decoder in `DTSDecoder`. That decoder feeds the words, as stored, to FFmpeg's `dca` parser and decoder (the `CVespertineDTS` shim over `Vendor/FFmpegDCA.xcframework`, built by `scripts/build-dts-decoder.sh` with only that decoder). Output is Float32 in the stream's own channel order, with a layout from its channel mask.
+A DTS CD (or DTS-WAV) stores a DTS bitstream as 16-bit stereo PCM, usually in 14-bit words. Played as PCM, it is full-scale noise. When `SourceOpener.probe` opens a 16-bit stereo 44.1/48 kHz lossless file, it looks in the first 16,384 frames for two consecutive DTS frames, each with a valid core header and each where the one before it says (`ndts_find_stream`): a sync word on its own is just two sample values, which ordinary music has now and then. If it finds them, it wraps the file's decoder in `DTSDecoder`; if FFmpeg then finds no DTS frames after all, the file opens as the PCM it looks like. That decoder feeds the words, as stored, to FFmpeg's `dca` parser and decoder (the `CVespertineDTS` shim over `Vendor/FFmpegDCA.xcframework`, built by `scripts/build-dts-decoder.sh` with only the DTS, TrueHD/MLP, Dolby Digital (Plus) and DSD decoders). Output is Float32 in the stream's own channel order, with a layout from its channel mask.
 
 Positions stay in the carrier's frames: a DTS CD holds one 512-sample frame per 512 carrier frames. So CUE indexes, seeks and durations are unchanged. Carrier frames before the first sync word are silence. A seek re-syncs a little before the target and drops the surplus decoded frames. The source is reported as lossy "DTS" with its real channel count, so the planner routes it as surround or Spatial Audio. A test checks the decode of a real DTS CD against FFmpeg's, bit for bit.
 
@@ -76,7 +76,7 @@ A path is marked bit-perfect only when all of these hold:
 - The device is held exclusively, or (shared mode) no other process is currently sending audio to it (Core Audio process objects, checked about once a second).
 - No Spatial Audio rendering or downmix.
 - No software gain is applied (neither ReplayGain nor digital volume).
-- For PCM: the source is lossless, it isn't resampled or converted from DSD, the source is at most 24-bit, and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float).
+- For PCM: the source is lossless, it isn't resampled or converted from DSD, the source is at most 24-bit (32-bit with integer mode, which skips the Float32 step), and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float).
 - For DoP: the carrier runs at the planned rate with at least 24 bits.
 
 ## Library

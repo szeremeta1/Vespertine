@@ -149,7 +149,10 @@ public enum RemoteMetadata {
             if type != "mdat" && type != "free" && type != "skip" && type != "wide" {
                 try src.ensure(o, Int(min(size, 64 * 1024 * 1024)))
             }
-            o += size
+            // A corrupt or crafted 64-bit size would overflow the offset (a crash): the walk ends there instead.
+            let (next, overflow) = o.addingReportingOverflow(size)
+            guard !overflow else { return }
+            o = next
         }
     }
 

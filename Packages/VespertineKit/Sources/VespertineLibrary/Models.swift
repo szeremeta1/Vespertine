@@ -142,10 +142,16 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var fileURL: URL { URL(fileURLWithPath: filePath, isDirectory: false) }
     public var displayArtist: String { artist ?? albumArtist ?? "Unknown Artist" }
     public var displayAlbumArtist: String { albumArtist ?? artist ?? "Unknown Artist" }
+    /// The library's album artist for compilations whose files name none.
+    public static let variousArtists = "Various Artists"
     public var displayAlbum: String { album ?? "Unknown Album" }
 
-    /// Key used to group tracks into albums.
-    public var albumKey: String { "\(displayAlbumArtist.lowercased())\u{1F}\(displayAlbum.lowercased())" }
+    /// Key used to group tracks into albums: byte for byte the `albumKey` column. SQLite's `lower()` folds ASCII
+    /// letters only ("Édith Piaf" → "Édith piaf"), so this does the same rather than Swift's `lowercased()`.
+    public var albumKey: String {
+        let bytes = "\(displayAlbumArtist)\u{1F}\(displayAlbum)".utf8.map { (b: UInt8) -> UInt8 in b >= 0x41 && b <= 0x5A ? b + 0x20 : b }
+        return String(decoding: bytes, as: UTF8.self)
+    }
 
     /// "FLAC · 24/96", "DSD128", "MP3 · 320k"
     /// " · 5.1" for multichannel tracks, empty for mono/stereo.

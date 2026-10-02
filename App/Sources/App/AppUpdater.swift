@@ -16,16 +16,20 @@ final class AppUpdater: NSObject {
     let isEnabled: Bool
 
     override init() {
-        // Isolated test libraries (QA runs) never phone home.
-        isEnabled = UserDefaults.standard.string(forKey: "VespertineDataDirectory") == nil
-            || UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride") != nil
+        // Isolated test libraries (QA runs) never phone home, and nor does Vespertine Dev: it's a separate app, and the
+        // release feed's updates aren't its to install. A feed given for testing (launch arguments only: a value saved
+        // in the settings must never switch updates off for good) turns them on.
+        let arguments = LaunchArguments()
+        let development = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+        isEnabled = (arguments.string(forKey: "VespertineDataDirectory") == nil && !development)
+            || arguments.string(forKey: "VespertineUpdateFeedOverride") != nil
         super.init()
         guard isEnabled else { return }
         let controller = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
         self.controller = controller
         automaticallyChecks = controller.updater.automaticallyChecksForUpdates
         automaticallyDownloads = controller.updater.automaticallyDownloadsUpdates
-        if UserDefaults.standard.bool(forKey: "VespertineCheckForUpdatesInBackground") {
+        if LaunchArguments().bool(forKey: "VespertineCheckForUpdatesInBackground") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.checkInBackground() }
         }
         observations.append(controller.updater.observe(\.canCheckForUpdates, options: [.initial, .new]) { [weak self] updater, _ in
@@ -55,6 +59,6 @@ final class AppUpdater: NSObject {
 extension AppUpdater: SPUUpdaterDelegate {
     /// Testing aid: `-VespertineUpdateFeedOverride <url>` points the updater at another appcast.
     nonisolated func feedURLString(for updater: SPUUpdater) -> String? {
-        UserDefaults.standard.string(forKey: "VespertineUpdateFeedOverride")
+        LaunchArguments().string(forKey: "VespertineUpdateFeedOverride")
     }
 }

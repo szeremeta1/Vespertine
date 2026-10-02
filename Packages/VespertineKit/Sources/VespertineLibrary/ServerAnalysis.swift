@@ -96,9 +96,11 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
                 r.size == track.fileSize && abs(r.mtime - track.modifiedAt.timeIntervalSince1970) < 2 ? r : nil
             }
             let candidates = (bySize[track.fileSize] ?? []).filter { abs($0.mtime - track.modifiedAt.timeIntervalSince1970) < 0.002 }
-            guard let r = byPath ?? (candidates.count == 1 ? candidates[0] : nil),
-                  r.analysis.version >= FileAnalysis.currentVersion else { continue }
-            matched.append((r.analysis, track.filePath))
+            // A server still on an older analyzer: its results are judged anew here from their measurements.
+            guard let r = byPath ?? (candidates.count == 1 ? candidates[0] : nil) else { continue }
+            let analysis = FileAnalyzer.rejudged(r.analysis)
+            guard analysis.version >= FileAnalysis.currentVersion else { continue }
+            matched.append((analysis, track.filePath))
         }
         try database.saveAnalyses(matched)
         return matched.count

@@ -138,6 +138,8 @@ public enum NetworkShareError: LocalizedError, Equatable {
     case notPermitted
     case shareNotFound(String)
     case folderNotFound(String)
+    /// Mounted, but the mount no longer answers, and it isn't one Vespertine made (so it isn't dropped).
+    case mountNotResponding
     case cancelled
     case failed(code: Int32)
 
@@ -156,11 +158,21 @@ public enum NetworkShareError: LocalizedError, Equatable {
         case .shareNotFound(let share):
             "The server has no share named “\(share)”."
         case .folderNotFound(let folder):
-            "Connected, but there’s no folder “\(folder)” in that share."
+            folder.isEmpty ? "Connected, but the share’s contents can’t be read." : "Connected, but there’s no folder “\(folder)” in that share."
+        case .mountNotResponding:
+            "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect."
         case .cancelled:
             "Connecting was cancelled."
         case .failed(let code):
             "Couldn’t connect (\(Self.describe(code)))."
+        }
+    }
+
+    /// The server refused the name and password, or none could be read: trying again won't help until it changes.
+    public var isCredentialProblem: Bool {
+        switch self {
+        case .authenticationFailed, .passwordMissing: true
+        default: false
         }
     }
 
@@ -182,6 +194,11 @@ public enum NetworkShareError: LocalizedError, Equatable {
 }
 
 public enum NetworkVolume {
+    /// Where deadlines fire. GCD's shared pool has a thread limit, and work stuck on a wedged mount holds its
+    /// threads, so a deadline queued there can wait seconds for one: late because of the very work it guards
+    /// against. A queue of its own always gets a thread.
+    private static let deadlines = DispatchQueue(label: "org.szeremeta.vespertine.share-deadlines", qos: .userInitiated)
+
     /// True for SMB, NFS, WebDAV, AFP… volumes (anything macOS doesn't mark local).
     public static func isNetwork(_ url: URL) -> Bool {
         var s = statfs()
@@ -254,7 +271,7 @@ public enum NetworkVolume {
                 }
             }
             connection.start(queue: .global(qos: .utility))
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) { finish(false) }
+            deadlines.asyncAfter(deadline: .now() + timeout) { finish(false) }
         }
     }
 
@@ -307,15 +324,21 @@ public enum NetworkVolume {
     /// stuck) on its own thread and its result is dropped.
     public static func blocking<T: Sendable>(timeout: TimeInterval, otherwise fallback: T,
                                              _ work: @escaping @Sendable () -> T) async -> T {
+        await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
+            blocking(timeout: timeout, otherwise: fallback, work) { continuation.resume(returning: $0) }
+        }
+    }
+
+    /// The same, handing the result to `then` (exactly once) on the thread that has it: the work's, or the deadline's.
+    static func blocking<T: Sendable>(timeout: TimeInterval, otherwise fallback: T, _ work: @escaping @Sendable () -> T,
+                                      then deliver: @escaping @Sendable (T) -> Void) {
         let once = ResumeOnce()
-        return await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
-            DispatchQueue.global(qos: .utility).async {
-                let value = work()
-                if once.claim() { continuation.resume(returning: value) }
-            }
-            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
-                if once.claim() { continuation.resume(returning: fallback) }
-            }
+        DispatchQueue.global(qos: .utility).async {
+            let value = work()
+            if once.claim() { deliver(value) }
+        }
+        deadlines.asyncAfter(deadline: .now() + timeout) {
+            if once.claim() { deliver(fallback) }
         }
     }
 

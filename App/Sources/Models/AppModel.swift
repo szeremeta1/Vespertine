@@ -177,8 +177,8 @@ final class AppModel {
     init(dataDirectory: URL? = nil) throws {
         let settings = AppSettings(dataDirectory: dataDirectory)
         self.settings = settings
-        let defaults = UserDefaults.standard
-        let isolated = defaults.string(forKey: "VespertineDataDirectory") != nil && !defaults.bool(forKey: "VespertinePersistFilters")
+        let arguments = LaunchArguments()
+        let isolated = arguments.string(forKey: "VespertineDataDirectory") != nil && !arguments.bool(forKey: "VespertinePersistFilters")
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory)
@@ -231,14 +231,14 @@ final class AppModel {
         }
 
         // Developer aid: `-VespertineAddSource <folder>` adds and scans a reference source on launch.
-        if let path = UserDefaults.standard.string(forKey: "VespertineAddSource") {
+        if let path = LaunchArguments().string(forKey: "VespertineAddSource") {
             let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
             if !library.sources.contains(where: { $0.path == url.path }) {
                 let library = self.library
                 Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
             }
         }
-        if !UserDefaults.standard.bool(forKey: "VespertineOpenMini") {
+        if !LaunchArguments().bool(forKey: "VespertineOpenMini") {
             Task { @MainActor [weak self] in self?.runDeveloperHooks(openWindow: nil) }
         }
     }
@@ -261,7 +261,7 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.dopDeviceUIDs
         let device = devices.device(uid: settings.selectedDeviceUID)
-        player.engine.update(settings: settings.engineSettings(deviceHasHardwareVolume: device?.hasHardwareVolume ?? false))
+        player.engine.update(settings: settings.engineSettings())
         devices.watchVolume(of: device)
         player.resolveVersions()
     }
@@ -284,7 +284,7 @@ final class AppModel {
 
     /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).
     func engineSpatialMode(for device: OutputDevice) -> SpatialMode {
-        settings.engineSettings(deviceHasHardwareVolume: device.hasHardwareVolume).spatialMode(for: device)
+        settings.engineSettings().spatialMode(for: device)
     }
 
     func selectDevice(_ uid: String?) {

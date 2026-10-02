@@ -13,7 +13,7 @@ let square = mode != "wide", vertical = mode == "vertical"
 let W = square ? 1080 : 1920, H = vertical ? 1920 : 1080
 /// Vertical cuts keep text clear of Shorts/Reels/TikTok controls: nothing in the top 250 or bottom 400 px.
 let safeBottom: CGFloat = vertical ? 420 : 0
-let fps: Int32 = 30, handle = 0.5, bar = 60.0 / 64 * 4   // Starlight Lounge, 64 BPM: one scene per bar
+let fps: Int32 = 30, handle = 0.5, bar = 60.0 / 64 * 4   // 64 BPM: one scene per bar
 try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
 
 func ease(_ t: CGFloat) -> CGFloat { let x = min(1, max(0, t)); return x * x * (3 - 2 * x) }

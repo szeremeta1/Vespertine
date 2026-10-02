@@ -111,7 +111,7 @@ struct NowPlayingPanel: View {
         .scrollContentBackground(.hidden)
         .task(id: player.signalPath != nil) {
             // QA: `-VespertineScrollInspector YES` scrolls to the meters for snapshots.
-            guard player.signalPath != nil, UserDefaults.standard.bool(forKey: "VespertineScrollInspector") else { return }
+            guard player.signalPath != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
             try? await Task.sleep(for: .milliseconds(300))
             scroller.scrollTo("spectrum", anchor: .bottom)
         }
@@ -522,7 +522,7 @@ struct AnalysisPanel: View {
         .onChange(of: playing?.id) { pinned = nil }
         .task(id: "\(track?.id ?? -1)-\(model.analysis.revision)") {
             stored = track.flatMap { model.library.storedAnalysis(for: $0) }
-            if UserDefaults.standard.bool(forKey: "VespertineRunAnalysis"), let track, stored?.isCurrent != true,
+            if LaunchArguments().bool(forKey: "VespertineRunAnalysis"), let track, stored?.isCurrent != true,
                !model.analysis.isAnalyzing(track) { model.analysis.analyzeNow([track]) }
         }
     }
@@ -581,14 +581,15 @@ struct AnalysisPanel: View {
         Text(r.summary).font(Typeface.ui(12.5)).foregroundStyle(Palette.text).fixedSize(horizontal: false, vertical: true)
         Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
             GridRow { k("Claimed"); v(r.claimedBitDepth.map { "\($0)-bit" } ?? "—") }
-            GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "—") }
+            GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "not checked") }
             GridRow { k("Recorded to"); v(String(format: "%.1f kHz of %@ kHz", r.bandwidthHz / 1000, SampleRate.format(r.sampleRate / 2))) }
             if let f = r.forensics {
                 if let hz = f.cliffHz, f.cliffDropDB >= 12 {
-                    GridRow { k("Cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
+                    GridRow { k("Steepest cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
                 }
                 if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
-                    GridRow { k("Synthetic"); v(String(format: "%.1f–%.1f kHz, flat (%.1f dB/kHz)", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope)) }
+                    let follows = f.shelfTracking.map { String(format: ", follows the music (r %.2f)", $0) } ?? ""
+                    GridRow { k("Shelf"); v(String(format: "%.1f–%.1f kHz, %.1f dB/kHz", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope) + follows) }
                 }
             }
             GridRow { k("Peak"); v(r.peakDBFS.isFinite ? String(format: "%.2f dBFS", r.peakDBFS) : "silent") }
@@ -604,7 +605,9 @@ struct AnalysisPanel: View {
     private func verdictBadges(_ r: FileAnalysis, ok: Bool) -> some View {
         StatusBadge(text: AnalysisVerdictText.badge(r.verdict), kind: ok ? .perfect : .converted)
         if r.version >= 2, r.verdict != .notApplicable {
-            StatusBadge(text: r.confidence >= 0.8 ? "HIGH CONFIDENCE" : r.confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
+            // Results from before version 3 weren't capped: a spectrum alone is never shown as high confidence.
+            let confidence = r.version < 3 && r.verdict != .paddedBitDepth ? min(r.confidence, FileAnalyzer.spectralConfidenceCap) : r.confidence
+            StatusBadge(text: confidence >= 0.8 ? "HIGH CONFIDENCE" : confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
         }
     }
 
@@ -626,16 +629,17 @@ struct AnalysisPanel: View {
     }
 }
 
-/// Verdict wording shared by the inspector, track tags and filters.
+/// Verdict wording shared by the inspector, track tags and filters. Spectral verdicts are questions: the
+/// same evidence has innocent explanations, which each summary names.
 enum AnalysisVerdictText {
     static func badge(_ v: FileAnalysis.Verdict) -> String {
         switch v {
         case .genuine: "GENUINE"
         case .paddedBitDepth: "PADDED BIT DEPTH"
-        case .upsampled: "UPSAMPLED"
-        case .possibleLossyOrigin: "LOSSY ORIGIN"
-        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES"
-        case .notApplicable: "N/A"
+        case .upsampled: "UPSAMPLED?"
+        case .possibleLossyOrigin: "LOSSY ORIGIN?"
+        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES?"
+        case .notApplicable: "INCONCLUSIVE"
         }
     }
 }
@@ -651,12 +655,17 @@ struct SpectrumPlot: View {
             guard values.count > 1 else { return }
             let lo: Float = -150, hi: Float = -20
             func y(_ v: Float) -> CGFloat { size.height * (1 - CGFloat((max(lo, min(hi, v)) - lo) / (hi - lo))) }
-            // Frequency gridlines.
-            for f in [100.0, 1_000, 10_000, 20_000] where f < nyquist {
+            // Frequency gridlines (on to 40 and 80 kHz in hi-res files, so the empty range above a cutoff reads).
+            // A label is left out where it would run into a marker or off the plot.
+            let markerXs = markers.filter { $0.hz > 20 && $0.hz < nyquist }.map { size.width * CGFloat(log($0.hz / 20) / log(nyquist / 20)) }
+            for f in [100.0, 1_000, 10_000, 20_000, 40_000, 80_000] where f < nyquist {
                 let x = size.width * CGFloat(log(f / 20) / log(nyquist / 20))
                 ctx.stroke(Path { $0.move(to: CGPoint(x: x, y: 0)); $0.addLine(to: CGPoint(x: x, y: size.height)) },
                            with: .color(Palette.hairlineStrong), lineWidth: 1)
-                ctx.draw(Text(f >= 1000 ? "\(Int(f / 1000))k" : "\(Int(f))").font(Typeface.mono(8.5)).foregroundStyle(Palette.text3),
+                let label = f >= 1000 ? "\(Int(f / 1000))k" : "\(Int(f))"
+                let end = x + 3 + CGFloat(label.count) * 5.5
+                guard end < size.width - 2, !markerXs.contains(where: { $0 > x - 3 && $0 < end + 3 }) else { continue }
+                ctx.draw(Text(label).font(Typeface.mono(8.5)).foregroundStyle(Palette.text3),
                          at: CGPoint(x: x + 3, y: size.height - 6), anchor: .leading)
             }
             var line = Path()

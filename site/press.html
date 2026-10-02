@@ -26,7 +26,10 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="./"><img src="assets/logo.svg" alt="Vespertine" width="149" height="44"></a>
-    <nav><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" hidden>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path class="icon-menu" d="M3 5.5h12M3 9h12M3 12.5h12"/><path class="icon-close" d="M4.5 4.5l9 9M13.5 4.5l-9 9"/></svg>
+    </button>
+    <nav id="site-nav"><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
     <a class="btn btn-brass btn-small js-download" href="https://github.com/szeremeta1/Vespertine/releases/latest">Download</a>
   </div>
 </header>
@@ -58,7 +61,7 @@
         <li><b>An honest signal path.</b> Each stage from file to DAC is shown with real numbers; <span class="mono">BIT-PERFECT</span> appears only when the conditions for it are met.</li>
         <li><b>Fake hi-res detection.</b> Spectral analysis finds 16-bit audio padded to 24, upsampled CD masters, lossy-sourced files and synthetic “AI-enhanced” treble, and shows the evidence.</li>
         <li><b>Surround you own.</b> SACD rips, DTS CDs, DTS-HD Master Audio, Dolby TrueHD and Dolby Atmos files play channel for channel, or as head-tracked Spatial Audio on AirPods.</li>
-        <li><b>AirPods Max over USB-C</b> are recognised as a lossless 24-bit / 48 kHz device.</li>
+        <li><b>AirPods Max over USB-C</b> are recognized as a lossless 24-bit / 48 kHz device.</li>
         <li><b>Free and open.</b> Paid alternatives such as Audirvana Studio and Roon cost $79.99 and $149.88 a year.</li>
       </ul>
     </section>
@@ -76,7 +79,7 @@
 
     <section class="press-block">
       <h2>Logo</h2>
-      <p>Always lowercase, the crescent always in brass. Please don't recolour, stretch or re-set it. <a href="https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/brand/brand-guide.pdf">Brand guide (PDF)</a>.</p>
+      <p>Always lowercase, the crescent always in brass. Please don't recolor, stretch or re-set it. <a href="https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/brand/brand-guide.pdf">Brand guide (PDF)</a>.</p>
       <div class="grid grid-2">
         <figure>
           <div class="logo-tile"><img src="assets/logo.svg" alt="The Vespertine lockup: a brass crescent and the word vespertine" loading="lazy"></div>
@@ -137,8 +140,8 @@
           <figcaption>A 5.1 SACD (Brothers in Arms, 20th Anniversary Edition) as Spatial Audio on AirPods Max</figcaption>
         </figure>
         <figure>
-          <a href="https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/screenshots/fake-hi-res-detection.png"><img src="assets/press/shot-fake-hi-res-detection.jpg" alt="A “hi-res” file with synthetic treble" loading="lazy" width="720" height="450"></a>
-          <figcaption>A “hi-res” file with synthetic treble (an unofficial “enhanced” copy from the developer's own collection, not an official release)</figcaption>
+          <a href="https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/screenshots/fake-hi-res-detection.png"><img src="assets/press/shot-fake-hi-res-detection.jpg" alt="A 24/192 “remaster” that stops at 19 kHz" loading="lazy" width="720" height="450"></a>
+          <figcaption>A 24/192 “remaster” that stops at 19 kHz (a deliberate fake: the trailer's own music, encoded to MP3 and upsampled, under a made-up band name)</figcaption>
         </figure>
         <figure>
           <a href="https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/screenshots/dsd-native-dop.png"><img src="assets/press/shot-dsd-native-dop.jpg" alt="DSD64 over DoP" loading="lazy" width="720" height="450"></a>
@@ -182,6 +185,20 @@
       if (dmg) document.querySelectorAll(".js-download").forEach(a => { a.href = dmg.browser_download_url; });
     })
     .catch(() => {});
+</script>
+<script>
+  // Mobile menu: below 900 px the button shows and hides the nav links. A link, Escape or a click elsewhere closes it.
+  (() => {
+    const button = document.querySelector(".nav-toggle"), nav = document.getElementById("site-nav");
+    const setOpen = open => { button.setAttribute("aria-expanded", open); nav.classList.toggle("open", open); };
+    button.hidden = false;
+    button.addEventListener("click", () => setOpen(button.getAttribute("aria-expanded") !== "true"));
+    nav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", e => { if (!e.target.closest("header.nav")) setOpen(false); });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && button.getAttribute("aria-expanded") === "true") { setOpen(false); button.focus(); }
+    });
+  })();
 </script>
 </body>
 </html>

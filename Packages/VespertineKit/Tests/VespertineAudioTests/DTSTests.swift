@@ -116,6 +116,42 @@ struct DTSTests {
         #expect(probed.format.channels == 2)
         #expect(probed.format.encoding == .pcm)
     }
+
+    @Test("PCM holding a stray DTS sync word and frame header is still played as PCM")
+    func strayHeader() throws {
+        // A real DTS core header (the first 24 bytes of a DTS stream) stored as twelve 16-bit samples at frame 100.
+        // Its sync word alone is just the samples -385 and +384. There's no second frame where it says, so it isn't DTS.
+        let dts = Bundle.module.url(forResource: "dts-tones", withExtension: "dts", subdirectory: "Fixtures")!
+        let header = [UInt8](try Data(contentsOf: dts).prefix(24))
+        let words = (0..<12).map { Int16(bitPattern: UInt16(header[2 * $0]) | UInt16(header[2 * $0 + 1]) << 8) }
+        let url = try writeWAV("stray-dts-header", rate: 44_100, bits: 16, seconds: 1) { c, i in
+            let w = (i - 100) * 2 + c
+            if w >= 0, w < words.count { return Float(words[w]) / 32_768 }
+            return Float((0.25 * sin(Double(i) * 0.05 + Double(c)) * 32_767).rounded()) / 32_768
+        }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let probed = try SourceOpener.probe(url)
+        #expect(probed.format.codec == "WAV")
+        #expect(probed.format.channels == 2)
+        #expect(probed.format.encoding == .pcm)
+    }
+
+    @Test("A DTS CD is still recognized when its stream starts after leading silence")
+    func lateStart() throws {
+        let data = try Data(contentsOf: fixture).dropFirst(44)   // the canonical 44-byte header
+        let samples = stride(from: data.startIndex, to: data.endIndex - 1, by: 2).map {
+            Int16(bitPattern: UInt16(data[$0]) | UInt16(data[$0 + 1]) << 8)
+        }
+        let lead = 10_000   // frames of silence, beyond the 8,192 the check used to read
+        let url = try writeWAV("dts-late-start", rate: 44_100, bits: 16, seconds: Double(lead + samples.count / 2) / 44_100) { c, i in
+            let w = (i - lead) * 2 + c
+            return w >= 0 && w < samples.count ? Float(samples[w]) / 32_768 : 0
+        }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let probed = try SourceOpener.probe(url)
+        #expect(probed.format.codec == "DTS")
+        #expect(probed.format.channels == 6)
+    }
 }
 
 /// Compares Vespertine's decode of a real DTS CD with FFmpeg's (set VESPERTINE_DTS_FILE and VESPERTINE_DTS_REFERENCE,

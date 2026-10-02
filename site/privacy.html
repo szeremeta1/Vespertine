@@ -33,14 +33,17 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="./"><img src="assets/logo.svg" alt="Vespertine" width="149" height="44"></a>
-    <nav><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu" hidden>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path class="icon-menu" d="M3 5.5h12M3 9h12M3 12.5h12"/><path class="icon-close" d="M4.5 4.5l9 9M13.5 4.5l-9 9"/></svg>
+    </button>
+    <nav id="site-nav"><a href="./#features">Features</a><a href="./#faq">FAQ</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></nav>
     <a class="btn btn-brass btn-small" href="https://github.com/szeremeta1/Vespertine/releases/latest">Download</a>
   </div>
 </header>
 <main class="doc">
   <div class="eyebrow">Privacy</div>
   <h1>Vespertine collects nothing.</h1>
-  <p class="updated">Effective 29 September 2026</p>
+  <p class="updated">Effective 2 October 2026 (clarified what each service receives; nothing new is sent)</p>
 
   <p>Vespertine is a free, open-source music player. It has no accounts, no analytics, no telemetry, no crash reporting and no advertising. The developer receives no information about you or your music. Because the source code is public, you can check every statement on this page.</p>
 
@@ -50,9 +53,9 @@
   <h2>When the app goes online</h2>
   <ul>
     <li><strong>Update checks.</strong> Vespertine asks GitHub for its update feed about once a day, and when you choose Check for Updates. GitHub sees your IP address, as with any download. You can turn automatic checks off in Settings.</li>
-    <li><strong>MusicBrainz and Cover Art Archive.</strong> Only when you use Look Up on MusicBrainz or Enrich Metadata, Vespertine sends the album, artist and track names it's looking for to musicbrainz.org and downloads covers from coverartarchive.org. Both are run by the MetaBrainz Foundation.</li>
-    <li><strong>ListenBrainz.</strong> Only if you turn on scrobbling and enter your token, Vespertine sends the songs you play (title, artist, album and time) to listenbrainz.org.</li>
-    <li><strong>Network shares.</strong> Vespertine connects to the servers you add, and nowhere else, to read your music.</li>
+    <li><strong>MusicBrainz and Cover Art Archive.</strong> Only when you use Look Up on MusicBrainz or Enrich Metadata (Find Music on This Mac offers Enrich for the music it adds, as a checkbox you can clear), Vespertine sends the album, artist and track names it's looking for to musicbrainz.org. With “Fetch cover art” on in Settings, it downloads covers from coverartarchive.org, which serves them from the Internet Archive (archive.org). MusicBrainz and the Cover Art Archive are run by the MetaBrainz Foundation.</li>
+    <li><strong>ListenBrainz.</strong> Only if you turn on scrobbling and enter your token, Vespertine sends listenbrainz.org the songs you play: title, artist, album, duration and their MusicBrainz IDs when your files have them. It sends “playing now” when a song starts, and a listen with its time once you've heard half of it or four minutes.</li>
+    <li><strong>Network shares.</strong> Vespertine connects to the servers you add, and nowhere else, to read your music. While a share is connected it checks every minute or so that the server still answers, and looks for new music every half hour (never while you're playing from it).</li>
   </ul>
 
   <h2>This website</h2>
@@ -66,5 +69,19 @@
     <div class="row"><a href="./">Home</a><a href="terms.html">Terms</a><a href="press.html">Press kit</a><a href="https://github.com/szeremeta1/Vespertine">GitHub</a></div>
   </div>
 </footer>
+<script>
+  // Mobile menu: below 900 px the button shows and hides the nav links. A link, Escape or a click elsewhere closes it.
+  (() => {
+    const button = document.querySelector(".nav-toggle"), nav = document.getElementById("site-nav");
+    const setOpen = open => { button.setAttribute("aria-expanded", open); nav.classList.toggle("open", open); };
+    button.hidden = false;
+    button.addEventListener("click", () => setOpen(button.getAttribute("aria-expanded") !== "true"));
+    nav.addEventListener("click", e => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", e => { if (!e.target.closest("header.nav")) setOpen(false); });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && button.getAttribute("aria-expanded") === "true") { setOpen(false); button.focus(); }
+    });
+  })();
+</script>
 </body>
 </html>

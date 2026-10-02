@@ -72,6 +72,15 @@ sign_sparkle() {
   codesign --force "$@" "$sp/Updater.app"
 }
 
+# A release is built from committed sources, and records which commit (publish.sh tags that one, not whatever HEAD is
+# by then). VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. Package.resolved doesn't count:
+# Xcode and SwiftPM each rewrite it after every build (Xcode adds the app's own packages to it, `swift test` takes them
+# out again), so it's never clean for long.
+if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=no -- . ':(exclude)*Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
+  print -u2 "The working tree has uncommitted changes: commit them first (or set VESPERTINE_ALLOW_DIRTY=1 for a test build)."
+  exit 2
+fi
+
 if ! $resume; then
   xcodegen generate >/dev/null
   xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -derivedDataPath "$derived" \
@@ -85,6 +94,7 @@ if ! $resume; then
   ditto "$derived"/Build/Products/Release/Vespertine.app "$staged"
   rm -rf "$app"
   mv "$staged" "$app"
+  git rev-parse HEAD > "$out/built-from"
 
   # Inside-out: frameworks first, then the app.
   if [[ $identity == "-" ]]; then

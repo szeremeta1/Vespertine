@@ -361,6 +361,13 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
     for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
 }
 
+/// The source channel feeding device channel `c`: channels in order, except that a mono source plays on
+/// both of the first two (left and right), as every player does, instead of the left speaker alone.
+/// Copying the same samples to both keeps them bit-exact (and keeps DoP frames intact).
+static inline uint32_t source_channel(uint32_t c, uint32_t srcCh) {
+    return srcCh == 1 && c == 1 ? 0 : c;
+}
+
 void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t frames, uint32_t outChannels) {
     if (!out || outChannels == 0) return;
     const uint32_t ch = nrt_ring_channels(ctx->ring);
@@ -381,13 +388,19 @@ void nrt_context_render_interleaved(NRTRenderContext *ctx, float *out, uint32_t 
             for (uint32_t f = 0; f < n; f++) {
                 uint32_t *o = (uint32_t *)(out + (size_t)(done + f) * outChannels);
                 const uint32_t *s = (const uint32_t *)(src + (size_t)f * srcCh);
-                for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0u;
+                for (uint32_t c = 0; c < outChannels; c++) {
+                    const uint32_t from = source_channel(c, srcCh);
+                    o[c] = from < srcCh ? s[from] : 0u;
+                }
             }
         } else {
             for (uint32_t f = 0; f < n; f++) {
                 float *o = out + (size_t)(done + f) * outChannels;
                 const float *s = src + (size_t)f * srcCh;
-                for (uint32_t c = 0; c < outChannels; c++) o[c] = c < srcCh ? s[c] : 0.f;
+                for (uint32_t c = 0; c < outChannels; c++) {
+                    const uint32_t from = source_channel(c, srcCh);
+                    o[c] = from < srcCh ? s[from] : 0.f;
+                }
             }
         }
         done += n;
@@ -438,7 +451,7 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
             if (!o) { deviceChannel += bch; continue; }
             for (uint32_t f = 0; f < n && done + f < capacity; f++) {
                 for (uint32_t c = 0; c < bch; c++) {
-                    const uint32_t from = deviceChannel + c;
+                    const uint32_t from = source_channel(deviceChannel + c, srcCh);
                     // memcpy keeps integer-mode words bit-exact (floats are copied the same way).
                     const float zero = 0.f;
                     memcpy(&o[(size_t)(done + f) * bch + c], from < srcCh ? &src[(size_t)f * srcCh + from] : &zero, sizeof(float));

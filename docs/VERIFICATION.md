@@ -63,7 +63,7 @@ VESPERTINE_HARDWARE_TESTS=1 swift test --filter HardwareAuditTests
 VESPERTINE_HARDWARE_TESTS=1 VESPERTINE_INTEGER_DEVICE="<part of your DAC's name>" swift test --filter HardwareAuditTests
 ```
 
-The integer-device test plays a 32-bit source to your DAC. It passes only if the device's physical format reads back as 32-bit integer and the signal path reports BIT-PERFECT. The hardware tests play silence or near-silence, so they're safe to run with speakers connected.
+The integer-device test plays a 32-bit source to your DAC. It passes only if the device's physical format reads back as 32-bit integer and the signal path reports BIT-PERFECT. The rate-change test plays a 96 kHz file in shared mode, switches the device to 48 kHz behind the engine's back (as Audio MIDI Setup does), and passes only if the song keeps its speed and the signal path names the rate the device really runs at; it uses the DAC named in `VESPERTINE_INTEGER_DEVICE`, or the built-in output. The hardware tests play silence or near-silence, so they're safe to run with speakers connected; quit Vespertine first, since a device it holds exclusively can't be opened or switched by the tests.
 
 ## 3. The probe
 
@@ -88,9 +88,9 @@ These methods don't depend on anything Vespertine reports.
 
 **DTS-CD or DoP indicator test (no extra hardware beyond what you own).**
 
-- A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if every bit arrives intact. One changed bit and the receiver plays white noise, or refuses the stream.
-- To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, that path was bit-perfect for that file.
-- The same principle works with DSD: a DAC lights its DSD indicator for DoP only when the marker bytes and DSD bits are untouched. Any gain or resampling destroys them.
+- A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if the stream arrives unprocessed. Any gain change, dither, resampling or mixing scrambles it, and the receiver plays white noise or refuses the stream.
+- To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, nothing on that path processed the samples. (It's a test for processing, not proof against every possible bit error: the null test below is the rigorous one.)
+- The same principle works with DSD: a DAC lights its DSD indicator for DoP only when the DoP marker bytes arrive untouched. Any gain or resampling destroys them, so a lit indicator rules out processing (the DAC checks the markers, not every DSD bit).
 
 **Digital loopback null test (the rigorous one).**
 

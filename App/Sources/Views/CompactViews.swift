@@ -228,6 +228,8 @@ struct PlaybackSettings: View {
 
 struct LibrarySettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
+    @State private var removingSource: LibrarySource?
 
     var body: some View {
         @Bindable var s = model.settings
@@ -243,15 +245,14 @@ struct LibrarySettings: View {
                         }
                         Spacer()
                         Button("Rescan") { Task { await model.library.scan(source) } }
-                        Button("Remove") {
-                            if source.isNetwork { Task { await model.shares.remove(source) } } else { model.library.removeSource(source) }
-                        }
+                        Button("Remove") { removingSource = source }
                     }
                 }
+                // Their panels belong to the main window: bring it forward, or they open behind Settings.
                 HStack {
-                    Button("Add Folder…") { model.presentImporter(.reference) }
-                    Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
-                    Button("Connect to Server…") { model.showConnectServer = true }
+                    Button("Add Folder…") { openWindow(id: "main"); model.presentImporter(.reference) }
+                    Button("Import & Organize…") { openWindow(id: "main"); model.presentImporter(.copyAndOrganize) }
+                    Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }
                 }
             }
             Section("Importing") {
@@ -259,6 +260,8 @@ struct LibrarySettings: View {
                     Text("Reference files in place").tag(ImportMode.reference)
                     Text("Copy & organize into managed folder").tag(ImportMode.copyAndOrganize)
                 }
+                Text("What Find Music on This Mac starts with. Add Folder always references files in place, and Import & Organize always copies.")
+                    .font(.caption).foregroundStyle(.secondary)
                 LabeledContent("Managed folder") {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
@@ -267,7 +270,7 @@ struct LibrarySettings: View {
                 }))
                 Toggle("Skip voice recordings and short clips", isOn: $s.skipNonMusic)
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
-                Button("Find Music on This Mac…") { model.showFindMusic = true }
+                Button("Find Music on This Mac…") { openWindow(id: "main"); model.showFindMusic = true }
             }
             Section {
                 Toggle("Analyze new music automatically", isOn: $s.autoAnalyze)
@@ -304,6 +307,7 @@ struct LibrarySettings: View {
             }
         }
         .formStyle(.grouped)
+        .modifier(RemoveSourceAlert(source: $removingSource))
     }
 
     private func serverLine(_ source: LibrarySource) -> String {

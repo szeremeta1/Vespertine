@@ -35,7 +35,7 @@ let features = [
     Feature(id: "fake-hi-res", shot: "fake-hi-res-detection",
             headline: "Know when hi-res isn’t.",
             sub: "Spectral analysis flags upsampled, padded and lossy-sourced files, with the measurements to back it up.",
-            chips: [("○ SYNTHETIC HIGH FREQUENCIES", .copper), ("HIGH CONFIDENCE", .plain)], focus: CGRect(x: 1826, y: 150, width: 564, height: 900)),
+            chips: [("○ LOSSY ORIGIN?", .copper), ("LIKELY", .plain)], focus: CGRect(x: 1826, y: 150, width: 564, height: 900)),
 ]
 
 /// Greedy word wrap into lines no wider than `width`.

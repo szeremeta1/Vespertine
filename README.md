@@ -26,7 +26,7 @@
 <br>
 
 <p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; DSD64 over DoP from an SACD; an SACD album listing stereo and 5.1 versions once; a 5.1 SACD as head-tracked Spatial Audio on AirPods Max; and a file flagged for synthetic high frequencies">
+  <img src="docs/screenshots/tour.gif" width="800" alt="A tour of Vespertine: the Albums page filtered to multichannel; a 24-bit / 192 kHz FLAC playing bit-perfect with its signal path; DSD64 over DoP from an SACD; an SACD album listing stereo and 5.1 versions once; a 5.1 SACD as head-tracked Spatial Audio on AirPods Max; and a 24-bit / 192 kHz “remaster” flagged as a likely lossy origin">
 </p>
 
 <p align="center"><sub>Vespertine was called Nocturne until version 0.6.0.</sub></p>
@@ -37,16 +37,16 @@ Free Mac players tend to be either pretty but indifferent to what reaches the DA
 
 | | Vespertine | Apple Music | Audirvana Studio | Roon |
 |---|---|---|---|---|
-| Price | **Free, open source** | Included with macOS | $79.99 a year | $149.88 a year |
+| Price | **Free, open source** | App free with macOS; streaming by subscription | $79.99 a year | $149.88 a year |
 | Plays FLAC | Yes | No | Yes | Yes |
 | Switches the DAC to each track's sample rate | Yes | No | Yes | Yes |
 | Exclusive (hog) mode | Yes | No | Yes | Yes |
 | Says when playback is bit-perfect | Yes | No | Shows the DAC format | Yes |
 | DSD | DSD64–512 | No | Yes | Yes |
-| Local multichannel | Yes | No | Yes | Yes |
-| Local Dolby Atmos files | Yes | Catalog only | No | No |
+| Local multichannel | Yes | Multichannel ALAC | Yes | Yes |
+| Local Dolby Atmos files | Yes | Subscription catalog | No | No |
 | Fake hi-res detection | Yes | No | AudioScan (no DSD or multichannel) | No |
-| Streaming (Qobuz, TIDAL) | No | Apple Music | Yes | Yes |
+| Streaming (Qobuz, TIDAL) | No | Apple Music (paid) | Yes | Yes |
 | EQ and room correction | No | Basic EQ | Yes | Yes |
 
 <sub>Checked September 2026 from each product's own pricing and support pages. If you stream or need room correction, the paid apps are worth it; if you own your music, Vespertine is the one to try.</sub>
@@ -76,11 +76,11 @@ When an album has every song in stereo and in 5.1, like an SACD's two layers, Ve
 ![Pink Floyd's Dark Side of the Moon SACD: each song listed once as DSD64 5.1, marked "+ STEREO", playing as Spatial Audio on AirPods Max](docs/screenshots/stereo-and-surround-versions.png)
 
 ### Flags fake hi-res
-Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the evidence shown. It's a measurement, not a proof: some high-bitrate lossy files can pass as genuine ([how it works, and where it misses](docs/ANALYSIS.md#limits)). Here a 24/48 file turns out to be a lossy source cut at 16.3 kHz, with a synthetic shelf generated above it.
+Upsampled, padded, lossy-origin and "AI-enhanced" files are flagged, with the evidence shown. Only zero padding is exact; the rest is read from the spectrum and flagged as a question, with what else could explain it: some high-bitrate lossy files pass as genuine, and steep mastering filters, FM sources and tape or vinyl transfers can look suspicious ([how it works, and where it misses](docs/ANALYSIS.md#limits)). Here a 24-bit / 192 kHz “remaster” stops dead at 19 kHz, with next to nothing in the 77 kHz above it: the steep cutoff of an MP3 or AAC encode.
 
-![The Analysis tab flagging a track as having synthetic high frequencies, with its long-term spectrum](docs/screenshots/fake-hi-res-detection.png)
+![The Analysis tab flagging a 24-bit / 192 kHz “remaster” as a likely lossy origin: its long-term spectrum stops at 19 kHz](docs/screenshots/fake-hi-res-detection.png)
 
-<sub>The file in this screenshot is an unofficial “enhanced” 24/48 copy from the developer's own collection, not an official release. To see a verdict on files you can regenerate, [make a fake of your own](docs/ANALYSIS.md#reproducing).</sub>
+<sub>The file in this screenshot is a deliberate fake: the trailer's own music, encoded to MP3 and upsampled to 24/192 under a made-up band name. To see a verdict on files you can regenerate, [make a fake of your own](docs/ANALYSIS.md#reproducing).</sub>
 
 ### Browse like Apple Music, filter like an audiophile
 Albums, artists, songs and **genres**, with the same filters on every page: the format chips combine ("FLAC, 24-bit, 88.2 kHz and up"), and the Filters panel adds genre, year, artist, exact sample rate, bit depth, channels, analysis verdict and source, each with how many albums or songs it leaves. Artists and genres follow the filter, each page remembers its own, and every page plays or **shuffles** what it shows: a genre, an artist, the 1970s, your 5.1 albums. Messy tags are handled: "Hip-Hop" and "hip hop" are one genre, multi-genre tags count under each, and localized genre names are merged.
@@ -120,7 +120,7 @@ The decoders have automated tests with generated fixtures: TrueHD output is comp
 ## What it does
 
 - **Automatic device format.** Each track's rate is matched on the device (16/44.1, 24/96, 24/192, 352.8, 384…). If the device can't run at that rate, Vespertine converts with Apple's mastering-quality resampler. It prefers a rate in the same family (44.1 → 88.2), then the nearest higher rate, then an integer divisor (768 → 384). Per-device overrides: *match source*, *device maximum* or a fixed rate.
-- **Shared or exclusive.** By default Vespertine shares the device and makes it the Mac's sound output while it plays, so volume keys, Control Center and the AirPods Max Digital Crown control what you hear. Playback is still bit-perfect unless another app plays through the same device at the same time, and Vespertine says so when that happens. **Exclusive (hog) mode** is one switch away if you'd rather silence other apps on the device. The volume keys, Control Center and the Digital Crown still reach it, and the device is released after a configurable pause. The Mac's own speakers and headphone jack always play shared: exclusive access gains nothing there.
+- **Shared or exclusive.** By default Vespertine shares the device and makes it the Mac's sound output when it starts playing (it stays the sound output afterwards; there's a switch for this in Settings), so volume keys, Control Center and the AirPods Max Digital Crown control what you hear. Playback is still bit-perfect unless another app plays through the same device at the same time, and Vespertine says so when that happens. **Exclusive (hog) mode** is one switch away if you'd rather silence other apps on the device. The volume keys, Control Center and the Digital Crown still reach it, and the device is released after a configurable pause. The Mac's own speakers and headphone jack always play shared: exclusive access gains nothing there.
 - **Integer mode.** With exclusive access, on DACs that offer it (the FiiO K11 does), music that needs no processing reaches the DAC as 32-bit integers with no floating-point step, so 32-bit recordings are bit-perfect too.
 - **Stays on the output you chose.** Vespertine never switches your music to another device on its own. If the chosen output is missing when playback starts (AirPods Max still reconnecting after you put them back on, a DAC being replugged), it waits for it for up to a minute and plays the moment it's back. If it drops out mid-song, playback continues where it left off once it returns.
 - **Hands your DAC back.** When Vespertine quits, each device it switched goes back to the sample rate and bit depth it had before (so other apps, and tools like LosslessSwitcher, carry on where they left off), or to 44.1 kHz · 16-bit or 48 kHz · 24-bit if you prefer.
@@ -137,14 +137,14 @@ The decoders have automated tests with generated fixtures: TrueHD output is comp
 - **A truthful signal path.** *BIT-PERFECT* (brass) appears only when the rate is native, nothing touches the samples, no other app is mixing into the device and the word length fits. Every other state is shown in copper with the reason. In shared mode, other apps are detected by polling about once a second, and processing inside the DAC itself is outside what macOS reports ([what it checks, and what it can't see](docs/VERIFICATION.md#what-bit-perfect-doesnt-cover)).
 - **Gapless playback** across tracks that share a device format, including CUE-sheet albums split from a single file.
 - **Volume.** Vespertine uses the DAC's hardware volume when it has one. Optionally, a 64-bit dithered digital volume can be enabled; it's clearly marked as not bit-perfect.
-- **Damaged files can't take it down.** Errors thrown inside codec libraries are caught; a broken file just won't play, with a message saying why.
-- **Find Music on This Mac.** Spotlight searches every drive. Each file's true format is checked, and hi-res, lossless or all music can be picked by folder or by file. Recordings, prompts, clips and duplicate copies are left out.
+- **Damaged files are contained.** Exceptions thrown inside codec libraries are caught, so a broken file usually just won't play, with a message saying why. (A crash deep inside a decoder can't be caught this way; please report any file that does it.)
+- **Find Music on This Mac.** Spotlight searches every drive it has indexed. Each file's true format is checked, and hi-res, lossless or all music can be picked by folder or by file. Recordings, prompts, clips and duplicate copies are left out.
 - **Library.** Folders are referenced in place and watched for changes, or you can *Import & Organize* to copy music into `~/Music/Vespertine`. On the same drive the copies are APFS clones and take no extra space. It keeps albums, artists, songs and genres, each page with its own filters (format, sample rate, bit depth, channels, genre, decade, artist, analysis verdict, source, favorites) and Play and Shuffle (albums are dated by their original release, not the reissue you have); search across artists, albums (title, artist, genre, year) and songs (accent-insensitive); playlists; and smart playlists whose rules use the same units as the rest of the app. Covers come from the files, from the album folder (including one above a "CD 1" folder), and are picked up when you add one later. Files on unplugged drives stay in the library and show as offline; files you delete disappear from every list on the next scan (and come back if you restore them). Files that are moved or renamed, for example by Lidarr reorganizing a share, are recognized as the same songs, so playlists, play counts and analysis stay with them.
 - **Rich metadata editing** for single tracks or batches, written into the files via TagLib (Vorbis comments, ID3v2, MP4, APE). It covers artwork, sort fields, lyrics and custom tags. Each file is cloned to a backup (instant on APFS) and the previous tags are kept for one-step revert. Files Vespertine can't write (a read-only share, one file of a CUE image) keep their edits in the library instead, through rescans.
 - **Enrich Metadata.** Missing titles, artists, albums, years, track numbers and cover art are filled in from structured file names and **MusicBrainz / Cover Art Archive**. Each proposal shows its source and confidence before anything is written.
 - **MusicBrainz and Cover Art Archive** lookup and correction, and **ListenBrainz** scrobbling (optional; the token is kept in the Keychain).
 - **Network shares.** Connect to SMB, NFS or WebDAV shares on your network or over Tailscale/VPN (⌘K). Read-only by default and mounted where macOS keeps network volumes (hidden from the Finder sidebar). They heal themselves: Vespertine reconnects after sleep, network changes and server restarts, and remounts a share that has stopped answering. Shares are rescanned every half hour (never while you're playing from them), so music added to or deleted from the server shows up by itself. Indexing is quick over slow links, and playback is built for slow or busy servers. It keeps up to half a minute of audio in hand, copies the playing track to the Mac straight away, and moves playback to that copy mid-song, sample for sample, the moment it's complete, so the rest of the song no longer depends on the network. What you play is cached, with **Keep Offline** for whole albums. Passwords live in the login keychain alongside Finder's.
-- **Fake hi-res detection.** Finds a file's true bit depth (16-bit padded into 24-bit), upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies were synthesized (SBR or AI upscaling). It's a heuristic: every verdict shows its evidence, and some high-bitrate lossy files can pass as genuine ([limits](docs/ANALYSIS.md#limits)). Results are saved, can run automatically on import, and can filter any page. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `vespertine-analyze` runs the same analysis next to the files and Vespertine imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
+- **Fake hi-res detection.** Finds 16-bit audio padded into 24-bit files (exactly), and flags likely upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies look synthesized (SBR or AI upscaling). Those three are heuristics: every verdict shows its evidence and names what else could explain it; some high-bitrate lossy files pass as genuine, and some genuine recordings with steep filters look suspicious ([limits](docs/ANALYSIS.md#limits)). Results are saved, can run automatically on import, and can filter any page. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `vespertine-analyze` runs the same analysis next to the files and Vespertine imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
 - **Live spectrum** of exactly what the DAC receives (DSD over DoP included), plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
 ## Build
@@ -183,7 +183,7 @@ scripts/build-dts-decoder.sh
 
 ## Try it without your own music
 
-`vespertine-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album, a deliberately fake 24-bit track and an upsampled "hi-res" album:
+`vespertine-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album and a 24-bit album with one track that is really 16-bit:
 
 ```bash
 cd Packages/VespertineKit && swift run -c release vespertine-demo ~/Desktop/VespertineDemo
@@ -237,7 +237,7 @@ scripts/publish.sh docs/releases/<version>.md
 
 The first command builds a universal app and signs it (and every embedded framework and Sparkle helper) with the Developer ID. It then notarizes and staples both the app and a designed installer DMG. If Apple takes longer than two hours, rerun it with `--resume` instead of `--notarize`.
 
-The second command publishes the GitHub release: it signs the Sparkle appcast entry with the EdDSA key in the login keychain (account `nocturne`, kept from before the rename so the key never changes) and uploads `appcast.xml` next to the DMG. Installed copies read the feed from `releases/latest/download/appcast.xml`.
+The second command publishes the GitHub release: it signs the Sparkle appcast entry with the EdDSA key in the login keychain (account `nocturne`, kept from before the rename so the key never changes) and uploads `appcast.xml` next to the DMG. Installed copies read the feed from `releases/latest/download/appcast.xml`, so the release GitHub marks *Latest* must always carry `appcast.xml`: any other release (a build of the analyzer, say) goes up with `gh release create --latest=false`, or every installed copy's update check fails until the next app release.
 
 **Back up the Sparkle signing key.** Without it, no future update can be published to existing installs:
 
