@@ -368,7 +368,8 @@ struct EnrichSheet: View {
         loading = true
         result = nil
         let keys = albumKeys.isEmpty ? nil : albumKeys
-        let r = await model.library.enrichmentProposals(albumKeys: keys, correctExisting: correctExisting) { done, total in progress = (done, total) }
+        let r = await model.library.enrichmentProposals(albumKeys: keys, correctExisting: correctExisting,
+                                                        fetchCovers: model.settings.fetchArtworkOnline) { done, total in progress = (done, total) }
         proposals = r.proposals
         complete = r.complete
         chosen = Set(r.proposals.filter(\.isHighConfidence).map(\.id))
