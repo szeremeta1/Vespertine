@@ -12,6 +12,8 @@ struct TagEditorView: View {
     @Environment(AppModel.self) private var model
 
     @State private var tracks: [Track] = []
+    /// The selection `tracks` was loaded for; reloads of the same selection keep what you've typed.
+    @State private var loadedIDs: Set<Int64>?
     @State private var draft: [TagField: String] = [:]
     @State private var mixed: Set<TagField> = []
     @State private var edited: Set<TagField> = []
@@ -281,15 +283,27 @@ struct TagEditorView: View {
         return "Writes \(kind) to \(files) file\(files == 1 ? "" : "s") · backup retained for undo"
     }
 
-    private func load(_ ids: Set<Int64>) {
+    /// Shows the tags of the selection. The library changes under a selection all the time (a scan, an analysis,
+    /// this editor's own save), so a reload of the same tracks keeps what you've typed and the last save's result;
+    /// only the fields you haven't touched show the fresh values. A new selection, or `discardingEdits`, starts over.
+    private func load(_ ids: Set<Int64>, discardingEdits: Bool = false) {
+        let previous = tracks
         tracks = model.library.tracks(ids: Array(ids)).sorted { ($0.discNumber ?? 0, $0.trackNumber ?? 0) < ($1.discNumber ?? 0, $1.trackNumber ?? 0) }
-        draft = [:]; mixed = []; edited = []; artwork = nil; status = nil
-        for f in TagField.allCases {
+        let fresh = discardingEdits || ids != loadedIDs
+        loadedIDs = ids
+        if fresh { draft = [:]; mixed = []; edited = []; artwork = nil; status = nil }
+        for f in TagField.allCases where !edited.contains(f) {
             let values = Set(tracks.map { f.value(in: $0) ?? "" })
-            if values.count == 1 { draft[f] = values.first! } else { mixed.insert(f) }
+            if values.count == 1 { draft[f] = values.first!; mixed.remove(f) } else { draft[f] = nil; mixed.insert(f) }
         }
+        // Custom tags are refreshed only while they're as loaded (a new row or a changed one is yours).
+        let untouched = custom.elementsEqual(Self.customTagRows(previous)) { $0.key == $1.key && $0.value == $1.value && $0.original == $1.original }
+        if fresh || untouched { custom = Self.customTagRows(tracks) }
+    }
+
+    private static func customTagRows(_ tracks: [Track]) -> [CustomTag] {
         let keys = Set(tracks.flatMap { $0.extraTags.keys }).subtracting(["LABEL", "ORGANIZATION", "PUBLISHER"]).sorted()
-        custom = keys.map { key in
+        return keys.map { key in
             let values = Set(tracks.map { $0.extraTags[key] ?? "" })
             return CustomTag(key: key, value: values.count == 1 ? values.first! : "", original: values.count == 1 ? values.first! : nil)
         }
@@ -304,26 +318,31 @@ struct TagEditorView: View {
         }
         let edit = TagEdit(fields: fields, custom: customEdits, artwork: artwork)
         let targets = tracks
+        let selection = loadedIDs
         saving = true
         Task {
             let result = await model.library.apply(edit, to: targets)
             saving = false
+            // Another selection is on screen now: its draft isn't this save's to clear.
+            guard loadedIDs == selection else { return }
             if let result {
                 var parts = ["Saved \(result.written) file\(result.written == 1 ? "" : "s")"]
                 if result.databaseOnly > 0 { parts.append("\(result.databaseOnly) CUE track(s) in library") }
                 if !result.failures.isEmpty { parts.append("\(result.failures.count) failed: \(result.failures[0].message)") }
                 status = parts.joined(separator: " · ")
             }
+            // Saved: the reload the save brings shows what was written. A failure keeps the draft to try again.
             if let result, result.failures.isEmpty {
                 edited = []
                 artwork = nil
+                custom = Self.customTagRows(tracks)
             }
         }
     }
 
     private func revert() {
         if hasChanges {
-            load(Set(tracks.compactMap(\.id)))
+            load(loadedIDs ?? Set(tracks.compactMap(\.id)), discardingEdits: true)
         } else {
             let targets = tracks
             Task {
