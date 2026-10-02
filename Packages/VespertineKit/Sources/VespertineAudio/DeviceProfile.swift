@@ -13,6 +13,8 @@ public struct DeviceProfile: Sendable, Hashable {
         case bluetooth
         case airPlay
         case builtIn
+        case speakers            // the Mac's own speakers: macOS tunes them with its own processing
+        case virtualDevice       // aggregate, multi-output and virtual devices: the audio goes on to something else
         case usbDAC
         case other
     }
@@ -64,8 +66,17 @@ public struct DeviceProfile: Sendable, Hashable {
                                  canBeBitPerfect: false, symbol: "airplay.audio")
         case .builtIn:
             let speakers = name.contains("speaker")
-            return DeviceProfile(kind: .builtIn, tag: "BUILT-IN", note: nil, canBeBitPerfect: true,
-                                 symbol: speakers ? "laptopcomputer" : "headphones")
+            return DeviceProfile(kind: speakers ? .speakers : .builtIn, tag: "BUILT-IN",
+                                 note: speakers ? "macOS tunes the Mac's own speakers with processing of its own, so music can't reach them bit-perfect." : nil,
+                                 canBeBitPerfect: !speakers, symbol: speakers ? "laptopcomputer" : "headphones")
+        case .aggregate, .virtual:
+            let aggregate = device.transport == .aggregate
+            return DeviceProfile(
+                kind: .virtualDevice, tag: aggregate ? "AGGREGATE" : "VIRTUAL",
+                note: aggregate
+                    ? "An aggregate or multi-output device hands the audio on to the devices inside it, and can resample it to keep them in step, so what reaches them can't be promised bit-perfect."
+                    : "A virtual device (an equalizer, a recorder, a router) hands the audio on to other software, which can change it, so what reaches your speakers can't be promised bit-perfect.",
+                canBeBitPerfect: false, symbol: "speaker.wave.2")
         case .usb, .thunderbolt, .fireWire, .pci:
             return DeviceProfile(kind: .usbDAC, tag: device.transport.label.uppercased(), note: nil, canBeBitPerfect: true,
                                  symbol: "hifireceiver")

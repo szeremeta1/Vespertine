@@ -4,6 +4,26 @@ import Testing
 @testable import VespertineAudio
 
 @Suite("Audio audit regressions") struct AuditAudioTests {
+    @Test("Speakers macOS tunes, and virtual or aggregate devices, are never called bit-perfect")
+    func processedOutputsAreNotBitPerfect() {
+        let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 48_000, bitDepth: 24, channels: 2)
+        let plan = FormatPlanner.plan(source: source, device: DeviceCapabilities(sampleRates: [48_000], physicalFormats: [],
+                                                                                 outputChannels: 2, supportsDoP: false))
+        let applied = AppliedFormat(sampleRate: 48_000, physicalBitDepth: 32, physicalIsInteger: false, virtualChannels: 2,
+                                    exclusive: false, bufferFrames: 512)
+        func path(_ profile: DeviceProfile) -> SignalPath {
+            SignalPath(source: source, decoderName: "test", plan: plan, applied: applied, deviceName: "Test", deviceUID: "Test",
+                       deviceProfile: profile, volume: .fixed)
+        }
+        #expect(path(DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "x")).statusLine == "BIT-PERFECT")
+        let speakers = path(DeviceProfile(kind: .speakers, tag: "BUILT-IN", canBeBitPerfect: false, symbol: "x"))
+        #expect(!speakers.isBitPerfect && speakers.statusLine == "SPEAKER PROCESSING")
+        let virtual = path(DeviceProfile(kind: .virtualDevice, tag: "VIRTUAL", canBeBitPerfect: false, symbol: "x"))
+        #expect(!virtual.isBitPerfect && virtual.statusLine == "VIRTUAL DEVICE")
+        let aggregate = path(DeviceProfile(kind: .virtualDevice, tag: "AGGREGATE", canBeBitPerfect: false, symbol: "x"))
+        #expect(aggregate.statusLine == "AGGREGATE DEVICE")
+    }
+
     @Test("A damaged ReplayGain tag can't blast: the adjustment stays between -30 and +15 dB")
     func replayGainIsClamped() {
         let url = URL(fileURLWithPath: "/tmp/x.flac")
