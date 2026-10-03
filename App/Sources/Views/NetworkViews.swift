@@ -73,6 +73,11 @@ struct ConnectServerSheet: View {
                             }
                             SecureField("Password", text: $password, prompt: Text(savedPassword ? "Saved in Keychain" : "Required"))
                             Toggle("Remember this password in my keychain", isOn: $remember)
+                            if share?.kind == .webdav, share?.secure == false {
+                                Label("This address uses http, so your name, password and music cross the network unencrypted. Use https if the server offers it.",
+                                      systemImage: "exclamationmark.triangle")
+                                    .font(.caption).foregroundStyle(Palette.copper)
+                            }
                         }
                     }
                 }
