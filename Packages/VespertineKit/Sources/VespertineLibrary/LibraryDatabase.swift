@@ -380,6 +380,13 @@ public extension LibraryDatabase {
         }
     }
 
+    /// The tracks of one file (several when a CUE sheet splits it), in order.
+    func tracks(filePath: String) throws -> [Track] {
+        try writer.read { db in
+            Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath = ? AND isMissing = 0", arguments: [filePath]))
+        }
+    }
+
     /// The tracks of several albums in one read: album after album as given, each in its own order.
     func tracks(albumKeys: [String]) throws -> [Track] {
         guard !albumKeys.isEmpty else { return [] }
