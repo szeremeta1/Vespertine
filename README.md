@@ -160,7 +160,8 @@ scripts/generate-project.sh && open Vespertine.xcodeproj
 Or build from the command line:
 
 ```bash
-xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -derivedDataPath build/DD build
+scripts/generate-project.sh && xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release \
+  -derivedDataPath build/DD -onlyUsePackageVersionsFromResolvedFile build
 ```
 
 Run the engine and library tests, and the analysis core's (it also builds on Linux):
