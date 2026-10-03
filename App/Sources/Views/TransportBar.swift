@@ -179,6 +179,9 @@ struct DeviceChip: View {
         }
         .buttonStyle(.plain)
         .help("Output device")
+        // Bit-perfect or converted is said in words too, not only by the colour and the dot.
+        .accessibilityLabel("Output device, \(device?.name ?? "none")")
+        .accessibilityValue(path.map { "\($0.isBitPerfect ? "Bit-perfect" : "Converted"), \(chipDetail(device, $0))" } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
             DevicePicker().environment(model).frame(width: 360)
         }

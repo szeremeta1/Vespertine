@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 struct MainWindow: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         @Bindable var model = model
@@ -26,7 +27,7 @@ struct MainWindow: View {
                         InspectorView()
                             .frame(width: 348)
                             .clipped()   // nothing inside may spill over the list beside it
-                            .transition(.move(edge: .trailing))
+                            .transition(reduceMotion ? .opacity : .move(edge: .trailing))
                     }
                 }
                 .animation(.easeInOut(duration: 0.22), value: model.showInspector)
@@ -148,6 +149,8 @@ private struct RouteLayer<Content: View>: View {
 
 struct ErrorBanner: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
 
     var body: some View {
         if let message = model.player.lastError ?? model.library.lastError {
@@ -161,8 +164,11 @@ struct ErrorBanner: View {
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Palette.copper.opacity(0.4)))
             .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
             .padding(.top, 12)
-            .transition(.move(edge: .top).combined(with: .opacity))
+            .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
             .task(id: message) {
+                // Spoken as it appears, and left up for VoiceOver users (who may not reach it in 8 s) until dismissed.
+                AccessibilityNotification.Announcement(message).post()
+                guard !voiceOver else { return }
                 do { try await Task.sleep(for: .seconds(8)) } catch { return }
                 dismiss()
             }
