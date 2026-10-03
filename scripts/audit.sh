@@ -18,11 +18,11 @@ for sanitizer in address,undefined thread; do
 done
 clang --analyze -std=c11 -I Packages/VespertineKit/Sources/CVespertineRT/include \
   Packages/VespertineKit/Sources/CVespertineRT/vespertine_rt.c -o "$out/rt-static.plist"
-xcodegen generate > "$out/xcodegen.log" 2>&1
+scripts/generate-project.sh > "$out/xcodegen.log" 2>&1
 xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
-  -derivedDataPath build/AuditDD CODE_SIGNING_ALLOWED=NO test > "$out/app-tests.log" 2>&1
+  -derivedDataPath build/AuditDD -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test > "$out/app-tests.log" 2>&1
 xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
-  -derivedDataPath build/AuditDD ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build > "$out/universal-build.log" 2>&1
+  -derivedDataPath build/AuditDD -onlyUsePackageVersionsFromResolvedFile ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build > "$out/universal-build.log" 2>&1
 zsh -n scripts/release.sh scripts/publish.sh scripts/backup-sparkle-key.sh
 git diff --check
 print "All audit checks passed. Logs: $out"

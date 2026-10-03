@@ -60,20 +60,22 @@ jobs:
       - name: Toolchain
         run: xcodebuild -version
       - name: Generate the project
-        run: brew install xcodegen && xcodegen generate
+        run: brew install xcodegen && scripts/generate-project.sh
+      - name: App and kit lockfiles agree
+        run: python3 scripts/check-lockfiles.py
       - uses: actions/cache@v4
         with:
           path: build/CI/SourcePackages
-          key: spm-app-${{ runner.os }}-${{ hashFiles('project.yml', 'Packages/VespertineKit/Package.resolved') }}
+          key: spm-app-${{ runner.os }}-${{ hashFiles('project.yml', 'App/Package.resolved') }}
           restore-keys: spm-app-${{ runner.os }}-
       - name: App tests
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
-            -derivedDataPath build/CI CODE_SIGNING_ALLOWED=NO test
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
-            -derivedDataPath build/CI ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build
           app=build/CI/Build/Products/Release/Vespertine.app
           # Current lipo verifies one architecture per call (two make it read the second as an input file).
           for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/Vespertine" -verify_arch $arch; done

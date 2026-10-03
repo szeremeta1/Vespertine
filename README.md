@@ -154,7 +154,7 @@ brew install xcodegen
 ```
 
 ```bash
-xcodegen generate && open Vespertine.xcodeproj
+scripts/generate-project.sh && open Vespertine.xcodeproj
 ```
 
 Or build from the command line:
