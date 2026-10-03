@@ -51,7 +51,12 @@ app="$out/Vespertine.app"
 make_dmg() {
   local version=$1 dest=$2
   local art="$out/dmg-art"
-  [[ -x build/.venv/bin/dmgbuild ]] || { python3 -m venv build/.venv && build/.venv/bin/pip install -q dmgbuild; }
+  # Pinned with hashes, and reinstalled when the pins change.
+  if ! cmp -s scripts/dmgbuild-requirements.txt build/.venv/requirements.txt 2>/dev/null; then
+    rm -rf build/.venv && python3 -m venv build/.venv
+    build/.venv/bin/pip install -q --require-hashes --no-deps -r scripts/dmgbuild-requirements.txt
+    cp scripts/dmgbuild-requirements.txt build/.venv/requirements.txt
+  fi
   swift scripts/make-dmg-background.swift "$version" "$art" >/dev/null
   rm -f "$dest"
   if ! build/.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$app" -D background="$art/background.png" \

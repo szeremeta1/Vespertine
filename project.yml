@@ -31,6 +31,10 @@ targets:
         buildPhase: resources
       - path: THIRD-PARTY-NOTICES.md
         buildPhase: resources
+      # Full license and copyright texts of the bundled components (Contents/Resources/Licenses).
+      - path: App/Licenses
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: VespertineKit
         product: VespertineAudio
