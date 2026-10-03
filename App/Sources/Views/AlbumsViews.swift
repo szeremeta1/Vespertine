@@ -259,11 +259,7 @@ struct AlbumDetailView: View {
         let wanted = model.outputWantsMultichannel() ?? true
         let shares = model.shares
         let shown = groups.map { TrackVersions.choose($0, multichannel: wanted, isLocal: { !shares.isNetwork($0) }) ?? $0[0] }
-        let others: [Int64: String] = Dictionary(uniqueKeysWithValues: zip(groups, shown).compactMap { group, chosen in
-            guard group.count > 1, let id = chosen.id else { return nil }
-            let names = group.filter { $0.id != chosen.id }.map { Self.versionName($0, beside: chosen) }
-            return (id, "+ " + Array(Set(names)).sorted().joined(separator: " · "))
-        })
+        let others = Self.otherVersions(of: groups, shown: shown)
         VStack(spacing: 0) {
             if let album {
                 hero(album, shown: shown)
@@ -284,6 +280,15 @@ struct AlbumDetailView: View {
             }
             tracks = found
         }
+    }
+
+    /// For each song shown in several versions, the others named beside the one shown: track ID → "+ STEREO", "+ 5.1".
+    static func otherVersions(of songs: [[Track]], shown: [Track]) -> [Int64: String] {
+        Dictionary(zip(songs, shown).compactMap { song, chosen in
+            guard song.count > 1, let id = chosen.id else { return nil }
+            let names = song.filter { $0.id != chosen.id }.map { versionName($0, beside: chosen) }
+            return (id, "+ " + Array(Set(names)).sorted().joined(separator: " · "))
+        }, uniquingKeysWith: { a, _ in a })
     }
 
     /// How another version of a song is named beside the one that plays: its layout ("STEREO", "5.1"), or for a

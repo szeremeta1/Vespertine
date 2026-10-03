@@ -90,4 +90,32 @@ struct FavoritesTests {
         #expect(try db.tracks(in: off).count == 2)
         #expect(SmartRule.Field.isFavorite.operators == [.isTrue, .isFalse])
     }
+
+    @Test("A favorite is a song: its stereo and 5.1 versions are favorites together, and count once")
+    func versionsTogether() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        func track(_ folder: String, _ n: Int, _ title: String, channels: Int) -> Track {
+            var t = Track.stub(path: "/m/Dire Straits/BIA/\(folder)/\(n).dsf")
+            t.sourceId = source.id
+            t.album = "Brothers In Arms"; t.albumArtist = "Dire Straits"; t.trackNumber = n; t.title = title
+            t.channels = channels; t.isDSD = true; t.sampleRate = 2_822_400; t.bitDepth = nil
+            return t
+        }
+        let tracks = [track("Multichannel", 1, "So Far Away", channels: 6), track("Stereo", 1, "So Far Away", channels: 2),
+                      track("Multichannel", 2, "Money For Nothing", channels: 6), track("Stereo", 2, "Money For Nothing", channels: 2)]
+        let ids = try db.writer.write { db in try tracks.map { t -> Int64 in var t = t; try t.insert(db); return t.id! } }
+        #expect(try db.favoriteEveryVersion() == 0)
+
+        // Favorited on headphones: only the stereo version was hearted.
+        let date = Date(timeIntervalSince1970: 3_000_000)
+        try db.setFavorite(true, trackIDs: [ids[1]], at: date)
+        #expect(try db.favoriteEveryVersion() == 1)
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[0], ids[1]])
+        let dates = try db.writer.read { db in try Date.fetchAll(db, sql: "SELECT favoritedAt FROM favorite") }
+        #expect(dates == [date, date], "the 5.1 version is a favorite from the day the song was")
+
+        #expect(try db.favoriteEveryVersion() == 1, "nothing more to add")
+        #expect(try db.favoriteTracks().count == 2)
+    }
 }
