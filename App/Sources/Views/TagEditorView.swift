@@ -191,6 +191,7 @@ struct TagEditorView: View {
                 Spacer()
                 Button { custom.append(CustomTag(key: "", value: "", original: nil)) } label: { Image(systemName: "plus") }
                     .buttonStyle(.plain).foregroundStyle(Palette.text2)
+                    .accessibilityLabel("Add custom tag")
             }
             ForEach($custom) { $tag in
                 HStack(spacing: 6) {
@@ -199,6 +200,7 @@ struct TagEditorView: View {
                     TextField("value", text: $tag.value).font(Typeface.mono(11))
                     Button { tag.value = ""; tag.key = tag.key.isEmpty ? "" : tag.key } label: { Image(systemName: "xmark.circle.fill") }
                         .buttonStyle(.plain).foregroundStyle(Palette.text3).help("Clear value (removes the tag on save)")
+                        .accessibilityLabel("Clear value")
                 }
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 8).frame(height: 26)
@@ -534,7 +536,7 @@ struct SmartPlaylistEditor: View {
             TextField("Name", text: $name).textFieldStyle(.roundedBorder)
             HStack {
                 Text("Match")
-                Picker("", selection: $rules.match) {
+                Picker("Match", selection: $rules.match) {
                     Text("all").tag(SmartRules.Match.all)
                     Text("any").tag(SmartRules.Match.any)
                 }
@@ -543,17 +545,17 @@ struct SmartPlaylistEditor: View {
             }
             ForEach($rules.rules) { $rule in
                 HStack {
-                    Picker("", selection: $rule.field) { ForEach(SmartRule.Field.allCases, id: \.self) { Text($0.label).tag($0) } }
+                    Picker("Field", selection: $rule.field) { ForEach(SmartRule.Field.allCases, id: \.self) { Text($0.label).tag($0) } }
                         .labelsHidden().frame(width: 170)
                         .onChange(of: rule.field) {
                             // Keep the comparison valid for the new field (e.g. no "contains" for a sample rate).
                             if !rule.field.operators.contains(rule.op) { rule.op = rule.field.operators[0] }
                             if rule.field == .verdict, FileAnalysis.Verdict(rawValue: rule.value) == nil { rule.value = FileAnalysis.Verdict.upsampled.rawValue }
                         }
-                    Picker("", selection: $rule.op) { ForEach(rule.field.operators, id: \.self) { Text($0.label).tag($0) } }
+                    Picker("Condition", selection: $rule.op) { ForEach(rule.field.operators, id: \.self) { Text($0.label).tag($0) } }
                         .labelsHidden().frame(width: 140)
                     if rule.field == .verdict {
-                        Picker("", selection: $rule.value) {
+                        Picker("Value", selection: $rule.value) {
                             ForEach([FileAnalysis.Verdict.genuine, .possibleLossyOrigin, .upsampled, .paddedBitDepth, .bandwidthExtended, .notApplicable], id: \.self) {
                                 Text(AnalysisVerdictText.badge($0).capitalized).tag($0.rawValue)
                             }
@@ -563,6 +565,7 @@ struct SmartPlaylistEditor: View {
                         TextField(rule.field.placeholder, text: $rule.value).textFieldStyle(.roundedBorder)
                     } else { Spacer() }
                     Button { rules.rules.removeAll { $0.id == rule.id } } label: { Image(systemName: "minus.circle") }.buttonStyle(.plain)
+                        .accessibilityLabel("Remove rule")
                 }
             }
             Button { rules.rules.append(SmartRule(field: .artist, op: .contains)) } label: { Label("Add Rule", systemImage: "plus") }
@@ -571,7 +574,7 @@ struct SmartPlaylistEditor: View {
                 Toggle("Limit to", isOn: $limitOn)
                 TextField("", value: $limit, format: .number).frame(width: 60).textFieldStyle(.roundedBorder).disabled(!limitOn)
                 Text("tracks, sorted by")
-                Picker("", selection: $rules.sort) {
+                Picker("Sort by", selection: $rules.sort) {
                     Text("Album").tag(SmartRules.Sort.album)
                     Text("Recently Added").tag(SmartRules.Sort.recentlyAdded)
                     Text("Most Played").tag(SmartRules.Sort.mostPlayed)

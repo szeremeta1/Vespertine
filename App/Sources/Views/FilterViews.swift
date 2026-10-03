@@ -440,6 +440,7 @@ struct SearchField: View {
             if !text.isEmpty {
                 Button { text = "" } label: { Image(systemName: "xmark.circle.fill").font(.system(size: 11)).foregroundStyle(Palette.text3) }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Clear search")
             }
         }
         .padding(.horizontal, 9)
