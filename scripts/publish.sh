@@ -96,13 +96,22 @@ signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
 sys.exit(0 if signed else 1)
 PY
 
+# The FFmpeg decoders are LGPL: the exact source they were built from goes up with every release, checked against
+# the hash build-dts-decoder.sh builds from, so it stays available as long as the release does.
+ffmpeg_version=$(sed -n 's/^version=//p' scripts/build-dts-decoder.sh)
+ffmpeg_sha=$(sed -n 's/^sha256=//p' scripts/build-dts-decoder.sh)
+ffmpeg_source="$out/ffmpeg-$ffmpeg_version.tar.xz"
+[[ -f $ffmpeg_source ]] || curl -sSfL "https://ffmpeg.org/releases/ffmpeg-$ffmpeg_version.tar.xz" -o "$ffmpeg_source"
+print "$ffmpeg_sha  $ffmpeg_source" | shasum -a 256 -c - >/dev/null \
+  || { print -u2 "$ffmpeg_source doesn't match the SHA-256 in scripts/build-dts-decoder.sh."; exit 1; }
+
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
   git tag -s "v$version" -m "Vespertine $version" "$built"
 fi
 [[ "$(git rev-parse "v$version^{commit}")" == "$built" ]] \
   || { print -u2 "Tag v$version doesn't point at the commit this app was built from ($built)."; exit 1; }
 git push -q origin "v$version"
-gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
+gh release create "v$version" "$dmg" "$feed/appcast.xml" "$ffmpeg_source" --repo "$repo" --verify-tag --latest \
   --title "Vespertine $version" --notes-file "$notes"
 
 # Homebrew: point the cask in szeremeta1/homebrew-tap at this release (a commit through GitHub's API).

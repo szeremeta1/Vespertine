@@ -80,6 +80,7 @@ jobs:
           # Current lipo verifies one architecture per call (two make it read the second as an input file).
           for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/Vespertine" -verify_arch $arch; done
           test -f "$app/Contents/Resources/LICENSE" && test -f "$app/Contents/Resources/THIRD-PARTY-NOTICES.md"
+          test -f "$app/Contents/Resources/Licenses/FFmpeg-LGPL-2.1.txt" && test -f "$app/Contents/Resources/Licenses/SFBAudioEngine-ACKNOWLEDGMENTS.md"
 
   realtime-c:
     name: Real-time C (sanitizers) and scripts
