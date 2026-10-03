@@ -210,6 +210,8 @@ public final class NetworkCache: @unchecked Sendable {
     /// When a download last received data from the share (a slow share that still delivers isn't dead).
     public var lastTransferAt: Date { lock.withLock { lastTransfer } }
 
+    private static let downloads = DispatchQueue(label: "org.szeremeta.vespertine.network-cache", qos: .utility, attributes: .concurrent)
+
     private func pump() {
         lock.lock()
         var started: [Job] = []
@@ -219,8 +221,10 @@ public final class NetworkCache: @unchecked Sendable {
             started.append(job)
         }
         lock.unlock()
+        // Plain GCD threads, not the Swift concurrency pool: a download blocks in read() for as long as the share
+        // takes (minutes on a NAS waking its disks), and blocked pool threads stall every other task in the app.
         for job in started {
-            Task.detached(priority: .utility) { [self] in
+            Self.downloads.async { [self] in
                 finish(job, ok: download(job))
             }
         }

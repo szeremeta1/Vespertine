@@ -245,10 +245,13 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
             guard let sb = output?.copyNextSampleBuffer() else { return nil }
             guard let block = CMSampleBufferGetDataBuffer(sb) else { continue }
             let count = CMSampleBufferGetNumSamples(sb)
-            var total = 0; var pointer: UnsafeMutablePointer<CChar>?
-            CMBlockBufferGetDataPointer(block, atOffset: 0, lengthAtOffsetOut: nil, totalLengthOut: &total, dataPointerOut: &pointer)
-            guard let pointer else { continue }
-            let bytes = UnsafeRawBufferPointer(start: pointer, count: total)
+            // Copied out rather than read through the first block's pointer: a block buffer can be several
+            // non-contiguous pieces, and reading `total` bytes from the first one would run past it.
+            let total = CMBlockBufferGetDataLength(block)
+            guard total > 0 else { continue }
+            var bytes = [UInt8](repeating: 0, count: total)
+            guard bytes.withUnsafeMutableBytes({ CMBlockBufferCopyDataBytes(block, atOffset: 0, dataLength: total, destination: $0.baseAddress!) })
+                    == kCMBlockBufferNoErr else { continue }
             var offset = 0
             for i in 0..<count {
                 let size = CMSampleBufferGetSampleSize(sb, at: i)

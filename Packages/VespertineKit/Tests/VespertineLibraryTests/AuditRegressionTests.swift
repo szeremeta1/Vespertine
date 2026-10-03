@@ -493,3 +493,74 @@ private func cue(_ title: String = "Second", at url: URL) throws {
     }
 
 }
+
+/// Removing a share after a failed unmount must never delete what's inside the mount folder (the music on the server).
+@Test func unmountCleanupNeverDeletesContents() async throws {
+    let base = try fixture()
+    defer { try? FileManager.default.removeItem(at: base) }
+    let stillMounted = base.appendingPathComponent("share", isDirectory: true)
+    try FileManager.default.createDirectory(at: stillMounted, withIntermediateDirectories: true)
+    let song = stillMounted.appendingPathComponent("song.flac")
+    try Data([1, 2, 3]).write(to: song)
+    await NetworkVolume.forceUnmount(stillMounted, ownedBy: base)
+    await NetworkVolume.unmount(stillMounted, ownedBy: base)
+    #expect(FileManager.default.fileExists(atPath: song.path))
+
+    let empty = base.appendingPathComponent("gone", isDirectory: true)
+    try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+    #expect(!NetworkVolume.isMountPoint(empty))
+    NetworkVolume.removeEmptyMountFolder(empty, ownedBy: base)
+    #expect(!FileManager.default.fileExists(atPath: empty.path))
+    #expect(NetworkVolume.isMountPoint(URL(fileURLWithPath: "/")))
+
+    // A sibling that merely starts with the same name isn't inside `base`.
+    let sibling = URL(fileURLWithPath: base.path + "-backup", isDirectory: true)
+    try FileManager.default.createDirectory(at: sibling, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: sibling) }
+    NetworkVolume.removeEmptyMountFolder(sibling, ownedBy: base)
+    #expect(FileManager.default.fileExists(atPath: sibling.path))
+}
+
+/// A folder that can't be listed is reported, not fatal: the rest of the source is still listed.
+@Test func unreadableFolderDoesNotStopTheListing() async throws {
+    let root = try fixture()
+    let locked = root.appendingPathComponent("locked", isDirectory: true)
+    try FileManager.default.createDirectory(at: locked, withIntermediateDirectories: true)
+    try audio(root.appendingPathComponent("open.wav"))
+    try audio(locked.appendingPathComponent("hidden.wav"))
+    try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: locked.path)
+    defer {
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)
+        try? FileManager.default.removeItem(at: root)
+    }
+    let listing = try await LibraryScanner.list(root)
+    #expect(listing.audio.map(\.url.lastPathComponent) == ["open.wav"])
+    #expect(listing.unreadable.count == 1)
+    #expect(listing.unreadable.first?.hasSuffix("/locked") == true)
+}
+
+/// A rescan that can't list a folder keeps the songs already indexed under it, and still picks up the rest.
+@Test func rescanKeepsTracksUnderUnreadableFolder() async throws {
+    let root = try fixture()
+    let locked = root.appendingPathComponent("locked", isDirectory: true)
+    try FileManager.default.createDirectory(at: locked, withIntermediateDirectories: true)
+    try audio(root.appendingPathComponent("open.wav"))
+    try audio(locked.appendingPathComponent("hidden.wav"))
+    defer {
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)
+        try? FileManager.default.removeItem(at: root)
+    }
+    let db = try LibraryDatabase.inMemory()
+    let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: root.appendingPathComponent(".art")))
+    await scanner.setSkipsNonMusic(false) // fixtures are short clips
+    let source = try db.addSource(LibrarySource(path: root.path, mode: .reference))
+    try await scanner.scan(source)
+    #expect(Set(try db.allTracks().map(\.fileURL.lastPathComponent)) == ["open.wav", "hidden.wav"])
+
+    try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: locked.path)
+    try audio(root.appendingPathComponent("added.wav"))
+    let summary = try await scanner.scan(source)
+    #expect(summary.missing == 0)
+    #expect(summary.failed.contains { $0.hasSuffix("/locked") })
+    #expect(Set(try db.allTracks().map(\.fileURL.lastPathComponent)) == ["open.wav", "hidden.wav", "added.wav"])
+}

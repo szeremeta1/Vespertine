@@ -31,6 +31,10 @@ targets:
         buildPhase: resources
       - path: THIRD-PARTY-NOTICES.md
         buildPhase: resources
+      # Full license and copyright texts of the bundled components (Contents/Resources/Licenses).
+      - path: App/Licenses
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: VespertineKit
         product: VespertineAudio
@@ -56,6 +60,9 @@ targets:
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
         SUAllowsAutomaticUpdates: true
+        # Check the update's EdDSA signature before the archive is even opened, not only before it's installed.
+        # Signed feeds (SURequireSignedFeed) need this too; turn that on once a release has gone through with it.
+        SUVerifyUpdateBeforeExtraction: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: Audio File
             CFBundleTypeRole: Viewer

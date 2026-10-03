@@ -17,7 +17,7 @@ enum Palette {
 
     static let text = Color(hex: 0xECE6DA)
     static let text2 = Color(hex: 0xA29B8F)
-    static let text3 = Color(hex: 0x69645C)
+    static let text3 = Color(hex: 0x8C867C)   // at least 4.5:1 on every background here (WCAG AA), even at 10 pt
 
     static let brass = Color(hex: 0xC8A66A)
     static let brassHi = Color(hex: 0xE7CD98)
@@ -143,7 +143,12 @@ struct TransportIconStyle: ButtonStyle {
         configuration.label
             .foregroundStyle(active ? Palette.brassHi : (configuration.isPressed ? Palette.text : Palette.text2))
             .frame(width: 28, height: 28)
+            // On is also a dot under the symbol, not only a colour (shuffle, repeat, queue, inspector).
+            .overlay(alignment: .bottom) {
+                if active { Circle().fill(Palette.brassHi).frame(width: 3, height: 3).offset(y: 1) }
+            }
             .contentShape(Rectangle())
+            .accessibilityAddTraits(active ? .isSelected : [])
     }
 }
 
@@ -176,6 +181,10 @@ struct BrassSlider: View {
     @Binding var value: Double          // 0…1
     var tint: Color = Palette.brass
     var showsThumb = true
+    /// What VoiceOver calls it ("Position", "Volume"), how it reads the value, and how far one swipe moves it.
+    var accessibilityName = ""
+    var accessibilityValueText: (Double) -> String = { "\(Int((max(0, min(1, $0)) * 100).rounded())) percent" }
+    var accessibilityStep = 0.05
     var onEditingChanged: (Bool) -> Void = { _ in }
     @State private var dragging = false
     @State private var hovering = false
@@ -208,6 +217,21 @@ struct BrassSlider: View {
         }
         .frame(height: 14)
         .animation(.easeOut(duration: 0.12), value: dragging)
+        // Drawn from shapes, so it says what it is and takes VoiceOver's (and Full Keyboard Access's) adjust actions,
+        // as one edit each (a seek happens when the edit ends, as after a drag).
+        .accessibilityElement()
+        .accessibilityLabel(accessibilityName)
+        .accessibilityValue(accessibilityValueText(value))
+        .accessibilityAdjustableAction { direction in
+            let delta: Double = switch direction {
+            case .increment: accessibilityStep
+            case .decrement: -accessibilityStep
+            @unknown default: 0
+            }
+            onEditingChanged(true)
+            value = max(0, min(1, value + delta))
+            onEditingChanged(false)
+        }
     }
 }
 

@@ -51,7 +51,12 @@ app="$out/Vespertine.app"
 make_dmg() {
   local version=$1 dest=$2
   local art="$out/dmg-art"
-  [[ -x build/.venv/bin/dmgbuild ]] || { python3 -m venv build/.venv && build/.venv/bin/pip install -q dmgbuild; }
+  # Pinned with hashes, and reinstalled when the pins change.
+  if ! cmp -s scripts/dmgbuild-requirements.txt build/.venv/requirements.txt 2>/dev/null; then
+    rm -rf build/.venv && python3 -m venv build/.venv
+    build/.venv/bin/pip install -q --require-hashes --no-deps -r scripts/dmgbuild-requirements.txt
+    cp scripts/dmgbuild-requirements.txt build/.venv/requirements.txt
+  fi
   swift scripts/make-dmg-background.swift "$version" "$art" >/dev/null
   rm -f "$dest"
   if ! build/.venv/bin/dmgbuild -s scripts/dmg-settings.py -D app="$app" -D background="$art/background.png" \
@@ -74,19 +79,19 @@ sign_sparkle() {
 
 # A release is built from committed sources, and records which commit (publish.sh tags that one, not whatever HEAD is
 # by then). Untracked files count too: XcodeGen builds every file in the source folders, committed or not.
-# VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. Package.resolved doesn't count: Xcode and
-# SwiftPM each rewrite it after every build (Xcode adds the app's own packages to it, `swift test` takes them out
-# again), so it's never clean for long.
-if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=all -- . ':(exclude)*Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
+# VESPERTINE_ALLOW_DIRTY=1 allows a test build from a tree with changes. The packages' own Package.resolved files don't
+# count: SwiftPM rewrites them after builds and tests. The app's lockfile, App/Package.resolved, does: it decides what
+# ships.
+if ! $resume && $notarize && [[ -n "$(git status --porcelain --untracked-files=all -- . ':(exclude)Packages/*/Package.resolved')" && -z ${VESPERTINE_ALLOW_DIRTY:-} ]]; then
   print -u2 "The working tree has uncommitted or untracked files: commit or remove them first (or set VESPERTINE_ALLOW_DIRTY=1 for a test build)."
-  git status --short --untracked-files=all -- . ':(exclude)*Package.resolved' >&2
+  git status --short --untracked-files=all -- . ':(exclude)Packages/*/Package.resolved' >&2
   exit 2
 fi
 
 if ! $resume; then
-  xcodegen generate >/dev/null
+  scripts/generate-project.sh
   xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -derivedDataPath "$derived" \
-    -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY=- \
+    -onlyUsePackageVersionsFromResolvedFile -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY=- \
     ${VESPERTINE_VERSION:+MARKETING_VERSION=$VESPERTINE_VERSION} ${VESPERTINE_BUILD:+CURRENT_PROJECT_VERSION=$VESPERTINE_BUILD} build > "$out".log 2>&1 \
     || { grep -E "error:" "$out".log; exit 1; }
 

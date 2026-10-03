@@ -38,6 +38,9 @@ struct MiniPlayerView: View {
                                  : path.deviceFormatShort)
                                 .font(Typeface.mono(10))
                                 .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                                .help(path.isBitPerfect ? "Bit-perfect" : "Converted on the way to the device")
+                                .accessibilityLabel(path.isBitPerfect ? "Bit-perfect" : "Converted")
+                                .accessibilityValue(path.deviceFormatShort)
                         }
                     }
                 }

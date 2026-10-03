@@ -96,7 +96,7 @@ struct TrackTable: View {
             }
             .width(min: 150, ideal: 190)
 
-            TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3)) { row in
+            TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
                 FavoriteCell(model: model, track: row.track,
                              emphasized: selection.contains(row.id) || model.player.current?.track.id == row.track.id)
             }

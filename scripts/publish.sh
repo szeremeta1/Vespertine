@@ -32,8 +32,11 @@ built=${provenance[1]:-} dmg_sha=${provenance[2]:-}
 feed="$out/appcast"
 rm -rf "$feed" && mkdir -p "$feed"
 cp "$dmg" "$feed/"
-# Carry forward the existing feed so older versions stay listed.
+# Carry forward the existing feed so older versions stay listed. Its channel title is carried over from the feed's
+# Nocturne days; it's fixed here, before generate_appcast, because nothing may edit the appcast after it's written:
+# with a signed feed (SURequireSignedFeed) any later edit breaks the signature and every installed copy's updates.
 gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/null || print "No existing appcast; starting a new one."
+[[ ! -f "$feed/appcast.xml" ]] || /usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
 
 # Sparkle shows HTML release notes placed beside the archive.
 /usr/bin/python3 - "$notes" "$feed/Vespertine-$version.html" <<'PY'
@@ -80,8 +83,6 @@ first_vespertine_build=27
   --link "https://github.com/$repo/releases/latest" --embed-release-notes --maximum-deltas 0 \
   --informational-update-versions "<$first_vespertine_build" \
   -o "$feed/appcast.xml" "$feed"
-# The channel title was carried over from the feed's Nocturne days.
-/usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
 # generate_appcast only warns (and exits 0) when it can't sign, and the entries carried over from older
 # releases are always signed, so check this release's own entry, and that the keychain key is the one
 # installed copies trust. Either failure would publish an update every installed copy refuses.
@@ -96,13 +97,22 @@ signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
 sys.exit(0 if signed else 1)
 PY
 
+# The FFmpeg decoders are LGPL: the exact source they were built from goes up with every release, checked against
+# the hash build-dts-decoder.sh builds from, so it stays available as long as the release does.
+ffmpeg_version=$(sed -n 's/^version=//p' scripts/build-dts-decoder.sh)
+ffmpeg_sha=$(sed -n 's/^sha256=//p' scripts/build-dts-decoder.sh)
+ffmpeg_source="$out/ffmpeg-$ffmpeg_version.tar.xz"
+[[ -f $ffmpeg_source ]] || curl -sSfL "https://ffmpeg.org/releases/ffmpeg-$ffmpeg_version.tar.xz" -o "$ffmpeg_source"
+print "$ffmpeg_sha  $ffmpeg_source" | shasum -a 256 -c - >/dev/null \
+  || { print -u2 "$ffmpeg_source doesn't match the SHA-256 in scripts/build-dts-decoder.sh."; exit 1; }
+
 if ! git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
   git tag -s "v$version" -m "Vespertine $version" "$built"
 fi
 [[ "$(git rev-parse "v$version^{commit}")" == "$built" ]] \
   || { print -u2 "Tag v$version doesn't point at the commit this app was built from ($built)."; exit 1; }
 git push -q origin "v$version"
-gh release create "v$version" "$dmg" "$feed/appcast.xml" --repo "$repo" --verify-tag --latest \
+gh release create "v$version" "$dmg" "$feed/appcast.xml" "$ffmpeg_source" --repo "$repo" --verify-tag --latest \
   --title "Vespertine $version" --notes-file "$notes"
 
 # Homebrew: point the cask in szeremeta1/homebrew-tap at this release (a commit through GitHub's API).

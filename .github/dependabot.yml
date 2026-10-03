@@ -1,0 +1,7 @@
+# Proposes updates for the pinned GitHub Actions (by commit) once a week.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
