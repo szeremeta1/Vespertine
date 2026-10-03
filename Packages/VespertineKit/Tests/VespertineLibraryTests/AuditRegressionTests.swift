@@ -493,3 +493,23 @@ private func cue(_ title: String = "Second", at url: URL) throws {
     }
 
 }
+
+/// Removing a share after a failed unmount must never delete what's inside the mount folder (the music on the server).
+@Test func unmountCleanupNeverDeletesContents() async throws {
+    let base = try fixture()
+    defer { try? FileManager.default.removeItem(at: base) }
+    let stillMounted = base.appendingPathComponent("share", isDirectory: true)
+    try FileManager.default.createDirectory(at: stillMounted, withIntermediateDirectories: true)
+    let song = stillMounted.appendingPathComponent("song.flac")
+    try Data([1, 2, 3]).write(to: song)
+    await NetworkVolume.forceUnmount(stillMounted, ownedBy: base)
+    await NetworkVolume.unmount(stillMounted, ownedBy: base)
+    #expect(FileManager.default.fileExists(atPath: song.path))
+
+    let empty = base.appendingPathComponent("gone", isDirectory: true)
+    try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+    #expect(!NetworkVolume.isMountPoint(empty))
+    NetworkVolume.removeEmptyMountFolder(empty, ownedBy: base)
+    #expect(!FileManager.default.fileExists(atPath: empty.path))
+    #expect(NetworkVolume.isMountPoint(URL(fileURLWithPath: "/")))
+}
