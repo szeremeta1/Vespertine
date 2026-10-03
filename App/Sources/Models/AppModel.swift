@@ -297,13 +297,14 @@ final class AppModel {
 
     var selectedTracks: [Track] { library.tracks(ids: Array(selectedTrackIDs)) }
 
-    /// Adds songs to Favorites, or removes them when every one already is a favorite. Undoable in the
+    /// Adds songs to Favorites, or removes them when every one already is a favorite. A song is all its
+    /// versions: favoriting its stereo version on headphones favorites its 5.1 one too. Undoable in the
     /// window you're in (⌘Z brings back a heart clicked by mistake); SwiftUI's own undo manager is nil in
     /// these windows, so it's the AppKit window's.
     func toggleFavorite(_ tracks: [Track]) {
-        let ids = tracks.compactMap(\.id)
-        guard !ids.isEmpty else { return }
-        let favorite = !ids.allSatisfy(library.favoriteIDs.contains)
+        guard tracks.contains(where: { $0.id != nil }) else { return }
+        let favorite = !tracks.filter { $0.id != nil }.allSatisfy(library.isFavorite)
+        let ids = Array(Set(library.versions(of: tracks).flatMap { $0 }.compactMap(\.id) + tracks.compactMap(\.id)))
         // Only the songs that change, so undo restores exactly what was there.
         let changed = ids.filter { library.favoriteIDs.contains($0) != favorite }
         setFavorite(favorite, trackIDs: changed, undoManager: NSApp.keyWindow?.undoManager ?? NSApp.mainWindow?.undoManager)
