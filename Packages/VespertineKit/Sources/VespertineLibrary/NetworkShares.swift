@@ -378,7 +378,9 @@ public enum NetworkVolume {
     /// folder (rmdir, never a recursive delete) and never while something is still mounted there: a failed or
     /// partial unmount must not turn into deleting the music on the server.
     static func removeEmptyMountFolder(_ mountPoint: URL, ownedBy base: URL) {
-        guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path),
+        // Inside `base` by whole path components: "…/Shares-backup" is not inside "…/Shares".
+        let basePath = base.standardizedFileURL.path
+        guard mountPoint.standardizedFileURL.path.hasPrefix(basePath.hasSuffix("/") ? basePath : basePath + "/"),
               !isMountPoint(mountPoint) else { return }
         _ = Darwin.rmdir(mountPoint.path)
     }

@@ -22,6 +22,9 @@ final class AnalysisQueue {
     /// by hand (one insert or remove as a track starts), not rebuilt on every change: rebuilding it for each track
     /// taken off a queue of tens of thousands made draining the queue quadratic.
     @ObservationIgnored private var pendingPaths: Set<String> = []
+    /// The offline shares the queue was last cleared of, so a pass that has nothing new to clear doesn't walk the
+    /// queue (it runs after every finished track). Nil once tracks are added: they haven't been looked at yet.
+    @ObservationIgnored private var clearedOffline: Set<Int64>?
     private(set) var active: Set<String> = []     // file paths being analyzed
     private var activeNetwork = 0
     private(set) var completed = 0
@@ -89,6 +92,7 @@ final class AnalysisQueue {
         let paths = Set(files.map(\.filePath))
         pending.removeAll { paths.contains($0.filePath) }
         pending.insert(contentsOf: files.filter { !active.contains($0.filePath) }, at: 0)
+        clearedOffline = nil
         rebuildPendingPaths()
         start(adding: files.count)
     }
@@ -102,6 +106,7 @@ final class AnalysisQueue {
         guard let tracks = try? library.database.tracksNeedingAnalysis(excludingSources: excluded) else { return }
         let fresh = tracks.filter { t in !isAnalyzing(t) }
         pending.append(contentsOf: fresh)
+        clearedOffline = nil
         rebuildPendingPaths()
         start(adding: fresh.count)
     }
@@ -167,13 +172,18 @@ final class AnalysisQueue {
 
     private func pump() {
         // Offline shares: skip their tracks for now (the next pass picks them up), all in one go rather than one
-        // array shift at a time, which on a large offline share held the main thread for many seconds.
-        let queued = pending.count
-        pending.removeAll { shares.isNetwork($0) && !shares.isReachable($0) }
-        if pending.count != queued {
-            completed += queued - pending.count
-            rebuildPendingPaths()
+        // array shift at a time, which on a large offline share held the main thread for many seconds. The queue is
+        // only walked when a share has gone offline since the last pass or tracks were added, not after every track.
+        let offline = Set(library.sources.filter { $0.isNetwork && !shares.status(of: $0).isConnected }.compactMap(\.id))
+        if !offline.isEmpty, !(clearedOffline.map { offline.isSubset(of: $0) } ?? false) {
+            let queued = pending.count
+            pending.removeAll { $0.sourceId.map(offline.contains) ?? false }
+            if pending.count != queued {
+                completed += queued - pending.count
+                rebuildPendingPaths()
+            }
         }
+        clearedOffline = offline
         while let index = nextStartable() {
             let next = pending.remove(at: index)
             pendingPaths.remove(next.filePath)
@@ -203,6 +213,7 @@ final class AnalysisQueue {
                 case .failure(AnalysisError.cancelled):
                     pending.append(next)          // stood aside for playback; try again later
                     pendingPaths.insert(next.filePath)
+                    clearedOffline = nil
                 case .failure:
                     failures += 1
                     completed += 1
