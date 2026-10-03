@@ -363,7 +363,7 @@ public enum NetworkVolume {
         await blocking(timeout: timeout, otherwise: ()) {
             guard isOwnMount(mountPoint, legacyBase: base) else { return }
             _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
-            if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { try? FileManager.default.removeItem(at: mountPoint) }
+            removeEmptyMountFolder(mountPoint, ownedBy: base)
         }
     }
 
@@ -371,9 +371,28 @@ public enum NetworkVolume {
     public static func unmount(_ mountPoint: URL, ownedBy base: URL) async {
         guard await blocking(timeout: 8, otherwise: false, { isOwnMount(mountPoint, legacyBase: base) }) else { return }
         try? await FileManager.default.unmountVolume(at: mountPoint, options: [.withoutUI])
-        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) {
-            await blocking(timeout: 8, otherwise: ()) { try? FileManager.default.removeItem(at: mountPoint) }
-        }
+        await blocking(timeout: 8, otherwise: ()) { removeEmptyMountFolder(mountPoint, ownedBy: base) }
+    }
+
+    /// Removes the folder an older version mounted a share on, once the share is gone from it. Only ever an empty
+    /// folder (rmdir, never a recursive delete) and never while something is still mounted there: a failed or
+    /// partial unmount must not turn into deleting the music on the server.
+    static func removeEmptyMountFolder(_ mountPoint: URL, ownedBy base: URL) {
+        guard mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path),
+              !isMountPoint(mountPoint) else { return }
+        _ = Darwin.rmdir(mountPoint.path)
+    }
+
+    /// Whether something is mounted at `url`: it's on a different device from its parent folder, or statfs says
+    /// it's the root of a file system. Unknown (stat fails) counts as mounted, so nothing is removed.
+    static func isMountPoint(_ url: URL) -> Bool {
+        var own = stat(), parent = stat()
+        guard stat(url.path, &own) == 0, stat(url.deletingLastPathComponent().path, &parent) == 0 else { return true }
+        if own.st_dev != parent.st_dev { return true }
+        var fs = statfs()
+        guard statfs(url.path, &fs) == 0 else { return true }
+        let root = withUnsafeBytes(of: fs.f_mntonname) { bytes in String(decoding: bytes.prefix { $0 != 0 }, as: UTF8.self) }
+        return root == url.standardizedFileURL.resolvingSymlinksInPath().path
     }
 }
 
