@@ -434,12 +434,13 @@ struct IdleDevicePanel: View {
 /// Live spectrum of exactly what the DAC receives.
 struct SpectrumView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var bands = [Float](repeating: 0, count: 32)
     @State private var buffer = [Float](repeating: 0, count: 4096)
     private let analyzer = SpectrumAnalyzer(size: 4096)
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: !model.player.isPlaying)) { context in
+        TimelineView(.animation(minimumInterval: reduceMotion ? 1 / 4 : 1 / 30, paused: !model.player.isPlaying)) { context in
             Canvas { ctx, size in
                 let n = bands.count
                 let gap: CGFloat = 2

@@ -17,7 +17,7 @@ enum Palette {
 
     static let text = Color(hex: 0xECE6DA)
     static let text2 = Color(hex: 0xA29B8F)
-    static let text3 = Color(hex: 0x69645C)
+    static let text3 = Color(hex: 0x8C867C)   // at least 4.5:1 on every background here (WCAG AA), even at 10 pt
 
     static let brass = Color(hex: 0xC8A66A)
     static let brassHi = Color(hex: 0xE7CD98)
