@@ -14,7 +14,7 @@ body:
     attributes:
       label: Vespertine version
       description: Vespertine → About Vespertine.
-      placeholder: "0.6.4 (Vespertine › About Vespertine)"
+      placeholder: "0.7.1 (Vespertine › About Vespertine)"
     validations:
       required: true
   - type: input
