@@ -383,19 +383,26 @@ public extension LibraryDatabase {
     /// The tracks of several albums in one read: album after album as given, each in its own order.
     func tracks(albumKeys: [String]) throws -> [Track] {
         guard !albumKeys.isEmpty else { return [] }
-        let byAlbum = try writer.read { db in
-            var found: [Track] = []
-            // A long list is read in parts (SQLite caps the number of arguments).
-            for start in stride(from: 0, to: albumKeys.count, by: 900) {
-                let part = Array(albumKeys[start..<min(start + 900, albumKeys.count)])
-                let marks = Array(repeating: "?", count: part.count).joined(separator: ",")
-                found += try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND albumKey IN (\(marks))",
-                                            arguments: StatementArguments(part))
-            }
-            return Dictionary(grouping: found, by: \.albumKey)
+        let found = try writer.read { db in try Self.tracks(db, albumKeys: albumKeys) }
+        return Self.inAlbumOrder(found, albumKeys: albumKeys)
+    }
+
+    private static func tracks(_ db: Database, albumKeys: [String]) throws -> [Track] {
+        var found: [Track] = []
+        // A long list is read in parts (SQLite caps the number of arguments).
+        for start in stride(from: 0, to: albumKeys.count, by: 900) {
+            let part = Array(albumKeys[start..<min(start + 900, albumKeys.count)])
+            let marks = Array(repeating: "?", count: part.count).joined(separator: ",")
+            found += try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND albumKey IN (\(marks))",
+                                        arguments: StatementArguments(part))
         }
+        return found
+    }
+
+    private static func inAlbumOrder(_ tracks: [Track], albumKeys: [String]) -> [Track] {
+        let byAlbum = Dictionary(grouping: tracks, by: \.albumKey)
         var seen = Set<String>()
-        return albumKeys.flatMap { key in seen.insert(key).inserted ? Self.albumOrder(byAlbum[key] ?? []) : [] }
+        return albumKeys.flatMap { key in seen.insert(key).inserted ? albumOrder(byAlbum[key] ?? []) : [] }
     }
 
     /// An album's tracks in disc and track order. Track numbers that repeat on one disc (an SACD rip's
@@ -594,6 +601,36 @@ public extension LibraryDatabase {
                     try db.execute(sql: "DELETE FROM favorite WHERE trackId = ?", arguments: [id])
                 }
             }
+        }
+    }
+
+    /// A favorite is a song, not a file: every version and copy of a favorite song on its album (its stereo and
+    /// 5.1 versions, the same song on a share) is a favorite too, from the date the song first was. Covers songs
+    /// favorited one version at a time and versions added since. Returns how many favorite songs there are
+    /// (present files only), the number the sidebar shows.
+    @discardableResult
+    func favoriteEveryVersion() throws -> Int {
+        try writer.write { db in
+            let rows = try Row.fetchAll(db, sql: """
+                SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date
+                FROM favorite JOIN track ON track.id = favorite.trackId WHERE track.isMissing = 0
+                """)
+            guard !rows.isEmpty else { return 0 }
+            var dates: [Int64: Date] = [:]
+            for row in rows { dates[row["id"] as Int64] = row["date"] as Date }
+            let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
+            let tracks = Self.inAlbumOrder(try Self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
+            var songs = 0
+            for album in Dictionary(grouping: tracks, by: \.albumKey).values {
+                for song in TrackVersions.group(album) {
+                    guard let date = song.compactMap({ $0.id.flatMap { dates[$0] } }).min() else { continue }
+                    songs += 1
+                    for id in song.compactMap(\.id) where dates[id] == nil {
+                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt) VALUES (?, ?)", arguments: [id, date])
+                    }
+                }
+            }
+            return songs
         }
     }
 

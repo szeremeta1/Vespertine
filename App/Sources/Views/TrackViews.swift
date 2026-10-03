@@ -267,11 +267,33 @@ struct TrackMenu: View {
 struct SongList {
     var tracks: [Track] = []
     var facts: [FilterFacts] = []
+    /// Pages that list a song once, however many versions it has (Favorites): each track's song, as an index
+    /// into `songs`, and every song's versions. nil on pages that list every file.
+    var songOf: [Int]? = nil
+    var songs: [[Track]] = []
 
     init() {}
     @MainActor init(_ tracks: [Track], model: AppModel) {
         self.tracks = tracks
         facts = model.trackFacts(tracks)
+    }
+
+    /// `tracks` as songs: each with all its versions on its album (the 5.1 one beside the stereo one that was
+    /// favorited), in the order the songs first appear.
+    @MainActor init(songs tracks: [Track], model: AppModel) {
+        var index: [String: Int] = [:]
+        var listed: [Track] = [], songOf: [Int] = []
+        for song in model.library.versions(of: tracks) {
+            let key = song.map(\.location).sorted().joined(separator: "\u{1F}")
+            guard index[key] == nil else { continue }
+            index[key] = songs.count
+            listed += song
+            songOf += Array(repeating: songs.count, count: song.count)
+            songs.append(song)
+        }
+        self.tracks = listed
+        self.songOf = songOf
+        facts = model.trackFacts(listed)
     }
 }
 
@@ -293,7 +315,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
         let favorites = model.library.favoriteIDs
         let indices = filter.isEmpty || list.facts.count != list.tracks.count ? Array(list.tracks.indices)
             : list.tracks.indices.filter { filter.matches(list.facts[$0], favorite: favorites.contains(list.tracks[$0].id ?? -1)) }
-        let shown = indices.map { list.tracks[$0] }
+        let (shown, others): ([Track], [Int64: String]) = list.songOf.map { oneVersionEach(indices, songOf: $0) } ?? (indices.map { list.tracks[$0] }, [:])
         VStack(spacing: 0) {
             PageHeader(title: title, meta: meta(shown, filtered: !filter.isEmpty)) {
                 extra
@@ -312,7 +334,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
                 } else {
                     // A filtered playlist keeps its own numbers, and edits through it keep the songs out of view.
                     let partial = !filter.isEmpty && playlist?.isSmart == false
-                    TrackTable(tracks: shown, reorderable: playlist,
+                    TrackTable(tracks: shown, reorderable: playlist, otherVersions: others,
                                positions: partial ? indices : nil, allTracks: partial ? list.tracks : nil)
                 }
             }
@@ -320,9 +342,28 @@ struct SongsPage<Extra: View, Empty: View>: View {
         .background(Palette.window)
     }
 
+    /// A song in several versions shows once, as album pages show it: the version that plays on this output among
+    /// those the filter lets through (the 5.1 one when the page asks for multichannel), the others named beside it.
+    private func oneVersionEach(_ indices: [Int], songOf: [Int]) -> ([Track], [Int64: String]) {
+        var order: [Int] = []
+        var passing: [Int: [Track]] = [:]
+        for i in indices {
+            if passing[songOf[i]] == nil { order.append(songOf[i]) }
+            passing[songOf[i], default: []].append(list.tracks[i])
+        }
+        let wanted = model.outputWantsMultichannel() ?? true
+        let shares = model.shares
+        let shown = order.map { s in
+            let versions = passing[s] ?? []
+            return TrackVersions.choose(versions, multichannel: wanted, isLocal: { !shares.isNetwork($0) }) ?? versions[0]
+        }
+        return (shown, AlbumDetailView.otherVersions(of: order.map { list.songs[$0] }, shown: shown))
+    }
+
     private func meta(_ shown: [Track], filtered: Bool) -> String {
         let n = shown.count
-        let count = filtered ? "\(n.formatted()) of \(list.tracks.count.formatted()) \(word)s" : "\(n.formatted()) \(word)\(n == 1 ? "" : "s")"
+        let total = list.songOf == nil ? list.tracks.count : list.songs.count
+        let count = filtered ? "\(n.formatted()) of \(total.formatted()) \(word)s" : "\(n.formatted()) \(word)\(n == 1 ? "" : "s")"
         return "\(kicker)\(count) · \(shown.reduce(0) { $0 + $1.duration }.longDuration)"
     }
 }
