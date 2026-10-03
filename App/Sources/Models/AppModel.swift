@@ -337,7 +337,7 @@ final class AppModel {
         Task {
             await library.addFolders([url], mode: .reference, managedRoot: url.deletingLastPathComponent())
             let path = url.resolvingSymlinksInPath().path
-            let tracks = library.allTracks().filter { $0.filePath == path }
+            let tracks = library.tracks(filePath: path)
             if !tracks.isEmpty { player.play(tracks) }
         }
     }

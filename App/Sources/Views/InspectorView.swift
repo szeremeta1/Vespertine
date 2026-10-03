@@ -15,7 +15,7 @@ struct InspectorView: View {
     var body: some View {
         @Bindable var model = model
         VStack(spacing: 0) {
-            Picker("", selection: $model.inspectorTab) {
+            Picker("Inspector view", selection: $model.inspectorTab) {
                 ForEach(InspectorTab.allCases) { Text($0.rawValue).tag($0) }
             }
             .pickerStyle(.segmented)
@@ -434,12 +434,13 @@ struct IdleDevicePanel: View {
 /// Live spectrum of exactly what the DAC receives.
 struct SpectrumView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var bands = [Float](repeating: 0, count: 32)
     @State private var buffer = [Float](repeating: 0, count: 4096)
     private let analyzer = SpectrumAnalyzer(size: 4096)
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: !model.player.isPlaying)) { context in
+        TimelineView(.animation(minimumInterval: reduceMotion ? 1 / 4 : 1 / 30, paused: !model.player.isPlaying)) { context in
             Canvas { ctx, size in
                 let n = bands.count
                 let gap: CGFloat = 2
@@ -499,7 +500,7 @@ struct AnalysisPanel: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 if let selected, let playing, selected.id != playing.id {
-                    Picker("", selection: Binding(get: { subject ?? .playing }, set: { pinned = $0 })) {
+                    Picker("Analyze", selection: Binding(get: { subject ?? .playing }, set: { pinned = $0 })) {
                         Text("Playing").tag(Subject.playing)
                         Text("Selected").tag(Subject.selection)
                     }

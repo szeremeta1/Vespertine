@@ -26,13 +26,16 @@ struct TransportBar: View {
                 Button { showQueue.toggle() } label: { Image(systemName: "list.bullet").font(.system(size: 14)) }
                     .buttonStyle(TransportIconStyle(active: showQueue))
                     .help("Queue")
+                    .accessibilityLabel("Queue")
                     .popover(isPresented: $showQueue, arrowEdge: .top) { QueueView().environment(model).frame(width: 380, height: 460) }
                 Button { openWindow(id: "mini") } label: { Image(systemName: "pip").font(.system(size: 14)) }
                     .buttonStyle(TransportIconStyle())
                     .help("Mini Player (⇧⌘M)")
+                    .accessibilityLabel("Mini Player")
                 Button { model.showInspector.toggle() } label: { Image(systemName: "sidebar.right").font(.system(size: 14)) }
                     .buttonStyle(TransportIconStyle(active: model.showInspector))
                     .help("Inspector (⌥⌘I)")
+                    .accessibilityLabel("Inspector")
             }
             .fixedSize()
         }
@@ -47,15 +50,19 @@ struct TransportBar: View {
             ArtworkView(key: model.player.current?.track.artworkKey, size: 160, cornerRadius: 5)
                 .frame(width: 46, height: 46)
             if let track = model.player.current?.track {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)
-                    Text("\(track.displayArtist) — \(track.displayAlbum)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
-                }
-                .contentShape(Rectangle())
-                .onTapGesture {
+                Button {
                     model.sidebar = .albums
                     model.path = [.album(track.albumKey)]
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)
+                        Text("\(track.displayArtist) — \(track.displayAlbum)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(track.title), \(track.displayArtist), \(track.displayAlbum)")
+                .accessibilityHint("Opens the album")
                 FavoriteButton(track: track)
             } else {
                 Text("Not Playing").font(Typeface.serif(14)).foregroundStyle(Palette.text3)
@@ -75,9 +82,12 @@ struct TransportControls: View {
                 if !compact {
                     Button { player.shuffle.toggle() } label: { Image(systemName: "shuffle").font(.system(size: 13)) }
                         .buttonStyle(TransportIconStyle(active: player.shuffle)).help("Shuffle")
+                        .accessibilityLabel("Shuffle")
+                        .accessibilityValue(player.shuffle ? "On" : "Off")
                 }
                 Button { player.previous() } label: { Image(systemName: "backward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
+                    .accessibilityLabel("Previous")
                 Button { player.togglePlayPause() } label: {
                     Image(systemName: player.isPlaying || player.waitingForDevice != nil ? "pause.fill" : "play.fill")
                         .font(.system(size: compact ? 12 : 14))
@@ -89,13 +99,17 @@ struct TransportControls: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.space, modifiers: [.option])
+                .accessibilityLabel(player.isPlaying || player.waitingForDevice != nil ? "Pause" : "Play")
                 Button { player.next() } label: { Image(systemName: "forward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
+                    .accessibilityLabel("Next")
                 if !compact {
                     Button {
                         player.repeatMode = switch player.repeatMode { case .off: .all; case .all: .one; case .one: .off }
                     } label: { Image(systemName: player.repeatMode.symbol).font(.system(size: 13)) }
                         .buttonStyle(TransportIconStyle(active: player.repeatMode != .off)).help("Repeat")
+                        .accessibilityLabel("Repeat")
+                        .accessibilityValue(player.repeatMode.spokenName)
                 }
             }
             if !compact { Scrubber() }
@@ -114,7 +128,10 @@ struct Scrubber: View {
         HStack(spacing: 10) {
             Text(shown.clock).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 44, alignment: .trailing)
             BrassSlider(value: Binding(get: { dragValue ?? (player.position / duration) }, set: { dragValue = $0 }),
-                        showsThumb: player.current != nil) { editing in
+                        showsThumb: player.current != nil,
+                        accessibilityName: "Position",
+                        accessibilityValueText: { "\(($0 * duration).clock) of \(duration.clock)" },
+                        accessibilityStep: min(1, 5 / duration)) { editing in
                 if !editing, let v = dragValue {
                     player.seek(to: v * duration)
                     dragValue = nil
@@ -162,6 +179,9 @@ struct DeviceChip: View {
         }
         .buttonStyle(.plain)
         .help("Output device")
+        // Bit-perfect or converted is said in words too, not only by the colour and the dot.
+        .accessibilityLabel("Output device, \(device?.name ?? "none")")
+        .accessibilityValue(path.map { "\($0.isBitPerfect ? "Bit-perfect" : "Converted"), \(chipDetail(device, $0))" } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
             DevicePicker().environment(model).frame(width: 360)
         }
@@ -229,7 +249,7 @@ struct DeviceSettings: View {
                 Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             }
             LabeledContent("Sample rate") {
-                Picker("", selection: Binding(get: { settings.rateChoice(for: device.uid) },
+                Picker("Sample rate", selection: Binding(get: { settings.rateChoice(for: device.uid) },
                                               set: { settings.setRateChoice($0, for: device.uid); model.syncEngine() })) {
                     Text(RateChoice.match.label).tag(RateChoice.match)
                     Text(RateChoice.maximum.label).tag(RateChoice.maximum)
@@ -262,7 +282,7 @@ struct DeviceSettings: View {
                         .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
-                Picker("", selection: Binding(get: { model.engineSpatialMode(for: device) },
+                Picker("Spatial Audio", selection: Binding(get: { model.engineSpatialMode(for: device) },
                                               set: { settings.spatialModes[device.uid] = $0.rawValue; model.syncEngine() })) {
                     ForEach(SpatialMode.allCases) { Text($0.label).tag($0) }
                 }
@@ -311,12 +331,12 @@ struct VolumeControl: View {
             Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundStyle(Palette.text2)
             if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
                 BrassSlider(value: Binding(get: { Double(v) }, set: { model.devices.setHardwareVolume(Float($0)) }),
-                            tint: Palette.text2, showsThumb: false)
+                            tint: Palette.text2, showsThumb: false, accessibilityName: "Hardware volume")
                     .frame(width: 72)
                 Text("HW").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched")
             } else if model.settings.allowDigitalVolume {
                 BrassSlider(value: Binding(get: { model.settings.digitalVolume }, set: { model.settings.digitalVolume = $0; model.syncEngine() }),
-                            tint: Palette.copper, showsThumb: false)
+                            tint: Palette.copper, showsThumb: false, accessibilityName: "Digital volume")
                     .frame(width: 84)
                 Text("DIG").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper).help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
             } else {
@@ -348,8 +368,12 @@ struct QueueView: View {
             List {
                 ForEach(Array(player.upcoming)) { entry in
                     row(entry, isCurrent: false)
-                        .contextMenu { Button("Remove") { player.removeFromQueue(entry.id) } }
+                        .contextMenu {
+                            Button("Play Now") { player.jump(to: entry.id) }
+                            Button("Remove") { player.removeFromQueue(entry.id) }
+                        }
                         .onTapGesture(count: 2) { player.jump(to: entry.id) }
+                        .accessibilityAction(named: "Play Now") { player.jump(to: entry.id) }
                 }
                 .onMove { player.moveUpcoming(from: $0, to: $1) }
                 .onDelete { idx in idx.map { Array(player.upcoming)[$0].id }.forEach(player.removeFromQueue) }
@@ -372,5 +396,8 @@ struct QueueView: View {
             Spacer()
             Text(e.track.formatSummary).font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
         }
+        // One VoiceOver stop per song: title, artist, format.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isCurrent ? .isSelected : [])
     }
 }

@@ -21,6 +21,13 @@ struct QueueEntry: Identifiable, Hashable {
 nonisolated enum RepeatMode: String, CaseIterable, Sendable {
     case off, all, one
     var symbol: String { self == .one ? "repeat.1" : "repeat" }
+    var spokenName: String {
+        switch self {
+        case .off: "Off"
+        case .all: "All"
+        case .one: "One"
+        }
+    }
 }
 
 /// Thread-safe copy of the play order, read by the engine thread for gapless hand-off.

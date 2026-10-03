@@ -201,7 +201,7 @@ final class LibraryStore {
             let summary = try await scanner.scan(source) { [weak self] progress in
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
-            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
+            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s) or folder(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
             if !summary.movedTracks.isEmpty { onTracksMoved?(summary.movedTracks) }
         } catch {
             lastError = error.localizedDescription
@@ -362,6 +362,7 @@ final class LibraryStore {
     // MARK: Queries (synchronous, small)
 
     func tracks(albumKey: String) -> [Track] { (try? database.tracks(albumKey: albumKey)) ?? [] }
+    func tracks(filePath: String) -> [Track] { (try? database.tracks(filePath: filePath)) ?? [] }
     func tracks(albumKeys: [String]) -> [Track] { (try? database.tracks(albumKeys: albumKeys)) ?? [] }
     func tracks(in playlist: Playlist) -> [Track] { (try? database.tracks(in: playlist)) ?? [] }
     func tracks(ids: [Int64]) -> [Track] { (try? database.tracks(ids: ids)) ?? [] }

@@ -76,7 +76,7 @@ struct FindMusicSheet: View {
                     .frame(maxWidth: .infinity, minHeight: 360)
             } else {
                 HStack {
-                    Picker("", selection: $filter) { ForEach(MusicFilter.allCases) { Text($0.rawValue).tag($0) } }
+                    Picker("Show", selection: $filter) { ForEach(MusicFilter.allCases) { Text($0.rawValue).tag($0) } }
                         .pickerStyle(.segmented).labelsHidden().fixedSize()
                     Spacer()
                     Button(allSelected ? "Select None" : "Select All") { toggleAll() }.buttonStyle(QuietButtonStyle(compact: true))
@@ -120,6 +120,8 @@ struct FindMusicSheet: View {
                 .buttonStyle(.plain)
                 .padding(.top, 2)
                 .help(chosen == files.count ? "Deselect this folder" : "Select every track in this folder")
+                .accessibilityLabel("Select \(folder.url.lastPathComponent)")
+                .accessibilityValue(chosen == 0 ? "None selected" : chosen == files.count ? "All selected" : "\(chosen) of \(files.count) selected")
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
                         Text(folder.url.lastPathComponent).font(Typeface.serif(15)).foregroundStyle(Palette.text).lineLimit(1)
@@ -136,6 +138,7 @@ struct FindMusicSheet: View {
                 }
                 .buttonStyle(.plain).foregroundStyle(Palette.text2)
                 .help(mode == .reference ? "Folders are added whole when referencing" : "Choose individual files")
+                .accessibilityLabel(expanded.contains(folder.url) ? "Hide files" : "Show files")
             }
             .padding(.horizontal, 22).padding(.vertical, 12)
             if expanded.contains(folder.url) {
@@ -161,7 +164,7 @@ struct FindMusicSheet: View {
     private var footer: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 16) {
-                Picker("", selection: $mode) {
+                Picker("Add as", selection: $mode) {
                     Text("Import & Organize").tag(ImportMode.copyAndOrganize)
                     Text("Reference in Place").tag(ImportMode.reference)
                 }

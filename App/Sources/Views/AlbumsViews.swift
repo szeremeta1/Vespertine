@@ -141,6 +141,9 @@ struct AlbumCard: View {
         .contentShape(Rectangle())
         .onHover { h in withAnimation(.easeOut(duration: 0.15)) { hovering = h } }
         .onTapGesture { model.openAlbum(album.key) }
+        // Full Keyboard Access: Tab reaches the card, Return or Space opens it (it can't be a Button: it holds one).
+        .focusable(interactions: .activate)
+        .onKeyPress(keys: [.return, .space]) { _ in model.openAlbum(album.key); return .handled }
         // VoiceOver (and other assistive tech) can open the album and play it.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(album.title), \(album.artist)")
@@ -168,8 +171,10 @@ struct FormatLabel: View {
 
 struct PlayingBars: View {
     var active: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 12, paused: !active)) { context in
+        // With Reduce Motion the bars hold still (at their staggered rest heights) instead of dancing.
+        TimelineView(.animation(minimumInterval: 1 / 12, paused: !active || reduceMotion)) { context in
             let t = context.date.timeIntervalSinceReferenceDate
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(0..<4, id: \.self) { i in
@@ -347,6 +352,7 @@ struct AlbumDetailView: View {
                     } label: {
                         Image(systemName: "ellipsis")
                     }
+                    .accessibilityLabel("More")
                     .menuStyle(.button)
                     .buttonStyle(QuietButtonStyle())
                     .menuIndicator(.hidden)
