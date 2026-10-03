@@ -63,7 +63,8 @@ struct FavoriteCell: View {
     }
 }
 
-/// Every favorite song, the most recently favorited first.
+/// Every favorite song, the most recently favorited first: once each, in the version that suits the output, with
+/// its other versions named beside it as on album pages.
 struct FavoritesView: View {
     @Environment(AppModel.self) private var model
     @State private var list = SongList()
@@ -85,7 +86,7 @@ struct FavoritesView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .task(id: "\(model.library.favoriteIDs.hashValue)#\(model.library.revision)") {
-            list = SongList(model.library.favoriteTracks(), model: model)
+            list = SongList(songs: model.library.favoriteTracks(), model: model)
         }
     }
 }

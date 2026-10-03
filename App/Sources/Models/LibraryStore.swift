@@ -32,7 +32,7 @@ final class LibraryStore {
     private(set) var playlists: [Playlist] = []
     /// Every favorite song's track ID (missing files included, so their heart stays filled).
     private(set) var favoriteIDs: Set<Int64> = []
-    /// Favorites whose files are present: the number in the sidebar.
+    /// Favorite songs whose files are present (a song in stereo and 5.1 counts once): the number in the sidebar.
     private(set) var favoriteCount = 0
     /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
     private(set) var favoriteAlbumKeys: Set<String> = []
@@ -87,6 +87,7 @@ final class LibraryStore {
     /// Local sources that changed while another scan was running: scanned when it ends, not dropped.
     @ObservationIgnored private var changedDuringScan: Set<String> = []
     @ObservationIgnored private var checkedAtLaunch = false
+    @ObservationIgnored private var favoriteVersionsTask: Task<Void, Never>?
 
     init(dataDirectory: URL) throws {
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
@@ -102,6 +103,7 @@ final class LibraryStore {
 
     deinit {
         albumTask?.cancel()
+        favoriteVersionsTask?.cancel()
         for task in tasks { task.cancel() }
     }
 
@@ -134,8 +136,8 @@ final class LibraryStore {
             do {
                 for try await value in obs.values(in: writer) {
                     self?.favoriteIDs = Set(value.map(\.id))
-                    self?.favoriteCount = value.count { !$0.missing }
                     self?.favoriteAlbumKeys = Set(value.filter { !$0.missing }.compactMap(\.album))
+                    self?.favoriteVersions()
                 }
             } catch {}
         })
@@ -423,6 +425,21 @@ final class LibraryStore {
 
     func isFavorite(_ track: Track?) -> Bool { track?.id.map(favoriteIDs.contains) ?? false }
     func favoriteTracks() -> [Track] { (try? database.favoriteTracks()) ?? [] }
+
+    /// Favoriting one version of a song (its stereo version, heard on headphones) favorites them all, and a
+    /// version scanned later joins in. Off the main thread, and once a scan's flurry of changes settles.
+    private func favoriteVersions() {
+        let first = favoriteVersionsTask == nil
+        favoriteVersionsTask?.cancel()
+        let database = database
+        favoriteVersionsTask = Task { [weak self] in
+            if !first { try? await Task.sleep(for: .milliseconds(300)) }
+            guard !Task.isCancelled else { return }
+            let songs = await Task.detached(priority: .utility) { try? database.favoriteEveryVersion() }.value
+            guard !Task.isCancelled, let songs else { return }
+            self?.favoriteCount = songs
+        }
+    }
 
     /// Library state only: favorites are never written into the files.
     func setFavorite(_ favorite: Bool, trackIDs: [Int64]) {
