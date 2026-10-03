@@ -209,8 +209,13 @@ public actor LibraryScanner {
         }
 
         // Flag files that disappeared (kept so playlists and play counts survive a re-plug).
-        let missing = known.filter { !seen.contains($0.key) && !$0.value.isMissing }.map(\.value.id)
+        // Nor are files under a folder that couldn't be listed (they may well still be there).
+        let unlisted = listing.unreadable.map { $0 + "/" }
+        let missing = known.filter { k in
+            !seen.contains(k.key) && !k.value.isMissing && !unlisted.contains { k.key.hasPrefix($0) }
+        }.map(\.value.id)
         summary.missing = missing.count
+        summary.failed.append(contentsOf: listing.unreadable.sorted())
         let failedPaths = Set(summary.failed)
         let moved = try await database.writer.write { db -> [Int64: Int64] in
             for (path, cue) in cueByAudio where !failedPaths.contains(path) {
@@ -258,9 +263,11 @@ public actor LibraryScanner {
     public struct ListedFile: Sendable { public var url: URL; public var size: Int64; public var modified: Date }
 
     /// Lists audio and CUE files with their size and date. Folders are listed concurrently so a
-    /// high-latency share costs one round trip per folder level, not per folder. Any folder that
-    /// can't be listed fails the whole listing, so its files are never mistaken for deleted ones.
-    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>) {
+    /// high-latency share costs one round trip per folder level, not per folder. If the source's own folder can't be
+    /// listed, the listing fails; a folder inside it that can't be (no permission, gone mid-scan) is returned in
+    /// `unreadable`, so the files under it are neither mistaken for deleted ones nor stop the rest being scanned.
+    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws
+        -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>, unreadable: Set<String>) {
         let exts = audioExtensions
         let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
         let start = root.resolvingSymlinksInPath()
@@ -269,11 +276,11 @@ public actor LibraryScanner {
             let v = try start.resourceValues(forKeys: Set(keys))
             let siblings = try FileManager.default.contentsOfDirectory(at: start.deletingLastPathComponent(), includingPropertiesForKeys: nil)
             return ([ListedFile(url: start, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast)],
-                    siblings.filter { $0.pathExtension.lowercased() == "cue" }, [])
+                    siblings.filter { $0.pathExtension.lowercased() == "cue" }, [], [])
         }
-        typealias Listed = Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>
+        typealias Listed = (dir: URL, result: Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>)
         let width = NetworkVolume.isNetwork(start) ? 12 : 4
-        var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = []
+        var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = [], unreadable: [URL] = []
         var pending: [URL] = [start]
         // Folders already listed, by path (symlinked ones resolved): a link back up the tree would loop forever.
         var visited: Set<String> = [start.path]
@@ -283,12 +290,13 @@ public actor LibraryScanner {
             func begin(_ dir: URL) {
                 running += 1
                 group.addTask { await onIOQueue {
-                    Result {
+                    (dir, Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
                         for item in items {
                             var url = item
-                            var v = try url.resourceValues(forKeys: Set(keys))
+                            // An item that vanished (or can't be read) since the folder was listed is skipped.
+                            guard var v = try? url.resourceValues(forKeys: Set(keys)) else { continue }
                             if v.isSymbolicLink == true {
                                 url = url.resolvingSymlinksInPath()
                                 guard let resolved = try? url.resourceValues(forKeys: Set(keys)) else { continue }
@@ -307,11 +315,11 @@ public actor LibraryScanner {
                             }
                         }
                         return (files, cues, dirs, ArtworkStore.pickCover(images) != nil ? dir : nil)
-                    }
+                    })
                 } }
             }
             while running < width, let dir = pending.popLast() { begin(dir) }
-            while let result = await group.next() {
+            while let (dir, result) = await group.next() {
                 running -= 1
                 switch result {
                 case .success(let r):
@@ -320,9 +328,11 @@ public actor LibraryScanner {
                     pending.append(contentsOf: r.dirs.filter { visited.insert($0.path).inserted })
                     if let dir = r.hasImage { imageDirs.append(dir) }
                     found?(audio.count)
-                case .failure(let error):
-                    failure = failure ?? error
+                case .failure(let error) where dir == start:
+                    failure = error
                     pending.removeAll()
+                case .failure:
+                    unreadable.append(dir)
                 }
                 while failure == nil, running < width, let dir = pending.popLast() { begin(dir) }
             }
@@ -345,7 +355,7 @@ public actor LibraryScanner {
         // URL.path decodes the whole path on every call; compute each once before sorting 10k+ files.
         let files = audio.map { ListedFile(url: canon($0.url), size: $0.size, modified: $0.modified) }
             .map { ($0.url.path, $0) }.sorted { $0.0 < $1.0 }.map(\.1)
-        return (files, cue.map(canon), Set(imageDirs.map { canon($0).path }))
+        return (files, cue.map(canon), Set(imageDirs.map { canon($0).path }), Set(unreadable.map { canon($0).path }))
     }
 
     public static func enumerate(_ root: URL) -> (audio: [URL], cue: [URL]) {

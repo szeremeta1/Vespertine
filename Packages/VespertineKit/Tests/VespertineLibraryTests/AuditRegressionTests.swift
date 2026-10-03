@@ -513,3 +513,21 @@ private func cue(_ title: String = "Second", at url: URL) throws {
     #expect(!FileManager.default.fileExists(atPath: empty.path))
     #expect(NetworkVolume.isMountPoint(URL(fileURLWithPath: "/")))
 }
+
+/// A folder that can't be listed is reported, not fatal: the rest of the source is still listed.
+@Test func unreadableFolderDoesNotStopTheListing() async throws {
+    let root = try fixture()
+    let locked = root.appendingPathComponent("locked", isDirectory: true)
+    try FileManager.default.createDirectory(at: locked, withIntermediateDirectories: true)
+    try audio(root.appendingPathComponent("open.wav"))
+    try audio(locked.appendingPathComponent("hidden.wav"))
+    try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: locked.path)
+    defer {
+        try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: locked.path)
+        try? FileManager.default.removeItem(at: root)
+    }
+    let listing = try await LibraryScanner.list(root)
+    #expect(listing.audio.map(\.url.lastPathComponent) == ["open.wav"])
+    #expect(listing.unreadable.count == 1)
+    #expect(listing.unreadable.first?.hasSuffix("/locked") == true)
+}

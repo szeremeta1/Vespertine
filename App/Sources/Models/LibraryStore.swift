@@ -199,7 +199,7 @@ final class LibraryStore {
             let summary = try await scanner.scan(source) { [weak self] progress in
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
-            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
+            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s) or folder(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
             if !summary.movedTracks.isEmpty { onTracksMoved?(summary.movedTracks) }
         } catch {
             lastError = error.localizedDescription
