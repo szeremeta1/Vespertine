@@ -159,7 +159,18 @@ if $notarize; then
 fi
 
 if $install; then
-  pkill -x Vespertine 2>/dev/null || true
+  # Quit a running copy the way its Quit command does, so it puts back the DAC's format, the volume keys and the
+  # alert volume before it's replaced. Only a copy still running 15 s later is killed (it puts the volume keys and
+  # alert volume back at its next launch). A development build (its own bundle ID) is left alone.
+  running() { [[ $(osascript -e 'application id "org.szeremeta.Vespertine" is running' 2>/dev/null) == true ]] }
+  if running; then
+    print "Quitting Vespertine…"
+    # Without waiting for a reply: an app that hangs would hold osascript for its two-minute timeout.
+    osascript -e 'ignoring application responses' -e 'tell application id "org.szeremeta.Vespertine" to quit' \
+      -e 'end ignoring' >/dev/null 2>&1 || true
+    for _ in {1..30}; do running || break; sleep 0.5; done
+    pkill -f '^/Applications/Vespertine\.app/Contents/MacOS/Vespertine( |$)' 2>/dev/null || true
+  fi
   staged_install="/Applications/.Vespertine-install-$$.app"
   ditto "$app" "$staged_install"
   codesign --verify --deep --strict "$staged_install"
