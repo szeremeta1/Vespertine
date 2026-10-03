@@ -368,8 +368,12 @@ struct QueueView: View {
             List {
                 ForEach(Array(player.upcoming)) { entry in
                     row(entry, isCurrent: false)
-                        .contextMenu { Button("Remove") { player.removeFromQueue(entry.id) } }
+                        .contextMenu {
+                            Button("Play Now") { player.jump(to: entry.id) }
+                            Button("Remove") { player.removeFromQueue(entry.id) }
+                        }
                         .onTapGesture(count: 2) { player.jump(to: entry.id) }
+                        .accessibilityAction(named: "Play Now") { player.jump(to: entry.id) }
                 }
                 .onMove { player.moveUpcoming(from: $0, to: $1) }
                 .onDelete { idx in idx.map { Array(player.upcoming)[$0].id }.forEach(player.removeFromQueue) }
@@ -392,5 +396,8 @@ struct QueueView: View {
             Spacer()
             Text(e.track.formatSummary).font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
         }
+        // One VoiceOver stop per song: title, artist, format.
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isCurrent ? .isSelected : [])
     }
 }

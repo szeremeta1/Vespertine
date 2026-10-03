@@ -91,6 +91,17 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut(.rightArrow, modifiers: [.command])
             Button("Previous") { model.player.previous() }
                 .keyboardShortcut(.leftArrow, modifiers: [.command])
+            Button("Skip Forward 10 Seconds") { model.player.seek(to: min(model.player.duration, model.player.position + 10)) }
+                .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
+                .disabled(model.player.current == nil)
+            Button("Skip Back 10 Seconds") { model.player.seek(to: max(0, model.player.position - 10)) }
+                .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
+                .disabled(model.player.current == nil)
+            Button("Go to Current Album") {
+                if let key = model.player.current?.track.albumKey { model.sidebar = .albums; model.path = [.album(key)] }
+            }
+            .keyboardShortcut("j", modifiers: [.command])
+            .disabled(model.player.current == nil)
             Divider()
             let current = model.player.current?.track
             Button(model.library.isFavorite(current) ? "Remove Current Song from Favorites" : "Add Current Song to Favorites") {
