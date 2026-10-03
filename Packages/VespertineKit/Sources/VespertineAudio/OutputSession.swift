@@ -283,7 +283,9 @@ final class OutputSession: @unchecked Sendable {
     }
 
     /// `restoreFormat` false: the next session configures the same device straight away (it keeps the hold).
-    func invalidate(releaseHog: Bool, restoreFormat: Bool = true) {
+    /// `idle`: the engine is letting the device go (a long pause, a stop, the end of the queue), not handing it to the
+    /// next song's session.
+    func invalidate(releaseHog: Bool, restoreFormat: Bool = true, idle: Bool = false) {
         unwatchFormats()
         stop()
         if let ioProcID { AudioDeviceDestroyIOProcID(deviceID, ioProcID) }
@@ -294,6 +296,12 @@ final class OutputSession: @unchecked Sendable {
         if applied.integerMode, restoreFormat { try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
             decodedSampleRate: applied.sampleRate, physicalBitDepth: applied.physicalBitDepth, channels: plan.deviceChannels,
             dsdConvertedToPCM: false, reason: ""), to: deviceID) }
+        // DoP's carrier rate (176.4 kHz and up for DSD64) is no music rate: a DAC let go at it shows it, and whatever
+        // plays next is resampled to it. Put back the rate it had before Vespertine changed it, while still held.
+        if idle, releaseHog, plan.mode == .dop, applied.exclusive, let rate = DeviceRestore.originalRate(deviceID),
+           abs(rate - applied.sampleRate) >= 0.5 {
+            try? DeviceControl.setNominalRate(rate, on: deviceID)
+        }
         if releaseHog, applied.exclusive { DeviceControl.releaseHog(deviceID) }
     }
 

@@ -21,6 +21,13 @@ struct VolumeRelayTests {
     private func level(_ d: AudioObjectID) -> Float32 { (try? HAL.get(d, Self.volume, initial: Float32(-1))) ?? -1 }
     private func muted(_ d: AudioObjectID) -> UInt32 { (try? HAL.get(d, Self.mute, initial: UInt32(9))) ?? 9 }
     private func settle() { Thread.sleep(forTimeInterval: 0.4) }
+
+    /// These tests set real volumes. While another app holds an output (Vespertine playing), its own relay carries them
+    /// to that output, under whoever is listening: refuse to run then, before touching anything.
+    private func requireNoOtherHold() throws {
+        let held = OutputDevices.list().filter { ![-1, getpid()].contains(DeviceControl.hogOwner($0.id)) }.map(\.name)
+        try #require(held.isEmpty, "\(held.joined(separator: ", ")) is held by another app (Vespertine playing?): stop it first")
+    }
     private func putBackAlerts(_ alert: Int?) {
         if let alert, let now = AlertVolume.get() { AlertVolume.set(alert, ifStill: now) }
     }
@@ -28,6 +35,7 @@ struct VolumeRelayTests {
     @Test("Keys and Control Center reach the held device; the stand-in gets its own volume back",
           .enabled(if: devices != nil))
     func relay() throws {
+        try requireNoOtherHold()
         let names = try #require(Self.devices).split(separator: "|").map(String.init)
         let all = OutputDevices.list()
         let held = try #require(all.first { $0.name.contains(names[0]) }).id
@@ -111,6 +119,7 @@ struct VolumeRelayTests {
     @Test("After a crash, the next launch puts back what the relay left, unless it was changed since",
           .enabled(if: devices != nil))
     func afterCrash() throws {
+        try requireNoOtherHold()
         let name = try #require(Self.devices).split(separator: "|").map(String.init)[1]
         let standIn = try #require(OutputDevices.list().first { $0.name.contains(name) }).id
         let uid = try #require(HAL.getString(standIn, .global(kAudioDevicePropertyDeviceUID)))

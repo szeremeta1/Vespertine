@@ -502,7 +502,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             }
         case .stop:
             carried = nil
-            teardown(releaseHog: true)
+            teardown(releaseHog: true, idle: true)
             parked = nil
             awaitingDevice = nil
             state = .stopped
@@ -662,7 +662,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 offset = 0
             }
         }
-        teardown(releaseHog: true)
+        // Nothing left that would play: done with the device.
+        teardown(releaseHog: true, idle: true)
         state = .stopped
     }
 
@@ -788,7 +789,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         buffering = false
     }
 
-    private func teardown(releaseHog: Bool) {
+    /// `idle`: the engine is done with the device for now (see `OutputSession.invalidate`).
+    private func teardown(releaseHog: Bool, idle: Bool = false) {
         teardownDecoding()
         atmos?.stop()
         atmos = nil
@@ -797,7 +799,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         session = nil
         sessionDevice = nil
         sessionLock.unlock()
-        old?.invalidate(releaseHog: releaseHog)
+        old?.invalidate(releaseHog: releaseHog, idle: idle)
     }
 
     /// How long a pause keeps the output. A held (exclusive) output is let go after the "Release device after pausing
@@ -814,7 +816,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func park() {
         let position = currentPosition()
         if let item = currentItem() { parked = (item, position) }
-        teardown(releaseHog: true)
+        teardown(releaseHog: true, idle: true)
         pausedAt = nil
     }
 
@@ -1166,7 +1168,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func finishQueue() {
-        teardown(releaseHog: true)
+        teardown(releaseHog: true, idle: true)
         state = .stopped
         lastAudibleSegmentID = nil
         emit(.queueEnded)
