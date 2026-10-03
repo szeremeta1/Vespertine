@@ -342,6 +342,7 @@ struct AlbumDetailView: View {
                     } label: {
                         Image(systemName: "ellipsis")
                     }
+                    .accessibilityLabel("More")
                     .menuStyle(.button)
                     .buttonStyle(QuietButtonStyle())
                     .menuIndicator(.hidden)

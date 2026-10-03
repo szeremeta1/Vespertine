@@ -70,6 +70,7 @@ struct SidebarView: View {
                     } label: {
                         Image(systemName: "plus").font(.system(size: 11, weight: .semibold))
                     }
+                    .accessibilityLabel("Add Playlist")
                     .menuStyle(.button)
                     .buttonStyle(.plain)
                     .menuIndicator(.hidden)
@@ -134,6 +135,7 @@ struct SidebarView: View {
                     } label: {
                         Image(systemName: "plus").font(.system(size: 11, weight: .semibold))
                     }
+                    .accessibilityLabel("Add Music")
                     .menuStyle(.button)
                     .buttonStyle(.plain)
                     .menuIndicator(.hidden)
