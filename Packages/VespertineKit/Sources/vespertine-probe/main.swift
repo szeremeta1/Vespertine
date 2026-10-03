@@ -320,6 +320,19 @@ if args.count >= 3, args[1] == "doptest" {
         note("device running: \(now ? "yes" : "no") (expected \(running ? "yes" : "no"): \(why))")
         if now != running { failures.append("\(why): device running \(now ? "yes" : "no")") }
     }
+    /// Let go after DoP, the DAC is back at the rate it had before, not at DoP's carrier rate.
+    let rateBefore = readback(device.id).rate
+    func expectRateBack(_ rate: Double, _ when: String) {
+        note("device rate: \(SampleRate.format(rate)) kHz (expected \(SampleRate.format(rateBefore)) kHz, as before DoP: \(when))")
+        // A failed read gives 0 on both sides, which would match: a rate has to be read to count.
+        guard rate.isFinite, rate > 0, rateBefore.isFinite, rateBefore > 0 else {
+            failures.append("\(when): the device's rate couldn't be read (\(rateBefore) before, \(rate) now)")
+            return
+        }
+        if abs(rate - rateBefore) >= 0.5 {
+            failures.append("\(when): the device was left at \(SampleRate.format(rate)) kHz, not \(SampleRate.format(rateBefore)) kHz")
+        }
+    }
 
     print("Device: \(device.name). Turn its volume down first: DoP can't be made quieter digitally (the pings are soft).")
     step("Play \(files[0].lastPathComponent)", listen: "a soft ping on every second, nothing else")
@@ -384,9 +397,11 @@ if args.count >= 3, args[1] == "doptest" {
         pump(min(5, release / 2))
         expectRunning(true, "still within the release time")
         pump(release - min(5, release / 2) + 4)
-        let owner = readback(device.id).hogPID
+        let let_go = readback(device.id)
+        let owner = let_go.hogPID
         note("hog: \(owner == getpid() ? "us" : owner == -1 ? "none" : String(owner)) (expected none: let go after \(Int(release)) s) · \(state())")
         if owner == getpid() { failures.append("still holding the device \(Int(release) + 4) s into a pause") }
+        expectRateBack(let_go.rate, "let go after the pause")
     }
     engine.resume()
     pump(3)
@@ -395,6 +410,7 @@ if args.count >= 3, args[1] == "doptest" {
     step("Stop", listen: "one click here is fine (DoP ends)")
     engine.stop(); pump(0.8)
     note(state())
+    expectRateBack(readback(device.id).rate, "stopped")
     print(failures.isEmpty ? "\nDevice checks passed. Underruns: \(engine.snapshot.underruns). Anything you heard besides the expected click(s) is a finding."
                            : "\nDevice checks FAILED:\n" + failures.map { "  - \($0)" }.joined(separator: "\n"))
     exit(failures.isEmpty ? 0 : 1)

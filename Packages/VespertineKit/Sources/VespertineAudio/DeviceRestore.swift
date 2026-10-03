@@ -43,6 +43,13 @@ public enum DeviceRestore {
             virtual: first.flatMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) })
     }
 
+    /// The device's rate before Vespertine first changed it this session, if known.
+    static func originalRate(_ device: AudioObjectID) -> Double? {
+        guard let uid = HAL.getString(device, .global(kAudioDevicePropertyDeviceUID)) else { return nil }
+        lock.lock(); defer { lock.unlock() }
+        return originals[uid].flatMap { $0.rate > 0 ? $0.rate : nil }
+    }
+
     /// Devices Vespertine changed this session (UIDs).
     public static var changedDevices: [String] { lock.lock(); defer { lock.unlock() }; return Array(originals.keys) }
 
