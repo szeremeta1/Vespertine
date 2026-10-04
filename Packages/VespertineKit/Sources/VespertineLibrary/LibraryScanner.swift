@@ -290,7 +290,7 @@ public actor LibraryScanner {
             func begin(_ dir: URL) {
                 running += 1
                 group.addTask { await onIOQueue {
-                    (dir, Result {
+                    (dir: dir, result: Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
                         for item in items {
