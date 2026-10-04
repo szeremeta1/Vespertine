@@ -23,7 +23,7 @@ body:
     id: setup
     attributes:
       label: Vespertine version, macOS version and Mac
-      placeholder: "0.7.1, macOS 26.1, Mac mini M4"
+      placeholder: "0.8.0, macOS 26.1, Mac mini M4"
     validations:
       required: true
   - type: checkboxes
