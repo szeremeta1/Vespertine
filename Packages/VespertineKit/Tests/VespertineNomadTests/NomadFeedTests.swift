@@ -173,14 +173,9 @@ struct NomadFeedLoadTests {
                         artworkID: art ? "cover-\(i)" : nil)
     }
 
-    private func settle(_ port: RecordingPort) async {
-        var last = -1
-        while true {
-            try? await Task.sleep(for: .milliseconds(150))
-            let now = port.infos.count + port.artworks.count
-            if now == last { return }
-            last = now
-        }
+    /// Waits (up to `seconds`) for a condition, instead of guessing how long a loaded machine needs.
+    private func until(_ seconds: Double = 10, _ condition: () -> Bool) async {
+        for _ in 0..<Int(seconds * 100) where !condition() { try? await Task.sleep(for: .milliseconds(10)) }
     }
 
     @Test func skippingFastAgainstASlowKeyboardEndsOnTheLastSongAndNeverMixesTracks() async {
@@ -192,17 +187,36 @@ struct NomadFeedLoadTests {
             Task { await feed.update(track(i)) }
             try? await Task.sleep(for: .milliseconds(5))
         }
-        await settle(port)
-        let infos = port.infos
+        let lastCover = Data("cover-29".utf8)
+        await until { port.infos.last?.title == "Title 29" && port.artworks.last == lastCover }
         // Whatever was sent, a title always came with its own artist.
-        for info in infos where info.title != nil {
+        for info in port.infos where info.title != nil {
             #expect(info.artist?.hasPrefix("Artist " + info.title!.dropFirst("Title ".count)) == true, "\(info)")
         }
-        #expect(infos.last?.title == "Title 29")
-        #expect(infos.count < 30, "updates were coalesced, not queued one by one")
-        // Only the last cover was worth sending.
-        #expect(port.artworks.last == Data("cover-29".utf8))
-        #expect(port.artworks.count <= 2)
+        #expect(port.infos.last?.title == "Title 29")
+        #expect(port.artworks.last == lastCover)
+    }
+
+    @Test func whatChangesWhileACallIsInFlightIsSentOnceAsTheLatestNotQueuedSongBySong() async {
+        let port = GatedPort()
+        let feed = NomadMediaFeed(link: port, style: .off, coverDelay: .milliseconds(5)) { _ in nil }
+        await feed.handle(.connected(name: "x"))
+        let first = Task { await feed.update(track(0, art: false)) }
+        await until { port.isBlocked }                       // the first call is now stuck at the keyboard
+        for i in 1...20 { await feed.update(track(i, art: false)) }   // each returns at once: a worker is running
+        port.release()
+        await first.value
+        #expect(port.titles == ["Title 0", "Title 20"])      // not 21 calls
+    }
+
+    @Test func rapidTrackChangesSendOnlyTheCoverOfWhereTheySettle() async {
+        let port = RecordingPort()
+        let feed = NomadMediaFeed(link: port, style: .off, coverDelay: .milliseconds(400)) { id in Data(id.utf8) }
+        await feed.handle(.connected(name: "x"))
+        for i in 0..<5 { await feed.update(track(i)) }
+        await until { !port.artworks.isEmpty }
+        try? await Task.sleep(for: .milliseconds(600))       // anything else due would have gone by now
+        #expect(port.artworks == [Data("cover-4".utf8)])
     }
 
     @Test func aFailedCallIsFollowedByTheWholeTrackNotAFragment() async {
@@ -243,6 +257,34 @@ struct NomadFeedLoadTests {
         await feed.handle(.mediaScreen(wantsData: false))
         await feed.handle(.disconnected)
     }
+}
+
+/// Holds its first info call until released, like a keyboard busy with one call while the player moves on.
+final class GatedPort: NomadWidgetPort, @unchecked Sendable {
+    private let lock = NSLock()
+    private var gate: CheckedContinuation<Void, Never>?
+    private var _blocked = false
+    private var _released = false
+    private var _titles: [String] = []
+    var isBlocked: Bool { lock.withLock { _blocked } }
+    var titles: [String] { lock.withLock { _titles } }
+
+    func release() {
+        let waiting: CheckedContinuation<Void, Never>? = lock.withLock { _released = true; defer { gate = nil }; return gate }
+        waiting?.resume()
+    }
+
+    func sendInfo(title: String?, artist: String?, elapsed: Int?, duration: Int?, isPlaying: Bool?) async throws {
+        let isFirst: Bool = lock.withLock { let first = _titles.isEmpty && !_blocked && !_released; if first { _blocked = true }; return first }
+        if isFirst {
+            await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+                let done: Bool = lock.withLock { if _released { return true }; gate = c; return false }
+                if done { c.resume() }
+            }
+        }
+        lock.withLock { if let title { _titles.append(title) } }
+    }
+    func sendArtwork(_ image: Data) async throws {}
 }
 
 /// Fails the first cover upload, like a keyboard that didn't answer a chunk.
