@@ -235,9 +235,11 @@ struct NomadFeedLoadTests {
         await feed.handle(.connected(name: "x"))
         await feed.handle(.mediaScreen(wantsData: true))
         await feed.update(track(1))
-        // Input overwrites the artist ~1.3 s after a new track; the feed repeats the whole text at about 1.6 s and 3.6 s.
-        for _ in 0..<80 where port.infos.filter({ $0.title == "Title 1" }).count < 3 { try? await Task.sleep(for: .milliseconds(100)) }
-        #expect(port.infos.filter { $0.title == "Title 1" && $0.artist == "Artist 1 - 24/96" }.count >= 3)
+        // Input overwrites the artist ~1.3 s after a new track, so the feed repeats the whole text at about 1.6 s and 3.6 s.
+        // A starved machine can wake it after both are due, and then one repeat covers both: so at least one, not exactly two.
+        for _ in 0..<150 where port.infos.filter({ $0.title == "Title 1" }).count < 2 { try? await Task.sleep(for: .milliseconds(100)) }
+        let full = port.infos.filter { $0.title == "Title 1" && $0.artist == "Artist 1 - 24/96" }
+        #expect(full.count >= 2, "the first send, and a repeat after it")
         await feed.handle(.mediaScreen(wantsData: false))
         await feed.handle(.disconnected)
     }
