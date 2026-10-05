@@ -12,6 +12,7 @@ let package = Package(
     products: [
         .library(name: "VespertineAudio", targets: ["VespertineAudio"]),
         .library(name: "VespertineLibrary", targets: ["VespertineLibrary"]),
+        .library(name: "VespertineNomad", targets: ["VespertineNomad"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
@@ -60,6 +61,13 @@ let package = Package(
             ],
             linkerSettings: [.linkedFramework("NetFS")]
         ),
+        // Work Louder Nomad [E] keyboards: feeds the media widget (text, time, cover art) over the vendor HID channel.
+        .target(
+            name: "VespertineNomad",
+            linkerSettings: [.linkedFramework("IOKit"), .linkedFramework("CoreGraphics"), .linkedFramework("ImageIO")]
+        ),
+        // Hardware verification for the Nomad link: status, watch notifications, push a test card.
+        .executableTarget(name: "vespertine-nomad", dependencies: ["VespertineNomad"]),
         // Generates a demo library of original, synthesized music with artwork (for development and screenshots).
         .executableTarget(
             name: "vespertine-demo",
@@ -74,6 +82,7 @@ let package = Package(
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineNomadTests", dependencies: ["VespertineNomad"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags"]),
     ],
     swiftLanguageModes: [.v6],

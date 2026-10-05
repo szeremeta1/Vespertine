@@ -40,6 +40,8 @@ targets:
         product: VespertineAudio
       - package: VespertineKit
         product: VespertineLibrary
+      - package: VespertineKit
+        product: VespertineNomad
       - package: Sparkle
     info:
       path: App/Info.plist

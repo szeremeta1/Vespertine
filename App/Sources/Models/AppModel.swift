@@ -131,6 +131,7 @@ final class AppModel {
     let settings: AppSettings
     let library: LibraryStore
     let player: PlayerController
+    let nomad: NomadController
     let devices: DeviceStore
     let shares: NetworkShareManager
     let analysis: AnalysisQueue
@@ -188,6 +189,7 @@ final class AppModel {
         // the relay can take them as they are.
         DeviceRestore.afterCrash()
         player = PlayerController(library: library, settings: settings, shares: shares)
+        nomad = NomadController(settings: settings)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
@@ -209,11 +211,16 @@ final class AppModel {
         syncEngine()
         shares.start()
         analysis.start()
+        // A Work Louder Nomad [E] keyboard's media widget follows playback. A QA run with its own library leaves the
+        // keyboard alone unless asked (-VespertineNomad YES).
+        player.nowPlayingObserver = { [weak nomad = self.nomad] in nomad?.update($0) }
+        if !isolated || arguments.bool(forKey: "VespertineNomad") { nomad.apply() }
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                self.nomad.shutDown()
                 self.player.volumeRelay.stop()
                 self.player.engine.stopAndWait()
                 DeviceRestore.finish(self.settings.deviceOnQuit)

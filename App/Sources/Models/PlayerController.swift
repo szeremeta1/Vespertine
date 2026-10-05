@@ -7,6 +7,7 @@ import AppKit
 import MediaPlayer
 import VespertineAudio
 import VespertineLibrary
+import VespertineNomad
 import Observation
 import Synchronization
 
@@ -555,13 +556,18 @@ final class PlayerController {
         return MPMediaItemArtwork(boundsSize: image.size) { @Sendable _ in image }
     }
 
+    /// Told whenever what's playing changes (track, play state, a seek): the keyboard widget's feed.
+    var nowPlayingObserver: ((NomadNowPlaying?) -> Void)?
+
     private func updateNowPlayingInfo() {
         let center = MPNowPlayingInfoCenter.default()
         guard let track = current?.track, state != .stopped else {
             center.nowPlayingInfo = nil
             center.playbackState = .stopped
+            nowPlayingObserver?(nil)
             return
         }
+        nowPlayingObserver?(NomadController.snapshot(track, state: state, position: position, duration: duration))
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: track.title,
             MPMediaItemPropertyArtist: track.displayArtist,

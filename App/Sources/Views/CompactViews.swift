@@ -6,6 +6,7 @@
 import AppKit
 import VespertineAudio
 import VespertineLibrary
+import VespertineNomad
 import SwiftUI
 
 // MARK: - Mini player
@@ -141,14 +142,18 @@ struct MenuBarView: View {
 // MARK: - Settings
 
 struct SettingsView: View {
+    /// `-VespertineSettingsTab keyboard` (QA) opens on another tab.
+    @State private var tab = LaunchArguments().string(forKey: "VespertineSettingsTab") ?? "playback"
+
     var body: some View {
-        TabView {
-            PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }
-            LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }
-            NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }
-            OnlineSettings().tabItem { Label("Online", systemImage: "globe") }
-            UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }
-            AboutSettings().tabItem { Label("About", systemImage: "info.circle") }
+        TabView(selection: $tab) {
+            PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }.tag("playback")
+            LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag("library")
+            NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag("network")
+            OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag("online")
+            KeyboardSettings().tabItem { Label("Keyboard", systemImage: "keyboard") }.tag("keyboard")
+            UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag("updates")
+            AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag("about")
         }
         .frame(width: 560, height: 460)
     }
@@ -349,6 +354,47 @@ struct OnlineSettings: View {
                 }
                 Text("Your token is stored in the macOS Keychain. Find it at listenbrainz.org → Settings.")
                     .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+struct KeyboardSettings: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        @Bindable var s = model.settings
+        let nomad = model.nomad
+        Form {
+            Section("Work Louder Nomad [E]") {
+                Toggle("Show what's playing on the keyboard's media widget", isOn: $s.nomadWidget)
+                    .onChange(of: s.nomadWidget) { model.nomad.apply() }
+                LabeledContent("Keyboard") {
+                    if let name = nomad.keyboard {
+                        Label(name, systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    } else if !s.nomadWidget {
+                        Text("Off").foregroundStyle(.secondary)
+                    } else {
+                        Text(nomad.problem ?? "Not connected by USB").foregroundStyle(.secondary)
+                    }
+                }
+                if nomad.keyboard != nil {
+                    LabeledContent("Media widget") {
+                        Text(nomad.mediaScreenOpen ? "Showing now" : "Not on screen").foregroundStyle(.secondary)
+                    }
+                }
+                Picker("Format on the artist line", selection: $s.nomadFormat) {
+                    Text("Artist and format (GENDEMA - FLAC 24/96)").tag(NomadFormatStyle.suffix)
+                    Text("Artist only").tag(NomadFormatStyle.off)
+                }
+                .onChange(of: s.nomadFormat) { model.nomad.formatChanged() }
+                Text("The widget shows the title, artist, cover, elapsed time and length of the song playing in Vespertine, and the format of the file after the artist. It only changes while Vespertine is playing; Spotify and Music keep their own card.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if nomad.inputIsRunning {
+                    Label("Work Louder's Input is open. It also writes to the widget and can't show covers or time for Vespertine, so quit it while you listen. Your key and dial settings stay on the keyboard.", systemImage: "exclamationmark.triangle")
+                        .font(.caption).foregroundStyle(.orange)
+                }
             }
         }
         .formStyle(.grouped)
