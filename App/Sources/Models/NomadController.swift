@@ -102,6 +102,11 @@ final class NomadController {
         }
     }
 
+    /// Quits Work Louder's Input (the Settings button). Its keymaps live on the keyboard; Input is only needed to change them.
+    func quitInput() {
+        for app in NSRunningApplication.runningApplications(withBundleIdentifier: Self.inputBundleID) { app.terminate() }
+    }
+
     private func refreshInput() {
         let running = !NSRunningApplication.runningApplications(withBundleIdentifier: Self.inputBundleID).isEmpty
         guard running != inputIsRunning else { return }

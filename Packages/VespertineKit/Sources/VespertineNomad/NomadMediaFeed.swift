@@ -58,26 +58,48 @@ extension NomadLink: NomadWidgetPort {}
 
 /// Sends the current track to the keyboard whenever it asks (its media screen is open) and whenever the track or the
 /// play state changes, and ticks the clock once a second while it's showing.
+///
+/// The keyboard takes one call at a time and a call can take a while, so updates are coalesced: one worker sends what is
+/// true *now*, and anything that changes meanwhile is picked up on its next pass instead of queueing behind stale
+/// calls. A text update always carries the whole track (title, artist, length, time, state): half a track, sent after
+/// an earlier call that was still in flight, is how a title ends up next to another song's artist. Covers go separately,
+/// at low priority and cancellable, a moment after the last track change.
 public actor NomadMediaFeed {
     private let link: any NomadWidgetPort
     private let encodeArtwork: @Sendable (String) async -> Data?
     private var style: NomadFormatStyle
     private var nowPlaying: NomadNowPlaying?
     private var screenOpen = false
-    /// Another program (Work Louder's Input) is writing to the same widget: say the text again every few seconds.
-    private var contested = false
-    private var ticks = 0
     private var connected = false
-    private var ticker: Task<Void, Never>?
-    /// What the keyboard already has.
-    private var sentTitle: String?, sentArtist: String?, sentDuration: Int?, sentPlaying: Bool?, sentElapsed: Int?
-    private var sentArtworkID: String??
-    private var artworkTask: Task<Void, Never>?
+    /// Another program (Work Louder's Input) is writing to the same widget.
+    private var contested = false
+
+    /// What the keyboard shows, as far as an acknowledged call told us.
+    private struct Shown {
+        var title: String, artist: String, duration: Int
+        var playing: Bool, elapsed: Int, at: Date
+    }
+    private var shown: Shown?
+    /// When to say the text again: Input rewrites the artist (without the format) a moment after each new track.
+    private var reasserts: [Date] = []
+
+    private var working = false
+    private var again = false
+    private var wake: Task<Void, Never>?
+
+    private var coverShown: String?
+    private var coverWanted: String?
+    private var coverTask: Task<Void, Never>?
+    private var coverAttempts = 0
+    /// How long the last track change settles before its cover is sent (skipping fast shouldn't upload every cover).
+    private let coverDelay: Duration
 
     /// `artwork` turns an artwork ID into the keyboard's image bytes (the app owns the covers).
-    public init(link: any NomadWidgetPort, style: NomadFormatStyle, artwork: @escaping @Sendable (String) async -> Data?) {
+    public init(link: any NomadWidgetPort, style: NomadFormatStyle, coverDelay: Duration = .milliseconds(350),
+                artwork: @escaping @Sendable (String) async -> Data?) {
         self.link = link
         self.style = style
+        self.coverDelay = coverDelay
         self.encodeArtwork = artwork
     }
 
@@ -86,105 +108,145 @@ public actor NomadMediaFeed {
     public func setStyle(_ style: NomadFormatStyle) async {
         guard style != self.style else { return }
         self.style = style
-        sentArtist = nil
-        await sync()
+        shown = nil
+        await run()
     }
 
     public func setContested(_ on: Bool) { contested = on }
 
     public func update(_ now: NomadNowPlaying?) async {
         nowPlaying = now
-        await sync()
+        await run()
     }
 
     public func handle(_ event: NomadLink.Event) async {
         switch event {
         case .connected:
             connected = true
-            forgetSent()
-            sentArtworkID = nil   // the keyboard may have been showing Input's cover
-            await sync()
+            shown = nil
+            coverShown = nil; coverWanted = nil   // the keyboard may have been showing Input's cover
+            await run()
         case .disconnected:
             connected = false
             screenOpen = false
-            ticker?.cancel(); ticker = nil
+            wake?.cancel(); wake = nil
+            coverTask?.cancel(); coverTask = nil
         case .mediaScreen(let wants):
             screenOpen = wants
-            if wants { forgetSent() }
-            await sync()
+            if wants { shown = nil }   // the screen may have lost it
+            await run()
         case .notification, .problem:
             break
         }
     }
 
-    // MARK: Output
+    // MARK: Worker
 
-    private func forgetSent() {
-        sentTitle = nil; sentArtist = nil; sentDuration = nil; sentPlaying = nil; sentElapsed = nil
+    /// Runs the worker unless one is running, in which case it will see the change on its next pass.
+    private func run() async {
+        again = true
+        guard !working else { return }
+        working = true
+        while again {
+            again = false
+            await pass()
+        }
+        working = false
     }
 
-    private func sync() async {
+    private func pass() async {
         guard connected else { return }
         guard let current = nowPlaying else {
             // Only if the widget was showing our track: when something else (Spotify, Music) owns it, stay out of its way.
-            if sentPlaying == true {
-                if (try? await link.sendInfo(title: nil, artist: nil, elapsed: nil, duration: nil, isPlaying: false)) != nil { sentPlaying = false }
+            if shown?.playing == true {
+                do {
+                    try await link.sendInfo(title: nil, artist: nil, elapsed: nil, duration: nil, isPlaying: false)
+                    shown?.playing = false
+                } catch { log.error("Couldn't tell the widget playback stopped: \(String(describing: error), privacy: .public)") }
             }
-            ticker?.cancel(); ticker = nil
+            wake?.cancel(); wake = nil
+            wantCover(nil)
             return
         }
         let now = Date()
         let artist = NomadText.artistLine(artist: current.artist, format: current.format, style: style)
         let duration = Int(current.duration.rounded())
         let elapsed = current.elapsed(at: now)
-        // Fields the keyboard already has are left out of the call, as Input does.
-        let titleChanged = current.title != sentTitle, artistChanged = artist != sentArtist
-        let durationChanged = duration != sentDuration, playingChanged = current.isPlaying != sentPlaying
-        // The clock is sent when it drifts from what the keyboard would count on its own, or when the state changes.
-        let drift = sentElapsed.map { abs(($0 + (sentPlaying == true ? Int(now.timeIntervalSince(lastSend)) : 0)) - elapsed) >= 2 } ?? true
-        if titleChanged || artistChanged || durationChanged || playingChanged || drift || screenOpen {
-            do {
-                try await link.sendInfo(title: titleChanged ? current.title : nil, artist: artistChanged ? artist : nil,
-                                        elapsed: elapsed, duration: durationChanged ? duration : nil, isPlaying: current.isPlaying)
-                sentTitle = current.title; sentArtist = artist; sentDuration = duration
-                sentPlaying = current.isPlaying; sentElapsed = elapsed; lastSend = now
-            } catch {
-                log.error("Couldn't update the widget: \(String(describing: error), privacy: .public)")
-                return   // the next change or tick tries again
+
+        let textChanged = shown.map { $0.title != current.title || $0.artist != artist || $0.duration != duration } ?? true
+        let dueReassert = contested && screenOpen && reasserts.contains { $0 <= now }
+        do {
+            if textChanged || dueReassert {
+                try await link.sendInfo(title: current.title, artist: artist, elapsed: elapsed, duration: duration, isPlaying: current.isPlaying)
+                shown = Shown(title: current.title, artist: artist, duration: duration, playing: current.isPlaying, elapsed: elapsed, at: now)
+                if textChanged, contested { reasserts = [now.addingTimeInterval(1.6), now.addingTimeInterval(3.6)] }
+                else { reasserts.removeAll { $0 <= now } }
+            } else if let s = shown {
+                let expected = s.playing ? s.elapsed + Int(now.timeIntervalSince(s.at)) : s.elapsed
+                let drifted = abs(expected - elapsed) >= 2
+                if current.isPlaying != s.playing || drifted || (screenOpen && current.isPlaying) {
+                    try await link.sendInfo(title: nil, artist: nil, elapsed: elapsed, duration: nil, isPlaying: current.isPlaying)
+                    shown = Shown(title: s.title, artist: s.artist, duration: s.duration, playing: current.isPlaying, elapsed: elapsed, at: now)
+                }
             }
+        } catch {
+            log.error("Couldn't update the widget: \(String(describing: error), privacy: .public)")
+            shown = nil          // we no longer know what it shows: the next pass sends the whole track
+            schedule(after: 1.5)
+            wantCover(current.artworkID)
+            return
         }
-        if let id = current.artworkID, sentArtworkID != .some(id) { sendArtwork(id) }
-        ticker?.cancel(); ticker = nil
-        if screenOpen, current.isPlaying {
-            ticker = Task { [weak self] in
-                try? await Task.sleep(for: .seconds(1))
-                if !Task.isCancelled { await self?.tick() }
-            }
+        wantCover(current.artworkID)
+
+        // The next pass: a second on while the media screen shows a playing song, or when a reassert is due.
+        var next: TimeInterval?
+        if screenOpen, current.isPlaying { next = 1 }
+        if contested, screenOpen, let due = reasserts.min() { next = min(next ?? .infinity, max(0.1, due.timeIntervalSince(Date()))) }
+        if let next { schedule(after: next) } else { wake?.cancel(); wake = nil }
+    }
+
+    private func schedule(after seconds: TimeInterval) {
+        wake?.cancel()
+        wake = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(seconds))
+            if !Task.isCancelled { await self?.run() }
         }
     }
 
-    private var lastSend = Date.distantPast
+    // MARK: Covers
 
-    private func tick() async {
-        ticks += 1
-        if contested, ticks % 5 == 0 { sentTitle = nil; sentArtist = nil; sentDuration = nil }
-        await sync()
+    private func wantCover(_ id: String?) {
+        guard id != coverWanted else { return }
+        coverWanted = id
+        coverAttempts = 0
+        coverTask?.cancel(); coverTask = nil
+        guard let id, id != coverShown else { return }
+        startCover(id, after: coverDelay)
     }
 
-    /// Covers go in a task of their own: about 150 ms of HID traffic that title changes shouldn't wait behind.
-    private func sendArtwork(_ id: String) {
-        artworkTask?.cancel()
+    private func startCover(_ id: String, after delay: Duration) {
         let encode = encodeArtwork, link = self.link
-        artworkTask = Task { [weak self] in
-            guard let data = await encode(id), !Task.isCancelled else { return }
+        coverTask = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled, let data = await encode(id), !Task.isCancelled else { return }
             do {
                 try await link.sendArtwork(data)
-                await self?.artworkSent(id)
+                await self?.coverSent(id)
+            } catch is CancellationError {
+                return
             } catch {
                 log.error("Couldn't send the cover: \(String(describing: error), privacy: .public)")
+                await self?.coverFailed(id)
             }
         }
     }
 
-    private func artworkSent(_ id: String) { sentArtworkID = .some(id) }
+    private func coverSent(_ id: String) { if coverWanted == id { coverShown = id } }
+
+    /// A cover that didn't go through is tried again, a few times, unless a newer track has asked for another.
+    private func coverFailed(_ id: String) {
+        guard coverWanted == id, connected, coverAttempts < 3 else { return }
+        coverAttempts += 1
+        startCover(id, after: .seconds(2 * coverAttempts))
+    }
 }

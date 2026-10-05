@@ -13,13 +13,24 @@ final class RecordingPort: NomadWidgetPort, @unchecked Sendable {
     private let lock = NSLock()
     private var _infos: [Info] = []
     private var _artworks: [Data] = []
+    private var _failNext = 0
+    /// How long each call takes, like a keyboard that answers slowly.
+    var latency: Duration = .zero
     var infos: [Info] { lock.withLock { _infos } }
     var artworks: [Data] { lock.withLock { _artworks } }
+    /// The next `n` info calls fail.
+    func failInfo(next n: Int) { lock.withLock { _failNext = n } }
 
     func sendInfo(title: String?, artist: String?, elapsed: Int?, duration: Int?, isPlaying: Bool?) async throws {
+        if latency > .zero { try await Task.sleep(for: latency) }
+        let fail: Bool = lock.withLock { if _failNext > 0 { _failNext -= 1; return true }; return false }
+        if fail { throw NomadError.timeout }
         lock.withLock { _infos.append(Info(title: title, artist: artist, elapsed: elapsed, duration: duration, isPlaying: isPlaying)) }
     }
-    func sendArtwork(_ image: Data) async throws { lock.withLock { _artworks.append(image) } }
+    func sendArtwork(_ image: Data) async throws {
+        if latency > .zero { try await Task.sleep(for: latency) }
+        lock.withLock { _artworks.append(image) }
+    }
 }
 
 @Suite("Nomad media feed")
@@ -34,7 +45,7 @@ struct NomadFeedTests {
     }
 
     private func feed(_ port: RecordingPort, style: NomadFormatStyle = .suffix) -> NomadMediaFeed {
-        NomadMediaFeed(link: port, style: style) { id in Data(id.utf8) }
+        NomadMediaFeed(link: port, style: style, coverDelay: .milliseconds(5)) { id in Data(id.utf8) }
     }
 
     @Test func nothingIsSentWithoutAKeyboard() async {
@@ -97,7 +108,7 @@ struct NomadFeedTests {
         await feed.update(track("Next Song", artist: "GENDEMA", position: 0, art: "cover-2"))
         await waitForArtwork(port, count: 2)
         #expect(port.infos.last?.title == "Next Song")
-        #expect(port.infos.last?.artist == nil)   // same artist line: already on the keyboard
+        #expect(port.infos.last?.artist == "GENDEMA - 24/96")   // a text update is always the whole track
         #expect(port.artworks == [Data("cover-1".utf8), Data("cover-2".utf8)])
     }
 
@@ -152,6 +163,98 @@ struct NomadFeedTests {
         await feed.handle(.connected(name: "x"))
         await feed.update(track())
         #expect(port.infos[0].artist == "GENDEMA")
+    }
+}
+
+@Suite("Nomad feed under load")
+struct NomadFeedLoadTests {
+    private func track(_ i: Int, art: Bool = true) -> NomadNowPlaying {
+        NomadNowPlaying(title: "Title \(i)", artist: "Artist \(i)", format: "24/96", duration: 200, position: 0, isPlaying: true,
+                        artworkID: art ? "cover-\(i)" : nil)
+    }
+
+    private func settle(_ port: RecordingPort) async {
+        var last = -1
+        while true {
+            try? await Task.sleep(for: .milliseconds(150))
+            let now = port.infos.count + port.artworks.count
+            if now == last { return }
+            last = now
+        }
+    }
+
+    @Test func skippingFastAgainstASlowKeyboardEndsOnTheLastSongAndNeverMixesTracks() async {
+        let port = RecordingPort()
+        port.latency = .milliseconds(40)
+        let feed = NomadMediaFeed(link: port, style: .suffix, coverDelay: .milliseconds(100)) { id in Data(id.utf8) }
+        await feed.handle(.connected(name: "x"))
+        for i in 0..<30 {
+            Task { await feed.update(track(i)) }
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        await settle(port)
+        let infos = port.infos
+        // Whatever was sent, a title always came with its own artist.
+        for info in infos where info.title != nil {
+            #expect(info.artist?.hasPrefix("Artist " + info.title!.dropFirst("Title ".count)) == true, "\(info)")
+        }
+        #expect(infos.last?.title == "Title 29")
+        #expect(infos.count < 30, "updates were coalesced, not queued one by one")
+        // Only the last cover was worth sending.
+        #expect(port.artworks.last == Data("cover-29".utf8))
+        #expect(port.artworks.count <= 2)
+    }
+
+    @Test func aFailedCallIsFollowedByTheWholeTrackNotAFragment() async {
+        let port = RecordingPort()
+        let feed = NomadMediaFeed(link: port, style: .suffix, coverDelay: .milliseconds(5)) { id in Data(id.utf8) }
+        await feed.handle(.connected(name: "x"))
+        await feed.update(track(1))
+        port.failInfo(next: 1)
+        await feed.update(track(2))                    // fails
+        for _ in 0..<60 where port.infos.count < 2 { try? await Task.sleep(for: .milliseconds(50)) }
+        #expect(port.infos.last?.title == "Title 2")   // retried by itself, with the artist too
+        #expect(port.infos.last?.artist == "Artist 2 - 24/96")
+        await feed.handle(.disconnected)
+    }
+
+    @Test func aCoverThatFailsIsRetried() async {
+        let port = FlakyCoverPort()
+        let feed = NomadMediaFeed(link: port, style: .off, coverDelay: .milliseconds(5)) { id in Data(id.utf8) }
+        await feed.handle(.connected(name: "x"))
+        await feed.update(track(1))
+        for _ in 0..<80 where port.sent.isEmpty { try? await Task.sleep(for: .milliseconds(50)) }
+        #expect(port.attempts >= 2)
+        #expect(port.sent == [Data("cover-1".utf8)])
+    }
+
+    @Test func whileInputIsWritingTooTheTextIsSaidAgainAfterEachNewTrack() async {
+        let port = RecordingPort()
+        let feed = NomadMediaFeed(link: port, style: .suffix, coverDelay: .milliseconds(5)) { id in Data(id.utf8) }
+        await feed.setContested(true)
+        await feed.handle(.connected(name: "x"))
+        await feed.handle(.mediaScreen(wantsData: true))
+        await feed.update(track(1))
+        // Input overwrites the artist ~1.3 s after a new track; the feed repeats the whole text at about 1.6 s and 3.6 s.
+        for _ in 0..<80 where port.infos.filter({ $0.title == "Title 1" }).count < 3 { try? await Task.sleep(for: .milliseconds(100)) }
+        #expect(port.infos.filter { $0.title == "Title 1" && $0.artist == "Artist 1 - 24/96" }.count >= 3)
+        await feed.handle(.mediaScreen(wantsData: false))
+        await feed.handle(.disconnected)
+    }
+}
+
+/// Fails the first cover upload, like a keyboard that didn't answer a chunk.
+final class FlakyCoverPort: NomadWidgetPort, @unchecked Sendable {
+    private let lock = NSLock()
+    private var _attempts = 0
+    private var _sent: [Data] = []
+    var attempts: Int { lock.withLock { _attempts } }
+    var sent: [Data] { lock.withLock { _sent } }
+    func sendInfo(title: String?, artist: String?, elapsed: Int?, duration: Int?, isPlaying: Bool?) async throws {}
+    func sendArtwork(_ image: Data) async throws {
+        let n = lock.withLock { _attempts += 1; return _attempts }
+        if n == 1 { throw NomadError.timeout }
+        lock.withLock { _sent.append(image) }
     }
 }
 

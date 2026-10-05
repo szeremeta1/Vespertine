@@ -392,8 +392,11 @@ struct KeyboardSettings: View {
                 Text("The widget shows the title, artist, cover, elapsed time and length of the song playing in Vespertine, and the format of the file after the artist. It only changes while Vespertine is playing; Spotify and Music keep their own card.")
                     .font(.caption).foregroundStyle(.secondary)
                 if nomad.inputIsRunning {
-                    Label("Work Louder's Input is open. It also writes to the widget and can't show covers or time for Vespertine, so quit it while you listen. Your key and dial settings stay on the keyboard.", systemImage: "exclamationmark.triangle")
+                    Label("Work Louder's Input is open. It writes to the same widget at the same time, which garbles covers and timing, and it can't show covers or time for Vespertine. Quit it while you listen; your key and dial settings stay on the keyboard.", systemImage: "exclamationmark.triangle")
                         .font(.caption).foregroundStyle(.orange)
+                    Button("Quit Input") { model.nomad.quitInput() }
+                    Text("Input opens at login. To stop that, remove it in System Settings › General › Login Items.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
             }
         }

@@ -57,9 +57,12 @@ public final class NomadLink: @unchecked Sendable {
         let id: Int
         let reports: [[UInt8]]
         let continuation: CheckedContinuation<Void, Error>
+        let low: Bool
+        let timeout: TimeInterval
     }
     private var waiting: [Call] = []
     private var inFlight: (call: Call, timeout: DispatchWorkItem)?
+    private var inFlightSince = DispatchTime.now()
 
     private let onEvent: @Sendable (Event) -> Void
     private let callTimeout: TimeInterval
@@ -127,15 +130,20 @@ public final class NomadLink: @unchecked Sendable {
 
     // MARK: Calls
 
-    /// Sends a JSON-RPC call and waits for the keyboard's answer. Calls run strictly one after another.
-    public func call(_ method: String, _ params: [(String, JSONValue)]?) async throws {
+    public enum Priority: Sendable { case normal, low }
+
+    /// Sends a JSON-RPC call and waits for the keyboard's answer. Calls run strictly one after another; a `.low` call
+    /// (a cover chunk) waits behind every `.normal` one, so text never queues up behind a cover.
+    public func call(_ method: String, _ params: [(String, JSONValue)]?, priority: Priority = .normal, timeout: TimeInterval? = nil) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             queue.async { [self] in
                 guard device != nil else { continuation.resume(throwing: NomadError.notConnected); return }
                 nextID = (nextID + 1) % 999
                 let id = nextID
                 let reports = NomadReports.split(NomadRPC.request(method: method, params: params, id: id))
-                waiting.append(Call(id: id, reports: reports, continuation: continuation))
+                let call = Call(id: id, reports: reports, continuation: continuation, low: priority == .low, timeout: timeout ?? callTimeout)
+                if call.low { waiting.append(call) }
+                else { waiting.insert(call, at: waiting.firstIndex(where: \.low) ?? waiting.endIndex) }
                 pump()
             }
         }
@@ -238,6 +246,8 @@ public final class NomadLink: @unchecked Sendable {
                     guard let current = inFlight, current.call.id == id else { continue }
                     current.timeout.cancel()
                     inFlight = nil
+                    let ms = Int((DispatchTime.now().uptimeNanoseconds - inFlightSince.uptimeNanoseconds) / 1_000_000)
+                    if ms > 400 { log.notice("Slow answer: \(ms, privacy: .public) ms for call \(id, privacy: .public)") }
                     if let error { current.call.continuation.resume(throwing: NomadError.rejected(error)) }
                     else { current.call.continuation.resume() }
                     pump()
@@ -257,7 +267,8 @@ public final class NomadLink: @unchecked Sendable {
             pump()
         }
         inFlight = (call, timeout)
-        queue.asyncAfter(deadline: .now() + callTimeout, execute: timeout)
+        inFlightSince = .now()
+        queue.asyncAfter(deadline: .now() + call.timeout, execute: timeout)
         for report in call.reports {
             trace?("-> \(report.count)B \(Self.hex(report))")
             let status = report.withUnsafeBufferPointer {
@@ -301,21 +312,30 @@ extension NomadLink {
         if let elapsed { params.append(("elapsed", .int(elapsed))) }
         if let duration { params.append(("total_duration", .int(duration))) }
         if let isPlaying { params.append(("is_playing", .bool(isPlaying))) }
-        try await call(NomadProtocol.Method.writeInfo, params)
+        try await call(NomadProtocol.Method.writeInfo, params, timeout: 2.5)
     }
 
-    /// Cover art, already in the keyboard's image layout (`NomadArtwork.encode`), in the chunks it takes.
+    /// Cover art, already in the keyboard's image layout (`NomadArtwork.encode`), in the chunks it takes. Stops at the next
+    /// chunk when the task is cancelled (a newer cover replaces this one), and tries a chunk that got no answer once more:
+    /// it carries its own offset, so repeating it is harmless.
     public func sendArtwork(_ image: Data) async throws {
         let size = NomadProtocol.artworkChunkBytes
         var offset = 0
         while offset < image.count {
+            try Task.checkCancellation()
             let chunk = image[offset..<min(offset + size, image.count)]
-            try await call(NomadProtocol.Method.writeArtwork, [
+            let params: [(String, JSONValue)] = [
                 ("data", .string(chunk.base64EncodedString())), ("offset", .int(offset)), ("size", .int(image.count)),
-            ])
+            ]
+            do {
+                try await call(NomadProtocol.Method.writeArtwork, params, priority: .low, timeout: 3)
+            } catch NomadError.timeout {
+                try Task.checkCancellation()
+                try await call(NomadProtocol.Method.writeArtwork, params, priority: .low, timeout: 3)
+            }
             offset += size
             // Input paces the chunks 50 ms apart; the firmware writes each to flash.
-            try? await Task.sleep(for: .milliseconds(50))
+            try await Task.sleep(for: .milliseconds(50))
         }
     }
 
