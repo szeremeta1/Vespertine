@@ -142,6 +142,7 @@ struct MenuBarView: View {
 // MARK: - Settings
 
 struct SettingsView: View {
+    @Environment(AppModel.self) private var model
     /// `-VespertineSettingsTab keyboard` (QA) opens on another tab.
     @State private var tab = LaunchArguments().string(forKey: "VespertineSettingsTab") ?? "playback"
 
@@ -151,7 +152,10 @@ struct SettingsView: View {
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag("library")
             NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag("network")
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag("online")
-            KeyboardSettings().tabItem { Label("Keyboard", systemImage: "keyboard") }.tag("keyboard")
+            // Only for someone who has a Nomad: a tab about a keyboard they don't own is noise.
+            if model.settings.nomadSeen {
+                KeyboardSettings().tabItem { Label("Keyboard", systemImage: "keyboard") }.tag("keyboard")
+            }
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag("updates")
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag("about")
         }

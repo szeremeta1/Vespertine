@@ -6,9 +6,12 @@
 import AppKit
 import Foundation
 import Observation
+import os
 import VespertineAudio
 import VespertineLibrary
 import VespertineNomad
+
+private let nomadLog = Logger(subsystem: "org.szeremeta.vespertine.nomad", category: "app")
 
 /// Owns the link to the keyboard and the feed that follows playback. Work Louder's Input app also writes to the
 /// widget (title and artist, never the cover or the time, for a player it doesn't know), so while it runs the feed
@@ -30,16 +33,18 @@ final class NomadController {
     private var feed: NomadMediaFeed?
     private var eventTask: Task<Void, Never>?
     private var latest: NomadNowPlaying?
-    private var observers: [NSObjectProtocol] = []
+    private var inputWatch: Task<Void, Never>?
 
     init(settings: AppSettings) {
         self.settings = settings
         refreshInput()
-        let center = NSWorkspace.shared.notificationCenter
-        for name in [NSWorkspace.didLaunchApplicationNotification, NSWorkspace.didTerminateApplicationNotification] {
-            observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.refreshInput() }
-            })
+        // A plain look every few seconds rather than launch/quit notifications: those went stale once, and the answer
+        // is one cheap lookup.
+        inputWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3))
+                self?.refreshInput()
+            }
         }
     }
 
@@ -94,7 +99,7 @@ final class NomadController {
 
     private func show(_ event: NomadLink.Event) {
         switch event {
-        case .connected(let name): keyboard = name; problem = nil
+        case .connected(let name): keyboard = name; problem = nil; settings.nomadSeen = true
         case .disconnected: keyboard = nil; mediaScreenOpen = false
         case .mediaScreen(let wants): mediaScreenOpen = wants
         case .problem(let reason): problem = reason
@@ -110,6 +115,7 @@ final class NomadController {
     private func refreshInput() {
         let running = !NSRunningApplication.runningApplications(withBundleIdentifier: Self.inputBundleID).isEmpty
         guard running != inputIsRunning else { return }
+        nomadLog.notice("Input is \(running ? "running" : "not running", privacy: .public)")
         inputIsRunning = running
         Task { await feed?.setContested(running) }
     }

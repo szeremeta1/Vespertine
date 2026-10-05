@@ -90,6 +90,8 @@ final class AppSettings {
     var analyzeNetworkShares: Bool { didSet { defaults.set(analyzeNetworkShares, forKey: "analyzeNetworkShares") } }
     /// Upcoming tracks copied ahead of playback when the cache is on.
     var networkPrefetch: Int { didSet { defaults.set(networkPrefetch, forKey: "networkPrefetch") } }
+    /// A Nomad [E] has been connected at least once: only then does Settings have a Keyboard tab.
+    var nomadSeen: Bool { didSet { defaults.set(nomadSeen, forKey: "nomadSeen") } }
     /// Feed the media widget of a connected Work Louder Nomad [E] keyboard.
     var nomadWidget: Bool { didSet { defaults.set(nomadWidget, forKey: "nomadWidget") } }
     /// Whether the widget's artist line also names the file's format ("GENDEMA - FLAC 24/96").
@@ -106,7 +108,7 @@ final class AppSettings {
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "deviceOnQuit": "restore",
-            "nomadWidget": true, "nomadFormat": "suffix",
+            "nomadWidget": true, "nomadFormat": "suffix", "nomadSeen": false,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
@@ -137,6 +139,7 @@ final class AppSettings {
         networkCache = defaults.bool(forKey: "networkCache")
         networkCacheLimitGB = defaults.double(forKey: "networkCacheLimitGB")
         networkPrefetch = defaults.integer(forKey: "networkPrefetch")
+        nomadSeen = defaults.bool(forKey: "nomadSeen")
         nomadWidget = defaults.bool(forKey: "nomadWidget")
         nomadFormat = NomadFormatStyle(rawValue: defaults.string(forKey: "nomadFormat") ?? "") ?? .suffix
 
