@@ -422,7 +422,8 @@ public enum NetworkCredentials {
     /// The saved password: the login keychain first (Finder's and NetAuth's), then the data-protection one.
     public static func password(for share: NetworkShare) -> String? { lookup(share).password }
 
-    /// Password plus the keychain result codes, for diagnosing a failed mount.
+    /// Password plus the keychain result codes, for diagnosing a failed mount. Can put up macOS's keychain prompt
+    /// (an item saved by an earlier signer of the app asks once), so call it off the main thread.
     public static func lookup(_ share: NetworkShare) -> (password: String?, status: String) {
         var codes: [String] = []
         for dp in [false, true] {
@@ -449,17 +450,23 @@ public enum NetworkCredentials {
         return false
     }
 
-    /// Saves to the login keychain (where Finder and macOS's network-auth agent look too).
-    public static func save(_ password: String, for share: NetworkShare) {
-        guard let q = query(share, dataProtection: false) else { return }
+    /// Saves to the login keychain (where Finder and macOS's network-auth agent look too). An item that refuses the
+    /// update (one saved by an earlier signer of the app, when access was denied) is replaced. Returns the keychain status.
+    @discardableResult
+    public static func save(_ password: String, for share: NetworkShare) -> OSStatus {
+        guard let q = query(share, dataProtection: false) else { return errSecParam }
         let data = Data(password.utf8)
-        if SecItemUpdate(q as CFDictionary, [kSecValueData as String: data] as CFDictionary) == errSecItemNotFound {
-            var add = q
-            add[kSecValueData as String] = data
-            add[kSecAttrLabel as String] = share.host
-            add[kSecAttrComment as String] = "Saved by Vespertine for \(share.displayString)"
-            SecItemAdd(add as CFDictionary, nil)
+        var status = SecItemUpdate(q as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        if status != errSecSuccess && status != errSecItemNotFound {
+            SecItemDelete(q as CFDictionary)
+            status = errSecItemNotFound
         }
+        guard status == errSecItemNotFound else { return status }
+        var add = q
+        add[kSecValueData as String] = data
+        add[kSecAttrLabel as String] = share.host
+        add[kSecAttrComment as String] = "Saved by Vespertine for \(share.displayString)"
+        return SecItemAdd(add as CFDictionary, nil)
     }
 
     public static func delete(for share: NetworkShare) {
