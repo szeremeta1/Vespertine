@@ -149,14 +149,35 @@ public enum Importer {
         try? file.writeMetadata()
     }
 
-    /// APFS clone when possible (same volume), full copy otherwise. Metadata and timestamps are preserved.
+    /// APFS clone when possible (same volume), full copy otherwise. Metadata and timestamps are preserved. The copy is
+    /// made under a hidden temporary name beside `dest` and renamed into place, so one that fails partway (a full disk,
+    /// a card pulled out) is removed rather than left at `dest`, where it would be scanned as music.
     static func cloneOrCopy(_ source: URL, to dest: URL) throws {
-        let status = source.withUnsafeFileSystemRepresentation { src in
-            dest.withUnsafeFileSystemRepresentation { dst in
-                copyfile(src!, dst!, nil, copyfile_flags_t(COPYFILE_ALL | COPYFILE_CLONE))
+        let temporary = dest.deletingLastPathComponent().appendingPathComponent(".vespertine-import-\(UUID().uuidString)")
+        do {
+            let status = source.withUnsafeFileSystemRepresentation { src in
+                temporary.withUnsafeFileSystemRepresentation { dst in
+                    copyfile(src!, dst!, nil, copyfile_flags_t(COPYFILE_ALL | COPYFILE_CLONE))
+                }
             }
+            if status != 0 {
+                try? FileManager.default.removeItem(at: temporary)
+                try FileManager.default.copyItem(at: source, to: temporary)
+            }
+            // Never over a file that's there already (checked first where the volume can't make the rename exclusive).
+            let renamed = temporary.withUnsafeFileSystemRepresentation { src in
+                dest.withUnsafeFileSystemRepresentation { dst in
+                    if renamex_np(src!, dst!, UInt32(RENAME_EXCL)) == 0 { return Int32(0) }
+                    guard errno == ENOTSUP || errno == EINVAL else { return errno }
+                    if access(dst!, F_OK) == 0 { return EEXIST }
+                    return rename(src!, dst!) == 0 ? 0 : errno
+                }
+            }
+            guard renamed == 0 else { throw POSIXError(POSIXErrorCode(rawValue: renamed) ?? .EIO) }
+        } catch {
+            try? FileManager.default.removeItem(at: temporary)
+            throw error
         }
-        if status != 0 { try FileManager.default.copyItem(at: source, to: dest) }
     }
 
     /// Every copy carries the size, modification date and a content fingerprint of the file it came from, so importing
