@@ -31,11 +31,17 @@ struct FindMusicSheet: View {
     @State private var mode: ImportMode = .copyAndOrganize
     @State private var enrichAfter = true
     @State private var adding = false
+    /// Second and later copies of identical files in the list: worked out when the list or the filter changes,
+    /// not for every row on every update.
+    @State private var duplicates = Set<URL>()
+    /// What Import & Organize would write, measured off the main thread (asking a volume for its free space can be
+    /// slow) whenever the selection, filter or mode changes. Nil until first measured.
+    @State private var space: ImportSpace?
 
     private var visible: [FoundFolder] { folders.filter { !$0.music.filter(filter.includes).isEmpty } }
 
     /// Second and later copies of identical files (same size and length), in list order.
-    private var duplicates: Set<URL> {
+    private func findDuplicates() -> Set<URL> {
         var seen = Set<String>(), dupes = Set<URL>()
         for file in visible.flatMap({ $0.music.filter(filter.includes) }) {
             if !seen.insert(file.duplicateKey).inserted { dupes.insert(file.url) }
@@ -47,10 +53,14 @@ struct FindMusicSheet: View {
     }
     /// What Import & Organize would write: files on another drive are copied in full, files on the
     /// Mac's own volume are APFS clones that take no space.
-    private var space: ImportSpace {
-        let files = visible.flatMap { $0.music.filter(filter.includes) }.filter { selected.contains($0.url) }
-        return ImportSpace.measure(files: files.map { ($0.url, $0.fileSize) },
-                                   destination: URL(fileURLWithPath: model.settings.managedFolderPath, isDirectory: true))
+    private func measureSpace() async {
+        guard mode == .copyAndOrganize else { return }
+        let files: [(url: URL, bytes: Int64)] = visible.flatMap { $0.music.filter(filter.includes) }
+            .filter { selected.contains($0.url) }.map { ($0.url, $0.fileSize) }
+        let destination = URL(fileURLWithPath: model.settings.managedFolderPath, isDirectory: true)
+        let measured = await Task.detached(priority: .userInitiated) { ImportSpace.measure(files: files, destination: destination) }.value
+        guard !Task.isCancelled else { return }
+        space = measured
     }
 
     var body: some View {
@@ -99,6 +109,7 @@ struct FindMusicSheet: View {
         .onAppear { mode = model.settings.defaultImportMode }
         .task { await scan() }
         .onChange(of: filter) { selectDefaults() }
+        .task(id: "\(mode)#\(filter.rawValue)#\(selected.hashValue)#\(selected.count)") { await measureSpace() }
     }
 
     private var allSelected: Bool { !selectedFiles.isEmpty && selectedFiles.count == visible.flatMap { $0.music.filter(filter.includes) }.count }
@@ -145,8 +156,8 @@ struct FindMusicSheet: View {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(files) { file in
                         HStack(spacing: 10) {
-                            Toggle("", isOn: Binding(get: { selected.contains(file.url) },
-                                                     set: { if $0 { selected.insert(file.url) } else { selected.remove(file.url) } }))
+                            Toggle(file.url.lastPathComponent, isOn: Binding(get: { selected.contains(file.url) },
+                                                                             set: { if $0 { selected.insert(file.url) } else { selected.remove(file.url) } }))
                                 .toggleStyle(.checkbox).labelsHidden()
                             Text(file.url.lastPathComponent).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1).truncationMode(.middle)
                             if duplicates.contains(file.url) { StatusBadge(text: "DUPLICATE", kind: .converted) }
@@ -174,7 +185,7 @@ struct FindMusicSheet: View {
                      : "Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
-            if mode == .copyAndOrganize, space.bytesToCopy > 0 {
+            if mode == .copyAndOrganize, let space, space.bytesToCopy > 0 {
                 Text(copyNote(space))
                     .font(Typeface.ui(11)).foregroundStyle(space.fits ? Palette.text3 : Palette.copper)
                     .fixedSize(horizontal: false, vertical: true)
@@ -186,7 +197,7 @@ struct FindMusicSheet: View {
                 Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
                 Button(adding ? "Adding…" : "Add \(selectedFiles.count) Track\(selectedFiles.count == 1 ? "" : "s")") { add() }
                     .buttonStyle(BrassButtonStyle())
-                    .disabled(selectedFiles.isEmpty || adding || scanning || (mode == .copyAndOrganize && !space.fits))
+                    .disabled(selectedFiles.isEmpty || adding || scanning || (mode == .copyAndOrganize && !(space?.fits ?? false)))
                     .keyboardShortcut(.defaultAction)
             }
         }
@@ -208,7 +219,8 @@ struct FindMusicSheet: View {
     }
 
     private func selectDefaults() {
-        let dupes = duplicates
+        let dupes = findDuplicates()
+        duplicates = dupes
         selected = Set(visible.flatMap { $0.music.filter(filter.includes).map(\.url) }.filter { !dupes.contains($0) })
     }
 
@@ -311,7 +323,7 @@ struct EnrichSheet: View {
         let current = model.library.album(key: p.albumKey)
         return VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 14) {
-                Toggle("", isOn: Binding(get: { chosen.contains(p.id) }, set: { if $0 { chosen.insert(p.id) } else { chosen.remove(p.id) } }))
+                Toggle("\(p.artist) — \(p.title)", isOn: Binding(get: { chosen.contains(p.id) }, set: { if $0 { chosen.insert(p.id) } else { chosen.remove(p.id) } }))
                     .toggleStyle(.checkbox).labelsHidden().padding(.top, 2)
                 Group {
                     if let data = p.cover, let image = NSImage(data: data) {
