@@ -29,12 +29,9 @@ public final class LibraryDatabase: Sendable {
 
     init(writer: any DatabaseWriter, migrate: Bool = true) throws {
         self.writer = writer
-        if migrate {
-            try Self.migrator.migrate(writer)
-            // Before anything asks what needs analyzing: after an analyzer update, stored results are judged anew
-            // from their measurements instead of every file (network shares' too) being read again.
-            try rejudgeStoredAnalyses()
-        }
+        // Stored analyses from an older analyzer are judged anew by `rejudgeStoredAnalyses`, which the app runs off the
+        // main thread after opening the library and before anything asks what needs analyzing.
+        if migrate { try Self.migrator.migrate(writer) }
     }
 
     public static var defaultURL: URL {
@@ -271,6 +268,13 @@ public final class LibraryDatabase: Sendable {
             // them under Various Artists (in the library only); do the same for tracks already scanned.
             try db.execute(sql: "UPDATE track SET albumArtist = ? WHERE compilation = 1 AND (albumArtist IS NULL OR trim(albumArtist) = '')",
                            arguments: [Track.variousArtists])
+        }
+        m.registerMigration("v16-meta") { db in
+            // Small facts about the library itself (which analyzer version stored results were last judged for).
+            try db.create(table: "meta") { t in
+                t.primaryKey("key", .text)
+                t.column("value", .text).notNull()
+            }
         }
         return m
     }
@@ -775,27 +779,42 @@ public extension LibraryDatabase {
     }
 
     /// Brings stored analyses from older versions up to the current judgement from their measurements
-    /// (`FileAnalyzer.rejudged`). Those that can't be (version 1 kept no measurements) stay as they are, for a fresh
-    /// analysis. Returns how many were brought up to date; nothing to do costs one query.
+    /// (`FileAnalyzer.rejudged`), so an analyzer update doesn't mean reading every file (network shares' too) again.
+    /// Those that can't be (version 1 kept no measurements, some hi-res results) stay as they are, for a fresh analysis.
+    /// Runs once per analyzer version, a few hundred results per transaction so it never holds the library for long;
+    /// call it off the main thread, before asking what needs analyzing. Returns how many were brought up to date.
     @discardableResult
-    public func rejudgeStoredAnalyses() throws -> Int {
-        try writer.write { db in
-            let rows = try Row.fetchAll(db, sql: "SELECT trackId, data FROM analysis WHERE version >= 2 AND version < ?",
-                                        arguments: [FileAnalysis.currentVersion])
-            let decoder = JSONDecoder(), encoder = JSONEncoder()
-            var updated = 0
-            for row in rows {
-                guard let stored = try? decoder.decode(FileAnalysis.self, from: row["data"] as Data) else { continue }
-                let analysis = FileAnalyzer.rejudged(stored)
-                guard analysis.version >= FileAnalysis.currentVersion, let data = try? encoder.encode(analysis) else { continue }
-                let id: Int64 = row["trackId"]
-                try db.execute(sql: "UPDATE analysis SET version = ?, data = ? WHERE trackId = ?", arguments: [analysis.version, data, id])
-                try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
-                               arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
-                updated += 1
+    public func rejudgeStoredAnalyses(batchSize: Int = 500) throws -> Int {
+        let key = "rejudgedForAnalyzerVersion", version = FileAnalysis.currentVersion
+        let done = try writer.read { db in try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: [key]) }
+        guard (done ?? 0) < version else { return 0 }
+        let decoder = JSONDecoder(), encoder = JSONEncoder()
+        var updated = 0, cursor: Int64 = .min
+        while true {
+            let (count, last) = try writer.write { db -> (Int, Int64?) in
+                let rows = try Row.fetchAll(db, sql: """
+                    SELECT trackId, data FROM analysis WHERE version >= 2 AND version < ? AND trackId > ? ORDER BY trackId LIMIT ?
+                    """, arguments: [version, cursor, batchSize])
+                for row in rows {
+                    guard let stored = try? decoder.decode(FileAnalysis.self, from: row["data"] as Data) else { continue }
+                    let analysis = FileAnalyzer.rejudged(stored)
+                    guard analysis.version >= version, let data = try? encoder.encode(analysis) else { continue }
+                    let id: Int64 = row["trackId"]
+                    try db.execute(sql: "UPDATE analysis SET version = ?, data = ? WHERE trackId = ?", arguments: [analysis.version, data, id])
+                    try db.execute(sql: "UPDATE track SET effectiveBitDepth = ?, bandwidthHz = ?, analysisVerdict = ? WHERE id = ?",
+                                   arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
+                    updated += 1
+                }
+                return (rows.count, rows.last.map { $0["trackId"] as Int64 })
             }
-            return updated
+            guard count == batchSize, let last else { break }
+            cursor = last
         }
+        // Those left behind are analyzed afresh (`tracksNeedingAnalysis`), not judged again at every launch.
+        try writer.write { db in
+            try db.execute(sql: "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", arguments: [key, String(version)])
+        }
+        return updated
     }
 
     /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
