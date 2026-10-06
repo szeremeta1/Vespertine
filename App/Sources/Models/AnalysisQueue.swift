@@ -50,6 +50,8 @@ final class AnalysisQueue {
     private let importer = ServerAnalysisImporter()
     private var syncing = false
     private var loops: [Task<Void, Never>] = []
+    /// Set by Stop: analyses that stood aside for playback aren't queued again. Cleared when analysis is asked for.
+    @ObservationIgnored private var stopped = false
 
     /// Read by analysis threads: true while network analysis must stand aside for playback.
     private let gate = AnalysisGate()
@@ -112,6 +114,7 @@ final class AnalysisQueue {
     }
 
     func cancel() {
+        stopped = true
         pending.removeAll()
         rebuildPendingPaths()
         if active.isEmpty { batchTotal = 0; completed = 0 }
@@ -154,6 +157,7 @@ final class AnalysisQueue {
     private func rebuildPendingPaths() { pendingPaths = Set(pending.map(\.filePath)) }
 
     private func start(adding count: Int) {
+        stopped = false
         if !isRunning || batchTotal == 0 { completed = 0; failures = 0; batchTotal = 0 }
         batchTotal += count
         pump()
@@ -211,7 +215,9 @@ final class AnalysisQueue {
                     revision += 1
                     library.analysisSaved()
                 case .failure(AnalysisError.cancelled):
-                    pending.append(next)          // stood aside for playback; try again later
+                    // Stood aside for playback: try again later, unless analysis was stopped meanwhile.
+                    guard !stopped else { break }
+                    pending.append(next)
                     pendingPaths.insert(next.filePath)
                     clearedOffline = nil
                 case .failure:
@@ -224,12 +230,30 @@ final class AnalysisQueue {
         }
     }
 
+    /// How many share files at the front of the queue are checked for a cached copy when only local slots are free.
+    private static let cachedLookahead = 16
+
     /// The first pending track that may start now: separate limits for local and network files,
     /// and no network reads while music plays from a share.
     private func nextStartable() -> Int? {
         let localActive = active.count - activeNetwork
         let networkFree = !gate.isBusy && activeNetwork < networkWidth, localFree = localActive < localWidth
         guard networkFree || localFree else { return nil }
+        // Both kinds of slot free: whatever is first can start, cached or not.
+        if networkFree && localFree { return pending.isEmpty ? nil : 0 }
+        if !networkFree {
+            // Only local slots: a local file needs no lookup. Share files can start only from a cached copy, and
+            // finding one hashes the track and checks the disk, so only the front of the queue is looked at; a
+            // queue of thousands of share files isn't hashed on the main thread every time a local file finishes.
+            var looked = 0
+            for (index, t) in pending.enumerated() {
+                guard shares.isNetwork(t) else { return index }
+                guard looked < Self.cachedLookahead else { continue }
+                looked += 1
+                if shares.cache.localURL(forKey: NetworkCache.key(for: t)) != nil { return index }
+            }
+            return nil
+        }
         return pending.firstIndex { t in
             guard shares.isNetwork(t) else { return localFree }
             // A local cached copy doesn't touch the network.
