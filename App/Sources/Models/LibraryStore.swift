@@ -122,7 +122,16 @@ final class LibraryStore {
                     FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY min(albumArtistSortKey)
                     """).map { LibraryDatabase.ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
             }
-            do { for try await value in obs.values(in: writer) { self?.artists = value; self?.revision += 1 } } catch {}
+            // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes
+            // this; only a real change reloads the views. Writes that change tracks without changing this bump
+            // `revision` themselves (scans, tag edits, plays, a share relinked).
+            do {
+                for try await value in obs.values(in: writer) {
+                    guard let self, self.artists != value else { continue }
+                    self.artists = value
+                    self.revision += 1
+                }
+            } catch {}
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db) }
@@ -145,6 +154,8 @@ final class LibraryStore {
             let obs = ValueObservation.tracking { db in try LibrarySource.order(Column("path")).fetchAll(db) }
             do {
                 for try await value in obs.values(in: writer) {
+                    // A share relinked to a new mount point rewrites its tracks' paths.
+                    if let self, self.sources != value, !self.sources.isEmpty { self.revision += 1 }
                     self?.sources = value
                     self?.updateWatcher()
                     self?.rescanLocalAtLaunch()
@@ -447,7 +458,10 @@ final class LibraryStore {
         do { try database.setFavorite(favorite, trackIDs: trackIDs) } catch { lastError = error.localizedDescription }
     }
 
-    func markPlayed(_ trackID: Int64) { try? database.markPlayed(trackID) }
+    func markPlayed(_ trackID: Int64) {
+        try? database.markPlayed(trackID)
+        revision += 1   // play counts in lists and the inspector
+    }
 
     /// A saved analysis changes verdict tags in lists; refresh them at most every couple of seconds.
     func analysisSaved() {
