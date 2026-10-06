@@ -36,6 +36,26 @@ struct NetworkTests {
         #expect(NetworkShare(string: "ftp://host/x") == nil)
     }
 
+    @Test("Only mounts Vespertine recorded making (or in the old mount folder) count as its own")
+    func ownMounts() throws {
+        let base = URL(fileURLWithPath: "/tmp/vespertine-own-mounts-\(UUID().uuidString)/Shares", isDirectory: true)
+        #expect(NetworkVolume.isOwnMount(base.appendingPathComponent("Music"), legacyBase: base))
+        // A folder that merely starts with the base's name isn't inside it.
+        #expect(!NetworkVolume.isOwnMount(URL(fileURLWithPath: base.path + "-backup/Music"), legacyBase: base))
+        // Any other mount, hidden or not (the root here), isn't, unless recorded; recorded points nothing is mounted
+        // on any more are forgotten with the next one recorded.
+        let root = URL(fileURLWithPath: "/"), gone = "/Volumes/vespertine-test-\(UUID().uuidString)"
+        #expect(!NetworkVolume.isOwnMount(root, legacyBase: base))
+        NetworkVolume.OwnMounts.record(gone, mounted: [])
+        #expect(NetworkVolume.OwnMounts.contains(gone))
+        NetworkVolume.OwnMounts.record("/", mounted: ["/"])
+        defer { NetworkVolume.OwnMounts.forget("/") }
+        #expect(!NetworkVolume.OwnMounts.contains(gone))
+        #expect(NetworkVolume.OwnMounts.contains("/"))
+        NetworkVolume.OwnMounts.forget("/")
+        #expect(!NetworkVolume.OwnMounts.contains("/"))
+    }
+
     /// When `blocking` hands over its result, measured on the thread that delivers it. Measuring after the `await`
     /// would add however long the awaiting task waits for a turn on Swift's few shared threads, seconds when every
     /// test in the package runs at once on a small CI machine.

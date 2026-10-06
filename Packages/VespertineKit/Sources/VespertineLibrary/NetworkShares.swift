@@ -230,7 +230,8 @@ public enum NetworkVolume {
     public static func existingMount(for share: NetworkShare) -> URL? {
         func norm(_ s: String) -> String { (s.removingPercentEncoding ?? s).lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "/")) }
         let host = share.host.lowercased(), target = norm(share.share)
-        for m in mounts() {
+        // Time Machine mounts a backup share of its own there: never adopted (it could be unmounted from under a backup).
+        for m in mounts() where !m.mountPoint.standardizedFileURL.path.hasPrefix("/Volumes/.timemachine/") {
             switch (share.kind, m.type) {
             case (.smb, "smbfs"):
                 // //user@host/share or //host/share (user may carry a ;domain)
@@ -304,18 +305,51 @@ public enum NetworkVolume {
             networkLog.error("mount \(share.host, privacy: .public)/\(share.share, privacy: .public) failed: code \(code, privacy: .public) (\(NetworkShareError.describe(code), privacy: .public)); user \(user != nil, privacy: .public), password \(password != nil, privacy: .public)")
             throw NetworkShareError.from(code: code, share: share)
         }
-        if let point { return URL(fileURLWithPath: point, isDirectory: true) }
-        if let existing = existingMount(for: share) { return existing }
-        throw NetworkShareError.failed(code: ENOENT)
+        guard let mounted = point.map({ URL(fileURLWithPath: $0, isDirectory: true) }) ?? existingMount(for: share) else {
+            throw NetworkShareError.failed(code: ENOENT)
+        }
+        OwnMounts.record(mounted.standardizedFileURL.path, mounted: Set(mounts().map(\.mountPoint.standardizedFileURL.path)))
+        return mounted
     }
 
-    /// Mounts Vespertine made: hidden from Finder (MNT_DONTBROWSE), or in the folder older versions used.
-    /// A share you mounted yourself in Finder is never unmounted by Vespertine.
+    /// Mounts Vespertine made: ones it recorded mounting (still hidden from Finder, as it mounts them), or in the folder
+    /// older versions used. A share mounted by anything else (Finder, Time Machine, another app) is never unmounted by
+    /// Vespertine, even when it's hidden too.
     public static func isOwnMount(_ mountPoint: URL, legacyBase base: URL) -> Bool {
-        if mountPoint.standardizedFileURL.path.hasPrefix(base.standardizedFileURL.path) { return true }
+        let path = mountPoint.standardizedFileURL.path, basePath = base.standardizedFileURL.path
+        if path.hasPrefix(basePath.hasSuffix("/") ? basePath : basePath + "/") { return true }
+        guard OwnMounts.contains(path) else { return false }
+        // Recorded, but a mount since made there by something else (ours gone) isn't hidden: not ours.
         var s = statfs()
         guard statfs(mountPoint.path, &s) == 0 else { return false }
         return s.f_flags & UInt32(MNT_DONTBROWSE) != 0
+    }
+
+    /// The mount points Vespertine mounted, kept across launches (a share stays mounted after Vespertine quits).
+    enum OwnMounts {
+        static let key = "VespertineOwnMountPoints"
+        private static let lock = NSLock()
+
+        static func contains(_ path: String) -> Bool {
+            lock.withLock { (UserDefaults.standard.stringArray(forKey: key) ?? []).contains(path) }
+        }
+
+        /// Records `path`, forgetting points nothing is mounted on any more (ones unmounted while Vespertine wasn't
+        /// running), so a later mount by something else there isn't taken for one of ours.
+        static func record(_ path: String, mounted: Set<String>) {
+            lock.withLock {
+                let kept = (UserDefaults.standard.stringArray(forKey: key) ?? []).filter { $0 != path && mounted.contains($0) }
+                UserDefaults.standard.set(kept + [path], forKey: key)
+            }
+        }
+
+        static func forget(_ path: String) {
+            lock.withLock {
+                let paths = UserDefaults.standard.stringArray(forKey: key) ?? []
+                guard paths.contains(path) else { return }
+                UserDefaults.standard.set(paths.filter { $0 != path }, forKey: key)
+            }
+        }
     }
 
     /// Runs file-system work that can block on a network mount (stat, list, open, unmount) on a GCD thread, never
@@ -362,7 +396,7 @@ public enum NetworkVolume {
     public static func forceUnmount(_ mountPoint: URL, ownedBy base: URL, timeout: TimeInterval = 15) async {
         await blocking(timeout: timeout, otherwise: ()) {
             guard isOwnMount(mountPoint, legacyBase: base) else { return }
-            _ = Darwin.unmount(mountPoint.path, MNT_FORCE)
+            if Darwin.unmount(mountPoint.path, MNT_FORCE) == 0 { OwnMounts.forget(mountPoint.standardizedFileURL.path) }
             removeEmptyMountFolder(mountPoint, ownedBy: base)
         }
     }
@@ -370,7 +404,9 @@ public enum NetworkVolume {
     /// Unmounts a share Vespertine mounted. Other mounts (Finder's) are left alone.
     public static func unmount(_ mountPoint: URL, ownedBy base: URL) async {
         guard await blocking(timeout: 8, otherwise: false, { isOwnMount(mountPoint, legacyBase: base) }) else { return }
-        try? await FileManager.default.unmountVolume(at: mountPoint, options: [.withoutUI])
+        if (try? await FileManager.default.unmountVolume(at: mountPoint, options: [.withoutUI])) != nil {
+            OwnMounts.forget(mountPoint.standardizedFileURL.path)
+        }
         await blocking(timeout: 8, otherwise: ()) { removeEmptyMountFolder(mountPoint, ownedBy: base) }
     }
 
