@@ -9,6 +9,7 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sched.h>
 
 // MARK: - Ring
 
@@ -19,6 +20,10 @@ struct NRTRing {
     uint32_t mask;
     _Alignas(64) _Atomic uint64_t writePos;
     _Alignas(64) _Atomic uint64_t readPos;
+    // Rewind handshake: while a rewind is deciding, the reader never reads past `readLimit` (UINT64_MAX otherwise),
+    // and `readEpoch` is odd while a read pass is under way, so the producer can wait one out.
+    _Alignas(64) _Atomic uint64_t readLimit;
+    _Atomic uint32_t readEpoch;
 };
 
 static uint32_t next_pow2(uint32_t v) {
@@ -40,6 +45,8 @@ NRTRing *nrt_ring_create(uint32_t minimumFrames, uint32_t channels) {
     if (!ring->data) { free(ring); return NULL; }
     atomic_init(&ring->writePos, 0);
     atomic_init(&ring->readPos, 0);
+    atomic_init(&ring->readLimit, UINT64_MAX);
+    atomic_init(&ring->readEpoch, 0);
     return ring;
 }
 
@@ -52,10 +59,20 @@ void nrt_ring_destroy(NRTRing *ring) {
 uint32_t nrt_ring_channels(const NRTRing *ring) { return ring->channels; }
 uint32_t nrt_ring_capacity(const NRTRing *ring) { return ring->capacity; }
 
+// The end of what the reader may take: the write position, held back while a rewind decides. Limit first: once the
+// limit is lifted, the (release) store that lifted it makes the rewound write position visible.
+static inline uint64_t read_end(const NRTRing *ring, uint64_t r) {
+    const uint64_t limit = atomic_load_explicit(&ring->readLimit, memory_order_seq_cst);
+    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_acquire);
+    const uint64_t end = w < limit ? w : limit;
+    return end > r ? end : r;
+}
+static inline void reader_enter(NRTRing *ring) { atomic_fetch_add_explicit(&ring->readEpoch, 1, memory_order_seq_cst); }
+static inline void reader_leave(NRTRing *ring) { atomic_fetch_add_explicit(&ring->readEpoch, 1, memory_order_release); }
+
 uint32_t nrt_ring_readable(const NRTRing *ring) {
-    uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_acquire);
     uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_acquire);
-    return (uint32_t)(w - r);
+    return (uint32_t)(read_end(ring, r) - r);
 }
 
 uint32_t nrt_ring_writable(const NRTRing *ring) { return ring->capacity - nrt_ring_readable(ring); }
@@ -76,10 +93,9 @@ uint32_t nrt_ring_write(NRTRing *ring, const float *src, uint32_t frames) {
     return frames;
 }
 
-uint32_t nrt_ring_read(NRTRing *ring, float *dst, uint32_t frames) {
+static uint32_t ring_read(NRTRing *ring, float *dst, uint32_t frames) {   // inside a reader pass
     uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_relaxed);
-    uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_acquire);
-    uint32_t avail = (uint32_t)(w - r);
+    uint32_t avail = (uint32_t)(read_end(ring, r) - r);
     if (frames > avail) frames = avail;
     if (frames == 0) return 0;
     uint32_t start = (uint32_t)(r & ring->mask);
@@ -92,18 +108,33 @@ uint32_t nrt_ring_read(NRTRing *ring, float *dst, uint32_t frames) {
     return frames;
 }
 
+uint32_t nrt_ring_read(NRTRing *ring, float *dst, uint32_t frames) {
+    reader_enter(ring);
+    const uint32_t got = ring_read(ring, dst, frames);
+    reader_leave(ring);
+    return got;
+}
+
 uint64_t nrt_ring_total_written(const NRTRing *ring) { return atomic_load_explicit(&ring->writePos, memory_order_acquire); }
 uint64_t nrt_ring_total_read(const NRTRing *ring) { return atomic_load_explicit(&ring->readPos, memory_order_acquire); }
 
 bool nrt_ring_rewind(NRTRing *ring, uint64_t totalWritten, uint32_t margin) {
-    uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_relaxed);
-    uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_acquire);
-    if (totalWritten > w || totalWritten < r + margin) return false;
-    atomic_store_explicit(&ring->writePos, totalWritten, memory_order_release);
-    return true;
+    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_relaxed);
+    if (totalWritten > w) return false;
+    // Hold the reader back to `totalWritten`, then wait out a pass that may have begun before it could see that
+    // (at most one I/O cycle). From here on the read position can't pass `totalWritten`, so the check below holds.
+    atomic_store_explicit(&ring->readLimit, totalWritten, memory_order_seq_cst);
+    const uint32_t epoch = atomic_load_explicit(&ring->readEpoch, memory_order_seq_cst);
+    if (epoch & 1u) while (atomic_load_explicit(&ring->readEpoch, memory_order_acquire) == epoch) sched_yield();
+    const uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_acquire);
+    const bool ok = totalWritten >= r + margin;
+    if (ok) atomic_store_explicit(&ring->writePos, totalWritten, memory_order_relaxed);
+    atomic_store_explicit(&ring->readLimit, UINT64_MAX, memory_order_release);
+    return ok;
 }
 
 void nrt_ring_reset(NRTRing *ring) {
+    atomic_store(&ring->readLimit, UINT64_MAX);
     atomic_store(&ring->writePos, 0);
     atomic_store(&ring->readPos, 0);
 }
@@ -364,8 +395,8 @@ static void take_discard(NRTRenderContext *ctx) {
     uint64_t to = atomic_load_explicit(&ctx->discardTo, memory_order_acquire);
     if (to == 0) return;
     NRTRing *ring = ctx->ring;
-    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_acquire);
     const uint64_t r = atomic_load_explicit(&ring->readPos, memory_order_relaxed);
+    const uint64_t w = read_end(ring, r);
     const uint64_t target = to < w ? to : w;
     if (target > r) atomic_store_explicit(&ring->readPos, target, memory_order_release);
     // Cleared unless a newer discard came in meanwhile (that one is taken next cycle).
@@ -393,8 +424,10 @@ static void pull_dop(NRTRenderContext *ctx, uint32_t frames, uint32_t ch, bool i
             done++;
             continue;
         }
-        nrt_ring_read(ctx->ring, ctx->scratch + (size_t)done * ch, run);
-        done += run;
+        // Fewer than `run` only if a rewind began holding the reader back since `readable` was taken.
+        const uint32_t got = ring_read(ctx->ring, ctx->scratch + (size_t)done * ch, run);
+        if (got == 0) break;
+        done += got;
         music = done;
         atomic_store_explicit(&ctx->dopLast, dop_marker(ctx->scratch[(size_t)(done - 1) * ch], integer), memory_order_relaxed);
     }
@@ -407,7 +440,7 @@ static void pull_dop(NRTRenderContext *ctx, uint32_t frames, uint32_t ch, bool i
 }
 
 // Pulls `frames` source frames into ctx->scratch (silence if dry: zeros, or DoP idle frames) and applies gain/meters.
-static void pull(NRTRenderContext *ctx, uint32_t frames) {
+static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     const uint32_t ch = nrt_ring_channels(ctx->ring);
     take_discard(ctx);
     const bool dop = atomic_load_explicit(&ctx->dop, memory_order_relaxed);
@@ -435,7 +468,7 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
         }
     }
     if (dop) { pull_dop(ctx, frames, ch, integer); return; }
-    uint32_t got = nrt_ring_read(ctx->ring, ctx->scratch, frames);
+    uint32_t got = ring_read(ctx->ring, ctx->scratch, frames);
     if (got < frames) {
         memset(ctx->scratch + (size_t)got * ch, 0, (size_t)(frames - got) * ch * sizeof(float));
         if (!atomic_load_explicit(&ctx->draining, memory_order_relaxed))
@@ -477,6 +510,13 @@ static void pull(NRTRenderContext *ctx, uint32_t frames) {
     }
     atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
     for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
+}
+
+// One reader pass: everything that looks at or moves the read position (see nrt_ring_rewind).
+static void pull(NRTRenderContext *ctx, uint32_t frames) {
+    reader_enter(ctx->ring);
+    pull_inside(ctx, frames);
+    reader_leave(ctx->ring);
 }
 
 /// The source channel feeding device channel `c`: channels in order, except that a mono source plays on
