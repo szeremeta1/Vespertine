@@ -882,21 +882,31 @@ extension LibraryDatabase {
     ///
     /// A match is the same size, duration and title (the file itself moved), or, for files whose tags were
     /// rewritten on the way, the same title, artist, track, disc, format and duration. Either must be
-    /// unambiguous on both sides. Returns the old track ID → new track ID of each match.
+    /// unambiguous on both sides. A track edited in the library only (a CUE track, a file on a read-only share) shows
+    /// its edit, not the file's tags, so it matches on the file alone (size, duration, CUE start), and its edit goes
+    /// with it. Returns the old track ID → new track ID of each match.
     @discardableResult
     static func reconcileMovedTracks(_ db: Database, sourceID: Int64) throws -> [Int64: Int64] {
-        let columns = "id, fileSize, duration, cueStartFrame, title, artist, trackNumber, discNumber, sampleRate, channels"
+        let columns = """
+            id, fileSize, duration, cueStartFrame, title, artist, trackNumber, discNumber, sampleRate, channels,
+            EXISTS (SELECT 1 FROM cueTagOverride o WHERE o.trackId = track.id) AS edited
+            """
         let missing = try Row.fetchAll(db, sql: "SELECT \(columns) FROM track WHERE sourceId = ? AND isMissing = 1", arguments: [sourceID])
         guard !missing.isEmpty else { return [:] }
         let present = try Row.fetchAll(db, sql: "SELECT \(columns) FROM track WHERE sourceId = ? AND isMissing = 0", arguments: [sourceID])
 
-        func exactKey(_ r: Row) -> String {
+        func edited(_ r: Row) -> Bool { r["edited"] }
+        func fileKey(_ r: Row) -> String {
             let size: Int64 = r["fileSize"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"]
+            return "\(size)|\(Int((duration * 1000).rounded()))|\(cue ?? -1)"
+        }
+        func exactKey(_ r: Row) -> String? {
+            guard !edited(r) else { return nil }
             let title: String = r["title"] ?? ""
-            return "\(size)|\(Int((duration * 1000).rounded()))|\(cue ?? -1)|\(title.lowercased())"
+            return fileKey(r) + "|" + title.lowercased()
         }
         func tagKey(_ r: Row) -> String? {
-            guard let title: String = r["title"], !title.isEmpty else { return nil }
+            guard !edited(r), let title: String = r["title"], !title.isEmpty else { return nil }
             let artist: String = r["artist"] ?? "", track: Int = r["trackNumber"] ?? 0, disc: Int = r["discNumber"] ?? 0
             let rate: Double = r["sampleRate"], channels: Int = r["channels"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"]
             return [title.lowercased(), artist.lowercased(), "\(track)", "\(disc)", "\(Int(rate))", "\(channels)",
@@ -904,10 +914,15 @@ extension LibraryDatabase {
         }
         var used = Set<Int64>()
         var pairs: [(old: Int64, new: Int64, sameFile: Bool)] = []
-        for (key, sameFile) in [(exactKey as (Row) -> String?, true), (tagKey, false)] {
+        let passes: [(old: (Row) -> String?, new: (Row) -> String?, sameFile: Bool)] = [
+            (exactKey, exactKey, true), (tagKey, tagKey, false),
+            // Edited in the library only: by the file alone, against new tracks (which have no edits of their own).
+            ({ edited($0) ? fileKey($0) : nil }, { edited($0) ? nil : fileKey($0) }, true),
+        ]
+        for (oldKey, newKey, sameFile) in passes {
             var olds: [String: [Int64]] = [:], news: [String: [Int64]] = [:]
-            for r in missing { let id: Int64 = r["id"]; if !used.contains(id), let k = key(r) { olds[k, default: []].append(id) } }
-            for r in present { let id: Int64 = r["id"]; if !used.contains(id), let k = key(r) { news[k, default: []].append(id) } }
+            for r in missing { let id: Int64 = r["id"]; if !used.contains(id), let k = oldKey(r) { olds[k, default: []].append(id) } }
+            for r in present { let id: Int64 = r["id"]; if !used.contains(id), let k = newKey(r) { news[k, default: []].append(id) } }
             for (k, o) in olds where o.count == 1 {
                 guard let n = news[k], n.count == 1 else { continue }
                 pairs.append((o[0], n[0], sameFile))
@@ -915,6 +930,15 @@ extension LibraryDatabase {
             }
         }
         for (old, new, sameFile) in pairs {
+            // A library-only edit goes with the track (deleting the old one would take it along): kept for later scans,
+            // and shown now in place of the file's tags.
+            if let edit = try Data.fetchOne(db, sql: "SELECT metadata FROM cueTagOverride WHERE trackId = ?", arguments: [old]) {
+                try db.execute(sql: "INSERT OR REPLACE INTO cueTagOverride (trackId, metadata) VALUES (?, ?)", arguments: [new, edit])
+                if var track = try Track.fetchOne(db, key: new), let edited = try? JSONDecoder().decode(Track.self, from: edit) {
+                    track.copyMetadata(from: edited)
+                    try track.update(db)
+                }
+            }
             try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: """
