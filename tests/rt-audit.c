@@ -349,6 +349,66 @@ static void test_dop_threads(void) {
     nrt_ring_destroy(dop_ring);
 }
 
+// Rewinding the look-ahead (as replanUpcoming does) while the I/O thread renders: frame n carries n, so anything the
+// reader takes past the write position, or from a slot being rewritten, shows up as a wrong value. After a rewind that
+// went through, the reader is never past the point taken back to.
+#define REWIND_ROUNDS 300u
+static NRTRing *rewind_ring;
+static NRTRenderContext *rewind_ctx;
+static atomic_bool rewind_done;
+
+static void *rewind_reader(void *unused) {
+    (void)unused;
+    static float out[2 * 256];
+    uint64_t checked = 0;
+    while (!atomic_load(&rewind_done) || nrt_ring_readable(rewind_ring) > 0) {
+        const uint64_t before = nrt_ring_total_read(rewind_ring);    // only this thread moves it
+        nrt_context_render_interleaved(rewind_ctx, out, 256, 2);
+        const uint64_t got = nrt_ring_total_read(rewind_ring) - before;
+        assert(got <= 256 && nrt_ring_readable(rewind_ring) <= nrt_ring_capacity(rewind_ring));
+        for (uint64_t i = 0; i < got; i++) assert(out[2 * i] == (float)(before + i) && out[2 * i + 1] == out[2 * i]);
+        checked += got;
+        sched_yield();
+    }
+    assert(checked > 0);
+    return NULL;
+}
+
+static void test_concurrent_rewind(void) {
+    rewind_ring = nrt_ring_create(8192, 1);
+    assert(rewind_ring);
+    rewind_ctx = nrt_context_create(rewind_ring, 512);
+    assert(rewind_ctx);
+    nrt_context_set_passthrough(rewind_ctx, true);
+    nrt_context_set_draining(rewind_ctx, true);         // running dry between writes isn't what's tested here
+    atomic_store(&rewind_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, rewind_reader, NULL);
+    assert(!started); (void)started;
+    static float chunk[512];
+    unsigned rewound = 0;
+    for (unsigned round = 0; round < REWIND_ROUNDS; round++) {
+        while (nrt_ring_writable(rewind_ring) < 4096) sched_yield();
+        for (unsigned k = 0; k < 8; k++) {
+            const uint64_t w = nrt_ring_total_written(rewind_ring);
+            assert(w + 512 < (1u << 24));               // exact as floats
+            for (uint32_t i = 0; i < 512; i++) chunk[i] = (float)(w + i);
+            const uint32_t wrote = nrt_ring_write(rewind_ring, chunk, 512);
+            assert(wrote == 512); (void)wrote;
+        }
+        const uint64_t to = nrt_ring_total_written(rewind_ring) - 1024;
+        if (nrt_ring_rewind(rewind_ring, to, 64)) {
+            rewound++;
+            assert(nrt_ring_total_written(rewind_ring) == to && nrt_ring_total_read(rewind_ring) <= to);
+        }
+    }
+    atomic_store(&rewind_done, true);
+    pthread_join(thread, NULL);
+    assert(rewound > 0);
+    nrt_context_destroy(rewind_ctx);
+    nrt_ring_destroy(rewind_ring);
+}
+
 static NRTRing *concurrent_ring;
 static NRTRenderContext *concurrent_context;
 static void *producer(void *unused) {
@@ -411,5 +471,6 @@ int main(void) {
     test_dop_silence(true);
     test_pcm_silence_is_zeros();
     test_dop_threads();
+    test_concurrent_rewind();
     return 0;
 }
