@@ -22,6 +22,9 @@ struct TagEditorView: View {
     @State private var saving = false
     @State private var status: String?
     @State private var showArtworkPicker = false
+    /// Whether the selection's files can't be rewritten: checked once per selection, off the main thread (asking a
+    /// dead share hangs until it times out).
+    @State private var readOnlyFiles = false
 
     struct CustomTag: Identifiable, Hashable {
         let id = UUID()
@@ -72,7 +75,8 @@ struct TagEditorView: View {
                 footer
             }
         }
-        .task(id: "\(ids.sorted())#\(model.library.revision)") { load(ids) }
+        // Cheap to compare on every update, unlike the sorted list of a large selection.
+        .task(id: [ids.hashValue, ids.count, model.library.revision]) { load(ids) }
         .fileImporter(isPresented: $showArtworkPicker, allowedContentTypes: [.image]) { result in
             if case .success(let url) = result, let data = try? Data(contentsOf: url) { artwork = .replace(data) }
         }
@@ -141,6 +145,7 @@ struct TagEditorView: View {
     private func field(_ f: TagField) -> some View {
         HStack(spacing: 10) {
             Text(f.label).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).frame(width: 92, alignment: .trailing)
+                .accessibilityHidden(true)
             input(f)
         }
         .padding(.bottom, 7)
@@ -149,8 +154,9 @@ struct TagEditorView: View {
     private func pairRow(_ label: String, _ a: TagField, _ b: TagField) -> some View {
         HStack(spacing: 10) {
             Text(label).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).frame(width: 92, alignment: .trailing)
+                .accessibilityHidden(true)
             input(a)
-            Text("of").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3)
+            Text("of").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
             input(b)
         }
         .padding(.bottom, 7)
@@ -168,6 +174,7 @@ struct TagEditorView: View {
             .frame(height: 26)
             .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
             .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(edited.contains(f) ? Palette.brass.opacity(0.6) : Palette.hairline))
+            .accessibilityLabel(f.label)   // "Track Total" for the second of "Track … of …"
     }
 
     private var lyrics: some View {
@@ -180,6 +187,7 @@ struct TagEditorView: View {
                 .frame(minHeight: 80, maxHeight: 180)
                 .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
                 .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(edited.contains(.lyrics) ? Palette.brass.opacity(0.6) : Palette.hairline))
+                .accessibilityLabel("Lyrics")
         }
         .padding(.top, 10)
     }
@@ -271,11 +279,7 @@ struct TagEditorView: View {
 
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
-        // One file answers for the lot: they share a source, and each check is a round trip on a share.
-        if let first = tracks.first(where: { $0.cueStartFrame == nil }),
-           !TagWriter.isWritable(first.fileURL) || first.sourceId.map(TagWriter.readOnlyShares(model.library.sources).contains) == true {
-            return "Read-only location · saved in Vespertine's library; the files aren't changed"
-        }
+        if readOnlyFiles { return "Read-only location · saved in Vespertine's library; the files aren't changed" }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
         case "FLAC", "Vorbis", "Opus": "Vorbis comments"
         case "MP3", "AIFF", "WAV", "DSF": "ID3v2 tags"
@@ -294,7 +298,7 @@ struct TagEditorView: View {
         tracks = model.library.tracks(ids: Array(ids)).sorted { ($0.discNumber ?? 0, $0.trackNumber ?? 0) < ($1.discNumber ?? 0, $1.trackNumber ?? 0) }
         let fresh = discardingEdits || ids != loadedIDs
         loadedIDs = ids
-        if fresh { draft = [:]; mixed = []; edited = []; artwork = nil; status = nil }
+        if fresh { draft = [:]; mixed = []; edited = []; artwork = nil; status = nil; checkWritable() }
         for f in TagField.allCases where !edited.contains(f) {
             let values = Set(tracks.map { f.value(in: $0) ?? "" })
             if values.count == 1 { draft[f] = values.first!; mixed.remove(f) } else { draft[f] = nil; mixed.insert(f) }
@@ -302,6 +306,21 @@ struct TagEditorView: View {
         // Custom tags are refreshed only while they're as loaded (a new row or a changed one is yours).
         let untouched = custom.elementsEqual(Self.customTagRows(previous)) { $0.key == $1.key && $0.value == $1.value && $0.original == $1.original }
         if fresh || untouched { custom = Self.customTagRows(tracks) }
+    }
+
+    /// One file answers for the lot: they share a source, and each check is a round trip on a share. A share added
+    /// read-only needs no check; otherwise the file is asked on a GCD thread, and one that doesn't answer in time
+    /// (a dead share) counts as read-only.
+    private func checkWritable() {
+        guard let first = tracks.first(where: { $0.cueStartFrame == nil }) else { readOnlyFiles = false; return }
+        if first.sourceId.map(TagWriter.readOnlyShares(model.library.sources).contains) == true { readOnlyFiles = true; return }
+        readOnlyFiles = false
+        let url = first.fileURL, selection = loadedIDs
+        Task {
+            let writable = await NetworkVolume.blocking(timeout: 5, otherwise: false) { TagWriter.isWritable(url) }
+            guard loadedIDs == selection else { return }
+            readOnlyFiles = !writable
+        }
     }
 
     private static func customTagRows(_ tracks: [Track]) -> [CustomTag] {

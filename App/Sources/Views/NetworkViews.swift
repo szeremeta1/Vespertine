@@ -30,9 +30,17 @@ struct ConnectServerSheet: View {
         return share
     }
 
-    private var savedPassword: Bool {
-        guard let share, share.user != nil else { return false }
-        return NetworkCredentials.hasPassword(for: share)
+    /// Whether the keychain has a password for `share`: looked up off the main thread when the share changes,
+    /// not on every keystroke.
+    @State private var savedPassword = false
+
+    private func lookUpSavedPassword() async {
+        guard let share, share.user != nil else { savedPassword = false; return }
+        try? await Task.sleep(for: .milliseconds(250))   // typing: ask once the address settles
+        guard !Task.isCancelled else { return }
+        let found = await Task.detached(priority: .userInitiated) { NetworkCredentials.hasPassword(for: share) }.value
+        guard !Task.isCancelled else { return }
+        savedPassword = found
     }
 
     var body: some View {
@@ -121,6 +129,7 @@ struct ConnectServerSheet: View {
                 model.connectPrefill = nil
             }
         }
+        .task(id: share) { await lookUpSavedPassword() }
     }
 
     private func connect() {
