@@ -323,7 +323,7 @@ struct LibrarySettings: View {
 
 struct OnlineSettings: View {
     @Environment(AppModel.self) private var model
-    @State private var token = Keychain.read("listenbrainz-token") ?? ""
+    @State private var token = ""
     @State private var validation: String?
 
     var body: some View {
@@ -339,8 +339,11 @@ struct OnlineSettings: View {
                 SecureField("User token", text: $token)
                 HStack {
                     Button("Save & Verify") {
-                        Keychain.write(token, account: "listenbrainz-token")
                         Task {
+                            guard await ListenBrainzClient.shared.saveToken(token) == errSecSuccess else {
+                                validation = "Couldn’t save the token to the keychain"
+                                return
+                            }
                             let user = try? await ListenBrainzClient.shared.validate(token: token)
                             validation = user.map { "Connected as \($0)" } ?? "Token not accepted"
                         }
@@ -352,6 +355,7 @@ struct OnlineSettings: View {
             }
         }
         .formStyle(.grouped)
+        .task { token = await ListenBrainzClient.shared.savedToken() }
     }
 }
 

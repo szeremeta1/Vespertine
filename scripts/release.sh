@@ -9,18 +9,23 @@
 #   --resume    skips the build and continues a notarization that timed out (uses <out>/.notary-id).
 #
 # Environment:
-#   VESPERTINE_SIGN_IDENTITY   identity name or SHA-1 (default: "Developer ID Application"; name the exact one when the
-#                            keychain holds more than one Developer ID);
+#   VESPERTINE_SIGN_IDENTITY   identity name or SHA-1 (default: "Developer ID Application: Alexander Szeremeta (<team>)";
+#                            on the laptop that's the YubiKey's (slot 9C; PIN and touch), on the hub the keychain's;
+#                            a SHA-1 picks one when both are present);
 #                            "-" makes a local-only ad-hoc build (no hardened runtime, runs on this Mac only)
 #   VESPERTINE_OUT / VESPERTINE_DERIVED     output and derived-data folders (default build/Release, build/DDR)
 #   VESPERTINE_VERSION / VESPERTINE_BUILD   override marketing version / build number (e.g. for update tests)
-#   VESPERTINE_NOTARY_PROFILE  notarytool keychain profile (default: vespertine-notary), created once with:
-#                            xcrun notarytool store-credentials vespertine-notary --apple-id <you@example.com> --team-id <your Developer ID team ID>
+#   VESPERTINE_TEAM_ID         the Developer ID team that must have signed the app and the DMG (default: 7WMQ9ZV6V8);
+#                            checked after signing, so a keychain holding another team's identity can't sign a release
+#   VESPERTINE_NOTARY_PROFILE  notarytool keychain profile (default: vespertine-notary-<team>), created once with:
+#                            xcrun notarytool store-credentials vespertine-notary-<team> --key <AuthKey_….p8> --key-id <id> --issuer <issuer>
+#                            (--resume must use the profile that made the submission)
 #   VESPERTINE_SIGN_KEYCHAIN   keychain holding it (default: search list), e.g. ~/Library/Keychains/old-mac-login.keychain-db
 set -euo pipefail
 cd "$(dirname $0)/.."
-identity=${VESPERTINE_SIGN_IDENTITY:-"Developer ID Application"}
-profile=${VESPERTINE_NOTARY_PROFILE:-vespertine-notary}
+team=${VESPERTINE_TEAM_ID:-7WMQ9ZV6V8}
+identity=${VESPERTINE_SIGN_IDENTITY:-"Developer ID Application: Alexander Szeremeta ($team)"}
+profile=${VESPERTINE_NOTARY_PROFILE:-vespertine-notary-$team}
 notarize=false; install=false; resume=false
 for arg in "$@"; do
   case $arg in
@@ -44,6 +49,19 @@ if [[ $resolved_project == $resolved_out/* ]]; then
 fi
 mkdir -p "${out:h}"
 keychain=(); [[ -n ${VESPERTINE_SIGN_KEYCHAIN:-} ]] && keychain=(--keychain "$VESPERTINE_SIGN_KEYCHAIN")
+# A name that matches more than one identity (two teams' certificates in one keychain) only fails at codesign, after
+# the whole build, so check it first. A SHA-1 names exactly one. No match is allowed: find-identity doesn't list a
+# YubiKey's identity, which codesign still finds (and check_team catches anything else).
+if [[ $identity != "-" && ! $identity =~ '^[0-9A-Fa-f]{40}$' ]]; then
+  matches=$(security find-identity -v -p codesigning ${VESPERTINE_SIGN_KEYCHAIN:-} | grep -c "\"$identity" || true)
+  (( matches <= 1 )) || { print -u2 "Signing identity \"$identity\" matches $matches identities; set VESPERTINE_SIGN_IDENTITY to the full name or SHA-1."; exit 2; }
+fi
+
+# Fails unless the given code was signed by the expected Developer ID team.
+check_team() {
+  local signed=$(codesign -dv "$1" 2>&1 | sed -n 's/^TeamIdentifier=//p')
+  [[ $signed == $team ]] || { print -u2 "$1 is signed by team ${signed:-none}, expected $team (VESPERTINE_TEAM_ID)."; exit 1; }
+}
 
 app="$out/Vespertine.app"
 
@@ -121,6 +139,7 @@ if ! $resume; then
 
   codesign --verify --deep --strict --verbose=2 "$app"
   codesign -dv "$app" 2>&1 | grep -E "Signature|Authority=Developer ID Application|TeamIdentifier"
+  [[ $identity == "-" ]] || check_team "$app"
 fi
 
 if $notarize; then
@@ -151,6 +170,7 @@ if $notarize; then
   dmg=$out/Vespertine-$version.dmg
   make_dmg "$version" "$dmg"
   codesign --force --timestamp "${keychain[@]}" --sign "$identity" "$dmg"
+  check_team "$dmg"
   print "Notarizing $dmg…"
   xcrun notarytool submit "$dmg" --keychain-profile "$profile" --wait --timeout 2h
   xcrun stapler staple "$dmg"
