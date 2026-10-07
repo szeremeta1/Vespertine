@@ -15,10 +15,24 @@ let args = Array(CommandLine.arguments.dropFirst())
 
 func minutes(_ s: Double) -> String { String(format: "%d:%02d", Int(s) / 60, Int(s) % 60) }
 
+func usageError(_ message: String) -> Never {
+    FileHandle.standardError.write((message + "\n").data(using: .utf8)!)
+    exit(2)
+}
+
+/// The argument after the one at `index` (an option's value); a usage error when there is none.
+func value(after index: Int) -> String {
+    guard index + 1 < args.count, !args[index + 1].hasPrefix("--") else { usageError("\(args[index]) needs a value") }
+    return args[index + 1]
+}
+
+/// The value of option `name`, or nil when it isn't given.
+func option(_ name: String) -> String? { args.firstIndex(of: name).map(value(after:)) }
+
 switch args.first {
 case "audit":
     // Read-only, without migrating: safe while Vespertine has the library open. Run it after importing music.
-    let dir = args.firstIndex(of: "--library").map { (args[$0 + 1] as NSString).expandingTildeInPath }
+    let dir = option("--library").map { ($0 as NSString).expandingTildeInPath }
         ?? LibraryDatabase.defaultURL.deletingLastPathComponent().path
     let database = try LibraryDatabase.readOnly(url: URL(fileURLWithPath: dir).appendingPathComponent("Library.sqlite"))
     let findings = LibraryAudit.run(try database.auditTracks())
@@ -68,8 +82,8 @@ case "import":
     var i = 1
     while i < args.count {
         switch args[i] {
-        case "--library": library = args[i + 1]; i += 2
-        case "--into": into = args[i + 1]; i += 2
+        case "--library": library = value(after: i); i += 2
+        case "--into": into = value(after: i); i += 2
         default: inputs.append(URL(fileURLWithPath: (args[i] as NSString).expandingTildeInPath)); i += 1
         }
     }
@@ -86,9 +100,11 @@ case "import":
 case "import-server-analysis":
     // vespertine-library import-server-analysis --library <data-dir>
     // Imports results from each network share's `.vespertine/analysis.jsonl` (written by vespertine-analyze).
-    guard let li = args.firstIndex(of: "--library"), li + 1 < args.count else { print("needs --library"); exit(2) }
-    let dataDir = URL(fileURLWithPath: (args[li + 1] as NSString).expandingTildeInPath)
+    guard let library = option("--library") else { usageError("import-server-analysis needs --library") }
+    let dataDir = URL(fileURLWithPath: (library as NSString).expandingTildeInPath)
     let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    // As the app does first: results an analyzer update can judge anew aren't looked for in the index.
+    try db.rejudgeStoredAnalyses()
     let importer = ServerAnalysisImporter()
     for source in try db.sources() where source.remoteURL != nil {
         let start = Date()
@@ -196,9 +212,9 @@ case "verify-remote":
                  directTime / Double(max(1, sample.count))))
 case "enrich":
     // vespertine-library enrich --library <data-dir> [--apply high|all]
-    guard let li = args.firstIndex(of: "--library") else { print("enrich needs --library"); exit(2) }
-    let dataDir = URL(fileURLWithPath: (args[li + 1] as NSString).expandingTildeInPath)
-    let mode = args.firstIndex(of: "--apply").map { args[$0 + 1] }
+    guard let library = option("--library") else { usageError("enrich needs --library") }
+    let dataDir = URL(fileURLWithPath: (library as NSString).expandingTildeInPath)
+    let mode = option("--apply")
     let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
     let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dataDir.appendingPathComponent("Artwork")))
     let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dataDir.appendingPathComponent("Tag Backups"))

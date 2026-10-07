@@ -224,53 +224,46 @@ public actor TagWriter {
             let url = track.fileURL
             do {
                 let backup = try makeBackup(of: url)
-                // The tags are written into a clone of the file, which then takes its place in one step (see
-                // `editingClone`); where that isn't possible, into the file itself, with the backup to fall back on.
-                let target = Self.editingClone(of: url) ?? url
-                defer { if target != url { try? FileManager.default.removeItem(at: target) } }
-                var replaced = target == url
-                let file = try AudioFile(url: target)
-                try file.readPropertiesAndMetadata()
-                var previous = Self.snapshot(file.metadata)
-                // SFBAudioEngine writes one value per field, so the save would keep only the first of several artists,
-                // genres or MusicBrainz IDs, edited or not. Read them now, and put back each one the save cut down.
-                let multiValued = target.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
-                defer { nvt_multivalued_free(multiValued) }
-
-                for (field, value) in edit.fields {
-                    if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
-                        field.apply(TagWriter.id3Timestamp(value), to: file.metadata)
-                    } else {
-                        field.apply(value, to: file.metadata)
-                    }
+                var previous = Self.snapshot(try AudioFile(readingPropertiesAndMetadataFrom: url).metadata)
+                // Recorded before the file is touched, so a crash mid-write leaves an edit that refers to its backup
+                // (undone from it, like an edit from before fingerprints); removed again when the write fails.
+                let recorded = previous
+                let entryID = try await database.writer.write { db in
+                    var entry = TagHistoryEntry(id: nil, trackId: id, editedAt: .now, previous: recorded, fileBackupPath: backup.path)
+                    try entry.insert(db)
+                    return entry.id
                 }
-                if !edit.custom.isEmpty {
-                    var extra = (file.metadata.additionalMetadata as? [String: Any]) ?? [:]
-                    for (k, v) in edit.custom { extra[k.uppercased()] = v }
-                    file.metadata.additionalMetadata = extra
-                }
-                switch edit.artwork {
-                case .replace(let data):
-                    file.metadata.removeAttachedPicturesOfType(.frontCover)
-                    file.metadata.attachPicture(AttachedPicture(imageData: data, type: .frontCover))
-                case .remove:
-                    file.metadata.removeAllAttachedPictures()
-                case nil:
-                    break
-                }
+                // The tags are written into a copy of the file (a free clone where the volume makes one), which then
+                // takes its place in one step (see `editingCopy`). Where no copy can be made, or the volume won't let it
+                // replace the file, into the file itself, with the backup to fall back on.
+                var replaced = false
                 do {
-                    TagWriter.protectDate(in: file)
-                    try file.writeMetadata()
-                    try Self.keepEveryValue(multiValued, of: target, edit: edit)
-                    if !replaced { try Self.move(target, over: url); replaced = true }
+                    if let copy = Self.editingCopy(of: url) {
+                        defer { try? FileManager.default.removeItem(at: copy) }
+                        try Self.writeTags(edit, into: copy, of: url)
+                        do {
+                            try Self.move(copy, over: url)
+                            replaced = true
+                        } catch let error as POSIXError where [.EBUSY, .EACCES, .EPERM].contains(error.code) {
+                            // A share that won't rename over the file (open on the server, renames refused): in place.
+                            replaced = true
+                            try Self.writeTags(edit, into: url, of: url)
+                        }
+                    } else {
+                        replaced = true
+                        try Self.writeTags(edit, into: url, of: url)
+                    }
                     previous["__fileSHA256"] = try Self.fileHash(url)
                     let history = previous
                     try await database.writer.write { db in
-                        var entry = TagHistoryEntry(id: nil, trackId: id, editedAt: .now, previous: history, fileBackupPath: backup.path)
-                        try entry.insert(db)
+                        guard var entry = try TagHistoryEntry.fetchOne(db, key: entryID) else { return }
+                        entry.previous = history
+                        try entry.update(db)
                     }
                 } catch {
                     if replaced { try Self.restore(backup, to: url) }   // otherwise the file was never touched
+                    // Only once the file is back as it was: an edit that couldn't be undone keeps its backup.
+                    _ = try? await database.writer.write { db in try TagHistoryEntry.deleteOne(db, key: entryID) }
                     throw error
                 }
                 refreshIDs.append(id)
@@ -511,16 +504,63 @@ public actor TagWriter {
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
-    /// A clone of `url` beside it to write the tags into, or nil where the volume can't clone (shares, non-APFS disks):
-    /// those are written in place, since copying a large file for every edit would be slow. Writing into a clone
-    /// means a crash or a full disk mid-write leaves the original whole, and a song that's playing goes on reading the
-    /// file it opened instead of one being rewritten under it.
-    static func editingClone(of url: URL) -> URL? {
+    /// Writes `edit` into the file at `target` (the file at `url` or a copy of it).
+    private static func writeTags(_ edit: TagEdit, into target: URL, of url: URL) throws {
+        let file = try AudioFile(url: target)
+        try file.readPropertiesAndMetadata()
+        // SFBAudioEngine writes one value per field, so the save would keep only the first of several artists,
+        // genres or MusicBrainz IDs, edited or not. Read them now, and put back each one the save cut down.
+        let multiValued = target.withUnsafeFileSystemRepresentation { $0.flatMap { nvt_multivalued_read($0) } }
+        defer { nvt_multivalued_free(multiValued) }
+
+        for (field, value) in edit.fields {
+            if field == .releaseDate, let value, TagWriter.usesID3v2(url) {
+                field.apply(TagWriter.id3Timestamp(value), to: file.metadata)
+            } else {
+                field.apply(value, to: file.metadata)
+            }
+        }
+        if !edit.custom.isEmpty {
+            var extra = (file.metadata.additionalMetadata as? [String: Any]) ?? [:]
+            for (k, v) in edit.custom { extra[k.uppercased()] = v }
+            file.metadata.additionalMetadata = extra
+        }
+        switch edit.artwork {
+        case .replace(let data):
+            file.metadata.removeAttachedPicturesOfType(.frontCover)
+            file.metadata.attachPicture(AttachedPicture(imageData: data, type: .frontCover))
+        case .remove:
+            file.metadata.removeAllAttachedPictures()
+        case nil:
+            break
+        }
+        TagWriter.protectDate(in: file)
+        try file.writeMetadata()
+        try Self.keepEveryValue(multiValued, of: target, edit: edit)
+    }
+
+    /// A copy of `url` beside it to write the tags into: a clone where the volume can make one (free), otherwise a full
+    /// copy (shares, non-APFS disks), or nil when neither works (no room, say): that file is written in place. Writing
+    /// into a copy means a crash, a dropped connection or a full disk mid-write leaves the original whole, and a song
+    /// that's playing goes on reading the file it opened instead of one being rewritten under it.
+    static func editingCopy(of url: URL) -> URL? {
         let clone = url.deletingLastPathComponent().appendingPathComponent(".vespertine-edit-\(UUID().uuidString).\(url.pathExtension)")
-        let status = url.withUnsafeFileSystemRepresentation { src in
+        var status = url.withUnsafeFileSystemRepresentation { src in
             clone.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, UInt32(CLONE_NOFOLLOW)) }
         }
-        guard status == 0 else { return nil }
+        if status != 0 {
+            status = url.withUnsafeFileSystemRepresentation { src in
+                clone.withUnsafeFileSystemRepresentation { dst in
+                    copyfile(src!, dst!, nil, copyfile_flags_t(COPYFILE_ALL | COPYFILE_CLONE))
+                }
+            }
+            // A copy cut short (the share dropped, the disk filled) is no copy.
+            let size = { (u: URL) in (try? FileManager.default.attributesOfItem(atPath: u.path))?[.size] as? Int64 }
+            if status != 0 || size(clone) == nil || size(clone) != size(url) {
+                try? FileManager.default.removeItem(at: clone)
+                return nil
+            }
+        }
         // The clone gets the file's dates and permissions, but its creation date is today's: keep the file's own.
         if let created = try? url.resourceValues(forKeys: [.creationDateKey]).creationDate {
             var values = URLResourceValues()

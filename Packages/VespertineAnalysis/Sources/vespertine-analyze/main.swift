@@ -44,12 +44,13 @@ struct Status: Codable {
 }
 
 enum Failure: Error, CustomStringConvertible {
-    case probe(String), decode(String), unsupported(String)
+    case probe(String), decode(String), unsupported(String), timedOut(String)
     var description: String {
         switch self {
         case .probe(let s): "probe failed: \(s)"
         case .decode(let s): "decode failed: \(s)"
         case .unsupported(let s): "unsupported: \(s)"
+        case .timedOut(let s): "timed out: \(s)"
         }
     }
 }
@@ -71,7 +72,41 @@ struct Probe {
 let losslessCodecs: Set<String> = ["flac", "alac", "ape", "wavpack", "tta", "tak", "mlp", "truehd", "shorten", "als", "mp4als"]
 let audioExtensions: Set<String> = ["flac", "wav", "wave", "aif", "aiff", "aifc", "m4a", "mp4", "caf", "ape", "wv", "tta", "tak", "shn", "dsf", "dff"]
 
-func run(_ tool: String, _ args: [String]) throws -> Data {
+/// Ends a tool that runs past its time (a damaged file that sends ffmpeg round in circles, a read stuck on a dead
+/// disk or share), so one file can't hold a worker, and the run, forever: SIGTERM, then SIGKILL if that isn't enough.
+/// Its output then ends, and the file counts as failed.
+final class Watchdog: @unchecked Sendable {
+    private let lock = NSLock()
+    private let process: Process
+    private var finished = false, fired = false
+
+    init(_ process: Process, seconds: Double) {
+        self.process = process
+        DispatchQueue.global().asyncAfter(deadline: .now() + seconds) { [self] in
+            guard send(SIGTERM) else { return }
+            DispatchQueue.global().asyncAfter(deadline: .now() + 10) { [self] in _ = send(SIGKILL) }
+        }
+    }
+
+    private func send(_ sig: Int32) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !finished, process.isRunning else { return false }
+        fired = true
+        kill(process.processIdentifier, sig)
+        return true
+    }
+
+    /// Call once the process has exited: whether the watchdog ended it.
+    func finish() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        finished = true
+        return fired
+    }
+}
+
+func run(_ tool: String, _ args: [String], timeout: Double = 120) throws -> Data {
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     p.arguments = [tool] + args
@@ -80,8 +115,10 @@ func run(_ tool: String, _ args: [String]) throws -> Data {
     p.standardError = FileHandle.nullDevice
     p.standardInput = FileHandle.nullDevice
     try p.run()
+    let watchdog = Watchdog(p, seconds: timeout)
     let data = out.fileHandleForReading.readDataToEndOfFile()
     p.waitUntilExit()
+    if watchdog.finish() { throw Failure.timedOut("\(tool) ran over \(Int(timeout)) s") }
     guard p.terminationStatus == 0 else { throw Failure.probe("\(tool) exited \(p.terminationStatus)") }
     return data
 }
@@ -141,6 +178,9 @@ func analyze(path: String, maxSeconds: Double, portable: Bool) throws -> FileAna
     p.standardError = FileHandle.nullDevice
     p.standardInput = FileHandle.nullDevice
     try p.run()
+    // Generous: decoding runs far faster than real time, even from a slow disk or a busy server.
+    let limit = maxSeconds * 4 + 60
+    let watchdog = Watchdog(p, seconds: limit)
     let frameBytes = 4 * info.channels
     var pending = Data()
     var floats = [Float]()
@@ -173,6 +213,7 @@ func analyze(path: String, maxSeconds: Double, portable: Bool) throws -> FileAna
         } catch { failure = error }
     }
     p.waitUntilExit()
+    if watchdog.finish() { throw Failure.timedOut("ffmpeg ran over \(Int(limit)) s") }
     if let failure { throw failure }
     guard p.terminationStatus == 0 || accumulator.framesDone > 0 else { throw Failure.decode("ffmpeg exited \(p.terminationStatus)") }
     return accumulator.finish()
