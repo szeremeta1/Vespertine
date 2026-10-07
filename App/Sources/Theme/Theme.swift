@@ -173,6 +173,7 @@ struct Chip: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn ? .isSelected : [])
     }
 }
 
