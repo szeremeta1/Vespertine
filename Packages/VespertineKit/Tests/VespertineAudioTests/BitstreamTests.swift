@@ -101,6 +101,81 @@ struct BitstreamTests {
             #expect(got == Array(whole[(target * 2)..<(target * 2 + got.count)]))
         }
     }
+
+    // MARK: Dependent substreams (7.1 and up: an independent frame, then a dependent one with the extra channels)
+
+    /// A synthetic E-AC-3 frame: header fields that matter here, numbered filler after it (so frames can be told apart).
+    private func eac3Frame(bytes: Int, blocks: Int, dependent: Bool = false, substream: Int = 0, tag: UInt8) -> [UInt8] {
+        let frmsiz = bytes / 2 - 1
+        let numblkscod = [1: 0, 2: 1, 3: 2, 6: 3][blocks]!
+        var f = [UInt8](repeating: tag, count: bytes)
+        f[0] = 0x0B; f[1] = 0x77
+        f[2] = UInt8((dependent ? 1 : 0) << 6 | substream << 3 | frmsiz >> 8)
+        f[3] = UInt8(frmsiz & 0xFF)
+        f[4] = UInt8(numblkscod << 4)          // fscod 0 (48 kHz)
+        f[5] = 16 << 3                         // bsid 16
+        return f
+    }
+
+    /// `units` stretches of audio, each an independent frame of `blocks` blocks and a dependent one of another size.
+    private func dependentStream(units: Int, blocks: Int) -> [UInt8] {
+        (0..<units).flatMap { u in
+            eac3Frame(bytes: 200, blocks: blocks, tag: UInt8(2 * u % 256)) + eac3Frame(bytes: 120, blocks: blocks, dependent: true, tag: UInt8((2 * u + 1) % 256))
+        }
+    }
+
+    private func temporaryFile(_ bytes: [UInt8]) throws -> URL {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-\(UUID().uuidString).ec3")
+        try Data(bytes).write(to: url)
+        return url
+    }
+
+    @Test("Dependent substreams ride in their independent frame's burst and add no blocks")
+    func dependentGrouping() {
+        let frames = DolbyFrames.frames(in: dependentStream(units: 4, blocks: 6))
+        #expect(frames.count == 8 && frames.map(\.isDependent) == [false, true, false, true, false, true, false, true])
+        let groups = BitstreamPacker.eac3Groups(frames)
+        #expect(groups.count == 4 && groups.allSatisfy { $0.count == 2 && !$0[0].isDependent && $0[1].isDependent })
+        // One-block frames: six independent ones (and their dependents) make a burst.
+        let small = BitstreamPacker.eac3Groups(DolbyFrames.frames(in: dependentStream(units: 12, blocks: 1)))
+        #expect(small.map(\.count) == [12, 12])
+        // An independent frame of another substream (a second program) adds no blocks either.
+        let second = DolbyFrames.frames(in: eac3Frame(bytes: 100, blocks: 6, tag: 0) + eac3Frame(bytes: 100, blocks: 6, substream: 1, tag: 1)
+                                             + eac3Frame(bytes: 100, blocks: 6, tag: 2))
+        #expect(BitstreamPacker.eac3Groups(second).map(\.count) == [2, 1])
+    }
+
+    @Test("A stream with dependent substreams: every frame goes out, the length and seeks hold with alternating sizes")
+    func dependentCarrier() throws {
+        let stream = dependentStream(units: 10, blocks: 6)
+        let url = try temporaryFile(stream)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let whole = try carrier(try BitstreamDecoder.open(url: url))
+        let groups = BitstreamPacker.eac3Groups(DolbyFrames.frames(in: stream))
+        #expect(unpack(whole, lengthInBytes: true).map(\.payload) == groups.map { $0.flatMap(\.bytes) })
+        let decoder = try BitstreamDecoder.open(url: url)
+        #expect(decoder.length == 10 * 6144 && Int64(whole.count / 2) == decoder.length)
+        for target in [6144 * 3, 6144 * 7 + 100] {
+            try decoder.seek(to: AVAudioFramePosition(target))
+            #expect(decoder.position == AVAudioFramePosition(target))
+            let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 6144)!
+            try decoder.decode(into: buffer, length: 6144)
+            let got = Array(UnsafeBufferPointer(start: buffer.int16ChannelData![0], count: Int(buffer.frameLength) * 2))
+            #expect(!got.isEmpty && got == Array(whole[(target * 2)..<(target * 2 + got.count)]))
+        }
+    }
+
+    @Test("A seek drops a burst that was half collected")
+    func seekClearsGroup() throws {
+        let url = try temporaryFile(dependentStream(units: 30, blocks: 1))
+        defer { try? FileManager.default.removeItem(at: url) }
+        let whole = try carrier(try BitstreamDecoder.open(url: url))
+        let decoder = try BitstreamDecoder.open(url: url)
+        let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 6144)!
+        try decoder.decode(into: buffer, length: 100)     // one burst out, part of the next collected
+        try decoder.seek(to: 0)
+        #expect(try carrier(decoder) == whole)
+    }
 }
 
 /// Writes the carriers as WAV files (VESPERTINE_IEC_OUT=dir) for checking with FFmpeg's S/PDIF demuxer:

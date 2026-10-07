@@ -94,6 +94,12 @@ public enum DolbyFrames {
         /// Audio blocks (256 samples each): 6 for AC-3; 1, 2, 3 or 6 for E-AC-3.
         public var blocks: Int
         public var sampleRate: Double
+        /// E-AC-3 dependent substream (strmtyp 1): extra channels for the independent frame before it, same audio blocks.
+        public var isDependent = false
+        /// E-AC-3 substream ID (0 for AC-3).
+        public var substream = 0
+        /// Starts a new stretch of audio: an independent frame of substream 0 (every AC-3 frame).
+        var startsAudio: Bool { !isDependent && substream == 0 }
     }
 
     /// The frame starting at `offset`, or nil if there's no valid frame header there.
@@ -115,7 +121,8 @@ public enum DolbyFrames {
             let blocks = fscod == 3 ? 6 : [1, 2, 3, 6][numblkscod]
             let rate: Double = fscod == 3 ? [24_000, 22_050, 16_000, 48_000][numblkscod] : [48_000, 44_100, 32_000][fscod]
             guard offset + size <= data.count else { return nil }
-            return Frame(bytes: Array(data[offset..<(offset + size)]), isEnhanced: true, blocks: blocks, sampleRate: rate)
+            return Frame(bytes: Array(data[offset..<(offset + size)]), isEnhanced: true, blocks: blocks, sampleRate: rate,
+                         isDependent: data[offset + 2] >> 6 == 1, substream: Int(data[offset + 2] >> 3) & 0x07)
         }
         return nil
     }
@@ -131,15 +138,40 @@ public enum DolbyFrames {
 }
 
 enum BitstreamPacker {
-    /// Dolby Digital Plus frames grouped into bursts of six audio blocks (1536 samples).
+    /// Dolby Digital Plus frames grouped into bursts of six audio blocks (1536 samples), as `EAC3Grouper` does.
     static func eac3Groups(_ frames: [DolbyFrames.Frame]) -> [[DolbyFrames.Frame]] {
-        var groups: [[DolbyFrames.Frame]] = [], current: [DolbyFrames.Frame] = [], blocks = 0
-        for f in frames {
-            current.append(f); blocks += f.blocks
-            if blocks >= 6 { groups.append(current); current = []; blocks = 0 }
-        }
+        var grouper = EAC3Grouper(), groups: [[DolbyFrames.Frame]] = []
+        for f in frames { if let g = grouper.add(f) { groups.append(g) } }
+        if let g = grouper.finish() { groups.append(g) }
         return groups
     }
+}
+
+/// Collects Dolby Digital Plus frames into bursts of six audio blocks. Only frames that start audio (independent,
+/// substream 0) add blocks; the dependent and other substreams that follow one belong to the same blocks and go in its
+/// burst. A burst is complete once it holds six blocks and the next frame starting audio arrives (or the stream ends).
+struct EAC3Grouper {
+    private var frames: [DolbyFrames.Frame] = []
+    private var blocks = 0
+
+    /// Adds a frame; returns a finished burst's frames when this frame starts the next one.
+    mutating func add(_ frame: DolbyFrames.Frame) -> [DolbyFrames.Frame]? {
+        var done: [DolbyFrames.Frame]?
+        if frame.startsAudio {
+            if blocks >= 6 { done = frames; frames = []; blocks = 0 }
+            blocks += frame.blocks
+        }
+        frames.append(frame)
+        return done
+    }
+
+    /// The end of the stream: whatever is left, as a last burst.
+    mutating func finish() -> [DolbyFrames.Frame]? {
+        defer { reset() }
+        return frames.isEmpty ? nil : frames
+    }
+
+    mutating func reset() { frames = []; blocks = 0 }
 }
 
 /// Where compressed Dolby frames come from: an elementary stream file, or the audio track of an MP4.
@@ -163,21 +195,28 @@ final class ElementaryDolbySource: DolbyFrameSource {
     let sampleRate: Double
     let isEnhanced: Bool
     let totalSamples: Int64
-    private let frameBytes: Int
-    private let samplesPerFrame: Int
+    private let start: UInt64
+    /// Bytes from one frame starting audio to the next (dependent and other substreams included), and its samples.
+    private let unitBytes: Int
+    private let samplesPerUnit: Int
 
     init(url: URL) throws {
         handle = try FileHandle(forReadingFrom: url)
         let head = [UInt8](try handle.read(upToCount: 65_536) ?? Data())
-        guard let start = (0..<max(0, head.count - 6)).first(where: { DolbyFrames.frame(in: head, at: $0) != nil }),
+        guard let start = (0..<max(0, head.count - 6)).first(where: { DolbyFrames.frame(in: head, at: $0)?.startsAudio == true }),
               let first = DolbyFrames.frame(in: head, at: start) else { throw SourceOpenerError.unsupported(url) }
         sampleRate = first.sampleRate
         isEnhanced = first.isEnhanced
-        frameBytes = first.bytes.count
-        samplesPerFrame = first.blocks * 256
+        // A unit is the first frame and any substreams after it, up to the next frame starting audio (sizes can alternate
+        // between an independent frame and its dependent one).
+        var unit = first.bytes.count
+        while let f = DolbyFrames.frame(in: head, at: start + unit), !f.startsAudio { unit += f.bytes.count }
+        unitBytes = unit
+        samplesPerUnit = first.blocks * 256
+        self.start = UInt64(start)
         let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
-        // Dolby streams are constant bit rate: frames × samples per frame.
-        totalSamples = Int64(max(0, size - Int64(start))) / Int64(frameBytes) * Int64(samplesPerFrame)
+        // Dolby streams are constant bit rate: units × samples per unit.
+        totalSamples = Int64(max(0, size - Int64(start))) / Int64(unitBytes) * Int64(samplesPerUnit)
         try handle.seek(toOffset: UInt64(start))
         fileOffset = UInt64(start)
     }
@@ -200,10 +239,10 @@ final class ElementaryDolbySource: DolbyFrameSource {
     }
 
     func seek(toSample sample: Int64) throws -> Int64 {
-        let frame = max(0, sample) / Int64(samplesPerFrame)
-        try handle.seek(toOffset: UInt64(frame) * UInt64(frameBytes))
+        let unit = max(0, sample) / Int64(samplesPerUnit)
+        try handle.seek(toOffset: start + UInt64(unit) * UInt64(unitBytes))
         buffer.removeAll(); eof = false
-        return frame * Int64(samplesPerFrame)
+        return unit * Int64(samplesPerUnit)
     }
 }
 
@@ -260,8 +299,14 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
                 offset += size
             }
         }
+        // The whole sample goes out: an MP4 sample is one stretch of audio, the independent frame and any dependent
+        // substreams after it, so the first header gives its blocks and rate.
         let bytes = pending.removeFirst()
-        return DolbyFrames.frame(in: bytes, at: 0) ?? DolbyFrames.Frame(bytes: bytes, isEnhanced: isEnhanced, blocks: 6, sampleRate: sampleRate)
+        guard var frame = DolbyFrames.frame(in: bytes, at: 0) else {
+            return DolbyFrames.Frame(bytes: bytes, isEnhanced: isEnhanced, blocks: 6, sampleRate: sampleRate)
+        }
+        frame.bytes = bytes
+        return frame
     }
 
     func seek(toSample sample: Int64) throws -> Int64 {
@@ -339,7 +384,7 @@ final class BitstreamDecoder: NSObject, PCMDecoding {
     func seek(to frame: AVAudioFramePosition) throws {
         let sample = max(0, frame) / ratio
         let start = try source.seek(toSample: sample)
-        pendingSamples.removeAll(); done = false
+        pendingSamples.removeAll(); eac3Group.reset(); done = false
         position_ = start * ratio
         // Land on the exact carrier frame (bursts are silent after their payload, so this is safe).
         let skip = Int(frame - position_)
@@ -350,21 +395,18 @@ final class BitstreamDecoder: NSObject, PCMDecoding {
         }
     }
 
-    private var eac3Group: [DolbyFrames.Frame] = []
+    private var eac3Group = EAC3Grouper()
 
     private func refill() throws {
         guard let frame = try source.next() else {
-            if !eac3Group.isEmpty { pendingSamples += IEC61937.eac3Burst(eac3Group.map(\.bytes)); eac3Group.removeAll() }
+            if let group = eac3Group.finish() { pendingSamples += IEC61937.eac3Burst(group.map(\.bytes)) }
             done = true
             return
         }
         if format == .ac3 {
             pendingSamples += IEC61937.ac3Burst(frame.bytes)
-        } else {
-            eac3Group.append(frame)
-            if eac3Group.reduce(0, { $0 + $1.blocks }) >= 6 {
-                pendingSamples += IEC61937.eac3Burst(eac3Group.map(\.bytes)); eac3Group.removeAll()
-            }
+        } else if let group = eac3Group.add(frame) {
+            pendingSamples += IEC61937.eac3Burst(group.map(\.bytes))
         }
     }
 }
