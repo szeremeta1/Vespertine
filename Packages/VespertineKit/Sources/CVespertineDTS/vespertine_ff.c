@@ -24,6 +24,7 @@ struct NFFDecoder {
     int64_t length, position;
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
+    int badFrames;            // damaged frames in a row (skipped, up to NFF_MAX_BAD_FRAMES)
     char profile[64];
     // Raw DSD reading
     uint8_t *dsd;             // per-channel planes, dsdCapacity bytes each
@@ -150,11 +151,18 @@ static bool append(NFFDecoder *d, const AVFrame *f) {
     return true;
 }
 
+/// A damaged frame (a bad sector, a broken rip) is skipped rather than ending the track, unless this many come in a row.
+#define NFF_MAX_BAD_FRAMES 32
+
+/// Skips a damaged frame; false once too many came in a row.
+static bool skip_bad_frame(NFFDecoder *d) { return ++d->badFrames <= NFF_MAX_BAD_FRAMES; }
+
 /// Decodes more into the FIFO. Returns false at the end (or on a fatal error).
 static bool pump(NFFDecoder *d) {
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
-        if (r == 0) { bool ok = append(d, d->frame); av_frame_unref(d->frame); if (!ok) return false; if (d->fifoFrames > 0) return true; continue; }
+        if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
+        if (r == 0) { d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame); if (!ok) return false; if (d->fifoFrames > 0) return true; continue; }
         if (r == AVERROR_EOF) return false;
         if (r != AVERROR(EAGAIN)) return false;
         if (d->eof) {
@@ -188,12 +196,14 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
     if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0 && av_seek_frame(d->fmt, d->stream, 0, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_BYTE) < 0)
         return false;
     avcodec_flush_buffers(d->ctx);
-    d->fifoFrames = 0; d->eof = false; d->flushed = false;
+    d->fifoFrames = 0; d->eof = false; d->flushed = false; d->badFrames = 0;
     // Find where decoding restarts: the first frame's timestamp.
     int64_t start = -1;
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
+        if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
         if (r == 0) {
+            d->badFrames = 0;
             int64_t pts = d->frame->best_effort_timestamp;
             start = pts == AV_NOPTS_VALUE ? 0 : av_rescale_q(pts, st->time_base, (AVRational){1, d->rate});
             d->discard = target > start ? target - start : 0;
