@@ -129,7 +129,9 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
     /// 1 swaps which frames carry 0x05 and which 0xFA (see `nextMarker`).
     private var markerOffset: AVAudioFramePosition = 0
     private let format: AVAudioFormat
-    private var bytes: [[UInt8]] = []
+    /// The raw DSD read in, one plane of `planeBytes` per channel, owned here (FFmpeg writes through pointers into it).
+    private var planes: UnsafeMutablePointer<UInt8>?
+    private var planeBytes = 0
 
     /// The next frame's marker: 0 for 0x05, 1 for 0xFA. Set when this track continues another one in the same
     /// output buffer, so the markers keep alternating across the join: two 0x05 in a row make a DAC drop out of DSD.
@@ -149,6 +151,8 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
         guard let f else { throw DTSError.unsupported("DoP format") }
         format = f
     }
+
+    deinit { planes?.deallocate() }
 
     var inputSource: InputSource { source.inputSource }
     var sourceFormat: AVAudioFormat { format }
@@ -170,13 +174,18 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
         buffer.frameLength = 0
         guard let h = handle, let out = buffer.floatChannelData else { throw DTSError.decoding }
         let channels = Int(format.channelCount), want = Int(min(length, buffer.frameCapacity))
-        if bytes.count != channels || bytes[0].count < want * 2 { bytes = Array(repeating: [UInt8](repeating: 0, count: want * 2), count: channels) }
-        var pointers = (0..<channels).map { c in bytes[c].withUnsafeMutableBufferPointer { $0.baseAddress! } }
+        if planes == nil || planeBytes < want * 2 {
+            planes?.deallocate()
+            planeBytes = max(want * 2, 2)
+            planes = .allocate(capacity: planeBytes * channels)
+        }
+        guard let planes else { throw DTSError.decoding }
+        var pointers: [UnsafeMutablePointer<UInt8>] = (0..<channels).map { planes + $0 * planeBytes }
         let got = pointers.withUnsafeMutableBufferPointer { nff_read_dsd(h, $0.baseAddress!, Int32(want * 2)) }
         guard got >= 0 else { throw DTSError.decoding }
         let frames = Int(got) / 2
         for c in 0..<channels {
-            let src = bytes[c]
+            let src = planes + c * planeBytes
             for i in 0..<frames {
                 let marker: UInt32 = (frame + markerOffset + AVAudioFramePosition(i)) & 1 == 0 ? 0x05 : 0xFA
                 let word = marker << 16 | UInt32(src[2 * i]) << 8 | UInt32(src[2 * i + 1])
