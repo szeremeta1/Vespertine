@@ -140,6 +140,44 @@ struct SmartRulesTests {
         #expect(try db.allTracks().count == 2)                                  // no duplicates left behind
     }
 
+    @Test("A moved file edited in the library only is matched by the file, and keeps its edit through later scans")
+    func movedLibraryOnlyEdit() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let old = dir.appendingPathComponent("01 Song.wav"), new = dir.appendingPathComponent("Album/01 Song.wav")
+        try makeWAV(old)
+        // Not writable: the edit lives in the library (as on a read-only share).
+        try FileManager.default.setAttributes([.posixPermissions: 0o444], ofItemAtPath: old.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: new.path) }
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        try await scanner.scan(source)
+        let track = try #require(try db.allTracks().first)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".bak"))
+        let result = try await writer.apply(TagEdit(fields: [.title: "Edited Title", .artist: "Edited Artist"]), to: [track])
+        #expect(result.databaseOnly == 1)
+        let playlist = try db.createPlaylist(name: "Mix")
+        try db.append(trackIDs: [try #require(track.id)], to: try #require(playlist.id))
+
+        try FileManager.default.createDirectory(at: new.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try FileManager.default.moveItem(at: old, to: new)
+        let summary = try await scanner.scan(source)
+        #expect(summary.moved == 1)
+        let moved = try #require(try db.tracks(in: playlist).first)
+        #expect(moved.filePath == new.path)
+        #expect(moved.title == "Edited Title" && moved.artist == "Edited Artist")
+        #expect(try db.allTracks().count == 1)
+
+        // A later re-read of the file still shows the edit, and it can be undone.
+        try await db.writer.write { try $0.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'") }
+        try await scanner.scan(source)
+        #expect(try db.allTracks().first?.title == "Edited Title")
+        #expect(try await writer.revertLastEdit(trackID: try #require(moved.id)))
+        #expect(try db.allTracks().first?.title == track.title)
+    }
+
     @Test("Re-reading an unchanged file keeps its analysis verdict")
     func rereadKeepsAnalysis() async throws {
         let dir = try tempDir()
