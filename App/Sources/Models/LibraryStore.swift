@@ -88,6 +88,9 @@ final class LibraryStore {
     @ObservationIgnored private var changedDuringScan: Set<String> = []
     @ObservationIgnored private var checkedAtLaunch = false
     @ObservationIgnored private var favoriteVersionsTask: Task<Void, Never>?
+    /// Whether stored analyses from an older analyzer have been judged anew (see `storedAnalysesJudged`).
+    @ObservationIgnored private(set) var analysesJudged = false
+    @ObservationIgnored private var judging: Task<Void, Never>?
 
     init(dataDirectory: URL) throws {
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
@@ -99,7 +102,17 @@ final class LibraryStore {
         ArtworkCache.shared.store = artwork
         observe()
         Task { await tagWriter.pruneBackups() }
+        // After an analyzer update, stored results are judged anew from their measurements: off the main thread (a large
+        // library has many), and before the analysis queue asks what needs analyzing.
+        let database = database
+        judging = Task { [weak self] in
+            await Task.detached(priority: .utility) { _ = try? database.rejudgeStoredAnalyses() }.value
+            self?.analysesJudged = true
+        }
     }
+
+    /// Waits until stored analyses have been judged anew (`LibraryDatabase.rejudgeStoredAnalyses`), started at launch.
+    func storedAnalysesJudged() async { await judging?.value }
 
     deinit {
         albumTask?.cancel()

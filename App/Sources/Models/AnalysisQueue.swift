@@ -102,6 +102,14 @@ final class AnalysisQueue {
     /// Queues everything that has no current analysis (new, changed, or analyzed by an older version).
     /// Shares analyzed by their server are left to the server.
     func analyzeLibrary(includeNetwork: Bool? = nil) {
+        // Results an analyzer update can judge from their measurements (done at launch) aren't queued to be read again.
+        guard library.analysesJudged else {
+            Task { [weak self] in
+                await self?.library.storedAnalysesJudged()
+                self?.analyzeLibrary(includeNetwork: includeNetwork)
+            }
+            return
+        }
         let network = includeNetwork ?? settings.analyzeNetworkShares
         var excluded = serverIndexed
         if !network { excluded.formUnion(library.sources.filter(\.isNetwork).compactMap(\.id)) }
@@ -125,6 +133,8 @@ final class AnalysisQueue {
         guard !syncing else { return }
         syncing = true
         defer { syncing = false }
+        // What the import looks for is what still needs analyzing: only once stored results are judged anew.
+        await library.storedAnalysesJudged()
         let sources = shares.sources.filter { shares.status(of: $0).isConnected }
         let importer = importer, database = library.database
         var indexed: Set<Int64> = [], statuses: [Int64: ServerAnalysisStatus] = [:], imported = 0
