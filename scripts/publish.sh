@@ -80,7 +80,15 @@ PY
 # install Vespertine: Sparkle only replaces an app with one of the same bundle ID. For them every new entry is
 # informational: they're told about it and offered the download page instead of a failing install.
 first_vespertine_build=27
-"$tools/generate_appcast" --account nocturne \
+# The keychain lets only generate_keys read the Sparkle key without asking (it made or imported it), so a Mac with
+# nobody at the screen, like the hub, would hang at generate_appcast's prompt. Hand the tools a private copy instead,
+# removed on exit.
+keydir=$(mktemp -d)
+trap 'rm -P "$keydir"/key 2>/dev/null; rmdir "$keydir"' EXIT
+"$tools/generate_keys" --account nocturne -x "$keydir/key" >/dev/null
+sparkle_key=(--ed-key-file "$keydir/key")
+
+"$tools/generate_appcast" "${sparkle_key[@]}" \
   --download-url-prefix "https://github.com/$repo/releases/download/v$version/" \
   --link "https://github.com/$repo/releases/latest" --embed-release-notes --maximum-deltas 0 \
   --informational-update-versions "<$first_vespertine_build" \
@@ -100,7 +108,7 @@ sys.exit(0 if signed else 1)
 PY
 # A build that requires a signed feed refuses every later update if this feed's signature is missing or broken.
 if [[ "$(/usr/libexec/PlistBuddy -c 'Print SURequireSignedFeed' "$app/Contents/Info.plist" 2>/dev/null)" == true ]]; then
-  "$tools/sign_update" --account nocturne --verify "$feed/appcast.xml" \
+  "$tools/sign_update" "${sparkle_key[@]}" --verify "$feed/appcast.xml" \
     || { print -u2 "appcast.xml is not validly signed; copies of $version would refuse every future update."; exit 1; }
 fi
 
