@@ -643,7 +643,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
                 let uid = (error as? ChosenDeviceMissing)?.uid ?? (error as? ChosenDeviceNotReady)?.uid ?? ""
                 log.notice("\(self.deviceName(uid), privacy: .public) \(error is ChosenDeviceMissing ? "isn't listed" : "won't start (\((error as? ChosenDeviceNotReady)?.reason ?? "?"))", privacy: .public); waiting for it")
-                teardown(releaseHog: true)
+                teardown(releaseHog: true, idle: true)   // let go while waiting: back on its own rate (DoP)
                 parked = (current, offset)
                 state = .paused
                 pausedAt = nil
@@ -758,7 +758,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         // macOS can lose track of its own pause/resume pairs then: the device stays paused for this process and
         // never starts again (AudioDeviceStart times out with error 35) until the app quits.
         let keep = old.map { $0.deviceID == device.id && $0.applied.exclusive && exclusive } ?? false
-        old?.invalidate(releaseHog: !keep, restoreFormat: !keep)
+        // Moving to another output lets the old one go: it gets its own rate back (a DoP carrier rate is no music rate).
+        old?.invalidate(releaseHog: !keep, restoreFormat: !keep, idle: old.map { $0.deviceID != device.id } ?? false)
         let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive)
         sessionLock.lock()
         session = new
@@ -902,8 +903,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     // MARK: Dolby Atmos (rendered by macOS)
 
     private func beginSystemRendering(_ item: PlayableItem, url: URL, device: OutputDevice, at seconds: TimeInterval) throws {
-        // macOS's renderer needs the device to itself: drop Vespertine's own session first.
-        teardown(releaseHog: true)
+        // macOS's renderer needs the device to itself: drop Vespertine's own session first, leaving the device on its
+        // own rate (not a DoP carrier rate the renderer would resample to).
+        teardown(releaseHog: true, idle: true)
         let volume = Float(settings.digitalVolume(for: device).map { pow(10, $0 / 20) } ?? 1)
         let session = try SystemRendererSession(item: item, url: url, deviceUID: device.uid,
                                                 spatial: settings.spatialMode(for: device) != .off,
@@ -1138,7 +1140,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
         if let next = pendingSystem {
-            teardown(releaseHog: true)
+            teardown(releaseHog: true, idle: true)     // macOS's renderer plays it (see beginSystemRendering)
             start(next, at: 0, autoplay: true)
             return
         }
