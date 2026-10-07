@@ -277,7 +277,8 @@ final class NetworkShareManager {
         do {
             let root = try await mountedRoot(share, readOnly: !source.isWritable) {
                 guard let user = share.user else { return nil }
-                let found = NetworkCredentials.lookup(share)
+                // Off the main thread: the read can wait on macOS's keychain prompt.
+                let found = await Task.detached { NetworkCredentials.lookup(share) }.value
                 // Without a password NetFS fails locally with an authentication error; say what's really wrong.
                 guard let password = found.password else {
                     shareLog.error("share \(id, privacy: .public): no saved password (keychain: \(found.status, privacy: .public))")
@@ -316,16 +317,16 @@ final class NetworkShareManager {
     /// Mounts `share` (or adopts its existing mount) and returns the folder to index. An adopted mount that no longer
     /// answers outlived a server restart or a dropped connection; reusing it would fail the same way at every try, so
     /// Vespertine's own is dropped and mounted afresh, once. One Vespertine didn't make (Finder's) is left alone.
-    private func mountedRoot(_ share: NetworkShare, readOnly: Bool, password: () throws -> String?) async throws -> URL {
+    private func mountedRoot(_ share: NetworkShare, readOnly: Bool, password: () async throws -> String?) async throws -> URL {
         let adopted = NetworkVolume.existingMount(for: share)
-        let mount = try await NetworkVolume.mount(share, password: adopted == nil ? password() : nil, in: mountBase, readOnly: readOnly)
+        let mount = try await NetworkVolume.mount(share, password: adopted == nil ? await password() : nil, in: mountBase, readOnly: readOnly)
         let root = share.root(at: mount).standardizedFileURL
         if await NetworkVolume.isDirectory(root) { return root }
         guard let adopted, await !NetworkVolume.isResponsive(adopted) else { throw NetworkShareError.folderNotFound(share.subpath) }
         await unmountOurselves(adopted, force: true)
         guard NetworkVolume.existingMount(for: share) == nil else { throw NetworkShareError.mountNotResponding }
         shareLog.notice("\(share.host, privacy: .public)/\(share.share, privacy: .public): the old mount didn't answer; mounting again")
-        let fresh = share.root(at: try await NetworkVolume.mount(share, password: password(), in: mountBase, readOnly: readOnly)).standardizedFileURL
+        let fresh = share.root(at: try await NetworkVolume.mount(share, password: await password(), in: mountBase, readOnly: readOnly)).standardizedFileURL
         guard await NetworkVolume.isDirectory(fresh) else { throw NetworkShareError.folderNotFound(share.subpath) }
         return fresh
     }
@@ -334,9 +335,13 @@ final class NetworkShareManager {
     /// A blank password uses the one saved in the keychain (by Vespertine or by Finder).
     func add(_ share: NetworkShare, password: String?, remember: Bool, name: String?, writable: Bool) async throws {
         let typed = password.flatMap { $0.isEmpty ? nil : $0 }
-        let secret = typed ?? (share.user == nil ? nil : NetworkCredentials.password(for: share))
+        let saved = typed == nil && share.user != nil ? await Task.detached { NetworkCredentials.password(for: share) }.value : nil
+        let secret = typed ?? saved
         let root = try await mountedRoot(share, readOnly: !writable) { secret }
-        if remember, let typed { NetworkCredentials.save(typed, for: share) }
+        if remember, let typed {
+            let status = await Task.detached { NetworkCredentials.save(typed, for: share) }.value
+            if status != errSecSuccess { shareLog.error("\(share.host, privacy: .public): couldn't save the password (keychain \(status, privacy: .public))") }
+        }
 
         if let existing = sources.first(where: { $0.remoteURL == share.urlString }) {
             await connect(existing)
