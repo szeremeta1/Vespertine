@@ -46,6 +46,8 @@ void nrt_ring_reset(NRTRing *_Nonnull ring);
 /// Producer side, safe while the consumer runs: takes back everything written after `totalWritten`
 /// (look-ahead that is no longer wanted), but only when that point is at least `margin` frames ahead
 /// of the reader, so the consumer can never be reading the frames being taken back. Returns whether it did.
+/// The consumer stays wait-free: it is held back to `totalWritten` while this decides, and this may wait out
+/// one read (or render pass) already under way.
 bool nrt_ring_rewind(NRTRing *_Nonnull ring, uint64_t totalWritten, uint32_t margin);
 
 // MARK: - Render context driven by a HAL IOProc

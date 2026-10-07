@@ -115,7 +115,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         case play(PlayableItem)
         case pause, resume, stop
         case seek(TimeInterval)
-        case settingsChanged(EngineSettings)
+        /// `outputSwitched`: the output was changed on the way (and silenced then), even if it's back where it was.
+        case settingsChanged(EngineSettings, outputSwitched: Bool)
         case devicesChanged
         case queueChanged(reloadCurrent: Bool)
         case barrier(DispatchSemaphore)
@@ -346,7 +347,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             return (true, newOutput)
         }
         if newOutput { silenceNow() }   // the old output stops now, not when the new one is ready
-        if changed { post(.settingsChanged(settings)) }
+        if changed { post(.settingsChanged(settings, outputSwitched: newOutput)) }
     }
 
     public var snapshot: EngineSnapshot { shared.withLock { $0.snapshot } }
@@ -436,12 +437,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// - Seeks: only the last one before the next play or stop.
     /// - Output changes (quick clicks): only the last one restarts playback. Each carries the complete
     ///   settings, and each comes with a queue update (other versions of upcoming songs), so those
-    ///   collapse into one too.
+    ///   collapse into one too. One that switched the output keeps that, so A → B → A still unmutes.
     static func coalesce(_ commands: [Command]) -> [Command] {
         let lastStart = commands.lastIndex { switch $0 { case .play, .stop: true; default: false } }
         let lastSettings = commands.lastIndex { if case .settingsChanged = $0 { true } else { false } }
         let lastQueue = commands.lastIndex { if case .queueChanged = $0 { true } else { false } }
         let reload = commands.contains { if case .queueChanged(true) = $0 { true } else { false } }
+        let switched = commands.contains { if case .settingsChanged(_, true) = $0 { true } else { false } }
         return commands.enumerated().compactMap { i, command in
             switch command {
             case .play, .pause, .resume:
@@ -451,7 +453,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 if let lastStart, i < lastStart { return nil }
                 let later = commands[(i + 1)...].contains { if case .seek = $0 { true } else { false } }
                 return later ? nil : command
-            case .settingsChanged: return i == lastSettings ? command : nil
+            case .settingsChanged(let settings, _):
+                return i == lastSettings ? .settingsChanged(settings, outputSwitched: switched) : nil
             case .queueChanged: return i == lastQueue ? .queueChanged(reloadCurrent: reload) : nil
             default: return command
             }
@@ -514,7 +517,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             session?.flush()
             parked = nil
             start(current, at: seconds, autoplay: resume)
-        case .settingsChanged(let new):
+        case .settingsChanged(let new, let outputSwitched):
             let old = settings
             settings = new
             applyGain()
@@ -528,6 +531,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
+            } else if outputSwitched, state == .playing {
+                // Switched away and back before this ran (A → B → A): silenced on the way, nothing to restart.
+                unmute()
             }
         case .queueChanged(let reloadCurrent):
             guard state != .stopped else { return }
@@ -637,7 +643,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
                 let uid = (error as? ChosenDeviceMissing)?.uid ?? (error as? ChosenDeviceNotReady)?.uid ?? ""
                 log.notice("\(self.deviceName(uid), privacy: .public) \(error is ChosenDeviceMissing ? "isn't listed" : "won't start (\((error as? ChosenDeviceNotReady)?.reason ?? "?"))", privacy: .public); waiting for it")
-                teardown(releaseHog: true)
+                teardown(releaseHog: true, idle: true)   // let go while waiting: back on its own rate (DoP)
                 parked = (current, offset)
                 state = .paused
                 pausedAt = nil
@@ -752,7 +758,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         // macOS can lose track of its own pause/resume pairs then: the device stays paused for this process and
         // never starts again (AudioDeviceStart times out with error 35) until the app quits.
         let keep = old.map { $0.deviceID == device.id && $0.applied.exclusive && exclusive } ?? false
-        old?.invalidate(releaseHog: !keep, restoreFormat: !keep)
+        // Moving to another output lets the old one go: it gets its own rate back (a DoP carrier rate is no music rate).
+        old?.invalidate(releaseHog: !keep, restoreFormat: !keep, idle: old.map { $0.deviceID != device.id } ?? false)
         let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive)
         sessionLock.lock()
         session = new
@@ -896,8 +903,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     // MARK: Dolby Atmos (rendered by macOS)
 
     private func beginSystemRendering(_ item: PlayableItem, url: URL, device: OutputDevice, at seconds: TimeInterval) throws {
-        // macOS's renderer needs the device to itself: drop Vespertine's own session first.
-        teardown(releaseHog: true)
+        // macOS's renderer needs the device to itself: drop Vespertine's own session first, leaving the device on its
+        // own rate (not a DoP carrier rate the renderer would resample to).
+        teardown(releaseHog: true, idle: true)
         let volume = Float(settings.digitalVolume(for: device).map { pow(10, $0 / 20) } ?? 1)
         let session = try SystemRendererSession(item: item, url: url, deviceUID: device.uid,
                                                 spatial: settings.spatialMode(for: device) != .off,
@@ -1132,7 +1140,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
         if let next = pendingSystem {
-            teardown(releaseHog: true)
+            teardown(releaseHog: true, idle: true)     // macOS's renderer plays it (see beginSystemRendering)
             start(next, at: 0, autoplay: true)
             return
         }
