@@ -210,7 +210,18 @@ final class Index: @unchecked Sendable {
     let dir: URL
     private let dirFD: Int32
     private let lock = NSLock()
-    private var records: [String: IndexRecord] = [:]
+    /// The latest line for one path in `analysis.jsonl`: what deciding whether to analyze the file again needs, and
+    /// where the line is so compacting can copy it. Whole records (a spectrum of hundreds of values each) aren't kept.
+    struct Entry {
+        var size: Int64
+        var mtime: Double
+        var current: Bool     // up to date, or judged anew from its measurements on import
+        var offset: UInt64
+        var length: Int
+    }
+    private var entries: [String: Entry] = [:]
+    /// The index is read and copied this much at a time.
+    static let chunkSize = 4 << 20
     private var handle: FileHandle?
     private let encoder: JSONEncoder = {
         let e = JSONEncoder()
@@ -239,11 +250,7 @@ final class Index: @unchecked Sendable {
         let openError = errno
         guard dirFD >= 0 else { throw IndexError(path: dir.path, code: openError) }
         if created { fchmod(dirFD, 0o755) } // readable by the Mac whatever the umask
-        if let data = try readExisting("analysis.jsonl") {
-            for line in data.split(separator: UInt8(ascii: "\n")) where !line.isEmpty {
-                if let r = try? Self.decoder.decode(IndexRecord.self, from: line) { records[r.path] = r }
-            }
-        }
+        try readExisting("analysis.jsonl")
     }
 
     deinit { close(dirFD) }
@@ -261,15 +268,48 @@ final class Index: @unchecked Sendable {
         return fd
     }
 
-    private func readExisting(_ name: String) throws -> Data? {
+    /// Learns where the latest record for each path is, a chunk at a time, decoding one line at a time and keeping
+    /// none of the records themselves.
+    private func readExisting(_ name: String) throws {
         let fd: Int32
-        do { fd = try openFile(name, O_RDONLY) } catch let error as IndexError where error.code == ENOENT { return nil }
-        return try FileHandle(fileDescriptor: fd, closeOnDealloc: true).readToEnd()
+        do { fd = try openFile(name, O_RDONLY) } catch let error as IndexError where error.code == ENOENT { return }
+        let file = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        var carry = Data()
+        var lineStart: UInt64 = 0   // where `carry` starts in the file
+        while true {
+            let chunk = try drained { try file.read(upToCount: Self.chunkSize) } ?? Data()
+            if chunk.isEmpty { break }
+            var buffer = carry
+            buffer.append(chunk)
+            var from = buffer.startIndex
+            while let newline = buffer[from...].firstIndex(of: UInt8(ascii: "\n")) {
+                let line = buffer[from..<newline]
+                if !line.isEmpty, let r = drained({ try? Self.decoder.decode(IndexRecord.self, from: Data(line)) }) {
+                    entries[r.path] = Entry(size: r.size, mtime: r.mtime,
+                                            current: FileAnalyzer.rejudged(r.analysis).version >= FileAnalysis.currentVersion,
+                                            offset: lineStart + UInt64(from - buffer.startIndex), length: line.count)
+                }
+                from = newline + 1
+            }
+            lineStart += UInt64(from - buffer.startIndex)
+            carry = Data(buffer[from...])
+        }
+        // A whole record that only lacks its newline still counts (as it did when the file was read in one go).
+        if !carry.isEmpty, let r = try? Self.decoder.decode(IndexRecord.self, from: carry) {
+            entries[r.path] = Entry(size: r.size, mtime: r.mtime,
+                                    current: FileAnalyzer.rejudged(r.analysis).version >= FileAnalysis.currentVersion,
+                                    offset: lineStart, length: carry.count)
+        }
     }
 
     /// Writes `data` to a new file beside `name`, then renames it over `name`: the Mac never reads a half-written
     /// file, and a link planted at either name is replaced, not followed.
     private func replace(_ name: String, with data: Data) throws {
+        try replace(name) { try $0.write(contentsOf: data) }
+    }
+
+    /// The same, with `write` filling the new file.
+    private func replace(_ name: String, writing write: (FileHandle) throws -> Void) throws {
         let temporary = ".\(name).tmp"
         unlinkat(dirFD, temporary, 0) // left by an interrupted run
         let fd = openat(dirFD, temporary, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o644)
@@ -277,7 +317,7 @@ final class Index: @unchecked Sendable {
         guard fd >= 0 else { throw IndexError(path: dir.path + "/" + temporary, code: code) }
         let file = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
         do {
-            try file.write(contentsOf: data)
+            try write(file)
             fchmod(fd, 0o644)
             try file.close()
         } catch {
@@ -298,32 +338,59 @@ final class Index: @unchecked Sendable {
     /// does on import), so after an update only the files that need reading again are analyzed again.
     func current(_ path: String, size: Int64, mtime: Double) -> Bool {
         lock.lock(); defer { lock.unlock() }
-        guard let r = records[path] else { return false }
-        return r.size == size && abs(r.mtime - mtime) < 1 && FileAnalyzer.rejudged(r.analysis).version >= FileAnalysis.currentVersion
+        guard let e = entries[path] else { return false }
+        return e.size == size && abs(e.mtime - mtime) < 1 && e.current
     }
 
     func append(_ record: IndexRecord) throws {
         let line = try encoder.encode(record) + Data("\n".utf8)
         lock.lock(); defer { lock.unlock() }
         if handle == nil {
-            let fd = try openFile("analysis.jsonl", O_WRONLY | O_CREAT | O_APPEND)
+            let fd = try openFile("analysis.jsonl", O_RDWR | O_CREAT | O_APPEND)
             fchmod(fd, 0o644)
-            handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+            let file = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+            // A line an interrupted run left unfinished is ended first, so the next record isn't run into it.
+            let end = try file.seekToEnd()
+            if end > 0 {
+                try file.seek(toOffset: end - 1)
+                if try file.read(upToCount: 1) != Data("\n".utf8) { try file.write(contentsOf: Data("\n".utf8)) }
+            }
+            handle = file
         }
-        try handle?.write(contentsOf: line)
-        records[record.path] = record
+        guard let handle else { return }
+        let offset = try handle.seekToEnd()  // appends land at the end (O_APPEND), and only one at a time (the lock)
+        try handle.write(contentsOf: line)
+        entries[record.path] = Entry(size: record.size, mtime: record.mtime,
+                                     current: FileAnalyzer.rejudged(record.analysis).version >= FileAnalysis.currentVersion,
+                                     offset: offset, length: line.count - 1)
     }
 
-    /// Rewrites the index with one record per existing file (atomically).
+    /// Rewrites the index with one record per existing file (atomically): the latest line for each, copied as it is,
+    /// sorted by path, streamed to the new file a chunk at a time.
     func compact(keeping present: Set<String>) throws {
         lock.lock(); defer { lock.unlock() }
         try handle?.close()
         handle = nil
-        var out = Data()
-        for path in records.keys.sorted() where present.contains(path) {
-            out += try encoder.encode(records[path]!) + Data("\n".utf8)
+        let source: FileHandle?
+        do { source = FileHandle(fileDescriptor: try openFile("analysis.jsonl", O_RDONLY), closeOnDealloc: true) }
+        catch let error as IndexError where error.code == ENOENT { source = nil }
+        try replace("analysis.jsonl") { out in
+            var buffer = Data()
+            for path in entries.keys.sorted() where present.contains(path) {
+                guard let source, let e = entries[path] else { continue }
+                let line = try drained {
+                    try source.seek(toOffset: e.offset)
+                    return try source.read(upToCount: e.length) ?? Data()
+                }
+                guard line.count == e.length else { throw IndexError(path: dir.path + "/analysis.jsonl", code: EIO) }
+                buffer += line
+                buffer.append(UInt8(ascii: "\n"))
+                if buffer.count >= Self.chunkSize { try out.write(contentsOf: buffer); buffer = Data() }
+            }
+            try out.write(contentsOf: buffer)
         }
-        try replace("analysis.jsonl", with: out)
+        // The lines are elsewhere now; the next run reads the new file afresh.
+        entries = [:]
     }
 
     func writeStatus(_ status: Status) {
