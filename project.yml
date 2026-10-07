@@ -16,8 +16,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "0.8.0"
-    CURRENT_PROJECT_VERSION: "34"
+    MARKETING_VERSION: "0.9.0"
+    CURRENT_PROJECT_VERSION: "35"
     DEAD_CODE_STRIPPING: YES
 targets:
   Vespertine:
