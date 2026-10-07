@@ -10,9 +10,10 @@ import Testing
 
 @Suite("Server analysis import")
 struct ServerAnalysisTests {
-    func line(path: String, size: Int64, mtime: Double, verdict: FileAnalysis.Verdict) throws -> String {
+    func line(path: String, size: Int64, mtime: Double, verdict: FileAnalysis.Verdict, summary: String = "from the server",
+              spectrum: [Float] = [-60, -70]) throws -> String {
         var a = FileAnalysis(claimedBitDepth: 24, effectiveBitDepth: 24, sampleRate: 96_000, bandwidthHz: 22_000, peakDBFS: -1,
-                             clippedSamples: 0, verdict: verdict, summary: "from the server", spectrum: [-60, -70],
+                             clippedSamples: 0, verdict: verdict, summary: summary, spectrum: spectrum,
                              version: FileAnalysis.currentVersion, confidence: 0.9)
         a.peakDBFS = -1
         let record: [String: Any] = ["path": path, "size": size, "mtime": mtime,
@@ -128,6 +129,103 @@ struct ServerAnalysisTests {
         try await db.writer.write { try $0.execute(sql: "DELETE FROM analysis") }
         #expect(try importer.importNew(for: source, into: db) == 2)
         #expect(try db.storedAnalysis(for: b)?.analysis.verdict == .paddedBitDepth)
+    }
+
+    /// A scanned share holding `names` (WAV files), with an empty `.vespertine/` folder.
+    func share(_ names: [String]) async throws -> (dir: URL, db: LibraryDatabase, source: LibrarySource, tracks: [String: Track], file: URL) {
+        let dir = try tempDir()
+        for name in names { try makeWAV(dir.appendingPathComponent(name), rate: 96_000) }
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        var share = LibrarySource(path: dir.path, mode: .reference)
+        share.remoteURL = "smb://server/music"
+        let source = try db.addSource(share)
+        try await scanner.scan(source)
+        let tracks = Dictionary(uniqueKeysWithValues: try db.allTracks().map { ($0.filePath.components(separatedBy: "/").last!, $0) })
+        let index = dir.appendingPathComponent(".vespertine")
+        try FileManager.default.createDirectory(at: index, withIntermediateDirectories: true)
+        return (dir, db, source, tracks, index.appendingPathComponent("analysis.jsonl"))
+    }
+
+    func append(_ text: String, to file: URL) throws {
+        let handle = try FileHandle(forWritingTo: file)
+        try handle.seekToEnd()
+        try handle.write(contentsOf: Data(text.utf8))
+        try handle.close()
+    }
+
+    @Test("A line the server is still writing is left for the next import, then read from where it starts")
+    func partialTrailingLine() async throws {
+        let s = try await share(["a.wav"])
+        defer { try? FileManager.default.removeItem(at: s.dir) }
+        let a = try #require(s.tracks["a.wav"])
+        let full = try line(path: "a.wav", size: a.fileSize, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .upsampled)
+        let cut = full.utf8.count / 2
+        try String(full.utf8.prefix(cut))!.write(to: s.file, atomically: true, encoding: .utf8)
+        let importer = ServerAnalysisImporter()
+        #expect(try importer.importNew(for: s.source, into: s.db) == 0)
+        try append(String(full.utf8.dropFirst(cut))!, to: s.file)
+        #expect(try importer.importNew(for: s.source, into: s.db) == 1)
+        #expect(try s.db.storedAnalysis(for: a)?.analysis.verdict == .upsampled)
+    }
+
+    @Test("A large index is read in chunks: lines across chunk boundaries, later lines winning, only matches decoded in full")
+    func largeIndex() async throws {
+        let s = try await share(["a.wav", "b.wav", "c.wav"])
+        defer { try? FileManager.default.removeItem(at: s.dir) }
+        let a = try #require(s.tracks["a.wav"]), b = try #require(s.tracks["b.wav"]), c = try #require(s.tracks["c.wav"])
+        let spectrum = (0..<256).map { -Float($0) / 3 - 0.123456 }
+        func filler(_ range: Range<Int>) throws -> String {
+            try range.map { try line(path: "Other/\($0) Track.flac", size: Int64(1_000_000 + $0), mtime: 1_700_000_000 + Double($0),
+                                     verdict: .genuine, spectrum: spectrum) }.joined()
+        }
+        // An earlier result for a.wav, superseded later in the file; b.wav and c.wav right at the end.
+        var text = try filler(0..<1_500)
+        text += try line(path: "a.wav", size: a.fileSize, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .upsampled, spectrum: spectrum)
+        text += try filler(1_500..<4_000)
+        text += try line(path: "a.wav", size: a.fileSize, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .genuine,
+                         summary: "second pass", spectrum: spectrum)
+        text += try filler(4_000..<6_000)
+        text += try line(path: "b.wav", size: b.fileSize, mtime: b.modifiedAt.timeIntervalSince1970, verdict: .paddedBitDepth, spectrum: spectrum)
+        try text.write(to: s.file, atomically: true, encoding: .utf8)
+        #expect(text.utf8.count > 3 * ServerAnalysisImporter.chunkSize)
+
+        let importer = ServerAnalysisImporter()
+        #expect(try importer.importNew(for: s.source, into: s.db) == 2)
+        #expect(try s.db.storedAnalysis(for: a)?.analysis.summary == "second pass")
+        #expect(try s.db.storedAnalysis(for: a)?.analysis.spectrum == spectrum)
+        #expect(try s.db.storedAnalysis(for: b)?.analysis.verdict == .paddedBitDepth)
+        #expect(try s.db.storedAnalysis(for: c) == nil)
+
+        // Appended afterwards, past the old end: read on its own.
+        try append(try filler(6_000..<6_100) + line(path: "c.wav", size: c.fileSize, mtime: c.modifiedAt.timeIntervalSince1970,
+                                                     verdict: .upsampled, spectrum: spectrum), to: s.file)
+        #expect(try importer.importNew(for: s.source, into: s.db) == 1)
+        #expect(try s.db.storedAnalysis(for: c)?.analysis.verdict == .upsampled)
+    }
+
+    @Test("A rewrite that keeps the first line is noticed when a remembered line no longer holds its record, and read again")
+    func rewriteUnderTheSameFirstLine() async throws {
+        let s = try await share(["a.wav", "b.wav"])
+        defer { try? FileManager.default.removeItem(at: s.dir) }
+        let a = try #require(s.tracks["a.wav"]), b = try #require(s.tracks["b.wav"])
+        let first = try line(path: "Other/0.flac", size: 1, mtime: 1, verdict: .genuine)
+        try (first + line(path: "Other/1 a much longer name than the rest.flac", size: 2, mtime: 2, verdict: .genuine)
+             + line(path: "a.wav", size: a.fileSize + 1, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .genuine)
+             + line(path: "b.wav", size: b.fileSize, mtime: b.modifiedAt.timeIntervalSince1970, verdict: .upsampled))
+            .write(to: s.file, atomically: true, encoding: .utf8)
+        let importer = ServerAnalysisImporter()
+        #expect(try importer.importNew(for: s.source, into: s.db) == 1)   // b.wav; a.wav's size doesn't match
+        try await s.db.writer.write { try $0.execute(sql: "DELETE FROM analysis") }
+        // Rewritten: same first line, the second dropped, so every remembered offset after it is wrong; a.wav now fits.
+        try (first + line(path: "a.wav", size: a.fileSize, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .paddedBitDepth)
+             + line(path: "b.wav", size: b.fileSize, mtime: b.modifiedAt.timeIntervalSince1970, verdict: .upsampled)
+             + line(path: "Other/c, with a name long enough that the file grows rather than shrinks.flac", size: 3, mtime: 3, verdict: .genuine))
+            .write(to: s.file, atomically: true, encoding: .utf8)
+        #expect(try importer.importNew(for: s.source, into: s.db) == 2)
+        #expect(try s.db.storedAnalysis(for: a)?.analysis.verdict == .paddedBitDepth)
+        #expect(try s.db.storedAnalysis(for: b)?.analysis.verdict == .upsampled)
     }
 
     @Test("A folder SMB shows under a mangled name is matched by size and date")
