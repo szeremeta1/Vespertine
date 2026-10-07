@@ -48,8 +48,24 @@ struct SkipTests {
 
     @Test("Output changes and queue updates still collapse into one each")
     func settings() {
-        let commands: [Command] = [.settingsChanged(EngineSettings()), .queueChanged(reloadCurrent: true),
-                                   .settingsChanged(EngineSettings()), .queueChanged(reloadCurrent: false)]
+        let commands: [Command] = [.settingsChanged(EngineSettings(), outputSwitched: false), .queueChanged(reloadCurrent: true),
+                                   .settingsChanged(EngineSettings(), outputSwitched: false), .queueChanged(reloadCurrent: false)]
         #expect(names(PlaybackEngine.coalesce(commands), []) == ["settings", "queue reload"])
+    }
+
+    @Test("Output A → B → A in one batch keeps that the output was switched (it was silenced on the way)")
+    func switchedAndBack() {
+        var a = EngineSettings(), b = EngineSettings()
+        a.deviceUID = "A"; b.deviceUID = "B"
+        let commands: [Command] = [.settingsChanged(b, outputSwitched: true), .settingsChanged(a, outputSwitched: true),
+                                   .settingsChanged(a, outputSwitched: false)]
+        let coalesced = PlaybackEngine.coalesce(commands)
+        #expect(coalesced.count == 1)
+        guard case .settingsChanged(let last, let switched) = coalesced.first else { Issue.record("no settings"); return }
+        #expect(last.deviceUID == "A" && switched)
+        // Nothing switched: nothing to unmute.
+        let plain = PlaybackEngine.coalesce([.settingsChanged(a, outputSwitched: false), .settingsChanged(a, outputSwitched: false)])
+        guard case .settingsChanged(_, let none) = plain.first else { Issue.record("no settings"); return }
+        #expect(!none)
     }
 }
