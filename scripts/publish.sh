@@ -17,7 +17,9 @@ notes=${1:?usage: scripts/publish.sh <release-notes.md>}
 app="$out/Vespertine.app"
 version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$app/Contents/Info.plist")
 dmg="$out/Vespertine-$version.dmg"
-tools=$(dirname "$(find build -path '*artifacts/sparkle/Sparkle/bin/generate_appcast' | head -1)")
+# The Sparkle tools from the release's own build, not whichever derived-data folder find lists first.
+tools=${VESPERTINE_DERIVED:-build/DDR}/SourcePackages/artifacts/sparkle/Sparkle/bin
+[[ -x $tools/generate_appcast ]] || { print -u2 "No Sparkle tools in $tools; run scripts/release.sh --notarize first."; exit 1; }
 
 [[ -f $dmg ]] || { print -u2 "Missing $dmg; run scripts/release.sh --notarize first."; exit 1; }
 xcrun stapler validate "$dmg" >/dev/null || { print -u2 "$dmg is not notarized and stapled."; exit 1; }
@@ -96,6 +98,11 @@ signed = any(e.get("url", "").endswith("/" + sys.argv[2]) and e.get(signature)
              for e in ET.parse(sys.argv[1]).iter("enclosure"))
 sys.exit(0 if signed else 1)
 PY
+# A build that requires a signed feed refuses every later update if this feed's signature is missing or broken.
+if [[ "$(/usr/libexec/PlistBuddy -c 'Print SURequireSignedFeed' "$app/Contents/Info.plist" 2>/dev/null)" == true ]]; then
+  "$tools/sign_update" --account nocturne --verify "$feed/appcast.xml" \
+    || { print -u2 "appcast.xml is not validly signed; copies of $version would refuse every future update."; exit 1; }
+fi
 
 # The FFmpeg decoders are LGPL: the exact source they were built from goes up with every release, checked against
 # the hash build-dts-decoder.sh builds from, so it stays available as long as the release does.

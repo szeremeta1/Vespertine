@@ -211,8 +211,32 @@ public actor ListenBrainzClient {
 
     public enum Kind: String { case single, playingNow = "playing_now" }
 
+    static let tokenAccount = "listenbrainz-token"
+    /// The token, read from the keychain once per session: a read can put up macOS's keychain prompt (after the app's
+    /// signer changes, say), and two reads a track would ask again and again. A denied read stays denied until the
+    /// token is saved again in Settings.
+    private var cachedToken: String??
+
+    private func token() -> String? {
+        if let cachedToken { return cachedToken }
+        let token = Keychain.read(Self.tokenAccount).value
+        cachedToken = .some(token)
+        return token
+    }
+
+    /// The saved token for Settings, without blocking the caller's thread on a keychain prompt.
+    public func savedToken() -> String { token() ?? "" }
+
+    /// Saves (or, when empty, removes) the token; returns the keychain status.
+    @discardableResult
+    public func saveToken(_ token: String) -> OSStatus {
+        let status = Keychain.write(token, account: Self.tokenAccount)
+        cachedToken = status == errSecSuccess ? .some(token.isEmpty ? nil : token) : nil
+        return status
+    }
+
     public func submit(_ track: Track, kind: Kind, listenedAt: Date = .now) async throws {
-        guard let token = Keychain.read("listenbrainz-token"), !token.isEmpty else { return }
+        guard let token = token(), !token.isEmpty else { return }
         var metadata: [String: Any] = ["artist_name": track.displayArtist, "track_name": track.title]
         if let album = track.album { metadata["release_name"] = album }
         var info: [String: Any] = ["media_player": "Vespertine", "submission_client": "Vespertine", "duration": Int(track.duration)]
@@ -247,20 +271,34 @@ public actor ListenBrainzClient {
 public enum Keychain {
     static let service = "org.szeremeta.vespertine.player"
 
-    public static func read(_ account: String) -> String? {
+    /// Can put up macOS's keychain prompt, so call it off the main thread.
+    public static func read(_ account: String) -> (value: String?, status: OSStatus) {
         let query: [CFString: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: service, kSecAttrAccount: account,
                                       kSecReturnData: true, kSecMatchLimit: kSecMatchLimitOne]
         var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess, let data = result as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess, let data = result as? Data else { return (nil, status) }
+        return (String(data: data, encoding: .utf8), status)
     }
 
-    public static func write(_ value: String?, account: String) {
+    /// Saves `value`, or removes the item when it's nil or empty. An item an earlier signer of the app made may refuse
+    /// the update (its access list names that signer); it's then replaced. Returns the keychain status.
+    @discardableResult
+    public static func write(_ value: String?, account: String) -> OSStatus {
         let query: [CFString: Any] = [kSecClass: kSecClassGenericPassword, kSecAttrService: service, kSecAttrAccount: account]
-        SecItemDelete(query as CFDictionary)
-        guard let value, !value.isEmpty else { return }
+        guard let value, !value.isEmpty else {
+            let status = SecItemDelete(query as CFDictionary)
+            return status == errSecItemNotFound ? errSecSuccess : status
+        }
+        let data = Data(value.utf8)
+        var status = SecItemUpdate(query as CFDictionary, [kSecValueData: data] as CFDictionary)
+        if status != errSecSuccess && status != errSecItemNotFound {
+            SecItemDelete(query as CFDictionary)
+            status = errSecItemNotFound
+        }
+        guard status == errSecItemNotFound else { return status }
         var add = query
-        add[kSecValueData] = Data(value.utf8)
-        SecItemAdd(add as CFDictionary, nil)
+        add[kSecValueData] = data
+        return SecItemAdd(add as CFDictionary, nil)
     }
 }
