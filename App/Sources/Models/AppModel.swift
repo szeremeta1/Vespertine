@@ -334,9 +334,12 @@ final class AppModel {
 
     func openAudio(_ url: URL) {
         guard url.isFileURL else { return }
+        let path = url.resolvingSymlinksInPath().path
+        // Already in the library: play it now. Adding it would rescan the whole source it sits in first.
+        let known = library.tracks(filePath: path)
+        if !known.isEmpty { player.play(known); return }
         Task {
             await library.addFolders([url], mode: .reference, managedRoot: url.deletingLastPathComponent())
-            let path = url.resolvingSymlinksInPath().path
             let tracks = library.tracks(filePath: path)
             if !tracks.isEmpty { player.play(tracks) }
         }

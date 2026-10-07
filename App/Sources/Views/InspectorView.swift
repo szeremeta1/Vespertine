@@ -480,10 +480,11 @@ struct AnalysisPanel: View {
 
     enum Subject { case selection, playing }
 
-    private var selected: Track? { model.selectedTracks.first }
+    /// The first selected track by ID (stable, unlike a set's order), fetched alone: not the whole selection.
+    private var selected: Track? { model.selectedTrackIDs.min().flatMap { model.library.tracks(ids: [$0]).first } }
     private var playing: Track? { model.player.current?.track }
 
-    private var subject: Subject? {
+    private func subject(selected: Track?, playing: Track?) -> Subject? {
         switch (selected, playing) {
         case (nil, nil): return nil
         case (_?, nil): return .selection
@@ -493,10 +494,12 @@ struct AnalysisPanel: View {
             return model.selectionChangedAt > model.player.trackStartedAt ? .selection : .playing
         }
     }
-    private var track: Track? { subject == .selection ? selected : subject == .playing ? playing : nil }
 
     var body: some View {
-        let track = self.track
+        // Each read of `selected` is a database fetch: once per update.
+        let selected = self.selected, playing = self.playing
+        let subject = self.subject(selected: selected, playing: playing)
+        let track = subject == .selection ? selected : subject == .playing ? playing : nil
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 if let selected, let playing, selected.id != playing.id {
