@@ -110,7 +110,8 @@ struct BitstreamTests {
         let numblkscod = [1: 0, 2: 1, 3: 2, 6: 3][blocks]!
         var f = [UInt8](repeating: tag, count: bytes)
         f[0] = 0x0B; f[1] = 0x77
-        f[2] = UInt8((dependent ? 1 : 0) << 6 | substream << 3 | frmsiz >> 8)
+        let strmtyp: Int = dependent ? 1 : 0
+        f[2] = UInt8(strmtyp << 6 | substream << 3 | frmsiz >> 8)
         f[3] = UInt8(frmsiz & 0xFF)
         f[4] = UInt8(numblkscod << 4)          // fscod 0 (48 kHz)
         f[5] = 16 << 3                         // bsid 16
@@ -119,9 +120,13 @@ struct BitstreamTests {
 
     /// `units` stretches of audio, each an independent frame of `blocks` blocks and a dependent one of another size.
     private func dependentStream(units: Int, blocks: Int) -> [UInt8] {
-        (0..<units).flatMap { u in
-            eac3Frame(bytes: 200, blocks: blocks, tag: UInt8(2 * u % 256)) + eac3Frame(bytes: 120, blocks: blocks, dependent: true, tag: UInt8((2 * u + 1) % 256))
+        var stream: [UInt8] = []
+        for u in 0..<units {
+            let tag = UInt8(truncatingIfNeeded: 2 * u)
+            stream += eac3Frame(bytes: 200, blocks: blocks, tag: tag)
+            stream += eac3Frame(bytes: 120, blocks: blocks, dependent: true, tag: tag &+ 1)
         }
+        return stream
     }
 
     private func temporaryFile(_ bytes: [UInt8]) throws -> URL {
