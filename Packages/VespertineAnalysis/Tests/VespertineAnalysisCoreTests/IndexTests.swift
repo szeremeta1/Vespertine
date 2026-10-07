@@ -14,13 +14,13 @@ private final class Marker {}
 @Suite("Server index")
 struct IndexTests {
     /// The built `vespertine-analyze`, beside the tests.
-    static var tool: URL? {
-        // The test bundle's folder on macOS; the test executable's on Linux.
+    static let tool: URL? = {
+        // The test bundle's folder on macOS; the test executable's on Linux. (Not Bundle.allBundles: on Linux it
+        // crashes when tests call it in parallel.)
         let dirs = [Bundle(for: Marker.self).bundleURL.deletingLastPathComponent(),
                     URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()]
-            + Bundle.allBundles.map { $0.bundleURL.deletingLastPathComponent() }
         return dirs.map { $0.appendingPathComponent("vespertine-analyze") }.first { FileManager.default.isExecutableFile(atPath: $0.path) }
-    }
+    }()
 
     static let encoder: JSONEncoder = {
         let e = JSONEncoder()
