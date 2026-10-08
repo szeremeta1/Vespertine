@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><img src="https://img.shields.io/github/v/release/szeremeta1/Vespertine?label=download&color=c8a765" alt="Latest release"></a>
-  <img src="https://img.shields.io/badge/macOS-26%2B-1f1f1f" alt="macOS 26 or later">
+  <img src="https://img.shields.io/badge/macOS-14.4%2B-1f1f1f" alt="macOS 14.4 or later">
   <img src="https://img.shields.io/badge/Apple%20silicon%20%26%20Intel-universal-1f1f1f" alt="Universal">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-1f1f1f" alt="GPL-3.0"></a>
 </p>
