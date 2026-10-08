@@ -8,7 +8,7 @@ import PackageDescription
 
 let package = Package(
     name: "VespertineKit",
-    platforms: [.macOS(.v26)],
+    platforms: [.macOS(.v14)],
     products: [
         .library(name: "VespertineAudio", targets: ["VespertineAudio"]),
         .library(name: "VespertineLibrary", targets: ["VespertineLibrary"]),

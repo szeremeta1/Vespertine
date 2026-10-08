@@ -2,7 +2,7 @@ name: Vespertine
 options:
   bundleIdPrefix: org.szeremeta
   deploymentTarget:
-    macOS: "26.0"
+    macOS: "14.0"
   createIntermediateGroups: true
   groupSortPosition: top
 packages:

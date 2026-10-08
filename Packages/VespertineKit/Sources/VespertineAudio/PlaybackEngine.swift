@@ -14,7 +14,6 @@ import CVespertineRT
 import CoreAudio
 import Foundation
 import SFBAudioEngine
-import Synchronization
 
 public enum PlaybackState: String, Sendable { case stopped, playing, paused }
 
@@ -109,7 +108,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var event: (@Sendable @MainActor (EngineEvent) -> Void)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
     }
-    private let callbacks = Mutex(Callbacks())
+    private let callbacks = Locked(Callbacks())
 
     enum Command {
         case play(PlayableItem)
@@ -128,7 +127,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var settings = EngineSettings()
     }
 
-    private let shared = Mutex(Shared())
+    private let shared = Locked(Shared())
     private let wake = DispatchSemaphore(value: 0)
     private let sessionLock = NSLock()
     private var thread: Thread?
