@@ -154,7 +154,7 @@ public extension LibraryDatabase {
                     byName[Self.nameKey(title, artist), default: []].append((id: id, duration: duration))
                 }
             }
-            return entries.map { e in
+            return entries.map { (e: PlaylistEntry) -> Int64? in
                 if let path = e.path {
                     // The library keeps paths with symlinks resolved (/tmp is /private/tmp); so must the lookup.
                     for p in [path, URL(fileURLWithPath: path).resolvingSymlinksInPath().path] {

@@ -273,7 +273,7 @@ extension EQPreset {
                 q = number(next); i += 2
             case "bw" where next.lowercased() == "oct":
                 // Bandwidth in octaves: Q = 1 / (2 sinh(ln 2 / 2 · BW)).
-                if let bw = i + 2 < tokens.count ? number(tokens[i + 2]) : nil, bw > 0 { q = 1 / (2 * sinh(log(2) / 2 * bw)) }
+                if let bw = i + 2 < tokens.count ? number(tokens[i + 2]) : nil, bw > 0 { q = 1 / (2 * sinh(Foundation.log(2.0) / 2 * bw)) }
                 i += 3
             default:
                 i += 1

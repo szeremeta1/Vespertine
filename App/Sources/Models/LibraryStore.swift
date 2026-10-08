@@ -452,7 +452,7 @@ final class LibraryStore {
     func importPlaylistFiles(_ urls: [URL]) async -> PlaylistImportResult {
         let database = database
         let result = await Task.detached(priority: .userInitiated) { () -> Result<PlaylistImportResult, Error> in
-            Result {
+            Result<PlaylistImportResult, Error> {
                 var total = PlaylistImportResult()
                 for url in urls {
                     let data = try Data(contentsOf: url)
@@ -481,7 +481,7 @@ final class LibraryStore {
     func importAppleMusicLibrary(_ url: URL) async -> PlaylistImportResult? {
         let database = database
         let result = await Task.detached(priority: .userInitiated) { () -> Result<PlaylistImportResult, Error> in
-            Result { try database.importAppleMusic(try AppleMusicLibrary(data: try Data(contentsOf: url))) }
+            Result<PlaylistImportResult, Error> { try database.importAppleMusic(try AppleMusicLibrary(data: try Data(contentsOf: url))) }
         }.value
         revision += 1
         favoriteVersions()
