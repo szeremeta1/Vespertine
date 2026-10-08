@@ -41,6 +41,13 @@ struct VespertineApp: App {
         .windowResizability(.contentSize)
         .defaultPosition(.bottomLeading)
 
+        Window("Equalizer", id: "equalizer") {
+            LibraryContent(startup: startup) { model in
+                EqualizerWindow().environment(model).preferredColorScheme(.dark)
+            }
+        }
+        .defaultSize(width: 860, height: 600)
+
         MenuBarExtra {
             LibraryContent(startup: startup) { model in
                 MenuBarView().environment(model).preferredColorScheme(.dark)
@@ -126,6 +133,8 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut("i", modifiers: [.command, .option])
             Button("Mini Player") { openWindow(id: "mini") }
                 .keyboardShortcut("m", modifiers: [.command, .shift])
+            Button("Equalizer") { openWindow(id: "equalizer") }
+                .keyboardShortcut("e", modifiers: [.command, .option])
         }
     }
 }

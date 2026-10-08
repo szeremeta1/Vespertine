@@ -89,6 +89,10 @@ final class AppSettings {
     var analyzeNetworkShares: Bool { didSet { defaults.set(analyzeNetworkShares, forKey: "analyzeNetworkShares") } }
     /// Upcoming tracks copied ahead of playback when the cache is on.
     var networkPrefetch: Int { didSet { defaults.set(networkPrefetch, forKey: "networkPrefetch") } }
+    /// Equalizer presets, imported or made here.
+    var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
+    /// The preset each output plays with (device UID → preset ID). Outputs that aren't listed play without one.
+    var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
 
     /// Library location. Overridable with `-VespertineDataDirectory <path>` for testing.
     let dataDirectory: URL
@@ -131,6 +135,8 @@ final class AppSettings {
         networkCache = defaults.bool(forKey: "networkCache")
         networkCacheLimitGB = defaults.double(forKey: "networkCacheLimitGB")
         networkPrefetch = defaults.integer(forKey: "networkPrefetch")
+        eqPresets = defaults.data(forKey: "eqPresets").flatMap { try? JSONDecoder().decode([EQPreset].self, from: $0) } ?? []
+        eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
 
         if let dataDirectory {
             self.dataDirectory = dataDirectory
@@ -145,6 +151,13 @@ final class AppSettings {
     }
 
     var networkCacheLimitBytes: Int64 { Int64(networkCacheLimitGB * 1_000_000_000) }
+
+    /// The equalizer preset `uid` plays with, if any.
+    func eqPreset(for uid: String) -> EQPreset? {
+        eqAssignments[uid].flatMap { id in eqPresets.first { $0.id.uuidString == id } }
+    }
+
+    func setEQPreset(_ id: UUID?, for uid: String) { eqAssignments[uid] = id?.uuidString }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
     func setRateChoice(_ choice: RateChoice, for uid: String) { rateChoices[uid] = choice.code }
@@ -171,6 +184,7 @@ final class AppSettings {
         s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem
         s.integerMode = integerMode
+        s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
         return s
     }
 }
