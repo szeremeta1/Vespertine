@@ -167,6 +167,8 @@ final class AppModel {
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
     var showConnectServer = false
+    /// What a playlist import did, shown in an alert until dismissed.
+    var playlistReport: String?
     /// Address to pre-fill in Connect to Server (e.g. to enter a password for an existing share).
     var connectPrefill: String?
     /// Tracks to export for Spatial Audio (sheet shown while non-nil).

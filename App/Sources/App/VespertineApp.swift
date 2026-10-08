@@ -81,6 +81,9 @@ struct VespertineCommands: Commands {
             Button("Connect to Server…") { model.showConnectServer = true }
                 .keyboardShortcut("k", modifiers: [.command])
             Divider()
+            Button("Import Playlist…") { model.importPlaylistFiles() }
+            Button("Import Apple Music Library…") { model.importAppleMusicLibrary() }
+            Divider()
             Button("Rescan Library") { Task { await model.library.rescanAll() } }
                 .keyboardShortcut("r", modifiers: [.command, .option])
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }

@@ -446,6 +446,51 @@ final class LibraryStore {
         if let id = playlist.id { try? database.updateSmartRules(id, rules); revision += 1 }
     }
 
+    // MARK: Playlists from and for other players
+
+    /// Makes a playlist of each M3U / M3U8 file, from the songs of it already in the library.
+    func importPlaylistFiles(_ urls: [URL]) async -> PlaylistImportResult {
+        let database = database
+        let result = await Task.detached(priority: .userInitiated) { () -> Result<PlaylistImportResult, Error> in
+            Result {
+                var total = PlaylistImportResult()
+                for url in urls {
+                    let data = try Data(contentsOf: url)
+                    // M3U8 is UTF-8; an old .m3u may be Latin-1.
+                    let text = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+                    let entries = M3U.entries(text, base: url.deletingLastPathComponent())
+                    if let one = try database.importPlaylist(named: url.deletingPathExtension().lastPathComponent, entries: entries)?.1 {
+                        total.playlists += one.playlists
+                        total.songs += one.songs
+                        total.unmatched += one.unmatched
+                    } else {
+                        total.unmatched += entries.count
+                    }
+                }
+                return total
+            }
+        }.value
+        revision += 1
+        switch result {
+        case .success(let r): return r
+        case .failure(let error): lastError = error.localizedDescription; return PlaylistImportResult()
+        }
+    }
+
+    /// Brings in the playlists, loved songs and play counts of a library exported from Apple Music.
+    func importAppleMusicLibrary(_ url: URL) async -> PlaylistImportResult? {
+        let database = database
+        let result = await Task.detached(priority: .userInitiated) { () -> Result<PlaylistImportResult, Error> in
+            Result { try database.importAppleMusic(try AppleMusicLibrary(data: try Data(contentsOf: url))) }
+        }.value
+        revision += 1
+        favoriteVersions()
+        switch result {
+        case .success(let r): return r
+        case .failure(let error): lastError = error.localizedDescription; return nil
+        }
+    }
+
     // MARK: Favorites
 
     func isFavorite(_ track: Track?) -> Bool { track?.id.map(favoriteIDs.contains) ?? false }
