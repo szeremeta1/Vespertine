@@ -1220,7 +1220,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         if path?.plan.mode == .pcm {
             if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
-            path?.equalizer = path?.applied.integerMode == true ? nil : settings.equalizer(for: sessionDevice)?.name
+            let integer = path?.applied.integerMode == true
+            path?.equalizer = integer ? nil : settings.equalizer(for: sessionDevice)?.name
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {
