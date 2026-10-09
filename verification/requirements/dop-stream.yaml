@@ -1,0 +1,112 @@
+# DoP output stream: what reaches the device while DoP plays. Contract: contracts/dop-stream.md
+
+- id: DOPS-001
+  claim: CLAIMS.md#dop-marker
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The 8 most significant bits are used for the DSD marker", to: "0x05 and 0xFA." }
+  requirement: "Across everything the stage outputs (music and silence alike), the marker byte alternates between 0x05 and 0xFA from each frame to the next, with no exception."
+  quote: "alternate with each sample between 0x05 and 0xFA"
+  quote_sha256: 77b16077dcd63dbfebf8bfdfbc5db4fc803f664aca41e04c231f11198ffe87fb
+  kind: spec
+  testable: true
+  gap: "The standard describes the stream a DAC receives; it doesn't discuss pauses, track changes or a sender running out of data. This record applies the alternation to the whole output, whatever is being played."
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-002
+  claim: CLAIMS.md#dop-continuity
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§4 Recommended implementation, page 3"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 3, from: "In order to switch from DSD to PCM mode", to: "in at least 1 channel." }
+  requirement: "A receiver leaves DSD mode on a single missing marker in any channel, so every output frame, on every channel, carries a valid marker, including while muted or when no music is available."
+  quote: "the receiver has to detect at least 1 single missing DSD marker byte in at least 1 channel."
+  quote_sha256: 53a3de6ea82098f497565ab777bd835e9f69aae0b279617da5284a41901547fa
+  kind: spec
+  testable: true
+  gap: "§4 is the standard's recommended receiver behaviour, not a rule for senders; the sender requirement is derived from it. The claim it supports (the DAC stays in DSD through pauses and seeks) is the product's own."
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-003
+  claim: CLAIMS.md#dop-continuity
+  source:
+    doc: "DSDIFF: Direct Stream Digital Interchange File Format"
+    version: "1.5 (2004-04-27)"
+    section: "§1.2 Definitions (Silence Pattern), page 5"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf"
+    availability: public
+    cache: { doc: dsdiff-1.5, pages: 5, from: "A digitally generated DSD pattern", to: "4 bits equal to one" }
+  requirement: "Frames that carry no music carry DSD silence: within a run of such frames every DSD byte, on every channel, has the same value, and that value has four bits set and four clear."
+  quote: "all Channel Bytes have the same value"
+  quote_sha256: e495d40d1a5f3f57cf555916128e8174766a61958dce5251ea445ffd6d5ed20d
+  kind: spec
+  testable: true
+  gap: "DoP 1.1 doesn't say what to send when there is no music. This record uses DSDIFF's definition of DSD silence. It doesn't name the byte value (0x69, 0x96, 0x55 … all qualify), so a test may not require a particular one."
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-004
+  claim: CLAIMS.md#dop-passthrough
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 25"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 25, from: "The frames themselves are never modified", to: "they come out bit-identical." }
+  requirement: "Every music frame written comes out bit-identical, in the order written, none dropped or repeated, while the stage keeps being rendered unmuted until it has played them."
+  quote_sha256: 9c0fd1d9bf2fa337c7eb0795d5e914a4d40144705e3ac426084b73ff5e207cdc
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-005
+  claim: CLAIMS.md#mute-no-skip
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 63"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 63, from: "mute and rebuffering never alter or skip music", to: "where playback is actually held" }
+  requirement: "Silence frames go out only where playback is held: while muted, or when no written music remains. One exception is allowed, see gap."
+  quote_sha256: 68de57b5fc481ef6014697b41409a3af28a71429101e03f15186dc2e054128b1
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs say silence is inserted only where playback is held. After a hold, the next music frame can carry the same marker as the last silence frame, and DOPS-001 then forces something in between. The docs don't cover this. This record allows at most one silence frame immediately before a music frame, and only where that music frame's marker equals the marker of the frame output just before it."
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-006
+  claim: CLAIMS.md#mute-no-skip
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 76"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 76, from: "the IOProc plays silence and takes nothing from the ring", to: "resumes exactly where it went quiet." }
+  requirement: "While muted, nothing written is consumed: after unmuting, the next music frame out is the first written frame that had not been output before the mute."
+  quote_sha256: 96c59c70767ecae201ce1fa121c7440bc0bbb73c05f4b8150875e6fa15d0e0ab
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/dop-stream.md"
+
+- id: DOPS-007
+  claim: CLAIMS.md#eq-not-dop
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 83"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 83, from: "EQ does not process DoP", to: "EQ does not process DoP" }
+  requirement: "A software gain other than 1.0, or the equalizer turned on, leaves DoP output unchanged: the same frames come out as with unity gain and no equalizer."
+  quote_sha256: 572ce6e690e171601522597920d2482669acfbb4f5482d27c0a6bf75d3bf0813
+  kind: vespertine-rule
+  testable: true
+  gap: "FEATURES.md names the equalizer; that gain doesn't apply to DoP either is from ARCHITECTURE.md line 15 (\"DoP is always passthrough.\")."
+  interface: "contracts/dop-stream.md"

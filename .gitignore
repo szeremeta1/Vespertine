@@ -38,3 +38,11 @@ AGENTS.md
 PROMOTION.md
 nocturne-sparkle-key.txt
 *sparkle-private-key*
+
+# Verification: the local copy of the specifications (paywalled text must never be committed; see verification/README.md)
+verification/spec-cache/
+# Oracle sources, fetched at pinned versions by verification/tools/fetch_oracles.py rather than vendored
+verification/oracles/fetched/
+
+# Python bytecode from the verification tools
+verification/**/__pycache__/

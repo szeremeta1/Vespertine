@@ -1,0 +1,150 @@
+# Receiver bitstream (IEC 61937). The burst format is defined only in IEC 61937-1, -2, -3 and -5, which are paywalled
+# and were not bought (decision 2026-10-09: oracle only). Clause numbers below are from the table of contents in IEC's
+# free preview of each part (spec-cache previews, SHA-256 in SOURCES.md); the clause text itself was not seen.
+# The oracle checks are described in hardware/IEC61937-ORACLE.md.
+
+- id: IEC-001
+  claim: CLAIMS.md#iec-ac3-burst
+  source:
+    doc: "IEC 61937-1:2021 Digital audio: Interface for non-linear PCM encoded audio bitstreams applying IEC 60958, Part 1: General"
+    version: "Edition 3.0 (2021-02-24)"
+    section: "§6.1 Coding of the bitstream; Figure 3 Burst-preamble; Table 3 Burst-preamble words; Table 4 Bit map of burst-preambles"
+    url: "https://webstore.iec.ch/en/publication/62828"
+    availability: paywalled
+  requirement: "Each data-burst starts with the burst-preamble words this clause defines; Vespertine's preamble must match them."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought (CHF 160)."
+  interface: "Vespertine's IEC61937.burst (no clean-room contract until the text is in hand)"
+
+- id: IEC-002
+  claim: CLAIMS.md#iec-ac3-burst
+  source:
+    doc: "IEC 61937-1:2021"
+    version: "Edition 3.0 (2021-02-24)"
+    section: "§6.2 Burst-payload; Figure 5 Length of the burst-payload specified by Pd"
+    url: "https://webstore.iec.ch/en/publication/62828"
+    availability: paywalled
+  requirement: "The burst-payload length field (Pd) and its unit; Vespertine writes bits for AC-3 and bytes for E-AC-3."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought. The unit per data type is in parts 3 and 5."
+  interface: "Vespertine's IEC61937.burst"
+
+- id: IEC-003
+  claim: CLAIMS.md#iec-ac3-burst
+  source:
+    doc: "IEC 61937-1:2021"
+    version: "Edition 3.0 (2021-02-24)"
+    section: "§6.3 Stuffing; Figure 6 Burst spacing; §3.1.2 audio data-word"
+    url: "https://webstore.iec.ch/en/publication/62828"
+    availability: paywalled
+  requirement: "What fills the space between data-bursts, and the order of the two bytes of each 16-bit payload word."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought. The free preview defines an audio data-word only as a 16-bit data word."
+  interface: "Vespertine's IEC61937.burst"
+
+- id: IEC-004
+  claim: CLAIMS.md#iec-ac3-burst
+  source:
+    doc: "IEC 61937-2:2021+AMD1:2026 CSV, Part 2: Burst-info"
+    version: "Edition 3.1 (2026-02-19)"
+    section: "§4.2 Data-type, subdata-type and extended data-type; §4.3.2 AC-3; §4.3.10-4.3.12 DTS type I-III; §4.3.20 Enhanced AC-3"
+    url: "https://webstore.iec.ch/en/publication/112261"
+    availability: paywalled
+  requirement: "The data-type codes in the burst-info word for AC-3, Enhanced AC-3 and DTS types I to III."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought (CHF 90 as base plus amendment). Amendment 1 was published in February 2026; whether it changes these codes is unknown."
+  interface: "Vespertine's IEC61937.burst"
+
+- id: IEC-005
+  claim: CLAIMS.md#iec-ac3-burst
+  source:
+    doc: "IEC 61937-3:2017+AMD1:2020 CSV, Part 3: Non-linear PCM bitstreams according to the AC-3 and enhanced AC-3 formats"
+    version: "Edition 3.1 (2020-09-22)"
+    section: "§5.3.1 AC-3 data; Figure 1 AC-3 data-burst; Table 3 Data-type-dependent information"
+    url: "https://webstore.iec.ch/en/publication/67665"
+    availability: paywalled
+  requirement: "The AC-3 data-burst: its repetition period, payload length unit and data-type-dependent bits (Vespertine sends 1536-frame bursts with Pd in bits and the frame's bsmod)."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought (CHF 90 as base plus amendment)."
+  interface: "Vespertine's BitstreamDecoder / ac3Burst"
+
+- id: IEC-006
+  claim: CLAIMS.md#iec-eac3-burst
+  source:
+    doc: "IEC 61937-3:2017+AMD1:2020 CSV"
+    version: "Edition 3.1 (2020-09-22)"
+    section: "§5.3.3 Enhanced AC-3 data; Figure 3 Enhanced AC-3 data-burst"
+    url: "https://webstore.iec.ch/en/publication/67665"
+    availability: paywalled
+  requirement: "The Enhanced AC-3 data-burst: how frames are grouped, its repetition period and payload length unit (Vespertine groups six blocks into 6144-frame bursts at four times the rate, Pd in bytes)."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought."
+  interface: "Vespertine's BitstreamDecoder / eac3Burst"
+
+- id: IEC-007
+  claim: CLAIMS.md#iec-carrier-exact
+  source:
+    doc: "IEC 61937-5:2006+AMD1:2019 CSV, Part 5: Non-linear PCM bitstreams according to the DTS format(s)"
+    version: "Edition 2.1 (2019-01-24)"
+    section: "§5.3.1-5.3.3 DTS type I-III data-bursts; Tables 3-5"
+    url: "https://webstore.iec.ch/en/publication/64573"
+    availability: paywalled
+  requirement: "The DTS type I to III data-bursts (Vespertine's dtsBurst). DTS CDs go out as stored and don't use these bursts."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought (CHF 100 as base plus amendment)."
+  interface: "Vespertine's dtsBurst"
+
+- id: IEC-O-001
+  claim: CLAIMS.md#iec-carrier-exact
+  source:
+    doc: "FFmpeg libavformat S/PDIF demuxer (spdifdec.c)"
+    version: "FFmpeg n6.1.1 (the version in Ubuntu 24.04)"
+    section: "libavformat/spdifdec.c, spdif.h"
+    url: "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.1.1/libavformat/spdifdec.c"
+    availability: public
+    cache:
+      oracle: verification/oracles/fetched/ffmpeg-spdif   # fetched by tools/fetch_oracles.py from libavformat at n6.1.1
+      files: [spdif.c, spdif.h, spdifdec.c]
+  requirement: "Demuxing Vespertine's carrier with FFmpeg's S/PDIF demuxer returns the original Dolby Digital, Dolby Digital Plus and DTS frames, byte for byte and in order."
+  quote_sha256: 7bd77701b22c5492b6c2fd6d53f2add19a1b7a6e42c91ce98b7362943f982ec9
+  kind: oracle
+  testable: true
+  gap: "FFmpeg follows the IEC text; agreement shows the carrier is readable by FFmpeg, not that it conforms."
+  interface: "hardware/IEC61937-ORACLE.md"
+
+- id: IEC-O-002
+  claim: CLAIMS.md#iec-carrier-exact
+  source:
+    doc: "Independent carrier scanner, written blind from the public ATSC A/52:2018 and ETSI TS 102 114 V1.6.1 frame syntax"
+    version: "verification/oracles/carrier-scan (this harness)"
+    section: "A/52 §5.3.1 syncinfo (Table 5.1), Table 5.18 Frame Size Code Table, Annex E §E2.3.1.3 frmsiz; TS 102 114 §5.4 Frame header"
+    url: "https://www.atsc.org/wp-content/uploads/2021/04/A52-2018.pdf"
+    availability: public
+    cache: { oracle: verification/oracles/carrier-scan, files: [carrier_scan.py] }
+  requirement: "Reading the carrier as 16-bit words and searching for the codecs' own sync words finds every original frame intact, with a valid frame length, in order, and nothing else that parses as a frame."
+  quote_sha256: TBD
+  kind: oracle
+  testable: true
+  gap: "The scanner doesn't know the burst format (that is IEC 61937 itself); it only shows that the frames are carried whole. Which byte of a 16-bit sample comes first is found by trying both."
+  interface: "hardware/IEC61937-ORACLE.md"
