@@ -145,7 +145,7 @@ func drawEndCard(alpha: CGFloat) {
     _ = draw("Free Mac player for surround and hi-res collections", font: serif(30), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 470 * scale)
     let mono = openFont("JetBrains Mono", 17, weight: 400)
     _ = draw("OPEN SOURCE · GPL-3.0 · MACOS 14.4+", font: mono, color: color(0xA29B8F), centerX: CGFloat(W) / 2, baselineFromTop: 540 * scale, kern: 2 * scale)
-    _ = draw("github.com/szeremeta1/Vespertine", font: openFont("Inter", 20, weight: 500), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)
+    _ = draw("vespertineapp.com", font: openFont("Inter", 20, weight: 500), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)
     ctx.restoreGState()
 }
 
