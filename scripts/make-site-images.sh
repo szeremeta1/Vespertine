@@ -4,6 +4,7 @@
 #   site/assets/<shot>.jpg           2000×1250, the page and press-kit images
 #   site/assets/<shot>-detail.jpg    the inspector side, cut 1:1 (the fake-hi-res one from the Album column on)
 #   site/assets/press/shot-<shot>.jpg  720×450 press-kit thumbnails
+#   site/assets/press/<feature>.jpg    900×506 previews of the key art in docs/press (run scripts/brand/build.sh first)
 # Usage: scripts/make-site-images.sh [shot…]   (default: every shot the site uses). Needs ffmpeg.
 set -euo pipefail
 root=${0:A:h:h}
@@ -29,4 +30,9 @@ for s in ${(u)want}; do
   [[ -n ${detail[$s]:-} ]] && jpeg "$shots/$s.png" "${detail[$s]}" "$site/$s-detail.jpg"
   (( ${thumbs[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=720:450:flags=lanczos" "$site/press/shot-$s.jpg"
   print "$s"
+done
+
+# The press kit's key-art previews follow the key art, whichever shots were named.
+for hero in $root/docs/press/*-hero.png; do
+  jpeg "$hero" "scale=900:506:flags=lanczos" "$site/press/${${hero:t}%-hero.png}.jpg"
 done

@@ -34,7 +34,7 @@ let shots: [Shot] = [
          to: CGRect(x: 520, y: 150, width: 1600, height: 1000),
          caption: "Your surround library: SACD, DTS CDs and 5.1 FLAC"),
     Shot(file: "docs/screenshots/bit-perfect-fiio-24-96.png", from: full,
-         to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
+         to: CGRect(x: 1290, y: 760, width: 1110, height: 693.75),   // the badges and the whole signal path
          caption: "BIT-PERFECT appears only when its conditions are met"),
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),

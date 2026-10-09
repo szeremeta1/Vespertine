@@ -7,8 +7,8 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 | Scene (`docs/screenshots/`) | Track | Needs | True on screen |
 |---|---|---|---|
 | `multichannel-albums` | Albums, Multichannel chip | library | the grid shows Bob Dylan's *Blood on the Tracks* DSD64 5.1, Elton John's *Goodbye Yellow Brick Road* and Oasis's *Morning Glory* SACD among the multichannel albums |
-| `bit-perfect-fiio-24-192` (renamed `bit-perfect-fiio-24-96`) | *Les jeux d'eau à la Villa d'Este*, Lazar Berman (FLAC 24/96) | FiiO K11, exclusive mode | BIT-PERFECT badge; source 24/96, device 96 kHz native, unity volume, hog mode; TRUE 24 badge from analysis |
-| `dsd-native-dop` | *Love for the Sake of Love*, Claudja Barry (DSD128) | FiiO K11, DoP enabled for it | DSD128 source; DoP at 352.8 kHz on the device; no PCM conversion step; BIT-PERFECT shown only if the path says so |
+| `bit-perfect-fiio-24-96` | *Les jeux d'eau à la Villa d'Este*, Lazar Berman (FLAC 24/96) | FiiO K11, exclusive mode | BIT-PERFECT, EXCLUSIVE, 32 / 96; 96 kHz native, unity volume, hog mode; TRUE 24 from analysis |
+| `dsd-native-dop` | *Love for the Sake of Love*, Claudja Barry (DSD128) | FiiO K11, DoP enabled for it | NATIVE DSD · DoP, 32 / 352.8; DSD128 · 5.6 MHz source; DSD over PCM marked native DSD; no conversion step |
 | `stereo-and-surround-versions` | *Don't Look Back in Anger*, Oasis, *Morning Glory* SACD: DSD64 stereo and 5.1 | AirPods Max | each song listed once, DSD64 · 5.1 + STEREO; the 5.1 version plays as head-tracked Spatial Audio; DSD → PCM 352.8 → 48 kHz shown as converted |
 | `spatial-audio-airpods-max` | *Candle in the Wind*, Elton John (24/88.2 5.1) | AirPods Max, head tracking on | Spatial Audio active, 6 channels in, head tracking shown; no BIT-PERFECT badge (it's rendered, not bit-perfect) |
 | `fake-hi-res-detection` | *Velvet Hour*, The Lantern Lounge Orchestra (the deliberate fake: MP3 192 kb/s → 24/192) | none | LOSSY ORIGIN?; claimed 24/192; steep cutoff ~16 kHz (measured on dormhub with `vespertine-probe` on a fresh fake from `score.py`, 76% of frames, 30 dB drop) |
@@ -23,13 +23,14 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
   only) on the same tracks as the stills, re-measure the overlay positions in `Scenes.swift` for each new recording,
   then `render.sh`, the Final Cut Pro edit and `deliver.sh`. Needs the FiiO K11 and AirPods Max for the bit-perfect,
   DSD and Spatial scenes.
-- **Tour GIFs** (`docs/screenshots/tour*.gif`): `scripts/make-tour.swift` from the stills.
+- **Tour GIF** (`docs/screenshots/tour.gif`): `scripts/make-tour-gif.sh` from the stills.
 
 ## Derived
 
 - Press key art (`docs/press/*`): `scripts/brand/build.sh`.
 - Social previews (`site/assets/og*.png`): `scripts/make-social-preview.sh`.
-- Site JPEGs (`site/assets/*.jpg`, `site/assets/press/shot-*.jpg`): crops of the stills.
+- Site JPEGs (`site/assets/*.jpg`, `site/assets/press/*.jpg`): `scripts/make-site-images.sh`.
+- Social previews render natively on a headless Mac with `VESPERTINE_SOCIAL_RENDERER=native`.
 
 ## Checks before a shot ships
 
