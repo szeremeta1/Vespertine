@@ -23,7 +23,7 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It b
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/tour-small.gif" width="640" alt="Vespertine's surround library, signal path on a FiiO K11, extracted SACD tracks over DoP and as Spatial Audio on AirPods Max, and hi-res file analysis">
+  <img src="docs/screenshots/tour.gif" width="640" alt="Vespertine's surround library, bit-perfect signal path on a FiiO K11, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
 </p>
 
 ## What it does

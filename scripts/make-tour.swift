@@ -2,6 +2,7 @@
 // Renders the README/site tour: slow zooms across the screenshots in docs/screenshots with captions,
 // ending on a title card. Writes raw BGRA frames to stdout for ffmpeg, e.g.
 //   swift scripts/make-tour.swift 1200 750 30 | ffmpeg -f rawvideo -pix_fmt bgra -s 1200x750 -r 30 -i - tour.mp4
+// scripts/make-tour-gif.sh makes the README's docs/screenshots/tour.gif from it.
 import AppKit
 import CoreText
 
@@ -31,19 +32,19 @@ let full = CGRect(x: 0, y: 0, width: 2400, height: 1500)
 let shots: [Shot] = [
     Shot(file: "docs/screenshots/multichannel-albums.png", from: full,
          to: CGRect(x: 520, y: 150, width: 1600, height: 1000),
-         caption: "Your surround library: SACD rips, DTS CDs and 5.1 FLAC"),
-    Shot(file: "docs/screenshots/bit-perfect-fiio-24-192.png", from: full,
+         caption: "Your surround library: SACD, DTS CDs and 5.1 FLAC"),
+    Shot(file: "docs/screenshots/bit-perfect-fiio-24-96.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "BIT-PERFECT appears only when its conditions are met"),
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
-         caption: "DSD64 over DoP, checked on a FiiO K11"),
+         caption: "DSD128 over DoP, checked on a FiiO K11"),
     Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
          to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
     Shot(file: "docs/screenshots/spatial-audio-airpods-max.png", from: CGRect(x: 600, y: 375, width: 1800, height: 1125),
          to: CGRect(x: 1380, y: 635, width: 1020, height: 637.5),
-         caption: "SACD 5.1 tracks as Spatial Audio on AirPods Max"),
+         caption: "5.1 as head-tracked Spatial Audio on AirPods Max"),
     Shot(file: "docs/screenshots/fake-hi-res-detection.png", from: CGRect(x: 1340, y: 170, width: 1060, height: 662.5),
          to: CGRect(x: 1340, y: 560, width: 1060, height: 662.5),
          caption: "Hi-res analysis shows evidence, with limits"),
