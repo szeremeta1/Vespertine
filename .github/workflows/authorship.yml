@@ -1,0 +1,32 @@
+# Every commit in a pull request is authored by the maintainer and carries no AI co-author or session trailers,
+# so the repository's history and Contributors list credit only people. Runs on Linux in a few seconds.
+name: Authorship
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  authorship:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check commit authors and trailers
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          bad=$(git log "$BASE..$HEAD" --format='%H%x09%an <%ae>%x09%cn <%ce>%n%B' \
+            | grep -iE 'noreply@anthropic\.com|^co-authored-by:.*claude|^claude-session:|generated with \[claude code\]' || true)
+          if [ -n "$bad" ]; then
+            echo "::error::Commits must be authored as the maintainer, with no Claude co-author or session lines:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "All commits in $BASE..$HEAD are clean."
