@@ -136,7 +136,7 @@ sha=$(shasum -a 256 "$dmg" | cut -d' ' -f1)
 if current=$(gh api "repos/$tap/contents/$cask" 2>/dev/null); then
   blob=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["sha"])')
   body=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys,base64; print(base64.b64decode(json.load(sys.stdin)["content"]).decode(), end="")' \
-    | /usr/bin/sed -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/")
+    | /usr/bin/sed -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/; s/^  depends_on macos: .*/  depends_on macos: \">= :sonoma\"/")
   gh api -X PUT "repos/$tap/contents/$cask" -f message="vespertine $version" -f sha="$blob" \
     -f content="$(print -r -- "$body" | base64)" >/dev/null && print "Homebrew cask updated to $version."
 else

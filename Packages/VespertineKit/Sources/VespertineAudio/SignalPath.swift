@@ -21,6 +21,8 @@ public struct SignalPath: Sendable, Hashable {
     public var deviceProfile: DeviceProfile
     public var volume: VolumeStage
     public var replayGainDB: Double?
+    /// The equalizer preset applied (its name), nil = none.
+    public var equalizer: String? = nil
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
 
@@ -29,6 +31,7 @@ public struct SignalPath: Sendable, Hashable {
     /// Gain other than exactly unity is applied somewhere in software.
     public var modifiesSamples: Bool {
         if let rg = replayGainDB, rg != 0 { return true }
+        if equalizer != nil { return true }
         if case .digital(let db) = volume, db != 0 { return true }
         return false
     }
@@ -77,6 +80,7 @@ public struct SignalPath: Sendable, Hashable {
         if isResampling { return "RESAMPLED" }
         if source.encoding == .lossy { return "LOSSY SOURCE" }
         if !applied.exclusive, otherAppsPlaying { return "MIXED WITH OTHER APPS" }
+        if equalizer != nil { return "EQUALIZER" }
         if modifiesSamples { return "DIGITAL GAIN" }
         return "CONVERTED"
     }

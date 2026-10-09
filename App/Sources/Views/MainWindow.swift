@@ -61,6 +61,11 @@ struct MainWindow: View {
         .sheet(isPresented: Binding(get: { model.spatialExportTracks != nil }, set: { if !$0 { model.spatialExportTracks = nil } })) {
             SpatialExportSheet(tracks: model.spatialExportTracks ?? []).environment(model)
         }
+        .alert("Playlists", isPresented: Binding(get: { model.playlistReport != nil }, set: { if !$0 { model.playlistReport = nil } })) {
+            Button("OK") { model.playlistReport = nil }
+        } message: {
+            Text(model.playlistReport ?? "")
+        }
         .sheet(isPresented: $model.showConnectServer) {
             ConnectServerSheet().environment(model)
         }

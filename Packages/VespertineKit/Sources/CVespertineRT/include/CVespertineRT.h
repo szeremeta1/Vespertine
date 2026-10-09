@@ -103,6 +103,22 @@ bool nrt_context_is_starved(const NRTRenderContext *_Nonnull ctx);
 /// Times playback had to hold for data since the last call.
 uint32_t nrt_context_take_stalls(NRTRenderContext *_Nonnull ctx);
 
+// MARK: - Equalizer, run on the I/O thread before gain and dither
+
+#define NRT_EQ_MAX_SECTIONS 20u
+
+/// One biquad section, normalized so a0 = 1: y = b0·x + b1·x[-1] + b2·x[-2] − a1·y[-1] − a2·y[-2].
+typedef struct {
+    double b0, b1, b2, a1, a2;
+} NRTBiquad;
+
+/// Sets the equalizer while the device runs: every channel is scaled by `preamp` (linear) and then runs through
+/// `count` sections (at most NRT_EQ_MAX_SECTIONS) in series, in double precision, before gain and dither. No
+/// sections and a preamp of exactly 1.0 turns it off and keeps the bit-transparent path. Takes effect on the next
+/// I/O cycle. Filter memory carries over when the number of sections is unchanged, so moving a band doesn't click,
+/// and is cleared otherwise. Never applied to passthrough (DoP) or integer samples. One caller at a time.
+void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullable sections, uint32_t count, double preamp);
+
 #define NRT_METER_CHANNELS 16u
 
 /// Peak (absolute, linear) since the last call, per decoded channel (0 … NRT_METER_CHANNELS-1).

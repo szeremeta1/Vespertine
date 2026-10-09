@@ -10,7 +10,7 @@ import PackageDescription
 
 let package = Package(
     name: "VespertineAnalysis",
-    platforms: [.macOS(.v26)],
+    platforms: [.macOS(.v14)],
     products: [
         .library(name: "VespertineAnalysisCore", targets: ["VespertineAnalysisCore"]),
         .executable(name: "vespertine-analyze", targets: ["vespertine-analyze"]),
