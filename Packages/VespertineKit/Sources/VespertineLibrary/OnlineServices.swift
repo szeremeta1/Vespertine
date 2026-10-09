@@ -51,7 +51,7 @@ public actor MusicBrainzClient {
     /// instead of blocking everyone when a client misbehaves.
     private let userAgent: String = {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
-        return "Vespertine/\(version) (https://github.com/szeremeta1/Vespertine)"
+        return "Vespertine/\(version) (https://vespertineapp.com)"
     }()
 
     public init() {

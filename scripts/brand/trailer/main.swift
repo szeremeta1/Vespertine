@@ -247,7 +247,7 @@ func renderEnd() async throws {
             ctx.saveGState(); ctx.setAlpha(a); ctx.translateBy(x: x0, y: baseline - m * 0.18); Brand.fillBrass(ctx, Brand.crescent(size: m)); ctx.restoreGState()
             ctx.saveGState(); ctx.translateBy(x: x0 + m + gap, y: baseline); ctx.addPath(word.path); ctx.setFillColor(Brand.color(Brand.text, a)); ctx.fillPath(); ctx.restoreGState()
             fillText(ctx, "Free and open source for macOS.", Brand.sans(square ? 30 : 34), Brand.text2, ramp(t, 0.8, 1.7), x: w / 2, baseline: baseline - size * 0.95, center: true)
-            fillText(ctx, "SZEREMETA1.GITHUB.IO/VESPERTINE", Brand.mono(square ? 21 : 24, weight: 500), Brand.brass, ramp(t, 1.3, 2.2),
+            fillText(ctx, "VESPERTINEAPP.COM", Brand.mono(square ? 21 : 24, weight: 500), Brand.brass, ramp(t, 1.3, 2.2),
                      x: w / 2, baseline: baseline - size * 1.5, tracking: 0.16, center: true)
             let tm = square ? ["AirPods is a trademark of Apple Inc. Dolby is a trademark of Dolby Laboratories. DTS is a trademark of DTS, Inc.",
                                "Vespertine is not affiliated with them. Music shown is from the maker’s own library."]
