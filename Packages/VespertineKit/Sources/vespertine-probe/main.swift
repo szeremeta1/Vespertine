@@ -11,7 +11,6 @@
 import CoreAudio
 import Foundation
 import VespertineAudio
-import Synchronization
 
 func readback(_ id: AudioObjectID) -> (rate: Double, physical: String, hogPID: pid_t) {
     var addr = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyNominalSampleRate, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
@@ -129,7 +128,7 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
         return items[i + 1]
     }
     let start = Date()
-    let ended = Mutex(false)
+    let ended = Locked(false)
     engine.eventHandler = { event in
         let t = String(format: "%6.2fs", Date().timeIntervalSince(start))
         switch event {
