@@ -6,7 +6,23 @@ gives their scores, Vespertine's results, how the isolation held up and what the
 
 ## The answer
 
-<<ANSWER>>
+On macOS, Vespertine passes 176 of the 179 accepted checks; on Linux, all 108 that can run there. All three
+failures are recorded in `FINDINGS.md`, and two of them point at Vespertine's code:
+
+- **F-01**, expected before the run: the badge trusts the plan when the device's physical format can't be read back.
+- **F-04**: the rate planner can pick a rate a hertz or two above the source over a true multiple of it, against
+  the order `docs/FEATURES.md` line 33 promises. It needs a device that offers a rate a few hertz above the source
+  but not the source itself.
+- The third, a shared-mode check, fails for two reasons, neither of them a bug: **F-05**, DoP always takes the
+  device exclusively and won't play without it, the safer behaviour, but the docs don't say so; and **H-01**, an
+  error in this harness, which expected 32-bit integer mode without exclusive access.
+
+Two findings come from outside the scored checks: **F-02**, the docs say DTS frames go out inside the IEC 61937
+carrier, and no DTS carrier exists; **F-03**, the sacd_extract comparison on two discs can't be re-checked from the
+repository.
+
+The checks held up: every check passes every clean-room implementation, and 237 of 238 mutants fail a check of a
+requirement they target. The one survivor is equivalent: it behaves exactly like the reference it wraps.
 
 ## What was checked
 
@@ -118,82 +134,88 @@ Survivors: `C-DOPS-007-c`, `C-DOPS-007-e`, `C-BPV-012-c` and the equivalent `C-D
 
 | Group | Checks | Requirements | Clean-room implementations pass | Mutants killed | Vespertine, Linux | Vespertine, macOS |
 |---|---|---|---|---|---|---|
-| DoP packing | 16 | 7 | B 16/16 | 24/24 | not run (Swift, macOS only) | <<MAC-dop-pack>> |
-| DoP output stream | 55 | 7 | B 55/55 | 30/30 | 55/55 | <<MAC-dop-stream>> |
-| Float output | 14 | 5 | B 14/14 | 24/24 | 11/11 (FLT-004's 3 need macOS) | <<MAC-float>> |
-| Integer output | 10 | 3 | B 10/10 | 16/16 | 10/10 | <<MAC-integer>> |
-| Rate planning | 22 | 10 | B 22/22, B2 22/22 | 38/38 | not run (macOS only) | <<MAC-rate>> |
-| BIT-PERFECT verdict | 30 | 17 | B 30/30, B2 30/30 | 79/79 | not run (macOS only) | <<MAC-verdict>> |
-| DST decoding | 32 | 4 | reference answers 32/32 | 26/27 (one equivalent) | 32/32 | <<MAC-dst>> |
-| **All** | **179** | **53** | **every check, every implementation** | **237/238** | **108/108 run** | <<MAC-all>> |
+| DoP packing | 16 | 7 | B 16/16 | 24/24 | not run (Swift, macOS only) | 16/16 |
+| DoP output stream | 55 | 7 | B 55/55 | 30/30 | 55/55 | 55/55 |
+| Float output | 14 | 5 | B 14/14 | 24/24 | 11/11 (FLT-004's 3 need macOS) | 14/14 |
+| Integer output | 10 | 3 | B 10/10 | 16/16 | 10/10 | 10/10 |
+| Rate planning | 22 | 10 | B 22/22, B2 22/22 | 38/38 | not run (macOS only) | 21/22 (F-04) |
+| BIT-PERFECT verdict | 30 | 17 | B 30/30, B2 30/30 | 79/79 | not run (macOS only) | 28/30 (F-01; F-05 and H-01) |
+| DST decoding | 32 | 4 | reference answers 32/32 | 26/27 (one equivalent) | 32/32 | 32/32 |
+| **All** | **179** | **53** | **every check, every implementation** | **237/238** | **108/108 run** | **176/179: 3 known, 0 new** |
 
 On Linux the harness builds Vespertine's real-time C engine (`vespertine_rt.c`, which does the DoP stream, float and
 integer output) and its DST decoder from `Packages/` and runs the checks on them; Vespertine's Swift code needs
 macOS. The 53 requirements are every testable record except the two IEC oracle records, which the
 `verification-iec-oracle` job runs on the carriers Vespertine writes (`hardware/IEC61937-ORACLE.md`).
 
-<<MAC-NOTES>>
+On macOS the adapters also run Vespertine's Swift code: the DoP packer, the rate planner, `SignalPath` behind
+the verdict, and 24-bit decoding for FLT-004. The macOS numbers are from the `verification-macos` CI job
+(`macos-26`); its summary prints the same tables. The three failing checks are known issues tied to their
+findings, so the job passes while they stand and fails when one of them stops failing. In the IEC step, the F-02
+test asks for a DTS carrier and gets `unsupported`, as recorded.
 
 ### By requirement
 
 Acceptance per requirement: every check of it passes every clean-room implementation, and every mutant aimed at it
-fails one of its checks. All 53 meet both, except DST-001's equivalent mutant.
+fails one of its checks. All 53 meet both, except DST-001's equivalent mutant. A requirement fails on Vespertine
+when one of its checks does; BPV-015 and BPV-016 fail through the same shared-mode check, BPV-015 on its 32-bit
+PCM paths (H-01) and BPV-016 on its DoP paths (F-05). The scoreboard labels both with the check's two IDs.
 
-| Requirement | Kind | Checks | Implementations | Mutants killed | Vespertine (Linux) |
-|---|---|---|---|---|---|
-| DOP-001 | spec | 2 | B pass | 4/4 | not run: not on this platform |
-| DOP-002 | spec | 3 | B pass | 4/4 | not run: not on this platform |
-| DOP-003 | spec | 1 | B pass | 3/3 | not run: not on this platform |
-| DOP-004 | spec | 1 | B pass | 11/11 | not run: not on this platform |
-| DOP-005 | spec | 2 | B pass | 3/3 | not run: not on this platform |
-| DOP-006 | spec | 1 | B pass | 3/3 | not run: not on this platform |
-| DOP-007 | vespertine-rule | 6 | B pass | 14/14 | not run: not on this platform |
-| DOPS-001 | spec | 11 | B pass | 8/8 | pass |
-| DOPS-002 | spec | 8 | B pass | 4/4 | pass |
-| DOPS-003 | spec | 8 | B pass | 5/5 | pass |
-| DOPS-004 | vespertine-rule | 9 | B pass | 8/8 | pass |
-| DOPS-005 | vespertine-rule | 10 | B pass | 5/5 | pass |
-| DOPS-006 | vespertine-rule | 5 | B pass | 4/4 | pass |
-| DOPS-007 | vespertine-rule | 4 | B pass | 5/5 | pass |
-| FLT-001 | vespertine-rule | 3 | B pass | 5/5 | pass |
-| FLT-002 | vespertine-rule | 2 | B pass | 9/9 | pass |
-| FLT-003 | vespertine-rule | 3 | B pass | 6/6 | pass |
-| FLT-004 | vespertine-rule | 3 | B pass | 5/5 | not run: 24-bit decoding goes through SFBAudioEngine and AVAudioConverter (macOS only) |
-| FLT-005 | vespertine-rule | 3 | B pass | 6/6 | pass |
-| INT-001 | vespertine-rule | 4 | B pass | 6/6 | pass |
-| INT-002 | vespertine-rule | 3 | B pass | 7/7 | pass |
-| INT-003 | vespertine-rule | 3 | B pass | 5/5 | pass |
-| RATE-001 | spec | 1 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| RATE-002 | spec | 1 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| RATE-003 | vespertine-rule | 2 | B pass, B2 pass | 10/10 | not run: not on this platform |
-| RATE-004 | vespertine-rule | 4 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| RATE-005 | vespertine-rule | 3 | B pass, B2 pass | 8/8 | not run: not on this platform |
-| RATE-006 | vespertine-rule | 2 | B pass, B2 pass | 4/4 | not run: not on this platform |
-| RATE-007 | vespertine-rule | 3 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| RATE-008 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| RATE-009 | vespertine-rule | 2 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| RATE-010 | vespertine-rule | 3 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| BPV-001 | vespertine-rule | 2 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| BPV-002 | vespertine-rule | 1 | B pass, B2 pass | 6/6 | not run: not on this platform |
-| BPV-003 | vespertine-rule | 3 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| BPV-004 | vespertine-rule | 2 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| BPV-005 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| BPV-006 | vespertine-rule | 3 | B pass, B2 pass | 7/7 | not run: not on this platform |
-| BPV-007 | vespertine-rule | 3 | B pass, B2 pass | 6/6 | not run: not on this platform |
-| BPV-008 | vespertine-rule | 1 | B pass, B2 pass | 7/7 | not run: not on this platform |
-| BPV-009 | spec | 1 | B pass, B2 pass | 4/4 | not run: not on this platform |
-| BPV-010 | vespertine-rule | 1 | B pass, B2 pass | 5/5 | not run: not on this platform |
-| BPV-011 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| BPV-012 | vespertine-rule | 2 | B pass, B2 pass | 3/3 | not run: not on this platform |
-| BPV-013 | vespertine-rule | 1 | B pass, B2 pass | 6/6 | not run: not on this platform |
-| BPV-014 | vespertine-rule | 1 | B pass, B2 pass | 4/4 | not run: not on this platform |
-| BPV-015 | vespertine-rule | 4 | B pass, B2 pass | 11/11 | not run: not on this platform |
-| BPV-016 | vespertine-rule | 4 | B pass, B2 pass | 12/12 | not run: not on this platform |
-| BPV-017 | vespertine-rule | 2 | B pass, B2 pass | 10/10 | not run: not on this platform |
-| DST-001 | spec | 32 | reference decoder pass | 6/7 | pass |
-| DST-002 | spec | 26 | reference decoder pass | 8/8 | pass |
-| DST-003 | oracle | 26 | reference decoder pass | 25/25 | pass |
-| DST-004 | vespertine-rule | 26 | reference decoder pass | 25/25 | pass |
+| Requirement | Kind | Checks | Implementations | Mutants killed | Vespertine (Linux) | Vespertine (macOS) |
+|---|---|---|---|---|---|---|
+| DOP-001 | spec | 2 | B pass | 4/4 | not run (macOS only) | pass |
+| DOP-002 | spec | 3 | B pass | 4/4 | not run (macOS only) | pass |
+| DOP-003 | spec | 1 | B pass | 3/3 | not run (macOS only) | pass |
+| DOP-004 | spec | 1 | B pass | 11/11 | not run (macOS only) | pass |
+| DOP-005 | spec | 2 | B pass | 3/3 | not run (macOS only) | pass |
+| DOP-006 | spec | 1 | B pass | 3/3 | not run (macOS only) | pass |
+| DOP-007 | vespertine-rule | 6 | B pass | 14/14 | not run (macOS only) | pass |
+| DOPS-001 | spec | 11 | B pass | 8/8 | pass | pass |
+| DOPS-002 | spec | 8 | B pass | 4/4 | pass | pass |
+| DOPS-003 | spec | 8 | B pass | 5/5 | pass | pass |
+| DOPS-004 | vespertine-rule | 9 | B pass | 8/8 | pass | pass |
+| DOPS-005 | vespertine-rule | 10 | B pass | 5/5 | pass | pass |
+| DOPS-006 | vespertine-rule | 5 | B pass | 4/4 | pass | pass |
+| DOPS-007 | vespertine-rule | 4 | B pass | 5/5 | pass | pass |
+| FLT-001 | vespertine-rule | 3 | B pass | 5/5 | pass | pass |
+| FLT-002 | vespertine-rule | 2 | B pass | 9/9 | pass | pass |
+| FLT-003 | vespertine-rule | 3 | B pass | 6/6 | pass | pass |
+| FLT-004 | vespertine-rule | 3 | B pass | 5/5 | not run (macOS only) | pass |
+| FLT-005 | vespertine-rule | 3 | B pass | 6/6 | pass | pass |
+| INT-001 | vespertine-rule | 4 | B pass | 6/6 | pass | pass |
+| INT-002 | vespertine-rule | 3 | B pass | 7/7 | pass | pass |
+| INT-003 | vespertine-rule | 3 | B pass | 5/5 | pass | pass |
+| RATE-001 | spec | 1 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| RATE-002 | spec | 1 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| RATE-003 | vespertine-rule | 2 | B pass, B2 pass | 10/10 | not run (macOS only) | pass |
+| RATE-004 | vespertine-rule | 4 | B pass, B2 pass | 5/5 | not run (macOS only) | pass |
+| RATE-005 | vespertine-rule | 3 | B pass, B2 pass | 8/8 | not run (macOS only) | pass |
+| RATE-006 | vespertine-rule | 2 | B pass, B2 pass | 4/4 | not run (macOS only) | pass |
+| RATE-007 | vespertine-rule | 3 | B pass, B2 pass | 3/3 | not run (macOS only) | FAIL (known: F-04) |
+| RATE-008 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| RATE-009 | vespertine-rule | 2 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| RATE-010 | vespertine-rule | 3 | B pass, B2 pass | 5/5 | not run (macOS only) | pass |
+| BPV-001 | vespertine-rule | 2 | B pass, B2 pass | 5/5 | not run (macOS only) | pass |
+| BPV-002 | vespertine-rule | 1 | B pass, B2 pass | 6/6 | not run (macOS only) | pass |
+| BPV-003 | vespertine-rule | 3 | B pass, B2 pass | 5/5 | not run (macOS only) | FAIL (known: F-01) |
+| BPV-004 | vespertine-rule | 2 | B pass, B2 pass | 5/5 | not run (macOS only) | pass |
+| BPV-005 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| BPV-006 | vespertine-rule | 3 | B pass, B2 pass | 7/7 | not run (macOS only) | pass |
+| BPV-007 | vespertine-rule | 3 | B pass, B2 pass | 6/6 | not run (macOS only) | pass |
+| BPV-008 | vespertine-rule | 1 | B pass, B2 pass | 7/7 | not run (macOS only) | pass |
+| BPV-009 | spec | 1 | B pass, B2 pass | 4/4 | not run (macOS only) | pass |
+| BPV-010 | vespertine-rule | 1 | B pass, B2 pass | 5/5 | not run (macOS only) | pass |
+| BPV-011 | vespertine-rule | 1 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| BPV-012 | vespertine-rule | 2 | B pass, B2 pass | 3/3 | not run (macOS only) | pass |
+| BPV-013 | vespertine-rule | 1 | B pass, B2 pass | 6/6 | not run (macOS only) | pass |
+| BPV-014 | vespertine-rule | 1 | B pass, B2 pass | 4/4 | not run (macOS only) | pass |
+| BPV-015 | vespertine-rule | 4 | B pass, B2 pass | 11/11 | not run (macOS only) | FAIL (known: H-01) |
+| BPV-016 | vespertine-rule | 4 | B pass, B2 pass | 12/12 | not run (macOS only) | FAIL (known: F-05) |
+| BPV-017 | vespertine-rule | 2 | B pass, B2 pass | 10/10 | not run (macOS only) | pass |
+| DST-001 | spec | 32 | reference decoder pass | 6/7 | pass | pass |
+| DST-002 | spec | 26 | reference decoder pass | 8/8 | pass | pass |
+| DST-003 | oracle | 26 | reference decoder pass | 25/25 | pass | pass |
+| DST-004 | vespertine-rule | 26 | reference decoder pass | 25/25 | pass | pass |
 
 ## The review round
 
@@ -258,10 +280,29 @@ outside the agents, each before the result it could affect was known:
 - **`EquivalentMutants`** gained `C-DST-001-g`, with the reasoning above.
 - **`KnownFindings`** gained F-01's check before the macOS run, and `IECCarriers.swift` F-02's, so CI stays green
   while a finding stands and fails when one stops reproducing.
+- **Two more `KnownFindings` entries** came after the first full macOS run: the rate check for F-04, and the
+  shared-mode check for F-05 and H-01. H-01 is an error in this harness, but the check stays as verdict-A wrote it:
+  fixing it by hand after seeing Vespertine's result would break the blind rule. `FINDINGS.md` gives the fix, a new
+  record and one more blind round. While it stands, the known issue covers the whole check, including its 16- and
+  24-bit cases that Vespertine passes today.
+- **The verdict adapter wasn't changed after any macOS result.** It turned on integer mode only while the device is
+  held, and refused DoP without the device held, from the first commit that had it, because `OutputSession` does
+  (lines 98 and 118-123). Those two lines are what the shared-mode check runs into.
+- **The macOS job** moved from a debug build to a release build after the debug run hit its time limit.
+- **The scoreboard** labels a failure that is already a finding as known, with its IDs, and any other as new.
 
 ## Vespertine's own CI on this branch
 
-<<CI>>
+Every job that tested Vespertine before this branch (the analysis core on Linux; the engine, library and
+real-time C on macOS; the app on macOS) passes on this branch, and nothing in `Packages/` or `App/` changed. Two
+things happened along the way:
+
+- One run failed one of Vespertine's own tests, in the engine job's release run: "Reads Apple Music's library…"
+  depends on the order a task group finishes in. It passed on the next run. `FINDINGS.md` has the details under
+  Observations.
+- The new macOS verification job first ran in a debug build and hit its 40-minute limit. It now builds once in
+  release (`swift test -c release`, which keeps `@testable` imports) and runs each group as its own step with its own
+  time limit: about 6 minutes in all. On Linux, debug and release gave identical results.
 
 ## What this run doesn't show
 

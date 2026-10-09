@@ -8,7 +8,8 @@
 #
 # Per group: checks, requirements covered, whether every clean-room implementation passes every check, how many
 # mutants the checks kill, and Vespertine's result on each platform. Per requirement: the same, plus the checks and
-# the mutants aimed at it. Then every surviving mutant and every check Vespertine fails, with the first failures.
+# the mutants aimed at it. Then every surviving mutant and every check Vespertine fails, with the first failures. A
+# failure already recorded in FINDINGS.md (KnownFindings.swift) is marked "known" with its finding IDs.
 
 import json
 import re
@@ -30,6 +31,15 @@ def records() -> dict:
     return out
 
 
+def known_findings() -> dict:
+    """(group, check) -> finding IDs, from KnownFindings.byCheck (one "group/check": "IDs" entry per line)."""
+    path = ROOT / "harness/Tests/AcceptanceTests/KnownFindings.swift"
+    out = {}
+    for m in re.finditer(r'^\s*"([^"/]+)/([^"]+)": "([^"]+)",$', path.read_text(encoding="utf-8"), re.M):
+        out[(m.group(1), m.group(2))] = m.group(3)
+    return out
+
+
 def subject_status(results: list, req: str) -> str:
     """'pass', 'FAIL' or 'no assertion' for one requirement over the checks that test it on one subject."""
     if not results:
@@ -45,11 +55,17 @@ def subject_status(results: list, req: str) -> str:
     return status
 
 
-def vespertine_status(checks: list, req: str) -> str:
+def vespertine_status(checks: list, req: str, group: str, known: dict) -> str:
     notes = {c["vespertine"].get("notRun") for c in checks if c["vespertine"].get("notRun")}
     if notes:
         return "not run: " + "; ".join(sorted(notes))
-    return subject_status([c["vespertine"].get("result") for c in checks], req)
+    status = subject_status([c["vespertine"].get("result") for c in checks], req)
+    if status == "FAIL":
+        ids = sorted({known[(group, c["name"])] for c in checks if (group, c["name"]) in known
+                      and c["vespertine"].get("result") and req in c["vespertine"]["result"]["failedRequirements"]})
+        if ids:
+            status += " (known: " + ", ".join(ids) + ")"
+    return status
 
 
 def main() -> int:
@@ -57,6 +73,7 @@ def main() -> int:
         print("usage: scoreboard.py <results.json> [<results.json> ...]")
         return 2
     regs = records()
+    known = known_findings()
     boards = [json.loads(Path(p).read_text()) for p in sys.argv[1:]]
     platforms = [b["platform"] for b in boards]
     first = boards[0]
@@ -81,7 +98,10 @@ def main() -> int:
             g = b["groups"][gi]
             ran = [c for c in g["checks"] if not c["vespertine"].get("notRun")]
             passed = sum(1 for c in ran if c["vespertine"].get("result") and c["vespertine"]["result"]["passed"])
-            vcells.append(f"{passed}/{len(ran)}" + (f" ({len(g['checks']) - len(ran)} not run)" if len(ran) < len(g["checks"]) else ""))
+            known_failing = sum(1 for c in ran if (g["name"], c["name"]) in known and c["vespertine"].get("result")
+                                and not c["vespertine"]["result"]["passed"])
+            vcells.append(f"{passed}/{len(ran)}" + (f" ({len(g['checks']) - len(ran)} not run)" if len(ran) < len(g["checks"]) else "")
+                          + (f" ({known_failing} known)" if known_failing else ""))
         lines.append(f"| {group['name']} | {len(checks)} | {len(reqs)} | {', '.join(ref_cells) or '–'} | "
                      f"{killed}/{len(mutants)} | " + " | ".join(vcells) + " |")
 
@@ -100,7 +120,8 @@ def main() -> int:
             aimed = [m for m in group["mutants"] if req in m["targets"]]
             killed = sum(1 for m in aimed if m["killedBy"])
             kind = regs.get(req, {}).get("kind", "?")
-            vs = [vespertine_status([c for c in b["groups"][gi]["checks"] if req in c["requirements"]], req) for b in boards]
+            vs = [vespertine_status([c for c in b["groups"][gi]["checks"] if req in c["requirements"]], req,
+                                    group["name"], known) for b in boards]
             lines.append(f"| {req} | {kind} | {len(checks)} | {impl} | {killed}/{len(aimed)} | " + " | ".join(vs) + " |")
     untested = sorted(i for i, r in regs.items() if r.get("testable") and r.get("kind") != "oracle"
                       and not any(i in c["requirements"] for g in first["groups"] for c in g["checks"]))
@@ -137,7 +158,9 @@ def main() -> int:
                 if r is not None and not r["passed"]:
                     any_fail = True
                     detail = "; ".join(r["failures"][:3]) or (r.get("thrown") or "made no assertion")
-                    lines.append(f"- {b['platform']}, {g['name']}: “{c['name']}” [{', '.join(r['failedRequirements'])}]: {detail}")
+                    finding = known.get((g["name"], c["name"]))
+                    note = f" (known: {finding}, FINDINGS.md)" if finding else " (new: not in FINDINGS.md)"
+                    lines.append(f"- {b['platform']}, {g['name']}: “{c['name']}” [{', '.join(r['failedRequirements'])}]{note}: {detail}")
     if not any_fail:
         lines.append("None.")
     print("\n".join(lines))

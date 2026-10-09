@@ -34,8 +34,8 @@ in `FINDINGS.md` as a known issue.
 | 24-bit through the float path unchanged (`#float-24bit`) | FLT-001, FLT-002, FLT-004 | rule checks | over the wire: LOOPBACK L2 |
 | Samples keep channel and order (`#bp-definition`) | FLT-003 | rule check | over the wire: LOOPBACK L1 |
 | Integer mode passes every 32-bit word (`#int-32bit-words`) | INT-001, INT-002 | rule checks | – |
-| BIT-PERFECT conditions (`#bp-*`, `#eq-label`) | BPV-001 to 017 | rule checks (BPV-009: spec, Core Audio headers) | macOS only; BPV-003 fails (F-01); readback on a real device: LOOPBACK P1 |
-| Track's own rate, planner fallback order (`#rate-native`, `#rate-planner-order`) | RATE-006 to 010 | rule checks | on a DAC: LOOPBACK R1 |
+| BIT-PERFECT conditions (`#bp-*`, `#eq-label`) | BPV-001 to 017 | rule checks (BPV-009: spec, Core Audio headers) | macOS only; BPV-003 fails (F-01); the shared-mode check fails (F-05: DoP is always exclusive; H-01: a harness error); readback on a real device: LOOPBACK P1 |
+| Track's own rate, planner fallback order (`#rate-native`, `#rate-planner-order`) | RATE-006 to 010 | rule checks | macOS only; RATE-007 fails (F-04); on a DAC: LOOPBACK R1 |
 | DST decodes to the original DSD (`#sacd-dst`) | DST-001 to 004 | spec checks (frame size), oracle (libdstdec), rule check | DST-005 blocked (ISO/IEC 14496-3) |
 | SACD frames are 1/75 s, 4704 bytes per channel (`#sacd-frames`) | DST-001, DST-002 | spec checks (DSDIFF 1.5, DSF 1.01) | – |
 | Dolby frames go out byte for byte in the carrier (`#iec-carrier-exact`) | IEC-O-001, IEC-O-002 | oracles (FFmpeg demux, blind scanner) | burst layout itself blocked: IEC-001 to 007; DTS: F-02 |
@@ -48,7 +48,8 @@ Not covered at all (no record, no procedure): `#eq-flat-is-none`, `#float-rounds
 `#int-conditions`, `#dop-file-bit-order`, `#iec-dtscd`, the DTS-CD claims, `#sacd-toc` and `#sacd-areas` beyond the
 SACD procedure's by-eye TOC comparison, `#sacd-readonly` beyond its fingerprints, `#stream-swap`, `#dec-lossless`
 and the file-analysis claims. Vespertine's own test suite covers several of these; this harness doesn't vouch for
-them.
+them. `#int-conditions` is the one that already cost something: without it, the shared-mode check expects integer
+mode without exclusive access (H-01).
 
 ## Blocked, and what it costs to unblock
 
