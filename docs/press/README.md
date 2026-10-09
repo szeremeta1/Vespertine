@@ -2,7 +2,7 @@
 
 Vespertine is the free, open-source Mac player for surround and hi-res music collections. Lead with extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library, with head-tracked Spatial Audio on AirPods. The source is GPL and the signal-path conditions and tests are public.
 
-Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO is not supported yet. PCM hardware checks reach 384 kHz; DSD file support is not proof of native DoP playback at every rate. Hi-res analysis is a feature other players offer too. Use the [feature details](../FEATURES.md), [verification guide](../VERIFICATION.md) and [comparison sources](../COMPARISON.md) when writing claims.
+Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO playback is coming in the next release. PCM hardware checks reach 384 kHz; DSD file support is not proof of native DoP playback at every rate. Hi-res analysis is a feature other players offer too. Use the [feature details](../FEATURES.md), [verification guide](../VERIFICATION.md) and [comparison sources](../COMPARISON.md) when writing claims.
 
 Each image covers one feature at three sizes:
 
@@ -24,3 +24,9 @@ A 36.6 s trailer in 16:9 and 1:1, with an original score: synthesized from scrat
 - **Delivery:** H.264 at −14 LUFS.
 
 The 16:9 trailer (web and 1080p versions) is in `site/assets/trailer`. The ProRes masters and the 1:1 and 9:16 versions aren't kept in the repo.
+
+## Reshooting
+
+[`shot-list.md`](shot-list.md) lists every scene, the track it uses and what must be true on screen. `scripts/shoot.sh`
+reshoots them on your library (it stops before each FiiO or AirPods scene so you can pick the output), then
+`scripts/brand/build.sh`, `scripts/make-social-preview.sh` and `scripts/make-tour.swift` rebuild what's derived.

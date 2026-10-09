@@ -59,6 +59,8 @@ final class Assets {
         ctx.setFillColor(CGColor(srgbRed: bg.r, green: bg.g, blue: bg.b, alpha: 1))
         let r = AppWindow.indicator
         ctx.fill(CGRect(x: r.minX * s, y: CGFloat(h) - r.maxY * s, width: r.width * s, height: r.height * s))
-        return keyOut(ctx.makeImage()!, background: bg)
+        // 1.0's sidebar picks up the window beside it in a faint gradient toward its right edge (up to 0.06 from the
+        // sampled colour); a wider tolerance keys that away with the rest instead of leaving a pale smudge on the glass.
+        return keyOut(ctx.makeImage()!, background: bg, tolerance: 0.075)
     }
 }

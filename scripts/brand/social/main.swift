@@ -18,7 +18,7 @@ func plain(_ s: String) -> String {
 let lede = plain(matches("<p class=\"lede\">(.*?)</p>")[0])
 let chips = matches("<span class=\"chip\">(.*?)</span>").map(plain)
 let foot = plain(matches("<div class=\"foot\">(.*?)</div>")[0])
-let shot = NSImage(contentsOf: Brand.repo.appendingPathComponent("docs/screenshots/bit-perfect-fiio-24-192.png"))!.cgImage(forProposedRect: nil, context: nil, hints: nil)!
+let shot = NSImage(contentsOf: Brand.repo.appendingPathComponent("docs/screenshots/bit-perfect-fiio-24-96.png"))!.cgImage(forProposedRect: nil, context: nil, hints: nil)!
 let logo = NSImage(contentsOf: Brand.repo.appendingPathComponent("docs/brand/logo.png"))!.cgImage(forProposedRect: nil, context: nil, hints: nil)!
 
 func render(wide: Bool) {
