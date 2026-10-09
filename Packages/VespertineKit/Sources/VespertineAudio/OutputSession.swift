@@ -27,6 +27,9 @@ public struct AppliedFormat: Sendable, Hashable {
     public var streamCount: Int = 1
     /// Integer mode in effect: the device takes 32-bit integers directly (non-mixable), no float step.
     public var integerMode = false
+    /// Every output stream's physical format was read back. When one couldn't be, the depth and integer flag above
+    /// come from the streams that could be read, or from the plan, and the path isn't marked bit-perfect.
+    public var physicalFormatKnown = true
 }
 
 final class OutputSession: @unchecked Sendable {
@@ -99,6 +102,7 @@ final class OutputSession: @unchecked Sendable {
         let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
         // The shallowest stream decides what the device as a whole can carry.
         let physical = physicals.min { $0.mBitsPerChannel < $1.mBitsPerChannel }
+        let physicalFormatKnown = !streams.isEmpty && physicals.count == streams.count
         let bufferFrames = (try? HAL.get(deviceID, .global(kAudioDevicePropertyBufferFrameSize), initial: UInt32(512))) ?? 512
         let deviceLatency = (try? HAL.get(deviceID, .output(kAudioDevicePropertyLatency), initial: UInt32(0))) ?? 0
         let safetyOffset = (try? HAL.get(deviceID, .output(kAudioDevicePropertySafetyOffset), initial: UInt32(0))) ?? 0
@@ -134,7 +138,8 @@ final class OutputSession: @unchecked Sendable {
             channelNames: routeLayout?.shortNames ?? (plan.channels == 1 ? ["M"] : ["L", "R"]),
             speakerNames: speakers.flatMap { $0.hasSpeakerPositions ? $0.shortNames : nil } ?? [],
             streamCount: streams.count,
-            integerMode: integerMode)
+            integerMode: integerMode,
+            physicalFormatKnown: physicalFormatKnown)
 
         guard let ring = nrt_ring_create(Self.ringFrames(rate: rate, channels: plan.channels), UInt32(plan.channels)) else {
             if hogged { DeviceControl.releaseHog(deviceID) }

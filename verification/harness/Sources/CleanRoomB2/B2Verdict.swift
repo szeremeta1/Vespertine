@@ -11,6 +11,13 @@ struct B2BadgeVerdict: BadgeVerdict {
         abs(a - b) <= 0.5
     }
 
+    /// BPV-009: the player holds the device exclusively only when the hog-mode owner read back is its own PID.
+    /// A failed read (nil) and -1 (no owner) never count.
+    private static func playerHoldsDevice(_ readback: VerdictInput.Readback) -> Bool {
+        guard let owner = readback.hogOwnerPID else { return false }
+        return owner != -1 && owner == readback.ownPID
+    }
+
     func verdict(_ input: VerdictInput) -> String {
         let source = input.source
         let plan = input.plan
@@ -60,8 +67,10 @@ struct B2BadgeVerdict: BadgeVerdict {
                 return "Device floating-point format is below 32 bits"
             }
 
-            // BPV-005
-            if let sourceDepth = source.bitDepth, sourceDepth > 24, !plan.integerMode {
+            // BPV-005, BPV-018: integer mode counts only while the player holds the device. An input with
+            // integer mode set but the device not held does not occur; it is treated as not in effect.
+            let integerModeInEffect = plan.integerMode && Self.playerHoldsDevice(readback)
+            if let sourceDepth = source.bitDepth, sourceDepth > 24, !integerModeInEffect {
                 return "Source deeper than 24 bits without integer mode"
             }
 
@@ -72,7 +81,10 @@ struct B2BadgeVerdict: BadgeVerdict {
             return Badge.bitPerfect
 
         case .dop:
-            // BPV-016
+            // BPV-016: DoP needs the device held (BPV-009); shared mode with no other app playing is not enough.
+            if !Self.playerHoldsDevice(readback) {
+                return "Player does not hold the device for DoP"
+            }
             if !Self.ratesEqual(nominalRate, plan.requestedRate) {
                 return "Device rate differs from the DoP carrier rate"
             }
@@ -82,7 +94,10 @@ struct B2BadgeVerdict: BadgeVerdict {
             return Badge.nativeDoP
 
         case .bitstream:
-            // BPV-017
+            // BPV-017: bitstream needs the device held (BPV-009), as DoP does.
+            if !Self.playerHoldsDevice(readback) {
+                return "Player does not hold the device for bitstream"
+            }
             if !Self.ratesEqual(nominalRate, plan.requestedRate) {
                 return "Device rate differs from the bitstream rate"
             }
@@ -131,16 +146,8 @@ struct B2BadgeVerdict: BadgeVerdict {
         }
 
         // BPV-008 and BPV-009: another app playing, unless the device is held exclusively.
-        if processing.otherAppsPlaying {
-            let heldByPlayer: Bool
-            if let owner = readback.hogOwnerPID, owner != -1, owner == readback.ownPID {
-                heldByPlayer = true
-            } else {
-                heldByPlayer = false
-            }
-            if !heldByPlayer {
-                return "Another app is playing to the device"
-            }
+        if processing.otherAppsPlaying && !Self.playerHoldsDevice(readback) {
+            return "Another app is playing to the device"
         }
 
         return nil

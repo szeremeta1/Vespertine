@@ -75,3 +75,38 @@ My earlier shared-mode check used only `usbDAC` paths, and all my AirPods Max US
 I put the scratch file back to how it was given. No other given file was changed.
 
 **New ambiguity:** none. A hog owner that couldn't be read (nil) with no other app playing is still untested, on every device, for the reason in my first report: BPV-003 covers only the rate and the physical format.
+
+## Round 2
+
+I've updated `/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift` to the new BPV-016, BPV-017, BPV-018 and the new `integerMode` row. There are now 32 checks (30 before), and it builds cleanly with no warnings. Every check still has a `// REQ:` line, and its `requirements:` list matches exactly the IDs it asserts; I confirmed that by running the checks. I restored the scratch file I used for trial runs, and no other given file was changed.
+
+**Changed**
+- **Shared-mode check** (was BPV-012, BPV-015, BPV-016; now BPV-012, BPV-015):
+  - The new BPV-016 contradicted its DoP part: it said shared mode with no other app playing gives "NATIVE DSD · DoP". I removed that part.
+  - Its PCM part used to release the device on paths with integer mode on, which the contract now says doesn't occur.
+  - It now turns integer mode off when the device isn't held. It only uses files of 24 bits or fewer, since BPV-005 and the BPV-018 gap say deeper files need integer mode.
+  - It still asserts "BIT-PERFECT" for shared mode with no other app playing, on `usbDAC` (BPV-015) and on AirPods Max over USB-C (BPV-012).
+- **BPV-005 check:** added one case per deeper file (25, 28, 32 bits) and clean base path: shared mode, no other app, integer mode off. It asserts the badge is not BIT-PERFECT, the case the BPV-018 gap describes. Integer mode on with the device held is unchanged.
+- **BPV-008 and BPV-009 not-held cases:** these built inputs with integer mode on and the hog owner set to −1, nil or another process. They now go through a helper that turns integer mode off whenever the device isn't held. The assertions are unchanged.
+  - For files deeper than 24 bits, turning integer mode off also breaks BPV-005. Those cases still hold, but they no longer isolate BPV-008 or BPV-009; the other base paths still do.
+
+**Added**
+- **BPV-016:** DoP needs the player to hold the device. Every clean DoP path is tried with the hog owner unread (nil), −1 or another process ID, with and without another app playing. The badge must not be "NATIVE DSD · DoP"; that's all I assert, because the gap leaves the rest open.
+- **BPV-017:** the same for bitstream. The badge must not start with "BITSTREAM · ".
+
+**Removed:** nothing. Every other check was left alone. All clean DoP and bitstream starting paths already hold the device, and every input that had integer mode on already held it.
+
+**Verified in scratch**
+- A test subject counted the inputs the 32 checks build: none of the 47,137 has integer mode on with the device not held.
+- My updated reference implementation passes all 32 checks.
+- Variants that let DoP or bitstream play without holding the device (shared mode, or an unread hog owner) each fail the new check for their record.
+- Variants that require holding the device for PCM, or for AirPods Max over USB-C, fail on BPV-015 and BPV-012 respectively.
+- A variant that treats a deeper-than-24-bit file in shared mode as bit-perfect fails BPV-005.
+- A variant that says "BIT-PERFECT" for an unheld DoP path passes. That is allowed by the BPV-016 gap.
+
+**New ambiguity**
+- **BPV-016 / BPV-017:** an unread hog owner (nil) is treated as "not held", because BPV-009 defines holding as the read-back owner being the player's own ID.
+- **BPV-016 gap:** an unheld DoP path "doesn't play", but its badge isn't specified. So even "BIT-PERFECT" passes my checks there, unless another app is playing (BPV-008).
+- **BPV-018:** it implies, without saying so outright, that a file of 24 bits or fewer on the float path in shared mode is still BIT-PERFECT. I kept that assertion, based on BPV-005, BPV-015 and the BPV-018 gap.
+- **BPV-017:** it still says "only when", so there is still no assertion that a bitstream badge does appear.
+- **PCM with an unread hog owner and no other app playing:** still untested, as in my earlier reports.

@@ -8,3 +8,17 @@ Bash	swiftbox /srv/cleanroom/verdict-B2 "cd harness && swift build 2>&1 | tail -
 Edit	/srv/cleanroom/verdict-B2/harness/Sources/Scratch/main.swift
 Bash	swiftbox /srv/cleanroom/verdict-B2 "cd harness && swift build 2>&1 | tail -30 && swift run Scratch 2>&1 | tail -90"
 SubagentHandback	(its final report, in reports/)
+Read	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift
+Bash	swiftbox /srv/cleanroom/verdict-B2 "cd harness && python3 - <<'EOF'\nimport re\np='Sources/Scratch/main.swift'\ns=open(p).read()\ns=s.replace('''i = base(); i.source.bitDepth = 32; i.readback.physicalBitDepth = 32\ncheck(\"32 no int\", i, notAny)\ni.plan.integerMode = true\ncheck(\"32 int\", i, isBP)''','''i = base(); i.source.bitDepth = 32; i.readback.physicalBitDepth = 32\ncheck(\"32 no int\", i
+Read	/srv/cleanroom/verdict-B2/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/verdict-B2 "cd harness && swift build 2>&1 | tail -5 && swift run Scratch 2>&1 | grep -E 'FAIL|ALL OK|FAILURES|dop|bitstream|32|other app'"
+Edit	/srv/cleanroom/verdict-B2/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/verdict-B2 "cd harness && swift build 2>&1 | tail -3 && swift run Scratch 2>&1 | grep -E 'FAIL|ALL OK'"
+SubagentHandback	(its final report, in reports/)

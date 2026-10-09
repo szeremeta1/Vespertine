@@ -1,5 +1,7 @@
 # verdict-C: final report
 
+## Round 0
+
 I've written 79 mutants covering all 17 testable requirements. `swift build` passes with no errors or warnings. In my own scratch tests every mutant was caught by a check of a requirement it targets.
 
 **Deliverable:** `/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift` defines `public enum VerdictMutants { public static let all: [Mutant<any BadgeVerdict>] }`. It imports only Contracts and SpecKit, has no stored state, and changes none of the given files. I edited `Sources/Scratch/main.swift` while testing and then put back its original one line.
@@ -44,3 +46,30 @@ Shared conditions broken only in DoP or bitstream mode also list BPV-016 or BPV-
 - Concealed-frame mutants only act on counts above 0.
 - I wrote no "wrong on the second call" mutants. They need shared state that is safe across threads, which requires the Synchronization or Foundation module, outside the package.
 - I avoided `Double.rounded()`, because without Foundation it fails to link (undefined `round`) in an executable that uses the module.
+
+## Round 2
+
+I've updated `/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift` for the new BPV-016, BPV-017 and BPV-018 and the new `integerMode` contract row. It now has 85 mutants (was 79), and a clean `swift build` passes with no errors or warnings. Against my own correct implementation and 150 checks (all inputs ones the contract allows), every mutant is caught by a check of a requirement it targets. Perturbation fuzzing found no traps. Every difference it found, on inputs that can occur, was the targeted reason turning into the wrong badge. No mutant targets BPV-018. The given files are unchanged, and `Scratch/main.swift` is back to its original line.
+
+**Mutants changed**
+- **C-BPV-008-b (BPV-008), new trigger, same target.** It used to ignore another app playing "while integer mode is on". To block BIT-PERFECT, that needs integer mode on with the device not held, which the contract now says never happens. It now ignores another app playing for sources of 16 bits or fewer, on the idea that the shared mixer is transparent at 16 bits.
+- **C-BPV-008-c (BPV-008, BPV-016), changed so it is wrong again.** It used to repair only "another app playing". That leaves shared-mode DoP, which the new BPV-016 also rejects, so the mutant had become identical to the correct verdict. It now also treats the device as held.
+- **C-BPV-005-a and C-BPV-005-b (BPV-005), changed to stay on valid inputs.** Turning integer mode on for a shared device produced an input that can't occur, so the correct verdict's answer there is undefined. They now also mark the device held. They no longer fire when another app plays to a device the player doesn't hold, so that change repairs nothing else. They are still wrong on valid inputs: a source deeper than 24 bits without integer mode gets BIT-PERFECT, whether held or shared.
+
+**Rechecked and left as they were.** All other DoP and bitstream mutants (003-d/e, 006-e/f, 007-e/f, 008-d, 010-d/e, 013-d/f, 016-a…f, 017-a…d) only give a DoP or BITSTREAM badge where the device is held, so they still break what they target. 008-d already treated the device as held. 004-d and 014-d need integer mode on, which now implies the device is held, so they are still wrong on inputs that occur.
+
+**New mutants**
+- **C-BPV-016-g [BPV-016]:** in DoP, holding the device isn't required. Shared mode with no other app playing gets NATIVE DSD · DoP.
+- **C-BPV-016-h [BPV-016, BPV-009]:** in DoP, a hog-mode owner that is another process (not −1) counts as the player holding the device.
+- **C-BPV-016-i [BPV-016, BPV-009]:** in DoP, an unreadable hog-mode owner (nil) counts as held.
+- **C-BPV-017-e / -f / -g:** the same three, for bitstream.
+
+All six only fire when no other app is playing, so they don't also break BPV-008.
+
+**New ambiguities**
+- **BPV-016/017 vs BPV-008:** in DoP and bitstream, holding the device now implies BPV-008 holds. So any mutant that ignores another app playing in those modes also breaks the hold requirement. 008-c and 008-d therefore target both requirements; they can't break BPV-008 alone.
+- **BPV-009 now tested through DoP and bitstream as well:** a wrong definition of "held" in those modes breaks BPV-009 and BPV-016/017 together.
+- **BPV-018 and nil hog owner:** I took "the device not held" to include a nil `hogOwnerPID`. So integer mode on with a nil owner is also treated as an input that can't occur.
+- **BPV-018 vs BPV-005 tests:** BPV-005 and BPV-004 tests that turn integer mode on must also hold the device. Otherwise the input is invalid.
+- **BPV-008 vs C-BPV-009-c:** a BPV-008 check of the "unless the player holds the device" exception (another app playing, device held → BIT-PERFECT) now catches C-BPV-009-c. I kept its targets as BPV-009 and BPV-015, because BPV-008 itself is only a necessary condition.
+- **Still open:** BPV-016 still doesn't say whether the ≥24-bit format must be integer (gap). BPV-017's "shared conditions" is still undefined. BPV-017 still only says when a BITSTREAM badge is allowed, never when one is required, so no mutant removes one.
