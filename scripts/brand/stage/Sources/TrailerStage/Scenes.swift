@@ -155,7 +155,7 @@ struct HeroScene: View {
         VStack(alignment: g.tall ? .center : .leading, spacing: 24 * g.u) {
             Tagline(text: "Every sample,\nuntouched.", size: g.pick(g.W * 0.05, square: g.W * 0.062, tall: g.W * 0.085), t: t, start: s + b * beat(g, 4.1, tall: 2.0),
                     alignment: g.tall ? .center : .leading, width: g.pick(g.W * 0.36, square: g.W * 0.42, tall: g.W * 0.86))
-            BrandLabel(text: g.wide ? "Bit-perfect · 24-bit · 192 kHz · exclusive" : "Bit-perfect · 24-bit · 192 kHz",
+            BrandLabel(text: g.wide ? "Bit-perfect · 24-bit · 96 kHz · exclusive" : "Bit-perfect · 24-bit · 96 kHz",
                        size: g.pick(g.W * 0.0098, square: g.W * 0.014, tall: g.W * 0.022), brass: true, dot: true)
                 .arrive(t, at: s + b * beat(g, 5.2, tall: 3.1))
         }
@@ -176,10 +176,11 @@ struct SignalPulse: View {
     // Re-measured on the 2026-10-01 recording of Elton John's Regimental Sgt. Zippo: its album line wraps to two lines, so
     // everything below it sits 16 pt lower than in the first recording (rings 538.75 ... 708.75, badge 452.25). Measured the
     // same way on both clips (brass pixels in the ring column): every ring and the badge moved by exactly 16.0 pt, x by 0.
+    // 1.0: re-recorded on Lazar Berman's Liszt (24/96), whose title wraps to four lines: everything is 71.0 pt lower.
     static let nodeX: CGFloat = 1116.75 - AppWindow.inspector.minX
-    static let nodes: [CGFloat] = [554.75, 593.75, 632.75, 685.75, 724.75].map { $0 - AppWindow.inspector.minY }
+    static let nodes: [CGFloat] = [625.75, 664.75, 703.75, 756.75, 795.75].map { $0 - AppWindow.inspector.minY }
     static let ring: CGFloat = 7.5
-    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 468.25 - AppWindow.inspector.minY, width: 106, height: 22)
+    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 539.25 - AppWindow.inspector.minY, width: 106, height: 22)
 
     var body: some View {
         let travel = easeInOutCubic(progress(t, start, start + b * 1.9))
@@ -279,8 +280,9 @@ struct DSDScene: View {
     let assets: Assets
     let frame: CGImage?
 
-    static let badges = CGRect(x: 1104, y: 404, width: 196, height: 110)
-    static let path = CGRect(x: 1104, y: 638, width: 306, height: 48)
+    // 1.0: Claudja Barry's DSD128 recording; its title wraps to two lines, so both sit 28 pt lower.
+    static let badges = CGRect(x: 1104, y: 432, width: 196, height: 110)
+    static let path = CGRect(x: 1104, y: 666, width: 306, height: 48)
 
     var body: some View {
         let g = Geo(size: size)
@@ -312,8 +314,9 @@ struct VersionsScene: View {
     let assets: Assets
     let frame: CGImage?
 
-    static let rows = CGRect(x: 292, y: 452, width: 484, height: 70)
-    static let source = CGRect(x: 1104, y: 562, width: 306, height: 34)
+    // 1.0: Oasis's Morning Glory SACD on the FiiO K11, the playing row 4 of 12 and the stereo version's source line.
+    static let rows = CGRect(x: 292, y: 418, width: 484, height: 70)
+    static let source = CGRect(x: 1104, y: 591, width: 306, height: 34)
 
     var body: some View {
         let g = Geo(size: size)
