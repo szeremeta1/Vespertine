@@ -208,6 +208,9 @@ struct SignalPathView: View {
         if let rg = path.replayGainDB, rg != 0 {
             s.append(Step(title: "ReplayGain", detail: "Loudness normalisation", value: String(format: "%+.1f dB", rg), tone: .changed))
         }
+        if let eq = path.equalizer {
+            s.append(Step(title: "Equalizer", detail: "\(eq) · 64-bit parametric", value: "on", tone: .changed))
+        }
         switch path.volume {
         case .hardware:
             s.append(Step(title: "Volume", detail: "DAC hardware control", value: "unity · 0.0 dB", tone: .good))

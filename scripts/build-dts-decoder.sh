@@ -31,7 +31,7 @@ for arch in arm64 x86_64; do
   mkdir -p "$build"
   (cd "$build" && "$src/configure" \
     --prefix="$work/install-$arch" --arch=$arch --target-os=darwin --enable-cross-compile \
-    --cc="clang -arch $arch -mmacosx-version-min=26.0" \
+    --cc="clang -arch $arch -mmacosx-version-min=14.0" \
     --enable-static --disable-shared --disable-programs --disable-doc --disable-network \
     --disable-autodetect --disable-everything --disable-avdevice --disable-avfilter \
     --disable-swscale --disable-swresample --disable-x86asm \

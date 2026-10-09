@@ -8,7 +8,6 @@ import MediaPlayer
 import VespertineAudio
 import VespertineLibrary
 import Observation
-import Synchronization
 
 struct QueueEntry: Identifiable, Hashable {
     let item: PlayableItem
@@ -33,7 +32,7 @@ nonisolated enum RepeatMode: String, CaseIterable, Sendable {
 /// Thread-safe copy of the play order, read by the engine thread for gapless hand-off.
 nonisolated final class QueueMirror: Sendable {
     private struct State { var items: [PlayableItem] = []; var repeatMode: RepeatMode = .off }
-    private let state = Mutex(State())
+    private let state = Locked(State())
 
     func update(_ items: [PlayableItem], repeatMode: RepeatMode) {
         state.withLock { $0 = State(items: items, repeatMode: repeatMode) }

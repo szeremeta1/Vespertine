@@ -141,6 +141,14 @@ void nrt_ring_reset(NRTRing *ring) {
 
 // MARK: - Render context
 
+typedef struct {
+    NRTBiquad sections[NRT_EQ_MAX_SECTIONS];
+    uint32_t count;
+    double preamp;
+} NRTEQBank;
+
+#define NRT_EQ_FRESH 0x80000000u
+
 struct NRTRenderContext {
     NRTRing *ring;
     float *scratch;
@@ -172,6 +180,15 @@ struct NRTRenderContext {
     _Atomic uint32_t tapWrite;
 
     uint64_t rng; // render-thread only
+
+    // Equalizer: a triple buffer of settings. The writer fills `eqBack` and swaps it into `eqMiddle` (marked fresh);
+    // the I/O thread swaps its `eqFront` for a fresh middle at the start of a slice. Neither side ever waits.
+    NRTEQBank eqBanks[3];
+    _Atomic uint32_t eqMiddle;
+    uint32_t eqBack;         // writer only
+    uint32_t eqFront;        // render thread only
+    double *eqState;         // render thread only: channels × NRT_EQ_MAX_SECTIONS × 2
+    uint32_t eqStateCount;   // render thread only: the section count eqState belongs to
 
     // Optional processor (set while stopped): scratch (ring channels) → processed (processedChannels).
     NRTProcessFn processor;
@@ -207,6 +224,13 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->tapWrite, 0);
     for (uint32_t i = 0; i < NRT_TAP_SIZE; i++) atomic_init(&ctx->tap[i], 0.f);
     ctx->rng = 0x9E3779B97F4A7C15ull;
+    ctx->eqState = calloc((size_t)nrt_ring_channels(ring) * NRT_EQ_MAX_SECTIONS * 2, sizeof(double));
+    if (!ctx->eqState) { free(ctx->scratch); free(ctx); return NULL; }
+    for (uint32_t i = 0; i < 3; i++) { ctx->eqBanks[i].count = 0; ctx->eqBanks[i].preamp = 1.0; }
+    ctx->eqFront = 0;
+    atomic_init(&ctx->eqMiddle, 1);
+    ctx->eqBack = 2;
+    ctx->eqStateCount = 0;
     return ctx;
 }
 
@@ -228,6 +252,7 @@ bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *use
 void nrt_context_destroy(NRTRenderContext *ctx) {
     if (!ctx) return;
     free(ctx->processed);
+    free(ctx->eqState);
     free(ctx->scratch);
     free(ctx);
 }
@@ -237,6 +262,35 @@ void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBit
     atomic_store(&ctx->gain, isfinite(gain) && gain >= 0 ? gain : 0.0);
 }
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
+
+void nrt_context_set_eq(NRTRenderContext *ctx, const NRTBiquad *sections, uint32_t count, double preamp) {
+    NRTEQBank *bank = &ctx->eqBanks[ctx->eqBack];
+    if (!sections) count = 0;
+    if (count > NRT_EQ_MAX_SECTIONS) count = NRT_EQ_MAX_SECTIONS;
+    uint32_t kept = 0;
+    for (uint32_t i = 0; i < count; i++) {
+        const NRTBiquad b = sections[i];
+        if (isfinite(b.b0) && isfinite(b.b1) && isfinite(b.b2) && isfinite(b.a1) && isfinite(b.a2)) bank->sections[kept++] = b;
+    }
+    bank->count = kept;
+    bank->preamp = isfinite(preamp) && preamp >= 0 ? preamp : 1.0;
+    const uint32_t previous = atomic_exchange_explicit(&ctx->eqMiddle, ctx->eqBack | NRT_EQ_FRESH, memory_order_acq_rel);
+    ctx->eqBack = previous & ~NRT_EQ_FRESH;
+}
+
+// The equalizer settings for this slice: the newest the writer published, if any came in since the last slice.
+static const NRTEQBank *take_eq(NRTRenderContext *ctx) {
+    if (atomic_load_explicit(&ctx->eqMiddle, memory_order_acquire) & NRT_EQ_FRESH) {
+        const uint32_t fresh = atomic_exchange_explicit(&ctx->eqMiddle, ctx->eqFront, memory_order_acq_rel);
+        ctx->eqFront = fresh & ~NRT_EQ_FRESH;
+        const uint32_t count = ctx->eqBanks[ctx->eqFront].count;
+        if (count != ctx->eqStateCount) {
+            memset(ctx->eqState, 0, (size_t)nrt_ring_channels(ctx->ring) * NRT_EQ_MAX_SECTIONS * 2 * sizeof(double));
+            ctx->eqStateCount = count;
+        }
+    }
+    return &ctx->eqBanks[ctx->eqFront];
+}
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
 void nrt_context_set_dop(NRTRenderContext *ctx, bool d) {
@@ -477,14 +531,36 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed) && !integer) return;
 
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
-    if (gain != 1.0) {
+    const NRTEQBank *eq = take_eq(ctx);
+    const bool equalize = !integer && (eq->count > 0 || eq->preamp != 1.0);
+    if (gain != 1.0 || equalize) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
-        const size_t n = (size_t)got * ch;
-        for (size_t i = 0; i < n; i++) {
-            double s = (double)ctx->scratch[i] * gain;
-            if (lsb > 0) s += tpdf(&ctx->rng) * lsb;
-            ctx->scratch[i] = (float)s;
+        for (uint32_t f = 0; f < got; f++) {
+            float *frame = ctx->scratch + (size_t)f * ch;
+            for (uint32_t c = 0; c < ch; c++) {
+                double s = (double)frame[c];
+                if (equalize) {
+                    s *= eq->preamp;
+                    double *z = ctx->eqState + (size_t)c * NRT_EQ_MAX_SECTIONS * 2;
+                    for (uint32_t k = 0; k < eq->count; k++, z += 2) {
+                        // Transposed direct form II: two state values per section and channel.
+                        const NRTBiquad *b = &eq->sections[k];
+                        const double y = b->b0 * s + z[0];
+                        z[0] = b->b1 * s - b->a1 * y + z[1];
+                        z[1] = b->b2 * s - b->a2 * y;
+                        s = y;
+                    }
+                }
+                s *= gain;
+                if (lsb > 0) s += tpdf(&ctx->rng) * lsb;
+                frame[c] = (float)s;
+            }
+        }
+        if (equalize) {
+            // Decaying filter memory would otherwise end in denormals, which are slow on Intel.
+            const size_t states = (size_t)ch * NRT_EQ_MAX_SECTIONS * 2;
+            for (size_t i = 0; i < states; i++) if (fabs(ctx->eqState[i]) < 1e-30) ctx->eqState[i] = 0;
         }
     }
 

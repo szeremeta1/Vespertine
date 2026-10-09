@@ -409,6 +409,47 @@ static void test_concurrent_rewind(void) {
     nrt_ring_destroy(rewind_ring);
 }
 
+// The equalizer is replaced from another thread while the I/O thread renders: every slice must come out with one
+// whole setting (here a preamp and a matching number of pass-through sections), never a mix of two.
+#define EQ_ROUNDS 20000u
+static NRTRenderContext *eq_ctx;
+static atomic_bool eq_done;
+
+static void *eq_writer(void *unused) {
+    (void)unused;
+    NRTBiquad unity[NRT_EQ_MAX_SECTIONS];
+    for (uint32_t i = 0; i < NRT_EQ_MAX_SECTIONS; i++) unity[i] = (NRTBiquad){.b0 = 1};
+    for (uint32_t round = 0; round < EQ_ROUNDS; round++) {
+        const uint32_t k = 1 + round % 8;   // k sections, preamp 1/k: a slice reads k from both or it mixed two settings
+        nrt_context_set_eq(eq_ctx, unity, k, 1.0 / k);
+    }
+    atomic_store(&eq_done, true);
+    return NULL;
+}
+
+static void test_concurrent_eq(void) {
+    NRTRing *ring = nrt_ring_create(1024, 2);
+    eq_ctx = nrt_context_create(ring, 256);
+    assert(ring && eq_ctx);
+    nrt_context_set_gain(eq_ctx, 1.0, 32);   // no dither, so the output is exactly input × preamp
+    atomic_store(&eq_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, eq_writer, NULL);
+    assert(!started); (void)started;
+    float in[512], out[512];
+    for (uint32_t i = 0; i < 512; i++) in[i] = 1.0f;
+    while (!atomic_load(&eq_done)) {
+        nrt_ring_write(ring, in, 256);
+        nrt_context_render_interleaved(eq_ctx, out, 256, 2);
+        for (uint32_t i = 1; i < 512; i++) assert(out[i] == out[0]);   // one setting for the whole slice
+        const float k = 1.0f / out[0];
+        assert(out[0] == 1.0f || fabsf(k - roundf(k)) < 1e-4f);
+    }
+    pthread_join(thread, NULL);
+    nrt_context_destroy(eq_ctx);
+    nrt_ring_destroy(ring);
+}
+
 static NRTRing *concurrent_ring;
 static NRTRenderContext *concurrent_context;
 static void *producer(void *unused) {
@@ -472,5 +513,6 @@ int main(void) {
     test_pcm_silence_is_zeros();
     test_dop_threads();
     test_concurrent_rewind();
+    test_concurrent_eq();
     return 0;
 }

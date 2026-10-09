@@ -14,7 +14,6 @@ import CVespertineRT
 import CoreAudio
 import Foundation
 import SFBAudioEngine
-import Synchronization
 
 public enum PlaybackState: String, Sendable { case stopped, playing, paused }
 
@@ -73,8 +72,16 @@ public struct EngineSettings: Sendable, Equatable {
     /// Integer mode for devices that offer it (exclusive access only): PCM that needs no processing goes
     /// to the DAC as 32-bit integers with no float step, so 32-bit sources arrive exact.
     public var integerMode = false
+    /// Parametric equalizer per device UID. A flat preset counts as none.
+    public var equalizers: [String: EQPreset] = [:]
 
     public init() {}
+
+    /// The equalizer that plays on `device`; nil = none (or one that changes nothing).
+    public func equalizer(for device: OutputDevice?) -> EQPreset? {
+        guard let device, let preset = equalizers[device.uid], !preset.isFlat else { return nil }
+        return preset
+    }
 
     public func spatialMode(for device: OutputDevice) -> SpatialMode {
         spatialModes[device.uid] ?? (device.isAppleHeadphones ? .headTracked : .off)
@@ -109,7 +116,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var event: (@Sendable @MainActor (EngineEvent) -> Void)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
     }
-    private let callbacks = Mutex(Callbacks())
+    private let callbacks = Locked(Callbacks())
 
     enum Command {
         case play(PlayableItem)
@@ -128,7 +135,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var settings = EngineSettings()
     }
 
-    private let shared = Mutex(Shared())
+    private let shared = Locked(Shared())
     private let wake = DispatchSemaphore(value: 0)
     private let sessionLock = NSLock()
     private var thread: Thread?
@@ -527,7 +534,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
             // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
             // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
-            let leavesInteger = session?.applied.integerMode == true && new.digitalVolume(for: sessionDevice) != nil
+            let leavesInteger = session?.applied.integerMode == true
+                && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil)
             if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
@@ -775,7 +783,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         else { volume = .fixed }
         return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
                           deviceName: device.name, deviceUID: device.uid, deviceProfile: device.profile, volume: volume,
-                          replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil)
+                          replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil,
+                          equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil)
     }
 
     private func applyGain() {
@@ -784,6 +793,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard let session else { return }
         let db = session.plan.isPassthrough ? 0 : (digital ?? 0)
         nrt_context_set_gain(session.context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(session.applied.physicalBitDepth))
+        // The equalizer runs only on PCM Vespertine renders: never on DoP or bitstream frames, or integer samples.
+        let eq = session.plan.isPassthrough || session.applied.integerMode ? nil : settings.equalizer(for: sessionDevice)
+        let sections = eq?.sections(sampleRate: session.applied.sampleRate) ?? []
+        sections.withUnsafeBufferPointer { buffer in
+            nrt_context_set_eq(session.context, buffer.baseAddress, UInt32(buffer.count), eq?.preampGain ?? 1)
+        }
     }
 
     private func teardownDecoding() {
@@ -887,13 +902,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// Integer mode applies only where nothing would change the samples: plain PCM at its own rate and
-    /// channel count, no Spatial Audio, digital volume or ReplayGain, on a device with a non-mixable Int32 format.
+    /// channel count, no Spatial Audio, digital volume, ReplayGain or equalizer, on a device with a non-mixable Int32 format.
     /// Float files aren't integers, so they'd be changed on the way: they keep the float path (and its label).
     private func wantsIntegerMode(_ plan: OutputPlan, source probed: ProbedSource, item: PlayableItem, device: OutputDevice) -> Bool {
         let source = probed.format
         return settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
-            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0
+            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
@@ -1205,6 +1220,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         if path?.plan.mode == .pcm {
             if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
+            let integer = path?.applied.integerMode == true
+            path?.equalizer = integer ? nil : settings.equalizer(for: sessionDevice)?.name
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

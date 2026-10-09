@@ -55,6 +55,7 @@ struct SidebarView: View {
                             if playlist.isSmart { Button("Edit Rules…") { model.smartEditorPlaylist = playlist } }
                             Button("Rename…") { newName = playlist.name; renaming = playlist }
                             playMenu(.playlist(id))
+                            Button("Export Playlist…") { model.exportPlaylist(playlist) }
                             Divider()
                             Button("Delete Playlist", role: .destructive) { deletingPlaylist = playlist }
                         }
@@ -67,6 +68,9 @@ struct SidebarView: View {
                     Menu {
                         Button("New Playlist") { newPlaylist(smart: false) }
                         Button("New Smart Playlist…") { newPlaylist(smart: true) }
+                        Divider()
+                        Button("Import Playlist…") { model.importPlaylistFiles() }
+                        Button("Import Apple Music Library…") { model.importAppleMusicLibrary() }
                     } label: {
                         Image(systemName: "plus").font(.system(size: 11, weight: .semibold))
                     }
