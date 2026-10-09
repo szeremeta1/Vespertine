@@ -7,6 +7,15 @@
 # Re-run it whenever docs/screenshots change, and re-upload og.png on GitHub.
 set -euo pipefail
 root=${0:A:h:h}
+# Native renderer is useful on a headless hub where WebKit cannot start its helper service.
+if [[ ${VESPERTINE_SOCIAL_RENDERER:-webkit} == native ]]; then
+  out="$root/build/social-preview"
+  mkdir -p "$out/module-cache"
+  swiftc -module-cache-path "$out/module-cache" -O "$root/scripts/brand/BrandKit.swift" \
+    "$root/scripts/brand/social/main.swift" -o "$out/render"
+  "$out/render"
+  exit 0
+fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
