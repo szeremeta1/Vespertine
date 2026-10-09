@@ -118,6 +118,12 @@ public actor LibraryScanner {
             return map
         }
 
+        // SACD images' tracks, by image: "<image>#2ch-1" … "<image>#mch-6".
+        var imageTracks: [String: [String]] = [:]
+        for location in known.keys where SACDArea(location: location) != nil {
+            imageTracks[String(location[..<location.lastIndex(of: "#")!]), default: []].append(location)
+        }
+
         // Decide what needs reading. Size and date come from the listing (no per-file stat).
         var toRead: [URL] = []
         var listed: [String: ListedFile] = [:]
@@ -137,6 +143,14 @@ public actor LibraryScanner {
                 let locations = cue.tracks.map { "\(url.path)#\($0.number)" }
                 locations.forEach { seen.insert($0) }
                 if priorCues[url.path] == cue.signature, locations.allSatisfy({ location in
+                    guard let k = known[location] else { return false }
+                    return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing && !coverAppeared(k, url)
+                }) { continue }
+                toRead.append(url)
+            } else if let locations = imageTracks[url.path] {
+                // An SACD image read before: unchanged when every one of its tracks is.
+                locations.forEach { seen.insert($0) }
+                if locations.allSatisfy({ location in
                     guard let k = known[location] else { return false }
                     return k.size == size && abs(k.modified.timeIntervalSince(modified)) < 0.001 && !k.isMissing && !coverAppeared(k, url)
                 }) { continue }
@@ -174,6 +188,8 @@ public actor LibraryScanner {
                     if let cue = cueByAudio[url.path] {
                         for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
                     }
+                    // Likewise an SACD image re-read with fewer tracks (or none: it's no longer an SACD).
+                    for location in imageTracks[url.path] ?? [] { seen.remove(location) }
                     for track in tracks { seen.insert(track.location) }
                     let kept = skipping ? tracks.filter(MusicFinder.keepsInLibrary) : tracks
                     summary.skipped += tracks.count - kept.count
@@ -407,6 +423,10 @@ public actor LibraryScanner {
 
     static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)?, artwork: ArtworkStore,
                            folderArt: FolderArtCache? = nil, remote: ListedFile? = nil) -> [Track]? {
+        if SourceInspector.discImageExtensions.contains(url.pathExtension.lowercased()) {
+            // An SACD image lists its own tracks; any other disc image has none.
+            return try? SACDTracks.read(url: url, artwork: artwork, folderArt: folderArt, size: remote?.size, modified: remote?.modified)
+        }
         let read: Track?
         if let remote {
             read = try? RemoteMetadata.readTrack(url: url, size: remote.size, modified: remote.modified, artwork: artwork, folderArt: folderArt)
