@@ -8,6 +8,7 @@ for copies distributed in binary form:
   Monkey's Audio, Musepack, mpg123, Speex, TagLib, Ogg, Vorbis, WavPack, DUMB, libsndfile, TTA, Opus, LAME), with
   their license texts.
 - One file per package, taken from that package's repository at the version Vespertine ships (App/Package.resolved).
-- FFmpeg-LGPL-2.1.txt: the license of the FFmpeg decoders built by scripts/build-dts-decoder.sh.
+- FFmpeg-LGPL-2.1.txt: the license of the FFmpeg decoders built by scripts/build-dts-decoder.sh, and of the DST
+  decoder for SACD images taken from FFmpeg's (Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c).
 
 Sources of the LGPL components are linked from THIRD-PARTY-NOTICES.md; the FFmpeg source is attached to each GitHub release.

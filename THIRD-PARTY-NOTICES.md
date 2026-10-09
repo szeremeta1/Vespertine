@@ -22,6 +22,7 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 | TTA | LGPL-3.0 | True Audio | https://sourceforge.net/projects/tta/ |
 | DUMB (CDUMB 2.0.3) | DUMB license (zlib-like) | Tracker formats | https://github.com/kode54/dumb |
 | FFmpeg 9.0.2 (a subset) | LGPL-2.1-or-later | DTS, DTS-HD, TrueHD/MLP, Dolby Digital modes macOS gets wrong, Matroska, DSD | https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz |
+| DST decoder, from FFmpeg's `libavcodec/dstdec.c` (Copyright (c) 2014 Peter Ross) | LGPL-2.1-or-later | DST-compressed SACD audio | [`Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c`](Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c) |
 
 Versions are the ones in the app's lockfile, [`App/Package.resolved`](App/Package.resolved), which release builds are held to. The full license and copyright text of every component ships inside the app, in `Contents/Resources/Licenses` (from [`App/Licenses`](App/Licenses), including SFBAudioEngine's `ACKNOWLEDGMENTS.md` at the shipped version). The FFmpeg source the decoders are built from is attached to every GitHub release; the other LGPL libraries' sources are linked above, and the prebuilt ones come from SFBAudioEngine's `*-binary-xcframework` packages, whose repositories hold the build scripts.
 
@@ -37,6 +38,10 @@ Vespertine links a small, static build of FFmpeg 9.0.2, made from FFmpeg's unmod
 - protocol: `file`
 
 It is built without `--enable-gpl` or `--enable-nonfree`, so it stays LGPL. To use your own FFmpeg build, run the script and it regenerates `Packages/VespertineKit/Vendor/FFmpegDCA.xcframework`; then rebuild Vespertine as described in the README.
+
+## DST decoder
+
+SACD images often store their audio compressed with DST (Direct Stream Transfer, ISO/IEC 14496-3 subpart 10). FFmpeg's DST decoder only puts out PCM, which can't go to a DAC as DoP, so [`vespertine_dst.c`](Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c) is a copy of it (from FFmpeg's `libavcodec/dstdec.c`, by Peter Ross) that returns the decoded DSD instead. It stands alone, with its own bit reader in place of FFmpeg's internal one. It keeps FFmpeg's license, the LGPL 2.1 or later (its text ships as `FFmpeg-LGPL-2.1.txt`), and is compiled from source with the rest of Vespertine. The SACD image layout (Master TOC, area TOCs, audio sectors) follows the Scarlet Book as documented by the open-source [SACD Ripper](https://github.com/sacd-ripper/sacd-ripper) project; Vespertine's reader is its own code, and none of SACD Ripper's is included.
 
 ## Trademarks
 

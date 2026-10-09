@@ -61,7 +61,7 @@ The device follows every track's native format, and **BIT-PERFECT** appears only
 ![Elton John's Regimental Sgt. Zippo at 24-bit / 192 kHz playing bit-perfect on a FiiO K11, with its signal path](docs/screenshots/bit-perfect-fiio-24-192.png)
 
 ### Native DSD, at any rate
-DSD64, DSD128, DSD256 and DSD512, in DSF or DSDIFF. On a DAC that takes DoP, the DSD goes out untouched in DoP frames, and the meters and spectrum still show the music. Anywhere else it's converted to high-rate PCM, and the signal path says so.
+DSD64, DSD128, DSD256 and DSD512, in DSF or DSDIFF, and SACD images (`.iso`) played straight from the image, stereo and 5.1. On a DAC that takes DoP, the DSD goes out untouched in DoP frames, and the meters and spectrum still show the music. Anywhere else it's converted to high-rate PCM, and the signal path says so.
 
 ![Oasis's (What's the Story) Morning Glory? from its SACD as DSD64 over DoP to a FiiO K11, with a DSD 64 badge](docs/screenshots/dsd-native-dop.png)
 
@@ -107,6 +107,7 @@ Rules use the units shown everywhere else (48 kHz, 24-bit), so "every 24-bit / 4
 |---|---|---|
 | FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate and depth, up to 32-bit and the rate your DAC runs (tested to 384 kHz); bit-perfect when the DAC can run the rate |
 | DSD64 – DSD512 | `.dsf` `.dff` | DoP on DACs marked DoP-capable that support the carrier rate; otherwise DSD → PCM |
+| SACD images | `.iso` (stereo and multichannel areas, DST-compressed or plain) | DSD64, the same way as DSF and DSDIFF; each song listed once, with its stereo and 5.1 versions |
 | Dolby Atmos | Dolby Digital Plus with Atmos in `.ec3` `.m4a` `.mp4` | Rendered by macOS (Spatial Audio on AirPods, heights on a multichannel output), or its 5.1/7.1 bed through Vespertine |
 | Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless, can be bit-perfect; Atmos in TrueHD plays its lossless bed |
 | Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` / `.mp4` | Decoded by macOS, or sent to a receiver untouched |
@@ -126,6 +127,7 @@ The decoders have automated tests with generated fixtures: TrueHD output is comp
 - **Hands your DAC back.** When Vespertine quits, each device it switched goes back to the sample rate and bit depth it had before (so other apps, and tools like LosslessSwitcher, carry on where they left off), or to 44.1 kHz · 16-bit or 48 kHz · 24-bit if you prefer.
 - **AirPods Max over USB-C.** These are recognized as lossless 24-bit / 48 kHz devices (macOS still lists them as Bluetooth, so Vespertine detects the cable itself). 48 kHz material plays bit-perfect and everything else is converted to 48 kHz. Over Bluetooth, Vespertine tells you the link is AAC. AirPods Max 2 is recognized the same way, by name, but hasn't been tested.
 - **DSD at every rate.** DSD64 to DSD512 in DSF and DSDIFF. DoP goes to DACs you mark as DoP-capable (off by default, because DoP sent to a non-DoP DAC is noise) at any rate the DAC can carry; anything else is converted to high-rate PCM.
+- **SACD images.** Add an SACD rip (`.iso`) and its stereo and multichannel areas become one album, each song listed once with both versions, titled from the disc's own text. DST-compressed areas are decoded to the original DSD, so they go out over DoP bit for bit like a DSF file, or through the same DSD → PCM conversion. Tracks play gaplessly, as on the disc. The image is read in place and never written to; tag edits stay in the library.
 - **Dolby Atmos.** Dolby Digital Plus with Atmos (the format Apple Music and streaming services use) is rendered by macOS's own Atmos renderer on the output you chose: head-tracked Spatial Audio on AirPods, height channels on a multichannel output. Or, if you prefer, its 5.1/7.1 bed plays through Vespertine's own path.
 - **Dolby Digital, Dolby Digital Plus, Dolby TrueHD, DTS-HD Master Audio.** `.ac3`, `.ec3`, Dolby audio in M4A/MP4, `.dts`, `.dtshd`, `.thd` and Matroska audio (`.mka`) all play, each channel in its place. TrueHD and DTS-HD MA are lossless and can be bit-perfect. With DTS:X and TrueHD Atmos, Vespertine plays the lossless channel bed and says so; the objects need a receiver.
 - **DTS CDs.** DTS 5.1 discs and DTS-WAV files (a DTS bitstream disguised as 16-bit stereo PCM) are recognized and decoded to 5.1, including albums split by a CUE sheet, so they play in surround or as Spatial Audio on AirPods.
@@ -157,6 +159,7 @@ Vespertine is young, and some of what it does hasn't met real hardware yet. Repo
 - **Intel Macs are untested.** The Intel half of the universal app has run under Rosetta, not on an Intel Mac.
 - **No room correction.** The parametric EQ handles headphone and speaker correction curves, but there's no convolution.
 - **No streaming services and no network renderers.** Vespertine plays your own files, locally or from a share. There is no Qobuz or TIDAL, and no UPnP/DLNA or Roon Ready renderers (AirPlay works, as any Mac output does, at 44.1 kHz).
+- **SACD images have only met synthesized discs.** The image reader is tested with SACD images generated to the Scarlet Book layout and the DST decoder against FFmpeg's on its DST sample, not yet with a rip of a real disc. Images on a network share are copied whole to the local cache when played, like CUE images.
 - **Not supported:** DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
 
 ## Build
