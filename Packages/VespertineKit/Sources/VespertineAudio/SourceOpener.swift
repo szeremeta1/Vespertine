@@ -22,10 +22,13 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public static let replayGainRange: ClosedRange<Double> = -30...15
     /// Identifies a local copy of a network file (see the engine's urlResolver); nil = always open `url`.
     public let cacheKey: String?
+    /// SACD images: the area to play (stereo when nil). The region is then in DSD samples of that area's time code.
+    public let sacdArea: SACDArea?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
-                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil) {
+                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil) {
         self.cacheKey = cacheKey
+        self.sacdArea = sacdArea
         self.id = id
         self.url = url
         self.trackID = trackID
@@ -49,17 +52,22 @@ final class ProbedSource: @unchecked Sendable {
     let decoderName: String
     fileprivate let pcm: PCMDecoding?
     fileprivate let dsd: DSDDecoding?
+    /// An SACD image's area, opened per track by `SourceOpener.decoder`.
+    let sacd: SACDImage.Area?
 
-    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?) {
+    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil) {
         self.url = url
         var format = format
         if format.channelLabels == nil {
-            format.channelLabels = ChannelLayouts.speakerLabels(pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout)
+            let layout = pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout
+                ?? sacd.flatMap { $0.channels > 2 ? ChannelLayouts.layout(channels: $0.channels) : nil }
+            format.channelLabels = ChannelLayouts.speakerLabels(layout)
         }
         self.format = format
         self.decoderName = decoderName
         self.pcm = pcm
         self.dsd = dsd
+        self.sacd = sacd
     }
 
     /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
@@ -78,15 +86,27 @@ private let mpegOpenLock = NSLock()
 enum SourceOpener {
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
-            .union(FFmpegDecoder.extensions)
+            .union(FFmpegDecoder.extensions).union(sacdExtensions)
     }
+
+    /// SACD disc images.
+    static let sacdExtensions: Set<String> = ["iso"]
 
     /// Dolby Digital / Dolby Digital Plus elementary streams. macOS decodes them (licensed); the MP3
     /// decoder would otherwise claim `.ac3` by its extension.
     static let dolbyExtensions: Set<String> = ["ac3", "ec3", "eac3"]
 
-    static func probe(_ url: URL) throws -> ProbedSource {
+    /// `area` picks an SACD image's area (stereo when nil); other files ignore it.
+    static func probe(_ url: URL, area: SACDArea? = nil) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
+        if sacdExtensions.contains(ext) {
+            // An SACD image: one area's DSD (plain or DST-compressed), as DoP or converted to PCM like DSDIFF.
+            let image = try SACDImage.read(url)
+            guard let chosen = area.map(image.area) ?? image.area(.stereo) ?? image.areas.first else { throw SACDError.noArea }
+            let format = SourceFormat(encoding: .dsd, codec: "SACD", sampleRate: chosen.sampleRate, bitDepth: 1, channels: chosen.channels)
+            let name = chosen.isDST ? "SACD image · DST (lossless) decoded to DSD" : "SACD image"
+            return ProbedSource(url: url, format: format, decoderName: name, pcm: nil, dsd: nil, sacd: chosen)
+        }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
             // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.
             let decoder = FFmpegDecoder(url: url)
@@ -192,6 +212,17 @@ enum SourceOpener {
     /// Wraps the probed decoder for the plan (DoP / DSD→PCM) and applies a CUE region.
     static func decoder(for probed: ProbedSource, plan: OutputPlan, item: PlayableItem) throws -> PCMDecoding {
         var decoder: PCMDecoding
+        if let area = probed.sacd {
+            // An SACD track: its stretch of the area (in DSD samples), whole frames of 1/75 s. Gapless into the next
+            // track, which starts at the frame this one ends on.
+            let perFrame = area.samplesPerFrame
+            let all = area.frameRange
+            let start = item.regionStartFrame.map { Int($0 / perFrame) } ?? all.lowerBound
+            let end = item.regionFrameLength.map { start + Int(($0 + perFrame - 1) / perFrame) } ?? all.upperBound
+            let frames = max(0, start)..<max(max(0, start), end)
+            return plan.mode == .dop ? try RawDoPDecoder(source: SACDSource(url: probed.url, area: area, frames: frames))
+                                     : try SACDPCMDecoder(url: probed.url, area: area, frames: frames)
+        }
         if plan.mode == .bitstream {
             // A receiver decodes: DTS CDs go out as stored; Dolby frames are wrapped in IEC 61937 bursts.
             if let dts = probed.pcm as? DTSDecoder {
@@ -274,6 +305,8 @@ public enum SourceInspector {
     public static var supportedExtensions: Set<String> { SourceOpener.supportedExtensions }
     /// Formats with no tag container of their own (read from the decoder and the file name).
     public static var untaggedExtensions: Set<String> { SourceOpener.dolbyExtensions.union(FFmpegDecoder.extensions) }
+    /// Disc images that hold several tracks (SACD), which the library splits by their own table of contents.
+    public static var discImageExtensions: Set<String> { SourceOpener.sacdExtensions }
 
     /// Whether this file can go to a receiver untouched: Dolby streams, and DTS CDs (the stored bitstream).
     public static func canBitstream(_ url: URL, codec: String) -> Bool {
@@ -303,7 +336,9 @@ public enum SourceInspector {
     public static func inspectWithDuration(_ url: URL) throws -> (format: SourceFormat, duration: Double) {
         let probed = try SourceOpener.probe(url)
         var seconds = 0.0
-        if let pcm = probed.pcm {
+        if let area = probed.sacd {
+            seconds = Double(area.frameRange.count) / Double(SACDImage.framesPerSecond)
+        } else if let pcm = probed.pcm {
             let rate = pcm.processingFormat.sampleRate
             if rate > 0, pcm.length > 0 { seconds = Double(pcm.length) / rate }
         } else if let dsd = probed.dsd {

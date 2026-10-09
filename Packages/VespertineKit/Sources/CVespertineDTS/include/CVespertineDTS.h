@@ -39,3 +39,4 @@ uint64_t ndts_channel_mask(const NDTSDecoder *_Nonnull d);
 /// Frames the parser has delimited since creation or the last reset, decodable or not.
 int ndts_frames_found(const NDTSDecoder *_Nonnull d);
 #include "CVespertineFF.h"
+#include "CVespertineDST.h"

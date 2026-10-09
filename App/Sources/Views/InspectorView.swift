@@ -174,6 +174,10 @@ struct SignalPathView: View {
         if path.plan.mode != .bitstream {
             s.append(Step(title: "Decoder", detail: path.decoderName, value: src.encoding == .lossy ? "decoded" : "lossless"))
         }
+        if path.concealedFrames > 0 {
+            s.append(Step(title: "Damaged audio", detail: "Frames missing or damaged in the image, played as silence",
+                          value: "\(path.concealedFrames) × 1/75 s", tone: .changed))
+        }
 
         switch path.plan.mode {
         case .dop:

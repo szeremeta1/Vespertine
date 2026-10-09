@@ -305,3 +305,60 @@ bool nff_seek_dsd(NFFDecoder *d, int64_t offset) {
     d->position = offset;
     return ok;
 }
+
+// MARK: - DSD to PCM for raw DSD
+
+struct NFFDSDConverter {
+    AVCodecContext *ctx;
+    AVPacket *packet;
+    AVFrame *frame;
+    int channels;
+};
+
+NFFDSDConverter *nff_dsd_converter_create(int channels, int byteRate) {
+    const AVCodec *codec = avcodec_find_decoder(AV_CODEC_ID_DSD_MSBF);
+    if (!codec || channels <= 0 || byteRate <= 0) return NULL;
+    NFFDSDConverter *c = calloc(1, sizeof *c);
+    if (!c) return NULL;
+    c->channels = channels;
+    c->ctx = avcodec_alloc_context3(codec);
+    c->packet = av_packet_alloc();
+    c->frame = av_frame_alloc();
+    if (!c->ctx || !c->packet || !c->frame) { nff_dsd_converter_destroy(c); return NULL; }
+    av_channel_layout_default(&c->ctx->ch_layout, channels);
+    c->ctx->sample_rate = byteRate;
+    if (avcodec_open2(c->ctx, codec, NULL) < 0) { nff_dsd_converter_destroy(c); return NULL; }
+    return c;
+}
+
+void nff_dsd_converter_destroy(NFFDSDConverter *c) {
+    if (!c) return;
+    avcodec_free_context(&c->ctx);
+    av_packet_free(&c->packet);
+    av_frame_free(&c->frame);
+    free(c);
+}
+
+int nff_dsd_convert(NFFDSDConverter *c, const uint8_t *interleaved, int bytes, float *const *planes) {
+    if (bytes <= 0) return 0;
+    if (av_new_packet(c->packet, bytes * c->channels) < 0) return -1;
+    memcpy(c->packet->data, interleaved, (size_t)bytes * (size_t)c->channels);
+    int r = avcodec_send_packet(c->ctx, c->packet);
+    av_packet_unref(c->packet);
+    if (r < 0) return -1;
+    int written = 0;
+    while ((r = avcodec_receive_frame(c->ctx, c->frame)) == 0) {
+        AVFrame *f = c->frame;
+        int n = f->nb_samples;
+        if (written + n > bytes || f->ch_layout.nb_channels != c->channels) { av_frame_unref(f); return -1; }
+        for (int ch = 0; ch < c->channels; ch++) {
+            float *out = planes[ch] + written;
+            if (f->format == AV_SAMPLE_FMT_FLTP) memcpy(out, f->extended_data[ch], (size_t)n * sizeof(float));
+            else if (f->format == AV_SAMPLE_FMT_FLT) for (int i = 0; i < n; i++) out[i] = ((const float *)f->extended_data[0])[i * c->channels + ch];
+            else { av_frame_unref(f); return -1; }
+        }
+        written += n;
+        av_frame_unref(f);
+    }
+    return r == AVERROR(EAGAIN) || r == AVERROR_EOF ? written : -1;
+}

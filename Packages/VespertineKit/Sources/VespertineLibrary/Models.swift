@@ -157,6 +157,8 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     /// " · 5.1" for multichannel tracks, empty for mono/stereo.
     public var channelSuffix: String { channels > 2 ? " · " + ChannelLayouts.name(channels: channels) : "" }
     public var isMultichannel: Bool { channels > 2 }
+    /// For a track of an SACD image, the area it's on ("<image>#2ch-3", "<image>#mch-3").
+    public var sacdArea: SACDArea? { SACDArea(location: location) }
 
     public var formatSummary: String { baseFormatSummary + channelSuffix }
 
