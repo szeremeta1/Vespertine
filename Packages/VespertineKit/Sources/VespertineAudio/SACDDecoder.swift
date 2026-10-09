@@ -15,6 +15,8 @@ import SFBAudioEngine
 /// Every audio sector starts with a header: how many packets it holds, how many frames start in it, and whether
 /// they are DST-compressed. Each packet says whether a frame starts with it, what it holds (audio, supplementary
 /// data, padding) and how long it is; each frame start has a time code. A frame's audio is its packets in order.
+/// Only whole frames are handed back: a DST frame with all the packets it declares, a plain one with exactly its
+/// DSD. A frame cut short by a damaged sector is left out, and plays as silence (`SACDSource`).
 final class SACDFrameReader {
     struct Frame {
         var timecode: Int
@@ -51,7 +53,7 @@ final class SACDFrameReader {
         if bufferStart < 0 || s < bufferStart || (s - bufferStart + 1) * size > buffer.count {
             let count = ahead ? min(Self.readAhead, area.lastSector - s + 1) : 1
             guard count > 0 else { return nil }
-            buffer = try SACDImage.sectors(handle, s, count)
+            buffer = try SACDImage.sectors(handle, s, count, area.layout)
             bufferStart = s
             guard buffer.count >= size else { return nil }
         }
@@ -91,8 +93,7 @@ final class SACDFrameReader {
     private func peek() throws -> Frame? {
         while ready.isEmpty {
             guard sector <= area.lastSector, let data = try load(sector) else {
-                // The end of the area: what was being built is the last frame.
-                if let frame = building { ready.append(frame); building = nil; continue }
+                building = nil      // the end of the area: a frame still being built is incomplete
                 return nil
             }
             sector += 1
@@ -116,6 +117,8 @@ final class SACDFrameReader {
             infos.append((Int(data[p] & 7) << 8 | Int(data[p + 1]), Int(data[p] >> 3 & 7), data[p] & 0x80 != 0))
             p += 2
         }
+        // At most 7 packets of at most 2045 bytes: anything else is a damaged sector.
+        guard packets <= 7, infos.allSatisfy({ $0.length <= 2045 }) else { building = nil; return }
         var timecodes: [(timecode: Int, packets: Int)] = []
         for _ in 0..<starts {
             guard p + 3 <= data.endIndex else { return }
@@ -130,7 +133,7 @@ final class SACDFrameReader {
             defer { p += packet.length }
             guard packet.type == 2 else { continue }       // supplementary data, padding
             if packet.frameStart {
-                if let frame = building { ready.append(frame) }
+                // A frame still being built never got all of its audio.
                 let tc = nextStart < timecodes.count ? timecodes[nextStart].timecode : (building?.timecode ?? -1) + 1
                 packetsLeft = nextStart < timecodes.count ? timecodes[nextStart].packets : 0
                 nextStart += 1
@@ -141,18 +144,19 @@ final class SACDFrameReader {
             building!.data.append(contentsOf: data[p..<p + packet.length])
             packetsLeft -= 1
             // Complete: a DST frame once all its packets are in, a plain one at its full size.
-            if (building!.isDST && packetsLeft == 0) || (!building!.isDST && building!.data.count >= plainSize) {
+            if (building!.isDST && packetsLeft == 0) || (!building!.isDST && building!.data.count == plainSize) {
                 ready.append(building!)
                 building = nil
-            } else if building!.data.count > 1 << 16 {
-                building = nil                              // no frame is this long: a damaged image
+            } else if packetsLeft < 0 && building!.isDST || building!.data.count > (building!.isDST ? 1 << 16 : plainSize) {
+                building = nil                              // more than the frame declared, or longer than any frame: damage
             }
         }
     }
 }
 
 /// Raw DSD from an SACD area, between two frames (a track): one byte per channel per position, decoded from DST
-/// when the area is compressed. Damaged frames play as DSD silence.
+/// when the area is compressed. Damaged frames play as DSD silence, and are counted (`concealedFrames`), so the
+/// signal path doesn't claim them bit-perfect.
 final class SACDSource: RawDSDSource {
     let url: URL
     let area: SACDImage.Area
@@ -167,6 +171,8 @@ final class SACDSource: RawDSDSource {
     private var loaded = false
     private var badInARow = 0
     private(set) var isOpen = true
+    /// Frames played as silence because they were missing or damaged in the image.
+    private(set) var concealedFrames = 0
 
     init(url: URL, area: SACDImage.Area, frames: Range<Int>) throws {
         self.url = url
@@ -206,24 +212,25 @@ final class SACDSource: RawDSDSource {
         guard let f = found, f.timecode == frameIndex else {
             if let f = found { try reader.seek(toFrame: f.timecode) }   // a gap: keep the frame after it for later
             frame.withUnsafeMutableBufferPointer { _ = memset($0.baseAddress!, 0x69, $0.count) }
-            return try countBad()
+            return try conceal()
         }
         if f.isDST, let dst {
             let ok = f.data.withUnsafeBufferPointer { src in
                 frame.withUnsafeMutableBufferPointer { ndst_decode(dst, src.baseAddress!, Int32(src.count), $0.baseAddress!) }
             }
-            if ok { badInARow = 0 } else { try countBad() }
+            if ok { badInARow = 0 } else { try conceal() }
         } else if !f.isDST, f.data.count == frame.count {
             frame = f.data
             badInARow = 0
         } else {
             frame.withUnsafeMutableBufferPointer { _ = memset($0.baseAddress!, 0x69, $0.count) }
-            try countBad()
+            try conceal()
         }
     }
 
     /// A few damaged frames play as silence; a long run of them means the image can't be read.
-    private func countBad() throws {
+    private func conceal() throws {
+        concealedFrames += 1
         badInARow += 1
         if badInARow > 32 { throw SACDError.damaged("audio frames") }
     }
@@ -282,7 +289,7 @@ final class SACDSource: RawDSDSource {
 /// DSD decoder, as DSDIFF files are. Seeks start a frame early and drop it, so the converter's filter is primed
 /// with the music before the seek point: a track that follows another comes out exactly as if the area had
 /// been converted in one piece.
-final class SACDPCMDecoder: NSObject, PCMDecoding {
+final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     private let source: SACDSource
     /// Frames of DSD before the stretch this decoder plays, read only to prime the filter.
     private let leadIn: Int64
@@ -319,6 +326,7 @@ final class SACDPCMDecoder: NSObject, PCMDecoding {
     var supportsSeeking: Bool { true }
     var position: AVAudioFramePosition { frame }
     var length: AVAudioFramePosition { source.dsdLength - leadIn }
+    var concealedFrames: Int { source.concealedFrames }
     func open() throws {}
     func close() throws { try source.close() }
 

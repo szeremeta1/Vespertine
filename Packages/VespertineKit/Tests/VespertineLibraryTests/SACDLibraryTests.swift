@@ -64,6 +64,32 @@ struct SACDLibraryTests {
         #expect(try db.allTracks().filter { !$0.isMissing }.map(\.location) == [iso.path + "#2ch-1"])
     }
 
+    @Test("A disc with only a multichannel area lists its songs once, plays them, and counts its size")
+    func multichannelOnly() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let iso = dir.appendingPathComponent("Surround Only.iso")
+        let planes = SACDFixture.modulate(channels: 5, frames: 4)
+        try SACDFixture.write(to: iso, stereo: nil,
+                              multichannel: .init(channels: 5, dst: true, planes: planes,
+                                                  tracks: [.init(title: "Front", frames: 2), .init(title: "Back", frames: 2)]))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        let summary = try await scanner.scan(source)
+        #expect(summary.added == 2 && summary.failed.isEmpty)
+        let all = try db.allTracks().sorted { ($0.trackNumber ?? 0) < ($1.trackNumber ?? 0) }
+        #expect(all.map(\.location) == ["#mch-1", "#mch-2"].map { iso.path + $0 } && all.allSatisfy { $0.channels == 5 })
+        let album = try #require(try db.albums().first)
+        #expect(album.maxChannels == 5 && album.trackCount == 2)
+        #expect(album.totalSize == Int64(try iso.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0))
+        let songs = TrackVersions.group(all)
+        #expect(songs.count == 2 && TrackVersions.choose(songs[0], multichannel: false)?.sacdArea == .multichannel)
+        // With no area named, the image plays its only one.
+        let probed = try SourceInspector.inspectWithDuration(iso)
+        #expect(probed.format.channels == 5 && probed.duration == 4.0 / 75)
+    }
+
     @Test("Import & Organize files an SACD image under its disc's artist and title, under its own name")
     func organize() throws {
         let dir = try tempDir()

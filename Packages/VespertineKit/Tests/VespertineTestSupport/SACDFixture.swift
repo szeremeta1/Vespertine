@@ -49,13 +49,17 @@ public enum SACDFixture {
         /// One DSD plane per channel, covering the whole area (every track and pause), from time code `firstFrame`.
         public var planes: [[UInt8]]
         public var tracks: [TrackSpec]
-        /// The time code of the area's first frame (the first track starts here).
+        /// The time code of the area's first frame.
         public var firstFrame: Int
+        /// Frames of the area before its first track, which belong to no track. Real discs start their time codes
+        /// at 00:00:00 and the first track at 00:02:00.
+        public var leadIn: Int
         /// DST areas: store these frames uncompressed (DST's own "not compressed" frames).
         public var uncompressedFrames: Set<Int>
-        public init(channels: Int, dst: Bool, planes: [[UInt8]], tracks: [TrackSpec], firstFrame: Int = 0, uncompressedFrames: Set<Int> = []) {
+        public init(channels: Int, dst: Bool, planes: [[UInt8]], tracks: [TrackSpec], firstFrame: Int = 0, leadIn: Int = 0,
+                    uncompressedFrames: Set<Int> = []) {
             self.channels = channels; self.dst = dst; self.planes = planes; self.tracks = tracks
-            self.firstFrame = firstFrame; self.uncompressedFrames = uncompressedFrames
+            self.firstFrame = firstFrame; self.leadIn = leadIn; self.uncompressedFrames = uncompressedFrames
         }
     }
 
@@ -72,8 +76,12 @@ public enum SACDFixture {
         public init() {}
     }
 
-    /// Writes an SACD image: the stereo area first, then the multichannel one, if given.
-    public static func write(to url: URL, disc: Disc = Disc(), stereo: AreaSpec, multichannel: AreaSpec? = nil) throws {
+    /// Writes an SACD image: the stereo area first, then the multichannel one (either may be left out). As on real
+    /// discs, the Master TOC and its text are stored three times (sectors 510, 520 and 530), and each area's TOC
+    /// twice: before its audio, and again in the sectors right after its last audio sector.
+    /// `rawSectors` stores every sector in its 2064-byte physical form (12 bytes of header, 4 of error detection).
+    public static func write(to url: URL, disc: Disc = Disc(), stereo: AreaSpec?, multichannel: AreaSpec? = nil,
+                             rawSectors: Bool = false) throws {
         var image = [UInt8](repeating: 0, count: 600 * 2048)
         func put(_ bytes: [UInt8], at sector: Int, offset: Int = 0) {
             let o = sector * 2048 + offset
@@ -81,23 +89,44 @@ public enum SACDFixture {
             image.replaceSubrange(o..<o + bytes.count, with: bytes)
         }
         let tocSize = 6
-        var areas: [(toc: Int, size: Int)] = []
+        var areas: [AreaPointer?] = [nil, nil]
         var next = 540
-        for (index, spec) in [stereo, multichannel].compactMap({ $0 }).enumerated() {
+        for (index, spec) in [stereo, multichannel].enumerated() {
+            guard let spec else { continue }
             let toc = next
             let audioStart = toc + tocSize + 4
             let (sectors, trackSectors) = audioSectors(spec)
             for (i, s) in sectors.enumerated() { put(s, at: audioStart + i) }
             let audioEnd = audioStart + sectors.count - 1
-            for (i, s) in areaTOC(spec, multichannel: index == 1, disc: disc, size: tocSize, audio: audioStart...audioEnd,
-                                  trackSectors: trackSectors.map { (audioStart + $0.start, $0.length) }).enumerated() { put(s, at: toc + i) }
-            areas.append((toc, tocSize))
-            next = audioEnd + 20
+            let tocSectors = areaTOC(spec, multichannel: index == 1, disc: disc, size: tocSize, audio: audioStart...audioEnd,
+                                     trackSectors: trackSectors.map { (audioStart + $0.start, $0.length) })
+            for (i, s) in tocSectors.enumerated() { put(s, at: toc + i); put(s, at: audioEnd + 1 + i) }
+            areas[index] = AreaPointer(toc: toc, copy: audioEnd + 1, size: tocSize)
+            next = audioEnd + 1 + tocSize + 20
         }
-        put(masterTOC(disc, areas: areas), at: 510)
-        put(masterText(disc), at: 511)
+        for sector in [510, 520, 530] {
+            put(masterTOC(disc, stereo: areas[0], multichannel: areas[1]), at: sector)
+            put(masterText(disc), at: sector + 1)
+        }
+        if rawSectors {
+            var raw: [UInt8] = []
+            raw.reserveCapacity(image.count / 2048 * 2064)
+            for lsn in 0..<image.count / 2048 {
+                let id = lsn + 0x30000      // the physical sector number, as a disc's ID field has it
+                raw += [0, UInt8(id >> 16 & 0xFF), UInt8(id >> 8 & 0xFF), UInt8(id & 0xFF)] + [UInt8](repeating: 0xA5, count: 8)
+                raw += image[lsn * 2048..<(lsn + 1) * 2048]
+                raw += [0xED, 0xC0, 0xED, 0xC0]
+            }
+            image = raw
+        }
         try Data(image).write(to: url)
     }
+
+    /// Where an area's TOC is, and its copy.
+    struct AreaPointer { var toc: Int; var copy: Int; var size: Int }
+
+    /// Where the Master TOC (or one of its copies) is in a plain image, by sector: 510, 520, 530.
+    public static func masterTOCOffset(copy: Int) -> Int { (510 + 10 * copy) * 2048 }
 
     // MARK: TOC sectors
 
@@ -115,15 +144,15 @@ public enum SACDFixture {
         return s
     }
 
-    static func masterTOC(_ disc: Disc, areas: [(toc: Int, size: Int)]) -> [UInt8] {
+    static func masterTOC(_ disc: Disc, stereo: AreaPointer?, multichannel: AreaPointer?) -> [UInt8] {
         sector { s in
             func at(_ o: Int, _ b: [UInt8]) { s.replaceSubrange(o..<o + b.count, with: b) }
             at(0, Array("SACDMTOC".utf8)); at(8, [1, 20])
             at(16, be16(1)); at(18, be16(1))
             at(24, padded(disc.catalog, 16))
             at(40, [1, 0, 0, disc.genre])
-            if let a = areas.first { at(64, be32(a.toc)); at(68, be32(0)); at(84, be16(a.size)) }
-            if areas.count > 1 { at(72, be32(areas[1].toc)); at(76, be32(0)); at(86, be16(areas[1].size)) }
+            if let a = stereo { at(64, be32(a.toc)); at(68, be32(a.copy)); at(84, be16(a.size)) }
+            if let a = multichannel { at(72, be32(a.toc)); at(76, be32(a.copy)); at(86, be16(a.size)) }
             at(88, padded(disc.catalog, 16))
             at(104, [1, 0, 0, disc.genre])
             at(120, be16(disc.year)); at(122, [UInt8(disc.month), UInt8(disc.day)])
@@ -150,7 +179,7 @@ public enum SACDFixture {
     static func areaTOC(_ spec: AreaSpec, multichannel: Bool, disc: Disc, size: Int, audio: ClosedRange<Int>,
                         trackSectors: [(start: Int, length: Int)]) -> [[UInt8]] {
         let count = spec.tracks.count
-        var starts: [Int] = [], t = spec.firstFrame
+        var starts: [Int] = [], t = spec.firstFrame + spec.leadIn
         for track in spec.tracks { starts.append(t); t += track.frames + track.pauseAfter }
         let toc = sector { s in
             func at(_ o: Int, _ b: [UInt8]) { s.replaceSubrange(o..<o + b.count, with: b) }
@@ -158,7 +187,7 @@ public enum SACDFixture {
             at(16, be32(spec.channels * 4704 * 75))
             at(20, [4, spec.dst ? 0 : 2])
             at(32, [UInt8(spec.channels), UInt8(spec.channels == 6 ? 4 << 3 : spec.channels == 5 ? 3 << 3 : 0), UInt8(spec.channels)])
-            at(64, timecode(t - spec.firstFrame))
+            at(64, timecode(t))                    // total play time: on real discs, where the last track ends
             at(69, [UInt8(count)])
             at(72, be32(audio.lowerBound)); at(76, be32(audio.upperBound))
             at(80, [1]); at(88, Array("en".utf8) + [disc.charset, 0])
@@ -251,7 +280,7 @@ public enum SACDFixture {
             return s + [UInt8](repeating: 0, count: 2048 - s.count)
         }
         var trackSectors: [(Int, Int)] = []
-        var t = 0
+        var t = spec.leadIn
         for track in spec.tracks {
             let first = frameSector[t] ?? 0
             let endFrame = t + track.frames + track.pauseAfter

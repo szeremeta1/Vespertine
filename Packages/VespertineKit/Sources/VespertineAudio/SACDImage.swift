@@ -42,6 +42,17 @@ public struct SACDImage: Sendable, Hashable {
     /// SACD audio is divided into frames of 1/75 s.
     public static let framesPerSecond = 75
     static let masterTOCSector = 510
+    /// The Master TOC and its two copies.
+    static let masterTOCSectors = [masterTOCSector, masterTOCSector + 10, masterTOCSector + 20]
+
+    /// How the file stores each 2048-byte sector: on its own (the usual .iso), or inside the disc's 2064-byte
+    /// physical sector, after 12 bytes of header and before 4 of error detection (raw rips).
+    public struct SectorLayout: Sendable, Hashable {
+        public var stride: Int
+        public var offset: Int
+        public static let plain = SectorLayout(stride: 2048, offset: 0)
+        public static let raw = SectorLayout(stride: 2064, offset: 12)
+    }
 
     public struct Track: Sendable, Hashable {
         public var number: Int
@@ -71,6 +82,7 @@ public struct SACDImage: Sendable, Hashable {
         public var lastSector: Int
         public var tracks: [Track]
         public var copyright: String?
+        public var layout = SectorLayout.plain
 
         /// DSD bytes per channel in one frame (4704 for DSD64).
         public var frameBytes: Int { Int(sampleRate) / SACDImage.framesPerSecond / 8 }
@@ -113,8 +125,10 @@ public struct SACDImage: Sendable, Hashable {
     public static func isSACD(_ url: URL) -> Bool {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
         defer { try? handle.close() }
-        return [masterTOCSector, masterTOCSector + 10, masterTOCSector + 20].contains { sector in
-            (try? Self.sectors(handle, sector, 1)).map { $0.starts(with: Array("SACDMTOC".utf8)) } ?? false
+        return [SectorLayout.plain, .raw].contains { layout in
+            masterTOCSectors.contains { sector in
+                (try? Self.sectors(handle, sector, 1, layout)).map { $0.starts(with: Array("SACDMTOC".utf8)) } ?? false
+            }
         }
     }
 
@@ -124,20 +138,47 @@ public struct SACDImage: Sendable, Hashable {
         return try read(handle)
     }
 
-    static func sectors(_ handle: FileHandle, _ first: Int, _ count: Int) throws -> [UInt8] {
-        try handle.seek(toOffset: UInt64(first) * UInt64(sectorSize))
-        return [UInt8](try handle.read(upToCount: count * sectorSize) ?? Data())
+    /// Sectors `first` to `first + count - 1`, their 2048 bytes each, one after another (fewer at the end of the file).
+    static func sectors(_ handle: FileHandle, _ first: Int, _ count: Int, _ layout: SectorLayout = .plain) throws -> [UInt8] {
+        try handle.seek(toOffset: UInt64(first) * UInt64(layout.stride))
+        let data = [UInt8](try handle.read(upToCount: count * layout.stride) ?? Data())
+        guard layout != .plain else { return data }
+        var out: [UInt8] = []
+        out.reserveCapacity(count * sectorSize)
+        var p = layout.offset
+        while p + sectorSize <= data.count {
+            out.append(contentsOf: data[p..<p + sectorSize])
+            p += layout.stride
+        }
+        return out
     }
 
     static func read(_ handle: FileHandle) throws -> SACDImage {
-        // The Master TOC is stored three times; the first good copy counts.
-        var found: (toc: [UInt8], sector: Int)?
-        for sector in [masterTOCSector, masterTOCSector + 10, masterTOCSector + 20] {
-            let toc = try sectors(handle, sector, 1)
-            if toc.count == sectorSize, toc.starts(with: Array("SACDMTOC".utf8)) { found = (toc, sector); break }
+        // The Master TOC is stored three times. The first copy whose every area can be read counts; when none is
+        // whole (damage in all three), the one that leads to the most areas.
+        var sawTOC = false
+        var best: SACDImage?
+        for layout in [SectorLayout.plain, .raw] {
+            for sector in masterTOCSectors {
+                let m = try sectors(handle, sector, 1, layout)
+                guard m.count == sectorSize, m.starts(with: Array("SACDMTOC".utf8)) else { continue }
+                sawTOC = true
+                let (image, whole) = try read(handle, masterTOC: m, sector: sector, layout: layout)
+                if whole { return image }
+                if image.areas.count > best?.areas.count ?? 0 { best = image }
+            }
+            if sawTOC { break }
         }
-        guard let (m, tocSector) = found else { throw SACDError.notSACD }
+        guard sawTOC else { throw SACDError.notSACD }
+        guard let best else { throw SACDError.noArea }
+        return best
+    }
+
+    /// The image one copy of the Master TOC describes, and whether that copy is whole: a Scarlet Book 1.x TOC
+    /// whose every area points to a readable area TOC.
+    static func read(_ handle: FileHandle, masterTOC m: [UInt8], sector tocSector: Int, layout: SectorLayout) throws -> (SACDImage, whole: Bool) {
         var image = SACDImage(areas: [])
+        var whole = m[8] == 1
         let setSize = Int(be16(m, 16)), sequence = Int(be16(m, 18))
         if setSize > 1, (1...setSize).contains(sequence) { image.discNumber = sequence; image.discTotal = setSize }
         image.catalogNumber = Self.text(Array(m[24..<40]), charset: 1) ?? Self.text(Array(m[88..<104]), charset: 1)
@@ -149,7 +190,7 @@ public struct SACDImage: Sendable, Hashable {
         let textAreas = Int(m[128])
         if textAreas > 0 {
             let charset = m[138] & 0x07
-            let t = try sectors(handle, tocSector + 1, 1)
+            let t = try sectors(handle, tocSector + 1, 1, layout)
             if t.count == sectorSize, t.starts(with: Array("SACDText".utf8)) {
                 func field(_ index: Int) -> String? {
                     let position = Int(be16(t, 16 + 2 * index))
@@ -163,19 +204,16 @@ public struct SACDImage: Sendable, Hashable {
 
         // The 2-channel area's TOC, then the multichannel one's (each also stored twice).
         for (start1, start2, size) in [(be32(m, 64), be32(m, 68), be16(m, 84)), (be32(m, 72), be32(m, 76), be16(m, 86))] {
-            for start in [start1, start2] where start > 0 && size > 0 {
-                if let area = try? readArea(handle, sector: Int(start), sectors: Int(size)) {
-                    if image.area(area.kind) == nil { image.areas.append(area) }
-                    break
-                }
-            }
+            guard start1 > 0 || start2 > 0 else { continue }       // no such area
+            let area = size == 0 ? nil : [start1, start2].lazy.filter { $0 > 0 }
+                .compactMap { try? readArea(handle, sector: Int($0), sectors: Int(size), layout: layout) }.first
+            if let area, image.area(area.kind) == nil { image.areas.append(area) } else { whole = false }
         }
-        guard !image.areas.isEmpty else { throw SACDError.noArea }
-        return image
+        return (image, whole && !image.areas.isEmpty)
     }
 
-    static func readArea(_ handle: FileHandle, sector: Int, sectors count: Int) throws -> Area {
-        let data = try sectors(handle, sector, min(count, 256))
+    static func readArea(_ handle: FileHandle, sector: Int, sectors count: Int, layout: SectorLayout = .plain) throws -> Area {
+        let data = try sectors(handle, sector, min(count, 256), layout)
         guard data.count >= sectorSize else { throw SACDError.damaged("area TOC") }
         let isTwo = data.starts(with: Array("TWOCHTOC".utf8)), isMulti = data.starts(with: Array("MULCHTOC".utf8))
         guard isTwo || isMulti else { throw SACDError.damaged("area TOC") }
@@ -190,11 +228,11 @@ public struct SACDImage: Sendable, Hashable {
         guard trackCount > 0, last >= first else { throw SACDError.damaged("track list") }
         let charset = data[90] & 0x07
         var area = Area(kind: kind, channels: channels, sampleRate: Double(fs) * 16 * 44_100, isDST: frameFormat == 0,
-                        firstSector: first, lastSector: last, tracks: [])
+                        firstSector: first, lastSector: last, tracks: [], layout: layout)
         let copyrightOffset = Int(be16(data, 146))
         if copyrightOffset > 0 { area.copyright = string(data, at: copyrightOffset, charset: charset) }
 
-        var starts: [Int]?, durations: [Int]?
+        var starts: [Int?]?, durations: [Int?]?
         var texts: [Int: [UInt8: String]] = [:]
         var isrcs: [Int: String] = [:], genres: [Int: String] = [:]
         var sawText = false
@@ -226,13 +264,19 @@ public struct SACDImage: Sendable, Hashable {
             }
             p += sectorSize
         }
-        guard let starts, let durations else { throw SACDError.damaged("track times") }
+        // Every time code valid, the tracks in order, and the last one with a length.
+        guard let starts = starts.map({ $0.compactMap { $0 } }), let durations = durations.map({ $0.compactMap { $0 } }),
+              starts.count == trackCount, durations.count == trackCount,
+              zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }), durations[trackCount - 1] > 0
+        else { throw SACDError.damaged("track times") }
+        // The area's playing time, when it has one, bounds the last track.
+        let total = timecode(data, 64) ?? 0
         for i in 0..<trackCount {
             // Up to the next track's start, so a pause between tracks stays with the one before it and the
             // tracks play on without a gap; the last track ends with its own duration.
-            let next = i + 1 < trackCount ? starts[i + 1] - starts[i] : 0
-            let length = next > 0 ? next : durations[i]
-            guard length > 0 else { continue }
+            var end = i + 1 < trackCount ? starts[i + 1] : starts[i] + durations[i]
+            if i + 1 == trackCount, total > starts[i] { end = min(end, total) }
+            let length = end - starts[i]
             let t = texts[i] ?? [:]
             area.tracks.append(Track(number: i + 1, startFrame: starts[i], frameCount: length, title: t[0x01], performer: t[0x02],
                                      songwriter: t[0x03], composer: t[0x04], arranger: t[0x05], message: t[0x06],
@@ -300,9 +344,9 @@ public struct SACDImage: Sendable, Hashable {
         return Int(code) < names.count ? names[Int(code)] : nil
     }
 
-    /// minutes, seconds, frames → frames.
-    static func timecode(_ d: [UInt8], _ o: Int) -> Int {
-        guard o + 3 <= d.count else { return 0 }
+    /// minutes, seconds, frames → frames; nil for seconds or frames out of range (a damaged TOC).
+    static func timecode(_ d: [UInt8], _ o: Int) -> Int? {
+        guard o + 3 <= d.count, d[o + 1] < 60, Int(d[o + 2]) < framesPerSecond else { return nil }
         return (Int(d[o]) * 60 + Int(d[o + 1])) * framesPerSecond + Int(d[o + 2])
     }
 

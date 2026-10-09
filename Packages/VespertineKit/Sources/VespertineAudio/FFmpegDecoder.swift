@@ -132,6 +132,17 @@ protocol RawDSDSource: AnyObject {
     func readDSD(into planes: UnsafeMutablePointer<UnsafeMutablePointer<UInt8>>, bytes: Int) throws -> Int
     func seekDSD(to position: Int64) throws
     func close() throws
+    /// Frames replaced by silence because they were damaged (0 for sources that never conceal).
+    var concealedFrames: Int { get }
+}
+
+extension RawDSDSource {
+    var concealedFrames: Int { 0 }
+}
+
+/// A decoder that can play damaged stretches of its file as silence, and counts how many frames it has.
+protocol ConcealingDecoder: AnyObject {
+    var concealedFrames: Int { get }
 }
 
 /// DSF and DSDIFF files, read raw through FFmpeg's demuxers.
@@ -153,7 +164,7 @@ extension FFmpegDecoder: RawDSDSource {
 
 /// DSD over PCM from the raw 1-bit stream (any DSD rate): 16 DSD bits per channel per frame, behind the
 /// alternating 0x05 / 0xFA marker, as 24-bit samples (carried exactly in Float32). Positions are DoP frames.
-final class RawDoPDecoder: NSObject, PCMDecoding {
+final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     private let source: RawDSDSource
     private var frame: AVAudioFramePosition = 0
     /// 1 swaps which frames carry 0x05 and which 0xFA (see `nextMarker`).
@@ -199,6 +210,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
     var supportsSeeking: Bool { true }
     var position: AVAudioFramePosition { frame }
     var length: AVAudioFramePosition { source.dsdLength / 2 }
+    var concealedFrames: Int { source.concealedFrames }
     func open() throws {}
     func close() throws { try source.close() }
     func decode(into buffer: AVAudioBuffer) throws {

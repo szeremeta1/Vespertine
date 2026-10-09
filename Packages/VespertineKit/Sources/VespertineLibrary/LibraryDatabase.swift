@@ -304,9 +304,11 @@ public extension LibraryDatabase {
                max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,
                max(codec) AS codec, count(DISTINCT codec) AS codecCount, min(isLossless) AS lossless, max(bitrate) AS bitrate,
                max(addedAt) AS addedAt,
-               -- a CUE-split file counts once (with its first track), not once per track; an SACD image once, with its
-               -- stereo area's first track (every SACD has a stereo area)
-               sum(CASE WHEN location LIKE '%#2ch-1' THEN fileSize WHEN location LIKE '%#2ch-%' OR location LIKE '%#mch-%' THEN 0
+               -- a CUE-split file counts once (with its first track), not once per track; an SACD image once, with
+               -- whichever of its tracks comes first (#2ch-1 usually, #mch-1 on a disc with only a multichannel area)
+               sum(CASE WHEN location LIKE '%#2ch-%' OR location LIKE '%#mch-%' THEN
+                            CASE WHEN location = (SELECT min(image.location) FROM track AS image WHERE image.albumKey = track.albumKey
+                                                  AND image.filePath = track.filePath AND image.isMissing = 0) THEN fileSize ELSE 0 END
                         WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
                min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey,
                -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')

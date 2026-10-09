@@ -222,7 +222,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private struct Segment {
         let id = UUID()
         let item: PlayableItem
-        let path: SignalPath
+        var path: SignalPath
         let startRingFrame: UInt64
         let startOffsetSeconds: Double
         let durationSeconds: Double
@@ -1068,6 +1068,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(decoding.path.plan.channels))
             }
             _ = nrt_ring_write(session.ring, data, frames)
+        }
+        // Damaged frames played as silence (SACD images): the track's signal path stops claiming bit-perfect.
+        if let concealing = decoding.decoder as? ConcealingDecoder, concealing.concealedFrames > 0,
+           let index = segments.lastIndex(where: { $0.item.id == decoding.item.id }) {
+            segments[index].path.concealedFrames = concealing.concealedFrames
         }
         if status == .error || status == .endOfStream || (decoding.inputExhausted && frames == 0) {
             decoding.finished = true
