@@ -464,7 +464,7 @@ struct CutoffSweep: View {
     // Measured in the recording (window points): the spectrum's plot panel and the app's dashed cutoff line.
     // Everything here stays inside the panel and is clipped to its rounded corners.
     static let plot = CGRect(x: 1112 - AnalysisScene.spectrum.minX, y: 503 - AnalysisScene.spectrum.minY, width: 308, height: 139.5)
-    static let cutoffX: CGFloat = 1361.25 - 1112
+    static let cutoffX: CGFloat = 1355.25 - 1112   // 1.0 re-recording: the fake from score.py cuts off at ~16.1 kHz
     static let corner: CGFloat = 6
 
     var body: some View {
@@ -501,9 +501,10 @@ struct LibraryScene: View {
     let assets: Assets
     let frame: CGImage?
 
-    static let columns: [CGFloat] = [256, 450, 644, 838, 1032, 1227]
-    static let rows: [CGFloat] = [176, 438]   // 0.6.4: the filter bar sits 2 pt lower
-    static let card = CGSize(width: 172, height: 236)   // cover, title, artist and format
+    // 1.0: covers are 175 pt (the grid gained 3 pt per card), 197 pt apart; the filter bar is where 0.6.4 put it.
+    static let columns: [CGFloat] = [256, 453, 650, 847, 1044, 1241]
+    static let rows: [CGFloat] = [176, 441]
+    static let card = CGSize(width: 175, height: 239)   // cover, title, artist and format
 
     var body: some View {
         let g = Geo(size: size)
