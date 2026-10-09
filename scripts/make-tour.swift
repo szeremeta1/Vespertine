@@ -31,22 +31,22 @@ let full = CGRect(x: 0, y: 0, width: 2400, height: 1500)
 let shots: [Shot] = [
     Shot(file: "docs/screenshots/multichannel-albums.png", from: full,
          to: CGRect(x: 520, y: 150, width: 1600, height: 1000),
-         caption: "Your library, every format: SACD, DTS CDs, 5.1 FLAC, DSD"),
+         caption: "Your surround library: SACD rips, DTS CDs and 5.1 FLAC"),
     Shot(file: "docs/screenshots/bit-perfect-fiio-24-192.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "BIT-PERFECT appears only when its conditions are met"),
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
-         caption: "DSD64 to DSD512, native over DoP on DACs that accept it"),
+         caption: "DSD64 over DoP, checked on a FiiO K11"),
     Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
          to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
     Shot(file: "docs/screenshots/spatial-audio-airpods-max.png", from: CGRect(x: 600, y: 375, width: 1800, height: 1125),
          to: CGRect(x: 1380, y: 635, width: 1020, height: 637.5),
-         caption: "A 5.1 SACD as head-tracked Spatial Audio on AirPods Max"),
+         caption: "SACD 5.1 tracks as Spatial Audio on AirPods Max"),
     Shot(file: "docs/screenshots/fake-hi-res-detection.png", from: CGRect(x: 1340, y: 170, width: 1060, height: 662.5),
          to: CGRect(x: 1340, y: 560, width: 1060, height: 662.5),
-         caption: "Flags upsampled, lossy-sourced and “AI-enhanced” files"),
+         caption: "Hi-res analysis shows evidence, with limits"),
 ]
 let images = shots.map { image($0.file) }
 let lockup = image("docs/brand/logo.png")   // crescent + "vespertine", with its clear space
@@ -141,9 +141,9 @@ func drawEndCard(alpha: CGFloat) {
                            endCenter: CGPoint(x: W / 2, y: Int(Double(H) * 0.58)), endRadius: 460 * scale, options: [])
     let lockupW = 640 * scale, lockupH = lockupW * CGFloat(lockup.height) / CGFloat(lockup.width)
     ctx.draw(lockup, in: CGRect(x: (CGFloat(W) - lockupW) / 2, y: CGFloat(H) - 196 * scale - lockupH, width: lockupW, height: lockupH))
-    _ = draw("The free, bit-perfect music player for Mac", font: serif(30), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 470 * scale)
+    _ = draw("Free Mac player for surround and hi-res collections", font: serif(30), color: color(0xECE6DA), centerX: CGFloat(W) / 2, baselineFromTop: 470 * scale)
     let mono = openFont("JetBrains Mono", 17, weight: 400)
-    _ = draw("OPEN SOURCE · GPL-3.0 · MACOS 26+", font: mono, color: color(0xA29B8F), centerX: CGFloat(W) / 2, baselineFromTop: 540 * scale, kern: 2 * scale)
+    _ = draw("OPEN SOURCE · GPL-3.0 · MACOS 14.4+", font: mono, color: color(0xA29B8F), centerX: CGFloat(W) / 2, baselineFromTop: 540 * scale, kern: 2 * scale)
     _ = draw("github.com/szeremeta1/Vespertine", font: openFont("Inter", 20, weight: 500), color: color(0xC8A66A), centerX: CGFloat(W) / 2, baselineFromTop: 590 * scale)
     ctx.restoreGState()
 }

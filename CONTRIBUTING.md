@@ -2,10 +2,14 @@
 
 Thanks for helping. Vespertine is a one-maintainer project, so the most useful things you can send are clear reports from real hardware and small, focused pull requests.
 
+## Release cadence
+
+Betas ship at most weekly; the 1.0 freeze starts November 3, 2026.
+
 ## Reports
 
 - **Something broke:** [open a bug report](https://github.com/szeremeta1/Vespertine/issues/new?template=bug_report.yml). Include the Vespertine version (Vespertine › About Vespertine), your macOS version and Mac, the output device, and what the signal path said.
-- **Your DAC, receiver or interface, working or not:** [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml). Reports from multichannel interfaces, AV receivers, Intel Macs and DSD DACs other than the FiiO K11 are especially welcome, because none of those have been tested yet. [docs/VERIFICATION.md](docs/VERIFICATION.md) explains how to check bit-perfect playback yourself.
+- **Your DAC, receiver or interface, working or not:** [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml). Multichannel DAC output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. Intel Macs and DSD DACs other than the FiiO K11 are also untested. [docs/VERIFICATION.md](docs/VERIFICATION.md) explains how to check bit-perfect playback yourself.
 - **An idea or a question:** start a [discussion](https://github.com/szeremeta1/Vespertine/discussions) first, so we can agree on the shape of it before anyone writes code.
 - **A security problem:** report it privately, as [SECURITY.md](SECURITY.md) describes, not in a public issue.
 

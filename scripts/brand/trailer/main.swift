@@ -226,7 +226,7 @@ func renderIntro() async throws {
             Brand.fillBrass(ctx, Brand.crescent(size: m)); ctx.restoreGState()
             ctx.saveGState(); ctx.translateBy(x: x0 + m + gap, y: baseline); ctx.addPath(word.path)
             ctx.setFillColor(Brand.color(Brand.text, ramp(t, 1.2, 2.5))); ctx.fillPath(); ctx.restoreGState()
-            fillText(ctx, "A BIT-PERFECT MUSIC PLAYER FOR MACOS", Brand.mono(square ? 17 : 19, weight: 500), Brand.brass, ramp(t, 2.1, 3.0),
+            fillText(ctx, "SURROUND AND HI-RES MUSIC FOR MAC", Brand.mono(square ? 17 : 19, weight: 500), Brand.brass, ramp(t, 2.1, 3.0),
                      x: w / 2, baseline: baseline - size * 0.78, tracking: 0.22, center: true)
         }
     }
