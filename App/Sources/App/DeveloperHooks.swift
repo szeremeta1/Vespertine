@@ -57,7 +57,8 @@ enum DeveloperHooks {
         guard open != nil || play != nil || d.object(forKey: "VespertineInspectorTab") != nil || d.bool(forKey: "VespertineOpenMini")
                 || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
                 || d.string(forKey: "VespertineOpenSheet") != nil || d.string(forKey: "VespertineFilter") != nil
-                || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil else { return }
+                || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil
+                || d.string(forKey: "VespertinePlaySong") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -125,6 +126,29 @@ enum DeveloperHooks {
             if d.double(forKey: "VespertinePauseAfter") > 0 {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
                 model.player.engine.pause()
+            }
+        }
+        // `-VespertinePlaySong "Title|Artist|DSD"`: opens and plays the album holding that song, from that song. Artist and
+        // a format word (matched against the format summary, e.g. "5.1", "DSD128", "24/96") are optional and pick one
+        // version where the library has several.
+        if let spec = d.string(forKey: "VespertinePlaySong") {
+            let parts = spec.split(separator: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+            let matches = { (t: Track) -> Bool in
+                t.title.localizedCaseInsensitiveCompare(parts[0]) == .orderedSame
+                    && (parts.count < 2 || parts[1].isEmpty || t.displayAlbumArtist.localizedCaseInsensitiveContains(parts[1]))
+                    && (parts.count < 3 || t.formatSummary.localizedCaseInsensitiveContains(parts[2]))
+            }
+            if let song = model.library.allTracks().first(where: matches) {
+                let tracks = model.library.tracks(albumKey: song.albumKey)
+                model.openAlbum(song.albumKey)
+                model.player.play(tracks, startAt: tracks.firstIndex { $0.id == song.id } ?? 0)
+                print("[qa] play song: \(song.displayAlbumArtist) — \(song.displayAlbum) — \(song.title) · \(song.formatSummary)")
+                if d.double(forKey: "VespertinePauseAfter") > 0 {
+                    try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
+                    model.player.engine.pause()
+                }
+            } else {
+                print("[qa] play song: no match for \(spec)")
             }
         }
         if let select = d.string(forKey: "VespertineSelectTracks"), let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {
