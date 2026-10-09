@@ -174,20 +174,20 @@ struct PlannerAdapter: RatePlanner {
 /// SignalPath.statusLine (SignalPath.swift), fed the way OutputSession fills in AppliedFormat.
 ///
 /// OutputSession needs a real device, so the readback step is reproduced here from OutputSession.swift, line by
-/// line, and nothing else is added (the line numbers are those of 98cad1a):
-/// - a failed nominal-rate read is replaced by the requested rate (line 94), but every output stream's virtual
-///   format must then carry that rate (lines 99, 109-111). The stream format is a second reading of the device's
+/// line, and nothing else is added (the line numbers are those of OutputSession.swift with the F-01 fix):
+/// - a failed nominal-rate read is replaced by the requested rate (line 97), but every output stream's virtual
+///   format must then carry that rate (lines 102, 113-115). The stream format is a second reading of the device's
 ///   rate, so when the system reports no rate (`nominalRate` nil) it can't confirm the requested one and the
 ///   session isn't opened. (A nominal-rate read that fails while the streams still report the rate opens only if
 ///   they carry the requested rate; the contract's one rate field can't express that case.)
 /// - a failed physical-format read is replaced by the planned bit depth, and the format is assumed integer
-///   (lines 129-130);
+///   (lines 133-134), but the format is marked unconfirmed (line 105), which keeps the path from being bit-perfect;
 /// - the device is held exclusively when the hog-mode owner read back is this process; a failed read counts as
-///   −1, no owner (DeviceControl.hogOwner and acquireHog, lines 318-331);
-/// - integer mode is in effect only for PCM with the device held (line 98);
+///   −1, no owner (DeviceControl.hogOwner and acquireHog, lines 323-336);
+/// - integer mode is in effect only for PCM with the device held (line 101);
 /// - the session isn't opened (so there is no badge) when the device carries fewer channels than planned or the
-///   rate read back isn't a usable rate (lines 111-117), or, for DoP and bitstream, when the device isn't held,
-///   the physical format is under 24 (DoP) or 16 bits, or the rate read back differs from the plan (lines 118-123).
+///   rate read back isn't a usable rate (lines 115-121), or, for DoP and bitstream, when the device isn't held,
+///   the physical format is under 24 (DoP) or 16 bits, or the rate read back differs from the plan (lines 122-127).
 /// The device class picks a device name and transport, and DeviceProfile.detect classifies it as for a real
 /// device. (AirPods Max over Bluetooth would classify as USB-C if an AirPods Max USB audio interface were attached
 /// to the Mac running the tests.)
@@ -226,7 +226,8 @@ struct SignalPathVerdict: BadgeVerdict {
             virtualChannels: i.readback.deviceChannels,
             exclusive: hogged,
             bufferFrames: 512,
-            integerMode: plan.integerSamples && hogged && mode == .pcm)
+            integerMode: plan.integerSamples && hogged && mode == .pcm,
+            physicalFormatKnown: physical != nil)
 
         let device = Self.device(i.deviceClass)
         let volume: SignalPath.VolumeStage = switch i.processing.volume {

@@ -1,0 +1,128 @@
+--- round1/VerdictChecks.swift
++++ round2/VerdictChecks.swift
+@@ -40,32 +40,57 @@
+             }
+         },
+ 
+-        // REQ: BPV-012, BPV-015, BPV-016
+-        Check("shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+-              requirements: ["BPV-012", "BPV-015", "BPV-016"]) { subject, checker in
++        // REQ: BPV-012, BPV-015
++        Check("PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
++              requirements: ["BPV-012", "BPV-015"]) { subject, checker in
++            // Without the device held the player uses the float path (integer mode off), so only files of at most
++            // 24 bits qualify (BPV-005).
+             for x0 in cleanPCMPaths() {
+-                var x = x0
+-                x.readback.hogOwnerPID = -1
++                guard let bits = x0.source.bitDepth, bits <= 24 else { continue }
++                var x = withHogOwner(x0, -1)
+                 x.processing.otherAppsPlaying = false
+                 let badge = subject.verdict(x)
+                 checker.expect(isExactly(badge, Badge.bitPerfect), "BPV-015",
+                                "no process holds the device and no other app plays (BPV-008 met): \(report(badge, x))")
+             }
+             for x0 in airPodsMaxUSBCPaths() {
+-                var x = x0
+-                x.readback.hogOwnerPID = -1
++                var x = withHogOwner(x0, -1)
+                 x.processing.otherAppsPlaying = false
+                 let badge = subject.verdict(x)
+                 checker.expect(isExactly(badge, Badge.bitPerfect), "BPV-012",
+                                "AirPods Max on USB-C, 48 kHz file, nobody holds the device, no other app plays (BPV-008 met): \(report(badge, x))")
+             }
++        },
++
++        // REQ: BPV-016
++        Check("DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing",
++              requirements: ["BPV-016"]) { subject, checker in
+             for x0 in cleanDoPPaths() {
+-                var x = x0
+-                x.readback.hogOwnerPID = -1
+-                x.processing.otherAppsPlaying = false
+-                let badge = subject.verdict(x)
+-                checker.expect(isExactly(badge, Badge.nativeDoP), "BPV-016",
+-                               "no process holds the device and no other app plays (BPV-008 holds): \(report(badge, x))")
++                for hog in foreignHogOwners(own: x0.readback.ownPID) {
++                    for othersPlaying in [false, true] {
++                        var x = withHogOwner(x0, hog)
++                        x.processing.otherAppsPlaying = othersPlaying
++                        let badge = subject.verdict(x)
++                        checker.expect(!looksNativeDoP(badge), "BPV-016",
++                                       "hog owner \(hog.map { String($0) } ?? "unread") is not the player (\(x.readback.ownPID)): \(report(badge, x))")
++                    }
++                }
++            }
++        },
++
++        // REQ: BPV-017
++        Check("bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing",
++              requirements: ["BPV-017"]) { subject, checker in
++            for x0 in bitstreamPaths() {
++                for hog in foreignHogOwners(own: x0.readback.ownPID) {
++                    for othersPlaying in [false, true] {
++                        var x = withHogOwner(x0, hog)
++                        x.processing.otherAppsPlaying = othersPlaying
++                        let badge = subject.verdict(x)
++                        checker.expect(!looksBitstream(badge), "BPV-017",
++                                       "hog owner \(hog.map { String($0) } ?? "unread") is not the player (\(x.readback.ownPID)): \(report(badge, x))")
++                    }
++                }
+             }
+         },
+ 
+@@ -246,6 +271,14 @@
+                     b = subject.verdict(x)
+                     checker.expect(!looksBitPerfect(b), "BPV-005",
+                                    "\(sourceBits)-bit file without integer mode (32-bit float device): \(report(b, x))")
++
++                    // Shared mode, nobody else playing: the player can't use integer mode (contract, BPV-018).
++                    var shared = withHogOwner(x, -1)
++                    shared.readback.physicalIsInteger = true
++                    shared.processing.otherAppsPlaying = false
++                    b = subject.verdict(shared)
++                    checker.expect(!looksBitPerfect(b), "BPV-005",
++                                   "\(sourceBits)-bit file in shared mode, so without integer mode: \(report(b, shared))")
+                 }
+                 var deep = x0
+                 deep.source.bitDepth = 32
+@@ -388,9 +421,8 @@
+         Check("another app playing to a device nobody holds exclusively rules out every untouched badge",
+               requirements: ["BPV-008"]) { subject, checker in
+             for x0 in everyModeBases() {
+-                var x = x0
++                var x = withHogOwner(x0, -1)
+                 x.processing.otherAppsPlaying = true
+-                x.readback.hogOwnerPID = -1
+                 let b = subject.verdict(x)
+                 checker.expect(!claimsUntouched(b), "BPV-008", "another app plays, no hog owner: \(report(b, x))")
+             }
+@@ -402,9 +434,8 @@
+             for x0 in everyModeBases() {
+                 let own = x0.readback.ownPID
+                 for hog in foreignHogOwners(own: own) {
+-                    var x = x0
++                    var x = withHogOwner(x0, hog)
+                     x.processing.otherAppsPlaying = true
+-                    x.readback.hogOwnerPID = hog
+                     let b = subject.verdict(x)
+                     checker.expect(!claimsUntouched(b), "BPV-009",
+                                    "another app plays, hog owner \(hog.map { String($0) } ?? "unread") is not the player (\(own)): \(report(b, x))")
+@@ -677,6 +708,17 @@
+     return [rate, depth, integer, format, everything]
+ }
+ 
++/// The scenario with `hog` read back as the hog owner. Integer mode is only ever on while the player holds the
++/// device (contract, BPV-018), so it is switched off whenever `hog` isn't the player's own PID.
++private func withHogOwner(_ x: VerdictInput, _ hog: Int32?) -> VerdictInput {
++    var y = x
++    y.readback.hogOwnerPID = hog
++    if hog != y.readback.ownPID {
++        y.plan.integerMode = false
++    }
++    return y
++}
++
+ /// Hog owners that aren't the player: unread, nobody, and other processes.
+ private func foreignHogOwners(own: Int32) -> [Int32?] {
+     let candidates: [Int32?] = [nil, -1, own &+ 1, own &- 1, 0, 1, 99_999, Int32.max]

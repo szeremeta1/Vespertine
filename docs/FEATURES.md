@@ -32,7 +32,7 @@ Shared-mode checks poll about once a second. Short sounds and activity Core Audi
 
 Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 384 kHz on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor. Per-device settings can match the source, use the device maximum, or force a rate.
 
-Shared output keeps the Mac's volume controls available. By default the selected playback device also becomes the Mac's sound output; Settings can disable that. Exclusive (hog) mode keeps other apps off the device and releases it after a configurable pause. The built-in speakers and headphone jack use shared mode. Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.
+Shared output keeps the Mac's volume controls available. By default the selected playback device also becomes the Mac's sound output; Settings can disable that. Exclusive (hog) mode keeps other apps off the device and releases it after a configurable pause. DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play. The built-in speakers and headphone jack use shared mode. Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.
 
 Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer format. It sends unprocessed PCM as integers, including 32-bit recordings that the normal Float32 path would round. The float path preserves up to 24 significant bits. Vespertine uses hardware volume where available; optional digital volume and ReplayGain appear in the signal path when they change the samples.
 

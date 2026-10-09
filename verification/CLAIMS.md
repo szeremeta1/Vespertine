@@ -76,8 +76,8 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/VERIFICATION.md:32` — "Either Vespertine has the device to itself (exclusive \"hog\" mode),"
 - **Text:** `docs/VERIFICATION.md:33` — "or no other app is playing to it at the same moment."
 - **Text:** `docs/VERIFICATION.md:124` — "Vespertine looks for this about once a second, through Core Audio's list of processes that are playing to the device (`DeviceControl.otherProcessesPlaying`), and drops the badge when it finds one."
-- **Text:** `docs/ARCHITECTURE.md:86` — "The device is held exclusively, or (shared mode) no other process is currently sending audio to it (Core Audio process objects, checked about once a second)."
-- **Property:** verdict false when the device is not held exclusively and another process is playing to it. "Held exclusively" means the hog-mode owner read back from Core Audio is Vespertine's process ID.
+- **Text:** `docs/ARCHITECTURE.md:86` — "The device is held exclusively, or (shared mode, PCM only) no other process is currently sending audio to it (Core Audio process objects, checked about once a second)."
+- **Property:** verdict false when the device is not held exclusively and another process is playing to it. Shared mode is a route for PCM only: DoP needs the device held (CL-BP-12). "Held exclusively" means the hog-mode owner read back from Core Audio is Vespertine's process ID.
 - **Governed by:** vespertine-rule; hog-mode semantics from Apple's `AudioHardware.h`.
 - **Route:** spec-traced (verdict group). The once-a-second polling and its blind spots are inventory only (documented limit, `docs/VERIFICATION.md:124`).
 
@@ -117,17 +117,19 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-BP-12 <a id="bp-dop-conditions"></a>DoP has its own badge and conditions
 
-- **Text:** `docs/ARCHITECTURE.md:91` — "For DoP: the carrier runs at the planned rate with at least 24 bits."
+- **Text:** `docs/ARCHITECTURE.md:91` — "For DoP: the device is held exclusively (DoP always takes it, whatever the exclusive setting, and doesn't play without it), and the carrier runs at the planned rate with at least 24 bits."
+- **Text:** `docs/FEATURES.md:35` — "DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play."
 - **Text:** `docs/VERIFICATION.md:38` — "DSD over DoP and the experimental Dolby/DTS bitstream path have their own badges and their own conditions"
-- **Property:** NATIVE DSD · DoP only when the common conditions hold, the device rate read back equals the planned carrier rate, and the physical format is at least 24 bits.
+- **Property:** NATIVE DSD · DoP only when the common conditions hold, the player holds the device exclusively, the device rate read back equals the planned carrier rate, and the physical format is at least 24 bits.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
 
 ### CL-BP-13 <a id="bp-bitstream-conditions"></a>Bitstream conditions
 
 - **Text:** `docs/ARCHITECTURE.md:64` — "Dolby and DTS-CD sources plan as mode `.bitstream`: exclusive, exact rate, integer ≥ 16-bit, no gain."
-- **Property:** BITSTREAM · … only when the common conditions hold, the device rate read back equals the planned rate, and the physical format is integer and at least 16 bits.
-- **Governed by:** vespertine-rule. Note: the docs say "exclusive" for the plan; the verdict's common condition accepts shared mode with no other app playing. Recorded as a gap in the requirement, not decided here.
+- **Text:** `docs/FEATURES.md:35` — "DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play."
+- **Property:** BITSTREAM · … only when the common conditions hold, the player holds the device exclusively, the device rate read back equals the planned rate, and the physical format is integer and at least 16 bits.
+- **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
 
 ---
@@ -206,9 +208,9 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/FEATURES.md:37` — "Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer format."
 - **Text:** `docs/ARCHITECTURE.md:68` — "no resampling, Spatial Audio, downmix, digital volume or ReplayGain, on a device with a non-mixable Int32 physical format."
-- **Property:** the planner chooses integer samples only when every one of those conditions holds.
+- **Property:** the planner chooses integer samples only when every one of those conditions holds; integer mode is in effect only while the player holds the device.
 - **Governed by:** vespertine-rule.
-- **Route:** inventory (planner logic; the verdict group covers the badge once integer mode is reported as applied).
+- **Route:** spec-traced for the exclusive-access condition, as a condition on the verdict's inputs (BPV-018, not testable from the verdict alone; the hardware loopback covers it); inventory for the rest of the planner logic.
 
 ---
 
@@ -280,10 +282,10 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-IEC-01 <a id="iec-carrier-exact"></a>Frames go out byte for byte inside the carrier
 
-- **Text:** `docs/VERIFICATION.md:61` — "Dolby/DTS frames go out byte for byte inside the IEC 61937 carrier"
+- **Text:** `docs/VERIFICATION.md:61` — "Dolby frames go out byte for byte inside the IEC 61937 carrier; DTS CDs go out as stored"
 - **Text:** `docs/ARCHITECTURE.md:64` — "The carriers are checked with FFmpeg's S/PDIF demuxer, which decodes them identically to the original files."
 - **Text:** `docs/FEATURES.md:21` — "Carrier tests compare the data with FFmpeg's S/PDIF reader."
-- **Property:** de-encapsulating the burst sequence returns the original Dolby/DTS frames, byte for byte, in order.
+- **Property:** de-encapsulating the burst sequence returns the original Dolby frames, byte for byte, in order. (DTS CDs aren't sent in bursts: CL-IEC-04.)
 - **Governed by:** spec (IEC 61937-1/-3/-5, paywalled) for the burst format; oracle (FFmpeg `spdif` demuxer, and an independent parser written blind for this harness) for the check that is possible today.
 - **Route:** oracle (`hardware/IEC61937-ORACLE.md`, IEC group). Spec records are blocked-on-source.
 

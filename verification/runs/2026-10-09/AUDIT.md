@@ -17,10 +17,10 @@ Every tool call each clean-room agent made, checked against its brief's rules (s
 | rate-B | claude-opus-5-5 | 17 | Bash 7, Edit 3, Read 2, SubagentHandback 1, Write 4 | clean |
 | rate-B2 | claude-sonnet-5-5 | 15 | Bash 5, Edit 4, Read 2, SubagentHandback 1, Write 3 | clean |
 | rate-C | claude-opus-5-5 | 25 | Bash 13, Edit 4, Read 4, SubagentHandback 1, Write 3 | clean |
-| verdict-A | claude-opus-5-5 | 37 | Bash 12, Edit 12, Read 4, SubagentHandback 2, Write 7 | clean |
-| verdict-B | claude-opus-5-5 | 13 | Bash 6, Edit 1, Read 2, SubagentHandback 1, Write 3 | clean |
-| verdict-B2 | claude-sonnet-5-5 | 9 | Bash 3, Edit 1, Read 2, SubagentHandback 1, Write 2 | clean |
-| verdict-C | claude-opus-5-5 | 23 | Bash 13, Edit 3, Read 3, SubagentHandback 1, Write 3 | clean |
+| verdict-A | claude-opus-5-5 | 52 | Bash 15, Edit 17, Read 8, SubagentHandback 3, Write 9 | clean |
+| verdict-B | claude-opus-5-5 | 28 | Bash 10, Edit 5, Read 5, SubagentHandback 2, Write 6 | clean |
+| verdict-B2 | claude-sonnet-5-5 | 23 | Bash 6, Edit 9, Read 4, SubagentHandback 2, Write 2 | clean |
+| verdict-C | claude-opus-5-5 | 43 | Bash 18, Edit 13, Read 6, SubagentHandback 2, Write 4 | clean |
 | dst-A | claude-opus-5-5 | 46 | Bash 22, Edit 12, Read 5, SubagentHandback 1, Write 6 | **1 problem(s)** |
 | dst-C | claude-opus-5-5 | 18 | Bash 8, Edit 3, Read 2, SubagentHandback 1, Write 4 | clean |
 | carrier-scan | claude-opus-5-5 | 77 | Bash 54, Edit 12, Read 4, SubagentHandback 1, Write 6 | **1 problem(s)** |

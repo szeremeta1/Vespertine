@@ -33,7 +33,7 @@ verdict(input: VerdictInput) -> String
 | `resampling` | Bool | the player converts the sample rate |
 | `dsdConvertedToPCM` | Bool | DSD is converted to PCM |
 | `spatial` | `off`, `fixed` or `headTracked` | spatial audio rendering |
-| `integerMode` | Bool | the player is sending 32-bit integers straight to the device, with no 32-bit float step |
+| `integerMode` | Bool | the player is sending 32-bit integers straight to the device, with no 32-bit float step. Only ever true while the player holds the device exclusively (`readback.hogOwnerPID == readback.ownPID`; BPV-018): inputs with `integerMode` true and the device not held don't occur |
 
 **readback**: what the operating system reported about the device after the player configured it. A field is nil when reading it failed.
 

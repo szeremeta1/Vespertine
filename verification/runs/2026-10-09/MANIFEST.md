@@ -1,6 +1,6 @@
 # Run manifest
 
-Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unchanged into the harness. Each is the agent's last delivery: where an agent had a review round, `round1/` holds the message it was sent and the diff from its first delivery.
+Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unchanged into the harness. Each is the agent's last delivery: where an agent had a review round, `round1/` (and `round2/` for the verdict group, after the F-05 and H-01 record changes) holds the message it was sent and the diff from its previous delivery.
 
 | Group | Role | File | SHA-256 | Lines |
 |---|---|---|---|---|
@@ -20,10 +20,10 @@ Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unc
 | rate | B | `harness/Sources/CleanRoomB/BRate.swift` | `7743ef551d959d70916ee93f20300f318a8fee24a438fbf85b7ee3479f7f08b0` | 163 |
 | rate | B2 | `harness/Sources/CleanRoomB2/B2Rate.swift` | `f04bca10adcdb6280d42374ef719a423cd382d42e831e3cc96edc24ce80c6177` | 120 |
 | rate | C | `harness/Sources/Mutants/RateMutants.swift` | `e38d5c63a07fd28086aaf412e6fa249baa16bb6ee1aab33e36810e81cce84b19` | 450 |
-| verdict | A | `harness/Sources/SpecChecks/VerdictChecks.swift` | `637a766d6851a0d976f560b887739b479099464129a1fddfe7673b2c7dea23eb` | 884 |
-| verdict | B | `harness/Sources/CleanRoomB/BVerdict.swift` | `768030becdb256f612a9e71980b5150e8cb73739a0a71f44ec951e6f9548b3fa` | 156 |
-| verdict | B2 | `harness/Sources/CleanRoomB2/B2Verdict.swift` | `07191d32551780e58615f1e3e26bc03e9961318cdd69f309591f90feec6d70b4` | 148 |
-| verdict | C | `harness/Sources/Mutants/VerdictMutants.swift` | `a8af8280ba358e4ab6c7db388e7976d1fc4be007a6e702dd53878b7baf8150a7` | 660 |
+| verdict | A | `harness/Sources/SpecChecks/VerdictChecks.swift` | `026258db4912f2da40e363e5444480ff84687ae813346b92a46c47f7a0a41d1c` | 926 |
+| verdict | B | `harness/Sources/CleanRoomB/BVerdict.swift` | `a429edc834f9676f261cb68765942c2856ba5146144be183b19757ac12aa5ce0` | 161 |
+| verdict | B2 | `harness/Sources/CleanRoomB2/B2Verdict.swift` | `459d2e56159d5e4da7261e729493a4ce62f2ff53fbcb18bd3a3709b38e979c84` | 155 |
+| verdict | C | `harness/Sources/Mutants/VerdictMutants.swift` | `5941eacb3cb7c0be28fcd9ca4b083239acff80516038937d2f273da31265fd16` | 709 |
 | dst | A | `harness/Sources/SpecChecks/DSTChecks.swift` | `beb4a3473d81387bb7f5ab596ab8ade48f88c0fc3fc9de040c0cc443516dc41b` | 546 |
 | dst | C | `harness/Sources/Mutants/DSTMutants.swift` | `c2f4fa4bbada11937c5d579aa731af0338ac1bea842415f7cb847d33a67878ed` | 329 |
 | carrier-scan | | `carrier_scan.py` | `7b49f90458f48666b886867929b6a8a247adcc02b08d4d2076d3515a21f90808` | 1013 |

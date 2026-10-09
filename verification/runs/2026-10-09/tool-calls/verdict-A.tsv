@@ -36,3 +36,18 @@ Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E
 Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (48 chars)
 Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build'"
 SubagentHandback	(its final report, in reports/)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && grep -n -B2 -A4 'integerMode' Sources/Contracts/Verdict.swift | head -30; grep -n 'integerMode\|hogOwnerPID\|otherAppsPlaying = ' Sources/SpecChecks/VerdictChecks.swift"
+Read	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Read	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Read	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Read	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (4170 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' ; swift run Scratch 2>&1 | tail -14"
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build'; grep -n -A1 '// REQ:' Sources/SpecChecks/VerdictChecks.swift | grep -c 'Check('"
+SubagentHandback	(its final report, in reports/)

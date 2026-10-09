@@ -22,3 +22,23 @@ Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && cp Sources/Scratch/main.sw
 Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && rm -f /work/lab-main.swift.bak && cat -A Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'error|warning|complete' && find /work -type f -not -path '*/.build/*'"
 Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && grep -n 'Mutant(\"' Sources/Mutants/VerdictMutants.swift | sed 's/^ *//' | cut -c1-110; wc -l Sources/Mutants/VerdictMutants.swift"
 SubagentHandback	(its final report, in reports/)
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && grep -n -B3 -A3 'integerMode' Sources/Contracts/Verdict.swift | head -40; md5sum Package.swift Sources/Contracts/*.swift Sources/SpecKit/*.swift Sources/Scratch/main.swift; ls -la Sources/Contracts"
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Read	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Read	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Read	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift (23494 chars)
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head -20; swift run Scratch 2>&1 | grep -v -E '^\[|Building|Compiling|Build of|Build complete' | head -110"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && swift run Scratch 2>&1 | sed -n '/^C-BPV-005-b diffs/,\$p' | cut -c1-260"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && md5sum Sources/Scratch/main.swift Package.swift Sources/Contracts/*.swift Sources/SpecKit/*.swift && swift build 2>&1 | grep -E 'error|warning:|Compiling Mutants|complete'"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && rm -rf .build && swift build 2>&1 | grep -E 'error|warning:|Compiling Mutants|complete'"
+SubagentHandback	(its final report, in reports/)

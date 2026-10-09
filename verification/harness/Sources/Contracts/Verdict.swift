@@ -54,7 +54,9 @@ public struct VerdictInput: Sendable, Hashable {
         /// DSD is converted to PCM.
         public var dsdConvertedToPCM: Bool
         public var spatial: Spatial
-        /// The player sends 32-bit integers straight to the device, with no 32-bit float step.
+        /// The player sends 32-bit integers straight to the device, with no 32-bit float step. Only ever true while
+        /// the player holds the device exclusively (`readback.hogOwnerPID == readback.ownPID`; BPV-018): inputs
+        /// with `integerMode` true and the device not held don't occur.
         public var integerMode: Bool
 
         public init(mode: Mode, requestedRate: Double, requestedBitDepth: Int, channels: Int, resampling: Bool,

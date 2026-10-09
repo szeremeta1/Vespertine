@@ -40,8 +40,9 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.exclusive || !otherAppsPlaying, !modifiesSamples, plan.spatial == .off, concealedFrames == 0,
-              plan.channels == source.channels, applied.virtualChannels >= source.channels else { return false }
+        guard deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
+              plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
+        else { return false }
         switch plan.mode {
         case .dop:
             return applied.physicalBitDepth >= 24 && abs(applied.sampleRate - plan.deviceSampleRate) < 0.5
@@ -85,6 +86,7 @@ public struct SignalPath: Sendable, Hashable {
         if !applied.exclusive, otherAppsPlaying { return "MIXED WITH OTHER APPS" }
         if equalizer != nil { return "EQUALIZER" }
         if modifiesSamples { return "DIGITAL GAIN" }
+        if !applied.physicalFormatKnown { return "FORMAT UNCONFIRMED" }
         return "CONVERTED"
     }
 

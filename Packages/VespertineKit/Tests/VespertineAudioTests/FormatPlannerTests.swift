@@ -64,6 +64,17 @@ struct FormatPlannerTests {
         #expect(FormatPlanner.plan(source: pcm(44_100), device: noBase).deviceSampleRate == 88_200)
     }
 
+    @Test("A rate a few hertz off the source isn't the source: a true multiple wins", arguments: [44_100.0, 48_000])
+    func nearRateIsNotTheSource(rate: Double) {
+        for offset in [1.0, 2.0, 5.0] {
+            let near = caps([rate + offset, rate * 2])
+            #expect(FormatPlanner.plan(source: pcm(rate), device: near).deviceSampleRate == rate * 2)
+        }
+        // The divisor search uses the same test.
+        #expect(!SampleRate.isIntegerMultiple(rate, of: rate / 2 - 1))
+        #expect(SampleRate.isIntegerMultiple(rate, of: rate / 2))
+    }
+
     @Test("Rate policies")
     func policies() {
         #expect(FormatPlanner.plan(source: pcm(44_100), device: k11, policy: .maximum).deviceSampleRate == 384_000)

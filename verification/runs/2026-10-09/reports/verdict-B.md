@@ -1,5 +1,7 @@
 # verdict-B: final report
 
+## Round 0
+
 I've delivered `/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift`. It compiles cleanly in Swift 6 mode with no warnings. I tested it against every testable record in a scratch program and all checks passed. The scratch program is gone: `Sources/Scratch/main.swift` is back to its original one-line content, and I didn't change any other file I was given. `swiftbox` also left a sandbox cache under `/work/.home`.
 
 **What it does.** `BVerdict.subject` is a stateless `BadgeVerdict` struct. It checks in this order, and the first condition that fails picks the badge:
@@ -37,3 +39,22 @@ Every other outcome is a short reason, such as "RATE MISMATCH" or "SHARED DEVICE
 - **Integer mode (BPV-005):** I don't check that the physical format is integer, so a 32-bit float physical format with integer mode on can still be "BIT-PERFECT".
 - **Label precedence:** concealed frames take priority over every other reason. The equalizer only decides the badge when everything else passes, so it never hides another failure.
 - **Ruled-out inputs:** a negative concealed-frame count counts as none. −0.0 dB counts as 0 dB. A hog owner of −1 is never exclusive, even if `ownPID` is −1.
+
+## Round 2
+
+I've updated `/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift` to the new records. A clean build with `swiftbox /srv/cleanroom/verdict-B "cd harness && swift build"` compiles in Swift 6 mode with no warnings. A scratch check of the new and changed behaviour passed. `Sources/Scratch/main.swift` is back to its original one-line content, and I didn't touch any file I was given.
+
+**What I changed**
+- **BPV-016 (DoP):** the device must now be held exclusively (BPV-009: the read-back hog owner is the player's own process ID). Otherwise the badge is "DEVICE NOT HELD", even when no other app is playing. This includes a hog owner of −1, another process's ID, or nil (read failed). The rest of the DoP rule is as before: rate matches the planned carrier rate, at least 24 physical bits, and BPV-006 to 011 and 013 hold.
+- **BPV-017 (bitstream):** the same hold requirement, with the same "DEVICE NOT HELD" result when it isn't met. The rest is unchanged: rate matches the planned rate, integer format with at least 16 bits, the shared conditions, and `"BITSTREAM · " + source.codec`.
+- **BPV-018 / BPV-005 (integer mode):** the depth check now asks whether integer mode is actually in effect, meaning `integerMode` is true and the device is held. Inputs with the flag set but the device not held are ruled out by the contract. If one arrives anyway, it is treated as the 32-bit float path. So a source deeper than 24 bits gets "NEEDS INTEGER MODE", never "BIT-PERFECT", without the hold.
+- **Ordering:** the shared check (BPV-008) runs first. So when another app is playing and the device isn't held, a DoP or bitstream track shows "SHARED DEVICE"; with no other app playing it shows "DEVICE NOT HELD".
+- **PCM in shared mode is unchanged:** it is still "BIT-PERFECT" when no other app is playing and the source is 24 bits or less. BPV-008 and BPV-015 still allow that.
+
+**New ambiguities**
+- **BPV-016 / BPV-017:** a track that isn't held "doesn't play", and the records don't say what it shows. I chose the reason "DEVICE NOT HELD".
+- **BPV-018:** it is `testable: false`, and the contract rules out `integerMode` true without the hold. My float-path handling of that case is a choice for invalid input, not something a record requires.
+- **BPV-018 vs BPV-005:** BPV-005 still checks only that integer mode is on. The hold requirement for sources deeper than 24 bits comes in only through the input rule in BPV-018.
+- **BPV-016 vs BPV-003 (still open):** if the bit depth is read back but the integer flag isn't, I still let BPV-003 win, so the badge is not "NATIVE DSD · DoP".
+
+All earlier assumptions from round one still stand.
