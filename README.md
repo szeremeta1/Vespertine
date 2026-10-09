@@ -47,19 +47,19 @@ Claude Code and Codex wrote most of the code. I decided how the app should behav
 
 Bit-perfect playback is available in several Mac players. Vespertine focuses on a surround collection, a signal path you can inspect, and GPL source you can audit. Here's what is documented; `?` means unverified, not unsupported.
 
-| | Vespertine | Apple Music (Mac) | Audirvana Studio / Origin | Roon | VeraVox | Swinsian | Colibri | Cog | foobar2000 for Mac |
-|---|---|---|---|---|---|---|---|---|---|
-| Source code | GPL-3.0 | Closed | Closed | Closed | Closed | ? | ? | Open | ? |
-| FLAC / DSD files | Yes / Yes | No / No | Yes / Yes | Yes / Yes | Yes / Yes | ? / ? | Yes / Yes | Yes / Yes | Yes / ? |
-| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | ? | Yes | ? | ? |
-| Exclusive (hog) mode | Yes | No | Yes | Yes | Yes | ? | Yes | ? | ? |
-| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | ? | ? | In-app loopback test | ? | ? | ? | ? |
-| Local surround files | Yes² | ? | Yes | Yes | Yes | ? | ? | Yes | ? |
-| Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | ? | Yes | ? |
-| Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? | ? |
-| SACD ISO | Coming in the next release | No | ? | ? | Yes | ? | No | ? | ? |
-| Convolution / audio effect plugins | No / No | ? / ? | Yes / ? | Yes / ? | ? / ? | ? / ? | ? / ? | ? / ? | ? / ? |
-| Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | ? | ? | ? | ? | ? |
+| | Vespertine | Apple Music (Mac) | Audirvana Studio / Origin | Roon | VeraVox | Colibri | Cog | foobar2000 for Mac |
+|---|---|---|---|---|---|---|---|---|
+| Source code | GPL-3.0 | Closed | Closed | Closed | Closed | ? | GPL | Closed |
+| FLAC / DSD files | Yes / Yes | No / No | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / ? |
+| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | Yes | Yes | ? |
+| Exclusive (hog) mode | Yes | No | Yes | Yes | Yes | Yes | Yes | Yes |
+| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | Vendor claim | Vendor claim | In-app loopback test | Vendor claim | In-app indicator | ? |
+| Local surround files | Yes² | ? | Yes | Yes | Yes | ? | Yes | ? |
+| Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | Yes | ? |
+| Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? |
+| SACD ISO | Coming in the next release | No | Yes | No (DSF/DFF only) | Yes | No | ? | ? |
+| Convolution / audio effect plugins | No / No | ? / ? | Yes (Origin: paid option) / Audio Units | Yes / ? | No / No | ? / ? | ? / ? | ? / Audio Units |
+| Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (radio only) | ? | ? |
 
 ¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in [third-party loopback tests reported on ASR](https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/). This is not a Vespertine measurement or a claim about every Mac configuration. Volume was at 100%; there is still no automatic rate switching, hog mode, FLAC or DSD on Mac. The original test report could not be independently rechecked for this update.
 
