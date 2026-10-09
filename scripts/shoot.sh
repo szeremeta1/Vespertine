@@ -20,8 +20,8 @@ output[bit-perfect-fiio-24-96]="FiiO K11";    settle[bit-perfect-fiio-24-96]=10
 args[bit-perfect-fiio-24-96]="-VespertinePlaySong \"jeux d'eaux à la Villa|Lazar Berman\" -VespertineInspectorTab now"
 output[dsd-native-dop]="FiiO K11";            settle[dsd-native-dop]=10
 args[dsd-native-dop]='-VespertinePlaySong "Love for the Sake of Love|Claudja Barry|DSD" -VespertineInspectorTab now'
-output[stereo-and-surround-versions]=any;     settle[stereo-and-surround-versions]=10
-args[stereo-and-surround-versions]="-VespertinePlaySong \"Don't Look Back in Anger|Oasis|24/96\" -VespertineInspectorTab details"
+output[stereo-and-surround-versions]="AirPods Max";     settle[stereo-and-surround-versions]=10
+args[stereo-and-surround-versions]="-VespertinePlaySong \"Don't Look Back in Anger|Oasis|DSD64\" -VespertineInspectorTab now"
 output[spatial-audio-airpods-max]="AirPods Max"; settle[spatial-audio-airpods-max]=12
 args[spatial-audio-airpods-max]='-VespertinePlaySong "Candle in the Wind|Elton John|5.1" -VespertineInspectorTab now'
 output[fake-hi-res-detection]=any;            settle[fake-hi-res-detection]=8
@@ -30,8 +30,8 @@ output[search]=any;                           settle[search]=8
 args[search]='-VespertineSearch "Let It Be" -VespertineOpenAlbum "Let It Be [DTS 5.1 CD-DA]" -VespertineSelectTracks 6 -VespertineInspectorTab details'
 output[genres]=any;                           settle[genres]=8
 args[genres]='-VespertineSidebar genres'
-output[smart-playlist]=any;                   settle[smart-playlist]=8
-args[smart-playlist]='-VespertineSidebar "AirPods Max Bit-Perfect"'
+output[smart-playlist]="AirPods Max";                   settle[smart-playlist]=8
+args[smart-playlist]="-VespertineSidebar \"AirPods Max Bit-Perfect\" -VespertineFilter artist=Oasis -VespertinePlaySong \"Don't Look Back in Anger|Oasis|24/48\" -VespertineInspectorTab now"
 output[mini-player]="AirPods Max";            settle[mini-player]=10
 args[mini-player]="-VespertinePlaySong \"Don't Look Back in Anger|Oasis|24/48\" -VespertineOpenMini YES"
 

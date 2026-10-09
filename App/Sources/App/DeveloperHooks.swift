@@ -81,6 +81,7 @@ enum DeveloperHooks {
         }
         if let sidebar = d.string(forKey: "VespertineSidebar") {
             switch sidebar {
+            case "albums": model.sidebar = .albums
             case "artists": model.sidebar = .artists
             case "songs": model.sidebar = .songs
             case "genres": model.sidebar = .genres
@@ -152,7 +153,7 @@ enum DeveloperHooks {
             }
             if let song = model.library.allTracks().first(where: matches) {
                 let tracks = model.library.tracks(albumKey: song.albumKey)
-                model.openAlbum(song.albumKey)
+                if d.string(forKey: "VespertineSidebar") == nil { model.openAlbum(song.albumKey) }   // else stay on that page
                 model.player.play(tracks, startAt: tracks.firstIndex { $0.id == song.id } ?? 0)
                 print("[qa] play song: \(song.displayAlbumArtist) — \(song.displayAlbum) — \(song.title) · \(song.formatSummary)")
                 if d.double(forKey: "VespertinePauseAfter") > 0 {

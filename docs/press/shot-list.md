@@ -9,11 +9,12 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 | `multichannel-albums` | Albums, Multichannel chip | library | the grid shows Bob Dylan's *Blood on the Tracks* DSD64 5.1, Elton John's *Goodbye Yellow Brick Road* and Oasis's *Morning Glory* SACD among the multichannel albums |
 | `bit-perfect-fiio-24-192` (renamed `bit-perfect-fiio-24-96`) | *Les jeux d'eau à la Villa d'Este*, Lazar Berman (FLAC 24/96) | FiiO K11, exclusive mode | BIT-PERFECT badge; source 24/96, device 96 kHz native, unity volume, hog mode; TRUE 24 badge from analysis |
 | `dsd-native-dop` | *Love for the Sake of Love*, Claudja Barry (DSD128) | FiiO K11, DoP enabled for it | DSD128 source; DoP at 352.8 kHz on the device; no PCM conversion step; BIT-PERFECT shown only if the path says so |
-| `stereo-and-surround-versions` | *Don't Look Back in Anger*, Oasis: stereo 24/96 and DSD64 5.1 | library | the song listed once with both versions; the version played matches the output (stereo on a stereo device) |
+| `stereo-and-surround-versions` | *Don't Look Back in Anger*, Oasis, *Morning Glory* SACD: DSD64 stereo and 5.1 | AirPods Max | each song listed once, DSD64 · 5.1 + STEREO; the 5.1 version plays as head-tracked Spatial Audio; DSD → PCM 352.8 → 48 kHz shown as converted |
 | `spatial-audio-airpods-max` | *Candle in the Wind*, Elton John (24/88.2 5.1) | AirPods Max, head tracking on | Spatial Audio active, 6 channels in, head tracking shown; no BIT-PERFECT badge (it's rendered, not bit-perfect) |
 | `fake-hi-res-detection` | *Velvet Hour*, The Lantern Lounge Orchestra (the deliberate fake: MP3 192 kb/s → 24/192) | none | LOSSY ORIGIN?; claimed 24/192; steep cutoff ~16 kHz (measured on dormhub with `vespertine-probe` on a fresh fake from `score.py`, 76% of frames, 30 dB drop) |
 | `search` | search "Let It Be"; *Let It Be*, The Beatles (DTS CD, 44.1 kHz 5.1) selected | library | DTS · 44.1 kHz · 5.1 next to the stereo FLAC mix and Dolly Parton's 24/96; tags read-only on the share |
-| `genres`, `smart-playlist` | library pages; smart playlist *AirPods Max Bit-Perfect* | library | counts match the library; rules shown are the playlist's |
+| `genres` | Genres page | library | counts match the library |
+| `smart-playlist` | smart playlist *AirPods Max Bit-Perfect*, filtered to Oasis; *Don't Look Back in Anger* (24/48) playing | AirPods Max | BIT-PERFECT, 48 kHz native, unity volume, exclusive |
 | `mini-player` | *Don't Look Back in Anger*, Oasis (24/48) on AirPods Max | AirPods Max | BIT-PERFECT only if the device runs at 48 kHz with unity volume |
 
 ## Video

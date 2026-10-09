@@ -57,7 +57,7 @@ struct NowPlayingPanel: View {
                             Text("\(i + 1) OF \(player.queue.count)").font(Typeface.ui(10.5, weight: .semibold)).tracking(0.9).foregroundStyle(Palette.text3)
                         }
                     }
-                    ArtworkView(key: track.artworkKey, size: 600, cornerRadius: 8)
+                    ArtworkView(key: model.artworkKey(track), size: 600, cornerRadius: 8)
                         .frame(width: artSide, height: artSide)
                         .shadow(color: .black.opacity(0.65), radius: 30, y: 24)
                         .frame(maxWidth: .infinity)
@@ -123,8 +123,8 @@ struct NowPlayingPanel: View {
                 .blur(radius: 20)
                 .allowsHitTesting(false)
         }
-        .task(id: player.current?.track.artworkKey) {
-            if let key = player.current?.track.artworkKey, let c = await ArtworkCache.shared.averageColor(key) {
+        .task(id: model.artworkKey(player.current?.track)) {
+            if let key = model.artworkKey(player.current?.track), let c = await ArtworkCache.shared.averageColor(key) {
                 withAnimation(.easeInOut(duration: 0.8)) { glow = c }
             }
         }
