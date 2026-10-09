@@ -70,7 +70,7 @@
       <img class="hero-icon" src="assets/icon-512.png" alt="Vespertine app icon" width="104" height="104">
       <h1>Surround and hi-res music, <em>on your Mac</em>.</h1>
       <p class="lede">The free, open-source Mac player for surround and hi-res music collections. Extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output.</p>
-      <p class="fine">Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO is not supported yet.</p>
+      <p class="fine">Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO playback is coming in the next release.</p>
       <div class="cta">
         <a class="btn btn-brass js-download" href="https://github.com/szeremeta1/Vespertine/releases/latest">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8.5M4.5 7.5 8 11l3.5-3.5M3 13.5h10"/></svg>
@@ -228,7 +228,7 @@
       <div class="formats">
         <table>
           <tr><th>FLAC, ALAC, WAV, AIFF</th><td>Native rate and depth up to 32-bit and the rate your DAC runs (tested to 384 kHz), CUE images <span class="mono">.flac .m4a .wav .aiff .cue</span></td></tr>
-          <tr><th>DSD64 – DSD512</th><td>DSD64–512 file decoding; DoP depends on the DAC and carrier rate, otherwise PCM. DoP carrier rates above 384 kHz are untested on hardware. No SACD ISO yet <span class="mono">.dsf .dff</span></td></tr>
+          <tr><th>DSD64 – DSD512</th><td>DSD64–512 file decoding; DoP depends on the DAC and carrier rate, otherwise PCM. DoP carrier rates above 384 kHz are untested on hardware. SACD ISO playback (stereo and 5.1, DST) is coming in the next release <span class="mono">.dsf .dff</span></td></tr>
           <tr><th>Dolby Atmos</th><td>Dolby Digital Plus with Atmos, rendered by macOS <span class="mono">.ec3 .m4a .mp4</span></td></tr>
           <tr><th>Dolby TrueHD, DTS-HD Master Audio</th><td>Lossless, can be bit-perfect; DTS:X and TrueHD Atmos play their bed <span class="mono">.thd .dts .dtshd .mka</span></td></tr>
           <tr><th>Dolby Digital (Plus), DTS</th><td>Decoded; Dolby receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted. Raw DTS decodes; DTS-CD bitstream is a separate path <span class="mono">.ac3 .ec3 .dts</span></td></tr>
@@ -245,7 +245,7 @@
       <div class="section-head">
         <div class="eyebrow">Compare</div>
         <h2>How it stacks up.</h2>
-        <p>Several Mac players offer bit-perfect playback. This compares documented features; ? means unverified, not unsupported. Vespertine has no SACD ISO yet, convolution, audio effect plugins or streaming services.</p>
+        <p>Several Mac players offer bit-perfect playback. This compares documented features; ? means unverified, not unsupported. SACD ISO playback is coming in the next release. Vespertine has no convolution, audio effect plugins or streaming services.</p>
       </div>
       <div class="compare-wrap">
         <p class="compare-hint" aria-hidden="true">Scroll for more →</p>
@@ -261,7 +261,7 @@
               <tr><th scope="row">Local surround files</th><td class="us">Yes²</td><td>?</td><td>Yes</td><td>Yes</td><td>Yes</td><td>?</td><td>?</td><td>Yes</td><td>?</td></tr>
               <tr><th scope="row">Apple Spatial Audio for local surround</th><td class="us">Yes</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>Yes</td><td>?</td></tr>
               <tr><th scope="row">Hi-res file analysis</th><td class="us">Yes</td><td>?</td><td>AudioScan</td><td>?</td><td>Yes</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>
-              <tr><th scope="row">SACD ISO</th><td class="us">No, not yet</td><td>No</td><td>?</td><td>?</td><td>Yes</td><td>?</td><td>No</td><td>?</td><td>?</td></tr>
+              <tr><th scope="row">SACD ISO</th><td class="us">Next release</td><td>No</td><td>?</td><td>?</td><td>Yes</td><td>?</td><td>No</td><td>?</td><td>?</td></tr>
               <tr><th scope="row">Convolution / audio effect plugins</th><td class="us">No / No</td><td>? / ?</td><td>Yes / ?</td><td>Yes / ?</td><td>? / ?</td><td>? / ?</td><td>? / ?</td><td>? / ?</td><td>? / ?</td></tr>
               <tr><th scope="row">Streaming services</th><td class="us">No</td><td>Apple Music</td><td>Studio: yes; Origin: no</td><td>Yes</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td></tr>
             </tbody>

@@ -28,7 +28,7 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It b
 
 ## What it does
 
-- Plays SACD images (new in the next beta; `.iso`, stereo and 5.1, DST-compressed or plain) straight from the image, plus extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC, alongside stereo albums. SACD ISO playback matched sacd_extract bit for bit on two real discs.
+- Plays SACD images (coming in the next release; `.iso`, stereo and 5.1, DST-compressed or plain) straight from the image, plus extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC, alongside stereo albums. SACD ISO playback matched sacd_extract bit for bit on two real discs.
 - Renders surround as head-tracked Spatial Audio on AirPods. Atmos objects are rendered from Dolby Digital Plus; TrueHD Atmos and DTS:X play their channel bed.
 - Chooses between an album's stereo and surround versions for the output you use, with each song listed once.
 - Switches your DAC to the file's sample rate. PCM playback has been tested up to 384 kHz on a FiiO K11. DSD files decode from DSD64 to DSD512; DoP depends on the DAC and its carrier rate.
@@ -57,7 +57,7 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 | Local surround files | Yes² | ? | Yes | Yes | Yes | ? | ? | Yes | ? |
 | Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | ? | Yes | ? |
 | Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? | ? |
-| SACD ISO | Yes, from the next beta | No | ? | ? | Yes | ? | No | ? | ? |
+| SACD ISO | Coming in the next release | No | ? | ? | Yes | ? | No | ? | ? |
 | Convolution / audio effect plugins | No / No | ? / ? | Yes / ? | Yes / ? | ? / ? | ? / ? | ? / ? | ? / ? | ? / ? |
 | Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | ? | ? | ? | ? | ? |
 
