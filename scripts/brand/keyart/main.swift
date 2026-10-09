@@ -137,7 +137,7 @@ func render(_ f: Feature, W: Int, H: Int, name: String) {
 
     // Footer.
     let ff = Brand.mono(13.5 * u, weight: 500)
-    fill(Brand.textPath("FREE & OPEN SOURCE · MACOS 26 · SZEREMETA1.GITHUB.IO/VESPERTINE", font: ff, tracking: 0.12).path, Brand.text3,
+    fill(Brand.textPath("FREE & OPEN SOURCE · MACOS 14.4+ · SZEREMETA1.GITHUB.IO/VESPERTINE", font: ff, tracking: 0.12).path, Brand.text3,
          at: CGPoint(x: margin, y: margin * 0.8))
     if let tm = f.trademarks {
         let tf = Brand.sans(11.5 * u)
