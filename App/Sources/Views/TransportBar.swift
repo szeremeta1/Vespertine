@@ -47,7 +47,7 @@ struct TransportBar: View {
 
     private var nowPlaying: some View {
         HStack(spacing: 12) {
-            ArtworkView(key: model.player.current?.track.artworkKey, size: 160, cornerRadius: 5)
+            ArtworkView(key: model.artworkKey(model.player.current?.track), size: 160, cornerRadius: 5)
                 .frame(width: 46, height: 46)
             if let track = model.player.current?.track {
                 Button {
@@ -389,7 +389,7 @@ struct QueueView: View {
 
     private func row(_ e: QueueEntry, isCurrent: Bool) -> some View {
         HStack(spacing: 10) {
-            ArtworkView(key: e.track.artworkKey, size: 160, cornerRadius: 4).frame(width: 34, height: 34)
+            ArtworkView(key: model.artworkKey(e.track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
             VStack(alignment: .leading, spacing: 1) {
                 Text(e.track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
                 Text(e.track.displayArtist).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)

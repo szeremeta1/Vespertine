@@ -321,6 +321,13 @@ final class AppModel {
         undoManager.setActionName(favorite ? "Add to Favorites" : "Remove from Favorites")
     }
 
+    /// A song's cover, or its album's when the song carries none of its own (an album where only some files have
+    /// embedded art, or art from a folder image), so Now Playing matches the album page.
+    func artworkKey(_ track: Track?) -> String? {
+        guard let track else { return nil }
+        return track.artworkKey ?? library.album(key: track.albumKey)?.artworkKey
+    }
+
     func openAlbum(_ key: String) {
         path.append(.album(key))
     }

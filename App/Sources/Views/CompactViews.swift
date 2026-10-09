@@ -19,7 +19,7 @@ struct MiniPlayerView: View {
         let player = model.player
         GeometryReader { geo in
             HStack(spacing: 0) {
-                ArtworkView(key: player.current?.track.artworkKey, size: 600, cornerRadius: 0)
+                ArtworkView(key: model.artworkKey(player.current?.track), size: 600, cornerRadius: 0)
                     .frame(width: geo.size.height, height: geo.size.height)
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -102,7 +102,7 @@ struct MenuBarView: View {
         let player = model.player
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                ArtworkView(key: player.current?.track.artworkKey, size: 160, cornerRadius: 6).frame(width: 64, height: 64)
+                ArtworkView(key: model.artworkKey(player.current?.track), size: 160, cornerRadius: 6).frame(width: 64, height: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).lineLimit(1)
                     Text(player.current.map { "\($0.track.displayArtist) — \($0.track.displayAlbum)" } ?? "Vespertine")

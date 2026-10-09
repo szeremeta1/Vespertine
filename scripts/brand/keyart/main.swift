@@ -15,23 +15,23 @@ struct Feature {
 enum Chip { case brass, copper, plain }
 
 let features = [
-    Feature(id: "bit-perfect", shot: "bit-perfect-fiio-24-192",
+    Feature(id: "bit-perfect", shot: "bit-perfect-fiio-24-96",
             headline: "Every sample, untouched.",
             sub: "Vespertine switches your DAC to the file’s rate and shows the signal path. Bit-perfect conditions and tests are in the source.",
-            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 192 kHz", .plain)], focus: CGRect(x: 1826, y: 826, width: 564, height: 590)),
+            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 96 kHz", .plain)], focus: CGRect(x: 1826, y: 985, width: 564, height: 400)),
     Feature(id: "stereo-and-surround", shot: "stereo-and-surround-versions",
             headline: "Stereo and surround in one library.",
-            sub: "Extracted SACD tracks list each song once, in stereo or 5.1. Surround renders as Spatial Audio on AirPods. SACD ISO is not supported yet.",
+            sub: "Extracted SACD tracks list each song once, in stereo or 5.1. Surround renders as Spatial Audio on AirPods.",
             chips: [("DSD64 · 5.1", .plain), ("+ STEREO", .plain), ("○ SPATIAL · HEAD TRACKED", .copper)], focus: CGRect(x: 370, y: 575, width: 1100, height: 390)),
     Feature(id: "spatial-audio", shot: "spatial-audio-airpods-max",
             headline: "Your 5.1 albums, all around you.",
             sub: "Surround albums play as head-tracked Spatial Audio on AirPods, each channel placed where it belongs.",
-            chips: [("5.1 · 6 CHANNELS", .plain), ("○ SPATIAL · HEAD TRACKED", .copper), ("32 / 48", .plain)], focus: CGRect(x: 1826, y: 284, width: 564, height: 622),
+            chips: [("5.1 · 6 CHANNELS", .plain), ("○ SPATIAL · HEAD TRACKED", .copper), ("32 / 48", .plain)], focus: CGRect(x: 1826, y: 255, width: 564, height: 650),
             trademarks: "AirPods is a trademark of Apple Inc. Vespertine is not affiliated with Apple."),
     Feature(id: "native-dsd", shot: "dsd-native-dop",
             headline: "Native DSD, not a conversion.",
-            sub: "DSD64 over DoP, checked on a FiiO K11. DSD64–512 files decode; native output depends on the DAC and carrier rate.",
-            chips: [("● NATIVE DSD · DoP", .brass), ("DSD64 · 2.8 MHz", .plain), ("32 / 176.4", .plain)], focus: CGRect(x: 1826, y: 600, width: 564, height: 560)),
+            sub: "DSD128 over DoP, checked on a FiiO K11. DSD64–512 files decode; native output depends on the DAC and carrier rate.",
+            chips: [("● NATIVE DSD · DoP", .brass), ("DSD128 · 5.6 MHz", .plain), ("32 / 352.8", .plain)], focus: CGRect(x: 1826, y: 800, width: 564, height: 550)),
     Feature(id: "fake-hi-res", shot: "fake-hi-res-detection",
             headline: "Know when hi-res isn’t.",
             sub: "Spectral analysis flags upsampled, padded and lossy-sourced files, with the measurements to back it up.",
@@ -137,7 +137,7 @@ func render(_ f: Feature, W: Int, H: Int, name: String) {
 
     // Footer.
     let ff = Brand.mono(13.5 * u, weight: 500)
-    fill(Brand.textPath("FREE & OPEN SOURCE · MACOS 14.4+ · SZEREMETA1.GITHUB.IO/VESPERTINE", font: ff, tracking: 0.12).path, Brand.text3,
+    fill(Brand.textPath("FREE & OPEN SOURCE · MACOS 14.4+ · VESPERTINEAPP.COM", font: ff, tracking: 0.12).path, Brand.text3,
          at: CGPoint(x: margin, y: margin * 0.8))
     if let tm = f.trademarks {
         let tf = Brand.sans(11.5 * u)
