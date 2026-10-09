@@ -9,7 +9,7 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It brings SACD images and extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files into one library, with head-tracked Spatial Audio on AirPods. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted. The signal path shows each stage from file to output, and the conditions and tests are in the source for anyone to audit.
+I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It puts extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library with your stereo albums, plays them as head-tracked Spatial Audio on AirPods, and checks whether your "hi-res" files really are. The signal path shows every step from file to output, and the bit-perfect conditions and their tests are in the source for anyone to audit. SACD ISO playback is coming in the next release. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted.
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+<br>
@@ -28,14 +28,15 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It b
 
 ## What it does
 
-- Plays SACD images (coming in the next release; `.iso`, stereo and 5.1, DST-compressed or plain) straight from the image, plus extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC, alongside stereo albums. SACD ISO playback matched sacd_extract bit for bit on two real discs.
-- Renders surround as head-tracked Spatial Audio on AirPods. Atmos objects are rendered from Dolby Digital Plus; TrueHD Atmos and DTS:X play their channel bed.
-- Chooses between an album's stereo and surround versions for the output you use, with each song listed once.
-- Switches your DAC to the file's sample rate. PCM playback has been tested up to 384 kHz on a FiiO K11. DSD files decode from DSD64 to DSD512; DoP depends on the DAC and its carrier rate.
-- Shows decoding, resampling, channel mixing, gain and output format in the signal path. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met. [Tests and hardware checks](docs/VERIFICATION.md) explain what that covers.
-- Flags padded bit depth and possible upsampling or lossy origin, with measurements and the limits of each verdict.
-- Browses and filters albums, artists, songs and genres, with playlists, tag editing and a parametric EQ with AutoEQ import.
-- Plays files from local drives or SMB, NFS and WebDAV shares, with caching and Keep Offline.
+- **One library for stereo and surround.** Extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC sit alongside stereo albums. When an album has both a stereo and a surround version, each song is listed once and Vespertine plays the version that suits your output.
+- **Head-tracked Spatial Audio on AirPods** for local surround files. Atmos objects are rendered from Dolby Digital Plus; TrueHD Atmos and DTS:X play their channel bed. Surround can also be exported as binaural stereo or multichannel ALAC.
+- **A signal path you can check.** Decoding, resampling, channel mixing, gain and output format are shown for every track, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met, and when something changed the samples it says what. [Tests and hardware checks](docs/VERIFICATION.md) explain what that covers.
+- **Fake hi-res detection.** Flags 16-bit audio padded to 24, likely upsampled masters and likely lossy origin, with the measurements behind each verdict and their limits. `vespertine-analyze` runs the same analysis on a Linux server next to your files.
+- **Native rate and depth.** Switches your DAC to each file's sample rate, with exclusive (hog) mode and integer mode. PCM playback has been tested up to 384 kHz on a FiiO K11. DSD files decode from DSD64 to DSD512; DoP depends on the DAC and its carrier rate.
+- **Lossless on AirPods Max over USB-C**, shown as a 24-bit / 48 kHz device; over Bluetooth it tells you the link is AAC.
+- **A library that respects your files.** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, and a tag editor that backs up every file first. A parametric EQ imports AutoEQ and Equalizer APO presets per output; it is off by default, and when it is on the signal path says EQUALIZER.
+- **NAS libraries.** Plays from local drives or SMB, NFS and WebDAV shares, with caching and Keep Offline.
+- **SACD images, in the next release.** `.iso` playback (stereo and 5.1, DST-compressed or plain) straight from the image. It matched sacd_extract bit for bit on two real discs.
 
 [All features and screenshots](docs/FEATURES.md) · [How it's made](#how-its-made)
 
