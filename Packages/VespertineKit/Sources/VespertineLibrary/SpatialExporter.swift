@@ -32,7 +32,7 @@ public enum SpatialExporter {
             do {
                 try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                 let item = PlayableItem(url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
-                                        regionFrameLength: track.cueFrameLength)
+                                        regionFrameLength: track.cueFrameLength, sacdArea: track.sacdArea)
                 try MultichannelExport.export(item, kind: kind, to: dest) { progress?(index, $0) }
                 try tag(dest, from: track, kind: kind, artwork: artwork)
                 result.written.append(dest)

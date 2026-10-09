@@ -312,7 +312,7 @@ final class PlayerController {
     private func makeItem(_ track: Track, id: UUID = UUID()) -> PlayableItem {
         PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
                      regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
-                     cacheKey: shares.isNetwork(track) ? NetworkCache.key(for: track) : nil)
+                     cacheKey: shares.isNetwork(track) ? NetworkCache.key(for: track) : nil, sacdArea: track.sacdArea)
     }
 
     /// ReplayGain adjustment with peak protection (never pushes the peak over 0 dBFS).

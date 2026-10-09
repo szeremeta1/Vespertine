@@ -47,7 +47,9 @@ struct MainWindow: View {
                     .help("Back (⌘[)")
             }
         }
-        .fileImporter(isPresented: $model.showImporter, allowedContentTypes: [.folder, .audio], allowsMultipleSelection: true) { result in
+        // SACD images (.iso) are disk images, not audio, to macOS.
+        .fileImporter(isPresented: $model.showImporter, allowedContentTypes: [.folder, .audio] + [UTType(filenameExtension: "iso")].compactMap { $0 },
+                      allowsMultipleSelection: true) { result in
             if case .success(let urls) = result { model.importFolders(urls) }
         }
         .onKeyPress(.space) {

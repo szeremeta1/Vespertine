@@ -229,7 +229,8 @@ struct TagEditorView: View {
                     if let b = t.bitrate { row("Bitrate", "\(Int(b)) kbps") }
                     row("Size", t.fileSize.byteString)
                     if let g = t.rgTrackGain { row("ReplayGain", String(format: "track %+.2f dB%@", g, t.rgAlbumGain.map { String(format: " · album %+.2f dB", $0) } ?? "")) }
-                    if t.cueStartFrame != nil { row("CUE", "Virtual track; edits stay in the library") }
+                    if let area = t.sacdArea { row("SACD", "\(area == .stereo ? "Stereo" : "Multichannel") area of a disc image; edits stay in the library") }
+                    else if t.cueStartFrame != nil { row("CUE", "Virtual track; edits stay in the library") }
                     row("Plays", "\(t.playCount)")
                 }
                 Text(model.library.displayPath(t.filePath)).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3)

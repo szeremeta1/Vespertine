@@ -65,8 +65,9 @@ public enum LibraryAudit {
                                         detail: "\(folders.count) folders; \(clashes.count) track numbers used by different songs",
                                         paths: folders.sorted()))
             }
-            // Copies: the same file (size, length, title) twice. The app shows one; worth tidying anyway.
-            let copies = Dictionary(grouping: ts) { "\($0.fileSize)|\(Int(($0.duration * 100).rounded()))|\($0.title.lowercased())|\($0.cueStartFrame ?? -1)" }
+            // Copies: the same file (size, length, title) twice. The app shows one; worth tidying anyway. An SACD image's
+            // stereo and multichannel tracks share the file and their lengths, not their channels.
+            let copies = Dictionary(grouping: ts) { "\($0.fileSize)|\(Int(($0.duration * 100).rounded()))|\($0.title.lowercased())|\($0.cueStartFrame ?? -1)|\($0.channels)" }
                 .values.filter { $0.count > 1 }
             if !copies.isEmpty {
                 let where_ = Set(copies.flatMap { $0.map { albumFolder($0.filePath) } }).sorted()

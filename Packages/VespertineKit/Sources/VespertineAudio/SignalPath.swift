@@ -25,6 +25,8 @@ public struct SignalPath: Sendable, Hashable {
     public var equalizer: String? = nil
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
+    /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
+    public var concealedFrames = 0
 
     public var isResampling: Bool { plan.resamples }
 
@@ -38,7 +40,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.exclusive || !otherAppsPlaying, !modifiesSamples, plan.spatial == .off,
+        guard deviceProfile.canBeBitPerfect, applied.exclusive || !otherAppsPlaying, !modifiesSamples, plan.spatial == .off, concealedFrames == 0,
               plan.channels == source.channels, applied.virtualChannels >= source.channels else { return false }
         switch plan.mode {
         case .dop:
@@ -66,6 +68,7 @@ public struct SignalPath: Sendable, Hashable {
             case .pcm: return "BIT-PERFECT"
             }
         }
+        if concealedFrames > 0 { return "DAMAGED FRAMES SILENCED" }
         if plan.spatial != .off { return plan.spatial == .headTracked ? "SPATIAL · HEAD TRACKED" : "SPATIAL AUDIO" }
         if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {

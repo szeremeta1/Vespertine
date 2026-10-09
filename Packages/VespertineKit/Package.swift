@@ -72,9 +72,12 @@ let package = Package(
         .executableTarget(name: "vespertine-probe", dependencies: ["VespertineAudio"]),
         // Library operations from the command line (find music, import, enrich) — same code the app uses.
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
-        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+        // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
+        .target(name: "VespertineTestSupport", path: "Tests/VespertineTestSupport"),
+        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport",
+                                                                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
-        .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags"]),
+        .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],
     swiftLanguageModes: [.v6],
     cxxLanguageStandard: .cxx17
