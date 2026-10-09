@@ -148,6 +148,17 @@ The decoders have automated tests with generated fixtures: TrueHD output is comp
 - **Fake hi-res detection.** Finds 16-bit audio padded into 24-bit files (exactly), and flags likely upsampled "hi-res", lossy-origin files, and "enhanced" files whose high frequencies look synthesized (SBR or AI upscaling). Those three are heuristics: every verdict shows its evidence and names what else could explain it; some high-bitrate lossy files pass as genuine, and some genuine recordings with steep filters look suspicious ([limits](docs/ANALYSIS.md#limits)). Results are saved, can run automatically on import, and can filter any page. A *Suspect Hi-Res* smart playlist collects them. For music on a NAS or server, `vespertine-analyze` runs the same analysis next to the files and Vespertine imports the results, so nothing is read over the network. [How it works](docs/ANALYSIS.md).
 - **Live spectrum** of exactly what the DAC receives (DSD over DoP included), plus a mini player, a menu-bar extra and full Now Playing / media-key integration.
 
+## Known limitations
+
+Vespertine is young, and some of what it does hasn't met real hardware yet. Reports help most here: [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
+
+- **Tested on a handful of devices.** Playback has been checked on a FiiO K11, AirPods Max (USB-C and Bluetooth) and a MacBook Pro's speakers. Other class-compliant DACs should work, but DSD over DoP has only been confirmed on the FiiO.
+- **No multichannel hardware or AV receiver yet.** Surround routing is covered by automated tests and a six-channel aggregate device, and bitstream to a receiver only by FFmpeg's S/PDIF reader.
+- **Intel Macs are untested.** The Intel half of the universal app has run under Rosetta, not on an Intel Mac.
+- **No room correction.** The parametric EQ handles headphone and speaker correction curves, but there's no convolution.
+- **No streaming services and no network renderers.** Vespertine plays your own files, locally or from a share. There is no Qobuz or TIDAL, and no UPnP/DLNA or Roon Ready renderers (AirPlay works, as any Mac output does, at 44.1 kHz).
+- **Not supported:** DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
+
 ## Build
 
 ```bash
@@ -268,6 +279,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how audio gets from file to
 ## How it's made
 
 Vespertine is designed and maintained by Alexander Szeremeta. Most of the code was written with AI coding agents (Claude Code and Codex) under his direction, as the commit history shows: he sets the behavior, the design and the acceptance tests, and checks the audio paths on real hardware (a FiiO K11 at every rate up to 384 kHz, AirPods Max over USB-C and Bluetooth, and a MacBook Pro's speakers). No multichannel DAC or AV receiver has been available, so reports from other DACs, receivers and multichannel interfaces are especially welcome: [open a device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
+
+## Contributing
+
+Bug reports, device reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
