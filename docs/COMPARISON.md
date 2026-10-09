@@ -8,7 +8,7 @@ The starting point was the maintainer's October 9, 2026 competitor-review summar
 
 The [feature details](FEATURES.md), [signal-path conditions](../Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) and [verification guide](VERIFICATION.md) describe what the app implements and how it is checked. The table says “conditions + tests” rather than claiming an independent loopback result.
 
-Receiver bitstream and multichannel DAC output are experimental, untested on real receivers/multichannel DACs; reports wanted. Decoding, routing and carrier tests do not establish hardware compatibility. There is no SACD ISO yet, convolution, audio effect plugin hosting or streaming-service integration.
+Receiver bitstream and multichannel DAC output are experimental, untested on real receivers/multichannel DACs; reports wanted. Decoding, routing and carrier tests do not establish hardware compatibility. SACD ISO playback is new (two real discs tested against sacd_extract). There is no convolution, audio effect plugin hosting or streaming-service integration.
 
 ## Apple Music on Mac
 

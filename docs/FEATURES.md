@@ -4,7 +4,7 @@ Vespertine is a free, open-source Mac player for surround and hi-res music colle
 
 ## Surround in one library
 
-Extracted SACD 5.1 tracks, multichannel FLAC, DTS CDs, Dolby TrueHD and DTS-HD Master Audio share a library with your stereo albums. SACD tracks must already be extracted as DSF, DFF or PCM files. SACD ISO is not supported yet.
+Extracted SACD 5.1 tracks, multichannel FLAC, DTS CDs, Dolby TrueHD and DTS-HD Master Audio share a library with your stereo albums. SACD images (`.iso`) play straight from the image: stereo and multichannel areas, DST-compressed or plain, each song listed once with both versions, titled from the disc's own text. DST is decoded to the original DSD, so it goes out over DoP bit for bit or through the same DSD → PCM conversion as DSF. The image is read in place and never written to. Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit; 5.0, multichannel-only and DSD128+ discs are covered only by synthesized images. Extracted DSF, DFF or PCM tracks work too.
 
 Surround renders as head-tracked or fixed Spatial Audio on AirPods, or folds down by channel layout on a stereo DAC. Dolby Digital Plus with Atmos uses macOS's object renderer. TrueHD Atmos and DTS:X play their lossless channel bed; their objects are not rendered.
 
@@ -97,7 +97,8 @@ For lossless PCM and DoP, a completed local copy can replace the network source 
 | Format | Files | Path |
 |---|---|---|
 | FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate when the DAC supports it; PCM hardware tested to 384 kHz. Unchanged 32-bit PCM needs integer mode. |
-| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. Hardware carrier rates above 384 kHz are untested. No SACD ISO yet. |
+| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. Hardware carrier rates above 384 kHz are untested. |
+| SACD images | `.iso` (stereo and multichannel areas, DST or plain) | DSD64, the same way as DSF and DSDIFF; each song listed once with its stereo and 5.1 versions |
 | Dolby Atmos | DD+ with Atmos in `.ec3` `.m4a` `.mp4` | macOS object renderer, or decoded channel bed |
 | Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless channel decode; TrueHD Atmos objects are not rendered |
 | Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` `.mp4` | macOS decode; receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted |

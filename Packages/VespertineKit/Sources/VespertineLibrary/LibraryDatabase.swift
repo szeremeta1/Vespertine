@@ -304,8 +304,12 @@ public extension LibraryDatabase {
                max(isDSD) AS isDSD, max(sampleRate) AS maxRate, max(bitDepth) AS maxBits, max(channels) AS maxChannels,
                max(codec) AS codec, count(DISTINCT codec) AS codecCount, min(isLossless) AS lossless, max(bitrate) AS bitrate,
                max(addedAt) AS addedAt,
-               -- a CUE-split file counts once (with its first track), not once per track
-               sum(CASE WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
+               -- a CUE-split file counts once (with its first track), not once per track; an SACD image once, with
+               -- whichever of its tracks comes first (#2ch-1 usually, #mch-1 on a disc with only a multichannel area)
+               sum(CASE WHEN location LIKE '%#2ch-%' OR location LIKE '%#mch-%' THEN
+                            CASE WHEN location = (SELECT min(image.location) FROM track AS image WHERE image.albumKey = track.albumKey
+                                                  AND image.filePath = track.filePath AND image.isMissing = 0) THEN fileSize ELSE 0 END
+                        WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
                min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey,
                -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')
                group_concat(DISTINCT replace(codec, ',', ' ') || ':' || isLossless || isDSD) AS kinds,
@@ -897,8 +901,9 @@ extension LibraryDatabase {
 
         func edited(_ r: Row) -> Bool { r["edited"] }
         func fileKey(_ r: Row) -> String {
-            let size: Int64 = r["fileSize"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"]
-            return "\(size)|\(Int((duration * 1000).rounded()))|\(cue ?? -1)"
+            // Channels too: an SACD image's stereo and multichannel tracks share the file, their starts and lengths.
+            let size: Int64 = r["fileSize"], duration: Double = r["duration"], cue: Int64? = r["cueStartFrame"], channels: Int = r["channels"]
+            return "\(size)|\(Int((duration * 1000).rounded()))|\(cue ?? -1)|\(channels)"
         }
         func exactKey(_ r: Row) -> String? {
             guard !edited(r) else { return nil }

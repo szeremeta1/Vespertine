@@ -44,3 +44,16 @@ bool nff_is_dsd(const NFFDecoder *_Nonnull d);
 int nff_read_dsd(NFFDecoder *_Nonnull d, uint8_t *_Nonnull const *_Nonnull planes, int bytes);
 /// Positions raw reading at byte `offset` (per channel).
 bool nff_seek_dsd(NFFDecoder *_Nonnull d, int64_t offset);
+
+// MARK: DSD to PCM for raw DSD from elsewhere (SACD images): FFmpeg's DSD decoder, the one DSDIFF files go through.
+
+typedef struct NFFDSDConverter NFFDSDConverter;
+
+/// A converter for `channels` channels at `byteRate` DSD bytes per second per channel (the DSD rate / 8), which
+/// is also the PCM rate it puts out. NULL if FFmpeg won't open it.
+NFFDSDConverter *_Nullable nff_dsd_converter_create(int channels, int byteRate);
+void nff_dsd_converter_destroy(NFFDSDConverter *_Nullable c);
+/// Converts `bytes` DSD bytes per channel, interleaved by channel and most significant bit first (as DSDIFF stores
+/// them), into as many float frames in `planes`. The filter carries on from the previous call. Returns frames
+/// written, -1 on error.
+int nff_dsd_convert(NFFDSDConverter *_Nonnull c, const uint8_t *_Nonnull interleaved, int bytes, float *_Nonnull const *_Nonnull planes);

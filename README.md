@@ -9,7 +9,7 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It brings extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files into one library, with head-tracked Spatial Audio on AirPods. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted. The signal path shows each stage from file to output, and the conditions and tests are in the source for anyone to audit.
+I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It brings SACD images and extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files into one library, with head-tracked Spatial Audio on AirPods. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted. The signal path shows each stage from file to output, and the conditions and tests are in the source for anyone to audit.
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+<br>
@@ -28,7 +28,7 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It b
 
 ## What it does
 
-- Plays extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC alongside stereo albums. SACD ISO is not supported yet.
+- Plays SACD images (new in the next beta; `.iso`, stereo and 5.1, DST-compressed or plain) straight from the image, plus extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC, alongside stereo albums. SACD ISO playback matched sacd_extract bit for bit on two real discs.
 - Renders surround as head-tracked Spatial Audio on AirPods. Atmos objects are rendered from Dolby Digital Plus; TrueHD Atmos and DTS:X play their channel bed.
 - Chooses between an album's stereo and surround versions for the output you use, with each song listed once.
 - Switches your DAC to the file's sample rate. PCM playback has been tested up to 384 kHz on a FiiO K11. DSD files decode from DSD64 to DSD512; DoP depends on the DAC and its carrier rate.
@@ -57,7 +57,7 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 | Local surround files | Yes² | ? | Yes | Yes | Yes | ? | ? | Yes | ? |
 | Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | ? | Yes | ? |
 | Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? | ? |
-| SACD ISO | No, not yet | No | ? | ? | Yes | ? | No | ? | ? |
+| SACD ISO | Yes, from the next beta | No | ? | ? | Yes | ? | No | ? | ? |
 | Convolution / audio effect plugins | No / No | ? / ? | Yes / ? | Yes / ? | ? / ? | ? / ? | ? / ? | ? / ? | ? / ? |
 | Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | ? | ? | ? | ? | ? |
 
@@ -73,7 +73,8 @@ I've tested playback on a FiiO K11 at rates up to 384 kHz, AirPods Max over USB-
 
 - Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. Routing has automated tests and a six-channel aggregate-device check; bitstream carriers were checked with FFmpeg's S/PDIF reader.
 - Intel Macs are untested. The Intel build has run under Rosetta. DoP has only been confirmed on the FiiO K11; carrier rates above 384 kHz have not been tested on hardware.
-- No SACD ISO yet, convolution, audio effect plugins, streaming services or UPnP/DLNA renderers.
+- SACD images have been tested on two real discs (The Dark Side of the Moon, Brothers in Arms: plain and DST stereo, DST 5.1). Discs with a 5.0 area, only a multichannel area, or DSD128 and above are covered only by synthesized images.
+- No convolution, audio effect plugins, streaming services or UPnP/DLNA renderers.
 - No DSD inside WavPack or DRM-protected Apple Music downloads. TrueHD Atmos and DTS:X objects are not rendered. TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
 ## Build

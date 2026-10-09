@@ -8,6 +8,7 @@ import CryptoKit
 import Darwin
 import Foundation
 import SFBAudioEngine
+import VespertineAudio
 
 public enum ImportMode: String, Sendable, CaseIterable {
     case reference, copyAndOrganize
@@ -54,12 +55,15 @@ public enum Importer {
             if file.resolvingSymlinksInPath().path.hasPrefix(managed + "/") { continue }
             let md = (try? AudioFile(readingPropertiesAndMetadataFrom: file))?.metadata
             let inferred = FilenameParser.parse(file)
-            let artist = sanitize(md?.albumArtist.flatMap(nonEmpty) ?? md?.artist.flatMap(nonEmpty) ?? inferred.artist ?? "Unknown Artist")
-            let album = sanitize(md?.albumTitle.flatMap(nonEmpty) ?? inferred.album ?? "Singles")
+            // An SACD image holds a whole album: it goes under the disc's own artist and title, keeping its name.
+            let sacd = SourceInspector.discImageExtensions.contains(file.pathExtension.lowercased()) ? try? SACDImage.read(file) : nil
+            let artist = sanitize(sacd.flatMap { $0.albumArtist ?? $0.discArtist } ?? md?.albumArtist.flatMap(nonEmpty)
+                                  ?? md?.artist.flatMap(nonEmpty) ?? inferred.artist ?? "Unknown Artist")
+            let album = sanitize(sacd.flatMap { $0.albumTitle ?? $0.discTitle } ?? md?.albumTitle.flatMap(nonEmpty) ?? inferred.album ?? "Singles")
             let title = md?.title.flatMap(nonEmpty) ?? inferred.title
             let number = md?.trackNumber ?? inferred.trackNumber
             let disc = (md?.discTotal ?? 1) > 1 ? md?.discNumber.map { "\($0)-" } ?? "" : ""
-            let name = disc + (number.map { String(format: "%02d ", $0) } ?? "") + title
+            let name = sacd != nil ? file.deletingPathExtension().lastPathComponent : disc + (number.map { String(format: "%02d ", $0) } ?? "") + title
 
             let folder = root.appendingPathComponent(artist, isDirectory: true).appendingPathComponent(album, isDirectory: true)
             let wanted = folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased())
