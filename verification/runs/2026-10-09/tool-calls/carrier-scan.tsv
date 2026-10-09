@@ -1,0 +1,78 @@
+tool	argument
+Read	/srv/cleanroom/carrier-scan/BRIEF.md
+Bash	swiftbox /srv/cleanroom/carrier-scan "ls -la; ls specs/*/ | head -50; ls specs/atsc-a52-2018 | wc -l; ls specs/etsi-ts-102114-1.6.1 | wc -l; ls -la samples"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-00{3,4,5,6,7,8}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-00{9,10}.txt specs/atsc-a52-2018/page-011.txt specs/atsc-a52-2018/page-012.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -l 'frmsizecod' specs/atsc-a52-2018/*.txt; grep -l -i 'crc' specs/atsc-a52-2018/*.txt; for f in specs/atsc-a52-2018/page-0{20,21,22,23}*.txt; do echo == \$f; tail -3 \$f; done"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-0{29,30,31,32}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-0{33,37,38,39,40,41}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-0{42,43,44}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-0{52,53,54,55,56}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-10{4,5,6,7,8}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -l 'strmtyp' specs/atsc-a52-2018/*.txt; grep -l 'frmsiz\b' specs/atsc-a52-2018/*.txt; grep -n 'ANNEX E' specs/atsc-a52-2018/*.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-010.txt; cat specs/atsc-a52-2018/page-13{1,2,3,4,5,6,7,8}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-1{39,40,41,42,43}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-1{58,59,60,61,62}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'crc\|encinfo\|syncword\|0x0B77\|frame size\|frmsiz' specs/atsc-a52-2018/page-1[4-9]*.txt specs/atsc-a52-2018/page-2*.txt | head -80"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-18{3,4,5}.txt; cat specs/atsc-a52-2018/page-176.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'shall not exceed\|kbps\|kbit\|Mbps\|maximum\|minimum' specs/atsc-a52-2018/page-1[3-9]*.txt specs/atsc-a52-2018/page-2*.txt | head -60"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'substream\|bsid' specs/atsc-a52-2018/page-2[2-3]*.txt | head -60"
+Bash	swiftbox /srv/cleanroom/carrier-scan "xxd samples/sample.ac3 | head -5; echo; xxd samples/sample.ec3 | head -5; echo; xxd samples/sample.dts | head -5"
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 -c \"\nimport sys\nfor f in ['samples/sample.ac3','samples/sample.ec3','samples/sample.dts']:\n    d=open(f,'rb').read()\n    print(f, len(d), d[:32].hex())\n\""
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-00{1,2,3,4,5,6}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -l 'FSIZE' specs/etsi-ts-102114-1.6.1/*.txt; grep -n 'Core Frame Header\|Frame Header\|SYNC' specs/etsi-ts-102114-1.6.1/page-00[3-9].txt | head -40"
+Bash	swiftbox /srv/cleanroom/carrier-scan "sed -n 60,130p specs/etsi-ts-102114-1.6.1/page-003.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "for i in 020 023 024 025; do echo == \$i; head -3 specs/etsi-ts-102114-1.6.1/page-\$i.txt; done"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-02{2,3,4,5}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-0{26,27,28,29,30,31,32}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-0{33,34,35,36}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'NumSubband\|frame size\|FSIZE' specs/etsi-ts-102114-1.6.1/*.txt | head -50"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-04{7,8}.txt; grep -n -i 'NumSubband *=\|NumSubband =\|NUM_SUBBAND' specs/etsi-ts-102114-1.6.1/*.txt | head"
+Bash	mkdir -p /srv/cleanroom/carrier-scan/dev 2>/dev/null; echo ok
+Write	/srv/cleanroom/carrier-scan/dev/peek_dts.py (1352 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/peek_dts.py samples/sample.dts"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-09{3,4,5,6}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-09{7,8,9}.txt specs/etsi-ts-102114-1.6.1/page-10{0,1}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'Annex B' specs/etsi-ts-102114-1.6.1/page-0*.txt | head; grep -l -i 'CRC' specs/etsi-ts-102114-1.6.1/*.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "sed -n 40,60p specs/etsi-ts-102114-1.6.1/page-006.txt; grep -n 'Annex B\|CRC' specs/etsi-ts-102114-1.6.1/page-20*.txt specs/etsi-ts-102114-1.6.1/page-19*.txt | head"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/etsi-ts-102114-1.6.1/page-204.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "grep -n -i 'fe7f\|1fffe8\|14-bit\|14 bit\|little\|endian\|byte order\|byte-swap' specs/etsi-ts-102114-1.6.1/*.txt | head -20; grep -n -i 'little\|endian\|byte order\|byte-swap\|770b\|0x770B' specs/atsc-a52-2018/*.txt | head"
+Write	/srv/cleanroom/carrier-scan/dev/peek_ac3.py (3029 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/peek_ac3.py samples/sample.ac3; python3 dev/peek_ac3.py samples/sample.ec3"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-16{3,4,5,6,7,8}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-1{69,70,71,72,73}.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "cat specs/atsc-a52-2018/page-232.txt"
+Bash	swiftbox /srv/cleanroom/carrier-scan "sed -n 1,200p specs/atsc-a52-2018/page-231.txt"
+Write	/srv/cleanroom/carrier-scan/dev/peek_crc.py (705 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/peek_crc.py samples/sample.ac3 1536; python3 dev/peek_crc.py samples/sample.ec3 1536"
+Write	/srv/cleanroom/carrier-scan/carrier_scan.py (42491 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "for f in ac3 ec3 dts; do python3 carrier_scan.py frames samples/sample.\$f > /tmp/o.txt; echo exit=\$?; head -2 /tmp/o.txt; wc -l < /tmp/o.txt; done"
+Write	/srv/cleanroom/carrier-scan/dev/check_tables.py (2618 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/check_tables.py"
+Write	/srv/cleanroom/carrier-scan/dev/tests.py (31711 chars)
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py 2>&1 | tail -150"
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py test_ac3_header_rules 2>&1 | tail -30; python3 -c \"\nimport sys; sys.path.insert(0,'.'); sys.path.insert(0,'dev')\nimport tests as t, carrier_scan as cs\nf0 = t.split(t.sample('sample.ac3'))[0]\nv = t.set_bits(bytes(f0[:1392]), 32, 2, 1)\nprint(cs.AC3_FRAME_WORDS[1][28])\nv = t.fix_ac3(v)\nprint(t.is_valid(v))\n\""
+Edit	/srv/cleanroom/carrier-scan/dev/tests.py
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py test_ac3_header_rules 2>&1 | tail -8"
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 -c \"\nimport sys; sys.path.insert(0,'.'); sys.path.insert(0,'dev')\nimport tests as t, carrier_scan as cs\nf0 = t.split(t.sample('sample.ac3'))[0]\nv = t.set_bits(bytes(f0[:834]), 32, 8, (1 << 6) | 22)\nprint(v[4], cs.AC3_FRAME_WORDS[1][22])\ntry:\n    v = t.fix_ac3(v)\nexcept AssertionError as e: print('assert', e)\nprint(t.is_valid(v))\n\""
+Edit	/srv/cleanroom/carrier-scan/dev/tests.py
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py 2>&1 | tail -4"
+Edit	/srv/cleanroom/carrier-scan/dev/tests.py
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py test_ac3_bsi_rules 2>&1 | tail -30"
+Edit	/srv/cleanroom/carrier-scan/dev/tests.py
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py 2>&1 | tail -3; python3 dev/check_tables.py"
+Bash	swiftbox /srv/cleanroom/carrier-scan "sed -n 60,90p specs/etsi-ts-102114-1.6.1/page-020.txt; grep -n 'Document Conventions\|^3.4' specs/etsi-ts-102114-1.6.1/page-020.txt"
+Read	/srv/cleanroom/carrier-scan/carrier_scan.py
+Read	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Read	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Edit	/srv/cleanroom/carrier-scan/carrier_scan.py
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 dev/tests.py 2>&1 | grep -c '^ok'; python3 dev/tests.py 2>&1 | tail -3; python3 dev/check_tables.py; python3 -m py_compile carrier_scan.py && echo compiled"
+Bash	swiftbox /srv/cleanroom/carrier-scan "python3 carrier_scan.py scan dev/out/falsesync.wav | sed -n '1,3p;\$p'; echo ---; python3 carrier_scan.py compare dev/out/c_sample.dts_little_2.wav samples/sample.dts; echo rc=\$?; python3 carrier_scan.py compare dev/out/bad_sample.ac3.wav samples/sample.ac3; echo rc=\$?; python3 carrier_scan.py -v scan dev/out/bad_sample.ac3.wav 2>&1 >/dev/null | head -3"
+SubagentHandback	(its final report, in reports/)

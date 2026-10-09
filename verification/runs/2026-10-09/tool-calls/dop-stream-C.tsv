@@ -1,0 +1,55 @@
+tool	argument
+Read	/srv/cleanroom/dop-stream-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dop-stream-C "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/*; ls harness/Sources/Mutants 2>&1"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "swift --version; cd harness && ls -la; ls .build 2>&1 | head"
+Write	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift (26225 chars)
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build 2>&1 | tail -30"
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build 2>&1 | tail -15"
+Write	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift (16138 chars)
+Read	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift (16138 chars)
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning|Compiling|Build' | head -30 && time swift run -c release Scratch 2>&1 | tail -150"
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:' | head -30 ; time swift run -c release Scratch 2>&1 | tail -150"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && grep -n 'overReportPartialWrite\|drainWhileMuted\|rightAlign\|popPending\|poppedTotal' Sources/Mutants/DoPStreamMutants.swift"
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Read	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:' | head -30 ; time swift run -c release Scratch 2>&1 | tail -120"
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:' | head -30 ; time swift run -c release Scratch fuzz 2>&1 | tail -20"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && grep -n 'exit(0)\|^let verbose\|^print(allGood' Sources/Scratch/main.swift"
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:' | head -30 ; time swift run -c release Scratch fuzz 2>&1 | tail -20"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && rm -rf .build && swift build 2>&1 | tail -20"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && time swift run Scratch fuzz 2>&1 | tail -5"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:'; swift run -c release Scratch 2>&1 | grep -E '^(BAD|==|ALL|SOME)' "
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:'; swift run -c release Scratch twin 2>&1 | tail -30"
+Read	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Read	/srv/cleanroom/dop-stream-C/harness/Sources/Mutants/DoPStreamMutants.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && sed -i 's/^enum Flaw: Sendable, Equatable {/private enum Flaw: Sendable, Equatable {/; s/^struct FlawedMaker: DoPStageMaker {/private struct FlawedMaker: DoPStageMaker {/; s/^final class FlawedStage: DoPStage {/private final class FlawedStage: DoPStage {/' Sources/Mutants/DoPStreamMutants.swift && grep -n '^private' Sources/Mutants/DoPStreamMutan
+Bash	swiftbox /srv/cleanroom/dop-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning:'; swift run -c release Scratch 2>&1 | grep -E '^(BAD|==|ALL|SOME)'; swift run -c release Scratch fuzz 2>&1 | tail -1; swift run -c release Scratch twin 2>&1 | grep -v '^checked' | tail -5"
+Bash	swiftbox /srv/cleanroom/dop-stream-C "mkdir -p notes && cp harness/Sources/Scratch/main.swift notes/scratch-validation.swift && printf '// Scratch: try things out here. Not delivered.\n' > harness/Sources/Scratch/main.swift && wc -c harness/Sources/Scratch/main.swift && cd harness && swift build 2>&1 | tail -3 && cd .. && find . -type f -not -path './harness/.build/*' | sort"
+SubagentHandback	(its final report, in reports/)

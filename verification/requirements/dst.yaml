@@ -1,0 +1,104 @@
+# SACD frames and DST decoding. Contract: contracts/dst-decode.md
+# The Scarlet Book (the SACD format) is not public, and the DST decoding process is in ISO/IEC 14496-3 subpart 10,
+# which is paywalled and not bought (decision 2026-10-09). What can be cited publicly is DSDIFF's description of the
+# frame and the DSD byte layout. Everything about decoding itself is oracle evidence.
+
+- id: DST-001
+  claim: CLAIMS.md#sacd-frames
+  source:
+    doc: "DSDIFF: Direct Stream Digital Interchange File Format"
+    version: "1.5 (2004-04-27)"
+    section: "§1.2 Definitions (Super Audio CD Frame), page 5"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf"
+    availability: public
+    cache: { doc: dsdiff-1.5, pages: 5, from: "1/75 second of audio", to: "37632 DSD samples per channel" }
+  requirement: "A Super Audio CD frame is 1/75 s; at 64 × 44.1 kHz it holds 37 632 DSD samples per channel, so a decoded frame is 4 704 bytes per channel."
+  quote: "At 64×fs a frame covers 37632 DSD samples per channel"
+  quote_sha256: 4b98cadfc2795b3606bdfc2df2faf1b0f81da58062959446ca3b5c441f52ad73
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/dst-decode.md"
+
+- id: DST-002
+  claim: CLAIMS.md#sacd-frames
+  source:
+    doc: "DSDIFF: Direct Stream Digital Interchange File Format"
+    version: "1.5 (2004-04-27)"
+    section: "§3.3 DSD Sound Data Chunk, page 18"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf"
+    availability: public
+    cache: { doc: dsdiff-1.5, pages: 18, from: "Eight bits (samples) of a channel are clustered", to: "is called a Clustered Frame." }
+  requirement: "Decoded DSD is laid out as channel bytes (8 samples of one channel, most significant bit oldest) interleaved one per channel in channel order."
+  quote: "channel bytes are interleaved in the order as identified in the Channels Chunk"
+  quote_sha256: bcd5dd1bdfe0310e3bfab2646d88a023ad352acf7628d027ac5d8dfbf6a6a9f3
+  kind: spec
+  testable: true
+  gap: "DSDIFF describes its own files. That an SACD's DST frames decode to the same layout is from the Scarlet Book, which isn't public; DSDIFF refers to its section 5.6."
+  interface: "contracts/dst-decode.md"
+
+- id: DST-003
+  claim: CLAIMS.md#sacd-dst
+  source:
+    doc: "SACD Ripper libdstdec (the MPEG-4 Audio reference module for DST, by Philips, as distributed with sacd_extract)"
+    version: "sacd-ripper commit a3d981c935c3224217e2842cd492f9351106c81e (2023-01-14)"
+    section: "libs/libdstdec: dst_fram.c DST_FramDSTDecode"
+    url: "https://github.com/sacd-ripper/sacd-ripper"
+    availability: public
+    cache:
+      oracle: verification/oracles/fetched/libdstdec   # fetched by tools/fetch_oracles.py from libs/libdstdec at that commit
+      files: [ccp_calc.c, ccp_calc.h, conststr.h, dst_ac.c, dst_ac.h, dst_data.c, dst_data.h, dst_fram.c, dst_fram.h,
+              dst_init.c, dst_init.h, types.h, unpack_dst.c, unpack_dst.h]
+  requirement: "For every DST frame in the fixtures, the decoder's output equals the reference decoder's output byte for byte."
+  quote_sha256: 593a13163daf6a8f8573c7f059ad562accd39acc8ad6ea3aa41cb42f021f18b4
+  kind: oracle
+  testable: true
+  gap: "An oracle is a second implementation, not the standard. The fixtures come from a small test encoder and exercise only the coding tools it uses (plain and Rice-coded tables, shared filters, half probability, stored frames); real discs are covered by hardware/SACD-ORACLE.md."
+  interface: "contracts/dst-decode.md"
+
+- id: DST-004
+  claim: CLAIMS.md#sacd-dst
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 7"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 7, from: "DST is decoded to the original DSD", to: "DST is decoded to the original DSD" }
+  requirement: "DST decoding is lossless: each fixture frame decodes to exactly the DSD it was encoded from."
+  quote_sha256: 0a4a380315ed112e31d46f04cd71f06fd4eb5791178a8bda2d632dfc7fd98182
+  kind: vespertine-rule
+  testable: true
+  gap: "The expected DSD is the encoder's input, confirmed by the reference decoder (DST-003) when the fixtures were made."
+  interface: "contracts/dst-decode.md"
+
+- id: DST-005
+  claim: CLAIMS.md#sacd-dst
+  source:
+    doc: "ISO/IEC 14496-3:2019 Information technology: Coding of audio-visual objects, Part 3: Audio"
+    version: "Edition 5 (2019-12)"
+    section: "Subpart 10 (DST); clause numbers not seen"
+    url: "https://www.iso.org/standard/76383.html"
+    availability: paywalled
+  requirement: "The DST decoding process (frame header, filter and probability tables, arithmetic decoding, prediction) and which frames are invalid."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Not bought (CHF 227). Until then DST decoding rests on oracle evidence (DST-003, hardware/SACD-ORACLE.md)."
+  interface: "contracts/dst-decode.md"
+
+- id: DST-006
+  claim: CLAIMS.md#sacd-toc
+  source:
+    doc: "Super Audio CD System Description (Scarlet Book)"
+    version: "1.3 (2002), as referenced by DSDIFF 1.5"
+    section: "not seen"
+    url: ""
+    availability: not-public
+  requirement: "Disc layout: Master TOC and its copies, area TOCs, track lists, sector and audio-frame format."
+  quote_sha256: BLOCKED
+  status: blocked-on-source
+  kind: spec
+  testable: false
+  gap: "Licensed only to SACD licensees; no purchase route. SACD image reading stays oracle evidence against sacd_extract (hardware/SACD-ORACLE.md)."
+  interface: "hardware/SACD-ORACLE.md"

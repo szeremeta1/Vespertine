@@ -1,0 +1,34 @@
+tool	argument
+Read	/srv/cleanroom/dop-pack-A/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dop-pack-A "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/SpecChecks 2>&1; cat harness/Sources/Contracts/DoPPack.swift"
+Bash	swiftbox /srv/cleanroom/dop-pack-A "swift --version; cd harness && ls -la; ls Sources/*"
+Write	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift (36025 chars)
+Bash	cd /srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks && python3 - <<'EOF' 2>/dev/null || echo "no python on host side; will edit with Edit tool"\nEOF\ntrue
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Read	/srv/cleanroom/dop-pack-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dop-pack-A/harness/Sources/Scratch/main.swift (7970 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift build 2>&1 | tail -40"
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift run Scratch 2>&1 | tail -80"
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && sed -i -E 's/tally\.finish\(checker, wanted: [^)]*(\([^)]*\))?[^)]*\)$/tally.finish(checker)/' Sources/SpecChecks/DoPPackChecks.swift && grep -n 'finish(' Sources/SpecChecks/DoPPackChecks.swift"
+Read	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift build 2>&1 | grep -E 'error|warning' ; swift run Scratch 2>&1 | grep -v '^\[' | head -60"
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Edit	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Read	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Read	/srv/cleanroom/dop-pack-A/harness/Sources/SpecChecks/DoPPackChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Complete|complete' ; swift run Scratch 2>&1 | grep -v '^\[' | grep -v 'not passed but' | head -70"
+Write	/srv/cleanroom/dop-pack-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && swift build 2>&1 | grep -Ei 'error|warning|complete'; git status 2>/dev/null | head -5; find . -path ./.build -prune -o -type f -newer Package.swift -print"
+Bash	swiftbox /srv/cleanroom/dop-pack-A "cd harness && rm -rf .build && swift build 2>&1 | tail -15"
+SubagentHandback	(its final report, in reports/)

@@ -1,0 +1,24 @@
+tool	argument
+Read	/srv/cleanroom/rate-A/BRIEF.md
+Bash	swiftbox /srv/cleanroom/rate-A "find . -type f -not -path '*/.build/*' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/rate-A "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/SpecChecks 2>&1"
+Bash	swiftbox /srv/cleanroom/rate-A "swift --version; cd harness && swift build 2>&1 | tail -5"
+Write	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift (39430 chars)
+Edit	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Read	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Edit	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' | head -40"
+Write	/srv/cleanroom/rate-A/harness/Sources/Scratch/main.swift (7888 chars)
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift build 2>&1 | grep -E 'error|warning' ; time swift run Scratch 2>&1 | tail -150"
+Read	/srv/cleanroom/rate-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/rate-A/harness/Sources/Scratch/main.swift (7888 chars)
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift build 2>&1 | grep -E 'error|warning' ; time swift run Scratch 2>&1 | tail -200"
+Edit	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift run Scratch 2>&1 | grep -c SKIP; swift run Scratch 2>&1 | grep SKIP | sort | uniq | head"
+Edit	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && rm -rf .build && swift build 2>&1 | grep -iE 'warning|error|Build complete'"
+Read	/srv/cleanroom/rate-A/harness/Sources/SpecChecks/RateChecks.swift
+Write	/srv/cleanroom/rate-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/rate-A "cd harness && swift build 2>&1 | grep -iE 'warning|error|Build complete'; find . -type f -not -path './.build/*' | sort"
+SubagentHandback	(its final report, in reports/)

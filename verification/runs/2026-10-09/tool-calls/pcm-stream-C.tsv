@@ -1,0 +1,38 @@
+tool	argument
+Read	/srv/cleanroom/pcm-stream-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/Mutants 2>&1; swift --version"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cat harness/Sources/Contracts/*.swift harness/Sources/SpecKit/SpecKit.swift | head -400"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && ls -la && ls -la .build 2>&1 | head -5"
+Write	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift (17955 chars)
+Write	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/IntegerMutants.swift (13918 chars)
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && swift build 2>&1 | tail -40"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && grep -n 'rounded' Sources/Mutants/*.swift"
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && swift build 2>&1 | tail -20"
+Write	/srv/cleanroom/pcm-stream-C/harness/Sources/Scratch/main.swift (18354 chars)
+Read	/srv/cleanroom/pcm-stream-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/pcm-stream-C/harness/Sources/Scratch/main.swift (18354 chars)
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && swift build -c release 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && time swift run -c release Scratch 2>&1 | tail -60"
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/IntegerMutants.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/IntegerMutants.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && sed -i 's/bases: \[RefFloat(extra: 0), RefFloat(extra: 37)\]/bases: [RefFloat(extra: 0), RefFloat(extra: 37), RefFloat(extra: 1 << 40)]/; s/bases: \[RefInt(extra: 0), RefInt(extra: 37)\]/bases: [RefInt(extra: 0), RefInt(extra: 37), RefInt(extra: 1 << 40)]/' Sources/Scratch/main.swift && tail -3 Sources/Scratch/main.swift && swift build -c release
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && rm -rf .build && swift build 2>&1 | grep -vE '^\[' | head -30"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && grep -n 'report(\"float\"' Sources/Scratch/main.swift"
+Read	/srv/cleanroom/pcm-stream-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/pcm-stream-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && time swift run Scratch fuzz 2>&1 | tail -5"
+Read	/srv/cleanroom/pcm-stream-C/harness/Sources/Mutants/FloatMutants.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness/Sources/Scratch && grep -n 'if CommandLine' main.swift && wc -l main.swift"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness/Sources/Scratch && head -n 461 main.swift > Harness.swift && cat >> Harness.swift <<'EOF'\n/// Runs the scratch checks: \`scratchMain(fuzz: false)\` reports what each mutant fails, \`fuzz: true\` fuzzes for traps.\n/// Not called from main.swift (left as given); call it from there temporarily to use it.\nfunc scratchMain(fuzz runFuzz: Bool) {\n    i
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && printf '// Scratch: try things out here. Not delivered.\nscratchMain(fuzz: false)\n' > Sources/Scratch/main.swift && swift run -c release Scratch 2>&1 | grep -E 'REFERENCE|MISSED|DUPLICATE|error|warning|==' ; swift run -c release Scratch 2>&1 | grep -c '^C-'"
+Bash	swiftbox /srv/cleanroom/pcm-stream-C "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && cat -A Sources/Scratch/main.swift && rm -rf .build && swift build 2>&1 | grep -vE '^\[' ; ls Sources/*/"
+SubagentHandback	(its final report, in reports/)

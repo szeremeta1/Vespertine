@@ -1,0 +1,46 @@
+# Integer mode. Contract: contracts/integer-stream.md
+
+- id: INT-001
+  claim: CLAIMS.md#int-32bit-words
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 58"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 58, from: "integer mode passes each 32-bit word through", to: "would be NaN as floats" }
+  requirement: "Every 32-bit word written comes out with all 32 bits unchanged, including words whose bit pattern would be a NaN (signalling or quiet), an infinity, a negative zero or a denormal if read as Float32."
+  quote_sha256: 1a6f6a4d4268a64080322be25fccf601f5c5a3d5e060d46197c31b6074545121
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/integer-stream.md"
+
+- id: INT-002
+  claim: CLAIMS.md#int-32bit-words
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 59"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 59, from: "A 32-bit integer source reaches the output word for word", to: "A 32-bit integer source reaches the output word for word" }
+  requirement: "Words keep their channel and their order: frame n channel c in is frame n channel c out, nothing dropped or repeated, however writes and renders are sized."
+  quote_sha256: 8df88c7919b06c823ce3e604041b421784e3ccaa40a9c2af82fb8adac0b6e3be
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/integer-stream.md"
+
+- id: INT-003
+  claim: CLAIMS.md#mute-no-skip
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 63"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 63, from: "mute and rebuffering never alter or skip music", to: "where playback is actually held" }
+  requirement: "While muted, or when no written words remain, the stage outputs silence (words equal to zero) and consumes nothing; afterwards the next word out is the next one not yet played."
+  quote_sha256: 68de57b5fc481ef6014697b41409a3af28a71429101e03f15186dc2e054128b1
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/integer-stream.md"
