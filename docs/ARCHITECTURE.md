@@ -59,6 +59,8 @@ Positions stay in the carrier's frames: a DTS CD holds one 512-sample frame per 
 
 ## Bitstream (IEC 61937)
 
+Receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted. The tests below validate the carrier, not a receiver.
+
 On outputs marked as having a receiver (`bitstreamDeviceUIDs`), Dolby and DTS-CD sources plan as mode `.bitstream`: exclusive, exact rate, integer ≥ 16-bit, no gain. `BitstreamDecoder` wraps Dolby Digital frames in 1536-frame bursts at the stream's rate (Pd in bits). It groups Dolby Digital Plus frames into six-block bursts of 6144 frames at four times the rate (Pd in bytes, so HDMI only). DTS CDs go out as stored. The carriers are checked with FFmpeg's S/PDIF demuxer, which decodes them identically to the original files. A gapless transition into an Atmos track that macOS renders drains the ring first, then hands over.
 
 ## Integer mode
@@ -103,6 +105,8 @@ The library is SQLite via GRDB:
 
 ## Multichannel and Spatial Audio
 
+Channel-for-channel output is experimental, untested on real receivers/multichannel DACs; reports wanted. Routing has automated tests and a six-channel aggregate-device check.
+
 `FormatPlanner` sends every channel to devices that can carry them (following the speaker layout from Audio MIDI Setup, and counting an HDMI receiver's channel capacity even in 2-channel mode), downmixes by channel layout on stereo devices, and on AirPods and Beats renders the channels with Apple's spatial mixer (`AUSpatialMixer`, head tracked or fixed) inside the I/O callback, through a C hook, so head tracking responds instantly.
 
 ## Network shares
@@ -130,7 +134,7 @@ The analysis core lives in `Packages/VespertineAnalysis` (plain Swift and Founda
 ## Known limits and roadmap
 
 - **Integer mode** needs exclusive access and a DAC with a non-mixable Int32 format. Elsewhere Vespertine renders Float32, which is exact up to 24 bits.
-- **Object audio.** Atmos in Dolby Digital Plus is rendered by macOS. Atmos in TrueHD and DTS:X play their lossless channel bed; their objects need a receiver, and macOS gives apps no way to send TrueHD or DTS-HD MA over HDMI (no high-bit-rate passthrough).
+- **Object audio.** Atmos in Dolby Digital Plus is rendered by macOS. Atmos in TrueHD and DTS:X play their lossless channel bed; their objects are not rendered, and macOS gives apps no way to send TrueHD or DTS-HD MA over HDMI (no high-bit-rate passthrough).
 - **DSD in WavPack** isn't supported.
 - **Resampler.** SRC uses Apple's mastering-quality converter. libsoxr is a candidate alternative.
 - **DoP support** can't be detected from the device, so it is opt-in per device.

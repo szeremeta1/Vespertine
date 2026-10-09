@@ -1,6 +1,6 @@
 // swift-tools-version: 6.2
 //
-// Vespertine — a bit-perfect audio player for macOS.
+// Vespertine: a surround and hi-res music player for macOS.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
