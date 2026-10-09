@@ -19,7 +19,7 @@ import SpecKit
 public enum IntegerChecks {
     public static let all: [SpecCheck<any IntegerOutput>] = [
         // REQ: INT-001
-        SpecCheck("INT-001: special words (NaN, infinity, ±0, denormal, extremes, single bits) on every channel of 1…8-channel stages",
+        SpecCheck("INT-001: special words (NaN, infinity, ±0, denormal, extremes, single bits), every channel",
                   requirements: ["INT-001"]) { subject, checker in
             istCheckSpecialWords(subject, checker)
         },
@@ -29,7 +29,7 @@ public enum IntegerChecks {
             istCheckSweeps(subject, checker)
         },
         // REQ: INT-001
-        SpecCheck("INT-001: all 2^16 high halves, and all 2^16 low halves under NaN, infinity, denormal and other high halves",
+        SpecCheck("INT-001: every high 16 bits; every low 16 bits under NaN, infinity, denormal and other highs",
                   requirements: ["INT-001"]) { subject, checker in
             istCheckHalves(subject, checker)
         },
@@ -146,7 +146,8 @@ fileprivate let istSpecialWords: [UInt32] = {
         w.append(~bit)
         w.append(bit | 0x7F80_0000)  // infinity or NaN with one more bit
     }
-    return w
+    var seen = Set<UInt32>()
+    return w.filter { seen.insert($0).inserted }
 }()
 
 /// Every float exponent with assorted significands, both signs; and every byte value in every byte position.
@@ -169,7 +170,8 @@ fileprivate let istSweepWords: [UInt32] = {
             }
         }
     }
-    return w
+    var seen = Set<UInt32>()
+    return w.filter { seen.insert($0).inserted }
 }()
 
 // MARK: - Value runs (INT-001)

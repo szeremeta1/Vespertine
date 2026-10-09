@@ -1,0 +1,15 @@
+tool	argument
+Read	/srv/cleanroom/dop-pack-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dop-pack-C "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dop-pack-C "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/; ls -la harness/Sources/Mutants 2>&1"
+Write	/srv/cleanroom/dop-pack-C/harness/Sources/Mutants/DoPPackMutants.swift (10684 chars)
+Write	/srv/cleanroom/dop-pack-C/harness/Sources/Scratch/main.swift (6078 chars)
+Read	/srv/cleanroom/dop-pack-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dop-pack-C/harness/Sources/Scratch/main.swift (6147 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-C "cd harness && swift build 2>&1 | tail -30 && swift run -c debug Scratch 2>&1 | tail -45"
+Edit	/srv/cleanroom/dop-pack-C/harness/Sources/Mutants/DoPPackMutants.swift
+Bash	swiftbox /srv/cleanroom/dop-pack-C "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' ; swift run Scratch 2>&1 | grep -E 'C-DOP-007|problems|REF'"
+Bash	swiftbox /srv/cleanroom/dop-pack-C "cd harness && rm -rf .build && swift build 2>&1 | grep -Ei 'warning|error|complete'; swift build -c release 2>&1 | grep -Ei 'warning|error|complete'; swift run -c release Scratch 2>&1 | grep -E 'problems|unique|DOP-00[0-9]\", value'"
+Write	/srv/cleanroom/dop-pack-C/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-C "cd harness && swift build 2>&1 | grep -Ei 'warning|error|complete'; find . -type f -not -path './.build/*'"
+SubagentHandback	(its final report, in reports/)

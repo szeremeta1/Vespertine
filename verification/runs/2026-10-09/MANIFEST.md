@@ -1,6 +1,6 @@
 # Run manifest
 
-Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unchanged into the harness.
+Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unchanged into the harness. Each is the agent's last delivery: where an agent had a review round, `round1/` holds the message it was sent and the diff from its first delivery.
 
 | Group | Role | File | SHA-256 | Lines |
 |---|---|---|---|---|
@@ -10,8 +10,8 @@ Every deliverable exactly as the agent wrote it (also in `outputs/`), copied unc
 | dop-stream | A | `harness/Sources/SpecChecks/DoPStreamChecks.swift` | `b6ce912709bfbfd17fb602eeeccf3ae141276ad252b3a97a3af2a131b9689826` | 1340 |
 | dop-stream | B | `harness/Sources/CleanRoomB/BDoPStream.swift` | `3200a0917e47b2da0a33e9bf330cc8cff9c063fdd4c4557334702d59be823712` | 123 |
 | dop-stream | C | `harness/Sources/Mutants/DoPStreamMutants.swift` | `4cac633061d4e5caebd5318f828d77dafb1fb4551898ef8b52f9a1ec99b89643` | 684 |
-| pcm-stream | A | `harness/Sources/SpecChecks/FloatChecks.swift` | `9ca959c91bf3d26a8a38d5f3ba840245c0a0faba411788fe5b4edbaad399610a` | 1080 |
-| pcm-stream | A | `harness/Sources/SpecChecks/IntegerChecks.swift` | `725511dc0b536fbe0be5c0c934024a349a3885b4fa2a20a9c7e5f9675d3548fc` | 911 |
+| pcm-stream | A | `harness/Sources/SpecChecks/FloatChecks.swift` | `39bf3474db985e63770caf4042fb2f8789bf8a567ff5dfb1b6319ae18cf674c9` | 1082 |
+| pcm-stream | A | `harness/Sources/SpecChecks/IntegerChecks.swift` | `84bbc0131a6b148bd581032d384e07b180cb6840afb9b883c9cb17b1b1d96c24` | 913 |
 | pcm-stream | B | `harness/Sources/CleanRoomB/BFloat.swift` | `3f49b533a992040fb8aeb2aec9ad47ef46e845d9515b5671c3a1fcd8432d6b2e` | 109 |
 | pcm-stream | B | `harness/Sources/CleanRoomB/BInteger.swift` | `0f239ca9a25b506ad38c83f963f6d17a670d8d68ef529c3369637c2431f33531` | 90 |
 | pcm-stream | C | `harness/Sources/Mutants/FloatMutants.swift` | `dcd12f1b45fde7752dcc45c0f60cf72451ea9020ee48703bb07813ea68a46cc5` | 437 |

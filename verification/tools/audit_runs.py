@@ -10,8 +10,11 @@
 #   - uses a tool other than Read, Write, Edit or Bash (or the hand-back that ends the run),
 #   - reads, writes or edits a path outside the agent's workspace,
 #   - runs Bash other than exactly `swiftbox <its workspace> "<command>"` (nothing before or after it).
-# A command inside swiftbox can't reach anything but the workspace (a chroot that sees only it, at /work), so its
-# text isn't searched; a command outside it is listed in full, with any path it names outside the workspace.
+# swiftbox is a chroot that sees the Swift image and the workspace (at /work), but it is not airtight: it mounts /proc
+# and /dev, and through /proc a process could reach the host's file system. So the text of every command run inside
+# it is searched too, for /proc, /sys, devices other than the usual pseudo-devices, and mount or namespace tools. A
+# command outside swiftbox is listed in full, with any path it names outside the workspace, and every problem call
+# with what came back (refused, an error, or its output), so a reader can tell whether it did anything.
 # The audit also lists which models served the agent and whether its own words or files mention the product.
 # Transcripts themselves are not kept in the repository: they include the session's environment (see REPORT.md).
 
@@ -23,6 +26,9 @@ from pathlib import Path
 
 ALLOWED = {"Read", "Write", "Edit", "Bash", "SubagentHandback"}
 PRODUCT = re.compile(r"vespertine", re.IGNORECASE)
+# Ways out of the chroot, or onto the host's devices: what a command run inside swiftbox must not mention.
+ESCAPES = re.compile(r"/proc\b|/sys\b|/dev/(?!null\b|zero\b|u?random\b|std(in|out|err)\b|fd/)|"
+                     r"\b(nsenter|chroot|unshare|mount|umount|pivot_root)\b|/srv\b|/home\b|/root\b|/opt\b")
 
 
 def tool_calls(transcript: Path):
@@ -33,7 +39,25 @@ def tool_calls(transcript: Path):
             continue
         for block in msg.get("content") or []:
             if isinstance(block, dict) and block.get("type") == "tool_use":
-                yield msg.get("model", "?"), block.get("name", "?"), block.get("input") or {}
+                yield block.get("id"), msg.get("model", "?"), block.get("name", "?"), block.get("input") or {}
+
+
+def tool_results(transcript: Path) -> dict:
+    """tool_use id -> what came back (text, cut short), so a problem call shows whether it was refused or ran."""
+    out = {}
+    for line in transcript.read_text(encoding="utf-8").splitlines():
+        entry = json.loads(line)
+        msg = entry.get("message")
+        if entry.get("type") != "user" or not isinstance(msg, dict) or not isinstance(msg.get("content"), list):
+            continue
+        for block in msg["content"]:
+            if isinstance(block, dict) and block.get("type") == "tool_result":
+                content = block.get("content")
+                if isinstance(content, list):
+                    content = " ".join(str(c.get("text", "")) for c in content if isinstance(c, dict))
+                text = " ".join(str(content or "").split())
+                out[block.get("tool_use_id")] = ("error: " if block.get("is_error") else "") + (text[:300] or "(no output)")
+    return out
 
 
 def assistant_text(transcript: Path) -> str:
@@ -68,21 +92,33 @@ def sandboxed(cmd: str, ws: Path) -> bool:
     return len(tokens) == 3 and tokens[0] == "swiftbox" and tokens[1] == str(ws)
 
 
+def sandboxed_command(cmd: str) -> str:
+    """The command a sandboxed call runs inside swiftbox (its third token)."""
+    lex = shlex.shlex(cmd, posix=True, punctuation_chars=True)
+    lex.whitespace_split = True
+    return list(lex)[2]
+
+
 def check(name: str, ws: Path, transcript: Path):
-    problems, rows, models, report = [], [], set(), ""
-    for model, tool, args in tool_calls(transcript):
+    problems, rows, models, reports = [], [], set(), []
+    results = tool_results(transcript)
+    for call_id, model, tool, args in tool_calls(transcript):
+        came_back = f"\n\n  What came back: `{results.get(call_id, '(no result recorded)').replace('`', chr(39))}`"
         models.add(model)
         if tool == "SubagentHandback":
-            report = str(args.get("message", ""))
-            rows.append((tool, ""))
+            reports.append(str(args.get("message", "")).strip())
+            rows.append((tool, "(its final report, in reports/)"))
             continue
         if tool == "Bash":
             cmd = str(args.get("command", ""))
-            rows.append((tool, cmd.replace("\t", " ").replace("\n", "\\n")[:400]))
+            rows.append((tool, cmd.replace("\t", " ").replace("\n", "\\n")[:400].rstrip()))
             if not sandboxed(cmd, ws):
                 outside = sorted({p for p in re.findall(r"(?<![\w.])(/[\w./-]+)", cmd) if not inside(p, ws)})
                 problems.append(f"Bash outside the sandbox (paths outside the workspace: "
-                                f"{', '.join(outside) or 'none'}):\n\n  ```\n  " + cmd.replace("\n", "\n  ") + "\n  ```")
+                                f"{', '.join(outside) or 'none'}):\n\n  ```\n  " + cmd.replace("\n", "\n  ") + "\n  ```" + came_back)
+            elif m := ESCAPES.search(sandboxed_command(cmd)):
+                problems.append(f"command in the sandbox mentions `{m.group(0)}`:\n\n  ```\n  "
+                                + cmd.replace("\n", "\n  ") + "\n  ```" + came_back)
             continue
         path = str(args.get("file_path") or args.get("path") or args.get("notebook_path") or "")
         detail = path
@@ -90,9 +126,11 @@ def check(name: str, ws: Path, transcript: Path):
             detail += f" ({len(str(args.get('content', '')))} chars)"
         rows.append((tool, detail))
         if tool not in ALLOWED:
-            problems.append(f"tool {tool} used: {json.dumps(args)[:200]}")
+            problems.append(f"tool {tool} used: {json.dumps(args)[:200]}" + came_back)
         elif not inside(path, ws):
-            problems.append(f"{tool} outside the workspace: `{path}`")
+            problems.append(f"{tool} outside the workspace: `{path}`" + came_back)
+    report = reports[0] if len(reports) == 1 else "\n\n".join(
+        f"## Round {i}\n\n{r}" for i, r in enumerate(reports))
     mentions = len(PRODUCT.findall(assistant_text(transcript) + report))
     for f in ws.rglob("*.swift"):
         if ".build" not in f.parts and PRODUCT.search(f.read_text(encoding="utf-8", errors="replace")):
@@ -129,9 +167,9 @@ def main() -> int:
         clean &= not problems
         lines.append(f"| {name} | {', '.join(models)} | {len(rows)} | {by_tool} | {verdict} |")
         if problems:
-            details.append(f"### {name}\n\n" + "\n".join(f"- {p}" for p in problems))
+            details.append(f"### {name}\n\n" + "\n".join(f"- {p}" for p in problems) + "\n")
     lines += ["", *(details or ["No agent broke isolation."]), ""]
-    (run / "AUDIT.md").write_text("\n".join(lines), encoding="utf-8")
+    (run / "AUDIT.md").write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
     print("\n".join(lines))
     return 0 if clean else 1
 

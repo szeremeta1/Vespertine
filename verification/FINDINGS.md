@@ -83,3 +83,11 @@ decoder passes every DST check (REPORT.md).
   rate, not `physicalIsInteger`; `OutputSession` line 118 likewise. A device with a 32-bit float physical format
   would pass and would almost certainly not carry DoP intact. The docs don't say either way (BPV-016's gap), so this
   is not counted as a failure.
+- **One of Vespertine's own tests depends on scan order.** "Reads Apple Music's library, and brings in its
+  playlists, loved songs and play counts once" (`PlaylistInterchangeTests.swift` line 129) reads the two play counts
+  `ORDER BY id` and expects song a's first. `LibraryScanner.scan` reads files in a task group and stores tracks in
+  the order the reads finish (`LibraryScanner.swift` lines 176-210), so a can get the higher id. It failed that way
+  in this branch's CI, in the release run of the engine job (`counts → [3, 7]`), with nothing in `Packages/`
+  changed. [3, 7] is what correct counts give when b has the lower id, but the test can't tell that apart from
+  swapped counts. Reading each id's count on its own would make it deterministic and catch a swap. Not changed
+  here.

@@ -33,7 +33,7 @@ public enum FloatChecks {
             fltCheckGridValuesAllChannels(subject, checker)
         },
         // REQ: FLT-002
-        SpecCheck("FLT-002: special finite values in −1…+1 (±1, ±0, subnormals, powers of two, off-grid) on every channel",
+        SpecCheck("FLT-002: special values in −1…+1 (±1, ±0, subnormals, powers of two, off-grid), every channel",
                   requirements: ["FLT-002"]) { subject, checker in
             fltCheckSpecialValues(subject, checker)
         },
@@ -63,7 +63,7 @@ public enum FloatChecks {
             fltCheckConvertAllAscending(subject, checker)
         },
         // REQ: FLT-004
-        SpecCheck("FLT-004: all 2^24 samples, scrambled, spread over calls of many sizes",
+        SpecCheck("FLT-004: 2^22 samples from the whole range, scrambled, spread over calls of many sizes",
                   requirements: ["FLT-004"]) { subject, checker in
             fltCheckConvertChunked(subject, checker)
         },
@@ -190,7 +190,8 @@ fileprivate let fltSpecialValues: [Float] = {
             v.append(-x)
         }
     }
-    return v.filter { $0.isFinite && $0.magnitude <= 1 }
+    var seen = Set<UInt32>()
+    return v.filter { $0.isFinite && $0.magnitude <= 1 && seen.insert($0.bitPattern).inserted }
 }()
 
 /// A pseudo-random finite value from −1.0 to +1.0, drawn from several distributions.
@@ -396,7 +397,8 @@ fileprivate func fltCheckGridValuesAllChannels(_ subject: any FloatOutput, _ che
         k += 32_771
     }
     for _ in 0..<3000 { ks.append(Int32(rng.inRange(Int(fltMinK), Int(fltMaxK)))) }
-    ks += fltEdgeK
+    var seen = Set<Int32>()
+    ks = ks.filter { seen.insert($0).inserted }
     let values = fltShuffled(ks.map(fltGrid), seed: 0xF1_7001_0002)
     let configs: [(capacity: Int, writes: [Int], renders: [Int])] = [
         (4096, [4096], [4096]),
@@ -936,12 +938,12 @@ fileprivate func fltCheckConvertChunked(_ subject: any FloatOutput, _ checker: C
                  1000, 1023, 1024, 1025, 4095, 4096, 4097, 65_535, 65_536, 65_537, 300_001]
     var start = 0
     var call = 0
-    let total = 1 << 24
+    let total = 1 << 22  // a quarter of all samples, scattered over the whole range (the single call has them all)
     while start < total {
         let n = min(sizes[call % sizes.count], total - start)
         var input = [Int32](repeating: 0, count: n)
-        // Every sample exactly once over all calls, in scrambled order: a bijection on 24 bits (odd multiplier,
-        // xorshift, offset), shifted to −2^23 … 2^23 − 1.
+        // No sample twice, in scrambled order: a bijection on 24 bits (odd multiplier, xorshift, offset), shifted
+        // to −2^23 … 2^23 − 1.
         for i in 0..<n {
             var x = UInt32(truncatingIfNeeded: start + i) & 0xFF_FFFF
             x = (x &* 0x2F_5AB7) & 0xFF_FFFF

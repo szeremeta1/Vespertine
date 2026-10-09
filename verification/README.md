@@ -38,6 +38,8 @@ VERIFICATION_RESULTS=$PWD/results.json swift test; python3 ../tools/scoreboard.p
 
 On macOS `swift test` builds Vespertine's own `VespertineAudio` and runs every check against it. On Linux it builds
 only Vespertine's C real-time engine and DST decoder (the parts that don't need Core Audio) and skips the rest.
+`swift test -c release` gives the same results about 15 times faster (35 seconds instead of 9 minutes on four
+cores), which is how CI runs it on macOS.
 
 `spec-cache/` holds the text of the standards the hashes are computed from. It is git-ignored and must stay that way:
 paywalled text never enters the repository. `python3 verification/tools/spec_cache.py fetch` rebuilds the public part.

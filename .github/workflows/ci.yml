@@ -202,21 +202,59 @@ jobs:
     name: Spec-traced checks against Vespertine (macOS)
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: macos-26
-    timeout-minutes: 40
+    timeout-minutes: 60
+    env:
+      VERIFICATION_IEC_OUT: ${{ github.workspace }}/verification-carriers
+      VERIFICATION_RESULTS: ${{ github.workspace }}/verification-carriers/results-macos.json
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Toolchain
         run: xcodebuild -version && swift --version
-      # The same checks and mutants, plus Vespertine's DoP packer, decoder float path, rate planner and BIT-PERFECT
-      # verdict; also writes the IEC 61937 carriers for the oracle job.
-      - name: Spec-traced checks, mutants and Vespertine's results
-        env:
-          VERIFICATION_IEC_OUT: ${{ github.workspace }}/verification-carriers
-          VERIFICATION_RESULTS: ${{ github.workspace }}/verification-carriers/results-macos.json
-        run: swift test --package-path verification/harness
+      # The same checks and mutants as on Linux, plus Vespertine's DoP packer, decoder float path, rate planner and
+      # BIT-PERFECT verdict. Release: the checks run millions of cases, which a debug build is too slow for on this
+      # runner (on Linux the results are identical in both); `swift test` keeps testable imports on for the verdict
+      # adapter. One step per group, so a slow or stuck group is named in the log; the first one builds.
+      - name: Build, then DoP packing
+        timeout-minutes: 20
+        run: swift test -c release --package-path verification/harness --filter DoPPackAcceptance
+      - name: DoP output stream
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter DoPStreamAcceptance
+      - name: Float output
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter FloatAcceptance
+      - name: Integer output
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter IntegerAcceptance
+      - name: Rate planning
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter RateAcceptance
+      - name: BIT-PERFECT verdict
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter VerdictAcceptance
+      - name: DST decoding
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter DSTAcceptance
+      # Also writes the IEC 61937 carriers for the oracle job, and checks F-02.
+      - name: Adapters, IEC 61937 carriers and F-02
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        run: swift test -c release --skip-build --package-path verification/harness --filter 'AdapterSmokeTests|writeIECCarriers|dtsCarrier|dumpSACDImage'
       - name: Scoreboard
         if: ${{ !cancelled() }}
-        run: python3 verification/tools/scoreboard.py verification-carriers/results-macos.json >> "$GITHUB_STEP_SUMMARY"
+        timeout-minutes: 10
+        run: |
+          set -o pipefail
+          status=0
+          swift test -c release --skip-build --package-path verification/harness --filter 'scoreboard\(\)' || status=$?
+          python3 verification/tools/scoreboard.py "$VERIFICATION_RESULTS" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $status
       - name: Loopback probe compiles
         if: ${{ !cancelled() }}
         run: swiftc -typecheck verification/hardware/probe.swift

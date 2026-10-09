@@ -1,0 +1,38 @@
+tool	argument
+Read	/srv/cleanroom/verdict-A/BRIEF.md
+Bash	swiftbox /srv/cleanroom/verdict-A "find . -type f -not -path './harness/.build/*' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/verdict-A "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/SpecChecks 2>&1"
+Bash	swiftbox /srv/cleanroom/verdict-A "swift --version; cd harness && time swift build 2>&1 | tail -5"
+Write	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift (44529 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && time swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (9316 chars)
+Read	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (9485 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning' | head -30; swift run Scratch 2>&1 | tail -90"
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && python3 - <<'EOF'\nimport re\np='Sources/Scratch/main.swift'\ns=open(p).read()\ns=s.replace('''    case speakersBPinDoPMode\n}''','''    case speakersBPinDoPMode\n    case lossyByCodecName, dsdByCodecName\n    // allowed by the records (gaps): these should survive\n    case okEqWinsOverEverything, okDamagedLast, okBitstreamShared, okDoPRequiresInteg
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning' | head -30; swift run Scratch 2>&1 | grep -vE '^  BPV|^slow' | tail -75"
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && grep -n -A1 '// REQ:' Sources/SpecChecks/VerdictChecks.swift | grep -v '^--' ; wc -l Sources/SpecChecks/VerdictChecks.swift"
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && rm -rf .build && swift build 2>&1 | grep -E 'error|warning|Build' ; find /work -type f -not -path '*/.build/*'"
+SubagentHandback	(its final report, in reports/)
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Read	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Edit	/srv/cleanroom/verdict-A/harness/Sources/SpecChecks/VerdictChecks.swift
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (2766 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' ; swift run Scratch 2>&1 | tail -4"
+Read	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (2766 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' ; swift run Scratch 2>&1 | tail -4"
+Write	/srv/cleanroom/verdict-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/verdict-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Build'"
+SubagentHandback	(its final report, in reports/)

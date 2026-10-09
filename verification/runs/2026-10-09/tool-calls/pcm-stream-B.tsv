@@ -1,0 +1,21 @@
+tool	argument
+Read	/srv/cleanroom/pcm-stream-B/BRIEF.md
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "find . -type f -not -path './harness/.build/*' | head -50; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/CleanRoomB 2>&1; cat harness/Sources/Contracts/FloatStream.swift harness/Sources/Contracts/IntegerStream.swift"
+Write	/srv/cleanroom/pcm-stream-B/harness/Sources/CleanRoomB/BFloat.swift (4041 chars)
+Write	/srv/cleanroom/pcm-stream-B/harness/Sources/CleanRoomB/BInteger.swift (3220 chars)
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "od -c harness/Sources/Scratch/main.swift | tail -3; wc -c harness/Sources/Scratch/main.swift; cp harness/Sources/Scratch/main.swift /work/.main.swift.orig"
+Write	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift (5836 chars)
+Read	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift (5836 chars)
+Edit	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cd harness && swift build 2>&1 | tail -20 && time swift run Scratch 2>&1 | tail -20"
+Edit	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -30 && time swift run Scratch 2>&1 | tail -20"
+Edit	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/pcm-stream-B/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' | head -30 && time swift run Scratch 2>&1 | tail -20"
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cd harness && cat > /tmp/perf.swift <<'EOF'\n// Scratch: try things out here. Not delivered.\nimport Contracts\nimport CleanRoomB\nlet fo = BFloat.subject!\nlet all = (Int32(-8_388_608)...Int32(8_388_607)).map { \$0 }\nlet conv = fo.int24ToFloat(samples: all)\nvar t0 = ContinuousClock.now\nlet st = fo.makeStage(channels: 2, capacityFrames: 1 << 23)\nprint(st.w
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cp /work/.main.swift.orig harness/Sources/Scratch/main.swift && rm /work/.main.swift.orig && cat harness/Sources/Scratch/main.swift && wc -c harness/Sources/Scratch/main.swift && cd harness && swift build 2>&1 | tail -3 && find /work -type f -not -path '*/.build/*'"
+Bash	swiftbox /srv/cleanroom/pcm-stream-B "cd harness && touch Sources/CleanRoomB/*.swift && swift build 2>&1 | grep -iE 'warning|error|complete'"
+SubagentHandback	(its final report, in reports/)
