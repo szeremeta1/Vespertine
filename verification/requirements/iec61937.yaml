@@ -126,12 +126,12 @@
     cache:
       oracle: verification/oracles/fetched/ffmpeg-spdif   # fetched by tools/fetch_oracles.py from libavformat at n6.1.1
       files: [spdif.c, spdif.h, spdifdec.c]
-  requirement: "Demuxing Vespertine's carrier with FFmpeg's S/PDIF demuxer returns the original Dolby Digital, Dolby Digital Plus and DTS frames, byte for byte and in order."
+  requirement: "Demuxing Vespertine's carrier with FFmpeg's S/PDIF demuxer returns the original Dolby Digital and Dolby Digital Plus frames, byte for byte and in order."
   quote_sha256: 7bd77701b22c5492b6c2fd6d53f2add19a1b7a6e42c91ce98b7362943f982ec9
   kind: oracle
   testable: true
-  gap: "FFmpeg follows the IEC text; agreement shows the carrier is readable by FFmpeg, not that it conforms."
-  interface: "hardware/IEC61937-ORACLE.md"
+  gap: "FFmpeg follows the IEC text; agreement shows the carrier is readable by FFmpeg, not that it conforms. DTS isn't sent in IEC 61937 bursts (DTS CDs go out as stored; other DTS files are decoded), so there is no DTS carrier to check."
+  interface: "oracles/iec61937/check_carriers.py, hardware/IEC61937-ORACLE.md"
 
 - id: IEC-O-002
   claim: CLAIMS.md#iec-carrier-exact
@@ -143,8 +143,8 @@
     availability: public
     cache: { oracle: verification/oracles/carrier-scan, files: [carrier_scan.py] }
   requirement: "Reading the carrier as 16-bit words and searching for the codecs' own sync words finds every original frame intact, with a valid frame length, in order, and nothing else that parses as a frame."
-  quote_sha256: TBD
+  quote_sha256: 428ecc48596c2b7e585dec29b73ef9956921415a66812a8362ef43db5dff1ca7
   kind: oracle
   testable: true
-  gap: "The scanner doesn't know the burst format (that is IEC 61937 itself); it only shows that the frames are carried whole. Which byte of a 16-bit sample comes first is found by trying both."
-  interface: "hardware/IEC61937-ORACLE.md"
+  gap: "The scanner doesn't know the burst format (that is IEC 61937 itself); it only shows that the frames are carried whole. Which byte of a 16-bit sample comes first is found by trying both. Checked on the Dolby Digital and Dolby Digital Plus carriers."
+  interface: "oracles/iec61937/check_carriers.py, hardware/IEC61937-ORACLE.md"

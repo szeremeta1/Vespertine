@@ -2,7 +2,10 @@
 # - the analysis core on Linux, where vespertine-analyze runs on servers;
 # - the engine and library packages on macOS, and in the same job the real-time C under AddressSanitizer,
 #   UndefinedBehaviorSanitizer and ThreadSanitizer, clang's analyzer, and a parse of the release scripts;
-# - the app itself (generated with XcodeGen) with its tests, plus a universal Release build.
+# - the app itself (generated with XcodeGen) with its tests, plus a universal Release build;
+# - the spec-traced verification (verification/): the requirement registry and oracles, the blind-written checks
+#   against their clean-room implementations, mutants and Vespertine, and Vespertine's IEC 61937 carriers against
+#   FFmpeg's S/PDIF demuxer and a blind carrier scanner.
 # Nothing here signs, notarizes or publishes; tests that need real audio hardware stay opt-in (VESPERTINE_HARDWARE_TESTS).
 #
 # macOS runner minutes are the expensive ones (about 10x Linux when billed), so:
@@ -160,3 +163,87 @@ jobs:
         with:
           path: build/CI/SourcePackages
           key: ${{ steps.app-cache.outputs.cache-primary-key }}
+
+  # Spec-traced verification (verification/README.md). The Linux jobs need nothing paywalled: the registry check
+  # recomputes only hashes of Vespertine's own docs and of the pinned oracle sources, never the spec cache.
+  verification-registry:
+    name: Verification registry and oracles (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml
+      - name: Fetch the pinned oracle sources (refuses any that differ from the registry)
+        run: python3 verification/tools/fetch_oracles.py
+      - name: Requirement registry, claims and hashes
+        run: python3 verification/tools/check_registry.py
+      - name: DST fixtures against the reference decoder (libdstdec)
+        run: python3 verification/oracles/dst/check_fixtures.py
+      - name: Loopback tools, on synthetic captures
+        run: python3 verification/hardware/selftest.py
+
+  verification-linux:
+    name: Spec-traced checks and mutants (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container: swift:6.2-noble@sha256:eccc7a97f9b9881d9659e2e788081fd7675f86d39793b51200bfb178398b3784
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Every check against every clean-room implementation, and against Vespertine's real-time C engine and DST
+      # decoder (the parts that build on Linux).
+      - name: Spec-traced checks
+        run: swift test --package-path verification/harness --skip 'mutant\('
+      # Fails when a mutant survives: a requirement its checks don't really test.
+      - name: Mutant suite
+        run: swift test --package-path verification/harness --filter 'mutant\('
+
+  verification-macos:
+    name: Spec-traced checks against Vespertine (macOS)
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Toolchain
+        run: xcodebuild -version && swift --version
+      # The same checks and mutants, plus Vespertine's DoP packer, decoder float path, rate planner and BIT-PERFECT
+      # verdict; also writes the IEC 61937 carriers for the oracle job.
+      - name: Spec-traced checks, mutants and Vespertine's results
+        env:
+          VERIFICATION_IEC_OUT: ${{ github.workspace }}/verification-carriers
+          VERIFICATION_RESULTS: ${{ github.workspace }}/verification-carriers/results-macos.json
+        run: swift test --package-path verification/harness
+      - name: Scoreboard
+        if: ${{ !cancelled() }}
+        run: python3 verification/tools/scoreboard.py verification-carriers/results-macos.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Loopback probe compiles
+        if: ${{ !cancelled() }}
+        run: swiftc -typecheck verification/hardware/probe.swift
+      # The repository pins no artifact action, so the carriers reach the Linux job through the cache. Saved even when
+      # a check above failed, so the carrier oracles still run.
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !cancelled() }}
+        with:
+          path: verification-carriers
+          key: verification-carriers-${{ github.run_id }}-${{ github.run_attempt }}
+          enableCrossOsArchive: true
+
+  verification-iec-oracle:
+    name: IEC 61937 carriers against FFmpeg and the blind scanner (Linux)
+    needs: verification-macos
+    if: ${{ !cancelled() && needs.verification-macos.result != 'skipped' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: verification-carriers
+          key: verification-carriers-${{ github.run_id }}-${{ github.run_attempt }}
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+      - name: FFmpeg 6.1.1 (the version the oracle record pins)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Carriers against FFmpeg's S/PDIF demuxer and the carrier scanner
+        run: python3 verification/oracles/iec61937/check_carriers.py verification-carriers

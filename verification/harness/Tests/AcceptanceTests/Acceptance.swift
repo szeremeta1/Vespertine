@@ -7,7 +7,9 @@
 //   implementation written blind from the same contract is either wrong or reads the source differently, and
 //   either way it can't be trusted against Vespertine until that is settled;
 // - every mutant is killed by a check on one of its target requirements: a mutant that survives, or that only
-//   fails checks of other requirements, shows a requirement the checks don't really test;
+//   fails checks of other requirements, shows a requirement the checks don't really test. The only exception is a
+//   mutant that behaves exactly like the reference it wraps (EquivalentMutants, explained in REPORT.md): no check can
+//   tell them apart, so its survival is expected, and if a check ever kills it the run fails until the entry goes;
 // - Vespertine's result is reported. A failure is a finding: it is expected (withKnownIssue) only when
 //   FINDINGS.md records it, so a new failure, or a recorded one that stops reproducing, fails the run.
 
@@ -55,10 +57,15 @@ func referencesPass<S>(_ check: SpecCheck<S>, in group: Group<S>) {
 func killed<S>(_ mutant: Mutant<S>, in group: Group<S>) {
     let outcome = group.outcome(of: mutant)
     #expect(outcome.ran, "\(group.name): no reference implementation to make mutant \(mutant.id) from")
-    #expect(outcome.killed, """
+    let message: Comment = """
         mutant \(mutant.id) [\(mutant.targets.joined(separator: ", "))] survived: \(mutant.summary)
         failed only elsewhere: \(outcome.failedElsewhere.isEmpty ? "nothing" : outcome.failedElsewhere.joined(separator: "; "))
-        """)
+        """
+    if let reason = EquivalentMutants.byID[mutant.id] {
+        withKnownIssue("equivalent mutant (REPORT.md): \(reason)") { #expect(outcome.killed, message) }
+    } else {
+        #expect(outcome.killed, message)
+    }
 }
 
 func vespertineResult<S>(_ check: SpecCheck<S>, in group: Group<S>) {

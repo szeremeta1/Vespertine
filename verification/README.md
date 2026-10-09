@@ -21,9 +21,9 @@ in [REPORT.md](REPORT.md), and anything Vespertine got wrong is in [FINDINGS.md]
 | `harness/` | A Swift package: the contracts in Swift, the checks (`SpecChecks`), the clean-room implementations (`CleanRoomB`, `CleanRoomB2`), the mutants (`Mutants`) and the adapters that put Vespertine behind the same contracts (`VespertineAdapters`). |
 | `fixtures/dst/` | DST frames with the DSD they encode, confirmed against the reference decoder. |
 | `oracles/` | Independent implementations used as second opinions, and the scripts that run them. |
-| `hardware/` | Procedures that need a DAC, a loopback interface or real discs. |
-| `runs/` | Every clean-room brief and every agent's output, with hashes. |
-| `tools/` | `check_registry.py`, `spec_cache.py`, `fetch_oracles.py`, `cleanroom.py`, the DST fixture generator. |
+| `hardware/` | Procedures that need a DAC, a loopback interface, a receiver or real discs (`LOOPBACK.md`, `IEC61937-ORACLE.md`, `SACD-ORACLE.md`), with their tools: `signals.py` makes the test signals and decides pass or fail on a capture, `probe.swift` prints what Core Audio reports for each output device, `selftest.py` shows the tools can tell right from wrong. |
+| `runs/` | Every clean-room brief, every agent's output with its hash (`MANIFEST.md`), each agent's final report, a log of every tool call it made, and the isolation audit (`AUDIT.md`). |
+| `tools/` | `check_registry.py`, `spec_cache.py`, `fetch_oracles.py`, `cleanroom.py` (sets up and collects the clean-room run), `audit_runs.py` (audits it), `scoreboard.py` (the tables in REPORT.md), the DST fixture generator. |
 
 ## Running it
 
@@ -31,7 +31,9 @@ in [REPORT.md](REPORT.md), and anything Vespertine got wrong is in [FINDINGS.md]
 python3 verification/tools/fetch_oracles.py          # fetch pinned oracle sources (checked against the registry)
 python3 verification/tools/check_registry.py         # the registry, claims and hashes
 python3 verification/oracles/dst/check_fixtures.py   # every DST fixture against the reference decoder (x86-64)
+python3 verification/hardware/selftest.py            # the loopback and SACD comparison tools on synthetic captures
 cd verification/harness && swift test                # checks against the clean-room implementations, mutants and Vespertine
+VERIFICATION_RESULTS=$PWD/results.json swift test; python3 ../tools/scoreboard.py results.json    # the scoreboard
 ```
 
 On macOS `swift test` builds Vespertine's own `VespertineAudio` and runs every check against it. On Linux it builds

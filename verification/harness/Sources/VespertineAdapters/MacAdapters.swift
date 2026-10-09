@@ -174,8 +174,12 @@ struct PlannerAdapter: RatePlanner {
 /// SignalPath.statusLine (SignalPath.swift), fed the way OutputSession fills in AppliedFormat.
 ///
 /// OutputSession needs a real device, so the readback step is reproduced here from OutputSession.swift, line by
-/// line, and nothing else is added:
-/// - a failed nominal-rate read is replaced by the requested rate (line 94);
+/// line, and nothing else is added (the line numbers are those of 98cad1a):
+/// - a failed nominal-rate read is replaced by the requested rate (line 94), but every output stream's virtual
+///   format must then carry that rate (lines 99, 109-111). The stream format is a second reading of the device's
+///   rate, so when the system reports no rate (`nominalRate` nil) it can't confirm the requested one and the
+///   session isn't opened. (A nominal-rate read that fails while the streams still report the rate opens only if
+///   they carry the requested rate; the contract's one rate field can't express that case.)
 /// - a failed physical-format read is replaced by the planned bit depth, and the format is assumed integer
 ///   (lines 129-130);
 /// - the device is held exclusively when the hog-mode owner read back is this process; a failed read counts as
@@ -209,6 +213,8 @@ struct SignalPathVerdict: BadgeVerdict {
         let physical: (bits: Int, integer: Bool)? = i.readback.physicalBitDepth.flatMap { bits in
             i.readback.physicalIsInteger.map { (bits, $0) }
         }
+        // Lines 99, 109-111: the streams' virtual formats must carry `rate`; with no rate reported they can't.
+        guard i.readback.nominalRate != nil else { return Self.notOpened }
         guard i.readback.deviceChannels >= plan.deviceChannels, rate.isFinite, rate > 0, rate <= 3_072_000 else { return Self.notOpened }
         if plan.isPassthrough, !hogged || (physical?.bits ?? 0) < (mode == .dop ? 24 : 16) || abs(rate - plan.deviceSampleRate) >= 0.5 {
             return Self.notOpened
@@ -257,6 +263,97 @@ struct SignalPathVerdict: BadgeVerdict {
         return OutputDevice(id: 0, uid: "", name: name, manufacturer: "", modelUID: nil, transport: transport, nominalSampleRate: 48_000,
                             capabilities: DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false),
                             hasHardwareVolume: false, isDefault: false)
+    }
+}
+
+// MARK: - IEC 61937 carriers (for the FFmpeg and carrier-scan oracles, hardware/IEC61937-ORACLE.md)
+
+extension Vespertine {
+    /// Writes the carrier Vespertine sends to a receiver for a Dolby Digital or Dolby Digital Plus file: the
+    /// output of BitstreamDecoder, the same object the engine plays in bitstream mode, as a 16-bit stereo WAV at
+    /// the carrier rate. Nothing here builds a burst; the samples are BitstreamDecoder's, written unchanged.
+    public static func writeCarrier(from source: URL, to destination: URL) throws {
+        let decoder = try BitstreamDecoder.open(url: source)
+        let format = decoder.processingFormat
+        let out = try AVAudioFile(forWriting: destination,
+                                  settings: [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: format.sampleRate,
+                                             AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 16,
+                                             AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false],
+                                  commonFormat: .pcmFormatInt16, interleaved: true)
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 8192) else { return }
+        while true {
+            try decoder.decode(into: buffer, length: 8192)
+            if buffer.frameLength == 0 { break }
+            try out.write(from: buffer)
+        }
+    }
+}
+// MARK: - SACD images (for the sacd_extract comparison, hardware/SACD-ORACLE.md)
+
+extension Vespertine {
+    /// For every area of an SACD image: the table of contents as Vespertine reads it (`toc.json`), each track's
+    /// DSD as Vespertine plays it (`<area>-<NN>.dff`), and the whole area in one piece (`<area>-all.dff`). The DSD
+    /// comes from SACDSource, the object the engine plays (DST frames decoded by vespertine_dst.c), written as
+    /// DSDIFF 1.5 (§3.3: channel bytes interleaved in channel order, most significant bit oldest). Returns the
+    /// frames concealed as silence, which must be 0 for an undamaged image.
+    @discardableResult
+    public static func writeSACDAreas(image url: URL, to dir: URL) throws -> Int {
+        let image = try SACDImage.read(url)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        var toc: [[String: Any]] = []
+        var concealed = 0
+        for area in image.areas {
+            toc.append([
+                "area": area.kind.rawValue, "channels": area.channels, "sampleRate": area.sampleRate, "dst": area.isDST,
+                "firstSector": area.firstSector, "lastSector": area.lastSector,
+                "tracks": area.tracks.map { ["number": $0.number, "startFrame": $0.startFrame, "frameCount": $0.frameCount,
+                                             "title": $0.title ?? "", "performer": $0.performer ?? ""] as [String: Any] },
+            ])
+            for track in area.tracks {
+                let frames = track.startFrame..<(track.startFrame + track.frameCount)
+                concealed += try writeDFF(SACDSource(url: url, area: area, frames: frames), area: area,
+                                          to: dir.appendingPathComponent(String(format: "%@-%02d.dff", area.kind.rawValue, track.number)))
+            }
+            concealed += try writeDFF(SACDSource(url: url, area: area, frames: area.frameRange), area: area,
+                                      to: dir.appendingPathComponent("\(area.kind.rawValue)-all.dff"))
+        }
+        let json = try JSONSerialization.data(withJSONObject: ["image": url.lastPathComponent, "areas": toc],
+                                              options: [.prettyPrinted, .sortedKeys])
+        try json.write(to: dir.appendingPathComponent("toc.json"))
+        return concealed
+    }
+
+    private static func writeDFF(_ source: SACDSource, area: SACDImage.Area, to url: URL) throws -> Int {
+        func be64(_ v: UInt64) -> [UInt8] { (0..<8).map { UInt8(truncatingIfNeeded: v >> (56 - 8 * $0)) } }
+        func be32(_ v: UInt32) -> [UInt8] { (0..<4).map { UInt8(truncatingIfNeeded: v >> (24 - 8 * $0)) } }
+        func chunk(_ id: String, _ body: [UInt8]) -> [UInt8] {
+            Array(id.utf8) + be64(UInt64(body.count)) + body + (body.count % 2 == 1 ? [0] : [])
+        }
+        let ids: [String] = switch area.channels {
+        case 2: ["SLFT", "SRGT"]
+        case 5: ["MLFT", "MRGT", "C   ", "LS  ", "RS  "]
+        case 6: ["MLFT", "MRGT", "C   ", "LFE ", "LS  ", "RS  "]
+        default: (1...area.channels).map { String(format: "C%03d", $0) }
+        }
+        let name = Array("not compressed".utf8)
+        let prop = Array("SND ".utf8) + chunk("FS  ", be32(UInt32(area.sampleRate)))
+            + chunk("CHNL", [UInt8(area.channels >> 8), UInt8(area.channels & 0xFF)] + ids.flatMap { Array($0.utf8) })
+            + chunk("CMPR", Array("DSD ".utf8) + [UInt8(name.count)] + name)
+        let soundBytes = UInt64(source.dsdLength) * UInt64(area.channels)
+        let head = Array("DSD ".utf8) + chunk("FVER", be32(0x0105_0000)) + chunk("PROP", prop)
+        let total = UInt64(head.count) + 12 + soundBytes + soundBytes % 2
+        FileManager.default.createFile(atPath: url.path, contents: nil)
+        let out = try FileHandle(forWritingTo: url)
+        defer { try? out.close() }
+        try out.write(contentsOf: Array("FRM8".utf8) + be64(total) + head + Array("DSD ".utf8) + be64(soundBytes))
+        var buffer = [UInt8](repeating: 0, count: area.frameBytes * area.channels)
+        while true {
+            let n = try buffer.withUnsafeMutableBufferPointer { try source.readInterleaved(into: $0.baseAddress!, bytes: area.frameBytes) }
+            if n == 0 { break }
+            try out.write(contentsOf: buffer[0..<(n * area.channels)])
+        }
+        if soundBytes % 2 == 1 { try out.write(contentsOf: [0]) }
+        return source.concealedFrames
     }
 }
 #endif
