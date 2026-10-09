@@ -23,7 +23,7 @@ args[dsd-native-dop]='-VespertinePlaySong "Love for the Sake of Love|Claudja Bar
 output[stereo-and-surround-versions]="AirPods Max";     settle[stereo-and-surround-versions]=10
 args[stereo-and-surround-versions]="-VespertinePlaySong \"Don't Look Back in Anger|Oasis|DSD64\" -VespertineInspectorTab now"
 output[spatial-audio-airpods-max]="AirPods Max"; settle[spatial-audio-airpods-max]=12
-args[spatial-audio-airpods-max]='-VespertinePlaySong "Candle in the Wind|Elton John|5.1" -VespertineInspectorTab now'
+args[spatial-audio-airpods-max]='-VespertinePlaySong "Candle in the Wind|Elton John|5.1" -VespertineInspectorTab now -VespertineScrollInspector YES'
 output[fake-hi-res-detection]=any;            settle[fake-hi-res-detection]=8
 args[fake-hi-res-detection]='-VespertineSidebar songs -VespertineSelectSong "Velvet Hour" -VespertineInspectorTab analysis'
 output[search]=any;                           settle[search]=8
