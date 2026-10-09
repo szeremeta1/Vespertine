@@ -17,7 +17,7 @@ typeset -A output settle args
 output[multichannel-albums]=any;              settle[multichannel-albums]=12
 args[multichannel-albums]='-VespertineFormatFilter multichannel -VespertineShowInspector NO'
 output[bit-perfect-fiio-24-96]="FiiO K11";    settle[bit-perfect-fiio-24-96]=10
-args[bit-perfect-fiio-24-96]="-VespertinePlaySong \"Les jeux d'eau à la Villa d'Este|Berman\" -VespertineInspectorTab now"
+args[bit-perfect-fiio-24-96]="-VespertinePlaySong \"jeux d'eaux à la Villa|Lazar Berman\" -VespertineInspectorTab now"
 output[dsd-native-dop]="FiiO K11";            settle[dsd-native-dop]=10
 args[dsd-native-dop]='-VespertinePlaySong "Love for the Sake of Love|Claudja Barry|DSD" -VespertineInspectorTab now'
 output[stereo-and-surround-versions]=any;     settle[stereo-and-surround-versions]=10
@@ -27,7 +27,7 @@ args[spatial-audio-airpods-max]='-VespertinePlaySong "Candle in the Wind|Elton J
 output[fake-hi-res-detection]=any;            settle[fake-hi-res-detection]=8
 args[fake-hi-res-detection]='-VespertineSidebar songs -VespertineSelectSong "Velvet Hour" -VespertineInspectorTab analysis'
 output[search]=any;                           settle[search]=8
-args[search]='-VespertineSearch "Lost" -VespertineSelectSong "Lost" -VespertineInspectorTab details'
+args[search]='-VespertineSearch "Let It Be" -VespertineOpenAlbum "Let It Be [DTS 5.1 CD-DA]" -VespertineSelectTracks 6 -VespertineInspectorTab details'
 output[genres]=any;                           settle[genres]=8
 args[genres]='-VespertineSidebar genres'
 output[smart-playlist]=any;                   settle[smart-playlist]=8
@@ -41,7 +41,7 @@ for scene in $scenes; do
   print "== $scene"
   pkill -x Vespertine 2>/dev/null || true
   sleep 1
-  eval "\"$bin\" -ApplePersistenceIgnoreState YES ${args[$scene]}" > "$log/$scene.log" 2>&1 &
+  eval "\"$bin\" -ApplePersistenceIgnoreState YES -VespertineWindowSize 1440x900 -autoAnalyze NO ${args[$scene]}" > "$log/$scene.log" 2>&1 &
   if [[ ${output[$scene]} != any ]]; then
     print "Select \"${output[$scene]}\" as the output in Vespertine (and check Audio MIDI Setup), then press Return."
     read -r
@@ -50,6 +50,7 @@ for scene in $scenes; do
   grep '\[qa\]' "$log/$scene.log" || true
   title=$([[ $scene == mini-player ]] && print "Mini" || print "")
   swift "$root/scripts/capture-window.swift" Vespertine "$out/$scene.png" $title
+  [[ $scene == mini-player ]] || sips -Z 2400 "$out/$scene.png" >/dev/null   # 1440×900 pt at 2× → 2400×1500
 done
 pkill -x Vespertine 2>/dev/null || true
 print "Shots in $out. Check each against docs/press/shot-list.md before committing."

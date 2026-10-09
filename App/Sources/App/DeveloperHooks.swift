@@ -51,6 +51,18 @@ enum DeveloperHooks {
         if d.bool(forKey: "VespertineOpenSettings") {
             NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         }
+        // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
+        // whatever frame the window last saved.
+        if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                if let window = NSApp.windows.filter({ $0.isVisible && $0.styleMask.contains(.titled) })
+                    .max(by: { $0.frame.width * $0.frame.height < $1.frame.width * $1.frame.height }) {
+                    let visible = window.screen?.visibleFrame ?? window.frame
+                    window.setFrame(NSRect(x: visible.minX + 40, y: visible.maxY - size[1] - 20, width: size[0], height: size[1]), display: true)
+                }
+            }
+        }
         if let path = d.string(forKey: "VespertineSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "VespertineSnapshotDelay"), repeats: max(1, d.integer(forKey: "VespertineSnapshotCount"))) }
         }
@@ -128,13 +140,13 @@ enum DeveloperHooks {
                 model.player.engine.pause()
             }
         }
-        // `-VespertinePlaySong "Title|Artist|DSD"`: opens and plays the album holding that song, from that song. Artist and
+        // `-VespertinePlaySong "Title|Artist|DSD"`: opens and plays the album holding the first song whose title contains Title, from that song. Artist and
         // a format word (matched against the format summary, e.g. "5.1", "DSD128", "24/96") are optional and pick one
         // version where the library has several.
         if let spec = d.string(forKey: "VespertinePlaySong") {
             let parts = spec.split(separator: "|").map { $0.trimmingCharacters(in: .whitespaces) }
             let matches = { (t: Track) -> Bool in
-                t.title.localizedCaseInsensitiveCompare(parts[0]) == .orderedSame
+                t.title.localizedCaseInsensitiveContains(parts[0])
                     && (parts.count < 2 || parts[1].isEmpty || t.displayAlbumArtist.localizedCaseInsensitiveContains(parts[1]))
                     && (parts.count < 3 || t.formatSummary.localizedCaseInsensitiveContains(parts[2]))
             }
