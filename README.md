@@ -159,7 +159,7 @@ Vespertine is young, and some of what it does hasn't met real hardware yet. Repo
 - **Intel Macs are untested.** The Intel half of the universal app has run under Rosetta, not on an Intel Mac.
 - **No room correction.** The parametric EQ handles headphone and speaker correction curves, but there's no convolution.
 - **No streaming services and no network renderers.** Vespertine plays your own files, locally or from a share. There is no Qobuz or TIDAL, and no UPnP/DLNA or Roon Ready renderers (AirPlay works, as any Mac output does, at 44.1 kHz).
-- **SACD images have only met synthesized discs.** The image reader is tested with SACD images generated to the Scarlet Book layout and the DST decoder against FFmpeg's on its DST sample, not yet with a rip of a real disc. Images on a network share are copied whole to the local cache when played, like CUE images.
+- **SACD images have met two real discs.** Rips of The Dark Side of the Moon and Brothers in Arms (plain and DST stereo, DST 5.1) play bit for bit as SACD Ripper extracts them. Discs with a 5.0 area, only a multichannel area, pauses between tracks or uncompressed frames inside DST are covered only by synthesized images. Images on a network share are copied whole to the local cache when played, like CUE images.
 - **Not supported:** DSD inside WavPack, DRM-protected Apple Music downloads, and sending TrueHD or DTS-HD MA to a receiver untouched (macOS gives apps no high-bit-rate HDMI passthrough).
 
 ## Build
