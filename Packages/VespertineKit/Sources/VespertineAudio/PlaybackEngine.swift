@@ -699,7 +699,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         if carried != nil, carry == nil { carried = nil }
         if let carry { probed = carry.probed }
         else if let reuse = unusedProbe, reuse.item == item.id, reuse.probed.url == url { probed = reuse.probed }
-        else { probed = try SourceOpener.probe(url) }
+        else { probed = try SourceOpener.probe(url, area: item.sacdArea) }
         unusedProbe = (item.id, probed)
         mark("probe")
         // Opening the file is the slow part on a busy share: if you've skipped on meanwhile, stop here,
@@ -982,7 +982,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                        item: PlayableItem) throws -> (ProbedSource, PCMDecoding)? {
         guard probed.format.encoding == .pcm || (probed.format.encoding == .dsd && plan.mode == .dop),
               current.supportsSeeking else { return nil }
-        let local = try SourceOpener.probe(url)
+        let local = try SourceOpener.probe(url, area: item.sacdArea)
         guard local.format == probed.format else { return nil }
         let decoder = try SourceOpener.decoder(for: local, plan: plan, item: item)
         let position = current.position
@@ -1095,7 +1095,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         while let next = candidate, attempts < 8 {
             attempts += 1
             do {
-                let probed = try SourceOpener.probe(resolve(next))
+                let probed = try SourceOpener.probe(resolve(next), area: next.sacdArea)
                 let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
                 if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
                     // macOS renders Atmos: let this track play out, then hand the next one over.

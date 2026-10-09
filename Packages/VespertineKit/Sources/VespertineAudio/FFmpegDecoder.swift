@@ -120,16 +120,46 @@ extension FFmpegDecoder {
     var dsdRate: Double { handle.map { Double(nff_sample_rate($0)) * 8 } ?? 0 }
 }
 
+/// Raw DSD for DoP: one plane per channel, most significant bit first in time. Positions are bytes per channel.
+protocol RawDSDSource: AnyObject {
+    var channelCount: Int { get }
+    var dsdRate: Double { get }
+    /// Bytes per channel.
+    var dsdLength: Int64 { get }
+    var isOpen: Bool { get }
+    var inputSource: InputSource { get }
+    /// Reads up to `bytes` bytes per channel into `planes`. Returns how many, 0 at the end.
+    func readDSD(into planes: UnsafeMutablePointer<UnsafeMutablePointer<UInt8>>, bytes: Int) throws -> Int
+    func seekDSD(to position: Int64) throws
+    func close() throws
+}
+
+/// DSF and DSDIFF files, read raw through FFmpeg's demuxers.
+extension FFmpegDecoder: RawDSDSource {
+    var channelCount: Int { rawHandle.map { Int(nff_channels($0)) } ?? 0 }
+    var dsdLength: Int64 { length }
+
+    func readDSD(into planes: UnsafeMutablePointer<UnsafeMutablePointer<UInt8>>, bytes: Int) throws -> Int {
+        guard let h = rawHandle else { throw DTSError.decoding }
+        let got = nff_read_dsd(h, planes, Int32(bytes))
+        guard got >= 0 else { throw DTSError.decoding }
+        return Int(got)
+    }
+
+    func seekDSD(to position: Int64) throws {
+        guard let h = rawHandle, nff_seek_dsd(h, position) else { throw DTSError.decoding }
+    }
+}
+
 /// DSD over PCM from the raw 1-bit stream (any DSD rate): 16 DSD bits per channel per frame, behind the
 /// alternating 0x05 / 0xFA marker, as 24-bit samples (carried exactly in Float32). Positions are DoP frames.
 final class RawDoPDecoder: NSObject, PCMDecoding {
-    private let source: FFmpegDecoder
-    private var handle: OpaquePointer? { source.rawHandle }
+    private let source: RawDSDSource
     private var frame: AVAudioFramePosition = 0
     /// 1 swaps which frames carry 0x05 and which 0xFA (see `nextMarker`).
     private var markerOffset: AVAudioFramePosition = 0
     private let format: AVAudioFormat
-    /// The raw DSD read in, one plane of `planeBytes` per channel, owned here (FFmpeg writes through pointers into it).
+    /// The raw DSD read in, one plane of `planeBytes` per channel, owned here (the source writes through pointers into it).
     private var planes: UnsafeMutablePointer<UInt8>?
     private var planeBytes = 0
 
@@ -140,11 +170,17 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
         set { markerOffset = (newValue - frame) & 1 }
     }
 
-    init(url: URL) throws {
-        source = FFmpegDecoder(url: url)
+    /// A DSF or DSDIFF file.
+    convenience init(url: URL) throws {
+        let source = FFmpegDecoder(url: url)
         try source.open()
-        guard source.isDSD, let h = source.rawHandle else { throw DTSError.unsupported("not DSD") }
-        let channels = Int(nff_channels(h)), carrier = source.dsdRate / 16
+        guard source.isDSD else { throw DTSError.unsupported("not DSD") }
+        try self.init(source: source)
+    }
+
+    init(source: RawDSDSource) throws {
+        self.source = source
+        let channels = source.channelCount, carrier = source.dsdRate / 16
         let layout = channels <= 2 ? nil : ChannelLayouts.layout(channels: channels)
         let f: AVAudioFormat? = if let layout { AVAudioFormat(standardFormatWithSampleRate: carrier, channelLayout: layout) }
                                 else { AVAudioFormat(standardFormatWithSampleRate: carrier, channels: AVAudioChannelCount(channels)) }
@@ -162,7 +198,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
     var isOpen: Bool { source.isOpen }
     var supportsSeeking: Bool { true }
     var position: AVAudioFramePosition { frame }
-    var length: AVAudioFramePosition { source.length / 2 }
+    var length: AVAudioFramePosition { source.dsdLength / 2 }
     func open() throws {}
     func close() throws { try source.close() }
     func decode(into buffer: AVAudioBuffer) throws {
@@ -172,7 +208,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
 
     func decode(into buffer: AVAudioPCMBuffer, length: AVAudioFrameCount) throws {
         buffer.frameLength = 0
-        guard let h = handle, let out = buffer.floatChannelData else { throw DTSError.decoding }
+        guard let out = buffer.floatChannelData else { throw DTSError.decoding }
         let channels = Int(format.channelCount), want = Int(min(length, buffer.frameCapacity))
         if planes == nil || planeBytes < want * 2 {
             planes?.deallocate()
@@ -181,9 +217,8 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
         }
         guard let planes else { throw DTSError.decoding }
         var pointers: [UnsafeMutablePointer<UInt8>] = (0..<channels).map { planes + $0 * planeBytes }
-        let got = pointers.withUnsafeMutableBufferPointer { nff_read_dsd(h, $0.baseAddress!, Int32(want * 2)) }
-        guard got >= 0 else { throw DTSError.decoding }
-        let frames = Int(got) / 2
+        let got = try pointers.withUnsafeMutableBufferPointer { try source.readDSD(into: $0.baseAddress!, bytes: want * 2) }
+        let frames = got / 2
         for c in 0..<channels {
             let src = planes + c * planeBytes
             for i in 0..<frames {
@@ -197,7 +232,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding {
     }
 
     func seek(to target: AVAudioFramePosition) throws {
-        guard let h = handle, nff_seek_dsd(h, max(0, target) * 2) else { throw DTSError.decoding }
+        try source.seekDSD(to: max(0, target) * 2)
         frame = max(0, target)
     }
 }
