@@ -15,17 +15,35 @@ struct PageHeader<Trailing: View>: View {
     @ViewBuilder var trailing: Trailing
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 14) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
-                Text(meta).font(Typeface.mono(11)).foregroundStyle(Palette.text3)
+        // Side by side when it fits; in a narrow window the controls drop below the title instead of squeezing
+        // words onto two lines ("Albu / ms", "Pl / ay"). Stacked, a long title truncates.
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 14) {
+                heading.fixedSize()
+                Spacer(minLength: 14)
+                controls
             }
-            Spacer()
-            trailing
+            VStack(alignment: .leading, spacing: 10) {
+                heading
+                controls
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 24)
         .padding(.top, 18)
         .padding(.bottom, 12)
+    }
+
+    private var heading: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
+            Text(meta).font(Typeface.mono(11)).foregroundStyle(Palette.text3)
+        }
+        .lineLimit(1)
+    }
+
+    private var controls: some View {
+        HStack(spacing: 14) { trailing }.fixedSize()
     }
 }
 
@@ -85,7 +103,7 @@ struct AlbumsGridView: View {
         if !filter.isEmpty { return "\(albums.count.formatted()) of \(base.count.formatted()) albums" }
         guard isLibrary else { return "\(albums.count) album\(albums.count == 1 ? "" : "s")" }
         let s = model.library.stats
-        return "\(s.albums.formatted()) albums · \(s.tracks.formatted()) tracks · \(s.bytes.byteString)"
+        return "\(s.albums.formatted()) album\(s.albums == 1 ? "" : "s") · \(s.tracks.formatted()) track\(s.tracks == 1 ? "" : "s") · \(s.bytes.byteString)"
     }
 }
 
