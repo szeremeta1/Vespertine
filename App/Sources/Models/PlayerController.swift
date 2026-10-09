@@ -569,7 +569,8 @@ final class PlayerController {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: position,
             MPNowPlayingInfoPropertyPlaybackRate: state == .playing ? 1.0 : 0.0,
         ]
-        if let key = track.artworkKey, let image = ArtworkCache.shared.cached(key, size: 600) ?? ArtworkCache.shared.cached(key, size: 160) {
+        if let key = track.artworkKey ?? library.album(key: track.albumKey)?.artworkKey,
+           let image = ArtworkCache.shared.cached(key, size: 600) ?? ArtworkCache.shared.cached(key, size: 160) {
             info[MPMediaItemPropertyArtwork] = Self.artwork(image)
         }
         center.nowPlayingInfo = info

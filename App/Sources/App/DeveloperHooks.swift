@@ -51,13 +51,26 @@ enum DeveloperHooks {
         if d.bool(forKey: "VespertineOpenSettings") {
             NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         }
+        // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
+        // whatever frame the window last saved.
+        if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                if let window = NSApp.windows.filter({ $0.isVisible && $0.styleMask.contains(.titled) })
+                    .max(by: { $0.frame.width * $0.frame.height < $1.frame.width * $1.frame.height }) {
+                    let visible = window.screen?.visibleFrame ?? window.frame
+                    window.setFrame(NSRect(x: visible.minX + 40, y: visible.maxY - size[1] - 20, width: size[0], height: size[1]), display: true)
+                }
+            }
+        }
         if let path = d.string(forKey: "VespertineSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "VespertineSnapshotDelay"), repeats: max(1, d.integer(forKey: "VespertineSnapshotCount"))) }
         }
         guard open != nil || play != nil || d.object(forKey: "VespertineInspectorTab") != nil || d.bool(forKey: "VespertineOpenMini")
                 || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
                 || d.string(forKey: "VespertineOpenSheet") != nil || d.string(forKey: "VespertineFilter") != nil
-                || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil else { return }
+                || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil
+                || d.string(forKey: "VespertinePlaySong") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -68,6 +81,7 @@ enum DeveloperHooks {
         }
         if let sidebar = d.string(forKey: "VespertineSidebar") {
             switch sidebar {
+            case "albums": model.sidebar = .albums
             case "artists": model.sidebar = .artists
             case "songs": model.sidebar = .songs
             case "genres": model.sidebar = .genres
@@ -125,6 +139,29 @@ enum DeveloperHooks {
             if d.double(forKey: "VespertinePauseAfter") > 0 {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
                 model.player.engine.pause()
+            }
+        }
+        // `-VespertinePlaySong "Title|Artist|DSD"`: opens and plays the album holding the first song whose title contains Title, from that song. Artist and
+        // a format word (matched against the format summary, e.g. "5.1", "DSD128", "24/96") are optional and pick one
+        // version where the library has several.
+        if let spec = d.string(forKey: "VespertinePlaySong") {
+            let parts = spec.split(separator: "|").map { $0.trimmingCharacters(in: .whitespaces) }
+            let matches = { (t: Track) -> Bool in
+                t.title.localizedCaseInsensitiveContains(parts[0])
+                    && (parts.count < 2 || parts[1].isEmpty || t.displayAlbumArtist.localizedCaseInsensitiveContains(parts[1]))
+                    && (parts.count < 3 || t.formatSummary.localizedCaseInsensitiveContains(parts[2]))
+            }
+            if let song = model.library.allTracks().first(where: matches) {
+                let tracks = model.library.tracks(albumKey: song.albumKey)
+                if d.string(forKey: "VespertineSidebar") == nil { model.openAlbum(song.albumKey) }   // else stay on that page
+                model.player.play(tracks, startAt: tracks.firstIndex { $0.id == song.id } ?? 0)
+                print("[qa] play song: \(song.displayAlbumArtist) — \(song.displayAlbum) — \(song.title) · \(song.formatSummary)")
+                if d.double(forKey: "VespertinePauseAfter") > 0 {
+                    try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
+                    model.player.engine.pause()
+                }
+            } else {
+                print("[qa] play song: no match for \(spec)")
             }
         }
         if let select = d.string(forKey: "VespertineSelectTracks"), let album = model.library.albums.first(where: { $0.title == (open ?? play) }) {

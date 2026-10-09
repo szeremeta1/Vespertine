@@ -128,6 +128,11 @@ struct WindowRig: View {
                 }
                 .frame(width: AppWindow.sidebar.width, height: AppWindow.sidebar.height)
                 .clipShape(RoundedRectangle(cornerRadius: mix(22, 26, e), style: .continuous))
+                // While it sits in the window it is part of the window body: dimmed and softened with it, so a
+                // feature scene doesn't leave it sharp over the blurred window (or the body's blur haloing past it).
+                .overlay(Color.black.opacity(0.45 * pose.contentDim * (1 - e))
+                    .clipShape(RoundedRectangle(cornerRadius: mix(22, 26, e), style: .continuous)))
+                .blur(radius: pose.contentBlur * CGFloat(1 - e))
                 .shadow(color: .black.opacity(0.5 * e), radius: 40 * CGFloat(e), x: 0, y: 24 * CGFloat(e))
                 .scaleEffect(mix(1, pose.sidebarScale, e), anchor: .center)
                 .rotation3DEffect(.degrees(pose.sidebarTiltY * e), axis: (x: 0, y: 1, z: 0), anchor: .center, perspective: 0.5)

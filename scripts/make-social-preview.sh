@@ -23,7 +23,7 @@ trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/site/assets/fonts" "$work/docs/screenshots" "$work/docs/brand"
 cp "$root/docs/brand/logo.svg" "$work/docs/brand/"
 cp "$root"/site/assets/fonts/*.woff2 "$work/site/assets/fonts/"
-cp "$root/docs/screenshots/bit-perfect-fiio-24-192.png" "$work/docs/screenshots/"
+cp "$root/docs/screenshots/bit-perfect-fiio-24-96.png" "$work/docs/screenshots/"
 sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' -e 's#\.\./brand/#docs/brand/#g' \
   "$root/docs/design/social-preview.html" > "$work/index.html"
 
