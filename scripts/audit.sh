@@ -18,6 +18,12 @@ for sanitizer in address,undefined thread; do
 done
 clang --analyze -std=c11 -I Packages/VespertineKit/Sources/CVespertineRT/include \
   Packages/VespertineKit/Sources/CVespertineRT/vespertine_rt.c -o "$out/rt-static.plist"
+# The DST decoder (SACD images) on frames that can't be valid: any overflow or stray read stops the audit.
+clang -std=c11 -g -O1 -fsanitize=address,undefined -fno-sanitize-recover=all -I Packages/VespertineKit/Sources/CVespertineDTS/include \
+  tests/dst-audit.c Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c -o "$out/dst-audit"
+"$out/dst-audit" > "$out/dst-audit.log" 2>&1
+clang --analyze -std=c11 -I Packages/VespertineKit/Sources/CVespertineDTS/include \
+  Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c -o "$out/dst-static.plist"
 scripts/generate-project.sh > "$out/xcodegen.log" 2>&1
 xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
   -derivedDataPath build/AuditDD -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test > "$out/app-tests.log" 2>&1

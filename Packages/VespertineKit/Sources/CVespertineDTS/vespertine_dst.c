@@ -8,8 +8,10 @@
 // option) any later version. It is distributed WITHOUT ANY WARRANTY; see the GNU Lesser General Public
 // License (Vendor/FFmpegDCA.xcframework/LICENSE.FFmpeg-LGPL-2.1.txt) for details.
 //
-// Changes from FFmpeg's decoder: it stands alone (its own bit reader instead of FFmpeg's internal one), and it
-// hands back the decoded DSD itself, so it can go out over DoP, instead of converting it to PCM.
+// Changed from FFmpeg's decoder for Vespertine on 2026-10-09: it stands alone (its own bit reader instead of
+// FFmpeg's internal one); it hands back the decoded DSD itself, so it can go out over DoP, instead of converting
+// it to PCM; and it rejects frames that are cut short or can't be valid (a short stored frame, tables that run
+// past the frame, filter coefficients out of range, arithmetic code left unread) instead of decoding them.
 //
 // The format: ISO/IEC 14496-3, subpart 10 (lossless coding of oversampled audio).
 //
@@ -119,7 +121,7 @@ static bool read_map(BitReader *gb, Table *t, unsigned map[DST_MAX_CHANNELS], in
 }
 
 /// Unsigned Rice code: a run of zeros ended by a one, then k bits (FFmpeg's get_ur_golomb_jpegls with the
-/// rest of the frame as the limit and no escape).
+/// rest of the frame as the limit and no escape). -1 when the run reaches the end of the frame.
 static int get_ur_golomb(BitReader *gb, int k) {
     int64_t limit = bits_left(gb), i = 0;
     while (i < limit && get_bit(gb) == 0 && bits_left(gb) > 0) i++;
@@ -127,10 +129,12 @@ static int get_ur_golomb(BitReader *gb, int k) {
     return -1;
 }
 
-static int get_sr_golomb_dst(BitReader *gb, int k) {
-    int v = get_ur_golomb(gb, k);
-    if (v && get_bit(gb)) v = -v;
-    return v;
+/// A signed Rice code: false when it runs past the end of the frame.
+static bool get_sr_golomb_dst(BitReader *gb, int k, int *v) {
+    *v = get_ur_golomb(gb, k);
+    if (*v < 0) return false;
+    if (*v && get_bit(gb)) *v = -*v;
+    return true;
 }
 
 static void read_uncoded_coeff(BitReader *gb, int *dst, unsigned elements, int coeff_bits, int is_signed, int offset) {
@@ -138,8 +142,12 @@ static void read_uncoded_coeff(BitReader *gb, int *dst, unsigned elements, int c
         dst[i] = (is_signed ? get_sbits(gb, coeff_bits) : (int)get_bits(gb, coeff_bits)) + offset;
 }
 
+/// Filter coefficients are 9-bit signed, probabilities 1 to 128: a coded value outside that range can't come from
+/// a valid frame (and unchecked, the next prediction could overflow).
 static bool read_table(BitReader *gb, Table *t, const int8_t code_pred_coeff[3][3],
                        int length_bits, int coeff_bits, int is_signed, int offset) {
+    const int64_t low = is_signed ? -(1 << (coeff_bits - 1)) : offset;
+    const int64_t high = is_signed ? (1 << (coeff_bits - 1)) - 1 : offset + (1 << coeff_bits) - 1;
     for (unsigned i = 0; i < t->elements; i++) {
         t->length[i] = get_bits(gb, length_bits) + 1;
         if (!get_bit(gb)) {
@@ -150,14 +158,16 @@ static bool read_table(BitReader *gb, Table *t, const int8_t code_pred_coeff[3][
             read_uncoded_coeff(gb, t->coeff[i], (unsigned)method + 1, coeff_bits, is_signed, offset);
             int lsb_size = (int)get_bits(gb, 3);
             for (unsigned j = (unsigned)method + 1; j < t->length[i]; j++) {
-                int c, x = 0;
+                int64_t x = 0, c;
+                int residual;
                 for (int k = 0; k < method + 1; k++)
-                    x += code_pred_coeff[method][k] * (unsigned)t->coeff[i][j - k - 1];
-                c = get_sr_golomb_dst(gb, lsb_size);
+                    x += code_pred_coeff[method][k] * (int64_t)t->coeff[i][j - k - 1];
+                if (!get_sr_golomb_dst(gb, lsb_size, &residual)) return false;
+                c = residual;
                 if (x >= 0) c -= (x + 4) / 8;
                 else c += (-x + 3) / 8;
-                if (!is_signed && (c < offset || c >= offset + (1 << coeff_bits))) return false;
-                t->coeff[i][j] = c;
+                if (c < low || c > high) return false;
+                t->coeff[i][j] = (int)c;
             }
         }
     }
@@ -226,12 +236,10 @@ static bool decode(NDSTDecoder *d, const uint8_t *data, int size, uint8_t *dsd) 
     BitReader gb = { d->input, (int64_t)size * 8, 0 };
 
     if (!get_bit(&gb)) {
-        // Stored uncompressed.
-        unsigned n = (unsigned)(size - 1) < total ? (unsigned)(size - 1) : total;
+        // Stored uncompressed: the header byte, then the whole frame of DSD.
         get_bit(&gb);
-        if (get_bits(&gb, 6)) return false;
-        memcpy(dsd, data + 1, n);
-        memset(dsd + n, DSD_SILENCE, total - n);
+        if (get_bits(&gb, 6) || (unsigned)(size - 1) < total) return false;
+        memcpy(dsd, data + 1, total);
         return true;
     }
 
@@ -255,8 +263,8 @@ static bool decode(NDSTDecoder *d, const uint8_t *data, int size, uint8_t *dsd) 
     if (!read_table(&gb, &d->fsets, fsets_code_pred_coeff, 7, 9, 1, 0)) return false;
     if (!read_table(&gb, &d->probs, probs_code_pred_coeff, 6, 7, 0, 1)) return false;
 
-    // Arithmetic-coded data (10.11)
-    if (get_bit(&gb)) return false;
+    // Arithmetic-coded data (10.11), which starts inside the frame.
+    if (bits_left(&gb) <= 0 || get_bit(&gb)) return false;
     ArithCoder ac;
     ac_init(&ac, &gb);
     if (!build_filter(d->filter, &d->fsets)) return false;
@@ -293,7 +301,9 @@ static bool decode(NDSTDecoder *d, const uint8_t *data, int size, uint8_t *dsd) 
             w[0] = (w[0] << 1) | (uint64_t)v;
         }
     }
-    return true;
+    // As the reference decoder checks: all but at most 7 bits of the arithmetic code were read. (Reading past the
+    // end is allowed: the encoder drops the code's trailing zeros. Real frames end 4 to a few hundred bits past it.)
+    return bits_left(&gb) <= 7;
 }
 
 bool ndst_decode(NDSTDecoder *d, const uint8_t *data, int size, uint8_t *out) {
