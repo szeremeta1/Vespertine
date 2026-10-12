@@ -1,0 +1,10 @@
+tool	argument
+Read	/srv/cleanroom/dop-pack-B/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dop-pack-B "find . -type f -not -path './harness/.build/*' | head -50; cat harness/Package.swift; ls -R harness/Sources"
+Read	/srv/cleanroom/dop-pack-B/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dop-pack-B/harness/Sources/CleanRoomB/BDoPPack.swift (1955 chars)
+Write	/srv/cleanroom/dop-pack-B/harness/Sources/Scratch/main.swift (1184 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-B "cd harness && swift build 2>&1 | tail -20 && swift run Scratch 2>&1 | tail -20"
+Write	/srv/cleanroom/dop-pack-B/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dop-pack-B "cd harness && swift build 2>&1 | tail -3"
+SubagentHandback	(its final report, in reports/)

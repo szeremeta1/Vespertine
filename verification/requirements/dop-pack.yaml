@@ -1,0 +1,118 @@
+# DoP packing: DSD bytes into DoP sample values. Contract: contracts/dop-pack.md
+
+- id: DOP-001
+  claim: CLAIMS.md#dop-marker
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The 8 most significant bits are used for the DSD marker", to: "0x05 and 0xFA." }
+  requirement: "Each DoP sample is a 24-bit value whose 8 most significant bits are the marker byte and whose 16 least significant bits carry DSD data."
+  quote: "The 8 most significant bits are used for the DSD marker"
+  quote_sha256: 77b16077dcd63dbfebf8bfdfbc5db4fc803f664aca41e04c231f11198ffe87fb
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-002
+  claim: CLAIMS.md#dop-marker
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The 8 most significant bits are used for the DSD marker", to: "0x05 and 0xFA." }
+  requirement: "The marker alternates from one sample period to the next between 0x05 and 0xFA."
+  quote: "alternate with each sample between 0x05 and 0xFA"
+  quote_sha256: 77b16077dcd63dbfebf8bfdfbc5db4fc803f664aca41e04c231f11198ffe87fb
+  kind: spec
+  testable: true
+  gap: "The standard doesn't say which marker the first sample of a stream carries. The contract makes it an input (firstMarker)."
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-003
+  claim: CLAIMS.md#dop-marker
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "Each channel within a sample contains the same marker.", to: "contains the same marker." }
+  requirement: "Within one sample period, every channel's DoP sample carries the same marker."
+  quote: "Each channel within a sample contains the same marker."
+  quote_sha256: ee048d8e178f648777704eb02e3fa34ecfa9ca5efbcaf80ac30a33117d2597ce
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-004
+  claim: CLAIMS.md#dop-bits
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2 (text and the 24-bit frame figure)"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The remaining 16 lower bits are then used for the DSD data", to: "first or oldest bit in slot t0." }
+  requirement: "The 16 DSD bits of a channel's sample are that channel's next 16 DSD samples in time order, the oldest in slot t0, the most significant of the 16 bits (bit 15)."
+  quote: "first or oldest bit in slot t0"
+  quote_sha256: 7c93b51bdb50599d1ca2dea500aeb867e5dec5ffa71105e665055ea8d21cb2bf
+  kind: spec
+  testable: true
+  gap: "The text says the oldest bit is in slot t0. That t0 is the most significant of the 16 DSD bits (t0 … t15 from MSB to LSB) is shown only in the figure above that text, not stated in words."
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-005
+  claim: CLAIMS.md#dop-bits
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The USB Audio specification assigns each PCM Frame", to: "corresponding to its assigned channel." }
+  requirement: "Each channel's DoP samples carry only DSD data of that same channel."
+  quote: "each PCM Frame contains only DSD data corresponding to its assigned channel."
+  quote_sha256: c4ccaa192e733f1f5e048382a82032aa81992ef3feaefbd6ed3b1ad928398130
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-006
+  claim: CLAIMS.md#dop-bits
+  source:
+    doc: "DSDIFF: Direct Stream Digital Interchange File Format"
+    version: "1.5 (2004-04-27)"
+    section: "§1.2 Definitions (Channel Byte), page 5; §3.3 DSD Sound Data Chunk, page 18"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf"
+    availability: public
+    cache: { doc: dsdiff-1.5, pages: 5, from: "8 consecutive DSD samples of 1 channel", to: "oldest bit of the sequence" }
+  requirement: "An input byte holds 8 consecutive DSD samples of one channel with the most significant bit the oldest, so the packer must read each byte from its most significant bit down."
+  quote: "the most significant bit is the oldest bit of the sequence"
+  quote_sha256: 06ef380f5d2577ef57d396397a5dc64684c9112ed86311374e11f0242c01e02b
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/dop-pack.md"
+
+- id: DOP-007
+  claim: CLAIMS.md#dop-bits
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 60"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 60, from: "DSF and DSDIFF DSD bits survive DoP packing exactly", to: "DSF and DSDIFF DSD bits survive DoP packing exactly" }
+  requirement: "Packing carries every DSD bit exactly once: per channel, the output has one sample per two input bytes, and no DSD bit is dropped, repeated, inverted or moved."
+  quote_sha256: 48e296858551079020e3b525e5f82a7d774f75a632c8f57a543d4ce0edaf036f
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/dop-pack.md"

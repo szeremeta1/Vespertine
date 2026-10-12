@@ -1,0 +1,104 @@
+[
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 4169,
+    "name" : "2ch-v0",
+    "variant" : 0
+  },
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 4325,
+    "name" : "2ch-v1",
+    "variant" : 1
+  },
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 4709,
+    "name" : "2ch-v2",
+    "variant" : 2
+  },
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 5188,
+    "name" : "2ch-v3",
+    "variant" : 3
+  },
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 4321,
+    "name" : "2ch-v4",
+    "variant" : 4
+  },
+  {
+    "channels" : 2,
+    "coding" : "dst",
+    "dstBytes" : 4498,
+    "name" : "2ch-v5",
+    "variant" : 5
+  },
+  {
+    "channels" : 2,
+    "coding" : "uncompressed",
+    "dstBytes" : 9409,
+    "name" : "2ch-stored"
+  },
+  {
+    "channels" : 5,
+    "coding" : "dst",
+    "dstBytes" : 9362,
+    "name" : "5ch-v0",
+    "variant" : 0
+  },
+  {
+    "channels" : 5,
+    "coding" : "dst",
+    "dstBytes" : 9893,
+    "name" : "5ch-v1",
+    "variant" : 1
+  },
+  {
+    "channels" : 5,
+    "coding" : "dst",
+    "dstBytes" : 10828,
+    "name" : "5ch-v2",
+    "variant" : 2
+  },
+  {
+    "channels" : 5,
+    "coding" : "uncompressed",
+    "dstBytes" : 23521,
+    "name" : "5ch-stored"
+  },
+  {
+    "channels" : 6,
+    "coding" : "dst",
+    "dstBytes" : 11332,
+    "name" : "6ch-v0",
+    "variant" : 0
+  },
+  {
+    "channels" : 6,
+    "coding" : "dst",
+    "dstBytes" : 12013,
+    "name" : "6ch-v1",
+    "variant" : 1
+  },
+  {
+    "channels" : 6,
+    "coding" : "dst",
+    "dstBytes" : 13020,
+    "name" : "6ch-v2",
+    "variant" : 2
+  },
+  {
+    "channels" : 6,
+    "coding" : "uncompressed",
+    "dstBytes" : 28225,
+    "name" : "6ch-stored"
+  }
+]

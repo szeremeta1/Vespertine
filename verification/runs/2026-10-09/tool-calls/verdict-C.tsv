@@ -1,0 +1,24 @@
+tool	argument
+Read	/srv/cleanroom/verdict-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/verdict-C "find . -type f -not -path '*/.build/*' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/verdict-C "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/Mutants 2>&1"
+Bash	swiftbox /srv/cleanroom/verdict-C "swift --version; cd harness && ls -la; ls Sources/*"
+Write	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift (38697 chars)
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && swift build 2>&1 | tail -30"
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Write	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift (21088 chars)
+Read	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift (21297 chars)
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40 && swift run Scratch 2>&1 | tail -120"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && sed -i 's/^func add(/@MainActor func add(/; s/^func randomInput()/@MainActor func randomInput()/' Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'error|warning' | head -20; swift run Scratch 2>&1 | grep -v -E '^\[|Building|Compiling|Build complete' | tail -120"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && cat >> Sources/Scratch/main.swift <<'EOF'\n\n// MARK: - Perturbation fuzz from valid baselines\n\n@MainActor func perturb(_ base: VerdictInput) -> VerdictInput {\n    var i = base\n    let n = 1 + Int(rng.next() % 2)\n    for _ in 0..<n {\n        switch rng.next() % 24 {\n        case 0: i.source.encoding = rng.pick([.pcm, .lossy, .dsd])\n        c
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && python3 - <<'EOF' 2>/dev/null || echo nopython\nEOF\ngrep -n 'var samples' Sources/Scratch/main.swift"
+Read	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && swift build 2>&1 | grep -E 'error' | head; swift run Scratch 2>&1 | sed -n '/^C-BPV-001-a diffs/,\$p'"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && rm -rf .build && swift build --target Mutants 2>&1 | grep -vE '^\[' | tail -20; git status 2>&1 | head -5; ls -la Sources/Contracts Sources/SpecKit; md5sum Package.swift Sources/Contracts/*.swift Sources/SpecKit/*.swift"
+Edit	/srv/cleanroom/verdict-C/harness/Sources/Mutants/VerdictMutants.swift
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && cp Sources/Scratch/main.swift /work/lab-main.swift.bak && swift build 2>&1 | grep -E 'error|warning|Compiling|complete' ; swift run Scratch 2>&1 | grep -E 'reference passes|killed=false|mutants:|^BPV-001='"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && rm -f /work/lab-main.swift.bak && cat -A Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'error|warning|complete' && find /work -type f -not -path '*/.build/*'"
+Bash	swiftbox /srv/cleanroom/verdict-C "cd harness && grep -n 'Mutant(\"' Sources/Mutants/VerdictMutants.swift | sed 's/^ *//' | cut -c1-110; wc -l Sources/Mutants/VerdictMutants.swift"
+SubagentHandback	(its final report, in reports/)

@@ -1,0 +1,26 @@
+tool	argument
+Read	/srv/cleanroom/rate-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/rate-C "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/rate-C "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/Mutants 2>&1"
+Bash	swiftbox /srv/cleanroom/rate-C "swift --version; cd harness && swift build 2>&1 | tail -5"
+Write	/srv/cleanroom/rate-C/harness/Sources/Mutants/RateMutants.swift (24092 chars)
+Edit	/srv/cleanroom/rate-C/harness/Sources/Mutants/RateMutants.swift
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && grep -n 'rounded\|truncatingRemainder\|squareRoot' Sources/Mutants/RateMutants.swift"
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && sed -i 's/(r \/ s).rounded()/nearest(r \/ s)/; s/(s \/ r).rounded()/nearest(s \/ r)/' Sources/Mutants/RateMutants.swift && sed -i 's/(r \/ s).rounded()/nearest(r \/ s)/; s/(s \/ r).rounded()/nearest(s \/ r)/' Sources/Mutants/RateMutants.swift && sed -i 's/(b.dopCarrierRate(dsdRate: d) \/ 1000).rounded(.down) \* 1000/Hz.down(b.dopCarrierRate(dsdRate: d)
+Edit	/srv/cleanroom/rate-C/harness/Sources/Mutants/RateMutants.swift
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && swift build 2>&1 | grep -E 'error|warning|Build' | head -40"
+Write	/srv/cleanroom/rate-C/harness/Sources/Scratch/main.swift (12435 chars)
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && swift build 2>&1 | grep -E 'error|warning:|Build' | head -20 && swift run Scratch 2>&1 | tail -90"
+Read	/srv/cleanroom/rate-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/rate-C/harness/Sources/Scratch/main.swift (12461 chars)
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && swift build 2>&1 | grep -E 'error|warning:|Build' | head -20 && swift run Scratch 2>&1 | tail -90"
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && sed -i 's|2_822_400 / 8, 6000|352_800.0, 6000|' Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'error|warning:|Build' | head -20 && swift run Scratch 2>&1 | tail -90"
+Edit	/srv/cleanroom/rate-C/harness/Sources/Mutants/RateMutants.swift
+Read	/srv/cleanroom/rate-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/rate-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && rm -rf .build && swift build 2>&1 | grep -E 'error|warning:|Build' | head -20 && swift run Scratch 2>&1 | grep -v ': ok ' | tail -30"
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && swift run -c release Scratch 2>&1 | grep -v ': ok ' | tail -8"
+Read	/srv/cleanroom/rate-C/harness/Sources/Mutants/RateMutants.swift
+Bash	swiftbox /srv/cleanroom/rate-C "cd harness && sed -i -E 's/^enum Hz \{/private enum Hz {/; s/^typealias /private typealias /; s/^struct Overlay: RatePlanner/private struct Overlay: RatePlanner/; s/^func (matchSource|otherPolicy|carrier|plan|planWithDoP|chooseWithout|pcmPlan)\(/private func \1(/' Sources/Mutants/RateMutants.swift && grep -nE '^(private |public )?(enum|struct|func|typealias)' Source
+SubagentHandback	(its final report, in reports/)

@@ -1,0 +1,47 @@
+tool	argument
+Read	/srv/cleanroom/dst-A/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dst-A "find . -path ./harness/.build -prune -o -print | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dst-A "cat harness/Sources/Scratch/main.swift; cat fixtures/dst/fixtures.json; ls -l fixtures/dst; ls harness/Sources/SpecChecks"
+Bash	swiftbox /srv/cleanroom/dst-A "swift --version; cd harness && ls -la .build 2>/dev/null | head -5; od -A d -t x1 ../fixtures/dst/2ch-stored.dst | head -3; od -A d -t x1 ../fixtures/dst/2ch-stored.dsd | head -3; od -A d -t x1 ../fixtures/dst/2ch-v0.dst | head -5; od -A d -t x1 ../fixtures/dst/2ch-v0.dsd | head -3"
+Write	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift (1184 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | tail -5 && swift run Scratch 2>&1 | tail -40"
+Read	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift (1184 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && mkdir -p Sources/SpecChecks && swift build 2>&1 | tail -5 && swift run Scratch 2>&1 | tail -40"
+Write	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift (2249 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'error|warning: .*main' ; swift run Scratch 2>&1 | tail -5"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch 2>&1 | grep -v '^0x' | head -30"
+Edit	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch 2>&1 | grep -v '^0x' | tail -8"
+Write	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift (30556 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'error|warning' | head -30; echo BUILD_DONE"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | tail -5"
+Write	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift (11791 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'error' | head; swift run Scratch 2>&1 | grep -v '^\[' | tail -80"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift package clean && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -30"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'warning' | head; swift run Scratch 2>&1 | grep -v '^\[' | tail -90"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch -slow 2>&1 | sed -n '/^slow/,\$p;/^  /p' | tail -40"
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Bash	cd /srv/cleanroom/dst-A/harness/Sources/Scratch && python3 - <<'EOF' 2>/dev/null || echo "no python on host; will edit via Edit tool"\nEOF
+Edit	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head; swift run Scratch -slow 2>&1 | grep -v '^\[' | grep -v '^Build' | tail -75"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch 2>&1 | grep -v '^\[' | grep -v '^Build' | head -16"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch -v 2>&1 | grep -v '^\[' | grep -A12 -E '^mutant (planar|swap56|missingLastSample|contentFlip|bitInterleaved|stickyNil)' | grep -E '^mutant|DST-00' | head -40"
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch -v 2>&1 | grep -v '^\[' | grep -B30 -E '^mutant (planar|swap56|channelsReversed)' | grep -E '^mutant|DST-002' | head -20"
+Read	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Read	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Edit	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head; swift run Scratch -slow 2>&1 | grep -v '^\[' | grep -v '^Build' | grep -E 'strict|lenient|SURVIVED|off target|^slow|^ +[0-9]' "
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift run Scratch 2>&1 | grep -E '^ +->' | sort | uniq -c"
+Read	/srv/cleanroom/dst-A/harness/Sources/SpecChecks/DSTChecks.swift
+Write	/srv/cleanroom/dst-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dst-A "cd harness && swift build 2>&1 | tail -3; grep -c 'SpecCheck(' Sources/SpecChecks/DSTChecks.swift; grep -c '// REQ:' Sources/SpecChecks/DSTChecks.swift; grep -nE '!\)|!\.|fatalError|try!|as!' Sources/SpecChecks/DSTChecks.swift | head"
+SubagentHandback	(its final report, in reports/)

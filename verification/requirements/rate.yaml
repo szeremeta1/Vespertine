@@ -1,0 +1,156 @@
+# Device-rate choice and DoP planning. Contract: contracts/rate-plan.md
+# Rate switching on a real device and handing the device back at quit are hardware checks (hardware/LOOPBACK.md).
+
+- id: RATE-001
+  claim: CLAIMS.md#dop-carrier-rate
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§2 Solutions, page 1"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 1, from: "DSD has a sample size of 1 bit", to: "24 bits at a sample rate of 176.4kHz." }
+  requirement: "DSD at 2.8224 MHz (64FS) is carried as 24-bit PCM at 176.4 kHz."
+  quote: "The PCM format with the next higher bit rate is 24 bits at a sample rate of 176.4kHz."
+  quote_sha256: 6126286c2b362057be04f1c0d92a6f76d601d5fd05f3f0d1c60ac0d761544f24
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/rate-plan.md (dopCarrierRate)"
+
+- id: RATE-002
+  claim: CLAIMS.md#dop-carrier-rate
+  source:
+    doc: "DoP Open Standard: Method for transferring DSD Audio over PCM Frames"
+    version: "1.1 (2012-03-30)"
+    section: "§3 Solutions for double rate DSD (128FS) and beyond, page 2"
+    url: "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf"
+    availability: public
+    cache: { doc: dop-1.1, pages: 2, from: "The solution described above for 64FS DSD", to: "All the marker bytes and bit ordering remain the same." }
+  requirement: "128FS DSD (5.6448 MHz) uses the same method with the PCM rate raised from 176.4 kHz to 352.8 kHz."
+  quote: "by simply raising the underlying PCM sample rate from 176.4kHz to 352.8kHz."
+  quote_sha256: 49e1511c95602208131afeb428ba5300e4157d56d047a80f3ef2e25a48304918
+  kind: spec
+  testable: true
+  gap: "§3 also describes a second method (markers 0x06/0xF9 on a channel pair at 176.4 kHz) for links that can't run 352.8 kHz. The contract and the product use the first method only."
+  interface: "contracts/rate-plan.md (dopCarrierRate)"
+
+- id: RATE-003
+  claim: CLAIMS.md#dop-carrier-rate
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 23"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 23, from: "so the DAC runs at a sixteenth of the DSD rate", to: "(176.4 kHz for DSD64)" }
+  requirement: "The DoP carrier rate is the DSD rate divided by 16 at every DSD rate, so DSD256 (11.2896 MHz) runs at 705.6 kHz and DSD512 (22.5792 MHz) at 1411.2 kHz."
+  quote_sha256: 0f73ab34bcbf2768bcd405bd0abe63f068cc2bbb0522626957ba8ef86f955660
+  kind: vespertine-rule
+  testable: true
+  gap: "DoP 1.1 says only that the first method \"can easily be extended\" to higher DSD rates by raising the PCM rate; it names no rate above 352.8 kHz. The docs also say carrier rates above 384 kHz are untested on hardware."
+  interface: "contracts/rate-plan.md (dopCarrierRate)"
+
+- id: RATE-004
+  claim: CLAIMS.md#dop-plan
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 23"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 23, from: "DoP is planned only when the DAC is marked DoP-capable and supports that carrier rate", to: "the planner resamples as needed." }
+  requirement: "DoP is planned only when the device is marked as decoding DoP and offers the carrier rate. Otherwise DSD is converted to PCM at the DSD rate divided by 8."
+  quote_sha256: 06282b4dcaceb37b4ba30f58ff780bb7872fb6e22977ebd44f10c3833a219f85
+  kind: vespertine-rule
+  testable: true
+  gap: "After the conversion to PCM, the device rate follows the ordinary choice (RATE-006 to RATE-009) for that PCM rate."
+  interface: "contracts/rate-plan.md (planDSD)"
+
+- id: RATE-005
+  claim: CLAIMS.md#dop-plan
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 43"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 43, from: "On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate.", to: "Otherwise it becomes high-rate PCM" }
+  requirement: "When the device is marked as decoding DoP and offers the carrier rate, DSD is planned as DoP at the carrier rate."
+  quote_sha256: 21d228590e49464a137f8d54ad2393667a2ed671c3148f667d09883cade40ea7
+  kind: vespertine-rule
+  testable: true
+  gap: "\"Supports the carrier rate\" could also take in the bit depth: DoP needs 24-bit samples, and the docs don't mention a device that offers the rate only at 16 bits. Tests should use devices that offer 24-bit or deeper integer formats."
+  interface: "contracts/rate-plan.md (planDSD)"
+
+- id: RATE-006
+  claim: CLAIMS.md#rate-native
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 33"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 33, from: "Vespertine switches the DAC to each track's native rate.", to: "Vespertine switches the DAC to each track's native rate." }
+  requirement: "With the match-source policy, when the device offers the source's rate, that rate is chosen."
+  quote_sha256: a5464bcc6d3545acb27e37a0cad586545fad8715fd05010c98dfc9e7a54e4f78
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/rate-plan.md (chooseRate)"
+
+- id: RATE-007
+  claim: CLAIMS.md#rate-planner-order
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 33"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+  requirement: "With the match-source policy, when the source rate isn't offered but an integer multiple of it is (twice, four times, …), an integer multiple is chosen."
+  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+  kind: vespertine-rule
+  testable: true
+  gap: "\"Same rate family\" is read as an integer multiple of the source rate, since the sentence lists higher rates and integer divisors after it. The docs don't say which multiple when several are offered; tests may not require a particular one."
+  interface: "contracts/rate-plan.md (chooseRate)"
+
+- id: RATE-008
+  claim: CLAIMS.md#rate-planner-order
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 33"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+  requirement: "With the match-source policy, when neither the source rate nor an integer multiple is offered but some offered rate is higher than the source rate, a higher rate is chosen."
+  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+  kind: vespertine-rule
+  testable: true
+  gap: "Which higher rate, when several are offered, isn't said; tests may not require a particular one."
+  interface: "contracts/rate-plan.md (chooseRate)"
+
+- id: RATE-009
+  claim: CLAIMS.md#rate-planner-order
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 33"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+  requirement: "With the match-source policy, when every offered rate is lower than the source rate and some offered rate divides it exactly (half, a quarter, …), such an integer divisor is chosen."
+  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+  kind: vespertine-rule
+  testable: true
+  gap: "Which divisor, when several are offered, isn't said. What happens when no offered rate is a multiple, higher, or a divisor isn't said either. Tests may not require either."
+  interface: "contracts/rate-plan.md (chooseRate)"
+
+- id: RATE-010
+  claim: CLAIMS.md#rate-planner-order
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 33"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 33, from: "Per-device settings can match the source, use the device maximum, or force a rate.", to: "or force a rate." }
+  requirement: "With the maximum policy the highest offered rate is chosen, whatever the source rate. With a fixed rate that the device offers, that rate is chosen."
+  quote_sha256: 8e5591b3127a508854ffded5033a528b7635d47336a22235d663599000b8ebb6
+  kind: vespertine-rule
+  testable: true
+  gap: "What a forced rate the device doesn't offer leads to isn't said; tests may not rely on it."
+  interface: "contracts/rate-plan.md (chooseRate)"

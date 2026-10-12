@@ -1,0 +1,260 @@
+# The BIT-PERFECT verdict. Contract: contracts/bit-perfect-verdict.md
+# Every record here is Vespertine's own definition (vespertine-rule), cited from its docs. The Core Audio header records
+# say what the readback values mean.
+
+- id: BPV-001
+  claim: CLAIMS.md#bp-pcm-native-rate
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 20"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 20, from: "The source is PCM", to: "no DSD is converted to PCM." }
+  requirement: "In PCM mode the badge is not BIT-PERFECT when the source is lossy or DSD, when the rate is converted, or when DSD is converted to PCM."
+  quote_sha256: 9545e217afe30d0fa3a30b91af876701d1bcaa4e07d3888950120a5765a02cf9
+  kind: vespertine-rule
+  testable: true
+  gap: "ARCHITECTURE.md line 90 says the source must be lossless; the contract's `pcm` encoding means lossless PCM."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-002
+  claim: CLAIMS.md#bp-readback
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 21"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 21, from: "The device runs at that rate.", to: "It doesn't trust its own request." }
+  requirement: "In PCM mode the badge is not BIT-PERFECT unless the nominal rate read back from the device equals the source's sample rate. The requested rate doesn't count."
+  quote_sha256: b4f36fae4d657aa460c95942c33c1e5cbb39c2d4805dc5c453e62e85e9836dc4
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs don't give a tolerance. The contract treats rates within 0.5 Hz as equal; tests should use rates that clearly differ."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-003
+  claim: CLAIMS.md#bp-readback
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 21"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 21, from: "The device runs at that rate.", to: "It doesn't trust its own request." }
+  requirement: "When the nominal rate or the physical format could not be read back, the badge is not BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM: an unconfirmed format is not trusted."
+  quote_sha256: b4f36fae4d657aa460c95942c33c1e5cbb39c2d4805dc5c453e62e85e9836dc4
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs say the app doesn't trust its own request; they don't describe a failed readback. This record reads the sentence as covering it."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-004
+  claim: CLAIMS.md#bp-word-length
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "lines 22-24"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: [22, 24], from: "The device's physical format holds the whole sample.", to: "A float device needs a full 32-bit float." }
+  requirement: "In PCM mode the badge is not BIT-PERFECT when an integer physical format has fewer bits than the source, or when a floating-point physical format has fewer than 32 bits."
+  quote_sha256: 25b9e59d1fa44328e7d4d390a943b530c9f30708f6bf1a52b283abee3d949b2a
+  kind: vespertine-rule
+  testable: true
+  gap: "A source with no bit depth (float or lossy files) isn't covered by the docs; tests shouldn't depend on it."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-005
+  claim: CLAIMS.md#bp-word-length
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 25"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 25, from: "In the normal float pipeline, up to 24 bits pass through exactly.", to: "DACs that offer an integer format." }
+  requirement: "In PCM mode a source deeper than 24 bits is BIT-PERFECT only with integer mode in effect; without it, the badge is not BIT-PERFECT."
+  quote_sha256: 0f283f468b721f5dcb5049135d97bc2d960a339b7a301c2041f9760988c5a6f2
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-006
+  claim: CLAIMS.md#bp-no-gain
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "lines 26-29"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: [26, 29], from: "No gain is applied anywhere in software.", to: "ReplayGain must be off or at 0 dB." }
+  requirement: "The badge is not BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM while digital volume or ReplayGain applies any gain other than exactly 0 dB. Hardware or fixed volume, and digital volume or ReplayGain at 0 dB, are allowed."
+  quote_sha256: 4f256aa44c3b2812c76ad75d89846524950ccf2d4c3f722f56191dad86aca9f5
+  kind: vespertine-rule
+  testable: true
+  gap: "That the gain conditions also apply to DoP and bitstream is from ARCHITECTURE.md lines 83-88 (the conditions every bit-perfect path meets)."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-007
+  claim: CLAIMS.md#bp-channels
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 30"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 30, from: "No spatial or channel processing is applied.", to: "at least as many channels as the file." }
+  requirement: "The badge is not BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM when spatial audio is on, when the channels sent differ from the file's channels, or when the device carries fewer channels than the file."
+  quote_sha256: 41175a697c57567fa7f61465467c539516eaa6e554b501669489c96cc8e63e92
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-008
+  claim: CLAIMS.md#bp-no-mixing
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "lines 31-33"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: [31, 33], from: "Nothing else is mixed in.", to: "or no other app is playing to it at the same moment." }
+  requirement: "The badge is not BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM when another app is playing to the device, unless the player holds the device exclusively."
+  quote_sha256: 21eb766bcb6640b6653ea56ac5b6de0ce6b837a99769603fc18b556ddfd890c7
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-009
+  claim: CLAIMS.md#bp-no-mixing
+  source:
+    doc: "Core Audio AudioHardware.h (macOS 27.0 SDK)"
+    version: "SDK 27.0 (26A425), Xcode 27.0 (27A266a)"
+    section: "kAudioDevicePropertyHogMode"
+    url: "https://developer.apple.com/documentation/coreaudio/kaudiodevicepropertyhogmode"
+    availability: public
+    cache: { header: AudioHardware.h, from: "A pid\\_t indicating the process that currently owns exclusive access", to: "currently available to all processes." }
+  requirement: "Holding the device exclusively means the hog-mode owner read back from the device is the player's own process ID; −1 means no process holds it. A request for exclusive access that didn't take effect doesn't count."
+  quote: "A pid_t indicating the process that currently owns exclusive access to the AudioDevice or a value of -1"
+  quote_sha256: 164efd6583c048f445f29934ef762b790e0666e79fc28bf4932af253395783f6
+  kind: spec
+  testable: true
+  gap: ""
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-010
+  claim: CLAIMS.md#bp-device-class
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 35"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 35, from: "Bluetooth devices never can", to: "AirPlay can't either." }
+  requirement: "On a Bluetooth device (AirPods Max over Bluetooth included) or an AirPlay device the badge is never BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM."
+  quote_sha256: 4c7a8f6461c4bfca243714c4608391e8b69d7354d4a2b267fddbef29a07ec7e5
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-011
+  claim: CLAIMS.md#bp-device-class
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 35"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.", to: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT." }
+  requirement: "On the computer's built-in speakers, a virtual device or an aggregate device the badge is never BIT-PERFECT."
+  quote_sha256: e59a38699f1bb4c6a269cf1430289123135aa957ab31384b503031207bdda8d0
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs say BIT-PERFECT; they don't say whether NATIVE DSD · DoP or BITSTREAM could appear on these devices."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-012
+  claim: CLAIMS.md#bp-airpods-usbc
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 36"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 36, from: "The one exception is AirPods Max with the USB-C cable connected.", to: "treats 48 kHz files as bit-perfect on that device." }
+  requirement: "AirPods Max with the USB-C cable connected can be bit-perfect: a 48 kHz file that meets every other condition gets BIT-PERFECT on them."
+  quote_sha256: 541df264aba6414d5748de1d81e1e2f213c66e187325ec5c1d10ac97a1924a58
+  kind: vespertine-rule
+  testable: true
+  gap: "The device reads back as 24-bit integer at 48 kHz in the docs' description; tests should use that readback."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-013
+  claim: CLAIMS.md#bp-damaged-frames
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 31"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 31, from: "the engine copies the count to the track's", to: "(\"DAMAGED FRAMES SILENCED\")" }
+  requirement: "When any frame of the track was replaced with silence, the badge is \"DAMAGED FRAMES SILENCED\" and not BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM."
+  quote_sha256: cb312698b7f7108428044cd7b3095b1ff101f8e75af88bd7d25c11cbc6fb4988
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs give this label for SACD images; they don't say whether another reason (spatial audio, a Bluetooth device) would be shown instead when both apply. Tests should change only the concealed-frame count."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-014
+  claim: CLAIMS.md#eq-label
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 81"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 81, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
+  requirement: "On a PCM path that would otherwise be BIT-PERFECT, an active equalizer preset makes the badge exactly \"EQUALIZER\"."
+  quote_sha256: 91af30f470ee9e93f90067b89d53ec5a14391dd891da113421239b9cc2c5486f
+  kind: vespertine-rule
+  testable: true
+  gap: "When the equalizer is on and another condition also fails, the docs don't say which label wins; tests should change only the equalizer."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-015
+  claim: CLAIMS.md#bp-says-what
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 38"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 38, from: "If any condition fails, the badge says what changed instead of BIT-PERFECT.", to: "If any condition fails, the badge says what changed instead of BIT-PERFECT." }
+  requirement: "A lossless PCM file at its own rate, on a device that can be bit-perfect, with every condition of BPV-001 to BPV-011 met and no frames concealed, gets exactly \"BIT-PERFECT\"."
+  quote_sha256: f9f78bf653a7a25e6e98c77538303fb23eb3e903febc576e14386784ce10bff4
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs state the conditions as necessary (\"only when\"). That meeting all of them gives the badge is read from this line: the badge says what changed only when a condition fails."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-016
+  claim: CLAIMS.md#bp-dop-conditions
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 91"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 91, from: "For DoP: the carrier runs at the planned rate with at least 24 bits.", to: "For DoP: the carrier runs at the planned rate with at least 24 bits." }
+  requirement: "In DoP mode the badge is \"NATIVE DSD · DoP\" exactly when the nominal rate read back equals the planned carrier rate, the physical format has at least 24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
+  quote_sha256: 10d9077b326096c3315a32452d51848f9d35a640bc8eef8072a40d1deae323e1
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs don't say whether the 24-bit physical format must be integer."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-017
+  claim: CLAIMS.md#bp-bitstream-conditions
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 64"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 64, from: "Dolby and DTS-CD sources plan as mode", to: "integer ≥ 16-bit, no gain." }
+  requirement: "In bitstream mode the badge starts \"BITSTREAM · \" only when the nominal rate read back equals the planned rate, the physical format is integer with at least 16 bits, and the shared conditions hold."
+  quote_sha256: 6a25cb3ab7bc7c5aef0215c836dcc95cfa7cbb48e78d3b6321d1cd0da1546d8d
+  kind: vespertine-rule
+  testable: true
+  gap: "\"Exclusive\" here describes the plan. Whether the badge also needs the device held exclusively, or accepts shared mode with no other app playing, isn't said; tests should hold the device exclusively. The codec name after the dot isn't specified."
+  interface: "contracts/bit-perfect-verdict.md"

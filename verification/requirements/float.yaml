@@ -1,0 +1,76 @@
+# Float path at unity gain. Contract: contracts/float-stream.md
+
+- id: FLT-001
+  claim: CLAIMS.md#float-24bit
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 57"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 57, from: "the float path carries every possible 24-bit sample unchanged at unity gain", to: "the float path carries every possible 24-bit sample unchanged at unity gain" }
+  requirement: "For every 24-bit sample value k, the Float32 k ÷ 2^23 written to the stage comes out with exactly the same value."
+  quote_sha256: 6b8f596cb01c883d6449e879cbf6a1040b2346c9842c523a0dd4d3e64f68c747
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/float-stream.md"
+
+- id: FLT-002
+  claim: CLAIMS.md#float-24bit
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 15"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 15, from: "Gain of exactly 1.0 with no equalizer is a straight copy.", to: "Gain of exactly 1.0 with no equalizer is a straight copy." }
+  requirement: "At unity gain with no equalizer the stage is a straight copy: any finite Float32 sample from −1.0 to +1.0, including values that need more than 24 significant bits, comes out with exactly the same value."
+  quote_sha256: 99467b88eae3adb47764f7b7c255e318edf540f503014e3443e1767abf31ceee
+  kind: vespertine-rule
+  testable: true
+  gap: "\"Straight copy\" would also cover NaN, infinities and values beyond ±1.0; the docs don't mention them and the contract doesn't send them."
+  interface: "contracts/float-stream.md"
+
+- id: FLT-003
+  claim: CLAIMS.md#bp-definition
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 18"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 18, from: "only when every sample of the file reaches the device's input unaltered", to: "unaltered." }
+  requirement: "Samples keep their channel and their order: frame n channel c in is frame n channel c out, nothing dropped or repeated, however writes and renders are sized."
+  quote_sha256: e93f7bb6e4d90a3a03645d429df86a86805eb5edbec5d02204f3b6eb107d74c2
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/float-stream.md"
+
+- id: FLT-004
+  claim: CLAIMS.md#float-24bit
+  source:
+    doc: "Vespertine docs/ARCHITECTURE.md"
+    version: "98cad1a"
+    section: "line 14"
+    availability: repository
+    cache: { repo: docs/ARCHITECTURE.md, lines: 14, from: "integer PCM up to 24 bits maps exactly into Float32", to: "verifies sample-for-sample." }
+  requirement: "Converting a 24-bit integer sample to Float32 is exact: int24ToFloat(k) equals k ÷ 2^23 for every 24-bit k, so distinct samples stay distinct and k is recovered by multiplying by 2^23."
+  quote_sha256: e17f7428c02a192b75b8b359ccf750889fcbadf1dcc9ae1f10b4f01aa2c8fcd8
+  kind: vespertine-rule
+  testable: true
+  gap: "The docs say \"exactly\" but not the scale. The contract fixes full scale at 2^23 (the only power-of-two scale that maps the 24-bit range into −1.0 … +1.0)."
+  interface: "contracts/float-stream.md"
+
+- id: FLT-005
+  claim: CLAIMS.md#mute-no-skip
+  source:
+    doc: "Vespertine docs/VERIFICATION.md"
+    version: "98cad1a"
+    section: "line 63"
+    availability: repository
+    cache: { repo: docs/VERIFICATION.md, lines: 63, from: "mute and rebuffering never alter or skip music", to: "where playback is actually held" }
+  requirement: "While muted, or when no written samples remain, the stage outputs silence (every sample equal to zero) and consumes nothing; afterwards the next sample out is the next one not yet played."
+  quote_sha256: 68de57b5fc481ef6014697b41409a3af28a71429101e03f15186dc2e054128b1
+  kind: vespertine-rule
+  testable: true
+  gap: ""
+  interface: "contracts/float-stream.md"

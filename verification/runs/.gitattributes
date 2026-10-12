@@ -1,0 +1,2 @@
+# The review-round diffs are unified diffs: their context lines for empty lines are a single space.
+*.diff -whitespace

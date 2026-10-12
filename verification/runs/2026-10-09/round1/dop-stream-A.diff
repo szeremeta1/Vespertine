@@ -1,0 +1,78 @@
+--- round0/DoPStreamChecks.swift
++++ round1/DoPStreamChecks.swift
+@@ -17,8 +17,10 @@
+ // For every output frame the model knows whether playback was held at that point (muted, or no written music
+ // left), which written frame was due, and what the previous output frame was, across render calls.
+ //
+-// Gain and equalizer (DOPS-007) are checked differentially: the same calls are made on a stage set to unity gain
+-// with the equalizer off, and the outputs must match frame for frame (DSD silence may use any qualifying byte).
++// Gain and equalizer (DOPS-007) are checked differentially: the same calls are made on two stages set to unity gain
++// with the equalizer off, and the output must match theirs frame for frame, silence byte included. Only where the
++// two unity stages themselves differ (a silence byte that varies from instance to instance, which DOPS-003 allows)
++// may the silence byte differ.
+ // Those scenarios write music before the first render, so that every frame out is fixed by DOPS-001…006 up to
+ // the silence byte value, and use gains between 0 and 0.5 only, so a stage that wrongly scales samples cannot
+ // overflow (and trap) doing so.
+@@ -1164,17 +1166,21 @@
+         return outs
+     }
+ 
+-    /// Equal frames, or two DSD silence frames that differ only in the (freely chosen) silence byte value.
+-    static func sameFrame(_ r: [UInt32], _ g: [UInt32], _ base: Int, _ channels: Int) -> Bool {
+-        var equal = true
++    static func equalFrames(_ r: [UInt32], _ g: [UInt32], _ base: Int, _ channels: Int) -> Bool {
+         var c = 0
+         while c < channels {
+-            if r[base + c] != g[base + c] { equal = false }
++            if r[base + c] != g[base + c] { return false }
+             c += 1
+         }
+-        if equal { return true }
++        return true
++    }
++
++    /// Equal frames, or two DSD silence frames that differ only in the silence byte value. Used only where two
++    /// stages at unity gain with the equalizer off, given the same calls, did not agree on that frame themselves.
++    static func sameUpToSilenceByte(_ r: [UInt32], _ g: [UInt32], _ base: Int, _ channels: Int) -> Bool {
++        if equalFrames(r, g, base, channels) { return true }
+         guard dsIsSilence(r, base, channels), dsIsSilence(g, base, channels) else { return false }
+-        c = 0
++        var c = 0
+         while c < channels {
+             if r[base + c] & 0xFF00_00FF != g[base + c] & 0xFF00_00FF { return false }
+             c += 1
+@@ -1182,10 +1188,16 @@
+         return true
+     }
+ 
++    /// The tested stage gets the gain and equalizer calls; two fresh stages at unity gain with the equalizer off get
++    /// the same other calls. Wherever those two agree on a frame — which is everywhere for a stage whose output
++    /// depends only on the calls made — the tested stage must send exactly that frame, silence byte included. Only
++    /// where they disagree (a stage whose silence byte varies from instance to instance, as DOPS-003 permits) is the
++    /// silence byte left free.
+     static func check(_ maker: DSMaker, _ checker: Checker, name: String, channels: Int, firstMarker: UInt8, salt: Int, ops: [DSOp]) {
+         let capacity = 8192
+         let music = DSMusic(channels: channels, salt: salt, firstMarker: firstMarker)
+         let reference = run(maker, channels: channels, capacity: capacity, music: music, ops: ops, controls: false)
++        let again = run(maker, channels: channels, capacity: capacity, music: music, ops: ops, controls: false)
+         let tested = run(maker, channels: channels, capacity: capacity, music: music, ops: ops, controls: true)
+         checker.expect(reference.count == tested.count, "DOPS-007", "\(name): \(tested.count) render results against \(reference.count)")
+         var frameBase = 0
+@@ -1197,12 +1209,15 @@
+                 frameBase += r.count / channels
+                 continue
+             }
++            let r2: [UInt32]? = call < again.count && again[call].count == r.count ? again[call] : nil
+             let frames = r.count / channels
+             var f = 0
+             while f < frames {
+                 let b = f * channels
+-                checker.expect(sameFrame(r, g, b, channels), "DOPS-007",
+-                          "\(name): output frame \(frameBase + f) is \(dsFrame(g, b, channels)), but \(dsFrame(r, b, channels)) at unity gain with the equalizer off")
++                let reproducible = r2.map { equalFrames(r, $0, b, channels) } ?? false
++                let same = reproducible ? equalFrames(r, g, b, channels) : sameUpToSilenceByte(r, g, b, channels)
++                checker.expect(same, "DOPS-007",
++                          "\(name): output frame \(frameBase + f) is \(dsFrame(g, b, channels)), but \(dsFrame(r, b, channels)) at unity gain with the equalizer off\(reproducible ? " (the same in two stages at unity gain)" : "")")
+                 f += 1
+             }
+             var w = frames * channels

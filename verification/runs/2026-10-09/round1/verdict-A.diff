@@ -1,0 +1,29 @@
+--- round0/VerdictChecks.swift
++++ round1/VerdictChecks.swift
+@@ -40,9 +40,9 @@
+             }
+         },
+ 
+-        // REQ: BPV-015, BPV-016
++        // REQ: BPV-012, BPV-015, BPV-016
+         Check("shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+-              requirements: ["BPV-015", "BPV-016"]) { subject, checker in
++              requirements: ["BPV-012", "BPV-015", "BPV-016"]) { subject, checker in
+             for x0 in cleanPCMPaths() {
+                 var x = x0
+                 x.readback.hogOwnerPID = -1
+@@ -51,6 +51,14 @@
+                 checker.expect(isExactly(badge, Badge.bitPerfect), "BPV-015",
+                                "no process holds the device and no other app plays (BPV-008 met): \(report(badge, x))")
+             }
++            for x0 in airPodsMaxUSBCPaths() {
++                var x = x0
++                x.readback.hogOwnerPID = -1
++                x.processing.otherAppsPlaying = false
++                let badge = subject.verdict(x)
++                checker.expect(isExactly(badge, Badge.bitPerfect), "BPV-012",
++                               "AirPods Max on USB-C, 48 kHz file, nobody holds the device, no other app plays (BPV-008 met): \(report(badge, x))")
++            }
+             for x0 in cleanDoPPaths() {
+                 var x = x0
+                 x.readback.hogOwnerPID = -1

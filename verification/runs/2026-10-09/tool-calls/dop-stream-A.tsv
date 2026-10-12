@@ -1,0 +1,71 @@
+tool	argument
+Read	/srv/cleanroom/dop-stream-A/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dop-stream-A "find . -type f | grep -v '/.build/' | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cat harness/Sources/Scratch/main.swift; ls -la harness/Sources/*; cat harness/Sources/Contracts/DoPStream.swift"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "swift --version; cd harness && swift build 2>&1 | tail -5"
+Write	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift (57076 chars)
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|Build' | head -40"
+Write	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift (9090 chars)
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift (9090 chars)
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head -20; swift run Scratch none 2>&1 | tail -70"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && sed -i 's/String(format: \"%6.2fs\", dt)/fmt(dt)/; s/String(format: \"total %.2fs\", total)/\"total \" + fmt(total)/; s/String(format: \"%.1fs\", total)/fmt(total)/' Sources/Scratch/main.swift && cat >> Sources/Scratch/main.swift <<'EOF'\n\nfunc fmt(_ d: Double) -> String {\n    let v = Int((d * 100).rounded())\n    let s = \"\(v / 100).\(v % 100
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && tail -6 Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'error|warning:' | head -20; time swift run Scratch none 2>&1 | tail -70"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift run Scratch all 2>&1 | tail -40"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in noBridge noBridgeAfterUnderrun silenceFixedMarkerAfterUnderrun perChannelPhase mutedZeros; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in shortRenderOnUnderrun renderExtra mutedMarkerZero silenceZeroByte silenceVaryingPerFrame bridgeDifferentByte muteSilenceDifferentByte silenceDiffPerChannel; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in dropOccasional repeatOnUnderrun lowByteSet rewriteMarker dropLastOfWrite writeReturnsLessButStores swapChannels; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in alwaysBridgeOnResume initialMarkerFixed threeBridges latencyOne muteSkips muteOutputsMusic flushOnMute unmuteSkipsOne; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in gainApplied eqFlips gainZeroMutes eqInsertsSilence; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && grep -n 'case none' Sources/Scratch/main.swift; grep -n 'func silenceByte' -A 12 Sources/Scratch/main.swift | head -3; grep -n 'if flaw == .initialMarkerFixed' Sources/Scratch/main.swift; grep -n 'let room = max' Sources/Scratch/main.swift"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && python3 - <<'EOF'\np='Sources/Scratch/main.swift'\ns=open(p).read()\ns=s.replace('    case none\n','    case none, altCorrect\n',1)\ns=s.replace('''        if flaw == .initialMarkerFixed { lastMarker = 0xFA }''','''        if flaw == .initialMarkerFixed { lastMarker = 0xFA }\n        if flaw == .altCorrect {\n            instanceCounter += 1\n
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in noBridge noBridgeAfterUnderrun silenceFixedMarkerAfterUnderrun perChannelPhase mutedZeros shortRenderOnUnderrun renderExtra mutedMarkerZero silenceZeroByte silenceVaryingPerFrame bridgeDifferentByte muteSilenceDifferentByte silenceDiffPerChannel; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head; for f in mutedZeros mutedMarkerZero dropOccasional repeatOnUnderrun lowByteSet rewriteMarker dropLastOfWrite writeReturnsLessButStores swapChannels alwaysBridgeOnResume initialMarkerFixed threeBridges; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in latencyOne muteSkips muteOutputsMusic flushOnMute unmuteSkipsOne gainApplied eqFlips gainZeroMutes eqInsertsSilence altCorrect none; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && timeout 60 swift run Scratch unmuteSkipsOne -v 2>&1 | grep 'DOPS-005' | head -8"
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head; for f in none altCorrect mutedZeros mutedMarkerZero unmuteSkipsOne muteSkips flushOnMute alwaysBridgeOnResume initialMarkerFixed threeBridges latencyOne; do timeout 60 swift run Scratch \$f 2>&1 | grep -E 'FAIL|total|^[a-zA-Z]' | tail -3; done"
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning:' | head; for f in none altCorrect mutedZeros mutedMarkerZero unmuteSkipsOne muteSkips flushOnMute alwaysBridgeOnResume initialMarkerFixed threeBridges latencyOne; do timeout 60 swift run Scratch \$f 2>&1 | grep -E 'FAIL|total|^[a-zA-Z]' | tail -3; done"
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && python3 - <<'EOF'\np='Sources/SpecChecks/DoPStreamChecks.swift'\ns=open(p).read()\nfor rid in ['DOPS-001','DOPS-002','DOPS-003','DOPS-005']:\n    old='            DSScenarios.mutes(maker, checker, [\"%s\"])\n        },' % rid\n    new='            DSScenarios.mutes(maker, checker, [\"%s\"])\n            DSScenarios.mutedFromStart(maker, checker,
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && python3 - <<'EOF'\np='Sources/Scratch/main.swift'\ns=open(p).read()\ns=s.replace('''struct Maker: DoPStageMaker {\n    let flaw: Flaw\n    func makeStage(channels: Int, capacityFrames: Int) -> any DoPStage {\n        RefStage(ch: channels, cap: capacityFrames, flaw: flaw)\n    }\n}''','''/// An independent correct implementation: ring buffer, exp
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in noBridge noBridgeAfterUnderrun silenceFixedMarkerAfterUnderrun perChannelPhase mutedZeros shortRenderOnUnderrun renderExtra mutedMarkerZero silenceZeroByte silenceVaryingPerFrame bridgeDifferentByte muteSilenceDifferentByte silenceDiffPerChannel dropOccasional; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in repeatOnUnderrun lowByteSet rewriteMarker dropLastOfWrite writeReturnsLessButStores swapChannels alwaysBridgeOnResume initialMarkerFixed threeBridges latencyOne muteSkips muteOutputsMusic; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && for f in flushOnMute unmuteSkipsOne gainApplied eqFlips gainZeroMutes eqInsertsSilence; do timeout 60 swift run Scratch \$f 2>&1 | tail -1; done; timeout 60 swift run Scratch initialMarkerFixed -v 2>&1 | grep DOPS-005 | head -3"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && sed -i 's/\bck\b/checker/g' Sources/SpecChecks/DoPStreamChecks.swift && grep -n 'expect(' Sources/SpecChecks/DoPStreamChecks.swift | grep -v 'checker.expect(' ; grep -c 'checker.expect(' Sources/SpecChecks/DoPStreamChecks.swift; grep -n 'see the report' Sources/SpecChecks/DoPStreamChecks.swift; swift build 2>&1 | grep -E 'error|warning:' | head"
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && rm -rf .build && swift build 2>&1 | grep -E 'warning|error|Compiling|Build complete' ; for f in none ring altCorrect; do timeout 100 swift run Scratch \$f 2>&1 | grep -E 'FAIL|total|^[a-zA-Z]' | tail -3; done"
+Write	/srv/cleanroom/dop-stream-A/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'warning|error|Build complete'; grep -c '// REQ:' Sources/SpecChecks/DoPStreamChecks.swift; grep -o 'requirements: \[\"DOPS-00[0-9]\"\]' Sources/SpecChecks/DoPStreamChecks.swift | sort | uniq -c; ls -la Sources/*/"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && cat Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'warning|error|Build complete'"
+SubagentHandback	(its final report, in reports/)
+Grep	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Read	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Edit	/srv/cleanroom/dop-stream-A/harness/Sources/SpecChecks/DoPStreamChecks.swift
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && cat > Sources/Scratch/main.swift <<'EOF'\n// Scratch: try things out here. Not delivered.\nimport Contracts\nimport SpecKit\nimport SpecChecks\n\nnonisolated(unsafe) var instances = 0\n\nenum Kind: String, CaseIterable { case correct, ring96, perInstance, perRun, eqComplement, gainComplement, gainApplied, eqToggleResets }\n\nfinal class S: DoPSta
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && sed -i 's|fr = fr.map { (/bin/bash \& 0xFF00_0000) \| (UInt32(Double((/bin/bash >> 8) \& 0xFFFF) \* gain) << 8) }|fr = fr.map { w in (w \& 0xFF00_0000) \| (UInt32(Double((w >> 8) \& 0xFFFF) * gain) << 8) }|' Sources/Scratch/main.swift && sed -n 54p Sources/Scratch/main.swift && grep -n 'map {' Sources/Scratch/main.swift"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && swift build 2>&1 | grep -E 'error|warning:'; timeout 110 swift run Scratch 2>&1 | grep -v -E 'Build|Compiling|Linking|Emitting|Write|Planning'"
+Bash	swiftbox /srv/cleanroom/dop-stream-A "cd harness && printf '// Scratch: try things out here. Not delivered.\n' > Sources/Scratch/main.swift && swift build 2>&1 | grep -E 'warning|error|Build complete'; grep -c '// REQ:' Sources/SpecChecks/DoPStreamChecks.swift"
+SubagentHandback	(its final report, in reports/)

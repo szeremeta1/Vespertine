@@ -1,0 +1,19 @@
+tool	argument
+Read	/srv/cleanroom/dst-C/BRIEF.md
+Bash	swiftbox /srv/cleanroom/dst-C "find . -path ./harness/.build -prune -o -type f -print | head -100; cat harness/Package.swift"
+Bash	swiftbox /srv/cleanroom/dst-C "cat harness/Sources/Scratch/main.swift; cat fixtures/dst/fixtures.json; ls -la fixtures/dst; ls harness/Sources/Mutants 2>&1"
+Bash	swiftbox /srv/cleanroom/dst-C "cd fixtures/dst && for f in *.dst; do printf '%s ' \$f; head -c 8 \$f | od -An -tx1; done; cmp <(tail -c +2 2ch-stored.dst) 2ch-stored.dsd && echo stored-payload-equal"
+Write	/srv/cleanroom/dst-C/harness/Sources/Mutants/DSTMutants.swift (15437 chars)
+Write	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift (3098 chars)
+Bash	swiftbox /srv/cleanroom/dst-C "cd harness && swift build 2>&1 | tail -30 && swift run Scratch 2>&1 | tail -120"
+Read	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift (3098 chars)
+Bash	swiftbox /srv/cleanroom/dst-C "cd harness && swift build 2>&1 | grep -E 'error|warning|Compiling|complete' ; swift run Scratch 2>&1 | tail -120"
+Edit	/srv/cleanroom/dst-C/harness/Sources/Mutants/DSTMutants.swift
+Edit	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift
+Edit	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift
+Bash	swiftbox /srv/cleanroom/dst-C "cd harness && swift build 2>&1 | grep -E 'error|warning|complete' ; swift run Scratch 2>&1 | grep -A1 -E '^(CAUGHT|MISSED|base)'"
+Bash	swiftbox /srv/cleanroom/dst-C "cd harness && touch Sources/Mutants/DSTMutants.swift && swift build 2>&1 | tail -8"
+Write	/srv/cleanroom/dst-C/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/dst-C "cd harness && swift build 2>&1 | tail -3 && grep -c 'mutant(\"C-' Sources/Mutants/DSTMutants.swift"
+SubagentHandback	(its final report, in reports/)
