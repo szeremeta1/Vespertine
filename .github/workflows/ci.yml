@@ -241,11 +241,11 @@ jobs:
         if: ${{ !cancelled() }}
         timeout-minutes: 10
         run: swift test -c release --skip-build --package-path verification/harness --filter DSTAcceptance
-      # Also writes the IEC 61937 carriers for the oracle job, and checks F-02.
-      - name: Adapters, IEC 61937 carriers and F-02
+      # Also writes the IEC 61937 carriers for the oracle job.
+      - name: Adapters and IEC 61937 carriers
         if: ${{ !cancelled() }}
         timeout-minutes: 10
-        run: swift test -c release --skip-build --package-path verification/harness --filter 'AdapterSmokeTests|writeIECCarriers|dtsCarrier|dumpSACDImage'
+        run: swift test -c release --skip-build --package-path verification/harness --filter 'AdapterSmokeTests|writeIECCarriers|dumpSACDImage'
       - name: Scoreboard
         if: ${{ !cancelled() }}
         timeout-minutes: 10

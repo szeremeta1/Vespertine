@@ -1,7 +1,6 @@
 //
 // Vespertine verification: writes the IEC 61937 carriers Vespertine sends for the Dolby test files, for the
-// oracle job in CI (oracles/iec61937/check_carriers.py: FFmpeg's S/PDIF demuxer and the blind carrier scanner),
-// and records that a DTS file has none (FINDINGS.md F-02).
+// oracle job in CI (oracles/iec61937/check_carriers.py: FFmpeg's S/PDIF demuxer and the blind carrier scanner).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -27,15 +26,4 @@ func writeIECCarriers() throws {
     }
 }
 
-/// FINDINGS.md F-02: docs/VERIFICATION.md line 61 says DTS frames go out byte for byte inside the IEC 61937 carrier.
-/// Vespertine makes no IEC 61937 carrier for a DTS file (DTS CDs go out as stored, other DTS is decoded), so this
-/// fails, as a known issue, until a DTS carrier exists or the line is corrected.
-@Test("F-02: a DTS file has an IEC 61937 carrier")
-func dtsCarrier() {
-    let out = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-dts-carrier-\(getpid()).wav")
-    defer { try? FileManager.default.removeItem(at: out) }
-    withKnownIssue("F-02 (FINDINGS.md)") {
-        try Vespertine.writeCarrier(from: vespertineFixtures.appendingPathComponent("dts-tones.dts"), to: out)
-    }
-}
 #endif

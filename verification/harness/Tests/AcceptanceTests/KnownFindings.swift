@@ -7,11 +7,8 @@
 
 enum KnownFindings {
     /// "group/check name" → finding IDs in FINDINGS.md. One entry per line: tools/scoreboard.py reads them.
-    static let byCheck: [String: String] = [
-        "BIT-PERFECT verdict/PCM: a rate or physical format that couldn't be read back is not trusted": "F-01",
-        "BIT-PERFECT verdict/shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP": "F-05, H-01",
-        "Rate planning/A rate 1 Hz or more from the source rate is not the source rate": "F-04",
-    ]
+    /// Empty: every failure found so far is fixed (FINDINGS.md, "Fixed").
+    static let byCheck: [String: String] = [:]
 
     static func finding(group: String, check: String) -> String? { byCheck["\(group)/\(check)"] }
 }

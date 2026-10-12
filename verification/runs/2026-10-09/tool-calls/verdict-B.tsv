@@ -12,3 +12,18 @@ Bash	swiftbox /srv/cleanroom/verdict-B "cd harness && rm -rf .build && swift bui
 Write	/srv/cleanroom/verdict-B/harness/Sources/Scratch/main.swift (48 chars)
 Bash	swiftbox /srv/cleanroom/verdict-B "cd harness && swift build 2>&1 | grep -E 'warning|error|Build complete'; rm -rf .build; find /work -type f | sort"
 SubagentHandback	(its final report, in reports/)
+Bash	swiftbox /srv/cleanroom/verdict-B "grep -n -B2 -A4 'integerMode' harness/Sources/Contracts/Verdict.swift | head -40"
+Read	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Edit	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Edit	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Read	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Edit	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Edit	/srv/cleanroom/verdict-B/harness/Sources/CleanRoomB/BVerdict.swift
+Write	/srv/cleanroom/verdict-B/harness/Sources/Scratch/main.swift (4408 chars)
+Bash	swiftbox /srv/cleanroom/verdict-B "cd harness && swift build 2>&1 | grep -E 'warning|error|Build complete'; swift run Scratch 2>&1 | grep -vE '^ok|Build|Compil|Emit|Write|Planning|Link' "
+Read	/srv/cleanroom/verdict-B/harness/Sources/Scratch/main.swift
+Write	/srv/cleanroom/verdict-B/harness/Sources/Scratch/main.swift (4408 chars)
+Bash	swiftbox /srv/cleanroom/verdict-B "cd harness && swift build 2>&1 | grep -E 'warning|error|Build complete'; swift run Scratch 2>&1 | tail -30"
+Write	/srv/cleanroom/verdict-B/harness/Sources/Scratch/main.swift (48 chars)
+Bash	swiftbox /srv/cleanroom/verdict-B "cd harness && rm -rf .build && swift build 2>&1 | grep -E 'warning|error|Build complete'; rm -rf .build"
+SubagentHandback	(its final report, in reports/)

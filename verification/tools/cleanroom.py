@@ -389,8 +389,9 @@ def collect(run: Path, root: Path) -> None:
     brief_rows = [f"| `briefs/{p.name}` | `{sha256(p)}` |" for p in sorted((run / "briefs").glob("*.md"))]
     (run / "MANIFEST.md").write_text(
         "# Run manifest\n\nEvery deliverable exactly as the agent wrote it (also in `outputs/`), copied unchanged into "
-        "the harness. Each is the agent's last delivery: where an agent had a review round, `round1/` holds the "
-        "message it was sent and the diff from its first delivery.\n\n"
+        "the harness. Each is the agent's last delivery: where an agent had a review round, `round1/` (and `round2/` "
+        "for the verdict group, after the F-05 and H-01 record changes) holds the message it was sent and the diff "
+        "from its previous delivery.\n\n"
         "| Group | Role | File | SHA-256 | Lines |\n|---|---|---|---|---|\n" + "\n".join(rows) +
         "\n\n## Briefs\n\n| Brief | SHA-256 |\n|---|---|\n" + "\n".join(brief_rows) + "\n")
     print("\n".join(rows))

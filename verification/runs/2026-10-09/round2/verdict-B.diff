@@ -1,0 +1,47 @@
+--- round1/BVerdict.swift
++++ round2/BVerdict.swift
+@@ -1,5 +1,5 @@
+ //
+-// Role B implementation of the BIT-PERFECT verdict contract (records BPV-001 to BPV-017).
++// Role B implementation of the BIT-PERFECT verdict contract (records BPV-001 to BPV-018).
+ //
+ 
+ import Contracts
+@@ -25,6 +25,7 @@
+         static let digitalVolume = "DIGITAL VOLUME"
+         static let replayGain = "REPLAYGAIN"
+         static let sharedDevice = "SHARED DEVICE"
++        static let deviceNotHeld = "DEVICE NOT HELD"
+         static let lossySource = "LOSSY SOURCE"
+         static let dsdSource = "DSD SOURCE"
+         static let dsdConverted = "DSD CONVERTED TO PCM"
+@@ -65,12 +66,14 @@
+             return Self.pcmVerdict(input, nominalRate: nominalRate, physicalBits: physicalBits,
+                                    physicalIsInteger: physicalIsInteger)
+         case .dop:
+-            // BPV-016
++            // BPV-016: DoP needs the device held (BPV-009); shared mode with no other app playing is not enough.
++            guard Self.holdsDeviceExclusively(readback) else { return Reason.deviceNotHeld }
+             guard Self.ratesEqual(nominalRate, input.plan.requestedRate) else { return Reason.rateMismatch }
+             guard physicalBits >= 24 else { return Reason.bitDepthReduced }
+             return Badge.nativeDoP
+         case .bitstream:
+-            // BPV-017
++            // BPV-017: bitstream needs the device held (BPV-009), as DoP does.
++            guard Self.holdsDeviceExclusively(readback) else { return Reason.deviceNotHeld }
+             guard Self.ratesEqual(nominalRate, input.plan.requestedRate) else { return Reason.rateMismatch }
+             guard physicalIsInteger else { return Reason.floatOutput }
+             guard physicalBits >= 16 else { return Reason.bitDepthReduced }
+@@ -132,8 +135,10 @@
+             return Reason.bitDepthReduced
+         }
+ 
+-        // BPV-005
+-        if let sourceBits = source.bitDepth, sourceBits > 24, !plan.integerMode { return Reason.needsIntegerMode }
++        // BPV-005, with BPV-018: integer mode is in effect only while the player holds the device. The input rules
++        // out the flag without the hold; if it arrives anyway, the path is taken to be the 32-bit float one.
++        let integerModeInEffect = plan.integerMode && holdsDeviceExclusively(input.readback)
++        if let sourceBits = source.bitDepth, sourceBits > 24, !integerModeInEffect { return Reason.needsIntegerMode }
+ 
+         // BPV-014: only on a path that is otherwise bit-perfect.
+         if input.processing.equalizerActive { return Badge.equalizer }

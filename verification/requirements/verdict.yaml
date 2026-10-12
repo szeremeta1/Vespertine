@@ -233,28 +233,43 @@
   claim: CLAIMS.md#bp-dop-conditions
   source:
     doc: "Vespertine docs/ARCHITECTURE.md"
-    version: "98cad1a"
+    version: "98cad1a, with the F-05 docs change"
     section: "line 91"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 91, from: "For DoP: the carrier runs at the planned rate with at least 24 bits.", to: "For DoP: the carrier runs at the planned rate with at least 24 bits." }
-  requirement: "In DoP mode the badge is \"NATIVE DSD · DoP\" exactly when the nominal rate read back equals the planned carrier rate, the physical format has at least 24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
-  quote_sha256: 10d9077b326096c3315a32452d51848f9d35a640bc8eef8072a40d1deae323e1
+    cache: { repo: docs/ARCHITECTURE.md, lines: 91, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
+  requirement: "For DoP the badge is \"NATIVE DSD · DoP\" exactly when the player holds the device (BPV-009), the nominal rate read back equals the planned carrier rate, the physical format has ≥24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
+  quote_sha256: fce73c5cb9df36e13899619fc5f4b472bb7577033b28222c70ad87ffd5a712e1
   kind: vespertine-rule
   testable: true
-  gap: "The docs don't say whether the 24-bit physical format must be integer."
+  gap: "Shared mode with no other app playing is not enough for DoP. The docs don't say whether the 24-bit physical format must be integer. A DoP track whose player doesn't hold the device doesn't play; what the badge then says isn't specified beyond not being \"NATIVE DSD · DoP\"."
   interface: "contracts/bit-perfect-verdict.md"
 
 - id: BPV-017
   claim: CLAIMS.md#bp-bitstream-conditions
   source:
     doc: "Vespertine docs/ARCHITECTURE.md"
-    version: "98cad1a"
+    version: "98cad1a, with the F-05 docs change"
     section: "line 64"
     availability: repository
     cache: { repo: docs/ARCHITECTURE.md, lines: 64, from: "Dolby and DTS-CD sources plan as mode", to: "integer ≥ 16-bit, no gain." }
-  requirement: "In bitstream mode the badge starts \"BITSTREAM · \" only when the nominal rate read back equals the planned rate, the physical format is integer with at least 16 bits, and the shared conditions hold."
+  requirement: "For bitstream the badge starts \"BITSTREAM · \" only when the player holds the device (BPV-009), the nominal rate read back equals the planned rate, the physical format is integer with at least 16 bits, and the shared conditions hold."
   quote_sha256: 6a25cb3ab7bc7c5aef0215c836dcc95cfa7cbb48e78d3b6321d1cd0da1546d8d
   kind: vespertine-rule
   testable: true
-  gap: "\"Exclusive\" here describes the plan. Whether the badge also needs the device held exclusively, or accepts shared mode with no other app playing, isn't said; tests should hold the device exclusively. The codec name after the dot isn't specified."
+  gap: "Bitstream always takes the device exclusively and doesn't play without it, as DoP does (BPV-016), so shared mode with no other app playing is not enough. The codec name after the dot isn't specified."
+  interface: "contracts/bit-perfect-verdict.md"
+
+- id: BPV-018
+  claim: CLAIMS.md#int-conditions
+  source:
+    doc: "Vespertine docs/FEATURES.md"
+    version: "98cad1a"
+    section: "line 37"
+    availability: repository
+    cache: { repo: docs/FEATURES.md, lines: 37, from: "Integer mode needs exclusive access", to: "non-mixable 32-bit integer format." }
+  requirement: "Integer mode is in effect only while the player holds the device exclusively (BPV-009); a path with integer mode in effect and the device not held doesn't occur. Without exclusive access the player uses the 32-bit float path."
+  quote_sha256: 4c2c4bf8e93578c6dd0e3ce1a32a8976e58cf43e10716dddd233172a8cf4e4d6
+  kind: vespertine-rule
+  testable: false
+  gap: "This is a condition on the verdict's inputs, enforced where the player configures the device, so the verdict alone can't show it. Checking it needs a real device: with shared mode chosen, a 32-bit source plays through the float path. A source deeper than 24 bits is bit-perfect only in integer mode (BPV-005), so it is never bit-perfect unless the player holds the device."
   interface: "contracts/bit-perfect-verdict.md"

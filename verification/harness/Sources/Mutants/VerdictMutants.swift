@@ -86,6 +86,17 @@ private extension VerdictInput {
         processing.volume = .hardware
         processing.replayGainDB = nil
     }
+
+    /// Another app plays to a device the player doesn't hold (BPV-008 fails).
+    var sharedWithOtherApp: Bool { processing.otherAppsPlaying && !holdsDevice }
+
+    /// Turns integer mode on. Integer mode only occurs while the player holds the device (BPV-018), so the device is
+    /// marked held too; callers only do this when no other app plays to a device the player doesn't hold, so marking
+    /// it held repairs nothing else on a PCM path.
+    mutating func turnOnIntegerMode() {
+        plan.integerMode = true
+        readback.hogOwnerPID = readback.ownPID
+    }
 }
 
 private let losslessCodecNames: Set<String> = ["FLAC", "ALAC", "WAV", "WAVE", "AIFF", "AIF", "APE", "WAVPACK", "WV"]
@@ -262,20 +273,20 @@ public enum VerdictMutants {
     // BPV-005: in PCM mode, a source deeper than 24 bits needs integer mode.
     static let bpv005: [Mutant<any BadgeVerdict>] = [
         Mutant("C-BPV-005-a", targets: ["BPV-005"],
-               summary: "PCM mode: integer mode is ignored, so a source deeper than 24 bits passes without it") { base in
+               summary: "PCM mode: integer mode is ignored, so a source deeper than 24 bits passes without it (held or shared)") { base in
             overlook(base, when: { i in
-                guard i.inPCM, !i.plan.integerMode, let bits = i.source.bitDepth else { return false }
+                guard i.inPCM, !i.plan.integerMode, !i.sharedWithOtherApp, let bits = i.source.bitDepth else { return false }
                 return bits > 24
-            }, fix: { i in i.plan.integerMode = true })
+            }, fix: { i in i.turnOnIntegerMode() })
         },
         Mutant("C-BPV-005-b", targets: ["BPV-005"],
                summary: "PCM mode: a source deeper than 24 bits passes without integer mode on a 32-bit float physical format") { base in
             overlook(base, when: { i in
-                guard i.inPCM, !i.plan.integerMode, let bits = i.source.bitDepth, bits > 24,
+                guard i.inPCM, !i.plan.integerMode, !i.sharedWithOtherApp, let bits = i.source.bitDepth, bits > 24,
                       i.readback.physicalIsInteger == false, let physical = i.readback.physicalBitDepth else { return false }
                 return physical >= 32
             }, fix: { i in
-                i.plan.integerMode = true
+                i.turnOnIntegerMode()
                 i.readback.physicalIsInteger = true
                 i.readback.physicalBitDepth = max(i.readback.physicalBitDepth ?? 32, i.source.bitDepth ?? 32)
             })
@@ -386,14 +397,18 @@ public enum VerdictMutants {
                      fix: { i in i.processing.otherAppsPlaying = false })
         },
         Mutant("C-BPV-008-b", targets: ["BPV-008"],
-               summary: "PCM mode: another app playing is ignored while integer mode is on") { base in
-            overlook(base, when: { $0.inPCM && $0.plan.integerMode && $0.processing.otherAppsPlaying },
-                     fix: { i in i.processing.otherAppsPlaying = false })
+               summary: "PCM mode: another app playing is ignored for sources of 16 bits or fewer (shared mixer assumed transparent)") { base in
+            overlook(base, when: { i in
+                guard i.inPCM, i.processing.otherAppsPlaying, let bits = i.source.bitDepth else { return false }
+                return bits <= 16
+            }, fix: { i in i.processing.otherAppsPlaying = false })
         },
         Mutant("C-BPV-008-c", targets: ["BPV-008", "BPV-016"],
-               summary: "DoP mode: another app playing to the device is ignored") { base in
-            overlook(base, when: { $0.inDoP && $0.processing.otherAppsPlaying },
-                     fix: { i in i.processing.otherAppsPlaying = false })
+               summary: "DoP mode: another app playing to a device the player doesn't hold is ignored (taken as held)") { base in
+            overlook(base, when: { $0.inDoP && $0.sharedWithOtherApp }, fix: { i in
+                i.processing.otherAppsPlaying = false
+                i.readback.hogOwnerPID = i.readback.ownPID
+            })
         },
         Mutant("C-BPV-008-d", targets: ["BPV-008", "BPV-017"],
                summary: "bitstream mode: another app playing to a device the player doesn't hold is ignored") { base in
@@ -583,8 +598,8 @@ public enum VerdictMutants {
         },
     ]
 
-    // BPV-016: in DoP mode, "NATIVE DSD · DoP" exactly when the read-back rate is the carrier rate, the physical format
-    // has at least 24 bits, and BPV-006 to BPV-011 and BPV-013 hold.
+    // BPV-016: in DoP mode, "NATIVE DSD · DoP" exactly when the player holds the device, the read-back rate is the
+    // carrier rate, the physical format has at least 24 bits, and BPV-006 to BPV-011 and BPV-013 hold.
     static let bpv016: [Mutant<any BadgeVerdict>] = [
         Mutant("C-BPV-016-a", targets: ["BPV-016"],
                summary: "the DoP badge uses U+2022 BULLET instead of U+00B7 MIDDLE DOT") { base in
@@ -621,10 +636,27 @@ public enum VerdictMutants {
             replace(base, when: { i, answer in answer == Badge.nativeDoP && i.plan.requestedRate > 176_400.5 },
                     with: "DoP RATE")
         },
+        Mutant("C-BPV-016-g", targets: ["BPV-016"],
+               summary: "DoP mode: holding the device isn't required; shared mode with no other app playing gets the DoP badge") { base in
+            overlook(base, when: { $0.inDoP && !$0.holdsDevice && !$0.processing.otherAppsPlaying },
+                     fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
+        },
+        Mutant("C-BPV-016-h", targets: ["BPV-016", "BPV-009"],
+               summary: "DoP mode: a hog-mode owner that is another process (not −1) counts as the player holding the device") { base in
+            overlook(base, when: { i in
+                guard i.inDoP, !i.processing.otherAppsPlaying, let owner = i.readback.hogOwnerPID else { return false }
+                return owner != -1 && owner != i.readback.ownPID
+            }, fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
+        },
+        Mutant("C-BPV-016-i", targets: ["BPV-016", "BPV-009"],
+               summary: "DoP mode: an unreadable hog-mode owner (nil) counts as the player holding the device") { base in
+            overlook(base, when: { $0.inDoP && !$0.processing.otherAppsPlaying && $0.readback.hogOwnerPID == nil },
+                     fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
+        },
     ]
 
-    // BPV-017: in bitstream mode, a "BITSTREAM · " badge only when the read-back rate is the planned rate, the
-    // physical format is integer with at least 16 bits, and the shared conditions hold.
+    // BPV-017: in bitstream mode, a "BITSTREAM · " badge only when the player holds the device, the read-back rate is
+    // the planned rate, the physical format is integer with at least 16 bits, and the shared conditions hold.
     static let bpv017: [Mutant<any BadgeVerdict>] = [
         Mutant("C-BPV-017-a", targets: ["BPV-017"],
                summary: "bitstream mode: trusts the planned rate instead of the nominal rate read back") { base in
@@ -655,6 +687,23 @@ public enum VerdictMutants {
                 guard i.inBitstream, let nominal = i.readback.nominalRate else { return false }
                 return ratesDiffer(nominal, i.plan.requestedRate) && ratesMatch(nominal, i.source.sampleRate)
             }, fix: { i in i.readback.nominalRate = i.plan.requestedRate })
+        },
+        Mutant("C-BPV-017-e", targets: ["BPV-017"],
+               summary: "bitstream mode: holding the device isn't required; shared mode with no other app playing gets BITSTREAM") { base in
+            overlook(base, when: { $0.inBitstream && !$0.holdsDevice && !$0.processing.otherAppsPlaying },
+                     fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
+        },
+        Mutant("C-BPV-017-f", targets: ["BPV-017", "BPV-009"],
+               summary: "bitstream mode: a hog-mode owner that is another process (not −1) counts as the player holding the device") { base in
+            overlook(base, when: { i in
+                guard i.inBitstream, !i.processing.otherAppsPlaying, let owner = i.readback.hogOwnerPID else { return false }
+                return owner != -1 && owner != i.readback.ownPID
+            }, fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
+        },
+        Mutant("C-BPV-017-g", targets: ["BPV-017", "BPV-009"],
+               summary: "bitstream mode: an unreadable hog-mode owner (nil) counts as the player holding the device") { base in
+            overlook(base, when: { $0.inBitstream && !$0.processing.otherAppsPlaying && $0.readback.hogOwnerPID == nil },
+                     fix: { i in i.readback.hogOwnerPID = i.readback.ownPID })
         },
     ]
 }

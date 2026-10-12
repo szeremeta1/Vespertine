@@ -83,12 +83,12 @@ With a specific output chosen (`EngineSettings.deviceUID`), the engine never sub
 A path is marked bit-perfect only when all of these hold:
 
 - The device profile can be bit-perfect (i.e. not Bluetooth or AirPlay).
-- The device is held exclusively, or (shared mode) no other process is currently sending audio to it (Core Audio process objects, checked about once a second).
+- The device is held exclusively, or (shared mode, PCM only) no other process is currently sending audio to it (Core Audio process objects, checked about once a second).
 - No Spatial Audio rendering or downmix.
 - No software gain is applied (neither ReplayGain nor digital volume).
 - The decoder hasn't replaced any damaged frames of the track with silence (SACD images).
 - For PCM: the source is lossless, it isn't resampled or converted from DSD, the source is at most 24-bit (32-bit with integer mode, which skips the Float32 step), and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float).
-- For DoP: the carrier runs at the planned rate with at least 24 bits.
+- For DoP: the device is held exclusively (DoP always takes it, whatever the exclusive setting, and doesn't play without it), and the carrier runs at the planned rate with at least 24 bits.
 
 ## Library
 

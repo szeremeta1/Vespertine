@@ -56,6 +56,22 @@ import Testing
         path.otherAppsPlaying = true
         #expect(!path.isBitPerfect && path.statusLine == "MIXED WITH OTHER APPS")
     }
+    @Test("A physical format that couldn't be read back is never trusted for the badge")
+    func unreadPhysicalFormat() {
+        let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 96_000, bitDepth: 24, channels: 2)
+        let device = DeviceCapabilities(sampleRates: [96_000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        let plan = FormatPlanner.plan(source: source, device: device)
+        // What OutputSession fills in when no stream's physical format could be read: the plan, assumed integer.
+        var applied = AppliedFormat(sampleRate: 96_000, physicalBitDepth: plan.physicalBitDepth, physicalIsInteger: true,
+                                    virtualChannels: 2, exclusive: true, bufferFrames: 512)
+        func path() -> SignalPath {
+            SignalPath(source: source, decoderName: "Test", plan: plan, applied: applied, deviceName: "Test", deviceUID: "Test",
+                       deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "x"), volume: .hardware)
+        }
+        #expect(path().statusLine == "BIT-PERFECT")
+        applied.physicalFormatKnown = false
+        #expect(!path().isBitPerfect && path().statusLine == "FORMAT UNCONFIRMED")
+    }
     @Test("Other-app detection answers without error for every output device")
     func otherProcessesQuery() {
         for device in OutputDevices.list(dopEnabledUIDs: []) { _ = DeviceControl.otherProcessesPlaying(to: device.id) }

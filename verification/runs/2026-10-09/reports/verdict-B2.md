@@ -1,5 +1,7 @@
 # verdict-B2: final report
 
+## Round 0
+
 ## B2 report: implementation
 
 **Delivered:** `/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift`. It defines `public enum B2Verdict { public static let subject: (any BadgeVerdict)? = B2BadgeVerdict() }`. `B2BadgeVerdict` is an internal stateless struct conforming to `BadgeVerdict`. It imports only `Contracts`. `swift build` succeeds in Swift 6 mode, and I changed none of the files I was given. I used `Sources/Scratch/main.swift` to try about 50 cases, which all behaved as intended. That file isn't delivered. The code never traps:
@@ -55,3 +57,26 @@ No reason string equals or starts with any of the named badges.
 - A gain of NaN counts as "other than exactly 0 dB". −0.0 counts as 0.
 - A negative `concealedFrames` (ruled out by the contract) counts as none.
 - A source codec that doesn't match the mode (for example FLAC sent as `bitstream`) isn't checked, because the records don't ask for it.
+
+## Round 2
+
+## B2 report, round 2
+
+**Delivered:** `/srv/cleanroom/verdict-B2/harness/Sources/CleanRoomB2/B2Verdict.swift` is updated for the new records. `swift build` passes in Swift 6 mode. About 55 scratch cases (not delivered) pass. I touched no given files.
+
+### What changed
+I moved the hog-mode check into one helper, `playerHoldsDevice(readback)`. It is true only when `hogOwnerPID` is non-nil, not −1, and equal to `ownPID` (BPV-009). BPV-008's "unless the player holds the device" now uses the same helper, with the same behaviour as before. The edits:
+- **BPV-016 (DoP):** `NATIVE DSD · DoP` now also requires the player to hold the device. If it doesn't, the result is a plain reason string, "Player does not hold the device for DoP". Shared mode with no other app playing is no longer enough. The other conditions are unchanged:
+  - the rate read back within 0.5 Hz of `plan.requestedRate`;
+  - physical depth at least 24, integer-ness not required;
+  - BPV-003, BPV-006 to BPV-011 and BPV-013.
+- **BPV-017 (bitstream):** `"BITSTREAM · " + source.codec` now also requires the player to hold the device. If it doesn't, the result is a plain reason string, "Player does not hold the device for bitstream". The other conditions are unchanged.
+- **BPV-018 and the `integerMode` row (PCM, BPV-005):** a source deeper than 24 bits is bit-perfect only when `plan.integerMode` is true and the player holds the device. A case with `integerMode` true and the device not held is ruled out. I treat integer mode as not in effect there, so a >24-bit source gets a reason string, never BIT-PERFECT. This matches BPV-018's note that such a source is never bit-perfect unless the player holds the device. It doesn't trap. BPV-018 is `testable: false`, so nothing else enforces it.
+- **Order of checks:** unchanged. The held check sits after the shared failures and the BPV-003 readback check, inside the DoP and bitstream branches.
+
+### New ambiguities and assumptions
+- **BPV-016/017 with `otherAppsPlaying`:** holding the device with `otherAppsPlaying` true still passes BPV-008 and gives the badge.
+- **BPV-016/017 reason when not held:** the badge is not specified beyond not being the named badge. I return a descriptive reason string, not `DAMAGED FRAMES SILENCED`, except that damaged frames still take priority over every other label (BPV-013).
+- **`integerMode` true with the device not held:** the contract rules it out, so treating it as not in effect is my choice. A nil `hogOwnerPID` counts as not held for the same purpose.
+- **BPV-005 / BPV-018:** integer mode still doesn't require `physicalIsInteger == true`, as in round 1.
+- All other round 1 ambiguities and assumptions stand as reported before.

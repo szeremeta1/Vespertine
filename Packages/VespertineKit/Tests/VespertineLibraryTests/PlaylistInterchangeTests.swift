@@ -125,8 +125,9 @@ struct PlaylistInterchangeTests {
         #expect(result.favorites == 1 && result.playCounts == 2)
         let a = try id(db, "a"), b = try id(db, "b")
         #expect(try db.favoriteTracks().map(\.id) == [a])
+        // Each song's own count: the scan stores tracks in the order its reads finish, so ids don't follow names.
         let counts = try await db.writer.read { db in
-            try Int.fetchAll(db, sql: "SELECT playCount FROM track WHERE id IN (?, ?) ORDER BY id", arguments: [a, b])
+            try [a, b].map { try Int.fetchOne(db, sql: "SELECT playCount FROM track WHERE id = ?", arguments: [$0]) }
         }
         #expect(counts == [7, 3])
 

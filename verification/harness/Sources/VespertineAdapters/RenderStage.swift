@@ -1,6 +1,6 @@
 //
 // Vespertine verification: the stream contracts (DoP, float, integer) connected to Vespertine's real-time C,
-// vespertine_rt.c, configured as OutputSession configures it (OutputSession.swift:150-152) and driven through
+// vespertine_rt.c, configured as OutputSession configures it (OutputSession.swift:155-157) and driven through
 // nrt_context_render_interleaved, the function its I/O proc uses. On Linux the same file is compiled from
 // Packages/ through the RTUnderTest target (a symlink, not a copy) with a small Core Audio shim.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -75,7 +75,7 @@ final class RefusedStage: DoPStage, FloatStage, IntegerStage {
 
 // MARK: - DoP
 
-/// DoP as Vespertine plays it: passthrough and DoP on, integer mode off (OutputSession.swift:98 allows integer mode
+/// DoP as Vespertine plays it: passthrough and DoP on, integer mode off (OutputSession.swift:101 allows integer mode
 /// only for PCM). The ring carries each DoP sample as RawDoPDecoder writes it (FFmpegDecoder.swift:238-239): the
 /// left-justified 32-bit word as a signed integer over 2^31, which a Float32 holds exactly.
 final class RenderDoPStage: DoPStage {

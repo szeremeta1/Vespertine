@@ -58,7 +58,7 @@ Run `swift test` in `Packages/VespertineKit`. The tests that bear on bit-perfect
 | `RingBufferTests` “Integer mode copies every 32-bit word untouched…” | integer mode passes each 32-bit word through, including patterns that would be NaN as floats |
 | `IntegerModeTests` “A 32-bit integer source reaches the output word for word”, “A 24-bit source arrives as its samples in the top 24 bits, nothing added” | the integer path end to end, from decoder to output buffer |
 | `DSDTests` “DoP from the raw stream carries the DSD bits exactly, with alternating markers” | DSF and DSDIFF DSD bits survive DoP packing exactly, and the markers a DAC looks for alternate correctly |
-| `BitstreamTests` “The carrier for a file holds its frames exactly, at the right rate” | Dolby/DTS frames go out byte for byte inside the IEC 61937 carrier |
+| `BitstreamTests` “The carrier for a file holds its frames exactly, at the right rate” | Dolby frames go out byte for byte inside the IEC 61937 carrier; DTS CDs go out as stored |
 | `StreamingTests` “Moving to the local copy mid-track continues sample for sample” | switching from the network share to the cached copy mid-track doesn't drop or repeat a sample |
 | `RingBufferTests` “Muted, the output is silent at once…” and “Rebuffering holds in silence without consuming…” | mute and rebuffering never alter or skip music; they only insert silence where playback is actually held |
 

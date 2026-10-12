@@ -167,9 +167,11 @@ public enum SampleRate {
         return abs(ratio.rounded() - ratio) < 0.0001 && ratio >= 1
     }
 
+    /// `a` is `b` times a whole number, to within the same 0.5 Hz as `DeviceCapabilities.supports`. A relative
+    /// tolerance would let a rate a few hertz off the source count as "one times" it.
     static func isIntegerMultiple(_ a: Double, of b: Double) -> Bool {
         guard b > 0 else { return false }
-        let r = a / b
-        return r >= 1 && abs(r.rounded() - r) < 0.0001
+        let n = (a / b).rounded()
+        return n >= 1 && abs(a - n * b) < 0.5
     }
 }

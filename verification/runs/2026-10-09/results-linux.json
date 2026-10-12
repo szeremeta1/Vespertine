@@ -6080,7 +6080,7 @@
           }
         },
         {
-          "name" : "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+          "name" : "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
           "references" : [
             {
               "label" : "B",
@@ -6109,8 +6109,79 @@
           ],
           "requirements" : [
             "BPV-012",
-            "BPV-015",
+            "BPV-015"
+          ],
+          "vespertine" : {
+            "label" : "Vespertine",
+            "notRun" : "not on this platform"
+          }
+        },
+        {
+          "name" : "DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing",
+          "references" : [
+            {
+              "label" : "B",
+              "result" : {
+                "failedRequirements" : [
+
+                ],
+                "failures" : [
+
+                ],
+                "passed" : true
+              }
+            },
+            {
+              "label" : "B2",
+              "result" : {
+                "failedRequirements" : [
+
+                ],
+                "failures" : [
+
+                ],
+                "passed" : true
+              }
+            }
+          ],
+          "requirements" : [
             "BPV-016"
+          ],
+          "vespertine" : {
+            "label" : "Vespertine",
+            "notRun" : "not on this platform"
+          }
+        },
+        {
+          "name" : "bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing",
+          "references" : [
+            {
+              "label" : "B",
+              "result" : {
+                "failedRequirements" : [
+
+                ],
+                "failures" : [
+
+                ],
+                "passed" : true
+              }
+            },
+            {
+              "label" : "B2",
+              "result" : {
+                "failedRequirements" : [
+
+                ],
+                "failures" : [
+
+                ],
+                "passed" : true
+              }
+            }
+          ],
+          "requirements" : [
+            "BPV-017"
           ],
           "vespertine" : {
             "label" : "Vespertine",
@@ -7373,7 +7444,7 @@
             "PCM: a file deeper than 24 bits needs integer mode"
           ],
           "ran" : true,
-          "summary" : "PCM mode: integer mode is ignored, so a source deeper than 24 bits passes without it",
+          "summary" : "PCM mode: integer mode is ignored, so a source deeper than 24 bits passes without it (held or shared)",
           "targets" : [
             "BPV-005"
           ]
@@ -7500,7 +7571,7 @@
           "killedBy" : [
             "PCM: a clean lossless path at the file's own rate is exactly BIT-PERFECT",
             "PCM: a requested rate that differs from a matching readback doesn't stop BIT-PERFECT",
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
             "PCM: a file deeper than 24 bits needs integer mode",
             "hardware or fixed volume, and digital volume or ReplayGain at 0 dB, are allowed",
             "a gain of negative zero is exactly 0 dB"
@@ -7622,7 +7693,7 @@
             "another app playing to a device nobody holds exclusively rules out every untouched badge"
           ],
           "ran" : true,
-          "summary" : "PCM mode: another app playing is ignored while integer mode is on",
+          "summary" : "PCM mode: another app playing is ignored for sources of 16 bits or fewer (shared mixer assumed transparent)",
           "targets" : [
             "BPV-008"
           ]
@@ -7633,10 +7704,11 @@
           ],
           "id" : "C-BPV-008-c",
           "killedBy" : [
+            "DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing",
             "another app playing to a device nobody holds exclusively rules out every untouched badge"
           ],
           "ran" : true,
-          "summary" : "DoP mode: another app playing to the device is ignored",
+          "summary" : "DoP mode: another app playing to a device the player doesn't hold is ignored (taken as held)",
           "targets" : [
             "BPV-008",
             "BPV-016"
@@ -7648,6 +7720,7 @@
           ],
           "id" : "C-BPV-008-d",
           "killedBy" : [
+            "bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing",
             "another app playing to a device nobody holds exclusively rules out every untouched badge"
           ],
           "ran" : true,
@@ -7843,7 +7916,7 @@
           ],
           "id" : "C-BPV-012-a",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
             "AirPods Max on USB-C: a clean 48 kHz file is BIT-PERFECT"
           ],
           "ran" : true,
@@ -7860,7 +7933,7 @@
           ],
           "id" : "C-BPV-012-b",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
             "AirPods Max on USB-C: a clean 48 kHz file is BIT-PERFECT"
           ],
           "ran" : true,
@@ -7876,7 +7949,7 @@
           ],
           "id" : "C-BPV-012-c",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP"
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits"
           ],
           "ran" : true,
           "summary" : "AirPods Max on USB-C: BIT-PERFECT only while the player holds the device in hog mode",
@@ -8037,7 +8110,7 @@
           "killedBy" : [
             "PCM: a clean lossless path at the file's own rate is exactly BIT-PERFECT",
             "PCM: a requested rate that differs from a matching readback doesn't stop BIT-PERFECT",
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
             "PCM: a file deeper than 24 bits needs integer mode"
           ],
           "ran" : true,
@@ -8056,7 +8129,7 @@
           "killedBy" : [
             "PCM: a clean lossless path at the file's own rate is exactly BIT-PERFECT",
             "PCM: a requested rate that differs from a matching readback doesn't stop BIT-PERFECT",
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP"
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits"
           ],
           "ran" : true,
           "summary" : "an integer physical format deeper than the source is rejected (exact bit-depth match required)",
@@ -8074,7 +8147,7 @@
           "killedBy" : [
             "PCM: a clean lossless path at the file's own rate is exactly BIT-PERFECT",
             "PCM: a requested rate that differs from a matching readback doesn't stop BIT-PERFECT",
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP"
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits"
           ],
           "ran" : true,
           "summary" : "a 24-bit source is rejected without integer mode (threshold 24 bits and up instead of above 24)",
@@ -8088,7 +8161,7 @@
           ],
           "id" : "C-BPV-015-d",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP"
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits"
           ],
           "ran" : true,
           "summary" : "shared mode with no other app playing is rejected (hog-mode ownership required)",
@@ -8106,7 +8179,7 @@
           "killedBy" : [
             "PCM: a clean lossless path at the file's own rate is exactly BIT-PERFECT",
             "PCM: a requested rate that differs from a matching readback doesn't stop BIT-PERFECT",
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
+            "PCM: shared mode with no other app playing is BIT-PERFECT for a file of at most 24 bits",
             "PCM: a file deeper than 24 bits needs integer mode"
           ],
           "ran" : true,
@@ -8123,7 +8196,6 @@
           ],
           "id" : "C-BPV-016-a",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
             "DoP: a clean path is exactly NATIVE DSD · DoP"
           ],
           "ran" : true,
@@ -8168,7 +8240,6 @@
           ],
           "id" : "C-BPV-016-d",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
             "DoP: a clean path is exactly NATIVE DSD · DoP"
           ],
           "ran" : true,
@@ -8185,7 +8256,6 @@
           ],
           "id" : "C-BPV-016-e",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
             "DoP: a clean path is exactly NATIVE DSD · DoP"
           ],
           "ran" : true,
@@ -8202,13 +8272,56 @@
           ],
           "id" : "C-BPV-016-f",
           "killedBy" : [
-            "shared mode with no other app playing: PCM is BIT-PERFECT, DoP is NATIVE DSD · DoP",
             "DoP: a clean path is exactly NATIVE DSD · DoP"
           ],
           "ran" : true,
           "summary" : "DoP mode: only the DSD64 carrier rate (176.4 kHz) gets the DoP badge",
           "targets" : [
             "BPV-016"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-016-g",
+          "killedBy" : [
+            "DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "DoP mode: holding the device isn't required; shared mode with no other app playing gets the DoP badge",
+          "targets" : [
+            "BPV-016"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-016-h",
+          "killedBy" : [
+            "DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "DoP mode: a hog-mode owner that is another process (not −1) counts as the player holding the device",
+          "targets" : [
+            "BPV-016",
+            "BPV-009"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-016-i",
+          "killedBy" : [
+            "DoP: NATIVE DSD · DoP needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "DoP mode: an unreadable hog-mode owner (nil) counts as the player holding the device",
+          "targets" : [
+            "BPV-016",
+            "BPV-009"
           ]
         },
         {
@@ -8265,6 +8378,50 @@
           "summary" : "bitstream mode: compares the read-back rate with the source's rate instead of the planned rate",
           "targets" : [
             "BPV-017"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-017-e",
+          "killedBy" : [
+            "bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "bitstream mode: holding the device isn't required; shared mode with no other app playing gets BITSTREAM",
+          "targets" : [
+            "BPV-017"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-017-f",
+          "killedBy" : [
+            "bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "bitstream mode: a hog-mode owner that is another process (not −1) counts as the player holding the device",
+          "targets" : [
+            "BPV-017",
+            "BPV-009"
+          ]
+        },
+        {
+          "failedElsewhere" : [
+
+          ],
+          "id" : "C-BPV-017-g",
+          "killedBy" : [
+            "bitstream: a BITSTREAM badge needs the player to hold the device, even with no other app playing"
+          ],
+          "ran" : true,
+          "summary" : "bitstream mode: an unreadable hog-mode owner (nil) counts as the player holding the device",
+          "targets" : [
+            "BPV-017",
+            "BPV-009"
           ]
         }
       ],

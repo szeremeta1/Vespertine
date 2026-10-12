@@ -99,7 +99,7 @@ def sandboxed_command(cmd: str) -> str:
     return list(lex)[2]
 
 
-def check(name: str, ws: Path, transcript: Path):
+def check(name: str, ws: Path, transcript: Path, rounds: list):
     problems, rows, models, reports = [], [], set(), []
     results = tool_results(transcript)
     for call_id, model, tool, args in tool_calls(transcript):
@@ -129,8 +129,10 @@ def check(name: str, ws: Path, transcript: Path):
             problems.append(f"tool {tool} used: {json.dumps(args)[:200]}" + came_back)
         elif not inside(path, ws):
             problems.append(f"{tool} outside the workspace: `{path}`" + came_back)
+    # Each report after the first answers a review-round message (<run-dir>/round<N>/<name>.md), in order.
+    labels = rounds if len(rounds) == len(reports) else list(range(len(reports)))
     report = reports[0] if len(reports) == 1 else "\n\n".join(
-        f"## Round {i}\n\n{r}" for i, r in enumerate(reports))
+        f"## Round {n}\n\n{r}" for n, r in zip(labels, reports))
     mentions = len(PRODUCT.findall(assistant_text(transcript) + report))
     for f in ws.rglob("*.swift"):
         if ".build" not in f.parts and PRODUCT.search(f.read_text(encoding="utf-8", errors="replace")):
@@ -155,7 +157,8 @@ def main() -> int:
     clean = True
     for arg in sys.argv[3:]:
         name, transcript = arg.split("=", 1)
-        problems, rows, models, report = check(name, root / name, Path(transcript))
+        rounds = [0] + sorted(int(d.name[5:]) for d in run.glob("round*") if d.name[5:].isdigit() and (d / f"{name}.md").exists())
+        problems, rows, models, report = check(name, root / name, Path(transcript), rounds)
         (run / "reports" / f"{name}.md").write_text(f"# {name}: final report\n\n{report.strip()}\n", encoding="utf-8")
         (run / "tool-calls" / f"{name}.tsv").write_text(
             "tool\targument\n" + "".join(f"{t}\t{d}\n" for t, d in rows), encoding="utf-8")
