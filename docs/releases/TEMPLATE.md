@@ -12,7 +12,7 @@ Free, open-source Mac player for surround and hi-res music collections.
 
 Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers/multichannel DACs; reports wanted: [device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
 
-SACD ISO is not supported in the current release. <Change this only once support ships and its test coverage is documented.>
+SACD images: <any change to SACD ISO playback, and the discs or tests that checked it.>
 
 ## Install
 
