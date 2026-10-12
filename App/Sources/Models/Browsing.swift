@@ -332,7 +332,7 @@ extension AppModel {
     func playableTracks(_ scope: FilterScope) -> [Track] {
         let filter = filter(scope)
         if let tracks = baseTracks(scope) { return filtered(tracks, facts: filter.isEmpty ? [] : trackFacts(tracks), by: filter) }
-        return songs(of: shownAlbums(scope), filter: filter)
+        return songs(of: AlbumFamilies.visibleGroups(shownAlbums(scope), among: library.albums).map(\.representative), filter: filter)
     }
 
     // MARK: Playing
@@ -344,11 +344,12 @@ extension AppModel {
 
     /// Plays albums through a filter (an artist's or a genre's albums from its tile).
     func play(albums: [Album], filter: LibraryFilter, shuffled: Bool) {
-        player.play(songs(of: albums, filter: filter), shuffled: shuffled, allowing: allowing(filter, perAlbum: true))
+        player.play(songs(of: AlbumFamilies.visibleGroups(albums, among: library.albums).map(\.representative), filter: filter),
+                    shuffled: shuffled, allowing: allowing(filter, perAlbum: true))
     }
 
     func enqueue(albums: [Album], filter: LibraryFilter, next: Bool) {
-        let tracks = songs(of: albums, filter: filter), allowing = allowing(filter, perAlbum: true)
+        let tracks = songs(of: AlbumFamilies.visibleGroups(albums, among: library.albums).map(\.representative), filter: filter), allowing = allowing(filter, perAlbum: true)
         if next { player.playNext(tracks, allowing: allowing) } else { player.addToQueue(tracks, allowing: allowing) }
     }
 

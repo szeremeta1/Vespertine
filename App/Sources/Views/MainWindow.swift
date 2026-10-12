@@ -135,6 +135,7 @@ struct ContentRouter: View {
     @ViewBuilder private func page(_ route: DetailRoute) -> some View {
         switch route {
         case .album(let key): AlbumDetailView(albumKey: key).id(key)
+        case .albumFamily(let key): AlbumFamilyDetailView(memberKey: key).id(key)
         case .artist(let name): ArtistDetailView(name: name).id(name)
         case .genre(let key): GenreDetailView(genreKey: key).id(key)
         }

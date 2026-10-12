@@ -402,6 +402,7 @@ struct SearchResultsView: View {
             : results.tracks.indices.filter { filter.matches(results.facts[$0], favorite: favorites.contains(results.tracks[$0].id ?? -1)) }.map { results.tracks[$0] }
         // Albums by their own facts; artists and genres when one of their albums passes.
         let albums = model.filtered(self.albums, by: filter)
+        let albumFamilies = AlbumFamilies.visibleGroups(albums, among: model.library.albums)
         let artists = filter.isEmpty ? self.artists : {
             let keep = Set(model.artists(filter).map { $0.name.lowercased() })
             return self.artists.filter { keep.contains($0.name.lowercased()) }
@@ -412,7 +413,7 @@ struct SearchResultsView: View {
         }()
         let found = !(results.tracks.isEmpty && self.albums.isEmpty && self.artists.isEmpty && self.genres.isEmpty)
         VStack(alignment: .leading, spacing: 0) {
-            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta(genres: genres.count, artists: artists.count, albums: albums.count, songs: songs.count)) {
+            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta(genres: genres.count, artists: artists.count, albums: albumFamilies.count, songs: songs.count)) {
                 PlayShuffleButtons(disabled: songs.isEmpty) { shuffled in
                     model.player.play(songs, shuffled: shuffled, allowing: model.allowing(filter, perAlbum: false))
                 }
@@ -437,9 +438,15 @@ struct SearchResultsView: View {
                         ForEach(artists) { ArtistTile(artist: $0, filter: filter).frame(width: 136) }
                     }
                 }
-                if !albums.isEmpty {
-                    shelf("Albums", count: albums.count) {
-                        ForEach(albums) { AlbumCard(album: $0).frame(width: 150) }
+                if !albumFamilies.isEmpty {
+                    shelf("Albums", count: albumFamilies.count) {
+                        ForEach(albumFamilies) { family in
+                            if family.editions.count > 1 {
+                                AlbumFamilyCard(family: family).frame(width: 150)
+                            } else {
+                                AlbumCard(album: family.representative).frame(width: 150)
+                            }
+                        }
                     }
                 }
                 if !songs.isEmpty {

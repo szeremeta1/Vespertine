@@ -31,6 +31,24 @@ private func quantize(_ x: Double, bits: Int) -> Float {
 
 @Suite("Decoding and analysis")
 struct DecodeAndAnalysisTests {
+    @Test("Reported FLAC tracks open and decode without a CUE region",
+          .enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_REAL_FLAC_FILES"] != nil))
+    func reportedFLACTracks() throws {
+        let paths = ProcessInfo.processInfo.environment["VESPERTINE_REAL_FLAC_FILES"]!.components(separatedBy: "\n")
+        for path in paths where !path.isEmpty {
+            let url = URL(fileURLWithPath: path)
+            let probed = try SourceOpener.probe(url)
+            #expect(probed.format.codec == "FLAC")
+            let plan = OutputPlan(mode: .pcm, deviceSampleRate: probed.format.sampleRate,
+                                  decodedSampleRate: probed.format.sampleRate, physicalBitDepth: 24,
+                                  channels: probed.format.channels, dsdConvertedToPCM: false, reason: "")
+            let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
+            let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 4096)!
+            try decoder.decode(into: buffer, length: 4096)
+            #expect(buffer.frameLength == 4096)
+        }
+    }
+
     @Test("A 24/96 WAV is probed as lossless 24-bit 96 kHz")
     func probe() throws {
         let url = try writeWAV("probe", rate: 96_000, bits: 24, seconds: 0.2) { _, i in quantize(0.5 * sin(Double(i) * 0.05), bits: 24) }

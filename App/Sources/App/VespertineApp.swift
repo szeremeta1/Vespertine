@@ -108,7 +108,11 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
                 .disabled(model.player.current == nil)
             Button("Go to Current Album") {
-                if let key = model.player.current?.track.albumKey { model.sidebar = .albums; model.path = [.album(key)] }
+                if let key = model.player.current?.track.albumKey {
+                    model.sidebar = .albums
+                    model.path = []
+                    model.openAlbum(key)
+                }
             }
             .keyboardShortcut("j", modifiers: [.command])
             .disabled(model.player.current == nil)

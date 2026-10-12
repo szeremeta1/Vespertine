@@ -18,6 +18,7 @@ enum SidebarItem: Hashable {
 
 enum DetailRoute: Hashable {
     case album(String)
+    case albumFamily(String)
     case artist(String)
     case genre(String)
 }
@@ -329,7 +330,15 @@ final class AppModel {
     }
 
     func openAlbum(_ key: String) {
-        path.append(.album(key))
+        if let family = AlbumFamilies.group(library.albums).first(where: { $0.contains(key) }), family.editions.count > 1 {
+            openAlbumFamily(key)
+        } else {
+            path.append(.album(key))
+        }
+    }
+
+    func openAlbumFamily(_ memberKey: String) {
+        path.append(.albumFamily(memberKey))
     }
 
     func showInFinder(_ tracks: [Track]) {

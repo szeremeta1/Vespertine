@@ -64,9 +64,10 @@ struct AlbumsGridView: View {
         let base = model.baseAlbums(scope)
         let filter = model.filter(scope)
         let albums = model.filtered(base, by: filter)
+        let families = AlbumFamilies.visibleGroups(albums, among: model.library.albums)
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: title, meta: meta(albums, base: base, filter: filter)) {
+                PageHeader(title: title, meta: meta(families, base: base, filter: filter)) {
                     if isLibrary {
                         Picker("Sort", selection: $library.albumSort) {
                             Text("Artist").tag(AlbumSort.artist)
@@ -78,7 +79,7 @@ struct AlbumsGridView: View {
                         .labelsHidden()
                         .fixedSize()
                     }
-                    PlayShuffleButtons(disabled: albums.isEmpty) { model.play(scope, shuffled: $0) }
+                    PlayShuffleButtons(disabled: families.isEmpty) { model.play(scope, shuffled: $0) }
                 }
                 FilterBar(scope: scope, items: .albums(base, model: model))
                     .padding(.bottom, 6)
@@ -86,8 +87,12 @@ struct AlbumsGridView: View {
                     NoMatchesView(unit: "album") { model.setFilter(LibraryFilter(), for: scope) }
                 } else {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 28) {
-                        ForEach(albums) { album in
-                            AlbumCard(album: album)
+                        ForEach(families) { family in
+                            if family.editions.count > 1 {
+                                AlbumFamilyCard(family: family)
+                            } else {
+                                AlbumCard(album: family.representative)
+                            }
                         }
                     }
                     .padding(.horizontal, 24)
@@ -99,11 +104,12 @@ struct AlbumsGridView: View {
         .background(Palette.window)
     }
 
-    private func meta(_ albums: [Album], base: [Album], filter: LibraryFilter) -> String {
-        if !filter.isEmpty { return "\(albums.count.formatted()) of \(base.count.formatted()) albums" }
-        guard isLibrary else { return "\(albums.count) album\(albums.count == 1 ? "" : "s")" }
+    private func meta(_ families: [AlbumFamily], base: [Album], filter: LibraryFilter) -> String {
+        let count = families.count
+        if !filter.isEmpty { return "\(count.formatted()) of \(AlbumFamilies.group(base).count.formatted()) albums" }
+        guard isLibrary else { return "\(count) album\(count == 1 ? "" : "s")" }
         let s = model.library.stats
-        return "\(s.albums.formatted()) album\(s.albums == 1 ? "" : "s") · \(s.tracks.formatted()) track\(s.tracks == 1 ? "" : "s") · \(s.bytes.byteString)"
+        return "\(count.formatted()) album\(count == 1 ? "" : "s") · \(s.albums.formatted()) edition\(s.albums == 1 ? "" : "s") · \(s.tracks.formatted()) track\(s.tracks == 1 ? "" : "s") · \(s.bytes.byteString)"
     }
 }
 
@@ -171,6 +177,130 @@ struct AlbumCard: View {
         .accessibilityAction(named: "Play") { model.player.play(model.library.tracks(albumKey: album.key), shuffled: false) }
         .contextMenu { AlbumMenu(album: album) }
         .draggable(model.library.tracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
+    }
+}
+
+/// One card for an album with several tagged releases. The artwork is from the edition that
+/// matched this page (for example a DSD filter), and every edition is available inside.
+struct AlbumFamilyCard: View {
+    @Environment(AppModel.self) private var model
+    let family: AlbumFamily
+
+    private var isPlaying: Bool {
+        guard let key = model.player.current?.track.albumKey, model.player.state != .stopped else { return false }
+        return family.contains(key)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .bottomTrailing) {
+                ArtworkView(key: family.representative.artworkKey, size: 600, cornerRadius: 6)
+                    .shadow(color: .black.opacity(0.45), radius: 13, y: 10)
+                    .overlay {
+                        if isPlaying { RoundedRectangle(cornerRadius: 6).strokeBorder(Palette.brass, lineWidth: 1.5) }
+                    }
+                Text("\(family.editions.count) EDITIONS")
+                    .font(Typeface.mono(9, weight: .semibold))
+                    .tracking(0.5)
+                    .foregroundStyle(Palette.brassHi)
+                    .padding(.horizontal, 8).padding(.vertical, 5)
+                    .background(Palette.surface, in: RoundedRectangle(cornerRadius: 4))
+                    .padding(9)
+            }
+            Text(family.title).font(Typeface.serif(14)).foregroundStyle(Palette.text)
+                .lineLimit(1).padding(.top, 10)
+            Text(family.artist).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
+                .lineLimit(1).padding(.top, 2)
+            FormatLabel(summary: "\(family.editions.count) editions · \(family.representative.formatSummary)", highlight: true)
+                .padding(.top, 5)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { model.openAlbumFamily(family.representative.key) }
+        .focusable(interactions: .activate)
+        .onKeyPress(keys: [.return, .space]) { _ in model.openAlbumFamily(family.representative.key); return .handled }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(family.title), \(family.artist), \(family.editions.count) editions")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { model.openAlbumFamily(family.representative.key) }
+        .contextMenu {
+            ForEach(family.editions) { edition in
+                Button(edition.title) { model.openAlbum(edition.key) }
+            }
+        }
+    }
+}
+
+struct AlbumFamilyDetailView: View {
+    @Environment(AppModel.self) private var model
+    let memberKey: String
+    @State private var selectedKey: String?
+
+    var body: some View {
+        if let family = AlbumFamilies.group(model.library.albums).first(where: { $0.contains(memberKey) }) {
+            let selected = selectedKey.flatMap { key in family.editions.first { $0.key == key } } ?? family.editions.first { $0.key == memberKey } ?? family.representative
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(family.title).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
+                            .lineLimit(1).minimumScaleFactor(0.7)
+                        Text("\(family.artist) · \(family.editions.count) EDITIONS")
+                            .font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
+                    }
+                    Spacer(minLength: 8)
+                    Menu {
+                        ForEach(family.editions) { edition in
+                            Button {
+                                selectedKey = edition.key
+                            } label: {
+                                if edition.key == selected.key {
+                                    Label(edition.title, systemImage: "checkmark")
+                                } else {
+                                    Text(edition.title)
+                                }
+                            }
+                        }
+                    } label: {
+                        Text("Choose Edition")
+                            .lineLimit(1)
+                    }
+                    .menuStyle(.button)
+                    .fixedSize()
+                }
+                .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 12)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(family.editions) { edition in
+                            Button { selectedKey = edition.key } label: {
+                                HStack(spacing: 10) {
+                                    ArtworkView(key: edition.artworkKey, size: 120, cornerRadius: 3)
+                                        .frame(width: 48, height: 48)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(edition.title).font(Typeface.ui(12, weight: .medium))
+                                            .foregroundStyle(Palette.text).lineLimit(2)
+                                        FormatLabel(summary: edition.formatSummary, highlight: edition.isHiRes)
+                                    }
+                                    Spacer(minLength: 0)
+                                }
+                                .frame(width: 280, height: 58)
+                                .padding(7)
+                                .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
+                                .overlay(RoundedRectangle(cornerRadius: 6)
+                                    .strokeBorder(edition.key == selected.key ? Palette.brass : Palette.hairlineStrong, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("\(edition.title), \(edition.formatSummary)")
+                        }
+                    }
+                    .padding(.horizontal, 24).padding(.bottom, 14)
+                }
+                Hairline()
+                AlbumDetailView(albumKey: selected.key).id(selected.key)
+            }
+            .background(Palette.window)
+            .navigationTitle(family.title)
+        } else {
+            AlbumDetailView(albumKey: memberKey)
+        }
     }
 }
 
@@ -361,10 +491,10 @@ struct AlbumDetailView: View {
                 HStack(spacing: 10) {
                     Button { model.player.play(shown, shuffled: false) } label: { Label("Play", systemImage: "play.fill") }
                         .buttonStyle(BrassButtonStyle())
+                        .fixedSize()
                     Button { model.player.play(shown, shuffled: true) } label: { Label("Shuffle", systemImage: "shuffle") }
                         .buttonStyle(QuietButtonStyle())
-                    Button("Look Up on MusicBrainz") { model.lookupTracks = tracks }
-                        .buttonStyle(QuietButtonStyle())
+                        .fixedSize()
                     Menu {
                         AlbumMenu(album: album)
                     } label: {

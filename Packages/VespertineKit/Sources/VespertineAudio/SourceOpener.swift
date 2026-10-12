@@ -40,8 +40,13 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
 
 public enum SourceOpenerError: Error, LocalizedError {
     case unsupported(URL)
+    case invalidRegion(URL, start: Int64, length: Int64?, available: Int64)
     public var errorDescription: String? {
-        switch self { case .unsupported(let url): "Unsupported file: \(url.lastPathComponent)" }
+        switch self {
+        case .unsupported(let url): "Unsupported file: \(url.lastPathComponent)"
+        case .invalidRegion(let url, let start, let length, let available):
+            "CUE track is outside \(url.lastPathComponent): start \(start), length \(length.map(String.init) ?? "unknown"), file length \(available) frames"
+        }
     }
 }
 
@@ -246,11 +251,32 @@ enum SourceOpener {
         } else {
             throw SourceOpenerError.unsupported(probed.url)
         }
-        if let start = item.regionStartFrame {
+        if let sourceStart = item.regionStartFrame {
+            // Library CUE offsets are in the file's native sample frames. DSD is decoded at 1/8
+            // its bit rate for PCM, or packed into DoP at 1/16. Convert before seeking the wrapped
+            // decoder; using native DSD offsets here puts every later track past its end.
+            let sourceRate = probed.format.sampleRate
+            let decoderRate = decoder.processingFormat.sampleRate
+            func decoderFrame(_ sourceFrame: Int64) -> Int64 {
+                guard sourceFrame >= 0, sourceRate > 0, decoderRate > 0 else { return -1 }
+                let frame = (Double(sourceFrame) * decoderRate / sourceRate).rounded()
+                return frame.isFinite && frame < Double(Int64.max) ? Int64(frame) : -1
+            }
+            let start = decoderFrame(sourceStart)
+            let requestedLength = item.regionFrameLength.map(decoderFrame)
             // A CUE track can't run past the audio actually there: the last track's length comes from
-            // rounded durations and may overshoot the file by a few frames, which the region decoder refuses.
-            let available = decoder.length > 0 ? max(0, decoder.length - start) : Int64.max
-            let length = min(item.regionFrameLength ?? available, available)
+            // rounded durations and may overshoot the file by a few frames. SFBAudioRegionDecoder
+            // asserts (and aborts the whole app) on a zero or negative length, so reject a stale or
+            // malformed region before constructing it.
+            let total = decoder.length
+            guard start >= 0, total > 0, start < total else {
+                throw SourceOpenerError.invalidRegion(item.url, start: sourceStart, length: item.regionFrameLength, available: total)
+            }
+            let available = total - start
+            let length = min(requestedLength ?? available, available)
+            guard length > 0 else {
+                throw SourceOpenerError.invalidRegion(item.url, start: sourceStart, length: item.regionFrameLength, available: total)
+            }
             let region = try AudioRegionDecoder(decoder: decoder, startFrame: start, frameLength: length)
             try region.open()
             decoder = region
