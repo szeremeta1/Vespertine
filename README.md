@@ -9,7 +9,7 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It puts extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library with your stereo albums, plays them as head-tracked Spatial Audio on AirPods, and checks whether your "hi-res" files really are. The signal path shows every step from file to output, and the bit-perfect conditions and their tests are in the source for anyone to audit. SACD ISO playback is coming in the next release. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted.
+I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It puts SACD images and extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library with your stereo albums, plays them as head-tracked Spatial Audio on AirPods, and checks whether your "hi-res" files really are. The signal path shows every step from file to output, and the bit-perfect conditions and their tests are in the source for anyone to audit. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted.
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+<br>
@@ -36,7 +36,7 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It p
 - **Lossless on AirPods Max over USB-C**, shown as a 24-bit / 48 kHz device; over Bluetooth it tells you the link is AAC.
 - **A library that respects your files.** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, and a tag editor that backs up every file first. A parametric EQ imports AutoEQ and Equalizer APO presets per output; it is off by default, and when it is on the signal path says EQUALIZER.
 - **NAS libraries.** Plays from local drives or SMB, NFS and WebDAV shares, with caching and Keep Offline.
-- **SACD images, in the next release.** `.iso` playback (stereo and 5.1, DST-compressed or plain) straight from the image. It matched sacd_extract bit for bit on two real discs.
+- **SACD images.** `.iso` playback (stereo and 5.1, DST-compressed or plain) straight from the image. It matched sacd_extract bit for bit on two real discs.
 
 [All features and screenshots](docs/FEATURES.md) · [How it's made](#how-its-made)
 
@@ -58,7 +58,7 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 | Local surround files | Yes² | ? | Yes | Yes | Yes | ? | Yes | ? |
 | Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | Yes | ? |
 | Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? |
-| SACD ISO | Coming in the next release | No | Yes | No (DSF/DFF only) | Yes | No | ? | ? |
+| SACD ISO | Yes | No | Yes | No (DSF/DFF only) | Yes | No | ? | ? |
 | Convolution / audio effect plugins | No / No | ? / ? | Yes (Origin: paid option) / Audio Units | Yes / ? | No / No | ? / ? | ? / ? | ? / Audio Units |
 | Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (radio only) | ? | ? |
 
