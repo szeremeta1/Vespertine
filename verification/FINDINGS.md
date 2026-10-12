@@ -193,5 +193,5 @@ BIT-PERFECT. All of them pass on macOS.
   the order the reads finish (`LibraryScanner.swift` lines 176-210), so a can get the higher id. It failed that way
   in PR #30's CI, in the release run of the engine job (`counts → [3, 7]`), with nothing in `Packages/`
   changed, and passed on the next run. [3, 7] is what correct counts give when b has the lower id, but the test can't tell that apart from
-  swapped counts. Reading each id's count on its own would make it deterministic and catch a swap. Not changed
-  here.
+  swapped counts. It failed the same way again in PR #31's CI, so the test now reads each song's count by its id,
+  which is deterministic and still catches a swap.

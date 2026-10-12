@@ -365,8 +365,8 @@ real-time C on macOS; the app on macOS) passes on this branch. The first pull re
 (run 38005282468). Two things happened along the way:
 
 - One run failed one of Vespertine's own tests, in the engine job's release run: "Reads Apple Music's library…"
-  depends on the order a task group finishes in. It passed on the next run. `FINDINGS.md` has the details under
-  Observations.
+  depends on the order a task group finishes in. It passed on the next run, failed again on this pull request, and
+  now reads each song's count by its id. `FINDINGS.md` has the details under Observations.
 - The new macOS verification job first ran in a debug build and hit its 40-minute limit. It now builds once in
   release (`swift test -c release`, which keeps `@testable` imports) and runs each group as its own step with its own
   time limit: about 6 minutes in all. On Linux, debug and release gave identical results.
