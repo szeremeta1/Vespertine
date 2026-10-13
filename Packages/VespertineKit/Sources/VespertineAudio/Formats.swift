@@ -94,6 +94,11 @@ public struct DeviceCapabilities: Sendable, Hashable, Codable {
         sampleRates.contains { abs($0 - rate) < 0.5 }
     }
 
+    /// Whether a real integer `bits`-bit format exists at `rate` for `channels` channels.
+    public func offersInteger(bits: Int, at rate: Double, channels: Int) -> Bool {
+        physicalFormats.contains { $0.isInteger && $0.bitDepth == bits && $0.supports(rate: rate) && $0.channels >= channels }
+    }
+
     /// Highest integer bit depth available at `rate` (falls back to 24).
     public func bestIntegerBitDepth(at rate: Double) -> Int {
         let depths = physicalFormats.filter { $0.isInteger && $0.supports(rate: rate) }.map(\.bitDepth)
@@ -139,6 +144,8 @@ public struct OutputPlan: Sendable, Hashable {
     /// Integer mode requested: decoded straight to 32-bit integers and sent to a non-mixable Int32 device
     /// format untouched (32-bit sources exact). Only for plain PCM with nothing to change the samples.
     public var integerSamples = false
+    /// "Match 16-bit sources": what became of a 16-bit source the setting applied to. nil: it didn't apply.
+    public var sixteenBit: SixteenBitMatch? = nil
 
     /// Channels the decoded stream (and ring) carries: `channels`. Channels written to the device:
     public var deviceChannels: Int { deviceChannelCount ?? channels }
@@ -149,6 +156,14 @@ public struct OutputPlan: Sendable, Hashable {
             && physicalBitDepth == other.physicalBitDepth && channels == other.channels
             && deviceChannels == other.deviceChannels && spatial == other.spatial && spatialBed == other.spatialBed
     }
+}
+
+/// "Match 16-bit sources" for one plan. The samples are the same either way; only the word the DAC receives differs.
+public enum SixteenBitMatch: Sendable, Hashable {
+    /// The device was asked for its own 16-bit mode at the source rate (`physicalBitDepth` is 16).
+    case requested
+    /// The device has no 16-bit mode at this rate: sent zero-padded to `physicalBitDepth` as before.
+    case noMode
 }
 
 public enum SampleRate {

@@ -79,6 +79,10 @@ public struct EngineSettings: Sendable, Equatable {
     /// Integer mode for devices that offer it (exclusive access only): PCM that needs no processing goes
     /// to the DAC as 32-bit integers with no float step, so 32-bit sources arrive exact.
     public var integerMode = false
+    /// "Match 16-bit sources": a 16-bit file goes to a DAC with a real 16-bit mode at its rate as 16-bit, not
+    /// zero-padded to 24 or 32 (same samples either way). Exclusive access, not the built-in output, nothing changing
+    /// the samples; see `FormatPlanner.matchSixteenBit`.
+    public var matchSixteenBit = false
     /// Parametric equalizer per device UID. A flat preset counts as none.
     public var equalizers: [String: EQPreset] = [:]
 
@@ -551,9 +555,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
+                || old.matchSixteenBit != new.matchSixteenBit
             // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
             // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
-            let leavesInteger = session?.applied.integerMode == true
+            // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
+            let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
                 && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil)
             if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
@@ -788,6 +794,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream)
         plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
+        plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                             eligible: mayMatchSixteenBit(item: item, device: device))
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
                 if let uid = settings.deviceUID, device.uid == uid {
@@ -984,6 +992,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
+    }
+
+    /// The engine's half of "Match 16-bit sources" (the plan's half is `FormatPlanner.matchSixteenBit`): the setting
+    /// is on, the output is held exclusively and isn't the built-in one, and nothing changes the samples.
+    private func mayMatchSixteenBit(item: PlayableItem, device: OutputDevice) -> Bool {
+        settings.matchSixteenBit && settings.exclusive && !device.alwaysShared
+            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
     }
 
     /// The item playing (or paused), whichever path plays it.
@@ -1187,6 +1202,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                                               policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
+                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                                     eligible: mayMatchSixteenBit(item: next, device: device))
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     Self.alignDoPMarkers(decoder, at: session.totalWritten)
