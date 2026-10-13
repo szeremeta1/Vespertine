@@ -261,17 +261,34 @@ struct TagEditorView: View {
     }
 
     private var footer: some View {
-        HStack(spacing: 10) {
-            Text(status ?? footerNote).font(Typeface.ui(11)).foregroundStyle(Palette.text3).lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true).layoutPriority(1)
-            Spacer()
-            Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving).fixedSize()
-                .help(hasChanges ? String(localized: "Discard unsaved changes") : String(localized: "Restore the tags from before the last save"))
-            Button(saving ? String(localized: "Saving…") : String(localized: "Save")) { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving).fixedSize()
-                .keyboardShortcut("s", modifiers: .command)
+        // The note sits beside the buttons when it fits on one line, and above them when it doesn't (most languages).
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                footerText.lineLimit(1)
+                Spacer()
+                footerButtons
+            }
+            VStack(alignment: .leading, spacing: 8) {
+                footerText.fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 10) {
+                    Spacer()
+                    footerButtons
+                }
+            }
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
         .overlay(alignment: .top) { Hairline() }
+    }
+
+    private var footerText: some View {
+        Text(status ?? footerNote).font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+    }
+
+    @ViewBuilder private var footerButtons: some View {
+        Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving).fixedSize()
+            .help(hasChanges ? String(localized: "Discard unsaved changes") : String(localized: "Restore the tags from before the last save"))
+        Button(saving ? String(localized: "Saving…") : String(localized: "Save")) { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving).fixedSize()
+            .keyboardShortcut("s", modifiers: .command)
     }
 
     // MARK: Logic
