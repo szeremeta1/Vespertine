@@ -70,9 +70,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 47"
+    section: "line 49"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 47, from: "On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate.", to: "Otherwise it becomes high-rate PCM" }
+    cache: { repo: docs/FEATURES.md, lines: 49, from: "On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate.", to: "Otherwise it becomes high-rate PCM" }
   requirement: "When the device is marked as decoding DoP and offers the carrier rate, DSD is planned as DoP at the carrier rate."
   quote_sha256: 21d228590e49464a137f8d54ad2393667a2ed671c3148f667d09883cade40ea7
   kind: vespertine-rule
@@ -85,9 +85,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 33"
+    section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 33, from: "Vespertine switches the DAC to each track's native rate.", to: "Vespertine switches the DAC to each track's native rate." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "Vespertine switches the DAC to each track's native rate.", to: "Vespertine switches the DAC to each track's native rate." }
   requirement: "With the match-source policy, when the device offers the source's rate, that rate is chosen."
   quote_sha256: a5464bcc6d3545acb27e37a0cad586545fad8715fd05010c98dfc9e7a54e4f78
   kind: vespertine-rule
@@ -100,9 +100,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 33"
+    section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
   requirement: "With the match-source policy, when the source rate isn't offered but an integer multiple of it is (twice, four times, …), an integer multiple is chosen."
   quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
   kind: vespertine-rule
@@ -115,9 +115,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 33"
+    section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
   requirement: "With the match-source policy, when neither the source rate nor an integer multiple is offered but some offered rate is higher than the source rate, a higher rate is chosen."
   quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
   kind: vespertine-rule
@@ -130,9 +130,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 33"
+    section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 33, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
   requirement: "With the match-source policy, when every offered rate is lower than the source rate and some offered rate divides it exactly (half, a quarter, …), such an integer divisor is chosen."
   quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
   kind: vespertine-rule
@@ -145,9 +145,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 33"
+    section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 33, from: "Per-device settings can match the source, use the device maximum, or force a rate.", to: "or force a rate." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "Per-device settings can match the source, use the device maximum, or force a rate.", to: "or force a rate." }
   requirement: "With the maximum policy the highest offered rate is chosen, whatever the source rate. With a fixed rate that the device offers, that rate is chosen."
   quote_sha256: 8e5591b3127a508854ffded5033a528b7635d47336a22235d663599000b8ebb6
   kind: vespertine-rule
