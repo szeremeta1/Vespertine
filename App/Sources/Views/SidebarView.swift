@@ -226,7 +226,7 @@ struct SidebarView: View {
 
     private func newPlaylist(smart: Bool) {
         let rules: SmartRules? = smart ? SmartRules(rules: [SmartRule(field: .genre, op: .contains, value: "")]) : nil
-        if let p = model.library.createPlaylist(name: smart ? String(localized: "New Smart Playlist") : String(localized: "New Playlist"), rules: rules), let id = p.id {
+        if let p = model.library.createPlaylist(name: smart ? String(localized: "New Smart Playlist") : String(localized: "New Playlist (name)", defaultValue: "New Playlist", comment: "Name given to a newly created playlist (a noun, not the command)"), rules: rules), let id = p.id {
             model.sidebar = .playlist(id)
             if smart { model.smartEditorPlaylist = p } else { newName = p.name; renaming = p }
         }

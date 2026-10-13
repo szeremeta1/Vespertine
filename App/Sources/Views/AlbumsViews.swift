@@ -388,7 +388,7 @@ struct AddToPlaylistMenu: View {
     var body: some View {
         Menu("Add to Playlist") {
             Button("New Playlist from Selection") {
-                if let p = model.library.createPlaylist(name: String(localized: "New Playlist"), trackIDs: trackIDs), let id = p.id { model.sidebar = .playlist(id) }
+                if let p = model.library.createPlaylist(name: String(localized: "New Playlist (name)", defaultValue: "New Playlist", comment: "Name given to a newly created playlist (a noun, not the command)"), trackIDs: trackIDs), let id = p.id { model.sidebar = .playlist(id) }
             }
             Divider()
             ForEach(model.library.playlists.filter { !$0.isSmart }) { p in

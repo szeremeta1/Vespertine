@@ -111,6 +111,11 @@ def check(path, problems):
             if got != expected and not (english_plural and set(got) <= set(expected)):
                 problems.append(f"{path.name}: {key!r} [{language}] has placeholders {got}, English has {expected}")
             plural = localization.get("variations", {}).get("plural")
+            # A whole-string plural follows one argument, which Xcode guesses (the first, mostly). With two counts the
+            # guess can pick the wrong one ("1 of 5 song"), so the count that drives the wording needs a substitution.
+            counts = [i for i, spec in normalize(placeholders(key)).items() if spec in ("lld", "ld", "d")]
+            if plural and len(counts) > 1:
+                problems.append(f"{path.name}: {key!r} [{language}] has a whole-string plural with {len(counts)} counts")
             subs = [s for s in localization.get("substitutions", {}).values()]
             needs = PLURALS[language]
             for variants in ([plural] if plural else []) + [s.get("variations", {}).get("plural", {}) for s in subs]:
