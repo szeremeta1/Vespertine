@@ -97,8 +97,8 @@ jobs:
           path: Packages/VespertineKit/.build
           key: spm-kit-${{ runner.os }}-${{ hashFiles('Packages/VespertineKit/Package.resolved') }}
           restore-keys: spm-kit-${{ runner.os }}-
-      - name: VespertineKit tests (debug)
-        run: swift test --package-path Packages/VespertineKit
+      # Release only: it is what ships, the kit has no debug-only checks (no assert, no #if DEBUG), and a second, debug
+      # build of the kit and its C dependencies cost 4 to 10 minutes of macOS time. The App job still builds it in Debug.
       - name: VespertineKit tests (release)
         run: swift test --package-path Packages/VespertineKit -c release
       - name: Analysis core tests (macOS, with the app-parity tests)
