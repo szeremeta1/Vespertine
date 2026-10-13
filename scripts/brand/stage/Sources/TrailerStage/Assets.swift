@@ -18,9 +18,11 @@ struct Cue {
     static let all: [Cue] = [
         Cue(scene: .bitPerfect, recording: "bitperfect", sourceStart: 0.8),
         Cue(scene: .dsd, recording: "dsd", sourceStart: 2.0),
+        Cue(scene: .sacd, recording: "sacd", sourceStart: 2.0),
         Cue(scene: .versions, recording: "versions", sourceStart: 2.0),
         Cue(scene: .spatial, recording: "spatial", sourceStart: 2.0),
         Cue(scene: .analysis, recording: "analysis", sourceStart: 2.0),
+        Cue(scene: .languages, recording: "languages", sourceStart: 1.0),
         Cue(scene: .library, recording: "albums", sourceStart: 0.6),
     ]
     static func `for`(_ scene: Scene) -> Cue? { all.first { $0.scene == scene } }
