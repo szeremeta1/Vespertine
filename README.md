@@ -162,46 +162,6 @@ cd Packages/VespertineKit && swift build -c release --product vespertine-probe
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, artists and genres, start playback or a shuffle, set any page's filters, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
-## Releasing
-
-Start with [the release-notes template](docs/releases/TEMPLATE.md). The [release cadence](CONTRIBUTING.md#release-cadence) is at most one beta a week, with the 1.0 freeze from November 3.
-
-```bash
-scripts/release.sh --notarize --install
-```
-
-```bash
-scripts/publish.sh docs/releases/<version>.md
-```
-
-The first command builds a universal app and signs it (and every embedded framework and Sparkle helper) with the Developer ID of team `7WMQ9ZV6V8`, and stops if anything ends up signed by another team. It then notarizes and staples both the app and a designed installer DMG, using the notarytool profile `vespertine-notary-7WMQ9ZV6V8` (created once with `xcrun notarytool store-credentials vespertine-notary-7WMQ9ZV6V8 --key AuthKey_<id>.p8 --key-id <id> --issuer <issuer>`). If Apple takes longer than two hours, rerun it with `--resume` instead of `--notarize`. The top of `scripts/release.sh` lists the environment variables that pick another identity, team or profile.
-
-The second command publishes the GitHub release: it signs each Sparkle appcast entry, and the feed itself, with the EdDSA key in the login keychain (account `nocturne`, kept from before the rename so the key never changes) and uploads `appcast.xml` next to the DMG. Never edit the uploaded `appcast.xml` by hand: the app requires a signed feed, so an edit stops every installed copy from updating. Installed copies read the feed from `releases/latest/download/appcast.xml`, so the release GitHub marks *Latest* must always carry `appcast.xml`: any other release (a build of the analyzer, say) goes up with `gh release create --latest=false`, or every installed copy's update check fails until the next app release.
-
-**Back up the Sparkle signing key.** Without it, no future update can be published to existing installs:
-
-```bash
-build/DDR/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys --account nocturne -x vespertine-sparkle-key.txt
-```
-
-Store that file somewhere safe (it is a secret), then delete it.
-
-## Layout
-
-| Path | What |
-|---|---|
-| `Packages/VespertineKit/Sources/CVespertineRT` | Real-time C: lock-free ring buffer, HAL IOProc, dithered gain, integer mode, meters, spectrum tap (DoP included) |
-| `Packages/VespertineKit/Sources/CVespertineDTS` | C shims over FFmpeg: DTS CDs, DTS-HD, TrueHD, Matroska and DSD |
-| `Packages/VespertineKit/Sources/CVespertineGuard` | Objective-C++ guard that turns exceptions from codec libraries into errors |
-| `Packages/VespertineKit/Sources/VespertineAudio` | Device discovery, shared/exclusive output, format switching, `FormatPlanner`, `PlaybackEngine`, Spatial Audio, Dolby Atmos, experimental bitstream (untested on real receivers/multichannel DACs; reports wanted), decoders |
-| `Packages/VespertineKit/Sources/VespertineLibrary` | GRDB/SQLite library, scanner, CUE, tag reader and writer, format badges, genres, smart playlists, network shares, server-analysis import, MusicBrainz/ListenBrainz |
-| `Packages/VespertineKit/Vendor` | FFmpeg's DTS, TrueHD and DSD decoders, prebuilt (see `scripts/build-dts-decoder.sh`) |
-| `Packages/VespertineAnalysis` | The analysis core (spectra, forensics, verdicts) in plain Swift, plus `vespertine-analyze` for Linux servers |
-| `App/` | SwiftUI app (Obsidian & Brass design) |
-| `docs/` | Architecture notes, design mockups, screenshots, release notes |
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how audio gets from file to DAC.
-
 ## Contributing
 
 Bug reports, device reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [code of conduct](CODE_OF_CONDUCT.md).
