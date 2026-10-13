@@ -41,7 +41,7 @@ struct SidebarView: View {
                 ForEach(model.library.playlists) { playlist in
                     if let id = playlist.id {
                         Label {
-                            Text(playlist.name).lineLimit(1)
+                            Text(playlist.name.libraryDisplayName).lineLimit(1)
                         } icon: {
                             Image(systemName: playlist.isSmart ? "gearshape" : "music.note.list")
                         }
@@ -53,7 +53,7 @@ struct SidebarView: View {
                         }
                         .contextMenu {
                             if playlist.isSmart { Button("Edit Rules…") { model.smartEditorPlaylist = playlist } }
-                            Button("Rename…") { newName = playlist.name; renaming = playlist }
+                            Button("Rename…") { newName = playlist.name.libraryDisplayName; renaming = playlist }
                             playMenu(.playlist(id))
                             Button("Export Playlist…") { model.exportPlaylist(playlist) }
                             Divider()
@@ -160,7 +160,7 @@ struct SidebarView: View {
         }
         .alert("Rename Playlist", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
-            Button("Rename") { if let p = renaming { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
+            Button("Rename") { if let p = renaming, newName != p.name.libraryDisplayName { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
             Button("Cancel", role: .cancel) { renaming = nil }
         }
         .alert(deleteTitle, isPresented: Binding(get: { deletingPlaylist != nil }, set: { if !$0 { deletingPlaylist = nil } }),
@@ -168,13 +168,13 @@ struct SidebarView: View {
             Button("Delete", role: .destructive) { delete(playlist) }
             Button("Cancel", role: .cancel) {}
         } message: { playlist in
-            Text(playlist.isSmart ? "Its rules are deleted. The songs stay in your library, and no files are deleted."
-                                  : "Its list of songs and their order are deleted. The songs stay in your library, and no files are deleted.")
+            playlist.isSmart ? Text("Its rules are deleted. The songs stay in your library, and no files are deleted.")
+                             : Text("Its list of songs and their order are deleted. The songs stay in your library, and no files are deleted.")
         }
         .modifier(RemoveSourceAlert(source: $removingSource))
     }
 
-    private var deleteTitle: String { deletingPlaylist.map { "Delete the playlist “\($0.name)”?" } ?? "" }
+    private var deleteTitle: String { deletingPlaylist.map { String(localized: "Delete the playlist “\($0.name.libraryDisplayName)”?") } ?? "" }
 
     private func delete(_ playlist: Playlist) {
         guard let id = playlist.id else { return }
@@ -193,7 +193,7 @@ struct SidebarView: View {
         }
     }
 
-    private func row(_ item: SidebarItem, _ title: String, _ symbol: String, count: Int?) -> some View {
+    private func row(_ item: SidebarItem, _ title: LocalizedStringKey, _ symbol: String, count: Int?) -> some View {
         Label {
             HStack {
                 Text(title)
@@ -226,7 +226,7 @@ struct SidebarView: View {
 
     private func newPlaylist(smart: Bool) {
         let rules: SmartRules? = smart ? SmartRules(rules: [SmartRule(field: .genre, op: .contains, value: "")]) : nil
-        if let p = model.library.createPlaylist(name: smart ? "New Smart Playlist" : "New Playlist", rules: rules), let id = p.id {
+        if let p = model.library.createPlaylist(name: smart ? String(localized: "New Smart Playlist") : String(localized: "New Playlist (name)", defaultValue: "New Playlist", comment: "Name given to a newly created playlist (a noun, not the command)"), rules: rules), let id = p.id {
             model.sidebar = .playlist(id)
             if smart { model.smartEditorPlaylist = p } else { newName = p.name; renaming = p }
         }
@@ -239,7 +239,7 @@ struct RemoveSourceAlert: ViewModifier {
     @Environment(AppModel.self) private var model
     @Binding var source: LibrarySource?
 
-    private var title: String { source.map { "Remove “\($0.displayName)” from the library?" } ?? "" }
+    private var title: String { source.map { String(localized: "Remove “\($0.displayName)” from the library?") } ?? "" }
 
     func body(content: Content) -> some View {
         content.alert(title, isPresented: Binding(get: { source != nil }, set: { if !$0 { source = nil } }),
@@ -247,7 +247,9 @@ struct RemoveSourceAlert: ViewModifier {
             Button("Remove", role: .destructive) { remove(source) }
             Button("Cancel", role: .cancel) {}
         } message: { source in
-            Text("Its songs leave the library, and with them their play counts, favorites, places in playlists, analyses and tag-edit history. Adding it again doesn’t bring these back. \(source.isNetwork ? "Nothing on the server is changed." : "The music files themselves aren’t deleted.")")
+            source.isNetwork
+                ? Text("Its songs leave the library, and with them their play counts, favorites, places in playlists, analyses and tag-edit history. Adding it again doesn’t bring these back. Nothing on the server is changed.")
+                : Text("Its songs leave the library, and with them their play counts, favorites, places in playlists, analyses and tag-edit history. Adding it again doesn’t bring these back. The music files themselves aren’t deleted.")
         }
     }
 
@@ -266,10 +268,11 @@ struct ScanStatusView: View {
         if let p = model.library.scanProgress {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(p.phase == .listing ? "Finding files" : "Reading tags")
+                    (p.phase == .listing ? Text("Finding files") : Text("Reading tags"))
                         .font(Typeface.ui(11, weight: .medium)).foregroundStyle(Palette.text2)
                     Spacer()
-                    Text(p.phase == .listing ? "\(p.processed) found" : p.total > 0 ? "\(p.processed)/\(p.total)" : "…")
+                    (p.phase == .listing ? Text("\(p.processed) found", comment: "Files found so far while scanning")
+                        : p.total > 0 ? Text(verbatim: "\(p.processed)/\(p.total)") : Text(verbatim: "…"))
                         .font(Typeface.mono(10)).foregroundStyle(Palette.text3)
                 }
                 if p.phase == .listing {

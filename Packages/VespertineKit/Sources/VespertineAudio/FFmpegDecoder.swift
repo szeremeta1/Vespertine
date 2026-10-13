@@ -185,7 +185,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     convenience init(url: URL) throws {
         let source = FFmpegDecoder(url: url)
         try source.open()
-        guard source.isDSD else { throw DTSError.unsupported("not DSD") }
+        guard source.isDSD else { throw DTSError.unsupported(String(localized: "not DSD", comment: "Why a file can't be played, in “This file can't be played (…).”")) }
         try self.init(source: source)
     }
 
@@ -195,7 +195,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         let layout = channels <= 2 ? nil : ChannelLayouts.layout(channels: channels)
         let f: AVAudioFormat? = if let layout { AVAudioFormat(standardFormatWithSampleRate: carrier, channelLayout: layout) }
                                 else { AVAudioFormat(standardFormatWithSampleRate: carrier, channels: AVAudioChannelCount(channels)) }
-        guard let f else { throw DTSError.unsupported("DoP format") }
+        guard let f else { throw DTSError.unsupported(String(localized: "DoP format", comment: "Why a file can't be played, in “This file can't be played (…).”")) }
         format = f
     }
 

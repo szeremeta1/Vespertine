@@ -88,14 +88,14 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut("r", modifiers: [.command, .option])
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
-            Button(model.analysis.isRunning ? "Stop Analyzing" : "Analyze Library") {
+            Button(model.analysis.isRunning ? String(localized: "Stop Analyzing") : String(localized: "Analyze Library")) {
                 if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
             }
             .keyboardShortcut("a", modifiers: [.command, .option])
         }
         CommandMenu("Controls") {
             // Space is handled by the main window so it never steals spaces from text fields.
-            Button(model.player.isPlaying ? "Pause" : "Play") { model.player.togglePlayPause() }
+            Button(model.player.isPlaying ? String(localized: "Pause") : String(localized: "Play", comment: "Verb: start playback")) { model.player.togglePlayPause() }
                 .keyboardShortcut("p", modifiers: [.command, .option])
             Button("Next") { model.player.next() }
                 .keyboardShortcut(.rightArrow, modifiers: [.command])
@@ -118,7 +118,7 @@ struct VespertineCommands: Commands {
             .disabled(model.player.current == nil)
             Divider()
             let current = model.player.current?.track
-            Button(model.library.isFavorite(current) ? "Remove Current Song from Favorites" : "Add Current Song to Favorites") {
+            Button(model.library.isFavorite(current) ? String(localized: "Remove Current Song from Favorites") : String(localized: "Add Current Song to Favorites")) {
                 if let current { model.toggleFavorite([current]) }
             }
             .keyboardShortcut("l", modifiers: [.command])
@@ -127,16 +127,16 @@ struct VespertineCommands: Commands {
             Toggle("Shuffle", isOn: Bindable(model.player).shuffle)
                 .keyboardShortcut("s", modifiers: [.command, .option])
             Picker("Repeat", selection: Bindable(model.player).repeatMode) {
-                Text("Off").tag(RepeatMode.off)
-                Text("All").tag(RepeatMode.all)
-                Text("One").tag(RepeatMode.one)
+                Text("Off", comment: "Repeat mode").tag(RepeatMode.off)
+                Text("All", comment: "Repeat mode").tag(RepeatMode.all)
+                Text("One", comment: "Repeat mode").tag(RepeatMode.one)
             }
             Divider()
             Toggle("Exclusive Mode", isOn: Binding(get: { model.settings.exclusiveMode },
                                                    set: { model.settings.exclusiveMode = $0; model.syncEngine() }))
         }
         CommandGroup(after: .sidebar) {
-            Button(model.showInspector ? "Hide Inspector" : "Show Inspector") { model.showInspector.toggle() }
+            Button(model.showInspector ? String(localized: "Hide Inspector") : String(localized: "Show Inspector")) { model.showInspector.toggle() }
                 .keyboardShortcut("i", modifiers: [.command, .option])
             Button("Mini Player") { openWindow(id: "mini") }
                 .keyboardShortcut("m", modifiers: [.command, .shift])

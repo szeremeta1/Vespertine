@@ -55,24 +55,24 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
 
         public var label: String {
             switch self {
-            case .title: "Title"
-            case .artist: "Artist"
-            case .album: "Album"
-            case .albumArtist: "Album Artist"
-            case .composer: "Composer"
-            case .genre: "Genre"
-            case .codec: "Format"
-            case .year: "Year"
-            case .sampleRate: "Sample Rate (kHz)"
-            case .bitDepth: "Bit Depth"
-            case .isDSD: "Is DSD"
-            case .isLossless: "Is Lossless"
-            case .playCount: "Plays"
-            case .rating: "Rating"
-            case .addedDaysAgo: "Added (days ago)"
-            case .verdict: "Analysis Verdict"
-            case .channels: "Channels"
-            case .isFavorite: "Is Favorite"
+            case .title: String(localized: "Title")
+            case .artist: String(localized: "Artist")
+            case .album: String(localized: "Album")
+            case .albumArtist: String(localized: "Album Artist")
+            case .composer: String(localized: "Composer")
+            case .genre: String(localized: "Genre")
+            case .codec: String(localized: "Format")
+            case .year: String(localized: "Year")
+            case .sampleRate: String(localized: "Sample Rate (kHz)", comment: "Smart playlist rule field.")
+            case .bitDepth: String(localized: "Bit Depth")
+            case .isDSD: String(localized: "Is DSD", comment: "Smart playlist rule field.")
+            case .isLossless: String(localized: "Is Lossless", comment: "Smart playlist rule field.")
+            case .playCount: String(localized: "Plays", comment: "Smart playlist rule field: how many times a song was played.")
+            case .rating: String(localized: "Rating")
+            case .addedDaysAgo: String(localized: "Added (days ago)", comment: "Smart playlist rule field.")
+            case .verdict: String(localized: "Analysis Verdict", comment: "Smart playlist rule field.")
+            case .channels: String(localized: "Channels")
+            case .isFavorite: String(localized: "Is Favorite", comment: "Smart playlist rule field.")
             }
         }
 
@@ -98,15 +98,15 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
         /// Hint for the value field.
         public var placeholder: String {
             switch self {
-            case .sampleRate: "kHz, e.g. 48 or 44.1"
-            case .bitDepth: "bits, e.g. 24"
-            case .year: "e.g. 1977"
-            case .channels: "e.g. 6 for 5.1"
-            case .addedDaysAgo: "days"
+            case .sampleRate: String(localized: "kHz, e.g. 48 or 44.1", comment: "Placeholder of a smart playlist rule's value field.")
+            case .bitDepth: String(localized: "bits, e.g. 24", comment: "Placeholder of a smart playlist rule's value field.")
+            case .year: String(localized: "e.g. 1977", comment: "Placeholder of a smart playlist rule's value field.")
+            case .channels: String(localized: "e.g. 6 for 5.1", comment: "Placeholder of a smart playlist rule's value field.")
+            case .addedDaysAgo: String(localized: "days", comment: "Placeholder of a smart playlist rule's value field.")
             case .rating: "0–5"
-            case .playCount: "plays"
-            case .codec: "e.g. FLAC"
-            default: "value"
+            case .playCount: String(localized: "plays", comment: "Placeholder of a smart playlist rule's value field: a number of plays.")
+            case .codec: String(localized: "e.g. FLAC", comment: "Placeholder of a smart playlist rule's value field.")
+            default: String(localized: "value", comment: "Placeholder of a smart playlist rule's value field.")
             }
         }
     }
@@ -116,14 +116,14 @@ public struct SmartRule: Codable, Sendable, Hashable, Identifiable {
 
         public var label: String {
             switch self {
-            case .contains: "contains"
-            case .notContains: "does not contain"
-            case .equals: "is"
-            case .notEquals: "is not"
+            case .contains: String(localized: "contains", comment: "Smart playlist rule condition, between a field and a value.")
+            case .notContains: String(localized: "does not contain", comment: "Smart playlist rule condition, between a field and a value.")
+            case .equals: String(localized: "is", comment: "Smart playlist rule condition, between a field and a value.")
+            case .notEquals: String(localized: "is not", comment: "Smart playlist rule condition, between a field and a value.")
             case .greaterOrEqual: "≥"
             case .lessOrEqual: "≤"
-            case .isTrue: "is true"
-            case .isFalse: "is false"
+            case .isTrue: String(localized: "is true", comment: "Smart playlist rule condition, after a yes/no field such as “Is Lossless”.")
+            case .isFalse: String(localized: "is false", comment: "Smart playlist rule condition, after a yes/no field such as “Is Lossless”.")
             }
         }
     }

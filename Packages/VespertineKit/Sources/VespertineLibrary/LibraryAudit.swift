@@ -15,6 +15,17 @@ public enum LibraryAudit {
             case duplicateFiles = "The same file listed twice"
             case missingNumbers = "Missing track or disc numbers"
             case fileNameTitles = "Titles that are file names"
+
+            /// The raw value, in the current language.
+            public var label: String {
+                switch self {
+                case .splitAlbum: String(localized: "One album split into several")
+                case .mergedEditions: String(localized: "Several editions merged into one album")
+                case .duplicateFiles: String(localized: "The same file listed twice")
+                case .missingNumbers: String(localized: "Missing track or disc numbers")
+                case .fileNameTitles: String(localized: "Titles that are file names")
+                }
+            }
         }
         public var kind: Kind
         /// "Artist — Album" for each album involved.
@@ -38,7 +49,7 @@ public enum LibraryAudit {
             let titles = Set(keys.compactMap { albums[$0]?.first.map { comparableTitle($0.album, keepEditions: true) } })
             guard titles.count < keys.count else { continue }   // e.g. Weezer's Black and Teal albums in one folder
             findings.append(Finding(kind: .splitAlbum, albums: keys.sorted().compactMap { albums[$0]?.first.map(name) },
-                                    detail: "one folder, \(keys.count) albums", paths: [folder]))
+                                    detail: String(localized: "one folder, \(keys.count) albums"), paths: [folder]))
         }
         var byTitle: [String: Set<String>] = [:]
         for (key, ts) in albums {
@@ -48,7 +59,7 @@ public enum LibraryAudit {
         for (_, keys) in byTitle where keys.count > 1 {
             let named = keys.sorted().compactMap { albums[$0]?.first.map(name) }
             guard !findings.contains(where: { $0.kind == .splitAlbum && Set($0.albums) == Set(named) }) else { continue }
-            findings.append(Finding(kind: .splitAlbum, albums: named, detail: "same album under different credits or disc titles",
+            findings.append(Finding(kind: .splitAlbum, albums: named, detail: String(localized: "same album under different credits or disc titles"),
                                     paths: keys.sorted().compactMap { albums[$0]?.first.map { albumFolder($0.filePath) } }))
         }
 
@@ -62,7 +73,7 @@ public enum LibraryAudit {
             let folders = Set(ts.map { albumFolder($0.filePath) })
             if !clashes.isEmpty && folders.count > 1 {
                 findings.append(Finding(kind: .mergedEditions, albums: [name(first)],
-                                        detail: "\(folders.count) folders; \(clashes.count) track numbers used by different songs",
+                                        detail: String(localized: "\(folders.count) folders; \(clashes.count) track numbers used by different songs"),
                                         paths: folders.sorted()))
             }
             // Copies: the same file (size, length, title) twice. The app shows one; worth tidying anyway. An SACD image's
@@ -72,7 +83,8 @@ public enum LibraryAudit {
             if !copies.isEmpty {
                 let where_ = Set(copies.flatMap { $0.map { albumFolder($0.filePath) } }).sorted()
                 findings.append(Finding(kind: .duplicateFiles, albums: [name(first)],
-                                        detail: copies.count == 1 ? copies[0][0].title : "\(copies.count) songs", paths: where_))
+                                        detail: copies.count == 1 ? copies[0][0].title : String(localized: "\(copies.count) songs"),
+                                        paths: where_))
             }
             // Numbers: an album (more than one track) with tracks lacking a number, or lacking a disc on a multi-disc album.
             if ts.count > 1 {
@@ -80,15 +92,17 @@ public enum LibraryAudit {
                 let usesDiscs = Set(ts.compactMap(\.discNumber)).count > 1
                 let noDisc = usesDiscs ? ts.filter { $0.discNumber == nil }.count : 0
                 if noNumber > 0 || noDisc > 0 {
-                    findings.append(Finding(kind: .missingNumbers, albums: [name(first)],
-                                            detail: [noNumber > 0 ? "\(noNumber) without a track number" : nil,
-                                                     noDisc > 0 ? "\(noDisc) without a disc number" : nil].compactMap { $0 }.joined(separator: ", ") + " (of \(ts.count))",
-                                            paths: folders.sorted()))
+                    let total = ts.count
+                    let detail = noNumber > 0 && noDisc > 0
+                        ? String(localized: "\(noNumber) without a track number, \(noDisc) without a disc number (of \(total))")
+                        : noNumber > 0 ? String(localized: "\(noNumber) without a track number (of \(total))")
+                                       : String(localized: "\(noDisc) without a disc number (of \(total))")
+                    findings.append(Finding(kind: .missingNumbers, albums: [name(first)], detail: detail, paths: folders.sorted()))
                 }
             }
             let named = ts.filter { $0.title.range(of: #"^.+ - .+ - \d{1,3} - "#, options: .regularExpression) != nil }
             if !named.isEmpty {
-                findings.append(Finding(kind: .fileNameTitles, albums: [name(first)], detail: "\(named.count) of \(ts.count)",
+                findings.append(Finding(kind: .fileNameTitles, albums: [name(first)], detail: String(localized: "\(named.count) of \(ts.count)", comment: "How many of an album's songs have file names as titles."),
                                         paths: [albumFolder(named[0].filePath)]))
             }
         }

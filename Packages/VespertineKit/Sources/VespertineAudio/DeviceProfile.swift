@@ -32,9 +32,12 @@ public struct DeviceProfile: Sendable, Hashable {
 
     public static func detect(_ device: OutputDevice) -> DeviceProfile {
         var profile = classify(device)
-        profile.connection = profile.kind == .airPodsMaxUSB ? "USB-C (lossless)" : device.transport.label
+        profile.connection = profile.kind == .airPodsMaxUSB ? String(localized: "USB-C (lossless)") : device.transport.label
         return profile
     }
+
+    /// The tag of an aggregate or multi-output device (also how the signal path tells it from a virtual one).
+    static var aggregateTag: String { String(localized: "AGGREGATE", comment: "Short uppercase tag for an aggregate or multi-output device.") }
 
     private static func classify(_ device: OutputDevice) -> DeviceProfile {
         let name = device.name.lowercased()
@@ -47,35 +50,36 @@ public struct DeviceProfile: Sendable, Hashable {
         switch device.transport {
         case .usb where isAirPodsMax, .bluetooth where usbAudioActive, .bluetoothLE where usbAudioActive:
             return DeviceProfile(
-                kind: .airPodsMaxUSB, tag: "USB-C · LOSSLESS",
-                note: "AirPods Max take lossless 24-bit / 48 kHz over USB-C. Other rates are converted to 48 kHz; 48 kHz material plays bit-perfect. (macOS still lists them as Bluetooth; that's only the control link.)",
+                kind: .airPodsMaxUSB, tag: String(localized: "USB-C · LOSSLESS", comment: "Short uppercase tag shown next to the device."),
+                note: String(localized: "AirPods Max take lossless 24-bit / 48 kHz over USB-C. Other rates are converted to 48 kHz; 48 kHz material plays bit-perfect. (macOS still lists them as Bluetooth; that's only the control link.)"),
                 canBeBitPerfect: true, symbol: "headphones")
         case .bluetooth, .bluetoothLE:
             if isAirPodsMax {
                 return DeviceProfile(
-                    kind: .airPodsMaxBluetooth, tag: "BLUETOOTH · AAC",
-                    note: "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz.",
+                    kind: .airPodsMaxBluetooth, tag: String(localized: "BLUETOOTH · AAC", comment: "Short uppercase tag shown next to the device."),
+                    note: String(localized: "Over Bluetooth, AirPods Max receive AAC, which is lossy. Connect the USB-C cable for lossless 24-bit / 48 kHz."),
                     canBeBitPerfect: false, symbol: "headphones")
             }
             return DeviceProfile(
-                kind: .bluetooth, tag: "BLUETOOTH",
-                note: "Bluetooth re-encodes audio with a lossy codec, so the output can't be bit-perfect.",
+                kind: .bluetooth, tag: String(localized: "BLUETOOTH", comment: "Short uppercase tag shown next to the device."),
+                note: String(localized: "Bluetooth re-encodes audio with a lossy codec, so the output can't be bit-perfect."),
                 canBeBitPerfect: false, symbol: name.contains("airpods") || name.contains("headphone") ? "headphones" : "hifispeaker")
         case .airPlay:
-            return DeviceProfile(kind: .airPlay, tag: "AIRPLAY", note: "AirPlay streams at 44.1 kHz; the receiver controls the final format.",
+            return DeviceProfile(kind: .airPlay, tag: String(localized: "AIRPLAY", comment: "Short uppercase tag shown next to the device."),
+                                 note: String(localized: "AirPlay streams at 44.1 kHz; the receiver controls the final format."),
                                  canBeBitPerfect: false, symbol: "airplay.audio")
         case .builtIn:
             let speakers = name.contains("speaker")
-            return DeviceProfile(kind: speakers ? .speakers : .builtIn, tag: "BUILT-IN",
-                                 note: speakers ? "macOS tunes the Mac's own speakers with processing of its own, so music can't reach them bit-perfect." : nil,
+            return DeviceProfile(kind: speakers ? .speakers : .builtIn, tag: String(localized: "BUILT-IN", comment: "Short uppercase tag shown next to the device."),
+                                 note: speakers ? String(localized: "macOS tunes the Mac's own speakers with processing of its own, so music can't reach them bit-perfect.") : nil,
                                  canBeBitPerfect: !speakers, symbol: speakers ? "laptopcomputer" : "headphones")
         case .aggregate, .virtual:
             let aggregate = device.transport == .aggregate
             return DeviceProfile(
-                kind: .virtualDevice, tag: aggregate ? "AGGREGATE" : "VIRTUAL",
+                kind: .virtualDevice, tag: aggregate ? aggregateTag : String(localized: "VIRTUAL", comment: "Short uppercase tag for a virtual audio device."),
                 note: aggregate
-                    ? "An aggregate or multi-output device hands the audio on to the devices inside it, and can resample it to keep them in step, so what reaches them can't be promised bit-perfect."
-                    : "A virtual device (an equalizer, a recorder, a router) hands the audio on to other software, which can change it, so what reaches your speakers can't be promised bit-perfect.",
+                    ? String(localized: "An aggregate or multi-output device hands the audio on to the devices inside it, and can resample it to keep them in step, so what reaches them can't be promised bit-perfect.")
+                    : String(localized: "A virtual device (an equalizer, a recorder, a router) hands the audio on to other software, which can change it, so what reaches your speakers can't be promised bit-perfect."),
                 canBeBitPerfect: false, symbol: "speaker.wave.2")
         case .usb, .thunderbolt, .fireWire, .pci:
             return DeviceProfile(kind: .usbDAC, tag: device.transport.label.uppercased(), note: nil, canBeBitPerfect: true,

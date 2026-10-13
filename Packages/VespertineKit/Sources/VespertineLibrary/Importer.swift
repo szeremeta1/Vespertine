@@ -21,9 +21,13 @@ public enum ImportError: LocalizedError, Equatable {
         switch self {
         case .notEnoughSpace(let space):
             let needed = ByteCountFormatter.string(fromByteCount: space.bytesToCopy, countStyle: .file)
-            let free = space.freeBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "less"
             let spare = ByteCountFormatter.string(fromByteCount: ImportSpace.reserve, countStyle: .file)
-            return "Nothing was imported: the copies need \(needed) and the Mac has \(free) free (Vespertine keeps \(spare) spare). Free up some space, or use Add Folder to play the music where it is."
+            guard let free = space.freeBytes.map({ ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) }) else {
+                return String(localized: "Nothing was imported: the copies need \(needed) and the Mac has less free (Vespertine keeps \(spare) spare). Free up some space, or use Add Folder to play the music where it is.",
+                              comment: "Sizes such as “2.1 GB”. “Add Folder” is the command that adds a folder to the library without copying it.")
+            }
+            return String(localized: "Nothing was imported: the copies need \(needed) and the Mac has \(free) free (Vespertine keeps \(spare) spare). Free up some space, or use Add Folder to play the music where it is.",
+                          comment: "Sizes such as “2.1 GB”. “Add Folder” is the command that adds a folder to the library without copying it.")
         }
     }
 }

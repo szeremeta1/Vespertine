@@ -79,7 +79,7 @@ struct ConnectServerSheet: View {
                             if NetworkShare(string: address)?.user == nil {
                                 TextField("Name", text: $user)
                             }
-                            SecureField("Password", text: $password, prompt: Text(savedPassword ? "Saved in Keychain" : "Required"))
+                            SecureField("Password", text: $password, prompt: savedPassword ? Text("Saved in Keychain") : Text("Required"))
                             Toggle("Remember this password in my keychain", isOn: $remember)
                             if share?.kind == .webdav, share?.secure == false {
                                 Label("This address uses http, so your name, password and music cross the network unencrypted. Use https if the server offers it.",
@@ -90,11 +90,11 @@ struct ConnectServerSheet: View {
                     }
                 }
                 Section {
-                    TextField("Name in library", text: $name, prompt: Text(share?.defaultName ?? "Optional"))
+                    TextField("Name in library", text: $name, prompt: share.map { Text($0.defaultName) } ?? Text("Optional"))
                     Toggle("Read-only (recommended)", isOn: $readOnly)
-                    Text(readOnly
-                         ? "Vespertine never changes files on the share. Tag edits stay in the library."
-                         : "Tag edits are written to the files on the server.")
+                    (readOnly
+                         ? Text("Vespertine never changes files on the share. Tag edits stay in the library.")
+                         : Text("Tag edits are written to the files on the server."))
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
@@ -182,7 +182,7 @@ struct NetworkSettings: View {
                 Toggle("Keep local copies of music played from shares", isOn: $s.networkCache)
                 Picker("Copy ahead", selection: $s.networkPrefetch) {
                     Text("Only the playing track").tag(0)
-                    ForEach([1, 2, 3, 5, 10], id: \.self) { n in Text("\(n) upcoming track\(n == 1 ? "" : "s")").tag(n) }
+                    ForEach([1, 2, 3, 5, 10], id: \.self) { n in Text("\(n) upcoming tracks").tag(n) }
                 }
                 .disabled(!s.networkCache)
                 Picker("Cache size", selection: $s.networkCacheLimitGB) {
@@ -216,9 +216,11 @@ struct NetworkSettings: View {
     private func usageText(_ u: NetworkCache.Usage) -> String {
         let f = ByteCountFormatter()
         f.countStyle = .file
-        var parts = ["\(f.string(fromByteCount: u.cachedBytes)) cached (\(u.cachedFiles) file\(u.cachedFiles == 1 ? "" : "s"))"]
-        if u.offlineFiles > 0 { parts.append("\(f.string(fromByteCount: u.offlineBytes)) offline") }
-        if u.downloading + u.queued > 0 { parts.append("copying \(u.downloading + u.queued)") }
+        var parts = [String(localized: "\(f.string(fromByteCount: u.cachedBytes)) cached (\(u.cachedFiles) files)")]
+        if u.offlineFiles > 0 { parts.append(String(localized: "\(f.string(fromByteCount: u.offlineBytes)) offline")) }
+        if u.downloading + u.queued > 0 {
+            parts.append(String(localized: "copying \(u.downloading + u.queued)", comment: "Number of files being copied to the cache"))
+        }
         return parts.joined(separator: " · ")
     }
 }
@@ -260,7 +262,7 @@ struct ShareStatusText: View {
         case .connected:
             Text("Connected").font(.caption).foregroundStyle(.green.opacity(0.8))
         case .offline(let reason):
-            Text(reason.isEmpty ? "Offline" : "Offline: \(reason)").font(.caption).foregroundStyle(Palette.copper)
+            (reason.isEmpty ? Text("Offline") : Text("Offline: \(reason)")).font(.caption).foregroundStyle(Palette.copper)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

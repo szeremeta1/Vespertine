@@ -24,7 +24,7 @@ final class LibraryStartup {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
-        panel.message = "Choose a folder for a Vespertine library. Your existing library will be preserved."
+        panel.message = String(localized: "Choose a folder for a Vespertine library. Your existing library will be preserved.")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         UserDefaults.standard.set(url.path, forKey: "LibraryDataDirectory")
         open(at: url)
@@ -36,7 +36,7 @@ struct LibraryRecoveryView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Couldn’t open the library").font(.title)
-            Text(startup.error ?? "An unexpected library error occurred.").textSelection(.enabled)
+            (startup.error.map { Text($0) } ?? Text("An unexpected library error occurred.")).textSelection(.enabled)
             Text("Your existing files have been preserved. Retry after reconnecting the drive or choose another library folder.")
             HStack {
                 Button("Retry") { startup.open() }

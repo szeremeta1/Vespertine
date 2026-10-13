@@ -19,31 +19,31 @@ public enum TagField: String, CaseIterable, Sendable, Hashable {
 
     public var label: String {
         switch self {
-        case .title: "Title"
-        case .artist: "Artist"
-        case .album: "Album"
-        case .albumArtist: "Album Artist"
-        case .composer: "Composer"
-        case .genre: "Genre"
-        case .releaseDate: "Year / Date"
-        case .trackNumber: "Track"
-        case .trackTotal: "Track Total"
-        case .discNumber: "Disc"
-        case .discTotal: "Disc Total"
-        case .compilation: "Compilation"
-        case .grouping: "Grouping"
-        case .comment: "Comment"
-        case .lyrics: "Lyrics"
+        case .title: String(localized: "Title")
+        case .artist: String(localized: "Artist")
+        case .album: String(localized: "Album")
+        case .albumArtist: String(localized: "Album Artist")
+        case .composer: String(localized: "Composer")
+        case .genre: String(localized: "Genre")
+        case .releaseDate: String(localized: "Year / Date", comment: "Tag field.")
+        case .trackNumber: String(localized: "Track", comment: "Tag field: the track number.")
+        case .trackTotal: String(localized: "Track Total", comment: "Tag field: the number of tracks on the disc.")
+        case .discNumber: String(localized: "Disc", comment: "Tag field: the disc number.")
+        case .discTotal: String(localized: "Disc Total", comment: "Tag field: the number of discs.")
+        case .compilation: String(localized: "Compilation", comment: "Tag field.")
+        case .grouping: String(localized: "Grouping", comment: "Tag field.")
+        case .comment: String(localized: "Comment", comment: "Tag field.")
+        case .lyrics: String(localized: "Lyrics", comment: "Tag field.")
         case .bpm: "BPM"
-        case .rating: "Rating"
+        case .rating: String(localized: "Rating")
         case .isrc: "ISRC"
-        case .label: "Label"
-        case .titleSort: "Sort Title"
-        case .artistSort: "Sort Artist"
-        case .albumSort: "Sort Album"
-        case .albumArtistSort: "Sort Album Artist"
-        case .musicBrainzReleaseID: "MusicBrainz Release"
-        case .musicBrainzRecordingID: "MusicBrainz Recording"
+        case .label: String(localized: "Label", comment: "Tag field: the record label.")
+        case .titleSort: String(localized: "Sort Title", comment: "Tag field.")
+        case .artistSort: String(localized: "Sort Artist", comment: "Tag field.")
+        case .albumSort: String(localized: "Sort Album", comment: "Tag field.")
+        case .albumArtistSort: String(localized: "Sort Album Artist", comment: "Tag field.")
+        case .musicBrainzReleaseID: String(localized: "MusicBrainz Release", comment: "Tag field: the MusicBrainz release ID.")
+        case .musicBrainzRecordingID: String(localized: "MusicBrainz Recording", comment: "Tag field: the MusicBrainz recording ID.")
         }
     }
 
@@ -657,10 +657,10 @@ private enum TagWriteError: LocalizedError {
     case invalidNumber(String), fileChanged, valuesNotKept, noRoomForBackup
     var errorDescription: String? {
         switch self {
-        case .invalidNumber(let field): "\(field) must be a nonnegative whole number or blank."
-        case .noRoomForBackup: "There isn't enough free space for a backup of this file, so its tags weren't changed. Free some space and try again."
-        case .valuesNotKept: "The tags couldn't be saved with every value of fields that have several (artists, genres), so the file was left as it was."
-        case .fileChanged: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available."
+        case .invalidNumber(let field): String(localized: "\(field) must be a nonnegative whole number or blank.", comment: "The name of a tag field, e.g. “Track”.")
+        case .noRoomForBackup: String(localized: "There isn't enough free space for a backup of this file, so its tags weren't changed. Free some space and try again.")
+        case .valuesNotKept: String(localized: "The tags couldn't be saved with every value of fields that have several (artists, genres), so the file was left as it was.")
+        case .fileChanged: String(localized: "This file changed after the last tag edit. Undo was stopped to preserve the newer file; its earlier backup is still available.")
         }
     }
 }

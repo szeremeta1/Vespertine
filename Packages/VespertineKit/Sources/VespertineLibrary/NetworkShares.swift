@@ -146,25 +146,29 @@ public enum NetworkShareError: LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .invalidAddress:
-            "That doesn’t look like a server address. Try smb://server/share."
+            String(localized: "That doesn’t look like a server address. Try smb://server/share.")
         case .unreachable(let host):
-            "Can’t reach \(host). Check that the server is on, and if you reach it through Tailscale or another VPN, that it’s connected."
+            String(localized: "Can’t reach \(host). Check that the server is on, and if you reach it through Tailscale or another VPN, that it’s connected.",
+                   comment: "A server's name or address.")
         case .authenticationFailed:
-            "The server didn’t accept that name and password."
+            String(localized: "The server didn’t accept that name and password.")
         case .notPermitted:
-            "macOS didn’t allow Vespertine to mount the share (operation not permitted). Try Reconnect; if it keeps happening, check System Settings → Privacy & Security → Files & Folders for Vespertine."
+            String(localized: "macOS didn’t allow Vespertine to mount the share (operation not permitted). Try Reconnect; if it keeps happening, check System Settings → Privacy & Security → Files & Folders for Vespertine.",
+                   comment: "Reconnect is a command on the share; System Settings → Privacy & Security → Files & Folders is the path in macOS's System Settings: use the names macOS shows in this language.")
         case .passwordMissing(let account):
-            "No saved password for \(account) was found. Right-click the share and choose Enter Password…; Vespertine saves it in your keychain."
+            String(localized: "No saved password for \(account) was found. Right-click the share and choose Enter Password…; Vespertine saves it in your keychain.",
+                   comment: "An account name on the server. “Enter Password…” is a command in the share's context menu.")
         case .shareNotFound(let share):
-            "The server has no share named “\(share)”."
+            String(localized: "The server has no share named “\(share)”.")
         case .folderNotFound(let folder):
-            folder.isEmpty ? "Connected, but the share’s contents can’t be read." : "Connected, but there’s no folder “\(folder)” in that share."
+            folder.isEmpty ? String(localized: "Connected, but the share’s contents can’t be read.")
+                           : String(localized: "Connected, but there’s no folder “\(folder)” in that share.")
         case .mountNotResponding:
-            "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect."
+            String(localized: "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect.", comment: "Reconnect is a command on the share.")
         case .cancelled:
-            "Connecting was cancelled."
+            String(localized: "Connecting was cancelled.")
         case .failed(let code):
-            "Couldn’t connect (\(Self.describe(code)))."
+            String(localized: "Couldn’t connect (\(Self.describe(code))).", comment: "The system's description of the error, e.g. “Connection refused”.")
         }
     }
 
@@ -178,7 +182,7 @@ public enum NetworkShareError: LocalizedError, Equatable {
 
     static func describe(_ code: Int32) -> String {
         let text = String(cString: strerror(code))
-        return text.hasPrefix("Unknown") ? "error \(code)" : text
+        return text.hasPrefix("Unknown") ? String(localized: "error \(Int(code))", comment: "An error number, when the system has no description for it.") : text
     }
 
     static func from(code: Int32, share: NetworkShare) -> NetworkShareError {

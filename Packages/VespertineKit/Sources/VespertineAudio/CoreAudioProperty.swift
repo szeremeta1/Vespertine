@@ -7,7 +7,10 @@ import CoreAudio
 import Foundation
 
 public struct CoreAudioError: LocalizedError, CustomStringConvertible, Sendable {
-    public var errorDescription: String? { description }
+    public var errorDescription: String? {
+        String(localized: "\(operation) failed: \(Int(status))\(fourCCSuffix)",
+               comment: "What failed (e.g. “find an output device”), then the Core Audio error code and its four-character form.")
+    }
     public let status: OSStatus
     public let operation: String
 
@@ -16,11 +19,12 @@ public struct CoreAudioError: LocalizedError, CustomStringConvertible, Sendable 
         self.operation = operation
     }
 
-    public var description: String {
+    public var description: String { "\(operation) failed: \(status)\(fourCCSuffix)" }
+
+    private var fourCCSuffix: String {
         let code = UInt32(bitPattern: status)
         let bytes = [24, 16, 8, 0].map { UInt8((code >> $0) & 0xFF) }
-        let fourCC = bytes.allSatisfy { $0 >= 32 && $0 < 127 } ? " '\(String(bytes: bytes, encoding: .ascii) ?? "")'" : ""
-        return "\(operation) failed: \(status)\(fourCC)"
+        return bytes.allSatisfy { $0 >= 32 && $0 < 127 } ? " '\(String(bytes: bytes, encoding: .ascii) ?? "")'" : ""
     }
 }
 

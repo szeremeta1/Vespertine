@@ -25,9 +25,9 @@ public enum SpatialMode: String, Codable, Sendable, CaseIterable, Identifiable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .off: "Off"
-        case .fixed: "Fixed"
-        case .headTracked: "Head Tracked"
+        case .off: String(localized: "Off", comment: "Spatial Audio mode: off (plain downmix).")
+        case .fixed: String(localized: "Fixed", comment: "Spatial Audio mode: virtual speakers fixed in front of you.")
+        case .headTracked: String(localized: "Head Tracked", comment: "Spatial Audio mode.")
         }
     }
 }
@@ -207,7 +207,7 @@ public enum ChannelLayouts {
         if set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround]
             || set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_RearSurroundLeft, kAudioChannelLabel_RearSurroundRight]
             || set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect] {
-            return "Quad"
+            return String(localized: "Quad", comment: "Four-channel speaker layout.")
         }
         let lfe = labels.filter(lfeLabels.contains).count, height = labels.filter(heightLabels.contains).count
         let base = "\(channels - lfe - height).\(lfe)"
@@ -217,15 +217,15 @@ public enum ChannelLayouts {
     /// "5.1", "7.1", "Stereo", …
     public static func name(channels: Int) -> String {
         switch channels {
-        case 1: "Mono"
-        case 2: "Stereo"
+        case 1: String(localized: "Mono")
+        case 2: String(localized: "Stereo")
         case 3: "3.0"
-        case 4: "Quad"
+        case 4: String(localized: "Quad", comment: "Four-channel speaker layout.")
         case 5: "5.0"
         case 6: "5.1"
         case 7: "6.1"
         case 8: "7.1"
-        default: "\(channels) ch"
+        default: String(localized: "\(channels) ch", comment: "A channel count, abbreviated (e.g. “12 ch”).")
         }
     }
 }
@@ -233,7 +233,10 @@ public enum ChannelLayouts {
 public enum SpatialError: LocalizedError {
     case unavailable(OSStatus, String)
     public var errorDescription: String? {
-        switch self { case .unavailable(let s, let what): "Spatial Audio isn't available (\(what): \(s))." }
+        switch self {
+        case .unavailable(let s, let what):
+            String(localized: "Spatial Audio isn't available (\(what): \(Int(s))).", comment: "A technical step of Apple's spatial mixer, then its error code.")
+        }
     }
 }
 
