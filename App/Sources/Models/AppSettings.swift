@@ -50,6 +50,8 @@ final class AppSettings {
     var exclusiveMode: Bool { didSet { defaults.set(exclusiveMode, forKey: "exclusiveMode") } }
     /// Integer mode (exclusive access only): PCM needing no processing goes to the DAC as 32-bit integers.
     var integerMode: Bool { didSet { defaults.set(integerMode, forKey: "integerMode") } }
+    /// "Match 16-bit sources" (exclusive access only): 16-bit files go to a DAC's own 16-bit mode where it has one.
+    var matchSixteenBit: Bool { didSet { defaults.set(matchSixteenBit, forKey: "matchSixteenBit") } }
     /// Dolby Atmos: rendered by macOS (objects), or its channel bed played through Vespertine.
     var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
     /// Songs with a stereo and a multichannel version: which to play.
@@ -104,7 +106,7 @@ final class AppSettings {
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
         self.defaults = defaults
         defaults.register(defaults: [
-            "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
+            "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
@@ -114,6 +116,7 @@ final class AppSettings {
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
         versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
         integerMode = defaults.bool(forKey: "integerMode")
+        matchSixteenBit = defaults.bool(forKey: "matchSixteenBit")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
         selectedDeviceUID = defaults.string(forKey: "selectedDeviceUID")
         selectedDevice = defaults.data(forKey: "selectedDevice").flatMap { try? JSONDecoder().decode(OutputIdentity.self, from: $0) }
@@ -201,6 +204,7 @@ final class AppSettings {
         s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem
         s.integerMode = integerMode
+        s.matchSixteenBit = matchSixteenBit
         s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
         return s
     }

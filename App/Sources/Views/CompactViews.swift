@@ -174,6 +174,10 @@ struct PlaybackSettings: View {
                     .disabled(!s.exclusiveMode)
                 Text("With exclusive access, on DACs that offer it (such as the FiiO K11): music that needs no processing goes to the DAC as 32-bit integers, with no floating-point step, so 32-bit recordings arrive exact. Anything with volume, ReplayGain, resampling or Spatial Audio still uses the floating-point path.")
                     .font(.caption).foregroundStyle(.secondary)
+                Toggle("Match 16-bit sources", isOn: $s.matchSixteenBit)
+                    .disabled(!s.exclusiveMode)
+                Text("With exclusive access: a 16-bit file goes to a DAC that has a 16-bit mode at its sample rate as 16-bit, instead of padded with zeros to 24 or 32 bits. The samples are the same either way; some DACs show or handle 16-bit input differently. Not for the Mac's own outputs, DSD, or anything with volume, EQ, ReplayGain, resampling or Spatial Audio. The signal path says when a DAC has no 16-bit mode at a rate.")
+                    .font(.caption).foregroundStyle(.secondary)
                 Picker("Release device after pausing for", selection: $s.releaseAfterPause) {
                     Text("10 seconds").tag(10.0)
                     Text("30 seconds").tag(30.0)
@@ -227,6 +231,7 @@ struct PlaybackSettings: View {
         .onChange(of: s.outputFallback) { model.syncEngine() }
         .onChange(of: s.atmosBySystem) { model.syncEngine() }
         .onChange(of: s.integerMode) { model.syncEngine() }
+        .onChange(of: s.matchSixteenBit) { model.syncEngine() }
         .onChange(of: s.releaseAfterPause) { model.syncEngine() }
         .onChange(of: s.allowDigitalVolume) { model.syncEngine() }
         .onChange(of: s.replayGain) { model.player.refreshReplayGain() }
