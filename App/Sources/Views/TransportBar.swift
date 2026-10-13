@@ -158,11 +158,11 @@ struct DeviceChip: View {
         let path = model.player.signalPath
         Button { showDevices.toggle() } label: {
             HStack(spacing: 9) {
-                Image(systemName: device?.profile.symbol ?? "hifispeaker")
+                Image(systemName: device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash"))
                     .font(.system(size: 14))
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(device?.name ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
                     Text(chipDetail(device, path)).font(Typeface.mono(9.5)).foregroundStyle(path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
                         .lineLimit(1)
                 }
@@ -182,7 +182,8 @@ struct DeviceChip: View {
             .fixedSize()
         }
         .buttonStyle(.plain)
-        .help("Output device")
+        .help(standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
+              ?? String(localized: "Output device"))
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
         .accessibilityLabel(device.map { String(localized: "Output device, \($0.name)") } ?? String(localized: "Output device, none"))
         .accessibilityValue(path.map {
@@ -193,14 +194,19 @@ struct DeviceChip: View {
         }
     }
 
+    /// The chosen output that isn't connected, while another one plays (or would play) in its place.
+    private var standIn: String? { model.activeDevice == nil ? nil : model.missingChosenOutput }
+
     private func chipDetail(_ device: OutputDevice?, _ path: SignalPath?) -> String {
         if let path {
             return path.applied.exclusive
                 ? String(localized: "\(path.deviceFormatShort) · EXCL", comment: "Device chip: format, then EXCL = exclusive access (short, uppercase)")
                 : String(localized: "\(path.deviceFormatShort) · SHARED", comment: "Device chip: format, then SHARED = shared with other apps (short, uppercase)")
         }
-        guard let device else { return "—" }
-        return String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · IDLE", comment: "Device chip: the device's sample rate, then IDLE (short, uppercase)")
+        guard let device else { return model.missingChosenOutput == nil ? "—" : String(localized: "NOT CONNECTED", comment: "Device chip: the chosen output isn't connected (short, uppercase)") }
+        return standIn == nil
+            ? String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · IDLE", comment: "Device chip: the device's sample rate, then IDLE (short, uppercase)")
+            : String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · STANDING IN", comment: "Device chip: the device's sample rate, then STANDING IN (short, uppercase): it plays in place of the chosen output, which isn't connected")
     }
 }
 
@@ -211,6 +217,13 @@ struct DevicePicker: View {
         VStack(alignment: .leading, spacing: 4) {
             SectionLabel(text: String(localized: "Output", comment: "Header of the output device list")).padding(.horizontal, 8).padding(.bottom, 4)
             deviceRow(nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"), symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
+            if let missing = model.missingChosenOutput, let uid = model.settings.selectedDeviceUID {
+                // Still the chosen one: playback goes back to it when it's connected again.
+                deviceRow(uid, name: missing,
+                          detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
+                              ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
+                          symbol: "cable.connector.slash", selected: true)
+            }
             ForEach(model.devices.devices) { d in
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,
                           selected: model.settings.selectedDeviceUID == d.uid)

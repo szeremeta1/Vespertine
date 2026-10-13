@@ -30,6 +30,8 @@ public struct EngineSnapshot: Sendable {
     public var isBuffering = false
     /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
     public var waitingForDevice: String?
+    /// The chosen output (by name) isn't connected and `outputDevice` plays in its place (see `OutputFallback`).
+    public var standingInFor: String?
     /// The track being decoded is read live from a network share (not yet from its local copy).
     public var readingFromShare = false
     /// Set while macOS itself renders the track (Dolby Atmos); there's no Vespertine signal path then.
@@ -54,6 +56,11 @@ public enum EngineEvent: Sendable {
 public struct EngineSettings: Sendable, Equatable {
     public var exclusive = true
     public var deviceUID: String?                 // nil = follow system default output
+    /// The chosen output's name, for messages about it before it has been seen (unplugged since the last launch).
+    public var deviceName: String?
+    /// What plays while the chosen output isn't connected. Playback still waits for one that dropped out mid-song or
+    /// moments ago (AirPods reconnecting), whatever this says.
+    public var outputFallback: OutputFallback = .waitForChosen
     public var dopDeviceUIDs: Set<String> = []
     public var ratePolicies: [String: RatePolicy] = [:]
     public var releaseExclusiveAfterPause: TimeInterval = 30
@@ -72,6 +79,10 @@ public struct EngineSettings: Sendable, Equatable {
     /// Integer mode for devices that offer it (exclusive access only): PCM that needs no processing goes
     /// to the DAC as 32-bit integers with no float step, so 32-bit sources arrive exact.
     public var integerMode = false
+    /// "Match 16-bit sources": a 16-bit file goes to a DAC with a real 16-bit mode at its rate as 16-bit, not
+    /// zero-padded to 24 or 32 (same samples either way). Exclusive access, not the built-in output, nothing changing
+    /// the samples; see `FormatPlanner.matchSixteenBit`.
+    public var matchSixteenBit = false
     /// Parametric equalizer per device UID. A flat preset counts as none.
     public var equalizers: [String: EQPreset] = [:]
 
@@ -273,13 +284,22 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Dolby Atmos being rendered by macOS (instead of `session`).
     private var atmos: SystemRendererSession?
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
-    private var awaitingDevice: (uid: String, until: Date, checkedAt: Date)?
+    /// `thenStandIn`: when the time is up, play on another output (`OutputFallback`) rather than give up.
+    private var awaitingDevice: (uid: String, until: Date, checkedAt: Date, thenStandIn: Bool)?
+    /// The chosen output (UID) that `sessionDevice` is playing in place of, while it isn't connected.
+    private var standingIn: String?
+    /// The outputs connected (UIDs), and when each one that was connected went away.
+    private var connectedUIDs: Set<String>?
+    private var lostAt: [String: Date] = [:]
     /// Reopenings that followed another app's change to the device's format, in the last half minute.
     private var followedFormatChanges: [Date] = []
     /// The device's own rate, kept for a while after something else kept changing it (no tug of war over it).
     private var heldRate: (uid: String, rate: Double, until: Date)?
     /// How long playback waits for a missing output (AirPods take several seconds to reconnect).
     private let deviceWait: TimeInterval
+    /// How long a song you start waits for a chosen output that left moments ago before playing on another one
+    /// (see `OutputFallback`): AirPods taken out of their case connect within a few seconds.
+    private let reconnectGrace: TimeInterval
     /// Names of outputs seen, for messages about ones that are gone.
     private var deviceNames: [String: String] = [:]
     private var lastAudibleSegmentID: UUID?
@@ -289,9 +309,11 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     public convenience init() { self.init(deviceWait: 60) }
 
-    init(deviceWait: TimeInterval) {
+    init(deviceWait: TimeInterval, reconnectGrace: TimeInterval = 10) {
         self.deviceWait = deviceWait
+        self.reconnectGrace = reconnectGrace
         let thread = Thread { [weak self] in
+            self?.noteConnectedOutputs()
             while !Thread.current.isCancelled {
                 guard let self else { return }
                 self.runIteration()
@@ -515,6 +537,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             teardown(releaseHog: true, idle: true)
             parked = nil
             awaitingDevice = nil
+            standingIn = nil
             state = .stopped
             lastAudibleSegmentID = nil
         case .seek(let seconds):
@@ -532,9 +555,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
+                || old.matchSixteenBit != new.matchSixteenBit
             // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
             // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
-            let leavesInteger = session?.applied.integerMode == true
+            // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
+            let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
                 && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil)
             if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
@@ -547,7 +572,14 @@ public final class PlaybackEngine: @unchecked Sendable {
             guard state != .stopped else { return }
             if reloadCurrent { restartFromCurrentPosition() } else { replanUpcoming() }
         case .devicesChanged:
+            noteConnectedOutputs()
             if awaitingDevice != nil { checkAwaitedDevice(force: true); return }
+            if let uid = settings.deviceUID, standingIn == uid, connectedUIDs?.contains(uid) == true, state != .stopped {
+                // The chosen output is back (plugged in again): playback moves to it from where it is.
+                log.notice("\(self.deviceName(uid), privacy: .public) is connected again; moving playback to it")
+                restartFromCurrentPosition()
+                return
+            }
             guard let device = sessionDevice else { return }
             let alive = DeviceQuery.allDeviceIDs().contains(device.id)
             if !alive {
@@ -561,7 +593,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 if wasPlaying, parked != nil, let uid = settings.deviceUID, uid == device.uid {
                     // The chosen output dropped out mid-song (a DAC re-enumerating, AirPods reconnecting):
                     // carry on when it's back rather than on some other device.
-                    awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date())
+                    awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date(), false)
                     emit(.waitingForDevice(device.name))
                 } else if wasPlaying {
                     emit(.deviceLost(device.name))
@@ -575,15 +607,28 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Starting and stopping
 
-    /// The output to play to. A chosen output that isn't there is never swapped for another one
-    /// (AirPods taken off and put back on would otherwise start playing out of the speakers).
-    private func resolveDevice() throws -> OutputDevice? {
+    /// The output to play to. A chosen output that left moments ago is waited for, not swapped for another one
+    /// (AirPods taken off and put back on would otherwise start playing out of the speakers). One that isn't
+    /// connected (unplugged before launch, or gone for a while) is stood in for as `outputFallback` says, and
+    /// `standIn` asks for that now (the wait for it is over).
+    private func resolveDevice(standIn: Bool = false) throws -> OutputDevice? {
         let devices = DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
         for device in devices { deviceNames[device.uid] = device.name }
+        noteConnectedOutputs(Set(devices.map(\.uid)))
         if let uid = settings.deviceUID {
-            if let chosen = devices.first(where: { $0.uid == uid }) { return chosen }
+            if let chosen = devices.first(where: { $0.uid == uid }) { standingIn = nil; return chosen }
+            // Already standing in: stay on that output (taking it exclusively can move the Mac's sound output away).
+            if standingIn == uid, let current = sessionDevice, let alive = devices.first(where: { $0.id == current.id }) { return alive }
+            if standIn || !recentlyLost(uid), let other = OutputChoice.substitute(among: devices, fallback: settings.outputFallback) {
+                if standingIn != uid {
+                    log.notice("\(self.deviceName(uid), privacy: .public) isn't connected; playing on \(other.name, privacy: .public) instead")
+                }
+                standingIn = uid
+                return other
+            }
             throw ChosenDeviceMissing(uid: uid)
         }
+        standingIn = nil
         // Following the default: stay on the device we already hold (our hog moved the system default away from it).
         if settings.deviceUID == nil, let current = sessionDevice, let alive = devices.first(where: { $0.id == current.id }) { return alive }
         return devices.first(where: \.isDefault) ?? devices.first
@@ -593,7 +638,24 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
     private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
 
-    private func deviceName(_ uid: String) -> String { deviceNames[uid] ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”") }
+    private func deviceName(_ uid: String) -> String {
+        deviceNames[uid] ?? (uid == settings.deviceUID ? settings.deviceName : nil) ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// Notes which outputs are connected (`uids`, or read now), and when each one that was connected went away.
+    private func noteConnectedOutputs(_ uids: Set<String>? = nil) {
+        let now = uids ?? DeviceQuery.outputUIDs()
+        if let before = connectedUIDs {
+            for gone in before.subtracting(now) { lostAt[gone] = Date() }
+        }
+        for uid in now { lostAt[uid] = nil }
+        connectedUIDs = now
+    }
+
+    /// The output left within `reconnectGrace` (it may be on its way back), as opposed to not being around.
+    private func recentlyLost(_ uid: String) -> Bool {
+        lostAt[uid].map { Date().timeIntervalSince($0) < reconnectGrace } ?? false
+    }
 
     /// While waiting for the chosen output: start as soon as it's back, or give up after `deviceWait`.
     private func checkAwaitedDevice(force: Bool = false) {
@@ -609,11 +671,17 @@ public final class PlaybackEngine: @unchecked Sendable {
             start(parked.item, at: parked.position, autoplay: true)
         } else if now > awaiting.until {
             awaitingDevice = nil
-            emit(.deviceUnavailable(deviceName(awaiting.uid)))
+            if awaiting.thenStandIn, let parked {
+                self.parked = nil
+                start(parked.item, at: parked.position, autoplay: true, standIn: true)
+            } else {
+                emit(.deviceUnavailable(deviceName(awaiting.uid)))
+            }
         }
     }
 
-    private func start(_ item: PlayableItem, at seconds: TimeInterval, autoplay: Bool) {
+    /// `standIn`: the chosen output isn't coming back; play on another one (see `resolveDevice`).
+    private func start(_ item: PlayableItem, at seconds: TimeInterval, autoplay: Bool, standIn: Bool = false) {
         let previousWait = awaitingDevice
         awaitingDevice = nil
         var candidate: PlayableItem? = item
@@ -623,7 +691,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         while let current = candidate, attempts < 8 {
             attempts += 1
             do {
-                try begin(current, at: offset)
+                try begin(current, at: offset, standIn: standIn)
                 if let atmos {
                     if autoplay { atmos.play(); state = .playing } else { state = .paused; pausedAt = Date() }
                     emit(.trackStarted(atmos.item))
@@ -631,7 +699,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 if autoplay {
                     do { try session?.start() } catch {
-                        if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "start: \(error.localizedDescription)") }
+                        if let uid = settings.deviceUID, sessionDevice?.uid == uid {
+                            throw ChosenDeviceNotReady(uid: uid, reason: "start: \(error.localizedDescription)")
+                        }
                         throw error
                     }
                     log.notice("Playing on \(self.sessionDevice?.name ?? "?", privacy: .public) from \(String(format: "%.1f", offset), privacy: .public) s after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
@@ -655,16 +725,24 @@ public final class PlaybackEngine: @unchecked Sendable {
                 parked = (current, offset)
                 state = .paused
                 pausedAt = nil
+                if standIn {
+                    // Nothing else to play on either.
+                    emit(.deviceUnavailable(deviceName(uid)))
+                    return
+                }
                 if autoplay || previousWait != nil {
                     let now = Date()
-                    let until = previousWait?.until ?? now.addingTimeInterval(deviceWait)
+                    // Missing moments after it left: a short wait, then another output, when Settings allow one.
+                    let thenStandIn = previousWait?.thenStandIn
+                        ?? (error is ChosenDeviceMissing && settings.outputFallback != .waitForChosen)
+                    let until = previousWait?.until ?? now.addingTimeInterval(thenStandIn ? reconnectGrace : deviceWait)
                     if error is ChosenDeviceNotReady, now > until {
                         // Connected all along and still won't start: stop trying (each try can block the engine
                         // for seconds, so pause and skip would barely respond) and say so.
                         emit(.deviceNotResponding(deviceName(uid)))
                         return
                     }
-                    awaitingDevice = (uid, until, now)
+                    awaitingDevice = (uid, until, now, thenStandIn)
                     if previousWait == nil { emit(.waitingForDevice(deviceName(uid))) }
                 }
                 return
@@ -682,14 +760,14 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// Opens `item`, (re)configures the device if needed, positions and prefills.
-    private func begin(_ item: PlayableItem, at seconds: TimeInterval) throws {
+    private func begin(_ item: PlayableItem, at seconds: TimeInterval, standIn: Bool = false) throws {
         var marks: [(String, Date)] = [("start", Date())]
         func mark(_ name: String) { marks.append((name, Date())) }
         defer {
             let steps = zip(marks, marks.dropFirst()).map { "\($1.0) \(Int($1.1.timeIntervalSince($0.1) * 1000))" }.joined(separator: ", ")
             log.info("Opening \(item.url.lastPathComponent, privacy: .public) (ms): \(steps, privacy: .public)")
         }
-        guard let device = try resolveDevice() else { throw CoreAudioError(kAudioHardwareBadDeviceError, String(localized: "find an output device", comment: "Followed by “failed: <error code>”.")) }
+        guard let device = try resolveDevice(standIn: standIn) else { throw CoreAudioError(kAudioHardwareBadDeviceError, String(localized: "find an output device", comment: "Followed by “failed: <error code>”.")) }
         mark("device")
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.
@@ -716,9 +794,13 @@ public final class PlaybackEngine: @unchecked Sendable {
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream)
         plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
+        plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                             eligible: mayMatchSixteenBit(item: item, device: device))
         if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
-                if let uid = settings.deviceUID { throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)") }
+                if let uid = settings.deviceUID, device.uid == uid {
+                    throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)")
+                }
                 throw error
             }
         } else {
@@ -910,6 +992,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
+    }
+
+    /// The engine's half of "Match 16-bit sources" (the plan's half is `FormatPlanner.matchSixteenBit`): the setting
+    /// is on, the output is held exclusively and isn't the built-in one, and nothing changes the samples.
+    private func mayMatchSixteenBit(item: PlayableItem, device: OutputDevice) -> Bool {
+        settings.matchSixteenBit && settings.exclusive && !device.alwaysShared
+            && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
     }
 
     /// The item playing (or paused), whichever path plays it.
@@ -1113,6 +1202,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                                               policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
+                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                                     eligible: mayMatchSixteenBit(item: next, device: device))
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     Self.alignDoPMarkers(decoder, at: session.totalWritten)
@@ -1243,6 +1334,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let underruns = underrunTotal
         let parkedItem = parked
         let waiting = awaitingDevice.map { deviceName($0.uid) }
+        let standingInFor = sessionDevice != nil ? standingIn.map(deviceName) : nil
         let fromShare = decoding?.streaming == true
         let system = atmos
         shared.withLock { s in
@@ -1255,6 +1347,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
             s.snapshot.waitingForDevice = waiting
+            s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }

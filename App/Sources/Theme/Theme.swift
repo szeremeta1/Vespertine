@@ -210,6 +210,7 @@ struct BrassSlider: View {
     var onEditingChanged: (Bool) -> Void = { _ in }
     @State private var dragging = false
     @State private var hovering = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         GeometryReader { geo in
@@ -219,12 +220,17 @@ struct BrassSlider: View {
                 Capsule().fill(Palette.text.opacity(0.10)).frame(height: 3)
                 Capsule().fill(tint).frame(width: x, height: 3)
                 if showsThumb {
+                    // Scale before offsetting, so the pop stays centred on the pointer (scaling after the offset
+                    // pushed the thumb 15% further along the bar). Only the pop and the halo animate; the position
+                    // follows the pointer immediately.
                     Circle()
                         .fill(Palette.brassHi)
                         .frame(width: 10, height: 10)
-                        .overlay(Circle().stroke(Palette.brass.opacity(0.18), lineWidth: 6).opacity(hovering || dragging ? 1 : 0.6))
+                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .bouncy(duration: 0.3, extraBounce: 0.25)) {
+                            $0.overlay(Circle().stroke(Palette.brass.opacity(0.18), lineWidth: 6).opacity(hovering || dragging ? 1 : 0.6))
+                                .scaleEffect(dragging ? (reduceMotion ? 1.15 : 1.3) : 1)
+                        }
                         .offset(x: x - 5)
-                        .scaleEffect(dragging ? 1.15 : 1)
                 }
             }
             .frame(maxHeight: .infinity)
@@ -238,7 +244,6 @@ struct BrassSlider: View {
             .onHover { hovering = $0 }
         }
         .frame(height: 14)
-        .animation(.easeOut(duration: 0.12), value: dragging)
         // Drawn from shapes, so it says what it is and takes VoiceOver's (and Full Keyboard Access's) adjust actions,
         // as one edit each (a seek happens when the edit ends, as after a drag).
         .accessibilityElement()

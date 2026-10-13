@@ -96,6 +96,21 @@ public struct SignalPath: Sendable, Hashable {
         return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
     }
 
+    /// What "Match 16-bit sources" did, from the format the device reports, not the one asked for. nil: it didn't apply.
+    public var sixteenBitNote: String? {
+        guard let match = plan.sixteenBit else { return nil }
+        let rate = SampleRate.format(applied.sampleRate)
+        let depth = applied.physicalBitDepth
+        switch match {
+        case .requested where depth == 16 && applied.physicalIsInteger:
+            return String(localized: "16-bit source sent as 16-bit at \(rate) kHz")
+        case .requested:
+            return String(localized: "Asked for 16-bit at \(rate) kHz; the device stayed at \(depth)-bit (same samples, zero-padded)")
+        case .noMode:
+            return String(localized: "No 16-bit mode at \(rate) kHz; sent as \(depth)-bit (same samples, zero-padded)")
+        }
+    }
+
     /// "24/192" as shown on the device chip (what the DAC receives).
     public var deviceFormatShort: String {
         "\(applied.physicalBitDepth)/\(SampleRate.format(applied.sampleRate))"

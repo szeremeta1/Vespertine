@@ -131,4 +131,24 @@ public enum FormatPlanner {
         if let divisor = rates.last(where: { SampleRate.isIntegerMultiple(rate, of: $0) }) { return divisor }
         return rates.last!
     }
+
+    /// "Match 16-bit sources": a 16-bit file goes to a DAC that offers a real 16-bit mode at its rate as 16-bit,
+    /// instead of zero-padded to 24 or 32 bits. `eligible` is the engine's part (the setting is on, the output is held
+    /// exclusively and isn't the built-in one, and no digital volume, equalizer or ReplayGain changes the samples);
+    /// the rest is the plan's: integer 16-bit PCM at its own rate and channel count, no Spatial Audio or downmix.
+    /// DSD, DoP and bitstream are never affected. Anything else keeps `plan` as it is.
+    public static func matchSixteenBit(_ plan: OutputPlan, source: SourceFormat, device: DeviceCapabilities, eligible: Bool) -> OutputPlan {
+        guard eligible, plan.mode == .pcm, source.encoding == .pcm, source.bitDepth == 16, !plan.dsdConvertedToPCM, !plan.resamples,
+              plan.spatial == .off, plan.channels == source.channels, plan.deviceChannels == source.channels else { return plan }
+        var plan = plan
+        if device.offersInteger(bits: 16, at: plan.deviceSampleRate, channels: plan.channels) {
+            // A 16-bit word needs no integer mode: Float32 carries every 16-bit sample exactly.
+            plan.integerSamples = false
+            plan.physicalBitDepth = 16
+            plan.sixteenBit = .requested
+        } else {
+            plan.sixteenBit = .noMode
+        }
+        return plan
+    }
 }

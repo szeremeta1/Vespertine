@@ -451,7 +451,9 @@ final class PlayerController {
             lastError = String(localized: "Waiting for \(name). Playback continues as soon as it’s ready.", comment: "%@ is the name of an audio output device.")
             waitingMessage = lastError
         case .deviceUnavailable(let name):
-            lastError = String(localized: "\(name) didn’t come back. Choose another output, or press play once it’s connected.", comment: "%@ is the name of an audio output device.")
+            lastError = settings.outputFallback == .waitForChosen
+                ? String(localized: "\(name) didn’t come back. Choose another output, or press play once it’s connected.", comment: "%@ is the name of an audio output device.")
+                : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
         }

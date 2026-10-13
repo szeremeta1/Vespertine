@@ -213,9 +213,11 @@ final class AppModel {
         devices.dopUIDs = settings.dopDeviceUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
+            self?.followChosenOutput()
             self?.player.engine.devicesChanged()
             self?.syncEngine()
         }
+        followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
         syncEngine()
         shares.start()
@@ -268,13 +270,43 @@ final class AppModel {
 
     /// The device playback is (or would be) routed to.
     var activeDevice: OutputDevice? {
-        player.outputDevice.flatMap { d in devices.devices.first { $0.id == d.id } } ?? devices.device(uid: settings.selectedDeviceUID)
+        player.outputDevice.flatMap { d in devices.devices.first { $0.id == d.id } } ?? plannedDevice
+    }
+
+    /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
+    /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
+    var plannedDevice: OutputDevice? {
+        guard let uid = settings.selectedDeviceUID else { return devices.device(uid: nil) }
+        if let chosen = devices.devices.first(where: { $0.uid == uid }) { return chosen }
+        guard player.waitingForDevice == nil else { return nil }
+        return OutputChoice.substitute(among: devices.devices, fallback: settings.outputFallback)
+    }
+
+    /// The chosen output's name while it isn't connected.
+    var missingChosenOutput: String? {
+        guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
+        return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// Keeps the chosen output chosen: remembers what it is while it's connected, and when it comes back under
+    /// another UID (some USB DACs get a new one in another port), picks it again with its settings.
+    private func followChosenOutput() {
+        guard let uid = settings.selectedDeviceUID else { return }
+        if let device = devices.devices.first(where: { $0.uid == uid }) {
+            let identity = OutputIdentity(device)
+            if settings.selectedDevice != identity { settings.selectedDevice = identity }
+        } else if let remembered = settings.selectedDevice, remembered.uid == uid,
+                  let device = OutputChoice.sameOutput(as: remembered, among: devices.devices) {
+            settings.moveDeviceSettings(from: uid, to: device.uid)
+            settings.selectedDeviceUID = device.uid
+            settings.selectedDevice = OutputIdentity(device)
+        }
     }
 
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {
         devices.dopUIDs = settings.dopDeviceUIDs
-        let device = devices.device(uid: settings.selectedDeviceUID)
+        let device = plannedDevice
         player.engine.update(settings: settings.engineSettings())
         devices.watchVolume(of: device)
         player.resolveVersions()
@@ -289,9 +321,7 @@ final class AppModel {
         case .multichannel: return true
         case .matchOutput: break
         }
-        let device: OutputDevice? = if let uid = settings.selectedDeviceUID { devices.devices.first { $0.uid == uid } }
-                                    else { devices.device(uid: nil) }
-        guard let device else { return nil }
+        guard let device = plannedDevice else { return nil }
         let caps = device.capabilities
         return caps.outputChannels > 2 || (caps.speakerLayoutChannels ?? 0) >= 3 || engineSpatialMode(for: device) != .off
     }
@@ -303,6 +333,8 @@ final class AppModel {
 
     func selectDevice(_ uid: String?) {
         settings.selectedDeviceUID = uid
+        settings.selectedDevice = uid.flatMap { uid in devices.devices.first { $0.uid == uid } }.map { OutputIdentity($0) }
+            ?? (uid == settings.selectedDevice?.uid ? settings.selectedDevice : nil)
         syncEngine()
     }
 

@@ -88,7 +88,7 @@ struct NowPlayingPanel: View {
                     } else if let system = player.systemRendering {
                         SystemRenderingView(rendering: system, device: player.outputDevice?.name).padding(.top, 16)
                     } else {
-                        Text("Preparing output…").font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
+                        Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
                     SpectrumView().frame(height: 44).padding(.top, 16).id("spectrum")
                     if player.buffering {

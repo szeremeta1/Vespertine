@@ -161,6 +161,10 @@ struct PlaybackSettings: View {
         @Bindable var s = model.settings
         Form {
             Section("Output") {
+                Picker("When the chosen output isn't connected, play on", selection: $s.outputFallback) {
+                    ForEach(OutputFallback.allCases) { Text($0.label).tag($0) }
+                }
+                Text(fallbackNote(s.outputFallback)).font(.caption).foregroundStyle(.secondary)
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
                 (s.exclusiveMode
                      ? Text("Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so Vespertine passes the volume keys, Control Center and the AirPods Max Digital Crown on to it. The Mac's own speakers and headphone jack always play shared.")
@@ -220,12 +224,24 @@ struct PlaybackSettings: View {
         }
         .formStyle(.grouped)
         .onChange(of: s.exclusiveMode) { model.syncEngine() }
+        .onChange(of: s.outputFallback) { model.syncEngine() }
         .onChange(of: s.atmosBySystem) { model.syncEngine() }
         .onChange(of: s.integerMode) { model.syncEngine() }
         .onChange(of: s.releaseAfterPause) { model.syncEngine() }
         .onChange(of: s.allowDigitalVolume) { model.syncEngine() }
         .onChange(of: s.replayGain) { model.player.refreshReplayGain() }
         .onChange(of: s.replayGainPreampDB) { model.player.refreshReplayGain() }
+    }
+
+    private func fallbackNote(_ fallback: OutputFallback) -> String {
+        switch fallback {
+        case .bestAvailable:
+            String(localized: "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the most capable one connected: an external DAC first, then the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.")
+        case .systemDefault:
+            String(localized: "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.")
+        case .waitForChosen:
+            String(localized: "Nothing plays until the output you chose is connected again.")
+        }
     }
 }
 

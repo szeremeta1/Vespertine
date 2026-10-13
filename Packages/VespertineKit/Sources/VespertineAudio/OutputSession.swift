@@ -298,10 +298,13 @@ final class OutputSession: @unchecked Sendable {
         ioProcID = nil
         nrt_context_destroy(context)
         nrt_ring_destroy(ring)
-        // Leave the device on an ordinary (mixable Float32) format for whoever uses it next.
-        if applied.integerMode, restoreFormat { try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
-            decodedSampleRate: applied.sampleRate, physicalBitDepth: applied.physicalBitDepth, channels: plan.deviceChannels,
-            dsdConvertedToPCM: false, reason: ""), to: deviceID) }
+        // Leave the device on an ordinary (mixable Float32) format for whoever uses it next, and at its full depth after
+        // "Match 16-bit sources": other apps' audio would otherwise be cut to 16 bits.
+        if applied.integerMode || plan.sixteenBit == .requested, restoreFormat {
+            try? DeviceControl.apply(plan: OutputPlan(mode: .pcm, deviceSampleRate: applied.sampleRate,
+                decodedSampleRate: applied.sampleRate, physicalBitDepth: plan.sixteenBit == .requested ? 32 : applied.physicalBitDepth,
+                channels: plan.deviceChannels, dsdConvertedToPCM: false, reason: ""), to: deviceID)
+        }
         // DoP's carrier rate (176.4 kHz and up for DSD64) is no music rate: a DAC let go at it shows it, and whatever
         // plays next is resampled to it. Put back the rate it had before Vespertine changed it, while still held.
         if idle, releaseHog, plan.mode == .dop, applied.exclusive, let rate = DeviceRestore.originalRate(deviceID),
