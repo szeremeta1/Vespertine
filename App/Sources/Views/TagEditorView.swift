@@ -619,7 +619,7 @@ struct SmartPlaylistEditor: View {
                 Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
                 Button("Save") {
                     rules.limit = limitOn ? limit : nil
-                    model.library.renamePlaylist(playlist, to: name)
+                    if name != playlist.name.libraryDisplayName { model.library.renamePlaylist(playlist, to: name) }
                     model.library.updateRules(playlist, rules)
                     dismiss()
                 }
@@ -630,7 +630,7 @@ struct SmartPlaylistEditor: View {
         .frame(width: 620)
         .background(Palette.panel)
         .onAppear {
-            name = playlist.name
+            name = playlist.name.libraryDisplayName
             rules = playlist.smartRules ?? SmartRules(rules: [])
             limitOn = rules.limit != nil
             limit = rules.limit ?? 100

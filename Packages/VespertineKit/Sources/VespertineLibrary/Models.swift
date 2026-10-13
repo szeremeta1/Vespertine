@@ -184,6 +184,10 @@ public struct Playlist: Codable, Sendable, Hashable, Identifiable, FetchableReco
     public static let databaseTableName = "playlist"
     public var isSmart: Bool { smartRules != nil }
 
+    /// The starter smart playlists' stored names (see String.libraryDisplayName).
+    public static let hiResName = "Hi-Res ≥ 88.2 kHz"
+    public static let suspectName = "Suspect Hi-Res"
+
     public init(id: Int64? = nil, name: String, smartRules: SmartRules? = nil, createdAt: Date = .now, sortIndex: Int = 0) {
         self.id = id
         self.name = name
@@ -266,14 +270,17 @@ extension Track {
 }
 
 extension String {
-    /// A library name to show: the library's own placeholders ("Unknown Artist", "Unknown Album", "Various Artists")
-    /// stay English where they're stored and matched (album keys, the database), and appear in the user's language.
+    /// A library name to show: the library's own placeholders ("Unknown Artist", "Unknown Album", "Various Artists") and
+    /// the starter smart playlists' names stay English where they're stored and matched (album keys, the database), and
+    /// appear in the user's language until the user renames them.
     /// Any other name is returned as it is.
     public var libraryDisplayName: String {
         switch self {
         case "Unknown Artist": String(localized: "Unknown Artist")
         case "Unknown Album": String(localized: "Unknown Album")
         case Track.variousArtists: String(localized: "Various Artists")
+        case Playlist.hiResName: String(localized: "Hi-Res ≥ 88.2 kHz", comment: "Name of a starter smart playlist.")
+        case Playlist.suspectName: String(localized: "Suspect Hi-Res", comment: "Name of a starter smart playlist: hi-res files the analysis doubts.")
         default: self
         }
     }

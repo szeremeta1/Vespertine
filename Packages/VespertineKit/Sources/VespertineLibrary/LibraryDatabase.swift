@@ -134,12 +134,11 @@ public final class LibraryDatabase: Sendable {
                 t.column("fileBackupPath", .text)
             }
 
-            // Starter smart playlists.
-            // Named in the language of the day the library is made; they're the user's to rename from then on.
-            var hiRes = Playlist(name: String(localized: "Hi-Res ≥ 88.2 kHz", comment: "Name of a starter smart playlist."), smartRules: .hiRes, sortIndex: 0)
+            // Starter smart playlists. Stored in English, and shown in the user's language until renamed
+            // (String.libraryDisplayName), so they follow a change of language.
+            var hiRes = Playlist(name: Playlist.hiResName, smartRules: .hiRes, sortIndex: 0)
             try hiRes.insert(db)
-            var suspect = Playlist(name: String(localized: "Suspect Hi-Res", comment: "Name of a starter smart playlist: hi-res files the analysis doubts."),
-                                   smartRules: .suspect, sortIndex: 1)
+            var suspect = Playlist(name: Playlist.suspectName, smartRules: .suspect, sortIndex: 1)
             try suspect.insert(db)
         }
         m.registerMigration("v2-cue-state") { db in
@@ -174,7 +173,7 @@ public final class LibraryDatabase: Sendable {
                 SmartRule(field: .verdict, op: .equals, value: "paddedBitDepth"),
                 SmartRule(field: .verdict, op: .equals, value: "possibleLossyOrigin"),
             ])
-            for var playlist in try Playlist.filter(Column("name") == "Suspect Hi-Res").fetchAll(db) where playlist.smartRules == old {
+            for var playlist in try Playlist.filter(Column("name") == Playlist.suspectName).fetchAll(db) where playlist.smartRules == old {
                 playlist.smartRules = .suspect
                 try playlist.update(db)
             }

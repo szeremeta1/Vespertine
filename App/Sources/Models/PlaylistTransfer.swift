@@ -11,7 +11,7 @@ extension AppModel {
     func exportPlaylist(_ playlist: Playlist) {
         let tracks = library.tracks(in: playlist)
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "\(playlist.name).m3u8"
+        panel.nameFieldStringValue = "\(playlist.name.libraryDisplayName).m3u8"
         panel.allowedContentTypes = [UTType(filenameExtension: "m3u8") ?? .plainText]
         panel.message = String(localized: "Other players open this as a playlist of the same files.")
         guard panel.runModal() == .OK, let url = panel.url else { return }

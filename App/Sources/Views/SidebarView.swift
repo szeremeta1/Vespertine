@@ -41,7 +41,7 @@ struct SidebarView: View {
                 ForEach(model.library.playlists) { playlist in
                     if let id = playlist.id {
                         Label {
-                            Text(playlist.name).lineLimit(1)
+                            Text(playlist.name.libraryDisplayName).lineLimit(1)
                         } icon: {
                             Image(systemName: playlist.isSmart ? "gearshape" : "music.note.list")
                         }
@@ -53,7 +53,7 @@ struct SidebarView: View {
                         }
                         .contextMenu {
                             if playlist.isSmart { Button("Edit Rules…") { model.smartEditorPlaylist = playlist } }
-                            Button("Rename…") { newName = playlist.name; renaming = playlist }
+                            Button("Rename…") { newName = playlist.name.libraryDisplayName; renaming = playlist }
                             playMenu(.playlist(id))
                             Button("Export Playlist…") { model.exportPlaylist(playlist) }
                             Divider()
@@ -160,7 +160,7 @@ struct SidebarView: View {
         }
         .alert("Rename Playlist", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
-            Button("Rename") { if let p = renaming { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
+            Button("Rename") { if let p = renaming, newName != p.name.libraryDisplayName { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
             Button("Cancel", role: .cancel) { renaming = nil }
         }
         .alert(deleteTitle, isPresented: Binding(get: { deletingPlaylist != nil }, set: { if !$0 { deletingPlaylist = nil } }),
@@ -174,7 +174,7 @@ struct SidebarView: View {
         .modifier(RemoveSourceAlert(source: $removingSource))
     }
 
-    private var deleteTitle: String { deletingPlaylist.map { String(localized: "Delete the playlist “\($0.name)”?") } ?? "" }
+    private var deleteTitle: String { deletingPlaylist.map { String(localized: "Delete the playlist “\($0.name.libraryDisplayName)”?") } ?? "" }
 
     private func delete(_ playlist: Playlist) {
         guard let id = playlist.id else { return }
