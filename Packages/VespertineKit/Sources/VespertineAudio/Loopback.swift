@@ -221,11 +221,26 @@ public enum LoopbackGuard {
 public enum LoopbackPermission {
     /// Asks for audio input when it hasn't been asked yet. Hardened runtime denies input silently without the
     /// `com.apple.security.device.audio-input` entitlement and an NSMicrophoneUsageDescription.
-    public static func ensure() async -> Bool {
+    public static func ensure() async -> Bool { await check() == .granted }
+
+    public enum Answer: Sendable { case granted, denied, unanswered }
+
+    /// Like `ensure`, but gives up waiting after `timeout`: a command-line tool has no bundle to show the prompt for,
+    /// so macOS may never answer. An unanswered request isn't a refusal; the tool may still inherit its Terminal's
+    /// access, and an all-zero capture is then reported as "no signal reached the input".
+    public static func check(timeout: Double = 30) async -> Answer {
         switch AVAudioApplication.shared.recordPermission {
-        case .granted: return true
-        case .denied: return false
-        default: return await AVAudioApplication.requestRecordPermission()
+        case .granted: return .granted
+        case .denied: return .denied
+        default: break
+        }
+        return await withCheckedContinuation { (k: CheckedContinuation<Answer, Never>) in
+            let answered = Locked(false)
+            let finish: @Sendable (Answer) -> Void = { answer in
+                if answered.withLock({ was in defer { was = true }; return !was }) { k.resume(returning: answer) }
+            }
+            AVAudioApplication.requestRecordPermission { finish($0 ? .granted : .denied) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + timeout) { finish(.unanswered) }
         }
     }
 }
