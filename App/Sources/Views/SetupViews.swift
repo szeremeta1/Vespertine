@@ -588,7 +588,7 @@ private struct SetupMusic: View {
             VStack(spacing: 8) {
                 ProgressView(value: scan.total > 0 ? Double(scan.processed) / Double(scan.total) : 0)
                     .progressViewStyle(.linear).tint(Palette.brass).frame(width: 300)
-                Text(scan.total > 0 ? "Reading \(scan.processed) of \(scan.total) files…" : "Looking for music…")
+                Text(scan.total > 0 ? "Checking \(scan.processed) of \(scan.total) audio files…" : "Looking for music…")
                     .font(Typeface.mono(11)).foregroundStyle(Palette.text3).monospacedDigit()
             }
             .transition(.opacity)
@@ -596,7 +596,7 @@ private struct SetupMusic: View {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Palette.brassHi)
                     .symbolEffect(.bounce, value: stats.tracks)
-                Text("\(stats.tracks) songs in \(stats.albums) albums")
+                Text("\(stats.albums) albums · \(stats.tracks) tracks")
                     .contentTransition(.numericText(value: Double(stats.tracks)))
                     .font(Typeface.ui(13, weight: .medium)).foregroundStyle(Palette.text)
                 Text("You can add more at any time.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)
