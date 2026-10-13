@@ -30,6 +30,7 @@ struct NFFDecoder {
     uint8_t *dsd;             // per-channel planes, dsdCapacity bytes each
     int dsdBytes, dsdCapacity;
     int64_t dsdDiscard;
+    int64_t dataStart;        // where the audio data begins in the file (DSF and DSDIFF), -1 when unknown
 };
 
 static void fail(char *error, int size, const char *msg, int code) {
@@ -51,6 +52,8 @@ NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     int r = avformat_open_input(&d->fmt, path, NULL, &options);
     av_dict_free(&options);
     if (r < 0) { fail(error, errorSize, "open", r); free(d); return NULL; }
+    // The DSF and DSDIFF readers leave the file at the start of the audio data once the header is read.
+    d->dataStart = d->fmt->pb ? avio_tell(d->fmt->pb) : -1;
     if ((r = avformat_find_stream_info(d->fmt, NULL)) < 0) { fail(error, errorSize, "read stream info", r); nff_close(d); return NULL; }
     const AVCodec *codec = NULL;
     d->stream = av_find_best_stream(d->fmt, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
@@ -187,12 +190,40 @@ int nff_read(NFFDecoder *d, float *const *planes, int frames) {
     return n;
 }
 
+/// DSF and DSDIFF hold uncompressed DSD at a fixed rate, so any position is a simple multiple into the data. FFmpeg's
+/// readers for them have no seek of their own, though: libavformat then finds a timestamp by reading every packet
+/// from the last one it has indexed, which for a fresh file is its start. A CUE track half an hour into a DSD64 album
+/// read about 1.3 GB first, 20 s and more over a network share, before a note played. This indexes the packet the
+/// seek wants, from the file's layout, so the seek goes straight there.
+///
+/// Positions are in bytes per channel, which is also these streams' time base (FFmpeg's DSD rate is the bit rate / 8).
+/// DSF stores blocks of `block_align / channels` bytes per channel, one channel after another; DSDIFF interleaves one
+/// byte per channel (its `block_align` is the channel count × 8). Either way packet n starts at
+/// dataStart + n × unit × channels. The index FFmpeg built while opening the file must agree with that, or nothing
+/// is added and the seek reads its way there as before.
+static void index_dsd_position(NFFDecoder *d, int64_t ts) {
+    if (ts <= 0 || d->dataStart < 0 || !nff_is_dsd(d)) return;
+    AVStream *st = d->fmt->streams[d->stream];
+    int64_t channels = st->codecpar->ch_layout.nb_channels;
+    int64_t unit = channels > 0 ? st->codecpar->block_align / channels : 0;
+    if (channels <= 0 || unit <= 0 || st->time_base.num != 1 || st->time_base.den != st->codecpar->sample_rate) return;
+    int entries = avformat_index_get_entries_count(st);
+    const AVIndexEntry *first = entries > 0 ? avformat_index_get_entry(st, 0) : NULL;
+    const AVIndexEntry *last = entries > 0 ? avformat_index_get_entry(st, entries - 1) : NULL;
+    if (!first || !last) return;
+    if (first->pos != d->dataStart + first->timestamp * channels || last->pos != d->dataStart + last->timestamp * channels) return;
+    if (d->length > 0 && ts >= d->length) ts = d->length - 1;   // at the very end: index the last packet
+    int64_t aligned = ts / unit * unit;
+    av_add_index_entry(st, d->dataStart + aligned * channels, aligned, 0, 0, AVINDEX_KEYFRAME);
+}
+
 bool nff_seek(NFFDecoder *d, int64_t target) {
     if (target < 0) target = 0;
     AVStream *st = d->fmt->streams[d->stream];
     // Seek a little early so the decoder settles, then drop frames up to the target by timestamp.
     int64_t early = target - d->rate / 2; if (early < 0) early = 0;
     int64_t ts = av_rescale_q(early, (AVRational){1, d->rate}, st->time_base);
+    index_dsd_position(d, ts);
     if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0 && av_seek_frame(d->fmt, d->stream, 0, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_BYTE) < 0)
         return false;
     avcodec_flush_buffers(d->ctx);
@@ -293,6 +324,7 @@ bool nff_seek_dsd(NFFDecoder *d, int64_t offset) {
     if (offset < 0) offset = 0;
     AVStream *st = d->fmt->streams[d->stream];
     int64_t ts = av_rescale_q(offset, (AVRational){1, d->rate}, st->time_base);
+    index_dsd_position(d, ts);
     if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0) return false;
     d->dsdBytes = 0; d->eof = false;
     // Find where the next packet starts, and drop up to the target.
