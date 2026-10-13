@@ -32,8 +32,11 @@ enum Typeface {
     static func serif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .serif) }
     /// SF Pro — interface.
     static func ui(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight) }
-    /// SF Mono — every number that describes the signal.
-    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .monospaced) }
+    /// SF Mono — every number that describes the signal. Arabic, Indic and Thai script stretch into its fixed-width
+    /// cells, so in those languages it's SF Pro with monospaced digits.
+    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        Locale.spacesLetters ? .system(size: size, weight: weight, design: .monospaced) : .system(size: size, weight: weight).monospacedDigit()
+    }
 }
 
 extension Color {

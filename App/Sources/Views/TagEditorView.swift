@@ -263,6 +263,7 @@ struct TagEditorView: View {
     private var footer: some View {
         HStack(spacing: 10) {
             Text(status ?? footerNote).font(Typeface.ui(11)).foregroundStyle(Palette.text3).lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true).layoutPriority(1)
             Spacer()
             Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving)
                 .help(hasChanges ? String(localized: "Discard unsaved changes") : String(localized: "Restore the tags from before the last save"))
