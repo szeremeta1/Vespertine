@@ -26,7 +26,8 @@ thumbs=(bit-perfect-fiio-24-96 dsd-native-dop fake-hi-res-detection genres multi
         spatial-audio-airpods-max stereo-and-surround-versions sacd-iso languages output-settings equalizer loopback-test
         setup-welcome setup-output)
 
-want=(${@:-$full $thumbs ${(k)detail}})
+want=($@)
+(( $# )) || want=($full $thumbs ${(k)detail})   # (inside ${@:-…} zsh glues the arrays' end words together)
 for s in ${(u)want}; do
   [[ -e $shots/$s.png ]] || { print -u2 "no docs/screenshots/$s.png"; continue; }
   (( ${full[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=2000:1250:flags=lanczos" "$site/$s.jpg"

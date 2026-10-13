@@ -39,6 +39,9 @@ let shots: [Shot] = [
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "DSD128 over DoP, checked on a FiiO K11"),
+    Shot(file: "docs/screenshots/sacd-iso.png", from: full,
+         to: CGRect(x: 1290, y: 620, width: 1110, height: 693.75),
+         caption: "An SACD image played as it is, native DSD over DoP"),
     Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
          to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
@@ -48,6 +51,13 @@ let shots: [Shot] = [
     Shot(file: "docs/screenshots/fake-hi-res-detection.png", from: CGRect(x: 1340, y: 170, width: 1060, height: 662.5),
          to: CGRect(x: 1340, y: 560, width: 1060, height: 662.5),
          caption: "Hi-res analysis shows evidence, with limits"),
+    // languages.png is the six-language grid (3840 × 1836): from the whole grid to the Arabic window.
+    Shot(file: "docs/screenshots/languages.png", from: CGRect(x: 451, y: 0, width: 2937.6, height: 1836),
+         to: CGRect(x: 40, y: 900, width: 1320, height: 825),
+         caption: "In 44 languages besides English, right to left where it should be"),
+    Shot(file: "docs/screenshots/setup-output.png", from: full,
+         to: CGRect(x: 560, y: 300, width: 1280, height: 800),
+         caption: "A minute of setup: pick your DAC and you're listening"),
 ]
 let images = shots.map { image($0.file) }
 let lockup = image("docs/brand/logo.png")   // crescent + "vespertine", with its clear space
