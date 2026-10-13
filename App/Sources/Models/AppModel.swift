@@ -266,10 +266,12 @@ final class AppModel {
     }
 
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
-    /// (Settings → Playback; nil when set to wait for it).
+    /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
         guard let uid = settings.selectedDeviceUID else { return devices.device(uid: nil) }
-        return devices.devices.first { $0.uid == uid } ?? OutputChoice.substitute(among: devices.devices, fallback: settings.outputFallback)
+        if let chosen = devices.devices.first(where: { $0.uid == uid }) { return chosen }
+        guard player.waitingForDevice == nil else { return nil }
+        return OutputChoice.substitute(among: devices.devices, fallback: settings.outputFallback)
     }
 
     /// The chosen output's name while it isn't connected.
