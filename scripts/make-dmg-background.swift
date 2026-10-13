@@ -152,11 +152,11 @@ func render(scale: CGFloat) -> Data {
     ctx.restoreGState()
 
     // Instructions and provenance.
-    drawText("Drag Vespertine into Applications to install", font(12.5), text2, centerX: W / 2, top: 332)
-    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, 500, .mono), text3, centerX: W / 2, top: 356, kern: 1.4)
+    drawText("Drag Vespertine into Applications to install", font(12.5), text2, centerX: W / 2, top: 320)
+    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, 500, .mono), text3, centerX: W / 2, top: 342, kern: 1.4)
 
     // Ukraine: a small flag beside a thank-you line, centred beneath the provenance.
-    drawUkraineTagline(centerX: W / 2, top: 384)
+    drawUkraineTagline(centerX: W / 2, top: 362)
 
     // Hairline frame.
     color(0xECE6DA, 0.06).setStroke()
