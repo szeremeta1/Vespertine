@@ -19,6 +19,19 @@ struct AppAuditTests {
         }
         #expect(RateChoice(code: "fixed:96000") == .fixed(96000))
     }
+    @Test("Match 16-bit sources is off until turned on, and reaches the engine")
+    func matchSixteenBitSetting() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-16bit-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(!settings.matchSixteenBit && !settings.engineSettings().matchSixteenBit)
+        settings.matchSixteenBit = true
+        #expect(settings.engineSettings().matchSixteenBit)
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).matchSixteenBit)
+    }
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

@@ -34,7 +34,11 @@ Vespertine switches the DAC to each track's native rate. PCM playback has been t
 
 Shared output keeps the Mac's volume controls available. By default the selected playback device also becomes the Mac's sound output; Settings can disable that. Exclusive (hog) mode keeps other apps off the device and releases it after a configurable pause. DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play. The built-in speakers and headphone jack use shared mode. Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.
 
-Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer format. It sends unprocessed PCM as integers, including 32-bit recordings that the normal Float32 path would round. The float path preserves up to 24 significant bits. Vespertine uses hardware volume where available; optional digital volume and ReplayGain appear in the signal path when they change the samples.
+Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer format. It sends unprocessed PCM as integers, including 32-bit recordings that the normal Float32 path would round. The float path preserves up to 24 significant bits.
+
+"Match 16-bit sources" (Settings › Playback › Output, under Integer mode, off by default) sends a 16-bit file to a DAC that offers a real 16-bit mode at the file's rate as 16-bit, instead of zero-padded to 24 or 32 bits. The samples are identical either way. It applies only with exclusive access, not on the Mac's built-in output, and only to 16-bit PCM at its own rate and channel count with no digital volume, EQ, ReplayGain, Spatial Audio or downmix; DSD is never affected. The signal path reports the format the DAC actually accepted, and says so when it has no 16-bit mode at that rate ("No 16-bit mode at 44.1 kHz; sent as 24-bit (same samples, zero-padded)").
+
+Vespertine uses hardware volume where available; optional digital volume and ReplayGain appear in the signal path when they change the samples.
 
 Vespertine waits for your selected device if it is missing, for up to a minute at playback start. If it disconnects during a song, playback resumes from the same position when it returns. At quit, each device is restored to its earlier rate and depth, or your chosen default. Tracks with the same output format play gaplessly, including CUE-sheet albums.
 

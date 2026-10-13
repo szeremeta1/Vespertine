@@ -231,6 +231,10 @@ struct SignalPathView: View {
                           tone: db == 0 ? .good : .changed))
         }
         let a = path.applied
+        if let note = path.sixteenBitNote {
+            s.append(Step(title: String(localized: "Match 16-bit sources"), detail: note,
+                          value: String(localized: "\(a.physicalBitDepth)-bit"), tone: path.isBitPerfect ? .good : .plain))
+        }
         var device = [path.deviceProfile.connection,
                       a.exclusive ? String(localized: "exclusive (hog)") : String(localized: "shared", comment: "The output device is shared with other apps"),
                       a.physicalIsInteger ? String(localized: "int \(a.physicalBitDepth)", comment: "Integer samples of this many bits, e.g. int 24")

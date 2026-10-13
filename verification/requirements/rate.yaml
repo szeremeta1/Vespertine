@@ -70,9 +70,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 43"
+    section: "line 47"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 43, from: "On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate.", to: "Otherwise it becomes high-rate PCM" }
+    cache: { repo: docs/FEATURES.md, lines: 47, from: "On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate.", to: "Otherwise it becomes high-rate PCM" }
   requirement: "When the device is marked as decoding DoP and offers the carrier rate, DSD is planned as DoP at the carrier rate."
   quote_sha256: 21d228590e49464a137f8d54ad2393667a2ed671c3148f667d09883cade40ea7
   kind: vespertine-rule

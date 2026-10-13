@@ -86,9 +86,9 @@
   source:
     doc: "Vespertine docs/ARCHITECTURE.md"
     version: "98cad1a"
-    section: "line 76"
+    section: "line 80"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 76, from: "the IOProc plays silence and takes nothing from the ring", to: "resumes exactly where it went quiet." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 80, from: "the IOProc plays silence and takes nothing from the ring", to: "resumes exactly where it went quiet." }
   requirement: "While muted, nothing written is consumed: after unmuting, the next music frame out is the first written frame that had not been output before the mute."
   quote_sha256: 96c59c70767ecae201ce1fa121c7440bc0bbb73c05f4b8150875e6fa15d0e0ab
   kind: vespertine-rule
@@ -101,9 +101,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 83"
+    section: "line 87"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 83, from: "EQ does not process DoP", to: "EQ does not process DoP" }
+    cache: { repo: docs/FEATURES.md, lines: 87, from: "EQ does not process DoP", to: "EQ does not process DoP" }
   requirement: "A software gain other than 1.0, or the equalizer turned on, leaves DoP output unchanged: the same frames come out as with unity gain and no equalizer."
   quote_sha256: 572ce6e690e171601522597920d2482669acfbb4f5482d27c0a6bf75d3bf0813
   kind: vespertine-rule
