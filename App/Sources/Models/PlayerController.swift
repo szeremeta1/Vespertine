@@ -448,7 +448,9 @@ final class PlayerController {
         case .waitingForDevice(let name):
             lastError = "Waiting for \(name). Playback continues as soon as it’s ready."
         case .deviceUnavailable(let name):
-            lastError = "\(name) didn’t come back. Choose another output, or press play once it’s connected."
+            lastError = settings.outputFallback == .waitForChosen
+                ? "\(name) didn’t come back. Choose another output, or press play once it’s connected."
+                : "\(name) didn’t come back. Press play to continue on another output."
         case .deviceNotResponding(let name):
             lastError = "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play."
         }

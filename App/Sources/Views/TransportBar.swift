@@ -155,11 +155,11 @@ struct DeviceChip: View {
         let path = model.player.signalPath
         Button { showDevices.toggle() } label: {
             HStack(spacing: 9) {
-                Image(systemName: device?.profile.symbol ?? "hifispeaker")
+                Image(systemName: device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash"))
                     .font(.system(size: 14))
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(device?.name ?? "No Output").font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(device?.name ?? model.missingChosenOutput ?? "No Output").font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
                     Text(chipDetail(device, path)).font(Typeface.mono(9.5)).foregroundStyle(path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
                         .lineLimit(1)
                 }
@@ -179,7 +179,7 @@ struct DeviceChip: View {
             .fixedSize()
         }
         .buttonStyle(.plain)
-        .help("Output device")
+        .help(standIn.map { "Output device: \(device?.name ?? "") plays while \($0) isn’t connected" } ?? "Output device")
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
         .accessibilityLabel("Output device, \(device?.name ?? "none")")
         .accessibilityValue(path.map { "\($0.isBitPerfect ? "Bit-perfect" : "Converted"), \(chipDetail(device, $0))" } ?? "")
@@ -188,12 +188,15 @@ struct DeviceChip: View {
         }
     }
 
+    /// The chosen output that isn't connected, while another one plays (or would play) in its place.
+    private var standIn: String? { model.activeDevice == nil ? nil : model.missingChosenOutput }
+
     private func chipDetail(_ device: OutputDevice?, _ path: SignalPath?) -> String {
         if let path {
             return "\(path.deviceFormatShort) · \(path.applied.exclusive ? "EXCL" : "SHARED")"
         }
-        guard let device else { return "—" }
-        return "\(SampleRate.format(device.nominalSampleRate)) kHz · IDLE"
+        guard let device else { return model.missingChosenOutput == nil ? "—" : "NOT CONNECTED" }
+        return "\(SampleRate.format(device.nominalSampleRate)) kHz · \(standIn == nil ? "IDLE" : "STANDING IN")"
     }
 }
 
@@ -204,6 +207,11 @@ struct DevicePicker: View {
         VStack(alignment: .leading, spacing: 4) {
             SectionLabel(text: "Output").padding(.horizontal, 8).padding(.bottom, 4)
             deviceRow(nil, name: "System Default", detail: "FOLLOWS SOUND SETTINGS", symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
+            if let missing = model.missingChosenOutput, let uid = model.settings.selectedDeviceUID {
+                // Still the chosen one: playback goes back to it when it's connected again.
+                deviceRow(uid, name: missing, detail: model.plannedDevice.map { "NOT CONNECTED · USING \($0.name.uppercased())" } ?? "NOT CONNECTED · WAITING FOR IT",
+                          symbol: "cable.connector.slash", selected: true)
+            }
             ForEach(model.devices.devices) { d in
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,
                           selected: model.settings.selectedDeviceUID == d.uid)

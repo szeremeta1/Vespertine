@@ -56,6 +56,10 @@ final class AppSettings {
     var versionPreference: TrackVersions.Preference { didSet { defaults.set(versionPreference.rawValue, forKey: "versionPreference") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
+    /// The chosen output as last seen, to name it while it's unplugged and find it again under a new UID.
+    var selectedDevice: OutputIdentity? { didSet { defaults.set(try? JSONEncoder().encode(selectedDevice), forKey: "selectedDevice") } }
+    /// What plays while the chosen output isn't connected.
+    var outputFallback: OutputFallback { didSet { defaults.set(outputFallback.rawValue, forKey: "outputFallback") } }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
     /// Outputs with an AV receiver: Dolby and DTS are sent to them untouched.
     var bitstreamDeviceUIDs: Set<String> { didSet { defaults.set(Array(bitstreamDeviceUIDs), forKey: "bitstreamDeviceUIDs") } }
@@ -112,6 +116,8 @@ final class AppSettings {
         integerMode = defaults.bool(forKey: "integerMode")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
         selectedDeviceUID = defaults.string(forKey: "selectedDeviceUID")
+        selectedDevice = defaults.data(forKey: "selectedDevice").flatMap { try? JSONDecoder().decode(OutputIdentity.self, from: $0) }
+        outputFallback = OutputFallback(rawValue: defaults.string(forKey: "outputFallback") ?? "") ?? .bestAvailable
         dopDeviceUIDs = Set(defaults.stringArray(forKey: "dopDeviceUIDs") ?? [])
         bitstreamDeviceUIDs = Set(defaults.stringArray(forKey: "bitstreamDeviceUIDs") ?? [])
         spatialModes = defaults.dictionary(forKey: "spatialModes") as? [String: String] ?? [:]
@@ -159,6 +165,15 @@ final class AppSettings {
 
     func setEQPreset(_ id: UUID?, for uid: String) { eqAssignments[uid] = id?.uuidString }
 
+    /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
+    func moveDeviceSettings(from old: String, to new: String) {
+        if dopDeviceUIDs.contains(old) { dopDeviceUIDs.insert(new) }
+        if bitstreamDeviceUIDs.contains(old) { bitstreamDeviceUIDs.insert(new) }
+        if spatialModes[new] == nil, let mode = spatialModes[old] { spatialModes[new] = mode }
+        if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
+        if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
+    }
+
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
     func setRateChoice(_ choice: RateChoice, for uid: String) { rateChoices[uid] = choice.code }
 
@@ -175,6 +190,8 @@ final class AppSettings {
         var s = EngineSettings()
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
+        s.deviceName = selectedDevice.flatMap { $0.uid == selectedDeviceUID ? $0.name : nil }
+        s.outputFallback = outputFallback
         s.dopDeviceUIDs = dopDeviceUIDs
         s.bitstreamDeviceUIDs = bitstreamDeviceUIDs
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
