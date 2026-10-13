@@ -1,8 +1,8 @@
 # Press and post images
 
-Vespertine is the free, open-source Mac player for surround and hi-res music collections. Lead with extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library, with head-tracked Spatial Audio on AirPods. The source is GPL and the signal-path conditions and tests are public.
+Vespertine is the free, open-source Mac player for surround and hi-res music collections. Lead with SACD images and extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library, with head-tracked Spatial Audio on AirPods. The source is GPL and the signal-path conditions and tests are public.
 
-Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO playback is new in 0.11.0 and checked on two real discs. PCM hardware checks reach 384 kHz; DSD file support is not proof of native DoP playback at every rate. Hi-res analysis is a feature other players offer too. Use the [feature details](../FEATURES.md), [verification guide](../VERIFICATION.md) and [comparison sources](../COMPARISON.md) when writing claims.
+Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. SACD ISO playback is new in 0.11.0 and checked on two real discs. The interface is translated into 44 languages besides English; translations welcome corrections. PCM hardware checks reach 384 kHz; DSD file support is not proof of native DoP playback at every rate. Hi-res analysis is a feature other players offer too. Use the [feature details](../FEATURES.md), [verification guide](../VERIFICATION.md) and [comparison sources](../COMPARISON.md) when writing claims.
 
 Each image covers one feature at three sizes:
 
@@ -12,7 +12,7 @@ Each image covers one feature at three sizes:
 | `-x` | 1600×900 | X and Bluesky |
 | `-producthunt` | 1270×760 | Product Hunt gallery |
 
-The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd` and `fake-hi-res`. They're built from `docs/screenshots` by `scripts/brand/build.sh`, and follow the [brand guide](../brand/brand-guide.pdf).
+The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd`, `fake-hi-res`, `sacd-iso` and `languages`. They're built from `docs/screenshots` by `scripts/brand/build.sh`, and follow the [brand guide](../brand/brand-guide.pdf).
 
 The fake hi-res screenshot and trailer scene show a deliberate fake, so no real release is called one: the trailer's own score, encoded to MP3 at 192 kb/s, decoded and upsampled to 24-bit / 192 kHz, and credited to a made-up band (The Lantern Lounge Orchestra, *After Midnight (24/192 Remaster)*).
 
