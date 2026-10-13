@@ -147,7 +147,7 @@ struct SetupFlow: View {
     private var footer: some View {
         HStack {
             if step != .welcome, let previous = step.previous {
-                Button { go(to: previous) } label: { Label("Back", systemImage: "chevron.left") }
+                Button { go(to: previous) } label: { Label("Back", systemImage: "chevron.backward") }
                     .buttonStyle(QuietButtonStyle())
                     .keyboardShortcut("[", modifiers: .command)
                     .transition(.opacity)
@@ -163,7 +163,7 @@ struct SetupFlow: View {
             }
             if SetupStep.named.contains(step), let next = step.next {
                 Button { go(to: next) } label: {
-                    HStack(spacing: 6) { Text("Continue"); Image(systemName: "chevron.right").font(.system(size: 11, weight: .semibold)) }
+                    HStack(spacing: 6) { Text("Continue"); Image(systemName: "chevron.forward").font(.system(size: 11, weight: .semibold)) }
                 }
                 .buttonStyle(SetupPrimaryButtonStyle())
                 .keyboardShortcut(.defaultAction)
@@ -441,6 +441,8 @@ private struct SetupWelcome: View {
             }
             .font(Typeface.serif(64, weight: .light))
             .foregroundStyle(Palette.text)
+            // The name is Latin in every language: keep its letters in order in right-to-left layouts.
+            .environment(\.layoutDirection, .leftToRight)
             .padding(.top, 26)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(verbatim: "Vespertine"))
@@ -458,7 +460,7 @@ private struct SetupWelcome: View {
                 .padding(.top, 6)
                 .reveal(shown, delay: 1.05)
             Button(action: start) {
-                HStack(spacing: 8) { Text("Get Started"); Image(systemName: "arrow.right").font(.system(size: 12, weight: .semibold)) }
+                HStack(spacing: 8) { Text("Get Started"); Image(systemName: "arrow.forward").font(.system(size: 12, weight: .semibold)) }
             }
             .buttonStyle(SetupPrimaryButtonStyle())
             .keyboardShortcut(.defaultAction)
@@ -521,6 +523,7 @@ private struct SetupMusic: View {
                     model.showConnectServer = true
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: 700)
             .padding(.top, 14)
             .reveal(shown, delay: 0.2)
@@ -569,12 +572,14 @@ private struct SetupMusic: View {
                         Spacer()
                         if recommended { StatusBadge(text: String(localized: "RECOMMENDED"), kind: .perfect) }
                     }
+                    // Titles wrap (some languages run long); the row's tiles keep one height.
                     Text(title).font(Typeface.ui(13.5, weight: .semibold)).foregroundStyle(Palette.text)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text(detail).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
                 }
-                .frame(height: 128, alignment: .top)
+                .frame(minHeight: 128, maxHeight: .infinity, alignment: .top)
             }
             .contentShape(Rectangle())
         }
@@ -838,6 +843,8 @@ private struct SetupDone: View {
                     .frame(width: 40, height: 30)
             }
             .frame(width: 104, height: 104)
+            // A check mark reads the same in every language; don't mirror it.
+            .environment(\.layoutDirection, .leftToRight)
             .accessibilityHidden(true)
             Text("You're all set")
                 .font(Typeface.serif(40))
