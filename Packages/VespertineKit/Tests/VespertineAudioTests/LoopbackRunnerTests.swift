@@ -191,6 +191,31 @@ struct LoopbackRunnerTests {
         #expect(LoopbackResultStore.latest(in: saved, sampleRate: 44_100, bits: 16, matchSixteenBit: true, macOS: "26.0.0", appVersion: "0.12.0") == nil)
     }
 
+    @Test("The signal path shows a saved result only for its own format, on this version, with nothing changing the samples")
+    func savedResultForSignalPath() throws {
+        let ok = LoopbackCaseResult(testCase: LoopbackCase(sampleRate: 96_000, bits: 24), status: .bitExact, summary: "bit-exact")
+        let saved = [LoopbackSavedResult(key: LoopbackResultKey(deviceUID: "loop", format: ok.id, settings: [:], macOS: "26.0.0", appVersion: "0.12.0"),
+                                         deviceName: "Vespertine Loopback", date: .now, mode: .quick, result: ok)]
+        func path(rate: Double, bits: Int, volume: SignalPath.VolumeStage = .fixed) -> SignalPath {
+            let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: rate, bitDepth: bits, channels: 2)
+            let plan = FormatPlanner.plan(source: source, device: DeviceCapabilities(sampleRates: [rate], physicalFormats: [],
+                                                                                     outputChannels: 2, supportsDoP: false))
+            return SignalPath(source: source, decoderName: "test", plan: plan,
+                              applied: AppliedFormat(sampleRate: rate, physicalBitDepth: 24, physicalIsInteger: true, virtualChannels: 2,
+                                                     exclusive: true, bufferFrames: 512),
+                              deviceName: "DAC", deviceUID: "dac",
+                              deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "x"), volume: volume)
+        }
+        func lookup(_ p: SignalPath, macOS: String = "26.0.0") -> LoopbackSavedResult? {
+            LoopbackResultStore.latest(in: saved, for: p, macOS: macOS, appVersion: "0.12.0")
+        }
+        #expect(lookup(path(rate: 96_000, bits: 24))?.result.status == .bitExact)
+        #expect(lookup(path(rate: 96_000, bits: 24), macOS: "26.1.0") == nil)
+        #expect(lookup(path(rate: 44_100, bits: 24)) == nil)
+        #expect(lookup(path(rate: 96_000, bits: 16)) == nil)
+        #expect(lookup(path(rate: 96_000, bits: 24, volume: .digital(dB: -6))) == nil)
+    }
+
     /// Plays the quick test through the dedicated loopback device. Silent: the device is virtual.
     @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))
     func quickRunIsBitExact() async throws {

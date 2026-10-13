@@ -143,4 +143,15 @@ public struct LoopbackResultStore: Sendable {
         }
         .max { $0.date < $1.date }
     }
+
+    /// The saved result for what a signal path plays, when its source format was checked on this macOS and
+    /// Vespertine version. Only for paths that leave the samples alone: the test forces every processing step off.
+    public static func latest(in saved: [LoopbackSavedResult], for path: SignalPath, macOS: String,
+                              appVersion: String) -> LoopbackSavedResult? {
+        guard path.plan.mode == .pcm, !path.modifiesSamples, !path.isResampling, !path.plan.dsdConvertedToPCM,
+              path.plan.spatial == .off, path.plan.channels == path.source.channels, let bits = path.source.bitDepth else { return nil }
+        return latest(in: saved, sampleRate: path.source.sampleRate, bits: bits, matchSixteenBit: path.plan.sixteenBit != nil,
+                      integerMode: path.applied.integerMode, macOS: macOS, appVersion: appVersion)
+    }
+
 }

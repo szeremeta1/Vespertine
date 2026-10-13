@@ -108,13 +108,8 @@ final class LoopbackTest {
         NSPasteboard.general.setString(report.markdown, forType: .string)
     }
 
-    /// The saved result for what's playing, when its source format was checked on this macOS and Vespertine version.
-    /// Only for paths that leave the samples alone: the test forces every processing step off.
+    /// The saved result for what's playing, when its format was checked on this macOS and Vespertine version.
     func result(for path: SignalPath) -> LoopbackSavedResult? {
-        guard path.plan.mode == .pcm, !path.modifiesSamples, !path.isResampling, !path.plan.dsdConvertedToPCM,
-              let bits = path.source.bitDepth else { return nil }
-        return LoopbackResultStore.latest(in: saved, sampleRate: path.source.sampleRate, bits: bits,
-                                          matchSixteenBit: path.plan.sixteenBit != nil, integerMode: path.applied.integerMode,
-                                          macOS: macOS, appVersion: appVersion)
+        LoopbackResultStore.latest(in: saved, for: path, macOS: macOS, appVersion: appVersion)
     }
 }
