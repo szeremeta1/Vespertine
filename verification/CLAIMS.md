@@ -350,7 +350,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-SACD-01 <a id="sacd-match"></a>Matched sacd_extract bit for bit on two real discs
 
-- **Text:** `README.md:44` — "It matched sacd_extract bit for bit on two real discs."
+- **Text:** `README.md:49` — "It matched sacd_extract bit for bit on two real discs."
 - **Text:** `docs/FEATURES.md:7` — "Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit"
 - **Text:** `docs/ARCHITECTURE.md:31` — "Their TOCs, the raw DST frames, the decoded DSD of three tracks per area including adjacent ones, the DoP and PCM output, and random seeks were all identical."
 - **Property:** for those images, TOC data, raw DST frames, decoded DSD, DoP and PCM output equal what `sacd_extract` produces.

@@ -42,7 +42,7 @@ Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer 
 
 Vespertine uses hardware volume where available; optional digital volume and ReplayGain appear in the signal path when they change the samples.
 
-Vespertine waits for your selected device if it is missing, for up to a minute at playback start. If it disconnects during a song, playback resumes from the same position when it returns. At quit, each device is restored to its earlier rate and depth, or your chosen default. Tracks with the same output format play gaplessly, including CUE-sheet albums.
+Vespertine remembers the output you chose. If it isn't connected, Settings › Playback decides what happens: play on the best connected output (the default), on the Mac's sound output, or wait for it. The output chip, picker and inspector name the missing device and any stand-in, and playback moves back when it returns, even if macOS gives it a new ID; its own settings come with it. If it disconnects during a song, playback resumes from the same position when it returns. At quit, each device is restored to its earlier rate and depth, or your chosen default. Tracks with the same output format play gaplessly, including CUE-sheet albums.
 
 ## DSD and AirPods Max
 
