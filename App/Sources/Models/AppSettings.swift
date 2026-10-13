@@ -107,6 +107,8 @@ final class AppSettings {
     var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
     /// The preset each output plays with (device UID → preset ID). Outputs that aren't listed play without one.
     var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
+    /// First-run setup has been finished (or skipped) once.
+    var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
     /// Library location. Overridable with `-VespertineDataDirectory <path>` for testing.
     let dataDirectory: URL
@@ -154,6 +156,7 @@ final class AppSettings {
         networkPrefetch = defaults.integer(forKey: "networkPrefetch")
         eqPresets = defaults.data(forKey: "eqPresets").flatMap { try? JSONDecoder().decode([EQPreset].self, from: $0) } ?? []
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
+        setupCompleted = defaults.bool(forKey: "setupCompleted")
 
         if let dataDirectory {
             self.dataDirectory = dataDirectory

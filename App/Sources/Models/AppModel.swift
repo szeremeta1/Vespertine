@@ -186,6 +186,8 @@ final class AppModel {
     var spatialExportTracks: [Track]?
     /// nil = not shown; [] = whole library; otherwise these albums.
     var enrichAlbumKeys: [String]?
+    /// First-run setup, in the main window in place of the library.
+    var showSetup = false
 
     init(dataDirectory: URL? = nil) throws {
         let settings = AppSettings(dataDirectory: dataDirectory)
@@ -195,6 +197,7 @@ final class AppModel {
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory)
+        showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
         shares = NetworkShareManager(library: library, settings: settings)
@@ -260,6 +263,28 @@ final class AppModel {
         if !LaunchArguments().bool(forKey: "VespertineOpenMini") {
             Task { @MainActor [weak self] in self?.runDeveloperHooks(openWindow: nil) }
         }
+    }
+
+    /// Setup shows until it's been finished once. A library that already has music (from before setup existed) counts
+    /// as set up. Test libraries (`-VespertineDataDirectory`) skip it, so screenshots open on the library, unless
+    /// `-VespertineSetup auto` (first-run rules) or `-VespertineSetup show` (always) asks for it.
+    private static func needsSetup(settings: AppSettings, library: LibraryStore, arguments: LaunchArguments) -> Bool {
+        switch arguments.string(forKey: "VespertineSetup") {
+        case "show": return true
+        case "auto": break
+        default: if arguments.string(forKey: "VespertineDataDirectory") != nil { return false }
+        }
+        guard !settings.setupCompleted else { return false }
+        if !((try? library.database.sources()) ?? []).isEmpty {
+            settings.setupCompleted = true
+            return false
+        }
+        return true
+    }
+
+    func completeSetup() {
+        settings.setupCompleted = true
+        showSetup = false
     }
 
     private var hooksStarted = false

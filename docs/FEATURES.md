@@ -98,6 +98,10 @@ SMB, NFS and WebDAV shares are read-only by default, with credentials in the log
 
 For lossless PCM and DoP, a completed local copy can replace the network source mid-song at the same sample. Automated tests cover the continuity. Lossy decoding and DSD-to-PCM keep using the share for the current song because their decoders carry state across a seek.
 
+## First launch
+
+A short setup assistant opens the first time Vespertine starts. It finds or adds your music (left in place, or copied and organized), picks the output to remember, and sets exclusive access, ReplayGain, volume keys, background quality checks, cover art and automatic updates. Every choice can be changed later in Settings. It shows once: libraries that already have music skip it, and Setup Assistant… in the Vespertine menu opens it again.
+
 ## Formats
 
 | Format | Files | Path |
