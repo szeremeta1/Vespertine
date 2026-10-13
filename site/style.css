@@ -181,6 +181,7 @@ footer { border-top: 1px solid var(--hair); padding: 36px 0 56px; color: var(--t
 footer .wrap { display: grid; gap: 14px; }
 footer .row { display: flex; gap: 18px; flex-wrap: wrap; }
 footer a { color: var(--text2); }
+footer .ukraine { margin: 0; padding-left: 12px; border-left: 3px solid #ffd700; box-shadow: inset 3px 0 0 #0057b7; color: var(--text2); }
 
 @media (max-width: 900px) {
   .nav .wrap { gap: 10px; }

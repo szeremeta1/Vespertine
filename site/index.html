@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vespertine: surround and hi-res music for Mac</title>
-<meta name="description" content="Free, open-source Mac player for surround and hi-res collections: extracted SACD 5.1, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
+<meta name="description" content="Free, open-source Mac player for surround and hi-res collections: SACD images and rips, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#09090A">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Vespertine">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="Vespertine: surround and hi-res music for Mac">
-<meta property="og:description" content="Free, open-source Mac player for surround and hi-res collections: extracted SACD 5.1, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
+<meta property="og:description" content="Free, open-source Mac player for surround and hi-res collections: SACD images and rips, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
 <meta property="og:url" content="https://vespertineapp.com/">
 <meta property="og:image" content="https://vespertineapp.com/assets/og-wide.png">
 <meta property="og:image:type" content="image/png">
@@ -24,7 +24,7 @@
 <meta property="og:image:alt" content="Vespertine's Now Playing panel: Lazar Berman's Liszt at 24-bit / 96 kHz on a FiiO K11, marked bit-perfect and exclusive, with its signal path.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Vespertine: surround and hi-res music for Mac">
-<meta name="twitter:description" content="Free, open-source Mac player for surround and hi-res collections: extracted SACD 5.1, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
+<meta name="twitter:description" content="Free, open-source Mac player for surround and hi-res collections: SACD images and rips, DTS CDs, DTS-HD MA, TrueHD and DD+ Atmos files, Spatial Audio on AirPods, and a signal path you can inspect.">
 <meta name="twitter:image" content="https://vespertineapp.com/assets/og-wide.png">
 <meta name="twitter:image:alt" content="Vespertine's Now Playing panel: Lazar Berman's Liszt at 24-bit / 96 kHz on a FiiO K11, marked bit-perfect and exclusive, with its signal path.">
 <script type="application/ld+json">
@@ -69,7 +69,7 @@
     <div class="wrap">
       <img class="hero-icon" src="assets/icon-512.png" alt="Vespertine app icon" width="104" height="104">
       <h1>Surround and hi-res music, <em>on your Mac</em>.</h1>
-      <p class="lede">The free, open-source Mac player for surround and hi-res music collections. Extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output.</p>
+      <p class="lede">The free, open-source Mac player for surround and hi-res music collections. SACD images, extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output. In English and 44 other languages.</p>
       <p class="fine">Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted.</p>
       <div class="cta">
         <a class="btn btn-brass js-download" href="https://github.com/szeremeta1/Vespertine/releases/latest">
@@ -92,7 +92,7 @@
       <span class="badge">Exclusive</span>
       <span class="badge">32 / 192</span>
       <span class="badge copper">44.1 → 48 <span class="unit">kHz</span></span>
-      <span class="badge">DSD 256 · <span class="unit">DoP</span></span>
+      <span class="badge">DSD 128 · <span class="unit">DoP</span></span>
       <span class="badge">Spatial · head tracked</span>
       <span class="badge copper">Synthetic high frequencies?</span>
     </div>
@@ -126,7 +126,7 @@
         <div class="pillar">
           <svg class="glyph" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="17" cy="17" r="3"/><path d="M9.5 9.5a10.6 10.6 0 0 0 0 15M24.5 9.5a10.6 10.6 0 0 1 0 15M5.5 5.5a16.3 16.3 0 0 0 0 23M28.5 5.5a16.3 16.3 0 0 1 0 23"/></svg>
           <h3>Surround in one library</h3>
-          <p>Extracted SACD 5.1, DTS CDs, DTS-HD MA and TrueHD sit next to your stereo albums and play as head-tracked Spatial Audio on AirPods. When an album comes in both, each song is listed once and the right version plays for your output.</p>
+          <p>SACD images and rips, DTS CDs, DTS-HD MA and TrueHD sit next to your stereo albums and play as head-tracked Spatial Audio on AirPods. When an album comes in both, each song is listed once and the right version plays for your output.</p>
         </div>
         <div class="pillar">
           <svg class="glyph" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h20v14H7z"/><path d="M13 27h8M17 22v5"/><path d="M12 15.5l3 3 6-6"/></svg>
@@ -169,6 +169,9 @@
             <li>Integer mode sends 32-bit integers straight to DACs that take them.</li>
             <li>Gapless, including CUE-sheet albums split from one file.</li>
             <li>Hands your DAC back at the rate and depth it had before, when Vespertine quits.</li>
+            <li>Remembers your DAC. If it isn't connected, music plays on the best connected output and moves back when the DAC returns.</li>
+            <li>Match 16-bit sources (off by default) sends 16-bit files to DACs with a real 16-bit mode as 16-bit, not zero-padded.</li>
+            <li>A built-in loopback test compares every sample Vespertine sends to a virtual device. It's a software check, labelled as one, and never changes the BIT-PERFECT badge. <a href="https://github.com/szeremeta1/Vespertine/blob/main/docs/LOOPBACK.md">What it proves →</a></li>
           </ul>
         </div>
         <img class="shot" src="assets/dsd-native-dop-detail.jpg" alt="Claudja Barry's Love for the Sake of Love as DSD128 over DoP to a FiiO K11, at 352.8 kHz" loading="lazy" width="1300" height="1100">
@@ -202,6 +205,28 @@
 
       <div class="feature">
         <div class="copy">
+          <div class="eyebrow">SACD images</div>
+          <h3>Play the disc image itself.</h3>
+          <p>Point Vespertine at an SACD <span class="mono">.iso</span> and it plays the stereo and 5.1 areas straight from the image, DST-compressed or plain, with no extraction step. Stereo goes to your DAC as native DSD over DoP where the DAC supports it; 5.1 plays as head-tracked Spatial Audio on AirPods.</p>
+          <ul>
+            <li>Matched sacd_extract bit for bit on two real discs.</li>
+            <li>Discs with a 5.0 area, only a multichannel area, or DSD128 and above are covered only by synthesized test images so far.</li>
+          </ul>
+        </div>
+        <img class="shot" src="assets/sacd-iso-detail.jpg" alt="SACD_ISO_ALT" loading="lazy" width="1300" height="1100">
+      </div>
+
+      <div class="feature flip">
+        <div class="copy">
+          <div class="eyebrow">44 languages</div>
+          <h3>Speaks your language.</h3>
+          <p>Every menu, setting and signal-path message is translated into 44 languages besides English, from Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats. Arabic, Hebrew, Persian and Urdu get a right-to-left layout. Corrections from native speakers are welcome on <a href="https://github.com/szeremeta1/Vespertine/issues">GitHub</a>.</p>
+        </div>
+        <img class="shot" src="assets/languages.jpg" alt="LANGUAGES_ALT" loading="lazy" width="LANG_W" height="LANG_H">
+      </div>
+
+      <div class="feature">
+        <div class="copy">
           <div class="eyebrow">Library</div>
           <h3>Browse like Apple Music. Manage like a librarian.</h3>
           <ul>
@@ -212,6 +237,7 @@
             <li>Tag editor with backups and one-step revert, plus MusicBrainz enrichment that shows its confidence before writing anything.</li>
             <li>Network shares over SMB, NFS or WebDAV, with caching, Keep Offline and playback built for slow servers.</li>
             <li>Find Music searches every drive for your real music and leaves the clutter behind.</li>
+            <li>A short setup on first launch finds your music, picks your output and explains what exclusive access and ReplayGain do to bit-perfect playback.</li>
             <li>Parametric EQ per output that imports AutoEQ and Equalizer APO presets. Off by default; when it's on, the signal path says EQUALIZER instead of BIT-PERFECT.</li>
           </ul>
         </div>
@@ -330,6 +356,7 @@
 
 <footer>
   <div class="wrap">
+    <p class="ukraine"><strong>Vespertine stands with Ukraine.</strong> Please donate through <a href="https://u24.gov.ua/">United24</a>, <a href="https://savelife.in.ua/en/donate-en/">Come Back Alive</a> or <a href="https://www.razomforukraine.org/donate/">Razom for Ukraine</a>.</p>
     <div class="row">
       <a href="https://github.com/szeremeta1/Vespertine">GitHub</a>
       <a href="https://github.com/szeremeta1/Vespertine/releases">Release notes</a>
