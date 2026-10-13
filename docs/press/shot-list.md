@@ -1,7 +1,7 @@
 # 1.0 shot list
 
 Every image and video of the app interface, the track each one is shot on, what it needs, and what has to be true on
-screen before it ships. Shot on Vespertine 1.0.0 (Release, from the main commit named in the commit that adds the shots) against a copy of the maker's library (`-VespertineDataDirectory`), with the window at 1440×900 pt (`-VespertineWindowSize`) on a Retina display, captured window-only and scaled to 2400×1500, and background analysis off (`-autoAnalyze NO`). Everything else (press key art, site
+screen before it ships. Shot on Vespertine 0.11.1 (Release of main at 8135150 plus this branch's QA hooks, run as its own copy with bundle ID `org.szeremeta.Vespertine.shoot`) against a copy of the maker's library (`-VespertineDataDirectory`), with the window at 1440×900 pt (`-VespertineWindowSize`) on a Retina display, captured window-only and scaled to 2400×1500, and background analysis off (`-autoAnalyze NO`). The Mac's default and alert outputs sit on the silent Vespertine Loopback during the shoot, so an exclusive hold on the K11 or the AirPods never moves macOS's output to the built-in speakers. Everything else (press key art, site
 JPEGs, the tour, the social previews) is derived from these by the scripts named at the end.
 
 | Scene (`docs/screenshots/`) | Track | Needs | True on screen |
@@ -16,11 +16,11 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 | `genres` | Genres page | library | counts match the library |
 | `smart-playlist` | smart playlist *AirPods Max Bit-Perfect*, filtered to Oasis; *Don't Look Back in Anger* (24/48) playing | AirPods Max | BIT-PERFECT, 48 kHz native, unity volume, exclusive |
 | `mini-player` | *Don't Look Back in Anger*, Oasis (24/48) on AirPods Max | AirPods Max | BIT-PERFECT only if the device runs at 48 kHz with unity volume |
-| `sacd-iso` | a track of a real SACD image (*Brothers in Arms* or *The Dark Side of the Moon*), played straight from the `.iso` | FiiO K11 with DoP, or AirPods Max | the source names the ISO; stereo DSD64 reads NATIVE DSD · DoP on the K11, or the 5.1 area plays as head-tracked Spatial Audio on the AirPods Max |
-| `languages` (`languages.png`) | Albums › *Goodbye Yellow Brick Road*, track 2 selected, Details inspector, in Japanese, German, Ukrainian, Arabic, Brazilian Portuguese and Simplified Chinese (`-AppleLanguages`) | none (silent) | no truncated or overlapping strings; Arabic mirrored right to left; composited by `scripts/make-languages-grid.sh` |
+| `sacd-iso` | *Brothers In Arms*, Dire Straits, from the 2005 20th Anniversary SACD image (`SACD-R.iso`), stereo area | FiiO K11, DoP enabled for it | NATIVE DSD · DoP, 32 / 176.4; source SACD · DSD64 · 2.8 MHz; decoder "SACD image · DST (lossless) decoded to DSD"; unity volume, hog mode |
+| `languages` (`languages.png`) | Albums › *Années de pèlerinage* (Lazar Berman), track 2 of each disc selected, Details inspector, in Japanese, German, Ukrainian, Arabic, Brazilian Portuguese and Simplified Chinese (`-AppleLanguages`; Arabic also with `-AppleTextDirection YES`, as on a Mac set to Arabic) | FiiO K11 selected, nothing playing | no truncated or overlapping strings; Arabic mirrored right to left; composited by `scripts/make-languages-grid.sh` |
 | `output-settings` | Settings › Playback | FiiO K11 selected, nothing playing | the remembered output, the fallback to the best connected output, Match 16-bit sources on |
-| `equalizer` | Window › Equalizer with the AutoEQ *Sennheiser HD 600* preset (oratory1990) on the FiiO K11; *Les jeux d'eau* playing behind it | FiiO K11 | the preset on for the K11; the signal path shows the equalizer step and no BIT-PERFECT badge |
-| `loopback-test` | Controls › Loopback Test… sheet and report | the "Vespertine Loopback" output installed | the report from a run on this build |
+| `equalizer` | Window › Equalizer with the AutoEQ *Sennheiser HD 600* preset (oratory1990) on the FiiO K11, over the main window playing *Les jeux d'eau* (24/96); the two window captures are laid out as they sat on screen (`scripts/compose-windows.swift`) | FiiO K11 | the preset on for the K11; EQUALIZER badge and the Equalizer step in the signal path; no BIT-PERFECT badge |
+| `loopback-test` | Controls › Loopback Test…, quick test run (`-VespertineOpenSheet loopback-run`) | the "Vespertine Loopback" output installed (`scripts/install-loopback-device.sh`) | BIT-EXACT for 24/44.1, 24/96, 16-bit padded and the gapless pair |
 | `setup-welcome`, `setup-output` | first-run setup, welcome and output steps (`-VespertineSetup show -VespertineSetupStep welcome\|output`) on an empty library | none (silent) | the steps as a new user sees them |
 
 ## Video

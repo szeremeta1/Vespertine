@@ -48,16 +48,18 @@ enum DeveloperHooks {
                 }
             }
         }
-        if d.bool(forKey: "VespertineOpenSettings") {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
         // `-VespertineEQPreset <ParametricEQ.txt>`: imports an AutoEQ / Equalizer APO file and turns it on for the
         // chosen output, as Import… and the output's switch in the Equalizer window do.
         if let path = d.string(forKey: "VespertineEQPreset") {
             let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
             do {
-                let preset = try EQPreset.parse(String(contentsOf: url, encoding: .utf8), name: url.deletingPathExtension().lastPathComponent)
-                model.settings.eqPresets.append(preset)
+                var preset = try EQPreset.parse(String(contentsOf: url, encoding: .utf8), name: url.deletingPathExtension().lastPathComponent)
+                if let i = model.settings.eqPresets.firstIndex(where: { $0.name == preset.name }) {   // imported before: refresh it
+                    preset.id = model.settings.eqPresets[i].id
+                    model.settings.eqPresets[i] = preset
+                } else {
+                    model.settings.eqPresets.append(preset)
+                }
                 if let uid = model.settings.selectedDeviceUID { model.settings.setEQPreset(preset.id, for: uid) }
                 model.syncEngine()
                 print("[qa] equalizer: \(preset.name), \(preset.bands.count) bands, on \(model.settings.selectedDeviceUID ?? "no output")")
@@ -67,7 +69,7 @@ enum DeveloperHooks {
         }
         // `-VespertineOpenWindow equalizer|mini`: opens one of the app's other windows.
         if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
-        if d.string(forKey: "VespertineOpenSheet") == "loopback" { model.showLoopbackTest = true }
+        if d.string(forKey: "VespertineOpenSheet")?.hasPrefix("loopback") == true { model.showLoopbackTest = true }   // loopback-run also starts it
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
         // whatever frame the window last saved.
         if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
@@ -158,15 +160,16 @@ enum DeveloperHooks {
                 model.player.engine.pause()
             }
         }
-        // `-VespertinePlaySong "Title|Artist|DSD"`: opens and plays the album holding the first song whose title contains Title, from that song. Artist and
+        // `-VespertinePlaySong "Title|Artist|DSD|.iso"`: opens and plays the album holding the first song whose title contains Title, from that song. Artist and
         // a format word (matched against the format summary, e.g. "5.1", "DSD128", "24/96") are optional and pick one
-        // version where the library has several.
+        // version where the library has several; a fourth part matches the file's path.
         if let spec = d.string(forKey: "VespertinePlaySong") {
             let parts = spec.split(separator: "|").map { $0.trimmingCharacters(in: .whitespaces) }
             let matches = { (t: Track) -> Bool in
                 t.title.localizedCaseInsensitiveContains(parts[0])
                     && (parts.count < 2 || parts[1].isEmpty || t.displayAlbumArtist.localizedCaseInsensitiveContains(parts[1]))
-                    && (parts.count < 3 || t.formatSummary.localizedCaseInsensitiveContains(parts[2]))
+                    && (parts.count < 3 || parts[2].isEmpty || t.formatSummary.localizedCaseInsensitiveContains(parts[2]))
+                    && (parts.count < 4 || t.filePath.localizedCaseInsensitiveContains(parts[3]))   // e.g. ".iso"
             }
             if let song = model.library.allTracks().first(where: matches) {
                 let tracks = model.library.tracks(albumKey: song.albumKey)

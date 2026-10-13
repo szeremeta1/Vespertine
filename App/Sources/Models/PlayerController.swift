@@ -495,7 +495,8 @@ final class PlayerController {
         if state == .playing, let device = snap.outputDevice { followSystemOutput(to: device) } else if state != .playing { lastFollowed = nil }
         if relayedDevice != snap.outputDevice?.id {
             relayedDevice = snap.outputDevice?.id
-            volumeRelay.follow(relayedDevice)
+            // QA: `-VespertineVolumeRelay NO` keeps the relay off, so a screenshot run never touches another output's level.
+            volumeRelay.follow(LaunchArguments().string(forKey: "VespertineVolumeRelay") == "NO" ? nil : relayedDevice)
         }
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }

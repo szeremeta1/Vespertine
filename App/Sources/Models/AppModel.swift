@@ -260,7 +260,8 @@ final class AppModel {
                 Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
             }
         }
-        if !LaunchArguments().bool(forKey: "VespertineOpenMini") {
+        // Hooks that open another window wait for the main window, which can open it.
+        if !LaunchArguments().bool(forKey: "VespertineOpenMini") && LaunchArguments().string(forKey: "VespertineOpenWindow") == nil {
             Task { @MainActor [weak self] in self?.runDeveloperHooks(openWindow: nil) }
         }
     }
