@@ -225,6 +225,10 @@ struct SignalPathView: View {
                           tone: db == 0 ? .good : .changed))
         }
         let a = path.applied
+        if let note = path.sixteenBitNote {
+            s.append(Step(title: "Match 16-bit sources", detail: note,
+                          value: "\(a.physicalBitDepth)-bit", tone: path.isBitPerfect ? .good : .plain))
+        }
         s.append(Step(title: path.deviceName,
                       detail: "\(path.deviceProfile.connection) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)\(a.integerMode ? " · integer mode" : "")",
                       value: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz",
