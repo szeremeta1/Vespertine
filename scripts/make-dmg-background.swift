@@ -60,6 +60,27 @@ func drawText(_ s: String, _ f: NSFont, _ c: NSColor, centerX: CGFloat, top: CGF
     attr.draw(at: CGPoint(x: centerX - size.width / 2 + kern / 2, y: H - top - size.height))
 }
 
+/// A small rounded Ukrainian flag (blue over yellow) followed by the thank-you line, centred as one unit.
+func drawUkraineTagline(centerX: CGFloat, top: CGFloat) {
+    let attr = NSAttributedString(string: "Thank you for supporting Ukraine!",
+                                  attributes: [.font: font(11, 500), .foregroundColor: ivory.withAlphaComponent(0.82), .kern: 0.1])
+    let textSize = attr.size(), flag = CGSize(width: 18, height: 12), gap: CGFloat = 8
+    let x0 = centerX - (flag.width + gap + textSize.width) / 2
+    let textY = H - top - textSize.height
+    let flagRect = NSRect(x: x0, y: textY + (textSize.height - flag.height) / 2, width: flag.width, height: flag.height)
+    let ctx = NSGraphicsContext.current!.cgContext
+    ctx.saveGState()
+    NSBezierPath(roundedRect: flagRect, xRadius: 2.5, yRadius: 2.5).addClip()
+    color(0xFFD700).setFill(); flagRect.fill()
+    color(0x0057B7).setFill(); NSRect(x: flagRect.minX, y: flagRect.midY, width: flag.width, height: flag.height / 2).fill()
+    ctx.restoreGState()
+    color(0xFFFFFF, 0.18).setStroke()
+    let rim = NSBezierPath(roundedRect: flagRect.insetBy(dx: 0.25, dy: 0.25), xRadius: 2.25, yRadius: 2.25)
+    rim.lineWidth = 0.5
+    rim.stroke()
+    attr.draw(at: CGPoint(x: x0 + flag.width + gap, y: textY))
+}
+
 func render(scale: CGFloat) -> Data {
     let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(W * scale), pixelsHigh: Int(H * scale),
                                bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
@@ -131,8 +152,11 @@ func render(scale: CGFloat) -> Data {
     ctx.restoreGState()
 
     // Instructions and provenance.
-    drawText("Drag Vespertine into Applications to install", font(12.5), text2, centerX: W / 2, top: 336)
-    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, 500, .mono), text3, centerX: W / 2, top: 362, kern: 1.4)
+    drawText("Drag Vespertine into Applications to install", font(12.5), text2, centerX: W / 2, top: 332)
+    drawText("VERSION \(version) · UNIVERSAL · NOTARIZED BY APPLE", font(9, 500, .mono), text3, centerX: W / 2, top: 356, kern: 1.4)
+
+    // Ukraine: a small flag beside a thank-you line, centred beneath the provenance.
+    drawUkraineTagline(centerX: W / 2, top: 384)
 
     // Hairline frame.
     color(0xECE6DA, 0.06).setStroke()
