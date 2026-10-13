@@ -3110,6 +3110,275 @@
         }
       }
     },
+    "%@ didn’t come back. Press play to continue on another output.": {
+      "comment": "%@ is the name of an audio output device.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ አልተመለሰም። በሌላ ውፅዓት ላይ ለመቀጠል አጫውትን ይጫኑ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يعد %@ متاحًا. اضغط تشغيل للمتابعة على مخرج آخر."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ আর ফিরে আসেনি। অন্য আউটপুটে চালিয়ে যেতে প্লে চাপুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: zařízení se nevrátilo. Stiskněte Přehrát a pokračujte na jiném výstupu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kom ikke tilbage. Tryk på afspil for at fortsætte på et andet output."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ist nicht zurückgekehrt. Starte die Wiedergabe, um auf einer anderen Ausgabe weiterzuspielen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: δεν επανήλθε. Πατήστε αναπαραγωγή για να συνεχίσετε σε άλλη έξοδο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no ha vuelto. Pulsa Reproducir para continuar en otra salida."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ برنگشت. برای ادامه روی خروجی دیگر، دکمهٔ پخش را بزنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laite %@ ei palannut. Paina toistoa, niin toisto jatkuu toisella ulostulolla."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi bumalik ang %@. Pindutin ang play para magpatuloy sa ibang output."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’est pas revenu. Appuyez sur Lecture pour continuer sur une autre sortie."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ પાછું આવ્યું નહીં. બીજા આઉટપુટ પર ચાલુ રાખવા માટે પ્લે દબાવો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ bai dawo ba. Danna kunna don ci gaba a wata na'urar fitar da sauti."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ לא חזר. לחץ על ״נגן״ כדי להמשיך בפלט אחר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ वापस कनेक्ट नहीं हुआ। किसी दूसरे आउटपुट पर जारी रखने के लिए प्ले दबाएँ।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: az eszköz nem csatlakozott újra. A lejátszás gombbal folytathatja egy másik kimeneten."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak tersambung kembali. Tekan putar untuk melanjutkan di output lain."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non è tornato disponibile. Premi Riproduci per continuare su un’altra uscita."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@が再接続されませんでした。再生ボタンを押すと、別の出力で再生を続けます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಮರಳಿ ಬರಲಿಲ್ಲ. ಬೇರೆ ಔಟ್‌ಪುಟ್‌ನಲ್ಲಿ ಮುಂದುವರಿಸಲು ಪ್ಲೇ ಒತ್ತಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 기기가 다시 연결되지 않았습니다. 재생을 누르면 다른 출력에서 계속 재생합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ തിരികെ വന്നില്ല. മറ്റൊരു ഔട്ട്‌പുട്ടിൽ തുടരാൻ പ്ലേ അമർത്തുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ परत आले नाही. दुसऱ्या आउटपुटवर सुरू ठेवण्यासाठी प्ले दाबा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak kembali. Tekan main untuk meneruskan pada output lain."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kom ikke tilbake. Trykk på spill av for å fortsette på en annen utgang."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is niet teruggekomen. Start het afspelen om op een andere uitvoer verder te gaan."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਵਾਪਸ ਨਹੀਂ ਆਇਆ। ਕਿਸੇ ਹੋਰ ਆਉਟਪੁੱਟ ’ਤੇ ਜਾਰੀ ਰੱਖਣ ਲਈ ਚਲਾਓ ਦਬਾਓ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenie %@ nie wróciło. Naciśnij Odtwórz, aby kontynuować na innym wyjściu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não voltou. Pressione Reproduzir para continuar em outra saída."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não voltou a ligar-se. Prima Reproduzir para continuar noutra saída."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu a revenit. Apăsați Redă pentru a continua pe altă ieșire."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kom inte tillbaka. Tryck på spela för att fortsätta på en annan utgång."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hakijarudi. Bonyeza cheza ili kuendelea kwenye kifaa kingine cha kutoa sauti."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ மீண்டும் இணையவில்லை. வேறொரு வெளியீட்டில் தொடர இயக்கு என்பதை அழுத்தவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ తిరిగి రాలేదు. మరో అవుట్‌పుట్‌లో కొనసాగించడానికి ప్లే నొక్కండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ไม่กลับมา กดเล่นเพื่อเล่นต่อบนขาออกอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ geri gelmedi. Başka bir çıkışta devam etmek için çal düğmesine basın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося дочекатися пристрою: %@. Натисніть «Відтворити», щоб продовжити на іншому виході."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ واپس نہیں آیا۔ کسی دوسرے آؤٹ پٹ پر جاری رکھنے کے لیے پلے دبائیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ không kết nối lại. Hãy nhấn phát để tiếp tục trên đầu ra khác."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未有恢復連接。按播放即可在其他輸出裝置上繼續播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未恢复连接。按下播放即可在其他输出设备上继续播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 沒有恢復連線。按下播放即可在其他輸出裝置上繼續播放。"
+          }
+        }
+      }
+    },
     "%@ discrete": {
       "localizations": {
         "am": {
@@ -5528,6 +5797,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ kHz · 原生"
+          }
+        }
+      }
+    },
+    "%@ kHz · STANDING IN": {
+      "comment": "Device chip: %@ is a sample rate. The device plays in place of the chosen output, which isn't connected (short, uppercase; like “%@ kHz · IDLE”)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · በምትክ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · بديل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · বিকল্প হিসেবে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · NÁHRADNÍ"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · AFLØSER"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ERSATZ"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ΑΝΑΠΛΗΡΩΣΗ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · EN SUSTITUCIÓN"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · جایگزین"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · SIJAISENA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · PAMALIT"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · REMPLACEMENT"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · અવેજીમાં"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MAIMAKO"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · חלופי"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · वैकल्पिक"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · HELYETTESÍTŐ"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · PENGGANTI"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · IN SOSTITUZIONE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 代わりに再生中"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ಬದಲಿಯಾಗಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 대신 재생 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · പകരമായി"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · पर्यायी"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · PENGGANTI"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ERSTATTER"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · INVALLER"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ਬਦਲ ਵਜੋਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ZASTĘPCZE"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · SUBSTITUINDO"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · A SUBSTITUIR"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ÎNLOCUIEȘTE"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ERSÄTTER"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · BADALA"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · மாற்றாக"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · బదులుగా"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · เล่นแทน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · YEDEK"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ЗАМІНА"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · متبادل"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · THAY THẾ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 代為播放"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 代为播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 代為播放"
           }
         }
       }
@@ -49272,7 +49810,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld-bit"
+            "value": "%lld біт"
           }
         },
         "ur": {
@@ -49945,7 +50483,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld-bit · %@ kHz"
+            "value": "%lld біт · %@ kHz"
           }
         },
         "ur": {
@@ -50749,7 +51287,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "1-bit"
+            "value": "1 біт"
           }
         },
         "ur": {
@@ -51591,6 +52129,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "10 秒"
+          }
+        }
+      }
+    },
+    "16-bit source sent as 16-bit at %@ kHz": {
+      "comment": "Signal-path note for the “Match 16-bit sources” setting; %@ is a sample rate.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit ምንጭ በ%@ kHz እንደ 16-bit ተልኳል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مصدر 16 بت يُرسَل بدقة 16 بت عند %@ kHz"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit সোর্স %@ kHz-এ 16-bit হিসেবে পাঠানো হয়েছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16bitový zdroj odeslán v 16 bitech při %@ kHz"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit-kilde sendt som 16-bit ved %@ kHz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-Bit-Quelle mit 16 Bit bei %@ kHz gesendet"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Πηγή 16 bit, αποστολή ως 16 bit στα %@ kHz"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit source sent as 16-bit at %@ kHz"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuente de 16 bits enviada en 16 bits a %@ kHz"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منبع ۱۶ بیتی به‌صورت ۱۶ بیتی در %@ kHz ارسال می‌شود"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bittinen lähde lähetetty 16-bittisenä (%@ kHz)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ipinadala ang 16-bit na source bilang 16-bit sa %@ kHz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source 16 bits envoyée en 16 bits à %@ kHz"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit સ્રોત %@ kHz પર 16-bit તરીકે મોકલ્યો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An aika tushen bit 16 a matsayin bit 16 a %@ kHz"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מקור של 16 סיביות נשלח כ־16 סיביות ב־%@ kHz"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit स्रोत %@ kHz पर 16-bit के रूप में भेजा गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 bites forrás 16 bitként küldve, %@ kHz-en"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sumber 16-bit dikirim sebagai 16-bit pada %@ kHz"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorgente a 16 bit inviata come 16 bit a %@ kHz"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16ビットのソースを16ビット / %@ kHzで送信"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit ಮೂಲವನ್ನು %@ kHz ನಲ್ಲಿ 16-bit ಆಗಿ ಕಳುಹಿಸಲಾಗಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16비트 소스를 16비트 / %@ kHz로 전송"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit സോഴ്‌സ് %@ kHz-ൽ 16-bit ആയി അയച്ചു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit स्रोत %@ kHz वर 16-bit म्हणून पाठवला"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sumber 16-bit dihantar sebagai 16-bit pada %@ kHz"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit-kilde sendt som 16-bit ved %@ kHz"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bits bron verzonden als 16 bit bij %@ kHz"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit ਸਰੋਤ %@ kHz ’ਤੇ 16-bit ਵਜੋਂ ਭੇਜਿਆ ਗਿਆ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Źródło 16-bitowe wysłane jako 16-bit przy %@ kHz"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte de 16 bits enviada em 16 bits a %@ kHz"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte de 16 bits enviada em 16 bits a %@ kHz"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sursă pe 16 biți trimisă pe 16 biți la %@ kHz"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bitarskälla skickad som 16 bitar vid %@ kHz"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chanzo cha biti 16 kimetumwa kama biti 16 kwa %@ kHz"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit மூலம் %@ kHz-இல் 16-bit ஆக அனுப்பப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit సోర్స్ %@ kHz వద్ద 16-bitగా పంపబడింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ต้นฉบับ 16 บิต ส่งเป็น 16 บิตที่ %@ kHz"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 bit kaynak, %@ kHz’de 16 bit olarak gönderiliyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-бітне джерело надсилається як 16-бітний сигнал %@ kHz"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16-bit سورس %@ kHz پر 16-bit کے طور پر بھیجا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nguồn 16 bit được gửi dưới dạng 16 bit ở %@ kHz"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 位元音源以 16 位元、%@ kHz 傳送"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 位来源以 16 位、%@ kHz 发送"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 位元來源以 16 位元、%@ kHz 傳送"
           }
         }
       }
@@ -52648,7 +53462,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "48 kHz · 24-bit"
+            "value": "48 kHz · 24 біт"
           }
         },
         "ur": {
@@ -69005,7 +69819,7 @@
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يقبل أيضًا \\\\\\\\server\\\\share و nfs://server/export و https://server/path (WebDAV). يؤدي وجود مجلد بعد اسم المشاركة إلى حصر Vespertine في ذلك المجلد."
+            "value": "يقبل أيضًا ⁦\\\\\\\\server\\\\share⁩ و nfs://server/export و https://server/path (WebDAV). يؤدي وجود مجلد بعد اسم المشاركة إلى حصر Vespertine في ذلك المجلد."
           }
         },
         "bn": {
@@ -69053,7 +69867,7 @@
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\\\\\server\\\\share، nfs://server/export و https://server/path (WebDAV) نیز پذیرفته می‌شوند. پوشه‌ای که پس از نام اشتراک بیاید، Vespertine را به همان پوشه محدود می‌کند."
+            "value": "⁦\\\\\\\\server\\\\share⁩، nfs://server/export و https://server/path (WebDAV) نیز پذیرفته می‌شوند. پوشه‌ای که پس از نام اشتراک بیاید، Vespertine را به همان پوشه محدود می‌کند."
           }
         },
         "fi": {
@@ -69089,7 +69903,7 @@
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "מקבל גם \\\\\\\\server\\\\share, nfs://server/export ו־https://server/path (WebDAV). תיקייה אחרי שם השיתוף מגבילה את Vespertine לתיקייה זו."
+            "value": "מקבל גם ⁦\\\\\\\\server\\\\share⁩, nfs://server/export ו־https://server/path (WebDAV). תיקייה אחרי שם השיתוף מגבילה את Vespertine לתיקייה זו."
           }
         },
         "hi": {
@@ -69239,7 +70053,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\\\\\server\\\\share، nfs://server/export اور https://server/path (WebDAV) بھی قبول ہیں۔ شیئر کے نام کے بعد کوئی فولڈر Vespertine کو اسی فولڈر تک محدود کر دیتا ہے۔"
+            "value": "⁦\\\\\\\\server\\\\share⁩، nfs://server/export اور https://server/path (WebDAV) بھی قبول ہیں۔ شیئر کے نام کے بعد کوئی فولڈر Vespertine کو اسی فولڈر تک محدود کر دیتا ہے۔"
           }
         },
         "vi": {
@@ -77661,6 +78475,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "藝人"
+          }
+        }
+      }
+    },
+    "Asked for 16-bit at %@ kHz; the device stayed at %lld-bit (same samples, zero-padded)": {
+      "comment": "Signal-path note; %@ is a sample rate, %lld a bit depth (24 or 32).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በ%@ kHz 16-bit ተጠይቋል፤ መሣሪያው በ%lld-bit ቆይቷል (ተመሳሳይ ናሙናዎች፣ በዜሮ የተሞሉ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طُلبت دقة 16 بت عند %@ kHz؛ بقي الجهاز على %lld بت (العينات نفسها، مبطّنة بالأصفار)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-এ 16-bit চাওয়া হয়েছিল; ডিভাইস %lld-bit-এই রয়ে গেছে (একই স্যাম্পল, জিরো-প্যাডেড)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyžádáno 16 bitů při %@ kHz; zařízení zůstalo na %lld bitech (stejné vzorky, doplněno nulami)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bad om 16-bit ved %@ kHz; enheden blev på %lld-bit (samme samples, nulpolstret)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 Bit bei %@ kHz angefordert; das Gerät blieb bei %lld Bit (gleiche Samples, mit Nullen aufgefüllt)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ζητήθηκαν 16 bit στα %@ kHz· η συσκευή έμεινε στα %lld bit (ίδια δείγματα, συμπλήρωση με μηδενικά)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asked for 16-bit at %@ kHz; the device stayed at %lld-bit (same samples, zero-padded)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se pidieron 16 bits a %@ kHz; el dispositivo se quedó en %lld bits (mismas muestras, rellenadas con ceros)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "۱۶ بیتی در %@ kHz درخواست شد؛ دستگاه روی %lld بیتی ماند (همان نمونه‌ها، صفرپرشده)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyydettiin 16-bittistä tilaa (%@ kHz); laite pysyi %lld-bittisenä (samat näytteet, täytetty nollilla)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Humiling ng 16-bit sa %@ kHz; nanatili ang device sa %lld-bit (parehong mga sample, zero-padded)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 bits demandés à %@ kHz ; le périphérique est resté en %lld bits (mêmes échantillons, complétés par des zéros)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz પર 16-bit માગ્યું; ડિવાઇસ %lld-bit પર જ રહ્યું (એ જ સેમ્પલ, શૂન્ય-પૅડ કરેલું)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An nemi bit 16 a %@ kHz; na'urar ta tsaya a bit %lld (samfura iri ɗaya, an cike da sifili)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התבקשו 16 סיביות ב־%@ kHz; ההתקן נשאר על %lld סיביות (אותן דגימות, מרופד באפסים)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz पर 16-bit माँगा गया; डिवाइस %lld-bit पर ही रहा (वही सैंपल, ज़ीरो-पैडेड)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 bit kérve %@ kHz-en; az eszköz %lld biten maradt (ugyanazok a minták, nullákkal kitöltve)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta 16-bit pada %@ kHz; perangkat tetap di %lld-bit (sampel sama, diisi nol)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesti 16 bit a %@ kHz; il dispositivo è rimasto a %lld bit (stessi campioni, riempiti con zeri)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16ビット / %@ kHzを要求しましたが、デバイスは%lldビットのままです（サンプルは同じ、ゼロパディング）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ನಲ್ಲಿ 16-bit ಕೇಳಲಾಯಿತು; ಸಾಧನ %lld-bit ನಲ್ಲೇ ಉಳಿಯಿತು (ಅದೇ ಸ್ಯಾಂಪಲ್‌ಗಳು, ಜೀರೋ-ಪ್ಯಾಡೆಡ್)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16비트 / %@ kHz를 요청했지만 기기가 %lld비트로 유지됨(샘플 동일, 제로 패딩)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-ൽ 16-bit ആവശ്യപ്പെട്ടു; ഉപകരണം %lld-bit-ൽത്തന്നെ തുടർന്നു (അതേ സാമ്പിളുകൾ, സീറോ-പാഡ് ചെയ്തത്)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz वर 16-bit मागितले; डिव्हाइस %lld-bit वरच राहिले (तेच सॅम्पल, शून्य-पॅड केलेले)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meminta 16-bit pada %@ kHz; peranti kekal pada %lld-bit (sampel sama, dipad sifar)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba om 16-bit ved %@ kHz; enheten ble værende på %lld-bit (samme samples, nullutfylt)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "16 bit gevraagd bij %@ kHz; het apparaat bleef op %lld bit (dezelfde samples, met nullen opgevuld)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ’ਤੇ 16-bit ਦੀ ਮੰਗ ਕੀਤੀ; ਡਿਵਾਈਸ %lld-bit ’ਤੇ ਹੀ ਰਿਹਾ (ਉਹੀ ਸੈਂਪਲ, ਜ਼ੀਰੋ-ਪੈਡ ਕੀਤਾ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zażądano 16 bitów przy %@ kHz; urządzenie pozostało przy %lld bitach (te same próbki, dopełnione zerami)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foram pedidos 16 bits a %@ kHz; o dispositivo ficou em %lld bits (mesmas amostras, preenchidas com zeros)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foram pedidos 16 bits a %@ kHz; o dispositivo manteve-se em %lld bits (mesmas amostras, preenchidas com zeros)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S-au cerut 16 biți la %@ kHz; dispozitivul a rămas la %lld biți (aceleași eșantioane, completate cu zerouri)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bad om 16 bitar vid %@ kHz; enheten stannade på %lld bitar (samma sampel, nollutfyllt)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biti 16 iliombwa kwa %@ kHz; kifaa kilibaki kwa biti %lld (sampuli zilezile, zimejazwa sufuri)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-இல் 16-bit கோரப்பட்டது; சாதனம் %lld-bit-இலேயே இருந்தது (அதே மாதிரிகள், ஜீரோ-பேட் செய்யப்பட்டது)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz వద్ద 16-bit అభ్యర్థించబడింది; పరికరం %lld-bit వద్దే ఉంది (అవే శాంపిల్‌లు, జీరో-ప్యాడెడ్)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขอ 16 บิตที่ %@ kHz แต่อุปกรณ์ยังคงอยู่ที่ %lld บิต (แซมเปิลเดิม เติมศูนย์)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz’de 16 bit istendi; aygıt %lld bit olarak kaldı (aynı örnekler, sıfırla doldurulmuş)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запитано 16-бітний режим із частотою %@ kHz; пристрій лишився в %lld-бітному (ті самі семпли, доповнено нулями)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz پر 16-bit کی درخواست کی گئی؛ ڈیوائس %lld-bit پر رہی (وہی سیمپلز، زیرو پیڈڈ)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã yêu cầu 16 bit ở %@ kHz; thiết bị vẫn ở %lld bit (mẫu giữ nguyên, chèn 0)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已要求 16 位元、%@ kHz；裝置仍保持 %lld 位元（取樣相同，補零）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已请求 16 位、%@ kHz；设备仍为 %lld 位（采样相同，补零）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已要求 16 位元、%@ kHz；裝置仍維持 %lld 位元（取樣相同，補零）"
           }
         }
       }
@@ -181244,6 +182334,282 @@
         }
       }
     },
+    "No 16-bit mode at %@ kHz; sent as %lld-bit (same samples, zero-padded)": {
+      "comment": "Signal-path note; %@ is a sample rate, %lld a bit depth (24 or 32).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በ%@ kHz 16-bit ሁነታ የለም፤ እንደ %lld-bit ተልኳል (ተመሳሳይ ናሙናዎች፣ በዜሮ የተሞሉ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد وضع 16 بت عند %@ kHz؛ أُرسل بدقة %lld بت (العينات نفسها، مبطّنة بالأصفار)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-এ কোনো 16-bit মোড নেই; %lld-bit হিসেবে পাঠানো হয়েছে (একই স্যাম্পল, জিরো-প্যাডেড)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Při %@ kHz není k dispozici 16bitový režim; odesláno v %lld bitech (stejné vzorky, doplněno nulami)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen 16-bit-tilstand ved %@ kHz; sendt som %lld-bit (samme samples, nulpolstret)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein 16-Bit-Modus bei %@ kHz; mit %lld Bit gesendet (gleiche Samples, mit Nullen aufgefüllt)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν υπάρχει λειτουργία 16 bit στα %@ kHz· αποστολή ως %lld bit (ίδια δείγματα, συμπλήρωση με μηδενικά)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No 16-bit mode at %@ kHz; sent as %lld-bit (same samples, zero-padded)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay modo de 16 bits a %@ kHz; se envía en %lld bits (mismas muestras, rellenadas con ceros)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حالت ۱۶ بیتی در %@ kHz وجود ندارد؛ به‌صورت %lld بیتی ارسال می‌شود (همان نمونه‌ها، صفرپرشده)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei 16-bittistä tilaa (%@ kHz); lähetetty %lld-bittisenä (samat näytteet, täytetty nollilla)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang 16-bit mode sa %@ kHz; ipinadala bilang %lld-bit (parehong mga sample, zero-padded)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas de mode 16 bits à %@ kHz ; envoyé en %lld bits (mêmes échantillons, complétés par des zéros)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz પર 16-bit મોડ નથી; %lld-bit તરીકે મોકલ્યું (એ જ સેમ્પલ, શૂન્ય-પૅડ કરેલું)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu yanayin bit 16 a %@ kHz; an aika a matsayin bit %lld (samfura iri ɗaya, an cike da sifili)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין מצב 16 סיביות ב־%@ kHz; נשלח ב־%lld סיביות (אותן דגימות, מרופד באפסים)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz पर कोई 16-bit मोड नहीं; %lld-bit के रूप में भेजा गया (वही सैंपल, ज़ीरो-पैडेड)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-en nincs 16 bites mód; %lld bitként küldve (ugyanazok a minták, nullákkal kitöltve)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada mode 16-bit pada %@ kHz; dikirim sebagai %lld-bit (sampel sama, diisi nol)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna modalità a 16 bit a %@ kHz; inviato a %lld bit (stessi campioni, riempiti con zeri)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHzでは16ビットモードがないため、%lldビットで送信（サンプルは同じ、ゼロパディング）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ನಲ್ಲಿ 16-bit ಮೋಡ್ ಇಲ್ಲ; %lld-bit ಆಗಿ ಕಳುಹಿಸಲಾಗಿದೆ (ಅದೇ ಸ್ಯಾಂಪಲ್‌ಗಳು, ಜೀರೋ-ಪ್ಯಾಡೆಡ್)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz에서는 16비트 모드가 없어 %lld비트로 전송함(샘플 동일, 제로 패딩)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-ൽ 16-bit മോഡ് ഇല്ല; %lld-bit ആയി അയച്ചു (അതേ സാമ്പിളുകൾ, സീറോ-പാഡ് ചെയ്തത്)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz वर 16-bit मोड नाही; %lld-bit म्हणून पाठवले (तेच सॅम्पल, शून्य-पॅड केलेले)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada mod 16-bit pada %@ kHz; dihantar sebagai %lld-bit (sampel sama, dipad sifar)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen 16-bit-modus ved %@ kHz; sendt som %lld-bit (samme samples, nullutfylt)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen 16-bitsmodus bij %@ kHz; verzonden als %lld bit (dezelfde samples, met nullen opgevuld)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ’ਤੇ ਕੋਈ 16-bit ਮੋਡ ਨਹੀਂ; %lld-bit ਵਜੋਂ ਭੇਜਿਆ ਗਿਆ (ਉਹੀ ਸੈਂਪਲ, ਜ਼ੀਰੋ-ਪੈਡ ਕੀਤਾ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brak trybu 16-bitowego przy %@ kHz; wysłano jako %lld-bit (te same próbki, dopełnione zerami)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem modo de 16 bits a %@ kHz; enviado em %lld bits (mesmas amostras, preenchidas com zeros)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem modo de 16 bits a %@ kHz; enviado em %lld bits (mesmas amostras, preenchidas com zeros)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niciun mod pe 16 biți la %@ kHz; trimis pe %lld biți (aceleași eșantioane, completate cu zerouri)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inget 16-bitarsläge vid %@ kHz; skickat som %lld bitar (samma sampel, nollutfyllt)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna hali ya biti 16 kwa %@ kHz; imetumwa kama biti %lld (sampuli zilezile, zimejazwa sufuri)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-இல் 16-bit பயன்முறை இல்லை; %lld-bit ஆக அனுப்பப்பட்டது (அதே மாதிரிகள், ஜீரோ-பேட் செய்யப்பட்டது)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz వద్ద 16-bit మోడ్ లేదు; %lld-bitగా పంపబడింది (అవే శాంపిల్‌లు, జీరో-ప్యాడెడ్)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มีโหมด 16 บิตที่ %@ kHz จึงส่งเป็น %lld บิต (แซมเปิลเดิม เติมศูนย์)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz’de 16 bit modu yok; %lld bit olarak gönderiliyor (aynı örnekler, sıfırla doldurulmuş)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Немає 16-бітного режиму з частотою %@ kHz; надсилається як %lld-бітний сигнал (ті самі семпли, доповнено нулями)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz پر کوئی 16-bit موڈ نہیں؛ %lld-bit کے طور پر بھیجا گیا (وہی سیمپلز، زیرو پیڈڈ)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có chế độ 16 bit ở %@ kHz; đã gửi dưới dạng %lld bit (mẫu giữ nguyên, chèn 0)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz 下沒有 16 位元模式；改以 %lld 位元傳送（取樣相同，補零）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz 下没有 16 位模式；改为以 %lld 位发送（采样相同，补零）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz 下沒有 16 位元模式；改以 %lld 位元傳送（取樣相同，補零）"
+          }
+        }
+      }
+    },
     "No albums match these filters": {
       "localizations": {
         "am": {
@@ -190145,6 +191511,275 @@
         }
       }
     },
+    "NOT CONNECTED": {
+      "comment": "Device chip: the chosen output isn't connected (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አልተገናኘም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غير متصل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সংযুক্ত নয়"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEPŘIPOJENO"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE FORBUNDET"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NICHT VERBUNDEN"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΜΗ ΣΥΝΔΕΔΕΜΕΝΗ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NO CONECTADO"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وصل نیست"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EI YHDISTETTY"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINDI NAKAKONEKTA"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNECTÉ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કનેક્ટ નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BA A HAƊA BA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא מחובר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नहीं"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NINCS CSATLAKOZTATVA"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK TERHUBUNG"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNESSO"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未接続"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "연결 안 됨"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണക്റ്റ് ചെയ്തിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK BERSAMBUNG"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE TILKOBLET"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIET VERBONDEN"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਨੈਕਟ ਨਹੀਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIEPODŁĄCZONE"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO CONECTADO"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO LIGADO"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NECONECTAT"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "INTE ANSLUTEN"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HAKIJAUNGANISHWA"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைக்கப்படவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనెక్ట్ కాలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่ได้เชื่อมต่อ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BAĞLI DEĞİL"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НЕ ПІД’ЄДНАНО"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منسلک نہیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CHƯA KẾT NỐI"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連接"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連線"
+          }
+        }
+      }
+    },
     "Not connected yet.": {
       "localizations": {
         "am": {
@@ -190409,6 +192044,544 @@
           "stringUnit": {
             "state": "translated",
             "value": "尚未連線。"
+          }
+        }
+      }
+    },
+    "NOT CONNECTED · USING %@": {
+      "comment": "Output menu row under the missing chosen output; %@ is the uppercased name of the device playing instead (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አልተገናኘም · %@ን በመጠቀም ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غير متصل · يُستخدم %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সংযুক্ত নয় · %@ ব্যবহার হচ্ছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEPŘIPOJENO · HRAJE %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE FORBUNDET · BRUGER %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NICHT VERBUNDEN · STATTDESSEN %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΜΗ ΣΥΝΔΕΔΕΜΕΝΗ · ΧΡΗΣΗ %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NO CONECTADO · USANDO %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وصل نیست · استفاده از %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EI YHDISTETTY · KÄYTÖSSÄ %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINDI NAKAKONEKTA · GAMIT ANG %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNECTÉ · LECTURE SUR %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કનેક્ટ નથી · %@ વપરાય છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BA A HAƊA BA · ANA AMFANI DA %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא מחובר · בשימוש: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नहीं · %@ का उपयोग"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NINCS CSATLAKOZTATVA · HELYETTE: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK TERHUBUNG · MEMAKAI %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNESSO · IN USO %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未接続 · %@を使用中"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ · %@ ಬಳಕೆಯಲ್ಲಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "연결 안 됨 · %@ 사용 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണക്റ്റ് ചെയ്തിട്ടില്ല · %@ ഉപയോഗിക്കുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नाही · %@ वापरत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK BERSAMBUNG · GUNA %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE TILKOBLET · BRUKER %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIET VERBONDEN · NU VIA %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਨੈਕਟ ਨਹੀਂ · %@ ਵਰਤਿਆ ਜਾ ਰਿਹਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIEPODŁĄCZONE · GRA %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO CONECTADO · USANDO %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO LIGADO · A USAR %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NECONECTAT · SE FOLOSEȘTE %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "INTE ANSLUTEN · ANVÄNDER %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HAKIJAUNGANISHWA · INATUMIA %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைக்கப்படவில்லை · %@ பயன்பாட்டில்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనెక్ట్ కాలేదు · %@ వాడుకలో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่ได้เชื่อมต่อ · ใช้ %@ แทน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BAĞLI DEĞİL · %@ KULLANILIYOR"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НЕ ПІД’ЄДНАНО · ВІДТВОРЕННЯ ЧЕРЕЗ %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منسلک نہیں · %@ استعمال ہو رہا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CHƯA KẾT NỐI · ĐANG DÙNG %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連接 · 正在使用 %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接 · 正在使用 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連線 · 正在使用 %@"
+          }
+        }
+      }
+    },
+    "NOT CONNECTED · WAITING FOR IT": {
+      "comment": "Output menu row under the missing chosen output: nothing plays until it returns (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አልተገናኘም · በመጠበቅ ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غير متصل · في انتظاره"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সংযুক্ত নয় · অপেক্ষা চলছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEPŘIPOJENO · ČEKÁ SE"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE FORBUNDET · VENTER"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NICHT VERBUNDEN · WARTEN"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΜΗ ΣΥΝΔΕΔΕΜΕΝΗ · ΣΕ ΑΝΑΜΟΝΗ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NO CONECTADO · ESPERANDO"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وصل نیست · در انتظار آن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EI YHDISTETTY · ODOTETAAN"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINDI NAKAKONEKTA · HINIHINTAY"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNECTÉ · EN ATTENTE"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કનેક્ટ નથી · રાહ જોવાય છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BA A HAƊA BA · ANA JIRA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא מחובר · ממתין לו"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नहीं · प्रतीक्षा जारी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NINCS CSATLAKOZTATVA · VÁRAKOZÁS"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK TERHUBUNG · MENUNGGU"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NON CONNESSO · IN ATTESA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未接続 · 接続待ち"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ · ಕಾಯಲಾಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "연결 안 됨 · 연결 대기 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണക്റ്റ് ചെയ്തിട്ടില്ല · കാത്തിരിക്കുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कनेक्ट नाही · प्रतीक्षा सुरू"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TIDAK BERSAMBUNG · MENUNGGU"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IKKE TILKOBLET · VENTER"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIET VERBONDEN · WACHTEN"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਨੈਕਟ ਨਹੀਂ · ਉਡੀਕ ਜਾਰੀ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIEPODŁĄCZONE · OCZEKIWANIE"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO CONECTADO · AGUARDANDO"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÃO LIGADO · A AGUARDAR"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NECONECTAT · SE AȘTEAPTĂ"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "INTE ANSLUTEN · VÄNTAR"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HAKIJAUNGANISHWA · INASUBIRI"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைக்கப்படவில்லை · காத்திருக்கிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనెక్ట్ కాలేదు · వేచి ఉంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่ได้เชื่อมต่อ · กำลังรอ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BAĞLI DEĞİL · BEKLENİYOR"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НЕ ПІД’ЄДНАНО · ОЧІКУВАННЯ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منسلک نہیں · انتظار جاری"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CHƯA KẾT NỐI · ĐANG CHỜ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連接 · 等待中"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接 · 等待中"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未連線 · 等待中"
           }
         }
       }
@@ -191493,6 +193666,282 @@
         }
       }
     },
+    "Nothing (wait for it)": {
+      "comment": "Completes “When the chosen output isn't connected, play on”",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ምንም (ይጠብቁ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا شيء (انتظار عودته)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কিছুই না (অপেক্ষা করুন)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Žádný (počkat na zvolený)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intet (vent på det)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine (auf sie warten)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Καμία (αναμονή)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing (wait for it)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada (esperar a que vuelva)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هیچ‌کدام (انتظار برای بازگشت)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei mitään (odotetaan)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wala (hintayin ito)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien (attendre son retour)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કંઈ નહીં (રાહ જુઓ)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu (a jira)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כלום (המתנה לחזרתו)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कुछ नहीं (प्रतीक्षा करें)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semmi (várakozás rá)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada (tunggu)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niente (attendi che torni)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "なし（再接続を待つ）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಏನೂ ಬೇಡ (ಕಾಯಿರಿ)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "없음(연결될 때까지 대기)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒന്നുമില്ല (കാത്തിരിക്കുക)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "काहीही नाही (प्रतीक्षा करा)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada (tunggu)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingenting (vent på den)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niets (erop wachten)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੁਝ ਨਹੀਂ (ਉਡੀਕ ਕਰੋ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brak (czekaj na wybrane)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada (aguardar a saída)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada (aguardar a saída)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nimic (se așteaptă revenirea)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen (vänta på den)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna (subiri)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "எதுவுமில்லை (காத்திரு)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఏదీ వద్దు (వేచి ఉండు)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มี (รอให้กลับมา)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiçbiri (geri gelmesini bekle)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ніде (чекати на нього)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کچھ نہیں (اس کا انتظار کریں)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thiết bị nào (chờ)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無（等待它恢復連接）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无（等待其恢复连接）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無（等待它恢復連線）"
+          }
+        }
+      }
+    },
     "Nothing in the spectrum stands out from the noise floor (very quiet, or the channels cancel when mixed to mono), so the spectral checks are inconclusive.": {
       "extractionState": "manual",
       "localizations": {
@@ -192032,6 +194481,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "沒有相符項目。"
+          }
+        }
+      }
+    },
+    "Nothing plays until the output you chose is connected again.": {
+      "comment": "Settings note under the fallback picker.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የመረጡት ውፅዓት እንደገና እስኪገናኝ ድረስ ምንም አይጫወትም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يُشغَّل أي شيء حتى يتصل المخرج الذي اخترته من جديد."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার বেছে নেওয়া আউটপুট আবার সংযুক্ত না হওয়া পর্যন্ত কিছুই চলবে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokud se zvolený výstup znovu nepřipojí, nic se nepřehrává."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intet afspilles, før det valgte output er forbundet igen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bis die von dir gewählte Ausgabe wieder verbunden ist, wird nichts wiedergegeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν παίζει τίποτα μέχρι να συνδεθεί ξανά η έξοδος που επιλέξατε."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se reproduce nada hasta que la salida que elegiste vuelva a estar conectada."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تا وقتی خروجی‌ای که انتخاب کرده‌اید دوباره وصل نشود، چیزی پخش نمی‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitään ei toisteta, ennen kuin valitsemasi ulostulo on taas yhdistetty."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang magpe-play hanggang muling makonekta ang output na pinili mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien n’est lu tant que la sortie choisie n’est pas de nouveau connectée."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમે પસંદ કરેલું આઉટપુટ ફરી કનેક્ટ ન થાય ત્યાં સુધી કંઈ વાગશે નહીં."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu abin da zai kunna har sai an sake haɗa na'urar da kuka zaɓa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שום דבר לא יושמע עד שהפלט שבחרת יחובר שוב."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जब तक आपका चुना गया आउटपुट फिर से कनेक्ट नहीं होता, कुछ नहीं चलेगा।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semmi sem szól, amíg a választott kimenet újra nem csatlakozik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada yang diputar hingga output yang Anda pilih terhubung kembali."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non viene riprodotto nulla finché l’uscita scelta non è di nuovo connessa."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択した出力が再び接続されるまで、何も再生されません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಆಯ್ಕೆಮಾಡಿದ ಔಟ್‌ಪುಟ್ ಮತ್ತೆ ಸಂಪರ್ಕಗೊಳ್ಳುವವರೆಗೆ ಏನೂ ಪ್ಲೇ ಆಗುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택한 출력이 다시 연결될 때까지 아무것도 재생되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ തിരഞ്ഞെടുത്ത ഔട്ട്‌പുട്ട് വീണ്ടും കണക്റ്റ് ചെയ്യുന്നതുവരെ ഒന്നും പ്ലേ ചെയ്യില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुम्ही निवडलेले आउटपुट पुन्हा कनेक्ट होईपर्यंत काहीही प्ले होणार नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada apa-apa dimainkan sehingga output yang anda pilih bersambung semula."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingenting spilles av før den valgte utgangen er tilkoblet igjen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er wordt niets afgespeeld totdat de gekozen uitvoer weer verbonden is."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ ਤੱਕ ਤੁਹਾਡਾ ਚੁਣਿਆ ਆਉਟਪੁੱਟ ਦੁਬਾਰਾ ਕਨੈਕਟ ਨਹੀਂ ਹੁੰਦਾ, ਕੁਝ ਨਹੀਂ ਚੱਲੇਗਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nic nie jest odtwarzane, dopóki wybrane wyjście nie zostanie ponownie podłączone."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada é reproduzido até que a saída escolhida seja conectada novamente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada é reproduzido até que a saída escolhida volte a estar ligada."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu se redă nimic până când ieșirea pe care ați ales-o este conectată din nou."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inget spelas förrän utgången du valde är ansluten igen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna kitakachocheza hadi kifaa ulichochagua kiunganishwe tena."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் தேர்ந்தெடுத்த வெளியீடு மீண்டும் இணைக்கப்படும் வரை எதுவும் இயங்காது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు ఎంచుకున్న అవుట్‌పుట్ మళ్లీ కనెక్ట్ అయ్యే వరకు ఏదీ ప్లే కాదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "จะไม่มีการเล่นใดๆ จนกว่าขาออกที่คุณเลือกจะเชื่อมต่ออีกครั้ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seçtiğiniz çıkış yeniden bağlanana kadar hiçbir şey çalmaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нічого не відтворюється, доки вибраний вами вихід не буде під’єднано знову."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب تک آپ کا منتخب کردہ آؤٹ پٹ دوبارہ منسلک نہ ہو، کچھ نہیں چلے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không phát gì cho đến khi đầu ra bạn đã chọn được kết nối lại."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你所選的輸出裝置重新連接之前，不會播放任何內容。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你选择的输出设备重新连接之前，不会播放任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在你選擇的輸出裝置重新連線之前，不會播放任何內容。"
           }
         }
       }
@@ -204767,6 +207485,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸出裝置，無"
+          }
+        }
+      }
+    },
+    "Output device: %@ plays while %@ isn’t connected": {
+      "comment": "Tooltip. Both are audio output device names: the first plays in place of the second.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የውፅዓት መሣሪያ፦ %2$@ ስላልተገናኘ %1$@ እያጫወተ ነው"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جهاز الإخراج: %@ يعمل ما دام %@ غير متصل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুট ডিভাইস: %2$@ সংযুক্ত না থাকায় %1$@ চলছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výstupní zařízení: %@ hraje místo nepřipojeného zařízení %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outputenhed: %@ spiller, mens %@ ikke er forbundet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgabegerät: %@ spielt, solange %@ nicht verbunden ist"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Συσκευή εξόδου: %@ αντί για %@ (μη συνδεδεμένη)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivo de salida: %@ reproduce mientras %@ no está conectado"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دستگاه خروجی: تا وقتی %2$@ وصل نیست، %1$@ پخش می‌کند"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulostulolaite: %@ toistaa niin kauan kuin %@ ei ole yhdistetty"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output device: nagpe-play ang %1$@ habang hindi nakakonekta ang %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Périphérique de sortie : %@ joue tant que %@ n’est pas connecté"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટ ડિવાઇસ: %2$@ કનેક્ટ ન હોવાથી %1$@ વાગી રહ્યું છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na'urar fitar da sauti: %1$@ yana kunnawa yayin da ba a haɗa %2$@ ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התקן פלט: %@ מנגן כל עוד %@ אינו מחובר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट डिवाइस: %2$@ कनेक्ट न होने तक %1$@ चल रहा है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimeneti eszköz: %@ játszik, amíg %@ nincs csatlakoztatva"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perangkat output: %1$@ memutar selama %2$@ tidak terhubung"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivo di uscita: %@ riproduce mentre %@ non è connesso"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力デバイス: %@（%@が未接続のため代わりに再生中）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್ ಸಾಧನ: %2$@ ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲದ ಕಾರಣ %1$@ ಪ್ಲೇ ಆಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력 기기: %@ 기기가 연결되지 않은 %@ 기기 대신 재생 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ട് ഉപകരണം: %2$@ കണക്റ്റ് ചെയ്യാത്തതിനാൽ %1$@ പ്ലേ ചെയ്യുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट डिव्हाइस: %2$@ कनेक्ट नसल्याने %1$@ प्ले करत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peranti output: %1$@ bermain semasa %2$@ tidak bersambung"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgangsenhet: %@ spiller mens %@ ikke er tilkoblet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitvoerapparaat: %@ speelt af zolang %@ niet verbonden is"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਡਿਵਾਈਸ: ਜਦੋਂ ਤੱਕ %2$@ ਕਨੈਕਟ ਨਹੀਂ, %1$@ ਚੱਲ ਰਿਹਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenie wyjściowe: %@ gra zamiast niepodłączonego urządzenia %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivo de saída: %@ reproduz enquanto %@ não está conectado"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivo de saída: %@ reproduz enquanto %@ não estiver ligado"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispozitiv de ieșire: %@ redă cât timp %@ nu este conectat"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgångsenhet: %@ spelar medan %@ inte är ansluten"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa cha kutoa sauti: %1$@ kinacheza wakati %2$@ hakijaunganishwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீட்டுச் சாதனம்: %2$@ இணைக்கப்படாததால் %1$@ இயங்குகிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్ పరికరం: %2$@ కనెక్ట్ కానందున %1$@ ప్లే అవుతోంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์ขาออก: %1$@ เล่นแทนขณะที่ %2$@ ไม่ได้เชื่อมต่อ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkış aygıtı: %2$@ bağlı değilken %1$@ çalıyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пристрій виводу: %@. Замінює пристрій %@, поки його не під’єднано."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ ڈیوائس: جب تک %2$@ منسلک نہیں، %1$@ چل رہا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết bị đầu ra: %1$@ đang phát trong khi %2$@ chưa được kết nối"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出裝置：%@，在 %@ 未連接時代為播放"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输出设备：%@，在 %@ 未连接时代为播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出裝置：%@，在 %@ 未連線時代為播放"
           }
         }
       }
@@ -255796,6 +258783,282 @@
         }
       }
     },
+    "The best connected output": {
+      "comment": "Completes “When the chosen output isn't connected, play on”",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የተገናኘው ምርጥ ውፅዓት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أفضل مخرج متصل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সবচেয়ে ভালো সংযুক্ত আউটপুট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nejlepší připojený výstup"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det bedste forbundne output"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste verbundene Ausgabe"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Καλύτερη συνδεδεμένη έξοδος"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The best connected output"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La mejor salida conectada"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بهترین خروجی وصل"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paras yhdistetty ulostulo"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinakamahusay na nakakonektang output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La meilleure sortie connectée"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કનેક્ટ થયેલું શ્રેષ્ઠ આઉટપુટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mafi kyawun na'urar da aka haɗa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפלט המחובר הטוב ביותר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सबसे अच्छा कनेक्ट किया गया आउटपुट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A legjobb csatlakoztatott kimenet"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output terhubung terbaik"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La migliore uscita connessa"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続されている最適な出力"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಪರ್ಕಗೊಂಡಿರುವವುಗಳಲ್ಲಿ ಉತ್ತಮ ಔಟ್‌ಪುಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "연결된 최적의 출력"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണക്റ്റ് ചെയ്തവയിൽ മികച്ച ഔട്ട്‌പുട്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सर्वोत्तम कनेक्ट केलेले आउटपुट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output bersambung terbaik"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den beste tilkoblede utgangen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De beste verbonden uitvoer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਭ ਤੋਂ ਵਧੀਆ ਕਨੈਕਟ ਕੀਤਾ ਆਉਟਪੁੱਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Najlepsze podłączone wyjście"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A melhor saída conectada"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A melhor saída ligada"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cea mai bună ieșire conectată"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den bästa anslutna utgången"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa bora kilichounganishwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைக்கப்பட்டவற்றில் சிறந்த வெளியீடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనెక్ట్ అయిన వాటిలో ఉత్తమ అవుట్‌పుట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขาออกที่ดีที่สุดที่เชื่อมต่ออยู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En iyi bağlı çıkış"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На найкращому під’єднаному виході"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بہترین منسلک آؤٹ پٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra tốt nhất đang kết nối"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已連接的最佳輸出裝置"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接的最佳输出设备"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已連線的最佳輸出裝置"
+          }
+        }
+      }
+    },
     "The curve peaks at +%@ dB, so loud passages can clip.": {
       "localizations": {
         "am": {
@@ -257878,6 +261141,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "此檔案中沒有濾波器。請選擇 AutoEQ 的「ParametricEQ.txt」或 Equalizer APO 設定。"
+          }
+        }
+      }
+    },
+    "The Mac's sound output": {
+      "comment": "Completes “When the chosen output isn't connected, play on”",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የMac የድምፅ ውፅዓት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مخرج صوت الـ Mac"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এর সাউন্ড আউটপুট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zvukový výstup Macu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac'ens lydoutput"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tonausgabe des Mac"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έξοδος ήχου του Mac"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Mac's sound output"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La salida de sonido del Mac"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خروجی صدای Mac"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macin äänen ulostulo"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound output ng Mac"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sortie audio du Mac"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac નું સાઉન્ડ આઉટપુટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitar da sautin Mac"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פלט הקול של ה־Mac"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac का साउंड आउटपुट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac hangkimenete"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output suara Mac"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’uscita audio del Mac"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macのサウンド出力"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ನ ಧ್ವನಿ ಔಟ್‌ಪುಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac의 사운드 출력"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ന്റെ സൗണ്ട് ഔട്ട്‌പുട്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac चे साउंड आउटपुट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output bunyi Mac"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macens lydutgang"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De geluidsuitvoer van de Mac"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਦਾ ਸਾਊਂਡ ਆਉਟਪੁੱਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyjście dźwięku Maca"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A saída de som do Mac"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A saída de som do Mac"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ieșirea de sunet a Mac-ului"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datorns ljudutgång"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa cha kutoa sauti cha Mac"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ஒலி வெளியீடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac సౌండ్ అవుట్‌పుట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขาออกเสียงของ Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’in ses çıkışı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На звуковому виході Mac"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac کا ساؤنڈ آؤٹ پٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra âm thanh của máy Mac"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 的聲音輸出"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 的声音输出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 的聲音輸出"
           }
         }
       }
@@ -278149,6 +281688,544 @@
         }
       }
     },
+    "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.": {
+      "comment": "Settings note under the fallback picker.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine የመረጡትን ውፅዓት ያስታውሳል፣ በተገናኘ ቁጥርም በእሱ ላይ ያጫውታል። እስከዚያው ድረስ የMac የድምፅ ውፅዓትን ይጠቀማል። ውፅዓትዎን ሲያገናኙ መጫወቱ ወደ እሱ ይመለሳል። በዘፈን መሃል የሚቋረጥ ውፅዓት (ለምሳሌ እንደገና እየተገናኙ ያሉ AirPods) ይጠበቃል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتذكر Vespertine المخرج الذي اخترته ويشغّل عليه كلما كان متصلًا. وحتى ذلك الحين يستخدم مخرج صوت الـ Mac. ويعود التشغيل إلى مخرجك عند توصيله. وإذا انقطع المخرج في منتصف أغنية (كإعادة اتصال AirPods)، ينتظره Vespertine."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine আপনার বেছে নেওয়া আউটপুট মনে রাখে এবং সেটি সংযুক্ত থাকলেই তাতে চালায়। ততক্ষণ এটি Mac-এর সাউন্ড আউটপুট ব্যবহার করে। আপনার আউটপুট সংযুক্ত করলে প্লেব্যাক আবার সেটিতে ফিরে যায়। গানের মাঝখানে কোনো আউটপুট বিচ্ছিন্ন হলে (যেমন AirPods আবার সংযুক্ত হওয়ার সময়), সেটির জন্য অপেক্ষা করা হয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine si pamatuje výstup, který jste zvolili, a přehrává na něm vždy, když je připojený. Do té doby používá zvukový výstup Macu. Jakmile zvolený výstup připojíte, přehrávání se na něj vrátí. Na výstup, který vypadne uprostřed skladby (např. AirPody při opětovném připojování), Vespertine počká."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine husker det output, du valgte, og afspiller på det, når det er forbundet. Indtil da bruger den Mac'ens lydoutput. Afspilningen flytter tilbage til dit output, når du forbinder det. Falder et output ud midt i en sang (AirPods, der genopretter forbindelsen), venter Vespertine på det."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine merkt sich die von dir gewählte Ausgabe und spielt darauf, wann immer sie verbunden ist. Bis dahin verwendet es die Tonausgabe des Mac. Die Wiedergabe wechselt zurück zu deiner Ausgabe, sobald du sie verbindest. Auf eine Ausgabe, die mitten im Titel wegfällt (etwa AirPods, die sich neu verbinden), wird gewartet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine θυμάται την έξοδο που επιλέξατε και παίζει σε αυτή όποτε είναι συνδεδεμένη. Μέχρι τότε χρησιμοποιεί την έξοδο ήχου του Mac. Η αναπαραγωγή επιστρέφει στην έξοδό σας όταν τη συνδέσετε. Αν μια έξοδος αποσυνδεθεί στη μέση ενός τραγουδιού (π.χ. όταν τα AirPods επανασυνδέονται), το Vespertine την περιμένει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine recuerda la salida que elegiste y reproduce en ella siempre que esté conectada. Mientras tanto, usa la salida de sonido del Mac. La reproducción vuelve a tu salida en cuanto la conectas. Si una salida se corta en mitad de una canción (unos AirPods que se reconectan), Vespertine la espera."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine خروجی‌ای را که انتخاب کرده‌اید به خاطر می‌سپارد و هر وقت وصل باشد، روی آن پخش می‌کند. تا آن موقع از خروجی صدای Mac استفاده می‌کند. وقتی خروجی خود را وصل کنید، پخش به آن برمی‌گردد. اگر خروجی وسط آهنگ قطع شود (مثلاً وقتی AirPods دوباره وصل می‌شود)، Vespertine منتظر آن می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine muistaa valitsemasi ulostulon ja toistaa sen kautta aina, kun se on yhdistetty. Siihen asti käytetään Macin äänen ulostuloa. Toisto siirtyy takaisin valitsemaasi ulostuloon, kun yhdistät sen. Jos ulostulo katkeaa kesken kappaleen (esimerkiksi AirPodien yhdistäessä uudelleen), sitä odotetaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinatandaan ng Vespertine ang output na pinili mo at doon ito nagpe-play tuwing nakakonekta ito. Habang hindi pa ito nakakonekta, ginagamit nito ang sound output ng Mac. Babalik ang playback sa output mo kapag ikinonekta mo ito. Hinihintay ang output na nawala sa gitna ng kanta (gaya ng AirPods na kumokonekta ulit)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mémorise la sortie que vous avez choisie et l’utilise chaque fois qu’elle est connectée. En attendant, il utilise la sortie audio du Mac. La lecture revient sur votre sortie dès que vous la connectez. Si une sortie décroche en cours de morceau (des AirPods qui se reconnectent), Vespertine l’attend."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine તમે પસંદ કરેલું આઉટપુટ યાદ રાખે છે અને જ્યારે પણ તે કનેક્ટ હોય ત્યારે તેના પર વગાડે છે. ત્યાં સુધી તે Mac નું સાઉન્ડ આઉટપુટ વાપરે છે. તમે તમારું આઉટપુટ કનેક્ટ કરો ત્યારે પ્લેબૅક પાછું તેના પર જાય છે. ગીતની વચ્ચે ડિસ્કનેક્ટ થઈ જતા આઉટપુટ (જેમ કે ફરી કનેક્ટ થતા AirPods) ની રાહ જોવાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana tuna na'urar fitar da sauti da kuka zaɓa, kuma yana kunnawa a kanta duk lokacin da aka haɗa ta. Kafin nan, yana amfani da fitar da sautin Mac. Kunnawa tana komawa kan na'urarku idan kuka haɗa ta. Ana jiran na'urar da ta katse a tsakiyar waƙa (kamar AirPods da ke sake haɗawa)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine זוכר את הפלט שבחרת ומנגן בו בכל פעם שהוא מחובר. עד אז הוא משתמש בפלט הקול של ה־Mac. ההשמעה חוזרת לפלט שלך כשתחבר אותו. אם הפלט מתנתק באמצע שיר (למשל AirPods שמתחברות מחדש), Vespertine ממתין לו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine आपके चुने गए आउटपुट को याद रखता है और जब भी वह कनेक्ट हो, उसी पर चलाता है। तब तक वह Mac के साउंड आउटपुट का उपयोग करता है। जब आप अपना आउटपुट कनेक्ट करते हैं, तो प्लेबैक वापस उस पर चला जाता है। अगर कोई आउटपुट गाने के बीच में डिस्कनेक्ट हो जाए (जैसे AirPods दोबारा कनेक्ट हो रहे हों), तो उसकी प्रतीक्षा की जाती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine megjegyzi a választott kimenetet, és mindig azon játszik, amikor csatlakoztatva van. Addig a Mac hangkimenetét használja. Amikor csatlakoztatja a kimenetét, a lejátszás visszakerül rá. Ha egy kimenet dal közben megszakad (például újracsatlakozó AirPods), a Vespertine megvárja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mengingat output yang Anda pilih dan memutar di output tersebut setiap kali terhubung. Hingga saat itu, Vespertine menggunakan output suara Mac. Pemutaran kembali ke output Anda saat Anda menghubungkannya. Output yang terputus di tengah lagu (AirPods yang sedang tersambung ulang) akan ditunggu."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ricorda l’uscita che hai scelto e la usa ogni volta che è connessa. Fino ad allora usa l’uscita audio del Mac. La riproduzione torna sulla tua uscita appena la colleghi. Se un’uscita si disconnette a metà brano (AirPods che si riconnettono), Vespertine la attende."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは選択した出力を記憶し、その出力が接続されているときは常にそこで再生します。接続されていない間は、Macのサウンド出力を使います。選択した出力を接続すると、再生はその出力に戻ります。曲の途中で接続が切れた出力（AirPodsの再接続中など）は、再接続されるまで待ちます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಆಯ್ಕೆಮಾಡಿದ ಔಟ್‌ಪುಟ್ ಅನ್ನು Vespertine ನೆನಪಿಟ್ಟುಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಅದು ಸಂಪರ್ಕಗೊಂಡಾಗಲೆಲ್ಲಾ ಅದರಲ್ಲೇ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಅಲ್ಲಿಯವರೆಗೆ, Mac ನ ಧ್ವನಿ ಔಟ್‌ಪುಟ್ ಅನ್ನು ಬಳಸುತ್ತದೆ. ನಿಮ್ಮ ಔಟ್‌ಪುಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿದಾಗ ಪ್ಲೇಬ್ಯಾಕ್ ಮತ್ತೆ ಅದಕ್ಕೆ ಹಿಂತಿರುಗುತ್ತದೆ. ಹಾಡಿನ ಮಧ್ಯದಲ್ಲಿ ಸಂಪರ್ಕ ಕಡಿತಗೊಳ್ಳುವ ಔಟ್‌ಪುಟ್‌ಗಾಗಿ (ಮರುಸಂಪರ್ಕಗೊಳ್ಳುತ್ತಿರುವ AirPods ನಂತಹ) ಕಾಯಲಾಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 선택한 출력을 기억하고, 해당 출력이 연결되어 있으면 언제나 그 출력으로 재생합니다. 그 전까지는 Mac의 사운드 출력을 사용합니다. 선택한 출력을 연결하면 재생이 다시 그 출력으로 돌아갑니다. 곡 중간에 연결이 끊긴 출력(다시 연결 중인 AirPods 등)은 다시 연결될 때까지 기다립니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ തിരഞ്ഞെടുത്ത ഔട്ട്‌പുട്ട് Vespertine ഓർത്തുവയ്ക്കുകയും അത് കണക്റ്റ് ചെയ്യുമ്പോഴെല്ലാം അതിൽത്തന്നെ പ്ലേ ചെയ്യുകയും ചെയ്യും. അതുവരെ, Mac-ന്റെ സൗണ്ട് ഔട്ട്‌പുട്ട് ഉപയോഗിക്കും. നിങ്ങളുടെ ഔട്ട്‌പുട്ട് കണക്റ്റ് ചെയ്യുമ്പോൾ പ്ലേബാക്ക് അതിലേക്ക് തിരികെ മാറും. പാട്ടിനിടയിൽ വിച്ഛേദിക്കപ്പെടുന്ന ഔട്ട്‌പുട്ടിനായി (വീണ്ടും കണക്റ്റ് ചെയ്യുന്ന AirPods പോലെ) കാത്തിരിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine तुम्ही निवडलेले आउटपुट लक्षात ठेवते आणि ते कनेक्ट असेल तेव्हा त्यावरच प्ले करते. तोपर्यंत ते Mac चे साउंड आउटपुट वापरते. तुम्ही तुमचे आउटपुट कनेक्ट केल्यावर प्लेबॅक पुन्हा त्यावर जातो. गाण्याच्या मध्येच एखादे आउटपुट डिस्कनेक्ट झाल्यास (उदा. AirPods पुन्हा कनेक्ट होत असताना), त्याची प्रतीक्षा केली जाते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mengingati output yang anda pilih dan bermain padanya setiap kali ia bersambung. Sehingga itu, ia menggunakan output bunyi Mac. Main balik beralih semula ke output anda apabila anda menyambungkannya. Output yang terputus di tengah lagu (AirPods yang sedang bersambung semula) akan ditunggu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine husker utgangen du valgte, og spiller på den når den er tilkoblet. Inntil da brukes Macens lydutgang. Avspillingen flyttes tilbake til utgangen din når du kobler den til. Faller en utgang ut midt i en sang (AirPods som kobler til igjen), venter Vespertine på den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine onthoudt de uitvoer die je hebt gekozen en speelt daarop af telkens als die verbonden is. Tot die tijd gebruikt het de geluidsuitvoer van de Mac. Het afspelen gaat terug naar jouw uitvoer zodra je die verbindt. Op een uitvoer die midden in een nummer wegvalt (AirPods die opnieuw verbinding maken), wordt gewacht."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਤੁਹਾਡਾ ਚੁਣਿਆ ਆਉਟਪੁੱਟ ਯਾਦ ਰੱਖਦਾ ਹੈ ਅਤੇ ਜਦੋਂ ਵੀ ਉਹ ਕਨੈਕਟ ਹੋਵੇ, ਉਸੇ ’ਤੇ ਚਲਾਉਂਦਾ ਹੈ। ਤਦ ਤੱਕ ਇਹ Mac ਦਾ ਸਾਊਂਡ ਆਉਟਪੁੱਟ ਵਰਤਦਾ ਹੈ। ਜਦੋਂ ਤੁਸੀਂ ਆਪਣਾ ਆਉਟਪੁੱਟ ਕਨੈਕਟ ਕਰਦੇ ਹੋ, ਤਾਂ ਪਲੇਬੈਕ ਵਾਪਸ ਉਸ ’ਤੇ ਚਲਾ ਜਾਂਦਾ ਹੈ। ਜੇ ਕੋਈ ਆਉਟਪੁੱਟ ਗੀਤ ਦੇ ਵਿਚਕਾਰ ਡਿਸਕਨੈਕਟ ਹੋ ਜਾਵੇ (ਜਿਵੇਂ AirPods ਦੁਬਾਰਾ ਕਨੈਕਟ ਹੋ ਰਹੇ ਹੋਣ), ਤਾਂ ਉਸਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine zapamiętuje wybrane przez Ciebie wyjście i odtwarza na nim zawsze, gdy jest podłączone. Do tego czasu używa wyjścia dźwięku Maca. Odtwarzanie wraca na Twoje wyjście, gdy je podłączysz. Na wyjście, które rozłączy się w trakcie utworu (np. ponownie łączące się AirPods), Vespertine czeka."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine lembra a saída que você escolheu e reproduz nela sempre que ela estiver conectada. Até lá, usa a saída de som do Mac. A reprodução volta para a sua saída quando você a conecta. Se uma saída cair no meio de uma música (AirPods se reconectando), o Vespertine espera por ela."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine memoriza a saída que escolheu e reproduz nela sempre que está ligada. Até lá, usa a saída de som do Mac. A reprodução volta para a sua saída quando a ligar. Se uma saída falhar a meio de uma música (AirPods a voltar a ligar-se), o Vespertine aguarda por ela."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine reține ieșirea pe care ați ales-o și redă pe ea ori de câte ori este conectată. Până atunci folosește ieșirea de sunet a Mac-ului. Redarea revine pe ieșirea dvs. când o conectați. Dacă o ieșire se deconectează în mijlocul unei melodii (AirPods care se reconectează), Vespertine o așteaptă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine kommer ihåg utgången du valde och spelar på den när den är ansluten. Tills dess används datorns ljudutgång. Uppspelningen flyttas tillbaka till din utgång när du ansluter den. På en utgång som faller bort mitt i en låt (AirPods som återansluter) väntar Vespertine."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hukumbuka kifaa cha kutoa sauti ulichochagua na hucheza kwenye kifaa hicho kila kinapounganishwa. Hadi wakati huo hutumia kifaa cha kutoa sauti cha Mac. Uchezaji hurudi kwenye kifaa chako unapokiunganisha. Kifaa kinachokatika katikati ya wimbo (kama AirPods zinazounganishwa upya) husubiriwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் தேர்ந்தெடுத்த வெளியீட்டை Vespertine நினைவில் வைத்து, அது இணைக்கப்படும்போதெல்லாம் அதிலேயே இயக்கும். அதுவரை, Mac ஒலி வெளியீட்டைப் பயன்படுத்தும். உங்கள் வெளியீட்டை இணைத்ததும் இயக்கம் அதற்கே திரும்பும். பாடலின் நடுவில் துண்டிக்கப்படும் வெளியீட்டுக்காக (மீண்டும் இணையும் AirPods போல) காத்திருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు ఎంచుకున్న అవుట్‌పుట్‌ను Vespertine గుర్తుంచుకుని, అది కనెక్ట్ అయినప్పుడల్లా దానిలోనే ప్లే చేస్తుంది. అప్పటివరకు, Mac సౌండ్ అవుట్‌పుట్‌ను ఉపయోగిస్తుంది. మీ అవుట్‌పుట్‌ను కనెక్ట్ చేసినప్పుడు ప్లేబ్యాక్ తిరిగి దానికి మారుతుంది. పాట మధ్యలో డిస్‌కనెక్ట్ అయ్యే అవుట్‌పుట్ (మళ్లీ కనెక్ట్ అవుతున్న AirPods వంటివి) కోసం వేచి ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine จะจำขาออกที่คุณเลือกไว้ และเล่นบนขาออกนั้นทุกครั้งที่เชื่อมต่ออยู่ ระหว่างที่ยังไม่ได้เชื่อมต่อ จะใช้ขาออกเสียงของ Mac การเล่นจะย้ายกลับไปยังขาออกของคุณเมื่อคุณเชื่อมต่อ หากขาออกหลุดการเชื่อมต่อกลางเพลง (เช่น AirPods ที่กำลังเชื่อมต่อใหม่) จะรอให้ขาออกนั้นกลับมา"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine seçtiğiniz çıkışı hatırlar ve bağlı olduğu her an onda çalar. O zamana kadar Mac’in ses çıkışını kullanır. Çıkışınızı bağladığınızda oynatma ona geri döner. Şarkının ortasında bağlantısı kopan bir çıkış (yeniden bağlanan AirPods gibi) beklenir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine запам’ятовує вибраний вами вихід і відтворює на ньому щоразу, коли його під’єднано. Доти використовується звуковий вихід Mac. Коли ви під’єднаєте свій вихід, відтворення повернеться на нього. Якщо вихід зникає посеред пісні (наприклад, AirPods під’єднуються знову), Vespertine чекає на нього."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine آپ کا منتخب کردہ آؤٹ پٹ یاد رکھتا ہے اور جب بھی وہ منسلک ہو اسی پر چلاتا ہے۔ تب تک وہ Mac کا ساؤنڈ آؤٹ پٹ استعمال کرتا ہے۔ جب آپ اپنا آؤٹ پٹ منسلک کرتے ہیں تو پلے بیک واپس اس پر چلا جاتا ہے۔ اگر کوئی آؤٹ پٹ گانے کے بیچ میں منقطع ہو جائے (جیسے AirPods دوبارہ منسلک ہو رہے ہوں) تو اس کا انتظار کیا جاتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ghi nhớ đầu ra bạn đã chọn và phát trên đầu ra đó mỗi khi nó được kết nối. Cho đến lúc đó, ứng dụng dùng đầu ra âm thanh của máy Mac. Khi bạn kết nối lại đầu ra của mình, việc phát sẽ chuyển về đó. Nếu đầu ra bị ngắt giữa bài hát (như AirPods đang kết nối lại), Vespertine sẽ chờ nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會記住你所選的輸出裝置，只要它已連接，便會使用它播放。在此之前，Vespertine 會使用 Mac 的聲音輸出。連接你所選的輸出裝置後，播放會轉回該裝置。如裝置在播放歌曲期間中斷連接（例如 AirPods 正在重新連接），Vespertine 會等待它恢復連接。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 会记住你选择的输出设备，只要它已连接，就会使用它播放。在此之前，Vespertine 会使用 Mac 的声音输出。连接你选择的输出设备后，播放会切换回该设备。如果设备在播放歌曲时断开连接（例如 AirPods 正在重新连接），Vespertine 会等待它恢复连接。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會記住你選擇的輸出裝置，只要它已連線，就會使用它播放。在此之前，Vespertine 會使用 Mac 的聲音輸出。連接你選擇的輸出裝置後，播放會切換回該裝置。如果裝置在播放歌曲時中斷連線（例如 AirPods 正在重新連線），Vespertine 會等待它恢復連線。"
+          }
+        }
+      }
+    },
+    "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the most capable one connected: an external DAC first, then the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.": {
+      "comment": "Settings note under the fallback picker.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine የመረጡትን ውፅዓት ያስታውሳል፣ በተገናኘ ቁጥርም በእሱ ላይ ያጫውታል። እስከዚያው ድረስ ከተገናኙት ውስጥ ከፍተኛ አቅም ያለውን ውፅዓት ይጠቀማል፦ በመጀመሪያ ውጫዊ DAC፣ ከዚያ የMac የድምፅ ውፅዓት። ውፅዓትዎን ሲያገናኙ መጫወቱ ወደ እሱ ይመለሳል። በዘፈን መሃል የሚቋረጥ ውፅዓት (ለምሳሌ እንደገና እየተገናኙ ያሉ AirPods) ይጠበቃል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتذكر Vespertine المخرج الذي اخترته ويشغّل عليه كلما كان متصلًا. وحتى ذلك الحين يستخدم أكثر المخرجات المتصلة قدرةً: DAC خارجي أولًا، ثم مخرج صوت الـ Mac. ويعود التشغيل إلى مخرجك عند توصيله. وإذا انقطع المخرج في منتصف أغنية (كإعادة اتصال AirPods)، ينتظره Vespertine."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine আপনার বেছে নেওয়া আউটপুট মনে রাখে এবং সেটি সংযুক্ত থাকলেই তাতে চালায়। ততক্ষণ এটি সংযুক্ত আউটপুটগুলোর মধ্যে সবচেয়ে সক্ষমটি ব্যবহার করে: প্রথমে কোনো বাহ্যিক DAC, তারপর Mac-এর সাউন্ড আউটপুট। আপনার আউটপুট সংযুক্ত করলে প্লেব্যাক আবার সেটিতে ফিরে যায়। গানের মাঝখানে কোনো আউটপুট বিচ্ছিন্ন হলে (যেমন AirPods আবার সংযুক্ত হওয়ার সময়), সেটির জন্য অপেক্ষা করা হয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine si pamatuje výstup, který jste zvolili, a přehrává na něm vždy, když je připojený. Do té doby používá nejlepší připojený výstup: nejdřív externí DAC, potom zvukový výstup Macu. Jakmile zvolený výstup připojíte, přehrávání se na něj vrátí. Na výstup, který vypadne uprostřed skladby (např. AirPody při opětovném připojování), Vespertine počká."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine husker det output, du valgte, og afspiller på det, når det er forbundet. Indtil da bruger den det bedste forbundne output: først en ekstern DAC, derefter Mac'ens lydoutput. Afspilningen flytter tilbage til dit output, når du forbinder det. Falder et output ud midt i en sang (AirPods, der genopretter forbindelsen), venter Vespertine på det."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine merkt sich die von dir gewählte Ausgabe und spielt darauf, wann immer sie verbunden ist. Bis dahin verwendet es die leistungsfähigste verbundene Ausgabe: zuerst einen externen DAC, dann die Tonausgabe des Mac. Die Wiedergabe wechselt zurück zu deiner Ausgabe, sobald du sie verbindest. Auf eine Ausgabe, die mitten im Titel wegfällt (etwa AirPods, die sich neu verbinden), wird gewartet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine θυμάται την έξοδο που επιλέξατε και παίζει σε αυτή όποτε είναι συνδεδεμένη. Μέχρι τότε χρησιμοποιεί την πιο προηγμένη συνδεδεμένη έξοδο: πρώτα έναν εξωτερικό DAC και έπειτα την έξοδο ήχου του Mac. Η αναπαραγωγή επιστρέφει στην έξοδό σας όταν τη συνδέσετε. Αν μια έξοδος αποσυνδεθεί στη μέση ενός τραγουδιού (π.χ. όταν τα AirPods επανασυνδέονται), το Vespertine την περιμένει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine recuerda la salida que elegiste y reproduce en ella siempre que esté conectada. Mientras tanto, usa la más capaz de las salidas conectadas: primero un DAC externo y después la salida de sonido del Mac. La reproducción vuelve a tu salida en cuanto la conectas. Si una salida se corta en mitad de una canción (unos AirPods que se reconectan), Vespertine la espera."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine خروجی‌ای را که انتخاب کرده‌اید به خاطر می‌سپارد و هر وقت وصل باشد، روی آن پخش می‌کند. تا آن موقع از توانمندترین خروجی وصل استفاده می‌کند: اول DAC خارجی، بعد خروجی صدای Mac. وقتی خروجی خود را وصل کنید، پخش به آن برمی‌گردد. اگر خروجی وسط آهنگ قطع شود (مثلاً وقتی AirPods دوباره وصل می‌شود)، Vespertine منتظر آن می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine muistaa valitsemasi ulostulon ja toistaa sen kautta aina, kun se on yhdistetty. Siihen asti käytetään parasta yhdistettyä ulostuloa: ensin ulkoista DAC:ia, sitten Macin äänen ulostuloa. Toisto siirtyy takaisin valitsemaasi ulostuloon, kun yhdistät sen. Jos ulostulo katkeaa kesken kappaleen (esimerkiksi AirPodien yhdistäessä uudelleen), sitä odotetaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinatandaan ng Vespertine ang output na pinili mo at doon ito nagpe-play tuwing nakakonekta ito. Habang hindi pa ito nakakonekta, ginagamit nito ang pinakamahusay na nakakonektang output: una ang external DAC, saka ang sound output ng Mac. Babalik ang playback sa output mo kapag ikinonekta mo ito. Hinihintay ang output na nawala sa gitna ng kanta (gaya ng AirPods na kumokonekta ulit)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mémorise la sortie que vous avez choisie et l’utilise chaque fois qu’elle est connectée. En attendant, il utilise la plus performante des sorties connectées : d’abord un DAC externe, puis la sortie audio du Mac. La lecture revient sur votre sortie dès que vous la connectez. Si une sortie décroche en cours de morceau (des AirPods qui se reconnectent), Vespertine l’attend."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine તમે પસંદ કરેલું આઉટપુટ યાદ રાખે છે અને જ્યારે પણ તે કનેક્ટ હોય ત્યારે તેના પર વગાડે છે. ત્યાં સુધી તે કનેક્ટ થયેલાં આઉટપુટમાંથી સૌથી સક્ષમ આઉટપુટ વાપરે છે: પહેલાં બાહ્ય DAC, પછી Mac નું સાઉન્ડ આઉટપુટ. તમે તમારું આઉટપુટ કનેક્ટ કરો ત્યારે પ્લેબૅક પાછું તેના પર જાય છે. ગીતની વચ્ચે ડિસ્કનેક્ટ થઈ જતા આઉટપુટ (જેમ કે ફરી કનેક્ટ થતા AirPods) ની રાહ જોવાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana tuna na'urar fitar da sauti da kuka zaɓa, kuma yana kunnawa a kanta duk lokacin da aka haɗa ta. Kafin nan, yana amfani da na'ura mafi ƙarfi da aka haɗa: DAC na waje da farko, sannan fitar da sautin Mac. Kunnawa tana komawa kan na'urarku idan kuka haɗa ta. Ana jiran na'urar da ta katse a tsakiyar waƙa (kamar AirPods da ke sake haɗawa)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine זוכר את הפלט שבחרת ומנגן בו בכל פעם שהוא מחובר. עד אז הוא משתמש בפלט המחובר המתקדם ביותר: קודם DAC חיצוני, ואחר כך פלט הקול של ה־Mac. ההשמעה חוזרת לפלט שלך כשתחבר אותו. אם הפלט מתנתק באמצע שיר (למשל AirPods שמתחברות מחדש), Vespertine ממתין לו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine आपके चुने गए आउटपुट को याद रखता है और जब भी वह कनेक्ट हो, उसी पर चलाता है। तब तक वह कनेक्ट किए गए सबसे सक्षम आउटपुट का उपयोग करता है: पहले कोई बाहरी DAC, फिर Mac का साउंड आउटपुट। जब आप अपना आउटपुट कनेक्ट करते हैं, तो प्लेबैक वापस उस पर चला जाता है। अगर कोई आउटपुट गाने के बीच में डिस्कनेक्ट हो जाए (जैसे AirPods दोबारा कनेक्ट हो रहे हों), तो उसकी प्रतीक्षा की जाती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine megjegyzi a választott kimenetet, és mindig azon játszik, amikor csatlakoztatva van. Addig a legjobb képességű csatlakoztatott kimenetet használja: először egy külső DAC-ot, aztán a Mac hangkimenetét. Amikor csatlakoztatja a kimenetét, a lejátszás visszakerül rá. Ha egy kimenet dal közben megszakad (például újracsatlakozó AirPods), a Vespertine megvárja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mengingat output yang Anda pilih dan memutar di output tersebut setiap kali terhubung. Hingga saat itu, Vespertine menggunakan output terhubung yang paling mumpuni: DAC eksternal terlebih dahulu, lalu output suara Mac. Pemutaran kembali ke output Anda saat Anda menghubungkannya. Output yang terputus di tengah lagu (AirPods yang sedang tersambung ulang) akan ditunggu."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ricorda l’uscita che hai scelto e la usa ogni volta che è connessa. Fino ad allora usa la più capace tra quelle connesse: prima un DAC esterno, poi l’uscita audio del Mac. La riproduzione torna sulla tua uscita appena la colleghi. Se un’uscita si disconnette a metà brano (AirPods che si riconnettono), Vespertine la attende."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは選択した出力を記憶し、その出力が接続されているときは常にそこで再生します。接続されていない間は、接続されている出力のうち最も高性能なものを使います（外部DACを優先し、次にMacのサウンド出力）。選択した出力を接続すると、再生はその出力に戻ります。曲の途中で接続が切れた出力（AirPodsの再接続中など）は、再接続されるまで待ちます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಆಯ್ಕೆಮಾಡಿದ ಔಟ್‌ಪುಟ್ ಅನ್ನು Vespertine ನೆನಪಿಟ್ಟುಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಅದು ಸಂಪರ್ಕಗೊಂಡಾಗಲೆಲ್ಲಾ ಅದರಲ್ಲೇ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಅಲ್ಲಿಯವರೆಗೆ, ಸಂಪರ್ಕಗೊಂಡಿರುವವುಗಳಲ್ಲಿ ಅತ್ಯಂತ ಸಮರ್ಥ ಔಟ್‌ಪುಟ್ ಅನ್ನು ಬಳಸುತ್ತದೆ: ಮೊದಲು ಬಾಹ್ಯ DAC, ನಂತರ Mac ನ ಧ್ವನಿ ಔಟ್‌ಪುಟ್. ನಿಮ್ಮ ಔಟ್‌ಪುಟ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿದಾಗ ಪ್ಲೇಬ್ಯಾಕ್ ಮತ್ತೆ ಅದಕ್ಕೆ ಹಿಂತಿರುಗುತ್ತದೆ. ಹಾಡಿನ ಮಧ್ಯದಲ್ಲಿ ಸಂಪರ್ಕ ಕಡಿತಗೊಳ್ಳುವ ಔಟ್‌ಪುಟ್‌ಗಾಗಿ (ಮರುಸಂಪರ್ಕಗೊಳ್ಳುತ್ತಿರುವ AirPods ನಂತಹ) ಕಾಯಲಾಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 선택한 출력을 기억하고, 해당 출력이 연결되어 있으면 언제나 그 출력으로 재생합니다. 그 전까지는 연결된 출력 중 성능이 가장 좋은 출력을 사용합니다. 외장 DAC가 우선이며, 그다음은 Mac의 사운드 출력입니다. 선택한 출력을 연결하면 재생이 다시 그 출력으로 돌아갑니다. 곡 중간에 연결이 끊긴 출력(다시 연결 중인 AirPods 등)은 다시 연결될 때까지 기다립니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ തിരഞ്ഞെടുത്ത ഔട്ട്‌പുട്ട് Vespertine ഓർത്തുവയ്ക്കുകയും അത് കണക്റ്റ് ചെയ്യുമ്പോഴെല്ലാം അതിൽത്തന്നെ പ്ലേ ചെയ്യുകയും ചെയ്യും. അതുവരെ, കണക്റ്റ് ചെയ്തവയിൽ ഏറ്റവും ശേഷിയുള്ള ഔട്ട്‌പുട്ട് ഉപയോഗിക്കും: ആദ്യം ഒരു ബാഹ്യ DAC, പിന്നെ Mac-ന്റെ സൗണ്ട് ഔട്ട്‌പുട്ട്. നിങ്ങളുടെ ഔട്ട്‌പുട്ട് കണക്റ്റ് ചെയ്യുമ്പോൾ പ്ലേബാക്ക് അതിലേക്ക് തിരികെ മാറും. പാട്ടിനിടയിൽ വിച്ഛേദിക്കപ്പെടുന്ന ഔട്ട്‌പുട്ടിനായി (വീണ്ടും കണക്റ്റ് ചെയ്യുന്ന AirPods പോലെ) കാത്തിരിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine तुम्ही निवडलेले आउटपुट लक्षात ठेवते आणि ते कनेक्ट असेल तेव्हा त्यावरच प्ले करते. तोपर्यंत ते कनेक्ट असलेल्यांपैकी सर्वात सक्षम आउटपुट वापरते: आधी बाह्य DAC, मग Mac चे साउंड आउटपुट. तुम्ही तुमचे आउटपुट कनेक्ट केल्यावर प्लेबॅक पुन्हा त्यावर जातो. गाण्याच्या मध्येच एखादे आउटपुट डिस्कनेक्ट झाल्यास (उदा. AirPods पुन्हा कनेक्ट होत असताना), त्याची प्रतीक्षा केली जाते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mengingati output yang anda pilih dan bermain padanya setiap kali ia bersambung. Sehingga itu, ia menggunakan output bersambung yang paling berkemampuan: DAC luaran dahulu, kemudian output bunyi Mac. Main balik beralih semula ke output anda apabila anda menyambungkannya. Output yang terputus di tengah lagu (AirPods yang sedang bersambung semula) akan ditunggu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine husker utgangen du valgte, og spiller på den når den er tilkoblet. Inntil da brukes den beste tilkoblede utgangen: først en ekstern DAC, deretter Macens lydutgang. Avspillingen flyttes tilbake til utgangen din når du kobler den til. Faller en utgang ut midt i en sang (AirPods som kobler til igjen), venter Vespertine på den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine onthoudt de uitvoer die je hebt gekozen en speelt daarop af telkens als die verbonden is. Tot die tijd gebruikt het de beste verbonden uitvoer: eerst een externe DAC, dan de geluidsuitvoer van de Mac. Het afspelen gaat terug naar jouw uitvoer zodra je die verbindt. Op een uitvoer die midden in een nummer wegvalt (AirPods die opnieuw verbinding maken), wordt gewacht."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਤੁਹਾਡਾ ਚੁਣਿਆ ਆਉਟਪੁੱਟ ਯਾਦ ਰੱਖਦਾ ਹੈ ਅਤੇ ਜਦੋਂ ਵੀ ਉਹ ਕਨੈਕਟ ਹੋਵੇ, ਉਸੇ ’ਤੇ ਚਲਾਉਂਦਾ ਹੈ। ਤਦ ਤੱਕ ਇਹ ਕਨੈਕਟ ਕੀਤੇ ਆਉਟਪੁੱਟਾਂ ਵਿੱਚੋਂ ਸਭ ਤੋਂ ਸਮਰੱਥ ਆਉਟਪੁੱਟ ਵਰਤਦਾ ਹੈ: ਪਹਿਲਾਂ ਕੋਈ ਬਾਹਰੀ DAC, ਫਿਰ Mac ਦਾ ਸਾਊਂਡ ਆਉਟਪੁੱਟ। ਜਦੋਂ ਤੁਸੀਂ ਆਪਣਾ ਆਉਟਪੁੱਟ ਕਨੈਕਟ ਕਰਦੇ ਹੋ, ਤਾਂ ਪਲੇਬੈਕ ਵਾਪਸ ਉਸ ’ਤੇ ਚਲਾ ਜਾਂਦਾ ਹੈ। ਜੇ ਕੋਈ ਆਉਟਪੁੱਟ ਗੀਤ ਦੇ ਵਿਚਕਾਰ ਡਿਸਕਨੈਕਟ ਹੋ ਜਾਵੇ (ਜਿਵੇਂ AirPods ਦੁਬਾਰਾ ਕਨੈਕਟ ਹੋ ਰਹੇ ਹੋਣ), ਤਾਂ ਉਸਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine zapamiętuje wybrane przez Ciebie wyjście i odtwarza na nim zawsze, gdy jest podłączone. Do tego czasu używa najlepszego podłączonego wyjścia: najpierw zewnętrznego DAC, potem wyjścia dźwięku Maca. Odtwarzanie wraca na Twoje wyjście, gdy je podłączysz. Na wyjście, które rozłączy się w trakcie utworu (np. ponownie łączące się AirPods), Vespertine czeka."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine lembra a saída que você escolheu e reproduz nela sempre que ela estiver conectada. Até lá, usa a mais capaz entre as saídas conectadas: primeiro um DAC externo, depois a saída de som do Mac. A reprodução volta para a sua saída quando você a conecta. Se uma saída cair no meio de uma música (AirPods se reconectando), o Vespertine espera por ela."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine memoriza a saída que escolheu e reproduz nela sempre que está ligada. Até lá, usa a mais capaz entre as saídas ligadas: primeiro um DAC externo, depois a saída de som do Mac. A reprodução volta para a sua saída quando a ligar. Se uma saída falhar a meio de uma música (AirPods a voltar a ligar-se), o Vespertine aguarda por ela."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine reține ieșirea pe care ați ales-o și redă pe ea ori de câte ori este conectată. Până atunci folosește cea mai capabilă ieșire conectată: întâi un DAC extern, apoi ieșirea de sunet a Mac-ului. Redarea revine pe ieșirea dvs. când o conectați. Dacă o ieșire se deconectează în mijlocul unei melodii (AirPods care se reconectează), Vespertine o așteaptă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine kommer ihåg utgången du valde och spelar på den när den är ansluten. Tills dess används den bästa anslutna utgången: först en extern DAC, sedan datorns ljudutgång. Uppspelningen flyttas tillbaka till din utgång när du ansluter den. På en utgång som faller bort mitt i en låt (AirPods som återansluter) väntar Vespertine."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hukumbuka kifaa cha kutoa sauti ulichochagua na hucheza kwenye kifaa hicho kila kinapounganishwa. Hadi wakati huo hutumia kifaa chenye uwezo zaidi kati ya vilivyounganishwa: DAC ya nje kwanza, kisha kifaa cha kutoa sauti cha Mac. Uchezaji hurudi kwenye kifaa chako unapokiunganisha. Kifaa kinachokatika katikati ya wimbo (kama AirPods zinazounganishwa upya) husubiriwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் தேர்ந்தெடுத்த வெளியீட்டை Vespertine நினைவில் வைத்து, அது இணைக்கப்படும்போதெல்லாம் அதிலேயே இயக்கும். அதுவரை, இணைக்கப்பட்டவற்றில் மிகத் திறன்வாய்ந்த வெளியீட்டைப் பயன்படுத்தும்: முதலில் வெளிப்புற DAC, பிறகு Mac ஒலி வெளியீடு. உங்கள் வெளியீட்டை இணைத்ததும் இயக்கம் அதற்கே திரும்பும். பாடலின் நடுவில் துண்டிக்கப்படும் வெளியீட்டுக்காக (மீண்டும் இணையும் AirPods போல) காத்திருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు ఎంచుకున్న అవుట్‌పుట్‌ను Vespertine గుర్తుంచుకుని, అది కనెక్ట్ అయినప్పుడల్లా దానిలోనే ప్లే చేస్తుంది. అప్పటివరకు, కనెక్ట్ అయిన వాటిలో అత్యంత సామర్థ్యం గల అవుట్‌పుట్‌ను ఉపయోగిస్తుంది: ముందుగా బాహ్య DAC, తర్వాత Mac సౌండ్ అవుట్‌పుట్. మీ అవుట్‌పుట్‌ను కనెక్ట్ చేసినప్పుడు ప్లేబ్యాక్ తిరిగి దానికి మారుతుంది. పాట మధ్యలో డిస్‌కనెక్ట్ అయ్యే అవుట్‌పుట్ (మళ్లీ కనెక్ట్ అవుతున్న AirPods వంటివి) కోసం వేచి ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine จะจำขาออกที่คุณเลือกไว้ และเล่นบนขาออกนั้นทุกครั้งที่เชื่อมต่ออยู่ ระหว่างที่ยังไม่ได้เชื่อมต่อ จะใช้ขาออกที่มีความสามารถสูงสุดที่เชื่อมต่ออยู่ โดยเลือก DAC ภายนอกก่อน แล้วจึงเป็นขาออกเสียงของ Mac การเล่นจะย้ายกลับไปยังขาออกของคุณเมื่อคุณเชื่อมต่อ หากขาออกหลุดการเชื่อมต่อกลางเพลง (เช่น AirPods ที่กำลังเชื่อมต่อใหม่) จะรอให้ขาออกนั้นกลับมา"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine seçtiğiniz çıkışı hatırlar ve bağlı olduğu her an onda çalar. O zamana kadar bağlı çıkışların en yetkin olanını kullanır: önce harici bir DAC, sonra Mac’in ses çıkışı. Çıkışınızı bağladığınızda oynatma ona geri döner. Şarkının ortasında bağlantısı kopan bir çıkış (yeniden bağlanan AirPods gibi) beklenir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine запам’ятовує вибраний вами вихід і відтворює на ньому щоразу, коли його під’єднано. Доти використовується найкращий із під’єднаних: спершу зовнішній ЦАП, потім звуковий вихід Mac. Коли ви під’єднаєте свій вихід, відтворення повернеться на нього. Якщо вихід зникає посеред пісні (наприклад, AirPods під’єднуються знову), Vespertine чекає на нього."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine آپ کا منتخب کردہ آؤٹ پٹ یاد رکھتا ہے اور جب بھی وہ منسلک ہو اسی پر چلاتا ہے۔ تب تک وہ منسلک آؤٹ پٹس میں سب سے قابل آؤٹ پٹ استعمال کرتا ہے: پہلے بیرونی DAC، پھر Mac کا ساؤنڈ آؤٹ پٹ۔ جب آپ اپنا آؤٹ پٹ منسلک کرتے ہیں تو پلے بیک واپس اس پر چلا جاتا ہے۔ اگر کوئی آؤٹ پٹ گانے کے بیچ میں منقطع ہو جائے (جیسے AirPods دوبارہ منسلک ہو رہے ہوں) تو اس کا انتظار کیا جاتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ghi nhớ đầu ra bạn đã chọn và phát trên đầu ra đó mỗi khi nó được kết nối. Cho đến lúc đó, ứng dụng dùng đầu ra có khả năng tốt nhất đang được kết nối: ưu tiên DAC ngoài, sau đó là đầu ra âm thanh của máy Mac. Khi bạn kết nối lại đầu ra của mình, việc phát sẽ chuyển về đó. Nếu đầu ra bị ngắt giữa bài hát (như AirPods đang kết nối lại), Vespertine sẽ chờ nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會記住你所選的輸出裝置，只要它已連接，便會使用它播放。在此之前，Vespertine 會使用已連接裝置中規格最高的一個：優先使用外置 DAC，其次是 Mac 的聲音輸出。連接你所選的輸出裝置後，播放會轉回該裝置。如裝置在播放歌曲期間中斷連接（例如 AirPods 正在重新連接），Vespertine 會等待它恢復連接。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 会记住你选择的输出设备，只要它已连接，就会使用它播放。在此之前，Vespertine 会使用已连接设备中规格最高的一个：优先使用外置 DAC，其次是 Mac 的声音输出。连接你选择的输出设备后，播放会切换回该设备。如果设备在播放歌曲时断开连接（例如 AirPods 正在重新连接），Vespertine 会等待它恢复连接。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會記住你選擇的輸出裝置，只要它已連線，就會使用它播放。在此之前，Vespertine 會使用已連線裝置中規格最高的一個：優先使用外接 DAC，其次是 Mac 的聲音輸出。連接你選擇的輸出裝置後，播放會切換回該裝置。如果裝置在播放歌曲時中斷連線（例如 AirPods 正在重新連線），Vespertine 會等待它恢復連線。"
+          }
+        }
+      }
+    },
     "Vespertine searched your drives with Spotlight and checked every file's real format. Voice recordings, prompts and short clips are left out.": {
       "localizations": {
         "am": {
@@ -280854,6 +284931,275 @@
         }
       }
     },
+    "Waiting for %@…": {
+      "comment": "%@ is the name of an audio output device.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ን በመጠበቅ ላይ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار %@…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-এর জন্য অপেক্ষা করা হচ্ছে…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: čeká se na připojení…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på %@…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warten auf %@ …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: αναμονή…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a %@…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در انتظار %@…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odotetaan laitetta %@…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinihintay ang %@…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente de %@…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ની રાહ જોઈ રહ્યાં છીએ…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana jiran %@…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין ל־%@…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ की प्रतीक्षा की जा रही है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Várakozás erre: %@…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu %@…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa di %@…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を待っています…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 기기를 기다리는 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-നായി കാത്തിരിക്കുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ची प्रतीक्षा करत आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu %@…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på %@ …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten op %@…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oczekiwanie na urządzenie %@…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aguardando %@…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A aguardar %@…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se așteaptă %@…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Väntar på %@ …"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inasubiri %@…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-க்காகக் காத்திருக்கிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ కోసం వేచి ఉంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังรอ %@…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ bekleniyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очікування: %@…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کا انتظار ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chờ %@…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@…"
+          }
+        }
+      }
+    },
     "was: %@ — %@": {
       "localizations": {
         "am": {
@@ -282197,6 +286543,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "加入音樂時"
+          }
+        }
+      }
+    },
+    "When the chosen output isn't connected, play on": {
+      "comment": "Settings picker label; the options complete the sentence: “The best connected output”, “The Mac's sound output”, “Nothing (wait for it)”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የተመረጠው ውፅዓት ካልተገናኘ፣ በዚህ ላይ አጫውት፦"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إذا لم يكن المخرج المختار متصلًا، فشغّل على:"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বেছে নেওয়া আউটপুট সংযুক্ত না থাকলে যেখানে চলবে:"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Náhradní výstup, když vybraný není připojený:"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Når det valgte output ikke er forbundet, afspil på:"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ist die gewählte Ausgabe nicht verbunden, Wiedergabe über:"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Όταν η επιλεγμένη έξοδος δεν είναι συνδεδεμένη, αναπαραγωγή σε:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si la salida elegida no está conectada, reproducir en:"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وقتی خروجی انتخاب‌شده وصل نیست، پخش روی:"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jos valittu ulostulo ei ole yhdistetty, toistoon käytetään:"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapag hindi nakakonekta ang napiling output, i-play sa:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si la sortie choisie n’est pas connectée, lire sur :"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પસંદ કરેલું આઉટપુટ કનેક્ટ ન હોય ત્યારે, આના પર વગાડો:"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idan ba a haɗa na'urar da aka zaɓa ba, kunna a kan:"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כשהפלט שנבחר אינו מחובר, השמע דרך:"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चुना गया आउटपुट कनेक्ट न होने पर इस पर चलाएँ:"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ha a választott kimenet nincs csatlakoztatva, lejátszás ezen:"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika output yang dipilih tidak terhubung, putar di:"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se l’uscita scelta non è connessa, riproduci su:"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択した出力が接続されていないときの再生先:"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಯ್ಕೆಮಾಡಿದ ಔಟ್‌ಪುಟ್ ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲದಿದ್ದಾಗ, ಇದರಲ್ಲಿ ಪ್ಲೇ ಮಾಡಿ:"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선택한 출력이 연결되지 않았을 때 재생할 출력"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "തിരഞ്ഞെടുത്ത ഔട്ട്‌പുട്ട് കണക്റ്റ് ചെയ്തിട്ടില്ലെങ്കിൽ, ഇതിൽ പ്ലേ ചെയ്യുക:"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "निवडलेले आउटपुट कनेक्ट नसताना यावर प्ले करा:"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apabila output yang dipilih tidak bersambung, main pada:"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Når den valgte utgangen ikke er tilkoblet, spill av på:"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als de gekozen uitvoer niet verbonden is, afspelen via:"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ ਚੁਣਿਆ ਆਉਟਪੁੱਟ ਕਨੈਕਟ ਨਾ ਹੋਵੇ, ਤਾਂ ਇਸ ’ਤੇ ਚਲਾਓ:"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyjście zastępcze, gdy wybrane nie jest podłączone:"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando a saída escolhida não estiver conectada, reproduzir em:"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando a saída escolhida não estiver ligada, reproduzir em:"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Când ieșirea aleasă nu este conectată, redă pe:"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "När den valda utgången inte är ansluten, spela upp på:"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa kilichochaguliwa kisipounganishwa, cheza kwenye:"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தேர்ந்தெடுத்த வெளியீடு இணைக்கப்படாதபோது, இதில் இயக்கு:"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఎంచుకున్న అవుట్‌పుట్ కనెక్ట్ కానప్పుడు, దీనిలో ప్లే చేయి:"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เมื่อขาออกที่เลือกไม่ได้เชื่อมต่อ ให้เล่นที่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seçilen çıkış bağlı değilken kullanılacak çıkış:"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Якщо вибраний вихід не під’єднано, відтворювати:"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب منتخب کردہ آؤٹ پٹ منسلک نہ ہو تو اس پر چلائیں:"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khi đầu ra đã chọn không được kết nối, phát qua:"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選的輸出裝置未連接時，使用："
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选输出设备未连接时，使用："
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所選的輸出裝置未連線時，使用："
           }
         }
       }
@@ -287740,7 +292355,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "≥ 24-bit"
+            "value": "≥ 24 біт"
           }
         },
         "ur": {
