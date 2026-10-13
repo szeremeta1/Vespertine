@@ -162,6 +162,7 @@ public enum LoopbackError: LocalizedError, Sendable {
     case notVirtual(String)
     case inUse(String)
     case noInput(String)
+    case inputBlocked(String)
     case inputFormat(String)
     case permissionDenied
 
@@ -172,6 +173,8 @@ public enum LoopbackError: LocalizedError, Sendable {
         case .inUse(let name):
             return "Another app is using \(name). The test leaves it alone; use a loopback device of its own (\u{201C}\(LoopbackGuard.deviceName)\u{201D})."
         case .noInput(let name): return "\(name) has no input to record from."
+        case .inputBlocked(let name):
+            return "macOS didn't start recording from \(name). It is usually waiting for microphone permission that nobody can answer: allow the app that runs the test (Vespertine, or Terminal for vespertine-probe) in System Settings › Privacy & Security › Microphone, then run it again."
         case .inputFormat(let name): return "\(name)'s input can't be set to Float32 at the test's rate."
         case .permissionDenied:
             return "Vespertine isn't allowed to record audio input, so nothing can be recorded from the loopback device. Allow it in System Settings › Privacy & Security › Microphone."
@@ -264,10 +267,15 @@ final class LoopbackRecorder {
     private(set) var samples: [[Float]]
     /// Input stream formats changed for the test, put back by `restore()`.
     private var changedFormats: [(AudioStreamID, AudioStreamBasicDescription)] = []
+    private let name: String
+    /// macOS never answered starting the input. The IOProc may still start later, so the capture and ring are
+    /// left allocated and the HAL isn't touched again.
+    private(set) var blocked = false
 
     init(device: AudioObjectID, rate: Double, maxChannels: Int = 8) throws {
         self.device = device
         let name = HAL.getString(device, .global(kAudioObjectPropertyName)) ?? "The input"
+        self.name = name
         let streams = (try? HAL.getArray(device, .input(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? []
         guard !streams.isEmpty else { throw LoopbackError.noInput(name) }
         // The IOProc reads Float32: put each input stream on Float32 at the test's rate.
@@ -308,11 +316,35 @@ final class LoopbackRecorder {
             && f.mFormatFlags & kAudioFormatFlagIsNonInterleaved == 0 && rate.map { abs(f.mSampleRate - $0) < 0.5 } ?? true
     }
 
-    func start() throws {
-        var id: AudioDeviceIOProcID?
-        try check(AudioDeviceCreateIOProcID(device, nrt_capture_ioproc, UnsafeMutableRawPointer(capture), &id), "AudioDeviceCreateIOProcID (input)")
-        procID = id
-        try check(AudioDeviceStart(device, id), "AudioDeviceStart (input)")
+    /// Starts recording. Creating an input IOProc can wait forever in coreaudiod when macOS is holding input for a
+    /// permission no one can answer (a command-line tool, nobody at the screen), so it runs off this thread and
+    /// gives up after `timeout`.
+    func start(timeout: Double = 10) throws {
+        final class Outcome: @unchecked Sendable {
+            var id: AudioDeviceIOProcID?
+            var status: OSStatus = noErr
+            var operation = "AudioDeviceCreateIOProcID (input)"
+        }
+        let outcome = Outcome()
+        let device = device
+        let context = UInt(bitPattern: UnsafeMutableRawPointer(capture))
+        let done = DispatchSemaphore(value: 0)
+        DispatchQueue.global(qos: .userInitiated).async {
+            var id: AudioDeviceIOProcID?
+            outcome.status = AudioDeviceCreateIOProcID(device, nrt_capture_ioproc, UnsafeMutableRawPointer(bitPattern: context), &id)
+            if outcome.status == noErr {
+                outcome.id = id
+                outcome.operation = "AudioDeviceStart (input)"
+                outcome.status = AudioDeviceStart(device, id)
+            }
+            done.signal()
+        }
+        guard done.wait(timeout: .now() + timeout) == .success else {
+            blocked = true
+            throw LoopbackError.inputBlocked(name)
+        }
+        procID = outcome.id
+        try check(outcome.status, outcome.operation)
     }
 
     /// Moves what's been recorded from the ring into `samples`. Call often enough that the ring (4 s) never fills.
@@ -339,6 +371,7 @@ final class LoopbackRecorder {
     var discontinuityCount: Int { Int(nrt_capture_discontinuities(capture, nil, 0)) }
 
     func stop() {
+        guard !blocked else { return }
         if let procID {
             AudioDeviceStop(device, procID)
             AudioDeviceDestroyIOProcID(device, procID)
@@ -348,11 +381,13 @@ final class LoopbackRecorder {
     }
 
     func restore() {
+        guard !blocked else { return }
         for (stream, format) in changedFormats { try? HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), format) }
         changedFormats = []
     }
 
     deinit {
+        guard !blocked else { return }   // leaked on purpose: a late IOProc may still write into them
         stop()
         restore()
         nrt_capture_destroy(capture)
@@ -399,6 +434,8 @@ public final class LoopbackRunner: @unchecked Sendable {
     public let output: OutputDevice
     public let inputDevice: AudioObjectID
     private let directory: URL
+    /// Set when macOS never started the input; the remaining cases are skipped rather than each waiting again.
+    private var inputBlocked = false
 
     /// `input`: the device to record; nil records the output device's own input (BlackHole loops it there).
     public init(output: OutputDevice, input: AudioObjectID? = nil) throws {
@@ -421,7 +458,12 @@ public final class LoopbackRunner: @unchecked Sendable {
         var results: [LoopbackCaseResult] = []
         for (i, c) in cases.enumerated() {
             progress(i, c)
-            let r = runCase(c, mode: mode)
+            let r: LoopbackCaseResult
+            if inputBlocked {
+                r = LoopbackCaseResult(testCase: c, status: .skipped, summary: "not run: the input couldn't be started")
+            } else {
+                r = runCase(c, mode: mode)
+            }
             caseDone(r)
             results.append(r)
         }
@@ -502,6 +544,11 @@ public final class LoopbackRunner: @unchecked Sendable {
         do {
             recorder = try LoopbackRecorder(device: inputDevice, rate: c.sampleRate)
             try recorder.start()
+        } catch LoopbackError.inputBlocked(let name) {
+            inputBlocked = true
+            result.status = .setupProblem
+            result.summary = "Test setup problem: " + LoopbackError.inputBlocked(name).localizedDescription
+            return result
         } catch {
             result.status = .setupProblem
             result.summary = "Test setup problem: " + error.localizedDescription
