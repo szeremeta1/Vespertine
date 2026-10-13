@@ -237,7 +237,8 @@ struct LoopbackTests {
             var out = [Float](repeating: 0, count: 600)
             for (i, v) in x.enumerated() {
                 out.append(v)
-                if signal.compared.contains(i), i % 4000 == 3999 { out.append(v) }
+                // Slips in the payload only: real clock drift slips rarely enough that the syncs still lock.
+                if signal.payload.contains(i), (i - signal.payload.lowerBound) % 2500 == 2499 { out.append(v) }
             }
             return out + [Float](repeating: 0, count: 600)
         }
