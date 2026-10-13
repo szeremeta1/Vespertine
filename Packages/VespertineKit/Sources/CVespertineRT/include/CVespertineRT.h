@@ -164,6 +164,33 @@ OSStatus nrt_spatial_install(NRTSpatial *_Nonnull spatial);
 void nrt_spatial_process(void *_Nullable user, const float *_Nonnull in, uint32_t inChannels,
                          float *_Nonnull out, uint32_t outChannels, uint32_t frames);
 
+// MARK: - Capture: an input IOProc recording into a ring (the loopback self-test)
+
+typedef struct NRTCapture NRTCapture;
+
+#define NRT_CAPTURE_MAX_EVENTS 64u
+
+/// Records the device's input into `ring` (its channel count: the first channels across the input streams, missing
+/// ones as silence). `maxFramesPerSlice`: the most frames one I/O cycle can deliver.
+NRTCapture *_Nullable nrt_capture_create(NRTRing *_Nonnull ring, uint32_t maxFramesPerSlice);
+void nrt_capture_destroy(NRTCapture *_Nullable capture);
+/// Frames recorded into the ring so far. Frames lost to a full ring aren't counted; they're a discontinuity.
+uint64_t nrt_capture_frames(const NRTCapture *_Nonnull capture);
+/// Times the input's sample time jumped (or the ring was full) since creation, and where: up to `max` capture-frame
+/// positions, oldest first (at most NRT_CAPTURE_MAX_EVENTS are kept). Returns the total count.
+uint32_t nrt_capture_discontinuities(const NRTCapture *_Nonnull capture, uint64_t *_Nullable positions, uint32_t max);
+/// Frames dropped because the ring was full.
+uint64_t nrt_capture_overflow(const NRTCapture *_Nonnull capture);
+
+/// Pass to AudioDeviceCreateIOProcID with the capture as client data. Reads the input only; writes no output.
+OSStatus nrt_capture_ioproc(AudioObjectID inDevice,
+                            const AudioTimeStamp *_Nonnull inNow,
+                            const AudioBufferList *_Nonnull inInputData,
+                            const AudioTimeStamp *_Nonnull inInputTime,
+                            AudioBufferList *_Nonnull outOutputData,
+                            const AudioTimeStamp *_Nonnull inOutputTime,
+                            void *_Nullable inClientData);
+
 /// Renders `frames` into a caller buffer exactly as the IOProc would (used by tests).
 void nrt_context_render_interleaved(NRTRenderContext *_Nonnull ctx, float *_Nonnull out,
                                     uint32_t frames, uint32_t outChannels);
