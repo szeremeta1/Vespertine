@@ -155,6 +155,7 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
 
 if args.count >= 2, args[1] == "loopback" {
     // Unattended: everything comes from the arguments, results go to stdout and, with --json, to a file.
+    setvbuf(stdout, nil, _IOLBF, 0)   // progress lines show up at once, even through a pipe
     func value(_ flag: String) -> String? { args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil } }
     let mode: LoopbackMode = args.contains("--full") ? .full : .quick
     let output: OutputDevice
@@ -173,10 +174,18 @@ if args.count >= 2, args[1] == "loopback" {
         guard let id = LoopbackGuard.inputDevice(matching: name) else { print("no input device matching \(name)"); exit(2) }
         input = id
     }
-    let permission = Locked<Bool?>(nil)
-    Task { let granted = await LoopbackPermission.ensure(); permission.withLock { $0 = granted } }
+    print("Asking for permission to record audio input…")
+    fflush(stdout)
+    let permission = Locked<LoopbackPermission.Answer?>(nil)
+    Task { let answer = await LoopbackPermission.check(timeout: 20); permission.withLock { $0 = answer } }
     while permission.withLock({ $0 }) == nil { RunLoop.main.run(until: Date().addingTimeInterval(0.05)) }
-    if permission.withLock({ $0 }) != true { print(LoopbackError.permissionDenied.localizedDescription); exit(2) }
+    switch permission.withLock({ $0 }) {
+    case .denied?: print(LoopbackError.permissionDenied.localizedDescription); exit(2)
+    case .unanswered?:
+        print("macOS didn't answer the permission request (a command-line tool can't show the prompt). Trying anyway: if the recording is silent, allow the app that runs this tool, such as Terminal, in System Settings › Privacy & Security › Microphone.")
+    default: break
+    }
+    fflush(stdout)
     var cases = LoopbackPlan.cases(rates: output.capabilities.sampleRates, mode: mode)
     if let rates = value("--rates") {
         let wanted = rates.split(separator: ",").compactMap { Double($0) }
