@@ -3,7 +3,8 @@
 # Rebuilds the website's screenshot JPEGs from docs/screenshots (2400×1500 PNGs):
 #   site/assets/<shot>.jpg           2000×1250, the page and press-kit images
 #   site/assets/<shot>-detail.jpg    the inspector side, cut 1:1 (the fake-hi-res one from the Album column on)
-#   site/assets/press/shot-<shot>.jpg  720×450 press-kit thumbnails
+#   site/assets/press/shot-<shot>.jpg  press-kit thumbnails, 720 wide (720×450 for the main window)
+#   site/assets/languages.jpg        the languages grid, 1920 wide
 #   site/assets/press/<feature>.jpg    900×506 previews of the key art in docs/press (run scripts/brand/build.sh first)
 # Usage: scripts/make-site-images.sh [shot…]   (default: every shot the site uses). Needs ffmpeg.
 set -euo pipefail
@@ -17,18 +18,21 @@ full=(genres spatial-audio-airpods-max bit-perfect-fiio-24-96)
 typeset -A detail=(
   [smart-playlist]="crop=1300:1100:1100:110"
   [dsd-native-dop]="crop=1300:1100:1100:110"
+  [sacd-iso]="crop=1300:1100:1100:110"
   [spatial-audio-airpods-max]="crop=1260:1140:1140:160"
   [fake-hi-res-detection]="crop=1333:1128:1067:147,scale=1300:1100:flags=lanczos"
 )
 thumbs=(bit-perfect-fiio-24-96 dsd-native-dop fake-hi-res-detection genres multichannel-albums search smart-playlist
-        spatial-audio-airpods-max stereo-and-surround-versions)
+        spatial-audio-airpods-max stereo-and-surround-versions sacd-iso languages output-settings equalizer loopback-test
+        setup-welcome setup-output)
 
 want=(${@:-$full $thumbs ${(k)detail}})
 for s in ${(u)want}; do
   [[ -e $shots/$s.png ]] || { print -u2 "no docs/screenshots/$s.png"; continue; }
   (( ${full[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=2000:1250:flags=lanczos" "$site/$s.jpg"
   [[ -n ${detail[$s]:-} ]] && jpeg "$shots/$s.png" "${detail[$s]}" "$site/$s-detail.jpg"
-  (( ${thumbs[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=720:450:flags=lanczos" "$site/press/shot-$s.jpg"
+  [[ $s == languages ]] && jpeg "$shots/$s.png" "scale=1920:-2:flags=lanczos" "$site/$s.jpg"
+  (( ${thumbs[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=720:-2:flags=lanczos" "$site/press/shot-$s.jpg"
   print "$s"
 done
 

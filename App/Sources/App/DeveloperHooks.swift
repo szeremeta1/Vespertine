@@ -51,6 +51,23 @@ enum DeveloperHooks {
         if d.bool(forKey: "VespertineOpenSettings") {
             NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         }
+        // `-VespertineEQPreset <ParametricEQ.txt>`: imports an AutoEQ / Equalizer APO file and turns it on for the
+        // chosen output, as Import… and the output's switch in the Equalizer window do.
+        if let path = d.string(forKey: "VespertineEQPreset") {
+            let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
+            do {
+                let preset = try EQPreset.parse(String(contentsOf: url, encoding: .utf8), name: url.deletingPathExtension().lastPathComponent)
+                model.settings.eqPresets.append(preset)
+                if let uid = model.settings.selectedDeviceUID { model.settings.setEQPreset(preset.id, for: uid) }
+                model.syncEngine()
+                print("[qa] equalizer: \(preset.name), \(preset.bands.count) bands, on \(model.settings.selectedDeviceUID ?? "no output")")
+            } catch {
+                print("[qa] equalizer import failed: \(error.localizedDescription)")
+            }
+        }
+        // `-VespertineOpenWindow equalizer|mini`: opens one of the app's other windows.
+        if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
+        if d.string(forKey: "VespertineOpenSheet") == "loopback" { model.showLoopbackTest = true }
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
         // whatever frame the window last saved.
         if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {

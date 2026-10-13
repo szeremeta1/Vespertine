@@ -1,7 +1,7 @@
 # 1.0 shot list
 
 Every image and video of the app interface, the track each one is shot on, what it needs, and what has to be true on
-screen before it ships. Shot on Vespertine 1.0.0 against a copy of the maker's library (`-VespertineDataDirectory`), with the window at 1440×900 pt (`-VespertineWindowSize`) on a Retina display, captured window-only and scaled to 2400×1500, and background analysis off (`-autoAnalyze NO`). Everything else (press key art, site
+screen before it ships. Shot on Vespertine 1.0.0 (Release, from the main commit named in the commit that adds the shots) against a copy of the maker's library (`-VespertineDataDirectory`), with the window at 1440×900 pt (`-VespertineWindowSize`) on a Retina display, captured window-only and scaled to 2400×1500, and background analysis off (`-autoAnalyze NO`). Everything else (press key art, site
 JPEGs, the tour, the social previews) is derived from these by the scripts named at the end.
 
 | Scene (`docs/screenshots/`) | Track | Needs | True on screen |
@@ -16,6 +16,12 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 | `genres` | Genres page | library | counts match the library |
 | `smart-playlist` | smart playlist *AirPods Max Bit-Perfect*, filtered to Oasis; *Don't Look Back in Anger* (24/48) playing | AirPods Max | BIT-PERFECT, 48 kHz native, unity volume, exclusive |
 | `mini-player` | *Don't Look Back in Anger*, Oasis (24/48) on AirPods Max | AirPods Max | BIT-PERFECT only if the device runs at 48 kHz with unity volume |
+| `sacd-iso` | a track of a real SACD image (*Brothers in Arms* or *The Dark Side of the Moon*), played straight from the `.iso` | FiiO K11 with DoP, or AirPods Max | the source names the ISO; stereo DSD64 reads NATIVE DSD · DoP on the K11, or the 5.1 area plays as head-tracked Spatial Audio on the AirPods Max |
+| `languages` (`languages.png`) | Albums › *Goodbye Yellow Brick Road*, track 2 selected, Details inspector, in Japanese, German, Ukrainian, Arabic, Brazilian Portuguese and Simplified Chinese (`-AppleLanguages`) | none (silent) | no truncated or overlapping strings; Arabic mirrored right to left; composited by `scripts/make-languages-grid.sh` |
+| `output-settings` | Settings › Playback | FiiO K11 selected, nothing playing | the remembered output, the fallback to the best connected output, Match 16-bit sources on |
+| `equalizer` | Window › Equalizer with the AutoEQ *Sennheiser HD 600* preset (oratory1990) on the FiiO K11; *Les jeux d'eau* playing behind it | FiiO K11 | the preset on for the K11; the signal path shows the equalizer step and no BIT-PERFECT badge |
+| `loopback-test` | Controls › Loopback Test… sheet and report | the "Vespertine Loopback" output installed | the report from a run on this build |
+| `setup-welcome`, `setup-output` | first-run setup, welcome and output steps (`-VespertineSetup show -VespertineSetupStep welcome\|output`) on an empty library | none (silent) | the steps as a new user sees them |
 
 ## Video
 
