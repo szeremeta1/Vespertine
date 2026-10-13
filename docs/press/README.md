@@ -18,7 +18,7 @@ The fake hi-res screenshot and trailer scene show a deliberate fake, so no real 
 
 ## Launch trailer
 
-A 36.6 s trailer in 16:9 and 1:1, with an original score: synthesized from scratch by `scripts/brand/stage/score.py` (no samples or loops), so it's Vespertine's own and free to use with the trailer anywhere.
+A 44.0 s trailer in 16:9, 1:1 and 9:16, with an original score: synthesized from scratch by `scripts/brand/stage/score.py` (no samples or loops), so it's Vespertine's own and free to use with the trailer anywhere.
 - **Scenes:** `scripts/brand/stage` (`render.sh`, `patch.sh`, `deliver.sh`) renders them as ProRes with half-second handles. They're built from window-only screen recordings of the app on the maker's library: ScreenCaptureKit, only the Vespertine window, no other windows or notifications.
 - **Edit:** assembled in Final Cut Pro from an FCPXML, with cuts on the bar lines and 16-frame dissolves.
 - **Delivery:** H.264 at −14 LUFS.
