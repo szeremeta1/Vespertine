@@ -32,8 +32,11 @@ enum Typeface {
     static func serif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .serif) }
     /// SF Pro — interface.
     static func ui(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight) }
-    /// SF Mono — every number that describes the signal.
-    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .monospaced) }
+    /// SF Mono — every number that describes the signal. Arabic, Indic and Thai script stretch into its fixed-width
+    /// cells, so in those languages it's SF Pro with monospaced digits.
+    static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        Locale.spacesLetters ? .system(size: size, weight: weight, design: .monospaced) : .system(size: size, weight: weight).monospacedDigit()
+    }
 }
 
 extension Color {
@@ -43,15 +46,36 @@ extension Color {
     }
 }
 
+// MARK: - Letter spacing
+
+extension Locale {
+    /// Whether the interface language's script can take letter spacing. Arabic letters join and Indic and Thai letters
+    /// stack into clusters, so spacing them apart breaks the words; those languages get none.
+    static let spacesLetters: Bool = {
+        let language = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en").language.languageCode?.identifier ?? "en"
+        return !["ar", "fa", "ur", "hi", "mr", "bn", "pa", "gu", "ta", "te", "kn", "ml", "th"].contains(language)
+    }()
+}
+
+extension Text {
+    /// Tracking for labels and badges, where the interface language allows it.
+    func letterSpacing(_ amount: CGFloat) -> Text { tracking(Locale.spacesLetters ? amount : 0) }
+}
+
+extension View {
+    /// Tracking for labels and badges, where the interface language allows it.
+    func letterSpacing(_ amount: CGFloat) -> some View { tracking(Locale.spacesLetters ? amount : 0) }
+}
+
 // MARK: - Small components
 
 /// Uppercase section label ("SIGNAL PATH").
 struct SectionLabel: View {
     let text: String
     var body: some View {
-        Text(text.uppercased())
+        Text(text.localizedUppercase)
             .font(Typeface.ui(10.5, weight: .semibold))
-            .tracking(0.9)
+            .letterSpacing(0.9)
             .foregroundStyle(Palette.text3)
     }
 }
@@ -82,7 +106,7 @@ struct StatusBadge: View {
             }
             Text(text)
                 .font(Typeface.mono(10, weight: .semibold))
-                .tracking(1)
+                .letterSpacing(1)
         }
         .foregroundStyle(foreground)
         .padding(.horizontal, 8)
@@ -184,7 +208,7 @@ struct BrassSlider: View {
     var showsThumb = true
     /// What VoiceOver calls it ("Position", "Volume"), how it reads the value, and how far one swipe moves it.
     var accessibilityName = ""
-    var accessibilityValueText: (Double) -> String = { "\(Int((max(0, min(1, $0)) * 100).rounded())) percent" }
+    var accessibilityValueText: (Double) -> String = { String(localized: "\(Int((max(0, min(1, $0)) * 100).rounded())) percent") }
     var accessibilityStep = 0.05
     var onEditingChanged: (Bool) -> Void = { _ in }
     @State private var dragging = false
@@ -251,7 +275,9 @@ extension TimeInterval {
 
     var longDuration: String {
         let minutes = Int(self / 60)
-        return minutes >= 60 ? "\(minutes / 60) HR \(minutes % 60) MIN" : "\(minutes) MIN"
+        return minutes >= 60
+            ? String(localized: "\(minutes / 60) HR \(minutes % 60) MIN", comment: "Total duration: hours and minutes, abbreviated, uppercase")
+            : String(localized: "\(minutes) MIN", comment: "Total duration in minutes, abbreviated, uppercase")
     }
 }
 

@@ -25,7 +25,7 @@ struct EqualizerChoice: View {
             Spacer()
             Picker("Equalizer", selection: Binding(get: { settings.eqPreset(for: device.uid)?.id },
                                                    set: { settings.setEQPreset($0, for: device.uid); model.syncEngine() })) {
-                Text("Off").tag(UUID?.none)
+                Text("Off", comment: "Equalizer choice: no equalizer").tag(UUID?.none)
                 if !settings.eqPresets.isEmpty { Divider() }
                 ForEach(settings.eqPresets) { Text($0.name).tag(UUID?.some($0.id)) }
             }
@@ -64,7 +64,7 @@ struct EqualizerWindow: View {
                 .listStyle(.sidebar)
                 Hairline()
                 HStack(spacing: 6) {
-                    Button { add(EQPreset(name: "New Preset", bands: [EQBand()])) } label: { Image(systemName: "plus") }
+                    Button { add(EQPreset(name: String(localized: "New Preset"), bands: [EQBand()])) } label: { Image(systemName: "plus") }
                         .help("New preset").accessibilityLabel("New preset")
                     Button { importing = true } label: { Image(systemName: "square.and.arrow.down") }
                         .help("Import an AutoEQ or Equalizer APO file").accessibilityLabel("Import")
@@ -126,7 +126,7 @@ struct EqualizerWindow: View {
 
     private func duplicate() {
         guard let id = selection, let preset = model.settings.eqPresets.first(where: { $0.id == id }) else { return }
-        add(EQPreset(name: "\(preset.name) Copy", preampDB: preset.preampDB, bands: preset.bands.map { var b = $0; b.id = UUID(); return b }))
+        add(EQPreset(name: String(localized: "\(preset.name) Copy", comment: "Name of a duplicated equalizer preset"), preampDB: preset.preampDB, bands: preset.bands.map { var b = $0; b.id = UUID(); return b }))
     }
 
     private func delete() {
@@ -192,6 +192,9 @@ struct EqualizerEditor: View {
     @Environment(AppModel.self) private var model
     @Binding var preset: EQPreset
 
+    /// "+1.5", in the user's number format.
+    private static let signedDB: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(1)).sign(strategy: .always())
+
     private var sampleRate: Double {
         let rate = model.player.signalPath?.applied.sampleRate ?? 48_000
         return rate > 0 ? rate : 48_000
@@ -219,15 +222,15 @@ struct EqualizerEditor: View {
                     Text("Preamp").font(Typeface.ui(12.5)).foregroundStyle(Palette.text)
                     Slider(value: $preset.preampDB, in: EQPreset.preampRange, step: 0.1) { Text("Preamp") }
                         .labelsHidden()
-                        .accessibilityValue(String(format: "%+.1f decibels", preset.preampDB))
-                    Text(String(format: "%+.1f dB", preset.preampDB)).font(Typeface.mono(11.5)).foregroundStyle(Palette.text2).frame(width: 64, alignment: .trailing)
+                        .accessibilityValue(String(localized: "\(preset.preampDB.formatted(Self.signedDB)) decibels"))
+                    Text("\(preset.preampDB.formatted(Self.signedDB)) dB").font(Typeface.mono(11.5)).foregroundStyle(Palette.text2).frame(width: 64, alignment: .trailing)
                 }
                 if peak > 0.05 {
                     HStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle").foregroundStyle(Palette.copper)
-                        Text(String(format: "The curve peaks at +%.1f dB, so loud passages can clip.", peak))
+                        Text("The curve peaks at +\(peak.formatted(.number.precision(.fractionLength(1)))) dB, so loud passages can clip.")
                             .font(Typeface.ui(12)).foregroundStyle(Palette.text2)
-                        Button(String(format: "Set Preamp to %.1f dB", preset.preampForNoClipping(sampleRate: sampleRate))) {
+                        Button("Set Preamp to \(preset.preampForNoClipping(sampleRate: sampleRate).formatted(.number.precision(.fractionLength(1)))) dB") {
                             preset.preampDB = preset.preampForNoClipping(sampleRate: sampleRate)
                         }
                         .controlSize(.small)
@@ -246,7 +249,7 @@ struct EqualizerEditor: View {
     private var bands: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                SectionLabel(text: "Bands")
+                SectionLabel(text: String(localized: "Bands", comment: "Equalizer frequency bands"))
                 Spacer()
                 Button("Add Band") { preset.bands.append(EQBand()) }
                     .controlSize(.small)
@@ -254,7 +257,8 @@ struct EqualizerEditor: View {
             }
             Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
                 GridRow {
-                    Text("On"); Text("Type"); Text("Frequency"); Text("Gain"); Text("Q"); Text("")
+                    Text("On", comment: "Column header: whether an equalizer band is enabled"); Text("Type"); Text("Frequency"); Text("Gain")
+                    Text("Q", comment: "Column header: the Q (bandwidth) of an equalizer band"); Text(verbatim: "")
                 }
                 .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3)
                 ForEach($preset.bands) { $band in
@@ -278,7 +282,7 @@ struct EqualizerEditor: View {
         }
     }
 
-    private func unitField(_ label: String, value: Binding<Double>, unit: String, digits: Int) -> some View {
+    private func unitField(_ label: LocalizedStringKey, value: Binding<Double>, unit: String, digits: Int) -> some View {
         HStack(spacing: 4) {
             TextField(label, value: value, format: .number.precision(.fractionLength(0...digits)))
                 .labelsHidden()
@@ -319,8 +323,8 @@ struct EQResponseView: View {
             for (f, label) in [(100.0, "100"), (1000.0, "1k"), (10_000.0, "10k")] {
                 context.draw(Text(label).font(Typeface.mono(9.5)).foregroundColor(Palette.text3), at: CGPoint(x: x(f) + 3, y: size.height - 8), anchor: .leading)
             }
-            context.draw(Text(String(format: "+%.0f dB", range)).font(Typeface.mono(9.5)).foregroundColor(Palette.text3), at: CGPoint(x: 4, y: 8), anchor: .leading)
-            context.draw(Text(String(format: "−%.0f dB", range)).font(Typeface.mono(9.5)).foregroundColor(Palette.text3), at: CGPoint(x: 4, y: size.height - 8), anchor: .leading)
+            context.draw(Text("+\(Int(range)) dB").font(Typeface.mono(9.5)).foregroundColor(Palette.text3), at: CGPoint(x: 4, y: 8), anchor: .leading)
+            context.draw(Text("−\(Int(range)) dB").font(Typeface.mono(9.5)).foregroundColor(Palette.text3), at: CGPoint(x: 4, y: size.height - 8), anchor: .leading)
         }
         .background(Palette.panel, in: RoundedRectangle(cornerRadius: 8))
         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Palette.hairline))
@@ -331,9 +335,12 @@ struct EQResponseView: View {
 
     private func summary(_ response: [Double]) -> String {
         guard let hi = response.indices.max(by: { response[$0] < response[$1] }),
-              let lo = response.indices.min(by: { response[$0] < response[$1] }) else { return "flat" }
-        func hz(_ f: Double) -> String { f >= 1000 ? String(format: "%.1f kilohertz", f / 1000) : String(format: "%.0f hertz", f) }
-        return String(format: "Highest %+.1f decibels at %@, lowest %+.1f decibels at %@",
-                      response[hi], hz(Self.frequencies[hi]), response[lo], hz(Self.frequencies[lo]))
+              let lo = response.indices.min(by: { response[$0] < response[$1] }) else { return String(localized: "flat", comment: "Equalizer frequency response with no peaks or dips") }
+        func hz(_ f: Double) -> String {
+            f >= 1000 ? String(localized: "\((f / 1000).formatted(.number.precision(.fractionLength(1)))) kilohertz")
+                      : String(localized: "\(Int(f.rounded())) hertz")
+        }
+        let db: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(1)).sign(strategy: .always())
+        return String(localized: "Highest \(response[hi].formatted(db)) decibels at \(hz(Self.frequencies[hi])), lowest \(response[lo].formatted(db)) decibels at \(hz(Self.frequencies[lo]))")
     }
 }

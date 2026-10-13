@@ -232,7 +232,7 @@ final class SACDSource: RawDSDSource {
     private func conceal() throws {
         concealedFrames += 1
         badInARow += 1
-        if badInARow > 32 { throw SACDError.damaged("audio frames") }
+        if badInARow > 32 { throw SACDError.damaged(String(localized: "audio frames", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
     }
 
     /// Reads up to `bytes` bytes per channel, interleaved by channel. Returns bytes per channel, 0 at the end.
@@ -364,7 +364,7 @@ final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         let prime = min(Int64(source.area.frameBytes), leadIn + target)
         if let converter { nff_dsd_converter_destroy(converter) }
         converter = nff_dsd_converter_create(Int32(source.channelCount), Int32(source.dsdRate / 8))
-        guard converter != nil else { throw DTSError.unsupported("DSD converter") }
+        guard converter != nil else { throw DTSError.unsupported(String(localized: "DSD converter", comment: "Why a file can't be played, in “This file can't be played (…).”")) }
         try source.seekDSD(to: leadIn + target - prime)
         if prime > 0 {
             let sink = (0..<source.channelCount).map { _ in UnsafeMutablePointer<Float>.allocate(capacity: Int(prime)) }

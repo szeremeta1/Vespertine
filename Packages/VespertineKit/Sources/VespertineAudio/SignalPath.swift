@@ -60,34 +60,40 @@ public struct SignalPath: Sendable, Hashable {
         }
     }
 
-    /// One-line state for badges and the menu bar.
+    /// One-line state for badges and the menu bar (in the current language; English without a string table).
     public var statusLine: String {
         if isBitPerfect {
             switch plan.mode {
-            case .dop: return "NATIVE DSD · DoP"
-            case .bitstream: return "BITSTREAM · \((BitstreamFormat(codec: source.codec)?.name ?? source.codec).uppercased())"
-            case .pcm: return "BIT-PERFECT"
+            case .dop: return String(localized: "NATIVE DSD · DoP", comment: "Status badge (short, uppercase).")
+            case .bitstream:
+                let codec = (BitstreamFormat(codec: source.codec)?.name ?? source.codec).uppercased()
+                return String(localized: "BITSTREAM · \(codec)", comment: "Status badge (short, uppercase), then the codec, e.g. DOLBY DIGITAL.")
+            case .pcm: return String(localized: "BIT-PERFECT", comment: "Status badge (short, uppercase).")
             }
         }
-        if concealedFrames > 0 { return "DAMAGED FRAMES SILENCED" }
-        if plan.spatial != .off { return plan.spatial == .headTracked ? "SPATIAL · HEAD TRACKED" : "SPATIAL AUDIO" }
+        if concealedFrames > 0 { return String(localized: "DAMAGED FRAMES SILENCED", comment: "Status badge (short, uppercase).") }
+        if plan.spatial != .off {
+            return plan.spatial == .headTracked ? String(localized: "SPATIAL · HEAD TRACKED", comment: "Status badge (short, uppercase).") : String(localized: "SPATIAL AUDIO", comment: "Status badge (short, uppercase).")
+        }
         if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
             switch deviceProfile.kind {
-            case .airPlay: return "AIRPLAY"
-            case .speakers: return "SPEAKER PROCESSING"
-            case .virtualDevice: return deviceProfile.tag == "AGGREGATE" ? "AGGREGATE DEVICE" : "VIRTUAL DEVICE"
-            default: return "BLUETOOTH · LOSSY"
+            case .airPlay: return String(localized: "AIRPLAY", comment: "Status badge (short, uppercase).")
+            case .speakers: return String(localized: "SPEAKER PROCESSING", comment: "Status badge (short, uppercase).")
+            case .virtualDevice:
+                return deviceProfile.tag == DeviceProfile.aggregateTag ? String(localized: "AGGREGATE DEVICE", comment: "Status badge (short, uppercase).")
+                                                                       : String(localized: "VIRTUAL DEVICE", comment: "Status badge (short, uppercase).")
+            default: return String(localized: "BLUETOOTH · LOSSY", comment: "Status badge (short, uppercase).")
             }
         }
         if plan.dsdConvertedToPCM { return "DSD → PCM" }
-        if isResampling { return "RESAMPLED" }
-        if source.encoding == .lossy { return "LOSSY SOURCE" }
-        if !applied.exclusive, otherAppsPlaying { return "MIXED WITH OTHER APPS" }
-        if equalizer != nil { return "EQUALIZER" }
-        if modifiesSamples { return "DIGITAL GAIN" }
-        if !applied.physicalFormatKnown { return "FORMAT UNCONFIRMED" }
-        return "CONVERTED"
+        if isResampling { return String(localized: "RESAMPLED", comment: "Status badge (short, uppercase).") }
+        if source.encoding == .lossy { return String(localized: "LOSSY SOURCE", comment: "Status badge (short, uppercase).") }
+        if !applied.exclusive, otherAppsPlaying { return String(localized: "MIXED WITH OTHER APPS", comment: "Status badge (short, uppercase).") }
+        if equalizer != nil { return String(localized: "EQUALIZER", comment: "Status badge (short, uppercase).") }
+        if modifiesSamples { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
+        if !applied.physicalFormatKnown { return String(localized: "FORMAT UNCONFIRMED", comment: "Status badge (short, uppercase).") }
+        return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
     }
 
     /// What "Match 16-bit sources" did, from the format the device reports, not the one asked for. nil: it didn't apply.
@@ -97,11 +103,11 @@ public struct SignalPath: Sendable, Hashable {
         let depth = applied.physicalBitDepth
         switch match {
         case .requested where depth == 16 && applied.physicalIsInteger:
-            return "16-bit source sent as 16-bit at \(rate) kHz"
+            return String(localized: "16-bit source sent as 16-bit at \(rate) kHz")
         case .requested:
-            return "Asked for 16-bit at \(rate) kHz; the device stayed at \(depth)-bit (same samples, zero-padded)"
+            return String(localized: "Asked for 16-bit at \(rate) kHz; the device stayed at \(depth)-bit (same samples, zero-padded)")
         case .noMode:
-            return "No 16-bit mode at \(rate) kHz; sent as \(depth)-bit (same samples, zero-padded)"
+            return String(localized: "No 16-bit mode at \(rate) kHz; sent as \(depth)-bit (same samples, zero-padded)")
         }
     }
 

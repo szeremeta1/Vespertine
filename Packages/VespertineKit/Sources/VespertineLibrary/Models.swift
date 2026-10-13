@@ -56,7 +56,7 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
     /// imports into, the volume name for external drives, else the folder name.
     public var displayName: String {
         if let name, !name.isEmpty { return name }
-        if mode == .managed { return "Imported Music" }
+        if mode == .managed { return String(localized: "Imported Music", comment: "Sidebar name of the folder Vespertine imports music into.") }
         if let remoteURL, let share = NetworkShare(string: remoteURL) { return share.defaultName }
         let components = url.pathComponents
         if path.hasPrefix("/Volumes/"), components.count == 3 { return components[2] }
@@ -184,6 +184,10 @@ public struct Playlist: Codable, Sendable, Hashable, Identifiable, FetchableReco
     public static let databaseTableName = "playlist"
     public var isSmart: Bool { smartRules != nil }
 
+    /// The starter smart playlists' stored names (see String.libraryDisplayName).
+    public static let hiResName = "Hi-Res ≥ 88.2 kHz"
+    public static let suspectName = "Suspect Hi-Res"
+
     public init(id: Int64? = nil, name: String, smartRules: SmartRules? = nil, createdAt: Date = .now, sortIndex: Int = 0) {
         self.id = id
         self.name = name
@@ -262,5 +266,22 @@ extension Track {
         musicBrainzReleaseID = t.musicBrainzReleaseID; musicBrainzRecordingID = t.musicBrainzRecordingID
         titleSort = t.titleSort; artistSort = t.artistSort; albumSort = t.albumSort; albumArtistSort = t.albumArtistSort
         extraTags = t.extraTags; artworkKey = t.artworkKey
+    }
+}
+
+extension String {
+    /// A library name to show: the library's own placeholders ("Unknown Artist", "Unknown Album", "Various Artists") and
+    /// the starter smart playlists' names stay English where they're stored and matched (album keys, the database), and
+    /// appear in the user's language until the user renames them.
+    /// Any other name is returned as it is.
+    public var libraryDisplayName: String {
+        switch self {
+        case "Unknown Artist": String(localized: "Unknown Artist")
+        case "Unknown Album": String(localized: "Unknown Album")
+        case Track.variousArtists: String(localized: "Various Artists")
+        case Playlist.hiResName: String(localized: "Hi-Res ≥ 88.2 kHz", comment: "Name of a starter smart playlist.")
+        case Playlist.suspectName: String(localized: "Suspect Hi-Res", comment: "Name of a starter smart playlist: hi-res files the analysis doubts.")
+        default: self
+        }
     }
 }

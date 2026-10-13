@@ -113,13 +113,13 @@ enum QuickChip: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .all: "All formats"
+        case .all: String(localized: "All formats")
         case .flac: "FLAC"
         case .pcm: "WAV / AIFF"
         case .alac: "ALAC"
         case .dsd: "DSD"
-        case .surround: "Dolby & DTS"
-        case .lossy: "Lossy"
+        case .surround: String(localized: "Dolby & DTS")
+        case .lossy: String(localized: "Lossy", comment: "Filter chip: lossy formats (MP3, AAC…).")
         default: flag?.label ?? ""
         }
     }

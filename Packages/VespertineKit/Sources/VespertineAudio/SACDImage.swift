@@ -29,9 +29,9 @@ public enum SACDError: Error, LocalizedError {
     case notSACD, damaged(String), noArea
     public var errorDescription: String? {
         switch self {
-        case .notSACD: "This disc image isn't a Super Audio CD."
-        case .damaged(let what): "This SACD image is damaged (\(what))."
-        case .noArea: "This SACD image has no audio area Vespertine can play."
+        case .notSACD: String(localized: "This disc image isn't a Super Audio CD.")
+        case .damaged(let what): String(localized: "This SACD image is damaged (\(what)).", comment: "The damaged part, e.g. “track list”.")
+        case .noArea: String(localized: "This SACD image has no audio area Vespertine can play.")
         }
     }
 }
@@ -214,18 +214,18 @@ public struct SACDImage: Sendable, Hashable {
 
     static func readArea(_ handle: FileHandle, sector: Int, sectors count: Int, layout: SectorLayout = .plain) throws -> Area {
         let data = try sectors(handle, sector, min(count, 256), layout)
-        guard data.count >= sectorSize else { throw SACDError.damaged("area TOC") }
+        guard data.count >= sectorSize else { throw SACDError.damaged(String(localized: "area TOC", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         let isTwo = data.starts(with: Array("TWOCHTOC".utf8)), isMulti = data.starts(with: Array("MULCHTOC".utf8))
-        guard isTwo || isMulti else { throw SACDError.damaged("area TOC") }
+        guard isTwo || isMulti else { throw SACDError.damaged(String(localized: "area TOC", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         let channels = Int(data[32]), loudspeakers = Int(data[33] >> 3)
         let fs = Int(data[20])
         let frameFormat = data[21] & 0x0F
-        guard (1...6).contains(channels), fs == 4 || fs == 8 || fs == 16 else { throw SACDError.damaged("area format") }
+        guard (1...6).contains(channels), fs == 4 || fs == 8 || fs == 16 else { throw SACDError.damaged(String(localized: "area format", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         // A 2-channel stereo area (loudspeaker setup 0) is the stereo area; anything else plays as surround.
         let kind: SACDArea = channels == 2 && loudspeakers == 0 && isTwo ? .stereo : .multichannel
         let trackCount = Int(data[69])
         let first = Int(be32(data, 72)), last = Int(be32(data, 76))
-        guard trackCount > 0, last >= first else { throw SACDError.damaged("track list") }
+        guard trackCount > 0, last >= first else { throw SACDError.damaged(String(localized: "track list", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         let charset = data[90] & 0x07
         var area = Area(kind: kind, channels: channels, sampleRate: Double(fs) * 16 * 44_100, isDST: frameFormat == 0,
                         firstSector: first, lastSector: last, tracks: [], layout: layout)
@@ -268,7 +268,7 @@ public struct SACDImage: Sendable, Hashable {
         guard let starts = starts.map({ $0.compactMap { $0 } }), let durations = durations.map({ $0.compactMap { $0 } }),
               starts.count == trackCount, durations.count == trackCount,
               zip(starts, starts.dropFirst()).allSatisfy({ $0 < $1 }), durations[trackCount - 1] > 0
-        else { throw SACDError.damaged("track times") }
+        else { throw SACDError.damaged(String(localized: "track times", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         // The area's playing time, when it has one, bounds the last track.
         let total = timecode(data, 64) ?? 0
         for i in 0..<trackCount {
@@ -282,7 +282,7 @@ public struct SACDImage: Sendable, Hashable {
                                      songwriter: t[0x03], composer: t[0x04], arranger: t[0x05], message: t[0x06],
                                      isrc: isrcs[i], genre: genres[i]))
         }
-        guard !area.tracks.isEmpty else { throw SACDError.damaged("track list") }
+        guard !area.tracks.isEmpty else { throw SACDError.damaged(String(localized: "track list", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         return area
     }
 

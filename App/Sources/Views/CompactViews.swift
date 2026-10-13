@@ -23,23 +23,23 @@ struct MiniPlayerView: View {
                     .frame(width: geo.size.height, height: geo.size.height)
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).foregroundStyle(Palette.text).lineLimit(1)
+                        Text(player.current?.track.title ?? String(localized: "Not Playing")).font(Typeface.serif(16)).foregroundStyle(Palette.text).lineLimit(1)
                         Spacer(minLength: 0)
                         if let track = player.current?.track { FavoriteButton(track: track, size: 12) }
                     }
-                    Text(player.current?.track.displayArtist ?? " ").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                    Text(player.current?.track.displayArtist.libraryDisplayName ?? " ").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     Spacer()
                     HStack(spacing: 14) {
                         TransportControls(compact: true)
                         Spacer(minLength: 4)
                         if let path = player.signalPath {
                             Text(path.isResampling
-                                 ? "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz"
+                                 ? String(localized: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz")
                                  : path.deviceFormatShort)
                                 .font(Typeface.mono(10))
                                 .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
-                                .help(path.isBitPerfect ? "Bit-perfect" : "Converted on the way to the device")
-                                .accessibilityLabel(path.isBitPerfect ? "Bit-perfect" : "Converted")
+                                .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
+                                .accessibilityLabel(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device"))
                                 .accessibilityValue(path.deviceFormatShort)
                         }
                     }
@@ -104,11 +104,11 @@ struct MenuBarView: View {
             HStack(spacing: 12) {
                 ArtworkView(key: model.artworkKey(player.current?.track), size: 160, cornerRadius: 6).frame(width: 64, height: 64)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(player.current?.track.title ?? "Not Playing").font(Typeface.serif(16)).lineLimit(1)
-                    Text(player.current.map { "\($0.track.displayArtist) — \($0.track.displayAlbum)" } ?? "Vespertine")
+                    Text(player.current?.track.title ?? String(localized: "Not Playing")).font(Typeface.serif(16)).lineLimit(1)
+                    Text(player.current.map { "\($0.track.displayArtist.libraryDisplayName) — \($0.track.displayAlbum.libraryDisplayName)" } ?? "Vespertine")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
-                        Text(player.buffering ? "BUFFERING…" : "\(path.statusLine) · \(path.deviceFormatShort)").font(Typeface.mono(9.5))
+                        (player.buffering ? Text("BUFFERING…") : Text(verbatim: "\(path.statusLine) · \(path.deviceFormatShort)")).font(Typeface.mono(9.5))
                             .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
                     }
                 }
@@ -167,9 +167,9 @@ struct PlaybackSettings: View {
                 }
                 Text(fallbackNote(s.outputFallback)).font(.caption).foregroundStyle(.secondary)
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
-                Text(s.exclusiveMode
-                     ? "Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so Vespertine passes the volume keys, Control Center and the AirPods Max Digital Crown on to it. The Mac's own speakers and headphone jack always play shared."
-                     : "Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
+                (s.exclusiveMode
+                     ? Text("Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so Vespertine passes the volume keys, Control Center and the AirPods Max Digital Crown on to it. The Mac's own speakers and headphone jack always play shared.")
+                     : Text("Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access."))
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Integer mode", isOn: $s.integerMode)
                     .disabled(!s.exclusiveMode)
@@ -202,9 +202,9 @@ struct PlaybackSettings: View {
                     Text("Rendered by macOS (objects)").tag(true)
                     Text("Channel bed through Vespertine").tag(false)
                 }
-                Text(s.atmosBySystem
-                     ? "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path and meters don't apply to these tracks."
-                     : "Vespertine decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio.")
+                (s.atmosBySystem
+                     ? Text("macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path and meters don't apply to these tracks.")
+                     : Text("Vespertine decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio."))
                     .font(.caption).foregroundStyle(.secondary)
                 Picker("Stereo and surround versions", selection: $s.versionPreference) {
                     Text("Match the output").tag(TrackVersions.Preference.matchOutput)
@@ -247,11 +247,11 @@ struct PlaybackSettings: View {
     private func fallbackNote(_ fallback: OutputFallback) -> String {
         switch fallback {
         case .bestAvailable:
-            "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the most capable one connected: an external DAC first, then the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for."
+            String(localized: "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the most capable one connected: an external DAC first, then the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.")
         case .systemDefault:
-            "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for."
+            String(localized: "Vespertine remembers the output you chose and plays on it whenever it's connected. Until then it uses the Mac's sound output. Playback moves back to your output when you connect it. One that drops out mid-song (AirPods reconnecting) is waited for.")
         case .waitForChosen:
-            "Nothing plays until the output you chose is connected again."
+            String(localized: "Nothing plays until the output you chose is connected again.")
         }
     }
 }
@@ -270,7 +270,7 @@ struct LibrarySettings: View {
                         Image(systemName: source.isNetwork ? "server.rack" : (source.mode == .managed ? "tray.full" : "folder"))
                         VStack(alignment: .leading) {
                             Text(source.displayName)
-                            Text(source.isNetwork ? "Network share" : (source.mode == .managed ? "Managed" : "Referenced in place"))
+                            (source.isNetwork ? Text("Network share") : (source.mode == .managed ? Text("Managed", comment: "Library source kind: Vespertine organizes the files") : Text("Referenced in place")))
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -308,7 +308,7 @@ struct LibrarySettings: View {
                 Toggle("Include network shares", isOn: $s.analyzeNetworkShares)
                     .disabled(!s.autoAnalyze)
                 HStack {
-                    Button(model.analysis.isRunning ? "Stop" : "Analyze Library Now") {
+                    Button(model.analysis.isRunning ? String(localized: "Stop", comment: "Stops the library analysis") : String(localized: "Analyze Library Now")) {
                         if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
                     }
                     if model.analysis.isRunning {
@@ -317,7 +317,8 @@ struct LibrarySettings: View {
                     }
                 }
                 ForEach(model.shares.sources.filter { $0.id.map(model.analysis.serverIndexed.contains) ?? false }, id: \.id) { source in
-                    LabeledContent("\(source.name ?? "Network share") (analyzed on the server)") {
+                    let name = source.name ?? String(localized: "Network share")
+                    LabeledContent("\(name) (analyzed on the server)") {
                         Text(serverLine(source)).foregroundStyle(.secondary).monospacedDigit()
                     }
                 }
@@ -341,10 +342,12 @@ struct LibrarySettings: View {
     }
 
     private func serverLine(_ source: LibrarySource) -> String {
-        guard let id = source.id, let st = model.analysis.serverStatus[id] else { return "Results found" }
+        guard let id = source.id, let st = model.analysis.serverStatus[id] else { return String(localized: "Results found") }
         let updated = st.updated.formatted(.relative(presentation: .named))
-        if st.isRunning { return "Running · \(st.done.formatted()) of \(st.total.formatted()) · \(updated)" }
-        return st.failures > 0 ? "Up to date · \(st.failures) couldn't be read · \(updated)" : "Up to date · \(updated)"
+        if st.isRunning { return String(localized: "Running · \(st.done) of \(st.total) · \(updated)", comment: "Server analysis progress; last value: when it was last updated, e.g. 2 minutes ago") }
+        return st.failures > 0
+            ? String(localized: "Up to date · \(st.failures) couldn't be read · \(updated)", comment: "Server analysis; last value: when it was last updated, e.g. 2 minutes ago")
+            : String(localized: "Up to date · \(updated)", comment: "Server analysis; value: when it was last updated, e.g. 2 minutes ago")
     }
 }
 
@@ -368,11 +371,11 @@ struct OnlineSettings: View {
                     Button("Save & Verify") {
                         Task {
                             guard await ListenBrainzClient.shared.saveToken(token) == errSecSuccess else {
-                                validation = "Couldn’t save the token to the keychain"
+                                validation = String(localized: "Couldn’t save the token to the keychain")
                                 return
                             }
                             let user = try? await ListenBrainzClient.shared.validate(token: token)
-                            validation = user.map { "Connected as \($0)" } ?? "Token not accepted"
+                            validation = user.map { String(localized: "Connected as \($0)") } ?? String(localized: "Token not accepted")
                         }
                     }
                     if let validation { Text(validation).font(.caption).foregroundStyle(.secondary) }
@@ -414,7 +417,7 @@ struct AboutSettings: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 96, height: 96)
-            Text("Vespertine").font(Typeface.serif(28))
+            Text(verbatim: "Vespertine").font(Typeface.serif(28))
             Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")")
                 .font(Typeface.mono(11)).foregroundStyle(.secondary)
             Text("Free software under the GNU General Public License v3.\nDecoding by SFBAudioEngine (MIT), libFLAC, WavPack, Monkey's Audio, libopus, libvorbis, mpg123, TagLib.\nDatabase by GRDB (MIT).")

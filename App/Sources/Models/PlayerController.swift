@@ -22,9 +22,9 @@ nonisolated enum RepeatMode: String, CaseIterable, Sendable {
     var symbol: String { self == .one ? "repeat.1" : "repeat" }
     var spokenName: String {
         switch self {
-        case .off: "Off"
-        case .all: "All"
-        case .one: "One"
+        case .off: String(localized: "Off", comment: "Repeat mode, read by VoiceOver: repeat is off.")
+        case .all: String(localized: "All", comment: "Repeat mode, read by VoiceOver: repeat the whole queue.")
+        case .one: String(localized: "One", comment: "Repeat mode, read by VoiceOver: repeat the current song.")
         }
     }
 }
@@ -79,6 +79,8 @@ final class PlayerController {
     /// Live level (0…1, linear peak with decay) of every channel Vespertine sends, for multichannel meters.
     private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
+    /// The "Waiting for …" message last shown, so it's cleared once the output is back (whatever the language).
+    @ObservationIgnored private var waitingMessage: String?
     /// The chosen output playback is waiting for (it starts by itself when the output is back).
     private(set) var waitingForDevice: String?
     /// When the current track started (the Analysis tab follows whichever changed last).
@@ -425,7 +427,7 @@ final class PlayerController {
             requested = nil
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
-                lastError = "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable."
+                lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
             } else if let track, shares.isNetwork(track) {
                 // On a share, even asking whether the file exists can block for seconds: ask off the main thread.
                 lastError = message
@@ -434,25 +436,26 @@ final class PlayerController {
                     let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
                     guard let self, !exists else { return }
                     self.library.rescanForMissingFile(track)
-                    self.lastError = "“\(track.title)” was moved or deleted. Updating the library to find it…"
+                    self.lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
                 }
             } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
                 // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
                 library.rescanForMissingFile(track)
-                lastError = "“\(track.title)” was moved or deleted. Updating the library to find it…"
+                lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
             } else {
                 lastError = message
             }
         case .deviceLost(let name):
-            lastError = "\(name) was disconnected. Playback paused."
+            lastError = String(localized: "\(name) was disconnected. Playback paused.", comment: "%@ is the name of an audio output device.")
         case .waitingForDevice(let name):
-            lastError = "Waiting for \(name). Playback continues as soon as it’s ready."
+            lastError = String(localized: "Waiting for \(name). Playback continues as soon as it’s ready.", comment: "%@ is the name of an audio output device.")
+            waitingMessage = lastError
         case .deviceUnavailable(let name):
             lastError = settings.outputFallback == .waitForChosen
-                ? "\(name) didn’t come back. Choose another output, or press play once it’s connected."
-                : "\(name) didn’t come back. Press play to continue on another output."
+                ? String(localized: "\(name) didn’t come back. Choose another output, or press play once it’s connected.", comment: "%@ is the name of an audio output device.")
+                : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
-            lastError = "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play."
+            lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
         }
     }
 
@@ -474,7 +477,7 @@ final class PlayerController {
         }
         if waitingForDevice != snap.waitingForDevice {
             waitingForDevice = snap.waitingForDevice
-            if waitingForDevice == nil, lastError?.hasPrefix("Waiting for ") == true { lastError = nil }
+            if waitingForDevice == nil, lastError != nil, lastError == waitingMessage { lastError = nil }
         }
         if requested == nil, let id = snap.item?.id, let i = queue.firstIndex(where: { $0.id == id }), currentIndex != i {
             currentIndex = i
@@ -565,8 +568,8 @@ final class PlayerController {
         }
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: track.title,
-            MPMediaItemPropertyArtist: track.displayArtist,
-            MPMediaItemPropertyAlbumTitle: track.displayAlbum,
+            MPMediaItemPropertyArtist: track.displayArtist.libraryDisplayName,
+            MPMediaItemPropertyAlbumTitle: track.displayAlbum.libraryDisplayName,
             MPMediaItemPropertyPlaybackDuration: duration > 0 ? duration : track.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: position,
             MPNowPlayingInfoPropertyPlaybackRate: state == .playing ? 1.0 : 0.0,

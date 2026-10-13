@@ -89,7 +89,7 @@ final class NetworkShareManager {
     /// A share counts as connected only once this session has mounted (or adopted) it.
     func status(of source: LibrarySource) -> Status {
         guard let id = source.id else { return .offline("") }
-        return status[id] ?? .offline("Not connected yet.")
+        return status[id] ?? .offline(String(localized: "Not connected yet."))
     }
 
     func isReachable(_ track: Track) -> Bool {
@@ -167,7 +167,7 @@ final class NetworkShareManager {
         guard let volume, !unmountingOurselves.contains(volume) else { return }
         for source in sources where source.path == volume || source.path.hasPrefix(volume + "/") {
             guard let id = source.id, let share = source.networkShare else { continue }
-            status[id] = .offline("The share was disconnected.")
+            status[id] = .offline(String(localized: "The share was disconnected."))
             try? library.database.setSourceOnline(id, false)
             ejected.insert(id) // until it's clear which it was, health checks don't mount it again
             Task {
@@ -175,7 +175,7 @@ final class NetworkShareManager {
                 // purpose, so it stays disconnected. Otherwise the connection dropped, and it's mounted again.
                 let dropped = Date().timeIntervalSince(lastDisruption) < 60
                 if !dropped, await NetworkVolume.isReachable(share, timeout: 3) {
-                    status[id] = .offline("Disconnected. Choose Reconnect to use it again.")
+                    status[id] = .offline(String(localized: "Disconnected. Choose Reconnect to use it again."))
                     return
                 }
                 try? await Task.sleep(for: .seconds(2))
@@ -222,7 +222,7 @@ final class NetworkShareManager {
                     guard (unresponsive[id] ?? 0) >= 2 else { continue }
                     unresponsive[id] = 0
                     await unmountOurselves(mount, force: true)
-                    status[id] = .offline("Reconnecting…")
+                    status[id] = .offline(String(localized: "Reconnecting…"))
                     await connect(source)
                     continue
                 }
@@ -305,7 +305,8 @@ final class NetworkShareManager {
             shareLog.error("share \(id, privacy: .public): connect failed: \(String(describing: error), privacy: .public)")
             if (error as? NetworkShareError)?.isCredentialProblem == true {
                 credentialFailedAt[id] = .now
-                status[id] = .offline(error.localizedDescription + " Vespertine tries again in 30 minutes, or when you choose Reconnect.")
+                status[id] = .offline(String(localized: "\(error.localizedDescription) Vespertine tries again in 30 minutes, or when you choose Reconnect.",
+                                                    comment: "Starts with the reason the share couldn't connect."))
             } else {
                 status[id] = .offline(error.localizedDescription)
             }

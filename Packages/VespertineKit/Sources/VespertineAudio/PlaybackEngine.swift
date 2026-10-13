@@ -639,7 +639,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
 
     private func deviceName(_ uid: String) -> String {
-        deviceNames[uid] ?? (uid == settings.deviceUID ? settings.deviceName : nil) ?? "The selected output"
+        deviceNames[uid] ?? (uid == settings.deviceUID ? settings.deviceName : nil) ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
     }
 
     /// Notes which outputs are connected (`uids`, or read now), and when each one that was connected went away.
@@ -767,7 +767,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             let steps = zip(marks, marks.dropFirst()).map { "\($1.0) \(Int($1.1.timeIntervalSince($0.1) * 1000))" }.joined(separator: ", ")
             log.info("Opening \(item.url.lastPathComponent, privacy: .public) (ms): \(steps, privacy: .public)")
         }
-        guard let device = try resolveDevice(standIn: standIn) else { throw CoreAudioError(kAudioHardwareBadDeviceError, "find an output device") }
+        guard let device = try resolveDevice(standIn: standIn) else { throw CoreAudioError(kAudioHardwareBadDeviceError, String(localized: "find an output device", comment: "Followed by “failed: <error code>”.")) }
         mark("device")
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.

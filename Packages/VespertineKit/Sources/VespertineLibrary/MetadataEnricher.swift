@@ -241,15 +241,27 @@ public actor MetadataEnricher {
         guard !edits.isEmpty || cover != nil else { return nil }
         var parts: [String] = []
         let fields = Set(edits.values.flatMap(\.keys))
-        let named: [(TagField, String)] = [(.title, "titles"), (.artist, "artists"), (.album, "album"), (.trackNumber, "track numbers"),
-                                           (.releaseDate, "year"), (.genre, "genre"), (.label, "label"), (.musicBrainzReleaseID, "MusicBrainz IDs")]
+        let named: [(TagField, String)] = [
+            (.title, String(localized: "titles", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.artist, String(localized: "artists", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.album, String(localized: "album", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.trackNumber, String(localized: "track numbers", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.releaseDate, String(localized: "year", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.genre, String(localized: "genre", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+            (.label, String(localized: "label", comment: "What an enrichment proposal fills in, listed after “Fills”: the record label.")),
+            (.musicBrainzReleaseID, String(localized: "MusicBrainz IDs", comment: "What an enrichment proposal fills in, listed after “Fills”.")),
+        ]
         let filled = named.filter { fields.contains($0.0) }.map(\.1)
-        if !filled.isEmpty { parts.append("Fills " + filled.joined(separator: ", ")) }
-        if cover != nil { parts.append("adds cover art") }
+        // Narrow list style: "titles, artists, album" in English, the locale's own separators elsewhere.
+        if !filled.isEmpty {
+            parts.append(String(localized: "Fills \(filled.formatted(.list(type: .and, width: .narrow)))",
+                                comment: "Summary of an enrichment proposal: a list such as “titles, artists, album”."))
+        }
+        if cover != nil { parts.append(String(localized: "adds cover art", comment: "Summary of an enrichment proposal, after “Fills …” when there is one.")) }
 
         return EnrichmentProposal(
             albumKey: albumKey,
-            title: edits.values.compactMap { $0[.album] ?? nil }.first ?? album ?? working.first?.title ?? "Untitled",
+            title: edits.values.compactMap { $0[.album] ?? nil }.first ?? album ?? working.first?.title ?? String(localized: "Untitled"),
             artist: edits.values.compactMap { $0[.albumArtist] ?? nil }.first ?? artist ?? "Unknown Artist",
             year: year, sources: sources,
             edits: edits.mapValues { TagEdit(fields: $0) },
