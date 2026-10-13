@@ -146,7 +146,7 @@ struct SetupFlow: View {
 
     private var footer: some View {
         HStack {
-            if step != .welcome && step != .done, let previous = step.previous {
+            if step != .welcome, let previous = step.previous {
                 Button { go(to: previous) } label: { Label("Back", systemImage: "chevron.left") }
                     .buttonStyle(QuietButtonStyle())
                     .keyboardShortcut("[", modifiers: .command)
@@ -506,6 +506,7 @@ private struct SetupMusic: View {
                 modeCard(.copyAndOrganize, symbol: "tray.full", title: "Copy and organize",
                          detail: "Copies music into one folder, sorted by artist and album. Your originals stay as they are.")
             }
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: 700)
             .padding(.top, 30)
             .reveal(shown, delay: 0.12)
@@ -545,10 +546,12 @@ private struct SetupMusic: View {
                     Spacer(minLength: 0)
                     Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 16))
+                        .frame(maxHeight: .infinity, alignment: .top)
                         .foregroundStyle(selected ? Palette.brassHi : Palette.text3)
                         .contentTransition(.symbolEffect(.replace))
                 }
             }
+            .frame(maxHeight: .infinity)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -659,8 +662,10 @@ private struct SetupOutput: View {
                 .fixedSize()
             }
             .padding(.top, 12)
-            .opacity(settings.selectedDeviceUID == nil ? 0.4 : 1)
+            .opacity(settings.selectedDeviceUID == nil ? 0 : 1)
+            .offset(y: settings.selectedDeviceUID == nil ? -6 : 0)
             .disabled(settings.selectedDeviceUID == nil)
+            .accessibilityHidden(settings.selectedDeviceUID == nil)
             .animation(.easeInOut(duration: 0.25), value: settings.selectedDeviceUID)
             .reveal(shown, delay: 0.36)
         }
@@ -713,7 +718,7 @@ private struct SetupSound: View {
         @Bindable var settings = model.settings
         VStack(spacing: 0) {
             SetupHeading(title: "How it should sound",
-                         detail: "Vespertine plays every file bit-perfect, exactly as recorded, and tells you when anything changes that. Two choices decide how it shares your DAC and evens out loudness.",
+                         detail: "Vespertine plays every file bit-perfect, exactly as recorded, and tells you when anything changes that. Choose how it shares your DAC and handles volume.",
                          shown: shown)
             VStack(spacing: 12) {
                 SetupOption(symbol: "lock.shield", title: "Exclusive access",
@@ -818,7 +823,7 @@ private struct SetupDone: View {
                     Circle()
                         .fill(i.isMultiple(of: 3) ? Palette.copper : Palette.brassHi)
                         .frame(width: i.isMultiple(of: 2) ? 5 : 3.5, height: i.isMultiple(of: 2) ? 5 : 3.5)
-                        .modifier(BurstParticle(progress: burst, angle: Double(i) / 16 * 2 * .pi + 0.2, distance: i.isMultiple(of: 2) ? 96 : 76))
+                        .modifier(BurstParticle(progress: burst, angle: Double(i) / 16 * 2 * .pi + 0.2, distance: i.isMultiple(of: 2) ? 48 : 32))
                 }
                 Circle().stroke(Palette.hairlineStrong, lineWidth: 2)
                 Circle()
@@ -915,7 +920,8 @@ private struct BurstParticle: ViewModifier, Animatable {
     }
 
     func body(content: Content) -> some View {
-        let travel = distance * (1 - pow(1 - progress, 3))
+        // From the ring's edge outwards.
+        let travel = 54 + distance * (1 - pow(1 - progress, 3))
         content
             .offset(x: cos(angle) * travel, y: sin(angle) * travel)
             .opacity(progress <= 0 || progress >= 1 ? 0 : sin(.pi * progress))
