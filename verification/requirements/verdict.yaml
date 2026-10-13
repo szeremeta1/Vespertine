@@ -204,9 +204,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 81"
+    section: "line 85"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 81, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
+    cache: { repo: docs/FEATURES.md, lines: 85, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
   requirement: "On a PCM path that would otherwise be BIT-PERFECT, an active equalizer preset makes the badge exactly \"EQUALIZER\"."
   quote_sha256: 91af30f470ee9e93f90067b89d53ec5a14391dd891da113421239b9cc2c5486f
   kind: vespertine-rule
@@ -234,9 +234,9 @@
   source:
     doc: "Vespertine docs/ARCHITECTURE.md"
     version: "98cad1a, with the F-05 docs change"
-    section: "line 91"
+    section: "line 95"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 91, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 95, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
   requirement: "For DoP the badge is \"NATIVE DSD · DoP\" exactly when the player holds the device (BPV-009), the nominal rate read back equals the planned carrier rate, the physical format has ≥24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
   quote_sha256: fce73c5cb9df36e13899619fc5f4b472bb7577033b28222c70ad87ffd5a712e1
   kind: vespertine-rule
