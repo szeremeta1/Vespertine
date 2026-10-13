@@ -16,8 +16,9 @@ struct VespertineApp: App {
     var body: some Scene {
         Window("Vespertine", id: "main") {
             LibraryContent(startup: startup) { model in
-                MainWindow()
+                MainRoot()
                     .environment(model)
+                    .environment(updater)
                     .frame(minWidth: 1080, minHeight: 680)
                     .preferredColorScheme(.dark)
             }
@@ -29,6 +30,10 @@ struct VespertineApp: App {
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates…") { updater.checkForUpdates() }
                     .disabled(!updater.canCheckForUpdates)
+                if let model = startup.model {
+                    Button("Setup Assistant…") { openWindow(id: "main"); model.showSetup = true }
+                        .disabled(model.showSetup)
+                }
             }
         }
 
