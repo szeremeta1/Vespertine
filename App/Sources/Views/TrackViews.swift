@@ -69,13 +69,13 @@ struct TrackTable: View {
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
-                    Text(row.track.displayArtist).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
                 .width(min: 100, ideal: 140)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
-                    Text(row.track.displayAlbum).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
                 .width(min: 100, ideal: 150)
             }

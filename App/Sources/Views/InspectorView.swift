@@ -71,8 +71,8 @@ struct NowPlayingPanel: View {
                         FavoriteButton(track: track, size: 15)
                     }
                     .padding(.top, 20)
-                    Text(track.displayArtist).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
-                    Text([track.displayAlbum, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
+                    Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
+                    Text([track.displayAlbum.libraryDisplayName, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
                         .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2)
                     if let mark = track.formatMark {
                         FormatMarkView(mark: mark).padding(.top, 14)
@@ -542,7 +542,7 @@ struct AnalysisPanel: View {
                 }
                 if let track {
                     Text(track.title).font(Typeface.serif(20)).foregroundStyle(Palette.text)
-                    Text("\(track.formatSummary) · \(track.displayArtist)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
+                    Text("\(track.formatSummary) · \(track.displayArtist.libraryDisplayName)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                     content(for: track)
                 } else {
                     Text("Select or play a track to analyze it.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)

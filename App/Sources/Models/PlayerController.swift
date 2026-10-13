@@ -566,8 +566,8 @@ final class PlayerController {
         }
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: track.title,
-            MPMediaItemPropertyArtist: track.displayArtist,
-            MPMediaItemPropertyAlbumTitle: track.displayAlbum,
+            MPMediaItemPropertyArtist: track.displayArtist.libraryDisplayName,
+            MPMediaItemPropertyAlbumTitle: track.displayAlbum.libraryDisplayName,
             MPMediaItemPropertyPlaybackDuration: duration > 0 ? duration : track.duration,
             MPNowPlayingInfoPropertyElapsedPlaybackTime: position,
             MPNowPlayingInfoPropertyPlaybackRate: state == .playing ? 1.0 : 0.0,

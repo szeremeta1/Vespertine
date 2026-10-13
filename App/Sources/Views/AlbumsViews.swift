@@ -150,12 +150,12 @@ struct AlbumCard: View {
                     .transition(.opacity)
                 }
             }
-            Text(album.title)
+            Text(album.title.libraryDisplayName)
                 .font(Typeface.serif(14))
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
                 .padding(.top, 10)
-            Text(album.artist)
+            Text(album.artist.libraryDisplayName)
                 .font(Typeface.ui(12))
                 .foregroundStyle(Palette.text2)
                 .lineLimit(1)
@@ -171,7 +171,7 @@ struct AlbumCard: View {
         .onKeyPress(keys: [.return, .space]) { _ in model.openAlbum(album.key); return .handled }
         // VoiceOver (and other assistive tech) can open the album and play it.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(album.title), \(album.artist)")
+        .accessibilityLabel("\(album.title.libraryDisplayName), \(album.artist.libraryDisplayName)")
         .accessibilityValue(album.formatSummary)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbum(album.key) }
@@ -208,9 +208,9 @@ struct AlbumFamilyCard: View {
                     .background(Palette.surface, in: RoundedRectangle(cornerRadius: 4))
                     .padding(9)
             }
-            Text(family.title).font(Typeface.serif(14)).foregroundStyle(Palette.text)
+            Text(family.title.libraryDisplayName).font(Typeface.serif(14)).foregroundStyle(Palette.text)
                 .lineLimit(1).padding(.top, 10)
-            Text(family.artist).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
+            Text(family.artist.libraryDisplayName).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
                 .lineLimit(1).padding(.top, 2)
             FormatLabel(summary: String(localized: "\(family.editions.count) editions") + " · " + family.representative.formatSummary, highlight: true)
                 .padding(.top, 5)
@@ -220,7 +220,7 @@ struct AlbumFamilyCard: View {
         .focusable(interactions: .activate)
         .onKeyPress(keys: [.return, .space]) { _ in model.openAlbumFamily(family.representative.key); return .handled }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(family.title), \(family.artist), \(family.editions.count) editions")
+        .accessibilityLabel("\(family.title.libraryDisplayName), \(family.artist.libraryDisplayName), \(family.editions.count) editions")
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbumFamily(family.representative.key) }
         .contextMenu {
@@ -242,9 +242,9 @@ struct AlbumFamilyDetailView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(family.title).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
+                        Text(family.title.libraryDisplayName).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
                             .lineLimit(1).minimumScaleFactor(0.7)
-                        Text("\(family.artist) · \(family.editions.count) EDITIONS")
+                        Text("\(family.artist.libraryDisplayName) · \(family.editions.count) EDITIONS")
                             .font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                     }
                     Spacer(minLength: 8)
@@ -256,7 +256,7 @@ struct AlbumFamilyDetailView: View {
                                 if edition.key == selected.key {
                                     Label(edition.title, systemImage: "checkmark")
                                 } else {
-                                    Text(edition.title)
+                                    Text(edition.title.libraryDisplayName)
                                 }
                             }
                         }
@@ -276,7 +276,7 @@ struct AlbumFamilyDetailView: View {
                                     ArtworkView(key: edition.artworkKey, size: 120, cornerRadius: 3)
                                         .frame(width: 48, height: 48)
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(edition.title).font(Typeface.ui(12, weight: .medium))
+                                        Text(edition.title.libraryDisplayName).font(Typeface.ui(12, weight: .medium))
                                             .foregroundStyle(Palette.text).lineLimit(2)
                                         FormatLabel(summary: edition.formatSummary, highlight: edition.isHiRes)
                                     }
@@ -472,14 +472,14 @@ struct AlbumDetailView: View {
                     .font(Typeface.mono(10.5, weight: .semibold))
                     .tracking(1.4)
                     .foregroundStyle(Palette.brass)
-                Text(album.title)
+                Text(album.title.libraryDisplayName)
                     .font(Typeface.serif(38))
                     .foregroundStyle(Palette.text)
                     .lineLimit(2)
                     .minimumScaleFactor(0.6)
                     .padding(.top, 8)
                 Button { model.path.append(.artist(album.artist)) } label: {
-                    Text(album.artist).font(Typeface.ui(15)).foregroundStyle(Palette.brassHi)
+                    Text(album.artist.libraryDisplayName).font(Typeface.ui(15)).foregroundStyle(Palette.brassHi)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 6)
@@ -590,7 +590,7 @@ struct ArtistTile: View {
             VStack(alignment: .leading, spacing: 0) {
                 ArtworkView(key: artist.artworkKey, size: 160, cornerRadius: 999)
                     .shadow(color: .black.opacity(0.4), radius: 10, y: 8)
-                Text(artist.name).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
+                Text(artist.name.libraryDisplayName).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
                 Text("\(artist.albumCount) albums · \(artist.trackCount) tracks")
                     .font(Typeface.mono(10)).foregroundStyle(Palette.text3).padding(.top, 3)
             }
@@ -624,8 +624,8 @@ struct ArtistDetailView: View {
     let name: String
 
     var body: some View {
-        AlbumsGridView(scope: .route(.artist(name)), title: name)
-            .navigationTitle(name)
+        AlbumsGridView(scope: .route(.artist(name)), title: name.libraryDisplayName)
+            .navigationTitle(name.libraryDisplayName)
     }
 }
 

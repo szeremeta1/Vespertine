@@ -57,12 +57,12 @@ struct TransportBar: View {
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)
-                        Text("\(track.displayArtist) — \(track.displayAlbum)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                        Text("\(track.displayArtist.libraryDisplayName) — \(track.displayAlbum.libraryDisplayName)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("\(track.title), \(track.displayArtist), \(track.displayAlbum)")
+                .accessibilityLabel("\(track.title), \(track.displayArtist.libraryDisplayName), \(track.displayAlbum.libraryDisplayName)")
                 .accessibilityHint("Opens the album")
                 FavoriteButton(track: track)
             } else {
@@ -397,7 +397,7 @@ struct QueueView: View {
             ArtworkView(key: model.artworkKey(e.track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
             VStack(alignment: .leading, spacing: 1) {
                 Text(e.track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
-                Text(e.track.displayArtist).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
+                Text(e.track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
             }
             Spacer()
             Text(e.track.formatSummary).font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)

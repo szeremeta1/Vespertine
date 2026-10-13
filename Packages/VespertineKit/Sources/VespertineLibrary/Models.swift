@@ -264,3 +264,17 @@ extension Track {
         extraTags = t.extraTags; artworkKey = t.artworkKey
     }
 }
+
+extension String {
+    /// A library name to show: the library's own placeholders ("Unknown Artist", "Unknown Album", "Various Artists")
+    /// stay English where they're stored and matched (album keys, the database), and appear in the user's language.
+    /// Any other name is returned as it is.
+    public var libraryDisplayName: String {
+        switch self {
+        case "Unknown Artist": String(localized: "Unknown Artist")
+        case "Unknown Album": String(localized: "Unknown Album")
+        case Track.variousArtists: String(localized: "Various Artists")
+        default: self
+        }
+    }
+}

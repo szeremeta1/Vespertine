@@ -27,7 +27,7 @@ struct MiniPlayerView: View {
                         Spacer(minLength: 0)
                         if let track = player.current?.track { FavoriteButton(track: track, size: 12) }
                     }
-                    Text(player.current?.track.displayArtist ?? " ").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                    Text(player.current?.track.displayArtist.libraryDisplayName ?? " ").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     Spacer()
                     HStack(spacing: 14) {
                         TransportControls(compact: true)
@@ -105,7 +105,7 @@ struct MenuBarView: View {
                 ArtworkView(key: model.artworkKey(player.current?.track), size: 160, cornerRadius: 6).frame(width: 64, height: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(player.current?.track.title ?? String(localized: "Not Playing")).font(Typeface.serif(16)).lineLimit(1)
-                    Text(player.current.map { "\($0.track.displayArtist) — \($0.track.displayAlbum)" } ?? "Vespertine")
+                    Text(player.current.map { "\($0.track.displayArtist.libraryDisplayName) — \($0.track.displayAlbum.libraryDisplayName)" } ?? "Vespertine")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
                         (player.buffering ? Text("BUFFERING…") : Text(verbatim: "\(path.statusLine) · \(path.deviceFormatShort)")).font(Typeface.mono(9.5))
