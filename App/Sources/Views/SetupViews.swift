@@ -154,7 +154,8 @@ struct SetupFlow: View {
             }
             Spacer()
             if step != .done {
-                Button(step == .welcome ? "Set Up Later" : "Skip the Rest") { go(to: .done) }
+                // Later from the welcome goes straight to the library; from a step, to the summary of what was chosen.
+                Button(step == .welcome ? "Set Up Later" : "Skip the Rest") { if step == .welcome { model.completeSetup() } else { go(to: .done) } }
                     .buttonStyle(.plain)
                     .font(Typeface.ui(12))
                     .foregroundStyle(Palette.text3)
@@ -724,7 +725,7 @@ private struct SetupSound: View {
                 SetupOption(symbol: "lock.shield", title: "Exclusive access",
                             detail: "Vespertine takes sole control of your DAC while it plays, so no other app can mix in or change its format. Other apps are silent on that device. Best for a dedicated DAC.",
                             on: settings.exclusiveMode) {
-                    Toggle("Exclusive access", isOn: $settings.exclusiveMode).labelsHidden().toggleStyle(.switch)
+                    Toggle("Exclusive access", isOn: $settings.exclusiveMode).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
                 }
                 .reveal(shown, delay: 0.12)
                 SetupOption(symbol: "dial.medium", title: "Volume leveling (ReplayGain)",
@@ -742,7 +743,7 @@ private struct SetupSound: View {
                             detail: "While Vespertine plays, the Mac's volume keys and headphone controls adjust the device it's playing to.",
                             on: settings.systemOutputFollowsPlayback || settings.exclusiveMode) {
                     Toggle("Volume keys follow Vespertine", isOn: $settings.systemOutputFollowsPlayback)
-                        .labelsHidden().toggleStyle(.switch)
+                        .labelsHidden().toggleStyle(.switch).tint(Palette.brass)
                         .disabled(settings.exclusiveMode)
                 }
                 .reveal(shown, delay: 0.28)
@@ -779,20 +780,20 @@ private struct SetupExtras: View {
                 SetupOption(symbol: "checkmark.seal", title: "Check each file's real quality",
                             detail: "Analyzes new music in the background for upsampling, padded bits and lossy sources sold as hi-res. Results are saved, so nothing is analyzed twice.",
                             on: settings.autoAnalyze) {
-                    Toggle("Check each file's real quality", isOn: $settings.autoAnalyze).labelsHidden().toggleStyle(.switch)
+                    Toggle("Check each file's real quality", isOn: $settings.autoAnalyze).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
                 }
                 .reveal(shown, delay: 0.12)
                 SetupOption(symbol: "photo.on.rectangle", title: "Cover art from the Cover Art Archive",
                             detail: "Finds missing album covers when you look an album up on MusicBrainz. Only when you ask for a lookup.",
                             on: settings.fetchArtworkOnline) {
-                    Toggle("Cover art from the Cover Art Archive", isOn: $settings.fetchArtworkOnline).labelsHidden().toggleStyle(.switch)
+                    Toggle("Cover art from the Cover Art Archive", isOn: $settings.fetchArtworkOnline).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
                 }
                 .reveal(shown, delay: 0.2)
                 if updater.isEnabled {
                     SetupOption(symbol: "arrow.down.circle", title: "Automatic updates",
                                 detail: "Checks Vespertine's GitHub releases now and then. Every update is signed and verified before it's installed.",
                                 on: updater.automaticallyChecks) {
-                        Toggle("Automatic updates", isOn: $updater.automaticallyChecks).labelsHidden().toggleStyle(.switch)
+                        Toggle("Automatic updates", isOn: $updater.automaticallyChecks).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
                     }
                     .reveal(shown, delay: 0.28)
                 }
