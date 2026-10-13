@@ -119,6 +119,9 @@ if ! $resume; then
   ditto "$derived"/Build/Products/Release/Vespertine.app "$staged"
   rm -rf "$app"
   mv "$staged" "$app"
+  # Vespertine has no Russian localization, and nothing inside it brings one in either (Sparkle ships one). Removed
+  # before signing, which covers the frameworks too.
+  find "$app" -type d -name ru.lproj -prune -exec rm -rf {} +
   git rev-parse HEAD > "$out/built-from"
 
   # Inside-out: frameworks first, then the app.

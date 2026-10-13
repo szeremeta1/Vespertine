@@ -56,7 +56,7 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
     /// imports into, the volume name for external drives, else the folder name.
     public var displayName: String {
         if let name, !name.isEmpty { return name }
-        if mode == .managed { return "Imported Music" }
+        if mode == .managed { return String(localized: "Imported Music", comment: "Sidebar name of the folder Vespertine imports music into.") }
         if let remoteURL, let share = NetworkShare(string: remoteURL) { return share.defaultName }
         let components = url.pathComponents
         if path.hasPrefix("/Volumes/"), components.count == 3 { return components[2] }

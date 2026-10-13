@@ -49,7 +49,7 @@ extension Color {
 struct SectionLabel: View {
     let text: String
     var body: some View {
-        Text(text.uppercased())
+        Text(text.localizedUppercase)
             .font(Typeface.ui(10.5, weight: .semibold))
             .tracking(0.9)
             .foregroundStyle(Palette.text3)
@@ -184,7 +184,7 @@ struct BrassSlider: View {
     var showsThumb = true
     /// What VoiceOver calls it ("Position", "Volume"), how it reads the value, and how far one swipe moves it.
     var accessibilityName = ""
-    var accessibilityValueText: (Double) -> String = { "\(Int((max(0, min(1, $0)) * 100).rounded())) percent" }
+    var accessibilityValueText: (Double) -> String = { String(localized: "\(Int((max(0, min(1, $0)) * 100).rounded())) percent") }
     var accessibilityStep = 0.05
     var onEditingChanged: (Bool) -> Void = { _ in }
     @State private var dragging = false
@@ -246,7 +246,9 @@ extension TimeInterval {
 
     var longDuration: String {
         let minutes = Int(self / 60)
-        return minutes >= 60 ? "\(minutes / 60) HR \(minutes % 60) MIN" : "\(minutes) MIN"
+        return minutes >= 60
+            ? String(localized: "\(minutes / 60) HR \(minutes % 60) MIN", comment: "Total duration: hours and minutes, abbreviated, uppercase")
+            : String(localized: "\(minutes) MIN", comment: "Total duration in minutes, abbreviated, uppercase")
     }
 }
 

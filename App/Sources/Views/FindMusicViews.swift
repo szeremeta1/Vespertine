@@ -12,6 +12,13 @@ import SwiftUI
 enum MusicFilter: String, CaseIterable, Identifiable {
     case hiRes = "Hi-Res", lossless = "Lossless", all = "All Music"
     var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .hiRes: String(localized: "Hi-Res", comment: "Filter: high-resolution music only")
+        case .lossless: String(localized: "Lossless", comment: "Filter: lossless music only")
+        case .all: String(localized: "All Music", comment: "Filter: every kind of music")
+        }
+    }
     func includes(_ f: FoundAudioFile) -> Bool {
         switch self { case .hiRes: f.isHiRes; case .lossless: f.isLossless; case .all: true }
     }
@@ -77,7 +84,7 @@ struct FindMusicSheet: View {
                 VStack(spacing: 12) {
                     ProgressView(value: progress.total > 0 ? Double(progress.inspected) / Double(progress.total) : 0)
                         .progressViewStyle(.linear).tint(Palette.brass).frame(width: 320)
-                    Text(progress.total > 0 ? "Checking \(progress.inspected) of \(progress.total) audio files…" : "Searching…")
+                    (progress.total > 0 ? Text("Checking \(progress.inspected) of \(progress.total) audio files…") : Text("Searching…"))
                         .font(Typeface.mono(11)).foregroundStyle(Palette.text3)
                 }
                 .frame(maxWidth: .infinity, minHeight: 360)
@@ -86,10 +93,10 @@ struct FindMusicSheet: View {
                     .frame(maxWidth: .infinity, minHeight: 360)
             } else {
                 HStack {
-                    Picker("Show", selection: $filter) { ForEach(MusicFilter.allCases) { Text($0.rawValue).tag($0) } }
+                    Picker("Show", selection: $filter) { ForEach(MusicFilter.allCases) { Text($0.label).tag($0) } }
                         .pickerStyle(.segmented).labelsHidden().fixedSize()
                     Spacer()
-                    Button(allSelected ? "Select None" : "Select All") { toggleAll() }.buttonStyle(QuietButtonStyle(compact: true))
+                    Button(allSelected ? String(localized: "Select None") : String(localized: "Select All")) { toggleAll() }.buttonStyle(QuietButtonStyle(compact: true))
                 }
                 .padding(.horizontal, 22).padding(.bottom, 10)
                 Hairline()
@@ -130,26 +137,29 @@ struct FindMusicSheet: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 2)
-                .help(chosen == files.count ? "Deselect this folder" : "Select every track in this folder")
+                .help(chosen == files.count ? String(localized: "Deselect this folder") : String(localized: "Select every track in this folder"))
                 .accessibilityLabel("Select \(folder.url.lastPathComponent)")
-                .accessibilityValue(chosen == 0 ? "None selected" : chosen == files.count ? "All selected" : "\(chosen) of \(files.count) selected")
+                .accessibilityValue(chosen == 0 ? String(localized: "None selected") : chosen == files.count ? String(localized: "All selected") : String(localized: "\(chosen) of \(files.count) selected"))
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
                         Text(folder.url.lastPathComponent).font(Typeface.serif(15)).foregroundStyle(Palette.text).lineLimit(1)
-                        if !folder.hiRes.isEmpty { StatusBadge(text: "\(folder.hiRes.count) HI-RES", kind: .perfect) }
+                        if !folder.hiRes.isEmpty { StatusBadge(text: String(localized: "\(folder.hiRes.count) HI-RES", comment: "Badge: number of hi-res tracks in a folder (uppercase)"), kind: .perfect) }
                     }
                     Text(folder.displayPath).font(Typeface.mono(10)).foregroundStyle(Palette.text3).lineLimit(1).truncationMode(.middle)
-                    Text("\(files.count) track\(files.count == 1 ? "" : "s") · \(FoundFolder.formatSummary(of: files)) · \(files.reduce(0) { $0 + $1.duration }.longDuration)\(folder.excludedCount > 0 ? " · \(folder.excludedCount) recordings/clips skipped" : "")")
+                    let formats = FoundFolder.formatSummary(of: files), length = files.reduce(0) { $0 + $1.duration }.longDuration
+                    (folder.excludedCount > 0
+                        ? Text("\(files.count) tracks · \(formats) · \(length) · \(folder.excludedCount) recordings/clips skipped")
+                        : Text("\(files.count) tracks · \(formats) · \(length)"))
                         .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2)
                 }
                 Spacer()
-                Text(chosen == files.count ? "" : "\(chosen) of \(files.count)").font(Typeface.mono(10)).foregroundStyle(Palette.brass)
+                (chosen == files.count ? Text(verbatim: "") : Text("\(chosen) of \(files.count)")).font(Typeface.mono(10)).foregroundStyle(Palette.brass)
                 Button { toggleExpanded(folder.url) } label: {
                     Image(systemName: expanded.contains(folder.url) ? "chevron.up" : "chevron.down").font(.system(size: 11, weight: .semibold))
                 }
                 .buttonStyle(.plain).foregroundStyle(Palette.text2)
-                .help(mode == .reference ? "Folders are added whole when referencing" : "Choose individual files")
-                .accessibilityLabel(expanded.contains(folder.url) ? "Hide files" : "Show files")
+                .help(mode == .reference ? String(localized: "Folders are added whole when referencing") : String(localized: "Choose individual files"))
+                .accessibilityLabel(expanded.contains(folder.url) ? String(localized: "Hide files") : String(localized: "Show files"))
             }
             .padding(.horizontal, 22).padding(.vertical, 12)
             if expanded.contains(folder.url) {
@@ -160,7 +170,7 @@ struct FindMusicSheet: View {
                                                                              set: { if $0 { selected.insert(file.url) } else { selected.remove(file.url) } }))
                                 .toggleStyle(.checkbox).labelsHidden()
                             Text(file.url.lastPathComponent).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1).truncationMode(.middle)
-                            if duplicates.contains(file.url) { StatusBadge(text: "DUPLICATE", kind: .converted) }
+                            if duplicates.contains(file.url) { StatusBadge(text: String(localized: "DUPLICATE"), kind: .converted) }
                             Spacer()
                             FormatLabel(summary: "\(file.format.codec) · \(file.format.shortDescription)", highlight: file.isHiRes)
                             Text(file.duration.clock).font(Typeface.mono(10)).foregroundStyle(Palette.text3).frame(width: 40, alignment: .trailing)
@@ -180,9 +190,9 @@ struct FindMusicSheet: View {
                     Text("Reference in Place").tag(ImportMode.reference)
                 }
                 .pickerStyle(.segmented).labelsHidden().fixedSize()
-                Text(mode == .copyAndOrganize
-                     ? "Copies the selected files into ~/Music/Vespertine as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed."
-                     : "Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files.")
+                (mode == .copyAndOrganize
+                     ? Text("Copies the selected files into ~/Music/Vespertine as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed.")
+                     : Text("Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files."))
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
             if mode == .copyAndOrganize, let space, space.bytesToCopy > 0 {
@@ -195,7 +205,7 @@ struct FindMusicSheet: View {
                     .toggleStyle(.checkbox).font(Typeface.ui(12))
                 Spacer()
                 Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
-                Button(adding ? "Adding…" : "Add \(selectedFiles.count) Track\(selectedFiles.count == 1 ? "" : "s")") { add() }
+                Button(adding ? String(localized: "Adding…") : String(localized: "Add \(selectedFiles.count) Tracks")) { add() }
                     .buttonStyle(BrassButtonStyle())
                     .disabled(selectedFiles.isEmpty || adding || scanning || (mode == .copyAndOrganize && !(space?.fits ?? false)))
                     .keyboardShortcut(.defaultAction)
@@ -206,9 +216,9 @@ struct FindMusicSheet: View {
 
     private func copyNote(_ space: ImportSpace) -> String {
         let needed = space.bytesToCopy.byteString
-        guard let free = space.freeBytes else { return "Copies \(needed) from other drives." }
-        if space.fits { return "Copies \(needed) from other drives. \(free.byteString) is free on this Mac." }
-        return "That needs \(needed), but only \(free.byteString) is free on this Mac, and Vespertine keeps 2 GB spare. Choose fewer files, or switch to Reference in Place."
+        guard let free = space.freeBytes else { return String(localized: "Copies \(needed) from other drives.") }
+        if space.fits { return String(localized: "Copies \(needed) from other drives. \(free.byteString) is free on this Mac.") }
+        return String(localized: "That needs \(needed), but only \(free.byteString) is free on this Mac, and Vespertine keeps 2 GB spare. Choose fewer files, or switch to Reference in Place.")
     }
 
     private func toggleExpanded(_ url: URL) { if expanded.contains(url) { expanded.remove(url) } else { expanded.insert(url) } }
@@ -290,7 +300,7 @@ struct EnrichSheet: View {
             } else if proposals.isEmpty {
                 VStack(spacing: 6) {
                     Text("Everything looks complete.").font(Typeface.serif(18)).foregroundStyle(Palette.text2)
-                    Text("\(complete) album\(complete == 1 ? "" : "s") checked").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
+                    Text("\(complete) albums checked").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                 }
                 .frame(maxWidth: .infinity, minHeight: 360)
             } else {
@@ -304,11 +314,11 @@ struct EnrichSheet: View {
 
             Hairline()
             HStack {
-                Text(result ?? (loading ? "" : "\(proposals.count) to review · \(complete) already complete"))
+                Text(result ?? (loading ? "" : String(localized: "\(proposals.count) to review · \(complete) already complete")))
                     .font(Typeface.ui(11.5)).foregroundStyle(Palette.text3)
                 Spacer()
                 Button("Close") { dismiss() }.buttonStyle(QuietButtonStyle())
-                Button(applying ? "Applying…" : "Apply \(chosen.count)") { apply() }
+                Button(applying ? String(localized: "Applying…") : String(localized: "Apply \(chosen.count)", comment: "Button: apply the chosen number of album changes")) { apply() }
                     .buttonStyle(BrassButtonStyle()).disabled(chosen.isEmpty || applying || loading)
                     .keyboardShortcut(.defaultAction)
             }
@@ -347,17 +357,17 @@ struct EnrichSheet: View {
                     HStack(spacing: 6) {
                         ForEach(Array(p.sources.enumerated()), id: \.offset) { _, s in
                             switch s {
-                            case .fileNames: StatusBadge(text: "FILE NAMES")
-                            case .musicBrainz(let score, _): StatusBadge(text: "MUSICBRAINZ \(score)%", kind: score >= 95 ? .perfect : .neutral)
+                            case .fileNames: StatusBadge(text: String(localized: "FILE NAMES", comment: "Badge: details came from the file names (uppercase)"))
+                            case .musicBrainz(let score, _): StatusBadge(text: String(localized: "MUSICBRAINZ \(score)%", comment: "Badge: MusicBrainz match score (uppercase)"), kind: score >= 95 ? .perfect : .neutral)
                             }
                         }
-                        if !p.isHighConfidence { StatusBadge(text: "REVIEW", kind: .converted) }
+                        if !p.isHighConfidence { StatusBadge(text: String(localized: "REVIEW", comment: "Badge: this proposal needs the user's review (uppercase)"), kind: .converted) }
                     }
                     .padding(.top, 2)
                 }
                 Spacer()
                 Button { if expanded.contains(p.id) { expanded.remove(p.id) } else { expanded.insert(p.id) } } label: {
-                    Text(expanded.contains(p.id) ? "Hide" : "\(p.changeCount) changes")
+                    expanded.contains(p.id) ? Text("Hide") : Text("\(p.changeCount) changes")
                 }
                 .buttonStyle(QuietButtonStyle(compact: true))
             }
@@ -397,7 +407,7 @@ struct EnrichSheet: View {
         Task {
             let r = await model.library.apply(selected)
             applying = false
-            result = "Updated \(r.written) track\(r.written == 1 ? "" : "s")\(r.failed > 0 ? " · \(r.failed) failed" : "")"
+            result = r.failed > 0 ? String(localized: "Updated \(r.written) tracks · \(r.failed) failed") : String(localized: "Updated \(r.written) tracks")
             proposals.removeAll { chosen.contains($0.id) }
             chosen.removeAll()
         }

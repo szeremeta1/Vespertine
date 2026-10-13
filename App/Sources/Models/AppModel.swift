@@ -26,6 +26,14 @@ enum DetailRoute: Hashable {
 enum InspectorTab: String, CaseIterable, Identifiable {
     case nowPlaying = "Now Playing", details = "Details", analysis = "Analysis"
     var id: String { rawValue }
+    /// The tab's name on screen (the raw value is matched by the `-VespertineInspectorTab` QA hook).
+    var label: String {
+        switch self {
+        case .nowPlaying: String(localized: "Now Playing")
+        case .details: String(localized: "Details")
+        case .analysis: String(localized: "Analysis")
+        }
+    }
 }
 
 /// Output devices and the chosen one's hardware volume.
@@ -319,7 +327,7 @@ final class AppModel {
         undoManager.registerUndo(withTarget: self) { model in
             MainActor.assumeIsolated { model.setFavorite(!favorite, trackIDs: trackIDs, undoManager: undoManager) }
         }
-        undoManager.setActionName(favorite ? "Add to Favorites" : "Remove from Favorites")
+        undoManager.setActionName(favorite ? String(localized: "Add to Favorites") : String(localized: "Remove from Favorites"))
     }
 
     /// A song's cover, or its album's when the song carries none of its own (an album where only some files have

@@ -8,6 +8,9 @@
 import Foundation
 import VespertineAudio
 
+// User-visible text in this package is `String(localized:)` from the main bundle: in the app that is Vespertine.app,
+// whose Localizable.xcstrings carries these keys too; command-line tools and tests have no table and get the English.
+
 /// A file format as people pick it.
 public enum FormatKind: String, CaseIterable, Sendable, Hashable, Identifiable {
     case flac, alac, wav, aiff, dsd, wavPack, ape, otherLossless, dolby, dts, mp3, aac, otherLossy
@@ -22,12 +25,12 @@ public enum FormatKind: String, CaseIterable, Sendable, Hashable, Identifiable {
         case .dsd: "DSD"
         case .wavPack: "WavPack"
         case .ape: "Monkey’s Audio"
-        case .otherLossless: "Other lossless"
+        case .otherLossless: String(localized: "Other lossless", comment: "File format filter: lossless formats not listed separately.")
         case .dolby: "Dolby"
         case .dts: "DTS"
         case .mp3: "MP3"
         case .aac: "AAC"
-        case .otherLossy: "Other lossy"
+        case .otherLossy: String(localized: "Other lossy", comment: "File format filter: lossy formats not listed separately.")
         }
     }
 
@@ -57,10 +60,10 @@ public enum FilterFlag: String, CaseIterable, Sendable, Hashable, Identifiable {
 
     public var label: String {
         switch self {
-        case .bits24: "≥ 24-bit"
-        case .rate88: "≥ 88.2 kHz"
-        case .multichannel: "Multichannel"
-        case .favorite: "Favorites"
+        case .bits24: String(localized: "≥ 24-bit", comment: "Filter chip: 24-bit or more.")
+        case .rate88: String(localized: "≥ 88.2 kHz", comment: "Filter chip: sample rate 88.2 kHz or more.")
+        case .multichannel: String(localized: "Multichannel")
+        case .favorite: String(localized: "Favorites")
         }
     }
 }
@@ -72,31 +75,31 @@ public enum Facet: String, CaseIterable, Sendable, Hashable, Identifiable {
 
     public var label: String {
         switch self {
-        case .genre: "Genre"
-        case .decade: "Year"
-        case .artist: "Artist"
-        case .format: "Format"
-        case .sampleRate: "Sample Rate"
-        case .bitDepth: "Bit Depth"
-        case .channels: "Channels"
-        case .analysis: "Analysis"
-        case .source: "Source"
+        case .genre: String(localized: "Genre")
+        case .decade: String(localized: "Year")
+        case .artist: String(localized: "Artist")
+        case .format: String(localized: "Format")
+        case .sampleRate: String(localized: "Sample Rate")
+        case .bitDepth: String(localized: "Bit Depth")
+        case .channels: String(localized: "Channels")
+        case .analysis: String(localized: "Analysis")
+        case .source: String(localized: "Source", comment: "A library location (a folder, drive or network share).")
         }
     }
 
     /// The fixed names of a value; genres, artists and sources are named by the library.
     public func name(of key: String) -> String {
         switch self {
-        case .decade: return "\(key)s"
+        case .decade: return String(localized: "\(key)s", comment: "A decade, e.g. “1970s”.")
         case .format: return FormatKind(rawValue: key)?.label ?? key
         case .sampleRate:
             guard let hz = Int(key) else { return key }
             if hz >= 2_822_400 { return "DSD\(Int((Double(hz) / 44_100).rounded()))" }
             return "\(SampleRate.format(Double(hz))) kHz"
-        case .bitDepth: return key == "1" ? "1-bit (DSD)" : "\(key)-bit"
+        case .bitDepth: return key == "1" ? String(localized: "1-bit (DSD)") : String(localized: "\(key)-bit", comment: "A word length, e.g. “24-bit”.")
         case .channels:
             guard let n = Int(key) else { return key }
-            return n == 1 ? "Mono" : n == 2 ? "Stereo" : ChannelLayouts.name(channels: n)
+            return ChannelLayouts.name(channels: n)   // "Mono", "Stereo", "5.1", …
         case .analysis: return FilterFacts.verdictNames[key] ?? key
         case .genre, .artist, .source: return key
         }
@@ -138,8 +141,13 @@ public struct FilterFacts: Sendable, Hashable {
     static let verdictOrder = ["genuine", "possibleLossyOrigin", "bandwidthExtended", "upsampled", "paddedBitDepth", "notApplicable", "none"]
     // The spectral verdicts are questions (the same spectrum has innocent explanations), so they're named as such.
     static let verdictNames = [
-        "genuine": "Genuine", "possibleLossyOrigin": "Lossy origin?", "bandwidthExtended": "Synthetic high frequencies?",
-        "upsampled": "Upsampled?", "paddedBitDepth": "Padded bit depth", "notApplicable": "Inconclusive", "none": "Not analyzed",
+        "genuine": String(localized: "Genuine", comment: "Analysis verdict."),
+        "possibleLossyOrigin": String(localized: "Lossy origin?", comment: "Analysis verdict, as a question."),
+        "bandwidthExtended": String(localized: "Synthetic high frequencies?", comment: "Analysis verdict, as a question."),
+        "upsampled": String(localized: "Upsampled?", comment: "Analysis verdict, as a question."),
+        "paddedBitDepth": String(localized: "Padded bit depth", comment: "Analysis verdict."),
+        "notApplicable": String(localized: "Inconclusive", comment: "Analysis verdict."),
+        "none": String(localized: "Not analyzed", comment: "Analysis verdict: the file hasn't been analyzed yet."),
     ]
 
     /// A song's facts. Songs without a genre or year of their own take their album's.

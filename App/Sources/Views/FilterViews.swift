@@ -12,14 +12,23 @@ struct FilterItems {
     var facts: [FilterFacts]
     /// Whether item `i` is (or, for an album, holds) a favorite.
     var favorite: (Int) -> Bool
-    /// "album" or "song", for counts.
-    var unit: String
+    /// Albums or songs, for counts.
+    var unit: Unit
     /// Song pages: the songs, so the panel can offer to analyze the ones without results.
     var tracks: [Track]? = nil
     /// Other things the page shows (search: its albums), so their formats get chips and facets too.
     var alsoOffering: [FilterFacts] = []
 
-    func units(_ n: Int) -> String { "\(n.formatted()) \(unit)\(n == 1 ? "" : "s")" }
+    enum Unit { case albums, songs }
+
+    /// "12 albums"
+    func units(_ n: Int) -> String { unit == .albums ? String(localized: "\(n) albums") : String(localized: "\(n) songs") }
+    /// "All 12 albums"
+    func all(_ n: Int) -> String { unit == .albums ? String(localized: "All \(n) albums") : String(localized: "All \(n) songs") }
+    /// "3 of 12 albums"
+    func count(_ m: Int, of n: Int) -> String {
+        unit == .albums ? String(localized: "\(m) of \(n) albums") : String(localized: "\(m) of \(n) songs")
+    }
 
     func matching(_ filter: LibraryFilter) -> Int {
         filter.isEmpty ? facts.count : facts.indices.count { filter.matches(facts[$0], favorite: favorite($0)) }
@@ -29,12 +38,12 @@ struct FilterItems {
 extension FilterItems {
     @MainActor static func albums(_ albums: [Album], model: AppModel) -> FilterItems {
         let favorites = model.library.favoriteAlbumKeys
-        return FilterItems(facts: albums.map(\.facts), favorite: { favorites.contains(albums[$0].key) }, unit: "album")
+        return FilterItems(facts: albums.map(\.facts), favorite: { favorites.contains(albums[$0].key) }, unit: .albums)
     }
 
     @MainActor static func songs(_ tracks: [Track], facts: [FilterFacts], model: AppModel, alsoOffering: [FilterFacts] = []) -> FilterItems {
         let favorites = model.library.favoriteIDs
-        return FilterItems(facts: facts, favorite: { favorites.contains(tracks[$0].id ?? -1) }, unit: "song", tracks: tracks,
+        return FilterItems(facts: facts, favorite: { favorites.contains(tracks[$0].id ?? -1) }, unit: .songs, tracks: tracks,
                            alsoOffering: alsoOffering)
     }
 }
@@ -177,7 +186,7 @@ struct FiltersButton: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .help("Filter by genre, year, artist, format, sample rate, bit depth, channels, analysis and source")
-        .accessibilityLabel(active ? "Filters, \(count) in use" : "Filters")
+        .accessibilityLabel(active ? Text("Filters, \(count) in use") : Text("Filters"))
     }
 }
 
@@ -192,7 +201,7 @@ struct FilterToken: View {
         HStack(spacing: 0) {
             Button(action: open) {
                 HStack(spacing: 6) {
-                    Text(title.uppercased())
+                    Text(title.localizedUppercase)
                         .font(Typeface.ui(9, weight: .semibold))
                         .tracking(0.8)
                         .foregroundStyle(Palette.brass.opacity(0.8))
@@ -259,7 +268,7 @@ struct FilterPanel: View {
             Hairline()
             HStack(spacing: 10) {
                 let matching = items.matching(filter)
-                Text(filter.isEmpty ? "All \(items.units(items.facts.count))" : "\(matching.formatted()) of \(items.units(items.facts.count))")
+                Text(filter.isEmpty ? items.all(items.facts.count) : items.count(matching, of: items.facts.count))
                     .font(Typeface.mono(10.5))
                     .foregroundStyle(matching == 0 ? Palette.copper : Palette.text3)
                 Spacer()
@@ -366,7 +375,7 @@ struct FilterPanel: View {
             .padding(.top, 14)
             .padding(.bottom, 10)
             if long || f == .genre || f == .artist {
-                SearchField(prompt: "Search \(f.label.lowercased())s", text: $search)
+                SearchField(prompt: Self.searchPrompt(f), text: $search)
                     .padding(.horizontal, 12)
                     .padding(.bottom, 8)
             }
@@ -376,7 +385,7 @@ struct FilterPanel: View {
                         valueRow(f, key: key, name: name(key), count: counts[key, default: 0], on: chosen.contains(key), numeric: numeric)
                     }
                     if shown.isEmpty {
-                        Text(search.isEmpty ? "Nothing to choose with the other filters as they are." : "No \(f.label.lowercased()) matches “\(search)”.")
+                        (search.isEmpty ? Text("Nothing to choose with the other filters as they are.") : Text(Self.noMatch(f, search)))
                             .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
                             .padding(16)
                     }
@@ -388,7 +397,7 @@ struct FilterPanel: View {
                 let pending = tracks.filter { $0.analysisVerdict == nil && $0.isLossless && !$0.isDSD }
                 if !pending.isEmpty {
                     Hairline()
-                    Button("Analyze \(pending.count.formatted()) \(pending.count == 1 ? "Song" : "Songs") Without Results") {
+                    Button("Analyze \(pending.count) Songs Without Results") {
                         model.analysis.analyzeNow(pending)
                     }
                     .buttonStyle(QuietButtonStyle(compact: true))
@@ -420,8 +429,37 @@ struct FilterPanel: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityValue(on ? "Selected" : "")
-        .accessibilityHint("\(count) \(items.unit)\(count == 1 ? "" : "s")")
+        .accessibilityValue(on ? String(localized: "Selected") : "")
+        .accessibilityHint(items.units(count))
+    }
+
+    private static func searchPrompt(_ f: Facet) -> String {
+        switch f {
+        case .genre: String(localized: "Search genres")
+        case .decade: String(localized: "Search years")
+        case .artist: String(localized: "Search artists")
+        case .format: String(localized: "Search formats")
+        case .sampleRate: String(localized: "Search sample rates")
+        case .bitDepth: String(localized: "Search bit depths")
+        case .channels: String(localized: "Search channels")
+        case .analysis: String(localized: "Search analysis results")
+        case .source: String(localized: "Search sources")
+        }
+    }
+
+    /// "No genre matches “jaz”."
+    private static func noMatch(_ f: Facet, _ search: String) -> String {
+        switch f {
+        case .genre: String(localized: "No genre matches “\(search)”.")
+        case .decade: String(localized: "No year matches “\(search)”.")
+        case .artist: String(localized: "No artist matches “\(search)”.")
+        case .format: String(localized: "No format matches “\(search)”.")
+        case .sampleRate: String(localized: "No sample rate matches “\(search)”.")
+        case .bitDepth: String(localized: "No bit depth matches “\(search)”.")
+        case .channels: String(localized: "No channel layout matches “\(search)”.")
+        case .analysis: String(localized: "No analysis result matches “\(search)”.")
+        case .source: String(localized: "No source matches “\(search)”.")
+        }
     }
 }
 
@@ -452,7 +490,8 @@ struct SearchField: View {
 
 /// Shown when a page's filter leaves nothing.
 struct NoMatchesView: View {
-    let unit: String
+    /// "No albums match these filters"
+    let title: LocalizedStringKey
     let clear: () -> Void
 
     var body: some View {
@@ -460,7 +499,7 @@ struct NoMatchesView: View {
             Image(systemName: "line.3.horizontal.decrease.circle")
                 .font(.system(size: 28, weight: .ultraLight))
                 .foregroundStyle(Palette.brass)
-            Text("No \(unit)s match these filters").font(Typeface.serif(18)).foregroundStyle(Palette.text2)
+            Text(title).font(Typeface.serif(18)).foregroundStyle(Palette.text2)
             Button("Clear Filters", action: clear).buttonStyle(QuietButtonStyle(compact: true))
         }
         .frame(maxWidth: .infinity)

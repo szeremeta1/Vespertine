@@ -29,7 +29,9 @@ struct SpatialExportSheet: View {
                 Image(systemName: "airpods.max").font(.system(size: 26, weight: .light)).foregroundStyle(Palette.brass).frame(width: 34)
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Export for Spatial Audio").font(Typeface.serif(24)).foregroundStyle(Palette.text)
-                    Text("\(eligible.count) multichannel track\(eligible.count == 1 ? "" : "s")\(tracks.count > eligible.count ? " (stereo tracks are skipped)" : ""). Your originals aren't changed.")
+                    (tracks.count > eligible.count
+                        ? Text("\(eligible.count) multichannel tracks (stereo tracks are skipped). Your originals aren't changed.")
+                        : Text("\(eligible.count) multichannel tracks. Your originals aren't changed."))
                         .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
             }
@@ -41,9 +43,9 @@ struct SpatialExportSheet: View {
                     Text("Multichannel lossless").tag(MultichannelExport.Kind.multichannelALAC)
                 }
                 .pickerStyle(.radioGroup)
-                Text(kind == .spatialStereo
-                     ? "Rendered with Apple's spatial audio renderer (your personalized profile, if set up) into 24-bit ALAC. Sounds spatial on any AirPods or headphones, on any device or player. Head tracking needs live playback, so the virtual speakers stay in front of you."
-                     : "Every channel, losslessly, as 24-bit ALAC (.m4a) with its speaker layout, for Apple devices and players that render surround or spatialize it.")
+                (kind == .spatialStereo
+                     ? Text("Rendered with Apple's spatial audio renderer (your personalized profile, if set up) into 24-bit ALAC. Sounds spatial on any AirPods or headphones, on any device or player. Head tracking needs live playback, so the virtual speakers stay in front of you.")
+                     : Text("Every channel, losslessly, as 24-bit ALAC (.m4a) with its speaker layout, for Apple devices and players that render surround or spatialize it."))
                     .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 LabeledContent("Save to") {
                     HStack {
@@ -61,14 +63,16 @@ struct SpatialExportSheet: View {
                 } else if let result {
                     Image(systemName: result.failures.isEmpty ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                         .foregroundStyle(result.failures.isEmpty ? Palette.brass : Palette.copper)
-                    Text("\(result.written.count) exported\(result.failures.isEmpty ? "" : ", \(result.failures.count) failed: \(result.failures[0].message)")")
+                    (result.failures.isEmpty
+                        ? Text("\(result.written.count) exported")
+                        : Text("\(result.written.count) exported, \(result.failures.count) failed: \(result.failures[0].message)"))
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(2)
                 }
                 Spacer()
                 if let result, !result.written.isEmpty {
                     Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting(result.written) }.buttonStyle(QuietButtonStyle())
                 }
-                Button(result == nil ? "Cancel" : "Done") { dismiss() }.buttonStyle(QuietButtonStyle()).disabled(running)
+                Button(result == nil ? String(localized: "Cancel") : String(localized: "Done")) { dismiss() }.buttonStyle(QuietButtonStyle()).disabled(running)
                 if result == nil {
                     Button("Export", action: export).buttonStyle(BrassButtonStyle()).keyboardShortcut(.defaultAction)
                         .disabled(running || eligible.isEmpty)

@@ -135,9 +135,11 @@ public final class LibraryDatabase: Sendable {
             }
 
             // Starter smart playlists.
-            var hiRes = Playlist(name: "Hi-Res ≥ 88.2 kHz", smartRules: .hiRes, sortIndex: 0)
+            // Named in the language of the day the library is made; they're the user's to rename from then on.
+            var hiRes = Playlist(name: String(localized: "Hi-Res ≥ 88.2 kHz", comment: "Name of a starter smart playlist."), smartRules: .hiRes, sortIndex: 0)
             try hiRes.insert(db)
-            var suspect = Playlist(name: "Suspect Hi-Res", smartRules: .suspect, sortIndex: 1)
+            var suspect = Playlist(name: String(localized: "Suspect Hi-Res", comment: "Name of a starter smart playlist: hi-res files the analysis doubts."),
+                                   smartRules: .suspect, sortIndex: 1)
             try suspect.insert(db)
         }
         m.registerMigration("v2-cue-state") { db in
@@ -337,7 +339,9 @@ public extension LibraryDatabase {
         let summary: String = if isDSD {
             "DSD\(Int((rate / 44_100).rounded()))"
         } else if codecCount > 1 {
-            bits.map { "\(codec) · up to \($0)/\(rateText)" } ?? "\(codec) · up to \(rateText) kHz"
+            // `codec` stays the "Mixed" sentinel (FormatMark checks it); the summary names it in the user's language.
+            bits.map { String(localized: "Mixed · up to \($0)/\(rateText)", comment: "Album in several formats: the most bits / kHz of its files, e.g. “up to 24/96”.") }
+                ?? String(localized: "Mixed · up to \(rateText) kHz", comment: "Album in several formats: the highest sample rate of its files.")
         } else if !lossless, let bitrate {
             "\(codec) · \(Int(bitrate))k"
         } else if let bits {
@@ -873,7 +877,7 @@ public extension LibraryDatabase {
 private struct SourceOverlapError: LocalizedError {
     let path: String
     var errorDescription: String? {
-        "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership."
+        String(localized: "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership.")
     }
 }
 

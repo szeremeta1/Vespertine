@@ -103,7 +103,8 @@ public struct AppleMusicLibrary: Sendable {
     public enum ReadError: Error, Equatable, LocalizedError {
         case notALibrary
         public var errorDescription: String? {
-            "This isn't a library exported from Apple Music. In Music, choose File \u{203A} Library \u{203A} Export Library\u{2026} and pick the file it saves."
+            String(localized: "This isn't a library exported from Apple Music. In Music, choose File \u{203A} Library \u{203A} Export Library\u{2026} and pick the file it saves.",
+                   comment: "File › Library › Export Library… is the menu path in Apple's Music app; use its name in this language.")
         }
     }
 

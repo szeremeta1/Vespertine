@@ -18,11 +18,11 @@ public struct EQBand: Codable, Hashable, Sendable, Identifiable {
 
         public var label: String {
             switch self {
-            case .peak: "Peak"
-            case .lowShelf: "Low shelf"
-            case .highShelf: "High shelf"
-            case .lowPass: "Low pass"
-            case .highPass: "High pass"
+            case .peak: String(localized: "Peak", comment: "Equalizer filter type.")
+            case .lowShelf: String(localized: "Low shelf", comment: "Equalizer filter type.")
+            case .highShelf: String(localized: "High shelf", comment: "Equalizer filter type.")
+            case .lowPass: String(localized: "Low pass", comment: "Equalizer filter type.")
+            case .highPass: String(localized: "High pass", comment: "Equalizer filter type.")
             }
         }
 
@@ -178,15 +178,16 @@ public enum EQImportError: Error, Equatable, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .noFilters:
-            "The file has no filters. Choose an AutoEQ \u{201C}ParametricEQ.txt\u{201D} or an Equalizer APO configuration."
+            String(localized: "The file has no filters. Choose an AutoEQ \u{201C}ParametricEQ.txt\u{201D} or an Equalizer APO configuration.")
         case .tooManyFilters(let n):
-            "The file has \(n) filters; Vespertine runs up to \(EQPreset.maxBands)."
+            String(localized: "The file has \(n) filters; Vespertine runs up to \(EQPreset.maxBands).")
         case .graphicEQ:
-            "This is a graphic EQ. Choose the \u{201C}ParametricEQ.txt\u{201D} file from AutoEQ for the same headphones instead."
+            String(localized: "This is a graphic EQ. Choose the \u{201C}ParametricEQ.txt\u{201D} file from AutoEQ for the same headphones instead.")
         case .unsupportedFilter(let line, let type):
-            "Line \(line) uses a filter type Vespertine doesn't have (\(type)). Peak, shelf, low-pass and high-pass filters are supported."
+            String(localized: "Line \(line) uses a filter type Vespertine doesn't have (\(type)). Peak, shelf, low-pass and high-pass filters are supported.",
+                   comment: "The filter type is a code from the file, e.g. “BP”.")
         case .unreadable(let line):
-            "Line \(line) couldn't be read as a filter."
+            String(localized: "Line \(line) couldn't be read as a filter.")
         }
     }
 }

@@ -11,7 +11,13 @@ import Observation
 enum ReplayGainMode: String, CaseIterable, Identifiable {
     case off, track, album
     var id: String { rawValue }
-    var label: String { switch self { case .off: "Off"; case .track: "Track"; case .album: "Album" } }
+    var label: String {
+        switch self {
+        case .off: String(localized: "Off", comment: "ReplayGain mode: no volume adjustment.")
+        case .track: String(localized: "Track", comment: "ReplayGain mode: adjust each song by its own gain.")
+        case .album: String(localized: "Album", comment: "ReplayGain mode: adjust songs by their album's gain.")
+        }
+    }
 }
 
 /// Stored per device: "match", "max" or "fixed:96000".
@@ -35,9 +41,11 @@ enum RateChoice: Hashable, Identifiable {
 
     var label: String {
         switch self {
-        case .match: "Match source"
-        case .maximum: "Device maximum"
-        case .fixed(let r): "Fixed \(SampleRate.format(r)) kHz"
+        case .match: String(localized: "Match source", comment: "Output sample rate choice: the song's own rate.")
+        case .maximum: String(localized: "Device maximum", comment: "Output sample rate choice: the highest rate the device takes.")
+        case .fixed(let r):
+            String(localized: "Fixed \((r / 1000).formatted(.number.grouping(.never).precision(.fractionLength(0...1)))) kHz",
+                   comment: "Output sample rate choice: always this rate, e.g. Fixed 96 kHz.")
         }
     }
 }

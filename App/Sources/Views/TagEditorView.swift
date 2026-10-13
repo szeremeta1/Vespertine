@@ -88,7 +88,7 @@ struct TagEditorView: View {
         HStack(spacing: 14) {
             artworkWell
             VStack(alignment: .leading, spacing: 3) {
-                Text(tracks.count == 1 ? tracks[0].title : "\(tracks.count) tracks selected")
+                (tracks.count == 1 ? Text(tracks[0].title) : Text("\(tracks.count) tracks selected"))
                     .font(Typeface.mono(11)).foregroundStyle(Palette.text).lineLimit(2)
                 Text(formatLine).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2)
                 if !mixed.isEmpty { Text("Mixed values shown in italics").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
@@ -128,13 +128,13 @@ struct TagEditorView: View {
     private var musicBrainzRow: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(tracks.first?.musicBrainzReleaseID != nil ? "Linked to MusicBrainz" : "Look up on MusicBrainz")
+                (tracks.first?.musicBrainzReleaseID != nil ? Text("Linked to MusicBrainz") : Text("Look up on MusicBrainz"))
                     .font(Typeface.ui(12)).foregroundStyle(Palette.text)
                 Text("Correct tags and fetch cover art from the open music database")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3)
             }
             Spacer()
-            Button(tracks.first?.musicBrainzReleaseID != nil ? "Review" : "Search") { model.lookupTracks = tracks }
+            Button(tracks.first?.musicBrainzReleaseID != nil ? String(localized: "Review") : String(localized: "Search")) { model.lookupTracks = tracks }
                 .buttonStyle(QuietButtonStyle(compact: true))
         }
         .padding(10)
@@ -151,12 +151,12 @@ struct TagEditorView: View {
         .padding(.bottom, 7)
     }
 
-    private func pairRow(_ label: String, _ a: TagField, _ b: TagField) -> some View {
+    private func pairRow(_ label: LocalizedStringKey, _ a: TagField, _ b: TagField) -> some View {
         HStack(spacing: 10) {
             Text(label).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).frame(width: 92, alignment: .trailing)
                 .accessibilityHidden(true)
             input(a)
-            Text("of").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
+            Text("of", comment: "Between two numbers in the tag editor: Track 3 of 12").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
             input(b)
         }
         .padding(.bottom, 7)
@@ -164,7 +164,7 @@ struct TagEditorView: View {
 
     private func input(_ f: TagField) -> some View {
         let isMixed = mixed.contains(f) && !edited.contains(f)
-        return TextField(isMixed ? "Mixed" : "", text: Binding(
+        return TextField(isMixed ? String(localized: "Mixed", comment: "Placeholder: the selected tracks have different values for this tag") : "", text: Binding(
             get: { draft[f] ?? "" },
             set: { draft[f] = $0; edited.insert(f) }))
             .textFieldStyle(.plain)
@@ -179,7 +179,7 @@ struct TagEditorView: View {
 
     private var lyrics: some View {
         VStack(alignment: .leading, spacing: 6) {
-            SectionLabel(text: "Lyrics")
+            SectionLabel(text: String(localized: "Lyrics"))
             TextEditor(text: Binding(get: { draft[.lyrics] ?? "" }, set: { draft[.lyrics] = $0; edited.insert(.lyrics) }))
                 .font(Typeface.ui(12))
                 .scrollContentBackground(.hidden)
@@ -195,7 +195,7 @@ struct TagEditorView: View {
     private var customTags: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                SectionLabel(text: "Custom tags")
+                SectionLabel(text: String(localized: "Custom tags"))
                 Spacer()
                 Button { custom.append(CustomTag(key: "", value: "", original: nil)) } label: { Image(systemName: "plus") }
                     .buttonStyle(.plain).foregroundStyle(Palette.text2)
@@ -220,18 +220,21 @@ struct TagEditorView: View {
 
     private var technical: some View {
         VStack(alignment: .leading, spacing: 6) {
-            SectionLabel(text: "File")
+            SectionLabel(text: String(localized: "File", comment: "Section header: technical details of the file"))
             if tracks.count == 1, let t = tracks.first {
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 5) {
                     row("Format", t.formatSummary)
                     row("Channels", "\(t.channels)")
                     row("Duration", t.duration.clock)
-                    if let b = t.bitrate { row("Bitrate", "\(Int(b)) kbps") }
+                    if let b = t.bitrate { row("Bitrate", String(localized: "\(Int(b)) kbps")) }
                     row("Size", t.fileSize.byteString)
-                    if let g = t.rgTrackGain { row("ReplayGain", String(format: "track %+.2f dB%@", g, t.rgAlbumGain.map { String(format: " · album %+.2f dB", $0) } ?? "")) }
-                    if let area = t.sacdArea { row("SACD", "\(area == .stereo ? "Stereo" : "Multichannel") area of a disc image; edits stay in the library") }
-                    else if t.cueStartFrame != nil { row("CUE", "Virtual track; edits stay in the library") }
-                    row("Plays", "\(t.playCount)")
+                    if let g = t.rgTrackGain { row("ReplayGain", replayGainLine(track: g, album: t.rgAlbumGain)) }
+                    if let area = t.sacdArea {
+                        row("SACD", area == .stereo ? String(localized: "Stereo area of a disc image; edits stay in the library")
+                                                    : String(localized: "Multichannel area of a disc image; edits stay in the library"))
+                    }
+                    else if t.cueStartFrame != nil { row("CUE", String(localized: "Virtual track; edits stay in the library")) }
+                    row("Plays", t.playCount.formatted())
                 }
                 Text(model.library.displayPath(t.filePath)).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3)
             } else {
@@ -242,7 +245,15 @@ struct TagEditorView: View {
         .padding(.top, 16)
     }
 
-    private func row(_ k: String, _ v: String) -> some View {
+    /// "track +1.23 dB · album −0.45 dB", in the user's number format.
+    private func replayGainLine(track: Double, album: Double?) -> String {
+        let style: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(2)).sign(strategy: .always())
+        let trackGain = track.formatted(style)
+        guard let album else { return String(localized: "track \(trackGain) dB", comment: "ReplayGain track gain") }
+        return String(localized: "track \(trackGain) dB · album \(album.formatted(style)) dB", comment: "ReplayGain track and album gain")
+    }
+
+    private func row(_ k: LocalizedStringKey, _ v: String) -> some View {
         GridRow {
             Text(k).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3)
             Text(v).font(Typeface.mono(11)).foregroundStyle(Palette.text2)
@@ -254,8 +265,8 @@ struct TagEditorView: View {
             Text(status ?? footerNote).font(Typeface.ui(11)).foregroundStyle(Palette.text3).lineLimit(2)
             Spacer()
             Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving)
-                .help(hasChanges ? "Discard unsaved changes" : "Restore the tags from before the last save")
-            Button(saving ? "Saving…" : "Save") { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving)
+                .help(hasChanges ? String(localized: "Discard unsaved changes") : String(localized: "Restore the tags from before the last save"))
+            Button(saving ? String(localized: "Saving…") : String(localized: "Save")) { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving)
                 .keyboardShortcut("s", modifiers: .command)
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
@@ -270,7 +281,7 @@ struct TagEditorView: View {
 
     private var formatLine: String {
         let formats = Set(tracks.map(\.formatSummary))
-        return formats.count == 1 ? formats.first! : "\(formats.count) formats"
+        return formats.count == 1 ? formats.first! : String(localized: "\(formats.count) formats")
     }
 
     private var commonArtworkKey: String? {
@@ -280,15 +291,15 @@ struct TagEditorView: View {
 
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
-        if readOnlyFiles { return "Read-only location · saved in Vespertine's library; the files aren't changed" }
+        if readOnlyFiles { return String(localized: "Read-only location · saved in Vespertine's library; the files aren't changed") }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
-        case "FLAC", "Vorbis", "Opus": "Vorbis comments"
-        case "MP3", "AIFF", "WAV", "DSF": "ID3v2 tags"
-        case "ALAC", "AAC": "MP4 atoms"
-        case "APE", "WavPack", "Musepack": "APEv2 tags"
-        default: "tags"
+        case "FLAC", "Vorbis", "Opus": String(localized: "Vorbis comments")
+        case "MP3", "AIFF", "WAV", "DSF": String(localized: "ID3v2 tags")
+        case "ALAC", "AAC": String(localized: "MP4 atoms")
+        case "APE", "WavPack", "Musepack": String(localized: "APEv2 tags")
+        default: String(localized: "tags", comment: "Generic name for the metadata written to a file, as in: Writes tags to 3 files")
         }
-        return "Writes \(kind) to \(files) file\(files == 1 ? "" : "s") · backup retained for undo"
+        return String(localized: "Writes \(kind) to \(files) files · backup retained for undo", comment: "First value: the tag format, e.g. ID3v2 tags")
     }
 
     /// Shows the tags of the selection. The library changes under a selection all the time (a scan, an analysis,
@@ -349,9 +360,9 @@ struct TagEditorView: View {
             // Another selection is on screen now: its draft isn't this save's to clear.
             guard loadedIDs == selection else { return }
             if let result {
-                var parts = ["Saved \(result.written) file\(result.written == 1 ? "" : "s")"]
-                if result.databaseOnly > 0 { parts.append("\(result.databaseOnly) CUE track(s) in library") }
-                if !result.failures.isEmpty { parts.append("\(result.failures.count) failed: \(result.failures[0].message)") }
+                var parts = [String(localized: "Saved \(result.written) files")]
+                if result.databaseOnly > 0 { parts.append(String(localized: "\(result.databaseOnly) CUE tracks in library")) }
+                if !result.failures.isEmpty { parts.append(String(localized: "\(result.failures.count) failed: \(result.failures[0].message)")) }
                 status = parts.joined(separator: " · ")
             }
             // Saved: the reload the save brings shows what was written. A failure keeps the draft to try again.
@@ -370,7 +381,7 @@ struct TagEditorView: View {
             let targets = tracks
             Task {
                 let restored = await model.library.revert(targets)
-                status = "Restored previous tags for \(restored) track(s)"
+                status = String(localized: "Restored previous tags for \(restored) tracks")
             }
         }
     }
@@ -412,7 +423,7 @@ struct MusicBrainzSheet: View {
                             Text("\(r.score)%").font(Typeface.mono(10)).foregroundStyle(r.score > 90 ? Palette.brass : Palette.text3)
                         }
                         Text(r.artist).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2)
-                        Text([r.date, r.country, r.format, r.label, "\(r.trackCount) tracks"].compactMap { $0 }.joined(separator: " · "))
+                        Text([r.date, r.country, r.format, r.label, String(localized: "\(r.trackCount) tracks")].compactMap { $0 }.joined(separator: " · "))
                             .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
                     }
                     .padding(.vertical, 2)
@@ -440,7 +451,7 @@ struct MusicBrainzSheet: View {
                     } else if busy {
                         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        Text(results.isEmpty ? "Search to find matching releases." : "Choose a release to preview changes.")
+                        (results.isEmpty ? Text("Search to find matching releases.") : Text("Choose a release to preview changes."))
                             .foregroundStyle(Palette.text3).frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
@@ -457,7 +468,7 @@ struct MusicBrainzSheet: View {
                     ProgressView(value: Double(progress), total: Double(max(tracks.count, 1))).frame(width: 120)
                     Text("\(progress + 1) of \(tracks.count)").font(Typeface.mono(11)).foregroundStyle(Palette.text2)
                 }
-                Button("Apply to \(tracks.count) Track\(tracks.count == 1 ? "" : "s")") { apply() }
+                Button("Apply to \(tracks.count) Tracks") { apply() }
                     .buttonStyle(BrassButtonStyle()).disabled(release == nil || busy)
             }
         }
@@ -493,7 +504,7 @@ struct MusicBrainzSheet: View {
             do {
                 results = try await MusicBrainzClient.shared.searchReleases(artist: artist, album: album)
                 if let best = results.first, best.score >= 95 { selected = best.id }
-            } catch { self.error = "Search failed: \(error.localizedDescription)" }
+            } catch { self.error = String(localized: "Search failed: \(error.localizedDescription)") }
             busy = false
         }
     }
@@ -512,7 +523,7 @@ struct MusicBrainzSheet: View {
                 }
             } catch {
                 guard selected == id else { return }
-                self.error = "Couldn't load the release: \(error.localizedDescription)"
+                self.error = String(localized: "Couldn't load the release: \(error.localizedDescription)")
             }
             busy = false
         }
@@ -534,7 +545,7 @@ struct MusicBrainzSheet: View {
             busy = false
             progress = nil
             if failures == 0 { dismiss() }
-            else { error = "Could not update \(failures) track(s): \(model.library.lastError ?? "unknown error")" }
+            else { error = String(localized: "Could not update \(failures) tracks: \(model.library.lastError ?? String(localized: "unknown error"))") }
         }
     }
 }
@@ -555,13 +566,13 @@ struct SmartPlaylistEditor: View {
             Text("Smart Playlist").font(Typeface.serif(22))
             TextField("Name", text: $name).textFieldStyle(.roundedBorder)
             HStack {
-                Text("Match")
+                Text("Match", comment: "Smart playlist sentence: Match [all/any] of the following rules:")
                 Picker("Match", selection: $rules.match) {
-                    Text("all").tag(SmartRules.Match.all)
-                    Text("any").tag(SmartRules.Match.any)
+                    Text("all", comment: "Smart playlist: Match [all] of the following rules").tag(SmartRules.Match.all)
+                    Text("any", comment: "Smart playlist: Match [any] of the following rules").tag(SmartRules.Match.any)
                 }
                 .labelsHidden().fixedSize()
-                Text("of the following rules:")
+                Text("of the following rules:", comment: "Smart playlist sentence: Match [all/any] of the following rules:")
             }
             ForEach($rules.rules) { $rule in
                 HStack {
@@ -577,7 +588,7 @@ struct SmartPlaylistEditor: View {
                     if rule.field == .verdict {
                         Picker("Value", selection: $rule.value) {
                             ForEach([FileAnalysis.Verdict.genuine, .possibleLossyOrigin, .upsampled, .paddedBitDepth, .bandwidthExtended, .notApplicable], id: \.self) {
-                                Text(AnalysisVerdictText.badge($0).capitalized).tag($0.rawValue)
+                                Text(AnalysisVerdictText.badge($0).localizedCapitalized).tag($0.rawValue)
                             }
                         }
                         .labelsHidden()
@@ -591,9 +602,9 @@ struct SmartPlaylistEditor: View {
             Button { rules.rules.append(SmartRule(field: .artist, op: .contains)) } label: { Label("Add Rule", systemImage: "plus") }
                 .buttonStyle(QuietButtonStyle(compact: true))
             HStack {
-                Toggle("Limit to", isOn: $limitOn)
+                Toggle(isOn: $limitOn) { Text("Limit to", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]") }
                 TextField("", value: $limit, format: .number).frame(width: 60).textFieldStyle(.roundedBorder).disabled(!limitOn)
-                Text("tracks, sorted by")
+                Text("tracks, sorted by", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]")
                 Picker("Sort by", selection: $rules.sort) {
                     Text("Album").tag(SmartRules.Sort.album)
                     Text("Recently Added").tag(SmartRules.Sort.recentlyAdded)

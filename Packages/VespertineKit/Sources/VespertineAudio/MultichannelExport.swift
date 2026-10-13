@@ -10,14 +10,17 @@ import AVFAudio
 import Foundation
 import SFBAudioEngine
 
+// User-visible text in this package is `String(localized:)` from the main bundle: in the app that is Vespertine.app,
+// whose Localizable.xcstrings carries these keys too; command-line tools and tests have no table and get the English.
+
 public enum MultichannelExport {
     public enum Kind: String, Sendable, CaseIterable, Identifiable {
         case spatialStereo, multichannelALAC
         public var id: String { rawValue }
         public var label: String {
             switch self {
-            case .spatialStereo: "Spatial stereo (binaural)"
-            case .multichannelALAC: "Multichannel lossless"
+            case .spatialStereo: String(localized: "Spatial stereo (binaural)")
+            case .multichannelALAC: String(localized: "Multichannel lossless")
             }
         }
         public var fileSuffix: String {
@@ -32,8 +35,8 @@ public enum MultichannelExport {
         case notMultichannel, unsupported(String)
         public var errorDescription: String? {
             switch self {
-            case .notMultichannel: "Only multichannel files (5.1, 7.1, …) can be exported for Spatial Audio."
-            case .unsupported(let why): "Couldn't export: \(why)."
+            case .notMultichannel: String(localized: "Only multichannel files (5.1, 7.1, …) can be exported for Spatial Audio.")
+            case .unsupported(let why): String(localized: "Couldn't export: \(why).", comment: "The reason is a short phrase, e.g. “no converter for 6 channels”.")
             }
         }
     }
@@ -44,7 +47,7 @@ public enum MultichannelExport {
     public static func export(_ item: PlayableItem, kind: Kind, to destination: URL,
                               progress: ((Double) -> Void)? = nil) throws -> Int {
         guard !FileManager.default.fileExists(atPath: destination.path) else {
-            throw ExportError.unsupported("\(destination.lastPathComponent) already exists")
+            throw ExportError.unsupported(String(localized: "\(destination.lastPathComponent) already exists"))
         }
         let probed = try SourceOpener.probe(item.url, area: item.sacdArea)
         let format = probed.format
@@ -59,7 +62,7 @@ public enum MultichannelExport {
         guard let bed = ChannelLayouts.layout(channels: channels),
               let bedFormat = AudioFormats.float32(sampleRate: rate, channels: channels, interleaved: true, layout: bed),
               let converter = AVAudioConverter(from: decoder.processingFormat, to: bedFormat) else {
-            throw ExportError.unsupported("no converter for \(channels) channels")
+            throw ExportError.unsupported(String(localized: "no converter for \(channels) channels"))
         }
         let outChannels = kind == .spatialStereo ? 2 : channels
         let outLayout = kind == .spatialStereo ? AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_Stereo)! : bed
@@ -79,7 +82,7 @@ public enum MultichannelExport {
                   let bedBuffer = AVAudioPCMBuffer(pcmFormat: bedFormat, frameCapacity: chunk),
                   let outFormat = AudioFormats.float32(sampleRate: rate, channels: outChannels, interleaved: false, layout: outLayout),
                   let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
-                throw ExportError.unsupported("buffers")
+                throw ExportError.unsupported(String(localized: "buffers", comment: "What failed, after “Couldn't export:” (audio buffers couldn't be made)."))
             }
             let renderer = kind == .spatialStereo
                 ? try SpatialRenderer(inputLayout: bed, channels: channels, sampleRate: rate, maxFrames: chunk, mode: .fixed) : nil
@@ -105,7 +108,9 @@ public enum MultichannelExport {
                 if n > 0, let bedData = bedBuffer.floatChannelData?[0] {
                     let interleaved = Array(UnsafeBufferPointer(start: bedData, count: n * channels))
                     outBuffer.frameLength = AVAudioFrameCount(n)
-                    guard let planes = outBuffer.floatChannelData else { throw ExportError.unsupported("output") }
+                    guard let planes = outBuffer.floatChannelData else {
+                        throw ExportError.unsupported(String(localized: "output", comment: "What failed, after “Couldn't export:” (no output samples)."))
+                    }
                     if let renderer {
                         let stereo = renderer.render(interleaved: interleaved, frames: n)
                         for f in 0..<n { planes[0][f] = stereo[f * 2]; planes[1][f] = stereo[f * 2 + 1] }

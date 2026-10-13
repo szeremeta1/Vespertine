@@ -13,10 +13,10 @@ enum DTSError: Error, LocalizedError {
     case unavailable, noStream, decoding, unsupported(String)
     var errorDescription: String? {
         switch self {
-        case .unavailable: "The DTS decoder isn't available."
-        case .noStream: "No DTS audio found in this file."
-        case .decoding: "The audio couldn't be decoded."
-        case .unsupported(let why): "This file can't be played (\(why))."
+        case .unavailable: String(localized: "The DTS decoder isn't available.")
+        case .noStream: String(localized: "No DTS audio found in this file.")
+        case .decoding: String(localized: "The audio couldn't be decoded.")
+        case .unsupported(let why): String(localized: "This file can't be played (\(why)).", comment: "The reason is a short technical phrase, e.g. “not DSD”.")
         }
     }
 }

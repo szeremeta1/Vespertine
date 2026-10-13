@@ -116,14 +116,15 @@ final class OutputSession: @unchecked Sendable {
             if hogged { DeviceControl.releaseHog(deviceID) }
             throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
                                  totalChannels < plan.deviceChannels
-                                    ? "open \(plan.deviceChannels) channels (the device offers \(totalChannels))"
-                                    : "set the device to Float32 at \(SampleRate.format(plan.deviceSampleRate)) kHz")
+                                    ? String(localized: "open \(plan.deviceChannels) channels (the device offers \(totalChannels))", comment: "Followed by “failed: <error code>”.")
+                                    : String(localized: "set the device to Float32 at \(SampleRate.format(plan.deviceSampleRate)) kHz", comment: "Followed by “failed: <error code>”."))
         }
         if plan.isPassthrough, (!hogged || (physical?.mBitsPerChannel ?? 0) < (plan.mode == .dop ? 24 : 16)
             || abs(rate - plan.deviceSampleRate) >= 0.5) {
             if hogged { DeviceControl.releaseHog(deviceID) }
             throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
-                                 plan.mode == .dop ? "DoP requires exclusive, bit-transparent output" : "Bitstream requires exclusive, bit-transparent output")
+                                 plan.mode == .dop ? String(localized: "DoP requires exclusive, bit-transparent output")
+                                                    : String(localized: "Bitstream requires exclusive, bit-transparent output"))
         }
 
         let speakers = DeviceQuery.speakerLayout(deviceID)
@@ -143,12 +144,12 @@ final class OutputSession: @unchecked Sendable {
 
         guard let ring = nrt_ring_create(Self.ringFrames(rate: rate, channels: plan.channels), UInt32(plan.channels)) else {
             if hogged { DeviceControl.releaseHog(deviceID) }
-            throw CoreAudioError(-1, "allocate ring buffer")
+            throw CoreAudioError(-1, String(localized: "allocate ring buffer", comment: "Followed by “failed: <error code>”."))
         }
         guard let ctx = nrt_context_create(ring, max(bufferFrames * 2, 4096)) else {
             nrt_ring_destroy(ring)
             if hogged { DeviceControl.releaseHog(deviceID) }
-            throw CoreAudioError(-1, "allocate render context")
+            throw CoreAudioError(-1, String(localized: "allocate render context", comment: "Followed by “failed: <error code>”."))
         }
         self.ring = ring
         self.context = ctx
@@ -406,7 +407,8 @@ public enum DeviceControl {
                 try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), float)
                 settle()
             } else {
-                throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "set a Float32 format at \(SampleRate.format(rate)) kHz")
+                throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
+                                     String(localized: "set a Float32 format at \(SampleRate.format(rate)) kHz", comment: "Followed by “failed: <error code>”."))
             }
         }
     }
@@ -457,7 +459,8 @@ public enum DeviceControl {
             if abs(now - rate) < 0.5 { settle(); return }
             usleep(10_000)
         }
-        throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "device did not switch to \(rate) Hz")
+        throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
+                             String(localized: "device did not switch to \(Int(rate.rounded())) Hz", comment: "Followed by “failed: <error code>”."))
     }
 
     /// A format or rate change reads back before macOS has finished telling this process about it (it pauses and

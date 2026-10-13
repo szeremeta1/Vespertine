@@ -39,8 +39,8 @@ struct FavoriteButton: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .disabled(track?.id == nil)
-        .help(isOn ? "Remove from Favorites" : "Add to Favorites")
-        .accessibilityLabel(isOn ? "Remove from Favorites" : "Add to Favorites")
+        .help(isOn ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites"))
+        .accessibilityLabel(isOn ? Text("Remove from Favorites") : Text("Add to Favorites"))
         .animation(.easeOut(duration: 0.15), value: hovering)
     }
 }
@@ -70,7 +70,7 @@ struct FavoritesView: View {
     @State private var list = SongList()
 
     var body: some View {
-        SongsPage(scope: .sidebar(.favorites), title: "Favorites", list: list, word: "song") {
+        SongsPage(scope: .sidebar(.favorites), title: String(localized: "Favorites"), list: list, countsSongs: true) {
             EmptyView()
         } empty: {
             VStack(spacing: 10) {

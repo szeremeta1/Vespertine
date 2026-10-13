@@ -39,8 +39,8 @@ enum LegacyMigration {
             catch {
                 migrationLog.error("Library copy failed: \(error.localizedDescription, privacy: .public)")
                 let alert = NSAlert()
-                alert.messageText = "Couldn’t bring over your Nocturne library"
-                alert.informativeText = "\(error.localizedDescription)\n\nNothing was changed in the Nocturne folder. Vespertine will quit and try again next time it opens."
+                alert.messageText = String(localized: "Couldn’t bring over your Nocturne library")
+                alert.informativeText = String(localized: "\(error.localizedDescription)\n\nNothing was changed in the Nocturne folder. Vespertine will quit and try again next time it opens.")
                 alert.runModal()
                 exit(0)
             }
@@ -88,10 +88,10 @@ enum LegacyMigration {
         let running = NSRunningApplication.runningApplications(withBundleIdentifier: legacyID)
         guard !running.isEmpty else { return true }
         let alert = NSAlert()
-        alert.messageText = "Nocturne is still open"
-        alert.informativeText = "Vespertine is Nocturne’s new name. Quit Nocturne so your library, playlists and settings can be brought over. Nocturne’s own files are left as they are."
-        alert.addButton(withTitle: "Quit Nocturne")
-        alert.addButton(withTitle: "Quit Vespertine")
+        alert.messageText = String(localized: "Nocturne is still open")
+        alert.informativeText = String(localized: "Vespertine is Nocturne’s new name. Quit Nocturne so your library, playlists and settings can be brought over. Nocturne’s own files are left as they are.")
+        alert.addButton(withTitle: String(localized: "Quit Nocturne"))
+        alert.addButton(withTitle: String(localized: "Quit Vespertine"))
         guard alert.runModal() == .alertFirstButtonReturn else { return false }
         running.forEach { $0.terminate() }
         let deadline = Date().addingTimeInterval(15)
