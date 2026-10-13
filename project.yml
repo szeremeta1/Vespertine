@@ -54,6 +54,8 @@ targets:
         # Network shares are probed and mounted over the local network (or a VPN); without this string
         # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
         NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
+        # Only the loopback self-test records, and only from a virtual loopback device such as "Vespertine Loopback".
+        NSMicrophoneUsageDescription: "The loopback test records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. It never records a microphone."
         # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.
         SUFeedURL: https://github.com/szeremeta1/Vespertine/releases/latest/download/appcast.xml
         SUPublicEDKey: 5KxX9Zdz/fXEO1SpPUjZWxkNWiIzSMzMXava8UpHeNw=
@@ -74,6 +76,8 @@ targets:
       path: App/Vespertine.entitlements
       properties:
         com.apple.security.app-sandbox: false
+        # Hardened runtime: the loopback self-test reads a virtual device's input.
+        com.apple.security.device.audio-input: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine

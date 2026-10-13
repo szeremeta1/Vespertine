@@ -135,6 +135,7 @@ final class AppModel {
     let devices: DeviceStore
     let shares: NetworkShareManager
     let analysis: AnalysisQueue
+    let loopback: LoopbackTest
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -168,6 +169,7 @@ final class AppModel {
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
     var showConnectServer = false
+    var showLoopbackTest = false
     /// What a playlist import did, shown in an alert until dismissed.
     var playlistReport: String?
     /// Address to pre-fill in Connect to Server (e.g. to enter a password for an existing share).
@@ -186,6 +188,7 @@ final class AppModel {
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory)
         devices = DeviceStore()
+        loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
         shares = NetworkShareManager(library: library, settings: settings)
         // If Vespertine last ended while relaying the volume keys, put the sound output and alert volume back before
         // the relay can take them as they are.

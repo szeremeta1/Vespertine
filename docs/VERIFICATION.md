@@ -80,6 +80,7 @@ vespertine-probe list
 vespertine-probe play "<device name or UID>" 20 <file> [file…]
 vespertine-probe watch 30
 vespertine-probe doptest "<DoP DAC name>"
+vespertine-probe loopback --full --json loopback.json
 ```
 
 - **`list`** shows every output device with:
@@ -89,6 +90,7 @@ vespertine-probe doptest "<DoP DAC name>"
 - **`play`** plays the files on the device for the given number of seconds. It then prints the signal path Vespertine computed, next to an independent Core Audio readback of nominal rate, physical format and hog owner, so you can check that the two agree.
 - **`watch`** prints every device's volume and the system output whenever they change. Use it to catch another app or macOS changing the device mid-play.
 - **`doptest`** plays DSD over DoP on the device (it turns DoP on for it, and writes two DSD64 test files of soft pings if you give it none). It pauses, seeks and skips on a schedule, prints what to listen for at each step, and checks that the device keeps running through them. The DAC should stay in DSD the whole time: no click, no missing ping. Only the resume after the last, long pause (the device is let go after `VESPERTINE_RELEASE_AFTER` seconds, 15 by default) and the stop may click.
+- **`loopback`** runs the [loopback test](LOOPBACK.md) unattended through a virtual loopback device and writes JSON. It is a software-path check: it shows that the decoder, the engine and Core Audio deliver every sample, not what a DAC receives.
 
 ## 4. Checking it outside Vespertine
 

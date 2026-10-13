@@ -7,7 +7,7 @@
 import AVFAudio
 import Foundation
 import Testing
-import VespertineAnalysisCore
+@testable import VespertineAnalysisCore
 @testable import VespertineAudio
 
 private func device(_ name: String, transport: Transport, rates: [Double] = [44_100, 48_000, 96_000],
@@ -137,6 +137,58 @@ struct LoopbackRunnerTests {
         #expect(report([skipped]).status == .skipped)
         let r = report([ok, bad])
         #expect(try JSONDecoder().decode(LoopbackReport.self, from: JSONEncoder().encode(r)) == r)
+    }
+
+    private func sampleReport(app: String = "0.12.0", macOS: String = "26.0.0", date: Double = 1_800_000_000) -> LoopbackReport {
+        let ok = LoopbackCaseResult(testCase: LoopbackCase(sampleRate: 96_000, bits: 24), status: .bitExact, summary: "bit-exact",
+                                    settings: ["Equalizer": "off", "Digital volume": "off"], deviceFormat: "Float32 · 96 kHz")
+        let channel = LoopbackChannelResult(channel: 1, capturedChannel: 1, lock: 1, nextPeak: 0.03, latencyFrames: 512, driftFrames: 0,
+                                            comparedFrames: 100_000, mismatchedFrames: 40, firstMismatch: 2_048, maxErrorLSB: 1)
+        let finding = LoopbackFinding(kind: .dither, channel: 1, frame: 2_048, count: 40, value: 1, summary: "dither on the right channel | ±1 LSB",
+                                      isSetupProblem: false)
+        var bad = LoopbackCaseResult(testCase: LoopbackCase(sampleRate: 44_100, bits: 16), status: .failed, summary: "dither on the right channel",
+                                     settings: ok.settings, sixteenBitNote: "No 16-bit mode at 44.1 kHz; sent as 32-bit (same samples, zero-padded)")
+        bad.analyses = [LoopbackResult(spec: .init(sampleRate: 44_100, bits: 16), channels: [channel], findings: [finding])]
+        let skipped = LoopbackCaseResult(testCase: LoopbackCase(sampleRate: 44_100, bits: 32, integerMode: true), status: .skipped,
+                                         summary: "no 32-bit integer format")
+        return LoopbackReport(outputDevice: "Vespertine Loopback", outputUID: "uid", inputDevice: "Vespertine Loopback", macOS: macOS,
+                              appVersion: app, date: Date(timeIntervalSince1970: date), mode: .quick, cases: [ok, bad, skipped])
+    }
+
+    @Test("The Markdown report says it's a software check, lists every case and the settings, and details the failures")
+    func markdown() {
+        let md = sampleReport().markdown
+        #expect(md.hasPrefix("## Loopback (software check)\n\n" + LoopbackReport.scope))
+        #expect(md.contains("- Result: **Failed**") && md.contains("Vespertine 0.12.0, macOS 26.0.0"))
+        #expect(md.contains("| 24-bit at 96 kHz | Bit-exact | Float32 · 96 kHz | bit-exact |"))
+        #expect(md.contains("| 16-bit padded at 44.1 kHz | Failed | – | dither on the right channel; No 16-bit mode"))
+        #expect(md.contains("| 32-bit integer mode at 44.1 kHz | Skipped |"))
+        #expect(md.contains("- Digital volume: off\n- Equalizer: off\n"))
+        #expect(md.contains("**16-bit padded at 44.1 kHz**") && !md.contains("**24-bit at 96 kHz**"))
+        #expect(md.contains("- Right (captured on 2), 40 of 100000 frames differ, first at frame 2048, up to 1 LSB"))
+        #expect(!md.lowercased().contains("dac is bit-perfect"))
+    }
+
+    @Test("Saved results are keyed by device, format, settings, macOS and app version; a newer run replaces its key")
+    func savedResults() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("loopback-results-\(UUID()).json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let store = LoopbackResultStore(url: url)
+        #expect(store.load().isEmpty)
+        try store.save(sampleReport())
+        #expect(store.load().count == 2)                       // the skipped case isn't kept
+        try store.save(sampleReport(date: 1_800_000_100))       // same keys: replaced
+        try store.save(sampleReport(app: "0.13.0"))             // another version: kept beside
+        let saved = store.load()
+        #expect(saved.count == 4)
+        #expect(Set(saved.map(\.key)).count == 4)
+        let key = try #require(saved.first { $0.key.appVersion == "0.12.0" && $0.key.format == "24-bit at 96 kHz" }).key
+        #expect(key.deviceUID == "uid" && key.macOS == "26.0.0" && key.settings == "Digital volume=off\nEqualizer=off")
+        let hit = LoopbackResultStore.latest(in: saved, sampleRate: 96_000, bits: 24, macOS: "26.0.0", appVersion: "0.12.0")
+        #expect(hit?.result.status == .bitExact && hit?.date == Date(timeIntervalSince1970: 1_800_000_100))
+        #expect(LoopbackResultStore.latest(in: saved, sampleRate: 96_000, bits: 24, macOS: "26.1.0", appVersion: "0.12.0") == nil)
+        #expect(LoopbackResultStore.latest(in: saved, sampleRate: 44_100, bits: 16, macOS: "26.0.0", appVersion: "0.12.0")?.result.status == .failed)
+        #expect(LoopbackResultStore.latest(in: saved, sampleRate: 44_100, bits: 16, matchSixteenBit: true, macOS: "26.0.0", appVersion: "0.12.0") == nil)
     }
 
     /// Plays the quick test through the dedicated loopback device. Silent: the device is virtual.

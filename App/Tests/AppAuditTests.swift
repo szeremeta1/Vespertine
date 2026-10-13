@@ -1,5 +1,6 @@
 import AVFAudio
 import Foundation
+import VespertineAudio
 import VespertineLibrary
 import Testing
 @testable import Vespertine
@@ -31,6 +32,32 @@ struct AppAuditTests {
         settings.matchSixteenBit = true
         #expect(settings.engineSettings().matchSixteenBit)
         #expect(AppSettings(defaults: defaults, dataDirectory: root).matchSixteenBit)
+    }
+    @Test("Loopback results show for a format checked on this macOS and version, only for paths that leave samples alone")
+    func loopbackResultForSignalPath() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-loopback-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let probe = LoopbackTest(dataDirectory: root)
+        let ok = LoopbackCaseResult(testCase: LoopbackCase(sampleRate: 96_000, bits: 24), status: .bitExact, summary: "bit-exact")
+        let report = LoopbackReport(outputDevice: "Vespertine Loopback", outputUID: "loop", inputDevice: "Vespertine Loopback",
+                                    macOS: probe.macOS, appVersion: probe.appVersion, date: .now, mode: .quick, cases: [ok])
+        try LoopbackResultStore(url: root.appendingPathComponent("loopback-results.json")).save(report)
+        let test = LoopbackTest(dataDirectory: root)
+        func path(rate: Double, bits: Int, volume: SignalPath.VolumeStage = .fixed) -> SignalPath {
+            let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: rate, bitDepth: bits, channels: 2)
+            let plan = FormatPlanner.plan(source: source, device: DeviceCapabilities(sampleRates: [rate], physicalFormats: [],
+                                                                                     outputChannels: 2, supportsDoP: false))
+            return SignalPath(source: source, decoderName: "test", plan: plan,
+                              applied: AppliedFormat(sampleRate: rate, physicalBitDepth: 24, physicalIsInteger: true, virtualChannels: 2,
+                                                     exclusive: true, bufferFrames: 512),
+                              deviceName: "DAC", deviceUID: "dac",
+                              deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "x"), volume: volume)
+        }
+        #expect(test.result(for: path(rate: 96_000, bits: 24))?.result.status == .bitExact)
+        #expect(test.result(for: path(rate: 44_100, bits: 24)) == nil)
+        #expect(test.result(for: path(rate: 96_000, bits: 16)) == nil)
+        #expect(test.result(for: path(rate: 96_000, bits: 24, volume: .digital(dB: -6))) == nil)
     }
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")

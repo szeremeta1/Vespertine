@@ -110,6 +110,18 @@ public struct LoopbackCaseResult: Sendable, Hashable, Codable, Identifiable {
     public var engineUnderruns = 0
     public var recorderDiscontinuities = 0
     public var id: String { testCase.id }
+
+    public init(testCase: LoopbackCase, status: Status, summary: String, analyses: [LoopbackResult] = [], settings: [String: String] = [:],
+                deviceFormat: String? = nil, signalPath: String? = nil, sixteenBitNote: String? = nil) {
+        self.testCase = testCase
+        self.status = status
+        self.summary = summary
+        self.analyses = analyses
+        self.settings = settings
+        self.deviceFormat = deviceFormat
+        self.signalPath = signalPath
+        self.sixteenBitNote = sixteenBitNote
+    }
 }
 
 public struct LoopbackReport: Sendable, Hashable, Codable {
@@ -125,6 +137,18 @@ public struct LoopbackReport: Sendable, Hashable, Codable {
     public var date: Date
     public var mode: LoopbackMode
     public var cases: [LoopbackCaseResult]
+
+    public init(outputDevice: String, outputUID: String, inputDevice: String, macOS: String, appVersion: String, date: Date,
+                mode: LoopbackMode, cases: [LoopbackCaseResult]) {
+        self.outputDevice = outputDevice
+        self.outputUID = outputUID
+        self.inputDevice = inputDevice
+        self.macOS = macOS
+        self.appVersion = appVersion
+        self.date = date
+        self.mode = mode
+        self.cases = cases
+    }
 
     public var status: LoopbackCaseResult.Status {
         let ran = cases.filter { $0.status != .skipped }

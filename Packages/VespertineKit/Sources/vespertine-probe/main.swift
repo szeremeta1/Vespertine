@@ -6,6 +6,7 @@
 //   vespertine-probe pausetest <device> <file> <volume 0…1> <pause seconds> <release-after seconds>
 //   vespertine-probe doptest <device> [a.dsf b.dsf]   DoP through pause, seek and skip, narrated (writes test files if none)
 //   vespertine-probe loopback [--quick|--full] [--device <name>] [--input <name>] [--rates 44100,96000] [--json <path>]
+//                             [--markdown <path>]
 //                             software loopback self-test through a virtual device ("Vespertine Loopback" by default);
 //                             exits 0 when every case is bit-exact, 1 on a failure, 2 on a test setup problem
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -203,6 +204,9 @@ if args.count >= 2, args[1] == "loopback" {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         encoder.dateEncodingStrategy = .iso8601
         do { try encoder.encode(report).write(to: URL(fileURLWithPath: path)); print("JSON: \(path)") } catch { print("couldn't write \(path): \(error)"); exit(2) }
+    }
+    if let path = value("--markdown") {
+        do { try report.markdown.write(toFile: path, atomically: true, encoding: .utf8); print("Markdown: \(path)") } catch { print("couldn't write \(path): \(error)"); exit(2) }
     }
     exit(report.status == .bitExact ? 0 : report.status == .setupProblem || report.status == .skipped ? 2 : 1)
 }
