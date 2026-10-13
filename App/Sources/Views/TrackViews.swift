@@ -86,7 +86,7 @@ struct TrackTable: View {
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
                     if let other = row.track.id.flatMap({ otherVersions[$0] }) {
-                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).tracking(0.6).foregroundStyle(Palette.text2)
+                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.6).foregroundStyle(Palette.text2)
                             .padding(.horizontal, 5).padding(.vertical, 2)
                             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                             .fixedSize()
@@ -212,7 +212,7 @@ struct AnalysisTag: View {
     private func tag(_ text: LocalizedStringKey, color: Color) -> some View {
         Text(text)
             .font(Typeface.mono(8.5, weight: .semibold))
-            .tracking(0.6)
+            .letterSpacing(0.6)
             .foregroundStyle(color)
             .padding(.horizontal, 5).padding(.vertical, 2)
             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(color.opacity(0.5)))
@@ -516,7 +516,7 @@ struct PlaylistView: View {
         let playlist = model.library.playlists.first { $0.id == playlistID }
         Group {
             if let playlist {
-                SongsPage(scope: .sidebar(.playlist(playlistID)), title: playlist.name, list: list,
+                SongsPage(scope: .sidebar(.playlist(playlistID)), title: playlist.name.libraryDisplayName, list: list,
                           kicker: playlist.isSmart ? String(localized: "SMART", comment: "Before a smart playlist's song count") + " · " : "", playlist: playlist) {
                     if playlist.isSmart {
                         Button("Edit Rules…") { model.smartEditorPlaylist = playlist }.buttonStyle(QuietButtonStyle())

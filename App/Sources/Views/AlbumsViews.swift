@@ -202,7 +202,7 @@ struct AlbumFamilyCard: View {
                     }
                 Text("\(family.editions.count) EDITIONS")
                     .font(Typeface.mono(9, weight: .semibold))
-                    .tracking(0.5)
+                    .letterSpacing(0.5)
                     .foregroundStyle(Palette.brassHi)
                     .padding(.horizontal, 8).padding(.vertical, 5)
                     .background(Palette.surface, in: RoundedRectangle(cornerRadius: 4))
@@ -314,7 +314,7 @@ struct FormatLabel: View {
         let parts = summary.components(separatedBy: " · ")
         Text("\(Text(parts.first ?? "").foregroundStyle(highlight ? Palette.brass : Palette.text3))\(Text(parts.count > 1 ? " · " + parts.dropFirst().joined(separator: " · ") : "").foregroundStyle(Palette.text3))")
             .font(Typeface.mono(10))
-            .tracking(0.3)
+            .letterSpacing(0.3)
     }
 }
 
@@ -392,7 +392,7 @@ struct AddToPlaylistMenu: View {
             }
             Divider()
             ForEach(model.library.playlists.filter { !$0.isSmart }) { p in
-                Button(p.name) { model.library.append(trackIDs, to: p) }
+                Button(p.name.libraryDisplayName) { model.library.append(trackIDs, to: p) }
             }
         }
     }
@@ -470,7 +470,7 @@ struct AlbumDetailView: View {
                 Spacer(minLength: 0)
                 Text(kicker(album, shown: shown))
                     .font(Typeface.mono(10.5, weight: .semibold))
-                    .tracking(1.4)
+                    .letterSpacing(1.4)
                     .foregroundStyle(Palette.brass)
                 Text(album.title.libraryDisplayName)
                     .font(Typeface.serif(38))

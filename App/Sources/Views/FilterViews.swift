@@ -203,7 +203,7 @@ struct FilterToken: View {
                 HStack(spacing: 6) {
                     Text(title.localizedUppercase)
                         .font(Typeface.ui(9, weight: .semibold))
-                        .tracking(0.8)
+                        .letterSpacing(0.8)
                         .foregroundStyle(Palette.brass.opacity(0.8))
                     Text(values)
                         .font(Typeface.ui(11.5))

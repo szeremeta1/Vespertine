@@ -43,6 +43,27 @@ extension Color {
     }
 }
 
+// MARK: - Letter spacing
+
+extension Locale {
+    /// Whether the interface language's script can take letter spacing. Arabic letters join and Indic and Thai letters
+    /// stack into clusters, so spacing them apart breaks the words; those languages get none.
+    static let spacesLetters: Bool = {
+        let language = Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en").language.languageCode?.identifier ?? "en"
+        return !["ar", "fa", "ur", "hi", "mr", "bn", "pa", "gu", "ta", "te", "kn", "ml", "th"].contains(language)
+    }()
+}
+
+extension Text {
+    /// Tracking for labels and badges, where the interface language allows it.
+    func letterSpacing(_ amount: CGFloat) -> Text { tracking(Locale.spacesLetters ? amount : 0) }
+}
+
+extension View {
+    /// Tracking for labels and badges, where the interface language allows it.
+    func letterSpacing(_ amount: CGFloat) -> some View { tracking(Locale.spacesLetters ? amount : 0) }
+}
+
 // MARK: - Small components
 
 /// Uppercase section label ("SIGNAL PATH").
@@ -51,7 +72,7 @@ struct SectionLabel: View {
     var body: some View {
         Text(text.localizedUppercase)
             .font(Typeface.ui(10.5, weight: .semibold))
-            .tracking(0.9)
+            .letterSpacing(0.9)
             .foregroundStyle(Palette.text3)
     }
 }
@@ -82,7 +103,7 @@ struct StatusBadge: View {
             }
             Text(text)
                 .font(Typeface.mono(10, weight: .semibold))
-                .tracking(1)
+                .letterSpacing(1)
         }
         .foregroundStyle(foreground)
         .padding(.horizontal, 8)

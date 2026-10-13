@@ -115,6 +115,9 @@ struct TransportControls: View {
             }
             if !compact { Scrubber() }
         }
+        // Playback controls and the timeline keep their left-to-right order in right-to-left languages too, as
+        // Apple's own players do: they follow the direction of time, not of the text.
+        .environment(\.layoutDirection, .leftToRight)
     }
 }
 
@@ -139,7 +142,7 @@ struct Scrubber: View {
                 }
             }
             .disabled(player.current == nil)
-            Text("−" + max(0, duration - shown).clock).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 48, alignment: .leading)
+            Text("\u{2066}−" + max(0, duration - shown).clock + "\u{2069}").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 48, alignment: .leading)
         }
     }
 }

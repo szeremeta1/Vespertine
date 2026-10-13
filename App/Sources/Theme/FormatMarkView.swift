@@ -26,7 +26,7 @@ struct FormatMarkView: View {
     private var plate: some View {
         Text(mark.product.isEmpty ? mark.brand : "\(mark.brand) \(mark.product)")
             .font(Typeface.mono(size, weight: .semibold))
-            .tracking(1)
+            .letterSpacing(1)
             .foregroundStyle(ink)
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
@@ -36,7 +36,7 @@ struct FormatMarkView: View {
 
     @ViewBuilder private var carrierText: some View {
         if showsCarrier, let carrier = mark.carrier {
-            Text(carrier.uppercased()).font(Typeface.mono(size * 0.9)).tracking(0.8).foregroundStyle(Palette.text3).fixedSize()
+            Text(carrier.uppercased()).font(Typeface.mono(size * 0.9)).letterSpacing(0.8).foregroundStyle(Palette.text3).fixedSize()
         }
     }
 

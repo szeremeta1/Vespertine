@@ -54,7 +54,7 @@ struct NowPlayingPanel: View {
                         SectionLabel(text: String(localized: "Now Playing"))
                         Spacer()
                         if let i = player.currentIndex {
-                            Text("\(i + 1) OF \(player.queue.count)").font(Typeface.ui(10.5, weight: .semibold)).tracking(0.9).foregroundStyle(Palette.text3)
+                            Text("\(i + 1) OF \(player.queue.count)").font(Typeface.ui(10.5, weight: .semibold)).letterSpacing(0.9).foregroundStyle(Palette.text3)
                         }
                     }
                     ArtworkView(key: model.artworkKey(track), size: 600, cornerRadius: 8)
