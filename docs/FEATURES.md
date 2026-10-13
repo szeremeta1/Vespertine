@@ -28,6 +28,8 @@ The signal path lists decoding, device rate and physical format, gain, resamplin
 
 Shared-mode checks poll about once a second. Short sounds and activity Core Audio does not report can escape detection. Processing inside a DAC or headphones is outside what macOS reports. A signal-path badge is not an independent digital loopback measurement.
 
+The [loopback test](LOOPBACK.md) (Settings › Playback, or Controls › Loopback Test…) plays a test signal through a virtual loopback device and checks that every sample comes back unchanged. It covers 44.1 to 384 kHz, 16-, 24- and 32-bit, gapless joins and 16-bit matching. Copy Report gives a Markdown report. It is a software-path check of the decoder, the engine and Core Audio, not of a DAC, so its results appear in the signal path as "Loopback (software check)" and never change the BIT-PERFECT badge.
+
 ![24-bit / 96 kHz FLAC, bit-perfect on a FiiO K11, with its signal path](screenshots/bit-perfect-fiio-24-96.png)
 
 Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 384 kHz on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor. Per-device settings can match the source, use the device maximum, or force a rate.

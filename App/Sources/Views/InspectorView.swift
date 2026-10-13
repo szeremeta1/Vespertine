@@ -81,7 +81,7 @@ struct NowPlayingPanel: View {
                     if let path = player.signalPath {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
-                        SignalPathView(path: path).padding(.top, 14)
+                        SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
                         if path.plan.channels > 2 || path.source.channels > 2 {
                             ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
                         }
@@ -149,6 +149,9 @@ struct StatusBadges: View {
 
 struct SignalPathView: View {
     let path: SignalPath
+    /// The loopback test's saved result for this format, on this macOS and Vespertine version. Informational only:
+    /// it's a software check, so the BIT-PERFECT badge never depends on it.
+    var loopback: LoopbackSavedResult? = nil
 
     struct Step: Identifiable {
         let id = UUID()
@@ -244,6 +247,21 @@ struct SignalPathView: View {
                       detail: device.joined(separator: " · "),
                       value: String(localized: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz"),
                       tone: path.isBitPerfect ? .good : .plain))
+        if let loopback {
+            let date = loopback.date.formatted(date: .abbreviated, time: .omitted)
+            switch loopback.result.status {
+            case .bitExact:
+                s.append(Step(title: LoopbackReport.label,
+                              detail: String(localized: "This format came back bit-exact through \(loopback.deviceName) on \(date). Checks Vespertine's software, not this device."),
+                              value: String(localized: "bit-exact")))
+            case .failed:
+                s.append(Step(title: LoopbackReport.label,
+                              detail: String(localized: "\(loopback.result.summary), through \(loopback.deviceName) on \(date). Checks Vespertine's software, not this device."),
+                              value: String(localized: "failed"), tone: .changed))
+            case .setupProblem, .skipped:
+                break
+            }
+        }
         return s
     }
 

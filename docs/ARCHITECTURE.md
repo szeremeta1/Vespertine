@@ -71,6 +71,17 @@ With `integerMode` and exclusive access, plain PCM that needs no processing plan
 
 With `matchSixteenBit`, `FormatPlanner.matchSixteenBit` sets `physicalBitDepth = 16` on a plan for integer 16-bit PCM at its own rate and channel count (no resampling, downmix or Spatial Audio, never DSD, DoP or bitstream), when the device lists an integer 16-bit physical format with enough channels at that rate. The engine adds its conditions: exclusive access, not the built-in output, no digital volume, EQ or ReplayGain. `DeviceControl.apply` then picks the 16-bit physical format, and the I/O proc renders Float32 as usual, which carries every 16-bit sample exactly, so integer mode isn't used. The plan records `sixteenBit` (`.requested` or `.noMode`), and `SignalPath.sixteenBitNote` reports what the device actually reads back, including a device that ignored the request. 16-bit and deeper plans aren't device-compatible, so a change between them reconfigures the device; when the session ends, the device goes back to its full depth.
 
+## Loopback self-test
+
+`LoopbackRunner` (VespertineAudio) runs a separate `PlaybackEngine` with settings that turn off everything that could change the samples: EQ, digital volume, ReplayGain, Spatial Audio, bitstream and DoP, with the rate matched to the source. It runs on a virtual output device only (`LoopbackGuard` refuses others).
+
+For each case it does the following:
+1. Writes the `LoopbackSignal` to temporary WAVs, so the real decoder runs.
+2. Records the device's input with `LoopbackRecorder`. Its IOProc (`nrt_capture_ioproc`) is real-time safe: it copies into the lock-free ring and counts `mSampleTime` discontinuities and overflows.
+3. Trims the capture and hands it to `LoopbackAnalyzer` (VespertineAnalysisCore, pure Swift, also tested on Linux).
+
+`LoopbackResultStore` keeps results in `loopback-results.json`, keyed by device, case, settings, macOS and app version. The app's `LoopbackTest` model shows the newest result for the playing format as an informational signal-path step. `SignalPath.isBitPerfect` never reads it. See [LOOPBACK.md](LOOPBACK.md).
+
 ## Output device
 
 With a specific output chosen (`EngineSettings.deviceUID`), the engine never substitutes another device. If that device isn't listed, or won't start, when playback begins, the item is parked and the engine waits for it (`waitingForDevice` in the snapshot) for up to 60 s. It re-checks on every Core Audio device-list change and twice a second, and starts playback as soon as the device is back. If the device disappears mid-song, it waits the same way. This covers AirPods Max, whose Core Audio device is removed while they're off your head and re-published a few seconds after they're back on, often after their "play" command has already arrived. Pause cancels the wait. With *System Output* chosen, the engine follows the Mac's default output as before.

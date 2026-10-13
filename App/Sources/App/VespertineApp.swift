@@ -134,6 +134,8 @@ struct VespertineCommands: Commands {
             Divider()
             Toggle("Exclusive Mode", isOn: Binding(get: { model.settings.exclusiveMode },
                                                    set: { model.settings.exclusiveMode = $0; model.syncEngine() }))
+            Divider()
+            Button("Loopback Test…") { openWindow(id: "main"); model.showLoopbackTest = true }
         }
         CommandGroup(after: .sidebar) {
             Button(model.showInspector ? String(localized: "Hide Inspector") : String(localized: "Show Inspector")) { model.showInspector.toggle() }

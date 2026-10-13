@@ -156,6 +156,7 @@ struct SettingsView: View {
 
 struct PlaybackSettings: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         @Bindable var s = model.settings
@@ -189,6 +190,11 @@ struct PlaybackSettings: View {
                     ForEach(DeviceOnQuit.allCases) { Text($0.label).tag($0) }
                 }
                 Text("\u{201C}Put it back as it was\u{201D} restores each device Vespertine switched to the sample rate and bit depth it had before, so other apps (and tools like LosslessSwitcher) take over from where they left off.")
+                    .font(.caption).foregroundStyle(.secondary)
+                LabeledContent("Software path") {
+                    Button("Loopback Test…") { openWindow(id: "main"); model.showLoopbackTest = true }
+                }
+                Text("Plays a test signal through a virtual loopback device and checks every sample comes back unchanged. A check of Vespertine's software path, not of your DAC.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Surround formats") {

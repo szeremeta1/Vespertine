@@ -159,9 +159,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 35"
+    section: "line 37"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 35, from: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.", to: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT." }
+    cache: { repo: docs/FEATURES.md, lines: 37, from: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.", to: "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT." }
   requirement: "On the computer's built-in speakers, a virtual device or an aggregate device the badge is never BIT-PERFECT."
   quote_sha256: e59a38699f1bb4c6a269cf1430289123135aa957ab31384b503031207bdda8d0
   kind: vespertine-rule
@@ -204,9 +204,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 85"
+    section: "line 87"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 85, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
+    cache: { repo: docs/FEATURES.md, lines: 87, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
   requirement: "On a PCM path that would otherwise be BIT-PERFECT, an active equalizer preset makes the badge exactly \"EQUALIZER\"."
   quote_sha256: 91af30f470ee9e93f90067b89d53ec5a14391dd891da113421239b9cc2c5486f
   kind: vespertine-rule
@@ -234,9 +234,9 @@
   source:
     doc: "Vespertine docs/ARCHITECTURE.md"
     version: "98cad1a, with the F-05 docs change"
-    section: "line 95"
+    section: "line 106"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 95, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 106, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
   requirement: "For DoP the badge is \"NATIVE DSD · DoP\" exactly when the player holds the device (BPV-009), the nominal rate read back equals the planned carrier rate, the physical format has ≥24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
   quote_sha256: fce73c5cb9df36e13899619fc5f4b472bb7577033b28222c70ad87ffd5a712e1
   kind: vespertine-rule
@@ -264,9 +264,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 37"
+    section: "line 39"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 37, from: "Integer mode needs exclusive access", to: "non-mixable 32-bit integer format." }
+    cache: { repo: docs/FEATURES.md, lines: 39, from: "Integer mode needs exclusive access", to: "non-mixable 32-bit integer format." }
   requirement: "Integer mode is in effect only while the player holds the device exclusively (BPV-009); a path with integer mode in effect and the device not held doesn't occur. Without exclusive access the player uses the 32-bit float path."
   quote_sha256: 4c2c4bf8e93578c6dd0e3ce1a32a8976e58cf43e10716dddd233172a8cf4e4d6
   kind: vespertine-rule
