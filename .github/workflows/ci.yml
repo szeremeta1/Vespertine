@@ -8,9 +8,12 @@
 #   FFmpeg's S/PDIF demuxer and a blind carrier scanner.
 # Nothing here signs, notarizes or publishes; tests that need real audio hardware stay opt-in (VESPERTINE_HARDWARE_TESTS).
 #
-# macOS runner minutes are the expensive ones (about 10x Linux when billed), so:
-# - changes only to the website, docs, root Markdown or issue templates don't start CI. THIRD-PARTY-NOTICES.md and
-#   LICENSE ship inside the app, so they still do;
+# macOS runner minutes are the expensive ones (about 10x Linux when billed), and an account runs only a few macOS jobs
+# at a time, so a run that needs more waits in a queue (the reason PR runs took 30 to 40 minutes). So:
+# - each macOS job runs only when the change touches something it reads (scripts/ci-changes.py decides, and runs
+#   everything when unsure). Changes only to the website, docs, root Markdown or issue templates run just the Linux
+#   jobs, so their required checks still report (a skipped job counts as passed). THIRD-PARTY-NOTICES.md and LICENSE
+#   ship inside the app, so they still run everything;
 # - draft pull requests get the Linux jobs only. The macOS jobs run when the PR is marked ready for review, or on
 #   demand (Actions > CI > Run workflow, on the PR's branch);
 # - a newer push to the same pull request or branch cancels the run in progress;
@@ -23,26 +26,8 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - '**'
-      - '!site/**'
-      - '!docs/**'
-      - '!*.md'
-      - 'THIRD-PARTY-NOTICES.md'
-      - '!.github/ISSUE_TEMPLATE/**'
-      - '!.github/workflows/pages.yml'
-      - '!scripts/brand/**'
   push:
     branches: [main]
-    paths:
-      - '**'
-      - '!site/**'
-      - '!docs/**'
-      - '!*.md'
-      - 'THIRD-PARTY-NOTICES.md'
-      - '!.github/ISSUE_TEMPLATE/**'
-      - '!.github/workflows/pages.yml'
-      - '!scripts/brand/**'
   workflow_dispatch:
 
 # Actions are pinned by commit (a tag can be moved); Dependabot proposes updates. The Linux image is pinned by digest.
@@ -54,6 +39,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Which macOS jobs this change needs (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      packages: ${{ steps.changes.outputs.packages }}
+      app: ${{ steps.changes.outputs.app }}
+      verification: ${{ steps.changes.outputs.verification }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - id: changes
+        run: python3 scripts/ci-changes.py | tee -a "$GITHUB_OUTPUT"
+
   analysis-linux:
     name: Analysis core (Linux)
     runs-on: ubuntu-latest
@@ -81,9 +81,12 @@ jobs:
 
   packages-macos:
     name: Engine, library and real-time C (macOS)
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    needs: changes
+    if: >-
+      ${{ !cancelled() && needs.changes.outputs.packages != 'false' &&
+      (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
     runs-on: macos-26
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Toolchain
@@ -128,9 +131,12 @@ jobs:
 
   app-macos:
     name: App (macOS)
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    needs: changes
+    if: >-
+      ${{ !cancelled() && needs.changes.outputs.app != 'false' &&
+      (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Toolchain
@@ -200,7 +206,10 @@ jobs:
 
   verification-macos:
     name: Spec-traced checks against Vespertine (macOS)
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    needs: changes
+    if: >-
+      ${{ !cancelled() && needs.changes.outputs.verification != 'false' &&
+      (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
     runs-on: macos-26
     timeout-minutes: 60
     env:
