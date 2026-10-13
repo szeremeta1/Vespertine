@@ -16,7 +16,7 @@ struct InspectorView: View {
         @Bindable var model = model
         VStack(spacing: 0) {
             Picker("Inspector view", selection: $model.inspectorTab) {
-                ForEach(InspectorTab.allCases) { Text($0.rawValue).tag($0) }
+                ForEach(InspectorTab.allCases) { Text($0.label).tag($0) }
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -51,10 +51,10 @@ struct NowPlayingPanel: View {
                 if let entry = player.current {
                     let track = entry.track
                     HStack {
-                        SectionLabel(text: "Now Playing")
+                        SectionLabel(text: String(localized: "Now Playing"))
                         Spacer()
                         if let i = player.currentIndex {
-                            Text("\(i + 1) OF \(player.queue.count)").font(Typeface.ui(10.5, weight: .semibold)).tracking(0.9).foregroundStyle(Palette.text3)
+                            Text("\(i + 1) OF \(player.queue.count)").font(Typeface.ui(10.5, weight: .semibold)).letterSpacing(0.9).foregroundStyle(Palette.text3)
                         }
                     }
                     ArtworkView(key: model.artworkKey(track), size: 600, cornerRadius: 8)
@@ -71,8 +71,8 @@ struct NowPlayingPanel: View {
                         FavoriteButton(track: track, size: 15)
                     }
                     .padding(.top, 20)
-                    Text(track.displayArtist).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
-                    Text([track.displayAlbum, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
+                    Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
+                    Text([track.displayAlbum.libraryDisplayName, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
                         .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2)
                     if let mark = track.formatMark {
                         FormatMarkView(mark: mark).padding(.top, 14)
@@ -88,7 +88,7 @@ struct NowPlayingPanel: View {
                     } else if let system = player.systemRendering {
                         SystemRenderingView(rendering: system, device: player.outputDevice?.name).padding(.top, 16)
                     } else {
-                        Text(player.waitingForDevice.map { "Waiting for \($0)…" } ?? "Preparing output…").font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
+                        Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
                     SpectrumView().frame(height: 44).padding(.top, 16).id("spectrum")
                     if player.buffering {
@@ -99,7 +99,7 @@ struct NowPlayingPanel: View {
                         .padding(.top, 8)
                     }
                     if player.underruns > 0 {
-                        Text("\(player.underruns) buffer underrun\(player.underruns == 1 ? "" : "s") this session")
+                        Text("\(player.underruns) buffer underruns this session")
                             .font(Typeface.mono(10)).foregroundStyle(Palette.copper).padding(.top, 8)
                     }
                 } else {
@@ -142,7 +142,7 @@ struct StatusBadges: View {
     }
     private var status: some View { StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted) }
     @ViewBuilder private var details: some View {
-        StatusBadge(text: path.applied.exclusive ? "EXCLUSIVE" : "SHARED")
+        StatusBadge(text: path.applied.exclusive ? String(localized: "EXCLUSIVE") : String(localized: "SHARED", comment: "Badge: the output device is shared with other apps"))
         StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")
     }
 }
@@ -163,75 +163,86 @@ struct SignalPathView: View {
         var s: [Step] = []
         let src = path.source
         let srcValue: String = if let dsd = src.dsdName {
-            "\(dsd) · \(String(format: "%.1f", src.sampleRate / 1_000_000)) MHz"
+            "\(dsd) · \((src.sampleRate / 1_000_000).formatted(.number.precision(.fractionLength(1)))) MHz"
         } else if let bits = src.bitDepth {
-            "\(bits)-bit · \(SampleRate.format(src.sampleRate)) kHz"
+            String(localized: "\(bits)-bit · \(SampleRate.format(src.sampleRate)) kHz")
         } else {
             "\(SampleRate.format(src.sampleRate)) kHz"
         }
-        let kind = src.encoding == .lossy ? "lossy" : (src.encoding == .dsd ? "1-bit" : "lossless")
-        s.append(Step(title: "Source", detail: "\(src.codec) · \(kind) · \(channelName(src.channels))", value: srcValue))
+        let kind = src.encoding == .lossy ? String(localized: "lossy") : (src.encoding == .dsd ? String(localized: "1-bit") : String(localized: "lossless"))
+        s.append(Step(title: String(localized: "Source", comment: "First step of the signal path: the file being played"), detail: "\(src.codec) · \(kind) · \(channelName(src.channels))", value: srcValue))
         if path.plan.mode != .bitstream {
-            s.append(Step(title: "Decoder", detail: path.decoderName, value: src.encoding == .lossy ? "decoded" : "lossless"))
+            s.append(Step(title: String(localized: "Decoder"), detail: path.decoderName,
+                          value: src.encoding == .lossy ? String(localized: "decoded") : String(localized: "lossless")))
         }
         if path.concealedFrames > 0 {
-            s.append(Step(title: "Damaged audio", detail: "Frames missing or damaged in the image, played as silence",
+            s.append(Step(title: String(localized: "Damaged audio"), detail: String(localized: "Frames missing or damaged in the image, played as silence"),
                           value: "\(path.concealedFrames) × 1/75 s", tone: .changed))
         }
 
         switch path.plan.mode {
         case .dop:
-            s.append(Step(title: "DSD over PCM", detail: "DSD packed into 24-bit frames with DoP markers", value: "native DSD", tone: .good))
+            s.append(Step(title: String(localized: "DSD over PCM"), detail: String(localized: "DSD packed into 24-bit frames with DoP markers"),
+                          value: String(localized: "native DSD"), tone: .good))
         case .bitstream:
-            s.append(Step(title: "Bitstream", detail: "\(src.codec) frames untouched in IEC 61937 bursts; the receiver decodes",
-                          value: "\(SampleRate.format(path.plan.deviceSampleRate)) kHz carrier", tone: .good))
+            s.append(Step(title: String(localized: "Bitstream"), detail: String(localized: "\(src.codec) frames untouched in IEC 61937 bursts; the receiver decodes"),
+                          value: String(localized: "\(SampleRate.format(path.plan.deviceSampleRate)) kHz carrier"), tone: .good))
         case .pcm:
             if path.plan.dsdConvertedToPCM {
-                s.append(Step(title: "DSD → PCM", detail: "Decimated to \(SampleRate.format(path.plan.decodedSampleRate)) kHz, 32-bit float",
-                              value: "converted", tone: .changed))
+                s.append(Step(title: "DSD → PCM", detail: String(localized: "Decimated to \(SampleRate.format(path.plan.decodedSampleRate)) kHz, 32-bit float"),
+                              value: String(localized: "converted"), tone: .changed))
             }
             if path.isResampling {
-                s.append(Step(title: "Sample rate converter", detail: "Apple mastering-quality SRC",
+                s.append(Step(title: String(localized: "Sample rate converter"), detail: String(localized: "Apple mastering-quality SRC"),
                               value: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz", tone: .changed))
             } else {
-                s.append(Step(title: "Sample rate", detail: "Device switched to match source",
-                              value: "\(SampleRate.format(path.applied.sampleRate)) kHz · native", tone: .good))
+                s.append(Step(title: String(localized: "Sample rate"), detail: String(localized: "Device switched to match source"),
+                              value: String(localized: "\(SampleRate.format(path.applied.sampleRate)) kHz · native"), tone: .good))
             }
         }
         if path.plan.spatial != .off {
-            s.append(Step(title: "Spatial Audio",
-                          detail: "\(ChannelLayouts.name(labels: src.channelLabels, channels: src.channels)) as virtual speakers · Apple spatial renderer, personalized profile if set up",
-                          value: path.plan.spatial == .headTracked ? "head tracked" : "fixed", tone: .changed))
+            s.append(Step(title: String(localized: "Spatial Audio"),
+                          detail: String(localized: "\(ChannelLayouts.name(labels: src.channelLabels, channels: src.channels)) as virtual speakers · Apple spatial renderer, personalized profile if set up"),
+                          value: path.plan.spatial == .headTracked ? String(localized: "head tracked")
+                              : String(localized: "fixed", comment: "Spatial Audio without head tracking"), tone: .changed))
         } else if path.plan.channels < src.channels {
-            s.append(Step(title: "Downmix", detail: "Standard channel-layout mix (centre and surrounds folded in)",
+            s.append(Step(title: String(localized: "Downmix"), detail: String(localized: "Standard channel-layout mix (centre and surrounds folded in)"),
                           value: "\(ChannelLayouts.name(channels: src.channels)) → \(ChannelLayouts.name(channels: path.plan.channels))", tone: .changed))
         } else if src.channels > 2 {
-            s.append(Step(title: "Channels", detail: "Every channel to its speaker (device layout)",
-                          value: "\(ChannelLayouts.name(channels: src.channels)) discrete", tone: .good))
+            s.append(Step(title: String(localized: "Channels"), detail: String(localized: "Every channel to its speaker (device layout)"),
+                          value: String(localized: "\(ChannelLayouts.name(channels: src.channels)) discrete"), tone: .good))
         }
         if let rg = path.replayGainDB, rg != 0 {
-            s.append(Step(title: "ReplayGain", detail: "Loudness normalisation", value: String(format: "%+.1f dB", rg), tone: .changed))
+            s.append(Step(title: "ReplayGain", detail: String(localized: "Loudness normalisation"),
+                          value: "\(rg.formatted(.number.precision(.fractionLength(1)).sign(strategy: .always()))) dB", tone: .changed))
         }
         if let eq = path.equalizer {
-            s.append(Step(title: "Equalizer", detail: "\(eq) · 64-bit parametric", value: "on", tone: .changed))
+            s.append(Step(title: String(localized: "Equalizer"), detail: String(localized: "\(eq) · 64-bit parametric"),
+                          value: String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on"), tone: .changed))
         }
         switch path.volume {
         case .hardware:
-            s.append(Step(title: "Volume", detail: "DAC hardware control", value: "unity · 0.0 dB", tone: .good))
+            s.append(Step(title: String(localized: "Volume"), detail: String(localized: "DAC hardware control"), value: String(localized: "unity · 0.0 dB"), tone: .good))
         case .fixed:
-            s.append(Step(title: "Volume", detail: "Fixed output; use the DAC or amplifier", value: "unity · 0.0 dB", tone: .good))
+            s.append(Step(title: String(localized: "Volume"), detail: String(localized: "Fixed output; use the DAC or amplifier"), value: String(localized: "unity · 0.0 dB"), tone: .good))
         case .digital(let db):
-            s.append(Step(title: "Volume", detail: "64-bit digital, TPDF dither", value: db == 0 ? "unity · 0.0 dB" : String(format: "%.1f dB", db),
+            s.append(Step(title: String(localized: "Volume"), detail: String(localized: "64-bit digital, TPDF dither"),
+                          value: db == 0 ? String(localized: "unity · 0.0 dB") : "\(db.formatted(.number.precision(.fractionLength(1)))) dB",
                           tone: db == 0 ? .good : .changed))
         }
         let a = path.applied
         if let note = path.sixteenBitNote {
-            s.append(Step(title: "Match 16-bit sources", detail: note,
-                          value: "\(a.physicalBitDepth)-bit", tone: path.isBitPerfect ? .good : .plain))
+            s.append(Step(title: String(localized: "Match 16-bit sources"), detail: note,
+                          value: String(localized: "\(a.physicalBitDepth)-bit"), tone: path.isBitPerfect ? .good : .plain))
         }
+        var device = [path.deviceProfile.connection,
+                      a.exclusive ? String(localized: "exclusive (hog)") : String(localized: "shared", comment: "The output device is shared with other apps"),
+                      a.physicalIsInteger ? String(localized: "int \(a.physicalBitDepth)", comment: "Integer samples of this many bits, e.g. int 24")
+                                          : String(localized: "float \(a.physicalBitDepth)", comment: "Floating-point samples of this many bits, e.g. float 32")]
+        if a.integerMode { device.append(String(localized: "integer mode")) }
         s.append(Step(title: path.deviceName,
-                      detail: "\(path.deviceProfile.connection) · \(a.exclusive ? "exclusive (hog)" : "shared") · \(a.physicalIsInteger ? "int" : "float") \(a.physicalBitDepth)\(a.integerMode ? " · integer mode" : "")",
-                      value: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz",
+                      detail: device.joined(separator: " · "),
+                      value: String(localized: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz"),
                       tone: path.isBitPerfect ? .good : .plain))
         return s
     }
@@ -247,7 +258,7 @@ struct SignalPathView: View {
     }
 
     private func channelName(_ n: Int) -> String {
-        n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? "mono" : "stereo")
+        n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? String(localized: "mono") : String(localized: "stereo"))
     }
 }
 
@@ -257,7 +268,7 @@ struct SignalSteps: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            SectionLabel(text: "Signal Path").padding(.bottom, 10)
+            SectionLabel(text: String(localized: "Signal Path")).padding(.bottom, 10)
             ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
                 HStack(alignment: .top, spacing: 10) {
                     ZStack(alignment: .top) {
@@ -295,21 +306,26 @@ struct SystemRenderingView: View {
         VStack(alignment: .leading, spacing: 0) {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
-                    StatusBadge(text: "OBJECTS RENDERED BY MACOS", kind: .perfect)
-                    if rendering.spatial { StatusBadge(text: "SPATIAL") }
+                    StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: .perfect)
+                    if rendering.spatial { StatusBadge(text: String(localized: "SPATIAL", comment: "Badge: Spatial Audio is on")) }
                 }
-                StatusBadge(text: "OBJECTS RENDERED BY MACOS", kind: .perfect)
+                StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: .perfect)
             }
             Hairline().padding(.top, 18)
             SignalSteps(steps: [
-                .init(title: "Source", detail: "Dolby Digital Plus with Atmos objects (JOC) · lossy",
-                      value: rendering.objectLayout.map { "up to \($0)" } ?? "objects"),
-                .init(title: "Dolby Atmos renderer", detail: "macOS renders the objects for this output (the same renderer Apple Music uses)",
-                      value: "objects → speakers", tone: .good),
-                .init(title: rendering.spatial ? "Spatial Audio" : "Output",
-                      detail: rendering.spatial ? "Head tracking and personalized profile as set in Control Center" : "The output's own speaker layout",
-                      value: rendering.spatial ? "on" : "channels", tone: rendering.spatial ? .changed : .plain),
-                .init(title: device ?? "Output", detail: "Frames go to macOS untouched; Vespertine's meters don't apply", value: "system"),
+                .init(title: String(localized: "Source", comment: "First step of the signal path: the file being played"), detail: String(localized: "Dolby Digital Plus with Atmos objects (JOC) · lossy"),
+                      value: rendering.objectLayout.map { String(localized: "up to \($0)", comment: "Up to a speaker layout, e.g. up to 9.1.6") }
+                          ?? String(localized: "objects", comment: "Dolby Atmos audio objects")),
+                .init(title: String(localized: "Dolby Atmos renderer"), detail: String(localized: "macOS renders the objects for this output (the same renderer Apple Music uses)"),
+                      value: String(localized: "objects → speakers"), tone: .good),
+                .init(title: rendering.spatial ? String(localized: "Spatial Audio") : String(localized: "Output"),
+                      detail: rendering.spatial ? String(localized: "Head tracking and personalized profile as set in Control Center")
+                          : String(localized: "The output's own speaker layout"),
+                      value: rendering.spatial ? String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on")
+                          : String(localized: "channels", comment: "Audio goes out as the output's channels"),
+                      tone: rendering.spatial ? .changed : .plain),
+                .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; Vespertine's meters don't apply"),
+                      value: String(localized: "system", comment: "The macOS system renderer handles this step")),
             ])
             .padding(.top, 14)
         }
@@ -324,7 +340,7 @@ struct ChannelMetersView: View {
     var body: some View {
         let names = path.applied.channelNames
         VStack(alignment: .leading, spacing: 10) {
-            SectionLabel(text: path.plan.spatial != .off ? "Channels · Spatial Audio" : "Channels")
+            SectionLabel(text: path.plan.spatial != .off ? String(localized: "Channels · Spatial Audio") : String(localized: "Channels"))
             HStack(alignment: .bottom, spacing: 6) {
                 ForEach(Array(names.enumerated()), id: \.offset) { i, name in
                     VStack(spacing: 4) {
@@ -351,22 +367,29 @@ struct ChannelMetersView: View {
     private var summary: String {
         let src = ChannelLayouts.name(labels: path.source.channelLabels, channels: path.source.channels)
         if path.plan.spatial != .off {
-            return "\(src) placed as virtual speakers around you and rendered for \(path.deviceName)."
+            return String(localized: "\(src) placed as virtual speakers around you and rendered for \(path.deviceName).")
         }
         if path.plan.channels < path.source.channels {
-            return "\(src) folded into \(ChannelLayouts.name(channels: path.plan.channels)) by speaker position."
+            return String(localized: "\(src) folded into \(ChannelLayouts.name(channels: path.plan.channels)) by speaker position.")
         }
         let speakers = path.applied.speakerNames
-        var text = "\(path.plan.channels) channels to \(path.deviceName)"
-        if path.applied.streamCount > 1 { text += " across \(path.applied.streamCount) outputs" }
-        if !speakers.isEmpty {
-            let used = Set(path.applied.channelNames)
-            let silent = speakers.filter { !used.contains($0) }
-            text += ", each on its matching speaker" + (silent.isEmpty ? "." : "; \(silent.joined(separator: " ")) stay silent.")
-        } else {
-            text += " in standard order (1 L, 2 R, 3 C, 4 LFE, 5 Ls, 6 Rs…). Set up speakers in Audio MIDI Setup to place them by position."
+        let channels = path.plan.channels, device = path.deviceName, streams = path.applied.streamCount
+        // Whole sentences, so each language can order them its own way.
+        guard !speakers.isEmpty else {
+            return streams > 1
+                ? String(localized: "\(channels) channels to \(device) across \(streams) outputs in standard order (1 L, 2 R, 3 C, 4 LFE, 5 Ls, 6 Rs…). Set up speakers in Audio MIDI Setup to place them by position.")
+                : String(localized: "\(channels) channels to \(device) in standard order (1 L, 2 R, 3 C, 4 LFE, 5 Ls, 6 Rs…). Set up speakers in Audio MIDI Setup to place them by position.")
         }
-        return text
+        let used = Set(path.applied.channelNames)
+        let silent = speakers.filter { !used.contains($0) }.joined(separator: " ")
+        if silent.isEmpty {
+            return streams > 1
+                ? String(localized: "\(channels) channels to \(device) across \(streams) outputs, each on its matching speaker.")
+                : String(localized: "\(channels) channels to \(device), each on its matching speaker.")
+        }
+        return streams > 1
+            ? String(localized: "\(channels) channels to \(device) across \(streams) outputs, each on its matching speaker; \(silent) stay silent.")
+            : String(localized: "\(channels) channels to \(device), each on its matching speaker; \(silent) stay silent.")
     }
 }
 
@@ -376,12 +399,12 @@ struct SpeakerSetupHint: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: configured ? "hifispeaker.2.fill" : "exclamationmark.circle").foregroundStyle(configured ? Palette.brass : Palette.copper)
-            Text(configured
-                 ? "Multichannel music goes to each speaker by position."
-                 : "No speaker layout is set up, so channels go out in standard order. Set one up to place each channel on its speaker.")
+            (configured
+                 ? Text("Multichannel music goes to each speaker by position.")
+                 : Text("No speaker layout is set up, so channels go out in standard order. Set one up to place each channel on its speaker."))
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
-            Button(configured ? "Speakers…" : "Configure Speakers…") {
+            Button(configured ? String(localized: "Speakers…") : String(localized: "Configure Speakers…")) {
                 NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/Utilities/Audio MIDI Setup.app"))
             }
             .buttonStyle(QuietButtonStyle(compact: true))
@@ -395,7 +418,7 @@ struct IdleDevicePanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionLabel(text: "Output Device")
+            SectionLabel(text: String(localized: "Output Device"))
             if let d = model.activeDevice {
                 HStack(spacing: 10) {
                     Image(systemName: d.profile.symbol).font(.system(size: 22, weight: .light)).foregroundStyle(Palette.brassHi)
@@ -412,12 +435,13 @@ struct IdleDevicePanel: View {
                         let speakers = d.speakerNames
                         GridRow {
                             key("Speakers")
-                            val(speakers.isEmpty ? "Not set up" : "\(ChannelLayouts.name(channels: speakers.count)) · \(speakers.joined(separator: " "))")
+                            val(speakers.isEmpty ? String(localized: "Not set up") : "\(ChannelLayouts.name(channels: speakers.count)) · \(speakers.joined(separator: " "))")
                         }
                     }
                     GridRow { key("Current rate"); val("\(SampleRate.format(d.nominalSampleRate)) kHz") }
-                    GridRow { key("Volume"); val(d.hasHardwareVolume ? "Hardware" : "Fixed") }
-                    GridRow { key("DoP"); val(d.capabilities.supportsDoP ? "Enabled" : "Off") }
+                    GridRow { key("Volume"); val(d.hasHardwareVolume ? String(localized: "Hardware", comment: "Volume is set by the device's hardware control")
+                                                          : String(localized: "Fixed", comment: "The device's volume can't be changed")) }
+                    GridRow { key("DoP"); val(d.capabilities.supportsDoP ? String(localized: "Enabled", comment: "DoP is on") : String(localized: "Off", comment: "DoP is off")) }
                 }
                 if let note = d.profile.note {
                     Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
@@ -431,14 +455,14 @@ struct IdleDevicePanel: View {
         }
     }
 
-    private func key(_ s: String) -> some View { Text(s).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
+    private func key(_ s: LocalizedStringKey) -> some View { Text(s).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
     private func val(_ s: String) -> some View { Text(s).font(Typeface.mono(11)).foregroundStyle(Palette.text2) }
 
     private func bitDepths(_ d: OutputDevice) -> String {
         let ints = Set(d.capabilities.physicalFormats.filter(\.isInteger).map(\.bitDepth)).sorted()
-        if !ints.isEmpty { return ints.map(String.init).joined(separator: " / ") + "-bit integer" }
+        if !ints.isEmpty { return String(localized: "\(ints.map(String.init).joined(separator: " / "))-bit integer", comment: "Bit depths, e.g. 16 / 24 / 32-bit integer") }
         let floats = Set(d.capabilities.physicalFormats.map(\.bitDepth)).sorted()
-        return floats.isEmpty ? "—" : floats.map(String.init).joined(separator: " / ") + "-bit float"
+        return floats.isEmpty ? "—" : String(localized: "\(floats.map(String.init).joined(separator: " / "))-bit float", comment: "Bit depths, e.g. 32-bit float")
     }
 }
 
@@ -522,7 +546,7 @@ struct AnalysisPanel: View {
                 }
                 if let track {
                     Text(track.title).font(Typeface.serif(20)).foregroundStyle(Palette.text)
-                    Text("\(track.formatSummary) · \(track.displayArtist)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
+                    Text("\(track.formatSummary) · \(track.displayArtist.libraryDisplayName)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                     content(for: track)
                 } else {
                     Text("Select or play a track to analyze it.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)
@@ -546,24 +570,24 @@ struct AnalysisPanel: View {
     private func content(for track: Track) -> some View {
         let busy = model.analysis.isAnalyzing(track)
         if track.isDSD || !track.isLossless {
-            Text(track.isDSD ? "DSD sources don't have a PCM word length to check." : "Lossy files are what they say they are; analysis is for lossless files.")
+            (track.isDSD ? Text("DSD sources don't have a PCM word length to check.") : Text("Lossy files are what they say they are; analysis is for lossless files."))
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
         } else if let stored {
             results(stored.analysis)
             HStack(spacing: 10) {
-                Text(stored.isCurrent ? "Analyzed \(stored.analyzedAt.formatted(.relative(presentation: .named)))"
-                                      : "From an older analysis or an earlier version of the file")
+                (stored.isCurrent ? Text("Analyzed \(stored.analyzedAt.formatted(.relative(presentation: .named)))")
+                                  : Text("From an older analysis or an earlier version of the file"))
                     .font(Typeface.ui(10.5)).foregroundStyle(stored.isCurrent ? Palette.text3 : Palette.copper)
                 Spacer()
                 if busy { ProgressView().controlSize(.small).tint(Palette.brass) }
-                Button(stored.isCurrent ? "Re-analyze" : "Update") { model.analysis.analyzeNow([track]) }
+                Button(stored.isCurrent ? String(localized: "Re-analyze") : String(localized: "Update", comment: "Button: analyze the file again, its result is out of date")) { model.analysis.analyzeNow([track]) }
                     .buttonStyle(QuietButtonStyle(compact: true)).disabled(busy)
             }
         } else {
             Text("Decodes the file at its native rate and checks for zero-padded bits, upsampling, lossy origins and synthesized high frequencies. Nothing is modified.")
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 10) {
-                Button(busy ? "Analyzing…" : "Analyze") { model.analysis.analyzeNow([track]) }
+                Button(busy ? String(localized: "Analyzing…") : String(localized: "Analyze")) { model.analysis.analyzeNow([track]) }
                     .buttonStyle(BrassButtonStyle()).disabled(busy)
                 if busy { ProgressView().controlSize(.small).tint(Palette.brass) }
             }
@@ -593,25 +617,30 @@ struct AnalysisPanel: View {
             HStack(spacing: 8) { verdictBadges(r, ok: ok) }
             VStack(alignment: .leading, spacing: 6) { verdictBadges(r, ok: ok) }
         }
-        Text(r.summary).font(Typeface.ui(12.5)).foregroundStyle(Palette.text).fixedSize(horizontal: false, vertical: true)
+        Text(r.localizedSummary).font(Typeface.ui(12.5)).foregroundStyle(Palette.text).fixedSize(horizontal: false, vertical: true)
         Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 6) {
-            GridRow { k("Claimed"); v(r.claimedBitDepth.map { "\($0)-bit" } ?? "—") }
-            GridRow { k("Effective"); v(r.effectiveBitDepth.map { "\($0)-bit" } ?? "not checked") }
-            GridRow { k("Recorded to"); v(String(format: "%.1f kHz of %@ kHz", r.bandwidthHz / 1000, SampleRate.format(r.sampleRate / 2))) }
+            GridRow { k("Claimed"); v(r.claimedBitDepth.map { String(localized: "\($0)-bit") } ?? "—") }
+            GridRow { k("Effective"); v(r.effectiveBitDepth.map { String(localized: "\($0)-bit") } ?? String(localized: "not checked")) }
+            GridRow { k("Recorded to"); v(String(localized: "\(Self.decimal(r.bandwidthHz / 1000, 1)) kHz of \(SampleRate.format(r.sampleRate / 2)) kHz")) }
             if let f = r.forensics {
                 if let hz = f.cliffHz, f.cliffDropDB >= 12 {
-                    GridRow { k("Steepest cutoff"); v(String(format: "%.1f kHz, %.0f dB drop in %d%% of frames", hz / 1000, f.cliffDropDB, Int(f.cliffConsistency * 100))) }
+                    GridRow { k("Steepest cutoff"); v(String(localized: "\(Self.decimal(hz / 1000, 1)) kHz, \(Self.decimal(f.cliffDropDB, 0)) dB drop in \(Int(f.cliffConsistency * 100))% of frames")) }
                 }
                 if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
-                    let follows = f.shelfTracking.map { String(format: ", follows the music (r %.2f)", $0) } ?? ""
-                    GridRow { k("Shelf"); v(String(format: "%.1f–%.1f kHz, %.1f dB/kHz", shelf / 1000, f.shelfEndHz / 1000, f.shelfSlope) + follows) }
+                    let range = "\(Self.decimal(shelf / 1000, 1))–\(Self.decimal(f.shelfEndHz / 1000, 1))"
+                    let slope = Self.decimal(f.shelfSlope, 1)
+                    GridRow {
+                        k("Shelf")
+                        v(f.shelfTracking.map { String(localized: "\(range) kHz, \(slope) dB/kHz, follows the music (r \(Self.decimal($0, 2)))") }
+                            ?? "\(range) kHz, \(slope) dB/kHz")
+                    }
                 }
             }
-            GridRow { k("Peak"); v(r.peakDBFS.isFinite ? String(format: "%.2f dBFS", r.peakDBFS) : "silent") }
+            GridRow { k("Peak"); v(r.peakDBFS.isFinite ? "\(Self.decimal(r.peakDBFS, 2)) dBFS" : String(localized: "silent")) }
             GridRow { k("Clipped samples"); v("\(r.clippedSamples)") }
-            GridRow { k("Decoded"); v(String(format: "%.0f s", r.secondsAnalyzed)) }
+            GridRow { k("Decoded"); v("\(Self.decimal(r.secondsAnalyzed, 0)) s") }
         }
-        SectionLabel(text: "Long-term spectrum").padding(.top, 6)
+        SectionLabel(text: String(localized: "Long-term spectrum")).padding(.top, 6)
         SpectrumPlot(values: r.spectrum, nyquist: r.sampleRate / 2,
                      markers: markers(r)).frame(height: 140)
     }
@@ -622,7 +651,8 @@ struct AnalysisPanel: View {
         if r.version >= 2, r.verdict != .notApplicable {
             // Results from before version 3 weren't capped: a spectrum alone is never shown as high confidence.
             let confidence = r.version < 3 && r.verdict != .paddedBitDepth ? min(r.confidence, FileAnalyzer.spectralConfidenceCap) : r.confidence
-            StatusBadge(text: confidence >= 0.8 ? "HIGH CONFIDENCE" : confidence >= 0.6 ? "LIKELY" : "POSSIBLE")
+            StatusBadge(text: confidence >= 0.8 ? String(localized: "HIGH CONFIDENCE")
+                : confidence >= 0.6 ? String(localized: "LIKELY", comment: "Confidence of an analysis verdict") : String(localized: "POSSIBLE", comment: "Confidence of an analysis verdict"))
         }
     }
 
@@ -630,17 +660,22 @@ struct AnalysisPanel: View {
         guard let f = r.forensics, r.verdict != .genuine else { return [] }
         var m: [SpectrumPlot.Marker] = []
         if r.verdict == .bandwidthExtended, let shelf = f.shelfHz {
-            m.append(.init(hz: shelf, label: "cutoff"))
+            m.append(.init(hz: shelf, label: String(localized: "cutoff", comment: "Marker on a spectrum plot")))
             if f.shelfEndHz > shelf { m.append(.init(hz: f.shelfEndHz, label: "")) }
         } else if let hz = f.cliffHz {
-            m.append(.init(hz: hz, label: "cutoff"))
+            m.append(.init(hz: hz, label: String(localized: "cutoff", comment: "Marker on a spectrum plot")))
         }
         return m
     }
 
-    private func k(_ s: String) -> some View { Text(s).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
+    private func k(_ s: LocalizedStringKey) -> some View { Text(s).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
     private func v(_ s: String) -> some View {
         Text(s).font(Typeface.mono(11)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// A number with this many decimals, in the user's locale ("44,1" in German).
+    private static func decimal(_ x: Double, _ digits: Int) -> String {
+        x.formatted(.number.precision(.fractionLength(digits)).grouping(.never))
     }
 }
 
@@ -649,12 +684,12 @@ struct AnalysisPanel: View {
 enum AnalysisVerdictText {
     static func badge(_ v: FileAnalysis.Verdict) -> String {
         switch v {
-        case .genuine: "GENUINE"
-        case .paddedBitDepth: "PADDED BIT DEPTH"
-        case .upsampled: "UPSAMPLED?"
-        case .possibleLossyOrigin: "LOSSY ORIGIN?"
-        case .bandwidthExtended: "SYNTHETIC HIGH FREQUENCIES?"
-        case .notApplicable: "INCONCLUSIVE"
+        case .genuine: String(localized: "GENUINE", comment: "Analysis verdict badge")
+        case .paddedBitDepth: String(localized: "PADDED BIT DEPTH")
+        case .upsampled: String(localized: "UPSAMPLED?")
+        case .possibleLossyOrigin: String(localized: "LOSSY ORIGIN?")
+        case .bandwidthExtended: String(localized: "SYNTHETIC HIGH FREQUENCIES?")
+        case .notApplicable: String(localized: "INCONCLUSIVE", comment: "Analysis verdict badge")
         }
     }
 }

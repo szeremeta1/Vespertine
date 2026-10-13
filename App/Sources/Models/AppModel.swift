@@ -26,6 +26,14 @@ enum DetailRoute: Hashable {
 enum InspectorTab: String, CaseIterable, Identifiable {
     case nowPlaying = "Now Playing", details = "Details", analysis = "Analysis"
     var id: String { rawValue }
+    /// The tab's name on screen (the raw value is matched by the `-VespertineInspectorTab` QA hook).
+    var label: String {
+        switch self {
+        case .nowPlaying: String(localized: "Now Playing")
+        case .details: String(localized: "Details")
+        case .analysis: String(localized: "Analysis")
+        }
+    }
 }
 
 /// Output devices and the chosen one's hardware volume.
@@ -277,7 +285,7 @@ final class AppModel {
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
-        return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? "The selected output"
+        return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
     }
 
     /// Keeps the chosen output chosen: remembers what it is while it's connected, and when it comes back under
@@ -351,7 +359,7 @@ final class AppModel {
         undoManager.registerUndo(withTarget: self) { model in
             MainActor.assumeIsolated { model.setFavorite(!favorite, trackIDs: trackIDs, undoManager: undoManager) }
         }
-        undoManager.setActionName(favorite ? "Add to Favorites" : "Remove from Favorites")
+        undoManager.setActionName(favorite ? String(localized: "Add to Favorites") : String(localized: "Remove from Favorites"))
     }
 
     /// A song's cover, or its album's when the song carries none of its own (an album where only some files have

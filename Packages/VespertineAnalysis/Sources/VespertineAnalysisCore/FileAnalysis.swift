@@ -62,6 +62,28 @@ public struct FileAnalysis: Sendable, Hashable, Codable {
         FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: nil, sampleRate: sampleRate, bandwidthHz: 0, peakDBFS: 0,
                      clippedSamples: 0, verdict: .notApplicable, summary: summary, spectrum: [])
     }
+
+    /// `summary` in the current language, with numbers in the current locale's format: what to show. The stored
+    /// `summary` keeps the language that was current when the file was analyzed (and English from a server), so this
+    /// words it anew from the stored measurements, as the stored verdict was reached. Results that kept no
+    /// measurements (version 1; lossy, DSD or DTS sources) and ones a newer analyzer would judge differently come back
+    /// as stored, translated where they are one of the fixed sentences.
+    public var localizedSummary: String {
+        guard version >= 2, let f = forensics else {
+            switch summary {
+            case "DSD source: bit depth analysis doesn't apply.": return localized("DSD source: bit depth analysis doesn't apply.")
+            case "Lossy source: analysis doesn't apply.": return localized("Lossy source: analysis doesn't apply.")
+            default: return summary
+            }
+        }
+        // A word length only counts when it was checked against a known one of at most 24 bits (as in `rejudged`).
+        let effective = claimedBitDepth.map { $0 <= 24 } == true ? effectiveBitDepth : nil
+        let worded = FileAnalyzer.conclude(forensics: f, claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective,
+                                           sampleRate: sampleRate, peakDBFS: peakDBFS, clippedSamples: clippedSamples,
+                                           bandwidth: bandwidthHz, spectrum: [], secondsAnalyzed: secondsAnalyzed,
+                                           locale: .current)
+        return worded.verdict == verdict ? worded.summary : summary
+    }
 }
 
 public enum AnalysisError: Error, Sendable {
@@ -197,28 +219,30 @@ public enum FileAnalyzer {
     /// brought up to date (`rejudged`) both come through here.
     static func conclude(forensics measured: SpectralForensics, claimedBitDepth: Int?, effectiveBitDepth effective: Int?,
                          sampleRate: Double, peakDBFS: Double, clippedSamples clipped: Int, bandwidth: Double,
-                         spectrum: [Float], secondsAnalyzed seconds: Double) -> FileAnalysis {
+                         spectrum: [Float], secondsAnalyzed seconds: Double,
+                         locale: Locale = .analysisPOSIX) -> FileAnalysis {
         let claimed = claimedBitDepth ?? 24
         if !peakDBFS.isFinite {
             // Nothing but digital silence decoded: no evidence either way, so never call it genuine.
             return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: nil, sampleRate: sampleRate,
                                 bandwidthHz: 0, peakDBFS: -.infinity, clippedSamples: 0, verdict: .notApplicable,
-                                summary: "The file decoded as digital silence, so there's nothing to analyze.", spectrum: spectrum,
+                                summary: localized("The file decoded as digital silence, so there's nothing to analyze."), spectrum: spectrum,
                                 secondsAnalyzed: seconds, forensics: measured, version: FileAnalysis.currentVersion, confidence: 0)
         }
-        let judged = judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: sampleRate)
+        let judged = judge(forensics: measured, claimedBits: claimed, effectiveBits: effective, sampleRate: sampleRate, locale: locale)
         // Too little to judge the spectrum on: a very short file, or nothing that stands out from the floor (very quiet,
         // or channels that cancel when mixed to mono). Zero padding is exact and still reported; nothing else is.
         let minimumFrames = 6
         if judged.verdict != .paddedBitDepth, measured.framesAnalyzed < minimumFrames || measured.contentHz == 0 {
             let reason = measured.framesAnalyzed < minimumFrames
-                ? "Too short for the spectral checks (they need a couple of seconds of audio), so the result is inconclusive."
-                : "Nothing in the spectrum stands out from the noise floor (very quiet, or the channels cancel when mixed to mono), so the spectral checks are inconclusive."
+                ? localized("Too short for the spectral checks (they need a couple of seconds of audio), so the result is inconclusive.")
+                : localized("Nothing in the spectrum stands out from the noise floor (very quiet, or the channels cancel when mixed to mono), so the spectral checks are inconclusive.")
             let bits: String
             if let effective, effective > 0 {
-                bits = effective >= claimed ? " No zero padding: all \(claimed) bits are in use." : " No zero padding: \(effective) of \(claimed) bits are in use."
+                bits = " " + (effective >= claimed ? localized("No zero padding: all \(claimed) bits are in use.")
+                                                   : localized("No zero padding: \(effective) of \(claimed) bits are in use."))
             } else {
-                bits = " Word length not checked."
+                bits = " " + localized("Word length not checked.")
             }
             return FileAnalysis(claimedBitDepth: claimedBitDepth, effectiveBitDepth: effective, sampleRate: sampleRate,
                                 bandwidthHz: 0, peakDBFS: peakDBFS, clippedSamples: clipped, verdict: .notApplicable,
@@ -278,12 +302,14 @@ public enum FileAnalyzer {
     /// HE-AAC (SBR), 44.1 kHz upsampling and 16-bit padding (see docs/ANALYSIS.md). Genuine CD
     /// masters show anti-alias walls at 20.4–21.3 kHz (steep ones, up to ~39 dB, at 21.1 kHz and
     /// above), so only walls below 20.7 kHz count against a CD-rate file.
-    public static func judge(forensics f: SpectralForensics, claimedBits: Int, effectiveBits: Int?, sampleRate: Double)
+    /// The summary's numbers use `locale`'s decimal separator (the stored text: always '.'; on display: the user's).
+    public static func judge(forensics f: SpectralForensics, claimedBits: Int, effectiveBits: Int?, sampleRate: Double,
+                             locale: Locale = Locale(identifier: "en_US_POSIX"))
         -> (verdict: FileAnalysis.Verdict, summary: String, confidence: Double, bandwidth: Double?) {
-        func khz(_ hz: Double) -> String { String(format: "%.1f", hz / 1000) }
-        func percent(_ x: Double) -> String { "\(Int((x * 100).rounded()))%" }
+        func khz(_ hz: Double) -> String { String(format: "%.1f", locale: locale, hz / 1000) }
+        func percent(_ x: Double) -> Int { Int((x * 100).rounded()) }
         if let effectiveBits, effectiveBits > 0, effectiveBits < claimedBits - 1 {
-            return (.paddedBitDepth, "\(claimedBits)-bit file, but only \(effectiveBits) bits carry audio (zero-padded).", 1, nil)
+            return (.paddedBitDepth, localized("\(claimedBits)-bit file, but only \(effectiveBits) bits carry audio (zero-padded)."), 1, nil)
         }
         // Below 44.1 kHz a file's own anti-alias filter falls in the codec zone: the top tenth of its band is that
         // filter, not a codec wall (a genuine 32 kHz master cuts off near 15 kHz).
@@ -326,63 +352,73 @@ public enum FileAnalyzer {
             let closedByWall = f.cliffHz.map { $0 > shelf + 1_000 && f.cliffDropDB >= 22 && f.cliffConsistency >= 0.85 } ?? false
             let conf = min(spectralConfidenceCap,
                            0.55 + (f.shelfConsistency - 0.8) + min(0.3, (f.shelfStepDB - 10) / 60) + (closedByWall ? 0.15 : 0))
-            let moving = f.shelfTracking == nil ? "" : " that rises and falls with the music"
-            return (.bandwidthExtended,
-                    "Steep step at ~\(khz(shelf)) kHz in \(percent(f.shelfConsistency)) of the music (\(Int(f.shelfStepDB.rounded())) dB), then a flat shelf of content up to ~\(khz(f.shelfEndHz)) kHz\(moving). High frequencies synthesized over a lossy source (HE-AAC SBR, AI \u{201C}enhancement\u{201D}) look like this; so can an exciter or noise reduction used on a band-limited recording.",
-                    conf, shelf)
+            let step = khz(shelf), end = khz(f.shelfEndHz), share = percent(f.shelfConsistency), dB = Int(f.shelfStepDB.rounded())
+            let text = f.shelfTracking == nil
+                ? localized("Steep step at ~\(step) kHz in \(share)% of the music (\(dB) dB), then a flat shelf of content up to ~\(end) kHz. High frequencies synthesized over a lossy source (HE-AAC SBR, AI \u{201C}enhancement\u{201D}) look like this; so can an exciter or noise reduction used on a band-limited recording.")
+                : localized("Steep step at ~\(step) kHz in \(share)% of the music (\(dB) dB), then a flat shelf of content up to ~\(end) kHz that rises and falls with the music. High frequencies synthesized over a lossy source (HE-AAC SBR, AI \u{201C}enhancement\u{201D}) look like this; so can an exciter or noise reduction used on a band-limited recording.")
+            return (.bandwidthExtended, text, conf, shelf)
         }
         if let wall {
-            var text = "Steep cutoff at ~\(khz(wall.hz)) kHz in \(percent(wall.consistency)) of the music (\(Int(wall.drop.rounded())) dB drop). MP3, AAC and Opus encodes look like this, but so do steep mastering or anti-alias filters, FM broadcast sources and band-limited historical masters."
+            let cutoff = khz(wall.hz), share = percent(wall.consistency), drop = Int(wall.drop.rounded())
+            var text = localized("Steep cutoff at ~\(cutoff) kHz in \(share)% of the music (\(drop) dB drop). MP3, AAC and Opus encodes look like this, but so do steep mastering or anti-alias filters, FM broadcast sources and band-limited historical masters.")
             if let tracking = f.shelfTracking, tracking < shelfTrackingThreshold, let shelf = f.shelfHz, abs(shelf - wall.hz) <= 1_000,
                f.shelfEndHz - shelf >= 1_500, f.shelfAboveFloorDB >= 10 {
-                text += " Above it, steady noise-like content that doesn't follow the music, as analog tape hiss or vinyl surface noise added after the cutoff would be."
+                text += " " + localized("Above it, steady noise-like content that doesn't follow the music, as analog tape hiss or vinyl surface noise added after the cutoff would be.")
             } else if encoderBand, follows, let shelf = f.shelfHz, f.shelfEndHz - shelf >= 1_500, f.shelfAboveFloorDB >= 10 {
-                text += " Between ~\(khz(shelf)) and ~\(khz(f.shelfEndHz)) kHz, a narrow band of quieter content that follows the music, as a lossy encoder's low-pass transition leaves."
+                let low = khz(shelf), high = khz(f.shelfEndHz)
+                text += " " + localized("Between ~\(low) and ~\(high) kHz, a narrow band of quieter content that follows the music, as a lossy encoder's low-pass transition leaves.")
             }
             return (.possibleLossyOrigin, text, wallConfidence, wall.hz)
         }
         // "22.05" or "24": where a mirror is.
-        func nyquistText(_ hz: Double) -> String { abs(hz - 22_050) < 1 ? "22.05" : rateText(hz) }
+        func nyquistText(_ hz: Double) -> String { abs(hz - 22_050) < 1 ? String(format: "%.2f", locale: locale, 22.05) : rateText(hz, locale: locale) }
+        let fileRate = rateText(sampleRate, locale: locale)
         // Imaging: above the old Nyquist of a 44.1/48 kHz source, a mirror image of the music just below it, which an
         // upsampler's filter leaves when it's short (ffmpeg's default; its wall lands at ~28 kHz, outside the zone below).
         if hiRes, let old = f.mirrorHz, let r = f.mirrorCorrelation, r >= mirrorThreshold, (f.mirrorFrames ?? 0) >= mirrorMinimumFrames {
-            let source = rateText(2 * old)
+            let source = rateText(2 * old, locale: locale), nyquist = nyquistText(old)
+            let correlation = String(format: "%.2f", locale: locale, r), frames = f.mirrorFrames ?? 0
             return (.upsampled,
-                    "Above \(nyquistText(old)) kHz, the spectrum mirrors the music just below it, moment by moment (r \(String(format: "%.2f", r)) in \(f.mirrorFrames ?? 0) frames): the image a sample-rate converter leaves behind. A \(source) kHz master upsampled to \(rateText(sampleRate)) kHz looks like this; so does a mix with parts recorded or processed at \(source) kHz.",
+                    localized("Above \(nyquist) kHz, the spectrum mirrors the music just below it, moment by moment (r \(correlation) in \(frames) frames): the image a sample-rate converter leaves behind. A \(source) kHz master upsampled to \(fileRate) kHz looks like this; so does a mix with parts recorded or processed at \(source) kHz."),
                     min(spectralConfidenceCap, 0.6 + (r - mirrorThreshold) / 2), old)
         }
         if hiRes, let hz = f.cliffHz, hz >= 19_600, hz <= 24_500, f.cliffDropDB >= 18, f.cliffConsistency >= 0.9 {
+            let cutoff = khz(hz), share = percent(f.cliffConsistency), drop = Int(f.cliffDropDB.rounded())
+            let limit = rateText(sampleRate / 2, locale: locale), cd = rateText(44_100, locale: locale)
             return (.upsampled,
-                    "Steep cutoff at ~\(khz(hz)) kHz in \(percent(f.cliffConsistency)) of the music (\(Int(f.cliffDropDB.rounded())) dB drop), far below this \(rateText(sampleRate)) kHz file's \(rateText(sampleRate / 2)) kHz limit. A 44.1 or 48 kHz master (or a lossy file) upsampled to \(rateText(sampleRate)) kHz looks like this; so does a steep low-pass applied in mastering or in a DSD-to-PCM conversion.",
+                    localized("Steep cutoff at ~\(cutoff) kHz in \(share)% of the music (\(drop) dB drop), far below this \(fileRate) kHz file's \(limit) kHz limit. A \(cd) or 48 kHz master (or a lossy file) upsampled to \(fileRate) kHz looks like this; so does a steep low-pass applied in mastering or in a DSD-to-PCM conversion."),
                     min(spectralConfidenceCap, 0.6 + (f.cliffDropDB - 18) / 40), hz)
         }
         let reach = f.contentHz
         var note: String
         if let effectiveBits, effectiveBits > 0 {
-            note = effectiveBits >= claimedBits ? "No zero padding: all \(claimedBits) bits are in use."
-                                                 : "No zero padding: \(effectiveBits) of \(claimedBits) bits are in use."
+            note = effectiveBits >= claimedBits ? localized("No zero padding: all \(claimedBits) bits are in use.")
+                                                 : localized("No zero padding: \(effectiveBits) of \(claimedBits) bits are in use.")
         } else {
-            note = claimedBits > 24 ? "Word length not checked (padding is only tested up to 24 bits)." : "Word length not checked."
+            note = claimedBits > 24 ? localized("Word length not checked (padding is only tested up to 24 bits).") : localized("Word length not checked.")
         }
-        note += " No codec-like cutoff, synthetic-looking shelf or upsampling wall found."
+        note += " " + localized("No codec-like cutoff, synthetic-looking shelf or upsampling wall found.")
         if let hz = f.cliffHz, ownFilter(hz), f.cliffDropDB >= 15 {
-            note += " The steep cutoff at ~\(khz(hz)) kHz is this \(rateText(sampleRate)) kHz file's own anti-alias filter."
+            let cutoff = khz(hz)
+            note += " " + localized("The steep cutoff at ~\(cutoff) kHz is this \(fileRate) kHz file's own anti-alias filter.")
         }
         if hiRes, let old = f.mirrorHz, let r = f.mirrorCorrelation, (f.mirrorFrames ?? 0) >= mirrorMinimumFrames, r < mirrorThreshold {
-            note += " What's above \(nyquistText(old)) kHz isn't a mirror image of the music below it, as an upsampler's would be."
+            let nyquist = nyquistText(old)
+            note += " " + localized("What's above \(nyquist) kHz isn't a mirror image of the music below it, as an upsampler's would be.")
         }
         if sampleRate >= 88_200, reach > 0, reach < 26_000 {
-            note += " Little recorded above ~\(khz(reach)) kHz, which is normal for analog-era masters."
+            let top = khz(reach)
+            note += " " + localized("Little recorded above ~\(top) kHz, which is normal for analog-era masters.")
         }
         // No flag isn't proof: some high-bitrate lossy files pass, and an unchecked word length proves nothing.
         return (.genuine, note, effectiveBits.map { $0 > 0 } == true ? 0.7 : 0.5, reach > 0 ? reach : nil)
     }
 
-    /// "44.1", "48", "192", "352.8"
-    static func rateText(_ rate: Double) -> String {
+    /// "44.1", "48", "192", "352.8" (with `locale`'s decimal separator)
+    static func rateText(_ rate: Double, locale: Locale = .analysisPOSIX) -> String {
         let k = rate / 1000
         if abs(k.rounded() - k) < 0.01 { return String(Int(k.rounded())) }
-        return String(format: "%.1f", k)
+        return String(format: "%.1f", locale: locale, k)
     }
 
     /// Highest frequency whose smoothed level is clearly above the top-band noise floor.

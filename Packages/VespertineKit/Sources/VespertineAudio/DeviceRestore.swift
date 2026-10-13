@@ -13,10 +13,10 @@ public enum DeviceOnQuit: String, CaseIterable, Sendable, Identifiable {
     public var id: String { rawValue }
     public var label: String {
         switch self {
-        case .restore: "Put it back as it was"
-        case .cd: "44.1 kHz · 16-bit"
-        case .dat: "48 kHz · 24-bit"
-        case .leave: "Leave it as it is"
+        case .restore: String(localized: "Put it back as it was", comment: "What to do with the output device's format when Vespertine quits.")
+        case .cd: String(localized: "44.1 kHz · 16-bit", comment: "Output device format to set when Vespertine quits.")
+        case .dat: String(localized: "48 kHz · 24-bit", comment: "Output device format to set when Vespertine quits.")
+        case .leave: String(localized: "Leave it as it is", comment: "What to do with the output device's format when Vespertine quits.")
         }
     }
 }

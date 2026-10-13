@@ -57,12 +57,12 @@ struct TransportBar: View {
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)
-                        Text("\(track.displayArtist) — \(track.displayAlbum)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                        Text("\(track.displayArtist.libraryDisplayName) — \(track.displayAlbum.libraryDisplayName)").font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("\(track.title), \(track.displayArtist), \(track.displayAlbum)")
+                .accessibilityLabel("\(track.title), \(track.displayArtist.libraryDisplayName), \(track.displayAlbum.libraryDisplayName)")
                 .accessibilityHint("Opens the album")
                 FavoriteButton(track: track)
             } else {
@@ -84,7 +84,7 @@ struct TransportControls: View {
                     Button { player.shuffle.toggle() } label: { Image(systemName: "shuffle").font(.system(size: 13)) }
                         .buttonStyle(TransportIconStyle(active: player.shuffle)).help("Shuffle")
                         .accessibilityLabel("Shuffle")
-                        .accessibilityValue(player.shuffle ? "On" : "Off")
+                        .accessibilityValue(player.shuffle ? String(localized: "On", comment: "Shuffle state") : String(localized: "Off", comment: "Shuffle state"))
                 }
                 Button { player.previous() } label: { Image(systemName: "backward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
@@ -100,7 +100,7 @@ struct TransportControls: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.space, modifiers: [.option])
-                .accessibilityLabel(player.isPlaying || player.waitingForDevice != nil ? "Pause" : "Play")
+                .accessibilityLabel(player.isPlaying || player.waitingForDevice != nil ? String(localized: "Pause", comment: "Button: pause playback") : String(localized: "Play", comment: "Button: start playback"))
                 Button { player.next() } label: { Image(systemName: "forward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
                     .accessibilityLabel("Next")
@@ -115,6 +115,9 @@ struct TransportControls: View {
             }
             if !compact { Scrubber() }
         }
+        // Playback controls and the timeline keep their left-to-right order in right-to-left languages too, as
+        // Apple's own players do: they follow the direction of time, not of the text.
+        .environment(\.layoutDirection, .leftToRight)
     }
 }
 
@@ -130,8 +133,8 @@ struct Scrubber: View {
             Text(shown.clock).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 44, alignment: .trailing)
             BrassSlider(value: Binding(get: { dragValue ?? (player.position / duration) }, set: { dragValue = $0 }),
                         showsThumb: player.current != nil,
-                        accessibilityName: "Position",
-                        accessibilityValueText: { "\(($0 * duration).clock) of \(duration.clock)" },
+                        accessibilityName: String(localized: "Position", comment: "VoiceOver name of the playback position slider"),
+                        accessibilityValueText: { String(localized: "\(($0 * duration).clock) of \(duration.clock)", comment: "Playback position: elapsed of total time") },
                         accessibilityStep: min(1, 5 / duration)) { editing in
                 if !editing, let v = dragValue {
                     player.seek(to: v * duration)
@@ -139,7 +142,7 @@ struct Scrubber: View {
                 }
             }
             .disabled(player.current == nil)
-            Text("−" + max(0, duration - shown).clock).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 48, alignment: .leading)
+            Text("\u{2066}−" + max(0, duration - shown).clock + "\u{2069}").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3).frame(width: 48, alignment: .leading)
         }
     }
 }
@@ -159,7 +162,7 @@ struct DeviceChip: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(device?.name ?? model.missingChosenOutput ?? "No Output").font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
                     Text(chipDetail(device, path)).font(Typeface.mono(9.5)).foregroundStyle(path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
                         .lineLimit(1)
                 }
@@ -179,10 +182,13 @@ struct DeviceChip: View {
             .fixedSize()
         }
         .buttonStyle(.plain)
-        .help(standIn.map { "Output device: \(device?.name ?? "") plays while \($0) isn’t connected" } ?? "Output device")
+        .help(standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
+              ?? String(localized: "Output device"))
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
-        .accessibilityLabel("Output device, \(device?.name ?? "none")")
-        .accessibilityValue(path.map { "\($0.isBitPerfect ? "Bit-perfect" : "Converted"), \(chipDetail(device, $0))" } ?? "")
+        .accessibilityLabel(device.map { String(localized: "Output device, \($0.name)") } ?? String(localized: "Output device, none"))
+        .accessibilityValue(path.map {
+            $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
+        } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
             DevicePicker().environment(model).frame(width: 360)
         }
@@ -193,10 +199,14 @@ struct DeviceChip: View {
 
     private func chipDetail(_ device: OutputDevice?, _ path: SignalPath?) -> String {
         if let path {
-            return "\(path.deviceFormatShort) · \(path.applied.exclusive ? "EXCL" : "SHARED")"
+            return path.applied.exclusive
+                ? String(localized: "\(path.deviceFormatShort) · EXCL", comment: "Device chip: format, then EXCL = exclusive access (short, uppercase)")
+                : String(localized: "\(path.deviceFormatShort) · SHARED", comment: "Device chip: format, then SHARED = shared with other apps (short, uppercase)")
         }
-        guard let device else { return model.missingChosenOutput == nil ? "—" : "NOT CONNECTED" }
-        return "\(SampleRate.format(device.nominalSampleRate)) kHz · \(standIn == nil ? "IDLE" : "STANDING IN")"
+        guard let device else { return model.missingChosenOutput == nil ? "—" : String(localized: "NOT CONNECTED", comment: "Device chip: the chosen output isn't connected (short, uppercase)") }
+        return standIn == nil
+            ? String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · IDLE", comment: "Device chip: the device's sample rate, then IDLE (short, uppercase)")
+            : String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · STANDING IN", comment: "Device chip: the device's sample rate, then STANDING IN (short, uppercase): it plays in place of the chosen output, which isn't connected")
     }
 }
 
@@ -205,11 +215,13 @@ struct DevicePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            SectionLabel(text: "Output").padding(.horizontal, 8).padding(.bottom, 4)
-            deviceRow(nil, name: "System Default", detail: "FOLLOWS SOUND SETTINGS", symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
+            SectionLabel(text: String(localized: "Output", comment: "Header of the output device list")).padding(.horizontal, 8).padding(.bottom, 4)
+            deviceRow(nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"), symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
             if let missing = model.missingChosenOutput, let uid = model.settings.selectedDeviceUID {
                 // Still the chosen one: playback goes back to it when it's connected again.
-                deviceRow(uid, name: missing, detail: model.plannedDevice.map { "NOT CONNECTED · USING \($0.name.uppercased())" } ?? "NOT CONNECTED · WAITING FOR IT",
+                deviceRow(uid, name: missing,
+                          detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
+                              ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
                           symbol: "cable.connector.slash", selected: true)
             }
             ForEach(model.devices.devices) { d in
@@ -274,9 +286,9 @@ struct DeviceSettings: View {
             Toggle(isOn: Binding(get: { settings.exclusiveMode }, set: { settings.exclusiveMode = $0; model.syncEngine() })) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Exclusive access").font(Typeface.ui(12))
-                    Text(device.alwaysShared
-                         ? "Not on the Mac's own speakers and headphone jack: they always play shared, so the volume keys keep working."
-                         : "Other apps are silenced on this device. Volume keys and Control Center still adjust it.")
+                    (device.alwaysShared
+                         ? Text("Not on the Mac's own speakers and headphone jack: they always play shared, so the volume keys keep working.")
+                         : Text("Other apps are silenced on this device. Volume keys and Control Center still adjust it."))
                         .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -286,9 +298,9 @@ struct DeviceSettings: View {
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Spatial Audio").font(Typeface.ui(12))
-                    Text(device.capabilities.outputChannels > 2
-                         ? "For multichannel music. Off sends every channel to this device's speakers."
-                         : "For multichannel music. Off plays a standard stereo downmix.")
+                    (device.capabilities.outputChannels > 2
+                         ? Text("For multichannel music. Off sends every channel to this device's speakers.")
+                         : Text("For multichannel music. Off plays a standard stereo downmix."))
                         .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
@@ -341,14 +353,14 @@ struct VolumeControl: View {
             Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundStyle(Palette.text2)
             if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
                 BrassSlider(value: Binding(get: { Double(v) }, set: { model.devices.setHardwareVolume(Float($0)) }),
-                            tint: Palette.text2, showsThumb: false, accessibilityName: "Hardware volume")
+                            tint: Palette.text2, showsThumb: false, accessibilityName: String(localized: "Hardware volume"))
                     .frame(width: 72)
-                Text("HW").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched")
+                Text("HW", comment: "Short label: hardware volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched")
             } else if model.settings.allowDigitalVolume {
                 BrassSlider(value: Binding(get: { model.settings.digitalVolume }, set: { model.settings.digitalVolume = $0; model.syncEngine() }),
-                            tint: Palette.copper, showsThumb: false, accessibilityName: "Digital volume")
+                            tint: Palette.copper, showsThumb: false, accessibilityName: String(localized: "Digital volume"))
                     .frame(width: 84)
-                Text("DIG").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper).help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
+                Text("DIG", comment: "Short label: digital volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper).help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
             } else {
                 Text("FIXED · USE DAC").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3)
                     .help("This device has no volume control Vespertine can use. Adjust volume on your DAC or amplifier, or enable digital volume in Settings.")
@@ -368,7 +380,7 @@ struct QueueView: View {
             HStack {
                 Text("Up Next").font(Typeface.serif(18))
                 Spacer()
-                Button("Clear") { player.clearUpcoming() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(player.upcoming.isEmpty)
+                Button(String(localized: "Clear", comment: "Clears the upcoming queue")) { player.clearUpcoming() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(player.upcoming.isEmpty)
             }
             .padding(14)
             if let current = player.current {
@@ -401,7 +413,7 @@ struct QueueView: View {
             ArtworkView(key: model.artworkKey(e.track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
             VStack(alignment: .leading, spacing: 1) {
                 Text(e.track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
-                Text(e.track.displayArtist).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
+                Text(e.track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
             }
             Spacer()
             Text(e.track.formatSummary).font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)

@@ -30,7 +30,7 @@ public enum Transport: String, Sendable, Codable {
 
     public var label: String {
         switch self {
-        case .builtIn: "Built-in"
+        case .builtIn: String(localized: "Built-in", comment: "How an audio device is connected.")
         case .usb: "USB"
         case .bluetooth, .bluetoothLE: "Bluetooth"
         case .hdmi: "HDMI"
@@ -39,9 +39,9 @@ public enum Transport: String, Sendable, Codable {
         case .thunderbolt: "Thunderbolt"
         case .pci: "PCI"
         case .fireWire: "FireWire"
-        case .aggregate: "Aggregate"
-        case .virtual: "Virtual"
-        case .unknown: "Other"
+        case .aggregate: String(localized: "Aggregate", comment: "How an audio device is connected: an aggregate device.")
+        case .virtual: String(localized: "Virtual", comment: "How an audio device is connected: a virtual (software) device.")
+        case .unknown: String(localized: "Other", comment: "How an audio device is connected: some other way.")
         }
     }
 }
@@ -85,7 +85,8 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
         var depths = Set(capabilities.physicalFormats.filter(\.isInteger).map(\.bitDepth)).sorted()
         if depths.isEmpty { depths = Set(capabilities.physicalFormats.map(\.bitDepth)).sorted() }
         let rates = lo == hi ? "\(SampleRate.format(lo)) kHz" : "\(SampleRate.format(lo))–\(SampleRate.format(hi)) kHz"
-        return depths.isEmpty ? rates : rates + " · " + depths.map(String.init).joined(separator: "/") + "-bit"
+        let bits = depths.map(String.init).joined(separator: "/")
+        return depths.isEmpty ? rates : String(localized: "\(rates) · \(bits)-bit", comment: "Sample-rate range, then the word lengths, e.g. “44.1–384 kHz · 16/24/32-bit”.")
     }
 }
 
@@ -210,7 +211,7 @@ enum DeviceQuery {
         return OutputDevice(
             id: id,
             uid: uid,
-            name: HAL.getString(id, .global(kAudioObjectPropertyName)) ?? "Unknown Device",
+            name: HAL.getString(id, .global(kAudioObjectPropertyName)) ?? String(localized: "Unknown Device"),
             manufacturer: HAL.getString(id, .global(kAudioObjectPropertyManufacturer)) ?? "",
             modelUID: HAL.getString(id, .global(kAudioDevicePropertyModelUID)),
             transport: transport,

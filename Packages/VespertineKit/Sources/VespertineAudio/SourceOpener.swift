@@ -43,9 +43,13 @@ public enum SourceOpenerError: Error, LocalizedError {
     case invalidRegion(URL, start: Int64, length: Int64?, available: Int64)
     public var errorDescription: String? {
         switch self {
-        case .unsupported(let url): "Unsupported file: \(url.lastPathComponent)"
-        case .invalidRegion(let url, let start, let length, let available):
-            "CUE track is outside \(url.lastPathComponent): start \(start), length \(length.map(String.init) ?? "unknown"), file length \(available) frames"
+        case .unsupported(let url): String(localized: "Unsupported file: \(url.lastPathComponent)")
+        case .invalidRegion(let url, let start, let length?, let available):
+            String(localized: "CUE track is outside \(url.lastPathComponent): start \(start), length \(length), file length \(available) frames",
+                   comment: "Positions and lengths in audio frames.")
+        case .invalidRegion(let url, let start, nil, let available):
+            String(localized: "CUE track is outside \(url.lastPathComponent): start \(start), length unknown, file length \(available) frames",
+                   comment: "Positions and lengths in audio frames.")
         }
     }
 }
@@ -109,7 +113,8 @@ enum SourceOpener {
             let image = try SACDImage.read(url)
             guard let chosen = area.map(image.area) ?? image.area(.stereo) ?? image.areas.first else { throw SACDError.noArea }
             let format = SourceFormat(encoding: .dsd, codec: "SACD", sampleRate: chosen.sampleRate, bitDepth: 1, channels: chosen.channels)
-            let name = chosen.isDST ? "SACD image · DST (lossless) decoded to DSD" : "SACD image"
+            let name = chosen.isDST ? String(localized: "SACD image · DST (lossless) decoded to DSD", comment: "The decoder, in the signal path.")
+                                    : String(localized: "SACD image", comment: "The decoder, in the signal path.")
             return ProbedSource(url: url, format: format, decoderName: name, pcm: nil, dsd: nil, sacd: chosen)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
@@ -128,7 +133,7 @@ enum SourceOpener {
             let format = SourceFormat(encoding: .dsd, codec: ext == "dff" ? "DSDIFF" : "DSF",
                                       sampleRate: asbd.mSampleRate, bitDepth: 1,
                                       channels: Int(asbd.mChannelsPerFrame))
-            return ProbedSource(url: url, format: format, decoderName: "Native DSD reader", pcm: nil, dsd: decoder)
+            return ProbedSource(url: url, format: format, decoderName: String(localized: "Native DSD reader", comment: "The decoder, in the signal path."), pcm: nil, dsd: decoder)
         }
         if FFmpegDecoder.extensions.contains(ext) {
             // DTS / DTS-HD MA / Dolby TrueHD: FFmpeg.
@@ -139,8 +144,12 @@ enum SourceOpener {
                                       bitDepth: d.bits, channels: d.channels)
             // FFmpeg decodes the channel bed of Atmos-in-TrueHD and DTS:X; say so rather than imply the objects.
             let name: String = switch d.codec {
-            case "Dolby Atmos (TrueHD)": "FFmpeg TrueHD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered"
-            case "DTS:X": "FFmpeg DTS-HD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered"
+            case "Dolby Atmos (TrueHD)":
+                String(localized: "FFmpeg TrueHD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered",
+                       comment: "The decoder, in the signal path: it plays the channel bed (e.g. 7.1) of a Dolby Atmos stream, not its objects.")
+            case "DTS:X":
+                String(localized: "FFmpeg DTS-HD · \(ChannelLayouts.name(channels: d.channels)) bed, objects not rendered",
+                       comment: "The decoder, in the signal path: it plays the channel bed (e.g. 7.1) of a DTS:X stream, not its objects.")
             default: "FFmpeg \(d.codec)"
             }
             return ProbedSource(url: url, format: format, decoderName: name, pcm: decoder, dsd: nil)
@@ -151,7 +160,8 @@ enum SourceOpener {
             try decoder.open()
             let d = decoder.describe
             let format = SourceFormat(encoding: .lossy, codec: d.codec, sampleRate: d.sampleRate, bitDepth: nil, channels: d.channels)
-            return ProbedSource(url: url, format: format, decoderName: "FFmpeg \(d.codec) · \(DolbyModes.name(mode)), which macOS decodes wrongly",
+            return ProbedSource(url: url, format: format, decoderName: String(localized: "FFmpeg \(d.codec) · \(DolbyModes.name(mode)), which macOS decodes wrongly",
+                                                              comment: "The decoder, in the signal path: a codec, then a channel mode such as 3/0+LFE."),
                                 pcm: decoder, dsd: nil)
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }

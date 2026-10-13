@@ -43,7 +43,7 @@ final class LibraryStore {
     func displayPath(_ path: String) -> String {
         if let share = sources.first(where: { $0.remoteURL != nil && (path == $0.path || path.hasPrefix($0.path + "/")) }) {
             let rest = String(path.dropFirst(share.path.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            let name = share.name ?? "Network share"
+            let name = share.name ?? String(localized: "Network share")
             return rest.isEmpty ? name : "\(name) › \(rest)"
         }
         return (path as NSString).abbreviatingWithTildeInPath
@@ -225,7 +225,8 @@ final class LibraryStore {
             let summary = try await scanner.scan(source) { [weak self] progress in
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
-            if !summary.failed.isEmpty { lastError = "Could not read \(summary.failed.count) file(s) or folder(s): \(summary.failed.prefix(3).joined(separator: ", "))" }
+            if !summary.failed.isEmpty { lastError = String(localized: "Could not read \(summary.failed.count) files or folders: \(summary.failed.prefix(3).joined(separator: ", "))",
+                                                         comment: "Followed by up to three of the paths that couldn't be read.") }
             if !summary.movedTracks.isEmpty { onTracksMoved?(summary.movedTracks) }
         } catch {
             lastError = error.localizedDescription

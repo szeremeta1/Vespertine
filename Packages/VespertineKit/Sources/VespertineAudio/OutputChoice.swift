@@ -18,9 +18,9 @@ public enum OutputFallback: String, CaseIterable, Sendable, Identifiable {
 
     public var label: String {
         switch self {
-        case .bestAvailable: "The best connected output"
-        case .systemDefault: "The Mac's sound output"
-        case .waitForChosen: "Nothing (wait for it)"
+        case .bestAvailable: String(localized: "The best connected output", comment: "Completes “When the chosen output isn't connected, play on”")
+        case .systemDefault: String(localized: "The Mac's sound output", comment: "Completes “When the chosen output isn't connected, play on”")
+        case .waitForChosen: String(localized: "Nothing (wait for it)", comment: "Completes “When the chosen output isn't connected, play on”")
         }
     }
 }

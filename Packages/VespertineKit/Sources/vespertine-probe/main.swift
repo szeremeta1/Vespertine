@@ -5,6 +5,9 @@
 //   vespertine-probe watch <seconds>          prints every device's volume and the system output whenever they change
 //   vespertine-probe pausetest <device> <file> <volume 0…1> <pause seconds> <release-after seconds>
 //   vespertine-probe doptest <device> [a.dsf b.dsf]   DoP through pause, seek and skip, narrated (writes test files if none)
+//   vespertine-probe loopback [--quick|--full] [--device <name>] [--input <name>] [--rates 44100,96000] [--json <path>]
+//                             software loopback self-test through a virtual device ("Vespertine Loopback" by default);
+//                             exits 0 when every case is bit-exact, 1 on a failure, 2 on a test setup problem
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -148,6 +151,69 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
     while !ended.withLock({ $0 }) && Date().timeIntervalSince(start) < 600 { RunLoop.main.run(until: Date().addingTimeInterval(0.1)) }
     engine.stop()
     exit(0)
+}
+
+if args.count >= 2, args[1] == "loopback" {
+    // Unattended: everything comes from the arguments, results go to stdout and, with --json, to a file.
+    setvbuf(stdout, nil, _IOLBF, 0)   // progress lines show up at once, even through a pipe
+    func value(_ flag: String) -> String? { args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil } }
+    let mode: LoopbackMode = args.contains("--full") ? .full : .quick
+    let output: OutputDevice
+    if let name = value("--device") {
+        guard let d = devices.first(where: { $0.uid == name || $0.name.localizedCaseInsensitiveContains(name) }) else { print("no device matching \(name)"); exit(2) }
+        output = d
+    } else {
+        guard let d = LoopbackGuard.dedicatedDevice(in: devices) else {
+            print("No \u{201C}\(LoopbackGuard.deviceName)\u{201D} device. Install it with scripts/install-loopback-device.sh, or pass --device <a virtual device>.")
+            exit(2)
+        }
+        output = d
+    }
+    var input: AudioObjectID?
+    if let name = value("--input") {
+        guard let id = LoopbackGuard.inputDevice(matching: name) else { print("no input device matching \(name)"); exit(2) }
+        input = id
+    }
+    print("Asking for permission to record audio input…")
+    fflush(stdout)
+    let permission = Locked<LoopbackPermission.Answer?>(nil)
+    Task { let answer = await LoopbackPermission.check(timeout: 20); permission.withLock { $0 = answer } }
+    while permission.withLock({ $0 }) == nil { RunLoop.main.run(until: Date().addingTimeInterval(0.05)) }
+    switch permission.withLock({ $0 }) {
+    case .denied?: print(LoopbackError.permissionDenied.localizedDescription); exit(2)
+    case .unanswered?:
+        print("macOS didn't answer the permission request (a command-line tool can't show the prompt). Trying anyway: if the recording is silent, allow the app that runs this tool, such as Terminal, in System Settings › Privacy & Security › Microphone.")
+    default: break
+    }
+    fflush(stdout)
+    var cases = LoopbackPlan.cases(rates: output.capabilities.sampleRates, mode: mode)
+    if let rates = value("--rates") {
+        let wanted = rates.split(separator: ",").compactMap { Double($0) }
+        cases = cases.filter { c in wanted.contains { abs($0 - c.sampleRate) < 0.5 } }
+    }
+    print("\(LoopbackReport.label): \(mode.rawValue), \(cases.count) cases on \(output.name)")
+    print(LoopbackReport.scope)
+    let report: LoopbackReport
+    do {
+        let runner = try LoopbackRunner(output: output, input: input)
+        report = try runner.run(cases, mode: mode, appVersion: "vespertine-probe") { i, c in
+            print(String(format: "[%2d/%d] ", i + 1, cases.count) + c.name, terminator: "")
+            fflush(stdout)
+        } caseDone: { r in
+            print(" … " + r.summary + (r.deviceFormat.map { "  [\($0)]" } ?? "") + (r.sixteenBitNote.map { "  (\($0))" } ?? ""))
+        }
+    } catch {
+        print(error.localizedDescription)
+        exit(2)
+    }
+    print("Overall: \(report.status.rawValue)")
+    if let path = value("--json") {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        encoder.dateEncodingStrategy = .iso8601
+        do { try encoder.encode(report).write(to: URL(fileURLWithPath: path)); print("JSON: \(path)") } catch { print("couldn't write \(path): \(error)"); exit(2) }
+    }
+    exit(report.status == .bitExact ? 0 : report.status == .setupProblem || report.status == .skipped ? 2 : 1)
 }
 
 func volumes() -> String {

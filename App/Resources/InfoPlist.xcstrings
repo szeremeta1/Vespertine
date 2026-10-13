@@ -1,0 +1,564 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Bundle display name",
+      "shouldTranslate": false
+    },
+    "CFBundleName": {
+      "comment": "Bundle name",
+      "shouldTranslate": false
+    },
+    "NSHumanReadableCopyright": {
+      "comment": "Copyright (human-readable)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 የVespertine አበርካቾች። በGNU GPL ስሪት 3 ወይም ከዚያ በኋላ ባለ ስሪት ስር የሚሰራጭ ነፃ ሶፍትዌር።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 المساهمون في Vespertine. برنامج حر مرخّص بموجب GNU GPL، الإصدار 3 أو أحدث."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-এর অবদানকারীরা। GNU GPL, সংস্করণ 3 বা পরবর্তী সংস্করণের অধীনে মুক্ত সফটওয়্যার।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 přispěvatelé projektu Vespertine. Svobodný software šířený pod licencí GNU GPL verze 3 nebo novější."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bidragydere. Fri software under GNU GPL, version 3 eller nyere."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-Mitwirkende. Freie Software unter der GNU GPL, Version 3 oder neuer."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Συντελεστές του Vespertine. Ελεύθερο λογισμικό υπό την άδεια GNU GPL, έκδοση 3 ή νεότερη."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 colaboradores de Vespertine. Software libre bajo la GNU GPL, versión 3 o posterior."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 مشارکت‌کنندگان Vespertine. نرم‌افزار آزاد تحت GNU GPL، نسخهٔ 3 یا بالاتر."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertinen kehittäjät. Vapaa ohjelmisto, GNU GPL -lisenssin versio 3 tai uudempi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Mga kontribyutor ng Vespertine. Malayang software sa ilalim ng GNU GPL, bersyon 3 o mas bago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Les contributeurs de Vespertine. Logiciel libre distribué sous licence GNU GPL, version 3 ou ultérieure."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ના યોગદાનકર્તાઓ. GNU GPL, આવૃત્તિ 3 અથવા પછીની આવૃત્તિ હેઠળ મુક્ત સૉફ્ટવેર."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Masu ba da gudummawa ga Vespertine. Manhaja ta ’yanci a ƙarƙashin GNU GPL, siga ta 3 ko wadda ta biyo baya."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 התורמים ל־Vespertine. תוכנה חופשית בכפוף לרישיון GNU GPL, גרסה 3 ואילך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine के योगदानकर्ता। GNU GPL, संस्करण 3 या बाद के संस्करण के अंतर्गत मुक्त सॉफ़्टवेयर।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 A Vespertine közreműködői. Szabad szoftver a GNU GPL 3-as vagy újabb verziója alatt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Kontributor Vespertine. Perangkat lunak bebas di bawah GNU GPL, versi 3 atau yang lebih baru."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Contributori di Vespertine. Software libero distribuito con licenza GNU GPL, versione 3 o successiva."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertineコントリビューター。GNU GPLバージョン3以降のもとで提供される自由ソフトウェアです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ಕೊಡುಗೆದಾರರು. GNU GPL, ಆವೃತ್ತಿ 3 ಅಥವಾ ನಂತರದ ಆವೃತ್ತಿಯ ಅಡಿಯಲ್ಲಿ ಮುಕ್ತ ತಂತ್ರಾಂಶ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 기여자. GNU GPL 버전 3 이상에 따라 배포되는 자유 소프트웨어입니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine സംഭാവകർ. GNU GPL, പതിപ്പ് 3 അല്ലെങ്കിൽ പിന്നീടുള്ള പതിപ്പിന് കീഴിലുള്ള സ്വതന്ത്ര സോഫ്റ്റ്‌വെയർ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine चे योगदानकर्ते. GNU GPL, आवृत्ती 3 किंवा त्यानंतरच्या आवृत्तीअंतर्गत मुक्त सॉफ्टवेअर."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Penyumbang Vespertine. Perisian bebas di bawah GNU GPL, versi 3 atau lebih baharu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bidragsytere. Fri programvare under GNU GPL, versjon 3 eller nyere."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bijdragers. Vrije software onder de GNU GPL, versie 3 of later."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ਦੇ ਯੋਗਦਾਨੀ। GNU GPL, ਸੰਸਕਰਨ 3 ਜਾਂ ਬਾਅਦ ਵਾਲੇ ਸੰਸਕਰਨ ਅਧੀਨ ਮੁਕਤ ਸਾਫ਼ਟਵੇਅਰ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Współtwórcy Vespertine. Wolne oprogramowanie na licencji GNU GPL w wersji 3 lub nowszej."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Colaboradores do Vespertine. Software livre sob a GNU GPL, versão 3 ou posterior."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Colaboradores do Vespertine. Software livre ao abrigo da GNU GPL, versão 3 ou posterior."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Contributorii Vespertine. Software liber distribuit sub licența GNU GPL, versiunea 3 sau ulterioară."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertines bidragsgivare. Fri programvara under GNU GPL, version 3 eller senare."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Wachangiaji wa Vespertine. Programu huru chini ya GNU GPL, toleo la 3 au la baadaye."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine பங்களிப்பாளர்கள். GNU GPL, பதிப்பு 3 அல்லது அதற்குப் பிந்தைய பதிப்பின் கீழ் உள்ள கட்டற்ற மென்பொருள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine కంట్రిబ్యూటర్‌లు. GNU GPL, వెర్షన్ 3 లేదా తదుపరి వెర్షన్ కింద స్వేచ్ఛా సాఫ్ట్‌వేర్."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 ผู้ร่วมพัฒนา Vespertine ซอฟต์แวร์เสรีภายใต้ GNU GPL เวอร์ชัน 3 ขึ้นไป"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine katkıda bulunanları. GNU GPL sürüm 3 veya sonrası kapsamında özgür yazılım."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Учасники проєкту Vespertine. Вільне програмне забезпечення за ліцензією GNU GPL версії 3 або новішої."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine کے معاونین۔ GNU GPL، ورژن 3 یا بعد کے ورژن کے تحت آزاد سافٹ ویئر۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Những người đóng góp cho Vespertine. Phần mềm tự do theo giấy phép GNU GPL, phiên bản 3 trở lên."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 貢獻者。根據 GNU GPL 第 3 版或更新版本授權的自由軟件。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 贡献者。依据 GNU GPL 第 3 版或更高版本授权的自由软件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 貢獻者。依據 GNU GPL 第 3 版或更新版本授權的自由軟體。"
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "comment": "Privacy - Local Network Usage Description",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine እርስዎ ካከሏቸው የሙዚቃ አገልጋዮች እና የአውታረ መረብ ማጋሪያዎች ጋር በአውታረ መረብዎ ላይ ወይም በVPN በኩል ይገናኛል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتصل Vespertine بخوادم الموسيقى ومشاركات الشبكة التي تضيفها، على شبكتك أو عبر VPN."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার যোগ করা মিউজিক সার্ভার ও নেটওয়ার্ক শেয়ারের সাথে Vespertine সংযোগ করে, আপনার নেটওয়ার্কে বা VPN-এর মাধ্যমে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine se připojuje k hudebním serverům a síťovým sdílením, která přidáte, ve vaší síti nebo přes VPN."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine opretter forbindelse til de musikservere og netværksdelinger, du tilføjer, på dit netværk eller via VPN."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine verbindet sich mit den Musikservern und Netzwerkfreigaben, die du hinzufügst – in deinem Netzwerk oder über ein VPN."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine συνδέεται στους διακομιστές μουσικής και τους κοινόχρηστους φακέλους δικτύου που προσθέτετε, στο δίκτυό σας ή μέσω VPN."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine se conecta a los servidores de música y recursos compartidos de red que añadas, en tu red o a través de una VPN."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine به سرورهای موسیقی و اشتراک‌های شبکه‌ای که اضافه می‌کنید وصل می‌شود، در شبکهٔ شما یا از طریق VPN."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine muodostaa yhteyden lisäämiisi musiikkipalvelimiin ja verkkojakoihin omassa verkossasi tai VPN:n kautta."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumokonekta ang Vespertine sa mga music server at network share na idinagdag mo, sa network mo o sa pamamagitan ng VPN."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine se connecte aux serveurs de musique et aux partages réseau que vous ajoutez, sur votre réseau ou via un VPN."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine તમે ઉમેરેલા મ્યુઝિક સર્વર અને નેટવર્ક શેર સાથે તમારા નેટવર્ક પર અથવા VPN દ્વારા કનેક્ટ થાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana haɗuwa da sabobin kiɗa da foldojin cibiyar sadarwa da kuka ƙara, a kan cibiyar sadarwarku ko ta VPN."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine מתחבר לשרתי המוזיקה ולשיתופי הרשת שהוספת, ברשת שלך או דרך VPN."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine आपके द्वारा जोड़े गए म्यूज़िक सर्वर और नेटवर्क शेयर से आपके नेटवर्क पर या VPN के ज़रिए कनेक्ट होता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine csatlakozik az Ön által hozzáadott zeneszerverekhez és hálózati megosztásokhoz, a hálózatán vagy VPN-en keresztül."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine terhubung ke server musik dan share jaringan yang Anda tambahkan, di jaringan Anda atau melalui VPN."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine si connette ai server musicali e alle condivisioni di rete che aggiungi, sulla tua rete o tramite VPN."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは、追加した音楽サーバやネットワーク共有に、ネットワーク上で、またはVPN経由で接続します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಸೇರಿಸುವ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಿಗೆ Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಅಥವಾ VPN ಮೂಲಕ ಸಂಪರ್ಕಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 사용자가 추가한 음악 서버 및 네트워크 공유에 사용자의 네트워크 또는 VPN을 통해 연결합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ ചേർക്കുന്ന മ്യൂസിക് സെർവറുകളിലേക്കും നെറ്റ്‌വർക്ക് ഷെയറുകളിലേക്കും നിങ്ങളുടെ നെറ്റ്‌വർക്കിലോ VPN വഴിയോ Vespertine കണക്റ്റ് ചെയ്യുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुम्ही जोडलेल्या म्युझिक सर्व्हर आणि नेटवर्क शेअरशी Vespertine तुमच्या नेटवर्कवर किंवा VPN द्वारे कनेक्ट होते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine menyambung ke pelayan muzik dan perkongsian rangkaian yang anda tambah, pada rangkaian anda atau melalui VPN."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine kobler til musikktjenerne og nettverksdelingene du legger til, på nettverket ditt eller via VPN."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine maakt verbinding met de muziekservers en netwerkshares die je toevoegt, op je netwerk of via een VPN."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਤੁਹਾਡੇ ਵੱਲੋਂ ਸ਼ਾਮਲ ਕੀਤੇ ਮਿਊਜ਼ਿਕ ਸਰਵਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਨਾਲ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਜਾਂ VPN ਰਾਹੀਂ ਕਨੈਕਟ ਕਰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine łączy się z dodanymi przez Ciebie serwerami muzyki i zasobami sieciowymi, w Twojej sieci lub przez VPN."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine se conecta aos servidores de música e compartilhamentos de rede que você adicionar, na sua rede ou por VPN."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine liga-se aos servidores de música e às partilhas de rede que adicionar, na sua rede ou através de uma VPN."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine se conectează la serverele de muzică și partajările de rețea pe care le adăugați, în rețeaua dvs. sau prin VPN."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ansluter till de musikservrar och nätverksresurser du lägger till, i ditt nätverk eller via VPN."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine huunganisha kwenye seva za muziki na folda za mtandao unazoongeza, kwenye mtandao wako au kupitia VPN."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் சேர்க்கும் இசை சர்வர்கள் மற்றும் நெட்வொர்க் பகிர்வுகளுடன் உங்கள் நெட்வொர்க்கில் அல்லது VPN மூலம் Vespertine இணைகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు జోడించే మ్యూజిక్ సర్వర్‌లు, నెట్‌వర్క్ షేర్‌లకు Vespertine మీ నెట్‌వర్క్‌లో లేదా VPN ద్వారా కనెక్ట్ అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine เชื่อมต่อกับเซิร์ฟเวอร์เพลงและแชร์เครือข่ายที่คุณเพิ่ม บนเครือข่ายของคุณหรือผ่าน VPN"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine, eklediğiniz müzik sunucularına ve ağ paylaşımlarına ağınızda veya bir VPN üzerinden bağlanır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine під’єднується до доданих вами музичних серверів і мережевих ресурсів у вашій мережі або через VPN."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine آپ کے شامل کردہ میوزک سرورز اور نیٹ ورک شیئرز سے آپ کے نیٹ ورک پر یا VPN کے ذریعے منسلک ہوتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine kết nối với các máy chủ nhạc và chia sẻ mạng mà bạn thêm vào, trên mạng của bạn hoặc qua VPN."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會連接至你加入的音樂伺服器和網絡共享，無論是在你的網絡上或透過 VPN。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 会连接到你添加的音乐服务器和网络共享，无论是在你的网络中还是通过 VPN。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會連線至你加入的音樂伺服器和網路分享，無論是在你的網路上或透過 VPN。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

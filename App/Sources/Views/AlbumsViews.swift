@@ -53,7 +53,7 @@ struct PageHeader<Trailing: View>: View {
 struct AlbumsGridView: View {
     @Environment(AppModel.self) private var model
     let scope: FilterScope
-    var title = "Albums"
+    var title = String(localized: "Albums")
     /// The Albums page: a sort order, and the library's size in the subtitle.
     var isLibrary = false
 
@@ -84,7 +84,7 @@ struct AlbumsGridView: View {
                 FilterBar(scope: scope, items: .albums(base, model: model))
                     .padding(.bottom, 6)
                 if albums.isEmpty && !base.isEmpty {
-                    NoMatchesView(unit: "album") { model.setFilter(LibraryFilter(), for: scope) }
+                    NoMatchesView(title: "No albums match these filters") { model.setFilter(LibraryFilter(), for: scope) }
                 } else {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 28) {
                         ForEach(families) { family in
@@ -106,10 +106,11 @@ struct AlbumsGridView: View {
 
     private func meta(_ families: [AlbumFamily], base: [Album], filter: LibraryFilter) -> String {
         let count = families.count
-        if !filter.isEmpty { return "\(count.formatted()) of \(AlbumFamilies.group(base).count.formatted()) albums" }
-        guard isLibrary else { return "\(count) album\(count == 1 ? "" : "s")" }
+        if !filter.isEmpty { return String(localized: "\(count) of \(AlbumFamilies.group(base).count) albums") }
+        guard isLibrary else { return String(localized: "\(count) albums") }
         let s = model.library.stats
-        return "\(count.formatted()) album\(count == 1 ? "" : "s") · \(s.albums.formatted()) edition\(s.albums == 1 ? "" : "s") · \(s.tracks.formatted()) track\(s.tracks == 1 ? "" : "s") · \(s.bytes.byteString)"
+        return [String(localized: "\(count) albums"), String(localized: "\(s.albums) editions"),
+                String(localized: "\(s.tracks) tracks"), s.bytes.byteString].joined(separator: " · ")
     }
 }
 
@@ -149,12 +150,12 @@ struct AlbumCard: View {
                     .transition(.opacity)
                 }
             }
-            Text(album.title)
+            Text(album.title.libraryDisplayName)
                 .font(Typeface.serif(14))
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
                 .padding(.top, 10)
-            Text(album.artist)
+            Text(album.artist.libraryDisplayName)
                 .font(Typeface.ui(12))
                 .foregroundStyle(Palette.text2)
                 .lineLimit(1)
@@ -170,7 +171,7 @@ struct AlbumCard: View {
         .onKeyPress(keys: [.return, .space]) { _ in model.openAlbum(album.key); return .handled }
         // VoiceOver (and other assistive tech) can open the album and play it.
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(album.title), \(album.artist)")
+        .accessibilityLabel("\(album.title.libraryDisplayName), \(album.artist.libraryDisplayName)")
         .accessibilityValue(album.formatSummary)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbum(album.key) }
@@ -201,17 +202,17 @@ struct AlbumFamilyCard: View {
                     }
                 Text("\(family.editions.count) EDITIONS")
                     .font(Typeface.mono(9, weight: .semibold))
-                    .tracking(0.5)
+                    .letterSpacing(0.5)
                     .foregroundStyle(Palette.brassHi)
                     .padding(.horizontal, 8).padding(.vertical, 5)
                     .background(Palette.surface, in: RoundedRectangle(cornerRadius: 4))
                     .padding(9)
             }
-            Text(family.title).font(Typeface.serif(14)).foregroundStyle(Palette.text)
+            Text(family.title.libraryDisplayName).font(Typeface.serif(14)).foregroundStyle(Palette.text)
                 .lineLimit(1).padding(.top, 10)
-            Text(family.artist).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
+            Text(family.artist.libraryDisplayName).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
                 .lineLimit(1).padding(.top, 2)
-            FormatLabel(summary: "\(family.editions.count) editions · \(family.representative.formatSummary)", highlight: true)
+            FormatLabel(summary: String(localized: "\(family.editions.count) editions") + " · " + family.representative.formatSummary, highlight: true)
                 .padding(.top, 5)
         }
         .contentShape(Rectangle())
@@ -219,7 +220,7 @@ struct AlbumFamilyCard: View {
         .focusable(interactions: .activate)
         .onKeyPress(keys: [.return, .space]) { _ in model.openAlbumFamily(family.representative.key); return .handled }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(family.title), \(family.artist), \(family.editions.count) editions")
+        .accessibilityLabel("\(family.title.libraryDisplayName), \(family.artist.libraryDisplayName), \(family.editions.count) editions")
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbumFamily(family.representative.key) }
         .contextMenu {
@@ -241,9 +242,9 @@ struct AlbumFamilyDetailView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .center, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(family.title).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
+                        Text(family.title.libraryDisplayName).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
                             .lineLimit(1).minimumScaleFactor(0.7)
-                        Text("\(family.artist) · \(family.editions.count) EDITIONS")
+                        Text("\(family.artist.libraryDisplayName) · \(family.editions.count) EDITIONS")
                             .font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                     }
                     Spacer(minLength: 8)
@@ -255,7 +256,7 @@ struct AlbumFamilyDetailView: View {
                                 if edition.key == selected.key {
                                     Label(edition.title, systemImage: "checkmark")
                                 } else {
-                                    Text(edition.title)
+                                    Text(edition.title.libraryDisplayName)
                                 }
                             }
                         }
@@ -275,7 +276,7 @@ struct AlbumFamilyDetailView: View {
                                     ArtworkView(key: edition.artworkKey, size: 120, cornerRadius: 3)
                                         .frame(width: 48, height: 48)
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text(edition.title).font(Typeface.ui(12, weight: .medium))
+                                        Text(edition.title.libraryDisplayName).font(Typeface.ui(12, weight: .medium))
                                             .foregroundStyle(Palette.text).lineLimit(2)
                                         FormatLabel(summary: edition.formatSummary, highlight: edition.isHiRes)
                                     }
@@ -313,7 +314,7 @@ struct FormatLabel: View {
         let parts = summary.components(separatedBy: " · ")
         Text("\(Text(parts.first ?? "").foregroundStyle(highlight ? Palette.brass : Palette.text3))\(Text(parts.count > 1 ? " · " + parts.dropFirst().joined(separator: " · ") : "").foregroundStyle(Palette.text3))")
             .font(Typeface.mono(10))
-            .tracking(0.3)
+            .letterSpacing(0.3)
     }
 }
 
@@ -387,11 +388,11 @@ struct AddToPlaylistMenu: View {
     var body: some View {
         Menu("Add to Playlist") {
             Button("New Playlist from Selection") {
-                if let p = model.library.createPlaylist(name: "New Playlist", trackIDs: trackIDs), let id = p.id { model.sidebar = .playlist(id) }
+                if let p = model.library.createPlaylist(name: String(localized: "New Playlist (name)", defaultValue: "New Playlist", comment: "Name given to a newly created playlist (a noun, not the command)"), trackIDs: trackIDs), let id = p.id { model.sidebar = .playlist(id) }
             }
             Divider()
             ForEach(model.library.playlists.filter { !$0.isSmart }) { p in
-                Button(p.name) { model.library.append(trackIDs, to: p) }
+                Button(p.name.libraryDisplayName) { model.library.append(trackIDs, to: p) }
             }
         }
     }
@@ -422,7 +423,7 @@ struct AlbumDetailView: View {
                        otherVersions: others)
         }
         .background(Palette.window)
-        .navigationTitle(album?.title ?? "Album")
+        .navigationTitle(album?.title ?? String(localized: "Album"))
         .task(id: "\(albumKey)#\(model.library.revision)") {
             let found = model.library.tracks(albumKey: albumKey)
             // Editing the album's title or Album Artist gives it a new key: follow its songs there instead of going blank.
@@ -448,12 +449,15 @@ struct AlbumDetailView: View {
     /// copy in the same layout its format ("DSD64", "16/44.1", "MP3"), or "COPY" when it's the same file.
     static func versionName(_ other: Track, beside chosen: Track) -> String {
         if other.isMultichannel != chosen.isMultichannel {
-            return other.isMultichannel ? ChannelLayouts.name(channels: other.channels) : "STEREO"
+            return other.isMultichannel ? ChannelLayouts.name(channels: other.channels)
+                : String(localized: "STEREO", comment: "Tag beside a song: it is also on the album in a stereo version")
         }
-        if other.fileSize == chosen.fileSize && abs(other.duration - chosen.duration) < 0.01 { return "COPY" }
+        if other.fileSize == chosen.fileSize && abs(other.duration - chosen.duration) < 0.01 {
+            return String(localized: "COPY", comment: "Tag beside a song: the album also holds an identical copy of the file")
+        }
         if other.isDSD { return "DSD\(Int((other.sampleRate / 44_100).rounded()))" }
         if !other.isLossless { return other.codec.uppercased() }
-        let rate = other.sampleRate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(other.sampleRate / 1000)) : String(format: "%.1f", other.sampleRate / 1000)
+        let rate = other.sampleRate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(other.sampleRate / 1000)) : (other.sampleRate / 1000).formatted(.number.precision(.fractionLength(1)))
         return "\(other.bitDepth ?? 16)/\(rate)"
     }
 
@@ -466,16 +470,16 @@ struct AlbumDetailView: View {
                 Spacer(minLength: 0)
                 Text(kicker(album, shown: shown))
                     .font(Typeface.mono(10.5, weight: .semibold))
-                    .tracking(1.4)
+                    .letterSpacing(1.4)
                     .foregroundStyle(Palette.brass)
-                Text(album.title)
+                Text(album.title.libraryDisplayName)
                     .font(Typeface.serif(38))
                     .foregroundStyle(Palette.text)
                     .lineLimit(2)
                     .minimumScaleFactor(0.6)
                     .padding(.top, 8)
                 Button { model.path.append(.artist(album.artist)) } label: {
-                    Text(album.artist).font(Typeface.ui(15)).foregroundStyle(Palette.brassHi)
+                    Text(album.artist.libraryDisplayName).font(Typeface.ui(15)).foregroundStyle(Palette.brassHi)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 6)
@@ -516,11 +520,11 @@ struct AlbumDetailView: View {
     }
 
     private func kicker(_ a: Album, shown: [Track]) -> String {
-        var parts = ["ALBUM"]
+        var parts = [String(localized: "ALBUM", comment: "Kicker above an album's title on its page")]
         if let y = a.year { parts.append(String(y)) }
         // Counted once per song, however many versions it has.
         let count = shown.isEmpty ? a.trackCount : shown.count
-        parts.append("\(count) TRACK\(count == 1 ? "" : "S")")
+        parts.append(String(localized: "\(count) TRACKS"))
         parts.append((shown.isEmpty ? a.duration : shown.reduce(0) { $0 + $1.duration }).longDuration)
         return parts.joined(separator: " · ")
     }
@@ -552,13 +556,14 @@ struct ArtistsView: View {
         let total = model.library.artists.count
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: "Artists", meta: filter.isEmpty ? "\(total.formatted()) artists" : "\(artists.count.formatted()) of \(total.formatted()) artists") {
+                PageHeader(title: String(localized: "Artists"),
+                           meta: filter.isEmpty ? String(localized: "\(total) artists") : String(localized: "\(artists.count) of \(total) artists")) {
                     PlayShuffleButtons(showsPlay: false, disabled: artists.isEmpty) { model.play(scope, shuffled: $0) }
                 }
                 FilterBar(scope: scope, items: .albums(model.baseAlbums(scope), model: model))
                     .padding(.bottom, 6)
                 if artists.isEmpty && total > 0 {
-                    NoMatchesView(unit: "artist") { model.setFilter(LibraryFilter(), for: scope) }
+                    NoMatchesView(title: "No artists match these filters") { model.setFilter(LibraryFilter(), for: scope) }
                 } else {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
                         ForEach(artists) { artist in
@@ -585,8 +590,8 @@ struct ArtistTile: View {
             VStack(alignment: .leading, spacing: 0) {
                 ArtworkView(key: artist.artworkKey, size: 160, cornerRadius: 999)
                     .shadow(color: .black.opacity(0.4), radius: 10, y: 8)
-                Text(artist.name).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
-                Text("\(artist.albumCount) album\(artist.albumCount == 1 ? "" : "s") · \(artist.trackCount) tracks")
+                Text(artist.name.libraryDisplayName).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
+                Text("\(artist.albumCount) albums · \(artist.trackCount) tracks")
                     .font(Typeface.mono(10)).foregroundStyle(Palette.text3).padding(.top, 3)
             }
             .contentShape(Rectangle())
@@ -619,8 +624,8 @@ struct ArtistDetailView: View {
     let name: String
 
     var body: some View {
-        AlbumsGridView(scope: .route(.artist(name)), title: name)
-            .navigationTitle(name)
+        AlbumsGridView(scope: .route(.artist(name)), title: name.libraryDisplayName)
+            .navigationTitle(name.libraryDisplayName)
     }
 }
 
@@ -636,7 +641,7 @@ struct SourceView: View {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(source.url.lastPathComponent).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
-                        Text("\(source.mode == .managed ? "MANAGED · COPIED & ORGANIZED" : "REFERENCED IN PLACE") · \(source.isOnline ? "ONLINE" : "OFFLINE")\(source.lastScannedAt.map { " · SCANNED " + $0.formatted(.relative(presentation: .named)).uppercased() } ?? "")")
+                        Text(status(source))
                             .font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                         Text(source.path).font(Typeface.ui(12)).foregroundStyle(Palette.text2).textSelection(.enabled)
                     }
@@ -646,9 +651,20 @@ struct SourceView: View {
                 }
                 .padding(24)
                 Hairline()
-                AlbumsGridView(scope: .sidebar(.source(sourceID)), title: "Albums in this source")
+                AlbumsGridView(scope: .sidebar(.source(sourceID)), title: String(localized: "Albums in this source"))
             }
             .background(Palette.window)
         }
+    }
+
+    /// "MANAGED · COPIED & ORGANIZED · ONLINE · SCANNED 2 HOURS AGO"
+    private func status(_ source: LibrarySource) -> String {
+        var parts = [source.mode == .managed ? String(localized: "MANAGED · COPIED & ORGANIZED") : String(localized: "REFERENCED IN PLACE"),
+                     source.isOnline ? String(localized: "ONLINE") : String(localized: "OFFLINE")]
+        if let scanned = source.lastScannedAt {
+            parts.append(String(localized: "SCANNED \(scanned.formatted(.relative(presentation: .named)).localizedUppercase)",
+                                comment: "Followed by when the source was last scanned, e.g. 2 HOURS AGO"))
+        }
+        return parts.joined(separator: " · ")
     }
 }

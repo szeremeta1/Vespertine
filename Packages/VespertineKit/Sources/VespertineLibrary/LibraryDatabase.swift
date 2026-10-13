@@ -134,10 +134,11 @@ public final class LibraryDatabase: Sendable {
                 t.column("fileBackupPath", .text)
             }
 
-            // Starter smart playlists.
-            var hiRes = Playlist(name: "Hi-Res ≥ 88.2 kHz", smartRules: .hiRes, sortIndex: 0)
+            // Starter smart playlists. Stored in English, and shown in the user's language until renamed
+            // (String.libraryDisplayName), so they follow a change of language.
+            var hiRes = Playlist(name: Playlist.hiResName, smartRules: .hiRes, sortIndex: 0)
             try hiRes.insert(db)
-            var suspect = Playlist(name: "Suspect Hi-Res", smartRules: .suspect, sortIndex: 1)
+            var suspect = Playlist(name: Playlist.suspectName, smartRules: .suspect, sortIndex: 1)
             try suspect.insert(db)
         }
         m.registerMigration("v2-cue-state") { db in
@@ -172,7 +173,7 @@ public final class LibraryDatabase: Sendable {
                 SmartRule(field: .verdict, op: .equals, value: "paddedBitDepth"),
                 SmartRule(field: .verdict, op: .equals, value: "possibleLossyOrigin"),
             ])
-            for var playlist in try Playlist.filter(Column("name") == "Suspect Hi-Res").fetchAll(db) where playlist.smartRules == old {
+            for var playlist in try Playlist.filter(Column("name") == Playlist.suspectName).fetchAll(db) where playlist.smartRules == old {
                 playlist.smartRules = .suspect
                 try playlist.update(db)
             }
@@ -337,7 +338,9 @@ public extension LibraryDatabase {
         let summary: String = if isDSD {
             "DSD\(Int((rate / 44_100).rounded()))"
         } else if codecCount > 1 {
-            bits.map { "\(codec) · up to \($0)/\(rateText)" } ?? "\(codec) · up to \(rateText) kHz"
+            // `codec` stays the "Mixed" sentinel (FormatMark checks it); the summary names it in the user's language.
+            bits.map { String(localized: "Mixed · up to \($0)/\(rateText)", comment: "Album in several formats: the most bits / kHz of its files, e.g. “up to 24/96”.") }
+                ?? String(localized: "Mixed · up to \(rateText) kHz", comment: "Album in several formats: the highest sample rate of its files.")
         } else if !lossless, let bitrate {
             "\(codec) · \(Int(bitrate))k"
         } else if let bits {
@@ -873,7 +876,7 @@ public extension LibraryDatabase {
 private struct SourceOverlapError: LocalizedError {
     let path: String
     var errorDescription: String? {
-        "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership."
+        String(localized: "This folder contains an existing library source (\(path)). Add non-overlapping folders to preserve track and playlist ownership.")
     }
 }
 

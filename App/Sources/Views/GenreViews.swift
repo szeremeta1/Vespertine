@@ -17,13 +17,14 @@ struct GenresView: View {
         let total = model.library.genres.count
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                PageHeader(title: "Genres", meta: filter.isEmpty ? "\(total) genres" : "\(genres.count) of \(total) genres") {
+                PageHeader(title: String(localized: "Genres"),
+                           meta: filter.isEmpty ? String(localized: "\(total) genres") : String(localized: "\(genres.count) of \(total) genres")) {
                     PlayShuffleButtons(showsPlay: false, disabled: genres.isEmpty) { model.play(scope, shuffled: $0) }
                 }
                 FilterBar(scope: scope, items: .albums(model.baseAlbums(scope), model: model))
                     .padding(.bottom, 6)
                 if genres.isEmpty && total > 0 {
-                    NoMatchesView(unit: "genre") { model.setFilter(LibraryFilter(), for: scope) }
+                    NoMatchesView(title: "No genres match these filters") { model.setFilter(LibraryFilter(), for: scope) }
                 } else {
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 26) {
                         ForEach(genres) { GenreTile(genre: $0, filter: filter) }
@@ -50,7 +51,7 @@ struct GenreTile: View {
                 GenreMosaic(keys: genre.artworkKeys)
                     .shadow(color: .black.opacity(0.45), radius: 13, y: 10)
                 Text(genre.name).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1).padding(.top, 10)
-                Text("\(genre.albumCount) album\(genre.albumCount == 1 ? "" : "s")")
+                Text("\(genre.albumCount) albums")
                     .font(Typeface.mono(10)).foregroundStyle(Palette.text3).padding(.top, 3)
             }
             .contentShape(Rectangle())

@@ -69,13 +69,13 @@ struct TrackTable: View {
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
-                    Text(row.track.displayArtist).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
                 .width(min: 100, ideal: 140)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
-                    Text(row.track.displayAlbum).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
                 }
                 .width(min: 100, ideal: 150)
             }
@@ -86,7 +86,7 @@ struct TrackTable: View {
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
                     if let other = row.track.id.flatMap({ otherVersions[$0] }) {
-                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).tracking(0.6).foregroundStyle(Palette.text2)
+                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.6).foregroundStyle(Palette.text2)
                             .padding(.horizontal, 5).padding(.vertical, 2)
                             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                             .fixedSize()
@@ -209,10 +209,10 @@ struct AnalysisTag: View {
         }
     }
 
-    private func tag(_ text: String, color: Color) -> some View {
+    private func tag(_ text: LocalizedStringKey, color: Color) -> some View {
         Text(text)
             .font(Typeface.mono(8.5, weight: .semibold))
-            .tracking(0.6)
+            .letterSpacing(0.6)
             .foregroundStyle(color)
             .padding(.horizontal, 5).padding(.vertical, 2)
             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(color.opacity(0.5)))
@@ -231,7 +231,7 @@ struct TrackMenu: View {
         Button("Play Next") { model.player.playNext(tracks) }
         Button("Add to Queue") { model.player.addToQueue(tracks) }
         AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
-        Button(tracks.allSatisfy(model.library.isFavorite) ? "Remove from Favorites" : "Add to Favorites") {
+        Button(tracks.allSatisfy(model.library.isFavorite) ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites")) {
             model.toggleFavorite(tracks)
         }
         Divider()
@@ -303,8 +303,8 @@ struct SongsPage<Extra: View, Empty: View>: View {
     let scope: FilterScope
     let title: String
     let list: SongList
-    /// What the subtitle calls them ("tracks", "songs").
-    var word = "track"
+    /// Whether the subtitle counts them as songs rather than tracks.
+    var countsSongs = false
     var kicker = ""
     var playlist: Playlist? = nil
     @ViewBuilder var extra: Extra
@@ -329,7 +329,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
                 FilterBar(scope: scope, items: .songs(list.tracks, facts: list.facts, model: model))
                     .padding(.bottom, 10)
                 if shown.isEmpty {
-                    NoMatchesView(unit: "song") { model.setFilter(LibraryFilter(), for: scope) }
+                    NoMatchesView(title: "No songs match these filters") { model.setFilter(LibraryFilter(), for: scope) }
                     Spacer(minLength: 0)
                 } else {
                     // A filtered playlist keeps its own numbers, and edits through it keep the songs out of view.
@@ -363,7 +363,12 @@ struct SongsPage<Extra: View, Empty: View>: View {
     private func meta(_ shown: [Track], filtered: Bool) -> String {
         let n = shown.count
         let total = list.songOf == nil ? list.tracks.count : list.songs.count
-        let count = filtered ? "\(n.formatted()) of \(total.formatted()) \(word)s" : "\(n.formatted()) \(word)\(n == 1 ? "" : "s")"
+        let count = switch (filtered, countsSongs) {
+        case (true, true): String(localized: "\(n) of \(total) songs")
+        case (true, false): String(localized: "\(n) of \(total) tracks")
+        case (false, true): String(localized: "\(n) songs")
+        case (false, false): String(localized: "\(n) tracks")
+        }
         return "\(kicker)\(count) · \(shown.reduce(0) { $0 + $1.duration }.longDuration)"
     }
 }
@@ -373,7 +378,7 @@ struct SongsView: View {
     @State private var list = SongList()
 
     var body: some View {
-        SongsPage(scope: .sidebar(.songs), title: "Songs", list: list) { EmptyView() } empty: { Spacer() }
+        SongsPage(scope: .sidebar(.songs), title: String(localized: "Songs"), list: list) { EmptyView() } empty: { Spacer() }
             .task(id: model.library.revision) {
                 // A scan changes the library many times a second: read it once things settle, and off the main thread.
                 if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
@@ -413,7 +418,7 @@ struct SearchResultsView: View {
         }()
         let found = !(results.tracks.isEmpty && self.albums.isEmpty && self.artists.isEmpty && self.genres.isEmpty)
         VStack(alignment: .leading, spacing: 0) {
-            PageHeader(title: "\u{201C}\(query)\u{201D}", meta: meta(genres: genres.count, artists: artists.count, albums: albumFamilies.count, songs: songs.count)) {
+            PageHeader(title: String(localized: "\u{201C}\(query)\u{201D}", comment: "Search results title: the search text in quotation marks"), meta: meta(genres: genres.count, artists: artists.count, albums: albumFamilies.count, songs: songs.count)) {
                 PlayShuffleButtons(disabled: songs.isEmpty) { shuffled in
                     model.player.play(songs, shuffled: shuffled, allowing: model.allowing(filter, perAlbum: false))
                 }
@@ -425,7 +430,7 @@ struct SearchResultsView: View {
                 FilterBar(scope: scope, items: .songs(results.tracks, facts: results.facts, model: model, alsoOffering: self.albums.map(\.facts)))
                     .padding(.bottom, 12)
                 if songs.isEmpty && albums.isEmpty && artists.isEmpty && genres.isEmpty {
-                    NoMatchesView(unit: "result") { model.setFilter(LibraryFilter(), for: scope) }
+                    NoMatchesView(title: "No results match these filters") { model.setFilter(LibraryFilter(), for: scope) }
                     Spacer(minLength: 0)
                 }
                 if !genres.isEmpty {
@@ -476,13 +481,12 @@ struct SearchResultsView: View {
     }
 
     private func meta(genres: Int, artists: Int, albums: Int, songs: Int) -> String {
-        func n(_ c: Int, _ word: String) -> String { "\(c) \(word)\(c == 1 ? "" : "s")" }
-        let parts: [String] = (genres == 0 ? [] : [n(genres, "genre")])
-            + [n(artists, "artist"), n(albums, "album"), n(songs, "song")]
+        let parts: [String] = (genres == 0 ? [] : [String(localized: "\(genres) genres")])
+            + [String(localized: "\(artists) artists"), String(localized: "\(albums) albums"), String(localized: "\(songs) songs")]
         return parts.joined(separator: " · ")
     }
 
-    private func sectionTitle(_ title: String, count: Int) -> some View {
+    private func sectionTitle(_ title: LocalizedStringKey, count: Int) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(title).font(Typeface.serif(18)).foregroundStyle(Palette.text)
             Text("\(count)").font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
@@ -491,7 +495,7 @@ struct SearchResultsView: View {
         .padding(.bottom, 10)
     }
 
-    private func shelf<Content: View>(_ title: String, count: Int, @ViewBuilder content: () -> Content) -> some View {
+    private func shelf<Content: View>(_ title: LocalizedStringKey, count: Int, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             sectionTitle(title, count: count)
             ScrollView(.horizontal, showsIndicators: false) {
@@ -512,16 +516,16 @@ struct PlaylistView: View {
         let playlist = model.library.playlists.first { $0.id == playlistID }
         Group {
             if let playlist {
-                SongsPage(scope: .sidebar(.playlist(playlistID)), title: playlist.name, list: list,
-                          kicker: playlist.isSmart ? "SMART · " : "", playlist: playlist) {
+                SongsPage(scope: .sidebar(.playlist(playlistID)), title: playlist.name.libraryDisplayName, list: list,
+                          kicker: playlist.isSmart ? String(localized: "SMART", comment: "Before a smart playlist's song count") + " · " : "", playlist: playlist) {
                     if playlist.isSmart {
                         Button("Edit Rules…") { model.smartEditorPlaylist = playlist }.buttonStyle(QuietButtonStyle())
                     }
                 } empty: {
                     VStack(spacing: 8) {
-                        Text(playlist.isSmart ? "No tracks match these rules yet." : "Drag albums or tracks here.")
+                        (playlist.isSmart ? Text("No tracks match these rules yet.") : Text("Drag albums or tracks here."))
                             .font(Typeface.serif(18)).foregroundStyle(Palette.text2)
-                        Text(playlist.isSmart ? "Run an analysis or adjust the rules." : "You can also use “Add to Playlist” in any context menu.")
+                        (playlist.isSmart ? Text("Run an analysis or adjust the rules.") : Text("You can also use “Add to Playlist” in any context menu."))
                             .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

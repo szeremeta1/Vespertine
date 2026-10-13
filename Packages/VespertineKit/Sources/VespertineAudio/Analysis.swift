@@ -24,6 +24,7 @@ extension FileAnalyzer {
             plan: OutputPlan(mode: .pcm, deviceSampleRate: format.sampleRate, decodedSampleRate: format.sampleRate,
                              physicalBitDepth: 32, channels: format.channels, dsdConvertedToPCM: false, reason: ""),
             item: PlayableItem(url: url)) else {
+            // Stored in English, like the server's; `FileAnalysis.localizedSummary` translates these two for display.
             return .notApplicable(claimedBitDepth: format.bitDepth, sampleRate: format.sampleRate,
                                   summary: format.encoding == .dsd ? "DSD source: bit depth analysis doesn't apply." : "Lossy source: analysis doesn't apply.")
         }

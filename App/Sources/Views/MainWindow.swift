@@ -41,7 +41,7 @@ struct MainWindow: View {
         .onChange(of: model.searchText) { model.path = [] }
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                Button { _ = model.path.popLast() } label: { Label("Back", systemImage: "chevron.left") }
+                Button { _ = model.path.popLast() } label: { Label("Back", systemImage: "chevron.backward") }
                     .disabled(model.path.isEmpty)
                     .keyboardShortcut("[", modifiers: .command)
                     .help("Back (⌘[)")
@@ -125,7 +125,7 @@ struct ContentRouter: View {
         case .artists: ArtistsView()
         case .songs: SongsView()
         case .genres: GenresView()
-        case .recentlyAdded: AlbumsGridView(scope: .sidebar(.recentlyAdded), title: "Recently Added")
+        case .recentlyAdded: AlbumsGridView(scope: .sidebar(.recentlyAdded), title: String(localized: "Recently Added"))
         case .favorites: FavoritesView()
         case .playlist(let id): PlaylistView(playlistID: id)
         case .source(let id): SourceView(sourceID: id)
