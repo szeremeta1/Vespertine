@@ -1,5 +1,6 @@
 // Captures the largest on-screen window of an app to PNG (used for visual QA).
-// Usage: swift scripts/capture-window.swift <AppName> <out.png> [titleContains]
+// Usage: swift scripts/capture-window.swift <AppName|pid> <out.png> [titleContains]
+// A number picks the windows of that process, so one copy of an app can be captured while another is open.
 import CoreGraphics
 import Foundation
 
@@ -7,7 +8,11 @@ let args = CommandLine.arguments
 let owner = args[1], out = args[2]
 let titleFilter = args.count > 3 ? args[3] : nil
 let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
-let windows = list.filter { ($0[kCGWindowOwnerName as String] as? String) == owner && ($0[kCGWindowLayer as String] as? Int ?? 1) >= 0 }
+let pid = Int(owner)
+let windows = list.filter { w in
+    (pid.map { (w[kCGWindowOwnerPID as String] as? Int) == $0 } ?? ((w[kCGWindowOwnerName as String] as? String) == owner))
+        && (w[kCGWindowLayer as String] as? Int ?? 1) >= 0
+}
     .filter { titleFilter == nil || (($0[kCGWindowName as String] as? String) ?? "").contains(titleFilter!) }
     .sorted {
         let a = $0[kCGWindowBounds as String] as? [String: Double] ?? [:], b = $1[kCGWindowBounds as String] as? [String: Double] ?? [:]

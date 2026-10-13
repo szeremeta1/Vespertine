@@ -306,6 +306,73 @@ struct DSDScene: View {
     }
 }
 
+// MARK: - SACD image
+
+struct SACDScene: View {
+    let t: Double
+    let size: CGSize
+    let assets: Assets
+    let frame: CGImage?
+
+    // 0.11.1: Dire Straits' Brothers In Arms, played from the 2005 SACD image's stereo area over DoP on the FiiO K11. Its
+    // title fits one line, so the badges sit 13 pt higher than DSD's; the lifted step is the decoder ("SACD image · DST").
+    static let badges = CGRect(x: 1104, y: 419, width: 196, height: 110)
+    static let path = CGRect(x: 1104, y: 614, width: 306, height: 50)
+
+    var body: some View {
+        let g = Geo(size: size)
+        let s = Scene.sacd.range.lowerBound
+        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
+        let pose = featurePose(g, t: t, s: s, right: true, dim: 0.55 * lifted)
+        let cue = Cue.for(.sacd)!
+        ZStack(alignment: .topLeading) {
+            WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose)
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Play the disc\nimage itself.", right: true)
+            Lift(image: frame, region: SACDScene.badges, pose: pose,
+                 to: g.at((0.23, 0.6), square: (0.3, 0.44), tall: (0.5, 0.52)),
+                 toScale: g.pick(1.75, square: 1.7, tall: 1.45) * g.u,
+                 p: spring(t, start: s + b * 0.55, response: 0.8, damping: 0.8))
+            Lift(image: frame, region: SACDScene.path, pose: pose,
+                 to: g.at((0.25, 0.83), square: (0.36, 0.66), tall: (0.5, 0.7)),
+                 toScale: g.pick(1.5, square: 1.35, tall: 1.2) * g.u,
+                 p: spring(t, start: s + b * 1.15, response: 0.8, damping: 0.8))
+        }
+        .frame(width: g.W, height: g.H)
+    }
+}
+
+// MARK: - Languages
+
+struct LanguagesScene: View {
+    let t: Double
+    let size: CGSize
+    let assets: Assets
+    let frame: CGImage?
+
+    // 0.11.1: the album page in Arabic, laid out right to left, so the sidebar and its window buttons are on the right;
+    // macOS's capture indicator sits there too and is covered by mirrored buttons on the sidebar's own colour.
+    static let indicator = CGRect(x: AppWindow.size.width - AppWindow.indicator.maxX, y: AppWindow.indicator.minY,
+                                  width: AppWindow.indicator.width, height: AppWindow.indicator.height)
+
+    var body: some View {
+        let g = Geo(size: size)
+        let s = Scene.languages.range.lowerBound
+        let pose = featurePose(g, t: t, s: s, right: false)
+        let side = assets.poster["languages"].map { sampleColor($0, at: CGRect(x: 1270, y: 14, width: 60, height: 24)) } ?? (r: 0.1, g: 0.1, b: 0.1)
+        let patch = ZStack(alignment: .topLeading) {
+            Color(.sRGB, red: side.r, green: side.g, blue: side.b).frame(width: LanguagesScene.indicator.width, height: LanguagesScene.indicator.height)
+            TrafficLights().scaleEffect(x: -1, y: 1)
+        }
+        .offset(x: LanguagesScene.indicator.minX, y: LanguagesScene.indicator.minY)
+        ZStack(alignment: .topLeading) {
+            WindowRig(frame: frame, sidebar: nil, sidebarColor: .clear, pose: pose, windowOverlay: AnyView(patch))
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Speaks your\nlanguage.",
+                        label: "44 languages + English", label2: "Right to left where it should be", right: false)
+        }
+        .frame(width: g.W, height: g.H)
+    }
+}
+
 // MARK: - Stereo and surround versions
 
 struct VersionsScene: View {
@@ -315,7 +382,8 @@ struct VersionsScene: View {
     let frame: CGImage?
 
     // 1.0: Oasis's Morning Glory SACD on the FiiO K11, the playing row 4 of 12 and the stereo version's source line.
-    static let rows = CGRect(x: 292, y: 418, width: 484, height: 70)
+    // 0.11.1 re-recording: the album now opens under its three-edition picker, so the rows sit 165 pt lower.
+    static let rows = CGRect(x: 292, y: 583, width: 484, height: 70)
     static let source = CGRect(x: 1104, y: 591, width: 306, height: 34)
 
     var body: some View {
@@ -505,9 +573,10 @@ struct LibraryScene: View {
     let frame: CGImage?
 
     // 1.0: covers are 175 pt (the grid gained 3 pt per card), 197 pt apart; the filter bar is where 0.6.4 put it.
-    static let columns: [CGFloat] = [256, 453, 650, 847, 1044, 1241]
-    static let rows: [CGFloat] = [176, 441]
-    static let card = CGSize(width: 175, height: 239)   // cover, title, artist and format
+    // 0.11.1 re-recording (inspector hidden, sort and filter rows above the grid): covers 172.5 pt on a 194.2 pt pitch.
+    static let columns: [CGFloat] = [256, 450, 644.5, 838.5, 1032.5, 1227]
+    static let rows: [CGFloat] = [176, 438]
+    static let card = CGSize(width: 172.5, height: 236)   // cover, title, artist and format
 
     var body: some View {
         let g = Geo(size: size)

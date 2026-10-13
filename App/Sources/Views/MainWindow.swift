@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 struct MainWindow: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -85,7 +86,10 @@ struct MainWindow: View {
                 .environment(model)
         }
         .overlay(alignment: .top) { ErrorBanner() }
-        .task { model.runDeveloperHooks(openWindow: openWindow) }
+        .task {
+            model.runDeveloperHooks(openWindow: openWindow)
+            if LaunchArguments().bool(forKey: "VespertineOpenSettings") { openSettings() }   // QA: -VespertineOpenSettings YES
+        }
         .onOpenURL { model.openAudio($0) }
     }
 }

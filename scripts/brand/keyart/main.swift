@@ -18,11 +18,11 @@ let features = [
     Feature(id: "bit-perfect", shot: "bit-perfect-fiio-24-96",
             headline: "Every sample, untouched.",
             sub: "Vespertine switches your DAC to the file’s rate and shows the signal path. Bit-perfect conditions and tests are in the source.",
-            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 96 kHz", .plain)], focus: CGRect(x: 1826, y: 985, width: 564, height: 400)),
+            chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 96 kHz", .plain)], focus: CGRect(x: 1826, y: 885, width: 564, height: 500)),
     Feature(id: "stereo-and-surround", shot: "stereo-and-surround-versions",
             headline: "Stereo and surround in one library.",
             sub: "Extracted SACD tracks list each song once, in stereo or 5.1. Surround renders as Spatial Audio on AirPods.",
-            chips: [("DSD64 · 5.1", .plain), ("+ STEREO", .plain), ("○ SPATIAL · HEAD TRACKED", .copper)], focus: CGRect(x: 370, y: 575, width: 1100, height: 390)),
+            chips: [("DSD64 · 5.1", .plain), ("+ STEREO", .plain), ("○ SPATIAL · HEAD TRACKED", .copper)], focus: CGRect(x: 370, y: 860, width: 1100, height: 340)),
     Feature(id: "spatial-audio", shot: "spatial-audio-airpods-max",
             headline: "Your 5.1 albums, all around you.",
             sub: "Surround albums play as head-tracked Spatial Audio on AirPods, each channel placed where it belongs.",
@@ -36,6 +36,15 @@ let features = [
             headline: "Know when hi-res isn’t.",
             sub: "Spectral analysis flags upsampled, padded and lossy-sourced files, with the measurements to back it up.",
             chips: [("○ LOSSY ORIGIN?", .copper), ("LIKELY", .plain)], focus: CGRect(x: 1826, y: 150, width: 564, height: 900)),
+    Feature(id: "sacd-iso", shot: "sacd-iso",
+            headline: "Play the disc image itself.",
+            sub: "SACD .iso images play as they are: stereo or 5.1, DST decoded, no extracting. Here as native DSD over DoP on a FiiO K11.",
+            chips: [("● NATIVE DSD · DoP", .brass), ("SACD IMAGE · DSD64", .plain), ("32 / 176.4", .plain)], focus: CGRect(x: 1826, y: 770, width: 564, height: 600)),
+    // languages.png is the six-language grid (3840 wide): the focus is the Arabic window's sidebar and album header.
+    Feature(id: "languages", shot: "languages",
+            headline: "Speaks your language.",
+            sub: "Every menu, setting and signal-path message in 44 languages besides English, with right-to-left layouts for Arabic, Hebrew, Persian and Urdu.",
+            chips: [("44 LANGUAGES", .plain), ("+ ENGLISH", .plain), ("RIGHT-TO-LEFT", .plain)], focus: CGRect(x: 430, y: 942, width: 842, height: 470)),
 ]
 
 /// Greedy word wrap into lines no wider than `width`.

@@ -222,5 +222,11 @@ struct LoopbackTestSheet: View {
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 14)
+        .task {   // QA: `-VespertineOpenSheet loopback-run` opens the sheet and starts the test as Run Test does
+            guard LaunchArguments().string(forKey: "VespertineOpenSheet") == "loopback-run" else { return }
+            try? await Task.sleep(for: .seconds(2))
+            guard test.phase == .setup, let output = test.output(in: model.devices.devices) else { return }
+            await test.run(on: output, player: model.player)
+        }
     }
 }
