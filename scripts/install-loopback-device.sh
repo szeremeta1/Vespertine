@@ -31,12 +31,15 @@ git -C "$work" fetch -q --depth 1 https://github.com/ExistentialAudio/BlackHole 
 git -C "$work" checkout -q FETCH_HEAD
 [[ "$(git -C "$work" rev-parse HEAD)" == "$commit" ]] || { echo "BlackHole $tag isn't at the expected commit."; exit 1; }
 
-# The device is named exactly "$name" (no channel count appended), with UIDs of its own. The space is written \040
-# (octal) because build settings split definitions at spaces.
+# The device is named exactly "$name" (no channel count appended), with UIDs of its own. The name is defined in the
+# source, because build settings split definitions at spaces and no escape survives that. Signing happens below.
+sed -i '' "1i\\
+#define kDevice_Name \"$name\"
+" "$work/BlackHole/BlackHole.c"
 (cd "$work" && xcodebuild -quiet \
-    -project BlackHole.xcodeproj -configuration Release -target BlackHole CONFIGURATION_BUILD_DIR="$work/build" \
+    -project BlackHole.xcodeproj -configuration Release -target BlackHole CONFIGURATION_BUILD_DIR="$work/build" CODE_SIGNING_ALLOWED=NO \
     PRODUCT_BUNDLE_IDENTIFIER="$bundle_id" \
-    GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS kNumber_Of_Channels=2 kHas_Driver_Name_Format=false kDriver_Name=\"VespertineLoopback\" kDevice_Name=\"Vespertine\\040Loopback\" kPlugIn_BundleID=\"'"$bundle_id"'\"')
+    GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS kNumber_Of_Channels=2 kHas_Driver_Name_Format=false kDriver_Name=\"VespertineLoopback\" kPlugIn_BundleID=\"'"$bundle_id"'\"')
 built="$work/build/BlackHole.driver"
 [[ -d "$built" ]] || { echo "The build didn't produce BlackHole.driver."; exit 1; }
 # A factory UUID of its own, as BlackHole's own installer does for each variant.
