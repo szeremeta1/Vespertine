@@ -88,6 +88,41 @@ struct DSDTests {
                                         item: PlayableItem(url: url))
     }
 
+    @Test("CUE offsets in DSD source frames open the right region in PCM and DoP", arguments: [false, true])
+    func cueRegionUsesDecoderRate(dopMode: Bool) throws {
+        let sourceRate = 2_822_400.0
+        let url = tmp("cue-64.dsf")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try DSDFiles.writeDSF(DSDFiles.modulate(rate: sourceRate, seconds: 0.5), rate: sourceRate, to: url)
+        let probed = try SourceOpener.probe(url)
+        let rate = dopMode ? 176_400.0 : 352_800.0
+        let plan = OutputPlan(mode: dopMode ? .dop : .pcm, deviceSampleRate: rate, decodedSampleRate: rate,
+                              physicalBitDepth: 24, channels: 2, dsdConvertedToPCM: !dopMode, reason: "")
+        let item = PlayableItem(url: url, regionStartFrame: Int64(sourceRate / 4), regionFrameLength: Int64(sourceRate / 4))
+        let region = try SourceOpener.decoder(for: probed, plan: plan, item: item)
+        #expect(region.processingFormat.sampleRate == rate)
+        #expect(region.length == Int64(rate / 4))
+        #expect(try read(region, frames: Int(rate / 4) + 1024)[0].count == Int(rate / 4))
+    }
+
+    @Test("A real DSD CUE track opens past track one", .enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_REAL_DSD_CUE_FILE"] != nil))
+    func realCueRegion() throws {
+        let env = ProcessInfo.processInfo.environment
+        let url = URL(fileURLWithPath: env["VESPERTINE_REAL_DSD_CUE_FILE"]!)
+        let start = try #require(Int64(env["VESPERTINE_REAL_DSD_CUE_START"] ?? ""))
+        let length = try #require(Int64(env["VESPERTINE_REAL_DSD_CUE_LENGTH"] ?? ""))
+        for dopMode in [false, true] {
+            let probed = try SourceOpener.probe(url)
+            let rate = dopMode ? FormatPlanner.dopCarrierRate(probed.format.sampleRate) : FormatPlanner.dsdToPCMRate(probed.format.sampleRate)
+            let plan = OutputPlan(mode: dopMode ? .dop : .pcm, deviceSampleRate: rate, decodedSampleRate: rate,
+                                  physicalBitDepth: 24, channels: probed.format.channels, dsdConvertedToPCM: !dopMode, reason: "")
+            let region = try SourceOpener.decoder(for: probed, plan: plan,
+                                                   item: PlayableItem(url: url, regionStartFrame: start, regionFrameLength: length))
+            #expect(region.length > 0)
+            #expect(try read(region, frames: 4096)[0].count == 4096)
+        }
+    }
+
     @Test("DoP from the raw stream carries the DSD bits exactly, with alternating markers (DSF and DSDIFF)", arguments: ["dsf", "dff"])
     func dopIsExact(ext: String) throws {
         let planes = DSDFiles.modulate(rate: 2_822_400, seconds: 0.5)

@@ -52,7 +52,8 @@ struct TransportBar: View {
             if let track = model.player.current?.track {
                 Button {
                     model.sidebar = .albums
-                    model.path = [.album(track.albumKey)]
+                    model.path = []
+                    model.openAlbum(track.albumKey)
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)

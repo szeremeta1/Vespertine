@@ -107,6 +107,19 @@ struct DTSTests {
         #expect(try decode(region, frames: 20_000)[0].count == 10_592)
     }
 
+    @Test("An invalid CUE region returns an error instead of aborting playback")
+    func invalidCueRegion() throws {
+        let plan = OutputPlan(mode: .pcm, deviceSampleRate: 44_100, decodedSampleRate: 44_100, physicalBitDepth: 32,
+                              channels: 6, dsdConvertedToPCM: false, reason: "")
+        for (start, length) in [(110_592, 1), (110_593, 1), (44_100, 0), (-2, 100)] as [(Int64, Int64)] {
+            let probed = try SourceOpener.probe(fixture)
+            #expect(throws: SourceOpenerError.self) {
+                try SourceOpener.decoder(for: probed, plan: plan,
+                                         item: PlayableItem(url: fixture, regionStartFrame: start, regionFrameLength: length))
+            }
+        }
+    }
+
     @Test("Ordinary 16-bit stereo PCM is left alone")
     func plainPCM() throws {
         let url = try writeWAV("not-dts", rate: 44_100, bits: 16, seconds: 1) { c, i in Float(sin(Double(i) * 0.05 + Double(c))) * 0.5 }
