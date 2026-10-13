@@ -25,7 +25,7 @@ struct MainRoot: View {
     }
 }
 
-enum SetupStep: Int, CaseIterable, Comparable {
+nonisolated enum SetupStep: Int, CaseIterable, Comparable {
     case welcome, music, output, sound, extras, done
 
     static func < (a: SetupStep, b: SetupStep) -> Bool { a.rawValue < b.rawValue }
@@ -269,11 +269,19 @@ private struct SetupBackdrop: View {
 // MARK: - Pieces
 
 struct SetupPrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: ButtonStyleConfiguration) -> some View {
+        SetupPrimaryButton(label: configuration.label, pressed: configuration.isPressed)
+    }
+}
+
+private struct SetupPrimaryButton: View {
+    let label: ButtonStyleConfiguration.Label
+    let pressed: Bool
     @Environment(\.isEnabled) private var isEnabled
     @State private var hovering = false
 
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
+    var body: some View {
+        label
             .font(Typeface.ui(14, weight: .semibold))
             .foregroundStyle(Color(hex: 0x1A140A))
             .padding(.horizontal, 24)
@@ -281,10 +289,10 @@ struct SetupPrimaryButtonStyle: ButtonStyle {
             .background(Palette.brassGradient, in: Capsule())
             .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 0.5).blendMode(.overlay))
             .shadow(color: Palette.brass.opacity(hovering ? 0.55 : 0.25), radius: hovering ? 16 : 8, y: 2)
-            .scaleEffect(configuration.isPressed ? 0.97 : hovering ? 1.03 : 1)
+            .scaleEffect(pressed ? 0.97 : hovering ? 1.03 : 1)
             .opacity(isEnabled ? 1 : 0.4)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: hovering)
-            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: configuration.isPressed)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: pressed)
             .onHover { hovering = $0 }
     }
 }
@@ -915,7 +923,7 @@ private struct BurstParticle: ViewModifier, Animatable {
     }
 }
 
-private struct CheckShape: Shape {
+private nonisolated struct CheckShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         path.move(to: CGPoint(x: rect.minX, y: rect.midY + rect.height * 0.05))
