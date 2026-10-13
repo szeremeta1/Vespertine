@@ -64,7 +64,8 @@ final class LoopbackTest {
     func run(on output: OutputDevice, player: PlayerController) async {
         guard phase != .running else { return }
         reset()
-        guard await LoopbackPermission.ensure() else {
+        // Unanswered isn't a refusal: try anyway, and a silent capture says "no signal reached the input".
+        guard await LoopbackPermission.check() != .denied else {
             error = LoopbackError.permissionDenied.localizedDescription
             phase = .finished
             return
