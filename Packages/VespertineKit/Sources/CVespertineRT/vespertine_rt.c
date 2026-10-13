@@ -699,6 +699,98 @@ OSStatus nrt_device_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, 
     return noErr;
 }
 
+// MARK: - Capture
+
+struct NRTCapture {
+    NRTRing *ring;
+    float *scratch;             // one slice, interleaved at the ring's channel count
+    uint32_t scratchFrames;
+    _Atomic uint64_t frames;
+    _Atomic uint64_t overflow;
+    _Atomic uint32_t eventCount;
+    _Atomic uint64_t events[NRT_CAPTURE_MAX_EVENTS];
+    double nextSampleTime;      // I/O thread only
+    bool started;               // I/O thread only
+};
+
+NRTCapture *nrt_capture_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
+    if (!ring || maxFramesPerSlice == 0) return NULL;
+    NRTCapture *c = calloc(1, sizeof *c);
+    if (!c) return NULL;
+    c->ring = ring;
+    c->scratchFrames = maxFramesPerSlice;
+    c->scratch = calloc((size_t)maxFramesPerSlice * nrt_ring_channels(ring), sizeof(float));
+    if (!c->scratch) { free(c); return NULL; }
+    return c;
+}
+
+void nrt_capture_destroy(NRTCapture *c) {
+    if (!c) return;
+    free(c->scratch);
+    free(c);
+}
+
+uint64_t nrt_capture_frames(const NRTCapture *c) { return atomic_load_explicit(&c->frames, memory_order_acquire); }
+uint64_t nrt_capture_overflow(const NRTCapture *c) { return atomic_load(&c->overflow); }
+
+uint32_t nrt_capture_discontinuities(const NRTCapture *c, uint64_t *positions, uint32_t max) {
+    const uint32_t count = atomic_load_explicit(&c->eventCount, memory_order_acquire);
+    const uint32_t kept = count < NRT_CAPTURE_MAX_EVENTS ? count : NRT_CAPTURE_MAX_EVENTS;
+    for (uint32_t i = 0; positions && i < kept && i < max; i++) positions[i] = atomic_load(&c->events[i]);
+    return count;
+}
+
+static void capture_event(NRTCapture *c, uint64_t at) {
+    const uint32_t i = atomic_load_explicit(&c->eventCount, memory_order_relaxed);
+    if (i < NRT_CAPTURE_MAX_EVENTS) atomic_store_explicit(&c->events[i], at, memory_order_relaxed);
+    atomic_store_explicit(&c->eventCount, i + 1, memory_order_release);
+}
+
+OSStatus nrt_capture_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow, const AudioBufferList *inInputData,
+                            const AudioTimeStamp *inInputTime, AudioBufferList *outOutputData,
+                            const AudioTimeStamp *inOutputTime, void *inClientData) {
+    (void)inDevice; (void)inNow; (void)outOutputData; (void)inOutputTime;
+    NRTCapture *c = (NRTCapture *)inClientData;
+    if (!c || !inInputData || inInputData->mNumberBuffers == 0) return noErr;
+    const AudioBuffer *first = &inInputData->mBuffers[0];
+    const uint32_t firstCh = first->mNumberChannels ? first->mNumberChannels : 1;
+    uint32_t frames = first->mDataByteSize / (uint32_t)(sizeof(float) * firstCh);
+    if (frames > c->scratchFrames) frames = c->scratchFrames;
+    if (frames == 0) return noErr;
+    const uint64_t at = atomic_load_explicit(&c->frames, memory_order_relaxed);
+
+    // The input's sample time should advance by exactly the frames delivered; a jump means the recorder missed some.
+    if (inInputTime && (inInputTime->mFlags & kAudioTimeStampSampleTimeValid)) {
+        if (c->started && fabs(inInputTime->mSampleTime - c->nextSampleTime) >= 0.5) capture_event(c, at);
+        c->nextSampleTime = inInputTime->mSampleTime + frames;
+        c->started = true;
+    }
+
+    // Interleave the first channels across the input streams into the ring's layout.
+    const uint32_t ch = nrt_ring_channels(c->ring);
+    uint32_t deviceChannel = 0;
+    memset(c->scratch, 0, (size_t)frames * ch * sizeof(float));
+    for (uint32_t bi = 0; bi < inInputData->mNumberBuffers && deviceChannel < ch; bi++) {
+        const AudioBuffer *b = &inInputData->mBuffers[bi];
+        const uint32_t bch = b->mNumberChannels ? b->mNumberChannels : 1;
+        const uint32_t available = b->mDataByteSize / (uint32_t)(sizeof(float) * bch);
+        const float *in = (const float *)b->mData;
+        if (in) {
+            for (uint32_t f = 0; f < frames && f < available; f++)
+                for (uint32_t k = 0; k < bch && deviceChannel + k < ch; k++)
+                    c->scratch[(size_t)f * ch + deviceChannel + k] = in[(size_t)f * bch + k];
+        }
+        deviceChannel += bch;
+    }
+    const uint32_t written = nrt_ring_write(c->ring, c->scratch, frames);
+    if (written < frames) {
+        atomic_fetch_add_explicit(&c->overflow, frames - written, memory_order_relaxed);
+        capture_event(c, at + written);
+    }
+    atomic_store_explicit(&c->frames, at + written, memory_order_release);
+    return noErr;
+}
+
 // MARK: - Spatial audio bridge
 
 struct NRTSpatial {

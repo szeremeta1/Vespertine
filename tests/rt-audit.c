@@ -466,7 +466,55 @@ static void *tap_reader(void *unused) {
     for (int i = 0; i < 10000; i++) nrt_context_copy_tap(concurrent_context, tap, 1024);
     return NULL;
 }
+// MARK: - Capture: the recorder interleaves every input stream, and reports jumps in the input's sample time
+
+static void capture_audit(void) {
+    NRTRing *ring = nrt_ring_create(4096, 2);
+    NRTCapture *capture = nrt_capture_create(ring, 512);
+    assert(ring && capture);
+    float left[512], right[512];
+    AudioBufferList *list = calloc(1, sizeof(AudioBufferList) + sizeof(AudioBuffer));
+    list->mNumberBuffers = 2;
+    list->mBuffers[0] = (AudioBuffer){.mNumberChannels = 1, .mDataByteSize = sizeof left, .mData = left};
+    list->mBuffers[1] = (AudioBuffer){.mNumberChannels = 1, .mDataByteSize = sizeof right, .mData = right};
+    AudioTimeStamp time = {.mSampleTime = 1000, .mFlags = kAudioTimeStampSampleTimeValid};
+    AudioBufferList none = {.mNumberBuffers = 0};
+    for (int slice = 0; slice < 6; slice++) {
+        for (int i = 0; i < 512; i++) { left[i] = (float)(slice * 512 + i); right[i] = -(float)(slice * 512 + i); }
+        if (slice == 4) time.mSampleTime += 100;   // the recorder missed 100 frames before slice 4
+        nrt_capture_ioproc(0, &time, list, &time, &none, &time, capture);
+        time.mSampleTime += 512;
+    }
+    uint64_t positions[4] = {0};
+    assert(nrt_capture_discontinuities(capture, positions, 4) == 1 && positions[0] == 4 * 512);
+    assert(nrt_capture_frames(capture) == 6 * 512 && nrt_capture_overflow(capture) == 0);
+    float frame[2];
+    for (uint32_t i = 0; i < 6 * 512; i++) {
+        assert(nrt_ring_read(ring, frame, 1) == 1);
+        assert(frame[0] == (float)i && frame[1] == -(float)i);
+    }
+    // A full ring loses frames, and says where.
+    for (int slice = 0; slice < 10; slice++) {
+        nrt_capture_ioproc(0, &time, list, &time, &none, &time, capture);
+        time.mSampleTime += 512;
+    }
+    assert(nrt_capture_overflow(capture) == 10 * 512 - nrt_ring_capacity(ring));
+    // Two slices didn't fit: two events, both where the ring filled.
+    assert(nrt_capture_discontinuities(capture, positions, 4) == 3);
+    assert(positions[1] == 6 * 512 + nrt_ring_capacity(ring) && positions[2] == positions[1]);
+    // No input buffers, or empty ones: nothing recorded, no crash.
+    nrt_capture_ioproc(0, &time, &none, &time, &none, &time, capture);
+    list->mBuffers[1].mData = NULL;
+    nrt_ring_reset(ring);
+    nrt_capture_ioproc(0, &time, list, &time, &none, &time, capture);
+    assert(nrt_ring_readable(ring) == 512);
+    free(list);
+    nrt_capture_destroy(capture);
+    nrt_ring_destroy(ring);
+}
+
 int main(void) {
+    capture_audit();
     alarm(30);
     concurrent_ring = nrt_ring_create(256, 1);
     assert(concurrent_ring);
