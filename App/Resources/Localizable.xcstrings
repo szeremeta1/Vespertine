@@ -13099,7 +13099,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@-bit (рухома кома)"
+            "value": "%@ біт (рухома кома)"
           }
         },
         "ur": {
@@ -13368,7 +13368,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@-bit (цілі)"
+            "value": "%@ біт (цілі числа)"
           }
         },
         "ur": {
@@ -52748,7 +52748,7 @@
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "64-bit digital, TPDF dither"
+            "value": "Digital sa 64-bit, may TPDF dither"
           }
         },
         "fr": {
@@ -68999,265 +68999,271 @@
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share፣ nfs://server/export እና https://server/path (WebDAV) እንዲሁ ይቀበላል። ከማጋሪያው ስም በኋላ ያለ አቃፊ Vespertineን በዚያ አቃፊ ብቻ ይገድበዋል።"
+            "value": "\\\\\\\\server\\\\share፣ nfs://server/export እና https://server/path (WebDAV) እንዲሁ ይቀበላል። ከማጋሪያው ስም በኋላ ያለ አቃፊ Vespertineን በዚያ አቃፊ ብቻ ይገድበዋል።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يقبل أيضًا \\\\server\\share و nfs://server/export و https://server/path (WebDAV). يؤدي وجود مجلد بعد اسم المشاركة إلى حصر Vespertine في ذلك المجلد."
+            "value": "يقبل أيضًا \\\\\\\\server\\\\share و nfs://server/export و https://server/path (WebDAV). يؤدي وجود مجلد بعد اسم المشاركة إلى حصر Vespertine في ذلك المجلد."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export এবং https://server/path (WebDAV)-ও গ্রহণ করে। শেয়ারের নামের পরে একটি ফোল্ডার দিলে Vespertine শুধু সেই ফোল্ডারেই সীমাবদ্ধ থাকে।"
+            "value": "\\\\\\\\server\\\\share, nfs://server/export এবং https://server/path (WebDAV)-ও গ্রহণ করে। শেয়ারের নামের পরে একটি ফোল্ডার দিলে Vespertine শুধু সেই ফোল্ডারেই সীমাবদ্ধ থাকে।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Přijímá také \\\\server\\sdileni, nfs://server/export a https://server/cesta (WebDAV). Složka za názvem sdílení omezí Vespertine jen na tuto složku."
+            "value": "Přijímá také \\\\\\\\server\\\\sdileni, nfs://server/export a https://server/cesta (WebDAV). Složka za názvem sdílení omezí Vespertine jen na tuto složku."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accepterer også \\\\server\\deling, nfs://server/eksport og https://server/sti (WebDAV). En mappe efter delingens navn begrænser Vespertine til den mappe."
+            "value": "Accepterer også \\\\\\\\server\\\\deling, nfs://server/eksport og https://server/sti (WebDAV). En mappe efter delingens navn begrænser Vespertine til den mappe."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Akzeptiert auch \\\\server\\freigabe, nfs://server/export und https://server/pfad (WebDAV). Ein Ordner nach dem Freigabenamen beschränkt Vespertine auf diesen Ordner."
+            "value": "Akzeptiert auch \\\\\\\\server\\\\freigabe, nfs://server/export und https://server/pfad (WebDAV). Ein Ordner nach dem Freigabenamen beschränkt Vespertine auf diesen Ordner."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Δέχεται επίσης \\\\server\\share, nfs://server/export και https://server/path (WebDAV). Ένας φάκελος μετά το όνομα του κοινόχρηστου φακέλου περιορίζει το Vespertine σε αυτόν τον φάκελο."
+            "value": "Δέχεται επίσης \\\\\\\\server\\\\share, nfs://server/export και https://server/path (WebDAV). Ένας φάκελος μετά το όνομα του κοινόχρηστου φακέλου περιορίζει το Vespertine σε αυτόν τον φάκελο."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Also accepts \\\\\\\\server\\\\share, nfs://server/export and https://server/path (WebDAV). A folder after the share name limits Vespertine to that folder."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "También acepta \\\\servidor\\recurso, nfs://servidor/export y https://servidor/ruta (WebDAV). Una carpeta tras el nombre del recurso compartido limita Vespertine a esa carpeta."
+            "value": "También acepta \\\\\\\\servidor\\\\recurso, nfs://servidor/export y https://servidor/ruta (WebDAV). Una carpeta tras el nombre del recurso compartido limita Vespertine a esa carpeta."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share، nfs://server/export و https://server/path (WebDAV) نیز پذیرفته می‌شوند. پوشه‌ای که پس از نام اشتراک بیاید، Vespertine را به همان پوشه محدود می‌کند."
+            "value": "\\\\\\\\server\\\\share، nfs://server/export و https://server/path (WebDAV) نیز پذیرفته می‌شوند. پوشه‌ای که پس از نام اشتراک بیاید، Vespertine را به همان پوشه محدود می‌کند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hyväksyy myös \\\\palvelin\\jako, nfs://palvelin/vienti ja https://palvelin/polku (WebDAV). Jaon nimen jälkeinen kansio rajaa Vespertinen kyseiseen kansioon."
+            "value": "Hyväksyy myös \\\\\\\\palvelin\\\\jako, nfs://palvelin/vienti ja https://palvelin/polku (WebDAV). Jaon nimen jälkeinen kansio rajaa Vespertinen kyseiseen kansioon."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tumatanggap din ng \\\\server\\share, nfs://server/export at https://server/path (WebDAV). Kapag may folder pagkatapos ng pangalan ng share, sa folder na iyon lang titingin ang Vespertine."
+            "value": "Tumatanggap din ng \\\\\\\\server\\\\share, nfs://server/export at https://server/path (WebDAV). Kapag may folder pagkatapos ng pangalan ng share, sa folder na iyon lang titingin ang Vespertine."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accepte aussi \\\\serveur\\partage, nfs://serveur/export et https://serveur/chemin (WebDAV). Un dossier après le nom du partage limite Vespertine à ce dossier."
+            "value": "Accepte aussi \\\\\\\\serveur\\\\partage, nfs://serveur/export et https://serveur/chemin (WebDAV). Un dossier après le nom du partage limite Vespertine à ce dossier."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export અને https://server/path (WebDAV) પણ સ્વીકારાય છે. શેરના નામ પછી ફોલ્ડર આપો તો Vespertine ફક્ત તે ફોલ્ડર સુધી મર્યાદિત રહે છે."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export અને https://server/path (WebDAV) પણ સ્વીકારાય છે. શેરના નામ પછી ફોલ્ડર આપો તો Vespertine ફક્ત તે ફોલ્ડર સુધી મર્યાદિત રહે છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Haka kuma yana karɓar \\\\server\\share, nfs://server/export da https://server/path (WebDAV). Folda bayan sunan folda ta cibiyar sadarwa tana iyakance Vespertine zuwa waccan folda."
+            "value": "Haka kuma yana karɓar \\\\\\\\server\\\\share, nfs://server/export da https://server/path (WebDAV). Folda bayan sunan folda ta cibiyar sadarwa tana iyakance Vespertine zuwa waccan folda."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "מקבל גם \\\\server\\share, nfs://server/export ו־https://server/path (WebDAV). תיקייה אחרי שם השיתוף מגבילה את Vespertine לתיקייה זו."
+            "value": "מקבל גם \\\\\\\\server\\\\share, nfs://server/export ו־https://server/path (WebDAV). תיקייה אחרי שם השיתוף מגבילה את Vespertine לתיקייה זו."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export और https://server/path (WebDAV) भी स्वीकार किए जाते हैं। शेयर के नाम के बाद कोई फ़ोल्डर देने पर Vespertine केवल उसी फ़ोल्डर तक सीमित रहता है।"
+            "value": "\\\\\\\\server\\\\share, nfs://server/export और https://server/path (WebDAV) भी स्वीकार किए जाते हैं। शेयर के नाम के बाद कोई फ़ोल्डर देने पर Vespertine केवल उसी फ़ोल्डर तक सीमित रहता है।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ezeket is elfogadja: \\\\szerver\\megosztas, nfs://szerver/export és https://szerver/utvonal (WebDAV). A megosztás neve után megadott mappa erre a mappára korlátozza a Vespertine hozzáférését."
+            "value": "Ezeket is elfogadja: \\\\\\\\szerver\\\\megosztas, nfs://szerver/export és https://szerver/utvonal (WebDAV). A megosztás neve után megadott mappa erre a mappára korlátozza a Vespertine hozzáférését."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Juga menerima \\\\server\\share, nfs://server/export, dan https://server/path (WebDAV). Folder setelah nama share membatasi Vespertine ke folder tersebut."
+            "value": "Juga menerima \\\\\\\\server\\\\share, nfs://server/export, dan https://server/path (WebDAV). Folder setelah nama share membatasi Vespertine ke folder tersebut."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accetta anche \\\\server\\condivisione, nfs://server/export e https://server/percorso (WebDAV). Una cartella dopo il nome della condivisione limita Vespertine a quella cartella."
+            "value": "Accetta anche \\\\\\\\server\\\\condivisione, nfs://server/export e https://server/percorso (WebDAV). Una cartella dopo il nome della condivisione limita Vespertine a quella cartella."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share、nfs://server/export、https://server/path（WebDAV）にも対応しています。共有名のあとにフォルダを指定すると、Vespertineはそのフォルダだけを使います。"
+            "value": "\\\\\\\\server\\\\share、nfs://server/export、https://server/path（WebDAV）にも対応しています。共有名のあとにフォルダを指定すると、Vespertineはそのフォルダだけを使います。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export ಮತ್ತು https://server/path (WebDAV) ಅನ್ನೂ ಸ್ವೀಕರಿಸುತ್ತದೆ. ಶೇರ್ ಹೆಸರಿನ ನಂತರ ಫೋಲ್ಡರ್ ನೀಡಿದರೆ Vespertine ಆ ಫೋಲ್ಡರ್‌ಗೆ ಮಾತ್ರ ಸೀಮಿತವಾಗುತ್ತದೆ."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export ಮತ್ತು https://server/path (WebDAV) ಅನ್ನೂ ಸ್ವೀಕರಿಸುತ್ತದೆ. ಶೇರ್ ಹೆಸರಿನ ನಂತರ ಫೋಲ್ಡರ್ ನೀಡಿದರೆ Vespertine ಆ ಫೋಲ್ಡರ್‌ಗೆ ಮಾತ್ರ ಸೀಮಿತವಾಗುತ್ತದೆ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export 및 https://server/path(WebDAV)도 사용할 수 있습니다. 공유 이름 뒤에 폴더를 지정하면 Vespertine은 해당 폴더만 사용합니다."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export 및 https://server/path(WebDAV)도 사용할 수 있습니다. 공유 이름 뒤에 폴더를 지정하면 Vespertine은 해당 폴더만 사용합니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export, https://server/path (WebDAV) എന്നിവയും സ്വീകരിക്കും. ഷെയർ പേരിനുശേഷം ഒരു ഫോൾഡർ നൽകിയാൽ Vespertine ആ ഫോൾഡറിൽ മാത്രം ഒതുങ്ങും."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export, https://server/path (WebDAV) എന്നിവയും സ്വീകരിക്കും. ഷെയർ പേരിനുശേഷം ഒരു ഫോൾഡർ നൽകിയാൽ Vespertine ആ ഫോൾഡറിൽ മാത്രം ഒതുങ്ങും."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export आणि https://server/path (WebDAV) देखील स्वीकारले जातात. शेअरच्या नावानंतर फोल्डर दिल्यास Vespertine फक्त त्या फोल्डरपुरते मर्यादित राहते."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export आणि https://server/path (WebDAV) देखील स्वीकारले जातात. शेअरच्या नावानंतर फोल्डर दिल्यास Vespertine फक्त त्या फोल्डरपुरते मर्यादित राहते."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Juga menerima \\\\server\\share, nfs://server/export dan https://server/path (WebDAV). Folder selepas nama perkongsian mengehadkan Vespertine kepada folder itu."
+            "value": "Juga menerima \\\\\\\\server\\\\share, nfs://server/export dan https://server/path (WebDAV). Folder selepas nama perkongsian mengehadkan Vespertine kepada folder itu."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Godtar også \\\\tjener\\deling, nfs://tjener/eksport og https://tjener/bane (WebDAV). En mappe etter delingsnavnet begrenser Vespertine til den mappen."
+            "value": "Godtar også \\\\\\\\tjener\\\\deling, nfs://tjener/eksport og https://tjener/bane (WebDAV). En mappe etter delingsnavnet begrenser Vespertine til den mappen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accepteert ook \\\\server\\share, nfs://server/export en https://server/pad (WebDAV). Een map na de sharenaam beperkt Vespertine tot die map."
+            "value": "Accepteert ook \\\\\\\\server\\\\share, nfs://server/export en https://server/pad (WebDAV). Een map na de sharenaam beperkt Vespertine tot die map."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export ਅਤੇ https://server/path (WebDAV) ਵੀ ਸਵੀਕਾਰ ਕਰਦਾ ਹੈ। ਸ਼ੇਅਰ ਦੇ ਨਾਂ ਤੋਂ ਬਾਅਦ ਦਿੱਤਾ ਫ਼ੋਲਡਰ Vespertine ਨੂੰ ਸਿਰਫ਼ ਉਸੇ ਫ਼ੋਲਡਰ ਤੱਕ ਸੀਮਿਤ ਰੱਖਦਾ ਹੈ।"
+            "value": "\\\\\\\\server\\\\share, nfs://server/export ਅਤੇ https://server/path (WebDAV) ਵੀ ਸਵੀਕਾਰ ਕਰਦਾ ਹੈ। ਸ਼ੇਅਰ ਦੇ ਨਾਂ ਤੋਂ ਬਾਅਦ ਦਿੱਤਾ ਫ਼ੋਲਡਰ Vespertine ਨੂੰ ਸਿਰਫ਼ ਉਸੇ ਫ਼ੋਲਡਰ ਤੱਕ ਸੀਮਿਤ ਰੱਖਦਾ ਹੈ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Akceptuje też \\\\serwer\\zasób, nfs://serwer/eksport i https://serwer/ścieżka (WebDAV). Folder podany po nazwie zasobu ogranicza Vespertine do tego folderu."
+            "value": "Akceptuje też \\\\\\\\serwer\\\\zasób, nfs://serwer/eksport i https://serwer/ścieżka (WebDAV). Folder podany po nazwie zasobu ogranicza Vespertine do tego folderu."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Também aceita \\\\servidor\\compartilhamento, nfs://servidor/export e https://servidor/caminho (WebDAV). Uma pasta após o nome do compartilhamento limita o Vespertine a essa pasta."
+            "value": "Também aceita \\\\\\\\servidor\\\\compartilhamento, nfs://servidor/export e https://servidor/caminho (WebDAV). Uma pasta após o nome do compartilhamento limita o Vespertine a essa pasta."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Também aceita \\\\server\\share, nfs://server/export e https://server/path (WebDAV). Uma pasta após o nome da partilha limita o Vespertine a essa pasta."
+            "value": "Também aceita \\\\\\\\server\\\\share, nfs://server/export e https://server/path (WebDAV). Uma pasta após o nome da partilha limita o Vespertine a essa pasta."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acceptă și \\\\server\\share, nfs://server/export și https://server/path (WebDAV). Un dosar după numele partajării limitează Vespertine la acel dosar."
+            "value": "Acceptă și \\\\\\\\server\\\\share, nfs://server/export și https://server/path (WebDAV). Un dosar după numele partajării limitează Vespertine la acel dosar."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accepterar även \\\\server\\resurs, nfs://server/export och https://server/sökväg (WebDAV). En mapp efter resursnamnet begränsar Vespertine till den mappen."
+            "value": "Accepterar även \\\\\\\\server\\\\resurs, nfs://server/export och https://server/sökväg (WebDAV). En mapp efter resursnamnet begränsar Vespertine till den mappen."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pia inakubali \\\\server\\share, nfs://server/export na https://server/path (WebDAV). Folda baada ya jina la folda ya mtandao huiwekea Vespertine kikomo kwenye folda hiyo."
+            "value": "Pia inakubali \\\\\\\\server\\\\share, nfs://server/export na https://server/path (WebDAV). Folda baada ya jina la folda ya mtandao huiwekea Vespertine kikomo kwenye folda hiyo."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export மற்றும் https://server/path (WebDAV) ஆகியவற்றையும் ஏற்கும். பகிர்வுப் பெயருக்குப் பின் உள்ள கோப்புறை, Vespertine-ஐ அந்தக் கோப்புறைக்கு மட்டும் வரம்பிடும்."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export மற்றும் https://server/path (WebDAV) ஆகியவற்றையும் ஏற்கும். பகிர்வுப் பெயருக்குப் பின் உள்ள கோப்புறை, Vespertine-ஐ அந்தக் கோப்புறைக்கு மட்டும் வரம்பிடும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share, nfs://server/export మరియు https://server/path (WebDAV)ను కూడా అంగీకరిస్తుంది. షేర్ పేరు తర్వాత ఫోల్డర్ ఇస్తే Vespertine ఆ ఫోల్డర్‌కే పరిమితమవుతుంది."
+            "value": "\\\\\\\\server\\\\share, nfs://server/export మరియు https://server/path (WebDAV)ను కూడా అంగీకరిస్తుంది. షేర్ పేరు తర్వాత ఫోల్డర్ ఇస్తే Vespertine ఆ ఫోల్డర్‌కే పరిమితమవుతుంది."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "รองรับ \\\\server\\share, nfs://server/export และ https://server/path (WebDAV) ด้วย โฟลเดอร์ที่ต่อท้ายชื่อแชร์จะจำกัด Vespertine ไว้เฉพาะโฟลเดอร์นั้น"
+            "value": "รองรับ \\\\\\\\server\\\\share, nfs://server/export และ https://server/path (WebDAV) ด้วย โฟลเดอร์ที่ต่อท้ายชื่อแชร์จะจำกัด Vespertine ไว้เฉพาะโฟลเดอร์นั้น"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\sunucu\\paylasim, nfs://sunucu/export ve https://sunucu/yol (WebDAV) biçimleri de kabul edilir. Paylaşım adından sonra gelen bir klasör, Vespertine’i o klasörle sınırlar."
+            "value": "\\\\\\\\sunucu\\\\paylasim, nfs://sunucu/export ve https://sunucu/yol (WebDAV) biçimleri de kabul edilir. Paylaşım adından sonra gelen bir klasör, Vespertine’i o klasörle sınırlar."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Також підтримуються \\\\server\\share, nfs://server/export і https://server/path (WebDAV). Папка після назви ресурсу обмежує Vespertine лише цією папкою."
+            "value": "Також підтримуються \\\\\\\\server\\\\share, nfs://server/export і https://server/path (WebDAV). Папка після назви ресурсу обмежує Vespertine лише цією папкою."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "\\\\server\\share، nfs://server/export اور https://server/path (WebDAV) بھی قبول ہیں۔ شیئر کے نام کے بعد کوئی فولڈر Vespertine کو اسی فولڈر تک محدود کر دیتا ہے۔"
+            "value": "\\\\\\\\server\\\\share، nfs://server/export اور https://server/path (WebDAV) بھی قبول ہیں۔ شیئر کے نام کے بعد کوئی فولڈر Vespertine کو اسی فولڈر تک محدود کر دیتا ہے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Also accepts \\\\server\\share, nfs://server/export and https://server/path (WebDAV). A folder after the share name limits Vespertine to that folder."
+            "value": "Cũng chấp nhận \\\\\\\\server\\\\share, nfs://server/export và https://server/path (WebDAV). Thư mục đứng sau tên chia sẻ sẽ giới hạn Vespertine trong thư mục đó."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "亦接受 \\\\server\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名稱後加上資料夾，可將 Vespertine 限制在該資料夾內。"
+            "value": "亦接受 \\\\\\\\server\\\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名稱後加上資料夾，可將 Vespertine 限制在該資料夾內。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "也支持 \\\\server\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名称后添加文件夹，可将 Vespertine 限制在该文件夹内。"
+            "value": "也支持 \\\\\\\\server\\\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名称后添加文件夹，可将 Vespertine 限制在该文件夹内。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "也接受 \\\\server\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名稱後加上檔案夾，可將 Vespertine 限制在該檔案夾內。"
+            "value": "也接受 \\\\\\\\server\\\\share、nfs://server/export 和 https://server/path（WebDAV）。在共享名稱後加上檔案夾，可將 Vespertine 限制在該檔案夾內。"
           }
         }
       }
@@ -110134,7 +110140,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Децимовано до %@ kHz, 32-бітний float"
+            "value": "Децимовано до %@ kHz, 32 біт (рухома кома)"
           }
         },
         "ur": {
@@ -113628,7 +113634,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "ЦИФР"
+            "value": "ЦИФР."
           }
         },
         "ur": {
@@ -147429,7 +147435,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "АПАР"
+            "value": "АПАР."
           }
         },
         "ur": {
@@ -153914,19 +153920,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "是 DSD"
+            "value": "DSD"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "是 DSD"
+            "value": "DSD"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "是 DSD"
+            "value": "DSD"
           }
         }
       }
@@ -154190,19 +154196,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "為假"
+            "value": "為「否」"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "为假"
+            "value": "为“否”"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "為假"
+            "value": "為「否」"
           }
         }
       }
@@ -154466,19 +154472,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "是喜好項目"
+            "value": "喜好項目"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "是个人收藏"
+            "value": "个人收藏"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "是喜好項目"
+            "value": "喜好項目"
           }
         }
       }
@@ -154742,19 +154748,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "是無損"
+            "value": "無損"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "是无损"
+            "value": "无损"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "是無損"
+            "value": "無損"
           }
         }
       }
@@ -155294,19 +155300,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "為真"
+            "value": "為「是」"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "为真"
+            "value": "为“是”"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "為真"
+            "value": "為「是」"
           }
         }
       }
@@ -228695,7 +228701,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Частота дискретизації (kHz)"
+            "value": "Частота (kHz)"
           }
         },
         "ur": {
@@ -229231,7 +229237,7 @@
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Частоти дискретизації"
+            "value": "Частоти"
           }
         },
         "ur": {
@@ -284192,25 +284198,25 @@
               "one": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "Буде записано %@ у %lld файл · резервна копія зберігається для скасування"
+                  "value": "Записує %@ у %lld файл · є копія для скасування"
                 }
               },
               "few": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "Буде записано %@ у %lld файли · резервна копія зберігається для скасування"
+                  "value": "Записує %@ у %lld файли · є копія для скасування"
                 }
               },
               "many": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "Буде записано %@ у %lld файлів · резервна копія зберігається для скасування"
+                  "value": "Записує %@ у %lld файлів · є копія для скасування"
                 }
               },
               "other": {
                 "stringUnit": {
                   "state": "translated",
-                  "value": "Буде записано %@ у %lld файлів · резервна копія зберігається для скасування"
+                  "value": "Записує %@ у %lld файлу · є копія для скасування"
                 }
               }
             }
@@ -284243,19 +284249,19 @@
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "將 %@ 寫入 %lld 個檔案 · 保留備份以便還原"
+            "value": "%@將寫入 %lld 個檔案 · 保留備份以便還原"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "将 %@ 写入 %lld 个文件 · 保留备份以便撤销"
+            "value": "%@将写入 %lld 个文件 · 保留备份以便撤销"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "將 %@ 寫入 %lld 個檔案 · 保留備份以便還原"
+            "value": "%@將寫入 %lld 個檔案 · 保留備份以便還原"
           }
         }
       }
