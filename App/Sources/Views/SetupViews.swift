@@ -44,6 +44,11 @@ enum SetupStep: Int, CaseIterable, Comparable {
         }
     }
 
+    init?(name: String) {
+        guard let step = Self.allCases.first(where: { "\($0)" == name }) else { return nil }
+        self = step
+    }
+
     var next: SetupStep? { SetupStep(rawValue: rawValue + 1) }
     var previous: SetupStep? { SetupStep(rawValue: rawValue - 1) }
 }
@@ -51,7 +56,8 @@ enum SetupStep: Int, CaseIterable, Comparable {
 struct SetupFlow: View {
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var step: SetupStep = .welcome
+    /// `-VespertineSetupStep output` opens on that step, for screenshots.
+    @State private var step = LaunchArguments().string(forKey: "VespertineSetupStep").flatMap(SetupStep.init(name:)) ?? .welcome
     @State private var forward = true
     @Namespace private var progress
 
