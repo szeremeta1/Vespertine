@@ -218,6 +218,21 @@ struct LoopbackTests {
         #expect(recorder.summary.hasPrefix("test setup problem"))
     }
 
+    @Test("A buffer of wrong samples where the recorder skipped an I/O cycle is a test setup problem, and elsewhere a failure")
+    func recorderSkipInPlace() {
+        let signal = LoopbackSignal(Self.spec16)
+        var c = Self.capture(signal, latency: 100)
+        let at = signal.payload.lowerBound + 3000
+        for ch in 0..<2 { for i in (at + 100)..<(at + 100 + 1024) { c[ch][i] = -c[ch][i] * 0.5 + 0.25 } }
+        let failed = Self.analyze(c, signal)
+        #expect(failed.verdict == .failed)
+        let skipped = Self.analyze(c, signal, discontinuities: [at + 100])
+        #expect(skipped.verdict == .setupProblem)
+        #expect(skipped.findings.count == 2 && skipped.findings.allSatisfy { $0.kind == .recorderDiscontinuity && $0.isSetupProblem && $0.count == 1024 })
+        let elsewhere = Self.analyze(c, signal, discontinuities: [at + 100 + 50_000])
+        #expect(elsewhere.verdict == .failed)
+    }
+
     @Test("A run replaced by silence with no timing change")
     func silencedRun() {
         let signal = LoopbackSignal(Self.spec16)

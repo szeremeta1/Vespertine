@@ -188,12 +188,16 @@ public enum LoopbackAnalyzer {
         var mismatches = 0
         var first: Int?
         var maxError = 0.0
+        // Capture frames the recorder reported a skip at, and whether every mismatch lies next to one of them.
+        let skips = discontinuities.sorted()
+        var allNearSkips = !skips.isEmpty
         for s in range {
             let v = captured(s)
             if v != ref[s] {
                 mismatches += 1
                 if first == nil { first = s }
                 maxError = max(maxError, abs((v ?? 0) - ref[s]))
+                if allNearSkips, !skips.contains(where: { abs($0 - (s + offset)) <= 4096 }) { allNearSkips = false }
             }
         }
         result.comparedFrames = range.count
@@ -237,6 +241,14 @@ public enum LoopbackAnalyzer {
                 }
                 if !findings.isEmpty { return findings }
             }
+        }
+
+        // Wrong samples only where the recorder skipped, with no shift: the input missed an I/O cycle and recorded
+        // whatever the virtual device held, so the playback path isn't what's at fault.
+        if allNearSkips, (drift ?? 0) == 0 {
+            return [LoopbackFinding(kind: .recorderDiscontinuity, channel: r, frame: first, count: mismatches,
+                                    summary: "\(label): the recorder skipped near frame \(first); \(mismatches) samples there weren't recorded as played",
+                                    isSetupProblem: true)]
         }
 
         // The same everywhere: truncation, dither, gain, or just different.
