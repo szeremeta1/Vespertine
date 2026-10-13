@@ -141,6 +141,33 @@ struct HardwareAuditTests {
         #expect(!events.value.contains("failed"))
     }
 
+    /// A chosen output that isn't connected at all (unplugged before launch) is stood in for at once, as
+    /// Settings → Playback says, and the snapshot names the output it stands in for.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))
+    func missingChosenOutputIsStoodInFor() async throws {
+        let device = try #require(OutputDevices.list().first { $0.transport == .builtIn })
+        let url = try writeWAV("hardware-stand-in", rate: device.nominalSampleRate, bits: 16, seconds: 3) { _, _ in 0 }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = PlaybackEngine(deviceWait: 1.5, reconnectGrace: 0.5)
+        defer { engine.stop() }
+        var settings = EngineSettings(); settings.exclusive = false
+        settings.deviceUID = "vespertine-test:absent-output"
+        settings.deviceName = "Absent DAC"
+        settings.outputFallback = .bestAvailable
+        engine.update(settings: settings)
+        engine.play(PlayableItem(url: url))
+        try await wait { engine.snapshot.state == .playing }
+        #expect(engine.snapshot.waitingForDevice == nil)
+        #expect(engine.snapshot.standingInFor == "Absent DAC")
+        #expect(engine.snapshot.outputDevice != nil && engine.snapshot.outputDevice?.uid != settings.deviceUID)
+
+        // Chosen and connected: no stand-in.
+        settings.deviceUID = device.uid
+        engine.update(settings: settings)
+        try await wait { engine.snapshot.state == .playing && engine.snapshot.outputDevice?.uid == device.uid }
+        #expect(engine.snapshot.standingInFor == nil)
+    }
+
     /// A track streaming from a share moves to its local copy once the copy is complete, mid-track,
     /// without restarting it.
     @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))

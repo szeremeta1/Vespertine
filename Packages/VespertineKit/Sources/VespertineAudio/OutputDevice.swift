@@ -220,6 +220,11 @@ enum DeviceQuery {
             isDefault: id == defaultID)
     }
 
+    /// UIDs of the connected outputs: cheap, no formats read.
+    static func outputUIDs() -> Set<String> {
+        Set(allDeviceIDs().filter { outputChannelCount($0) > 0 }.compactMap { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) })
+    }
+
     static func outputDevices(dopEnabledUIDs: Set<String>) -> [OutputDevice] {
         let def = defaultOutputDeviceID()
         return allDeviceIDs().compactMap { snapshot($0, defaultID: def, dopEnabledUIDs: dopEnabledUIDs) }

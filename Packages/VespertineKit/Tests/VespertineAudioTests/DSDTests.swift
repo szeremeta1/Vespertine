@@ -105,6 +105,30 @@ struct DSDTests {
         #expect(try read(region, frames: Int(rate / 4) + 1024)[0].count == Int(rate / 4))
     }
 
+    @Test("A DSD CUE track deep in the file starts on the right samples (DSF and DSDIFF, PCM and DoP)", arguments: ["dsf", "dff"])
+    func deepRegionIsExact(ext: String) throws {
+        // Seeks into DSF and DSDIFF jump straight to the packet (vespertine_ff.c indexes it from the file layout)
+        // instead of reading from the start of the file; what they land on must be what reading through gives.
+        let rate = 2_822_400.0, bytes = Int(rate / 8 * 4)
+        let planes = (0..<2).map { c in (0..<bytes).map { i in UInt8(truncatingIfNeeded: (i &* 2_654_435_761 &+ c &* 97 &+ (i >> 13) &* 7) >> 13) } }
+        let url = tmp("deep.\(ext)")
+        defer { try? FileManager.default.removeItem(at: url) }
+        if ext == "dsf" { try DSDFiles.writeDSF(planes, rate: rate, to: url) } else { try DSDFiles.writeDFF(planes, rate: rate, to: url) }
+        let start = Int64(rate * 3.1) / 8 * 8 + 8 * 1_234 + 8   // DSD bits, not on a block boundary
+        for dopMode in [false, true] {
+            let probed = try SourceOpener.probe(url)
+            let decoded = dopMode ? FormatPlanner.dopCarrierRate(rate) : FormatPlanner.dsdToPCMRate(rate)
+            let plan = OutputPlan(mode: dopMode ? .dop : .pcm, deviceSampleRate: decoded, decodedSampleRate: decoded,
+                                  physicalBitDepth: 24, channels: 2, dsdConvertedToPCM: !dopMode, reason: "")
+            let region = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url, regionStartFrame: start))
+            let got = try read(region, frames: 2048)
+            let first = Int((Double(start) * decoded / rate).rounded())
+            let whole = try read(SourceOpener.decoder(for: SourceOpener.probe(url), plan: plan, item: PlayableItem(url: url)), frames: first + 2048)
+            #expect(got[0].count == 2048)
+            #expect(got[0] == Array(whole[0][first..<first + 2048]) && got[1] == Array(whole[1][first..<first + 2048]), "\(ext) \(dopMode ? "DoP" : "PCM")")
+        }
+    }
+
     @Test("A real DSD CUE track opens past track one", .enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_REAL_DSD_CUE_FILE"] != nil))
     func realCueRegion() throws {
         let env = ProcessInfo.processInfo.environment
