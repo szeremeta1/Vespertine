@@ -95,6 +95,10 @@ final class AppSettings {
     /// While playing, make the Mac's sound output follow Vespertine's device, so volume keys and
     /// headphone controls (e.g. the AirPods Max Digital Crown) adjust what you're listening to.
     var systemOutputFollowsPlayback: Bool { didSet { defaults.set(systemOutputFollowsPlayback, forKey: "systemOutputFollowsPlayback") } }
+    /// "Volume keys control the device held exclusively": with exclusive access, macOS moves the Mac's sound output to
+    /// another device, and the volume relay ties that device's level to the DAC's. Off by default, so no other output's
+    /// level is ever touched.
+    var relayVolumeKeys: Bool { didSet { defaults.set(relayVolumeKeys, forKey: "relayVolumeKeys") } }
     /// What happens to devices Vespertine changed when it quits.
     var deviceOnQuit: DeviceOnQuit { didSet { defaults.set(deviceOnQuit.rawValue, forKey: "deviceOnQuit") } }
     /// Analyze new and changed music in the background after it's added.
@@ -120,7 +124,8 @@ final class AppSettings {
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
-            "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "deviceOnQuit": "restore",
+            "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
+            "deviceOnQuit": "restore",
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
@@ -148,6 +153,7 @@ final class AppSettings {
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
         skipNonMusic = defaults.bool(forKey: "skipNonMusic")
         systemOutputFollowsPlayback = defaults.bool(forKey: "systemOutputFollowsPlayback")
+        relayVolumeKeys = defaults.bool(forKey: "relayVolumeKeys")
         deviceOnQuit = DeviceOnQuit(rawValue: defaults.string(forKey: "deviceOnQuit") ?? "") ?? .restore
         autoAnalyze = defaults.bool(forKey: "autoAnalyze")
         analyzeNetworkShares = defaults.bool(forKey: "analyzeNetworkShares")

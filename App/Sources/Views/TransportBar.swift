@@ -288,7 +288,9 @@ struct DeviceSettings: View {
                     Text("Exclusive access").font(Typeface.ui(12))
                     (device.alwaysShared
                          ? Text("Not on the Mac's own speakers and headphone jack: they always play shared, so the volume keys keep working.")
-                         : Text("Other apps are silenced on this device. Volume keys and Control Center still adjust it."))
+                         : settings.relayVolumeKeys
+                         ? Text("Other apps are silenced on this device. Volume keys and Control Center still adjust it.")
+                         : Text("Other apps are silenced on this device. Volume keys adjust it only when Settings › Playback allows it."))
                         .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
             }

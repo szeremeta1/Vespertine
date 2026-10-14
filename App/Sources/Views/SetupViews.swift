@@ -744,12 +744,15 @@ private struct SetupSound: View {
                     .pickerStyle(.segmented).labelsHidden().fixedSize()
                 }
                 .reveal(shown, delay: 0.2)
+                // With exclusive access the DAC can't be the Mac's sound output; the switch then turns on the volume relay.
                 SetupOption(symbol: "speaker.wave.2", title: "Volume keys follow Vespertine",
-                            detail: "While Vespertine plays, the Mac's volume keys and headphone controls adjust the device it's playing to.",
-                            on: settings.systemOutputFollowsPlayback || settings.exclusiveMode) {
-                    Toggle("Volume keys follow Vespertine", isOn: $settings.systemOutputFollowsPlayback)
+                            detail: settings.exclusiveMode
+                                ? "While Vespertine holds your DAC, the volume keys and headphone controls adjust it by way of another output, which then plays other apps' sounds at the DAC's level."
+                                : "While Vespertine plays, the Mac's volume keys and headphone controls adjust the device it's playing to.",
+                            on: settings.exclusiveMode ? settings.relayVolumeKeys : settings.systemOutputFollowsPlayback) {
+                    Toggle("Volume keys follow Vespertine",
+                           isOn: settings.exclusiveMode ? $settings.relayVolumeKeys : $settings.systemOutputFollowsPlayback)
                         .labelsHidden().toggleStyle(.switch).tint(Palette.brass)
-                        .disabled(settings.exclusiveMode)
                 }
                 .reveal(shown, delay: 0.28)
             }
