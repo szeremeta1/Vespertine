@@ -64,6 +64,48 @@ struct DSTDSDIFFTests {
         #expect(try end.withUnsafeMutableBufferPointer { try source.readInterleaved(into: $0.baseAddress!, bytes: 1) } == 0)
     }
 
+    @Test("Stored DST frames at DSD128, 256 and 512 are not limited to SACD64 packet sizes", arguments: [2, 4, 8], [false, true])
+    func higherRates(multiplier: Int, indexed: Bool) throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("dst-rate-\(UUID()).dff")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let bytes = SACDFixture.frameBytes * multiplier
+        let planes = (0..<6).map { c in (0..<bytes).map { UInt8(truncatingIfNeeded: $0 + c * 13) } }
+        try DSDIFFFixture.writeDST(planes, indexed: indexed, rate: 2_822_400 * multiplier, storedOnly: true, to: url)
+        let info = try #require(try DSTDSDIFFInfo.read(url))
+        #expect(info.frameBytes == bytes && info.frameCount == 1)
+        let source = try DSTDSDIFFSource(url: url, info: info)
+        var actual = [UInt8](repeating: 0, count: bytes * 6)
+        #expect(try actual.withUnsafeMutableBufferPointer { try source.readInterleaved(into: $0.baseAddress!, bytes: bytes) } == bytes)
+        for c in 0..<6 { #expect(stride(from: c, to: actual.count, by: 6).map { actual[$0] } == planes[c]) }
+        try source.seekDSD(to: Int64(bytes - 17))
+        var tail = [UInt8](repeating: 0, count: 17 * 6)
+        #expect(try tail.withUnsafeMutableBufferPointer { try source.readInterleaved(into: $0.baseAddress!, bytes: 17) } == 17)
+        #expect(tail == Array(actual.suffix(17 * 6)))
+    }
+
+    @Test("CHNL speaker order survives probing, PCM and DoP; unknown IDs remain discrete")
+    func channelOrder() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("dst-layout-\(UUID()).dff")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let planes = SACDFixture.modulate(channels: 6, frames: 1)
+        let ids = ["C   ", "MLFT", "MRGT", "LS  ", "RS  ", "LFE "]
+        let labels: [AudioChannelLabel] = [kAudioChannelLabel_Center, kAudioChannelLabel_Left, kAudioChannelLabel_Right,
+            kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround, kAudioChannelLabel_LFEScreen]
+        try DSDIFFFixture.writeDST(planes, indexed: true, channelIDs: ids, to: url)
+        let probed = try SourceOpener.probe(url)
+        #expect(probed.format.channelLabels == labels)
+        for mode in [OutputPlan.Mode.pcm, .dop] {
+            let rate = SACDFixture.rate / (mode == .dop ? 16 : 8)
+            let plan = OutputPlan(mode: mode, deviceSampleRate: rate, decodedSampleRate: rate, physicalBitDepth: 32,
+                                  channels: 6, dsdConvertedToPCM: mode == .pcm, reason: "")
+            let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
+            defer { try? decoder.close() }
+            #expect(ChannelLayouts.speakerLabels(decoder.processingFormat.channelLayout) == labels)
+        }
+        try DSDIFFFixture.writeDST(planes, indexed: false, channelIDs: ["C000", "C001", "C002", "C003", "C004", "C005"], to: url)
+        #expect(try SourceOpener.probe(url).format.channelLabels == (0..<6).map { kAudioChannelLabel_Discrete_0 + UInt32($0) })
+    }
+
     @Test("Truncated containers and invalid DST frames are errors")
     func damage() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("dst-damage-\(UUID()).dff")

@@ -13,11 +13,13 @@ struct DSTDSDIFFInfo: Sendable {
     struct Frame: Sendable { var offset: UInt64; var length: Int }
     var rate: Int
     var channels: Int
+    var channelIDs: [String]
     var frameCount: Int
     var firstFrame: UInt64
     var end: UInt64
     var index: [Frame]
     var frameBytes: Int { rate / 75 / 8 }
+    var maximumFrameLength: Int { max(65536, frameBytes * channels * 2) }
 
     /// nil for uncompressed DSDIFF (still handled by the existing DSD reader).
     static func read(_ url: URL) throws -> Self? {
@@ -33,6 +35,7 @@ struct DSTDSDIFFInfo: Sendable {
         var rate = 0, channels = 0, compression = "", frames = 0
         var first: UInt64 = 0, audioEnd: UInt64 = 0
         var indexData: [UInt8] = []
+        var channelIDs: [String] = []
         var p: UInt64 = 16
         while p + 12 <= end {
             let h = try read(file, at: p, count: 12)
@@ -49,7 +52,12 @@ struct DSTDSDIFFInfo: Sendable {
                     guard n <= UInt64(data.count - q - 12) else { throw DTSError.decoding }
                     switch id(data, q) {
                     case "FS  " where n >= 4: rate = Int(number(data, q + 12, 4))
-                    case "CHNL" where n >= 2: channels = Int(number(data, q + 12, 2))
+                    case "CHNL" where n >= 2:
+                        channels = Int(number(data, q + 12, 2))
+                        channelIDs = []
+                        if n >= UInt64(2 + channels * 4) {
+                            channelIDs = (0..<channels).map { id(data, q + 14 + $0 * 4) }
+                        }
                     case "CMPR" where n >= 4: compression = id(data, q + 12)
                     default: break
                     }
@@ -69,7 +77,7 @@ struct DSTDSDIFFInfo: Sendable {
             p = body + length + (length & 1)
         }
         guard compression == "DST " else { return nil }
-        guard (1...6).contains(channels), [2_822_400, 5_644_800, 11_289_600, 22_579_200].contains(rate),
+        guard (1...6).contains(channels), channelIDs.count == channels, [2_822_400, 5_644_800, 11_289_600, 22_579_200].contains(rate),
               (1...10_000_000).contains(frames), first > 0, audioEnd > first else { throw DTSError.decoding }
         var index: [Frame] = []
         if indexData.count == frames * 12 {
@@ -77,11 +85,11 @@ struct DSTDSDIFFInfo: Sendable {
             for q in stride(from: 0, to: indexData.count, by: 12) {
                 let offset = number(indexData, q, 8), length = number(indexData, q + 8, 4)
                 guard offset >= first + 12, offset > previous, offset <= audioEnd,
-                      length > 0, length <= 65536, length <= audioEnd - offset else { index.removeAll(); break }
+                      length > 0, length <= UInt64(max(65536, rate / 75 / 8 * channels * 2)), length <= audioEnd - offset else { index.removeAll(); break }
                 index.append(Frame(offset: offset, length: Int(length))); previous = offset
             }
         }
-        return Self(rate: rate, channels: channels, frameCount: frames, firstFrame: first, end: audioEnd, index: index)
+        return Self(rate: rate, channels: channels, channelIDs: channelIDs, frameCount: frames, firstFrame: first, end: audioEnd, index: index)
     }
 
     static func read(_ file: FileHandle, at offset: UInt64, count: Int) throws -> [UInt8] {
@@ -144,7 +152,7 @@ final class DSTDSDIFFSource: InterleavedDSDSource {
             let length = DSTDSDIFFInfo.number(h, 4, 8), body = scan + 12
             guard length <= info.end - body else { throw DTSError.decoding }
             if DSTDSDIFFInfo.id(h, 0) == "DSTF" {
-                guard length > 0, length <= 65536 else { throw DTSError.decoding }
+                guard length > 0, length <= UInt64(info.maximumFrameLength) else { throw DTSError.decoding }
                 index.append(.init(offset: body, length: Int(length)))
             }
             scan = body + length + (length & 1)

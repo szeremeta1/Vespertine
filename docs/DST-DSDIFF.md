@@ -2,7 +2,7 @@
 
 SACD images and DST-compressed DSDIFF are separate input paths. The SACD reader already recognizes plain 2,048-byte sectors and raw 2,064-byte sectors. Before this fix, `.dff` files went through the bundled FFmpeg reader, whose enabled decoders did not include DST. Such a file could have library metadata while playback failed with “Decoder not found”.
 
-`DSTDSDIFFInfo` reads the DSDIFF properties, frame count and optional seek index. `DSTDSDIFFSource` decodes its DST frames using the same production DST implementation as SACD images. It provides raw DSD to DoP or to the shared, primed DSD-to-PCM converter. Existing CUE-region handling applies after that. Nothing is extracted into or written over the source file.
+`DSTDSDIFFInfo` reads the DSDIFF properties, frame count and optional seek index. `DSTDSDIFFSource` decodes its DST frames using the same production DST implementation as SACD images. It provides raw DSD to DoP or to the shared, primed DSD-to-PCM converter. Existing CUE-region handling applies after that. Nothing is extracted into or written over the source file. DSDIFF CHNL identifiers define the speaker order through probing and both decoder formats; unknown IDs remain discrete. Stored DST frames at DSD128/256/512 have rate-aware bounds rather than a SACD64-only size limit.
 
 The parser follows [Philips DSDIFF 1.5](https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf), §§3.2 and 3.4–3.5. An absent or structurally invalid optional index is rebuilt from frame headers. Indexed frames are checked against their actual headers. Truncated containers, invalid frames and mismatching optional CRCs fail decoding. Reads are buffered for sequential/network access; indexed seeks do not decode the preceding album.
 
@@ -12,7 +12,7 @@ The source audit also exposed an EAC CUE parser bug: `FILE` may follow `TRACK` o
 
 ## Verification
 
-- `DSTDSDIFFTests`: indexed/unindexed stereo, five-channel and six-channel files; compressed and stored frames; every DSD byte and the complete PCM/DoP outputs against an uncompressed equivalent; seeking; optional CRCs; malformed indexes, truncation and damaged frames.
+- `DSTDSDIFFTests`: indexed/unindexed stereo, five-channel and six-channel files; stored frames at DSD128/256/512; explicit speaker order and discrete unknown channel IDs; compressed and stored frames; every DSD byte and the complete PCM/DoP outputs against an uncompressed equivalent; seeking; optional CRCs; malformed indexes, truncation and damaged frames.
 - `SACDLibraryTests`: raw/plain SACD import preserves the image byte for byte; compressed DSDIFF CUE tracks scan correctly; an old library upgrades and rereads unchanged files without losing play counts or track IDs.
 - `SACDCorpusTests`: opt-in actual-image and DSDIFF checks through the app's own source opener and PCM/DoP paths. These open no output device.
 - [Corpus runner](../verification/oracles/sacd/corpus/README.md): complete production-core reads and per-track hashes on a server, with matching native macOS integration checks. [Recorded results](../verification/runs/sacd-2026-10-14/) contain no audio or private source paths.

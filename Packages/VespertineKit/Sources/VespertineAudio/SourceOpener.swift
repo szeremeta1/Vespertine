@@ -96,6 +96,14 @@ final class ProbedSource: @unchecked Sendable {
 private let mpegOpenLock = NSLock()
 
 enum SourceOpener {
+    /// DSDIFF's CHNL order is authoritative, including discrete/unknown channel IDs.
+    private static func dsdiffLabels(_ ids: [String]) -> [AudioChannelLabel] {
+        let known: [String: AudioChannelLabel] = ["SLFT": kAudioChannelLabel_Left, "MLFT": kAudioChannelLabel_Left,
+            "SRGT": kAudioChannelLabel_Right, "MRGT": kAudioChannelLabel_Right, "C   ": kAudioChannelLabel_Center,
+            "LFE ": kAudioChannelLabel_LFEScreen, "LS  ": kAudioChannelLabel_LeftSurround, "RS  ": kAudioChannelLabel_RightSurround]
+        return ids.enumerated().map { known[$0.element] ?? (kAudioChannelLabel_Discrete_0 + UInt32($0.offset)) }
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
             .union(FFmpegDecoder.extensions).union(sacdExtensions)
@@ -121,7 +129,7 @@ enum SourceOpener {
             return ProbedSource(url: url, format: format, decoderName: name, pcm: nil, dsd: nil, sacd: chosen)
         }
         if ["dff", "dsdiff"].contains(ext), let info = try DSTDSDIFFInfo.read(url) {
-            let format = SourceFormat(encoding: .dsd, codec: "DSDIFF", sampleRate: Double(info.rate), bitDepth: 1, channels: info.channels)
+            let format = SourceFormat(encoding: .dsd, codec: "DSDIFF", sampleRate: Double(info.rate), bitDepth: 1, channels: info.channels, channelLabels: dsdiffLabels(info.channelIDs))
             return ProbedSource(url: url, format: format, decoderName: "DSDIFF · DST", pcm: nil, dsd: nil, dstDSDIFF: info)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
@@ -247,7 +255,8 @@ enum SourceOpener {
         }
         if let info = probed.dstDSDIFF {
             let source = try DSTDSDIFFSource(url: probed.url, info: info)
-            decoder = plan.mode == .dop ? try RawDoPDecoder(source: source) : try SACDPCMDecoder(source: source)
+            let layout = probed.format.channelLabels.flatMap { ChannelLayouts.layout(labels: $0) }
+            decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
         } else if plan.mode == .bitstream {
             // A receiver decodes: DTS CDs go out as stored; Dolby frames are wrapped in IEC 61937 bursts.
             if let dts = probed.pcm as? DTSDecoder {

@@ -305,10 +305,11 @@ final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         try self.init(source: source, leadIn: Int64(frames.lowerBound - start) * Int64(area.frameBytes))
     }
 
-    init(source: any InterleavedDSDSource, leadIn: Int64 = 0) throws {
+    init(source: any InterleavedDSDSource, leadIn: Int64 = 0, channelLayout: AVAudioChannelLayout? = nil) throws {
         self.source = source
         self.leadIn = leadIn
-        format = SACDPCMDecoder.format(rate: source.dsdRate / 8, channels: source.channelCount)
+        format = channelLayout.map { AVAudioFormat(standardFormatWithSampleRate: source.dsdRate / 8, channelLayout: $0) }
+            ?? SACDPCMDecoder.format(rate: source.dsdRate / 8, channels: source.channelCount)
         super.init()
         try seek(to: 0)
     }
