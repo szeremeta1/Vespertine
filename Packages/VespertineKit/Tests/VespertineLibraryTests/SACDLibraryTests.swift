@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import GRDB
 import Testing
 import VespertineAudio
 import VespertineTestSupport
@@ -90,15 +91,66 @@ struct SACDLibraryTests {
         #expect(probed.format.channels == 5 && probed.duration == 4.0 / 75)
     }
 
-    @Test("Import & Organize files an SACD image under its disc's artist and title, under its own name")
-    func organize() throws {
+    @Test("DST-compressed DSDIFF is indexed with its true rate and duration")
+    func compressedDSDIFF() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let file = dir.appendingPathComponent("Compressed.dff")
+        try DSDIFFFixture.writeDST(SACDFixture.modulate(channels: 2, frames: 3), indexed: true, to: file)
+        let original = try Data(contentsOf: file)
+        try """
+        PERFORMER "The Vesper Quartet"
+        TITLE "Compressed Studies"
+        FILE "Compressed.dff" WAVE
+          TRACK 01 AUDIO
+            TITLE "One"
+            INDEX 01 00:00:00
+          TRACK 02 AUDIO
+            TITLE "Two"
+            INDEX 01 00:00:01
+        """.write(to: dir.appendingPathComponent("Compressed.cue"), atomically: true, encoding: .utf8)
+        let writer = try DatabaseQueue()
+        try LibraryDatabase.migrator.migrate(writer, upTo: "v16-meta")
+        let db = try LibraryDatabase(writer: writer, migrate: false)
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        let summary = try await scanner.scan(source)
+        #expect(summary.added == 2 && summary.failed.isEmpty)
+        let tracks = try db.allTracks().sorted { ($0.trackNumber ?? 0) < ($1.trackNumber ?? 0) }
+        #expect(tracks.map(\.title) == ["One", "Two"])
+        #expect(tracks.map(\.cueStartFrame) == [0, 37_632])
+        #expect(tracks.allSatisfy { $0.isDSD && $0.isLossless && $0.sampleRate == 2_822_400 && $0.channels == 2 })
+        #expect(abs(tracks.reduce(0) { $0 + $1.duration } - 3.0 / 75) < 1e-9)
+        let ids = tracks.map(\.id)
+        try await db.writer.write { db in
+            try db.execute(sql: "UPDATE track SET isDSD = 0, playCount = 7")
+        }
+        let cached = try await scanner.scan(source)
+        #expect(cached.updated == 0)
+        try LibraryDatabase.migrator.migrate(db.writer)
+        let refreshed = try await scanner.scan(source)
+        #expect(refreshed.updated == 2 && refreshed.failed.isEmpty)
+        let migrated = try db.allTracks().sorted { ($0.trackNumber ?? 0) < ($1.trackNumber ?? 0) }
+        #expect(migrated.map(\.id) == ids && migrated.allSatisfy { $0.isDSD && $0.playCount == 7 })
+        #expect(try Data(contentsOf: file) == original)
+    }
+
+    @Test("Import & Organize preserves and indexes plain and raw SACD images", arguments: [false, true])
+    func organize(rawSectors: Bool) throws {
         let dir = try tempDir()
         defer { try? FileManager.default.removeItem(at: dir) }
         let iso = dir.appendingPathComponent("src").appendingPathComponent("NS-SACD.iso")
         try FileManager.default.createDirectory(at: iso.deletingLastPathComponent(), withIntermediateDirectories: true)
         try SACDFixture.write(to: iso, stereo: .init(channels: 2, dst: false, planes: SACDFixture.modulate(channels: 2, frames: 2),
-                                                     tracks: [.init(title: "One", frames: 2)]))
+                                                     tracks: [.init(title: "One", frames: 2)]), rawSectors: rawSectors)
         let written = try Importer.copyAndOrganize([iso.deletingLastPathComponent()], into: dir.appendingPathComponent("lib"))
         #expect(written.map { Array($0.pathComponents.suffix(3)) } == [["The Vesper Quartet", "Night Studies", "NS-SACD.iso"]])
+        let copy = try #require(written.first)
+        #expect(try Data(contentsOf: copy) == Data(contentsOf: iso))
+        let tracks = try SACDTracks.read(url: copy, artwork: nil)
+        #expect(tracks.count == 1 && tracks.first?.title == "One")
+        #expect(tracks.first?.sacdArea == .stereo)
+        #expect(try SACDImage.read(copy).areas.first?.layout == (rawSectors ? .raw : .plain))
     }
 }

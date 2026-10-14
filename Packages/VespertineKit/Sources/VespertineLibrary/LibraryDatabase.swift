@@ -277,6 +277,14 @@ public final class LibraryDatabase: Sendable {
                 t.column("value", .text).notNull()
             }
         }
+        m.registerMigration("v17-dst-dsdiff") { db in
+            // DST DSDIFF could be listed from TagLib's properties while its decoder was unavailable. Its
+            // unchanged size/mtime must not keep that stale format (including CUE tracks) after the upgrade.
+            try db.execute(sql: """
+                UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'
+                WHERE isMissing = 0 AND isDSD = 0 AND lower(filePath) LIKE '%.dff'
+                """)
+        }
         return m
     }
 }
