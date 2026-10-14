@@ -272,7 +272,7 @@
       <div class="section-head">
         <div class="eyebrow">Compare</div>
         <h2>How it stacks up.</h2>
-        <p>Several Mac players offer bit-perfect playback. This compares documented features; ? means unverified, not unsupported. Vespertine has no convolution, audio effect plugins or streaming services.</p>
+        <p>Several Mac players offer bit-perfect playback. This compares what each player's own documentation or source code says. “Not documented” means the vendor doesn't say either way, not that the feature is missing. Vespertine has no convolution, audio effect plugins or streaming services.</p>
       </div>
       <div class="compare-wrap">
         <p class="compare-hint" aria-hidden="true">Scroll for more →</p>
@@ -280,22 +280,22 @@
           <table>
             <thead><tr><th scope="col">Feature</th><th scope="col" class="us">Vespertine</th><th scope="col">Apple Music (Mac)</th><th scope="col">Audirvana Studio / Origin</th><th scope="col">Roon</th><th scope="col">VeraVox</th><th scope="col">Colibri</th><th scope="col">Cog</th><th scope="col">foobar2000 for Mac</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Source code</th><td class="us">GPL-3.0</td><td>Closed</td><td>Closed</td><td>Closed</td><td>Closed</td><td>?</td><td>GPL</td><td>Closed</td></tr>
-              <tr><th scope="row">FLAC / DSD files</th><td class="us">Yes / Yes</td><td>No / No</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / ?</td></tr>
-              <tr><th scope="row">Automatic DAC rate switching</th><td class="us">Yes</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>?</td></tr>
+              <tr><th scope="row">Source code</th><td class="us">GPL-3.0</td><td>Closed</td><td>Closed</td><td>Closed</td><td>Closed</td><td>Closed</td><td>GPL-2.0</td><td>Closed</td></tr>
+              <tr><th scope="row">FLAC / DSD files</th><td class="us">Yes / Yes</td><td>No / No</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Yes</td><td>Yes / Not documented</td></tr>
+              <tr><th scope="row">Automatic DAC rate switching</th><td class="us">Yes</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Not documented</td></tr>
               <tr><th scope="row">Exclusive (hog) mode</th><td class="us">Yes</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-              <tr><th scope="row">16/24-bit PCM without sample changes</th><td class="us">Conditions + tests</td><td>macOS 27: third-party tests¹</td><td>Vendor claim</td><td>Vendor claim</td><td>In-app loopback test</td><td>Vendor claim</td><td>In-app indicator</td><td>?</td></tr>
-              <tr><th scope="row">Local surround files</th><td class="us">Yes²</td><td>?</td><td>Yes</td><td>Yes</td><td>Yes</td><td>?</td><td>Yes</td><td>?</td></tr>
-              <tr><th scope="row">Apple Spatial Audio for local surround</th><td class="us">Yes</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>Yes</td><td>?</td></tr>
-              <tr><th scope="row">Hi-res file analysis</th><td class="us">Yes</td><td>?</td><td>AudioScan</td><td>?</td><td>Yes</td><td>?</td><td>?</td><td>?</td></tr>
-              <tr><th scope="row">SACD ISO</th><td class="us">Yes</td><td>No</td><td>Yes</td><td>No (DSF/DFF only)</td><td>Yes</td><td>No</td><td>?</td><td>?</td></tr>
-              <tr><th scope="row">Convolution / audio effect plugins</th><td class="us">No / No</td><td>? / ?</td><td>Yes (Origin: paid option) / Audio Units</td><td>Yes / ?</td><td>No / No</td><td>? / ?</td><td>? / ?</td><td>? / Audio Units</td></tr>
-              <tr><th scope="row">Streaming services</th><td class="us">No</td><td>Apple Music</td><td>Studio: yes; Origin: no</td><td>Yes</td><td>No (local + UPnP)</td><td>No (radio only)</td><td>?</td><td>?</td></tr>
+              <tr><th scope="row">16/24-bit PCM without sample changes</th><td class="us">Conditions + tests</td><td>macOS 27: third-party tests¹</td><td>Vendor claim</td><td>Vendor claim</td><td>In-app loopback test</td><td>Vendor claim</td><td>In-app indicator</td><td>Not documented</td></tr>
+              <tr><th scope="row">Local surround files</th><td class="us">Yes²</td><td>Not documented</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Not documented</td><td>Yes</td><td>Not documented</td></tr>
+              <tr><th scope="row">Apple Spatial Audio for local surround</th><td class="us">Yes</td><td>Catalog Atmos only³</td><td>Not documented</td><td>Not documented</td><td>Not documented</td><td>Not documented</td><td>Yes</td><td>Not documented</td></tr>
+              <tr><th scope="row">Hi-res file analysis</th><td class="us">Yes</td><td>No</td><td>AudioScan</td><td>Dynamic range, loudness</td><td>Yes</td><td>Not documented</td><td>No (live spectrum only)</td><td>No (live spectrum only)</td></tr>
+              <tr><th scope="row">SACD ISO</th><td class="us">Yes</td><td>No</td><td>Yes</td><td>No (DSF/DFF only)</td><td>Yes</td><td>No</td><td>No</td><td>Not documented</td></tr>
+              <tr><th scope="row">Convolution / audio effect plugins</th><td class="us">No / No</td><td>No / No</td><td>Yes (Origin: paid option) / Audio Units</td><td>Yes / No</td><td>No / No</td><td>Not documented / Not documented</td><td>No / No</td><td>Not documented / Audio Units</td></tr>
+              <tr><th scope="row">Streaming services</th><td class="us">No</td><td>Apple Music</td><td>Studio: yes; Origin: no</td><td>Yes</td><td>No (local + UPnP)</td><td>No (internet radio)</td><td>No (internet radio)</td><td>No (internet radio)</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <p class="compare-note">¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in <a href="https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/">third-party loopback tests reported on ASR</a>, at 100% volume. This is not a Vespertine measurement; the original report could not be independently rechecked for this update. There is still no automatic rate switching, hog mode, FLAC or DSD on Mac.<br>² Multichannel DAC output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted.<br><a href="https://github.com/szeremeta1/Vespertine/blob/main/docs/COMPARISON.md">Sources and scope</a>. Corrections welcome: <a href="https://github.com/szeremeta1/Vespertine/issues">open an issue</a>.</p>
+      <p class="compare-note">¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in <a href="https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/">third-party loopback tests reported on ASR</a>, at 100% volume. This is not a Vespertine measurement; the original report could not be independently rechecked for this update. There is still no automatic rate switching, hog mode, FLAC or DSD on Mac.<br>² Multichannel DAC output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted.<br>³ Apple documents Spatial Audio with head tracking for Dolby Atmos tracks in the Apple Music catalog, not spatial rendering of your own multichannel files.<br><a href="https://github.com/szeremeta1/Vespertine/blob/main/docs/COMPARISON.md">Sources and scope</a>. Corrections welcome: <a href="https://github.com/szeremeta1/Vespertine/issues">open an issue</a>.</p>
     </div>
   </section>
 
