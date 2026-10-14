@@ -310,6 +310,8 @@ struct TagEditorView: View {
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
         if readOnlyFiles { return String(localized: "Read-only location · saved in Vespertine's library; the files aren't changed") }
+        // Only CUE or disc-image tracks selected: their tags live in the library alone, so no file is written.
+        if files == 0 { return String(localized: "Saved in Vespertine's library; the files aren't changed") }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
         case "FLAC", "Vorbis", "Opus": String(localized: "Vorbis comments")
         case "MP3", "AIFF", "WAV", "DSF": String(localized: "ID3v2 tags")
@@ -378,7 +380,8 @@ struct TagEditorView: View {
             // Another selection is on screen now: its draft isn't this save's to clear.
             guard loadedIDs == selection else { return }
             if let result {
-                var parts = [String(localized: "Saved \(result.written) files")]
+                // Only CUE or disc-image tracks: no file was written, so "Saved 0 files" would say nothing true.
+                var parts: [String] = result.written == 0 && result.databaseOnly > 0 ? [] : [String(localized: "Saved \(result.written) files")]
                 if result.databaseOnly > 0 { parts.append(String(localized: "\(result.databaseOnly) CUE tracks in library")) }
                 if !result.failures.isEmpty { parts.append(String(localized: "\(result.failures.count) failed: \(result.failures[0].message)")) }
                 status = parts.joined(separator: " · ")
