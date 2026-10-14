@@ -49,7 +49,7 @@ public enum MultichannelExport {
         guard !FileManager.default.fileExists(atPath: destination.path) else {
             throw ExportError.unsupported(String(localized: "\(destination.lastPathComponent) already exists"))
         }
-        let probed = try SourceOpener.probe(item.url, area: item.sacdArea)
+        let probed = try SourceOpener.probe(item.url, area: item.sacdArea, dvd: item.dvd)
         let format = probed.format
         guard format.encoding == .pcm, format.channels > 2 else { throw ExportError.notMultichannel }
         let plan = OutputPlan(mode: .pcm, deviceSampleRate: format.sampleRate, decodedSampleRate: format.sampleRate,
