@@ -218,8 +218,9 @@ struct TagEditorView: View {
             ForEach($custom) { $tag in
                 HStack(spacing: 6) {
                     ZStack(alignment: .leading) {
-                        Text(verbatim: longestKey + " ").font(Typeface.mono(11)).hidden().fixedSize()
-                            .frame(maxWidth: 160, alignment: .leading)
+                        Text(verbatim: longestKey).font(Typeface.mono(11)).hidden().fixedSize()
+                            .padding(.horizontal, 4)
+                            .frame(maxWidth: 190, alignment: .leading)
                         Text("KEY").font(Typeface.mono(11)).hidden().fixedSize()
                         TextField("KEY", text: $tag.key).font(Typeface.mono(11))
                     }
