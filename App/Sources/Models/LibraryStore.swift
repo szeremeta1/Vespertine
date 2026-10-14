@@ -100,6 +100,7 @@ final class LibraryStore {
                               backupDirectory: dataDirectory.appendingPathComponent("Tag Backups", isDirectory: true))
         enricher = MetadataEnricher(database: database)
         ArtworkCache.shared.store = artwork
+        loadSidebarState()
         observe()
         Task { await tagWriter.pruneBackups() }
         // After an analyzer update, stored results are judged anew from their measurements: off the main thread (a large
@@ -124,6 +125,37 @@ final class LibraryStore {
 
     // MARK: Observation
 
+    /// The sidebar's rows and the choice between the library and the empty-library screen, read before the first
+    /// frame. The observations below deliver their first values a moment after the window is up; until then the
+    /// sidebar listed no playlists or sources and the window showed the empty library. Their rows then arrived in
+    /// separate updates while the sidebar's outline view was still settling its first row heights, and AppKit logged
+    /// "reentrant operation in its NSTableView delegate" (issue #54). Read here, the first frame already has every
+    /// row, and the observations' first values change nothing. Three small queries; a failure leaves them to the
+    /// observations.
+    private func loadSidebarState() {
+        guard let state = try? database.writer.read({ db in
+            (try Self.fetchSources(db), try Self.fetchPlaylists(db), try Self.fetchStats(db))
+        }) else { return }
+        sources = state.0
+        playlists = state.1
+        if let stats = state.2 { self.stats = stats }
+    }
+
+    private nonisolated static func fetchSources(_ db: Database) throws -> [LibrarySource] {
+        try LibrarySource.order(Column("path")).fetchAll(db)
+    }
+
+    private nonisolated static func fetchPlaylists(_ db: Database) throws -> [Playlist] {
+        try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db)
+    }
+
+    private nonisolated static func fetchStats(_ db: Database) throws -> LibraryDatabase.Stats? {
+        try Row.fetchOne(db, sql: """
+            SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
+                   coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
+            """).map { LibraryDatabase.Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
+    }
+
     private func observe() {
         observeAlbums()
         let writer = database.writer
@@ -147,8 +179,8 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db) }
-            do { for try await value in obs.values(in: writer) { self?.playlists = value } } catch {}
+            let obs = ValueObservation.tracking(Self.fetchPlaylists)
+            do { for try await value in obs.values(in: writer) where self?.playlists != value { self?.playlists = value } } catch {}
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in
@@ -164,25 +196,22 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in try LibrarySource.order(Column("path")).fetchAll(db) }
+            let obs = ValueObservation.tracking(Self.fetchSources)
             do {
                 for try await value in obs.values(in: writer) {
                     // A share relinked to a new mount point rewrites its tracks' paths.
-                    if let self, self.sources != value, !self.sources.isEmpty { self.revision += 1 }
-                    self?.sources = value
+                    if let self, self.sources != value {
+                        if !self.sources.isEmpty { self.revision += 1 }
+                        self.sources = value
+                    }
                     self?.updateWatcher()
                     self?.rescanLocalAtLaunch()
                 }
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in
-                try Row.fetchOne(db, sql: """
-                    SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                           coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
-                    """).map { LibraryDatabase.Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
-            }
-            do { for try await value in obs.values(in: writer) { if let value { self?.stats = value } } } catch {}
+            let obs = ValueObservation.tracking(Self.fetchStats)
+            do { for try await value in obs.values(in: writer) { if let value, self?.stats != value { self?.stats = value } } } catch {}
         })
     }
 
