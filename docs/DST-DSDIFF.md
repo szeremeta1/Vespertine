@@ -15,7 +15,7 @@ The source audit also exposed an EAC CUE parser bug: `FILE` may follow `TRACK` o
 - `DSTDSDIFFTests`: indexed/unindexed stereo, five-channel and six-channel files; stored frames at DSD128/256/512; explicit speaker order and discrete unknown channel IDs; compressed and stored frames; every DSD byte and the complete PCM/DoP outputs against an uncompressed equivalent; seeking; optional CRCs; malformed indexes, truncation and damaged frames.
 - `SACDLibraryTests`: raw/plain SACD import preserves the image byte for byte; compressed DSDIFF CUE tracks scan correctly; an old library upgrades and rereads unchanged files without losing play counts or track IDs.
 - `SACDCorpusTests`: opt-in actual-image and DSDIFF checks through the app's own source opener and PCM/DoP paths. These open no output device.
-- [Corpus runner](../verification/oracles/sacd/corpus/README.md): complete production-core reads and per-track hashes on a server, with matching native macOS integration checks. [Recorded results](../verification/runs/sacd-2026-10-14/) contain no audio or private source paths.
+- [Corpus runner](../verification/oracles/sacd/corpus/README.md): complete production-core reads and per-track hashes on a server, with matching native macOS integration checks. [Native results](verification/sacd-2026-10-14-native.json) contain no audio or private source paths.
 
 A complete SACD-area read retains pauses between tracks. Independent extractors can end each track at its declared duration instead. Any differing lengths must be checked at the original track boundary; a matching music prefix and separately retained pause are not a decoding mismatch. Never silently label a different-length comparison “identical”.
 
