@@ -5,7 +5,8 @@
 
 Every string is translated into every language the app ships, each translation carries the same format
 placeholders as the English text (in any order), plural variants cover the categories each language needs, and
-the catalogs hold no Russian localization. Fails with a list of what's wrong.
+the catalogs hold no Russian localization. Every literal the Swift source uses as a localization key (Text("…"),
+Button("…"), String(localized: "…") and the like) is in Localizable.xcstrings. Fails with a list of what's wrong.
 """
 
 import json
@@ -124,6 +125,77 @@ def check(path, problems):
                     problems.append(f"{path.name}: {key!r} [{language}] lacks plural forms {sorted(missing)}")
 
 
+# Where a string literal in the source becomes a key of Localizable.xcstrings: the SwiftUI views and modifiers that
+# take a LocalizedStringKey, String(localized:) (the packages' too: they look their text up in the app's main bundle)
+# and the analysis package's localized(_:). The first argument may be a ternary between two literals.
+SOURCES = ["App/Sources/**/*.swift", "Packages/*/Sources/**/*.swift"]
+LOCALIZING = re.compile(
+    r'(?:\b(?:Text|Button|Label|Toggle|Section|Picker|LabeledContent|Menu|TextField|SecureField|Link|GroupBox'
+    r'|DisclosureGroup|ContentUnavailableView|Stepper|ProgressView)\(|\.(?:navigationTitle|help|accessibilityLabel'
+    r'|accessibilityValue|accessibilityHint|alert|confirmationDialog)\(|\bString\(localized:|\blocalized\()'
+    r'\s*(?:[^"(){},]*\s\?\s*)?(?=")'
+)
+# Literals in those places that are deliberately not localized.
+NOT_LOCALIZED = {
+    "\u2066\u2212",  # TransportBar: an isolate and minus sign concatenated before the remaining time
+    " \u00b7 ",  # AlbumsViews: the separator joined back between a summary's parts
+}
+ESCAPES = {"n": "\n", "t": "\t", "r": "\r", "0": "\0", "\\": "\\", '"': '"', "'": "'"}
+
+
+def literal(source, start):
+    """The Swift string literal opening at `start` as a catalog key with its interpolations as \\0, and where it ends."""
+    end = '"""' if source.startswith('"""', start) else '"'
+    i, text = start + len(end), []
+    while not source.startswith(end, i):
+        char = source[i]
+        if char == "\\" and source[i + 1] == "(":
+            depth, i = 1, i + 2
+            while depth:
+                if source[i] == '"':
+                    i = literal(source, i)[1]
+                    continue
+                depth += {"(": 1, ")": -1}.get(source[i], 0)
+                i += 1
+            text.append("\0")
+        elif char == "\\" and source[i + 1] == "u":
+            close = source.index("}", i)
+            text.append(chr(int(source[i + 3:close], 16)))
+            i = close + 1
+        elif char == "\\":
+            text.append(ESCAPES.get(source[i + 1], source[i + 1]))
+            i += 2
+        else:
+            text.append(char)
+            i += 1
+    text = "".join(text)
+    if end == '"""':  # a multi-line literal drops its first and last line breaks and the closing line's indentation
+        *lines, indent = text[1:].split("\n")
+        text = "\n".join(line[len(indent):] for line in lines)
+    return text, i + len(end)
+
+
+def check_sources(problems):
+    """Every literal the source uses as a localization key is in Localizable.xcstrings."""
+    catalog = json.loads(CATALOGS[0].read_text(encoding="utf-8"))["strings"]
+    # Interpolations become %@, %lld… by the value's type, which a scan can't know: compare with every argument as \0.
+    keys = {PLACEHOLDER.sub("\0", key.replace("%%", "\1")).replace("\1", "%") for key in catalog}
+    for pattern in SOURCES:
+        for path in sorted(ROOT.glob(pattern)):
+            source = path.read_text(encoding="utf-8")
+            for match in LOCALIZING.finditer(source):
+                found = [literal(source, match.end())]
+                end = found[0][1]
+                branch = re.match(r'\s*:\s*(?=")', source[end:])  # the other side of a ternary
+                if branch and match.group(0).rstrip().endswith("?"):
+                    found.append(literal(source, end + branch.end()))
+                for key, _ in found:
+                    if key and key not in keys and key not in NOT_LOCALIZED:
+                        line = source.count("\n", 0, match.start()) + 1
+                        shown = key.replace("\0", "%@")
+                        problems.append(f"{path.relative_to(ROOT)}:{line}: {shown!r} is not in Localizable.xcstrings")
+
+
 def main():
     problems = []
     for path in CATALOGS:
@@ -131,6 +203,8 @@ def main():
             problems.append(f"{path.relative_to(ROOT)} is missing")
             continue
         check(path, problems)
+    if CATALOGS[0].exists():
+        check_sources(problems)
     if any((ROOT / "App").rglob("ru.lproj")):
         problems.append("App/ contains a ru.lproj")
     for problem in problems:

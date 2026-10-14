@@ -167,9 +167,15 @@ struct PlaybackSettings: View {
                 }
                 Text(fallbackNote(s.outputFallback)).font(.caption).foregroundStyle(.secondary)
                 Toggle("Exclusive access (hog mode)", isOn: $s.exclusiveMode)
-                (s.exclusiveMode
+                (!s.exclusiveMode
+                     ? Text("Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access.")
+                     : s.relayVolumeKeys
                      ? Text("Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so Vespertine passes the volume keys, Control Center and the AirPods Max Digital Crown on to it. The Mac's own speakers and headphone jack always play shared.")
-                     : Text("Off: Vespertine still sets the device's format for each track and plays bit-perfect, and says so, unless another app plays through the same device at the same time. Volume keys and headphone controls work normally. DSD over DoP always takes exclusive access."))
+                     : Text("Vespertine takes sole control of the device; other apps are silent on it while Vespertine plays. macOS then won't let it be the Mac's sound output, so the volume keys, Control Center and the AirPods Max Digital Crown adjust another output instead, unless the setting below is on. The Mac's own speakers and headphone jack always play shared."))
+                    .font(.caption).foregroundStyle(.secondary)
+                Toggle("Volume keys control the device held exclusively", isOn: $s.relayVolumeKeys)
+                    .disabled(!s.exclusiveMode)
+                Text("With exclusive access, macOS moves the Mac's sound output to another device while Vespertine holds the DAC. With this on, the volume keys, Control Center and the AirPods Max Digital Crown change the DAC's volume by way of that output, which then plays other apps' sounds at the DAC's level. Off: that output keeps its own volume.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Integer mode", isOn: $s.integerMode)
                     .disabled(!s.exclusiveMode)

@@ -267,9 +267,25 @@ final class PlayerController {
     /// while it plays so they adjust what you hear, and never change some other device's volume.
     /// (macOS never makes a device another app holds exclusively the sound output, so this needs shared mode.)
     private var lastFollowed: AudioObjectID?
-    /// With exclusive access the device can't be the sound output; the relay carries the keys to it instead.
+    /// With exclusive access the device can't be the sound output; the relay carries the keys to it instead, when
+    /// Settings › Playback › Volume allows it.
     let volumeRelay = VolumeRelay()
+    /// The device the relay was last told to follow (nil: none).
     private var relayedDevice: AudioObjectID?
+
+    /// QA: `-VespertineVolumeRelay NO` keeps the relay off whatever the setting, so a screenshot run never touches
+    /// another output's level.
+    nonisolated private static let relayOffForQA = LaunchArguments().string(forKey: "VespertineVolumeRelay") == "NO"
+
+    /// Points the relay at the device Vespertine plays on, or at nothing while the setting is off (checked on every
+    /// poll, so turning it off takes effect at once). Turned off while it relays, the sound output standing in gets its
+    /// own volume and mute back.
+    private func syncVolumeRelay() {
+        let device = settings.relayVolumeKeys && !Self.relayOffForQA ? outputDevice?.id : nil
+        guard relayedDevice != device else { return }
+        relayedDevice = device
+        volumeRelay.follow(device)
+    }
     nonisolated private static let halQueue = DispatchQueue(label: "org.szeremeta.vespertine.system-output", qos: .userInitiated)
     private func followSystemOutput(to device: OutputDevice) {
         guard settings.systemOutputFollowsPlayback, signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
@@ -493,11 +509,7 @@ final class PlayerController {
             outputDevice = snap.outputDevice
         }
         if state == .playing, let device = snap.outputDevice { followSystemOutput(to: device) } else if state != .playing { lastFollowed = nil }
-        if relayedDevice != snap.outputDevice?.id {
-            relayedDevice = snap.outputDevice?.id
-            // QA: `-VespertineVolumeRelay NO` keeps the relay off, so a screenshot run never touches another output's level.
-            volumeRelay.follow(LaunchArguments().string(forKey: "VespertineVolumeRelay") == "NO" ? nil : relayedDevice)
-        }
+        syncVolumeRelay()
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).

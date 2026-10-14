@@ -156,7 +156,7 @@ struct TagEditorView: View {
             Text(label).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).frame(width: 92, alignment: .trailing)
                 .accessibilityHidden(true)
             input(a)
-            Text("of", comment: "Between two numbers in the tag editor: Track 3 of 12").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
+            Text("of", comment: "Between two numbers in the tag editor: Track 3 of 12").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).fixedSize().accessibilityHidden(true)
             input(b)
         }
         .padding(.bottom, 7)
@@ -164,17 +164,28 @@ struct TagEditorView: View {
 
     private func input(_ f: TagField) -> some View {
         let isMixed = mixed.contains(f) && !edited.contains(f)
-        return TextField(isMixed ? String(localized: "Mixed", comment: "Placeholder: the selected tracks have different values for this tag") : "", text: Binding(
+        let mixedNote = String(localized: "Mixed", comment: "Placeholder: the selected tracks have different values for this tag")
+        return TextField("", text: Binding(
             get: { draft[f] ?? "" },
             set: { draft[f] = $0; edited.insert(f) }))
             .textFieldStyle(.plain)
-            .font(isMixed ? Typeface.ui(12.5).italic() : Typeface.ui(12.5))
+            .font(Typeface.ui(12.5))
             .foregroundStyle(Palette.text)
+            // Drawn here rather than as the field's placeholder, so a long translation in a narrow field (Track and
+            // Disc numbers) shrinks to fit instead of being cut off. A mixed field is empty until you type.
+            .overlay(alignment: .leading) {
+                if isMixed {
+                    Text(mixedNote).font(Typeface.ui(12.5).italic()).foregroundStyle(Palette.text3)
+                        .lineLimit(1).minimumScaleFactor(0.6)
+                        .allowsHitTesting(false).accessibilityHidden(true)
+                }
+            }
             .padding(.horizontal, 8)
             .frame(height: 26)
             .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
             .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(edited.contains(f) ? Palette.brass.opacity(0.6) : Palette.hairline))
             .accessibilityLabel(f.label)   // "Track Total" for the second of "Track … of …"
+            .accessibilityHint(isMixed ? mixedNote : "")
     }
 
     private var lyrics: some View {
@@ -201,9 +212,18 @@ struct TagEditorView: View {
                     .buttonStyle(.plain).foregroundStyle(Palette.text2)
                     .accessibilityLabel("Add custom tag")
             }
+            // The key column is at least as wide as the longest key (up to about half the row), so keys such as
+            // MUSICBRAINZ_ALBUMARTISTID aren't cut off; short keys keep the even split.
+            let longestKey = custom.map(\.key).max { $0.count < $1.count } ?? ""
             ForEach($custom) { $tag in
                 HStack(spacing: 6) {
-                    TextField("KEY", text: $tag.key).font(Typeface.mono(11))
+                    ZStack(alignment: .leading) {
+                        Text(verbatim: longestKey).font(Typeface.mono(11)).hidden().fixedSize()
+                            .padding(.horizontal, 4)
+                            .frame(maxWidth: 190, alignment: .leading)
+                        Text("KEY").font(Typeface.mono(11)).hidden().fixedSize()
+                        TextField("KEY", text: $tag.key).font(Typeface.mono(11))
+                    }
                     Text("=").foregroundStyle(Palette.text3)
                     TextField("value", text: $tag.value).font(Typeface.mono(11))
                     Button { tag.value = ""; tag.key = tag.key.isEmpty ? "" : tag.key } label: { Image(systemName: "xmark.circle.fill") }
@@ -310,6 +330,8 @@ struct TagEditorView: View {
     private var footerNote: String {
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
         if readOnlyFiles { return String(localized: "Read-only location · saved in Vespertine's library; the files aren't changed") }
+        // Only CUE or disc-image tracks selected: their tags live in the library alone, so no file is written.
+        if files == 0 { return String(localized: "Saved in Vespertine's library; the files aren't changed") }
         let kind: String = switch Set(tracks.map(\.codec)).first ?? "" {
         case "FLAC", "Vorbis", "Opus": String(localized: "Vorbis comments")
         case "MP3", "AIFF", "WAV", "DSF": String(localized: "ID3v2 tags")
@@ -378,7 +400,8 @@ struct TagEditorView: View {
             // Another selection is on screen now: its draft isn't this save's to clear.
             guard loadedIDs == selection else { return }
             if let result {
-                var parts = [String(localized: "Saved \(result.written) files")]
+                // Only CUE or disc-image tracks: no file was written, so "Saved 0 files" would say nothing true.
+                var parts: [String] = result.written == 0 && result.databaseOnly > 0 ? [] : [String(localized: "Saved \(result.written) files")]
                 if result.databaseOnly > 0 { parts.append(String(localized: "\(result.databaseOnly) CUE tracks in library")) }
                 if !result.failures.isEmpty { parts.append(String(localized: "\(result.failures.count) failed: \(result.failures[0].message)")) }
                 status = parts.joined(separator: " · ")

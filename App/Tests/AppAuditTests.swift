@@ -32,6 +32,19 @@ struct AppAuditTests {
         #expect(settings.engineSettings().matchSixteenBit)
         #expect(AppSettings(defaults: defaults, dataDirectory: root).matchSixteenBit)
     }
+    @Test("Volume keys reach the exclusively held device only once turned on")
+    func relayVolumeKeysSetting() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-relay-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(!settings.relayVolumeKeys)
+        #expect(settings.systemOutputFollowsPlayback)
+        settings.relayVolumeKeys = true
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).relayVolumeKeys)
+    }
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
