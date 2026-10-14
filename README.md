@@ -56,25 +56,29 @@ Claude Code and Codex wrote most of the code. I decided how the app should behav
 
 ## Compared with other Mac players
 
-Bit-perfect playback is available in several Mac players. Vespertine focuses on a surround collection, a signal path you can inspect, and GPL source you can audit. Here's what is documented; `?` means unverified, not unsupported.
+Bit-perfect playback is available in several Mac players. Vespertine focuses on a surround collection, a signal path you can inspect, and GPL source you can audit. Here's what each player's own documentation or source code says. "Not documented" means the vendor doesn't say either way; it is not a claim that the player lacks the feature.
 
 | | Vespertine | Apple Music (Mac) | Audirvana Studio / Origin | Roon | VeraVox | Colibri | Cog | foobar2000 for Mac |
 |---|---|---|---|---|---|---|---|---|
-| Source code | GPL-3.0 | Closed | Closed | Closed | Closed | ? | GPL | Closed |
-| FLAC / DSD files | Yes / Yes | No / No | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / ? |
-| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | Yes | Yes | ? |
+| Source code | GPL-3.0 | Closed | Closed | Closed | Closed | Closed | GPL-2.0 | Closed |
+| FLAC / DSD files | Yes / Yes | No / No | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / No⁴ |
+| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | Yes | Yes | Not documented |
 | Exclusive (hog) mode | Yes | No | Yes | Yes | Yes | Yes | Yes | Yes |
-| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | Vendor claim | Vendor claim | In-app loopback test | Vendor claim | In-app indicator | ? |
-| Local surround files | Yes² | ? | Yes | Yes | Yes | ? | Yes | ? |
-| Apple Spatial Audio for local surround | Yes | ? | ? | ? | ? | ? | Yes | ? |
-| Hi-res file analysis | Yes | ? | AudioScan | ? | Yes | ? | ? | ? |
-| SACD ISO | Yes | No | Yes | No (DSF/DFF only) | Yes | No | ? | ? |
-| Convolution / audio effect plugins | No / No | ? / ? | Yes (Origin: paid option) / Audio Units | Yes / ? | No / No | ? / ? | ? / ? | ? / Audio Units |
-| Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (radio only) | ? | ? |
+| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | Vendor claim | Vendor claim | In-app loopback test | Vendor claim | In-app indicator | Not documented |
+| Local surround files | Yes² | Not documented | Yes | Yes | Yes | Not documented | Yes | Not documented |
+| Apple Spatial Audio for local surround | Yes | Catalog Atmos only³ | Not documented | Not documented | Not documented | Not documented | Yes | Not documented |
+| Hi-res file analysis | Yes | No | AudioScan | Dynamic range, loudness | Yes | Not documented | No (live spectrum only) | No (live spectrum only) |
+| SACD ISO | Yes | No | Yes | No (DSF/DFF only) | Yes | No | No | No⁴ |
+| Convolution / audio effect plugins | No / No | No / No | Yes (Origin: paid option) / Audio Units | Yes / No | No / No | Not documented / Not documented | No / No | Not documented / Audio Units |
+| Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (internet radio) | No (internet radio) | No (internet radio) |
 
 ¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in [third-party loopback tests reported on ASR](https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/). This is not a Vespertine measurement or a claim about every Mac configuration. Volume was at 100%; there is still no automatic rate switching, hog mode, FLAC or DSD on Mac. The original test report could not be independently rechecked for this update.
 
 ² Multichannel DAC output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. Automated routing and carrier tests do not establish hardware compatibility.
+
+³ Apple documents Spatial Audio with head tracking for Dolby Atmos tracks in the Apple Music catalog. It does not document spatial rendering of your own multichannel files.
+
+⁴ Tested on foobar2000 2.26 (macOS 27.0.1), with no components: DSF, DFF and SACD ISO files fail with "Unsupported file format". DSF and DFF play only as 352.8 kHz PCM after installing FFmpeg separately and adding them to its FFmpeg Decoder Wrapper; SACD ISO still fails.
 
 [Comparison sources and scope](docs/COMPARISON.md). Corrections welcome: [open an issue](https://github.com/szeremeta1/Vespertine/issues).
 
