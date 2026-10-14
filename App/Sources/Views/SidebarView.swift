@@ -196,7 +196,9 @@ struct SidebarView: View {
     private func row(_ item: SidebarItem, _ title: LocalizedStringKey, _ symbol: String, count: Int?) -> some View {
         Label {
             HStack {
-                Text(title)
+                // Long translations ("Adicionadas Recentemente") shrink a little to fit the sidebar rather than being
+                // cut off. The count beside it keeps its full width.
+                Text(title).lineLimit(1).minimumScaleFactor(0.8)
                 Spacer()
                 if !model.filter(.sidebar(item)).isEmpty {
                     Image(systemName: "line.3.horizontal.decrease")
@@ -208,6 +210,7 @@ struct SidebarView: View {
                     Text(count.formatted())
                         .font(Typeface.mono(10.5))
                         .foregroundStyle(Palette.text3)
+                        .fixedSize()
                 }
             }
         } icon: {
