@@ -3,6 +3,7 @@
 # - the engine and library packages on macOS, and in the same job the real-time C under AddressSanitizer,
 #   UndefinedBehaviorSanitizer and ThreadSanitizer, clang's analyzer, and a parse of the release scripts;
 # - the app itself (generated with XcodeGen) with its tests, plus a universal Release build;
+# - the String Catalogs (scripts/check-localizations.py), in the verification registry job;
 # - the spec-traced verification (verification/): the requirement registry and oracles, the blind-written checks
 #   against their clean-room implementations, mutants and Vespertine, and Vespertine's IEC 61937 carriers against
 #   FFmpeg's S/PDIF demuxer and a blind carrier scanner.
@@ -188,6 +189,11 @@ jobs:
         run: python3 verification/oracles/dst/check_fixtures.py
       - name: Loopback tools, on synthetic captures
         run: python3 verification/hardware/selftest.py
+      # Not verification, but a Linux job every change runs (no path filter), so a catalog or Swift string change
+      # can't skip it: every string translated, placeholders matching, every localized literal in the catalog.
+      - name: String Catalogs complete
+        if: ${{ !cancelled() }}
+        run: python3 scripts/check-localizations.py
 
   verification-linux:
     name: Spec-traced checks and mutants (Linux)

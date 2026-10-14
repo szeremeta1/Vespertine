@@ -283,6 +283,12 @@ enum DeveloperHooks {
             }
         }
         print("[qa] snapshot done")
-        if LaunchArguments().bool(forKey: "VespertineQuitAfterSnapshot") { NSApp.terminate(nil) }
+        guard LaunchArguments().bool(forKey: "VespertineQuitAfterSnapshot") else { return }
+        // A window with a sheet up (the loopback test's) holds the quit off, so the sheets close first. Should the
+        // app still be here a moment later, a QA run ends anyway.
+        for window in NSApp.windows { if let sheet = window.attachedSheet { window.endSheet(sheet) } }
+        NSApp.terminate(nil)
+        try? await Task.sleep(for: .seconds(3))
+        exit(0)
     }
 }

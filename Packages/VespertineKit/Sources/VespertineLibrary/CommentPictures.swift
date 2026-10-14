@@ -1,7 +1,7 @@
 //
 // Vespertine — cover art stored as a METADATA_BLOCK_PICTURE Vorbis comment inside a FLAC file
 // (a base64 FLAC picture structure; some taggers write art this way instead of a PICTURE block,
-// and TagLib doesn't report it for FLAC).
+// and TagLib doesn't report it for FLAC), and raw comment values the tag reader reduces to a number.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -9,7 +9,10 @@ import Foundation
 
 enum CommentPictures {
     /// The image data of the first (preferably front-cover) METADATA_BLOCK_PICTURE comment in a FLAC file.
-    static func flacCover(at url: URL) -> Data? {
+    static func flacCover(at url: URL) -> Data? { flacVorbisComment(at: url).flatMap(cover(inVorbisComment:)) }
+
+    /// A FLAC file's Vorbis comment block.
+    static func flacVorbisComment(at url: URL) -> Data? {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
         defer { try? handle.close() }
         func read(_ n: Int) -> Data? { let d = try? handle.read(upToCount: n); return d?.count == n ? d : nil }
@@ -27,10 +30,7 @@ enum CommentPictures {
             guard let h = read(4) else { return nil }
             let last = h[h.startIndex] & 0x80 != 0, type = h[h.startIndex] & 0x7F
             let length = Int(h[h.startIndex + 1]) << 16 | Int(h[h.startIndex + 2]) << 8 | Int(h[h.startIndex + 3])
-            if type == 4 {
-                guard let body = read(length) else { return nil }
-                return cover(inVorbisComment: body)
-            }
+            if type == 4 { return read(length) }
             guard let here = try? handle.offset() else { return nil }
             try? handle.seek(toOffset: here + UInt64(length))
             if last { return nil }
@@ -63,6 +63,31 @@ enum CommentPictures {
             pictures.append(picture)
         }
         return (pictures.first { $0.type == 3 } ?? pictures.first)?.data
+    }
+
+    /// The first value of each comment named in `names` (upper case), keyed by its upper-cased name.
+    static func values(_ names: Set<String>, inVorbisComment body: Data) -> [String: String] {
+        let b = [UInt8](body)
+        var p = 0
+        func u32le() -> Int? {
+            guard p + 4 <= b.count else { return nil }
+            defer { p += 4 }
+            return Int(b[p]) | Int(b[p + 1]) << 8 | Int(b[p + 2]) << 16 | Int(b[p + 3]) << 24
+        }
+        guard let vendor = u32le(), p + vendor <= b.count else { return [:] }
+        p += vendor
+        guard let count = u32le() else { return [:] }
+        var found: [String: String] = [:]
+        for _ in 0..<count {
+            guard let length = u32le(), p + length <= b.count else { break }
+            let entry = b[p..<(p + length)]
+            p += length
+            guard let equals = entry.firstIndex(of: UInt8(ascii: "=")),
+                  let name = String(bytes: entry[..<equals], encoding: .utf8)?.uppercased(), names.contains(name), found[name] == nil,
+                  let value = String(bytes: entry[(equals + 1)...], encoding: .utf8) else { continue }
+            found[name] = value
+        }
+        return found
     }
 
     /// A FLAC picture structure: type, MIME, description, dimensions, then the image.

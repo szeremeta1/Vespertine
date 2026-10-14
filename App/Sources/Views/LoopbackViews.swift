@@ -102,8 +102,8 @@ struct LoopbackTestSheet: View {
                 }
                 if let report = test.report {
                     HStack(spacing: 10) {
-                        StatusBadge(text: report.status.label.uppercased(), kind: report.status == .bitExact ? .perfect : report.status == .failed ? .converted : .neutral)
-                        Text(LoopbackReport.label).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
+                        StatusBadge(text: report.status.localizedLabel.localizedUppercase, kind: report.status == .bitExact ? .perfect : report.status == .failed ? .converted : .neutral)
+                        Text(LoopbackReport.localizedLabel).font(Typeface.ui(12)).foregroundStyle(Palette.text2)
                     }
                     Text(verdict(report)).font(Typeface.ui(12)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
                     Text("\(report.outputDevice) · Vespertine \(report.appVersion) · macOS \(report.macOS)")
@@ -133,7 +133,7 @@ struct LoopbackTestSheet: View {
                     } label: {
                         HStack(alignment: .firstTextBaseline, spacing: 10) {
                             Image(systemName: icon(c.status)).foregroundStyle(tint(c.status)).frame(width: 14)
-                            Text(c.testCase.name).font(Typeface.ui(12.5)).foregroundStyle(Palette.text)
+                            Text(c.testCase.localizedName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text)
                             Spacer(minLength: 8)
                             Text(c.summary).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).lineLimit(1).truncationMode(.tail)
                             Image(systemName: expanded.contains(c.id) ? "chevron.down" : "chevron.right")
@@ -142,7 +142,7 @@ struct LoopbackTestSheet: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(c.testCase.name): \(c.status.label), \(c.summary)")
+                    .accessibilityLabel("\(c.testCase.localizedName): \(c.status.localizedLabel), \(c.summary)")
                     if expanded.contains(c.id) { details(c).padding(.leading, 24) }
                 }
                 .padding(.vertical, 7)
@@ -153,7 +153,7 @@ struct LoopbackTestSheet: View {
 
     private func details(_ c: LoopbackCaseResult) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            if let format = c.deviceFormat { line("Device format: \(format)") }
+            if let format = c.deviceFormat { line(String(localized: "Device format: \(format)", comment: "Loopback test case details: the format the device ran at.")) }
             if let note = c.sixteenBitNote { line(note) }
             ForEach(Array(c.analyses.enumerated()), id: \.offset) { _, a in
                 ForEach(a.channels, id: \.channel) { ch in line(LoopbackReport.describe(ch)) }
@@ -162,7 +162,8 @@ struct LoopbackTestSheet: View {
                 }
             }
             if c.engineUnderruns > 0 || c.recorderDiscontinuities > 0 {
-                line("Engine underruns: \(c.engineUnderruns) · recorder discontinuities: \(c.recorderDiscontinuities)")
+                line(String(localized: "Engine underruns: \(c.engineUnderruns) · recorder discontinuities: \(c.recorderDiscontinuities)",
+                             comment: "Loopback test case details: playback buffer underruns and gaps in the recording."))
             }
         }
     }
@@ -227,6 +228,53 @@ struct LoopbackTestSheet: View {
             try? await Task.sleep(for: .seconds(2))
             guard test.phase == .setup, let output = test.output(in: model.devices.devices) else { return }
             await test.run(on: output, player: model.player)
+        }
+    }
+}
+
+// The loopback labels the sheet and the signal path show, in the app's language. VespertineAudio keeps its English
+// ones for the Markdown report (pasted into bug reports), the vespertine-probe output and the keys results are saved under.
+extension LoopbackReport {
+    static var localizedLabel: String {
+        String(localized: "Loopback (software check)", comment: "How loopback test results are labelled: a check of Vespertine's software, not of a DAC.")
+    }
+}
+
+extension LoopbackCaseResult.Status {
+    var localizedLabel: String {
+        switch self {
+        case .bitExact: String(localized: "Bit-exact", comment: "Loopback test result: every sample came back unchanged.")
+        case .failed: String(localized: "Failed", comment: "Loopback test result: some samples came back changed.")
+        case .setupProblem: String(localized: "Test setup problem", comment: "Loopback test result: the test itself couldn't be trusted.")
+        case .skipped: String(localized: "Skipped", comment: "Loopback test result: the case didn't run.")
+        }
+    }
+}
+
+extension LoopbackCase {
+    /// `name` in the app's language ("24-bit at 96 kHz").
+    var localizedName: String {
+        let rate = SampleRate.format(sampleRate)
+        switch kind {
+        case .gapless:
+            return String(localized: "Gapless pair, \(bits)-bit at \(rate) kHz", comment: "Loopback test case: one signal split across two files played gaplessly.")
+        case .sixteenThenTwentyFour:
+            return matchSixteenBit
+                ? String(localized: "16-bit then 24-bit at \(rate) kHz, 16-bit matched", comment: "Loopback test case: a 16-bit file, then a 24-bit one; 16-bit files sent as 16-bit.")
+                : String(localized: "16-bit then 24-bit at \(rate) kHz", comment: "Loopback test case: a 16-bit file, then a 24-bit one.")
+        case .single:
+            switch bits {
+            case 16:
+                return matchSixteenBit
+                    ? String(localized: "16-bit matched at \(rate) kHz", comment: "Loopback test case: a 16-bit file sent to the device as 16-bit.")
+                    : String(localized: "16-bit padded at \(rate) kHz", comment: "Loopback test case: a 16-bit file sent zero-padded to the device's word length.")
+            case 32:
+                return integerMode
+                    ? String(localized: "32-bit integer mode at \(rate) kHz", comment: "Loopback test case: a 32-bit file with the device in integer mode.")
+                    : String(localized: "32-bit at \(rate) kHz", comment: "Loopback test case: a 32-bit file.")
+            default:
+                return String(localized: "\(bits)-bit at \(rate) kHz", comment: "Loopback test case: a file of this bit depth, e.g. 24-bit at 96 kHz.")
+            }
         }
     }
 }

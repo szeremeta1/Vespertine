@@ -251,11 +251,11 @@ struct SignalPathView: View {
             let date = loopback.date.formatted(date: .abbreviated, time: .omitted)
             switch loopback.result.status {
             case .bitExact:
-                s.append(Step(title: LoopbackReport.label,
+                s.append(Step(title: LoopbackReport.localizedLabel,
                               detail: String(localized: "This format came back bit-exact through \(loopback.deviceName) on \(date). Checks Vespertine's software, not this device."),
                               value: String(localized: "bit-exact")))
             case .failed:
-                s.append(Step(title: LoopbackReport.label,
+                s.append(Step(title: LoopbackReport.localizedLabel,
                               detail: String(localized: "\(loopback.result.summary), through \(loopback.deviceName) on \(date). Checks Vespertine's software, not this device."),
                               value: String(localized: "failed"), tone: .changed))
             case .setupProblem, .skipped:
