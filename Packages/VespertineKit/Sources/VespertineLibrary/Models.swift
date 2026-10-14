@@ -159,6 +159,10 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var isMultichannel: Bool { channels > 2 }
     /// For a track of an SACD image, the area it's on ("<image>#2ch-3", "<image>#mch-3").
     public var sacdArea: SACDArea? { SACDArea(location: location) }
+    /// For a track of a DVD-Video (image or VIDEO_TS folder), the LPCM run it's a range of ("<disc>#dvd-…").
+    public var dvdStream: DVDStreamRef? { DVDStreamRef(location: location) }
+    /// A track of a VIDEO_TS folder: its file is the folder's VIDEO_TS.IFO, which can't be copied or cached on its own.
+    public var isDVDFolderTrack: Bool { dvdStream != nil && (filePath as NSString).pathExtension.lowercased() == "ifo" }
 
     public var formatSummary: String { baseFormatSummary + channelSuffix }
 

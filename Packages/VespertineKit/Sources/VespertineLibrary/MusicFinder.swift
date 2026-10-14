@@ -77,7 +77,8 @@ public enum MusicFinder {
     /// Files already inside `excludingRoots` (e.g. existing library sources) are skipped.
     public static func find(roots: [URL]? = nil, excludingRoots: [URL] = [],
                             progress: (@Sendable (Progress) -> Void)? = nil) async -> [FoundFolder] {
-        let extensions = LibraryScanner.audioExtensions
+        // VIDEO_TS folders are whole discs, added in place (Add Folder), not files to find and copy.
+        let extensions = LibraryScanner.audioExtensions.subtracting(SourceInspector.dvdFolderExtensions)
         var candidates: [URL]
         if let roots {
             candidates = roots.flatMap { LibraryScanner.enumerate($0).audio }

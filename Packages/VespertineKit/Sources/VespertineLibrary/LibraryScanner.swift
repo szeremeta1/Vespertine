@@ -121,9 +121,9 @@ public actor LibraryScanner {
             return map
         }
 
-        // SACD images' tracks, by image: "<image>#2ch-1" … "<image>#mch-6".
+        // Disc images' tracks, by image: SACD "<image>#2ch-1" … "<image>#mch-6", DVD-Video "<image or VIDEO_TS.IFO>#dvd-…".
         var imageTracks: [String: [String]] = [:]
-        for location in known.keys where SACDArea(location: location) != nil {
+        for location in known.keys where SACDArea(location: location) != nil || DVDStreamRef(location: location) != nil {
             imageTracks[String(location[..<location.lastIndex(of: "#")!]), default: []].append(location)
         }
 
@@ -151,7 +151,7 @@ public actor LibraryScanner {
                 }) { continue }
                 toRead.append(url)
             } else if let locations = imageTracks[url.path] {
-                // An SACD image read before: unchanged when every one of its tracks is.
+                // A disc image (or VIDEO_TS) read before: unchanged when every one of its tracks is.
                 locations.forEach { seen.insert($0) }
                 if locations.allSatisfy({ location in
                     guard let k = known[location] else { return false }
@@ -427,9 +427,14 @@ public actor LibraryScanner {
 
     static func readTracks(_ url: URL, cue: (sheet: CueSheet, tracks: [CueSheet.Entry], signature: String)?, artwork: ArtworkStore,
                            folderArt: FolderArtCache? = nil, remote: ListedFile? = nil) -> [Track]? {
-        if SourceInspector.discImageExtensions.contains(url.pathExtension.lowercased()) {
-            // An SACD image lists its own tracks; any other disc image has none.
-            return try? SACDTracks.read(url: url, artwork: artwork, folderArt: folderArt, size: remote?.size, modified: remote?.modified)
+        let ext = url.pathExtension.lowercased()
+        if SourceInspector.discImageExtensions.contains(ext) || SourceInspector.dvdFolderExtensions.contains(ext) {
+            // An SACD image or a DVD-Video (image, or VIDEO_TS folder by its VIDEO_TS.IFO) lists its own tracks;
+            // any other disc image or IFO has none. A damaged one fails.
+            if ext == "iso", SACDImage.isSACD(url) {
+                return try? SACDTracks.read(url: url, artwork: artwork, folderArt: folderArt, size: remote?.size, modified: remote?.modified)
+            }
+            return try? DVDTracks.read(url: url, artwork: artwork, folderArt: folderArt, size: remote?.size, modified: remote?.modified)
         }
         let read: Track?
         if let remote {
