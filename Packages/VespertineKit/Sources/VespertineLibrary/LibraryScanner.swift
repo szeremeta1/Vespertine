@@ -54,8 +54,11 @@ public actor LibraryScanner {
     /// few blocked reads would stall the rest). GCD adds threads while they wait on the network.
     static let ioQueue = DispatchQueue(label: "org.szeremeta.vespertine.scan-io", qos: .utility, attributes: .concurrent)
 
-    static func onIOQueue<T: Sendable>(_ work: @escaping @Sendable () -> T) async -> T {
-        await withCheckedContinuation { continuation in
+    /// `network`: the work reads a network share, so it waits its turn while a song streams from one (`ShareIOGate`).
+    static func onIOQueue<T: Sendable>(network: Bool = false, _ work: @escaping @Sendable () -> T) async -> T {
+        if network { await ShareIOGate.shared.enter() }
+        defer { if network { ShareIOGate.shared.leave() } }
+        return await withCheckedContinuation { continuation in
             ioQueue.async { continuation.resume(returning: work()) }
         }
     }
@@ -178,7 +181,7 @@ public actor LibraryScanner {
             for _ in 0..<Self.readWidth(for: root) {
                 guard let url = iterator.next() else { break }
                 let cue = cueByAudio[url.path], file = listed[url.path]
-                group.addTask { (url, await Self.onIOQueue { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
+                group.addTask { (url, await Self.onIOQueue(network: remote) { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
             }
             let skipping = self.skipsNonMusic && source.mode != .managed
             while let (url, tracks) = try await group.next() {
@@ -207,7 +210,7 @@ public actor LibraryScanner {
                 }
                 if let next = iterator.next() {
                     let cue = cueByAudio[next.path], file = listed[next.path]
-                    group.addTask { (next, await Self.onIOQueue { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
+                    group.addTask { (next, await Self.onIOQueue(network: remote) { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
                 }
             }
         }
@@ -295,7 +298,8 @@ public actor LibraryScanner {
                     siblings.filter { $0.pathExtension.lowercased() == "cue" }, [], [])
         }
         typealias Listed = (dir: URL, result: Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>)
-        let width = NetworkVolume.isNetwork(start) ? 12 : 4
+        let network = NetworkVolume.isNetwork(start)
+        let width = network ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = [], unreadable: [URL] = []
         var pending: [URL] = [start]
         // Folders already listed, by path (symlinked ones resolved): a link back up the tree would loop forever.
@@ -305,7 +309,7 @@ public actor LibraryScanner {
             var running = 0
             func begin(_ dir: URL) {
                 running += 1
-                group.addTask { await onIOQueue {
+                group.addTask { await onIOQueue(network: network) {
                     (dir: dir, result: Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
