@@ -399,11 +399,12 @@ final class NetworkShareManager {
     private func prefetchable(current: Track?, upcoming: [Track]) -> [Track] {
         guard settings.networkCache else { return [] }
         return ([current].compactMap { $0 } + upcoming.prefix(max(0, settings.networkPrefetch)))
-            .filter { isNetwork($0) && isReachable($0) }
+            // A VIDEO_TS folder's track plays from the whole folder; its VIDEO_TS.IFO alone is no use as a cached copy.
+            .filter { isNetwork($0) && isReachable($0) && !$0.isDVDFolderTrack }
     }
 
     func setOffline(_ offline: Bool, tracks: [Track]) {
-        cache.setOffline(offline, for: tracks.filter(isNetwork))
+        cache.setOffline(offline, for: tracks.filter { isNetwork($0) && !$0.isDVDFolderTrack })
     }
 
     func applyCacheLimit() { cache.limitBytes = settings.networkCacheLimitBytes }

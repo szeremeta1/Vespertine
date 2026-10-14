@@ -47,6 +47,8 @@ public enum Importer {
             guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else { return [] }
             return isDir.boolValue ? LibraryScanner.enumerate(url).audio : [url]
         }.filter { audioExts.contains($0.pathExtension.lowercased()) && include($0) }
+            // A VIDEO_TS folder is a whole disc, not a file to copy: it's played where it is (Add Folder).
+            .filter { !SourceInspector.dvdFolderExtensions.contains($0.pathExtension.lowercased()) }
 
         // A source folder's cover image is only meaningful when that folder holds a single album.
         var albumsPerSourceFolder: [URL: Set<URL>] = [:]

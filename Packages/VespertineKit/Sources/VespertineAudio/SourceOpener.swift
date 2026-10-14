@@ -24,11 +24,15 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public let cacheKey: String?
     /// SACD images: the area to play (stereo when nil). The region is then in DSD samples of that area's time code.
     public let sacdArea: SACDArea?
+    /// DVD-Video discs: the LPCM run (a VOB's audio) to play. The region is then in sample frames of that run.
+    public let dvd: DVDStreamRef?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
-                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil) {
+                regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil,
+                dvd: DVDStreamRef? = nil) {
         self.cacheKey = cacheKey
         self.sacdArea = sacdArea
+        self.dvd = dvd
         self.id = id
         self.url = url
         self.trackID = trackID
@@ -106,19 +110,32 @@ enum SourceOpener {
 
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
-            .union(FFmpegDecoder.extensions).union(sacdExtensions)
+            .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions)
     }
 
-    /// SACD disc images.
+    /// Disc images: SACD, or DVD-Video (read in place).
     static let sacdExtensions: Set<String> = ["iso"]
+    /// A VIDEO_TS folder is listed by its VIDEO_TS.IFO.
+    static let dvdFolderExtensions: Set<String> = ["ifo"]
 
     /// Dolby Digital / Dolby Digital Plus elementary streams. macOS decodes them (licensed); the MP3
     /// decoder would otherwise claim `.ac3` by its extension.
     static let dolbyExtensions: Set<String> = ["ac3", "ec3", "eac3"]
 
-    /// `area` picks an SACD image's area (stereo when nil); other files ignore it.
-    static func probe(_ url: URL, area: SACDArea? = nil) throws -> ProbedSource {
+    /// `area` picks an SACD image's area (stereo when nil), `dvd` a DVD-Video's LPCM run (its first track's when
+    /// nil); other files ignore them.
+    static func probe(_ url: URL, area: SACDArea? = nil, dvd: DVDStreamRef? = nil) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
+        if dvd != nil || dvdFolderExtensions.contains(ext) || (sacdExtensions.contains(ext) && !SACDImage.isSACD(url) && DVDVideoDisc.isDVDVideo(url)) {
+            // DVD-Video LPCM: a run of one VOB's audio, decoded here (tracks are regions of it).
+            guard dvd != nil || ext != "ifo" || DVDVideoVolume.isFolderEntry(url) else { throw SourceOpenerError.unsupported(url) }
+            let ref = try dvd ?? (DVDVideoDisc.read(url).tracks.first?.ref).orThrow(SourceOpenerError.unsupported(url))
+            let decoder = try DVDLPCMDecoder(url: url, ref: ref)
+            let f = decoder.run.format
+            let format = SourceFormat(encoding: .pcm, codec: "LPCM", sampleRate: Double(f.sampleRate), bitDepth: f.bits, channels: f.channels)
+            return ProbedSource(url: url, format: format, decoderName: String(localized: "DVD-Video LPCM", comment: "The decoder, in the signal path."),
+                                pcm: decoder, dsd: nil)
+        }
         if sacdExtensions.contains(ext) {
             // An SACD image: one area's DSD (plain or DST-compressed), as DoP or converted to PCM like DSDIFF.
             let image = try SACDImage.read(url)
@@ -362,6 +379,8 @@ public enum SourceInspector {
     public static var untaggedExtensions: Set<String> { SourceOpener.dolbyExtensions.union(FFmpegDecoder.extensions) }
     /// Disc images that hold several tracks (SACD), which the library splits by their own table of contents.
     public static var discImageExtensions: Set<String> { SourceOpener.sacdExtensions }
+    /// A DVD-Video VIDEO_TS folder's entry file (VIDEO_TS.IFO), which the library splits by the disc's navigation.
+    public static var dvdFolderExtensions: Set<String> { SourceOpener.dvdFolderExtensions }
 
     /// Whether this file can go to a receiver untouched: Dolby streams, and DTS CDs (the stored bitstream).
     public static func canBitstream(_ url: URL, codec: String) -> Bool {
@@ -418,5 +437,12 @@ extension SourceInspector {
             return "descriptions \(layout.shortNames)"
         }
         return String(format: "tag 0x%08X (%d ch)", tag, Int(tag & 0xFFFF))
+    }
+}
+
+extension Optional {
+    func orThrow(_ error: @autoclosure () -> Error) throws -> Wrapped {
+        guard let self else { throw error() }
+        return self
     }
 }

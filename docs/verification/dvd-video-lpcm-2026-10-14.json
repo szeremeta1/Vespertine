@@ -1,0 +1,1310 @@
+{
+ "date": "2026-10-14",
+ "issue": 53,
+ "method": "DVDVideoCorpusTests (opt-in, VESPERTINE_DVD_FIXTURES) through SourceOpener.probe + SourceOpener.decoder (region over the VOB's LPCM run), release build. MD5 over every decoded sample as signed 24-bit little-endian, interleaved (the FLAC MD5 convention). Seek check: 4096-frame windows at the beginning, middle and end of each track decoded after a seek must equal the same windows from the sequential decode. Run hashes come straight from the run decoder. This file is also the reference input (VESPERTINE_DVD_REFERENCE): discs[].source, expectedTracks and referenceTracks.",
+ "sources_note": "Sources are named relative to a local fixture folder holding copies (read-only originals on the media server). No audio is included.",
+ "discs": [
+  {
+   "source": "dylan/Bob Dylan.iso",
+   "description": "DVD-Video .iso (UDF + ISO 9660), Bob Dylan compilation 'Coming Back Home - All the Best', authored with DVDAuthor; one title, one VOB in 26 cells, NTSC.",
+   "expectedTracks": 26,
+   "referenceTracks": {
+    "1": {
+     "md5": "97ea0bb24e93533ad522fba92ba2b9e7",
+     "frames": 16336320
+    },
+    "2": {
+     "md5": "39a3e891992983aac47665a37605205e",
+     "frames": 49329280
+    },
+    "3": {
+     "md5": "d35a96bf6e30506b29541bad60f7e187",
+     "frames": 36196160
+    },
+    "4": {
+     "md5": "29c28b2f90d164f5093f8cb59fbb7624",
+     "frames": 13613600
+    },
+    "5": {
+     "md5": "623180c84ae77a661f55699e86bb4b02",
+     "frames": 32992960
+    },
+    "6": {
+     "md5": "2ab65224e2d475576248de62c2b397ea",
+     "frames": 19379360
+    },
+    "7": {
+     "md5": "7be396799645994957406beb154e42b7",
+     "frames": 40200160
+    },
+    "8": {
+     "md5": "cf8b12bab5467808f5b845f115cf9f20",
+     "frames": 22742720
+    },
+    "9": {
+     "md5": "ea98450fce7aab54ea2f00f94ef31eed",
+     "frames": 26746720
+    },
+    "10": {
+     "md5": "7cc4e7945ad979a9645647e83c934236",
+     "frames": 14894880
+    },
+    "11": {
+     "md5": "9c9f96ef0ebfa7922b864258ed6d04ce",
+     "frames": 45004960
+    },
+    "12": {
+     "md5": "5d98f3f915ecba3a3a45ecd63387c1ec",
+     "frames": 21781760
+    },
+    "13": {
+     "md5": "922b3b0429fc8fcc7650b7488bb73767",
+     "frames": 34914880
+    },
+    "14": {
+     "md5": "73d8e1a1cd081c72762aa20ae8df3cb9",
+     "frames": 19859840
+    },
+    "15": {
+     "md5": "5a88803e4df327f8d4892307975dce1f",
+     "frames": 40040000
+    },
+    "16": {
+     "md5": "fefcb1747a8255252b9d8c472c6f5095",
+     "frames": 19219200
+    },
+    "17": {
+     "md5": "39a1d1254bf13a2f1cd49fd4a631f8a3",
+     "frames": 29149120
+    },
+    "18": {
+     "md5": "83aae816398e0a1218ae2acf7c4aa299",
+     "frames": 21141120
+    },
+    "19": {
+     "md5": "ccafb220f58a45e9c7db5350cbed612d",
+     "frames": 18098080
+    },
+    "20": {
+     "md5": "ec51a65ddd696658bcf2716d056e968f",
+     "frames": 27707680
+    },
+    "21": {
+     "md5": "13ae1209266a26b86fa7bfb2204299c8",
+     "frames": 32032000
+    },
+    "22": {
+     "md5": "be220d7696d4c2e601cbada4a6082ada",
+     "frames": 31871840
+    },
+    "23": {
+     "md5": "4de8b7ac23d2515aa8aef0d6b50bcd71",
+     "frames": 30750720
+    },
+    "24": {
+     "md5": "6279311d5e42f81eb5457b39b36fe9de",
+     "frames": 43883840
+    },
+    "25": {
+     "md5": "d8651b7e4606ce602b3e58b0bcde9675",
+     "frames": 28028000
+    },
+    "26": {
+     "md5": "07d829ea6cadc6282c0b46576f37891b",
+     "frames": 16008392
+    }
+   },
+   "referenceProvenance": "Import audit's FFmpeg extraction of the disc, split at the 90 kHz chapter times; MD5 = FLAC MD5 signature of the library copies (identical to the audit plan's audio_md5).",
+   "result": {
+    "tracks": 26,
+    "identical": 25,
+    "track26": "88 frames longer than the reference; its first 16008392 frames match the reference exactly. The reference ends 88 samples before the VOB's LPCM does (cause not established; not the last VOBU's end time).",
+    "runMD5": "3a4f0a15a86e947f52d34b7268db2aaa",
+    "runFrames": 731923680,
+    "runIndependentFFmpegMPEGPS": {
+     "md5": "3a4f0a15a86e947f52d34b7268db2aaa",
+     "frames": 731923680,
+     "match": true,
+     "tool": "FFmpeg 9.0.2 -f mpeg (MPEG-PS demuxer, pcm_dvd) over the title VOB sectors read from the image"
+    },
+    "importAuditFullProgram": {
+     "md5": "adff238613a97f949200df6a9bd66106",
+     "frames": 731923592,
+     "relation": "equals the first 731923592 frames of the run (tracks 1-25 identical, track 26 prefix identical)"
+    },
+    "seeks": "all 26 tracks match at beginning, middle and end",
+    "boundaries": "All 25 internal boundaries are at the sample nearest each cell's first-VOBU start time (90 kHz), equal to the reference's sample positions; every one lies in silence or near-silence (<= -62 dB RMS over the 0.5 s either side), so none cuts into music.",
+    "readme": "The disc's bundled readme lists 25 titles alphabetically, including two not on the disc (All I Really Want to Do, Mr. Bojangles) and omitting three that are (One More Cup of Coffee, If You See Her Say Hello, Just Like a Woman).",
+    "identities": "Titles are the import audit's fingerprint identifications of PCM that is bit-identical to these tracks (not re-fingerprinted here).",
+    "mono": "No track has bit-identical channels. Side-to-mid below -27 dB (mono masters carried as stereo): tracks 4, 6, 8, 21, 24. Others stereo; 14, 23 and 26 are wide-panned (side about equal to mid)."
+   },
+   "tracks": [
+    {
+     "track": 1,
+     "title": 1,
+     "chapter": 1,
+     "vobCells": [
+      "1/1"
+     ],
+     "startFrame": 0,
+     "frames": 16336320,
+     "seconds": 170.17,
+     "md5": "97ea0bb24e93533ad522fba92ba2b9e7",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -3.9,
+     "referenceMD5": "97ea0bb24e93533ad522fba92ba2b9e7",
+     "referenceFrames": 16336320,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Blowin' In The Wind"
+    },
+    {
+     "track": 2,
+     "title": 1,
+     "chapter": 2,
+     "vobCells": [
+      "1/2"
+     ],
+     "startFrame": 16336320,
+     "frames": 49329280,
+     "seconds": 513.8466666666667,
+     "md5": "39a3e891992983aac47665a37605205e",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -9.4,
+     "referenceMD5": "39a3e891992983aac47665a37605205e",
+     "referenceFrames": 49329280,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Hurricane",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -75.2,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -2.35
+     }
+    },
+    {
+     "track": 3,
+     "title": 1,
+     "chapter": 3,
+     "vobCells": [
+      "1/3"
+     ],
+     "startFrame": 65665600,
+     "frames": 36196160,
+     "seconds": 377.04333333333335,
+     "md5": "d35a96bf6e30506b29541bad60f7e187",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.6,
+     "referenceMD5": "d35a96bf6e30506b29541bad60f7e187",
+     "referenceFrames": 36196160,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Like a Rolling Stone",
+     "boundaryAudio": {
+      "before_0.5s_dB": -66.4,
+      "after_0.5s_dB": -70.2,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": 1.1
+     }
+    },
+    {
+     "track": 4,
+     "title": 1,
+     "chapter": 4,
+     "vobCells": [
+      "1/4"
+     ],
+     "startFrame": 101861760,
+     "frames": 13613600,
+     "seconds": 141.80833333333334,
+     "md5": "29c28b2f90d164f5093f8cb59fbb7624",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -33.7,
+     "referenceMD5": "29c28b2f90d164f5093f8cb59fbb7624",
+     "referenceFrames": 13613600,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "mono (side >= 27 dB below mid)",
+     "identityFromImportAudit": "Subterranean Homesick Blues",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -3.0
+     }
+    },
+    {
+     "track": 5,
+     "title": 1,
+     "chapter": 5,
+     "vobCells": [
+      "1/5"
+     ],
+     "startFrame": 115475360,
+     "frames": 32992960,
+     "seconds": 343.6766666666667,
+     "md5": "623180c84ae77a661f55699e86bb4b02",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -9.2,
+     "referenceMD5": "623180c84ae77a661f55699e86bb4b02",
+     "referenceFrames": 32992960,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Tangled up in Blue (Album Version)",
+     "boundaryAudio": {
+      "before_0.5s_dB": -69.0,
+      "after_0.5s_dB": -69.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": 1.5
+     }
+    },
+    {
+     "track": 6,
+     "title": 1,
+     "chapter": 6,
+     "vobCells": [
+      "1/6"
+     ],
+     "startFrame": 148468320,
+     "frames": 19379360,
+     "seconds": 201.86833333333334,
+     "md5": "2ab65224e2d475576248de62c2b397ea",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -32.5,
+     "referenceMD5": "2ab65224e2d475576248de62c2b397ea",
+     "referenceFrames": 19379360,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "mono (side >= 27 dB below mid)",
+     "identityFromImportAudit": "The Times They Are A-Changin' (Album Version)",
+     "boundaryAudio": {
+      "before_0.5s_dB": -65.8,
+      "after_0.5s_dB": -66.5,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": 1.25
+     }
+    },
+    {
+     "track": 7,
+     "title": 1,
+     "chapter": 7,
+     "vobCells": [
+      "1/7"
+     ],
+     "startFrame": 167847680,
+     "frames": 40200160,
+     "seconds": 418.75166666666667,
+     "md5": "7be396799645994957406beb154e42b7",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -11.9,
+     "referenceMD5": "7be396799645994957406beb154e42b7",
+     "referenceFrames": 40200160,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Isis",
+     "boundaryAudio": {
+      "before_0.5s_dB": -72.9,
+      "after_0.5s_dB": -32.4,
+      "quietest_50ms_dB": -75.3,
+      "quietest_at_s_rel": 0.25
+     }
+    },
+    {
+     "track": 8,
+     "title": 1,
+     "chapter": 8,
+     "vobCells": [
+      "1/8"
+     ],
+     "startFrame": 208047840,
+     "frames": 22742720,
+     "seconds": 236.90333333333334,
+     "md5": "cf8b12bab5467808f5b845f115cf9f20",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -31.5,
+     "referenceMD5": "cf8b12bab5467808f5b845f115cf9f20",
+     "referenceFrames": 22742720,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "mono (side >= 27 dB below mid)",
+     "identityFromImportAudit": "Maggie's Farm",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -1.0
+     }
+    },
+    {
+     "track": 9,
+     "title": 1,
+     "chapter": 9,
+     "vobCells": [
+      "1/9"
+     ],
+     "startFrame": 230790560,
+     "frames": 26746720,
+     "seconds": 278.6116666666667,
+     "md5": "ea98450fce7aab54ea2f00f94ef31eed",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -10.6,
+     "referenceMD5": "ea98450fce7aab54ea2f00f94ef31eed",
+     "referenceFrames": 26746720,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Masters Of War",
+     "boundaryAudio": {
+      "before_0.5s_dB": -72.8,
+      "after_0.5s_dB": -72.8,
+      "quietest_50ms_dB": -124.2,
+      "quietest_at_s_rel": 1.65
+     }
+    },
+    {
+     "track": 10,
+     "title": 1,
+     "chapter": 10,
+     "vobCells": [
+      "1/10"
+     ],
+     "startFrame": 257537280,
+     "frames": 14894880,
+     "seconds": 155.155,
+     "md5": "7cc4e7945ad979a9645647e83c934236",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -10.5,
+     "referenceMD5": "7cc4e7945ad979a9645647e83c934236",
+     "referenceFrames": 14894880,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "All Along the Watchtower",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -3.0
+     }
+    },
+    {
+     "track": 11,
+     "title": 1,
+     "chapter": 11,
+     "vobCells": [
+      "1/11"
+     ],
+     "startFrame": 272432160,
+     "frames": 45004960,
+     "seconds": 468.8016666666667,
+     "md5": "9c9f96ef0ebfa7922b864258ed6d04ce",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -11.6,
+     "referenceMD5": "9c9f96ef0ebfa7922b864258ed6d04ce",
+     "referenceFrames": 45004960,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Idiot Wind",
+     "boundaryAudio": {
+      "before_0.5s_dB": -71.6,
+      "after_0.5s_dB": -71.6,
+      "quietest_50ms_dB": -72.2,
+      "quietest_at_s_rel": -1.2
+     }
+    },
+    {
+     "track": 12,
+     "title": 1,
+     "chapter": 12,
+     "vobCells": [
+      "1/12"
+     ],
+     "startFrame": 317437120,
+     "frames": 21781760,
+     "seconds": 226.89333333333335,
+     "md5": "5d98f3f915ecba3a3a45ecd63387c1ec",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -12.8,
+     "referenceMD5": "5d98f3f915ecba3a3a45ecd63387c1ec",
+     "referenceFrames": 21781760,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "One More Cup Of Coffee",
+     "boundaryAudio": {
+      "before_0.5s_dB": -63.2,
+      "after_0.5s_dB": -62.6,
+      "quietest_50ms_dB": -127.7,
+      "quietest_at_s_rel": 1.45
+     }
+    },
+    {
+     "track": 13,
+     "title": 1,
+     "chapter": 13,
+     "vobCells": [
+      "1/13"
+     ],
+     "startFrame": 339218880,
+     "frames": 34914880,
+     "seconds": 363.69666666666666,
+     "md5": "922b3b0429fc8fcc7650b7488bb73767",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -8.7,
+     "referenceMD5": "922b3b0429fc8fcc7650b7488bb73767",
+     "referenceFrames": 34914880,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Ballad Of A Thin Man",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -0.65
+     }
+    },
+    {
+     "track": 14,
+     "title": 1,
+     "chapter": 14,
+     "vobCells": [
+      "1/14"
+     ],
+     "startFrame": 374133760,
+     "frames": 19859840,
+     "seconds": 206.87333333333333,
+     "md5": "73d8e1a1cd081c72762aa20ae8df3cb9",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -0.7,
+     "referenceMD5": "73d8e1a1cd081c72762aa20ae8df3cb9",
+     "referenceFrames": 19859840,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Pretty Peggy-O",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -2.15
+     }
+    },
+    {
+     "track": 15,
+     "title": 1,
+     "chapter": 15,
+     "vobCells": [
+      "1/15"
+     ],
+     "startFrame": 393993600,
+     "frames": 40040000,
+     "seconds": 417.0833333333333,
+     "md5": "5a88803e4df327f8d4892307975dce1f",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -9.9,
+     "referenceMD5": "5a88803e4df327f8d4892307975dce1f",
+     "referenceFrames": 40040000,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "A Hard Rain's A-Gonna Fall",
+     "boundaryAudio": {
+      "before_0.5s_dB": -69.6,
+      "after_0.5s_dB": -69.8,
+      "quietest_50ms_dB": -125.4,
+      "quietest_at_s_rel": 1.5
+     }
+    },
+    {
+     "track": 16,
+     "title": 1,
+     "chapter": 16,
+     "vobCells": [
+      "1/16"
+     ],
+     "startFrame": 434033600,
+     "frames": 19219200,
+     "seconds": 200.2,
+     "md5": "fefcb1747a8255252b9d8c472c6f5095",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -3,
+     "referenceMD5": "fefcb1747a8255252b9d8c472c6f5095",
+     "referenceFrames": 19219200,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Lay Lady Lay",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -3.0
+     }
+    },
+    {
+     "track": 17,
+     "title": 1,
+     "chapter": 17,
+     "vobCells": [
+      "1/17"
+     ],
+     "startFrame": 453252800,
+     "frames": 29149120,
+     "seconds": 303.63666666666666,
+     "md5": "39a1d1254bf13a2f1cd49fd4a631f8a3",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -14.3,
+     "referenceMD5": "39a1d1254bf13a2f1cd49fd4a631f8a3",
+     "referenceFrames": 29149120,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Forever Young",
+     "boundaryAudio": {
+      "before_0.5s_dB": -68.6,
+      "after_0.5s_dB": -68.6,
+      "quietest_50ms_dB": -73.0,
+      "quietest_at_s_rel": 1.3
+     }
+    },
+    {
+     "track": 18,
+     "title": 1,
+     "chapter": 18,
+     "vobCells": [
+      "1/18"
+     ],
+     "startFrame": 482401920,
+     "frames": 21141120,
+     "seconds": 220.22,
+     "md5": "83aae816398e0a1218ae2acf7c4aa299",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -13.8,
+     "referenceMD5": "83aae816398e0a1218ae2acf7c4aa299",
+     "referenceFrames": 21141120,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Don't Think Twice, It's All Right",
+     "boundaryAudio": {
+      "before_0.5s_dB": -69.6,
+      "after_0.5s_dB": -69.6,
+      "quietest_50ms_dB": -123.6,
+      "quietest_at_s_rel": 0.75
+     }
+    },
+    {
+     "track": 19,
+     "title": 1,
+     "chapter": 19,
+     "vobCells": [
+      "1/19"
+     ],
+     "startFrame": 503543040,
+     "frames": 18098080,
+     "seconds": 188.52166666666668,
+     "md5": "ccafb220f58a45e9c7db5350cbed612d",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -4.1,
+     "referenceMD5": "ccafb220f58a45e9c7db5350cbed612d",
+     "referenceFrames": 18098080,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "I Want You",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -1.6
+     }
+    },
+    {
+     "track": 20,
+     "title": 1,
+     "chapter": 20,
+     "vobCells": [
+      "1/20"
+     ],
+     "startFrame": 521641120,
+     "frames": 27707680,
+     "seconds": 288.62166666666667,
+     "md5": "ec51a65ddd696658bcf2716d056e968f",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.8,
+     "referenceMD5": "ec51a65ddd696658bcf2716d056e968f",
+     "referenceFrames": 27707680,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "If You See Her, Say Hello",
+     "boundaryAudio": {
+      "before_0.5s_dB": -70.1,
+      "after_0.5s_dB": -70.1,
+      "quietest_50ms_dB": -70.5,
+      "quietest_at_s_rel": -2.4
+     }
+    },
+    {
+     "track": 21,
+     "title": 1,
+     "chapter": 21,
+     "vobCells": [
+      "1/21"
+     ],
+     "startFrame": 549348800,
+     "frames": 32032000,
+     "seconds": 333.6666666666667,
+     "md5": "13ae1209266a26b86fa7bfb2204299c8",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -27.7,
+     "referenceMD5": "13ae1209266a26b86fa7bfb2204299c8",
+     "referenceFrames": 32032000,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "mono (side >= 27 dB below mid)",
+     "identityFromImportAudit": "Mr. Tambourine Man",
+     "boundaryAudio": {
+      "before_0.5s_dB": -66.6,
+      "after_0.5s_dB": -67.0,
+      "quietest_50ms_dB": -69.6,
+      "quietest_at_s_rel": 0.8
+     }
+    },
+    {
+     "track": 22,
+     "title": 1,
+     "chapter": 22,
+     "vobCells": [
+      "1/22"
+     ],
+     "startFrame": 581380800,
+     "frames": 31871840,
+     "seconds": 331.99833333333333,
+     "md5": "be220d7696d4c2e601cbada4a6082ada",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -13,
+     "referenceMD5": "be220d7696d4c2e601cbada4a6082ada",
+     "referenceFrames": 31871840,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Sara",
+     "boundaryAudio": {
+      "before_0.5s_dB": -72.0,
+      "after_0.5s_dB": -72.1,
+      "quietest_50ms_dB": -120.3,
+      "quietest_at_s_rel": 1.5
+     }
+    },
+    {
+     "track": 23,
+     "title": 1,
+     "chapter": 23,
+     "vobCells": [
+      "1/23"
+     ],
+     "startFrame": 613252640,
+     "frames": 30750720,
+     "seconds": 320.32,
+     "md5": "4de8b7ac23d2515aa8aef0d6b50bcd71",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -0.7,
+     "referenceMD5": "4de8b7ac23d2515aa8aef0d6b50bcd71",
+     "referenceFrames": 30750720,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "House of the Risin' Sun",
+     "boundaryAudio": {
+      "before_0.5s_dB": -71.9,
+      "after_0.5s_dB": -72.8,
+      "quietest_50ms_dB": -75.1,
+      "quietest_at_s_rel": 0.3
+     }
+    },
+    {
+     "track": 24,
+     "title": 1,
+     "chapter": 24,
+     "vobCells": [
+      "1/24"
+     ],
+     "startFrame": 644003360,
+     "frames": 43883840,
+     "seconds": 457.12333333333333,
+     "md5": "6279311d5e42f81eb5457b39b36fe9de",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -33.5,
+     "referenceMD5": "6279311d5e42f81eb5457b39b36fe9de",
+     "referenceFrames": 43883840,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "mono (side >= 27 dB below mid)",
+     "identityFromImportAudit": "It's Alright Ma (I'm Only Bleeding)",
+     "boundaryAudio": {
+      "before_0.5s_dB": -67.6,
+      "after_0.5s_dB": -67.6,
+      "quietest_50ms_dB": -71.8,
+      "quietest_at_s_rel": 1.45
+     }
+    },
+    {
+     "track": 25,
+     "title": 1,
+     "chapter": 25,
+     "vobCells": [
+      "1/25"
+     ],
+     "startFrame": 687887200,
+     "frames": 28028000,
+     "seconds": 291.9583333333333,
+     "md5": "d8651b7e4606ce602b3e58b0bcde9675",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -4.5,
+     "referenceMD5": "d8651b7e4606ce602b3e58b0bcde9675",
+     "referenceFrames": 28028000,
+     "referenceMatch": "identical",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Just Like A Woman",
+     "boundaryAudio": {
+      "before_0.5s_dB": -68.3,
+      "after_0.5s_dB": -68.3,
+      "quietest_50ms_dB": -68.7,
+      "quietest_at_s_rel": -2.5
+     }
+    },
+    {
+     "track": 26,
+     "title": 1,
+     "chapter": 26,
+     "vobCells": [
+      "1/26"
+     ],
+     "startFrame": 715915200,
+     "frames": 16008480,
+     "seconds": 166.755,
+     "md5": "d9d512eeeb1be79e7c8ec7ebce3eb746",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -0.9,
+     "referenceMD5": "07d829ea6cadc6282c0b46576f37891b",
+     "referenceFrames": 16008392,
+     "referenceMatch": "reference is the first 16008392 of 16008480 frames",
+     "masteringFromSideToMid": "stereo",
+     "identityFromImportAudit": "Song to Woody",
+     "boundaryAudio": {
+      "before_0.5s_dB": -200.0,
+      "after_0.5s_dB": -200.0,
+      "quietest_50ms_dB": -200.0,
+      "quietest_at_s_rel": -0.5
+     }
+    }
+   ],
+   "excluded": [],
+   "navCells": false,
+   "defectiveChapters": false
+  },
+  {
+   "source": "supertramp-bia-hodgson/VIDEO_TS/VIDEO_TS.IFO",
+   "description": "VIDEO_TS folder (PAL): title 1 = 10 programs (Breakfast in America), title 2 = 7 programs (Roger Hodgson, In the Eye of the Storm, 1984); 19 VOBs, one cell each.",
+   "expectedTracks": 17,
+   "referenceTracks": {
+    "1": {
+     "md5": "972291a259c1673583aac79bc87b8f34",
+     "frames": 30520480
+    },
+    "2": {
+     "md5": "2b2b777ef13b0bea22595599e91cd044",
+     "frames": 24088480
+    },
+    "3": {
+     "md5": "e7824fb7a05be8789e28f6bcac6e682b",
+     "frames": 33592480
+    },
+    "4": {
+     "md5": "62b71deb382a311c7dec090ff0e4a2cc",
+     "frames": 15352480
+    },
+    "5": {
+     "md5": "6a35a2e86f1886b3facc848cd703bbb3",
+     "frames": 22360480
+    },
+    "6": {
+     "md5": "4563896d1de1e946aa5fb2423a116c9a",
+     "frames": 29694880
+    },
+    "7": {
+     "md5": "6a8742bd6104ebf0e44f8f1bc5e1bc0e",
+     "frames": 23954080
+    },
+    "8": {
+     "md5": "41bb0a7aa2a3f17ead0ec13df2eda036",
+     "frames": 25432480
+    },
+    "9": {
+     "md5": "b8586d9ad449a5f744fbaac2cb991e58",
+     "frames": 17272480
+    },
+    "10": {
+     "md5": "fad5082cedd62019dfa00a3eb3290f0a",
+     "frames": 42908320
+    },
+    "11": {
+     "md5": "0abe8bb0d798df4963527987706ae427",
+     "frames": 48618400
+    },
+    "12": {
+     "md5": "8b8c72202441e3d2eeba05da6f4e9c5e",
+     "frames": 34252960
+    },
+    "13": {
+     "md5": "82eb8e61274b6c196f05a97d33556d19",
+     "frames": 24353440
+    },
+    "14": {
+     "md5": "784ef2d1076eb024c4d85d5a97bcd598",
+     "frames": 28807840
+    },
+    "15": {
+     "md5": "ac8966999acd65d49cd26126f71574b3",
+     "frames": 43461280
+    },
+    "16": {
+     "md5": "0b7b3275239dcb3ad99dafffef21474d",
+     "frames": 44409760
+    },
+    "17": {
+     "md5": "49ab63de2dc54add47ce7138592980f2",
+     "frames": 46053280
+    }
+   },
+   "result": {
+    "tracks": 17,
+    "identical": 17,
+    "albums": "Two albums ('<disc> · Title 1', '<disc> · Title 2'); no artist is inferred, so the Hodgson album is never attributed to Supertramp.",
+    "excludedPreviews": "VOB 19 (67.92 s, last cell of title 1 chapter 10) and VOB 18 (51.92 s, last cell of title 2 chapter 7): short cells of another VOB at the end of a program. Including them is what made whole-title chapter 10 and chapter 7 run long (447.0 + 67.96 s and 479.76 + 51.96 s).",
+    "navigation": "The IFO's cell table matched the NAV packs (no fallback needed); chapter references were valid. The 'missing music' in whole-title extraction came from the disc's navigation commands and the preview cells, which this reader doesn't follow or include.",
+    "allNineteenVOBsConcatenatedMD5": "525c14f20917ecbfe42d1c69f5f26d87",
+    "importAuditRawProgramMD5": "525c14f20917ecbfe42d1c69f5f26d87",
+    "importAuditRawProgramFrames": 546638560,
+    "concatenatedMatch": true,
+    "previewRunsVsFFmpeg": [
+     {
+      "vob": 18,
+      "md5": "2262004afb57a12592e0209cfe2066f1",
+      "frames": 4984480
+     },
+     {
+      "vob": 19,
+      "md5": "092b9c025681e899a3b5dd08b1ca87ad",
+      "frames": 6520480
+     }
+    ],
+    "seeks": "all 17 tracks match at beginning, middle and end"
+   },
+   "boundaryReview": {
+    "hodgsonTrack4": "VOB 14 (track 4, 300.0817 s, 28807840 frames) is complete on the disc: it opens with a ~6.5 s pulse intro after VOB 13's decay, and ends in a full fade-out (-51 to -54 dB RMS over its last 5 s) followed by 0.36 s of near-digital silence (-73.7 dB). Nothing is missing at either VOB boundary. The ~8 s shortfall against the 1984 CD (308.1 s) is in the content (a different, shorter edit or fade of this vinyl-sourced transfer), not a decoding or boundary loss.",
+    "hodgsonTracks6and7": {
+     "discStructure": "Track 6 = VOB 16 = 44409760 frames (462.6017 s); track 7 = VOB 17 = 46053280 frames (479.7217 s). The split is the VOB boundary; the disc's program chain, cell table and NAV packs all agree on it.",
+     "audio": "Song 6's band stops at ~411.5-412 s into VOB 16 and decays by ~418 s. From ~418 s to the end of VOB 16 (44.6 s) is a continuous quiet passage (about -36 to -40 dB RMS, well above the ~-45 dB groove noise), with no silence or gap anywhere (no stretch below -50 dB for 0.25 s). A new harmonic layer enters softly at ~425.1 s (+2 dB, stereo image narrows), about 40,810,000 frames into VOB 16 (±10,000; the onset is gradual). Distinct note onsets begin at the VOB 16/17 boundary. VOB 17 opens with ~40 s of sparse quiet intro.",
+     "conclusion": "The library split reproduces the disc exactly (bit-identical). Against the CD (425.1 / 516.6 s) the difference is where the quiet ~37.5 s passage is assigned: the CD index sits at the soft onset ~425.1 s into VOB 16 (37.5 + 479.72 = 517.2 s ≈ CD 516.6 s, the rest being vinyl run-out), the DVD at the start of VOB 17. Neither point is a silence gap. Moving the split would be an editorial choice, not a correction of decoded audio; if wanted, the candidate offset is ~40,810,000 frames into track 6 (to be confirmed by ear)."
+    }
+   },
+   "tracks": [
+    {
+     "track": 1,
+     "title": 1,
+     "chapter": 1,
+     "vobCells": [
+      "1/1"
+     ],
+     "startFrame": 0,
+     "frames": 30520480,
+     "seconds": 317.9216666666667,
+     "md5": "972291a259c1673583aac79bc87b8f34",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6,
+     "referenceMD5": "972291a259c1673583aac79bc87b8f34",
+     "referenceFrames": 30520480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Gone Hollywood",
+     "libraryVinylRipSeconds": 317.667,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 2,
+     "title": 1,
+     "chapter": 2,
+     "vobCells": [
+      "2/1"
+     ],
+     "startFrame": 0,
+     "frames": 24088480,
+     "seconds": 250.92166666666665,
+     "md5": "2b2b777ef13b0bea22595599e91cd044",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -9.6,
+     "referenceMD5": "2b2b777ef13b0bea22595599e91cd044",
+     "referenceFrames": 24088480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "The Logical Song",
+     "libraryVinylRipSeconds": 250.733,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 3,
+     "title": 1,
+     "chapter": 3,
+     "vobCells": [
+      "3/1"
+     ],
+     "startFrame": 0,
+     "frames": 33592480,
+     "seconds": 349.9216666666667,
+     "md5": "e7824fb7a05be8789e28f6bcac6e682b",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -8.9,
+     "referenceMD5": "e7824fb7a05be8789e28f6bcac6e682b",
+     "referenceFrames": 33592480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Goodbye Stranger",
+     "libraryVinylRipSeconds": 349.267,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 4,
+     "title": 1,
+     "chapter": 4,
+     "vobCells": [
+      "4/1"
+     ],
+     "startFrame": 0,
+     "frames": 15352480,
+     "seconds": 159.92166666666665,
+     "md5": "62b71deb382a311c7dec090ff0e4a2cc",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -7,
+     "referenceMD5": "62b71deb382a311c7dec090ff0e4a2cc",
+     "referenceFrames": 15352480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Breakfast in America",
+     "libraryVinylRipSeconds": 159.0,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 5,
+     "title": 1,
+     "chapter": 5,
+     "vobCells": [
+      "5/1"
+     ],
+     "startFrame": 0,
+     "frames": 22360480,
+     "seconds": 232.92166666666665,
+     "md5": "6a35a2e86f1886b3facc848cd703bbb3",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -8.1,
+     "referenceMD5": "6a35a2e86f1886b3facc848cd703bbb3",
+     "referenceFrames": 22360480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Oh Darling",
+     "libraryVinylRipSeconds": 235.285,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 6,
+     "title": 1,
+     "chapter": 6,
+     "vobCells": [
+      "6/1"
+     ],
+     "startFrame": 0,
+     "frames": 29694880,
+     "seconds": 309.32166666666666,
+     "md5": "4563896d1de1e946aa5fb2423a116c9a",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -4.6,
+     "referenceMD5": "4563896d1de1e946aa5fb2423a116c9a",
+     "referenceFrames": 29694880,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Take the Long Way Home",
+     "libraryVinylRipSeconds": 308.0,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 7,
+     "title": 1,
+     "chapter": 7,
+     "vobCells": [
+      "7/1"
+     ],
+     "startFrame": 0,
+     "frames": 23954080,
+     "seconds": 249.52166666666668,
+     "md5": "6a8742bd6104ebf0e44f8f1bc5e1bc0e",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.9,
+     "referenceMD5": "6a8742bd6104ebf0e44f8f1bc5e1bc0e",
+     "referenceFrames": 23954080,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Lord Is It Mine",
+     "libraryVinylRipSeconds": 249.267,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 8,
+     "title": 1,
+     "chapter": 8,
+     "vobCells": [
+      "8/1"
+     ],
+     "startFrame": 0,
+     "frames": 25432480,
+     "seconds": 264.9216666666667,
+     "md5": "41bb0a7aa2a3f17ead0ec13df2eda036",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -8.6,
+     "referenceMD5": "41bb0a7aa2a3f17ead0ec13df2eda036",
+     "referenceFrames": 25432480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Just Another Nervous Wreck",
+     "libraryVinylRipSeconds": 265.133,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 9,
+     "title": 1,
+     "chapter": 9,
+     "vobCells": [
+      "9/1"
+     ],
+     "startFrame": 0,
+     "frames": 17272480,
+     "seconds": 179.92166666666665,
+     "md5": "b8586d9ad449a5f744fbaac2cb991e58",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -11.1,
+     "referenceMD5": "b8586d9ad449a5f744fbaac2cb991e58",
+     "referenceFrames": 17272480,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Casual Conversations",
+     "libraryVinylRipSeconds": 178.267,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 10,
+     "title": 1,
+     "chapter": 10,
+     "vobCells": [
+      "10/1"
+     ],
+     "startFrame": 0,
+     "frames": 42908320,
+     "seconds": 446.96166666666664,
+     "md5": "fad5082cedd62019dfa00a3eb3290f0a",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6,
+     "referenceMD5": "fad5082cedd62019dfa00a3eb3290f0a",
+     "referenceFrames": 42908320,
+     "referenceMatch": "identical",
+     "album": "Supertramp - Breakfast in America (title 1)",
+     "identity": "Child of Vision",
+     "libraryVinylRipSeconds": 444.995,
+     "referenceSource": "FFmpeg 9.0.2 MPEG-PS decode of this VOB's sectors (independent decoder, same bytes)"
+    },
+    {
+     "track": 1,
+     "title": 2,
+     "chapter": 1,
+     "vobCells": [
+      "11/1"
+     ],
+     "startFrame": 0,
+     "frames": 48618400,
+     "seconds": 506.44166666666666,
+     "md5": "0abe8bb0d798df4963527987706ae427",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.7,
+     "referenceMD5": "0abe8bb0d798df4963527987706ae427",
+     "referenceFrames": 48618400,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "Had a Dream (Sleeping with the Enemy)",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 2,
+     "title": 2,
+     "chapter": 2,
+     "vobCells": [
+      "12/1"
+     ],
+     "startFrame": 0,
+     "frames": 34252960,
+     "seconds": 356.8016666666667,
+     "md5": "8b8c72202441e3d2eeba05da6f4e9c5e",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -8.9,
+     "referenceMD5": "8b8c72202441e3d2eeba05da6f4e9c5e",
+     "referenceFrames": 34252960,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "In Jeopardy",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 3,
+     "title": 2,
+     "chapter": 3,
+     "vobCells": [
+      "13/1"
+     ],
+     "startFrame": 0,
+     "frames": 24353440,
+     "seconds": 253.68166666666667,
+     "md5": "82eb8e61274b6c196f05a97d33556d19",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -9.4,
+     "referenceMD5": "82eb8e61274b6c196f05a97d33556d19",
+     "referenceFrames": 24353440,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "Lovers in the Wind",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 4,
+     "title": 2,
+     "chapter": 4,
+     "vobCells": [
+      "14/1"
+     ],
+     "startFrame": 0,
+     "frames": 28807840,
+     "seconds": 300.08166666666665,
+     "md5": "784ef2d1076eb024c4d85d5a97bcd598",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.5,
+     "referenceMD5": "784ef2d1076eb024c4d85d5a97bcd598",
+     "referenceFrames": 28807840,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "Hooked on a Problem",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 5,
+     "title": 2,
+     "chapter": 5,
+     "vobCells": [
+      "15/1"
+     ],
+     "startFrame": 0,
+     "frames": 43461280,
+     "seconds": 452.7216666666667,
+     "md5": "ac8966999acd65d49cd26126f71574b3",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -5.3,
+     "referenceMD5": "ac8966999acd65d49cd26126f71574b3",
+     "referenceFrames": 43461280,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "Give Me Love, Give Me Life",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 6,
+     "title": 2,
+     "chapter": 6,
+     "vobCells": [
+      "16/1"
+     ],
+     "startFrame": 0,
+     "frames": 44409760,
+     "seconds": 462.6016666666667,
+     "md5": "0b7b3275239dcb3ad99dafffef21474d",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -7.5,
+     "referenceMD5": "0b7b3275239dcb3ad99dafffef21474d",
+     "referenceFrames": 44409760,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "I'm Not Afraid",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    },
+    {
+     "track": 7,
+     "title": 2,
+     "chapter": 7,
+     "vobCells": [
+      "17/1"
+     ],
+     "startFrame": 0,
+     "frames": 46053280,
+     "seconds": 479.7216666666667,
+     "md5": "49ab63de2dc54add47ce7138592980f2",
+     "seekMatches": true,
+     "identicalChannels": false,
+     "sideToMidDB": -6.1,
+     "referenceMD5": "49ab63de2dc54add47ce7138592980f2",
+     "referenceFrames": 46053280,
+     "referenceMatch": "identical",
+     "album": "Roger Hodgson - In the Eye of the Storm (1984) (title 2)",
+     "identity": "Only Because of You",
+     "referenceSource": "Library FLAC from the import audit (whole physical VOB, FFmpeg); also equal to a fresh FFmpeg 9.0.2 decode of the same sectors"
+    }
+   ],
+   "excluded": [
+    {
+     "cell": 1,
+     "reason": "navigation preview: a short cell of another VOB at the end of title 1 chapter 10",
+     "seconds": 67.92166666666667,
+     "vob": 19
+    },
+    {
+     "cell": 1,
+     "reason": "navigation preview: a short cell of another VOB at the end of title 2 chapter 7",
+     "seconds": 51.92166666666667,
+     "vob": 18
+    }
+   ],
+   "navCells": false,
+   "defectiveChapters": false
+  }
+ ]
+}

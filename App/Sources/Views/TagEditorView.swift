@@ -253,6 +253,9 @@ struct TagEditorView: View {
                         row("SACD", area == .stereo ? String(localized: "Stereo area of a disc image; edits stay in the library")
                                                     : String(localized: "Multichannel area of a disc image; edits stay in the library"))
                     }
+                    else if t.dvdStream != nil {
+                        row("DVD", String(localized: "DVD-Video LPCM track; edits stay in the library"))
+                    }
                     else if t.cueStartFrame != nil { row("CUE", String(localized: "Virtual track; edits stay in the library")) }
                     row("Plays", t.playCount.formatted())
                 }

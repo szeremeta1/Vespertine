@@ -109,6 +109,7 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 | FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate when the DAC supports it; PCM hardware tested to 384 kHz. Unchanged 32-bit PCM needs integer mode. |
 | DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. Hardware carrier rates above 384 kHz are untested. |
 | SACD images | `.iso` (stereo and multichannel areas, DST or plain) | DSD64, the same way as DSF and DSDIFF; each song listed once with its stereo and 5.1 versions |
+| DVD-Video LPCM | DVD `.iso`, or a `VIDEO_TS` folder (added with Add Folder) | 16/20/24-bit, 48/96 kHz, 1–8 channels within DVD-Video's limit, bit for bit; one album per title, a track per chapter. DVD-Audio (`AUDIO_TS`, MLP, DVD-Audio PCM) is not supported. [Details](DVD-VIDEO-LPCM.md) |
 | Dolby Atmos | DD+ with Atmos in `.ec3` `.m4a` `.mp4` | macOS object renderer, or decoded channel bed |
 | Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless channel decode; TrueHD Atmos objects are not rendered |
 | Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` `.mp4` | macOS decode; receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted |
