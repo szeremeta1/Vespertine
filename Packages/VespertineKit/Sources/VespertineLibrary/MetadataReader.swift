@@ -42,6 +42,16 @@ public enum MetadataReader {
         // Readers that drop the ID3 date (DSF) still have it here; a date with no year in it counts as none.
         let releaseDate = md.releaseDate.flatMap(nonEmpty).flatMap { year(from: $0) != nil ? $0 : nil } ?? extra["DATE"]
         let label = extra["LABEL"] ?? extra["ORGANIZATION"] ?? extra["PUBLISHER"]
+        // FFmpeg writes the total into the number ("TRACKNUMBER=1/4") and no TRACKTOTAL; the tag reader keeps only the 1.
+        // Other taggers spell the total TOTALTRACKS / TOTALDISCS, which the tag reader passes on as extra tags.
+        var numbers: [String: String] = [:]
+        if (md.trackTotal == nil && md.trackNumber != nil) || (md.discTotal == nil && md.discNumber != nil),
+           [url, home].contains(where: { $0.pathExtension.lowercased() == "flac" }),
+           let comments = CommentPictures.flacVorbisComment(at: url) {
+            numbers = CommentPictures.values(["TRACKNUMBER", "DISCNUMBER"], inVorbisComment: comments)
+        }
+        let trackTotal = md.trackTotal ?? extra["TOTALTRACKS"].flatMap(Self.positiveNumber) ?? Self.total(inNumber: numbers["TRACKNUMBER"])
+        let discTotal = md.discTotal ?? extra["TOTALDISCS"].flatMap(Self.positiveNumber) ?? Self.total(inNumber: numbers["DISCNUMBER"])
 
         var artworkKey: String?
         if let artwork {
@@ -82,9 +92,9 @@ public enum MetadataReader {
             // A number of 0 is no number. Missing numbers come from the file name ("… - 05 - Title", "05 Title"),
             // a missing disc from a numbered disc folder ("CD 02"), so albums with incomplete tags still list in order.
             trackNumber: md.trackNumber.flatMap { $0 > 0 ? $0 : nil } ?? inferred?.trackNumber ?? Self.trackNumber(fromFileName: home),
-            trackTotal: md.trackTotal,
+            trackTotal: trackTotal,
             discNumber: md.discNumber.flatMap { $0 > 0 ? $0 : nil } ?? ArtworkStore.discNumber(fromFolder: home.deletingLastPathComponent().lastPathComponent),
-            discTotal: md.discTotal,
+            discTotal: discTotal,
             compilation: md.isCompilation ?? false,
             grouping: md.grouping.flatMap(nonEmpty), comment: md.comment.flatMap(nonEmpty),
             lyrics: md.lyrics.flatMap(nonEmpty), bpm: md.bpm, rating: md.rating,
@@ -110,6 +120,17 @@ public enum MetadataReader {
             if let n = Int(name[r].filter(\.isNumber)), n > 0 { return n }
         }
         return nil
+    }
+
+    /// The total in a number written as "n/m" ("1/4" → 4); nil when it has none.
+    static func total(inNumber value: String?) -> Int? {
+        guard let value, let slash = value.firstIndex(of: "/") else { return nil }
+        return positiveNumber(String(value[value.index(after: slash)...]))
+    }
+
+    /// A positive whole number ("4", " 12 "); nil otherwise.
+    static func positiveNumber(_ value: String) -> Int? {
+        Int(value.trimmingCharacters(in: .whitespaces)).flatMap { $0 > 0 ? $0 : nil }
     }
 
     /// The folder a file sits in, or the one above for a disc folder ("CD 2").

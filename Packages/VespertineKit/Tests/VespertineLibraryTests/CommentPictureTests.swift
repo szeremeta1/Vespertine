@@ -60,6 +60,18 @@ struct CommentPictureTests {
         defer { try? FileManager.default.removeItem(at: url) }
         #expect(CommentPictures.flacCover(at: url) == Data(image))
     }
+
+    @Test("A track or disc number written as n/m (FFmpeg) gives the total")
+    func numberWithTotal() {
+        let block = commentBlock(["TITLE=Song", "tracknumber=1/4", "DISCNUMBER=1/2", "TRACKNUMBER=9/9"])
+        let numbers = CommentPictures.values(["TRACKNUMBER", "DISCNUMBER"], inVorbisComment: block)
+        #expect(numbers == ["TRACKNUMBER": "1/4", "DISCNUMBER": "1/2"])
+        #expect(MetadataReader.total(inNumber: numbers["TRACKNUMBER"]) == 4)
+        #expect(MetadataReader.total(inNumber: numbers["DISCNUMBER"]) == 2)
+        #expect(MetadataReader.total(inNumber: "3 / 12") == 12)
+        for plain in ["1", "1/", "1/0", "1/x", nil] as [String?] { #expect(MetadataReader.total(inNumber: plain) == nil) }
+        #expect(CommentPictures.values(["TRACKNUMBER"], inVorbisComment: Data([1, 2])).isEmpty)
+    }
 }
 
 @Suite("Folder art")

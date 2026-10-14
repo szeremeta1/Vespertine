@@ -84,7 +84,7 @@ final class LoopbackTest {
             Result {
                 let runner = try LoopbackRunner(output: output)
                 return try runner.run(cases, mode: mode, appVersion: appVersion) { _, c in
-                    Task { @MainActor [weak self] in if self?.report == nil { self?.currentCase = c.name } }
+                    Task { @MainActor [weak self] in if self?.report == nil { self?.currentCase = c.localizedName } }
                 } caseDone: { r in
                     Task { @MainActor [weak self] in if let self, self.report == nil { self.done.append(r) } }
                 }

@@ -481,9 +481,13 @@ struct SearchResultsView: View {
     }
 
     private func meta(genres: Int, artists: Int, albums: Int, songs: Int) -> String {
+        // Each count is what its shelf shows. An artist who matches only as a song's artist, or a search that matches
+        // albums across fields ("miles 1959"), has no artist shelf, so a zero is left out rather than shown as "0 artists".
         let parts: [String] = (genres == 0 ? [] : [String(localized: "\(genres) genres")])
-            + [String(localized: "\(artists) artists"), String(localized: "\(albums) albums"), String(localized: "\(songs) songs")]
-        return parts.joined(separator: " · ")
+            + (artists == 0 ? [] : [String(localized: "\(artists) artists")])
+            + (albums == 0 ? [] : [String(localized: "\(albums) albums")])
+            + (songs == 0 ? [] : [String(localized: "\(songs) songs")])
+        return parts.isEmpty ? String(localized: "\(songs) songs") : parts.joined(separator: " · ")
     }
 
     private func sectionTitle(_ title: LocalizedStringKey, count: Int) -> some View {
