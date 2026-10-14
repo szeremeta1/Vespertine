@@ -157,7 +157,7 @@ final class SACDFrameReader {
 /// Raw DSD from an SACD area, between two frames (a track): one byte per channel per position, decoded from DST
 /// when the area is compressed. Damaged frames play as DSD silence, and are counted (`concealedFrames`), so the
 /// signal path doesn't claim them bit-perfect.
-final class SACDSource: RawDSDSource {
+final class SACDSource: InterleavedDSDSource {
     let url: URL
     let area: SACDImage.Area
     /// The frames this source covers, in the area's time code.
@@ -290,7 +290,7 @@ final class SACDSource: RawDSDSource {
 /// with the music before the seek point: a track that follows another comes out exactly as if the area had
 /// been converted in one piece.
 final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
-    private let source: SACDSource
+    private let source: any InterleavedDSDSource
     /// Frames of DSD before the stretch this decoder plays, read only to prime the filter.
     private let leadIn: Int64
     private var converter: OpaquePointer?
@@ -298,12 +298,18 @@ final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     private var frame: AVAudioFramePosition = 0
     private var scratch: [UInt8] = []
 
-    init(url: URL, area: SACDImage.Area, frames: Range<Int>) throws {
+    convenience init(url: URL, area: SACDImage.Area, frames: Range<Int>) throws {
         let first = area.frameRange.lowerBound
         let start = frames.lowerBound > first ? frames.lowerBound - 1 : frames.lowerBound
-        source = try SACDSource(url: url, area: area, frames: start..<frames.upperBound)
-        leadIn = Int64(frames.lowerBound - start) * Int64(area.frameBytes)
-        format = SACDPCMDecoder.format(rate: area.sampleRate / 8, channels: area.channels)
+        let source = try SACDSource(url: url, area: area, frames: start..<frames.upperBound)
+        try self.init(source: source, leadIn: Int64(frames.lowerBound - start) * Int64(area.frameBytes))
+    }
+
+    init(source: any InterleavedDSDSource, leadIn: Int64 = 0, channelLayout: AVAudioChannelLayout? = nil) throws {
+        self.source = source
+        self.leadIn = leadIn
+        format = channelLayout.map { AVAudioFormat(standardFormatWithSampleRate: source.dsdRate / 8, channelLayout: $0) }
+            ?? SACDPCMDecoder.format(rate: source.dsdRate / 8, channels: source.channelCount)
         super.init()
         try seek(to: 0)
     }
@@ -361,7 +367,7 @@ final class SACDPCMDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     func seek(to target: AVAudioFramePosition) throws {
         let target = max(0, min(target, length))
         // Prime a fresh filter with up to a frame of the music before the target.
-        let prime = min(Int64(source.area.frameBytes), leadIn + target)
+        let prime = min(Int64(source.dsdRate / 75 / 8), leadIn + target)
         if let converter { nff_dsd_converter_destroy(converter) }
         converter = nff_dsd_converter_create(Int32(source.channelCount), Int32(source.dsdRate / 8))
         guard converter != nil else { throw DTSError.unsupported(String(localized: "DSD converter", comment: "Why a file can't be played, in “This file can't be played (…).”")) }

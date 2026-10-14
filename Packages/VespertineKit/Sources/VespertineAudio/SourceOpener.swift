@@ -63,13 +63,15 @@ final class ProbedSource: @unchecked Sendable {
     fileprivate let dsd: DSDDecoding?
     /// An SACD image's area, opened per track by `SourceOpener.decoder`.
     let sacd: SACDImage.Area?
+    let dstDSDIFF: DSTDSDIFFInfo?
 
-    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil) {
+    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil) {
         self.url = url
         var format = format
         if format.channelLabels == nil {
             let layout = pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout
                 ?? sacd.flatMap { $0.channels > 2 ? ChannelLayouts.layout(channels: $0.channels) : nil }
+                ?? dstDSDIFF.flatMap { $0.channels > 2 ? ChannelLayouts.layout(channels: $0.channels) : nil }
             format.channelLabels = ChannelLayouts.speakerLabels(layout)
         }
         self.format = format
@@ -77,6 +79,7 @@ final class ProbedSource: @unchecked Sendable {
         self.pcm = pcm
         self.dsd = dsd
         self.sacd = sacd
+        self.dstDSDIFF = dstDSDIFF
     }
 
     /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
@@ -93,6 +96,14 @@ final class ProbedSource: @unchecked Sendable {
 private let mpegOpenLock = NSLock()
 
 enum SourceOpener {
+    /// DSDIFF's CHNL order is authoritative, including discrete/unknown channel IDs.
+    private static func dsdiffLabels(_ ids: [String]) -> [AudioChannelLabel] {
+        let known: [String: AudioChannelLabel] = ["SLFT": kAudioChannelLabel_Left, "MLFT": kAudioChannelLabel_Left,
+            "SRGT": kAudioChannelLabel_Right, "MRGT": kAudioChannelLabel_Right, "C   ": kAudioChannelLabel_Center,
+            "LFE ": kAudioChannelLabel_LFEScreen, "LS  ": kAudioChannelLabel_LeftSurround, "RS  ": kAudioChannelLabel_RightSurround]
+        return ids.enumerated().map { known[$0.element] ?? (kAudioChannelLabel_Discrete_0 + UInt32($0.offset)) }
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
             .union(FFmpegDecoder.extensions).union(sacdExtensions)
@@ -116,6 +127,10 @@ enum SourceOpener {
             let name = chosen.isDST ? String(localized: "SACD image · DST (lossless) decoded to DSD", comment: "The decoder, in the signal path.")
                                     : String(localized: "SACD image", comment: "The decoder, in the signal path.")
             return ProbedSource(url: url, format: format, decoderName: name, pcm: nil, dsd: nil, sacd: chosen)
+        }
+        if ["dff", "dsdiff"].contains(ext), let info = try DSTDSDIFFInfo.read(url) {
+            let format = SourceFormat(encoding: .dsd, codec: "DSDIFF", sampleRate: Double(info.rate), bitDepth: 1, channels: info.channels, channelLabels: dsdiffLabels(info.channelIDs))
+            return ProbedSource(url: url, format: format, decoderName: "DSDIFF · DST", pcm: nil, dsd: nil, dstDSDIFF: info)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
             // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.
@@ -238,7 +253,11 @@ enum SourceOpener {
             return plan.mode == .dop ? try RawDoPDecoder(source: SACDSource(url: probed.url, area: area, frames: frames))
                                      : try SACDPCMDecoder(url: probed.url, area: area, frames: frames)
         }
-        if plan.mode == .bitstream {
+        if let info = probed.dstDSDIFF {
+            let source = try DSTDSDIFFSource(url: probed.url, info: info)
+            let layout = probed.format.channelLabels.flatMap { ChannelLayouts.layout(labels: $0) }
+            decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
+        } else if plan.mode == .bitstream {
             // A receiver decodes: DTS CDs go out as stored; Dolby frames are wrapped in IEC 61937 bursts.
             if let dts = probed.pcm as? DTSDecoder {
                 decoder = dts.carrier
@@ -374,6 +393,8 @@ public enum SourceInspector {
         var seconds = 0.0
         if let area = probed.sacd {
             seconds = Double(area.frameRange.count) / Double(SACDImage.framesPerSecond)
+        } else if let info = probed.dstDSDIFF {
+            seconds = Double(info.frameCount) / 75
         } else if let pcm = probed.pcm {
             let rate = pcm.processingFormat.sampleRate
             if rate > 0, pcm.length > 0 { seconds = Double(pcm.length) / rate }

@@ -29,10 +29,14 @@ public struct CueSheet: Sendable, Hashable {
     public static func parse(_ text: String) -> CueSheet {
         var sheet = CueSheet(title: nil, performer: nil, genre: nil, date: nil, files: [])
         var current: Entry?
+        var currentFile: Int?
 
         func flush() {
-            if let c = current, !sheet.files.isEmpty { sheet.files[sheet.files.count - 1].tracks.append(c) }
+            if let c = current, !sheet.files.isEmpty {
+                sheet.files[currentFile ?? (sheet.files.count - 1)].tracks.append(c)
+            }
             current = nil
+            currentFile = nil
         }
 
         for raw in text.components(separatedBy: .newlines) {
@@ -51,7 +55,9 @@ public struct CueSheet: Sendable, Hashable {
             case "ISRC":
                 current?.isrc = unquote(rest)
             case "FILE":
-                flush()
+                // EAC can put FILE between TRACK (or INDEX 00) and INDEX 01.
+                // The track belongs to the file containing its INDEX 01.
+                if currentFile != nil { flush() }
                 // FILE "name with spaces.flac" WAVE
                 var name = rest
                 if let r = rest.range(of: #"\s+(WAVE|FLAC|AIFF|MP3|BINARY|MOTOROLA)$"#, options: [.regularExpression, .caseInsensitive]) {
@@ -64,7 +70,10 @@ public struct CueSheet: Sendable, Hashable {
                 current = Entry(number: Int(number) ?? (sheet.files.last?.tracks.count ?? 0) + 1, startCDFrames: 0)
             case "INDEX":
                 let (index, time) = split(rest)
-                if Int(index) == 1, let frames = cdFrames(time) { current?.startCDFrames = frames }
+                if Int(index) == 1, let frames = cdFrames(time) {
+                    current?.startCDFrames = frames
+                    if !sheet.files.isEmpty { currentFile = sheet.files.count - 1 }
+                }
             default:
                 break
             }

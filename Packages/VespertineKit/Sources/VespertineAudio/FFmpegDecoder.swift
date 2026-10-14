@@ -189,10 +189,10 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         try self.init(source: source)
     }
 
-    init(source: RawDSDSource) throws {
+    init(source: RawDSDSource, channelLayout: AVAudioChannelLayout? = nil) throws {
         self.source = source
         let channels = source.channelCount, carrier = source.dsdRate / 16
-        let layout = channels <= 2 ? nil : ChannelLayouts.layout(channels: channels)
+        let layout = channelLayout ?? (channels <= 2 ? nil : ChannelLayouts.layout(channels: channels))
         let f: AVAudioFormat? = if let layout { AVAudioFormat(standardFormatWithSampleRate: carrier, channelLayout: layout) }
                                 else { AVAudioFormat(standardFormatWithSampleRate: carrier, channels: AVAudioChannelCount(channels)) }
         guard let f else { throw DTSError.unsupported(String(localized: "DoP format", comment: "Why a file can't be played, in “This file can't be played (…).”")) }

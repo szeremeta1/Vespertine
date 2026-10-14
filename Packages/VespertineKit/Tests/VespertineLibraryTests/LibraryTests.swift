@@ -28,6 +28,36 @@ func tempDir() throws -> URL {
 
 @Suite("CUE sheets")
 struct CueTests {
+    @Test("FILE after TRACK keeps metadata and assigns INDEX 01 to the new file")
+    func fileAfterTrack() {
+        let sheet = CueSheet.parse("""
+        TITLE "Album"
+        TRACK 01 AUDIO
+          TITLE "First"
+          FILE "one.flac" WAVE
+          INDEX 01 00:00:00
+        TRACK 02 AUDIO
+          TITLE "Second"
+          PERFORMER "Guest"
+          ISRC ABC123
+          INDEX 00 03:10:00
+          FILE "two.flac" WAVE
+          INDEX 01 00:00:00
+        TRACK 03 AUDIO
+          TITLE "Third"
+          INDEX 01 01:00:00
+        FILE "three.flac" WAVE
+        TRACK 04 AUDIO
+          INDEX 01 00:00:00
+        """)
+        #expect(sheet.files.map(\.name) == ["one.flac", "two.flac", "three.flac"])
+        #expect(sheet.files.map { $0.tracks.map(\.number) } == [[1], [2, 3], [4]])
+        #expect(sheet.files[1].tracks[0].title == "Second")
+        #expect(sheet.files[1].tracks[0].performer == "Guest")
+        #expect(sheet.files[1].tracks[0].isrc == "ABC123")
+        #expect(sheet.files[1].tracks.map(\.startCDFrames) == [0, 4500])
+    }
+
     @Test("Parses album and per-track fields")
     func parse() {
         let text = """

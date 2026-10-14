@@ -478,11 +478,50 @@ public enum DSDIFFFixture {
         func chunk(_ id: String, _ body: [UInt8]) -> [UInt8] { Array(id.utf8) + be(UInt64(body.count)) + body + (body.count % 2 == 1 ? [0] : []) }
         var inter = [UInt8](repeating: 0, count: planes[0].count * planes.count)
         for i in 0..<planes[0].count { for c in 0..<planes.count { inter[i * planes.count + c] = planes[c][i] } }
-        let ids = planes.count == 2 ? ["SLFT", "SRGT"] : Array(["MLFT", "MRGT", "C   ", "LFE ", "LS  ", "RS  "].prefix(planes.count))
+        let ids = planes.count == 2 ? ["SLFT", "SRGT"] : planes.count == 5 ? ["MLFT", "MRGT", "C   ", "LS  ", "RS  "] : Array(["MLFT", "MRGT", "C   ", "LFE ", "LS  ", "RS  "].prefix(planes.count))
         let name = Array("not compressed".utf8)
         let prop = Array("SND ".utf8) + chunk("FS  ", be(UInt32(rate))) + chunk("CHNL", be(UInt16(planes.count)) + ids.flatMap { Array($0.utf8) })
             + chunk("CMPR", Array("DSD ".utf8) + [UInt8(name.count)] + name + [0])
         let body = Array("DSD ".utf8) + chunk("FVER", be(UInt32(0x0105_0000))) + chunk("PROP", prop) + chunk("DSD ", inter)
+        try Data(Array("FRM8".utf8) + be(UInt64(body.count)) + body).write(to: url)
+    }
+}
+
+extension DSDIFFFixture {
+    /// Real DST frames in a DSDIFF container, including odd-size padding and an optional seek index.
+    public static func writeDST(_ planes: [[UInt8]], indexed: Bool, withCRC: Bool = false, rate: Int = 2_822_400, storedOnly: Bool = false, channelIDs: [String]? = nil, to url: URL) throws {
+        func chunk(_ id: String, _ body: [UInt8]) -> [UInt8] {
+            Array(id.utf8) + be(UInt64(body.count)) + body + (body.count % 2 == 1 ? [0] : [])
+        }
+        let frameBytes = rate / 75 / 8
+        precondition(storedOnly || rate == 2_822_400)
+        let channels = planes.count, count = planes[0].count / frameBytes
+        let ids = channelIDs ?? (channels == 2 ? ["SLFT", "SRGT"] : channels == 5 ? ["MLFT", "MRGT", "C   ", "LS  ", "RS  "] : Array(["MLFT", "MRGT", "C   ", "LFE ", "LS  ", "RS  "].prefix(channels)))
+        precondition(ids.count == channels && ids.allSatisfy { $0.utf8.count == 4 })
+        let prop = Array("SND ".utf8) + chunk("FS  ", be(UInt32(rate)))
+            + chunk("CHNL", be(UInt16(channels)) + ids.flatMap { Array($0.utf8) })
+            + chunk("CMPR", Array("DST ".utf8) + [11] + Array("DST Encoded".utf8))
+        let prefix = Array("DSD ".utf8) + chunk("FVER", be(UInt32(0x0105_0000))) + chunk("PROP", prop)
+        var audio = chunk("FRTE", be(UInt32(count)) + be(UInt16(75))) + chunk("JUNK", [1, 2, 3])
+        var index: [UInt8] = []
+        let encoder = DSTEncoder(planes: planes)
+        for f in 0..<count {
+            var inter = [UInt8](repeating: 0, count: frameBytes * channels)
+            for i in 0..<frameBytes { for c in 0..<channels { inter[i * channels + c] = planes[c][f * frameBytes + i] } }
+            let coded = (storedOnly || f == 1) ? DSTEncoder.uncompressed(inter) : encoder.encode(inter, variant: f)
+            index += be(UInt64(12 + prefix.count + 12 + audio.count + 12)) + be(UInt32(coded.count))
+            audio += chunk("DSTF", coded)
+            if withCRC {
+                // Slow polynomial division, independent of the production table implementation.
+                var crc: UInt32 = 0
+                for byte in inter {
+                    crc ^= UInt32(byte) << 24
+                    for _ in 0..<8 { crc = crc & 0x8000_0000 != 0 ? (crc << 1) ^ 0x8000_0011 : crc << 1 }
+                }
+                audio += chunk("DSTC", be(crc))
+            }
+        }
+        let body = prefix + chunk("DST ", audio) + (indexed ? chunk("DSTI", index) : [])
         try Data(Array("FRM8".utf8) + be(UInt64(body.count)) + body).write(to: url)
     }
 }

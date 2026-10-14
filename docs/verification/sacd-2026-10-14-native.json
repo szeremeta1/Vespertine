@@ -1,0 +1,103 @@
+{
+  "platform": "macOS arm64",
+  "unit_tests_passed": 333,
+  "raw_images": [
+    {
+      "disc": "Queen - A Night at the Opera (1975 vinyl transfer)",
+      "areas": [
+        {
+          "area": "2ch",
+          "bytesPerChannel": 911451744,
+          "channels": 2,
+          "concealedFrames": 0,
+          "dst": false,
+          "sha256": "778ac304340773b0180b1cfadf4c560935bef29af9371d60298923f536738fe1",
+          "stride": 2064,
+          "tracks": 12
+        }
+      ],
+      "checks": "Full DSD read; PCM and DoP beginning/middle/end seeks on every track; no output device opened"
+    },
+    {
+      "disc": "The Rolling Stones - Dirty Work",
+      "areas": [
+        {
+          "area": "2ch",
+          "bytesPerChannel": 848027712,
+          "channels": 2,
+          "concealedFrames": 0,
+          "dst": false,
+          "sha256": "62468908ca1b86cc5cdd262b9340dbdaa9d813fefb2d3839e0796408db889dcd",
+          "stride": 2064,
+          "tracks": 10
+        }
+      ],
+      "checks": "Full DSD read; PCM and DoP beginning/middle/end seeks on every track; no output device opened"
+    }
+  ],
+  "base_commit": "17f255b",
+  "test_products": {
+    "VespertineLibraryTests": 137,
+    "VespertineAudioTests": 196
+  },
+  "app_debug_build": "passed",
+  "isolated_gui_scan": {
+    "app_build": "passed",
+    "isolated_library_scan": "passed",
+    "albums": [
+      {
+        "format": "DSDIFF",
+        "album": "Nashville Skyline",
+        "tracks": 10,
+        "sample_rate": 2822400.0,
+        "channels": 2
+      },
+      {
+        "format": "SACD",
+        "album": "A Night At The Opera",
+        "tracks": 12,
+        "sample_rate": 2822400.0,
+        "channels": 2
+      },
+      {
+        "format": "SACD",
+        "album": "Dirty Work",
+        "tracks": 10,
+        "sample_rate": 2822400.0,
+        "channels": 2
+      }
+    ],
+    "played_audio": false,
+    "real_library_used": false,
+    "warning": "NSTableView delegate reentrant-operation warning during scan/snapshot; no crash; coordinator follow-up"
+  },
+  "library_migration": "v17-dst-dsdiff verified with preserved IDs and play counts",
+  "cue_regression": "FILE after TRACK and cross-file INDEX 00/01 passed",
+  "dst_dsdiff": {
+    "bytesPerChannel": 563496864,
+    "channels": 2,
+    "frameCount": 119791,
+    "sha256": "7ffc461e9dfe39b3212a1a1f57e816e34314cb0c14df1b40c5f5dea26be8f86a"
+  },
+  "integration_base_commit": "e54edae",
+  "implementation_commit": "a26349a11ca5523f7dbe09bb087ef3a2516f5e70",
+  "higher_rate_stored_dst": "DSD128/256/512 indexed and unindexed six-channel byte-exact reads and tail seeks passed",
+  "channel_order": "Explicit CHNL order reaches PCM/DoP formats; unknown identifiers remain discrete",
+  "source_damage_check": {
+    "disc": "Miles Smiles",
+    "native_result": [
+      {
+        "area": "2ch",
+        "bytesPerChannel": 883787520,
+        "channels": 2,
+        "concealedFrames": 1,
+        "dst": false,
+        "sha256": "bc528d435e296710bbebc6f22f7f439042b05f68a2542825cab2db6931497d88",
+        "stride": 2048,
+        "tracks": 6
+      }
+    ],
+    "strict_clean_source_test": "failed as expected: one concealed frame in DSD, PCM and DoP",
+    "cause": "Invalid final audio sector leaves the final frame incomplete. The independent extractor omits that same frame."
+  }
+}
