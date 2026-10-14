@@ -41,7 +41,11 @@ def audit_one(core, name):
                 if process.stdout.read(1):
                     raise RuntimeError('DSD after final track')
                 detail = process.stderr.read().decode()
-                if process.wait() != 0 or detail.strip() != 'concealed=0':
+                code = process.wait()
+                area['sha256'] = whole.hexdigest()
+                area['concealedFrames'] = int(detail.strip().split('=')[-1]) if detail.strip().startswith('concealed=') else None
+                result['areas'].append(area)
+                if code != 0 or detail.strip() != 'concealed=0':
                     raise RuntimeError(detail)
             finally:
                 if process.poll() is None:
@@ -49,9 +53,6 @@ def audit_one(core, name):
                 process.wait()
                 process.stdout.close()
                 process.stderr.close()
-            area['sha256'] = whole.hexdigest()
-            area['concealedFrames'] = 0
-            result['areas'].append(area)
         after = path.stat()
         if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
             raise RuntimeError('source changed during audit')
