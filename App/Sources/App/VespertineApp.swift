@@ -27,6 +27,9 @@ struct VespertineApp: App {
         .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             if let model = startup.model { VespertineCommands(model: model) }
+            CommandGroup(replacing: .appInfo) {
+                Button("About Vespertine") { AboutPanel.show() }
+            }
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates…") { updater.checkForUpdates() }
                     .disabled(!updater.canCheckForUpdates)

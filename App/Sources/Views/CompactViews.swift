@@ -431,6 +431,9 @@ struct AboutSettings: View {
                 .font(Typeface.mono(11)).foregroundStyle(.secondary)
             Text("Free software under the GNU General Public License v3.\nDecoding by SFBAudioEngine (MIT), libFLAC, WavPack, Monkey's Audio, libopus, libvorbis, mpg123, TagLib.\nDatabase by GRDB (MIT).")
                 .font(.caption).multilineTextAlignment(.center).foregroundStyle(.secondary)
+            Text("Made with ❤️ in Boston")
+                .font(Typeface.serif(12).italic()).foregroundStyle(.secondary)
+                .padding(.top, 6)
         }
         .padding(30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
