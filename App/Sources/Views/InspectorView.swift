@@ -458,11 +458,15 @@ struct IdleDevicePanel: View {
                     }
                     GridRow { key("Current rate"); val("\(SampleRate.format(d.nominalSampleRate)) kHz") }
                     GridRow { key("Volume"); val(d.hasHardwareVolume ? String(localized: "Hardware", comment: "Volume is set by the device's hardware control")
+                                                          : model.settings.usesAppVolume(d.uid) ? String(localized: "In Vespertine", comment: "Volume is set by Vespertine's digital volume")
                                                           : String(localized: "Fixed", comment: "The device's volume can't be changed")) }
                     GridRow { key("DoP"); val(d.capabilities.supportsDoP ? String(localized: "Enabled", comment: "DoP is on") : String(localized: "Off", comment: "DoP is off")) }
                 }
                 if let note = d.profile.note {
                     Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+                }
+                if !d.hasHardwareVolume {
+                    AppVolumeToggle(device: d)
                 }
                 if d.capabilities.outputChannels > 2 {
                     SpeakerSetupHint(configured: !d.speakerNames.isEmpty)
