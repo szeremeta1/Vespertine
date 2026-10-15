@@ -554,6 +554,151 @@ static void test_concurrent_room(void) {
     nrt_ring_destroy(ring);
 }
 
+// MARK: - FIR filters: convolution matches direct convolution, unfiltered channels are a bit-exact delayed copy, new
+// filters fade in over one block, and a seek starts from silence
+
+static uint32_t fir_seed = 12345;
+static float fir_random(void) {   // −0.5 ..< 0.5
+    fir_seed = fir_seed * 1664525u + 1013904223u;
+    return (float)(fir_seed >> 8) / 16777216.f - 0.5f;
+}
+
+#define FIR_TEST_FRAMES 12000u
+#define FIR_TEST_TAPS 1500u
+
+static void test_fir(void) {
+    NRTRing *ring = nrt_ring_create(4096, 3);
+    NRTRenderContext *ctx = nrt_context_create(ring, 1024);
+    assert(ring && ctx);
+    nrt_context_set_gain(ctx, 1.0, 32);
+    assert(nrt_context_fir_latency(ctx) == 0);
+    assert(nrt_context_set_fir(ctx, NULL, 0, 0));          // nothing to filter: no convolver, no latency
+    assert(nrt_context_fir_latency(ctx) == 0);
+
+    static float h[FIR_TEST_TAPS];
+    for (uint32_t i = 0; i < FIR_TEST_TAPS; i++) h[i] = fir_random() / 8;
+    const float *impulses[2] = {h, NULL};                  // left filtered, middle unfiltered, right past the count
+    assert(nrt_context_set_fir(ctx, impulses, 2, FIR_TEST_TAPS));
+    assert(nrt_context_fir_latency(ctx) == NRT_FIR_BLOCK);
+
+    static float in[FIR_TEST_FRAMES * 3], out[FIR_TEST_FRAMES * 3];
+    for (uint32_t i = 0; i < FIR_TEST_FRAMES * 3; i++) in[i] = fir_random();
+    const uint32_t slices[] = {37, 300, 511, 512, 513, 1024, 1, 900};
+    uint32_t done = 0;
+    for (uint32_t s = 0; done < FIR_TEST_FRAMES; s++) {
+        uint32_t n = slices[s % 8];
+        if (n > FIR_TEST_FRAMES - done) n = FIR_TEST_FRAMES - done;
+        assert(nrt_ring_write(ring, in + done * 3, n) == n);
+        nrt_context_render_interleaved(ctx, out + done * 3, n, 3);
+        done += n;
+    }
+    double worst = 0;
+    for (uint32_t f = 0; f < FIR_TEST_FRAMES; f++) {
+        double want = 0;
+        if (f >= NRT_FIR_BLOCK)
+            for (uint32_t k = 0; k < FIR_TEST_TAPS && k <= f - NRT_FIR_BLOCK; k++) want += (double)h[k] * in[(f - NRT_FIR_BLOCK - k) * 3];
+        const double error = fabs(out[f * 3] - want);
+        if (f >= 2 * NRT_FIR_BLOCK && error > worst) worst = error;   // the block before fades in from unfiltered
+        const float late1 = f >= NRT_FIR_BLOCK ? in[(f - NRT_FIR_BLOCK) * 3 + 1] : 0.f;
+        const float late2 = f >= NRT_FIR_BLOCK ? in[(f - NRT_FIR_BLOCK) * 3 + 2] : 0.f;
+        assert(same_bits(out[f * 3 + 1], late1) && same_bits(out[f * 3 + 2], late2));
+    }
+    assert(worst < 1e-6);
+
+    // Filters off: the convolver stays, so the latency doesn't jump, and after the fade every channel is a bit-exact
+    // copy, a block late.
+    assert(nrt_context_set_fir(ctx, NULL, 0, 0));
+    assert(nrt_context_fir_latency(ctx) == NRT_FIR_BLOCK);
+    for (uint32_t i = 0; i < 4 * NRT_FIR_BLOCK * 3; i++) in[i] = fir_random();
+    for (uint32_t b = 0; b < 4; b++) {
+        nrt_ring_write(ring, in + b * NRT_FIR_BLOCK * 3, NRT_FIR_BLOCK);
+        nrt_context_render_interleaved(ctx, out + b * NRT_FIR_BLOCK * 3, NRT_FIR_BLOCK, 3);
+    }
+    for (uint32_t f = 2 * NRT_FIR_BLOCK; f < 4 * NRT_FIR_BLOCK; f++)
+        for (uint32_t c = 0; c < 3; c++) assert(same_bits(out[f * 3 + c], in[(f - NRT_FIR_BLOCK) * 3 + c]));
+
+    // A new filter fades in over one block: steady 0.5 into a gain of 1 then 2 ramps from 0.5 to 1 with no step.
+    static float one[1] = {1.f}, two[1] = {2.f};
+    const float *gain1[1] = {one}, *gain2[1] = {two};
+    assert(nrt_context_set_fir(ctx, gain1, 1, 1));
+    for (uint32_t i = 0; i < 6 * NRT_FIR_BLOCK * 3; i++) in[i] = 0.5f;
+    for (uint32_t b = 0; b < 6; b++) {
+        if (b == 3) assert(nrt_context_set_fir(ctx, gain2, 1, 1));
+        nrt_ring_write(ring, in, NRT_FIR_BLOCK);
+        nrt_context_render_interleaved(ctx, out + b * NRT_FIR_BLOCK * 3, NRT_FIR_BLOCK, 3);
+    }
+    assert(fabsf(out[(3 * NRT_FIR_BLOCK - 1) * 3] - 0.5f) < 1e-6f);
+    assert(fabsf(out[(6 * NRT_FIR_BLOCK - 1) * 3] - 1.0f) < 1e-6f);
+    for (uint32_t f = 3 * NRT_FIR_BLOCK; f < 6 * NRT_FIR_BLOCK; f++)
+        assert(fabsf(out[f * 3] - out[(f - 1) * 3]) < 0.5f / NRT_FIR_BLOCK + 1e-5f);
+
+    // A seek: nothing from before comes out after, whatever was half-collected.
+    nrt_ring_write(ring, in, 200);
+    nrt_context_render_interleaved(ctx, out, 200, 3);
+    nrt_ring_reset(ring);
+    nrt_context_reset_history(ctx);
+    memset(in, 0, 4 * NRT_FIR_BLOCK * 3 * sizeof(float));
+    nrt_ring_write(ring, in, 2 * NRT_FIR_BLOCK);
+    nrt_context_render_interleaved(ctx, out, 2 * NRT_FIR_BLOCK, 3);
+    for (uint32_t i = 0; i < 2 * NRT_FIR_BLOCK * 3; i++) assert(out[i] == 0.f);
+
+    // Integer samples skip the convolver altogether.
+    nrt_context_set_integer(ctx, true);
+    for (uint32_t i = 0; i < 64 * 3; i++) in[i] = fir_random();
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    assert(!memcmp(in, out, 64 * 3 * sizeof(float)));
+    nrt_context_destroy(ctx);
+    nrt_ring_destroy(ring);
+}
+
+// Filters replaced from another thread while the I/O thread renders: both channels always play the same setting
+// (or the same fade between two), never a mix of a bank half-written.
+static NRTRenderContext *fir_ctx;
+static atomic_bool fir_done;
+
+static void *fir_writer(void *unused) {
+    (void)unused;
+    static float taps[8][64];
+    for (uint32_t round = 0; round < EQ_ROUNDS; round++) {
+        const uint32_t k = 1 + round % 8, length = 1 + (round * 7) % 64;
+        for (uint32_t i = 0; i < length; i++) taps[k - 1][i] = i == length - 1 ? 1.f / k : 0.f;
+        const float *impulses[2] = {taps[k - 1], taps[k - 1]};
+        assert(nrt_context_set_fir(fir_ctx, impulses, 2, length));
+    }
+    atomic_store(&fir_done, true);
+    return NULL;
+}
+
+static void test_concurrent_fir(void) {
+    NRTRing *ring = nrt_ring_create(1024, 2);
+    fir_ctx = nrt_context_create(ring, 256);
+    assert(ring && fir_ctx);
+    nrt_context_set_gain(fir_ctx, 1.0, 32);
+    const float unit[1] = {1.f};
+    const float *impulses[2] = {unit, unit};
+    assert(nrt_context_set_fir(fir_ctx, impulses, 2, 1));
+    atomic_store(&fir_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, fir_writer, NULL);
+    assert(!started); (void)started;
+    float in[512], out[512];
+    for (uint32_t i = 0; i < 512; i++) in[i] = 1.0f;
+    uint64_t rendered = 0;
+    while (!atomic_load(&fir_done)) {
+        nrt_ring_write(ring, in, 256);
+        nrt_context_render_interleaved(fir_ctx, out, 256, 2);
+        rendered += 256;
+        for (uint32_t f = 0; f < 256; f++) {
+            assert(out[2 * f] == out[2 * f + 1]);
+            if (rendered > 4096) assert(isfinite(out[2 * f]) && out[2 * f] > 0.12f && out[2 * f] < 1.0001f);
+        }
+    }
+    pthread_join(thread, NULL);
+    nrt_context_destroy(fir_ctx);
+    nrt_ring_destroy(ring);
+}
+
 static NRTRing *concurrent_ring;
 static NRTRenderContext *concurrent_context;
 static void *producer(void *unused) {
@@ -668,5 +813,7 @@ int main(void) {
     test_concurrent_eq();
     test_room();
     test_concurrent_room();
+    test_fir();
+    test_concurrent_fir();
     return 0;
 }

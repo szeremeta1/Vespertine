@@ -963,6 +963,27 @@ public final class PlaybackEngine: @unchecked Sendable {
         channels.withUnsafeBufferPointer { buffer in
             nrt_context_set_room(session.context, buffer.baseAddress, UInt32(buffer.count))
         }
+        // Measured filters (impulse responses) are convolved first, a block (512 frames) late once there have been any.
+        let key = (room?.impulseKey(channelCount: session.plan.channels) ?? []).joined(separator: "|") + "@\(session.applied.sampleRate)"
+        if session.roomFilterKey != key {
+            session.roomFilterKey = key
+            Self.setRoomFilters(session.context, room?.impulseTaps(sampleRate: session.applied.sampleRate, channelCount: session.plan.channels))
+        }
+    }
+
+    /// Hands each channel's taps (nil: unfiltered) to the I/O thread; nil, no filters at all.
+    private static func setRoomFilters(_ context: OpaquePointer, _ taps: [[Float]?]?) {
+        guard let taps else { _ = nrt_context_set_fir(context, nil, 0, 0); return }
+        let length = taps.map { $0?.count ?? 0 }.max() ?? 0
+        var flat = [Float](repeating: 0, count: taps.count * length)
+        for (c, channel) in taps.enumerated() {
+            if let channel { flat.replaceSubrange(c * length ..< c * length + channel.count, with: channel) }
+        }
+        let ok = flat.withUnsafeBufferPointer { buffer in
+            let pointers: [UnsafePointer<Float>?] = taps.indices.map { c in taps[c] == nil ? nil : buffer.baseAddress.map { $0 + c * length } }
+            return pointers.withUnsafeBufferPointer { nrt_context_set_fir(context, $0.baseAddress, UInt32(taps.count), UInt32(length)) }
+        }
+        if !ok { log.error("Not enough memory for the room correction filters; playing without them") }
     }
 
     private func teardownDecoding() {

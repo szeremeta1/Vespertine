@@ -18,18 +18,21 @@ public struct RoomChannelCorrection: Codable, Hashable, Sendable {
     /// Level trim in dB.
     public var levelDB: Double
     public var bands: [EQBand]
+    /// A measured correction filter, convolved before the delay, level and bands.
+    public var impulse: RoomImpulse?
 
     public static let delayRange: ClosedRange<Double> = 0...40
     public static let levelRange: ClosedRange<Double> = -30...12
 
-    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = []) {
+    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil) {
         self.delayMs = delayMs
         self.levelDB = levelDB
         self.bands = bands
+        self.impulse = impulse
     }
 
     /// Whether the channel's correction does anything at all.
-    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains { $0.isActive } }
+    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains { $0.isActive } || impulse != nil }
 }
 
 public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
@@ -78,6 +81,19 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
             out.count = UInt32(sections.count)
             return out
         }
+    }
+
+    /// What identifies the filters for a stream of `channelCount` channels: the same key, the same taps.
+    func impulseKey(channelCount: Int) -> [String] {
+        (0..<min(max(channelCount, 0), Self.maxChannels)).map { c in c < channels.count ? channels[c].impulse?.file ?? "" : "" }
+    }
+
+    /// Each channel's filter taps at `sampleRate` (nil: unfiltered), or nil if no channel has a filter. A filter that
+    /// can't be read, or is too long for the I/O thread at this rate, leaves its channel unfiltered.
+    func impulseTaps(sampleRate: Double, channelCount: Int) -> [[Float]?]? {
+        let count = min(max(channelCount, 0), Self.maxChannels)
+        let taps = (0..<count).map { c in c < channels.count ? channels[c].impulse?.taps(at: sampleRate) : nil }
+        return taps.contains { $0 != nil } ? taps : nil
     }
 
     /// Channel `c`'s response in dB (preamp and level included, delay doesn't change it), at each of `frequencies`.
@@ -193,6 +209,7 @@ extension RoomProfile {
             lines.append("Channel: " + (c < names.count ? names[c] : String(c + 1)))
             if channel.levelDB != 0 { lines.append(String(format: "Preamp: %.1f dB", channel.levelDB)) }
             if channel.delayMs > 0 { lines.append(String(format: "Delay: %.2f ms", channel.delayMs)) }
+            if let impulse = channel.impulse { lines.append("# Convolution: \(impulse.name) (impulse responses aren't exported)") }
             let filters = EQPreset(name: name, bands: channel.bands).apoText.components(separatedBy: "\n").dropFirst().filter { !$0.isEmpty }
             lines.append(contentsOf: filters)
         }

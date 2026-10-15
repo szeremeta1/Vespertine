@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AVFAudio
 import CVespertineRT
 import Foundation
 import Testing
@@ -177,5 +178,44 @@ struct RoomCorrectionTests {
         #expect(abs(profile.preampForNoClipping() + 6) < 0.15)
         #expect(RoomProfile(name: "Cuts", channels: [RoomChannelCorrection(bands: [EQBand(frequency: 60, gainDB: -6, q: 4)])]).preampForNoClipping() == 0)
         #expect(abs(profile.responseDB(channel: 1, at: [60], sampleRate: 48_000)[0] - 6) < 0.05)
+    }
+    @Test func impulseResponsesImportAndKeepTheirGainAtEveryRate() throws {
+        // A 48 kHz stereo filter: the left speaker's a unit impulse 10 samples in, the right's half as loud.
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("room-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        do {
+            let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
+                AVSampleRateKey: 48_000.0, AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 32, AVLinearPCMIsFloatKey: true])
+            let buffer = try #require(AVAudioPCMBuffer(pcmFormat: f.processingFormat, frameCapacity: 1000))
+            buffer.frameLength = 1000
+            for i in 0..<1000 { buffer.floatChannelData![0][i] = i == 10 ? 1 : 0; buffer.floatChannelData![1][i] = i == 10 ? 0.5 : 0 }
+            try f.write(from: buffer)
+        }
+        let impulses = try RoomImpulse.importFile(url)
+        defer { impulses.forEach { $0.delete() } }
+        #expect(impulses.count == 2 && impulses[0].frames == 1000 && impulses[0].sampleRate == 48_000)
+        let same = try #require(impulses[0].taps(at: 48_000))
+        #expect(same.count == 11 && same[10] == 1)   // trailing silence trimmed
+        let doubled = try #require(impulses[1].taps(at: 96_000))
+        #expect(abs(doubled.reduce(0, +) - 0.5) < 0.01)   // the same gain at twice the rate
+
+        // In a profile: the speakers get their own filters, and a filter alone counts as correction.
+        let profile = RoomProfile(name: "IR", channels: [RoomChannelCorrection(impulse: impulses[0]), RoomChannelCorrection(impulse: impulses[1])])
+        #expect(!profile.isFlat)
+        let taps = try #require(profile.impulseTaps(sampleRate: 48_000, channelCount: 3))
+        #expect(taps.count == 3 && taps[0]?[10] == 1 && taps[1]?[10] == 0.5 && taps[2] == nil)
+        #expect(profile.impulseKey(channelCount: 2) == [impulses[0].file, impulses[1].file])
+        #expect(RoomProfile(name: "None").impulseTaps(sampleRate: 48_000, channelCount: 2) == nil)
+        // A profile saved before filters existed still loads.
+        let old = #"{"id":"6A1F2B9E-1C55-4C55-9A57-1F7A5E5B9D10","name":"Old","enabled":true,"preampDB":0,"channels":[{"delayMs":1,"levelDB":0,"bands":[]}]}"#
+        let decoded = try JSONDecoder().decode(RoomProfile.self, from: Data(old.utf8))
+        #expect(decoded.channels[0].impulse == nil && decoded.channels[0].delayMs == 1)
+    }
+
+    @Test func impulseResponsesThatArentAudioAreRefused() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("room-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try Data("Filter 1: ON PK Fc 40 Hz Gain -6 dB Q 4".utf8).write(to: url)
+        #expect(throws: RoomImpulseError.unreadable) { try RoomImpulse.importFile(url) }
     }
 }
