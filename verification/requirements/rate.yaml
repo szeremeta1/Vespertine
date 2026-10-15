@@ -133,7 +133,7 @@
     section: "line 35"
     availability: repository
     cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate.", to: "then the device's top rate." }
-  requirement: "With the match-source policy, when every offered rate is lower than the source rate and some offered rate divides it exactly (half, a quarter, …) and is at least half the highest offered rate, such an integer divisor is chosen; when every offered divisor is below half the highest offered rate, the highest offered rate is chosen."
+  requirement: "With the match-source policy and every offered rate below the source rate, the largest offered exact divisor at least half the highest offered rate is chosen; with no such divisor, the highest offered rate."
   quote_sha256: d168af95e0d3395226f6c374a41038c0143e4df2f92e3483821ef0bdf47a09fc
   kind: vespertine-rule
   testable: true
