@@ -37,8 +37,7 @@ IEC 61937 burst; `CLAIMS.md#iec-dtscd`), decodes other DTS files to PCM, and not
   version whose source the record pins (Ubuntu 24.04's package).
 - **The blind scanner** shares nothing with FFmpeg or with Vespertine: it knows only the codecs' frame syntax from
   the public ATSC standard, and it would find a frame that is truncated, split, byte-swapped wrongly or followed by
-  junk that parses as a frame. Its brief is `runs/2026-10-09/briefs/carrier-scan.md`, its report
-  `runs/2026-10-09/reports/carrier-scan.md`.
+  junk that parses as a frame.
 
 Agreement of both says the frames ride the carrier whole. A disagreement between them, or with the original
 stream, is a finding.

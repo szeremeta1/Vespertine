@@ -28,7 +28,7 @@ decoding itself is checked in CI against libdstdec on 15 fixture frames (DST-003
 decoder passes every DST check (REPORT.md).
 
 **To close it.** Run `hardware/SACD-ORACLE.md` on the two discs and commit its record under
-`verification/runs/sacd-<date>/`. It needs the disc images and the `sacd_extract` build on a Linux machine.
+`verification/hardware/sacd-<date>/`. It needs the disc images and the `sacd_extract` build on a Linux machine.
 
 ## Fixed
 
@@ -176,7 +176,7 @@ modelled line 98 faithfully, so it turned those inputs into the float path.
 device (`docs/FEATURES.md` line 37). It is `testable: false` from the verdict alone, because it is a condition on the
 verdict's inputs, and the contract's `integerMode` row now says those inputs don't occur. The check wasn't changed by
 hand: verdict-A, verdict-B, verdict-B2 and verdict-C got BPV-016, BPV-017 and BPV-018 as they now stand, and nothing
-about any result, in a second round in their own workspaces (`runs/2026-10-09/round2/`). verdict-A split the check:
+about any result, in a second round in their own workspaces. verdict-A split the check:
 shared-mode PCM now uses sources of at most 24 bits with integer mode off, DoP and bitstream each have a check that
 their badge needs the device held, and BPV-005 gained shared-mode cases for deeper sources, which must not be
 BIT-PERFECT. All of them pass on macOS.

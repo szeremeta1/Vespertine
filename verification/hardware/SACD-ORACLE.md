@@ -78,5 +78,5 @@ DoP groups of the harness, and PCM from SACD goes through the same FFmpeg `dsd_m
 ## Record
 
 Commit `toc.json`, `sacd_extract-help.txt`, `sacd_extract-toc.txt` and the compare output under
-`verification/runs/sacd-<date>/` (no audio, no image). The disc names already in the docs are The Dark Side of the
+`verification/hardware/sacd-<date>/` (no audio, no image). The disc names already in the docs are The Dark Side of the
 Moon (2003; plain stereo, DST 5.1) and Brothers in Arms (20th anniversary; DST stereo, DST 5.1).
