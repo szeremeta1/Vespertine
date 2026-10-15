@@ -59,7 +59,8 @@ final class AnalysisQueue {
     private var syncing = false
     private var loops: [Task<Void, Never>] = []
     /// Set by Stop: analyses that stood aside for playback aren't queued again. Cleared when analysis is asked for.
-    @ObservationIgnored private var stopped = false
+    /// Observed, so the sidebar's progress goes at Stop (`isStopping`).
+    private var stopped = false
     /// Bumped by Stop, so a library query still running when Stop is pressed doesn't queue its results afterwards.
     @ObservationIgnored private var generation = 0
 
@@ -93,6 +94,8 @@ final class AnalysisQueue {
 
     var isRunning: Bool { !active.isEmpty || !pendingLocal.isEmpty || !pendingNetwork.isEmpty }
     var remaining: Int { pendingLocal.count + pendingNetwork.count + active.count }
+    /// Stopped, with files already being read left to finish (a share file can take a while).
+    var isStopping: Bool { stopped && !active.isEmpty }
 
     func isAnalyzing(_ track: Track) -> Bool {
         active.contains(track.filePath) || pendingPaths.contains(track.filePath)

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AppKit
 import VespertineLibrary
 import SwiftUI
 
@@ -120,7 +121,10 @@ struct TrackTable: View {
             let chosen = chosenRows.map(\.track)
             if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.index))) }
         } primaryAction: { ids in
-            guard let first = ids.first, let index = rows.firstIndex(where: { $0.id == first }) else { return }
+            // Double-clicking a row of a multi-selection gets the whole selection: play the row clicked, not whichever
+            // song the set happens to list first (else the first selected, in the order shown).
+            let clicked = Self.clickedRow().flatMap { rows.indices.contains($0) && ids.contains(rows[$0].id) ? $0 : nil }
+            guard let index = clicked ?? rows.firstIndex(where: { ids.contains($0.id) }) else { return }
             model.player.play(rows.map(\.track), startAt: index)
         }
         .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id))) }
@@ -134,7 +138,13 @@ struct TrackTable: View {
             // same entries again rather than the same places, or Play, Return and Remove would act on whatever moved there.
             mirror(Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) }))
         }
-        .onChange(of: selection) { _, new in
+        .onChange(of: selection) { old, new in
+            // A plain click on one row of a multi-selection empties it in SwiftUI's table (macOS 27), where a list
+            // should select just that row, as AppKit's own tables do; Shift-clicking after it then started from the top.
+            if new.isEmpty, old.count > 1, let index = Self.clickedRow(), rows.indices.contains(index), old.contains(rows[index].id) {
+                selection = [rows[index].id]
+                return
+            }
             selectedEntries = Self.entries(new, in: rows.map { ($0.id, $0.track.id) })
             // Only a selection made here is the app's new selection. Pages kept alive underneath (Favorites under an
             // album, Songs under search results) follow the selection too; when they wrote back their share of it, a
@@ -145,7 +155,7 @@ struct TrackTable: View {
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
         .onKeyPress(.return) {
-            guard let first = selection.first, let index = rows.firstIndex(where: { $0.id == first }) else { return .ignored }
+            guard let index = rows.firstIndex(where: { selection.contains($0.id) }) else { return .ignored }
             model.player.play(rows.map(\.track), startAt: index)
             return .handled
         }
@@ -153,6 +163,20 @@ struct TrackTable: View {
 }
 
 extension TrackTable {
+    /// The row under a plain click being handled now, as the table shows them (sorted), if the click is on a row.
+    private static func clickedRow() -> Int? {
+        guard let event = NSApp.currentEvent, event.type == .leftMouseDown || event.type == .leftMouseUp,
+              event.modifierFlags.isDisjoint(with: [.command, .shift]),
+              var view = event.window?.contentView?.hitTest(event.locationInWindow) else { return nil }
+        while !(view is NSTableView) {
+            guard let parent = view.superview else { return nil }
+            view = parent
+        }
+        let table = view as! NSTableView
+        let row = table.row(at: table.convert(event.locationInWindow, from: nil))
+        return row >= 0 ? row : nil
+    }
+
     /// Selects `rows` to follow the app's selection (or keep it across a reload), without making it the app's selection.
     private func mirror(_ rows: Set<Int64>) {
         guard rows != selection else { return }
