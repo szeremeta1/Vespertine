@@ -45,6 +45,32 @@ struct AppAuditTests {
         settings.relayVolumeKeys = true
         #expect(AppSettings(defaults: defaults, dataDirectory: root).relayVolumeKeys)
     }
+    @Test("Volume control in Vespertine is chosen per output, with a level of its own")
+    func appVolumePerOutput() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-volume-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(!settings.usesAppVolume("HDMI") && settings.engineSettings().deviceDigitalVolumes.isEmpty)
+        #expect(settings.engineSettings().digitalVolumeDB == nil)
+
+        settings.setUsesAppVolume(true, for: "HDMI")
+        #expect(settings.engineSettings().deviceDigitalVolumes == ["HDMI": 0])            // 100%: untouched
+        settings.setAppVolumeLevel(0.25, for: "HDMI")
+        #expect(settings.engineSettings().deviceDigitalVolumes == ["HDMI": -30])
+
+        // The Settings default covers outputs without a choice of their own; one turned off here stays off.
+        settings.allowDigitalVolume = true
+        settings.setUsesAppVolume(false, for: "Line out")
+        let engine = settings.engineSettings()
+        #expect(engine.digitalVolumeDB == 0)
+        #expect(engine.deviceDigitalVolumes == ["HDMI": -30, "Line out": nil])
+
+        let reloaded = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(reloaded.usesAppVolume("HDMI") && reloaded.appVolumeLevel(for: "HDMI") == 0.25 && !reloaded.usesAppVolume("Line out"))
+    }
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

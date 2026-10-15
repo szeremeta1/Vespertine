@@ -78,9 +78,13 @@ final class AppSettings {
     var rateChoices: [String: String] { didSet { defaults.set(rateChoices, forKey: "rateChoices") } }
     var replayGain: ReplayGainMode { didSet { defaults.set(replayGain.rawValue, forKey: "replayGain") } }
     var replayGainPreampDB: Double { didSet { defaults.set(replayGainPreampDB, forKey: "replayGainPreamp") } }
-    /// Offer a (dithered) software volume when the device has no hardware control.
+    /// Offer a (dithered) software volume when the device has no hardware control: the default for every such output.
     var allowDigitalVolume: Bool { didSet { defaults.set(allowDigitalVolume, forKey: "allowDigitalVolume") } }
     var digitalVolume: Double { didSet { defaults.set(digitalVolume, forKey: "digitalVolume") } }
+    /// "Volume control in Vespertine", chosen for one output (device UID → on), overriding `allowDigitalVolume` there.
+    var appVolumeChoices: [String: Bool] { didSet { defaults.set(appVolumeChoices, forKey: "appVolumeChoices") } }
+    /// Vespertine's volume level per output (0…1). Outputs that aren't listed use `digitalVolume`.
+    var appVolumeLevels: [String: Double] { didSet { defaults.set(appVolumeLevels, forKey: "appVolumeLevels") } }
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
     var managedFolderPath: String { didSet { defaults.set(managedFolderPath, forKey: "managedFolder") } }
     var watchFolders: Bool { didSet { defaults.set(watchFolders, forKey: "watchFolders") } }
@@ -144,6 +148,8 @@ final class AppSettings {
         replayGainPreampDB = defaults.double(forKey: "replayGainPreamp")
         allowDigitalVolume = defaults.bool(forKey: "allowDigitalVolume")
         digitalVolume = defaults.double(forKey: "digitalVolume")
+        appVolumeChoices = defaults.dictionary(forKey: "appVolumeChoices") as? [String: Bool] ?? [:]
+        appVolumeLevels = defaults.dictionary(forKey: "appVolumeLevels") as? [String: Double] ?? [:]
         defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
         managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
@@ -192,6 +198,8 @@ final class AppSettings {
         if spatialModes[new] == nil, let mode = spatialModes[old] { spatialModes[new] = mode }
         if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
         if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
+        if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
+        if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
     }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
@@ -200,9 +208,28 @@ final class AppSettings {
     /// Digital volume slider (0…1) → dB, with a musical taper and a hard mute at 0.
     var digitalVolumeDB: Double? {
         guard allowDigitalVolume else { return nil }
-        if digitalVolume >= 0.999 { return 0 }
-        if digitalVolume <= 0.001 { return -120 }
-        return 60 * (pow(digitalVolume, 0.5) - 1)
+        return Self.decibels(digitalVolume)
+    }
+
+    static func decibels(_ level: Double) -> Double {
+        if level >= 0.999 { return 0 }
+        if level <= 0.001 { return -120 }
+        return 60 * (pow(level, 0.5) - 1)
+    }
+
+    /// Whether Vespertine sets the volume on `uid` (when it has no hardware volume): its own choice, else the default.
+    func usesAppVolume(_ uid: String) -> Bool { appVolumeChoices[uid] ?? allowDigitalVolume }
+    func setUsesAppVolume(_ on: Bool, for uid: String) { appVolumeChoices[uid] = on }
+    func appVolumeLevel(for uid: String) -> Double { appVolumeLevels[uid] ?? digitalVolume }
+    func setAppVolumeLevel(_ level: Double, for uid: String) { appVolumeLevels[uid] = min(max(level, 0), 1) }
+
+    /// Each output with a volume choice or level of its own: its digital volume in dB, or nil where it stays fixed.
+    var deviceDigitalVolumes: [String: Double?] {
+        var result: [String: Double?] = [:]
+        for uid in Set(appVolumeChoices.keys).union(appVolumeLevels.keys) {
+            result.updateValue(usesAppVolume(uid) ? Self.decibels(appVolumeLevel(for: uid)) : nil, forKey: uid)
+        }
+        return result
     }
 
     /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
@@ -218,6 +245,7 @@ final class AppSettings {
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
         s.digitalVolumeDB = digitalVolumeDB
+        s.deviceDigitalVolumes = deviceDigitalVolumes
         s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem
         s.integerMode = integerMode

@@ -71,6 +71,8 @@ public struct EngineSettings: Sendable, Equatable {
     /// Outputs with their own volume control get no digital volume. Decided for the output that's actually
     /// playing (see `digitalVolume(for:)`), so a change of the Mac's default output can't take it off a DAC.
     public var preferHardwareVolume = false
+    /// Per-output digital volume (dB) by UID, overriding `digitalVolumeDB` for that output; a nil value means none there.
+    public var deviceDigitalVolumes: [String: Double?] = [:]
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
     /// Dolby Atmos: let macOS render the objects (true), or play the Dolby Digital Plus channel bed
@@ -102,7 +104,9 @@ public struct EngineSettings: Sendable, Equatable {
 
     /// The digital volume (dB) applied on `device`; nil = none.
     public func digitalVolume(for device: OutputDevice?) -> Double? {
-        preferHardwareVolume && device?.hasHardwareVolume == true ? nil : digitalVolumeDB
+        if preferHardwareVolume && device?.hasHardwareVolume == true { return nil }
+        if let uid = device?.uid, let own = deviceDigitalVolumes[uid] { return own }
+        return digitalVolumeDB
     }
 }
 

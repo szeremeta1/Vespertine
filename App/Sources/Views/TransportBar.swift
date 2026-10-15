@@ -295,6 +295,9 @@ struct DeviceSettings: View {
                 }
             }
             .toggleStyle(.switch).controlSize(.mini)
+            if !device.hasHardwareVolume {
+                AppVolumeToggle(device: device)
+            }
             EqualizerChoice(device: device)
             // Multichannel music (5.1, 7.1…): Spatial Audio on headphones, all channels or a downmix elsewhere.
             HStack {
@@ -348,9 +351,11 @@ struct DeviceSettings: View {
 
 struct VolumeControl: View {
     @Environment(AppModel.self) private var model
+    @State private var showOptions = false
 
     var body: some View {
         let device = model.activeDevice
+        let settings = model.settings
         HStack(spacing: 8) {
             Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundStyle(Palette.text2)
             if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
@@ -358,16 +363,64 @@ struct VolumeControl: View {
                             tint: Palette.text2, showsThumb: false, accessibilityName: String(localized: "Hardware volume"))
                     .frame(width: 72)
                 Text("HW", comment: "Short label: hardware volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched")
-            } else if model.settings.allowDigitalVolume {
-                BrassSlider(value: Binding(get: { model.settings.digitalVolume }, set: { model.settings.digitalVolume = $0; model.syncEngine() }),
+            } else if let device, settings.usesAppVolume(device.uid) {
+                BrassSlider(value: Binding(get: { settings.appVolumeLevel(for: device.uid) },
+                                           set: { settings.setAppVolumeLevel($0, for: device.uid); model.syncEngine() }),
                             tint: Palette.copper, showsThumb: false, accessibilityName: String(localized: "Digital volume"))
                     .frame(width: 84)
-                Text("DIG", comment: "Short label: digital volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper).help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
-            } else {
-                Text("FIXED · USE DAC").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3)
-                    .help("This device has no volume control Vespertine can use. Adjust volume on your DAC or amplifier, or enable digital volume in Settings.")
+                Button { showOptions.toggle() } label: {
+                    HStack(spacing: 3) {
+                        Text("DIG", comment: "Short label: digital volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.copper)
+                        Image(systemName: "chevron.up").font(.system(size: 7, weight: .semibold)).foregroundStyle(Palette.copper)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
+                .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
+            } else if let device {
+                // A fixed-volume output (HDMI, optical, a line-out DAC): the way to Vespertine's own volume.
+                Button { showOptions.toggle() } label: {
+                    HStack(spacing: 3) {
+                        Text("FIXED · USE DAC").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3)
+                        Image(systemName: "chevron.up").font(.system(size: 7, weight: .semibold)).foregroundStyle(Palette.text3)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("This output has no volume control of its own. Click to set the volume in Vespertine instead (not bit-perfect below 100%).")
+                .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
             }
         }
+    }
+
+    private func options(_ device: OutputDevice) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: device.name)
+            AppVolumeToggle(device: device)
+        }
+        .padding(14)
+        .frame(width: 320)
+        .environment(model)
+    }
+}
+
+/// "Volume control in Vespertine" for an output with no volume of its own, such as HDMI or a line-out DAC.
+struct AppVolumeToggle: View {
+    @Environment(AppModel.self) private var model
+    let device: OutputDevice
+
+    var body: some View {
+        let settings = model.settings
+        Toggle(isOn: Binding(get: { settings.usesAppVolume(device.uid) },
+                             set: { settings.setUsesAppVolume($0, for: device.uid); model.syncEngine() })) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Volume control in Vespertine").font(Typeface.ui(12))
+                Text("This output has no volume of its own. On: set the level with Vespertine's slider, in 64-bit with dither; below 100% the output is no longer bit-perfect. Off: the signal stays untouched, and you set the level on the DAC, amplifier or TV.")
+                    .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .toggleStyle(.switch).controlSize(.mini)
     }
 }
 

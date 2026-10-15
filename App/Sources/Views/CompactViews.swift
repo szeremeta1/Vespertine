@@ -245,7 +245,7 @@ struct PlaybackSettings: View {
         .onChange(of: s.integerMode) { model.syncEngine() }
         .onChange(of: s.matchSixteenBit) { model.syncEngine() }
         .onChange(of: s.releaseAfterPause) { model.syncEngine() }
-        .onChange(of: s.allowDigitalVolume) { model.syncEngine() }
+        .onChange(of: s.allowDigitalVolume) { s.appVolumeChoices = [:]; model.syncEngine() }
         .onChange(of: s.replayGain) { model.player.refreshReplayGain() }
         .onChange(of: s.replayGainPreampDB) { model.player.refreshReplayGain() }
     }

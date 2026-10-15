@@ -297102,274 +297102,6 @@
         }
       }
     },
-    "This device has no volume control Vespertine can use. Adjust volume on your DAC or amplifier, or enable digital volume in Settings.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ይህ መሣሪያ Vespertine ሊጠቀምበት የሚችል የድምፅ መቆጣጠሪያ የለውም። የድምፅ መጠኑን በDACዎ ወይም በአምፕሊፋየርዎ ላይ ያስተካክሉ፣ ወይም በቅንብሮች ውስጥ ዲጂታል የድምፅ መጠንን ያንቁ።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لا يملك هذا الجهاز تحكمًا في مستوى الصوت يمكن لـ Vespertine استخدامه. اضبط مستوى الصوت على DAC أو المضخم، أو فعّل مستوى الصوت الرقمي في الإعدادات."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "এই ডিভাইসে Vespertine ব্যবহার করতে পারে এমন কোনো ভলিউম নিয়ন্ত্রণ নেই। আপনার DAC বা অ্যামপ্লিফায়ারে ভলিউম ঠিক করুন, অথবা সেটিংসে ডিজিটাল ভলিউম চালু করুন।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toto zařízení nemá ovládání hlasitosti, které by Vespertine mohl použít. Upravte hlasitost na DAC nebo zesilovači, nebo zapněte digitální hlasitost v Nastavení."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Denne enhed har ingen lydstyrkeregulering, som Vespertine kan bruge. Juster lydstyrken på din DAC eller forstærker, eller slå digital lydstyrke til i Indstillinger."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dieses Gerät hat keine Lautstärkeregelung, die Vespertine nutzen kann. Regle die Lautstärke an deinem DAC oder Verstärker oder aktiviere die digitale Lautstärke in den Einstellungen."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Αυτή η συσκευή δεν έχει έλεγχο έντασης που μπορεί να χρησιμοποιήσει το Vespertine. Ρυθμίστε την ένταση στο DAC ή στον ενισχυτή σας ή ενεργοποιήστε την ψηφιακή ένταση στις Ρυθμίσεις."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este dispositivo no tiene un control de volumen que Vespertine pueda usar. Ajusta el volumen en tu DAC o amplificador, o activa el volumen digital en Ajustes."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "این دستگاه کنترل صدایی ندارد که Vespertine بتواند از آن استفاده کند. صدا را روی DAC یا تقویت‌کنندهٔ خود تنظیم کنید یا در تنظیمات، صدای دیجیتال را فعال کنید."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tässä laitteessa ei ole äänenvoimakkuuden säädintä, jota Vespertine voisi käyttää. Säädä äänenvoimakkuutta DAC:sta tai vahvistimesta tai ota digitaalinen äänenvoimakkuus käyttöön asetuksissa."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Walang volume control ang device na ito na magagamit ng Vespertine. Ayusin ang volume sa DAC o amplifier mo, o i-enable ang digital volume sa Settings."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cet appareil n’a pas de réglage du volume utilisable par Vespertine. Réglez le volume sur votre DAC ou votre amplificateur, ou activez le volume numérique dans les réglages."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "આ ડિવાઇસમાં Vespertine વાપરી શકે એવું વૉલ્યૂમ નિયંત્રણ નથી. તમારા DAC અથવા ઍમ્પ્લિફાયર પર વૉલ્યૂમ ઍડજસ્ટ કરો, અથવા સેટિંગ્સમાં ડિજિટલ વૉલ્યૂમ ચાલુ કરો."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wannan na'urar ba ta da sarrafawar ƙara da Vespertine zai iya amfani da ita. Daidaita ƙara a DAC ko amplifier ɗinku, ko kunna ƙarar dijital a Saituna."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "להתקן זה אין בקרת עוצמת קול ש־Vespertine יכול להשתמש בה. כוונן את עוצמת הקול ב־DAC או במגבר, או הפעל עוצמת קול דיגיטלית ב״הגדרות״."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "इस डिवाइस में ऐसा कोई वॉल्यूम नियंत्रण नहीं है जिसका Vespertine उपयोग कर सके। अपने DAC या एम्प्लिफ़ायर पर वॉल्यूम बदलें, या सेटिंग्ज़ में डिजिटल वॉल्यूम चालू करें।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ennek az eszköznek nincs olyan hangerő-szabályzója, amelyet a Vespertine használni tudna. Állítsa a hangerőt a DAC-on vagy az erősítőn, vagy kapcsolja be a digitális hangerőt a Beállításokban."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perangkat ini tidak memiliki kontrol volume yang dapat digunakan Vespertine. Sesuaikan volume di DAC atau amplifier Anda, atau aktifkan volume digital di Pengaturan."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Questo dispositivo non ha un controllo del volume utilizzabile da Vespertine. Regola il volume sul DAC o sull’amplificatore, oppure attiva il volume digitale nelle impostazioni."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このデバイスには、Vespertineが使える音量調節がありません。DACまたはアンプで音量を調整するか、設定でデジタル音量を有効にしてください。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಈ ಸಾಧನದಲ್ಲಿ Vespertine ಬಳಸಬಹುದಾದ ವಾಲ್ಯೂಮ್ ನಿಯಂತ್ರಣ ಇಲ್ಲ. ನಿಮ್ಮ DAC ಅಥವಾ ಆಂಪ್ಲಿಫೈಯರ್‌ನಲ್ಲಿ ವಾಲ್ಯೂಮ್ ಹೊಂದಿಸಿ, ಅಥವಾ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಡಿಜಿಟಲ್ ವಾಲ್ಯೂಮ್ ಸಕ್ರಿಯಗೊಳಿಸಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 기기에는 Vespertine이 사용할 수 있는 음량 조절 기능이 없습니다. DAC 또는 앰프에서 음량을 조절하거나 설정에서 디지털 음량을 활성화하십시오."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ഈ ഉപകരണത്തിന് Vespertine-ന് ഉപയോഗിക്കാവുന്ന വോളിയം നിയന്ത്രണമില്ല. നിങ്ങളുടെ DAC-ലോ ആംപ്ലിഫയറിലോ വോളിയം ക്രമീകരിക്കുക, അല്ലെങ്കിൽ ക്രമീകരണങ്ങളിൽ ഡിജിറ്റൽ വോളിയം പ്രവർത്തനക്ഷമമാക്കുക."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "या डिव्हाइसवर Vespertine वापरू शकेल असे व्हॉल्यूम नियंत्रण नाही. तुमच्या DAC किंवा ॲम्प्लिफायरवर व्हॉल्यूम समायोजित करा, किंवा सेटिंग्जमध्ये डिजिटल व्हॉल्यूम चालू करा."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Peranti ini tiada kawalan kelantangan yang boleh digunakan oleh Vespertine. Laraskan kelantangan pada DAC atau penguat anda, atau dayakan kelantangan digital dalam Seting."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Denne enheten har ingen volumkontroll Vespertine kan bruke. Juster volumet på DAC-en eller forsterkeren, eller slå på digitalt volum i Innstillinger."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dit apparaat heeft geen volumeregeling die Vespertine kan gebruiken. Regel het volume op je DAC of versterker, of schakel digitaal volume in bij Instellingen."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਇਸ ਡਿਵਾਈਸ ਵਿੱਚ ਕੋਈ ਅਜਿਹਾ ਵੌਲਿਊਮ ਕੰਟਰੋਲ ਨਹੀਂ ਜੋ Vespertine ਵਰਤ ਸਕੇ। ਆਪਣੇ DAC ਜਾਂ ਐਂਪਲੀਫ਼ਾਇਰ ’ਤੇ ਵੌਲਿਊਮ ਵਿਵਸਥਿਤ ਕਰੋ, ਜਾਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਡਿਜੀਟਲ ਵੌਲਿਊਮ ਚਾਲੂ ਕਰੋ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To urządzenie nie ma regulacji głośności, której Vespertine może użyć. Reguluj głośność na przetworniku DAC lub wzmacniaczu albo włącz głośność cyfrową w Ustawieniach."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este dispositivo não tem um controle de volume que o Vespertine possa usar. Ajuste o volume no seu DAC ou amplificador, ou ative o volume digital nos Ajustes."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Este dispositivo não tem um controlo de volume que o Vespertine possa usar. Ajuste o volume no DAC ou no amplificador, ou ative o volume digital nas Definições."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acest dispozitiv nu are un control de volum pe care Vespertine să-l poată folosi. Reglați volumul de pe DAC sau amplificator ori activați volumul digital în Configurări."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Den här enheten har ingen volymkontroll som Vespertine kan använda. Justera volymen på din DAC eller förstärkare, eller aktivera digital volym i Inställningar."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kifaa hiki hakina kidhibiti cha sauti ambacho Vespertine inaweza kutumia. Rekebisha sauti kwenye DAC au amplifaya yako, au washa kiwango cha sauti cha kidijitali katika Mipangilio."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine பயன்படுத்தக்கூடிய ஒலியளவுக் கட்டுப்பாடு இந்தச் சாதனத்தில் இல்லை. உங்கள் DAC அல்லது ஆம்ப்ளிஃபையரில் ஒலியளவைச் சரிசெய்யவும், அல்லது அமைப்புகளில் டிஜிட்டல் ஒலியளவை இயக்கவும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ఈ పరికరానికి Vespertine ఉపయోగించగల వాల్యూమ్ నియంత్రణ లేదు. మీ DAC లేదా యాంప్లిఫైయర్‌లో వాల్యూమ్‌ను సర్దుబాటు చేయండి, లేదా సెట్టింగ్‌లలో డిజిటల్ వాల్యూమ్‌ను ప్రారంభించండి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "อุปกรณ์นี้ไม่มีการควบคุมระดับเสียงที่ Vespertine ใช้ได้ ปรับระดับเสียงที่ DAC หรือแอมป์ของคุณ หรือเปิดระดับเสียงดิจิทัลในการตั้งค่า"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu aygıtın Vespertine’in kullanabileceği bir ses düzeyi denetimi yok. Ses düzeyini DAC’nizden veya amfinizden ayarlayın ya da Ayarlar’da dijital ses düzeyini etkinleştirin."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Цей пристрій не має регулятора гучності, яким може користуватися Vespertine. Регулюйте гучність на ЦАП або підсилювачі чи ввімкніть цифрову гучність у Параметрах."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس ڈیوائس میں کوئی ایسا والیوم کنٹرول نہیں جسے Vespertine استعمال کر سکے۔ اپنے DAC یا ایمپلیفائر پر والیوم ایڈجسٹ کریں، یا سیٹنگز میں ڈیجیٹل والیوم فعال کریں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thiết bị này không có điều khiển âm lượng mà Vespertine có thể dùng. Hãy chỉnh âm lượng trên DAC hoặc bộ khuếch đại, hoặc bật âm lượng kỹ thuật số trong Cài đặt."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此裝置沒有 Vespertine 可使用的音量控制。請在 DAC 或擴音機上調整音量，或在「設定」中啟用數碼音量。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此设备没有 Vespertine 可以使用的音量控制。请在 DAC 或放大器上调节音量，或在设置中启用数字音量。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此裝置沒有 Vespertine 可使用的音量控制。請在 DAC 或擴大機上調整音量，或在設定中啟用數位音量。"
-          }
-        }
-      }
-    },
     "This disc image isn't a Super Audio CD.": {
       "extractionState": "manual",
       "localizations": {
@@ -332710,6 +332442,1079 @@
           "stringUnit": {
             "state": "translated",
             "value": "「立即分析資料庫」也會包含網路共享，並在從其中一個共享播放音樂時暫停。"
+          }
+        }
+      }
+    },
+    "Volume control in Vespertine": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምፅ መጠን መቆጣጠሪያ በVespertine"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التحكم في مستوى الصوت داخل Vespertine"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এ ভলিউম নিয়ন্ত্রণ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovládání hlasitosti ve Vespertine"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lydstyrke i Vespertine"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lautstärke in Vespertine regeln"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έλεγχος έντασης στο Vespertine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control de volumen en Vespertine"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کنترل صدا در Vespertine"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänenvoimakkuus Vespertinessa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume control sa Vespertine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume réglé dans Vespertine"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineમાં વૉલ્યૂમ નિયંત્રણ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sarrafa ƙara a cikin Vespertine"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שליטה בעוצמת הקול ב־Vespertine"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine में वॉल्यूम नियंत्रण"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangerő a Vespertine-ben"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrol volume di Vespertine"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume regolato in Vespertine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineで音量を調整"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನಲ್ಲಿ ವಾಲ್ಯೂಮ್ ನಿಯಂತ್ರಣ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine에서 음량 조절"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ൽ വോളിയം നിയന്ത്രണം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine मध्ये व्हॉल्यूम नियंत्रण"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kawalan kelantangan dalam Vespertine"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volum i Vespertine"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume regelen in Vespertine"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਵਿੱਚ ਵੌਲਿਊਮ ਕੰਟਰੋਲ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regulacja głośności w Vespertine"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle de volume no Vespertine"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlo de volume no Vespertine"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlul volumului în Vespertine"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volym i Vespertine"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kidhibiti cha sauti ndani ya Vespertine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-இல் ஒலியளவுக் கட்டுப்பாடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine‌లో వాల్యూమ్ నియంత్రణ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ควบคุมระดับเสียงใน Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses düzeyi Vespertine’de"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гучність у Vespertine"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine میں والیوم کنٹرول"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điều khiển âm lượng trong Vespertine"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Vespertine 中控制音量"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Vespertine 中控制音量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Vespertine 中控制音量"
+          }
+        }
+      }
+    },
+    "This output has no volume of its own. On: set the level with Vespertine's slider, in 64-bit with dither; below 100% the output is no longer bit-perfect. Off: the signal stays untouched, and you set the level on the DAC, amplifier or TV.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ ውፅዓት የራሱ የድምፅ መጠን የለውም። ሲበራ፦ የድምፅ መጠኑን በVespertine ተንሸራታች ያዘጋጁ፣ በ64-bit ከዲዘር ጋር፤ ከ100% በታች ውፅዓቱ ከአሁን በኋላ ቢት-ፍጹም አይደለም። ሲጠፋ፦ ምልክቱ ሳይነካ ይቆያል፣ የድምፅ መጠኑንም በDACው፣ በአምፕሊፋየሩ ወይም በቴሌቪዥኑ ላይ ያዘጋጃሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يملك هذا المخرج مستوى صوت خاصًا به. عند التشغيل: اضبط المستوى بشريط تمرير Vespertine، بدقة 64 بت مع التمويه؛ وتحت 100% لا يعود الإخراج مطابقًا للبتات. عند الإيقاف: تبقى الإشارة كما هي دون أي تغيير، وتضبط المستوى على DAC أو المضخم أو التلفاز."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই আউটপুটের নিজস্ব কোনো ভলিউম নেই। চালু থাকলে: Vespertine-এর স্লাইডার দিয়ে লেভেল ঠিক করুন, 64-bit-এ ডিদারসহ; 100%-এর নিচে আউটপুট আর বিট-পারফেক্ট থাকে না। বন্ধ থাকলে: সিগন্যাল অপরিবর্তিত থাকে, আর আপনি DAC, অ্যামপ্লিফায়ার বা টিভিতে লেভেল ঠিক করেন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento výstup nemá vlastní hlasitost. Zapnuto: úroveň nastavíte posuvníkem ve Vespertine, v 64 bitech s ditheringem; pod 100 % výstup už není bit-perfect. Vypnuto: signál zůstává nedotčený a úroveň nastavujete na DAC, zesilovači nebo televizoru."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne udgang har ingen lydstyrke selv. Til: indstil niveauet med Vespertines skyder, i 64-bit med dither; udgangen er ikke længere bitperfekt under 100 %. Fra: signalet forbliver uberørt, og du indstiller niveauet på DAC'en, forstærkeren eller tv'et."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Ausgang hat keine eigene Lautstärke. Ein: Du stellst den Pegel mit dem Regler in Vespertine ein, in 64 Bit mit Dither; die Ausgabe ist unter 100 % nicht mehr bit-perfekt. Aus: Das Signal bleibt unverändert, und du regelst den Pegel am DAC, Verstärker oder Fernseher."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτή η έξοδος δεν έχει δική της ένταση. Ενεργό: ρυθμίζετε τη στάθμη με το ρυθμιστικό του Vespertine, σε 64 bit με dither· κάτω από 100% η έξοδος δεν είναι πλέον bit-perfect. Ανενεργό: το σήμα μένει ανέγγιχτο και ρυθμίζετε τη στάθμη στο DAC, τον ενισχυτή ή την τηλεόραση."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta salida no tiene volumen propio. Activado: ajustas el nivel con el control deslizante de Vespertine, en 64 bits con dither; la salida deja de ser bit-perfect por debajo del 100 %. Desactivado: la señal no se toca y ajustas el nivel en el DAC, el amplificador o el televisor."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این خروجی صدای مخصوص خود را ندارد. روشن: سطح صدا را با لغزندهٔ Vespertine تنظیم کنید، در ۶۴ بیت با دیتر؛ زیر ۱۰۰٪ خروجی دیگر بیت‌به‌بیت نیست. خاموش: سیگنال دست‌نخورده می‌ماند و سطح صدا را روی DAC، تقویت‌کننده یا تلویزیون تنظیم می‌کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tällä lähdöllä ei ole omaa äänenvoimakkuutta. Päällä: säädät tasoa Vespertinen liukusäätimellä, 64-bittisenä ja ditheröitynä; alle 100 %:n tasolla lähtö ei ole enää bittitarkka. Pois: signaaliin ei kosketa, ja säädät tasoa DAC:sta, vahvistimesta tai televisiosta."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang sariling volume ang output na ito. Naka-on: itakda ang level gamit ang slider ng Vespertine, sa 64-bit na may dither; kapag mas mababa sa 100%, hindi na bit-perfect ang output. Naka-off: hindi ginagalaw ang signal, at sa DAC, amplifier o TV mo itinatakda ang level."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette sortie n’a pas de volume propre. Activé : réglez le niveau avec le curseur de Vespertine, en 64 bits avec dither ; en dessous de 100 %, la sortie n’est plus bit-perfect. Désactivé : le signal reste intact, et vous réglez le niveau sur le DAC, l’amplificateur ou le téléviseur."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ આઉટપુટનું પોતાનું વૉલ્યૂમ નથી. ચાલુ: Vespertineના સ્લાઇડરથી લેવલ સેટ કરો, 64-bitમાં ડિધર સાથે; 100% થી નીચે આઉટપુટ હવે બિટ-પરફેક્ટ રહેતું નથી. બંધ: સિગ્નલ જેમ છે તેમ રહે છે, અને તમે DAC, ઍમ્પ્લિફાયર અથવા ટીવી પર લેવલ સેટ કરો છો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan fitarwa ba ta da ƙarar kanta. A kunne: saita matakin da madaidaicin Vespertine, a bit 64 da dither; fitarwar ba ta zama bit-perfect ba idan ta yi ƙasa da 100%. A kashe: siginar ba a taɓa ta ba, kuma kuna saita matakin a DAC, amplifier ko talabijin."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ליציאה זו אין עוצמת קול משלה. מופעל: קובעים את הרמה במחוון של Vespertine, ב־64 סיביות עם דיתור; מתחת ל־100% הפלט כבר אינו מדויק לסיבית. כבוי: האות נשאר ללא שינוי, ואת הרמה קובעים ב־DAC, במגבר או בטלוויזיה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस आउटपुट का अपना कोई वॉल्यूम नहीं है। चालू: Vespertine के स्लाइडर से लेवल सेट करें, 64-bit में डिदर के साथ; 100% से कम पर आउटपुट बिट-परफ़ेक्ट नहीं रहता। बंद: सिग्नल अछूता रहता है, और आप DAC, एम्प्लिफ़ायर या टीवी पर लेवल सेट करते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ennek a kimenetnek nincs saját hangereje. Be: a szintet a Vespertine csúszkájával állítja, 64 biten, ditheréssel; 100%-nál kisebb értéknél a kimenet már nem bit-perfect. Ki: a jel érintetlen marad, a szintet pedig a DAC-on, az erősítőn vagy a tévén állítja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output ini tidak memiliki volume sendiri. Aktif: atur level dengan penggeser Vespertine, dalam 64-bit dengan dither; output tidak lagi bit-perfect di bawah 100%. Nonaktif: sinyal tetap utuh, dan Anda mengatur level di DAC, amplifier, atau TV."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa uscita non ha un volume proprio. Attivo: regoli il livello con il cursore di Vespertine, a 64 bit con dither; sotto il 100% l’uscita non è più bit-perfect. Disattivo: il segnale resta intatto e regoli il livello sul DAC, sull’amplificatore o sul televisore."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この出力には独自の音量調節がありません。オン：Vespertineのスライダで音量を調整します（64ビット、ディザ付き）。100%未満では出力はビットパーフェクトではなくなります。オフ：信号には一切手を加えず、DAC、アンプ、またはテレビで音量を調整します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಔಟ್‌ಪುಟ್‌ಗೆ ತನ್ನದೇ ಆದ ವಾಲ್ಯೂಮ್ ಇಲ್ಲ. ಆನ್: Vespertine ನ ಸ್ಲೈಡರ್‌ನಿಂದ ಮಟ್ಟವನ್ನು ಹೊಂದಿಸಿ, 64-bit ನಲ್ಲಿ ಡಿದರ್‌ನೊಂದಿಗೆ; 100% ಗಿಂತ ಕಡಿಮೆಯಲ್ಲಿ ಔಟ್‌ಪುಟ್ ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ. ಆಫ್: ಸಿಗ್ನಲ್ ಬದಲಾಗದೆ ಉಳಿಯುತ್ತದೆ, ಮತ್ತು ನೀವು DAC, ಆಂಪ್ಲಿಫೈಯರ್ ಅಥವಾ ಟಿವಿಯಲ್ಲಿ ಮಟ್ಟವನ್ನು ಹೊಂದಿಸುತ್ತೀರಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 출력에는 자체 음량 조절이 없습니다. 켬: Vespertine의 슬라이더로 음량을 조절합니다(64비트, 디더 적용). 100% 미만에서는 출력이 더 이상 비트 퍼펙트가 아닙니다. 끔: 신호는 그대로 유지되며, 음량은 DAC, 앰프 또는 TV에서 조절합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഔട്ട്‌പുട്ടിന് സ്വന്തമായി വോളിയം ഇല്ല. ഓൺ: Vespertine-ന്റെ സ്ലൈഡർ ഉപയോഗിച്ച് ലെവൽ ക്രമീകരിക്കുക, 64-bit-ൽ ഡിതറോടെ; 100%-ൽ താഴെ ഔട്ട്‌പുട്ട് ഇനി ബിറ്റ്-പെർഫെക്റ്റ് അല്ല. ഓഫ്: സിഗ്നൽ മാറ്റമില്ലാതെ തുടരും, ലെവൽ നിങ്ങൾ DAC-ലോ ആംപ്ലിഫയറിലോ ടിവിയിലോ ക്രമീകരിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या आउटपुटला स्वतःचा व्हॉल्यूम नाही. चालू: Vespertine च्या स्लायडरने पातळी सेट करा, 64-bit मध्ये डिथरसह; 100% पेक्षा कमी असल्यास आउटपुट बिट-परफेक्ट राहत नाही. बंद: सिग्नल जसाच्या तसा राहतो, आणि तुम्ही DAC, ॲम्प्लिफायर किंवा टीव्हीवर पातळी सेट करता."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output ini tiada kelantangan sendiri. Hidup: tetapkan paras dengan peluncur Vespertine, dalam 64-bit dengan dither; output tidak lagi bit-perfect di bawah 100%. Mati: isyarat kekal tidak disentuh, dan anda menetapkan paras pada DAC, penguat atau TV."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne utgangen har ikke eget volum. På: still inn nivået med glidebryteren i Vespertine, i 64-bit med dither; utgangen er ikke lenger bitperfekt under 100 %. Av: signalet forblir urørt, og du stiller inn nivået på DAC-en, forsterkeren eller TV-en."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze uitgang heeft geen eigen volume. Aan: je stelt het niveau in met de schuifregelaar van Vespertine, in 64 bits met dither; de uitvoer is onder 100% niet meer bitperfect. Uit: het signaal blijft onaangeroerd en je stelt het niveau in op de DAC, versterker of tv."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਆਉਟਪੁੱਟ ਦਾ ਆਪਣਾ ਕੋਈ ਵੌਲਿਊਮ ਨਹੀਂ। ਚਾਲੂ: Vespertine ਦੇ ਸਲਾਈਡਰ ਨਾਲ ਪੱਧਰ ਸੈੱਟ ਕਰੋ, 64-bit ਵਿੱਚ ਡਿਦਰ ਨਾਲ; 100% ਤੋਂ ਹੇਠਾਂ ਆਉਟਪੁੱਟ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਨਹੀਂ ਰਹਿੰਦੀ। ਬੰਦ: ਸਿਗਨਲ ਬਿਨਾਂ ਛੇੜੇ ਰਹਿੰਦਾ ਹੈ, ਅਤੇ ਤੁਸੀਂ DAC, ਐਂਪਲੀਫ਼ਾਇਰ ਜਾਂ ਟੀਵੀ ’ਤੇ ਪੱਧਰ ਸੈੱਟ ਕਰਦੇ ਹੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To wyjście nie ma własnej głośności. Włączone: poziom ustawiasz suwakiem w Vespertine, w 64 bitach z ditheringiem; sygnał wyjściowy nie jest już bit-perfect poniżej 100%. Wyłączone: sygnał pozostaje nietknięty, a poziom ustawiasz na przetworniku DAC, wzmacniaczu lub telewizorze."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta saída não tem volume próprio. Ativado: ajuste o nível com o controle deslizante do Vespertine, em 64 bits com dither; a saída deixa de ser bit-perfect abaixo de 100 %. Desativado: o sinal fica intacto, e você ajusta o nível no DAC, no amplificador ou na TV."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta saída não tem volume próprio. Ativado: ajuste o nível com o cursor do Vespertine, em 64 bits com dither; a saída deixa de ser bit-perfect abaixo de 100%. Desativado: o sinal fica intacto e ajusta o nível no DAC, no amplificador ou no televisor."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Această ieșire nu are volum propriu. Activat: setați nivelul cu glisorul din Vespertine, pe 64 de biți cu dither; ieșirea nu mai este bit-perfect sub 100%. Dezactivat: semnalul rămâne neatins, iar nivelul îl setați de pe DAC, amplificator sau televizor."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här utgången har ingen egen volym. På: ställ in nivån med reglaget i Vespertine, i 64 bitar med dither; under 100 % är utgången inte längre bitperfekt. Av: signalen lämnas orörd, och du ställer in nivån på DAC:n, förstärkaren eller tv:n."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Towe hili halina kiwango chake cha sauti. Kimewashwa: weka kiwango kwa kitelezi cha Vespertine, kwa biti 64 na dither; towe si bit-perfect tena chini ya 100%. Kimezimwa: ishara inabaki bila kuguswa, na unaweka kiwango kwenye DAC, amplifaya au TV."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த வெளியீட்டுக்குச் சொந்த ஒலியளவு இல்லை. இயக்கத்தில்: Vespertine-இன் ஸ்லைடரில் அளவை அமைக்கவும், 64-bit-இல் டிதருடன்; 100%-க்குக் கீழ் வெளியீடு இனி பிட்-பெர்ஃபெக்ட் அல்ல. முடக்கத்தில்: சிக்னல் தொடப்படாமல் இருக்கும், அளவை DAC, ஆம்ப்ளிஃபையர் அல்லது டிவியில் நீங்கள் அமைக்கிறீர்கள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ అవుట్‌పుట్‌కు సొంత వాల్యూమ్ లేదు. ఆన్: Vespertine స్లైడర్‌తో స్థాయిని సెట్ చేయండి, 64-bit‌లో డిదర్‌తో; 100% కంటే తక్కువలో అవుట్‌పుట్ ఇక బిట్-పర్ఫెక్ట్ కాదు. ఆఫ్: సిగ్నల్ మార్పు లేకుండా ఉంటుంది, మరియు మీరు DAC, యాంప్లిఫైయర్ లేదా టీవీలో స్థాయిని సెట్ చేస్తారు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เอาต์พุตนี้ไม่มีระดับเสียงของตัวเอง เปิด: ปรับระดับด้วยแถบเลื่อนของ Vespertine แบบ 64 บิตพร้อม dither เมื่อต่ำกว่า 100% เอาต์พุตจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป ปิด: สัญญาณจะไม่ถูกแตะต้อง และคุณปรับระดับที่ DAC แอมป์ หรือทีวี"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu çıkışın kendi ses düzeyi yok. Açık: Düzeyi Vespertine’in sürgüsüyle, dither uygulanmış 64 bit olarak ayarlarsınız; %100’ün altında çıkış artık bit-perfect değildir. Kapalı: Sinyale dokunulmaz ve düzeyi DAC’den, amfiden veya televizyondan ayarlarsınız."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей вихід не має власної гучності. Увімкнено: рівень регулюється повзунком Vespertine, у 64 бітах із дизерингом; нижче 100% вихід уже не біт-у-біт. Вимкнено: сигнал лишається незмінним, а рівень ви регулюєте на ЦАП, підсилювачі чи телевізорі."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس آؤٹ پٹ کا اپنا کوئی والیوم نہیں۔ آن: Vespertine کے سلائیڈر سے لیول سیٹ کریں، 64-bit میں ڈیدر کے ساتھ؛ 100% سے کم پر آؤٹ پٹ بٹ پرفیکٹ نہیں رہتا۔ آف: سگنل جوں کا توں رہتا ہے، اور آپ DAC، ایمپلیفائر یا ٹی وی پر لیول سیٹ کرتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra này không có âm lượng riêng. Bật: chỉnh mức bằng thanh trượt của Vespertine, ở 64 bit có dither; dưới 100% đầu ra không còn bit-perfect. Tắt: tín hiệu được giữ nguyên, và bạn chỉnh mức trên DAC, bộ khuếch đại hoặc TV."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此輸出沒有自己的音量控制。開啟：用 Vespertine 的滑桿調整音量，以 64 位元運算並加上抖動處理；低於 100% 時輸出不再是位元完美。關閉：訊號原封不動，請在 DAC、擴音機或電視上調整音量。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此输出没有自己的音量控制。打开：用 Vespertine 的滑块调节音量，以 64 位运算并加抖动；低于 100% 时输出不再是比特完美。关闭：信号原封不动，请在 DAC、放大器或电视上调节音量。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此輸出沒有自己的音量控制。開啟：用 Vespertine 的滑桿調整音量，以 64 位元運算並加上抖動；低於 100% 時輸出不再是位元完美。關閉：訊號原封不動，請在 DAC、擴大機或電視上調整音量。"
+          }
+        }
+      }
+    },
+    "This output has no volume control of its own. Click to set the volume in Vespertine instead (not bit-perfect below 100%).": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ ውፅዓት የራሱ የድምፅ መቆጣጠሪያ የለውም። በምትኩ የድምፅ መጠኑን በVespertine ለማዘጋጀት ጠቅ ያድርጉ (ከ100% በታች ቢት-ፍጹም አይደለም)።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يملك هذا المخرج تحكمًا خاصًا به في مستوى الصوت. انقر لضبط مستوى الصوت في Vespertine بدلًا من ذلك (غير مطابق للبتات تحت 100%)."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই আউটপুটের নিজস্ব কোনো ভলিউম নিয়ন্ত্রণ নেই। এর বদলে Vespertine-এ ভলিউম ঠিক করতে ক্লিক করুন (100%-এর নিচে বিট-পারফেক্ট নয়)।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento výstup nemá vlastní ovládání hlasitosti. Klikněte a nastavte hlasitost místo toho ve Vespertine (pod 100 % není bit-perfect)."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne udgang har ingen lydstyrkeregulering selv. Klik for at indstille lydstyrken i Vespertine i stedet (ikke bitperfekt under 100 %)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Ausgang hat keine eigene Lautstärkeregelung. Klicke, um die Lautstärke stattdessen in Vespertine zu regeln (unter 100 % nicht bit-perfekt)."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτή η έξοδος δεν έχει δικό της έλεγχο έντασης. Κάντε κλικ για να ρυθμίζετε την ένταση στο Vespertine (όχι bit-perfect κάτω από 100%)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta salida no tiene control de volumen propio. Haz clic para ajustar el volumen en Vespertine (no es bit-perfect por debajo del 100 %)."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این خروجی کنترل صدای مخصوص خود را ندارد. برای تنظیم صدا در Vespertine کلیک کنید (زیر ۱۰۰٪ بیت‌به‌بیت نیست)."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tällä lähdöllä ei ole omaa äänenvoimakkuuden säädintä. Napsauta, niin säädät äänenvoimakkuutta Vespertinessa (ei bittitarkka alle 100 %:n tasolla)."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang sariling volume control ang output na ito. I-click para sa Vespertine na lang itakda ang volume (hindi bit-perfect kapag mas mababa sa 100%)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette sortie n’a pas de réglage du volume propre. Cliquez pour régler plutôt le volume dans Vespertine (pas bit-perfect en dessous de 100 %)."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ આઉટપુટમાં પોતાનું વૉલ્યૂમ નિયંત્રણ નથી. તેના બદલે Vespertineમાં વૉલ્યૂમ સેટ કરવા ક્લિક કરો (100% થી નીચે બિટ-પરફેક્ટ નથી)."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan fitarwa ba ta da sarrafawar ƙara ta kanta. Danna don saita ƙara a cikin Vespertine maimakon haka (ba bit-perfect ba ƙasa da 100%)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ליציאה זו אין בקרת עוצמת קול משלה. לחץ כדי לכוונן את עוצמת הקול ב־Vespertine במקום זאת (אינה מדויקת לסיבית מתחת ל־100%)."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस आउटपुट में अपना कोई वॉल्यूम नियंत्रण नहीं है। इसके बजाय Vespertine में वॉल्यूम सेट करने के लिए क्लिक करें (100% से कम पर बिट-परफ़ेक्ट नहीं)।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ennek a kimenetnek nincs saját hangerő-szabályzója. Kattintson, hogy a hangerőt inkább a Vespertine-ben állítsa (100%-nál kisebb értéknél nem bit-perfect)."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output ini tidak memiliki kontrol volume sendiri. Klik untuk mengatur volume di Vespertine saja (tidak bit-perfect di bawah 100%)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa uscita non ha un controllo del volume proprio. Fai clic per regolare invece il volume in Vespertine (non bit-perfect al di sotto del 100%)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この出力には独自の音量調節がありません。クリックすると、代わりにVespertineで音量を調整できます（100%未満ではビットパーフェクトではありません）。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಔಟ್‌ಪುಟ್‌ಗೆ ತನ್ನದೇ ಆದ ವಾಲ್ಯೂಮ್ ನಿಯಂತ್ರಣ ಇಲ್ಲ. ಬದಲಿಗೆ Vespertine ನಲ್ಲಿ ವಾಲ್ಯೂಮ್ ಹೊಂದಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ (100% ಗಿಂತ ಕಡಿಮೆಯಲ್ಲಿ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಅಲ್ಲ)."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 출력에는 자체 음량 조절이 없습니다. 대신 Vespertine에서 음량을 조절하려면 클릭하십시오(100% 미만에서는 비트 퍼펙트가 아님)."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഔട്ട്‌പുട്ടിന് സ്വന്തമായി വോളിയം നിയന്ത്രണമില്ല. പകരം Vespertine-ൽ വോളിയം ക്രമീകരിക്കാൻ ക്ലിക്ക് ചെയ്യുക (100%-ൽ താഴെ ബിറ്റ്-പെർഫെക്റ്റ് അല്ല)."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या आउटपुटला स्वतःचे व्हॉल्यूम नियंत्रण नाही. त्याऐवजी Vespertine मध्ये व्हॉल्यूम सेट करण्यासाठी क्लिक करा (100% पेक्षा कमी असल्यास बिट-परफेक्ट नाही)."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output ini tiada kawalan kelantangan sendiri. Klik untuk menetapkan kelantangan dalam Vespertine sebaliknya (tidak bit-perfect di bawah 100%)."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne utgangen har ingen egen volumkontroll. Klikk for å stille inn volumet i Vespertine i stedet (ikke bitperfekt under 100 %)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze uitgang heeft geen eigen volumeregeling. Klik om het volume in plaats daarvan in Vespertine te regelen (niet bitperfect onder 100%)."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਆਉਟਪੁੱਟ ਦਾ ਆਪਣਾ ਕੋਈ ਵੌਲਿਊਮ ਕੰਟਰੋਲ ਨਹੀਂ। ਇਸਦੀ ਬਜਾਏ Vespertine ਵਿੱਚ ਵੌਲਿਊਮ ਸੈੱਟ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ (100% ਤੋਂ ਹੇਠਾਂ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਨਹੀਂ)।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To wyjście nie ma własnej regulacji głośności. Kliknij, aby zamiast tego ustawiać głośność w Vespertine (poniżej 100% nie jest bit-perfect)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta saída não tem controle de volume próprio. Clique para ajustar o volume no Vespertine em vez disso (não é bit-perfect abaixo de 100 %)."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta saída não tem controlo de volume próprio. Clique para ajustar o volume no Vespertine em alternativa (não é bit-perfect abaixo de 100%)."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Această ieșire nu are control de volum propriu. Faceți clic pentru a seta în schimb volumul în Vespertine (nu este bit-perfect sub 100%)."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här utgången har ingen egen volymkontroll. Klicka för att ställa in volymen i Vespertine i stället (inte bitperfekt under 100 %)."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Towe hili halina kidhibiti chake cha sauti. Bofya ili kuweka sauti ndani ya Vespertine badala yake (si bit-perfect chini ya 100%)."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த வெளியீட்டுக்குச் சொந்த ஒலியளவுக் கட்டுப்பாடு இல்லை. அதற்குப் பதிலாக Vespertine-இல் ஒலியளவை அமைக்கக் கிளிக் செய்யவும் (100%-க்குக் கீழ் பிட்-பெர்ஃபெக்ட் அல்ல)."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ అవుట్‌పుట్‌కు సొంత వాల్యూమ్ నియంత్రణ లేదు. బదులుగా Vespertine‌లో వాల్యూమ్ సెట్ చేయడానికి క్లిక్ చేయండి (100% కంటే తక్కువలో బిట్-పర్ఫెక్ట్ కాదు)."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เอาต์พุตนี้ไม่มีการควบคุมระดับเสียงของตัวเอง คลิกเพื่อปรับระดับเสียงใน Vespertine แทน (ไม่เป็นบิตเพอร์เฟกต์เมื่อต่ำกว่า 100%)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu çıkışın kendi ses düzeyi denetimi yok. Ses düzeyini bunun yerine Vespertine’de ayarlamak için tıklayın (%100’ün altında bit-perfect değildir)."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей вихід не має власного регулятора гучності. Клацніть, щоб натомість регулювати гучність у Vespertine (нижче 100% — не біт-у-біт)."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس آؤٹ پٹ کا اپنا کوئی والیوم کنٹرول نہیں۔ اس کے بجائے Vespertine میں والیوم سیٹ کرنے کے لیے کلک کریں (100% سے کم پر بٹ پرفیکٹ نہیں)۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra này không có điều khiển âm lượng riêng. Bấm để chỉnh âm lượng trong Vespertine thay vào đó (không bit-perfect khi dưới 100%)."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此輸出沒有自己的音量控制。按一下即可改為在 Vespertine 中調整音量（低於 100% 時並非位元完美）。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此输出没有自己的音量控制。点按即可改为在 Vespertine 中调节音量（低于 100% 时不是比特完美）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此輸出沒有自己的音量控制。按一下即可改為在 Vespertine 中調整音量（低於 100% 時不是位元完美）。"
+          }
+        }
+      }
+    },
+    "In Vespertine": {
+      "comment": "Volume is set by Vespertine's digital volume",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በVespertine"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في Vespertine"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ve Vespertine"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I Vespertine"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Vespertine"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Στο Vespertine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Vespertine"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در Vespertine"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertinessa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sa Vespertine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Vespertine"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineમાં"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cikin Vespertine"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ב־Vespertine"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine में"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine-ben"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di Vespertine"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Vespertine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineで調整"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನಲ್ಲಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine에서"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ൽ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine मध्ये"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dalam Vespertine"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I Vespertine"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Vespertine"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਵਿੱਚ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "W Vespertine"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Vespertine"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Vespertine"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "În Vespertine"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I Vespertine"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ndani ya Vespertine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-இல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine‌లో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ใน Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine’de"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У Vespertine"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine میں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trong Vespertine"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 Vespertine 控制"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 Vespertine 控制"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 Vespertine 控制"
           }
         }
       }
