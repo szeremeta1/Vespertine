@@ -448,6 +448,24 @@ public final class LoopbackRunner: @unchecked Sendable {
 
     deinit { try? FileManager.default.removeItem(at: directory) }
 
+    /// Unmutes `device` and sets its volume to full; returns what puts the old levels back.
+    static func openUp(_ device: AudioObjectID) -> () -> Void {
+        var undo: [() -> Void] = []
+        for element in [kAudioObjectPropertyElementMain, 1, 2] {
+            let mute = AudioObjectPropertyAddress.output(kAudioDevicePropertyMute, element: element)
+            if HAL.has(device, mute), HAL.isSettable(device, mute), let was = try? HAL.get(device, mute, initial: UInt32(0)), was != 0 {
+                try? HAL.set(device, mute, UInt32(0))
+                undo.append { try? HAL.set(device, mute, was) }
+            }
+            let volume = AudioObjectPropertyAddress.output(kAudioDevicePropertyVolumeScalar, element: element)
+            if HAL.has(device, volume), HAL.isSettable(device, volume), let was = try? HAL.get(device, volume, initial: Float32(1)), was < 1 {
+                try? HAL.set(device, volume, Float32(1))
+                undo.append { try? HAL.set(device, volume, was) }
+            }
+        }
+        return { for step in undo.reversed() { step() } }
+    }
+
     /// Runs `cases` one after the other, calling `progress` before each. Puts both devices back on the rate they had.
     public func run(_ cases: [LoopbackCase], mode: LoopbackMode, appVersion: String,
                     progress: (Int, LoopbackCase) -> Void = { _, _ in },
@@ -455,6 +473,10 @@ public final class LoopbackRunner: @unchecked Sendable {
         if LoopbackGuard.inUseByOthers(output.id) { throw LoopbackError.inUse(output.name) }
         let originalRates = Set([output.id, inputDevice]).map { ($0, (try? HAL.get($0, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0) }
         defer { for (device, rate) in originalRates where rate > 0 { try? DeviceControl.setNominalRate(rate, on: device) } }
+        // A muted or turned-down loopback device records silence or scaled samples, which read as a setup problem or a
+        // failure that isn't Vespertine's. It's a virtual device (the guard above), so it's safe to open it up for the run.
+        let restoreLevels = Self.openUp(output.id)
+        defer { restoreLevels() }
         var results: [LoopbackCaseResult] = []
         for (i, c) in cases.enumerated() {
             progress(i, c)
