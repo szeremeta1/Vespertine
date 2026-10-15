@@ -245,4 +245,6 @@ void nrt_context_render_interleaved(NRTRenderContext *_Nonnull ctx, float *_Nonn
 }
 #endif
 
+#include "CVespertineMeasure.h"   // so Swift sees it: this header is the module's umbrella
+
 #endif
