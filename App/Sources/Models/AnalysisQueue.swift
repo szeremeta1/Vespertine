@@ -16,8 +16,12 @@ final class AnalysisQueue {
     private let settings: AppSettings
     private let shares: NetworkShareManager
 
-    private var pending: [Track] = []
-    /// The paths in `pending`, so asking whether a track is queued doesn't walk the queue: done for every track a
+    /// Files waiting their turn, in two lines that drain side by side: files on this Mac (limited by the processor)
+    /// and files on network shares (limited by the network, and paused while music plays from a share). One line
+    /// made a library of both take turns, so a share's slow reads held back the local files queued behind them.
+    private var pendingLocal = TrackQueue()
+    private var pendingNetwork = TrackQueue()
+    /// The paths in both lines, so asking whether a track is queued doesn't walk the queue: done for every track a
     /// scan offers, that was minutes on the main thread with a large library waiting to be analyzed. Kept up to date
     /// by hand (one insert or remove as a track starts), not rebuilt on every change: rebuilding it for each track
     /// taken off a queue of tens of thousands made draining the queue quadratic.
@@ -26,14 +30,18 @@ final class AnalysisQueue {
     /// queue (it runs after every finished track). Nil once tracks are added: they haven't been looked at yet.
     @ObservationIgnored private var clearedOffline: Set<Int64>?
     private(set) var active: Set<String> = []     // file paths being analyzed
+    /// Analyses in flight that read over the network (a share file with a complete local copy reads from disk).
     private var activeNetwork = 0
     private(set) var completed = 0
     private(set) var batchTotal = 0
     private(set) var failures = 0
     /// Bumped after every saved result so views reload what they show.
     private(set) var revision = 0
-    /// Local files are limited by the processor; two at a time leaves room for everything else.
-    private let localWidth = 2
+    /// Local files are limited by the processor: half its cores (two to six) leaves room for everything else, and two
+    /// in Low Power Mode. Each analysis is one thread decoding and measuring, at utility priority.
+    private var localWidth: Int {
+        ProcessInfo.processInfo.isLowPowerModeEnabled ? 2 : max(2, min(6, ProcessInfo.processInfo.activeProcessorCount / 2))
+    }
     /// Network files: a few reads in flight hide the round trips; playback always comes first.
     private let networkWidth = 3
     /// Set by the app: whether playback is playing or starting a track from a network share.
@@ -52,6 +60,8 @@ final class AnalysisQueue {
     private var loops: [Task<Void, Never>] = []
     /// Set by Stop: analyses that stood aside for playback aren't queued again. Cleared when analysis is asked for.
     @ObservationIgnored private var stopped = false
+    /// Bumped by Stop, so a library query still running when Stop is pressed doesn't queue its results afterwards.
+    @ObservationIgnored private var generation = 0
 
     /// Read by analysis threads: true while network analysis must stand aside for playback.
     private let gate = AnalysisGate()
@@ -81,8 +91,8 @@ final class AnalysisQueue {
         })
     }
 
-    var isRunning: Bool { !active.isEmpty || !pending.isEmpty }
-    var remaining: Int { pending.count + active.count }
+    var isRunning: Bool { !active.isEmpty || !pendingLocal.isEmpty || !pendingNetwork.isEmpty }
+    var remaining: Int { pendingLocal.count + pendingNetwork.count + active.count }
 
     func isAnalyzing(_ track: Track) -> Bool {
         active.contains(track.filePath) || pendingPaths.contains(track.filePath)
@@ -90,40 +100,74 @@ final class AnalysisQueue {
 
     /// Analyzes these tracks next (e.g. the one shown in the inspector), ahead of background work.
     func analyzeNow(_ tracks: [Track]) {
-        let files = tracks.filter { $0.isLossless && !$0.isDSD }
-        let paths = Set(files.map(\.filePath))
-        pending.removeAll { paths.contains($0.filePath) }
-        pending.insert(contentsOf: files.filter { !active.contains($0.filePath) }, at: 0)
+        var seen = Set<String>()
+        let files = tracks.filter { $0.isLossless && !$0.isDSD && seen.insert($0.filePath).inserted }
+        guard !files.isEmpty else { return }
+        // Those already queued move to the front; they're in the batch's count already.
+        let added = files.count { !active.contains($0.filePath) && !pendingPaths.contains($0.filePath) }
+        pendingLocal.removeAll { seen.contains($0.filePath) }
+        pendingNetwork.removeAll { seen.contains($0.filePath) }
+        let waiting = files.filter { !active.contains($0.filePath) }
+        pendingLocal.prepend(waiting.filter { !shares.isNetwork($0) })
+        pendingNetwork.prepend(waiting.filter(shares.isNetwork))
         clearedOffline = nil
         rebuildPendingPaths()
-        start(adding: files.count)
+        start(adding: added)
     }
 
-    /// Queues everything that has no current analysis (new, changed, or analyzed by an older version).
-    /// Shares analyzed by their server are left to the server.
-    func analyzeLibrary(includeNetwork: Bool? = nil) {
-        // Results an analyzer update can judge from their measurements (done at launch) aren't queued to be read again.
-        guard library.analysesJudged else {
-            Task { [weak self] in
-                await self?.library.storedAnalysesJudged()
-                self?.analyzeLibrary(includeNetwork: includeNetwork)
-            }
-            return
+    /// Analyzes the songs of a selection that have no current result, ahead of background work; a selection that is
+    /// all analyzed already is analyzed again (it was asked for). A single song is always analyzed again.
+    func analyze(_ tracks: [Track]) {
+        let files = tracks.filter { $0.isLossless && !$0.isDSD }
+        guard files.count > 1 else { analyzeNow(files); return }
+        let ids = Set(files.compactMap(\.id)), database = library.database, generation = generation
+        Task { [weak self] in
+            await self?.library.storedAnalysesJudged()
+            let needed = await Task.detached(priority: .userInitiated) {
+                (try? database.tracksNeedingAnalysis(among: ids)) ?? []
+            }.value
+            guard let self, self.generation == generation else { return }
+            self.analyzeNow(needed.isEmpty ? files : needed)
         }
+    }
+
+    /// Queues everything that has no current analysis (new, changed, or analyzed by an older version). Shares
+    /// analyzed by their server are left to the server. `includeNetwork`: nil follows the setting (automatic
+    /// analysis); Analyze Library asks for the shares too, since that's what pressing it means.
+    func analyzeLibrary(includeNetwork: Bool? = nil) {
         let network = includeNetwork ?? settings.analyzeNetworkShares
-        var excluded = serverIndexed
-        if !network { excluded.formUnion(library.sources.filter(\.isNetwork).compactMap(\.id)) }
-        guard let tracks = try? library.database.tracksNeedingAnalysis(excludingSources: excluded) else { return }
-        let fresh = tracks.filter { t in !isAnalyzing(t) }
-        pending.append(contentsOf: fresh)
+        let database = library.database, generation = generation
+        Task { [weak self] in
+            // Results an analyzer update can judge from their measurements (done at launch) aren't queued to be read again.
+            await self?.library.storedAnalysesJudged()
+            guard let self, self.generation == generation else { return }
+            var excluded = self.serverIndexed
+            if !network { excluded.formUnion(self.library.sources.filter(\.isNetwork).compactMap(\.id)) }
+            // Off the main thread: on a large library this query and its tens of thousands of rows took seconds.
+            let tracks = await Task.detached(priority: .utility) { [excluded] in
+                try? database.tracksNeedingAnalysis(excludingSources: excluded)
+            }.value
+            guard let tracks, self.generation == generation else { return }
+            self.enqueue(tracks)
+        }
+    }
+
+    /// Adds tracks at the back of their lines, skipping any already queued or in flight.
+    private func enqueue(_ tracks: [Track]) {
+        var fresh: [Track] = []
+        for t in tracks where !active.contains(t.filePath) && pendingPaths.insert(t.filePath).inserted { fresh.append(t) }
+        guard !fresh.isEmpty else { return }
+        pendingLocal.append(fresh.filter { !shares.isNetwork($0) })
+        pendingNetwork.append(fresh.filter(shares.isNetwork))
         clearedOffline = nil
-        rebuildPendingPaths()
         start(adding: fresh.count)
     }
 
     func cancel() {
         stopped = true
-        pending.removeAll()
+        generation += 1
+        pendingLocal.removeAll()
+        pendingNetwork.removeAll()
         rebuildPendingPaths()
         if active.isEmpty { batchTotal = 0; completed = 0 }
     }
@@ -160,11 +204,13 @@ final class AnalysisQueue {
             library.analysisSaved()
         }
         // Anything queued for a share its server now covers doesn't need to be read over the network.
-        pending.removeAll { $0.sourceId.map(indexed.contains) ?? false }
+        pendingNetwork.removeAll { $0.sourceId.map(indexed.contains) ?? false }
         rebuildPendingPaths()
     }
 
-    private func rebuildPendingPaths() { pendingPaths = Set(pending.map(\.filePath)) }
+    private func rebuildPendingPaths() {
+        pendingPaths = Set(pendingLocal.elements.map(\.filePath)).union(pendingNetwork.elements.map(\.filePath))
+    }
 
     private func start(adding count: Int) {
         stopped = false
@@ -190,45 +236,46 @@ final class AnalysisQueue {
         // only walked when a share has gone offline since the last pass or tracks were added, not after every track.
         let offline = Set(library.sources.filter { $0.isNetwork && !shares.status(of: $0).isConnected }.compactMap(\.id))
         if !offline.isEmpty, !(clearedOffline.map { offline.isSubset(of: $0) } ?? false) {
-            let queued = pending.count
-            pending.removeAll { $0.sourceId.map(offline.contains) ?? false }
-            if pending.count != queued {
-                completed += queued - pending.count
+            let queued = pendingNetwork.count
+            pendingNetwork.removeAll { $0.sourceId.map(offline.contains) ?? false }
+            if pendingNetwork.count != queued {
+                completed += queued - pendingNetwork.count
                 rebuildPendingPaths()
             }
         }
         clearedOffline = offline
-        while let index = nextStartable() {
-            let next = pending.remove(at: index)
+        while let next = takeNext() {
             pendingPaths.remove(next.filePath)
             let network = shares.isNetwork(next)
-            active.insert(next.filePath)
-            if network { activeNetwork += 1 }
             let url = next.fileURL, path = next.filePath
             let resolved = network ? (shares.cache.localURL(forKey: NetworkCache.key(for: next)) ?? url) : url
             let readsNetwork = network && resolved == url
-            let gate = gate
+            active.insert(path)
+            if readsNetwork { activeNetwork += 1 }
+            let gate = gate, database = library.database
             Task {
                 // On a GCD thread rather than the Swift concurrency pool: reading a file over a share can block for as
-                // long as the server takes, and blocked pool threads would stall every other task in the app.
+                // long as the server takes, and blocked pool threads would stall every other task in the app. The
+                // result is saved there too, so the main thread only counts it.
                 let outcome = await withCheckedContinuation { (continuation: CheckedContinuation<Result<FileAnalysis, Error>, Never>) in
                     Self.analysisThreads.async {
-                        continuation.resume(returning: Result { try FileAnalyzer.analyze(url: resolved, shouldContinue: readsNetwork ? { !gate.isBusy } : nil) })
+                        let result = Result { try FileAnalyzer.analyze(url: resolved, shouldContinue: readsNetwork ? { !gate.isBusy } : nil) }
+                        if case .success(let analysis) = result { try? database.saveAnalysis(analysis, filePath: path) }
+                        continuation.resume(returning: result)
                     }
                 }
                 active.remove(path)
-                if network { activeNetwork -= 1 }
+                if readsNetwork { activeNetwork -= 1 }
                 switch outcome {
-                case .success(let result):
-                    try? library.database.saveAnalysis(result, filePath: path)
+                case .success:
                     completed += 1
                     revision += 1
                     library.analysisSaved()
                 case .failure(AnalysisError.cancelled):
                     // Stood aside for playback: try again later, unless analysis was stopped meanwhile.
                     guard !stopped else { break }
-                    pending.append(next)
-                    pendingPaths.insert(next.filePath)
+                    pendingNetwork.append([next])
+                    pendingPaths.insert(path)
                     clearedOffline = nil
                 case .failure:
                     failures += 1
@@ -240,37 +287,52 @@ final class AnalysisQueue {
         }
     }
 
-    /// How many share files at the front of the queue are checked for a cached copy when only local slots are free.
+    /// How many share files at the front of their line are checked for a cached copy when only local slots are free.
     private static let cachedLookahead = 16
 
-    /// The first pending track that may start now: separate limits for local and network files,
-    /// and no network reads while music plays from a share.
-    private func nextStartable() -> Int? {
-        let localActive = active.count - activeNetwork
-        let networkFree = !gate.isBusy && activeNetwork < networkWidth, localFree = localActive < localWidth
-        guard networkFree || localFree else { return nil }
-        // Both kinds of slot free: whatever is first can start, cached or not.
-        if networkFree && localFree { return pending.isEmpty ? nil : 0 }
-        if !networkFree {
-            // Only local slots: a local file needs no lookup. Share files can start only from a cached copy, and
-            // finding one hashes the track and checks the disk, so only the front of the queue is looked at; a
-            // queue of thousands of share files isn't hashed on the main thread every time a local file finishes.
-            var looked = 0
-            for (index, t) in pending.enumerated() {
-                guard shares.isNetwork(t) else { return index }
-                guard looked < Self.cachedLookahead else { continue }
-                looked += 1
-                if shares.cache.localURL(forKey: NetworkCache.key(for: t)) != nil { return index }
+    /// The next track that may start now: local files while local slots are free (then share files with a complete
+    /// local copy, which read from disk too), and share files while network slots are free and no music plays from a share.
+    private func takeNext() -> Track? {
+        if active.count - activeNetwork < localWidth {
+            if let t = pendingLocal.popFirst() { return t }
+            // Finding a cached copy hashes the track and checks the disk, so only the front of the line is looked at;
+            // a line of thousands of share files isn't hashed on the main thread every time a local file finishes.
+            if let i = pendingNetwork.elements.prefix(Self.cachedLookahead).firstIndex(where: {
+                shares.cache.localURL(forKey: NetworkCache.key(for: $0)) != nil
+            }) {
+                return pendingNetwork.remove(at: i)
             }
-            return nil
         }
-        return pending.firstIndex { t in
-            guard shares.isNetwork(t) else { return localFree }
-            // A local cached copy doesn't touch the network.
-            if shares.cache.localURL(forKey: NetworkCache.key(for: t)) != nil { return localFree }
-            return networkFree
-        }
+        if !gate.isBusy && activeNetwork < networkWidth { return pendingNetwork.popFirst() }
+        return nil
     }
+}
+
+/// A line of tracks: taking from the front is constant time (a plain array shifted every element along each time,
+/// which over a queue of tens of thousands added up to minutes of the main thread).
+struct TrackQueue {
+    private var items: [Track] = []
+    private var head = 0
+
+    var isEmpty: Bool { head == items.count }
+    var count: Int { items.count - head }
+    /// What's waiting, front first. Indices are the array's, as `remove(at:)` takes them.
+    var elements: ArraySlice<Track> { items[head...] }
+
+    mutating func popFirst() -> Track? {
+        guard head < items.count else { return nil }
+        let first = items[head]
+        head += 1
+        // Drop what's been taken once it's most of the array, so memory follows what's waiting.
+        if head > 1024 && head * 2 > items.count { items.removeFirst(head); head = 0 }
+        return first
+    }
+
+    mutating func remove(at index: Int) -> Track { items.remove(at: index) }
+    mutating func append(_ tracks: [Track]) { items.append(contentsOf: tracks) }
+    mutating func prepend(_ tracks: [Track]) { items.replaceSubrange(items.startIndex..<head, with: tracks); head = 0 }
+    mutating func removeAll(where shouldRemove: (Track) -> Bool) { items = items[head...].filter { !shouldRemove($0) }; head = 0 }
+    mutating func removeAll() { items = []; head = 0 }
 }
 
 /// A flag analysis threads poll between chunks (lock-protected, readable from any thread).

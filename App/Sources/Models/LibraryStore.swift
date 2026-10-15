@@ -551,12 +551,13 @@ final class LibraryStore {
         revision += 1   // play counts in lists and the inspector
     }
 
-    /// A saved analysis changes verdict tags in lists; refresh them at most every couple of seconds.
+    /// A saved analysis changes verdict tags in lists; refresh them at most every few seconds. Each refresh reloads the
+    /// page shown (all of Songs, on that page), so a batch analyzing several files a second refreshes less often.
     func analysisSaved() {
         guard !analysisRefreshPending else { return }
         analysisRefreshPending = true
         Task { @MainActor in
-            try? await Task.sleep(for: .seconds(2))
+            try? await Task.sleep(for: .seconds(5))
             analysisRefreshPending = false
             revision += 1
         }

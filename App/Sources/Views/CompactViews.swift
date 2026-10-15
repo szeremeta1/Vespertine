@@ -315,7 +315,7 @@ struct LibrarySettings: View {
                     .disabled(!s.autoAnalyze)
                 HStack {
                     Button(model.analysis.isRunning ? String(localized: "Stop", comment: "Stops the library analysis") : String(localized: "Analyze Library Now")) {
-                        if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
+                        if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary(includeNetwork: true) }
                     }
                     if model.analysis.isRunning {
                         ProgressView(value: Double(model.analysis.completed), total: Double(max(1, model.analysis.batchTotal))).frame(width: 120)
@@ -331,8 +331,11 @@ struct LibrarySettings: View {
             } header: {
                 Text("Analysis")
             } footer: {
-                Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full, except shares whose server runs vespertine-analyze: their results come from the server, without reading the music over the network.")
-                    .font(.caption).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Checks each lossless file for zero-padded bits, upsampling, lossy origins and synthesized (\u{201C}enhanced\u{201D}) high frequencies, in the background. Results are saved; unchanged files are never analyzed twice. Network shares are left out by default because each file is read in full, except shares whose server runs vespertine-analyze: their results come from the server, without reading the music over the network.")
+                    Text("Analyze Library Now includes network shares, and pauses while music plays from one.")
+                }
+                .font(.caption).foregroundStyle(.secondary)
             }
             Section("Library data") {
                 LabeledContent("Location") {

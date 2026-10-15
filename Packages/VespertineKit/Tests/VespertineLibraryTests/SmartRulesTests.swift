@@ -199,6 +199,20 @@ struct SmartRulesTests {
         #expect(try db.tracksNeedingAnalysis().isEmpty)
     }
 
+    @Test("Analyzing a selection queues only its songs without a current result")
+    func selectionNeedingAnalysis() async throws {
+        let (db, dir) = try await library()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let tracks = try db.allTracks()
+        let done = try #require(tracks.first { $0.filePath.hasSuffix("a48.wav") })
+        let other = try #require(tracks.first { $0.filePath.hasSuffix("b441.wav") })
+        try db.saveAnalysis(try FileAnalyzer.analyze(url: done.fileURL), filePath: done.filePath)
+        let chosen = Set([done, other].compactMap(\.id))
+        #expect(try db.tracksNeedingAnalysis(among: chosen).map(\.id) == [other.id])
+        #expect(try db.tracksNeedingAnalysis(among: []).isEmpty)
+        #expect(try db.tracksNeedingAnalysis().count == 2)
+    }
+
     @Test("A re-read restores a verdict the track lost while its stored analysis still holds")
     func rereadRestoresLostVerdict() async throws {
         let dir = try tempDir()

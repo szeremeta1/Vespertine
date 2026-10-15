@@ -833,8 +833,8 @@ public extension LibraryDatabase {
     }
 
     /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
-    /// analyzed by an older version). One track per file.
-    public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = []) throws -> [Track] {
+    /// analyzed by an older version). One track per file. `among`: only these tracks (a selection).
+    public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = [], among ids: Set<Int64>? = nil) throws -> [Track] {
         try writer.read { db in
             let rows = try Track.fetchAll(db, sql: """
                 SELECT t.* FROM track t LEFT JOIN analysis a ON a.trackId = t.id
@@ -843,7 +843,10 @@ public extension LibraryDatabase {
                 ORDER BY t.addedAt DESC
                 """, arguments: [FileAnalysis.currentVersion])
             var seen = Set<String>()
-            return rows.filter { !excluded.contains($0.sourceId ?? -1) && seen.insert($0.filePath).inserted }
+            return rows.filter { track in
+                guard ids?.contains(track.id ?? -1) ?? true else { return false }
+                return !excluded.contains(track.sourceId ?? -1) && seen.insert(track.filePath).inserted
+            }
         }
     }
 

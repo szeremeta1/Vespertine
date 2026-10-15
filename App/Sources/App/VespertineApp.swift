@@ -94,7 +94,7 @@ struct VespertineCommands: Commands {
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
             Button(model.analysis.isRunning ? String(localized: "Stop Analyzing") : String(localized: "Analyze Library")) {
-                if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary() }
+                if model.analysis.isRunning { model.analysis.cancel() } else { model.analysis.analyzeLibrary(includeNetwork: true) }
             }
             .keyboardShortcut("a", modifiers: [.command, .option])
         }

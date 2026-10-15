@@ -28,6 +28,8 @@ struct TrackTable: View {
     /// The selected songs, each with which of its copies in the list it is (a playlist can hold a song twice), so a
     /// change to the list selects the same entries again, not every copy of them.
     @State private var selectedEntries: [Int64: Set<Int>] = [:]
+    /// A selection this table set itself, to follow the app's (`mirror`), not one made by clicking it.
+    @State private var mirrored: Set<Int64>?
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
     @State private var sorted = SortedRows()
 
@@ -97,8 +99,10 @@ struct TrackTable: View {
             .width(min: 150, ideal: 190)
 
             TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
-                FavoriteCell(model: model, track: row.track,
-                             emphasized: selection.contains(row.id) || model.player.current?.track.id == row.track.id)
+                // Selected rows show the heart through the row's own highlight (FavoriteCell), not by reading the
+                // selection here: that redrew every row of the table on each click, which on a large library lagged
+                // behind Shift- and Command-clicks.
+                FavoriteCell(model: model, track: row.track, emphasized: model.player.current?.track.id == row.track.id)
             }
             .width(22)
 
@@ -119,21 +123,24 @@ struct TrackTable: View {
             guard let first = ids.first, let index = rows.firstIndex(where: { $0.id == first }) else { return }
             model.player.play(rows.map(\.track), startAt: index)
         }
-        .onAppear { selection = Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id)) }
+        .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id))) }
         .onChange(of: model.selectedTrackIDs) { _, new in
             let selectedTracks = Set(rows.filter { selection.contains($0.id) }.compactMap { $0.track.id })
             guard selectedTracks != new else { return }
-            let visible = Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id))
-            if visible != selection { selection = visible }
+            mirror(Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id)))
         }
         .onChange(of: tracks) {
             // Rows are numbered by their place in the list: when the list changes (a scan adds a song above), select the
             // same entries again rather than the same places, or Play, Return and Remove would act on whatever moved there.
-            let same = Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) })
-            if same != selection { selection = same }
+            mirror(Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) }))
         }
         .onChange(of: selection) { _, new in
             selectedEntries = Self.entries(new, in: rows.map { ($0.id, $0.track.id) })
+            // Only a selection made here is the app's new selection. Pages kept alive underneath (Favorites under an
+            // album, Songs under search results) follow the selection too; when they wrote back their share of it, a
+            // Shift- or Command-click selection on the page in front shrank to the songs both pages list.
+            defer { mirrored = nil }
+            guard new != mirrored else { return }
             model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
@@ -146,6 +153,13 @@ struct TrackTable: View {
 }
 
 extension TrackTable {
+    /// Selects `rows` to follow the app's selection (or keep it across a reload), without making it the app's selection.
+    private func mirror(_ rows: Set<Int64>) {
+        guard rows != selection else { return }
+        mirrored = rows
+        selection = rows
+    }
+
     /// Each selected row (of rows in the order shown, with their songs' IDs) as its song and which copy of it it is.
     static func entries(_ selected: Set<Int64>, in rows: [(row: Int64, song: Int64?)]) -> [Int64: Set<Int>] {
         var copies: [Int64: Int] = [:], entries: [Int64: Set<Int>] = [:]
@@ -241,7 +255,9 @@ struct TrackMenu: View {
             model.showInspector = true
         }
         Button("Analyze Bit Depth & Spectrum") {
-            model.selectedTrackIDs = Set(tracks.prefix(1).compactMap(\.id))
+            // Every chosen song, not just the first: the inspector shows the first and the batch's progress.
+            model.analysis.analyze(tracks)
+            model.selectedTrackIDs = Set(tracks.compactMap(\.id))
             model.inspectorTab = .analysis
             model.showInspector = true
         }
