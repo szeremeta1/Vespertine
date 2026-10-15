@@ -110,7 +110,9 @@ public enum FormatPlanner {
     /// Order of preference when the exact rate is unavailable:
     ///  1. the smallest integer multiple of the source rate (same family: 44.1 → 88.2)
     ///  2. the smallest rate above the source
-    ///  3. the largest integer divisor of the source (384 → 192)
+    ///  3. the largest integer divisor of the source (384 → 192), unless it would give up more than half the
+    ///     device's top rate: 176.4 kHz on a 96 kHz-max DAC goes to 96, not 44.1, which would cut everything
+    ///     above 22 kHz
     ///  4. the highest rate the device offers
     public static func chooseRate(for rate: Double, device: DeviceCapabilities, policy: RatePolicy) -> Double {
         let rates = device.sampleRates
@@ -128,8 +130,9 @@ public enum FormatPlanner {
         if device.supports(rate: rate) { return rate }
         if let multiple = rates.first(where: { SampleRate.isIntegerMultiple($0, of: rate) }) { return multiple }
         if let above = rates.first(where: { $0 > rate }) { return above }
-        if let divisor = rates.last(where: { SampleRate.isIntegerMultiple(rate, of: $0) }) { return divisor }
-        return rates.last!
+        let highest = rates.max()!
+        if let divisor = rates.last(where: { SampleRate.isIntegerMultiple(rate, of: $0) }), divisor * 2 >= highest { return divisor }
+        return highest
     }
 
     /// "Match 16-bit sources": a 16-bit file goes to a DAC that offers a real 16-bit mode at its rate as 16-bit,

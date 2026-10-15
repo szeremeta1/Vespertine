@@ -18,11 +18,27 @@ private func caps(_ rates: [Double], depths: [Int] = [16, 24, 32], dop: Bool = f
 private let k11 = caps([44_100, 48_000, 88_200, 96_000, 176_400, 192_000, 352_800, 384_000])
 /// AirPods Max on USB-C: 24-bit / 48 kHz only.
 private let airPodsMax = caps([48_000], depths: [24])
+/// UGREEN CM450 (read 2026-10-15): 44.1, 48, 96, 192 and 384 kHz, none of 88.2 / 176.4 / 352.8.
+private let cm450 = caps([44_100, 48_000, 96_000, 192_000, 384_000])
 /// A 192 kHz-max DAC.
 private let dac192 = caps([44_100, 48_000, 88_200, 96_000, 176_400, 192_000])
 
 @Suite("FormatPlanner")
 struct FormatPlannerTests {
+    @Test("A DAC without the 44.1 family's high rates converts up to the next rate, never down")
+    func missingHighFortyFourFamily() {
+        for (source, expected) in [(88_200.0, 96_000.0), (176_400, 192_000), (352_800, 384_000)] {
+            let plan = FormatPlanner.plan(source: pcm(source), device: cm450)
+            #expect(plan.deviceSampleRate == expected)
+            #expect(plan.resamples)
+        }
+        #expect(!FormatPlanner.plan(source: pcm(44_100, 16), device: cm450).resamples)
+        let dsd = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        let plan = FormatPlanner.plan(source: dsd, device: cm450)
+        #expect(plan.dsdConvertedToPCM)
+        #expect(plan.deviceSampleRate == 384_000)
+    }
+
     @Test("Native rates are matched exactly", arguments: [44_100.0, 48_000, 88_200, 96_000, 176_400, 192_000, 352_800, 384_000])
     func matchesNative(rate: Double) {
         let plan = FormatPlanner.plan(source: pcm(rate), device: k11)
@@ -56,6 +72,19 @@ struct FormatPlannerTests {
     func downFamily() {
         #expect(FormatPlanner.plan(source: pcm(384_000), device: dac192).deviceSampleRate == 192_000)
         #expect(FormatPlanner.plan(source: pcm(352_800), device: dac192).deviceSampleRate == 176_400)
+    }
+
+    @Test("A divisor far below the device's top rate loses to the top rate")
+    func divisorKeepsBandwidth() {
+        // The KTMicro chip in UGREEN's small USB-C adapter (read 2026-10-15): 44.1, 48 and 96 kHz only.
+        let kt = caps([44_100, 48_000, 96_000], depths: [16, 24])
+        #expect(FormatPlanner.plan(source: pcm(176_400), device: kt).deviceSampleRate == 96_000)
+        #expect(FormatPlanner.plan(source: pcm(352_800), device: kt).deviceSampleRate == 96_000)
+        #expect(FormatPlanner.plan(source: pcm(192_000), device: kt).deviceSampleRate == 96_000)
+        let dsd = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        #expect(FormatPlanner.plan(source: dsd, device: kt).deviceSampleRate == 96_000)
+        // A 48 kHz-max device still takes the same family's divisor.
+        #expect(FormatPlanner.plan(source: pcm(88_200), device: caps([44_100, 48_000])).deviceSampleRate == 44_100)
     }
 
     @Test("Missing low rates prefer an integer multiple (same family)")

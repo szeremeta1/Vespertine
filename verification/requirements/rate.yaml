@@ -102,9 +102,9 @@
     version: "98cad1a"
     section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate.", to: "then the device's top rate." }
   requirement: "With the match-source policy, when the source rate isn't offered but an integer multiple of it is (twice, four times, …), an integer multiple is chosen."
-  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+  quote_sha256: d168af95e0d3395226f6c374a41038c0143e4df2f92e3483821ef0bdf47a09fc
   kind: vespertine-rule
   testable: true
   gap: "\"Same rate family\" is read as an integer multiple of the source rate, since the sentence lists higher rates and integer divisors after it. The docs don't say which multiple when several are offered; tests may not require a particular one."
@@ -117,9 +117,9 @@
     version: "98cad1a"
     section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate.", to: "then the device's top rate." }
   requirement: "With the match-source policy, when neither the source rate nor an integer multiple is offered but some offered rate is higher than the source rate, a higher rate is chosen."
-  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+  quote_sha256: d168af95e0d3395226f6c374a41038c0143e4df2f92e3483821ef0bdf47a09fc
   kind: vespertine-rule
   testable: true
   gap: "Which higher rate, when several are offered, isn't said; tests may not require a particular one."
@@ -132,12 +132,12 @@
     version: "98cad1a"
     section: "line 35"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor.", to: "then an integer divisor." }
-  requirement: "With the match-source policy, when every offered rate is lower than the source rate and some offered rate divides it exactly (half, a quarter, …), such an integer divisor is chosen."
-  quote_sha256: 602af1595e6f54fc73ba4061e8858141eea2fc9da2dda1b5dae67bbf55175440
+    cache: { repo: docs/FEATURES.md, lines: 35, from: "The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate.", to: "then the device's top rate." }
+  requirement: "With the match-source policy and every offered rate below the source rate, the largest offered exact divisor at least half the highest offered rate is chosen; with no such divisor, the highest offered rate."
+  quote_sha256: d168af95e0d3395226f6c374a41038c0143e4df2f92e3483821ef0bdf47a09fc
   kind: vespertine-rule
   testable: true
-  gap: "Which divisor, when several are offered, isn't said. What happens when no offered rate is a multiple, higher, or a divisor isn't said either. Tests may not require either."
+  gap: "Which divisor, when several qualify, isn't said. What happens when no offered rate is a multiple, higher, or a divisor isn't said either. Tests may not require either. Changed 2026-10-15 (docs/FEATURES.md:35): a divisor far below the device's top rate (176.4 kHz to 44.1 kHz on a 96 kHz-max DAC) cut the bandwidth for no reason."
   interface: "contracts/rate-plan.md (chooseRate)"
 
 - id: RATE-010
