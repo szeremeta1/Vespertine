@@ -23,7 +23,7 @@ You need a Mac with Xcode and XcodeGen (`brew install xcodegen`). Vespertine run
 scripts/generate-project.sh && open Vespertine.xcodeproj
 ```
 
-The README's [Build](README.md#build) and [Try it without your own music](README.md#try-it-without-your-own-music) sections cover command-line builds, the test suites, a synthesized demo library and the command-line tools that drive the real engine.
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) covers command-line builds, the test suites, a synthesized demo library and the command-line tools that drive the real engine.
 
 ## Pull requests
 

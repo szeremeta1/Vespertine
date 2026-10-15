@@ -13,9 +13,9 @@ re-runnable. Until it has been run and its output recorded, the claim rests on t
 
 `sacd_extract` from SACD Ripper reads the disc with its own TOC parser and decodes DST with libdstdec, the
 Philips reference module (not FFmpeg's decoder, from which Vespertine's `vespertine_dst.c` is derived). The build
-on Alex's machines is "Enhanced sacd_extract" 0.3.9.3 pre-release, Linux x86-64, 2021-12-13, SHA-256
+used for this check is "Enhanced sacd_extract" 0.3.9.3 pre-release, Linux x86-64, 2021-12-13, SHA-256
 `2f3a280c73d0e8f49c5ad2071d4949e1f621a7987d758dc1123e886746c70bab` (`../SOURCES.md`). It runs on Linux, so step 2
-runs on the home server where the images are; step 1 needs macOS.
+runs on a Linux machine that holds the images; step 1 needs macOS.
 
 ## Steps (about 30 minutes per disc, most of it waiting)
 
@@ -78,5 +78,5 @@ DoP groups of the harness, and PCM from SACD goes through the same FFmpeg `dsd_m
 ## Record
 
 Commit `toc.json`, `sacd_extract-help.txt`, `sacd_extract-toc.txt` and the compare output under
-`verification/runs/sacd-<date>/` (no audio, no image). The disc names already in the docs are The Dark Side of the
+`verification/hardware/sacd-<date>/` (no audio, no image). The disc names already in the docs are The Dark Side of the
 Moon (2003; plain stereo, DST 5.1) and Brothers in Arms (20th anniversary; DST stereo, DST 5.1).

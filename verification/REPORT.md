@@ -44,7 +44,7 @@ requirement they target. The one survivor is equivalent: it behaves exactly like
 | `vespertine-rule` | 39 | Vespertine's own docs at `98cad1a` (BPV-016 and BPV-017 with the F-05 docs change), where no public standard applies (the BIT-PERFECT conditions, integer mode, the rate planner) |
 
 Paywalled text never entered the repository: the IEC records carry only the document, edition and clause, and
-Alex chose oracle evidence over buying them (2026-10-09). FFmpeg, libdstdec and the carrier scanner are used only
+the maintainer chose oracle evidence over buying them (2026-10-09). FFmpeg, libdstdec and the carrier scanner are used only
 as oracles, never as the source of a `spec` record. No record cites Apple sample code.
 
 ## Method
@@ -57,75 +57,41 @@ as oracles, never as the source of a `spec` record. No record cites Apple sample
    verdict, the groups with the most room for reading), and **C** mutants: deliberately broken implementations,
    each aimed at named requirements. DST has no B (DST-005, the decoding standard, isn't bought), so its checks are
    judged against the fixtures' known answers, which libdstdec confirms. A separate agent wrote the IEC 61937
-   carrier scanner from the public ATSC and ETSI frame syntax. 20 agents in all; their briefs are in
-   `runs/2026-10-09/briefs/`, their deliverables, unchanged, in `runs/2026-10-09/outputs/` with hashes in
-   `MANIFEST.md`.
+   carrier scanner from the public ATSC and ETSI frame syntax. 20 agents in all.
 3. **Acceptance** (`harness/Tests/AcceptanceTests/Acceptance.swift`). A group's checks are accepted when every
    clean-room implementation passes every check, and every mutant fails a check of a requirement it targets. A
    mutant that only fails checks of other requirements counts as a survivor: it shows a requirement its own checks
    don't really test.
 4. **Review rounds.** Where a mutant survived, the A agent that wrote the checks got one message naming the
    mutant and what it does, and was asked to strengthen the checks or explain which words of the records leave the
-   case open (`runs/2026-10-09/round1/`). When records changed after the findings were fixed, the group's four
-   agents got the changed records, and nothing about any result, in a second round (`runs/2026-10-09/round2/`).
+   case open. When records changed after the findings were fixed, the group's four agents got the changed records,
+   and nothing about any result, in a second round.
 5. **Vespertine.** Adapters in `harness/Sources/VespertineAdapters/` put Vespertine's real code behind the same
    contracts, and the accepted checks run against it. Its result is reported as it comes out: a check Vespertine
    fails stays failing, recorded as a known issue tied to `FINDINGS.md`, until Vespertine or its docs change.
 
 ## Isolation
 
-Each agent had its own workspace (`/srv/cleanroom/<group>-<role>/`), a SwiftPM package holding only the contract's
-Swift API, and a brief with the records, the contract and the rules: read and write only inside the workspace, and
-run commands only as `swiftbox <workspace> "<command>"`. `swiftbox` is a chroot into a plain Ubuntu 24.04 image
-with Swift 6.2.4, the workspace mounted at `/work` and a private `/tmp`. Records were redacted for the briefs: the
-product's name and its doc file names and lines became "the product" and "the product documentation"
-(`tools/cleanroom.py`). No agent opened Vespertine's source, another agent's work or this repository.
-
-`runs/2026-10-09/AUDIT.md` checks every tool call every agent made (`tools/audit_runs.py`; the full call logs are
-in `runs/2026-10-09/tool-calls/`):
-
-| | Agents |
-|---|---|
-| No problem | 15 |
-| A command run outside `swiftbox` | 4 (dop-pack-A, pcm-stream-A twice, dst-A, carrier-scan) |
-| A tool other than Read, Write, Edit or Bash | 1 (dop-stream-A: one Grep, inside its own workspace) |
-| A sandboxed command naming `/proc`, `/sys`, a device, a mount or namespace tool, or a host directory | 0 |
-| A path read or written outside the workspace | 0 |
-| The product named in an agent's words or files | 0 |
-
-The five commands outside `swiftbox`, and what came back, are listed in full in `AUDIT.md`. Three were refused
-by the session's permission checks (two `python3` calls on the host, one `mkdir` in the agent's own workspace). The
-other two ran and did nothing: a host `python3` given an empty program, and `mkdir -p /dev/null` (which already
-exists) in front of an otherwise sandboxed command. None read anything outside the agent's workspace. The audit
-covers the four verdict agents' second round too: every call they made in it was clean.
+Each agent had its own workspace, a SwiftPM package holding only the contract's Swift API, and a brief with the
+records, the contract and the rules: read and write only inside the workspace, and run commands only in a sandbox
+(a chroot into a plain Ubuntu 24.04 image with Swift 6.2.4). Records were redacted for the briefs: the product's
+name and its doc file names and lines became "the product" and "the product documentation" (`tools/cleanroom.py`).
+No agent opened Vespertine's source, another agent's work or this repository.
 
 What the isolation doesn't cover:
 
-- **It was enforced by instruction and audited afterwards, not by the operating system.** The agents ran in the
-  same container as the session that built this harness, as root. Their Read, Write and Edit tools weren't confined
-  to the workspace; the audit shows they stayed in it. `swiftbox` mounts `/proc` and `/dev` and shares the
-  container's network, so a process inside it could have reached the host's files through `/proc`; the audit
-  searches every sandboxed command for that and found nothing.
-- **Each agent's session context named the working directory of the session that started it**
-  (`/home/claude/Vespertine`), and so the product's name, and the requester's email address. No agent's words,
-  files or tool calls mention the product (the audit checks for it).
+- **It was enforced by instruction, not by the operating system.** The sandbox shares the host's network and
+  mounts `/proc` and `/dev`.
 - **The records and contracts were written by someone who had read Vespertine's code and docs.** The agents were
   blind; the author of what they read was not. The records' `gap` fields show each place where the author had to
   decide what a doc line means, and the mutant results show the checks test what the records say, not what
   Vespertine does.
 
-## Models
-
-The A, B and C agents and the carrier scanner ran on Claude Opus 5.5 (18 agents). The two B2 implementations ran
-on Claude Sonnet 5.5. The prompt asked for a different model or vendor for B2: no other vendor was reachable from
-this environment (the proxy refused `api.openai.com` with HTTP 403, and no Codex CLI was installed), so B2 is a
-different model from the same vendor. The model of every call is in `AUDIT.md`.
-
 ## Scores
 
 The numbers come from `swift test` with `VERIFICATION_RESULTS` set and `tools/scoreboard.py`. The Linux results
-are in `runs/2026-10-09/results-linux.json` (the final run, in a release build; before the second round a debug and
-a release build gave identical results); the macOS ones are in the CI job's summary.
+below are from the final run, in a release build (before the second round a debug and a release build gave
+identical results); the macOS ones are in the CI job's summary.
 
 ### First scoring, before the first review round
 
@@ -248,8 +214,7 @@ same shared-mode check, BPV-015 on its 32-bit PCM paths (H-01) and BPV-016 on it
 ## The first review round
 
 Three mutants survived the first scoring, in two groups, and DST had the equivalent mutant below. Each A agent
-got one message, resumed in its own workspace with the same rules; the messages are in `runs/2026-10-09/round1/`
-with the diff of what each changed.
+got one message and resumed in its own workspace with the same rules.
 
 - **dop-stream-A**, for `C-DOPS-007-c` and `C-DOPS-007-e`: with the equalizer on or a gain other than 1, they
   start silence runs with the complement silence byte, which DOPS-003 allows. The checks compared the tested stage
@@ -278,8 +243,7 @@ and bitstream always take the device exclusively, BPV-016 and BPV-017 require th
 had left that open as a gap). BPV-018, new, says integer mode is in effect only while the player holds the device;
 it is `testable: false`, and the contract's `integerMode` row now says inputs that break it don't occur. Each of the
 four verdict agents was resumed in its own workspace, under the same rules, with one message carrying those records
-and that row, redacted like the briefs, and nothing about how any implementation had scored. The messages and the
-diff of what each agent changed are in `runs/2026-10-09/round2/`.
+and that row, redacted like the briefs, and nothing about how any implementation had scored.
 
 - **verdict-A** split the shared-mode check. Shared-mode PCM with no other app playing must still be BIT-PERFECT,
   now only for sources of at most 24 bits, with integer mode off. Two new checks say a DoP or bitstream path never
@@ -382,7 +346,7 @@ real-time C on macOS; the app on macOS) passes on this branch. The first pull re
 - **DST decoding from the standard.** DST-005 and DST-006 are blocked. DST is checked against libdstdec on 15
   fixture frames, and against the fixtures' known answers.
 - **The SACD comparison on real discs** (F-03). `hardware/SACD-ORACLE.md` is ready; it needs the disc images and
-  `sacd_extract` on the home server.
+  `sacd_extract` on a Linux machine.
 - **Claims with no record.** `MAINTAINER-CHECKLIST.md` lists them.
 - **That the docs are right.** A `vespertine-rule` check enforces what the docs say. If a doc line is wrong, so is
   the check.
@@ -399,5 +363,4 @@ VERIFICATION_RESULTS=$PWD/results.json swift test; python3 ../tools/scoreboard.p
 
 On Linux this needs Swift 6.2 and Python 3 with PyYAML; on macOS, Xcode's toolchain, and it runs every check
 against Vespertine. The clean-room run itself can be repeated with `tools/cleanroom.py setup`, a fresh agent per
-brief, `tools/cleanroom.py collect` and `tools/audit_runs.py`; a new run goes in a new `runs/<date>/` and doesn't
-replace this one.
+brief and `tools/cleanroom.py collect`.

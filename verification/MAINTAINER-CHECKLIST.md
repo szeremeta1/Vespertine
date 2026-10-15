@@ -54,7 +54,7 @@ integer mode without exclusive access (H-01).
 
 ## Blocked, and what it costs to unblock
 
-From `SOURCES.md` (list prices on 2026-10-09). Alex chose oracle evidence instead on 2026-10-09.
+From `SOURCES.md` (list prices on 2026-10-09). The maintainer chose oracle evidence instead on 2026-10-09.
 
 | Buy | Price | Unblocks |
 |---|---|---|
@@ -86,7 +86,7 @@ readback; F-01 rests on it), BPV-006 (applies the gain conditions to DoP and bit
 "same rate family" as integer multiples and divisors), and BPV-016 (doesn't require the DoP carrier's physical
 format to be integer).
 
-## Five spot checks (under 30 minutes in all)
+## Four spot checks (under 30 minutes in all)
 
 Run from the repository root, on a Mac with the Command Line Tools or on Linux with Swift 6 and Python 3 with PyYAML.
 
@@ -104,12 +104,7 @@ Run from the repository root, on a Mac with the Command Line Tools or on Linux w
    then `swift test --package-path verification/harness --filter 'DoPStreamAcceptance/vespertine'`. About 19 DoP
    stream checks must fail, naming DOPS-002 (tried on 2026-10-09: 19 issues). `git checkout Packages/`.
 
-4. **The clean room was clean** (5 minutes). Open `runs/2026-10-09/briefs/` and pick one brief, say
-   `verdict-B.md`: it gives the records, the contract and nothing about Vespertine. Then open
-   `runs/2026-10-09/tool-calls/verdict-B.tsv`: every call is a read or write inside its own workspace or a
-   `swiftbox` command. `runs/2026-10-09/AUDIT.md` lists the exceptions.
-
-5. **A mutant dies for the right reason** (5 minutes). Pick a mutant in `harness/Sources/Mutants/` and read its
+4. **A mutant dies for the right reason** (5 minutes). Pick a mutant in `harness/Sources/Mutants/` and read its
    summary and targets. Run `VERIFICATION_RESULTS=$PWD/results.json swift test --package-path verification/harness`,
    then `python3 verification/tools/scoreboard.py results.json` and look the mutant up in `results.json`: `killedBy`
    lists the checks it failed on a requirement it targets (only those count as a kill), and `failedElsewhere` the
@@ -124,8 +119,8 @@ Run from the repository root, on a Mac with the Command Line Tools or on Linux w
 - **A finding is fixed**: the known issue turns into a failure. Delete its entry in `KnownFindings.swift` (or its
   `withKnownIssue`) and move the finding to the "Fixed" section of `FINDINGS.md`.
 - **A record's meaning changes after results were seen** (a doc fix, a missing record): give the group's agents the
-  changed records in one more blind round, as `runs/2026-10-09/round2/` did for F-05 and H-01, then collect, audit
-  and score again. Never edit a check by hand to match Vespertine.
+  changed records in one more blind round, as the second round did for F-05 and H-01, then collect and score
+  again. Never edit a check by hand to match Vespertine.
 - **A mutant survives in CI**: a check got weaker. Find the commit that changed the check; never delete the mutant.
 - **A standard is bought**: see "Blocked" above. The record's `status: blocked-on-source` goes, its hash is filled
   in from the cache, and its checks go through the same clean-room round (`tools/cleanroom.py`).

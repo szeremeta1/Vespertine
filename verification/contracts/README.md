@@ -1,6 +1,6 @@
 # Interface contracts
 
-Each contract describes one narrow function or stage that a requirement group is tested through. The clean-room agents (see `../runs/`) receive a contract and the requirement records, and nothing else: no product name, no source code, no existing tests.
+Each contract describes one narrow function or stage that a requirement group is tested through. The clean-room agents receive a contract and the requirement records, and nothing else: no product name, no source code, no existing tests.
 
 Rules every contract follows:
 

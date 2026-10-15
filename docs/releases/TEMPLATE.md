@@ -18,6 +18,6 @@ SACD images: <any change to SACD ISO playback, and the discs or tests that check
 
 [Download the DMG](https://github.com/szeremeta1/Vespertine/releases/latest) or `brew install --cask szeremeta1/tap/vespertine`. Requires macOS 14.4+.
 
-[All features](https://github.com/szeremeta1/Vespertine/blob/main/docs/FEATURES.md) · [How it's made](https://github.com/szeremeta1/Vespertine#how-its-made) · [Privacy](https://vespertineapp.com/privacy.html)
+[All features](https://github.com/szeremeta1/Vespertine/blob/main/docs/FEATURES.md) · [Privacy](https://vespertineapp.com/privacy.html)
 
 Betas ship at most weekly; the 1.0 freeze starts November 3, 2026.

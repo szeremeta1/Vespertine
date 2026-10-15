@@ -10,8 +10,7 @@
 #
 # Environment:
 #   VESPERTINE_SIGN_IDENTITY   identity name or SHA-1 (default: "Developer ID Application: Alexander Szeremeta (<team>)";
-#                            on the laptop that's the YubiKey's (slot 9C; PIN and touch), on the hub the keychain's;
-#                            a SHA-1 picks one when both are present);
+#                            a SHA-1 picks one when a keychain and a smart card both hold it);
 #                            "-" makes a local-only ad-hoc build (no hardened runtime, runs on this Mac only)
 #   VESPERTINE_OUT / VESPERTINE_DERIVED     output and derived-data folders (default build/Release, build/DDR)
 #   VESPERTINE_VERSION / VESPERTINE_BUILD   override marketing version / build number (e.g. for update tests)
@@ -51,7 +50,7 @@ mkdir -p "${out:h}"
 keychain=(); [[ -n ${VESPERTINE_SIGN_KEYCHAIN:-} ]] && keychain=(--keychain "$VESPERTINE_SIGN_KEYCHAIN")
 # A name that matches more than one identity (two teams' certificates in one keychain) only fails at codesign, after
 # the whole build, so check it first. A SHA-1 names exactly one. No match is allowed: find-identity doesn't list a
-# YubiKey's identity, which codesign still finds (and check_team catches anything else).
+# smart card's identity, which codesign still finds (and check_team catches anything else).
 if [[ $identity != "-" && ! $identity =~ '^[0-9A-Fa-f]{40}$' ]]; then
   matches=$(security find-identity -v -p codesigning ${VESPERTINE_SIGN_KEYCHAIN:-} | grep -c "\"$identity" || true)
   (( matches <= 1 )) || { print -u2 "Signing identity \"$identity\" matches $matches identities; set VESPERTINE_SIGN_IDENTITY to the full name or SHA-1."; exit 2; }

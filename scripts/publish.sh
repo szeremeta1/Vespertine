@@ -81,7 +81,7 @@ PY
 # informational: they're told about it and offered the download page instead of a failing install.
 first_vespertine_build=27
 # The keychain lets only generate_keys read the Sparkle key without asking (it made or imported it), so a Mac with
-# nobody at the screen, like the hub, would hang at generate_appcast's prompt. Hand the tools a private copy instead,
+# nobody at the screen would hang at generate_appcast's prompt. Hand the tools a private copy instead,
 # removed on exit.
 keydir=$(mktemp -d)
 trap 'rm -P "$keydir"/key 2>/dev/null; rmdir "$keydir"' EXIT

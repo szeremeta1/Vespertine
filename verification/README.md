@@ -7,7 +7,7 @@ a paywalled standard cited only by clause and hash, an independent implementatio
 Vespertine's own rules from its docs. Nothing here changes Vespertine itself.
 
 Start with [MAINTAINER-CHECKLIST.md](MAINTAINER-CHECKLIST.md): what is proven, by which evidence, what is blocked
-and what it would cost, and five spot checks you can run in under 30 minutes. The results of the clean-room run are
+and what it would cost, and four spot checks you can run in under 30 minutes. The results of the clean-room run are
 in [REPORT.md](REPORT.md), and anything Vespertine got wrong is in [FINDINGS.md](FINDINGS.md).
 
 ## Layout
@@ -22,8 +22,7 @@ in [REPORT.md](REPORT.md), and anything Vespertine got wrong is in [FINDINGS.md]
 | `fixtures/dst/` | DST frames with the DSD they encode, confirmed against the reference decoder. |
 | `oracles/` | Independent implementations used as second opinions, and the scripts that run them. |
 | `hardware/` | Procedures that need a DAC, a loopback interface, a receiver or real discs (`LOOPBACK.md`, `IEC61937-ORACLE.md`, `SACD-ORACLE.md`), with their tools: `signals.py` makes the test signals and decides pass or fail on a capture, `probe.swift` prints what Core Audio reports for each output device, `selftest.py` shows the tools can tell right from wrong. |
-| `runs/` | Every clean-room brief, every agent's output with its hash (`MANIFEST.md`), each agent's final report, a log of every tool call it made, and the isolation audit (`AUDIT.md`). |
-| `tools/` | `check_registry.py`, `spec_cache.py`, `fetch_oracles.py`, `cleanroom.py` (sets up and collects the clean-room run), `audit_runs.py` (audits it), `scoreboard.py` (the tables in REPORT.md), the DST fixture generator. |
+| `tools/` | `check_registry.py`, `spec_cache.py`, `fetch_oracles.py`, `cleanroom.py` (sets up and collects the clean-room run), `scoreboard.py` (the tables in REPORT.md), the DST fixture generator. |
 
 ## Running it
 

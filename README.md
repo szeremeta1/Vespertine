@@ -9,11 +9,11 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It puts SACD images and extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files in one library with your stereo albums, plays them as head-tracked Spatial Audio on AirPods, and checks whether your "hi-res" files really are. The signal path shows every step from file to output, and the bit-perfect conditions and their tests are in the source for anyone to audit. Channel-for-channel output to an interface and Dolby/DTS bitstream to a receiver are experimental, untested on real receivers/multichannel DACs; reports wanted.
+Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround as head-tracked Spatial Audio on AirPods, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are.
 
 <p align="center">
-  <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+<br>
-  Signed and notarized · <a href="https://vespertineapp.com/">Website</a> · <a href="https://vespertineapp.com/privacy.html">Privacy: nothing collected</a> · <a href="#how-its-made">How it's made</a>
+  <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
+  Signed and notarized · no account, no telemetry · <a href="https://vespertineapp.com/">Website</a> · <a href="https://vespertineapp.com/privacy.html">Privacy</a>
 </p>
 
 <p align="center">
@@ -31,28 +31,27 @@ I'm Alex, a student who built Vespertine for my own SACD rips and FiiO K11. It p
   <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a FiiO K11, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
 </p>
 
-## What it does
+## Highlights
 
-- **One library for stereo and surround.** Extracted SACD tracks, DTS CDs, DTS-HD MA, TrueHD and multichannel FLAC sit alongside stereo albums. When an album has both a stereo and a surround version, each song is listed once and Vespertine plays the version that suits your output.
-- **Head-tracked Spatial Audio on AirPods** for local surround files. Atmos objects are rendered from Dolby Digital Plus; TrueHD Atmos and DTS:X play their channel bed. Surround can also be exported as binaural stereo or multichannel ALAC.
-- **A signal path you can check.** Decoding, resampling, channel mixing, gain and output format are shown for every track, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met, and when something changed the samples it says what. [Tests and hardware checks](docs/VERIFICATION.md) explain what that covers.
-- **Fake hi-res detection.** Flags 16-bit audio padded to 24, likely upsampled masters and likely lossy origin, with the measurements behind each verdict and their limits. `vespertine-analyze` runs the same analysis on a Linux server next to your files.
-- **Native rate and depth.** Switches your DAC to each file's sample rate, with exclusive (hog) mode and integer mode. PCM playback has been tested up to 384 kHz on a FiiO K11. DSD files decode from DSD64 to DSD512; DoP depends on the DAC and its carrier rate.
-- **Lossless on AirPods Max over USB-C**, shown as a 24-bit / 48 kHz device; over Bluetooth it tells you the link is AAC.
-- **A library that respects your files.** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, and a tag editor that backs up every file first. A parametric EQ imports AutoEQ and Equalizer APO presets per output; it is off by default, and when it is on the signal path says EQUALIZER.
-- **A loopback test you can run yourself.** Settings › Playback › Loopback Test… plays a test signal into a virtual device and compares every sample it gets back, catching dropped frames, gain, dither, truncation and channel swaps. Results are labelled "Loopback (software check)" and never change the BIT-PERFECT badge; they say nothing about your DAC. [What it proves](docs/LOOPBACK.md).
-- **Match 16-bit sources** (off by default) sends 16-bit files to a DAC that has a real 16-bit mode as 16-bit, instead of zero-padded to 24 or 32 bits. The samples are the same either way, and the signal path says which format the DAC took.
-- **Remembers your output.** If the DAC you chose isn't connected, it plays on the best connected output (or the Mac's sound output, or waits; your choice) and moves back when the DAC returns.
-- **In your language.** The whole interface is translated into 44 languages besides English, including Ukrainian, Arabic, Hebrew, Persian and Urdu with right-to-left layout, and Simplified, Taiwan and Hong Kong Chinese. Corrections from native speakers are welcome.
-- **A short setup on first launch.** It finds or adds your music, picks the output to remember, and sets exclusive access and ReplayGain, with what each choice does to bit-perfect playback spelled out. Everything can be changed later in Settings.
-- **NAS libraries.** Plays from local drives or SMB, NFS and WebDAV shares, with caching and Keep Offline.
-- **SACD images.** `.iso` playback (stereo and 5.1, DST-compressed or plain) straight from the image. It matched sacd_extract bit for bit on two real discs.
+- **Stereo and surround in one library.** SACD 5.1, multichannel FLAC, DTS CDs, TrueHD and DTS-HD MA sit next to your stereo albums. When an album has both versions, each song is listed once and Vespertine plays the one that suits your output.
+- **Disc images, played directly.** SACD `.iso` images (stereo and multichannel, DST or plain) and DVD-Video LPCM (`.iso` or a `VIDEO_TS` folder) play straight from the image, with nothing mounted or extracted. It matched sacd_extract bit for bit on two real discs.
+- **Spatial Audio for your own files.** Local surround plays as head-tracked Spatial Audio on AirPods, with Atmos objects rendered from Dolby Digital Plus. Surround can also be exported as binaural stereo or multichannel ALAC.
+- **A signal path you can check.** Decoding, resampling, mixing, gain and output format are shown for every track, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met, and when something changed the samples it says what. A built-in [loopback test](docs/LOOPBACK.md) checks the software path sample by sample.
+- **Native DSD.** DSF and DSDIFF from DSD64 to DSD512, including DST-compressed files, go out as DoP to DACs that take it, or convert to high-rate PCM.
+- **Fake hi-res detection.** Flags 16-bit audio padded to 24, likely upsampled masters and likely lossy sources, with the measurements behind each verdict. `vespertine-analyze` runs the same analysis on a Linux server next to your files.
 
-[All features and screenshots](docs/FEATURES.md) · [How it's made](#how-its-made)
+## Everything else
 
-## How it's made
+- **Output:** Switches your DAC to each file's sample rate, with exclusive (hog) mode, integer mode and an option to send 16-bit files as 16-bit. Remembers your DAC and falls back to the best connected output when it's unplugged. Lossless 24-bit / 48 kHz on AirPods Max over USB-C.
+- **EQ:** A 20-band parametric EQ that imports AutoEQ and Equalizer APO presets per output. It's off by default, and when it is on the signal path says EQUALIZER.
+- **Library:** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, gapless CUE-sheet albums, and favorites. Imports M3U and Apple Music playlists, play counts and favorites.
+- **Metadata:** A tag editor that backs up every file before writing, with MusicBrainz and cover art lookup.
+- **Network shares:** SMB, NFS and WebDAV, with caching and Keep Offline. Library scans step aside for the song you're playing.
+- **Everyday:** Mini player, menu-bar extra, media keys, ReplayGain, a short setup assistant, automatic updates, and an interface in 44 languages besides English, including right-to-left layouts.
 
-Claude Code and Codex wrote most of the code. I decided how the app should behave, wrote acceptance tests, and measured playback on my FiiO K11, AirPods Max over USB-C and Bluetooth, and MacBook Pro speakers. The [commit history](https://github.com/szeremeta1/Vespertine/commits/main/) and [verification guide](docs/VERIFICATION.md) are public.
+**Formats:** FLAC, ALAC, WAV, AIFF, DSF, DSDIFF, SACD ISO, DVD-Video LPCM, Dolby Digital, Dolby Digital Plus with Atmos, Dolby TrueHD, MLP, DTS, DTS-HD MA, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC, plus CUE sheets.
+
+[All features, formats and screenshots](docs/FEATURES.md)
 
 ## Compared with other Mac players
 
@@ -84,100 +83,30 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 
 ## Known limitations
 
-I've tested playback on a FiiO K11 at rates up to 384 kHz, AirPods Max over USB-C and Bluetooth, and MacBook Pro speakers. [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that coverage.
+Playback has been tested on a FiiO K11 at rates up to 384 kHz, AirPods Max over USB-C and Bluetooth, and MacBook Pro speakers. [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
 
-- Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted. Routing has automated tests and a six-channel aggregate-device check; bitstream carriers were checked with FFmpeg's S/PDIF reader.
-- Intel Macs are untested. The Intel build has run under Rosetta. DoP has only been confirmed on the FiiO K11; carrier rates above 384 kHz have not been tested on hardware.
-- SACD images have been tested on two real discs (The Dark Side of the Moon, Brothers in Arms: plain and DST stereo, DST 5.1). Discs with a 5.0 area, only a multichannel area, or DSD128 and above are covered only by synthesized images.
-- No convolution, audio effect plugins, streaming services or UPnP/DLNA renderers.
-- No DSD inside WavPack or DRM-protected Apple Music downloads. TrueHD Atmos and DTS:X objects are not rendered. TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
+- Channel-for-channel output to multichannel DACs and Dolby/DTS bitstream to receivers are experimental and untested on real hardware; reports wanted.
+- Intel Macs are untested (the Intel build has run under Rosetta). DoP is confirmed only on the FiiO K11, and carrier rates above 384 kHz are untested on hardware.
+- No convolution, audio effect plugins, streaming services or UPnP/DLNA.
+- No DVD-Audio, DSD inside WavPack or DRM-protected Apple Music downloads. TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
-## Build
+## Building
 
-```bash
-brew install xcodegen
-```
+You need Xcode and XcodeGen (`brew install xcodegen`):
 
 ```bash
 scripts/generate-project.sh && open Vespertine.xcodeproj
 ```
 
-Or build from the command line:
-
-```bash
-scripts/generate-project.sh && xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release \
-  -derivedDataPath build/DD -onlyUsePackageVersionsFromResolvedFile build
-```
-
-Run the engine and library tests, and the analysis core's (it also builds on Linux):
-
-```bash
-cd Packages/VespertineKit && swift test
-```
-
-```bash
-cd Packages/VespertineAnalysis && swift test
-```
-
-`scripts/audit.sh` runs everything above plus the app tests, sanitizer builds of the real-time C code and a release build.
-
-The FFmpeg decoders for DTS, TrueHD and DSD ship prebuilt in `Packages/VespertineKit/Vendor/FFmpegDCA.xcframework`. To rebuild them from FFmpeg's release tarball (checksum-verified, only those decoders enabled):
-
-```bash
-scripts/build-dts-decoder.sh
-```
-
-## Try it without your own music
-
-`vespertine-demo` synthesizes an original demo library of 13 fictional albums in every supported container, including DSD64, a CUE-split album and a 24-bit album with one track that is really 16-bit:
-
-```bash
-cd Packages/VespertineKit && swift run -c release vespertine-demo ~/Desktop/VespertineDemo
-```
-
-To launch against an isolated test library, so your real one is untouched:
-
-```bash
-build/DD/Build/Products/Release/Vespertine.app/Contents/MacOS/Vespertine -VespertineDataDirectory /tmp/vespertine-test -VespertineAddSource ~/Desktop/VespertineDemo
-```
-
-For Dolby, DTS and TrueHD samples, [FFmpeg's FATE suite](https://fate-suite.ffmpeg.org/) has short clips of each (`ac3/`, `eac3/`, `dts/`, `dca/`, `truehd/`), and `Packages/VespertineKit/Tests/VespertineAudioTests/Fixtures` has tone files made with FFmpeg's encoders.
-
-### Hardware verification
-
-[docs/VERIFICATION.md](docs/VERIFICATION.md) explains how to check bit-perfect playback on your own hardware. `vespertine-probe` drives the real engine against a device and reads back what Core Audio actually did (nominal rate, physical format, hog owner):
-
-```bash
-cd Packages/VespertineKit && swift build -c release --product vespertine-probe
-```
-
-```bash
-.build/release/vespertine-probe list
-```
-
-```bash
-.build/release/vespertine-probe play "FiiO K11" 3 ~/Music/a.flac ~/Music/b.flac
-```
-
-`vespertine-library` runs the same library code from the command line:
-- `find` lists folders with music;
-- `hires` lists every hi-res file;
-- `search <term>` searches tags;
-- `import --library <dir> --into <dir> <files…>` imports;
-- `enrich --library <dir> [--apply high|all]` enriches;
-- `import-server-analysis --library <dir>` imports a share's server analysis results.
-
-`gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis (`analyze-json` prints it as JSON, for comparing with `vespertine-analyze file`); `forensics <files…>` prints its raw measurements as a table; `restore-test <device>` checks the quit options that hand a device back.
-
-`scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, artists and genres, start playback or a shuffle, set any page's filters, select inspector tabs and render windows to PNG, which works even while the screen is locked.
+Run the tests with `swift test` in `Packages/VespertineKit` and `Packages/VespertineAnalysis` (the analysis core also builds on Linux), or `scripts/audit.sh` for everything. [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) covers command-line builds, a synthesized demo library, and the tools for checking playback on your own hardware.
 
 ## Contributing
 
-Bug reports, device reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [code of conduct](CODE_OF_CONDUCT.md).
+Bug reports, device reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
-GPL-3.0-or-later. See [LICENSE](LICENSE). Third-party components, with versions, sources and the FFmpeg build options, are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md): SFBAudioEngine (MIT), GRDB (MIT), Sparkle (MIT), TagLib (LGPL/MPL), libFLAC (BSD), WavPack (BSD), Monkey's Audio (BSD), libopus/libvorbis/libogg (BSD), the Musepack decoder (BSD), mpg123 (LGPL), libsndfile (LGPL), LAME (LGPL), DUMB (zlib-like), TTA (LGPL), and FFmpeg's DTS, TrueHD/MLP and DSD decoders with its DTS, TrueHD, Matroska, DSF and DSDIFF demuxers (LGPL-2.1+, built from source by `scripts/build-dts-decoder.sh`).
+GPL-3.0-or-later. See [LICENSE](LICENSE). Third-party components and their licenses are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ## Trademarks
 
