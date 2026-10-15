@@ -18,6 +18,8 @@ struct TagEditorView: View {
     @State private var mixed: Set<TagField> = []
     @State private var edited: Set<TagField> = []
     @State private var custom: [CustomTag] = []
+    /// The custom tag rows as last loaded, to tell whether `custom` has been edited since.
+    @State private var loadedCustom: [CustomTag] = []
     @State private var artwork: TagEdit.ArtworkChange?
     @State private var saving = false
     @State private var status: String?
@@ -26,7 +28,7 @@ struct TagEditorView: View {
     /// dead share hangs until it times out).
     @State private var readOnlyFiles = false
 
-    struct CustomTag: Identifiable, Hashable {
+    nonisolated struct CustomTag: Identifiable, Hashable, Sendable {
         let id = UUID()
         var key: String
         var value: String
@@ -76,7 +78,7 @@ struct TagEditorView: View {
             }
         }
         // Cheap to compare on every update, unlike the sorted list of a large selection.
-        .task(id: [ids.hashValue, ids.count, model.library.revision]) { load(ids) }
+        .task(id: [ids.hashValue, ids.count, model.library.revision]) { await load(ids) }
         .fileImporter(isPresented: $showArtworkPicker, allowedContentTypes: [.image]) { result in
             if case .success(let url) = result, let data = try? Data(contentsOf: url) { artwork = .replace(data) }
         }
@@ -348,19 +350,44 @@ struct TagEditorView: View {
     /// Shows the tags of the selection. The library changes under a selection all the time (a scan, an analysis,
     /// this editor's own save), so a reload of the same tracks keeps what you've typed and the last save's result;
     /// only the fields you haven't touched show the fresh values. A new selection, or `discardingEdits`, starts over.
-    private func load(_ ids: Set<Int64>, discardingEdits: Bool = false) {
-        let previous = tracks
-        tracks = model.library.tracks(ids: Array(ids)).sorted { ($0.discNumber ?? 0, $0.trackNumber ?? 0) < ($1.discNumber ?? 0, $1.trackNumber ?? 0) }
+    private func load(_ ids: Set<Int64>, discardingEdits: Bool = false) async {
+        // Off the main thread: ⌘A on a whole library selects thousands of songs, and fetching and comparing all their
+        // tags here held the window up for seconds (and again on each library change while the selection stayed).
+        let database = model.library.database
+        let loaded = await Task.detached(priority: .userInitiated) { Self.summarize(ids, in: database) }.value
+        guard !Task.isCancelled else { return }
+        tracks = loaded.tracks
         let fresh = discardingEdits || ids != loadedIDs
         loadedIDs = ids
         if fresh { draft = [:]; mixed = []; edited = []; artwork = nil; status = nil; checkWritable() }
         for f in TagField.allCases where !edited.contains(f) {
-            let values = Set(tracks.map { f.value(in: $0) ?? "" })
-            if values.count == 1 { draft[f] = values.first!; mixed.remove(f) } else { draft[f] = nil; mixed.insert(f) }
+            if let value = loaded.shared[f] { draft[f] = value; mixed.remove(f) } else { draft[f] = nil; mixed.insert(f) }
         }
         // Custom tags are refreshed only while they're as loaded (a new row or a changed one is yours).
-        let untouched = custom.elementsEqual(Self.customTagRows(previous)) { $0.key == $1.key && $0.value == $1.value && $0.original == $1.original }
-        if fresh || untouched { custom = Self.customTagRows(tracks) }
+        let untouched = custom.elementsEqual(loadedCustom) { $0.key == $1.key && $0.value == $1.value && $0.original == $1.original }
+        if fresh || untouched { custom = loaded.custom }
+        loadedCustom = loaded.custom
+    }
+
+    /// A selection's songs in disc and track order, the value of each tag they all share (a tag missing from the map
+    /// differs between them), and their custom tag rows.
+    private nonisolated struct Summary: Sendable {
+        var tracks: [Track]
+        var shared: [TagField: String]
+        var custom: [CustomTag]
+    }
+
+    private nonisolated static func summarize(_ ids: Set<Int64>, in database: LibraryDatabase) -> Summary {
+        let tracks = ((try? database.tracks(ids: Array(ids))) ?? [])
+            .sorted { ($0.discNumber ?? 0, $0.trackNumber ?? 0) < ($1.discNumber ?? 0, $1.trackNumber ?? 0) }
+        var shared: [TagField: String] = [:]
+        if let first = tracks.first {
+            for f in TagField.allCases {
+                let value = f.value(in: first) ?? ""
+                if tracks.allSatisfy({ (f.value(in: $0) ?? "") == value }) { shared[f] = value }
+            }
+        }
+        return Summary(tracks: tracks, shared: shared, custom: customTagRows(tracks))
     }
 
     /// One file answers for the lot: they share a source, and each check is a round trip on a share. A share added
@@ -378,7 +405,7 @@ struct TagEditorView: View {
         }
     }
 
-    private static func customTagRows(_ tracks: [Track]) -> [CustomTag] {
+    private nonisolated static func customTagRows(_ tracks: [Track]) -> [CustomTag] {
         let keys = Set(tracks.flatMap { $0.extraTags.keys }).subtracting(["LABEL", "ORGANIZATION", "PUBLISHER"]).sorted()
         return keys.map { key in
             let values = Set(tracks.map { $0.extraTags[key] ?? "" })
@@ -420,7 +447,8 @@ struct TagEditorView: View {
 
     private func revert() {
         if hasChanges {
-            load(loadedIDs ?? Set(tracks.compactMap(\.id)), discardingEdits: true)
+            let ids = loadedIDs ?? Set(tracks.compactMap(\.id))
+            Task { await load(ids, discardingEdits: true) }
         } else {
             let targets = tracks
             Task {
