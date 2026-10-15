@@ -204,16 +204,47 @@ enum DeviceQuery {
         return channels
     }
 
+    /// Names some USB DACs give their output, which say nothing about which device it is.
+    static let genericNames: Set<String> = [
+        "headphone", "headphones", "headset", "speaker", "speakers", "earphone", "earphones", "audio", "usb audio",
+        "usb audio device", "usb-c audio", "usb advanced audio device", "usb audio dac", "dac", "output", "line out",
+        "analog", "analog output", "digital output", "speaker/hp", "speaker/headphone",
+    ]
+
+    /// The name to show for a device. Cheap USB-C DACs often call their output just "Headphone" (the UGREEN CM450
+    /// does), which is useless in a device list; for those, the USB product name from the model UID is used instead
+    /// ("UGREEN CM450"), or the manufacturer is put in front of the name.
+    static func displayName(_ name: String, manufacturer: String, modelUID: String?, transport: Transport) -> String {
+        guard transport == .usb, genericNames.contains(name.trimmingCharacters(in: .whitespaces).lowercased()) else { return name }
+        // Apple's USB audio driver builds the model UID as "<product>:<vendor ID>:<product ID>".
+        var parts = (modelUID ?? "").split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+        if parts.count >= 3, parts.suffix(2).allSatisfy({ $0.count == 4 && $0.allSatisfy(\.isHexDigit) }) { parts.removeLast(2) }
+        var product = parts.joined(separator: ":").trimmingCharacters(in: .whitespaces)
+        for suffix in [" USB Audio", " USB-C Audio", " Audio"] where product.count > suffix.count
+            && product.lowercased().hasSuffix(suffix.lowercased()) {
+            product = String(product.dropLast(suffix.count)).trimmingCharacters(in: .whitespaces)
+            break
+        }
+        let vendor = manufacturer.trimmingCharacters(in: .whitespaces)
+        if !product.isEmpty, !genericNames.contains(product.lowercased()), product.lowercased() != vendor.lowercased() {
+            return vendor.isEmpty || product.localizedCaseInsensitiveContains(vendor) ? product : "\(vendor) \(product)"
+        }
+        return vendor.isEmpty || name.localizedCaseInsensitiveContains(vendor) ? name : "\(vendor) \(name)"
+    }
+
     static func snapshot(_ id: AudioObjectID, defaultID: AudioObjectID?, dopEnabledUIDs: Set<String>) -> OutputDevice? {
         guard outputChannelCount(id) > 0 else { return nil }
         let uid = HAL.getString(id, .global(kAudioDevicePropertyDeviceUID)) ?? "\(id)"
         let transport = Transport((try? HAL.get(id, .global(kAudioDevicePropertyTransportType), initial: UInt32(0))) ?? 0)
+        let manufacturer = HAL.getString(id, .global(kAudioObjectPropertyManufacturer)) ?? ""
+        let modelUID = HAL.getString(id, .global(kAudioDevicePropertyModelUID))
         return OutputDevice(
             id: id,
             uid: uid,
-            name: HAL.getString(id, .global(kAudioObjectPropertyName)) ?? String(localized: "Unknown Device"),
-            manufacturer: HAL.getString(id, .global(kAudioObjectPropertyManufacturer)) ?? "",
-            modelUID: HAL.getString(id, .global(kAudioDevicePropertyModelUID)),
+            name: displayName(HAL.getString(id, .global(kAudioObjectPropertyName)) ?? String(localized: "Unknown Device"),
+                              manufacturer: manufacturer, modelUID: modelUID, transport: transport),
+            manufacturer: manufacturer,
+            modelUID: modelUID,
             transport: transport,
             nominalSampleRate: (try? HAL.get(id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0,
             capabilities: capabilities(id, supportsDoP: dopEnabledUIDs.contains(uid)),
