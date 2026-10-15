@@ -96,6 +96,12 @@ final class PlayerController {
     /// resuming if it was paused): still the same play. Cleared by that report, or by playing something else or stopping,
     /// never by a clock, so a song seeked while paused and resumed minutes later isn't counted twice.
     @ObservationIgnored private var seekRestart: UUID?
+    /// A pause or resume the engine hasn't acted on yet: the button shows it right away, and the engine's older state
+    /// doesn't undo it. The engine thread can be stuck for a long time in one read from a slow network share after the
+    /// audio is already muted, and a second press meanwhile must resume, not pause again. Cleared once the engine
+    /// reports that state or anything other than the one it was leaving (it stopped), or when another song is started.
+    /// A resume also gives up after half a minute: unlike a pause, the engine can decline it (nothing left to resume).
+    @ObservationIgnored private var requestedState: (state: PlaybackState, from: PlaybackState, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
@@ -361,6 +367,7 @@ final class PlayerController {
 
     private func start(_ entry: QueueEntry) {
         requested = entry.id
+        requestedState = nil
         seekRestart = nil
         requestedPosition = nil
         position = 0
@@ -378,12 +385,25 @@ final class PlayerController {
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
         switch state {
-        case .playing: engine.pause()
-        case .paused: engine.resume()
+        case .playing: pause()
+        case .paused: request(.playing); engine.resume()
         case .stopped:
             if let current { start(current) }
             else if let first = queue.first { currentIndex = 0; start(first) }
         }
+    }
+
+    func pause() {
+        if waitingForDevice != nil { engine.pause(); return }
+        guard state == .playing else { return }
+        request(.paused)
+        engine.pause()
+    }
+
+    private func request(_ target: PlaybackState) {
+        requestedState = (target, state, .now)
+        state = target
+        updateNowPlayingInfo()
     }
 
     func next() {
@@ -406,7 +426,7 @@ final class PlayerController {
         requestedPosition = (seconds, .now)
     }
 
-    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; engine.stop() }
+    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; requestedState = nil; engine.stop() }
 
     func clearError() { lastError = nil }
 
@@ -488,8 +508,12 @@ final class PlayerController {
 
     private func poll() {
         let snap = engine.snapshot
-        let stateChanged = state != snap.state
-        state = snap.state
+        if let requestedState, snap.state != requestedState.from
+            || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
+            self.requestedState = nil
+        }
+        let stateChanged = requestedState == nil && state != snap.state
+        if requestedState == nil { state = snap.state }
         // Until the engine reports the song you asked for, what it says is about the previous one.
         if let requested {
             if snap.item?.id == requested || snap.state == .stopped && snap.lastError != nil { self.requested = nil }
@@ -561,7 +585,7 @@ final class PlayerController {
         Self.register(center.playCommand) { [weak self] _ in
             Task { @MainActor in if self?.state != .playing, self?.waitingForDevice == nil { self?.togglePlayPause() } }
         }
-        Self.register(center.pauseCommand) { [weak self] _ in Task { @MainActor in self?.engine.pause() } }
+        Self.register(center.pauseCommand) { [weak self] _ in Task { @MainActor in self?.pause() } }
         Self.register(center.togglePlayPauseCommand) { [weak self] _ in Task { @MainActor in self?.togglePlayPause() } }
         Self.register(center.nextTrackCommand) { [weak self] _ in Task { @MainActor in self?.next() } }
         Self.register(center.previousTrackCommand) { [weak self] _ in Task { @MainActor in self?.previous() } }
