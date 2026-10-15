@@ -30,7 +30,7 @@ struct FavoriteButton: View {
         } label: {
             Image(systemName: isOn ? "heart.fill" : "heart")
                 .font(.system(size: size, weight: .regular))
-                .foregroundStyle(isOn ? Palette.brass : hovering ? Palette.text2 : Palette.text3)
+                .rowForeground(isOn ? Palette.brass : hovering ? Palette.text2 : Palette.text3)
                 .contentTransition(.symbolEffect(.replace.downUp))
                 .symbolEffect(.bounce.up, options: .nonRepeating, value: bounce)
                 .frame(width: size + 9, height: size + 9)

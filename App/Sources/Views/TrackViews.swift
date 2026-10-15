@@ -53,11 +53,11 @@ struct TrackTable: View {
                 if model.player.current?.track.id == row.track.id, model.player.state != .stopped {
                     Image(systemName: model.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
                         .font(.system(size: 10))
-                        .foregroundStyle(Palette.brass)
+                        .rowForeground(Palette.brass)
                 } else {
                     Text(showAlbum ? "\(row.index + 1)" : number(row.track, discs: discs))
                         .font(Typeface.mono(11.5))
-                        .foregroundStyle(Palette.text3)
+                        .rowForeground(Palette.text3)
                 }
             }
             .width(discs ? 44 : 36)
@@ -65,31 +65,31 @@ struct TrackTable: View {
             TableColumn("Title", value: \.track.title) { row in
                 Text(row.track.title)
                     .font(Typeface.ui(13))
-                    .foregroundStyle(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
+                    .rowForeground(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
                     .opacity(row.track.isMissing ? 0.45 : 1)
             }
             .width(min: 160, ideal: 240)
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
-                    Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
                 }
                 .width(min: 100, ideal: 140)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
-                    Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
+                    Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
                 }
                 .width(min: 100, ideal: 150)
             }
 
             TableColumn("Format", value: \.track.sampleRate) { row in
                 HStack(spacing: 8) {
-                    Text(row.track.formatSummary).font(Typeface.mono(11)).foregroundStyle(Palette.text2)
+                    Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
                     if let other = row.track.id.flatMap({ otherVersions[$0] }) {
-                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.6).foregroundStyle(Palette.text2)
+                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.6).rowForeground(Palette.text2)
                             .padding(.horizontal, 5).padding(.vertical, 2)
                             .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                             .fixedSize()
@@ -108,7 +108,7 @@ struct TrackTable: View {
             .width(22)
 
             TableColumn("Time", value: \.track.duration) { row in
-                Text(row.track.duration.clock).font(Typeface.mono(11.5)).foregroundStyle(Palette.text3)
+                Text(row.track.duration.clock).font(Typeface.mono(11.5)).rowForeground(Palette.text3)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .width(56)
@@ -139,6 +139,7 @@ struct TrackTable: View {
             mirror(Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) }))
         }
         .onChange(of: selection) { old, new in
+            Self.focusClickedTable()
             // A plain click on one row of a multi-selection empties it in SwiftUI's table (macOS 27), where a list
             // should select just that row, as AppKit's own tables do; Shift-clicking after it then started from the top.
             if new.isEmpty, old.count > 1, let index = Self.clickedRow(), rows.indices.contains(index), old.contains(rows[index].id) {
@@ -165,16 +166,28 @@ struct TrackTable: View {
 extension TrackTable {
     /// The row under a plain click being handled now, as the table shows them (sorted), if the click is on a row.
     private static func clickedRow() -> Int? {
+        guard let event = NSApp.currentEvent, event.modifierFlags.isDisjoint(with: [.command, .shift]),
+              let table = clickedTable() else { return nil }
+        let row = table.row(at: table.convert(event.locationInWindow, from: nil))
+        return row >= 0 ? row : nil
+    }
+
+    /// The table under the click (plain, Shift or Command) being handled now, if there is one.
+    private static func clickedTable() -> NSTableView? {
         guard let event = NSApp.currentEvent, event.type == .leftMouseDown || event.type == .leftMouseUp,
-              event.modifierFlags.isDisjoint(with: [.command, .shift]),
               var view = event.window?.contentView?.hitTest(event.locationInWindow) else { return nil }
         while !(view is NSTableView) {
             guard let parent = view.superview else { return nil }
             view = parent
         }
-        let table = view as! NSTableView
-        let row = table.row(at: table.convert(event.locationInWindow, from: nil))
-        return row >= 0 ? row : nil
+        return view as? NSTableView
+    }
+
+    /// Clicking a row selects it but leaves the keyboard where it was (the sidebar), so arrow keys, Return and ⌘A went
+    /// there. A click on a table hands it the keyboard, as clicking an AppKit table does.
+    private static func focusClickedTable() {
+        guard let table = clickedTable(), let window = table.window, window.firstResponder !== table else { return }
+        window.makeFirstResponder(table)
     }
 
     /// Selects `rows` to follow the app's selection (or keep it across a reload), without making it the app's selection.
@@ -251,9 +264,9 @@ struct AnalysisTag: View {
         Text(text)
             .font(Typeface.mono(8.5, weight: .semibold))
             .letterSpacing(0.6)
-            .foregroundStyle(color)
             .padding(.horizontal, 5).padding(.vertical, 2)
-            .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(color.opacity(0.5)))
+            .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(.foreground.opacity(0.5)))
+            .rowForeground(color)
     }
 }
 

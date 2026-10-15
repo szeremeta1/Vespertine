@@ -27,6 +27,21 @@ enum Palette {
     static let brassGradient = LinearGradient(colors: [brassHi, brass], startPoint: .top, endPoint: .bottom)
 }
 
+/// Text and marks in a table row. The selected row of the list that has the keyboard is painted solid brass, and the
+/// light text and brass marks of the other columns all but vanished into it, so there they turn dark.
+struct RowForeground: ViewModifier {
+    let color: Color
+    @Environment(\.backgroundProminence) private var prominence
+
+    func body(content: Content) -> some View {
+        content.foregroundStyle(prominence == .increased ? Palette.base : color)
+    }
+}
+
+extension View {
+    func rowForeground(_ color: Color) -> some View { modifier(RowForeground(color: color)) }
+}
+
 enum Typeface {
     /// New York — names of things.
     static func serif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .serif) }
