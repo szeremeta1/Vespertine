@@ -132,10 +132,25 @@ struct MenuBarView: View {
             }
             .buttonStyle(QuietButtonStyle(compact: true))
         }
+        .foregroundStyle(Palette.text)
         .padding(16)
         .frame(width: 360)
         .background(Palette.panel)
     }
+}
+
+/// The menu bar extra's panel takes the menu bar's appearance, and `preferredColorScheme(.dark)` doesn't reach it, so in
+/// Light Mode the text and controls that use the system colors came out black on the dark panel (issue #68). Pin the
+/// panel itself to the dark appearance.
+struct DarkWindowAppearance: NSViewRepresentable {
+    final class Probe: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            window?.appearance = NSAppearance(named: .darkAqua)
+        }
+    }
+    func makeNSView(context: Context) -> NSView { Probe() }
+    func updateNSView(_ view: NSView, context: Context) {}
 }
 
 // MARK: - Settings

@@ -25,7 +25,10 @@ enum AboutPanel {
         if let url = Bundle.main.url(forResource: "Credits", withExtension: "html"),
            let html = try? NSAttributedString(url: url, options: [.documentType: NSAttributedString.DocumentType.html],
                                               documentAttributes: nil) {
-            credits.append(html)
+            // HTML import bakes in a fixed text color; use the system's so the credits read in any appearance.
+            let text = NSMutableAttributedString(attributedString: html)
+            text.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: NSRange(location: 0, length: text.length))
+            credits.append(text)
         }
         NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
