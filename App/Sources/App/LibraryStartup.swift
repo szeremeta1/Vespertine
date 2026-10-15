@@ -9,6 +9,10 @@ final class LibraryStartup {
     private var selectedDirectory: URL?
 
     init() {
+        // Vespertine is drawn dark only. Without this, whatever SwiftUI's preferredColorScheme doesn't reach (the menu
+        // bar window, popovers, alerts, open and save panels, menus, the About panel) followed the Mac's Light Mode and
+        // could show dark text on Vespertine's dark backgrounds (issue #68). Set before the migration alerts can appear.
+        NSApplication.shared.appearance = NSAppearance(named: .darkAqua)
         LegacyMigration.runIfNeeded()
         open()
     }
