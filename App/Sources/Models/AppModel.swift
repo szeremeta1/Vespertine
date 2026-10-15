@@ -211,8 +211,19 @@ final class AppModel {
             guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
             return player.state == .playing || (player.state != .paused && Date().timeIntervalSince(player.trackStartedAt) < 20)
         }
-        analysis.isStreamingPlayback = streaming
         shares.isStreamingPlayback = streaming
+        analysis.playbackShareClaim = { [weak player = self.player, weak shares = self.shares] in
+            // A song with a complete local copy reads from disk: the network is free for analysis.
+            guard let player, let shares, let track = player.current?.track, shares.isNetwork(track),
+                  !shares.cache.isAvailable(track) else { return .idle }
+            let starting = Date().timeIntervalSince(player.trackStartedAt) < 15
+            if player.state == .playing {
+                // The buffer's own signal, shared with the network cache: under a third full (or holding for more)
+                // until it's back over two thirds.
+                return starting || shares.cache.yieldsToPlayback ? .all : .streaming
+            }
+            return player.state != .paused && starting ? .all : .idle
+        }
         analysis.onServerStatus = { [weak shares = self.shares] id, status in
             Task { await shares?.serverReported(status, for: id) }
         }
