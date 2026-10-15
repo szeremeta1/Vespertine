@@ -7,6 +7,7 @@
 
 import AppKit
 import Network
+import VespertineAudio
 import VespertineLibrary
 import Observation
 import os
@@ -213,7 +214,7 @@ final class NetworkShareManager {
                     if await NetworkVolume.isResponsive(share.root(at: mount)) { unresponsive[id] = 0; continue }
                     // Slow isn't dead: a busy server can take many seconds to list a folder while it's
                     // still delivering music. Remounting then would cut off what's playing.
-                    if Date().timeIntervalSince(cache.lastTransferAt) < 30 {
+                    if Date().timeIntervalSince(max(cache.lastTransferAt, PlaybackEngine.lastShareDelivery)) < 30 {
                         shareLog.notice("share \(id, privacy: .public): slow to answer, but still transferring")
                         continue
                     }

@@ -34,6 +34,8 @@ public struct EngineSnapshot: Sendable {
     public var standingInFor: String?
     /// The track being decoded is read live from a network share (not yet from its local copy).
     public var readingFromShare = false
+    /// How full the output buffer is (0…1): decoded audio not yet played.
+    public var bufferFill: Double = 0
     /// Set while macOS itself renders the track (Dolby Atmos); there's no Vespertine signal path then.
     public var systemRendering: SystemRendering?
 }
@@ -253,25 +255,66 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var buffering = false
     private var rebuffer: (context: OpaquePointer, frames: UInt32)?
 
+    /// Read live from a network share: a file of a share with no complete local copy, or any file on a volume
+    /// macOS doesn't mark local (a share mounted in the Finder and added as a folder, a DVD folder on a share).
     private func isStreaming(_ item: PlayableItem) -> Bool {
-        item.cacheKey != nil && resolve(item) == item.url
+        let url = resolve(item)
+        return item.cacheKey != nil ? url == item.url : Self.isOnNetworkVolume(url)
     }
 
+    static func isOnNetworkVolume(_ url: URL) -> Bool {
+        var s = statfs()
+        guard statfs(url.path, &s) == 0 else { return false }
+        return s.f_flags & UInt32(MNT_LOCAL) == 0
+    }
+
+    /// A track read live from a share is decoded on a thread of its own, so a slow read holds up only that
+    /// thread, never the engine (see `ReadAheadDecoder`).
+    private static func readingAhead(_ decoder: PCMDecoding, streaming: Bool) -> PCMDecoding {
+        streaming && !(decoder is ReadAheadDecoder) ? ReadAheadDecoder(decoder) : decoder
+    }
+
+    /// When audio last arrived from a network share (a share slow to answer but still delivering isn't dead).
+    public static var lastShareDelivery: Date { ReadAheadDecoder.lastDelivery }
+
     /// Network stalls: the output callback holds in silence when a streamed track's ring runs dry
-    /// (even while the decoder is blocked in a read) and resumes once five seconds are buffered
-    /// (enough that one slow read doesn't turn into a string of stops).
+    /// (the decoder waiting on the share) and resumes once `rebufferSeconds` are buffered: five at first
+    /// (enough that one slow read doesn't turn into a string of stops), more after stalls in quick succession.
     /// Nothing is skipped, so the position stays exact. Off once the file is fully read.
     private func updateRebuffering() {
         guard let session else { buffering = false; rebuffer = nil; return }
+        let now = Date()
+        if nrt_context_take_stalls(session.context) > 0 {
+            rebufferSeconds = Self.nextRebufferSeconds(rebufferSeconds, sinceLastStall: now.timeIntervalSince(lastStallAt))
+            lastStallAt = now
+        } else if now.timeIntervalSince(lastStallAt) > Self.rebufferRelax {
+            rebufferSeconds = Self.rebufferRange.lowerBound
+        }
         let active = decoding.map { $0.streaming && !$0.finished } ?? false
-        let want = active && !draining ? UInt32(session.applied.sampleRate * 5) : 0
+        let want = active && !draining ? UInt32(session.applied.sampleRate * rebufferSeconds) : 0
         if rebuffer?.context != session.context || rebuffer?.frames != want {
             nrt_context_set_rebuffer(session.context, want)
             rebuffer = (session.context, want)
         }
         let starved = nrt_context_is_starved(session.context)
-        if starved, !buffering { log.notice("Network read stalled; holding until 5 s are buffered") }
+        if starved, !buffering {
+            log.notice("Network read stalled; holding until \(Int(self.rebufferSeconds), privacy: .public) s are buffered")
+        }
         buffering = starved
+    }
+
+    /// Seconds buffered before playback resumes after a stall, and when a stall counts as following another.
+    static let rebufferRange: ClosedRange<Double> = 5...20
+    static let rebufferRelax: TimeInterval = 120
+    private var rebufferSeconds = PlaybackEngine.rebufferRange.lowerBound
+    private var lastStallAt = Date.distantPast
+
+    /// A share that keeps stalling (a link only just fast enough) gets fewer, longer holds, not a stop every few
+    /// seconds: each stall within a minute of the last doubles what's buffered before playing on, up to 20 s.
+    /// Two minutes without one and it's back to 5 s.
+    static func nextRebufferSeconds(_ current: Double, sinceLastStall: TimeInterval) -> Double {
+        guard sinceLastStall < 60 else { return current }
+        return min(max(current, rebufferRange.lowerBound) * 2, rebufferRange.upperBound)
     }
 
     /// Shared mode: whether another app is sending sound to the same device (checked about once a second).
@@ -821,11 +864,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             actualOffset = Double(frame) / decoder.processingFormat.sampleRate
         }
         Self.alignDoPMarkers(decoder, at: session.totalWritten)
-        let decoding = try Decoding(item: item, probed: probed, decoder: decoder,
+        let streaming = isStreaming(item)
+        let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
         mark("seek+converter")
-        decoding.streaming = isStreaming(item)
+        decoding.streaming = streaming
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
                             startOffsetSeconds: actualOffset, durationSeconds: decoding.durationSeconds)]
@@ -1078,7 +1122,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard decoder.length == current.length, position >= 0, position <= decoder.length else { return nil }
         try decoder.seek(to: position)
         guard decoder.position == position else { return nil }
-        if let dop = decoder as? RawDoPDecoder, let was = current as? RawDoPDecoder { dop.nextMarker = was.nextMarker }
+        let marker = (current as? RawDoPDecoder)?.nextMarker ?? (current as? ReadAheadDecoder)?.nextDoPMarker
+        if let dop = decoder as? RawDoPDecoder, let marker { dop.nextMarker = marker }
         return (local, decoder)
     }
 
@@ -1086,7 +1131,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// frame): a DoP track starting at `ringFrame` takes up that sequence, so a gapless join never sends two
     /// 0x05 in a row (a DAC drops out of DSD for a moment, a click). A fresh buffer starts on 0x05.
     private static func alignDoPMarkers(_ decoder: PCMDecoding, at ringFrame: UInt64) {
-        (decoder as? RawDoPDecoder)?.nextMarker = AVAudioFramePosition(ringFrame & 1)
+        let marker = AVAudioFramePosition(ringFrame & 1)
+        if let ahead = decoder as? ReadAheadDecoder { ahead.nextDoPMarker = marker }
+        else { (decoder as? RawDoPDecoder)?.nextMarker = marker }
     }
 
 
@@ -1096,13 +1143,23 @@ public final class PlaybackEngine: @unchecked Sendable {
         // a share must not become an audible gap.
         let seconds = decoding?.streaming == true ? 1.5 : 0.3
         let target = min(Int(session.applied.sampleRate * seconds), Int(nrt_ring_capacity(session.ring)) / 2)
+        let giveUp = Date().addingTimeInterval(Self.prefillWait)
         // Bound work so a repeating empty/corrupt track cannot monopolize the engine thread.
-        for _ in 0..<256 {
+        var chunks = 0
+        while chunks < 256 {
             // A command waiting (another output, pause, skip) goes first: it would throw this work away,
             // and on a slow share the rest of the prefill can take seconds. Playback rebuffers as usual.
-            if session.readableFrames >= target || hasPendingCommands || !fill() { break }
+            if session.readableFrames >= target || hasPendingCommands { break }
+            if fill() { chunks += 1; continue }
+            // Read ahead from a share and nothing decoded yet: wait for it, a little at a time so a command
+            // still goes first, and not for ever (the output then starts and rebuffers).
+            guard let ahead = decoding?.decoder as? ReadAheadDecoder, Date() < giveUp else { break }
+            ahead.waitForAudio(timeout: 0.05)
         }
     }
+
+    /// How long a start waits for a share's first audio before the output starts and holds until some is buffered.
+    static let prefillWait: TimeInterval = 10
 
     /// Decodes one chunk into the ring. Returns true when it did any work.
     @discardableResult
@@ -1119,6 +1176,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
         decoding.output.frameLength = 0
         var conversionError: NSError?
+        var waiting = false
         let status = decoding.converter.convert(to: decoding.output, error: &conversionError) { requested, inputStatus in
             if decoding.inputExhausted {
                 inputStatus.pointee = .endOfStream
@@ -1127,6 +1185,11 @@ public final class PlaybackEngine: @unchecked Sendable {
             decoding.input.frameLength = 0
             do {
                 try decoding.decoder.decode(into: decoding.input, length: min(requested, decoding.input.frameCapacity))
+            } catch is ReadAheadDecoder.Starved {
+                // The share hasn't delivered the next audio yet: convert what's here, and try again shortly.
+                waiting = true
+                inputStatus.pointee = .noDataNow
+                return nil
             } catch {
                 decoding.error = error
                 decoding.inputExhausted = true
@@ -1169,7 +1232,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 emit(.failed(decoding.item, error.localizedDescription))
             }
         }
-        return true
+        // Waiting on a share with nothing new: no work done, so the engine thread rests a moment.
+        return frames > 0 || !waiting || decoding.finished
     }
 
     /// The current item is fully decoded: line up the next one gaplessly, or wait for a device change.
@@ -1207,10 +1271,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 if session.plan.isDeviceCompatible(with: plan) {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     Self.alignDoPMarkers(decoder, at: session.totalWritten)
-                    let d = try Decoding(item: next, probed: probed, decoder: decoder,
+                    let streaming = isStreaming(next)
+                    let d = try Decoding(item: next, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
-                    d.streaming = isStreaming(next)
+                    d.streaming = streaming
                     decoding = d
                     segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten,
                                             startOffsetSeconds: 0, durationSeconds: d.durationSeconds))
@@ -1262,11 +1327,12 @@ public final class PlaybackEngine: @unchecked Sendable {
                 try replaceSession(device: pending.device, plan: pending.plan)
                 guard let session = self.session else { return }
                 let decoder = try SourceOpener.decoder(for: pending.probed, plan: pending.plan, item: pending.item)
-                let d = try Decoding(item: pending.item, probed: pending.probed, decoder: decoder,
+                let streaming = isStreaming(pending.item)
+                let d = try Decoding(item: pending.item, probed: pending.probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                      path: makePath(probed: pending.probed, plan: pending.plan, device: pending.device,
                                                     session: session, item: pending.item),
                                      chunk: chunkFrames, layout: session.decodedLayout)
-                d.streaming = isStreaming(pending.item)
+                d.streaming = streaming
                 decoding = d
                 buffering = false
                 segments = [Segment(item: pending.item, path: d.path, startRingFrame: session.totalWritten,
@@ -1336,6 +1402,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let waiting = awaitingDevice.map { deviceName($0.uid) }
         let standingInFor = sessionDevice != nil ? standingIn.map(deviceName) : nil
         let fromShare = decoding?.streaming == true
+        let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0
         let system = atmos
         shared.withLock { s in
             s.snapshot.state = st
@@ -1349,6 +1416,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.waitingForDevice = waiting
             s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare
+            s.snapshot.bufferFill = bufferFill
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }
         }
