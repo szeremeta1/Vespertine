@@ -54,7 +54,7 @@ integer mode without exclusive access (H-01).
 
 ## Blocked, and what it costs to unblock
 
-From `SOURCES.md` (list prices on 2026-10-09). Alex chose oracle evidence instead on 2026-10-09.
+From `SOURCES.md` (list prices on 2026-10-09). The maintainer chose oracle evidence instead on 2026-10-09.
 
 | Buy | Price | Unblocks |
 |---|---|---|

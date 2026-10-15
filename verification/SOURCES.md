@@ -1,6 +1,6 @@
 # Sources
 
-Every document the requirement records cite, with the exact edition, where it was opened and the SHA-256 of the file read. All were opened on 2026-10-09. The container that built this harness can't reach dsd-guide.com, atsc.org, etsi.org, iec.ch or iso.org, so those were opened on Alex's Mac and copied into the git-ignored spec cache; `raw.githubusercontent.com` was opened from both. "HTTP 200" means the URL returned the file directly, with no redirect.
+Every document the requirement records cite, with the exact edition, where it was opened and the SHA-256 of the file read. All were opened on 2026-10-09. The container that built this harness can't reach dsd-guide.com, atsc.org, etsi.org, iec.ch or iso.org, so those were opened on a Mac and copied into the git-ignored spec cache; `raw.githubusercontent.com` was opened from both. "HTTP 200" means the URL returned the file directly, with no redirect.
 
 `tools/spec_cache.py fetch` downloads the public documents again and refuses any file whose SHA-256 differs from the one below, so a record's hash can always be checked against the edition it was written from.
 
@@ -21,7 +21,7 @@ Two text extractors were used on each PDF: poppler's `pdftotext` (in the contain
 
 | Source | Edition | SHA-256 | Opened at | Cited by |
 |---|---|---|---|---|
-| `AudioHardware.h` (CoreAudio.framework) | macOS 27.0 SDK, build 26A425 (Xcode 27.0, 27A266a) | `a699437248e079d9ebe47078ef3861492d8253fef1a6007e476031031d3535ca` | Copied from the SDK on Alex's Mac, `cmp`-identical | BPV-009 (the comment on `kAudioDevicePropertyHogMode`) |
+| `AudioHardware.h` (CoreAudio.framework) | macOS 27.0 SDK, build 26A425 (Xcode 27.0, 27A266a) | `a699437248e079d9ebe47078ef3861492d8253fef1a6007e476031031d3535ca` | Copied from the SDK on a Mac, `cmp`-identical | BPV-009 (the comment on `kAudioDevicePropertyHogMode`) |
 | `AudioHardwareBase.h` (CoreAudio.framework) | same SDK | `cbac54e8edb7ee99bf10c18a2db044e01c47645985b2f2824623f3f8371a7c4e` | same | Background only |
 | `CoreAudioBaseTypes.h` (CoreAudioTypes.framework) | same SDK | `f58c4e2bccc86193afa89160bba76ab57989138e8885bed1c068d41ebe2b5c86` | same | Background only |
 | kAudioDevicePropertyHogMode documentation page | DocC JSON as served 2026-10-09 | `06bdb21abfef282514db3dbb4ea159fd37cd2a5b1079786113d41b60cc2b0c88` (JSON) | https://developer.apple.com/documentation/coreaudio/kaudiodevicepropertyhogmode (HTTP 200) | BPV-009's URL |
@@ -39,13 +39,13 @@ The header is the interface definition, not sample code. No record cites Apple s
 | libdstdec, the MPEG-4 Audio reference module for DST (Philips), as distributed with SACD Ripper | sacd-ripper commit `a3d981c935c3224217e2842cd492f9351106c81e` (2023-01-14) | 14 files in `libs/libdstdec/`; tree digest `593a13163daf6a8f8573c7f059ad562accd39acc8ad6ea3aa41cb42f021f18b4` | https://raw.githubusercontent.com/sacd-ripper/sacd-ripper/a3d981c935c3224217e2842cd492f9351106c81e/libs/libdstdec/ | DST-003 |
 | FFmpeg S/PDIF demuxer | n6.1.1, the version Ubuntu 24.04 packages (`ffmpeg 7:6.1.1-3ubuntu5`) | `spdifdec.c` `3d795daf73b8e8af1b4091f4ff054ea211e7f330de36a209ab49f31c363ed41d`, `spdif.h` `e66963e5277d5bd76494b021af6adc48c91aeb132fcc8749692b226be19df535`, `spdif.c` `cef204bc3ae547a98e69c78457d448baeb3bee2166da65286f8794daccaf364e`; tree digest `7bd77701b22c5492b6c2fd6d53f2add19a1b7a6e42c91ce98b7362943f982ec9` | https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.1.1/libavformat/ | IEC-O-001 |
 | Independent carrier scanner | this harness, `oracles/carrier-scan/carrier_scan.py` | hashed in its record | written blind from A/52 and TS 102 114 (see `hardware/IEC61937-ORACLE.md`) | IEC-O-002 |
-| sacd_extract | "Enhanced sacd_extract" 0.3.9.3 pre-release, Linux x86-64 build of 2021-12-13 | binary `2f3a280c73d0e8f49c5ad2071d4949e1f621a7987d758dc1123e886746c70bab` | Already on Alex's Mac and home server | `hardware/SACD-ORACLE.md` |
+| sacd_extract | "Enhanced sacd_extract" 0.3.9.3 pre-release, Linux x86-64 build of 2021-12-13 | binary `2f3a280c73d0e8f49c5ad2071d4949e1f621a7987d758dc1123e886746c70bab` | Already on the maintainer's Mac and a Linux machine | `hardware/SACD-ORACLE.md` |
 
 `tools/fetch_oracles.py` fetches the first two at those exact versions into the git-ignored `oracles/fetched/` and stops if the digest differs. They are fetched rather than vendored: libdstdec's ISO licence covers products claiming MPEG-4 Audio conformance, and keeping an upstream copy separate makes clear the oracle isn't part of Vespertine.
 
 ## Paywalled: not bought
 
-Alex decided on 2026-10-09 not to buy these for now and to use oracle evidence instead. Every requirement that depends on them is in the registry as `quote_sha256: BLOCKED`, `status: blocked-on-source`, with the clause numbers taken from the table of contents in each document's free preview (the clause text itself wasn't seen). Prices are the publishers' list prices on 2026-10-09.
+The maintainer decided on 2026-10-09 not to buy these for now and to use oracle evidence instead. Every requirement that depends on them is in the registry as `quote_sha256: BLOCKED`, `status: blocked-on-source`, with the clause numbers taken from the table of contents in each document's free preview (the clause text itself wasn't seen). Prices are the publishers' list prices on 2026-10-09.
 
 | Buy | Price | Unlocks | Store page |
 |---|---|---|---|

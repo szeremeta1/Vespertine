@@ -28,7 +28,7 @@ decoding itself is checked in CI against libdstdec on 15 fixture frames (DST-003
 decoder passes every DST check (REPORT.md).
 
 **To close it.** Run `hardware/SACD-ORACLE.md` on the two discs and commit its record under
-`verification/runs/sacd-<date>/`. It needs the disc images and the `sacd_extract` build on the home server.
+`verification/runs/sacd-<date>/`. It needs the disc images and the `sacd_extract` build on a Linux machine.
 
 ## Fixed
 

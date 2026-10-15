@@ -21,7 +21,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
 - **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:41` — "/// True only when every sample reaches the DAC unaltered."
-- **Text:** `README.md:38` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
+- **Text:** `README.md:39` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
 - **Route:** spec-traced (verdict group, float group, integer group, DoP group); hardware (`hardware/LOOPBACK.md`).
@@ -110,7 +110,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-11 <a id="bp-says-what"></a>Otherwise the badge says what changed
 
 - **Text:** `docs/VERIFICATION.md:38` — "If any condition fails, the badge says what changed instead of BIT-PERFECT."
-- **Text:** `README.md:38` — "when something changed the samples it says what"
+- **Text:** `README.md:39` — "when something changed the samples it says what"
 - **Property:** when the verdict is false the status line is never BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM · …, and it names a reason.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group: never a positive badge when a condition fails). Which reason is shown first is a UI choice and is inventory only.
@@ -140,7 +140,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/FEATURES.md:87` — "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
 - **Text:** `site/index.html:241` — "when it's on, the signal path says EQUALIZER instead of BIT-PERFECT."
-- **Text:** `README.md:42` — "when it is on the signal path says EQUALIZER."
+- **Text:** `README.md:46` — "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -350,7 +350,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-SACD-01 <a id="sacd-match"></a>Matched sacd_extract bit for bit on two real discs
 
-- **Text:** `README.md:49` — "It matched sacd_extract bit for bit on two real discs."
+- **Text:** `README.md:37` — "It matched sacd_extract bit for bit on two real discs."
 - **Text:** `docs/FEATURES.md:7` — "Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit"
 - **Text:** `docs/ARCHITECTURE.md:31` — "Their TOCs, the raw DST frames, the decoded DSD of three tracks per area including adjacent ones, the DoP and PCM output, and random seeks were all identical."
 - **Property:** for those images, TOC data, raw DST frames, decoded DSD, DoP and PCM output equal what `sacd_extract` produces.
@@ -407,7 +407,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-RATE-01 <a id="rate-native"></a>The DAC runs at the track's own rate
 
 - **Text:** `docs/FEATURES.md:35` — "Vespertine switches the DAC to each track's native rate."
-- **Text:** `README.md:40` — "Switches your DAC to each file's sample rate"
+- **Text:** `README.md:45` — "Switches your DAC to each file's sample rate"
 - **Text:** `site/index.html:166` — "Vespertine switches the device to each file's rate and resamples when the DAC cannot run it."
 - **Property:** when the device lists the source rate and the policy is "match source", the planned device rate equals the source rate and nothing is resampled.
 - **Governed by:** vespertine-rule.

@@ -44,7 +44,7 @@ requirement they target. The one survivor is equivalent: it behaves exactly like
 | `vespertine-rule` | 39 | Vespertine's own docs at `98cad1a` (BPV-016 and BPV-017 with the F-05 docs change), where no public standard applies (the BIT-PERFECT conditions, integer mode, the rate planner) |
 
 Paywalled text never entered the repository: the IEC records carry only the document, edition and clause, and
-Alex chose oracle evidence over buying them (2026-10-09). FFmpeg, libdstdec and the carrier scanner are used only
+the maintainer chose oracle evidence over buying them (2026-10-09). FFmpeg, libdstdec and the carrier scanner are used only
 as oracles, never as the source of a `spec` record. No record cites Apple sample code.
 
 ## Method
@@ -382,7 +382,7 @@ real-time C on macOS; the app on macOS) passes on this branch. The first pull re
 - **DST decoding from the standard.** DST-005 and DST-006 are blocked. DST is checked against libdstdec on 15
   fixture frames, and against the fixtures' known answers.
 - **The SACD comparison on real discs** (F-03). `hardware/SACD-ORACLE.md` is ready; it needs the disc images and
-  `sacd_extract` on the home server.
+  `sacd_extract` on a Linux machine.
 - **Claims with no record.** `MAINTAINER-CHECKLIST.md` lists them.
 - **That the docs are right.** A `vespertine-rule` check enforces what the docs say. If a doc line is wrong, so is
   the check.

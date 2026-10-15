@@ -7,7 +7,7 @@
 # Re-run it whenever docs/screenshots change, and re-upload og.png on GitHub.
 set -euo pipefail
 root=${0:A:h:h}
-# Native renderer is useful on a headless hub where WebKit cannot start its helper service.
+# Native renderer is useful on a headless Mac where WebKit cannot start its helper service.
 if [[ ${VESPERTINE_SOCIAL_RENDERER:-webkit} == native ]]; then
   out="$root/build/social-preview"
   mkdir -p "$out/module-cache"
