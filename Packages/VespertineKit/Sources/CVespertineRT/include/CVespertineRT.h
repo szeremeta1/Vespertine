@@ -121,6 +121,29 @@ void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullab
 
 #define NRT_METER_CHANNELS 16u
 
+// MARK: - Room correction, run on the I/O thread before the equalizer
+
+#define NRT_ROOM_MAX_SECTIONS 24u
+/// The longest delay a channel can have, in frames (a power of two): 42 ms at 768 kHz, over half a second at 48 kHz.
+#define NRT_ROOM_MAX_DELAY 32768u
+
+/// One speaker's correction: the samples are delayed by `delayFrames` (below NRT_ROOM_MAX_DELAY), scaled by `gain`
+/// (linear) and run through `count` sections (at most NRT_ROOM_MAX_SECTIONS) in series, in double precision.
+typedef struct {
+    uint32_t delayFrames;
+    double gain;
+    uint32_t count;
+    NRTBiquad sections[NRT_ROOM_MAX_SECTIONS];
+} NRTRoomChannel;
+
+/// Sets per-channel room correction while the device runs: `channels[c]` applies to decoded channel c, for the first
+/// `count` channels (at most NRT_METER_CHANNELS); channels past `count` are left as they are. A count of 0 turns it off
+/// and keeps the bit-transparent path. Runs before the equalizer, gain and dither, never on passthrough (DoP) or
+/// integer samples. Takes effect on the next I/O cycle. A channel's filter memory carries over when its number of
+/// sections is unchanged, and is cleared otherwise; turning correction on starts every delay line from silence.
+/// One caller at a time.
+void nrt_context_set_room(NRTRenderContext *_Nonnull ctx, const NRTRoomChannel *_Nullable channels, uint32_t count);
+
 /// Peak (absolute, linear) since the last call, per decoded channel (0 … NRT_METER_CHANNELS-1).
 float nrt_context_take_peak(NRTRenderContext *_Nonnull ctx, uint32_t channel);
 

@@ -149,6 +149,11 @@ typedef struct {
 
 #define NRT_EQ_FRESH 0x80000000u
 
+typedef struct {
+    NRTRoomChannel channels[NRT_METER_CHANNELS];
+    uint32_t count;
+} NRTRoomBank;
+
 struct NRTRenderContext {
     NRTRing *ring;
     float *scratch;
@@ -189,6 +194,18 @@ struct NRTRenderContext {
     uint32_t eqFront;        // render thread only
     double *eqState;         // render thread only: channels × NRT_EQ_MAX_SECTIONS × 2
     uint32_t eqStateCount;   // render thread only: the section count eqState belongs to
+
+    // Room correction: a triple buffer of settings, exchanged like the equalizer's (heap: the banks are large).
+    NRTRoomBank *roomBanks;  // 3
+    _Atomic uint32_t roomMiddle;
+    uint32_t roomBack;       // writer only
+    uint32_t roomFront;      // render thread only
+    uint32_t roomChannels;   // render thread only: min(ring channels, NRT_METER_CHANNELS)
+    double *roomState;       // render thread only: roomChannels × NRT_ROOM_MAX_SECTIONS × 2
+    uint32_t roomStateCount[NRT_METER_CHANNELS];   // render thread only: the section count each channel's state belongs to
+    float *roomDelay;        // render thread only: roomChannels × NRT_ROOM_MAX_DELAY, a circular history per channel
+    uint32_t roomDelayWrite; // render thread only
+    bool roomWasOn;          // render thread only
 
     // Optional processor (set while stopped): scratch (ring channels) → processed (processedChannels).
     NRTProcessFn processor;
@@ -231,6 +248,17 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->eqMiddle, 1);
     ctx->eqBack = 2;
     ctx->eqStateCount = 0;
+    const uint32_t ringChannels = nrt_ring_channels(ring);
+    ctx->roomChannels = ringChannels < NRT_METER_CHANNELS ? ringChannels : NRT_METER_CHANNELS;
+    ctx->roomBanks = calloc(3, sizeof(NRTRoomBank));
+    ctx->roomState = calloc((size_t)ctx->roomChannels * NRT_ROOM_MAX_SECTIONS * 2, sizeof(double));
+    ctx->roomDelay = calloc((size_t)ctx->roomChannels * NRT_ROOM_MAX_DELAY, sizeof(float));
+    if (!ctx->roomBanks || !ctx->roomState || !ctx->roomDelay) { nrt_context_destroy(ctx); return NULL; }
+    ctx->roomFront = 0;
+    atomic_init(&ctx->roomMiddle, 1);
+    ctx->roomBack = 2;
+    ctx->roomDelayWrite = 0;
+    ctx->roomWasOn = false;
     return ctx;
 }
 
@@ -252,6 +280,9 @@ bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *use
 void nrt_context_destroy(NRTRenderContext *ctx) {
     if (!ctx) return;
     free(ctx->processed);
+    free(ctx->roomDelay);
+    free(ctx->roomState);
+    free(ctx->roomBanks);
     free(ctx->eqState);
     free(ctx->scratch);
     free(ctx);
@@ -291,6 +322,46 @@ static const NRTEQBank *take_eq(NRTRenderContext *ctx) {
     }
     return &ctx->eqBanks[ctx->eqFront];
 }
+void nrt_context_set_room(NRTRenderContext *ctx, const NRTRoomChannel *channels, uint32_t count) {
+    NRTRoomBank *bank = &ctx->roomBanks[ctx->roomBack];
+    if (!channels) count = 0;
+    if (count > NRT_METER_CHANNELS) count = NRT_METER_CHANNELS;
+    for (uint32_t c = 0; c < count; c++) {
+        const NRTRoomChannel in = channels[c];
+        NRTRoomChannel *out = &bank->channels[c];
+        out->delayFrames = in.delayFrames < NRT_ROOM_MAX_DELAY ? in.delayFrames : NRT_ROOM_MAX_DELAY - 1;
+        out->gain = isfinite(in.gain) && in.gain >= 0 ? in.gain : 1.0;
+        const uint32_t n = in.count < NRT_ROOM_MAX_SECTIONS ? in.count : NRT_ROOM_MAX_SECTIONS;
+        uint32_t kept = 0;
+        for (uint32_t i = 0; i < n; i++) {
+            const NRTBiquad b = in.sections[i];
+            if (isfinite(b.b0) && isfinite(b.b1) && isfinite(b.b2) && isfinite(b.a1) && isfinite(b.a2)) out->sections[kept++] = b;
+        }
+        out->count = kept;
+    }
+    bank->count = count;
+    const uint32_t previous = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomBack | NRT_EQ_FRESH, memory_order_acq_rel);
+    ctx->roomBack = previous & ~NRT_EQ_FRESH;
+}
+
+// The room correction for this slice, taken like the equalizer's (see take_eq). Clears the filter memory of every
+// channel whose number of sections changed.
+static const NRTRoomBank *take_room(NRTRenderContext *ctx) {
+    if (atomic_load_explicit(&ctx->roomMiddle, memory_order_acquire) & NRT_EQ_FRESH) {
+        const uint32_t fresh = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomFront, memory_order_acq_rel);
+        ctx->roomFront = fresh & ~NRT_EQ_FRESH;
+        const NRTRoomBank *bank = &ctx->roomBanks[ctx->roomFront];
+        for (uint32_t c = 0; c < ctx->roomChannels; c++) {
+            const uint32_t count = c < bank->count ? bank->channels[c].count : 0;
+            if (count != ctx->roomStateCount[c]) {
+                memset(ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2, 0, NRT_ROOM_MAX_SECTIONS * 2 * sizeof(double));
+                ctx->roomStateCount[c] = count;
+            }
+        }
+    }
+    return &ctx->roomBanks[ctx->roomFront];
+}
+
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
 void nrt_context_set_dop(NRTRenderContext *ctx, bool d) {
@@ -533,13 +604,35 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
     const NRTEQBank *eq = take_eq(ctx);
     const bool equalize = !integer && (eq->count > 0 || eq->preamp != 1.0);
-    if (gain != 1.0 || equalize) {
+    const NRTRoomBank *room = take_room(ctx);
+    const uint32_t roomed = integer ? 0 : (room->count < ctx->roomChannels ? room->count : ctx->roomChannels);
+    if (roomed > 0 && !ctx->roomWasOn) {
+        // Delay lines start from silence, not from whatever played the last time correction was on.
+        memset(ctx->roomDelay, 0, (size_t)ctx->roomChannels * NRT_ROOM_MAX_DELAY * sizeof(float));
+    }
+    ctx->roomWasOn = roomed > 0;
+    if (gain != 1.0 || equalize || roomed > 0) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
         for (uint32_t f = 0; f < got; f++) {
             float *frame = ctx->scratch + (size_t)f * ch;
+            const uint32_t w = (ctx->roomDelayWrite + f) & (NRT_ROOM_MAX_DELAY - 1);
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
+                if (c < roomed) {
+                    const NRTRoomChannel *r = &room->channels[c];
+                    float *line = ctx->roomDelay + (size_t)c * NRT_ROOM_MAX_DELAY;
+                    line[w] = frame[c];
+                    s = (double)line[(w - r->delayFrames) & (NRT_ROOM_MAX_DELAY - 1)] * r->gain;
+                    double *z = ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2;
+                    for (uint32_t k = 0; k < r->count; k++, z += 2) {
+                        const NRTBiquad *b = &r->sections[k];
+                        const double y = b->b0 * s + z[0];
+                        z[0] = b->b1 * s - b->a1 * y + z[1];
+                        z[1] = b->b2 * s - b->a2 * y;
+                        s = y;
+                    }
+                }
                 if (equalize) {
                     s *= eq->preamp;
                     double *z = ctx->eqState + (size_t)c * NRT_EQ_MAX_SECTIONS * 2;
@@ -561,6 +654,11 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             // Decaying filter memory would otherwise end in denormals, which are slow on Intel.
             const size_t states = (size_t)ch * NRT_EQ_MAX_SECTIONS * 2;
             for (size_t i = 0; i < states; i++) if (fabs(ctx->eqState[i]) < 1e-30) ctx->eqState[i] = 0;
+        }
+        if (roomed > 0) {
+            ctx->roomDelayWrite = (ctx->roomDelayWrite + got) & (NRT_ROOM_MAX_DELAY - 1);
+            const size_t states = (size_t)roomed * NRT_ROOM_MAX_SECTIONS * 2;
+            for (size_t i = 0; i < states; i++) if (fabs(ctx->roomState[i]) < 1e-30) ctx->roomState[i] = 0;
         }
     }
 

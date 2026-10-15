@@ -450,6 +450,110 @@ static void test_concurrent_eq(void) {
     nrt_ring_destroy(ring);
 }
 
+// Room correction: each channel gets its own delay, gain and sections; channels past the count are untouched; off
+// (or integer samples) leaves the samples bit-exact.
+static void test_room(void) {
+    NRTRing *ring = nrt_ring_create(4096, 3);
+    NRTRenderContext *ctx = nrt_context_create(ring, 512);
+    assert(ring && ctx);
+    nrt_context_set_gain(ctx, 1.0, 32);
+    NRTRoomChannel room[2];
+    memset(room, 0, sizeof room);
+    room[0] = (NRTRoomChannel){.delayFrames = 5, .gain = 0.5, .count = 0};
+    room[1] = (NRTRoomChannel){.delayFrames = 0, .gain = 1.0, .count = 1};
+    room[1].sections[0] = (NRTBiquad){.b0 = 2};
+    nrt_context_set_room(ctx, room, 2);
+
+    float in[3 * 64] = {0}, out[3 * 64];
+    for (uint32_t f = 0; f < 64; f++) { in[f * 3] = f == 0 ? 1.0f : 0.0f; in[f * 3 + 1] = 0.25f; in[f * 3 + 2] = 0.125f; }
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    for (uint32_t f = 0; f < 64; f++) {
+        assert(out[f * 3] == (f == 5 ? 0.5f : 0.0f));   // the impulse, 5 frames late, at half level
+        assert(out[f * 3 + 1] == 0.5f);                  // doubled by its section
+        assert(out[f * 3 + 2] == 0.125f);                // past the count: untouched
+    }
+    // The delay line carries across slices: an impulse at the last frame comes out 5 frames into the next slice.
+    memset(in, 0, sizeof in);
+    in[63 * 3] = 1.0f;
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    memset(in, 0, sizeof in);
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    for (uint32_t f = 0; f < 64; f++) assert(out[f * 3] == (f == 4 ? 0.5f : 0.0f));
+
+    // Off: the samples pass bit-exact again, and turning it back on starts the delay line from silence (it last held
+    // ones, which would otherwise come out first).
+    for (uint32_t f = 0; f < 64; f++) in[f * 3] = 1.0f;
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    assert(out[63 * 3] == 0.5f);
+    nrt_context_set_room(ctx, NULL, 0);
+    for (uint32_t f = 0; f < 64; f++) { in[f * 3] = 0.3f; in[f * 3 + 1] = -0.7f; in[f * 3 + 2] = 0.9f; }
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    assert(!memcmp(in, out, sizeof in));
+    nrt_context_set_room(ctx, room, 2);
+    memset(in, 0, sizeof in);
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    for (uint32_t f = 0; f < 64; f++) assert(out[f * 3] == 0.0f);
+
+    // Integer samples are never touched.
+    nrt_context_set_integer(ctx, true);
+    for (uint32_t f = 0; f < 64; f++) { in[f * 3] = 0.3f; in[f * 3 + 1] = -0.7f; in[f * 3 + 2] = 0.9f; }
+    nrt_ring_write(ring, in, 64);
+    nrt_context_render_interleaved(ctx, out, 64, 3);
+    assert(!memcmp(in, out, sizeof in));
+    nrt_context_destroy(ctx);
+    nrt_ring_destroy(ring);
+}
+
+// Room correction replaced from another thread while the I/O thread renders: every slice gets one whole setting.
+static NRTRenderContext *room_ctx;
+static atomic_bool room_done;
+
+static void *room_writer(void *unused) {
+    (void)unused;
+    NRTRoomChannel room[2];
+    memset(room, 0, sizeof room);
+    for (uint32_t round = 0; round < EQ_ROUNDS; round++) {
+        const uint32_t k = 1 + round % 8;   // k unity sections and gain 1/k on both channels
+        for (uint32_t c = 0; c < 2; c++) {
+            room[c].gain = 1.0 / k;
+            room[c].count = k;
+            for (uint32_t i = 0; i < k; i++) room[c].sections[i] = (NRTBiquad){.b0 = 1};
+        }
+        nrt_context_set_room(room_ctx, room, 2);
+    }
+    atomic_store(&room_done, true);
+    return NULL;
+}
+
+static void test_concurrent_room(void) {
+    NRTRing *ring = nrt_ring_create(1024, 2);
+    room_ctx = nrt_context_create(ring, 256);
+    assert(ring && room_ctx);
+    nrt_context_set_gain(room_ctx, 1.0, 32);
+    atomic_store(&room_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, room_writer, NULL);
+    assert(!started); (void)started;
+    float in[512], out[512];
+    for (uint32_t i = 0; i < 512; i++) in[i] = 1.0f;
+    while (!atomic_load(&room_done)) {
+        nrt_ring_write(ring, in, 256);
+        nrt_context_render_interleaved(room_ctx, out, 256, 2);
+        for (uint32_t i = 1; i < 512; i++) assert(out[i] == out[0]);
+        const float k = 1.0f / out[0];
+        assert(out[0] == 1.0f || fabsf(k - roundf(k)) < 1e-4f);
+    }
+    pthread_join(thread, NULL);
+    nrt_context_destroy(room_ctx);
+    nrt_ring_destroy(ring);
+}
+
 static NRTRing *concurrent_ring;
 static NRTRenderContext *concurrent_context;
 static void *producer(void *unused) {
@@ -562,5 +666,7 @@ int main(void) {
     test_dop_threads();
     test_concurrent_rewind();
     test_concurrent_eq();
+    test_room();
+    test_concurrent_room();
     return 0;
 }
