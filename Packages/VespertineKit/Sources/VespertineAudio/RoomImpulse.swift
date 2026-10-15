@@ -103,6 +103,9 @@ public struct RoomImpulse: Codable, Hashable, Sendable {
     /// Taps a resampled filter may grow by: the sample rate converter's own impulse response.
     static let resamplerSpread = 256.0
 
+    /// Silence added after a filter before resampling it (input frames): more than the converter's reach.
+    static let resamplerPadding = 1024
+
     /// The filter at `rate`, with the same gain, or nil if it can't be read or doesn't fit (`fits(at:)`).
     func taps(at rate: Double) -> [Float]? {
         guard fits(at: rate), let samples = samples(), let taps = Self.resample(samples, from: sampleRate, to: rate) else { return nil }
@@ -114,19 +117,22 @@ public struct RoomImpulse: Codable, Hashable, Sendable {
     public func delete() { try? FileManager.default.removeItem(at: url) }
 
     /// Resamples an impulse response. Sampling it more often adds samples, so it's scaled by `from / to` to keep its gain.
+    /// Silence is added after the filter first, so the converter's own ringing after the filter's last sample comes
+    /// out whole instead of being cut off at the end of the input.
     static func resample(_ samples: [Float], from: Double, to: Double) -> [Float]? {
         guard from != to else { return samples }
         guard from > 0, to > 0, !samples.isEmpty,
               let inFormat = AudioFormats.float32(sampleRate: from, channels: 1, interleaved: false),
               let outFormat = AudioFormats.float32(sampleRate: to, channels: 1, interleaved: false),
               let converter = AVAudioConverter(from: inFormat, to: outFormat),
-              let input = AVAudioPCMBuffer(pcmFormat: inFormat, frameCapacity: AVAudioFrameCount(samples.count)),
+              let input = AVAudioPCMBuffer(pcmFormat: inFormat, frameCapacity: AVAudioFrameCount(samples.count + Self.resamplerPadding)),
               let chunk = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: 16_384),
               let inData = input.floatChannelData else { return nil }
         converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
         converter.sampleRateConverterQuality = AVAudioQuality.max.rawValue
-        input.frameLength = AVAudioFrameCount(samples.count)
+        input.frameLength = AVAudioFrameCount(samples.count + Self.resamplerPadding)
         samples.withUnsafeBufferPointer { inData[0].update(from: $0.baseAddress!, count: samples.count) }
+        (inData[0] + samples.count).update(repeating: 0, count: Self.resamplerPadding)
         var given = false
         var out: [Float] = []
         out.reserveCapacity(Int(Double(samples.count) * to / from) + 16_384)

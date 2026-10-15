@@ -200,8 +200,8 @@ public enum EQImportError: Error, Equatable, LocalizedError {
         case .unsupportedCommand(let line, let command):
             String(localized: "Line \(line) uses a command Vespertine can't apply (\(command)).",
                    comment: "The command is from the file, e.g. “Copy”.")
-        case .tooManyRoomFilters(let n):
-            String(localized: "A speaker in the file has \(n) filters; Vespertine runs up to \(RoomProfile.maxBands) per speaker.")
+        case .tooManyRoomFilters:
+            String(localized: "A speaker in the file has too many filters. Vespertine runs up to \(RoomProfile.maxBands) per speaker.")
         }
     }
 }
