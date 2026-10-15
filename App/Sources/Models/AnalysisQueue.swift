@@ -17,7 +17,7 @@ final class AnalysisQueue {
     private let shares: NetworkShareManager
 
     /// Files waiting their turn, in two lines that drain side by side: files on this Mac (limited by the processor)
-    /// and files on network shares (limited by the network, and paused while music plays from a share). One line
+    /// and files on network shares (limited by the network, held back while music streams from a share). One line
     /// made a library of both take turns, so a share's slow reads held back the local files queued behind them.
     private var pendingLocal = TrackQueue()
     private var pendingNetwork = TrackQueue()
@@ -44,8 +44,10 @@ final class AnalysisQueue {
     }
     /// Network files: a few reads in flight hide the round trips; playback always comes first.
     private let networkWidth = 3
-    /// Set by the app: whether playback is playing or starting a track from a network share.
-    var isStreamingPlayback: @MainActor () -> Bool = { false }
+    /// Set by the app: how much of the network the song playing from a share needs right now.
+    var playbackShareClaim: @MainActor () -> PlaybackShareClaim = { .idle }
+    /// What `playbackShareClaim` said at the last look, so a change can start the files it lets through.
+    @ObservationIgnored private var shareClaim = PlaybackShareClaim.idle
     /// Called with each share's server status after a sync (the app rescans when the server ran after our last scan).
     var onServerStatus: @MainActor (Int64, ServerAnalysisStatus) -> Void = { _, _ in }
 
@@ -222,12 +224,15 @@ final class AnalysisQueue {
         pump()
     }
 
-    /// Playback from a share pauses network analysis (and stops what's in flight); it resumes after.
+    /// A song streaming from a share leaves network analysis one file at a time, and stops it (what's in flight
+    /// stands aside to be read again later) while the song starts or its buffer runs low. Pausing it for as long as
+    /// any share song played left an analysis asked for during an evening's listening at 0 forever.
     private func watchPlayback() {
-        let busy = isStreamingPlayback()
-        guard busy != gate.isBusy else { return }
-        gate.set(busy)
-        if !busy { pump() }
+        let claim = playbackShareClaim()
+        guard claim != shareClaim else { return }
+        shareClaim = claim
+        gate.set(claim == .all)
+        if claim != .all { pump() }
     }
 
     private nonisolated static let analysisThreads = DispatchQueue(label: "org.szeremeta.vespertine.analysis", qos: .utility,
@@ -306,9 +311,20 @@ final class AnalysisQueue {
                 return pendingNetwork.remove(at: i)
             }
         }
-        if !gate.isBusy && activeNetwork < networkWidth { return pendingNetwork.popFirst() }
+        let width = shareClaim == .streaming ? 1 : networkWidth
+        if !gate.isBusy && activeNetwork < width { return pendingNetwork.popFirst() }
         return nil
     }
+}
+
+/// How much of the network a song playing from a share needs, which decides how much analysis may read from shares.
+enum PlaybackShareClaim {
+    /// Nothing plays from a share, or the song has a complete local copy: analysis reads at full width.
+    case idle
+    /// The song streams with its buffer in good shape: one analysis read at a time alongside it.
+    case streaming
+    /// The song is starting or its buffer is low: no analysis reads from shares.
+    case all
 }
 
 /// A line of tracks: taking from the front is constant time (a plain array shifted every element along each time,
