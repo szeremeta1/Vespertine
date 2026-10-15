@@ -607,7 +607,12 @@ private func matchExpectation(source: Double, offered: [Double]) -> MatchExpecta
     let higher = offered.filter { $0 > source }
     if !higher.isEmpty { return MatchExpectation(rule: .higher, allowed: higher) }
     let divisors = offered.filter { isDivisor($0, of: source) }
-    if !divisors.isEmpty { return MatchExpectation(rule: .divisor, allowed: divisors) }
+    if !divisors.isEmpty {
+        // RATE-009: only a divisor at least half the highest offered rate; below that, the highest offered rate.
+        let top = offered.max()!
+        let kept = divisors.filter { $0 * 2 >= top - 0.5 }
+        return MatchExpectation(rule: .divisor, allowed: kept.isEmpty ? [top] : kept)
+    }
     return MatchExpectation(rule: .open, allowed: [])
 }
 

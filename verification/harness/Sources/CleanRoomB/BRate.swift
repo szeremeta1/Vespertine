@@ -86,9 +86,10 @@ struct BRatePlanner: RatePlanner {
         }
 
         // RATE-009: every offered rate is lower; an integer divisor of the source rate (the highest one,
-        // preferring the closest match and power-of-two divisors).
+        // preferring the closest match and power-of-two divisors), if it is at least half the highest offered rate.
+        let top = highest(offered) ?? source
         var bestDivisor: (rate: Double, match: Match)?
-        for rate in offered {
+        for rate in offered where rate * 2 >= top - 0.5 {
             guard let match = multiple(large: source, small: rate) else { continue }
             if let current = bestDivisor {
                 if match.rank < current.match.rank

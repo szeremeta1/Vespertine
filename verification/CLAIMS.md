@@ -415,9 +415,9 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-RATE-02 <a id="rate-planner-order"></a>Fallback order when the rate isn't offered
 
-- **Text:** `docs/FEATURES.md:35` — "The planner prefers the same rate family, then a higher rate, then an integer divisor."
+- **Text:** `docs/FEATURES.md:35` — "The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate."
 - **Text:** `docs/FEATURES.md:35` — "Per-device settings can match the source, use the device maximum, or force a rate."
-- **Property:** when the source rate is not offered, the planner picks the smallest offered integer multiple of it, then the smallest offered rate above it, then the largest offered integer divisor, then the highest offered rate.
+- **Property:** when the source rate is not offered, the planner picks the smallest offered integer multiple of it, then the smallest offered rate above it, then the largest offered integer divisor if it is at least half the highest offered rate, otherwise the highest offered rate.
 - **Governed by:** vespertine-rule. The docs' "same rate family, then a higher rate" is less precise than the code; the requirement records the gap.
 - **Route:** spec-traced (rate group).
 

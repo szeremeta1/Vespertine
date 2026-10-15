@@ -99,9 +99,11 @@ private struct B2RatePlanner: RatePlanner {
         }
         if let higher { return higher }
 
-        // 4. Every offered rate is lower: an integer divisor of the source rate (largest one offered).
+        // 4. Every offered rate is lower: an integer divisor of the source rate (largest one offered), if it is at
+        //    least half the highest offered rate.
+        let top = highest(of: offeredRates, startingWith: first)
         var divisor: Double?
-        for rate in offeredRates {
+        for rate in offeredRates where rate * 2 >= top - 0.5 {
             guard let k = nearestInteger(sourceRate / rate), k >= 2,
                   sameRate(rate, sourceRate / k) else { continue }
             if divisor == nil || rate > divisor! {
@@ -110,8 +112,8 @@ private struct B2RatePlanner: RatePlanner {
         }
         if let divisor { return divisor }
 
-        // Not specified by the contract: fall back to the highest offered rate.
-        return highest(of: offeredRates, startingWith: first)
+        // 5. The highest offered rate.
+        return top
     }
 }
 
