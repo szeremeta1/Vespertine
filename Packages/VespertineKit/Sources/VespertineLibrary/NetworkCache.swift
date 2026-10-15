@@ -60,6 +60,16 @@ public final class NetworkCache: @unchecked Sendable {
         }
     }
 
+    private var yielding = false
+
+    /// Copies hold between reads while set: a song streaming from a share is short of buffered audio, and the
+    /// copies would otherwise take half the connection it needs (a slow link carries little more than the song).
+    /// They carry on, where they were, once it has enough again.
+    public var yieldsToPlayback: Bool {
+        get { lock.withLock { yielding } }
+        set { lock.withLock { yielding = newValue } }
+    }
+
     /// Called (on any thread) when usage or download state changes.
     public var onChange: (@Sendable () -> Void)?
 
@@ -267,6 +277,7 @@ public final class NetworkCache: @unchecked Sendable {
         var ok = true
         while true {
             if lock.withLock({ cancelled.contains(job.key) }) { ok = false; break }
+            if lock.withLock({ yielding }) { usleep(100_000); continue }
             let n = read(input, buffer, chunk)
             if n == 0 { break }
             if n < 0 { if errno == EINTR { continue }; ok = false; break }

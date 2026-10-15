@@ -486,6 +486,20 @@ final class PlayerController {
         if ShareIOGate.shared.maxInFlight != limit { ShareIOGate.shared.maxInFlight = limit }
     }
 
+    /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
+    /// under a third full (or it's holding for more), and carry on once it's two thirds full again. On a link
+    /// little faster than the music, a copy running alongside took half of it and the song stalled every few
+    /// seconds; the copy still finishes when the link has room to spare.
+    private func yieldCacheToPlayback(_ snap: EngineSnapshot) {
+        let cache = shares.cache
+        let yielding: Bool
+        if snap.state != .playing || !snap.readingFromShare { yielding = false }
+        else if snap.isBuffering || snap.bufferFill < 1.0 / 3 { yielding = true }
+        else if snap.bufferFill > 2.0 / 3 { yielding = false }
+        else { yielding = cache.yieldsToPlayback }
+        if cache.yieldsToPlayback != yielding { cache.yieldsToPlayback = yielding }
+    }
+
     private func poll() {
         let snap = engine.snapshot
         let stateChanged = state != snap.state
@@ -524,6 +538,7 @@ final class PlayerController {
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
         yieldShareToPlayback()
+        yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
         if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
             let peaks = engine.takeChannelPeaks()
