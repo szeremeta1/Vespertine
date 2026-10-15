@@ -299,6 +299,7 @@ struct DeviceSettings: View {
                 AppVolumeToggle(device: device)
             }
             EqualizerChoice(device: device)
+            RoomCorrectionChoice(device: device)
             // Multichannel music (5.1, 7.1…): Spatial Audio on headphones, all channels or a downmix elsewhere.
             HStack {
                 VStack(alignment: .leading, spacing: 1) {

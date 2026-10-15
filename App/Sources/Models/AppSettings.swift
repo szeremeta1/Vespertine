@@ -115,6 +115,10 @@ final class AppSettings {
     var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
     /// The preset each output plays with (device UID → preset ID). Outputs that aren't listed play without one.
     var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
+    /// Room correction per output (device UID → profile), imported from REW or another measurement tool.
+    var roomProfiles: [String: RoomProfile] { didSet { defaults.set(try? JSONEncoder().encode(roomProfiles), forKey: "roomProfiles") } }
+    /// Outputs that keep native DSD, uncorrected, while room correction is on (elsewhere DSD is converted to PCM).
+    var roomNativeDSDUIDs: Set<String> { didSet { defaults.set(Array(roomNativeDSDUIDs), forKey: "roomNativeDSDUIDs") } }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
@@ -168,6 +172,8 @@ final class AppSettings {
         networkPrefetch = defaults.integer(forKey: "networkPrefetch")
         eqPresets = defaults.data(forKey: "eqPresets").flatMap { try? JSONDecoder().decode([EQPreset].self, from: $0) } ?? []
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
+        roomProfiles = defaults.data(forKey: "roomProfiles").flatMap { try? JSONDecoder().decode([String: RoomProfile].self, from: $0) } ?? [:]
+        roomNativeDSDUIDs = Set(defaults.stringArray(forKey: "roomNativeDSDUIDs") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
 
         if let dataDirectory {
@@ -191,7 +197,7 @@ final class AppSettings {
 
     func setEQPreset(_ id: UUID?, for uid: String) { eqAssignments[uid] = id?.uuidString }
 
-    /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
+    /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer, room correction) over to its new UID.
     func moveDeviceSettings(from old: String, to new: String) {
         if dopDeviceUIDs.contains(old) { dopDeviceUIDs.insert(new) }
         if bitstreamDeviceUIDs.contains(old) { bitstreamDeviceUIDs.insert(new) }
@@ -200,6 +206,8 @@ final class AppSettings {
         if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
+        if roomProfiles[new] == nil, let profile = roomProfiles[old] { roomProfiles[new] = profile }
+        if roomNativeDSDUIDs.contains(old) { roomNativeDSDUIDs.insert(new) }
     }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
@@ -251,6 +259,8 @@ final class AppSettings {
         s.integerMode = integerMode
         s.matchSixteenBit = matchSixteenBit
         s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
+        s.roomCorrections = roomProfiles
+        s.roomNativeDSDDeviceUIDs = roomNativeDSDUIDs
         return s
     }
 }

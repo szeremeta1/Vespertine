@@ -122,11 +122,18 @@ jobs:
               -framework CoreAudio -framework AudioToolbox -o "rt-audit-${sanitizer//,/}"
             "./rt-audit-${sanitizer//,/}"
           done
+          # Room measurement (sweep, impulse response, filter fit) on simulated rooms.
+          clang -std=c11 -g -O1 -fsanitize=address,undefined -fno-sanitize-recover=all \
+            -I Packages/VespertineKit/Sources/CVespertineRT/include \
+            tests/measure-audit.c Packages/VespertineKit/Sources/CVespertineRT/vespertine_measure.c -o measure-audit
+          ./measure-audit
       - name: Static analysis
         if: ${{ !cancelled() }}
         run: |
           clang --analyze -Xclang -analyzer-werror -std=c11 -I Packages/VespertineKit/Sources/CVespertineRT/include \
             Packages/VespertineKit/Sources/CVespertineRT/vespertine_rt.c -o /dev/null
+          clang --analyze -Xclang -analyzer-werror -std=c11 -I Packages/VespertineKit/Sources/CVespertineRT/include \
+            Packages/VespertineKit/Sources/CVespertineRT/vespertine_measure.c -o /dev/null
       - name: Release scripts parse
         if: ${{ !cancelled() }}
         run: for s in scripts/*.sh; do zsh -n "$s"; done
