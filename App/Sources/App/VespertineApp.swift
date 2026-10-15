@@ -58,8 +58,10 @@ struct VespertineApp: App {
 
         MenuBarExtra {
             LibraryContent(startup: startup) { model in
-                MenuBarView().environment(model).preferredColorScheme(.dark)
+                MenuBarView().environment(model)
             }
+            .environment(\.colorScheme, .dark)
+            .background(DarkWindowAppearance())
         } label: {
             if let model = startup.model { MenuBarLabel().environment(model) }
             else { Image(systemName: "exclamationmark.triangle") }
