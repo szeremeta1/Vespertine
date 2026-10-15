@@ -19,6 +19,7 @@ struct RoomCorrectionChoice: View {
     /// The speaker an import is for: nil, every speaker in the file; 0, left only; 1, right only.
     @State private var importSpeaker: Int?
     @State private var problem: String?
+    @State private var measuring = false
 
     var body: some View {
         let settings = model.settings
@@ -37,6 +38,8 @@ struct RoomCorrectionChoice: View {
                         .labelsHidden().toggleStyle(.switch).controlSize(.mini)
                 }
                 Menu {
+                    Button("Measure with a Microphone…") { measuring = true }
+                    Divider()
                     Section("Parametric Filters (Equalizer APO Text)") {
                         Button("Import Filters for All Speakers…") { startImport(impulse: false, speaker: nil) }
                         Button("Import Filters for the Left Speaker…") { startImport(impulse: false, speaker: 0) }
@@ -85,6 +88,7 @@ struct RoomCorrectionChoice: View {
             guard case .success(let url) = result else { return }
             if importingImpulse { importImpulse(url, speaker: importSpeaker) } else { importFile(url, speaker: importSpeaker) }
         }
+        .sheet(isPresented: $measuring) { RoomMeasurementSheet(device: device).environment(model) }
         .alert("Couldn't import the file", isPresented: Binding(get: { problem != nil }, set: { if !$0 { problem = nil } })) {
             Button("OK") { problem = nil }
         } message: {

@@ -224,4 +224,56 @@ struct RoomCorrectionTests {
         try Data("Filter 1: ON PK Fc 40 Hz Gain -6 dB Q 4".utf8).write(to: url)
         #expect(throws: RoomImpulseError.unreadable) { try RoomImpulse.importFile(url) }
     }
+    @Test func measuringTwoSpeakersFindsTheirDelaysLevelsAndModes() throws {
+        // A simulated take: the left speaker 100 samples away with a +10 dB mode at 50 Hz, the right 148 samples away
+        // and quieter, both under a little noise.
+        var plan = RoomMeasurementPlan(sampleRate: 48_000, speakers: 2)
+        plan.sweepSeconds = 2
+        plan.gapSeconds = 1.5
+        let playback = plan.playback(levelDB: -12)
+        let mode = try #require(EQBand(kind: .peak, frequency: 50, gainDB: 10, q: 5).section(sampleRate: 48_000))
+        var left = playback[0].map(Double.init)
+        var z1 = 0.0, z2 = 0.0
+        for i in left.indices {
+            let x = left[i], y = mode.b0 * x + z1
+            z1 = mode.b1 * x - mode.a1 * y + z2
+            z2 = mode.b2 * x - mode.a2 * y
+            left[i] = y
+        }
+        var recording = [Float](repeating: 0, count: plan.frames + 48_000)
+        for i in 0..<plan.frames {
+            recording[i + 100] += Float(left[i] * 0.5)
+            recording[i + 148] += playback[1][i] * 0.4
+        }
+        var seed: UInt32 = 7
+        for i in recording.indices {
+            seed = seed &* 1_664_525 &+ 1_013_904_223
+            recording[i] += (Float(seed >> 8) / 16_777_216 - 0.5) * 1e-5
+        }
+
+        let speakers = try RoomMeasurement.analyze(recording: recording, plan: plan)
+        #expect(speakers.count == 2)
+        #expect(abs((speakers[1].arrivalMs - speakers[0].arrivalMs) - 1.0) < 0.01)              // 48 samples
+        #expect(abs((speakers[1].levelDB - speakers[0].levelDB) - 20 * log10(0.4 / 0.5)) < 0.3)
+        #expect(speakers.allSatisfy { $0.signalToNoiseDB > 40 })
+        let cut = try #require(speakers[0].filters.first)
+        #expect(abs(cut.frequency - 50) < 3 && abs(cut.gainDB + 10) < 2)
+        #expect(speakers[1].filters.count <= 1)                                                   // flat already
+        let i50 = RoomMeasurement.frequencies.firstIndex { $0 >= 50 }!
+        #expect(abs(speakers[0].correctedDB[i50] - speakers[0].levelDB) < 2)
+
+        // As a profile: the nearer left speaker held back 1 ms, the louder left one turned down to the right's level.
+        let profile = RoomMeasurement.profile(speakers, name: "Living room")
+        #expect(abs(profile.channels[0].delayMs - 1.0) < 0.01 && profile.channels[1].delayMs == 0)
+        #expect(abs(profile.channels[0].levelDB - 20 * log10(0.4 / 0.5)) < 0.3 && profile.channels[1].levelDB == 0)
+        #expect(profile.preampDB <= 0)
+    }
+
+    @Test func aSilentOrClippedMeasurementIsRefused() {
+        let plan = RoomMeasurementPlan(sampleRate: 48_000, speakers: 2)
+        #expect(throws: RoomMeasurementError.noSignal) { try RoomMeasurement.analyze(recording: [Float](repeating: 0, count: plan.frames), plan: plan) }
+        #expect(throws: RoomMeasurementError.clipped) {
+            try RoomMeasurement.analyze(recording: [Float](repeating: 1, count: plan.frames), plan: plan)
+        }
+    }
 }
