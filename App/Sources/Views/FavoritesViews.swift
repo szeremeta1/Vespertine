@@ -52,9 +52,11 @@ struct FavoriteCell: View {
     let track: Track
     var emphasized = false
     @State private var hovering = false
+    /// Increased in a selected row of the table that has focus, which is when the selection is drawn in the accent color.
+    @Environment(\.backgroundProminence) private var prominence
 
     var body: some View {
-        let visible = hovering || emphasized || model.library.isFavorite(track)
+        let visible = hovering || emphasized || prominence == .increased || model.library.isFavorite(track)
         FavoriteButton(track: track, size: 11, appModel: model)
             .opacity(visible ? 1 : 0)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

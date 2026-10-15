@@ -361,7 +361,7 @@ struct AlbumMenu: View {
             Button("Export for Spatial Audio…") { model.spatialExportTracks = tracks }
         }
         Button("Analyze") {
-            model.analysis.analyzeNow(tracks)
+            model.analysis.analyze(tracks)
             model.selectedTrackIDs = Set(tracks.prefix(1).compactMap(\.id))
             model.inspectorTab = .analysis
             model.showInspector = true

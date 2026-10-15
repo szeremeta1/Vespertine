@@ -331909,6 +331909,274 @@
           }
         }
       }
+    },
+    "Analyze Library Now includes network shares, and pauses while music plays from one.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«ቤተ-መጻሕፍቱን አሁን ተንትን» የአውታረ መረብ ማጋሪያዎችንም ያካትታል፤ ከአንዱ ማጋሪያ ሙዚቃ ሲጫወት ለአፍታ ይቆማል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشمل «تحليل المكتبة الآن» مشاركات الشبكة أيضًا، ويتوقف مؤقتًا أثناء تشغيل الموسيقى من إحداها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“এখনই লাইব্রেরি বিশ্লেষণ করুন” নেটওয়ার্ক শেয়ারও অন্তর্ভুক্ত করে, এবং কোনো শেয়ার থেকে গান বাজার সময় থেমে থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Analyzovat knihovnu nyní“ zahrnuje i síťová sdílení a pozastaví se, když hraje hudba z některého z nich."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analyser bibliotek nu” medtager netværksdelinger og holder pause, mens der afspilles musik fra en af dem."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Mediathek jetzt analysieren“ bezieht Netzwerkfreigaben ein und pausiert, während Musik von einer Freigabe spielt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η «Ανάλυση βιβλιοθήκης τώρα» περιλαμβάνει και τους κοινόχρηστους φακέλους δικτύου, και σταματά προσωρινά όσο παίζει μουσική από κάποιον από αυτούς."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Analizar la biblioteca ahora» incluye los recursos compartidos de red y se pausa mientras suena música de uno de ellos."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«تحلیل کتابخانه اکنون» اشتراک‌های شبکه را هم در بر می‌گیرد و هنگام پخش موسیقی از یکی از آن‌ها مکث می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”Analysoi kirjasto nyt” sisältää myös verkkojaot ja pitää taukoa, kun musiikkia toistetaan jostakin niistä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kasama sa “Suriin ang Library Ngayon” ang mga network share, at humihinto ito habang may tumutugtog na musika mula sa isa sa mga ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Analyser la bibliothèque maintenant » inclut les partages réseau et se met en pause pendant la lecture de musique depuis l’un d’eux."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“હમણાં લાઇબ્રેરીનું વિશ્લેષણ કરો” નેટવર્ક શેર પણ સામેલ કરે છે, અને કોઈ શેરમાંથી સંગીત વાગતું હોય ત્યારે થોભી જાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Yi Nazarin Laburare Yanzu” yana haɗa da foldojin cibiyar sadarwa, kuma yana tsayawa na ɗan lokaci yayin da kiɗa ke kunnawa daga ɗaya daga cikinsu."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„נתח את הספריה עכשיו” כולל גם שיתופי רשת, ומשהה את עצמו בזמן שמתנגנת מוזיקה מאחד מהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“लाइब्रेरी का अभी विश्लेषण करें” नेटवर्क शेयर भी शामिल करता है, और किसी शेयर से संगीत बजने के दौरान रुका रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A „Könyvtár elemzése most” a hálózati megosztásokat is elemzi, és szünetel, amíg valamelyikükről zene szól."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analisis Perpustakaan Sekarang” juga menyertakan share jaringan, dan berhenti sejenak saat musik diputar dari salah satunya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analizza libreria ora” include le condivisioni di rete e si mette in pausa mentre viene riprodotta musica da una di esse."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「今すぐライブラリを解析」はネットワーク共有も対象にし、共有から音楽を再生している間は一時停止します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“ಲೈಬ್ರರಿಯನ್ನು ಈಗ ವಿಶ್ಲೇಷಿಸಿ” ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳನ್ನೂ ಒಳಗೊಳ್ಳುತ್ತದೆ, ಮತ್ತು ಯಾವುದಾದರೂ ಶೇರ್‌ನಿಂದ ಸಂಗೀತ ಪ್ಲೇ ಆಗುತ್ತಿರುವಾಗ ವಿರಾಮಗೊಳ್ಳುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘지금 보관함 분석’은 네트워크 공유도 포함하며, 공유에서 음악을 재생하는 동안에는 일시 정지됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“ലൈബ്രറി ഇപ്പോൾ വിശകലനം ചെയ്യുക” നെറ്റ്‌വർക്ക് ഷെയറുകളും ഉൾപ്പെടുത്തുന്നു, അവയിലൊന്നിൽ നിന്ന് സംഗീതം പ്ലേ ചെയ്യുമ്പോൾ താൽക്കാലികമായി നിൽക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“आता लायब्ररीचे विश्लेषण करा” नेटवर्क शेअरही समाविष्ट करते, आणि एखाद्या शेअरवरून संगीत वाजत असताना थांबून राहते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analisis Pustaka Sekarang” turut merangkumi perkongsian rangkaian, dan dijeda semasa muzik dimainkan daripada salah satunya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Analyser biblioteket nå» tar med nettverksdelinger, og tar pause mens det spilles musikk fra en av dem."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘Analyseer bibliotheek nu’ neemt netwerkshares mee en pauzeert zolang er muziek van een van die shares speelt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“ਹੁਣੇ ਲਾਇਬ੍ਰੇਰੀ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ” ਨੈੱਟਵਰਕ ਸ਼ੇਅਰ ਵੀ ਸ਼ਾਮਲ ਕਰਦਾ ਹੈ, ਅਤੇ ਕਿਸੇ ਸ਼ੇਅਰ ਤੋਂ ਸੰਗੀਤ ਚੱਲਣ ਦੌਰਾਨ ਰੁਕਿਆ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Analizuj bibliotekę teraz” obejmuje także zasoby sieciowe i wstrzymuje się, gdy odtwarzana jest muzyka z któregoś z nich."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analisar a Biblioteca Agora” inclui os compartilhamentos de rede e pausa enquanto toca música de um deles."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Analisar biblioteca agora” inclui as partilhas de rede e faz uma pausa enquanto se reproduz música de uma delas."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Analizează biblioteca acum” include și partajările de rețea și se oprește temporar cât timp se redă muzică de pe una dintre ele."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”Analysera biblioteket nu” inkluderar nätverksresurser och pausar medan musik spelas från någon av dem."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Chambua Maktaba Sasa” inajumuisha folda za mtandao, na husimama kwa muda muziki unapocheza kutoka mojawapo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“லைப்ரரியை இப்போது பகுப்பாய்வுசெய்” நெட்வொர்க் பகிர்வுகளையும் சேர்த்துக்கொள்ளும்; அவற்றில் ஒன்றிலிருந்து இசை இயங்கும்போது இடைநிறுத்தப்படும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“లైబ్రరీని ఇప్పుడే విశ్లేషించు” నెట్‌వర్క్ షేర్‌లను కూడా చేర్చుతుంది, వాటిలో ఒకదాని నుండి సంగీతం ప్లే అవుతున్నప్పుడు తాత్కాలికంగా ఆగుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“วิเคราะห์คลังเดี๋ยวนี้” จะรวมแชร์เครือข่ายด้วย และจะหยุดชั่วคราวขณะเล่นเพลงจากแชร์ใดแชร์หนึ่ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Arşivi Şimdi Analiz Et” ağ paylaşımlarını da kapsar ve bunlardan birinden müzik çalarken duraklar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Аналізувати медіатеку зараз» охоплює й мережеві ресурси та призупиняється, поки грає музика з одного з них."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”ابھی لائبریری کا تجزیہ کریں“ نیٹ ورک شیئرز بھی شامل کرتا ہے، اور کسی شیئر سے موسیقی چلنے کے دوران رکا رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Phân tích thư viện ngay” bao gồm cả chia sẻ mạng, và tạm dừng trong khi đang phát nhạc từ một chia sẻ."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「立即分析資料庫」亦會包括網絡共享，並會在從其中一個共享播放音樂時暫停。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“立即分析资料库”也会包括网络共享，并在从其中一个共享播放音乐时暂停。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「立即分析資料庫」也會包含網路共享，並在從其中一個共享播放音樂時暫停。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

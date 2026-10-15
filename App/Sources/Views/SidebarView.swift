@@ -268,6 +268,42 @@ struct ScanStatusView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
+        VStack(spacing: 0) {
+            scan
+            analysis
+        }
+    }
+
+    /// A library analysis's progress, wherever you are in the library (not only in Settings or the inspector).
+    @ViewBuilder private var analysis: some View {
+        let queue = model.analysis
+        // Gone at Stop, rather than showing the stopped batch until the files in flight finish.
+        if queue.batchTotal > 1, !queue.isStopping {
+            VStack(alignment: .leading, spacing: 6) {
+                // Laid out like the scan's card above it; Stop sits by the bar, since a title, a five-digit count and
+                // a button on one line wrapped the title at the sidebar's usual width.
+                HStack {
+                    Text("Analyzing library").font(Typeface.ui(11, weight: .medium)).foregroundStyle(Palette.text2)
+                        .lineLimit(1)
+                    Spacer(minLength: 6)
+                    Text(verbatim: "\(queue.completed.formatted())/\(queue.batchTotal.formatted())")
+                        .font(Typeface.mono(10)).foregroundStyle(Palette.text3)
+                        .fixedSize()
+                }
+                HStack(spacing: 8) {
+                    ProgressView(value: Double(queue.completed), total: Double(max(1, queue.batchTotal)))
+                        .progressViewStyle(.linear)
+                        .tint(Palette.brass)
+                    Button("Stop") { queue.cancel() }.buttonStyle(QuietButtonStyle(compact: true))
+                }
+            }
+            .padding(12)
+            .background(Palette.surface, in: RoundedRectangle(cornerRadius: 8))
+            .padding(10)
+        }
+    }
+
+    @ViewBuilder private var scan: some View {
         if let p = model.library.scanProgress {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
