@@ -37,8 +37,9 @@ public struct RoomImpulse: Codable, Hashable, Sendable {
     public var sampleRate: Double
     public var frames: Int
 
-    /// Longest filter accepted at import: the I/O thread's longest filter at 48 kHz.
-    public static let maxSeconds = Double(NRT_FIR_MAX_TAPS) / 48_000
+    /// Longest filter accepted at import: one that fits the I/O thread whole at up to 96 kHz (and at 192 kHz up to half
+    /// as long).
+    public static let maxSeconds = Double(NRT_FIR_MAX_TAPS) / 96_000
 
     public init(file: String, name: String, sampleRate: Double, frames: Int) {
         self.file = file
@@ -74,10 +75,14 @@ public struct RoomImpulse: Codable, Hashable, Sendable {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let name = source.deletingPathExtension().lastPathComponent
         return try (0..<channels).map { c in
-            let samples = Array(UnsafeBufferPointer(start: data[c], count: length))
+            var samples = Array(UnsafeBufferPointer(start: data[c], count: length))
             guard samples.allSatisfy(\.isFinite) else { throw RoomImpulseError.notFinite }
+            // Trailing silence (below −120 dB) costs time on the I/O thread and does nothing.
+            let quiet = (samples.lazy.map { abs($0) }.max() ?? 0) * 1e-6
+            guard let last = samples.lastIndex(where: { abs($0) > quiet }) else { throw RoomImpulseError.empty }
+            samples.removeSubrange((last + 1)...)
             let impulse = RoomImpulse(file: UUID().uuidString + ".f32",
-                                      name: channels == 1 ? name : "\(name) \(c + 1)", sampleRate: rate, frames: length)
+                                      name: channels == 1 ? name : "\(name) \(c + 1)", sampleRate: rate, frames: samples.count)
             try samples.withUnsafeBytes { try Data($0).write(to: impulse.url, options: .atomic) }
             return impulse
         }
@@ -89,16 +94,21 @@ public struct RoomImpulse: Codable, Hashable, Sendable {
         return data.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
     }
 
-    /// The filter at `rate`, with the same gain, or nil if it can't be read or is too long for the I/O thread there.
+    /// Whether the filter, resampled to `rate`, fits the I/O thread whole. One that doesn't is left out at that rate
+    /// (cut short, it would no longer correct anything).
+    public func fits(at rate: Double) -> Bool {
+        sampleRate > 0 && rate > 0 && Double(frames) * rate / sampleRate + Self.resamplerSpread <= Double(NRT_FIR_MAX_TAPS)
+    }
+
+    /// Taps a resampled filter may grow by: the sample rate converter's own impulse response.
+    static let resamplerSpread = 256.0
+
+    /// The filter at `rate`, with the same gain, or nil if it can't be read or doesn't fit (`fits(at:)`).
     func taps(at rate: Double) -> [Float]? {
-        guard let samples = samples(), let taps = Self.resample(samples, from: sampleRate, to: rate) else { return nil }
-        // Trailing silence costs time on the I/O thread and does nothing.
-        let peak = taps.lazy.map { abs($0) }.max() ?? 0
-        guard peak > 0 else { return nil }
-        let quiet = peak * 1e-6   // −120 dB
-        let end = (taps.lastIndex { abs($0) > quiet } ?? 0) + 1
-        guard end <= Int(NRT_FIR_MAX_TAPS) else { return nil }
-        return Array(taps[..<end])
+        guard fits(at: rate), let samples = samples(), let taps = Self.resample(samples, from: sampleRate, to: rate) else { return nil }
+        let quiet = (taps.lazy.map { abs($0) }.max() ?? 0) * 1e-6
+        guard let last = taps.lastIndex(where: { abs($0) > quiet }) else { return nil }
+        return Array(taps[...min(last, Int(NRT_FIR_MAX_TAPS) - 1)])
     }
 
     public func delete() { try? FileManager.default.removeItem(at: url) }

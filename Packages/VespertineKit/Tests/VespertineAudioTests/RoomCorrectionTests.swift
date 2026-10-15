@@ -193,9 +193,9 @@ struct RoomCorrectionTests {
         }
         let impulses = try RoomImpulse.importFile(url)
         defer { impulses.forEach { $0.delete() } }
-        #expect(impulses.count == 2 && impulses[0].frames == 1000 && impulses[0].sampleRate == 48_000)
+        #expect(impulses.count == 2 && impulses[0].frames == 11 && impulses[0].sampleRate == 48_000)   // trailing silence trimmed
         let same = try #require(impulses[0].taps(at: 48_000))
-        #expect(same.count == 11 && same[10] == 1)   // trailing silence trimmed
+        #expect(same.count == 11 && same[10] == 1)
         let doubled = try #require(impulses[1].taps(at: 96_000))
         #expect(abs(doubled.reduce(0, +) - 0.5) < 0.01)   // the same gain at twice the rate
 
@@ -206,6 +206,12 @@ struct RoomCorrectionTests {
         #expect(taps.count == 3 && taps[0]?[10] == 1 && taps[1]?[10] == 0.5 && taps[2] == nil)
         #expect(profile.impulseKey(channelCount: 2) == [impulses[0].file, impulses[1].file])
         #expect(RoomProfile(name: "None").impulseTaps(sampleRate: 48_000, channelCount: 2) == nil)
+        // A filter too long to run at a rate is left out there, and the signal path says so.
+        let long = RoomImpulse(file: "none.f32", name: "Long", sampleRate: 48_000, frames: 200_000)
+        #expect(long.fits(at: 48_000) && !long.fits(at: 96_000) && long.taps(at: 96_000) == nil)
+        let longProfile = RoomProfile(name: "Long", channels: [RoomChannelCorrection(impulse: long)])
+        #expect(!longProfile.filtersTooLong(sampleRate: 48_000, channelCount: 2) && longProfile.filtersTooLong(sampleRate: 96_000, channelCount: 2))
+        #expect(!profile.filtersTooLong(sampleRate: 768_000, channelCount: 2))
         // A profile saved before filters existed still loads.
         let old = #"{"id":"6A1F2B9E-1C55-4C55-9A57-1F7A5E5B9D10","name":"Old","enabled":true,"preampDB":0,"channels":[{"delayMs":1,"levelDB":0,"bands":[]}]}"#
         let decoded = try JSONDecoder().decode(RoomProfile.self, from: Data(old.utf8))

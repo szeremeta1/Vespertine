@@ -96,6 +96,11 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
         return taps.contains { $0 != nil } ? taps : nil
     }
 
+    /// Some speaker's measured filter is too long to run at `sampleRate`, so it's left out there.
+    public func filtersTooLong(sampleRate: Double, channelCount: Int) -> Bool {
+        channels.prefix(min(max(channelCount, 0), Self.maxChannels)).contains { $0.impulse.map { !$0.fits(at: sampleRate) } ?? false }
+    }
+
     /// Channel `c`'s response in dB (preamp and level included, delay doesn't change it), at each of `frequencies`.
     public func responseDB(channel c: Int, at frequencies: [Double], sampleRate: Double) -> [Double] {
         let correction = c < channels.count ? channels[c] : RoomChannelCorrection()

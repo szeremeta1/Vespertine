@@ -938,11 +938,14 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let db = settings.digitalVolume(for: device), plan.mode == .pcm { volume = .digital(dB: db) }
         else if device.hasHardwareVolume { volume = .hardware }
         else { volume = .fixed }
-        return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
-                          deviceName: device.name, deviceUID: device.uid, deviceProfile: device.profile, volume: volume,
-                          replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil,
-                          equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil,
-                          roomCorrection: plan.mode == .pcm ? settings.roomCorrection(for: device)?.name : nil)
+        let room = plan.mode == .pcm ? settings.roomCorrection(for: device) : nil
+        var path = SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
+                              deviceName: device.name, deviceUID: device.uid, deviceProfile: device.profile, volume: volume,
+                              replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil,
+                              equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil,
+                              roomCorrection: room?.name)
+        path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
+        return path
     }
 
     private func applyGain() {
@@ -969,6 +972,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             session.roomFilterKey = key
             Self.setRoomFilters(session.context, room?.impulseTaps(sampleRate: session.applied.sampleRate, channelCount: session.plan.channels))
         }
+    }
+
+    /// The longest a speaker's room correction delay holds sound back, which the end of the queue plays out.
+    private var roomDelaySeconds: Double {
+        guard let session, !session.plan.isPassthrough else { return 0 }
+        let delays = settings.roomCorrection(for: sessionDevice)?.channels.map(\.delayMs) ?? []
+        return min(delays.max() ?? 0, RoomChannelCorrection.delayRange.upperBound) / 1000
     }
 
     /// Hands each channel's taps (nil: unfiltered) to the I/O thread; nil, no filters at all.
@@ -1372,7 +1382,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard draining, session.readableFrames == 0 else { drainedAt = nil; return }
         // Let the device play out its own buffer before touching it.
         if drainedAt == nil { drainedAt = Date() }
-        let tail = Double(session.applied.bufferFrames * 3 + session.latencyFrames) / session.applied.sampleRate + 0.05
+        let tail = Double(session.applied.bufferFrames * 3 + session.latencyFrames + Int(nrt_context_fir_latency(session.context)))
+            / session.applied.sampleRate + roomDelaySeconds + 0.05
         guard Date().timeIntervalSince(drainedAt!) >= tail else { return }
         drainedAt = nil
         if let next = pendingSystem {
@@ -1444,7 +1455,11 @@ public final class PlaybackEngine: @unchecked Sendable {
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
             let integer = path?.applied.integerMode == true
             path?.equalizer = integer ? nil : settings.equalizer(for: sessionDevice)?.name
-            path?.roomCorrection = integer ? nil : settings.roomCorrection(for: sessionDevice)?.name
+            let room = integer ? nil : settings.roomCorrection(for: sessionDevice)
+            path?.roomCorrection = room?.name
+            if let p = path {
+                path?.roomFiltersSkipped = room?.filtersTooLong(sampleRate: p.applied.sampleRate, channelCount: p.plan.channels) ?? false
+            }
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

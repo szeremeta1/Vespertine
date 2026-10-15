@@ -25,6 +25,8 @@ public struct SignalPath: Sendable, Hashable {
     public var equalizer: String? = nil
     /// The room correction applied (its profile's name), nil = none.
     public var roomCorrection: String? = nil
+    /// A speaker's measured room correction filter is too long for this sample rate, so it's left out.
+    public var roomFiltersSkipped = false
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).

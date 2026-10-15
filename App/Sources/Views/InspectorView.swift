@@ -220,7 +220,10 @@ struct SignalPathView: View {
                           value: "\(rg.formatted(.number.precision(.fractionLength(1)).sign(strategy: .always()))) dB", tone: .changed))
         }
         if let room = path.roomCorrection {
-            s.append(Step(title: String(localized: "Room correction"), detail: String(localized: "\(room) · 64-bit, per speaker"),
+            let detail = path.roomFiltersSkipped
+                ? String(localized: "\(room) · a measured filter is too long for \(SampleRate.format(path.applied.sampleRate)) kHz and is left out")
+                : String(localized: "\(room) · 64-bit, per speaker")
+            s.append(Step(title: String(localized: "Room correction"), detail: detail,
                           value: String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on"), tone: .changed))
         }
         if let eq = path.equalizer {
