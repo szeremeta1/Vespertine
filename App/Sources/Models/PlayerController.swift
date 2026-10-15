@@ -97,10 +97,10 @@ final class PlayerController {
     /// never by a clock, so a song seeked while paused and resumed minutes later isn't counted twice.
     @ObservationIgnored private var seekRestart: UUID?
     /// A pause or resume the engine hasn't acted on yet: the button shows it right away, and the engine's older state
-    /// doesn't undo it. The engine thread can be busy for seconds (a slow read, the device stopping) after the audio is
-    /// already muted, and a second press meanwhile must resume, not pause again. Cleared once the engine reports
-    /// that state or anything other than the one it was leaving (it stopped), when another song is started, or after
-    /// half a minute (the engine ignored it; show what it's really doing).
+    /// doesn't undo it. The engine thread can be stuck for a long time in one read from a slow network share after the
+    /// audio is already muted, and a second press meanwhile must resume, not pause again. Cleared once the engine
+    /// reports that state or anything other than the one it was leaving (it stopped), or when another song is started.
+    /// A resume also gives up after half a minute: unlike a pause, the engine can decline it (nothing left to resume).
     @ObservationIgnored private var requestedState: (state: PlaybackState, from: PlaybackState, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
 
@@ -508,7 +508,8 @@ final class PlayerController {
 
     private func poll() {
         let snap = engine.snapshot
-        if let requestedState, snap.state != requestedState.from || Date().timeIntervalSince(requestedState.at) > 30 {
+        if let requestedState, snap.state != requestedState.from
+            || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
             self.requestedState = nil
         }
         let stateChanged = requestedState == nil && state != snap.state
