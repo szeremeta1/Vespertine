@@ -110,6 +110,73 @@ struct AppAuditTests {
         #expect(duplicateRows[0].id != duplicateRows[1].id)
         player.stop()
     }
+
+    /// Up Next as in Apple Music: songs you add go to Playing Next, ahead of the rest of what was playing, in the order
+    /// added; shuffle leaves them where they are; drags, removals and Play Next work by entry, not by place.
+    @Test func playingNextComesBeforeTheRest() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let url = root.appendingPathComponent("sample.wav")
+        do {
+            let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
+                AVSampleRateKey: 48000.0, AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 16])
+            let b = try #require(AVAudioPCMBuffer(pcmFormat: f.processingFormat, frameCapacity: 480))
+            b.frameLength = 480
+            for c in 0..<2 { for i in 0..<480 { b.floatChannelData![c][i] = 0 } }
+            try f.write(from: b)
+        }
+        let original = try MetadataReader.read(url: url, artwork: nil)
+        // Nonexistent paths exercise queue logic without playing anything on the user's DAC.
+        try FileManager.default.removeItem(at: url)
+        func song(_ i: Int, _ title: String) -> Track {
+            var t = original; t.id = Int64(i); t.title = title; t.location = "/nowhere/\(title).wav"; t.filePath = t.location; return t
+        }
+        let album = (1...4).map { song($0, "A\($0)") }
+        let x = song(10, "X"), y = song(11, "Y"), z = song(12, "Z")
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults)
+        let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
+        let shares = NetworkShareManager(library: library, settings: settings, dataDirectory: root.appendingPathComponent("database"))
+        let player = PlayerController(library: library, settings: settings, shares: shares)
+        defer { player.stop() }
+        func titles(_ entries: some Sequence<QueueEntry>) -> [String] { entries.map(\.track.title) }
+
+        player.play(album)
+        player.addToQueue([x])
+        player.addToQueue([y])
+        player.playNext([z])
+        #expect(titles(player.playingNext) == ["Z", "X", "Y"])
+        #expect(titles(player.continuing) == ["A2", "A3", "A4"])
+
+        // Shuffling mixes the album only; turning it off puts the album back in order, after Playing Next.
+        player.shuffle = true
+        #expect(titles(player.playingNext) == ["Z", "X", "Y"])
+        #expect(Set(titles(player.continuing)) == ["A2", "A3", "A4"])
+        player.shuffle = false
+        #expect(titles(player.upcoming) == ["Z", "X", "Y", "A2", "A3", "A4"])
+
+        // Moved out of Playing Next it plays with the rest; Play Next brings songs back to the front.
+        let xID = try #require(player.playingNext.first { $0.track.title == "X" }?.id)
+        player.moveUpcoming([xID], before: nil, playingNext: false)
+        #expect(titles(player.playingNext) == ["Z", "Y"])
+        #expect(titles(player.continuing) == ["A2", "A3", "A4", "X"])
+        let a3 = try #require(player.continuing.first { $0.track.title == "A3" }?.id)
+        player.playNext(entries: [xID, a3])
+        #expect(titles(player.playingNext) == ["A3", "X", "Z", "Y"])
+
+        // Removing works by entry: unknown and already removed entries change nothing, the song playing stays.
+        let current = try #require(player.current?.id)
+        player.removeFromQueue([a3, UUID(), current])
+        player.removeFromQueue([a3])
+        #expect(player.current?.id == current)
+        #expect(titles(player.upcoming) == ["X", "Z", "Y", "A2", "A4"])
+        player.clearPlayingNext()
+        #expect(titles(player.upcoming) == ["A2", "A4"])
+        player.clearUpcoming()
+        #expect(player.upcoming.isEmpty && player.current?.id == current)
+    }
     @Test func launchArgumentsIgnoreOtherDefaultsDomains() {
         // A value UserDefaults knows from elsewhere (registered here: in memory, never saved, like one left in the
         // app's settings) is not a launch argument, so no QA hook acts on it.

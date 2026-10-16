@@ -89,7 +89,7 @@ enum DeveloperHooks {
                 || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
                 || d.string(forKey: "VespertineOpenSheet") != nil || d.string(forKey: "VespertineFilter") != nil
                 || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil
-                || d.string(forKey: "VespertinePlaySong") != nil else { return }
+                || d.string(forKey: "VespertinePlaySong") != nil || d.string(forKey: "VespertineShowQueue") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -112,6 +112,8 @@ enum DeveloperHooks {
             }
         }
         if d.object(forKey: "VespertineShowInspector") != nil { model.showInspector = d.bool(forKey: "VespertineShowInspector") }
+        // QA: -VespertineShowQueue upNext|history opens Up Next on that tab.
+        if let tab = d.string(forKey: "VespertineShowQueue").flatMap(QueueTab.init(rawValue:)) { model.queueTab = tab; model.showQueue = true }
         if let open, let album = model.library.albums.first(where: { $0.title == open }) {
             model.openAlbum(album.key)
         }

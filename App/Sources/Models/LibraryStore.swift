@@ -551,6 +551,25 @@ final class LibraryStore {
         revision += 1   // play counts in lists and the inspector
     }
 
+    // MARK: Play history
+
+    /// Bumped whenever the history changes, so History reloads.
+    private(set) var historyRevision = 0
+
+    func history(limit: Int = 1000) -> [LibraryDatabase.HistoryEntry] { (try? database.history(limit: limit)) ?? [] }
+
+    func recordHistory(_ trackID: Int64) {
+        do { try database.recordHistory(trackID); historyRevision += 1 } catch { lastError = error.localizedDescription }
+    }
+
+    func removeHistory(_ ids: [Int64]) {
+        do { try database.removeHistory(ids); historyRevision += 1 } catch { lastError = error.localizedDescription }
+    }
+
+    func clearHistory() {
+        do { try database.clearHistory(); historyRevision += 1 } catch { lastError = error.localizedDescription }
+    }
+
     /// A saved analysis changes verdict tags in lists; refresh them at most every few seconds. Each refresh reloads the
     /// page shown (all of Songs, on that page), so a batch analyzing several files a second refreshes less often.
     func analysisSaved() {

@@ -23,7 +23,13 @@ struct MainWindow: View {
                 HStack(spacing: 0) {
                     ContentRouter()
                         .frame(minWidth: 520)
-                    if model.showInspector {
+                    if model.showQueue {
+                        Hairline(vertical: true)
+                        QueuePanel()
+                            .frame(width: 348)
+                            .clipped()
+                            .transition(reduceMotion ? .opacity : .move(edge: .trailing))
+                    } else if model.showInspector {
                         Hairline(vertical: true)
                         InspectorView()
                             .frame(width: 348)
@@ -32,6 +38,7 @@ struct MainWindow: View {
                     }
                 }
                 .animation(.easeInOut(duration: 0.22), value: model.showInspector)
+                .animation(.easeInOut(duration: 0.22), value: model.showQueue)
             }
             TransportBar()
         }

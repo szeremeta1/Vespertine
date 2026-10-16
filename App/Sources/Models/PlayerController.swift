@@ -14,7 +14,14 @@ struct QueueEntry: Identifiable, Hashable {
     let track: Track
     /// Every version of this song on its album (stereo and 5.1…), `track` among them; empty when there's one.
     var versions: [Track] = []
+    /// Added with Play Next or Add to Queue: listed under Playing Next, ahead of the rest of what was playing.
+    var queuedByUser = false
     var id: UUID { item.id }
+
+    /// The same entry (same place in the queue, same flags) playing `track` through `item`.
+    func replacing(_ track: Track, item: PlayableItem) -> QueueEntry {
+        QueueEntry(item: item, track: track, versions: versions, queuedByUser: queuedByUser)
+    }
 }
 
 nonisolated enum RepeatMode: String, CaseIterable, Sendable {
@@ -89,8 +96,12 @@ final class PlayerController {
     var scrubbing: Double?
 
     private var scrobbledEntry: UUID?
+    /// The song last added to the play history, so one listen is added once.
+    @ObservationIgnored private var historyEntry: UUID?
     /// Time actually listened to the current song, for counting a play: seeking doesn't add to it.
     @ObservationIgnored private var listened: TimeInterval = 0
+    /// The entry `listened` is about: the engine moves on to the next song (gapless) a moment before it reports it.
+    @ObservationIgnored private var listenedEntry: UUID?
     @ObservationIgnored private var lastListenTick: Date?
     /// A seek restarts the engine's segment, which reports the song as started again (once it plays, so after
     /// resuming if it was paused): still the same play. Cleared by that report, or by playing something else or stopping,
@@ -110,6 +121,10 @@ final class PlayerController {
         guard let i = currentIndex, i + 1 < queue.count else { return [] }
         return queue[(i + 1)...]
     }
+    /// The songs added with Play Next or Add to Queue that come next, before the rest of what was playing.
+    var playingNext: ArraySlice<QueueEntry> { upcoming.prefix { $0.queuedByUser } }
+    /// What plays after Playing Next: the rest of the album, playlist or list that was started.
+    var continuing: ArraySlice<QueueEntry> { upcoming.dropFirst(playingNext.count) }
 
     init(library: LibraryStore, settings: AppSettings, shares: NetworkShareManager) {
         self.library = library
@@ -171,7 +186,7 @@ final class PlayerController {
                   let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
                   chosen.id != entry.track.id else { return entry }
             changed = true
-            return QueueEntry(item: makeItem(chosen, id: entry.id), track: chosen, versions: entry.versions)
+            return entry.replacing(chosen, item: makeItem(chosen, id: entry.id))
         }
         let upcomingIDs = Set(queue.indices.filter { $0 >= start }.map { queue[$0].id })
         queue = queue.enumerated().map { $0.offset >= start ? resolve($0.element) : $0.element }
@@ -206,46 +221,87 @@ final class PlayerController {
         if let current { start(current) }
     }
 
+    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next.
     func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        let entries = entries(tracks, allowing: allowing)
         guard let i = currentIndex else { play(tracks, allowing: allowing); return }
+        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
         syncMirror()
     }
 
+    /// Adds `tracks` to the end of Playing Next: after the songs already added, before the rest of what was
+    /// playing (as Apple Music's Play Last does), so they're heard without first sitting through the whole album.
     func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        let entries = entries(tracks, allowing: allowing)
-        guard currentIndex != nil else { play(tracks, allowing: allowing); return }
-        queue.append(contentsOf: entries)
+        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
+        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+        queue.insert(contentsOf: entries, at: i + 1 + playingNext.count)
         originalOrder.append(contentsOf: entries)
         syncMirror()
     }
 
-    func removeFromQueue(_ id: UUID) {
-        guard let i = queue.firstIndex(where: { $0.id == id }), i != currentIndex else { return }
-        queue.remove(at: i)
-        originalOrder.removeAll { $0.id == id }
-        if let c = currentIndex, i < c { currentIndex = c - 1 }
+    func removeFromQueue(_ id: UUID) { removeFromQueue([id]) }
+
+    /// Removes songs from the queue by entry, never the one playing. Entries no longer queued are ignored, so a
+    /// request made from a list drawn a moment ago (the song ended meanwhile) can't remove the wrong song.
+    func removeFromQueue(_ ids: some Collection<UUID>) {
+        let remove = Set(ids).subtracting(current.map { [$0.id] } ?? [])
+        guard queue.contains(where: { remove.contains($0.id) }) else { return }
+        let currentID = current?.id
+        queue.removeAll { remove.contains($0.id) }
+        originalOrder.removeAll { remove.contains($0.id) }
+        currentIndex = currentID.flatMap { id in queue.firstIndex { $0.id == id } }
         syncMirror()
     }
 
-    func moveUpcoming(from source: IndexSet, to destination: Int) {
+    /// Moves upcoming entries (in the order given) to just before `target`, or to the end when it's nil. Entries
+    /// that are playing, already played or gone are left alone. `playingNext` says whether they join Playing Next
+    /// or play as part of the rest; nil decides by where they land (among Playing Next's songs, they join it).
+    func moveUpcoming(_ ids: [UUID], before target: UUID?, playingNext: Bool? = nil) {
         guard let c = currentIndex else { return }
-        var upcoming = Array(queue[(c + 1)...])
-        upcoming.move(fromOffsets: source, toOffset: destination)
-        queue = Array(queue[...c]) + upcoming
+        let upcoming = Array(queue[(c + 1)...])
+        let byID = Dictionary(upcoming.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        var seen = Set<UUID>()
+        let moving = ids.filter { byID[$0] != nil && $0 != target && seen.insert($0).inserted }
+        guard !moving.isEmpty else { return }
+        var rest = upcoming.filter { !seen.contains($0.id) }
+        let at = target.flatMap { t in rest.firstIndex { $0.id == t } } ?? rest.count
+        let block = rest.prefix { $0.queuedByUser }.count
+        let joins = playingNext ?? (at < block || (at == block && block > 0 && moving.allSatisfy { byID[$0]!.queuedByUser }))
+        rest.insert(contentsOf: moving.map { var e = byID[$0]!; e.queuedByUser = joins; return e }, at: at)
+        // Songs left behind Playing Next's last one aren't part of it any more (they'd play after the rest started).
+        if let firstOther = rest.firstIndex(where: { !$0.queuedByUser }) {
+            for i in rest.indices where i > firstOther { rest[i].queuedByUser = false }
+        }
+        queue = Array(queue[...c]) + rest
         originalOrder = queue
         syncMirror()
     }
 
+    /// Moves upcoming entries by their places in `upcoming` (as a list's drag reports them).
+    func moveUpcoming(from source: IndexSet, to destination: Int) {
+        let shown = Array(upcoming)
+        let ids = source.sorted().compactMap { shown.indices.contains($0) ? shown[$0].id : nil }
+        moveUpcoming(ids, before: destination < shown.count ? shown[destination].id : nil)
+    }
+
+    /// Moves upcoming entries (in the order they play) to the front of Playing Next.
+    func playNext(entries ids: [UUID]) {
+        let chosen = Set(ids)
+        let shown = Array(upcoming)
+        let ordered = shown.map(\.id).filter(chosen.contains)
+        // Before the first song not moved: a song already at the front stays where it is and joins Playing Next.
+        moveUpcoming(ordered, before: shown.first { !chosen.contains($0.id) }?.id, playingNext: true)
+    }
+
+    /// Empties Up Next (only the songs that come after the one playing).
     func clearUpcoming() {
         guard let c = currentIndex else { return }
-        queue = Array(queue[...c])
-        let retained = Set(queue.map(\.id))
-        originalOrder.removeAll { !retained.contains($0.id) }
-        syncMirror()
+        removeFromQueue(queue[(c + 1)...].map(\.id))
     }
+
+    /// Empties Playing Next: the rest of what was playing carries on after the current song.
+    func clearPlayingNext() { removeFromQueue(playingNext.map(\.id)) }
 
     func jump(to id: UUID) {
         guard let i = queue.firstIndex(where: { $0.id == id }) else { return }
@@ -253,17 +309,27 @@ final class PlayerController {
         start(queue[i])
     }
 
+    /// Shuffling mixes what was playing, never the songs you added to Playing Next: they still come next, in
+    /// your order. Turning shuffle off puts the rest back in its order, after them.
     private func applyShuffle(keepingCurrent: Bool = true) {
         guard !queue.isEmpty else { return }
         let current = self.current
+        let next = Array(playingNext)
+        let nextIDs = Set(next.map(\.id))
         if shuffle {
-            var rest = queue.filter { $0.id != current?.id }
+            var rest = queue.filter { $0.id != current?.id && !nextIDs.contains($0.id) }
             rest.shuffle()
-            queue = (current.map { [$0] } ?? []) + rest
+            queue = (current.map { [$0] } ?? []) + next + rest
             currentIndex = current == nil ? nil : 0
         } else {
-            queue = originalOrder
-            currentIndex = current.flatMap { c in queue.firstIndex { $0.id == c.id } }
+            let ordered = originalOrder.filter { !nextIDs.contains($0.id) }
+            if let current, let c = ordered.firstIndex(where: { $0.id == current.id }) {
+                queue = Array(ordered[...c]) + next + Array(ordered[(c + 1)...])
+                currentIndex = c
+            } else {
+                queue = originalOrder
+                currentIndex = current.flatMap { c in queue.firstIndex { $0.id == c.id } }
+            }
         }
         syncMirror()
     }
@@ -318,7 +384,7 @@ final class PlayerController {
         let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         func remap(_ entry: QueueEntry) -> QueueEntry {
             guard let old = entry.track.id, let new = moves[old], let track = byID[new] else { return entry }
-            return QueueEntry(item: makeItem(track, id: entry.id), track: track, versions: entry.versions)
+            return entry.replacing(track, item: makeItem(track, id: entry.id))
         }
         let remapped = queue.map(remap)
         guard remapped != queue else { return }
@@ -328,8 +394,8 @@ final class PlayerController {
     }
 
     func refreshReplayGain() {
-        queue = queue.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track, versions: $0.versions) }
-        originalOrder = originalOrder.map { QueueEntry(item: makeItem($0.track, id: $0.id), track: $0.track, versions: $0.versions) }
+        queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
+        originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
         syncMirror(reloadCurrent: true)
     }
 
@@ -430,6 +496,9 @@ final class PlayerController {
 
     func clearError() { lastError = nil }
 
+    /// Seconds of listening that put a song in the play history.
+    static let historyListen: TimeInterval = 10
+
     // MARK: Engine events & polling
 
     private func handle(_ event: EngineEvent) {
@@ -450,7 +519,9 @@ final class PlayerController {
             resolveVersions()
             trackStartedAt = .now
             scrobbledEntry = nil
+            historyEntry = nil
             listened = 0
+            listenedEntry = item.id
             prefetchNetworkTracks()
             updateNowPlayingInfo()
             if settings.scrobble, let track = current?.track {
@@ -579,7 +650,13 @@ final class PlayerController {
         let listening = state == .playing && !buffering
         if listening, let last = lastListenTick { listened += min(now.timeIntervalSince(last), 1) }
         lastListenTick = listening ? now : nil
-        if state == .playing, let entry = current, scrobbledEntry != entry.id, duration > 30,
+        // The play history lists a song once it's been heard for a few seconds (or half of it, if it's that short), so
+        // skipping through the queue doesn't fill it.
+        if state == .playing, let entry = current, listenedEntry == entry.id, historyEntry != entry.id, listened >= min(Self.historyListen, max(1, duration / 2)) {
+            historyEntry = entry.id
+            if let id = entry.track.id { library.recordHistory(id) }
+        }
+        if state == .playing, let entry = current, listenedEntry == entry.id, scrobbledEntry != entry.id, duration > 30,
            listened >= min(duration / 2, 240) {
             scrobbledEntry = entry.id
             if let id = entry.track.id { library.markPlayed(id) }

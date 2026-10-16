@@ -285,6 +285,16 @@ public final class LibraryDatabase: Sendable {
                 WHERE isMissing = 0 AND isDSD = 0 AND lower(filePath) LIKE '%.dff'
                 """)
         }
+        m.registerMigration("v18-play-history") { db in
+            // Every song listened to, with when: the History beside Up Next. Library state like plays and favorites.
+            try db.create(table: "playHistory") { t in
+                t.autoIncrementedPrimaryKey("id")
+                t.belongsTo("track", onDelete: .cascade).notNull()
+                t.column("playedAt", .datetime).notNull().indexed()
+            }
+            // Songs played before there was a history start it with the last time each was played.
+            try db.execute(sql: "INSERT INTO playHistory (trackId, playedAt) SELECT id, lastPlayedAt FROM track WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt")
+        }
         return m
     }
 }
@@ -600,6 +610,48 @@ public extension LibraryDatabase {
             p.smartRules = rules
             try p.update(db)
         }
+    }
+
+    // MARK: Play history
+
+    /// One song heard, and when.
+    struct HistoryEntry: Sendable, Hashable, Identifiable {
+        public let id: Int64
+        public let playedAt: Date
+        public let track: Track
+    }
+
+    /// Adds a song to the play history.
+    func recordHistory(_ trackID: Int64, at date: Date = .now) throws {
+        try writer.write { db in
+            try db.execute(sql: "INSERT INTO playHistory (trackId, playedAt) SELECT id, ? FROM track WHERE id = ?", arguments: [date, trackID])
+        }
+    }
+
+    /// The most recent plays first (a song heard twice is listed twice). Missing files are left out, as in playlists.
+    func history(limit: Int = 1000) throws -> [HistoryEntry] {
+        try writer.read { db in
+            try Row.fetchAll(db, sql: """
+                SELECT playHistory.id AS historyId, playHistory.playedAt AS historyPlayedAt, track.*
+                FROM playHistory JOIN track ON track.id = playHistory.trackId
+                WHERE track.isMissing = 0 ORDER BY playHistory.playedAt DESC, playHistory.id DESC LIMIT ?
+                """, arguments: [limit]).map { row in
+                HistoryEntry(id: row["historyId"], playedAt: row["historyPlayedAt"], track: try Track(row: row))
+            }
+        }
+    }
+
+    /// Removes entries from the history (the songs' play counts stay as they are).
+    func removeHistory(_ ids: [Int64]) throws {
+        guard !ids.isEmpty else { return }
+        try writer.write { db in
+            for id in ids { try db.execute(sql: "DELETE FROM playHistory WHERE id = ?", arguments: [id]) }
+        }
+    }
+
+    /// Forgets the whole history (play counts stay).
+    func clearHistory() throws {
+        try writer.write { db in try db.execute(sql: "DELETE FROM playHistory") }
     }
 
     // MARK: Favorites
@@ -960,6 +1012,7 @@ extension LibraryDatabase {
             }
             try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
+            try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: """
                 INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT ?, favoritedAt FROM favorite WHERE trackId = ?
                 """, arguments: [new, old])

@@ -150,6 +150,9 @@ struct VespertineCommands: Commands {
         CommandGroup(after: .sidebar) {
             Button(model.showInspector ? String(localized: "Hide Inspector") : String(localized: "Show Inspector")) { model.showInspector.toggle() }
                 .keyboardShortcut("i", modifiers: [.command, .option])
+            Button(model.showQueue && model.queueTab == .upNext ? String(localized: "Hide Up Next") : String(localized: "Show Up Next")) { model.toggleQueue(.upNext) }
+                .keyboardShortcut("u", modifiers: [.command, .option])
+            Button(model.showQueue && model.queueTab == .history ? String(localized: "Hide History") : String(localized: "Show History")) { model.toggleQueue(.history) }
             Button("Mini Player") { openWindow(id: "mini") }
                 .keyboardShortcut("m", modifiers: [.command, .shift])
             Button("Equalizer") { openWindow(id: "equalizer") }
