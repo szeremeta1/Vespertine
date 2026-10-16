@@ -6,6 +6,7 @@
 
 import AVFAudio
 import Foundation
+import SFBAudioEngine
 import Testing
 @testable import VespertineAudio
 
