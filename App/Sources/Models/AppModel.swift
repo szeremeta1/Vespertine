@@ -36,6 +36,17 @@ enum InspectorTab: String, CaseIterable, Identifiable {
     }
 }
 
+enum QueueTab: String, CaseIterable, Identifiable {
+    case upNext, history
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .upNext: String(localized: "Up Next")
+        case .history: String(localized: "History", comment: "Tab beside Up Next: the songs played before, most recent first")
+        }
+    }
+}
+
 /// Output devices and the chosen one's hardware volume.
 ///
 /// Core Audio calls never run on the main thread (after the first read at launch): while a device switches rate or
@@ -170,7 +181,27 @@ final class AppModel {
     /// When the selection last changed; the Analysis tab shows whichever changed last, selection or playback.
     private(set) var selectionChangedAt: Date = .distantPast
     var inspectorTab: InspectorTab = .nowPlaying
-    var showInspector = true
+    /// The Inspector and Up Next share the right side of the window, as lyrics and the queue do in Apple Music:
+    /// showing one hides the other, and hiding Up Next brings back the Inspector if it was open before.
+    var showInspector = true { didSet { if showInspector, showQueue { showQueue = false } } }
+    var showQueue = false {
+        didSet {
+            guard showQueue != oldValue else { return }
+            if showQueue {
+                inspectorBeforeQueue = showInspector
+                if showInspector { showInspector = false }
+            } else if inspectorBeforeQueue, !showInspector {
+                inspectorBeforeQueue = false
+                showInspector = true
+            }
+        }
+    }
+    @ObservationIgnored private var inspectorBeforeQueue = false
+    var queueTab: QueueTab = .upNext
+    /// Shows Up Next on `tab`, or hides it when it's already showing that tab.
+    func toggleQueue(_ tab: QueueTab) {
+        if showQueue, queueTab == tab { showQueue = false } else { queueTab = tab; showQueue = true }
+    }
     var showImporter = false
     var pendingImportMode: ImportMode = .reference
     var lookupTracks: [Track]?     // MusicBrainz sheet
@@ -415,6 +446,13 @@ final class AppModel {
         } else {
             path.append(.album(key))
         }
+    }
+
+    /// Shows a song's album from anywhere (Up Next, History, the transport).
+    func goToAlbum(of track: Track) {
+        sidebar = .albums
+        path = []
+        openAlbum(track.albumKey)
     }
 
     func openAlbumFamily(_ memberKey: String) {

@@ -11,7 +11,6 @@ struct TransportBar: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
     @State private var showDevices = false
-    @State private var showQueue = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -23,11 +22,10 @@ struct TransportBar: View {
             HStack(spacing: 12) {
                 DeviceChip(showDevices: $showDevices)
                 VolumeControl()
-                Button { showQueue.toggle() } label: { Image(systemName: "list.bullet").font(.system(size: 14)) }
-                    .buttonStyle(TransportIconStyle(active: showQueue))
-                    .help("Queue")
-                    .accessibilityLabel("Queue")
-                    .popover(isPresented: $showQueue, arrowEdge: .top) { QueueView().environment(model).frame(width: 380, height: 460) }
+                Button { model.showQueue.toggle() } label: { Image(systemName: "list.bullet").font(.system(size: 14)) }
+                    .buttonStyle(TransportIconStyle(active: model.showQueue))
+                    .help("Up Next (⌥⌘U)")
+                    .accessibilityLabel("Up Next")
                 Button { openWindow(id: "mini") } label: { Image(systemName: "pip").font(.system(size: 14)) }
                     .buttonStyle(TransportIconStyle())
                     .help("Mini Player (⇧⌘M)")
@@ -421,60 +419,5 @@ struct AppVolumeToggle: View {
             }
         }
         .toggleStyle(.switch).controlSize(.mini)
-    }
-}
-
-// MARK: - Queue
-
-struct QueueView: View {
-    @Environment(AppModel.self) private var model
-
-    var body: some View {
-        let player = model.player
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Up Next").font(Typeface.serif(18))
-                Spacer()
-                Button(String(localized: "Clear", comment: "Clears the upcoming queue")) { player.clearUpcoming() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(player.upcoming.isEmpty)
-            }
-            .padding(14)
-            if let current = player.current {
-                row(current, isCurrent: true).padding(.horizontal, 8)
-                Hairline().padding(.vertical, 6)
-            }
-            List {
-                ForEach(Array(player.upcoming)) { entry in
-                    row(entry, isCurrent: false)
-                        .contextMenu {
-                            Button("Play Now") { player.jump(to: entry.id) }
-                            Button("Remove") { player.removeFromQueue(entry.id) }
-                        }
-                        .onTapGesture(count: 2) { player.jump(to: entry.id) }
-                        .accessibilityAction(named: "Play Now") { player.jump(to: entry.id) }
-                }
-                .onMove { player.moveUpcoming(from: $0, to: $1) }
-                .onDelete { idx in idx.map { Array(player.upcoming)[$0].id }.forEach(player.removeFromQueue) }
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            if player.upcoming.isEmpty {
-                Text("Nothing queued").font(Typeface.ui(12)).foregroundStyle(Palette.text3).frame(maxWidth: .infinity).padding()
-            }
-        }
-    }
-
-    private func row(_ e: QueueEntry, isCurrent: Bool) -> some View {
-        HStack(spacing: 10) {
-            ArtworkView(key: model.artworkKey(e.track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(e.track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
-                Text(e.track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
-            }
-            Spacer()
-            Text(e.track.formatSummary).font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
-        }
-        // One VoiceOver stop per song: title, artist, format.
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(isCurrent ? .isSelected : [])
     }
 }
