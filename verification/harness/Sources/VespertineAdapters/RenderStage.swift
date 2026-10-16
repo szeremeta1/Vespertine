@@ -76,7 +76,7 @@ final class RefusedStage: DoPStage, FloatStage, IntegerStage {
 // MARK: - DoP
 
 /// DoP as Vespertine plays it: passthrough and DoP on, integer mode off (OutputSession.swift:101 allows integer mode
-/// only for PCM). The ring carries each DoP sample as RawDoPDecoder writes it (FFmpegDecoder.swift:238-239): the
+/// only for PCM). The ring carries each DoP sample as RawDoPDecoder writes it (FFmpegDecoder.swift:252-253): the
 /// left-justified 32-bit word as a signed integer over 2^31, which a Float32 holds exactly.
 final class RenderDoPStage: DoPStage {
     let rt: RenderContext

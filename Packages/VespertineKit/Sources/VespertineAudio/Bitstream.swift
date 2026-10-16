@@ -35,21 +35,44 @@ public enum BitstreamFormat: String, Sendable, Hashable {
     public func carrierRate(for rate: Double) -> Double { self == .eac3 ? rate * 4 : rate }
 }
 
+/// Why a frame can't go out in a burst. The framers check their own input rather than trust the reader: a burst
+/// whose length word (Pd) claims more than it carries makes a receiver read into the next burst's preamble.
+public enum BurstError: Error, Equatable, Sendable {
+    /// No sync word where the frame should start.
+    case noSync
+    /// The bytes don't hold a whole frame (cut short, a header that doesn't parse, or bytes left over after it).
+    case notAFrame
+    /// The frame isn't the codec this burst carries (E-AC-3 handed to the AC-3 framer, or the other way round).
+    case wrongCodec
+    /// Dolby Digital Plus: the frames don't add up to six audio blocks (1536 samples).
+    case blocks(Int)
+    /// DTS: a frame of a length with no burst type (only 512, 1024 and 2048 samples have one).
+    case samples(Int)
+    /// The payload doesn't fit after the preamble within the burst's repetition period.
+    case tooBig(bytes: Int, room: Int)
+}
+
 /// IEC 61937 framing.
 public enum IEC61937 {
     static let pa: UInt16 = 0xF872, pb: UInt16 = 0x4E1F
     static let typeAC3: UInt16 = 1, typeEAC3: UInt16 = 21
     static let typeDTS512: UInt16 = 11, typeDTS1024: UInt16 = 12, typeDTS2048: UInt16 = 13
 
+    /// Payload bytes that fit in a burst of `period` stereo frames, after the four preamble words.
+    static func room(period: Int) -> Int { (period * 2 - 4) * 2 }
+
     /// One data burst of `period` stereo frames: preamble, the payload as 16-bit words, zeros.
     /// Words are big-endian pairs of payload bytes (the order the bitstream is written in);
-    /// the samples go out as ordinary 16-bit PCM.
-    static func burst(type: UInt16, lengthCode: UInt16, payload: [UInt8], period: Int) -> [Int16] {
+    /// the samples go out as ordinary 16-bit PCM. Pd is the payload's length in bytes or bits, and a payload
+    /// that doesn't fit whole is refused: never cut short under a Pd that claims all of it.
+    static func burst(type: UInt16, payload: [UInt8], lengthInBytes: Bool, period: Int) throws(BurstError) -> [Int16] {
+        guard payload.count <= room(period: period) else { throw .tooBig(bytes: payload.count, room: room(period: period)) }
         var out = [Int16](repeating: 0, count: period * 2)
         out[0] = Int16(bitPattern: pa); out[1] = Int16(bitPattern: pb)
-        out[2] = Int16(bitPattern: type); out[3] = Int16(bitPattern: lengthCode)
+        out[2] = Int16(bitPattern: type)
+        out[3] = Int16(bitPattern: UInt16(lengthInBytes ? payload.count : payload.count * 8))
         var i = 0, w = 4
-        while i < payload.count, w < out.count {
+        while i < payload.count {
             let hi = UInt16(payload[i]), lo = i + 1 < payload.count ? UInt16(payload[i + 1]) : 0
             out[w] = Int16(bitPattern: hi << 8 | lo)
             i += 2; w += 1
@@ -57,24 +80,62 @@ public enum IEC61937 {
         return out
     }
 
+    /// The Dolby frame at `offset` of `bytes`, which must start with a sync word and fit whole.
+    private static func dolbyFrame(_ bytes: [UInt8], at offset: Int) throws(BurstError) -> DolbyFrames.Frame {
+        guard offset + 2 <= bytes.count, bytes[offset] == 0x0B, bytes[offset + 1] == 0x77 else { throw .noSync }
+        guard let frame = DolbyFrames.frame(in: bytes, at: offset) else { throw .notAFrame }
+        return frame
+    }
+
     /// A Dolby Digital frame: one burst per 1536-sample frame. Pd is the length in bits.
-    public static func ac3Burst(_ frame: [UInt8]) -> [Int16] {
-        let bsmod = frame.count > 5 ? UInt16(frame[5] & 0x07) : 0
-        return burst(type: typeAC3 | bsmod << 8, lengthCode: UInt16(truncatingIfNeeded: frame.count * 8), payload: frame, period: 1536)
+    public static func ac3Burst(_ frame: [UInt8]) throws(BurstError) -> [Int16] {
+        let parsed = try dolbyFrame(frame, at: 0)
+        guard !parsed.isEnhanced else { throw .wrongCodec }
+        guard parsed.bytes.count == frame.count else { throw .notAFrame }
+        let bsmod = UInt16(frame[5] & 0x07)
+        return try burst(type: typeAC3 | bsmod << 8, payload: frame, lengthInBytes: false, period: 1536)
     }
 
     /// Dolby Digital Plus: frames adding up to six audio blocks (1536 samples) in one burst of 6144 stereo
-    /// frames at four times the rate. Pd is the length in bytes.
-    public static func eac3Burst(_ frames: [[UInt8]]) -> [Int16] {
-        let payload = frames.flatMap { $0 }
-        return burst(type: typeEAC3, lengthCode: UInt16(truncatingIfNeeded: payload.count), payload: payload, period: 6144)
+    /// frames at four times the rate. Pd is the length in bytes. Each element may hold several frames back to back
+    /// (an MP4 sample: the independent frame and its dependent substreams); every byte must belong to a frame.
+    public static func eac3Burst(_ frames: [[UInt8]]) throws(BurstError) -> [Int16] {
+        var blocks = 0
+        for bytes in frames {
+            var offset = 0
+            repeat {
+                let frame = try dolbyFrame(bytes, at: offset)
+                guard frame.isEnhanced else { throw .wrongCodec }
+                if frame.startsAudio { blocks += frame.blocks }
+                offset += frame.bytes.count
+            } while offset < bytes.count
+        }
+        guard blocks == 6 else { throw .blocks(blocks) }
+        return try burst(type: typeEAC3, payload: frames.flatMap { $0 }, lengthInBytes: true, period: 6144)
     }
 
-    /// A DTS core frame of `samples` samples (512, 1024 or 2048). Pd is the length in bits.
-    public static func dtsBurst(_ frame: [UInt8], samples: Int) -> [Int16] {
-        let type = samples == 512 ? typeDTS512 : samples == 1024 ? typeDTS1024 : typeDTS2048
-        return burst(type: type, lengthCode: UInt16(truncatingIfNeeded: frame.count * 8), payload: frame, period: samples)
+    /// A DTS core frame (16-bit big-endian form). Its length in samples (NBLKS) picks the burst type and period,
+    /// and its size (FSIZE) must match the bytes given. Pd is the length in bits.
+    public static func dtsBurst(_ frame: [UInt8]) throws(BurstError) -> [Int16] {
+        guard frame.count >= 4, frame[0] == 0x7F, frame[1] == 0xFE, frame[2] == 0x80, frame[3] == 0x01 else { throw .noSync }
+        guard frame.count >= 8 else { throw .notAFrame }
+        let nblks = Int(frame[4] & 0x01) << 6 | Int(frame[5] >> 2)
+        let fsize = Int(frame[5] & 0x03) << 12 | Int(frame[6]) << 4 | Int(frame[7] >> 4)
+        guard fsize + 1 == frame.count else { throw .notAFrame }
+        let samples = (nblks + 1) * 32
+        let type: UInt16
+        switch samples {
+        case 512: type = typeDTS512
+        case 1024: type = typeDTS1024
+        case 2048: type = typeDTS2048
+        default: throw .samples(samples)
+        }
+        return try burst(type: type, payload: frame, lengthInBytes: false, period: samples)
     }
+
+    /// What goes out in place of a burst that can't be sent: `frames` stereo frames of zeros, so the carrier keeps
+    /// its timing. A receiver plays no audio for it.
+    static func silence(frames: Int) -> [Int16] { [Int16](repeating: 0, count: frames * 2) }
 }
 
 /// Splits Dolby Digital / Dolby Digital Plus elementary streams into frames.
@@ -253,6 +314,8 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
     private var reader: AVAssetReader?
     private var output: AVAssetReaderTrackOutput?
     private var pending: [[UInt8]] = []
+    /// Audio blocks in the last sample that parsed: a damaged sample is assumed to hold as many.
+    private var lastBlocks = 6
     let sampleRate: Double
     let isEnhanced: Bool
     let totalSamples: Int64
@@ -300,12 +363,14 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
             }
         }
         // The whole sample goes out: an MP4 sample is one stretch of audio, the independent frame and any dependent
-        // substreams after it, so the first header gives its blocks and rate.
+        // substreams after it, so the first header gives its blocks and rate. A sample that doesn't parse keeps its
+        // place in time (as many blocks as the last good one); the framer refuses it and its burst plays as silence.
         let bytes = pending.removeFirst()
         guard var frame = DolbyFrames.frame(in: bytes, at: 0) else {
-            return DolbyFrames.Frame(bytes: bytes, isEnhanced: isEnhanced, blocks: 6, sampleRate: sampleRate)
+            return DolbyFrames.Frame(bytes: bytes, isEnhanced: isEnhanced, blocks: lastBlocks, sampleRate: sampleRate)
         }
         frame.bytes = bytes
+        lastBlocks = frame.blocks
         return frame
     }
 
@@ -324,7 +389,10 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
 }
 
 /// Produces the IEC 61937 carrier (16-bit stereo) for a Dolby source. Positions are carrier frames.
-final class BitstreamDecoder: NSObject, PCMDecoding {
+/// A burst the framer refuses (a damaged frame, or a payload too big for its burst) goes out as silence of the
+/// same length, and is counted in `concealedFrames`. So does the last Dolby Digital Plus burst of a stream when it
+/// holds fewer than six audio blocks, which isn't counted: the stream simply ends there.
+final class BitstreamDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     private let source: DolbyFrameSource
     private let url: URL
     private var pendingSamples: [Int16] = []    // interleaved carrier samples not yet delivered
@@ -335,6 +403,8 @@ final class BitstreamDecoder: NSObject, PCMDecoding {
     let format: BitstreamFormat
     private(set) var isOpen = false
     private let outFormat: AVAudioFormat
+    /// Bursts sent as silence because the framer refused them.
+    private(set) var concealedFrames = 0
 
     init(url: URL, source: DolbyFrameSource) {
         self.url = url
@@ -399,14 +469,26 @@ final class BitstreamDecoder: NSObject, PCMDecoding {
 
     private func refill() throws {
         guard let frame = try source.next() else {
-            if let group = eac3Group.finish() { pendingSamples += IEC61937.eac3Burst(group.map(\.bytes)) }
+            if let group = eac3Group.finish() { pendingSamples += eac3Carrier(group, last: true) }
             done = true
             return
         }
         if format == .ac3 {
-            pendingSamples += IEC61937.ac3Burst(frame.bytes)
+            do throws(BurstError) { pendingSamples += try IEC61937.ac3Burst(frame.bytes) }
+            catch { pendingSamples += IEC61937.silence(frames: 1536); concealedFrames += 1 }
         } else if let group = eac3Group.add(frame) {
-            pendingSamples += IEC61937.eac3Burst(group.map(\.bytes))
+            pendingSamples += eac3Carrier(group, last: false)
+        }
+    }
+
+    /// One Dolby Digital Plus group's burst, or silence for as long as its audio blocks last (four carrier frames per
+    /// sample) if the framer refuses it. A short last group is expected at the end of a stream and not counted.
+    private func eac3Carrier(_ group: [DolbyFrames.Frame], last: Bool) -> [Int16] {
+        do throws(BurstError) { return try IEC61937.eac3Burst(group.map(\.bytes)) }
+        catch {
+            let blocks = group.filter(\.startsAudio).reduce(0) { $0 + $1.blocks }
+            if !(last && error == .blocks(blocks) && blocks < 6) { concealedFrames += 1 }
+            return IEC61937.silence(frames: blocks * 256 * Int(ratio))
         }
     }
 }

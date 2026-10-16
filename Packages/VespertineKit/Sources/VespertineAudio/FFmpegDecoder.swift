@@ -164,6 +164,8 @@ extension FFmpegDecoder: RawDSDSource {
 
 /// DSD over PCM from the raw 1-bit stream (any DSD rate): 16 DSD bits per channel per frame, behind the
 /// alternating 0x05 / 0xFA marker, as 24-bit samples (carried exactly in Float32). Positions are DoP frames.
+/// An odd last byte per channel at the end of the track is padded with DSD silence (`DoP.silence`) into a last
+/// whole frame rather than dropped.
 final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     private let source: RawDSDSource
     private var frame: AVAudioFramePosition = 0
@@ -209,7 +211,7 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     var isOpen: Bool { source.isOpen }
     var supportsSeeking: Bool { true }
     var position: AVAudioFramePosition { frame }
-    var length: AVAudioFramePosition { source.dsdLength / 2 }
+    var length: AVAudioFramePosition { (source.dsdLength + 1) / 2 }
     var concealedFrames: Int { source.concealedFrames }
     func open() throws {}
     func close() throws { try source.close() }
@@ -228,14 +230,26 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
             planes = .allocate(capacity: planeBytes * channels)
         }
         guard let planes else { throw DTSError.decoding }
-        var pointers: [UnsafeMutablePointer<UInt8>] = (0..<channels).map { planes + $0 * planeBytes }
-        let got = try pointers.withUnsafeMutableBufferPointer { try source.readDSD(into: $0.baseAddress!, bytes: want * 2) }
-        let frames = got / 2
+        guard want > 0 else { return }
+        // Whole frames only: a read that ends on half a frame reads on, and the end of the track on half a frame is
+        // padded with DSD silence.
+        var bytes = 0, end = false
+        while bytes < want * 2 {
+            var pointers: [UnsafeMutablePointer<UInt8>] = (0..<channels).map { planes + $0 * planeBytes + bytes }
+            let got = try pointers.withUnsafeMutableBufferPointer { try source.readDSD(into: $0.baseAddress!, bytes: want * 2 - bytes) }
+            bytes += got
+            if got == 0 { end = true; break }
+            if bytes % 2 == 0 { break }
+        }
+        if bytes % 2 == 1, end {
+            for c in 0..<channels { planes[c * planeBytes + bytes] = DoP.silence }
+            bytes += 1
+        }
+        let frames = bytes / 2
         for c in 0..<channels {
             let src = planes + c * planeBytes
             for i in 0..<frames {
-                let marker: UInt32 = (frame + markerOffset + AVAudioFramePosition(i)) & 1 == 0 ? 0x05 : 0xFA
-                let word = marker << 16 | UInt32(src[2 * i]) << 8 | UInt32(src[2 * i + 1])
+                let word = DoP.word(marker: Int(frame + markerOffset) + i, src[2 * i], src[2 * i + 1])
                 out[c][i] = Float(Int32(bitPattern: word << 8)) / 2_147_483_648
             }
         }

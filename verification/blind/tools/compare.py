@@ -67,12 +67,19 @@ def main(vdir: Path, ref_path: str, out_json=None, out_md=None) -> int:
     ref = load(ref_path)
     rows = []
 
-    def record(kind, name, fn_ref, ves_entry, serialize, unit, describe):
+    def record(kind, name, fn_ref, ves_entry, serialize, unit, describe, ves_refused=None):
         try:
             r = fn_ref()
         except Exception as e:                       # the reference refuses this input
-            rows.append({"kind": kind, "name": name, "result": "REF-REFUSES", "detail": f"{type(e).__name__}: {e}",
-                         "ves_bytes": len(serialize(ves_entry))})
+            if ves_refused is not None:
+                rows.append({"kind": kind, "name": name, "result": "BOTH-REFUSE",
+                             "detail": f"reference {type(e).__name__}: {e}; Vespertine {ves_refused}"})
+            else:
+                rows.append({"kind": kind, "name": name, "result": "REF-REFUSES", "detail": f"{type(e).__name__}: {e}",
+                             "ves_bytes": len(serialize(ves_entry))})
+            return
+        if ves_refused is not None:
+            rows.append({"kind": kind, "name": name, "result": "VES-REFUSES", "detail": ves_refused})
             return
         rb, vb = serialize(r), serialize(ves_entry)
         if rb == vb:
@@ -93,8 +100,8 @@ def main(vdir: Path, ref_path: str, out_json=None, out_md=None) -> int:
                 fn = lambda c=c: ref.eac3_burst([bytes.fromhex(f) for f in c["frames"]])
             else:
                 fn = lambda c=c: ref.dts_burst(bytes.fromhex(c["frame"]))
-            record(kind, c["name"], fn, words_hex(v["words"]), s16le, 2,
-                   lambda k: f"word {k} (frame {k // 2} subframe {k % 2 + 1})")
+            record(kind, c["name"], fn, words_hex(v.get("words", "")), s16le, 2,
+                   lambda k: f"word {k} (frame {k // 2} subframe {k % 2 + 1})", v.get("refused"))
     for c, v in zip(inp["eac3_group"], ves["eac3_group"]):
         frames = [bytes.fromhex(f) for f in c["frames"]]
         try:
@@ -125,6 +132,10 @@ def main(vdir: Path, ref_path: str, out_json=None, out_md=None) -> int:
             d = f"{r.get('bytes', '')} bytes identical" if "bytes" in r else "same groups"
         elif r["result"] == "REF-REFUSES":
             d = f"reference refuses ({r['detail']}); Vespertine produced {r.get('ves_bytes', '?')} bytes"
+        elif r["result"] == "BOTH-REFUSE":
+            d = f"both refuse ({r['detail']})"
+        elif r["result"] == "VES-REFUSES":
+            d = f"Vespertine refuses ({r['detail']}); the reference produced output"
         elif "diff" in r:
             x = r["diff"]
             d = f"{x['mismatched_bytes']} bytes differ (ref {x['ref_bytes']} B, Vespertine {x['ves_bytes']} B); " + "; ".join(

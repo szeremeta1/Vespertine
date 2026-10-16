@@ -15,9 +15,11 @@ changed. This is separate from, and doesn't replace, the spec-traced harness in
 - On valid input, Vespertine's bytes are what the public sources call for, as far as those sources go.
   - 28 of 30 fixed inputs came out byte-identical to two independently written blind reference implementations.
   - The blind suite has 276 cases, and none of its assertions about output values failed against Vespertine.
-- Ten cases failed. Each one asks the framer to refuse bad input, and Vespertine's framers never refuse anything.
+- Ten cases failed. Each one asks the framer to refuse bad input, and Vespertine's framers never refused anything.
+  They do now (see *Fixes after the round*).
 - The two inputs that didn't match exposed a real but hard-to-reach flaw: a payload too big for its burst is cut
   short, while the length word still claims the full size.
+- All four findings (B-01 to B-04) are fixed, each with a test.
 - The paid IEC 61937 standard wasn't available, so for IEC 61937 this shows agreement with SMPTE's public
   professional sibling standard and with FFmpeg. It does not show conformance to IEC 61937 itself.
 
@@ -49,27 +51,26 @@ keep their columns. Each page gets an anchor (`[doc p.N]`) and each detected hea
 
 ### 3. Isolated rooms, blind roles
 
-Each role ran headless in its own directory, through Vesper's `vesper-run --kind code-small --write
---tools Read,Grep,Glob` (no web tools). It got only the files its manifest names (`tools/make_room.py`):
+Each role ran headless in its own directory, with only file tools (read, search, write; no web tools). It got only the files its manifest names (`tools/make_room.py`):
 - the corpus;
 - the agent-facing [scope](../verification/blind/kit/SCOPE.md) and [rulings](../verification/blind/kit/RULINGS.md);
 - a hand-written [interface stub](../verification/blind/kit/stub/vblind.py), which states representations
   but no spec values;
 - for test-running roles, the pytest harness and the [citation checker](../verification/blind/kit/harness/citecheck.py).
 
-No role had repository access. Every tool call was traced (Vesper's delegated-command log) and checked by
+No role had repository access. Every tool call was logged and checked by
 `tools/isolation.py`. Each room's file list with hashes is in `rounds/*/*/ROOM-MANIFEST.txt`, and its trace
 check in `rounds/*/*/ISOLATION.txt`.
 
-| Role | What it did | Model |
-|---|---|---|
-| meter | Reference DoP packer/unpacker and IEC 61937 framer/parser from the corpus text, every constant cited | Claude Sonnet 5.5 (r1), GPT-6.1 Sol (r2 fix) |
-| tester | pytest suite against the stub. Every `assert` carries `[KEY]` citations (doc, section, page, verbatim quote, tier); tests that rest only on FFmpeg are marked `secondary` | Claude Sonnet 5.5 (r1), GPT-6.1 Sol (r2 fix) |
-| saboteur | Its own correct implementation (`base.py`) and 6 variants, each breaking exactly one cited behaviour | GPT-6.1 Sol |
-| auditor | Ran the suite against everything, then graded every citation against its page; verdict on line 1 | GPT-6.1 Sol |
+| Role | What it did |
+|---|---|
+| meter | Reference DoP packer/unpacker and IEC 61937 framer/parser from the corpus text, every constant cited |
+| tester | pytest suite against the stub. Every `assert` carries `[KEY]` citations (doc, section, page, verbatim quote, tier); tests that rest only on FFmpeg are marked `secondary` |
+| saboteur | Its own correct implementation (`base.py`) and 6 variants, each breaking exactly one cited behaviour |
+| auditor | Ran the suite against everything, then graded every citation against its page; verdict on line 1 |
 
-The brief asked for the Max account for every role. `vesper-run`'s router sends work elsewhere when Max's
-5-hour window runs hot (it was at 81%), so five of the seven runs went to Codex.
+The roles ran on models from two different vendors, so the reference, the tests and the audit don't all come
+from one model.
 
 Isolation results:
 - Every trace was checked. 175 tool calls stayed inside their rooms, and none used the network or git.
@@ -174,26 +175,67 @@ The saboteur's independent `base.py` gives the same 28/30 and refuses the same t
 | B-03 | The burst framers don't validate their input; validation sits upstream | MP4 samples that fail `DolbyFrames.frame` are forwarded with `blocks: 6` (`Bitstream.swift:305-306`) | damaged MP4 files | low |
 | B-04 | An odd trailing DSD byte per channel is dropped | `FFmpegDecoder.swift:233` | at most 8 DSD bits at a track's end; DoP 1.1 is silent | info |
 
-These are observations for the maintainer. How to handle them (refuse, split, skip or pad) is a design choice.
+## Fixes after the round
 
-## What this does not cover
+All four findings are fixed in VespertineKit, each with its own test. The round's records above are kept as they
+ran; they describe the code before the fixes.
 
-- **Conformance to IEC 61937** itself. Its clauses on the preamble, data types, stuffing, repetition periods and
-  the AC-3/E-AC-3/DTS mappings are paid. Every IEC 61937 pass here means agreement with ST 337/338/340 (the
-  professional sibling) and with FFmpeg as read by a blind agent. Rows marked secondary rest on FFmpeg alone.
-  Buying IEC 61937-1/-2/-3/-5 (CHF 440) would let a round test against the standard.
-- The consumer `data_type_dependent` fields. AC-3 bsmod in Pc bits 8-10 rests on FFmpeg only; E-AC-3 and DTS
-  use zero.
-- Pd for odd-length DTS payloads: exact bits (what Vespertine and both blind references send) or rounded up to a
-  whole word (FFmpeg's generic path). This is untested.
-- E-AC-3 with several independent substreams, and the convsync alignment rule.
-- DoP behaviour the standard doesn't define: the start marker, the idle "DSD silence" frames sent by
-  `vespertine_rt.c` (not bridged), and 32-bit integer containers. The paired-channel 128FS method isn't used by
-  Vespertine.
-- SFBAudioEngine's own `DoPDecoder`, which is only a fallback for DSD extensions FFmpeg doesn't open. It isn't
-  bridged.
-- Channel status, receivers and real hardware. The inputs are synthetic frames with valid headers, not decodable
-  audio.
+| ID | Behaviour chosen | Test |
+|---|---|---|
+| B-01 | **Refuse.** `IEC61937.burst` throws `BurstError.tooBig` when the payload doesn't fit after the preamble, so Pd can never claim more than the burst carries. Splitting isn't possible: a burst must carry its 1536 samples within its own repetition period. In playback the refused burst goes out as silence of the same length (the carrier keeps its timing) and counts as a damaged frame. | `BitstreamTests.overCapacity` |
+| B-02 | **Skip.** A Dolby Digital Plus burst must hold exactly six audio blocks (`BurstError.blocks`). A short last group at the end of a stream goes out as silence for as long as its blocks last, so the track's length holds. It isn't counted as damage: the stream just ends there. | `BitstreamTests.eac3Refusals`, `shortLastGroup` |
+| B-03 | **Drop.** An MP4 sample that doesn't parse keeps its place in time (as many blocks as the last good sample), the framer refuses it, and its burst plays as silence, counted as a damaged frame (the existing "damaged frames silenced" status). | `BitstreamTests.damagedMP4Sample` (an M4A with one sample's sync word broken) |
+| B-04 | **Pad.** An odd last DSD byte per channel is padded with DSD silence (0x69, the idle pattern Vespertine already sends) into a last whole DoP frame. DoP 1.1 is silent on half frames; padding keeps every DSD bit of the track and adds at most 8 bits (2.8 µs at DSD64) of silence, where dropping lost 8 bits of music. A read that ends on half a frame mid-track reads on rather than drop or split a frame. | `DoPPackingTests.oddLastByte` |
+
+### The framers now validate their own input
+
+The 10 refusal tests failed because Vespertine's framers trusted the reader. Rather than mark them expected-fail,
+the framers now check their input themselves, for three reasons: B-01 and B-03 are both cases of a framer
+trusting input it shouldn't (the MP4 path never went through the reader's checks); the checks are a header parse
+per burst, a few microseconds every 32 ms; and an expected-fail marker would hide a regression in exactly the code
+that writes the length word.
+
+- `IEC61937.ac3Burst`, `eac3Burst` and `dtsBurst` throw `BurstError`: no sync word, bytes that aren't exactly
+  whole frames (cut short, or left over), the wrong codec, other than six blocks (E-AC-3), a DTS frame length with
+  no burst type (only 512, 1024 and 2048 samples have one), or a payload that doesn't fit. `dtsBurst` now reads
+  everything from the frame header (NBLKS, FSIZE) instead of being told the frame length.
+- `DoP.pack` is the packer as a function: it throws `DoPError` for an odd byte count, unequal channels, no
+  channels, or a marker other than 0x05 / 0xFA. `RawDoPDecoder` shares its sample word (`DoP.word`) and pads,
+  as B-04 describes, before anything reaches the packing.
+
+The bridge (`verification/blind/bridge`) and `tools/vespertine_adapter.py` now pass those refusals through as
+`BurstError` / `DoPError`, and `tools/compare.py` reports a refusal on both sides as `BOTH-REFUSE`. The adapter no
+longer answers the DoP marker, unequal-length and short-DTS-header cases as not applicable, since Vespertine now
+decides them itself.
+
+The blind matrix needs macOS to run against Vespertine and hasn't been re-run since the fixes. The expected result
+is all 10 former failures passing, the 6 DoP refusal cases moving from not applicable to tested, and the two
+over-capacity inputs reading `BOTH-REFUSE`; until it is re-run, the round-2 tables above are the measured result.
+To re-run, export the vectors again and run the matrix (see *Running it again*).
+
+## Limits
+
+- **170 of the 276 cases rest on FFmpeg's reading of IEC 61937, not on the standard.** IEC 61937 itself is paid
+  and wasn't bought; a library copy has been requested. Every IEC 61937 pass here means agreement with ST 337/338/340
+  (the professional sibling) and with FFmpeg as read by a blind agent, not conformance to IEC 61937. Rows marked
+  secondary rest on FFmpeg alone. With the standard in hand (IEC 61937-1/-2/-3/-5, CHF 440 to buy) a round could
+  test against it.
+- **Not covered:**
+  - the DSD silence frames Vespertine sends between tracks and through pauses (the idle pattern in
+    `vespertine_rt.c`, not bridged; DoP 1.1 doesn't define one);
+  - DoP in 32-bit integer containers;
+  - IEC 60958 channel status (Vespertine sets none);
+  - real hardware: receivers and DACs. The inputs are synthetic frames with valid headers, not decodable audio.
+- Also outside the round:
+  - the consumer `data_type_dependent` fields. AC-3 bsmod in Pc bits 8-10 rests on FFmpeg only; E-AC-3 and DTS
+    use zero;
+  - Pd for odd-length DTS payloads: exact bits (what Vespertine and both blind references send) or rounded up to a
+    whole word (FFmpeg's generic path). This is untested;
+  - E-AC-3 with several independent substreams, and the convsync alignment rule;
+  - which DoP marker the first frame carries (DoP 1.1 doesn't say). The paired-channel 128FS method isn't used by
+    Vespertine;
+  - SFBAudioEngine's own `DoPDecoder`, which is only a fallback for DSD extensions FFmpeg doesn't open. It isn't
+    bridged.
 
 ## Running it again
 

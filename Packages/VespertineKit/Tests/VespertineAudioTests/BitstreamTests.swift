@@ -37,7 +37,7 @@ struct BitstreamTests {
         #expect(frames.count > 40)
         #expect(frames.allSatisfy { !$0.isEnhanced && $0.blocks == 6 && $0.sampleRate == 48_000 })
         #expect(frames.reduce(0) { $0 + $1.bytes.count } == stream.count)            // nothing skipped
-        let bursts = frames.map { IEC61937.ac3Burst($0.bytes) }
+        let bursts = try frames.map { try IEC61937.ac3Burst($0.bytes) }
         #expect(bursts.allSatisfy { $0.count == 1536 * 2 })
         let back = unpack(bursts.flatMap { $0 }, lengthInBytes: false)
         #expect(back.map(\.payload) == frames.map(\.bytes))
@@ -52,7 +52,7 @@ struct BitstreamTests {
         #expect(frames.reduce(0) { $0 + $1.bytes.count } == stream.count)
         let groups = BitstreamPacker.eac3Groups(frames)
         #expect(groups.allSatisfy { $0.reduce(0) { $0 + $1.blocks } == 6 })
-        let bursts = groups.map { IEC61937.eac3Burst($0.map(\.bytes)) }
+        let bursts = try groups.map { try IEC61937.eac3Burst($0.map(\.bytes)) }
         #expect(bursts.allSatisfy { $0.count == 6144 * 2 })
         let back = unpack(bursts.flatMap { $0 }, lengthInBytes: true)
         #expect(back.map(\.payload) == groups.map { $0.flatMap(\.bytes) })
@@ -180,6 +180,133 @@ struct BitstreamTests {
         try decoder.decode(into: buffer, length: 100)     // one burst out, part of the next collected
         try decoder.seek(to: 0)
         #expect(try carrier(decoder) == whole)
+    }
+
+    // MARK: The framers check their input (blind-agent findings B-01 to B-03, docs/VERIFICATION-BLIND.md)
+
+    /// A synthetic AC-3 syncframe: 48 kHz, frmsizecod 16 (256 words), bsid 8, `bsmod`.
+    private func ac3Frame(bsmod: UInt8 = 0) -> [UInt8] {
+        var f = [UInt8](repeating: 0x5A, count: 512)
+        f[0] = 0x0B; f[1] = 0x77; f[4] = 16; f[5] = 8 << 3 | bsmod
+        return f
+    }
+
+    /// A synthetic DTS core frame (16-bit big-endian): NBLKS and FSIZE as given, the rest filler.
+    private func dtsFrame(nblks: Int, bytes: Int) -> [UInt8] {
+        let bits: UInt32 = 1 << 31 | 31 << 26 | UInt32(nblks) << 18 | UInt32(bytes - 1) << 4
+        var f: [UInt8] = [0x7F, 0xFE, 0x80, 0x01, UInt8(bits >> 24), UInt8(bits >> 16 & 0xFF), UInt8(bits >> 8 & 0xFF), UInt8(bits & 0xFF)]
+        f += [UInt8](repeating: 0x33, count: bytes - 8)
+        return f
+    }
+
+    /// The burst's Pd in bytes, and the payload bytes the burst has room for.
+    private func pdBytes(_ burst: [Int16], lengthInBytes: Bool) -> Int {
+        let pd = Int(UInt16(bitPattern: burst[3]))
+        return lengthInBytes ? pd : (pd + 7) / 8
+    }
+
+    @Test("Dolby Digital: a frame without its sync word, cut short, or of the wrong codec is refused")
+    func ac3Refusals() throws {
+        let good = ac3Frame(bsmod: 2)
+        let burst = try IEC61937.ac3Burst(good)
+        #expect(UInt16(bitPattern: burst[2]) == 1 | 2 << 8 && Int(burst[3]) == good.count * 8)
+        var badSync = good; badSync[1] = 0x78
+        #expect(throws: BurstError.noSync) { try IEC61937.ac3Burst(badSync) }
+        #expect(throws: BurstError.notAFrame) { try IEC61937.ac3Burst(Array(good.prefix(300))) }
+        #expect(throws: BurstError.notAFrame) { try IEC61937.ac3Burst(good + [0]) }
+        #expect(throws: BurstError.wrongCodec) { try IEC61937.ac3Burst(eac3Frame(bytes: 200, blocks: 6, tag: 1)) }
+    }
+
+    @Test("Dolby Digital Plus: a burst must hold exactly six audio blocks of valid frames (B-02)")
+    func eac3Refusals() throws {
+        let oneBlock = (0..<6).map { eac3Frame(bytes: 200, blocks: 1, tag: UInt8($0)) }
+        #expect(try IEC61937.eac3Burst(oneBlock).count == 6144 * 2)
+        #expect(throws: BurstError.blocks(3)) { try IEC61937.eac3Burst(Array(oneBlock.prefix(3))) }
+        #expect(throws: BurstError.blocks(7)) { try IEC61937.eac3Burst(oneBlock + [eac3Frame(bytes: 200, blocks: 1, tag: 9)]) }
+        var badSync = eac3Frame(bytes: 200, blocks: 6, tag: 1); badSync[0] = 0x77; badSync[1] = 0x0B
+        #expect(throws: BurstError.noSync) { try IEC61937.eac3Burst([badSync]) }
+        #expect(throws: BurstError.wrongCodec) { try IEC61937.eac3Burst([ac3Frame()]) }
+        // An MP4 sample holds the independent frame and its dependent one back to back: both are checked.
+        let sample = eac3Frame(bytes: 200, blocks: 6, tag: 1) + eac3Frame(bytes: 120, blocks: 6, dependent: true, tag: 2)
+        #expect(try IEC61937.eac3Burst([sample]).count == 6144 * 2)
+        #expect(throws: BurstError.notAFrame) { try IEC61937.eac3Burst([Array(sample.dropLast(10))]) }
+    }
+
+    @Test("A payload too big for its burst is refused, never cut short under a Pd that claims all of it (B-01)")
+    func overCapacity() throws {
+        // Six 4096-byte one-block frames: 24 576 bytes, 8 more than fit after the preamble in 6144 frames.
+        let big = (0..<6).map { eac3Frame(bytes: 4096, blocks: 1, tag: UInt8($0)) }
+        #expect(throws: BurstError.tooBig(bytes: 24_576, room: 24_568)) { try IEC61937.eac3Burst(big) }
+        // The biggest that fits goes out whole, Pd and payload agreeing.
+        let fits = try IEC61937.eac3Burst([eac3Frame(bytes: 4096, blocks: 6, tag: 1)])
+        #expect(pdBytes(fits, lengthInBytes: true) == 4096)
+        // DTS: a 512-sample frame has room for 2040 bytes.
+        #expect(try IEC61937.dtsBurst(dtsFrame(nblks: 15, bytes: 2040)).count == 512 * 2)
+        #expect(throws: BurstError.tooBig(bytes: 2044, room: 2040)) { try IEC61937.dtsBurst(dtsFrame(nblks: 15, bytes: 2044)) }
+
+        // In playback the refused burst goes out as silence of the same length, so the carrier keeps its timing.
+        let good = (0..<6).map { eac3Frame(bytes: 200, blocks: 1, tag: UInt8(10 + $0)) }
+        let url = try temporaryFile((good + big + good).flatMap { $0 })
+        defer { try? FileManager.default.removeItem(at: url) }
+        let decoder = try BitstreamDecoder.open(url: url)
+        let samples = try carrier(decoder)
+        #expect(samples.count == 3 * 6144 * 2)
+        #expect(samples[(6144 * 2)..<(2 * 6144 * 2)].allSatisfy { $0 == 0 })
+        #expect(unpack(samples, lengthInBytes: true).map(\.payload) == [good.flatMap { $0 }, good.flatMap { $0 }])
+        #expect(decoder.concealedFrames == 1)
+    }
+
+    @Test("DTS: the frame header decides the burst; no sync, a cut header, or an unsupported length is refused")
+    func dtsRefusals() throws {
+        for (nblks, type, period) in [(15, 11, 512), (31, 12, 1024), (63, 13, 2048)] {
+            let frame = dtsFrame(nblks: nblks, bytes: 1007)
+            let burst = try IEC61937.dtsBurst(frame)
+            #expect(burst.count == period * 2 && burst[2] == Int16(type) && Int(burst[3]) == 1007 * 8)
+        }
+        var noSync = dtsFrame(nblks: 31, bytes: 1000); noSync[0...3] = [0, 0, 0, 0]
+        #expect(throws: BurstError.noSync) { try IEC61937.dtsBurst(noSync) }
+        #expect(throws: BurstError.notAFrame) { try IEC61937.dtsBurst(Array(dtsFrame(nblks: 31, bytes: 1000).prefix(6))) }
+        #expect(throws: BurstError.notAFrame) { try IEC61937.dtsBurst(Array(dtsFrame(nblks: 31, bytes: 1000).prefix(900))) }
+        #expect(throws: BurstError.samples(256)) { try IEC61937.dtsBurst(dtsFrame(nblks: 7, bytes: 600)) }
+        #expect(throws: BurstError.samples(4096)) { try IEC61937.dtsBurst(dtsFrame(nblks: 127, bytes: 3000)) }
+    }
+
+    @Test("A stream ending on fewer than six blocks ends in silence for those blocks, not a short burst (B-02)")
+    func shortLastGroup() throws {
+        let stream = (0..<8).flatMap { eac3Frame(bytes: 200, blocks: 1, tag: UInt8($0)) }
+        let url = try temporaryFile(stream)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let decoder = try BitstreamDecoder.open(url: url)
+        let samples = try carrier(decoder)
+        // One burst of six blocks, then two blocks' worth (2 × 256 samples × 4 carrier frames) of silence.
+        #expect(samples.count == (6144 + 2 * 256 * 4) * 2 && Int64(samples.count / 2) == decoder.length)
+        #expect(samples[(6144 * 2)...].allSatisfy { $0 == 0 })
+        #expect(unpack(samples, lengthInBytes: true).map(\.payload) == [Array(stream.prefix(6 * 200))])
+        #expect(decoder.concealedFrames == 0)        // the stream just ends there; nothing was damaged
+    }
+
+    @Test("A damaged MP4 sample is dropped: its burst plays as silence and the rest stays in place (B-03)")
+    func damagedMP4Sample() throws {
+        let m4a = try fixture("dolby-digital-plus-tones.m4a")
+        let frames = DolbyFrames.frames(in: try fixture("dolby-digital-plus-tones.ec3"))
+        #expect(frames.allSatisfy { $0.blocks == 6 && !$0.isDependent })
+        // Break the sync word of the fourth frame where the MP4 holds it.
+        let target = frames[3].bytes
+        let at = try #require((0...(m4a.count - target.count)).first { m4a[$0..<($0 + target.count)].elementsEqual(target) })
+        var damaged = m4a
+        damaged[at] = 0; damaged[at + 1] = 0
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-\(UUID().uuidString).m4a")
+        try Data(damaged).write(to: url)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let decoder = try BitstreamDecoder.open(url: url)
+        let samples = try carrier(decoder)
+        let groups = BitstreamPacker.eac3Groups(frames)
+        #expect(samples.count == groups.count * 6144 * 2)
+        #expect(samples[(3 * 6144 * 2)..<(4 * 6144 * 2)].allSatisfy { $0 == 0 })
+        var expected = groups.map { $0.flatMap(\.bytes) }
+        expected.remove(at: 3)
+        #expect(unpack(samples, lengthInBytes: true).map(\.payload) == expected)
+        #expect(decoder.concealedFrames == 1)
     }
 }
 

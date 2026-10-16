@@ -1,10 +1,10 @@
 """Vespertine behind the blind interface (stub/vblind.py), so the tester's suite can run against it.
 
 The framing calls go to Vespertine's own Swift code through the bridge's `serve` test (bridge/Tests/BridgeExport):
-dop_pack -> RawDoPDecoder, ac3_burst / eac3_burst / dts_burst -> IEC61937.*, eac3_group -> EAC3Grouper.
-Vespertine has no receiver side, so dop_unpack and parse_bursts raise NotApplicable, and so does any input
-Vespertine's callers can never hand it (the adapter refuses it rather than crash the bridge); tests that end in
-NotApplicable are reported as not applicable, not as failures.
+dop_pack -> DoP.pack, ac3_burst / eac3_burst / dts_burst -> IEC61937.*, eac3_group -> EAC3Grouper. The framers
+check their own input; their refusals come back as DoPError / BurstError. Vespertine has no receiver side, so
+dop_unpack and parse_bursts raise NotApplicable, and so does a frame its parser rejects handed to the grouper (it
+can never reach it); tests that end in NotApplicable are reported as not applicable, not as failures.
 
 If VBLIND_REF_PARSER names a reference module, parse_bursts / dop_unpack are taken from it instead (to read
 Vespertine's output with an independent parser); results from that mode are labelled as such.
@@ -71,6 +71,8 @@ def _call(req: dict) -> dict:
     resp = json.loads(line)
     if "error" in resp:
         raise RuntimeError("bridge: " + resp["error"])
+    if "refused" in resp:
+        raise (DoPError if req["op"] == "dop_pack" else BurstError)(resp["refused"])
     return resp
 
 
@@ -79,10 +81,8 @@ def _words(h: str) -> list[int]:
 
 
 def dop_pack(dsd: list[bytes], first_marker: int = 0x05) -> list[list[int]]:
-    if not dsd or any(len(p) != len(dsd[0]) for p in dsd):
-        raise NotApplicable("Vespertine's DSD sources always deliver one or more channels of equal length")
-    if first_marker not in (0x05, 0xFA):
-        raise NotApplicable("Vespertine's marker state is a phase (0 or 1), it can't be given another marker")
+    if not 0 <= first_marker <= 0xFF:
+        raise NotApplicable("a marker is one byte")
     return _call({"op": "dop_pack", "planes": [bytes(p).hex() for p in dsd], "first_marker": first_marker})["frames"]
 
 
@@ -102,11 +102,7 @@ def eac3_group(frames: list[bytes]) -> list[list[int]]:
 
 
 def dts_burst(frame: bytes) -> list[int]:
-    frame = bytes(frame)
-    if len(frame) < 6:
-        raise NotApplicable("too short to carry a DTS header")
-    samples = ((frame[4] & 0x01) << 6 | frame[5] >> 2) * 32 + 32      # (NBLKS + 1) x 32; Vespertine is told this
-    return _words(_call({"op": "dts_burst", "frame": frame.hex(), "samples": samples})["words"])
+    return _words(_call({"op": "dts_burst", "frame": bytes(frame).hex()})["words"])
 
 
 _ref = None

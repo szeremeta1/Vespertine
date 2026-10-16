@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Isolation check for a blind role: every tool call the run made (from Vesper's delegated-command log) must stay
-inside its room. Flags absolute paths outside the room, `..`, `~`, $HOME, network and git commands.
+"""Isolation check for a blind role: every tool call the run made (from the runner's command log, JSON lines with
+`t`, `cwd` and `cmd`) must stay inside its room. Flags absolute paths outside the room, `..`, `~`, $HOME, network and git commands.
 
-Usage: python3 -I tools/isolation.py <room_dir> [cmdlog.jsonl ...]  -> prints a report; exit 1 if anything flagged
+Usage: python3 -I tools/isolation.py <room_dir> <cmdlog.jsonl> [...]  -> prints a report; exit 1 if anything flagged
 """
 import json
 import re
@@ -18,7 +18,7 @@ ALLOWED_ABS = ("/dev/null", "/tmp/", "/usr/bin/", "/bin/", "/private/tmp/")
 
 def main(argv):
     room = Path(argv[0]).resolve()
-    logs = argv[1:] or sorted(Path.home().glob("Vesper/state/models/cmdlog/*.jsonl"))[-2:]
+    logs = argv[1:]
     calls, flags = 0, []
     for lf in logs:
         for line in open(lf):

@@ -2,11 +2,13 @@
 // Vespertine verification, blind-agent round: runs Vespertine's own code on every input in inputs.json and writes
 // what it produced to vespertine.json. No checks here: the comparison is ../../tools/compare.py.
 //
-// Code paths exercised (VespertineKit, unchanged):
-//   DoP          RawDoPDecoder (FFmpegDecoder.swift), the packer used for playback, fed from memory
+// Code paths exercised (VespertineKit, read-only):
+//   DoP          RawDoPDecoder (FFmpegDecoder.swift), the decoder used for playback, fed from memory (export), and
+//                DoP.pack, the packer it shares its sample word with, which refuses half frames (serve)
 //   AC-3         IEC61937.ac3Burst, and BitstreamDecoder over an .ac3 file (the playback path)
 //   E-AC-3       IEC61937.eac3Burst, BitstreamPacker.eac3Groups (EAC3Grouper), BitstreamDecoder over an .ec3 file
-//   DTS          IEC61937.dtsBurst (samples per frame taken from the header's NBLKS by this adapter)
+//   DTS          IEC61937.dtsBurst (everything taken from the frame header)
+// A framer's refusal is written as {"refused": "<why>"} in place of the output.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -47,6 +49,11 @@ func bytes(_ hex: String) -> [UInt8] {
 }
 
 func hex16(_ words: [Int16]) -> String { words.map { String(format: "%04x", UInt16(bitPattern: $0)) }.joined() }
+
+/// A burst's words, or the framer's refusal.
+func burstEntry(_ make: () throws(BurstError) -> [Int16]) -> [String: Any] {
+    do throws(BurstError) { return ["words": hex16(try make())] } catch { return ["refused": "\(error)"] }
+}
 
 /// DoP frames as frames[n][c] 24-bit words: RawDoPDecoder's Float32 output is the 24-bit word over 2^23.
 func dopFrames(planes: [[UInt8]], firstMarker: Int) throws -> [[UInt32]] {
@@ -107,12 +114,13 @@ func carrier(frames: [[UInt8]], ext: String) throws -> (words: [Int16], rate: Do
             do {
                 switch op {
                 case "dop_pack":
-                    reply(["frames": try dopFrames(planes: (r["planes"] as! [String]).map(bytes), firstMarker: r["first_marker"] as! Int)
-                        .map { $0.map(Int.init) }])
-                case "ac3_burst": reply(["words": hex16(IEC61937.ac3Burst(bytes(r["frame"] as! String)))])
-                case "eac3_burst": reply(["words": hex16(IEC61937.eac3Burst((r["frames"] as! [String]).map(bytes)))])
-                case "dts_burst":
-                    reply(["words": hex16(IEC61937.dtsBurst(bytes(r["frame"] as! String), samples: r["samples"] as! Int))])
+                    do throws(DoPError) {
+                        let frames = try DoP.pack((r["planes"] as! [String]).map(bytes), firstMarker: UInt8(r["first_marker"] as! Int))
+                        reply(["frames": frames.map { $0.map(Int.init) }])
+                    } catch { reply(["refused": "\(error)"]) }
+                case "ac3_burst": reply(burstEntry { () throws(BurstError) in try IEC61937.ac3Burst(bytes(r["frame"] as! String)) })
+                case "eac3_burst": reply(burstEntry { () throws(BurstError) in try IEC61937.eac3Burst((r["frames"] as! [String]).map(bytes)) })
+                case "dts_burst": reply(burstEntry { () throws(BurstError) in try IEC61937.dtsBurst(bytes(r["frame"] as! String)) })
                 case "eac3_group":
                     let raw = (r["frames"] as! [String]).map(bytes)
                     // Vespertine's grouper takes parsed frames; a frame its parser rejects can't be grouped.
@@ -140,10 +148,10 @@ func carrier(frames: [[UInt8]], ext: String) throws -> (words: [Int16], rate: Do
         return ["name": c["name"]!, "frames": frames.map { $0.map(Int.init) }]
     }
     out["ac3"] = input["ac3"]!.map { c in
-        ["name": c["name"]!, "words": hex16(IEC61937.ac3Burst(bytes(c["frame"] as! String)))]
+        burstEntry { () throws(BurstError) in try IEC61937.ac3Burst(bytes(c["frame"] as! String)) }.merging(["name": c["name"]!]) { a, _ in a }
     }
     out["eac3"] = input["eac3"]!.map { c in
-        ["name": c["name"]!, "words": hex16(IEC61937.eac3Burst((c["frames"] as! [String]).map(bytes)))]
+        burstEntry { () throws(BurstError) in try IEC61937.eac3Burst((c["frames"] as! [String]).map(bytes)) }.merging(["name": c["name"]!]) { a, _ in a }
     }
     out["eac3_group"] = input["eac3_group"]!.map { c in
         let frames = (c["frames"] as! [String]).map { DolbyFrames.frame(in: bytes($0), at: 0)! }
@@ -152,10 +160,7 @@ func carrier(frames: [[UInt8]], ext: String) throws -> (words: [Int16], rate: Do
         return ["name": c["name"]!, "groups": groups]
     }
     out["dts"] = input["dts"]!.map { c in
-        let frame = bytes(c["frame"] as! String)
-        let nblks = Int(frame[4] & 0x01) << 6 | Int(frame[5] >> 2)       // NBLKS: bits 25..19 after SYNC
-        return ["name": c["name"]!, "samples": (nblks + 1) * 32,
-                "words": hex16(IEC61937.dtsBurst(frame, samples: (nblks + 1) * 32))]
+        burstEntry { () throws(BurstError) in try IEC61937.dtsBurst(bytes(c["frame"] as! String)) }.merging(["name": c["name"]!]) { a, _ in a }
     }
     for key in ["ac3_stream", "eac3_stream"] {
         out[key] = try input[key]!.map { c in
