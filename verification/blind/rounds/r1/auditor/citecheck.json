@@ -1,0 +1,1352 @@
+{
+ "citations": {
+  "DOP_MARKER_ALT": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_MARKER_SAME": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_MARKER_MSB": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_BITS_OLDEST": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_DIAGRAM": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_24BIT": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_PER_CHANNEL": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_OTHER_MARKER": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_ALT_MARKERS": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "DOP_RX_MISSING": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary",
+   "doc": "dop-1.1"
+  },
+  "ST337_PA": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_PB": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_EXT_SYNC": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_FRAME_PRE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_CONSUMER_SUBSET": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_CONSUMER_16": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_PRE_FOLLOW": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T7_TYPE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T7_MODE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T7_ERR": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T7_DTD": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T7_STREAM": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_T8_16": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_ERR0": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_STREAM0": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_LEN_BITS": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_LEN_NOPRE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_FIRST_BIT": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_LAST_UNUSED": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_UNUSED_ZERO": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_FOUR_ZERO": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST337_IDLE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st337-2015"
+  },
+  "ST338_AC3": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st338-2016"
+  },
+  "ST338_EAC3_IEC": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st338-2016"
+  },
+  "ST338_DTS1": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st338-2016"
+  },
+  "ST338_DTS2": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st338-2016"
+  },
+  "ST338_DTS3": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st338-2016"
+  },
+  "ST340_AC3_TYPE": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_AC3_DTD_RESERVED": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_AC3_PAYLOAD": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_AC3_PERIOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_AC3_PAD": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_EAC3_PAYLOAD": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_EAC3_6BLK": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_EAC3_TYPE_PRO": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "ST340_EAC3_PERIOD_PRO": {
+   "ok": true,
+   "errors": [],
+   "tier": "sibling-standard",
+   "doc": "smpte-st340-2015"
+  },
+  "IEC3_T3": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary-preview",
+   "doc": "iec61937-3-preview"
+  },
+  "IEC3_T4": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary-preview",
+   "doc": "iec61937-3-preview"
+  },
+  "IEC3_T4_56": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary-preview",
+   "doc": "iec61937-3-preview"
+  },
+  "IEC3_T5": {
+   "ok": true,
+   "errors": [],
+   "tier": "primary-preview",
+   "doc": "iec61937-3-preview"
+  },
+  "A52_SYNC": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_FSCOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_SYNCINFO": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_SIZE_48_128": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_SIZE_44_0": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_SIZE_32_40": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "A52_BSMOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "atsc-a52-2018"
+  },
+  "E_SYNCINFO": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102366"
+  },
+  "E_FRMSIZ": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102366"
+  },
+  "E_NUMBLKS": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102366"
+  },
+  "DTS_SYNC": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102114"
+  },
+  "DTS_FSIZE": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102114"
+  },
+  "DTS_NBLKS": {
+   "ok": true,
+   "errors": [],
+   "tier": "codec-spec",
+   "doc": "etsi-ts-102114"
+  },
+  "FF_SYNC1": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_SYNC2": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_PC_BITS": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_PC_STREAM": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_PD_UNIT": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_FILL_ZERO": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_AC3_TYPE": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_AC3_BSMOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_AC3_PERIOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_PERIOD_BYTES": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_LEN_BITS": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_EAC3_TYPE": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_EAC3_ENUM": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_EAC3_PERIOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_EAC3_LEN": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_EAC3_GROUP": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_EAC3_GROUP_IDX": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_DTS1": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_DTS2": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_DTS3": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdif"
+  },
+  "FF_DTS_PERIOD": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_DTS_BADSYNC": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_DTS_UNSUPPORTED": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_TOO_BIG": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  },
+  "FF_ODD": {
+   "ok": true,
+   "errors": [],
+   "tier": "secondary",
+   "doc": "ffmpeg-spdif-n7.1/spdifenc"
+  }
+ },
+ "tests": {
+  "test_dop.py::test_pack_markers_alternate_from_05": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_markers_alternate_from_fa": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_default_first_marker": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_same_marker_on_every_channel": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_SAME"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_marker_is_the_8_msbs_of_a_24_bit_word": {
+   "cited_assertions": 2,
+   "keys": [
+    "DOP_24BIT",
+    "DOP_MARKER_MSB"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_oldest_bit_is_bit15": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_BITS_OLDEST",
+    "DOP_DIAGRAM"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_bit_order_within_first_byte": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_DIAGRAM"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_second_byte_in_low_half": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_DIAGRAM"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_sixteen_bits_per_frame_in_time_order": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_BITS_OLDEST",
+    "DOP_DIAGRAM"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_frame_count_and_width": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_BITS_OLDEST",
+    "DOP_PER_CHANNEL"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_channel_k_goes_to_pcm_channel_k": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_PER_CHANNEL"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_rejects_marker_not_of_base_method": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_ALT_MARKERS",
+    "DOP_MARKER_ALT",
+    "DOP_OTHER_MARKER"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_rejects_odd_byte_count": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_BITS_OLDEST"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_pack_rejects_unequal_channel_lengths": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_SAME",
+    "DOP_PER_CHANNEL"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_inverts_pack": {
+   "cited_assertions": 2,
+   "keys": [
+    "DOP_BITS_OLDEST",
+    "DOP_DIAGRAM",
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_reads_hand_built_stream": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_BITS_OLDEST",
+    "DOP_DIAGRAM",
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_non_alternating_markers": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_ALT"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_marker_differing_between_channels": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_SAME"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_channel_without_marker": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_SAME",
+    "DOP_RX_MISSING"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_markers_of_other_method": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_ALT_MARKERS",
+    "DOP_OTHER_MARKER"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_pcm_audio": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_MARKER_ALT",
+    "DOP_RX_MISSING"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_dop.py::test_unpack_rejects_word_wider_than_24_bits": {
+   "cited_assertions": 1,
+   "keys": [
+    "DOP_24BIT",
+    "DOP_MARKER_MSB"
+   ],
+   "tiers": [
+    "primary"
+   ]
+  },
+  "test_iec61937.py::test_pa_pb_are_the_sync_words_in_frame_one": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_EXT_SYNC",
+    "ST337_FRAME_PRE",
+    "ST337_PA",
+    "ST337_PB"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_pc_data_mode_bits_are_zero": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_CONSUMER_16",
+    "ST337_T7_MODE",
+    "ST337_T8_16"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_pc_error_flag_clear": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_ERR0",
+    "ST337_T7_ERR"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_pc_stream_number_is_zero": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_STREAM0",
+    "ST337_T7_STREAM"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_payload_follows_pd_big_endian": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FIRST_BIT",
+    "ST337_FRAME_PRE",
+    "ST337_PRE_FOLLOW"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_fill_after_payload_is_zero": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_FILL_ZERO",
+    "ST337_UNUSED_ZERO"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_unused_second_subframe_of_last_payload_frame_is_zero": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SIZE_44_0",
+    "ST337_LAST_UNUSED"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_data_type_is_1": {
+   "cited_assertions": 1,
+   "keys": [
+    "IEC3_T3",
+    "ST337_T7_TYPE",
+    "ST338_AC3",
+    "ST340_AC3_TYPE"
+   ],
+   "tiers": [
+    "primary-preview",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_pd_is_payload_length_in_bits": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_LEN_BITS",
+    "ST337_LEN_BITS",
+    "ST337_LEN_NOPRE",
+    "ST338_AC3"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_burst_is_1536_frames_long": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_AC3_PERIOD",
+    "ST340_AC3_PAD",
+    "ST340_AC3_PERIOD"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_payload_starts_with_the_syncword": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SYNC",
+    "ST337_FIRST_BIT",
+    "ST340_AC3_PAYLOAD"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_payload_is_one_whole_syncframe_48k": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SIZE_48_128",
+    "ST340_AC3_PAYLOAD"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_data_type_dependent_zero_for_bsmod_0": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_AC3_TYPE",
+    "ST340_AC3_DTD_RESERVED"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_bsmod_in_data_type_dependent_bits_0_2": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_AC3_BSMOD",
+    "FF_AC3_TYPE",
+    "FF_PC_BITS"
+   ],
+   "tiers": [
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_ac3_rejects_wrong_syncword": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SYNC",
+    "ST340_AC3_PAYLOAD"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_ac3_rejects_truncated_syncframe": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SIZE_48_128",
+    "A52_SYNCINFO",
+    "ST340_AC3_PAYLOAD"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_data_type_is_21_with_bits_5_6_zero": {
+   "cited_assertions": 1,
+   "keys": [
+    "IEC3_T4",
+    "IEC3_T4_56",
+    "ST338_EAC3_IEC"
+   ],
+   "tiers": [
+    "primary-preview",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_pd_is_payload_length_in_bytes": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_EAC3_LEN",
+    "FF_PD_UNIT"
+   ],
+   "tiers": [
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_eac3_burst_is_6144_frames_long": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_EAC3_PERIOD",
+    "FF_PERIOD_BYTES"
+   ],
+   "tiers": [
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_eac3_payload_is_the_frames_in_order": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FIRST_BIT",
+    "ST340_EAC3_PAYLOAD"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_payload_starts_with_the_syncword": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SYNC",
+    "E_SYNCINFO",
+    "ST337_FIRST_BIT"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_rejects_partial_group": {
+   "cited_assertions": 1,
+   "keys": [
+    "E_NUMBLKS",
+    "ST340_EAC3_6BLK"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_rejects_more_than_six_blocks": {
+   "cited_assertions": 1,
+   "keys": [
+    "E_NUMBLKS",
+    "ST340_EAC3_6BLK"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_rejects_wrong_syncword": {
+   "cited_assertions": 1,
+   "keys": [
+    "A52_SYNC",
+    "E_SYNCINFO"
+   ],
+   "tiers": [
+    "codec-spec"
+   ]
+  },
+  "test_iec61937.py::test_eac3_group_is_six_blocks_per_burst": {
+   "cited_assertions": 1,
+   "keys": [
+    "E_NUMBLKS",
+    "ST340_EAC3_6BLK"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_group_covers_every_frame_once_in_order": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST340_EAC3_6BLK",
+    "ST340_EAC3_PAYLOAD"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_eac3_group_of_six_block_frames_feeds_eac3_burst": {
+   "cited_assertions": 1,
+   "keys": [
+    "IEC3_T4",
+    "ST340_EAC3_6BLK"
+   ],
+   "tiers": [
+    "primary-preview",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_data_type_by_frame_length": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_NBLKS",
+    "FF_DTS1",
+    "FF_DTS2",
+    "FF_DTS3",
+    "ST338_DTS1",
+    "ST338_DTS2",
+    "ST338_DTS3"
+   ],
+   "tiers": [
+    "codec-spec",
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_pd_is_payload_length_in_bits": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_FSIZE",
+    "FF_LEN_BITS",
+    "ST337_LEN_BITS",
+    "ST337_LEN_NOPRE"
+   ],
+   "tiers": [
+    "codec-spec",
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_burst_length_is_two_words_per_sample": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_NBLKS",
+    "FF_DTS_PERIOD",
+    "FF_PERIOD_BYTES"
+   ],
+   "tiers": [
+    "codec-spec",
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_dts_payload_starts_with_the_sync_word": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_SYNC",
+    "ST337_FIRST_BIT"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_odd_length_frame_last_byte_is_msb_aligned": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_FSIZE",
+    "FF_ODD",
+    "ST337_FIRST_BIT",
+    "ST337_LAST_UNUSED"
+   ],
+   "tiers": [
+    "codec-spec",
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_odd_length_frame_fill_is_zero_and_period_kept": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_ODD",
+    "ST337_LAST_UNUSED",
+    "ST337_UNUSED_ZERO"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_iec61937.py::test_dts_rejects_missing_core_sync": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_SYNC",
+    "FF_DTS_BADSYNC"
+   ],
+   "tiers": [
+    "codec-spec",
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_dts_rejects_header_cut_short": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_FSIZE",
+    "DTS_NBLKS",
+    "DTS_SYNC"
+   ],
+   "tiers": [
+    "codec-spec"
+   ]
+  },
+  "test_iec61937.py::test_dts_rejects_frame_lengths_other_than_512_1024_2048": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_DTS_UNSUPPORTED"
+   ],
+   "tiers": [
+    "secondary"
+   ]
+  },
+  "test_iec61937.py::test_dts_rejects_frame_too_large_for_its_period": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_DTS_PERIOD",
+    "FF_TOO_BIG"
+   ],
+   "tiers": [
+    "secondary"
+   ]
+  },
+  "test_parse.py::test_parse_offset_is_index_of_pa_after_leading_zeros": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_EXT_SYNC",
+    "ST337_FOUR_ZERO",
+    "ST337_FRAME_PRE"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_pc_fields": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_PC_BITS",
+    "FF_PC_STREAM",
+    "ST337_T7_DTD",
+    "ST337_T7_ERR",
+    "ST337_T7_STREAM",
+    "ST337_T7_TYPE"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_length_code_is_raw_pd": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FRAME_PRE"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_payload_in_bits_for_ac3_type": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FIRST_BIT",
+    "ST337_LEN_BITS",
+    "ST338_AC3"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_payload_odd_byte_count_in_bits": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_ODD",
+    "ST337_LAST_UNUSED",
+    "ST337_LEN_BITS",
+    "ST338_DTS1"
+   ],
+   "tiers": [
+    "secondary",
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_payload_excludes_fill": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_LEN_BITS",
+    "ST337_LEN_NOPRE",
+    "ST337_UNUSED_ZERO"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_payload_in_bytes_for_eac3_type": {
+   "cited_assertions": 1,
+   "keys": [
+    "FF_EAC3_LEN",
+    "FF_PD_UNIT",
+    "IEC3_T4"
+   ],
+   "tiers": [
+    "primary-preview",
+    "secondary"
+   ]
+  },
+  "test_parse.py::test_parse_two_back_to_back_bursts": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FRAME_PRE",
+    "ST337_UNUSED_ZERO"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_all_zero_stream_has_no_burst": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_IDLE"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_parse_rejects_payload_running_past_the_end": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_LEN_BITS",
+    "ST337_PRE_FOLLOW"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_roundtrip_ac3_single_burst_fields": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_ERR0",
+    "ST337_FRAME_PRE",
+    "ST337_LEN_BITS",
+    "ST337_STREAM0",
+    "ST338_AC3"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_roundtrip_ac3_payload": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_LEN_BITS",
+    "ST340_AC3_PAYLOAD"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_roundtrip_ac3_three_bursts_offsets": {
+   "cited_assertions": 1,
+   "keys": [
+    "ST337_FRAME_PRE",
+    "ST340_AC3_PERIOD"
+   ],
+   "tiers": [
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_roundtrip_eac3_payload": {
+   "cited_assertions": 1,
+   "keys": [
+    "IEC3_T4",
+    "ST340_EAC3_PAYLOAD"
+   ],
+   "tiers": [
+    "primary-preview",
+    "sibling-standard"
+   ]
+  },
+  "test_parse.py::test_roundtrip_dts_payload_and_offsets": {
+   "cited_assertions": 1,
+   "keys": [
+    "DTS_FSIZE",
+    "ST337_FRAME_PRE",
+    "ST337_LEN_BITS"
+   ],
+   "tiers": [
+    "codec-spec",
+    "sibling-standard"
+   ]
+  }
+ },
+ "unused_citations": [
+  "A52_BSMOD",
+  "A52_FSCOD",
+  "A52_SIZE_32_40",
+  "E_FRMSIZ",
+  "FF_EAC3_ENUM",
+  "FF_EAC3_GROUP",
+  "FF_EAC3_GROUP_IDX",
+  "FF_EAC3_TYPE",
+  "FF_SYNC1",
+  "FF_SYNC2",
+  "IEC3_T5",
+  "ST337_CONSUMER_SUBSET",
+  "ST340_EAC3_PERIOD_PRO",
+  "ST340_EAC3_TYPE_PRO"
+ ],
+ "problems": []
+}

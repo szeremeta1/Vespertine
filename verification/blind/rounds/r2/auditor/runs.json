@@ -1,0 +1,65 @@
+[
+  {
+    "name": "stub",
+    "implementation": null,
+    "command": "VBLIND_IMPL unset: ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/stub.xml",
+    "exit_code": 1,
+    "output_file": "audit/stub.txt"
+  },
+  {
+    "name": "meter",
+    "implementation": "meter/vblind_ref.py",
+    "command": "VBLIND_IMPL=meter/vblind_ref.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/meter.xml",
+    "exit_code": 0,
+    "output_file": "audit/meter.txt"
+  },
+  {
+    "name": "base",
+    "implementation": "saboteurs/base.py",
+    "command": "VBLIND_IMPL=saboteurs/base.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/base.xml",
+    "exit_code": 0,
+    "output_file": "audit/base.txt"
+  },
+  {
+    "name": "sab_byte_order",
+    "implementation": "saboteurs/sab_byte_order.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_byte_order.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_byte_order.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_byte_order.txt"
+  },
+  {
+    "name": "sab_dop_bit_order",
+    "implementation": "saboteurs/sab_dop_bit_order.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_dop_bit_order.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_dop_bit_order.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_dop_bit_order.txt"
+  },
+  {
+    "name": "sab_length_off_by_one",
+    "implementation": "saboteurs/sab_length_off_by_one.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_length_off_by_one.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_length_off_by_one.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_length_off_by_one.txt"
+  },
+  {
+    "name": "sab_padding",
+    "implementation": "saboteurs/sab_padding.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_padding.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_padding.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_padding.txt"
+  },
+  {
+    "name": "sab_pc_datatype",
+    "implementation": "saboteurs/sab_pc_datatype.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_pc_datatype.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_pc_datatype.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_pc_datatype.txt"
+  },
+  {
+    "name": "sab_swapped_markers",
+    "implementation": "saboteurs/sab_swapped_markers.py",
+    "command": "VBLIND_IMPL=saboteurs/sab_swapped_markers.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_swapped_markers.xml",
+    "exit_code": 1,
+    "output_file": "audit/sab_swapped_markers.txt"
+  }
+]

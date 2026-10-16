@@ -1,0 +1,76 @@
+1. cat RULINGS.md
+exit=0; R0–R5 read successfully (full source: RULINGS.md).
+
+VBLIND_IMPL unset; ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/stub.xml
+exit=1; full output: audit/stub.log
+
+VBLIND_IMPL=meter/vblind_ref.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/meter.xml
+exit=1; full output: audit/meter.log
+
+VBLIND_IMPL=saboteurs/base.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/base.xml
+exit=0; full output: audit/base.log
+
+VBLIND_IMPL=saboteurs/sab_byte_order.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_byte_order.xml
+exit=1; full output: audit/sab_byte_order.log
+
+VBLIND_IMPL=saboteurs/sab_dop_bit_order.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_dop_bit_order.xml
+exit=1; full output: audit/sab_dop_bit_order.log
+
+VBLIND_IMPL=saboteurs/sab_length_off_by_one.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_length_off_by_one.xml
+exit=1; full output: audit/sab_length_off_by_one.log
+
+VBLIND_IMPL=saboteurs/sab_padding.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_padding.xml
+exit=1; full output: audit/sab_padding.log
+
+VBLIND_IMPL=saboteurs/sab_pc_datatype.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_pc_datatype.xml
+exit=1; full output: audit/sab_pc_datatype.log
+
+VBLIND_IMPL=saboteurs/sab_swapped_markers.py ./.venv/bin/python -m pytest tests -q -p no:cacheprovider --junitxml audit/sab_swapped_markers.xml
+exit=1; full output: audit/sab_swapped_markers.log
+
+Remaining command ledger (in execution order; Python inline programs identified by their operation). Every shell command exited 0 except the pytest runs already recorded above. Console truncation was a display limit, not command failure.
+
+2. ./.venv/bin/python -I -c [create audit and initialize command log]
+Result: exit0; audit created; command log initialized.
+3. cat SCOPE.md tests/citations.py tests/REPORT.md meter/COMPLIANCE.md saboteurs/SABOTEURS.md stub/vblind.py
+Result: exit0; source/contracts/reports read; combined console output truncated. Relevant tests/citations and meter source reread separately.
+4. ./.venv/bin/python -I citecheck.py . --json audit/citecheck.json
+Result: exit0; citations88 (88 resolve); tests74; problems0; unused14. JSON retained unchanged.
+5. ls tests meter saboteurs corpus/md
+Result: exit0; listed three test modules and helpers/citations/report, meter source/report/checker, base/six variants/support files and13 corpus markdown files.
+6. cat conftest.py tests/test_dop.py
+Result: exit0; harness loader and complete DoP tests read.
+7. cat tests/citations.py
+Result: exit0; complete88-key citation dictionary read.
+8. ./.venv/bin/python -I -c [run nine pytest subprocesses with60-second timeout each; persist outputs and runs.json]
+Result: exit0 for runner; individual subprocess exit codes/results above. Stub0/159; meter157/2; base159/0; byte-order136/23; bit-order153/6; length155/4; padding148/11; type158/1; markers152/7. All159-case runs completed within timeout.
+9. cat tests/test_iec61937.py tests/test_parse.py tests/helpers.py
+Result: exit0; complete remaining tests/builders read.
+10. cat audit/meter.log meter/vblind_ref.py tests/REPORT.md
+Result: exit0; two meter tracebacks, implementation and tester report read; combined output display truncated.
+11. ./.venv/bin/python -I -c [extract every unique cited page grouped by keys]
+Result: exit0; all28 cited pages opened; console truncated; targeted context reads followed, complete pages later saved to audit/cited-pages.md.
+12. ./.venv/bin/python -I -c [open every key page and emit context around its quote]
+Result: exit0; all88 quotes located on actual pages; console truncated; subset reads followed.
+13. sed -n '220,440p' meter/vblind_ref.py
+Result: exit0; meter AC-3/E-AC-3/DTS/parser implementation inspected.
+14. ./.venv/bin/python -I -c [targeted citation-page contexts for A52/E/DTS/IEC/ST340_E keys]
+Result: exit0; all selected contexts returned, including codec sizes and block table, preview titles and professional E-AC-3 clauses.
+15. ./.venv/bin/python -I -c [read A52 pages39/53/161; ETSI102366 pages126/241; ST337 page14]
+Result: exit0; confirmed AC-3 bsid/table continuation, ATSC reduced-rate branch, substream ordering, incorrect meter J.1.4.1 page and explicit consumer/professional differences.
+16. sed -n '198,225p' meter/vblind_ref.py
+Result: exit0; all three AC-3 lookup tables and reserved-code citation inspected.
+17. ./.venv/bin/python -I -c [targeted contexts for every FF_ citation]
+Result: exit0; all secondary enum/comment/assignment quotes inspected; full page supplies oversized-DTS and odd-byte code.
+18. ./.venv/bin/python -I -c [read ETSI102366 pages127/240 and A52 page52]
+Result: exit0; confirmed ETSI reserved fscod3, full numblks table, CMAF-specific J.1.4.1 on240, all early AC-3 table entries.
+19. cat audit/citecheck.json
+Result: exit0; machine report has no problems and14 unused keys; display truncated, JSON subsequently parsed directly.
+20. ./.venv/bin/python -I -c [parse every audit JUnit XML and list failed testcase IDs]
+Result: exit0; full six variant kill lists and two meter failures returned; counts agree with run logs.
+21. ./.venv/bin/python -I - [build semantic grade dictionary and AUDIT.md; preserve complete cited pages and citation uses]
+Result: exit0; wrote AUDIT.md with FAIL verdict,88 grades,28 complete cited pages and six full kill lists. Grade-key equality assertion passed.
+22. ./.venv/bin/python -I - [append this ledger and verify audit artifact consistency]
+Result: see final verification line below; no submitted role file modified by audit edits.
+
+Final verification: exit0; all9 XML files contain159 cases, no skips/errors; all159 stub failures are NotImplementedError; all88 grade rows present; one DOES-NOT-SUPPORT; verdict exactly VERDICT: FAIL.

@@ -1,0 +1,857 @@
+[
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "0x05 and 0xFA. Each channel within a sample contains the same marker.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "base.py:14"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 1,
+    "quote": "24 bits at a sample rate of 176.4kHz.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "base.py:17"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "The remaining 16 lower bits are then used for the DSD data, first or oldest bit in slot t0.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "base.py:18"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "The 8 most significant bits are used for the DSD marker and alternate with each sample between 0x05 and 0xFA.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "base.py:22"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "The remaining 16 lower bits are then used for the DSD data, first or oldest bit in slot t0.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "base.py:28"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "#define SYNCWORD1 0xF872",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:62"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "#define SYNCWORD2 0x4E1F",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:63"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_AC3                = 0x01,          ///< AC-3 data",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:66"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_EAC3               = 0x15,          ///< E-AC-3 data",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:67"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_DTS1               = 0x0B,          ///< DTS type I   (512 samples)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:68"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_DTS2               = 0x0C,          ///< DTS type II  (1024 samples)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:69"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_DTS3               = 0x0D,          ///< DTS type III (2048 samples)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:70"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "Pc - burst-info, contains data-type (bits 0-6), error flag (bit 7), data-type-dependent info (bits 8-12)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:75"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "and bitstream number (bits 13-15)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:76"
+  },
+  {
+    "doc": "smpte-st337-2015",
+    "section": "7.2.5",
+    "page": 12,
+    "quote": "The length_code shall indicate the length of the burst_payload in bits.",
+    "tier": "sibling-standard",
+    "note": "Shared burst structure inferred applicable via ST 337 sections 8.2\u20138.3. Consumer applicability of exact bit lengths is unverified for odd-byte DTS payloads; FFmpeg normally rounds these to whole words.",
+    "location": "base.py:82"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ctx->length_code = ctx->hd_buf_filled;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:83"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ctx->pkt_offset = AC3_FRAME_SIZE << 2;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:92"
+  },
+  {
+    "doc": "smpte-st340-2015",
+    "section": "4.1",
+    "page": 4,
+    "quote": "A Sync Frame begins with a sync word and contains 1536",
+    "tier": "sibling-standard",
+    "note": "Sibling-only evidence: codec sample count and six-block payload grouping are inferred to carry over because they describe decoded audio duration; consumer grouping and synchronization applicability unverified. Professional repetition rates and dependent fields are not imported.",
+    "location": "base.py:93"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ctx->pkt_offset  = 24576;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:94"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ctx->pkt_offset = blocks << 7;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:95"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ffio_fill(s->pb, 0, padding);",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:100"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ff_spdif_bswap_buf16((uint16_t *)ctx->buffer, (const uint16_t *)ctx->out_buf, ctx->out_bytes >> 1);",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:104"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "/* a final lone byte has to be MSB aligned */",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:105"
+  },
+  {
+    "doc": "smpte-st337-2015",
+    "section": "7.2.2",
+    "page": 9,
+    "quote": "The next frame shall contain Pc in Ch1 and Pd in Ch2.",
+    "tier": "sibling-standard",
+    "note": "Shared burst structure inferred applicable via ST 337 sections 8.2\u20138.3. Consumer applicability of exact bit lengths is unverified for odd-byte DTS payloads; FFmpeg normally rounds these to whole words.",
+    "location": "base.py:110"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.0",
+    "page": 32,
+    "quote": "The syncword is always 0x0B77, or 0000 1011 0111 0111.",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:119"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "Table 4.13: Frame size code table (1 word = 16 bits)",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:122"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000000 (0)                32                       96                     69                       64",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:123"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100101 (18)              640                       1 920                    1 394                    1 280",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:124"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000000 (0)                32                       96                     69                       64",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:125"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000001 (0)                32                       96                     70                       64",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:126"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000010 (1)                40                      120                     87                       80",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:127"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000011 (1)                40                      120                     88                       80",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:128"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000100 (2)                48                      144                    104                       96",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:129"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000101 (2)                48                      144                    105                       96",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:130"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000110 (3)                56                      168                    121                      112",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:131"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "000111 (3)                56                      168                    122                      112",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:132"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001000 (4)                64                      192                    139                      128",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:133"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001001 (4)                64                      192                    140                      128",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:134"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001010 (5)                80                      240                    174                      160",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:135"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001011 (5)                80                      240                    175                      160",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:136"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001100 (6)                96                      288                    208                      192",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:137"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001101 (6)                96                      288                    209                      192",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:138"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001110 (7)               112                      336                    243                      224",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:139"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "001111 (7)               112                      336                    244                      224",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:140"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010000 (8)               128                      384                    278                      256",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:141"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010001 (8)               128                      384                    279                      256",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:142"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010010 (9)               160                      480                    348                      320",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:143"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010011 (9)               160                      480                    349                      320",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:144"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010100 (10)               192                      576                    417                      384",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:145"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010101 (10)               192                      576                    418                      384",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:146"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 45,
+    "quote": "010110 (11)               224                      672                    487                      448",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:147"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "010111 (11)              224                        672                      488                      448",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:148"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011000 (12)              256                        768                      557                      512",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:149"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011001 (12)              256                        768                      558                      512",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:150"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011010 (13)              320                        960                      696                      640",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:151"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011011 (13)              320                        960                      697                      640",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:152"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011100 (14)              384                       1 152                     835                      768",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:153"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011101 (14)              384                       1 152                     836                      768",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:154"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011110 (15)              448                       1 344                     975                      896",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:155"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "011111 (15)              448                       1 344                     976                      896",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:156"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100000 (16)              512                       1 536                    1 114                    1 024",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:157"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100001 (16)              512                       1 536                    1 115                    1 024",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:158"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100010 (17)              576                       1 728                    1 253                    1 152",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:159"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100011 (17)              576                       1 728                    1 254                    1 152",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:160"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100100 (18)              640                       1 920                    1 393                    1 280",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:161"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.4.4.0",
+    "page": 46,
+    "quote": "100101 (18)              640                       1 920                    1 394                    1 280",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:162"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.3.0",
+    "page": 28,
+    "quote": "bsid ....................................................................................... 5",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:172"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "4.3.0",
+    "page": 28,
+    "quote": "bsmod ...................................................................................... 3",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:173"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "int bitstream_mode = pkt->data[5] & 0x7;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:174"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 127,
+    "quote": "00             1 block per syncframe",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:185"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 127,
+    "quote": "01             2 blocks per syncframe",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:186"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 127,
+    "quote": "10             3 blocks per syncframe",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:187"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 127,
+    "quote": "11             6 blocks per syncframe",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:188"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 114,
+    "quote": "strmtyp .................................................................................... 2",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:191"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 114,
+    "quote": "substreamid ................................................................................ 3",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:192"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 114,
+    "quote": "frmsiz .................................................................................... 11",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:193"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 127,
+    "quote": "The frmsiz field indicates a value one less than the overall size of the coded syncframe in 16-bit words.",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:194"
+  },
+  {
+    "doc": "smpte-st340-2015",
+    "section": "5.3",
+    "page": 10,
+    "quote": "deliver six blocks of audio data from all substreams being carried in the bitstream.",
+    "tier": "sibling-standard",
+    "note": "Sibling-only evidence: codec sample count and six-block payload grouping are inferred to carry over because they describe decoded audio duration; consumer grouping and synchronization applicability unverified. Professional repetition rates and dependent fields are not imported.",
+    "location": "base.py:208"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 126,
+    "quote": "The independent substream assigned substream ID 0 shall be the first substream present in the bit stream.",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:209"
+  },
+  {
+    "doc": "etsi-ts-102366",
+    "section": "Annex-E",
+    "page": 126,
+    "quote": "Dependent substreams shall immediately follow the independent substream with which they are associated.",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:210"
+  },
+  {
+    "doc": "etsi-ts-102114",
+    "section": "5.4.2",
+    "page": 25,
+    "quote": "SYNC = ExtractBits(32); //0x7FFE8001",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:250"
+  },
+  {
+    "doc": "etsi-ts-102114",
+    "section": "5.4.2",
+    "page": 26,
+    "quote": "(FSIZE+1) is the total byte size of the current frame including primary audio data as well as any extension audio data.",
+    "tier": "codec-spec",
+    "note": "Codec syntax, not a consumer transport requirement.",
+    "location": "base.py:253"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "blocks = (AV_RB16(pkt->data + 4) >> 2) & 0x7f;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:254"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "core_size = ((AV_RB24(pkt->data + 5) >> 4) & 0x3fff) + 1;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:255"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "case  512 >> 5: ctx->data_type = IEC61937_DTS1; break;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:256"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "case 1024 >> 5: ctx->data_type = IEC61937_DTS2; break;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:257"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "case 2048 >> 5: ctx->data_type = IEC61937_DTS3; break;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:258"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "Pd - length code (number of bits or bytes of encapsuled frame - according to data_type)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "base.py:281"
+  },
+  {
+    "doc": "smpte-st337-2015",
+    "section": "7.2.2",
+    "page": 9,
+    "quote": "The frame beginning the data burst shall contain preamble word Pa in the Ch1 subframe, and Pb in the Ch2 subframe.",
+    "tier": "sibling-standard",
+    "note": "Shared burst structure inferred applicable via ST 337 sections 8.2\u20138.3. Consumer applicability of exact bit lengths is unverified for odd-byte DTS payloads; FFmpeg normally rounds these to whole words.",
+    "location": "base.py:290"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ff_spdif_bswap_buf16((uint16_t *)ctx->buffer, (const uint16_t *)ctx->out_buf, ctx->out_bytes >> 1);",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "sab_byte_order.py:5"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "The remaining 16 lower bits are then used for the DSD data, first or oldest bit in slot t0.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "sab_dop_bit_order.py:5"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ctx->length_code = ctx->hd_buf_filled;",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "sab_length_off_by_one.py:5"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdifenc",
+    "section": "file",
+    "page": 1,
+    "quote": "ffio_fill(s->pb, 0, padding);",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "sab_padding.py:5"
+  },
+  {
+    "doc": "ffmpeg-spdif-n7.1/spdif",
+    "section": "file",
+    "page": 1,
+    "quote": "IEC61937_DTS3               = 0x0D,          ///< DTS type III (2048 samples)",
+    "tier": "secondary",
+    "note": "Independent implementation evidence only; consumer normative text unavailable.",
+    "location": "sab_pc_datatype.py:5"
+  },
+  {
+    "doc": "dop-1.1",
+    "section": "2",
+    "page": 2,
+    "quote": "0x05 and 0xFA. Each channel within a sample contains the same marker.",
+    "tier": "primary",
+    "note": "Direct DoP requirement; neither phase is mandated as the first sample.",
+    "location": "sab_swapped_markers.py:5"
+  }
+]

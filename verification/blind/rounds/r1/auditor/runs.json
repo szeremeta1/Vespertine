@@ -1,0 +1,47 @@
+[
+  {
+    "name": "stub",
+    "impl": null,
+    "exit": 1
+  },
+  {
+    "name": "meter",
+    "impl": "meter/vblind_ref.py",
+    "exit": 1
+  },
+  {
+    "name": "base",
+    "impl": "saboteurs/base.py",
+    "exit": 0
+  },
+  {
+    "name": "sab_byte_order",
+    "impl": "saboteurs/sab_byte_order.py",
+    "exit": 1
+  },
+  {
+    "name": "sab_dop_bit_order",
+    "impl": "saboteurs/sab_dop_bit_order.py",
+    "exit": 1
+  },
+  {
+    "name": "sab_length_off_by_one",
+    "impl": "saboteurs/sab_length_off_by_one.py",
+    "exit": 1
+  },
+  {
+    "name": "sab_padding",
+    "impl": "saboteurs/sab_padding.py",
+    "exit": 1
+  },
+  {
+    "name": "sab_pc_datatype",
+    "impl": "saboteurs/sab_pc_datatype.py",
+    "exit": 1
+  },
+  {
+    "name": "sab_swapped_markers",
+    "impl": "saboteurs/sab_swapped_markers.py",
+    "exit": 1
+  }
+]

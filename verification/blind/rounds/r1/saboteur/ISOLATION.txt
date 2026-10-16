@@ -1,0 +1,1 @@
+saboteur: 27 tool calls logged with cwd = room; 0 flagged
