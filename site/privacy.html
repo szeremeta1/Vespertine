@@ -43,7 +43,7 @@
 <main class="doc">
   <div class="eyebrow">Privacy</div>
   <h1>Vespertine collects nothing.</h1>
-  <p class="updated">Effective 2 October 2026 (clarified what each service receives; nothing new is sent)</p>
+  <p class="updated">Effective 17 October 2026 (adds the optional Discord status)</p>
 
   <p>Vespertine is a free, open-source music player. It has no accounts, no analytics, no telemetry, no crash reporting and no advertising. The developer receives no information about you or your music. Because the source code is public, you can check every statement on this page.</p>
 
@@ -55,6 +55,7 @@
     <li><strong>Update checks.</strong> Vespertine asks GitHub for its update feed about once a day, and when you choose Check for Updates. GitHub sees your IP address, as with any download. You can turn automatic checks off in Settings.</li>
     <li><strong>MusicBrainz and Cover Art Archive.</strong> Only when you use Look Up on MusicBrainz or Enrich Metadata (Find Music on This Mac offers Enrich for the music it adds, as a checkbox you can clear), Vespertine sends the album, artist and track names it's looking for to musicbrainz.org. With “Fetch cover art” on in Settings, it downloads covers from coverartarchive.org, which serves them from the Internet Archive (archive.org). MusicBrainz and the Cover Art Archive are run by the MetaBrainz Foundation.</li>
     <li><strong>ListenBrainz.</strong> Only if you turn on scrobbling and enter your token, Vespertine sends listenbrainz.org the songs you play: title, artist, album, duration and their MusicBrainz IDs when your files have them. It sends “playing now” when a song starts, and a listen with its time once you've heard half of it or four minutes.</li>
+    <li><strong>Discord.</strong> Only if you turn on the Discord status in Settings, Vespertine tells the Discord app on your Mac, over a connection that stays on your Mac, what's playing: title, artist, album, format and progress. Discord shows it as your status to the people who can see your activity. To show the album's cover, Vespertine looks it up by name, because Discord can only show images from the web: on coverartarchive.org when your files carry a MusicBrainz release ID, otherwise in Apple's iTunes Search (itunes.apple.com), which receives the artist and album names. Discord then downloads the cover from there. You can turn covers off, and your files and their covers are never uploaded.</li>
     <li><strong>Network shares.</strong> Vespertine connects to the servers you add, and nowhere else, to read your music. While a share is connected it checks every minute or so that the server still answers, and looks for new music every half hour (never while you're playing from it).</li>
   </ul>
 
