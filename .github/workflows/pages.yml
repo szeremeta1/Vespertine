@@ -1,42 +1,71 @@
-# Publishes site/ to GitHub Pages whenever it changes on main.
+# Builds the website (site/, Astro) and publishes it to GitHub Pages (vespertineapp.com, site/public/CNAME):
+# - on every push to main that touches the site, the feature guide it quotes (llms-full.txt) or this file;
+# - whenever a release is published, so the version, download link and "What's new" follow the release
+#   (scripts/fetch-releases.mjs reads them from GitHub's API before the build);
+# - by hand (Actions > Website > Run workflow).
+# Pull requests that touch the site get the same build and checks, without publishing.
 name: Website
 
 on:
   push:
     branches: [main]
-    paths: [site/**, .github/workflows/pages.yml]
+    paths: [site/**, docs/FEATURES.md, .github/workflows/pages.yml]
+  pull_request:
+    branches: [main]
+    paths: [site/**, docs/FEATURES.md, .github/workflows/pages.yml]
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages
-  # A deployment cut off halfway can leave the site half-published.
-  cancel-in-progress: false
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  # A deployment cut off halfway can leave the site half-published; superseded PR builds can go.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: site/.node-version
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      # The latest releases and their notes; if GitHub can't be reached, the committed snapshot is used.
+      - name: Refresh the release data
+        run: node scripts/fetch-releases.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      # astro build, then scripts/check-dist.mjs (CSP hashes, alt text, one h1, canonical, social cards, JSON-LD,
+      # local links, robots.txt, sitemap.xml, llms.txt).
+      - run: npm run build
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     # Only the deploying job can write to Pages.
     permissions:
-      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-      # Browsers cache style.css for 10 minutes; naming it by its content makes new pages arrive with their styles.
-      - name: Version the stylesheet
-        run: |
-          v=$(sha256sum site/style.css | cut -c1-10)
-          sed -i "s/style\.css?v=[A-Za-z0-9]*/style.css?v=$v/" site/*.html
-          grep -c "style.css?v=$v" site/*.html
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: site
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

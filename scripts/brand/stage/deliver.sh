@@ -37,9 +37,9 @@ ffmpeg -loglevel error -y -i "$out/Vespertine trailer poster.png" -q:v 3 "$out/V
 print "$out/Vespertine trailer poster.jpg"
 
 # The website and press kit serve the web cut in their player and offer the 1080p file for download.
-site=${0:A:h:h:h:h}/site/assets/trailer
+site=${0:A:h:h:h:h}/site/public/assets/trailer
 mkdir -p "$site"
 cp "$out/Vespertine trailer 16x9 web.mp4" "$site/vespertine-trailer.mp4"
 cp "$out/Vespertine trailer 16x9.mp4" "$site/vespertine-trailer-1080p.mp4"
-cp "$out/Vespertine trailer poster.jpg" "$site/poster.jpg"
+cp "$out/Vespertine trailer poster.jpg" "${site:h:h:h}/src/assets/shots/trailer-poster.jpg"   # the build makes the WebP poster from it
 print "site: $(du -sh "$site" | cut -f1) in $site"

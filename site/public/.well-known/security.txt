@@ -1,0 +1,7 @@
+# Vespertine's security policy: https://github.com/szeremeta1/Vespertine/blob/main/SECURITY.md
+# Please report security problems privately, not in a public issue.
+Contact: https://github.com/szeremeta1/Vespertine/security/advisories/new
+Expires: 2027-10-17T00:00:00.000Z
+Policy: https://github.com/szeremeta1/Vespertine/blob/main/SECURITY.md
+Preferred-Languages: en
+Canonical: https://vespertineapp.com/.well-known/security.txt
