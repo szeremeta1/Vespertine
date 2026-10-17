@@ -13,22 +13,22 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
-  Signed and notarized · no account, no telemetry · <a href="https://vespertineapp.com/">Website</a> · <a href="https://vespertineapp.com/privacy.html">Privacy</a>
+  Signed and notarized · no account, no telemetry · <a href="https://vespertineapp.com/">Website</a> · <a href="https://github.com/szeremeta1/Vespertine/discussions">Discussions</a> · <a href="https://github.com/sponsors/szeremeta1">Sponsor</a> · <a href="https://vespertineapp.com/privacy.html">Privacy</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><img src="https://img.shields.io/github/v/release/szeremeta1/Vespertine?label=download&color=c8a765" alt="Latest release"></a>
-  <a href="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml"><img src="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml"><img src="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml/badge.svg" alt="CI status"></a> <a href="https://github.com/szeremeta1/Vespertine/actions/workflows/pages.yml"><img src="https://github.com/szeremeta1/Vespertine/actions/workflows/pages.yml/badge.svg" alt="Website deploy status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-1f1f1f" alt="GPL-3.0"></a>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a FiiO K11, DSD over DoP, SACD images, 5.1 as Spatial Audio on AirPods Max, hi-res file analysis and 44 languages">
 </p>
 
 <p align="center">
   <a href="https://u24.gov.ua/"><img src="https://img.shields.io/badge/Stand_with-Ukraine-ffd700?labelColor=0057b7" alt="Stand with Ukraine"></a><br>
   <sub><strong>Vespertine stands with Ukraine.</strong> Please donate through <a href="https://u24.gov.ua/">United24</a>, <a href="https://savelife.in.ua/en/donate-en/">Come Back Alive</a> or <a href="https://www.razomforukraine.org/donate/">Razom for Ukraine</a>, or see <a href="https://stand-with-ukraine.pp.ua/">more ways to help</a>.</sub>
-</p>
-
-<p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a FiiO K11, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
 </p>
 
 ## Highlights
@@ -55,20 +55,20 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 
 ## Compared with other Mac players
 
-Bit-perfect playback is available in several Mac players. Vespertine focuses on a surround collection, a signal path you can inspect, and GPL source you can audit. Here's what each player's own documentation or source code says. "Not documented" means the vendor doesn't say either way; it is not a claim that the player lacks the feature.
+Bit-perfect playback is available in several Mac players. Vespertine focuses on a surround collection, a signal path you can inspect, and GPL source you can audit. Here's what each player's own documentation or source code says. **?** means the vendor doesn't say either way ("not documented"); it is not a claim that the player lacks the feature.
 
 | | Vespertine | Apple Music (Mac) | Audirvana Studio / Origin | Roon | VeraVox | Colibri | Cog | foobar2000 for Mac |
 |---|---|---|---|---|---|---|---|---|
 | Source code | GPL-3.0 | Closed | Closed | Closed | Closed | Closed | GPL-2.0 | Closed |
 | FLAC / DSD files | Yes / Yes | No / No | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / Yes | Yes / No⁴ |
-| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | Yes | Yes | Not documented |
+| Automatic DAC rate switching | Yes | No | Yes | Yes | Yes | Yes | Yes | ? |
 | Exclusive (hog) mode | Yes | No | Yes | Yes | Yes | Yes | Yes | Yes |
-| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | Vendor claim | Vendor claim | In-app loopback test | Vendor claim | In-app indicator | Not documented |
-| Local surround files | Yes² | Not documented | Yes | Yes | Yes | Not documented | Yes | Not documented |
-| Apple Spatial Audio for local surround | Yes | Catalog Atmos only³ | Not documented | Not documented | Not documented | Not documented | Yes | Not documented |
-| Hi-res file analysis | Yes | No | AudioScan | Dynamic range, loudness | Yes | Not documented | No (live spectrum only) | No (live spectrum only) |
+| 16/24-bit PCM without sample changes | Conditions + tests | macOS 27: third-party tests¹ | Vendor claim | Vendor claim | In-app loopback test | Vendor claim | In-app indicator | ? |
+| Local surround files | Yes² | ? | Yes | Yes | Yes | ? | Yes | ? |
+| Apple Spatial Audio for local surround | Yes | Catalog Atmos only³ | ? | ? | ? | ? | Yes | ? |
+| Hi-res file analysis | Yes | No | AudioScan | Dynamic range, loudness | Yes | ? | No (live spectrum only) | No (live spectrum only) |
 | SACD ISO | Yes | No | Yes | No (DSF/DFF only) | Yes | No | No | No⁴ |
-| Convolution / audio effect plugins | No / No | No / No | Yes (Origin: paid option) / Audio Units | Yes / No | No / No | Not documented / Not documented | No / No | Not documented / Audio Units |
+| Convolution / audio effect plugins | No / No | No / No | Yes (Origin: paid option) / Audio Units | Yes / No | No / No | ? / ? | No / No | ? / Audio Units |
 | Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (internet radio) | No (internet radio) | No (internet radio) |
 
 ¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in [third-party loopback tests reported on ASR](https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/). This is not a Vespertine measurement or a claim about every Mac configuration. Volume was at 100%; there is still no automatic rate switching, hog mode, FLAC or DSD on Mac. The original test report could not be independently rechecked for this update.
