@@ -1,0 +1,113 @@
+{
+  "measured": "2026-10-17, Lighthouse 13.5.0, default mobile emulation (simulated slow 4G, 4x CPU) unless desktop; after = astro preview on dormhub, before = live vespertineapp.com",
+  "runs": {
+    "before-home-mobile": {
+      "url": "https://vespertineapp.com/",
+      "performance": 73,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 6042,
+      "cls": 0.112,
+      "tbtMs": 0,
+      "fcpMs": 1992,
+      "kb": 930
+    },
+    "before-press-mobile": {
+      "url": "https://vespertineapp.com/press.html",
+      "performance": 100,
+      "accessibility": 96,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1668,
+      "cls": 0.011,
+      "tbtMs": 0,
+      "fcpMs": 838,
+      "kb": 461
+    },
+    "home-desktop": {
+      "url": "http://127.0.0.1:4329/",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 525,
+      "cls": 0,
+      "tbtMs": 0,
+      "fcpMs": 312,
+      "kb": 303
+    },
+    "home-mobile-1": {
+      "url": "http://127.0.0.1:4329/",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2416,
+      "cls": 0,
+      "tbtMs": 10,
+      "fcpMs": 1169,
+      "kb": 274
+    },
+    "home-mobile-2": {
+      "url": "http://127.0.0.1:4329/",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2423,
+      "cls": 0,
+      "tbtMs": 18,
+      "fcpMs": 1176,
+      "kb": 274
+    },
+    "home-mobile-3": {
+      "url": "http://127.0.0.1:4329/",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2337,
+      "cls": 0,
+      "tbtMs": 12,
+      "fcpMs": 1140,
+      "kb": 274
+    },
+    "press-mobile": {
+      "url": "http://127.0.0.1:4329/press.html",
+      "performance": 98,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2264,
+      "cls": 0,
+      "tbtMs": 0,
+      "fcpMs": 1377,
+      "kb": 188
+    },
+    "privacy-mobile": {
+      "url": "http://127.0.0.1:4329/privacy.html",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1958,
+      "cls": 0,
+      "tbtMs": 0,
+      "fcpMs": 1215,
+      "kb": 152
+    },
+    "terms-mobile": {
+      "url": "http://127.0.0.1:4329/terms.html",
+      "performance": 99,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 1954,
+      "cls": 0,
+      "tbtMs": 0,
+      "fcpMs": 1209,
+      "kb": 152
+    }
+  }
+}

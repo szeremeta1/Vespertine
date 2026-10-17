@@ -1,0 +1,190 @@
+[
+  {
+    "mode": "motion",
+    "w": 390,
+    "p": "/",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 390,
+    "p": "/press.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 390,
+    "p": "/privacy.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 390,
+    "p": "/terms.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 390,
+    "p": "/404.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 1440,
+    "p": "/",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 1440,
+    "p": "/press.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 1440,
+    "p": "/privacy.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 1440,
+    "p": "/terms.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "motion",
+    "w": 1440,
+    "p": "/404.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 390,
+    "p": "/",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 390,
+    "p": "/press.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 390,
+    "p": "/privacy.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 390,
+    "p": "/terms.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 390,
+    "p": "/404.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 1440,
+    "p": "/",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 1440,
+    "p": "/press.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast",
+      "video-caption"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 1440,
+    "p": "/privacy.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 1440,
+    "p": "/terms.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  },
+  {
+    "mode": "reduced",
+    "w": 1440,
+    "p": "/404.html",
+    "violations": [],
+    "incomplete": [
+      "color-contrast"
+    ]
+  }
+]
