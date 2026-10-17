@@ -280,8 +280,8 @@ nonisolated final class DiscordRPCClient: @unchecked Sendable {
             // READY arrives once Discord accepts the application (an unknown ID gets a CLOSE instead).
             let ready = try connection.receive(timeout: 5).first { $0.json?["evt"] as? String == "READY" }
             guard let ready else { connection.close(); throw DiscordIPC.Failure.timedOut }
-            let user = (ready.json?["data"] as? [String: Any])?["user"] as? [String: Any]
-            let name = (user?["global_name"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? user?["username"] as? String
+            let account = (ready.json?["data"] as? [String: Any])?["user"] as? [String: Any]
+            let name = (account?["global_name"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? account?["username"] as? String
             self.connection = connection
             shown = nil
             user = name
