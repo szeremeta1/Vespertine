@@ -58,6 +58,18 @@ struct AlbumFamiliesTests {
         #expect(groups[0].editions.count == 3)
     }
 
+    @Test("Mastering, pressing and reissue labels are editions too")
+    func masteringLabels() {
+        let groups = AlbumFamilies.group([album("A Night at the Opera", artist: "Queen", year: 1975),
+                                          album("A Night at the Opera (DCC Mastering)", artist: "Queen", year: 1975),
+                                          album("A Night at the Opera (2011 Japanese SHM-SACD)", artist: "Queen", year: 1975),
+                                          album("It's Only Rock 'n Roll (2009 Re-Mastered)", artist: "The Rolling Stones", year: 1974),
+                                          album("It's Only Rock 'n Roll", artist: "The Rolling Stones", year: 1974),
+                                          album("Desire (Live)", year: 1976)])
+        #expect(groups.map { $0.editions.count } == [3, 2, 1])
+        #expect(groups[0].title == "A Night at the Opera")
+    }
+
     @Test("A filtered page keeps one card when the matching editions have different joint credits")
     func filteredJointCredits() {
         let plain = album("Planet Waves", year: 1974)
