@@ -1,0 +1,91 @@
+name: Crash report
+description: Vespertine quit unexpectedly, or won't open.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a crash. The crash log is what makes it fixable, so please paste it below.
+
+        **Finding the crash log:** when macOS shows "Vespertine quit unexpectedly", click **Report…** and copy the text. Later, open **Console** › **Crash Reports** and pick the newest Vespertine entry, or look in `~/Library/Logs/DiagnosticReports` (in Finder: **Go** › **Go to Folder…**) for a file named `Vespertine-<date>.ips`.
+
+        Crash logs list your macOS user name in file paths and can include the names of files that were open. Edit those out if you prefer; the rest of the log is what matters.
+  - type: input
+    id: version
+    attributes:
+      label: Vespertine version
+      description: Vespertine › About Vespertine. If it won't open, select it in Applications and choose File › Get Info.
+      placeholder: "The version in Vespertine › About Vespertine"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      description: Apple menu › About This Mac. The build number helps too.
+      placeholder: "macOS 27.0.1 (build number)"
+    validations:
+      required: true
+  - type: input
+    id: mac
+    attributes:
+      label: Mac model
+      placeholder: "MacBook Pro 14-inch 2023, Mac mini 2018…"
+    validations:
+      required: true
+  - type: dropdown
+    id: chip
+    attributes:
+      label: Chip
+      options:
+        - Apple silicon (M1 or later)
+        - Intel
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: when
+    attributes:
+      label: When does it crash?
+      options:
+        - When it opens
+        - During playback
+        - While scanning or adding music
+        - While analyzing files
+        - In Settings or the setup assistant
+        - While updating
+        - Something else (describe below)
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What you did just before the crash, and whether it happens every time.
+      placeholder: |
+        1. Play an SACD image to the FiiO K11
+        2. Unplug the DAC
+        3. Vespertine quits
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Output device and file format
+      description: If it crashed during playback, the DAC or headphones and the format shown in the track list.
+      placeholder: "FiiO K11 over USB-C, DSD64 · 5.1"
+  - type: textarea
+    id: log
+    attributes:
+      label: Crash log
+      description: Paste the whole report. It is formatted as plain text automatically.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched existing issues for the same crash.
+          required: true

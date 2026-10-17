@@ -61,4 +61,10 @@ extension AppUpdater: SPUUpdaterDelegate {
     nonisolated func feedURLString(for updater: SPUUpdater) -> String? {
         LaunchArguments().string(forKey: "VespertineUpdateFeedOverride")
     }
+
+    /// Beta updates, opt-in (docs/BETA-CHANNEL.md): with `VespertineBetaUpdates` on, appcast items in the `beta`
+    /// channel are offered too. Off (the default) is Sparkle's empty set: only items without a channel.
+    nonisolated func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        UserDefaults.standard.bool(forKey: "VespertineBetaUpdates") ? ["beta"] : []
+    }
 }
