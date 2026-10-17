@@ -23,7 +23,7 @@ A 44.0 s trailer in 16:9, 1:1 and 9:16, with an original score: synthesized from
 - **Edit:** assembled in Final Cut Pro from an FCPXML, with cuts on the bar lines and 16-frame dissolves.
 - **Delivery:** H.264 at −14 LUFS.
 
-The 16:9 trailer (web and 1080p versions) is in `site/assets/trailer`. The ProRes masters and the 1:1 and 9:16 versions aren't kept in the repo.
+The 16:9 trailer (web and 1080p versions) is in `site/public/assets/trailer`. The ProRes masters and the 1:1 and 9:16 versions aren't kept in the repo.
 
 ## Reshooting
 

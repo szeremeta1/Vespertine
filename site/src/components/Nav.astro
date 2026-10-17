@@ -1,0 +1,29 @@
+---
+import logo from '../assets/brand/logo.svg';
+import { latest } from '../data/app';
+interface Props {
+  /** On the home page links are in-page anchors; elsewhere they point back home. */
+  home?: boolean;
+  current?: string;
+}
+const { home = false, current } = Astro.props;
+const base = home ? '' : '/';
+const items = [
+  { href: `${base}#features`, text: 'Features' },
+  { href: `${base}#formats`, text: 'Formats', cls: 'wide' },
+  { href: `${base}#compare`, text: 'Compare', cls: 'mid' },
+  { href: `${base}#whats-new`, text: 'What’s new', cls: 'wide' },
+  { href: `${base}#faq`, text: 'FAQ' },
+  { href: '/press.html', text: 'Press kit', cls: 'mid' },
+];
+---
+<header class="nav" id="top">
+  <a class="nav__brand" href={home ? '#top' : '/'}><img src={logo.src} width="1321" height="391" alt={home ? 'Vespertine, back to top' : 'Vespertine, home'}></a>
+  <nav aria-label="Primary">
+    <ul class="nav__links">
+      {items.map((i) => <li class={i.cls}><a href={i.href} aria-current={current === i.href ? 'page' : undefined}>{i.text}</a></li>)}
+    </ul>
+  </nav>
+  <a class="btn btn--brass btn--sm" href={latest.dmg.url}>Download<span class="sr-only"> Vespertine {latest.version} for Mac</span></a>
+  <div class="nav__meter" aria-hidden="true"><span></span></div>
+</header>

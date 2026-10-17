@@ -25,7 +25,7 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 
 ## Video
 
-- **Trailer** (`site/assets/trailer`): re-record the window clips (`scripts/brand/stage/raw`, ScreenCaptureKit, window
+- **Trailer** (`site/public/assets/trailer`): re-record the window clips (`scripts/brand/stage/raw`, ScreenCaptureKit, window
   only) on the same tracks as the stills, re-measure the overlay positions in `Scenes.swift` for each new recording,
   then `render.sh`, the Final Cut Pro edit and `deliver.sh`. Needs the FiiO K11 and AirPods Max for the bit-perfect,
   DSD and Spatial scenes.
@@ -34,8 +34,8 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 ## Derived
 
 - Press key art (`docs/press/*`): `scripts/brand/build.sh`.
-- Social previews (`site/assets/og*.png`): `scripts/make-social-preview.sh`.
-- Site JPEGs (`site/assets/*.jpg`, `site/assets/press/*.jpg`): `scripts/make-site-images.sh`.
+- Social previews (`site/public/assets/og*.png`): `scripts/make-social-preview.sh`. The website's per-page cards (`site/public/og/*.jpg`): `npm run og` in `site/`.
+- Site JPEGs (`site/src/assets/shots/*.jpg`, `site/src/assets/press/*.jpg`): `scripts/make-site-images.sh`.
 - Social previews render natively on a headless Mac with `VESPERTINE_SOCIAL_RENDERER=native`.
 
 ## Checks before a shot ships

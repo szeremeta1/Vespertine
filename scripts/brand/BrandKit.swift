@@ -18,10 +18,10 @@ enum Brand {
     /// The repo, found from this file's location (scripts/brand/).
     static let repo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
 
-    // MARK: Fonts (variable OFL fonts self-hosted by the website)
+    // MARK: Fonts (variable OFL fonts in docs/design/fonts/web)
 
     static func font(_ file: String, size: CGFloat, weight: CGFloat, opticalSize: CGFloat? = nil) -> CTFont {
-        let url = repo.appendingPathComponent("site/assets/fonts/\(file).woff2") as CFURL
+        let url = repo.appendingPathComponent("docs/design/fonts/web/\(file).woff2") as CFURL
         let d = (CTFontManagerCreateFontDescriptorsFromURL(url) as! [CTFontDescriptor])[0]
         let base = CTFontCreateWithFontDescriptor(d, size, nil)
         var variation: [NSNumber: NSNumber] = [:]
