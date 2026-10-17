@@ -59,7 +59,7 @@ struct BitstreamTests {
         #expect(BitstreamFormat.eac3.carrierRate(for: 48_000) == 192_000)
     }
 
-    private func carrier(_ decoder: BitstreamDecoder) throws -> [Int16] {
+    private static func carrier(_ decoder: BitstreamDecoder) throws -> [Int16] {
         let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 5000)!
         var out: [Int16] = []
         while true {
@@ -70,27 +70,48 @@ struct BitstreamTests {
         return out
     }
 
+    /// What a decoder made of a whole file.
+    private struct Played: Sendable {
+        var rate: Double, int16Stereo: Bool, samples: [Int16], length: Int64, concealed: Int
+    }
+
+    /// Opens `url` and plays it through on a thread of its own. AVFoundation's MP4 reader waits for work that needs a
+    /// thread of Swift's concurrency pool, so reading from a pool thread (any test) can wait forever once every pool
+    /// thread is busy the same way: CI's three-core runners hung on exactly that. Playback reads on its own thread.
+    private func play(_ url: URL) async throws -> Played {
+        return try await withCheckedThrowingContinuation { done in
+            Thread {
+                done.resume(with: Result {
+                    let decoder = try BitstreamDecoder.open(url: url)
+                    let format = decoder.processingFormat
+                    let samples = try Self.carrier(decoder)
+                    return Played(rate: format.sampleRate, int16Stereo: format.commonFormat == .pcmFormatInt16 && format.channelCount == 2,
+                                  samples: samples, length: decoder.length, concealed: decoder.concealedFrames)
+                })
+            }.start()
+        }
+    }
+
     @Test("The carrier for a file holds its frames exactly, at the right rate", arguments: [
         ("dolby-digital-tones.ac3", 48_000.0, false), ("dolby-digital-plus-tones.ec3", 192_000.0, true),
         ("dolby-digital-plus-tones.m4a", 192_000.0, true),
     ])
-    func carrierFromFile(name: String, rate: Double, enhanced: Bool) throws {
-        let url = Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Fixtures")!
-        let decoder = try BitstreamDecoder.open(url: url)
-        #expect(decoder.processingFormat.sampleRate == rate)
-        #expect(decoder.processingFormat.commonFormat == .pcmFormatInt16 && decoder.processingFormat.channelCount == 2)
-        let samples = try carrier(decoder)
+    func carrierFromFile(name: String, rate: Double, enhanced: Bool) async throws {
+        let played = try await play(Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Fixtures")!)
+        #expect(played.rate == rate)
+        #expect(played.int16Stereo)
+        let samples = played.samples
         let elementary = try fixture(name.replacingOccurrences(of: ".m4a", with: ".ec3"))
         let frames = DolbyFrames.frames(in: elementary)
         let expected = enhanced ? BitstreamPacker.eac3Groups(frames).map { $0.flatMap(\.bytes) } : frames.map(\.bytes)
         #expect(unpack(samples, lengthInBytes: enhanced).map(\.payload) == expected)
-        #expect(Int64(samples.count / 2) == decoder.length)
+        #expect(Int64(samples.count / 2) == played.length)
     }
 
     @Test("Seeking lands on the requested carrier frame, inside the burst that holds it")
     func seek() throws {
         let url = Bundle.module.url(forResource: "dolby-digital-tones.ac3", withExtension: nil, subdirectory: "Fixtures")!
-        let whole = try carrier(try BitstreamDecoder.open(url: url))
+        let whole = try Self.carrier(try BitstreamDecoder.open(url: url))
         let decoder = try BitstreamDecoder.open(url: url)
         for target in [0, 1536, 5000, 30_000] {
             try decoder.seek(to: AVAudioFramePosition(target))
@@ -155,7 +176,7 @@ struct BitstreamTests {
         let stream = dependentStream(units: 10, blocks: 6)
         let url = try temporaryFile(stream)
         defer { try? FileManager.default.removeItem(at: url) }
-        let whole = try carrier(try BitstreamDecoder.open(url: url))
+        let whole = try Self.carrier(try BitstreamDecoder.open(url: url))
         let groups = BitstreamPacker.eac3Groups(DolbyFrames.frames(in: stream))
         #expect(unpack(whole, lengthInBytes: true).map(\.payload) == groups.map { $0.flatMap(\.bytes) })
         let decoder = try BitstreamDecoder.open(url: url)
@@ -174,12 +195,12 @@ struct BitstreamTests {
     func seekClearsGroup() throws {
         let url = try temporaryFile(dependentStream(units: 30, blocks: 1))
         defer { try? FileManager.default.removeItem(at: url) }
-        let whole = try carrier(try BitstreamDecoder.open(url: url))
+        let whole = try Self.carrier(try BitstreamDecoder.open(url: url))
         let decoder = try BitstreamDecoder.open(url: url)
         let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 6144)!
         try decoder.decode(into: buffer, length: 100)     // one burst out, part of the next collected
         try decoder.seek(to: 0)
-        #expect(try carrier(decoder) == whole)
+        #expect(try Self.carrier(decoder) == whole)
     }
 
     // MARK: The framers check their input (blind-agent findings B-01 to B-03, docs/VERIFICATION-BLIND.md)
@@ -249,7 +270,7 @@ struct BitstreamTests {
         let url = try temporaryFile((good + big + good).flatMap { $0 })
         defer { try? FileManager.default.removeItem(at: url) }
         let decoder = try BitstreamDecoder.open(url: url)
-        let samples = try carrier(decoder)
+        let samples = try Self.carrier(decoder)
         #expect(samples.count == 3 * 6144 * 2)
         #expect(samples[(6144 * 2)..<(2 * 6144 * 2)].allSatisfy { $0 == 0 })
         #expect(unpack(samples, lengthInBytes: true).map(\.payload) == [good.flatMap { $0 }, good.flatMap { $0 }])
@@ -277,7 +298,7 @@ struct BitstreamTests {
         let url = try temporaryFile(stream)
         defer { try? FileManager.default.removeItem(at: url) }
         let decoder = try BitstreamDecoder.open(url: url)
-        let samples = try carrier(decoder)
+        let samples = try Self.carrier(decoder)
         // One burst of six blocks, then two blocks' worth (2 × 256 samples × 4 carrier frames) of silence.
         #expect(samples.count == (6144 + 2 * 256 * 4) * 2 && Int64(samples.count / 2) == decoder.length)
         #expect(samples[(6144 * 2)...].allSatisfy { $0 == 0 })
@@ -286,7 +307,7 @@ struct BitstreamTests {
     }
 
     @Test("A damaged MP4 sample is dropped: its burst plays as silence and the rest stays in place (B-03)")
-    func damagedMP4Sample() throws {
+    func damagedMP4Sample() async throws {
         let m4a = try fixture("dolby-digital-plus-tones.m4a")
         let frames = DolbyFrames.frames(in: try fixture("dolby-digital-plus-tones.ec3"))
         #expect(frames.allSatisfy { $0.blocks == 6 && !$0.isDependent })
@@ -298,15 +319,15 @@ struct BitstreamTests {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-\(UUID().uuidString).m4a")
         try Data(damaged).write(to: url)
         defer { try? FileManager.default.removeItem(at: url) }
-        let decoder = try BitstreamDecoder.open(url: url)
-        let samples = try carrier(decoder)
+        let played = try await play(url)
+        let samples = played.samples
         let groups = BitstreamPacker.eac3Groups(frames)
         #expect(samples.count == groups.count * 6144 * 2)
         #expect(samples[(3 * 6144 * 2)..<(4 * 6144 * 2)].allSatisfy { $0 == 0 })
         var expected = groups.map { $0.flatMap(\.bytes) }
         expected.remove(at: 3)
         #expect(unpack(samples, lengthInBytes: true).map(\.payload) == expected)
-        #expect(decoder.concealedFrames == 1)
+        #expect(played.concealed == 1)
     }
 }
 
