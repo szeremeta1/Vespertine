@@ -160,7 +160,7 @@ nonisolated enum DiscordStatus {
 final class DiscordPresence {
     /// Vespertine's application on Discord's developer portal: Discord shows its name ("Listening to Vespertine").
     /// `-DiscordApplicationID <id>` (or the same default) overrides it for testing.
-    nonisolated static let builtInApplicationID = "0"
+    nonisolated static let builtInApplicationID = "1561080379203653692"
     nonisolated static var applicationID: String {
         UserDefaults.standard.string(forKey: "DiscordApplicationID") ?? builtInApplicationID
     }
@@ -180,7 +180,7 @@ final class DiscordPresence {
     /// Shows `song` (nil: nothing is playing, so no status) while `enabled`. Cheap to call often: Discord only hears
     /// about changes.
     func update(enabled: Bool, song: DiscordNowPlaying?, lookUpArtwork: Bool) {
-        guard enabled, Self.applicationID != "0" else {
+        guard enabled else {
             if client != nil {
                 client?.shutdown()
                 client = nil
