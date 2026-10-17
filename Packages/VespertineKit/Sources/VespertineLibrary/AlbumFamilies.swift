@@ -87,7 +87,9 @@ public enum AlbumFamilies {
         var hasEditionSuffix = false
         if let range = title.range(of: #"\s*(?:\[[^\[\]]+\]|\([^()]+\))\s*$"#, options: .regularExpression) {
             let suffix = String(title[range])
-            if suffix.range(of: #"(?i)sacd|dsd|mofi|mobile fidelity|remaster|edition|deluxe|mono|stereo|\bmix\b|flac|vinyl|blu.?ray|dvd.a|spatial|surround|atmos|\b\d{2}[-/]\d{2,3}\b"#,
+            if suffix.range(of: #"(?i)sacd|dsd|mofi|mobile fidelity|remaster|edition|deluxe|mono|stereo|\bmix\b|flac|vinyl|blu.?ray|dvd.a|spatial|surround|atmos|\b\d{2}[-/]\d{2,3}\b"#
+                            + #"|\bdcc\b|master(?:ing|ed)?\b|\bhdcd\b|\bxrcd|\bshm\b|uhqcd|blu.?spec|\bgold\b|audiophile|japan(?:ese)?\b|\bimport\b"#
+                            + #"|expanded|anniversary|bonus|hi.?res|\b24.?bit|\bmfsl\b|\bdts\b|quad|\b5\.1\b|reissue"#,
                             options: .regularExpression) != nil {
                 title.removeSubrange(range)
                 title = title.trimmingCharacters(in: .whitespacesAndNewlines)
