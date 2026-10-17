@@ -89604,6 +89604,276 @@
         }
       }
     },
+    "Bit-perfect in Vespertine": {
+      "comment": "Shown on the user's Discord status, as the tooltip of Vespertine's small icon over the album cover: the song plays bit-perfect (samples reach the DAC unaltered) in Vespertine. Friends on Discord read this. Keep short.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በVespertine ውስጥ ቢት-ፍጹም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطابق للبتات في Vespertine"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এ বিট-পারফেক্ট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect ve Vespertine"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitperfekt i Vespertine"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfekt in Vespertine"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect στο Vespertine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect en Vespertine"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیت‌به‌بیت در Vespertine"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bittitarkka Vespertinessä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect sa Vespertine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect dans Vespertine"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineમાં બિટ-પરફેક્ટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect a Vespertine"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מדויק לסיבית ב־Vespertine"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine में बिट-परफ़ेक्ट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect a Vespertine-ben"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect di Vespertine"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect in Vespertine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineでビットパーフェクト再生"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನಲ್ಲಿ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine에서 비트 퍼펙트 재생"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ൽ ബിറ്റ്-പെർഫെക്റ്റ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine मध्ये बिट-परफेक्ट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect dalam Vespertine"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitperfekt i Vespertine"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitperfect in Vespertine"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਵਿੱਚ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect w Vespertine"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect no Vespertine"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect no Vespertine"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect în Vespertine"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitperfekt i Vespertine"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect katika Vespertine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-இல் பிட்-பெர்ஃபெக்ட்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineలో బిట్-పర్ఫెక్ట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บิตเพอร์เฟกต์ใน Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine’de bit-perfect"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Біт-у-біт у Vespertine"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine میں بٹ پرفیکٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bit-perfect trong Vespertine"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 位元完美播放"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 比特完美播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 位元完美播放"
+          }
+        }
+      }
+    },
     "Bit-perfect, %@": {
       "localizations": {
         "am": {
@@ -109826,6 +110096,546 @@
         }
       }
     },
+    "Connected to Discord": {
+      "comment": "Settings › Online › Discord, status caption.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከDiscord ጋር ተገናኝቷል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متصل بـ Discord"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord-এ সংযুক্ত"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Připojeno k Discordu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbundet til Discord"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit Discord verbunden"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Συνδεδεμένο στο Discord"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado a Discord"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وصل به Discord"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yhdistetty Discordiin"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nakakonekta sa Discord"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecté à Discord"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord સાથે કનેક્ટ થયું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An haɗa da Discord"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחובר ל־Discord"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord से कनेक्ट है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozva a Discordhoz"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terhubung ke Discord"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connesso a Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordに接続済み"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ಗೆ ಸಂಪರ್ಕಗೊಂಡಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord에 연결됨"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord-ലേക്ക് കണക്റ്റ് ചെയ്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord शी कनेक्ट केले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bersambung ke Discord"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilkoblet Discord"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbonden met Discord"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ਨਾਲ ਕਨੈਕਟ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połączono z Discordem"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado ao Discord"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligado ao Discord"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectat la Discord"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansluten till Discord"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imeunganishwa na Discord"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord-உடன் இணைக்கப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordకు కనెక్ట్ అయింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เชื่อมต่อกับ Discord แล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord’a bağlanıldı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Під’єднано до Discord"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord سے منسلک"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã kết nối Discord"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已連接 Discord"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接到 Discord"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已連線到 Discord"
+          }
+        }
+      }
+    },
+    "Connected to Discord as %@": {
+      "comment": "Settings › Online › Discord, status caption. %@ is the name of a Discord account.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከDiscord ጋር እንደ %@ ተገናኝቷል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متصل بـ Discord باسم %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ হিসেবে Discord-এ সংযুক্ত"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Připojeno k Discordu jako %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbundet til Discord som %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit Discord verbunden als %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Συνδεδεμένο στο Discord ως %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado a Discord como %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وصل به Discord به‌عنوان %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yhdistetty Discordiin käyttäjänä %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nakakonekta sa Discord bilang %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecté à Discord en tant que %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord સાથે %@ તરીકે કનેક્ટ થયું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An haɗa da Discord a matsayin %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחובר ל־Discord בתור %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord से %@ के रूप में कनेक्ट है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozva a Discordhoz: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terhubung ke Discord sebagai %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connesso a Discord come %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@としてDiscordに接続済み"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ಗೆ %@ ಆಗಿ ಸಂಪರ್ಕಗೊಂಡಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@(으)로 Discord에 연결됨"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ആയി Discord-ലേക്ക് കണക്റ്റ് ചെയ്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ म्हणून Discord शी कनेक्ट केले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bersambung ke Discord sebagai %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilkoblet Discord som %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbonden met Discord als %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ਨਾਲ %@ ਵਜੋਂ ਕਨੈਕਟ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połączono z Discordem jako %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectado ao Discord como %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligado ao Discord como %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectat la Discord ca %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansluten till Discord som %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imeunganishwa na Discord kama %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ஆக Discord-உடன் இணைக்கப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordకు %@గా కనెక్ట్ అయింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เชื่อมต่อกับ Discord แล้วในชื่อ %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord’a %@ olarak bağlanıldı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Під’єднано до Discord як %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord سے %@ کے طور پر منسلک"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã kết nối Discord với tư cách %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已以 %@ 身分連接 Discord"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已以 %@ 身份连接到 Discord"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已用 %@ 的身分連線到 Discord"
+          }
+        }
+      }
+    },
     "Connected, but the share’s contents can’t be read.": {
       "extractionState": "manual",
       "localizations": {
@@ -120753,6 +121563,276 @@
         }
       }
     },
+    "Covers are found by album name on the Cover Art Archive or in Apple’s music catalog, because Discord can only show images from the web. Your own files are never uploaded.": {
+      "comment": "Settings › Online › Discord, explanatory footer. 'Cover Art Archive' is a proper name (keep).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ምስሎችን ከድር ብቻ ማሳየት ስለሚችል፣ ሽፋኖች በአልበም ስም በCover Art Archive ላይ ወይም በApple የሙዚቃ ካታሎግ ውስጥ ይፈለጋሉ። የራስዎ ፋይሎች በጭራሽ አይሰቀሉም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتم البحث عن الأغلفة حسب اسم الألبوم في Cover Art Archive أو في كتالوج الموسيقى من Apple، لأن Discord لا يمكنه عرض الصور إلا من الويب. لا يتم تحميل ملفاتك الخاصة أبدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord শুধু ওয়েব থেকে ছবি দেখাতে পারে, তাই অ্যালবামের নাম দিয়ে Cover Art Archive-এ বা Apple-এর মিউজিক ক্যাটালগে কভার খোঁজা হয়। আপনার নিজের ফাইল কখনো আপলোড করা হয় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obaly se hledají podle názvu alba v Cover Art Archive nebo v hudebním katalogu Applu, protože Discord umí zobrazit jen obrázky z webu. Vaše vlastní soubory se nikdy nenahrávají."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag findes ud fra albumnavnet i Cover Art Archive eller i Apples musikkatalog, fordi Discord kun kan vise billeder fra internettet. Dine egne filer uploades aldrig."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cover werden anhand des Albumnamens im Cover Art Archive oder im Musikkatalog von Apple gesucht, da Discord nur Bilder aus dem Web anzeigen kann. Deine eigenen Dateien werden nie hochgeladen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα εξώφυλλα αναζητούνται με βάση το όνομα του άλμπουμ στο Cover Art Archive ή στον μουσικό κατάλογο της Apple, επειδή το Discord μπορεί να εμφανίσει μόνο εικόνες από το διαδίκτυο. Τα δικά σας αρχεία δεν αποστέλλονται ποτέ."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las portadas se buscan por el nombre del álbum en Cover Art Archive o en el catálogo musical de Apple, porque Discord solo puede mostrar imágenes de la web. Tus propios archivos nunca se suben."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصاویر جلد بر اساس نام آلبوم در Cover Art Archive یا در کاتالوگ موسیقی Apple جست‌وجو می‌شوند، چون Discord فقط می‌تواند تصاویر را از وب نشان دهد. فایل‌های خود شما هرگز بارگذاری نمی‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kansikuvat haetaan albumin nimen perusteella Cover Art Archivesta tai Applen musiikkiluettelosta, koska Discord voi näyttää vain verkosta haettuja kuvia. Omia tiedostojasi ei koskaan ladata palvelimelle."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinahanap ang mga cover ayon sa pangalan ng album sa Cover Art Archive o sa music catalog ng Apple, dahil mga larawan lang mula sa web ang kayang ipakita ng Discord. Hindi kailanman ina-upload ang sarili mong mga file."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les pochettes sont recherchées par nom d’album sur le Cover Art Archive ou dans le catalogue musical d’Apple, car Discord ne peut afficher que des images provenant du Web. Vos propres fichiers ne sont jamais envoyés."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કવર Cover Art Archive પર અથવા Appleના મ્યુઝિક કૅટલૉગમાં આલ્બમના નામ દ્વારા શોધવામાં આવે છે, કારણ કે Discord ફક્ત વેબ પરની છબીઓ જ બતાવી શકે છે. તમારી પોતાની ફાઇલો ક્યારેય અપલોડ થતી નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana nemo hotunan bango ta sunan kundi a Cover Art Archive ko a cikin kundin waƙoƙin Apple, saboda Discord yana iya nuna hotuna daga yanar gizo kawai. Ba a taɓa ɗora fayilolinku ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "העטיפות נמצאות לפי שם האלבום ב־Cover Art Archive או בקטלוג המוזיקה של Apple, כי Discord יכול להציג רק תמונות מהאינטרנט. הקבצים שלך לעולם אינם מועלים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कवर, एल्बम के नाम से Cover Art Archive या Apple के म्यूज़िक कैटलॉग में खोजे जाते हैं, क्योंकि Discord सिर्फ़ वेब से इमेज दिखा सकता है। आपकी अपनी फ़ाइलें कभी अपलोड नहीं की जातीं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A borítók keresése albumnév alapján történik a Cover Art Archive-ban vagy az Apple zenekatalógusában, mivel a Discord csak az internetről származó képeket tud megjeleníteni. A saját fájljait a rendszer soha nem tölti fel."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sampul dicari berdasarkan nama album di Cover Art Archive atau di katalog musik Apple, karena Discord hanya dapat menampilkan gambar dari web. File Anda sendiri tidak pernah diunggah."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le copertine vengono cercate in base al nome dell’album nel Cover Art Archive o nel catalogo musicale di Apple, perché Discord può mostrare solo immagini dal web. I tuoi file non vengono mai caricati."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordはウェブ上の画像しか表示できないため、カバーアートはアルバム名をもとにCover Art ArchiveまたはAppleのミュージックカタログで検索されます。お使いのファイルがアップロードされることはありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ವೆಬ್‌ನ ಚಿತ್ರಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸಬಲ್ಲದು, ಆದ್ದರಿಂದ ಕವರ್‌ಗಳನ್ನು ಆಲ್ಬಮ್ ಹೆಸರಿನ ಮೂಲಕ Cover Art Archive ನಲ್ಲಿ ಅಥವಾ Apple ನ ಸಂಗೀತ ಕ್ಯಾಟಲಾಗ್‌ನಲ್ಲಿ ಹುಡುಕಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಸ್ವಂತ ಫೈಲ್‌ಗಳನ್ನು ಎಂದಿಗೂ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord는 웹의 이미지만 표시할 수 있으므로 커버는 앨범 이름으로 Cover Art Archive 또는 Apple 음악 카탈로그에서 찾습니다. 사용자의 파일은 절대 업로드되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord-ന് വെബിൽ നിന്നുള്ള ചിത്രങ്ങൾ മാത്രമേ കാണിക്കാൻ കഴിയൂ എന്നതിനാൽ, ആൽബത്തിന്റെ പേര് ഉപയോഗിച്ച് Cover Art Archive-ലോ Apple Music കാറ്റലോഗിലോ കവറുകൾ കണ്ടെത്തുന്നു. നിങ്ങളുടെ സ്വന്തം ഫയലുകൾ ഒരിക്കലും അപ്‌ലോഡ് ചെയ്യില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord फक्त वेबवरील इमेज दाखवू शकते, त्यामुळे कव्हर अल्बमच्या नावाने Cover Art Archive वर किंवा Apple Music कॅटलॉगमध्ये शोधले जातात. तुमच्या स्वतःच्या फाइल कधीही अपलोड केल्या जात नाहीत."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kulit album dicari mengikut nama album dalam Cover Art Archive atau katalog Apple Music, kerana Discord hanya boleh menunjukkan imej dari web. Fail anda sendiri tidak pernah dimuat naik."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag finnes etter albumnavn i Cover Art Archive eller i Apple Music-katalogen, fordi Discord bare kan vise bilder fra nettet. Dine egne filer lastes aldri opp."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoezen worden op albumnaam gezocht in het Cover Art Archive of in de catalogus van Apple Music, omdat Discord alleen afbeeldingen van het web kan tonen. Je eigen bestanden worden nooit geüpload."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਵਰ ਐਲਬਮ ਦੇ ਨਾਮ ਨਾਲ Cover Art Archive ’ਤੇ ਜਾਂ Apple Music ਕੈਟਾਲਾਗ ਵਿੱਚ ਲੱਭੇ ਜਾਂਦੇ ਹਨ, ਕਿਉਂਕਿ Discord ਸਿਰਫ਼ ਵੈੱਬ ਤੋਂ ਚਿੱਤਰ ਦਿਖਾ ਸਕਦਾ ਹੈ। ਤੁਹਾਡੀਆਂ ਆਪਣੀਆਂ ਫ਼ਾਈਲਾਂ ਕਦੇ ਵੀ ਅੱਪਲੋਡ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾਂਦੀਆਂ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okładki są wyszukiwane według nazwy albumu w Cover Art Archive lub w katalogu Apple Music, ponieważ Discord może pokazywać tylko obrazy z internetu. Twoje własne pliki nigdy nie są wysyłane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As capas são encontradas pelo nome do álbum no Cover Art Archive ou no catálogo do Apple Music, porque o Discord só pode mostrar imagens da web. Seus próprios arquivos nunca são enviados."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As capas são procuradas pelo nome do álbum no Cover Art Archive ou no catálogo do Apple Music, porque o Discord só consegue mostrar imagens da web. Os seus ficheiros nunca são enviados."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copertele sunt căutate după numele albumului în Cover Art Archive sau în catalogul Apple Music, deoarece Discord poate afișa doar imagini de pe web. Fișierele dvs. nu sunt încărcate niciodată."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag hittas via albumnamnet i Cover Art Archive eller i Apple Music-katalogen, eftersom Discord bara kan visa bilder från webben. Dina egna filer överförs aldrig."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picha za jalada hutafutwa kwa jina la albamu kwenye Cover Art Archive au katika katalogi ya muziki ya Apple, kwa sababu Discord inaweza kuonyesha picha kutoka kwenye wavuti pekee. Faili zako mwenyewe hazipakiwi kamwe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord இணையத்திலிருந்து வரும் படங்களை மட்டுமே காட்ட முடியும் என்பதால், கவர் ஆர்ட் ஆல்பத்தின் பெயரைக் கொண்டு Cover Art Archive-இல் அல்லது Apple-இன் இசை அட்டவணையில் தேடப்படுகிறது. உங்கள் சொந்தக் கோப்புகள் ஒருபோதும் பதிவேற்றப்படாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord వెబ్ నుండి వచ్చే చిత్రాలను మాత్రమే చూపగలదు కాబట్టి, కవర్ ఆర్ట్‌ను ఆల్బమ్ పేరుతో Cover Art Archiveలో లేదా Apple సంగీత కేటలాగ్‌లో వెతుకుతారు. మీ సొంత ఫైల్‌లు ఎప్పుడూ అప్‌లోడ్ చేయబడవు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาพปกจะค้นหาจากชื่ออัลบั้มใน Cover Art Archive หรือในแคตตาล็อกเพลงของ Apple เนื่องจาก Discord แสดงได้เฉพาะภาพจากเว็บเท่านั้น ไฟล์ของคุณเองจะไม่ถูกอัปโหลด"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord yalnızca web’deki görüntüleri gösterebildiği için kapak resimleri albüm adına göre Cover Art Archive’da veya Apple’ın müzik kataloğunda aranır. Kendi dosyalarınız asla yüklenmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine шукає обкладинки за назвою альбому в Cover Art Archive або в музичному каталозі Apple, бо Discord може показувати лише зображення з інтернету. Ваші власні файли ніколи не вивантажуються."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کور آرٹ البم کے نام سے Cover Art Archive یا Apple کے میوزک کیٹلاگ میں تلاش کیا جاتا ہے، کیونکہ Discord صرف ویب سے تصاویر دکھا سکتا ہے۔ آپ کی اپنی فائلیں کبھی اپ لوڈ نہیں کی جاتیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh bìa được tìm theo tên album trên Cover Art Archive hoặc trong danh mục nhạc của Apple, vì Discord chỉ có thể hiển thị hình ảnh từ web. Các tệp của riêng bạn không bao giờ được tải lên."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由於 Discord 只能顯示來自網絡的影像，封面會按專輯名稱在 Cover Art Archive 或 Apple 的音樂目錄中搜尋。你自己的檔案絕不會被上載。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由于 Discord 只能显示来自网络的图像，封面会按专辑名称在 Cover Art Archive 或 Apple 的音乐目录中查找。你自己的文件绝不会被上传。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由於 Discord 只能顯示來自網路的影像，封面會依專輯名稱在 Cover Art Archive 或 Apple 的音樂目錄中尋找。你自己的檔案絕不會上傳。"
+          }
+        }
+      }
+    },
     "CUE": {
       "localizations": {
         "am": {
@@ -129965,6 +131045,816 @@
           "stringUnit": {
             "state": "translated",
             "value": "已中斷連線。選擇「重新連線」即可再次使用。"
+          }
+        }
+      }
+    },
+    "Discord": {
+      "comment": "Settings › Online: section header for the Discord status option. Brand name: keep as is.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        }
+      }
+    },
+    "Discord didn’t accept the status: %@": {
+      "comment": "Settings › Online › Discord, status caption. %@ is Discord's own reason, in English (e.g. 'Invalid Client ID').",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ሁኔታውን አልተቀበለም፦ %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يقبل Discord الحالة: %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord স্ট্যাটাসটি গ্রহণ করেনি: %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord stav nepřijal: %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord accepterede ikke status: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord hat den Status nicht angenommen: %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Discord δεν αποδέχτηκε την κατάσταση: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord no ha aceptado el estado: %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord وضعیت را نپذیرفت: %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ei hyväksynyt tilaa: %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi tinanggap ng Discord ang status: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord n’a pas accepté le statut : %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord દ્વારા સ્ટેટસ સ્વીકારવામાં આવ્યું નહીં: %@"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord bai karɓi matsayin ba: %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord לא קיבל את הסטטוס: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ने स्टेटस स्वीकार नहीं किया: %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Discord nem fogadta el az állapotot: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord tidak menerima status: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord non ha accettato lo stato: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordがステータスを受け付けませんでした: %@"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ಸ್ಟೇಟಸ್ ಅನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord에서 상태를 수락하지 않음: %@"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord സ്റ്റാറ്റസ് സ്വീകരിച്ചില്ല: %@"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ने स्टेटस स्वीकारले नाही: %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord tidak menerima status: %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord godtok ikke statusen: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord heeft de status niet geaccepteerd: %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ਨੇ ਸਟੇਟਸ ਸਵੀਕਾਰ ਨਹੀਂ ਕੀਤਾ: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord nie przyjął statusu: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Discord não aceitou o status: %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Discord não aceitou o estado: %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord nu a acceptat statusul: %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord godtog inte statusen: %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord haikukubali hali hii: %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord நிலையை ஏற்கவில்லை: %@"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord స్టేటస్‌ను అంగీకరించలేదు: %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ไม่ยอมรับสถานะ: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord durumu kabul etmedi: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord не прийняв статус: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord نے اسٹیٹس قبول نہیں کیا: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord không chấp nhận trạng thái: %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 不接受此狀態：%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 未接受此状态：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 未接受此狀態：%@"
+          }
+        }
+      }
+    },
+    "Discord isn’t open. Your status appears once it is.": {
+      "comment": "Settings › Online › Discord, status caption: the Discord app isn't running on this Mac.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord አልተከፈተም። ሲከፈት ሁኔታዎ ይታያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord غير مفتوح. ستظهر حالتك بمجرد فتحه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord খোলা নেই। খোলা হলেই আপনার স্ট্যাটাস দেখা যাবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord není otevřený. Váš stav se zobrazí, jakmile ho otevřete."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord er ikke åben. Din status vises, så snart den er."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ist nicht geöffnet. Dein Status erscheint, sobald es geöffnet ist."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Discord δεν είναι ανοιχτό. Η κατάστασή σας θα εμφανιστεί μόλις ανοίξει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord no está abierto. Tu estado aparecerá en cuanto lo esté."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord باز نیست. وضعیت شما به‌محض باز شدن آن نمایش داده می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ei ole auki. Tilasi näkyy heti, kun se on."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi bukas ang Discord. Lalabas ang iyong status kapag nabuksan na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord n’est pas ouvert. Votre statut s’affichera dès qu’il le sera."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ખુલ્લું નથી. તે ખૂલતાં જ તમારું સ્ટેટસ દેખાશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ba a buɗe yake ba. Matsayinku zai bayyana da zarar an buɗe shi."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord אינו פתוח. הסטטוס שלך יופיע ברגע שהוא ייפתח."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord खुला नहीं है। उसके खुलते ही आपका स्टेटस दिखने लगेगा।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Discord nincs megnyitva. Az állapota a megnyitása után jelenik meg."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord tidak terbuka. Status Anda akan muncul setelah Discord dibuka."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord non è aperto. Il tuo stato apparirà non appena lo sarà."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discordが開いていません。開くとステータスが表示されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ತೆರೆದಿಲ್ಲ. ಅದು ತೆರೆದ ತಕ್ಷಣ ನಿಮ್ಮ ಸ್ಟೇಟಸ್ ಕಾಣಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord가 열려 있지 않습니다. Discord가 열리면 상태가 표시됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord തുറന്നിട്ടില്ല. അത് തുറന്നാലുടൻ നിങ്ങളുടെ സ്റ്റാറ്റസ് ദൃശ്യമാകും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord उघडलेले नाही. ते उघडताच तुमचे स्टेटस दिसेल."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord tidak dibuka. Status anda dipaparkan sebaik sahaja ia dibuka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord er ikke åpen. Statusen din vises så snart den er det."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord is niet geopend. Je status verschijnt zodra het is geopend."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ਖੁੱਲ੍ਹਾ ਨਹੀਂ ਹੈ। ਇਸਦੇ ਖੁੱਲ੍ਹਦੇ ਹੀ ਤੁਹਾਡਾ ਸਟੇਟਸ ਦਿਖਾਈ ਦੇਵੇਗਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord nie jest otwarty. Twój status pojawi się, gdy go otworzysz."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Discord não está aberto. Seu status aparecerá assim que ele for aberto."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Discord não está aberto. O seu estado aparece assim que estiver."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord nu este deschis. Statusul dvs. va apărea după ce îl deschideți."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord är inte öppet. Din status visas så snart det är det."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord haijafunguliwa. Hali yako itaonekana itakapofunguliwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord திறக்கப்படவில்லை. அது திறந்ததும் உங்கள் நிலை தோன்றும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord తెరవబడలేదు. అది తెరిచిన వెంటనే మీ స్టేటస్ కనిపిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord ไม่ได้เปิดอยู่ สถานะของคุณจะปรากฏเมื่อเปิด Discord"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord açık değil. Açıldığında durumunuz görünür."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord не відкрито. Ваш статус з’явиться, щойно його буде відкрито."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord کھلا نہیں ہے۔ اس کے کھلتے ہی آپ کا اسٹیٹس ظاہر ہو جائے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord chưa mở. Trạng thái của bạn sẽ xuất hiện ngay khi Discord được mở."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 未開啟。開啟後便會顯示你的狀態。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 未打开。打开后即会显示你的状态。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord 未開啟。開啟後就會顯示你的狀態。"
           }
         }
       }
@@ -162182,6 +164072,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "開始使用"
+          }
+        }
+      }
+    },
+    "Get Vespertine": {
+      "comment": "Button on the user's Discord status that friends can click to open Vespertine's website (to download the free app). AT MOST 32 characters.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineን ያግኙ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "احصل على Vespertine"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine নিন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Získat Vespertine"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hent Vespertine"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine laden"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Λήψη Vespertine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargar Vespertine"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دریافت Vespertine"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanki Vespertine"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunin ang Vespertine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Télécharger Vespertine"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine મેળવો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Samu Vespertine"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הורד את Vespertine"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine प्राप्त करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine letöltése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dapatkan Vespertine"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scarica Vespertine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineを入手"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ಪಡೆಯಿರಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 받기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine നേടുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine मिळवा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dapatkan Vespertine"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last ned Vespertine"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download Vespertine"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਪ੍ਰਾਪਤ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pobierz Vespertine"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baixar o Vespertine"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obter o Vespertine"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obțineți Vespertine"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hämta Vespertine"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pata Vespertine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ஐப் பெறுக"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineను పొందండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ดาวน์โหลด Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine’i İndir"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Завантажити Vespertine"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine حاصل کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải Vespertine"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取得 Vespertine"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "获取 Vespertine"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取得 Vespertine"
           }
         }
       }
@@ -239294,6 +241454,276 @@
         }
       }
     },
+    "Playing in Vespertine": {
+      "comment": "Shown on the user's Discord status, as the tooltip of Vespertine's small icon over the album cover. Friends on Discord read this. Keep short.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በVespertine ውስጥ በመጫወት ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قيد التشغيل في Vespertine"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এ চলছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrává se ve Vespertine"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller i Vespertine"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft in Vespertine"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παίζει στο Vespertine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonando en Vespertine"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در حال پخش در Vespertine"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soi Vespertinessä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagpe-play sa Vespertine"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En lecture dans Vespertine"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineમાં વાગી રહ્યું છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana kunnawa a Vespertine"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מתנגן ב־Vespertine"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine में चल रहा है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lejátszás a Vespertine-ben"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diputar di Vespertine"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In riproduzione in Vespertine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineで再生中"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine에서 재생 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ൽ പ്ലേ ചെയ്യുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine मध्ये वाजत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimainkan dalam Vespertine"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spilles i Vespertine"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speelt in Vespertine"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਵਿੱਚ ਚੱਲ ਰਿਹਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzane w Vespertine"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocando no Vespertine"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tocar no Vespertine"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se redă în Vespertine"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelas i Vespertine"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inacheza katika Vespertine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-இல் இயங்குகிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineలో ప్లే అవుతోంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังเล่นใน Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine’de çalıyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Грає у Vespertine"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine میں چل رہا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang phát trong Vespertine"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 Vespertine 中播放"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 Vespertine 中播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在 Vespertine 中播放"
+          }
+        }
+      }
+    },
     "Playing Next": {
       "comment": "Section heading in Up Next: the songs the user added with Play Next or Add to Queue, which play before the rest of the album or list (Apple Music's “Playing Next”).",
       "extractionState": "manual",
@@ -276033,6 +278463,276 @@
         }
       }
     },
+    "Show album covers": {
+      "comment": "Settings › Online › Discord, a toggle: whether the Discord status shows the album's cover image.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የአልበም ሽፋኖችን አሳይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عرض أغلفة الألبومات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অ্যালবাম কভার দেখান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zobrazovat obaly alb"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis albumomslag"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albumcover anzeigen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εμφάνιση εξωφύλλων άλμπουμ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar portadas de álbumes"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمایش تصویر جلد آلبوم‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Näytä albumien kansikuvat"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ipakita ang mga album cover"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher les pochettes"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આલ્બમ કવર બતાવો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuna hotunan bangon kundi"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצג עטיפות אלבומים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एल्बम कवर दिखाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albumborítók megjelenítése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tampilkan sampul album"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra le copertine degli album"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カバーアートを表示"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಲ್ಬಮ್ ಕವರ್‌ಗಳನ್ನು ತೋರಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앨범 커버 표시"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആൽബം കവറുകൾ കാണിക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अल्बम कव्हर दाखवा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunjukkan kulit album"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis albumomslag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toon albumhoezen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਐਲਬਮ ਕਵਰ ਦਿਖਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokazuj okładki albumów"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar capas de álbuns"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar capas dos álbuns"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afișează copertele albumelor"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visa albumomslag"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onyesha picha za jalada za albamu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஆல்பம் கவர் ஆர்ட்டைக் காட்டு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆల్బమ్ కవర్ ఆర్ట్‌ను చూపించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แสดงภาพปกอัลบั้ม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albüm kapaklarını göster"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показувати обкладинки альбомів"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البم کا کور آرٹ دکھائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiển thị ảnh bìa album"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示專輯封面"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示专辑封面"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示專輯封面"
+          }
+        }
+      }
+    },
     "Show files": {
       "localizations": {
         "am": {
@@ -277373,6 +280073,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "顯示待播清單"
+          }
+        }
+      }
+    },
+    "Show what’s playing as my Discord status": {
+      "comment": "Settings › Online, a toggle: while on, the user's Discord profile status shows the song Vespertine is playing (like Spotify's 'Listening to' status).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እየተጫወተ ያለውን እንደ Discord ሁኔታዬ አሳይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عرض ما يتم تشغيله كحالتي في Discord"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "যা চলছে তা আমার Discord স্ট্যাটাস হিসেবে দেখান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zobrazovat přehrávanou hudbu jako můj stav na Discordu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis det, der spiller, som min Discord-status"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabe als meinen Discord-Status anzeigen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εμφάνιση του τι παίζει ως κατάστασή μου στο Discord"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar lo que suena como mi estado de Discord"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمایش آنچه در حال پخش است به‌عنوان وضعیت Discord من"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Näytä toistettava musiikki Discord-tilanani"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ipakita ang nagpe-play bilang aking Discord status"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher ce que j’écoute dans mon statut Discord"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "જે વાગી રહ્યું છે તે મારા Discord સ્ટેટસ તરીકે બતાવો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuna abin da ake kunnawa a cikin matsayina na Discord"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצג את מה שמתנגן כסטטוס שלי ב־Discord"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जो चल रहा है, उसे मेरे Discord स्टेटस के रूप में दिखाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az éppen szóló zene megjelenítése a Discord-állapotomban"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tampilkan yang sedang diputar sebagai status Discord saya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra cosa sto ascoltando nel mio stato di Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再生中の曲をDiscordのステータスに表示"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ಲೇ ಆಗುತ್ತಿರುವುದನ್ನು ನನ್ನ Discord ಸ್ಟೇಟಸ್ ಆಗಿ ತೋರಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "재생 중인 음악을 Discord 상태로 표시"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്ലേ ചെയ്യുന്നത് എന്റെ Discord സ്റ്റാറ്റസായി കാണിക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "काय वाजत आहे ते माझ्या Discord स्टेटसमध्ये दाखवा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunjukkan apa yang sedang dimainkan sebagai status Discord saya"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vis hva som spilles, som Discord-statusen min"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toon wat er speelt als mijn Discord-status"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜੋ ਚੱਲ ਰਿਹਾ ਹੈ ਉਸਨੂੰ ਮੇਰੇ Discord ਸਟੇਟਸ ਵਜੋਂ ਦਿਖਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokazuj odtwarzany utwór jako mój status na Discordzie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar o que está tocando como meu status do Discord"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar o que está a tocar como o meu estado no Discord"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afișează ce se redă ca status Discord"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visa vad som spelas som min Discord-status"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onyesha kinachocheza kama hali yangu ya Discord"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இயங்குவதை எனது Discord நிலையாகக் காட்டு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్లే అవుతున్నదాన్ని నా Discord స్టేటస్‌గా చూపించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แสดงเพลงที่กำลังเล่นเป็นสถานะ Discord ของฉัน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çalan şarkıyı Discord durumum olarak göster"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показувати, що грає, як мій статус у Discord"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو چل رہا ہے اسے میرے Discord اسٹیٹس کے طور پر دکھائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiển thị bài đang phát làm trạng thái Discord của tôi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將正在播放的內容顯示為我的 Discord 狀態"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将正在播放的内容显示为我的 Discord 状态"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將正在播放的內容顯示為我的 Discord 狀態"
           }
         }
       }
@@ -330092,6 +333062,276 @@
         }
       }
     },
+    "While a song plays, your status shows its title, artist, album, format and progress, through the Discord app on this Mac. It clears when you pause or quit. Discord shows it to everyone who can see your activity, if Activity Privacy in Discord’s settings allows it.": {
+      "comment": "Settings › Online › Discord, explanatory footer. 'Activity Privacy' is the name of a section in Discord's own settings: use Discord's localized name for it in this language if it has one.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዘፈን በሚጫወትበት ጊዜ፣ ሁኔታዎ በዚህ Mac ላይ ባለው የDiscord መተግበሪያ በኩል ርዕሱን፣ አርቲስቱን፣ አልበሙን፣ ቅርጸቱንና ሂደቱን ያሳያል። ለአፍታ ሲያቆሙ ወይም ሲዘጉ ይጠፋል። በDiscord ቅንብሮች ውስጥ ያለው የእንቅስቃሴ ግላዊነት (Activity Privacy) ከፈቀደ፣ Discord እንቅስቃሴዎን ማየት ለሚችሉ ሁሉ ያሳየዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أثناء تشغيل أغنية، تعرض حالتك عنوانها والفنان والألبوم والتنسيق والتقدّم، عبر تطبيق Discord على هذا الـ Mac. وتُمسح عند الإيقاف المؤقت أو الإنهاء. ويعرضها Discord لكل من يمكنه رؤية نشاطك، إذا سمحت بذلك «خصوصية النشاط» في إعدادات Discord."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কোনো গান চলার সময় এই Mac-এর Discord অ্যাপের মাধ্যমে আপনার স্ট্যাটাসে গানটির শিরোনাম, শিল্পী, অ্যালবাম, ফরম্যাট ও অগ্রগতি দেখায়। বিরতি দিলে বা প্রস্থান করলে এটি মুছে যায়। Discord-এর সেটিংসে Activity Privacy অনুমতি দিলে, যাঁরা আপনার অ্যাক্টিভিটি দেখতে পারেন তাঁদের সবাইকে Discord এটি দেখায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Během přehrávání skladby váš stav ukazuje její název, interpreta, album, formát a průběh, a to prostřednictvím aplikace Discord na tomto Macu. Po pozastavení nebo ukončení zmizí. Discord ho ukazuje všem, kdo vidí vaši aktivitu, pokud to povoluje Soukromí aktivit v nastavení Discordu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mens en sang spiller, viser din status dens titel, kunstner, album, format og forløb via Discord-appen på denne Mac. Den fjernes, når du sætter på pause eller afslutter. Discord viser den til alle, der kan se din aktivitet, hvis Aktivitetsprivatliv i Discords indstillinger tillader det."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Während ein Titel läuft, zeigt dein Status über die Discord-App auf diesem Mac seinen Namen, Künstler, Album, Format und Fortschritt. Er verschwindet, wenn du pausierst oder Vespertine beendest. Discord zeigt ihn allen, die deine Aktivität sehen können, sofern die Aktivitäts-Privatsphäre in den Discord-Einstellungen das erlaubt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Όσο παίζει ένα τραγούδι, η κατάστασή σας δείχνει τον τίτλο, τον καλλιτέχνη, το άλμπουμ, τη μορφή και την πρόοδό του, μέσω της εφαρμογής Discord σε αυτό το Mac. Διαγράφεται όταν κάνετε παύση ή τερματισμό. Το Discord την εμφανίζει σε όλους όσοι μπορούν να δουν τη δραστηριότητά σας, αν το επιτρέπει το Απόρρητο δραστηριότητας στις ρυθμίσεις του Discord."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras suena una canción, tu estado muestra su título, artista, álbum, formato y progreso, a través de la app Discord de este Mac. Se borra al poner en pausa o al salir. Discord lo muestra a todos los que pueden ver tu actividad, si lo permite la opción Privacidad de la actividad de los ajustes de Discord."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هنگام پخش یک آهنگ، وضعیت شما از طریق برنامهٔ Discord روی این Mac عنوان، هنرمند، آلبوم، قالب و پیشرفت آن را نشان می‌دهد. با مکث یا خروج، پاک می‌شود. Discord آن را به همهٔ کسانی که می‌توانند فعالیت شما را ببینند نشان می‌دهد، اگر «حریم خصوصی فعالیت» در تنظیمات Discord اجازه دهد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kun kappale soi, tilasi näyttää sen nimen, esittäjän, albumin, formaatin ja edistymisen tämän Macin Discord-apin kautta. Tila poistuu, kun keskeytät toiston tai lopetat Vespertinen. Discord näyttää sen kaikille, jotka näkevät toimintasi, jos Discordin asetusten Toiminnan yksityisyys sallii sen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Habang may kantang nagpe-play, ipinapakita ng iyong status ang pamagat, artist, album, format, at progreso nito sa pamamagitan ng Discord app sa Mac na ito. Nawawala ito kapag nag-pause o nag-quit ka. Ipinapakita ito ng Discord sa lahat ng nakakakita ng iyong activity, kung pinapayagan ito ng Activity Privacy sa mga setting ng Discord."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendant la lecture d’un morceau, votre statut affiche son titre, son artiste, son album, son format et sa progression, via l’app Discord sur ce Mac. Il disparaît lorsque vous mettez en pause ou quittez. Discord le montre à toutes les personnes qui peuvent voir votre activité, si l’option Confidentialité de l’activité des réglages de Discord l’autorise."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીત વાગે ત્યારે, આ Mac પરની Discord ઍપ મારફતે તમારા સ્ટેટસમાં તેનું શીર્ષક, કલાકાર, આલ્બમ, ફૉર્મેટ અને પ્રગતિ દેખાય છે. તમે થોભાવો અથવા બંધ કરો ત્યારે તે દૂર થાય છે. જો Discord સેટિંગ્સમાં Activity Privacy તેની મંજૂરી આપે, તો Discord તેને તમારી પ્રવૃત્તિ જોઈ શકે તેવા દરેકને બતાવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yayin da ake kunna waƙa, matsayinku yana nuna takenta, mawaƙinta, kundinta, tsarinta da ci gabanta, ta manhajar Discord da ke kan wannan Mac. Yana gogewa idan kuka dakata ko kuka fita. Discord yana nuna shi ga duk wanda zai iya ganin ayyukanku, idan Activity Privacy a cikin saitunan Discord ya ba da dama."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בזמן שמתנגן שיר, הסטטוס שלך מציג את הכותרת, האמן, האלבום, הפורמט וההתקדמות שלו, דרך יישום Discord ב־Mac זה. הוא נמחק כשמשהים את ההשמעה או יוצאים מהיישום. Discord מציג אותו לכל מי שיכול לראות את הפעילות שלך, אם ההגדרה Activity Privacy בהגדרות של Discord מאפשרת זאת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "किसी गाने के चलते समय, इस Mac पर Discord ऐप के ज़रिए आपके स्टेटस में उसका शीर्षक, कलाकार, एल्बम, फ़ॉर्मैट और प्रगति दिखती है। पॉज़ करने या बंद करने पर यह हट जाता है। अगर Discord की सेटिंग्ज़ में गतिविधि गोपनीयता इसकी अनुमति देती है, तो Discord इसे उन सभी को दिखाता है जो आपकी गतिविधि देख सकते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amíg egy dal szól, az állapota megjeleníti a címét, az előadóját, az albumát, a formátumát és az előrehaladását az ezen a Macen futó Discord appon keresztül. Szüneteltetéskor vagy kilépéskor eltűnik. A Discord mindenkinek megmutatja, aki láthatja a tevékenységét, ha a Discord beállításaiban a Tevékenység adatvédelme ezt engedélyezi."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat lagu diputar, status Anda menampilkan judul, artis, album, format, dan progresnya melalui app Discord di Mac ini. Status dihapus saat Anda menjeda atau keluar. Discord menampilkannya kepada semua orang yang dapat melihat aktivitas Anda, jika Privasi Aktivitas di pengaturan Discord mengizinkannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durante la riproduzione di un brano, il tuo stato mostra titolo, artista, album, formato e avanzamento, tramite l’app Discord su questo Mac. Scompare quando metti in pausa o esci. Discord lo mostra a chiunque possa vedere la tua attività, se “Privacy delle attività” nelle impostazioni di Discord lo consente."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲の再生中は、このMac上のDiscordアプリを通じて、曲のタイトル、アーティスト、アルバム、フォーマット、再生位置がステータスに表示されます。一時停止または終了すると消去されます。Discordの設定の「アクティビティのプライバシー」で許可されている場合、あなたのアクティビティを閲覧できるすべてのユーザに表示されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡು ಪ್ಲೇ ಆಗುತ್ತಿರುವಾಗ, ಈ Mac ನಲ್ಲಿರುವ Discord ಆ್ಯಪ್ ಮೂಲಕ ನಿಮ್ಮ ಸ್ಟೇಟಸ್ ಅದರ ಶೀರ್ಷಿಕೆ, ಕಲಾವಿದ, ಆಲ್ಬಮ್, ಫಾರ್ಮ್ಯಾಟ್ ಮತ್ತು ಪ್ರಗತಿಯನ್ನು ತೋರಿಸುತ್ತದೆ. ನೀವು ವಿರಾಮಗೊಳಿಸಿದಾಗ ಅಥವಾ ತ್ಯಜಿಸಿದಾಗ ಅದು ತೆರವಾಗುತ್ತದೆ. Discord ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿನ Activity Privacy ಅನುಮತಿಸಿದರೆ, ನಿಮ್ಮ ಚಟುವಟಿಕೆಯನ್ನು ನೋಡಬಲ್ಲ ಎಲ್ಲರಿಗೂ Discord ಅದನ್ನು ತೋರಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래가 재생되는 동안 이 Mac의 Discord 앱을 통해 상태에 제목, 아티스트, 앨범, 포맷 및 진행 상황이 표시됩니다. 일시 정지하거나 종료하면 지워집니다. Discord 설정의 활동 개인정보 보호에서 허용하는 경우, Discord는 사용자의 활동을 볼 수 있는 모든 사람에게 이를 표시합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരു പാട്ട് പ്ലേ ചെയ്യുമ്പോൾ, ഈ Mac-ലെ Discord ആപ്പ് വഴി നിങ്ങളുടെ സ്റ്റാറ്റസ് അതിന്റെ ശീർഷകം, ആർട്ടിസ്റ്റ്, ആൽബം, ഫോർമാറ്റ്, പുരോഗതി എന്നിവ കാണിക്കുന്നു. നിങ്ങൾ പോസ് ചെയ്യുകയോ പുറത്തുകടക്കുകയോ ചെയ്യുമ്പോൾ അത് മായും. Discord-ന്റെ ക്രമീകരണങ്ങളിലെ Activity Privacy അനുവദിക്കുന്നുണ്ടെങ്കിൽ, നിങ്ങളുടെ ആക്റ്റിവിറ്റി കാണാൻ കഴിയുന്ന എല്ലാവർക്കും Discord അത് കാണിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाणे वाजत असताना, या Mac वरील Discord ॲपद्वारे तुमच्या स्टेटसमध्ये त्याचे शीर्षक, कलाकार, अल्बम, फॉरमॅट आणि प्रगती दिसते. तुम्ही पॉझ करता किंवा बाहेर पडता तेव्हा ते काढले जाते. Discord च्या सेटिंग्जमधील Activity Privacy परवानगी देत असल्यास, तुमची ॲक्टिव्हिटी पाहू शकणाऱ्या प्रत्येकाला Discord ते दाखवते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semasa lagu dimainkan, status anda menunjukkan tajuk, artis, album, format dan kemajuannya, melalui app Discord pada Mac ini. Status dikosongkan apabila anda menjeda atau keluar. Discord menunjukkannya kepada semua orang yang dapat melihat aktiviti anda, jika Activity Privacy dalam tetapan Discord membenarkannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mens en sang spilles, viser statusen din tittel, artist, album, format og fremdrift, via Discord-appen på denne Macen. Den fjernes når du setter på pause eller avslutter. Discord viser den til alle som kan se aktiviteten din, hvis «Aktivitetspersonvern» i Discord-innstillingene tillater det."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terwijl er een nummer speelt, toont je status de titel, de artiest, het album, het formaat en de voortgang, via de Discord-app op deze Mac. De status verdwijnt wanneer je pauzeert of stopt. Discord toont hem aan iedereen die je activiteit kan zien, als ‘Activiteitsprivacy’ in de instellingen van Discord dat toestaat."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ ਕੋਈ ਗੀਤ ਚੱਲਦਾ ਹੈ, ਤਾਂ ਇਸ Mac ’ਤੇ Discord ਐਪ ਰਾਹੀਂ ਤੁਹਾਡਾ ਸਟੇਟਸ ਉਸਦਾ ਸਿਰਲੇਖ, ਕਲਾਕਾਰ, ਐਲਬਮ, ਫ਼ਾਰਮੈਟ ਅਤੇ ਪ੍ਰਗਤੀ ਦਿਖਾਉਂਦਾ ਹੈ। ਜਦੋਂ ਤੁਸੀਂ ਰੋਕਦੇ ਹੋ ਜਾਂ ਬੰਦ ਕਰਦੇ ਹੋ ਤਾਂ ਇਹ ਹਟ ਜਾਂਦਾ ਹੈ। ਜੇ Discord ਦੀਆਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ Activity Privacy ਇਜਾਜ਼ਤ ਦਿੰਦੀ ਹੈ, ਤਾਂ Discord ਇਸਨੂੰ ਉਨ੍ਹਾਂ ਸਾਰਿਆਂ ਨੂੰ ਦਿਖਾਉਂਦਾ ਹੈ ਜੋ ਤੁਹਾਡੀ ਗਤੀਵਿਧੀ ਦੇਖ ਸਕਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Podczas odtwarzania utworu Twój status pokazuje jego tytuł, wykonawcę, album, format i postęp – za pośrednictwem aplikacji Discord na tym Macu. Status znika po wstrzymaniu odtwarzania lub zakończeniu Vespertine. Discord pokazuje go wszystkim, którzy widzą Twoją aktywność, jeśli pozwala na to sekcja „Prywatność aktywności” w ustawieniach Discorda."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma música toca, seu status mostra o título, o artista, o álbum, o formato e o progresso, por meio do app Discord neste Mac. Ele é removido quando você pausa ou encerra. O Discord o mostra a todos que podem ver sua atividade, se a opção “Privacidade de atividades” nas configurações do Discord permitir."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto uma música está a tocar, o seu estado mostra o título, o artista, o álbum, o formato e o progresso, através da app Discord neste Mac. Desaparece quando colocar em pausa ou encerrar. O Discord mostra-o a todos os que podem ver a sua atividade, se a opção “Privacidade da atividade” nas definições do Discord o permitir."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cât timp se redă o melodie, statusul dvs. afișează titlul, artistul, albumul, formatul și progresul, prin aplicația Discord de pe acest Mac. Acesta dispare când puneți pe pauză sau ieșiți. Discord îl afișează tuturor celor care vă pot vedea activitatea, dacă secțiunea „Confidențialitatea activității” din configurările Discord permite acest lucru."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medan en låt spelas visar din status titel, artist, album, format och förlopp, via Discord-appen på den här datorn. Den försvinner när du pausar eller avslutar. Discord visar den för alla som kan se din aktivitet, om ”Aktivitetsintegritet” i Discords inställningar tillåter det."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo unapocheza, hali yako huonyesha jina lake, msanii, albamu, fomati na maendeleo, kupitia programu ya Discord kwenye Mac hii. Hufutika unaposimamisha kwa muda au kufunga programu. Discord huionyesha kwa kila mtu anayeweza kuona shughuli zako, ikiwa Activity Privacy katika mipangilio ya Discord inaruhusu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒரு பாடல் இயங்கும்போது, இந்த Mac-இல் உள்ள Discord ஆப் மூலம் உங்கள் நிலை அதன் தலைப்பு, கலைஞர், ஆல்பம், வடிவம், முன்னேற்றம் ஆகியவற்றைக் காட்டும். நீங்கள் இடைநிறுத்தும்போது அல்லது வெளியேறும்போது அது அழிக்கப்படும். Discord அமைப்புகளில் உள்ள Activity Privacy அனுமதித்தால், உங்கள் செயல்பாட்டைக் காணக்கூடிய அனைவருக்கும் Discord அதைக் காட்டும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాట ప్లే అవుతున్నప్పుడు, ఈ Macలోని Discord యాప్ ద్వారా మీ స్టేటస్ దాని శీర్షిక, ఆర్టిస్ట్, ఆల్బమ్, ఫార్మాట్, పురోగతిని చూపిస్తుంది. మీరు పాజ్ చేసినప్పుడు లేదా నిష్క్రమించినప్పుడు అది తొలగిపోతుంది. Discord సెట్టింగ్‌లలోని Activity Privacy అనుమతిస్తే, మీ యాక్టివిటీని చూడగల అందరికీ Discord దాన్ని చూపిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขณะที่เพลงกำลังเล่น สถานะของคุณจะแสดงชื่อเพลง ศิลปิน อัลบั้ม รูปแบบ และความคืบหน้า ผ่านแอป Discord บน Mac เครื่องนี้ สถานะจะถูกล้างเมื่อคุณหยุดชั่วคราวหรือออกจากแอป Discord จะแสดงสถานะนี้ให้ทุกคนที่ดูกิจกรรมของคุณได้เห็น หากความเป็นส่วนตัวของกิจกรรมในการตั้งค่าของ Discord อนุญาต"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir şarkı çalarken durumunuz, bu Mac’teki Discord uygulaması aracılığıyla şarkının adını, sanatçısını, albümünü, biçimini ve ilerlemesini gösterir. Duraklattığınızda veya çıktığınızda temizlenir. Discord’un ayarlarındaki Etkinlik Gizliliği izin veriyorsa Discord bunu etkinliğinizi görebilen herkese gösterir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поки грає пісня, ваш статус показує її назву, виконавця, альбом, формат і поступ відтворення через застосунок Discord на цьому Mac. Статус зникає, коли ви призупиняєте відтворення або виходите з програми. Discord показує його всім, хто може бачити вашу активність, якщо це дозволяє «Конфіденційність активності» в налаштуваннях Discord."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب کوئی گانا چل رہا ہو تو اس Mac پر Discord ایپ کے ذریعے آپ کا اسٹیٹس اس کا عنوان، فنکار، البم، فارمیٹ اور پیش رفت دکھاتا ہے۔ جب آپ موقوف کریں یا ایپ بند کریں تو یہ ہٹ جاتا ہے۔ اگر Discord کی سیٹنگز میں Activity Privacy اجازت دے تو Discord اسے ہر اس شخص کو دکھاتا ہے جو آپ کی سرگرمی دیکھ سکتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khi một bài hát đang phát, trạng thái của bạn hiển thị tên bài, nghệ sĩ, album, định dạng và tiến trình, thông qua ứng dụng Discord trên máy Mac này. Trạng thái sẽ bị xóa khi bạn tạm dừng hoặc thoát. Discord hiển thị trạng thái này cho tất cả những ai có thể xem hoạt động của bạn, nếu Quyền riêng tư hoạt động trong cài đặt của Discord cho phép."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲時，你的狀態會透過這部 Mac 上的 Discord App 顯示歌曲的標題、藝人、專輯、格式及播放進度。暫停或結束時，狀態便會清除。如 Discord 設定中的「活動隱私」允許，Discord 會向所有能看到你活動的人顯示此狀態。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲时，你的状态会通过这台 Mac 上的 Discord App 显示歌曲的标题、艺人、专辑、格式和播放进度。暂停或退出时，状态会被清除。如果 Discord 设置中的“活动隐私”允许，Discord 会向所有能看到你活动的人显示该状态。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲時，你的狀態會透過這部 Mac 上的 Discord App 顯示歌曲的標題、藝人、專輯、格式和播放進度。暫停或結束時，狀態會清除。如果 Discord 設定中的「活動隱私」允許，Discord 會向所有能看到你活動的人顯示此狀態。"
+          }
+        }
+      }
+    },
     "While an equalizer is on, the samples are changed (in 64-bit, then dithered to the DAC's word length), so the signal path no longer says BIT-PERFECT. It doesn't apply to DSD sent as DoP, to Dolby and DTS sent to a receiver, or to Dolby Atmos that macOS renders.": {
       "localizations": {
         "am": {
@@ -335683,6 +338923,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的資料庫是空的"
+          }
+        }
+      }
+    },
+    "Your status appears while a song plays.": {
+      "comment": "Settings › Online › Discord, status caption: the option is on and nothing is playing yet.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዘፈን በሚጫወትበት ጊዜ ሁኔታዎ ይታያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تظهر حالتك أثناء تشغيل أغنية."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কোনো গান চললে আপনার স্ট্যাটাস দেখা যায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Váš stav se zobrazí během přehrávání skladby."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Din status vises, mens en sang spiller."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Status erscheint, während ein Titel läuft."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η κατάστασή σας εμφανίζεται όσο παίζει ένα τραγούδι."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu estado aparece mientras suena una canción."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وضعیت شما هنگام پخش یک آهنگ نمایش داده می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilasi näkyy, kun kappale soi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lalabas ang iyong status habang may kantang nagpe-play."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre statut s’affiche pendant la lecture d’un morceau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીત વાગે ત્યારે તમારું સ્ટેટસ દેખાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matsayinku yana bayyana yayin da ake kunna waƙa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסטטוס שלך יופיע בזמן שמתנגן שיר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "किसी गाने के चलते समय आपका स्टेटस दिखता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az állapota akkor jelenik meg, amikor egy dal szól."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status Anda muncul saat lagu diputar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo stato appare durante la riproduzione di un brano."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲の再生中にステータスが表示されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡು ಪ್ಲೇ ಆಗುತ್ತಿರುವಾಗ ನಿಮ್ಮ ಸ್ಟೇಟಸ್ ಕಾಣಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래가 재생되는 동안 상태가 표시됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരു പാട്ട് പ്ലേ ചെയ്യുമ്പോൾ നിങ്ങളുടെ സ്റ്റാറ്റസ് ദൃശ്യമാകും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाणे वाजत असताना तुमचे स्टेटस दिसते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status anda dipaparkan semasa lagu dimainkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statusen din vises mens en sang spilles."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je status verschijnt terwijl er een nummer speelt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ ਕੋਈ ਗੀਤ ਚੱਲਦਾ ਹੈ ਤਾਂ ਤੁਹਾਡਾ ਸਟੇਟਸ ਦਿਖਾਈ ਦਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twój status pojawia się podczas odtwarzania utworu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seu status aparece enquanto uma música toca."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O seu estado aparece enquanto uma música está a tocar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statusul dvs. apare cât timp se redă o melodie."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Din status visas medan en låt spelas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hali yako huonekana wimbo unapocheza."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பாடல் இயங்கும்போது உங்கள் நிலை தோன்றும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాట ప్లే అవుతున్నప్పుడు మీ స్టేటస్ కనిపిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สถานะของคุณจะปรากฏขณะที่เพลงกำลังเล่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir şarkı çalarken durumunuz görünür."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваш статус з’являється, коли грає пісня."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گانا چلنے پر آپ کا اسٹیٹس ظاہر ہوتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trạng thái của bạn sẽ xuất hiện khi một bài hát đang phát."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲時會顯示你的狀態。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲时会显示你的状态。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放歌曲時會顯示你的狀態。"
           }
         }
       }
