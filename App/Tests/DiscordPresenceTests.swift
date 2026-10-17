@@ -183,7 +183,8 @@ struct DiscordPresenceTests {
         #expect(noCover.assets?.largeImage == DiscordStatus.appIconURL && noCover.assets?.smallImage == nil)
 
         // Discord's own key names, and nothing it would refuse (nil fields are left out).
-        let json = try #require(try JSONSerialization.jsonObject(with: #require(noCover.encoded())) as? [String: Any])
+        let data = try #require(noCover.encoded())
+        let json = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
         #expect(Set(json.keys) == ["type", "status_display_type", "details", "state", "timestamps", "assets", "buttons"])
         let assets = try #require(json["assets"] as? [String: Any])
         #expect(Set(assets.keys) == ["large_image", "large_text"])
