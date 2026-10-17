@@ -322,20 +322,9 @@ final class MP4DolbySource: DolbyFrameSource, @unchecked Sendable {
 
     init(url: URL) throws {
         asset = AVURLAsset(url: url)
-        struct Loaded: @unchecked Sendable { var track: AVAssetTrack?; var duration: CMTime; var asbd: AudioStreamBasicDescription? }
-        let done = DispatchSemaphore(value: 0)
-        nonisolated(unsafe) var loaded: Loaded?
-        Task.detached { [asset] in
-            let track = try? await asset.loadTracks(withMediaType: .audio).first
-            let duration = (try? await asset.load(.duration)) ?? .zero
-            let desc = try? await track?.load(.formatDescriptions).first
-            loaded = Loaded(track: track, duration: duration, asbd: desc.flatMap { CMAudioFormatDescriptionGetStreamBasicDescription($0)?.pointee })
-            done.signal()
-        }
-        done.wait()
-        guard let info = loaded, let track = info.track, let asbd = info.asbd,
+        guard let info = LoadedAudioTrack(asset), let asbd = info.format.flatMap({ CMAudioFormatDescriptionGetStreamBasicDescription($0)?.pointee }),
               asbd.mFormatID == kAudioFormatAC3 || asbd.mFormatID == kAudioFormatEnhancedAC3 else { throw SourceOpenerError.unsupported(url) }
-        self.track = track
+        track = info.track
         sampleRate = asbd.mSampleRate
         isEnhanced = asbd.mFormatID == kAudioFormatEnhancedAC3
         totalSamples = Int64(CMTimeGetSeconds(info.duration) * asbd.mSampleRate)

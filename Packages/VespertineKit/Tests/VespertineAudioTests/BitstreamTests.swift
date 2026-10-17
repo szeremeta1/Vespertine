@@ -59,20 +59,6 @@ struct BitstreamTests {
         #expect(BitstreamFormat.eac3.carrierRate(for: 48_000) == 192_000)
     }
 
-    /// Opens a decoder on a thread of its own. An MP4 source waits for AVFoundation's async loading, as the engine
-    /// thread can; a test thread is one of the concurrency pool's, and enough of them waiting at once leave none to
-    /// do the loading.
-    private func openOffPool(_ url: URL) async throws -> BitstreamDecoder {
-        struct Opened: @unchecked Sendable { let result: Result<BitstreamDecoder, Error> }
-        let opened: Opened = await withCheckedContinuation { done in
-            Thread {
-                do { done.resume(returning: Opened(result: .success(try BitstreamDecoder.open(url: url)))) }
-                catch { done.resume(returning: Opened(result: .failure(error))) }
-            }.start()
-        }
-        return try opened.result.get()
-    }
-
     private func carrier(_ decoder: BitstreamDecoder) throws -> [Int16] {
         let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 5000)!
         var out: [Int16] = []
@@ -88,9 +74,9 @@ struct BitstreamTests {
         ("dolby-digital-tones.ac3", 48_000.0, false), ("dolby-digital-plus-tones.ec3", 192_000.0, true),
         ("dolby-digital-plus-tones.m4a", 192_000.0, true),
     ])
-    func carrierFromFile(name: String, rate: Double, enhanced: Bool) async throws {
+    func carrierFromFile(name: String, rate: Double, enhanced: Bool) throws {
         let url = Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Fixtures")!
-        let decoder = try await openOffPool(url)
+        let decoder = try BitstreamDecoder.open(url: url)
         #expect(decoder.processingFormat.sampleRate == rate)
         #expect(decoder.processingFormat.commonFormat == .pcmFormatInt16 && decoder.processingFormat.channelCount == 2)
         let samples = try carrier(decoder)
@@ -300,7 +286,7 @@ struct BitstreamTests {
     }
 
     @Test("A damaged MP4 sample is dropped: its burst plays as silence and the rest stays in place (B-03)")
-    func damagedMP4Sample() async throws {
+    func damagedMP4Sample() throws {
         let m4a = try fixture("dolby-digital-plus-tones.m4a")
         let frames = DolbyFrames.frames(in: try fixture("dolby-digital-plus-tones.ec3"))
         #expect(frames.allSatisfy { $0.blocks == 6 && !$0.isDependent })
@@ -312,7 +298,7 @@ struct BitstreamTests {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-\(UUID().uuidString).m4a")
         try Data(damaged).write(to: url)
         defer { try? FileManager.default.removeItem(at: url) }
-        let decoder = try await openOffPool(url)
+        let decoder = try BitstreamDecoder.open(url: url)
         let samples = try carrier(decoder)
         let groups = BitstreamPacker.eac3Groups(frames)
         #expect(samples.count == groups.count * 6144 * 2)
