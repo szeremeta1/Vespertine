@@ -1,0 +1,354 @@
+{
+  "DOP_MARKER_ALT": {
+    "grade": "PARTIAL",
+    "reason": "Correct values/alternation; does not prescribe default 05 or requested starting phase, which come from stub contract."
+  },
+  "DOP_MARKER_SAME": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit same marker on all channels; unequal lengths cannot form complete synchronous frames."
+  },
+  "DOP_MARKER_MSB": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit eight MSbits marker; diagram supplies 24-bit width."
+  },
+  "DOP_BITS_OLDEST": {
+    "grade": "SUPPORTS",
+    "reason": "Sixteen low bits, oldest at t0; exact interface representation implies refusing incomplete 16-bit groups."
+  },
+  "DOP_DIAGRAM": {
+    "grade": "SUPPORTS",
+    "reason": "Diagram orders t0 through t15 from bit15 to bit0, supporting all byte/bit expectations."
+  },
+  "DOP_24BIT": {
+    "grade": "SUPPORTS",
+    "reason": "Diagram explicitly specifies 24-bit PCM word."
+  },
+  "DOP_PER_CHANNEL": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit channel assignment supports channel order and frame dimensions."
+  },
+  "DOP_OTHER_MARKER": {
+    "grade": "SUPPORTS",
+    "reason": "Alternative paired-channel method distinguished by another marker; base values supplied by \u00a72."
+  },
+  "DOP_ALT_MARKERS": {
+    "grade": "SUPPORTS",
+    "reason": "Diagram explicitly places 06/F9 in the excluded alternative method."
+  },
+  "DOP_RX_MISSING": {
+    "grade": "SUPPORTS",
+    "reason": "Missing marker in any channel ends DSD recognition; used only for malformed streams, not acquisition delay."
+  },
+  "ST337_PA": {
+    "grade": "SUPPORTS",
+    "reason": "Table 6 gives F872; note states shared-structure carryover via \u00a78.2\u20138.3 at sibling tier."
+  },
+  "ST337_PB": {
+    "grade": "SUPPORTS",
+    "reason": "Table 6 gives 4E1F; note explicitly inherits shared-structure justification."
+  },
+  "ST337_EXT_SYNC": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit 16-bit extended sync values; used for Pa/Pb and offsets, not demanding every burst have four leading zeros."
+  },
+  "ST337_FRAME_PRE": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit Pa/Pb then Pc/Pd frame order; offset/raw-Pd expectations also derive from interface."
+  },
+  "ST337_CONSUMER_SUBSET": {
+    "grade": "SUPPORTS",
+    "reason": "Unused in tests; honestly quotes general subset argument, subject to \u00a78.4 exceptions."
+  },
+  "ST337_CONSUMER_16": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit consumer-compatible 16-bit frame mode with mode=0."
+  },
+  "ST337_PRE_FOLLOW": {
+    "grade": "SUPPORTS",
+    "reason": "Preamble followed by payload; common structural inference is stated."
+  },
+  "ST337_T7_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Table gives bits0\u20134; consumer-compatible mode restriction is independently cited; type numbers require separate evidence."
+  },
+  "ST337_T7_MODE": {
+    "grade": "SUPPORTS",
+    "reason": "Table gives bits5\u20136; consumer mode=0 separately explicit in \u00a78.3."
+  },
+  "ST337_T7_ERR": {
+    "grade": "SUPPORTS",
+    "reason": "Table locates error flag at bit7, consistent with cited secondary consumer comment."
+  },
+  "ST337_T7_DTD": {
+    "grade": "PARTIAL",
+    "reason": "Correct field position, not consumer value semantics; note omits R2 applicability explanation (FF_PC_BITS independently supports position)."
+  },
+  "ST337_T7_STREAM": {
+    "grade": "PARTIAL",
+    "reason": "Correct field position; note omits explicit carryover rationale, though FF_PC_STREAM confirms consumer layout."
+  },
+  "ST337_T8_16": {
+    "grade": "SUPPORTS",
+    "reason": "Mode0 is explicitly 16-bit; applicability additionally established by consumer \u00a78.3."
+  },
+  "ST337_ERR0": {
+    "grade": "PARTIAL",
+    "reason": "Full sentence gives error=0 for unknown errors; note omits explicit consumer carryover rationale, though consumer encoding agrees."
+  },
+  "ST337_STREAM0": {
+    "grade": "SUPPORTS",
+    "reason": "At least one stream0 plus SCOPE explicitly fixes the only stream to 0."
+  },
+  "ST337_LEN_BITS": {
+    "grade": "PARTIAL",
+    "reason": "Professional bits unit; consumer even-size AC-3/DTS agrees with FFmpeg, but odd-DTS exact Pd inference is unverified and \u00a78.4 exceptions matter."
+  },
+  "ST337_LEN_NOPRE": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit payload-only count, a shared burst-structure property; no claim that E-AC-3 uses bits."
+  },
+  "ST337_FIRST_BIT": {
+    "grade": "SUPPORTS",
+    "reason": "Page describes serial bits across subframes, first at MSB; shared structure rationale stated in note."
+  },
+  "ST337_LAST_UNUSED": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit unused final-frame bits zero; supports low-byte and unused-subframe fill under structural inference."
+  },
+  "ST337_UNUSED_ZERO": {
+    "grade": "SUPPORTS",
+    "reason": "Page completes truncated quote with zero; interburst unused locations zero, independently confirmed by consumer FFmpeg."
+  },
+  "ST337_FOUR_ZERO": {
+    "grade": "SUPPORTS",
+    "reason": "Zeros preceding Pa are outside the burst; test uses eight leading zero words and does not assert a universal four-zero rule."
+  },
+  "ST337_IDLE": {
+    "grade": "SUPPORTS",
+    "reason": "All-zero stream is idle, no burst; informative annex at honest sibling tier."
+  },
+  "ST338_AC3": {
+    "grade": "SUPPORTS",
+    "reason": "Informative IEC column confirms consumer code1; Same data does not automatically establish all consumer timing/field rules."
+  },
+  "ST338_EAC3_IEC": {
+    "grade": "SUPPORTS",
+    "reason": "Full row21 gives consumer E-AC-3 allocation with sub-data-type caveat; preview independently confirms scoped code21."
+  },
+  "ST338_DTS1": {
+    "grade": "PARTIAL",
+    "reason": "Row11 IEC column says DTS I; does not itself link 512 samples, which correctly rests on FF_DTS1."
+  },
+  "ST338_DTS2": {
+    "grade": "PARTIAL",
+    "reason": "Row12 IEC column says DTS II; 1024-sample link is secondary FFmpeg."
+  },
+  "ST338_DTS3": {
+    "grade": "PARTIAL",
+    "reason": "Row13 IEC column says DTS III; 2048-sample link is secondary FFmpeg."
+  },
+  "ST340_AC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Professional code1 is explicitly also code1 in ST338 consumer allocation, as note states."
+  },
+  "ST340_AC3_DTD_RESERVED": {
+    "grade": "DOES-NOT-SUPPORT",
+    "reason": "Professional reserved bits and rep-rate flag do not establish consumer bsmod0 dependent field; \u00a78.4 explicitly warns of differences. FF_AC3_TYPE is the actual secondary support."
+  },
+  "ST340_AC3_PAYLOAD": {
+    "grade": "PARTIAL",
+    "reason": "Explicit professional one-syncframe payload; Same data is a reasonable declared inference, not consumer normative confirmation."
+  },
+  "ST340_AC3_PERIOD": {
+    "grade": "PARTIAL",
+    "reason": "1536 is professional repetition period; Same data allocation does not guarantee spacing under \u00a78.4. Consumer value independently secondary FFmpeg plus codec duration."
+  },
+  "ST340_AC3_PAD": {
+    "grade": "PARTIAL",
+    "reason": "Professional padding to1536; note does not explain consumer applicability; consumer period support is secondary."
+  },
+  "ST340_EAC3_PAYLOAD": {
+    "grade": "PARTIAL",
+    "reason": "Professional syncframe grouping only; note admits consumer carryover rests on FFmpeg, so consumer rule is secondary."
+  },
+  "ST340_EAC3_6BLK": {
+    "grade": "PARTIAL",
+    "reason": "Professional six-block rule and convsync restriction; consumer single-substream grouping agrees with FFmpeg, not independently established by professional clause."
+  },
+  "ST340_EAC3_TYPE_PRO": {
+    "grade": "SUPPORTS",
+    "reason": "Unused background explicitly professional16, never used as consumer expected code."
+  },
+  "ST340_EAC3_PERIOD_PRO": {
+    "grade": "SUPPORTS",
+    "reason": "Unused background explicitly professional1536, never used as consumer period."
+  },
+  "IEC3_T3": {
+    "grade": "SUPPORTS",
+    "reason": "Contents and surrounding AC-3 section/table identify type bits0\u20134=1; preview tier honestly limited to title."
+  },
+  "IEC3_T4": {
+    "grade": "SUPPORTS",
+    "reason": "E-AC-3 table title identifies bits0\u20134=21, without inventing absent table contents."
+  },
+  "IEC3_T4_56": {
+    "grade": "SUPPORTS",
+    "reason": "Same title explicitly restricts bits5\u20136=0."
+  },
+  "IEC3_T5": {
+    "grade": "PARTIAL",
+    "reason": "Unused title establishes size/rate dependence only; does not prove a specific repetition period or difference from1536."
+  },
+  "A52_SYNC": {
+    "grade": "PARTIAL",
+    "reason": "Quoted AC-3 clause establishes 0B77; E-AC-3 use needs Annex E syncword semantics (available elsewhere in corpus), not this clause alone."
+  },
+  "A52_FSCOD": {
+    "grade": "SUPPORTS",
+    "reason": "Page38 table gives 48/44.1/32 mapping; layout is on separately cited page31; unused in test assertions."
+  },
+  "A52_SYNCINFO": {
+    "grade": "SUPPORTS",
+    "reason": "Full page31 table supplies 16/16/2/6 layout; short title quote alone is weak but cited page supports builder."
+  },
+  "A52_SIZE_48_128": {
+    "grade": "SUPPORTS",
+    "reason": "Table columns and row16 give256 words=512 bytes at48k."
+  },
+  "A52_SIZE_44_0": {
+    "grade": "SUPPORTS",
+    "reason": "Row0 at44.1k gives69 words=138 bytes, odd word count."
+  },
+  "A52_SIZE_32_40": {
+    "grade": "SUPPORTS",
+    "reason": "Row2 at32k gives120 words; unused assertion citation also supports fixture size."
+  },
+  "A52_BSMOD": {
+    "grade": "SUPPORTS",
+    "reason": "Page32 bsi starts bsid5 then bsmod3; with syncinfo this is byte5 low3; unused assertion key."
+  },
+  "E_SYNCINFO": {
+    "grade": "PARTIAL",
+    "reason": "Page114 supports header layout and 16-bit syncword but not numeric 0B77; add E-AC-3 syncword semantic clause."
+  },
+  "E_FRMSIZ": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit size-minus-one in16-bit words; unused key supports fixture construction."
+  },
+  "E_NUMBLKS": {
+    "grade": "SUPPORTS",
+    "reason": "Full table supplies all four 1/2/3/6 mappings; codec block count is not a consumer grouping mandate."
+  },
+  "DTS_SYNC": {
+    "grade": "SUPPORTS",
+    "reason": "Table5-1 supplies32-bit sync and complete builder field widths."
+  },
+  "DTS_FSIZE": {
+    "grade": "SUPPORTS",
+    "reason": "FSIZE+1 total bytes, range96\u201316384, no even-byte restriction; carriage acceptance separately secondary."
+  },
+  "DTS_NBLKS": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit32*(NBLKS+1), supports sample calculations, not IEC repetition period by itself."
+  },
+  "FF_SYNC1": {
+    "grade": "SUPPORTS",
+    "reason": "Unused direct secondary Pa constant."
+  },
+  "FF_SYNC2": {
+    "grade": "SUPPORTS",
+    "reason": "Unused direct secondary Pb constant."
+  },
+  "FF_PC_BITS": {
+    "grade": "PARTIAL",
+    "reason": "Consumer comment gives type bits0\u20136, not a universal5-bit type; supports error/dtd positions; scoped bits5\u20136=0 separately justified."
+  },
+  "FF_PC_STREAM": {
+    "grade": "SUPPORTS",
+    "reason": "Consumer comment explicitly gives bitstream bits13\u201315."
+  },
+  "FF_PD_UNIT": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit unit varies by type; E-AC-3 assignment separately establishes bytes."
+  },
+  "FF_FILL_ZERO": {
+    "grade": "SUPPORTS",
+    "reason": "Consumer comment explicitly says spaces filled with zero, corroborated by ffio_fill."
+  },
+  "FF_AC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Code copies bsmod into bits8\u201310 and leaves higher dependent bits clear; secondary even when bsmod=0."
+  },
+  "FF_AC3_BSMOD": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit byte5 low3 extraction."
+  },
+  "FF_AC3_PERIOD": {
+    "grade": "PARTIAL",
+    "reason": "Expression references AC3_FRAME_SIZE; its1536 definition is not in supplied FFmpeg files. Codec/sibling corpus corroborates1536; expression alone lacks numeric definition."
+  },
+  "FF_PERIOD_BYTES": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit pkt_offset units bytes; conversion to2-byte words/4-byte frames follows interface."
+  },
+  "FF_LEN_BITS": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit even-byte alignment then*8; tested encoder lengths are even. Does not support exact unrounded odd-DTS Pd."
+  },
+  "FF_EAC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Unused direct enum assignment leaves dependent/error/stream bits0."
+  },
+  "FF_EAC3_ENUM": {
+    "grade": "SUPPORTS",
+    "reason": "Unused direct enum21=E-AC-3."
+  },
+  "FF_EAC3_PERIOD": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit24576-byte period, secondary; conversion12288 words is exact."
+  },
+  "FF_EAC3_LEN": {
+    "grade": "SUPPORTS",
+    "reason": "hd_buf_filled accumulates packet bytes and is assigned to Pd; secondary byte-count rule."
+  },
+  "FF_EAC3_GROUP": {
+    "grade": "SUPPORTS",
+    "reason": "Unused repeat array supports same-numblkscod single-substream grouping only."
+  },
+  "FF_EAC3_GROUP_IDX": {
+    "grade": "SUPPORTS",
+    "reason": "Unused code extracts byte4 bits5\u20134 to index repeats, guarded by fscod."
+  },
+  "FF_DTS1": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit consumer enum11 and512 samples; secondary mapping honestly labeled."
+  },
+  "FF_DTS2": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit consumer enum12 and1024 samples; secondary mapping honestly labeled."
+  },
+  "FF_DTS3": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit consumer enum13 and2048 samples; secondary mapping honestly labeled."
+  },
+  "FF_DTS_PERIOD": {
+    "grade": "SUPPORTS",
+    "reason": "blocks++ then<<7 bytes gives32 samples/block times4 bytes/frame."
+  },
+  "FF_DTS_BADSYNC": {
+    "grade": "SUPPORTS",
+    "reason": "Code default sync case returns invalid data; scoped input is16-bit BE."
+  },
+  "FF_DTS_UNSUPPORTED": {
+    "grade": "SUPPORTS",
+    "reason": "Switch accepts512/1024/2048 and rejects other sample counts."
+  },
+  "FF_TOO_BIG": {
+    "grade": "SUPPORTS",
+    "reason": "Full page DTS oversized path and packet padding<0 error support refusal; exact-fit no-preamble exception is not exercised."
+  },
+  "FF_ODD": {
+    "grade": "SUPPORTS",
+    "reason": "Explicit live odd-byte path emits final byte<<8; supports acceptance/alignment at secondary tier, not normative consumer conformance."
+  }
+}

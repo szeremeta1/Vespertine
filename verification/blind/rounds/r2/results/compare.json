@@ -1,0 +1,290 @@
+{
+ "summary": {
+  "MATCH": 28,
+  "REF-REFUSES": 2
+ },
+ "rows": [
+  {
+   "kind": "dop",
+   "name": "stereo-8B-05",
+   "result": "MATCH",
+   "bytes": 24
+  },
+  {
+   "kind": "dop",
+   "name": "stereo-8B-FA",
+   "result": "MATCH",
+   "bytes": 24
+  },
+  {
+   "kind": "dop",
+   "name": "mono-bitorder",
+   "result": "MATCH",
+   "bytes": 9
+  },
+  {
+   "kind": "dop",
+   "name": "6ch-32B",
+   "result": "MATCH",
+   "bytes": 288
+  },
+  {
+   "kind": "dop",
+   "name": "stereo-8192B",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "dop",
+   "name": "silence-like-0x69",
+   "result": "MATCH",
+   "bytes": 48
+  },
+  {
+   "kind": "ac3",
+   "name": "48k-128kbps-bsmod0",
+   "result": "MATCH",
+   "bytes": 6144
+  },
+  {
+   "kind": "ac3",
+   "name": "48k-640kbps-bsmod7",
+   "result": "MATCH",
+   "bytes": 6144
+  },
+  {
+   "kind": "ac3",
+   "name": "44k1-odd-words-bsmod2",
+   "result": "MATCH",
+   "bytes": 6144
+  },
+  {
+   "kind": "ac3",
+   "name": "32k-max-3840B-bsmod1",
+   "result": "MATCH",
+   "bytes": 6144
+  },
+  {
+   "kind": "ac3",
+   "name": "48k-32kbps-bsmod4",
+   "result": "MATCH",
+   "bytes": 6144
+  },
+  {
+   "kind": "eac3",
+   "name": "1x6blk-768B",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "eac3",
+   "name": "2x3blk",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "eac3",
+   "name": "6x1blk",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "eac3",
+   "name": "ind+dep-6blk",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "eac3",
+   "name": "max-6blk-4096B",
+   "result": "MATCH",
+   "bytes": 24576
+  },
+  {
+   "kind": "eac3",
+   "name": "over-capacity-6x4096B",
+   "result": "REF-REFUSES",
+   "detail": "BurstError: burst does not fit in its repetition period",
+   "ves_bytes": 24576
+  },
+  {
+   "kind": "dts",
+   "name": "512-1006B",
+   "result": "MATCH",
+   "bytes": 2048
+  },
+  {
+   "kind": "dts",
+   "name": "512-odd-1007B",
+   "result": "MATCH",
+   "bytes": 2048
+  },
+  {
+   "kind": "dts",
+   "name": "1024-2012B",
+   "result": "MATCH",
+   "bytes": 4096
+  },
+  {
+   "kind": "dts",
+   "name": "2048-4000B",
+   "result": "MATCH",
+   "bytes": 8192
+  },
+  {
+   "kind": "dts",
+   "name": "512-fills-2040B",
+   "result": "MATCH",
+   "bytes": 2048
+  },
+  {
+   "kind": "dts",
+   "name": "512-over-2044B",
+   "result": "REF-REFUSES",
+   "detail": "BurstError: frame does not fit in the repetition period together with the preamble",
+   "ves_bytes": 2048
+  },
+  {
+   "kind": "eac3_group",
+   "name": "12x1blk",
+   "result": "MATCH",
+   "ref": [
+    [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    [
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   ],
+   "ves": [
+    [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    [
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ]
+   ]
+  },
+  {
+   "kind": "eac3_group",
+   "name": "ind-dep-x3",
+   "result": "MATCH",
+   "ref": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     4,
+     5
+    ]
+   ],
+   "ves": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     4,
+     5
+    ]
+   ]
+  },
+  {
+   "kind": "eac3_group",
+   "name": "4x3blk",
+   "result": "MATCH",
+   "ref": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "ves": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ]
+  },
+  {
+   "kind": "eac3_group",
+   "name": "2x6blk-sub0+sub1",
+   "result": "MATCH",
+   "ref": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   "ves": [
+    [
+     0,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ]
+  },
+  {
+   "kind": "ac3_stream",
+   "name": "48k-192kbps-x5",
+   "result": "MATCH",
+   "bytes": 30720
+  },
+  {
+   "kind": "eac3_stream",
+   "name": "3blk-x8",
+   "result": "MATCH",
+   "bytes": 98304
+  },
+  {
+   "kind": "eac3_stream",
+   "name": "ind+dep-x4",
+   "result": "MATCH",
+   "bytes": 98304
+  }
+ ]
+}

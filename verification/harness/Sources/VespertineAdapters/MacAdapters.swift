@@ -41,11 +41,12 @@ final class MemoryDSD: RawDSDSource {
     func close() throws {}
 }
 
-/// RawDoPDecoder, which packs DSD into DoP frames for playback (FFmpegDecoder.swift:165-250), fed from memory.
-/// Its output is the 24-bit DoP sample over 2^23 in Float32 (line 239), read back here as the 24-bit value.
+/// RawDoPDecoder, which packs DSD into DoP frames for playback (FFmpegDecoder.swift:169-264), fed from memory.
+/// Its output is the 24-bit DoP sample over 2^23 in Float32 (line 253), read back here as the 24-bit value.
 ///
 /// The input checks below are the adapter's, not Vespertine's: RawDoPDecoder reads from a source that can't
-/// express unequal channel lengths, and it drops a trailing odd byte. No requirement record covers them.
+/// express unequal channel lengths, and it pads an odd last byte with DSD silence (`DoP.pack` refuses one). No
+/// requirement record covers them.
 struct RawDoPPacker: DoPPacker {
     func dopPack(dsd: [[UInt8]], firstMarker: UInt8) throws -> [[UInt32]] {
         guard !dsd.isEmpty, firstMarker == 0x05 || firstMarker == 0xFA,

@@ -1,0 +1,342 @@
+{
+  "DOP_MARKER_ALT": [
+    "test_dop.py::test_pack_markers_alternate_from_05",
+    "test_dop.py::test_pack_markers_alternate_from_fa",
+    "test_dop.py::test_pack_default_first_marker",
+    "test_dop.py::test_pack_rejects_marker_not_of_base_method",
+    "test_dop.py::test_unpack_inverts_pack",
+    "test_dop.py::test_unpack_reads_hand_built_stream",
+    "test_dop.py::test_unpack_rejects_non_alternating_markers",
+    "test_dop.py::test_unpack_rejects_pcm_audio"
+  ],
+  "DOP_MARKER_SAME": [
+    "test_dop.py::test_pack_same_marker_on_every_channel",
+    "test_dop.py::test_pack_rejects_unequal_channel_lengths",
+    "test_dop.py::test_unpack_rejects_marker_differing_between_channels",
+    "test_dop.py::test_unpack_rejects_channel_without_marker"
+  ],
+  "DOP_MARKER_MSB": [
+    "test_dop.py::test_pack_marker_is_the_8_msbs_of_a_24_bit_word",
+    "test_dop.py::test_unpack_rejects_word_wider_than_24_bits"
+  ],
+  "DOP_BITS_OLDEST": [
+    "test_dop.py::test_pack_oldest_bit_is_bit15",
+    "test_dop.py::test_pack_sixteen_bits_per_frame_in_time_order",
+    "test_dop.py::test_pack_frame_count_and_width",
+    "test_dop.py::test_pack_rejects_odd_byte_count",
+    "test_dop.py::test_unpack_inverts_pack",
+    "test_dop.py::test_unpack_reads_hand_built_stream"
+  ],
+  "DOP_DIAGRAM": [
+    "test_dop.py::test_pack_oldest_bit_is_bit15",
+    "test_dop.py::test_pack_bit_order_within_first_byte",
+    "test_dop.py::test_pack_second_byte_in_low_half",
+    "test_dop.py::test_pack_sixteen_bits_per_frame_in_time_order",
+    "test_dop.py::test_unpack_inverts_pack",
+    "test_dop.py::test_unpack_reads_hand_built_stream"
+  ],
+  "DOP_24BIT": [
+    "test_dop.py::test_pack_marker_is_the_8_msbs_of_a_24_bit_word",
+    "test_dop.py::test_unpack_rejects_word_wider_than_24_bits"
+  ],
+  "DOP_PER_CHANNEL": [
+    "test_dop.py::test_pack_frame_count_and_width",
+    "test_dop.py::test_pack_channel_k_goes_to_pcm_channel_k",
+    "test_dop.py::test_pack_rejects_unequal_channel_lengths"
+  ],
+  "DOP_OTHER_MARKER": [
+    "test_dop.py::test_pack_rejects_marker_not_of_base_method",
+    "test_dop.py::test_unpack_rejects_markers_of_other_method"
+  ],
+  "DOP_ALT_MARKERS": [
+    "test_dop.py::test_pack_rejects_marker_not_of_base_method",
+    "test_dop.py::test_unpack_rejects_markers_of_other_method"
+  ],
+  "DOP_RX_MISSING": [
+    "test_dop.py::test_unpack_rejects_channel_without_marker",
+    "test_dop.py::test_unpack_rejects_pcm_audio"
+  ],
+  "ST337_PA": [
+    "test_iec61937.py::test_pa_pb_are_the_sync_words_in_frame_one"
+  ],
+  "ST337_PB": [
+    "test_iec61937.py::test_pa_pb_are_the_sync_words_in_frame_one"
+  ],
+  "ST337_EXT_SYNC": [
+    "test_iec61937.py::test_pa_pb_are_the_sync_words_in_frame_one",
+    "test_parse.py::test_parse_offset_is_index_of_pa_after_leading_zeros"
+  ],
+  "ST337_FRAME_PRE": [
+    "test_iec61937.py::test_pa_pb_are_the_sync_words_in_frame_one",
+    "test_iec61937.py::test_payload_follows_pd_big_endian",
+    "test_parse.py::test_parse_offset_is_index_of_pa_after_leading_zeros",
+    "test_parse.py::test_parse_length_code_is_raw_pd",
+    "test_parse.py::test_parse_two_back_to_back_bursts",
+    "test_parse.py::test_roundtrip_ac3_single_burst_fields",
+    "test_parse.py::test_roundtrip_ac3_three_bursts_offsets",
+    "test_parse.py::test_roundtrip_dts_payload_and_offsets"
+  ],
+  "ST337_CONSUMER_SUBSET": [],
+  "ST337_CONSUMER_16": [
+    "test_iec61937.py::test_pc_data_mode_bits_are_zero"
+  ],
+  "ST337_PRE_FOLLOW": [
+    "test_iec61937.py::test_payload_follows_pd_big_endian",
+    "test_parse.py::test_parse_rejects_payload_running_past_the_end"
+  ],
+  "ST337_T7_TYPE": [
+    "test_iec61937.py::test_ac3_data_type_is_1",
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "ST337_T7_MODE": [
+    "test_iec61937.py::test_pc_data_mode_bits_are_zero"
+  ],
+  "ST337_T7_ERR": [
+    "test_iec61937.py::test_pc_error_flag_clear",
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "ST337_T7_DTD": [
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "ST337_T7_STREAM": [
+    "test_iec61937.py::test_pc_stream_number_is_zero",
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "ST337_T8_16": [
+    "test_iec61937.py::test_pc_data_mode_bits_are_zero"
+  ],
+  "ST337_ERR0": [
+    "test_iec61937.py::test_pc_error_flag_clear",
+    "test_parse.py::test_roundtrip_ac3_single_burst_fields"
+  ],
+  "ST337_STREAM0": [
+    "test_iec61937.py::test_pc_stream_number_is_zero",
+    "test_parse.py::test_roundtrip_ac3_single_burst_fields"
+  ],
+  "ST337_LEN_BITS": [
+    "test_iec61937.py::test_ac3_pd_is_payload_length_in_bits",
+    "test_iec61937.py::test_dts_pd_is_payload_length_in_bits",
+    "test_parse.py::test_parse_payload_in_bits_for_ac3_type",
+    "test_parse.py::test_parse_payload_odd_byte_count_in_bits",
+    "test_parse.py::test_parse_payload_excludes_fill",
+    "test_parse.py::test_parse_rejects_payload_running_past_the_end",
+    "test_parse.py::test_roundtrip_ac3_single_burst_fields",
+    "test_parse.py::test_roundtrip_ac3_payload",
+    "test_parse.py::test_roundtrip_dts_payload_and_offsets"
+  ],
+  "ST337_LEN_NOPRE": [
+    "test_iec61937.py::test_ac3_pd_is_payload_length_in_bits",
+    "test_iec61937.py::test_dts_pd_is_payload_length_in_bits",
+    "test_parse.py::test_parse_payload_excludes_fill"
+  ],
+  "ST337_FIRST_BIT": [
+    "test_iec61937.py::test_payload_follows_pd_big_endian",
+    "test_iec61937.py::test_ac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_eac3_payload_is_the_frames_in_order",
+    "test_iec61937.py::test_eac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_dts_payload_starts_with_the_sync_word",
+    "test_iec61937.py::test_dts_odd_length_frame_last_byte_is_msb_aligned",
+    "test_parse.py::test_parse_payload_in_bits_for_ac3_type"
+  ],
+  "ST337_LAST_UNUSED": [
+    "test_iec61937.py::test_unused_second_subframe_of_last_payload_frame_is_zero",
+    "test_iec61937.py::test_dts_odd_length_frame_last_byte_is_msb_aligned",
+    "test_iec61937.py::test_dts_odd_length_frame_fill_is_zero_and_period_kept",
+    "test_parse.py::test_parse_payload_odd_byte_count_in_bits"
+  ],
+  "ST337_UNUSED_ZERO": [
+    "test_iec61937.py::test_fill_after_payload_is_zero",
+    "test_iec61937.py::test_dts_odd_length_frame_fill_is_zero_and_period_kept",
+    "test_parse.py::test_parse_payload_excludes_fill",
+    "test_parse.py::test_parse_two_back_to_back_bursts"
+  ],
+  "ST337_FOUR_ZERO": [
+    "test_parse.py::test_parse_offset_is_index_of_pa_after_leading_zeros"
+  ],
+  "ST337_IDLE": [
+    "test_parse.py::test_parse_all_zero_stream_has_no_burst"
+  ],
+  "ST338_AC3": [
+    "test_iec61937.py::test_ac3_data_type_is_1",
+    "test_iec61937.py::test_ac3_pd_is_payload_length_in_bits",
+    "test_parse.py::test_parse_payload_in_bits_for_ac3_type",
+    "test_parse.py::test_roundtrip_ac3_single_burst_fields"
+  ],
+  "ST338_EAC3_IEC": [
+    "test_iec61937.py::test_eac3_data_type_is_21_with_bits_5_6_zero"
+  ],
+  "ST338_DTS1": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length",
+    "test_parse.py::test_parse_payload_odd_byte_count_in_bits"
+  ],
+  "ST338_DTS2": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length"
+  ],
+  "ST338_DTS3": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length"
+  ],
+  "ST340_AC3_TYPE": [
+    "test_iec61937.py::test_ac3_data_type_is_1"
+  ],
+  "ST340_AC3_DTD_RESERVED": [
+    "test_iec61937.py::test_ac3_data_type_dependent_zero_for_bsmod_0"
+  ],
+  "ST340_AC3_PAYLOAD": [
+    "test_iec61937.py::test_ac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_ac3_payload_is_one_whole_syncframe_48k",
+    "test_iec61937.py::test_ac3_rejects_wrong_syncword",
+    "test_iec61937.py::test_ac3_rejects_truncated_syncframe",
+    "test_parse.py::test_roundtrip_ac3_payload"
+  ],
+  "ST340_AC3_PERIOD": [
+    "test_iec61937.py::test_ac3_burst_is_1536_frames_long",
+    "test_parse.py::test_roundtrip_ac3_three_bursts_offsets"
+  ],
+  "ST340_AC3_PAD": [
+    "test_iec61937.py::test_ac3_burst_is_1536_frames_long"
+  ],
+  "ST340_EAC3_PAYLOAD": [
+    "test_iec61937.py::test_eac3_payload_is_the_frames_in_order",
+    "test_iec61937.py::test_eac3_group_covers_every_frame_once_in_order",
+    "test_parse.py::test_roundtrip_eac3_payload"
+  ],
+  "ST340_EAC3_6BLK": [
+    "test_iec61937.py::test_eac3_rejects_partial_group",
+    "test_iec61937.py::test_eac3_rejects_more_than_six_blocks",
+    "test_iec61937.py::test_eac3_group_is_six_blocks_per_burst",
+    "test_iec61937.py::test_eac3_group_covers_every_frame_once_in_order",
+    "test_iec61937.py::test_eac3_group_of_six_block_frames_feeds_eac3_burst"
+  ],
+  "ST340_EAC3_TYPE_PRO": [],
+  "ST340_EAC3_PERIOD_PRO": [],
+  "IEC3_T3": [
+    "test_iec61937.py::test_ac3_data_type_is_1"
+  ],
+  "IEC3_T4": [
+    "test_iec61937.py::test_eac3_data_type_is_21_with_bits_5_6_zero",
+    "test_iec61937.py::test_eac3_group_of_six_block_frames_feeds_eac3_burst",
+    "test_parse.py::test_parse_payload_in_bytes_for_eac3_type",
+    "test_parse.py::test_roundtrip_eac3_payload"
+  ],
+  "IEC3_T4_56": [
+    "test_iec61937.py::test_eac3_data_type_is_21_with_bits_5_6_zero"
+  ],
+  "IEC3_T5": [],
+  "A52_SYNC": [
+    "test_iec61937.py::test_ac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_ac3_rejects_wrong_syncword",
+    "test_iec61937.py::test_eac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_eac3_rejects_wrong_syncword"
+  ],
+  "A52_FSCOD": [],
+  "A52_SYNCINFO": [
+    "test_iec61937.py::test_ac3_rejects_truncated_syncframe"
+  ],
+  "A52_SIZE_48_128": [
+    "test_iec61937.py::test_ac3_payload_is_one_whole_syncframe_48k",
+    "test_iec61937.py::test_ac3_rejects_truncated_syncframe"
+  ],
+  "A52_SIZE_44_0": [
+    "test_iec61937.py::test_unused_second_subframe_of_last_payload_frame_is_zero"
+  ],
+  "A52_SIZE_32_40": [],
+  "A52_BSMOD": [],
+  "E_SYNCINFO": [
+    "test_iec61937.py::test_eac3_payload_starts_with_the_syncword",
+    "test_iec61937.py::test_eac3_rejects_wrong_syncword"
+  ],
+  "E_FRMSIZ": [],
+  "E_NUMBLKS": [
+    "test_iec61937.py::test_eac3_rejects_partial_group",
+    "test_iec61937.py::test_eac3_rejects_more_than_six_blocks",
+    "test_iec61937.py::test_eac3_group_is_six_blocks_per_burst"
+  ],
+  "DTS_SYNC": [
+    "test_iec61937.py::test_dts_payload_starts_with_the_sync_word",
+    "test_iec61937.py::test_dts_rejects_missing_core_sync",
+    "test_iec61937.py::test_dts_rejects_header_cut_short"
+  ],
+  "DTS_FSIZE": [
+    "test_iec61937.py::test_dts_pd_is_payload_length_in_bits",
+    "test_iec61937.py::test_dts_odd_length_frame_last_byte_is_msb_aligned",
+    "test_iec61937.py::test_dts_rejects_header_cut_short",
+    "test_parse.py::test_roundtrip_dts_payload_and_offsets"
+  ],
+  "DTS_NBLKS": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length",
+    "test_iec61937.py::test_dts_burst_length_is_two_words_per_sample",
+    "test_iec61937.py::test_dts_rejects_header_cut_short"
+  ],
+  "FF_SYNC1": [],
+  "FF_SYNC2": [],
+  "FF_PC_BITS": [
+    "test_iec61937.py::test_ac3_bsmod_in_data_type_dependent_bits_0_2",
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "FF_PC_STREAM": [
+    "test_parse.py::test_parse_pc_fields"
+  ],
+  "FF_PD_UNIT": [
+    "test_iec61937.py::test_eac3_pd_is_payload_length_in_bytes",
+    "test_parse.py::test_parse_payload_in_bytes_for_eac3_type"
+  ],
+  "FF_FILL_ZERO": [
+    "test_iec61937.py::test_fill_after_payload_is_zero"
+  ],
+  "FF_AC3_TYPE": [
+    "test_iec61937.py::test_ac3_data_type_dependent_zero_for_bsmod_0",
+    "test_iec61937.py::test_ac3_bsmod_in_data_type_dependent_bits_0_2"
+  ],
+  "FF_AC3_BSMOD": [
+    "test_iec61937.py::test_ac3_bsmod_in_data_type_dependent_bits_0_2"
+  ],
+  "FF_AC3_PERIOD": [
+    "test_iec61937.py::test_ac3_burst_is_1536_frames_long"
+  ],
+  "FF_PERIOD_BYTES": [
+    "test_iec61937.py::test_eac3_burst_is_6144_frames_long",
+    "test_iec61937.py::test_dts_burst_length_is_two_words_per_sample"
+  ],
+  "FF_LEN_BITS": [
+    "test_iec61937.py::test_ac3_pd_is_payload_length_in_bits",
+    "test_iec61937.py::test_dts_pd_is_payload_length_in_bits"
+  ],
+  "FF_EAC3_TYPE": [],
+  "FF_EAC3_ENUM": [],
+  "FF_EAC3_PERIOD": [
+    "test_iec61937.py::test_eac3_burst_is_6144_frames_long"
+  ],
+  "FF_EAC3_LEN": [
+    "test_iec61937.py::test_eac3_pd_is_payload_length_in_bytes",
+    "test_parse.py::test_parse_payload_in_bytes_for_eac3_type"
+  ],
+  "FF_EAC3_GROUP": [],
+  "FF_EAC3_GROUP_IDX": [],
+  "FF_DTS1": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length"
+  ],
+  "FF_DTS2": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length"
+  ],
+  "FF_DTS3": [
+    "test_iec61937.py::test_dts_data_type_by_frame_length"
+  ],
+  "FF_DTS_PERIOD": [
+    "test_iec61937.py::test_dts_burst_length_is_two_words_per_sample",
+    "test_iec61937.py::test_dts_rejects_frame_too_large_for_its_period"
+  ],
+  "FF_DTS_BADSYNC": [
+    "test_iec61937.py::test_dts_rejects_missing_core_sync"
+  ],
+  "FF_DTS_UNSUPPORTED": [
+    "test_iec61937.py::test_dts_rejects_frame_lengths_other_than_512_1024_2048"
+  ],
+  "FF_TOO_BIG": [
+    "test_iec61937.py::test_dts_rejects_frame_too_large_for_its_period"
+  ],
+  "FF_ODD": [
+    "test_iec61937.py::test_dts_odd_length_frame_last_byte_is_msb_aligned",
+    "test_iec61937.py::test_dts_odd_length_frame_fill_is_zero_and_period_kept",
+    "test_parse.py::test_parse_payload_odd_byte_count_in_bits"
+  ]
+}

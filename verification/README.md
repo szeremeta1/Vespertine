@@ -23,6 +23,7 @@ in [REPORT.md](REPORT.md), and anything Vespertine got wrong is in [FINDINGS.md]
 | `oracles/` | Independent implementations used as second opinions, and the scripts that run them. |
 | `hardware/` | Procedures that need a DAC, a loopback interface, a receiver or real discs (`LOOPBACK.md`, `IEC61937-ORACLE.md`, `SACD-ORACLE.md`), with their tools: `signals.py` makes the test signals and decides pass or fail on a capture, `probe.swift` prints what Core Audio reports for each output device, `selftest.py` shows the tools can tell right from wrong. |
 | `tools/` | `check_registry.py`, `spec_cache.py`, `fetch_oracles.py`, `cleanroom.py` (sets up and collects the clean-room run), `scoreboard.py` (the tables in REPORT.md), the DST fixture generator. |
+| `blind/` | A separate blind-agent round for DoP and IEC 61937 (Python, public sources only), run against Vespertine byte for byte: [docs/VERIFICATION-BLIND.md](../docs/VERIFICATION-BLIND.md). |
 
 ## Running it
 

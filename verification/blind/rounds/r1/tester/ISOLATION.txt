@@ -1,0 +1,9 @@
+tester: 39 tool calls logged with cwd = room; 2 flagged
+  2026-10-16T14:24:08  grep -n "infomdate\|mixmdate" etsi-ts-102366.md | sed -n 1,12p; printf '%s\t%s\n' smpte-st338-2016 "ST 2041-2 DTS type I 11 ADTS or LATM/LOAS" smpte-st338-2016 "12 Reserved for compatibility with IEC
+      -> parent directory (..)
+  2026-10-16T14:26:10  python3 - <<'E' p='tests/citations.py' s=open(p).read() s=s.replace('"quote": "The flag shall be set to 0 if the AC-3 data burst is placed in the AES3 interface such that the reference point of the da
+      -> command 'open'
+Manual review of the two flags (orchestrator, 2026-10-16):
+  14:24:08  the shell was in corpus/md (an earlier `cd`), so `cd ..` lands in corpus/ and `../.venv`, `../tools` are the room's own; inside the room.
+  14:26:10  `open` is Python's open() inside a heredoc editing tests/citations.py, not the shell command; inside the room.
+Disclosed by the tester itself: `cat > /tmp/x` once created an empty /tmp/x (nothing read from outside the room).
