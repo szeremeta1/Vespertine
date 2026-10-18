@@ -40,11 +40,7 @@ let features = [
             headline: "Play the disc image itself.",
             sub: "SACD .iso images play as they are: stereo or 5.1, DST decoded, no extracting. Here as native DSD over DoP on a FiiO K11.",
             chips: [("● NATIVE DSD · DoP", .brass), ("SACD IMAGE · DSD64", .plain), ("32 / 176.4", .plain)], focus: CGRect(x: 1826, y: 770, width: 564, height: 600)),
-    // languages.png is the six-language grid (3840 wide): the focus is the Arabic window's sidebar and album header.
-    Feature(id: "languages", shot: "languages",
-            headline: "Speaks your language.",
-            sub: "Every menu, setting and signal-path message in 44 languages besides English, with right-to-left layouts for Arabic, Hebrew, Persian and Urdu.",
-            chips: [("44 LANGUAGES", .plain), ("+ ENGLISH", .plain), ("RIGHT-TO-LEFT", .plain)], focus: CGRect(x: 430, y: 942, width: 842, height: 470)),
+    // The languages art is the language wall, drawn by site/scripts/make-languages-art.mjs.
 ]
 
 /// Greedy word wrap into lines no wider than `width`.

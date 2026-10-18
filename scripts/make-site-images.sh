@@ -6,7 +6,6 @@
 #   site/src/assets/shots/<shot>-detail.jpg  the inspector side, cut 1:1 (the fake-hi-res one from the Album column on;
 #                                            the bit-perfect one is the Now Playing title and signal path, for the hero)
 #   site/src/assets/press/shot-<shot>.jpg    press-kit thumbnails, 720 wide (720×450 for the main window)
-#   site/src/assets/shots/languages.jpg      the languages grid, 1920 wide
 #   site/src/assets/press/<feature>.jpg      900×506 previews of the key art in docs/press (run scripts/brand/build.sh first)
 # Usage: scripts/make-site-images.sh [shot…]   (default: every shot the site uses). Needs ffmpeg.
 set -euo pipefail
@@ -26,7 +25,7 @@ typeset -A detail=(
   [bit-perfect-fiio-24-96]="crop=542:824:1830:548"
 )
 thumbs=(bit-perfect-fiio-24-96 dsd-native-dop fake-hi-res-detection genres multichannel-albums search smart-playlist
-        spatial-audio-airpods-max stereo-and-surround-versions sacd-iso languages output-settings equalizer loopback-test
+        spatial-audio-airpods-max stereo-and-surround-versions sacd-iso output-settings equalizer loopback-test
         setup-welcome setup-output)
 
 want=($@)
@@ -35,7 +34,6 @@ for s in ${(u)want}; do
   [[ -e $shots/$s.png ]] || { print -u2 "no docs/screenshots/$s.png"; continue; }
   (( ${full[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=2000:1250:flags=lanczos" "$site/shots/$s.jpg"
   [[ -n ${detail[$s]:-} ]] && jpeg "$shots/$s.png" "${detail[$s]}" "$site/shots/$s-detail.jpg"
-  [[ $s == languages ]] && jpeg "$shots/$s.png" "scale=1920:-2:flags=lanczos" "$site/shots/$s.jpg"
   (( ${thumbs[(Ie)$s]} )) && jpeg "$shots/$s.png" "scale=720:-2:flags=lanczos" "$site/press/shot-$s.jpg"
   print "$s"
 done

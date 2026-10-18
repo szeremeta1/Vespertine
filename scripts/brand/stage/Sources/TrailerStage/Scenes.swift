@@ -349,27 +349,17 @@ struct LanguagesScene: View {
     let assets: Assets
     let frame: CGImage?
 
-    // 0.11.1: the album page in Arabic, laid out right to left, so the sidebar and its window buttons are on the right;
-    // macOS's capture indicator sits there too and is covered by mirrored buttons on the sidebar's own colour.
-    static let indicator = CGRect(x: AppWindow.size.width - AppWindow.indicator.maxX, y: AppWindow.indicator.minY,
-                                  width: AppWindow.indicator.width, height: AppWindow.indicator.height)
-
+    // Vespertine in every interface language (docs/screenshots/languages-wall.png, from site/scripts/make-languages-art.mjs),
+    // pushing in slowly over the bar.
     var body: some View {
         let g = Geo(size: size)
-        let s = Scene.languages.range.lowerBound
-        let pose = featurePose(g, t: t, s: s, right: false)
-        let side = assets.poster["languages"].map { sampleColor($0, at: CGRect(x: 1270, y: 14, width: 60, height: 24)) } ?? (r: 0.1, g: 0.1, b: 0.1)
-        let patch = ZStack(alignment: .topLeading) {
-            Color(.sRGB, red: side.r, green: side.g, blue: side.b).frame(width: LanguagesScene.indicator.width, height: LanguagesScene.indicator.height)
-            TrafficLights().scaleEffect(x: -1, y: 1)
-        }
-        .offset(x: LanguagesScene.indicator.minX, y: LanguagesScene.indicator.minY)
-        ZStack(alignment: .topLeading) {
-            WindowRig(frame: frame, sidebar: nil, sidebarColor: .clear, pose: pose, windowOverlay: AnyView(patch))
-            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Speaks your\nlanguage.",
-                        label: "44 languages + English", label2: "Right to left where it should be", right: false)
-        }
-        .frame(width: g.W, height: g.H)
+        let p = progress(t, Scene.languages.range.lowerBound, Scene.languages.range.upperBound)
+        Image(decorative: assets.languageWall, scale: 1)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .scaleEffect(1 + 0.045 * p)
+            .frame(width: g.W, height: g.H)
+            .background(Color(.sRGB, red: 0.035, green: 0.035, blue: 0.04))
     }
 }
 

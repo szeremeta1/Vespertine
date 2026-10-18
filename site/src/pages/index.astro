@@ -13,6 +13,7 @@ import { SITE, app, latest, releases, links, longDate, megabytes, releaseSummary
 import { description, hero, pillars, scenes, badges, marquee, formats, compare, faq, support } from '../data/content';
 import { notesToHtml } from '../lib/text';
 import { homeGraph } from '../lib/seo';
+import NameWall from '../components/NameWall.astro';
 import { shot, sceneShots, trailerPoster, TRAILER as trailer } from '../lib/shots';
 
 const title = 'Vespertine: surround and hi-res music player for Mac';
@@ -162,7 +163,7 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
     </div>
 
     {scenes.map((s, i) => (
-      <article class:list={['scene', `scene--${s.id}`, { 'scene--flip': i % 2 === 1 }]} id={s.id} data-node={s.id} aria-labelledby={`${s.id}-title`}>
+      <article class:list={['scene', `scene--${s.id}`, { 'scene--flip': i % 2 === 1 && !s.wall, 'scene--wall': s.wall }]} id={s.id} data-node={s.id} aria-labelledby={`${s.id}-title`}>
         <div class="scene__num" aria-hidden="true">{n(i)}</div>
         <div class="wrap scene__grid">
           <div class="scene__copy">
@@ -175,7 +176,7 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
             {s.note && <p class="scene__note">{s.note}</p>}
             {s.links && <p class="links">{s.links.map((l) => <a href={l.href}>{l.text} <span aria-hidden="true">↗</span></a>)}</p>}
           </div>
-          <div class:list={['scene__media', { 'scene__media--float': !!s.float }]}>
+          {s.wall ? <NameWall /> : <div class:list={['scene__media', { 'scene__media--float': !!s.float }]}>
             <figure class="display" data-parallax="-5">
               <div class="display__screen">
                 <Pic src={shot(s.shot)} alt={s.alt} {...display} />
@@ -188,7 +189,7 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
                 <figcaption class="mono">{s.float.caption}</figcaption>
               </figure>
             )}
-          </div>
+          </div>}
         </div>
       </article>
     ))}

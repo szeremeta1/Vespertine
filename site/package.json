@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/check-dist.mjs",
+    "build": "node scripts/check-names.mjs && astro build && node scripts/check-dist.mjs",
     "preview": "astro preview",
     "releases": "node scripts/fetch-releases.mjs",
     "og": "node scripts/make-og.mjs",
