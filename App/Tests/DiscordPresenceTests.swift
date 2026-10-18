@@ -203,6 +203,16 @@ struct DiscordPresenceTests {
         #expect(!a.isSame(as: c))
     }
 
+    @Test("Songs of one album share a looked-up cover; a song without an album is looked up by its title")
+    func coverPerAlbum() {
+        let soWhat = DiscordArtworkQuery(artist: "Miles Davis", album: "Kind of Blue", title: "So What")
+        let freddie = DiscordArtworkQuery(artist: "Miles Davis", album: "Kind of Blue", title: "Freddie Freeloader")
+        #expect(soWhat.cacheKey == freddie.cacheKey)
+        let single = DiscordArtworkQuery(artist: "Miles Davis", album: nil, title: "So What")
+        let other = DiscordArtworkQuery(artist: "Miles Davis", album: "Unknown Album", title: "Blue in Green")
+        #expect(single.cacheKey == single && other.cacheKey == other && single.cacheKey != other.cacheKey)
+    }
+
     @Test("Covers from Apple's catalog only for a clear match of album and artist")
     func appleMatches() throws {
         func results(_ items: [[String: String]]) throws -> Data {

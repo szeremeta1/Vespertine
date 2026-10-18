@@ -201,16 +201,16 @@ final class DiscordPresence {
         }
         if let showing, showing.isSame(as: song) { return }
         showing = song
-        if let query = song.artwork, artworkURLs[query] == nil, !lookups.contains(query) {
-            lookups.insert(query)
+        if let query = song.artwork, case let key = query.cacheKey, artworkURLs[key] == nil, !lookups.contains(key) {
+            lookups.insert(key)
             Task { [weak self, artwork] in
                 let url = await artwork.url(for: query)
                 guard let self else { return }
-                self.lookups.remove(query)
+                self.lookups.remove(key)
                 guard let url else { return }
-                self.artworkURLs[query] = url
-                // The cover arrived while the song still plays: show it.
-                if let showing = self.showing, showing.artwork == query { self.send(showing) }
+                self.artworkURLs[key] = url
+                // The cover arrived while a song of that album still plays: show it.
+                if let showing = self.showing, showing.artwork?.cacheKey == key { self.send(showing) }
             }
         }
         send(song)
@@ -224,7 +224,7 @@ final class DiscordPresence {
     }
 
     private func send(_ song: DiscordNowPlaying) {
-        let url = song.artwork.flatMap { artworkURLs[$0] }
+        let url = song.artwork.flatMap { artworkURLs[$0.cacheKey] }
         (client ?? makeClient()).setActivity(DiscordStatus.activity(for: song, artworkURL: url).encoded())
     }
 
@@ -243,6 +243,13 @@ nonisolated struct DiscordArtworkQuery: Hashable, Sendable {
     var album: String?
     var title: String
     var musicBrainzReleaseID: String?
+
+    /// Songs of one album share a cover, so the album (not the song) is what's looked up and remembered: the next
+    /// song shows the cover at once instead of Vespertine's logo while it's looked up again.
+    var cacheKey: DiscordArtworkQuery {
+        let hasAlbum = musicBrainzReleaseID != nil || (album.map { !$0.isEmpty && $0 != "Unknown Album" } ?? false)
+        return hasAlbum ? DiscordArtworkQuery(artist: artist, album: album, title: "", musicBrainzReleaseID: musicBrainzReleaseID) : self
+    }
 }
 
 /// Finds a public address for an album's cover, since Discord can only show images it can download. The cover in
@@ -263,11 +270,12 @@ actor DiscordArtworkFinder {
     }
 
     func url(for query: DiscordArtworkQuery) async -> String? {
-        if let known = found[query] { return known }
+        let key = query.cacheKey
+        if let known = found[key] { return known }
         var url: String?
         if let id = query.musicBrainzReleaseID, UUID(uuidString: id) != nil { url = await coverArtArchive(releaseID: id) }
         if url == nil { url = await appleCatalog(query) }
-        found[query] = url
+        found[key] = url
         return url
     }
 
