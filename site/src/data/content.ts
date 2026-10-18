@@ -45,6 +45,7 @@ export type Scene = {
   note?: string;
   links?: { href: string; text: string }[];
   shot: string;
+  wall?: boolean;
   alt: string;
   float?: { shot: string; alt: string; caption: string };
   caption?: string;
@@ -178,10 +179,12 @@ export const scenes: Scene[] = [
     title: 'Speaks your language.',
     lede: `Every menu, setting and signal-path message is translated into ${app.languages} languages besides English.`,
     body: [
-      'From Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats. Arabic, Hebrew, Persian and Urdu get a right-to-left layout. The translations are careful machine translations, checked on screen; corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
+      'From Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats, and Simplified, Traditional and Hong Kong Chinese each with their own vocabulary. Arabic, Hebrew, Persian and Urdu get a right-to-left layout.',
+      'How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and every screen was reviewed in every language for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
     ],
+    wall: true,
     shot: 'languages',
-    alt: 'The same Vespertine album window in Japanese, German, Ukrainian, Arabic (mirrored right to left), Brazilian Portuguese and Simplified Chinese.',
+    alt: 'Vespertine written in each of its 45 interface languages, from ヴェスパタイン and Веспертайн to فسبرتاين and वेस्परटाइन, at mixed sizes and typefaces.',
   },
 ];
 

@@ -12,7 +12,7 @@ Each image covers one feature at three sizes:
 | `-x` | 1600×900 | X and Bluesky |
 | `-producthunt` | 1270×760 | Product Hunt gallery |
 
-The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd`, `fake-hi-res`, `sacd-iso` and `languages`. They're built from `docs/screenshots` by `scripts/brand/build.sh`, and follow the [brand guide](../brand/brand-guide.pdf).
+The features are `bit-perfect`, `stereo-and-surround`, `spatial-audio`, `native-dsd`, `fake-hi-res`, `sacd-iso` and `languages`. They're built from `docs/screenshots` by `scripts/brand/build.sh` (`languages`, the name in every interface language, by `site/scripts/make-languages-art.mjs`), and follow the [brand guide](../brand/brand-guide.pdf).
 
 The fake hi-res screenshot and trailer scene show a deliberate fake, so no real release is called one: the trailer's own score, encoded to MP3 at 192 kb/s, decoded and upsampled to 24-bit / 192 kHz, and credited to a made-up band (The Lantern Lounge Orchestra, *After Midnight (24/192 Remaster)*).
 

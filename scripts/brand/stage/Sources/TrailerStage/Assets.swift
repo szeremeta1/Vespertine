@@ -36,11 +36,13 @@ final class Assets {
     var sidebars: [String: CGImage] = [:]      // keyed sidebar per recording, for floating over glass
     var sidebarColor: [String: Color] = [:]    // the sidebar's own background, to patch the capture indicator
     var poster: [String: CGImage] = [:]        // a representative frame per recording
+    let languageWall: CGImage  // Vespertine in every interface language
 
     init(_ paths: Paths) {
         self.paths = paths
         logo = loadImage(paths.brand.appendingPathComponent("logo.png"))
         mark = loadImage(paths.brand.appendingPathComponent("mark.png"))
+        languageWall = loadImage(paths.repo.appendingPathComponent("docs/screenshots/languages-wall.png"))
         for cue in Cue.all {
             let frame = firstFrame(of: paths.recording(cue.recording), at: cue.sourceStart + 0.5)
             poster[cue.recording] = frame

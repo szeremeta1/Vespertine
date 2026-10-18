@@ -39,6 +39,11 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 - **A signal path you can check.** Decoding, resampling, mixing, gain and output format are shown for every track, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met, and when something changed the samples it says what. A built-in [loopback test](docs/LOOPBACK.md) checks the software path sample by sample.
 - **Native DSD.** DSF and DSDIFF from DSD64 to DSD512, including DST-compressed files, go out as DoP to DACs that take it, or convert to high-rate PCM.
 - **Fake hi-res detection.** Flags 16-bit audio padded to 24, likely upsampled masters and likely lossy sources, with the measurements behind each verdict. `vespertine-analyze` runs the same analysis on a Linux server next to your files.
+- **Speaks your language.** English and 44 more, from Ukrainian and Japanese to Amharic and Tamil, with right-to-left layouts for Arabic, Hebrew, Persian and Urdu and separate Simplified, Traditional and Hong Kong Chinese. A check on every change confirms each string exists in every language with matching placeholders and plural forms, and every screen was reviewed in every language for clipped or overlapping text. Corrections from native speakers are welcome.
+
+<p align="center">
+  <img src="docs/screenshots/languages-wall.png" width="800" alt="Vespertine written in each of its 45 interface languages, from ヴェスパタイン and Веспертайн to فسبرتاين and वेस्परटाइन, at mixed sizes and typefaces">
+</p>
 
 ## Everything else
 
@@ -47,7 +52,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 - **Library:** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, gapless CUE-sheet albums, and favorites. Imports M3U and Apple Music playlists, play counts and favorites.
 - **Metadata:** A tag editor that backs up every file before writing, with MusicBrainz and cover art lookup.
 - **Network shares:** SMB, NFS and WebDAV, with caching and Keep Offline. Library scans step aside for the song you're playing.
-- **Everyday:** Mini player, menu-bar extra, media keys, an optional Discord status with cover and format, ReplayGain, a short setup assistant, automatic updates, and an interface in 44 languages besides English, including right-to-left layouts.
+- **Everyday:** Mini player, menu-bar extra, media keys, an optional Discord status with cover and format, ReplayGain, a short setup assistant and automatic updates.
 
 **Formats:** FLAC, ALAC, WAV, AIFF, DSF, DSDIFF, SACD ISO, DVD-Video LPCM, Dolby Digital, Dolby Digital Plus with Atmos, Dolby TrueHD, MLP, DTS, DTS-HD MA, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC, plus CUE sheets.
 
