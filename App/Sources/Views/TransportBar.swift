@@ -267,7 +267,9 @@ struct DeviceSettings: View {
             if let note = device.profile.note {
                 Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             }
-            LabeledContent("Sample rate") {
+            HStack {
+                Text("Sample rate").layoutPriority(1)
+                Spacer()
                 Picker("Sample rate", selection: Binding(get: { settings.rateChoice(for: device.uid) },
                                               set: { settings.setRateChoice($0, for: device.uid); model.syncEngine() })) {
                     Text(RateChoice.match.label).tag(RateChoice.match)
@@ -278,7 +280,7 @@ struct DeviceSettings: View {
                     }
                 }
                 .labelsHidden()
-                .fixedSize()
+                .frame(minWidth: 120)
             }
             .font(Typeface.ui(12))
             Toggle(isOn: Binding(get: { settings.exclusiveMode }, set: { settings.exclusiveMode = $0; model.syncEngine() })) {
@@ -306,13 +308,14 @@ struct DeviceSettings: View {
                          : Text("For multichannel music. Off plays a standard stereo downmix."))
                         .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
+                .layoutPriority(1)
                 Spacer()
                 Picker("Spatial Audio", selection: Binding(get: { model.engineSpatialMode(for: device) },
                                               set: { settings.spatialModes[device.uid] = $0.rawValue; model.syncEngine() })) {
                     ForEach(SpatialMode.allCases) { Text($0.label).tag($0) }
                 }
                 .labelsHidden()
-                .fixedSize()
+                .frame(minWidth: 120)
             }
             .font(Typeface.ui(12))
             if device.transport == .usb || device.transport == .thunderbolt {

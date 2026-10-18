@@ -16,23 +16,26 @@ struct EqualizerChoice: View {
 
     var body: some View {
         let settings = model.settings
-        HStack {
+        // Text on top, picker underneath: a preset name can be as long as the row, in any language.
+        VStack(alignment: .leading, spacing: 6) {
             VStack(alignment: .leading, spacing: 1) {
                 Text("Equalizer").font(Typeface.ui(12))
                 Text("Changes the sound, so this output isn't bit-perfect while one is on.")
                     .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
-            Picker("Equalizer", selection: Binding(get: { settings.eqPreset(for: device.uid)?.id },
-                                                   set: { settings.setEQPreset($0, for: device.uid); model.syncEngine() })) {
-                Text("Off", comment: "Equalizer choice: no equalizer").tag(UUID?.none)
-                if !settings.eqPresets.isEmpty { Divider() }
-                ForEach(settings.eqPresets) { Text($0.name).tag(UUID?.some($0.id)) }
+            HStack {
+                Picker("Equalizer", selection: Binding(get: { settings.eqPreset(for: device.uid)?.id },
+                                                       set: { settings.setEQPreset($0, for: device.uid); model.syncEngine() })) {
+                    Text("Off", comment: "Equalizer choice: no equalizer").tag(UUID?.none)
+                    if !settings.eqPresets.isEmpty { Divider() }
+                    ForEach(settings.eqPresets) { Text($0.name).tag(UUID?.some($0.id)) }
+                }
+                .labelsHidden()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                Button("Edit…") { openWindow(id: "equalizer") }
+                    .controlSize(.small)
+                    .fixedSize()
             }
-            .labelsHidden()
-            .fixedSize()
-            Button("Edit…") { openWindow(id: "equalizer") }
-                .controlSize(.small)
         }
         .font(Typeface.ui(12))
     }
