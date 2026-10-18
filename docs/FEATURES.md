@@ -80,7 +80,7 @@ Folders are watched in place, or Import & Organize copies files into `~/Music/Ve
 
 Find Music on This Mac searches Spotlight-indexed drives. It checks file formats and can select hi-res, lossless or all music by folder or file, while excluding recordings, prompts and duplicate copies.
 
-The tag editor handles single files or batches through TagLib, including artwork, sort fields, lyrics and custom tags. Each file has a backup and one-step revert. Read-only files and individual CUE tracks keep edits in the library instead. Enrich Metadata proposes values from structured filenames and MusicBrainz, with source and confidence shown before writing. Cover art lookup uses the Cover Art Archive. ListenBrainz scrobbling is optional, with the token in Keychain. [Privacy](https://vespertineapp.com/privacy.html).
+The tag editor handles single files or batches through TagLib, including artwork, sort fields, lyrics and custom tags. Each file has a backup and one-step revert. Read-only files and individual CUE tracks keep edits in the library instead. Enrich Metadata proposes values from structured filenames and MusicBrainz, with source and confidence shown before writing. Cover art lookup uses the Cover Art Archive. ListenBrainz scrobbling is optional, with the token in Keychain. An optional Discord status shows the song, artist, album, format (such as 24/192 FLAC or DSD128) and progress while music plays, through the Discord app on the Mac, with the cover looked up by album name. [Privacy](https://vespertineapp.com/privacy.html).
 
 ## EQ, meters and controls
 

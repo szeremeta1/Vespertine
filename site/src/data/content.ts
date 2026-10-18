@@ -238,7 +238,7 @@ export const compare = {
 export const faq = [
   {
     q: 'Is it really free?',
-    a: 'Yes. Vespertine is free and open source under the GPL-3.0. There’s no account, no subscription, no ads and no telemetry (<a href="/privacy.html">privacy</a>). It only goes online to check for updates, and to reach MusicBrainz, the Cover Art Archive or ListenBrainz when you ask it to.',
+    a: 'Yes. Vespertine is free and open source under the GPL-3.0. There’s no account, no subscription, no ads and no telemetry (<a href="/privacy.html">privacy</a>). It only goes online to check for updates, and to reach MusicBrainz, the Cover Art Archive or ListenBrainz, or to find covers for your Discord status, when you ask it to.',
   },
   {
     q: 'What do I need?',

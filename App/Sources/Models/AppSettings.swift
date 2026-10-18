@@ -90,6 +90,10 @@ final class AppSettings {
     var watchFolders: Bool { didSet { defaults.set(watchFolders, forKey: "watchFolders") } }
     var fetchArtworkOnline: Bool { didSet { defaults.set(fetchArtworkOnline, forKey: "fetchArtworkOnline") } }
     var scrobble: Bool { didSet { defaults.set(scrobble, forKey: "scrobble") } }
+    /// Show the song that's playing as the Discord status (through the Discord app on this Mac).
+    var discordPresence: Bool { didSet { defaults.set(discordPresence, forKey: "discordPresence") } }
+    /// Look the album up online for a cover the Discord status can show (Discord can only show public images).
+    var discordArtwork: Bool { didSet { defaults.set(discordArtwork, forKey: "discordArtwork") } }
     var miniPlayerFloats: Bool { didSet { defaults.set(miniPlayerFloats, forKey: "miniPlayerFloats") } }
     /// Leave voice recordings, telephony audio and short clips out of the library.
     var skipNonMusic: Bool { didSet { defaults.set(skipNonMusic, forKey: "skipNonMusic") } }
@@ -126,7 +130,7 @@ final class AppSettings {
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
-            "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "miniPlayerFloats": true, "skipNonMusic": true,
+            "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
             "deviceOnQuit": "restore",
@@ -156,6 +160,8 @@ final class AppSettings {
         watchFolders = defaults.bool(forKey: "watchFolders")
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
+        discordPresence = defaults.bool(forKey: "discordPresence")
+        discordArtwork = defaults.bool(forKey: "discordArtwork")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
         skipNonMusic = defaults.bool(forKey: "skipNonMusic")
         systemOutputFollowsPlayback = defaults.bool(forKey: "systemOutputFollowsPlayback")

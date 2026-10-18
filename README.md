@@ -47,7 +47,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 - **Library:** Albums, artists, songs and genres with combinable filters, smart playlists in units like 24-bit and 88.2 kHz, gapless CUE-sheet albums, and favorites. Imports M3U and Apple Music playlists, play counts and favorites.
 - **Metadata:** A tag editor that backs up every file before writing, with MusicBrainz and cover art lookup.
 - **Network shares:** SMB, NFS and WebDAV, with caching and Keep Offline. Library scans step aside for the song you're playing.
-- **Everyday:** Mini player, menu-bar extra, media keys, ReplayGain, a short setup assistant, automatic updates, and an interface in 44 languages besides English, including right-to-left layouts.
+- **Everyday:** Mini player, menu-bar extra, media keys, an optional Discord status with cover and format, ReplayGain, a short setup assistant, automatic updates, and an interface in 44 languages besides English, including right-to-left layouts.
 
 **Formats:** FLAC, ALAC, WAV, AIFF, DSF, DSDIFF, SACD ISO, DVD-Video LPCM, Dolby Digital, Dolby Digital Plus with Atmos, Dolby TrueHD, MLP, DTS, DTS-HD MA, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC, plus CUE sheets.
 

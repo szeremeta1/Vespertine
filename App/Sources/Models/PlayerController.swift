@@ -1,5 +1,5 @@
 //
-// Vespertine — play queue, transport and system integration (Now Playing, media keys, scrobbling).
+// Vespertine — play queue, transport and system integration (Now Playing, media keys, scrobbling, Discord).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -114,6 +114,8 @@ final class PlayerController {
     /// A resume also gives up after half a minute: unlike a pause, the engine can decline it (nothing left to resume).
     @ObservationIgnored private var requestedState: (state: PlaybackState, from: PlaybackState, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
+    /// The Discord status, while Settings › Online turns it on.
+    let discord = DiscordPresence()
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
     var isPlaying: Bool { state == .playing }
@@ -668,6 +670,33 @@ final class PlayerController {
         // macOS extrapolates the elapsed time from the rate; tell it again only when that drifts (a seek, a stall).
         if state == .playing, let anchor = nowPlayingAnchor,
            abs(anchor.position + Date().timeIntervalSince(anchor.at) - position) > 1 { updateNowPlayingInfo() }
+        syncDiscord()
+    }
+
+    // MARK: Discord
+
+    /// What the Discord status shows now: the song while it plays (not while paused, buffering from a share, or
+    /// waiting for the output), with its start set back by the position so Discord's progress bar is right.
+    var discordNowPlaying: DiscordNowPlaying? {
+        guard state == .playing, !buffering, waitingForDevice == nil, let track = current?.track else { return nil }
+        // Until the engine reports this song, its signal path is the previous one's.
+        let path = requested == nil ? signalPath : nil
+        let length = duration > 0 ? duration : track.duration
+        return DiscordNowPlaying(
+            title: track.title,
+            artist: track.displayArtist.libraryDisplayName,
+            album: track.album.map(\.libraryDisplayName),
+            format: DiscordStatus.formatLine(track: track, path: path),
+            bitPerfect: path?.isBitPerfect == true,
+            startedAt: Date().addingTimeInterval(-position),
+            duration: length,
+            artwork: DiscordArtworkQuery(artist: track.displayAlbumArtist, album: track.album, title: track.title,
+                                         musicBrainzReleaseID: track.musicBrainzReleaseID))
+    }
+
+    /// Called on every poll and when the setting changes; Discord only hears about changes.
+    func syncDiscord() {
+        discord.update(enabled: settings.discordPresence, song: discordNowPlaying, lookUpArtwork: settings.discordArtwork)
     }
 
     // MARK: System Now Playing

@@ -276,6 +276,7 @@ final class AppModel {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 self.player.volumeRelay.stop()
+                self.player.discord.shutdown()
                 self.player.engine.stopAndWait()
                 DeviceRestore.finish(self.settings.deviceOnQuit)
             }

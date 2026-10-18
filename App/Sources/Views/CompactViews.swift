@@ -407,9 +407,37 @@ struct OnlineSettings: View {
                 Text("Your token is stored in the macOS Keychain. Find it at listenbrainz.org → Settings.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            Section {
+                Toggle("Show what’s playing as my Discord status", isOn: $s.discordPresence)
+                    .onChange(of: s.discordPresence) { model.player.syncDiscord() }
+                Toggle("Show album covers", isOn: $s.discordArtwork)
+                    .disabled(!s.discordPresence)
+                    .onChange(of: s.discordArtwork) { model.player.syncDiscord() }
+                if s.discordPresence {
+                    Text(discordLine).font(.caption).foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Discord")
+            } footer: {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("While a song plays, your status shows its title, artist, album, format and progress, through the Discord app on this Mac. It clears when you pause or quit. Discord shows it to everyone who can see your activity, if Activity Privacy in Discord’s settings allows it.")
+                    Text("Covers are found by album name on the Cover Art Archive or in Apple’s music catalog, because Discord can only show images from the web. Your own files are never uploaded.")
+                }
+                .font(.caption).foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .task { token = await ListenBrainzClient.shared.savedToken() }
+    }
+
+    private var discordLine: String {
+        switch model.player.discord.connection {
+        case .idle: String(localized: "Your status appears while a song plays.")
+        case .waitingForDiscord: String(localized: "Discord isn’t open. Your status appears once it is.")
+        case .connected(let user?): String(localized: "Connected to Discord as \(user)", comment: "%@ is the name of a Discord account.")
+        case .connected(nil): String(localized: "Connected to Discord")
+        case .refused(let reason): String(localized: "Discord didn’t accept the status: \(reason)", comment: "%@ is Discord's own reason, in English.")
+        }
     }
 }
 
