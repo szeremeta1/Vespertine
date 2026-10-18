@@ -176,11 +176,11 @@ struct DiscordPresenceTests {
         #expect(withCover.timestamps == .init(start: 1_800_000_000_000, end: 1_800_000_562_500))
         #expect(withCover.assets?.largeImage == "https://example.org/cover.jpg")
         #expect(withCover.assets?.largeText == "Kind of Blue · 24/192 FLAC")
-        #expect(withCover.assets?.smallImage == DiscordStatus.appIconURL)
+        #expect(withCover.assets?.smallImage == DiscordStatus.appIcon)
         #expect(withCover.buttons?.first?.url == "https://vespertineapp.com")
 
         let noCover = DiscordStatus.activity(for: song(), artworkURL: nil)
-        #expect(noCover.assets?.largeImage == DiscordStatus.appIconURL && noCover.assets?.smallImage == nil)
+        #expect(noCover.assets?.largeImage == DiscordStatus.appIcon && noCover.assets?.smallImage == nil)
 
         // Discord's own key names, and nothing it would refuse (nil fields are left out).
         let data = try #require(noCover.encoded())
