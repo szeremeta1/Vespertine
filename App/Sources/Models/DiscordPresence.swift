@@ -75,8 +75,9 @@ nonisolated struct DiscordNowPlaying: Equatable, Sendable {
 }
 
 nonisolated enum DiscordStatus {
-    /// Shown on the status when the cover can't be found: Vespertine's icon.
-    static let appIconURL = "https://vespertineapp.com/icon-512.png"
+    /// Shown on the status when the cover can't be found: Vespertine's icon, uploaded to the
+    /// Discord application's Rich Presence art assets under this key.
+    static let appIconURL = "logo"
     static let siteURL = "https://vespertineapp.com"
 
     /// Discord refuses text under 2 or over 128 UTF-16 units.
