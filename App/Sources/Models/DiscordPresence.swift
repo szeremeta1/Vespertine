@@ -78,6 +78,8 @@ nonisolated enum DiscordStatus {
     /// Shown on the status when the cover can't be found: Vespertine's icon, uploaded to the
     /// Discord application's Rich Presence art assets under this key.
     static let appIcon = "logo"
+    /// Vespertine's icon on the website, shown small over the album cover.
+    static let appIconURL = "https://vespertineapp.com/icon-512.png"
     static let siteURL = "https://vespertineapp.com"
 
     /// Discord refuses text under 2 or over 128 UTF-16 units.
@@ -143,7 +145,7 @@ nonisolated enum DiscordStatus {
         let assets = DiscordActivity.Assets(
             largeImage: artworkURL ?? appIcon,
             largeText: fit(albumLine),
-            smallImage: artworkURL == nil ? nil : appIcon,
+            smallImage: artworkURL == nil ? nil : appIconURL,
             smallText: artworkURL == nil ? nil : fit(quality))
         let label = String(localized: "Get Vespertine", comment: "Button on a Discord status (at most 32 characters) linking to Vespertine's website.")
         return DiscordActivity(
