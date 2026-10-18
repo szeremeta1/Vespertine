@@ -1,0 +1,189 @@
+{
+ "pdftotext": "pdftotext version 26.10.0",
+ "docs": [
+  {
+   "id": "dop-1.1",
+   "file": "DoP_openStandard_1v1.pdf",
+   "url": "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf",
+   "sha256": "640ff447f1456186927365cf422622e3665634b99dbd7c56b39f77e6720f1a4c",
+   "bytes": 126634
+  },
+  {
+   "id": "iec61937-1-preview",
+   "file": "info_iec61937-1ed3.0b.pdf",
+   "url": "https://webstore.iec.ch/en/iec_catalog/product/preview/?id=L3B1Yi9wZGYvcHJldmlldy9pbmZvX2llYzYxOTM3LTF7ZWQzLjB9Yi5wZGY=",
+   "sha256": "b09173296ee93891c3a76a95aaff5b19ec7ff0ed2ac947c8a5ed744052938501",
+   "bytes": 369799
+  },
+  {
+   "id": "iec61937-2-preview",
+   "file": "info_iec61937-2ed3.0b.pdf",
+   "url": "https://webstore.iec.ch/en/iec_catalog/product/preview/?id=L3B1Yi9wZGYvcHJldmlldy9pbmZvX2llYzYxOTM3LTJ7ZWQzLjB9Yi5wZGY=",
+   "sha256": "b6057d8d62413ac79bd5b18c9a31b9e4ade1de0f4c0070e8059493be4329df47",
+   "bytes": 240499
+  },
+  {
+   "id": "iec61937-3-preview",
+   "file": "info_iec61937-3ed3.0en.pdf",
+   "url": "https://webstore.iec.ch/en/iec_catalog/product/preview/?id=L3B1Yi9wZGYvcHJldmlldy9pbmZvX2llYzYxOTM3LTN7ZWQzLjB9ZW4ucGRm",
+   "sha256": "2d5bb58292bbd2efe096bd2874bb3780422b58f7e79eee3cd4a23e749efd50ab",
+   "bytes": 276256
+  },
+  {
+   "id": "iec61937-5-preview",
+   "file": "info_iec61937-5ed2.0en.pdf",
+   "url": "https://webstore.iec.ch/en/iec_catalog/product/preview/?id=L3B1Yi9wZGYvcHJldmlldy9pbmZvX2llYzYxOTM3LTV7ZWQyLjB9ZW4ucGRm",
+   "sha256": "e654443eeb603213c3b0bb871f86acf5db8fc88d9848983065e1931dcd03ec30",
+   "bytes": 203539
+  },
+  {
+   "id": "smpte-st337-2015",
+   "file": "st0337-2015.pdf",
+   "url": "https://pub.smpte.org/latest/st337/st0337-2015.pdf",
+   "sha256": "98e6ee852e988fea7089d441925e6a0f7a419e8e6d901d3b04f5a2b77cf589bd",
+   "bytes": 348335
+  },
+  {
+   "id": "smpte-st338-2016",
+   "file": "st0338-2016.pdf",
+   "url": "https://pub.smpte.org/latest/st338/st0338-2016.pdf",
+   "sha256": "2d628a3133fe55e3dff736b487ab769f0c6266e0705699bb9d6d75e6f4b5b2c2",
+   "bytes": 308536
+  },
+  {
+   "id": "smpte-st340-2015",
+   "file": "st0340-2015.pdf",
+   "url": "https://pub.smpte.org/latest/st340/st0340-2015.pdf",
+   "sha256": "c3fe4a9c6c6a349b01736fac29a640ef9d8f47f7c52b0348acd560c6f4834603",
+   "bytes": 278123
+  },
+  {
+   "id": "atsc-a52-2018",
+   "file": "A52-2018.pdf",
+   "url": "https://www.atsc.org/wp-content/uploads/2021/04/A52-2018.pdf",
+   "sha256": "4580b631f5ac1aafdd31034f28d5fc9c29bce72a3d3f6367e3d9746906e0ffa1",
+   "bytes": 1919274
+  },
+  {
+   "id": "etsi-ts-102366",
+   "file": "ts_102366v010401p.pdf",
+   "url": "https://www.etsi.org/deliver/etsi_ts/102300_102399/102366/01.04.01_60/ts_102366v010401p.pdf",
+   "sha256": "0229e151dfd9f8cec427f234798cac679a66fdec096feecc4d5ce455bbe3cadf",
+   "bytes": 1833684
+  },
+  {
+   "id": "etsi-ts-102114",
+   "file": "ts_102114v010601p.pdf",
+   "url": "https://www.etsi.org/deliver/etsi_ts/102100_102199/102114/01.06.01_60/ts_102114v010601p.pdf",
+   "sha256": "29f9e50575e48bfe55222c5f004088af379bc9a6c65274ed975a81dca10647ba",
+   "bytes": 1749942
+  },
+  {
+   "id": "ffmpeg-spdif-n7.1",
+   "file": "spdifenc.c",
+   "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n7.1/libavformat/spdifenc.c",
+   "sha256": "b46676e70e6f7c423be2fa4af61b0c651231057032b93d32bef576fdaad1c5a7",
+   "bytes": 25072
+  },
+  {
+   "id": "ffmpeg-spdif-n7.1",
+   "file": "spdif.h",
+   "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n7.1/libavformat/spdif.h",
+   "sha256": "e66963e5277d5bd76494b021af6adc48c91aeb132fcc8749692b226be19df535",
+   "bytes": 3051
+  }
+ ],
+ "normalized": [
+  {
+   "id": "dop-1.1",
+   "md": "md/dop-1.1.md",
+   "md_sha256": "8c0994b27610e4f542fbaab339afdfa5a25ee09a3762f1b4f9dedf9d7ecb8f98",
+   "pages": 4,
+   "sections": 6
+  },
+  {
+   "id": "iec61937-1-preview",
+   "md": "md/iec61937-1-preview.md",
+   "md_sha256": "0f3cbb2a414dc77708dbdd062f682c096e440c7206b9fa3a0a9a9cf2e71f8574",
+   "pages": 11,
+   "sections": 10
+  },
+  {
+   "id": "iec61937-2-preview",
+   "md": "md/iec61937-2-preview.md",
+   "md_sha256": "2949a69629b850f68dce0a650878a1db5eb04f622604cec9685c520f565c818b",
+   "pages": 11,
+   "sections": 7
+  },
+  {
+   "id": "iec61937-3-preview",
+   "md": "md/iec61937-3-preview.md",
+   "md_sha256": "9df827d0958a023ec8e0191862511b660af93c5a7dc98df90ba5df9419adb578",
+   "pages": 5,
+   "sections": 3
+  },
+  {
+   "id": "iec61937-5-preview",
+   "md": "md/iec61937-5-preview.md",
+   "md_sha256": "c1413c4b09774b55ded2843b631f127335ce66c476184921d6c30dd82768086a",
+   "pages": 5,
+   "sections": 7
+  },
+  {
+   "id": "smpte-st337-2015",
+   "md": "md/smpte-st337-2015.md",
+   "md_sha256": "f06a38079daadb13c924fa4b96e8141bb62de4c4d6ecf790d91cd660491ee506",
+   "pages": 17,
+   "sections": 38
+  },
+  {
+   "id": "smpte-st338-2016",
+   "md": "md/smpte-st338-2016.md",
+   "md_sha256": "87ef25a97cf5501cd3c53e87ad2ba3e468dee37ca0cf5adc026f4db83e28e4ef",
+   "pages": 6,
+   "sections": 6
+  },
+  {
+   "id": "smpte-st340-2015",
+   "md": "md/smpte-st340-2015.md",
+   "md_sha256": "ac280747adee3c86cb6eca1ec85aa6a8b9119deec3d8b77c19bbdc6c4465efb8",
+   "pages": 12,
+   "sections": 32
+  },
+  {
+   "id": "atsc-a52-2018",
+   "md": "md/atsc-a52-2018.md",
+   "md_sha256": "78d163a0a1295ba710a2a281f98c90a1407e2b7bd57f6f65a5f38b21040330df",
+   "pages": 271,
+   "sections": 238
+  },
+  {
+   "id": "etsi-ts-102366",
+   "md": "md/etsi-ts-102366.md",
+   "md_sha256": "4809d8d46b3a286c89cdbb97e727170cd6097412d2e1546232d5b0bf402cfc19",
+   "pages": 244,
+   "sections": 130
+  },
+  {
+   "id": "etsi-ts-102114",
+   "md": "md/etsi-ts-102114.md",
+   "md_sha256": "dfe4e980523131def28d5ede508700e51fea5edab2f2b375acc506665febf499",
+   "pages": 298,
+   "sections": 198
+  },
+  {
+   "id": "ffmpeg-spdif-n7.1/spdif",
+   "md": "md/ffmpeg-spdif-n7.1__spdif.md",
+   "md_sha256": "c3265593a53505e8b99453b95121a0d67e12cfe19b3e5d8b8861946df33c0413",
+   "pages": 1,
+   "sections": 0
+  },
+  {
+   "id": "ffmpeg-spdif-n7.1/spdifenc",
+   "md": "md/ffmpeg-spdif-n7.1__spdifenc.md",
+   "md_sha256": "47b03f22962dc3244c4cd5e593c1454603d6d6de90c5e4bcbcbaf08ba23b42dd",
+   "pages": 1,
+   "sections": 0
+  }
+ ]
+}

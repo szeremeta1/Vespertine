@@ -1,0 +1,48 @@
+---
+// Shell for the plain document pages (privacy, terms).
+import Base from '../layouts/Base.astro';
+import Nav from './Nav.astro';
+import Footer from './Footer.astro';
+import { SITE } from '../data/app';
+import { innerGraph } from '../lib/seo';
+import { sceneShots } from '../lib/shots';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  og: string;
+  ogAlt: string;
+  eyebrow: string;
+  /** schema.org type besides WebPage. */
+  type?: string;
+  /** Effective date, YYYY-MM-DD. */
+  date: string;
+}
+const { title, description, path, og, ogAlt, eyebrow, type, date } = Astro.props;
+const jsonLd = innerGraph({ path, title, crumb: eyebrow, description, type, dateModified: date, image: `${SITE}/og/${og}.jpg`, screenshots: await sceneShots() });
+---
+<Base title={title} description={description} path={path} og={og} ogAlt={ogAlt} jsonLd={jsonLd}>
+<a class="skip" href="#main">Skip to content</a>
+<Nav current={path} />
+<main id="main" tabindex="-1">
+  <header class="page-head">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">{eyebrow}</p>
+      <slot name="title" />
+      <slot name="updated" />
+    </div>
+  </header>
+  <article class="wrap doc">
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+</main>
+<Footer />
+<script>
+  import '../scripts/main';
+</script>
+</Base>

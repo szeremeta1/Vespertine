@@ -80,3 +80,7 @@ cd Packages/VespertineKit && swift build -c release --product vespertine-probe
 `gapless <device> <files…>` plays a queue and reports hand-offs and underruns. `analyze <files…>` runs the analysis (`analyze-json` prints it as JSON, for comparing with `vespertine-analyze file`); `forensics <files…>` prints its raw measurements as a table; `restore-test <device>` checks the quit options that hand a device back.
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, artists and genres, start playback or a shuffle, set any page's filters, select inspector tabs and render windows to PNG, which works even while the screen is locked.
+
+## Website
+
+The website (vespertineapp.com) is an Astro site in `site/`: `cd site && npm ci && npm run dev`. Its version, download link and "What's new" come from the GitHub releases at build time, and publishing a release rebuilds it, so a release needs no website edit. Feature, format and FAQ wording lives in `site/src/data/content.ts`; keep it in step with this folder's docs. [site/README.md](../site/README.md) has the rest.

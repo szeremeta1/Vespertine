@@ -1,9 +1,10 @@
 #!/bin/zsh
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Renders docs/design/social-preview.html twice:
-#   site/assets/og.png       1280x640 (2:1), for the repo's Settings → General → Social preview;
-#   site/assets/og-wide.png  1200x630 (1.91:1), the website's Open Graph / Twitter image, the shape
-#                            Facebook, LinkedIn, iMessage, Reddit and X crop to.
+#   site/public/assets/og.png       1280x640 (2:1), for the repo's Settings → General → Social preview;
+#   site/public/assets/og-wide.png  1200x630 (1.91:1), the earlier website card, still served at /assets/og-wide.png
+#                                   for links shared before the per-page cards (site/scripts/make-og.mjs).
+#                                   It's the shape Facebook, LinkedIn, iMessage, Reddit and X crop to.
 # Re-run it whenever docs/screenshots change, and re-upload og.png on GitHub.
 set -euo pipefail
 root=${0:A:h:h}
@@ -20,11 +21,11 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 # WebKit only reads files under the page's folder, so stage the page next to what it uses.
-mkdir -p "$work/site/assets/fonts" "$work/docs/screenshots" "$work/docs/brand"
+mkdir -p "$work/docs/design/fonts/web" "$work/docs/screenshots" "$work/docs/brand"
 cp "$root/docs/brand/logo.svg" "$work/docs/brand/"
-cp "$root"/site/assets/fonts/*.woff2 "$work/site/assets/fonts/"
+cp "$root"/docs/design/fonts/web/*.woff2 "$work/docs/design/fonts/web/"
 cp "$root/docs/screenshots/bit-perfect-fiio-24-96.png" "$work/docs/screenshots/"
-sed -e 's#\.\./\.\./site/assets/#site/assets/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' -e 's#\.\./brand/#docs/brand/#g' \
+sed -e 's#\.\./\.\./docs/design/fonts/web/#docs/design/fonts/web/#g' -e 's#\.\./screenshots/#docs/screenshots/#g' -e 's#\.\./brand/#docs/brand/#g' \
   "$root/docs/design/social-preview.html" > "$work/index.html"
 
 swift "$root/scripts/snapshot-html.swift" "$work/index.html" "$work/og.png" 1280 1 0 640 >/dev/null
@@ -34,6 +35,6 @@ sed -e 's#</style>#  html, body { width: 1200px; height: 630px; } .card { height
   "$work/index.html" > "$work/wide.html"
 swift "$root/scripts/snapshot-html.swift" "$work/wide.html" "$work/og-wide.png" 1200 1 0 630 >/dev/null
 # Snapshots come out at the screen's scale; social cards want these exact sizes.
-sips -z 640 1280 "$work/og.png" --out "$root/site/assets/og.png" >/dev/null
-sips -z 630 1200 "$work/og-wide.png" --out "$root/site/assets/og-wide.png" >/dev/null
-for f in og.png og-wide.png; do print "wrote site/assets/$f ($(stat -f %z "$root/site/assets/$f") bytes)"; done
+sips -z 640 1280 "$work/og.png" --out "$root/site/public/assets/og.png" >/dev/null
+sips -z 630 1200 "$work/og-wide.png" --out "$root/site/public/assets/og-wide.png" >/dev/null
+for f in og.png og-wide.png; do print "wrote site/public/assets/$f ($(stat -f %z "$root/site/public/assets/$f") bytes)"; done

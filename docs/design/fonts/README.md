@@ -8,4 +8,4 @@ Social cards (`scripts/make-social-preview.sh`) and the README tour (`scripts/ma
 | Inter | Interface text (stands in for SF Pro) | SIL OFL 1.1, `OFL-Inter.txt` |
 | JetBrains Mono | Numbers and labels (stands in for SF Mono) | SIL OFL 1.1, `OFL-JetBrainsMono.txt` |
 
-From [google/fonts](https://github.com/google/fonts). The website serves latin-subset WOFF2 copies from `site/assets/fonts/`.
+From [google/fonts](https://github.com/google/fonts). `web/` holds the latin-subset WOFF2 copies the artwork scripts load (`scripts/brand/BrandKit.swift`, `scripts/make-dmg-background.swift`, `docs/design/social-preview.html`). The website builds its own smaller subsets from Fontsource into `site/src/assets/fonts/` (`site/scripts/subset-fonts.sh`).

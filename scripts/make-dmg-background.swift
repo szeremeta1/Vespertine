@@ -17,9 +17,9 @@ func color(_ hex: UInt32, _ a: CGFloat = 1) -> NSColor {
 let brass = color(0xC8A66A), brassHi = color(0xE7CD98), brassLo = color(0x7C6541)
 let ivory = color(0xECE6DA), text2 = color(0xA29B8F), text3 = color(0x69645C)
 
-// Brand fonts (OFL, shipped with the website): Newsreader for the wordmark, Inter for text, JetBrains Mono for
+// Brand fonts (OFL, in docs/design/fonts/web): Newsreader for the wordmark, Inter for text, JetBrains Mono for
 // numbers. Apple's system fonts are licensed for app UI only, not for distributed artwork like this.
-let fontDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("site/assets/fonts")
+let fontDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("docs/design/fonts/web")
 func brandFont(_ file: String, _ size: CGFloat, weight: CGFloat, opticalSize: CGFloat? = nil) -> NSFont {
     let d = (CTFontManagerCreateFontDescriptorsFromURL(fontDir.appendingPathComponent("\(file).woff2") as CFURL) as! [CTFontDescriptor])[0]
     let base = CTFontCreateWithFontDescriptor(d, size, nil)

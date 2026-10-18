@@ -1,0 +1,1 @@
+auditor: 22 tool calls logged with cwd = room; 0 flagged

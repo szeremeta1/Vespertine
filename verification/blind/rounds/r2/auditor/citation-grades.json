@@ -1,0 +1,374 @@
+{
+  "DOP_MARKER_ALT": {
+    "grade": "PARTIAL",
+    "reason": "\u00a72 supplies values and alternation; requested/default first phase and returned phase come from the stub contract, explicitly disclosed in the note."
+  },
+  "DOP_MARKER_SAME": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a72 explicitly requires the same marker across every channel in a sample."
+  },
+  "DOP_MARKER_MSB": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a72 places the eight marker bits at the top of the 24-bit sample."
+  },
+  "DOP_BITS_OLDEST": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a72 assigns sixteen low bits to successive DSD bits, oldest at t0; exact-slot rejection also follows the interface."
+  },
+  "DOP_DIAGRAM": {
+    "grade": "SUPPORTS",
+    "reason": "The full p.2 diagram places t0 immediately below dm0 and t15 at the LSB, supporting both byte and bit order."
+  },
+  "DOP_24BIT": {
+    "grade": "SUPPORTS",
+    "reason": "The p.2 diagram explicitly labels a 24-bit PCM word."
+  },
+  "DOP_PER_CHANNEL": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a72 preserves assigned DSD channel identity; the interface supplies frame/channel indexing."
+  },
+  "DOP_OTHER_MARKER": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a73 distinguishes the paired-channel method; \u00a72 and the scope restrict this interface to the base markers."
+  },
+  "DOP_ALT_MARKERS": {
+    "grade": "SUPPORTS",
+    "reason": "The \u00a73 row explicitly places 06/F9 in the excluded paired-channel method."
+  },
+  "DOP_RX_MISSING": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a74 is a recommended receiver algorithm, not a 32-frame minimum for this API; missing-marker refusal is independently required by \u00a72."
+  },
+  "ST337_PA": {
+    "grade": "SUPPORTS",
+    "reason": "Table 6 supplies F872 in 16-bit mode; note explains the \u00a78.2\u20138.3 shared-preamble inference at sibling tier."
+  },
+  "ST337_PB": {
+    "grade": "SUPPORTS",
+    "reason": "Table 6 supplies 4E1F in 16-bit mode with the same explicit structural inference."
+  },
+  "ST337_EXT_SYNC": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.4 explicitly prints four zeros then Pa/Pb; tests do not require this before every burst."
+  },
+  "ST337_FRAME_PRE": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.2.2 gives Pa/Pb then Pc/Pd in two frames; offset/raw-Pd semantics also use the interface contract."
+  },
+  "ST337_CONSUMER_SUBSET": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a78.2 expressly supports a general structural relationship, not universal consumer payload/timing equivalence; unused documentation key."
+  },
+  "ST337_CONSUMER_16": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a78.3 expressly limits consumer-compatible bursts to 16-bit frame mode, mode zero."
+  },
+  "ST337_PRE_FOLLOW": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.1 says preamble followed by payload in a continuous sequence; structural inference is disclosed."
+  },
+  "ST337_T7_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Table 7 supplies low-five-bit positions; the note limits consumer carryover to scoped mode zero, not arbitrary seven-bit consumer types."
+  },
+  "ST337_T7_MODE": {
+    "grade": "SUPPORTS",
+    "reason": "Table 7 supplies bits 5\u20136; consumer-compatible zero mode is separately supported by \u00a78.3."
+  },
+  "ST337_T7_ERR": {
+    "grade": "SUPPORTS",
+    "reason": "Table 7 supplies error flag bit 7; note expressly limits the structural inference."
+  },
+  "ST337_T7_DTD": {
+    "grade": "SUPPORTS",
+    "reason": "Table 7 supplies bits 8\u201312 only; no professional dependent-field contents are imported."
+  },
+  "ST337_T7_STREAM": {
+    "grade": "SUPPORTS",
+    "reason": "Table 7 supplies bits 13\u201315; scope fixes emitted stream zero and parser tests only extract fields."
+  },
+  "ST337_T8_16": {
+    "grade": "SUPPORTS",
+    "reason": "Table 8 explicitly maps zero to 16-bit mode, used with the consumer compatibility clause."
+  },
+  "ST337_ERR0": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.2.4.4 explicitly sets zero when error status is unknown; note explains the sibling inference rather than claiming CRC validity."
+  },
+  "ST337_STREAM0": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.2.4.6 requires a stream zero, consistent with the scope explicitly fixing the single emitted stream to zero."
+  },
+  "ST337_LEN_BITS": {
+    "grade": "PARTIAL",
+    "reason": "\u00a77.2.5 establishes professional bit units only; consumer AC-3/DTS units depend on secondary FF_LEN_BITS, as disclosed."
+  },
+  "ST337_LEN_NOPRE": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.2.5 excludes Pa\u2013Pd from payload length; the note separates shared structure from per-type consumer units."
+  },
+  "ST337_FIRST_BIT": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.3.1 treats payload as a serial bitstream, first bit at subframe-1 MSB; stated structural inference supports word order, not codec-specific contents."
+  },
+  "ST337_LAST_UNUSED": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.3.1 zeroes unused final-frame bits; note correctly leaves odd-DTS acceptance and encoder Pd at secondary/unverified status."
+  },
+  "ST337_UNUSED_ZERO": {
+    "grade": "PARTIAL",
+    "reason": "Right page and section, but quote ends at \u201cset to\u201d and omits the actual zero; complete \u00a76.1 on p.6 and FF_FILL_ZERO support the assertion."
+  },
+  "ST337_FOUR_ZERO": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a77.4 describes four zero subframes preceding Pa; parser offset comes from Pa per the interface, not the preceding sync extension."
+  },
+  "ST337_IDLE": {
+    "grade": "SUPPORTS",
+    "reason": "Informative Annex A explicitly describes all-zero idle and no arriving burst; no acquisition policy is imposed."
+  },
+  "ST338_AC3": {
+    "grade": "SUPPORTS",
+    "reason": "Table 1 row 1 labels AC-3 and the informative IEC column says Same data; this supports allocation, not identical timing."
+  },
+  "ST338_EAC3_IEC": {
+    "grade": "PARTIAL",
+    "reason": "Page Table 1 row 21 supports the qualified consumer allocation, but quote omits row number and sub-data-type qualification; IEC3_T4 independently supports the tested code."
+  },
+  "ST338_DTS1": {
+    "grade": "PARTIAL",
+    "reason": "Page Table 1 supports IEC code 11, but quoted wrapped fragment omits the row number; sample count comes from FF_DTS1, not SMPTE."
+  },
+  "ST338_DTS2": {
+    "grade": "SUPPORTS",
+    "reason": "Table 1 IEC column supplies code 12 for type II; note and secondary test correctly source sample count elsewhere."
+  },
+  "ST338_DTS3": {
+    "grade": "SUPPORTS",
+    "reason": "Table 1 IEC column supplies code 13 for type III; note and secondary test correctly source sample count elsewhere."
+  },
+  "ST340_AC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "Professional code 1 is corroborated by the IEC allocation column and consumer preview; not used alone as consumer authority."
+  },
+  "ST340_AC3_PAYLOAD": {
+    "grade": "PARTIAL",
+    "reason": "\u00a74.3 specifies a complete professional syncframe; consumer unchanged payload relies on FF_PAYLOAD and codec/interface validation, explicitly disclosed."
+  },
+  "ST340_AC3_PERIOD": {
+    "grade": "PARTIAL",
+    "reason": "\u00a74.6 supplies professional 1536-frame spacing, not consumer spacing under \u00a78.4; secondary macro/duration inference remains incomplete."
+  },
+  "ST340_AC3_PAD": {
+    "grade": "PARTIAL",
+    "reason": "\u00a74.1 supplies professional padding to 1536 samples; note honestly limits this to corroboration of the consumer timing inference."
+  },
+  "ST340_EAC3_PAYLOAD": {
+    "grade": "PARTIAL",
+    "reason": "\u00a75.3 specifies professional syncframe payloads; consumer concatenation is supported by secondary FF_EAC3_CONCAT, not this clause alone."
+  },
+  "ST340_EAC3_6BLK": {
+    "grade": "PARTIAL",
+    "reason": "\u00a75.3 is professional and includes all-substream/convsync constraints; tested constant-block single-substream groups rely on secondary FFmpeg, as disclosed."
+  },
+  "ST340_EAC3_TYPE_PRO": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a75.2.1 says professional code 16; unused documentation key explicitly warns against applying it to consumer E-AC-3."
+  },
+  "ST340_EAC3_PERIOD_PRO": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a75.6 says professional 1536-frame spacing; unused documentation key does not assert this for consumer E-AC-3."
+  },
+  "IEC3_T3": {
+    "grade": "SUPPORTS",
+    "reason": "Preview contents Table 3 title supplies AC-3 low-five-bit type 1; no hidden table contents are inferred."
+  },
+  "IEC3_T4": {
+    "grade": "SUPPORTS",
+    "reason": "Preview contents Table 4 title supplies enhanced AC-3 low-five-bit type 21."
+  },
+  "IEC3_T4_56": {
+    "grade": "SUPPORTS",
+    "reason": "The same Table 4 title explicitly specifies type bits 5\u20136 equal zero."
+  },
+  "IEC3_T5": {
+    "grade": "SUPPORTS",
+    "reason": "Unused title only establishes a size/rate-dependent table exists; note infers no numeric values or timing."
+  },
+  "A52_SYNC": {
+    "grade": "SUPPORTS",
+    "reason": "Printed \u00a75.4.1.1 p.38 explicitly supplies AC-3 0B77 and left-bit-first transmission, not E-AC-3 numeric authority."
+  },
+  "A52_FSCOD": {
+    "grade": "SUPPORTS",
+    "reason": "Printed \u00a75.4.1.3 Table 5.6 maps all three tested rate codes and the reserved code."
+  },
+  "A52_SYNCINFO": {
+    "grade": "SUPPORTS",
+    "reason": "Printed \u00a75.3.1 Table 5.1 gives all syncinfo field widths used by the builder; BSI follows on p.32."
+  },
+  "A52_SIZE_48_128": {
+    "grade": "SUPPORTS",
+    "reason": "Table 5.18 code 010000 is 256 words at 48 kHz, exactly the tested 512-byte fixture; code 17 also appears separately on this page."
+  },
+  "A52_SIZE_44_0": {
+    "grade": "SUPPORTS",
+    "reason": "Table 5.18 code zero is 69 words at 44.1 kHz, supporting the half-used final interface frame."
+  },
+  "A52_SIZE_32_40": {
+    "grade": "SUPPORTS",
+    "reason": "Table 5.18 code two is 120 words at 32 kHz; unused numeric fixture documentation."
+  },
+  "A52_BSMOD": {
+    "grade": "SUPPORTS",
+    "reason": "Printed \u00a75.3.2 BSI starts bsid5, bsmod3, acmod3; unused key correctly explains byte-five layout."
+  },
+  "E_SYNCINFO": {
+    "grade": "SUPPORTS",
+    "reason": "Annex E p.114 supplies a sixteen-bit sync field and subsequent BSI layout; E_SYNCWORD supplies the numeric value separately."
+  },
+  "E_FRMSIZ": {
+    "grade": "SUPPORTS",
+    "reason": "Annex E p.127 explicitly defines frmsiz as total sixteen-bit words minus one; unused key supports builder sizing."
+  },
+  "E_NUMBLKS": {
+    "grade": "SUPPORTS",
+    "reason": "Annex E p.127 Table E.1.3 explicitly supplies all four tested block-count mappings; no consumer burst period follows from this alone."
+  },
+  "DTS_SYNC": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a75.4.2 p.25 supplies core 7FFE8001 and the field-width layout; header-short refusal also follows the interface."
+  },
+  "DTS_FSIZE": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a75.4.2 p.26 defines total bytes FSIZE+1 without an even-byte restriction; consumer odd carriage is independently secondary."
+  },
+  "DTS_NBLKS": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a75.4.2 p.26 explicitly defines 32*(NBLKS+1) samples; transport code/period still need FFmpeg."
+  },
+  "FF_SYNC1": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h defines F872; unused corroboration, honestly secondary."
+  },
+  "FF_SYNC2": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h defines 4E1F; unused corroboration, honestly secondary."
+  },
+  "FF_PC_BITS": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc lines 38\u201339 give seven type bits, error7 and dependent8\u201312; note explicitly limits five-bit extraction to scoped bits5\u20136 zero."
+  },
+  "FF_PC_STREAM": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 39 supplies consumer stream bits13\u201315, independently of professional type-dependent meanings."
+  },
+  "FF_PD_UNIT": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 41 says units depend on type; specific branches provide the asserted units, not this comment alone."
+  },
+  "FF_FILL_ZERO": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 670 explicitly fills padding with zero; surrounding lines compute its extent."
+  },
+  "FF_AC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 117 explicitly ORs AC-3 with bitstream_mode shifted8, supplying consumer bsmod behavior instead of professional reserved000."
+  },
+  "FF_AC3_BSMOD": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 115 extracts byte5 low3, matching the tested bsmod values."
+  },
+  "FF_AC3_PERIOD": {
+    "grade": "PARTIAL",
+    "reason": "spdifenc line 118 uses AC3_FRAME_SIZE<<2 but the macro definition is absent; equating it with codec duration1536 is a disclosed inference, not a verified expansion."
+  },
+  "FF_PERIOD_BYTES": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line 64 explicitly defines pkt_offset in bytes; conversion to two sixteen-bit words per interface frame follows the contract."
+  },
+  "FF_LEN_BITS": {
+    "grade": "PARTIAL",
+    "reason": "spdifenc line 633 supports even AC-3/DTS encoded bit counts; it rounds odd packets to an even size and does not itself prove odd parser extraction of supplied Pd40."
+  },
+  "FF_EAC3_TYPE": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line145 sets only the E-AC-3 enum; unused corroboration."
+  },
+  "FF_EAC3_ENUM": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h explicitly gives E-AC-3=0x15; unused corroboration."
+  },
+  "FF_EAC3_PERIOD": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line146 gives24576 bytes, hence6144 interface frames; consumer timing is honestly secondary."
+  },
+  "FF_EAC3_LEN": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc lines138\u2013149 accumulate bytes then put hd_buf_filled in Pd, supporting byte units and concatenated length."
+  },
+  "FF_EAC3_GROUP": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc repeat array and frame counter give6/3/2/1 frames for the tested constant-numblkscod independent stream; no multi-substream rule is inferred."
+  },
+  "FF_EAC3_GROUP_IDX": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line131 indexes repeat by byte4 bits5\u20134 in the tested full-rate branch."
+  },
+  "FF_DTS1": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h explicitly links512 samples, typeI and code0B; secondary sample-to-code mapping."
+  },
+  "FF_DTS2": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h explicitly links1024 samples, typeII and code0C; secondary sample-to-code mapping."
+  },
+  "FF_DTS3": {
+    "grade": "SUPPORTS",
+    "reason": "spdif.h explicitly links2048 samples, typeIII and code0D; this is the decisive datatype-mutation oracle."
+  },
+  "FF_DTS_PERIOD": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc lines266,293,315 make blocks=NBLKS+1 and period=blocks*128 bytes, matching sample count times four."
+  },
+  "FF_DTS_BADSYNC": {
+    "grade": "SUPPORTS",
+    "reason": "The bad-sync switch default returns invalid data on the cited source page; the test uses an unsupported all-zero sync."
+  },
+  "FF_DTS_UNSUPPORTED": {
+    "grade": "SUPPORTS",
+    "reason": "The switch permits only512/1024/2048 samples and rejects others, matching both tested unsupported durations."
+  },
+  "FF_TOO_BIG": {
+    "grade": "SUPPORTS",
+    "reason": "Core-size and padding checks on the same source page reject payloads exceeding a period; the test is not an exact-fit preamble-free case."
+  },
+  "FF_ODD": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc lines666\u2013668 explicitly emit a lone final byte shifted8; this supports the secondary odd-byte alignment assertion, not Pd rounding."
+  },
+  "E_SYNCWORD": {
+    "grade": "SUPPORTS",
+    "reason": "Annex J p.240 explicitly requires0B77 for the constrained elementary streams used as fixtures; note correctly denies general IEC transport authority."
+  },
+  "FF_EAC3_CONCAT": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc memcpy and subsequent count update concatenate successive packets unchanged before emitting their buffer."
+  },
+  "FF_PAYLOAD": {
+    "grade": "SUPPORTS",
+    "reason": "spdifenc line631 defaults output to packet bytes; the AC-3 header branch does not replace it, supporting unchanged complete payload."
+  },
+  "A52_SIZE_TABLE52": {
+    "grade": "SUPPORTS",
+    "reason": "All31 quoted rows match Table5.18 on p.52, including odd/even44.1kHz sizes; helpers transcribe their columns correctly."
+  },
+  "A52_SIZE_TABLE53": {
+    "grade": "SUPPORTS",
+    "reason": "All seven continuation rows match p.53; together with p.52 they cover all38 codes at all three rates."
+  },
+  "A52_DURATION": {
+    "grade": "SUPPORTS",
+    "reason": "\u00a78.2.1.2 explicitly gives1536 audio samples per AC-3 syncframe; it supplies codec duration, not an independent consumer-spacing rule."
+  }
+}

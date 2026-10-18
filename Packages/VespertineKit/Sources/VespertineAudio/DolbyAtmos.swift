@@ -94,15 +94,8 @@ final class SystemRendererSession: @unchecked Sendable {
         renderer.allowedAudioSpatializationFormats = spatial ? .monoStereoAndMultichannel : []
         renderer.volume = volume
         synchronizer.addRenderer(renderer)
-        let loaded = Self.wait { [asset] in
-            let track = try await asset.loadTracks(withMediaType: .audio).first
-            let duration = try await asset.load(.duration)
-            let range = try await track?.load(.timeRange)
-            return Loaded(track: track, duration: duration, start: range?.start ?? .zero)
-        }
-        let info = try loaded.get()
-        guard let track = info.track else { throw SourceOpenerError.unsupported(url) }
-        let total = info.duration, start = info.start
+        guard let info = LoadedAudioTrack(asset) else { throw SourceOpenerError.unsupported(url) }
+        let track = info.track, total = info.duration, start = info.timeRange.start
         self.track = track
         origin = start
         duration = max(0, CMTimeGetSeconds(total) - max(0, CMTimeGetSeconds(start)))
@@ -172,21 +165,4 @@ final class SystemRendererSession: @unchecked Sendable {
     }
 
     var failure: Error? { renderer.status == .failed ? (renderer.error ?? SourceOpenerError.unsupported(url)) : nil }
-
-    private struct Loaded: @unchecked Sendable { var track: AVAssetTrack?; var duration: CMTime; var start: CMTime }
-
-    /// Runs async AVFoundation loading from a plain thread (the engine thread isn't in the concurrency pool).
-    private static func wait<T: Sendable>(_ work: @escaping @Sendable () async throws -> T) -> Result<T, Error> {
-        let done = DispatchSemaphore(value: 0)
-        nonisolated(unsafe) var result: Result<T, Error> = .failure(CancellationError())
-        Task.detached { result = await Result { try await work() }; done.signal() }
-        done.wait()
-        return result
-    }
-}
-
-extension Result where Failure == Error {
-    init(catching body: () async throws -> Success) async {
-        do { self = .success(try await body()) } catch { self = .failure(error) }
-    }
 }

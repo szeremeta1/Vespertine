@@ -1,0 +1,340 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Pic from '../components/Pic.astro';
+import SplitWords from '../components/SplitWords.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import GitHubButton from '../components/GitHubButton.astro';
+import Brew from '../components/Brew.astro';
+import { DEFER_IMAGES } from '../inline-scripts.mjs';
+import italicFont from '../assets/fonts/newsreader-italic.woff2?url';
+import { SITE, app, latest, releases, links, longDate, megabytes, releaseSummary } from '../data/app';
+import { description, hero, pillars, scenes, badges, marquee, formats, compare, faq, support } from '../data/content';
+import { notesToHtml } from '../lib/text';
+import { homeGraph } from '../lib/seo';
+import { shot, sceneShots, trailerPoster, TRAILER as trailer } from '../lib/shots';
+
+const title = 'Vespertine: surround and hi-res music player for Mac';
+const n = (i: number) => String(i + 1).padStart(2, '0');
+
+// Absolute URLs of real screenshots for the JSON-LD, and the trailer poster.
+const screenshots = await sceneShots();
+const poster = await trailerPoster();
+
+const notes = notesToHtml(latest.body.replace(/^\*\*.+?\*\*\s*/s, ''), { skip: ['Install'] });
+const jsonLd = homeGraph({ title, screenshots, trailer: SITE + trailer, poster: SITE + poster.src });
+
+const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width: 900px) calc(100vw - 72px), min(700px, 54vw)' };
+---
+<Base
+  title={title}
+  description={description}
+  path="/"
+  og="home"
+  ogAlt={`Vespertine: the free, open-source Mac player for surround and hi-res music. Its signal path shows a 24-bit / 96 kHz FLAC playing bit-perfect on a FiiO K11. Version ${latest.version}, macOS ${app.minMacOS} or later.`}
+  jsonLd={jsonLd}
+>
+<link slot="head" rel="preload" as="font" type="font/woff2" crossorigin href={italicFont}>
+<a class="skip" href="#main">Skip to content</a>
+
+<Nav home />
+
+<main id="main" class="route-host" tabindex="-1" data-motion>
+  <svg class="route" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-route" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#E7CD98"/>
+        <stop offset=".5" stop-color="#C8A66A"/>
+        <stop offset="1" stop-color="#C98B5B"/>
+      </linearGradient>
+      <radialGradient id="g-head">
+        <stop offset="0" stop-color="#fffaf0"/>
+        <stop offset=".25" stop-color="#F3DDAE"/>
+        <stop offset=".5" stop-color="#C8A66A" stop-opacity=".45"/>
+        <stop offset="1" stop-color="#C8A66A" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <path class="route__bed"/>
+    <path class="route__halo"/>
+    <path class="route__live" stroke="url(#g-route)"/>
+    <g class="route__branches"></g>
+    <circle class="route__head" r="16"/>
+  </svg>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow hero__eyebrow">
+          <span>Free and open source</span>
+          <span>macOS {app.minMacOS}+</span>
+          <span>Apple silicon and Intel</span>
+        </p>
+        <h1 class="hero__title" id="hero-title">
+          <span class="sr-only">Surround and hi-res music, on your Mac.</span>
+          <span aria-hidden="true">
+            <span class="line"><span style="--i:0">Surround and</span></span>
+            <span class="line"><span style="--i:1">hi-res music,</span></span>
+            <span class="line"><span style="--i:2"><span class="brass-italic">on your Mac.</span></span></span>
+          </span>
+        </h1>
+        <p class="hero__lede">{hero.lede}</p>
+        <div class="hero__cta">
+          <DownloadButton />
+          <GitHubButton />
+        </div>
+        <p class="hero__meta mono"><b>Version {latest.version}</b> · {megabytes(latest.dmg.size)} · {longDate(latest.date)} · signed and notarized · <a href={latest.url} class="nowrap">Release notes</a></p>
+        <Brew />
+        <p class="hero__fine">{hero.fine} <a href="/privacy.html">Privacy: nothing collected.</a></p>
+      </div>
+
+      <figure class="hero__panel">
+        <div class="panel">
+          <Pic
+            src={shot('bit-perfect-fiio-24-96-detail')}
+            widths={[360, 542]}
+            sizes="(max-width: 900px) min(340px, calc(100vw - 52px)), 380px"
+            priority
+            avifQuality={64}
+            webpQuality={82}
+            alt="Vespertine’s Now Playing inspector: Liszt’s Les jeux d’eaux à la Villa d’Este by Lazar Berman, marked HI-RES LOSSLESS and BIT-PERFECT, exclusive, 32 / 96, with its signal path from a 24-bit / 96 kHz FLAC through libFLAC at the native rate and unity volume to a FiiO K11."
+          />
+        </div>
+        <figcaption class="mono panel__cap">
+          <span class="live">Signal path</span>
+          <span>FiiO K11 · 24 / 96</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <nav class="wrap patchbay" aria-labelledby="patch-label">
+      <div class="patchbay__origin">
+        <span class="origin-node" data-route-origin aria-hidden="true"></span>
+        <p class="eyebrow" id="patch-label">Follow the signal</p>
+      </div>
+      <ul class="patchbay__jacks">
+        {scenes.map((s, i) => <li style={`--i:${i}`}><a class="jack" href={`#${s.id}`} data-route-to={s.id}><span class="jack__n">{n(i)}</span>{s.jack}</a></li>)}
+      </ul>
+    </nav>
+  </section>
+
+  <!-- TRAILER -->
+  <section class="section" id="trailer" aria-labelledby="trailer-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Trailer</p>
+        <h2 class="section-title section-title--sm" id="trailer-title"><SplitWords text="See it in 44 seconds." /></h2>
+        <p>Turn the sound on. Everything in it is the real app, recorded on the developer’s own library.</p>
+      </div>
+      <figure class="video">
+        <video controls playsinline preload="none" poster={poster.src} width="1920" height="1080" aria-label="Vespertine trailer, 44 seconds">
+          <source src={trailer} type="video/mp4">
+          <a href={trailer}>Watch the trailer (MP4)</a>
+        </video>
+        <figcaption class="media-cap mono">44 s · 1080p · album art belongs to its owners</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features section" id="features" aria-labelledby="features-title">
+    <div class="wrap section-head">
+      <p class="eyebrow">Why Vespertine</p>
+      <h2 class="section-title" id="features-title"><SplitWords text="Built for your surround collection." /></h2>
+      <p>Surround and stereo music in one library, and a player that shows exactly what it did to the signal.</p>
+    </div>
+    <div class="wrap">
+      <ul class="cards" data-reveal>
+        {pillars.map((p) => (
+          <li class="card spot">
+            <svg viewBox="0 0 34 34" aria-hidden="true"><path d={p.icon}/></svg>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="badges" aria-label="Signal path states the app shows" role="list" style="margin-top:28px">
+        {badges.map((b) => <span role="listitem" class:list={['badge', b.tone]} set:html={b.text} />)}
+      </div>
+    </div>
+
+    {scenes.map((s, i) => (
+      <article class:list={['scene', `scene--${s.id}`, { 'scene--flip': i % 2 === 1 }]} id={s.id} data-node={s.id} aria-labelledby={`${s.id}-title`}>
+        <div class="scene__num" aria-hidden="true">{n(i)}</div>
+        <div class="wrap scene__grid">
+          <div class="scene__copy">
+            <span class="node" aria-hidden="true"></span>
+            <p class="kicker mono"><span>{n(i)}</span> {s.kicker}</p>
+            <h3 class="scene__title" id={`${s.id}-title`}>{s.title}</h3>
+            <p class="scene__lede">{s.lede}</p>
+            {s.body.map((p) => <p set:html={p} />)}
+            {s.list && <ul class="ticks">{s.list.map((li) => <li set:html={li} />)}</ul>}
+            {s.note && <p class="scene__note">{s.note}</p>}
+            {s.links && <p class="links">{s.links.map((l) => <a href={l.href}>{l.text} <span aria-hidden="true">↗</span></a>)}</p>}
+          </div>
+          <div class:list={['scene__media', { 'scene__media--float': !!s.float }]}>
+            <figure class="display" data-parallax="-5">
+              <div class="display__screen">
+                <Pic src={shot(s.shot)} alt={s.alt} {...display} />
+              </div>
+              <div class="display__stand" aria-hidden="true"></div>
+            </figure>
+            {s.float && (
+              <figure class="float-card" data-parallax="9">
+                <Pic src={shot(s.float.shot)} alt={s.float.alt} widths={[300, 600]} sizes="(max-width: 900px) 48vw, 290px" />
+                <figcaption class="mono">{s.float.caption}</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      {[...marquee, ...marquee].map((w) => <span>{w}</span>)}
+    </div>
+  </div>
+
+  <!-- FORMATS -->
+  <section class="section" id="formats" aria-labelledby="formats-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Formats</p>
+        <h2 class="section-title section-title--sm" id="formats-title"><SplitWords text="Surround, lossless and lossy files." /></h2>
+        <p>Stereo and multichannel, PCM and DSD, disc images and plain files, with CUE sheets throughout.</p>
+      </div>
+      <div class="table formats">
+        <table>
+          <caption class="sr-only">Formats Vespertine plays, and how</caption>
+          <tbody>
+            {formats.map((f) => <tr><th scope="row">{f.name}</th><td>{f.text}<span class="ext">{f.ext}</span></td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="section" id="compare" aria-labelledby="compare-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Compare</p>
+        <h2 class="section-title section-title--sm" id="compare-title"><SplitWords text="How it stacks up." /></h2>
+        <p>{compare.intro}</p>
+      </div>
+      <div class="compare-wrap">
+        <p class="compare-hint" aria-hidden="true">Scroll for more →</p>
+        <div class="compare" role="region" aria-label="Comparison table (scrolls sideways)" tabindex="0">
+          <table>
+            <caption class="sr-only">Vespertine compared with seven other Mac music players, from each player’s own documentation or source</caption>
+            <thead><tr><th scope="col">Feature</th>{compare.players.map((p, i) => <th scope="col" class:list={{ us: i === 0 }}>{p}</th>)}</tr></thead>
+            <tbody>
+              {compare.rows.map(([label, ...cells]) => <tr><th scope="row">{label}</th>{cells.map((c, i) => <td class:list={{ us: i === 0 }}>{c}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="compare-note">
+        {compare.notes.map((t) => <p set:html={t} />)}
+        <p><a href={links.comparison}>Sources and scope</a>. Corrections welcome: <a href={links.issues}>open an issue</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW -->
+  <section class="section" id="whats-new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What’s new</p>
+        <h2 class="section-title section-title--sm" id="new-title"><SplitWords text={`What’s new in ${latest.version}.`} /></h2>
+      </div>
+      <div class="releases">
+        <article class="release" aria-labelledby="latest-v">
+          <p class="release__tag mono eyebrow"><span>Latest release</span> <time datetime={latest.date}>{longDate(latest.date)}</time></p>
+          <h3 class="release__v" id="latest-v">Vespertine {latest.version}</h3>
+          <p class="release__summary">{releaseSummary(latest)}</p>
+          <div class="notes" set:html={notes} />
+          <div class="hero__cta" style="margin-top:28px">
+            <DownloadButton label={`Download ${latest.version}`} />
+            <a class="btn btn--text" href={latest.url}>Full release notes <span aria-hidden="true">↗</span></a>
+          </div>
+          <p class="hero__meta mono">{latest.dmg.name} · {megabytes(latest.dmg.size)} · already installed? It updates itself, or <code>{app.brewUpgrade}</code></p>
+        </article>
+        <div>
+          <h3 class="eyebrow" style="margin-bottom:16px">Earlier releases</h3>
+          <ol class="history" data-reveal>
+            {releases.slice(1).map((r) => (
+              <li>
+                <div><span class="v"><a href={r.url}>{r.version}</a></span><time datetime={r.date}>{longDate(r.date)}</time></div>
+                <p>{releaseSummary(r)}</p>
+              </li>
+            ))}
+          </ol>
+          <p class="links" style="margin-top:18px"><a href={links.releases}>Every release <span aria-hidden="true">↗</span></a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2 class="section-title section-title--sm" id="faq-title"><SplitWords text="Questions, answered." /></h2>
+      </div>
+      <div class="faq">
+        {faq.map((f) => <div><h3>{f.q}</h3><p set:html={f.a} /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="section" id="support" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Support</p>
+        <h2 class="section-title section-title--sm" id="support-title"><SplitWords text="Help Vespertine grow." /></h2>
+        <p>It’s free, open source and built in the open. Here’s how to help.</p>
+      </div>
+      <ul class="cards" data-reveal>
+        {support.map((c) => (
+          <li class="card spot">
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+            <p class="links"><a href={c.href}>{c.cta} <span aria-hidden="true">↗</span></a></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="closing__glow" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">Download</p>
+      <h2 class="closing__title" id="closing-title"><SplitWords text="Play your surround collection on your Mac." /></h2>
+      <div class="hero__cta">
+        <DownloadButton />
+        <GitHubButton label="Report an issue" href={links.newIssue} />
+      </div>
+      <p class="hero__meta mono">Free · open source · version {latest.version} · macOS {app.minMacOS} or later · {app.arch}</p>
+      <Brew />
+    </div>
+  </section>
+</main>
+
+<Footer home />
+
+<script>
+  import '../scripts/main';
+</script>
+<script is:inline set:html={DEFER_IMAGES} />
+</Base>

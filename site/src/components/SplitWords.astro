@@ -1,0 +1,12 @@
+---
+// Splits a heading into word boxes at build time, so the scroll reveal needs no DOM rewrite
+// (and nothing reflows when the script arrives). Screen readers get the plain sentence.
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+const words = text.trim().split(/\s+/);
+---
+<span class="sr-only">{text}</span><span aria-hidden="true" data-words>{words.map((w, i) => (
+  <Fragment><span class="rw"><span>{w}</span></span>{i < words.length - 1 && ' '}</Fragment>
+))}</span>

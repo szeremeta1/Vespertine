@@ -1,0 +1,148 @@
+[
+ {
+  "id": "dop-1.1",
+  "files": [
+   "DoP_openStandard_1v1.pdf"
+  ],
+  "tier": "primary",
+  "title": "DoP open Standard: Method for transferring DSD Audio over PCM Frames, Version 1.1 (2012-03-30)",
+  "url": "https://dsd-guide.com/sites/default/files/white-papers/DoP_openStandard_1v1.pdf",
+  "note": "The DoP standard itself (open, freely published). Primary source for every DoP requirement.",
+  "normalize": {
+   "require_dot": true,
+   "max_indent": 0
+  }
+ },
+ {
+  "id": "iec61937-1-preview",
+  "files": [
+   "info_iec61937-1ed3.0b.pdf"
+  ],
+  "tier": "primary-preview",
+  "title": "IEC 61937-1:2021 ed. 3.0, General \u2014 publisher's free preview (front matter only)",
+  "url": "https://webstore.iec.ch/en/publication/62828 (Preview button)",
+  "note": "Only the table of contents, foreword, scope, normative references and terms are public. The clause text that defines the burst-preamble, burst-payload and stuffing is NOT in this file (paid standard, not bought). Usable for terms/definitions and clause titles only."
+ },
+ {
+  "id": "iec61937-2-preview",
+  "files": [
+   "info_iec61937-2ed3.0b.pdf"
+  ],
+  "tier": "primary-preview",
+  "title": "IEC 61937-2:2021 ed. 3.0, Burst-info \u2014 publisher's free preview (front matter only)",
+  "url": "https://webstore.iec.ch/en/publication/66291 (Preview button)",
+  "note": "Front matter only. The data-type code table itself is NOT in this file."
+ },
+ {
+  "id": "iec61937-3-preview",
+  "files": [
+   "info_iec61937-3ed3.0en.pdf"
+  ],
+  "tier": "primary-preview",
+  "title": "IEC 61937-3:2017 ed. 3.0, AC-3 and enhanced AC-3 \u2014 publisher's free preview (front matter only)",
+  "url": "https://webstore.iec.ch/en/publication/32333 (Preview button)",
+  "note": "Front matter only (contents, foreword, scope, terms). Clause 4-5 text is NOT in this file."
+ },
+ {
+  "id": "iec61937-5-preview",
+  "files": [
+   "info_iec61937-5ed2.0en.pdf"
+  ],
+  "tier": "primary-preview",
+  "title": "IEC 61937-5:2006 ed. 2.0, DTS \u2014 publisher's free preview (front matter only)",
+  "url": "https://webstore.iec.ch/en/publication/6134 (Preview button)",
+  "note": "Front matter only. Clause text is NOT in this file."
+ },
+ {
+  "id": "smpte-st337-2015",
+  "files": [
+   "st0337-2015.pdf"
+  ],
+  "tier": "sibling-standard",
+  "title": "SMPTE ST 337:2015, Format for Non-PCM Audio and Data in an AES3 Serial Digital Audio Interface",
+  "url": "https://pub.smpte.org/latest/st337/st0337-2015.pdf",
+  "note": "Free from SMPTE. The PROFESSIONAL (AES3) counterpart of IEC 61937, not IEC 61937 itself. Same burst structure (Pa/Pb/Pc/Pd); differences from the consumer standard are possible and must not be assumed away.",
+  "normalize": {
+   "allow_lowercase_title": true
+  }
+ },
+ {
+  "id": "smpte-st338-2016",
+  "files": [
+   "st0338-2016.pdf"
+  ],
+  "tier": "sibling-standard",
+  "title": "SMPTE ST 338:2016, Format for Non-PCM Audio and Data in AES3 \u2014 Data Types",
+  "url": "https://pub.smpte.org/latest/st338/st0338-2016.pdf",
+  "note": "Free from SMPTE. Data-type codes for ST 337 (professional). These numbers are NOT guaranteed to equal IEC 61937-2 data-type codes.",
+  "normalize": {
+   "allow_lowercase_title": true
+  }
+ },
+ {
+  "id": "smpte-st340-2015",
+  "files": [
+   "st0340-2015.pdf"
+  ],
+  "tier": "sibling-standard",
+  "title": "SMPTE ST 340:2015, Format for Non-PCM Audio and Data in AES3 \u2014 ATSC A/52 (AC-3) Data Type",
+  "url": "https://pub.smpte.org/latest/st340/st0340-2015.pdf",
+  "note": "Free from SMPTE. AC-3 (and possibly E-AC-3) carriage in ST 337 (professional).",
+  "normalize": {
+   "allow_lowercase_title": true
+  }
+ },
+ {
+  "id": "atsc-a52-2018",
+  "files": [
+   "A52-2018.pdf"
+  ],
+  "tier": "codec-spec",
+  "title": "ATSC A/52:2018, Digital Audio Compression (AC-3, E-AC-3) Standard",
+  "url": "https://www.atsc.org/wp-content/uploads/2021/04/A52-2018.pdf",
+  "note": "AC-3 / E-AC-3 frame syntax (syncword, bsmod, frmsizecod, frame sizes, E-AC-3 Annex E). Has no IEC 61937 annex in this edition.",
+  "normalize": {
+   "max_gap": 12,
+   "max_top": 12
+  }
+ },
+ {
+  "id": "etsi-ts-102366",
+  "files": [
+   "ts_102366v010401p.pdf"
+  ],
+  "tier": "codec-spec",
+  "title": "ETSI TS 102 366 V1.4.1, Digital Audio Compression (AC-3, Enhanced AC-3) Standard",
+  "url": "https://www.etsi.org/deliver/etsi_ts/102300_102399/102366/01.04.01_60/ts_102366v010401p.pdf",
+  "note": "European edition of the AC-3/E-AC-3 syntax (cross-check of A/52). No IEC 61937 annex.",
+  "normalize": {
+   "max_gap": 20,
+   "max_top": 12
+  }
+ },
+ {
+  "id": "etsi-ts-102114",
+  "files": [
+   "ts_102114v010601p.pdf"
+  ],
+  "tier": "codec-spec",
+  "title": "ETSI TS 102 114 V1.6.1, DTS Coherent Acoustics; Core and Extensions with Additional Profiles",
+  "url": "https://www.etsi.org/deliver/etsi_ts/102100_102199/102114/01.06.01_60/ts_102114v010601p.pdf",
+  "note": "DTS core frame header syntax (SYNC, NBLKS, FSIZE). Not an IEC 61937 document.",
+  "normalize": {
+   "max_gap": 20,
+   "max_top": 12
+  }
+ },
+ {
+  "id": "ffmpeg-spdif-n7.1",
+  "files": [
+   "spdifenc.c",
+   "spdif.h"
+  ],
+  "tier": "secondary-implementation",
+  "title": "FFmpeg n7.1 libavformat S/PDIF (IEC 61937) muxer source",
+  "url": "https://github.com/FFmpeg/FFmpeg/tree/n7.1/libavformat (spdifenc.c, spdif.h)",
+  "note": "SECONDARY REFERENCE, NOT A SPECIFICATION. An independent open-source implementation of IEC 61937 framing. Any requirement resting only on this file is labelled tier=secondary and is evidence of agreement with FFmpeg, not of conformance to IEC 61937."
+ }
+]

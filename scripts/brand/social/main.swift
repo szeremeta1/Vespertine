@@ -69,7 +69,7 @@ func render(wide: Bool) {
         text(label, mono, Brand.text2, x: x + 10, top: top + 6, tracking: 1.5 / 13); x += width + 9
     }
     text(foot, Brand.sans(17), Brand.text2, x: 76, top: height - (wide ? 58 : 42) - 21)
-    Brand.writePNG(ctx, to: Brand.repo.appendingPathComponent("site/assets/\(wide ? "og-wide" : "og").png").path)
+    Brand.writePNG(ctx, to: Brand.repo.appendingPathComponent("site/public/assets/\(wide ? "og-wide" : "og").png").path)
 }
 render(wide: false)
 render(wide: true)

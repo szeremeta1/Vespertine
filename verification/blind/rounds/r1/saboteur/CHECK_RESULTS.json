@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "checks": 1815,
+  "random_trials": 40,
+  "changed_public_functions": {
+    "swapped_markers": [
+      "dop_pack",
+      "dop_unpack"
+    ],
+    "pc_datatype": [
+      "dts_burst"
+    ],
+    "length_off_by_one": [
+      "eac3_burst"
+    ],
+    "padding": [
+      "ac3_burst",
+      "dts_burst",
+      "eac3_burst"
+    ],
+    "byte_order": [
+      "ac3_burst",
+      "dts_burst",
+      "eac3_burst"
+    ],
+    "dop_bit_order": [
+      "dop_pack",
+      "dop_unpack"
+    ]
+  },
+  "fixture_limit": "structurally valid framing headers; compressed decoding and CRCs unverified"
+}
