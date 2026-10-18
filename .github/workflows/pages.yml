@@ -1,7 +1,8 @@
 # Builds the website (site/, Astro) and publishes it to GitHub Pages (vespertineapp.com, site/public/CNAME):
 # - on every push to main that touches the site, the feature guide it quotes (llms-full.txt) or this file;
 # - whenever a release is published, so the version, download link and "What's new" follow the release
-#   (scripts/fetch-releases.mjs reads them from GitHub's API before the build);
+#   (scripts/fetch-releases.mjs reads them from GitHub's API before the build). A release run's ref is its tag,
+#   which the github-pages environment won't deploy, so it only re-runs this workflow on main;
 # - by hand (Actions > Website > Run workflow).
 # Pull requests that touch the site get the same build and checks, without publishing.
 name: Website
@@ -26,7 +27,20 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # On a release, publish from main: GITHUB_TOKEN may start workflow_dispatch runs.
+  republish-from-main:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   build:
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
