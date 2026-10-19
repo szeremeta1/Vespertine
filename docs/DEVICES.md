@@ -7,7 +7,7 @@ What Vespertine has been run on, and what each test did and did not show. A **re
 | FiiO K11 | USB | PCM at every rate to 384 kHz, DSD over DoP, 32-bit integer mode | Bit-perfect, see [VERIFICATION](VERIFICATION.md) | Tested |
 | AirPods Max | USB-C and Bluetooth | 48 kHz lossless over USB-C; AAC reported over Bluetooth | As documented in [FEATURES](FEATURES.md) | Tested |
 | MacBook Pro speakers | Built in | Stereo playback | Plays | Tested |
-| **Sony TV (HDMI)** | HDMI, exclusive (hog) mode | **Six-channel 5.1 FLAC, 7.1 FLAC folded to 5.1, and 5.1 DSD64 converted to PCM** | **Each of the six channels went to its matching speaker position; BIT-PERFECT shown** | **Reported, 2026-10-19** |
+| **Sony TV (HDMI)** | HDMI, exclusive (hog) mode | **Six-channel 5.1 FLAC, 7.1 FLAC folded to 5.1, and 5.1 DSD64 converted to PCM, and Dolby Atmos rendered by macOS (tentative)** | **Each of the six channels went to its matching speaker position; BIT-PERFECT shown** | **Reported, 2026-10-19** |
 
 ## Sony TV over HDMI (first multichannel result)
 
@@ -32,6 +32,10 @@ Vespertine's output device panel showed the same facts: 6 channels, speakers L R
 **5.1 DSD on a PCM-only HDMI device.** Elton John, "Rocket Man (I Think It's Going to Be a Long, Long Time) (5.1 mix)" (DSF, DSD64, 5.1) played as **DSD → PCM**, not bit-perfect, and the app said so: DSD decimated to 352.8 kHz / 32-bit float, then sample-rate conversion to 176.4 kHz, delivered as 24-bit integer to the TV with every channel on its matching speaker. The TV does not accept DoP over HDMI (its audio formats are PCM, Dolby Digital, DTS and Dolby Digital Plus), so a conversion is the only way to play DSD to it.
 
 ![5.1 DSD64 played to the Sony TV as DSD to PCM, with the decimation and sample-rate conversion named in the signal path and a six-channel readout](screenshots/multichannel-sony-tv-hdmi-dsd-to-pcm.png)
+
+**Dolby Atmos (tentative).** Elton John, "I'm Still Standing" (Dolby Digital Plus with Atmos, 5.1 bed) played with the badge **OBJECTS RENDERED BY MACOS**: the signal path shows macOS rendering the Atmos objects to the TV's own speaker layout, with the frames going to macOS untouched and Vespertine's meters not applying. The developer's note is that Atmos "also works, I think", so treat it as playing and unconfirmed by listening notes. It was **not** sent as a bitstream to the TV; Atmos bitstream to this device is not supported or tested.
+
+![Dolby Atmos played to the Sony TV with objects rendered by macOS, the output's own speaker layout, and frames passed to macOS untouched](screenshots/multichannel-sony-tv-hdmi-atmos-macos-rendered.png)
 
 **What this does not show.**
 
