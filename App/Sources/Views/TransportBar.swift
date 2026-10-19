@@ -188,7 +188,11 @@ struct DeviceChip: View {
             $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
         } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
-            DevicePicker().environment(model).frame(width: 360)
+            ScrollView {
+                DevicePicker().environment(model)
+            }
+            .scrollIndicators(.visible)
+            .frame(width: 360, height: 560)
         }
     }
 
@@ -267,6 +271,9 @@ struct DeviceSettings: View {
             if let note = device.profile.note {
                 Text(note).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             }
+            // Put the device-specific sound correction above lower-priority controls so it remains visible in the
+            // bounded output popover. This is especially useful for the AirPods Max factory default.
+            EqualizerChoice(device: device)
             HStack {
                 Text("Sample rate").layoutPriority(1)
                 Spacer()
@@ -298,7 +305,6 @@ struct DeviceSettings: View {
             if !device.hasHardwareVolume {
                 AppVolumeToggle(device: device)
             }
-            EqualizerChoice(device: device)
             // Multichannel music (5.1, 7.1…): Spatial Audio on headphones, all channels or a downmix elsewhere.
             HStack {
                 VStack(alignment: .leading, spacing: 1) {

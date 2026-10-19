@@ -54,6 +54,7 @@ targets:
         # Network shares are probed and mounted over the local network (or a VPN); without this string
         # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
         NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
+        NSBluetoothAlwaysUsageDescription: "Vespertine checks the product ID of paired Bluetooth audio devices to choose the matching factory equalizer for AirPods Max."
         # Only the loopback self-test records, and only from a virtual loopback device such as "Vespertine Loopback".
         NSMicrophoneUsageDescription: "The loopback test records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. It never records a microphone."
         # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.

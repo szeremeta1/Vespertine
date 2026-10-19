@@ -318,3 +318,52 @@ public struct EqualizerStatus: Sendable, Hashable {
         self.reason = systemRendering != nil ? .systemRendered : path?.equalizerBypass
     }
 }
+
+/// Vespertine's factory corrections for the two USB-C AirPods Max models.
+/// The first-generation curve starts from the published AutoEQ Rtings/B&K 5128 correction. The second generation
+/// has a restrained presence and treble adjustment based on Headphones.com's B&K 5128 and on-head measurements.
+/// Individual fit and preference still vary, especially above 3 kHz; these remain editable reference presets.
+public enum AirPodsMaxEQProfiles {
+    public static let firstGeneration = EQPreset(
+        id: UUID(uuidString: "e0d14657-0073-4d0a-947e-7bb321c81251")!,
+        name: "AirPods Max USB-C (1st gen) — Reference",
+        preampDB: -5.6,
+        bands: [
+            EQBand(kind: .lowShelf, frequency: 105, gainDB: -2.1, q: 0.70),
+            EQBand(kind: .peak, frequency: 5092, gainDB: 5.9, q: 1.63),
+            EQBand(kind: .peak, frequency: 414, gainDB: -1.7, q: 0.23),
+            EQBand(kind: .peak, frequency: 9875, gainDB: -3.4, q: 2.73),
+            EQBand(kind: .peak, frequency: 1895, gainDB: 2.9, q: 2.72),
+            EQBand(kind: .highShelf, frequency: 10_000, gainDB: 0, q: 0.70),
+            EQBand(kind: .peak, frequency: 207, gainDB: -1.3, q: 1.30),
+            EQBand(kind: .peak, frequency: 365, gainDB: 1.2, q: 2.60),
+            EQBand(kind: .peak, frequency: 91, gainDB: 1.0, q: 1.98),
+            EQBand(kind: .peak, frequency: 621, gainDB: 0.7, q: 2.98),
+        ])
+
+    public static let secondGeneration = EQPreset(
+        id: UUID(uuidString: "9ac07d3b-23c3-4a42-9ff8-63a11fc5bca8")!,
+        name: "AirPods Max 2 — Reference",
+        preampDB: -5.6,
+        bands: [
+            EQBand(kind: .lowShelf, frequency: 105, gainDB: -2.1, q: 0.70),
+            EQBand(kind: .peak, frequency: 5092, gainDB: 4.0, q: 1.63),
+            EQBand(kind: .peak, frequency: 414, gainDB: -1.7, q: 0.23),
+            EQBand(kind: .peak, frequency: 9875, gainDB: -4.0, q: 2.73),
+            EQBand(kind: .peak, frequency: 1895, gainDB: 2.4, q: 2.72),
+            EQBand(kind: .highShelf, frequency: 10_000, gainDB: 0, q: 0.70),
+            EQBand(kind: .peak, frequency: 207, gainDB: -1.3, q: 1.30),
+            EQBand(kind: .peak, frequency: 365, gainDB: 1.2, q: 2.60),
+            EQBand(kind: .peak, frequency: 91, gainDB: 1.0, q: 1.98),
+            EQBand(kind: .peak, frequency: 621, gainDB: 0.7, q: 2.98),
+        ])
+
+    public static let all = [firstGeneration, secondGeneration]
+
+    public static func `default`(for model: AirPodsMaxEQModel) -> EQPreset {
+        switch model {
+        case .usbCFirstGeneration: firstGeneration
+        case .secondGeneration: secondGeneration
+        }
+    }
+}

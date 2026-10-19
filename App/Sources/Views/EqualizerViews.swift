@@ -24,7 +24,7 @@ struct EqualizerChoice: View {
                     .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
             HStack {
-                Picker("Equalizer", selection: Binding(get: { settings.eqPreset(for: device.uid)?.id },
+                Picker("Equalizer", selection: Binding(get: { settings.eqPreset(for: device)?.id },
                                                        set: { settings.setEQPreset($0, for: device.uid); model.syncEngine() })) {
                     Text("Off", comment: "Equalizer choice: no equalizer").tag(UUID?.none)
                     if !settings.eqPresets.isEmpty { Divider() }
@@ -84,7 +84,7 @@ struct EqualizerWindow: View {
                         HStack {
                             Text(preset.name).lineLimit(1)
                             Spacer()
-                            if let device = model.activeDevice, settings.eqPreset(for: device.uid)?.id == preset.id {
+                            if let device = model.activeDevice, settings.eqPreset(for: device)?.id == preset.id {
                                 Image(systemName: "hifispeaker.fill").font(.system(size: 10)).foregroundStyle(Palette.brass)
                                     .accessibilityLabel("Playing on \(device.name)")
                             }
@@ -128,7 +128,7 @@ struct EqualizerWindow: View {
             .background(Palette.window)
         }
         .frame(minWidth: 760, minHeight: 520)
-        .onAppear { if selection == nil { selection = model.activeDevice.flatMap { settings.eqPreset(for: $0.uid)?.id } ?? settings.eqPresets.first?.id } }
+        .onAppear { if selection == nil { selection = model.activeDevice.flatMap { settings.eqPreset(for: $0)?.id } ?? settings.eqPresets.first?.id } }
         .fileImporter(isPresented: $importing, allowedContentTypes: [.plainText, .text, .data], allowsMultipleSelection: true) { result in
             if case .success(let urls) = result { importFiles(urls) }
         }

@@ -172,10 +172,11 @@ final class AppSettings {
         networkCache = defaults.bool(forKey: "networkCache")
         networkCacheLimitGB = defaults.double(forKey: "networkCacheLimitGB")
         networkPrefetch = defaults.integer(forKey: "networkPrefetch")
-        eqPresets = defaults.data(forKey: "eqPresets").flatMap { try? JSONDecoder().decode([EQPreset].self, from: $0) } ?? []
+        let savedPresets = defaults.data(forKey: "eqPresets").flatMap { try? JSONDecoder().decode([EQPreset].self, from: $0) }
+        let savedIDs = Set(savedPresets?.map(\.id) ?? [])
+        eqPresets = (savedPresets ?? []) + AirPodsMaxEQProfiles.all.filter { !savedIDs.contains($0.id) }
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
         setupCompleted = defaults.bool(forKey: "setupCompleted")
-
         if let dataDirectory {
             self.dataDirectory = dataDirectory
         } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
@@ -192,10 +193,29 @@ final class AppSettings {
 
     /// The equalizer preset `uid` plays with, if any.
     func eqPreset(for uid: String) -> EQPreset? {
-        eqAssignments[uid].flatMap { id in eqPresets.first { $0.id.uuidString == id } }
+        guard let id = eqAssignments[uid], id != Self.equalizerOff else { return nil }
+        return eqPresets.first { $0.id.uuidString == id }
     }
 
-    func setEQPreset(_ id: UUID?, for uid: String) { eqAssignments[uid] = id?.uuidString }
+    /// An explicit assignment wins; otherwise an AirPods Max USB-C model gets its factory profile.
+    func eqPreset(for device: OutputDevice) -> EQPreset? {
+        if let assigned = eqAssignments[device.uid] {
+            guard assigned != Self.equalizerOff else { return nil }
+            return eqPresets.first { $0.id.uuidString == assigned }
+        }
+        return eqPreset(for: device.profile.airPodsMaxEQModel)
+    }
+
+    /// Factory correction when no per-output choice overrides it.
+    func eqPreset(for model: AirPodsMaxEQModel?) -> EQPreset? {
+        guard let model else { return nil }
+        let factoryID = AirPodsMaxEQProfiles.default(for: model).id
+        return eqPresets.first { $0.id == factoryID }
+    }
+
+    func setEQPreset(_ id: UUID?, for uid: String) { eqAssignments[uid] = id?.uuidString ?? Self.equalizerOff }
+
+    private static let equalizerOff = "__off__"
 
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
     func moveDeviceSettings(from old: String, to new: String) {
@@ -239,7 +259,7 @@ final class AppSettings {
     }
 
     /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
-    func engineSettings() -> EngineSettings {
+    func engineSettings(devices: [OutputDevice] = []) -> EngineSettings {
         var s = EngineSettings()
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
@@ -257,6 +277,10 @@ final class AppSettings {
         s.integerMode = integerMode
         s.matchSixteenBit = matchSixteenBit
         s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
+        for device in devices {
+            if let preset = eqPreset(for: device) { s.equalizers[device.uid] = preset }
+            else if eqAssignments[device.uid] == nil { s.equalizers.removeValue(forKey: device.uid) }
+        }
         return s
     }
 }
