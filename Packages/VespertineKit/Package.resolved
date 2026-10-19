@@ -1,5 +1,5 @@
 {
-  "originHash" : "408cf3e14a1a9ebe129bce5e9f4c98b546c4645c411b5db9db291c385b84a0e5",
+  "originHash" : "72b2d44310091165425aa409a107ba4639e026811bce7d8167b33d71205ad09a",
   "pins" : [
     {
       "identity" : "avfaudioextensions",
@@ -170,15 +170,6 @@
       "state" : {
         "revision" : "52f73460dc04ba789ad3007ad004faa328b732dd",
         "version" : "0.1.2"
-      }
-    },
-    {
-      "identity" : "sparkle",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sparkle-project/Sparkle",
-      "state" : {
-        "revision" : "eef1a539a373c1f1a320624b1130fc5de7b2e100",
-        "version" : "2.10.0"
       }
     },
     {
