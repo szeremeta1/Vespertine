@@ -276,6 +276,16 @@ jobs:
       - name: Loopback probe compiles
         if: ${{ !cancelled() }}
         run: swiftc -typecheck verification/hardware/probe.swift
+      - name: Speaker probe compiles (macOS and tvOS)
+        if: ${{ !cancelled() }}
+        run: |
+          sources=(verification/hardware/speaker-probe/Sources/*.swift)
+          xcrun swiftc -typecheck -parse-as-library -swift-version 5 -target arm64-apple-macos14.4 "${sources[@]}"
+          if xcrun --sdk appletvos --show-sdk-path >/dev/null 2>&1; then
+            xcrun --sdk appletvos swiftc -typecheck -parse-as-library -swift-version 5 -target arm64-apple-tvos18.0 "${sources[@]}"
+          else
+            echo "::warning::No tvOS SDK on this runner; the tvOS half of the speaker probe wasn't checked."
+          fi
       # The repository pins no artifact action, so the carriers reach the Linux job through the cache. Saved even when
       # a check above failed, so the carrier oracles still run.
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

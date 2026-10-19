@@ -1,0 +1,36 @@
+# Speaker probe: test signals and route readouts for docs/NETWORK-SPEAKERS.md (tests A and B).
+# Not part of the app. Generate with `xcodegen` in this folder, then open SpeakerProbe.xcodeproj.
+name: SpeakerProbe
+options:
+  bundleIdPrefix: org.szeremeta
+  deploymentTarget:
+    tvOS: "18.0"
+    macOS: "14.4"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: Speaker Probe
+targets:
+  # Test B: runs on an Apple TV 4K and plays to whatever its audio output is (HomePods, a TV, a soundbar).
+  SpeakerProbeTV:
+    type: application
+    platform: tvOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.speakerprobe
+        CODE_SIGN_STYLE: Automatic
+  # Test A: plays the same signals from a Mac through AVFoundation's own AirPlay, to compare with the system output.
+  SpeakerProbeMac:
+    type: application
+    platform: macOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.speakerprobe.mac
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
