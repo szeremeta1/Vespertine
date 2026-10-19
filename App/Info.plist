@@ -48,8 +48,6 @@
 	<string>Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Vespertine connects to the music servers and network shares you add, on your network or over a VPN.</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Vespertine checks the product ID of paired Bluetooth audio devices to choose the matching factory equalizer for AirPods Max.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The loopback test records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. It never records a microphone.</string>
 	<key>SUAllowsAutomaticUpdates</key>

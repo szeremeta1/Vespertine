@@ -87,7 +87,7 @@ struct NowPlayingPanel: View {
                         }
                     } else if let system = player.systemRendering {
                         SystemRenderingView(rendering: system, device: player.outputDevice?.name,
-                                            bypassedEqualizer: player.outputDevice.flatMap { model.settings.eqPreset(for: $0.uid) }.flatMap { $0.isFlat ? nil : $0.name }).padding(.top, 16)
+                                            bypassedEqualizer: player.outputDevice.flatMap { model.settings.eqPreset(for: $0) }.flatMap { $0.isFlat ? nil : $0.name }).padding(.top, 16)
                     } else {
                         Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
