@@ -130,7 +130,7 @@ Vespertine has no accounts, analytics, telemetry, crash reporting or advertising
 
 ${app.tested.map((t) => `- ${t}`).join('\n')}
 
-Channel-for-channel output to multichannel DACs and Dolby/DTS bitstream to receivers are experimental and untested on real hardware; device reports are welcome: ${links.dacReport}
+Channel-for-channel output to multichannel DACs and Dolby/DTS bitstream to receivers are experimental and untested on real hardware (one Sony TV over HDMI has been tested: see docs/DEVICES.md); device reports are welcome: ${links.dacReport}
 
 ## The feature guide (docs/FEATURES.md)
 
