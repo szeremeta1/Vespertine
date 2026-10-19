@@ -149,4 +149,72 @@ struct EqualizerTests {
         path.equalizer = "HD 650"
         #expect(!path.isBitPerfect && path.statusLine == "EQUALIZER")
     }
+
+    /// A path for `source` on an exclusive USB DAC, planned the way the engine plans it.
+    private func path(for source: SourceFormat, dop: Bool, equalizer: String? = nil, bypassed: String? = nil) -> SignalPath {
+        let plan = FormatPlanner.plan(source: source, device: DeviceCapabilities(sampleRates: [44_100, 48_000, 176_400, 352_800],
+                                                                                 physicalFormats: [], outputChannels: 2, supportsDoP: dop))
+        let applied = AppliedFormat(sampleRate: plan.deviceSampleRate, physicalBitDepth: 32, physicalIsInteger: true, virtualChannels: 2,
+                                    exclusive: true, bufferFrames: 512)
+        return SignalPath(source: source, decoderName: "test", plan: plan, applied: applied, deviceName: "DAC", deviceUID: "DAC",
+                          deviceProfile: DeviceProfile(kind: .usbDAC, tag: "USB", canBeBitPerfect: true, symbol: "x"), volume: .hardware,
+                          equalizer: equalizer, bypassedEqualizer: bypassed)
+    }
+
+    @Test("The equalizer is active on PCM and bypassed, with the reason, on native DSD (DoP)")
+    func status() {
+        let flac = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 44_100, bitDepth: 16, channels: 2)
+        let dsd = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+
+        let pcm = EqualizerStatus(path: path(for: flac, dop: true, equalizer: "Eris"), systemRendering: nil)
+        #expect(pcm.eqActive && pcm.reason == nil)
+
+        let dop = path(for: dsd, dop: true, bypassed: "Eris")
+        #expect(dop.plan.mode == .dop && dop.equalizerBypass == .dopBypass)
+        let bypassed = EqualizerStatus(path: dop, systemRendering: nil)
+        #expect(!bypassed.eqActive && bypassed.reason == .dopBypass)
+
+        // DSD converted to PCM (DoP off for the DAC) is PCM Vespertine renders, so the equalizer applies.
+        let converted = EqualizerStatus(path: path(for: dsd, dop: false, equalizer: "Eris"), systemRendering: nil)
+        #expect(converted.eqActive && converted.reason == nil)
+
+        // Nothing playing: the equalizer will apply to the next PCM song.
+        #expect(EqualizerStatus(path: nil, systemRendering: nil).eqActive)
+        #expect(EqualizerStatus(path: nil, systemRendering: SystemRendering(format: "Dolby Atmos", objectLayout: nil, spatial: false)).reason == .systemRendered)
+    }
+
+    @Test("A DoP path still says NATIVE DSD with the equalizer bypassed: the samples really are untouched")
+    func dopStaysBitPerfect() {
+        let dsd = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        let dop = path(for: dsd, dop: true, bypassed: "Eris")
+        #expect(!dop.modifiesSamples && dop.isBitPerfect && dop.statusLine == "NATIVE DSD · DoP")
+        #expect(dop.equalizer == nil && dop.bypassedEqualizer == "Eris")
+    }
+
+    @Test("A passthrough render (DoP, bitstream) leaves every sample alone even with an equalizer installed; PCM doesn't")
+    func passthroughIgnoresEqualizer() {
+        let preset = EQPreset(name: "Peak", bands: [EQBand(kind: .peak, frequency: 1000, gainDB: 12, q: 1)])
+        // 24-bit DoP-like words: marker byte on top, DSD bits below, each exactly representable as Float32.
+        let words = (0..<4096).map { i -> Float in
+            let marker: UInt32 = i % 2 == 0 ? 0x05 : 0xFA
+            let word = Int32(bitPattern: (marker << 24) | UInt32((i * 2_654_435_761) & 0xFFFF) << 8) >> 8
+            return Float(word) / 8_388_608
+        }
+        func render(passthrough: Bool) -> [Float] {
+            let ring = nrt_ring_create(8192, 1)!
+            let context = nrt_context_create(ring, 512)!
+            defer { nrt_context_destroy(context); nrt_ring_destroy(ring) }
+            nrt_context_set_gain(context, 1, 32)
+            nrt_context_set_passthrough(context, passthrough)
+            preset.sections(sampleRate: 176_400).withUnsafeBufferPointer {
+                nrt_context_set_eq(context, $0.baseAddress, UInt32($0.count), preset.preampGain)
+            }
+            #expect(nrt_ring_write(ring, words, 4096) == 4096)
+            var output = [Float](repeating: 0, count: 4096)
+            nrt_context_render_interleaved(context, &output, 4096, 1)
+            return output
+        }
+        #expect(render(passthrough: true) == words)
+        #expect(render(passthrough: false) != words)
+    }
 }
