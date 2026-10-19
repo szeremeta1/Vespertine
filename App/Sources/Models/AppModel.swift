@@ -385,7 +385,7 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.dopDeviceUIDs
         let device = plannedDevice
-        player.engine.update(settings: settings.engineSettings())
+        player.engine.update(settings: settings.engineSettings(devices: devices.devices))
         devices.watchVolume(of: device)
         player.resolveVersions()
     }

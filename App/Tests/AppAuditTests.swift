@@ -1,5 +1,6 @@
 import AVFAudio
 import Foundation
+import VespertineAudio
 import VespertineLibrary
 import Testing
 @testable import Vespertine
@@ -44,6 +45,20 @@ struct AppAuditTests {
         #expect(settings.systemOutputFollowsPlayback)
         settings.relayVolumeKeys = true
         #expect(AppSettings(defaults: defaults, dataDirectory: root).relayVolumeKeys)
+    }
+    @Test("AirPods Max USB-C factory corrections are available by default and remain model-specific")
+    func airPodsMaxFactoryEQ() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+
+        #expect(settings.eqPreset(for: AirPodsMaxEQModel.usbCFirstGeneration)?.id == AirPodsMaxEQProfiles.firstGeneration.id)
+        #expect(settings.eqPreset(for: AirPodsMaxEQModel.secondGeneration)?.id == AirPodsMaxEQProfiles.secondGeneration.id)
+        #expect(settings.eqPreset(for: Optional<AirPodsMaxEQModel>.none) == nil)
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).eqPresets.contains { $0.id == AirPodsMaxEQProfiles.firstGeneration.id })
     }
     @Test("Volume control in Vespertine is chosen per output, with a level of its own")
     func appVolumePerOutput() throws {

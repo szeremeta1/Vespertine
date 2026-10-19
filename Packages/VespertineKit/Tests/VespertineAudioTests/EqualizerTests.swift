@@ -47,6 +47,16 @@ struct EqualizerTests {
         #expect(!EQPreset(name: "Pass", bands: [EQBand(kind: .highPass, frequency: 20)]).isFlat)
     }
 
+    @Test("AirPods Max USB-C hardware IDs select separate factory corrections")
+    func airPodsMaxModels() {
+        #expect(AirPodsMaxEQModel.from(productID: 0x201F) == .usbCFirstGeneration)
+        #expect(AirPodsMaxEQModel.from(productID: 0x202D) == .secondGeneration)
+        #expect(AirPodsMaxEQModel.from(productID: 0) == nil)
+        #expect(AirPodsMaxEQProfiles.firstGeneration.id != AirPodsMaxEQProfiles.secondGeneration.id)
+        #expect(AirPodsMaxEQProfiles.firstGeneration.name.contains("1st gen"))
+        #expect(AirPodsMaxEQProfiles.secondGeneration.name.contains("AirPods Max 2"))
+    }
+
     @Test("Bands above what the sample rate carries are left out, except a low shelf, which becomes a gain")
     func aboveNyquist() {
         let bands = [EQBand(kind: .peak, frequency: 30_000, gainDB: 6), EQBand(kind: .lowShelf, frequency: 30_000, gainDB: -6)]
