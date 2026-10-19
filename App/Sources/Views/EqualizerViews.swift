@@ -36,7 +36,7 @@ struct EqualizerChoice: View {
                     .controlSize(.small)
                     .fixedSize()
             }
-            if settings.eqPreset(for: device.uid) != nil, device.uid == model.activeDevice?.uid, let reason = model.equalizerStatus.reason {
+            if settings.eqPreset(for: device) != nil, device.uid == model.activeDevice?.uid, let reason = model.equalizerStatus.reason {
                 EqualizerBypassNote(reason: reason)
             }
         }
@@ -234,7 +234,7 @@ struct EqualizerEditor: View {
     var body: some View {
         let peak = preset.peakDB(sampleRate: sampleRate)
         // The preset is chosen for the output, but what is playing doesn't pass through it.
-        let bypass = model.activeDevice.flatMap { model.settings.eqPreset(for: $0.uid)?.id == preset.id ? model.equalizerStatus.reason : nil }
+        let bypass = model.activeDevice.flatMap { model.settings.eqPreset(for: $0)?.id == preset.id ? model.equalizerStatus.reason : nil }
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .firstTextBaseline) {
@@ -244,7 +244,7 @@ struct EqualizerEditor: View {
                     Spacer()
                     if let device = model.activeDevice {
                         Toggle("Use on \(device.name)", isOn: Binding(
-                            get: { model.settings.eqPreset(for: device.uid)?.id == preset.id },
+                            get: { model.settings.eqPreset(for: device)?.id == preset.id },
                             set: { model.settings.setEQPreset($0 ? preset.id : nil, for: device.uid); model.syncEngine() }))
                             .toggleStyle(.switch).controlSize(.small)
                     }

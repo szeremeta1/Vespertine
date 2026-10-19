@@ -5,69 +5,19 @@
 
 import Foundation
 import IOKit
-import IOBluetooth
 
 /// The AirPods Max models for which Vespertine ships an individual correction.
 public enum AirPodsMaxEQModel: Hashable, Sendable {
     case usbCFirstGeneration
     case secondGeneration
 
+    /// Bluetooth product IDs from Apple's AirPods model registry (A3184 = 0x201F, A3454 = 0x202D).
     public static func from(productID: UInt32) -> AirPodsMaxEQModel? {
         switch productID {
         case 0x201F: .usbCFirstGeneration
         case 0x202D: .secondGeneration
         default: nil
         }
-    }
-
-    /// Bluetooth product IDs from Apple's AirPods model registry (A3184 = 0x201F, A3454 = 0x202D).
-    public static func detect(for device: OutputDevice, isUSBCAudio: Bool) -> AirPodsMaxEQModel? {
-        // Don't ask macOS for Bluetooth access while inspecting unrelated outputs, or for AirPods Max used
-        // wirelessly. The factory correction is specifically for the USB-C audio path.
-        guard isUSBCAudio, device.name.localizedCaseInsensitiveContains("AirPods Max") else { return nil }
-        return BluetoothAccessoryRegistry.productID(for: device.uid, deviceName: device.name).flatMap { Self.from(productID: $0) }
-    }
-}
-
-/// Core Audio's UID normally includes the Bluetooth address. Use the paired hardware product ID, not the editable name.
-private enum BluetoothAccessoryRegistry {
-    private struct Snapshot: Sendable {
-        var readAt = Date.distantPast
-        var productIDs: [String: UInt32] = [:]
-    }
-    private static let snapshot = Locked(Snapshot())
-
-    static func productID(for coreAudioUID: String, deviceName: String) -> UInt32? {
-        let address = bluetoothAddress(in: coreAudioUID)
-        let now = Date()
-        let productIDs = snapshot.withLock { state -> [String: UInt32] in
-            if now.timeIntervalSince(state.readAt) < 3 { return state.productIDs }
-            var current: [String: UInt32] = [:]
-            for device in (IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] ?? []) where device.isConnected() {
-                let key = (device.addressString ?? "").replacingOccurrences(of: ":", with: "").lowercased()
-                guard key.count == 12,
-                      device.responds(to: NSSelectorFromString("productID")),
-                      let id = device.value(forKey: "productID") as? NSNumber else { continue }
-                current[key] = id.uint32Value
-            }
-            state = Snapshot(readAt: now, productIDs: current)
-            return current
-        }
-        if let address, let id = productIDs[address] { return id }
-
-        // Some macOS versions put a transport UID before the address (or omit it). When the output
-        // is named AirPods Max and only one paired Max is connected, this product ID is unambiguous.
-        guard deviceName.localizedCaseInsensitiveContains("AirPods Max") else { return nil }
-        let candidates = Set(productIDs.values.filter { $0 == 0x201F || $0 == 0x202D })
-        return candidates.count == 1 ? candidates.first : nil
-    }
-
-    private static func bluetoothAddress(in uid: String) -> String? {
-        guard let regex = try? NSRegularExpression(pattern: #"(?i)(?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}|[0-9a-f]{12}"#) else { return nil }
-        let range = NSRange(uid.startIndex..<uid.endIndex, in: uid)
-        guard let match = regex.firstMatch(in: uid, range: range), let swiftRange = Range(match.range, in: uid) else { return nil }
-        let address = uid[swiftRange].filter(\.isHexDigit).lowercased()
-        return address.count == 12 ? address : nil
     }
 }
 
@@ -85,8 +35,6 @@ public struct DeviceProfile: Sendable, Hashable {
     }
 
     public var kind: Kind
-    /// Identifies AirPods Max USB-C models by Bluetooth hardware product ID when connected.
-    public var airPodsMaxEQModel: AirPodsMaxEQModel? = nil
     /// Short tag shown next to the device, e.g. "USB-C · LOSSLESS".
     public var tag: String
     /// One-sentence explanation for the device picker and signal-path view.
@@ -99,7 +47,6 @@ public struct DeviceProfile: Sendable, Hashable {
 
     public static func detect(_ device: OutputDevice) -> DeviceProfile {
         var profile = classify(device)
-        profile.airPodsMaxEQModel = AirPodsMaxEQModel.detect(for: device, isUSBCAudio: profile.kind == .airPodsMaxUSB)
         profile.connection = profile.kind == .airPodsMaxUSB ? String(localized: "USB-C (lossless)") : device.transport.label
         return profile
     }

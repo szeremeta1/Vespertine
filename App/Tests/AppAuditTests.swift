@@ -46,19 +46,63 @@ struct AppAuditTests {
         settings.relayVolumeKeys = true
         #expect(AppSettings(defaults: defaults, dataDirectory: root).relayVolumeKeys)
     }
-    @Test("AirPods Max USB-C factory corrections are available by default and remain model-specific")
-    func airPodsMaxFactoryEQ() throws {
+    @Test("The AirPods Max reference presets are offered, but play only once chosen")
+    func airPodsMaxReferenceEQIsOptIn() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        let uid = "AirPods-Max-USB"
 
-        #expect(settings.eqPreset(for: AirPodsMaxEQModel.usbCFirstGeneration)?.id == AirPodsMaxEQProfiles.firstGeneration.id)
-        #expect(settings.eqPreset(for: AirPodsMaxEQModel.secondGeneration)?.id == AirPodsMaxEQProfiles.secondGeneration.id)
-        #expect(settings.eqPreset(for: Optional<AirPodsMaxEQModel>.none) == nil)
-        #expect(AppSettings(defaults: defaults, dataDirectory: root).eqPresets.contains { $0.id == AirPodsMaxEQProfiles.firstGeneration.id })
+        for preset in AirPodsMaxEQProfiles.all { #expect(settings.eqPresets.contains { $0.id == preset.id }) }
+        // Nothing chosen: no output plays an equalizer, AirPods Max included (48 kHz stays bit-perfect).
+        #expect(settings.eqAssignments.isEmpty)
+        #expect(settings.eqPreset(for: uid) == nil && settings.engineSettings().equalizers.isEmpty)
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).engineSettings().equalizers.isEmpty)
+
+        settings.setEQPreset(AirPodsMaxEQProfiles.firstGeneration.id, for: uid)
+        #expect(settings.eqPreset(for: uid)?.id == AirPodsMaxEQProfiles.firstGeneration.id)
+        #expect(settings.engineSettings().equalizers[uid]?.id == AirPodsMaxEQProfiles.firstGeneration.id)
+    }
+    @Test("Choosing Off for an output is kept as a choice and carried to its new UID")
+    func equalizerOffIsRemembered() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-off-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        let uid = "AirPods-Max-USB"
+        settings.setEQPreset(AirPodsMaxEQProfiles.secondGeneration.id, for: uid)
+        settings.setEQPreset(nil, for: uid)
+
+        let reloaded = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(reloaded.eqAssignments[uid] != nil)
+        #expect(reloaded.eqPreset(for: uid) == nil && reloaded.engineSettings().equalizers.isEmpty)
+        reloaded.moveDeviceSettings(from: uid, to: "AirPods-Max-USB-2")
+        #expect(reloaded.eqAssignments["AirPods-Max-USB-2"] == reloaded.eqAssignments[uid])
+        #expect(reloaded.engineSettings().equalizers.isEmpty)
+    }
+    @Test("A deleted reference preset stays deleted")
+    func deletedReferencePresetStaysDeleted() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-delete-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        // Upgrading with presets of one's own: the reference presets are added once, after them.
+        let own = EQPreset(name: "Mine", bands: [EQBand()])
+        defaults.set(try JSONEncoder().encode([own]), forKey: "eqPresets")
+        let first = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(first.eqPresets.map(\.id) == [own.id] + AirPodsMaxEQProfiles.all.map(\.id))
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).eqPresets.map(\.id) == first.eqPresets.map(\.id))
+
+        first.eqPresets.removeAll { $0.id == AirPodsMaxEQProfiles.firstGeneration.id }
+        let reloaded = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(reloaded.eqPresets.map(\.id) == [own.id, AirPodsMaxEQProfiles.secondGeneration.id])
+        #expect(reloaded.engineSettings().equalizers.isEmpty)
     }
     @Test("Volume control in Vespertine is chosen per output, with a level of its own")
     func appVolumePerOutput() throws {
