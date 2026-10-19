@@ -8,7 +8,7 @@ Extracted SACD 5.1 tracks, multichannel FLAC, DTS CDs, Dolby TrueHD and DTS-HD M
 
 Surround renders as head-tracked or fixed Spatial Audio on AirPods, or folds down by channel layout on a stereo DAC. Dolby Digital Plus with Atmos uses macOS's object renderer. TrueHD Atmos and DTS:X play their lossless channel bed; their objects are not rendered.
 
-Channel-for-channel output to multichannel interfaces and AV receivers is experimental, untested on real receivers/multichannel DACs; reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check. Those checks do not establish compatibility with a hardware interface or receiver.
+Channel-for-channel output to multichannel interfaces and AV receivers is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check. Those checks do not establish compatibility with a hardware interface or receiver.
 
 ![Albums filtered to multichannel: extracted SACD tracks, DTS CDs and 5.1 FLAC](screenshots/multichannel-albums.png)
 
@@ -18,7 +18,7 @@ When an album contains stereo and surround versions, each song is listed once. V
 
 DTS CDs and DTS-WAV files store a DTS stream in what looks like stereo PCM. Vespertine detects the stream and decodes it to 5.1, including CUE-split albums. Ordinary PCM playback of that data would be noise. Format badges name the codec and channel layout, and the signal path has a meter for each channel.
 
-Receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted. The per-output option packs Dolby Digital, Dolby Digital Plus and DTS-CD data into IEC 61937 carriers. Dolby Digital Plus needs HDMI. Carrier tests compare the data with FFmpeg's S/PDIF reader. TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
+Receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. The per-output option packs Dolby Digital, Dolby Digital Plus and DTS-CD data into IEC 61937 carriers. Dolby Digital Plus needs HDMI. Carrier tests compare the data with FFmpeg's S/PDIF reader. TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
 Export for Spatial Audio makes binaural stereo for headphones or multichannel ALAC for Apple devices. It copies tags and artwork, handles CUE tracks, and leaves the originals in place.
 
@@ -86,7 +86,7 @@ The tag editor handles single files or batches through TagLib, including artwork
 
 The parametric EQ has up to 20 peak, shelf, low-pass and high-pass bands plus a preamp. It runs in 64-bit and dithers to the DAC's word length. Import AutoEQ `ParametricEQ.txt` or Equalizer APO configurations, inspect the curve and clipping risk, and choose a preset per output. It is off by default. An active preset that changes samples replaces BIT-PERFECT with EQUALIZER. Convolution and audio effect plugins are not supported.
 
-EQ does not process DoP, system-rendered Atmos, or the experimental receiver bitstream path, which is untested on real receivers/multichannel DACs; reports wanted.
+EQ does not process DoP, system-rendered Atmos, or the experimental receiver bitstream path, which is untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.
 
 Meters and the live spectrum include DoP monitoring. A mini player, menu-bar extra, Now Playing integration and media keys keep playback controls available. Codec-library exceptions become playback errors where possible; a deeper decoder crash still needs a report.
 
@@ -112,9 +112,9 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 | DVD-Video LPCM | DVD `.iso`, or a `VIDEO_TS` folder (added with Add Folder) | 16/20/24-bit, 48/96 kHz, 1–8 channels within DVD-Video's limit, bit for bit; one album per title, a track per chapter. DVD-Audio (`AUDIO_TS`, MLP, DVD-Audio PCM) is not supported. [Details](DVD-VIDEO-LPCM.md) |
 | Dolby Atmos | DD+ with Atmos in `.ec3` `.m4a` `.mp4` | macOS object renderer, or decoded channel bed |
 | Dolby TrueHD, MLP | `.thd` `.mlp` `.mka` | Lossless channel decode; TrueHD Atmos objects are not rendered |
-| Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` `.mp4` | macOS decode; receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted |
+| Dolby Digital, Dolby Digital Plus | `.ac3` `.ec3`, Dolby in `.m4a` `.mp4` | macOS decode; receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted |
 | DTS-HD MA, DTS-HD HR, DTS | `.dts` `.dtshd` `.mka` | FFmpeg decode; MA is lossless; DTS:X objects are not rendered |
-| DTS CDs, DTS-WAV | `.wav` `.flac` with optional `.cue` | Decode to 5.1; receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted |
+| DTS CDs, DTS-WAV | `.wav` `.flac` with optional `.cue` | Decode to 5.1; receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted |
 | APE, WavPack, TTA | `.ape` `.wv` `.tta` | Lossless PCM; DSD inside WavPack is unsupported |
 | Opus, Vorbis, Musepack, MP3, AAC | `.opus` `.ogg` `.mpc` `.mp3` `.m4a` | Decoded and marked lossy |
 

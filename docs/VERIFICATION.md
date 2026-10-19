@@ -11,7 +11,7 @@
 
 Playback has been checked on a FiiO K11 at rates up to 384 kHz, including DoP and integer mode; AirPods Max over USB-C and Bluetooth; and MacBook Pro speakers. The Intel build has run under Rosetta, not on an Intel Mac. DoP carrier rates above 384 kHz have not been tested on hardware. DSD64–512 file decoding is not proof of native DSD output at every rate.
 
-Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers/multichannel DACs; reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check; IEC 61937 carriers are checked with FFmpeg's S/PDIF reader. Those checks do not establish receiver or interface compatibility.
+Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check; IEC 61937 carriers are checked with FFmpeg's S/PDIF reader. Those checks do not establish receiver or interface compatibility.
 
 ## What the claim covers
 
@@ -98,7 +98,7 @@ These methods don't depend on anything Vespertine reports.
 
 **DTS-CD or DoP indicator test (no extra hardware beyond what you own).**
 
-The receiver path below is experimental, untested on real receivers/multichannel DACs; reports wanted. This is a proposed check for your setup, not a result already measured by the developer.
+The receiver path below is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. This is a proposed check for your setup, not a result already measured by the developer.
 
 - A DTS-encoded audio CD rip (a `.wav` that is really a DTS stream) only turns into surround on an AV receiver if the stream arrives unprocessed. Any gain change, dither, resampling or mixing scrambles it, and the receiver plays white noise or refuses the stream.
 - To test: play such a file from Vespertine as **PCM** (bitstream off) over optical or HDMI to a receiver. If the receiver shows DTS, nothing on that path processed the samples. (It's a test for processing, not proof against every possible bit error: the null test below is the rigorous one.)

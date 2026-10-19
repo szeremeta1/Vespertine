@@ -59,7 +59,7 @@ Positions stay in the carrier's frames: a DTS CD holds one 512-sample frame per 
 
 ## Bitstream (IEC 61937)
 
-Receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted. The tests below validate the carrier, not a receiver.
+Receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. The tests below validate the carrier, not a receiver.
 
 On outputs marked as having a receiver (`bitstreamDeviceUIDs`), Dolby and DTS-CD sources plan as mode `.bitstream`: exclusive, exact rate, integer ≥ 16-bit, no gain. `BitstreamDecoder` wraps Dolby Digital frames in 1536-frame bursts at the stream's rate (Pd in bits). It groups Dolby Digital Plus frames into six-block bursts of 6144 frames at four times the rate (Pd in bytes, so HDMI only). DTS CDs go out as stored. The carriers are checked with FFmpeg's S/PDIF demuxer, which decodes them identically to the original files. A gapless transition into an Atmos track that macOS renders drains the ring first, then hands over. The framers check their input (`BurstError`): a frame that doesn't parse, a payload too big for its burst, or a Dolby Digital Plus burst of other than six blocks is refused, and goes out as silence of the same length, counted as damaged frames. A short last Dolby Digital Plus burst at the end of a stream goes out as silence too, uncounted.
 
@@ -120,7 +120,7 @@ The library is SQLite via GRDB:
 
 ## Multichannel and Spatial Audio
 
-Channel-for-channel output is experimental, untested on real receivers/multichannel DACs; reports wanted. Routing has automated tests and a six-channel aggregate-device check.
+Channel-for-channel output is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Routing has automated tests and a six-channel aggregate-device check.
 
 `FormatPlanner` sends every channel to devices that can carry them (following the speaker layout from Audio MIDI Setup, and counting an HDMI receiver's channel capacity even in 2-channel mode), downmixes by channel layout on stereo devices, and on AirPods and Beats renders the channels with Apple's spatial mixer (`AUSpatialMixer`, head tracked or fixed) inside the I/O callback, through a C hook, so head tracking responds instantly.
 

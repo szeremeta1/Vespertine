@@ -8,7 +8,7 @@ export const description =
 
 export const hero = {
   lede: `The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output. In English and ${app.languages} other languages.`,
-  fine: 'Channel-for-channel output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted.',
+  fine: 'Channel-for-channel output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.',
 };
 
 export const pillars = [
@@ -87,11 +87,11 @@ export const scenes: Scene[] = [
     title: 'Your 5.1 discs, in the same library.',
     lede: 'Multichannel music plays as head-tracked Spatial Audio on AirPods, or folds down by channel layout on a stereo DAC.',
     body: [
-      'DTS CDs decode to 5.1. SACD images, extracted SACD tracks, multichannel FLAC, TrueHD and DTS-HD MA render as head-tracked Spatial Audio on AirPods or fold down on a stereo DAC. Dolby Digital Plus with Atmos uses macOS’s object renderer; TrueHD Atmos and DTS:X play their channel bed. Channel-for-channel output is experimental, untested on real receivers/multichannel DACs; reports wanted.',
+      'DTS CDs decode to 5.1. SACD images, extracted SACD tracks, multichannel FLAC, TrueHD and DTS-HD MA render as head-tracked Spatial Audio on AirPods or fold down on a stereo DAC. Dolby Digital Plus with Atmos uses macOS’s object renderer; TrueHD Atmos and DTS:X play their channel bed. Channel-for-channel output is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.',
     ],
     list: [
       'Stereo and surround versions of an album are listed once; Vespertine plays whichever suits the output, or the one you pin.',
-      'Dolby Digital, DD+ and DTS-CD receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted. Carrier tests use FFmpeg’s S/PDIF reader. TrueHD and DTS-HD MA passthrough is unsupported on macOS.',
+      'Dolby Digital, DD+ and DTS-CD receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Carrier tests use FFmpeg’s S/PDIF reader. TrueHD and DTS-HD MA passthrough is unsupported on macOS.',
       'Export for Spatial Audio as binaural stereo for headphones or multichannel ALAC for Apple devices, with tags and artwork.',
     ],
     shot: 'spatial-audio-airpods-max',
@@ -208,7 +208,7 @@ export const formats = [
   { name: 'Dolby Atmos', text: 'Dolby Digital Plus with Atmos, rendered by macOS’s object renderer, or its decoded channel bed.', ext: '.ec3 .m4a .mp4' },
   { name: 'Dolby TrueHD, MLP', text: 'Lossless, can be bit-perfect; TrueHD Atmos plays its channel bed, its objects aren’t rendered.', ext: '.thd .mlp .mka' },
   { name: 'DTS-HD Master Audio, DTS-HD HR, DTS', text: 'MA is lossless and can be bit-perfect; DTS:X plays its channel bed. Raw DTS decodes; DTS-CD bitstream is a separate path.', ext: '.dts .dtshd .mka' },
-  { name: 'Dolby Digital (Plus)', text: 'Decoded by macOS. Receiver bitstream is experimental, untested on real receivers/multichannel DACs; reports wanted.', ext: '.ac3 .ec3' },
+  { name: 'Dolby Digital (Plus)', text: 'Decoded by macOS. Receiver bitstream is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.', ext: '.ac3 .ec3' },
   { name: 'DTS CDs and DTS-WAV', text: 'Recognized and decoded to 5.1, including CUE-split albums.', ext: '.wav .flac .cue' },
   { name: 'APE, WavPack, TTA', text: 'Lossless. DSD inside WavPack isn’t supported.', ext: '.ape .wv .tta' },
   { name: 'Opus, Vorbis, Musepack, MP3, AAC', text: 'Decoded and marked lossy.', ext: '.opus .ogg .mpc .mp3 .m4a' },
@@ -232,7 +232,7 @@ export const compare = {
   ],
   notes: [
     '¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in <a href="https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/">third-party loopback tests reported on ASR</a>, at 100% volume. This is not a Vespertine measurement; the original report could not be independently rechecked for this update. There is still no automatic rate switching, hog mode, FLAC or DSD on Mac.',
-    '² Multichannel DAC output and receiver bitstream are experimental, untested on real receivers/multichannel DACs; reports wanted.',
+    '² Multichannel DAC output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.',
     '³ Apple documents Spatial Audio with head tracking for Dolby Atmos tracks in the Apple Music catalog, not spatial rendering of your own multichannel files.',
     '⁴ Tested on foobar2000 2.26 (macOS 27.0.1), with no components: DSF, DFF and SACD ISO files fail with “Unsupported file format”. DSF and DFF play only as 352.8 kHz PCM after installing FFmpeg separately and adding them to its FFmpeg Decoder Wrapper; SACD ISO still fails.',
   ],
@@ -273,7 +273,7 @@ export const faq = [
   },
   {
     q: 'Which hardware has it been tested on?',
-    a: `Playback has been tested on a FiiO K11 at rates up to 384 kHz, with DoP and integer mode; AirPods Max over USB-C and Bluetooth; and MacBook Pro speakers. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers/multichannel DACs; <a href="${links.dacReport}">reports wanted</a>.`,
+    a: `Playback has been tested on a FiiO K11 at rates up to 384 kHz, with DoP and integer mode; AirPods Max over USB-C and Bluetooth; MacBook Pro speakers; and a Sony TV over HDMI in 5.1. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); <a href="${links.dacReport}">reports wanted</a>.`,
   },
   {
     q: 'Is it in my language?',
