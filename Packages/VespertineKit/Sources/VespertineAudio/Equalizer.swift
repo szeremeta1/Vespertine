@@ -292,3 +292,29 @@ extension EQPreset {
         return Double(prefix).flatMap { $0.isFinite ? $0 : nil }
     }
 }
+
+/// Whether the equalizer is in the signal for what is playing now, and when it isn't, why. The engine applies it only
+/// to PCM that Vespertine renders; DSD sent as DoP, Dolby/DTS bitstreams and Dolby Atmos rendered by macOS reach the
+/// device untouched, so the interface says so instead of showing a switch that seems to do nothing.
+public struct EqualizerStatus: Sendable, Hashable {
+    public enum Bypass: Sendable, Hashable {
+        /// Native DSD in DoP frames: a bitstream the equalizer can't process without breaking it.
+        case dopBypass
+        /// Dolby or DTS frames for a receiver to decode.
+        case bitstreamBypass
+        /// Dolby Atmos objects that macOS's own renderer turns into what the output plays.
+        case systemRendered
+    }
+
+    public var reason: Bypass?
+    /// The equalizer changes the sound of what is playing (or of what plays next, when nothing is).
+    public var eqActive: Bool { reason == nil }
+
+    public init(reason: Bypass? = nil) { self.reason = reason }
+
+    /// `path`: the signal path of the song on the output (nil: nothing is playing). `systemRendering`: set while
+    /// macOS renders the song (there's no signal path then).
+    public init(path: SignalPath?, systemRendering: SystemRendering?) {
+        self.reason = systemRendering != nil ? .systemRendered : path?.equalizerBypass
+    }
+}

@@ -36,8 +36,36 @@ struct EqualizerChoice: View {
                     .controlSize(.small)
                     .fixedSize()
             }
+            if settings.eqPreset(for: device.uid) != nil, device.uid == model.activeDevice?.uid, let reason = model.equalizerStatus.reason {
+                EqualizerBypassNote(reason: reason)
+            }
         }
         .font(Typeface.ui(12))
+    }
+}
+
+extension EqualizerStatus.Bypass {
+    /// Why the equalizer doesn't apply, as the end of "Not applied: …" and as a signal-path detail.
+    var explanation: String {
+        switch self {
+        case .dopBypass: String(localized: "native DSD (DoP) is sent untouched")
+        case .bitstreamBypass: String(localized: "Dolby and DTS bitstreams are sent untouched")
+        case .systemRendered: String(localized: "macOS renders Dolby Atmos")
+        }
+    }
+}
+
+/// Says the equalizer isn't in what is playing, so a switch that seems to do nothing isn't a mystery.
+struct EqualizerBypassNote: View {
+    let reason: EqualizerStatus.Bypass
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Image(systemName: "info.circle").foregroundStyle(Palette.text3)
+            Text("Not applied: \(reason.explanation)")
+                .font(Typeface.ui(12)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -205,6 +233,8 @@ struct EqualizerEditor: View {
 
     var body: some View {
         let peak = preset.peakDB(sampleRate: sampleRate)
+        // The preset is chosen for the output, but what is playing doesn't pass through it.
+        let bypass = model.activeDevice.flatMap { model.settings.eqPreset(for: $0.uid)?.id == preset.id ? model.equalizerStatus.reason : nil }
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .firstTextBaseline) {
@@ -219,8 +249,10 @@ struct EqualizerEditor: View {
                             .toggleStyle(.switch).controlSize(.small)
                     }
                 }
+                if let bypass { EqualizerBypassNote(reason: bypass) }
                 EQResponseView(preset: preset, sampleRate: sampleRate)
                     .frame(height: 200)
+                    .opacity(bypass == nil ? 1 : 0.35)
                 HStack(spacing: 12) {
                     Text("Preamp").font(Typeface.ui(12.5)).foregroundStyle(Palette.text)
                     Slider(value: $preset.preampDB, in: EQPreset.preampRange, step: 0.1) { Text("Preamp") }

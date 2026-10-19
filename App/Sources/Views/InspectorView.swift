@@ -86,7 +86,8 @@ struct NowPlayingPanel: View {
                             ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
                         }
                     } else if let system = player.systemRendering {
-                        SystemRenderingView(rendering: system, device: player.outputDevice?.name).padding(.top, 16)
+                        SystemRenderingView(rendering: system, device: player.outputDevice?.name,
+                                            bypassedEqualizer: player.outputDevice.flatMap { model.settings.eqPreset(for: $0.uid) }.flatMap { $0.isFlat ? nil : $0.name }).padding(.top, 16)
                     } else {
                         Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
@@ -222,6 +223,10 @@ struct SignalPathView: View {
         if let eq = path.equalizer {
             s.append(Step(title: String(localized: "Equalizer"), detail: String(localized: "\(eq) · 64-bit parametric"),
                           value: String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on"), tone: .changed))
+        } else if let eq = path.bypassedEqualizer, let bypass = path.equalizerBypass {
+            // Chosen for this output but not in the signal: say so rather than leave the row out.
+            s.append(Step(title: String(localized: "Equalizer"), detail: "\(eq) · \(bypass.explanation)",
+                          value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream")))
         }
         switch path.volume {
         case .hardware:
@@ -319,6 +324,8 @@ struct SignalSteps: View {
 struct SystemRenderingView: View {
     let rendering: SystemRendering
     let device: String?
+    /// The equalizer chosen for this output, which macOS's renderer doesn't pass through.
+    var bypassedEqualizer: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -344,7 +351,8 @@ struct SystemRenderingView: View {
                       tone: rendering.spatial ? .changed : .plain),
                 .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; Vespertine's meters don't apply"),
                       value: String(localized: "system", comment: "The macOS system renderer handles this step")),
-            ])
+            ] + (bypassedEqualizer.map { [.init(title: String(localized: "Equalizer"), detail: "\($0) · \(EqualizerStatus.Bypass.systemRendered.explanation)",
+                                               value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream"))] } ?? []))
             .padding(.top, 14)
         }
     }

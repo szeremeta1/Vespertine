@@ -914,7 +914,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: session.applied,
                           deviceName: device.name, deviceUID: device.uid, deviceProfile: device.profile, volume: volume,
                           replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil,
-                          equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil)
+                          equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil,
+                          bypassedEqualizer: plan.mode == .pcm ? nil : settings.equalizer(for: device)?.name)
     }
 
     private func applyGain() {
@@ -1388,6 +1389,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             else { path?.volume = sessionDevice?.hasHardwareVolume == true ? .hardware : .fixed }
             let integer = path?.applied.integerMode == true
             path?.equalizer = integer ? nil : settings.equalizer(for: sessionDevice)?.name
+        } else if path != nil {
+            path?.bypassedEqualizer = settings.equalizer(for: sessionDevice)?.name
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

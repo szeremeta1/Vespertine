@@ -23,12 +23,23 @@ public struct SignalPath: Sendable, Hashable {
     public var replayGainDB: Double?
     /// The equalizer preset applied (its name), nil = none.
     public var equalizer: String? = nil
+    /// The preset chosen for this output that can't be applied to this stream (DoP, bitstream), by name; nil = none chosen.
+    public var bypassedEqualizer: String? = nil
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
     public var concealedFrames = 0
 
     public var isResampling: Bool { plan.resamples }
+
+    /// Why an equalizer wouldn't apply to this stream: it reaches the device untouched. nil: PCM Vespertine renders.
+    public var equalizerBypass: EqualizerStatus.Bypass? {
+        switch plan.mode {
+        case .pcm: nil
+        case .dop: .dopBypass
+        case .bitstream: .bitstreamBypass
+        }
+    }
 
     /// Gain other than exactly unity is applied somewhere in software.
     public var modifiesSamples: Bool {

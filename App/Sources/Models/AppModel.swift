@@ -345,6 +345,12 @@ final class AppModel {
         player.outputDevice.flatMap { d in devices.devices.first { $0.id == d.id } } ?? plannedDevice
     }
 
+    /// Whether the equalizer is in the signal for what is playing: bypassed (with the reason) on native DSD over DoP,
+    /// bitstreams and macOS-rendered Atmos, active otherwise. The Equalizer window and the signal path read this.
+    var equalizerStatus: EqualizerStatus {
+        EqualizerStatus(path: player.signalPath, systemRendering: player.systemRendering)
+    }
+
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
