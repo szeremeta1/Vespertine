@@ -124,7 +124,7 @@ All releases: ${links.releases}
 
 ## Privacy, in short
 
-Vespertine has no accounts, analytics, telemetry, crash reporting or advertising, and the developer receives no information about you or your music. It goes online only to check GitHub for updates (about once a day, can be turned off), and, when you ask it to, to look up MusicBrainz and the Cover Art Archive scrobble to ListenBrainz, or find album covers for the optional Discord status; it also connects to the network shares you add. The full policy: ${SITE}/privacy.html
+The Vespertine app has no accounts, analytics, telemetry, crash reporting or advertising, and the developer receives no information about you or your music. It goes online only to check GitHub for updates (about once a day, can be turned off), and, when you ask it to, to look up MusicBrainz and the Cover Art Archive scrobble to ListenBrainz, or find album covers for the optional Discord status; it also connects to the network shares you add. The website counts visits with self-hosted, cookieless statistics (no cookies, no IP address kept; the app never contacts them). The full policy: ${SITE}/privacy.html
 
 ## Tested hardware
 
