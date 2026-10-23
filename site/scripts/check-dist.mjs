@@ -1,6 +1,7 @@
 // Post-build checks on dist/ (from szeremeta.org's, extended). Fails the build, and so the deploy, if:
 //  - an inline <script> isn't allowed by its page's CSP hashes (it would silently not run),
 //  - an <img> has no alt attribute,
+//  - a page lacks the self-hosted stats script (or the CSP that lets it run and report),
 //  - a page lacks a canonical link, a description or exactly one <h1>, or shares its title or description with another,
 //  - a page's og:image or twitter:image isn't a 1200×630 file in dist/, or its JSON-LD doesn't parse,
 //  - a page carries a noai/noimageai robots directive, or is noindex without being the 404 page,
@@ -51,6 +52,8 @@ for (const file of files) {
     const hash = `sha256-${createHash('sha256').update(m[2]).digest('base64')}`;
     if (!allowed.has(hash)) problems.push(`${file}: inline script not in CSP (${hash}): ${m[2].slice(0, 50)}`);
   }
+  if (!/<script defer src="https:\/\/stats\.szeremeta\.org\/howl\.js" data-website-id="a4b69e33-e989-45bd-bbc2-4d6b1036aa63" data-domains="vespertineapp\.com,www\.vespertineapp\.com" data-do-not-track="true">/.test(html)) problems.push(`${file}: stats script missing or changed`);
+  if (!/script-src[^;]*https:\/\/stats\.szeremeta\.org/.test(csp) || !/connect-src[^;]*https:\/\/stats\.szeremeta\.org/.test(csp)) problems.push(`${file}: CSP doesn't allow stats.szeremeta.org`);
   for (const m of html.matchAll(/<img\b[^>]*>/g)) if (!/\salt(=|[\s>])/.test(m[0])) problems.push(`${file}: <img> without alt: ${m[0].slice(0, 80)}`);
   if (!/<link rel="canonical"/.test(html)) problems.push(`${file}: no canonical link`);
   if ((html.match(/<h1\b/g) ?? []).length !== 1) problems.push(`${file}: expected exactly one <h1>`);
