@@ -192,6 +192,8 @@ jobs:
         run: python3 verification/oracles/dst/check_fixtures.py
       - name: Loopback tools, on synthetic captures
         run: python3 verification/hardware/selftest.py
+      - name: Studio evidence tools (parsers, signal-path checks, MEASURED/UNVERIFIED report)
+        run: python3 verification/studio/test_evidence.py
       # Not verification, but a Linux job every change runs (no path filter), so a catalog or Swift string change
       # can't skip it: every string translated, placeholders matching, every localized literal in the catalog.
       - name: String Catalogs complete

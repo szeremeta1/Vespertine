@@ -19,8 +19,10 @@ IRRELEVANT = {
     "packages": ("App/", "project.yml", "verification/"),
     # The app links VespertineKit, so Packages/ counts; scripts/ holds generate-project.sh and check-lockfiles.py.
     "app": ("verification/", "tests/"),
-    # The harness builds against Packages/ and reads verification/'s fixtures and requirements, not its Markdown.
-    "verification": ("App/", "project.yml", "tests/", "scripts/", "verification/*.md", "verification/hardware/*.md"),
+    # The harness builds against Packages/ and reads verification/'s fixtures and requirements, not its Markdown or the
+    # studio suite (verification/studio/, tested on Linux).
+    "verification": ("App/", "project.yml", "tests/", "scripts/", "verification/*.md", "verification/hardware/*.md",
+                     "verification/studio/"),
 }
 
 
