@@ -14,6 +14,10 @@ evidence/; `report` then turns everything found there into evidence.json and REP
   evidence.py render-list  --out OUT                          channel-ID files for the offline engine render
   evidence.py render-check --library DIR --out OUT [--python PY]
         verify_chid.py --coreaudio on each CAF StudioRoutingTests rendered      -> evidence/render-check.jsonl
+  evidence.py config-list  --out OUT                          files for StudioDeviceConfigTests
+  evidence.py config-check --out OUT
+        planned output format vs Core Audio after the engine's configuration step, per file (no audio)
+                                                                                 -> evidence/device-config-checked.jsonl
   evidence.py signal-check --out OUT
         computed signal path vs engine vs Core Audio readback, per file, from `vespertine-probe signal-path`
                                                                                  -> evidence/signal-path-checked.jsonl
@@ -117,8 +121,10 @@ def classify_open(rel, vsh, returncode):
 LAYOUT_FOLDERS = {'01': '2.0', '02': '2.1', '03': '3.0', '04': 'quad', '05': 'lcrs', '06': '5.0', '07': '5.0side',
                   '08': '5.1', '09': '5.1side', '10': '6.1', '11': '7.1', '12': '7.1wide', '13': '7.1wideside', '14': '8.1',
                   '15': '5.1.2', '16': '5.1.4', '17': '7.1.2', '18': '7.1.4', '19': '9.1.6', '20': '22.2'}
-SIGNALS = (('channel id', '1_channel_ID', 'channel_ID'), ('pink noise walk', '2_pink_noise_walk', 'pink_noise_walk'),
-           ('polarity and phase', '4_polarity_and_phase', None))
+SIGNALS = (('channel id', '1_channel_ID', 'channel_ID'), ('pink noise walk', '2_pink_noise_walk', 'pink_noise_walk'))
+# Not routing signals: polarity-and-phase files sound on channel pairs at once, which verify_chid.py's rule (one loud
+# channel per segment) can't judge; the pack records no routing result for them either.
+NOT_ROUTING = ('polarity and phase',)
 # Folders whose files hold channel-ID content without saying so in the name (MANIFEST.csv notes; the pack's own routing record)
 CHID_CONTENT = ('04 Dolby and DTS', '06 Edge cases/1 Channel masks', '06 Edge cases/7 Tags and artwork')
 
@@ -143,6 +149,8 @@ def resolve_segments(rel, rate, names, layouts=None):
     """The segments file (a name from `names`) that describes `rel` (path relative to the pack), or None.
     `layouts` maps a segments file name to its 'layout' field (needed only for the AC-3 channel modes)."""
     name = rel.split('/')[-1].lower()
+    if any(k in name for k in NOT_ROUTING):
+        return None
     signal = next((s for s in SIGNALS if s[0] in name), None)
     names = set(names)
     m = re.search(r'mode (\d-\d)( \+ lfe)?', name)
@@ -309,18 +317,18 @@ def build_evidence(env, files, chid, checks, signal, render, captures, config=()
                 counts[f.get('open_class')] = counts.get(f.get('open_class'), 0) + 1
             c['classes'] = counts
     ran = [r for r in chid if r.get('ok') is not None]
-    claims.append(_claim('source-routing', 'Each channel-ID test file carries every voice on the channel its layout labels (FFmpeg and Core Audio decoders)',
-                         ran, lambda r: r.get('ok'), [f'{EV}/chid-source.jsonl'], 'verify_chid.py was not run on the source files'))
+    per_file = {}
+    for r in ran:
+        per_file[r['rel']] = per_file.get(r['rel'], False) or bool(r['ok'])
+    claims.append(_claim('source-routing', 'Each channel-ID test file carries every voice on the channel its layout labels, '
+                         'confirmed by at least one independent decoder (FFmpeg, or Core Audio where it opens the file)',
+                         [{'rel': k, 'ok': v} for k, v in sorted(per_file.items())], lambda r: r['ok'],
+                         [f'{EV}/chid-source.jsonl'], 'verify_chid.py was not run on the source files'))
     for c in claims:
         if c['id'] == 'source-routing' and c['status'] == 'MEASURED':
             for dec in ('FF', 'CA'):
                 rows = [r for r in ran if r.get('decoder') == dec]
                 c[dec] = {'total': len(rows), 'pass': sum(1 for r in rows if r['ok'])}
-            files_ok = {}
-            for r in ran:
-                files_ok[r['rel']] = files_ok.get(r['rel'], False) or bool(r['ok'])
-            c['files'] = len(files_ok)
-            c['files_passing_some_decoder'] = sum(files_ok.values())
             rep = [r for r in ran if r.get('manifest')]
             c['matches_pack_record'] = {'total': len(rep), 'same': sum(1 for r in rep if r['manifest'] == ('PASS' if r['ok'] else 'FAIL'))}
     rran = [r for r in render if r.get('ok') is not None]
@@ -394,8 +402,6 @@ def render_markdown(ev, details=None, limit=40):
         for k in ('FF', 'CA'):
             if k in c:
                 L.append(f"  - {k} decoder: {c[k]['pass']}/{c[k]['total']} pass")
-        if 'files' in c:
-            L.append(f"  - files passing with at least one independent decoder: {c['files_passing_some_decoder']}/{c['files']}")
         if 'matches_pack_record' in c:
             m = c['matches_pack_record']
             L.append(f"  - same result as the pack's own MANIFEST.csv record: {m['same']}/{m['total']}")
@@ -767,8 +773,10 @@ def details_for(files, chid, render, signal, config=()):
             ch = {x for x in (ff.get('channels'), v.get('channels'), man.get('channels')) if x}
             if len(ch) > 1:
                 d['format-identification'].append(f"{nm(f['rel'])}: FFmpeg {ff.get('channels')} ch, Vespertine {v.get('channels')} ch, manifest {man.get('channels')} ch")
-    d['source-routing'] = [f"{r['decoder']} FAIL{' (pack recorded ' + r['manifest'] + ')' if r.get('manifest') else ''}: {nm(r['rel'])} [{r.get('layout')}]"
-                           for r in chid if r.get('ok') is False]
+    confirmed = {r['rel'] for r in chid if r.get('ok')}
+    d['source-routing'] = [f"no decoder confirms: {nm(rel)}" for rel in sorted({r['rel'] for r in chid if r.get('ok') is not None} - confirmed)]
+    d['source-routing'] += [f"{r['decoder']} FAIL{' (the pack recorded ' + r['manifest'] + ')' if r.get('manifest') else ''}: {nm(r['rel'])} [{r.get('layout')}]"
+                            for r in chid if r.get('ok') is False]
     for variant, cid in (('decoder', 'decoder-labels'), ('discrete', 'engine-routing-render')):
         d[cid] = [f"FAIL: {nm(r['rel'])}: {r.get('error') or r.get('layout')}" for r in render
                   if r.get('ok') is False and (r.get('variant') or 'discrete') == variant]
