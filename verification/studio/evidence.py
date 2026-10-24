@@ -260,7 +260,7 @@ def compare_configuration(row):
 # Where a channel-ID voice (FFmpeg's speaker name, as in the segments) may land, in Vespertine's short channel names.
 # Core Audio has two 7.1 conventions (back = Lrs/Rrs and side = Ls/Rs, or back = Ls/Rs and side = Lsd/Rsd), so the
 # back and side pairs each accept both; two voices on the same output are caught separately (SHARED).
-EXPECT = {'FL': {'L'}, 'FR': {'R'}, 'FC': {'C'}, 'LFE': {'LFE'}, 'LFE2': {'LFE'}, 'BL': {'Ls', 'Lrs'}, 'BR': {'Rs', 'Rrs'},
+EXPECT = {'FL': {'L'}, 'FR': {'R'}, 'FC': {'C', 'M'}, 'LFE': {'LFE'}, 'LFE2': {'LFE'}, 'BL': {'Ls', 'Lrs'}, 'BR': {'Rs', 'Rrs'},
           'SL': {'Ls', 'Lsd'}, 'SR': {'Rs', 'Rsd'}, 'BC': {'Cs'}, 'FLC': {'Lc'}, 'FRC': {'Rc'}, 'WL': {'Lw'}, 'WR': {'Rw'},
           'FLW': {'Lw'}, 'FRW': {'Rw'}, 'SDL': {'Lsd'}, 'SDR': {'Rsd'}, 'TC': {'Top', 'Ctm'}, 'TFL': {'Ltf'}, 'TFR': {'Rtf'},
           'TFC': {'Ctf'}, 'TBL': {'Ltr'}, 'TBR': {'Rtr'}, 'TBC': {'Ctr'}, 'TSL': {'Lts'}, 'TSR': {'Rts'}}
@@ -277,6 +277,10 @@ def judge_placement(voices, levels, labels, src_levels=None, lossy=False):
     least 60 dB down, 15 for lossy codecs), that output carries its speaker's name (or, unlabelled, its position), no
     other voice shares it, and its level is the source's (within 0.5 dB, 1.5 for lossy and DSD)."""
     floor, tol = (15, 1.5) if lossy else (60, 0.5)
+    # One surround pair only: back and side name the same speakers (verify_chid.py's rule too).
+    pairs = [p for p in (('Ls', 'Rs'), ('Lsd', 'Rsd'), ('Lrs', 'Rrs')) if p[0] in labels or p[1] in labels]
+    surround = {'Ls', 'Rs', 'Lsd', 'Rsd', 'Lrs', 'Rrs'}
+    one_pair = len(pairs) == 1
     out = []
     for i, ((name, pos), lev) in enumerate(zip(voices, levels)):
         loud = max(range(len(lev)), key=lambda c: lev[c])
@@ -291,7 +295,11 @@ def judge_placement(voices, levels, labels, src_levels=None, lossy=False):
         if also:
             v['issues'].append('SPREAD')
             v['also'] = also
-        placed = (pos is not None and loud == pos) if _unlabelled(v['label']) else v['label'] in EXPECT.get(name, {name})
+        want = set(EXPECT.get(name, {name}))
+        if one_pair and want & surround:
+            left = name in ('BL', 'SL')
+            want |= {x for x in surround if x.startswith('L') == left}
+        placed = (pos is not None and loud == pos) if _unlabelled(v['label']) else v['label'] in want
         if not placed:
             v['issues'].append('MOVED')
         src = src_levels[i] if src_levels and i < len(src_levels) else None
@@ -939,14 +947,21 @@ def details_for(files, chid, render, signal, config=()):
         if v.get('opened'):
             ch = {x for x in (ff.get('channels'), v.get('channels'), man.get('channels')) if x}
             if len(ch) > 1:
-                d['format-identification'].append(f"{nm(f['rel'])}: FFmpeg {ff.get('channels')} ch, Vespertine {v.get('channels')} ch, manifest {man.get('channels')} ch")
+                dec = re.search(r'\[decoded ([\d.]+) s\]', f.get('vsh_analyze_raw') or '')
+                d['format-identification'].append(f"{nm(f['rel'])}: FFmpeg {ff.get('channels')} ch {ff.get('codec')}, Vespertine {v.get('channels')} ch "
+                                                  f"via {v.get('decoder')}{f' (decodes {dec.group(1)} s)' if dec else ''}, manifest {man.get('channels')} ch")
     confirmed = {r['rel'] for r in chid if r.get('ok')}
     d['source-routing'] = [f"no decoder confirms: {nm(rel)}" for rel in sorted({r['rel'] for r in chid if r.get('ok') is not None} - confirmed)]
     d['source-routing'] += [f"{r['decoder']} FAIL{' (the pack recorded ' + r['manifest'] + ')' if r.get('manifest') else ''}: {nm(r['rel'])} [{r.get('layout')}]"
                             for r in chid if r.get('ok') is False]
     for variant, cid in (('decoder', 'decoder-labels'), ('discrete', 'engine-routing-render')):
-        d[cid] = [f"{nm(r['rel'])}: {r.get('error') or r.get('summary')}" for r in render
-                  if r.get('ok') is False and (r.get('variant') or 'discrete') == variant]
+        # the same problem in many files (every 7.1 rate, every container) is one line: count, problem, an example
+        groups = {}
+        for r in render:
+            if r.get('ok') is False and (r.get('variant') or 'discrete') == variant:
+                groups.setdefault(r.get('error') or r.get('summary') or '?', []).append(r)
+        d[cid] = [f"{len(rows)} file{'s' if len(rows) > 1 else ''}: {problem} (e.g. {nm(rows[0]['rel'])})"
+                  for problem, rows in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0]))]
     d['device-configuration-readback'] = []
     for r in config:
         if r.get('verdict') == 'MISMATCH':

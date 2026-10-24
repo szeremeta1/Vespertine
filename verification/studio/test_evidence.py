@@ -192,6 +192,15 @@ class Placement(unittest.TestCase):
         r = evidence.judge_placement(self.v51, levels, self.l51)
         self.assertIn("SHARED", r["voices"][5]["issues"])
 
+    def test_mono_and_single_surround_pair(self):
+        # a mono file's only channel (M) holds the centre voice; with one surround pair, back and side are the same speakers
+        self.assertTrue(evidence.judge_placement([("FC", 0)], [[-20.0]], ["M"])["ok"])
+        r = evidence.judge_placement(self.v51, [lv(6, i) for i in range(6)], ["L", "R", "C", "LFE", "Lsd", "Rsd"])
+        self.assertTrue(r["ok"], r)
+        voices = [("FL", 0), ("FR", 1), ("FC", 2), ("LFE", 3), ("BL", 4), ("BR", 5), ("SL", 6), ("SR", 7)]
+        r = evidence.judge_placement(voices, [lv(8, i) for i in range(8)], ["L", "R", "C", "LFE", "Lsd", "Rsd", "Lrs", "Rrs"])
+        self.assertIn("MOVED", r["voices"][4]["issues"])   # two pairs: the back voice on a side output is moved
+
     def test_summary_line(self):
         voices = [("FL", 0), ("LFE", 1)]
         r = evidence.judge_placement(voices, [lv(2, 0), [NEG, NEG]], ["L", "R"])
