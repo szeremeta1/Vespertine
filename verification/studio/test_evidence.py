@@ -133,6 +133,71 @@ class Configuration(unittest.TestCase):
         self.assertEqual(evidence.compare_configuration({"file": "/a.ec3", "error": "system-rendered Atmos"})["verdict"], "NOT-CHECKED")
 
 
+NEG = float("-inf")
+
+
+def lv(n, at, level=-20.0, others=NEG, extra=None):
+    """One segment's per-output levels: `level` dB on output `at`, `others` elsewhere, `extra` {output: dB}."""
+    row = [others] * n
+    row[at] = level
+    for k, v in (extra or {}).items():
+        row[k] = v
+    return row
+
+
+class Placement(unittest.TestCase):
+    """Where each voice of a channel-ID render lands: output index, its label, level, and whether it is alone there."""
+    v51 = [("FL", 0), ("FR", 1), ("FC", 2), ("LFE", 3), ("BL", 4), ("BR", 5)]
+    l51 = ["L", "R", "C", "LFE", "Ls", "Rs"]
+
+    def test_exact(self):
+        r = evidence.judge_placement(self.v51, [lv(6, i) for i in range(6)], self.l51, src_levels=[-20.0] * 6)
+        self.assertTrue(r["ok"], r)
+        self.assertEqual([v["out"] for v in r["voices"]], [1, 2, 3, 4, 5, 6])
+
+    def test_side_pair_on_rear_outputs_at_minus_3_db(self):
+        voices = [("FL", 0), ("FR", 1), ("FC", 2), ("LFE", 3), ("BL", 4), ("BR", 5), ("SL", 6), ("SR", 7)]
+        labels = ["L", "R", "C", "LFE", "Ls", "Rs", "Lrs", "Rrs"]
+        levels = [lv(8, i) for i in range(6)] + [lv(8, 6, -23.0), lv(8, 7, -23.0)]
+        r = evidence.judge_placement(voices, levels, labels, src_levels=[-20.0] * 8)
+        self.assertFalse(r["ok"])
+        sl = r["voices"][6]
+        self.assertIn("MOVED", sl["issues"])
+        self.assertIn("GAIN -3.0 dB", sl["issues"])
+        self.assertEqual(r["voices"][4]["issues"], [])   # BL on Ls is right in the WAVE convention
+
+    def test_spread(self):
+        voices = [("FL", 0), ("FR", 1), ("FC", 2), ("BC", 3)]
+        levels = [lv(4, 0), lv(4, 1), lv(4, 0, -28.1, extra={1: -28.1}), lv(4, 2, -28.8, extra={3: -28.8})]
+        r = evidence.judge_placement(voices, levels, ["L", "R", "Ls", "Rs"])
+        self.assertIn("SPREAD", r["voices"][2]["issues"])
+
+    def test_lost(self):
+        r = evidence.judge_placement([("FL", 0), ("FR", 1), ("LFE", 2)], [lv(3, 0), lv(3, 1), [NEG] * 3], ["L", "R", "C"])
+        self.assertEqual(r["voices"][2]["issues"], ["LOST"])
+
+    def test_unlabelled_outputs_match_by_position(self):
+        r = evidence.judge_placement(self.v51, [lv(6, i) for i in range(6)], ["·"] * 6)
+        self.assertTrue(r["ok"], r)
+        r = evidence.judge_placement(self.v51, [lv(6, (i + 1) % 6) for i in range(6)], [str(i + 1) for i in range(6)])
+        self.assertFalse(r["ok"])
+
+    def test_lossy_floor(self):
+        levels = [lv(6, i) for i in range(5)] + [lv(6, 5, -20.8, extra={4: -40.4})]
+        self.assertTrue(evidence.judge_placement(self.v51, levels, self.l51, lossy=True)["ok"])
+        self.assertFalse(evidence.judge_placement(self.v51, levels, self.l51)["ok"])
+
+    def test_shared_output(self):
+        levels = [lv(6, i) for i in range(5)] + [lv(6, 4)]
+        r = evidence.judge_placement(self.v51, levels, self.l51)
+        self.assertIn("SHARED", r["voices"][5]["issues"])
+
+    def test_summary_line(self):
+        voices = [("FL", 0), ("LFE", 1)]
+        r = evidence.judge_placement(voices, [lv(2, 0), [NEG, NEG]], ["L", "R"])
+        self.assertEqual(evidence.placement_summary(r), "LFE lost")
+
+
 class Segments(unittest.TestCase):
     names = ["2.0-1_channel_ID-48000.json", "2.0-1_channel_ID-96000.json", "5.1-1_channel_ID-48000.json",
              "5.1-1_channel_ID-96000.json", "5.1side-1_channel_ID-48000.json", "5.1side-2_pink_noise_walk-48000.json",

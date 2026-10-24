@@ -16,6 +16,64 @@ import Foundation
 import Testing
 @testable import VespertineAudio
 
+/// A float32 interleaved CAF written byte for byte from the converter's output, with its channel layout and true rate.
+/// (AVAudioFile wrote a 192 kHz header for 352.8 kHz DSD-to-PCM output, which made the file 1.8 times too long.)
+final class CAFWriter {
+    let handle: FileHandle
+    let dataSizeOffset: UInt64
+    var bytes: UInt64 = 0
+
+    init(_ url: URL, rate: Double, channels: Int, layout: AVAudioChannelLayout?) throws {
+        FileManager.default.createFile(atPath: url.path, contents: nil)
+        handle = try FileHandle(forWritingTo: url)
+        var d = Data()
+        func u16(_ v: UInt16) { withUnsafeBytes(of: v.bigEndian) { d.append(contentsOf: $0) } }
+        func u32(_ v: UInt32) { withUnsafeBytes(of: v.bigEndian) { d.append(contentsOf: $0) } }
+        func i64(_ v: Int64) { withUnsafeBytes(of: v.bigEndian) { d.append(contentsOf: $0) } }
+        func f64(_ v: Double) { u32(UInt32(v.bitPattern >> 32)); u32(UInt32(v.bitPattern & 0xFFFF_FFFF)) }
+        func f32(_ v: Float) { u32(v.bitPattern) }
+        func tag(_ s: String) { d.append(contentsOf: Array(s.utf8)) }
+        tag("caff"); u16(1); u16(0)
+        tag("desc"); i64(32)
+        f64(rate); tag("lpcm"); u32(1 | 2)   // kCAFLinearPCMFormatFlagIsFloat | IsLittleEndian
+        u32(UInt32(4 * channels)); u32(1); u32(UInt32(channels)); u32(32)
+        let acl = layout?.layout.pointee
+        let tagValue = acl?.mChannelLayoutTag ?? (channels == 1 ? kAudioChannelLayoutTag_Mono
+                                                  : channels == 2 ? kAudioChannelLayoutTag_Stereo
+                                                  : kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels))
+        let count = tagValue == kAudioChannelLayoutTag_UseChannelDescriptions ? Int(acl?.mNumberChannelDescriptions ?? 0) : 0
+        tag("chan"); i64(Int64(12 + 20 * count))
+        u32(tagValue); u32(acl?.mChannelBitmap.rawValue ?? 0); u32(UInt32(count))
+        if count > 0, let layout {
+            // The descriptions run past the struct's one-element array: read them through the layout's own pointer.
+            let descs = (UnsafeRawPointer(layout.layout) + MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!)
+                .assumingMemoryBound(to: AudioChannelDescription.self)
+            for i in 0..<count {
+                u32(descs[i].mChannelLabel); u32(descs[i].mChannelFlags.rawValue)
+                f32(descs[i].mCoordinates.0); f32(descs[i].mCoordinates.1); f32(descs[i].mCoordinates.2)
+            }
+        }
+        tag("data")
+        dataSizeOffset = UInt64(d.count)
+        i64(-1); u32(0)   // size patched on close; edit count
+        handle.write(d)
+    }
+
+    func write(_ buffer: AVAudioPCMBuffer) {
+        let list = UnsafeMutableAudioBufferListPointer(buffer.mutableAudioBufferList)
+        guard let first = list.first, let data = first.mData else { return }
+        let n = Int(buffer.frameLength) * Int(buffer.format.streamDescription.pointee.mBytesPerFrame)
+        handle.write(Data(bytes: data, count: n))
+        bytes += UInt64(n)
+    }
+
+    func close() {
+        try? handle.seek(toOffset: dataSizeOffset)
+        withUnsafeBytes(of: Int64(bytes + 4).bigEndian) { handle.write(Data($0)) }
+        try? handle.close()
+    }
+}
+
 @Suite("Studio routing render (opt-in)")
 struct StudioRoutingTests {
     static let list = ProcessInfo.processInfo.environment["VESPERTINE_STUDIO_RENDER"]
@@ -48,7 +106,8 @@ struct StudioRoutingTests {
         converter.sampleRateConverterQuality = .max
         converter.downmix = true
         converter.dither = false
-        let file = try AVAudioFile(forWriting: dest, settings: outFormat.settings, commonFormat: .pcmFormatFloat32, interleaved: true)
+        let file = try CAFWriter(dest, rate: rate, channels: channels, layout: outFormat.channelLayout)
+        defer { file.close() }
         var ended = false, frames = 0
         while true {
             output.frameLength = 0
@@ -59,7 +118,7 @@ struct StudioRoutingTests {
                 s.pointee = .haveData
                 return input
             }
-            if output.frameLength > 0 { try file.write(from: output); frames += Int(output.frameLength) }
+            if output.frameLength > 0 { file.write(output); frames += Int(output.frameLength) }
             if status == .error || status == .endOfStream || (output.frameLength == 0 && ended) { break }
         }
         return ["file": url.path, "variant": variant.rawValue, "out": dest.path, "frames": frames,

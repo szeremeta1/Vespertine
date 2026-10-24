@@ -295,7 +295,7 @@ if (( want_evidence )) && [[ -f $OUT/evidence/files.jsonl ]]; then
     (( rc == 0 )) && rec "routing render" PASS "$(grep -m1 'studio render:' "$OUT/render-test.log" | sed 's/.*studio render: //')" "render-test.log" \
                   || rec "routing render" FAIL "exit $rc, see render-test.log" "render-test.log"
     $PY -I "$EVIDENCE" render-check --library "$LIB" --out "$OUT" --python "$PY" --jobs 4 > "$OUT/evidence-render.log" 2>&1
-    tail -1 "$OUT/evidence-render.log" | sed 's/^/  /'
+    tail -2 "$OUT/evidence-render.log" | sed 's/^/  /'
   elif (( want_render )); then
     rec "routing render" SKIP "no channel-ID files resolved (verify_chid step did not run)"
   fi

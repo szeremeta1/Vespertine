@@ -255,6 +255,84 @@ def compare_configuration(row):
     return out
 
 
+# ------------------------------------------------------------------ voice placement in a render (pure)
+
+# Where a channel-ID voice (FFmpeg's speaker name, as in the segments) may land, in Vespertine's short channel names.
+# Core Audio has two 7.1 conventions (back = Lrs/Rrs and side = Ls/Rs, or back = Ls/Rs and side = Lsd/Rsd), so the
+# back and side pairs each accept both; two voices on the same output are caught separately (SHARED).
+EXPECT = {'FL': {'L'}, 'FR': {'R'}, 'FC': {'C'}, 'LFE': {'LFE'}, 'LFE2': {'LFE'}, 'BL': {'Ls', 'Lrs'}, 'BR': {'Rs', 'Rrs'},
+          'SL': {'Ls', 'Lsd'}, 'SR': {'Rs', 'Rsd'}, 'BC': {'Cs'}, 'FLC': {'Lc'}, 'FRC': {'Rc'}, 'WL': {'Lw'}, 'WR': {'Rw'},
+          'FLW': {'Lw'}, 'FRW': {'Rw'}, 'SDL': {'Lsd'}, 'SDR': {'Rsd'}, 'TC': {'Top', 'Ctm'}, 'TFL': {'Ltf'}, 'TFR': {'Rtf'},
+          'TFC': {'Ctf'}, 'TBL': {'Ltr'}, 'TBR': {'Rtr'}, 'TBC': {'Ctr'}, 'TSL': {'Lts'}, 'TSR': {'Rts'}}
+NEG_INF = float('-inf')
+
+
+def _unlabelled(label):
+    return label in (None, '', '·', '?') or str(label).isdigit()
+
+
+def judge_placement(voices, levels, labels, src_levels=None, lossy=False):
+    """voices: [(speaker, position in the file)] per segment; levels: per segment, the level (dB) of every output;
+    labels: each output's channel name. A voice is right when it is loud on exactly one output (every other output at
+    least 60 dB down, 15 for lossy codecs), that output carries its speaker's name (or, unlabelled, its position), no
+    other voice shares it, and its level is the source's (within 0.5 dB, 1.5 for lossy and DSD)."""
+    floor, tol = (15, 1.5) if lossy else (60, 0.5)
+    out = []
+    for i, ((name, pos), lev) in enumerate(zip(voices, levels)):
+        loud = max(range(len(lev)), key=lambda c: lev[c])
+        level = lev[loud]
+        v = {'voice': name, 'out': loud + 1, 'label': labels[loud] if loud < len(labels) else '?',
+             'level': round(level, 1) if level != NEG_INF else None, 'issues': []}
+        if level == NEG_INF or level < -60:
+            v.update({'out': None, 'label': None, 'issues': ['LOST']})
+            out.append(v)
+            continue
+        also = [c + 1 for c in range(len(lev)) if c != loud and lev[c] > level - floor]
+        if also:
+            v['issues'].append('SPREAD')
+            v['also'] = also
+        placed = (pos is not None and loud == pos) if _unlabelled(v['label']) else v['label'] in EXPECT.get(name, {name})
+        if not placed:
+            v['issues'].append('MOVED')
+        src = src_levels[i] if src_levels and i < len(src_levels) else None
+        if src is not None and src != NEG_INF:
+            d = level - src
+            v['gain_db'] = round(d, 1)
+            if abs(d) > tol:
+                v['issues'].append(f'GAIN {d:.1f} dB')
+        out.append(v)
+    seen = {}
+    for v in out:
+        if v['out'] is not None:
+            seen.setdefault(v['out'], []).append(v)
+    for group in seen.values():
+        if len(group) > 1:
+            for v in group:
+                v['issues'].append('SHARED')
+    return {'ok': all(not v['issues'] for v in out), 'voices': out}
+
+
+def placement_summary(r):
+    """The problems in one line: 'SL on out 7 (Lrs) -3.0 dB; LFE lost'."""
+    parts = []
+    for v in r['voices']:
+        iss = v['issues']
+        if not iss:
+            continue
+        if 'LOST' in iss:
+            parts.append(f"{v['voice']} lost")
+            continue
+        bits = [f"{v['voice']} on out {v['out']} ({v['label']})"]
+        if 'SPREAD' in iss:
+            bits.append(f"also on out {', '.join(map(str, v.get('also', [])))}")
+        if any(x.startswith('GAIN') for x in iss):
+            bits.append(f"{v['gain_db']:+.1f} dB")
+        if 'SHARED' in iss:
+            bits.append('shared')
+        parts.append(' '.join(bits))
+    return '; '.join(parts)
+
+
 # ------------------------------------------------------------------ report (pure)
 
 def _private(rel):
@@ -333,12 +411,12 @@ def build_evidence(env, files, chid, checks, signal, render, captures, config=()
             c['matches_pack_record'] = {'total': len(rep), 'same': sum(1 for r in rep if r['manifest'] == ('PASS' if r['ok'] else 'FAIL'))}
     rran = [r for r in render if r.get('ok') is not None]
     render_files = [f'{EV}/render-check.jsonl', 'render/render.jsonl', 'render-test.log']
-    claims.append(_claim('decoder-labels', "Vespertine's own decoder labels every channel of each channel-ID file with the speaker it holds "
-                         '(its decoded output, checked offline)', [r for r in rran if r.get('variant') == 'decoder'], lambda r: r.get('ok'),
+    claims.append(_claim('decoder-labels', "Vespertine's own decoder delivers each voice of each channel-ID file alone on one channel that carries "
+                         "its speaker's name (or, unlabelled, its position), at the source's level (its decoded output, checked offline)", [r for r in rran if r.get('variant') == 'decoder'], lambda r: r.get('ok'),
                          render_files, 'StudioRoutingTests render not run in this run'))
     claims.append(_claim('engine-routing-render', "Vespertine's multichannel converter, set up as the engine sets it up for a discrete N-channel output "
-                         'with no speaker layout configured, puts each voice on the output channel labelled with its speaker '
-                         '(offline; ends where the device I/O begins)', [r for r in rran if r.get('variant') != 'decoder'],
+                         "with no speaker layout configured, puts each voice alone on one output that carries its speaker's name, at the "
+                         "source's level (offline; ends where the device I/O begins)", [r for r in rran if r.get('variant') != 'decoder'],
                          lambda r: r.get('ok'), render_files, 'StudioRoutingTests render not run in this run'))
     dev = env.get('signal_device')
     on = f' ({dev})' if dev else ''
@@ -536,6 +614,11 @@ def inspect_file(library, pack, rel_lib, sums, manifest, probe):
         row['vsh_raw'] = (so + se)[-2000:]
         row['vsh_rc'] = rc
         row['open_class'] = classify_open(rel, row['vsh'], rc if rc is not None else 255)
+        ff_ch = (row.get('ffprobe') or {}).get('channels')
+        if (row.get('vsh') or {}).get('opened') and ff_ch and row['vsh'].get('channels') != ff_ch:
+            # Vespertine sees a different channel count than FFmpeg: record what it actually decodes from the file
+            rc, so, se = run([probe, 'analyze', path], timeout=900)
+            row['vsh_analyze_raw'] = (so + se)[-2000:]
     return row
 
 
@@ -627,40 +710,119 @@ def step_render_list(a):
     return 0
 
 
+def read_caf_float(path):
+    """(samples as float32 [frames, channels], rate) from a float32 interleaved CAF as StudioRoutingTests writes it."""
+    import numpy as np
+    import struct
+    d = open(path, 'rb').read()
+    pos, rate, nch, data = 8, None, None, None
+    while pos + 12 <= len(d):
+        cid, size = d[pos:pos + 4], struct.unpack('>q', d[pos + 4:pos + 12])[0]
+        body = d[pos + 12: pos + 12 + size] if size >= 0 else d[pos + 12:]
+        if cid == b'desc':
+            rate = struct.unpack('>d', body[:8])[0]
+            nch = struct.unpack('>I', body[24:28])[0]
+        elif cid == b'data':
+            data = body[4:]
+        pos += 12 + (size if size >= 0 else len(d))
+    x = np.frombuffer(data[:len(data) // (4 * nch) * 4 * nch], '<f4').reshape(-1, nch)
+    return x, rate
+
+
+def _lowpass_48k(x, rate):
+    """DSD-to-PCM rates carry ultrasonic noise that swamps quiet channels: resample to 48 kHz with FFmpeg, as verify_chid.py does."""
+    import numpy as np
+    n = x.shape[1]
+    p = subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-f', 'f32le', '-ar', str(int(rate)), '-ac', str(n), '-i', '-',
+                        '-af', 'aresample=48000', '-f', 'f32le', '-acodec', 'pcm_f32le', '-'],
+                       input=np.ascontiguousarray(x).tobytes(), capture_output=True, check=True)
+    return np.frombuffer(p.stdout, '<f4').reshape(-1, n), 48000
+
+
+def segment_levels(x, rate, segments):
+    """Per segment: every channel's RMS level in dB over the segment (50 ms in from each end)."""
+    import numpy as np
+    out = []
+    for _, t0, t1 in segments:
+        a, b = int((t0 + 0.05) * rate), int((t1 - 0.05) * rate)
+        seg = x[a:b].astype(np.float64)
+        rms = np.sqrt(np.mean(np.square(seg), axis=0)) if len(seg) else np.zeros(x.shape[1])
+        out.append([float(20 * np.log10(v)) if v > 0 else NEG_INF for v in rms])
+    return out
+
+
+def decode_ffmpeg_f32(path):
+    """(samples, rate) of a source file decoded by FFmpeg; DSD and rates above 192 kHz low-passed to 48 kHz."""
+    import numpy as np
+    pr = json.loads(subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a:0', '-show_entries', 'stream=channels,sample_rate',
+                                    '-of', 'json', path], capture_output=True, text=True).stdout)['streams'][0]
+    n, rate = int(pr['channels']), int(pr['sample_rate'])
+    af = []
+    if rate > 192000 or path.lower().endswith(('.dsf', '.dff')):
+        af, rate = ['-af', 'aresample=48000'], 48000
+    raw = subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-i', path, '-map', '0:a:0'] + af + ['-f', 'f32le', '-acodec', 'pcm_f32le', '-'],
+                         capture_output=True, check=True).stdout
+    return np.frombuffer(raw, '<f4').reshape(-1, n), rate
+
+
+LOSSY_CODECS = ('aac', 'opus', 'vorbis', 'ac3', 'eac3', 'dts', 'mp3')
+
+
 def step_render_check(a):
     library = os.path.abspath(a.library)
     tdir = tools_dir(library)
-    names, layouts = segment_index(os.path.join(tdir, 'segments'))
     chid = read_jsonl(os.path.join(a.out, EV, 'chid-source.jsonl'))
+    files = {f['path']: f for f in read_jsonl(os.path.join(a.out, EV, 'files.jsonl'))}
     seg_of = {r['path']: r['segments'] for r in chid}
     rel_of = {r['path']: r['rel'] for r in chid}
     rendered = read_jsonl(os.path.join(a.out, 'render', 'render.jsonl'))
-    tmp = tempfile.mkdtemp(prefix='vsh-render-')
+    src_cache = {}
+
+    def source_levels(path, segs):
+        if path not in src_cache:
+            try:
+                x, rate = decode_ffmpeg_f32(path)
+                src_cache[path] = [max(l) if l else None for l in segment_levels(x, rate, segs)]
+            except Exception as e:    # noqa: BLE001 - recorded, not fatal
+                src_cache[path] = None
+        return src_cache[path]
 
     def one(r):
         out = {'rel': rel_of.get(r.get('file'), r.get('file')), 'file': r.get('file'), 'render': r.get('out'), 'variant': r.get('variant'),
-               'plan': r.get('plan'), 'route_layout': r.get('route_layout'), 'decoder_layout': r.get('decoder_layout')}
+               'plan': r.get('plan'), 'route_layout': r.get('route_layout'), 'decoder_layout': r.get('decoder_layout'),
+               'decoder': r.get('decoder')}
         if r.get('error') or not r.get('out'):
-            out.update({'ok': False, 'error': r.get('error') or 'no render'}); return out
-        seg = seg_of.get(r['file'])
-        if not seg:
-            out.update({'ok': None, 'error': 'no segments'}); return out
-        caf = r['out']
-        if (r.get('plan') or {}).get('rate', 48000) > 192000:
-            # DSD renders run at 352.8 kHz and up: resample to 48 kHz first, as verify_chid.py does for DSD itself
-            low = os.path.join(tmp, os.path.basename(caf))
-            rc, so, se = run(['afconvert', '-f', 'caff', '-d', 'LEF32@48000', caf, low], timeout=600)
-            if rc != 0:
-                out.update({'ok': False, 'error': 'afconvert: ' + (se or so)[-300:]}); return out
-            caf, out['resampled_for_check'] = low, 48000
-        res = verify_cmd(a.python, os.path.join(tdir, 'verify_chid.py'), os.path.join(tdir, 'segments', seg), caf, True)
-        out.update({'segments': seg, 'sha256': sha256(r['out']), **res})
+            out.update({'ok': False, 'error': r.get('error') or 'no render'})
+            return out
+        seg_name = seg_of.get(r['file'])
+        if not seg_name:
+            out.update({'ok': None, 'error': 'no segments'})
+            return out
+        seg = json.load(open(os.path.join(tdir, 'segments', seg_name)))
+        segs = seg['segments']
+        voices = [(lab.split()[0], seg['channels'].index(lab.split()[0]) if lab.split()[0] in seg['channels'] else None) for lab, _, _ in segs]
+        try:
+            x, rate = read_caf_float(r['out'])
+            if rate > 192000:
+                x, rate = _lowpass_48k(x, rate)
+                out['resampled_for_check'] = 48000
+            levels = segment_levels(x, rate, segs)
+        except Exception as e:    # noqa: BLE001
+            out.update({'ok': False, 'error': f'could not measure the render: {e}'})
+            return out
+        codec = ((files.get(r['file']) or {}).get('ffprobe') or {}).get('codec') or ''
+        dsd = codec.startswith('dsd') or r['file'].lower().endswith(('.dsf', '.dff'))
+        lossy = codec in LOSSY_CODECS or dsd
+        res = judge_placement(voices, levels, r.get('route_layout') or [], source_levels(r['file'], segs), lossy=lossy)
+        out.update({'segments': seg_name, 'sha256': sha256(r['out']), 'ok': res['ok'], 'placement': res['voices'],
+                    'summary': placement_summary(res), 'tolerance': 'lossy/DSD (15 dB, 1.5 dB)' if lossy else 'lossless (60 dB, 0.5 dB)'})
         return out
     with cf.ThreadPoolExecutor(max_workers=a.jobs) as pool:
         rows = list(pool.map(one, rendered))
-    shutil.rmtree(tmp, ignore_errors=True)
     write_jsonl(os.path.join(ev_dir(a.out), 'render-check.jsonl'), rows)
-    print(f"render check: {sum(1 for r in rows if r.get('ok'))}/{len(rows)} PASS")
+    for v in ('decoder', 'discrete'):
+        rr = [r for r in rows if r.get('variant') == v]
+        print(f"render check ({v}): {sum(1 for r in rr if r.get('ok'))}/{len(rr)} exact")
     return 0
 
 
@@ -723,7 +885,12 @@ def step_captures(a):
             key = LAYOUT_FOLDERS.get(lm.group(1)[:2])
             seg = f'{key}-1_channel_ID-48000.json' if key else None
         seg = seg or (m.group(1).split('/')[-1] if m else None)
-        r = {'run': run_dir, 'capture': os.path.relpath(cap, a.out) if cap.startswith(os.path.abspath(a.out)) else cap,
+        # keep the capture with the report: copy the run folder (WAVs, logs) into captures/<run name>/
+        dest = os.path.join(a.out, 'captures', os.path.basename(os.path.normpath(run_dir)))
+        if not os.path.abspath(run_dir).startswith(os.path.abspath(a.out)):
+            shutil.copytree(run_dir, dest, dirs_exist_ok=True)
+            cap = os.path.join(dest, 'capture.wav')
+        r = {'run': run_dir, 'capture': os.path.relpath(cap, a.out) if os.path.abspath(cap).startswith(os.path.abspath(a.out)) else cap,
              'sha256': sha256(cap), 'segments': seg, 'channels': int(lm.group(2)) if lm else None,
              'original_result': next((l for l in text.splitlines() if l.startswith('RESULT')), None)}
         if seg:
@@ -778,7 +945,7 @@ def details_for(files, chid, render, signal, config=()):
     d['source-routing'] += [f"{r['decoder']} FAIL{' (the pack recorded ' + r['manifest'] + ')' if r.get('manifest') else ''}: {nm(r['rel'])} [{r.get('layout')}]"
                             for r in chid if r.get('ok') is False]
     for variant, cid in (('decoder', 'decoder-labels'), ('discrete', 'engine-routing-render')):
-        d[cid] = [f"FAIL: {nm(r['rel'])}: {r.get('error') or r.get('layout')}" for r in render
+        d[cid] = [f"{nm(r['rel'])}: {r.get('error') or r.get('summary')}" for r in render
                   if r.get('ok') is False and (r.get('variant') or 'discrete') == variant]
     d['device-configuration-readback'] = []
     for r in config:
