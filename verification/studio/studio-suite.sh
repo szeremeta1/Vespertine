@@ -324,6 +324,7 @@ if (( want_evidence )) && [[ -f $OUT/evidence/files.jsonl ]]; then
       rc=$?; rm -f "$chunk"
       if (( rc == 4 )); then print "  the engine's audio I/O did not start in this process: stopping the signal-path step"; break; fi
     done
+    rm -f "$OUT"/evidence/signal-chunk.*(N)
     $PY -I "$EVIDENCE" signal-check --out "$OUT" | sed 's/^/  /'
   elif (( want_signal )); then
     rec "signal path (playing)" SKIP "no virtual output device named '$DEVICE'"

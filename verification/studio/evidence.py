@@ -438,7 +438,7 @@ def build_evidence(env, files, chid, checks, signal, render, captures, config=()
     reason = ('vespertine-probe signal-path not run (needs a virtual output device such as Vespertine Loopback)' if not blocked else
               f"the engine's audio I/O could not start in this process ({blocked[0].get('error')}); "
               'consistent with a process that has no Microphone permission on a device that also has inputs. '
-              f"Evidence: {EV}/signal-path.jsonl, signal-path-stall.txt")
+              f"Evidence: {EV}/signal-path.jsonl, signal-path.log")
     claims.append(_claim('signal-path-readback', 'While playing, the signal path the engine reports (format, rate, bit depth, channels, exclusive) '
                          f'is what Core Audio reports for the device{on}', sp, lambda r: r.get('verdict') == 'MATCH',
                          [f'{EV}/signal-path.jsonl', f'{EV}/signal-path-checked.jsonl'], reason))
@@ -995,6 +995,10 @@ def step_report(a):
     checks = read_checks(out)
     ev = build_evidence(env, files=files, chid=chid, checks=checks, signal=signal, render=render, captures=captures,
                         config=config, extra_unverified=env.get('unverified', []))
+    stall = 'signal-path-stall-sample.txt'   # a `sample` of a blocked probe, when one was saved next to the report
+    for c in ev['claims']:
+        if c['id'] == 'signal-path-readback' and c['status'] == 'UNVERIFIED' and os.path.exists(os.path.join(out, stall)):
+            c['reason'] += f', {stall}'
     with open(os.path.join(out, 'evidence.json'), 'w', encoding='utf-8') as f:
         json.dump(ev, f, indent=1, sort_keys=True)
     with open(os.path.join(out, 'REPORT.md'), 'w', encoding='utf-8') as f:
