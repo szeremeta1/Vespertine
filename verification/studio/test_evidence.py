@@ -131,6 +131,17 @@ class Segments(unittest.TestCase):
         self.assertEqual(self.r("04 Dolby and DTS (FFmpeg encoders)/AC-3 (Dolby Digital)/Every channel mode (acmod x LFE)/01 AC-3 mode 1-0.ac3"),
                          "ac3_1-0_mono-1_channel_ID-48000.json")
 
+    def test_channel_id_content_without_keyword(self):
+        # Dolby/DTS encodes and the channel-mask and tag edge cases hold channel-ID content; their names don't say so
+        self.assertEqual(self.r("04 Dolby and DTS (FFmpeg encoders)/AC-3 (Dolby Digital)/AC-3 5.1 44.1 kHz 448k.ac3", 44100),
+                         "5.1-1_channel_ID-48000.json")
+        self.assertEqual(self.r("04 Dolby and DTS (FFmpeg encoders)/DTS/DTS 2.0 48k 768k.dts"), "2.0-1_channel_ID-48000.json")
+        self.assertEqual(self.r("06 Edge cases/1 Channel masks (5.1 channel ID content)/7.1 - WAV legacy WAVE_FORMAT_PCM, no mask.wav"),
+                         "7.1-1_channel_ID-48000.json")
+        self.assertEqual(self.r("06 Edge cases/7 Tags and artwork on multichannel files/5.1 tagged + cover - FLAC.flac"),
+                         "5.1-1_channel_ID-48000.json")
+        self.assertIsNone(self.r("06 Edge cases/3 Long file/5.1 long.flac"))
+
     def test_unknown(self):
         self.assertIsNone(self.r("08 Real music (your favourites, local use only)/Album/01 Song.flac"))
 
