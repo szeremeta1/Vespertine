@@ -191,30 +191,22 @@ else
 fi
 
 # environment.json: what the report names as the setup
-{
-  print -r -- "{"
-  print -r -- "  \"machine\": \"$(scutil --get LocalHostName 2>/dev/null || hostname -s)\","
-  print -r -- "  \"model\": \"$(sysctl -n hw.model 2>/dev/null)\","
-  print -r -- "  \"macos\": \"$(sw_vers -productVersion) ($(sw_vers -buildVersion))\","
-  print -r -- "  \"arch\": \"$(uname -m)\","
-  print -r -- "  \"swift\": \"$(swift --version 2>&1 | head -1 | sed 's/"/\\"/g')\","
-  print -r -- "  \"commit\": \"$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)\","
-  print -r -- "  \"branch\": \"$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null)\","
-  print -r -- "  \"version\": \"release code of $TAG$( [[ -s $OUT/release-diff.txt ]] && print ' WITH CHANGES (release-diff.txt)' )\","
-  print -r -- "  \"date\": \"$(date '+%Y-%m-%d %H:%M %Z')\","
-  print -r -- "  \"library\": \"${LIB//\"/\\\"}\","
-  print -r -- "  \"signal_device\": \"${DEVICE//\"/\\\"}$( (( DEVICE_OK )) && print ' (virtual, 2 ch)' )\","
-  print -r -- "  \"devices\": \"$(print -r -- ${(j:; :)D_NAME} | sed 's/"/\\"/g')\","
-  print -r -- "  \"unverified\": ["
-  sep=""
-  for u in $UNVERIFIED_EXTRA; do
-    parts=("${(@s:|:)u}")
-    print -r -- "    $sep[\"$parts[1]\", \"${parts[2]//\"/\\\"}\", \"${parts[3]//\"/\\\"}\"]"; sep=","
-  done
-  print -r -- "  ]"
-  print -r -- "}"
-} > "$OUT/environment.json"
-[[ $DEVICE_OK == 1 ]] && sed -i '' "s/ (virtual, 2 ch)/ (virtual, $(grep -A3 "^■ $DEVICE " "$OUT/devices.txt" | grep -oE '[0-9]+ch' | head -1))/" "$OUT/environment.json"
+dev_ch=$(grep -A3 "^■ $DEVICE  " "$OUT/devices.txt" 2>/dev/null | grep -oE '[0-9]+ch' | sort -n | tail -1)
+E_MACHINE="$(scutil --get LocalHostName 2>/dev/null || hostname -s)" E_MODEL="$(sysctl -n hw.model 2>/dev/null)" \
+E_MACOS="$(sw_vers -productVersion) ($(sw_vers -buildVersion))" E_ARCH="$(uname -m)" E_SWIFT="$(swift --version 2>&1 | head -1)" \
+E_COMMIT="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)" E_BRANCH="$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null)" \
+E_VERSION="release code of $TAG$( [[ -s $OUT/release-diff.txt ]] && print ' WITH CHANGES (release-diff.txt)' )" \
+E_DATE="$(date '+%Y-%m-%d %H:%M %Z')" E_LIBRARY="$LIB" E_DEVICE="$DEVICE$( (( DEVICE_OK )) && print " (virtual, ${dev_ch:-?})" )" \
+E_DEVICES="${(j:; :)D_NAME}" E_UNVERIFIED="${(pj:\n:)UNVERIFIED_EXTRA}" \
+$PY -I -c '
+import json, os, sys
+e = os.environ
+keys = ["machine", "model", "macos", "arch", "swift", "commit", "branch", "version", "date", "library", "devices"]
+env = {k: e.get("E_" + k.upper(), "") for k in keys}
+env["signal_device"] = e.get("E_DEVICE", "")
+env["unverified"] = [u.split("|", 2) for u in e.get("E_UNVERIFIED", "").split("\n") if u.count("|") == 2]
+json.dump(env, open(sys.argv[1], "w"), indent=1)
+' "$OUT/environment.json"
 
 # ---------------------------------------------------------------- 3. safe layer
 hdr "3. Safe layer: swift test (fixtures only, no hardware, no audio out)"
