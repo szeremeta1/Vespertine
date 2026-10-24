@@ -92,6 +92,47 @@ class SignalPath(unittest.TestCase):
         self.assertEqual(evidence.compare_signal_path({"file": "/x.iso", "error": "inspect: nope"})["verdict"], "NOT-OPENED")
 
 
+    def test_io_not_started_is_not_a_vespertine_failure(self):
+        row = path_row(engine={"state": "stopped", "error": "the engine's audio I/O did not start within 4 s (...)"})
+        self.assertEqual(evidence.compare_signal_path(row)["verdict"], "IO-NOT-STARTED")
+
+
+def config_row(**over):
+    row = {"file": "/x/5.1 96k.flac", "pid": 7, "stage": "configuration", "hogged": True, "exclusive_requested": True,
+           "computed": {"mode": "pcm", "rate": 96000, "bits": 32, "channels": 2, "device_channels": 2},
+           "readback": {"rate": 96000, "bits": 32, "integer": False, "channels": 2, "hog_pid": 7}}
+    row.update(over)
+    return row
+
+
+class Configuration(unittest.TestCase):
+    def test_match(self):
+        r = evidence.compare_configuration(config_row())
+        self.assertEqual(r["verdict"], "MATCH", r)
+
+    def test_rate(self):
+        r = evidence.compare_configuration(config_row(readback={"rate": 48000, "bits": 32, "integer": False, "channels": 2, "hog_pid": 7}))
+        self.assertEqual(r["verdict"], "MISMATCH")
+        self.assertFalse(r["checks"]["rate"]["ok"])
+
+    def test_bits_and_channels(self):
+        r = evidence.compare_configuration(config_row(readback={"rate": 96000, "bits": 24, "integer": True, "channels": 1, "hog_pid": 7}))
+        self.assertFalse(r["checks"]["bits"]["ok"])
+        self.assertFalse(r["checks"]["channels"]["ok"])
+
+    def test_no_hog(self):
+        r = evidence.compare_configuration(config_row(hogged=False, readback={"rate": 96000, "bits": 32, "integer": False, "channels": 2, "hog_pid": -1}))
+        self.assertFalse(r["checks"]["exclusive"]["ok"])
+
+    def test_apply_error(self):
+        r = evidence.compare_configuration(config_row(apply_error="set rate failed"))
+        self.assertFalse(r["checks"]["apply"]["ok"])
+        self.assertEqual(r["verdict"], "MISMATCH")
+
+    def test_not_checked(self):
+        self.assertEqual(evidence.compare_configuration({"file": "/a.ec3", "error": "system-rendered Atmos"})["verdict"], "NOT-CHECKED")
+
+
 class Segments(unittest.TestCase):
     names = ["2.0-1_channel_ID-48000.json", "2.0-1_channel_ID-96000.json", "5.1-1_channel_ID-48000.json",
              "5.1-1_channel_ID-96000.json", "5.1side-1_channel_ID-48000.json", "5.1side-2_pink_noise_walk-48000.json",
@@ -184,6 +225,20 @@ class Report(unittest.TestCase):
             # a skipped check is never reported as measured
             measured = md[md.index("## MEASURED"):md.index("## UNVERIFIED")]
             self.assertNotIn("HardwareAuditTests", measured)
+
+    def test_render_variants_config_and_blocked_io(self):
+        env = {"machine": "m", "macos": "27", "commit": "c", "date": "d", "signal_device": "Vespertine Loopback"}
+        render = [{"rel": "01 Layouts/a.flac", "variant": "decoder", "ok": True},
+                  {"rel": "01 Layouts/a.flac", "variant": "discrete", "ok": False}]
+        config = [{"verdict": "MATCH"}, {"verdict": "MATCH"}, {"verdict": "NOT-CHECKED"}]
+        signal = [{"verdict": "IO-NOT-STARTED", "error": "the engine's audio I/O did not start within 4 s"}]
+        ev = evidence.build_evidence(env, files=[], chid=[], checks=[], signal=signal, render=render, captures=[], config=config)
+        c = {c["id"]: c for c in ev["claims"]}
+        self.assertEqual((c["decoder-labels"]["status"], c["decoder-labels"]["result"]), ("MEASURED", "PASS"))
+        self.assertEqual((c["engine-routing-render"]["status"], c["engine-routing-render"]["result"]), ("MEASURED", "FAIL"))
+        self.assertEqual((c["device-configuration-readback"]["status"], c["device-configuration-readback"]["total"]), ("MEASURED", 2))
+        self.assertEqual(c["signal-path-readback"]["status"], "UNVERIFIED")
+        self.assertIn("did not start", c["signal-path-readback"]["reason"])
 
     def test_measured_failure_stays_measured(self):
         env = {"machine": "m", "macos": "27", "commit": "c", "date": "d"}

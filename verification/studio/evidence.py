@@ -197,8 +197,8 @@ def compare_signal_path(row):
     eng = row['engine']
     plan, applied, hw, comp = eng.get('plan'), eng.get('applied'), row.get('readback') or {}, row.get('computed') or {}
     if not plan or not applied:
-        out['verdict'] = 'NO-PATH'
         out['error'] = eng.get('error')
+        out['verdict'] = 'IO-NOT-STARTED' if 'did not start' in (eng.get('error') or '') else 'NO-PATH'
         return out
     c = out['checks']
 
@@ -218,6 +218,31 @@ def compare_signal_path(row):
     hog_is_us = hw.get('hog_pid') == row.get('pid')
     chk('exclusive', bool(applied.get('exclusive')) == hog_is_us, 'hog = probe' if applied.get('exclusive') else 'no hog',
         'hog = probe' if hog_is_us else f"hog pid {hw.get('hog_pid')}")
+    out['verdict'] = 'MATCH' if all(v['ok'] for v in c.values()) else 'MISMATCH'
+    return out
+
+
+def compare_configuration(row):
+    """Checks one StudioDeviceConfigTests row: the plan FormatPlanner makes for the file on this device, against what
+    Core Audio reports after the engine's own configuration step (exclusive access, DeviceControl.apply). No I/O runs."""
+    out = {'file': row.get('file'), 'checks': {}}
+    comp, hw = row.get('computed'), row.get('readback')
+    if not comp or not hw:
+        out['verdict'] = 'NOT-CHECKED'
+        out['error'] = row.get('error')
+        return out
+    c = out['checks']
+
+    def chk(key, ok, expected, got):
+        c[key] = {'ok': bool(ok), 'expected': expected, 'got': got}
+    chk('apply', not row.get('apply_error'), 'configured', row.get('apply_error') or 'configured')
+    rate = hw.get('rate')
+    chk('rate', rate is not None and abs(rate - comp['rate']) < 0.5, comp['rate'], rate)
+    chk('bits', hw.get('bits') == comp.get('bits'), comp.get('bits'), [hw.get('bits'), 'int' if hw.get('integer') else 'float'])
+    chk('channels', (hw.get('channels') or 0) >= comp['device_channels'], f">= {comp['device_channels']}", hw.get('channels'))
+    if row.get('exclusive_requested', True):
+        chk('exclusive', row.get('hogged') and hw.get('hog_pid') == row.get('pid'), 'hog = this process',
+            'hog = this process' if hw.get('hog_pid') == row.get('pid') else f"hog pid {hw.get('hog_pid')}")
     out['verdict'] = 'MATCH' if all(v['ok'] for v in c.values()) else 'MISMATCH'
     return out
 
@@ -258,7 +283,7 @@ STANDING_UNVERIFIED = [
 ]
 
 
-def build_evidence(env, files, chid, checks, signal, render, captures, extra_unverified=()):
+def build_evidence(env, files, chid, checks, signal, render, captures, config=(), extra_unverified=()):
     claims = []
     hashed = [f for f in files if f.get('sha256')]
     listed = [f for f in hashed if f.get('expected_sha256')]
@@ -299,16 +324,30 @@ def build_evidence(env, files, chid, checks, signal, render, captures, extra_unv
             rep = [r for r in ran if r.get('manifest')]
             c['matches_pack_record'] = {'total': len(rep), 'same': sum(1 for r in rep if r['manifest'] == ('PASS' if r['ok'] else 'FAIL'))}
     rran = [r for r in render if r.get('ok') is not None]
-    claims.append(_claim('engine-routing-render', "Vespertine's own decoder and multichannel converter place each channel on the matching output channel "
-                         '(offline, discrete N-channel output with no speaker layout; ends before the device I/O)',
-                         rran, lambda r: r.get('ok'), [f'{EV}/render-check.jsonl', 'render/render.jsonl', 'render-test.log'],
-                         'StudioRoutingTests render not run in this run'))
-    sp = [r for r in signal if r.get('verdict') in ('MATCH', 'MISMATCH', 'NO-PATH')]
+    render_files = [f'{EV}/render-check.jsonl', 'render/render.jsonl', 'render-test.log']
+    claims.append(_claim('decoder-labels', "Vespertine's own decoder labels every channel of each channel-ID file with the speaker it holds "
+                         '(its decoded output, checked offline)', [r for r in rran if r.get('variant') == 'decoder'], lambda r: r.get('ok'),
+                         render_files, 'StudioRoutingTests render not run in this run'))
+    claims.append(_claim('engine-routing-render', "Vespertine's multichannel converter, set up as the engine sets it up for a discrete N-channel output "
+                         'with no speaker layout configured, puts each voice on the output channel labelled with its speaker '
+                         '(offline; ends where the device I/O begins)', [r for r in rran if r.get('variant') != 'decoder'],
+                         lambda r: r.get('ok'), render_files, 'StudioRoutingTests render not run in this run'))
     dev = env.get('signal_device')
-    claims.append(_claim('signal-path-readback', 'The signal path Vespertine computes (format, rate, bit depth, channels, exclusive) is what Core Audio reports for the device'
-                         + (f' ({dev})' if dev else ''), sp, lambda r: r.get('verdict') == 'MATCH',
-                         [f'{EV}/signal-path.jsonl', f'{EV}/signal-path-checked.jsonl'],
-                         'vespertine-probe signal-path not run (needs a virtual output device such as Vespertine Loopback)'))
+    on = f' ({dev})' if dev else ''
+    cfg = [r for r in config if r.get('verdict') in ('MATCH', 'MISMATCH')]
+    claims.append(_claim('device-configuration-readback', 'For each file, the output format Vespertine plans (rate, bit depth, channels, exclusive access) '
+                         f'is what Core Audio reports once the engine has configured the device{on}; no audio played',
+                         cfg, lambda r: r.get('verdict') == 'MATCH', [f'{EV}/device-config.jsonl', f'{EV}/device-config-checked.jsonl', 'config-test.log'],
+                         'StudioDeviceConfigTests not run (needs a virtual output device such as Vespertine Loopback)'))
+    sp = [r for r in signal if r.get('verdict') in ('MATCH', 'MISMATCH', 'NO-PATH')]
+    blocked = [r for r in signal if r.get('verdict') == 'IO-NOT-STARTED']
+    reason = ('vespertine-probe signal-path not run (needs a virtual output device such as Vespertine Loopback)' if not blocked else
+              f"the engine's audio I/O could not start in this process ({blocked[0].get('error')}); "
+              'consistent with a process that has no Microphone permission on a device that also has inputs. '
+              f"Evidence: {EV}/signal-path.jsonl, signal-path-stall.txt")
+    claims.append(_claim('signal-path-readback', 'While playing, the signal path the engine reports (format, rate, bit depth, channels, exclusive) '
+                         f'is what Core Audio reports for the device{on}', sp, lambda r: r.get('verdict') == 'MATCH',
+                         [f'{EV}/signal-path.jsonl', f'{EV}/signal-path-checked.jsonl'], reason))
     cap = [r for r in captures if r.get('ok') is not None]
     claims.append(_claim('device-routing-capture', 'A real capture of what Vespertine sent to a Core Audio device has every voice on the right channel',
                          cap, lambda r: r.get('ok'), [f'{EV}/captures.jsonl'] + sorted({r['capture'] for r in cap if r.get('capture')}),
@@ -593,7 +632,7 @@ def step_render_check(a):
     tmp = tempfile.mkdtemp(prefix='vsh-render-')
 
     def one(r):
-        out = {'rel': rel_of.get(r.get('file'), r.get('file')), 'file': r.get('file'), 'render': r.get('out'),
+        out = {'rel': rel_of.get(r.get('file'), r.get('file')), 'file': r.get('file'), 'render': r.get('out'), 'variant': r.get('variant'),
                'plan': r.get('plan'), 'route_layout': r.get('route_layout'), 'decoder_layout': r.get('decoder_layout')}
         if r.get('error') or not r.get('out'):
             out.update({'ok': False, 'error': r.get('error') or 'no render'}); return out
@@ -635,6 +674,32 @@ def step_signal_check(a):
     return 0
 
 
+def step_config_check(a):
+    rows = read_jsonl(os.path.join(a.out, EV, 'device-config.jsonl'))
+    out = []
+    for r in rows:
+        c = compare_configuration(r)
+        c['source'] = r.get('source')
+        c['computed'] = r.get('computed')
+        c['readback'] = r.get('readback')
+        out.append(c)
+    write_jsonl(os.path.join(ev_dir(a.out), 'device-config-checked.jsonl'), out)
+    counts = {}
+    for c in out:
+        counts[c['verdict']] = counts.get(c['verdict'], 0) + 1
+    print('device configuration:', ', '.join(f'{k} {v}' for k, v in sorted(counts.items())))
+    return 0
+
+
+def step_config_list(a):
+    files = read_jsonl(os.path.join(a.out, EV, 'files.jsonl'))
+    sel = [f['path'] for f in files if (f.get('vsh') or {}).get('opened')]
+    with open(os.path.join(a.out, EV, 'config-list.txt'), 'w', encoding='utf-8') as f:
+        f.write('\n'.join(sel) + ('\n' if sel else ''))
+    print(f'configuration list: {len(sel)} files Vespertine opens')
+    return 0
+
+
 def step_captures(a):
     library = os.path.abspath(a.library)
     tdir = tools_dir(library)
@@ -657,6 +722,15 @@ def step_captures(a):
              'original_result': next((l for l in text.splitlines() if l.startswith('RESULT')), None)}
         if seg:
             r.update(verify_cmd(a.python, os.path.join(tdir, 'verify_chid.py'), os.path.join(tdir, 'segments', seg), cap))
+            # Negative control: the same capture with its first two channels swapped must FAIL, or the check proves nothing.
+            with tempfile.TemporaryDirectory() as t:
+                swapped = os.path.join(t, 'swapped.wav')
+                n = r.get('channels') or 2
+                pan = '|'.join([f'c0=c1', f'c1=c0'] + [f'c{i}=c{i}' for i in range(2, n)])
+                rc, so, se = run(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', cap, '-af', f'pan={n}c|{pan}', '-c:a', 'pcm_f32le', swapped])
+                if rc == 0:
+                    neg = verify_cmd(a.python, os.path.join(tdir, 'verify_chid.py'), os.path.join(tdir, 'segments', seg), swapped)
+                    r['negative_control'] = {'swapped': 'channels 1 and 2', 'ok': neg['ok'], 'fails_as_it_should': neg['ok'] is False}
         rows.append(r)
     write_jsonl(os.path.join(ev_dir(a.out), 'captures.jsonl'), rows)
     print(f"captures: {len(rows)} re-verified, {sum(1 for r in rows if r.get('ok'))} PASS")
@@ -674,7 +748,7 @@ def read_checks(out):
     return rows
 
 
-def details_for(files, chid, render, signal):
+def details_for(files, chid, render, signal, config=()):
     d = {}
     idx = {}
 
@@ -695,7 +769,14 @@ def details_for(files, chid, render, signal):
                 d['format-identification'].append(f"{nm(f['rel'])}: FFmpeg {ff.get('channels')} ch, Vespertine {v.get('channels')} ch, manifest {man.get('channels')} ch")
     d['source-routing'] = [f"{r['decoder']} FAIL{' (pack recorded ' + r['manifest'] + ')' if r.get('manifest') else ''}: {nm(r['rel'])} [{r.get('layout')}]"
                            for r in chid if r.get('ok') is False]
-    d['engine-routing-render'] = [f"FAIL: {nm(r['rel'])}: {r.get('error') or r.get('layout')}" for r in render if r.get('ok') is False]
+    for variant, cid in (('decoder', 'decoder-labels'), ('discrete', 'engine-routing-render')):
+        d[cid] = [f"FAIL: {nm(r['rel'])}: {r.get('error') or r.get('layout')}" for r in render
+                  if r.get('ok') is False and (r.get('variant') or 'discrete') == variant]
+    d['device-configuration-readback'] = []
+    for r in config:
+        if r.get('verdict') == 'MISMATCH':
+            bad = ', '.join(f"{k} expected {v['expected']} got {v['got']}" for k, v in r.get('checks', {}).items() if not v['ok'])
+            d['device-configuration-readback'].append(f"MISMATCH: {nm(r.get('rel'))}: {bad}")
     d['signal-path-readback'] = []
     for r in signal:
         if r.get('verdict') != 'MATCH':
@@ -718,13 +799,16 @@ def step_report(a):
     for r in signal:
         r['rel'] = rel_of.get(r.get('file'), r.get('file'))
     captures = read_jsonl(os.path.join(e, 'captures.jsonl'))
+    config = read_jsonl(os.path.join(e, 'device-config-checked.jsonl'))
+    for r in config:
+        r['rel'] = rel_of.get(r.get('file'), r.get('file'))
     checks = read_checks(out)
     ev = build_evidence(env, files=files, chid=chid, checks=checks, signal=signal, render=render, captures=captures,
-                        extra_unverified=env.get('unverified', []))
+                        config=config, extra_unverified=env.get('unverified', []))
     with open(os.path.join(out, 'evidence.json'), 'w', encoding='utf-8') as f:
         json.dump(ev, f, indent=1, sort_keys=True)
     with open(os.path.join(out, 'REPORT.md'), 'w', encoding='utf-8') as f:
-        f.write(render_markdown(ev, details_for(files, chid, render, signal)))
+        f.write(render_markdown(ev, details_for(files, chid, render, signal, config)))
     # a hash of every file in the results folder, last, so the report can be checked later
     lines = []
     for root, dirs, names in os.walk(out):
@@ -746,7 +830,7 @@ def step_report(a):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('files', 'chid', 'render-list', 'render-check', 'signal-check', 'captures', 'report'):
+    for name in ('files', 'chid', 'render-list', 'render-check', 'signal-check', 'config-list', 'config-check', 'captures', 'report'):
         p = sub.add_parser(name)
         p.add_argument('--out', required=True)
         p.add_argument('--library')
@@ -756,7 +840,8 @@ def main(argv=None):
         p.add_argument('--runs', nargs='*', default=[])
     a = ap.parse_args(argv)
     return {'files': step_files, 'chid': step_chid, 'render-list': step_render_list, 'render-check': step_render_check,
-            'signal-check': step_signal_check, 'captures': step_captures, 'report': step_report}[a.cmd](a)
+            'signal-check': step_signal_check, 'config-list': step_config_list, 'config-check': step_config_check,
+            'captures': step_captures, 'report': step_report}[a.cmd](a)
 
 
 if __name__ == '__main__':
