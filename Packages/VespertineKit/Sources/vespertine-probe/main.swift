@@ -5,6 +5,8 @@
 //   vespertine-probe watch <seconds>          prints every device's volume and the system output whenever they change
 //   vespertine-probe pausetest <device> <file> <volume 0…1> <pause seconds> <release-after seconds>
 //   vespertine-probe doptest <device> [a.dsf b.dsf]   DoP through pause, seek and skip, narrated (writes test files if none)
+//   vespertine-probe signal-path <virtual device> [--shared] [--settle s] <file…>   computed signal path vs engine vs
+//                             Core Audio readback, one JSON line per file (plays into virtual devices only)
 //   vespertine-probe loopback [--quick|--full] [--device <name>] [--input <name>] [--rates 44100,96000] [--json <path>]
 //                             [--markdown <path>]
 //                             software loopback self-test through a virtual device ("Vespertine Loopback" by default);
@@ -483,6 +485,143 @@ if args.count >= 3, args[1] == "doptest" {
     print(failures.isEmpty ? "\nDevice checks passed. Underruns: \(engine.snapshot.underruns). Anything you heard besides the expected click(s) is a finding."
                            : "\nDevice checks FAILED:\n" + failures.map { "  - \($0)" }.joined(separator: "\n"))
     exit(failures.isEmpty ? 0 : 1)
+}
+
+/// The device's output as Core Audio reports it, read here and not taken from the engine: every output stream's
+/// physical and virtual format, the nominal rate and the hog owner.
+func hardwareReadback(_ id: AudioObjectID) -> [String: Any] {
+    var addr = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyNominalSampleRate, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+    var rate = Float64(0); var size = UInt32(MemoryLayout<Float64>.size)
+    AudioObjectGetPropertyData(id, &addr, 0, nil, &size, &rate)
+    addr.mSelector = kAudioDevicePropertyStreams; addr.mScope = kAudioObjectPropertyScopeOutput
+    size = 0
+    AudioObjectGetPropertyDataSize(id, &addr, 0, nil, &size)
+    var streams = [AudioStreamID](repeating: 0, count: Int(size) / MemoryLayout<AudioStreamID>.size)
+    if !streams.isEmpty { AudioObjectGetPropertyData(id, &addr, 0, nil, &size, &streams) }
+    var physicalChannels = 0, virtualChannels = 0, bits: [Int] = [], integer = true, formats: [String] = []
+    for stream in streams {
+        for selector in [kAudioStreamPropertyPhysicalFormat, kAudioStreamPropertyVirtualFormat] {
+            var asbd = AudioStreamBasicDescription(); var sz = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
+            var p = AudioObjectPropertyAddress(mSelector: selector, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+            guard AudioObjectGetPropertyData(stream, &p, 0, nil, &sz, &asbd) == noErr else { continue }
+            let isFloat = asbd.mFormatFlags & kAudioFormatFlagIsFloat != 0
+            if selector == kAudioStreamPropertyPhysicalFormat {
+                physicalChannels += Int(asbd.mChannelsPerFrame); bits.append(Int(asbd.mBitsPerChannel))
+                if isFloat { integer = false }
+                formats.append("physical \(isFloat ? "float" : "int")\(asbd.mBitsPerChannel) \(asbd.mChannelsPerFrame)ch @ \(asbd.mSampleRate)")
+            } else {
+                virtualChannels += Int(asbd.mChannelsPerFrame)
+                formats.append("virtual \(isFloat ? "float" : "int")\(asbd.mBitsPerChannel) \(asbd.mChannelsPerFrame)ch @ \(asbd.mSampleRate)")
+            }
+        }
+    }
+    var hog = pid_t(-1); size = UInt32(MemoryLayout<pid_t>.size)
+    var haddr = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyHogMode, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+    AudioObjectGetPropertyData(id, &haddr, 0, nil, &size, &hog)
+    return ["rate": rate, "channels": virtualChannels, "physical_channels": physicalChannels, "bits": bits.min() ?? 0,
+            "integer": integer, "streams": streams.count, "hog_pid": Int(hog), "formats": formats]
+}
+
+if args.count >= 4, args[1] == "signal-path" {
+    // signal-path <virtual device name or UID> [--shared] [--settle <seconds>] <file>…   one JSON object per line
+    // For each file: the plan FormatPlanner makes from the file and the device's capabilities alone ("computed"), the
+    // engine's own signal path while it plays the file ("engine"), and what Core Audio reports for the device
+    // ("readback", read here). It plays real audio, so it takes only a virtual device (no speaker, DAC or receiver can
+    // be reached), and it never enables bitstream or DoP. Exclusive (hog) mode unless --shared, like the app's default.
+    setvbuf(stdout, nil, _IOLBF, 0)
+    var files = Array(args[3...]), shared = false, settle = 1.0
+    while let first = files.first, first.hasPrefix("--") {
+        files.removeFirst()
+        if first == "--shared" { shared = true }
+        if first == "--settle", let s = files.first.flatMap(Double.init) { settle = s; files.removeFirst() }
+    }
+    guard let device = devices.first(where: { $0.uid == args[2] || $0.name == args[2] }) else { print("no device named \(args[2])"); exit(1) }
+    guard device.transport == .virtual else {
+        print("signal-path plays audio, so it takes only a virtual device; \(device.name) is \(device.transport.label)"); exit(2)
+    }
+    func emit(_ row: [String: Any]) {
+        guard let data = try? JSONSerialization.data(withJSONObject: row, options: [.sortedKeys, .withoutEscapingSlashes]) else { return }
+        print(String(decoding: data, as: UTF8.self))
+    }
+    func planRow(_ p: OutputPlan) -> [String: Any] {
+        ["mode": p.mode.rawValue, "rate": p.deviceSampleRate, "decoded_rate": p.decodedSampleRate, "bits": p.physicalBitDepth,
+         "channels": p.channels, "device_channels": p.deviceChannels, "resamples": p.resamples, "dsd_to_pcm": p.dsdConvertedToPCM,
+         "spatial": p.spatial.rawValue, "integer": p.integerSamples, "reason": p.reason]
+    }
+    // Leave the device at the rate it was found at.
+    var rateAddr = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyNominalSampleRate, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
+    var foundRate = Float64(0); var rateSize = UInt32(MemoryLayout<Float64>.size)
+    AudioObjectGetPropertyData(device.id, &rateAddr, 0, nil, &rateSize, &foundRate)
+    let engine = PlaybackEngine()
+    var settings = EngineSettings()
+    settings.deviceUID = device.uid
+    settings.exclusive = !shared
+    settings.dopDeviceUIDs = []
+    settings.bitstreamDeviceUIDs = []
+    settings.spatialModes[device.uid] = .off
+    engine.update(settings: settings)
+    for path in files {
+        let url = URL(fileURLWithPath: path)
+        var row: [String: Any] = ["file": path, "pid": Int(getpid()), "device": device.name, "device_uid": device.uid,
+                                  "transport": device.transport.rawValue, "exclusive_requested": !shared]
+        do {
+            let (format, decoder) = try SourceInspector.inspect(url)
+            row["source"] = ["codec": format.codec, "channels": format.channels, "rate": format.sampleRate,
+                             "bits": format.bitDepth.map { $0 as Any } ?? NSNull(), "encoding": format.encoding.rawValue,
+                             "description": format.shortDescription, "decoder": decoder]
+            row["computed"] = planRow(FormatPlanner.plan(source: format, device: device.capabilities))
+        } catch {
+            row["error"] = "inspect: \(error.localizedDescription)"; emit(row); continue
+        }
+        let item = PlayableItem(url: url)
+        engine.play(item)
+        let start = Date(), limit = max(4, settle * 4)
+        var started = false
+        while Date().timeIntervalSince(start) < limit {
+            let s = engine.snapshot
+            if s.item?.id == item.id, s.signalPath != nil, s.state == .playing, s.position > 0.05 { started = true; break }
+            if s.lastError != nil, s.state == .stopped { break }
+            RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+        }
+        if !started, engine.snapshot.lastError == nil {
+            // Core Audio never started the engine's I/O. Seen on a process without Microphone permission and a device
+            // that also has inputs (a loopback): the engine waits inside AudioDeviceCreateIOProcID, and any further
+            // HAL call from here would wait with it. Report it and leave at once.
+            row["engine"] = ["state": engine.snapshot.state.rawValue,
+                             "error": "the engine's audio I/O did not start within \(Int(limit)) s (Core Audio did not return from creating the IOProc)"]
+            emit(row)
+            fflush(stdout)
+            _exit(4)
+        }
+        RunLoop.main.run(until: Date().addingTimeInterval(settle * 0.3))
+        let snap = engine.snapshot
+        let hw = hardwareReadback(device.id)
+        var eng: [String: Any] = ["state": snap.state.rawValue, "position": snap.position, "underruns": snap.underruns]
+        if let e = snap.lastError { eng["error"] = e }
+        if let p = snap.signalPath, snap.item?.id == item.id {
+            guard p.plan.mode == .pcm else {
+                engine.stop(); row["error"] = "the engine chose \(p.plan.mode.rawValue) on a virtual device; stopped"; emit(row); exit(3)
+            }
+            eng["plan"] = planRow(p.plan)
+            eng["applied"] = ["rate": p.applied.sampleRate, "bits": p.applied.physicalBitDepth, "integer": p.applied.physicalIsInteger,
+                              "virtual_channels": p.applied.virtualChannels, "exclusive": p.applied.exclusive,
+                              "channel_names": p.applied.channelNames, "integer_mode": p.applied.integerMode,
+                              "format_known": p.applied.physicalFormatKnown, "streams": p.applied.streamCount]
+            eng["status"] = p.statusLine
+            eng["bit_perfect"] = p.isBitPerfect
+            eng["decoder"] = p.decoderName
+        }
+        row["engine"] = eng
+        row["readback"] = hw
+        emit(row)
+    }
+    engine.stop()
+    RunLoop.main.run(until: Date().addingTimeInterval(0.6))
+    if foundRate > 0 { AudioObjectSetPropertyData(device.id, &rateAddr, 0, nil, rateSize, &foundRate) }
+    RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+    let end = hardwareReadback(device.id)
+    FileHandle.standardError.write(Data("signal-path: \(files.count) files; after stop: hog owner \(end["hog_pid"] ?? -1), rate \(end["rate"] ?? 0) (found at \(foundRate))\n".utf8))
+    exit(0)
 }
 
 /// VESPERTINE_AGGREGATE=uid1,uid2,… makes a private aggregate of those devices (a multichannel output
