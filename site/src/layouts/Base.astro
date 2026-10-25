@@ -67,6 +67,8 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <script is:inline set:html={HEAD_CLASSES} />
 <link rel="preload" as="font" type="font/woff2" crossorigin href={romanFont}>
 <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont}>
+<script defer src="https://stats.szeremeta.org/howl.js" data-website-id="a4b69e33-e989-45bd-bbc2-4d6b1036aa63" data-domains="vespertineapp.com,www.vespertineapp.com" data-do-not-track="true"></script>
+<script defer src="/track.js?v=2026-10-23a"></script>
 <slot name="head" />
 {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
 </head>

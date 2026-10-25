@@ -18,13 +18,14 @@ export default defineConfig({
         "img-src 'self' data:",
         "media-src 'self'",
         "font-src 'self'",
-        "connect-src 'self'",
+        "connect-src 'self' https://stats.szeremeta.org",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
       ],
       scriptDirective: {
-        resources: ["'self'"],
+        // stats.szeremeta.org: the self-hosted Umami script (cookieless visitor counts; see privacy.html).
+        resources: ["'self'", 'https://stats.szeremeta.org'],
         // Astro hashes its bundled scripts; the is:inline ones are hashed here from their single source.
         hashes: Object.values(inlineScripts).map(sha256),
       },
