@@ -32,6 +32,23 @@ enum DSDFiles {
     private static func le<T: FixedWidthInteger>(_ v: T) -> [UInt8] { withUnsafeBytes(of: v.littleEndian) { Array($0) } }
     private static func be<T: FixedWidthInteger>(_ v: T) -> [UInt8] { withUnsafeBytes(of: v.bigEndian) { Array($0) } }
 
+    /// One tone per channel at `amplitude`, through the same modulator, for multichannel files.
+    static func modulate(rate: Double, seconds: Double, tones: [Double], amplitude: Double = 0.1) -> [[UInt8]] {
+        let bits = Int(rate * seconds) / 8 * 8
+        var out = [[UInt8]](repeating: [UInt8](repeating: 0, count: bits / 8), count: tones.count)
+        var i1 = [Double](repeating: 0, count: tones.count), i2 = i1
+        let steps = tones.map { 2 * .pi * $0 / rate }
+        for n in 0..<bits {
+            for c in tones.indices {
+                let v = i2[c] >= 0 ? 1.0 : -1.0
+                i1[c] += amplitude * sin(steps[c] * Double(n)) - v
+                i2[c] += i1[c] - 2 * v
+                if v > 0 { out[c][n / 8] |= UInt8(0x80 >> (n % 8)) }
+            }
+        }
+        return out
+    }
+
     /// `channelType`: the DSF format chunk's channel type (2 = stereo, 5 = L R C LFE, 7 = 5.1, …).
     static func writeDSF(_ planes: [[UInt8]], rate: Double, channelType: UInt32 = 2, to url: URL) throws {
         let block = 4096, perCh = planes[0].count, blocks = (perCh + block - 1) / block

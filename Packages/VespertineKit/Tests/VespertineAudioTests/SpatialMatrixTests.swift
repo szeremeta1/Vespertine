@@ -153,13 +153,14 @@ struct SpatialProbe {
     }
 
     /// Decodes `url` the way the engine does for a Spatial Audio plan, and checks every channel.
-    static func check(_ url: URL, channels: [String]) throws -> Result {
+    /// `device`: the headphones' capabilities (a device at the decoded rate when nil).
+    static func check(_ url: URL, channels: [String], device: DeviceCapabilities? = nil) throws -> Result {
         var result = Result()
         let probed = try SourceOpener.probe(url)
         let f = probed.format
         let pcmRate = f.encoding == .dsd ? FormatPlanner.dsdToPCMRate(f.sampleRate) : f.sampleRate
-        var plan = FormatPlanner.plan(source: f, device: DeviceCapabilities(sampleRates: [pcmRate], physicalFormats: [], outputChannels: 2,
-                                                                            supportsDoP: false), spatial: .fixed)
+        let device = device ?? DeviceCapabilities(sampleRates: [pcmRate], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        var plan = FormatPlanner.plan(source: f, device: device, spatial: .fixed)
         plan.integerSamples = false
         guard plan.spatial == .fixed else { result.problems.append("not planned for Spatial Audio (\(f.channels) ch)"); return result }
         let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))

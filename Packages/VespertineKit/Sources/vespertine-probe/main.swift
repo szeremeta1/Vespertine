@@ -653,12 +653,15 @@ print("device: \(device.name) · \(device.capabilities.outputChannels) output ch
 let seconds = Double(args[3]) ?? 3
 // VESPERTINE_SPATIAL=off|fixed|headTracked forces the multichannel mode for this device.
 let forcedSpatial = ProcessInfo.processInfo.environment["VESPERTINE_SPATIAL"].flatMap(SpatialMode.init(rawValue:))
+// VESPERTINE_RATE=<Hz> holds the device at one rate (48000: a virtual device standing in for AirPods).
+let forcedRate = ProcessInfo.processInfo.environment["VESPERTINE_RATE"].flatMap(Double.init)
 let items = args[4...].map { PlayableItem(url: URL(fileURLWithPath: $0)) }
 let engine = PlaybackEngine()
 var settings = EngineSettings()
 settings.deviceUID = device.uid
 settings.exclusive = true
 if let forcedSpatial { settings.spatialModes[device.uid] = forcedSpatial }
+if let forcedRate { settings.ratePolicies[device.uid] = .fixed(forcedRate) }
 engine.update(settings: settings)
 let queue = items
 engine.nextItemProvider = { finished in
