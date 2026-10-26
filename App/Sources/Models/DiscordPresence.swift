@@ -216,11 +216,14 @@ final class DiscordPresence {
         send(song)
     }
 
-    /// Clears the status before Vespertine quits (Discord would also clear it once the connection closes).
-    func shutdown() {
-        client?.shutdown(wait: true)
-        client = nil
+    /// Lets go of the connection and returns the step that clears the status before Vespertine quits (Discord would also
+    /// clear it once the connection closes). The step waits for Discord's answer, so it runs off the main thread, within
+    /// `QuitSequence`'s budget.
+    func shutdownStep() -> @Sendable () -> Void {
+        let client = client
+        self.client = nil
         showing = nil
+        return { client?.shutdown(wait: true) }
     }
 
     private func send(_ song: DiscordNowPlaying) {

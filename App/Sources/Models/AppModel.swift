@@ -271,14 +271,21 @@ final class AppModel {
         shares.start()
         analysis.start()
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
-        // standardize its format as chosen in Settings.
+        // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
+        // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
+        // within QuitSequence's budget.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: nil) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
-                self.player.volumeRelay.stop()
-                self.player.discord.shutdown()
-                self.player.engine.stopAndWait()
-                DeviceRestore.finish(self.settings.deviceOnQuit)
+                let relay = self.player.volumeRelay, engine = self.player.engine
+                let discord = self.player.discord.shutdownStep()
+                let onQuit = self.settings.deviceOnQuit
+                QuitSequence.run(steps: [
+                    { relay.stop() },
+                    discord,
+                    { engine.stopAndWait() },
+                    { DeviceRestore.finish(onQuit) },
+                ])
             }
         }
         library.onTracksMoved = { [weak self] moves in self?.player.tracksMoved(moves) }
