@@ -107,6 +107,39 @@ public struct SignalPath: Sendable, Hashable {
         return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
     }
 
+    /// A source's channels mixed into fewer ("5.1" → "Stereo").
+    public struct Downmix: Sendable, Hashable {
+        public var from: String
+        public var to: String
+    }
+
+    /// What was done to the music on the way that the listener is told about whatever the status badge shows
+    /// (Spatial Audio, Bluetooth, a downmix): DSD converted to PCM, channels mixed down.
+    public struct Conversion: Sendable, Hashable {
+        public var dsdToPCM: Bool
+        /// nil: every channel is heard on its own (Spatial Audio renders each one as a virtual speaker).
+        public var downmix: Downmix?
+    }
+
+    /// nil: neither happened.
+    public var conversion: Conversion? {
+        let downmix = plan.mode == .pcm && plan.spatial == .off && plan.channels < source.channels
+            ? Downmix(from: ChannelLayouts.name(labels: source.channelLabels, channels: source.channels), to: ChannelLayouts.name(channels: plan.channels))
+            : nil
+        guard plan.dsdConvertedToPCM || downmix != nil else { return nil }
+        return Conversion(dsdToPCM: plan.dsdConvertedToPCM, downmix: downmix)
+    }
+
+    /// The parts of `conversion` that `statusLine` doesn't already say, as short badges ("DSD → PCM", "5.1 → STEREO").
+    public var conversionBadges: [String] {
+        guard let conversion else { return [] }
+        var badges: [String] = []
+        if conversion.dsdToPCM, statusLine != "DSD → PCM" { badges.append("DSD → PCM") }
+        // The status line says a downmix itself, unless damaged frames take its place.
+        if let mix = conversion.downmix, concealedFrames > 0 { badges.append("\(mix.from) → \(mix.to.uppercased())") }
+        return badges
+    }
+
     /// What "Match 16-bit sources" did, from the format the device reports, not the one asked for. nil: it didn't apply.
     public var sixteenBitNote: String? {
         guard let match = plan.sixteenBit else { return nil }

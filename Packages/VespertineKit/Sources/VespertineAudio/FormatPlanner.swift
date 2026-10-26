@@ -31,8 +31,10 @@ public enum FormatPlanner {
         let name = ChannelLayouts.name(labels: source.channelLabels, channels: source.channels)
         if spatial != .off, rawDevice.outputChannels >= 2 {
             plan.channels = source.channels
-            // The source's own speakers; unlabeled channels are taken in the standard order for their count.
-            let labels = source.channelLabels.flatMap { $0.count == source.channels ? $0 : nil } ?? ChannelLayouts.standardLabels(channels: source.channels)
+            // The source's own speakers; unlabeled or discrete channels are taken in the standard order for their count,
+            // as the engine routes them (PlaybackEngine.Decoding).
+            let labels = ChannelLayouts.speakerLabels(source.channelLabels.flatMap { $0.count == source.channels ? $0 : nil })
+                ?? ChannelLayouts.standardLabels(channels: source.channels)
             if let labels, let bed = ChannelLayouts.spatialBed(for: labels) {
                 plan.spatialBed = bed.tag
                 plan.channels = bed.channels

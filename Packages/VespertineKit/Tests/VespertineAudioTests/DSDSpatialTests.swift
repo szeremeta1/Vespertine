@@ -88,4 +88,26 @@ struct DSDSpatialTests {
         #expect(result.bed == Self.fiveOne)
         #expect(result.problems.isEmpty, "\(ext): \(result.problems)")
     }
+
+    @Test("A DSDIFF whose channel IDs say nothing (discrete) is planned on the standard 5.1 bed the engine routes it to")
+    func discreteChannelIDsPlanned() {
+        var source = Self.surround
+        source.codec = "DSDIFF"
+        source.channelLabels = (0..<6).map { kAudioChannelLabel_Discrete_0 + UInt32($0) }
+        let plan = FormatPlanner.plan(source: source, device: Self.airPodsMax, spatial: .headTracked)
+        #expect(plan.spatial == .headTracked)
+        #expect(plan.channels == 6 && plan.spatialBed == kAudioChannelLayoutTag_MPEG_5_1_A)
+    }
+
+    @Test("Every channel of a DST DSDIFF with discrete channel IDs is heard after Spatial Audio, in the standard 5.1 order")
+    func discreteChannelIDsEndToEnd() throws {
+        let channels = ["FL", "FR", "FC", "LFE", "SL", "SR"]
+        let url = tmp("51-discrete.dff")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let planes = DSDFiles.modulate(rate: SACDFixture.rate, seconds: 98.0 / 75, tones: SpatialProbe.frequencies(channels))
+        try DSDIFFFixture.writeDST(planes, indexed: true, storedOnly: true, channelIDs: ["C000", "C001", "C002", "C003", "C004", "C005"], to: url)
+        let result = try SpatialProbe.check(url, channels: channels, device: Self.airPodsMax)
+        #expect(result.bed == Self.fiveOne)
+        #expect(result.problems.isEmpty, "\(result.problems)")
+    }
 }
