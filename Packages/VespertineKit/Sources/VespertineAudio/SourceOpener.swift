@@ -108,6 +108,25 @@ enum SourceOpener {
         return ids.enumerated().map { known[$0.element] ?? (kAudioChannelLabel_Discrete_0 + UInt32($0.offset)) }
     }
 
+    /// The speakers of a DSF file's channel type (DSF specification 1.01, format chunk): nil for mono and stereo.
+    static func dsfLabels(_ url: URL) -> [AudioChannelLabel]? {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? file.close() }
+        guard let head = try? file.read(upToCount: 52), head.count == 52,
+              String(decoding: head[0..<4], as: UTF8.self) == "DSD ", String(decoding: head[28..<32], as: UTF8.self) == "fmt " else { return nil }
+        let type = head[48..<52].reversed().reduce(0) { $0 << 8 | Int($1) }
+        let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                      kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        switch type {
+        case 3: return [L, R, C]
+        case 4: return [L, R, Ls, Rs]
+        case 5: return [L, R, C, LFE]
+        case 6: return [L, R, C, Ls, Rs]
+        case 7: return [L, R, C, LFE, Ls, Rs]
+        default: return nil
+        }
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
             .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions)
@@ -154,6 +173,13 @@ enum SourceOpener {
             let decoder = FFmpegDecoder(url: url)
             try decoder.open()
             guard decoder.isDSD else { throw SourceOpenerError.unsupported(url) }
+            // The speakers as the file's header names them. FFmpeg's reader calls DSF channel type 5 (L R C LFE)
+            // 4.0 (L R C Cs).
+            let labels = ext == "dsf" ? dsfLabels(url) : nil
+            if let labels, labels.count == Int(decoder.processingFormat.channelCount), labels.count > 2,
+               let layout = ChannelLayouts.layout(labels: labels) {
+                decoder.relabel(layout)
+            }
             let format = SourceFormat(encoding: .dsd, codec: ext == "dsf" ? "DSF" : "DSDIFF", sampleRate: decoder.dsdRate,
                                       bitDepth: 1, channels: Int(decoder.processingFormat.channelCount))
             return ProbedSource(url: url, format: format, decoderName: "DSD (FFmpeg)", pcm: decoder, dsd: nil)
@@ -294,7 +320,7 @@ enum SourceOpener {
             }
         } else if probed.format.encoding == .dsd, probed.pcm is FFmpegDecoder {
             // DSD at any rate: DoP from the raw stream, or FFmpeg's DSD→PCM conversion (at the DSD rate / 8).
-            decoder = plan.mode == .dop ? try RawDoPDecoder(url: probed.url) : probed.pcm!
+            decoder = plan.mode == .dop ? try RawDoPDecoder(url: probed.url, channelLayout: probed.pcm?.processingFormat.channelLayout) : probed.pcm!
         } else if let dsd = probed.dsd {
             if plan.mode == .dop {
                 decoder = try DoPDecoder(decoder: dsd)
