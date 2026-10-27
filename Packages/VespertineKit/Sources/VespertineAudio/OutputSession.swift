@@ -62,8 +62,27 @@ final class OutputSession: @unchecked Sendable {
             return plan.spatialBed.flatMap { AVAudioChannelLayout(layoutTag: $0) } ?? ChannelLayouts.layout(channels: plan.channels)
         }
         guard plan.channels > 2 else { return nil }
+        if let labels = plan.routeLabels, labels.count == plan.channels, let layout = ChannelLayouts.layout(labels: labels) { return layout }
         return speakers.flatMap { Int($0.channelCount) == plan.channels && $0.hasSpeakerPositions ? $0 : nil }
             ?? ChannelLayouts.layout(channels: plan.channels)
+    }
+
+    /// The converter from a decoder's output to the ring, as playback sets it up for `plan`.
+    static func converter(from input: AVAudioFormat, to output: AVAudioFormat, plan: OutputPlan) -> AVAudioConverter? {
+        guard let converter = AVAudioConverter(from: input, to: output) else { return nil }
+        converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
+        converter.sampleRateConverterQuality = .max
+        converter.downmix = true
+        converter.dither = false
+        // A discrete output: each channel to its own output, unmixed. Matched by layout instead, the converter drops
+        // speakers the output layout lacks, mixes a side pair onto a back pair at -3 dB, lowers the whole mix when it
+        // folds one in, and plays a file with no speaker names as silence.
+        if plan.routeLabels != nil, plan.spatial == .off, input.channelCount == output.channelCount, let outputs = output.channelLayout?.channelLabels {
+            converter.downmix = false
+            converter.channelMap = ChannelLayouts.discreteMap(source: ChannelLayouts.speakerLabels(input.channelLayout), outputs: outputs)
+                .map { NSNumber(value: $0) }
+        }
+        return converter
     }
 
     /// Configures the device for `plan` and prepares (but does not start) I/O.

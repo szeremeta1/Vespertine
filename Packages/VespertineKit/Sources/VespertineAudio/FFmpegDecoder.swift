@@ -85,6 +85,12 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
         isOpen = true
     }
 
+    /// Names the channels from the file's own header, where FFmpeg's reader gets them wrong (DSF, DSDIFF).
+    func relabel(_ layout: AVAudioChannelLayout) {
+        guard let format, layout.channelCount == format.channelCount else { return }
+        self.format = AVAudioFormat(standardFormatWithSampleRate: format.sampleRate, channelLayout: layout)
+    }
+
     func close() throws {
         if let handle { nff_close(handle) }
         handle = nil
@@ -183,12 +189,12 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         set { markerOffset = (newValue - frame) & 1 }
     }
 
-    /// A DSF or DSDIFF file.
-    convenience init(url: URL) throws {
+    /// A DSF or DSDIFF file; `channelLayout` names its channels (by default, the standard layout for their count).
+    convenience init(url: URL, channelLayout: AVAudioChannelLayout? = nil) throws {
         let source = FFmpegDecoder(url: url)
         try source.open()
         guard source.isDSD else { throw DTSError.unsupported(String(localized: "not DSD", comment: "Why a file can't be played, in “This file can't be played (…).”")) }
-        try self.init(source: source)
+        try self.init(source: source, channelLayout: channelLayout)
     }
 
     init(source: RawDSDSource, channelLayout: AVAudioChannelLayout? = nil) throws {

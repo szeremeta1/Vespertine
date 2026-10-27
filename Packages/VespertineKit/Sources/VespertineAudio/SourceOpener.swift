@@ -108,6 +108,25 @@ enum SourceOpener {
         return ids.enumerated().map { known[$0.element] ?? (kAudioChannelLabel_Discrete_0 + UInt32($0.offset)) }
     }
 
+    /// The speakers of a DSF file's channel type (DSF specification 1.01, format chunk): nil for mono and stereo.
+    static func dsfLabels(_ url: URL) -> [AudioChannelLabel]? {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? file.close() }
+        guard let head = try? file.read(upToCount: 52), head.count == 52,
+              String(decoding: head[0..<4], as: UTF8.self) == "DSD ", String(decoding: head[28..<32], as: UTF8.self) == "fmt " else { return nil }
+        let type = head[48..<52].reversed().reduce(0) { $0 << 8 | Int($1) }
+        let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                      kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        switch type {
+        case 3: return [L, R, C]
+        case 4: return [L, R, Ls, Rs]
+        case 5: return [L, R, C, LFE]
+        case 6: return [L, R, C, Ls, Rs]
+        case 7: return [L, R, C, LFE, Ls, Rs]
+        default: return nil
+        }
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
             .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions)
@@ -154,6 +173,13 @@ enum SourceOpener {
             let decoder = FFmpegDecoder(url: url)
             try decoder.open()
             guard decoder.isDSD else { throw SourceOpenerError.unsupported(url) }
+            // The speakers as the file's header names them. FFmpeg's readers call DSF channel type 5 (L R C LFE)
+            // 4.0 (L R C Cs) and know DSDIFF's CHNL only for stereo, 5.0 and 5.1 (a 3.1 became quad).
+            let labels = ext == "dsf" ? dsfLabels(url) : DSDIFFChannels.ids(url).map(dsdiffLabels)
+            if let labels, labels.count == Int(decoder.processingFormat.channelCount), labels.count > 2,
+               let layout = ChannelLayouts.layout(labels: labels) {
+                decoder.relabel(layout)
+            }
             let format = SourceFormat(encoding: .dsd, codec: ext == "dsf" ? "DSF" : "DSDIFF", sampleRate: decoder.dsdRate,
                                       bitDepth: 1, channels: Int(decoder.processingFormat.channelCount))
             return ProbedSource(url: url, format: format, decoderName: "DSD (FFmpeg)", pcm: decoder, dsd: nil)
@@ -197,18 +223,28 @@ enum SourceOpener {
                                 pcm: decoder, dsd: nil)
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
+        // RF64 and Wave64: Core Audio, else libsndfile. The decoder is otherwise picked by a look at the header that
+        // only knows "RIFF…WAVE", and the MP3 decoder's look finds a frame header in RF64's 0xFFFFFFFF size or in the
+        // first 2 KB of 24-bit samples: it then claims the file and fails, or plays 0 s of it.
+        let names: [AudioDecoder.Name?] = dolbyExtensions.contains(ext) ? [.coreAudio] : isLargeWAV(url) ? [.coreAudio, .libsndfile] : [nil]
         func openDecoder() throws -> (raw: AudioDecoder, decoder: GuardedDecoder) {
-            let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
-            // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
-            let decoder = GuardedDecoder(raw)
-            if String(describing: type(of: raw)).contains("MPEG") {
-                // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
-                // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
-                try mpegOpenLock.withLock { try decoder.open() }
-            } else {
-                try decoder.open()
+            var failure: Error?
+            for name in names {
+                do {
+                    let raw = try name.map { try AudioDecoder(url: url, decoderName: $0) } ?? AudioDecoder(url: url)
+                    // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
+                    let decoder = GuardedDecoder(raw)
+                    if String(describing: type(of: raw)).contains("MPEG") {
+                        // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
+                        // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
+                        try mpegOpenLock.withLock { try decoder.open() }
+                    } else {
+                        try decoder.open()
+                    }
+                    return (raw, decoder)
+                } catch { failure = error }
             }
-            return (raw, decoder)
+            throw failure ?? SourceOpenerError.unsupported(url)
         }
         var (raw, decoder) = try openDecoder()
         // A DTS CD / DTS-WAV: 16-bit stereo "PCM" that is really a DTS bitstream (noise if played as PCM).
@@ -284,7 +320,7 @@ enum SourceOpener {
             }
         } else if probed.format.encoding == .dsd, probed.pcm is FFmpegDecoder {
             // DSD at any rate: DoP from the raw stream, or FFmpeg's DSD→PCM conversion (at the DSD rate / 8).
-            decoder = plan.mode == .dop ? try RawDoPDecoder(url: probed.url) : probed.pcm!
+            decoder = plan.mode == .dop ? try RawDoPDecoder(url: probed.url, channelLayout: probed.pcm?.processingFormat.channelLayout) : probed.pcm!
         } else if let dsd = probed.dsd {
             if plan.mode == .dop {
                 decoder = try DoPDecoder(decoder: dsd)
@@ -328,6 +364,17 @@ enum SourceOpener {
             decoder = region
         }
         return decoder
+    }
+
+    /// RF64 / BW64 (EBU Tech 3306, ITU-R BS.2088) or Sony Wave64, by the file's first bytes.
+    static func isLargeWAV(_ url: URL) -> Bool {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? file.close() }
+        guard let head = try? file.read(upToCount: 12), head.count == 12 else { return false }
+        let bytes = [UInt8](head)
+        let w64: [UInt8] = [0x72, 0x69, 0x66, 0x66, 0x2E, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB]   // "riff" GUID
+        let id = String(decoding: bytes[0..<4], as: UTF8.self), form = String(decoding: bytes[8..<12], as: UTF8.self)
+        return bytes == w64 || (["RF64", "BW64"].contains(id) && form == "WAVE")
     }
 
     static func codecName(ext: String, formatID: AudioFormatID) -> String {

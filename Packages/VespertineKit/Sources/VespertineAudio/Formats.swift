@@ -141,6 +141,9 @@ public struct OutputPlan: Sendable, Hashable {
     /// the source, so a 3.1 keeps its LFE, an LCRS its centres, a 7.1.4 its heights. nil: the standard layout of
     /// `channels`. The decoded stream is converted to it, so `channels` is its channel count.
     public var spatialBed: UInt32? = nil
+    /// A discrete multichannel output with no speaker setup: the speaker each output carries (see
+    /// `ChannelLayouts.discreteLabels`); the converter sends each source channel to one output, unmixed. nil otherwise.
+    public var routeLabels: [UInt32]? = nil
     /// Integer mode requested: decoded straight to 32-bit integers and sent to a non-mixable Int32 device
     /// format untouched (32-bit sources exact). Only for plain PCM with nothing to change the samples.
     public var integerSamples = false

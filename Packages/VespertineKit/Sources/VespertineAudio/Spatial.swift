@@ -183,6 +183,60 @@ public enum ChannelLayouts {
         }
     }
 
+    /// A multichannel file on a device with as many outputs and no speaker setup: the source channel each output
+    /// carries (-1: none). Every channel goes to an output of its own, unmixed: its own speaker's output, else the
+    /// nearest single one free, else the first output left over. Channels without speaker names are taken to be in
+    /// WAV order for their count (`wavOrderLabels`).
+    static func discreteMap(source: [AudioChannelLabel]?, outputs: [AudioChannelLabel]) -> [Int] {
+        guard let source = source ?? wavOrderLabels(channels: outputs.count), source.count == outputs.count else {
+            return outputs.indices.map { $0 < (source?.count ?? outputs.count) ? $0 : -1 }
+        }
+        let wanted = normalizedSurrounds(source).map(canonical), slots = outputs.map(canonical)
+        var map = [Int](repeating: -1, count: outputs.count), placed = [Bool](repeating: false, count: source.count)
+        func place(_ s: Int, _ candidates: [AudioChannelLabel]) {
+            guard !placed[s], let o = candidates.lazy.compactMap({ label in slots.indices.first { slots[$0] == label && map[$0] < 0 } }).first else { return }
+            map[o] = s
+            placed[s] = true
+        }
+        for s in source.indices { place(s, [wanted[s]]) }
+        for s in source.indices { place(s, nearest(wanted[s]).filter { $0.count == 1 }.map { canonical($0[0]) }) }
+        for s in source.indices where !placed[s] {
+            guard let o = map.firstIndex(of: -1) else { break }
+            map[o] = s
+            placed[s] = true
+        }
+        return map
+    }
+
+    /// The speakers of a WAV file with no channel mask, in the order of the mask's bits as FFmpeg and SMPTE use them for
+    /// the count (WAVE labels: the back pair is Ls/Rs, the side pair Lsd/Rsd). 6.1 is FL FR FC LFE BC SL SR and 7.1
+    /// FL FR FC LFE BL BR SL SR, where the standard (MPEG) layouts of those counts put the side pair first.
+    static func wavOrderLabels(channels: Int) -> [AudioChannelLabel]? {
+        let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                      kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        switch channels {
+        case 7: return [L, R, C, LFE, kAudioChannelLabel_CenterSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
+        case 8: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
+        default: return standardLabels(channels: channels)
+        }
+    }
+
+    /// The names of the outputs `discreteMap` fills, in the standard order for the count: an output that took a
+    /// speaker the standard order has no place for (2.1's LFE, LCRS's centres, 7.1 wide's front centres, 5.1.2's
+    /// heights) is named after it. nil where there is no standard order (more than 8 channels) or none is needed.
+    public static func discreteLabels(source: [AudioChannelLabel]?, channels: Int) -> [AudioChannelLabel]? {
+        guard let standard = standardLabels(channels: channels) else { return nil }
+        guard let source, source.count == channels else { return standard }
+        let map = discreteMap(source: source, outputs: standard), wanted = normalizedSurrounds(source)
+        return standard.indices.map { o in
+            let s = map[o]
+            guard s >= 0 else { return standard[o] }
+            // Its own speaker, or the nearest one the standard order has (the back pair of a 5.1 on Ls/Rs).
+            let own = canonical(wanted[s]) == canonical(standard[o]) || nearest(wanted[s]).contains([standard[o]])
+            return own ? standard[o] : wanted[s]
+        }
+    }
+
     /// The speaker of each channel when a multichannel layout names them all (nil for stereo, unlabeled
     /// or discrete channels, and for a speaker named twice).
     public static func speakerLabels(_ layout: AVAudioChannelLayout?) -> [AudioChannelLabel]? {
