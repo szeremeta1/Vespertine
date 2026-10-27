@@ -19,6 +19,8 @@ struct DSDSpatialTests {
     static let surround = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 6,
                                        channelLabels: [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
                                                        kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround])
+    /// Left/right placement after the spatial mixer is machine-specific: asserted on a real Mac (VESPERTINE_HARDWARE_TESTS=1), not on the CI runner.
+    static let sides = ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"
     static let fiveOne: [String] = ["L", "R", "C", "LFE", "Ls", "Rs"]
 
     private func tmp(_ name: String) -> URL { FileManager.default.temporaryDirectory.appendingPathComponent("dsd51-\(UUID())-\(name)") }
@@ -84,7 +86,7 @@ struct DSDSpatialTests {
             url = try write(ext, channels: channels)
         }
         defer { try? FileManager.default.removeItem(at: url) }
-        let result = try SpatialProbe.check(url, channels: channels, device: Self.airPodsMax)
+        let result = try SpatialProbe.check(url, channels: channels, device: Self.airPodsMax, sides: Self.sides)
         #expect(result.bed == Self.fiveOne)
         #expect(result.problems.isEmpty, "\(ext): \(result.problems)")
     }
@@ -106,7 +108,7 @@ struct DSDSpatialTests {
         defer { try? FileManager.default.removeItem(at: url) }
         let planes = DSDFiles.modulate(rate: SACDFixture.rate, seconds: 98.0 / 75, tones: SpatialProbe.frequencies(channels))
         try DSDIFFFixture.writeDST(planes, indexed: true, storedOnly: true, channelIDs: ["C000", "C001", "C002", "C003", "C004", "C005"], to: url)
-        let result = try SpatialProbe.check(url, channels: channels, device: Self.airPodsMax)
+        let result = try SpatialProbe.check(url, channels: channels, device: Self.airPodsMax, sides: Self.sides)
         #expect(result.bed == Self.fiveOne)
         #expect(result.problems.isEmpty, "\(result.problems)")
     }
