@@ -35,16 +35,16 @@ struct ConversionNoticeTests {
         #expect(downmixed?.dsdToPCM == false && downmixed?.downmix == SignalPath.Downmix(from: "5.1", to: "Stereo"))
     }
 
-    @Test("The badges add what the status line leaves out: DSD → PCM beside SPATIAL or a downmix, nothing twice")
+    @Test("The badges add what the status line leaves out: Converted from DSD beside SPATIAL or a downmix, nothing twice")
     func badges() {
         let spatial = DSDSpatialTests.path(S.surround, FormatPlanner.plan(source: S.surround, device: S.airPodsMax, spatial: .headTracked))
-        #expect(spatial.statusLine == "SPATIAL · HEAD TRACKED" && spatial.conversionBadges == ["DSD → PCM"])
+        #expect(spatial.statusLine == "SPATIAL · HEAD TRACKED" && spatial.conversionBadges == ["Converted from DSD"])
         let downmixed = DSDSpatialTests.path(S.surround, FormatPlanner.plan(source: S.surround, device: S.airPodsMax, spatial: .off))
-        #expect(downmixed.statusLine == "5.1 → STEREO" && downmixed.conversionBadges == ["DSD → PCM"])
+        #expect(downmixed.statusLine == "Downmixed to stereo" && downmixed.conversionBadges == ["Converted from DSD"])
         var stereo = S.surround
         stereo.channels = 2
         stereo.channelLabels = nil
         let converted = DSDSpatialTests.path(stereo, FormatPlanner.plan(source: stereo, device: S.airPodsMax, spatial: .headTracked))
-        #expect(converted.statusLine == "DSD → PCM" && converted.conversionBadges.isEmpty)
+        #expect(converted.statusLine == "Converted from DSD" && converted.conversionBadges.isEmpty)
     }
 }

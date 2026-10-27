@@ -139,15 +139,13 @@ struct StatusBadges: View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 8) { status; details }
             VStack(alignment: .leading, spacing: 8) { status; HStack(spacing: 8) { details } }
+            VStack(alignment: .leading, spacing: 8) { statusBadge; notices; HStack(spacing: 8) { details } }
         }
     }
-    private var status: some View {
-        HStack(spacing: 8) {
-            StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted)
-            // What the status leaves out: DSD converted to PCM beside SPATIAL or a downmix.
-            ForEach(path.conversionBadges, id: \.self) { StatusBadge(text: $0, kind: .converted) }
-        }
-    }
+    private var statusBadge: some View { StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted) }
+    // What the status leaves out: "Converted from DSD" beside SPATIAL or a downmix.
+    private var notices: some View { ForEach(path.conversionBadges, id: \.self) { StatusBadge(text: $0, kind: .converted) } }
+    private var status: some View { HStack(spacing: 8) { statusBadge; notices } }
     @ViewBuilder private var details: some View {
         StatusBadge(text: path.applied.exclusive ? String(localized: "EXCLUSIVE") : String(localized: "SHARED", comment: "Badge: the output device is shared with other apps"))
         StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")

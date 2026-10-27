@@ -86,7 +86,7 @@ public struct SignalPath: Sendable, Hashable {
         if plan.spatial != .off {
             return plan.spatial == .headTracked ? String(localized: "SPATIAL · HEAD TRACKED", comment: "Status badge (short, uppercase).") : String(localized: "SPATIAL AUDIO", comment: "Status badge (short, uppercase).")
         }
-        if plan.channels < source.channels { return "\(ChannelLayouts.name(channels: source.channels)) → \(ChannelLayouts.name(channels: plan.channels).uppercased())" }
+        if plan.channels < source.channels { return downmixNotice(from: ChannelLayouts.name(channels: source.channels), channels: plan.channels) }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
             switch deviceProfile.kind {
             case .airPlay: return String(localized: "AIRPLAY", comment: "Status badge (short, uppercase).")
@@ -97,7 +97,7 @@ public struct SignalPath: Sendable, Hashable {
             default: return String(localized: "BLUETOOTH · LOSSY", comment: "Status badge (short, uppercase).")
             }
         }
-        if plan.dsdConvertedToPCM { return "DSD → PCM" }
+        if plan.dsdConvertedToPCM { return Self.convertedFromDSD }
         if isResampling { return String(localized: "RESAMPLED", comment: "Status badge (short, uppercase).") }
         if source.encoding == .lossy { return String(localized: "LOSSY SOURCE", comment: "Status badge (short, uppercase).") }
         if !applied.exclusive, otherAppsPlaying { return String(localized: "MIXED WITH OTHER APPS", comment: "Status badge (short, uppercase).") }
@@ -105,6 +105,15 @@ public struct SignalPath: Sendable, Hashable {
         if modifiesSamples { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
         if !applied.physicalFormatKnown { return String(localized: "FORMAT UNCONFIRMED", comment: "Status badge (short, uppercase).") }
         return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
+    }
+
+    /// The notice for DSD played as PCM. "DSD" stays untranslated.
+    static var convertedFromDSD: String { String(localized: "Converted from DSD", comment: "Notice (badge, menu-bar line): the DSD music was converted to PCM for this output. DSD stays untranslated.") }
+
+    /// The notice for channels mixed down: "Downmixed to stereo", or "5.1 → MONO" for the rare mono output.
+    private func downmixNotice(from: String, channels: Int) -> String {
+        channels == 2 ? String(localized: "Downmixed to stereo", comment: "Notice (badge, menu-bar line): a surround track's channels were mixed down to two.")
+                      : "\(from) → \(ChannelLayouts.name(channels: channels).uppercased())"
     }
 
     /// A source's channels mixed into fewer ("5.1" → "Stereo").
@@ -130,13 +139,13 @@ public struct SignalPath: Sendable, Hashable {
         return Conversion(dsdToPCM: plan.dsdConvertedToPCM, downmix: downmix)
     }
 
-    /// The parts of `conversion` that `statusLine` doesn't already say, as short badges ("DSD → PCM", "5.1 → STEREO").
+    /// The parts of `conversion` that `statusLine` doesn't already say, as short notices ("Converted from DSD", "Downmixed to stereo").
     public var conversionBadges: [String] {
         guard let conversion else { return [] }
         var badges: [String] = []
-        if conversion.dsdToPCM, statusLine != "DSD → PCM" { badges.append("DSD → PCM") }
+        if conversion.dsdToPCM, statusLine != Self.convertedFromDSD { badges.append(Self.convertedFromDSD) }
         // The status line says a downmix itself, unless damaged frames take its place.
-        if let mix = conversion.downmix, concealedFrames > 0 { badges.append("\(mix.from) → \(mix.to.uppercased())") }
+        if let mix = conversion.downmix, concealedFrames > 0 { badges.append(downmixNotice(from: mix.from, channels: plan.channels)) }
         return badges
     }
 
