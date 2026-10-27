@@ -44,7 +44,12 @@ struct DiscreteRoutingTests {
     // The studio evidence run's engine-routing-render failures (2026-10-23), one case per kind, and the layouts that passed.
     static let cases: [Case] = [
         Case("5.1 with no layout (AIFF, legacy WAV, mask 0): was silent", nil, channels: 6, outputs: ["L", "R", "C", "LFE", "Ls", "Rs"]),
-        Case("7.1 with no layout (legacy WAV): was silent", nil, channels: 8, outputs: ["L", "R", "C", "LFE", "Ls", "Rs", "Lrs", "Rrs"]),
+        // With no layout, channels are in WAV order (FL FR FC LFE BL BR SL SR, as FFmpeg and SMPTE also write 7.1): the side
+        // pair goes to Ls/Rs and the back pair to Lrs/Rrs, like a labelled WAV 7.1.
+        Case("7.1 with no layout (AIFF, legacy WAV): was silent", nil, channels: 8, outputs: ["L", "R", "C", "LFE", "Ls", "Rs", "Lrs", "Rrs"],
+             carries: [0, 1, 2, 3, 6, 7, 4, 5]),
+        Case("6.1 with no layout (WAV order FL FR FC LFE BC SL SR)", nil, channels: 7, outputs: ["L", "R", "C", "LFE", "Ls", "Rs", "Cs"],
+             carries: [0, 1, 2, 3, 5, 6, 4]),
         Case("5.1 with a 2-speaker mask: C, LFE and surrounds were lost", ["L", "R", "-", "-", "-", "-"], outputs: ["L", "R", "C", "LFE", "Ls", "Rs"]),
         Case("5.1 back pair (CAF WAVE tag): BL/BR were lost", ["L", "R", "C", "LFE", "Lrs", "Rrs"], tag: kAudioChannelLayoutTag_WAVE_5_1_B,
              outputs: ["L", "R", "C", "LFE", "Ls", "Rs"]),

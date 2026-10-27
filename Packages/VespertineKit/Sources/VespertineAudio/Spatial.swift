@@ -185,10 +185,12 @@ public enum ChannelLayouts {
 
     /// A multichannel file on a device with as many outputs and no speaker setup: the source channel each output
     /// carries (-1: none). Every channel goes to an output of its own, unmixed: its own speaker's output, else the
-    /// nearest single one free, else the first output left over. Channels without speaker names stay in stored order,
-    /// which is the standard order for their count.
+    /// nearest single one free, else the first output left over. Channels without speaker names are taken to be in
+    /// WAV order for their count (`wavOrderLabels`).
     static func discreteMap(source: [AudioChannelLabel]?, outputs: [AudioChannelLabel]) -> [Int] {
-        guard let source, source.count == outputs.count else { return outputs.indices.map { $0 < (source?.count ?? outputs.count) ? $0 : -1 } }
+        guard let source = source ?? wavOrderLabels(channels: outputs.count), source.count == outputs.count else {
+            return outputs.indices.map { $0 < (source?.count ?? outputs.count) ? $0 : -1 }
+        }
         let wanted = normalizedSurrounds(source).map(canonical), slots = outputs.map(canonical)
         var map = [Int](repeating: -1, count: outputs.count), placed = [Bool](repeating: false, count: source.count)
         func place(_ s: Int, _ candidates: [AudioChannelLabel]) {
@@ -204,6 +206,19 @@ public enum ChannelLayouts {
             placed[s] = true
         }
         return map
+    }
+
+    /// The speakers of a WAV file with no channel mask, in the order of the mask's bits as FFmpeg and SMPTE use them for
+    /// the count (WAVE labels: the back pair is Ls/Rs, the side pair Lsd/Rsd). 6.1 is FL FR FC LFE BC SL SR and 7.1
+    /// FL FR FC LFE BL BR SL SR, where the standard (MPEG) layouts of those counts put the side pair first.
+    static func wavOrderLabels(channels: Int) -> [AudioChannelLabel]? {
+        let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                      kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        switch channels {
+        case 7: return [L, R, C, LFE, kAudioChannelLabel_CenterSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
+        case 8: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
+        default: return standardLabels(channels: channels)
+        }
     }
 
     /// The names of the outputs `discreteMap` fills, in the standard order for the count: an output that took a
