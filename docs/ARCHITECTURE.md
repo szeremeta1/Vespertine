@@ -124,6 +124,8 @@ Channel-for-channel output is experimental, untested on real receivers and multi
 
 `FormatPlanner` sends every channel to devices that can carry them (following the speaker layout from Audio MIDI Setup, and counting an HDMI receiver's channel capacity even in 2-channel mode), downmixes by channel layout on stereo devices, and on AirPods and Beats renders the channels with Apple's spatial mixer (`AUSpatialMixer`, head tracked or fixed) inside the I/O callback, through a C hook, so head tracking responds instantly.
 
+On a device with as many outputs as the file has channels and no speaker setup, the plan's `routeLabels` name the outputs in the standard order for the count (L R C LFE Ls Rs …), and the converter gets an explicit channel map (`ChannelLayouts.discreteMap`) instead of mixing by layout: each channel goes, unmixed, to its own speaker's output, else the nearest single one (a 5.1's back pair on Ls/Rs), else an output left over, which is then named after it (2.1's LFE, LCRS's centres, 7.1 wide's front centres, 5.1.2's heights). Channels with no speaker names stay in stored order. Matched by layout, the converter dropped speakers the standard layout lacks, put a side pair on the back pair at -3 dB, lowered a whole mix it folded a pair into, and played files with no speaker names as silence.
+
 ## Network shares
 
 - `NetworkVolume` mounts with NetFS: soft, read-only by default, hidden from the Finder sidebar, in `/Volumes`. Current macOS refuses mounts inside an app's Application Support folder (protected app data), so mounting there would work once and never again.

@@ -95,17 +95,20 @@ struct StudioRoutingTests {
         let layout = variant == .decoder ? own : OutputSession.routeLayout(plan: plan, speakers: nil)
         let channels = variant == .decoder ? Int(decoder.processingFormat.channelCount) : plan.channels
         let rate = variant == .decoder ? decoder.processingFormat.sampleRate : plan.deviceSampleRate
+        // The engine's own converter (PlaybackEngine.Decoding); the decoder variant keeps the decoder's channels as they are.
         guard let outFormat = AudioFormats.float32(sampleRate: rate, channels: channels, interleaved: true, layout: layout),
-              let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat),
+              let converter = variant == .discrete ? OutputSession.converter(from: decoder.processingFormat, to: outFormat, plan: plan)
+                                                   : AVAudioConverter(from: decoder.processingFormat, to: outFormat),
               let input = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 8192),
               let output = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: 8192) else {
             throw SourceOpenerError.unsupported(url)
         }
-        // The engine's converter settings (PlaybackEngine.Decoding).
-        converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
-        converter.sampleRateConverterQuality = .max
-        converter.downmix = true
-        converter.dither = false
+        if variant == .decoder {
+            converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
+            converter.sampleRateConverterQuality = .max
+            converter.downmix = true
+            converter.dither = false
+        }
         let file = try CAFWriter(dest, rate: rate, channels: channels, layout: outFormat.channelLayout)
         defer { file.close() }
         var ended = false, frames = 0

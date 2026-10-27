@@ -50,6 +50,7 @@ public enum FormatPlanner {
         } else if plan.channels < source.channels {
             plan.reason = "\(name) downmixed to \(ChannelLayouts.name(channels: plan.channels)). " + plan.reason
         } else {
+            plan.routeLabels = ChannelLayouts.discreteLabels(source: source.channelLabels, channels: source.channels)
             plan.reason = "\(name) to \(source.channels) outputs in standard order (L R C LFE Ls Rs…). " + plan.reason
         }
         return plan

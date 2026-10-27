@@ -204,13 +204,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                               ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
             }
             guard let outFormat = path.applied.integerMode ? integer : float,
-                  let converter = AVAudioConverter(from: decoder.processingFormat, to: outFormat) else {
+                  let converter = OutputSession.converter(from: decoder.processingFormat, to: outFormat, plan: path.plan) else {
                 throw SourceOpenerError.unsupported(item.url)
             }
-            converter.sampleRateConverterAlgorithm = AVSampleRateConverterAlgorithm_Mastering
-            converter.sampleRateConverterQuality = .max
-            converter.downmix = true
-            converter.dither = false
             self.converter = converter
             let inCapacity = AVAudioFrameCount(Double(chunk) * decoder.processingFormat.sampleRate / path.plan.deviceSampleRate) + 1024
             guard let inBuffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity),
