@@ -265,4 +265,23 @@ struct DSDTests {
         #expect(found.pcm == expected)
         #expect(found.dop == expected)
     }
+
+    // DSDIFF names each channel in its CHNL chunk; FFmpeg's reader knows only stereo, 5.0 and 5.1 there and calls a
+    // 3.1 file (MLFT MRGT C LFE) quad (L R Ls Rs).
+    static let dsdiffIDs: [([String], [AudioChannelLabel])] = [
+        (["MLFT", "MRGT", "C   ", "LFE "], [L, R, C, LFE]), (["MLFT", "MRGT", "C   "], [L, R, C]),
+        (["MLFT", "MRGT", "LS  ", "RS  "], [L, R, Ls, Rs]), (["MLFT", "MRGT", "C   ", "LFE ", "LS  ", "RS  "], [L, R, C, LFE, Ls, Rs]),
+    ]
+    @Test("DSDIFF: channels are labelled from the file's CHNL chunk", arguments: dsdiffIDs)
+    func dsdiffChannelIDs(ids: [String], expected: [AudioChannelLabel]) throws {
+        let stereo = DSDFiles.modulate(rate: 2_822_400, seconds: 0.05)
+        let planes = (0..<ids.count).map { stereo[$0 % 2] }
+        let url = tmp("\(ids.count)ch.dff")
+        defer { try? FileManager.default.removeItem(at: url) }
+        try DSDFiles.writeDFF(planes, rate: 2_822_400, channelIDs: ids, to: url)
+        let found = try labels(url, channels: ids.count)
+        #expect(found.probe == expected)
+        #expect(found.pcm == expected)
+        #expect(found.dop == expected)
+    }
 }

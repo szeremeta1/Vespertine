@@ -173,9 +173,9 @@ enum SourceOpener {
             let decoder = FFmpegDecoder(url: url)
             try decoder.open()
             guard decoder.isDSD else { throw SourceOpenerError.unsupported(url) }
-            // The speakers as the file's header names them. FFmpeg's reader calls DSF channel type 5 (L R C LFE)
-            // 4.0 (L R C Cs).
-            let labels = ext == "dsf" ? dsfLabels(url) : nil
+            // The speakers as the file's header names them. FFmpeg's readers call DSF channel type 5 (L R C LFE)
+            // 4.0 (L R C Cs) and know DSDIFF's CHNL only for stereo, 5.0 and 5.1 (a 3.1 became quad).
+            let labels = ext == "dsf" ? dsfLabels(url) : DSDIFFChannels.ids(url).map(dsdiffLabels)
             if let labels, labels.count == Int(decoder.processingFormat.channelCount), labels.count > 2,
                let layout = ChannelLayouts.layout(labels: labels) {
                 decoder.relabel(layout)

@@ -210,3 +210,39 @@ final class DSTDSDIFFSource: InterleavedDSDSource {
         return n
     }
 }
+
+/// The channel IDs in any DSDIFF file's CHNL chunk, compressed or not (DSDIFF 1.5 §3.2.2), in stored order.
+enum DSDIFFChannels {
+    static func ids(_ url: URL) -> [String]? {
+        typealias F = DSTDSDIFFInfo
+        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? file.close() }
+        guard let size = try? file.seekToEnd(), size >= 16, let head = try? F.read(file, at: 0, count: 16),
+              F.id(head, 0) == "FRM8", F.id(head, 12) == "DSD " else { return nil }
+        let formSize = F.number(head, 4, 8)
+        guard formSize >= 4, formSize <= size - 12 else { return nil }
+        let end = formSize + 12
+        var p: UInt64 = 16
+        while p + 12 <= end, let h = try? F.read(file, at: p, count: 12) {
+            let length = F.number(h, 4, 8), body = p + 12
+            guard length <= end - body else { return nil }
+            if F.id(h, 0) == "PROP" {
+                guard length >= 4, length <= 1 << 20, let data = try? F.read(file, at: body, count: Int(length)), F.id(data, 0) == "SND " else { return nil }
+                var q = 4
+                while q + 12 <= data.count {
+                    let n = F.number(data, q + 4, 8)
+                    guard n <= UInt64(data.count - q - 12) else { return nil }
+                    if F.id(data, q) == "CHNL", n >= 2 {
+                        let channels = Int(F.number(data, q + 12, 2))
+                        guard n >= UInt64(2 + channels * 4) else { return nil }
+                        return (0..<channels).map { F.id(data, q + 14 + $0 * 4) }
+                    }
+                    q += 12 + Int(n) + Int(n & 1)
+                }
+                return nil
+            }
+            p = body + length + (length & 1)
+        }
+        return nil
+    }
+}
