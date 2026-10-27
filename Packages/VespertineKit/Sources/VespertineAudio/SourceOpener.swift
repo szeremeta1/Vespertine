@@ -197,18 +197,28 @@ enum SourceOpener {
                                 pcm: decoder, dsd: nil)
         }
         guard AudioDecoder.handlesPaths(withExtension: ext) || !ext.isEmpty else { throw SourceOpenerError.unsupported(url) }
+        // RF64 and Wave64: Core Audio, else libsndfile. The decoder is otherwise picked by a look at the header that
+        // only knows "RIFF…WAVE", and the MP3 decoder's look finds a frame header in RF64's 0xFFFFFFFF size or in the
+        // first 2 KB of 24-bit samples: it then claims the file and fails, or plays 0 s of it.
+        let names: [AudioDecoder.Name?] = dolbyExtensions.contains(ext) ? [.coreAudio] : isLargeWAV(url) ? [.coreAudio, .libsndfile] : [nil]
         func openDecoder() throws -> (raw: AudioDecoder, decoder: GuardedDecoder) {
-            let raw = dolbyExtensions.contains(ext) ? try AudioDecoder(url: url, decoderName: .coreAudio) : try AudioDecoder(url: url)
-            // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
-            let decoder = GuardedDecoder(raw)
-            if String(describing: type(of: raw)).contains("MPEG") {
-                // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
-                // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
-                try mpegOpenLock.withLock { try decoder.open() }
-            } else {
-                try decoder.open()
+            var failure: Error?
+            for name in names {
+                do {
+                    let raw = try name.map { try AudioDecoder(url: url, decoderName: $0) } ?? AudioDecoder(url: url)
+                    // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
+                    let decoder = GuardedDecoder(raw)
+                    if String(describing: type(of: raw)).contains("MPEG") {
+                        // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
+                        // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
+                        try mpegOpenLock.withLock { try decoder.open() }
+                    } else {
+                        try decoder.open()
+                    }
+                    return (raw, decoder)
+                } catch { failure = error }
             }
-            return (raw, decoder)
+            throw failure ?? SourceOpenerError.unsupported(url)
         }
         var (raw, decoder) = try openDecoder()
         // A DTS CD / DTS-WAV: 16-bit stereo "PCM" that is really a DTS bitstream (noise if played as PCM).
@@ -328,6 +338,17 @@ enum SourceOpener {
             decoder = region
         }
         return decoder
+    }
+
+    /// RF64 / BW64 (EBU Tech 3306, ITU-R BS.2088) or Sony Wave64, by the file's first bytes.
+    static func isLargeWAV(_ url: URL) -> Bool {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? file.close() }
+        guard let head = try? file.read(upToCount: 12), head.count == 12 else { return false }
+        let bytes = [UInt8](head)
+        let w64: [UInt8] = [0x72, 0x69, 0x66, 0x66, 0x2E, 0x91, 0xCF, 0x11, 0xA5, 0xD6, 0x28, 0xDB]   // "riff" GUID
+        let id = String(decoding: bytes[0..<4], as: UTF8.self), form = String(decoding: bytes[8..<12], as: UTF8.self)
+        return bytes == w64 || (["RF64", "BW64"].contains(id) && form == "WAVE")
     }
 
     static func codecName(ext: String, formatID: AudioFormatID) -> String {
