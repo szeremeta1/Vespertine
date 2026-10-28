@@ -153,13 +153,16 @@ struct SpatialProbe {
     }
 
     /// Decodes `url` the way the engine does for a Spatial Audio plan, and checks every channel.
-    static func check(_ url: URL, channels: [String]) throws -> Result {
+    /// `device`: the headphones' capabilities (a device at the decoded rate when nil).
+    /// `sides`: also check each channel's left/right level difference after Apple's spatial mixer. That depends on the machine's
+    /// renderer (a 420 Hz front-left is +3.4 dB here and +0.1 dB on the macos-26 runner), so CI skips it, as it skips hardware checks.
+    static func check(_ url: URL, channels: [String], device: DeviceCapabilities? = nil, sides: Bool = true) throws -> Result {
         var result = Result()
         let probed = try SourceOpener.probe(url)
         let f = probed.format
         let pcmRate = f.encoding == .dsd ? FormatPlanner.dsdToPCMRate(f.sampleRate) : f.sampleRate
-        var plan = FormatPlanner.plan(source: f, device: DeviceCapabilities(sampleRates: [pcmRate], physicalFormats: [], outputChannels: 2,
-                                                                            supportsDoP: false), spatial: .fixed)
+        let device = device ?? DeviceCapabilities(sampleRates: [pcmRate], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        var plan = FormatPlanner.plan(source: f, device: device, spatial: .fixed)
         plan.integerSamples = false
         guard plan.spatial == .fixed else { result.problems.append("not planned for Spatial Audio (\(f.channels) ch)"); return result }
         let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
@@ -242,6 +245,7 @@ struct SpatialProbe {
                 result.problems.append("\(name) silent after Spatial Audio (\(String(format: "%.0f", 20 * log10(max(l, r, 1e-9) / 0.1))) dB)")
                 continue
             }
+            guard sides else { continue }
             switch side(position) {
             case .left where ild < 2: result.problems.append("\(name) not on the left (ILD \(String(format: "%+.1f", ild)) dB)")
             case .right where ild > -2: result.problems.append("\(name) not on the right (ILD \(String(format: "%+.1f", ild)) dB)")

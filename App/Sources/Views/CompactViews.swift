@@ -108,7 +108,7 @@ struct MenuBarView: View {
                     Text(player.current.map { "\($0.track.displayArtist.libraryDisplayName) — \($0.track.displayAlbum.libraryDisplayName)" } ?? "Vespertine")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
-                        (player.buffering ? Text("BUFFERING…") : Text(verbatim: "\(path.statusLine) · \(path.deviceFormatShort)")).font(Typeface.mono(9.5))
+                        (player.buffering ? Text("BUFFERING…") : Text(verbatim: ([path.statusLine] + path.conversionBadges + [path.deviceFormatShort]).joined(separator: " · "))).font(Typeface.mono(9.5)).lineLimit(2)
                             .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
                     }
                 }

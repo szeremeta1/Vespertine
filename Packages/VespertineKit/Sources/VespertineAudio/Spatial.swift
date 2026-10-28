@@ -240,9 +240,14 @@ public enum ChannelLayouts {
     /// The speaker of each channel when a multichannel layout names them all (nil for stereo, unlabeled
     /// or discrete channels, and for a speaker named twice).
     public static func speakerLabels(_ layout: AVAudioChannelLayout?) -> [AudioChannelLabel]? {
-        guard let layout, layout.channelCount > 2, layout.hasSpeakerPositions else { return nil }
-        let labels = layout.channelLabels
-        return Set(labels).count == labels.count ? labels : nil
+        speakerLabels(layout?.channelLabels)
+    }
+
+    /// The same for labels already read: nil unless every channel names its own speaker (DSDIFF's discrete
+    /// channel IDs name none, and are taken in the standard order like unlabeled channels).
+    public static func speakerLabels(_ labels: [AudioChannelLabel]?) -> [AudioChannelLabel]? {
+        guard let labels, labels.count > 2, labels.allSatisfy(AVAudioChannelLayout.isSpeaker), Set(labels).count == labels.count else { return nil }
+        return labels
     }
 
     static let lfeLabels: Set<AudioChannelLabel> = [kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3]
@@ -256,7 +261,7 @@ public enum ChannelLayouts {
 
     /// "Quad", "5.1", "3.1", "7.1.4", … from the speakers themselves; by channel count when they aren't known.
     public static func name(labels: [AudioChannelLabel]?, channels: Int) -> String {
-        guard let labels, labels.count == channels, channels > 2 else { return name(channels: channels) }
+        guard let labels = speakerLabels(labels), labels.count == channels else { return name(channels: channels) }
         let set = Set(labels)
         if set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround]
             || set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_RearSurroundLeft, kAudioChannelLabel_RearSurroundRight]
@@ -487,10 +492,13 @@ extension AVAudioChannelLayout {
 
     /// True when channels carry real speaker positions (not just "channel 1, 2, …").
     public var hasSpeakerPositions: Bool {
-        let labels = channelLabels
-        let positional = labels.filter { $0 != kAudioChannelLabel_Unknown && $0 != kAudioChannelLabel_Unused
-            && !($0 >= kAudioChannelLabel_Discrete && $0 <= kAudioChannelLabel_Discrete_65535) }
-        return channelCount >= 2 && positional.count == labels.count
+        channelCount >= 2 && channelLabels.allSatisfy(Self.isSpeaker)
+    }
+
+    /// A speaker position, not "unknown", "unused" or a discrete channel number.
+    static func isSpeaker(_ label: AudioChannelLabel) -> Bool {
+        label != kAudioChannelLabel_Unknown && label != kAudioChannelLabel_Unused
+            && !(label >= kAudioChannelLabel_Discrete && label <= kAudioChannelLabel_Discrete_65535)
     }
 
     /// "L R C LFE Ls Rs"
