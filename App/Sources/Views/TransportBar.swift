@@ -325,9 +325,10 @@ struct DeviceSettings: View {
             }
             .font(Typeface.ui(12))
             if device.transport == .usb || device.transport == .thunderbolt {
-                Toggle(isOn: Binding(get: { settings.dopDeviceUIDs.contains(device.uid) },
+                Toggle(isOn: Binding(get: { DoPDefaults.isEnabled(uid: device.uid, on: settings.dopDeviceUIDs, off: settings.dopOffDeviceUIDs) },
                                      set: { on in
-                                         if on { settings.dopDeviceUIDs.insert(device.uid) } else { settings.dopDeviceUIDs.remove(device.uid) }
+                                         if on { settings.dopDeviceUIDs.insert(device.uid); settings.dopOffDeviceUIDs.remove(device.uid) }
+                                         else { settings.dopDeviceUIDs.remove(device.uid); settings.dopOffDeviceUIDs.insert(device.uid) }
                                          model.syncEngine()
                                      })) {
                     VStack(alignment: .leading, spacing: 1) {
