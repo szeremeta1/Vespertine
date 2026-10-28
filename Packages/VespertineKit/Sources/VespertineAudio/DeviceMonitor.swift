@@ -7,6 +7,9 @@ import CoreAudio
 import Foundation
 
 public enum OutputDevices {
+    /// UIDs of the connected outputs: cheap, no formats read.
+    public static func connectedUIDs() -> Set<String> { DeviceQuery.outputUIDs() }
+
     public static func list(dopEnabledUIDs: Set<String> = []) -> [OutputDevice] {
         DeviceQuery.outputDevices(dopEnabledUIDs: dopEnabledUIDs)
     }

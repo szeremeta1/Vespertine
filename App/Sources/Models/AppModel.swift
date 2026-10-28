@@ -258,7 +258,7 @@ final class AppModel {
         analysis.onServerStatus = { [weak shares = self.shares] id, status in
             Task { await shares?.serverReported(status, for: id) }
         }
-        devices.dopUIDs = settings.dopDeviceUIDs
+        devices.dopUIDs = settings.effectiveDoPUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
             self?.followChosenOutput()
@@ -390,7 +390,7 @@ final class AppModel {
 
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {
-        devices.dopUIDs = settings.dopDeviceUIDs
+        devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
         player.engine.update(settings: settings.engineSettings())
         devices.watchVolume(of: device)

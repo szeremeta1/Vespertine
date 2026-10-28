@@ -70,7 +70,13 @@ final class AppSettings {
     var selectedDevice: OutputIdentity? { didSet { defaults.set(try? JSONEncoder().encode(selectedDevice), forKey: "selectedDevice") } }
     /// What plays while the chosen output isn't connected.
     var outputFallback: OutputFallback { didSet { defaults.set(outputFallback.rawValue, forKey: "outputFallback") } }
+    /// Explicit ons plus connected known DACs not turned off: what the engine and device list use.
+    var effectiveDoPUIDs: Set<String> {
+        DoPDefaults.resolve(on: dopDeviceUIDs, off: dopOffDeviceUIDs, connected: OutputDevices.connectedUIDs())
+    }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
+    /// DACs known to take DoP (`DoPDefaults`) start with it on; a device turned off here stays off.
+    var dopOffDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopOffDeviceUIDs), forKey: "dopOffDeviceUIDs") } }
     /// Outputs with an AV receiver: Dolby and DTS are sent to them untouched.
     var bitstreamDeviceUIDs: Set<String> { didSet { defaults.set(Array(bitstreamDeviceUIDs), forKey: "bitstreamDeviceUIDs") } }
     /// Spatial Audio for multichannel music, per device (unset = head tracked on AirPods/Beats, off elsewhere).
@@ -145,6 +151,7 @@ final class AppSettings {
         selectedDevice = defaults.data(forKey: "selectedDevice").flatMap { try? JSONDecoder().decode(OutputIdentity.self, from: $0) }
         outputFallback = OutputFallback(rawValue: defaults.string(forKey: "outputFallback") ?? "") ?? .bestAvailable
         dopDeviceUIDs = Set(defaults.stringArray(forKey: "dopDeviceUIDs") ?? [])
+        dopOffDeviceUIDs = Set(defaults.stringArray(forKey: "dopOffDeviceUIDs") ?? [])
         bitstreamDeviceUIDs = Set(defaults.stringArray(forKey: "bitstreamDeviceUIDs") ?? [])
         spatialModes = defaults.dictionary(forKey: "spatialModes") as? [String: String] ?? [:]
         rateChoices = defaults.dictionary(forKey: "rateChoices") as? [String: String] ?? [:]
@@ -219,6 +226,7 @@ final class AppSettings {
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
     func moveDeviceSettings(from old: String, to new: String) {
         if dopDeviceUIDs.contains(old) { dopDeviceUIDs.insert(new) }
+        if dopOffDeviceUIDs.contains(old) { dopOffDeviceUIDs.insert(new) }
         if bitstreamDeviceUIDs.contains(old) { bitstreamDeviceUIDs.insert(new) }
         if spatialModes[new] == nil, let mode = spatialModes[old] { spatialModes[new] = mode }
         if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
@@ -264,7 +272,7 @@ final class AppSettings {
         s.deviceUID = selectedDeviceUID
         s.deviceName = selectedDevice.flatMap { $0.uid == selectedDeviceUID ? $0.name : nil }
         s.outputFallback = outputFallback
-        s.dopDeviceUIDs = dopDeviceUIDs
+        s.dopDeviceUIDs = effectiveDoPUIDs
         s.bitstreamDeviceUIDs = bitstreamDeviceUIDs
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }

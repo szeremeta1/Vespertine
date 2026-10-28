@@ -88,10 +88,10 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 
 ## Known limitations
 
-Playback has been tested on a FiiO K11 at rates up to 384 kHz, AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
+Playback has been tested on a FiiO K11 at rates up to 384 kHz, a Fosi Audio ZD3 (DSD over DoP), AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
 
 - Channel-for-channel output is confirmed on one real device, a Sony TV over HDMI (5.1 and a 7.1 to 5.1 downmix; see [Tested devices](docs/DEVICES.md)). Multichannel USB DACs and Dolby/DTS bitstream to receivers are untested on real hardware; reports wanted.
-- Intel Macs are untested (the Intel build has run under Rosetta). DoP is confirmed only on the FiiO K11, and carrier rates above 384 kHz are untested on hardware.
+- Intel Macs are untested (the Intel build has run under Rosetta). DoP is confirmed on the FiiO K11 and the Fosi Audio ZD3, and carrier rates above 384 kHz are untested on hardware.
 - No convolution, audio effect plugins, streaming services or UPnP/DLNA.
 - No DVD-Audio, DSD inside WavPack or DRM-protected Apple Music downloads. TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
