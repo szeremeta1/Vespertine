@@ -30,6 +30,9 @@ const fontRules = readFileSync(here('../src/styles/global.css'), 'utf8').split('
 const UNTRACKED = new Set(['ar', 'fa', 'ur', 'hi', 'mr', 'bn', 'gu', 'pa', 'ta', 'te', 'kn', 'ml', 'th', 'am']);
 const CJK = new Set(['ja', 'ko', 'zh-Hans', 'zh-Hant', 'zh-HK']);
 const NO_ITALIC = new Set([...UNTRACKED, ...CJK, 'he']);
+// Scripts whose home-card headline breaks only where the site's hero breaks its lines (titleLines), so a phrase
+// ("عالية الدقة", "آپ کے", "高解析度音乐") never splits; Latin, Greek, Cyrillic and Japanese wrap on their own.
+const DESIGNED_LINES = new Set([...UNTRACKED, 'he', 'ko', 'zh-Hans', 'zh-Hant', 'zh-HK']);
 
 const css = `
 @font-face { font-family: "Newsreader"; font-style: normal; font-weight: 300 400; src: url(${url('../src/assets/fonts/newsreader-roman.woff2')}) format("woff2"); }
@@ -96,8 +99,10 @@ p.lede { font-size: 21px; line-height: 1.5; color: #c9c2b5; margin: 24px 0 0; wi
 .lang-ur h1 { line-height: 1.6; }
 .lang-ko { word-break: keep-all; }
 .lang-ja h1 { word-break: auto-phrase; }
-/* Chinese headlines break only where the site's hero breaks its lines (<wbr>), never inside a word. */
-.lang-zh-Hans h1, .lang-zh-Hant h1, .lang-zh-HK h1 { word-break: keep-all; }
+/* Chinese headlines and ledes break at spaces and punctuation, never inside a word ("简单明了", "注册"). */
+.lang-zh-Hans :is(h1, .lede), .lang-zh-Hant :is(h1, .lede), .lang-zh-HK :is(h1, .lede) { word-break: keep-all; }
+/* A run that never breaks: a designed headline line, a hyphenated word ("hi-res"). */
+.nw { white-space: nowrap; }
 /* No one-character last lines (Chinese and Japanese ledes); the English cards keep their original wrapping. */
 .l10n p.lede { text-wrap: pretty; }
 `;
@@ -107,6 +112,22 @@ const shot = (n) => url(`../src/assets/shots/${n}.jpg`);
 const press = (n) => url(`../src/assets/press/${n}.jpg`);
 const mark = url('../../docs/brand/mark.svg');
 const brass = (s) => `<span class="brass-italic">${esc(s)}</span>`;
+/** Escaped headline text in which hyphenated words ("hi-res", "Hi-Res") don't break at the hyphen. */
+const words = (s) => esc(s).replace(/[\p{L}\p{M}\d]+(?:-[\p{L}\p{M}\d]+)+/gu, (w) => `<span class="nw">${w}</span>`);
+/** The hero headline as the site sets it: its lines (and the brass phrase) kept whole, a break allowed between them. */
+function designed(h) {
+  const parts = [...h.titleLines, h.titleBrass];
+  let rest = h.titleSr, out = '';
+  parts.forEach((p, i) => {
+    const at = rest.indexOf(p);
+    if (at < 0) throw new Error(`hero line "${p}" isn't in titleSr "${h.titleSr}"`);
+    const gap = rest.slice(0, at);
+    rest = rest.slice(at + p.length);
+    const text = i === parts.length - 1 ? brass(p) : esc(p);
+    out += `${i === 0 ? '' : gap ? ' ' : '<wbr>'}<span class="nw">${text}</span>`;
+  });
+  return out;
+}
 // An isolated run in the foot reads right to left if it has any Hebrew or Arabic-script letter ("Apple silicon وIntel"),
 // as runDir in src/i18n/index.ts does on the pages.
 const bdi = (s) => `<bdi dir="${/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(s) ? 'rtl' : 'ltr'}">${esc(s)}</bdi>`;
@@ -120,7 +141,6 @@ function cards(lang) {
   const [free, mac, arch] = h.eyebrow.map(fill);
   const lower = (x) => (x.length > 1 && x[1] === x[1].toLocaleLowerCase(lang) ? x[0].toLocaleLowerCase(lang) + x.slice(1) : x);
   const foot = `<div class="rule"></div><div class="foot"><b>vespertineapp.com</b> · ${bdi(lower(free))} · ${bdi(mac)} · ${bdi(arch)}</div>`;
-  const before = (whole, tail) => esc(whole.slice(0, whole.length - tail.length));
   // The press heading puts the name where the language needs it; the name and the full stop after it are brass.
   const [pBefore, pRest = ''] = fill(s.press.heading).replace('Vespertine', '\u0000').split('\u0000');
   const pStop = pRest.match(/^[.。।۔።]?/)[0];
@@ -128,7 +148,7 @@ function cards(lang) {
     home: `
     <div class="copy">
       <img class="lockup" src="${lockup}" alt="">
-      <h1>${lang.startsWith('zh-') ? `${h.titleLines.map(esc).join('<wbr>')}<wbr>` : before(h.titleSr, h.titleBrass)}${brass(h.titleBrass)}</h1>
+      <h1>${DESIGNED_LINES.has(lang) ? designed(h) : `${words(h.titleSr.slice(0, h.titleSr.length - h.titleBrass.length))}${brass(h.titleBrass)}`}</h1>
       <p class="lede">${esc(og.homeLede)}</p>
       <div class="chips"><span class="chip brass">${esc(s.home.badges.bitPerfect)}</span><span class="chip" dir="ltr">SACD ISO</span><span class="chip" dir="ltr">DSD · DoP</span><span class="chip">${esc(og.spatial)}</span></div>
     </div>
@@ -138,7 +158,7 @@ function cards(lang) {
     <div class="copy" style="width:560px">
       <img class="lockup" src="${lockup}" alt="">
       <p class="eyebrow">${esc(s.press.eyebrow)}</p>
-      <h1>${esc(pBefore)}${brass(`Vespertine${pStop}`)}${esc(pRest.slice(pStop.length))}</h1>
+      <h1>${words(pBefore)}${brass(`Vespertine${pStop}`)}${words(pRest.slice(pStop.length))}</h1>
       <p class="lede" style="width:520px">${esc(og.pressLede)}</p>
     </div>
     <div class="stack">
@@ -151,7 +171,7 @@ function cards(lang) {
     <div class="copy">
       <img class="lockup" src="${lockup}" alt="">
       <p class="eyebrow">${esc(s.privacy.eyebrow)}</p>
-      <h1 class="big">${esc(s.privacy.heading)} ${brass(s.privacy.headingBrass)}</h1>
+      <h1 class="big">${words(s.privacy.heading)} ${brass(s.privacy.headingBrass)}</h1>
       <p class="lede">${esc(og.privacyLede)}</p>
     </div>
     <img class="mark" src="${mark}" alt="">
@@ -160,7 +180,7 @@ function cards(lang) {
     <div class="copy">
       <img class="lockup" src="${lockup}" alt="">
       <p class="eyebrow">${esc(s.terms.eyebrow)}</p>
-      <h1 class="big">${esc(s.terms.heading)} ${brass(s.terms.headingBrass)}</h1>
+      <h1 class="big">${words(s.terms.heading)} ${brass(s.terms.headingBrass)}</h1>
       <p class="lede">${esc(og.termsLede)}</p>
     </div>
     <img class="mark" src="${mark}" alt="">

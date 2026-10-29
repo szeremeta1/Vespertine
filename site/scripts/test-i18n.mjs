@@ -1,7 +1,8 @@
 // Headless checks of the language features on the built site (dist/), in Google Chrome via playwright-core:
 //  - the first visit to / goes to the browser's language (pt-PT, zh-TW, no …) once, and stays English otherwise;
 //  - a language picked in the menu wins over the browser's, English included, and survives a return to /;
-//  - arriving at / from another page of the site never redirects;
+//  - arriving at / from another page of the site never redirects, nor does a crawler (Googlebot, YandexBot …), nor
+//    does a shared link to a language's page (/el/ stays Greek for a German browser or a stored choice);
 //  - the menu opens and closes from the keyboard, names each language in itself, marks the current one, and keeps
 //    the visitor on the same page (and section) in the new language;
 //  - a missing page answers 404 in the visitor's language;
@@ -18,8 +19,8 @@ const results = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok, detail }); console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${detail ? ` (${detail})` : ''}`); };
 
 /** A fresh visitor whose browser asks for these languages. */
-async function visitor(languages, storage) {
-  const context = await browser.newContext({ locale: languages[0], reducedMotion: 'reduce' });
+async function visitor(languages, storage, userAgent) {
+  const context = await browser.newContext({ locale: languages[0], reducedMotion: 'reduce', ...(userAgent ? { userAgent } : {}) });
   await context.addInitScript(({ languages, storage }) => {
     Object.defineProperty(navigator, 'languages', { get: () => languages });
     Object.defineProperty(navigator, 'language', { get: () => languages[0] });
@@ -35,7 +36,7 @@ const cases = [
   [['ru-RU', 'en-US', 'de'], '/'], [['fr-CA'], '/fr/'], [['pt-PT'], '/pt-PT/'], [['pt'], '/pt-BR/'], [['pt-BR'], '/pt-BR/'],
   [['zh-CN'], '/zh-Hans/'], [['zh-TW'], '/zh-Hant/'], [['zh-HK'], '/zh-HK/'], [['zh-Hant-HK'], '/zh-HK/'], [['zh'], '/zh-Hans/'],
   [['nb-NO'], '/nb/'], [['no'], '/nb/'], [['he-IL'], '/he/'], [['iw'], '/he/'], [['ar-EG'], '/ar/'], [['fil-PH'], '/fil/'], [['tl'], '/fil/'],
-  [['ja-JP'], '/ja/'], [['xx-YY'], '/'],
+  [['ja-JP'], '/ja/'], [['xx-YY'], '/'], [['el-GR', 'el'], '/el/'], [['fr-FR', 'en'], '/fr/'], [['ko-KR'], '/ko/'],
 ];
 for (const [langs, want] of cases) {
   const ctx = await visitor(langs);
@@ -78,6 +79,32 @@ for (const [langs, want] of cases) {
   const page = await ctx.newPage();
   await page.goto(`${BASE}/`);
   check('a stored value that is not a language is ignored (stays /)', path(page) === '/', path(page));
+  await ctx.close();
+}
+
+// ---- Crawlers stay on the page they asked for ----
+for (const [name, ua] of [
+  ['Googlebot', 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'],
+  ['Bingbot', 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/141.0.0.0 Safari/537.36'],
+  ['YandexBot', 'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)'],
+  ['Baiduspider', 'Mozilla/5.0 (compatible; Baiduspider-render/2.0; +http://www.baidu.com/search/spider.html)'],
+  ['Naver Yeti', 'Mozilla/5.0 (compatible; Yeti/1.1; +https://naver.me/spd)'],
+]) {
+  const ctx = await visitor(['de-DE', 'de'], null, ua);
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(150);
+  check(`${name} with a German locale on / stays on / (English)`, path(page) === '/', path(page));
+  await ctx.close();
+}
+
+// ---- A shared link to a language's page opens that page ----
+for (const [langs, storage, label] of [[['de-DE'], null, 'German browser'], [['en-US'], 'de', 'stored choice de'], [['el-GR'], 'en', 'stored choice en']]) {
+  const ctx = await visitor(langs, storage);
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/el/?utm_source=share#faq`, { referer: 'https://www.facebook.com/' });
+  await page.waitForTimeout(150);
+  check(`shared /el/ link stays Greek (${label})`, path(page) === '/el/#faq' && (await page.locator('html').getAttribute('lang')) === 'el', path(page));
   await ctx.close();
 }
 
