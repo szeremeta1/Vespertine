@@ -10,7 +10,9 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/check-names.mjs && astro build && node scripts/check-dist.mjs",
+    "build": "node scripts/check-names.mjs && node scripts/check-i18n.mjs && astro build && node scripts/check-dist.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "i18n:releases": "node scripts/i18n-releases.mjs",
     "preview": "astro preview",
     "releases": "node scripts/fetch-releases.mjs",
     "og": "node scripts/make-og.mjs",

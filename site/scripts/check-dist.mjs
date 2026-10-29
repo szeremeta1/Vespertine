@@ -2,14 +2,18 @@
 //  - an inline <script> isn't allowed by its page's CSP hashes (it would silently not run),
 //  - an <img> has no alt attribute,
 //  - a page lacks the self-hosted stats script (or the CSP that lets it run and report),
-//  - a page lacks a canonical link, a description or exactly one <h1>, or shares its title or description with another,
+//  - a page lacks a canonical link, a description or exactly one <h1>, or shares its title or description with another
+//    page in its language,
+//  - a page's <html lang> or dir doesn't match its folder (/de/…), or it lacks an hreflang link to every language's
+//    version (and x-default), or its canonical isn't its own URL,
 //  - a page's og:image or twitter:image isn't a 1200×630 file in dist/, or its JSON-LD doesn't parse,
 //  - a page carries a noai/noimageai robots directive, or is noindex without being the 404 page,
 //  - a root-relative link or asset points at a file that isn't in dist/,
 //  - robots.txt, sitemap.xml, llms.txt, llms-full.txt or CNAME is missing.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { join, relative, sep } from 'node:path';
+import { CODES, LOCALES } from '../src/i18n/locales.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://vespertineapp.com';
@@ -24,6 +28,7 @@ const files = [];
 
 const problems = [];
 const seen = { title: new Map(), description: new Map() };
+const rtl = new Set(LOCALES.filter((l) => l.rtl).map((l) => l.code));
 const attr = (html, re) => html.match(re)?.[1];
 const jpegSize = (buf) => {
   for (let i = 2; i < buf.length;) {
@@ -42,6 +47,17 @@ const exists = (url) => {
 for (const file of files) {
   const html = readFileSync(file, 'utf8');
   const is404 = file.endsWith('404.html');
+  const rel = relative(DIST, file).split(sep);
+  const lang = rel.length > 1 && CODES.includes(rel[0]) ? rel[0] : 'en';
+  if (attr(html, /<html lang="([^"]+)"/) !== lang) problems.push(`${file}: <html lang> isn't ${lang}`);
+  if (attr(html, /<html lang="[^"]+" dir="([^"]+)"/) !== (rtl.has(lang) ? 'rtl' : 'ltr')) problems.push(`${file}: dir isn't ${rtl.has(lang) ? 'rtl' : 'ltr'}`);
+  if (!is404) {
+    const alts = new Set([...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => m[1]));
+    for (const c of [...CODES, 'x-default']) if (!alts.has(c)) problems.push(`${file}: no hreflang ${c}`);
+    const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/) ?? '';
+    const own = `${SITE}/${rel.join('/')}`.replace(/\/index\.html$/, '/');
+    if (canonical !== own) problems.push(`${file}: canonical ${canonical}, expected ${own}`);
+  }
   const csp = attr(html, /http-equiv="content-security-policy" content="([^"]+)"/) ?? '';
   const allowed = new Set([...csp.matchAll(/'(sha256-[^']+)'/g)].map((m) => m[1]));
   for (const m of html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g)) {
@@ -62,8 +78,8 @@ for (const file of files) {
   for (const k of ['title', 'description']) {
     const v = k === 'title' ? attr(html, /<title>([^<]+)<\/title>/) : attr(html, /<meta name="description" content="([^"]+)"/);
     if (!v) { problems.push(`${file}: no ${k}`); continue; }
-    if (!is404 && seen[k].has(v)) problems.push(`${file}: same ${k} as ${seen[k].get(v)}`);
-    if (!is404) seen[k].set(v, file);
+    if (!is404 && seen[k].has(`${lang} ${v}`)) problems.push(`${file}: same ${k} as ${seen[k].get(`${lang} ${v}`)}`);
+    if (!is404) seen[k].set(`${lang} ${v}`, file);
   }
   for (const prop of ['property="og:image"', 'name="twitter:image"']) {
     const img = attr(html, new RegExp(`<meta ${prop} content="([^"]+)"`));
@@ -91,4 +107,4 @@ if (problems.length) {
   console.error(problems.join('\n'));
   process.exit(1);
 }
-console.log(`check-dist: ${files.length} pages OK (CSP hashes, alt text, canonical, one h1, unique titles, social cards, JSON-LD, local links)`);
+console.log(`check-dist: ${files.length} pages OK (CSP hashes, alt text, lang and dir, canonical, hreflang, one h1, unique titles, social cards, JSON-LD, local links)`);

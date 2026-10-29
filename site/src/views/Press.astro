@@ -1,0 +1,159 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import posterSrc from '../assets/shots/trailer-poster.jpg';
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Pic from '../components/Pic.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import { DEFER_IMAGES } from '../inline-scripts.mjs';
+import logo from '../assets/brand/logo.svg';
+import logoStacked from '../assets/brand/logo-stacked.svg';
+import { SITE, app, latest, links, isoDay } from '../data/app';
+import { vars } from '../data/content';
+import { innerGraph } from '../lib/seo';
+import { escapeHtml } from '../lib/text';
+import { sceneShots, TRAILER } from '../lib/shots';
+import { t, fill, longDate, megabytes, pagePath, type Lang } from '../i18n';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+const p = s.press;
+const v = vars(lang);
+const f = (x: string, more: Record<string, string | number> = {}) => fill(x, { ...v, ...more });
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/press/*.jpg', { eager: true });
+const img = (name: string) => {
+  const file = files[`../assets/press/${name}.jpg`];
+  if (!file) throw new Error(`no src/assets/press/${name}.jpg`);
+  return file.default;
+};
+
+const path = pagePath(lang, 'press');
+const title = p.title;
+const description = p.description;
+const raw = links.raw;
+const trailerDownload = '/assets/trailer/vespertine-trailer-1080p.mp4';
+
+const keyArt = Object.entries(p.art.items).map(([k, text]) => [k, f(text)]);
+const screenshots = Object.entries(p.shots.items);
+const poster = await getImage({ src: posterSrc, width: 1280, format: 'webp', quality: 70 });
+const jsonLd = innerGraph({ lang, path, title, crumb: p.eyebrow, description, dateModified: isoDay(latest.date), image: `${SITE}/og/press.jpg`, screenshots: await sceneShots(lang), trailer: { url: SITE + TRAILER, poster: SITE + poster.src } });
+const facts = p.facts;
+---
+<Base lang={lang} page="press" title={title} description={description} og="press" ogAlt={p.ogAlt} jsonLd={jsonLd}>
+<a class="skip" href="#main">{s.common.skip}</a>
+<Nav lang={lang} page="press" />
+<main id="main" tabindex="-1" class="press">
+  <header class="page-head">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">{p.eyebrow}</p>
+      <h1 class="page-title">{p.heading} <span class="brass-italic">Vespertine.</span></h1>
+      <p class="page-lede">{p.lede}</p>
+      <p class="fine">{p.fine}</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="press-block" aria-labelledby="facts-title">
+      <p class="eyebrow">{facts.eyebrow}</p>
+      <h2 id="facts-title">{facts.title}</h2>
+      <dl class="facts">
+        <div><dt>{facts.name}</dt><dd>Vespertine <span class="fine">{f(facts.formerly)}</span></dd></div>
+        <div><dt>{facts.developer}</dt><dd>{f(facts.developerValue, { author: app.author.short })}</dd></div>
+        <div><dt>{facts.price}</dt><dd>{facts.priceValue}</dd></div>
+        <div><dt>{facts.platform}</dt><dd>{f(facts.platformValue)}</dd></div>
+        <div><dt>{facts.current}</dt><dd>{f(facts.currentValue, { version: latest.version, date: longDate(lang, latest.date) })} <span class="fine">{f(facts.currentFine, { size: megabytes(lang, latest.dmg.size) })}</span></dd></div>
+        <div><dt>{facts.first}</dt><dd>{longDate(lang, '2026-09-27T12:00:00-04:00')} <span class="fine">{f(facts.firstFine)}</span></dd></div>
+        <div><dt>{facts.languages}</dt><dd>{f(facts.languagesValue)}</dd></div>
+        <div><dt>{facts.install}</dt><dd set:html={f(facts.installValue, { 'href.dmg': escapeHtml(latest.dmg.url) })} /></div>
+        <div><dt>{facts.tested}</dt><dd>{facts.testedValue}</dd></div>
+        <div><dt>{facts.links}</dt><dd><a href={pagePath(lang, 'home')}>{facts.website}</a> · <a href={links.repo}>{facts.source}</a> · <a href={links.releases}>{facts.releaseNotes}</a> · <a href={links.verification}>{facts.verify}</a></dd></div>
+      </dl>
+    </section>
+
+    <section class="press-block" aria-labelledby="focus-title">
+      <p class="eyebrow">{p.angle.eyebrow}</p>
+      <h2 id="focus-title">{p.angle.title}</h2>
+      <ul class="ticks">
+        {p.angle.list.map((li) => <li set:html={f(li)} />)}
+      </ul>
+      <p set:html={f(p.angle.text)} />
+    </section>
+
+    <section class="press-block" aria-labelledby="trailer-title">
+      <p class="eyebrow">{p.video.eyebrow}</p>
+      <h2 id="trailer-title">{p.video.title}</h2>
+      <p set:html={f(p.video.text, { 'href.trailerDownload': trailerDownload, size: megabytes(lang, 27e6) })} />
+      <figure class="video">
+        <video controls playsinline preload="none" poster={poster.src} width="1920" height="1080" aria-label={s.common.trailerLabel}>
+          <source src="/assets/trailer/vespertine-trailer.mp4" type="video/mp4">
+          <a href={trailerDownload}>{p.video.fallback}</a>
+        </video>
+      </figure>
+    </section>
+
+    <section class="press-block" aria-labelledby="logo-title">
+      <p class="eyebrow">{p.logo.eyebrow}</p>
+      <h2 id="logo-title">{p.logo.title}</h2>
+      <p set:html={f(p.logo.text)} />
+      <div class="grid grid--2">
+        <figure>
+          <div class="logo-tile"><img src={logo.src} width="1321" height="391" alt={p.logo.primaryAlt} loading="lazy" decoding="async"></div>
+          <figcaption>{p.logo.primary} · <a href={`${raw}/docs/brand/logo.svg`}>SVG</a> · <a href={`${raw}/docs/brand/logo.png`}>PNG</a> · {p.logo.onLight} <a href={`${raw}/docs/brand/logo-on-light.svg`}>SVG</a> · <a href={`${raw}/docs/brand/logo-on-light.png`}>PNG</a></figcaption>
+        </figure>
+        <figure>
+          <div class="logo-tile"><img class="stacked" src={logoStacked.src} width={logoStacked.width} height={logoStacked.height} alt={p.logo.stackedAlt} loading="lazy" decoding="async"></div>
+          <figcaption>{p.logo.stacked} · <a href={`${raw}/docs/brand/logo-stacked.svg`}>SVG</a> · <a href={`${raw}/docs/brand/logo-stacked.png`}>PNG</a> · {p.logo.crescent} <a href={`${raw}/docs/brand/mark.svg`}>SVG</a> · <a href={`${raw}/docs/brand/mark.png`}>PNG</a></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="press-block" aria-labelledby="art-title">
+      <p class="eyebrow">{p.art.eyebrow}</p>
+      <h2 id="art-title">{p.art.title}</h2>
+      <p>{p.art.text}</p>
+      <div class="grid grid--2 grid--key">
+        {keyArt.map(([k, text], i) => (
+          <figure>
+            <a href={`${raw}/docs/press/${k}-hero.png`}><Pic src={img(k)} alt={text} widths={[450, 900]} sizes={i === 0 ? '(max-width: 900px) calc(100vw - 52px), 1240px' : '(max-width: 600px) calc(100vw - 52px), 600px'} /></a>
+            <figcaption>{text} · <a href={`${raw}/docs/press/${k}-hero.png`}>2400</a> · <a href={`${raw}/docs/press/${k}-x.png`}>1600</a> · <a href={`${raw}/docs/press/${k}-producthunt.png`}>1270</a></figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section class="press-block" aria-labelledby="shots-title">
+      <p class="eyebrow">{p.shots.eyebrow}</p>
+      <h2 id="shots-title">{p.shots.title}</h2>
+      <p>{p.shots.text}</p>
+      <div class="grid grid--3">
+        {screenshots.map(([k, text]) => (
+          <figure>
+            <a href={`${raw}/docs/screenshots/${k}.png`}><Pic src={img(`shot-${k}`)} alt={text} widths={[360, 720]} sizes="(max-width: 600px) calc(100vw - 52px), (max-width: 1000px) 45vw, 400px" /></a>
+            <figcaption>{text}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+
+    <section class="press-block" aria-labelledby="contact-title">
+      <p class="eyebrow">{p.contact.eyebrow}</p>
+      <h2 id="contact-title">{p.contact.title}</h2>
+      <div class="contact-card">
+        <p set:html={f(p.contact.text, { email: `<a href="mailto:${app.pressEmail}">${app.pressEmail}</a>` })} />
+        <DownloadButton lang={lang} />
+      </div>
+    </section>
+  </div>
+</main>
+<Footer lang={lang} page="press" />
+<script>
+  import '../scripts/main';
+</script>
+<script is:inline set:html={DEFER_IMAGES} />
+</Base>

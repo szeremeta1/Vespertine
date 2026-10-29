@@ -1,0 +1,7 @@
+---
+import Terms from '../../views/Terms.astro';
+import { localePaths } from '../../i18n';
+export const getStaticPaths = localePaths;
+const { lang } = Astro.params;
+---
+<Terms lang={lang!} />

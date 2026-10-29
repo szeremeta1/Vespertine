@@ -1,5 +1,7 @@
 /* The routed signal (from szeremeta.org): a brass line from the hero's origin node down a trunk at the left edge,
-   drawn as you scroll, lighting each feature's node and branching into it, like the app's own signal path. */
+   drawn as you scroll, lighting each feature's node and branching into it, like the app's own signal path.
+   On right-to-left pages the trunk runs down the right edge: positions are measured from the right and the SVG is
+   mirrored in CSS, so the geometry below is the same either way. */
 import { $, $$ } from './dom';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -31,9 +33,10 @@ export function initRoute(reduce: boolean) {
 
   function layout() {
     const hr = host!.getBoundingClientRect();
+    const rtl = document.documentElement.dir === 'rtl';
     const rel = (el: Element) => {
       const r = el.getBoundingClientRect();
-      return { x: r.left - hr.left + r.width / 2, y: r.top - hr.top + r.height / 2 };
+      return { x: (rtl ? hr.right - r.right : r.left - hr.left) + r.width / 2, y: r.top - hr.top + r.height / 2 };
     };
     svg!.setAttribute('viewBox', `0 0 ${hr.width} ${hr.height}`);
     svg!.setAttribute('width', `${hr.width}`);

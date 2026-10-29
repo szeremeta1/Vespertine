@@ -1,0 +1,8 @@
+---
+// The 404 page in each language: not served by GitHub Pages directly, fetched by src/scripts/notfound.ts.
+import NotFound from '../../views/NotFound.astro';
+import { localePaths } from '../../i18n';
+export const getStaticPaths = localePaths;
+const { lang } = Astro.params;
+---
+<NotFound lang={lang!} />

@@ -1,0 +1,28 @@
+---
+// The language menu: a small disclosure in the nav listing every language in its own name. Plain links to the same
+// page in each language, so it works without JS and crawlers see every version; main.ts remembers a choice
+// (localStorage) so the redirect on / never overrides it, keeps the #section, and closes the menu on Esc or a click
+// outside.
+import { CODES, nativeName, pagePath, t, type Lang, type Page } from '../i18n';
+interface Props { lang: Lang; page: Page; }
+const { lang, page } = Astro.props;
+const s = t(lang).lang;
+// Latin, then Greek and Cyrillic, Hebrew, Arabic, Ethiopic, Indic, Thai, Korean, Japanese, Chinese (CLDR root order).
+const items = CODES.map((c) => ({ code: c, name: nativeName(c), href: pagePath(c, page === '404' ? 'home' : page) }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'und'));
+const short = lang.split('-')[0].toUpperCase();
+---
+<details class="lang" data-lang-menu>
+  <summary class="lang__btn" aria-label={`${s.label}: ${nativeName(lang)}`}>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="8" cy="8" r="6.4"/><path d="M1.6 8h12.8M8 1.6c1.9 1.8 2.8 4 2.8 6.4S9.9 12.6 8 14.4C6.1 12.6 5.2 10.4 5.2 8S6.1 3.4 8 1.6Z"/></svg>
+    <span class="lang__code" aria-hidden="true">{short}</span>
+  </summary>
+  <div class="lang__panel">
+    <p class="lang__title" id="lang-menu-title">{s.menuLabel}</p>
+    <ul class="lang__list" aria-labelledby="lang-menu-title">
+      {items.map((i) => (
+        <li><a href={i.href} hreflang={i.code} lang={i.code} data-lang-choice={i.code} aria-current={i.code === lang ? 'true' : undefined}>{i.name}</a></li>
+      ))}
+    </ul>
+  </div>
+</details>

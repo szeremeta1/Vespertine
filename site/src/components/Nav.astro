@@ -1,29 +1,36 @@
 ---
 import logo from '../assets/brand/logo.svg';
+import LangMenu from './LangMenu.astro';
 import { latest } from '../data/app';
+import { t, fill, pagePath, type Lang, type Page } from '../i18n';
 interface Props {
+  lang: Lang;
+  page: Page;
   /** On the home page links are in-page anchors; elsewhere they point back home. */
   home?: boolean;
-  current?: string;
 }
-const { home = false, current } = Astro.props;
-const base = home ? '' : '/';
+const { lang, page, home = false } = Astro.props;
+const s = t(lang).nav;
+const homeHref = pagePath(lang, 'home');
+const base = home ? '' : homeHref;
+const press = pagePath(lang, 'press');
 const items = [
-  { href: `${base}#features`, text: 'Features' },
-  { href: `${base}#formats`, text: 'Formats', cls: 'wide' },
-  { href: `${base}#compare`, text: 'Compare', cls: 'mid' },
-  { href: `${base}#whats-new`, text: 'What’s new', cls: 'wide' },
-  { href: `${base}#faq`, text: 'FAQ' },
-  { href: '/press.html', text: 'Press kit', cls: 'mid' },
+  { href: `${base}#features`, text: s.features },
+  { href: `${base}#formats`, text: s.formats, cls: 'wide' },
+  { href: `${base}#compare`, text: s.compare, cls: 'mid' },
+  { href: `${base}#whats-new`, text: s.whatsNew, cls: 'wide' },
+  { href: `${base}#faq`, text: s.faq },
+  { href: press, text: s.press, cls: 'mid' },
 ];
 ---
 <header class="nav" id="top">
-  <a class="nav__brand" href={home ? '#top' : '/'}><img src={logo.src} width="1321" height="391" alt={home ? 'Vespertine, back to top' : 'Vespertine, home'}></a>
-  <nav aria-label="Primary">
+  <a class="nav__brand" href={home ? '#top' : homeHref}><img src={logo.src} width="1321" height="391" alt={home ? s.top : s.home}></a>
+  <nav aria-label={s.label}>
     <ul class="nav__links">
-      {items.map((i) => <li class={i.cls}><a href={i.href} aria-current={current === i.href ? 'page' : undefined}>{i.text}</a></li>)}
+      {items.map((i) => <li class={i.cls}><a href={i.href} aria-current={page === 'press' && i.href === press ? 'page' : undefined}>{i.text}</a></li>)}
     </ul>
   </nav>
-  <a class="btn btn--brass btn--sm" href={latest.dmg.url}>Download<span class="sr-only"> Vespertine {latest.version} for Mac</span></a>
+  <LangMenu lang={lang} page={page} />
+  <a class="btn btn--brass btn--sm" href={latest.dmg.url} aria-label={fill(s.downloadLabel, { version: latest.version })}>{s.download}</a>
   <div class="nav__meter" aria-hidden="true"><span></span></div>
 </header>

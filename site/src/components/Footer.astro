@@ -1,31 +1,38 @@
 ---
 import logo from '../assets/brand/logo.svg';
-import { app, latest, links, trademarks } from '../data/app';
-interface Props { home?: boolean; }
-const { home = false } = Astro.props;
-const base = home ? '' : '/';
-const year = new Date().getFullYear();
+import { app, latest, links } from '../data/app';
+import { t, fill, orList, pagePath, year as yearOf, type Lang, type Page } from '../i18n';
+import { escapeHtml } from '../lib/text';
+interface Props { lang: Lang; page: Page; home?: boolean; }
+const { lang, home = false } = Astro.props;
+const s = t(lang);
+const f = s.footer;
+const n = s.nav;
+const base = home ? '' : pagePath(lang, 'home');
+const year = yearOf(lang, new Date().getFullYear());
 const cols = [
   { title: 'Vespertine', items: [
-    { href: `${base}#features`, text: 'Features' }, { href: `${base}#formats`, text: 'Formats' }, { href: `${base}#compare`, text: 'Compare' },
-    { href: `${base}#whats-new`, text: 'What’s new' }, { href: `${base}#faq`, text: 'FAQ' }, { href: latest.dmg.url, text: `Download ${latest.version}` },
+    { href: `${base}#features`, text: n.features }, { href: `${base}#formats`, text: n.formats }, { href: `${base}#compare`, text: n.compare },
+    { href: `${base}#whats-new`, text: n.whatsNew }, { href: `${base}#faq`, text: n.faq }, { href: latest.dmg.url, text: fill(s.common.downloadVersion, { version: latest.version }) },
   ] },
-  { title: 'Project', items: [
-    { href: links.repo, text: 'Source on GitHub' }, { href: links.releases, text: 'Release notes' }, { href: links.sponsors, text: 'Sponsor' },
-    { href: links.newIssue, text: 'Report an issue' }, { href: links.discussions, text: 'Discussions' }, { href: links.architecture, text: 'Architecture' },
+  { title: f.project, items: [
+    { href: links.repo, text: s.common.sourceOnGitHub }, { href: links.releases, text: f.releaseNotes }, { href: links.sponsors, text: f.sponsor },
+    { href: links.newIssue, text: s.common.reportIssue }, { href: links.discussions, text: f.discussions }, { href: links.architecture, text: f.architecture },
   ] },
-  { title: 'About', items: [
-    { href: '/press.html', text: 'Press kit' }, { href: '/privacy.html', text: 'Privacy' }, { href: '/terms.html', text: 'Terms' },
-    { href: links.license, text: 'License (GPL-3.0)' }, { href: links.notices, text: 'Third-party notices' }, { href: '/llms.txt', text: 'llms.txt' },
+  { title: f.about, items: [
+    { href: pagePath(lang, 'press'), text: n.press }, { href: pagePath(lang, 'privacy'), text: f.privacy }, { href: pagePath(lang, 'terms'), text: f.terms },
+    { href: links.license, text: f.license }, { href: links.notices, text: f.notices }, { href: '/llms.txt', text: 'llms.txt' },
   ] },
 ];
+const orgs = orList(lang, links.ukraine.map((u) => `<a href="${u.url}">${escapeHtml(u.name)}</a>`));
+const author = `<a href="${app.author.url}">${escapeHtml(app.author.name)}</a>`;
 ---
 <footer class="footer">
   <div class="wrap">
     <div class="footer__grid">
       <div class="footer__brand">
         <img src={logo.src} width="1321" height="391" alt="Vespertine" loading="lazy" decoding="async">
-        <p>{app.tagline} {`macOS ${app.minMacOS} or later.`}</p>
+        <p>{s.common.tagline} {fill(s.common.requires, { minMacOS: app.minMacOS })}</p>
       </div>
       <div class="footer__cols">
         {cols.map((c) => (
@@ -36,11 +43,11 @@ const cols = [
         ))}
       </div>
     </div>
-    <p class="footer__ukraine"><strong>Vespertine stands with Ukraine.</strong> Please donate through {links.ukraine.map((u, i) => <Fragment>{i === links.ukraine.length - 1 ? ' or ' : i ? ', ' : ''}<a href={u.url}>{u.name}</a></Fragment>)}.</p>
-    <p class="footer__legal">{trademarks}</p>
+    <p class="footer__ukraine" set:html={fill(f.ukraine, { orgs })} />
+    <p class="footer__legal">{s.common.trademarks}</p>
     <div class="footer__row">
-      <p>© {year} Vespertine contributors <span aria-hidden="true">·</span> Free software under the GPL <span aria-hidden="true">·</span> Made in Boston by <a href={app.author.url}>{app.author.name}</a></p>
-      <p class="mono">{home ? <a href="#top">Back to top <span aria-hidden="true">↑</span></a> : <a href="/">Home</a>}</p>
+      <p>{fill(f.copyright, { year })} <span aria-hidden="true">·</span> {f.free} <span aria-hidden="true">·</span> <Fragment set:html={fill(escapeHtml(f.madeIn), { author })} /></p>
+      <p class="mono">{home ? <a href="#top">{f.backToTop} <span aria-hidden="true">↑</span></a> : <a href={pagePath(lang, 'home')}>{f.home}</a>}</p>
     </div>
   </div>
 </footer>
