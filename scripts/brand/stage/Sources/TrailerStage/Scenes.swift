@@ -178,7 +178,10 @@ struct SignalPulse: View {
     // same way on both clips (brass pixels in the ring column): every ring and the badge moved by exactly 16.0 pt, x by 0.
     // 1.0: re-recorded on Lazar Berman's Liszt (24/96), whose title wraps to four lines: everything is 71.0 pt lower.
     static let nodeX: CGFloat = 1116.75 - AppWindow.inspector.minX
-    static let nodes: [CGFloat] = [625.75, 664.75, 703.75, 756.75, 795.75].map { $0 - AppWindow.inspector.minY }
+    // 0.14: the Fosi Audio ZD3 screenshot (docs/screenshots/bit-perfect-fosi-zd3-24-96.png, 2400 px wide, scaled to 2×). Volume's
+    // note now takes two lines ("Fixed output; use the DAC or amplifier"), so the output's ring sits 13.6 pt lower; measured
+    // the same way (ring edges, without the line) the others moved 0.4 pt up in the scaling.
+    static let nodes: [CGFloat] = [625.35, 664.35, 703.35, 756.35, 809.35].map { $0 - AppWindow.inspector.minY }
     static let ring: CGFloat = 7.5
     static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 539.25 - AppWindow.inspector.minY, width: 106, height: 22)
 
@@ -272,6 +275,67 @@ struct FeatureCopy: View {
     }
 }
 
+// MARK: - Room correction: the real measurement's graph lifts out and turns from measured to predicted.
+
+struct RoomScene: View {
+    let t: Double
+    let size: CGSize
+    let assets: Assets
+    let frame: CGImage?
+
+    /// The Room Correction window, scrolled to its profile (the recording is 2× this).
+    static let window = CGSize(width: 780, height: 877)
+    /// The Before / After switch and the graph under it, legend included, in the window's points.
+    static let graph = CGRect(x: 22, y: 293, width: 736, height: 336)
+
+    var body: some View {
+        let g = Geo(size: size)
+        let s = Scene.room.range.lowerBound
+        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
+        let pose = self.pose(g, s, dim: 0.55 * lifted)
+        ZStack(alignment: .topLeading) {
+            windowView(pose)
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Measured in\nyour room.",
+                        label: "Room correction · Warm target", label2: "Off by default, bit-perfect while off", brass: true, right: true)
+            // The graph rises out of the window; the app's own Curve Reveal then runs in it (the recording, at beat 1.5).
+            Lift(image: frame, region: RoomScene.graph, pose: pose,
+                 to: g.at((0.35, 0.68), square: (0.5, 0.6), tall: (0.5, 0.6)),
+                 toScale: g.pick(0.98, square: 1.1, tall: 0.66) * g.u,
+                 p: spring(t, start: s + b * 0.55, response: 0.8, damping: 0.8),
+                 window: RoomScene.window)
+        }
+        .frame(width: g.W, height: g.H)
+    }
+
+    /// As `featurePose` on the right, for this narrower, taller window: about as tall on stage as the main window.
+    func pose(_ g: Geo, _ s: Double, dim: Double) -> RigPose {
+        let arrive = spring(t, start: s - 0.45, response: 1.0, damping: 0.88)
+        let drift = progress(t, s - 0.45, s + Music.bar + 0.45)
+        let scale = g.pick(0.62, square: 0.56, tall: 0.42) * g.u * CGFloat(mix(0.93, 1.0, arrive) + 0.03 * drift)
+        return RigPose(
+            center: CGPoint(x: g.W * g.pick(0.7, square: 0.62, tall: 0.5) + CGFloat(mix(24, -18, drift)) * g.u, y: g.H * g.pick(0.52, square: 0.62, tall: 0.5)),
+            scale: scale,
+            tiltY: g.tall ? 0 : -mix(15, 9, drift),
+            contentDim: dim,
+            contentBlur: CGFloat(dim * 6)
+        )
+    }
+
+    @ViewBuilder func windowView(_ pose: RigPose) -> some View {
+        if let frame {
+            // The capture keeps the window's own rounded corners (transparent outside them) and hairline edge.
+            Image(decorative: frame, scale: 2).resizable()
+                .frame(width: RoomScene.window.width, height: RoomScene.window.height)
+                .overlay(Color.black.opacity(0.45 * pose.contentDim).mask(Image(decorative: frame, scale: 2).resizable()))
+                .blur(radius: pose.contentBlur)
+                .shadow(color: .black.opacity(0.55 * pose.shadow), radius: 60, y: 30)
+                .scaleEffect(pose.scale)
+                .rotation3DEffect(.degrees(pose.tiltY), axis: (x: 0, y: 1, z: 0), anchor: .center, perspective: 0.45)
+                .position(pose.center)
+        }
+    }
+}
+
 // MARK: - Native DSD
 
 struct DSDScene: View {
@@ -292,47 +356,13 @@ struct DSDScene: View {
         let cue = Cue.for(.dsd)!
         ZStack(alignment: .topLeading) {
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose)
-            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Native DSD,\nnot a conversion.", right: true)
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Native DSD,\nnot a conversion.",
+                        label: "DSD128 over DoP · Fosi Audio ZD3", label2: "Up to DSD256 · 768 kHz", brass: true, right: true)
             Lift(image: frame, region: DSDScene.badges, pose: pose,
                  to: g.at((0.23, 0.6), square: (0.3, 0.44), tall: (0.5, 0.52)),
                  toScale: g.pick(1.75, square: 1.7, tall: 1.45) * g.u,
                  p: spring(t, start: s + b * 0.55, response: 0.8, damping: 0.8))
             Lift(image: frame, region: DSDScene.path, pose: pose,
-                 to: g.at((0.25, 0.83), square: (0.36, 0.66), tall: (0.5, 0.7)),
-                 toScale: g.pick(1.5, square: 1.35, tall: 1.2) * g.u,
-                 p: spring(t, start: s + b * 1.15, response: 0.8, damping: 0.8))
-        }
-        .frame(width: g.W, height: g.H)
-    }
-}
-
-// MARK: - SACD image
-
-struct SACDScene: View {
-    let t: Double
-    let size: CGSize
-    let assets: Assets
-    let frame: CGImage?
-
-    // 0.11.1: Dire Straits' Brothers In Arms, played from the 2005 SACD image's stereo area over DoP on the FiiO K11. Its
-    // title fits one line, so the badges sit 13 pt higher than DSD's; the lifted step is the decoder ("SACD image · DST").
-    static let badges = CGRect(x: 1104, y: 419, width: 196, height: 110)
-    static let path = CGRect(x: 1104, y: 614, width: 306, height: 50)
-
-    var body: some View {
-        let g = Geo(size: size)
-        let s = Scene.sacd.range.lowerBound
-        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
-        let pose = featurePose(g, t: t, s: s, right: true, dim: 0.55 * lifted)
-        let cue = Cue.for(.sacd)!
-        ZStack(alignment: .topLeading) {
-            WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose)
-            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Play the disc\nimage itself.", right: true)
-            Lift(image: frame, region: SACDScene.badges, pose: pose,
-                 to: g.at((0.23, 0.6), square: (0.3, 0.44), tall: (0.5, 0.52)),
-                 toScale: g.pick(1.75, square: 1.7, tall: 1.45) * g.u,
-                 p: spring(t, start: s + b * 0.55, response: 0.8, damping: 0.8))
-            Lift(image: frame, region: SACDScene.path, pose: pose,
                  to: g.at((0.25, 0.83), square: (0.36, 0.66), tall: (0.5, 0.7)),
                  toScale: g.pick(1.5, square: 1.35, tall: 1.2) * g.u,
                  p: spring(t, start: s + b * 1.15, response: 0.8, damping: 0.8))
@@ -584,7 +614,7 @@ struct LibraryScene: View {
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose,
                       windowOverlay: AnyView(covers(s, dim: pose.contentDim)))
             FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Your whole\nlibrary.",
-                        label: "FLAC · ALAC · WAV · AIFF", label2: "DSD · Dolby · DTS", right: true)
+                        label: "FLAC · ALAC · WAV · AIFF", label2: "SACD · DSD · Dolby · DTS", right: true)
         }
         .frame(width: g.W, height: g.H)
     }
@@ -653,7 +683,7 @@ struct EndScene: View {
                 .blur(radius: CGFloat(1 - clamp01(logoIn)) * 16)
                 .opacity(clamp01(logoIn * 1.4))
                 .offset(y: -g.H * g.pick(0.07, square: 0.07, tall: 0.1))
-            Text("Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
+            Text("Version 0.14. Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
                 .arrive(t, at: s + 0.9)
                 .offset(y: g.H * g.pick(0.1, square: 0.08, tall: 0.03))
             Text("vespertineapp.com").font(Font(BrandFont.mono(small * 0.72, 500))).kerning(small * 0.07)

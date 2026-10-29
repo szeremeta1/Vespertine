@@ -23,8 +23,8 @@ struct Geo {
 }
 
 /// Where a window point lands on stage for a pose (tilt ignored; lifts start from flat windows).
-func stagePoint(_ p: CGPoint, _ pose: RigPose) -> CGPoint {
-    CGPoint(x: pose.center.x + (p.x - AppWindow.size.width / 2) * pose.scale, y: pose.center.y + (p.y - AppWindow.size.height / 2) * pose.scale)
+func stagePoint(_ p: CGPoint, _ pose: RigPose, window: CGSize = AppWindow.size) -> CGPoint {
+    CGPoint(x: pose.center.x + (p.x - window.width / 2) * pose.scale, y: pose.center.y + (p.y - window.height / 2) * pose.scale)
 }
 
 /// The window centre that puts window point `p` at stage point `target` for a given scale.
@@ -47,9 +47,10 @@ struct Lift: View {
     var plate: CGFloat = 14
     var corner: CGFloat = 12
     var overlay: AnyView? = nil  // drawn in the region's own coordinates
+    var window = AppWindow.size  // the size of the window it comes out of (the room correction window is smaller)
 
     var body: some View {
-        let from = stagePoint(region.mid, pose)
+        let from = stagePoint(region.mid, pose, window: window)
         let s = mix(pose.scale, toScale, p)
         let rise = clamp01(p)
         let shape = RoundedRectangle(cornerRadius: corner + plate, style: .continuous)
@@ -61,7 +62,7 @@ struct Lift: View {
                                                            startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1))
                 .opacity(smooth(rise * 1.6))
             if let image {
-                Image(decorative: crop(image, region), scale: 2).resizable()
+                Image(decorative: crop(image, region, windowWidth: window.width), scale: 2).resizable()
                     .frame(width: region.width, height: region.height)
                     .overlay(alignment: .topLeading) { overlay }
                     .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))

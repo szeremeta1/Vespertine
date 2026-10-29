@@ -10,7 +10,7 @@ enum Music {
     static let beat = 60.0 / 65.0            // 0.923 s
     static let bar = beat * 4                // 3.692 s
     static let firstDownbeat = 3.657
-    static let duration = 44.017              // 36.633 + two bars (SACD image, languages)
+    static let duration = 44.017              // 36.633 + two bars (room correction, languages)
     /// Start of bar `k` (bar 0 is the intro, which begins at 0).
     static func bar(_ k: Int) -> Double { k == 0 ? 0 : firstDownbeat + Double(k - 1) * bar }
     /// Beat `n` counted from the first downbeat (fractional beats allowed).
@@ -19,14 +19,14 @@ enum Music {
 
 /// The trailer's scenes, one per bar except the two-bar opening shot and the end card.
 enum Scene: CaseIterable {
-    case intro, bitPerfect, dsd, sacd, versions, spatial, analysis, languages, library, end
+    case intro, bitPerfect, dsd, room, versions, spatial, analysis, languages, library, end
 
     var range: ClosedRange<Double> {
         switch self {
         case .intro: return 0...Music.bar(1)
         case .bitPerfect: return Music.bar(1)...Music.bar(3)
         case .dsd: return Music.bar(3)...Music.bar(4)
-        case .sacd: return Music.bar(4)...Music.bar(5)
+        case .room: return Music.bar(4)...Music.bar(5)
         case .versions: return Music.bar(5)...Music.bar(6)
         case .spatial: return Music.bar(6)...Music.bar(7)
         case .analysis: return Music.bar(7)...Music.bar(8)

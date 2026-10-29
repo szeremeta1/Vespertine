@@ -140,7 +140,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/FEATURES.md:87` — "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
 - **Text:** `site/src/i18n/en.json:254` — "Off by default; when it’s on, the signal path says"
-- **Text:** `README.md:68` — "when it is on the signal path says EQUALIZER."
+- **Text:** `README.md:76` — "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -407,7 +407,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-RATE-01 <a id="rate-native"></a>The DAC runs at the track's own rate
 
 - **Text:** `docs/FEATURES.md:35` — "Vespertine switches the DAC to each track's native rate."
-- **Text:** `README.md:67` — "Switches your DAC to each file's sample rate"
+- **Text:** `README.md:75` — "Switches your DAC to each file's sample rate"
 - **Text:** `site/src/i18n/en.json:129` — "Vespertine switches the device to each file’s rate and resamples"
 - **Property:** when the device lists the source rate and the policy is "match source", the planned device rate equals the source rate and nothing is resampled.
 - **Governed by:** vespertine-rule.

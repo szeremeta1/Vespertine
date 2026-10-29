@@ -36,6 +36,10 @@ let shots: [Shot] = [
     Shot(file: "docs/screenshots/bit-perfect-fosi-zd3-24-96.png", from: full,
          to: CGRect(x: 1290, y: 760, width: 1110, height: 693.75),   // the badges and the whole signal path
          caption: "BIT-PERFECT appears only when its conditions are met"),
+    // room-correction-fosi-zd3.png is the Room Correction window (1560 × 1754): from the ZD3's switch to the curves.
+    Shot(file: "docs/screenshots/room-correction-fosi-zd3.png", from: CGRect(x: 0, y: 64, width: 1560, height: 975),
+         to: CGRect(x: 24, y: 572, width: 1180, height: 737.5),
+         caption: "Room correction, measured in a real room"),
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "DSD128 over DoP on a Fosi Audio ZD3"),

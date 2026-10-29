@@ -28,7 +28,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a Fosi Audio ZD3, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
+  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a Fosi Audio ZD3, room correction measured in a real room, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, hi-res file analysis and its 44 languages besides English">
 </p>
 
 ## Highlights
@@ -56,8 +56,16 @@ Measure your room with a UMIK-1 (or another calibrated USB microphone) from one 
 - **See the change:** the Room Portrait shows the speakers, your seat and each microphone spot as it's measured, and the Curve Reveal turns the measured response into the predicted one. A before/after switch compares them. "After" is predicted, not measured.
 - **Off by default.** Playback is bit-perfect while it's off. While it's on, the signal path says ROOM CORRECTION.
 
+**Measured in a real room:** a stereo pair on a Fosi Audio ZD3, measured with a UMIK-1 (its serial number is blacked out), with the Warm target. The thin lines are the measurement, the bold lines the predicted result, and below them are each speaker's delay, level and filters.
+
 <p align="center">
-  <img src="docs/screenshots/room-correction.png" width="560" alt="Vespertine's Room Correction window with a 5.1 profile imported from REW: the on switch for the output, Measure Again, Import and Export, a graph of what the correction does to each of the six speakers, and each speaker's delay, level and filters">
+  <img src="docs/screenshots/room-correction-fosi-zd3.png" width="560" alt="Vespertine's Room Correction window for a Fosi Audio ZD3, with room correction on and Keep native DSD ticked. The stereo profile measured with a UMIK-1 microphone, its serial number blacked out, shows the measured and predicted response of the left and right speakers against the Warm target, with a room peak near 125 Hz cut by 14 and 18 dB, then each speaker's delay, level and filters">
+</p>
+
+**Imported from REW (sample):** a 5.1 profile imported as Equalizer APO text, showing what the correction does to each of the six speakers.
+
+<p align="center">
+  <img src="docs/screenshots/room-correction-rew-5-1.png" width="560" alt="Vespertine's Room Correction window with a sample 5.1 profile imported from REW: the on switch for the output, Measure Again, Import and Export, a graph of what the correction does to each of the six speakers, and each speaker's delay, level and filters">
 </p>
 
 [How room correction works](docs/ROOM-CORRECTION.md)

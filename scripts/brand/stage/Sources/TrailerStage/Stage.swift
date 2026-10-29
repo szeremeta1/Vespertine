@@ -35,7 +35,7 @@ struct StageView: View {
     func glow(for scene: Scene) -> CGPoint {
         let g = Geo(size: size)
         switch scene {
-        case .dsd, .sacd, .analysis: return g.at((0.3, 0.6), square: (0.35, 0.45), tall: (0.5, 0.55))
+        case .room, .dsd, .analysis: return g.at((0.3, 0.6), square: (0.35, 0.45), tall: (0.5, 0.55))
         case .languages: return g.at((0.66, 0.5), square: (0.5, 0.5), tall: (0.5, 0.55))
         case .versions: return g.at((0.72, 0.62), square: (0.5, 0.5), tall: (0.5, 0.55))
         case .spatial: return g.at((0.71, 0.53), square: (0.68, 0.58), tall: (0.5, 0.56))
@@ -52,8 +52,8 @@ struct StageView: View {
         switch scene {
         case .intro: IntroScene(t: t, size: size, assets: assets)
         case .bitPerfect: HeroScene(t: t, size: size, assets: assets, frame: video(.bitPerfect))
+        case .room: RoomScene(t: t, size: size, assets: assets, frame: video(.room))
         case .dsd: DSDScene(t: t, size: size, assets: assets, frame: video(.dsd))
-        case .sacd: SACDScene(t: t, size: size, assets: assets, frame: video(.sacd))
         case .versions: VersionsScene(t: t, size: size, assets: assets, frame: video(.versions))
         case .spatial: SpatialScene(t: t, size: size, assets: assets, frame: video(.spatial), meters: frame.meters)
         case .analysis: AnalysisScene(t: t, size: size, assets: assets, frame: video(.analysis))
@@ -99,7 +99,7 @@ struct Transition {
 
     static let all: [Transition] = [
         Transition(into: .dsd, center: UnitPoint(x: 0.72, y: 0.5)),
-        Transition(into: .sacd, center: UnitPoint(x: 0.3, y: 0.55), shape: .capsule(aspect: 1.9)),
+        Transition(into: .room, center: UnitPoint(x: 0.3, y: 0.55), shape: .capsule(aspect: 1.9)),
         Transition(into: .versions, center: UnitPoint(x: 0.3, y: 0.62), shape: .capsule(aspect: 2.4)),
         Transition(into: .spatial, center: UnitPoint(x: 0.71, y: 0.53)),
         Transition(into: .analysis, center: UnitPoint(x: 0.64, y: 0.56), shape: .capsule(aspect: 1.9)),
