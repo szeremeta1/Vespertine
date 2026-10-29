@@ -726,6 +726,8 @@ html:is(:lang(ar), :lang(fa), :lang(ur), :lang(hi), :lang(mr), :lang(bn), :lang(
 :lang(ur) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title) { line-height: 1.6; }
 /* Korean wraps between words (at the spaces), not between syllables. */
 :lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
+/* Japanese headings wrap between phrases (bunsetsu), not inside them ("スピーカーごと|に"); browsers without it ignore it. */
+:lang(ja) :is(.section-title, .scene__title, .closing__title, .page-title, .press-block h2) { word-break: auto-phrase; }
 
 /* ---------- Right to left (ar, fa, he, ur): the layout mirrors ---------- */
 [dir="rtl"] .skip { left: auto; right: 12px; }
