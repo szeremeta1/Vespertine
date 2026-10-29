@@ -7,7 +7,7 @@
 //  1. Smooth the measurement (power average over a sixth of an octave) and read it on a 48-per-octave log grid.
 //  2. Find the speaker's low-frequency roll-off: going down from 200 Hz, the first point more than 6 dB below the
 //     mean level from 200 Hz to 2 kHz. Nothing below it is boosted (a speaker can't be made to play lower).
-//  3. Target = the chosen curve (a gentle downward tilt by default), anchored to the measurement's level from
+//  3. Target = the chosen curve (Warm by default), anchored to the measurement's level from
 //     200 Hz to 2 kHz, so correcting the bass never changes the overall level of the midrange.
 //  4. Fit within the correction range (20 to 500 Hz by default; 20 Hz to 16 kHz for full range), above the roll-off:
 //     repeatedly place a peaking band on the largest remaining error, then refine its centre, gain and Q by
@@ -197,7 +197,7 @@ public struct RoomFilterDesignOptions: Codable, Hashable, Sendable {
     public static let defaultRange: ClosedRange<Double> = 20...500
     public static let fullRange: ClosedRange<Double> = 20...16_000
 
-    public init(target: RoomTargetCurve = .gentleTilt, range: ClosedRange<Double> = defaultRange, maxBoostDB: Double = 3,
+    public init(target: RoomTargetCurve = .warm, range: ClosedRange<Double> = defaultRange, maxBoostDB: Double = 3,
                 maxCutDB: Double = 18, maxBands: Int = 10, minQ: Double = 0.5, maxCutQ: Double = 6, maxBoostQ: Double = 2,
                 toleranceDB: Double = 1, smoothingOctaves: Double = 1.0 / 6) {
         self.target = target

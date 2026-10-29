@@ -204,7 +204,7 @@ struct RoomFilterDesignTests {
         profile.designOptions = .default
         let decoded = try RoomCorrectionCoding.decodeProfile(try RoomCorrectionCoding.encode(profile))
         #expect(decoded == profile)
-        #expect(decoded.target == RoomTargetCurve.gentleTilt.roomTarget)
+        #expect(decoded.target == RoomTargetCurve.warm.roomTarget)
         let list = try RoomCorrectionCoding.decodeProfiles(try RoomCorrectionCoding.encodeProfiles([profile, profile]))
         #expect(list == [profile, profile])
 

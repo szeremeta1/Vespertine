@@ -64,5 +64,5 @@ codesign -dv "$app" 2>&1 | grep -E "Identifier|Signature|Authority=Developer ID 
 print "signing: $signed (not notarized)"
 print "bundle id: $(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$plist")"
 print "version: $(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$plist")"
-print "built from: $(<"$out/built-from")"
+print "built from: $(cat "$out/built-from")"
 print "App: ${app:A}"

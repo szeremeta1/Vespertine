@@ -92,8 +92,8 @@ measurement and options always give the same filters.
 2. **Roll-off**: going down from 200 Hz, the first point (third-octave smoothed) more than 6 dB below the 200 Hz to
    2 kHz level. Nothing below it is boosted.
 3. **Target**: the chosen curve at the measurement's own 200 Hz to 2 kHz level, so correcting the bass never moves the
-   midrange. Presets: *Gentle tilt* (default, −0.8 dB per octave around 1 kHz), *Flat*, *Warm* (−1 dB per octave plus
-   a 3 dB lift below about 100 Hz).
+   midrange. Presets: *Warm* (default, −1 dB per octave plus a 3 dB lift below about 100 Hz), *Gentle tilt* (−0.8 dB per
+   octave around 1 kHz), *Flat*.
 4. **Fit**, within the correction range (20 to 500 Hz by default, or full range 20 Hz to 16 kHz) and above the roll-off:
    up to 10 peaking bands, each placed on the largest remaining error and refined (centre, gain, Q) by coordinate
    descent on the squared error, then all refined together. Cut-dominant: errors under the target count half as much
