@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: kostenloser Hi-Res- und Surround-Musikplayer für Mac",
-    "description": "Kostenloser Open-Source-Musikplayer für den Mac: SACD-ISO und DVD-Video, DSD, Mehrkanal-Surround in DTS-HD MA, TrueHD und Dolby Atmos, Hi-Res bit-perfekt, 3D-Audio auf AirPods und Raumkorrektur.",
+    "description": "Kostenloser Open-Source-Musikplayer für den Mac: SACD-ISO und DVD-Video, DSD, Mehrkanal-Surround in DTS-HD MA, TrueHD und Dolby Atmos, bit-perfektes Hi-Res, 3D-Audio auf AirPods und Raumkorrektur.",
     "ogAlt": "Vespertine: der kostenlose Open-Source-Player für Surround- und Hi-Res-Musik auf dem Mac. Sein Signalweg zeigt eine FLAC-Datei mit 24 Bit / 96 kHz, die bit-perfekt auf einem Fosi Audio ZD3 läuft. Version {version}, macOS {minMacOS} oder neuer.",
     "hero": {
       "eyebrow": [
