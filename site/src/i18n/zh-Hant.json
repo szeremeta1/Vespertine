@@ -152,11 +152,11 @@
         "title": "你的 5.1 光碟，也在同一個資料庫。",
         "lede": "多聲道音樂可在 AirPods 上以頭部追蹤空間音訊播放，或在立體聲 DAC 上依聲道配置降混。",
         "body": [
-          "DTS CD 會解碼為 5.1。SACD 映像檔、擷取出的 SACD 曲目、多聲道 FLAC、TrueHD 與 DTS-HD MA，可在 AirPods 上以頭部追蹤空間音訊呈現，或在立體聲 DAC 上降混。含 Atmos 的 Dolby Digital Plus 使用 macOS 的物件渲染器；TrueHD Atmos 與 DTS:X 則播放其聲道床（channel bed）。逐聲道輸出仍屬實驗性功能，尚未在實際的 AV 擴大機與多聲道 USB DAC 上測試（已透過 HDMI 測試過一台 Sony 電視：請見 docs/DEVICES.md）；歡迎回報測試結果。"
+          "DTS CD 會解碼為 5.1。SACD 映像檔、擷取出的 SACD 曲目、多聲道 FLAC、TrueHD 與 DTS-HD MA，可在 AirPods 上以頭部追蹤空間音訊呈現，或在立體聲 DAC 上降混。含 Atmos 的 Dolby Digital Plus 使用 macOS 的物件渲染器；TrueHD Atmos 與 DTS:X 則播放其中的基礎聲道層。逐聲道輸出仍屬實驗性功能，尚未在實際的 AV 擴大機與多聲道 USB DAC 上測試（已透過 HDMI 測試過一台 Sony 電視：請見 docs/DEVICES.md）；歡迎回報測試結果。"
         ],
         "list": [
           "專輯的立體聲與環繞聲版本只列出一次；Vespertine 會播放適合當前輸出的版本，或你指定的版本。",
-          "Dolby Digital、DD+ 與 DTS-CD 的 AV 擴大機位元流輸出仍屬實驗性功能，尚未在實際的 AV 擴大機與多聲道 USB DAC 上測試（已透過 HDMI 測試過一台 Sony 電視：請見 docs/DEVICES.md）；歡迎回報測試結果。載波測試使用 FFmpeg 的 S/PDIF 讀取器。macOS 不支援 TrueHD 與 DTS-HD MA 直通（passthrough）。",
+          "Dolby Digital、DD+ 與 DTS-CD 的 AV 擴大機位元流輸出仍屬實驗性功能，尚未在實際的 AV 擴大機與多聲道 USB DAC 上測試（已透過 HDMI 測試過一台 Sony 電視：請見 docs/DEVICES.md）；歡迎回報測試結果。載波測試使用 FFmpeg 的 S/PDIF 讀取器。macOS 不支援以直通方式輸出 TrueHD 與 DTS-HD MA。",
           "使用「輸出為空間音訊」，可輸出為耳機用的雙耳立體聲，或 Apple 裝置用的多聲道 ALAC，並附上標籤與封面圖片。"
         ],
         "alt": "Elton John 的《Goodbye Yellow Brick Road》，一張 24 位元 / 88.2 kHz 的 5.1 專輯，正在 AirPods Max 上以頭部追蹤空間音訊播放，畫面顯示訊號路徑與各聲道的電平表。",
@@ -654,7 +654,7 @@
     "online": [
       "<strong>檢查更新。</strong>Vespertine 大約每天一次，以及在你選擇「檢查更新」時，向 GitHub 取得更新資訊。如同任何下載，GitHub 會看到你的 IP 位址。你可以在「設定」中關閉自動檢查。",
       "<strong>MusicBrainz 與 Cover Art Archive。</strong>只有在你使用「在 MusicBrainz 上查詢」或「補齊後設資料」時（「在這部 Mac 上尋找音樂」會為加入的音樂提供「補齊」選項，以可取消勾選的核取方塊呈現），Vespertine 才會將要查詢的專輯、藝人與曲目名稱傳送到 musicbrainz.org。若在「設定」中開啟「取得封面圖片」，則會從 coverartarchive.org 下載封面，這些封面由 Internet Archive（archive.org）提供。MusicBrainz 與 Cover Art Archive 均由 MetaBrainz Foundation 營運。",
-      "<strong>ListenBrainz。</strong>只有在你開啟播放紀錄上傳（scrobbling）並輸入權杖後，Vespertine 才會將你播放的歌曲傳送到 listenbrainz.org：標題、藝人、專輯、長度，以及檔案中若有的 MusicBrainz ID。歌曲開始時會傳送「正在播放」，當你聽完一半或聽滿四分鐘後，則傳送一筆附有時間的收聽紀錄。",
+      "<strong>ListenBrainz。</strong>只有在你開啟播放紀錄上傳功能並輸入權杖後，Vespertine 才會將你播放的歌曲傳送到 listenbrainz.org：標題、藝人、專輯、長度，以及檔案中若有的 MusicBrainz ID。歌曲開始時會傳送「正在播放」，當你聽完一半或聽滿四分鐘後，則傳送一筆附有時間的收聽紀錄。",
       "<strong>Discord。</strong>只有在你於「設定」中開啟 Discord 狀態後，Vespertine 才會透過只在你 Mac 上進行的連線，告訴你 Mac 上的 Discord App 正在播放什麼：標題、藝人、專輯、格式與播放進度。Discord 會將它顯示為你的狀態，讓能看到你活動的人看見。為了顯示專輯封面，Vespertine 會依名稱查詢封面，因為 Discord 只能顯示來自網路的圖片：若你的檔案帶有 MusicBrainz 發行版本 ID，會在 coverartarchive.org 上查詢；否則會使用 Apple 的 iTunes Search（itunes.apple.com），它會收到藝人與專輯名稱。接著 Discord 會從該處下載封面。你可以關閉封面，而且你的檔案及其封面都不會被上傳。",
       "<strong>網路共享。</strong>Vespertine 只會連線到你加入的伺服器來讀取音樂，不會連到其他地方。共享連線期間，它大約每分鐘確認一次伺服器是否仍有回應，並每半小時尋找一次新音樂（從該共享播放時則不會）。"
     ],

@@ -152,7 +152,7 @@
         "title": "Disk 5.1 Anda, di perpustakaan yang sama.",
         "lede": "Musik multisaluran diputar sebagai Audio Spasial berpelacakan kepala di AirPods, atau di-downmix sesuai tata letak salurannya di DAC stereo.",
         "body": [
-          "CD DTS didekode menjadi 5.1. Image SACD, trek SACD hasil ekstraksi, FLAC multisaluran, TrueHD, dan DTS-HD MA dirender sebagai Audio Spasial berpelacakan kepala di AirPods atau di-downmix di DAC stereo. Dolby Digital Plus dengan Atmos menggunakan renderer objek macOS; TrueHD Atmos dan DTS:X memutar channel bed-nya. Output saluran demi saluran bersifat eksperimental, belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda."
+          "CD DTS didekode menjadi 5.1. Image SACD, trek SACD hasil ekstraksi, FLAC multisaluran, TrueHD, dan DTS-HD MA dirender sebagai Audio Spasial berpelacakan kepala di AirPods atau di-downmix di DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memutar channel bed-nya. Output saluran demi saluran bersifat eksperimental, belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda."
         ],
         "list": [
           "Versi stereo dan surround dari sebuah album ditampilkan sekali; Vespertine memutar versi yang sesuai dengan output, atau versi yang Anda sematkan.",
@@ -169,7 +169,7 @@
         "title": "Putar langsung image disknya.",
         "lede": "Arahkan Vespertine ke image SACD atau DVD-Video, dan musiknya langsung diputar dari image tersebut, tanpa ada yang di-mount, diekstrak, atau ditulis.",
         "body": [
-          "Image SACD <span class=\"mono\">.iso</span> memutar area stereo dan 5.1-nya, baik terkompresi DST maupun tidak, dengan judul dari teks bawaan disk itu sendiri. DST didekode kembali menjadi DSD yang persis sama, sehingga stereo dikirim ke DAC Anda sebagai DSD native melalui DoP jika DAC mendukungnya, dan 5.1 diputar sebagai Audio Spasial berpelacakan kepala di AirPods. Musik LPCM pada disk DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) diputar bit demi bit, satu album per title dan satu trek per chapter."
+          "Image SACD <span class=\"mono\">.iso</span> memutar area stereo dan 5.1-nya, baik terkompresi DST maupun tidak, dengan judul dari teks bawaan disk itu sendiri. DST didekode kembali menjadi DSD yang persis sama, sehingga stereo dikirim ke DAC Anda sebagai DSD native melalui DoP jika DAC mendukungnya, dan 5.1 diputar sebagai Audio Spasial berpelacakan kepala di AirPods. Musik LPCM pada disk DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) diputar bit demi bit, satu album per judul dan satu trek per chapter."
         ],
         "list": [
           "Identik bit demi bit dengan hasil sacd_extract pada dua disk sungguhan. Disk dengan area 5.0, yang hanya memiliki area multisaluran, atau DSD128 ke atas sejauh ini baru dicakup oleh image uji sintetis.",
@@ -225,9 +225,9 @@
           "Remaster, rilis mono dan stereo, serta SACD dari satu album berbagi satu kartu; pilih edisinya saat Anda membukanya.",
           "Favorit dan jumlah putar, disimpan di perpustakaan dan tidak pernah ditulis ke file Anda. Mengimpor daftar putar M3U dan Apple Music, jumlah putar, serta favorit.",
           "Editor tag dengan cadangan dan pengembalian dalam satu langkah, plus pengayaan data MusicBrainz yang menunjukkan tingkat keyakinannya sebelum menulis apa pun.",
-          "Folder bersama di jaringan melalui SMB, NFS, atau WebDAV, dengan caching, Simpan Offline, dan pemutaran yang dirancang untuk server lambat.",
+          "Share jaringan melalui SMB, NFS, atau WebDAV, dengan caching, Simpan Offline, dan pemutaran yang dirancang untuk server lambat.",
           "Temukan Musik menelusuri setiap drive untuk menemukan musik Anda yang sebenarnya dan mengabaikan file yang tidak perlu. Pengaturan singkat saat pertama kali dibuka memilih output Anda dan menjelaskan fungsi akses eksklusif dan ReplayGain.",
-          "EQ parametrik per output yang dapat mengimpor preset AutoEQ dan Equalizer APO. Mati secara default; saat aktif, jalur sinyal menampilkan <span class=\"mono nowrap\">EQUALIZER</span>, bukan <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "EQ parametrik per output yang dapat mengimpor preset AutoEQ dan Equalizer APO. Mati secara default; saat aktif, jalur sinyal menampilkan <span class=\"mono nowrap\">EKUALISER</span>, bukan <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Pemutar Mini, ikon di bar menu, tombol media, ReplayGain, serta pembaruan otomatis yang ditandatangani."
         ],
         "links": [
@@ -256,11 +256,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Sample rate dan bit depth asli, hingga 32-bit dan sample rate yang dijalankan DAC Anda (diuji hingga 384 kHz). PCM 32-bit tanpa perubahan memerlukan mode integer. Image dengan CUE sheet."
+          "text": "Laju sampel dan kedalaman bit asli, hingga 32-bit dan laju sampel yang dijalankan DAC Anda (diuji hingga 384 kHz). PCM 32-bit tanpa perubahan memerlukan mode integer. Image dengan CUE sheet."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF dan DSDIFF, terkompresi DST maupun tidak. DoP bergantung pada DAC dan carrier rate; jika tidak, diputar sebagai PCM. Carrier rate DoP di atas 384 kHz belum diuji pada perangkat keras."
+          "text": "DSF dan DSDIFF, terkompresi DST maupun tidak. DoP bergantung pada DAC dan laju carrier; jika tidak, diputar sebagai PCM. Laju carrier DoP di atas 384 kHz belum diuji pada perangkat keras."
         },
         {
           "name": "Image SACD",
@@ -302,7 +302,7 @@
     },
     "compare": {
       "eyebrow": "Perbandingan",
-      "title": "Bagaimana perbandingannya.",
+      "title": "Perbandingan dengan pemutar lain.",
       "intro": "Beberapa pemutar Mac menawarkan pemutaran bit-perfect. Perbandingan ini didasarkan pada apa yang dinyatakan dokumentasi atau kode sumber masing-masing pemutar. “Tidak didokumentasikan” berarti vendor tidak menyatakan ada atau tidaknya, bukan berarti fiturnya tidak ada. Vespertine tidak memiliki konvolusi, plugin efek audio, maupun layanan streaming.",
       "hint": "Gulir untuk melihat lebih banyak →",
       "region": "Tabel perbandingan (dapat digulir ke samping)",
@@ -333,7 +333,7 @@
           "Ya / Tidak⁴"
         ],
         [
-          "Peralihan sample rate DAC otomatis",
+          "Peralihan laju sampel DAC otomatis",
           "Ya",
           "Tidak",
           "Ya",
@@ -433,7 +433,7 @@
         ]
       ],
       "notes": [
-        "¹ Apple Music di macOS 27 identik bit demi bit pada 16/24-bit dalam <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">tes loopback pihak ketiga yang dilaporkan di ASR</a>, pada volume 100%. Ini bukan pengukuran Vespertine; laporan aslinya tidak dapat diperiksa ulang secara independen untuk pembaruan ini. Di Mac masih belum ada peralihan sample rate otomatis, mode hog, FLAC, maupun DSD.",
+        "¹ Apple Music di macOS 27 identik bit demi bit pada 16/24-bit dalam <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">tes loopback pihak ketiga yang dilaporkan di ASR</a>, pada volume 100%. Ini bukan pengukuran Vespertine; laporan aslinya tidak dapat diperiksa ulang secara independen untuk pembaruan ini. Di Mac masih belum ada peralihan laju sampel otomatis, mode hog, FLAC, maupun DSD.",
         "² Output DAC multisaluran dan bitstream ke receiver masih eksperimental dan belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md). Laporan dinantikan.",
         "³ Apple mendokumentasikan Audio Spasial dengan pelacakan kepala untuk trek Dolby Atmos di katalog Apple Music, bukan rendering spasial untuk file multisaluran milik Anda sendiri.",
         "⁴ Diuji pada foobar2000 2.26 (macOS 27.0.1), tanpa komponen: file DSF, DFF, dan SACD ISO gagal dengan pesan “Unsupported file format”. DSF dan DFF hanya dapat diputar sebagai PCM 352,8 kHz setelah FFmpeg dipasang secara terpisah dan kedua format itu ditambahkan ke FFmpeg Decoder Wrapper-nya; SACD ISO tetap gagal."
@@ -472,7 +472,7 @@
         },
         {
           "q": "Bagaimana saya tahu pemutarannya benar-benar bit-perfect?",
-          "a": "Jalur sinyal membaca kembali apa yang benar-benar dilakukan Core Audio: sample rate nominal perangkat, format fisiknya, dan siapa yang memegangnya. Dekoder memiliki tes otomatis (TrueHD terhadap sumbernya, DTS terhadap dekoder milik FFmpeg sendiri), tes loopback bawaan memeriksa jalur perangkat lunak sampel demi sampel, dan <span class=\"mono nowrap\">vespertine-probe</span> memungkinkan Anda memeriksa perangkat keras Anda sendiri. <a href=\"{href.verification}\">Cara memverifikasinya sendiri</a>."
+          "a": "Jalur sinyal membaca kembali apa yang benar-benar dilakukan Core Audio: laju sampel nominal perangkat, format fisiknya, dan siapa yang memegangnya. Dekoder memiliki tes otomatis (TrueHD terhadap sumbernya, DTS terhadap dekoder milik FFmpeg sendiri), tes loopback bawaan memeriksa jalur perangkat lunak sampel demi sampel, dan <span class=\"mono nowrap\">vespertine-probe</span> memungkinkan Anda memeriksa perangkat keras Anda sendiri. <a href=\"{href.verification}\">Cara memverifikasinya sendiri</a>."
         },
         {
           "q": "Bisakah memutar disk SACD dan DVD?",
@@ -488,7 +488,7 @@
         },
         {
           "q": "Sudah diuji pada perangkat keras apa saja?",
-          "a": "Pemutaran telah diuji pada FiiO K11 dengan sample rate hingga 384 kHz, dengan DoP dan mode integer; AirPods Max melalui USB-C dan Bluetooth; speaker MacBook Pro; serta TV Sony melalui HDMI dalam 5.1. Perangkat keras Intel belum diuji. Bitstream ke receiver dan output DAC multisaluran masih eksperimental dan belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md). <a href=\"{href.dacReport}\">Laporan dinantikan</a>."
+          "a": "Pemutaran telah diuji pada FiiO K11 dengan laju sampel hingga 384 kHz, dengan DoP dan mode integer; AirPods Max melalui USB-C dan Bluetooth; speaker MacBook Pro; serta TV Sony melalui HDMI dalam 5.1. Perangkat keras Intel belum diuji. Bitstream ke receiver dan output DAC multisaluran masih eksperimental dan belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md). <a href=\"{href.dacReport}\">Laporan dinantikan</a>."
         },
         {
           "q": "Apakah tersedia dalam bahasa saya?",
@@ -541,7 +541,7 @@
     "eyebrow": "Kit pers",
     "heading": "Semua bahan untuk tulisan Anda",
     "lede": "Vespertine adalah pemutar Mac gratis dan open source untuk koleksi musik surround dan hi-res. Image disk SACD dan DVD-Video, trek SACD 5.1 hasil ekstraksi, CD DTS, serta file DTS-HD MA, TrueHD, dan Atmos berkumpul dalam satu perpustakaan, dengan Audio Spasial berpelacakan kepala di AirPods. Jalur sinyal menampilkan setiap tahap dari file hingga output, dengan kondisi dan pengujian dalam kode sumber GPL yang dapat diaudit siapa saja.",
-    "fine": "Output saluran-ke-saluran dan bitstream ke receiver masih eksperimental, belum diuji pada receiver dan DAC USB multisaluran sungguhan (satu TV Sony melalui HDMI sudah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memutar channel bed-nya.",
+    "fine": "Output saluran demi saluran dan bitstream ke receiver masih eksperimental, belum diuji pada receiver dan DAC USB multisaluran sungguhan (satu TV Sony melalui HDMI sudah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memutar channel bed-nya.",
     "facts": {
       "eyebrow": "Lembar fakta",
       "title": "Faktanya.",
@@ -563,7 +563,7 @@
       "install": "Instalasi",
       "installValue": "<a href=\"{href.dmg}\">Unduh DMG</a> atau {brew}",
       "tested": "Diuji dengan",
-      "testedValue": "FiiO K11 (semua sample rate hingga 384 kHz, DoP, mode integer), AirPods Max melalui USB-C dan Bluetooth, speaker MacBook Pro",
+      "testedValue": "FiiO K11 (semua laju sampel hingga 384 kHz, DoP, mode integer), AirPods Max melalui USB-C dan Bluetooth, speaker MacBook Pro",
       "links": "Tautan",
       "website": "Situs web",
       "source": "Kode sumber",
@@ -576,9 +576,9 @@
       "list": [
         "Musik surround dalam satu perpustakaan Mac, dari image SACD dan DVD-Video, hasil rip, dan CD DTS hingga TrueHD dan DD+ Atmos, dengan Audio Spasial di AirPods.",
         "Kode sumber GPL-3.0 gratis yang dapat dibaca, di-build, dan diubah siapa saja.",
-        "Jalur sinyal yang menampilkan sample rate, word length, penguatan, dan pemrosesan saluran. Kondisi bit-perfect tertuang di dalam kode, lengkap dengan pengujian, tes loopback bawaan, dan <a href=\"{href.verification}\">panduan verifikasi</a>."
+        "Jalur sinyal yang menampilkan laju sampel, word length, penguatan, dan pemrosesan saluran. Kondisi bit-perfect tertuang di dalam kode, lengkap dengan pengujian, tes loopback bawaan, dan <a href=\"{href.verification}\">panduan verifikasi</a>."
       ],
-      "text": "Analisis file hi-res juga tersedia. Deteksi zero padding bersifat pasti; vonis spektral berupa perkiraan dengan keterbatasan. VeraVox dan Audirvana AudioScan juga menawarkan analisis. <a href=\"{href.comparison}\">Sumber perbandingan</a>."
+      "text": "Analisis file hi-res juga tersedia. Deteksi zero padding bersifat pasti; hasil analisis spektral berupa perkiraan dengan keterbatasan. VeraVox dan Audirvana AudioScan juga menawarkan analisis. <a href=\"{href.comparison}\">Sumber perbandingan</a>."
     },
     "video": {
       "eyebrow": "Video",
@@ -598,7 +598,7 @@
       "crescent": "bulan sabit saja:"
     },
     "art": {
-      "eyebrow": "Key art",
+      "eyebrow": "Visual utama",
       "title": "Satu gambar per fitur.",
       "text": "Dalam tiga ukuran: 2400×1350, 1600×900, dan 1270×760.",
       "items": {
@@ -629,7 +629,7 @@
         "loopback-test": "Tes loopback: pemeriksaan perangkat lunak terhadap jalur output, sampel demi sampel",
         "setup-welcome": "Pengaturan awal: sambutan",
         "setup-output": "Pengaturan awal: memilih output yang akan diingat",
-        "output-settings": "Pengaturan output: output yang diingat, cadangan, penyesuaian 16-bit",
+        "output-settings": "Pengaturan output: output yang diingat, output cadangan, pencocokan sumber 16-bit",
         "equalizer": "EQ parametrik dengan preset AutoEQ"
       }
     },
@@ -654,7 +654,7 @@
     "online": [
       "<strong>Pemeriksaan pembaruan.</strong> Vespertine meminta feed pembaruannya ke GitHub sekitar sekali sehari, dan saat Anda memilih Periksa Pembaruan. GitHub melihat alamat IP Anda, seperti pada unduhan apa pun. Anda dapat mematikan pemeriksaan otomatis di Pengaturan.",
       "<strong>MusicBrainz dan Cover Art Archive.</strong> Hanya saat Anda menggunakan Cari di MusicBrainz atau Perkaya Metadata (Temukan Musik di Mac Ini menawarkan Perkaya untuk musik yang ditambahkannya, berupa kotak centang yang dapat Anda kosongkan), Vespertine mengirimkan nama album, artis, dan trek yang dicarinya ke musicbrainz.org. Jika “Ambil sampul album” aktif di Pengaturan, Vespertine mengunduh sampul dari coverartarchive.org, yang menyajikannya dari Internet Archive (archive.org). MusicBrainz dan Cover Art Archive dikelola oleh MetaBrainz Foundation.",
-      "<strong>ListenBrainz.</strong> Hanya jika Anda mengaktifkan scrobbling dan memasukkan token Anda, Vespertine mengirimkan lagu yang Anda putar ke listenbrainz.org: judul, artis, album, durasi, dan ID MusicBrainz-nya jika file Anda memilikinya. Vespertine mengirimkan “sedang diputar” saat lagu dimulai, dan satu listen beserta waktunya setelah Anda mendengarkan separuh lagu atau empat menit.",
+      "<strong>ListenBrainz.</strong> Hanya jika Anda mengaktifkan scrobbling dan memasukkan token Anda, Vespertine mengirimkan lagu yang Anda putar ke listenbrainz.org: judul, artis, album, durasi, dan ID MusicBrainz-nya jika file Anda memilikinya. Vespertine mengirimkan “sedang diputar” saat lagu dimulai, dan satu catatan dengar beserta waktunya setelah Anda mendengarkan separuh lagu atau empat menit.",
       "<strong>Discord.</strong> Hanya jika Anda mengaktifkan status Discord di Pengaturan, Vespertine memberi tahu aplikasi Discord di Mac Anda, melalui koneksi yang tetap berada di Mac Anda, apa yang sedang diputar: judul, artis, album, format, dan progres. Discord menampilkannya sebagai status Anda kepada orang-orang yang dapat melihat aktivitas Anda. Untuk menampilkan sampul album, Vespertine mencarinya berdasarkan nama, karena Discord hanya dapat menampilkan gambar dari web: di coverartarchive.org jika file Anda memuat ID rilis MusicBrainz, atau jika tidak, di iTunes Search milik Apple (itunes.apple.com), yang menerima nama artis dan album. Discord lalu mengunduh sampul dari sana. Anda dapat mematikan sampul, dan file Anda beserta sampulnya tidak pernah diunggah.",
       "<strong>Share jaringan.</strong> Vespertine terhubung ke server yang Anda tambahkan, dan tidak ke tempat lain, untuk membaca musik Anda. Selama share terhubung, Vespertine memeriksa kira-kira setiap menit apakah server masih merespons, dan mencari musik baru setiap setengah jam (tidak pernah saat Anda sedang memutar musik darinya)."
     ],
@@ -682,7 +682,7 @@
     "musicTitle": "Musik Anda dan layanan lain",
     "music": "Anda bertanggung jawab memastikan bahwa Anda berhak memutar musik yang Anda tambahkan. Vespertine tidak dapat memutar file yang dilindungi DRM dan tidak mencoba melakukannya. MusicBrainz, Cover Art Archive, dan ListenBrainz adalah layanan independen dengan ketentuannya sendiri, yang berlaku saat Anda menggunakannya melalui Vespertine.",
     "trademarksTitle": "Merek dagang",
-    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus, dan Dolby TrueHD adalah merek dagang Dolby Laboratories. DTS, DTS-HD Master Audio, dan DTS:X adalah merek dagang DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS, dan Audio Spasial adalah merek dagang Apple Inc. Vespertine menyebutkannya hanya untuk menjelaskan apa yang diputarnya dan di mana. Vespertine tidak disertifikasi, dilisensikan, atau didukung oleh Dolby, DTS, maupun Apple.",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus, dan Dolby TrueHD adalah merek dagang Dolby Laboratories. DTS, DTS-HD Master Audio, dan DTS:X adalah merek dagang DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS, dan Spatial Audio adalah merek dagang Apple Inc. Vespertine menyebutkannya hanya untuk menjelaskan apa yang diputarnya dan di mana. Vespertine tidak disertifikasi, dilisensikan, atau didukung oleh Dolby, DTS, maupun Apple.",
     "contactTitle": "Kontak",
     "contact": "Bug, pertanyaan, dan permintaan: <a href=\"{href.issues}\">GitHub issues</a>.",
     "englishNote": "Ini adalah terjemahan untuk memudahkan Anda. Teks GNU General Public License itu sendirilah yang mengikat, dan teks tersebut berbahasa Inggris."
@@ -731,7 +731,7 @@
     },
     "0.12.1": {
       "hash": "45e9b01884e3",
-      "summary": "Vespertine kini memutar dengan lancar dari share jaringan yang lambat, menganalisis perpustakaan besar lebih cepat termasuk yang berada di share, memutar hi-res pada DAC USB-C kecil dengan sample rate tertinggi yang ditawarkannya, dan menjaga fokus keyboard serta pilihan ganda tetap di tempat yang Anda harapkan."
+      "summary": "Vespertine kini memutar dengan lancar dari share jaringan yang lambat, menganalisis perpustakaan besar lebih cepat termasuk yang berada di share, memutar hi-res pada DAC USB-C kecil dengan laju sampel tertinggi yang ditawarkannya, dan menjaga fokus keyboard serta pilihan ganda tetap di tempat yang Anda harapkan."
     },
     "0.12.0": {
       "hash": "f25478b5e324",

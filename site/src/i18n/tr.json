@@ -28,7 +28,7 @@
     "faq": "SSS",
     "press": "Basın kiti",
     "download": "İndir",
-    "downloadLabel": "İndir: Mac için Vespertine {version}"
+    "downloadLabel": "Mac için Vespertine {version} sürümünü indir"
   },
   "lang": {
     "label": "Dil",
@@ -47,7 +47,7 @@
     "license": "Lisans (GPL-3.0)",
     "notices": "Üçüncü taraf bildirimleri",
     "ukraine": "<strong>Vespertine, Ukrayna’nın yanında.</strong> Lütfen {orgs} aracılığıyla bağış yapın.",
-    "copyright": "© {year} Vespertine katkıda bulunanları",
+    "copyright": "© {year} Vespertine’e katkıda bulunanlar",
     "free": "GPL kapsamında özgür yazılım",
     "madeIn": "{author} tarafından Boston’da yapıldı",
     "backToTop": "Başa dön",
@@ -152,7 +152,7 @@
         "title": "5.1 diskleriniz aynı arşivde.",
         "lede": "Çok kanallı müzik, AirPods’ta baş takipli Uzamsal Ses olarak çalar ya da stereo bir DAC’ta kanal düzenine göre stereoya indirgenir.",
         "body": [
-          "DTS CD’leri 5.1 olarak çözülür. SACD görüntüleri, çıkarılmış SACD parçaları, çok kanallı FLAC, TrueHD ve DTS-HD MA, AirPods’ta baş takipli Uzamsal Ses olarak işlenir ya da stereo bir DAC’ta stereoya indirgenir. Atmos içeren Dolby Digital Plus, macOS’in nesne işleyicisini kullanır; TrueHD Atmos ve DTS:X kendi kanal tabanını (channel bed) çalar. Kanal kanal çıkış deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
+          "DTS CD’leri 5.1 olarak çözülür. SACD görüntüleri, çıkarılmış SACD parçaları, çok kanallı FLAC, TrueHD ve DTS-HD MA, AirPods’ta baş takipli Uzamsal Ses olarak işlenir ya da stereo bir DAC’ta stereoya indirgenir. Atmos içeren Dolby Digital Plus, macOS’in nesne işleyicisini kullanır; TrueHD Atmos ve DTS:X kendi temel kanal katmanını çalar. Kanal kanal çıkış deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
         ],
         "list": [
           "Bir albümün stereo ve surround sürümleri bir kez listelenir; Vespertine çıkışa hangisi uygunsa onu ya da sizin sabitlediğinizi çalar.",
@@ -226,8 +226,8 @@
           "Favoriler ve çalma sayıları arşivde tutulur, dosyalarınıza asla yazılmaz. M3U ve Apple Music çalma listelerini, çalma sayılarını ve favorileri içe aktarır.",
           "Yedekleme ve tek adımda geri döndürme özellikli etiket düzenleyici; ayrıca bir şey yazmadan önce güven düzeyini gösteren MusicBrainz zenginleştirmesi.",
           "SMB, NFS veya WebDAV üzerinden ağ paylaşımları; önbellekleme, Çevrimdışı Tut ve yavaş sunucular için tasarlanmış oynatma.",
-          "Müzik Bul, gerçek müziğinizi bulmak için her sürücüyü tarar ve karmaşayı geride bırakır. İlk açılıştaki kısa kurulum çıkışınızı seçer ve özel erişimin ve ReplayGain’in ne işe yaradığını açıklar.",
-          "Çıkış başına parametrik EQ; AutoEQ ve Equalizer APO ön ayarlarını içe aktarır. Varsayılan olarak kapalıdır; açıkken sinyal yolunda <span class=\"mono nowrap\">BIT-PERFECT</span> yerine <span class=\"mono nowrap\">EQUALIZER</span> yazar.",
+          "“Bu Mac’teki Müzikleri Bul”, gerçek müziğinizi bulmak için her sürücüyü tarar ve karmaşayı geride bırakır. İlk açılıştaki kısa kurulum çıkışınızı seçer ve özel erişimin ve ReplayGain’in ne işe yaradığını açıklar.",
+          "Çıkış başına parametrik EQ; AutoEQ ve Equalizer APO ön ayarlarını içe aktarır. Varsayılan olarak kapalıdır; açıkken sinyal yolunda <span class=\"mono nowrap\">EKOLAYZIR</span> yerine <span class=\"mono nowrap\">BIT-PERFECT</span> yazar.",
           "Mini Oynatıcı, menü çubuğu öğesi, medya tuşları, ReplayGain ve otomatik, imzalı güncellemeler."
         ],
         "links": [
@@ -284,7 +284,7 @@
         },
         {
           "name": "Dolby Digital (Plus)",
-          "text": "Kodu macOS tarafından çözülür. Alıcıya bitstream deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz."
+          "text": "Kodu macOS tarafından çözülür. Alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz."
         },
         {
           "name": "DTS CD’leri ve DTS-WAV",
@@ -302,7 +302,7 @@
     },
     "compare": {
       "eyebrow": "Karşılaştırma",
-      "title": "Rakipleriyle kıyasla.",
+      "title": "Rakipleri karşısında nerede duruyor?",
       "intro": "Birçok Mac oynatıcısı bit-perfect oynatma sunuyor. Bu karşılaştırma, her oynatıcının kendi belgelerinin veya kaynak kodunun söylediklerine dayanır. “Belgelenmemiş”, özelliğin olmadığı anlamına gelmez; üreticinin bu konuda olumlu ya da olumsuz bir şey söylemediği anlamına gelir. Vespertine’de konvolüsyon, ses efekti eklentileri veya akış hizmetleri yoktur.",
       "hint": "Devamı için kaydırın →",
       "region": "Karşılaştırma tablosu (yana kayar)",
@@ -388,7 +388,7 @@
           "Belgelenmemiş"
         ],
         [
-          "Hi-Res dosya analizi",
+          "Hi-res dosya analizi",
           "Evet",
           "Hayır",
           "AudioScan",
@@ -434,11 +434,11 @@
       ],
       "notes": [
         "¹ macOS 27’deki Apple Music, <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">ASR’de bildirilen üçüncü taraf loopback testlerinde</a> %100 ses düzeyinde, 16/24 bit’te bit düzeyinde aynıydı. Bu bir Vespertine ölçümü değildir; özgün rapor bu güncelleme için bağımsız olarak yeniden doğrulanamadı. Mac’te hâlâ otomatik hız değiştirme, hog modu, FLAC veya DSD yok.",
-        "² Çok kanallı DAC çıkışı ve alıcıya bitstream deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz.",
-        "³ Apple, kafa izlemeli Uzamsal Ses’i Apple Music kataloğundaki Dolby Atmos parçaları için belgeliyor; kendi çok kanallı dosyalarınızın uzamsal olarak işlenmesini değil.",
+        "² Çok kanallı DAC çıkışı ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz.",
+        "³ Apple, baş takipli Uzamsal Ses’i Apple Music kataloğundaki Dolby Atmos parçaları için belgeliyor; kendi çok kanallı dosyalarınızın uzamsal olarak işlenmesini değil.",
         "⁴ foobar2000 2.26 (macOS 27.0.1) üzerinde, hiçbir bileşen olmadan test edildi: DSF, DFF ve SACD ISO dosyaları “Unsupported file format” hatası veriyor. DSF ve DFF, FFmpeg ayrıca kurulup FFmpeg Decoder Wrapper’a eklendikten sonra yalnızca 352,8 kHz PCM olarak çalıyor; SACD ISO yine açılmıyor."
       ],
-      "sources": "<a href=\"{href.comparison}\">Kaynaklar ve kapsam</a>. Düzeltmelere açığız: <a href=\"{href.issues}\">bir issue açın</a>."
+      "sources": "<a href=\"{href.comparison}\">Kaynaklar ve kapsam</a>. Düzeltmelere açığız: <a href=\"{href.issues}\">bir sorun kaydı açın</a>."
     },
     "whatsNew": {
       "eyebrow": "Yenilikler",
@@ -480,7 +480,7 @@
         },
         {
           "q": "Dolby Atmos çalıyor mu?",
-          "a": "Atmos’lu Dolby Digital Plus, macOS’in nesne işleyicisi üzerinden, AirPods’ta kafa izlemeli Uzamsal Ses olarak çalar. TrueHD Atmos ve DTS:X kayıpsız kanal tabanlarını çalar; nesneleri işlenmez. AV alıcısına bitstream deneyseldir, gerçek alıcılarda test edilmedi; raporlarınızı bekliyoruz."
+          "a": "Atmos’lu Dolby Digital Plus, macOS’in nesne işleyicisi üzerinden, AirPods’ta baş takipli Uzamsal Ses olarak çalar. TrueHD Atmos ve DTS:X kayıpsız kanal tabanlarını çalar; nesneleri işlenmez. AV alıcısına bitstream aktarımı deneyseldir, gerçek alıcılarda test edilmedi; raporlarınızı bekliyoruz."
         },
         {
           "q": "Dosyalarımı değiştirir mi?",
@@ -488,11 +488,11 @@
         },
         {
           "q": "Hangi donanımlarda test edildi?",
-          "a": "Oynatma şu donanımlarda test edildi: 384 kHz’e kadar hızlarda, DoP ve tam sayı moduyla bir FiiO K11; USB-C ve Bluetooth üzerinden AirPods Max; MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV. Intel donanımı test edilmedi. Alıcıya bitstream ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
+          "a": "Oynatma şu donanımlarda test edildi: 384 kHz’e kadar hızlarda, DoP ve tam sayı moduyla bir FiiO K11; USB-C ve Bluetooth üzerinden AirPods Max; MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV. Intel donanımı test edilmedi. Alıcıya bitstream aktarımı ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
         },
         {
           "q": "Benim dilimde mi?",
-          "a": "Büyük olasılıkla: arayüz İngilizcenin yanı sıra, sağdan sola yazılan Arapça, İbranice, Farsça ve Urduca dahil {languages} dilde daha sunuluyor. Vespertine, Sistem Ayarları’nda kendisi için belirlenen dili kullanır. Anadili konuşanlardan gelen düzeltmeleri <a href=\"{href.newIssue}\">GitHub</a>’da memnuniyetle karşılarız."
+          "a": "Büyük olasılıkla: arayüz İngilizcenin yanı sıra, sağdan sola yazılan Arapça, İbranice, Farsça ve Urduca dahil {languages} dilde daha sunuluyor. Vespertine, Sistem Ayarları’nda kendisi için belirlenen dili kullanır. Ana dil konuşurlarından gelen düzeltmeleri <a href=\"{href.newIssue}\">GitHub</a>’da memnuniyetle karşılarız."
         }
       ]
     },
@@ -513,7 +513,7 @@
         },
         {
           "title": "Bir çeviriyi düzeltin",
-          "text": "{languages} dilden birinde kulağa tuhaf gelen bir ifade mi gördünüz? Daha iyi bir ifadeyle bir issue açın.",
+          "text": "{languages} dilden birinde kulağa tuhaf gelen bir ifade mi gördünüz? Daha iyi bir ifadeyle bir sorun kaydı açın.",
           "cta": "Düzeltme önerin"
         },
         {
@@ -540,8 +540,8 @@
     "ogAlt": "Vespertine basın kiti: bilgi sayfası, logolar, tanıtım görselleri, gerçek ekran görüntüleri ve fragman; arka planda uygulamanın üç gerçek ekran görüntüsü.",
     "eyebrow": "Basın kiti",
     "heading": "Hakkında yazmak için ihtiyacınız olan her şey",
-    "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk imajları, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta baş takipli Uzamsal Ses de var. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
-    "fine": "Kanalı kanalına çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz. Dolby Digital Plus Atmos nesnelerini macOS işler; TrueHD Atmos ve DTS:X kanal tabanlarını (channel bed) çalar.",
+    "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk görüntüleri, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta baş takipli Uzamsal Ses de var. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
+    "fine": "Kanalı kanalına çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz. Dolby Digital Plus Atmos nesnelerini macOS işler; TrueHD Atmos ve DTS:X kendi temel kanal katmanlarını çalar.",
     "facts": {
       "eyebrow": "Bilgi sayfası",
       "title": "Temel bilgiler.",
@@ -574,11 +574,11 @@
       "eyebrow": "Odak",
       "title": "Neye odaklanıyor.",
       "list": [
-        "Tek bir Mac arşivinde surround müzik: SACD ve DVD-Video imajlarından, rip’lerden ve DTS CD’lerden TrueHD ve DD+ Atmos’a kadar; AirPods’ta Uzamsal Ses ile.",
+        "Tek bir Mac arşivinde surround müzik: SACD ve DVD-Video görüntülerinden, rip’lerden ve DTS CD’lerden TrueHD ve DD+ Atmos’a kadar; AirPods’ta Uzamsal Ses ile.",
         "Herkesin okuyabileceği, derleyebileceği ve değiştirebileceği ücretsiz GPL-3.0 kaynak kodu.",
-        "Örnekleme hızını, bit derinliğini (word length), kazancı ve kanal işlemeyi gösteren bir sinyal yolu. Bit-perfect koşulları kodda tanımlıdır; testler, yerleşik bir loopback testi ve bir <a href=\"{href.verification}\">doğrulama kılavuzu</a> eşliğinde."
+        "Örnekleme hızını, sözcük uzunluğunu, kazancı ve kanal işlemeyi gösteren bir sinyal yolu. Bit-perfect koşulları kodda tanımlıdır; testler, yerleşik bir loopback testi ve bir <a href=\"{href.verification}\">doğrulama kılavuzu</a> eşliğinde."
       ],
-      "text": "Hi-res dosya analizi de dahildir. Sıfır dolgu (zero padding) tespiti kesindir; spektral değerlendirmeler ise sınırları olan tahminlerdir. VeraVox ve Audirvana AudioScan de analiz sunar. <a href=\"{href.comparison}\">Karşılaştırma kaynakları</a>."
+      "text": "Hi-res dosya analizi de dahildir. Sıfır doldurma tespiti kesindir; spektral değerlendirmeler ise sınırları olan tahminlerdir. VeraVox ve Audirvana AudioScan de analiz sunar. <a href=\"{href.comparison}\">Karşılaştırma kaynakları</a>."
     },
     "video": {
       "eyebrow": "Video",
@@ -607,7 +607,7 @@
         "spatial-audio": "AirPods’ta Uzamsal Ses olarak surround",
         "native-dsd": "DoP üzerinden yerel DSD",
         "stereo-and-surround": "Stereo ve surround sürümleri",
-        "sacd-iso": "Doğrudan çalınan SACD imajları",
+        "sacd-iso": "Doğrudan çalınan SACD görüntüleri",
         "languages": "{languages} dil"
       }
     },
@@ -620,9 +620,9 @@
         "multichannel-albums": "Çok kanallı olarak filtrelenmiş albümler",
         "stereo-and-surround-versions": "Stereo ve 5.1 sürümleriyle çıkarılmış SACD parçaları",
         "spatial-audio-airpods-max": "AirPods Max’te Uzamsal Ses olarak 24/88,2 5.1 bir albüm (Elton John, Goodbye Yellow Brick Road)",
-        "fake-hi-res-detection": "16 kHz’de kesilen 24/192 bir “remaster” (kasıtlı bir sahte: fragmanın kendi müziği, MP3’e kodlanıp upsampling uygulanmış, uydurma bir grup adıyla)",
+        "fake-hi-res-detection": "16 kHz’de kesilen 24/192 bir “remaster” (kasıtlı bir sahte: fragmanın kendi müziği, MP3’e kodlanıp yukarı örneklenmiş, uydurma bir grup adıyla)",
         "dsd-native-dop": "Fosi Audio ZD3’te DoP üzerinden 352,8 kHz’de DSD128: Claudja Barry, Love for the Sake of Love",
-        "sacd-iso": "Doğrudan imajdan çalınan bir SACD .iso: Dire Straits, Brothers In Arms",
+        "sacd-iso": "Doğrudan görüntüden çalınan bir SACD .iso: Dire Straits, Brothers In Arms",
         "genres": "Türler",
         "search": "Arama",
         "smart-playlist": "USB-C üzerinden AirPods Max’te bit-perfect çalan bir akıllı çalma listesi",
@@ -646,14 +646,14 @@
     "eyebrow": "Gizlilik",
     "heading": "Vespertine",
     "headingBrass": "hiçbir şey toplamaz.",
-    "updated": "Yürürlük tarihi: {effective} (isteğe bağlı Discord durumu eklendi). “Bu web sitesi” bölümü {statsUpdated} tarihinde (site ziyaretleri kendi barındırdığımız, çerezsiz istatistiklerle saymaya başladığında) ve {langUpdated} tarihinde (dil menüsü seçiminizi aygıtınızda hatırlamaya başladığında) güncellendi.",
+    "updated": "Yürürlük tarihi: {effective} (isteğe bağlı Discord durumu eklendi). “Bu web sitesi” bölümü {statsUpdated} tarihinde (site, ziyaretleri kendi barındırdığımız, çerezsiz istatistiklerle saymaya başladığında) ve {langUpdated} tarihinde (dil menüsü seçiminizi aygıtınızda hatırlamaya başladığında) güncellendi.",
     "intro": "Vespertine ücretsiz, açık kaynak bir müzik oynatıcısıdır. Uygulamada hesap, analitik, telemetri, çökme raporu ve reklam yoktur. Geliştiriciye sizin veya müziğiniz hakkında hiçbir bilgi ulaşmaz. Kaynak kod herkese açık olduğundan bu sayfadaki her ifadeyi kendiniz doğrulayabilirsiniz.",
     "staysTitle": "Mac’inizde kalanlar",
-    "stays": "Arşiv veritabanınız, çalma listeleriniz, çalma sayılarınız, dosya analizi sonuçlarınız, kapak görseli önbelleğiniz ve ayarlarınız Mac’inizdeki kullanıcı Kitaplık klasörünüzde saklanır. Ağ paylaşımlarının parolaları ve eklediyseniz ListenBrainz belirteciniz (token) macOS Anahtar Zinciri’nde saklanır. Bunların hiçbiri hiçbir yere yüklenmez.",
+    "stays": "Arşiv veritabanınız, çalma listeleriniz, çalma sayılarınız, dosya analizi sonuçlarınız, kapak görseli önbelleğiniz ve ayarlarınız Mac’inizdeki kullanıcı Kitaplık klasörünüzde saklanır. Ağ paylaşımlarının parolaları ve eklediyseniz ListenBrainz erişim belirteciniz macOS Anahtar Zinciri’nde saklanır. Bunların hiçbiri hiçbir yere yüklenmez.",
     "onlineTitle": "Uygulama ne zaman internete bağlanır",
     "online": [
       "<strong>Güncelleme denetimleri.</strong> Vespertine güncelleme akışını yaklaşık günde bir kez ve siz Güncellemeleri Denetle’yi seçtiğinizde GitHub’dan ister. Her indirmede olduğu gibi GitHub IP adresinizi görür. Otomatik denetimleri Ayarlar’dan kapatabilirsiniz.",
-      "<strong>MusicBrainz ve Cover Art Archive.</strong> Yalnızca “MusicBrainz’de ara” veya “Meta Verileri Zenginleştir” özelliğini kullandığınızda (Bu Mac’teki Müzikleri Bul, eklediği müzikler için Zenginleştir’i işaretini kaldırabileceğiniz bir onay kutusu olarak sunar), Vespertine aradığı albüm, sanatçı ve parça adlarını musicbrainz.org’a gönderir. Ayarlar’da “Kapak görselini getir” açıksa kapakları coverartarchive.org’dan indirir; bu site onları Internet Archive (archive.org) üzerinden sunar. MusicBrainz ve Cover Art Archive, MetaBrainz Foundation tarafından işletilir.",
+      "<strong>MusicBrainz ve Cover Art Archive.</strong> Yalnızca “MusicBrainz’de ara” veya “Meta Verileri Zenginleştir” özelliğini kullandığınızda (Bu Mac’teki Müzikleri Bul, eklediği müzikler için Zenginleştir’i, işaretini kaldırabileceğiniz bir onay kutusu olarak sunar), Vespertine aradığı albüm, sanatçı ve parça adlarını musicbrainz.org’a gönderir. Ayarlar’da “Kapak görselini getir” açıksa kapakları coverartarchive.org’dan indirir; bu site onları Internet Archive (archive.org) üzerinden sunar. MusicBrainz ve Cover Art Archive, MetaBrainz Foundation tarafından işletilir.",
       "<strong>ListenBrainz.</strong> Yalnızca scrobbling’i açıp belirtecinizi girerseniz Vespertine çaldığınız şarkıları listenbrainz.org’a gönderir: başlık, sanatçı, albüm, süre ve dosyalarınızda varsa MusicBrainz kimlikleri. Bir şarkı başladığında “şimdi çalıyor” bilgisini, şarkının yarısını veya dört dakikasını dinlediğinizde de zamanıyla birlikte bir dinleme kaydı gönderir.",
       "<strong>Discord.</strong> Yalnızca Ayarlar’da Discord durumunu açarsanız Vespertine, Mac’inizden dışarı çıkmayan bir bağlantı üzerinden Mac’inizdeki Discord uygulamasına neyin çaldığını bildirir: başlık, sanatçı, albüm, biçim ve ilerleme. Discord bunu, etkinliğinizi görebilen kişilere durumunuz olarak gösterir. Albüm kapağını göstermek için Vespertine kapağı adıyla arar, çünkü Discord yalnızca web’deki görselleri gösterebilir: dosyalarınızda bir MusicBrainz yayın kimliği varsa coverartarchive.org’da, yoksa sanatçı ve albüm adlarını alan Apple’ın iTunes Search hizmetinde (itunes.apple.com). Discord da kapağı oradan indirir. Kapakları kapatabilirsiniz; dosyalarınız ve kapakları hiçbir zaman yüklenmez.",
       "<strong>Ağ paylaşımları.</strong> Vespertine müziğinizi okumak için yalnızca eklediğiniz sunuculara bağlanır, başka hiçbir yere değil. Bir paylaşım bağlıyken sunucunun hâlâ yanıt verdiğini yaklaşık dakikada bir denetler ve yarım saatte bir yeni müzik arar (o paylaşımdan çalarken asla)."
@@ -689,8 +689,8 @@
   },
   "notFound": {
     "title": "Sayfa bulunamadı: Vespertine",
-    "description": "Bu sayfa burada değil. Vespertine, surround ve Hi-Res müzik koleksiyonları için ücretsiz, açık kaynaklı Mac oynatıcısıdır.",
-    "ogAlt": "Vespertine: surround ve Hi-Res müzik için ücretsiz, açık kaynaklı Mac oynatıcısı.",
+    "description": "Bu sayfa burada değil. Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynaklı Mac oynatıcısıdır.",
+    "ogAlt": "Vespertine: surround ve hi-res müzik için ücretsiz, açık kaynaklı Mac oynatıcısı.",
     "eyebrow": "404 · Sinyal yok",
     "heading": "Bu sayfa",
     "headingBrass": "burada değil.",
@@ -702,15 +702,15 @@
     "processor": "Apple silicon (arm64) veya Intel (x86-64)",
     "subCategory": "Müzik oynatıcı",
     "sourceName": "Vespertine kaynak kodu",
-    "trailerName": "Vespertine tanıtım videosu",
-    "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 44 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve Hi-Res dosya analizi.",
+    "trailerName": "Vespertine fragmanı",
+    "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 44 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve hi-res dosya analizi.",
     "keywords": "bit-perfect, hi-res ses, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Uzamsal Ses, AirPods Max, FLAC, müzik oynatıcı, macOS, açık kaynak"
   },
   "releases": {
     "0.14.0": {
       "hash": "13646de5db46",
       "summary": "Vespertine 0.14.0 oda düzeltmesi getiriyor: hoparlörlerinizi bir UMIK-1 mikrofonla ölçün ve odanız için hazırlanmış filtrelerle dinleyin. Ayrıca ağdan oynatmada verinin tükenmesini önlüyor.",
-      "notes": "### Oda düzeltmesi\n- **Odanızı ölçün.** Kalibre edilmiş bir UMIK-1 mikrofonu dinleme koltuğuna koyun; Vespertine her hoparlörden sırayla, 1 ile 5 arasında noktada test taramaları çalar (varsayılan 5: koltuk, ardından koltuğun solu, sağı, önü ve arkası). Önce her hoparlörün seviyesini ve o hoparlöre giden yolu denetler, hatalı bir ölçümü reddeder ve yeniden denemenize ya da kaldığınız yerden devam etmenize olanak tanır. Hem stereo hem de 5.1 desteklenir.\n- **Her hoparlör için filtreler.** Vespertine ölçümden her hoparlör için küçük bir filtre seti oluşturur; bunlar çoğunlukla odanın eklediği bas tepeleri için kesimlerdir. Bir hedef (varsayılan Sıcak’tır; Hafif eğim veya Düz de seçilebilir) ve bir aralık (yalnızca bas veya tam aralık) seçin; filtreler yeniden ölçüm yapmadan kayıtlı ölçümden yeniden uyarlanır. Grafik; ölçüleni, düzeltme sonrası tahmin edileni ve hedefi gösterir, tahmin de tahmin olarak etiketlenir.\n- **Gecikme ve seviye hizalaması.** Her hoparlörün gecikmesi ve seviyesi de ölçülür; böylece daha yakın hoparlörler en uzaktakinin sesi ulaşana dek bekletilir, daha yüksek sesli olanlar da en sessiz olanın seviyesine kısılır.\n- **Kendi filtrelerinizi getirin.** Bir Equalizer APO veya REW filtre dosyasını (hoparlör başına gecikme, seviye ve filtreler) içe aktarın ya da konvolüsyon filtresi olarak çalınmak üzere dürtü yanıtlarını (WAV, AIFF, CAF veya FLAC) içe aktarın. Bir profili Equalizer APO metni veya Vespertine profili olarak dışa aktarın. Vespertine’in çalamadığı satırlar, başka bir şeymiş gibi çalınmak yerine satır numarası belirtilerek reddedilir.\n- **Varsayılan olarak kapalı, yani bit-perfect bit-perfect kalır.** Oda düzeltmesi çıkış başına açılır ve ölçümün yapıldığı çıkışa bağlıdır. Örnekleri değiştirdiği sürece sinyal yolunda ODA DÜZELTMESİ yazar ve akış artık bit-perfect olarak işaretlenmez. Kapalıyken oynatmaya hiç dokunulmaz. Açıkken Tam sayı modu ve 16 bit’e Eşleştir kapalı kalır.\n- **Neleri kapsar?** Vespertine’in işlediği stereo ve 5.1 PCM. Dolby ve DTS bitstream’leri, Atmos ve diğer kanal sayılarında devre dışı kalır, sinyal yolu da nedenini söyler. DoP kullanan bir DAC’ta DSD, düzeltme açıkken o da düzeltilsin diye PCM’e dönüştürülür; bunun yerine yerel olarak ve düzeltilmeden göndermek için o çıkışta Yerel DSD’yi koru seçeneğini işaretleyin.\n- **Tek pencere.** Görüntü → Oda Düzeltmesi (Ekolayzır penceresinden ve her çıkışın ayarlarından da açılabilir) şunları bir arada barındırır: açma/kapama anahtarı, Ölç, İçe Aktar, Dışa Aktar, profiller, önce/sonra grafiği, hedef ve aralık, ayrıca her hoparlörün gecikmesi, seviyesi ve filtreleri. Bu, önceki beta Oda Ölçümü penceresinin yerini alır. Yöntem `docs/ROOM-CORRECTION.md` dosyasında anlatılıyor.\n\n### Ağdan oynatma\n- **NAS’tan daha az kesinti.** Ağ paylaşımındaki parçalar artık çalınmadan önce Mac’inize kopyalanıyor ve sonraki parça önceden kopyalanıyor; böylece ağdaki bir aksama artık müziği durdurmuyor. Büyük DSD dosyaları, önde uzun bir tampon hazır tutacak şekilde okunuyor.\n- **Oynat düğmesinde yükleme halkası.** Vespertine ağdan veri beklerken oynat/duraklat düğmesinde dönen küçük bir halka görünür (Hareketi Azalt açıkken hareketsizdir). Kısa süreli okuma hataları yeniden denenir.\n- **Sınırlar.** Çok uzun bir kesinti ya da müzikten daha yavaş bir bağlantı, oynatmanın yeniden dolmak için duraklamasına yine de yol açabilir. Önbelleğe alınan kopyalar en fazla 8 GB kullanır; bundan büyük bir kaynak açık bir iletiyle başarısız olur. Bkz. `docs/NETWORK-PLAYBACK.md`.\n\n### Diğer yenilikler\n- **Bilinen DAC’larda DoP varsayılan olarak açık.** FiiO K11 ve Fosi Audio ZD3, DoP açık olarak başlar. Kapatırsanız Vespertine bunu hatırlar.\n- **Son Eklenenler 150 albüm gösteriyor**, önceden 60’tı; böylece büyük bir içe aktarma, kendisinden hemen önceki albümleri listeden düşürmüyor.\n- **Fosi Audio ZD3.** ZD3 artık desteklenen aygıtlar listesinde ve web sitesindeki ekran görüntüleri bu aygıtla yeniden alındı.\n- **Web sitesi.** İndirme düğmelerinin altında “GitHub’da yıldız verin” ve “Tartışmaya katılın” satırı yer alıyor.\n\n### Doğrulama\n- Motor, arşiv ve uygulama test paketleri geçiyor; oda filtresi tasarımı, düzeltme aşamasından ve konvolüsyon filtresinden oynatma, simüle edilmiş bir odada ölçüm adımları, içe aktarma biçimleri ve ağ önbelleği için yeni testler de dahil. Gerçek zamanlı ses kodu ayrıca adres, iş parçacığı (thread) ve tanımsız davranış (undefined behavior) sanitizer’larıyla denetleniyor.\n- Gerçek donanımda denetlenenler: dinleme koltuğunda bir UMIK-1 ile tam bir ölçüm, bu ölçümden oluşturulan filtreler ve stereo hoparlörlerle bir Fosi Audio ZD3 üzerinde oda düzeltmesiyle oynatma."
+      "notes": "### Oda düzeltmesi\n- **Odanızı ölçün.** Kalibre edilmiş bir UMIK-1 mikrofonu dinleme koltuğuna koyun; Vespertine her hoparlörden sırayla, 1 ile 5 arasında noktada test taramaları çalar (varsayılan 5: koltuk, ardından koltuğun solu, sağı, önü ve arkası). Önce her hoparlörün seviyesini ve o hoparlöre giden yolu denetler, hatalı bir ölçümü reddeder ve yeniden denemenize ya da kaldığınız yerden devam etmenize olanak tanır. Hem stereo hem de 5.1 desteklenir.\n- **Her hoparlör için filtreler.** Vespertine ölçümden her hoparlör için küçük bir filtre seti oluşturur; bunlar çoğunlukla odanın eklediği bas tepeleri için kesimlerdir. Bir hedef (varsayılan Sıcak’tır; Hafif eğim veya Düz de seçilebilir) ve bir aralık (yalnızca bas veya tam aralık) seçin; filtreler yeniden ölçüm yapmadan kayıtlı ölçümden yeniden uyarlanır. Grafik; ölçüleni, düzeltme sonrası tahmin edileni ve hedefi gösterir, tahmin de tahmin olarak etiketlenir.\n- **Gecikme ve seviye hizalaması.** Her hoparlörün gecikmesi ve seviyesi de ölçülür; böylece daha yakın hoparlörler en uzaktakinin sesi ulaşana dek bekletilir, daha yüksek sesli olanlar da en sessiz olanın seviyesine kısılır.\n- **Kendi filtrelerinizi getirin.** Bir Equalizer APO veya REW filtre dosyasını (hoparlör başına gecikme, seviye ve filtreler) içe aktarın ya da konvolüsyon filtresi olarak çalınmak üzere dürtü yanıtlarını (WAV, AIFF, CAF veya FLAC) içe aktarın. Bir profili Equalizer APO metni veya Vespertine profili olarak dışa aktarın. Vespertine’in çalamadığı satırlar, başka bir şeymiş gibi çalınmak yerine satır numarası belirtilerek reddedilir.\n- **Varsayılan olarak kapalı, yani bit-perfect bit-perfect kalır.** Oda düzeltmesi çıkış başına açılır ve ölçümün yapıldığı çıkışa bağlıdır. Örnekleri değiştirdiği sürece sinyal yolunda ODA DÜZELTMESİ yazar ve akış artık bit-perfect olarak işaretlenmez. Kapalıyken oynatmaya hiç dokunulmaz. Açıkken Tam sayı modu ve 16 bit kaynaklarla eşleştir kapalı kalır.\n- **Neleri kapsar?** Vespertine’in işlediği stereo ve 5.1 PCM. Dolby ve DTS bitstream’lerinde, Atmos’ta ve diğer kanal sayılarında devre dışı kalır, sinyal yolu da nedenini söyler. DoP kullanan bir DAC’ta DSD, düzeltme açıkken o da düzeltilsin diye PCM’e dönüştürülür; bunun yerine yerel olarak ve düzeltilmeden göndermek için o çıkışta Yerel DSD’yi koru seçeneğini işaretleyin.\n- **Tek pencere.** Görüntü → Oda Düzeltmesi (Ekolayzır penceresinden ve her çıkışın ayarlarından da açılabilir) şunları bir arada barındırır: açma/kapama anahtarı, Ölç, İçe Aktar, Dışa Aktar, profiller, önce/sonra grafiği, hedef ve aralık, ayrıca her hoparlörün gecikmesi, seviyesi ve filtreleri. Bu, önceki beta Oda Ölçümü penceresinin yerini alır. Yöntem `docs/ROOM-CORRECTION.md` dosyasında anlatılıyor.\n\n### Ağdan oynatma\n- **NAS’tan daha az kesinti.** Ağ paylaşımındaki parçalar artık çalınmadan önce Mac’inize kopyalanıyor ve sonraki parça önceden kopyalanıyor; böylece ağdaki bir aksama artık müziği durdurmuyor. Büyük DSD dosyaları, önde uzun bir tampon hazır tutacak şekilde okunuyor.\n- **Oynat düğmesinde yükleme halkası.** Vespertine ağdan veri beklerken oynat/duraklat düğmesinde dönen küçük bir halka görünür (Hareketi Azalt açıkken hareketsizdir). Kısa süreli okuma hataları yeniden denenir.\n- **Sınırlar.** Çok uzun bir kesinti ya da müzikten daha yavaş bir bağlantı, oynatmanın yeniden dolmak için duraklamasına yine de yol açabilir. Önbelleğe alınan kopyalar en fazla 8 GB kullanır; bundan büyük bir kaynak açık bir iletiyle başarısız olur. Bkz. `docs/NETWORK-PLAYBACK.md`.\n\n### Diğer yenilikler\n- **Bilinen DAC’larda DoP varsayılan olarak açık.** FiiO K11 ve Fosi Audio ZD3, DoP açık olarak başlar. Kapatırsanız Vespertine bunu hatırlar.\n- **Son Eklenenler 150 albüm gösteriyor**, önceden 60’tı; böylece büyük bir içe aktarma, kendisinden hemen önceki albümleri listeden düşürmüyor.\n- **Fosi Audio ZD3.** ZD3 artık desteklenen aygıtlar listesinde ve web sitesindeki ekran görüntüleri bu aygıtla yeniden alındı.\n- **Web sitesi.** İndirme düğmelerinin altında “GitHub’da yıldız verin” ve “Tartışmaya katılın” satırı yer alıyor.\n\n### Doğrulama\n- Motor, arşiv ve uygulama test paketleri geçiyor; oda filtresi tasarımı, düzeltme aşamasından ve konvolüsyon filtresinden oynatma, simüle edilmiş bir odada ölçüm adımları, içe aktarma biçimleri ve ağ önbelleği için yeni testler de dahil. Gerçek zamanlı ses kodu ayrıca adres, iş parçacığı ve tanımsız davranış sanitizer’larıyla denetleniyor.\n- Gerçek donanımda denetlenenler: dinleme koltuğunda bir UMIK-1 ile tam bir ölçüm, bu ölçümden oluşturulan filtreler ve stereo hoparlörlerle bir Fosi Audio ZD3 üzerinde oda düzeltmesiyle oynatma."
     },
     "0.13.2": {
       "hash": "f78ea179d3a9",

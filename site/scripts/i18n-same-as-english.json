@@ -6,5 +6,16 @@
     "Conditions + tests",
     "Angle",
     "Contact"
+  ],
+  "it": [
+    "Home"
+  ],
+  "nl": [
+    "Project",
+    "Contact"
+  ],
+  "ro": [
+    "Brand",
+    "Contact"
   ]
 }

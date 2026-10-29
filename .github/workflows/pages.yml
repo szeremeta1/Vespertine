@@ -67,6 +67,11 @@ jobs:
       # astro build, then scripts/check-dist.mjs (CSP hashes, alt text, lang and dir, one h1, canonical, hreflang,
       # social cards, JSON-LD, local links, robots.txt, sitemap.xml, llms.txt).
       - run: npm run build
+      # Pull requests only (a deploy never waits on a browser): the language redirect, the remembered choice, the
+      # language menu, the localized 404, RTL mirroring and overflow, headless in the runner's Google Chrome.
+      - name: Test the language features
+        if: github.event_name == 'pull_request'
+        run: node scripts/test-i18n.mjs
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

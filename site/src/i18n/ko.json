@@ -227,7 +227,7 @@
           "백업과 한 번에 되돌리기를 지원하는 태그 편집기, 그리고 파일에 기록하기 전에 신뢰도를 보여 주는 MusicBrainz 메타데이터 보완 기능.",
           "SMB, NFS 또는 WebDAV를 통한 네트워크 공유를 지원하며, 캐시 기능과 ‘오프라인으로 유지’ 기능, 느린 서버에 맞춘 재생 기능을 제공합니다.",
           "이 Mac에서 음악 찾기는 모든 드라이브에서 실제 음악만 찾아내고 잡다한 파일은 남겨 둡니다. 처음 실행할 때 짧은 설정 과정에서 출력을 고르고 독점 접근과 ReplayGain의 역할을 설명합니다.",
-          "출력별 파라메트릭 EQ로, AutoEQ 및 Equalizer APO 프리셋을 가져올 수 있습니다. 기본값은 끔이며, 켜면 신호 경로에 <span class=\"mono nowrap\">비트 퍼펙트</span> 대신 <span class=\"mono nowrap\">이퀄라이저</span>가 표시됩니다.",
+          "출력별 파라메트릭 EQ로, AutoEQ 및 Equalizer APO 프리셋을 가져올 수 있습니다. 기본값은 끔이며, 켜면 신호 경로에 <span class=\"mono nowrap\">이퀄라이저</span> 대신 <span class=\"mono nowrap\">비트 퍼펙트</span>가 표시됩니다.",
           "미니 플레이어, 메뉴 막대 항목, 미디어 키, ReplayGain, 서명된 자동 업데이트."
         ],
         "links": [

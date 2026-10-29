@@ -125,7 +125,7 @@
         "title": "每首曲目都以原生取樣率及位元深度播放。",
         "lede": "訊號路徑會列出由檔案到你的 DAC 的每一步（從 Core Audio 讀回），並在樣本被改動時註明。",
         "body": [
-          "Vespertine 會將裝置切換至每個檔案的取樣率，只有在 DAC 無法以該取樣率運作時，才會使用 Apple 母帶級的轉換器重新取樣。只有在符合原始碼中的條件時，才會顯示 <span class=\"mono nowrap\">BIT-PERFECT</span>：原生取樣率、沒有任何處理改動樣本、字長合適，以及裝置處於獨佔狀態或未與其他 App 共用。PCM 播放已在 FiiO K11 上測試至 384 kHz。"
+          "Vespertine 會將裝置切換至每個檔案的取樣率，只有在 DAC 無法以該取樣率運作時，才會使用 Apple 母帶級的轉換器重新取樣。只有在符合原始碼中的條件時，才會顯示 <span class=\"mono nowrap\">位元完美</span>：原生取樣率、沒有任何處理改動樣本、字長合適，以及裝置處於獨佔狀態或未與其他 App 共用。PCM 播放已在 FiiO K11 上測試至 384 kHz。"
         ],
         "list": [
           "獨佔（hog）模式可阻止其他 App 使用裝置。在共用模式下，音量鍵及 Digital Crown 會調整你的 DAC；在獨佔模式下，只要你開啟相關設定，它們同樣可以調整。",
@@ -135,7 +135,7 @@
           "會記住你的 DAC。如果 DAC 未連接，音樂會在已連接的最佳輸出裝置上播放，並在 DAC 重新連接時切換回去。",
           "本身沒有音量控制的輸出（HDMI、光纖、線路輸出）可使用 Vespertine 的音量，並可按輸出逐一選擇。低於 100% 時，標籤會註明已不再是位元完美。",
           "Vespertine 結束時，會將你的 DAC 交還，並恢復原本的取樣率及位元深度。",
-          "內置的迴路測試會比對 Vespertine 傳送至虛擬裝置的每個樣本。這是軟件檢查，亦會標明為軟件檢查，而且絕不會改變 <span class=\"mono nowrap\">BIT-PERFECT</span> 徽章。"
+          "內置的迴路測試會比對 Vespertine 傳送至虛擬裝置的每個樣本。這是軟件檢查，亦會標明為軟件檢查，而且絕不會改變 <span class=\"mono nowrap\">位元完美</span> 徽章。"
         ],
         "links": [
           "程式碼中的條件",
@@ -227,7 +227,7 @@
           "標籤編輯器設有備份及一步還原，另有 MusicBrainz 資料補充，在寫入任何內容前會先顯示其可信度。",
           "透過 SMB、NFS 或 WebDAV 存取網絡共享，提供快取、「保留離線副本」，以及專為慢速伺服器而設的播放功能。",
           "「尋找音樂」會搜尋每個磁碟，找出你真正的音樂，略過雜亂檔案。首次啟動時的簡短設定會選擇你的輸出，並說明獨佔存取及 ReplayGain 的作用。",
-          "每個輸出各自設定的參數 EQ，可匯入 AutoEQ 及 Equalizer APO 預設集。預設為關閉；開啟後，訊號路徑會顯示 <span class=\"mono nowrap\">EQUALIZER</span> 而非 <span class=\"mono nowrap\">BIT-PERFECT</span>。",
+          "每個輸出各自設定的參數 EQ，可匯入 AutoEQ 及 Equalizer APO 預設集。預設為關閉；開啟後，訊號路徑會顯示 <span class=\"mono nowrap\">均衡器</span> 而非 <span class=\"mono nowrap\">位元完美</span>。",
           "迷你播放器、選單列項目、媒體鍵、ReplayGain，以及自動、已簽署的更新。"
         ],
         "links": [
@@ -654,7 +654,7 @@
     "online": [
       "<strong>檢查更新。</strong>Vespertine 大約每日一次，以及在你選擇「檢查更新」時，向 GitHub 索取其更新資訊。與任何下載一樣，GitHub 會看到你的 IP 位址。你可以在「設定」中關閉自動檢查。",
       "<strong>MusicBrainz 及 Cover Art Archive。</strong>只有在你使用「在 MusicBrainz 上查詢」或「補充元數據」時（「在這部 Mac 上尋找音樂」會為其加入的音樂提供「補充」選項，以可取消剔選的剔選框形式呈現），Vespertine 才會將正在查詢的專輯、藝人及曲目名稱傳送至 musicbrainz.org。如在「設定」中開啟「擷取專輯封面」，Vespertine 會從 coverartarchive.org 下載封面，而該網站經 Internet Archive（archive.org）提供這些封面。MusicBrainz 及 Cover Art Archive 由 MetaBrainz Foundation 營運。",
-      "<strong>ListenBrainz。</strong>只有在你開啟收聽記錄提交（scrobbling）並輸入權杖後，Vespertine 才會將你播放的歌曲傳送至 listenbrainz.org：標題、藝人、專輯、長度，以及（如檔案中有）其 MusicBrainz ID。歌曲開始時會傳送「正在播放」，而在你聽了一半或四分鐘後，會傳送一次附有時間的收聽記錄。",
+      "<strong>ListenBrainz。</strong>只有在你開啟收聽記錄提交並輸入權杖後，Vespertine 才會將你播放的歌曲傳送至 listenbrainz.org：標題、藝人、專輯、長度，以及（如檔案中有）其 MusicBrainz ID。歌曲開始時會傳送「正在播放」，而在你聽了一半或四分鐘後，會傳送一次附有時間的收聽記錄。",
       "<strong>Discord。</strong>只有在你於「設定」中開啟 Discord 狀態後，Vespertine 才會透過只在你 Mac 上進行的連線，告訴你 Mac 上的 Discord App 正在播放甚麼：標題、藝人、專輯、格式及進度。Discord 會將其顯示為你的狀態，讓可以看到你活動的人看到。由於 Discord 只能顯示網上的圖片，為了顯示專輯封面，Vespertine 會按名稱查詢封面：如檔案帶有 MusicBrainz 發行版本 ID，便在 coverartarchive.org 查詢；否則便在 Apple 的 iTunes Search（itunes.apple.com）查詢，該服務會收到藝人及專輯名稱。Discord 其後會從該處下載封面。你可以關閉封面顯示，而你的檔案及其封面永遠不會被上載。",
       "<strong>網絡共享。</strong>Vespertine 只會連接你加入的伺服器以讀取你的音樂，不會連接其他地方。共享連接期間，它大約每分鐘檢查一次伺服器是否仍有回應，並每半小時尋找新音樂（從該共享播放期間一律不會）。"
     ],

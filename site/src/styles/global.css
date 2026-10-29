@@ -667,6 +667,11 @@ html:not(.js) .features::before {
 .lang__list a:hover, .lang__list a:focus-visible { color: var(--ink); background: rgba(236, 230, 218, .05); }
 .lang__list a[aria-current] { color: var(--brass-hi); }
 .lang__list a[aria-current]::after { content: " ✓" / ""; }
+/* Phones: the panel spans the bar, gutter to gutter, so it never runs off the screen. */
+@media (max-width: 760px) {
+  .lang { position: static; }
+  .lang__panel { inset-inline: var(--gutter); width: auto; top: calc(100% + 6px); }
+}
 @media (max-width: 400px) { .lang__btn { padding: 0 8px; } .lang__code { display: none; } }
 
 /* English release notes on a translated page (a release published before its translation). */

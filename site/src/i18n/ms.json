@@ -15,7 +15,7 @@
     "copyFailed": "Pilihnya",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus dan Dolby TrueHD ialah tanda dagangan Dolby Laboratories. DTS, DTS-HD Master Audio dan DTS:X ialah tanda dagangan DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS dan Audio Ruang ialah tanda dagangan Apple Inc. Vespertine menamakannya hanya untuk menerangkan apa yang dimainkannya dan di mana; ia tidak diperakui, dilesenkan atau disokong oleh Dolby, DTS atau Apple.",
     "trailerLabel": "Treler Vespertine, 44 saat",
-    "untested": "Output saluran demi saluran dan bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan dialu-alukan."
+    "untested": "Output saluran demi saluran dan bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
   },
   "nav": {
     "label": "Utama",
@@ -105,7 +105,7 @@
       },
       {
         "title": "Menyemak fail hi-res",
-        "text": "Analisis menandakan kedalaman bit yang dipad serta kemungkinan upsampling atau asal daripada format berkehilangan. Keputusan spektrum ialah anggaran, ditunjukkan bersama bukti dan batasannya. Analisis yang sama berjalan pada pelayan Linux di sebelah fail anda."
+        "text": "Analisis menandakan kedalaman bit yang dipad serta kemungkinan pensampelan naik atau asal daripada format berkehilangan. Keputusan spektrum ialah anggaran, ditunjukkan bersama bukti dan batasannya. Analisis yang sama berjalan pada pelayan Linux di sebelah fail anda."
       },
       {
         "title": "Sumber terbuka yang boleh anda audit",
@@ -150,13 +150,13 @@
         "jack": "Bunyi keliling",
         "kicker": "Bunyi keliling & Audio Ruang",
         "title": "Cakera 5.1 anda, dalam pustaka yang sama.",
-        "lede": "Muzik berbilang saluran dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods, atau di-downmix mengikut susun atur saluran pada DAC stereo.",
+        "lede": "Muzik berbilang saluran dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods, atau dimiks turun mengikut susun atur saluran pada DAC stereo.",
         "body": [
-          "CD DTS dinyahkod kepada 5.1. Imej SACD, trek SACD yang diekstrak, FLAC berbilang saluran, TrueHD dan DTS-HD MA dirender sebagai Audio Ruang penjejakan kepala pada AirPods atau di-downmix pada DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya (channel bed). Output saluran demi saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan dialu-alukan."
+          "CD DTS dinyahkod kepada 5.1. Imej SACD, trek SACD yang diekstrak, FLAC berbilang saluran, TrueHD dan DTS-HD MA dirender sebagai Audio Ruang penjejakan kepala pada AirPods atau dimiks turun pada DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya. Output saluran demi saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
         ],
         "list": [
           "Versi stereo dan bunyi keliling sesebuah album disenaraikan sekali; Vespertine memainkan versi yang sesuai dengan output, atau versi yang anda sematkan.",
-          "Bitstream Dolby Digital, DD+ dan DTS-CD ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan dialu-alukan. Ujian pembawa menggunakan pembaca S/PDIF FFmpeg. Passthrough TrueHD dan DTS-HD MA tidak disokong pada macOS.",
+          "Bitstream Dolby Digital, DD+ dan DTS-CD ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Ujian pembawa menggunakan pembaca S/PDIF FFmpeg. Passthrough TrueHD dan DTS-HD MA tidak disokong pada macOS.",
           "Eksport untuk Audio Ruang sebagai stereo binaural untuk fon kepala atau ALAC berbilang saluran untuk peranti Apple, lengkap dengan tag dan karya seni."
         ],
         "alt": "Goodbye Yellow Brick Road oleh Elton John, album 5.1 24-bit / 88.2 kHz, dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods Max, dengan laluan isyarat dan meter bagi setiap saluran.",
@@ -193,12 +193,12 @@
         ],
         "list": [
           "Audio 16-bit yang dipad ke dalam bekas 24-bit",
-          "Master berkualiti CD yang berkemungkinan di-upsample lalu dijual sebagai 96 atau 192 kHz",
+          "Master berkualiti CD yang berkemungkinan disampel naik lalu dijual sebagai 96 atau 192 kHz",
           "Berkemungkinan berasal daripada format berkehilangan: MP3 atau AAC yang ditranskod ke FLAC",
           "Berkemungkinan frekuensi tinggi sintetik daripada SBR atau “peningkatan AI”",
           "<span class=\"mono\">vespertine-analyze</span> menjalankan analisis yang sama pada pelayan Linux di sebelah fail anda; aplikasi mengimport keputusannya."
         ],
-        "note": "Fail dalam tangkapan skrin ini sengaja dipalsukan: muzik treler itu sendiri, dikodkan ke MP3 dan di-upsample ke 24/192 di bawah nama kumpulan rekaan.",
+        "note": "Fail dalam tangkapan skrin ini sengaja dipalsukan: muzik treler itu sendiri, dikodkan ke MP3 dan disampel naik ke 24/192 di bawah nama kumpulan rekaan.",
         "links": [
           "Cara analisis berfungsi, dan di mana ia tersasar"
         ],
@@ -227,7 +227,7 @@
           "Editor tag dengan sandaran dan pembalikan satu langkah, serta pengayaan MusicBrainz yang menunjukkan tahap keyakinannya sebelum menulis apa-apa.",
           "Perkongsian rangkaian melalui SMB, NFS atau WebDAV, dengan cache, Simpan Luar Talian dan main balik yang dibina untuk pelayan perlahan.",
           "Cari Muzik mencari muzik sebenar anda di setiap pemacu dan meninggalkan fail-fail yang bersepah. Persediaan ringkas pada pelancaran pertama memilih output anda dan menerangkan fungsi akses eksklusif dan ReplayGain.",
-          "EQ parametrik bagi setiap output yang mengimport pratetap AutoEQ dan Equalizer APO. Mati secara lalai; apabila dihidupkan, laluan isyarat menunjukkan <span class=\"mono nowrap\">EQUALIZER</span> dan bukannya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "EQ parametrik bagi setiap output yang mengimport pratetap AutoEQ dan Equalizer APO. Mati secara lalai; apabila dihidupkan, laluan isyarat menunjukkan <span class=\"mono nowrap\">PENYAMA</span> dan bukannya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Pemain Mini, ikon bar menu, kekunci media, ReplayGain dan kemas kini automatik yang ditandatangani."
         ],
         "links": [
@@ -250,7 +250,7 @@
     },
     "formats": {
       "eyebrow": "Format",
-      "title": "Fail surround, tanpa kehilangan dan berkehilangan.",
+      "title": "Fail bunyi keliling, tanpa kehilangan dan berkehilangan.",
       "text": "Stereo dan berbilang saluran, PCM dan DSD, imej cakera dan fail biasa, semuanya dengan sokongan helaian CUE.",
       "caption": "Format yang dimainkan Vespertine, dan caranya",
       "rows": [
@@ -272,15 +272,15 @@
         },
         {
           "name": "Dolby Atmos",
-          "text": "Dolby Digital Plus dengan Atmos, dirender oleh perender objek macOS, atau channel bed yang telah dinyahkod."
+          "text": "Dolby Digital Plus dengan Atmos, dirender oleh perender objek macOS, atau lapisan saluran asasnya yang telah dinyahkod."
         },
         {
           "name": "Dolby TrueHD, MLP",
-          "text": "Tanpa kehilangan, boleh menjadi bit-perfect; TrueHD Atmos memainkan channel bed-nya, objeknya tidak dirender."
+          "text": "Tanpa kehilangan, boleh menjadi bit-perfect; TrueHD Atmos memainkan lapisan saluran asasnya, objeknya tidak dirender."
         },
         {
           "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
-          "text": "MA adalah tanpa kehilangan dan boleh menjadi bit-perfect; DTS:X memainkan channel bed-nya. DTS mentah dinyahkod; bitstream DTS-CD ialah laluan berasingan."
+          "text": "MA adalah tanpa kehilangan dan boleh menjadi bit-perfect; DTS:X memainkan lapisan saluran asasnya. DTS mentah dinyahkod; bitstream DTS-CD ialah laluan berasingan."
         },
         {
           "name": "Dolby Digital (Plus)",
@@ -366,7 +366,7 @@
           "Tidak didokumenkan"
         ],
         [
-          "Fail surround setempat",
+          "Fail bunyi keliling setempat",
           "Ya²",
           "Tidak didokumenkan",
           "Ya",
@@ -377,7 +377,7 @@
           "Tidak didokumenkan"
         ],
         [
-          "Audio Ruang Apple untuk surround setempat",
+          "Audio Ruang Apple untuk bunyi keliling setempat",
           "Ya",
           "Atmos katalog sahaja³",
           "Tidak didokumenkan",
@@ -480,7 +480,7 @@
         },
         {
           "q": "Adakah ia memainkan Dolby Atmos?",
-          "a": "Dolby Digital Plus dengan Atmos dimainkan melalui perender objek macOS, sebagai Audio Ruang dengan penjejakan kepala pada AirPods. TrueHD Atmos dan DTS:X memainkan channel bed tanpa kehilangannya; objeknya tidak dirender. Bitstream ke penerima AV adalah eksperimental, belum diuji pada penerima sebenar; laporan diperlukan."
+          "a": "Dolby Digital Plus dengan Atmos dimainkan melalui perender objek macOS, sebagai Audio Ruang dengan penjejakan kepala pada AirPods. TrueHD Atmos dan DTS:X memainkan lapisan saluran asas tanpa kehilangannya; objeknya tidak dirender. Bitstream ke penerima AV adalah eksperimental, belum diuji pada penerima sebenar; laporan diperlukan."
         },
         {
           "q": "Adakah ia akan mengubah fail saya?",
@@ -525,7 +525,7 @@
     },
     "closing": {
       "eyebrow": "Muat Turun",
-      "title": "Mainkan koleksi surround anda di Mac anda.",
+      "title": "Mainkan koleksi bunyi keliling anda di Mac anda.",
       "meta": [
         "Percuma",
         "sumber terbuka",
@@ -541,7 +541,7 @@
     "eyebrow": "Kit media",
     "heading": "Semua yang anda perlukan untuk menulis tentangnya",
     "lede": "Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, trek SACD 5.1 yang diekstrak, CD DTS serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka, dengan Audio Ruang berpenjejakan kepala pada AirPods. Laluan Isyarat menunjukkan setiap langkah daripada fail hingga ke output, dengan syarat dan ujian dalam kod sumber GPL yang boleh diaudit oleh sesiapa sahaja.",
-    "fine": "Output saluran demi saluran dan bitstream ke penerima masih eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya (channel bed).",
+    "fine": "Output saluran demi saluran dan bitstream ke penerima masih eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya.",
     "facts": {
       "eyebrow": "Lembaran fakta",
       "title": "Fakta.",
@@ -576,9 +576,9 @@
       "list": [
         "Muzik bunyi keliling dalam satu pustaka Mac, daripada imej SACD dan DVD-Video, rip dan CD DTS hinggalah TrueHD dan DD+ Atmos, dengan Audio Ruang pada AirPods.",
         "Kod sumber GPL-3.0 percuma yang boleh dibaca, dibina dan diubah oleh sesiapa sahaja.",
-        "Laluan isyarat yang menunjukkan kadar sampel, panjang perkataan, gandaan dan pemprosesan saluran. Syarat bit-perfect ditetapkan dalam kod, berserta ujian, ujian gelung balik terbina dalam dan <a href=\"{href.verification}\">panduan pengesahan</a>."
+        "Laluan isyarat yang menunjukkan kadar sampel, panjang kata, gandaan dan pemprosesan saluran. Syarat bit-perfect ditetapkan dalam kod, berserta ujian, ujian gelung balik terbina dalam dan <a href=\"{href.verification}\">panduan pengesahan</a>."
       ],
-      "text": "Analisis fail hi-res turut disertakan. Pengesanan pelapikan sifar (zero padding) adalah tepat; keputusan spektrum ialah anggaran yang ada batasannya. VeraVox dan Audirvana AudioScan juga menawarkan analisis. <a href=\"{href.comparison}\">Sumber perbandingan</a>."
+      "text": "Analisis fail hi-res turut disertakan. Pengesanan pad sifar adalah tepat; keputusan spektrum ialah anggaran yang ada batasannya. VeraVox dan Audirvana AudioScan juga menawarkan analisis. <a href=\"{href.comparison}\">Sumber perbandingan</a>."
     },
     "video": {
       "eyebrow": "Video",
@@ -689,8 +689,8 @@
   },
   "notFound": {
     "title": "Halaman tidak ditemui: Vespertine",
-    "description": "Halaman ini tiada di sini. Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik surround dan hi-res.",
-    "ogAlt": "Vespertine: pemain Mac percuma dan sumber terbuka untuk muzik surround dan hi-res.",
+    "description": "Halaman ini tiada di sini. Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res.",
+    "ogAlt": "Vespertine: pemain Mac percuma dan sumber terbuka untuk muzik bunyi keliling dan hi-res.",
     "eyebrow": "404 · Tiada isyarat",
     "heading": "Halaman ini",
     "headingBrass": "tiada di sini.",
@@ -703,7 +703,7 @@
     "subCategory": "Pemain muzik",
     "sourceName": "Kod sumber Vespertine",
     "trailerName": "Treler Vespertine",
-    "trailerDescription": "Lawatan 44 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, surround sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
+    "trailerDescription": "Lawatan 44 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, bunyi keliling sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
     "keywords": "bit-perfect, audio hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, CD DTS, Audio Ruang, AirPods Max, FLAC, pemain muzik, macOS, sumber terbuka"
   },
   "releases": {
@@ -715,7 +715,7 @@
     "0.13.2": {
       "hash": "f78ea179d3a9",
       "summary": "Vespertine 0.13.2 memainkan DSD 5.1 dalam Audio Ruang pada AirPods, memberitahu anda apabila audio ditukar atau dimiks turun, dan tidak lagi tergantung semasa keluar.",
-      "notes": "### Audio Ruang\n- **DSD 5.1 kini dimainkan dalam Audio Ruang.** Fail DSD 5.1 (DSF, DSDIFF, DSDIFF yang dimampatkan DST atau imej SACD) ditukar kepada PCM dan setiap saluran diletakkan di tempat sepatutnya, jadi saluran LFE dan surround tidak lagi hilang. Sebelum ini, saluran DSDIFF diskret boleh berakhir pada bed tiga pembesar suara dan saluran belakang hilang.\n- **Ia memberitahu apa yang berlaku pada audio.** Laluan isyarat memaparkan **DSD → PCM** di sebelah RUANG atau campuran turun, dan dua notis baharu, “Ditukar daripada DSD” dan “Dimiks turun ke stereo”, muncul apabila berkenaan. Kedua-duanya diterjemahkan ke dalam kesemua 44 bahasa.\n- Disemak oleh pembangun pada AirPods Max.\n\n### Dibetulkan\n- **Keluar tidak lagi tergantung.** Cmd-Q boleh menyebabkan kursor berputar sementara Vespertine menunggu peranti audio. Kini ia keluar serta-merta.\n- **Fail berbilang saluran dibaca dengan betul.** Fail RF64 dan Wave64 dibuka dengan betul, nama saluran DSD dibaca daripada fail, dan penghalaan berbilang saluran diskret mengikut susun atur saluran fail itu sendiri.\n\n### Pengesahan\n- Suite ujian enjin, pustaka dan apl lulus, termasuk ujian baharu yang memainkan setiap format DSD 5.1 melalui Audio Ruang dan menyemak bahawa setiap saluran tiba di tempatnya. Semakan penempatan kiri/kanan hanya dijalankan pada Mac sebenar; mesin ujian GitHub melangkau semakan yang satu itu."
+      "notes": "### Audio Ruang\n- **DSD 5.1 kini dimainkan dalam Audio Ruang.** Fail DSD 5.1 (DSF, DSDIFF, DSDIFF yang dimampatkan DST atau imej SACD) ditukar kepada PCM dan setiap saluran diletakkan di tempat sepatutnya, jadi saluran LFE dan bunyi keliling tidak lagi hilang. Sebelum ini, saluran DSDIFF diskret boleh berakhir pada lapisan saluran asas tiga pembesar suara dan saluran belakang hilang.\n- **Ia memberitahu apa yang berlaku pada audio.** Laluan isyarat memaparkan **DSD → PCM** di sebelah RUANG atau campuran turun, dan dua notis baharu, “Ditukar daripada DSD” dan “Dimiks turun ke stereo”, muncul apabila berkenaan. Kedua-duanya diterjemahkan ke dalam kesemua 44 bahasa.\n- Disemak oleh pembangun pada AirPods Max.\n\n### Dibetulkan\n- **Keluar tidak lagi tergantung.** Cmd-Q boleh menyebabkan kursor berputar sementara Vespertine menunggu peranti audio. Kini ia keluar serta-merta.\n- **Fail berbilang saluran dibaca dengan betul.** Fail RF64 dan Wave64 dibuka dengan betul, nama saluran DSD dibaca daripada fail, dan penghalaan berbilang saluran diskret mengikut susun atur saluran fail itu sendiri.\n\n### Pengesahan\n- Suite ujian enjin, pustaka dan apl lulus, termasuk ujian baharu yang memainkan setiap format DSD 5.1 melalui Audio Ruang dan menyemak bahawa setiap saluran tiba di tempatnya. Semakan penempatan kiri/kanan hanya dijalankan pada Mac sebenar; mesin ujian GitHub melangkau semakan yang satu itu."
     },
     "0.13.1": {
       "hash": "60b7a86a49b9",
@@ -723,7 +723,7 @@
     },
     "0.13.0": {
       "hash": "3a618b344990",
-      "summary": "Vespertine kini menyimpan sejarah apa yang telah anda mainkan, memberikan Seterusnya panelnya sendiri di sebelah pustaka, memaparkan setiap edisi album pada satu kad, dan boleh memaparkan apa yang sedang anda mainkan sebagai status Discord anda."
+      "summary": "Vespertine kini menyimpan sejarah apa yang telah anda mainkan, memberikan panel tersendiri kepada Seterusnya di sebelah pustaka, memaparkan setiap edisi album pada satu kad, dan boleh memaparkan apa yang sedang anda mainkan sebagai status Discord anda."
     },
     "0.12.2": {
       "hash": "061c50f44ec0",
