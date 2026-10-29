@@ -36,7 +36,7 @@ scripts/install-loopback-device.sh          # builds and installs it (asks for y
 scripts/install-loopback-device.sh --remove # uninstalls it
 ```
 
-Any other virtual device works too, as long as nothing else plays to it or records from it during the test. macOS asks once for permission to record, because the test reads the loopback device's input. Vespertine never records a microphone.
+Any other virtual device works too, as long as nothing else plays to it or records from it during the test. macOS asks once for permission to record, because the test reads the loopback device's input. The loopback test never records a microphone; only Room Correction's measurement does, while you run one.
 
 ## Running it
 

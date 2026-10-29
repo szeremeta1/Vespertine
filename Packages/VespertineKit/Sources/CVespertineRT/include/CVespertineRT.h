@@ -121,6 +121,57 @@ void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullab
 
 #define NRT_METER_CHANNELS 16u
 
+// MARK: - Room correction, run on the I/O thread before the equalizer
+//
+// One chain per decoded channel: delay → gain → parametric sections → FIR filter (convolution), then the equalizer,
+// volume and dither. Each stage that changes nothing is skipped, so with no correction the path stays bit-transparent.
+
+#define NRT_ROOM_MAX_CHANNELS NRT_METER_CHANNELS
+#define NRT_ROOM_MAX_SECTIONS 24u
+/// The longest delay a channel can have, in frames (a power of two): 42 ms at 768 kHz, over half a second at 48 kHz.
+#define NRT_ROOM_MAX_DELAY 32768u
+
+/// One speaker's correction: the samples are delayed by `delayFrames` (below NRT_ROOM_MAX_DELAY), scaled by `gain`
+/// (linear: the profile's preamp times the speaker's level) and run through `count` sections (at most
+/// NRT_ROOM_MAX_SECTIONS) in series, in double precision.
+typedef struct {
+    uint32_t delayFrames;
+    double gain;
+    uint32_t count;
+    NRTBiquad sections[NRT_ROOM_MAX_SECTIONS];
+} NRTRoomChannel;
+
+/// Sets per-channel room correction while the device runs: `channels[c]` applies to decoded channel c, for the first
+/// `count` channels (at most NRT_ROOM_MAX_CHANNELS); channels past `count` are left as they are. A count of 0 turns it
+/// off and keeps the bit-transparent path. Never applied to passthrough (DoP) or integer samples. Takes effect on the
+/// next I/O cycle. A channel's filter memory carries over when its number of sections is unchanged, and is cleared
+/// otherwise; turning correction on starts every delay line from silence. One caller at a time.
+void nrt_context_set_room(NRTRenderContext *_Nonnull ctx, const NRTRoomChannel *_Nullable channels, uint32_t count);
+
+/// Block size of the partitioned convolution, in frames. Once a context has had FIR filters, its output is this many
+/// frames late (every channel alike, filtered or not), so turning filters on and off later doesn't jump.
+#define NRT_FIR_BLOCK 512u
+/// The longest FIR filter, in taps: 5.5 s at 48 kHz, 1.4 s at 192 kHz.
+#define NRT_FIR_MAX_TAPS 262144u
+
+/// Sets FIR filters (measured impulse responses) while the device runs: `impulses[c]` (`length` taps, at most
+/// NRT_FIR_MAX_TAPS) filters decoded channel c after its delay, gain and sections, for the first `count` channels (at
+/// most the ring's channel count and NRT_ROOM_MAX_CHANNELS); a NULL impulse, or a channel past `count`, plays
+/// unfiltered. `count` 0 turns filtering off. Prepares the filters' spectra on the calling thread (never the I/O
+/// thread) and hands them over lock-free; the I/O thread switches at its next 4,096-frame period and crossfades from
+/// the old filters to the new over one block, so changes don't click. The first call with filters allocates their
+/// memory (about 10 MB per channel) and from then on the output is NRT_FIR_BLOCK frames late; with no filters it is
+/// otherwise bit-exact. Never applied to passthrough (DoP) or integer samples. One caller at a time. Returns false if
+/// out of memory.
+bool nrt_context_set_fir(NRTRenderContext *_Nonnull ctx, const float *_Nullable const *_Nullable impulses, uint32_t count, uint32_t length);
+
+/// Frames the output is held back by filtering (0, or NRT_FIR_BLOCK once FIR filters have been set).
+uint32_t nrt_context_fir_latency(const NRTRenderContext *_Nonnull ctx);
+
+/// Clears what room correction holds from before (a seek or skip): delay lines, filter memory, convolution history.
+/// Only while the device is stopped.
+void nrt_context_reset_history(NRTRenderContext *_Nonnull ctx);
+
 /// Peak (absolute, linear) since the last call, per decoded channel (0 … NRT_METER_CHANNELS-1).
 float nrt_context_take_peak(NRTRenderContext *_Nonnull ctx, uint32_t channel);
 

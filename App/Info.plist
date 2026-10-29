@@ -49,7 +49,7 @@
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Vespertine connects to the music servers and network shares you add, on your network or over a VPN.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The loopback test records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. It never records a microphone.</string>
+	<string>Vespertine records from a measurement microphone only when you run a room measurement, to hear the test sweep it plays through your speakers. The loopback test also records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. Nothing is recorded otherwise.</string>
 	<key>SUAllowsAutomaticUpdates</key>
 	<true/>
 	<key>SUEnableAutomaticChecks</key>

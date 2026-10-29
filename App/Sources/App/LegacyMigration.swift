@@ -15,7 +15,7 @@ enum LegacyMigration {
     /// Runs before the library opens. Does nothing for new users, test runs and libraries in a custom folder.
     @MainActor
     static func runIfNeeded(defaults: UserDefaults = .standard, bundleID: String? = Bundle.main.bundleIdentifier) {
-        guard let bundleID, bundleID.hasPrefix("org.szeremeta.Vespertine"), defaults.object(forKey: doneKey) == nil,
+        guard let bundleID, bundleID.hasPrefix("org.szeremeta.Vespertine"), !bundleID.hasSuffix(".roomtest"), defaults.object(forKey: doneKey) == nil,
               defaults.string(forKey: "VespertineDataDirectory") == nil else { return }
         let dev = bundleID.hasSuffix(".dev")
         let legacyID = dev ? "org.nocturne.Nocturne.dev" : "org.nocturne.Nocturne"

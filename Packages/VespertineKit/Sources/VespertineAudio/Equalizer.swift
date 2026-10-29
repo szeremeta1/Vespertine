@@ -174,6 +174,10 @@ public enum EQImportError: Error, Equatable, LocalizedError {
     case graphicEQ
     case unsupportedFilter(line: Int, type: String)
     case unreadable(line: Int)
+    case unsupportedChannel(line: Int, name: String)
+    case delayInSamples(line: Int)
+    case unsupportedCommand(line: Int, command: String)
+    case tooManyRoomFilters(Int)
 
     public var errorDescription: String? {
         switch self {
@@ -188,6 +192,16 @@ public enum EQImportError: Error, Equatable, LocalizedError {
                    comment: "The filter type is a code from the file, e.g. “BP”.")
         case .unreadable(let line):
             String(localized: "Line \(line) couldn't be read as a filter.")
+        case .unsupportedChannel(let line, let name):
+            String(localized: "Line \(line) names a channel Vespertine doesn't know (\(name)). Use L, R, C, LFE, RL, RR, SL, SR or a channel number.",
+                   comment: "The channel name is from the file, e.g. “X”.")
+        case .delayInSamples(let line):
+            String(localized: "Line \(line) gives a delay in samples. Give it in milliseconds (ms), which work at every sample rate.")
+        case .unsupportedCommand(let line, let command):
+            String(localized: "Line \(line) uses a command Vespertine can't apply (\(command)).",
+                   comment: "The command is from the file, e.g. “Copy”.")
+        case .tooManyRoomFilters:
+            String(localized: "A speaker in the file has too many filters. Vespertine runs up to \(RoomCorrectionPlayback.maxBandsPerChannel) per speaker.")
         }
     }
 }
@@ -242,7 +256,7 @@ extension EQPreset {
         return lines.joined(separator: "\n") + "\n"
     }
 
-    private static func band(_ tokens: [String], line: Int) throws -> EQBand {
+    static func band(_ tokens: [String], line: Int) throws -> EQBand {
         guard tokens.count >= 2 else { throw EQImportError.unreadable(line: line) }
         let enabled: Bool
         switch tokens[0].uppercased() {
@@ -286,7 +300,7 @@ extension EQPreset {
     }
 
     /// "6.4", "-3,1" (a decimal comma), "105Hz" or "6dB": the number at the start.
-    private static func number(_ token: String) -> Double? {
+    static func number(_ token: String) -> Double? {
         let cleaned = token.replacingOccurrences(of: ",", with: ".")
         let prefix = cleaned.prefix { $0.isNumber || $0 == "." || $0 == "-" || $0 == "+" || $0 == "e" || $0 == "E" }
         return Double(prefix).flatMap { $0.isFinite ? $0 : nil }

@@ -1,2 +1,4 @@
 # License texts are kept exactly as their projects publish them (trailing spaces and all).
 App/Licenses/** -whitespace
+# Calibration-file fixtures keep the CRLF line endings real downloads have (the parser is tested on them).
+Packages/VespertineKit/Tests/VespertineAudioTests/Fixtures/umik-synthetic*.txt -whitespace -text

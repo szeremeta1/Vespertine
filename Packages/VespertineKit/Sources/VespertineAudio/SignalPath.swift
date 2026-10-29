@@ -25,6 +25,13 @@ public struct SignalPath: Sendable, Hashable {
     public var equalizer: String? = nil
     /// The preset chosen for this output that can't be applied to this stream (DoP, bitstream), by name; nil = none chosen.
     public var bypassedEqualizer: String? = nil
+    /// The room correction profile applied (its name), nil = none.
+    public var roomCorrection: String? = nil
+    /// The room correction chosen for this output that doesn't apply to this stream (native DSD kept, bitstream,
+    /// channels that don't match its speakers), by name; nil = none chosen.
+    public var bypassedRoomCorrection: String? = nil
+    /// A speaker's measured room correction filter is too long for this sample rate, so it's left out.
+    public var roomFiltersSkipped = false
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
@@ -44,7 +51,7 @@ public struct SignalPath: Sendable, Hashable {
     /// Gain other than exactly unity is applied somewhere in software.
     public var modifiesSamples: Bool {
         if let rg = replayGainDB, rg != 0 { return true }
-        if equalizer != nil { return true }
+        if equalizer != nil || roomCorrection != nil { return true }
         if case .digital(let db) = volume, db != 0 { return true }
         return false
     }
@@ -101,6 +108,7 @@ public struct SignalPath: Sendable, Hashable {
         if isResampling { return String(localized: "RESAMPLED", comment: "Status badge (short, uppercase).") }
         if source.encoding == .lossy { return String(localized: "LOSSY SOURCE", comment: "Status badge (short, uppercase).") }
         if !applied.exclusive, otherAppsPlaying { return String(localized: "MIXED WITH OTHER APPS", comment: "Status badge (short, uppercase).") }
+        if roomCorrection != nil { return String(localized: "ROOM CORRECTION", comment: "Status badge (short, uppercase).") }
         if equalizer != nil { return String(localized: "EQUALIZER", comment: "Status badge (short, uppercase).") }
         if modifiesSamples { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
         if !applied.physicalFormatKnown { return String(localized: "FORMAT UNCONFIRMED", comment: "Status badge (short, uppercase).") }

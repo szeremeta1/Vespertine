@@ -45,6 +45,9 @@ final class OutputSession: @unchecked Sendable {
     private(set) var spatial: SpatialRenderer?
     private var ioProcID: AudioDeviceIOProcID?
     private(set) var isRunning = false
+    /// The measured room filters the context was last given (`PlaybackEngine.applyGain`), so they're only loaded,
+    /// resampled and transformed again when they or the stream change.
+    var roomFilterKey = ""
     /// What the device still holds after the I/O proc's last buffer: its latency, safety offset and stream latency.
     /// A few milliseconds on a USB DAC; hundreds on Bluetooth and AirPlay, whose end of the last song was cut off
     /// when the device was stopped as soon as the ring ran dry.
@@ -305,6 +308,7 @@ final class OutputSession: @unchecked Sendable {
         stop()
         nrt_context_cancel_discard(context)
         nrt_ring_reset(ring)
+        nrt_context_reset_history(context)   // room correction's delays and filters start the next position from silence
     }
 
     /// `restoreFormat` false: the next session configures the same device straight away (it keeps the hold).

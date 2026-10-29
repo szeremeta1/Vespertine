@@ -55,7 +55,7 @@ targets:
         # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
         NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
         # Only the loopback self-test records, and only from a virtual loopback device such as "Vespertine Loopback".
-        NSMicrophoneUsageDescription: "The loopback test records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. It never records a microphone."
+        NSMicrophoneUsageDescription: "Vespertine records from a measurement microphone only when you run a room measurement, to hear the test sweep it plays through your speakers. The loopback test also records what Vespertine played to a virtual loopback device, to check the samples came back unchanged. Nothing is recorded otherwise."
         # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.
         SUFeedURL: https://github.com/szeremeta1/Vespertine/releases/latest/download/appcast.xml
         SUPublicEDKey: 5KxX9Zdz/fXEO1SpPUjZWxkNWiIzSMzMXava8UpHeNw=

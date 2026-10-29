@@ -71,6 +71,7 @@ struct EqualizerBypassNote: View {
 
 struct EqualizerWindow: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
     @State private var selection: UUID?
     @State private var importing = false
     @State private var problem: String?
@@ -94,6 +95,12 @@ struct EqualizerWindow: View {
                 }
                 .listStyle(.sidebar)
                 Hairline()
+                Button { openWindow(id: "room-correction") } label: {
+                    Label("Room Correction…", systemImage: "waveform.path.ecg").frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.borderless)
+                .help("Measure your room and correct its bass, per speaker")
+                .padding(.horizontal, 10).padding(.top, 8)
                 HStack(spacing: 6) {
                     Button { add(EQPreset(name: String(localized: "New Preset"), bands: [EQBand()])) } label: { Image(systemName: "plus") }
                         .help("New preset").accessibilityLabel("New preset")
