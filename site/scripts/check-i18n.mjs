@@ -63,11 +63,11 @@ does did done doing make makes made get gets got see seen look looks want wants 
 off over under up down out on of to in is it as at by or an no not for all one two three if so do`.split(/\s+/));
 // Of those, words that some target language also uses (in, an, on, is, of, to, for, no, a …): they count only next to two others.
 const WEAK = new Set(['in', 'an', 'on', 'is', 'of', 'to', 'for', 'no', 'as', 'at', 'by', 'or', 'up', 'so', 'do', 'it', 'be', 'me', 'we', 'us', 'he', 'she', 'his', 'her', 'him', 'my', 'all', 'one', 'two', 'if', 'not', 'open', 'source', 'free', 'more', 'like', 'over', 'under', 'out', 'off', 'here', 'still', 'music', 'code', 'track', 'tracks', 'player', 'device', 'channel', 'channels', 'turn', 'die', 'per', 'files', 'albums', 'sample', 'samples', 'has', 'are', 'was', 'made', 'use', 'shows', 'type', 'what', 'just', 'way']);
-function englishRun(s) {
+function englishRun(s, lang) {
   const words = strip(s).toLowerCase().match(/[a-z][a-z'’]*/g) ?? [];
   let run = 0, strong = 0;
   for (const w of words) {
-    if (EN.has(w)) { run++; if (!WEAK.has(w)) strong++; if (run >= 3 && strong >= 2) return true; }
+    if (EN.has(w) && !vocab[lang]?.has(w)) { run++; if (!WEAK.has(w)) strong++; if (run >= 3 && strong >= 2) return true; }
     else { run = 0; strong = 0; }
   }
   return false;
@@ -79,6 +79,22 @@ const SAME = new Set(['version', 'trailer', 'surround', 'download', 'name', 'lin
   'hi-res', 'design', 'analyse', 'spectrum', 'audio', 'radio', 'internet', 'streaming', 'plugins', 'feedback', 'online', 'offline', 'studio', 'origin']);
 // Product and format names and units that appear in values on their own.
 const NAMES = /^(Vespertine|Nocturne|Mac|macOS|Apple|Intel|AirPods|Max|Music|Atmos|Dolby|TrueHD|Digital|Plus|Master|Audio|WavPack|Opus|Vorbis|Musepack|AudioScan|Roon|VeraVox|Colibri|Cog|Audirvana|Studio|Origin|Video|Homebrew|GitHub|Discord|Sonoma|Rosetta|Linux|Bluetooth|Boston|Szeremeta|Alexander|Alex|Sony|FiiO|Fosi|UPnP|Units|kHz|fps|bit|bits|Hi-Res|Spatial|Crown|DoP|DSD\d*|DVD-Video|DVD-Audio)$/;
+
+// Latin-script words the app's own translation for each language uses (Czech keeps "Bit-perfect" and "open source",
+// many keep "DAC"): on the site they are the app's terms, not leftovers.
+const catalog = JSON.parse(readFileSync(here('../../App/Resources/Localizable.xcstrings'), 'utf8')).strings;
+const vocab = {};
+const collect = (lang, node) => {
+  if (!node || typeof node !== 'object') return;
+  if (typeof node.value === 'string') for (const w of node.value.toLowerCase().match(/[a-z][a-z'’-]*/g) ?? []) vocab[lang].add(w);
+  for (const v of Object.values(node)) collect(lang, v);
+};
+for (const entry of Object.values(catalog)) {
+  for (const [lang, loc] of Object.entries(entry.localizations ?? {})) {
+    vocab[lang] ??= new Set();
+    collect(lang, loc);
+  }
+}
 
 // ---- Structure ----
 const placeholders = (s) => [...s.matchAll(/\{[\w.]+\}/g)].map((m) => m[0]).sort().join(' ');
@@ -99,8 +115,9 @@ function walk(a, b, path, lang, out) {
     if (tags(a) !== tags(b)) out.push(`${path}: HTML tags differ from the English`);
     if (path.startsWith('releases.') && markdown(a) !== markdown(b)) out.push(`${path}: Markdown differs from the English (${markdown(b)} vs ${markdown(a)})`);
     const english = strip(a).match(/[A-Za-z][A-Za-z-]{2,}/g) ?? [];
-    if (a === b && english.some((w) => EN.has(w.toLowerCase()) || (!SAME.has(w.toLowerCase()) && w !== w.toUpperCase() && !NAMES.test(w)))) out.push(`${path}: unchanged English "${a.slice(0, 70)}"`);
-    else if (englishRun(b)) out.push(`${path}: English left in "${strip(b).replace(/\s+/g, ' ').trim().slice(0, 90)}"`);
+    const leftover = (w) => !vocab[lang]?.has(w.toLowerCase()) && (EN.has(w.toLowerCase()) || (!SAME.has(w.toLowerCase()) && w !== w.toUpperCase() && !NAMES.test(w)));
+    if (a === b && english.some(leftover)) out.push(`${path}: unchanged English "${a.slice(0, 70)}"`);
+    else if (englishRun(b, lang)) out.push(`${path}: English left in "${strip(b).replace(/\s+/g, ' ').trim().slice(0, 90)}"`);
     return;
   }
   if (Array.isArray(a)) {
