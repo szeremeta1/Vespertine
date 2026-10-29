@@ -225,7 +225,8 @@ html:not(.js) .features::before {
 .hero__title {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(46px, 8vw, 128px);
+  /* --fit (and --fit-s on phones) shrink a headline whose lines run longer than the English ones (Home.astro). */
+  font-size: calc(clamp(46px, 8vw, 128px) * var(--fit, 1));
   line-height: .94;
   letter-spacing: -.035em;
   font-variation-settings: "opsz" 72;
@@ -313,7 +314,7 @@ html:not(.js) .features::before {
   /* Separators would start a wrapped line; the three facts read as tags instead. */
   .hero__eyebrow { font-size: 11px; letter-spacing: .12em; margin-bottom: 20px; gap: 6px 16px; }
   .hero__eyebrow span + span::before { display: none; }
-  .hero__title { font-size: clamp(42px, 13.2vw, 64px); }
+  .hero__title { font-size: calc(clamp(42px, 13.2vw, 64px) * var(--fit-s, 1)); }
   .hero__cta .btn { flex: 1 1 auto; }
   .patchbay { gap: 14px; }
   .jack { font-size: 13px; }
@@ -675,33 +676,36 @@ html:not(.js) .features::before {
    The web fonts cover Latin (and the language wall's names are set per script by lang). Text in other scripts
    falls back to each system's own faces; these stacks pick the good ones on macOS, iOS, Windows and Android, keeping
    Newsreader, Inter and JetBrains Mono for the Latin words inside. No extra downloads. */
-:lang(ja) { --serif: "Newsreader", "Newsreader fallback", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --sans: "Inter", "Inter fallback", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif; }
-:lang(zh-Hans) { --serif: "Newsreader", "Newsreader fallback", "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif; --sans: "Inter", "Inter fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
-:lang(zh-Hant) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif TC", "PMingLiU", serif; --sans: "Inter", "Inter fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
-:lang(zh-HK) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif HK", "Noto Serif TC", "MingLiU_HKSCS", serif; --sans: "Inter", "Inter fallback", "PingFang HK", "Microsoft JhengHei", "Noto Sans HK", "Noto Sans TC", sans-serif; }
-:lang(ko) { --serif: "Newsreader", "Newsreader fallback", "AppleMyungjo", "Nanum Myeongjo", "Noto Serif KR", "Batang", serif; --sans: "Inter", "Inter fallback", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
-:lang(ar), :lang(ur), :lang(fa) { --serif: "Newsreader", "Newsreader fallback", "Geeza Pro", "Noto Naskh Arabic", "Times New Roman", serif; --sans: "Inter", "Inter fallback", "SF Arabic", "Geeza Pro", "Segoe UI", "Noto Sans Arabic", sans-serif; }
-:lang(ur) { --serif: "Newsreader", "Newsreader fallback", "Noto Nastaliq Urdu", "Geeza Pro", "Noto Naskh Arabic", serif; }
-:lang(he) { --serif: "Newsreader", "Newsreader fallback", "Times New Roman", "Noto Serif Hebrew", "David", serif; --sans: "Inter", "Inter fallback", "SF Hebrew", "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", sans-serif; }
-:lang(hi), :lang(mr) { --serif: "Newsreader", "Newsreader fallback", "ITF Devanagari", "Kohinoor Devanagari", "Noto Serif Devanagari", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", sans-serif; }
-:lang(bn) { --serif: "Newsreader", "Newsreader fallback", "Bangla MN", "Noto Serif Bengali", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", "Noto Sans Bengali", sans-serif; }
-:lang(th) { --serif: "Newsreader", "Newsreader fallback", "Thonburi", "Noto Serif Thai", "Leelawadee UI", serif; --sans: "Inter", "Inter fallback", "Thonburi", "Sukhumvit Set", "Leelawadee UI", "Noto Sans Thai", sans-serif; }
-:lang(am) { --serif: "Newsreader", "Newsreader fallback", "Kefa", "Noto Serif Ethiopic", "Nyala", serif; --sans: "Inter", "Inter fallback", "Kefa", "Noto Sans Ethiopic", "Ebrima", sans-serif; }
+/* An element in another language (a name in the language menu) starts from the default faces, not the page
+   language's: Greek or Cyrillic set in a Japanese face come out full-width. The language wall keeps exactly the
+   faces it has on the English page, in every language. */
+[lang], .namewall { --serif: "Newsreader", "Newsreader fallback", "Iowan Old Style", Georgia, serif; --sans: "Inter", "Inter fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+:lang(ja):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --sans: "Inter", "Inter fallback", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif; }
+:lang(zh-Hans):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif; --sans: "Inter", "Inter fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+:lang(zh-Hant):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif TC", "PMingLiU", serif; --sans: "Inter", "Inter fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
+:lang(zh-HK):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif HK", "Noto Serif TC", "MingLiU_HKSCS", serif; --sans: "Inter", "Inter fallback", "PingFang HK", "Microsoft JhengHei", "Noto Sans HK", "Noto Sans TC", sans-serif; }
+:lang(ko):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "AppleMyungjo", "Nanum Myeongjo", "Noto Serif KR", "Batang", serif; --sans: "Inter", "Inter fallback", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+:lang(ar):not(.namewall, .namewall *), :lang(ur):not(.namewall, .namewall *), :lang(fa):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Geeza Pro", "Noto Naskh Arabic", "Times New Roman", serif; --sans: "Inter", "Inter fallback", "SF Arabic", "Geeza Pro", "Segoe UI", "Noto Sans Arabic", sans-serif; }
+:lang(ur):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Noto Nastaliq Urdu", "Geeza Pro", "Noto Naskh Arabic", serif; }
+:lang(he):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Times New Roman", "Noto Serif Hebrew", "David", serif; --sans: "Inter", "Inter fallback", "SF Hebrew", "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", sans-serif; }
+:lang(hi):not(.namewall, .namewall *), :lang(mr):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "ITF Devanagari", "Kohinoor Devanagari", "Noto Serif Devanagari", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", sans-serif; }
+:lang(bn):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Bangla MN", "Noto Serif Bengali", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", "Noto Sans Bengali", sans-serif; }
+:lang(th):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Thonburi", "Noto Serif Thai", "Leelawadee UI", serif; --sans: "Inter", "Inter fallback", "Thonburi", "Sukhumvit Set", "Leelawadee UI", "Noto Sans Thai", sans-serif; }
+:lang(am):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Kefa", "Noto Serif Ethiopic", "Nyala", serif; --sans: "Inter", "Inter fallback", "Kefa", "Noto Sans Ethiopic", "Ebrima", sans-serif; }
 
 /* Headings: no negative tracking or synthetic italics outside Latin, Greek and Cyrillic, room for tall marks
    (Thai, Indic and Arabic vowels and stacks), and long compound words may hyphenate instead of overflowing. */
 html:not([lang="en"]) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title, .release__v) { hyphens: auto; overflow-wrap: break-word; }
 :is(:lang(ja), :lang(zh), :lang(ko), :lang(th), :lang(ar), :lang(fa), :lang(ur), :lang(he), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(am)) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title, .marquee__track, .scene__num, .release__v, .press-block h2) { letter-spacing: 0; }
 :is(:lang(ja), :lang(zh), :lang(ko), :lang(th), :lang(ar), :lang(fa), :lang(ur), :lang(he), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(am)) .brass-italic { font-style: normal; }
-:is(:lang(ar), :lang(fa), :lang(ur), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(th), :lang(am)) :is(.eyebrow, .kicker, .badge, .jack, .panel__cap, .float-card figcaption, .facts dt, .footer__cols h2, .notes h4, .lang__title, .compare-hint, .copy) { letter-spacing: 0; }
+/* Tracking pulls Arabic letters apart and spreads Indic, Thai and Ethiopic clusters: none, anywhere, in those. */
+html:is(:lang(ar), :lang(fa), :lang(ur), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(th), :lang(am)) *:not(.nw__name) { letter-spacing: normal; }
 :is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) .hero__title { line-height: 1.22; }
 :is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) :is(.section-title, .scene__title, .closing__title, .page-title) { line-height: 1.3; }
 :is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) .rw { padding-block: .12em .2em; margin-block: -.12em -.2em; }
 :is(:lang(ja), :lang(zh), :lang(ko)) :is(.hero__title, .closing__title, .page-title) { line-height: 1.12; }
 :is(:lang(ja), :lang(zh), :lang(ko)) :is(.section-title, .scene__title) { line-height: 1.18; }
 :lang(ur) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title) { line-height: 1.6; }
-/* Long words (Finnish, Tamil, Malayalam …) at phone width. */
-@media (max-width: 520px) { html:not([lang="en"]) .hero__title { font-size: clamp(36px, 10.5vw, 56px); } }
 
 /* ---------- Right to left (ar, fa, he, ur): the layout mirrors ---------- */
 [dir="rtl"] .skip { left: auto; right: 12px; }

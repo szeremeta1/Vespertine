@@ -38,6 +38,14 @@ const jsonLd = homeGraph({ lang, title, screenshots, trailer: SITE + trailer, po
 // English text inside a translated page says so, for screen readers and hyphenation.
 const en = (english: boolean) => (english ? { lang: 'en', dir: 'ltr' } : {});
 
+// The hero headline's three lines are set as large as English's: lines that run longer (wide CJK glyphs, long German
+// or Tamil words) scale the headline down so each line still fits, estimated from each script's typical glyph width.
+const ems = (line: string) => [...line].reduce((w, c) =>
+  w + (/\p{M}/u.test(c) ? 0 : /[\u1100-\u11FF\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFF00-\uFFEF]/u.test(c) ? 1 : /[\u0B80-\u0D7F\u1200-\u139F]/u.test(c) ? 0.68 : /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFEFF]/u.test(c) ? 0.36 : /[A-Z]/.test(c) ? 0.62 : /\s/.test(c) ? 0.24 : /[.,·:;!?'’]/.test(c) ? 0.24 : 0.47), 0);
+const longest = Math.max(...[...h.hero.titleLines, h.hero.titleBrass].map(ems));
+const fit = (room: number) => Math.min(1, room / longest).toFixed(3);
+const heroFit = lang === DEFAULT_LOCALE ? undefined : `--fit:${fit(6)};--fit-s:${fit(6.4)}`;
+
 const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width: 900px) calc(100vw - 72px), min(700px, 54vw)' };
 ---
 <Base
@@ -83,9 +91,9 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
     <div class="wrap hero__grid">
       <div class="hero__copy">
         <p class="eyebrow hero__eyebrow">
-          {h.hero.eyebrow.map((e) => <span>{f(e)}</span>)}
+          {h.hero.eyebrow.map((e) => <span>{lang === DEFAULT_LOCALE ? f(e) : <bdi>{f(e)}</bdi>}</span>)}
         </p>
-        <h1 class="hero__title" id="hero-title">
+        <h1 class="hero__title" id="hero-title" style={heroFit}>
           <span class="sr-only">{h.hero.titleSr}</span>
           <span aria-hidden="true">
             {h.hero.titleLines.map((l, i) => <span class="line"><span style={`--i:${i}`}>{l}</span></span>)}

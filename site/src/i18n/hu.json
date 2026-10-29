@@ -1,0 +1,741 @@
+{
+  "common": {
+    "skip": "Ugrás a tartalomra",
+    "tagline": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez.",
+    "requires": "macOS {minMacOS} vagy újabb.",
+    "arch": "Apple silicon és Intel",
+    "download": "Letöltés Macre",
+    "downloadVersion": "A {version} letöltése",
+    "sourceOnGitHub": "Forráskód a GitHubon",
+    "reportIssue": "Hiba bejelentése",
+    "brewLead": "Vagy Homebrew-val:",
+    "copy": "Másolás",
+    "copyLabel": "A Homebrew-parancs másolása",
+    "copied": "Másolva",
+    "copyFailed": "Jelölje ki",
+    "trademarks": "A Dolby, a Dolby Atmos, a Dolby Digital, a Dolby Digital Plus és a Dolby TrueHD a Dolby Laboratories védjegyei. A DTS, a DTS-HD Master Audio és a DTS:X a DTS, Inc. védjegyei. Az Apple, az AirPods, az AirPods Max, a Mac, a macOS és a Térhatású hang az Apple Inc. védjegyei. A Vespertine kizárólag annak leírására említi őket, hogy mit és milyen eszközön játszik le; a Dolby, a DTS és az Apple nem tanúsította, nem licencelte és nem támogatja.",
+    "trailerLabel": "Vespertine-bemutató, 44 másodperc",
+    "untested": "A csatornánkénti kimenet és a vevőnek küldött bitstream kísérleti funkció, valódi vevőkön és többcsatornás USB DAC-okon nem teszteltük (egy Sony tévén HDMI-n teszteltük: lásd docs/DEVICES.md); várjuk a tapasztalatokat."
+  },
+  "nav": {
+    "label": "Fő navigáció",
+    "home": "Vespertine, főoldal",
+    "top": "Vespertine, vissza az oldal tetejére",
+    "features": "Funkciók",
+    "formats": "Formátumok",
+    "compare": "Összehasonlítás",
+    "whatsNew": "Újdonságok",
+    "faq": "GYIK",
+    "press": "Sajtóanyagok",
+    "download": "Letöltés",
+    "downloadLabel": "Letöltés: Vespertine {version} Macre"
+  },
+  "lang": {
+    "label": "Nyelv",
+    "menuLabel": "Válasszon nyelvet",
+    "current": "Jelenlegi nyelv"
+  },
+  "footer": {
+    "project": "Projekt",
+    "about": "Névjegy",
+    "releaseNotes": "Kiadási megjegyzések",
+    "sponsor": "Támogatás",
+    "discussions": "Beszélgetések",
+    "architecture": "Felépítés",
+    "privacy": "Adatvédelem",
+    "terms": "Felhasználási feltételek",
+    "license": "Licenc (GPL-3.0)",
+    "notices": "Harmadik felekre vonatkozó közlemények",
+    "ukraine": "<strong>A Vespertine kiáll Ukrajna mellett.</strong> Kérjük, adományozzon ezeken a szervezeteken keresztül: {orgs}.",
+    "copyright": "© {year} A Vespertine közreműködői",
+    "free": "Szabad szoftver GPL-licenccel",
+    "madeIn": "Bostonban készítette: {author}",
+    "backToTop": "Vissza az oldal tetejére",
+    "home": "Főoldal"
+  },
+  "home": {
+    "title": "Vespertine: surround és hi-res zenelejátszó Macre",
+    "description": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res gyűjteményekhez: SACD- és DVD-Video-lemezképek, DSD, DTS CD-k, DTS-HD MA-, TrueHD- és Dolby Atmos-fájlok, Térhatású hang AirPodson és ellenőrizhető bit-perfect jelút.",
+    "ogAlt": "Vespertine: ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenéhez. A jelút egy 24 bit / 96 kHz-es FLAC bit-perfect lejátszását mutatja egy Fosi Audio ZD3 eszközön. {version} verzió, macOS {minMacOS} vagy újabb.",
+    "hero": {
+      "eyebrow": [
+        "Ingyenes és nyílt forráskódú",
+        "macOS {minMacOS}+",
+        "Apple silicon és Intel"
+      ],
+      "titleSr": "Surround és hi-res zene a Macjén.",
+      "titleLines": [
+        "Surround és",
+        "hi-res zene"
+      ],
+      "titleBrass": "a Macjén.",
+      "lede": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez. A SACD- és DVD-Video-lemezképek, a DSD, a DTS CD-k, valamint a DTS-HD MA-, TrueHD- és Atmos-fájlok egy könyvtárban kapnak helyet a sztereó albumokkal, AirPodson pedig fejkövetéses Térhatású hang szólal meg. A jelút a fájltól a kimenetig minden lépést megmutat. Angolul és további {languages} nyelven.",
+      "ask": "Tetszik?",
+      "star": "Adjon csillagot a GitHubon",
+      "discuss": "Csatlakozzon a beszélgetéshez",
+      "version": "{version} verzió",
+      "signed": "aláírva és az Apple által hitelesítve",
+      "releaseNotes": "Kiadási megjegyzések",
+      "privacy": "Adatvédelem: nincs adatgyűjtés.",
+      "panelAlt": "A Vespertine Most játszott infópanelje: Liszt Les jeux d’eaux à la Villa d’Este című műve Lazar Berman előadásában, HI-RES VESZTESÉGMENTES és BIT-PERFECT jelöléssel, kizárólagos hozzáféréssel, 32 / 96 formátumban. A jelút a 24 bit / 96 kHz-es FLAC-tól a libFLAC-on át, az eredeti mintavételi frekvencián és egységnyi erősítéssel vezet a Fosi Audio ZD3 eszközig.",
+      "panelCaption": "Jelút",
+      "followSignal": "Kövesse a jelet"
+    },
+    "trailer": {
+      "eyebrow": "Bemutató",
+      "title": "Nézze meg 44 másodpercben.",
+      "text": "Kapcsolja be a hangot. A videó végig a valódi alkalmazást mutatja, a fejlesztő saját zenekönyvtárával rögzítve.",
+      "fallback": "A bemutató megtekintése (MP4)",
+      "caption": "44 s · 1080p · az albumborítók joga a tulajdonosaiké"
+    },
+    "features": {
+      "eyebrow": "Miért a Vespertine?",
+      "title": "Surround gyűjteményéhez készült.",
+      "text": "Surround és sztereó zene egy könyvtárban, olyan lejátszóval, amely pontosan megmutatja, mit tett a jellel.",
+      "badgesLabel": "Az alkalmazásban megjelenő jelútállapotok"
+    },
+    "pillars": [
+      {
+        "title": "Surround egy könyvtárban",
+        "text": "A SACD-lemezképek és a SACD-ről kinyert zenék, a DVD-Video-lemezek, a DTS CD-k, a DTS-HD MA és a TrueHD a sztereó albumok mellett kapnak helyet, és AirPodson fejkövetéses Térhatású hang formájában szólalnak meg. Ha egy albumból mindkét változat megvan, minden dal csak egyszer szerepel, és a kimenethez illő változat szól."
+      },
+      {
+        "title": "Ellenőrizhető jelút",
+        "text": "Mintavételi frekvenciák, szóhosszak, erősítés és csatornafeldolgozás, a Core Audio rendszerből visszaolvasva. A bit-perfect működés feltételei megtalálhatók a forráskódban, automatizált tesztekkel, loopback-teszttel és hardveres ellenőrzési útmutatóval együtt."
+      },
+      {
+        "title": "Ellenőrzi a hi-res fájlokat",
+        "text": "Az elemzés jelzi a kitöltött bitmélységet, valamint a lehetséges felmintavételezést vagy veszteséges eredetet. A spektrum alapján levont következtetések becslések; a bizonyítékaikkal és korlátaikkal együtt jelennek meg. Ugyanez az elemzés Linux-szerveren is futtatható, közvetlenül a fájlok mellett."
+      },
+      {
+        "title": "Átvizsgálható, nyílt forráskód",
+        "text": "Ingyenes, GPL-licenccel. Olvassa el, fordítsa le és módosítsa a lejátszót, a kimeneti feltételeivel és tesztjeivel együtt. Nincs fiók, előfizetés, reklám vagy telemetria."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Kizárólagos",
+      "spatial": "Térhatású · fejkövetés",
+      "synthetic": "Szintetikus magas frekvenciák?"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Jelút",
+        "kicker": "Bit-perfect",
+        "title": "Minden szám az eredeti frekvencián és bitmélységgel.",
+        "lede": "A jelút a fájltól a DAC-ig minden lépést felsorol a Core Audio rendszerből visszaolvasott adatok alapján, és jelzi, ha valami megváltoztatta a mintákat.",
+        "body": [
+          "A Vespertine minden fájl mintavételi frekvenciájára átállítja az eszközt, és csak akkor végez újramintavételezést az Apple maszterelési minőségű konverterével, ha a DAC nem tud ezen a frekvencián működni. A <span class=\"mono nowrap\">BIT-PERFECT</span> jelölés csak akkor jelenik meg, ha teljesülnek a forráskódban rögzített feltételek: eredeti mintavételi frekvencia, változatlan minták, a forrás szóhosszát befogadó kimeneti szóhossz, valamint kizárólagosan használt vagy más alkalmazással meg nem osztott eszköz. A PCM-lejátszást 384 kHz-ig teszteltük egy FiiO K11 eszközön."
+        ],
+        "list": [
+          "A kizárólagos (hog) mód megakadályozza, hogy más alkalmazások használják az eszközt. Megosztott módban a hangerőgombok és a Digital Crown a DAC hangerejét állítják; kizárólagos módban is képesek erre, ha bekapcsolja ezt a lehetőséget.",
+          "Az Egész számos mód feldolgozatlan, 32 bites PCM-jelet küld közvetlenül az egész számos adatot fogadó DAC-oknak.",
+          "Az Igazítás a 16 bites forrásokhoz beállítás (alapértelmezés szerint kikapcsolva) a 16 bites fájlokat 16 biten, nullákkal való kitöltés nélkül küldi a valódi 16 bites móddal rendelkező DAC-oknak.",
+          "Szünetmentes lejátszás, az egyetlen fájlból CUE-leíróval számokra bontott albumoknál is.",
+          "Megjegyzi a DAC-ot. Ha nincs csatlakoztatva, a zene a legjobb csatlakoztatott kimeneten szól, majd visszakerül a DAC-ra, amikor az újra elérhető.",
+          "A saját hangerőszabályzó nélküli kimenetek (HDMI, optikai, vonalkimenet) használhatják a Vespertine hangerőszabályzását; ez kimenetenként választható. 100% alatt a jelölések jelzik, hogy a lejátszás már nem bit-perfect.",
+          "A Vespertine kilépéskor visszaállítja a DAC korábbi mintavételi frekvenciáját és bitmélységét.",
+          "A beépített loopback-teszt összehasonlít minden mintát, amelyet a Vespertine egy virtuális eszközre küld. Ez szoftveres ellenőrzés, és így is van megjelölve; a <span class=\"mono nowrap\">BIT-PERFECT</span> jelvényt soha nem változtatja meg."
+        ],
+        "links": [
+          "A feltételek a kódban",
+          "Ellenőrizze saját maga",
+          "Mit bizonyít a loopback-teszt?"
+        ],
+        "alt": "A Vespertine Liszt Années de pèlerinage című művét játssza Lazar Berman előadásában, 24 bit / 96 kHz-es FLAC-ból: az infópanel bit-perfect lejátszást és kizárólagos hozzáférést jelez egy Fosi Audio ZD3 eszközön, a jelút minden lépésével.",
+        "floatAlt": "A loopback-teszt panelje: 24 bit 44,1 és 96 kHz-en, kitöltött 16 bites jel és egy szünetmentesen lejátszott számpár; mindegyik bitre pontos.",
+        "floatCaption": "Loopback-teszt · szoftveres ellenőrzés"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround és Térhatású hang",
+        "title": "Az 5.1-es lemezei ugyanabban a könyvtárban.",
+        "lede": "A többcsatornás zene AirPodson fejkövetéses Térhatású hang formájában szólal meg, sztereó DAC-on pedig a csatornakiosztásnak megfelelő sztereó lekeveréssel.",
+        "body": [
+          "A DTS CD-ket 5.1-re dekódolja. A SACD-lemezképek, a SACD-ről kinyert számok, a többcsatornás FLAC, a TrueHD és a DTS-HD MA AirPodson fejkövetéses Térhatású hang formájában szólalnak meg, sztereó DAC-on pedig sztereóra keverve. Az Atmos-tartalmú Dolby Digital Plus a macOS objektumalapú renderelőjét használja; a TrueHD Atmos és a DTS:X esetében a csatornaalapú hangréteg szólal meg. A csatornánkénti kimenet kísérleti funkció, valódi vevőkön és többcsatornás USB DAC-okon nem teszteltük (egy Sony tévén HDMI-n teszteltük: lásd docs/DEVICES.md); várjuk a tapasztalatokat."
+        ],
+        "list": [
+          "Egy album sztereó és surround változatai egyszer szerepelnek a listában; a Vespertine a kimenethez illőt játssza le, vagy azt, amelyiket Ön rögzíti.",
+          "A Dolby Digital, DD+ és DTS-CD bitstream továbbítása a vevőnek kísérleti funkció, valódi vevőkön és többcsatornás USB DAC-okon nem teszteltük (egy Sony tévén HDMI-n teszteltük: lásd docs/DEVICES.md); várjuk a tapasztalatokat. A vivőjel tesztjei az FFmpeg S/PDIF-olvasóját használják. A TrueHD és DTS-HD MA passthrough macOS-en nem támogatott.",
+          "Az Exportálás térhatású hanghoz funkció fejhallgatóhoz binaurális sztereó, Apple-eszközökhöz többcsatornás ALAC formátumban exportál, címkékkel és borítóval együtt."
+        ],
+        "alt": "Elton John Goodbye Yellow Brick Road című, 24 bit / 88,2 kHz-es, 5.1-es albuma fejkövetéses Térhatású hang formájában szól egy AirPods Maxon, a jelúttal és csatornánként egy szintmérővel.",
+        "floatAlt": "Egy album, amelynek minden dalából van sztereó és 5.1-es változat, de minden dal csak egyszer szerepel.",
+        "floatCaption": "Sztereó és 5.1, egyetlen bejegyzésben"
+      },
+      "discs": {
+        "jack": "Lemezképek és DSD",
+        "kicker": "SACD, DVD-Video és DSD",
+        "title": "Játssza le magát a lemezképet.",
+        "lede": "Adjon meg a Vespertine-nak egy SACD- vagy DVD-Video-lemezképet, és közvetlenül abból játssza le a zenét, csatolás, kinyerés vagy írás nélkül.",
+        "body": [
+          "A SACD <span class=\"mono\">.iso</span> lemezképek sztereó és 5.1-es területei DST-tömörítéssel vagy anélkül is lejátszhatók, a címeket a lemez saját szöveges adatai adják. A DST dekódolása pontosan visszaállítja a DSD-t, így a sztereó jel natív DSD formájában, DoP-on jut a DAC-ra, ha az támogatja, az 5.1 pedig AirPodson fejkövetéses Térhatású hang formájában szólal meg. A DVD-Video-lemezek LPCM-zenéje (<span class=\"mono\">.iso</span> fájlból vagy <span class=\"mono\">VIDEO_TS</span> mappából) bitre pontosan szólal meg; minden title egy albumként, minden fejezet egy számként jelenik meg."
+        ],
+        "list": [
+          "Két valódi lemezen bitre pontosan egyezett a sacd_extract kimenetével. Az 5.0-s területtel, kizárólag többcsatornás területtel, illetve DSD128 vagy magasabb formátummal rendelkező lemezeket eddig csak mesterségesen előállított tesztlemezképekkel ellenőriztük.",
+          "A DSF és DSDIFF DSD64-től DSD512-ig, a DST-tömörítésű DSDIFF-et is beleértve, DoP-ként jut a vivőjel mintavételi frekvenciáját fogadó DAC-okra, vagy magas mintavételi frekvenciájú PCM-mé alakul. A DoP működését egy FiiO K11 eszközön igazoltuk; a 384 kHz feletti vivőfrekvenciákat hardveren nem teszteltük.",
+          "DVD-Video LPCM 16, 20 és 24 biten, 48 és 96 kHz-en, legfeljebb 8 csatornával. A DVD-Audio nem támogatott, a titkosított (CSS) lemezekhez pedig visszafejtett másolat szükséges."
+        ],
+        "links": [
+          "A DVD-Video részletei"
+        ],
+        "alt": "A Dire Straits Brothers In Arms című albuma közvetlenül a SACD-lemezképéről szól: sztereó DSD64 DoP-on egy FiiO K11 eszközre, NATÍV DSD · DoP jelvénnyel, a Dekóder mezőben SACD-lemezkép, DST (veszteségmentes) felirattal.",
+        "floatAlt": "Claudja Barry Love for the Sake of Love című száma DSD128 formátumban, DoP-on egy Fosi Audio ZD3 eszközre, 352,8 kHz-en.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Elemzés",
+        "kicker": "Hamis hi-res felismerése és spektrum",
+        "title": "Melyik „hi-res” fájl nem az?",
+        "lede": "Minden fájl elemezhető a valódi bitmélység, a valódi sávszélesség, valamint a veszteséges kódolók és újramintavételezők nyomainak kimutatására.",
+        "body": [
+          "Az eredmények mellett megjelennek a bizonyítékok és a lehetséges egyéb magyarázatok is; a fájlokat a <em>Gyanús hi-res</em> lejátszási lista gyűjti össze. Csak a nullákkal való kitöltés kimutatása egzakt: a spektrum alapján levont következtetések kérdésként jelennek meg, mert egyes nagy bitrátájú veszteséges fájlok valódinak tűnhetnek, a meredek maszterelési szűrők, az FM-források, valamint a szalagról vagy hanglemezről készült átjátszások pedig gyanúsnak látszhatnak. Zenehallgatás közben szintmérők és élő spektrum mutatja a kimenő jelet, a DoP-ot is beleértve."
+        ],
+        "list": [
+          "24 bites tárolóformátumba kitöltött 16 bites hang",
+          "Valószínűleg felmintavételezett, CD-minőségű maszterek, amelyeket 96 vagy 192 kHz-esként árulnak",
+          "Valószínűleg veszteséges eredet: FLAC-ba átkódolt MP3 vagy AAC",
+          "Valószínűleg SBR-rel vagy „AI-javítással” létrehozott szintetikus magas frekvenciák",
+          "A <span class=\"mono\">vespertine-analyze</span> ugyanezt az elemzést futtatja Linux-szerveren, közvetlenül a fájlok mellett; az alkalmazás importálja az eredményeket."
+        ],
+        "note": "A képernyőképen látható fájl szándékos hamisítvány: a bemutató saját zenéje, MP3-ba kódolva és 24/192-re felmintavételezve, kitalált zenekarnév alatt.",
+        "links": [
+          "Hogyan működik az elemzés, és hol tévedhet?"
+        ],
+        "alt": "Az Elemzés lap valószínűleg veszteséges eredetűként jelöl egy 24/192-es „remasztert”: a hosszú távú spektruma 16 kHz-nél véget ér."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max USB-C-n",
+        "title": "Veszteségmentesen AirPods Maxon. Láthatóan.",
+        "lede": "USB-C-kábellel csatlakoztatva az AirPods Maxot 24 bit / 48 kHz-es veszteségmentes eszközként ismeri fel.",
+        "body": [
+          "A 48 kHz-es zene bit-perfect módon szólal meg, minden mást az Apple maszterelési minőségű újramintavételezője alakít át, jól láthatóan. Bluetoothon a Vespertine jelzi, hogy a kapcsolat AAC-t használ. Ez az Apple kábeles jelútról adott leírásán és a Core Audio rendszerből visszaolvasott adatokon alapul, mivel az AirPodsnak nincs loopback-ellenőrzéshez használható digitális kimenete."
+        ],
+        "alt": "24 bit / 48 kHz-es számokból álló, Oasisra szűkített intelligens lejátszási lista, bit-perfect lejátszással AirPods Maxon, USB-C-n keresztül."
+      },
+      "library": {
+        "jack": "Könyvtár",
+        "kicker": "Könyvtár",
+        "title": "Böngésszen, mint az Apple Musicban. Rendszerezzen könyvtárosként.",
+        "lede": "Albumok, előadók, dalok és műfajok, mindegyiknél kombinálható szűrőkkel és Keverés funkcióval.",
+        "list": [
+          "Szűrők formátumra, 24 bitre, 88,2 kHz-re és afölé, többcsatornás hangra, műfajra, évre, mintavételi frekvenciára, csatornákra és az elemzés eredményére. A keresés nem tesz különbséget kis- és nagybetűk, illetve ékezetek között.",
+          "Intelligens lejátszási listák az Ön által használt mértékegységekkel: 24 bit, 88,2 kHz.",
+          "Egy album remaszterei, monó és sztereó kiadásai, valamint SACD-változatai közös kártyán jelennek meg; megnyitáskor választhatja ki a kiadást.",
+          "Kedvencek és lejátszásszámok, a könyvtárban tárolva, soha nem a fájlokba írva. M3U- és Apple Music-lejátszási listákat, lejátszásszámokat és kedvenceket importál.",
+          "Címkeszerkesztő biztonsági mentésekkel és egylépéses visszaállítással, valamint MusicBrainz-adatkiegészítés, amely minden írás előtt jelzi a találat megbízhatóságát.",
+          "SMB-, NFS- vagy WebDAV-hálózati megosztások, gyorsítótárazással, Megtartás offline funkcióval és lassú szerverekhez tervezett lejátszással.",
+          "A Zenék keresése minden meghajtón megkeresi a valódi zenéit, a felesleges fájlokat pedig kihagyja. Az első indítás rövid beállítása során kiválaszthatja a kimenetet, és megtudhatja, mire való a kizárólagos hozzáférés és a ReplayGain.",
+          "Kimenetenkénti parametrikus hangszínszabályzó, amely AutoEQ- és Equalizer APO-beállításokat importál. Alapértelmezés szerint ki van kapcsolva; bekapcsolva a jelút <span class=\"mono nowrap\">EQUALIZER</span> feliratot mutat a <span class=\"mono nowrap\">BIT-PERFECT</span> helyett.",
+          "Minilejátszó, menüsoros kiegészítő, médiabillentyűk, ReplayGain és automatikus, aláírt frissítések."
+        ],
+        "links": [
+          "Minden funkció részletesen"
+        ],
+        "alt": "A Műfajok oldal: műfajonként egy csempe, az albumborítókból összeállított mozaikkal."
+      },
+      "languages": {
+        "jack": "Nyelvek",
+        "kicker": "{languages} nyelv",
+        "title": "Az Ön nyelvén is.",
+        "lede": "Minden menü, beállítás és jelútüzenet elérhető az angol mellett további {languages} nyelven.",
+        "body": [
+          "Az ukrántól, némettől és japántól a szuahéliig, tamilig és hausza nyelvig, az adott nyelv többes számú alakjaival és számformátumaival; az egyszerűsített, hagyományos és hongkongi kínai pedig külön szókinccsel. Az arab, héber, perzsa és urdu jobbról balra haladó elrendezést kap.",
+          "Így ellenőrizzük a fordításokat: minden módosításnál automatikus ellenőrzés igazolja, hogy az alkalmazás minden szövege mind a {languages} nyelven létezik, azonos helyőrzőkkel és az adott nyelvhez szükséges többes számú alakokkal. Emellett minden képernyőt minden nyelven átnéztünk, ellenőrizve a levágott vagy egymást fedő szövegeket és a jobbról balra haladó elrendezés tükrözését. A fordítások gondosan elkészített gépi fordításként indultak, ezért örömmel fogadjuk az anyanyelvi beszélők javításait a <a href=\"{href.newIssue}\">GitHubon</a>."
+        ],
+        "alt": "A Vespertine neve a kezelőfelület mind a {languagesTotal} nyelvén, a ヴェスパタイン és Веспертайн alakoktól a فسبرتاين és वेस्परटाइन alakokig, különböző méretekben és betűtípusokkal.",
+        "wallLabel": "Vespertine minden elérhető nyelven"
+      }
+    },
+    "formats": {
+      "eyebrow": "Formátumok",
+      "title": "Surround, veszteségmentes és veszteséges fájlok.",
+      "text": "Sztereó és többcsatornás, PCM és DSD, lemezképek és egyszerű fájlok, mindenhol CUE-lapokkal.",
+      "caption": "Milyen formátumokat játszik le a Vespertine, és hogyan",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Natív mintavételi frekvencia és bitmélység, legfeljebb 32 bitig, illetve a DAC által használt frekvenciáig (384 kHz-ig tesztelve); a változatlan 32 bites PCM-hez egész számos mód kell. CUE-lapos lemezképek."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF és DSDIFF, DST-tömörítéssel vagy tömörítetlenül. A DoP a DAC-tól és a vivőfrekvenciától függ, egyébként PCM. A 384 kHz feletti DoP-vivőfrekvenciák hardveren nincsenek tesztelve."
+        },
+        {
+          "name": "SACD-lemezképek",
+          "text": "Sztereó és többcsatornás területek, DST-tömörítéssel vagy tömörítetlenül, közvetlenül a lemezképből; minden dal egyszer szerepel, sztereó és 5.1-es változatával."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16, 20 és 24 bit, 48 és 96 kHz, 1–8 csatorna, bitről bitre; címenként egy album, fejezetenként egy sáv. A DVD-Audio nem támogatott."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus Atmosszal, a macOS objektumrenderelőjével renderelve, vagy annak dekódolt csatornaalapú rétege."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Veszteségmentes, lehet bit-perfect; a TrueHD Atmosnak a csatornaalapú rétege szól, objektumait nem rendereli."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "Az MA veszteségmentes, és lehet bit-perfect; a DTS:X-nek a csatornaalapú rétege szól. A nyers DTS dekódolódik; a DTS-CD-bitstream külön útvonalon halad."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "A macOS dekódolja. Az AV-erősítőre küldött bitstream kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); visszajelzéseket várunk."
+        },
+        {
+          "name": "DTS CD-k és DTS-WAV",
+          "text": "Felismeri és 5.1-re dekódolja őket, a CUE-val felosztott albumokat is."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Veszteségmentes. A WavPackben tárolt DSD nem támogatott."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Dekódolva, veszteségesként megjelölve."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Összehasonlítás",
+      "title": "Hol áll a mezőnyben?",
+      "intro": "Több Mac-lejátszó is kínál bit-perfect lejátszást. Ez az összehasonlítás azt veti össze, amit az egyes lejátszók saját dokumentációja vagy forráskódja állít. A „Nincs dokumentálva” azt jelenti, hogy a gyártó egyik irányban sem nyilatkozik, nem azt, hogy a funkció hiányzik. A Vespertine-ben nincs konvolúció, hangeffekt-bővítmény és streamingszolgáltatás.",
+      "hint": "Görgessen a továbbiakért →",
+      "region": "Összehasonlító táblázat (oldalra görgethető)",
+      "caption": "A Vespertine hét másik Mac-zenelejátszóval összevetve, az egyes lejátszók saját dokumentációja vagy forráskódja alapján",
+      "feature": "Funkció",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Forráskód",
+          "GPL-3.0",
+          "Zárt",
+          "Zárt",
+          "Zárt",
+          "Zárt",
+          "Zárt",
+          "GPL-2.0",
+          "Zárt"
+        ],
+        [
+          "FLAC / DSD fájlok",
+          "Igen / Igen",
+          "Nem / Nem",
+          "Igen / Igen",
+          "Igen / Igen",
+          "Igen / Igen",
+          "Igen / Igen",
+          "Igen / Igen",
+          "Igen / Nem⁴"
+        ],
+        [
+          "A DAC mintavételi frekvenciájának automatikus váltása",
+          "Igen",
+          "Nem",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Nincs dokumentálva"
+        ],
+        [
+          "Kizárólagos (hog) mód",
+          "Igen",
+          "Nem",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Igen"
+        ],
+        [
+          "16/24 bites PCM a minták módosítása nélkül",
+          "Feltételek + tesztek",
+          "macOS 27: külső tesztek¹",
+          "Gyártói állítás",
+          "Gyártói állítás",
+          "Alkalmazáson belüli loopback-teszt",
+          "Gyártói állítás",
+          "Alkalmazáson belüli jelző",
+          "Nincs dokumentálva"
+        ],
+        [
+          "Helyi surround fájlok",
+          "Igen²",
+          "Nincs dokumentálva",
+          "Igen",
+          "Igen",
+          "Igen",
+          "Nincs dokumentálva",
+          "Igen",
+          "Nincs dokumentálva"
+        ],
+        [
+          "Apple Térhatású hang helyi surround fájlokhoz",
+          "Igen",
+          "Csak katalógusbeli Atmos³",
+          "Nincs dokumentálva",
+          "Nincs dokumentálva",
+          "Nincs dokumentálva",
+          "Nincs dokumentálva",
+          "Igen",
+          "Nincs dokumentálva"
+        ],
+        [
+          "Hi-res fájlelemzés",
+          "Igen",
+          "Nem",
+          "AudioScan",
+          "Dinamikatartomány, hangosság",
+          "Igen",
+          "Nincs dokumentálva",
+          "Nem (csak élő spektrum)",
+          "Nem (csak élő spektrum)"
+        ],
+        [
+          "SACD ISO",
+          "Igen",
+          "Nem",
+          "Igen",
+          "Nem (csak DSF/DFF)",
+          "Igen",
+          "Nem",
+          "Nem",
+          "Nem⁴"
+        ],
+        [
+          "Konvolúció / hangeffekt-bővítmények",
+          "Nem / Nem",
+          "Nem / Nem",
+          "Igen (Origin: fizetős opció) / Audio Units",
+          "Igen / Nem",
+          "Nem / Nem",
+          "Nincs dokumentálva / Nincs dokumentálva",
+          "Nem / Nem",
+          "Nincs dokumentálva / Audio Units"
+        ],
+        [
+          "Streamingszolgáltatások",
+          "Nem",
+          "Apple Music",
+          "Studio: igen; Origin: nem",
+          "Igen",
+          "Nem (helyi + UPnP)",
+          "Nem (internetes rádió)",
+          "Nem (internetes rádió)",
+          "Nem (internetes rádió)"
+        ]
+      ],
+      "notes": [
+        "¹ Az Apple Music macOS 27 alatt 16/24 biten bitre pontos volt <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">az ASR-en közölt külső loopback-tesztekben</a>, 100%-os hangerőn. Ez nem a Vespertine mérése; az eredeti beszámolót ehhez a frissítéshez nem lehetett függetlenül újraellenőrizni. Macen továbbra sincs automatikus frekvenciaváltás, hog mód, FLAC és DSD.",
+        "² A többcsatornás DAC-kimenet és az AV-erősítőre küldött bitstream kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); visszajelzéseket várunk.",
+        "³ Az Apple a fejkövetéses Térhatású hangot az Apple Music katalógusában lévő Dolby Atmos-számokhoz dokumentálja, a saját többcsatornás fájlok térbeli renderelését nem.",
+        "⁴ foobar2000 2.26-on tesztelve (macOS 27.0.1), komponensek nélkül: a DSF-, DFF- és SACD ISO fájlok „Unsupported file format” hibával nem nyílnak meg. A DSF és a DFF csak 352,8 kHz-es PCM-ként szól, miután az FFmpeget külön telepítjük, és hozzáadjuk őket a foobar2000 FFmpeg Decoder Wrapperéhez; a SACD ISO továbbra is hibát ad."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Források és hatókör</a>. Javításokat szívesen fogadunk: <a href=\"{href.issues}\">nyisson hibajegyet</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Újdonságok",
+      "title": "A {version} verzió újdonságai.",
+      "latest": "Legújabb kiadás",
+      "fullNotes": "Teljes kiadási megjegyzések",
+      "meta": "már telepítve van? Magától frissül, vagy {brewUpgrade}",
+      "earlier": "Korábbi kiadások",
+      "every": "Minden kiadás",
+      "inEnglish": "Ezek a kiadási megjegyzések még nincsenek lefordítva, ezért angolul jelennek meg."
+    },
+    "faq": {
+      "eyebrow": "GYIK",
+      "title": "Kérdések és válaszok.",
+      "items": [
+        {
+          "q": "Tényleg ingyenes?",
+          "a": "Igen. A Vespertine ingyenes és nyílt forráskódú, GPL-3.0 licenc alatt. Nincs fiók, előfizetés, reklám és telemetria (<a href=\"{href.privacy}\">adatvédelem</a>). Csak akkor csatlakozik az internethez, amikor frissítéseket keres, illetve ha Ön kéri: a MusicBrainz, a Cover Art Archive vagy a ListenBrainz eléréséhez, vagy borítók kereséséhez a Discord-állapotához."
+        },
+        {
+          "q": "Mire van szükségem?",
+          "a": "macOS {minMacOS} ({minMacOSName}) vagy újabb, Apple silicon vagy Intel alapú gépen. Intel hardveren nincs tesztelve; az Intel-build futott Rosetta alatt, és szívesen fogadjuk a valódi Intel Macekről érkező visszajelzéseket."
+        },
+        {
+          "q": "Hogyan telepíthetem és frissíthetem?",
+          "a": "Töltse le a DMG-t, nyissa meg, és húzza a Vespertine-t az Alkalmazások mappába. Developer ID-vel aláírt, az Apple által hitelesített (notarized), és magától frissül; minden frissítés aláírt. Homebrew-val: {brew}, majd {brewUpgrade} vagy az alkalmazás saját frissítései."
+        },
+        {
+          "q": "Streamel a Qobuzról, a TIDAL-ról vagy az Apple Musicról?",
+          "a": "Nem. A Vespertine az Ön saját zenéjét játssza le, a Macről, külső meghajtókról vagy hálózati megosztásról. A DRM-védett Apple Music-előfizetéses letöltések nem játszhatók le."
+        },
+        {
+          "q": "Honnan tudhatom, hogy tényleg bit-perfect?",
+          "a": "A jelút visszaolvassa, mit csinált ténylegesen a Core Audio: az eszköz névleges frekvenciáját, fizikai formátumát, és hogy ki foglalja le. A dekóderekhez automatizált tesztek tartoznak (a TrueHD a forrásával, a DTS az FFmpeg saját dekóderével összevetve), a beépített loopback-teszt mintáról mintára ellenőrzi a szoftveres jelutat, a <span class=\"mono nowrap\">vespertine-probe</span> segítségével pedig a saját hardverét ellenőrizheti. <a href=\"{href.verification}\">Így ellenőrizheti saját maga</a>."
+        },
+        {
+          "q": "Lejátssza a SACD- és DVD-lemezeket?",
+          "a": "A lemezképeiket játssza le. A SACD <code>.iso</code> lemezképek – sztereó és többcsatornás, DST-tömörített vagy tömörítetlen –, valamint a DVD-Video lemezképeken vagy <code>VIDEO_TS</code> mappákban lévő LPCM-zene közvetlenül a lemezképből szól, semmit sem kell kibontani. A DVD-Audio nem támogatott, a titkosított (CSS) DVD-khez pedig visszafejtett másolat kell."
+        },
+        {
+          "q": "Lejátssza a Dolby Atmost?",
+          "a": "Az Atmosszal kiegészített Dolby Digital Plus a macOS objektumrenderelőjén keresztül szól, AirPodson fejkövetéses Térhatású hangként. A TrueHD Atmosnak és a DTS:X-nek a veszteségmentes csatornaalapú rétege szól; objektumaikat nem rendereli. Az AV-erősítőre küldött bitstream kísérleti, valódi AV-erősítőkön nincs tesztelve; visszajelzéseket várunk."
+        },
+        {
+          "q": "Módosítja a fájljaimat?",
+          "a": "Csak ha címkéket szerkeszt, és ilyenkor minden fájlról előbb biztonsági másolat készül, amely egy lépésben visszaállítható. A mappákra a helyükön hivatkozik; az importálás APFS-klónokat hoz létre, amelyek nem foglalnak extra helyet."
+        },
+        {
+          "q": "Milyen hardveren tesztelték?",
+          "a": "A lejátszást tesztelték FiiO K11-en 384 kHz-ig, DoP-vel és egész számos móddal; AirPods Maxon USB-C-n és Bluetooth-on; MacBook Pro hangszórókon; valamint egy Sony TV-n HDMI-n keresztül, 5.1-ben. Intel hardveren nincs tesztelve. Az AV-erősítőre küldött bitstream és a többcsatornás DAC-kimenet kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); <a href=\"{href.dacReport}\">visszajelzéseket várunk</a>."
+        },
+        {
+          "q": "Elérhető az én nyelvemen?",
+          "a": "Valószínűleg: a felület angolul és további {languages} nyelven érhető el, köztük a jobbról balra írt arab, héber, perzsa és urdu nyelven. A Vespertine a Rendszerbeállításokban hozzá beállított nyelvet követi. Az anyanyelvi beszélők javításait szívesen fogadjuk a <a href=\"{href.newIssue}\">GitHubon</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Támogatás",
+      "title": "Segítse a Vespertine fejlődését.",
+      "text": "Ingyenes, nyílt forráskódú, és nyilvánosan készül. Így segíthet.",
+      "cards": [
+        {
+          "title": "Szponzorálás a GitHubon",
+          "text": "A Vespertine ingyenes. Ha hasznosnak találja, egy GitHub-szponzorációval a fejlesztését támogatja.",
+          "cta": "Legyen szponzor"
+        },
+        {
+          "title": "Jelentse a DAC-ját",
+          "text": "Írja meg, hogyan működött a DAC-ja, audiointerfésze vagy AV-erősítője. Minden eszközbeszámoló bővíti a valódi hardveren ellenőrzöttek körét.",
+          "cta": "Eszközbeszámoló beküldése"
+        },
+        {
+          "title": "Javítson egy fordítást",
+          "text": "Esetlen megfogalmazást talált a {languages} nyelv valamelyikében? Nyisson hibajegyet a jobb megfogalmazással.",
+          "cta": "Javítás javaslata"
+        },
+        {
+          "title": "Olvassa el a kódot",
+          "text": "Hibajelentéseket, pull requesteket és kérdéseket szívesen fogadunk. A jelút feltételei és a hozzájuk tartozó tesztek mind megtalálhatók a tárolóban.",
+          "cta": "Forráskód a GitHubon"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Letöltés",
+      "title": "Hallgassa surround-gyűjteményét a Macen.",
+      "meta": [
+        "Ingyenes",
+        "nyílt forráskódú",
+        "{version} verzió",
+        "macOS {minMacOS} vagy újabb"
+      ]
+    }
+  },
+  "press": {
+    "title": "Sajtócsomag: Vespertine, a surround és hi-res zenelejátszó Macre",
+    "description": "Adatok, logók, kulcsgrafikák, valódi képernyőképek és előzetes a Vespertine-ről, az ingyenes, nyílt forráskódú Mac-lejátszóról surround és hi-res zenegyűjteményekhez.",
+    "ogAlt": "A Vespertine sajtócsomagja: adatlap, logók, kulcsgrafikák, valódi képernyőképek és az előzetes, az alkalmazás három valódi képernyőképe fölött.",
+    "eyebrow": "Sajtócsomag",
+    "heading": "Minden, ami egy cikkhez kell",
+    "lede": "A Vespertine ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez. Az SACD- és DVD-Video-lemezképek, a kinyert SACD 5.1-es sávok, a DTS CD-k, valamint a DTS-HD MA-, TrueHD- és Atmos-fájlok egyetlen könyvtárban férnek meg, AirPodson fejkövetéses Térhatású hanggal. A Jelút a fájltól a kimenetig minden lépést megmutat; a feltételek és a tesztek a GPL-forráskódban vannak, amelyet bárki ellenőrizhet.",
+    "fine": "A csatornáról csatornára továbbított kimenet és a bitstream-továbbítás receiverre kísérleti funkció, valódi receivereken és többcsatornás USB DAC-okon nem tesztelt (HDMI-n egyetlen Sony tévével történt teszt: lásd docs/DEVICES.md); visszajelzéseket várunk. A Dolby Digital Plus Atmos objektumait a macOS rendereli; a TrueHD Atmos és a DTS:X a csatornaalapját (channel bed) játssza le.",
+    "facts": {
+      "eyebrow": "Adatlap",
+      "title": "Tények.",
+      "name": "Név",
+      "formerly": "(a 0.6.0-s verzióig {formerName} néven)",
+      "developer": "Fejlesztő",
+      "developerValue": "{author}, független fejlesztő",
+      "price": "Ár",
+      "priceValue": "Ingyenes. Nyílt forráskódú, GPL-3.0 licenc alatt; fiók, előfizetés, reklám és telemetria nélkül",
+      "platform": "Platform",
+      "platformValue": "macOS {minMacOS} {minMacOSName} vagy újabb, Apple silicon és Intel",
+      "current": "Jelenlegi verzió",
+      "currentValue": "{version}, kiadva: {date}",
+      "currentFine": "Aláírt és notarizált DMG ({size}), magától frissül",
+      "first": "Első kiadás",
+      "firstFine": "({formerName} 0.1.0 néven)",
+      "languages": "Nyelvek",
+      "languagesValue": "Angol és további {languages} nyelv, köztük ukrán, arab, héber, japán és háromféle kínai",
+      "install": "Telepítés",
+      "installValue": "<a href=\"{href.dmg}\">Töltse le a DMG-t</a>, vagy: {brew}",
+      "tested": "Tesztelt eszközök",
+      "testedValue": "FiiO K11 (minden mintavételi frekvencia 384 kHz-ig, DoP, egész számos mód), AirPods Max USB-C-n és Bluetoothon keresztül, a MacBook Pro hangszórói",
+      "links": "Linkek",
+      "website": "Weboldal",
+      "source": "Forráskód",
+      "releaseNotes": "Kiadási megjegyzések",
+      "verify": "A bit-perfect lejátszás ellenőrzése"
+    },
+    "angle": {
+      "eyebrow": "Fókusz",
+      "title": "Amire összpontosít.",
+      "list": [
+        "Surround zene egyetlen Mac-könyvtárban – az SACD- és DVD-Video-lemezképektől, a rippektől és a DTS CD-ktől a TrueHD és DD+ Atmos anyagokig –, AirPodson Térhatású hanggal.",
+        "Ingyenes GPL-3.0 forráskód, amelyet bárki elolvashat, lefordíthat és módosíthat.",
+        "Jelút, amely mutatja a mintavételi frekvenciát, a bitmélységet, az erősítést és a csatornafeldolgozást. A bit-perfect lejátszás feltételei a kódban vannak rögzítve, tesztekkel, beépített loopback-teszttel és <a href=\"{href.verification}\">ellenőrzési útmutatóval</a>."
+      ],
+      "text": "Hi-res fájlelemzés is van benne. A nullákkal való kitöltés (zero padding) felismerése pontos; a spektrumelemzés ítéletei becslések, és megvannak a korlátaik. Elemzést a VeraVox és az Audirvana AudioScan is kínál. <a href=\"{href.comparison}\">Az összehasonlítás forrásai</a>."
+    },
+    "video": {
+      "eyebrow": "Videó",
+      "title": "Előzetes.",
+      "text": "44 másodperc, 16:9, 1080p 60 fps-sel, hanggal. <a href=\"{href.trailerDownload}\" download>Töltse le az MP4-et</a> ({size}). Kérésre 4K-s master is elérhető.",
+      "fallback": "Az előzetes letöltése (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Márka",
+      "title": "Logó.",
+      "text": "Mindig kisbetűvel, a holdsarló mindig sárgarézszínű. Kérjük, ne színezze át, ne nyújtsa meg és ne szedje újra. <a href=\"{href.brandGuide}\">Arculati kézikönyv (PDF)</a>.",
+      "primaryAlt": "A Vespertine logója: sárgarézszínű holdsarló és a vespertine szó",
+      "stackedAlt": "A Vespertine logója egymás alatti elrendezésben",
+      "primary": "Elsődleges",
+      "stacked": "Egymás alatti",
+      "onLight": "világos alapon:",
+      "crescent": "csak a holdsarló:"
+    },
+    "art": {
+      "eyebrow": "Kulcsgrafikák",
+      "title": "Funkciónként egy kép.",
+      "text": "Három méretben: 2400×1350, 1600×900 és 1270×760.",
+      "items": {
+        "bit-perfect": "Bit-perfect, ha a feltételek teljesülnek",
+        "fake-hi-res": "Hamis hi-res felismerése",
+        "spatial-audio": "Surround Térhatású hangként AirPodson",
+        "native-dsd": "Natív DSD DoP-n keresztül",
+        "stereo-and-surround": "Sztereó és surround változatok",
+        "sacd-iso": "SACD-lemezképek, közvetlenül lejátszva",
+        "languages": "{languages} nyelv"
+      }
+    },
+    "shots": {
+      "eyebrow": "Képernyőképek",
+      "title": "Az igazi alkalmazás.",
+      "text": "A fejlesztő saját könyvtárával, 2400×1500. Az albumborítók a jogtulajdonosaiké.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24 bit / 96 kHz, bit-perfect egy Fosi Audio ZD3 készüléken: Lazar Berman, Liszt: Les jeux d’eaux à la Villa d’Este",
+        "multichannel-albums": "Albumok, többcsatornásra szűrve",
+        "stereo-and-surround-versions": "Kinyert SACD-sávok sztereó és 5.1-es változattal",
+        "spatial-audio-airpods-max": "Egy 24/88,2-es 5.1-es album (Elton John, Goodbye Yellow Brick Road) Térhatású hangként AirPods Maxon",
+        "fake-hi-res-detection": "Egy 24/192-es „remaster”, amely 16 kHz-nél véget ér (szándékos hamisítvány: az előzetes saját zenéje MP3-ba kódolva, majd felmintavételezve, kitalált zenekarnév alatt)",
+        "dsd-native-dop": "DSD128 DoP-n keresztül, 352,8 kHz-en, egy Fosi Audio ZD3 készüléken: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Egy SACD .iso, közvetlenül a lemezképből lejátszva: Dire Straits, Brothers In Arms",
+        "genres": "Műfajok",
+        "search": "Keresés",
+        "smart-playlist": "Egy intelligens lejátszási lista, bit-perfect lejátszással AirPods Maxon, USB-C-n keresztül",
+        "loopback-test": "A loopback-teszt: a kimeneti út szoftveres ellenőrzése, mintáról mintára",
+        "setup-welcome": "Kezdeti beállítás: üdvözlés",
+        "setup-output": "Kezdeti beállítás: a megjegyzendő kimenet kiválasztása",
+        "output-settings": "Kimeneti beállítások: megjegyzett kimenet, tartalék kimenet, 16 bites illesztés",
+        "equalizer": "A parametrikus EQ egy AutoEQ-előbeállítással"
+      }
+    },
+    "contact": {
+      "eyebrow": "Kapcsolat",
+      "title": "Írjon nekünk.",
+      "text": "Sajtó, kérdések és interjúkérések: {email}. Közösségi kérdések: <a href=\"{href.discussions}\">GitHub Discussions</a>. Hibák és eszközbeszámolók: <a href=\"{href.issues}\">GitHub Issues</a>."
+    }
+  },
+  "privacy": {
+    "title": "Adatvédelem: a Vespertine semmit sem gyűjt",
+    "description": "A Vespertine alkalmazás semmit sem gyűjt: nincs fiók, analitika, telemetria, összeomlás-jelentés vagy reklám. Itt olvashatja, mihez kapcsolódik az alkalmazás és ez a weboldal, és miért.",
+    "ogAlt": "A Vespertine adatvédelme: a Vespertine semmit sem gyűjt. Nincs fiók, analitika, telemetria, összeomlás-jelentés vagy reklám.",
+    "eyebrow": "Adatvédelem",
+    "heading": "A Vespertine",
+    "headingBrass": "semmit sem gyűjt.",
+    "updated": "Hatályos: {effective} (kiegészítve a nem kötelező Discord-állapottal). Az „Ez a weboldal” szakasz frissítve: {websiteUpdated}. A webhely mostantól saját üzemeltetésű, sütik nélküli statisztikával számolja a látogatásokat.",
+    "intro": "A Vespertine ingyenes, nyílt forráskódú zenelejátszó. Az alkalmazásban nincs fiók, analitika, telemetria, összeomlás-jelentés és reklám. A fejlesztő semmilyen információt nem kap Önről vagy a zenéiről. Mivel a forráskód nyilvános, az oldal minden állítását ellenőrizheti.",
+    "staysTitle": "Ami a Macen marad",
+    "stays": "A könyvtár adatbázisa, a lejátszási listák, a lejátszásszámlálók, a fájlelemzések eredményei, a borítók gyorsítótára és a beállítások a Macen, az Ön felhasználói Könyvtár mappájában tárolódnak. A hálózati megosztások jelszavai és a ListenBrainz-tokenje, ha megad egyet, a macOS Kulcskarikájában tárolódnak. Ezekből semmi sem töltődik fel sehová.",
+    "onlineTitle": "Amikor az alkalmazás az internethez kapcsolódik",
+    "online": [
+      "<strong>Frissítés-ellenőrzés.</strong> A Vespertine nagyjából naponta egyszer, valamint amikor a Frissítések keresése parancsot választja, lekéri a frissítési hírcsatornáját a GitHubtól. A GitHub – mint bármely letöltésnél – látja az IP-címét. Az automatikus ellenőrzést a Beállításokban kikapcsolhatja.",
+      "<strong>MusicBrainz és Cover Art Archive.</strong> Csak amikor a Keresés a MusicBrainzen vagy a Metaadatok kiegészítése funkciót használja (a Zene keresése ezen a Macen a hozzáadott zenéhez felajánlja a kiegészítést egy jelölőnégyzettel, amelyből kiveheti a pipát), a Vespertine elküldi a musicbrainz.org-nak a keresett album, előadó és sáv nevét. Ha a Beállításokban be van kapcsolva a „Borítók letöltése”, a borítókat a coverartarchive.org-ról tölti le, amely azokat az Internet Archive-ból (archive.org) szolgálja ki. A MusicBrainzt és a Cover Art Archive-ot a MetaBrainz Foundation üzemelteti.",
+      "<strong>ListenBrainz.</strong> Csak ha bekapcsolja a scrobblingot és megadja a tokenjét, a Vespertine elküldi a listenbrainz.org-nak a lejátszott dalokat: a címet, az előadót, az albumot, az időtartamot, valamint a MusicBrainz-azonosítókat, ha a fájljai tartalmazzák őket. Egy dal indulásakor „most szól” jelzést küld, majd amikor a dal felét vagy négy percét meghallgatta, egy meghallgatást az időpontjával együtt.",
+      "<strong>Discord.</strong> Csak ha a Beállításokban bekapcsolja a Discord-állapotot, a Vespertine egy a Macen belül maradó kapcsolaton keresztül közli a Macen futó Discord-alkalmazással, mi szól: a címet, az előadót, az albumot, a formátumot és a lejátszás állását. A Discord ezt állapotként mutatja azoknak, akik láthatják a tevékenységét. Az album borítójának megjelenítéséhez a Vespertine név alapján megkeresi a borítót, mert a Discord csak a webről tud képeket megjeleníteni: a coverartarchive.org-on, ha a fájljai MusicBrainz-kiadásazonosítót tartalmaznak, egyébként az Apple iTunes Search szolgáltatásában (itunes.apple.com), amely megkapja az előadó és az album nevét. Ezután a Discord onnan tölti le a borítót. A borítókat kikapcsolhatja, a fájljai és a borítóik pedig soha nem töltődnek fel.",
+      "<strong>Hálózati megosztások.</strong> A Vespertine csak az Ön által hozzáadott szerverekhez kapcsolódik – máshová nem –, hogy beolvassa a zenéit. Amíg egy megosztás csatlakoztatva van, nagyjából percenként ellenőrzi, hogy a szerver még válaszol-e, és félóránként új zenék után néz (de soha, amíg éppen onnan játszik le)."
+    ],
+    "websiteTitle": "Ez a weboldal",
+    "website": [
+      "Ez a webhely a GitHub Pages tárhelyén fut, amely naplózhatja a látogatók IP-címét; lásd: <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">a GitHub adatvédelmi nyilatkozata</a>. A letöltőgombok az alkalmazás GitHubon található kiadásaira mutatnak. A webhely nem állít be sütiket, a betűtípusokat, képeket és videókat pedig saját magáról tölti be.",
+      "Hogy megtudjuk, mely oldalakat és gombokat használják a látogatók, a webhely az <a href=\"https://umami.is\">Umami</a> segítségével számolja a látogatásokat: ez egy adatvédelembarát szoftver, amelyet mi magunk futtatunk a stats.szeremeta.org címen. Nem állít be sütiket, semmit sem tárol az Ön eszközén, nem őrzi meg az IP-címét, és semmit sem oszt meg hirdetőkkel vagy bármely más vállalattal. Rögzíti az oldalt, a webhelyet, ahonnan érkezett, a hozzávetőleges országát, a böngészőjét, az operációs rendszerét, a képernyőméretét és a nyelvét, valamint a letöltés-, GitHub- és Homebrew-gombokra leadott kattintásokat. Nem tudja követni Önt a webhelyek között, sem azonosítani, és kihagyja azokat a látogatókat, akiknek a böngészője Do Not Track jelzést küld. <strong>Az alkalmazás soha nem lép kapcsolatba vele.</strong>",
+      "Ha a webhely nyelvi menüjében nyelvet választ, a böngészője az Ön eszközén (a helyi tárolójában) megjegyzi a választást, hogy a webhely ne váltson vissza. Ez soha nem jut el sehová, és a webhely nélküle is ugyanúgy működik."
+    ],
+    "changesTitle": "Változások és kapcsolat",
+    "changes": "Ha ez valaha megváltozik, ez az oldal és a kiadási megjegyzések jelzik majd elsőként. Kérdéseit szívesen fogadjuk egy <a href=\"{href.issues}\">GitHub-issue</a> formájában."
+  },
+  "terms": {
+    "title": "Feltételek: a Vespertine GPL licencű szabad szoftver",
+    "description": "A Vespertine szabad szoftver, amelyre a GNU General Public License 3-as vagy újabb verziója vonatkozik: nincs költség, nincs regisztráció, nincs garancia.",
+    "ogAlt": "A Vespertine feltételei: szabad szoftver, egyszerűen. A GNU General Public License 3-as vagy újabb verziója.",
+    "eyebrow": "Feltételek",
+    "heading": "Szabad szoftver,",
+    "headingBrass": "egyszerűen.",
+    "updated": "Hatályos: {effective}",
+    "licenseTitle": "Licenc",
+    "license": "A Vespertine szabad szoftver, amelyre a <a href=\"{href.license}\">GNU General Public License 3-as vagy újabb verziója</a> vonatkozik. Bármilyen célra használhatja, tanulmányozhatja és módosíthatja a forráskódját, és másolatokat – akár módosítottakat is – terjeszthet ugyanazon licenc alatt. Semmibe sem kerül, és sehová sem kell regisztrálni.",
+    "warrantyTitle": "Nincs garancia",
+    "warranty": "Ahogy a licenc kimondja, a Vespertine „ahogy van” alapon, mindenféle garancia nélkül érhető el, a jogszabályok által megengedett mértékben. Készítsen biztonsági másolatot a zenéiről. A Vespertine csak akkor módosít fájlokat, amikor Ön szerkeszti a címkéiket, és előtte mindegyikről biztonsági másolatot készít, de a használata a saját felelősségére történik.",
+    "musicTitle": "Az Ön zenéi és más szolgáltatások",
+    "music": "Ön felel azért, hogy joga legyen lejátszani a hozzáadott zenéket. A Vespertine nem tudja lejátszani a DRM-mel védett fájlokat, és nem is próbálja meg. A MusicBrainz, a Cover Art Archive és a ListenBrainz független szolgáltatások saját feltételekkel, amelyek akkor érvényesek, amikor a Vespertine-en keresztül használja őket.",
+    "trademarksTitle": "Védjegyek",
+    "trademarks": "A Dolby, a Dolby Atmos, a Dolby Digital, a Dolby Digital Plus és a Dolby TrueHD a Dolby Laboratories védjegyei. A DTS, a DTS-HD Master Audio és a DTS:X a DTS, Inc. védjegyei. Az Apple, az AirPods, az AirPods Max, a Mac, a macOS és a Térhatású hang az Apple Inc. védjegyei. A Vespertine csak azért említi őket, hogy leírja, mit és hol játszik le. A Vespertine-t sem a Dolby, sem a DTS, sem az Apple nem tanúsította, nem licencelte és nem támogatja hivatalosan.",
+    "contactTitle": "Kapcsolat",
+    "contact": "Hibák, kérdések és kérések: <a href=\"{href.issues}\">GitHub Issues</a>.",
+    "englishNote": "Ez a fordítás az Ön kényelmét szolgálja. A kötelező erejű szöveg maga a GNU General Public License, amely angol nyelvű."
+  },
+  "notFound": {
+    "title": "Az oldal nem található: Vespertine",
+    "description": "Ez az oldal nincs itt. A Vespertine ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez.",
+    "ogAlt": "Vespertine: az ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenéhez.",
+    "eyebrow": "404 · Nincs jel",
+    "heading": "Ez az oldal",
+    "headingBrass": "nincs itt.",
+    "lede": "Lehet, hogy a hivatkozás elavult, vagy elírták a címet. A Vespertine-nel kapcsolatban minden a kezdőlapon kezdődik.",
+    "home": "Ugrás a kezdőlapra"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} vagy újabb",
+    "processor": "Apple silicon (arm64) vagy Intel (x86-64)",
+    "subCategory": "Zenelejátszó",
+    "sourceName": "A Vespertine forráskódja",
+    "trailerName": "A Vespertine előzetese",
+    "trailerDescription": "44 másodperces bemutató a Vespertine-ről, a valódi alkalmazásból rögzítve, a fejlesztő saját könyvtárán: a bit-perfect jelút, DSD DoP-n keresztül, surround Térhatású hangként AirPodson és hi-res fájlelemzés.",
+    "keywords": "bit-perfect, hi-res hang, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Térhatású hang, AirPods Max, FLAC, zenelejátszó, macOS, nyílt forráskód"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "A Vespertine 0.14.0 szobakorrekcióval bővül: mérje be a hangszóróit egy UMIK-1 mikrofonnal, és hallgasson zenét a szobájához készült szűrőkön keresztül. Emellett megakadályozza, hogy a hálózati lejátszás kifogyjon az adatból.",
+      "notes": "### Szobakorrekció\n- **Mérje be a szobáját.** Helyezzen egy kalibrált UMIK-1 mikrofont a hallgatási pozícióba, és a Vespertine sorban minden hangszórón tesztsweepeket játszik le. Előbb ellenőrzi a szintet és az útvonalat minden hangszóróhoz, elveti a hibás mérést, és lehetővé teszi, hogy újrapróbálja, vagy ott folytassa, ahol abbahagyta.\n- **Szűrők minden hangszóróhoz.** A mérésből a Vespertine hangszórónként néhány szűrőt készít, többnyire vágásokat a szoba okozta basszuscsúcsokra. A grafikon mutatja a mért görbét, a korrekció utáni előrejelzést és a célt, az előrejelzés pedig előrejelzésként van feliratozva. Válasszon célt (Enyhe dőlés, Egyenes vagy Meleg) és tartományt (csak basszus vagy teljes tartomány), és a szűrők a tárolt mérésből újraillesztődnek.\n- **Alapból kikapcsolva, így a bit-perfect bit-perfect marad.** A szobakorrekció kimenetenként kapcsolható be, és ahhoz a kimenethez kötődik, amelyen a mérés készült. Amíg a mintákat módosítja, a jelúton SZOBAKORREKCIÓ felirat látható, és a stream már nincs bit-perfectként megjelölve. A Vespertine által renderelt sztereó PCM-re vonatkozik; DoP-n át küldött DSD, bitstreamek, Atmos és más csatornaszámok esetén félreáll, és megmondja, miért. Amíg be van kapcsolva, az egész számos mód és a 16 bites illesztés kikapcsolva marad.\n- **Hol található.** Nézet → Szobakorrekció, valamint a Hangszínszabályzó ablakból és az egyes kimenetek beállításaiból. A mérést elmentheti, bekapcsolhatja, elvetheti, vagy importálhat egy mentett `room-profile.json` fájlt. Ez váltja fel a korábbi béta Szobamérés ablakot. A módszer leírása: `docs/ROOM-CORRECTION.md`.\n\n### Hálózati lejátszás\n- **Kevesebb kiesés NAS-ról.** A hálózati megosztáson lévő számok mostantól lejátszás előtt a Macre másolódnak, a következő szám pedig előre, így egy hálózati akadás már nem állítja meg a zenét. A nagy DSD-fájlok olvasása úgy történik, hogy mindig hosszú tartalék álljon készen.\n- **Töltésjelző gyűrű a lejátszás gombon.** Amíg a Vespertine a hálózatról érkező adatokra vár, a lejátszás/szünet gombon kis forgó gyűrű látható (bekapcsolt Mozgás csökkentése mellett álló). A rövid olvasási hibáknál újrapróbálkozik.\n- **Korlátok.** Egy nagyon hosszú kimaradás vagy a zenénél lassabb kapcsolat továbbra is szüneteltetheti a lejátszást az újratöltésig. A gyorsítótárazott másolatok legfeljebb 8 GB-ot foglalnak, az ennél nagyobb forrás pedig egyértelmű üzenettel meghiúsul. Lásd: `docs/NETWORK-PLAYBACK.md`.\n\n### További újdonságok\n- **DoP alapból bekapcsolva az ismert DAC-oknál.** A FiiO K11 és a Fosi Audio ZD3 bekapcsolt DoP-vel indul. Ha kikapcsolja, a Vespertine megjegyzi.\n- **A Nemrég hozzáadva 150 albumot mutat** a korábbi 60 helyett, így egy nagy importálás nem szorítja ki a listáról a közvetlenül előtte hozzáadott albumokat.\n- **Fosi Audio ZD3.** A ZD3 bekerült a támogatott eszközök listájába, és a webhely képernyőképei újra elkészültek vele.\n- **Webhely.** A letöltés gombok alatt egy „Csillagozza a GitHubon” és „Csatlakozzon a beszélgetéshez” sor található.\n\n### Ellenőrzés\n- A motor, a könyvtár és az alkalmazás tesztkészletei sikeresen lefutnak, köztük az új tesztek a szobaszűrők tervezéséhez, az új korrekciós fokozaton át történő lejátszáshoz, a mérési lépésekhez és a hálózati gyorsítótárhoz. A valós idejű hangkódot az address és undefined-behavior sanitizerekkel is ellenőrzik.\n- Tesztekkel még nem ellenőrzött: a lejátszás szobakorrekción keresztül valódi hardveren, valamint a mérési varázsló valódi UMIK-1-gyel."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "A Vespertine 0.13.2 Térhatású hangként játssza le az 5.1-es DSD-t AirPodson, jelzi, ha a hangot konvertálja vagy lekeveri, és kilépéskor már nem akad le.",
+      "notes": "### Térhatású hang\n- **Az 5.1-es DSD most Térhatású hangként szól.** Az 5.1-es DSD-fájl (DSF, DSDIFF, DST-tömörített DSDIFF vagy SACD-lemezkép) PCM-re konvertálódik, és minden csatorna a helyére kerül, így az LFE- és a surround csatornák már nem vesznek el. Korábban a diszkrét DSDIFF-csatornák háromhangszórós csatornarétegre kerülhettek, és a hátsó csatornák eltűntek.\n- **Megmondja, mi történt a hanggal.** A jelút a TÉRHATÁSÚ vagy egy lekeverés mellett **DSD → PCM** jelzést mutat, és két új értesítés, a „DSD-ből konvertálva” és a „Sztereóra keverve” jelenik meg, amikor érvényes. Mindkettő mind a 44 nyelvre le van fordítva.\n- A fejlesztő AirPods Maxon ellenőrizte.\n\n### Javítások\n- **A kilépés már nem akad le.** A Cmd-Q után pörgő kurzor maradhatott, amíg a Vespertine az audioeszközre várt. Most azonnal kilép.\n- **A többcsatornás fájlok helyesen olvashatók.** Az RF64 és Wave64 fájlok rendesen megnyílnak, a DSD-csatornaneveket a fájlból olvassa be, és a diszkrét többcsatornás útválasztás a fájl saját csatornakiosztását követi.\n\n### Ellenőrzés\n- A motor, a könyvtár és az alkalmazás tesztkészletei sikeresen lefutnak, köztük új tesztek, amelyek minden 5.1-es DSD-formátumot Térhatású hangon keresztül játszanak le, és ellenőrzik, hogy minden csatorna a helyére érkezik. A bal/jobb elhelyezés ellenőrzése csak valódi Maceken fut; a GitHub tesztgépei ezt az egy ellenőrzést kihagyják."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "A Vespertine mostantól jelzi, ha a hangszínszabályzó nem tudja módosítani azt, ami éppen szól, minden USB-C-s AirPods Max modellhez nem kötelező referencia-hangszínszabályzót kínál, és megvan az első többcsatornás eredménye valódi hardveren."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "A Vespertine mostantól előzményként rögzíti, mit hallgatott, a Következik saját panelt kap a könyvtár mellett, egy album minden kiadása egyetlen kártyán jelenik meg, és az éppen szóló zene megjelenhet Discord-állapotként."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "A Vespertine mostantól megfelelően működik világos megjelenésben, a hangerő-szabályozó nélküli kimenetek használhatják a Vespertine hangerejét, és a könyvtár elemzése akkor is folytatódik, ha hálózati megosztásról hallgat zenét."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "A Vespertine mostantól akadás nélkül játszik lassú hálózati megosztásokról, a nagy könyvtárakat a megosztásokkal együtt is gyorsabban elemzi, a kis USB-C-s DAC-okon a legmagasabb elérhető frekvencián játssza a hi-res anyagot, és a billentyűzetes fókusz és a többes kijelölések ott maradnak, ahol várja."
+    },
+    "0.12.0": {
+      "hash": "f25478b5e324",
+      "summary": "A Vespertine mostantól natívan lejátssza a DST-tömörített DSDIFF-fájlokat és a DVD-Video lemezek LPCM-zenéjét, megtartja az EAC CUE-lapok minden sávját, és a hálózati megosztásról indított dalok azonnal elindulnak, akkor is, ha épp könyvtárbeolvasás fut."
+    }
+  }
+}

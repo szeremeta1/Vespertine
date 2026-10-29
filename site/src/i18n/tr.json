@@ -1,0 +1,741 @@
+{
+  "common": {
+    "skip": "İçeriğe geç",
+    "tagline": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı.",
+    "requires": "macOS {minMacOS} veya üstü.",
+    "arch": "Apple silicon ve Intel",
+    "download": "Mac için indir",
+    "downloadVersion": "{version} sürümünü indir",
+    "sourceOnGitHub": "GitHub’da kaynak kodu",
+    "reportIssue": "Sorun bildir",
+    "brewLead": "Ya da Homebrew ile:",
+    "copy": "Kopyala",
+    "copyLabel": "Homebrew komutunu kopyala",
+    "copied": "Kopyalandı",
+    "copyFailed": "Elle seçin",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ve Dolby TrueHD, Dolby Laboratories’in ticari markalarıdır. DTS, DTS-HD Master Audio ve DTS:X, DTS, Inc.’in ticari markalarıdır. Apple, AirPods, AirPods Max, Mac, macOS ve Uzamsal Ses, Apple Inc.’in ticari markalarıdır. Vespertine bu adları yalnızca neyi ve nerede çaldığını tanımlamak için kullanır; Dolby, DTS veya Apple tarafından sertifikalandırılmamış, lisanslanmamış ya da onaylanmamıştır.",
+    "trailerLabel": "Vespertine fragmanı, 44 saniye",
+    "untested": "Kanal kanal çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
+  },
+  "nav": {
+    "label": "Ana menü",
+    "home": "Vespertine, ana sayfa",
+    "top": "Vespertine, başa dön",
+    "features": "Özellikler",
+    "formats": "Biçimler",
+    "compare": "Karşılaştır",
+    "whatsNew": "Yenilikler",
+    "faq": "SSS",
+    "press": "Basın kiti",
+    "download": "İndir",
+    "downloadLabel": "İndir: Mac için Vespertine {version}"
+  },
+  "lang": {
+    "label": "Dil",
+    "menuLabel": "Dil seçin",
+    "current": "Geçerli dil"
+  },
+  "footer": {
+    "project": "Proje",
+    "about": "Hakkında",
+    "releaseNotes": "Sürüm notları",
+    "sponsor": "Sponsor ol",
+    "discussions": "Tartışmalar",
+    "architecture": "Mimari",
+    "privacy": "Gizlilik",
+    "terms": "Koşullar",
+    "license": "Lisans (GPL-3.0)",
+    "notices": "Üçüncü taraf bildirimleri",
+    "ukraine": "<strong>Vespertine, Ukrayna’nın yanında.</strong> Lütfen {orgs} aracılığıyla bağış yapın.",
+    "copyright": "© {year} Vespertine katkıda bulunanları",
+    "free": "GPL kapsamında özgür yazılım",
+    "madeIn": "{author} tarafından Boston’da yapıldı",
+    "backToTop": "Başa dön",
+    "home": "Ana sayfa"
+  },
+  "home": {
+    "title": "Vespertine: Mac için surround ve hi-res müzik oynatıcısı",
+    "description": "Surround ve hi-res koleksiyonlar için ücretsiz, açık kaynak Mac oynatıcısı: SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Dolby Atmos dosyaları, AirPods’ta Uzamsal Ses ve inceleyebileceğiniz bit-perfect bir sinyal yolu.",
+    "ogAlt": "Vespertine: surround ve hi-res müzik için ücretsiz, açık kaynak Mac oynatıcısı. Sinyal yolu, bir Fosi Audio ZD3 üzerinde bit-perfect çalan 24 bit / 96 kHz bir FLAC dosyasını gösteriyor. Sürüm {version}, macOS {minMacOS} veya üstü.",
+    "hero": {
+      "eyebrow": [
+        "Ücretsiz ve açık kaynak",
+        "macOS {minMacOS}+",
+        "Apple silicon ve Intel"
+      ],
+      "titleSr": "Surround ve hi-res müzik, Mac’inizde.",
+      "titleLines": [
+        "Surround ve",
+        "hi-res müzik,"
+      ],
+      "titleBrass": "Mac’inizde.",
+      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur; AirPods’ta baş takipli Uzamsal Ses desteğiyle. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
+      "ask": "Beğendiniz mi?",
+      "star": "GitHub’da yıldız verin",
+      "discuss": "Tartışmaya katılın",
+      "version": "Sürüm {version}",
+      "signed": "imzalı ve noter onaylı",
+      "releaseNotes": "Sürüm notları",
+      "privacy": "Gizlilik: hiçbir veri toplanmaz.",
+      "panelAlt": "Vespertine’in Şu An Çalan denetçisi: Lazar Berman’ın yorumuyla Liszt’in Les jeux d’eaux à la Villa d’Este eseri; HI-RES KAYIPSIZ ve BIT-PERFECT olarak işaretli, özel, 32 / 96. Sinyal yolu, 24 bit / 96 kHz bir FLAC dosyasından libFLAC üzerinden, yerel örnekleme hızında ve tam ses düzeyinde bir Fosi Audio ZD3’e uzanıyor.",
+      "panelCaption": "Sinyal Yolu",
+      "followSignal": "Sinyali izleyin"
+    },
+    "trailer": {
+      "eyebrow": "Fragman",
+      "title": "44 saniyede izleyin.",
+      "text": "Sesi açın. Gördüğünüz her şey gerçek uygulamadır ve geliştiricinin kendi arşivinde kaydedildi.",
+      "fallback": "Fragmanı izleyin (MP4)",
+      "caption": "44 sn · 1080p · albüm kapakları sahiplerine aittir"
+    },
+    "features": {
+      "eyebrow": "Neden Vespertine",
+      "title": "Surround koleksiyonunuz için tasarlandı.",
+      "text": "Surround ve stereo müzik tek bir arşivde; üstelik sinyale tam olarak ne yaptığını gösteren bir oynatıcıyla.",
+      "badgesLabel": "Uygulamanın gösterdiği sinyal yolu durumları"
+    },
+    "pillars": [
+      {
+        "title": "Tek arşivde surround",
+        "text": "SACD görüntüleri ve rip’leri, DVD-Video diskleri, DTS CD’leri, DTS-HD MA ve TrueHD, stereo albümlerinizin yanında yer alır ve AirPods’ta baş takipli Uzamsal Ses olarak çalar. Bir albümün her iki sürümü de varsa her şarkı bir kez listelenir ve çıkışınıza uygun sürüm çalınır."
+      },
+      {
+        "title": "Doğrulayabileceğiniz bir sinyal yolu",
+        "text": "Örnekleme hızları, sözcük uzunlukları, kazanç ve kanal işleme Core Audio’dan geri okunur. Bit-perfect koşulları kaynak kodda yer alır; otomatik testler, bir loopback testi ve bir donanım doğrulama kılavuzuyla birlikte."
+      },
+      {
+        "title": "Hi-res dosyaları denetler",
+        "text": "Analiz, doldurulmuş bit derinliğini ve olası yukarı örneklemeyi ya da kayıplı kökeni işaretler. Spektral sonuçlar tahmindir; kanıtları ve sınırlarıyla birlikte gösterilir. Aynı analiz, dosyalarınızın yanındaki bir Linux sunucusunda da çalışır."
+      },
+      {
+        "title": "Denetlenebilir açık kaynak",
+        "text": "GPL kapsamında ücretsiz. Çıkış koşulları ve testleri dâhil, oynatıcıyı okuyun, derleyin ve değiştirin. Hesap, abonelik, reklam ya da telemetri yok."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Özel",
+      "spatial": "Uzamsal · baş takipli",
+      "synthetic": "Sentetik yüksek frekanslar?"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Sinyal yolu",
+        "kicker": "Bit-perfect",
+        "title": "Her parça kendi hızında ve derinliğinde.",
+        "lede": "Sinyal yolu, dosyadan DAC’ınıza kadar her adımı Core Audio’dan geri okuyarak listeler ve örnekleri bir şey değiştirdiğinde bunu söyler.",
+        "body": [
+          "Vespertine, aygıtı her dosyanın örnekleme hızına geçirir; yalnızca DAC o hızda çalışamadığında Apple’ın mastering kalitesindeki dönüştürücüsüyle yeniden örnekleme yapar. <span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kaynak koddaki koşullar sağlandığında görünür: yerel hız, örnekleri değiştiren hiçbir şeyin olmaması, uygun bir sözcük uzunluğu ve özel modda olan ya da başka bir uygulamayla paylaşılmayan bir aygıt. PCM oynatma, bir FiiO K11 üzerinde 384 kHz’e kadar test edildi."
+        ],
+        "list": [
+          "Özel (hog) mod, diğer uygulamaları aygıttan uzak tutar. Paylaşımlı modda ses tuşları ve Digital Crown DAC’ınızı ayarlar; özel modda da bu seçeneği açarsanız ayarlayabilir.",
+          "Tam sayı modu, işlenmemiş 32 bit PCM’i tam sayı kabul eden DAC’lara doğrudan gönderir.",
+          "“16 bit kaynaklarla eşleştir” (varsayılan olarak kapalı), gerçek bir 16 bit modu olan DAC’lara 16 bit dosyaları sıfırla doldurmadan, 16 bit olarak gönderir.",
+          "Boşluksuz çalma; tek bir dosyadan bölünen CUE sayfalı albümler dâhil.",
+          "DAC’ınızı hatırlar. DAC bağlı değilse müzik en iyi bağlı çıkışta çalar ve DAC geri geldiğinde ona döner.",
+          "Kendi ses düzeyi denetimi olmayan çıkışlar (HDMI, optik, line-out) Vespertine’in ses düzeyini kullanabilir; bu, çıkış başına seçilir. %100’ün altında etiketler artık bit-perfect olmadığını belirtir.",
+          "Vespertine kapandığında DAC’ınızı önceki hızına ve derinliğine döndürerek bırakır.",
+          "Yerleşik loopback testi, Vespertine’in sanal bir aygıta gönderdiği her örneği karşılaştırır. Bu bir yazılım denetimidir, öyle de etiketlenir ve <span class=\"mono nowrap\">BIT-PERFECT</span> rozetini asla değiştirmez."
+        ],
+        "links": [
+          "Koddaki koşullar",
+          "Kendiniz doğrulayın",
+          "Loopback testi neyi kanıtlar"
+        ],
+        "alt": "Vespertine, Lazar Berman’ın Liszt yorumu Années de pèlerinage’ı 24 bit / 96 kHz bir FLAC dosyasından çalıyor: denetçi, bir Fosi Audio ZD3 üzerinde bit-perfect ve özel olarak işaretliyor ve sinyal yolunun her adımını gösteriyor.",
+        "floatAlt": "Loopback testi penceresi: 44,1 ve 96 kHz’de 24 bit, doldurulmuş 16 bit ve bir boşluksuz çift; her biri bit düzeyinde aynı.",
+        "floatCaption": "Loopback Testi · yazılım denetimi"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround ve Uzamsal Ses",
+        "title": "5.1 diskleriniz aynı arşivde.",
+        "lede": "Çok kanallı müzik, AirPods’ta baş takipli Uzamsal Ses olarak çalar ya da stereo bir DAC’ta kanal düzenine göre stereoya indirgenir.",
+        "body": [
+          "DTS CD’leri 5.1 olarak çözülür. SACD görüntüleri, çıkarılmış SACD parçaları, çok kanallı FLAC, TrueHD ve DTS-HD MA, AirPods’ta baş takipli Uzamsal Ses olarak işlenir ya da stereo bir DAC’ta stereoya indirgenir. Atmos içeren Dolby Digital Plus, macOS’in nesne işleyicisini kullanır; TrueHD Atmos ve DTS:X kendi kanal tabanını (channel bed) çalar. Kanal kanal çıkış deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
+        ],
+        "list": [
+          "Bir albümün stereo ve surround sürümleri bir kez listelenir; Vespertine çıkışa hangisi uygunsa onu ya da sizin sabitlediğinizi çalar.",
+          "Alıcıya Dolby Digital, DD+ ve DTS-CD bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz. Taşıyıcı testlerinde FFmpeg’in S/PDIF okuyucusu kullanılır. TrueHD ve DTS-HD MA passthrough macOS’te desteklenmez.",
+          "Uzamsal Ses İçin Dışa Aktar: kulaklıklar için binaural stereo ya da Apple aygıtları için çok kanallı ALAC olarak, etiketler ve kapak görseliyle."
+        ],
+        "alt": "Elton John’un 24 bit / 88,2 kHz 5.1 albümü Goodbye Yellow Brick Road, AirPods Max’te baş takipli Uzamsal Ses olarak çalıyor; sinyal yolu ve her kanal için bir seviye göstergesiyle.",
+        "floatAlt": "Her şarkının stereo ve 5.1 sürümleri bulunan, bir kez listelenmiş bir albüm.",
+        "floatCaption": "Stereo ve 5.1, tek listede"
+      },
+      "discs": {
+        "jack": "Disk görüntüleri ve DSD",
+        "kicker": "SACD, DVD-Video ve DSD",
+        "title": "Disk görüntüsünü doğrudan çalın.",
+        "lede": "Vespertine’e bir SACD ya da DVD-Video görüntüsü gösterin; müziği doğrudan ondan çalar, hiçbir şey bağlanmaz, çıkarılmaz ya da yazılmaz.",
+        "body": [
+          "SACD <span class=\"mono\">.iso</span> görüntülerinin DST sıkıştırmalı ya da düz stereo ve 5.1 alanları, diskin kendi metninden alınan başlıklarla çalınır. DST, tam olarak aynı DSD’ye geri çözülür; böylece stereo, DAC destekliyorsa DoP üzerinden yerel DSD olarak DAC’ınıza gider, 5.1 ise AirPods’ta baş takipli Uzamsal Ses olarak çalar. DVD-Video disklerindeki (bir <span class=\"mono\">.iso</span> ya da <span class=\"mono\">VIDEO_TS</span> klasörü) LPCM müzik bit bit aynen çalınır: her başlık bir albüm, her bölüm bir parça olur."
+        ],
+        "list": [
+          "İki gerçek diskte sacd_extract ile bit bit aynı sonucu verdi. 5.0 alanı olan, yalnızca çok kanallı alanı olan ya da DSD128 ve üzeri diskler şimdilik yalnızca sentezlenmiş test görüntüleriyle kapsanıyor.",
+          "DSD64’ten DSD512’ye kadar DSF ve DSDIFF, DST sıkıştırmalı DSDIFF dâhil, taşıyıcı hızını kabul eden DAC’lara DoP olarak gider ya da yüksek hızlı PCM’e dönüştürülür. DoP bir FiiO K11 üzerinde doğrulandı; 384 kHz’in üzerindeki taşıyıcı hızları donanımda test edilmedi.",
+          "16, 20 ve 24 bit, 48 ve 96 kHz, 8 kanala kadar DVD-Video LPCM. DVD-Audio desteklenmez; şifreli (CSS) diskler için şifresi çözülmüş bir kopya gerekir."
+        ],
+        "links": [
+          "DVD-Video ayrıntıları"
+        ],
+        "alt": "Dire Straits’in Brothers In Arms albümü doğrudan SACD disk görüntüsünden çalıyor: DoP üzerinden bir FiiO K11’e stereo DSD64, YEREL DSD · DoP rozeti ve kod çözücü satırında “SACD görüntüsü, DST (kayıpsız)”.",
+        "floatAlt": "Claudja Barry’nin Love for the Sake of Love parçası, DSD128 olarak DoP üzerinden bir Fosi Audio ZD3’e, 352,8 kHz’de.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Analiz",
+        "kicker": "Sahte hi-res tespiti ve spektrum",
+        "title": "Hangi “hi-res” dosyaların öyle olmadığını bulun.",
+        "lede": "Her dosya; gerçek bit derinliği, gerçek bant genişliği ve kayıplı kodlayıcılarla yeniden örnekleyicilerin bıraktığı izler açısından analiz edilebilir.",
+        "body": [
+          "Sonuçlar kanıtlarıyla birlikte gelir ve durumu başka neyin açıklayabileceğini de belirtir; <em>Şüpheli Hi-Res</em> çalma listesi bunları bir araya toplar. Yalnızca sıfır doldurma kesindir: spektral sonuçlar soru olarak işaretlenir, çünkü bazı yüksek bit hızlı kayıplı dosyalar gerçek olarak geçer; dik mastering filtreleri, FM kaynakları ve bant ya da plak aktarımları da şüpheli görünebilir. Müzik çalarken seviye göstergeleri ve canlı bir spektrum, DoP dâhil, çıkışa neyin gittiğini gösterir."
+        ],
+        "list": [
+          "24 bit kapsayıcılara doldurulmuş 16 bit ses",
+          "96 ya da 192 kHz diye satılan, muhtemelen yukarı örneklenmiş CD kalitesinde masterlar",
+          "Muhtemel kayıplı köken: FLAC’a dönüştürülmüş MP3 ya da AAC",
+          "SBR ya da “yapay zekâ iyileştirmesi” kaynaklı muhtemel sentetik yüksek frekanslar",
+          "<span class=\"mono\">vespertine-analyze</span>, aynı analizi dosyalarınızın yanındaki bir Linux sunucusunda çalıştırır; uygulama sonuçları içe aktarır."
+        ],
+        "note": "Bu ekran görüntüsündeki dosya kasıtlı bir sahtedir: fragmanın kendi müziği, uydurma bir grup adıyla MP3’e kodlanıp 24/192’ye yukarı örneklendi.",
+        "links": [
+          "Analiz nasıl çalışır ve nerede yetersiz kalır"
+        ],
+        "alt": "Analiz sekmesi, 24/192 bir “remaster”ı muhtemel kayıplı köken olarak işaretliyor: uzun vadeli spektrumu 16 kHz’de kesiliyor."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "USB-C üzerinden AirPods Max",
+        "title": "AirPods Max’te kayıpsız ve bunu açıkça söylüyor.",
+        "lede": "USB-C kablosuyla bağlandığında AirPods Max, 24 bit / 48 kHz kayıpsız bir aygıt olarak tanınır.",
+        "body": [
+          "48 kHz müzik bit-perfect çalar; geri kalan her şey, gözünüzün önünde, Apple’ın mastering kalitesindeki yeniden örnekleyicisiyle dönüştürülür. Bluetooth üzerinden Vespertine, bağlantının AAC olduğunu size söyler. Bu, Apple’ın kablolu yol açıklamasına ve Core Audio’nun geri okumasına dayanır, çünkü AirPods’ta loopback yapılabilecek bir dijital çıkış yoktur."
+        ],
+        "alt": "Oasis ile daraltılmış, 24 bit / 48 kHz parçalardan oluşan bir akıllı çalma listesi, USB-C üzerinden AirPods Max’te bit-perfect çalıyor."
+      },
+      "library": {
+        "jack": "Arşiv",
+        "kicker": "Arşiv",
+        "title": "Apple Music gibi gezinin. Bir kütüphaneci gibi yönetin.",
+        "lede": "Albümler, sanatçılar, şarkılar ve türler; her birinde birleştirebileceğiniz filtreler ve hepsi için Karıştır.",
+        "list": [
+          "Biçim, 24 bit, 88,2 kHz ve üzeri, çok kanallı, tür, yıl, örnekleme hızı, kanallar ve analiz sonucu için filtreler. Arama, büyük/küçük harf ve aksan ayrımı yapmaz.",
+          "Düşündüğünüz birimlerle akıllı çalma listeleri: 24 bit, 88,2 kHz.",
+          "Bir albümün remaster’ları, mono ve stereo yayınları ve SACD’leri tek bir kartı paylaşır; açtığınızda baskıyı seçin.",
+          "Favoriler ve çalma sayıları arşivde tutulur, dosyalarınıza asla yazılmaz. M3U ve Apple Music çalma listelerini, çalma sayılarını ve favorileri içe aktarır.",
+          "Yedekleme ve tek adımda geri döndürme özellikli etiket düzenleyici; ayrıca bir şey yazmadan önce güven düzeyini gösteren MusicBrainz zenginleştirmesi.",
+          "SMB, NFS veya WebDAV üzerinden ağ paylaşımları; önbellekleme, Çevrimdışı Tut ve yavaş sunucular için tasarlanmış oynatma.",
+          "Müzik Bul, gerçek müziğinizi bulmak için her sürücüyü tarar ve karmaşayı geride bırakır. İlk açılıştaki kısa kurulum çıkışınızı seçer ve özel erişimin ve ReplayGain’in ne işe yaradığını açıklar.",
+          "Çıkış başına parametrik EQ; AutoEQ ve Equalizer APO ön ayarlarını içe aktarır. Varsayılan olarak kapalıdır; açıkken sinyal yolunda <span class=\"mono nowrap\">BIT-PERFECT</span> yerine <span class=\"mono nowrap\">EQUALIZER</span> yazar.",
+          "Mini Oynatıcı, menü çubuğu öğesi, medya tuşları, ReplayGain ve otomatik, imzalı güncellemeler."
+        ],
+        "links": [
+          "Tüm özellikler, ayrıntılı olarak"
+        ],
+        "alt": "Türler sayfası: her tür için, kapaklarından oluşan bir mozaikle bir karo."
+      },
+      "languages": {
+        "jack": "Diller",
+        "kicker": "{languages} dil",
+        "title": "Sizin dilinizi konuşur.",
+        "lede": "Her menü, ayar ve sinyal yolu mesajı, İngilizcenin yanı sıra {languages} dile çevrildi.",
+        "body": [
+          "Ukraynaca, Almanca ve Japoncadan Svahiliceye, Tamilceye ve Hausacaya; yerel çoğul biçimleri ve sayı biçimleriyle. Basitleştirilmiş, Geleneksel ve Hong Kong Çincesi ise her biri kendi sözcük dağarcığıyla. Arapça, İbranice, Farsça ve Urducada sağdan sola düzen kullanılır.",
+          "Çevirilerin nasıl denetlendiği: her değişiklikte çalışan otomatik bir denetim, uygulamadaki her dizenin {languages} dilin tümünde aynı yer tutucularla ve her dilin gerektirdiği çoğul biçimleriyle bulunduğunu doğrular; her ekran da her dilde kırpılmış ya da üst üste binen metin ve sağdan sola yansıtma açısından gözden geçirildi. Çeviriler özenli makine çevirileri olarak başladı; bu yüzden ana dili bu diller olan kişilerin düzeltmelerini <a href=\"{href.newIssue}\">GitHub</a>’da memnuniyetle karşılıyoruz."
+        ],
+        "alt": "Vespertine, {languagesTotal} arayüz dilinin her birinde yazılmış: ヴェスパタイン ve Веспертайн gibi yazımlardan فسبرتاين ve वेस्परटाइन gibi yazımlara kadar, karışık boyut ve yazı tiplerinde.",
+        "wallLabel": "Vespertine, her dilinde"
+      }
+    },
+    "formats": {
+      "eyebrow": "Biçimler",
+      "title": "Surround, kayıpsız ve kayıplı dosyalar.",
+      "text": "Stereo ve çok kanallı, PCM ve DSD, disk görüntüleri ve sıradan dosyalar; hepsinde CUE sayfası desteğiyle.",
+      "caption": "Vespertine’in çaldığı biçimler ve nasıl çaldığı",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "32 bit’e ve DAC’ınızın çalıştığı hıza kadar özgün örnekleme hızı ve bit derinliği (384 kHz’e kadar test edildi); 32 bit PCM’in değiştirilmeden çalınması tam sayı modu gerektirir. CUE sayfalı görüntüler."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF ve DSDIFF, DST sıkıştırmalı veya sıkıştırmasız. DoP, DAC’a ve taşıyıcı hızına bağlıdır; aksi hâlde PCM kullanılır. 384 kHz üzerindeki DoP taşıyıcı hızları donanımda test edilmedi."
+        },
+        {
+          "name": "SACD görüntüleri",
+          "text": "Stereo ve çok kanallı alanlar, DST sıkıştırmalı veya sıkıştırmasız, doğrudan görüntüden; her şarkı, stereo ve 5.1 sürümleriyle birlikte bir kez listelenir."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "48 ve 96 kHz’de 16, 20 ve 24 bit, 1 ila 8 kanal, bit bit birebir; her başlık bir albüm, her bölüm bir parça. DVD-Audio desteklenmez."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Atmos’lu Dolby Digital Plus: macOS’in nesne işleyicisiyle işlenir ya da kodu çözülmüş kanal tabanı çalınır."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Kayıpsız, bit-perfect olabilir; TrueHD Atmos’ta kanal tabanı çalınır, nesneleri işlenmez."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA kayıpsızdır ve bit-perfect olabilir; DTS:X’te kanal tabanı çalınır. Ham DTS’nin kodu çözülür; DTS-CD bitstream ayrı bir yoldur."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Kodu macOS tarafından çözülür. Alıcıya bitstream deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz."
+        },
+        {
+          "name": "DTS CD’leri ve DTS-WAV",
+          "text": "Tanınır ve kodu 5.1 olarak çözülür; CUE ile bölünmüş albümler de dahil."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Kayıpsız. WavPack içindeki DSD desteklenmez."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Kodu çözülür ve kayıplı olarak işaretlenir."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Karşılaştırma",
+      "title": "Rakipleriyle kıyasla.",
+      "intro": "Birçok Mac oynatıcısı bit-perfect oynatma sunuyor. Bu karşılaştırma, her oynatıcının kendi belgelerinin veya kaynak kodunun söylediklerine dayanır. “Belgelenmemiş”, özelliğin olmadığı anlamına gelmez; üreticinin bu konuda olumlu ya da olumsuz bir şey söylemediği anlamına gelir. Vespertine’de konvolüsyon, ses efekti eklentileri veya akış hizmetleri yoktur.",
+      "hint": "Devamı için kaydırın →",
+      "region": "Karşılaştırma tablosu (yana kayar)",
+      "caption": "Vespertine ile diğer yedi Mac müzik oynatıcısının, her oynatıcının kendi belgelerine veya kaynak koduna dayanan karşılaştırması",
+      "feature": "Özellik",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Kaynak kodu",
+          "GPL-3.0",
+          "Kapalı",
+          "Kapalı",
+          "Kapalı",
+          "Kapalı",
+          "Kapalı",
+          "GPL-2.0",
+          "Kapalı"
+        ],
+        [
+          "FLAC / DSD dosyaları",
+          "Evet / Evet",
+          "Hayır / Hayır",
+          "Evet / Evet",
+          "Evet / Evet",
+          "Evet / Evet",
+          "Evet / Evet",
+          "Evet / Evet",
+          "Evet / Hayır⁴"
+        ],
+        [
+          "DAC örnekleme hızını otomatik değiştirme",
+          "Evet",
+          "Hayır",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Belgelenmemiş"
+        ],
+        [
+          "Özel (hog) mod",
+          "Evet",
+          "Hayır",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Evet"
+        ],
+        [
+          "Örnekleri değiştirmeden 16/24 bit PCM",
+          "Koşullar + testler",
+          "macOS 27: üçüncü taraf testleri¹",
+          "Üretici beyanı",
+          "Üretici beyanı",
+          "Uygulama içi loopback testi",
+          "Üretici beyanı",
+          "Uygulama içi gösterge",
+          "Belgelenmemiş"
+        ],
+        [
+          "Yerel surround dosyaları",
+          "Evet²",
+          "Belgelenmemiş",
+          "Evet",
+          "Evet",
+          "Evet",
+          "Belgelenmemiş",
+          "Evet",
+          "Belgelenmemiş"
+        ],
+        [
+          "Yerel surround için Apple Uzamsal Ses",
+          "Evet",
+          "Yalnızca katalogdaki Atmos³",
+          "Belgelenmemiş",
+          "Belgelenmemiş",
+          "Belgelenmemiş",
+          "Belgelenmemiş",
+          "Evet",
+          "Belgelenmemiş"
+        ],
+        [
+          "Hi-Res dosya analizi",
+          "Evet",
+          "Hayır",
+          "AudioScan",
+          "Dinamik aralık, ses yüksekliği",
+          "Evet",
+          "Belgelenmemiş",
+          "Hayır (yalnızca canlı spektrum)",
+          "Hayır (yalnızca canlı spektrum)"
+        ],
+        [
+          "SACD ISO",
+          "Evet",
+          "Hayır",
+          "Evet",
+          "Hayır (yalnızca DSF/DFF)",
+          "Evet",
+          "Hayır",
+          "Hayır",
+          "Hayır⁴"
+        ],
+        [
+          "Konvolüsyon / ses efekti eklentileri",
+          "Hayır / Hayır",
+          "Hayır / Hayır",
+          "Evet (Origin: ücretli seçenek) / Audio Units",
+          "Evet / Hayır",
+          "Hayır / Hayır",
+          "Belgelenmemiş / Belgelenmemiş",
+          "Hayır / Hayır",
+          "Belgelenmemiş / Audio Units"
+        ],
+        [
+          "Akış hizmetleri",
+          "Hayır",
+          "Apple Music",
+          "Studio: evet; Origin: hayır",
+          "Evet",
+          "Hayır (yerel + UPnP)",
+          "Hayır (internet radyosu)",
+          "Hayır (internet radyosu)",
+          "Hayır (internet radyosu)"
+        ]
+      ],
+      "notes": [
+        "¹ macOS 27’deki Apple Music, <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">ASR’de bildirilen üçüncü taraf loopback testlerinde</a> %100 ses düzeyinde, 16/24 bit’te bit düzeyinde aynıydı. Bu bir Vespertine ölçümü değildir; özgün rapor bu güncelleme için bağımsız olarak yeniden doğrulanamadı. Mac’te hâlâ otomatik hız değiştirme, hog modu, FLAC veya DSD yok.",
+        "² Çok kanallı DAC çıkışı ve alıcıya bitstream deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz.",
+        "³ Apple, kafa izlemeli Uzamsal Ses’i Apple Music kataloğundaki Dolby Atmos parçaları için belgeliyor; kendi çok kanallı dosyalarınızın uzamsal olarak işlenmesini değil.",
+        "⁴ foobar2000 2.26 (macOS 27.0.1) üzerinde, hiçbir bileşen olmadan test edildi: DSF, DFF ve SACD ISO dosyaları “Unsupported file format” hatası veriyor. DSF ve DFF, FFmpeg ayrıca kurulup FFmpeg Decoder Wrapper’a eklendikten sonra yalnızca 352,8 kHz PCM olarak çalıyor; SACD ISO yine açılmıyor."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Kaynaklar ve kapsam</a>. Düzeltmelere açığız: <a href=\"{href.issues}\">bir issue açın</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Yenilikler",
+      "title": "{version} sürümündeki yenilikler.",
+      "latest": "Son sürüm",
+      "fullNotes": "Sürüm notlarının tamamı",
+      "meta": "zaten kurulu mu? Kendiliğinden güncellenir ya da {brewUpgrade}",
+      "earlier": "Önceki sürümler",
+      "every": "Tüm sürümler",
+      "inEnglish": "Bu sürüm notları henüz çevrilmediği için İngilizce gösteriliyor."
+    },
+    "faq": {
+      "eyebrow": "SSS",
+      "title": "Sorular ve yanıtlar.",
+      "items": [
+        {
+          "q": "Gerçekten ücretsiz mi?",
+          "a": "Evet. Vespertine, GPL-3.0 kapsamında ücretsiz ve açık kaynaklıdır. Hesap, abonelik, reklam ve telemetri yoktur (<a href=\"{href.privacy}\">gizlilik</a>). İnternete yalnızca güncellemeleri denetlemek için ve siz istediğinizde MusicBrainz’e, Cover Art Archive’a veya ListenBrainz’e erişmek ya da Discord durumunuz için kapak bulmak amacıyla bağlanır."
+        },
+        {
+          "q": "Neye ihtiyacım var?",
+          "a": "Apple silicon veya Intel tabanlı bir Mac’te macOS {minMacOS} ({minMacOSName}) veya sonrası. Intel donanımı test edilmedi; Intel derlemesi Rosetta altında çalıştırıldı ve gerçek Intel Mac’lerden gelecek raporları memnuniyetle karşılarız."
+        },
+        {
+          "q": "Nasıl kurar ve güncellerim?",
+          "a": "DMG’yi indirin, açın ve Vespertine’i Uygulamalar klasörüne taşıyın. Developer ID ile imzalanmıştır, Apple tarafından noter onayından geçirilmiştir ve kendini günceller; her güncelleme imzalıdır. Homebrew ile: {brew}, ardından {brewUpgrade} ya da uygulamanın kendi güncellemeleri."
+        },
+        {
+          "q": "Qobuz, TIDAL veya Apple Music’ten akış yapıyor mu?",
+          "a": "Hayır. Vespertine, Mac’inizdeki, harici disklerdeki veya bir ağ paylaşımındaki, sahibi olduğunuz müziği çalar. DRM korumalı Apple Music abonelik indirmeleri çalınamaz."
+        },
+        {
+          "q": "Gerçekten bit-perfect olduğunu nasıl bilebilirim?",
+          "a": "Sinyal yolu, Core Audio’nun gerçekte ne yaptığını geri okur: aygıtın nominal hızını, fiziksel biçimini ve aygıtı kimin tuttuğunu. Kod çözücülerin otomatik testleri vardır (TrueHD kaynağıyla, DTS ise FFmpeg’in kendi kod çözücüsüyle karşılaştırılarak); yerleşik bir loopback testi yazılım yolunu örnek örnek denetler ve <span class=\"mono nowrap\">vespertine-probe</span> kendi donanımınızı denetlemenizi sağlar. <a href=\"{href.verification}\">Kendiniz nasıl doğrularsınız</a>."
+        },
+        {
+          "q": "SACD ve DVD disklerini çalabilir mi?",
+          "a": "Disk görüntülerini çalar. Stereo ve çok kanallı, DST sıkıştırmalı veya sıkıştırmasız SACD <code>.iso</code> görüntüleri ile DVD-Video görüntülerindeki ya da <code>VIDEO_TS</code> klasörlerindeki LPCM müzik, hiçbir şey çıkarılmadan doğrudan görüntüden çalınır. DVD-Audio desteklenmez; şifreli (CSS) DVD’ler için şifresi çözülmüş bir kopya gerekir."
+        },
+        {
+          "q": "Dolby Atmos çalıyor mu?",
+          "a": "Atmos’lu Dolby Digital Plus, macOS’in nesne işleyicisi üzerinden, AirPods’ta kafa izlemeli Uzamsal Ses olarak çalar. TrueHD Atmos ve DTS:X kayıpsız kanal tabanlarını çalar; nesneleri işlenmez. AV alıcısına bitstream deneyseldir, gerçek alıcılarda test edilmedi; raporlarınızı bekliyoruz."
+        },
+        {
+          "q": "Dosyalarımı değiştirir mi?",
+          "a": "Yalnızca etiketleri düzenlediğinizde; o durumda da her dosya önce yedeklenir ve tek adımda geri alınabilir. Klasörlere yerinde başvurulur; içe aktarma, fazladan yer kaplamayan APFS klonları oluşturur."
+        },
+        {
+          "q": "Hangi donanımlarda test edildi?",
+          "a": "Oynatma şu donanımlarda test edildi: 384 kHz’e kadar hızlarda, DoP ve tam sayı moduyla bir FiiO K11; USB-C ve Bluetooth üzerinden AirPods Max; MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV. Intel donanımı test edilmedi. Alıcıya bitstream ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
+        },
+        {
+          "q": "Benim dilimde mi?",
+          "a": "Büyük olasılıkla: arayüz İngilizcenin yanı sıra, sağdan sola yazılan Arapça, İbranice, Farsça ve Urduca dahil {languages} dilde daha sunuluyor. Vespertine, Sistem Ayarları’nda kendisi için belirlenen dili kullanır. Anadili konuşanlardan gelen düzeltmeleri <a href=\"{href.newIssue}\">GitHub</a>’da memnuniyetle karşılarız."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Destek",
+      "title": "Vespertine’in büyümesine yardım edin.",
+      "text": "Ücretsiz, açık kaynaklı ve herkesin gözü önünde geliştiriliyor. İşte nasıl yardım edebileceğiniz.",
+      "cards": [
+        {
+          "title": "GitHub’da sponsor olun",
+          "text": "Vespertine ücretsizdir. İşinize yarıyorsa, GitHub’daki bir sponsorluk geliştirilmesini destekler.",
+          "cta": "Sponsor olun"
+        },
+        {
+          "title": "DAC’ınızı bildirin",
+          "text": "DAC’ınızın, ses arabiriminizin veya alıcınızın nasıl davrandığını bize anlatın. Her aygıt raporu, gerçek donanımda denetlenenlerin kapsamını genişletir.",
+          "cta": "Aygıt raporu gönderin"
+        },
+        {
+          "title": "Bir çeviriyi düzeltin",
+          "text": "{languages} dilden birinde kulağa tuhaf gelen bir ifade mi gördünüz? Daha iyi bir ifadeyle bir issue açın.",
+          "cta": "Düzeltme önerin"
+        },
+        {
+          "title": "Kodu okuyun",
+          "text": "Hata raporları, pull request’ler ve sorular memnuniyetle karşılanır. Sinyal yolu koşulları ve testlerinin tamamı depoda.",
+          "cta": "Kaynak kodu GitHub’da"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "İndir",
+      "title": "Surround koleksiyonunuzu Mac’inizde çalın.",
+      "meta": [
+        "Ücretsiz",
+        "açık kaynak",
+        "sürüm {version}",
+        "macOS {minMacOS} veya sonrası"
+      ]
+    }
+  },
+  "press": {
+    "title": "Basın kiti: Mac için surround ve hi-res müzik oynatıcısı Vespertine",
+    "description": "Mac için ücretsiz, açık kaynak surround ve hi-res müzik koleksiyonu oynatıcısı Vespertine’in temel bilgileri, logoları, tanıtım görselleri, gerçek ekran görüntüleri ve fragmanı.",
+    "ogAlt": "Vespertine basın kiti: bilgi sayfası, logolar, tanıtım görselleri, gerçek ekran görüntüleri ve fragman; arka planda uygulamanın üç gerçek ekran görüntüsü.",
+    "eyebrow": "Basın kiti",
+    "heading": "Hakkında yazmak için ihtiyacınız olan her şey",
+    "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk imajları, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta baş takipli Uzamsal Ses de var. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
+    "fine": "Kanalı kanalına çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz. Dolby Digital Plus Atmos nesnelerini macOS işler; TrueHD Atmos ve DTS:X kanal tabanlarını (channel bed) çalar.",
+    "facts": {
+      "eyebrow": "Bilgi sayfası",
+      "title": "Temel bilgiler.",
+      "name": "Ad",
+      "formerly": "(0.6.0 sürümüne kadar adı {formerName} idi)",
+      "developer": "Geliştirici",
+      "developerValue": "{author}, bağımsız geliştirici",
+      "price": "Fiyat",
+      "priceValue": "Ücretsiz. GPL-3.0 lisansıyla açık kaynak; hesap, abonelik, reklam veya telemetri yok",
+      "platform": "Platform",
+      "platformValue": "macOS {minMacOS} {minMacOSName} veya üstü, Apple silicon ve Intel",
+      "current": "Güncel sürüm",
+      "currentValue": "{version}, {date} tarihinde yayımlandı",
+      "currentFine": "İmzalı ve noter onaylı DMG ({size}), kendi kendini günceller",
+      "first": "İlk sürüm",
+      "firstFine": "({formerName} 0.1.0 olarak)",
+      "languages": "Diller",
+      "languagesValue": "İngilizce ve Ukraynaca, Arapça, İbranice, Japonca ile üç tür Çince dahil {languages} dil daha",
+      "install": "Kurulum",
+      "installValue": "<a href=\"{href.dmg}\">DMG’yi indirin</a> veya {brew}",
+      "tested": "Test edildiği cihazlar",
+      "testedValue": "FiiO K11 (384 kHz’e kadar tüm örnekleme hızları, DoP, tam sayı modu), USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri",
+      "links": "Bağlantılar",
+      "website": "Web sitesi",
+      "source": "Kaynak kod",
+      "releaseNotes": "Sürüm notları",
+      "verify": "Bit-perfect oynatma nasıl doğrulanır"
+    },
+    "angle": {
+      "eyebrow": "Odak",
+      "title": "Neye odaklanıyor.",
+      "list": [
+        "Tek bir Mac arşivinde surround müzik: SACD ve DVD-Video imajlarından, rip’lerden ve DTS CD’lerden TrueHD ve DD+ Atmos’a kadar; AirPods’ta Uzamsal Ses ile.",
+        "Herkesin okuyabileceği, derleyebileceği ve değiştirebileceği ücretsiz GPL-3.0 kaynak kodu.",
+        "Örnekleme hızını, bit derinliğini (word length), kazancı ve kanal işlemeyi gösteren bir sinyal yolu. Bit-perfect koşulları kodda tanımlıdır; testler, yerleşik bir loopback testi ve bir <a href=\"{href.verification}\">doğrulama kılavuzu</a> eşliğinde."
+      ],
+      "text": "Hi-res dosya analizi de dahildir. Sıfır dolgu (zero padding) tespiti kesindir; spektral değerlendirmeler ise sınırları olan tahminlerdir. VeraVox ve Audirvana AudioScan de analiz sunar. <a href=\"{href.comparison}\">Karşılaştırma kaynakları</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Fragman.",
+      "text": "44 saniye, 16:9, 60 fps’de 1080p, sesli. <a href=\"{href.trailerDownload}\" download>MP4’ü indirin</a> ({size}). İstek üzerine 4K master da sağlanabilir.",
+      "fallback": "Fragmanı indirin (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Marka",
+      "title": "Logo.",
+      "text": "Her zaman küçük harfle, hilal her zaman pirinç renginde. Lütfen yeniden renklendirmeyin, esnetmeyin veya harflerini yeniden dizmeyin. <a href=\"{href.brandGuide}\">Marka kılavuzu (PDF)</a>.",
+      "primaryAlt": "Vespertine logosu: pirinç renkli bir hilal ve vespertine sözcüğü",
+      "stackedAlt": "Vespertine logosunun alt alta düzeni",
+      "primary": "Ana",
+      "stacked": "Alt alta",
+      "onLight": "açık zeminde:",
+      "crescent": "yalnızca hilal:"
+    },
+    "art": {
+      "eyebrow": "Tanıtım görselleri",
+      "title": "Her özelliğe bir görsel.",
+      "text": "Üç boyutta: 2400×1350, 1600×900 ve 1270×760.",
+      "items": {
+        "bit-perfect": "Koşullar sağlandığında bit-perfect",
+        "fake-hi-res": "Sahte hi-res tespiti",
+        "spatial-audio": "AirPods’ta Uzamsal Ses olarak surround",
+        "native-dsd": "DoP üzerinden yerel DSD",
+        "stereo-and-surround": "Stereo ve surround sürümleri",
+        "sacd-iso": "Doğrudan çalınan SACD imajları",
+        "languages": "{languages} dil"
+      }
+    },
+    "shots": {
+      "eyebrow": "Ekran görüntüleri",
+      "title": "Gerçek uygulama.",
+      "text": "Geliştiricinin kendi arşivinden, 2400×1500. Albüm kapakları sahiplerine aittir.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24 bit / 96 kHz, Fosi Audio ZD3’te bit-perfect: Lazar Berman, Liszt’in Les jeux d’eaux à la Villa d’Este eseri",
+        "multichannel-albums": "Çok kanallı olarak filtrelenmiş albümler",
+        "stereo-and-surround-versions": "Stereo ve 5.1 sürümleriyle çıkarılmış SACD parçaları",
+        "spatial-audio-airpods-max": "AirPods Max’te Uzamsal Ses olarak 24/88,2 5.1 bir albüm (Elton John, Goodbye Yellow Brick Road)",
+        "fake-hi-res-detection": "16 kHz’de kesilen 24/192 bir “remaster” (kasıtlı bir sahte: fragmanın kendi müziği, MP3’e kodlanıp upsampling uygulanmış, uydurma bir grup adıyla)",
+        "dsd-native-dop": "Fosi Audio ZD3’te DoP üzerinden 352,8 kHz’de DSD128: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Doğrudan imajdan çalınan bir SACD .iso: Dire Straits, Brothers In Arms",
+        "genres": "Türler",
+        "search": "Arama",
+        "smart-playlist": "USB-C üzerinden AirPods Max’te bit-perfect çalan bir akıllı çalma listesi",
+        "loopback-test": "Loopback testi: çıkış yolunun örnek örnek yazılımsal denetimi",
+        "setup-welcome": "İlk açılış kurulumu: karşılama",
+        "setup-output": "İlk açılış kurulumu: hatırlanacak çıkışı seçme",
+        "output-settings": "Çıkış ayarları: hatırlanan çıkış, yedek çıkış, 16 bit eşleştirme",
+        "equalizer": "AutoEQ ön ayarıyla parametrik EQ"
+      }
+    },
+    "contact": {
+      "eyebrow": "İletişim",
+      "title": "Bize ulaşın.",
+      "text": "Basın, sorular ve röportaj talepleri: {email}. Topluluk soruları: <a href=\"{href.discussions}\">GitHub Discussions</a>. Hatalar ve cihaz raporları: <a href=\"{href.issues}\">GitHub sorun kayıtları</a>."
+    }
+  },
+  "privacy": {
+    "title": "Gizlilik: Vespertine hiçbir şey toplamaz",
+    "description": "Vespertine uygulaması hiçbir şey toplamaz: hesap, analitik, telemetri, çökme raporu veya reklam yok. Uygulamanın ve bu web sitesinin nelere bağlandığı ve neden.",
+    "ogAlt": "Vespertine gizliliği: Vespertine hiçbir şey toplamaz. Hesap, analitik, telemetri, çökme raporu veya reklam yok.",
+    "eyebrow": "Gizlilik",
+    "heading": "Vespertine",
+    "headingBrass": "hiçbir şey toplamaz.",
+    "updated": "Yürürlük tarihi: {effective} (isteğe bağlı Discord durumu eklendi). “Bu web sitesi” bölümü {websiteUpdated} tarihinde güncellendi: site artık ziyaretleri kendi barındırdığımız, çerezsiz istatistiklerle sayıyor.",
+    "intro": "Vespertine ücretsiz, açık kaynak bir müzik oynatıcısıdır. Uygulamada hesap, analitik, telemetri, çökme raporu ve reklam yoktur. Geliştiriciye sizin veya müziğiniz hakkında hiçbir bilgi ulaşmaz. Kaynak kod herkese açık olduğundan bu sayfadaki her ifadeyi kendiniz doğrulayabilirsiniz.",
+    "staysTitle": "Mac’inizde kalanlar",
+    "stays": "Arşiv veritabanınız, çalma listeleriniz, çalma sayılarınız, dosya analizi sonuçlarınız, kapak görseli önbelleğiniz ve ayarlarınız Mac’inizdeki kullanıcı Kitaplık klasörünüzde saklanır. Ağ paylaşımlarının parolaları ve eklediyseniz ListenBrainz belirteciniz (token) macOS Anahtar Zinciri’nde saklanır. Bunların hiçbiri hiçbir yere yüklenmez.",
+    "onlineTitle": "Uygulama ne zaman internete bağlanır",
+    "online": [
+      "<strong>Güncelleme denetimleri.</strong> Vespertine güncelleme akışını yaklaşık günde bir kez ve siz Güncellemeleri Denetle’yi seçtiğinizde GitHub’dan ister. Her indirmede olduğu gibi GitHub IP adresinizi görür. Otomatik denetimleri Ayarlar’dan kapatabilirsiniz.",
+      "<strong>MusicBrainz ve Cover Art Archive.</strong> Yalnızca “MusicBrainz’de ara” veya “Meta Verileri Zenginleştir” özelliğini kullandığınızda (Bu Mac’teki Müzikleri Bul, eklediği müzikler için Zenginleştir’i işaretini kaldırabileceğiniz bir onay kutusu olarak sunar), Vespertine aradığı albüm, sanatçı ve parça adlarını musicbrainz.org’a gönderir. Ayarlar’da “Kapak görselini getir” açıksa kapakları coverartarchive.org’dan indirir; bu site onları Internet Archive (archive.org) üzerinden sunar. MusicBrainz ve Cover Art Archive, MetaBrainz Foundation tarafından işletilir.",
+      "<strong>ListenBrainz.</strong> Yalnızca scrobbling’i açıp belirtecinizi girerseniz Vespertine çaldığınız şarkıları listenbrainz.org’a gönderir: başlık, sanatçı, albüm, süre ve dosyalarınızda varsa MusicBrainz kimlikleri. Bir şarkı başladığında “şimdi çalıyor” bilgisini, şarkının yarısını veya dört dakikasını dinlediğinizde de zamanıyla birlikte bir dinleme kaydı gönderir.",
+      "<strong>Discord.</strong> Yalnızca Ayarlar’da Discord durumunu açarsanız Vespertine, Mac’inizden dışarı çıkmayan bir bağlantı üzerinden Mac’inizdeki Discord uygulamasına neyin çaldığını bildirir: başlık, sanatçı, albüm, biçim ve ilerleme. Discord bunu, etkinliğinizi görebilen kişilere durumunuz olarak gösterir. Albüm kapağını göstermek için Vespertine kapağı adıyla arar, çünkü Discord yalnızca web’deki görselleri gösterebilir: dosyalarınızda bir MusicBrainz yayın kimliği varsa coverartarchive.org’da, yoksa sanatçı ve albüm adlarını alan Apple’ın iTunes Search hizmetinde (itunes.apple.com). Discord da kapağı oradan indirir. Kapakları kapatabilirsiniz; dosyalarınız ve kapakları hiçbir zaman yüklenmez.",
+      "<strong>Ağ paylaşımları.</strong> Vespertine müziğinizi okumak için yalnızca eklediğiniz sunuculara bağlanır, başka hiçbir yere değil. Bir paylaşım bağlıyken sunucunun hâlâ yanıt verdiğini yaklaşık dakikada bir denetler ve yarım saatte bir yeni müzik arar (o paylaşımdan çalarken asla)."
+    ],
+    "websiteTitle": "Bu web sitesi",
+    "website": [
+      "Bu site, ziyaretçilerin IP adreslerini kaydedebilen GitHub Pages’de barındırılır; bkz. <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">GitHub’ın gizlilik bildirimi</a>. İndirme düğmeleri, uygulamanın GitHub’daki sürümlerine bağlantı verir. Site çerez yerleştirmez; yazı tiplerini, görsellerini ve videosunu bu siteden yükler.",
+      "Hangi sayfaların ve düğmelerin kullanıldığını öğrenmek için site, ziyaretleri stats.szeremeta.org adresinde kendimiz çalıştırdığımız, gizlilik dostu bir yazılım olan <a href=\"https://umami.is\">Umami</a> ile sayar. Umami çerez yerleştirmez, cihazınızda hiçbir şey saklamaz, IP adresinizi tutmaz ve reklamcılarla ya da başka herhangi bir şirketle hiçbir şey paylaşmaz. Sayfayı, geldiğiniz siteyi, yaklaşık ülkenizi, tarayıcınızı, işletim sisteminizi, ekran boyutunuzu ve dilinizi, ayrıca indirme, GitHub ve Homebrew düğmelerine yapılan tıklamaları kaydeder. Sizi web siteleri arasında izleyemez veya kimliğinizi belirleyemez; tarayıcısı Do Not Track sinyali gönderen ziyaretçileri saymaz. <strong>Uygulama ona hiçbir zaman bağlanmaz.</strong>",
+      "Sitenin dil menüsünden bir dil seçerseniz tarayıcınız bu seçimi cihazınızda (yerel depolamasında) hatırlar; böylece site dili geri değiştirmez. Bu bilgi hiçbir yere gönderilmez ve site onsuz da aynı şekilde çalışır."
+    ],
+    "changesTitle": "Değişiklikler ve iletişim",
+    "changes": "Bu durum bir gün değişirse bunu ilk önce bu sayfa ve sürüm notları duyuracaktır. Sorularınızı <a href=\"{href.issues}\">GitHub sorun kaydı</a> olarak memnuniyetle bekliyoruz."
+  },
+  "terms": {
+    "title": "Koşullar: Vespertine, GPL lisanslı özgür yazılımdır",
+    "description": "Vespertine, GNU General Public License sürüm 3 veya sonrası kapsamında özgür yazılımdır: ücret yok, kayıt yok, garanti yok.",
+    "ogAlt": "Vespertine koşulları: özgür yazılım, açık ve net. GNU General Public License, sürüm 3 veya sonrası.",
+    "eyebrow": "Koşullar",
+    "heading": "Özgür yazılım,",
+    "headingBrass": "açık ve net.",
+    "updated": "Yürürlük tarihi: {effective}",
+    "licenseTitle": "Lisans",
+    "license": "Vespertine, <a href=\"{href.license}\">GNU General Public License, sürüm 3 veya sonrası</a> kapsamında özgür yazılımdır. Onu her amaçla kullanabilir, kaynak kodunu inceleyip değiştirebilir ve değiştirilmiş olanlar dahil kopyalarını aynı lisans altında paylaşabilirsiniz. Hiçbir ücreti yoktur ve kaydolmanızı gerektiren hiçbir şey yoktur.",
+    "warrantyTitle": "Garanti yok",
+    "warranty": "Lisansta belirtildiği gibi Vespertine, yasaların izin verdiği ölçüde, hiçbir türde garanti olmaksızın “olduğu gibi” sunulur. Müziğinizin yedeklerini alın. Vespertine dosyaları yalnızca etiketlerini düzenlediğinizde değiştirir ve önce her birini yedekler; yine de kullanım riski size aittir.",
+    "musicTitle": "Müziğiniz ve diğer hizmetler",
+    "music": "Eklediğiniz müziği çalma hakkına sahip olmak sizin sorumluluğunuzdadır. Vespertine DRM korumalı dosyaları çalamaz ve çalmaya da çalışmaz. MusicBrainz, Cover Art Archive ve ListenBrainz kendi koşulları olan bağımsız hizmetlerdir; bunları Vespertine üzerinden kullandığınızda bu koşullar geçerlidir.",
+    "trademarksTitle": "Ticari markalar",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ve Dolby TrueHD, Dolby Laboratories’in ticari markalarıdır. DTS, DTS-HD Master Audio ve DTS:X, DTS, Inc.’in ticari markalarıdır. Apple, AirPods, AirPods Max, Mac, macOS ve Uzamsal Ses (Spatial Audio), Apple Inc.’in ticari markalarıdır. Vespertine bunları yalnızca neyi ve nerede çaldığını açıklamak için anar. Dolby, DTS veya Apple tarafından sertifikalandırılmamış, lisanslanmamış ya da onaylanmamıştır.",
+    "contactTitle": "İletişim",
+    "contact": "Hatalar, sorular ve talepler: <a href=\"{href.issues}\">GitHub sorun kayıtları</a>.",
+    "englishNote": "Bu çeviri kolaylık olsun diye sunulmuştur. Bağlayıcı metin GNU General Public License’ın kendisidir ve İngilizcedir."
+  },
+  "notFound": {
+    "title": "Sayfa bulunamadı: Vespertine",
+    "description": "Bu sayfa burada değil. Vespertine, surround ve Hi-Res müzik koleksiyonları için ücretsiz, açık kaynaklı Mac oynatıcısıdır.",
+    "ogAlt": "Vespertine: surround ve Hi-Res müzik için ücretsiz, açık kaynaklı Mac oynatıcısı.",
+    "eyebrow": "404 · Sinyal yok",
+    "heading": "Bu sayfa",
+    "headingBrass": "burada değil.",
+    "lede": "Bağlantı eski olabilir ya da adres yanlış yazılmış olabilir. Vespertine ile ilgili her şey ana sayfada başlar.",
+    "home": "Ana sayfaya git"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} veya sonrası",
+    "processor": "Apple silicon (arm64) veya Intel (x86-64)",
+    "subCategory": "Müzik oynatıcı",
+    "sourceName": "Vespertine kaynak kodu",
+    "trailerName": "Vespertine tanıtım videosu",
+    "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 44 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve Hi-Res dosya analizi.",
+    "keywords": "bit-perfect, hi-res ses, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Uzamsal Ses, AirPods Max, FLAC, müzik oynatıcı, macOS, açık kaynak"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 oda düzeltmesi getiriyor: hoparlörlerinizi bir UMIK-1 mikrofonla ölçün ve odanız için hazırlanmış filtrelerle dinleyin. Ayrıca ağdan oynatmada verinin tükenmesini önlüyor.",
+      "notes": "### Oda düzeltmesi\n- **Odanızı ölçün.** Kalibre edilmiş bir UMIK-1 mikrofonu dinleme koltuğuna koyun; Vespertine her hoparlörden sırayla test taramaları çalar. Önce her hoparlörün seviyesini ve o hoparlöre giden yolu denetler, hatalı bir ölçümü reddeder ve yeniden denemenize ya da kaldığınız yerden devam etmenize olanak tanır.\n- **Her hoparlör için filtreler.** Vespertine ölçümden her hoparlör için küçük bir filtre seti oluşturur; bunlar çoğunlukla odanın eklediği bas tepeleri için kesimlerdir. Grafik; ölçüleni, düzeltme sonrası tahmin edileni ve hedefi gösterir, tahmin de tahmin olarak etiketlenir. Bir hedef (Hafif eğim, Düz veya Sıcak) ve bir aralık (yalnızca bas veya tam aralık) seçin; filtreler kayıtlı ölçümden yeniden uyarlanır.\n- **Varsayılan olarak kapalı, yani bit-perfect bit-perfect kalır.** Oda düzeltmesi çıkış başına açılır ve ölçümün yapıldığı çıkışa bağlıdır. Örnekleri değiştirdiği sürece sinyal yolunda ODA DÜZELTMESİ yazar ve akış artık bit-perfect olarak işaretlenmez. Vespertine’in işlediği stereo PCM’e uygulanır; DoP üzerinden DSD, bitstream’ler, Atmos ve diğer kanal sayılarında devre dışı kalır ve nedenini söyler. Açıkken Tam sayı modu ve 16 bit’e Eşleştir kapalı kalır.\n- **Nerede bulunur?** Görüntü → Oda Düzeltmesi; ayrıca Ekolayzır penceresinden ve her çıkışın ayarlarından. Bir ölçümü kaydedebilir, etkinleştirebilir, atabilir ya da kaydedilmiş bir `room-profile.json` dosyasını içe aktarabilirsiniz. Bu, önceki beta Oda Ölçümü penceresinin yerini alır. Yöntem `docs/ROOM-CORRECTION.md` dosyasında anlatılıyor.\n\n### Ağdan oynatma\n- **NAS’tan daha az kesinti.** Ağ paylaşımındaki parçalar artık çalınmadan önce Mac’inize kopyalanıyor ve sonraki parça önceden kopyalanıyor; böylece ağdaki bir aksama artık müziği durdurmuyor. Büyük DSD dosyaları, önde uzun bir tampon hazır tutacak şekilde okunuyor.\n- **Oynat düğmesinde yükleme halkası.** Vespertine ağdan veri beklerken oynat/duraklat düğmesinde dönen küçük bir halka görünür (Hareketi Azalt açıkken hareketsizdir). Kısa süreli okuma hataları yeniden denenir.\n- **Sınırlar.** Çok uzun bir kesinti ya da müzikten daha yavaş bir bağlantı, oynatmanın yeniden dolmak için duraklamasına yine de yol açabilir. Önbelleğe alınan kopyalar en fazla 8 GB kullanır; bundan büyük bir kaynak açık bir iletiyle başarısız olur. Bkz. `docs/NETWORK-PLAYBACK.md`.\n\n### Diğer yenilikler\n- **Bilinen DAC’larda DoP varsayılan olarak açık.** FiiO K11 ve Fosi Audio ZD3, DoP açık olarak başlar. Kapatırsanız Vespertine bunu hatırlar.\n- **Son Eklenenler 150 albüm gösteriyor**, önceden 60’tı; böylece büyük bir içe aktarma, kendisinden hemen önceki albümleri listeden düşürmüyor.\n- **Fosi Audio ZD3.** ZD3 artık desteklenen aygıtlar listesinde ve web sitesindeki ekran görüntüleri bu aygıtla yeniden alındı.\n- **Web sitesi.** İndirme düğmelerinin altında “GitHub’da yıldız verin” ve “Tartışmaya katılın” satırı yer alıyor.\n\n### Doğrulama\n- Motor, arşiv ve uygulama test paketleri geçiyor; oda filtresi tasarımı, yeni düzeltme aşamasından oynatma, ölçüm adımları ve ağ önbelleği için yeni testler de dahil. Gerçek zamanlı ses kodu ayrıca adres ve tanımsız davranış (undefined behavior) sanitizer’larıyla denetleniyor.\n- Henüz testlerle denetlenmeyenler: gerçek donanımda oda düzeltmesiyle oynatma ve gerçek bir UMIK-1 ile ölçüm sihirbazı."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2, 5.1 DSD’yi AirPods’ta Uzamsal Ses’te çalıyor, sesin ne zaman dönüştürüldüğünü veya indirgendiğini bildiriyor ve çıkarken artık takılmıyor.",
+      "notes": "### Uzamsal Ses\n- **5.1 DSD artık Uzamsal Ses’te çalıyor.** 5.1 bir DSD dosyası (DSF, DSDIFF, DST sıkıştırmalı DSDIFF veya bir SACD görüntüsü) PCM’e dönüştürülür ve her kanal ait olduğu yere yerleştirilir; böylece LFE ve surround kanalları artık kaybolmaz. Önceden ayrık DSDIFF kanalları üç hoparlörlük bir kanal tabanına düşebiliyor ve arka kanallar kayboluyordu.\n- **Sese ne olduğunu söylüyor.** Sinyal yolu, UZAMSAL veya bir downmix’in yanında **DSD → PCM** gösterir; geçerli olduklarında iki yeni bildirim, “DSD'den dönüştürüldü” ve “Stereoya indirgendi”, görünür. İkisi de 44 dilin tamamına çevrildi.\n- Geliştirici tarafından AirPods Max’te denetlendi.\n\n### Düzeltilenler\n- **Çıkarken artık takılma yok.** Vespertine ses aygıtını beklerken Cmd-Q dönen bir imleç bırakabiliyordu. Artık hemen çıkıyor.\n- **Çok kanallı dosyalar doğru okunuyor.** RF64 ve Wave64 dosyaları düzgün açılıyor, DSD kanal adları dosyadan okunuyor ve ayrık çok kanallı yönlendirme dosyanın kendi kanal düzenini izliyor.\n\n### Doğrulama\n- Motor, arşiv ve uygulama test paketleri geçiyor; her 5.1 DSD biçimini Uzamsal Ses üzerinden çalıp her kanalın yerine ulaştığını denetleyen yeni testler de dahil. Sol/sağ yerleşim denetimi yalnızca gerçek Mac’lerde çalışır; GitHub’ın test makineleri yalnızca bu tek denetimi atlar."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine artık ekolayzırın çalan şeyi değiştiremediği durumları bildiriyor, her USB-C AirPods Max modeli için isteğe bağlı bir referans ekolayzır sunuyor ve gerçek donanımda ilk çok kanallı sonucunu aldı."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine artık çaldıklarınızın geçmişini tutuyor, Sıradakiler’e arşivin yanında kendi panelini veriyor, bir albümün tüm baskılarını tek kartta gösteriyor ve çaldığınız şeyi Discord durumunuz olarak gösterebiliyor."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine artık Açık Mod’da düzgün çalışıyor, ses düzeyi denetimi olmayan çıkışların Vespertine’in ses düzeyini kullanmasına olanak tanıyor ve siz bir ağ paylaşımından dinlerken arşivinizi analiz etmeyi sürdürüyor."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine artık yavaş ağ paylaşımlarından akıcı biçimde çalıyor, büyük arşivleri paylaşımlar dahil daha hızlı analiz ediyor, küçük USB-C DAC’larda Hi-Res sesi sundukları en yüksek hızda çalıyor ve klavyeyi ve çoklu seçimleri beklediğiniz yerde tutuyor."
+    },
+    "0.12.0": {
+      "hash": "f25478b5e324",
+      "summary": "Vespertine artık DST sıkıştırmalı DSDIFF dosyalarını ve DVD-Video disklerindeki LPCM müziği yerel olarak çalıyor, EAC CUE sayfalarının tüm parçalarını koruyor ve bir arşiv taraması sürerken bile ağ paylaşımındaki şarkıları hemen başlatıyor."
+    }
+  }
+}

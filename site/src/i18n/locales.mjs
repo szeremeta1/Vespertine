@@ -59,6 +59,16 @@ export const CODES = LOCALES.map((l) => l.code);
 export const STORAGE_KEY = 'vespertine-lang';
 
 /**
+ * matchLocale as ES5 source, for the inline redirect script in <head> (bundlers reformat Function.toString(), which
+ * would break its CSP hash). scripts/check-i18n.mjs checks it answers exactly like matchLocale below.
+ */
+export const MATCH_LOCALE_SRC =
+  "function matchLocale(tag){var t=String(tag||'').toLowerCase();if(!t)return null;for(var i=0;i<CODES.length;i++)if(CODES[i].toLowerCase()===t)return CODES[i];" +
+  "var p=t.split('-'),l=p[0],r=p.slice(1),has=function(x){return r.indexOf(x)>=0};" +
+  "if(l==='zh'){if(has('hant'))return has('hk')||has('mo')?'zh-HK':'zh-Hant';if(has('hans'))return 'zh-Hans';if(has('hk')||has('mo'))return 'zh-HK';if(has('tw'))return 'zh-Hant';return 'zh-Hans'}" +
+  "if(l==='pt')return r.length&&!has('br')?'pt-PT':'pt-BR';var a={no:'nb',nn:'nb',tl:'fil',iw:'he','in':'id'}[l];if(a)return a;return CODES.indexOf(l)>=0?l:null}";
+
+/**
  * The supported locale a browser language tag maps to, or null. Exact tags first (pt-BR, zh-HK), then Chinese by
  * script or region, Portuguese by region, Norwegian, legacy codes, then the primary language.
  */

@@ -1,6 +1,6 @@
 // The site's inline scripts. They live here so astro.config.mjs can hash them for the CSP:
 // Astro hashes the scripts it bundles, not `is:inline` ones. Edit here, never in the pages.
-import { CODES, STORAGE_KEY, matchLocale } from './i18n/locales.mjs';
+import { CODES, STORAGE_KEY, MATCH_LOCALE_SRC } from './i18n/locales.mjs';
 
 /** <head>: mark JS + motion before first paint, so the CSS intro and JS-only styles apply without a flash. */
 export const HEAD_CLASSES =
@@ -17,7 +17,7 @@ export const DEFER_IMAGES =
  * the visitor arrived from another page of this site. Locale matching is matchLocale in src/i18n/locales.mjs.
  */
 export const LANG_REDIRECT =
-  `(function(){var CODES=${JSON.stringify(CODES)};${matchLocale.toString()}` +
+  `(function(){var CODES=${JSON.stringify(CODES)};${MATCH_LOCALE_SRC}` +
   `try{var p=location.pathname;if(p!=='/'&&p!=='/index.html')return;var s=null;try{s=localStorage.getItem(${JSON.stringify(STORAGE_KEY)})}catch(e){}` +
   `var to=null;if(s){if(s!=='en'&&CODES.indexOf(s)>=0)to=s}else{var r=document.referrer;if(r){try{if(new URL(r).host===location.host)return}catch(e){}}` +
   `var l=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language];for(var i=0;i<l.length;i++){var m=matchLocale(l[i]);if(m){if(m!=='en')to=m;break}}}` +

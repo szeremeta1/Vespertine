@@ -12,7 +12,7 @@
 //   node scripts/check-i18n.mjs
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { CODES, LOCALES } from '../src/i18n/locales.mjs';
+import { CODES, LOCALES, MATCH_LOCALE_SRC, matchLocale } from '../src/i18n/locales.mjs';
 import { notesHash } from '../src/i18n/release-parts.mjs';
 
 const here = (p) => fileURLToPath(new URL(p, import.meta.url));
@@ -28,6 +28,12 @@ if (JSON.stringify([...CODES].sort()) !== JSON.stringify(want)) errors.push(`src
 for (const c of want) if (!files.includes(c)) errors.push(`src/i18n/${c}.json is missing`);
 for (const f of files) if (!want.includes(f)) errors.push(`src/i18n/${f}.json is not a language the app ships`);
 if (LOCALES.filter((l) => l.rtl).map((l) => l.code).sort().join() !== 'ar,fa,he,ur') errors.push('right-to-left locales should be ar, fa, he, ur');
+
+// The redirect script's copy of matchLocale answers like the module's.
+const inlineMatch = new Function('CODES', `${MATCH_LOCALE_SRC}; return matchLocale;`)(CODES);
+for (const tag of ['de', 'de-DE', 'en-US', 'pt', 'pt-BR', 'pt-PT', 'pt-AO', 'zh', 'zh-CN', 'zh-SG', 'zh-TW', 'zh-HK', 'zh-MO', 'zh-Hans', 'zh-Hant', 'zh-Hant-HK', 'zh-Hans-HK', 'no', 'nn', 'nb-NO', 'tl', 'fil-PH', 'iw', 'in', 'he-IL', 'ar-EG', 'fa-IR', 'ru', 'xx', '', 'EN', 'ZH-hk', 'sr-Latn', 'es-419', 'fr-CA', ...CODES]) {
+  if (inlineMatch(tag) !== matchLocale(tag)) errors.push(`MATCH_LOCALE_SRC("${tag}") is ${inlineMatch(tag)}, matchLocale says ${matchLocale(tag)}`);
+}
 
 // ---- What may stay in Latin script, untranslated ----
 // Product, brand, format and proper names, and the album, work and artist names the screenshots show.
@@ -96,6 +102,24 @@ for (const entry of Object.values(catalog)) {
   }
 }
 
+// An English term kept in parentheses after its translation ("… (gapless)"): a gloss copied from the English source,
+// or in a non-Latin-script language any Latin words the app doesn't use there and that aren't names.
+const NON_LATIN = new Set(['am', 'ar', 'bn', 'el', 'fa', 'gu', 'he', 'hi', 'ja', 'kn', 'ko', 'ml', 'mr', 'pa', 'ta', 'te', 'th', 'uk', 'ur', 'zh-Hans', 'zh-Hant', 'zh-HK']);
+const norm = (x) => x.toLowerCase().replace(/[-‐\s]+/g, ' ').trim();
+function glosses(en, tr, lang) {
+  const found = [];
+  for (const m of tr.matchAll(/[(（]([A-Za-z][A-Za-z' \-]{2,40})[)）]/g)) {
+    const g = m[1];
+    if (PROTECTED.some((p) => norm(p) === norm(g)) || g.split(/\s+/).every((w) => NAMES.test(w))) continue;
+    if (new RegExp(`\\(${g.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)`, 'i').test(en)) continue; // the English has it in parentheses too
+    const words = g.match(/[A-Za-z][A-Za-z'-]*/g) ?? [];
+    const copied = norm(en).includes(norm(g));
+    const foreign = NON_LATIN.has(lang) && words.some((w) => !vocab[lang]?.has(w.toLowerCase()) && !NAMES.test(w) && !PROTECTED.some((p) => p.includes(w)) && w !== w.toUpperCase());
+    if ((copied && words.some((w) => !vocab[lang]?.has(w.toLowerCase()) && !NAMES.test(w) && w !== w.toUpperCase())) || foreign) found.push(g);
+  }
+  return found;
+}
+
 // ---- Structure ----
 const placeholders = (s) => [...s.matchAll(/\{[\w.]+\}/g)].map((m) => m[0]).sort().join(' ');
 const tags = (s) => [...s.matchAll(/<\/?[a-z][^>]*>/g)].map((m) => m[0]).sort().join('');
@@ -118,6 +142,7 @@ function walk(a, b, path, lang, out) {
     const leftover = (w) => !vocab[lang]?.has(w.toLowerCase()) && (EN.has(w.toLowerCase()) || (!SAME.has(w.toLowerCase()) && w !== w.toUpperCase() && !NAMES.test(w)));
     if (a === b && english.some(leftover)) out.push(`${path}: unchanged English "${a.slice(0, 70)}"`);
     else if (englishRun(b, lang)) out.push(`${path}: English left in "${strip(b).replace(/\s+/g, ' ').trim().slice(0, 90)}"`);
+    for (const g of glosses(a, b, lang)) out.push(`${path}: English gloss "(${g})"`);
     return;
   }
   if (Array.isArray(a)) {

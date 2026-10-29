@@ -13,7 +13,7 @@
     "copyLabel": "Homebrew-Befehl kopieren",
     "copied": "Kopiert",
     "copyFailed": "Markiere ihn",
-    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus und Dolby TrueHD sind Marken von Dolby Laboratories. DTS, DTS-HD Master Audio und DTS:X sind Marken von DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS und 3D-Audio sind Marken von Apple Inc. Vespertine nennt sie nur, um zu beschreiben, was es wo abspielt; es ist von Dolby, DTS und Apple weder zertifiziert noch lizenziert oder befürwortet.",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus und Dolby TrueHD sind Marken von Dolby Laboratories. DTS, DTS-HD Master Audio und DTS:X sind Marken von DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS und 3D-Audio sind Marken von Apple Inc. Vespertine nennt sie nur, um zu beschreiben, was es wo abspielt; es ist von Dolby, DTS und Apple weder zertifiziert noch lizenziert noch befürwortet.",
     "trailerLabel": "Vespertine-Trailer, 44 Sekunden",
     "untested": "Kanal-für-Kanal-Ausgabe und Bitstream an Receiver sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht."
   },
@@ -152,11 +152,11 @@
         "title": "Deine 5.1-Discs in derselben Mediathek.",
         "lede": "Mehrkanalmusik läuft auf AirPods als 3D-Audio mit Kopfbewegungserkennung oder wird auf einem Stereo-DAC je nach Kanallayout heruntergemischt.",
         "body": [
-          "DTS-CDs werden zu 5.1 dekodiert. SACD-Images, extrahierte SACD-Titel, Mehrkanal-FLAC, TrueHD und DTS-HD MA werden auf AirPods als 3D-Audio mit Kopfbewegungserkennung gerendert oder auf einem Stereo-DAC heruntergemischt. Dolby Digital Plus mit Atmos nutzt den Objekt-Renderer von macOS; TrueHD Atmos und DTS:X geben ihr Channel-Bed wieder. Kanal-für-Kanal-Ausgabe ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht."
+          "DTS-CDs werden zu 5.1 dekodiert. SACD-Images, extrahierte SACD-Titel, Mehrkanal-FLAC, TrueHD und DTS-HD MA werden auf AirPods als 3D-Audio mit Kopfbewegungserkennung gerendert oder auf einem Stereo-DAC heruntergemischt. Dolby Digital Plus mit Atmos nutzt den Objekt-Renderer von macOS; TrueHD Atmos und DTS:X geben ihr Kanalbett wieder. Kanal-für-Kanal-Ausgabe ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht."
         ],
         "list": [
           "Stereo- und Surround-Versionen eines Albums werden einmal aufgeführt; Vespertine spielt die Version, die zur Ausgabe passt, oder die, die du festlegst.",
-          "Bitstream an Receiver für Dolby Digital, DD+ und DTS-CD ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht. Die Carrier-Tests nutzen den S/PDIF-Reader von FFmpeg. Passthrough für TrueHD und DTS-HD MA wird unter macOS nicht unterstützt.",
+          "Bitstream an Receiver für Dolby Digital, DD+ und DTS-CD ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht. Die Tests des Trägersignals nutzen den S/PDIF-Reader von FFmpeg. Passthrough für TrueHD und DTS-HD MA wird unter macOS nicht unterstützt.",
           "Für 3D-Audio exportieren: als binaurales Stereo für Kopfhörer oder als Mehrkanal-ALAC für Apple-Geräte, mit Tags und Coverbildern."
         ],
         "alt": "Goodbye Yellow Brick Road von Elton John, ein 5.1-Album mit 24 Bit / 88,2 kHz, läuft als 3D-Audio mit Kopfbewegungserkennung auf AirPods Max, mit dem Signalweg und einer Pegelanzeige für jeden Kanal.",
@@ -189,7 +189,7 @@
         "title": "Finde heraus, welche „Hi-Res“-Dateien keine sind.",
         "lede": "Jede Datei lässt sich auf ihre echte Bittiefe, ihre echte Bandbreite und die Spuren verlustbehafteter Encoder und Resampler analysieren.",
         "body": [
-          "Die Ergebnisse kommen mit ihren Belegen und nennen, was es sonst erklären könnte, und eine Playlist <em>Zweifelhaftes Hi-Res</em> sammelt sie. Exakt ist nur der Nachweis von Zero Padding: Die spektralen Ergebnisse sind als Fragen gekennzeichnet, weil manche verlustbehafteten Dateien mit hoher Bitrate als echt durchgehen und steile Mastering-Filter, UKW-Quellen sowie Band- oder Vinyl-Überspielungen verdächtig aussehen können. Während Musik läuft, zeigen Pegelanzeigen und ein Live-Spektrum, was ausgegeben wird, DoP eingeschlossen."
+          "Die Ergebnisse kommen mit ihren Belegen und nennen, was den Befund sonst erklären könnte, und eine Playlist <em>Zweifelhaftes Hi-Res</em> sammelt sie. Exakt ist nur der Nachweis von Zero Padding: Die spektralen Ergebnisse sind als Fragen gekennzeichnet, weil manche verlustbehafteten Dateien mit hoher Bitrate als echt durchgehen und steile Mastering-Filter, UKW-Quellen sowie Band- oder Vinyl-Überspielungen verdächtig aussehen können. Während Musik läuft, zeigen Pegelanzeigen und ein Live-Spektrum, was ausgegeben wird, DoP eingeschlossen."
         ],
         "list": [
           "16-Bit-Audio, aufgefüllt in 24-Bit-Container",
@@ -202,7 +202,7 @@
         "links": [
           "Wie die Analyse funktioniert und wo sie danebenliegt"
         ],
-        "alt": "Der Tab „Analyse“ markiert ein „Remaster“ mit 24/192 als wahrscheinlich verlustbehaftet in der Herkunft: Sein Langzeitspektrum endet bei 16 kHz."
+        "alt": "Der Tab „Analyse“ markiert ein „Remaster“ mit 24/192 als Datei mit wahrscheinlich verlustbehafteter Herkunft: Sein Langzeitspektrum endet bei 16 kHz."
       },
       "airpods": {
         "jack": "AirPods Max",
@@ -233,7 +233,7 @@
         "links": [
           "Alle Funktionen im Detail"
         ],
-        "alt": "Die Seite „Genres“: eine Kachel pro Genre mit einem Mosaik ihrer Cover."
+        "alt": "Die Seite „Genres“: eine Kachel pro Genre mit einem Mosaik seiner Cover."
       },
       "languages": {
         "jack": "Sprachen",
@@ -284,7 +284,7 @@
         },
         {
           "name": "Dolby Digital (Plus)",
-          "text": "Von macOS decodiert. Bitstream an Receiver ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Berichte erwünscht."
+          "text": "Von macOS decodiert. Bitstream an Receiver ist experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht."
         },
         {
           "name": "DTS-CDs und DTS-WAV",
@@ -344,7 +344,7 @@
           "Nicht dokumentiert"
         ],
         [
-          "Exklusiv-Modus (Hog)",
+          "Exklusivmodus (Hog)",
           "Ja",
           "Nein",
           "Ja",
@@ -377,7 +377,7 @@
           "Nicht dokumentiert"
         ],
         [
-          "Apple 3D-Audio für lokalen Surround",
+          "3D-Audio von Apple für lokale Surround-Dateien",
           "Ja",
           "Nur Atmos aus dem Katalog³",
           "Nicht dokumentiert",
@@ -434,8 +434,8 @@
       ],
       "notes": [
         "¹ Apple Music unter macOS 27 war bei 16/24 Bit bitgenau, laut <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">Loopback-Tests Dritter, über die auf ASR berichtet wurde</a>, bei 100 % Lautstärke. Das ist keine Messung von Vespertine; der ursprüngliche Bericht konnte für dieses Update nicht unabhängig nachgeprüft werden. Automatische Ratenumschaltung, Hog-Modus, FLAC und DSD gibt es auf dem Mac weiterhin nicht.",
-        "² Mehrkanal-Ausgabe an DACs und Bitstream an Receiver sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Berichte erwünscht.",
-        "³ Apple dokumentiert 3D-Audio mit Kopferfassung für Dolby-Atmos-Titel im Katalog von Apple Music, nicht das räumliche Rendering deiner eigenen Mehrkanaldateien.",
+        "² Mehrkanal-Ausgabe an DACs und Bitstream an Receiver sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht.",
+        "³ Apple dokumentiert 3D-Audio mit Kopfbewegungserkennung für Dolby-Atmos-Titel im Katalog von Apple Music, nicht das räumliche Rendering deiner eigenen Mehrkanaldateien.",
         "⁴ Getestet mit foobar2000 2.26 (macOS 27.0.1) ohne Komponenten: DSF-, DFF- und SACD-ISO-Dateien scheitern mit „Unsupported file format“. DSF und DFF werden nur als PCM mit 352,8 kHz wiedergegeben, nachdem FFmpeg separat installiert und im FFmpeg Decoder Wrapper von foobar2000 eingetragen wurde; SACD ISO scheitert weiterhin."
       ],
       "sources": "<a href=\"{href.comparison}\">Quellen und Umfang</a>. Korrekturen willkommen: <a href=\"{href.issues}\">Issue erstellen</a>."
@@ -468,7 +468,7 @@
         },
         {
           "q": "Streamt es von Qobuz, TIDAL oder Apple Music?",
-          "a": "Nein. Vespertine spielt Musik, die dir gehört – auf deinem Mac, auf externen Laufwerken oder auf einer Netzwerkfreigabe. DRM-geschützte Downloads aus einem Apple Music-Abo können nicht wiedergegeben werden."
+          "a": "Nein. Vespertine spielt Musik, die dir gehört – auf deinem Mac, auf externen Laufwerken oder auf einer Netzwerkfreigabe. DRM-geschützte Downloads aus einem Apple-Music-Abo können nicht wiedergegeben werden."
         },
         {
           "q": "Woher weiß ich, dass es wirklich bit-perfekt ist?",
@@ -480,7 +480,7 @@
         },
         {
           "q": "Spielt es Dolby Atmos ab?",
-          "a": "Dolby Digital Plus mit Atmos läuft über den Objekt-Renderer von macOS, auf AirPods als 3D-Audio mit Kopferfassung. Bei TrueHD Atmos und DTS:X wird das verlustfreie Kanalbett wiedergegeben; die Objekte werden nicht gerendert. Bitstream an einen AV-Receiver ist experimentell und an echten Receivern ungetestet; Berichte erwünscht."
+          "a": "Dolby Digital Plus mit Atmos läuft über den Objekt-Renderer von macOS, auf AirPods als 3D-Audio mit Kopfbewegungserkennung. Bei TrueHD Atmos und DTS:X wird das verlustfreie Kanalbett wiedergegeben; die Objekte werden nicht gerendert. Bitstream an einen AV-Receiver ist experimentell und an echten Receivern ungetestet; Erfahrungsberichte erwünscht."
         },
         {
           "q": "Verändert es meine Dateien?",
@@ -540,8 +540,8 @@
     "ogAlt": "Pressekit zu Vespertine: Datenblatt, Logos, Key Art, echte Screenshots und der Trailer, über drei echten Screenshots der App.",
     "eyebrow": "Pressekit",
     "heading": "Alles, was du für deinen Bericht brauchst",
-    "lede": "Vespertine ist der kostenlose Open-Source-Player für Surround- und Hi-Res-Musiksammlungen auf dem Mac. SACD- und DVD-Video-Images, extrahierte SACD-5.1-Titel, DTS-CDs sowie DTS-HD-MA-, TrueHD- und Atmos-Dateien teilen sich eine Mediathek, mit 3D-Audio und Kopferfassung auf AirPods. Der Signalweg zeigt jeden Schritt von der Datei bis zur Ausgabe – mit Bedingungen und Tests im GPL-Quellcode, den jeder prüfen kann.",
-    "fine": "Kanal-für-Kanal-Ausgabe und Bitstream an den Receiver sind experimentell und mit echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht. Atmos-Objekte in Dolby Digital Plus rendert macOS; bei TrueHD Atmos und DTS:X wird das Channel-Bed wiedergegeben.",
+    "lede": "Vespertine ist der kostenlose Open-Source-Player für Surround- und Hi-Res-Musiksammlungen auf dem Mac. SACD- und DVD-Video-Images, extrahierte SACD-5.1-Titel, DTS-CDs sowie DTS-HD-MA-, TrueHD- und Atmos-Dateien teilen sich eine Mediathek; auf AirPods laufen sie als 3D-Audio mit Kopfbewegungserkennung. Der Signalweg zeigt jeden Schritt von der Datei bis zur Ausgabe – mit Bedingungen und Tests im GPL-Quellcode, den jeder prüfen kann.",
+    "fine": "Kanal-für-Kanal-Ausgabe und Bitstream an Receiver sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); Erfahrungsberichte erwünscht. Atmos-Objekte in Dolby Digital Plus rendert macOS; bei TrueHD Atmos und DTS:X wird das Kanalbett wiedergegeben.",
     "facts": {
       "eyebrow": "Datenblatt",
       "title": "Die Fakten.",
@@ -603,7 +603,7 @@
       "text": "In drei Größen: 2400×1350, 1600×900 und 1270×760.",
       "items": {
         "bit-perfect": "Bit-perfekt, wenn die Bedingungen erfüllt sind",
-        "fake-hi-res": "Erkennung von falschem Hi-Res",
+        "fake-hi-res": "Erkennung von Fake-Hi-Res",
         "spatial-audio": "Surround als 3D-Audio auf AirPods",
         "native-dsd": "Natives DSD über DoP",
         "stereo-and-surround": "Stereo- und Surround-Versionen",
@@ -710,7 +710,7 @@
     "0.14.0": {
       "hash": "13646de5db46",
       "summary": "Vespertine 0.14.0 bringt die Raumkorrektur: Miss deine Lautsprecher mit einem UMIK-1-Mikrofon und spiele über Filter, die für deinen Raum erstellt wurden. Außerdem verhindert es, dass der Netzwerkwiedergabe die Daten ausgehen.",
-      "notes": "### Raumkorrektur\n- **Miss deinen Raum.** Stell ein kalibriertes UMIK-1-Mikrofon an den Hörplatz, und Vespertine spielt nacheinander über jeden Lautsprecher Mess-Sweeps ab, an 1 bis 5 Positionen (standardmäßig 5: der Hörplatz, dann links, rechts, davor und dahinter). Vorher prüft es den Pegel und den Weg zu jedem Lautsprecher, verwirft einen fehlerhaften Durchgang und lässt dich erneut versuchen oder dort weitermachen, wo du aufgehört hast. Unterstützt werden sowohl Stereo als auch 5.1.\n- **Filter für jeden Lautsprecher.** Aus der Messung erstellt Vespertine für jeden Lautsprecher einen kleinen Satz Filter, überwiegend Absenkungen für die Bassüberhöhungen, die ein Raum hinzufügt. Wähle ein Ziel (standardmäßig Warm, alternativ Sanfte Neigung oder Linear) und einen Bereich (nur Bass oder Gesamtbereich), und die Filter werden aus der gespeicherten Messung neu angepasst, ohne dass erneut gemessen werden muss. Die Grafik zeigt, was gemessen wurde, was nach der Korrektur vorhergesagt wird, und die Zielkurve; die Vorhersage ist als Vorhersage gekennzeichnet.\n- **Verzögerungs- und Pegelabgleich.** Auch Verzögerung und Pegel jedes Lautsprechers werden gemessen, sodass nähere Lautsprecher zurückgehalten werden, bis der Schall des entferntesten ankommt, und lautere auf den leisesten abgesenkt werden.\n- **Eigene Filter mitbringen.** Importiere eine Filterdatei von Equalizer APO oder REW (Verzögerung, Pegel und Filter pro Lautsprecher) oder importiere Impulsantworten (WAV, AIFF, CAF oder FLAC), die bei der Wiedergabe als Faltungsfilter dienen. Exportiere ein Profil als Equalizer-APO-Text oder als Vespertine-Profil. Zeilen, die Vespertine nicht abspielen kann, werden unter Angabe der Zeilennummer abgelehnt, statt als etwas anderes abgespielt zu werden.\n- **Standardmäßig aus, damit bit-perfekt bit-perfekt bleibt.** Die Raumkorrektur wird pro Ausgabe eingeschaltet und ist an die Ausgabe gebunden, an der gemessen wurde. Solange sie die Samples verändert, zeigt der Signalweg RAUMKORREKTUR an, und der Stream ist nicht mehr als bit-perfekt gekennzeichnet. Ist sie aus, bleibt die Wiedergabe unangetastet. Integer-Modus und „An 16 Bit anpassen“ bleiben aus, solange sie aktiv ist.\n- **Was sie abdeckt.** Stereo- und 5.1-PCM, das Vespertine rendert. Bei Dolby- und DTS-Bitstreams, Atmos und anderen Kanalzahlen setzt sie aus, und der Signalweg zeigt an, warum. DSD an einem DoP-DAC wird bei eingeschalteter Korrektur in PCM umgewandelt und damit ebenfalls korrigiert; aktiviere für diese Ausgabe „Natives DSD beibehalten“, um es stattdessen nativ und unkorrigiert zu senden.\n- **Alles in einem Fenster.** Darstellung → Raumkorrektur, auch erreichbar über das Equalizer-Fenster und die Einstellungen jeder Ausgabe, enthält den Schalter, „Messen“, „Importieren“, „Exportieren“, die Profile, die Vorher-Nachher-Grafik, Ziel und Bereich sowie Verzögerung, Pegel und Filter jedes Lautsprechers. Das ersetzt das frühere Beta-Fenster „Raummessung“. Die Methode ist in `docs/ROOM-CORRECTION.md` beschrieben.\n\n### Netzwerkwiedergabe\n- **Weniger Aussetzer von einem NAS.** Titel auf einer Netzwerkfreigabe werden jetzt vor der Wiedergabe auf deinen Mac kopiert, und der nächste Titel wird schon im Voraus kopiert, sodass ein Schluckauf im Netzwerk die Musik nicht mehr anhält. Große DSD-Dateien werden so gelesen, dass ein langer Vorlauf bereitsteht.\n- **Ein Ladering auf der Wiedergabetaste.** Während Vespertine auf Daten aus dem Netzwerk wartet, zeigt die Taste für Wiedergabe/Pause einen kleinen, sich drehenden Ring (stillstehend, wenn „Bewegung reduzieren“ aktiviert ist). Kurze Lesefehler werden erneut versucht.\n- **Grenzen.** Ein sehr langer Ausfall oder eine Verbindung, die langsamer ist als die Musik, kann die Wiedergabe weiterhin zum Nachfüllen pausieren lassen. Zwischengespeicherte Kopien belegen höchstens 8 GB, und eine größere Quelle schlägt mit einer klaren Meldung fehl. Siehe `docs/NETWORK-PLAYBACK.md`.\n\n### Außerdem neu\n- **DoP bei bekannten DACs standardmäßig an.** Der FiiO K11 und der Fosi Audio ZD3 starten mit eingeschaltetem DoP. Wenn du es ausschaltest, merkt sich Vespertine das.\n- **„Zuletzt hinzugefügt“ zeigt 150 Alben** statt bisher 60, damit ein großer Import die kurz davor hinzugefügten Alben nicht aus der Liste verdrängt.\n- **Fosi Audio ZD3.** Der ZD3 steht jetzt in der Liste der unterstützten Geräte, und die Screenshots der Website wurden damit neu aufgenommen.\n- **Website.** Unter den Download-Buttons steht eine Zeile mit „Auf GitHub mit Stern markieren“ und „An der Diskussion teilnehmen“.\n\n### Überprüfung\n- Die Testsuites für Engine, Mediathek und App laufen durch, darunter neue Tests für den Entwurf der Raumfilter, für die Wiedergabe über die Korrekturstufe und den Faltungsfilter, für die Messschritte an einem simulierten Raum, für die Importformate und für den Netzwerk-Cache. Der Echtzeit-Audiocode wird außerdem mit dem Address-, dem Thread- und dem Undefined-Behavior-Sanitizer geprüft.\n- Auf echter Hardware geprüft: eine vollständige Messung mit einem UMIK-1 am Hörplatz, die daraus erstellten Filter und die Wiedergabe über die Raumkorrektur an einem Fosi Audio ZD3 mit Stereolautsprechern."
+      "notes": "### Raumkorrektur\n- **Miss deinen Raum.** Stell ein kalibriertes UMIK-1-Mikrofon an den Hörplatz, und Vespertine spielt nacheinander über jeden Lautsprecher Mess-Sweeps ab, an 1 bis 5 Positionen (standardmäßig 5: der Hörplatz, dann links, rechts, davor und dahinter). Vorher prüft es den Pegel und den Weg zu jedem Lautsprecher, verwirft einen fehlerhaften Durchgang und lässt dich erneut versuchen oder dort weitermachen, wo du aufgehört hast. Unterstützt werden sowohl Stereo als auch 5.1.\n- **Filter für jeden Lautsprecher.** Aus der Messung erstellt Vespertine für jeden Lautsprecher einen kleinen Satz Filter, überwiegend Absenkungen für die Bassüberhöhungen, die ein Raum hinzufügt. Wähle ein Ziel (standardmäßig Warm, alternativ Sanfte Neigung oder Linear) und einen Bereich (nur Bass oder Gesamtbereich), und die Filter werden aus der gespeicherten Messung neu angepasst, ohne dass erneut gemessen werden muss. Das Diagramm zeigt, was gemessen wurde, was nach der Korrektur vorhergesagt wird, und die Zielkurve; die Vorhersage ist als Vorhersage gekennzeichnet.\n- **Verzögerungs- und Pegelabgleich.** Auch Verzögerung und Pegel jedes Lautsprechers werden gemessen, sodass nähere Lautsprecher zurückgehalten werden, bis der Schall des entferntesten ankommt, und lautere auf den leisesten abgesenkt werden.\n- **Eigene Filter mitbringen.** Importiere eine Filterdatei von Equalizer APO oder REW (Verzögerung, Pegel und Filter pro Lautsprecher) oder importiere Impulsantworten (WAV, AIFF, CAF oder FLAC), die bei der Wiedergabe als Faltungsfilter dienen. Exportiere ein Profil als Equalizer-APO-Text oder als Vespertine-Profil. Zeilen, die Vespertine nicht abspielen kann, werden unter Angabe der Zeilennummer abgelehnt, statt als etwas anderes abgespielt zu werden.\n- **Standardmäßig aus, damit bit-perfekt bit-perfekt bleibt.** Die Raumkorrektur wird pro Ausgabe eingeschaltet und ist an die Ausgabe gebunden, an der gemessen wurde. Solange sie die Samples verändert, zeigt der Signalweg RAUMKORREKTUR an, und der Stream ist nicht mehr als bit-perfekt gekennzeichnet. Ist sie aus, bleibt die Wiedergabe unangetastet. Integer-Modus und „An 16-Bit-Quellen anpassen“ bleiben aus, solange sie aktiv ist.\n- **Was sie abdeckt.** Stereo- und 5.1-PCM, das Vespertine rendert. Bei Dolby- und DTS-Bitstreams, Atmos und anderen Kanalzahlen setzt sie aus, und der Signalweg zeigt an, warum. DSD an einem DoP-DAC wird bei eingeschalteter Korrektur in PCM umgewandelt und damit ebenfalls korrigiert; aktiviere für diese Ausgabe „Natives DSD beibehalten“, um es stattdessen nativ und unkorrigiert zu senden.\n- **Alles in einem Fenster.** Darstellung → Raumkorrektur, auch erreichbar über das Equalizer-Fenster und die Einstellungen jeder Ausgabe, enthält den Schalter, „Messen“, „Importieren“, „Exportieren“, die Profile, das Vorher-Nachher-Diagramm, Ziel und Bereich sowie Verzögerung, Pegel und Filter jedes Lautsprechers. Das ersetzt das frühere Beta-Fenster „Raummessung“. Die Methode ist in `docs/ROOM-CORRECTION.md` beschrieben.\n\n### Netzwerkwiedergabe\n- **Weniger Aussetzer von einem NAS.** Titel auf einer Netzwerkfreigabe werden jetzt vor der Wiedergabe auf deinen Mac kopiert, und der nächste Titel wird schon im Voraus kopiert, sodass ein Schluckauf im Netzwerk die Musik nicht mehr anhält. Große DSD-Dateien werden so gelesen, dass ein langer Vorlauf bereitsteht.\n- **Ein Ladering auf der Wiedergabetaste.** Während Vespertine auf Daten aus dem Netzwerk wartet, zeigt die Taste für Wiedergabe/Pause einen kleinen, sich drehenden Ring (stillstehend, wenn „Bewegung reduzieren“ aktiviert ist). Nach kurzen Lesefehlern versucht es Vespertine erneut.\n- **Grenzen.** Ein sehr langer Ausfall oder eine Verbindung, die langsamer ist als die Musik, kann die Wiedergabe weiterhin zum Nachfüllen pausieren lassen. Zwischengespeicherte Kopien belegen höchstens 8 GB, und eine größere Quelle schlägt mit einer klaren Meldung fehl. Siehe `docs/NETWORK-PLAYBACK.md`.\n\n### Außerdem neu\n- **DoP bei bekannten DACs standardmäßig an.** Der FiiO K11 und der Fosi Audio ZD3 starten mit eingeschaltetem DoP. Wenn du es ausschaltest, merkt sich Vespertine das.\n- **„Zuletzt hinzugefügt“ zeigt 150 Alben** statt bisher 60, damit ein großer Import die kurz davor hinzugefügten Alben nicht aus der Liste verdrängt.\n- **Fosi Audio ZD3.** Der ZD3 steht jetzt in der Liste der unterstützten Geräte, und die Screenshots der Website wurden damit neu aufgenommen.\n- **Website.** Unter den Download-Buttons steht eine Zeile mit „Auf GitHub einen Stern geben“ und „Mitdiskutieren“.\n\n### Überprüfung\n- Die Testsuites für Engine, Mediathek und App laufen durch, darunter neue Tests für den Entwurf der Raumfilter, für die Wiedergabe über die Korrekturstufe und den Faltungsfilter, für die Messschritte an einem simulierten Raum, für die Importformate und für den Netzwerk-Cache. Der Echtzeit-Audiocode wird außerdem mit dem Address-, dem Thread- und dem Undefined-Behavior-Sanitizer geprüft.\n- Auf echter Hardware geprüft: eine vollständige Messung mit einem UMIK-1 am Hörplatz, die daraus erstellten Filter und die Wiedergabe über die Raumkorrektur an einem Fosi Audio ZD3 mit Stereolautsprechern."
     },
     "0.13.2": {
       "hash": "f78ea179d3a9",

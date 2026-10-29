@@ -1,0 +1,741 @@
+{
+  "common": {
+    "skip": "Tsallaka zuwa abun ciki",
+    "tagline": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res.",
+    "requires": "macOS {minMacOS} ko na baya.",
+    "arch": "Apple silicon da Intel",
+    "download": "Sauke don Mac",
+    "downloadVersion": "Sauke {version}",
+    "sourceOnGitHub": "Lambar tushe a GitHub",
+    "reportIssue": "Kai rahoton matsala",
+    "brewLead": "Ko da Homebrew:",
+    "copy": "Kwafa",
+    "copyLabel": "Kwafa umarnin Homebrew",
+    "copied": "An kwafa",
+    "copyFailed": "Zaɓe shi",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus da Dolby TrueHD alamomin kasuwanci ne na Dolby Laboratories. DTS, DTS-HD Master Audio da DTS:X alamomin kasuwanci ne na DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS da Spatial Audio alamomin kasuwanci ne na Apple Inc. Vespertine yana ambatonsu ne kawai don bayyana abin da yake kunnawa da inda yake kunnawa; Dolby, DTS ko Apple ba su tabbatar da shi, ba shi lasisi ko amincewa da shi ba.",
+    "trailerLabel": "Bidiyon gabatarwar Vespertine, daƙiƙa 44",
+    "untested": "Fitar da kowace tasha zuwa tashar da ta dace da aika bitstream zuwa risiva na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
+  },
+  "nav": {
+    "label": "Na farko",
+    "home": "Vespertine, shafin farko",
+    "top": "Vespertine, koma sama",
+    "features": "Fasaloli",
+    "formats": "Tsarukan fayil",
+    "compare": "Kwatanta",
+    "whatsNew": "Sabbin abubuwa",
+    "faq": "Tambayoyin da aka fi yi",
+    "press": "Kayan aikin manema labarai",
+    "download": "Sauke",
+    "downloadLabel": "Sauke Vespertine {version} don Mac"
+  },
+  "lang": {
+    "label": "Harshe",
+    "menuLabel": "Zaɓi harshe",
+    "current": "Harshen yanzu"
+  },
+  "footer": {
+    "project": "Aikin",
+    "about": "Game da",
+    "releaseNotes": "Bayanin sabbin sigogi",
+    "sponsor": "Ɗauki nauyi",
+    "discussions": "Tattaunawa",
+    "architecture": "Tsarin gini",
+    "privacy": "Sirri",
+    "terms": "Sharuɗɗa",
+    "license": "Lasisi (GPL-3.0)",
+    "notices": "Sanarwar ɓangarori na uku",
+    "ukraine": "<strong>Vespertine yana goyon bayan Ukraine.</strong> Da fatan za ku ba da gudummawa ta {orgs}.",
+    "copyright": "© {year} Masu ba da gudummawa ga Vespertine",
+    "free": "Manhaja mai 'yanci a ƙarƙashin GPL",
+    "madeIn": "{author} ne ya ƙera a Boston",
+    "backToTop": "Koma sama",
+    "home": "Shafin farko"
+  },
+  "home": {
+    "title": "Vespertine: mai kunna kiɗan kewaye da hi-res don Mac",
+    "description": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res: kwafin faifan SACD da DVD-Video, DSD, DTS CD, fayilolin DTS-HD MA, TrueHD da Dolby Atmos, Spatial Audio a AirPods, da hanyar sigina ta bit-perfect da za ku iya bincika.",
+    "ogAlt": "Vespertine: mai kunna kiɗan kewaye da hi-res na Mac, kyauta kuma buɗaɗɗen tushe. Hanyar Sigina tasa tana nuna FLAC na bit 24 / 96 kHz yana kunnawa bit-perfect a Fosi Audio ZD3. Siga {version}, macOS {minMacOS} ko na baya.",
+    "hero": {
+      "eyebrow": [
+        "Kyauta kuma buɗaɗɗen tushe",
+        "macOS {minMacOS}+",
+        "Apple silicon da Intel"
+      ],
+      "titleSr": "Kiɗan kewaye da hi-res, a kan Mac ɗinku.",
+      "titleLines": [
+        "Kiɗan kewaye",
+        "da hi-res,"
+      ],
+      "titleBrass": "a kan Mac ɗinku.",
+      "lede": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res. Kwafin faifan SACD da DVD-Video, DSD, DTS CD, fayilolin DTS-HD MA, TrueHD da Atmos suna zama a laburare ɗaya tare da kundayenku na stereo, tare da Spatial Audio mai bin motsin kai a AirPods. Hanyar sigina tana nuna kowane mataki daga fayil zuwa fitarwa. A Turanci da wasu harsuna {languages}.",
+      "ask": "Ya burge ku?",
+      "star": "Ba shi tauraro a GitHub",
+      "discuss": "Shiga tattaunawar",
+      "version": "Siga {version}",
+      "signed": "an sa wa hannu kuma Apple ya tantance",
+      "releaseNotes": "Bayanin sabbin sigogi",
+      "privacy": "Sirri: ba a tattara komai.",
+      "panelAlt": "Faifan Bayanai na Ana Kunnawa Yanzu a Vespertine: Les jeux d’eaux à la Villa d’Este na Liszt, wanda Lazar Berman ya kaɗa, mai alamun HI-RES MARAR ASARA da BIT-PERFECT, keɓe, 32 / 96, tare da Hanyar Sigina daga FLAC na bit 24 / 96 kHz ta libFLAC a ƙimar asali ba tare da ƙara ko rage ƙarar sauti ba zuwa Fosi Audio ZD3.",
+      "panelCaption": "Hanyar Sigina",
+      "followSignal": "Bi siginar"
+    },
+    "trailer": {
+      "eyebrow": "Bidiyon gabatarwa",
+      "title": "Gani a cikin daƙiƙa 44.",
+      "text": "Kunna sautin. Duk abin da ke ciki daga ainihin manhajar ne, an ɗauka daga laburaren mai ƙera ta.",
+      "fallback": "Kalli bidiyon gabatarwa (MP4)",
+      "caption": "44 s · 1080p · hotunan bangon kundi mallakin masu su ne"
+    },
+    "features": {
+      "eyebrow": "Me ya sa Vespertine",
+      "title": "An gina don tarin kiɗanku na kewaye.",
+      "text": "Kiɗan kewaye da na stereo a laburare ɗaya, da mai kunnawa da yake nuna ainihin abin da ya yi wa siginar.",
+      "badgesLabel": "Yanayin Hanyar Sigina da manhajar ke nunawa"
+    },
+    "pillars": [
+      {
+        "title": "Kiɗan kewaye a laburare ɗaya",
+        "text": "Kwafin SACD da waƙoƙin da aka ciro daga gare su, faifan DVD-Video, DTS CD, DTS-HD MA da TrueHD suna zama kusa da kundayenku na stereo kuma su kunna a matsayin Spatial Audio mai bin motsin kai a AirPods. Idan kundi yana da nau'ukan biyu, kowace waƙa tana bayyana sau ɗaya kuma nau'in da ya dace da fitarwarku ne yake kunnawa."
+      },
+      {
+        "title": "Hanyar sigina da za ku bincika",
+        "text": "Ƙimar samfuri, tsawon kalmar bit, ƙari da sarrafa tashoshi, duk ana karanto su daga Core Audio. Sharuɗɗan bit-perfect suna cikin lambar tushe, tare da gwaje-gwaje na atomatik, gwajin loopback da jagorar tabbatarwa da na'urori."
+      },
+      {
+        "title": "Yana bincika fayilolin hi-res",
+        "text": "Nazari yana nuna zurfin bit da aka cike da sifili da yiwuwar ƙara ƙimar samfuri ko asali mai asara. Hukunce-hukuncen bakan mita kimantawa ne, ana nuna su tare da hujjojinsu da iyakokinsu. Ana gudanar da nazarin iri ɗaya a sabar Linux kusa da fayilolinku."
+      },
+      {
+        "title": "Buɗaɗɗen tushe da za ku tantance",
+        "text": "Kyauta a ƙarƙashin GPL. Karanta, gina kuma gyara mai kunnawar, har da sharuɗɗan fitarwarsa da gwaje-gwajensa. Babu asusu, biyan kuɗin shiga, talla ko aika bayanan amfani."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Keɓe",
+      "spatial": "Spatial · bin motsin kai",
+      "synthetic": "Mitocin sama na ƙirƙira?"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Hanyar Sigina",
+        "kicker": "Bit-perfect",
+        "title": "Kowace waƙa a ƙimar samfurinta da zurfin bit nata na asali.",
+        "lede": "Hanyar Sigina tana jera kowane mataki daga fayil zuwa DAC ɗinku, bisa abin da aka karanto daga Core Audio, kuma tana faɗa idan wani abu ya canza samfuran.",
+        "body": [
+          "Vespertine yana sauya na'urar zuwa ƙimar samfurin kowane fayil, kuma yana sake samfurawa da mai juyawar Apple mai ingancin mastering ne kawai idan DAC ba zai iya amfani da ƙimar ba. <span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan an cika sharuɗɗan da ke cikin lambar tushe: ƙimar samfuri ta asali, babu abin da yake canza samfuran, tsawon kalmar bit da ya dace, da na'ura da aka keɓe ko wadda babu wata manhaja da ke amfani da ita tare. An gwada kunna PCM har zuwa 384 kHz a FiiO K11."
+        ],
+        "list": [
+          "Yanayin keɓe (hog) yana hana sauran manhajoji amfani da na'urar. A yanayin rabawa, maɓallan ƙarar sauti da Digital Crown suna daidaita DAC ɗinku; a yanayin keɓe ma za su iya, idan kun kunna hakan.",
+          "Yanayin integer yana aika PCM na bit 32 da ba a sarrafa ba kai tsaye zuwa DAC masu karɓar integers.",
+          "Daidaita da tushen bit 16 (a kashe tun farko) yana aika fayilolin bit 16 a matsayin bit 16 zuwa DAC masu yanayin bit 16 na gaske, ba tare da cika su da sifili ba.",
+          "Kunnawa ba tare da tazara ba, har da kundayen da takardar CUE ta raba waƙoƙinsu daga fayil ɗaya.",
+          "Yana tuna DAC ɗinku. Idan ba a haɗa shi ba, kiɗa yana kunnawa a Mafi kyawun na'urar da aka haɗa kuma ya koma idan DAC ya dawo.",
+          "Fitarwar da ba ta da na'urar sarrafa ƙarar sauti tata (HDMI, optical, line-out) za ta iya amfani da ta Vespertine, ana zaɓa ga kowace fitarwa. Idan ƙarar ta yi ƙasa da 100%, alamun suna faɗa cewa ba bit-perfect ba ne kuma.",
+          "Idan Vespertine ya rufe, yana mayar da DAC ɗinku zuwa ƙimar samfuri da zurfin bit da yake da su a da.",
+          "Gwajin loopback da aka gina a ciki yana kwatanta kowane samfuri da Vespertine yake aikawa zuwa na'ura ta kama-da-wane. Gwajin manhaja ne, an bayyana shi haka, kuma ba ya taɓa canza alamar <span class=\"mono nowrap\">BIT-PERFECT</span>."
+        ],
+        "links": [
+          "Sharuɗɗan a cikin lambar tushe",
+          "Tabbatar da kanku",
+          "Abin da gwajin loopback yake tabbatarwa"
+        ],
+        "alt": "Vespertine yana kunna Liszt, Années de pèlerinage na Lazar Berman daga FLAC na bit 24 / 96 kHz: Faifan Bayanai yana nuna shi a matsayin bit-perfect da keɓe a Fosi Audio ZD3, tare da kowane mataki na Hanyar Sigina.",
+        "floatAlt": "Takardar Gwajin Loopback: bit 24 a 44.1 da 96 kHz, bit 16 da aka cike da sifili da waƙoƙi biyu marasa tazara, kowanne daidai bit da bit.",
+        "floatCaption": "Gwajin Loopback · gwajin manhaja"
+      },
+      "surround": {
+        "jack": "Kiɗan kewaye",
+        "kicker": "Kiɗan kewaye da Spatial Audio",
+        "title": "Faifan 5.1 ɗinku, a laburare ɗaya.",
+        "lede": "Kiɗa mai tashoshi da yawa yana kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods, ko a haɗe tashoshinsa zuwa stereo bisa tsarin tashoshin a DAC na stereo.",
+        "body": [
+          "Ana warware DTS CD zuwa 5.1. Kwafin SACD, waƙoƙin da aka ciro daga SACD, FLAC mai tashoshi da yawa, TrueHD da DTS-HD MA suna kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods ko a haɗe tashoshinsu zuwa stereo a DAC na stereo. Dolby Digital Plus mai Atmos yana amfani da mai sarrafa abubuwan sauti na macOS; TrueHD Atmos da DTS:X suna kunna ƙayyadadden rukunin tashoshinsu. Fitar da kowace tasha zuwa tashar da ta dace na gwaji ne, ba a gwada shi a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
+        ],
+        "list": [
+          "Nau'ukan stereo da na kewaye na kundi suna bayyana sau ɗaya; Vespertine yana kunna wanda ya dace da fitarwar, ko wanda kuka ɗora.",
+          "Aika bitstream na Dolby Digital, DD+ da DTS-CD zuwa risiva na gwaji ne, ba a gwada shi a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni. Gwaje-gwajen siginar ɗauka suna amfani da mai karanta S/PDIF na FFmpeg. Ba a tallafa wa wucewar TrueHD da DTS-HD MA ba tare da sarrafawa ba a macOS.",
+          "Fitarwa don Spatial Audio a matsayin stereo na binaural don belun kunne ko ALAC mai tashoshi da yawa don na'urorin Apple, tare da alamomi da hotunan bangon kundi."
+        ],
+        "alt": "Goodbye Yellow Brick Road na Elton John, kundi na bit 24 / 88.2 kHz 5.1, yana kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods Max, tare da Hanyar Sigina da ma'aunin kowace tasha.",
+        "floatAlt": "Kundi mai nau'ukan stereo da 5.1 na kowace waƙa, waɗanda aka jera sau ɗaya.",
+        "floatCaption": "Stereo da 5.1, an jera sau ɗaya"
+      },
+      "discs": {
+        "jack": "Kwafin faifai da DSD",
+        "kicker": "SACD, DVD-Video da DSD",
+        "title": "Kunna kwafin faifan da kansa.",
+        "lede": "Nuna wa Vespertine kwafin SACD ko DVD-Video, sai ya kunna kiɗa kai tsaye daga cikinsa, ba tare da ɗora, ciro ko rubuta komai ba.",
+        "body": [
+          "Kwafin SACD <span class=\"mono\">.iso</span> yana kunna sassan stereo da 5.1 nasa, ko an matse su da DST ko ba a matse su ba, tare da sunaye daga rubutun da ke cikin faifan kansa. Ana warware DST zuwa ainihin DSD ɗin, don haka stereo yana zuwa DAC ɗinku a matsayin DSD na asali ta DoP idan DAC yana tallafa masa, kuma 5.1 yana kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods. Kiɗan LPCM a faifan DVD-Video (<span class=\"mono\">.iso</span> ko foldar <span class=\"mono\">VIDEO_TS</span>) yana kunnawa daidai bit da bit, kundi ɗaya ga kowane title da waƙa ɗaya ga kowane chapter."
+        ],
+        "list": [
+          "Ya yi daidai bit da bit da sacd_extract a faifai biyu na gaske. Faifai masu sashen 5.0, masu sashen tashoshi da yawa kawai, ko na DSD128 da sama, an gwada su da kwafin faifan gwaji na ƙirƙira kawai ya zuwa yanzu.",
+          "DSF da DSDIFF daga DSD64 zuwa DSD512, har da DSDIFF da aka matse da DST, suna fita a matsayin DoP zuwa DAC masu karɓar ƙimar samfurin siginar ɗauka, ko su koma PCM mai ƙimar samfuri mai yawa. An tabbatar da DoP a FiiO K11; ba a gwada ƙimar samfurin siginar ɗauka da ta haura 384 kHz a kan na'urori ba.",
+          "DVD-Video LPCM na bit 16, 20 da 24, a 48 da 96 kHz, har zuwa tashoshi 8. Ba a tallafa wa DVD-Audio ba, kuma faifai masu ɓoyayyen bayani (CSS) suna buƙatar kwafin da aka warware ɓoyayyen bayaninsa."
+        ],
+        "links": [
+          "Cikakken bayani kan DVD-Video"
+        ],
+        "alt": "Brothers In Arms na Dire Straits yana kunnawa kai tsaye daga kwafin faifan SACD nasa: stereo DSD64 ta DoP zuwa FiiO K11, tare da alamar DSD NA ASALI · DoP kuma Decoder yana nuna Kwafin SACD, DST (Marar asara).",
+        "floatAlt": "Love for the Sake of Love na Claudja Barry a matsayin DSD128 ta DoP zuwa Fosi Audio ZD3, a 352.8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352.8 kHz"
+      },
+      "analysis": {
+        "jack": "Nazari",
+        "kicker": "Gano hi-res na bogi da bakan mita",
+        "title": "Gano fayilolin “hi-res” da ba haka suke ba.",
+        "lede": "Za a iya nazarin kowane fayil don gano ainihin zurfin bit ɗinsa, ainihin faɗin zangon mitocinsa da alamomin da masu sa lambar sauti mai asara da masu sake samfurawa suka bari.",
+        "body": [
+          "Hukunce-hukunce suna zuwa da hujjojinsu kuma suna bayyana wasu dalilan da za su iya haddasa abin da aka gani, sannan jerin waƙoƙin <em>Hi-Res da Ake Shakku</em> yana tara su. Cikawa da sifili ne kawai ake tabbatarwa da cikakken daidaito: ana nuna hukunce-hukuncen bakan mita a matsayin tambayoyi, domin wasu fayiloli masu asara amma masu babban bitrate suna wucewa a matsayin na gaske, kuma matatun mastering masu yanke mitoci da kaifi, tushen FM da sautin da aka kwaso daga tef ko vinyl na iya zama abin shakku. Yayin da kiɗa ke kunnawa, ma'aunai da bakan mita na kai tsaye suna nuna abin da yake fita, har da DoP."
+        ],
+        "list": [
+          "Sauti na bit 16 da aka cike da sifili a cikin kwantena na bit 24",
+          "Mai yiwuwa an ƙara ƙimar samfurin masters masu ingancin CD, aka sayar da su a matsayin 96 ko 192 kHz",
+          "Mai yiwuwa asalinsa mai asara ne: MP3 ko AAC da aka juya zuwa FLAC",
+          "Mai yiwuwa mitocin sama na ƙirƙira ne daga SBR ko “ingantawa da AI”",
+          "<span class=\"mono\">vespertine-analyze</span> yana gudanar da nazarin iri ɗaya a sabar Linux kusa da fayilolinku; manhajar tana shigo da sakamakon."
+        ],
+        "note": "Fayil ɗin da ke wannan hoton allo na bogi ne da aka yi da gangan: kiɗan bidiyon gabatarwar kansa, an sa masa lambar MP3 kuma an ƙara ƙimar samfurinsa zuwa 24/192 a ƙarƙashin sunan ƙungiyar kiɗa na ƙirƙira.",
+        "links": [
+          "Yadda nazarin yake aiki, da inda yake kasa ganewa"
+        ],
+        "alt": "Shafin Nazari yana nuna “remaster” na 24/192 a matsayin mai yiwuwar asali mai asara: Bakan mita na dogon lokaci nasa yana tsayawa a 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max ta USB-C",
+        "title": "Sauti marar asara a AirPods Max, kuma yana faɗa.",
+        "lede": "Idan an haɗa su da kebul na USB-C, ana gane AirPods Max a matsayin na'urar sauti marar asara ta bit 24 / 48 kHz.",
+        "body": [
+          "Kiɗan 48 kHz yana kunnawa bit-perfect, kuma ana juya duk sauran da mai sake samfurawa na Apple mai ingancin mastering, duk a bayyane. Ta Bluetooth, Vespertine yana faɗa muku cewa haɗin AAC ne. Wannan ya dogara ne da bayanin Apple na hanyar kebul da abin da aka karanto daga Core Audio, domin AirPods ba su da fitarwar dijital da za a yi loopback da ita."
+        ],
+        "alt": "Jerin Waƙoƙi Mai Wayo na waƙoƙin bit 24 / 48 kHz, an tace zuwa Oasis, yana kunnawa bit-perfect a AirPods Max ta USB-C."
+      },
+      "library": {
+        "jack": "Laburare",
+        "kicker": "Laburare",
+        "title": "Lilo kamar a Apple Music. Tsara kamar ma'aikacin laburare.",
+        "lede": "Kundaye, mawaƙa, waƙoƙi da salo-salo, kowanne da matatun da za ku iya haɗawa, da Gauraya ga kowannensu.",
+        "list": [
+          "Matatu don tsarin fayil, bit 24, 88.2 kHz da sama, tashoshi da yawa, salo, shekara, ƙimar samfuri, tashoshi da Hukuncin Nazari. Nema ba ya bambanta manyan baƙaƙe da ƙanana ko alamomin lafazi.",
+          "Jerin Waƙoƙi Mai Wayo a ma'aunan da kuka saba da su: bit 24, 88.2 kHz.",
+          "Remasters, sigogin mono da stereo da SACD na kundi ɗaya suna zama a kati ɗaya; ku zaɓi sigar idan kun buɗe shi.",
+          "Waɗanda Aka Fi So da adadin lokutan kunnawa, ana ajiye su a laburare kuma ba a taɓa rubuta su a fayilolinku ba. Yana shigo da jerin waƙoƙin M3U da Apple Music, adadin lokutan kunnawa da waɗanda aka fi so.",
+          "Mai gyara alamomi tare da kwafin ajiya da mayarwa da mataki ɗaya, da ƙarin bayanai daga MusicBrainz wanda yake nuna gwargwadon tabbacinsa kafin ya rubuta komai.",
+          "Abubuwan da aka raba a hanyar sadarwa ta SMB, NFS ko WebDAV, tare da ajiyar wucin gadi, Riƙe don Wajen Layi da kunnawa da aka gina don sabobin da ba su da sauri.",
+          "Nemo Kiɗa yana bincika kowace ma'ajiya don gano ainihin kiɗanku kuma ya bar tarkace. Ɗan gajeren saiti a buɗewar farko yana zaɓar fitarwarku kuma yana bayyana abin da Amfani na keɓe da ReplayGain suke yi.",
+          "EQ na parametric ga kowace fitarwa wanda yake shigo da saitattun AutoEQ da Equalizer APO. A kashe tun farko; idan yana kunne, Hanyar Sigina tana cewa <span class=\"mono nowrap\">EQUALIZER</span> maimakon <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "Ƙaramin Mai Kunnawa, ƙarin sarrafawa a sandar menu, maɓallan kafofin watsa labarai, ReplayGain da sabuntawa na atomatik masu sa hannu."
+        ],
+        "links": [
+          "Kowace fasali, dalla-dalla"
+        ],
+        "alt": "Shafin Salo-salo: tayal ga kowane salo mai haɗaɗɗen hotunan bangon kundayensa."
+      },
+      "languages": {
+        "jack": "Harsuna",
+        "kicker": "Harsuna {languages}",
+        "title": "Yana magana da harshenku.",
+        "lede": "An fassara kowane menu, saiti da saƙon Hanyar Sigina zuwa harsuna {languages} ban da Turanci.",
+        "body": [
+          "Daga Ukrainian, Jamusanci da Jafananci zuwa Swahili, Tamil da Hausa, tare da tsarin jam'i da rubuta lambobi na kowane harshe, da Sinanci Sauƙaƙaƙƙe, na Gargajiya da na Hong Kong, kowanne da nasa ƙamus. Larabci, Ibrananci, Farisanci da Urdu suna da tsarin shafi daga dama zuwa hagu.",
+          "Yadda ake bincika fassarorin: binciken atomatik a kowane sauyi yana tabbatar da cewa kowane rubutu a manhajar yana cikin duk harsuna {languages} tare da guraben cike iri ɗaya da nau'ukan jam'in da kowane harshe yake buƙata, kuma an duba kowane allo a kowane harshe don rubutun da ya yanke ko ya hau kan wani da juyawar tsarin dama zuwa hagu. An fara su a matsayin fassarar na'ura da aka yi da kulawa, don haka ana matuƙar maraba da gyaran masu harshen a <a href=\"{href.newIssue}\">GitHub</a>."
+        ],
+        "alt": "Vespertine da aka rubuta a kowane ɗaya daga cikin harsunan mu'amalarsa {languagesTotal}, daga ヴェスパタイン da Веспертайн zuwa فسبرتاين da वेस्परटाइन, da girma da salon rubutu dabam-dabam.",
+        "wallLabel": "Vespertine a kowane harshensa"
+      }
+    },
+    "formats": {
+      "eyebrow": "Tsarukan fayil",
+      "title": "Fayilolin surround, marasa asara da masu asara.",
+      "text": "Stereo da tashoshi da yawa, PCM da DSD, kwafin faifai da fayiloli na yau da kullum, tare da takardun CUE a dukkansu.",
+      "caption": "Tsarukan da Vespertine ke kunnawa, da yadda yake kunna su",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Ƙimar samfur da tsawon bit na asali har zuwa bit 32 da ƙimar da DAC ɗinku ke aiki da ita (an gwada har zuwa 384 kHz); PCM na bit 32 ba tare da sauyi ba yana buƙatar Yanayin integer. Kwafin faifai masu takardar CUE."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF da DSDIFF, waɗanda aka matsa da DST ko ba a matsa ba. DoP ya dogara da DAC da ƙimar samfur ta mai ɗaukarsa; in ba haka ba, PCM. Ba a gwada ƙimar mai ɗaukar DoP sama da 384 kHz a kan na'urori ba."
+        },
+        {
+          "name": "Kwafin SACD",
+          "text": "Sassan stereo da na tashoshi da yawa, masu DST ko marasa matsawa, kai tsaye daga kwafin; ana lissafa kowace waƙa sau ɗaya tare da sigoginta na stereo da 5.1."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "Bit 16, 20 da 24 a 48 da 96 kHz, tashoshi 1 zuwa 8, daidai bit da bit; kundi ɗaya ga kowane title, waƙa ɗaya ga kowane chapter. Ba a tallafa wa DVD-Audio ba."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus mai Atmos, ta na'urar sarrafa abubuwan sauti ta macOS, ko kuma tushen tashoshinsa da aka warware."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Marar asara, kuma yana iya zama bit-perfect; TrueHD Atmos yana kunna tushen tashoshinsa, ba a sarrafa abubuwan sautinsa."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA marar asara ne kuma yana iya zama bit-perfect; DTS:X yana kunna tushen tashoshinsa. Ana warware ɗanyen DTS; bitstream na DTS-CD yana da wata hanya dabam."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "macOS ne ke warware shi. Bitstream zuwa risiva na gwaji ne, ba a gwada shi a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
+        },
+        {
+          "name": "DTS CD da DTS-WAV",
+          "text": "Ana gane su a warware zuwa 5.1, har da kundayen da aka raba ta CUE."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Marasa asara. Ba a tallafa wa DSD da ke cikin WavPack ba."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Ana warware su kuma a yi musu alamar masu asara."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Kwatanta",
+      "title": "Yadda yake a kwatance.",
+      "intro": "Manhajojin kunna kiɗa da dama a Mac suna bayar da kunnawa bit-perfect. Wannan kwatancen yana nuna abin da takardun kowace manhaja ko lambar tushenta suka ce. “Ba a bayyana a takardu ba” yana nufin mai samarwa bai faɗi ko akwai ko babu ba, ba wai fasalin bai nan ba. Vespertine ba shi da convolution, ƙarin manhajojin tasirin sauti ko sabis na yaɗa kiɗa.",
+      "hint": "Gungura don ganin ƙari →",
+      "region": "Jadawalin kwatance (yana gungurawa a kwance)",
+      "caption": "Kwatancen Vespertine da wasu manhajojin kiɗa bakwai na Mac, daga takardun kowace manhaja ko lambar tushenta",
+      "feature": "Fasali",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Lambar tushe",
+          "GPL-3.0",
+          "Rufaffe",
+          "Rufaffe",
+          "Rufaffe",
+          "Rufaffe",
+          "Rufaffe",
+          "GPL-2.0",
+          "Rufaffe"
+        ],
+        [
+          "Fayilolin FLAC / DSD",
+          "I / I",
+          "A'a / A'a",
+          "I / I",
+          "I / I",
+          "I / I",
+          "I / I",
+          "I / I",
+          "I / A'a⁴"
+        ],
+        [
+          "Sauya ƙimar samfur ta DAC ta atomatik",
+          "I",
+          "A'a",
+          "I",
+          "I",
+          "I",
+          "I",
+          "I",
+          "Ba a bayyana a takardu ba"
+        ],
+        [
+          "Yanayin keɓe (hog)",
+          "I",
+          "A'a",
+          "I",
+          "I",
+          "I",
+          "I",
+          "I",
+          "I"
+        ],
+        [
+          "PCM na bit 16/24 ba tare da sauya samfuran sauti ba",
+          "Sharuɗɗa + gwaje-gwaje",
+          "macOS 27: gwaje-gwajen wasu masu zaman kansu¹",
+          "Da'awar mai samarwa",
+          "Da'awar mai samarwa",
+          "Gwajin Loopback a cikin manhajar",
+          "Da'awar mai samarwa",
+          "Mai nuna hali a cikin manhajar",
+          "Ba a bayyana a takardu ba"
+        ],
+        [
+          "Fayilolin surround na gida",
+          "I²",
+          "Ba a bayyana a takardu ba",
+          "I",
+          "I",
+          "I",
+          "Ba a bayyana a takardu ba",
+          "I",
+          "Ba a bayyana a takardu ba"
+        ],
+        [
+          "Apple Spatial Audio don surround na gida",
+          "I",
+          "Atmos na kundin sabis kaɗai³",
+          "Ba a bayyana a takardu ba",
+          "Ba a bayyana a takardu ba",
+          "Ba a bayyana a takardu ba",
+          "Ba a bayyana a takardu ba",
+          "I",
+          "Ba a bayyana a takardu ba"
+        ],
+        [
+          "Nazarin fayilolin hi-res",
+          "I",
+          "A'a",
+          "AudioScan",
+          "Faɗin bambancin ƙarar sauti, ƙarar da ake ji",
+          "I",
+          "Ba a bayyana a takardu ba",
+          "A'a (bakan sauti kai tsaye kaɗai)",
+          "A'a (bakan sauti kai tsaye kaɗai)"
+        ],
+        [
+          "SACD ISO",
+          "I",
+          "A'a",
+          "I",
+          "A'a (DSF/DFF kaɗai)",
+          "I",
+          "A'a",
+          "A'a",
+          "A'a⁴"
+        ],
+        [
+          "Convolution / ƙarin manhajojin tasirin sauti",
+          "A'a / A'a",
+          "A'a / A'a",
+          "I (Origin: zaɓi na kuɗi) / Audio Units",
+          "I / A'a",
+          "A'a / A'a",
+          "Ba a bayyana a takardu ba / Ba a bayyana a takardu ba",
+          "A'a / A'a",
+          "Ba a bayyana a takardu ba / Audio Units"
+        ],
+        [
+          "Sabis na yaɗa kiɗa",
+          "A'a",
+          "Apple Music",
+          "Studio: i; Origin: a'a",
+          "I",
+          "A'a (na gida + UPnP)",
+          "A'a (rediyon intanet)",
+          "A'a (rediyon intanet)",
+          "A'a (rediyon intanet)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music a macOS 27 ya kasance daidai bit da bit a bit 16/24 a <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">gwaje-gwajen loopback na wasu masu zaman kansu da aka ruwaito a ASR</a>, da ƙarar sauti a 100%. Wannan ba ma'aunin Vespertine ba ne; ba a iya sake tabbatar da rahoton asali da kansa don wannan sabuntawa ba. Har yanzu babu sauya ƙimar samfur ta atomatik, yanayin hog, FLAC ko DSD a Mac.",
+        "² Fitarwar DAC mai tashoshi da yawa da bitstream zuwa risiva na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni.",
+        "³ Apple ya bayyana Spatial Audio mai bin motsin kai don waƙoƙin Dolby Atmos a kundin Apple Music, ba sarrafa fayilolinku masu tashoshi da yawa zuwa sautin sararin samaniya ba.",
+        "⁴ An gwada a foobar2000 2.26 (macOS 27.0.1), ba tare da ƙarin sassa ba: fayilolin DSF, DFF da SACD ISO sun kasa kunnawa da saƙon “Ba a tallafa wa tsarin fayil ba”. DSF da DFF suna kunnawa a matsayin PCM na 352.8 kHz kaɗai bayan an girka FFmpeg dabam kuma an ƙara su cikin FFmpeg Decoder Wrapper nasa; SACD ISO har yanzu yana kasa kunnawa."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Tushe da iyakar kwatancen</a>. Ana maraba da gyara: <a href=\"{href.issues}\">buɗe batun matsala</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Sabbin abubuwa",
+      "title": "Sabbin abubuwa a {version}.",
+      "latest": "Sabuwar siga",
+      "fullNotes": "Cikakkun bayanan siga",
+      "meta": "kun riga kun girka? Yana sabunta kansa, ko kuma {brewUpgrade}",
+      "earlier": "Sigogin baya",
+      "every": "Dukkan sigogi",
+      "inEnglish": "Ba a fassara waɗannan bayanan siga ba tukuna, don haka ana nuna su da Turanci."
+    },
+    "faq": {
+      "eyebrow": "Tambayoyin da aka fi yi",
+      "title": "Tambayoyi da amsoshi.",
+      "items": [
+        {
+          "q": "Da gaske kyauta ne?",
+          "a": "I. Vespertine kyauta ne kuma buɗaɗɗen tushe ne ƙarƙashin GPL-3.0. Babu asusu, babu biyan kuɗin rajista, babu talla kuma babu tattara bayanan amfani ta atomatik (<a href=\"{href.privacy}\">sirri</a>). Yana shiga intanet ne kawai don duba sabuntawa, da kuma tuntuɓar MusicBrainz, Cover Art Archive ko ListenBrainz, ko nemo hotunan bangon kundi don halinku na Discord, idan kun nemi hakan."
+        },
+        {
+          "q": "Me nake buƙata?",
+          "a": "macOS {minMacOS} ({minMacOSName}) ko na gaba, a Apple silicon ko Intel. Ba a gwada a kan na'urorin Intel ba; sigar Intel ta yi aiki ƙarƙashin Rosetta, kuma ana maraba da rahotanni daga Mac na Intel na gaske."
+        },
+        {
+          "q": "Yaya zan girka shi kuma in sabunta shi?",
+          "a": "Sauke DMG, buɗe shi sannan ku matsar da Vespertine zuwa Applications. An sa masa sa hannun Developer ID kuma Apple ta tabbatar da shi, kuma yana sabunta kansa; kowane sabuntawa yana da sa hannu. Da Homebrew: {brew}, sannan {brewUpgrade} ko sabuntawar da ke cikin manhajar."
+        },
+        {
+          "q": "Yana yaɗa kiɗa daga Qobuz, TIDAL ko Apple Music?",
+          "a": "A'a. Vespertine yana kunna kiɗan da kuka mallaka, a Mac ɗinku, a ma'ajiyoyin waje ko a Folda ta cibiyar sadarwa. Ba zai iya kunna abubuwan da aka sauke ta rajistar Apple Music masu kariyar DRM ba."
+        },
+        {
+          "q": "Ta yaya zan san cewa da gaske bit-perfect ne?",
+          "a": "Hanyar Sigina tana karanta ainihin abin da Core Audio ya yi: ƙimar samfur da aka saita wa na'urar, tsarin bayanan sauti da take amfani da shi a zahiri da kuma wanda yake riƙe da ikon ta. Masu warware sauti suna da gwaje-gwaje na atomatik (TrueHD da tushensa, DTS da na'urar warware sauti ta FFmpeg kanta), Gwajin Loopback da ke ciki yana duba Hanyar manhaja samfur da samfur, kuma <span class=\"mono nowrap\">vespertine-probe</span> yana ba ku damar duba na'urorinku. <a href=\"{href.verification}\">Yadda za ku tabbatar da kanku</a>."
+        },
+        {
+          "q": "Zai iya kunna faifan SACD da DVD?",
+          "a": "Yana kunna kwafinsu. Kwafin SACD <code>.iso</code>, na stereo da tashoshi da yawa, masu matsawar DST ko marasa matsawa, da kiɗan LPCM a kwafin DVD-Video ko foldojin <code>VIDEO_TS</code> suna kunnawa kai tsaye daga kwafin, ba tare da cire komai ba. Ba a tallafa wa DVD-Audio ba, kuma DVD masu ɓoyewa ta CSS suna buƙatar kwafin da aka cire wa ɓoyewar."
+        },
+        {
+          "q": "Yana kunna Dolby Atmos?",
+          "a": "Dolby Digital Plus mai Atmos yana kunnawa ta na'urar sarrafa abubuwan sauti ta macOS, a matsayin Spatial Audio mai bin motsin kai a AirPods. TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu marar asara; ba a sarrafa abubuwan sautinsu. Bitstream zuwa risivar AV na gwaji ne, ba a gwada shi a kan risivoci na gaske ba; ana neman rahotanni."
+        },
+        {
+          "q": "Zai sauya fayilolina?",
+          "a": "Sai idan kun gyara alamomi kawai, kuma a lokacin ana fara yin kwafin ajiyar kowane fayil kuma za a iya mayar da shi yadda yake a mataki ɗaya. Ana nuni ga foldoji a inda suke; shigo da su yana ƙirƙirar kwafin APFS waɗanda ba sa cin ƙarin sarari."
+        },
+        {
+          "q": "A kan waɗanne na'urori aka gwada shi?",
+          "a": "An gwada kunnawa a FiiO K11 a ƙimar samfur har zuwa 384 kHz, da DoP da Yanayin integer; AirPods Max ta USB-C da Bluetooth; lasifikokin MacBook Pro; da TV na Sony ta HDMI a 5.1. Ba a gwada a kan na'urorin Intel ba. Bitstream zuwa risiva da fitarwar DAC mai tashoshi da yawa na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); <a href=\"{href.dacReport}\">ana neman rahotanni</a>."
+        },
+        {
+          "q": "Akwai shi a yarena?",
+          "a": "Mai yiwuwa: manhajar tana da Turanci da wasu harsuna {languages}, har da Larabci, Ibrananci, Farisanci da Urdu masu tafiya daga dama zuwa hagu. Vespertine yana bin yaren da aka saita masa a Saitunan Tsarin Aiki. Ana maraba da gyara daga masu jin harsunan a matsayin harshen uwa a <a href=\"{href.newIssue}\">GitHub</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Taimako",
+      "title": "Ku taimaka wa Vespertine ya bunƙasa.",
+      "text": "Kyauta ne, buɗaɗɗen tushe ne kuma ana gina shi a fili. Ga yadda za ku taimaka.",
+      "cards": [
+        {
+          "title": "Ɗauki nauyi a GitHub",
+          "text": "Vespertine kyauta ne. Idan yana amfanar ku, ɗaukar nauyinsa a GitHub yana tallafa wa ci gabansa.",
+          "cta": "Zama mai ɗaukar nauyi"
+        },
+        {
+          "title": "Bayar da rahoton DAC ɗinku",
+          "text": "Ku faɗa mana abin da DAC ɗinku, na'urar haɗa sauti ko risiva ta yi. Kowane rahoton na'ura yana ƙara faɗaɗa abin da aka bincika a kan na'urori na gaske.",
+          "cta": "Miƙa rahoton na'ura"
+        },
+        {
+          "title": "Gyara fassara",
+          "text": "Kun ga jimlar da ba ta zauna ba a ɗaya daga cikin harsuna {languages}? Buɗe batun matsala tare da lafazi mafi kyau.",
+          "cta": "Ba da shawarar gyara"
+        },
+        {
+          "title": "Karanta lambar tushe",
+          "text": "Ana maraba da rahotannin kura-kurai, buƙatun haɗa sauye-sauye da tambayoyi. Sharuɗɗan Hanyar Sigina da gwaje-gwajensu duk suna cikin ma'ajiyar lambar tushe.",
+          "cta": "Lambar tushe a GitHub"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Sauke",
+      "title": "Ku kunna tarin kiɗanku na surround a Mac ɗinku.",
+      "meta": [
+        "Kyauta",
+        "buɗaɗɗen tushe",
+        "siga {version}",
+        "macOS {minMacOS} ko na gaba"
+      ]
+    }
+  },
+  "press": {
+    "title": "Kayan 'yan jarida: Vespertine, manhajar kunna waƙoƙin kewaye da Hi-Res don Mac",
+    "description": "Bayanai, tambura, manyan zane-zane, hotunan allo na gaske da tallan bidiyo na Vespertine, manhajar Mac kyauta mai buɗaɗɗen tushe don tarin waƙoƙin kewaye da Hi-Res.",
+    "ogAlt": "Kayan 'yan jarida na Vespertine: takardar bayanai, tambura, manyan zane-zane, hotunan allo na gaske da tallan bidiyo, a kan hotunan allo uku na gaske na manhajar.",
+    "eyebrow": "Kayan 'yan jarida",
+    "heading": "Duk abin da kuke buƙata don yin rubutu",
+    "lede": "Vespertine manhajar Mac ce kyauta, mai buɗaɗɗen tushe, don tarin waƙoƙin kewaye da Hi-Res. Hotunan faifan SACD da DVD-Video, waƙoƙin SACD 5.1 da aka ciro, CD na DTS, da fayilolin DTS-HD MA, TrueHD da Atmos suna raba laburare ɗaya, tare da Spatial Audio mai bin motsin kai a AirPods. Hanyar Sigina tana nuna kowane mataki daga fayil zuwa fitarwa, tare da sharuɗɗa da gwaje-gwaje a cikin lambar tushe ta GPL wadda kowa zai iya bincika.",
+    "fine": "Fitarwa tasha-zuwa-tasha da bitstream zuwa risiva na gwaji ne, kuma ba a gwada su ba a kan risiva na gaske da DAC na USB masu tashoshi da yawa (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni. macOS ne ke tsara sautin abubuwan Dolby Digital Plus Atmos; TrueHD Atmos da DTS:X suna kunna channel bed ɗinsu.",
+    "facts": {
+      "eyebrow": "Takardar bayanai",
+      "title": "Bayanan gaskiya.",
+      "name": "Suna",
+      "formerly": "(ana kiranta {formerName} har zuwa sigar 0.6.0)",
+      "developer": "Mai haɓakawa",
+      "developerValue": "{author}, mai haɓakawa mai zaman kansa",
+      "price": "Farashi",
+      "priceValue": "Kyauta. Buɗaɗɗen tushe ƙarƙashin GPL-3.0; babu asusu, biyan kuɗi na rajista, tallace-tallace ko telemetry",
+      "platform": "Dandali",
+      "platformValue": "macOS {minMacOS} {minMacOSName} ko wanda ya biyo baya, Apple silicon da Intel",
+      "current": "Sigar yanzu",
+      "currentValue": "{version}, an fitar da ita a {date}",
+      "currentFine": "DMG mai sa hannu kuma an yi masa notarization ({size}), yana sabunta kansa",
+      "first": "Fitowa ta farko",
+      "firstFine": "(a matsayin {formerName} 0.1.0)",
+      "languages": "Harsuna",
+      "languagesValue": "Turanci da wasu harsuna {languages}, ciki har da Yukiraniyanci, Larabci, Ibrananci, Jafananci da nau'ukan Sinanci uku",
+      "install": "Shigarwa",
+      "installValue": "<a href=\"{href.dmg}\">Sauke DMG ɗin</a> ko {brew}",
+      "tested": "An gwada da",
+      "testedValue": "FiiO K11 (kowane sample rate har zuwa 384 kHz, DoP, Yanayin integer), AirPods Max ta USB-C da Bluetooth, lasifikokin MacBook Pro",
+      "links": "Hanyoyin haɗi",
+      "website": "Shafin yanar gizo",
+      "source": "Lambar tushe",
+      "releaseNotes": "Bayanan fitowa",
+      "verify": "Yadda ake tabbatar da kunnawa bit-perfect"
+    },
+    "angle": {
+      "eyebrow": "Fuskar labari",
+      "title": "Abin da take mai da hankali a kai.",
+      "list": [
+        "Waƙoƙin kewaye a laburaren Mac ɗaya, daga hotunan SACD da DVD-Video, waƙoƙin da aka ciro da CD na DTS zuwa TrueHD da DD+ Atmos, tare da Spatial Audio a AirPods.",
+        "Lambar tushe ta GPL-3.0 kyauta wadda kowa zai iya karantawa, ginawa da gyarawa.",
+        "Hanyar sigina da ke nuna sample rate, word length, gain da sarrafa tashoshi. Sharuɗɗan bit-perfect suna cikin lambar shirin, tare da gwaje-gwaje, gwajin loopback da ke cikin manhajar da kuma <a href=\"{href.verification}\">jagorar tabbatarwa</a>."
+      ],
+      "text": "Har ila yau akwai nazarin fayilolin Hi-Res. Gano zero padding yana da cikakken daidaito; hukuncin binciken spectrum ƙiyasi ne kuma suna da iyaka. VeraVox da Audirvana AudioScan ma suna ba da nazari. <a href=\"{href.comparison}\">Tushen bayanan kwatance</a>."
+    },
+    "video": {
+      "eyebrow": "Bidiyo",
+      "title": "Tallan bidiyo.",
+      "text": "Daƙiƙa 44, 16:9, 1080p a 60 fps, tare da sauti. <a href=\"{href.trailerDownload}\" download>Sauke MP4 ɗin</a> ({size}). Akwai babban kwafin 4K idan an nema.",
+      "fallback": "Sauke tallan bidiyon (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Alama",
+      "title": "Tambari.",
+      "text": "Kullum da ƙananan haruffa, jinjirin watan kuma kullum da launin tagulla. Don Allah kada ku canza launinsa, ku miƙe shi ko ku sake tsara shi. <a href=\"{href.brandGuide}\">Jagorar alama (PDF)</a>.",
+      "primaryAlt": "Tambarin Vespertine: jinjirin wata na tagulla da kalmar vespertine",
+      "stackedAlt": "Tambarin Vespertine a jere sama da ƙasa",
+      "primary": "Babba",
+      "stacked": "Sama da ƙasa",
+      "onLight": "a bango mai haske:",
+      "crescent": "jinjirin wata shi kaɗai:"
+    },
+    "art": {
+      "eyebrow": "Manyan zane-zane",
+      "title": "Hoto ɗaya ga kowane fasali.",
+      "text": "A girma uku: 2400×1350, 1600×900 da 1270×760.",
+      "items": {
+        "bit-perfect": "Bit-perfect idan sharuɗɗan sun cika",
+        "fake-hi-res": "Gano Hi-Res na bogi",
+        "spatial-audio": "Kewaye a matsayin Spatial Audio a AirPods",
+        "native-dsd": "DSD na asali ta DoP",
+        "stereo-and-surround": "Nau'ukan stereo da na kewaye",
+        "sacd-iso": "Hotunan SACD, ana kunna su kai tsaye",
+        "languages": "Harsuna {languages}"
+      }
+    },
+    "shots": {
+      "eyebrow": "Hotunan allo",
+      "title": "Ainihin manhajar.",
+      "text": "A kan laburaren mai haɓakawa da kansa, 2400×1500. Hotunan kundi mallakar masu su ne.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "bit 24 / 96 kHz, bit-perfect a kan Fosi Audio ZD3: Lazar Berman, Les jeux d’eaux à la Villa d’Este na Liszt",
+        "multichannel-albums": "Kundaye da aka tace zuwa masu tashoshi da yawa",
+        "stereo-and-surround-versions": "Waƙoƙin SACD da aka ciro tare da nau'ukan stereo da na 5.1",
+        "spatial-audio-airpods-max": "Kundin 24/88.2 5.1 (Elton John, Goodbye Yellow Brick Road) a matsayin Spatial Audio a AirPods Max",
+        "fake-hi-res-detection": "“Remaster” na 24/192 da ke tsayawa a 16 kHz (na bogi da gangan: waƙar tallan bidiyon kanta, an mayar da ita MP3 sannan aka yi mata upsampling, ƙarƙashin sunan ƙungiyar mawaƙa da aka ƙirƙira)",
+        "dsd-native-dop": "DSD128 ta DoP a 352.8 kHz a kan Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Fayil ɗin SACD .iso, ana kunna shi daga hoton: Dire Straits, Brothers In Arms",
+        "genres": "Salo-salo",
+        "search": "Nema",
+        "smart-playlist": "Jerin Waƙoƙi Mai Wayo, bit-perfect a kan AirPods Max ta USB-C",
+        "loopback-test": "Gwajin Loopback: binciken manhaja na hanyar fitarwa, samfuri bayan samfuri",
+        "setup-welcome": "Saitin farko: maraba",
+        "setup-output": "Saitin farko: zaɓar fitarwar da za a tuna",
+        "output-settings": "Saitunan fitarwa: fitarwar da aka tuna, madadi, daidaitawar bit 16",
+        "equalizer": "EQ na parametric tare da saitin AutoEQ"
+      }
+    },
+    "contact": {
+      "eyebrow": "Tuntuɓa",
+      "title": "Tuntuɓe mu.",
+      "text": "'Yan jarida, tambayoyi da buƙatun hira: {email}. Tambayoyin al'umma: <a href=\"{href.discussions}\">GitHub Discussions</a>. Kurakurai da rahotannin na'urori: <a href=\"{href.issues}\">GitHub issues</a>."
+    }
+  },
+  "privacy": {
+    "title": "Sirri: Vespertine ba ta tattara komai",
+    "description": "Manhajar Vespertine ba ta tattara komai: babu asusu, analytics, telemetry, rahoton faɗuwar manhaja ko tallace-tallace. Abin da manhajar da wannan shafin yanar gizo ke haɗawa da su, da kuma dalili.",
+    "ogAlt": "Sirrin Vespertine: Vespertine ba ta tattara komai. Babu asusu, analytics, telemetry, rahoton faɗuwar manhaja ko tallace-tallace.",
+    "eyebrow": "Sirri",
+    "heading": "Vespertine ba ta tattara",
+    "headingBrass": "komai.",
+    "updated": "Yana aiki daga {effective} (yana ƙara matsayin Discord na zaɓi). An sabunta sashen “Wannan shafin yanar gizo” a {websiteUpdated}: yanzu shafin yana ƙirga ziyara da ƙididdiga marasa kukis da muke gudanarwa a kan sabarmu.",
+    "intro": "Vespertine manhajar kunna waƙoƙi ce kyauta, mai buɗaɗɗen tushe. Manhajar ba ta da asusu, ba ta da analytics, ba ta da telemetry, ba ta da rahoton faɗuwa kuma ba ta da tallace-tallace. Mai haɓakawa ba ya karɓar wani bayani game da ku ko waƙoƙinku. Saboda lambar tushe a fili take, kuna iya duba kowace magana a wannan shafin.",
+    "staysTitle": "Abin da ke zama a kan Mac ɗinku",
+    "stays": "Rumbun bayanan laburarenku, jerin waƙoƙi, ƙididdigar kunnawa, sakamakon nazarin fayiloli, ma'ajiyar hotunan kundi da saituna ana adana su a cikin Library na mai amfani a kan Mac ɗinku. Kalmomin sirri na wuraren rabawa na network da token ɗinku na ListenBrainz, idan kun ƙara ɗaya, ana adana su a cikin Keychain na macOS. Babu ɗayansu da ake lodawa zuwa ko'ina.",
+    "onlineTitle": "Lokacin da manhajar ke shiga intanet",
+    "online": [
+      "<strong>Binciken sabuntawa.</strong> Vespertine tana tambayar GitHub jerin sabuntawarta kusan sau ɗaya a rana, da kuma lokacin da kuka zaɓi Bincika Sabuntawa. GitHub na ganin adireshin IP ɗinku, kamar yadda yake a kowane saukewa. Kuna iya kashe bincike ta atomatik a cikin Saituna.",
+      "<strong>MusicBrainz da Cover Art Archive.</strong> Kawai lokacin da kuka yi amfani da Nema a MusicBrainz ko Inganta Bayanan Waƙa (Nemo Waƙoƙi a Wannan Mac yana ba da Inganta don waƙoƙin da yake ƙarawa, a matsayin akwatin zaɓi da za ku iya cirewa), Vespertine tana aika sunayen kundi, mawaƙi da waƙar da take nema zuwa musicbrainz.org. Idan “Ɗauko hotunan bangon kundi” a kunne yake a cikin Saituna, tana sauke hotunan bango daga coverartarchive.org, wanda ke samar da su daga Internet Archive (archive.org). MetaBrainz Foundation ce ke gudanar da MusicBrainz da Cover Art Archive.",
+      "<strong>ListenBrainz.</strong> Kawai idan kun kunna scrobbling kuma kun shigar da token ɗinku, Vespertine tana aika wa listenbrainz.org waƙoƙin da kuke kunnawa: take, mawaƙi, kundi, tsawon lokaci da lambobin ID na MusicBrainz ɗinsu idan fayilolinku na ɗauke da su. Tana aika “ana kunnawa yanzu” lokacin da waƙa ta fara, da kuma sauraro tare da lokacinsa da zarar kun ji rabin waƙar ko minti huɗu.",
+      "<strong>Discord.</strong> Kawai idan kun kunna matsayin Discord a cikin Saituna, Vespertine tana gaya wa manhajar Discord da ke kan Mac ɗinku, ta hanyar haɗin da ke zama a kan Mac ɗinku, abin da ake kunnawa: take, mawaƙi, kundi, tsari da ci gaba. Discord tana nuna shi a matsayin matsayinku ga mutanen da za su iya ganin ayyukanku. Don nuna hoton bangon kundin, Vespertine tana nemansa ta suna, saboda Discord tana iya nuna hotuna daga yanar gizo kawai: a coverartarchive.org idan fayilolinku na ɗauke da ID na fitowar MusicBrainz, in ba haka ba a iTunes Search na Apple (itunes.apple.com), wanda ke karɓar sunayen mawaƙi da kundi. Sai Discord ta sauke hoton daga can. Kuna iya kashe hotunan bango, kuma ba a taɓa loda fayilolinku da hotunansu ba.",
+      "<strong>Wuraren rabawa na network.</strong> Vespertine tana haɗawa da sabobin da kuka ƙara, ba wani wuri ba, don karanta waƙoƙinku. Yayin da wurin rabawa ke haɗe, tana duba kusan kowane minti ɗaya cewa sabar har yanzu tana amsawa, kuma tana neman sababbin waƙoƙi kowane rabin awa (ba a taɓa yi ba yayin da kuke kunnawa daga gare shi)."
+    ],
+    "websiteTitle": "Wannan shafin yanar gizo",
+    "website": [
+      "Ana ajiye wannan shafin a GitHub Pages, wanda zai iya rubuta adireshin IP na maziyarta; duba <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">sanarwar sirri ta GitHub</a>. Maɓallan saukewa suna kai ga fitowar manhajar a GitHub. Shafin ba ya saka kukis kuma yana loda haruffansa (fonts), hotunansa da bidiyonsa daga wannan shafin.",
+      "Don sanin waɗanne shafuka da maɓallai mutane ke amfani da su, shafin yana ƙirga ziyara da <a href=\"https://umami.is\">Umami</a>, manhaja mai mutunta sirri da muke gudanarwa da kanmu a stats.szeremeta.org. Ba ta saka kukis, ba ta adana komai a na'urarku, ba ta riƙe adireshin IP ɗinku, kuma ba ta raba komai da masu talla ko wani kamfani. Tana rubuta shafin, shafin da kuka fito daga gare shi, ƙasarku a kusan, burauzarku, tsarin aiki, girman allo da harshe, da dannawa a kan maɓallan saukewa, GitHub da Homebrew. Ba za ta iya bin ku a shafukan yanar gizo daban-daban ko gane ku ba, kuma tana tsallake maziyartan da burauzarsu ke aika Do Not Track. <strong>Manhajar ba ta taɓa tuntuɓarta.</strong>",
+      "Idan kun zaɓi harshe da menu na harshe na shafin, burauzarku tana tuna zaɓin a na'urarku (a cikin ma'ajiyarta ta gida), don kada shafin ya mayar da ku. Ba a taɓa aika shi ko'ina ba, kuma shafin yana aiki iri ɗaya ba tare da shi ba."
+    ],
+    "changesTitle": "Canje-canje da tuntuɓa",
+    "changes": "Idan wannan ya taɓa canzawa, wannan shafin da bayanan fitowa ne za su fara sanar da hakan. Ana maraba da tambayoyi a matsayin <a href=\"{href.issues}\">GitHub issue</a>."
+  },
+  "terms": {
+    "title": "Sharuɗɗa: Vespertine manhaja ce ta 'yanci ƙarƙashin GPL",
+    "description": "Vespertine manhaja ce ta 'yanci ƙarƙashin GNU General Public License, siga ta 3 ko wadda ta biyo baya: babu kuɗi, babu rajista, babu garanti.",
+    "ogAlt": "Sharuɗɗan Vespertine: manhaja ta 'yanci, a sarari. GNU General Public License, siga ta 3 ko wadda ta biyo baya.",
+    "eyebrow": "Sharuɗɗa",
+    "heading": "Manhaja ta 'yanci,",
+    "headingBrass": "a sarari.",
+    "updated": "Yana aiki daga {effective}",
+    "licenseTitle": "Lasisi",
+    "license": "Vespertine manhaja ce ta 'yanci ƙarƙashin <a href=\"{href.license}\">GNU General Public License, siga ta 3 ko wadda ta biyo baya</a>. Kuna iya amfani da ita don kowace manufa, ku yi nazari kuma ku canza lambar tushenta, ku kuma raba kwafe-kwafe, har da waɗanda aka gyara, ƙarƙashin lasisi ɗaya. Ba ta da kuɗi, kuma babu wani abin da za a yi rajista da shi.",
+    "warrantyTitle": "Babu garanti",
+    "warranty": "Kamar yadda lasisin ya faɗa, ana ba da Vespertine “yadda take”, ba tare da garanti na kowane iri ba, gwargwadon abin da doka ta yarda. Ku riƙe kwafin ajiya na waƙoƙinku. Vespertine tana canza fayiloli ne kawai lokacin da kuka gyara alamominsu, kuma tana yin kwafin ajiya na kowanne tukuna, amma kuna amfani da ita bisa haɗarin kanku.",
+    "musicTitle": "Waƙoƙinku da sauran ayyuka",
+    "music": "Ku ne ke da alhakin samun haƙƙin kunna waƙoƙin da kuke ƙarawa. Vespertine ba za ta iya kunna fayilolin da ke da kariyar DRM ba kuma ba ta ƙoƙarin yin hakan. MusicBrainz, Cover Art Archive da ListenBrainz ayyuka ne masu zaman kansu da ke da nasu sharuɗɗan, waɗanda suke aiki lokacin da kuke amfani da su ta Vespertine.",
+    "trademarksTitle": "Alamomin kasuwanci",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus da Dolby TrueHD alamomin kasuwanci ne na Dolby Laboratories. DTS, DTS-HD Master Audio da DTS:X alamomin kasuwanci ne na DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS da Spatial Audio alamomin kasuwanci ne na Apple Inc. Vespertine tana ambatonsu ne kawai don bayyana abin da take kunnawa da kuma inda. Dolby, DTS ko Apple ba su ba ta takardar shaida, lasisi ko goyon baya ba.",
+    "contactTitle": "Tuntuɓa",
+    "contact": "Kurakurai, tambayoyi da buƙatu: <a href=\"{href.issues}\">GitHub issues</a>.",
+    "englishNote": "Wannan fassara ce don sauƙaƙa muku. Ainihin rubutun GNU General Public License shi ne mai ɗaurewa, kuma da Turanci yake."
+  },
+  "notFound": {
+    "title": "Ba a sami shafin ba: Vespertine",
+    "description": "Wannan shafin ba ya nan. Vespertine manhajar Mac ce ta kyauta kuma buɗaɗɗen tushe don tarin kiɗan surround da hi-res.",
+    "ogAlt": "Vespertine: manhajar Mac ta kyauta kuma buɗaɗɗen tushe don kiɗan surround da hi-res.",
+    "eyebrow": "404 · Babu sigina",
+    "heading": "Wannan shafin",
+    "headingBrass": "ba ya nan.",
+    "lede": "Mai yiwuwa hanyar haɗin ta tsufa, ko an yi kuskuren rubuta adireshin. Duk abin da ya shafi Vespertine yana farawa daga shafin farko.",
+    "home": "Je zuwa shafin farko"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} ko na gaba",
+    "processor": "Apple silicon (arm64) ko Intel (x86-64)",
+    "subCategory": "Manhajar kunna kiɗa",
+    "sourceName": "Lambar tushen Vespertine",
+    "trailerName": "Bidiyon gabatar da Vespertine",
+    "trailerDescription": "Yawon Vespertine na daƙiƙa 44, da aka ɗauka daga ainihin manhajar a laburaren mai haɓaka ta: Hanyar Sigina ta bit-perfect, DSD ta DoP, surround a matsayin Spatial Audio a AirPods da nazarin fayilolin hi-res.",
+    "keywords": "bit-perfect, sautin hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, manhajar kunna kiɗa, macOS, buɗaɗɗen tushe"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 ya ƙara gyaran sautin ɗaki: ku auna lasifikokinku da makirufon UMIK-1 sannan ku kunna kiɗa ta matatun da aka yi don ɗakinku. Haka kuma yana hana bayanan kunnawa daga cibiyar sadarwa ƙarewa.",
+      "notes": "### Gyaran sautin ɗaki\n- **Auna ɗakinku.** Sanya makirufon UMIK-1 da aka daidaita a kujerar sauraro, sai Vespertine ya kunna sautukan gwaji masu hawa ta kowace lasifika bi da bi. Yana fara duba Matakin sauti da hanyar zuwa kowace lasifika, yana ƙin karɓar gwajin da bai yi kyau ba kuma yana ba ku damar sake gwadawa ko ci gaba daga inda kuka tsaya.\n- **Matatu ga kowace lasifika.** Daga ma'aunin, Vespertine yana gina ƙaramin rukunin matatu ga kowace lasifika, yawanci don rage kololuwar bass da ɗaki ke ƙarawa. Jadawalin yana nuna abin da aka auna, abin da aka yi hasashen zai kasance bayan gyara da Manufa, kuma ana yi wa hasashen alamar cewa hasashe ne. Zaɓi manufa (Ɗan karkata, Lebur ko Mai ɗumi) da fadi (bass kaɗai, ko Cikakken fadi) sannan a sake daidaita matatun daga ma'aunin da aka adana.\n- **A kashe yake tun farko, don haka bit-perfect yana nan bit-perfect.** Ana kunna gyaran sautin ɗaki ga kowace fitarwa dabam, kuma yana ɗaure da fitarwar da aka yi ma'aunin a kanta. Yayin da yake sauya samfuran sauti, Hanyar Sigina tana nuna ROOM CORRECTION kuma ba a ƙara yi wa rafin sautin alamar bit-perfect ba. Yana aiki a kan PCM na stereo da Vespertine ke sarrafawa; ga DSD ta DoP, bitstream, Atmos da sauran adadin tashoshi, yana janye kansa kuma ya faɗi dalili. Yanayin integer da Daidaita da bit 16 suna kasancewa a kashe yayin da yake kunne.\n- **Inda za ku same shi.** Duba → Gyaran Sautin Ɗaki, haka kuma daga tagar Mai Daidaita Sauti da saitunan kowace fitarwa. Za ku iya ajiye ma'auni, kunna shi, yar da shi ko shigo da `room-profile.json` da aka ajiye. Wannan ya maye gurbin tagar beta ta Auna Ɗaki ta baya. An bayyana hanyar a `docs/ROOM-CORRECTION.md`.\n\n### Kunnawa daga cibiyar sadarwa\n- **Ƙarancin katsewa daga NAS.** Yanzu ana kwafar waƙoƙin da ke Folda ta cibiyar sadarwa zuwa Mac ɗinku kafin su kunna, kuma ana kwafar waƙa ta gaba tun da wuri, don haka ɗan tangarɗar cibiyar sadarwa ba ya ƙara tsayar da kiɗa. Ana karanta manyan fayilolin DSD ta hanyar da ke shirya bayanai masu nisa gaba.\n- **Zoben lodawa a maɓallin kunnawa.** Yayin da Vespertine yake jiran bayanai daga cibiyar sadarwa, maɓallin kunnawa/dakata yana nuna ƙaramin zobe mai juyawa (yana tsaye idan Rage Motsi yana kunne). Ana sake gwada karatun da ya gaza na ɗan lokaci.\n- **Iyakoki.** Katsewa mai tsawo sosai, ko hanyar sadarwar da ta fi kiɗan jinkiri, har yanzu na iya sa kunnawa ya dakata don sake cika bayanai. Kwafin ma'ajiya suna amfani da 8 GB a iyakar su, kuma tushen da ya fi haka girma yana kasa tare da saƙo bayyananne. Duba `docs/NETWORK-PLAYBACK.md`.\n\n### Sauran sabbin abubuwa\n- **DoP yana kunne tun farko ga DAC da aka sani.** FiiO K11 da Fosi Audio ZD3 suna farawa da DoP a kunne. Idan kun kashe shi, Vespertine yana tunawa.\n- **Waɗanda Aka Ƙara Kwanan Nan yana nuna kundaye 150**, maimakon 60, don haka shigo da kundaye da yawa ba ya ture waɗanda aka ƙara gabansa daga jerin.\n- **Fosi Audio ZD3.** Yanzu ZD3 yana cikin jerin na'urorin da ake tallafa wa kuma an sake ɗaukar hotunan gidan yanar gizon da shi.\n- **Gidan yanar gizo.** Akwai layin \"Ba shi tauraro a GitHub\" da \"Shiga tattaunawar\" a ƙarƙashin maɓallan saukewa.\n\n### Tabbatarwa\n- Rukunin gwaje-gwajen injin sauti, laburare da manhaja sun ci, har da sabbin gwaje-gwajen ƙirar matatun ɗaki, kunnawa ta sabon matakin gyara, matakan aunawa da ma'ajiyar cibiyar sadarwa. Ana kuma duba lambar sautin da ke aiki kai tsaye da kayan gano kurakuran adireshin ƙwaƙwalwa da halayen da ba a ayyana ba.\n- Abin da ba a duba ta gwaje-gwaje ba tukuna: kunnawa ta gyaran sautin ɗaki a kan na'urori na gaske, da mai jagorantar aunawa tare da UMIK-1 na gaske."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 yana kunna DSD na 5.1 a Spatial Audio a AirPods, yana sanar da ku idan an canza sauti ko an rage tashoshinsa, kuma ba ya ƙara makalewa yayin fita.",
+      "notes": "### Spatial Audio\n- **Yanzu DSD na 5.1 yana kunnawa a Spatial Audio.** Ana canza fayil ɗin DSD na 5.1 (DSF, DSDIFF, DSDIFF mai matsawar DST ko Kwafin SACD) zuwa PCM kuma ana sanya kowace tasha a inda ta dace, don haka LFE da tashoshin surround ba sa ƙara ɓacewa. A baya, tashoshin DSDIFF masu zaman kansu kan faɗa kan tushen lasifikoki uku kuma tashoshin baya su ɓace.\n- **Yana faɗin abin da ya faru da sautin.** Hanyar Sigina tana nuna **DSD → PCM** kusa da SPATIAL ko Downmix, kuma sabbin sanarwa biyu, \"An canza daga DSD\" da \"An rage zuwa stereo\", suna bayyana idan sun dace. An fassara dukkansu zuwa harsuna 44 duka.\n- Mai haɓaka manhajar ya duba a AirPods Max.\n\n### Abubuwan da aka gyara\n- **Fita ba ta ƙara makalewa.** Cmd-Q kan bar alamar kwamfuta tana juyawa yayin da Vespertine yake jiran na'urar sauti. Yanzu yana fita nan take.\n- **Ana karanta fayilolin tashoshi da yawa daidai.** Fayilolin RF64 da Wave64 suna buɗewa yadda ya kamata, ana karanta sunayen tashoshin DSD daga fayil ɗin, kuma rarraba tashoshi masu zaman kansu da yawa yana bin tsarin tashoshin fayil ɗin kansa.\n\n### Tabbatarwa\n- Rukunin gwaje-gwajen injin sauti, laburare da manhaja sun ci, har da sabbin gwaje-gwajen da ke kunna kowane tsarin DSD na 5.1 ta Spatial Audio kuma su duba cewa kowace tasha ta isa inda ta dace. Gwajin matsayin hagu/dama yana gudana a Mac na gaske kaɗai; na'urorin gwajin GitHub suna tsallake wannan gwaji guda."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Yanzu Vespertine yana faɗin lokacin da Mai Daidaita Sauti ba zai iya sauya abin da ke kunnawa ba, yana bayar da Mai Daidaita Sauti na ma'auni na zaɓi ga kowane samfurin AirPods Max na USB-C, kuma ya samu sakamakonsa na farko na tashoshi da yawa a kan na'urori na gaske."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Yanzu Vespertine yana adana Tarihi na abin da kuka kunna, yana ba Na Gaba nasa ɓangaren kusa da laburare, yana nuna kowace sigar kundi a kati ɗaya, kuma yana iya nuna abin da kuke kunnawa a matsayin halinku na Discord."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Yanzu Vespertine yana aiki yadda ya kamata a Yanayin Haske, yana ba fitarwar da ba ta da sarrafa ƙarar sauti damar amfani da Ƙarar sauti ta Vespertine, kuma yana ci gaba da nazarin laburarenku yayin da kuke sauraro daga Folda ta cibiyar sadarwa."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Yanzu Vespertine yana kunnawa lami lafiya daga foldojin cibiyar sadarwa masu jinkiri, yana nazarin manyan laburare da sauri har da foldojin cibiyar sadarwa, yana kunna hi-res a ƙananan DAC na USB-C a mafi girman ƙimar samfur da suke bayarwa, kuma yana riƙe wurin sarrafawar madannai da zaɓuka da yawa a inda kuke tsammani."
+    },
+    "0.12.0": {
+      "hash": "f25478b5e324",
+      "summary": "Yanzu Vespertine yana kunna fayilolin DSDIFF masu matsawar DST da kiɗan LPCM a faifan DVD-Video kai tsaye, yana riƙe kowace waƙa ta takardun EAC CUE, kuma yana fara waƙoƙi daga Folda ta cibiyar sadarwa nan take ko da ana ci gaba da binciken laburare."
+    }
+  }
+}
