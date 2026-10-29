@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "Naar de inhoud",
+    "tagline": "De gratis opensource-speler voor de Mac, voor muziekcollecties in surround en hi-res.",
+    "requires": "macOS {minMacOS} of nieuwer.",
+    "arch": "Apple silicon en Intel",
+    "download": "Download voor Mac",
+    "downloadVersion": "Download {version}",
+    "sourceOnGitHub": "Broncode op GitHub",
+    "reportIssue": "Meld een probleem",
+    "brewLead": "Of met Homebrew:",
+    "copy": "Kopieer",
+    "copyLabel": "Kopieer het Homebrew-commando",
+    "copied": "Gekopieerd",
+    "copyFailed": "Selecteer het",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus en Dolby TrueHD zijn handelsmerken van Dolby Laboratories. DTS, DTS-HD Master Audio en DTS:X zijn handelsmerken van DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS en Ruimtelijke audio zijn handelsmerken van Apple Inc. Vespertine noemt ze alleen om te beschrijven wat het afspeelt en waarop; het is niet gecertificeerd, gelicentieerd of goedgekeurd door Dolby, DTS of Apple.",
+    "trailerLabel": "Trailer van Vespertine, 44 seconden",
+    "untested": "Uitvoer kanaal voor kanaal en bitstream naar een receiver zijn experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
+  },
+  "nav": {
+    "label": "Hoofdmenu",
+    "home": "Vespertine, startpagina",
+    "top": "Vespertine, terug naar boven",
+    "features": "Functies",
+    "formats": "Formaten",
+    "compare": "Vergelijk",
+    "whatsNew": "Wat is er nieuw",
+    "faq": "FAQ",
+    "press": "Perskit",
+    "download": "Download",
+    "downloadLabel": "Download Vespertine {version} voor Mac"
+  },
+  "lang": {
+    "label": "Taal",
+    "menuLabel": "Kies een taal",
+    "current": "Huidige taal"
+  },
+  "footer": {
+    "project": "Project",
+    "about": "Over",
+    "releaseNotes": "Releasenotes",
+    "sponsor": "Sponsor",
+    "discussions": "Discussies",
+    "architecture": "Architectuur",
+    "privacy": "Privacy",
+    "terms": "Voorwaarden",
+    "license": "Licentie (GPL-3.0)",
+    "notices": "Kennisgevingen van derden",
+    "ukraine": "<strong>Vespertine staat achter Oekraïne.</strong> Doneer alsjeblieft via {orgs}.",
+    "copyright": "© {year} bijdragers aan Vespertine",
+    "free": "Vrije software onder de GPL",
+    "madeIn": "Gemaakt in Boston door {author}",
+    "backToTop": "Terug naar boven",
+    "home": "Startpagina"
+  },
+  "home": {
+    "title": "Vespertine: surround- en hi-res-muziekspeler voor de Mac",
+    "description": "Gratis opensource-speler voor de Mac, voor collecties in surround en hi-res: SACD- en DVD-Video-schijfkopieën, DSD, DTS-cd’s, bestanden in DTS-HD MA, TrueHD en Dolby Atmos, ruimtelijke audio op AirPods, ruimtecorrectie op basis van metingen in je eigen ruimte en een bitperfect signaalpad dat je kunt inspecteren.",
+    "ogAlt": "Vespertine: de gratis opensource-speler voor de Mac, voor muziek in surround en hi-res. Het signaalpad toont een FLAC van 24 bit / 96 kHz die bitperfect speelt op een Fosi Audio ZD3. Versie {version}, macOS {minMacOS} of nieuwer.",
+    "hero": {
+      "eyebrow": [
+        "Gratis en open source",
+        "macOS {minMacOS}+",
+        "Apple silicon en Intel"
+      ],
+      "titleSr": "Surround- en hi-res-muziek, op je Mac.",
+      "titleLines": [
+        "Surround- en",
+        "hi-res-muziek,"
+      ],
+      "titleBrass": "op je Mac.",
+      "lede": "De gratis opensource-speler voor de Mac, voor muziekcollecties in surround en hi-res. SACD- en DVD-Video-schijfkopieën, DSD, DTS-cd’s en bestanden in DTS-HD MA, TrueHD en Atmos delen één bibliotheek met je stereoalbums en spelen op AirPods als ruimtelijke audio met hoofdtracking. Ruimtecorrectie meet je ruimte met een USB-microfoon en corrigeert elke luidspreker; de functie staat uit tot je die inschakelt. Een signaalpad toont elke stap van bestand tot uitvoer. In het Engels en {languages} andere talen.",
+      "ask": "Bevalt het?",
+      "star": "Geef een ster op GitHub",
+      "discuss": "Doe mee aan de discussie",
+      "version": "Versie {version}",
+      "signed": "ondertekend en genotariseerd",
+      "releaseNotes": "Releasenotes",
+      "privacy": "Privacy: er wordt niets verzameld.",
+      "panelAlt": "De Inspector ‘Speelt nu’ van Vespertine: Les jeux d’eaux à la Villa d’Este van Liszt, gespeeld door Lazar Berman, gemarkeerd als HI-RES LOSSLESS en BITPERFECT, exclusief, 32 / 96, met het signaalpad van een FLAC van 24 bit / 96 kHz via libFLAC op de oorspronkelijke samplefrequentie en het volume op 100% naar een Fosi Audio ZD3.",
+      "panelCaption": "Signaalpad",
+      "followSignal": "Volg het signaal"
+    },
+    "trailer": {
+      "eyebrow": "Trailer",
+      "title": "Bekijk het in 44 seconden.",
+      "text": "Zet het geluid aan. Alles wat je ziet is de echte app, opgenomen met de eigen bibliotheek van de ontwikkelaar.",
+      "fallback": "Bekijk de trailer (MP4)",
+      "caption": "44 s · 1080p · albumillustraties behoren toe aan hun eigenaars"
+    },
+    "features": {
+      "eyebrow": "Waarom Vespertine",
+      "title": "Gemaakt voor je surroundcollectie.",
+      "text": "Surround- en stereomuziek in één bibliotheek, en een speler die precies laat zien wat hij met het signaal heeft gedaan.",
+      "badgesLabel": "Statussen van het signaalpad die de app toont"
+    },
+    "pillars": [
+      {
+        "title": "Surround in één bibliotheek",
+        "text": "SACD-schijfkopieën en -rips, DVD-Video-schijven, DTS-cd’s, DTS-HD MA en TrueHD staan naast je stereoalbums en spelen op AirPods als ruimtelijke audio met hoofdtracking. Heeft een album beide versies, dan staat elk nummer er één keer in en speelt de versie die bij je uitvoer past."
+      },
+      {
+        "title": "Een signaalpad dat je kunt controleren",
+        "text": "Samplefrequenties, woordlengtes, versterking en kanaalbewerking, teruggelezen uit Core Audio. De voorwaarden voor bitperfect staan in de broncode, met geautomatiseerde tests, een loopbacktest en een handleiding om het met hardware te verifiëren."
+      },
+      {
+        "title": "Controleert hi-res-bestanden",
+        "text": "De analyse signaleert opgevulde bitdiepte en mogelijke upsampling of lossy herkomst. Spectrale oordelen zijn schattingen, getoond met hun onderbouwing en beperkingen. Dezelfde analyse draait op een Linux-server naast je bestanden."
+      },
+      {
+        "title": "Open source die je kunt doorlichten",
+        "text": "Gratis onder de GPL. Lees, bouw en wijzig de speler, inclusief de uitvoervoorwaarden en tests. Geen account, abonnement, advertenties of telemetrie."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bitperfect",
+      "exclusive": "Exclusief",
+      "spatial": "Ruimtelijk · hoofdtracking",
+      "synthetic": "Synthetische hoge frequenties?",
+      "roomCorrection": "Ruimtecorrectie"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Signaalpad",
+        "kicker": "Bitperfect",
+        "title": "Elk nummer op zijn eigen samplefrequentie en bitdiepte.",
+        "lede": "Het signaalpad toont elke stap van het bestand tot je DAC, teruggelezen uit Core Audio, en meldt het wanneer iets de samples heeft veranderd.",
+        "body": [
+          "Vespertine zet het apparaat op de samplefrequentie van elk bestand en resamplet, met Apples converter van masteringkwaliteit, alleen als de DAC die frequentie niet aankan. <span class=\"mono nowrap\">BITPERFECT</span> verschijnt alleen als aan de voorwaarden in de broncode is voldaan: de oorspronkelijke samplefrequentie, niets dat de samples verandert, een passende woordlengte en een apparaat dat exclusief is of niet met een andere app wordt gedeeld. Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11."
+        ],
+        "list": [
+          "De exclusieve modus (hog) houdt andere apps weg van het apparaat. In gedeelde modus regelen de volumetoetsen en de Digital Crown je DAC; in exclusieve modus kan dat ook, als je dat aanzet.",
+          "Integermodus stuurt onbewerkte 32-bits PCM rechtstreeks naar DAC’s die integers accepteren.",
+          "‘Stem af op 16-bits bronnen’ (standaard uit) stuurt 16-bits bestanden als 16 bit naar DAC’s met een echte 16-bitsmodus, niet opgevuld met nullen.",
+          "Gapless, ook bij albums met een CUE-sheet die uit één bestand zijn opgesplitst.",
+          "Onthoudt je DAC. Is die niet aangesloten, dan speelt de muziek via de beste verbonden uitvoer en schakelt ze terug zodra de DAC er weer is.",
+          "Uitgangen zonder eigen volumeregeling (HDMI, optisch, lijnuitgang) kunnen het volume van Vespertine gebruiken, per uitgang in te stellen. Onder de 100% geven de labels aan dat het niet meer bitperfect is.",
+          "Geeft je DAC bij het afsluiten van Vespertine terug met de samplefrequentie en bitdiepte die hij daarvoor had.",
+          "Een ingebouwde loopbacktest vergelijkt elke sample die Vespertine naar een virtueel apparaat stuurt. Het is een softwarecontrole, ook zo gelabeld, en verandert nooit de badge <span class=\"mono nowrap\">BITPERFECT</span>."
+        ],
+        "links": [
+          "De voorwaarden in de code",
+          "Controleer het zelf",
+          "Wat de loopbacktest bewijst"
+        ],
+        "alt": "Vespertine speelt Liszt, Années de pèlerinage, door Lazar Berman, van een FLAC van 24 bit / 96 kHz: de Inspector markeert het als bitperfect en exclusief op een Fosi Audio ZD3, met elke stap van het signaalpad.",
+        "floatAlt": "Het blad van de loopbacktest: 24 bit op 44,1 en 96 kHz, 16 bit opgevuld en een gapless paar, elk bitidentiek.",
+        "floatCaption": "Loopbacktest · softwarecontrole"
+      },
+      "room-correction": {
+        "jack": "Ruimtecorrectie",
+        "kicker": "Ruimtecorrectie",
+        "title": "Meet je ruimte. Corrigeer elke luidspreker.",
+        "lede": "Meet je ruimte met een UMIK-1 of een andere gekalibreerde USB-microfoon, en Vespertine berekent filters voor elke luidspreker op basis van wat het op je zitplaats hoort.",
+        "body": [
+          "Sweeps klinken via één luidspreker tegelijk, op één tot vijf plekken rond je zitplaats. Elke luidspreker krijgt eigen filters, ontworpen op basis van de meting. Het zijn vooral verlagingen: ze halen de pieken van de ruimte omlaag en versterken brede dalen slechts voorzichtig. Dezelfde meting bepaalt de vertraging en het niveau van elke luidspreker, zodat elke luidspreker je zitplaats tegelijk en even luid bereikt. Ruimtecorrectie staat standaard uit, en afspelen blijft bitperfect zolang ze uitstaat. Staat ze aan, dan toont het signaalpad <span class=\"mono nowrap\">RUIMTECORRECTIE</span>."
+        ],
+        "list": [
+          "Drie doelcurves: Warm (de standaard), Gentle tilt en Flat. Corrigeer alleen de bas of het volledige bereik, en ontwerp de filters later opnieuw zonder opnieuw te meten.",
+          "Importeert filters uit REW of Equalizer APO, met de vertraging en het niveau van elke luidspreker, en exporteert tekst voor Equalizer APO.",
+          "Importeert impulsresponsen (WAV, AIFF, CAF of FLAC) en speelt ze af via convolutie.",
+          "Stereo en 5.1.",
+          "Het Ruimteportret toont de luidsprekers, je zitplaats en elke microfoonplek terwijl die wordt gemeten. De curve-overgang zet daarna de gemeten respons om in de voorspelde, en met een voor/na-schakelaar vergelijk je ze."
+        ],
+        "note": "De ‘na’-curve is voorspeld op basis van de meting en de filters, niet gemeten. Wil je zien wat de ruimte echt doet, meet dan opnieuw met de correctie aan.",
+        "links": [
+          "Zo werkt ruimtecorrectie"
+        ],
+        "alt": "De voorspelde ruimtecorrectie van Vespertine voor een stereopaar met de doelcurve Warm: per luidspreker de gemeten respons, de doelcurve en de voorspelde respons na correctie, met een ruimtepiek rond 120 Hz die met 14 en 18 dB wordt verlaagd, en de filters van elke luidspreker.",
+        "floatAlt": "Het Ruimteportret in de meetwizard: linker- en rechterluidspreker, de zitplaats en vijf microfoonplekken eromheen, de eerste met de microfoon erop.",
+        "floatCaption": "Ruimteportret"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround & ruimtelijke audio",
+        "title": "Je 5.1-schijven, in dezelfde bibliotheek.",
+        "lede": "Meerkanaalsmuziek speelt op AirPods als ruimtelijke audio met hoofdtracking, of wordt op een stereo-DAC volgens de kanaalindeling teruggemengd.",
+        "body": [
+          "DTS-cd’s worden gedecodeerd naar 5.1. SACD-schijfkopieën, uitgepakte SACD-tracks, meerkanaals FLAC, TrueHD en DTS-HD MA worden op AirPods weergegeven als ruimtelijke audio met hoofdtracking, of op een stereo-DAC teruggemengd. Dolby Digital Plus met Atmos gebruikt de objectrenderer van macOS; TrueHD Atmos en DTS:X spelen hun kanaalbed af. Uitvoer kanaal voor kanaal is experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
+        ],
+        "list": [
+          "Stereo- en surroundversies van een album staan er één keer in; Vespertine speelt de versie die bij de uitvoer past, of de versie die je vastzet.",
+          "Bitstream van Dolby Digital, DD+ en DTS-CD naar een receiver is experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht. Tests van het draagsignaal gebruiken de S/PDIF-lezer van FFmpeg. Passthrough van TrueHD en DTS-HD MA wordt op macOS niet ondersteund.",
+          "Exporteer voor ruimtelijke audio als binaurale stereo voor koptelefoons of als meerkanaals ALAC voor Apple-apparaten, met tags en illustraties."
+        ],
+        "alt": "Goodbye Yellow Brick Road van Elton John, een 5.1-album van 24 bit / 88,2 kHz, speelt als ruimtelijke audio met hoofdtracking op AirPods Max, met het signaalpad en een meter per kanaal.",
+        "floatAlt": "Een album met stereo- en 5.1-versies van elk nummer, één keer vermeld.",
+        "floatCaption": "Stereo en 5.1, één keer vermeld"
+      },
+      "discs": {
+        "jack": "Schijfkopieën & DSD",
+        "kicker": "SACD, DVD-Video & DSD",
+        "title": "Speel de schijfkopie zelf af.",
+        "lede": "Wijs Vespertine een SACD- of DVD-Video-schijfkopie aan en het speelt de muziek er rechtstreeks uit af, zonder iets te activeren, uit te pakken of weg te schrijven.",
+        "body": [
+          "SACD-schijfkopieën (<span class=\"mono\">.iso</span>) spelen hun stereo- en 5.1-gebied af, met of zonder DST-compressie, met titels uit de eigen tekst van de schijf. DST wordt teruggedecodeerd naar precies de oorspronkelijke DSD, zodat stereo als native DSD via DoP naar je DAC gaat als de DAC dat ondersteunt, en 5.1 op AirPods speelt als ruimtelijke audio met hoofdtracking. De LPCM-muziek op DVD-Video-schijven (een <span class=\"mono\">.iso</span> of een map <span class=\"mono\">VIDEO_TS</span>) speelt bit voor bit af, één album per titel en een track per hoofdstuk."
+        ],
+        "list": [
+          "Bit voor bit gelijk aan sacd_extract op twee echte schijven. Schijven met een 5.0-gebied, met alleen een meerkanaalsgebied, of met DSD128 en hoger zijn tot nu toe alleen getest met gesynthetiseerde testschijfkopieën.",
+          "DSF en DSDIFF van DSD64 tot DSD512, inclusief DSDIFF met DST-compressie, gaan als DoP naar DAC’s die de dragerfrequentie aankunnen, of worden omgezet naar PCM met een hoge samplefrequentie. DoP is bevestigd tot DSD256 op een Fosi Audio ZD3 en tot DSD128 op een FiiO K11; DSD512 via DoP is niet getest op hardware.",
+          "DVD-Video LPCM op 16, 20 en 24 bit, 48 en 96 kHz, tot 8 kanalen. DVD-Audio wordt niet ondersteund, en versleutelde (CSS-)schijven vereisen een ontsleutelde kopie."
+        ],
+        "links": [
+          "Details over DVD-Video"
+        ],
+        "alt": "Brothers In Arms van Dire Straits speelt rechtstreeks van de SACD-schijfkopie: stereo DSD64 via DoP naar een FiiO K11, met de badge NATIVE DSD · DoP en als decoder ‘SACD-schijfkopie, DST (lossless)’.",
+        "floatAlt": "Love for the Sake of Love van Claudja Barry als DSD128 via DoP naar een Fosi Audio ZD3, op 352,8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Analyse",
+        "kicker": "Nep-hi-res opsporen & spectrum",
+        "title": "Ontdek welke ‘hi-res’-bestanden het niet zijn.",
+        "lede": "Elk bestand kan worden geanalyseerd op zijn echte bitdiepte, zijn echte bandbreedte en de vingerafdrukken van lossy encoders en resamplers.",
+        "body": [
+          "Oordelen komen met hun onderbouwing en noemen wat het ook zou kunnen verklaren, en een playlist <em>Twijfelachtige hi-res</em> verzamelt ze. Alleen opvulling met nullen is exact: de spectrale oordelen worden als vraag gemarkeerd, omdat sommige lossy bestanden met een hoge bitsnelheid voor echt doorgaan, en steile masteringfilters, FM-bronnen en overzettingen van tape of vinyl verdacht kunnen lijken. Tijdens het afspelen laten meters en een live spectrum zien wat er wordt uitgevoerd, DoP inbegrepen."
+        ],
+        "list": [
+          "16-bits audio opgevuld in 24-bits containers",
+          "Waarschijnlijk geüpsamplede masters van cd-kwaliteit, verkocht als 96 of 192 kHz",
+          "Waarschijnlijk lossy herkomst: MP3 of AAC getranscodeerd naar FLAC",
+          "Waarschijnlijk synthetische hoge frequenties door SBR of ‘AI-verbetering’",
+          "<span class=\"mono\">vespertine-analyze</span> voert dezelfde analyse uit op een Linux-server naast je bestanden; de app importeert de resultaten."
+        ],
+        "note": "Het bestand in deze screenshot is opzettelijk nep: de eigen muziek van de trailer, gecodeerd naar MP3 en geüpsampled naar 24/192 onder een verzonnen bandnaam.",
+        "links": [
+          "Hoe de analyse werkt, en waar ze tekortschiet"
+        ],
+        "alt": "Het tabblad Analyse markeert een ‘remaster’ in 24/192 als waarschijnlijk van lossy herkomst: het langetermijnspectrum houdt op bij 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max via USB-C",
+        "title": "Lossless op AirPods Max, en de app zegt het ook.",
+        "lede": "Aangesloten met de USB-C-kabel worden AirPods Max herkend als lossless apparaat van 24 bit / 48 kHz.",
+        "body": [
+          "Muziek van 48 kHz speelt bitperfect af en al het andere wordt zichtbaar geconverteerd met Apples resampler van masteringkwaliteit. Via Bluetooth vertelt Vespertine je dat de verbinding AAC is. Dit berust op Apples beschrijving van het kabelpad en op wat Core Audio terugleest, want AirPods hebben geen digitale uitgang voor een loopback."
+        ],
+        "alt": "Een slimme playlist met tracks van 24 bit / 48 kHz, gefilterd op Oasis, speelt bitperfect op AirPods Max via USB-C."
+      },
+      "library": {
+        "jack": "Bibliotheek",
+        "kicker": "Bibliotheek",
+        "title": "Blader als in Apple Music. Beheer als een bibliothecaris.",
+        "lede": "Albums, artiesten, nummers en genres, elk met combineerbare filters, en Shuffle voor elk ervan.",
+        "list": [
+          "Filters voor formaat, 24 bit, 88,2 kHz en hoger, meerkanaals, genre, jaar, samplefrequentie, kanalen en analyseoordeel. Zoeken negeert hoofdletters en accenten.",
+          "Slimme playlists in de eenheden waarin jij denkt: 24 bit, 88,2 kHz.",
+          "Remasters, mono- en stereo-uitgaven en SACD’s van één album delen één kaart; kies de editie wanneer je die opent.",
+          "Favorieten en afspeelaantallen, bewaard in de bibliotheek en nooit naar je bestanden geschreven. Importeert M3U- en Apple Music-playlists, afspeelaantallen en favorieten.",
+          "Tageditor met back-ups en herstel in één stap, plus verrijking via MusicBrainz die eerst laat zien hoe zeker die is, voordat er iets wordt geschreven.",
+          "Netwerkshares via SMB, NFS of WebDAV, met caching, ‘Bewaar offline’ en afspelen dat is gebouwd voor trage servers: nummers worden op je Mac gebufferd voordat ze spelen, met een laadring op de afspeelknop zolang dat duurt.",
+          "‘Zoek muziek op deze Mac’ doorzoekt elke schijf naar je echte muziek en laat de rommel links liggen. Een korte configuratie bij de eerste start kiest je uitvoer en legt uit wat exclusieve toegang en ReplayGain doen.",
+          "Parametrische EQ per uitvoer die presets van AutoEQ en Equalizer APO importeert. Standaard uit; staat hij aan, dan toont het signaalpad <span class=\"mono nowrap\">EQUALIZER</span> in plaats van <span class=\"mono nowrap\">BITPERFECT</span>.",
+          "Minispeler, menubalkextra, mediatoetsen, ReplayGain en automatische, ondertekende updates."
+        ],
+        "links": [
+          "Alle functies, in detail"
+        ],
+        "alt": "De pagina Genres: een tegel per genre met een mozaïek van de bijbehorende hoezen."
+      },
+      "languages": {
+        "jack": "Talen",
+        "kicker": "{languages} talen",
+        "title": "Spreekt jouw taal.",
+        "lede": "Elk menu, elke instelling en elke melding in het signaalpad is naast het Engels in {languages} talen vertaald.",
+        "body": [
+          "Van Oekraïens, Duits en Japans tot Swahili, Tamil en Hausa, met lokale meervoudsvormen en getalnotaties, en Vereenvoudigd, Traditioneel en Hongkongs Chinees, elk met een eigen woordenschat. Arabisch, Hebreeuws, Perzisch en Urdu krijgen een lay-out van rechts naar links.",
+          "Hoe de vertalingen worden gecontroleerd: bij elke wijziging bevestigt een automatische controle dat elke string in de app in alle 44 talen bestaat, met dezelfde placeholders en de meervoudsvormen die elke taal nodig heeft, en de belangrijkste schermen zijn in meerdere talen nagekeken op afgekapte of overlappende tekst en spiegeling van rechts naar links. Ze begonnen als zorgvuldige machinevertalingen, dus correcties van moedertaalsprekers zijn zeer welkom op <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
+        ],
+        "alt": "Vespertine geschreven in elk van zijn {languagesTotal} interfacetalen, van ヴェスパタイン en Веспертайн tot فسبرتاين en वेस्परटाइन, in wisselende groottes en lettertypen.",
+        "wallLabel": "Vespertine in al zijn talen"
+      }
+    },
+    "formats": {
+      "eyebrow": "Formaten",
+      "title": "Surround, lossless en lossy bestanden.",
+      "text": "Stereo en meerkanaals, PCM en DSD, schijfkopieën en gewone bestanden, overal met CUE-sheets.",
+      "caption": "Formaten die Vespertine afspeelt, en hoe",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Oorspronkelijke samplefrequentie en woordlengte, tot 32 bit en de frequentie waarop je DAC draait (getest tot 768 kHz); ongewijzigde PCM op 32 bit vereist integermodus. Schijfkopieën met CUE-sheet."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF en DSDIFF, met of zonder DST-compressie. DoP hangt af van de DAC en de dragerfrequentie, anders PCM. DoP is getest tot DSD256; DSD512 via DoP is niet getest op hardware."
+        },
+        {
+          "name": "SACD-schijfkopieën",
+          "text": "Stereo- en meerkanaalsgebieden, met of zonder DST, rechtstreeks uit de schijfkopie; elk nummer staat één keer in de lijst, met zijn stereo- en 5.1-versie."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16, 20 en 24 bit op 48 en 96 kHz, 1 tot 8 kanalen, bit voor bit; één album per titel, één track per hoofdstuk. DVD-Audio wordt niet ondersteund."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus met Atmos, gerenderd door de objectrenderer van macOS, of het gedecodeerde kanaalbed ervan."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Lossless, kan bitperfect zijn; van TrueHD Atmos wordt het kanaalbed afgespeeld, de objecten worden niet gerenderd."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA is lossless en kan bitperfect zijn; van DTS:X wordt het kanaalbed afgespeeld. Ruwe DTS wordt gedecodeerd; DTS-CD-bitstream is een apart pad."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Gedecodeerd door macOS. Bitstream naar receivers is experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
+        },
+        {
+          "name": "DTS-cd’s en DTS-WAV",
+          "text": "Herkend en gedecodeerd naar 5.1, ook albums die met een CUE-sheet zijn opgesplitst."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Lossless. DSD in WavPack wordt niet ondersteund."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Gedecodeerd en gemarkeerd als lossy."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Vergelijking",
+      "title": "Zo verhoudt het zich.",
+      "intro": "Meerdere spelers voor de Mac bieden bitperfect afspelen. Deze vergelijking volgt wat de eigen documentatie of broncode van elke speler zegt. ‘Niet gedocumenteerd’ betekent dat de maker zich er niet over uitspreekt, niet dat de functie ontbreekt. De convolutie in Vespertine is bedoeld voor ruimtecorrectie; plug-ins voor audio-effecten en streamingdiensten heeft Vespertine niet.",
+      "hint": "Scroll voor meer →",
+      "region": "Vergelijkingstabel (scrolt zijwaarts)",
+      "caption": "Vespertine vergeleken met zeven andere muziekspelers voor de Mac, op basis van de eigen documentatie of broncode van elke speler",
+      "feature": "Functie",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Broncode",
+          "GPL-3.0",
+          "Gesloten",
+          "Gesloten",
+          "Gesloten",
+          "Gesloten",
+          "Gesloten",
+          "GPL-2.0",
+          "Gesloten"
+        ],
+        [
+          "FLAC- / DSD-bestanden",
+          "Ja / Ja",
+          "Nee / Nee",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Nee⁴"
+        ],
+        [
+          "DAC-frequentie automatisch omschakelen",
+          "Ja",
+          "Nee",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Niet gedocumenteerd"
+        ],
+        [
+          "Exclusieve modus (hog)",
+          "Ja",
+          "Nee",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja"
+        ],
+        [
+          "PCM op 16/24 bit zonder gewijzigde samples",
+          "Voorwaarden + tests",
+          "macOS 27: tests door derden¹",
+          "Bewering van de maker",
+          "Bewering van de maker",
+          "Loopbacktest in de app",
+          "Bewering van de maker",
+          "Indicator in de app",
+          "Niet gedocumenteerd"
+        ],
+        [
+          "Lokale surroundbestanden",
+          "Ja²",
+          "Niet gedocumenteerd",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Niet gedocumenteerd",
+          "Ja",
+          "Niet gedocumenteerd"
+        ],
+        [
+          "Ruimtelijke audio van Apple voor lokale surround",
+          "Ja",
+          "Alleen Atmos uit de catalogus³",
+          "Niet gedocumenteerd",
+          "Niet gedocumenteerd",
+          "Niet gedocumenteerd",
+          "Niet gedocumenteerd",
+          "Ja",
+          "Niet gedocumenteerd"
+        ],
+        [
+          "Analyse van hi-res-bestanden",
+          "Ja",
+          "Nee",
+          "AudioScan",
+          "Dynamisch bereik, luidheid",
+          "Ja",
+          "Niet gedocumenteerd",
+          "Nee (alleen live spectrum)",
+          "Nee (alleen live spectrum)"
+        ],
+        [
+          "SACD ISO",
+          "Ja",
+          "Nee",
+          "Ja",
+          "Nee (alleen DSF/DFF)",
+          "Ja",
+          "Nee",
+          "Nee",
+          "Nee⁴"
+        ],
+        [
+          "Ruimtecorrectie",
+          "Gemeten in de app (USB-microfoon), of import van REW / APO en impulsresponsen",
+          "Nee",
+          "Via convolutie (Origin: betaalde optie) of Audio Units",
+          "Via convolutie",
+          "Nee (bewuste keuze)",
+          "Niet gedocumenteerd",
+          "Nee",
+          "Niet gedocumenteerd"
+        ],
+        [
+          "Convolutie / plug-ins voor audio-effecten",
+          "Ja (ruimtecorrectie) / Nee",
+          "Nee / Nee",
+          "Ja (Origin: betaalde optie) / Audio Units",
+          "Ja / Nee",
+          "Nee / Nee",
+          "Niet gedocumenteerd / Niet gedocumenteerd",
+          "Nee / Nee",
+          "Niet gedocumenteerd / Audio Units"
+        ],
+        [
+          "Streamingdiensten",
+          "Nee",
+          "Apple Music",
+          "Studio: ja; Origin: nee",
+          "Ja",
+          "Nee (lokaal + UPnP)",
+          "Nee (internetradio)",
+          "Nee (internetradio)",
+          "Nee (internetradio)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music op macOS 27 was bitidentiek op 16/24 bit in <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">loopbacktests door derden, gemeld op ASR</a>, bij 100% volume. Dit is geen meting van Vespertine; het oorspronkelijke rapport kon voor deze update niet onafhankelijk opnieuw worden gecontroleerd. Op de Mac is er nog steeds geen automatisch omschakelen van de samplefrequentie, geen hog-modus, geen FLAC en geen DSD.",
+        "² Meerkanaalsuitvoer naar DAC’s en bitstream naar receivers zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht.",
+        "³ Apple documenteert ruimtelijke audio met hoofdtracking voor Dolby Atmos-nummers uit de Apple Music-catalogus, niet ruimtelijke weergave van je eigen meerkanaalsbestanden.",
+        "⁴ Getest met foobar2000 2.26 (macOS 27.0.1), zonder componenten: DSF-, DFF- en SACD ISO-bestanden mislukken met ‘Unsupported file format’. DSF en DFF spelen alleen af als PCM op 352,8 kHz nadat je FFmpeg apart hebt geïnstalleerd en ze aan de FFmpeg Decoder Wrapper van de speler hebt toegevoegd; SACD ISO mislukt nog steeds."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Bronnen en reikwijdte</a>. Correcties zijn welkom: <a href=\"{href.issues}\">open een issue</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Wat is er nieuw",
+      "title": "Nieuw in {version}.",
+      "latest": "Nieuwste release",
+      "fullNotes": "Volledige releasenotes",
+      "meta": "al geïnstalleerd? De app werkt zichzelf bij, of gebruik {brewUpgrade}",
+      "earlier": "Eerdere releases",
+      "every": "Alle releases",
+      "inEnglish": "Deze releasenotes zijn nog niet vertaald en worden daarom in het Engels getoond."
+    },
+    "faq": {
+      "eyebrow": "Veelgestelde vragen",
+      "title": "Je vragen beantwoord.",
+      "items": [
+        {
+          "q": "Is het echt gratis?",
+          "a": "Ja. Vespertine is gratis en open source onder de GPL-3.0. Er is geen account, geen abonnement, geen reclame en geen telemetrie (<a href=\"{href.privacy}\">privacy</a>). De app gaat alleen online om op updates te controleren en, als je daarom vraagt, om MusicBrainz, het Cover Art Archive of ListenBrainz te bereiken of albumillustraties voor je Discord-status te zoeken."
+        },
+        {
+          "q": "Wat heb ik nodig?",
+          "a": "macOS {minMacOS} ({minMacOSName}) of nieuwer, op Apple silicon of Intel. Intel-hardware is niet getest; de Intel-versie heeft onder Rosetta gedraaid, en meldingen van echte Intel-Macs zijn welkom."
+        },
+        {
+          "q": "Hoe installeer ik het en hoe werk ik het bij?",
+          "a": "Download de DMG, open hem en verplaats Vespertine naar de map Programma’s. De app is ondertekend met een Developer ID en door Apple genotariseerd, en werkt zichzelf bij; elke update is ondertekend. Met Homebrew: {brew}, daarna {brewUpgrade} of de eigen updates van de app."
+        },
+        {
+          "q": "Streamt het van Qobuz, TIDAL of Apple Music?",
+          "a": "Nee. Vespertine speelt muziek af die van jou is, op je Mac, op externe schijven of op een netwerkshare. Met DRM beveiligde downloads uit een Apple Music-abonnement kunnen niet worden afgespeeld."
+        },
+        {
+          "q": "Hoe weet ik dat het echt bitperfect is?",
+          "a": "Het signaalpad leest terug wat Core Audio werkelijk heeft gedaan: de nominale samplefrequentie van het apparaat, het fysieke formaat en wie het apparaat bezet houdt. De decoders hebben geautomatiseerde tests (TrueHD tegen de bron, DTS tegen de eigen decoder van FFmpeg), een ingebouwde loopbacktest controleert het softwarepad sample voor sample, en met <span class=\"mono nowrap\">vespertine-probe</span> controleer je je eigen hardware. <a href=\"{href.verification}\">Zo controleer je het zelf</a>."
+        },
+        {
+          "q": "Heeft Vespertine ruimtecorrectie?",
+          "a": "Ja. Meet je ruimte met een UMIK-1 of een andere gekalibreerde USB-microfoon op één tot vijf plekken rond je zitplaats, en Vespertine berekent filters voor elke luidspreker en stemt hun vertraging en niveau op elkaar af, in stereo of 5.1. Daarnaast importeert het filters uit REW en Equalizer APO, en impulsresponsen. Ruimtecorrectie staat standaard uit, afspelen blijft bitperfect zolang ze uitstaat, en het signaalpad toont <span class=\"mono nowrap\">RUIMTECORRECTIE</span> zolang ze aanstaat. <a href=\"{href.roomCorrection}\">Zo werkt ruimtecorrectie</a>."
+        },
+        {
+          "q": "Speelt het SACD’s en dvd’s af?",
+          "a": "Het speelt de schijfkopieën ervan af. SACD-schijfkopieën (<code>.iso</code>), stereo en meerkanaals, met of zonder DST-compressie, en de LPCM-muziek op DVD-Video-schijfkopieën of in <code>VIDEO_TS</code>-mappen spelen rechtstreeks uit de schijfkopie, zonder dat er iets wordt uitgepakt. DVD-Audio wordt niet ondersteund, en voor versleutelde (CSS) dvd’s is een ontsleutelde kopie nodig."
+        },
+        {
+          "q": "Speelt het Dolby Atmos af?",
+          "a": "Dolby Digital Plus met Atmos speelt via de objectrenderer van macOS, als ruimtelijke audio met hoofdtracking op AirPods. Van TrueHD Atmos en DTS:X wordt het lossless kanaalbed afgespeeld; de objecten worden niet gerenderd. Bitstream naar een AV-receiver is experimenteel en niet getest op echte receivers; meldingen gezocht."
+        },
+        {
+          "q": "Verandert het mijn bestanden?",
+          "a": "Alleen als je tags bewerkt, en dan wordt van elk bestand eerst een reservekopie gemaakt en kun je het in één stap terugzetten. Naar mappen wordt verwezen op hun eigen locatie; importeren maakt APFS-klonen die geen extra ruimte innemen."
+        },
+        {
+          "q": "Op welke hardware is het getest?",
+          "a": "Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11, waarop ook integermodus is getest. Het is daarnaast getest op AirPods Max via USB-C en Bluetooth, op de luidsprekers van een MacBook Pro en op een Sony-tv via HDMI in 5.1. Intel-hardware is niet getest. Bitstream naar receivers en meerkanaalsuitvoer naar DAC’s zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); <a href=\"{href.dacReport}\">meldingen gezocht</a>."
+        },
+        {
+          "q": "Is het er in mijn taal?",
+          "a": "Waarschijnlijk wel: de interface is er in het Engels en in {languages} andere talen, waaronder het van rechts naar links geschreven Arabisch, Hebreeuws, Perzisch en Urdu. Vespertine volgt de taal die er in Systeeminstellingen voor is ingesteld. Correcties van moedertaalsprekers zijn welkom op <a href=\"{href.newIssue}\">GitHub</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Steun",
+      "title": "Help Vespertine groeien.",
+      "text": "Het is gratis, open source en wordt in alle openheid gebouwd. Zo kun je helpen.",
+      "cards": [
+        {
+          "title": "Sponsor op GitHub",
+          "text": "Vespertine is gratis. Heb je er iets aan, dan steunt een sponsoring op GitHub de ontwikkeling.",
+          "cta": "Word sponsor"
+        },
+        {
+          "title": "Meld je DAC",
+          "text": "Vertel ons wat je DAC, interface of receiver deed. Elke apparaatmelding breidt uit wat er op echte hardware is gecontroleerd.",
+          "cta": "Dien een apparaatmelding in"
+        },
+        {
+          "title": "Verbeter een vertaling",
+          "text": "Een stroeve zin gezien in een van de {languages} talen? Open een issue met een betere formulering.",
+          "cta": "Stel een correctie voor"
+        },
+        {
+          "title": "Lees de code",
+          "text": "Bugmeldingen, pull requests en vragen zijn welkom. De voorwaarden voor het signaalpad en de tests ervan staan allemaal in de repository.",
+          "cta": "Broncode op GitHub"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Download",
+      "title": "Speel je surroundcollectie af op je Mac.",
+      "meta": [
+        "Gratis",
+        "open source",
+        "versie {version}",
+        "macOS {minMacOS} of nieuwer"
+      ]
+    }
+  },
+  "press": {
+    "title": "Perskit: Vespertine, de surround- en hi-res-muziekspeler voor de Mac",
+    "description": "Feiten, logo’s, key art, echte screenshots en de trailer van Vespertine, de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac.",
+    "ogAlt": "Perskit van Vespertine: factsheet, logo’s, key art, echte screenshots en de trailer, op een achtergrond van drie echte screenshots van de app.",
+    "eyebrow": "Perskit",
+    "heading": "Alles wat je nodig hebt om over {name} te schrijven.",
+    "lede": "Vespertine is de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac. Schijfkopieën van SACD’s en DVD-Video, uit SACD’s geëxtraheerde 5.1-tracks, DTS-cd’s en DTS-HD MA-, TrueHD- en Atmos-bestanden delen één bibliotheek, met ruimtelijke audio met hoofdtracking op AirPods. Het signaalpad toont elke stap van bestand tot uitvoer, met de voorwaarden en tests in GPL-broncode die iedereen kan controleren.",
+    "fine": "Uitvoer kanaal voor kanaal en bitstream naar een receiver zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht. Atmos-objecten in Dolby Digital Plus worden door macOS gerenderd; TrueHD Atmos en DTS:X spelen hun kanaalbed af.",
+    "facts": {
+      "eyebrow": "Factsheet",
+      "title": "De feiten.",
+      "name": "Naam",
+      "formerly": "(heette tot versie 0.6.0 {formerName})",
+      "developer": "Ontwikkelaar",
+      "developerValue": "{author}, onafhankelijk ontwikkelaar",
+      "price": "Prijs",
+      "priceValue": "Gratis. Open source onder de GPL-3.0; geen account, abonnement, advertenties of telemetrie",
+      "platform": "Platform",
+      "platformValue": "macOS {minMacOS} {minMacOSName} of nieuwer, Apple silicon en Intel",
+      "current": "Huidige versie",
+      "currentValue": "{version}, uitgebracht op {date}",
+      "currentFine": "Ondertekende en genotariseerde DMG ({size}), werkt zichzelf bij",
+      "first": "Eerste release",
+      "firstFine": "(als {formerName} 0.1.0)",
+      "languages": "Talen",
+      "languagesValue": "Engels en nog {languages} andere, waaronder Oekraïens, Arabisch, Hebreeuws, Japans en drie varianten van het Chinees",
+      "install": "Installeren",
+      "installValue": "<a href=\"{href.dmg}\">Download de DMG</a> of {brew}",
+      "tested": "Getest met",
+      "testedValue": "Fosi Audio ZD3 (PCM tot 768 kHz, DSD256 via DoP), FiiO K11 (PCM tot 384 kHz, DSD128 via DoP, integermodus), AirPods Max via USB-C en Bluetooth, luidsprekers van de MacBook Pro",
+      "links": "Links",
+      "website": "Website",
+      "source": "Broncode",
+      "releaseNotes": "Releasenotes",
+      "verify": "Zo controleer je of het afspelen bitperfect is"
+    },
+    "angle": {
+      "eyebrow": "Invalshoek",
+      "title": "Waar het om draait.",
+      "list": [
+        "Surroundmuziek in één Mac-bibliotheek, van SACD- en DVD-Video-schijfkopieën, rips en DTS-cd’s tot TrueHD en DD+ Atmos, met ruimtelijke audio op AirPods.",
+        "Gratis GPL-3.0-broncode die iedereen kan lezen, bouwen en aanpassen.",
+        "Een signaalpad dat samplefrequentie, woordlengte, versterking en kanaalbewerking toont. De voorwaarden voor bitperfect afspelen zijn in code vastgelegd, met tests, een ingebouwde loopbacktest en een <a href=\"{href.verification}\">verificatiegids</a>."
+      ],
+      "text": "Analyse van hi-res-bestanden zit er ook in. De detectie van opvulling met nullen is exact; spectrale oordelen zijn schattingen met beperkingen. Ook VeraVox en Audirvana AudioScan bieden analyse. <a href=\"{href.comparison}\">Bronnen voor de vergelijking</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Trailer.",
+      "text": "44 seconden, 16:9, 1080p bij 60 fps, met geluid. <a href=\"{href.trailerDownload}\" download>Download de MP4</a> ({size}). Een 4K-master is op aanvraag beschikbaar.",
+      "fallback": "Download de trailer (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Merk",
+      "title": "Logo.",
+      "text": "Altijd in kleine letters, de maansikkel altijd in messing. Geef het alsjeblieft geen andere kleur, rek het niet uit en zet het niet opnieuw in een ander lettertype. <a href=\"{href.brandGuide}\">Merkrichtlijnen (pdf)</a>.",
+      "primaryAlt": "Het Vespertine-woordbeeldmerk: een messingkleurige maansikkel en het woord vespertine",
+      "stackedAlt": "Het gestapelde Vespertine-woordbeeldmerk",
+      "primary": "Primair",
+      "stacked": "Gestapeld",
+      "onLight": "op licht:",
+      "crescent": "alleen de maansikkel:"
+    },
+    "art": {
+      "eyebrow": "Beeldmateriaal",
+      "title": "Eén beeld per functie.",
+      "text": "In drie formaten: 2400×1350, 1600×900 en 1270×760.",
+      "items": {
+        "bit-perfect": "Bitperfect als aan de voorwaarden is voldaan",
+        "fake-hi-res": "Detectie van nep-hi-res",
+        "spatial-audio": "Surround als ruimtelijke audio op AirPods",
+        "native-dsd": "Native DSD via DoP",
+        "stereo-and-surround": "Stereo- en surroundversies",
+        "sacd-iso": "SACD-schijfkopieën, direct afgespeeld",
+        "languages": "{languages} talen"
+      }
+    },
+    "shots": {
+      "eyebrow": "Screenshots",
+      "title": "De echte app.",
+      "text": "Op de eigen bibliotheek van de ontwikkelaar, 2400×1500. Albumillustraties zijn eigendom van hun rechthebbenden.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24 bit / 96 kHz, bitperfect op een Fosi Audio ZD3: Lazar Berman, Les jeux d’eaux à la Villa d’Este van Liszt",
+        "multichannel-albums": "Albums gefilterd op meerkanaals",
+        "stereo-and-surround-versions": "Uit SACD’s geëxtraheerde tracks met stereo- en 5.1-versies",
+        "spatial-audio-airpods-max": "Een 24/88,2-album in 5.1 (Elton John, Goodbye Yellow Brick Road) als ruimtelijke audio op AirPods Max",
+        "fake-hi-res-detection": "Een 24/192-‘remaster’ die ophoudt bij 16 kHz (een bewuste nep: de muziek van de trailer zelf, naar MP3 gecodeerd en geüpsampled, onder een verzonnen bandnaam)",
+        "dsd-native-dop": "DSD128 via DoP op 352,8 kHz, op een Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Een SACD-.iso, afgespeeld vanuit de schijfkopie: Dire Straits, Brothers In Arms",
+        "genres": "Genres",
+        "search": "Zoeken",
+        "smart-playlist": "Een slimme playlist, bitperfect op AirPods Max via USB-C",
+        "loopback-test": "De loopbacktest: een softwarematige controle van het uitvoerpad, sample voor sample",
+        "setup-welcome": "Eerste keer instellen: welkom",
+        "setup-output": "Eerste keer instellen: de uitvoer kiezen die onthouden wordt",
+        "output-settings": "Uitvoerinstellingen: onthouden uitvoer, terugvaloptie, afstemming op 16 bit",
+        "equalizer": "De parametrische EQ met een AutoEQ-preset"
+      }
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Neem contact op.",
+      "text": "Pers, vragen en interviewverzoeken: {email}. Vragen voor de community: <a href=\"{href.discussions}\">GitHub Discussions</a>. Bugs en apparaatmeldingen: <a href=\"{href.issues}\">GitHub-issues</a>."
+    }
+  },
+  "privacy": {
+    "title": "Privacy: Vespertine verzamelt niets",
+    "description": "De Vespertine-app verzamelt niets: geen accounts, analytics, telemetrie, crashrapportage of advertenties. Waarmee de app en deze website verbinding maken, en waarom.",
+    "ogAlt": "Privacy bij Vespertine: Vespertine verzamelt niets. Geen accounts, analytics, telemetrie, crashrapportage of advertenties.",
+    "eyebrow": "Privacy",
+    "heading": "Vespertine verzamelt",
+    "headingBrass": "niets.",
+    "updated": "Van kracht vanaf {effective} (voegt het microfoongebruik van ruimtecorrectie toe, voor versie 0.14). Eerdere wijzigingen: de optionele Discord-status, {discordUpdated}; het onderdeel ‘Deze website’, {statsUpdated}, toen de site bezoeken ging tellen met zelf gehoste statistieken zonder cookies. Op {langUpdated} ging het onderdeel ‘Deze website’ ook het taalmenu beschrijven, dat je keuze op je apparaat onthoudt.",
+    "intro": "Vespertine is een gratis opensource-muziekspeler. De app heeft geen accounts, geen analytics, geen telemetrie, geen crashrapportage en geen advertenties. De ontwikkelaar ontvangt geen informatie over jou of je muziek. Omdat de broncode openbaar is, kun je elke bewering op deze pagina controleren.",
+    "staysTitle": "Wat op je Mac blijft",
+    "stays": "Je bibliotheekdatabase, playlists, aantallen keren afgespeeld, analyseresultaten van bestanden, de cache met illustraties en je instellingen worden bewaard in de map Bibliotheek van je gebruikersaccount op je Mac. Wachtwoorden voor netwerkshares en je ListenBrainz-token, als je er een toevoegt, worden bewaard in de macOS-sleutelhanger. Ruimtecorrectie gebruikt je meetmicrofoon alleen terwijl je een meting uitvoert, en bewaart de opnamen in je map Documenten. Niets daarvan wordt ergens naartoe geüpload.",
+    "onlineTitle": "Wanneer de app online gaat",
+    "online": [
+      "<strong>Controle op updates.</strong> Vespertine vraagt ongeveer eens per dag zijn updatefeed op bij GitHub, en ook wanneer je ‘Zoek naar updates’ kiest. GitHub ziet je IP-adres, zoals bij elke download. Je kunt automatische controles uitschakelen in Instellingen.",
+      "<strong>MusicBrainz en Cover Art Archive.</strong> Alleen als je ‘Zoek op in MusicBrainz’ of ‘Vul metadata aan’ gebruikt (‘Zoek muziek op deze Mac’ biedt ‘Vul metadata aan’ aan voor de muziek die het toevoegt, als aankruisvak dat je kunt uitvinken), stuurt Vespertine de namen van het album, de artiest en de nummers die het zoekt naar musicbrainz.org. Met ‘Haal albumillustraties op’ ingeschakeld in Instellingen downloadt het hoezen van coverartarchive.org, dat ze aanbiedt vanuit het Internet Archive (archive.org). MusicBrainz en het Cover Art Archive worden beheerd door de MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Alleen als je scrobbelen inschakelt en je token invoert, stuurt Vespertine de nummers die je afspeelt naar listenbrainz.org: titel, artiest, album, duur en hun MusicBrainz-ID’s als je bestanden die bevatten. Het stuurt ‘nu aan het afspelen’ wanneer een nummer begint, en een luisterbeurt met het tijdstip zodra je de helft ervan of vier minuten hebt gehoord.",
+      "<strong>Discord.</strong> Alleen als je de Discord-status inschakelt in Instellingen, vertelt Vespertine de Discord-app op je Mac wat er speelt, via een verbinding die op je Mac blijft: titel, artiest, album, formaat en voortgang. Discord toont dat als je status aan de mensen die je activiteit kunnen zien. Om de albumhoes te tonen, zoekt Vespertine die op naam op, omdat Discord alleen afbeeldingen van het web kan tonen: op coverartarchive.org als je bestanden een MusicBrainz-release-ID bevatten, anders in iTunes Search van Apple (itunes.apple.com), dat de namen van de artiest en het album ontvangt. Discord downloadt de hoes vervolgens vandaar. Je kunt hoezen uitschakelen, en je bestanden en hun hoezen worden nooit geüpload.",
+      "<strong>Netwerkshares.</strong> Vespertine maakt verbinding met de servers die je toevoegt, en met niets anders, om je muziek te lezen. Zolang een share verbonden is, controleert het ongeveer elke minuut of de server nog antwoordt, en zoekt het elk halfuur naar nieuwe muziek (nooit terwijl je ervan afspeelt)."
+    ],
+    "websiteTitle": "Deze website",
+    "website": [
+      "Deze site wordt gehost op GitHub Pages, dat de IP-adressen van bezoekers kan registreren; zie de <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">privacyverklaring van GitHub</a>. De downloadknoppen linken naar de releases van de app op GitHub. De site plaatst geen cookies en laadt zijn lettertypen, afbeeldingen en video van deze site zelf.",
+      "Om te zien welke pagina’s en knoppen mensen gebruiken, telt de site bezoeken met <a href=\"https://umami.is\">Umami</a>, privacyvriendelijke software die we zelf draaien op stats.szeremeta.org. Het plaatst geen cookies, bewaart niets op je apparaat, houdt je IP-adres niet bij en deelt niets met adverteerders of andere bedrijven. Het registreert de pagina, de site waar je vandaan kwam, je land bij benadering, je browser, besturingssysteem, schermgrootte en taal, en klikken op de knoppen voor downloaden, GitHub en Homebrew. Het kan je niet over websites heen volgen of je identificeren, en het slaat bezoekers over van wie de browser Do Not Track meestuurt. <strong>De app neemt er nooit contact mee op.</strong>",
+      "Als je een taal kiest in het taalmenu van de site, onthoudt je browser die keuze op je apparaat (in zijn lokale opslag), zodat de site je niet terugzet naar een andere taal. Die keuze wordt nergens naartoe gestuurd, en de site werkt zonder die opgeslagen keuze precies hetzelfde."
+    ],
+    "changesTitle": "Wijzigingen en contact",
+    "changes": "Als dit ooit verandert, staat dat eerst op deze pagina en in de releasenotes. Vragen zijn welkom als <a href=\"{href.issues}\">GitHub-issue</a>."
+  },
+  "terms": {
+    "title": "Voorwaarden: Vespertine is vrije software onder de GPL",
+    "description": "Vespertine is vrije software onder de GNU General Public License, versie 3 of later: geen kosten, geen registratie, geen garantie.",
+    "ogAlt": "Voorwaarden van Vespertine: vrije software, zonder omwegen. De GNU General Public License, versie 3 of later.",
+    "eyebrow": "Voorwaarden",
+    "heading": "Vrije software,",
+    "headingBrass": "zonder omwegen.",
+    "updated": "Van kracht vanaf {effective}",
+    "licenseTitle": "Licentie",
+    "license": "Vespertine is vrije software onder de <a href=\"{href.license}\">GNU General Public License, versie 3 of later</a>. Je mag het voor elk doel gebruiken, de broncode bestuderen en aanpassen, en kopieën delen, ook aangepaste, onder dezelfde licentie. Het kost niets, en je hoeft je nergens voor aan te melden.",
+    "warrantyTitle": "Geen garantie",
+    "warranty": "Zoals de licentie zegt, wordt Vespertine geleverd ‘zoals het is’, zonder enige garantie, voor zover de wet dat toestaat. Maak back-ups van je muziek. Vespertine wijzigt bestanden alleen als je hun tags bewerkt, en maakt eerst van elk bestand een back-up, maar je gebruikt het op eigen risico.",
+    "musicTitle": "Je muziek en andere diensten",
+    "music": "Je bent er zelf verantwoordelijk voor dat je het recht hebt om de muziek die je toevoegt af te spelen. Vespertine kan geen met DRM beveiligde bestanden afspelen en probeert dat ook niet. MusicBrainz, het Cover Art Archive en ListenBrainz zijn onafhankelijke diensten met hun eigen voorwaarden, die van toepassing zijn als je ze via Vespertine gebruikt.",
+    "trademarksTitle": "Handelsmerken",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus en Dolby TrueHD zijn handelsmerken van Dolby Laboratories. DTS, DTS-HD Master Audio en DTS:X zijn handelsmerken van DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS en Ruimtelijke audio zijn handelsmerken van Apple Inc. Vespertine noemt ze alleen om te beschrijven wat het afspeelt en waar. Het is niet gecertificeerd, gelicentieerd of goedgekeurd door Dolby, DTS of Apple.",
+    "contactTitle": "Contact",
+    "contact": "Bugs, vragen en verzoeken: <a href=\"{href.issues}\">GitHub-issues</a>.",
+    "englishNote": "Dit is een vertaling voor je gemak. De GNU General Public License zelf is de bindende tekst, en die is in het Engels."
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden: Vespertine",
+    "description": "Deze pagina bestaat niet. Vespertine is de gratis opensource-speler voor de Mac, voor surround- en hi-res-muziekcollecties.",
+    "ogAlt": "Vespertine: de gratis opensource-speler voor de Mac, voor surround- en hi-res-muziek.",
+    "eyebrow": "404 · Geen signaal",
+    "heading": "Deze pagina",
+    "headingBrass": "bestaat niet.",
+    "lede": "De link is misschien oud, of het adres is verkeerd getypt. Alles over Vespertine begint op de homepage.",
+    "home": "Naar de homepage"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} of nieuwer",
+    "processor": "Apple silicon (arm64) of Intel (x86-64)",
+    "subCategory": "Muziekspeler",
+    "sourceName": "Broncode van Vespertine",
+    "trailerName": "Trailer van Vespertine",
+    "trailerDescription": "Een rondleiding van 44 seconden door Vespertine, opgenomen in de echte app met de eigen bibliotheek van de ontwikkelaar: het bitperfecte signaalpad, DSD via DoP, surround als ruimtelijke audio op AirPods en analyse van hi-res-bestanden.",
+    "keywords": "bitperfect, hi-res audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS-cd, ruimtelijke audio, AirPods Max, FLAC, muziekspeler, macOS, open source"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 voegt ruimtecorrectie toe: meet je luidsprekers met een UMIK-1-microfoon en speel af via filters die voor jouw ruimte zijn gemaakt. Ook voorkomt het dat afspelen via het netwerk stokt doordat de buffer leegloopt.",
+      "notes": "### Ruimtecorrectie\n- **Meet je ruimte.** Zet een gekalibreerde UMIK-1-microfoon op de luisterplek en Vespertine speelt testsweeps af via elke luidspreker om de beurt, op 1 tot 5 posities (standaard 5: de zitplaats, daarna links, rechts, ervoor en erachter). Eerst controleert het het niveau en de route naar elke luidspreker; een mislukte meting wordt afgekeurd en je kunt het opnieuw proberen of verdergaan waar je was gebleven. Zowel stereo als 5.1 wordt ondersteund.\n- **Filters per luidspreker.** Op basis van de meting maakt Vespertine per luidspreker een kleine set filters, vooral verlagingen voor de baspieken die een ruimte toevoegt. Kies een doel (standaard Warm, of Lichte helling of Vlak) en een bereik (alleen bas, of volledig bereik) en de filters worden opnieuw berekend uit de opgeslagen meting, zonder opnieuw te meten. De grafiek toont wat er is gemeten, wat er na correctie wordt voorspeld en het doel, en de voorspelling is als voorspelling aangeduid.\n- **Vertraging en niveau gelijktrekken.** Ook de vertraging en het niveau van elke luidspreker worden gemeten, zodat dichterbij staande luidsprekers worden vertraagd tot het geluid van de verste is aangekomen en luidere luidsprekers zachter worden gezet tot het niveau van de stilste.\n- **Gebruik je eigen filters.** Importeer een filterbestand van Equalizer APO of REW (vertraging, niveau en filters per luidspreker), of importeer impulsresponsen (WAV, AIFF, CAF of FLAC) die bij het afspelen als convolutiefilters worden toegepast. Exporteer een profiel als Equalizer APO-tekst of als Vespertine-profiel. Regels die Vespertine niet kan afspelen, worden geweigerd met vermelding van het regelnummer, in plaats van als iets anders te worden afgespeeld.\n- **Standaard uit, dus bitperfect blijft bitperfect.** Ruimtecorrectie wordt per uitvoer ingeschakeld en is gekoppeld aan de uitvoer waarop is gemeten. Zolang ze de samples verandert, toont het signaalpad RUIMTECORRECTIE en is de stream niet langer als bitperfect gemarkeerd. Staat ze uit, dan blijft het afspelen onaangeroerd. Integermodus en ‘Stem af op 16-bits bronnen’ blijven uit zolang ze aan staat.\n- **Waarvoor ze werkt.** Stereo- en 5.1-PCM die Vespertine rendert. Dolby- en DTS-bitstreams, Atmos en andere aantallen kanalen doen niet mee, en het signaalpad meldt waarom. DSD op een DoP-DAC wordt naar PCM omgezet zolang de correctie aan staat, zodat ook dat wordt gecorrigeerd; vink ‘Behoud native DSD’ aan bij die uitvoer om het in plaats daarvan native en ongecorrigeerd te versturen.\n- **Eén venster.** Weergave → Ruimtecorrectie, ook te openen vanuit het venster Equalizer en de instellingen van elke uitvoer, bevat de schakelaar, Meet, Importeer, Exporteer, de profielen, de grafiek met voor en na, het doel en het bereik, en de vertraging, het niveau en de filters van elke luidspreker. Dit vervangt het eerdere bètavenster Ruimtemeting. De methode staat beschreven in `docs/ROOM-CORRECTION.md`.\n\n### Afspelen via het netwerk\n- **Minder onderbrekingen vanaf een NAS.** Nummers op een netwerkshare worden nu naar je Mac gekopieerd voordat ze spelen, en het volgende nummer wordt alvast gekopieerd, zodat een hapering op het netwerk de muziek niet meer stopt. Grote DSD-bestanden worden zo gelezen dat er een ruime voorsprong klaarstaat.\n- **Een laadring op de afspeelknop.** Terwijl Vespertine op data van het netwerk wacht, toont de afspeel-/pauzeknop een kleine draaiende ring (stilstaand als ‘Verminder beweging’ aan staat). Korte leesfouten worden opnieuw geprobeerd.\n- **Beperkingen.** Een heel lange uitval, of een verbinding die trager is dan de muziek, kan het afspelen nog steeds laten pauzeren om bij te vullen. Kopieën in de cache gebruiken maximaal 8 GB, en een bron die groter is, mislukt met een duidelijke melding. Zie `docs/NETWORK-PLAYBACK.md`.\n\n### Ook nieuw\n- **DoP standaard aan voor bekende DAC’s.** De FiiO K11 en de Fosi Audio ZD3 starten met DoP ingeschakeld. Zet je het uit, dan onthoudt Vespertine dat.\n- **Recent toegevoegd toont 150 albums**, in plaats van 60, zodat een grote import de albums van net daarvoor niet uit de lijst duwt.\n- **Fosi Audio ZD3.** De ZD3 staat nu in de lijst met ondersteunde apparaten en de screenshots op de website zijn er opnieuw mee gemaakt.\n- **Website.** Onder de downloadknoppen staat een regel ‘Geef een ster op GitHub’ en ‘Doe mee aan de discussie’.\n\n### Verificatie\n- De testsuites van de engine, de bibliotheek en de app slagen, inclusief nieuwe tests voor het ontwerp van de ruimtefilters, voor afspelen via de correctiestap en het convolutiefilter, voor de meetstappen in een gesimuleerde ruimte, voor de importformaten en voor de netwerkcache. De realtime-audiocode wordt ook gecontroleerd met de address-, thread- en undefined-behavior-sanitizers.\n- Gecontroleerd op echte hardware: een volledige meting met een UMIK-1 op de luisterplek, de daaruit gemaakte filters, en afspelen via ruimtecorrectie op een Fosi Audio ZD3 met stereoluidsprekers."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 speelt 5.1-DSD af in ruimtelijke audio op AirPods, meldt wanneer audio wordt geconverteerd of gedownmixt, en blijft niet meer hangen bij het stoppen.",
+      "notes": "### Ruimtelijke audio\n- **5.1-DSD speelt nu af in ruimtelijke audio.** Een 5.1-DSD-bestand (DSF, DSDIFF, DST-gecomprimeerde DSDIFF of een SACD-schijfkopie) wordt naar PCM geconverteerd en elk kanaal komt op zijn juiste plek, zodat de LFE- en surroundkanalen niet meer verloren gaan. Voorheen konden discrete DSDIFF-kanalen op een bed met drie luidsprekers terechtkomen en ontbraken de achterkanalen.\n- **Het meldt wat er met de audio is gebeurd.** Het signaalpad toont **DSD → PCM** naast RUIMTELIJK of een downmix, en twee nieuwe meldingen, ‘Geconverteerd van DSD’ en ‘Gedownmixt naar stereo’, verschijnen wanneer ze van toepassing zijn. Beide zijn vertaald in alle 44 talen.\n- Door de ontwikkelaar gecontroleerd op AirPods Max.\n\n### Opgelost\n- **Stoppen blijft niet meer hangen.** Cmd-Q kon een draaiende cursor achterlaten terwijl Vespertine op het audioapparaat wachtte. Nu stopt het meteen.\n- **Meerkanaalsbestanden worden correct gelezen.** RF64- en Wave64-bestanden openen goed, DSD-kanaalnamen worden uit het bestand gelezen, en discrete meerkanaalsroutering volgt de eigen kanaalindeling van het bestand.\n\n### Verificatie\n- De testsuites van de engine, de bibliotheek en de app slagen, inclusief nieuwe tests die elk 5.1-DSD-formaat via ruimtelijke audio afspelen en controleren dat elk kanaal op zijn plek aankomt. De controle van de links/rechtsplaatsing draait alleen op echte Macs; de testmachines van GitHub slaan die ene controle over."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine meldt nu wanneer de equalizer niet kan veranderen wat er speelt, biedt voor elk USB-C-model van de AirPods Max een optionele referentie-equalizer, en heeft zijn eerste meerkanaalsresultaat op echte hardware."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine houdt nu een geschiedenis bij van wat je hebt afgespeeld, geeft Volgende een eigen paneel naast de bibliotheek, toont alle edities van een album op één kaart, en kan wat je afspeelt als je Discord-status tonen."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine werkt nu goed in de lichte modus, laat uitvoerapparaten zonder volumeregeling het volume van Vespertine gebruiken, en blijft je bibliotheek analyseren terwijl je via een netwerkshare luistert."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine speelt nu soepel af vanaf trage netwerkshares, analyseert grote bibliotheken sneller, ook met shares erbij, speelt hi-res af op kleine USB-C-DAC’s met de hoogste frequentie die ze bieden, en houdt het toetsenbord en meervoudige selecties waar je ze verwacht."
+    }
+  }
+}

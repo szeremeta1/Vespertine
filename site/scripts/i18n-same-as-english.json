@@ -1,0 +1,21 @@
+{
+  "_": "Strings a native reviewer confirmed are written exactly as in English in that language (scripts/check-i18n.mjs allows them). Keep it short; translate anything that has a native word.",
+  "fr": [
+    "Discussions",
+    "Architecture",
+    "Conditions + tests",
+    "Angle",
+    "Contact"
+  ],
+  "it": [
+    "Home"
+  ],
+  "nl": [
+    "Project",
+    "Contact"
+  ],
+  "ro": [
+    "Brand",
+    "Contact"
+  ]
+}

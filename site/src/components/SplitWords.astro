@@ -1,12 +1,33 @@
 ---
 // Splits a heading into word boxes at build time, so the scroll reveal needs no DOM rewrite
 // (and nothing reflows when the script arrives). Screen readers get the plain sentence.
+// Languages written without spaces (Chinese, Japanese, Thai) are split into words with Intl.Segmenter, punctuation
+// kept with the word before it; in right-to-left languages a run of left-to-right words (AirPods Max) stays in one
+// box, so the bidi algorithm keeps its order.
+import { isRtl, type Lang } from '../i18n';
 interface Props {
   text: string;
+  lang?: Lang;
 }
-const { text } = Astro.props;
-const words = text.trim().split(/\s+/);
+const { text, lang = 'en' } = Astro.props;
+const spaceless = /^(ja|zh|th)\b/.test(lang);
+// Each entry is a word box, or ' ' for a space between boxes.
+let words: string[] = [];
+if (spaceless) {
+  for (const s of new Intl.Segmenter(lang, { granularity: 'word' }).segment(text.trim())) {
+    const last = words[words.length - 1];
+    if (/^\s+$/.test(s.segment)) words.push(' ');
+    else if (!s.isWordLike && last && last !== ' ') words[words.length - 1] += s.segment;
+    else words.push(s.segment);
+  }
+} else {
+  const latin = (w: string) => /[A-Za-z0-9]/.test(w) && !/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(w);
+  for (const w of text.trim().split(/\s+/)) {
+    const last = words[words.length - 2];
+    if (isRtl(lang) && last && latin(last) && latin(w)) words[words.length - 2] += ` ${w}`;
+    else words.push(w, ' ');
+  }
+  words.pop();
+}
 ---
-<span class="sr-only">{text}</span><span aria-hidden="true" data-words>{words.map((w, i) => (
-  <Fragment><span class="rw"><span>{w}</span></span>{i < words.length - 1 && ' '}</Fragment>
-))}</span>
+<span class="sr-only">{text}</span><span aria-hidden="true" data-words>{words.map((w) => (w === ' ' ? ' ' : <span class="rw"><span>{w}</span></span>))}</span>

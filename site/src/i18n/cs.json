@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "Přeskočit na obsah",
+    "tagline": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac.",
+    "requires": "macOS {minMacOS} nebo novější.",
+    "arch": "Apple silicon a Intel",
+    "download": "Stáhnout pro Mac",
+    "downloadVersion": "Stáhnout {version}",
+    "sourceOnGitHub": "Zdrojový kód na GitHubu",
+    "reportIssue": "Nahlásit problém",
+    "brewLead": "Nebo přes Homebrew:",
+    "copy": "Kopírovat",
+    "copyLabel": "Zkopírovat příkaz pro Homebrew",
+    "copied": "Zkopírováno",
+    "copyFailed": "Označte ho",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus a Dolby TrueHD jsou ochranné známky společnosti Dolby Laboratories. DTS, DTS-HD Master Audio a DTS:X jsou ochranné známky společnosti DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS a Spatial Audio (prostorový zvuk) jsou ochranné známky společnosti Apple Inc. Vespertine je uvádí jen proto, aby popsal, co a kde přehrává; není certifikován, licencován ani schválen společnostmi Dolby, DTS ani Apple.",
+    "trailerLabel": "Upoutávka na Vespertine, 44 sekund",
+    "untested": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nebyly otestovány se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
+  },
+  "nav": {
+    "label": "Hlavní",
+    "home": "Vespertine, úvod",
+    "top": "Vespertine, zpět nahoru",
+    "features": "Funkce",
+    "formats": "Formáty",
+    "compare": "Srovnání",
+    "whatsNew": "Novinky",
+    "faq": "Časté dotazy",
+    "press": "Pro média",
+    "download": "Stáhnout",
+    "downloadLabel": "Stáhnout Vespertine {version} pro Mac"
+  },
+  "lang": {
+    "label": "Jazyk",
+    "menuLabel": "Vyberte jazyk",
+    "current": "Aktuální jazyk"
+  },
+  "footer": {
+    "project": "Projekt",
+    "about": "O projektu",
+    "releaseNotes": "Poznámky k vydání",
+    "sponsor": "Podpořit",
+    "discussions": "Diskuze",
+    "architecture": "Architektura",
+    "privacy": "Soukromí",
+    "terms": "Podmínky",
+    "license": "Licence (GPL-3.0)",
+    "notices": "Oznámení třetích stran",
+    "ukraine": "<strong>Vespertine stojí za Ukrajinou.</strong> Přispějte prosím prostřednictvím {orgs}.",
+    "copyright": "© {year} přispěvatelé Vespertine",
+    "free": "Svobodný software pod licencí GPL",
+    "madeIn": "Vytvořil {author} v Bostonu",
+    "backToTop": "Zpět nahoru",
+    "home": "Domů"
+  },
+  "home": {
+    "title": "Vespertine: přehrávač surround a hi-res hudby pro Mac",
+    "description": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac: obrazy disků SACD a DVD-Video, DSD, DTS CD, soubory DTS-HD MA, TrueHD a Dolby Atmos, prostorový zvuk na AirPods, korekce místnosti změřená přímo ve vaší místnosti a bit-perfect signálová cesta, kterou si můžete prozkoumat.",
+    "ogAlt": "Vespertine: bezplatný open-source přehrávač surround a hi-res hudby pro Mac. Jeho signálová cesta ukazuje FLAC 24 bitů / 96 kHz přehrávaný bit-perfect na Fosi Audio ZD3. Verze {version}, macOS {minMacOS} nebo novější.",
+    "hero": {
+      "eyebrow": [
+        "Zdarma a open source",
+        "macOS {minMacOS}+",
+        "Apple silicon a Intel"
+      ],
+      "titleSr": "Surround a hi-res hudba na vašem Macu.",
+      "titleLines": [
+        "Surround a",
+        "hi-res hudba"
+      ],
+      "titleBrass": "na vašem Macu.",
+      "lede": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac. Obrazy disků SACD a DVD-Video, DSD, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu s vašimi stereo alby a na AirPods hrají jako prostorový zvuk se sledováním hlavy. Korekce místnosti změří vaši místnost USB mikrofonem a koriguje každý reproduktor; dokud ji nezapnete, je vypnutá. Signálová cesta ukazuje každý krok od souboru po výstup. V angličtině a ve {languages} dalších jazycích.",
+      "ask": "Líbí se vám?",
+      "star": "Dejte mu hvězdičku na GitHubu",
+      "discuss": "Zapojte se do diskuze",
+      "version": "Verze {version}",
+      "signed": "podepsáno a notarizováno",
+      "releaseNotes": "Poznámky k vydání",
+      "privacy": "Soukromí: nic se neshromažďuje.",
+      "panelAlt": "Inspektor Právě hraje ve Vespertine: Liszt, Les jeux d’eaux à la Villa d’Este, hraje Lazar Berman, s označením HI-RES BEZEZTRÁTOVÉ a BIT-PERFECT, výhradní, 32 / 96, se signálovou cestou od FLAC 24 bitů / 96 kHz přes libFLAC v nativní frekvenci a bez útlumu hlasitosti až do Fosi Audio ZD3.",
+      "panelCaption": "Signálová cesta",
+      "followSignal": "Sledujte signál"
+    },
+    "trailer": {
+      "eyebrow": "Upoutávka",
+      "title": "Vespertine za 44 sekund.",
+      "text": "Zapněte si zvuk. Vše, co v ní uvidíte, je skutečná aplikace, nahraná na vývojářově vlastní knihovně.",
+      "fallback": "Přehrát upoutávku (MP4)",
+      "caption": "44 s · 1080p · obaly alb patří jejich vlastníkům"
+    },
+    "features": {
+      "eyebrow": "Proč Vespertine",
+      "title": "Stvořený pro vaši surround sbírku.",
+      "text": "Surround a stereo hudba v jedné knihovně a přehrávač, který přesně ukazuje, co se signálem udělal.",
+      "badgesLabel": "Stavy signálové cesty, které aplikace zobrazuje"
+    },
+    "pillars": [
+      {
+        "title": "Surround v jedné knihovně",
+        "text": "Obrazy a ripy SACD, disky DVD-Video, DTS CD, DTS-HD MA a TrueHD stojí vedle vašich stereo alb a na AirPods hrají jako prostorový zvuk se sledováním hlavy. Když album existuje v obou verzích, každá skladba je uvedena jednou a přehraje se verze, která odpovídá vašemu výstupu."
+      },
+      {
+        "title": "Signálová cesta, kterou si ověříte",
+        "text": "Vzorkovací frekvence, délky slova, zisk a zpracování kanálů, zpětně načtené z Core Audio. Podmínky pro bit-perfect jsou ve zdrojovém kódu, spolu s automatickými testy, testem loopbacku a návodem k ověření na hardwaru."
+      },
+      {
+        "title": "Kontroluje hi-res soubory",
+        "text": "Analýza upozorní na doplněnou bitovou hloubku a možný upsampling nebo ztrátový původ. Spektrální výsledky jsou odhady a zobrazují se i se svými důkazy a limity. Stejná analýza běží také na serveru s Linuxem vedle vašich souborů."
+      },
+      {
+        "title": "Open source, který si můžete prověřit",
+        "text": "Zdarma pod licencí GPL. Kód přehrávače si můžete přečíst, sestavit i upravit, včetně podmínek výstupu a testů. Žádný účet, předplatné, reklamy ani telemetrie."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Výhradní",
+      "spatial": "Prostorový · sledování hlavy",
+      "synthetic": "Syntetické vysoké frekvence?",
+      "roomCorrection": "Korekce místnosti"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Signálová cesta",
+        "kicker": "Bit-perfect",
+        "title": "Každá skladba v nativní frekvenci a bitové hloubce.",
+        "lede": "Signálová cesta vypisuje každý krok od souboru až po váš DAC, zpětně načtený z Core Audio, a řekne vám, když něco změnilo vzorky.",
+        "body": [
+          "Vespertine přepne zařízení na vzorkovací frekvenci každého souboru a převzorkovává (převodníkem Apple v masteringové kvalitě) jen tehdy, když ji DAC nezvládne. <span class=\"mono nowrap\">BIT-PERFECT</span> se zobrazí jen při splnění podmínek ze zdrojového kódu: nativní frekvence, nic, co by měnilo vzorky, vyhovující délka slova a zařízení, které je ve výhradním režimu nebo které nesdílí jiná aplikace. Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128."
+        ],
+        "list": [
+          "Výhradní režim (hog) nepustí k zařízení jiné aplikace. Ve sdíleném režimu ovládají hlasitost vašeho DAC klávesy hlasitosti a Digital Crown; ve výhradním režimu mohou také, pokud to zapnete.",
+          "Celočíselný režim posílá nezpracované 32bitové PCM přímo do DAC, které přijímají celá čísla.",
+          "Volba Přizpůsobit 16bitovým zdrojům (ve výchozím stavu vypnutá) posílá 16bitové soubory do DAC se skutečným 16bitovým režimem jako 16bitové, ne doplněné nulami.",
+          "Přehrávání bez mezer, včetně alb rozdělených podle CUE sheetu z jednoho souboru.",
+          "Pamatuje si váš DAC. Pokud není připojený, hudba hraje na nejlepším připojeném výstupu, a jakmile se DAC vrátí, přesune se zpět na něj.",
+          "Výstupy bez vlastního ovládání hlasitosti (HDMI, optický, linkový výstup) mohou používat hlasitost Vespertine, nastavitelnou pro každý výstup zvlášť. Pod 100 % popisky uvádějí, že už nejde o bit-perfect.",
+          "Když Vespertine ukončíte, vrátí vašemu DAC vzorkovací frekvenci a bitovou hloubku, které měl předtím.",
+          "Vestavěný test loopbacku porovnává každý vzorek, který Vespertine pošle do virtuálního zařízení. Jde o softwarovou kontrolu, je tak i označený a odznak <span class=\"mono nowrap\">BIT-PERFECT</span> nikdy nemění."
+        ],
+        "links": [
+          "Podmínky v kódu",
+          "Ověřte si to sami",
+          "Co test loopbacku dokazuje"
+        ],
+        "alt": "Vespertine přehrává Liszt, Années de pèlerinage, hraje Lazar Berman, z FLAC 24 bitů / 96 kHz: inspektor ho označuje jako bit-perfect a výhradní na Fosi Audio ZD3 a ukazuje každý krok signálové cesty.",
+        "floatAlt": "Panel testu loopbacku: 24 bitů při 44,1 a 96 kHz, doplněný 16bitový zvuk a dvojice bez mezer, vše bitově přesné.",
+        "floatCaption": "Test loopbacku · softwarová kontrola"
+      },
+      "room-correction": {
+        "jack": "Korekce místnosti",
+        "kicker": "Korekce místnosti",
+        "title": "Změřte svou místnost. Korigujte každý reproduktor.",
+        "lede": "Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem a Vespertine podle toho, co slyší na vašem místě, navrhne filtry na míru každému reproduktoru.",
+        "body": [
+          "Rozmítání hraje postupně z každého reproduktoru zvlášť, v jednom až pěti bodech kolem vašeho poslechového místa. Každý reproduktor dostane vlastní filtry navržené podle měření. Většinou ubírají: tlumí špičky místnosti a široké propady zdvihají jen mírně. Stejné měření nastaví zpoždění a úroveň každého reproduktoru, aby zvuk z každého z nich dorazil k vašemu místu ve stejnou chvíli a se stejnou hlasitostí. Korekce místnosti je ve výchozím stavu vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect. Když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>."
+        ],
+        "list": [
+          "Tři cíle: Warm (výchozí), Gentle tilt a Flat. Korigujte jen basy, nebo celé pásmo, a filtry později navrhněte znovu bez nového měření.",
+          "Importuje filtry z REW nebo Equalizer APO včetně zpoždění a úrovně každého reproduktoru a exportuje text pro Equalizer APO.",
+          "Importuje impulzní odezvy (WAV, AIFF, CAF nebo FLAC) a přehrává je konvolucí.",
+          "Stereo a 5.1.",
+          "Portrét místnosti ukazuje reproduktory, vaše místo a postupně každý bod mikrofonu, jak se měří. Animace proměny křivky pak převede naměřenou odezvu na předpovídanou a přepínač předtím/potom je porovná."
+        ],
+        "note": "Křivka „potom“ je předpovězená z měření a filtrů, ne naměřená. Chcete-li vidět, co místnost skutečně dělá, změřte ji znovu se zapnutou korekcí.",
+        "links": [
+          "Jak korekce místnosti funguje"
+        ],
+        "alt": "Předpovězená korekce místnosti ve Vespertine pro stereo pár s cílem Warm: pro každý reproduktor naměřená odezva, cíl a předpovídaná odezva po korekci, se špičkou způsobenou místností kolem 120 Hz sníženou o 14 a 18 dB, a filtry každého reproduktoru.",
+        "floatAlt": "Portrét místnosti v průvodci měřením: levý a pravý reproduktor, poslechové místo a kolem něj pět bodů pro mikrofon, na prvním z nich stojí mikrofon.",
+        "floatCaption": "Portrét místnosti"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround a prostorový zvuk",
+        "title": "Vaše disky 5.1 ve stejné knihovně.",
+        "lede": "Vícekanálová hudba hraje na AirPods jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC provede downmix podle rozložení kanálů.",
+        "body": [
+          "DTS CD se dekódují do 5.1. Obrazy SACD, extrahované stopy SACD, vícekanálový FLAC, TrueHD a DTS-HD MA se na AirPods vykreslí jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC downmixují. Dolby Digital Plus s Atmosem využívá objektový renderer macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu. Výstup kanál po kanálu je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
+        ],
+        "list": [
+          "Stereo a surround verze alba jsou uvedeny jednou; Vespertine přehraje tu, která se hodí k výstupu, nebo tu, kterou si připnete.",
+          "Bitstream Dolby Digital, DD+ a DTS-CD do receiveru je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Testy nosného signálu používají čtečku S/PDIF z FFmpeg. Passthrough TrueHD a DTS-HD MA není v macOS podporován.",
+          "Funkce Exportovat pro prostorový zvuk vytvoří binaurální stereo pro sluchátka nebo vícekanálový ALAC pro zařízení Apple, včetně tagů a obalů."
+        ],
+        "alt": "Album Goodbye Yellow Brick Road (Elton John) v 5.1, 24 bitů / 88,2 kHz, hraje jako prostorový zvuk se sledováním hlavy na AirPods Max, se signálovou cestou a měřičem pro každý kanál.",
+        "floatAlt": "Album se stereo a 5.1 verzí každé skladby; každá je uvedena jednou.",
+        "floatCaption": "Stereo a 5.1, uvedené jednou"
+      },
+      "discs": {
+        "jack": "Obrazy disků a DSD",
+        "kicker": "SACD, DVD-Video a DSD",
+        "title": "Přehrávejte přímo obraz disku.",
+        "lede": "Nasměrujte Vespertine na obraz SACD nebo DVD-Video a hudbu přehraje přímo z něj: nic se nepřipojuje, neextrahuje ani nezapisuje.",
+        "body": [
+          "Obrazy SACD <span class=\"mono\">.iso</span> přehrávají svou stereo i 5.1 oblast, s kompresí DST i bez ní, s názvy převzatými z textu samotného disku. DST se dekóduje zpět přesně na původní DSD, takže stereo jde do vašeho DAC jako nativní DSD přes DoP, pokud to DAC podporuje, a 5.1 hraje na AirPods jako prostorový zvuk se sledováním hlavy. Hudba v LPCM na discích DVD-Video (obraz <span class=\"mono\">.iso</span> nebo složka <span class=\"mono\">VIDEO_TS</span>) se přehrává bit po bitu, jedno album na titul a jedna stopa na kapitolu."
+        ],
+        "list": [
+          "Na dvou skutečných discích se výstup bit po bitu shodoval se sacd_extract. Disky s oblastí 5.0, pouze s vícekanálovou oblastí nebo s DSD128 a výše zatím pokrývají jen syntetické testovací obrazy.",
+          "DSF a DSDIFF od DSD64 po DSD512, včetně DSDIFF s kompresí DST, jdou jako DoP do DAC, které přijímají frekvenci nosného signálu, nebo se převedou na PCM s vysokou vzorkovací frekvencí. DoP je ověřené až do DSD256 na Fosi Audio ZD3 a až do DSD128 na FiiO K11; DSD512 přes DoP nebylo na hardwaru otestováno.",
+          "DVD-Video LPCM v 16, 20 a 24 bitech, při 48 a 96 kHz, až 8 kanálů. DVD-Audio podporováno není a šifrované disky (CSS) vyžadují dešifrovanou kopii."
+        ],
+        "links": [
+          "Podrobnosti o DVD-Video"
+        ],
+        "alt": "Album Brothers In Arms (Dire Straits) hraje přímo z obrazu disku SACD: stereo DSD64 přes DoP do FiiO K11, s odznakem NATIVNÍ DSD · DoP a dekodérem, který uvádí Obraz SACD, DST (bezeztrátové).",
+        "floatAlt": "Love for the Sake of Love (Claudja Barry) jako DSD128 přes DoP do Fosi Audio ZD3, při 352,8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Analýza",
+        "kicker": "Detekce falešného hi-res a spektrum",
+        "title": "Zjistěte, které „hi-res“ soubory ve skutečnosti nejsou.",
+        "lede": "Každý soubor lze analyzovat na skutečnou bitovou hloubku, skutečnou šířku pásma a otisky ztrátových kodérů a resamplerů.",
+        "body": [
+          "Každý výsledek je doložen důkazy a uvádí, čím jiným by se dal vysvětlit, a playlist <em>Podezřelé hi-res</em> je všechny shromažďuje. Přesný je jen výsledek u doplnění nulami: spektrální výsledky jsou označené jako otázky, protože některé ztrátové soubory s vysokým datovým tokem projdou jako pravé a strmé masteringové filtry, zdroje z FM nebo přepisy z pásku či vinylu mohou vypadat podezřele. Během přehrávání ukazují měřiče a živé spektrum, co jde na výstup, včetně DoP."
+        ],
+        "list": [
+          "16bitový zvuk doplněný do 24bitových kontejnerů",
+          "Pravděpodobně převzorkované mastery v CD kvalitě prodávané jako 96 nebo 192 kHz",
+          "Pravděpodobně ztrátový původ: MP3 nebo AAC překódované do FLAC",
+          "Pravděpodobně syntetické vysoké frekvence ze SBR nebo „vylepšení pomocí AI“",
+          "<span class=\"mono\">vespertine-analyze</span> spustí stejnou analýzu na serveru s Linuxem vedle vašich souborů; aplikace výsledky naimportuje."
+        ],
+        "note": "Soubor na tomto snímku obrazovky je záměrný podvrh: vlastní hudba z upoutávky, zakódovaná do MP3 a převzorkovaná na 24/192 pod smyšleným jménem kapely.",
+        "links": [
+          "Jak analýza funguje a kde selhává"
+        ],
+        "alt": "Karta Analýza označuje „remaster“ 24/192 jako pravděpodobně ztrátového původu: jeho dlouhodobé spektrum končí na 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max přes USB-C",
+        "title": "Bezeztrátově na AirPods Max – a řekne vám to.",
+        "lede": "Po připojení kabelem USB-C jsou AirPods Max rozpoznány jako bezeztrátové zařízení 24 bitů / 48 kHz.",
+        "body": [
+          "Hudba ve 48 kHz hraje bit-perfect a vše ostatní se převádí převzorkovačem Apple v masteringové kvalitě, zcela otevřeně. Přes Bluetooth vám Vespertine sdělí, že spojení používá AAC. Vychází to z popisu kabelové cesty od Apple a ze zpětného načtení z Core Audio, protože AirPods nemají digitální výstup, který by šlo zapojit do loopbacku."
+        ],
+        "alt": "Chytrý playlist skladeb 24 bitů / 48 kHz, zúžený na Oasis, hraje bit-perfect na AirPods Max přes USB-C."
+      },
+      "library": {
+        "jack": "Knihovna",
+        "kicker": "Knihovna",
+        "title": "Procházejte jako v Apple Music. Spravujte jako knihovník.",
+        "lede": "Alba, interpreti, skladby a žánry, každé s filtry, které můžete kombinovat, a s volbou Náhodně pro kterékoli z nich.",
+        "list": [
+          "Filtry podle formátu, 24 bitů, 88,2 kHz a výše, vícekanálového zvuku, žánru, roku, vzorkovací frekvence, kanálů a výsledku analýzy. Hledání ignoruje velikost písmen i diakritiku.",
+          "Chytré playlisty v jednotkách, ve kterých přemýšlíte: 24 bitů, 88,2 kHz.",
+          "Remastery, mono a stereo vydání i SACD jednoho alba sdílejí jednu kartu; vydání si zvolíte při jejím otevření.",
+          "Oblíbené a počty přehrání se ukládají v knihovně a nikdy se nezapisují do vašich souborů. Importuje playlisty M3U a Apple Music, počty přehrání a oblíbené.",
+          "Editor tagů se zálohami a vrácením jedním krokem, plus obohacení z MusicBrainz, které před jakýmkoli zápisem ukáže svou míru jistoty.",
+          "Síťová sdílení přes SMB, NFS nebo WebDAV, s mezipamětí, volbou Ponechat offline a přehráváním uzpůsobeným pomalým serverům: skladby se před přehráním uloží do vyrovnávací paměti ve vašem Macu a tlačítko přehrávání mezitím ukazuje kroužek načítání.",
+          "Funkce Najít hudbu prohledá všechny disky, najde vaši skutečnou hudbu a nepořádek nechá stranou. Krátké nastavení při prvním spuštění vybere váš výstup a vysvětlí, co dělají výhradní přístup a ReplayGain.",
+          "Parametrický EQ pro každý výstup, který importuje předvolby AutoEQ a Equalizer APO. Ve výchozím stavu vypnutý; když je zapnutý, signálová cesta ukazuje <span class=\"mono nowrap\">EKVALIZÉR</span> místo <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "Minipřehrávač, položka na řádku nabídek, mediální klávesy, ReplayGain a automatické podepsané aktualizace."
+        ],
+        "links": [
+          "Všechny funkce podrobně"
+        ],
+        "alt": "Stránka Žánry: dlaždice pro každý žánr s mozaikou jeho obalů."
+      },
+      "languages": {
+        "jack": "Jazyky",
+        "kicker": "{languages} jazyků",
+        "title": "Mluví vaším jazykem.",
+        "lede": "Každá nabídka, nastavení i hlášení signálové cesty je kromě angličtiny přeloženo do {languages} jazyků.",
+        "body": [
+          "Od ukrajinštiny, němčiny a japonštiny po svahilštinu, tamilštinu a hausštinu, s místními tvary množného čísla a formáty čísel, a zjednodušená, tradiční i hongkongská čínština mají každá vlastní slovní zásobu. Arabština, hebrejština, perština a urdština mají rozvržení zprava doleva.",
+          "Jak se překlady kontrolují: automatická kontrola při každé změně ověří, že každý řetězec v aplikaci existuje ve všech 44 jazycích se stejnými zástupnými symboly a s tvary množného čísla, které daný jazyk potřebuje, a hlavní obrazovky byly v několika jazycích zkontrolovány kvůli oříznutému nebo překrývajícímu se textu a zrcadlení zprava doleva. Překlady vznikly jako pečlivé strojové překlady, takže opravy od rodilých mluvčích jsou na <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHubu</a> velmi vítány."
+        ],
+        "alt": "Vespertine napsané v každém z {languagesTotal} jazyků rozhraní, od ヴェスパタイン a Веспертайн po فسبرتاين a वेस्परटाइन, v různých velikostech a písmech.",
+        "wallLabel": "Vespertine ve všech jeho jazycích"
+      }
+    },
+    "formats": {
+      "eyebrow": "Formáty",
+      "title": "Surround, bezeztrátové i ztrátové soubory.",
+      "text": "Stereo i vícekanálový zvuk, PCM i DSD, obrazy disků i běžné soubory, všude včetně CUE sheetů.",
+      "caption": "Formáty, které Vespertine přehrává, a jak",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Nativní vzorkovací frekvence a bitová hloubka až do 32 bitů a do frekvence, na které běží váš DAC (testováno do 768 kHz); nezměněné PCM 32 bitů vyžaduje celočíselný režim. Obrazy s CUE sheetem."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF a DSDIFF, komprimované DST i bez komprese. DoP závisí na DAC a nosné frekvenci, jinak PCM. DoP je otestované do DSD256; DSD512 přes DoP není na hardwaru otestované."
+        },
+        {
+          "name": "Obrazy SACD",
+          "text": "Stereo i vícekanálové oblasti, DST i bez komprese, přímo z obrazu; každá skladba je uvedena jednou, se svou stereo i 5.1 verzí."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16, 20 a 24 bitů při 48 a 96 kHz, 1 až 8 kanálů, bit po bitu; jedno album na titul, jedna stopa na kapitolu. DVD-Audio není podporováno."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus s Atmosem, vykreslený objektovým rendererem macOS, nebo jeho dekódovaná kanálová vrstva."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Bezeztrátové, může být bit-perfect; u TrueHD Atmos hraje kanálová vrstva, objekty se nevykreslují."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA je bezeztrátový a může být bit-perfect; u DTS:X hraje kanálová vrstva. Surové DTS se dekóduje; bitstream DTS-CD je samostatná cesta."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Dekóduje macOS. Bitstream do receiveru je experimentální, netestovaný na skutečných receiverech a vícekanálových USB DAC (testován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme hlášení."
+        },
+        {
+          "name": "DTS CD a DTS-WAV",
+          "text": "Rozpoznává je a dekóduje do 5.1, včetně alb rozdělených pomocí CUE."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Bezeztrátové. DSD uvnitř souborů WavPack není podporováno."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Dekódováno a označeno jako ztrátové."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Srovnání",
+      "title": "Jak obstojí.",
+      "intro": "Bit-perfect přehrávání nabízí několik přehrávačů pro Mac. Toto srovnání vychází z toho, co uvádí vlastní dokumentace nebo zdrojový kód každého přehrávače. „Nezdokumentováno“ znamená, že výrobce neuvádí ani jedno, ne že funkce chybí. Vespertine používá konvoluci ke korekci místnosti; pluginy zvukových efektů ani streamovací služby nemá.",
+      "hint": "Posuňte pro další →",
+      "region": "Srovnávací tabulka (posouvá se do stran)",
+      "caption": "Vespertine ve srovnání se sedmi dalšími hudebními přehrávači pro Mac, podle vlastní dokumentace nebo zdrojového kódu každého z nich",
+      "feature": "Funkce",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Zdrojový kód",
+          "GPL-3.0",
+          "Uzavřený",
+          "Uzavřený",
+          "Uzavřený",
+          "Uzavřený",
+          "Uzavřený",
+          "GPL-2.0",
+          "Uzavřený"
+        ],
+        [
+          "Soubory FLAC / DSD",
+          "Ano / Ano",
+          "Ne / Ne",
+          "Ano / Ano",
+          "Ano / Ano",
+          "Ano / Ano",
+          "Ano / Ano",
+          "Ano / Ano",
+          "Ano / Ne⁴"
+        ],
+        [
+          "Automatické přepínání frekvence DAC",
+          "Ano",
+          "Ne",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Nezdokumentováno"
+        ],
+        [
+          "Výhradní (hog) režim",
+          "Ano",
+          "Ne",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Ano"
+        ],
+        [
+          "PCM 16/24 bitů beze změny vzorků",
+          "Podmínky + testy",
+          "macOS 27: testy třetích stran¹",
+          "Tvrzení výrobce",
+          "Tvrzení výrobce",
+          "Test loopbacku v aplikaci",
+          "Tvrzení výrobce",
+          "Indikátor v aplikaci",
+          "Nezdokumentováno"
+        ],
+        [
+          "Lokální surround soubory",
+          "Ano²",
+          "Nezdokumentováno",
+          "Ano",
+          "Ano",
+          "Ano",
+          "Nezdokumentováno",
+          "Ano",
+          "Nezdokumentováno"
+        ],
+        [
+          "Prostorový zvuk od Applu pro lokální surround",
+          "Ano",
+          "Jen Atmos z katalogu³",
+          "Nezdokumentováno",
+          "Nezdokumentováno",
+          "Nezdokumentováno",
+          "Nezdokumentováno",
+          "Ano",
+          "Nezdokumentováno"
+        ],
+        [
+          "Analýza hi-res souborů",
+          "Ano",
+          "Ne",
+          "AudioScan",
+          "Dynamický rozsah, hlasitost",
+          "Ano",
+          "Nezdokumentováno",
+          "Ne (jen živé spektrum)",
+          "Ne (jen živé spektrum)"
+        ],
+        [
+          "SACD ISO",
+          "Ano",
+          "Ne",
+          "Ano",
+          "Ne (jen DSF/DFF)",
+          "Ano",
+          "Ne",
+          "Ne",
+          "Ne⁴"
+        ],
+        [
+          "Korekce místnosti",
+          "Měření v aplikaci (USB mikrofon) nebo import z REW / APO a import impulzních odezev",
+          "Ne",
+          "Přes konvoluci (Origin: placená možnost) nebo Audio Units",
+          "Přes konvoluci",
+          "Ne (záměrně)",
+          "Nezdokumentováno",
+          "Ne",
+          "Nezdokumentováno"
+        ],
+        [
+          "Konvoluce / pluginy zvukových efektů",
+          "Ano (korekce místnosti) / Ne",
+          "Ne / Ne",
+          "Ano (Origin: placená možnost) / Audio Units",
+          "Ano / Ne",
+          "Ne / Ne",
+          "Nezdokumentováno / Nezdokumentováno",
+          "Ne / Ne",
+          "Nezdokumentováno / Audio Units"
+        ],
+        [
+          "Streamovací služby",
+          "Ne",
+          "Apple Music",
+          "Studio: ano; Origin: ne",
+          "Ano",
+          "Ne (lokální + UPnP)",
+          "Ne (internetové rádio)",
+          "Ne (internetové rádio)",
+          "Ne (internetové rádio)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music v macOS 27 byla v <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">loopbackových testech třetích stran zveřejněných na ASR</a> bitově přesná při 16/24 bitech a 100% hlasitosti. Nejde o měření Vespertine; původní zprávu se pro tuto aktualizaci nepodařilo nezávisle znovu ověřit. Na Macu stále nenabízí automatické přepínání frekvence, režim hog, FLAC ani DSD.",
+        "² Výstup do vícekanálového DAC a bitstream do receiveru jsou experimentální, netestované na skutečných receiverech a vícekanálových USB DAC (testován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme hlášení.",
+        "³ Apple dokumentuje prostorový zvuk se sledováním hlavy pro skladby v Dolby Atmos z katalogu Apple Music, nikoli prostorové vykreslování vašich vlastních vícekanálových souborů.",
+        "⁴ Testováno ve foobar2000 2.26 (macOS 27.0.1) bez komponent: soubory DSF, DFF a SACD ISO selžou s hlášením „Unsupported file format“. DSF a DFF se přehrají jen jako PCM 352,8 kHz po samostatné instalaci FFmpeg a jejich přidání do FFmpeg Decoder Wrapperu ve foobar2000; SACD ISO stále selhává."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Zdroje a rozsah</a>. Opravy vítáme: <a href=\"{href.issues}\">založte issue</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Novinky",
+      "title": "Novinky ve verzi {version}.",
+      "latest": "Nejnovější verze",
+      "fullNotes": "Úplné poznámky k vydání",
+      "meta": "už máte nainstalováno? Aktualizuje se sama, nebo {brewUpgrade}",
+      "earlier": "Starší verze",
+      "every": "Všechny verze",
+      "inEnglish": "Tyto poznámky k vydání zatím nejsou přeložené, proto se zobrazují v angličtině."
+    },
+    "faq": {
+      "eyebrow": "Časté dotazy",
+      "title": "Otázky a odpovědi.",
+      "items": [
+        {
+          "q": "Je opravdu zdarma?",
+          "a": "Ano. Vespertine je zdarma a open source pod licencí GPL-3.0. Žádný účet, žádné předplatné, žádné reklamy a žádná telemetrie (<a href=\"{href.privacy}\">soukromí</a>). Na internet se připojuje jen kvůli kontrole aktualizací a dále, když o to požádáte, k MusicBrainz, Cover Art Archive nebo ListenBrainz nebo k vyhledání obalů pro váš status na Discordu."
+        },
+        {
+          "q": "Co potřebuji?",
+          "a": "macOS {minMacOS} ({minMacOSName}) nebo novější, na Apple silicon nebo Intelu. Hardware Intel není otestovaný; verze pro Intel běžela pod Rosettou a hlášení ze skutečných Maců s Intelem uvítáme."
+        },
+        {
+          "q": "Jak ji nainstaluji a aktualizuji?",
+          "a": "Stáhněte DMG, otevřete ho a přesuňte Vespertine do složky Aplikace. Je podepsaná certifikátem Developer ID, notarizovaná společností Apple a aktualizuje se sama; každá aktualizace je podepsaná. S Homebrew: {brew}, poté {brewUpgrade} nebo vlastní aktualizace aplikace."
+        },
+        {
+          "q": "Streamuje z Qobuzu, TIDALu nebo Apple Music?",
+          "a": "Ne. Vespertine přehrává hudbu, kterou vlastníte, na vašem Macu, na externích discích nebo na síťovém sdílení. Stažené skladby z předplatného Apple Music chráněné DRM přehrát nelze."
+        },
+        {
+          "q": "Jak poznám, že je přehrávání opravdu bit-perfect?",
+          "a": "Signálová cesta zpětně čte, co Core Audio skutečně udělalo: nominální frekvenci zařízení, jeho fyzický formát a kdo ho drží. Dekodéry mají automatizované testy (TrueHD proti svému zdroji, DTS proti vlastnímu dekodéru FFmpeg), vestavěný test loopbacku kontroluje softwarovou cestu vzorek po vzorku a <span class=\"mono nowrap\">vespertine-probe</span> vám umožní ověřit váš vlastní hardware. <a href=\"{href.verification}\">Jak to ověřit sami</a>."
+        },
+        {
+          "q": "Umí korekci místnosti?",
+          "a": "Ano. Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem v jednom až pěti bodech kolem svého poslechového místa a Vespertine navrhne filtry na míru každému reproduktoru a srovná jejich zpoždění a úroveň, ve stereu i v 5.1. Importuje také filtry z REW a Equalizer APO a impulzní odezvy. Ve výchozím stavu je vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect; když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>. <a href=\"{href.roomCorrection}\">Jak korekce místnosti funguje</a>."
+        },
+        {
+          "q": "Přehraje disky SACD a DVD?",
+          "a": "Přehrává jejich obrazy. Obrazy SACD <code>.iso</code>, stereo i vícekanálové, komprimované DST i bez komprese, a hudba LPCM na obrazech DVD-Video nebo ve složkách <code>VIDEO_TS</code> se přehrávají přímo z obrazu, nic se neextrahuje. DVD-Audio není podporováno a šifrovaná DVD (CSS) vyžadují dešifrovanou kopii."
+        },
+        {
+          "q": "Přehraje Dolby Atmos?",
+          "a": "Dolby Digital Plus s Atmosem se přehrává přes objektový renderer macOS, na AirPods jako prostorový zvuk se sledováním hlavy. TrueHD Atmos a DTS:X přehrávají svou bezeztrátovou kanálovou vrstvu; jejich objekty se nevykreslují. Bitstream do AV receiveru je experimentální, netestovaný na skutečných receiverech; uvítáme hlášení."
+        },
+        {
+          "q": "Změní mé soubory?",
+          "a": "Jen když upravujete tagy, a i pak se každý soubor nejdřív zazálohuje a změnu lze jedním krokem vrátit. Na složky se odkazuje na místě; import vytváří klony APFS, které nezabírají místo navíc."
+        },
+        {
+          "q": "Na jakém hardwaru byla testována?",
+          "a": "Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128; na FiiO K11 byl otestován i celočíselný režim. Testováno bylo také na AirPods Max přes USB-C a Bluetooth, na reproduktorech MacBooku Pro a na televizoru Sony přes HDMI v 5.1. Hardware Intel není otestovaný. Bitstream do receiveru a výstup do vícekanálového DAC jsou experimentální, netestované na skutečných receiverech a vícekanálových USB DAC (testován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); <a href=\"{href.dacReport}\">uvítáme hlášení</a>."
+        },
+        {
+          "q": "Je v mém jazyce?",
+          "a": "Nejspíš ano: rozhraní je v angličtině a ve {languages} dalších jazycích, včetně arabštiny, hebrejštiny, perštiny a urdštiny psaných zprava doleva. Vespertine se řídí jazykem, který je pro ni nastavený v Nastavení systému. Opravy od rodilých mluvčích uvítáme na <a href=\"{href.newIssue}\">GitHubu</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Podpora",
+      "title": "Pomozte Vespertine růst.",
+      "text": "Je zdarma, open source a vzniká veřejně. Takhle můžete pomoct.",
+      "cards": [
+        {
+          "title": "Sponzorujte na GitHubu",
+          "text": "Vespertine je zdarma. Pokud je vám užitečná, sponzorstvím na GitHubu podpoříte její vývoj.",
+          "cta": "Stát se sponzorem"
+        },
+        {
+          "title": "Nahlaste svůj DAC",
+          "text": "Dejte nám vědět, jak se choval váš DAC, rozhraní nebo receiver. Každé hlášení o zařízení rozšiřuje okruh toho, co bylo ověřeno na skutečném hardwaru.",
+          "cta": "Poslat hlášení o zařízení"
+        },
+        {
+          "title": "Opravte překlad",
+          "text": "Narazili jste v některém ze {languages} jazyků na neobratnou formulaci? Založte issue s lepším zněním.",
+          "cta": "Navrhnout opravu"
+        },
+        {
+          "title": "Prohlédněte si kód",
+          "text": "Hlášení chyb, pull requesty i dotazy jsou vítány. Podmínky signálové cesty a jejich testy najdete v repozitáři.",
+          "cta": "Zdrojový kód na GitHubu"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Stažení",
+      "title": "Přehrávejte svou surround sbírku na Macu.",
+      "meta": [
+        "Zdarma",
+        "open source",
+        "verze {version}",
+        "macOS {minMacOS} nebo novější"
+      ]
+    }
+  },
+  "press": {
+    "title": "Tiskové materiály: Vespertine, přehrávač surround a hi-res hudby pro Mac",
+    "description": "Fakta, loga, klíčové vizuály, skutečné snímky obrazovky a trailer k Vespertine, bezplatnému open-source přehrávači pro Mac určenému pro sbírky surround a hi-res hudby.",
+    "ogAlt": "Tiskové materiály Vespertine: přehled faktů, loga, klíčové vizuály, skutečné snímky obrazovky a trailer, na pozadí tří skutečných snímků aplikace.",
+    "eyebrow": "Tiskové materiály",
+    "heading": "Vše, co potřebujete k psaní o {name}.",
+    "lede": "Vespertine je bezplatný open-source přehrávač pro Mac určený pro sbírky surround a hi-res hudby. Obrazy disků SACD a DVD-Video, extrahované skladby SACD v 5.1, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu a ve sluchátkách AirPods hrají jako Prostorový zvuk se sledováním hlavy. Signálová cesta ukazuje každý krok od souboru až po výstup, s podmínkami a testy ve zdrojovém kódu pod GPL, který si může kdokoli prověřit.",
+    "fine": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nejsou otestované na skutečných receiverech ani vícekanálových USB DAC (otestován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Objekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu.",
+    "facts": {
+      "eyebrow": "Přehled faktů",
+      "title": "Fakta.",
+      "name": "Název",
+      "formerly": "(do verze 0.6.0 pod názvem {formerName})",
+      "developer": "Vývojář",
+      "developerValue": "{author}, nezávislý vývojář",
+      "price": "Cena",
+      "priceValue": "Zdarma. Open source pod licencí GPL-3.0; bez účtu, předplatného, reklam a telemetrie",
+      "platform": "Platforma",
+      "platformValue": "macOS {minMacOS} {minMacOSName} nebo novější, Apple silicon i Intel",
+      "current": "Aktuální verze",
+      "currentValue": "{version}, vydána {date}",
+      "currentFine": "Podepsaný a notarizovaný DMG ({size}); aplikace se aktualizuje sama",
+      "first": "První vydání",
+      "firstFine": "(jako {formerName} 0.1.0)",
+      "languages": "Jazyky",
+      "languagesValue": "Angličtina a dalších {languages}, mimo jiné ukrajinština, arabština, hebrejština, japonština a tři varianty čínštiny",
+      "install": "Instalace",
+      "installValue": "<a href=\"{href.dmg}\">Stáhněte si DMG</a> nebo {brew}",
+      "tested": "Otestováno s",
+      "testedValue": "Fosi Audio ZD3 (PCM do 768 kHz, DSD256 přes DoP), FiiO K11 (PCM do 384 kHz, DSD128 přes DoP, celočíselný režim), AirPods Max přes USB-C a Bluetooth, reproduktory MacBooku Pro",
+      "links": "Odkazy",
+      "website": "Web",
+      "source": "Zdrojový kód",
+      "releaseNotes": "Poznámky k vydání",
+      "verify": "Jak ověřit bit-perfect přehrávání"
+    },
+    "angle": {
+      "eyebrow": "Zaměření",
+      "title": "Na co se zaměřuje.",
+      "list": [
+        "Surround hudba v jedné knihovně na Macu – od obrazů SACD a DVD-Video, ripů a DTS CD po TrueHD a DD+ Atmos, s Prostorovým zvukem ve sluchátkách AirPods.",
+        "Svobodný zdrojový kód pod GPL-3.0, který si kdokoli může přečíst, sestavit a upravit.",
+        "Signálová cesta, která ukazuje vzorkovací frekvenci, bitovou hloubku, zisk a zpracování kanálů. Podmínky bit-perfect přehrávání jsou zakotvené v kódu, s testy, vestavěným testem loopbacku a <a href=\"{href.verification}\">návodem k ověření</a>."
+      ],
+      "text": "Součástí je i analýza hi-res souborů. Detekce doplnění nulami je přesná; spektrální výsledky jsou odhady s omezeními. Analýzu nabízejí také VeraVox a Audirvana AudioScan. <a href=\"{href.comparison}\">Zdroje srovnání</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Trailer.",
+      "text": "44 sekund, 16:9, 1080p při 60 fps, se zvukem. <a href=\"{href.trailerDownload}\" download>Stáhnout MP4</a> ({size}). Master ve 4K poskytneme na vyžádání.",
+      "fallback": "Stáhnout trailer (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Značka",
+      "title": "Logo.",
+      "text": "Vždy malými písmeny, srpek vždy v mosazné barvě. Prosíme, neměňte jeho barvy, nedeformujte ho ani ho znovu nesázejte. <a href=\"{href.brandGuide}\">Manuál značky (PDF)</a>.",
+      "primaryAlt": "Logotyp Vespertine: mosazný srpek a slovo vespertine",
+      "stackedAlt": "Vertikální verze logotypu Vespertine",
+      "primary": "Základní",
+      "stacked": "Vertikální",
+      "onLight": "na světlém:",
+      "crescent": "samotný srpek:"
+    },
+    "art": {
+      "eyebrow": "Klíčové vizuály",
+      "title": "Jeden obrázek na každou funkci.",
+      "text": "Ve třech velikostech: 2400×1350, 1600×900 a 1270×760.",
+      "items": {
+        "bit-perfect": "Bit-perfect, když jsou splněny podmínky",
+        "fake-hi-res": "Odhalení falešného hi-res",
+        "spatial-audio": "Surround jako Prostorový zvuk ve sluchátkách AirPods",
+        "native-dsd": "Nativní DSD přes DoP",
+        "stereo-and-surround": "Stereo a surround verze",
+        "sacd-iso": "Obrazy SACD přehrávané přímo",
+        "languages": "{languages} jazyků"
+      }
+    },
+    "shots": {
+      "eyebrow": "Snímky obrazovky",
+      "title": "Skutečná aplikace.",
+      "text": "Na vlastní knihovně vývojáře, 2400×1500. Obaly alb patří jejich vlastníkům.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24 bitů / 96 kHz, bit-perfect na Fosi Audio ZD3: Lazar Berman, Liszt: Les jeux d’eaux à la Villa d’Este",
+        "multichannel-albums": "Alba filtrovaná na vícekanálová",
+        "stereo-and-surround-versions": "Extrahované skladby SACD ve stereo a 5.1 verzi",
+        "spatial-audio-airpods-max": "Album 24/88,2 v 5.1 (Elton John, Goodbye Yellow Brick Road) jako Prostorový zvuk ve sluchátkách AirPods Max",
+        "fake-hi-res-detection": "„Remaster“ 24/192, který končí na 16 kHz (záměrný podvrh: hudba z traileru zakódovaná do MP3 a převzorkovaná na vyšší frekvenci, pod smyšleným názvem kapely)",
+        "dsd-native-dop": "DSD128 přes DoP při 352,8 kHz na Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Soubor .iso SACD přehrávaný přímo z obrazu: Dire Straits, Brothers In Arms",
+        "genres": "Žánry",
+        "search": "Hledat",
+        "smart-playlist": "Chytrý playlist, bit-perfect ve sluchátkách AirPods Max přes USB-C",
+        "loopback-test": "Test loopbacku: softwarová kontrola výstupní cesty, vzorek po vzorku",
+        "setup-welcome": "Úvodní nastavení: uvítání",
+        "setup-output": "Úvodní nastavení: výběr výstupu, který se má zapamatovat",
+        "output-settings": "Nastavení výstupu: zapamatovaný výstup, záložní výstup, přizpůsobení 16bitovým zdrojům",
+        "equalizer": "Parametrický EQ s předvolbou AutoEQ"
+      }
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Ozvěte se.",
+      "text": "Novináři, dotazy a žádosti o rozhovor: {email}. Dotazy komunity: <a href=\"{href.discussions}\">GitHub Discussions</a>. Chyby a hlášení o zařízeních: <a href=\"{href.issues}\">issues na GitHubu</a>."
+    }
+  },
+  "privacy": {
+    "title": "Soukromí: Vespertine nic neshromažďuje",
+    "description": "Aplikace Vespertine nic neshromažďuje: žádné účty, analytika, telemetrie, hlášení pádů ani reklamy. K čemu se aplikace a tento web připojují a proč.",
+    "ogAlt": "Soukromí ve Vespertine: Vespertine nic neshromažďuje. Žádné účty, analytika, telemetrie, hlášení pádů ani reklama.",
+    "eyebrow": "Soukromí",
+    "heading": "Vespertine neshromažďuje",
+    "headingBrass": "nic.",
+    "updated": "Platné od {effective} (doplňuje informace o tom, jak korekce místnosti používá mikrofon; pro verzi 0.14). Dřívější změny: volitelný stav na Discordu, {discordUpdated}; sekce „Tento web“, {statsUpdated}, kdy web začal počítat návštěvy pomocí statistik bez cookies hostovaných na vlastním serveru. Od {langUpdated} sekce „Tento web“ popisuje také nabídku jazyků, která si pamatuje vaši volbu ve vašem zařízení.",
+    "intro": "Vespertine je bezplatný open-source hudební přehrávač. Aplikace nemá žádné účty, analytiku, telemetrii, hlášení pádů ani reklamy. Vývojář o vás ani o vaší hudbě nedostává žádné informace. Protože je zdrojový kód veřejný, můžete si každé tvrzení na této stránce ověřit.",
+    "staysTitle": "Co zůstává ve vašem Macu",
+    "stays": "Databáze knihovny, playlisty, počty přehrání, výsledky analýzy souborů, mezipaměť obalů a nastavení se ukládají do vaší uživatelské složky Knihovna ve vašem Macu. Hesla k síťovým sdílením a váš token ListenBrainz, pokud ho přidáte, se ukládají do Klíčenky macOS. Korekce místnosti používá váš měřicí mikrofon jen během měření, které sami spustíte, a nahrávky ukládá do vaší složky Dokumenty. Nic z toho se nikam nenahrává.",
+    "onlineTitle": "Kdy se aplikace připojuje k internetu",
+    "online": [
+      "<strong>Kontrola aktualizací.</strong> Vespertine zhruba jednou denně, a také když zvolíte Vyhledat aktualizace, požádá GitHub o svůj kanál aktualizací. GitHub přitom vidí vaši IP adresu, stejně jako při každém stahování. Automatické kontroly můžete vypnout v Nastavení.",
+      "<strong>MusicBrainz a Cover Art Archive.</strong> Jen když použijete Vyhledat v MusicBrainz nebo Doplnit metadata (Najít hudbu v tomto Macu nabízí Doplnit pro hudbu, kterou přidává, jako zaškrtávací políčko, které můžete zrušit), odešle Vespertine na musicbrainz.org názvy alb, interpretů a skladeb, které hledá. Když je v Nastavení zapnuté „Stahovat obaly alb“, stahuje obaly z coverartarchive.org, který je poskytuje z Internet Archive (archive.org). MusicBrainz a Cover Art Archive provozuje MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Jen pokud zapnete scrobblování a zadáte svůj token, posílá Vespertine na listenbrainz.org skladby, které přehráváte: název, interpreta, album, délku a jejich ID MusicBrainz, pokud je vaše soubory obsahují. Když skladba začne, pošle „právě hraje“, a jakmile uslyšíte její polovinu nebo čtyři minuty, pošle poslech i s jeho časem.",
+      "<strong>Discord.</strong> Jen pokud v Nastavení zapnete stav v Discordu, sdělí Vespertine aplikaci Discord ve vašem Macu – přes spojení, které váš Mac neopouští –, co hraje: název, interpreta, album, formát a průběh. Discord to zobrazí jako váš stav lidem, kteří vidí vaši aktivitu. Aby mohl zobrazit obal alba, vyhledá ho Vespertine podle názvu, protože Discord umí zobrazovat jen obrázky z webu: na coverartarchive.org, pokud vaše soubory nesou ID vydání MusicBrainz, jinak ve službě iTunes Search od Applu (itunes.apple.com), která obdrží jméno interpreta a název alba. Discord pak obal stáhne odtud. Obaly můžete vypnout a vaše soubory ani jejich obaly se nikdy nenahrávají.",
+      "<strong>Síťová sdílení.</strong> Vespertine se kvůli čtení vaší hudby připojuje k serverům, které přidáte, a nikam jinam. Dokud je sdílení připojené, zhruba každou minutu ověřuje, že server stále odpovídá, a každou půlhodinu hledá novou hudbu (nikdy, když z něj přehráváte)."
+    ],
+    "websiteTitle": "Tento web",
+    "website": [
+      "Tento web je hostován na GitHub Pages, které mohou zaznamenávat IP adresy návštěvníků; viz <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">prohlášení GitHubu o ochraně osobních údajů</a>. Tlačítka ke stažení vedou na vydání aplikace na GitHubu. Web nenastavuje žádné cookies a písma, obrázky i video načítá z tohoto webu.",
+      "Abychom věděli, které stránky a tlačítka lidé používají, počítá web návštěvy pomocí <a href=\"https://umami.is\">Umami</a>, softwaru šetrného k soukromí, který sami provozujeme na stats.szeremeta.org. Nenastavuje žádné cookies, nic neukládá do vašeho zařízení, neuchovává vaši IP adresu a nic nesdílí s inzerenty ani s žádnou jinou firmou. Zaznamenává stránku, web, ze kterého jste přišli, vaši přibližnou zemi, prohlížeč, operační systém, velikost obrazovky a jazyk a kliknutí na tlačítka ke stažení, GitHub a Homebrew. Nedokáže vás sledovat napříč weby ani vás identifikovat a vynechává návštěvníky, jejichž prohlížeč odesílá Do Not Track. <strong>Aplikace se k němu nikdy nepřipojuje.</strong>",
+      "Pokud si vyberete jazyk v jazykové nabídce webu, váš prohlížeč si volbu zapamatuje ve vašem zařízení (ve svém místním úložišti), aby vás web nepřepínal zpět. Nikam se neodesílá a web bez ní funguje stejně."
+    ],
+    "changesTitle": "Změny a kontakt",
+    "changes": "Pokud se na tom někdy něco změní, nejdřív to uvede tato stránka a poznámky k vydání. Dotazy uvítáme jako <a href=\"{href.issues}\">issue na GitHubu</a>."
+  },
+  "terms": {
+    "title": "Podmínky: Vespertine je svobodný software pod licencí GPL",
+    "description": "Vespertine je svobodný software pod licencí GNU General Public License, verze 3 nebo novější: zdarma, bez registrace, bez záruky.",
+    "ogAlt": "Podmínky Vespertine: svobodný software, prostě a jasně. GNU General Public License, verze 3 nebo novější.",
+    "eyebrow": "Podmínky",
+    "heading": "Svobodný software,",
+    "headingBrass": "prostě a jasně.",
+    "updated": "Platné od {effective}",
+    "licenseTitle": "Licence",
+    "license": "Vespertine je svobodný software pod licencí <a href=\"{href.license}\">GNU General Public License, verze 3 nebo novější</a>. Můžete ho používat k jakémukoli účelu, studovat a upravovat jeho zdrojový kód a šířit kopie, včetně upravených, pod stejnou licencí. Nic nestojí a není k čemu se registrovat.",
+    "warrantyTitle": "Bez záruky",
+    "warranty": "Jak uvádí licence, Vespertine se poskytuje „tak, jak je“, bez jakékoli záruky, v rozsahu povoleném zákonem. Zálohujte si hudbu. Vespertine mění soubory jen tehdy, když upravujete jejich tagy, a každý z nich předtím zazálohuje, přesto ho používáte na vlastní riziko.",
+    "musicTitle": "Vaše hudba a další služby",
+    "music": "Odpovídáte za to, že máte právo přehrávat hudbu, kterou přidáte. Vespertine neumí přehrávat soubory chráněné DRM a ani se o to nepokouší. MusicBrainz, Cover Art Archive a ListenBrainz jsou nezávislé služby s vlastními podmínkami, které platí, když je používáte prostřednictvím Vespertine.",
+    "trademarksTitle": "Ochranné známky",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus a Dolby TrueHD jsou ochranné známky společnosti Dolby Laboratories. DTS, DTS-HD Master Audio a DTS:X jsou ochranné známky společnosti DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS a Prostorový zvuk (Spatial Audio) jsou ochranné známky společnosti Apple Inc. Vespertine je uvádí jen proto, aby popsal, co a kde přehrává. Není certifikován, licencován ani schválen společnostmi Dolby, DTS ani Apple.",
+    "contactTitle": "Kontakt",
+    "contact": "Chyby, dotazy a požadavky: <a href=\"{href.issues}\">issues na GitHubu</a>.",
+    "englishNote": "Tento překlad slouží pro vaše pohodlí. Závazným textem je samotná GNU General Public License, a ta je v angličtině."
+  },
+  "notFound": {
+    "title": "Stránka nenalezena: Vespertine",
+    "description": "Tato stránka tu není. Vespertine je bezplatný open-source přehrávač pro Mac pro surround a hi-res hudební sbírky.",
+    "ogAlt": "Vespertine: bezplatný open-source přehrávač pro Mac pro surround a hi-res hudbu.",
+    "eyebrow": "404 · Žádný signál",
+    "heading": "Tahle stránka",
+    "headingBrass": "tu není.",
+    "lede": "Odkaz může být starý, nebo je v adrese překlep. Všechno o Vespertine začíná na domovské stránce.",
+    "home": "Přejít na domovskou stránku"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} nebo novější",
+    "processor": "Apple silicon (arm64) nebo Intel (x86-64)",
+    "subCategory": "Hudební přehrávač",
+    "sourceName": "Zdrojový kód Vespertine",
+    "trailerName": "Trailer Vespertine",
+    "trailerDescription": "44sekundová prohlídka Vespertine nahraná ve skutečné aplikaci na vlastní knihovně vývojáře: bit-perfect signálová cesta, DSD přes DoP, surround jako Prostorový zvuk na AirPods a analýza hi-res souborů.",
+    "keywords": "bit-perfect, hi-res audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Prostorový zvuk, AirPods Max, FLAC, hudební přehrávač, macOS, open source"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 přináší korekci místnosti: změřte své reproduktory mikrofonem UMIK-1 a přehrávejte přes filtry vytvořené pro vaši místnost. Zároveň hlídá, aby přehrávání ze sítě nezůstalo bez dat.",
+      "notes": "### Korekce místnosti\n- **Změřte svou místnost.** Umístěte kalibrovaný mikrofon UMIK-1 na poslechové místo a Vespertine postupně přehraje testovací rozmítání každým reproduktorem, a to v 1 až 5 bodech (výchozí je 5: poslechové místo, pak vlevo, vpravo, vpředu a vzadu). Nejprve u každého reproduktoru zkontroluje úroveň a cestu signálu, nepovedené měření odmítne a umožní vám ho zopakovat nebo pokračovat tam, kde jste skončili. Podporováno je stereo i 5.1.\n- **Filtry pro každý reproduktor.** Z měření Vespertine sestaví pro každý reproduktor malou sadu filtrů, většinou útlumů basových špiček, které přidává místnost. Zvolte cíl (výchozí je „Teplá“, případně „Mírný sklon“ nebo „Rovná“) a rozsah (jen basy, nebo celé pásmo) a filtry se znovu přizpůsobí z uloženého měření, aniž byste museli měřit znovu. Graf ukazuje naměřený průběh, předpověď po korekci a cíl, přičemž předpověď je jako předpověď označena.\n- **Vyrovnání zpoždění a úrovně.** Měří se také zpoždění a úroveň každého reproduktoru, takže bližší reproduktory se pozdrží, dokud nedorazí zvuk z toho nejvzdálenějšího, a hlasitější se ztlumí na úroveň nejtiššího.\n- **Vlastní filtry.** Importujte soubor filtrů z Equalizer APO nebo REW (zpoždění, úroveň a filtry pro každý reproduktor), nebo importujte impulzní odezvy (WAV, AIFF, CAF nebo FLAC) a přehrávejte přes ně jako přes konvoluční filtry. Profil můžete exportovat jako text pro Equalizer APO nebo jako profil Vespertine. Řádky, které Vespertine neumí přehrát, odmítne s uvedením čísla řádku, místo aby je přehrála jako něco jiného.\n- **Ve výchozím stavu vypnuto, takže bit-perfect zůstává bit-perfect.** Korekce místnosti se zapíná pro každý výstup zvlášť a je vázaná na výstup, na kterém byla změřena. Dokud mění vzorky, signálová cesta ukazuje KOREKCE MÍSTNOSTI a stream už není označen jako bit-perfect. Když je vypnutá, přehrávání zůstává nedotčené. Dokud je zapnutá, Celočíselný režim a Přizpůsobit 16bitovým zdrojům zůstávají vypnuté.\n- **Na co se vztahuje.** Na stereo a 5.1 PCM, které Vespertine renderuje. U bitstreamů Dolby a DTS, u Atmosu a u jiných počtů kanálů korekce ustoupí stranou a signálová cesta uvede proč. DSD na DAC s DoP se při zapnuté korekci převádí na PCM, aby se korigovalo také; pokud ho chcete na daném výstupu místo toho posílat nativně a bez korekce, zaškrtněte u něj Ponechat nativní DSD.\n- **Jedno okno.** Zobrazení → Korekce místnosti, dostupné také z okna Ekvalizér a z nastavení každého výstupu, obsahuje vypínač, Měřit, Importovat, Exportovat, profily, graf před a po korekci, cíl a rozsah a také zpoždění, úroveň a filtry každého reproduktoru. Nahrazuje dřívější betaverzi okna Měření místnosti. Metoda je popsána v `docs/ROOM-CORRECTION.md`.\n\n### Přehrávání ze sítě\n- **Méně výpadků z NAS.** Skladby na síťovém sdílení se nyní před přehráním zkopírují do vašeho Macu a další skladba se kopíruje předem, takže zaškobrtnutí sítě už hudbu nezastaví. Velké soubory DSD se čtou tak, aby byla vždy připravena dlouhá rezerva.\n- **Kroužek načítání na tlačítku přehrávání.** Zatímco Vespertine čeká na data ze sítě, tlačítko přehrát/pozastavit ukazuje malý otáčející se kroužek (při zapnutém Omezit pohyb stojí). Krátká selhání čtení se zkoušejí znovu.\n- **Omezení.** Velmi dlouhý výpadek nebo spojení pomalejší než samotná hudba může přehrávání stále pozastavit, dokud se zásoba dat znovu nedoplní. Kopie v mezipaměti zabírají nejvýše 8 GB a zdroj větší než tato hodnota selže se srozumitelnou zprávou. Viz `docs/NETWORK-PLAYBACK.md`.\n\n### Další novinky\n- **DoP ve výchozím stavu zapnuto u známých DAC.** FiiO K11 a Fosi Audio ZD3 začínají se zapnutým DoP. Pokud ho vypnete, Vespertine si to zapamatuje.\n- **Nedávno přidané ukazuje 150 alb**, dříve 60, takže velký import nevytlačí ze seznamu alba přidaná těsně před ním.\n- **Fosi Audio ZD3.** ZD3 je nyní v seznamu podporovaných zařízení a snímky obrazovky na webu byly znovu pořízeny na něm.\n- **Web.** Pod tlačítky ke stažení je řádek „Dejte mu hvězdičku na GitHubu“ a „Zapojte se do diskuze“.\n\n### Ověření\n- Sady testů enginu, knihovny i aplikace procházejí, včetně nových testů návrhu filtrů pro místnost, přehrávání přes korekční stupeň a konvoluční filtr, kroků měření na simulované místnosti, importních formátů a síťové mezipaměti. Kód pro zvuk v reálném čase je navíc kontrolován sanitizéry adres, vláken a nedefinovaného chování.\n- Ověřeno na skutečném hardwaru: kompletní měření s UMIK-1 na poslechovém místě, z něj sestavené filtry a přehrávání přes korekci místnosti na Fosi Audio ZD3 se stereo reproduktory."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 přehrává 5.1 DSD jako Prostorový zvuk na AirPods, dá vědět, když se zvuk převádí nebo downmixuje, a už se nezasekává při ukončení.",
+      "notes": "### Prostorový zvuk\n- **5.1 DSD se teď přehrává jako Prostorový zvuk.** Soubor 5.1 DSD (DSF, DSDIFF, DSDIFF komprimovaný DST nebo obraz SACD) se převede na PCM a každý kanál se umístí tam, kam patří, takže kanály LFE a surround se už neztrácejí. Dřív mohly samostatné kanály DSDIFF skončit ve vrstvě se třemi reproduktory a zadní kanály chyběly.\n- **Řekne, co se se zvukem stalo.** Signálová cesta ukazuje **DSD → PCM** vedle PROSTOROVÝ nebo downmixu a když je to na místě, objeví se dvě nová upozornění, „Převedeno z DSD“ a „Sloučeno do stereo“. Obě jsou přeložená do všech 44 jazyků.\n- Ověřeno vývojářem na AirPods Max.\n\n### Opraveno\n- **Ukončení se už nezasekává.** Po Cmd-Q mohl zůstat točící se kurzor, zatímco Vespertine čekala na zvukové zařízení. Teď se ukončí okamžitě.\n- **Vícekanálové soubory se čtou správně.** Soubory RF64 a Wave64 se otevírají správně, názvy kanálů DSD se čtou ze souboru a samostatné vícekanálové směrování se řídí vlastním rozložením kanálů souboru.\n\n### Ověření\n- Testovací sady enginu, knihovny i aplikace procházejí, včetně nových testů, které přehrají každý formát 5.1 DSD přes Prostorový zvuk a zkontrolují, že každý kanál dorazí na své místo. Kontrola umístění vlevo/vpravo běží jen na skutečných Macích; testovací stroje GitHubu tuto jedinou kontrolu přeskakují."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine teď řekne, když ekvalizér nemůže změnit to, co hraje, nabízí volitelný referenční ekvalizér pro každý model AirPods Max s USB-C a má první vícekanálový výsledek na skutečném hardwaru."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine teď vede historii toho, co jste přehráli, dává seznamu Na řadě vlastní panel vedle knihovny, zobrazuje všechna vydání alba na jedné kartě a umí ukázat, co právě hrajete, jako váš status na Discordu."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine teď správně funguje ve světlém režimu, umožňuje výstupům bez ovládání hlasitosti používat hlasitost Vespertine a pokračuje v analýze knihovny, i když posloucháte ze síťového sdílení."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine teď plynule přehrává z pomalých síťových sdílení, rychleji analyzuje velké knihovny včetně sdílení, přehrává hi-res na malých USB-C DAC v nejvyšší frekvenci, kterou nabízejí, a nechává klávesnici i vícenásobné výběry tam, kde je čekáte."
+    }
+  }
+}

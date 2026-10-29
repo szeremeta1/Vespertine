@@ -1,0 +1,39 @@
+---
+import Doc from '../components/Doc.astro';
+import { vars } from '../data/content';
+import { t, fill, longDate, DEFAULT_LOCALE, type Lang } from '../i18n';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const p = t(lang).terms;
+const f = (s: string) => fill(s, vars(lang));
+---
+<Doc
+  lang={lang}
+  page="terms"
+  title={p.title}
+  description={p.description}
+  og="terms"
+  ogAlt={p.ogAlt}
+  eyebrow={p.eyebrow}
+  date="2026-09-29"
+>
+  <h1 slot="title" class="page-title">{p.heading} <span class="brass-italic">{p.headingBrass}</span></h1>
+  <p slot="updated" class="updated">{fill(p.updated, { effective: longDate(lang, '2026-09-29T12:00:00-04:00') })}</p>
+
+  {lang !== DEFAULT_LOCALE && <p class="fine">{p.englishNote}</p>}
+
+  <h2>{p.licenseTitle}</h2>
+  <p set:html={f(p.license)} />
+
+  <h2>{p.warrantyTitle}</h2>
+  <p>{p.warranty}</p>
+
+  <h2>{p.musicTitle}</h2>
+  <p>{p.music}</p>
+
+  <h2>{p.trademarksTitle}</h2>
+  <p>{p.trademarks}</p>
+
+  <h2>{p.contactTitle}</h2>
+  <p set:html={f(p.contact)} />
+</Doc>

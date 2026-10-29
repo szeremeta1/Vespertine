@@ -1,5 +1,6 @@
 # Builds the website (site/, Astro) and publishes it to GitHub Pages (vespertineapp.com, site/public/CNAME):
-# - on every push to main that touches the site, the feature guide it quotes (llms-full.txt) or this file;
+# - on every push to main that touches the site, the feature guide it quotes (llms-full.txt), the app's language
+#   list (scripts/check-localizations.py, which the site's languages follow) or this file;
 # - whenever a release is published, so the version, download link and "What's new" follow the release
 #   (scripts/fetch-releases.mjs reads them from GitHub's API before the build). A release run's ref is its tag,
 #   which the github-pages environment won't deploy, so it only re-runs this workflow on main;
@@ -10,10 +11,10 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: [site/**, docs/FEATURES.md, .github/workflows/pages.yml]
+    paths: [site/**, docs/FEATURES.md, scripts/check-localizations.py, .github/workflows/pages.yml]
   pull_request:
     branches: [main]
-    paths: [site/**, docs/FEATURES.md, .github/workflows/pages.yml]
+    paths: [site/**, docs/FEATURES.md, scripts/check-localizations.py, .github/workflows/pages.yml]
   release:
     types: [published]
   workflow_dispatch:
@@ -59,9 +60,18 @@ jobs:
         run: node scripts/fetch-releases.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      # astro build, then scripts/check-dist.mjs (CSP hashes, alt text, one h1, canonical, social cards, JSON-LD,
-      # local links, robots.txt, sitemap.xml, llms.txt).
+      # Every locale in src/i18n has every key, no empty values, the English placeholders, HTML and Markdown, and no
+      # English left; release notes not yet translated are a warning (they show in English, marked as such).
+      - name: Check the translations
+        run: node scripts/check-i18n.mjs
+      # astro build, then scripts/check-dist.mjs (CSP hashes, alt text, lang and dir, one h1, canonical, hreflang,
+      # social cards, JSON-LD, local links, robots.txt, sitemap.xml, llms.txt).
       - run: npm run build
+      # Pull requests only (a deploy never waits on a browser): the language redirect, the remembered choice, the
+      # language menu, the localized 404, RTL mirroring and overflow, headless in the runner's Google Chrome.
+      - name: Test the language features
+        if: github.event_name == 'pull_request'
+        run: node scripts/test-i18n.mjs
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

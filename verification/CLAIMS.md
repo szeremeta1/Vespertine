@@ -38,7 +38,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:21` — "Vespertine switches the device's nominal rate and reads it back from Core Audio. It doesn't trust its own request."
 - **Text:** `docs/VERIFICATION.md:42` — "The device values are read from Core Audio after playback starts:"
-- **Text:** `site/src/data/content.ts:284` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
+- **Text:** `site/src/i18n/en.json:510` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
 - **Property:** the rate, physical format and hog owner that the verdict uses are the values Core Audio returned (`kAudioDevicePropertyNominalSampleRate`, `kAudioStreamPropertyPhysicalFormat`, `kAudioDevicePropertyHogMode`). If a readback fails, the verdict must not fall back to what Vespertine asked for.
 - **Governed by:** vespertine-rule; the meaning of each property comes from Apple's Core Audio headers (spec for the property semantics only).
 - **Route:** spec-traced (verdict group: a failed or stale readback must not yield BIT-PERFECT); source review recorded in `FINDINGS.md` (F-01). The readback itself happens in `OutputSession`, which needs a real device; see `hardware/LOOPBACK.md` step P1.
@@ -94,7 +94,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:36` — "Vespertine detects the cable through the IORegistry (`DeviceProfile.swift`) and treats 48 kHz files as bit-perfect on that device."
 - **Text:** `docs/FEATURES.md:53` — "AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz."
-- **Text:** `site/src/data/content.ts:170` — "48 kHz music plays bit-perfect"
+- **Text:** `site/src/i18n/en.json:237` — "48 kHz music plays bit-perfect"
 - **Property:** with the cable connected, the device profile allows bit-perfect and 48 kHz unprocessed PCM gets the badge.
 - **Governed by:** vespertine-rule, resting on Apple's description of the USB-C path. The docs already say a loopback cannot confirm it.
 - **Route:** inventory. Detection needs the hardware, and no standard or loopback can check what happens inside the headphones.
@@ -139,7 +139,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-EQ-01 <a id="eq-label"></a>An active preset replaces BIT-PERFECT with EQUALIZER
 
 - **Text:** `docs/FEATURES.md:87` — "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
-- **Text:** `site/src/data/content.ts:190` — "Off by default; when it’s on, the signal path says"
+- **Text:** `site/src/i18n/en.json:254` — "Off by default; when it’s on, the signal path says"
 - **Text:** `README.md:68` — "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
 - **Governed by:** vespertine-rule.
@@ -191,7 +191,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/VERIFICATION.md:58` — "integer mode passes each 32-bit word through, including patterns that would be NaN as floats"
 - **Text:** `docs/ARCHITECTURE.md:68` — "the IOProc copies them as integers, including ones that would be NaN as floats"
 - **Text:** `docs/ARCHITECTURE.md:68` — "So 32-bit sources are bit-perfect."
-- **Text:** `site/src/data/content.ts:66` — "Integer mode sends unprocessed 32-bit PCM straight to DACs that take integers."
+- **Text:** `site/src/i18n/en.json:133` — "Integer mode sends unprocessed 32-bit PCM straight to DACs that take integers."
 - **Text:** `docs/FEATURES.md:39` — "It sends unprocessed PCM as integers, including 32-bit recordings that the normal Float32 path would round."
 - **Property:** with integer mode on, every 32-bit word written to the ring (including all signalling and quiet NaN bit patterns, ±0, ±infinity and denormal patterns when read as Float32) comes out of the render stage with the same 32 bits, in order, per channel.
 - **Governed by:** vespertine-rule.
@@ -408,7 +408,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/FEATURES.md:35` — "Vespertine switches the DAC to each track's native rate."
 - **Text:** `README.md:67` — "Switches your DAC to each file's sample rate"
-- **Text:** `site/src/data/content.ts:62` — "Vespertine switches the device to each file’s rate and resamples"
+- **Text:** `site/src/i18n/en.json:129` — "Vespertine switches the device to each file’s rate and resamples"
 - **Property:** when the device lists the source rate and the policy is "match source", the planned device rate equals the source rate and nothing is resampled.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (rate group).
@@ -424,7 +424,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-RATE-03 <a id="rate-handback"></a>The device is handed back on quit
 
 - **Text:** `docs/FEATURES.md:45` — "At quit, each device is restored to its earlier rate and depth, or your chosen default."
-- **Text:** `site/src/data/content.ts:71` — "Hands your DAC back at the rate and depth it had before, when Vespertine quits."
+- **Text:** `site/src/i18n/en.json:138` — "Hands your DAC back at the rate and depth it had before, when Vespertine quits."
 - **Text:** `docs/ARCHITECTURE.md:13` — "`DeviceRestore` remembers each device's format before the first change, so it can be put back when Vespertine quits."
 - **Property:** after quit, the device's nominal rate and physical format read back equal what they were before Vespertine first changed them (or the chosen default).
 - **Governed by:** vespertine-rule.
@@ -444,7 +444,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-GAP-01 <a id="gapless"></a>Gapless, including CUE albums
 
 - **Text:** `docs/FEATURES.md:45` — "Tracks with the same output format play gaplessly, including CUE-sheet albums."
-- **Text:** `site/src/data/content.ts:68` — "Gapless, including CUE-sheet albums split from one file."
+- **Text:** `site/src/i18n/en.json:135` — "Gapless, including CUE-sheet albums split from one file."
 - **Text:** `docs/ARCHITECTURE.md:41` — "If the new plan is device-compatible (same rate, depth, mode and channels), decoding simply continues into the same ring buffer"
 - **Property:** two consecutive device-compatible tracks (or CUE regions of one file) produce the same samples as the file played straight through, with no inserted or dropped frame at the boundary.
 - **Governed by:** vespertine-rule. CUE sheets have no formal standard; the de facto reference is CDRWIN's documentation, and the index → frame mapping (75 frames per second) comes from the CD format (IEC 60908, paywalled).
@@ -470,7 +470,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DEC-01 <a id="dec-lossless"></a>Lossless decoders are exact
 
 - **Text:** `docs/ARCHITECTURE.md:58` — "A test checks TrueHD decodes identically to the 24-bit source it was encoded from."
-- **Text:** `site/src/data/content.ts:232` — "Lossless, can be bit-perfect"
+- **Text:** `site/src/i18n/en.json:303` — "Lossless, can be bit-perfect"
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.
@@ -482,7 +482,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-HIRES-01 <a id="hires-padding"></a>Zero padding is detected exactly
 
 - **Text:** `docs/FEATURES.md:59` — "Analysis detects zero-padded bit depth exactly."
-- **Text:** `site/src/data/content.ts:149` — "Only zero padding is exact"
+- **Text:** `site/src/i18n/en.json:216` — "Only zero padding is exact"
 - **Text:** `docs/ANALYSIS.md:13` — "Every sample's lowest bits are zero. Exact."
 - **Property:** the reported effective bit depth is 24 minus the number of low bits that are zero in every sample.
 - **Governed by:** vespertine-rule (a definition, not a standard).

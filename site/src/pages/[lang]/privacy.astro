@@ -1,0 +1,7 @@
+---
+import Privacy from '../../views/Privacy.astro';
+import { localePaths } from '../../i18n';
+export const getStaticPaths = localePaths;
+const { lang } = Astro.params;
+---
+<Privacy lang={lang!} />

@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "跳至正文",
+    "tagline": "适用于 Mac 的免费开源播放器，专为环绕声与高解析度音乐收藏打造。",
+    "requires": "需要 macOS {minMacOS} 或更高版本。",
+    "arch": "Apple silicon 和 Intel",
+    "download": "下载 Mac 版",
+    "downloadVersion": "下载 {version}",
+    "sourceOnGitHub": "GitHub 上的源代码",
+    "reportIssue": "报告问题",
+    "brewLead": "或使用 Homebrew：",
+    "copy": "拷贝",
+    "copyLabel": "拷贝 Homebrew 命令",
+    "copied": "已拷贝",
+    "copyFailed": "请手动选中",
+    "trademarks": "Dolby、Dolby Atmos、Dolby Digital、Dolby Digital Plus 和 Dolby TrueHD 是 Dolby Laboratories 的商标。DTS、DTS-HD Master Audio 和 DTS:X 是 DTS, Inc. 的商标。Apple、AirPods、AirPods Max、Mac、macOS 和空间音频是 Apple Inc. 的商标。Vespertine 提及这些名称，仅用于说明它能播放什么、在哪里播放；Vespertine 未获得 Dolby、DTS 或 Apple 的认证、授权或背书。",
+    "trailerLabel": "Vespertine 预告片，44 秒",
+    "untested": "逐声道输出和向功放输出比特流均为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已通过 HDMI 测试过一台 Sony 电视，详见 docs/DEVICES.md）；欢迎提交测试报告。"
+  },
+  "nav": {
+    "label": "主导航",
+    "home": "Vespertine，主页",
+    "top": "Vespertine，返回顶部",
+    "features": "功能",
+    "formats": "格式",
+    "compare": "对比",
+    "whatsNew": "新功能",
+    "faq": "常见问题",
+    "press": "媒体资料包",
+    "download": "下载",
+    "downloadLabel": "下载 Mac 版 Vespertine {version}"
+  },
+  "lang": {
+    "label": "语言",
+    "menuLabel": "选择语言",
+    "current": "当前语言"
+  },
+  "footer": {
+    "project": "项目",
+    "about": "关于",
+    "releaseNotes": "发行说明",
+    "sponsor": "赞助",
+    "discussions": "讨论区",
+    "architecture": "架构",
+    "privacy": "隐私",
+    "terms": "条款",
+    "license": "许可证（GPL-3.0）",
+    "notices": "第三方声明",
+    "ukraine": "<strong>Vespertine 与乌克兰站在一起。</strong>请通过 {orgs} 捐款。",
+    "copyright": "© {year} Vespertine 贡献者",
+    "free": "基于 GPL 的自由软件",
+    "madeIn": "由 {author} 在波士顿制作",
+    "backToTop": "返回顶部",
+    "home": "主页"
+  },
+  "home": {
+    "title": "Vespertine：适用于 Mac 的环绕声与高解析度音乐播放器",
+    "description": "适用于 Mac 的免费开源播放器，专为环绕声与高解析度音乐收藏打造：支持 SACD 和 DVD-Video 光盘映像、DSD、DTS CD、DTS-HD MA、TrueHD 及 Dolby Atmos 文件，支持 AirPods 上的空间音频、在你自己的房间中实测的房间校正，以及可供你查看的比特完美信号路径。",
+    "ogAlt": "Vespertine：适用于 Mac 的免费开源环绕声与高解析度音乐播放器。其信号路径显示一个 24 位 / 96 kHz FLAC 文件正在 Fosi Audio ZD3 上以比特完美方式播放。版本 {version}，需要 macOS {minMacOS} 或更高版本。",
+    "hero": {
+      "eyebrow": [
+        "免费开源",
+        "macOS {minMacOS}+",
+        "Apple silicon 和 Intel"
+      ],
+      "titleSr": "环绕声与高解析度音乐，尽在你的 Mac。",
+      "titleLines": [
+        "环绕声与",
+        "高解析度音乐，"
+      ],
+      "titleBrass": "尽在你的 Mac。",
+      "lede": "适用于 Mac 的免费开源播放器，专为环绕声与高解析度音乐收藏打造。SACD 和 DVD-Video 光盘映像、DSD、DTS CD、DTS-HD MA、TrueHD 及 Atmos 文件与你的立体声专辑同处一个资料库，在 AirPods 上还能以头部追踪的空间音频播放。房间校正会用 USB 麦克风测量你的房间，并校正每只扬声器；在你开启之前，它一直处于关闭状态。信号路径会显示从文件到输出的每一步。支持英语及其他 {languages} 种语言。",
+      "ask": "喜欢吗？",
+      "star": "在 GitHub 上加星标",
+      "discuss": "加入讨论",
+      "version": "版本 {version}",
+      "signed": "已签名并经过公证",
+      "releaseNotes": "发行说明",
+      "privacy": "隐私：不收集任何数据。",
+      "panelAlt": "Vespertine 的“正在播放”检查器：Lazar Berman 演奏的 Liszt《Les jeux d’eaux à la Villa d’Este》，标记为“高解析度无损”和“比特完美”、独占、32 / 96；信号路径从 24 位 / 96 kHz FLAC 开始，经 libFLAC 以原生采样率和单位增益音量送至 Fosi Audio ZD3。",
+      "panelCaption": "信号路径",
+      "followSignal": "跟随信号"
+    },
+    "trailer": {
+      "eyebrow": "预告片",
+      "title": "44 秒，一览全貌。",
+      "text": "请打开声音。片中的一切都来自真实的应用，录制于开发者自己的资料库。",
+      "fallback": "观看预告片（MP4）",
+      "caption": "44 秒 · 1080p · 专辑封面归其所有者所有"
+    },
+    "features": {
+      "eyebrow": "为什么选择 Vespertine",
+      "title": "为你的环绕声收藏而生。",
+      "text": "环绕声与立体声音乐同处一个资料库，播放器还会如实告诉你它对信号做了什么。",
+      "badgesLabel": "应用显示的信号路径状态"
+    },
+    "pillars": [
+      {
+        "title": "环绕声同在一个资料库",
+        "text": "SACD 映像与抓轨文件、DVD-Video 光盘、DTS CD、DTS-HD MA 和 TrueHD 与你的立体声专辑并列，并可在 AirPods 上以头部追踪的空间音频播放。若一张专辑同时有立体声和环绕声版本，每首歌只列出一次，并根据你的输出设备播放合适的版本。"
+      },
+      {
+        "title": "可核查的信号路径",
+        "text": "采样率、字长、增益和声道处理，均从 Core Audio 读回。比特完美的判定条件写在源代码中，并配有自动化测试、回环测试和硬件验证指南。"
+      },
+      {
+        "title": "检查高解析度文件",
+        "text": "分析功能会标记位深度补零，以及可能的升采样或有损来源。频谱结论均为估计，会连同依据和局限一并显示。同样的分析也可在你文件所在的 Linux 服务器上运行。"
+      },
+      {
+        "title": "可审计的开源软件",
+        "text": "依据 GPL 免费提供。你可以阅读、构建和修改这款播放器，包括其输出条件和测试。无需账户，没有订阅、广告或遥测。"
+      }
+    ],
+    "badges": {
+      "bitPerfect": "比特完美",
+      "exclusive": "独占",
+      "spatial": "空间 · 头部追踪",
+      "synthetic": "合成高频？",
+      "roomCorrection": "房间校正"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "信号路径",
+        "kicker": "比特完美",
+        "title": "每首曲目都以原生采样率和位深度播放。",
+        "lede": "信号路径列出从文件到 DAC 的每一步（从 Core Audio 读回），并在有环节改动了采样时明确告知。",
+        "body": [
+          "Vespertine 会将设备切换到每个文件的采样率，只有在 DAC 无法运行该采样率时，才会使用 Apple 的母带级转换器进行重采样。只有满足源代码中的条件时，才会显示 <span class=\"mono nowrap\">比特完美</span>：原生采样率、没有任何环节改动样本、字长合适，且设备处于独占状态或未与其他应用共享。PCM 播放已在 Fosi Audio ZD3 上测试至 768 kHz 及 DSD256，并在 FiiO K11 上测试至 384 kHz 及 DSD128。"
+        ],
+        "list": [
+          "独占（hog）模式会阻止其他应用使用该设备。在共享模式下，音量键和数码表冠会调节你的 DAC；在独占模式下，只要开启相应选项，它们也可以调节。",
+          "整数模式会将未经处理的 32 位 PCM 直接发送给接受整数格式的 DAC。",
+          "“匹配 16 位来源”（默认关闭）会将 16 位文件以 16 位格式发送给具备真正 16 位模式的 DAC，而不是补零。",
+          "无缝播放，包括由单个文件按 CUE 表拆分的专辑。",
+          "记住你的 DAC。若 DAC 未连接，音乐会在已连接的最佳输出设备上播放，DAC 重新连接后再切换回去。",
+          "自身没有音量控制的输出（HDMI、光纤、线路输出）可以使用 Vespertine 的音量，按输出分别设置。低于 100% 时，标签会注明已不再是比特完美。",
+          "Vespertine 退出时，会将 DAC 恢复为之前的采样率和位深度。",
+          "内置回环测试会比对 Vespertine 发送到虚拟设备的每一个采样。它是软件检查，也明确标注为软件检查，永远不会改变 <span class=\"mono nowrap\">比特完美</span> 标志。"
+        ],
+        "links": [
+          "代码中的条件",
+          "亲自验证",
+          "回环测试能证明什么"
+        ],
+        "alt": "Vespertine 正在播放 Lazar Berman 演奏的 Liszt《Années de pèlerinage》，来源为 24 位 / 96 kHz FLAC：检查器将其标记为在 Fosi Audio ZD3 上比特完美、独占播放，并列出信号路径的每一步。",
+        "floatAlt": "回环测试表：44.1 kHz 和 96 kHz 下的 24 位、补零的 16 位，以及一组无缝衔接曲目，均逐位一致。",
+        "floatCaption": "回环测试 · 软件检查"
+      },
+      "room-correction": {
+        "jack": "房间校正",
+        "kicker": "房间校正",
+        "title": "测量你的房间。校正每只扬声器。",
+        "lede": "用 UMIK-1 或其他经过校准的 USB 麦克风测量你的房间，Vespertine 会根据在你座位处听到的声音，为每只扬声器拟合滤波器。",
+        "body": [
+          "扫频信号每次只通过一只扬声器播放，并在你聆听座位周围的一到五个位置进行测量。每只扬声器都会获得根据测量结果设计的专属滤波器。这些滤波器以衰减为主：压低房间的峰值，对宽阔的凹陷只作轻微提升。同一次测量还会设定每只扬声器的延迟和电平，让每只扬声器的声音同时、以相同的响度到达你的座位。房间校正默认关闭，关闭时播放保持比特完美。开启时，信号路径会显示 <span class=\"mono nowrap\">房间校正</span>。"
+        ],
+        "list": [
+          "三种目标：Warm（默认）、Gentle tilt 和 Flat。可以只校正低音，也可以校正全频段；之后无需重新测量即可重新设计滤波器。",
+          "可从 REW 或 Equalizer APO 导入滤波器，连同每只扬声器的延迟和电平一并导入，并可导出 Equalizer APO 文本。",
+          "可导入脉冲响应（WAV、AIFF、CAF 或 FLAC），并通过卷积播放。",
+          "支持立体声和 5.1。",
+          "房间画像会显示扬声器、你的座位，并在测量时逐一显示每个麦克风位置。随后，曲线变换动画会把测量响应变换为预测响应，还可通过校正前/校正后开关进行对比。"
+        ],
+        "note": "“校正后”曲线是根据测量结果和滤波器预测的，并非实测。要了解房间的真实表现，请在开启校正的状态下重新测量。",
+        "links": [
+          "房间校正的工作原理"
+        ],
+        "alt": "Vespertine 对一对立体声扬声器使用 Warm 目标时预测的房间校正效果：每只扬声器的测量响应、目标曲线和校正后的预测响应，其中 120 Hz 附近的一个房间峰值分别被削减了 14 dB 和 18 dB；另附每只扬声器的滤波器。",
+        "floatAlt": "测量向导中的房间画像：左右扬声器、座位，以及座位周围的五个麦克风位置，麦克风放在第一个位置上。",
+        "floatCaption": "房间画像"
+      },
+      "surround": {
+        "jack": "环绕声",
+        "kicker": "环绕声与空间音频",
+        "title": "你的 5.1 光盘，同在一个资料库。",
+        "lede": "多声道音乐可在 AirPods 上以头部追踪的空间音频播放，或在立体声 DAC 上按声道布局缩混。",
+        "body": [
+          "DTS CD 会解码为 5.1。SACD 映像、提取出的 SACD 音轨、多声道 FLAC、TrueHD 和 DTS-HD MA 可在 AirPods 上渲染为头部追踪的空间音频，或在立体声 DAC 上缩混。带 Atmos 的 Dolby Digital Plus 使用 macOS 的对象渲染器；TrueHD Atmos 和 DTS:X 播放其声道床。逐声道输出为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已通过 HDMI 测试过一台 Sony 电视，详见 docs/DEVICES.md）；欢迎提交测试报告。"
+        ],
+        "list": [
+          "专辑的立体声版本和环绕声版本只列出一次；Vespertine 会播放适合当前输出的版本，或你固定的版本。",
+          "向功放输出 Dolby Digital、DD+ 和 DTS-CD 比特流为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已通过 HDMI 测试过一台 Sony 电视，详见 docs/DEVICES.md）；欢迎提交测试报告。载波测试使用 FFmpeg 的 S/PDIF 读取器。macOS 不支持 TrueHD 和 DTS-HD MA 直通。",
+          "“为空间音频导出”可导出供耳机使用的双耳立体声，或供 Apple 设备使用的多声道 ALAC，并附带标签和封面。"
+        ],
+        "alt": "Elton John 的《Goodbye Yellow Brick Road》（24 位 / 88.2 kHz 5.1 专辑）正在 AirPods Max 上以头部追踪的空间音频播放，并显示信号路径和各声道电平表。",
+        "floatAlt": "一张每首歌都有立体声和 5.1 版本的专辑，每首只列出一次。",
+        "floatCaption": "立体声与 5.1，只列一次"
+      },
+      "discs": {
+        "jack": "光盘映像与 DSD",
+        "kicker": "SACD、DVD-Video 与 DSD",
+        "title": "直接播放光盘映像。",
+        "lede": "将 Vespertine 指向 SACD 或 DVD-Video 映像，它会直接从中播放音乐，无需装载、提取或写入任何内容。",
+        "body": [
+          "SACD <span class=\"mono\">.iso</span> 映像可播放其立体声区和 5.1 区，无论是否经过 DST 压缩，并以光盘自带的文本作为标题。DST 会被解码还原为完全一致的 DSD，因此在 DAC 支持的情况下，立体声会通过 DoP 以原生 DSD 送往你的 DAC，5.1 则在 AirPods 上以头部追踪的空间音频播放。DVD-Video 光盘（<span class=\"mono\">.iso</span> 或 <span class=\"mono\">VIDEO_TS</span> 文件夹）上的 LPCM 音乐会逐位原样播放，每个标题对应一张专辑，每个章节对应一首曲目。"
+        ],
+        "list": [
+          "在两张真实光盘上与 sacd_extract 的结果逐位一致。带 5.0 区、仅有多声道区或 DSD128 及以上的光盘，目前仅通过合成测试映像覆盖。",
+          "从 DSD64 到 DSD512 的 DSF 和 DSDIFF（包括 DST 压缩的 DSDIFF）会以 DoP 发送给支持相应载波采样率的 DAC，或转换为高采样率 PCM。DoP 已在 Fosi Audio ZD3 上确认可用至 DSD256，在 FiiO K11 上确认可用至 DSD128；通过 DoP 传输 DSD512 尚未在硬件上测试。",
+          "DVD-Video LPCM，支持 16、20 和 24 位，48 和 96 kHz，最多 8 个声道。不支持 DVD-Audio，加密（CSS）光盘需要使用解密后的副本。"
+        ],
+        "links": [
+          "DVD-Video 详情"
+        ],
+        "alt": "Dire Straits 的《Brothers In Arms》直接从 SACD 光盘映像播放：立体声 DSD64 通过 DoP 送至 FiiO K11，显示“原生 DSD · DoP”标志，解码器显示为“SACD 映像，DST（无损）”。",
+        "floatAlt": "Claudja Barry 的《Love for the Sake of Love》以 DSD128 通过 DoP 送至 Fosi Audio ZD3，采样率 352.8 kHz。",
+        "floatCaption": "DSD128 · DoP · 352.8 kHz"
+      },
+      "analysis": {
+        "jack": "分析",
+        "kicker": "伪高解析度检测与频谱",
+        "title": "找出名不副实的“高解析度”文件。",
+        "lede": "每个文件都可以分析其真实位深度、真实带宽，以及有损编码器和重采样器留下的痕迹。",
+        "body": [
+          "每个结论都附有依据，并指出还有哪些其他可能的解释；<em>可疑的高解析度</em>播放列表会将这些文件汇总在一起。只有补零检测是精确的：频谱结论以疑问形式标出，因为某些高比特率的有损文件会被判定为真实的，而陡峭的母带滤波器、FM 音源以及磁带或黑胶转录也可能看起来可疑。播放音乐时，电平表和实时频谱会显示正在输出的内容，包括 DoP。"
+        ],
+        "list": [
+          "装进 24 位容器、经过补零的 16 位音频",
+          "可能经过升采样、却以 96 或 192 kHz 出售的 CD 品质母带",
+          "可能的有损来源：由 MP3 或 AAC 转码而来的 FLAC",
+          "可能由 SBR 或“AI 增强”合成的高频",
+          "<span class=\"mono\">vespertine-analyze</span> 可在你文件所在的 Linux 服务器上运行同样的分析；应用会导入分析结果。"
+        ],
+        "note": "此截图中的文件是刻意伪造的：将预告片自己的配乐编码为 MP3，再升采样至 24/192，并冠以虚构的乐队名称。",
+        "links": [
+          "分析原理，以及它的盲区"
+        ],
+        "alt": "“分析”标签页将一张 24/192 的“重制版”标记为可能的有损来源：其长期频谱在 16 kHz 处截止。"
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "通过 USB-C 连接 AirPods Max",
+        "title": "在 AirPods Max 上无损播放，并如实标明。",
+        "lede": "使用 USB-C 线缆连接时，AirPods Max 会被识别为 24 位 / 48 kHz 无损设备。",
+        "body": [
+          "48 kHz 音乐以比特完美方式播放，其他音乐则使用 Apple 的母带级重采样器转换，全程公开可见。通过蓝牙连接时，Vespertine 会告诉你链路使用的是 AAC。这一判断依据的是 Apple 对线缆通路的说明以及 Core Audio 的读回结果，因为 AirPods 没有可供回环测试的数字输出。"
+        ],
+        "alt": "一个由 24 位 / 48 kHz 曲目组成的智能播放列表，已筛选至 Oasis，正通过 USB-C 在 AirPods Max 上以比特完美方式播放。"
+      },
+      "library": {
+        "jack": "资料库",
+        "kicker": "资料库",
+        "title": "像 Apple Music 一样浏览，像图书管理员一样管理。",
+        "lede": "专辑、艺人、歌曲和类型，每一项都有可组合的过滤条件，也都能随机播放。",
+        "list": [
+          "可按格式、24 位、88.2 kHz 及以上、多声道、类型、年份、采样率、声道和分析结论过滤。搜索不区分大小写和重音符号。",
+          "智能播放列表使用你习惯的单位：24 位、88.2 kHz。",
+          "同一张专辑的重制版、单声道与立体声版本以及 SACD 共用一张卡片；打开时再选择版本。",
+          "个人收藏和播放次数保存在资料库中，绝不会写入你的文件。可导入 M3U 和 Apple Music 播放列表、播放次数和个人收藏。",
+          "标签编辑器带有备份和一步还原，另有 MusicBrainz 信息补全，在写入任何内容之前会先显示匹配可信度。",
+          "支持通过 SMB、NFS 或 WebDAV 访问网络共享，提供缓存、“保留离线副本”以及专为慢速服务器设计的播放机制：曲目在播放前会先缓冲到你的 Mac 上，缓冲期间播放按钮上会显示加载圆环。",
+          "“在这台 Mac 上查找音乐”会搜索每个磁盘，找出你真正的音乐，略过杂乱文件。首次启动时的简短设置会帮你选择输出设备，并说明独占访问和 ReplayGain 的作用。",
+          "按输出设置的参数均衡器，可导入 AutoEQ 和 Equalizer APO 预设。默认关闭；开启后，信号路径显示的是 <span class=\"mono nowrap\">均衡器</span>，而不是 <span class=\"mono nowrap\">比特完美</span>。",
+          "迷你播放器、菜单栏附加项、媒体键、ReplayGain，以及已签名的自动更新。"
+        ],
+        "links": [
+          "所有功能详解"
+        ],
+        "alt": "“类型”页面：每个类型一个磁贴，上面拼贴着该类型的专辑封面。"
+      },
+      "languages": {
+        "jack": "语言",
+        "kicker": "{languages} 种语言",
+        "title": "会说你的语言。",
+        "lede": "每个菜单、设置和信号路径消息，除英语外都已翻译为 {languages} 种语言。",
+        "body": [
+          "从乌克兰语、德语、日语，到斯瓦希里语、泰米尔语和豪萨语，均采用当地的复数形式和数字格式；简体中文、繁体中文和香港繁体中文各自使用自己的词汇。阿拉伯语、希伯来语、波斯语和乌尔都语采用从右到左的布局。",
+          "翻译如何核查：每次更改都会运行自动检查，确认应用中的每个字符串都存在于全部 44 种语言中，占位符一致，并具备每种语言所需的复数形式；主要界面也已在多种语言下检查过文字截断、重叠以及从右到左的镜像排版。这些翻译最初是经过仔细处理的机器翻译，因此非常欢迎母语使用者在 <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a> 上提出更正。"
+        ],
+        "alt": "以 {languagesTotal} 种界面语言分别写出的 Vespertine，从 ヴェスパタイン、Веспертайн 到 فسبرتاين 和 वेस्परटाइन，字号与字体各不相同。",
+        "wallLabel": "以各种语言写出的 Vespertine"
+      }
+    },
+    "formats": {
+      "eyebrow": "格式",
+      "title": "环绕声、无损与有损文件。",
+      "text": "立体声与多声道，PCM 与 DSD，光盘映像与普通文件，全部支持 CUE 表单。",
+      "caption": "Vespertine 可播放的格式及播放方式",
+      "rows": [
+        {
+          "name": "FLAC、ALAC、WAV、AIFF",
+          "text": "原生采样率与位深：位深最高 32 位，采样率最高达 DAC 的运行速率（已测试至 768 kHz）；未经改动的 32 位 PCM 需要整数模式。支持 CUE 表单映像。"
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF 与 DSDIFF，DST 压缩或未压缩均可。能否使用 DoP 取决于 DAC 和载波采样率，否则转为 PCM。DoP 已测试至 DSD256；通过 DoP 传输 DSD512 尚未在硬件上测试。"
+        },
+        {
+          "name": "SACD 映像",
+          "text": "立体声区与多声道区，DST 压缩或未压缩，均直接从映像播放；每首歌曲只列出一次，并附带其立体声和 5.1 版本。"
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16、20 和 24 位，48 与 96 kHz，1 至 8 声道，逐位一致；每个标题对应一张专辑，每个章节对应一条音轨。不支持 DVD-Audio。"
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "含 Atmos 的 Dolby Digital Plus，由 macOS 的对象渲染器渲染，或播放其解码后的声道床。"
+        },
+        {
+          "name": "Dolby TrueHD、MLP",
+          "text": "无损，可做到比特完美；TrueHD Atmos 播放其声道床，不渲染其中的对象。"
+        },
+        {
+          "name": "DTS-HD Master Audio、DTS-HD HR、DTS",
+          "text": "MA 为无损，可做到比特完美；DTS:X 播放其声道床。原始 DTS 可解码；DTS-CD 比特流走单独的路径。"
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "由 macOS 解码。向功放输出比特流为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已测试过一台通过 HDMI 连接的 Sony 电视：见 docs/DEVICES.md）；征集测试报告。"
+        },
+        {
+          "name": "DTS CD 与 DTS-WAV",
+          "text": "可识别并解码为 5.1，包括按 CUE 分轨的专辑。"
+        },
+        {
+          "name": "APE、WavPack、TTA",
+          "text": "无损。不支持封装在 WavPack 中的 DSD。"
+        },
+        {
+          "name": "Opus、Vorbis、Musepack、MP3、AAC",
+          "text": "解码播放，并标记为有损。"
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "对比",
+      "title": "横向对比。",
+      "intro": "不少 Mac 播放器都提供比特完美播放。本表对比的是各播放器自己的文档或源代码中的说法。“文档未提及”表示厂商对此没有任何说明，并不代表缺少该功能。Vespertine 的卷积用于房间校正；它没有音频效果插件，也不提供流媒体服务。",
+      "hint": "滑动查看更多 →",
+      "region": "对比表格（可横向滚动）",
+      "caption": "Vespertine 与其他七款 Mac 音乐播放器的对比，依据各播放器自己的文档或源代码",
+      "feature": "功能",
+      "appleMusic": "Apple Music（Mac）",
+      "rows": [
+        [
+          "源代码",
+          "GPL-3.0",
+          "闭源",
+          "闭源",
+          "闭源",
+          "闭源",
+          "闭源",
+          "GPL-2.0",
+          "闭源"
+        ],
+        [
+          "FLAC / DSD 文件",
+          "支持 / 支持",
+          "不支持 / 不支持",
+          "支持 / 支持",
+          "支持 / 支持",
+          "支持 / 支持",
+          "支持 / 支持",
+          "支持 / 支持",
+          "支持 / 不支持⁴"
+        ],
+        [
+          "DAC 采样率自动切换",
+          "支持",
+          "不支持",
+          "支持",
+          "支持",
+          "支持",
+          "支持",
+          "支持",
+          "文档未提及"
+        ],
+        [
+          "独占（hog）模式",
+          "支持",
+          "不支持",
+          "支持",
+          "支持",
+          "支持",
+          "支持",
+          "支持",
+          "支持"
+        ],
+        [
+          "16/24 位 PCM 不改动样本",
+          "条件说明 + 测试",
+          "macOS 27：第三方测试¹",
+          "厂商声称",
+          "厂商声称",
+          "应用内回环测试",
+          "厂商声称",
+          "应用内指示",
+          "文档未提及"
+        ],
+        [
+          "本地环绕声文件",
+          "支持²",
+          "文档未提及",
+          "支持",
+          "支持",
+          "支持",
+          "文档未提及",
+          "支持",
+          "文档未提及"
+        ],
+        [
+          "本地环绕声使用 Apple 空间音频",
+          "支持",
+          "仅限曲库中的 Atmos³",
+          "文档未提及",
+          "文档未提及",
+          "文档未提及",
+          "文档未提及",
+          "支持",
+          "文档未提及"
+        ],
+        [
+          "高解析度文件分析",
+          "支持",
+          "不支持",
+          "AudioScan",
+          "动态范围、响度",
+          "支持",
+          "文档未提及",
+          "不支持（仅实时频谱）",
+          "不支持（仅实时频谱）"
+        ],
+        [
+          "SACD ISO",
+          "支持",
+          "不支持",
+          "支持",
+          "不支持（仅 DSF/DFF）",
+          "支持",
+          "不支持",
+          "不支持",
+          "不支持⁴"
+        ],
+        [
+          "房间校正",
+          "在应用内测量（USB 麦克风），或导入 REW / APO 滤波器及脉冲响应",
+          "不支持",
+          "通过卷积（Origin：付费选项）或 Audio Units",
+          "通过卷积",
+          "不支持（设计如此）",
+          "文档未提及",
+          "不支持",
+          "文档未提及"
+        ],
+        [
+          "卷积 / 音频效果插件",
+          "支持（房间校正）/ 不支持",
+          "不支持 / 不支持",
+          "支持（Origin：付费选项）/ Audio Units",
+          "支持 / 不支持",
+          "不支持 / 不支持",
+          "文档未提及 / 文档未提及",
+          "不支持 / 不支持",
+          "文档未提及 / Audio Units"
+        ],
+        [
+          "流媒体服务",
+          "不支持",
+          "Apple Music",
+          "Studio：支持；Origin：不支持",
+          "支持",
+          "不支持（本地 + UPnP）",
+          "不支持（网络电台）",
+          "不支持（网络电台）",
+          "不支持（网络电台）"
+        ]
+      ],
+      "notes": [
+        "¹ 根据 <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">ASR 上发布的第三方回环测试</a>，macOS 27 上的 Apple Music 在 100% 音量下以 16/24 位播放时逐位一致。这并非 Vespertine 的测量结果；本次更新未能独立复核原始报告。Mac 上的 Apple Music 仍然没有自动采样率切换和独占（hog）模式，也不支持 FLAC 或 DSD。",
+        "² 多声道 DAC 输出和向功放输出比特流为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已测试过一台通过 HDMI 连接的 Sony 电视：见 docs/DEVICES.md）；征集测试报告。",
+        "³ Apple 文档中说明的是 Apple Music 曲库中 Dolby Atmos 曲目的空间音频及头部追踪，而不是对你自己的多声道文件进行空间渲染。",
+        "⁴ 在 foobar2000 2.26（macOS 27.0.1）上、未安装任何组件时测试：DSF、DFF 和 SACD ISO 文件均无法播放，提示“Unsupported file format”。另行安装 FFmpeg 并将这些格式添加到其 FFmpeg Decoder Wrapper 后，DSF 和 DFF 只能以 352.8 kHz PCM 播放；SACD ISO 仍然无法播放。"
+      ],
+      "sources": "<a href=\"{href.comparison}\">资料来源与范围</a>。欢迎指正：<a href=\"{href.issues}\">提交 issue</a>。"
+    },
+    "whatsNew": {
+      "eyebrow": "新功能",
+      "title": "{version} 的新功能。",
+      "latest": "最新版本",
+      "fullNotes": "完整发行说明",
+      "meta": "已经安装？它会自动更新，也可以运行 {brewUpgrade}",
+      "earlier": "早期版本",
+      "every": "所有版本",
+      "inEnglish": "这些发行说明尚未翻译，因此以英文显示。"
+    },
+    "faq": {
+      "eyebrow": "常见问题",
+      "title": "问题解答。",
+      "items": [
+        {
+          "q": "真的免费吗？",
+          "a": "是的。Vespertine 免费开源，采用 GPL-3.0 许可证。无需账户，没有订阅，没有广告，也没有遥测（<a href=\"{href.privacy}\">隐私</a>）。它只在以下情况联网：检查更新；以及在你要求时访问 MusicBrainz、Cover Art Archive 或 ListenBrainz，或为你的 Discord 状态查找封面。"
+        },
+        {
+          "q": "需要什么配置？",
+          "a": "macOS {minMacOS}（{minMacOSName}）或更高版本，Apple silicon 或 Intel 均可。Intel 硬件尚未测试；Intel 版本曾在 Rosetta 下运行过，欢迎真实 Intel Mac 用户反馈。"
+        },
+        {
+          "q": "如何安装和更新？",
+          "a": "下载 DMG，打开后将 Vespertine 移到“应用程序”文件夹。它使用 Developer ID 签名并经过 Apple 公证，而且会自动更新；每次更新都经过签名。使用 Homebrew：{brew}，之后通过 {brewUpgrade} 或应用自带的更新功能更新。"
+        },
+        {
+          "q": "能播放 Qobuz、TIDAL 或 Apple Music 的流媒体吗？",
+          "a": "不能。Vespertine 播放你拥有的音乐，无论存放在你的 Mac、外置硬盘还是网络共享上。受 DRM 保护的 Apple Music 订阅下载内容无法播放。"
+        },
+        {
+          "q": "怎么知道它真的是比特完美？",
+          "a": "信号路径会读回 Core Audio 实际执行的情况：设备的标称采样率、物理格式，以及由谁占用该设备。解码器有自动化测试（TrueHD 与其源文件比对，DTS 与 FFmpeg 自带的解码器比对），内置的回环测试会逐个样本检查软件路径，<span class=\"mono nowrap\">vespertine-probe</span> 则让你可以检查自己的硬件。<a href=\"{href.verification}\">如何自行验证</a>。"
+        },
+        {
+          "q": "支持房间校正吗？",
+          "a": "支持。用 UMIK-1 或其他经过校准的 USB 麦克风，在你座位周围的一到五个位置测量房间，Vespertine 就会为每只扬声器拟合滤波器，并对齐它们的延迟和电平，立体声和 5.1 均适用。它还能导入 REW 和 Equalizer APO 的滤波器及脉冲响应。该功能默认关闭，关闭时播放保持比特完美；开启时，信号路径会显示 <span class=\"mono nowrap\">房间校正</span>。<a href=\"{href.roomCorrection}\">房间校正的工作原理</a>。"
+        },
+        {
+          "q": "能播放 SACD 和 DVD 光盘吗？",
+          "a": "它播放的是光盘映像。SACD <code>.iso</code> 映像（立体声和多声道，DST 压缩或未压缩），以及 DVD-Video 映像或 <code>VIDEO_TS</code> 文件夹中的 LPCM 音乐，都直接从映像播放，无需提取任何内容。不支持 DVD-Audio；加密（CSS）的 DVD 需要解密后的副本。"
+        },
+        {
+          "q": "支持 Dolby Atmos 吗？",
+          "a": "含 Atmos 的 Dolby Digital Plus 通过 macOS 的对象渲染器播放，在 AirPods 上呈现为带头部追踪的空间音频。TrueHD Atmos 和 DTS:X 播放其无损声道床，不渲染其中的对象。向 AV 功放输出比特流为实验性功能，尚未在真实功放上测试；征集测试报告。"
+        },
+        {
+          "q": "会改动我的文件吗？",
+          "a": "只有在你编辑标签时才会，而且每个文件都会先备份，可一步还原。文件夹以原位引用的方式添加；导入时会创建不占用额外空间的 APFS 克隆。"
+        },
+        {
+          "q": "在哪些硬件上测试过？",
+          "a": "PCM 播放已在 Fosi Audio ZD3 上测试至最高 768 kHz 及 DSD256，并在 FiiO K11 上测试至最高 384 kHz 及 DSD128，整数模式也在 FiiO K11 上测试过。此外还在以下设备上测试过：通过 USB-C 和蓝牙连接的 AirPods Max、MacBook Pro 扬声器，以及通过 HDMI 以 5.1 播放的 Sony 电视。Intel 硬件尚未测试。向功放输出比特流和多声道 DAC 输出为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已测试过一台通过 HDMI 连接的 Sony 电视：见 docs/DEVICES.md）；<a href=\"{href.dacReport}\">征集测试报告</a>。"
+        },
+        {
+          "q": "支持我的语言吗？",
+          "a": "很可能支持：界面提供英语及其他 {languages} 种语言，包括从右到左书写的阿拉伯语、希伯来语、波斯语和乌尔都语。Vespertine 会使用“系统设置”中为它设定的语言。欢迎母语使用者在 <a href=\"{href.newIssue}\">GitHub</a> 上提交更正。"
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "支持",
+      "title": "助力 Vespertine 成长。",
+      "text": "它免费、开源，并以公开的方式开发。你可以这样帮忙。",
+      "cards": [
+        {
+          "title": "在 GitHub 上赞助",
+          "text": "Vespertine 是免费的。如果它对你有用，在 GitHub 上赞助即可支持它的开发。",
+          "cta": "成为赞助者"
+        },
+        {
+          "title": "报告你的 DAC",
+          "text": "告诉我们你的 DAC、音频接口或功放的表现。每一份设备报告都会扩大在真实硬件上验证过的范围。",
+          "cta": "提交设备报告"
+        },
+        {
+          "title": "改进翻译",
+          "text": "在这 {languages} 种语言中发现了别扭的表述？提交 issue，附上更好的措辞。",
+          "cta": "建议更正"
+        },
+        {
+          "title": "阅读代码",
+          "text": "欢迎提交 Bug 报告、拉取请求和问题。信号路径的各项条件及其测试都在代码仓库中。",
+          "cta": "GitHub 上的源代码"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "下载",
+      "title": "在你的 Mac 上播放你的环绕声收藏。",
+      "meta": [
+        "免费",
+        "开源",
+        "版本 {version}",
+        "macOS {minMacOS} 或更高版本"
+      ]
+    }
+  },
+  "press": {
+    "title": "媒体资料包：Vespertine，Mac 上的环绕声与高解析度音乐播放器",
+    "description": "Vespertine 的基本信息、标志、主视觉、真实截图和预告片。Vespertine 是一款免费开源的 Mac 播放器，专为环绕声与高解析度音乐收藏打造。",
+    "ogAlt": "Vespertine 媒体资料包：资料表、标志、主视觉、真实截图和预告片，叠加在三张应用的真实截图之上。",
+    "eyebrow": "媒体资料包",
+    "heading": "撰写 {name} 相关报道所需的一切。",
+    "lede": "Vespertine 是一款免费开源的 Mac 播放器，专为环绕声与高解析度音乐收藏打造。SACD 和 DVD-Video 光盘映像、提取出的 SACD 5.1 音轨、DTS CD，以及 DTS-HD MA、TrueHD 和 Atmos 文件，都汇集在同一个资料库中，并可在 AirPods 上以支持头部追踪的空间音频播放。信号路径会显示从文件到输出的每一步，相关条件和测试都写在任何人都能审查的 GPL 源代码中。",
+    "fine": "逐声道输出和向功放输出比特流均为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已测试过一台通过 HDMI 连接的 Sony 电视：见 docs/DEVICES.md）；欢迎反馈测试结果。Dolby Digital Plus Atmos 的对象由 macOS 渲染；TrueHD Atmos 和 DTS:X 播放其声道床。",
+    "facts": {
+      "eyebrow": "资料表",
+      "title": "基本信息。",
+      "name": "名称",
+      "formerly": "（0.6.0 版之前名为 {formerName}）",
+      "developer": "开发者",
+      "developerValue": "{author}，独立开发者",
+      "price": "价格",
+      "priceValue": "免费。以 GPL-3.0 许可证开源；无需账户，无订阅、无广告、无遥测",
+      "platform": "平台",
+      "platformValue": "macOS {minMacOS} {minMacOSName} 或更高版本，支持 Apple silicon 和 Intel",
+      "current": "当前版本",
+      "currentValue": "{version}，发布于 {date}",
+      "currentFine": "经过签名和公证的 DMG（{size}），可自动更新",
+      "first": "首个版本",
+      "firstFine": "（当时名为 {formerName} 0.1.0）",
+      "languages": "语言",
+      "languagesValue": "英语及其他 {languages} 种语言，包括乌克兰语、阿拉伯语、希伯来语、日语和三种中文",
+      "install": "安装",
+      "installValue": "<a href=\"{href.dmg}\">下载 DMG</a> 或 {brew}",
+      "tested": "测试设备",
+      "testedValue": "Fosi Audio ZD3（PCM 最高 768 kHz、通过 DoP 传输 DSD256）、FiiO K11（PCM 最高 384 kHz、通过 DoP 传输 DSD128、整数模式）、通过 USB-C 和蓝牙连接的 AirPods Max、MacBook Pro 扬声器",
+      "links": "链接",
+      "website": "网站",
+      "source": "源代码",
+      "releaseNotes": "发行说明",
+      "verify": "如何验证比特完美播放"
+    },
+    "angle": {
+      "eyebrow": "定位",
+      "title": "它专注什么。",
+      "list": [
+        "在同一个 Mac 资料库中收纳环绕声音乐：从 SACD 和 DVD-Video 映像、翻录文件和 DTS CD，到 TrueHD 和 DD+ Atmos，并可在 AirPods 上以空间音频播放。",
+        "免费的 GPL-3.0 源代码，任何人都可以阅读、构建和修改。",
+        "信号路径会显示采样率、字长、增益和声道处理。比特完美的条件写在代码里，并配有测试、内置的回环测试和一份<a href=\"{href.verification}\">验证指南</a>。"
+      ],
+      "text": "同时还提供高解析度文件分析。补零检测结果是精确的；频谱判断只是估计，存在局限。VeraVox 和 Audirvana AudioScan 也提供分析功能。<a href=\"{href.comparison}\">对比来源</a>。"
+    },
+    "video": {
+      "eyebrow": "视频",
+      "title": "预告片。",
+      "text": "44 秒，16:9，1080p 60 fps，带声音。<a href=\"{href.trailerDownload}\" download>下载 MP4</a>（{size}）。如有需要，可索取 4K 母版。",
+      "fallback": "下载预告片（MP4）"
+    },
+    "logo": {
+      "eyebrow": "品牌",
+      "title": "标志。",
+      "text": "始终使用小写，新月始终为黄铜色。请勿更改颜色、拉伸或重新排版。<a href=\"{href.brandGuide}\">品牌指南（PDF）</a>。",
+      "primaryAlt": "Vespertine 组合标志：黄铜色新月和 vespertine 字样",
+      "stackedAlt": "Vespertine 堆叠式组合标志",
+      "primary": "主标志",
+      "stacked": "堆叠式",
+      "onLight": "浅色背景：",
+      "crescent": "仅新月："
+    },
+    "art": {
+      "eyebrow": "主视觉",
+      "title": "每项功能一张图。",
+      "text": "提供三种尺寸：2400×1350、1600×900 和 1270×760。",
+      "items": {
+        "bit-perfect": "满足条件时比特完美",
+        "fake-hi-res": "伪高解析度检测",
+        "spatial-audio": "在 AirPods 上以空间音频播放环绕声",
+        "native-dsd": "通过 DoP 播放原生 DSD",
+        "stereo-and-surround": "立体声版本和环绕声版本",
+        "sacd-iso": "SACD 映像，直接播放",
+        "languages": "{languages} 种语言"
+      }
+    },
+    "shots": {
+      "eyebrow": "截图",
+      "title": "真实的应用。",
+      "text": "取自开发者自己的资料库，2400×1500。专辑封面版权归其所有者。",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24 位 / 96 kHz，在 Fosi Audio ZD3 上比特完美播放：Lazar Berman 演奏 Liszt 的 Les jeux d’eaux à la Villa d’Este",
+        "multichannel-albums": "已过滤为多声道的专辑",
+        "stereo-and-surround-versions": "提取出的 SACD 音轨，含立体声版本和 5.1 版本",
+        "spatial-audio-airpods-max": "一张 24/88.2 的 5.1 专辑（Elton John，Goodbye Yellow Brick Road）在 AirPods Max 上以空间音频播放",
+        "fake-hi-res-detection": "一张 24/192 的“重制版”，频谱止于 16 kHz（刻意伪造的文件：预告片自己的音乐，先编码为 MP3 再升采样，并署上虚构的乐队名）",
+        "dsd-native-dop": "在 Fosi Audio ZD3 上通过 DoP 以 352.8 kHz 播放 DSD128：Claudja Barry，Love for the Sake of Love",
+        "sacd-iso": "直接从映像播放的 SACD .iso：Dire Straits，Brothers In Arms",
+        "genres": "类型",
+        "search": "搜索",
+        "smart-playlist": "一个智能播放列表，通过 USB-C 在 AirPods Max 上比特完美播放",
+        "loopback-test": "回环测试：逐个采样检查输出路径的软件检测",
+        "setup-welcome": "首次运行设置：欢迎",
+        "setup-output": "首次运行设置：选择要记住的输出",
+        "output-settings": "输出设置：记住的输出、备用输出、16 位匹配",
+        "equalizer": "使用 AutoEQ 预设的参数均衡器"
+      }
+    },
+    "contact": {
+      "eyebrow": "联系",
+      "title": "欢迎联系。",
+      "text": "媒体、问题和采访请求：{email}。社区问题：<a href=\"{href.discussions}\">GitHub Discussions</a>。错误和设备报告：<a href=\"{href.issues}\">GitHub Issues</a>。"
+    }
+  },
+  "privacy": {
+    "title": "隐私：Vespertine 不收集任何数据",
+    "description": "Vespertine 应用不收集任何数据：没有账户、分析、遥测、崩溃报告或广告。这里说明应用和本网站会连接哪些服务以及原因。",
+    "ogAlt": "Vespertine 隐私：Vespertine 不收集任何数据。没有账户、分析、遥测、崩溃报告或广告。",
+    "eyebrow": "隐私",
+    "heading": "Vespertine",
+    "headingBrass": "什么都不收集。",
+    "updated": "自 {effective} 起生效（新增房间校正对麦克风的使用，适用于 0.14 版）。此前的更改：可选的 Discord 状态，{discordUpdated}；“本网站”一节，{statsUpdated}，本站自那时起使用自托管、不使用 Cookie 的统计来计算访问量。{langUpdated}，“本网站”一节还开始介绍语言菜单，该菜单会在你的设备上记住你的选择。",
+    "intro": "Vespertine 是一款免费开源的音乐播放器。应用没有账户，没有分析，没有遥测，没有崩溃报告，也没有广告。开发者不会收到任何关于你或你的音乐的信息。由于源代码是公开的，你可以核实本页的每一条说明。",
+    "staysTitle": "哪些内容留在你的 Mac 上",
+    "stays": "你的资料库数据库、播放列表、播放次数、文件分析结果、封面缓存和设置都存储在 Mac 上你的用户“资源库”文件夹中。网络共享的密码，以及你的 ListenBrainz 令牌（如果你添加了的话），存储在 macOS 钥匙串中。房间校正仅在你进行测量时使用你的测量麦克风，并将录音保存在你的“文稿”文件夹中。这些内容都不会上传到任何地方。",
+    "onlineTitle": "应用何时联网",
+    "online": [
+      "<strong>检查更新。</strong>Vespertine 大约每天一次向 GitHub 获取更新源，在你选择“检查更新”时也会获取。与任何下载一样，GitHub 会看到你的 IP 地址。你可以在“设置”中关闭自动检查。",
+      "<strong>MusicBrainz 和 Cover Art Archive。</strong>仅当你使用“在 MusicBrainz 上查找”或“补全元数据”时（“在这台 Mac 上查找音乐”会为其添加的音乐提供补全选项，这是一个可以取消勾选的复选框），Vespertine 才会将要查找的专辑名、艺人名和音轨名发送到 musicbrainz.org。如果在“设置”中打开了“获取封面”，它会从 coverartarchive.org 下载封面，后者通过 Internet Archive（archive.org）提供这些封面。MusicBrainz 和 Cover Art Archive 由 MetaBrainz Foundation 运营。",
+      "<strong>ListenBrainz。</strong>仅当你打开 Scrobble 功能并输入令牌后，Vespertine 才会把你播放的歌曲发送到 listenbrainz.org：标题、艺人、专辑、时长，以及文件中带有的 MusicBrainz ID。歌曲开始时它会发送“正在播放”，在你听完一半或听满四分钟后，会发送一条带有时间的收听记录。",
+      "<strong>Discord。</strong>仅当你在“设置”中打开 Discord 状态后，Vespertine 才会通过一条只在你的 Mac 内部进行的连接，告诉你 Mac 上的 Discord 应用正在播放什么：标题、艺人、专辑、格式和进度。Discord 会把它作为你的状态显示给能看到你动态的人。为了显示专辑封面，Vespertine 会按名称查找封面，因为 Discord 只能显示来自网络的图像：如果你的文件带有 MusicBrainz 发行版本 ID，就在 coverartarchive.org 上查找，否则在 Apple 的 iTunes Search（itunes.apple.com）中查找，后者会收到艺人名和专辑名。随后 Discord 会从那里下载封面。你可以关闭封面显示，你的文件及其封面永远不会被上传。",
+      "<strong>网络共享。</strong>Vespertine 只连接你添加的服务器来读取你的音乐，不会连接其他任何地方。共享处于连接状态时，它大约每分钟检查一次服务器是否仍有响应，并每半小时查找一次新音乐（你正在从该共享播放时绝不会进行）。"
+    ],
+    "websiteTitle": "本网站",
+    "website": [
+      "本站托管在 GitHub Pages 上，GitHub Pages 可能会记录访问者的 IP 地址；参见<a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">GitHub 的隐私声明</a>。下载按钮链接到 GitHub 上的应用发行版本。本站不设置 Cookie，字体、图片和视频均从本站加载。",
+      "为了解大家使用哪些页面和按钮，本站使用 <a href=\"https://umami.is\">Umami</a> 统计访问量，这是一款注重隐私的软件，由我们自己在 stats.szeremeta.org 上运行。它不设置 Cookie，不在你的设备上存储任何内容，不保留你的 IP 地址，也不与广告商或任何其他公司共享任何信息。它会记录页面、你来自的网站、你大致所在的国家、你的浏览器、操作系统、屏幕尺寸和语言，以及对下载、GitHub 和 Homebrew 按钮的点击。它无法跨网站追踪你，也无法识别你的身份，并且会跳过浏览器发送了“请勿追踪”（Do Not Track）信号的访问者。<strong>应用从不联系它。</strong>",
+      "如果你通过本站的语言菜单选择了语言，浏览器会在你的设备上（在其本地存储中）记住这一选择，这样本站就不会把你切换回去。这项选择永远不会发送到任何地方，没有它本站也能照常使用。"
+    ],
+    "changesTitle": "变更与联系",
+    "changes": "如果情况有变，本页和发行说明会率先说明。欢迎以 <a href=\"{href.issues}\">GitHub Issue</a> 的形式提问。"
+  },
+  "terms": {
+    "title": "条款：Vespertine 是采用 GPL 许可的自由软件",
+    "description": "Vespertine 是采用 GNU 通用公共许可证第 3 版或更高版本的自由软件：免费、无需注册、不提供担保。",
+    "ogAlt": "Vespertine 条款：自由软件，简单明了。GNU 通用公共许可证第 3 版或更高版本。",
+    "eyebrow": "条款",
+    "heading": "自由软件，",
+    "headingBrass": "简单明了。",
+    "updated": "自 {effective} 起生效",
+    "licenseTitle": "许可证",
+    "license": "Vespertine 是依据<a href=\"{href.license}\">GNU 通用公共许可证第 3 版或更高版本</a>发布的自由软件。你可以出于任何目的使用它，研究和修改其源代码，并按照同一许可证分享副本，包括修改后的版本。它不收取任何费用，也无需注册任何东西。",
+    "warrantyTitle": "无担保",
+    "warranty": "正如许可证所述，在法律允许的范围内，Vespertine 按“原样”提供，不附带任何形式的担保。请备份你的音乐。Vespertine 只会在你编辑文件标签时修改文件，并会先备份每个文件，但使用风险由你自行承担。",
+    "musicTitle": "你的音乐与其他服务",
+    "music": "你有责任确保自己有权播放所添加的音乐。Vespertine 无法播放受 DRM 保护的文件，也不会尝试这样做。MusicBrainz、Cover Art Archive 和 ListenBrainz 是独立服务，各有其条款，你通过 Vespertine 使用它们时，这些条款同样适用。",
+    "trademarksTitle": "商标",
+    "trademarks": "Dolby、Dolby Atmos、Dolby Digital、Dolby Digital Plus 和 Dolby TrueHD 是 Dolby Laboratories 的商标。DTS、DTS-HD Master Audio 和 DTS:X 是 DTS, Inc. 的商标。Apple、AirPods、AirPods Max、Mac、macOS 和空间音频是 Apple Inc. 的商标。Vespertine 提及它们只是为了说明它能播放什么以及在哪里播放。Vespertine 未获得 Dolby、DTS 或 Apple 的认证、许可或背书。",
+    "contactTitle": "联系",
+    "contact": "错误报告、问题和请求：<a href=\"{href.issues}\">GitHub Issues</a>。",
+    "englishNote": "本译文仅为方便你阅读而提供。具有约束力的是 GNU 通用公共许可证原文，其为英文。"
+  },
+  "notFound": {
+    "title": "页面未找到：Vespertine",
+    "description": "此页面不存在。Vespertine 是一款免费开源的 Mac 播放器，专为环绕声和高解析度音乐收藏打造。",
+    "ogAlt": "Vespertine：免费开源的 Mac 环绕声与高解析度音乐播放器。",
+    "eyebrow": "404 · 无信号",
+    "heading": "此页面",
+    "headingBrass": "不存在。",
+    "lede": "链接可能已过时，或地址输入有误。关于 Vespertine 的一切，都从首页开始。",
+    "home": "前往首页"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} 或更高版本",
+    "processor": "Apple silicon（arm64）或 Intel（x86-64）",
+    "subCategory": "音乐播放器",
+    "sourceName": "Vespertine 源代码",
+    "trailerName": "Vespertine 预告片",
+    "trailerDescription": "44 秒的 Vespertine 导览，录制自真实应用和开发者自己的资料库：比特完美信号路径、通过 DoP 传输的 DSD、在 AirPods 上以空间音频播放环绕声，以及高解析度文件分析。",
+    "keywords": "比特完美, 高解析度音频, 环绕声, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, 空间音频, AirPods Max, FLAC, 音乐播放器, macOS, 开源"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 新增房间校正：用 UMIK-1 麦克风测量你的扬声器，再通过为你的房间生成的滤波器播放。它还能避免网络播放因缓冲耗尽而中断。",
+      "notes": "### 房间校正\n- **测量你的房间。** 将经过校准的 UMIK-1 麦克风放在聆听座位上，Vespertine 会在 1 到 5 个位置（默认 5 个：先是座位处，然后是左侧、右侧、前方和后方）依次通过每只扬声器播放测试扫频信号。它会先检查电平和通往每只扬声器的路由，拒绝无效的测量，并让你重试或从中断处继续。立体声和 5.1 均受支持。\n- **为每只扬声器生成滤波器。** Vespertine 根据测量结果为每只扬声器生成一小组滤波器，主要用于削减房间带来的低频峰值。选择目标（默认为“温暖”，也可选“柔和倾斜”或“平直”）和范围（仅低频，或全频段），滤波器就会根据已存储的测量数据重新拟合，无需重新测量。图表会显示测量结果、校正后的预测结果以及目标，预测结果会明确标注为预测。\n- **延迟与电平对齐。** 每只扬声器的延迟和电平也会一并测量，因此较近的扬声器会被延后，直到最远那只扬声器的声音到达；较响的扬声器则会被调低到与最安静的一只一致。\n- **使用你自己的滤波器。** 可导入 Equalizer APO 或 REW 滤波器文件（包含每只扬声器的延迟、电平和滤波器），或导入脉冲响应（WAV、AIFF、CAF 或 FLAC）作为卷积滤波器进行播放。可将配置文件导出为 Equalizer APO 文本或 Vespertine 配置文件。Vespertine 无法播放的行会被拒绝并给出行号，而不会被当作其他内容播放。\n- **默认关闭，比特完美依然比特完美。** 房间校正按输出单独开启，并与测量时所用的输出绑定。在它改动样本期间，信号路径会显示“房间校正”，音频流也不再标记为比特完美。关闭时，播放完全不受影响。开启期间，整数模式和“匹配 16 位来源”保持关闭。\n- **适用范围。** 由 Vespertine 渲染的立体声和 5.1 PCM。Dolby 和 DTS 比特流、Atmos 以及其他声道数的音频不经房间校正，信号路径会说明原因。在 DoP DAC 上，开启校正时 DSD 会转换为 PCM，因此同样会得到校正；如果想改为以原生方式发送且不经校正，请在该输出上勾选“保留原生 DSD”。\n- **一个窗口。** 显示 → 房间校正（也可从“均衡器”窗口和每个输出的设置中进入）集中了开关、“测量”“导入”“导出”、配置文件、校正前后对比图表、目标和范围，以及每只扬声器的延迟、电平和滤波器。它取代了之前测试版的“房间测量”窗口。具体方法见 `docs/ROOM-CORRECTION.md`。\n\n### 网络播放\n- **从 NAS 播放更少断续。** 网络共享上的曲目现在会在播放前先拷贝到你的 Mac，下一首也会提前拷贝，因此网络的短暂波动不会再让音乐停下。大型 DSD 文件的读取方式会始终预留较长的提前量。\n- **播放按钮上的加载圆环。** Vespertine 等待网络数据时，播放/暂停按钮会显示一个旋转的小圆环（开启“减弱动态效果”时保持静止）。短暂的读取失败会自动重试。\n- **局限。** 非常长时间的中断，或比音乐所需速率更慢的连接，仍可能使播放暂停以重新缓冲。缓存副本最多占用 8 GB，大于此大小的音源会失败并给出明确提示。见 `docs/NETWORK-PLAYBACK.md`。\n\n### 其他新内容\n- **已知 DAC 默认开启 DoP。** FiiO K11 和 Fosi Audio ZD3 初始即开启 DoP。如果你将其关闭，Vespertine 会记住。\n- **“最近添加”显示 150 张专辑**，此前为 60 张，因此大批量导入不会把在此之前添加的专辑挤出列表。\n- **Fosi Audio ZD3。** ZD3 现已列入支持设备列表，网站截图也已改用它重新拍摄。\n- **网站。** 下载按钮下方新增一行“在 GitHub 上加星标”和“加入讨论”。\n\n### 验证\n- 引擎、资料库和应用的测试套件均已通过，包括针对房间滤波器设计、经过校正环节和卷积滤波器的播放、在模拟房间中进行的测量步骤、导入格式以及网络缓存的新测试。实时音频代码还经过了地址、线程和未定义行为运行时检测器的检查。\n- 已在真实硬件上验证：在聆听座位使用 UMIK-1 完成的完整测量、据此生成的滤波器，以及在搭配立体声扬声器的 Fosi Audio ZD3 上通过房间校正进行的播放。"
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 可在 AirPods 上以空间音频播放 5.1 DSD，会在音频被转换或缩混时告诉你，退出时也不再卡住。",
+      "notes": "### 空间音频\n- **5.1 DSD 现在可以用空间音频播放。** 5.1 DSD 文件（DSF、DSDIFF、DST 压缩的 DSDIFF 或 SACD 映像）会被转换为 PCM，每个声道都会放到应在的位置，因此 LFE 和环绕声道不再丢失。此前，离散的 DSDIFF 声道可能落到三扬声器的声道床上，后置声道随之丢失。\n- **会说明音频经过了什么处理。** 信号路径会在“空间”或缩混旁显示 **DSD → PCM**，并在适用时出现两条新提示：“已从 DSD 转换”和“已降混为立体声”。两条提示均已翻译为全部 44 种语言。\n- 已由开发者在 AirPods Max 上检验。\n\n### 修复\n- **退出不再卡住。** 按 Cmd-Q 时，Vespertine 可能因等待音频设备而一直显示旋转光标。现在会立即退出。\n- **多声道文件读取正确。** RF64 和 Wave64 文件可正常打开，DSD 声道名称从文件中读取，离散多声道路由遵循文件自身的声道布局。\n\n### 验证\n- 引擎、资料库和应用的测试套件均已通过，包括新的测试：通过空间音频播放每种 5.1 DSD 格式，并检查每个声道都到达正确位置。左/右定位检查只在真实 Mac 上运行；GitHub 的测试机器会跳过这一项检查。"
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine 现在会在均衡器无法改变正在播放的内容时告诉你，为每款 USB-C AirPods Max 型号提供可选的参考均衡器，并在真实硬件上取得了首个多声道测试结果。"
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine 现在会保存你的播放历史记录，为“待播清单”在资料库旁提供独立面板，在一张卡片上显示专辑的所有版本，还能将你正在播放的内容显示为 Discord 状态。"
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine 现在可在浅色模式下正常工作，让没有音量控制的输出使用 Vespertine 的音量，并在你从网络共享收听时继续分析你的资料库。"
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine 现在能流畅播放速度较慢的网络共享上的音乐，分析大型资料库（包括网络共享）的速度更快，在小型 USB-C DAC 上以其支持的最高采样率播放高解析度音频，并让键盘焦点和多选保持在你预期的位置。"
+    }
+  }
+}

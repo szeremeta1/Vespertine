@@ -5,14 +5,16 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import romanFont from '../assets/fonts/newsreader-roman.woff2?url';
 import interFont from '../assets/fonts/inter.woff2?url';
-import { HEAD_CLASSES } from '../inline-scripts.mjs';
+import { HEAD_CLASSES, LANG_REDIRECT } from '../inline-scripts.mjs';
 import { app } from '../data/app';
+import { CODES, DEFAULT_LOCALE, dir, ogLocale, pagePath, type Lang, type Page } from '../i18n';
 
 interface Props {
+  lang: Lang;
+  /** Which page this is, for the canonical URL, og:url and the other languages' URLs. */
+  page: Page;
   title: string;
   description: string;
-  /** Path of this page (/, /press.html …), for the canonical URL and og:url. */
-  path: string;
   /** Name of the social card in public/og/ (made by scripts/make-og.mjs). */
   og: string;
   ogAlt: string;
@@ -21,22 +23,27 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description, path, og, ogAlt, jsonLd, noindex = false } = Astro.props;
+const { lang, page, title, description, og, ogAlt, jsonLd, noindex = false } = Astro.props;
 const site = Astro.site ?? new URL('https://vespertineapp.com');
-const canonical = new URL(path, site).href;
+const canonical = new URL(pagePath(lang, page), site).href;
+// Every language's version of this page (the 404 page has none: GitHub Pages serves one 404.html for every path).
+const alternates = page === '404' ? [] : CODES.map((c) => ({ lang: c, href: new URL(pagePath(c, page), site).href }));
 // The card's content hash in the URL, so a redesigned card isn't hidden behind a scraper's cached copy.
 const card = readFileSync(join(process.cwd(), 'public/og', `${og}.jpg`));
 const ogImage = new URL(`/og/${og}.jpg?v=${createHash('sha256').update(card).digest('hex').slice(0, 8)}`, site).href;
 const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={dir(lang)}>
 <head>
 <meta charset="utf-8">
+{page === 'home' && lang === DEFAULT_LOCALE && <script is:inline set:html={LANG_REDIRECT} />}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
+{alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href}>)}
+{alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={alternates[0].href}>}
 <meta name="robots" content={robots}>
 <meta name="author" content={app.author.name}>
 <meta name="application-name" content="Vespertine">
@@ -49,7 +56,8 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vespertine">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content={ogLocale(lang)}>
+{alternates.filter((a) => a.lang !== lang).map((a) => <meta property="og:locale:alternate" content={ogLocale(a.lang)}>)}
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={canonical}>
