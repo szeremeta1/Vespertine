@@ -88,17 +88,12 @@ struct TransportControls: View {
                     .buttonStyle(TransportIconStyle())
                     .accessibilityLabel("Previous")
                 Button { player.togglePlayPause() } label: {
-                    Image(systemName: player.isPlaying || player.waitingForDevice != nil ? "pause.fill" : "play.fill")
-                        .font(.system(size: compact ? 12 : 14))
-                        .foregroundStyle(Color(hex: 0x1A140A))
-                        .frame(width: compact ? 30 : 38, height: compact ? 30 : 38)
-                        .background(Palette.brassGradient, in: Circle())
-                        .overlay(Circle().strokeBorder(.white.opacity(0.35), lineWidth: 0.5).blendMode(.overlay))
-                        .shadow(color: Palette.brass.opacity(0.28), radius: 9, y: 4)
+                    TransportPlayPauseFace(loading: player.loading, playing: player.isPlaying || player.waitingForDevice != nil, compact: compact)
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.space, modifiers: [.option])
-                .accessibilityLabel(player.isPlaying || player.waitingForDevice != nil ? String(localized: "Pause", comment: "Button: pause playback") : String(localized: "Play", comment: "Button: start playback"))
+                .accessibilityLabel(player.canCancelLoading ? String(localized: "Cancel") : player.isPlaying || player.waitingForDevice != nil ? String(localized: "Pause", comment: "Button: pause playback") : String(localized: "Play", comment: "Button: start playback"))
+                .accessibilityValue(player.loading ? String(localized: "BUFFERING…") : "")
                 Button { player.next() } label: { Image(systemName: "forward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())
                     .accessibilityLabel("Next")

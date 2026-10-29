@@ -1,0 +1,35 @@
+# Network playback staging
+
+SMB/NFS sources, including files added from Finder-mounted network volumes, are staged before decoding. This is mandatory playback buffering; the existing optional Network Cache/Keep Offline preference still controls persistent copies. A complete persistent copy is reused when available. With Network Cache enabled, completed staged bytes are adopted into it using an APFS clone (or a local copy), preserving persistent caching without a duplicate NAS read. Offline pins are retained.
+
+Previously the engine started with 1.5 seconds of audio in its output ring and an additional eight seconds (at most 48 MiB) in `ReadAheadDecoder`. The independent library cache started copying after playback began and yielded when the ring was short. Only lossless PCM and DoP could switch to that completed copy without changing decoder state. Consequently the live decoder could still run dry.
+
+## Ordinary tracks and the queue
+
+`NetworkPlaybackCache` copies the entire source before `SourceOpener.probe` or output starts. The decoder opens the local URL from its first frame; there is no decoder swap, resampling, or change to source bytes. Lossy codecs, integer PCM, DoP, CUE regions, IEC bitstreams and system-rendered Atmos retain their existing decoder/output paths. A network outage after staging cannot starve this track's decoder.
+
+Once the current source is local, the engine copies the next queued source on a utility task. The next item is selected through the same queue provider as gapless playback, including shuffle/repeat and version selection. Queue changes replace the next lease. CUE regions sharing one source reuse that source. Compatible output formats still join through the existing ring and DoP marker alignment. If the next source has not arrived in time, there must be a wait at the boundary; no finite prefetch can guarantee a gapless boundary during an unlimited outage.
+
+VIDEO_TS folder playback stages all IFO, BUP and VOB files as a set, preserving their names with local links. Caching only the entry IFO would leave the audio on the share. Disc images are copied as files; large SACD images with an explicit SACD area use the DSD path below.
+
+## Large DSD
+
+DSF, DSDIFF and identified SACD sources over 512 MiB use a sparse local file and guarded reads rather than waiting for the whole file. Startup first copies 16 MiB, opens/seeks the decoder, then waits for a lead at the decoder's actual audio position: two minutes at the raw DSD byte rate, at least 128 MiB and at most 1 GiB (clipped at EOF). At DSD64 stereo the minimum is roughly three minutes; the cap gives shorter reserves at extreme rates/channel counts. Startup latency depends on actual link throughput, so even the lead can take a long time on a very slow link, but it does not require a multi-gigabyte full copy.
+
+FFmpeg receives a custom seekable AVIO source; native DST/SACD parsers use `PlaybackFile`. Every requested byte range waits until it is present on disk. An unwritten sparse range can never become zero-valued audio, corrupt-frame concealment or premature EOF. There is one remote copy reader per source; decoders read only local bytes. Demand ranges go first; background copying continues from the playback/seek position and eventually fills the rest. Temporary POSIX network read errors retry at the same byte offset while the local reserve plays; real EOF and local disk-write errors remain errors. Successful cache deliveries feed the existing share-health heartbeat so a busy NAS is not remounted just because staging replaced live decoding. Decoder seeks never reopen a separate live network stream. Once the source is complete, the engine clears its streaming state without replacing the decoder or disturbing conversion/filter/DoP marker state.
+
+The current copy gets the connection before the next copy: for progressive DSD, next prefetch starts when the current copy finishes. A stall within the local lead does not interrupt audio. An outage longer than all buffered bytes, or a link persistently slower than the source's consumption rate, can still exhaust a progressive reserve. Existing lossless-position rebuffering remains as the final fallback, with the loading indicator. An absolute guarantee against an arbitrarily long outage requires the complete file before playback, which conflicts with progressive startup. This change does not claim that impossible guarantee for progressive DSD.
+
+## Bounds, cleanup and loading
+
+The transient cache reserves at most **8 GiB per process** across current, prefetched and still-finishing cancelled copies; it also checks for 64 MiB free-disk headroom. A source or DVD set exceeding that budget fails with the system's file-too-large error instead of silently reverting to live streaming. It never loads the whole source into RAM: the copy chunk is 1 MiB, in addition to the existing decoder/ring budgets. This hard limit also means an unusually large pair may have to wait/fail rather than exceed the reservation. Persistent offline copies remain separately governed by the existing settings.
+
+Cache files live in the application's Caches directory under `Playback/<session UUID>`. Leases protect current/next files from deletion. Cancelled kernel network reads cannot always be interrupted, so their files and reservation remain until that read returns. Releasing the final lease deletes its file/session. On startup, advisory session locks permit removal of crash leftovers while protecting another running instance. The original music and metadata are never changed.
+
+The full and compact brass transport replace their glyph with a small rotating ring during an initial network wait or rebuffering. Pressing it cancels the pending start. VoiceOver reports Cancel / BUFFERING; Reduce Motion freezes the ring. The same brass face, dimensions and shadow remain in use. A component snapshot is generated from the production SwiftUI component, not a mock HTML drawing.
+
+## Validation and manual checks
+
+`NetworkPlaybackCacheTests` uses a throttled/stalling fake reader for complete-copy outages, progressive reserves, sparse-range waits/loading transitions and cancellation. It renders a whole staged PCM track through the real C ring/output context with zero underruns while the share is held, and compares guarded FFmpeg DSD→PCM and DoP output byte-for-byte with direct decoding. Tests also cover budget reservations, live-session cleanup protection and DVD folder layout.
+
+On a test library, try SMB and NFS, a Finder-added share, a normal FLAC/ALAC album with gapless joins, CUE tracks, DSD/DoP and DSD→PCM, seeking into a large DSD/SACD source, rapid skips, pause/cancel while loading, shuffle/Play Next changes and Keep Offline. Throttle the link before starting, then disconnect it after a normal track starts: that track should finish uninterrupted. For progressive DSD, distinguish a stall within its reserve from an outage longer than its reserve. Watch the loading ring and the signal-path/rate/bit-perfect indicators. No real DAC/physical loopback behavior was verified by the fake-reader tests.

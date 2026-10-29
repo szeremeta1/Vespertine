@@ -188,6 +188,25 @@ struct NetworkTests {
         #expect(cache.usage() == NetworkCache.Usage())
     }
 
+    @Test("The persistent cache adopts staged bytes without reopening an unavailable share")
+    func adoptStagedCopy() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-adopt-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let local = dir.appendingPathComponent("staged.flac")
+        let data = Data(repeating: 91, count: 4096)
+        try data.write(to: local)
+        var track = Track.stub(path: "/unavailable-nas/no-such-file.flac")
+        track.fileSize = Int64(data.count)
+        let cache = NetworkCache(directory: dir.appendingPathComponent("persistent"), limitBytes: 1 << 20)
+        #expect(cache.adopt(track, from: local))
+        for _ in 0..<200 where cache.isPending(track) { try await Task.sleep(for: .milliseconds(10)) }
+        let copy = try #require(cache.localURL(forKey: NetworkCache.key(for: track)))
+        try FileManager.default.removeItem(at: local)
+        #expect(try Data(contentsOf: copy) == data)
+        #expect(cache.usage().cachedFiles == 1)
+    }
+
     @Test("Copies of songs skipped past stop; queued ones are dropped; Keep Offline copies carry on")
     func cacheKeepOnly() async throws {
         signal(SIGPIPE, SIG_IGN)

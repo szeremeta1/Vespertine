@@ -125,6 +125,36 @@ public final class NetworkCache: @unchecked Sendable {
 
     // MARK: Changes
 
+    /// Retain an already staged playback source without copying it from the NAS a second time.
+    /// APFS clones share the original bytes safely; other file systems copy the local file.
+    @discardableResult
+    public func adopt(_ track: Track, from local: URL) -> Bool {
+        let key = Self.key(for: track)
+        lock.lock()
+        if entries[key] != nil || active[key] != nil { lock.unlock(); return true }
+        guard active.count < concurrentDownloads else { lock.unlock(); return false }
+        let pinned = queue.contains { $0.key == key && $0.pinned }
+        queue.removeAll { $0.key == key }
+        cancelled.remove(key)
+        let job = Job(key: key, remote: URL(fileURLWithPath: track.filePath), size: track.fileSize, pinned: pinned)
+        active[key] = job
+        lock.unlock()
+        Self.downloads.async { [self] in
+            let final = directory.appendingPathComponent(fileName(job))
+            let partial = directory.appendingPathComponent(UUID().uuidString + ".partial")
+            var ok = false
+            do {
+                if clonefile(local.path, partial.path, 0) != 0 { try FileManager.default.copyItem(at: local, to: partial) }
+                let size = (try FileManager.default.attributesOfItem(atPath: partial.path)[.size] as? NSNumber)?.int64Value
+                ok = size == job.size && rename(partial.path, final.path) == 0
+            } catch { }
+            if !ok { try? FileManager.default.removeItem(at: partial) }
+            finish(job, ok: ok)
+        }
+        onChange?()
+        return true
+    }
+
     public var limitBytes: Int64 {
         get { lock.withLock { limit } }
         set { lock.withLock { limit = newValue }; evict(); onChange?() }

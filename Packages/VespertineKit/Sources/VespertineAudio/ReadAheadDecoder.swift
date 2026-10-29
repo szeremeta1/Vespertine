@@ -219,6 +219,8 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
 
     // MARK: For the engine
 
+    var hasEnded: Bool { shared.condition.withLock { shared.ended } }
+
     /// Waits up to `timeout` for decoded audio (or the end of the file). True when there is some.
     @discardableResult
     func waitForAudio(timeout: TimeInterval) -> Bool {

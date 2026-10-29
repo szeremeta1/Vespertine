@@ -123,7 +123,7 @@ public struct SACDImage: Sendable, Hashable {
 
     /// Whether the file is an SACD image (it has a Master TOC where the Scarlet Book puts it).
     public static func isSACD(_ url: URL) -> Bool {
-        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
+        guard let handle = try? PlaybackFile(forReadingFrom: url) else { return false }
         defer { try? handle.close() }
         return [SectorLayout.plain, .raw].contains { layout in
             masterTOCSectors.contains { sector in
@@ -133,13 +133,13 @@ public struct SACDImage: Sendable, Hashable {
     }
 
     public static func read(_ url: URL) throws -> SACDImage {
-        let handle = try FileHandle(forReadingFrom: url)
+        let handle = try PlaybackFile(forReadingFrom: url)
         defer { try? handle.close() }
         return try read(handle)
     }
 
     /// Sectors `first` to `first + count - 1`, their 2048 bytes each, one after another (fewer at the end of the file).
-    static func sectors(_ handle: FileHandle, _ first: Int, _ count: Int, _ layout: SectorLayout = .plain) throws -> [UInt8] {
+    static func sectors(_ handle: PlaybackFile, _ first: Int, _ count: Int, _ layout: SectorLayout = .plain) throws -> [UInt8] {
         try handle.seek(toOffset: UInt64(first) * UInt64(layout.stride))
         let data = [UInt8](try handle.read(upToCount: count * layout.stride) ?? Data())
         guard layout != .plain else { return data }
@@ -153,7 +153,7 @@ public struct SACDImage: Sendable, Hashable {
         return out
     }
 
-    static func read(_ handle: FileHandle) throws -> SACDImage {
+    static func read(_ handle: PlaybackFile) throws -> SACDImage {
         // The Master TOC is stored three times. The first copy whose every area can be read counts; when none is
         // whole (damage in all three), the one that leads to the most areas.
         var sawTOC = false
@@ -176,7 +176,7 @@ public struct SACDImage: Sendable, Hashable {
 
     /// The image one copy of the Master TOC describes, and whether that copy is whole: a Scarlet Book 1.x TOC
     /// whose every area points to a readable area TOC.
-    static func read(_ handle: FileHandle, masterTOC m: [UInt8], sector tocSector: Int, layout: SectorLayout) throws -> (SACDImage, whole: Bool) {
+    static func read(_ handle: PlaybackFile, masterTOC m: [UInt8], sector tocSector: Int, layout: SectorLayout) throws -> (SACDImage, whole: Bool) {
         var image = SACDImage(areas: [])
         var whole = m[8] == 1
         let setSize = Int(be16(m, 16)), sequence = Int(be16(m, 18))
@@ -212,7 +212,7 @@ public struct SACDImage: Sendable, Hashable {
         return (image, whole && !image.areas.isEmpty)
     }
 
-    static func readArea(_ handle: FileHandle, sector: Int, sectors count: Int, layout: SectorLayout = .plain) throws -> Area {
+    static func readArea(_ handle: PlaybackFile, sector: Int, sectors count: Int, layout: SectorLayout = .plain) throws -> Area {
         let data = try sectors(handle, sector, min(count, 256), layout)
         guard data.count >= sectorSize else { throw SACDError.damaged(String(localized: "area TOC", comment: "The damaged part of an SACD image, in “This SACD image is damaged (…).”")) }
         let isTwo = data.starts(with: Array("TWOCHTOC".utf8)), isMulti = data.starts(with: Array("MULCHTOC".utf8))

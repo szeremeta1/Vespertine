@@ -23,7 +23,7 @@ struct DSTDSDIFFInfo: Sendable {
 
     /// nil for uncompressed DSDIFF (still handled by the existing DSD reader).
     static func read(_ url: URL) throws -> Self? {
-        let file = try FileHandle(forReadingFrom: url)
+        let file = try PlaybackFile(forReadingFrom: url)
         defer { try? file.close() }
         let size = try file.seekToEnd()
         guard size >= 16 else { return nil }
@@ -92,7 +92,7 @@ struct DSTDSDIFFInfo: Sendable {
         return Self(rate: rate, channels: channels, channelIDs: channelIDs, frameCount: frames, firstFrame: first, end: audioEnd, index: index)
     }
 
-    static func read(_ file: FileHandle, at offset: UInt64, count: Int) throws -> [UInt8] {
+    static func read(_ file: PlaybackFile, at offset: UInt64, count: Int) throws -> [UInt8] {
         try file.seek(toOffset: offset)
         let data = [UInt8](try file.read(upToCount: count) ?? Data())
         guard data.count == count else { throw DTSError.decoding }
@@ -107,7 +107,7 @@ struct DSTDSDIFFInfo: Sendable {
 final class DSTDSDIFFSource: InterleavedDSDSource {
     let url: URL
     let info: DSTDSDIFFInfo
-    private let file: FileHandle
+    private let file: PlaybackFile
     private let decoder: OpaquePointer
     private var index: [DSTDSDIFFInfo.Frame]
     private var scan: UInt64
@@ -120,7 +120,7 @@ final class DSTDSDIFFSource: InterleavedDSDSource {
 
     init(url: URL, info: DSTDSDIFFInfo) throws {
         self.url = url; self.info = info
-        file = try FileHandle(forReadingFrom: url)
+        file = try PlaybackFile(forReadingFrom: url)
         guard let decoder = ndst_create(Int32(info.channels), Int32(info.frameBytes)) else { throw DTSError.decoding }
         self.decoder = decoder; index = info.index; scan = info.firstFrame
         frame = [UInt8](repeating: 0, count: info.frameBytes * info.channels)
@@ -215,7 +215,7 @@ final class DSTDSDIFFSource: InterleavedDSDSource {
 enum DSDIFFChannels {
     static func ids(_ url: URL) -> [String]? {
         typealias F = DSTDSDIFFInfo
-        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return nil }
         defer { try? file.close() }
         guard let size = try? file.seekToEnd(), size >= 16, let head = try? F.read(file, at: 0, count: 16),
               F.id(head, 0) == "FRM8", F.id(head, 12) == "DSD " else { return nil }

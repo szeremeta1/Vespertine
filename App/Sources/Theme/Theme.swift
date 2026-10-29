@@ -27,6 +27,38 @@ enum Palette {
     static let brassGradient = LinearGradient(colors: [brassHi, brass], startPoint: .top, endPoint: .bottom)
 }
 
+/// Shared by the full and compact transports. Keep the brass face steady while the glyph waits for data.
+struct TransportPlayPauseFace: View {
+    var loading: Bool
+    var playing: Bool
+    var compact: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Group {
+            if loading {
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { context in
+                    ZStack {
+                        Circle().stroke(lineWidth: 1.5).opacity(0.2)
+                        Circle().trim(from: 0.08, to: 0.8).stroke(style: StrokeStyle(lineWidth: 1.5, lineCap: .round))
+                            .rotationEffect(.degrees(reduceMotion ? -90 : context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1) * 360))
+                    }
+                }
+                .frame(width: compact ? 12 : 15, height: compact ? 12 : 15)
+                .accessibilityHidden(true)
+            } else {
+                Image(systemName: playing ? "pause.fill" : "play.fill")
+                    .font(.system(size: compact ? 12 : 14))
+            }
+        }
+        .foregroundStyle(Color(hex: 0x1A140A))
+        .frame(width: compact ? 30 : 38, height: compact ? 30 : 38)
+        .background(Palette.brassGradient, in: Circle())
+        .overlay(Circle().strokeBorder(.white.opacity(0.35), lineWidth: 0.5).blendMode(.overlay))
+        .shadow(color: Palette.brass.opacity(0.28), radius: 9, y: 4)
+    }
+}
+
 /// Text and marks in a table row. The selected row of the list that has the keyboard is painted solid brass, and the
 /// light text and brass marks of the other columns all but vanished into it, so there they turn dark.
 struct RowForeground: ViewModifier {

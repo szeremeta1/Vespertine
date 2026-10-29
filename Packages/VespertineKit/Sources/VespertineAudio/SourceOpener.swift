@@ -61,6 +61,9 @@ public enum SourceOpenerError: Error, LocalizedError {
 /// Opened source before a plan is known.
 final class ProbedSource: @unchecked Sendable {
     let url: URL
+    /// Native decoders hold file descriptors too: retain the disk reservation until they release them,
+    /// including a fully decoded source still alive while the engine opens the next track.
+    private let cacheLease: NetworkPlaybackCache.Entry?
     let format: SourceFormat
     let decoderName: String
     fileprivate let pcm: PCMDecoding?
@@ -71,6 +74,7 @@ final class ProbedSource: @unchecked Sendable {
 
     fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil) {
         self.url = url
+        cacheLease = NetworkPlaybackCache.lookup(url)
         var format = format
         if format.channelLabels == nil {
             let layout = pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout
@@ -110,7 +114,7 @@ enum SourceOpener {
 
     /// The speakers of a DSF file's channel type (DSF specification 1.01, format chunk): nil for mono and stereo.
     static func dsfLabels(_ url: URL) -> [AudioChannelLabel]? {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return nil }
         defer { try? file.close() }
         guard let head = try? file.read(upToCount: 52), head.count == 52,
               String(decoding: head[0..<4], as: UTF8.self) == "DSD ", String(decoding: head[28..<32], as: UTF8.self) == "fmt " else { return nil }
@@ -368,7 +372,7 @@ enum SourceOpener {
 
     /// RF64 / BW64 (EBU Tech 3306, ITU-R BS.2088) or Sony Wave64, by the file's first bytes.
     static func isLargeWAV(_ url: URL) -> Bool {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return false }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return false }
         defer { try? file.close() }
         guard let head = try? file.read(upToCount: 12), head.count == 12 else { return false }
         let bytes = [UInt8](head)

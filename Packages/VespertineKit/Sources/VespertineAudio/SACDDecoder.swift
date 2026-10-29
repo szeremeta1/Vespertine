@@ -24,7 +24,7 @@ final class SACDFrameReader {
         var isDST: Bool
     }
 
-    private let handle: FileHandle
+    private let handle: PlaybackFile
     let area: SACDImage.Area
     /// The next sector to parse.
     private var sector: Int
@@ -39,7 +39,7 @@ final class SACDFrameReader {
     private static let readAhead = 32
 
     init(url: URL, area: SACDImage.Area) throws {
-        handle = try FileHandle(forReadingFrom: url)
+        handle = try PlaybackFile(forReadingFrom: url)
         self.area = area
         sector = area.firstSector
     }
