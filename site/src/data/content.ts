@@ -4,10 +4,10 @@
 import { app, links } from './app';
 
 export const description =
-  'Free, open-source Mac player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, and a bit-perfect signal path you can inspect.';
+  'Free, open-source Mac player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, room correction measured in your own room, and a bit-perfect signal path you can inspect.';
 
 export const hero = {
-  lede: `The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output. In English and ${app.languages} other languages.`,
+  lede: `The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. Room correction measures your room with a USB microphone and corrects each speaker; it’s off until you turn it on. A signal path shows each step from file to output. In English and ${app.languages} other languages.`,
   fine: 'Channel-for-channel output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.',
 };
 
@@ -59,7 +59,7 @@ export const scenes: Scene[] = [
     title: 'Every track at its native rate and depth.',
     lede: 'The signal path lists each step from the file to your DAC, read back from Core Audio, and says when something changed the samples.',
     body: [
-      'Vespertine switches the device to each file’s rate and resamples, with Apple’s mastering-quality converter, only when the DAC can’t run it. <span class="mono nowrap">BIT-PERFECT</span> appears only when the conditions in the source are met: a native rate, nothing changing the samples, a word length that fits, and a device that is exclusive or not shared with another app. PCM playback has been tested up to 384 kHz on a FiiO K11.',
+      'Vespertine switches the device to each file’s rate and resamples, with Apple’s mastering-quality converter, only when the DAC can’t run it. <span class="mono nowrap">BIT-PERFECT</span> appears only when the conditions in the source are met: a native rate, nothing changing the samples, a word length that fits, and a device that is exclusive or not shared with another app. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11.',
     ],
     list: [
       'Exclusive (hog) mode keeps other apps off the device. In shared mode the volume keys and the Digital Crown adjust your DAC; in exclusive mode they can too, if you turn that on.',
@@ -79,6 +79,28 @@ export const scenes: Scene[] = [
     shot: 'bit-perfect-fosi-zd3-24-96',
     alt: 'Vespertine playing Lazar Berman’s Liszt, Années de pèlerinage, from a 24-bit / 96 kHz FLAC: the inspector marks it bit-perfect and exclusive on a Fosi Audio ZD3, with each step of the signal path.',
     float: { shot: 'loopback-test', alt: 'The loopback test sheet: 24-bit at 44.1 and 96 kHz, 16-bit padded and a gapless pair, each bit-exact.', caption: 'Loopback test · software check' },
+  },
+  {
+    id: 'room-correction',
+    jack: 'Room correction',
+    kicker: 'Room correction',
+    title: 'Measure your room. Correct each speaker.',
+    lede: 'Measure your room with a UMIK-1 or another calibrated USB microphone, and Vespertine fits filters to each speaker from what it hears at your seat.',
+    body: [
+      'Sweeps play through one speaker at a time, at one to five spots around your listening seat. Each speaker gets its own filters, designed from the measurement. They are mostly cuts: they take down the room’s peaks and boost broad dips only gently. The same measurement sets each speaker’s delay and level, so every speaker reaches your seat at the same time and the same loudness. Room correction is off by default, and playback stays bit-perfect while it’s off. When it’s on, the signal path says <span class="mono nowrap">ROOM CORRECTION</span>.',
+    ],
+    list: [
+      'Three targets: Warm (the default), Gentle tilt and Flat. Correct the bass only or the full range, and redesign the filters later without measuring again.',
+      'Imports filters from REW or Equalizer APO, with each speaker’s delay and level, and exports Equalizer APO text.',
+      'Imports impulse responses (WAV, AIFF, CAF or FLAC) and plays them by convolution.',
+      'Stereo and 5.1.',
+      'The Room Portrait shows the speakers, your seat and each microphone spot as it’s measured. The Curve Reveal then turns the measured response into the predicted one, and a before/after switch compares them.',
+    ],
+    note: 'The “after” curve is predicted from the measurement and the filters, not measured. To see what the room really does, measure again with correction on.',
+    links: [{ href: links.roomCorrection, text: 'How room correction works' }],
+    shot: 'room-correction-predicted',
+    alt: 'Vespertine’s predicted room correction for a stereo pair with the Warm target: for each speaker, the measured response, the target and the predicted response after correction, with a room peak near 120 Hz cut by 14 and 18 dB, and each speaker’s filters.',
+    float: { shot: 'room-correction-portrait-detail', alt: 'The Room Portrait in the measurement wizard: left and right speakers, the seat, and five microphone spots around it, the first with the microphone on it.', caption: 'Room Portrait' },
   },
   {
     id: 'surround',
@@ -109,7 +131,7 @@ export const scenes: Scene[] = [
     ],
     list: [
       'Matched sacd_extract bit for bit on two real discs. Discs with a 5.0 area, only a multichannel area, or DSD128 and above are covered only by synthesized test images so far.',
-      'DSF and DSDIFF from DSD64 to DSD512, DST-compressed DSDIFF included, go out as DoP to DACs that take the carrier rate, or convert to high-rate PCM. DoP is confirmed on a FiiO K11; carrier rates above 384 kHz are untested on hardware.',
+      'DSF and DSDIFF from DSD64 to DSD512, DST-compressed DSDIFF included, go out as DoP to DACs that take the carrier rate, or convert to high-rate PCM. DoP is confirmed up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11; DSD512 over DoP is untested on hardware.',
       'DVD-Video LPCM at 16, 20 and 24 bits, 48 and 96 kHz, up to 8 channels. DVD-Audio isn’t supported, and encrypted (CSS) discs need a decrypted copy.',
     ],
     links: [{ href: links.dvd, text: 'DVD-Video details' }],
@@ -163,7 +185,7 @@ export const scenes: Scene[] = [
       'Remasters, mono and stereo releases and SACDs of one album share a card; choose the edition when you open it.',
       'Favorites and play counts, kept in the library and never written to your files. Imports M3U and Apple Music playlists, play counts and favorites.',
       'Tag editor with backups and one-step revert, plus MusicBrainz enrichment that shows its confidence before writing anything.',
-      'Network shares over SMB, NFS or WebDAV, with caching, Keep Offline and playback built for slow servers.',
+      'Network shares over SMB, NFS or WebDAV, with caching, Keep Offline and playback built for slow servers: tracks are buffered on your Mac before they play, with a loading ring on the play button while they do.',
       'Find Music searches every drive for your real music and leaves the clutter behind. A short setup on first launch picks your output and explains what exclusive access and ReplayGain do.',
       'Parametric EQ per output that imports AutoEQ and Equalizer APO presets. Off by default; when it’s on, the signal path says <span class="mono nowrap">EQUALIZER</span> instead of <span class="mono nowrap">BIT-PERFECT</span>.',
       'Mini player, menu-bar extra, media keys, ReplayGain and automatic, signed updates.',
@@ -180,7 +202,7 @@ export const scenes: Scene[] = [
     lede: `Every menu, setting and signal-path message is translated into ${app.languages} languages besides English.`,
     body: [
       'From Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats, and Simplified, Traditional and Hong Kong Chinese each with their own vocabulary. Arabic, Hebrew, Persian and Urdu get a right-to-left layout.',
-      'How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and every screen was reviewed in every language for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
+      'How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and the main screens were checked in several languages for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
     ],
     wall: true,
     shot: 'languages',
@@ -194,6 +216,7 @@ export const badges = [
   { text: '32 / 192' },
   { text: '44.1 → 48 <span class="unit">kHz</span>', tone: 'copper' },
   { text: 'DSD 128 · <span class="unit">DoP</span>' },
+  { text: 'Room correction', tone: 'copper' },
   { text: 'Spatial · head tracked' },
   { text: 'Synthetic high frequencies?', tone: 'copper' },
 ];
@@ -201,8 +224,8 @@ export const badges = [
 export const marquee = ['FLAC', 'DSD', 'SACD ISO', 'Dolby Atmos', 'DVD-Video', 'TrueHD', 'DTS-HD MA', 'ALAC', 'DTS CD', 'WavPack'];
 
 export const formats = [
-  { name: 'FLAC, ALAC, WAV, AIFF', text: 'Native rate and depth up to 32-bit and the rate your DAC runs (tested to 384 kHz); unchanged 32-bit PCM needs integer mode. CUE-sheet images.', ext: '.flac .m4a .wav .aiff .cue' },
-  { name: 'DSD64 – DSD512', text: 'DSF and DSDIFF, DST-compressed or plain. DoP depends on the DAC and carrier rate, otherwise PCM. DoP carrier rates above 384 kHz are untested on hardware.', ext: '.dsf .dff' },
+  { name: 'FLAC, ALAC, WAV, AIFF', text: 'Native rate and depth up to 32-bit and the rate your DAC runs (tested to 768 kHz); unchanged 32-bit PCM needs integer mode. CUE-sheet images.', ext: '.flac .m4a .wav .aiff .cue' },
+  { name: 'DSD64 – DSD512', text: 'DSF and DSDIFF, DST-compressed or plain. DoP depends on the DAC and carrier rate, otherwise PCM. DoP is tested to DSD256; DSD512 over DoP is untested on hardware.', ext: '.dsf .dff' },
   { name: 'SACD images', text: 'Stereo and multichannel areas, DST or plain, straight from the image; each song listed once with its stereo and 5.1 versions.', ext: '.iso' },
   { name: 'DVD-Video LPCM', text: '16, 20 and 24-bit at 48 and 96 kHz, 1 to 8 channels, bit for bit; one album per title, a track per chapter. DVD-Audio isn’t supported.', ext: '.iso VIDEO_TS' },
   { name: 'Dolby Atmos', text: 'Dolby Digital Plus with Atmos, rendered by macOS’s object renderer, or its decoded channel bed.', ext: '.ec3 .m4a .mp4' },
@@ -215,7 +238,7 @@ export const formats = [
 ];
 
 export const compare = {
-  intro: 'Several Mac players offer bit-perfect playback. This compares what each player’s own documentation or source code says. “Not documented” means the vendor doesn’t say either way, not that the feature is missing. Vespertine has no convolution, audio effect plugins or streaming services.',
+  intro: 'Several Mac players offer bit-perfect playback. This compares what each player’s own documentation or source code says. “Not documented” means the vendor doesn’t say either way, not that the feature is missing. Vespertine’s convolution is for room correction; it has no audio effect plugins or streaming services.',
   players: ['Vespertine', 'Apple Music (Mac)', 'Audirvana Studio / Origin', 'Roon', 'VeraVox', 'Colibri', 'Cog', 'foobar2000 for Mac'],
   rows: [
     ['Source code', 'GPL-3.0', 'Closed', 'Closed', 'Closed', 'Closed', 'Closed', 'GPL-2.0', 'Closed'],
@@ -227,7 +250,8 @@ export const compare = {
     ['Apple Spatial Audio for local surround', 'Yes', 'Catalog Atmos only³', 'Not documented', 'Not documented', 'Not documented', 'Not documented', 'Yes', 'Not documented'],
     ['Hi-res file analysis', 'Yes', 'No', 'AudioScan', 'Dynamic range, loudness', 'Yes', 'Not documented', 'No (live spectrum only)', 'No (live spectrum only)'],
     ['SACD ISO', 'Yes', 'No', 'Yes', 'No (DSF/DFF only)', 'Yes', 'No', 'No', 'No⁴'],
-    ['Convolution / audio effect plugins', 'No / No', 'No / No', 'Yes (Origin: paid option) / Audio Units', 'Yes / No', 'No / No', 'Not documented / Not documented', 'No / No', 'Not documented / Audio Units'],
+    ['Room correction', 'Measured in the app (USB mic), or REW / APO and impulse-response import', 'No', 'Via convolution (Origin: paid option) or Audio Units', 'Via convolution', 'No (by design)', 'Not documented', 'No', 'Not documented'],
+    ['Convolution / audio effect plugins', 'Yes (room correction) / No', 'No / No', 'Yes (Origin: paid option) / Audio Units', 'Yes / No', 'No / No', 'Not documented / Not documented', 'No / No', 'Not documented / Audio Units'],
     ['Streaming services', 'No', 'Apple Music', 'Studio: yes; Origin: no', 'Yes', 'No (local + UPnP)', 'No (internet radio)', 'No (internet radio)', 'No (internet radio)'],
   ],
   notes: [
@@ -260,6 +284,10 @@ export const faq = [
     a: `The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it. The decoders have automated tests (TrueHD against its source, DTS against FFmpeg’s own decoder), a built-in loopback test checks the software path sample by sample, and <span class="mono nowrap">vespertine-probe</span> lets you check your own hardware. <a href="${links.verification}">How to verify it yourself</a>.`,
   },
   {
+    q: 'Does it do room correction?',
+    a: `Yes. Measure your room with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level, in stereo or 5.1. It also imports REW and Equalizer APO filters and impulse responses. It’s off by default, playback stays bit-perfect while it’s off, and the signal path says <span class="mono nowrap">ROOM CORRECTION</span> while it’s on. <a href="${links.roomCorrection}">How room correction works</a>.`,
+  },
+  {
     q: 'Can it play SACD and DVD discs?',
     a: 'It plays their images. SACD <code>.iso</code> images, stereo and multichannel, DST-compressed or plain, and the LPCM music on DVD-Video images or <code>VIDEO_TS</code> folders play straight from the image, with nothing extracted. DVD-Audio isn’t supported, and encrypted (CSS) DVDs need a decrypted copy.',
   },
@@ -273,7 +301,7 @@ export const faq = [
   },
   {
     q: 'Which hardware has it been tested on?',
-    a: `Playback has been tested on a FiiO K11 at rates up to 384 kHz, with DoP and integer mode; AirPods Max over USB-C and Bluetooth; MacBook Pro speakers; and a Sony TV over HDMI in 5.1. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); <a href="${links.dacReport}">reports wanted</a>.`,
+    a: `PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11, where integer mode was tested too. It has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); <a href="${links.dacReport}">reports wanted</a>.`,
   },
   {
     q: 'Is it in my language?',

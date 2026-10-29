@@ -21,7 +21,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
 - **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:59` — "/// True only when every sample reaches the DAC unaltered."
-- **Text:** `README.md:39` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
+- **Text:** `README.md:40` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
 - **Route:** spec-traced (verdict group, float group, integer group, DoP group); hardware (`hardware/LOOPBACK.md`).
@@ -38,7 +38,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:21` — "Vespertine switches the device's nominal rate and reads it back from Core Audio. It doesn't trust its own request."
 - **Text:** `docs/VERIFICATION.md:42` — "The device values are read from Core Audio after playback starts:"
-- **Text:** `site/src/data/content.ts:260` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
+- **Text:** `site/src/data/content.ts:284` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
 - **Property:** the rate, physical format and hog owner that the verdict uses are the values Core Audio returned (`kAudioDevicePropertyNominalSampleRate`, `kAudioStreamPropertyPhysicalFormat`, `kAudioDevicePropertyHogMode`). If a readback fails, the verdict must not fall back to what Vespertine asked for.
 - **Governed by:** vespertine-rule; the meaning of each property comes from Apple's Core Audio headers (spec for the property semantics only).
 - **Route:** spec-traced (verdict group: a failed or stale readback must not yield BIT-PERFECT); source review recorded in `FINDINGS.md` (F-01). The readback itself happens in `OutputSession`, which needs a real device; see `hardware/LOOPBACK.md` step P1.
@@ -94,7 +94,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:36` — "Vespertine detects the cable through the IORegistry (`DeviceProfile.swift`) and treats 48 kHz files as bit-perfect on that device."
 - **Text:** `docs/FEATURES.md:53` — "AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz."
-- **Text:** `site/src/data/content.ts:148` — "48 kHz music plays bit-perfect"
+- **Text:** `site/src/data/content.ts:170` — "48 kHz music plays bit-perfect"
 - **Property:** with the cable connected, the device profile allows bit-perfect and 48 kHz unprocessed PCM gets the badge.
 - **Governed by:** vespertine-rule, resting on Apple's description of the USB-C path. The docs already say a loopback cannot confirm it.
 - **Route:** inventory. Detection needs the hardware, and no standard or loopback can check what happens inside the headphones.
@@ -110,7 +110,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-11 <a id="bp-says-what"></a>Otherwise the badge says what changed
 
 - **Text:** `docs/VERIFICATION.md:38` — "If any condition fails, the badge says what changed instead of BIT-PERFECT."
-- **Text:** `README.md:39` — "when something changed the samples it says what"
+- **Text:** `README.md:40` — "when something changed the samples it says what"
 - **Property:** when the verdict is false the status line is never BIT-PERFECT, NATIVE DSD · DoP or BITSTREAM · …, and it names a reason.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group: never a positive badge when a condition fails). Which reason is shown first is a UI choice and is inventory only.
@@ -139,8 +139,8 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-EQ-01 <a id="eq-label"></a>An active preset replaces BIT-PERFECT with EQUALIZER
 
 - **Text:** `docs/FEATURES.md:87` — "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
-- **Text:** `site/src/data/content.ts:168` — "Off by default; when it’s on, the signal path says"
-- **Text:** `README.md:51` — "when it is on the signal path says EQUALIZER."
+- **Text:** `site/src/data/content.ts:190` — "Off by default; when it’s on, the signal path says"
+- **Text:** `README.md:68` — "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -350,7 +350,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-SACD-01 <a id="sacd-match"></a>Matched sacd_extract bit for bit on two real discs
 
-- **Text:** `README.md:37` — "It matched sacd_extract bit for bit on two real discs."
+- **Text:** `README.md:38` — "It matched sacd_extract bit for bit on two real discs."
 - **Text:** `docs/FEATURES.md:7` — "Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit"
 - **Text:** `docs/ARCHITECTURE.md:31` — "Their TOCs, the raw DST frames, the decoded DSD of three tracks per area including adjacent ones, the DoP and PCM output, and random seeks were all identical."
 - **Property:** for those images, TOC data, raw DST frames, decoded DSD, DoP and PCM output equal what `sacd_extract` produces.
@@ -407,7 +407,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-RATE-01 <a id="rate-native"></a>The DAC runs at the track's own rate
 
 - **Text:** `docs/FEATURES.md:35` — "Vespertine switches the DAC to each track's native rate."
-- **Text:** `README.md:50` — "Switches your DAC to each file's sample rate"
+- **Text:** `README.md:67` — "Switches your DAC to each file's sample rate"
 - **Text:** `site/src/data/content.ts:62` — "Vespertine switches the device to each file’s rate and resamples"
 - **Property:** when the device lists the source rate and the policy is "match source", the planned device rate equals the source rate and nothing is resampled.
 - **Governed by:** vespertine-rule.
@@ -470,7 +470,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DEC-01 <a id="dec-lossless"></a>Lossless decoders are exact
 
 - **Text:** `docs/ARCHITECTURE.md:58` — "A test checks TrueHD decodes identically to the 24-bit source it was encoded from."
-- **Text:** `site/src/data/content.ts:209` — "Lossless, can be bit-perfect"
+- **Text:** `site/src/data/content.ts:232` — "Lossless, can be bit-perfect"
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.
@@ -482,7 +482,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-HIRES-01 <a id="hires-padding"></a>Zero padding is detected exactly
 
 - **Text:** `docs/FEATURES.md:59` — "Analysis detects zero-padded bit depth exactly."
-- **Text:** `site/src/data/content.ts:127` — "Only zero padding is exact"
+- **Text:** `site/src/data/content.ts:149` — "Only zero padding is exact"
 - **Text:** `docs/ANALYSIS.md:13` — "Every sample's lowest bits are zero. Exact."
 - **Property:** the reported effective bit depth is 24 minus the number of low bits that are zero in every sample.
 - **Governed by:** vespertine-rule (a definition, not a standard).
