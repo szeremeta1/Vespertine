@@ -25,11 +25,31 @@ private final class SlowShare: PlaybackCacheReader, @unchecked Sendable {
     var readCount: Int { gate.withLock { reads } }
 }
 
+private final class ReconnectingShare: PlaybackCacheReader, @unchecked Sendable {
+    let size: Int64 = 4096
+    var attempts = 0
+    func read(at offset: Int64, count: Int) throws -> Data {
+        attempts += 1
+        if attempts <= 2 { throw POSIXError(.ETIMEDOUT) }
+        return Data(repeating: 42, count: count)
+    }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return url
+    }
+
+    @Test("Temporary share errors retry the same bytes instead of terminating playback")
+    func reconnectingShare() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20)
+        let entry = try cache.entry(key: "retry", url: URL(fileURLWithPath: "/share/a.flac"), reader: ReconnectingShare())
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(try entry.read(at: 0, count: 4096) == Data(repeating: 42, count: 4096))
+        #expect(!entry.isWaiting)
     }
 
     @Test("A slow current track is completely local before output; a later outage makes no reads")

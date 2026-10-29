@@ -92,7 +92,7 @@ struct TransportControls: View {
                 }
                 .buttonStyle(.plain)
                 .keyboardShortcut(.space, modifiers: [.option])
-                .accessibilityLabel(player.loading ? String(localized: "Cancel") : player.isPlaying || player.waitingForDevice != nil ? String(localized: "Pause", comment: "Button: pause playback") : String(localized: "Play", comment: "Button: start playback"))
+                .accessibilityLabel(player.canCancelLoading ? String(localized: "Cancel") : player.isPlaying || player.waitingForDevice != nil ? String(localized: "Pause", comment: "Button: pause playback") : String(localized: "Play", comment: "Button: start playback"))
                 .accessibilityValue(player.loading ? String(localized: "BUFFERING…") : "")
                 Button { player.next() } label: { Image(systemName: "forward.end.fill").font(.system(size: 15)) }
                     .buttonStyle(TransportIconStyle())

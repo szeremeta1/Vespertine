@@ -34,6 +34,8 @@ public struct EngineSnapshot: Sendable {
     public var standingInFor: String?
     /// The track being decoded is read live from a network share (not yet from its local copy).
     public var readingFromShare = false
+    /// A complete local source, suitable for adopting into the optional persistent network cache.
+    public var localSourceURL: URL?
     /// How full the output buffer is (0…1): decoded audio not yet played.
     public var bufferFill: Double = 0
     /// Set while macOS itself renders the track (Dolby Atmos); there's no Vespertine signal path then.
@@ -330,7 +332,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// When audio last arrived from a network share (a share slow to answer but still delivering isn't dead).
-    public static var lastShareDelivery: Date { ReadAheadDecoder.lastDelivery }
+    public static var lastShareDelivery: Date { max(ReadAheadDecoder.lastDelivery, NetworkPlaybackCache.lastDelivery) }
 
     /// Network stalls: the output callback holds in silence when a streamed track's ring runs dry
     /// (the decoder waiting on the share) and resumes once `rebufferSeconds` are buffered: five at first
@@ -1521,6 +1523,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         let fromShare = decoding?.streaming == true
         let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0
         let system = atmos
+        let sourceItem = segment?.item ?? system?.item
+        let localSource = sourceItem.flatMap { item -> URL? in
+            guard stagedFolder == nil else { return nil }
+            if let entry = staged[cacheKey(item)] { return entry.isComplete ? entry.url : nil }
+            let url = resolve(item)
+            return url != item.url ? url : nil
+        }
         shared.withLock { s in
             s.snapshot.state = st
             s.snapshot.item = segment?.item ?? system?.item ?? parkedItem?.item
@@ -1534,6 +1543,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.waitingForDevice = waiting
             s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare
+            s.snapshot.localSourceURL = localSource
             s.snapshot.bufferFill = bufferFill
             s.snapshot.outputDevice = device
             if st == .stopped && parkedItem == nil { s.snapshot.item = nil; s.snapshot.position = 0; s.snapshot.signalPath = nil }

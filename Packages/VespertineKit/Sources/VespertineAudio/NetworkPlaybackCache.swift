@@ -40,6 +40,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     }
     private final class WeakEntry { weak var value: Entry?; init(_ value: Entry) { self.value = value } }
     private static let registry = Locked([String: WeakEntry]())
+    private static let delivered = Locked(Date.distantPast)
+    static var lastDelivery: Date { delivered.withLock { $0 } }
     static func lookup(_ url: URL) -> Entry? { registry.withLock { $0[url.path]?.value } }
 
     /// A process may have another Vespertine instance open. Clean only sessions whose advisory lease
@@ -238,6 +240,32 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         deinit { try? file.close(); try? FileManager.default.removeItem(at: url); release() }
         func cancel() { condition.withLock { cancelled = true; condition.broadcast() } }
 
+        private func readPart(at offset: Int64, count: Int) throws -> Data {
+            while true {
+                if condition.withLock({ cancelled }) { throw Failure.cancelled }
+                do { return try reader.read(at: offset, count: count) }
+                catch {
+                    // SMB/NFS can return a temporary POSIX failure during reconnection. Keep the local
+                    // lead playing and retry the same bytes; disk-write failures are never retried here.
+                    var cause = error as NSError
+                    var transient = false
+                    for _ in 0..<5 {
+                        if cause.domain == NSPOSIXErrorDomain,
+                           [Int(EIO), Int(EINTR), Int(ETIMEDOUT), Int(ENETDOWN), Int(ENETRESET),
+                            Int(ENOTCONN), Int(ECONNRESET), Int(EHOSTUNREACH)].contains(cause.code) {
+                            transient = true; break
+                        }
+                        guard let underlying = cause.userInfo[NSUnderlyingErrorKey] as? NSError else { break }
+                        cause = underlying
+                    }
+                    guard transient else { throw error }
+                    condition.lock()
+                    if !cancelled { _ = condition.wait(until: Date().addingTimeInterval(0.25)) }
+                    condition.unlock()
+                }
+            }
+        }
+
         func ensure(offset: Int64, count: Int64, cancelled shouldCancel: () -> Bool) throws {
             guard count > 0 else { return }
             let range = Int(offset / Int64(chunk))..<Int((offset + count - 1) / Int64(chunk) + 1)
@@ -277,8 +305,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         var data = Data()
                         while data.count < length {
                             if condition.withLock({ cancelled }) { return }
-                            let part = try reader.read(at: offset + Int64(data.count), count: length - data.count)
+                            let part = try readPart(at: offset + Int64(data.count), count: length - data.count)
                             guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
+                            NetworkPlaybackCache.delivered.withLock { $0 = .now }
                             data.append(part)
                         }
                         try file.seek(toOffset: UInt64(offset))

@@ -114,12 +114,14 @@ final class PlayerController {
     /// A resume also gives up after half a minute: unlike a pause, the engine can decline it (nothing left to resume).
     @ObservationIgnored private var requestedState: (state: PlaybackState, from: PlaybackState, at: Date)?
     @ObservationIgnored private var pollTask: Task<Void, Never>?
+    @ObservationIgnored private var adoptedSource: UUID?
     /// The Discord status, while Settings › Online turns it on.
     let discord = DiscordPresence()
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
     var isPlaying: Bool { state == .playing }
-    var loading: Bool { buffering || (requested != nil && current.map { shares.isNetwork($0.track) } == true) }
+    var loading: Bool { (buffering && state != .paused) || (requested != nil && current.map { shares.isNetwork($0.track) } == true) }
+    var canCancelLoading: Bool { loading && requested != nil }
     var upcoming: ArraySlice<QueueEntry> {
         guard let i = currentIndex, i + 1 < queue.count else { return [] }
         return queue[(i + 1)...]
@@ -453,7 +455,7 @@ final class PlayerController {
     }
 
     func togglePlayPause() {
-        if loading { stop(); return }
+        if canCancelLoading { stop(); return }
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
         switch state {
@@ -597,8 +599,8 @@ final class PlayerController {
         if cache.yieldsToPlayback != yielding { cache.yieldsToPlayback = yielding }
     }
 
-    private func poll() {
-        let snap = engine.snapshot
+    func poll(_ snapshot: EngineSnapshot? = nil) {
+        let snap = snapshot ?? engine.snapshot
         if let requestedState, snap.state != requestedState.from
             || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
             self.requestedState = nil
@@ -638,6 +640,11 @@ final class PlayerController {
         syncVolumeRelay()
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
+        if settings.networkCache, let current, current.id == snap.item?.id, adoptedSource != current.id,
+           shares.isNetwork(current.track), !current.track.isDVDFolderTrack, let local = snap.localSourceURL,
+           shares.cache.adopt(current.track, from: local) {
+            adoptedSource = current.id
+        }
         yieldShareToPlayback(snap)
         yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
