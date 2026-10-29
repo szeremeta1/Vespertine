@@ -243,6 +243,10 @@ html:not(.js) .features::before {
 }
 .hero__lede { font-size: clamp(17.5px, 1.4vw, 20px); line-height: 1.6; color: #d8d1c4; max-width: 36em; margin-bottom: 30px; }
 .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
+.hero__ask { font-size: 14px; color: var(--muted); margin: 16px 0 0; }
+.hero__ask a { color: var(--brass-hi); text-decoration-color: rgba(231, 205, 152, .4); text-underline-offset: 3px; }
+.hero__ask a:hover { text-decoration-color: currentColor; }
+.hero__ask + .hero__meta { margin-top: 10px; }
 .hero__meta { font-size: 13px; letter-spacing: .02em; color: var(--muted); margin: 16px 0 0; }
 .hero__meta b { color: var(--ink); font-weight: 500; }
 .brew {
