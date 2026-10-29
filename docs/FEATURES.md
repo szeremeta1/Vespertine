@@ -32,7 +32,7 @@ The [loopback test](LOOPBACK.md) (Settings › Playback, or Controls › Loopbac
 
 ![24-bit / 96 kHz FLAC, bit-perfect on a Fosi Audio ZD3, with its signal path](screenshots/bit-perfect-fosi-zd3-24-96.png)
 
-Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 384 kHz on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate. Per-device settings can match the source, use the device maximum, or force a rate.
+Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate. Per-device settings can match the source, use the device maximum, or force a rate.
 
 Shared output keeps the Mac's volume controls available. By default the selected playback device also becomes the Mac's sound output; Settings can disable that. Exclusive (hog) mode keeps other apps off the device and releases it after a configurable pause. While Vespertine holds a device, macOS moves the Mac's sound output to another one, and the volume keys, Control Center and the AirPods Max Digital Crown adjust that output. "Volume keys control the device held exclusively" (Settings › Playback › Output, off by default) carries their changes to the held device by way of that output, which then plays other apps' sounds at the device's level; when Vespertine lets go, or the setting is turned off, that output gets its own volume and mute back. DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play. The built-in speakers and headphone jack use shared mode. Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.
 
@@ -46,7 +46,7 @@ Vespertine remembers the output you chose. If it isn't connected, Settings › P
 
 ## DSD and AirPods Max
 
-DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DoP has only been confirmed on a FiiO K11; carrier rates above 384 kHz have not been tested on hardware. DSD256/512 file support does not establish native playback at those rates on a real DAC.
+DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DACs known to take it (the FiiO K11 and Fosi Audio ZD3) start with it on. DoP has been confirmed up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11; DSD512 over DoP has not been tested on hardware. DSD512 file support does not establish native playback at that rate on a real DAC.
 
 ![A DSD128 file playing natively over DoP on a Fosi Audio ZD3](screenshots/dsd-native-dop.png)
 
@@ -84,7 +84,7 @@ The tag editor handles single files or batches through TagLib, including artwork
 
 ## EQ, meters and controls
 
-The parametric EQ has up to 20 peak, shelf, low-pass and high-pass bands plus a preamp. It runs in 64-bit and dithers to the DAC's word length. Import AutoEQ `ParametricEQ.txt` or Equalizer APO configurations, inspect the curve and clipping risk, and choose a preset per output. It is off by default. An active preset that changes samples replaces BIT-PERFECT with EQUALIZER. Convolution and audio effect plugins are not supported.
+The parametric EQ has up to 20 peak, shelf, low-pass and high-pass bands plus a preamp. It runs in 64-bit and dithers to the DAC's word length. Import AutoEQ `ParametricEQ.txt` or Equalizer APO configurations, inspect the curve and clipping risk, and choose a preset per output. It is off by default. An active preset that changes samples replaces BIT-PERFECT with EQUALIZER. Audio effect plugins are not supported; convolution is available only as part of [room correction](ROOM-CORRECTION.md) (from 0.14).
 
 EQ does not process DoP, system-rendered Atmos, or the experimental receiver bitstream path, which is untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.
 
@@ -106,8 +106,8 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 
 | Format | Files | Path |
 |---|---|---|
-| FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate when the DAC supports it; PCM hardware tested to 384 kHz. Unchanged 32-bit PCM needs integer mode. |
-| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. Hardware carrier rates above 384 kHz are untested. |
+| FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate when the DAC supports it; PCM hardware tested to 768 kHz. Unchanged 32-bit PCM needs integer mode. |
+| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. DoP is hardware-tested to DSD256; DSD512 over DoP is untested. |
 | SACD images | `.iso` (stereo and multichannel areas, DST or plain) | DSD64, the same way as DSF and DSDIFF; each song listed once with its stereo and 5.1 versions |
 | DVD-Video LPCM | DVD `.iso`, or a `VIDEO_TS` folder (added with Add Folder) | 16/20/24-bit, 48/96 kHz, 1–8 channels within DVD-Video's limit, bit for bit; one album per title, a track per chapter. DVD-Audio (`AUDIO_TS`, MLP, DVD-Audio PCM) is not supported. [Details](DVD-VIDEO-LPCM.md) |
 | Dolby Atmos | DD+ with Atmos in `.ec3` `.m4a` `.mp4` | macOS object renderer, or decoded channel bed |
@@ -118,4 +118,4 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 | APE, WavPack, TTA | `.ape` `.wv` `.tta` | Lossless PCM; DSD inside WavPack is unsupported |
 | Opus, Vorbis, Musepack, MP3, AAC | `.opus` `.ogg` `.mpc` `.mp3` `.m4a` | Decoded and marked lossy |
 
-TrueHD decoder fixtures are compared sample for sample with their source; DTS output is compared with FFmpeg's decoder on a real disc rip. Tested playback hardware is a FiiO K11, AirPods Max over USB-C and Bluetooth, and MacBook Pro speakers. The Intel build has run under Rosetta, not on an Intel Mac. No streaming services or DRM-protected Apple Music downloads. [Verification and its limits](VERIFICATION.md).
+TrueHD decoder fixtures are compared sample for sample with their source; DTS output is compared with FFmpeg's decoder on a real disc rip. Tested playback hardware is a Fosi Audio ZD3, a FiiO K11, AirPods Max over USB-C and Bluetooth, MacBook Pro speakers and a Sony TV over HDMI ([details](DEVICES.md)). The Intel build has run under Rosetta, not on an Intel Mac. No streaming services or DRM-protected Apple Music downloads. [Verification and its limits](VERIFICATION.md).
