@@ -1,0 +1,365 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Pic from '../components/Pic.astro';
+import SplitWords from '../components/SplitWords.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import GitHubButton from '../components/GitHubButton.astro';
+import Brew from '../components/Brew.astro';
+import { DEFER_IMAGES } from '../inline-scripts.mjs';
+import italicFont from '../assets/fonts/newsreader-italic.woff2?url';
+import { SITE, app, latest, releases, links } from '../data/app';
+import { content, vars } from '../data/content';
+import { notesToHtml } from '../lib/text';
+import { homeGraph } from '../lib/seo';
+import NameWall from '../components/NameWall.astro';
+import { shot, sceneShots, trailerPoster, TRAILER as trailer } from '../lib/shots';
+import { t, fill, longDate, megabytes, releaseText, isRtl, runDir, DEFAULT_LOCALE, type Lang } from '../i18n';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const s = t(lang);
+const h = s.home;
+const v = vars(lang);
+const f = (x: string, more: Record<string, string | number> = {}) => fill(x, { ...v, version: latest.version, ...more });
+const { description, hero, pillars, scenes, badges, marquee, formats, compare, faq, support } = content(lang);
+
+const title = h.title;
+const n = (i: number) => new Intl.NumberFormat(lang, { minimumIntegerDigits: 2 }).format(i + 1);
+
+// Absolute URLs of real screenshots for the JSON-LD, and the trailer poster.
+const screenshots = await sceneShots(lang);
+const poster = await trailerPoster();
+
+const now = releaseText(lang, latest);
+const notes = notesToHtml(now.notes, { skip: ['Install'] });
+const jsonLd = homeGraph({ lang, title, screenshots, trailer: SITE + trailer, poster: SITE + poster.src });
+// English text inside a translated page says so, for screen readers and hyphenation.
+const en = (english: boolean) => (english ? { lang: 'en', dir: 'ltr' } : {});
+
+// The hero headline's three lines are set as large as English's: lines that run longer (wide CJK glyphs, long German
+// or Tamil words) scale the headline down so each line still fits, estimated from each script's typical glyph width.
+const ems = (line: string) => [...line].reduce((w, c) =>
+  w + (/\p{Mn}/u.test(c) ? 0 : /[\u1100-\u11FF\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFF00-\uFFEF]/u.test(c) ? 1 : /[\u0B80-\u0D7F\u1200-\u139F]/u.test(c) ? 0.68 : /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFEFF]/u.test(c) ? 0.36 : /[฀-๿]/u.test(c) ? 0.58 : /[A-Z]/.test(c) ? 0.62 : /\s/.test(c) ? 0.24 : /[.,·:;!?'’]/.test(c) ? 0.24 : 0.47), 0);
+// Urdu is set in Nastaliq, which runs about a third wider than the Naskh the Arabic estimate is based on.
+const longest = Math.max(...[...h.hero.titleLines, h.hero.titleBrass].map(ems)) * (lang === 'ur' ? 1.35 : 1);
+const fit = (room: number) => Math.min(1, room / longest).toFixed(3);
+const heroFit = lang === DEFAULT_LOCALE ? undefined : `--fit:${fit(6)};--fit-s:${fit(6.4)}`;
+
+const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width: 900px) calc(100vw - 72px), min(700px, 54vw)' };
+---
+<Base
+  lang={lang}
+  page="home"
+  title={title}
+  description={description}
+  og="home"
+  ogAlt={f(h.ogAlt)}
+  jsonLd={jsonLd}
+>
+<link slot="head" rel="preload" as="font" type="font/woff2" crossorigin href={italicFont}>
+<a class="skip" href="#main">{s.common.skip}</a>
+
+<Nav lang={lang} page="home" home />
+
+<main id="main" class="route-host" tabindex="-1" data-motion>
+  <svg class="route" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-route" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#E7CD98"/>
+        <stop offset=".5" stop-color="#C8A66A"/>
+        <stop offset="1" stop-color="#C98B5B"/>
+      </linearGradient>
+      <radialGradient id="g-head">
+        <stop offset="0" stop-color="#fffaf0"/>
+        <stop offset=".25" stop-color="#F3DDAE"/>
+        <stop offset=".5" stop-color="#C8A66A" stop-opacity=".45"/>
+        <stop offset="1" stop-color="#C8A66A" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <path class="route__bed"/>
+    <path class="route__halo"/>
+    <path class="route__live" stroke="url(#g-route)"/>
+    <g class="route__branches"></g>
+    <circle class="route__head" r="16"/>
+  </svg>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title" data-placement="hero">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow hero__eyebrow">
+          {h.hero.eyebrow.map((e) => <span>{lang === DEFAULT_LOCALE ? f(e) : <bdi dir={runDir(f(e))}>{f(e)}</bdi>}</span>)}
+        </p>
+        <h1 class="hero__title" id="hero-title" style={heroFit}>
+          <span class="sr-only">{h.hero.titleSr}</span>
+          <span aria-hidden="true">
+            {h.hero.titleLines.map((l, i) => <span class="line"><span style={`--i:${i}`}>{l}</span></span>)}
+            <span class="line"><span style={`--i:${h.hero.titleLines.length}`}><span class="brass-italic">{h.hero.titleBrass}</span></span></span>
+          </span>
+        </h1>
+        <p class="hero__lede">{hero.lede}</p>
+        <div class="hero__cta">
+          <DownloadButton lang={lang} />
+          <GitHubButton lang={lang} />
+        </div>
+        <p class="hero__ask">{h.hero.ask} <a href={links.repo}>{h.hero.star}</a> · <a href={links.discussions}>{h.hero.discuss}</a></p>
+        <p class="hero__meta mono"><b>{f(h.hero.version)}</b> · {isRtl(lang) ? <bdi>{megabytes(lang, latest.dmg.size)}</bdi> : megabytes(lang, latest.dmg.size)} · {longDate(lang, latest.date)} · {h.hero.signed} · <a href={latest.url} class="nowrap">{h.hero.releaseNotes}</a></p>
+        <Brew lang={lang} />
+        <p class="hero__fine">{hero.fine} <a href={v['href.privacy']}>{h.hero.privacy}</a></p>
+      </div>
+
+      <figure class="hero__panel">
+        <div class="panel">
+          <Pic
+            src={shot('bit-perfect-fosi-zd3-24-96-detail')}
+            widths={[360, 542]}
+            sizes="(max-width: 900px) min(340px, calc(100vw - 52px)), 380px"
+            priority
+            avifQuality={64}
+            webpQuality={82}
+            alt={h.hero.panelAlt}
+          />
+        </div>
+        <figcaption class="mono panel__cap">
+          <span class="live">{h.hero.panelCaption}</span>
+          <span dir="ltr">Fosi Audio ZD3 · 24 / 96</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <nav class="wrap patchbay" aria-labelledby="patch-label">
+      <div class="patchbay__origin">
+        <span class="origin-node" data-route-origin aria-hidden="true"></span>
+        <p class="eyebrow" id="patch-label">{h.hero.followSignal}</p>
+      </div>
+      <ul class="patchbay__jacks">
+        {scenes.map((sc, i) => <li style={`--i:${i}`}><a class="jack" href={`#${sc.id}`} data-route-to={sc.id}><span class="jack__n">{n(i)}</span>{sc.jack}</a></li>)}
+      </ul>
+    </nav>
+  </section>
+
+  <!-- TRAILER -->
+  <section class="section" id="trailer" aria-labelledby="trailer-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.trailer.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="trailer-title"><SplitWords lang={lang} text={h.trailer.title} /></h2>
+        <p>{h.trailer.text}</p>
+      </div>
+      <figure class="video">
+        <video controls playsinline preload="none" poster={poster.src} width="1920" height="1080" aria-label={s.common.trailerLabel}>
+          <source src={trailer} type="video/mp4">
+          <a href={trailer}>{h.trailer.fallback}</a>
+        </video>
+        <figcaption class="media-cap mono">{h.trailer.caption}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features section" id="features" aria-labelledby="features-title">
+    <div class="wrap section-head">
+      <p class="eyebrow">{h.features.eyebrow}</p>
+      <h2 class="section-title" id="features-title"><SplitWords lang={lang} text={h.features.title} /></h2>
+      <p>{h.features.text}</p>
+    </div>
+    <div class="wrap">
+      <ul class="cards" data-reveal>
+        {pillars.map((p) => (
+          <li class="card spot">
+            <svg viewBox="0 0 34 34" aria-hidden="true"><path d={p.icon}/></svg>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="badges" aria-label={h.features.badgesLabel} role="list" style="margin-top:28px">
+        {badges.map((b) => <span role="listitem" class:list={['badge', b.tone]} dir={lang === DEFAULT_LOCALE ? undefined : 'auto'} set:html={b.text} />)}
+      </div>
+    </div>
+
+    {scenes.map((sc, i) => (
+      <article class:list={['scene', `scene--${sc.id}`, { 'scene--flip': i % 2 === 1 && !sc.wall, 'scene--wall': sc.wall }]} id={sc.id} data-node={sc.id} aria-labelledby={`${sc.id}-title`}>
+        <div class="scene__num" aria-hidden="true">{n(i)}</div>
+        <div class="wrap scene__grid">
+          <div class="scene__copy">
+            <span class="node" aria-hidden="true"></span>
+            <p class="kicker mono"><span>{n(i)}</span> {sc.kicker}</p>
+            <h3 class="scene__title" id={`${sc.id}-title`}>{sc.title}</h3>
+            <p class="scene__lede">{sc.lede}</p>
+            {sc.body.map((p) => <p set:html={p} />)}
+            {sc.list && <ul class="ticks">{sc.list.map((li) => <li set:html={li} />)}</ul>}
+            {sc.note && <p class="scene__note">{sc.note}</p>}
+            {sc.links && <p class="links">{sc.links.map((l) => <a href={l.href}>{l.text} <span class="ext-arrow" aria-hidden="true">↗</span></a>)}</p>}
+          </div>
+          {sc.wall ? <NameWall label={sc.wallLabel} /> : <div class:list={['scene__media', { 'scene__media--float': !!sc.float }]}>
+            <figure class="display" data-parallax="-5">
+              <div class="display__screen">
+                <Pic src={shot(sc.shot)} alt={sc.alt} {...display} />
+              </div>
+              <div class="display__stand" aria-hidden="true"></div>
+            </figure>
+            {sc.float && (
+              <figure class="float-card" data-parallax="9">
+                <Pic src={shot(sc.float.shot)} alt={sc.float.alt} widths={[300, 600]} sizes="(max-width: 900px) 48vw, 290px" />
+                <figcaption class="mono">{sc.float.caption}</figcaption>
+              </figure>
+            )}
+          </div>}
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <div class="marquee" aria-hidden="true" dir="ltr">
+    <div class="marquee__track">
+      {[...marquee, ...marquee].map((w) => <span>{w}</span>)}
+    </div>
+  </div>
+
+  <!-- FORMATS -->
+  <section class="section" id="formats" aria-labelledby="formats-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.formats.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="formats-title"><SplitWords lang={lang} text={h.formats.title} /></h2>
+        <p>{h.formats.text}</p>
+      </div>
+      <div class="table formats">
+        <table>
+          <caption class="sr-only">{h.formats.caption}</caption>
+          <tbody>
+            {formats.map((fm) => <tr><th scope="row">{fm.name}</th><td>{fm.text}<span class="ext" dir="ltr">{fm.ext}</span></td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="section" id="compare" aria-labelledby="compare-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.compare.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="compare-title"><SplitWords lang={lang} text={h.compare.title} /></h2>
+        <p>{compare.intro}</p>
+      </div>
+      <div class="compare-wrap">
+        <p class="compare-hint" aria-hidden="true">{h.compare.hint}</p>
+        <div class="compare" role="region" aria-label={h.compare.region} tabindex="0">
+          <table>
+            <caption class="sr-only">{h.compare.caption}</caption>
+            <thead><tr><th scope="col">{h.compare.feature}</th>{compare.players.map((p, i) => <th scope="col" class:list={{ us: i === 0 }}>{p}</th>)}</tr></thead>
+            <tbody>
+              {compare.rows.map(([label, ...cells]) => <tr><th scope="row">{label}</th>{cells.map((c, i) => <td class:list={{ us: i === 0 }}>{c}</td>)}</tr>)}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="compare-note">
+        {compare.notes.map((x) => <p set:html={x} />)}
+        <p set:html={f(h.compare.sources)} />
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW -->
+  <section class="section" id="whats-new" aria-labelledby="new-title" data-placement="whats-new">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.whatsNew.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="new-title"><SplitWords lang={lang} text={f(h.whatsNew.title)} /></h2>
+      </div>
+      <div class="releases">
+        <article class="release" aria-labelledby="latest-v">
+          <p class="release__tag mono eyebrow"><span>{h.whatsNew.latest}</span> <time datetime={latest.date}>{longDate(lang, latest.date)}</time></p>
+          <h3 class="release__v" id="latest-v">Vespertine {latest.version}</h3>
+          <p class="release__summary" {...en(now.summaryEnglish)}>{now.summary}</p>
+          {now.notesEnglish && <p class="release__english">{h.whatsNew.inEnglish}</p>}
+          <div class="notes" {...en(now.notesEnglish)} set:html={notes} />
+          <div class="hero__cta" style="margin-top:28px">
+            <DownloadButton lang={lang} label={f(s.common.downloadVersion)} />
+            <a class="btn btn--text" href={latest.url}>{h.whatsNew.fullNotes} <span class="ext-arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <p class="hero__meta mono"><span dir="ltr">{latest.dmg.name}</span> · {megabytes(lang, latest.dmg.size)} · <Fragment set:html={f(h.whatsNew.meta)} /></p>
+        </article>
+        <div>
+          <h3 class="eyebrow" style="margin-bottom:16px">{h.whatsNew.earlier}</h3>
+          <ol class="history" data-reveal>
+            {releases.slice(1).map((r) => {
+              const rt = releaseText(lang, r);
+              return (
+                <li>
+                  <div><span class="v"><a href={r.url}>{r.version}</a></span><time datetime={r.date}>{longDate(lang, r.date)}</time></div>
+                  <p {...en(rt.summaryEnglish)}>{rt.summary}</p>
+                </li>
+              );
+            })}
+          </ol>
+          <p class="links" style="margin-top:18px"><a href={links.releases}>{h.whatsNew.every} <span class="ext-arrow" aria-hidden="true">↗</span></a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.faq.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="faq-title"><SplitWords lang={lang} text={h.faq.title} /></h2>
+      </div>
+      <div class="faq">
+        {faq.map((x) => <div><h3>{x.q}</h3><p set:html={x.a} /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="section" id="support" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">{h.support.eyebrow}</p>
+        <h2 class="section-title section-title--sm" id="support-title"><SplitWords lang={lang} text={h.support.title} /></h2>
+        <p>{h.support.text}</p>
+      </div>
+      <ul class="cards" data-reveal>
+        {support.map((c) => (
+          <li class="card spot">
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+            <p class="links"><a href={c.href}>{c.cta} <span class="ext-arrow" aria-hidden="true">↗</span></a></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing" aria-labelledby="closing-title" data-placement="closing">
+    <div class="closing__glow" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">{h.closing.eyebrow}</p>
+      <h2 class="closing__title" id="closing-title"><SplitWords lang={lang} text={h.closing.title} /></h2>
+      <div class="hero__cta">
+        <DownloadButton lang={lang} />
+        <GitHubButton lang={lang} label={s.common.reportIssue} href={links.newIssue} />
+      </div>
+      <p class="hero__meta mono">{[...h.closing.meta.map((x) => f(x)), s.common.arch].join(' · ')}</p>
+      <Brew lang={lang} />
+    </div>
+  </section>
+</main>
+
+<Footer lang={lang} page="home" home />
+
+<script>
+  import '../scripts/main';
+</script>
+<script is:inline set:html={DEFER_IMAGES} />
+</Base>

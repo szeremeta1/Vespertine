@@ -9,8 +9,9 @@ export default defineConfig({
   site: 'https://vespertineapp.com',
   // GitHub Pages serves /press.html at /press too. Keeping the .html files keeps every URL the old site had
   // (and that release notes, the README and search engines link to) working, with no redirects needed.
-  build: { format: 'file', inlineStylesheets: 'always' },
-  trailingSlash: 'never',
+  // 'preserve' builds pages/[lang]/index.astro as /de/index.html, so each language's home page is /de/.
+  build: { format: 'preserve', inlineStylesheets: 'always' },
+  trailingSlash: 'ignore',
   security: {
     csp: {
       directives: [

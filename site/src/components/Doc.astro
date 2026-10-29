@@ -6,11 +6,13 @@ import Footer from './Footer.astro';
 import { SITE } from '../data/app';
 import { innerGraph } from '../lib/seo';
 import { sceneShots } from '../lib/shots';
+import { t, pagePath, type Lang, type Page } from '../i18n';
 
 interface Props {
+  lang: Lang;
+  page: Page;
   title: string;
   description: string;
-  path: string;
   og: string;
   ogAlt: string;
   eyebrow: string;
@@ -19,12 +21,12 @@ interface Props {
   /** Effective date, YYYY-MM-DD. */
   date: string;
 }
-const { title, description, path, og, ogAlt, eyebrow, type, date } = Astro.props;
-const jsonLd = innerGraph({ path, title, crumb: eyebrow, description, type, dateModified: date, image: `${SITE}/og/${og}.jpg`, screenshots: await sceneShots() });
+const { lang, page, title, description, og, ogAlt, eyebrow, type, date } = Astro.props;
+const jsonLd = innerGraph({ lang, path: pagePath(lang, page), title, crumb: eyebrow, description, type, dateModified: date, image: `${SITE}/og/${og}.jpg`, screenshots: await sceneShots(lang) });
 ---
-<Base title={title} description={description} path={path} og={og} ogAlt={ogAlt} jsonLd={jsonLd}>
-<a class="skip" href="#main">Skip to content</a>
-<Nav current={path} />
+<Base lang={lang} page={page} title={title} description={description} og={og} ogAlt={ogAlt} jsonLd={jsonLd}>
+<a class="skip" href="#main">{t(lang).common.skip}</a>
+<Nav lang={lang} page={page} />
 <main id="main" tabindex="-1">
   <header class="page-head">
     <div class="grain" aria-hidden="true"></div>
@@ -41,7 +43,7 @@ const jsonLd = innerGraph({ path, title, crumb: eyebrow, description, type, date
     </div>
   </article>
 </main>
-<Footer />
+<Footer lang={lang} page={page} />
 <script>
   import '../scripts/main';
 </script>

@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "Ruka hadi maudhui",
+    "tagline": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res.",
+    "requires": "macOS {minMacOS} au mpya zaidi.",
+    "arch": "Apple silicon na Intel",
+    "download": "Pakua kwa Mac",
+    "downloadVersion": "Pakua {version}",
+    "sourceOnGitHub": "Msimbo chanzo kwenye GitHub",
+    "reportIssue": "Ripoti tatizo",
+    "brewLead": "Au kwa Homebrew:",
+    "copy": "Nakili",
+    "copyLabel": "Nakili amri ya Homebrew",
+    "copied": "Imenakiliwa",
+    "copyFailed": "Ichague",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus na Dolby TrueHD ni alama za biashara za Dolby Laboratories. DTS, DTS-HD Master Audio na DTS:X ni alama za biashara za DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS na Spatial Audio ni alama za biashara za Apple Inc. Vespertine inazitaja tu ili kueleza inachocheza na inapocheza; haina cheti, leseni wala uidhinishaji kutoka kwa Dolby, DTS au Apple.",
+    "trailerLabel": "Trela ya Vespertine, sekunde 44",
+    "untested": "Utoaji wa sauti chaneli kwa chaneli na bitstream kwa resiva ni vya kimajaribio, havijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
+  },
+  "nav": {
+    "label": "Menyu kuu",
+    "home": "Vespertine, ukurasa wa mwanzo",
+    "top": "Vespertine, rudi juu",
+    "features": "Vipengele",
+    "formats": "Fomati",
+    "compare": "Linganisha",
+    "whatsNew": "Yaliyo mapya",
+    "faq": "Maswali",
+    "press": "Kwa wanahabari",
+    "download": "Pakua",
+    "downloadLabel": "Pakua Vespertine {version} kwa Mac"
+  },
+  "lang": {
+    "label": "Lugha",
+    "menuLabel": "Chagua lugha",
+    "current": "Lugha ya sasa"
+  },
+  "footer": {
+    "project": "Mradi",
+    "about": "Kuhusu",
+    "releaseNotes": "Maelezo ya matoleo",
+    "sponsor": "Dhamini",
+    "discussions": "Majadiliano",
+    "architecture": "Usanifu",
+    "privacy": "Faragha",
+    "terms": "Masharti",
+    "license": "Leseni (GPL-3.0)",
+    "notices": "Taarifa za wahusika wengine",
+    "ukraine": "<strong>Vespertine iko pamoja na Ukraine.</strong> Tafadhali changia kupitia {orgs}.",
+    "copyright": "© {year} Wachangiaji wa Vespertine",
+    "free": "Programu huria chini ya GPL",
+    "madeIn": "Imetengenezwa Boston na {author}",
+    "backToTop": "Rudi juu",
+    "home": "Mwanzo"
+  },
+  "home": {
+    "title": "Vespertine: kicheza muziki wa sauti ya kuzunguka na hi-res kwa Mac",
+    "description": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya sauti ya kuzunguka na hi-res: nakala za diski za SACD na DVD-Video, DSD, CD za DTS, faili za DTS-HD MA, TrueHD na Dolby Atmos, Spatial Audio kwenye AirPods, urekebishaji wa chumba unaopimwa ndani ya chumba chako mwenyewe, na njia ya mawimbi ya bit-perfect unayoweza kuikagua.",
+    "ogAlt": "Vespertine: kicheza muziki cha Mac, bila malipo na programu huria, kwa muziki wa sauti ya kuzunguka na hi-res. Njia yake ya mawimbi inaonyesha FLAC ya biti 24 / 96 kHz ikicheza bit-perfect kwenye Fosi Audio ZD3. Toleo {version}, macOS {minMacOS} au mpya zaidi.",
+    "hero": {
+      "eyebrow": [
+        "Bila malipo na programu huria",
+        "macOS {minMacOS}+",
+        "Apple silicon na Intel"
+      ],
+      "titleSr": "Muziki wa sauti ya kuzunguka na hi-res, kwenye Mac yako.",
+      "titleLines": [
+        "Muziki wa sauti",
+        "ya kuzunguka na hi-res,"
+      ],
+      "titleBrass": "kwenye Mac yako.",
+      "lede": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, DSD, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos hukaa kwenye maktaba moja pamoja na albamu zako za stereo, na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Urekebishaji wa chumba hupima chumba chako kwa maikrofoni ya USB na kurekebisha kila spika; umezimwa hadi utakapouwasha. Njia ya mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti. Kwa Kiingereza na lugha nyingine {languages}.",
+      "ask": "Umeipenda?",
+      "star": "Ipe nyota kwenye GitHub",
+      "discuss": "Jiunge na majadiliano",
+      "version": "Toleo {version}",
+      "signed": "imetiwa sahihi na kuthibitishwa rasmi",
+      "releaseNotes": "Maelezo ya matoleo",
+      "privacy": "Faragha: hakuna kinachokusanywa.",
+      "panelAlt": "Kikaguzi cha Inacheza Sasa cha Vespertine: Les jeux d’eaux à la Villa d’Este ya Liszt, kwa uchezaji wa Lazar Berman, ikiwa na alama za HI-RES BILA UPOTEVU na BIT-PERFECT, kipekee, 32 / 96, pamoja na njia yake ya mawimbi kutoka FLAC ya biti 24 / 96 kHz kupitia libFLAC kwa kiwango asilia cha sampuli na kiwango cha sauti kisichoongezwa wala kupunguzwa hadi Fosi Audio ZD3.",
+      "panelCaption": "Njia ya mawimbi",
+      "followSignal": "Fuatilia mawimbi"
+    },
+    "trailer": {
+      "eyebrow": "Trela",
+      "title": "Ione kwa sekunde 44.",
+      "text": "Washa sauti. Kila kitu ndani yake ni programu halisi, iliyorekodiwa kwenye maktaba ya msanidi mwenyewe.",
+      "fallback": "Tazama trela (MP4)",
+      "caption": "sekunde 44 · 1080p · majalada ya albamu ni mali ya wamiliki wake"
+    },
+    "features": {
+      "eyebrow": "Kwa nini Vespertine",
+      "title": "Imeundwa kwa mkusanyiko wako wa sauti ya kuzunguka.",
+      "text": "Muziki wa sauti ya kuzunguka na wa stereo katika maktaba moja, na kicheza muziki kinachoonyesha hasa kilichofanya kwa mawimbi.",
+      "badgesLabel": "Hali za njia ya mawimbi zinazoonyeshwa na programu"
+    },
+    "pillars": [
+      {
+        "title": "Sauti ya kuzunguka katika maktaba moja",
+        "text": "Nakala za SACD na faili zilizonakiliwa kutoka SACD, diski za DVD-Video, CD za DTS, DTS-HD MA na TrueHD hukaa kando ya albamu zako za stereo na hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Albamu inapokuja katika matoleo yote mawili, kila wimbo huorodheshwa mara moja na toleo sahihi hucheza kulingana na kifaa chako cha kutoa sauti."
+      },
+      {
+        "title": "Njia ya mawimbi unayoweza kuikagua",
+        "text": "Viwango vya sampuli, idadi ya biti kwa kila sampuli, ongezeko na uchakataji wa chaneli, vikisomwa tena kutoka Core Audio. Masharti ya bit-perfect yako kwenye msimbo chanzo, pamoja na majaribio ya kiotomatiki, jaribio la loopback na mwongozo wa kuthibitisha kwenye maunzi."
+      },
+      {
+        "title": "Hukagua faili za hi-res",
+        "text": "Uchambuzi huashiria kina cha biti kilichojazwa na uwezekano wa upsampling au asili yenye upotevu. Maamuzi yanayotokana na wigo ni makadirio, yanayoonyeshwa pamoja na ushahidi na mipaka yake. Uchambuzi huo huo huendeshwa kwenye seva ya Linux pale faili zako zilipo."
+      },
+      {
+        "title": "Programu huria unayoweza kuikagua",
+        "text": "Bila malipo chini ya GPL. Soma, jenga na ubadilishe kicheza muziki, ikiwemo masharti yake ya kutoa sauti na majaribio yake. Hakuna akaunti, usajili, matangazo wala telemetry."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Kipekee",
+      "spatial": "Spatial · ufuatiliaji wa kichwa",
+      "synthetic": "Masafa ya juu ya kutengenezwa?",
+      "roomCorrection": "Room correction"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Njia ya mawimbi",
+        "kicker": "Bit-perfect",
+        "title": "Kila wimbo kwa kiwango na kina chake asilia.",
+        "lede": "Njia ya mawimbi huorodhesha kila hatua kutoka kwenye faili hadi DAC yako, ikisomwa tena kutoka Core Audio, na hukuambia kitu kinapobadilisha sampuli.",
+        "body": [
+          "Vespertine hubadilisha kifaa kitumie kiwango cha sampuli cha kila faili, na hubadilisha kiwango cha sampuli (resampling), kwa kigeuzi cha Apple chenye ubora wa mastering, pale tu DAC isipoweza kutumia kiwango hicho. <span class=\"mono nowrap\">BIT-PERFECT</span> huonekana pale tu masharti yaliyo kwenye msimbo chanzo yanapotimizwa: kiwango asilia, hakuna kinachobadilisha sampuli, urefu wa neno unaotoshea, na kifaa kilicho katika hali ya kipekee au kisichoshirikiwa na programu nyingine. Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11."
+        ],
+        "list": [
+          "Hali ya kipekee (hog) huzuia programu nyingine kutumia kifaa. Katika hali ya kushirikiwa, vitufe vya kiwango cha sauti na Digital Crown hurekebisha DAC yako; katika hali ya kipekee navyo vinaweza, ukiwasha hilo.",
+          "Hali ya integer hutuma PCM ya biti 32 isiyochakatwa moja kwa moja kwa DAC zinazopokea integer.",
+          "Chaguo la “Linganisha vyanzo vya biti 16” (limezimwa kwa chaguo-msingi) hutuma faili za biti 16 kama biti 16 kwa DAC zenye hali halisi ya biti 16, bila kuzijaza sifuri.",
+          "Uchezaji bila mapengo kati ya nyimbo, ikiwemo albamu za CUE sheet zilizogawanywa kutoka kwenye faili moja.",
+          "Hukumbuka DAC yako. Isipounganishwa, muziki hucheza kwenye kifaa bora kilichounganishwa na hurudi DAC inaporudi.",
+          "Vifaa vya kutoa sauti visivyo na udhibiti wake wenyewe wa kiwango cha sauti (HDMI, optiki, line-out) vinaweza kutumia kiwango cha sauti cha Vespertine, kinachochaguliwa kwa kila kifaa. Chini ya 100%, lebo husema si bit-perfect tena.",
+          "Vespertine inapofungwa, hurudisha DAC yako kwenye kiwango cha sampuli na kina cha biti ilivyokuwa navyo awali.",
+          "Jaribio la loopback lililojengewa ndani hulinganisha kila sampuli ambayo Vespertine hutuma kwenda kwenye kifaa pepe. Ni ukaguzi wa kiprogramu, umewekwa lebo hivyo, na kamwe haubadilishi beji ya <span class=\"mono nowrap\">BIT-PERFECT</span>."
+        ],
+        "links": [
+          "Masharti ndani ya msimbo",
+          "Jithibitishie mwenyewe",
+          "Jaribio la loopback linathibitisha nini"
+        ],
+        "alt": "Vespertine ikicheza Années de pèlerinage ya Liszt, kwa uchezaji wa Lazar Berman, kutoka FLAC ya biti 24 / 96 kHz: kikaguzi kinaionyesha kuwa bit-perfect na ya kipekee kwenye Fosi Audio ZD3, pamoja na kila hatua ya njia ya mawimbi.",
+        "floatAlt": "Dirisha la jaribio la loopback: biti 24 kwa 44.1 na 96 kHz, biti 16 iliyojazwa na jozi isiyo na mapengo, kila moja sawa biti kwa biti.",
+        "floatCaption": "Jaribio la Loopback · ukaguzi wa kiprogramu"
+      },
+      "room-correction": {
+        "jack": "Urekebishaji wa chumba",
+        "kicker": "Urekebishaji wa chumba",
+        "title": "Pima chumba chako. Rekebisha kila spika.",
+        "lede": "Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa, na Vespertine hutengeneza vichujio vinavyolingana na kila spika kutokana na kile inachosikia kwenye kiti chako.",
+        "body": [
+          "Sauti zinazopanda huchezwa kupitia spika moja baada ya nyingine, katika sehemu moja hadi tano kuzunguka kiti chako cha kusikilizia. Kila spika hupata vichujio vyake, vilivyobuniwa kutokana na kipimo. Kwa sehemu kubwa ni vya kupunguza: hushusha vilele vya chumba na huinua mabonde mapana kwa upole tu. Kipimo hicho hicho huweka ucheleweshaji na kiwango cha kila spika, ili sauti ya kila spika ifike kwenye kiti chako kwa wakati mmoja na kwa ukubwa uleule. Urekebishaji wa chumba umezimwa kwa chaguo-msingi, na uchezaji hubaki bit-perfect ukiwa umezimwa. Ukiwa umewashwa, njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span>."
+        ],
+        "list": [
+          "Malengo matatu: Warm (chaguo-msingi), Gentle tilt na Flat. Rekebisha besi pekee au masafa kamili, na ubuni upya vichujio baadaye bila kupima tena.",
+          "Huingiza vichujio kutoka REW au Equalizer APO, pamoja na ucheleweshaji na kiwango cha kila spika, na hutoa maandishi ya Equalizer APO.",
+          "Huingiza miitikio ya msukumo (WAV, AIFF, CAF au FLAC) na kuicheza kwa convolution.",
+          "Stereo na 5.1.",
+          "Picha ya Chumba huonyesha spika, kiti chako na kila sehemu ya maikrofoni inapopimwa. Kisha Ufunuo wa Mkunjo hubadilisha mwitikio uliopimwa kuwa ule uliotabiriwa, na swichi ya kabla/baada huilinganisha."
+        ],
+        "note": "Mkunjo wa “baada” umetabiriwa kutokana na kipimo na vichujio, haujapimwa. Ili kuona kile chumba kinachofanya kwa kweli, pima tena urekebishaji ukiwa umewashwa.",
+        "links": [
+          "Jinsi urekebishaji wa chumba unavyofanya kazi"
+        ],
+        "alt": "Urekebishaji wa chumba uliotabiriwa na Vespertine kwa jozi ya spika za stereo kwa lengo la Warm: kwa kila spika, mwitikio uliopimwa, lengo na mwitikio uliotabiriwa baada ya urekebishaji, kilele cha chumba karibu na 120 Hz kikiwa kimepunguzwa kwa dB 14 na 18, pamoja na vichujio vya kila spika.",
+        "floatAlt": "Picha ya Chumba katika mwongozo wa kupima: spika za kushoto na kulia, kiti, na sehemu tano za maikrofoni kukizunguka, ya kwanza ikiwa na maikrofoni juu yake.",
+        "floatCaption": "Picha ya Chumba"
+      },
+      "surround": {
+        "jack": "Sauti ya kuzunguka",
+        "kicker": "Sauti ya kuzunguka na Spatial Audio",
+        "title": "Diski zako za 5.1, katika maktaba ileile.",
+        "lede": "Muziki wa chaneli nyingi hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, au hupunguzwa kuwa stereo (downmix) kulingana na mpangilio wa chaneli kwenye DAC ya stereo.",
+        "body": [
+          "CD za DTS husimbuliwa kuwa 5.1. Nakala za SACD, nyimbo zilizotolewa kutoka SACD, FLAC ya chaneli nyingi, TrueHD na DTS-HD MA huchezwa kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods au hupunguzwa kuwa stereo kwenye DAC ya stereo. Dolby Digital Plus yenye Atmos hutumia kichakataji cha macOS cha vitu vya sauti; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi. Utoaji wa sauti chaneli kwa chaneli ni wa kimajaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
+        ],
+        "list": [
+          "Matoleo ya stereo na ya kuzunguka ya albamu huorodheshwa mara moja; Vespertine hucheza lile linalofaa kifaa cha kutoa sauti, au lile ulilolibandika.",
+          "Bitstream ya Dolby Digital, DD+ na DTS-CD kwa resiva ni ya kimajaribio, haijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika. Majaribio ya carrier hutumia kisomaji cha S/PDIF cha FFmpeg. Passthrough ya TrueHD na DTS-HD MA haitumiki kwenye macOS.",
+          "Hamisha kwa ajili ya Spatial Audio kama stereo ya binaural kwa vipokea sauti vya kichwani au ALAC ya chaneli nyingi kwa vifaa vya Apple, pamoja na tagi na picha za albamu."
+        ],
+        "alt": "Goodbye Yellow Brick Road ya Elton John, albamu ya 5.1 ya biti 24 / 88.2 kHz, ikicheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods Max, pamoja na njia ya mawimbi na mita kwa kila chaneli.",
+        "floatAlt": "Albamu yenye matoleo ya stereo na 5.1 ya kila wimbo, kila wimbo ukiorodheshwa mara moja.",
+        "floatCaption": "Stereo na 5.1, zimeorodheshwa mara moja"
+      },
+      "discs": {
+        "jack": "Nakala za diski na DSD",
+        "kicker": "SACD, DVD-Video na DSD",
+        "title": "Cheza nakala ya diski yenyewe.",
+        "lede": "Ielekeze Vespertine kwenye nakala ya SACD au DVD-Video nayo itacheza muziki moja kwa moja kutoka humo, bila kuipachika kama diski kwenye mfumo, kutoa wala kuandika chochote.",
+        "body": [
+          "Nakala za SACD za <span class=\"mono\">.iso</span> hucheza sehemu zake za stereo na 5.1, zikiwa zimebanwa kwa DST au bila kubanwa, zikipewa majina kutoka kwenye maandishi ya diski yenyewe. DST husimbuliwa kurudi kwenye DSD ileile kamili, hivyo stereo huenda kwa DAC yako kama DSD asilia kupitia DoP pale DAC inapoiunga mkono, na 5.1 hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Muziki wa LPCM kwenye diski za DVD-Video (<span class=\"mono\">.iso</span> au folda ya <span class=\"mono\">VIDEO_TS</span>) hucheza biti kwa biti, albamu moja kwa kila kichwa cha DVD na wimbo mmoja kwa kila sura yake."
+        ],
+        "list": [
+          "Matokeo yamelingana na sacd_extract biti kwa biti kwenye diski mbili halisi. Diski zenye eneo la 5.0, zenye eneo la chaneli nyingi pekee, au DSD128 na zaidi, hadi sasa zimejaribiwa tu kwa nakala za majaribio zilizotengenezwa kisintetiki.",
+          "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier, au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. DoP imethibitishwa hadi DSD256 kwenye Fosi Audio ZD3 na hadi DSD128 kwenye FiiO K11; DSD512 kupitia DoP haijajaribiwa kwenye maunzi.",
+          "DVD-Video LPCM ya biti 16, 20 na 24, 48 na 96 kHz, hadi chaneli 8. DVD-Audio haitumiki, na diski zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
+        ],
+        "links": [
+          "Maelezo ya DVD-Video"
+        ],
+        "alt": "Brothers In Arms ya Dire Straits ikicheza moja kwa moja kutoka kwenye nakala yake ya diski ya SACD: DSD64 ya stereo kupitia DoP hadi FiiO K11, ikiwa na beji ya DSD ASILIA · DoP na kisimbuaji kikionyesha Nakala ya SACD, DST (bila upotevu).",
+        "floatAlt": "Love for the Sake of Love ya Claudja Barry kama DSD128 kupitia DoP hadi Fosi Audio ZD3, kwa 352.8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352.8 kHz"
+      },
+      "analysis": {
+        "jack": "Uchambuzi",
+        "kicker": "Kugundua hi-res bandia na wigo",
+        "title": "Gundua faili za “hi-res” ambazo si hi-res kweli.",
+        "lede": "Kila faili inaweza kuchambuliwa ili kujua kina chake halisi cha biti, upana wake halisi wa masafa ya sauti na alama za visimbaji vyenye upotevu na vigeuzi vya kiwango cha sampuli.",
+        "body": [
+          "Maamuzi huja na ushahidi wake na hutaja kitu kingine kinachoweza kuyaeleza, na orodha ya nyimbo ya <em>Hi-Res ya Kutiliwa Shaka</em> hukusanya faili hizo. Ni kujazwa kwa sifuri pekee kunakogunduliwa kwa uhakika kamili: maamuzi yanayotokana na wigo huwekwa alama kama maswali, kwa sababu baadhi ya faili zenye upotevu za kasi ya juu ya biti hupita kama halisi, na vichujio vikali vya mastering, vyanzo vya FM na uhamisho kutoka kanda au santuri vinaweza kuonekana vya kutiliwa shaka. Muziki unapocheza, mita na wigo wa moja kwa moja huonyesha kinachotoka, ikiwemo DoP."
+        ],
+        "list": [
+          "Sauti ya biti 16 iliyojazwa ndani ya vifungashio vya biti 24",
+          "Master zinazoelekea kuwa za ubora wa CD zilizofanyiwa upsampling na kuuzwa kama 96 au 192 kHz",
+          "Asili inayoelekea kuwa yenye upotevu: MP3 au AAC iliyogeuzwa kuwa FLAC",
+          "Masafa ya juu yanayoelekea kuwa ya kutengenezwa kutokana na SBR au “uboreshaji wa AI”",
+          "<span class=\"mono\">vespertine-analyze</span> huendesha uchambuzi huo huo kwenye seva ya Linux pale faili zako zilipo; programu huingiza matokeo."
+        ],
+        "note": "Faili kwenye picha hii ya skrini ni bandia kwa makusudi: muziki wa trela yenyewe, uliosimbwa kuwa MP3 na kufanyiwa upsampling hadi 24/192 chini ya jina la bendi la kubuni.",
+        "links": [
+          "Jinsi uchambuzi unavyofanya kazi, na unapokosa kugundua"
+        ],
+        "alt": "Kichupo cha Uchambuzi kikiashiria “remaster” ya 24/192 kuwa inaelekea kuwa na asili yenye upotevu: wigo wake wa muda mrefu unaishia 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max kupitia USB-C",
+        "title": "Bila upotevu kwenye AirPods Max, na inakwambia hivyo.",
+        "lede": "Zikiunganishwa kwa kebo ya USB-C, AirPods Max hutambuliwa kama kifaa kisicho na upotevu cha biti 24 / 48 kHz.",
+        "body": [
+          "Muziki wa 48 kHz hucheza bit-perfect na mwingine wote hugeuzwa kwa kigeuzi cha kiwango cha sampuli cha Apple chenye ubora wa mastering, waziwazi. Kupitia Bluetooth, Vespertine hukuambia kuwa muunganisho ni AAC. Hili linategemea maelezo ya Apple kuhusu njia ya kebo na usomaji wa Core Audio, kwa kuwa AirPods hazina njia ya kutoa sauti ya kidijitali ya kufanyia loopback."
+        ],
+        "alt": "Orodha mahiri ya nyimbo za biti 24 / 48 kHz, iliyochujwa hadi Oasis, ikicheza bit-perfect kwenye AirPods Max kupitia USB-C."
+      },
+      "library": {
+        "jack": "Maktaba",
+        "kicker": "Maktaba",
+        "title": "Vinjari kama Apple Music. Panga kama mtunza maktaba.",
+        "lede": "Albamu, wasanii, nyimbo na aina, kila kimoja na vichujio unavyoweza kuviunganisha, na Changanya kwa yoyote kati ya hivyo.",
+        "list": [
+          "Vichujio vya fomati, biti 24, 88.2 kHz na zaidi, chaneli nyingi, aina, mwaka, kiwango cha sampuli, chaneli na uamuzi wa uchambuzi. Utafutaji hupuuza herufi kubwa/ndogo na alama za lafudhi.",
+          "Orodha mahiri za nyimbo kwa vipimo unavyovifikiria: biti 24, 88.2 kHz.",
+          "Remaster, matoleo ya mono na stereo, na SACD za albamu moja hushiriki kadi moja; chagua toleo unapoifungua.",
+          "Vipendwa na idadi ya mara zilizochezwa, vinavyohifadhiwa kwenye maktaba na kamwe haviandikwi kwenye faili zako. Huingiza orodha za nyimbo za M3U na Apple Music, idadi ya mara zilizochezwa na vipendwa.",
+          "Kihariri cha tagi chenye nakala rudufu na kurejesha kwa hatua moja, pamoja na kujaza taarifa kutoka MusicBrainz kunakoonyesha kiwango chake cha uhakika kabla ya kuandika chochote.",
+          "Folda za mtandao kupitia SMB, NFS au WebDAV, zenye akiba ya faili, Hifadhi Nje ya Mtandao na uchezaji ulioundwa kwa ajili ya seva za polepole: nyimbo huhifadhiwa kwa muda kwenye Mac yako kabla ya kuchezwa, huku pete ya upakiaji ikionekana kwenye kitufe cha kucheza wakati huo.",
+          "Tafuta Muziki hutafuta kila diski ili kupata muziki wako halisi na huacha takataka nyuma. Mipangilio mifupi wakati wa kufungua kwa mara ya kwanza huchagua kifaa chako cha kutoa sauti na hueleza ufikiaji wa kipekee na ReplayGain hufanya nini.",
+          "EQ ya parametric kwa kila kifaa cha kutoa sauti, inayoingiza mipangilio iliyoandaliwa tayari ya AutoEQ na Equalizer APO. Imezimwa kwa chaguo-msingi; ikiwashwa, njia ya mawimbi husema <span class=\"mono nowrap\">KISAWAZISHI</span> badala ya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "Kicheza Kidogo, kipengele cha upau wa menyu, vitufe vya media, ReplayGain na masasisho ya kiotomatiki yaliyotiwa sahihi."
+        ],
+        "links": [
+          "Kila kipengele, kwa undani"
+        ],
+        "alt": "Ukurasa wa Aina: kigae kwa kila aina chenye mosaiki ya majalada yake."
+      },
+      "languages": {
+        "jack": "Lugha",
+        "kicker": "Lugha {languages}",
+        "title": "Inazungumza lugha yako.",
+        "lede": "Kila menyu, mpangilio na ujumbe wa njia ya mawimbi umetafsiriwa katika lugha {languages} mbali na Kiingereza.",
+        "body": [
+          "Kuanzia Kiukreni, Kijerumani na Kijapani hadi Kiswahili, Kitamil na Kihausa, zikiwa na maumbo ya wingi na mifumo ya namba ya kila eneo, na Kichina Kilichorahisishwa, Kichina cha Jadi na Kichina cha Hong Kong, kila kimoja na msamiati wake. Kiarabu, Kiebrania, Kiajemi na Kiurdu hupata mpangilio wa kulia kwenda kushoto.",
+          "Jinsi tafsiri zinavyokaguliwa: ukaguzi wa kiotomatiki kwenye kila badiliko huthibitisha kuwa kila maandishi kwenye programu yapo katika lugha zote 44 yakiwa na vishika-nafasi vilevile na maumbo ya wingi yanayohitajika na kila lugha, na skrini kuu zilikaguliwa katika lugha kadhaa kuona maandishi yaliyokatwa au yanayopishana na uakisi wa kulia kwenda kushoto. Zilianza kama tafsiri za mashine zilizofanywa kwa uangalifu, kwa hiyo masahihisho kutoka kwa wazungumzaji asilia yanakaribishwa sana kwenye <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
+        ],
+        "alt": "Vespertine imeandikwa katika kila moja ya lugha zake {languagesTotal} za kiolesura, kuanzia ヴェスパタイン na Веспертайн hadi فسبرتاين na वेस्परटाइन, kwa ukubwa na mitindo tofauti ya herufi.",
+        "wallLabel": "Vespertine katika kila moja ya lugha zake"
+      }
+    },
+    "formats": {
+      "eyebrow": "Fomati",
+      "title": "Faili za sauti ya kuzunguka, zisizo na upotevu na zenye upotevu.",
+      "text": "Stereo na chaneli nyingi, PCM na DSD, nakala za diski na faili za kawaida, na CUE sheet kwa zote.",
+      "caption": "Fomati ambazo Vespertine hucheza, na jinsi inavyozicheza",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Kiwango cha sampuli na kina cha biti asilia, hadi biti 32 na hadi kiwango ambacho DAC yako hutumia (kimejaribiwa hadi 768 kHz); PCM ya biti 32 isiyobadilishwa inahitaji hali ya integer. Nakala za diski zenye CUE sheet."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF na DSDIFF, zilizobanwa kwa DST au za kawaida. DoP inategemea DAC na kiwango cha carrier, vinginevyo PCM. DoP imejaribiwa hadi DSD256; DSD512 kupitia DoP haijajaribiwa kwenye maunzi."
+        },
+        {
+          "name": "Nakala za SACD",
+          "text": "Sehemu za stereo na chaneli nyingi, DST au za kawaida, moja kwa moja kutoka kwenye nakala; kila wimbo huorodheshwa mara moja pamoja na matoleo yake ya stereo na 5.1."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "Biti 16, 20 na 24 kwa 48 na 96 kHz, chaneli 1 hadi 8, biti kwa biti; albamu moja kwa kila kichwa cha DVD, wimbo mmoja kwa kila sura yake. DVD-Audio haitumiki."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus yenye Atmos, ikichakatwa na kichakataji cha macOS cha vitu vya sauti, au channel bed yake iliyosimbuliwa."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Bila upotevu, inaweza kuwa bit-perfect; TrueHD Atmos hucheza channel bed yake, vitu vyake havichakatwi."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA haina upotevu na inaweza kuwa bit-perfect; DTS:X hucheza channel bed yake. DTS ghafi husimbuliwa; bitstream ya DTS-CD ni njia tofauti."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Husimbuliwa na macOS. Bitstream kwa resiva ni ya majaribio, haijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
+        },
+        {
+          "name": "CD za DTS na DTS-WAV",
+          "text": "Hutambuliwa na kusimbuliwa hadi 5.1, zikiwemo albamu zilizogawanywa kwa CUE."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Bila upotevu. DSD ndani ya WavPack haitumiki."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Husimbuliwa na kutiwa alama kuwa zenye upotevu."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Linganisha",
+      "title": "Inavyolinganishwa na vingine.",
+      "intro": "Vicheza muziki kadhaa vya Mac hutoa uchezaji wa bit-perfect. Ulinganisho huu unaonyesha kile ambacho nyaraka au msimbo chanzo wa kila kicheza muziki unasema wenyewe. “Haijaandikwa” inamaanisha mtengenezaji hasemi lolote kuhusu hilo, si kwamba kipengele hakipo. Convolution ya Vespertine ni kwa ajili ya urekebishaji wa chumba; haina programu-jalizi za athari za sauti wala huduma za kutiririsha.",
+      "hint": "Sogeza kuona zaidi →",
+      "region": "Jedwali la ulinganisho (husogezwa kando)",
+      "caption": "Vespertine ikilinganishwa na vicheza muziki vingine saba vya Mac, kutoka kwenye nyaraka au msimbo chanzo wa kila kicheza muziki",
+      "feature": "Kipengele",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Msimbo chanzo",
+          "GPL-3.0",
+          "Imefungwa",
+          "Imefungwa",
+          "Imefungwa",
+          "Imefungwa",
+          "Imefungwa",
+          "GPL-2.0",
+          "Imefungwa"
+        ],
+        [
+          "Faili za FLAC / DSD",
+          "Ndiyo / Ndiyo",
+          "Hapana / Hapana",
+          "Ndiyo / Ndiyo",
+          "Ndiyo / Ndiyo",
+          "Ndiyo / Ndiyo",
+          "Ndiyo / Ndiyo",
+          "Ndiyo / Ndiyo",
+          "Ndiyo / Hapana⁴"
+        ],
+        [
+          "Kubadilisha kiwango cha DAC kiotomatiki",
+          "Ndiyo",
+          "Hapana",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Haijaandikwa"
+        ],
+        [
+          "Hali ya kipekee (hog)",
+          "Ndiyo",
+          "Hapana",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo"
+        ],
+        [
+          "PCM ya biti 16/24 bila kubadilisha sampuli",
+          "Masharti + majaribio",
+          "macOS 27: majaribio ya wahusika wengine¹",
+          "Dai la mtengenezaji",
+          "Dai la mtengenezaji",
+          "Jaribio la loopback ndani ya programu",
+          "Dai la mtengenezaji",
+          "Kiashiria ndani ya programu",
+          "Haijaandikwa"
+        ],
+        [
+          "Faili za ndani za sauti ya kuzunguka",
+          "Ndiyo²",
+          "Haijaandikwa",
+          "Ndiyo",
+          "Ndiyo",
+          "Ndiyo",
+          "Haijaandikwa",
+          "Ndiyo",
+          "Haijaandikwa"
+        ],
+        [
+          "Apple Spatial Audio kwa faili za ndani za sauti ya kuzunguka",
+          "Ndiyo",
+          "Atmos ya katalogi pekee³",
+          "Haijaandikwa",
+          "Haijaandikwa",
+          "Haijaandikwa",
+          "Haijaandikwa",
+          "Ndiyo",
+          "Haijaandikwa"
+        ],
+        [
+          "Uchambuzi wa faili za hi-res",
+          "Ndiyo",
+          "Hapana",
+          "AudioScan",
+          "Masafa ya dynamic, ukubwa wa sauti",
+          "Ndiyo",
+          "Haijaandikwa",
+          "Hapana (wigo wa moja kwa moja pekee)",
+          "Hapana (wigo wa moja kwa moja pekee)"
+        ],
+        [
+          "SACD ISO",
+          "Ndiyo",
+          "Hapana",
+          "Ndiyo",
+          "Hapana (DSF/DFF pekee)",
+          "Ndiyo",
+          "Hapana",
+          "Hapana",
+          "Hapana⁴"
+        ],
+        [
+          "Urekebishaji wa chumba",
+          "Hupimwa ndani ya programu (maikrofoni ya USB), au kwa kuingiza REW / APO na miitikio ya msukumo",
+          "Hapana",
+          "Kupitia convolution (Origin: chaguo la kulipia) au Audio Units",
+          "Kupitia convolution",
+          "Hapana (kwa makusudi)",
+          "Haijaandikwa",
+          "Hapana",
+          "Haijaandikwa"
+        ],
+        [
+          "Convolution / programu-jalizi za athari za sauti",
+          "Ndiyo (urekebishaji wa chumba) / Hapana",
+          "Hapana / Hapana",
+          "Ndiyo (Origin: chaguo la kulipia) / Audio Units",
+          "Ndiyo / Hapana",
+          "Hapana / Hapana",
+          "Haijaandikwa / Haijaandikwa",
+          "Hapana / Hapana",
+          "Haijaandikwa / Audio Units"
+        ],
+        [
+          "Huduma za kutiririsha",
+          "Hapana",
+          "Apple Music",
+          "Studio: ndiyo; Origin: hapana",
+          "Ndiyo",
+          "Hapana (za ndani + UPnP)",
+          "Hapana (redio ya intaneti)",
+          "Hapana (redio ya intaneti)",
+          "Hapana (redio ya intaneti)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music kwenye macOS 27 ilikuwa sawa biti kwa biti kwenye biti 16/24 katika <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">majaribio ya loopback ya wahusika wengine yaliyoripotiwa kwenye ASR</a>, kwa kiwango cha sauti cha 100%. Hiki si kipimo cha Vespertine; ripoti ya awali haikuweza kukaguliwa upya kwa kujitegemea kwa sasisho hili. Bado hakuna kubadilisha kiwango kiotomatiki, hali ya hog, FLAC wala DSD kwenye Mac.",
+        "² Utoaji wa sauti wa chaneli nyingi kwa DAC na bitstream kwa resiva ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika.",
+        "³ Apple inaeleza katika nyaraka zake Spatial Audio yenye ufuatiliaji wa kichwa kwa nyimbo za Dolby Atmos zilizo kwenye katalogi ya Apple Music, si uchakataji wa spatial wa faili zako mwenyewe za chaneli nyingi.",
+        "⁴ Imejaribiwa kwenye foobar2000 2.26 (macOS 27.0.1), bila vijenzi vya ziada: faili za DSF, DFF na SACD ISO hushindwa kwa ujumbe “Unsupported file format”. DSF na DFF hucheza tu kama PCM ya 352.8 kHz baada ya kusakinisha FFmpeg kando na kuziongeza kwenye FFmpeg Decoder Wrapper yake; SACD ISO bado hushindwa."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Vyanzo na upeo</a>. Marekebisho yanakaribishwa: <a href=\"{href.issues}\">fungua issue</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Mapya",
+      "title": "Mapya katika {version}.",
+      "latest": "Toleo jipya zaidi",
+      "fullNotes": "Maelezo kamili ya toleo",
+      "meta": "tayari imesakinishwa? Hujisasisha yenyewe, au {brewUpgrade}",
+      "earlier": "Matoleo ya awali",
+      "every": "Matoleo yote",
+      "inEnglish": "Maelezo haya ya toleo bado hayajatafsiriwa, kwa hivyo yanaonyeshwa kwa Kiingereza."
+    },
+    "faq": {
+      "eyebrow": "Maswali",
+      "title": "Maswali na majibu.",
+      "items": [
+        {
+          "q": "Je, ni bure kweli?",
+          "a": "Ndiyo. Vespertine ni bila malipo na programu huria chini ya GPL-3.0. Hakuna akaunti, hakuna usajili wa malipo, hakuna matangazo wala telemetry (<a href=\"{href.privacy}\">faragha</a>). Huingia mtandaoni tu ili kuangalia masasisho, na kufikia MusicBrainz, Cover Art Archive au ListenBrainz, au kutafuta majalada ya hali yako ya Discord, pale unapoiomba."
+        },
+        {
+          "q": "Ninahitaji nini?",
+          "a": "macOS {minMacOS} ({minMacOSName}) au mpya zaidi, kwenye Apple silicon au Intel. Maunzi ya Intel hayajajaribiwa; toleo la Intel limeendeshwa chini ya Rosetta, na ripoti kutoka kwa Mac halisi za Intel zinakaribishwa."
+        },
+        {
+          "q": "Ninaisakinisha na kuisasisha vipi?",
+          "a": "Pakua DMG, ifungue kisha uhamishe Vespertine hadi Applications. Imesainiwa kwa Developer ID na kuthibitishwa rasmi na Apple, na hujisasisha yenyewe; kila sasisho limesainiwa. Kwa Homebrew: {brew}, kisha {brewUpgrade} au masasisho ya programu yenyewe."
+        },
+        {
+          "q": "Je, inatiririsha kutoka Qobuz, TIDAL au Apple Music?",
+          "a": "Hapana. Vespertine hucheza muziki unaoumiliki, kwenye Mac yako, kwenye diski za nje au kwenye folda ya mtandao. Vipakuliwa vya usajili wa Apple Music vilivyolindwa kwa DRM haviwezi kuchezwa."
+        },
+        {
+          "q": "Nitajuaje kuwa ni bit-perfect kweli?",
+          "a": "Njia ya mawimbi husoma tena kile ambacho Core Audio ilifanya hasa: kiwango rasmi cha sampuli cha kifaa, fomati yake ya kimaunzi na nani anayekishikilia. Visimbuaji vina majaribio ya kiotomatiki (TrueHD dhidi ya chanzo chake, DTS dhidi ya kisimbuaji cha FFmpeg chenyewe), jaribio la loopback lililojengwa ndani hukagua njia ya programu sampuli kwa sampuli, na <span class=\"mono nowrap\">vespertine-probe</span> hukuwezesha kukagua maunzi yako mwenyewe. <a href=\"{href.verification}\">Jinsi ya kuthibitisha mwenyewe</a>."
+        },
+        {
+          "q": "Je, ina urekebishaji wa chumba?",
+          "a": "Ndiyo. Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa katika sehemu moja hadi tano kuzunguka kiti chako, na Vespertine hutengeneza vichujio vinavyolingana na kila spika na kulinganisha ucheleweshaji na kiwango chao, kwa stereo au 5.1. Pia huingiza vichujio vya REW na Equalizer APO pamoja na miitikio ya msukumo. Umezimwa kwa chaguo-msingi, uchezaji hubaki bit-perfect ukiwa umezimwa, na njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span> ukiwa umewashwa. <a href=\"{href.roomCorrection}\">Jinsi urekebishaji wa chumba unavyofanya kazi</a>."
+        },
+        {
+          "q": "Je, inaweza kucheza diski za SACD na DVD?",
+          "a": "Hucheza nakala zake. Nakala za SACD <code>.iso</code>, stereo na chaneli nyingi, zilizobanwa kwa DST au za kawaida, pamoja na muziki wa LPCM kwenye nakala za DVD-Video au folda za <code>VIDEO_TS</code>, hucheza moja kwa moja kutoka kwenye nakala, bila kutoa chochote nje. DVD-Audio haitumiki, na DVD zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
+        },
+        {
+          "q": "Je, inacheza Dolby Atmos?",
+          "a": "Dolby Digital Plus yenye Atmos hucheza kupitia kichakataji cha macOS cha vitu vya sauti, kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. TrueHD Atmos na DTS:X hucheza channel bed yao isiyo na upotevu; vitu vyao havichakatwi. Bitstream kwa resiva ya AV ni ya majaribio, haijajaribiwa kwenye resiva halisi; ripoti zinahitajika."
+        },
+        {
+          "q": "Je, itabadilisha faili zangu?",
+          "a": "Ni pale tu unapohariri tagi, na hapo nakala rudufu ya kila faili huhifadhiwa kwanza na faili inaweza kurejeshwa kwa hatua moja. Folda hurejelewa mahali zilipo; kuingiza huunda nakala za APFS zisizochukua nafasi ya ziada."
+        },
+        {
+          "q": "Imejaribiwa kwenye maunzi gani?",
+          "a": "Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11, ambapo hali ya integer ilijaribiwa pia. Pia umejaribiwa kwenye AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro, na TV ya Sony kupitia HDMI kwa 5.1. Maunzi ya Intel hayajajaribiwa. Bitstream kwa resiva na utoaji wa sauti wa chaneli nyingi kwa DAC ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); <a href=\"{href.dacReport}\">ripoti zinahitajika</a>."
+        },
+        {
+          "q": "Je, inapatikana kwa lugha yangu?",
+          "a": "Huenda ndiyo: kiolesura kiko kwa Kiingereza na lugha nyingine {languages}, zikiwemo Kiarabu, Kiebrania, Kiajemi na Kiurdu zinazoandikwa kutoka kulia kwenda kushoto. Vespertine hufuata lugha iliyowekwa kwa ajili yake katika System Settings. Marekebisho kutoka kwa wazungumzaji asilia yanakaribishwa kwenye <a href=\"{href.newIssue}\">GitHub</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Changia",
+      "title": "Saidia Vespertine ikue.",
+      "text": "Ni bila malipo, programu huria na hujengwa hadharani. Hivi ndivyo unavyoweza kusaidia.",
+      "cards": [
+        {
+          "title": "Dhamini kwenye GitHub",
+          "text": "Vespertine ni bila malipo. Ikiwa inakufaa, udhamini kwenye GitHub unasaidia uundaji wake.",
+          "cta": "Kuwa mdhamini"
+        },
+        {
+          "title": "Ripoti DAC yako",
+          "text": "Tuambie DAC, kiolesura cha sauti au resiva yako ilifanya nini. Kila ripoti ya kifaa hupanua kile kilichokaguliwa kwenye maunzi halisi.",
+          "cta": "Wasilisha ripoti ya kifaa"
+        },
+        {
+          "title": "Rekebisha tafsiri",
+          "text": "Umeona kifungu kisichokaa vizuri katika mojawapo ya lugha {languages}? Fungua issue yenye maneno bora zaidi.",
+          "cta": "Pendekeza marekebisho"
+        },
+        {
+          "title": "Soma msimbo",
+          "text": "Ripoti za hitilafu, pull request na maswali yanakaribishwa. Masharti ya njia ya mawimbi na majaribio yake yote yako kwenye hazina ya msimbo.",
+          "cta": "Msimbo chanzo kwenye GitHub"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Pakua",
+      "title": "Cheza mkusanyiko wako wa sauti ya kuzunguka kwenye Mac yako.",
+      "meta": [
+        "Bila malipo",
+        "programu huria",
+        "toleo {version}",
+        "macOS {minMacOS} au mpya zaidi"
+      ]
+    }
+  },
+  "press": {
+    "title": "Vifaa vya wanahabari: Vespertine, kicheza muziki cha sauti ya kuzunguka na hi-res kwa Mac",
+    "description": "Taarifa muhimu, nembo, picha kuu, picha halisi za skrini na trela ya Vespertine, kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res.",
+    "ogAlt": "Vifaa vya wanahabari vya Vespertine: karatasi ya taarifa, nembo, picha kuu, picha halisi za skrini na trela, juu ya picha tatu halisi za skrini za programu.",
+    "eyebrow": "Vifaa vya wanahabari",
+    "heading": "Kila kitu unachohitaji ili kuandika kuhusu {name}.",
+    "lede": "Vespertine ni kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, nyimbo za SACD 5.1 zilizotolewa kwenye diski, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos zinakaa katika maktaba moja, pamoja na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Njia ya Mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti, huku masharti na majaribio yakiwa katika msimbo chanzo wa GPL ambao mtu yeyote anaweza kuukagua.",
+    "fine": "Utoaji wa chaneli kwa chaneli na bitstream kwenda kwa resiva ni vya majaribio, havijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika. Vitu vya Dolby Digital Plus Atmos huchakatwa na macOS; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi.",
+    "facts": {
+      "eyebrow": "Karatasi ya taarifa",
+      "title": "Taarifa muhimu.",
+      "name": "Jina",
+      "formerly": "(iliitwa {formerName} hadi toleo 0.6.0)",
+      "developer": "Msanidi",
+      "developerValue": "{author}, msanidi huru",
+      "price": "Bei",
+      "priceValue": "Bila malipo. Programu huria chini ya GPL-3.0; hakuna akaunti, usajili wa kulipia, matangazo wala telemetry",
+      "platform": "Jukwaa",
+      "platformValue": "macOS {minMacOS} {minMacOSName} au mpya zaidi, Apple silicon na Intel",
+      "current": "Toleo la sasa",
+      "currentValue": "{version}, lilitolewa {date}",
+      "currentFine": "DMG iliyotiwa sahihi na kuthibitishwa rasmi ({size}), hujisasisha yenyewe",
+      "first": "Toleo la kwanza",
+      "firstFine": "(kama {formerName} 0.1.0)",
+      "languages": "Lugha",
+      "languagesValue": "Kiingereza na lugha nyingine {languages}, zikiwemo Kiukreni, Kiarabu, Kiebrania, Kijapani na aina tatu za Kichina",
+      "install": "Usakinishaji",
+      "installValue": "<a href=\"{href.dmg}\">Pakua DMG</a> au {brew}",
+      "tested": "Imejaribiwa kwenye",
+      "testedValue": "Fosi Audio ZD3 (PCM hadi 768 kHz, DSD256 kupitia DoP), FiiO K11 (PCM hadi 384 kHz, DSD128 kupitia DoP, hali ya integer), AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro",
+      "links": "Viungo",
+      "website": "Tovuti",
+      "source": "Msimbo wa chanzo",
+      "releaseNotes": "Maelezo ya matoleo",
+      "verify": "Jinsi ya kuthibitisha uchezaji wa bit-perfect"
+    },
+    "angle": {
+      "eyebrow": "Mtazamo",
+      "title": "Inachozingatia.",
+      "list": [
+        "Muziki wa sauti ya kuzunguka katika maktaba moja ya Mac, kuanzia nakala za SACD na DVD-Video, faili zilizonakiliwa kutoka diski na CD za DTS hadi TrueHD na DD+ Atmos, pamoja na Spatial Audio kwenye AirPods.",
+        "Msimbo wa chanzo huria wa GPL-3.0 ambao mtu yeyote anaweza kuusoma, kuujenga na kuubadilisha.",
+        "Njia ya Mawimbi inayoonyesha kiwango cha sampuli, idadi ya biti kwa kila sampuli, ongezeko na uchakataji wa chaneli. Masharti ya bit-perfect yamo kwenye msimbo, yakiwa na majaribio, Jaribio la Loopback lililojengewa ndani na <a href=\"{href.verification}\">mwongozo wa uthibitishaji</a>."
+      ],
+      "text": "Uchambuzi wa faili za hi-res pia umejumuishwa. Utambuzi wa kujazwa kwa sifuri ni wa uhakika kamili; maamuzi yanayotokana na wigo ni makadirio yenye mipaka. VeraVox na Audirvana AudioScan pia hutoa uchambuzi. <a href=\"{href.comparison}\">Vyanzo vya ulinganisho</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Trela.",
+      "text": "Sekunde 44, 16:9, 1080p kwa 60 fps, pamoja na sauti. <a href=\"{href.trailerDownload}\" download>Pakua MP4</a> ({size}). Nakala kuu ya 4K inapatikana ukiiomba.",
+      "fallback": "Pakua trela (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Chapa",
+      "title": "Nembo.",
+      "text": "Daima kwa herufi ndogo, na hilali daima kwa rangi ya shaba. Tafadhali usiibadilishe rangi, usiivute wala usiiandike upya kwa herufi nyingine. <a href=\"{href.brandGuide}\">Mwongozo wa chapa (PDF)</a>.",
+      "primaryAlt": "Nembo kamili ya Vespertine: hilali ya rangi ya shaba na neno vespertine",
+      "stackedAlt": "Nembo kamili ya Vespertine iliyopangwa wima",
+      "primary": "Kuu",
+      "stacked": "Iliyopangwa wima",
+      "onLight": "kwenye mandharinyuma angavu:",
+      "crescent": "hilali pekee:"
+    },
+    "art": {
+      "eyebrow": "Picha kuu",
+      "title": "Picha moja kwa kila kipengele.",
+      "text": "Kwa saizi tatu: 2400×1350, 1600×900 na 1270×760.",
+      "items": {
+        "bit-perfect": "Bit-perfect masharti yanapotimizwa",
+        "fake-hi-res": "Utambuzi wa hi-res bandia",
+        "spatial-audio": "Sauti ya kuzunguka kama Spatial Audio kwenye AirPods",
+        "native-dsd": "DSD asilia kupitia DoP",
+        "stereo-and-surround": "Matoleo ya stereo na ya kuzunguka",
+        "sacd-iso": "Nakala za SACD, zinazochezwa moja kwa moja",
+        "languages": "Lugha {languages}"
+      }
+    },
+    "shots": {
+      "eyebrow": "Picha za skrini",
+      "title": "Programu halisi.",
+      "text": "Kwenye maktaba ya msanidi mwenyewe, 2400×1500. Majalada ya albamu ni mali ya wamiliki wake.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "Biti 24 / 96 kHz, bit-perfect kwenye Fosi Audio ZD3: Lazar Berman, Les jeux d’eaux à la Villa d’Este ya Liszt",
+        "multichannel-albums": "Albamu zilizochujwa kuonyesha chaneli nyingi",
+        "stereo-and-surround-versions": "Nyimbo za SACD zilizotolewa kwenye diski, zenye matoleo ya stereo na 5.1",
+        "spatial-audio-airpods-max": "Albamu ya 5.1 ya 24/88.2 (Elton John, Goodbye Yellow Brick Road) kama Spatial Audio kwenye AirPods Max",
+        "fake-hi-res-detection": "“Remaster” ya 24/192 inayokomea 16 kHz (bandia ya makusudi: muziki wa trela yenyewe, uliosimbwa kuwa MP3 na kufanyiwa upsampling, chini ya jina la bendi la kubuni)",
+        "dsd-native-dop": "DSD128 kupitia DoP kwa 352.8 kHz kwenye Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Faili ya SACD .iso, ikichezwa kutoka kwenye nakala ya diski: Dire Straits, Brothers In Arms",
+        "genres": "Aina",
+        "search": "Tafuta",
+        "smart-playlist": "Orodha Mahiri ya Nyimbo, bit-perfect kwenye AirPods Max kupitia USB-C",
+        "loopback-test": "Jaribio la Loopback: ukaguzi wa kiprogramu wa njia ya kutoa sauti, sampuli kwa sampuli",
+        "setup-welcome": "Mipangilio ya mara ya kwanza: karibu",
+        "setup-output": "Mipangilio ya mara ya kwanza: kuchagua kifaa cha kutoa sauti cha kukumbukwa",
+        "output-settings": "Mipangilio ya kutoa sauti: kifaa kinachokumbukwa, mbadala, ulinganishaji wa biti 16",
+        "equalizer": "EQ ya parametric yenye mpangilio wa awali wa AutoEQ"
+      }
+    },
+    "contact": {
+      "eyebrow": "Mawasiliano",
+      "title": "Wasiliana nasi.",
+      "text": "Wanahabari, maswali na maombi ya mahojiano: {email}. Maswali ya jumuiya: <a href=\"{href.discussions}\">GitHub Discussions</a>. Hitilafu na ripoti za vifaa: <a href=\"{href.issues}\">GitHub issues</a>."
+    }
+  },
+  "privacy": {
+    "title": "Faragha: Vespertine haikusanyi chochote",
+    "description": "Programu ya Vespertine haikusanyi chochote: hakuna akaunti, takwimu za matumizi, telemetry, ripoti za kuanguka kwa programu wala matangazo. Programu na tovuti hii huunganishwa na nini, na kwa nini.",
+    "ogAlt": "Faragha ya Vespertine: Vespertine haikusanyi chochote. Hakuna akaunti, takwimu za matumizi, telemetry, ripoti za kuanguka kwa programu wala matangazo.",
+    "eyebrow": "Faragha",
+    "heading": "Vespertine haikusanyi",
+    "headingBrass": "chochote.",
+    "updated": "Inatumika kuanzia {effective} (inaongeza matumizi ya maikrofoni katika urekebishaji wa chumba, kwa toleo la 0.14). Mabadiliko ya awali: hali ya Discord, ambayo si lazima, {discordUpdated}; sehemu ya “Tovuti hii”, {statsUpdated}, tovuti ilipoanza kuhesabu ziara kwa takwimu zisizotumia vidakuzi, zinazopangishwa na sisi wenyewe. Mnamo {langUpdated}, sehemu ya “Tovuti hii” pia ilianza kueleza menyu ya lugha, ambayo hukumbuka chaguo lako kwenye kifaa chako.",
+    "intro": "Vespertine ni kicheza muziki kisicho na malipo na huria. Programu haina akaunti, takwimu za matumizi, telemetry, ripoti za kuanguka kwa programu wala matangazo. Msanidi hapokei taarifa yoyote kukuhusu wewe au muziki wako. Kwa kuwa msimbo wa chanzo uko wazi kwa umma, unaweza kukagua kila kauli kwenye ukurasa huu.",
+    "staysTitle": "Kinachobaki kwenye Mac yako",
+    "stays": "Hifadhidata ya maktaba yako, orodha za nyimbo, idadi ya mara nyimbo zilizochezwa, matokeo ya uchambuzi wa faili, akiba ya majalada na mipangilio huhifadhiwa kwenye folda ya Library ya mtumiaji wako kwenye Mac yako. Nenosiri za folda za mtandao zinazoshirikiwa na tokeni yako ya ListenBrainz, ukiiongeza, huhifadhiwa kwenye Keychain ya macOS. Urekebishaji wa chumba hutumia maikrofoni yako ya kupimia wakati tu unapofanya kipimo, na huhifadhi rekodi kwenye folda yako ya Documents. Hakuna kati ya hivi kinachopakiwa popote.",
+    "onlineTitle": "Programu inapounganishwa na mtandao",
+    "online": [
+      "<strong>Ukaguzi wa masasisho.</strong> Vespertine huiomba GitHub mlisho wake wa masasisho takriban mara moja kwa siku, na unapochagua Angalia Masasisho. GitHub huona anwani yako ya IP, kama ilivyo kwa upakuaji wowote. Unaweza kuzima ukaguzi wa kiotomatiki kwenye Mipangilio.",
+      "<strong>MusicBrainz na Cover Art Archive.</strong> Pale tu unapotumia Tafuta kwenye MusicBrainz au Boresha Metadata (Tafuta Muziki kwenye Mac Hii hutoa Boresha kwa muziki inaouongeza, kama kisanduku cha kuteua unachoweza kukiondolea tiki), Vespertine hutuma kwa musicbrainz.org majina ya albamu, msanii na nyimbo inazozitafuta. “Leta majalada” ikiwa imewashwa kwenye Mipangilio, hupakua majalada kutoka coverartarchive.org, ambayo huyatoa kutoka Internet Archive (archive.org). MusicBrainz na Cover Art Archive huendeshwa na MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Ikiwa tu utawasha scrobbling na kuweka tokeni yako, Vespertine hutuma kwa listenbrainz.org nyimbo unazocheza: jina la wimbo, msanii, albamu, muda na vitambulisho vya MusicBrainz vya nyimbo hizo pale faili zako zinapokuwa navyo. Hutuma “inacheza sasa” wimbo unapoanza, na usikilizaji pamoja na wakati wake mara tu unapokuwa umesikiliza nusu yake au dakika nne.",
+      "<strong>Discord.</strong> Ikiwa tu utawasha hali ya Discord kwenye Mipangilio, Vespertine huiambia programu ya Discord kwenye Mac yako, kupitia muunganisho unaobaki ndani ya Mac yako, kinachocheza: jina la wimbo, msanii, albamu, fomati na maendeleo ya uchezaji. Discord huionyesha kama hali yako kwa watu wanaoweza kuona shughuli zako. Ili kuonyesha jalada la albamu, Vespertine hulitafuta kwa jina, kwa sababu Discord inaweza kuonyesha picha za kutoka mtandaoni pekee: kwenye coverartarchive.org pale faili zako zinapobeba kitambulisho cha toleo la MusicBrainz, vinginevyo kwenye iTunes Search ya Apple (itunes.apple.com), ambayo hupokea majina ya msanii na albamu. Kisha Discord hupakua jalada kutoka hapo. Unaweza kuzima majalada, na faili zako pamoja na majalada yake hazipakiwi kamwe.",
+      "<strong>Folda za mtandao.</strong> Vespertine huunganishwa na seva unazoongeza, na si kwingine popote, ili kusoma muziki wako. Folda inayoshirikiwa ikiwa imeunganishwa, huhakikisha takriban kila dakika kwamba seva bado inajibu, na hutafuta muziki mpya kila nusu saa (kamwe si wakati unacheza kutoka kwake)."
+    ],
+    "websiteTitle": "Tovuti hii",
+    "website": [
+      "Tovuti hii imepangishwa kwenye GitHub Pages, ambayo huenda ikaweka kumbukumbu za anwani za IP za wageni; tazama <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">taarifa ya faragha ya GitHub</a>. Vitufe vya kupakua vinaelekeza kwenye matoleo ya programu kwenye GitHub. Tovuti haiweki vidakuzi, na hupakia fonti, picha na video zake kutoka tovuti hii yenyewe.",
+      "Ili kujua ni kurasa na vitufe gani watu hutumia, tovuti huhesabu ziara kwa <a href=\"https://umami.is\">Umami</a>, programu inayolinda faragha tunayoiendesha sisi wenyewe kwenye stats.szeremeta.org. Haiweki vidakuzi, haihifadhi chochote kwenye kifaa chako, haihifadhi anwani yako ya IP, na haishiriki chochote na watangazaji wala kampuni nyingine yoyote. Hurekodi ukurasa, tovuti uliyotoka, nchi yako kwa takriban, kivinjari chako, mfumo wa uendeshaji, ukubwa wa skrini na lugha, pamoja na mibofyo kwenye vitufe vya kupakua, GitHub na Homebrew. Haiwezi kukufuatilia kati ya tovuti mbalimbali wala kukutambua, na huwaruka wageni ambao kivinjari chao hutuma Do Not Track. <strong>Programu haiwasiliani nayo kamwe.</strong>",
+      "Ukichagua lugha kwa menyu ya lugha ya tovuti, kivinjari chako hukumbuka chaguo hilo kwenye kifaa chako (katika hifadhi yake ya ndani), ili tovuti isikurudishe kwenye lugha nyingine. Halitumwi popote kamwe, na tovuti hufanya kazi vilevile bila hilo."
+    ],
+    "changesTitle": "Mabadiliko na mawasiliano",
+    "changes": "Ikiwa hili litawahi kubadilika, ukurasa huu na maelezo ya matoleo yatasema hivyo kwanza. Maswali yanakaribishwa kama <a href=\"{href.issues}\">GitHub issue</a>."
+  },
+  "terms": {
+    "title": "Masharti: Vespertine ni programu huria chini ya GPL",
+    "description": "Vespertine ni programu huria chini ya GNU General Public License, toleo la 3 au la baadaye: bila gharama, bila kujisajili, bila dhamana.",
+    "ogAlt": "Masharti ya Vespertine: programu huria, kwa uwazi. GNU General Public License, toleo la 3 au la baadaye.",
+    "eyebrow": "Masharti",
+    "heading": "Programu huria,",
+    "headingBrass": "kwa uwazi.",
+    "updated": "Inatumika kuanzia {effective}",
+    "licenseTitle": "Leseni",
+    "license": "Vespertine ni programu huria chini ya <a href=\"{href.license}\">GNU General Public License, toleo la 3 au la baadaye</a>. Unaweza kuitumia kwa madhumuni yoyote, kusoma na kubadilisha msimbo wake wa chanzo, na kushiriki nakala, zikiwemo zilizobadilishwa, chini ya leseni hiyo hiyo. Haigharimu chochote, na hakuna cha kujisajili.",
+    "warrantyTitle": "Hakuna dhamana",
+    "warranty": "Kama leseni inavyosema, Vespertine inatolewa “kama ilivyo”, bila dhamana ya aina yoyote, kwa kiwango kinachoruhusiwa na sheria. Weka nakala rudufu za muziki wako. Vespertine hubadilisha faili pale tu unapohariri tagi zake, na huhifadhi nakala rudufu ya kila moja kwanza, lakini unaitumia kwa hatari yako mwenyewe.",
+    "musicTitle": "Muziki wako na huduma nyingine",
+    "music": "Una wajibu wa kuhakikisha una haki ya kucheza muziki unaouongeza. Vespertine haiwezi kucheza faili zilizolindwa kwa DRM na haijaribu kufanya hivyo. MusicBrainz, Cover Art Archive na ListenBrainz ni huduma zinazojitegemea zenye masharti yake, ambayo hutumika unapozitumia kupitia Vespertine.",
+    "trademarksTitle": "Alama za biashara",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus na Dolby TrueHD ni alama za biashara za Dolby Laboratories. DTS, DTS-HD Master Audio na DTS:X ni alama za biashara za DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS na Spatial Audio ni alama za biashara za Apple Inc. Vespertine inazitaja tu ili kueleza inachocheza na mahali inapokicheza. Haijathibitishwa, haijapewa leseni wala kuidhinishwa na Dolby, DTS au Apple.",
+    "contactTitle": "Mawasiliano",
+    "contact": "Hitilafu, maswali na maombi: <a href=\"{href.issues}\">GitHub issues</a>.",
+    "englishNote": "Hii ni tafsiri kwa urahisi wako. Maandishi yanayofunga kisheria ni GNU General Public License yenyewe, nayo iko kwa Kiingereza."
+  },
+  "notFound": {
+    "title": "Ukurasa haupatikani: Vespertine",
+    "description": "Ukurasa huu haupo hapa. Vespertine ni kicheza muziki cha Mac, bila malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res.",
+    "ogAlt": "Vespertine: kicheza muziki cha Mac, bila malipo na huria, kwa muziki wa sauti ya kuzunguka na hi-res.",
+    "eyebrow": "404 · Hakuna mawimbi",
+    "heading": "Ukurasa huu",
+    "headingBrass": "haupo hapa.",
+    "lede": "Huenda kiungo ni cha zamani, au anwani imeandikwa vibaya. Kila kitu kuhusu Vespertine huanzia kwenye ukurasa wa nyumbani.",
+    "home": "Nenda kwenye ukurasa wa nyumbani"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} au mpya zaidi",
+    "processor": "Apple silicon (arm64) au Intel (x86-64)",
+    "subCategory": "Kicheza muziki",
+    "sourceName": "Msimbo chanzo wa Vespertine",
+    "trailerName": "Trela ya Vespertine",
+    "trailerDescription": "Ziara ya sekunde 44 ya Vespertine, iliyorekodiwa kutoka kwenye programu halisi ikitumia maktaba ya msanidi mwenyewe: njia ya mawimbi ya bit-perfect, DSD kupitia DoP, sauti ya kuzunguka kama Spatial Audio kwenye AirPods na uchambuzi wa faili za hi-res.",
+    "keywords": "bit-perfect, sauti ya hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, kicheza muziki, macOS, programu huria"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 inaongeza urekebishaji wa chumba: pima spika zako kwa maikrofoni ya UMIK-1 na ucheze kupitia vichujio vilivyotengenezwa kwa ajili ya chumba chako. Pia huzuia uchezaji kutoka kwenye mtandao usiishiwe na data.",
+      "notes": "### Urekebishaji wa chumba\n- **Pima chumba chako.** Weka maikrofoni ya UMIK-1 iliyorekebishwa kwa vipimo sahihi kwenye kiti cha kusikilizia na Vespertine hucheza sauti za majaribio zinazopanda kupitia kila spika kwa zamu, katika sehemu 1 hadi 5 (5 kwa chaguo-msingi: kiti, kisha kushoto, kulia, mbele na nyuma). Kwanza hukagua kiwango na njia ya kufikia kila spika, hukataa kipimo kibovu na kukuruhusu ujaribu tena au uendelee pale ulipoishia. Stereo na 5.1 zote mbili zinatumika.\n- **Vichujio kwa kila spika.** Kutokana na kipimo, Vespertine huunda seti ndogo ya vichujio kwa kila spika, hasa vya kupunguza vilele vya besi ambavyo chumba huongeza. Chagua lengo (Joto ndilo chaguo-msingi, au Mteremko mpole au Bapa) na masafa (besi pekee, au masafa kamili) na vichujio hurekebishwa upya kutoka kwenye kipimo kilichohifadhiwa bila kupima tena. Grafu inaonyesha kilichopimwa, kinachotabiriwa baada ya urekebishaji na lengo, na utabiri umeandikwa wazi kuwa ni utabiri.\n- **Kupatanisha ucheleweshaji na kiwango.** Ucheleweshaji na kiwango cha kila spika hupimwa pia, ili spika zilizo karibu zicheleweshwe hadi sauti ya ile iliyo mbali zaidi ifike, na zenye sauti kubwa zaidi zipunguzwe hadi kulingana na ile yenye sauti ndogo zaidi.\n- **Tumia vichujio vyako mwenyewe.** Ingiza faili ya vichujio ya Equalizer APO au REW (ucheleweshaji, kiwango na vichujio vya kila spika), au ingiza miitikio ya msukumo (WAV, AIFF, CAF au FLAC) ili ichezwe kama vichujio vya convolution. Hamisha wasifu kama maandishi ya Equalizer APO au kama wasifu wa Vespertine. Mistari ambayo Vespertine haiwezi kucheza hukataliwa pamoja na nambari ya mstari, badala ya kuchezwa kama kitu kingine.\n- **Imezimwa kwa chaguo-msingi, ili bit-perfect ibaki bit-perfect.** Urekebishaji wa chumba huwashwa kwa kila kifaa cha kutoa sauti na hufungamana na kifaa ambacho kilipimiwa. Wakati unabadilisha sampuli, njia ya mawimbi huonyesha ROOM CORRECTION na mtiririko hautiwi tena alama ya bit-perfect. Ukiwa umezimwa, uchezaji haubadilishwi hata kidogo. Hali ya integer na Linganisha vyanzo vya biti 16 hubaki zimezimwa wakati umewashwa.\n- **Unachoshughulikia.** PCM ya stereo na 5.1 ambayo Vespertine huchakata. Bitstream za Dolby na DTS, Atmos na idadi nyingine za chaneli hujiweka kando, na njia ya mawimbi hueleza sababu. DSD kwenye DAC ya DoP hubadilishwa kuwa PCM wakati urekebishaji umewashwa ili nayo irekebishwe; weka alama kwenye Hifadhi DSD asilia kwa kifaa hicho cha kutoa sauti ili badala yake iende kama DSD asilia bila kurekebishwa.\n- **Dirisha moja.** Dirisha la View → Room Correction (linalopatikana pia kutoka kwenye dirisha la Kisawazishi na mipangilio ya kila kifaa cha kutoa sauti) lina swichi, vitufe vya Pima, Ingiza na Hamisha, wasifu, grafu ya kabla na baada, lengo na masafa, pamoja na ucheleweshaji, kiwango na vichujio vya kila spika. Hii inachukua nafasi ya dirisha la awali la beta la Room Measurement. Mbinu imeelezwa katika `docs/ROOM-CORRECTION.md`.\n\n### Uchezaji kupitia mtandao\n- **Kukatika kuchache kutoka kwenye NAS.** Nyimbo zilizo kwenye folda ya mtandao sasa hunakiliwa kwenye Mac yako kabla ya kuchezwa, na wimbo unaofuata hunakiliwa mapema, hivyo hitilafu ndogo kwenye mtandao haisimamishi tena muziki. Faili kubwa za DSD husomwa kwa njia inayoweka akiba ndefu tayari mbele ya uchezaji.\n- **Pete ya kupakia kwenye kitufe cha kucheza.** Wakati Vespertine inasubiri data kutoka kwenye mtandao, kitufe cha kucheza/kusitisha huonyesha pete ndogo inayozunguka (iliyotulia ikiwa Reduce Motion imewashwa). Hitilafu fupi za kusoma hujaribiwa tena.\n- **Mipaka.** Kukatika kwa muda mrefu sana, au muunganisho ulio polepole kuliko muziki, bado kunaweza kufanya uchezaji usitishwe ili kujaza tena. Nakala za akiba hazitumii zaidi ya 8 GB, na chanzo kikubwa kuliko hicho hushindwa kwa ujumbe ulio wazi. Tazama `docs/NETWORK-PLAYBACK.md`.\n\n### Mengine mapya\n- **DoP imewashwa kwa chaguo-msingi kwa DAC zinazojulikana.** FiiO K11 na Fosi Audio ZD3 huanza DoP ikiwa imewashwa. Ukiizima, Vespertine hukumbuka.\n- **Zilizoongezwa Hivi Karibuni huonyesha albamu 150**, kutoka 60, ili uingizaji mkubwa usisukume nje ya orodha albamu zilizoongezwa kabla yake.\n- **Fosi Audio ZD3.** ZD3 sasa iko kwenye orodha ya vifaa vinavyotumika na picha za skrini za tovuti zimepigwa upya kwa kuitumia.\n- **Tovuti.** Mstari wa “Ipe nyota kwenye GitHub” na “Jiunge na majadiliano” sasa uko chini ya vitufe vya kupakua.\n\n### Uthibitishaji\n- Majaribio ya injini, maktaba na programu yote yanapita, yakiwemo majaribio mapya ya muundo wa vichujio vya chumba, ya uchezaji kupitia hatua ya urekebishaji na kichujio cha convolution, ya hatua za kupima dhidi ya chumba kilichoigwa, ya miundo ya faili za kuingiza na ya akiba ya mtandao. Msimbo wa sauti wa muda halisi pia hukaguliwa chini ya sanitizer za anwani za kumbukumbu, nyuzi za utekelezaji na tabia isiyobainishwa ya msimbo.\n- Imekaguliwa kwenye maunzi halisi: kipimo kamili kwa UMIK-1 kwenye kiti cha kusikilizia, vichujio vilivyoundwa kutokana nacho, na uchezaji kupitia urekebishaji wa chumba kwenye Fosi Audio ZD3 yenye spika za stereo."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 hucheza DSD ya 5.1 katika Spatial Audio kwenye AirPods, hukuambia sauti inapobadilishwa au kuchanganywa (downmix), na haikwami tena unapoondoka.",
+      "notes": "### Spatial Audio\n- **DSD ya 5.1 sasa inacheza katika Spatial Audio.** Faili ya DSD ya 5.1 (DSF, DSDIFF, DSDIFF iliyobanwa kwa DST au nakala ya SACD) hubadilishwa kuwa PCM na kila chaneli huwekwa mahali pake, hivyo chaneli za LFE na surround hazipotei tena. Awali, chaneli zinazojitegemea za DSDIFF zingeweza kuangukia kwenye channel bed ya spika tatu na chaneli za nyuma zilipotea.\n- **Inaeleza kilichotokea kwa sauti.** Njia ya mawimbi huonyesha **DSD → PCM** kando ya SPATIAL au downmix, na arifa mbili mpya, “Imebadilishwa kutoka DSD” na “Imechanganywa hadi stereo”, huonekana pale zinapohusika. Zote mbili zimetafsiriwa katika lugha zote 44.\n- Imekaguliwa na msanidi kwenye AirPods Max.\n\n### Marekebisho\n- **Kuondoka hakukwami tena.** Cmd-Q ingeweza kuacha kishale kinachozunguka wakati Vespertine ikisubiri kifaa cha sauti. Sasa huondoka mara moja.\n- **Faili za chaneli nyingi husomwa ipasavyo.** Faili za RF64 na Wave64 hufunguka vizuri, majina ya chaneli za DSD husomwa kutoka kwenye faili, na upitishaji wa chaneli nyingi zinazojitegemea hufuata mpangilio wa chaneli wa faili yenyewe.\n\n### Uthibitishaji\n- Majaribio ya injini, maktaba na programu yote yanapita, yakiwemo majaribio mapya yanayocheza kila fomati ya DSD ya 5.1 kupitia Spatial Audio na kukagua kuwa kila chaneli inafika mahali pake. Ukaguzi wa uwekaji wa kushoto/kulia huendeshwa kwenye Mac halisi pekee; mashine za majaribio za GitHub huruka ukaguzi huo mmoja."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine sasa inaeleza pale kisawazishi kisipoweza kubadilisha kinachocheza, inatoa kisawazishi cha marejeleo cha hiari kwa kila modeli ya AirPods Max ya USB-C, na ina matokeo yake ya kwanza ya chaneli nyingi kwenye maunzi halisi."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine sasa huhifadhi historia ya ulichocheza, hupa Zinazofuata kidirisha chake kando ya maktaba, huonyesha kila toleo la albamu kwenye kadi moja, na inaweza kuonyesha unachocheza kama hali yako ya Discord."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine sasa inafanya kazi ipasavyo katika Light Mode, huruhusu vifaa vya kutoa sauti visivyo na kidhibiti cha kiwango cha sauti kutumia kiwango cha sauti cha Vespertine, na huendelea kuchambua maktaba yako unaposikiliza kutoka kwenye folda ya mtandao."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine sasa hucheza bila kukwama kutoka kwenye folda za mtandao zilizo polepole, huchambua maktaba kubwa haraka zaidi huku folda za mtandao zikijumuishwa, hucheza hi-res kwenye DAC ndogo za USB-C kwa kiwango cha juu zaidi zinachotoa, na huweka kibodi na uteuzi wa vipengee vingi pale unapotarajia."
+    }
+  }
+}

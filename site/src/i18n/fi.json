@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "Siirry sisältöön",
+    "tagline": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille.",
+    "requires": "macOS {minMacOS} tai uudempi.",
+    "arch": "Apple silicon ja Intel",
+    "download": "Lataa Macille",
+    "downloadVersion": "Lataa {version}",
+    "sourceOnGitHub": "Lähdekoodi GitHubissa",
+    "reportIssue": "Ilmoita ongelmasta",
+    "brewLead": "Tai Homebrew’lla:",
+    "copy": "Kopioi",
+    "copyLabel": "Kopioi Homebrew-komento",
+    "copied": "Kopioitu",
+    "copyFailed": "Valitse teksti",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ja Dolby TrueHD ovat Dolby Laboratoriesin tavaramerkkejä. DTS, DTS-HD Master Audio ja DTS:X ovat DTS, Inc:n tavaramerkkejä. Apple, AirPods, AirPods Max, Mac, macOS ja Tilaääni (Spatial Audio) ovat Apple Inc:n tavaramerkkejä. Vespertine mainitsee ne vain kertoakseen, mitä se toistaa ja missä; Dolby, DTS tai Apple ei ole sertifioinut, lisensoinut eikä hyväksynyt sitä.",
+    "trailerLabel": "Vespertine-traileri, 44 sekuntia",
+    "untested": "Kanava kanavaan -ulostulo ja bittivirta vastaanottimelle ovat kokeellisia, eikä niitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan."
+  },
+  "nav": {
+    "label": "Päävalikko",
+    "home": "Vespertine, etusivu",
+    "top": "Vespertine, takaisin ylös",
+    "features": "Ominaisuudet",
+    "formats": "Formaatit",
+    "compare": "Vertailu",
+    "whatsNew": "Uutta",
+    "faq": "UKK",
+    "press": "Lehdistöpaketti",
+    "download": "Lataa",
+    "downloadLabel": "Lataa Vespertine {version} Macille"
+  },
+  "lang": {
+    "label": "Kieli",
+    "menuLabel": "Valitse kieli",
+    "current": "Nykyinen kieli"
+  },
+  "footer": {
+    "project": "Projekti",
+    "about": "Tietoja",
+    "releaseNotes": "Julkaisutiedot",
+    "sponsor": "Tue",
+    "discussions": "Keskustelut",
+    "architecture": "Arkkitehtuuri",
+    "privacy": "Tietosuoja",
+    "terms": "Käyttöehdot",
+    "license": "Lisenssi (GPL-3.0)",
+    "notices": "Kolmansien osapuolten huomautukset",
+    "ukraine": "<strong>Vespertine on Ukrainan tukena.</strong> Lahjoita näiden kautta: {orgs}.",
+    "copyright": "© {year} Vespertinen tekijät",
+    "free": "Vapaa ohjelmisto GPL-lisenssillä",
+    "madeIn": "Tehnyt {author} Bostonissa",
+    "backToTop": "Takaisin ylös",
+    "home": "Etusivu"
+  },
+  "home": {
+    "title": "Vespertine: surround- ja hi-res-musiikkisoitin Macille",
+    "description": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-kokoelmille: SACD- ja DVD-Video-levykuvat, DSD, DTS CD -levyt, DTS-HD MA -, TrueHD- ja Dolby Atmos -tiedostot, tilaääni AirPods-kuulokkeilla, omassa huoneessasi mitattu huonekorjaus ja bittitarkka signaalipolku, jonka voit tarkistaa.",
+    "ogAlt": "Vespertine: ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikille. Signaalipolku näyttää 24-bit / 96 kHz FLAC -tiedoston soivan bittitarkasti Fosi Audio ZD3:lla. Versio {version}, macOS {minMacOS} tai uudempi.",
+    "hero": {
+      "eyebrow": [
+        "Ilmainen ja avointa lähdekoodia",
+        "macOS {minMacOS}+",
+        "Apple silicon ja Intel"
+      ],
+      "titleSr": "Surround- ja hi-res-musiikkia Macillasi.",
+      "titleLines": [
+        "Surround- ja",
+        "hi-res-musiikkia"
+      ],
+      "titleBrass": "Macillasi.",
+      "lede": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, DSD, DTS CD -levyt sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa stereoalbumiesi kanssa, ja AirPods-kuulokkeilla ne soivat tilaäänenä pään seurannalla. Huonekorjaus mittaa huoneesi USB-mikrofonilla ja korjaa jokaisen kaiuttimen. Se on pois päältä, kunnes otat sen käyttöön. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon. Englanniksi ja {languages} muulla kielellä.",
+      "ask": "Pidätkö siitä?",
+      "star": "Anna tähti GitHubissa",
+      "discuss": "Liity keskusteluun",
+      "version": "Versio {version}",
+      "signed": "allekirjoitettu ja notarisoitu",
+      "releaseNotes": "Julkaisutiedot",
+      "privacy": "Tietosuoja: mitään ei kerätä.",
+      "panelAlt": "Vespertinen Toistetaan nyt -tarkastaja: Lisztin Les jeux d’eaux à la Villa d’Este Lazar Bermanin soittamana, merkinnöillä HI-RES HÄVIÖTÖN ja BITTITARKKA, yksinomainen, 32 / 96, sekä signaalipolku 24-bit / 96 kHz FLAC -tiedostosta libFLACin kautta natiivilla taajuudella ja täydellä äänenvoimakkuudella Fosi Audio ZD3:lle.",
+      "panelCaption": "Signaalipolku",
+      "followSignal": "Seuraa signaalia"
+    },
+    "trailer": {
+      "eyebrow": "Traileri",
+      "title": "Vespertine 44 sekunnissa.",
+      "text": "Laita äänet päälle. Kaikki videossa on oikeaa sovellusta, kuvattuna kehittäjän omalla kirjastolla.",
+      "fallback": "Katso traileri (MP4)",
+      "caption": "44 s · 1080p · kansikuvat kuuluvat oikeudenhaltijoilleen"
+    },
+    "features": {
+      "eyebrow": "Miksi Vespertine",
+      "title": "Tehty surround-kokoelmallesi.",
+      "text": "Surround- ja stereomusiikki samassa kirjastossa, ja soitin, joka näyttää tarkalleen, mitä se teki signaalille.",
+      "badgesLabel": "Sovelluksen näyttämät signaalipolun tilat"
+    },
+    "pillars": [
+      {
+        "title": "Surround samassa kirjastossa",
+        "text": "SACD-levykuvat ja -rippaukset, DVD-Video-levyt, DTS CD -levyt sekä DTS-HD MA ja TrueHD ovat stereoalbumiesi rinnalla ja soivat AirPods-kuulokkeilla tilaäänenä pään seurannalla. Kun albumista on molemmat versiot, jokainen kappale näkyy listassa kerran ja soimaan pääsee ulostulollesi sopiva versio."
+      },
+      {
+        "title": "Signaalipolku, jonka voit tarkistaa",
+        "text": "Näytteenottotaajuudet, sananpituudet, vahvistus ja kanavakäsittely luettuna takaisin Core Audiosta. Bittitarkkuuden ehdot ovat lähdekoodissa, ja niille on automaattiset testit, loopback-testi ja ohje laitteistotason varmennukseen."
+      },
+      {
+        "title": "Tarkistaa hi-res-tiedostot",
+        "text": "Analyysi merkitsee täytetyn bittisyvyyden sekä mahdollisen ylösnäytteistyksen tai häviöllisen alkuperän. Spektriin perustuvat tulokset ovat arvioita, ja ne näytetään todisteineen ja rajoituksineen. Sama analyysi toimii Linux-palvelimella tiedostojesi vieressä."
+      },
+      {
+        "title": "Avoin lähdekoodi, jonka voit tarkastaa",
+        "text": "Ilmainen GPL-lisenssillä. Lue, käännä ja muokkaa soitinta, myös sen ulostuloehtoja ja testejä. Ei tiliä, tilausta, mainoksia eikä telemetriaa."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bittitarkka",
+      "exclusive": "Yksinomainen",
+      "spatial": "Tilaääni · pään seuranta",
+      "synthetic": "Synteettiset korkeat taajuudet?",
+      "roomCorrection": "Huonekorjaus"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Signaalipolku",
+        "kicker": "Bittitarkka",
+        "title": "Jokainen kappale omalla taajuudellaan ja bittisyvyydellään.",
+        "lede": "Signaalipolku listaa jokaisen vaiheen tiedostosta DAC:llesi asti, luettuna takaisin Core Audiosta, ja kertoo, kun jokin muutti näytteitä.",
+        "body": [
+          "Vespertine vaihtaa laitteen kunkin tiedoston näytteenottotaajuudelle ja muuntaa taajuutta Applen masterointitason muuntimella vain silloin, kun DAC ei pysty toimimaan sillä. <span class=\"mono nowrap\">BITTITARKKA</span> näkyy vain, kun lähdekoodin ehdot täyttyvät: natiivi taajuus, mikään ei muuta näytteitä, sananpituus mahtuu ja laite on yksinomaisessa käytössä tai sitä ei jaeta toisen sovelluksen kanssa. Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti sekä FiiO K11:llä PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti."
+        ],
+        "list": [
+          "Yksinomainen tila (hog) pitää muut sovellukset poissa laitteelta. Jaetussa tilassa äänenvoimakkuusnäppäimet ja Digital Crown säätävät DAC:tasi; yksinomaisessa tilassa ne voivat säätää sitä myös, jos otat asetuksen käyttöön.",
+          "Kokonaislukutila lähettää käsittelemättömän 32-bittisen PCM:n suoraan DAC-laitteille, jotka ottavat vastaan kokonaislukuja.",
+          "Sovita 16-bittisiin lähteisiin (oletuksena pois päältä) lähettää 16-bittiset tiedostot DAC-laitteille, joissa on aito 16-bittinen tila, 16-bittisinä eikä nollilla täytettyinä.",
+          "Katkoton toisto, myös CUE-tiedostolla yhdestä tiedostosta jaetuissa albumeissa.",
+          "Muistaa DAC:si. Jos se ei ole yhdistettynä, musiikki soi parhaan yhdistetyn ulostulon kautta ja siirtyy takaisin, kun DAC palaa.",
+          "Ulostulot, joissa ei ole omaa äänenvoimakkuuden säätöä (HDMI, optinen, linjalähtö), voivat käyttää Vespertinen äänenvoimakkuutta; valinta tehdään ulostulokohtaisesti. Alle 100 %:n voimakkuudella merkinnät kertovat, ettei toisto ole enää bittitarkka.",
+          "Palauttaa DAC:si sen aiempaan näytteenottotaajuuteen ja bittisyvyyteen, kun Vespertine suljetaan.",
+          "Sisäänrakennettu loopback-testi vertaa jokaista Vespertinen virtuaalilaitteelle lähettämää näytettä. Se on ohjelmistotason tarkistus, joka on myös merkitty sellaiseksi, eikä se koskaan muuta <span class=\"mono nowrap\">BITTITARKKA</span>-merkintää."
+        ],
+        "links": [
+          "Ehdot koodissa",
+          "Varmista itse",
+          "Mitä loopback-testi todistaa"
+        ],
+        "alt": "Vespertine toistaa Lazar Bermanin esittämää Lisztin teosta Années de pèlerinage 24-bit / 96 kHz FLAC -tiedostosta: tarkastaja merkitsee toiston bittitarkaksi ja yksinomaiseksi Fosi Audio ZD3:lla ja näyttää signaalipolun jokaisen vaiheen.",
+        "floatAlt": "Loopback-testin taulukko: 24-bit 44,1 ja 96 kHz:llä, täytetty 16-bit sekä katkoton pari, jokainen bittitarkka.",
+        "floatCaption": "Loopback-testi · ohjelmistotarkistus"
+      },
+      "room-correction": {
+        "jack": "Huonekorjaus",
+        "kicker": "Huonekorjaus",
+        "title": "Mittaa huoneesi. Korjaa jokainen kaiutin.",
+        "lede": "Mittaa huoneesi UMIK-1:llä tai muulla kalibroidulla USB-mikrofonilla. Vespertine sovittaa suodattimet jokaiselle kaiuttimelle sen perusteella, mitä se kuulee kuuntelupaikallasi.",
+        "body": [
+          "Pyyhkäisyt soivat yhden kaiuttimen kautta kerrallaan, yhdessä–viidessä kohdassa kuuntelupaikkasi ympärillä. Jokainen kaiutin saa omat suodattimensa, jotka suunnitellaan mittauksen perusteella. Ne ovat enimmäkseen vaimennuksia: ne laskevat huoneen korostumia ja nostavat leveitä notkoja vain maltillisesti. Sama mittaus asettaa jokaisen kaiuttimen viiveen ja tason, joten jokaisen kaiuttimen ääni saapuu kuuntelupaikallesi samaan aikaan ja samalla voimakkuudella. Huonekorjaus on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>."
+        ],
+        "list": [
+          "Kolme tavoitetta: Warm (oletus), Gentle tilt ja Flat. Korjaa vain basso tai koko alue, ja suunnittele suodattimet myöhemmin uudelleen ilman uutta mittausta.",
+          "Tuo suodattimet REW:stä tai Equalizer APO:sta kunkin kaiuttimen viiveineen ja tasoineen ja vie suodattimia Equalizer APO -tekstimuodossa.",
+          "Tuo impulssivasteita (WAV, AIFF, CAF tai FLAC) ja toistaa ne konvoluutiolla.",
+          "Stereo ja 5.1.",
+          "Huonekuva näyttää kaiuttimet, kuuntelupaikkasi ja kunkin mikrofonikohdan sitä mukaa kuin niitä mitataan. Sen jälkeen käyräsiirtymä muuttaa mitatun vasteen ennustetuksi, ja ennen/jälkeen-kytkimellä voit verrata niitä."
+        ],
+        "note": "”Jälkeen”-käyrä on ennustettu mittauksen ja suodattimien perusteella, ei mitattu. Jos haluat nähdä, mitä huone todella tekee, mittaa uudelleen korjauksen ollessa päällä.",
+        "links": [
+          "Näin huonekorjaus toimii"
+        ],
+        "alt": "Vespertinen ennustama huonekorjaus stereoparille Warm-tavoitteella. Kullekin kaiuttimelle näkyvät mitattu vaste, tavoite, ennustettu vaste korjauksen jälkeen ja kaiuttimen omat suodattimet. Huoneen korostumaa noin 120 Hz:n kohdalla on vaimennettu 14 ja 18 dB.",
+        "floatAlt": "Huonekuva mittausavustajassa: vasen ja oikea kaiutin, kuuntelupaikka ja sen ympärillä viisi mikrofonikohtaa, joista ensimmäisessä on mikrofoni.",
+        "floatCaption": "Huonekuva"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround ja tilaääni",
+        "title": "5.1-levysi samassa kirjastossa.",
+        "lede": "Monikanavainen musiikki soi AirPods-kuulokkeilla tilaäänenä pään seurannalla tai miksataan stereo-DAC:lle stereoksi kanavakokoonpanon mukaan.",
+        "body": [
+          "DTS CD -levyt dekoodataan 5.1-ääneksi. SACD-levykuvat, puretut SACD-raidat, monikanavainen FLAC, TrueHD ja DTS-HD MA renderöidään AirPods-kuulokkeilla tilaäänenä pään seurannalla tai miksataan stereoksi stereo-DAC:lle. Atmosia sisältävä Dolby Digital Plus käyttää macOS:n objektirenderöijää; TrueHD Atmos ja DTS:X toistavat kanavapohjaisen pohjakerroksensa. Kanava kanavaan -ulostulo on kokeellinen, eikä sitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan."
+        ],
+        "list": [
+          "Albumin stereo- ja surround-versiot näkyvät listassa kerran; Vespertine toistaa sen, joka sopii ulostuloon, tai sen, jonka kiinnität.",
+          "Dolby Digitalin, DD+:n ja DTS-CD:n bittivirta vastaanottimelle on kokeellinen, eikä sitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan. Kantoaaltotestit käyttävät FFmpegin S/PDIF-lukijaa. TrueHD:n ja DTS-HD MA:n muuttamatonta läpivientiä vastaanottimelle ei tueta macOS:ssä.",
+          "Vie tilaääntä varten binauraalisena stereona kuulokkeille tai monikanavaisena ALAC-tiedostona Apple-laitteille, tagien ja kansikuvien kanssa."
+        ],
+        "alt": "Elton Johnin Goodbye Yellow Brick Road, 24-bit / 88,2 kHz 5.1-albumi, soi tilaäänenä pään seurannalla AirPods Max -kuulokkeilla; näkyvissä signaalipolku ja mittari jokaiselle kanavalle.",
+        "floatAlt": "Albumi, jonka jokaisesta kappaleesta on stereo- ja 5.1-versio, listattuna kerran.",
+        "floatCaption": "Stereo ja 5.1, listattu kerran"
+      },
+      "discs": {
+        "jack": "Levykuvat ja DSD",
+        "kicker": "SACD, DVD-Video ja DSD",
+        "title": "Soita suoraan levykuvasta.",
+        "lede": "Valitse SACD- tai DVD-Video-levykuva, niin Vespertine toistaa musiikin suoraan siitä – mitään ei liitetä, pureta eikä kirjoiteta.",
+        "body": [
+          "SACD-levykuvista (<span class=\"mono\">.iso</span>) soivat stereo- ja 5.1-alueet, DST-pakattuina tai pakkaamattomina, ja nimet tulevat levyn omista tekstitiedoista. DST puretaan takaisin täsmälleen alkuperäiseksi DSD:ksi, joten stereo menee DAC:lle natiivina DSD:nä DoP:n kautta, jos DAC tukee sitä, ja 5.1 soi AirPods-kuulokkeilla tilaäänenä pään seurannalla. DVD-Video-levyjen LPCM-musiikki (<span class=\"mono\">.iso</span> tai <span class=\"mono\">VIDEO_TS</span>-kansio) soi bitti bitiltä, yksi albumi nimikettä ja yksi raita lukua kohden."
+        ],
+        "list": [
+          "Tulos vastasi sacd_extractin tulosta bitti bitiltä kahdella oikealla levyllä. Levyt, joilla on 5.0-alue, pelkkä monikanava-alue tai DSD128 tai sitä korkeampi, on toistaiseksi katettu vain synteettisillä testilevykuvilla.",
+          "DSF ja DSDIFF DSD64:stä DSD512:een, myös DST-pakattu DSDIFF, lähtevät DoP:nä DAC-laitteille, jotka tukevat kantoaaltotaajuutta, tai muunnetaan korkean näytteenottotaajuuden PCM:ksi. DoP on vahvistettu Fosi Audio ZD3:lla DSD256:een asti ja FiiO K11:llä DSD128:aan asti. DSD512:ta DoP:n kautta ei ole testattu laitteistolla.",
+          "DVD-Video LPCM 16, 20 ja 24 bitillä, 48 ja 96 kHz:llä, enintään 8 kanavaa. DVD-Audiota ei tueta, ja salatuista (CSS) levyistä tarvitaan salauksesta purettu kopio."
+        ],
+        "links": [
+          "Lisätietoa DVD-Videosta"
+        ],
+        "alt": "Dire Straitsin Brothers In Arms soi suoraan SACD-levykuvastaan: stereo-DSD64 DoP:n kautta FiiO K11:lle, NATIIVI DSD · DoP -merkintä, ja dekooderikentässä lukee SACD-levykuva, DST (häviötön).",
+        "floatAlt": "Claudja Barryn Love for the Sake of Love DSD128:na DoP:n kautta Fosi Audio ZD3:lle, 352,8 kHz:llä.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Analyysi",
+        "kicker": "Väärennetyn hi-resin tunnistus ja spektri",
+        "title": "Selvitä, mitkä ”hi-res”-tiedostot eivät sitä ole.",
+        "lede": "Jokaisesta tiedostosta voi analysoida todellisen bittisyvyyden, todellisen kaistanleveyden sekä häviöllisten enkooderien ja näytteenottotaajuusmuuntimien sormenjäljet.",
+        "body": [
+          "Tulosten mukana tulevat niiden todisteet ja muut mahdolliset selitykset, ja <em>Epäilyttävä hi-res</em> -soittolista kokoaa ne. Vain nollatäytön tunnistus on tarkka: spektriin perustuvat tulokset esitetään kysymyksinä, koska jotkin korkean bittinopeuden häviölliset tiedostot menevät läpi aitoina ja jyrkät masterointisuodattimet, FM-lähteet sekä nauha- tai vinyylisiirrot voivat näyttää epäilyttäviltä. Musiikin soidessa mittarit ja reaaliaikainen spektri näyttävät, mitä ulos lähtee, myös DoP:n."
+        ],
+        "list": [
+          "24-bittisiin säiliöihin täytetty 16-bittinen ääni",
+          "Todennäköisesti ylösnäytteistetyt CD-laatuiset masterit, joita myydään 96 tai 192 kHz:n versioina",
+          "Todennäköinen häviöllinen alkuperä: MP3 tai AAC transkoodattuna FLACiksi",
+          "Todennäköisesti synteettiset korkeat taajuudet SBR:stä tai ”tekoälyparannuksesta”",
+          "<span class=\"mono\">vespertine-analyze</span> ajaa saman analyysin Linux-palvelimella tiedostojesi vieressä; sovellus tuo tulokset."
+        ],
+        "note": "Tämän kuvakaappauksen tiedosto on tahallinen väärennös: trailerin oma musiikki, koodattu MP3:ksi ja ylösnäytteistetty 24/192:een keksityn yhtyeen nimellä.",
+        "links": [
+          "Miten analyysi toimii ja missä se pettää"
+        ],
+        "alt": "Analyysi-välilehti merkitsee 24/192-”remasterin” alkuperän todennäköisesti häviölliseksi: sen pitkän aikavälin spektri loppuu 16 kHz:iin."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max USB-C:n kautta",
+        "title": "Häviötön AirPods Maxilla – ja sen näkee.",
+        "lede": "USB-C-kaapelilla yhdistettyinä AirPods Max tunnistetaan häviöttömäksi 24-bit / 48 kHz -laitteeksi.",
+        "body": [
+          "48 kHz:n musiikki soi bittitarkasti, ja kaikki muu muunnetaan Applen masterointitason näytteenottotaajuusmuuntimella avoimesti näkyvissä. Bluetoothin kautta Vespertine kertoo, että yhteys on AAC. Tämä perustuu Applen kuvaukseen kaapeliyhteydestä ja Core Audion takaisinlukuun, koska AirPods-kuulokkeissa ei ole digitaalista ulostuloa, jonka voisi kytkeä loopbackiin."
+        ],
+        "alt": "Älykäs soittolista 24-bit / 48 kHz -kappaleista, rajattuna artistiin Oasis, soi bittitarkasti AirPods Max -kuulokkeilla USB-C:n kautta."
+      },
+      "library": {
+        "jack": "Kirjasto",
+        "kicker": "Kirjasto",
+        "title": "Selaa kuin Apple Musicissa. Hallitse kuin kirjastonhoitaja.",
+        "lede": "Albumit, artistit, kappaleet ja tyylilajit – jokaisessa yhdisteltäviä suodattimia ja Sekoita-toiminto.",
+        "list": [
+          "Suodata formaatin, 24-bitin, vähintään 88,2 kHz:n, monikanavaisuuden, tyylilajin, vuoden, näytteenottotaajuuden, kanavien ja analyysin tuloksen mukaan. Haku ei välitä kirjainkoosta eikä aksenteista.",
+          "Älykkäät soittolistat niillä yksiköillä, joilla ajattelet: 24-bit, 88,2 kHz.",
+          "Saman albumin remasteroinnit, mono- ja stereojulkaisut sekä SACD:t jakavat yhden kortin; valitse painos, kun avaat sen.",
+          "Suosikit ja soittokerrat tallennetaan kirjastoon, eikä niitä koskaan kirjoiteta tiedostoihisi. M3U- ja Apple Music -soittolistojen, soittokertojen ja suosikkien tuonti.",
+          "Tagieditori varmuuskopioineen ja yhden askeleen palautuksella sekä MusicBrainz-täydennys, joka näyttää varmuustasonsa ennen kuin kirjoittaa mitään.",
+          "Verkkojaot SMB:n, NFS:n tai WebDAVin kautta, välimuistilla, Pidä offline-tilassa -toiminnolla ja hitaille palvelimille suunnitellulla toistolla: kappaleet puskuroidaan Macillesi ennen toistoa, ja sillä aikaa toistopainikkeessa näkyy latausrengas.",
+          "Etsi musiikkia käy läpi kaikki asemat, löytää todellisen musiikkisi ja jättää sotkun pois. Lyhyt käyttöönotto ensimmäisellä käynnistyskerralla valitsee ulostulosi ja kertoo, mitä yksinomainen käyttö ja ReplayGain tekevät.",
+          "Ulostulokohtainen parametrinen EQ, joka tuo AutoEQ- ja Equalizer APO -esiasetuksia. Oletuksena pois päältä; kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">TAAJUUSKORJAIN</span> eikä <span class=\"mono nowrap\">BITTITARKKA</span>.",
+          "Minisoitin, valikkorivin lisäke, medianäppäimet, ReplayGain sekä automaattiset, allekirjoitetut päivitykset."
+        ],
+        "links": [
+          "Kaikki ominaisuudet yksityiskohtaisesti"
+        ],
+        "alt": "Tyylilajit-sivu: oma ruutu jokaiselle tyylilajille ja sen kansikuvista koottu mosaiikki."
+      },
+      "languages": {
+        "jack": "Kielet",
+        "kicker": "{languages} kieltä",
+        "title": "Puhuu kieltäsi.",
+        "lede": "Jokainen valikko, asetus ja signaalipolun viesti on käännetty englannin lisäksi {languages} kielelle.",
+        "body": [
+          "Ukrainasta, saksasta ja japanista swahiliin, tamiliin ja hausaan, paikallisine monikkomuotoineen ja lukujen esitystapoineen, ja yksinkertaistetulla, perinteisellä ja Hongkongin kiinalla on kullakin oma sanastonsa. Arabia, heprea, persia ja urdu saavat oikealta vasemmalle -asettelun.",
+          "Näin käännökset tarkistetaan: jokaisen muutoksen yhteydessä automaattinen tarkistus varmistaa, että jokainen sovelluksen merkkijono on olemassa kaikilla 44 kielellä samoine paikkamerkkeineen ja kunkin kielen tarvitsemine monikkomuotoineen. Lisäksi päänäkymät tarkistettiin useilla kielillä leikkautuneen tai päällekkäisen tekstin ja oikealta vasemmalle -peilauksen varalta. Käännökset tehtiin alun perin huolellisella konekäännöksellä, joten äidinkielisten puhujien korjaukset ovat erittäin tervetulleita <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHubissa</a>."
+        ],
+        "alt": "Vespertine kirjoitettuna kaikilla sen {languagesTotal} käyttöliittymäkielellä, muodoista ヴェスパタイン ja Веспертайн muotoihin فسبرتاين ja वेस्परटाइन, eri kokoisina ja eri kirjasintyypein.",
+        "wallLabel": "Vespertine kaikilla kielillään"
+      }
+    },
+    "formats": {
+      "eyebrow": "Formaatit",
+      "title": "Surround-, häviöttömät ja häviölliset tiedostot.",
+      "text": "Stereo ja monikanava, PCM ja DSD, levykuvat ja tavalliset tiedostot, ja kaikissa CUE-tuki.",
+      "caption": "Vespertinen toistamat formaatit ja miten se ne toistaa",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Alkuperäinen taajuus ja sananpituus: jopa 32-bit ja mikä tahansa taajuus, jolla DAC:si toimii (testattu 768 kHz:iin asti). Muuttamaton 32-bit PCM vaatii kokonaislukutilan. Levykuvat CUE-tiedostoineen."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF ja DSDIFF, DST-pakattuna tai pakkaamattomana. DoP riippuu DAC:sta ja kantoaaltotaajuudesta, muuten PCM. DoP on testattu DSD256:een asti. DSD512:ta DoP:n kautta ei ole testattu laitteistolla."
+        },
+        {
+          "name": "SACD-levykuvat",
+          "text": "Stereo- ja monikanava-alueet, DST-pakattuina tai pakkaamattomina, suoraan levykuvasta. Jokainen kappale listataan kerran stereo- ja 5.1-versioineen."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16-, 20- ja 24-bit, 48 ja 96 kHz, 1–8 kanavaa, bitti bitiltä. Yksi albumi nimikettä kohden ja yksi raita kutakin lukua kohden. DVD-Audiota ei tueta."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus Atmosilla: sen renderöi macOS:n objektirenderöijä, tai toistetaan sen dekoodattu kanavapohja."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Häviötön, voi olla bittitarkka. TrueHD Atmosista toistetaan kanavapohja, objekteja ei renderöidä."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA on häviötön ja voi olla bittitarkka. DTS:X-raidoista toistetaan kanavapohja. Raaka DTS dekoodataan, ja DTS-CD-bittivirralla on oma erillinen polkunsa."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "macOS dekoodaa. Bittivirta vastaanottimelle on kokeellinen eikä sitä ole testattu oikeilla vastaanottimilla tai monikanavaisilla USB-DAC:eilla (yksi Sony-televisio HDMI:n kautta on testattu: ks. docs/DEVICES.md). Raportteja kaivataan."
+        },
+        {
+          "name": "DTS-CD:t ja DTS-WAV",
+          "text": "Tunnistetaan ja dekoodataan 5.1-muotoon, myös CUE-tiedostolla jaetut albumit."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Häviöttömiä. WavPackin sisällä olevaa DSD:tä ei tueta."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Dekoodataan ja merkitään häviöllisiksi."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Vertailu",
+      "title": "Miten se pärjää.",
+      "intro": "Useat Mac-soittimet tarjoavat bittitarkan toiston. Tässä vertaillaan, mitä kunkin soittimen oma dokumentaatio tai lähdekoodi kertoo. ”Ei dokumentoitu” tarkoittaa, ettei valmistaja kerro asiasta suuntaan eikä toiseen. Se ei tarkoita, että ominaisuus puuttuu. Vespertinen konvoluutio on tarkoitettu huonekorjaukseen. Siinä ei ole ääniefektilaajennuksia eikä suoratoistopalveluita.",
+      "hint": "Vieritä nähdäksesi lisää →",
+      "region": "Vertailutaulukko (vierittyy sivusuunnassa)",
+      "caption": "Vespertine verrattuna seitsemään muuhun Mac-musiikkisoittimeen kunkin soittimen oman dokumentaation tai lähdekoodin perusteella",
+      "feature": "Ominaisuus",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Lähdekoodi",
+          "GPL-3.0",
+          "Suljettu",
+          "Suljettu",
+          "Suljettu",
+          "Suljettu",
+          "Suljettu",
+          "GPL-2.0",
+          "Suljettu"
+        ],
+        [
+          "FLAC- / DSD-tiedostot",
+          "Kyllä / Kyllä",
+          "Ei / Ei",
+          "Kyllä / Kyllä",
+          "Kyllä / Kyllä",
+          "Kyllä / Kyllä",
+          "Kyllä / Kyllä",
+          "Kyllä / Kyllä",
+          "Kyllä / Ei⁴"
+        ],
+        [
+          "Automaattinen DAC-taajuuden vaihto",
+          "Kyllä",
+          "Ei",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Ei dokumentoitu"
+        ],
+        [
+          "Yksinomainen (hog) -tila",
+          "Kyllä",
+          "Ei",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä"
+        ],
+        [
+          "16/24-bit PCM ilman näytteiden muutoksia",
+          "Ehdot + testit",
+          "macOS 27: kolmannen osapuolen testit¹",
+          "Valmistajan väite",
+          "Valmistajan väite",
+          "Sovelluksen sisäinen loopback-testi",
+          "Valmistajan väite",
+          "Sovelluksen sisäinen ilmaisin",
+          "Ei dokumentoitu"
+        ],
+        [
+          "Paikalliset surround-tiedostot",
+          "Kyllä²",
+          "Ei dokumentoitu",
+          "Kyllä",
+          "Kyllä",
+          "Kyllä",
+          "Ei dokumentoitu",
+          "Kyllä",
+          "Ei dokumentoitu"
+        ],
+        [
+          "Applen Tilaääni paikallisille surround-tiedostoille",
+          "Kyllä",
+          "Vain katalogin Atmos³",
+          "Ei dokumentoitu",
+          "Ei dokumentoitu",
+          "Ei dokumentoitu",
+          "Ei dokumentoitu",
+          "Kyllä",
+          "Ei dokumentoitu"
+        ],
+        [
+          "Hi-res-tiedostojen analyysi",
+          "Kyllä",
+          "Ei",
+          "AudioScan",
+          "Dynamiikka-alue, äänekkyys",
+          "Kyllä",
+          "Ei dokumentoitu",
+          "Ei (vain reaaliaikainen spektri)",
+          "Ei (vain reaaliaikainen spektri)"
+        ],
+        [
+          "SACD ISO",
+          "Kyllä",
+          "Ei",
+          "Kyllä",
+          "Ei (vain DSF/DFF)",
+          "Kyllä",
+          "Ei",
+          "Ei",
+          "Ei⁴"
+        ],
+        [
+          "Huonekorjaus",
+          "Mittaus sovelluksessa (USB-mikrofoni) tai REW- / APO-suodattimien ja impulssivasteiden tuonti",
+          "Ei",
+          "Konvoluutiolla (Origin: maksullinen lisävalinta) tai Audio Units -laajennuksilla",
+          "Konvoluutiolla",
+          "Ei (tarkoituksella)",
+          "Ei dokumentoitu",
+          "Ei",
+          "Ei dokumentoitu"
+        ],
+        [
+          "Konvoluutio / ääniefektilaajennukset",
+          "Kyllä (huonekorjaus) / Ei",
+          "Ei / Ei",
+          "Kyllä (Origin: maksullinen lisävalinta) / Audio Units",
+          "Kyllä / Ei",
+          "Ei / Ei",
+          "Ei dokumentoitu / Ei dokumentoitu",
+          "Ei / Ei",
+          "Ei dokumentoitu / Audio Units"
+        ],
+        [
+          "Suoratoistopalvelut",
+          "Ei",
+          "Apple Music",
+          "Studio: kyllä; Origin: ei",
+          "Kyllä",
+          "Ei (paikallinen + UPnP)",
+          "Ei (internetradio)",
+          "Ei (internetradio)",
+          "Ei (internetradio)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music oli macOS 27:ssä bittitarkka 16/24-bit-sananpituuksilla <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">ASR:ssä raportoiduissa kolmannen osapuolen loopback-testeissä</a> 100 %:n äänenvoimakkuudella. Kyseessä ei ole Vespertinen mittaus, eikä alkuperäistä raporttia voitu tarkistaa uudelleen riippumattomasti tätä päivitystä varten. Macissa siitä puuttuvat edelleen automaattinen taajuudenvaihto, hog-tila, FLAC ja DSD.",
+        "² Monikanavainen DAC-ulostulo ja bittivirta vastaanottimelle ovat kokeellisia eikä niitä ole testattu oikeilla vastaanottimilla tai monikanavaisilla USB-DAC:eilla (yksi Sony-televisio HDMI:n kautta on testattu: ks. docs/DEVICES.md). Raportteja kaivataan.",
+        "³ Apple dokumentoi pään liikkeitä seuraavan Tilaäänen Apple Music -katalogin Dolby Atmos -kappaleille. Omien monikanavaisten tiedostojesi tilallista renderöintiä se ei dokumentoi.",
+        "⁴ Testattu foobar2000:n versiolla 2.26 (macOS 27.0.1) ilman komponentteja: DSF-, DFF- ja SACD ISO -tiedostot eivät avaudu, vaan antavat virheen ”Unsupported file format”. DSF ja DFF toistuvat vain 352,8 kHz:n PCM:nä, kun FFmpeg on asennettu erikseen ja ne on lisätty foobar2000:n FFmpeg Decoder Wrapper -komponenttiin. SACD ISO ei edelleenkään toimi."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Lähteet ja rajaus</a>. Korjaukset ovat tervetulleita: <a href=\"{href.issues}\">avaa issue</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Uutta",
+      "title": "Uutta versiossa {version}.",
+      "latest": "Uusin julkaisu",
+      "fullNotes": "Täydet julkaisutiedot",
+      "meta": "onko jo asennettu? Se päivittää itsensä, tai aja {brewUpgrade}",
+      "earlier": "Aiemmat julkaisut",
+      "every": "Kaikki julkaisut",
+      "inEnglish": "Näitä julkaisutietoja ei ole vielä käännetty, joten ne näytetään englanniksi."
+    },
+    "faq": {
+      "eyebrow": "UKK",
+      "title": "Vastauksia kysymyksiin.",
+      "items": [
+        {
+          "q": "Onko se todella ilmainen?",
+          "a": "On. Vespertine on ilmainen ja avointa lähdekoodia GPL-3.0-lisenssillä. Ei tiliä, tilausta, mainoksia eikä telemetriaa (<a href=\"{href.privacy}\">tietosuoja</a>). Se käyttää verkkoa vain päivitysten tarkistamiseen sekä, kun itse pyydät, yhteydenottoon MusicBrainziin, Cover Art Archiveen tai ListenBrainziin tai kansikuvien hakemiseen Discord-tilaasi varten."
+        },
+        {
+          "q": "Mitä tarvitsen?",
+          "a": "macOS {minMacOS} ({minMacOSName}) tai uudempi, Apple silicon- tai Intel-Macissa. Intel-laitteistoa ei ole testattu. Intel-versio on toiminut Rosettan avulla, ja raportit oikeista Intel-Maceista ovat tervetulleita."
+        },
+        {
+          "q": "Miten asennan ja päivitän sen?",
+          "a": "Lataa DMG, avaa se ja siirrä Vespertine Ohjelmat-kansioon. Se on allekirjoitettu Developer ID:llä ja Applen notarisoima. Se päivittää itsensä, ja jokainen päivitys on allekirjoitettu. Homebrew’lla: {brew}. Päivitä sitten komennolla {brewUpgrade} tai sovelluksen omilla päivityksillä."
+        },
+        {
+          "q": "Toistaako se Qobuzista, TIDALista tai Apple Musicista?",
+          "a": "Ei. Vespertine toistaa omistamaasi musiikkia: Macillasi, ulkoisilla asemilla tai verkkojaossa. DRM-suojattuja Apple Music -tilauksen latauksia ei voi toistaa."
+        },
+        {
+          "q": "Mistä tiedän, että se on todella bittitarkka?",
+          "a": "Signaalipolku lukee takaisin, mitä Core Audio todella teki: laitteen nimellisen taajuuden, sen fyysisen formaatin ja sen, kuka laitetta pitää hallussaan. Dekoodereilla on automaattiset testit: TrueHD:tä verrataan lähteeseensä ja DTS:ää FFmpegin omaan dekooderiin. Sisäänrakennettu loopback-testi tarkistaa ohjelmistopolun näyte näytteeltä, ja <span class=\"mono nowrap\">vespertine-probe</span> antaa sinun tarkistaa oman laitteistosi. <a href=\"{href.verification}\">Näin tarkistat sen itse</a>."
+        },
+        {
+          "q": "Onko siinä huonekorjausta?",
+          "a": "Kyllä. Mittaa huoneesi UMIK-1:llä tai muulla kalibroidulla USB-mikrofonilla yhdestä viiteen kohdasta kuuntelupaikkasi ympäriltä. Vespertine sovittaa suodattimet jokaiselle kaiuttimelle ja yhdenmukaistaa niiden viiveet ja tasot, joko stereona tai 5.1-kokoonpanossa. Se tuo myös REW- ja Equalizer APO -suodattimia sekä impulssivasteita. Toiminto on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>. <a href=\"{href.roomCorrection}\">Näin huonekorjaus toimii</a>."
+        },
+        {
+          "q": "Toistaako se SACD- ja DVD-levyjä?",
+          "a": "Se toistaa niiden levykuvia. SACD-levykuvat (<code>.iso</code>) toistuvat suoraan levykuvasta mitään purkamatta, sekä stereo että monikanava ja DST-pakattuina tai pakkaamattomina. Samoin toistuu DVD-Video-levykuvien tai <code>VIDEO_TS</code>-kansioiden LPCM-musiikki. DVD-Audiota ei tueta, ja salatuista (CSS) DVD-levyistä tarvitaan salaukseton kopio."
+        },
+        {
+          "q": "Toistaako se Dolby Atmosia?",
+          "a": "Dolby Digital Plus Atmosilla toistuu macOS:n objektirenderöijän kautta, AirPodseilla pään liikkeitä seuraavana Tilaäänenä. TrueHD Atmos- ja DTS:X-raidoista toistetaan häviötön kanavapohja, mutta niiden objekteja ei renderöidä. Bittivirta AV-vastaanottimelle on kokeellinen eikä sitä ole testattu oikeilla vastaanottimilla. Raportteja kaivataan."
+        },
+        {
+          "q": "Muuttaako se tiedostojani?",
+          "a": "Vain kun muokkaat tageja. Silloinkin jokaisesta tiedostosta tehdään ensin varmuuskopio, ja muutoksen voi perua yhdellä askeleella. Kansioihin viitataan paikallaan. Tuonti tekee APFS-klooneja, jotka eivät vie lisätilaa."
+        },
+        {
+          "q": "Millä laitteilla sitä on testattu?",
+          "a": "Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti. FiiO K11:llä sitä on testattu PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti, ja K11:llä testattiin myös kokonaislukutila. Toistoa on testattu myös AirPods Maxilla USB-C:n ja Bluetoothin kautta, MacBook Pron kaiuttimilla sekä Sony-televisiolla HDMI:n kautta 5.1-muodossa. Intel-laitteistoa ei ole testattu. Bittivirta vastaanottimelle ja monikanavainen DAC-ulostulo ovat kokeellisia eikä niitä ole testattu oikeilla vastaanottimilla tai monikanavaisilla USB-DAC:eilla (yksi Sony-televisio HDMI:n kautta on testattu: ks. docs/DEVICES.md). <a href=\"{href.dacReport}\">Raportteja kaivataan</a>."
+        },
+        {
+          "q": "Onko se minun kielelläni?",
+          "a": "Todennäköisesti. Käyttöliittymä on englanniksi ja {languages} muulla kielellä, mukaan lukien oikealta vasemmalle kirjoitettavat arabia, heprea, persia ja urdu. Vespertine noudattaa kieltä, joka sille on asetettu Järjestelmäasetuksissa. Äidinkielisten korjaukset ovat tervetulleita <a href=\"{href.newIssue}\">GitHubissa</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Tue",
+      "title": "Auta Vespertineä kasvamaan.",
+      "text": "Se on ilmainen ja avointa lähdekoodia, ja sitä kehitetään avoimesti. Näin voit auttaa.",
+      "cards": [
+        {
+          "title": "Sponsoroi GitHubissa",
+          "text": "Vespertine on ilmainen. Jos siitä on sinulle hyötyä, GitHub-sponsorointi tukee sen kehitystä.",
+          "cta": "Ryhdy sponsoriksi"
+        },
+        {
+          "title": "Raportoi DAC:si",
+          "text": "Kerro, miten DAC:si, äänikorttisi tai vastaanottimesi toimi. Jokainen laiteraportti laajentaa sitä, mitä on tarkistettu oikealla laitteistolla.",
+          "cta": "Tee laiteraportti"
+        },
+        {
+          "title": "Korjaa käännös",
+          "text": "Huomasitko kömpelön ilmauksen jossakin {languages} kielestä? Avaa issue ja ehdota parempaa sanamuotoa.",
+          "cta": "Ehdota korjausta"
+        },
+        {
+          "title": "Lue koodi",
+          "text": "Virheraportit, pull requestit ja kysymykset ovat tervetulleita. Kaikki signaalipolun ehdot ja niiden testit löytyvät repositoriosta.",
+          "cta": "Lähdekoodi GitHubissa"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Lataa",
+      "title": "Toista surround-kokoelmasi Macillasi.",
+      "meta": [
+        "Ilmainen",
+        "avointa lähdekoodia",
+        "versio {version}",
+        "macOS {minMacOS} tai uudempi"
+      ]
+    }
+  },
+  "press": {
+    "title": "Lehdistöpaketti: Vespertine, surround- ja hi-res-musiikkisoitin Macille",
+    "description": "Faktat, logot, mainoskuvat, aidot kuvakaappaukset ja traileri Vespertinestä, ilmaisesta avoimen lähdekoodin Mac-soittimesta surround- ja hi-res-musiikkikokoelmille.",
+    "ogAlt": "Vespertinen lehdistöpaketti: tietolehti, logot, mainoskuvat, aidot kuvakaappaukset ja traileri kolmen sovelluksesta otetun aidon kuvakaappauksen päällä.",
+    "eyebrow": "Lehdistöpaketti",
+    "heading": "Kaikki, mitä tarvitset kirjoittaaksesi {name}-sovelluksesta.",
+    "lede": "Vespertine on ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, puretut SACD-levyjen 5.1-raidat, DTS CD:t sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa, ja AirPodeilla ne soivat pään liikkeitä seuraavana Tilaäänenä. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon, ja ehdot ja testit ovat GPL-lähdekoodissa, jonka kuka tahansa voi tarkastaa.",
+    "fine": "Kanava kanavaan -ulostulo ja bittivirta vastaanottimelle ovat kokeellisia, eikä niitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan. Dolby Digital Plus Atmosin objektit renderöi macOS; TrueHD Atmosista ja DTS:X:stä toistetaan niiden kanavapohja.",
+    "facts": {
+      "eyebrow": "Tietolehti",
+      "title": "Faktat.",
+      "name": "Nimi",
+      "formerly": "(nimeltään {formerName} versioon 0.6.0 asti)",
+      "developer": "Kehittäjä",
+      "developerValue": "{author}, itsenäinen kehittäjä",
+      "price": "Hinta",
+      "priceValue": "Ilmainen. Avointa lähdekoodia GPL-3.0-lisenssillä; ei tiliä, tilausta, mainoksia eikä telemetriaa",
+      "platform": "Alusta",
+      "platformValue": "macOS {minMacOS} {minMacOSName} tai uudempi, Apple silicon ja Intel",
+      "current": "Nykyinen versio",
+      "currentValue": "{version}, julkaistu {date}",
+      "currentFine": "Allekirjoitettu ja notarisoitu DMG ({size}), päivittää itsensä",
+      "first": "Ensimmäinen julkaisu",
+      "firstFine": "(nimellä {formerName} 0.1.0)",
+      "languages": "Kielet",
+      "languagesValue": "Englanti ja {languages} muuta, mukaan lukien ukraina, arabia, heprea, japani ja kolme kiinan varianttia",
+      "install": "Asennus",
+      "installValue": "<a href=\"{href.dmg}\">Lataa DMG</a> tai {brew}",
+      "tested": "Testattu laitteilla",
+      "testedValue": "Fosi Audio ZD3 (PCM 768 kHz:iin asti, DSD256 DoP:n kautta), FiiO K11 (PCM 384 kHz:iin asti, DSD128 DoP:n kautta, kokonaislukutila), AirPods Max USB-C:n ja Bluetoothin kautta, MacBook Pron kaiuttimet",
+      "links": "Linkit",
+      "website": "Verkkosivusto",
+      "source": "Lähdekoodi",
+      "releaseNotes": "Julkaisutiedot",
+      "verify": "Näin varmistat bittitarkan toiston"
+    },
+    "angle": {
+      "eyebrow": "Näkökulma",
+      "title": "Mihin se keskittyy.",
+      "list": [
+        "Surround-musiikki yhdessä Mac-kirjastossa SACD- ja DVD-Video-levykuvista, rippauksista ja DTS CD:istä TrueHD- ja DD+ Atmos -tiedostoihin, ja AirPodeilla Tilaäänenä.",
+        "Ilmainen GPL-3.0-lähdekoodi, jota kuka tahansa voi lukea, kääntää ja muuttaa.",
+        "Signaalipolku, joka näyttää näytteenottotaajuuden, sananpituuden, vahvistuksen ja kanavakäsittelyn. Bittitarkkuuden ehdot ovat koodissa testeineen, ja mukana on sisäänrakennettu loopback-testi ja <a href=\"{href.verification}\">varmistusopas</a>."
+      ],
+      "text": "Mukana on myös hi-res-tiedostojen analyysi. Nollatäytön tunnistus on täsmällinen; spektriin perustuvat tulkinnat ovat arvioita, joilla on rajansa. Analyysia tarjoavat myös VeraVox ja Audirvana AudioScan. <a href=\"{href.comparison}\">Vertailun lähteet</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Traileri.",
+      "text": "44 sekuntia, 16:9, 1080p 60 fps:llä, ääni mukana. <a href=\"{href.trailerDownload}\" download>Lataa MP4</a> ({size}). 4K-master on saatavilla pyynnöstä.",
+      "fallback": "Lataa traileri (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Brändi",
+      "title": "Logo.",
+      "text": "Aina pienillä kirjaimilla, kuunsirppi aina messinginvärisenä. Ethän värjää, venytä tai ladota sitä uudelleen. <a href=\"{href.brandGuide}\">Brändiohje (PDF)</a>.",
+      "primaryAlt": "Vespertinen logoyhdistelmä: messinginvärinen kuunsirppi ja sana vespertine",
+      "stackedAlt": "Vespertinen pystymallinen logoyhdistelmä",
+      "primary": "Ensisijainen",
+      "stacked": "Pystymalli",
+      "onLight": "vaalealla:",
+      "crescent": "pelkkä kuunsirppi:"
+    },
+    "art": {
+      "eyebrow": "Mainoskuvat",
+      "title": "Kuva jokaisesta ominaisuudesta.",
+      "text": "Kolmessa koossa: 2400×1350, 1600×900 ja 1270×760.",
+      "items": {
+        "bit-perfect": "Bittitarkka, kun ehdot täyttyvät",
+        "fake-hi-res": "Väärennetyn hi-resin tunnistus",
+        "spatial-audio": "Surround Tilaäänenä AirPodeilla",
+        "native-dsd": "Natiivi DSD DoP:n kautta",
+        "stereo-and-surround": "Stereo- ja surround-versiot",
+        "sacd-iso": "SACD-levykuvat suoraan toistettuina",
+        "languages": "{languages} kieltä"
+      }
+    },
+    "shots": {
+      "eyebrow": "Kuvakaappaukset",
+      "title": "Oikea sovellus.",
+      "text": "Kehittäjän omasta kirjastosta, 2400×1500. Albumien kansikuvat kuuluvat oikeudenhaltijoilleen.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24-bit / 96 kHz, bittitarkka Fosi Audio ZD3:lla: Lazar Berman, Lisztin Les jeux d’eaux à la Villa d’Este",
+        "multichannel-albums": "Albumit suodatettuna monikanavaisiin",
+        "stereo-and-surround-versions": "Puretut SACD-raidat stereo- ja 5.1-versioineen",
+        "spatial-audio-airpods-max": "24/88,2-muotoinen 5.1-albumi (Elton John, Goodbye Yellow Brick Road) Tilaäänenä AirPods Maxilla",
+        "fake-hi-res-detection": "24/192-muotoinen ”remaster”, joka loppuu 16 kHz:iin (tahallinen väärennös: trailerin oma musiikki MP3:ksi koodattuna ja ylösnäytteistettynä keksityn yhtyeen nimellä)",
+        "dsd-native-dop": "DSD128 DoP:n kautta 352,8 kHz:llä Fosi Audio ZD3:lla: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "SACD-.iso toistettuna suoraan levykuvasta: Dire Straits, Brothers In Arms",
+        "genres": "Tyylilajit",
+        "search": "Etsi",
+        "smart-playlist": "Älykäs soittolista, bittitarkka AirPods Maxilla USB-C:n kautta",
+        "loopback-test": "Loopback-testi: ulostulopolun ohjelmallinen tarkistus näyte näytteeltä",
+        "setup-welcome": "Käyttöönotto: tervetuloa",
+        "setup-output": "Käyttöönotto: muistettavan ulostulon valinta",
+        "output-settings": "Ulostuloasetukset: muistettu ulostulo, varaulostulo, Sovita 16-bittisiin lähteisiin",
+        "equalizer": "Parametrinen EQ AutoEQ-esiasetuksella"
+      }
+    },
+    "contact": {
+      "eyebrow": "Yhteystiedot",
+      "title": "Ota yhteyttä.",
+      "text": "Lehdistö, kysymykset ja haastattelupyynnöt: {email}. Yhteisön kysymykset: <a href=\"{href.discussions}\">GitHub Discussions</a>. Bugit ja laiteraportit: <a href=\"{href.issues}\">GitHub issues</a>."
+    }
+  },
+  "privacy": {
+    "title": "Tietosuoja: Vespertine ei kerää mitään",
+    "description": "Vespertine-sovellus ei kerää mitään: ei tilejä, analytiikkaa, telemetriaa, kaatumisraportointia eikä mainoksia. Mihin sovellus ja tämä verkkosivusto ottavat yhteyttä, ja miksi.",
+    "ogAlt": "Vespertinen tietosuoja: Vespertine ei kerää mitään. Ei tilejä, analytiikkaa, telemetriaa, kaatumisraportointia eikä mainontaa.",
+    "eyebrow": "Tietosuoja",
+    "heading": "Vespertine ei kerää",
+    "headingBrass": "mitään.",
+    "updated": "Voimassa {effective} alkaen (lisätty kuvaus huonekorjauksen mikrofonin käytöstä, koskee versiota 0.14). Aiemmat muutokset: valinnainen Discord-tila {discordUpdated}. ”Tämä verkkosivusto” -osio päivitettiin {statsUpdated}, kun sivusto alkoi laskea käyntejä itse ylläpidetyllä, evästeettömällä tilastoinnilla. ”Tämä verkkosivusto” -osioon lisättiin {langUpdated} myös kuvaus kielivalikosta, joka muistaa valintasi laitteellasi.",
+    "intro": "Vespertine on ilmainen, avoimen lähdekoodin musiikkisoitin. Sovelluksessa ei ole tilejä, analytiikkaa, telemetriaa, kaatumisraportointia eikä mainontaa. Kehittäjä ei saa mitään tietoja sinusta tai musiikistasi. Koska lähdekoodi on julkinen, voit tarkistaa jokaisen tämän sivun väitteen.",
+    "staysTitle": "Mikä pysyy Macillasi",
+    "stays": "Kirjastotietokantasi, soittolistasi, soittokertasi, tiedostoanalyysien tulokset, kansikuvien välimuisti ja asetukset tallennetaan Macisi käyttäjäkohtaiseen Kirjasto-kansioon. Verkkojakojen salasanat ja ListenBrainz-käyttöoikeustunnuksesi, jos lisäät sellaisen, tallennetaan macOS:n Avainnippuun. Huonekorjaus käyttää mittausmikrofoniasi vain mittauksen aikana ja säilyttää tallenteet Dokumentit-kansiossasi. Mitään niistä ei lähetetä minnekään.",
+    "onlineTitle": "Milloin sovellus käyttää verkkoa",
+    "online": [
+      "<strong>Päivitysten tarkistus.</strong> Vespertine pyytää GitHubilta päivityssyötettään noin kerran päivässä sekä silloin, kun valitset Tarkista päivitykset. GitHub näkee IP-osoitteesi, kuten minkä tahansa latauksen yhteydessä. Voit poistaa automaattiset tarkistukset käytöstä Asetuksissa.",
+      "<strong>MusicBrainz ja Cover Art Archive.</strong> Vain kun käytät toimintoa Hae MusicBrainzista tai Täydennä metatietoja (Etsi musiikkia tältä Macilta tarjoaa Täydennä-toimintoa lisäämälleen musiikille valintaruutuna, jonka voit poistaa valinnasta), Vespertine lähettää etsimänsä albumin, artistin ja kappaleiden nimet osoitteeseen musicbrainz.org. Kun ”Hae kansikuvat” on päällä Asetuksissa, se lataa kansikuvia osoitteesta coverartarchive.org, joka jakelee ne Internet Archivesta (archive.org). MusicBrainzia ja Cover Art Archivea ylläpitää MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Vain jos otat scrobblauksen käyttöön ja syötät tunnuksesi, Vespertine lähettää osoitteeseen listenbrainz.org soittamasi kappaleet: nimen, artistin, albumin, keston sekä niiden MusicBrainz-tunnisteet, jos tiedostoissasi on ne. Se lähettää ”soi nyt” -tiedon kappaleen alkaessa ja kuuntelukerran ajankohtineen, kun olet kuullut kappaleesta puolet tai neljä minuuttia.",
+      "<strong>Discord.</strong> Vain jos otat Discord-tilan käyttöön Asetuksissa, Vespertine kertoo Macisi Discord-sovellukselle Macin sisällä pysyvän yhteyden kautta, mitä soi: nimen, artistin, albumin, muodon ja toiston edistymisen. Discord näyttää sen tilanasi niille, jotka näkevät toimintasi. Näyttääkseen albumin kansikuvan Vespertine hakee sen nimen perusteella, koska Discord voi näyttää vain verkossa olevia kuvia: osoitteesta coverartarchive.org, kun tiedostoissasi on MusicBrainz-julkaisun tunniste, muuten Applen iTunes Searchista (itunes.apple.com), joka saa artistin ja albumin nimet. Discord lataa kansikuvan sitten sieltä. Voit poistaa kansikuvat käytöstä, eikä tiedostojasi tai niiden kansikuvia koskaan lähetetä verkkoon.",
+      "<strong>Verkkojaot.</strong> Vespertine muodostaa yhteyden lisäämiisi palvelimiin, eikä minnekään muualle, lukeakseen musiikkiasi. Kun jako on yhdistetty, se tarkistaa noin minuutin välein, että palvelin vastaa yhä, ja etsii uutta musiikkia puolen tunnin välein (ei koskaan, kun toistat musiikkia siitä)."
+    ],
+    "websiteTitle": "Tämä verkkosivusto",
+    "website": [
+      "Tämä sivusto toimii GitHub Pagesissa, joka saattaa kirjata kävijöiden IP-osoitteita; katso <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">GitHubin tietosuojaseloste</a>. Latauspainikkeet johtavat sovelluksen julkaisuihin GitHubissa. Sivusto ei aseta evästeitä ja lataa fonttinsa, kuvansa ja videonsa tältä sivustolta.",
+      "Saadakseen selville, mitä sivuja ja painikkeita käytetään, sivusto laskee käynnit <a href=\"https://umami.is\">Umamilla</a>, yksityisyyttä kunnioittavalla ohjelmistolla, jota ylläpidämme itse osoitteessa stats.szeremeta.org. Se ei aseta evästeitä, ei tallenna laitteellesi mitään, ei säilytä IP-osoitettasi eikä jaa mitään mainostajille tai muille yrityksille. Se tallentaa sivun, sivuston, jolta tulit, likimääräisen maasi, selaimesi, käyttöjärjestelmäsi, näytön koon ja kielen sekä klikkaukset lataus-, GitHub- ja Homebrew-painikkeisiin. Se ei voi seurata sinua sivustolta toiselle eikä tunnistaa sinua, ja se ohittaa kävijät, joiden selain lähettää Do Not Track -pyynnön. <strong>Sovellus ei koskaan ota siihen yhteyttä.</strong>",
+      "Jos valitset kielen sivuston kielivalikosta, selaimesi muistaa valinnan laitteellasi (paikallisessa tallennustilassaan), jotta sivusto ei vaihda kieltä takaisin. Valintaa ei koskaan lähetetä minnekään, ja sivusto toimii samoin ilman sitä."
+    ],
+    "changesTitle": "Muutokset ja yhteystiedot",
+    "changes": "Jos tämä joskus muuttuu, tämä sivu ja julkaisutiedot kertovat siitä ensin. Kysymykset ovat tervetulleita <a href=\"{href.issues}\">GitHub-issuena</a>."
+  },
+  "terms": {
+    "title": "Käyttöehdot: Vespertine on GPL-lisensoitu vapaa ohjelmisto",
+    "description": "Vespertine on vapaa ohjelmisto, jota koskee GNU General Public License, versio 3 tai uudempi: ei maksua, ei rekisteröitymistä, ei takuuta.",
+    "ogAlt": "Vespertinen käyttöehdot: vapaa ohjelmisto, selkeästi. GNU General Public License, versio 3 tai uudempi.",
+    "eyebrow": "Käyttöehdot",
+    "heading": "Vapaa ohjelmisto,",
+    "headingBrass": "selkeästi.",
+    "updated": "Voimassa {effective} alkaen",
+    "licenseTitle": "Lisenssi",
+    "license": "Vespertine on vapaa ohjelmisto, jota koskee <a href=\"{href.license}\">GNU General Public License, versio 3 tai uudempi</a>. Saat käyttää sitä mihin tahansa tarkoitukseen, tutkia ja muuttaa sen lähdekoodia sekä jakaa kopioita, myös muokattuja, saman lisenssin ehdoin. Se on maksuton, eikä mihinkään tarvitse rekisteröityä.",
+    "warrantyTitle": "Ei takuuta",
+    "warranty": "Kuten lisenssissä todetaan, Vespertine toimitetaan ”sellaisenaan” ilman minkäänlaista takuuta siinä laajuudessa kuin laki sallii. Pidä musiikistasi varmuuskopiot. Vespertine muuttaa tiedostoja vain, kun muokkaat niiden tageja, ja varmuuskopioi jokaisen ensin, mutta käytät sitä omalla vastuullasi.",
+    "musicTitle": "Musiikkisi ja muut palvelut",
+    "music": "Olet vastuussa siitä, että sinulla on oikeus toistaa lisäämääsi musiikkia. Vespertine ei pysty toistamaan DRM-suojattuja tiedostoja eikä yritäkään. MusicBrainz, Cover Art Archive ja ListenBrainz ovat itsenäisiä palveluita, joilla on omat käyttöehtonsa, ja niitä sovelletaan, kun käytät palveluita Vespertinen kautta.",
+    "trademarksTitle": "Tavaramerkit",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ja Dolby TrueHD ovat Dolby Laboratoriesin tavaramerkkejä. DTS, DTS-HD Master Audio ja DTS:X ovat DTS, Inc.:n tavaramerkkejä. Apple, AirPods, AirPods Max, Mac, macOS ja Tilaääni (Spatial Audio) ovat Apple Inc.:n tavaramerkkejä. Vespertine mainitsee ne vain kuvatakseen, mitä se toistaa ja missä. Dolby, DTS tai Apple ei ole sertifioinut, lisensoinut eikä suositellut sitä.",
+    "contactTitle": "Yhteystiedot",
+    "contact": "Bugit, kysymykset ja toiveet: <a href=\"{href.issues}\">GitHub issues</a>.",
+    "englishNote": "Tämä on käännös käytön helpottamiseksi. Sitova teksti on itse GNU General Public License, joka on englanninkielinen."
+  },
+  "notFound": {
+    "title": "Sivua ei löytynyt: Vespertine",
+    "description": "Tätä sivua ei ole täällä. Vespertine on ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille.",
+    "ogAlt": "Vespertine: ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikille.",
+    "eyebrow": "404 · Ei signaalia",
+    "heading": "Tätä sivua",
+    "headingBrass": "ei ole täällä.",
+    "lede": "Linkki voi olla vanha tai osoite kirjoitettu väärin. Kaikki Vespertinestä alkaa etusivulta.",
+    "home": "Siirry etusivulle"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} tai uudempi",
+    "processor": "Apple silicon (arm64) tai Intel (x86-64)",
+    "subCategory": "Musiikkisoitin",
+    "sourceName": "Vespertinen lähdekoodi",
+    "trailerName": "Vespertinen traileri",
+    "trailerDescription": "44 sekunnin esittely Vespertinestä, tallennettu oikeasta sovelluksesta kehittäjän omalla kirjastolla. Siinä näkyvät bittitarkka signaalipolku, DSD DoP:n kautta, surround Tilaäänenä AirPodseilla ja hi-res-tiedostojen analyysi.",
+    "keywords": "bittitarkka, hi-res-ääni, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Tilaääni, AirPods Max, FLAC, musiikkisoitin, macOS, avoin lähdekoodi"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 tuo huonekorjauksen: mittaa kaiuttimesi UMIK-1-mikrofonilla ja toista huoneellesi tehtyjen suodattimien kautta. Lisäksi se estää verkkotoistoa jäämästä ilman dataa.",
+      "notes": "### Huonekorjaus\n- **Mittaa huoneesi.** Aseta kalibroitu UMIK-1-mikrofoni kuuntelupaikalle, niin Vespertine soittaa testipyyhkäisyt jokaisen kaiuttimen kautta vuorollaan 1–5 mittauspisteessä (oletuksena 5: ensin kuuntelupaikalla, sitten sen vasemmalla ja oikealla puolella, edessä ja takana). Se tarkistaa ensin tason ja reitin jokaiseen kaiuttimeen. Epäonnistuneen mittauksen se hylkää, ja voit yrittää uudelleen tai jatkaa siitä, mihin jäit. Sekä stereo että 5.1 ovat tuettuja.\n- **Suodattimet jokaiselle kaiuttimelle.** Mittauksen perusteella Vespertine rakentaa jokaiselle kaiuttimelle pienen joukon suodattimia. Ne ovat enimmäkseen leikkauksia huoneen aiheuttamiin bassopiikkeihin. Valitse tavoite (oletuksena Lämmin, muut vaihtoehdot Loiva kallistus ja Tasainen) ja alue (vain basso tai koko alue), niin suodattimet sovitetaan uudelleen tallennetusta mittauksesta ilman uutta mittausta. Kaaviossa näkyvät mitattu vaste, ennustettu vaste korjauksen jälkeen ja tavoite, ja ennuste on merkitty ennusteeksi.\n- **Viiveiden ja tasojen kohdistus.** Myös jokaisen kaiuttimen viive ja taso mitataan. Lähempiä kaiuttimia viivästetään, kunnes kaukaisimman kaiuttimen ääni ehtii perille, ja voimakkaampia hiljennetään hiljaisimman tasolle.\n- **Tuo omat suodattimesi.** Tuo Equalizer APO- tai REW-suodatintiedosto (kaiutinkohtainen viive, taso ja suodattimet) tai tuo impulssivasteita (WAV, AIFF, CAF tai FLAC) toistettaviksi konvoluutiosuodattimina. Vie profiili Equalizer APO -tekstinä tai Vespertine-profiilina. Rivit, joita Vespertine ei pysty toistamaan, hylätään rivinumeron kera sen sijaan, että ne toistettaisiin jonakin muuna.\n- **Oletuksena pois päältä, joten bittitarkka pysyy bittitarkkana.** Huonekorjaus kytketään päälle ulostulokohtaisesti, ja se on sidottu ulostuloon, jolla se mitattiin. Kun se muuttaa näytteitä, signaalipolussa lukee HUONEKORJAUS, eikä virtaa enää merkitä bittitarkaksi. Kun se on pois päältä, toistoon ei kosketa. Kokonaislukutila ja Sovita 16-bittisiin lähteisiin pysyvät pois päältä niin kauan kuin se on päällä.\n- **Mitä se kattaa.** Vespertinen renderöimä stereo- ja 5.1-PCM. Dolby- ja DTS-bittivirtojen, Atmosin ja muiden kanavamäärien kohdalla se väistyy, ja signaalipolku kertoo syyn. DoP-DAC:lla toistettava DSD muunnetaan PCM:ksi, kun korjaus on päällä, joten sekin korjataan. Jos haluat sen sijaan lähettää DSD:n natiivina ja korjaamattomana, valitse kyseisen ulostulon kohdalla Säilytä natiivi DSD.\n- **Yksi ikkuna.** Näytä → Huonekorjaus (avautuu myös Taajuuskorjain-ikkunasta ja kunkin ulostulon asetuksista) kokoaa yhteen kytkimen, Mittaa-, Tuo- ja Vie-toiminnot, profiilit, ennen ja jälkeen -kaavion, tavoitteen ja alueen sekä kunkin kaiuttimen viiveen, tason ja suodattimet. Tämä korvaa aiemman beetavaiheen Huoneen mittaus -ikkunan. Menetelmä on kuvattu tiedostossa `docs/ROOM-CORRECTION.md`.\n\n### Verkkotoisto\n- **Vähemmän katkoja NASista.** Verkkojaossa olevat raidat kopioidaan nyt Macillesi ennen toistoa, ja seuraava raita kopioidaan etukäteen. Näin verkon hetkellinen häiriö ei enää pysäytä musiikkia. Suuret DSD-tiedostot luetaan tavalla, joka pitää pitkän etumatkan valmiina.\n- **Latausrengas toistopainikkeessa.** Kun Vespertine odottaa dataa verkosta, toista/keskeytä-painikkeessa näkyy pieni pyörivä rengas. Kun Vähennä liikettä on päällä, rengas pysyy paikallaan. Lyhyiden lukuvirheiden jälkeen lukua yritetään uudelleen.\n- **Rajoitukset.** Hyvin pitkä katkos tai musiikkia hitaampi yhteys voi yhä keskeyttää toiston puskurin täyttämiseksi. Välimuistikopiot vievät enintään 8 Gt, ja sitä suurempi lähde epäonnistuu selkeällä viestillä. Katso `docs/NETWORK-PLAYBACK.md`.\n\n### Myös uutta\n- **DoP oletuksena päällä tunnetuissa DAC:eissa.** FiiO K11 ja Fosi Audio ZD3 käynnistyvät DoP päällä. Jos kytket sen pois, Vespertine muistaa valintasi.\n- **Äskettäin lisätyt näyttää nyt 150 albumia**, aiemmin 60. Iso tuonti ei siis enää työnnä juuri ennen sitä lisättyjä albumeja pois listalta.\n- **Fosi Audio ZD3.** ZD3 on nyt tuettujen laitteiden listalla, ja verkkosivuston kuvakaappaukset otettiin uudelleen sillä.\n- **Verkkosivusto.** Latauspainikkeiden alla on nyt rivi ”Anna tähti GitHubissa” ja ”Liity keskusteluun”.\n\n### Varmennus\n- Moottorin, kirjaston ja sovelluksen testisarjat menevät läpi. Mukana on uusia testejä huonesuodattimien suunnittelulle, toistolle korjausvaiheen ja konvoluutiosuodattimen kautta, mittausvaiheille simuloidussa huoneessa, tuontimuodoille ja verkkovälimuistille. Reaaliaikainen äänikoodi tarkistetaan lisäksi osoite-, säie- ja määrittelemättömän käytöksen sanitoijilla.\n- Tarkistettu oikealla laitteistolla: täysi mittaus UMIK-1:llä kuuntelupaikalla, sen perusteella rakennetut suodattimet sekä toisto huonekorjauksen kautta Fosi Audio ZD3:lla ja stereokaiuttimilla."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 toistaa 5.1-DSD:n Tilaäänenä AirPodseilla ja kertoo, kun ääni muunnetaan tai alasmiksataan. Se ei myöskään enää jumiudu lopetettaessa.",
+      "notes": "### Tilaääni\n- **5.1-DSD toistuu nyt Tilaäänenä.** 5.1-DSD-tiedosto (DSF, DSDIFF, DST-pakattu DSDIFF tai SACD-levykuva) muunnetaan PCM:ksi, ja jokainen kanava sijoitetaan oikealle paikalleen. Näin LFE- ja surround-kanavat eivät enää katoa. Aiemmin erilliset DSDIFF-kanavat saattoivat päätyä kolmen kaiuttimen kanavapohjaan, ja takakanavat jäivät pois.\n- **Se kertoo, mitä äänelle tapahtui.** Signaalipolussa näkyy **DSD → PCM** TILAÄÄNI-merkinnän tai alasmiksauksen vieressä. Lisäksi kaksi uutta ilmoitusta, ”Muunnettu DSD:stä” ja ”Miksattu stereoksi”, tulevat näkyviin, kun ne pätevät. Molemmat on käännetty kaikille 44 kielelle.\n- Kehittäjä on tarkistanut toiminnan AirPods Maxilla.\n\n### Korjatut\n- **Lopetus ei enää jumiudu.** Cmd-Q saattoi jättää pyörivän kursorin, kun Vespertine odotti äänilaitetta. Nyt se lopettaa heti.\n- **Monikanavaiset tiedostot luetaan oikein.** RF64- ja Wave64-tiedostot avautuvat kunnolla, ja DSD-kanavien nimet luetaan tiedostosta. Erillinen monikanavareititys noudattaa tiedoston omaa kanava-asettelua.\n\n### Varmennus\n- Moottorin, kirjaston ja sovelluksen testisarjat menevät läpi. Mukana on uusia testejä, jotka toistavat jokaisen 5.1-DSD-formaatin Tilaäänen kautta ja tarkistavat, että jokainen kanava saapuu paikalleen. Vasen/oikea-sijoittelun tarkistus ajetaan vain oikeilla Maceilla, ja GitHubin testikoneet ohittavat juuri tämän yhden tarkistuksen."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine kertoo nyt, kun taajuuskorjain ei voi vaikuttaa toistettavaan ääneen, ja tarjoaa valinnaisen referenssitaajuuskorjaimen kullekin USB-C AirPods Max -mallille. Lisäksi sillä on ensimmäinen monikanavatulos oikealla laitteistolla."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine pitää nyt kirjaa siitä, mitä olet toistanut, ja antaa Seuraavaksi-jonolle oman paneelin kirjaston viereen. Se näyttää albumin kaikki painokset yhdellä kortilla ja voi näyttää toistamasi musiikin Discord-tilanasi."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine toimii nyt kunnolla vaaleassa tilassa. Ulostulot, joissa ei ole äänenvoimakkuuden säätöä, voivat nyt käyttää Vespertinen äänenvoimakkuutta. Kirjastosi analysointi myös jatkuu, kun kuuntelet verkkojaosta."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine toistaa nyt sujuvasti hitaista verkkojaoista ja analysoi suuret kirjastot nopeammin verkkojaot mukaan lukien. Pienillä USB-C-DAC:eilla se toistaa hi-resiä suurimmalla niiden tarjoamalla taajuudella. Lisäksi se pitää näppäimistön ja monivalinnat siellä, missä odotat niiden olevan."
+    }
+  }
+}

@@ -2,23 +2,94 @@
    This is the only script on the critical path; GSAP + Lenis load later from ./motion, and only on the home page. */
 import { $, $$, state } from './dom';
 import { initRoute } from './route';
+import { STORAGE_KEY } from '../i18n/locales.mjs';
 
 const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
 const reduce = reduceMQ.matches;
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-/* ---------- Copy the Homebrew command ---------- */
+const rtl = document.documentElement.dir === 'rtl';
+
+/* ---------- Copy the Homebrew command (labels in the page's language) ---------- */
 $$<HTMLButtonElement>('[data-copy]').forEach((b) => {
+  const label = b.textContent;
   b.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(b.dataset.copy ?? '');
-      b.textContent = 'Copied';
+      b.textContent = b.dataset.copied ?? 'Copied';
       b.classList.add('is-done');
     } catch {
-      b.textContent = 'Select it';
+      b.textContent = b.dataset.failed ?? 'Select it';
     }
-    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('is-done'); }, 2200);
+    setTimeout(() => { b.textContent = label; b.classList.remove('is-done'); }, 2200);
   });
+});
+
+/* ---------- Language menu: remember the choice, keep the section, close on Esc or a click outside ---------- */
+$$<HTMLDetailsElement>('[data-lang-menu]').forEach((menu) => {
+  const summary = $('summary', menu)!;
+  $$<HTMLAnchorElement>('[data-lang-choice]', menu).forEach((a) => {
+    a.addEventListener('click', () => {
+      try { localStorage.setItem(STORAGE_KEY, a.dataset.langChoice!); } catch { /* private mode: the link still works */ }
+      if (location.hash.length > 1) a.href = a.href.split('#')[0] + location.hash;
+    });
+  });
+  menu.addEventListener('toggle', () => {
+    if (menu.open) ($('a[aria-current]', menu) ?? $('a', menu))?.scrollIntoView({ block: 'nearest' });
+  });
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); }
+    if (!menu.open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+    // Arrow keys move through the list, like a menu; Tab still works as usual.
+    const items = $$<HTMLAnchorElement>('a', menu);
+    const i = items.indexOf(document.activeElement as HTMLAnchorElement);
+    const next = e.key === 'ArrowDown' ? (i + 1) % items.length : (i <= 0 ? items.length - 1 : i - 1);
+    items[next].focus();
+    e.preventDefault();
+  });
+  document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target as Node)) menu.open = false; });
+  menu.addEventListener('focusout', (e) => { if (menu.open && e.relatedTarget && !menu.contains(e.relatedTarget as Node)) menu.open = false; });
+});
+
+/* ---------- Nav: links that don't fit on one line (long words in some languages) hide, rather than overflow ---------- */
+$$('.nav__links').forEach((list) => {
+  const items = $$('li', list);
+  // Hiding a link narrows the nav (its flex basis shrinks), which can push the next one out, so re-measure until
+  // nothing more needs hiding. A link is out when it wrapped onto the clipped second row or is cut off at the edge.
+  const fit = () => {
+    items.forEach((li) => li.classList.remove('is-squeezed'));
+    for (let pass = 0; pass < items.length; pass++) {
+      const box = list.getBoundingClientRect();
+      const shown = items.filter((li) => li.offsetParent && !li.classList.contains('is-squeezed'));
+      const top = shown[0]?.offsetTop ?? 0;
+      const out = shown.filter((li) => { const r = li.getBoundingClientRect(); return li.offsetTop > top + 4 || r.right > box.right - 5 || r.left < box.left + 5; });
+      if (!out.length) break;
+      out.forEach((li) => li.classList.add('is-squeezed'));
+    }
+  };
+  new ResizeObserver(fit).observe(list.closest('.nav') ?? list);
+  document.fonts?.ready.then(fit);
+  fit();
+});
+
+/* ---------- Hero headline on translated pages: the build sizes it from each script's typical glyph widths; if a line
+   still wraps with the fonts this device actually has, step the size down until every line fits on one line ---------- */
+$$('html:not([lang="en"]) .hero__title').forEach((title) => {
+  const lines = $$('.line > span', title);
+  const wraps = () => {
+    const lh = parseFloat(getComputedStyle(title).lineHeight) || parseFloat(getComputedStyle(title).fontSize);
+    return lines.some((s) => s.getBoundingClientRect().height > lh * 1.5);
+  };
+  let width = 0;
+  const fit = () => {
+    if (title.clientWidth === width) return;
+    width = title.clientWidth;
+    title.style.removeProperty('--shrink');
+    for (let k = 1, i = 0; i < 14 && wraps(); i++) { k *= 0.95; title.style.setProperty('--shrink', k.toFixed(3)); }
+  };
+  new ResizeObserver(fit).observe(title);
+  document.fonts?.ready.then(() => { width = 0; fit(); });
+  fit();
 });
 
 /* ---------- Comparison table: mark which edges have more columns (fade, shadow, hint) ---------- */
@@ -26,8 +97,10 @@ $$('.compare-wrap').forEach((wrap) => {
   const table = $('.compare', wrap)!;
   const update = () => {
     const max = table.scrollWidth - table.clientWidth;
-    wrap.classList.toggle('more-left', max > 1 && table.scrollLeft > 1);
-    wrap.classList.toggle('more-right', max > 1 && table.scrollLeft < max - 1);
+    // Distance scrolled from the start edge (right-to-left pages scroll to negative scrollLeft).
+    const pos = rtl ? -table.scrollLeft : table.scrollLeft;
+    wrap.classList.toggle('more-left', max > 1 && pos > 1);
+    wrap.classList.toggle('more-right', max > 1 && pos < max - 1);
   };
   table.addEventListener('scroll', update, { passive: true });
   new ResizeObserver(update).observe(table);

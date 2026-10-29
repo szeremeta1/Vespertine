@@ -1,0 +1,776 @@
+{
+  "common": {
+    "skip": "Langkau ke kandungan",
+    "tagline": "Pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res.",
+    "requires": "macOS {minMacOS} atau lebih baharu.",
+    "arch": "Apple silicon dan Intel",
+    "download": "Muat turun untuk Mac",
+    "downloadVersion": "Muat turun {version}",
+    "sourceOnGitHub": "Kod sumber di GitHub",
+    "reportIssue": "Laporkan isu",
+    "brewLead": "Atau dengan Homebrew:",
+    "copy": "Salin",
+    "copyLabel": "Salin arahan Homebrew",
+    "copied": "Disalin",
+    "copyFailed": "Pilihnya",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus dan Dolby TrueHD ialah tanda dagangan Dolby Laboratories. DTS, DTS-HD Master Audio dan DTS:X ialah tanda dagangan DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS dan Audio Ruang ialah tanda dagangan Apple Inc. Vespertine menamakannya hanya untuk menerangkan apa yang dimainkannya dan di mana; ia tidak diperakui, dilesenkan atau disokong oleh Dolby, DTS atau Apple.",
+    "trailerLabel": "Treler Vespertine, 44 saat",
+    "untested": "Output saluran demi saluran dan bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
+  },
+  "nav": {
+    "label": "Utama",
+    "home": "Vespertine, laman utama",
+    "top": "Vespertine, kembali ke atas",
+    "features": "Ciri",
+    "formats": "Format",
+    "compare": "Bandingkan",
+    "whatsNew": "Apa yang baharu",
+    "faq": "Soalan Lazim",
+    "press": "Kit media",
+    "download": "Muat turun",
+    "downloadLabel": "Muat turun Vespertine {version} untuk Mac"
+  },
+  "lang": {
+    "label": "Bahasa",
+    "menuLabel": "Pilih bahasa",
+    "current": "Bahasa semasa"
+  },
+  "footer": {
+    "project": "Projek",
+    "about": "Perihal",
+    "releaseNotes": "Nota keluaran",
+    "sponsor": "Taja",
+    "discussions": "Perbincangan",
+    "architecture": "Seni bina",
+    "privacy": "Privasi",
+    "terms": "Terma",
+    "license": "Lesen (GPL-3.0)",
+    "notices": "Notis pihak ketiga",
+    "ukraine": "<strong>Vespertine bersama Ukraine.</strong> Sila derma melalui {orgs}.",
+    "copyright": "© {year} penyumbang Vespertine",
+    "free": "Perisian bebas di bawah GPL",
+    "madeIn": "Dibuat di Boston oleh {author}",
+    "backToTop": "Kembali ke atas",
+    "home": "Laman utama"
+  },
+  "home": {
+    "title": "Vespertine: pemain muzik bunyi keliling dan hi-res untuk Mac",
+    "description": "Pemain Mac percuma dan sumber terbuka untuk koleksi bunyi keliling dan hi-res: imej cakera SACD dan DVD-Video, DSD, CD DTS, fail DTS-HD MA, TrueHD dan Dolby Atmos, Audio Ruang pada AirPods, pembetulan bilik yang diukur di bilik anda sendiri, serta laluan isyarat bit-perfect yang boleh anda periksa.",
+    "ogAlt": "Vespertine: pemain Mac percuma dan sumber terbuka untuk muzik bunyi keliling dan hi-res. Laluan isyaratnya menunjukkan FLAC 24-bit / 96 kHz dimainkan secara bit-perfect pada Fosi Audio ZD3. Versi {version}, macOS {minMacOS} atau lebih baharu.",
+    "hero": {
+      "eyebrow": [
+        "Percuma dan sumber terbuka",
+        "macOS {minMacOS}+",
+        "Apple silicon dan Intel"
+      ],
+      "titleSr": "Muzik bunyi keliling dan hi-res, pada Mac anda.",
+      "titleLines": [
+        "Muzik bunyi keliling",
+        "dan hi-res,"
+      ],
+      "titleBrass": "pada Mac anda.",
+      "lede": "Pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, DSD, CD DTS, serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka dengan album stereo anda, dengan Audio Ruang penjejakan kepala pada AirPods. Pembetulan bilik mengukur bilik anda dengan mikrofon USB dan membetulkan setiap pembesar suara; ia kekal dimatikan sehingga anda menghidupkannya. Laluan isyarat menunjukkan setiap langkah daripada fail ke output. Dalam bahasa Inggeris dan {languages} bahasa lain.",
+      "ask": "Suka?",
+      "star": "Beri bintang di GitHub",
+      "discuss": "Sertai perbincangan",
+      "version": "Versi {version}",
+      "signed": "ditandatangani dan dinotarikan",
+      "releaseNotes": "Nota keluaran",
+      "privacy": "Privasi: tiada apa-apa dikumpul.",
+      "panelAlt": "Pemeriksa Sedang Dimainkan Vespertine: Les jeux d’eaux à la Villa d’Este karya Liszt oleh Lazar Berman, ditandakan HI-RES TANPA KEHILANGAN dan BIT-PERFECT, eksklusif, 32 / 96, dengan laluan isyaratnya daripada FLAC 24-bit / 96 kHz melalui libFLAC pada kadar asli dan kelantangan penuh ke Fosi Audio ZD3.",
+      "panelCaption": "Laluan Isyarat",
+      "followSignal": "Ikuti isyarat"
+    },
+    "trailer": {
+      "eyebrow": "Treler",
+      "title": "Lihat dalam 44 saat.",
+      "text": "Hidupkan bunyi. Semua yang dipaparkan ialah aplikasi sebenar, dirakam pada pustaka milik pembangun sendiri.",
+      "fallback": "Tonton treler (MP4)",
+      "caption": "44 s · 1080p · seni album milik pemiliknya masing-masing"
+    },
+    "features": {
+      "eyebrow": "Mengapa Vespertine",
+      "title": "Dibina untuk koleksi bunyi keliling anda.",
+      "text": "Muzik bunyi keliling dan stereo dalam satu pustaka, dan pemain yang menunjukkan dengan tepat apa yang dilakukannya pada isyarat.",
+      "badgesLabel": "Keadaan laluan isyarat yang ditunjukkan oleh aplikasi"
+    },
+    "pillars": [
+      {
+        "title": "Bunyi keliling dalam satu pustaka",
+        "text": "Imej dan rip SACD, cakera DVD-Video, CD DTS, DTS-HD MA dan TrueHD berada di sebelah album stereo anda dan dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods. Apabila sesebuah album ada dalam kedua-dua versi, setiap lagu disenaraikan sekali dan versi yang betul dimainkan untuk output anda."
+      },
+      {
+        "title": "Laluan isyarat yang boleh anda semak",
+        "text": "Kadar, panjang kata, gandaan dan pemprosesan saluran, dibaca semula daripada Core Audio. Syarat bit-perfect ada dalam kod sumber, dengan ujian automatik, ujian gelung balik dan panduan pengesahan perkakasan."
+      },
+      {
+        "title": "Menyemak fail hi-res",
+        "text": "Analisis menandakan kedalaman bit yang dipad serta kemungkinan pensampelan naik atau asal daripada format berkehilangan. Keputusan spektrum ialah anggaran, ditunjukkan bersama bukti dan batasannya. Analisis yang sama berjalan pada pelayan Linux di sebelah fail anda."
+      },
+      {
+        "title": "Sumber terbuka yang boleh anda audit",
+        "text": "Percuma di bawah GPL. Baca, bina dan ubah pemain ini, termasuk syarat output dan ujiannya. Tiada akaun, langganan, iklan atau telemetri."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bit-perfect",
+      "exclusive": "Eksklusif",
+      "spatial": "Ruang · penjejakan kepala",
+      "synthetic": "Frekuensi tinggi sintetik?",
+      "roomCorrection": "Pembetulan bilik"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Laluan isyarat",
+        "kicker": "Bit-perfect",
+        "title": "Setiap trek pada kadar dan kedalaman aslinya.",
+        "lede": "Laluan isyarat menyenaraikan setiap langkah daripada fail ke DAC anda, dibaca semula daripada Core Audio, dan memberitahu apabila sesuatu mengubah sampel.",
+        "body": [
+          "Vespertine menukar peranti kepada kadar setiap fail dan hanya mensampel semula, dengan penukar berkualiti mastering Apple, apabila DAC tidak dapat menjalankan kadar itu. <span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul apabila syarat dalam kod sumber dipenuhi: kadar asli, tiada apa-apa yang mengubah sampel, panjang kata yang muat, dan peranti yang eksklusif atau tidak dikongsi dengan aplikasi lain. Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11."
+        ],
+        "list": [
+          "Mod eksklusif (hog) menghalang aplikasi lain daripada menggunakan peranti. Dalam mod kongsi, kekunci kelantangan dan Digital Crown melaraskan DAC anda; dalam mod eksklusif pun boleh, jika anda menghidupkannya.",
+          "Mod integer menghantar PCM 32-bit yang tidak diproses terus ke DAC yang menerima integer.",
+          "Padankan sumber 16-bit (mati secara lalai) menghantar fail 16-bit ke DAC yang mempunyai mod 16-bit sebenar sebagai 16-bit, bukan dipad dengan sifar.",
+          "Main tanpa jurang, termasuk album helaian CUE yang dipecahkan daripada satu fail.",
+          "Mengingati DAC anda. Jika ia tidak bersambung, muzik dimainkan pada output bersambung terbaik dan beralih semula apabila DAC kembali.",
+          "Output tanpa kawalan kelantangan sendiri (HDMI, optik, line-out) boleh menggunakan kelantangan Vespertine, dipilih bagi setiap output. Di bawah 100%, label menyatakan bahawa ia bukan lagi bit-perfect.",
+          "Menyerahkan semula DAC anda pada kadar dan kedalaman yang digunakannya sebelum itu, apabila Vespertine ditutup.",
+          "Ujian gelung balik terbina dalam membandingkan setiap sampel yang dihantar Vespertine ke peranti maya. Ia semakan perisian, dilabel sedemikian, dan tidak pernah mengubah lencana <span class=\"mono nowrap\">BIT-PERFECT</span>."
+        ],
+        "links": [
+          "Syarat-syarat dalam kod",
+          "Sahkan sendiri",
+          "Apa yang dibuktikan oleh ujian gelung balik"
+        ],
+        "alt": "Vespertine memainkan rakaman Liszt oleh Lazar Berman, Années de pèlerinage, daripada FLAC 24-bit / 96 kHz: pemeriksa menandakannya bit-perfect dan eksklusif pada Fosi Audio ZD3, dengan setiap langkah laluan isyarat.",
+        "floatAlt": "Helaian ujian gelung balik: 24-bit pada 44.1 dan 96 kHz, 16-bit dipad dan sepasang trek tanpa jurang, setiap satunya sama bit demi bit.",
+        "floatCaption": "Ujian Gelung Balik · semakan perisian"
+      },
+      "room-correction": {
+        "jack": "Pembetulan bilik",
+        "kicker": "Pembetulan bilik",
+        "title": "Ukur bilik anda. Betulkan setiap pembesar suara.",
+        "lede": "Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara berdasarkan apa yang didengarnya di tempat duduk anda.",
+        "body": [
+          "Sapuan dimainkan melalui satu pembesar suara pada satu masa, di satu hingga lima titik di sekeliling tempat duduk mendengar anda. Setiap pembesar suara mendapat penapisnya sendiri, yang direka berdasarkan pengukuran. Kebanyakannya berupa pemotongan: penapis ini menurunkan puncak bilik dan menaikkan lekukan yang luas secara sederhana sahaja. Pengukuran yang sama menetapkan kelewatan dan aras setiap pembesar suara, supaya bunyi setiap pembesar suara tiba di tempat duduk anda pada masa yang sama dan dengan kekuatan yang sama. Pembetulan bilik dimatikan secara lalai, dan main balik kekal bit-perfect semasa ia dimatikan. Apabila ia dihidupkan, laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span>."
+        ],
+        "list": [
+          "Tiga sasaran: Warm (lalai), Gentle tilt dan Flat. Betulkan bes sahaja atau julat penuh, dan reka semula penapis kemudian tanpa perlu mengukur semula.",
+          "Mengimport penapis daripada REW atau Equalizer APO, berserta kelewatan dan aras setiap pembesar suara, dan mengeksport teks Equalizer APO.",
+          "Mengimport respons impuls (WAV, AIFF, CAF atau FLAC) dan memainkannya melalui konvolusi.",
+          "Stereo dan 5.1.",
+          "Potret Bilik menunjukkan pembesar suara, tempat duduk anda dan setiap titik mikrofon semasa ia diukur. Animasi lengkung kemudian mengubah respons yang diukur menjadi respons yang diramalkan, dan suis sebelum/selepas membandingkan kedua-duanya."
+        ],
+        "note": "Lengkung “selepas” diramalkan daripada pengukuran dan penapis, bukan diukur. Untuk melihat apa yang sebenarnya berlaku dalam bilik, ukur semula dengan pembetulan dihidupkan.",
+        "links": [
+          "Cara pembetulan bilik berfungsi"
+        ],
+        "alt": "Pembetulan bilik yang diramalkan oleh Vespertine untuk sepasang pembesar suara stereo dengan sasaran Warm: bagi setiap pembesar suara, respons yang diukur, sasaran dan respons yang diramalkan selepas pembetulan, dengan puncak bilik berhampiran 120 Hz dipotong sebanyak 14 dan 18 dB, serta penapis setiap pembesar suara.",
+        "floatAlt": "Potret Bilik dalam wizard pengukuran: pembesar suara kiri dan kanan, tempat duduk, dan lima titik mikrofon di sekelilingnya, dengan mikrofon diletakkan pada titik pertama.",
+        "floatCaption": "Potret Bilik"
+      },
+      "surround": {
+        "jack": "Bunyi keliling",
+        "kicker": "Bunyi keliling & Audio Ruang",
+        "title": "Cakera 5.1 anda, dalam pustaka yang sama.",
+        "lede": "Muzik berbilang saluran dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods, atau dimiks turun mengikut susun atur saluran pada DAC stereo.",
+        "body": [
+          "CD DTS dinyahkod kepada 5.1. Imej SACD, trek SACD yang diekstrak, FLAC berbilang saluran, TrueHD dan DTS-HD MA dirender sebagai Audio Ruang penjejakan kepala pada AirPods atau dimiks turun pada DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya. Output saluran demi saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
+        ],
+        "list": [
+          "Versi stereo dan bunyi keliling sesebuah album disenaraikan sekali; Vespertine memainkan versi yang sesuai dengan output, atau versi yang anda sematkan.",
+          "Bitstream Dolby Digital, DD+ dan DTS-CD ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Ujian pembawa menggunakan pembaca S/PDIF FFmpeg. Passthrough TrueHD dan DTS-HD MA tidak disokong pada macOS.",
+          "Eksport untuk Audio Ruang sebagai stereo binaural untuk fon kepala atau ALAC berbilang saluran untuk peranti Apple, lengkap dengan tag dan karya seni."
+        ],
+        "alt": "Goodbye Yellow Brick Road oleh Elton John, album 5.1 24-bit / 88.2 kHz, dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods Max, dengan laluan isyarat dan meter bagi setiap saluran.",
+        "floatAlt": "Album dengan versi stereo dan 5.1 bagi setiap lagu, disenaraikan sekali.",
+        "floatCaption": "Stereo dan 5.1, disenaraikan sekali"
+      },
+      "discs": {
+        "jack": "Imej cakera & DSD",
+        "kicker": "SACD, DVD-Video & DSD",
+        "title": "Mainkan imej cakera itu sendiri.",
+        "lede": "Halakan Vespertine ke imej SACD atau DVD-Video dan ia memainkan muzik terus daripadanya, tanpa apa-apa dilekapkan, diekstrak atau ditulis.",
+        "body": [
+          "Imej SACD <span class=\"mono\">.iso</span> memainkan kawasan stereo dan 5.1, sama ada dimampatkan DST atau tidak, dengan tajuk daripada teks cakera itu sendiri. DST dinyahkod kembali kepada DSD yang tepat, jadi stereo dihantar ke DAC anda sebagai DSD asli melalui DoP jika DAC menyokongnya, dan 5.1 dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods. Muzik LPCM pada cakera DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) dimainkan bit demi bit, satu album bagi setiap tajuk dan satu trek bagi setiap bab."
+        ],
+        "list": [
+          "Sepadan dengan sacd_extract bit demi bit pada dua cakera sebenar. Cakera dengan kawasan 5.0, hanya kawasan berbilang saluran, atau DSD128 ke atas setakat ini hanya diliputi oleh imej ujian sintetik.",
+          "DSF dan DSDIFF daripada DSD64 hingga DSD512, termasuk DSDIFF yang dimampatkan DST, dihantar sebagai DoP ke DAC yang menerima kadar pembawa, atau ditukar kepada PCM berkadar tinggi. DoP disahkan sehingga DSD256 pada Fosi Audio ZD3 dan sehingga DSD128 pada FiiO K11; DSD512 melalui DoP belum diuji pada perkakasan.",
+          "DVD-Video LPCM pada 16, 20 dan 24 bit, 48 dan 96 kHz, sehingga 8 saluran. DVD-Audio tidak disokong, dan cakera yang disulitkan (CSS) memerlukan salinan yang telah dinyahsulit."
+        ],
+        "links": [
+          "Butiran DVD-Video"
+        ],
+        "alt": "Brothers In Arms oleh Dire Straits dimainkan terus daripada imej cakera SACD: DSD64 stereo melalui DoP ke FiiO K11, dengan lencana DSD ASLI · DoP dan penyahkod menunjukkan Imej SACD, DST (tanpa kehilangan).",
+        "floatAlt": "Love for the Sake of Love oleh Claudja Barry sebagai DSD128 melalui DoP ke Fosi Audio ZD3, pada 352.8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352.8 kHz"
+      },
+      "analysis": {
+        "jack": "Analisis",
+        "kicker": "Pengesanan hi-res palsu & spektrum",
+        "title": "Ketahui fail “hi-res” yang sebenarnya bukan.",
+        "lede": "Setiap fail boleh dianalisis untuk kedalaman bit sebenarnya, lebar jalur sebenarnya dan cap jari pengekod berkehilangan serta pensampel semula.",
+        "body": [
+          "Keputusan disertakan dengan buktinya dan menamakan perkara lain yang boleh menjelaskannya, dan senarai main <em>Hi-Res Diragui</em> mengumpulkannya. Hanya pengesanan pad sifar yang tepat: keputusan spektrum ditandakan sebagai persoalan, kerana sesetengah fail berkehilangan berkadar bit tinggi lepas sebagai tulen, manakala penapis mastering yang curam, sumber FM dan pindahan pita atau piring hitam boleh kelihatan mencurigakan. Semasa muzik dimainkan, meter dan spektrum langsung menunjukkan apa yang dihantar keluar, termasuk DoP."
+        ],
+        "list": [
+          "Audio 16-bit yang dipad ke dalam bekas 24-bit",
+          "Master berkualiti CD yang berkemungkinan disampel naik lalu dijual sebagai 96 atau 192 kHz",
+          "Berkemungkinan berasal daripada format berkehilangan: MP3 atau AAC yang ditranskod ke FLAC",
+          "Berkemungkinan frekuensi tinggi sintetik daripada SBR atau “peningkatan AI”",
+          "<span class=\"mono\">vespertine-analyze</span> menjalankan analisis yang sama pada pelayan Linux di sebelah fail anda; aplikasi mengimport keputusannya."
+        ],
+        "note": "Fail dalam tangkapan skrin ini sengaja dipalsukan: muzik treler itu sendiri, dikodkan ke MP3 dan disampel naik ke 24/192 di bawah nama kumpulan rekaan.",
+        "links": [
+          "Cara analisis berfungsi, dan di mana ia tersasar"
+        ],
+        "alt": "Tab Analisis menandakan “remaster” 24/192 sebagai berkemungkinan berasal daripada format berkehilangan: spektrum jangka panjangnya berhenti pada 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max melalui USB-C",
+        "title": "Tanpa kehilangan pada AirPods Max, dan ia memberitahu anda.",
+        "lede": "Apabila disambungkan dengan kabel USB-C, AirPods Max dikenali sebagai peranti tanpa kehilangan 24-bit / 48 kHz.",
+        "body": [
+          "Muzik 48 kHz dimainkan secara bit-perfect dan selebihnya ditukar dengan pensampel semula berkualiti mastering Apple, secara terang-terangan. Melalui Bluetooth, Vespertine memberitahu anda bahawa pautannya ialah AAC. Ini bergantung pada penerangan Apple tentang laluan kabel dan bacaan semula Core Audio, kerana AirPods tiada output digital untuk diuji secara gelung balik."
+        ],
+        "alt": "Senarai main pintar trek 24-bit / 48 kHz, ditapis kepada Oasis, dimainkan secara bit-perfect pada AirPods Max melalui USB-C."
+      },
+      "library": {
+        "jack": "Pustaka",
+        "kicker": "Pustaka",
+        "title": "Layari seperti Apple Music. Urus seperti pustakawan.",
+        "lede": "Album, artis, lagu dan genre, setiap satu dengan penapis yang boleh digabungkan, serta Kocok untuk mana-mana daripadanya.",
+        "list": [
+          "Penapis untuk format, 24-bit, 88.2 kHz ke atas, berbilang saluran, genre, tahun, kadar sampel, saluran dan keputusan analisis. Carian mengabaikan huruf besar/kecil dan aksen.",
+          "Senarai main pintar dalam unit yang anda fikirkan: 24-bit, 88.2 kHz.",
+          "Remaster, keluaran mono dan stereo serta SACD bagi satu album berkongsi satu kad; pilih edisi apabila anda membukanya.",
+          "Kegemaran dan kiraan main, disimpan dalam pustaka dan tidak pernah ditulis ke fail anda. Mengimport senarai main M3U dan Apple Music, kiraan main dan kegemaran.",
+          "Editor tag dengan sandaran dan pembalikan satu langkah, serta pengayaan MusicBrainz yang menunjukkan tahap keyakinannya sebelum menulis apa-apa.",
+          "Perkongsian rangkaian melalui SMB, NFS atau WebDAV, dengan cache, Simpan Luar Talian dan main balik yang dibina untuk pelayan perlahan: lagu ditimbal pada Mac anda sebelum dimainkan, dengan gelang pemuatan pada butang main sepanjang proses itu.",
+          "Cari Muzik mencari muzik sebenar anda di setiap pemacu dan meninggalkan fail-fail yang bersepah. Persediaan ringkas pada pelancaran pertama memilih output anda dan menerangkan fungsi akses eksklusif dan ReplayGain.",
+          "EQ parametrik bagi setiap output yang mengimport pratetap AutoEQ dan Equalizer APO. Mati secara lalai; apabila dihidupkan, laluan isyarat menunjukkan <span class=\"mono nowrap\">PENYAMA</span> dan bukannya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "Pemain Mini, ikon bar menu, kekunci media, ReplayGain dan kemas kini automatik yang ditandatangani."
+        ],
+        "links": [
+          "Setiap ciri, secara terperinci"
+        ],
+        "alt": "Halaman Genre: satu jubin bagi setiap genre dengan mozek kulit albumnya."
+      },
+      "languages": {
+        "jack": "Bahasa",
+        "kicker": "{languages} bahasa",
+        "title": "Bertutur dalam bahasa anda.",
+        "lede": "Setiap menu, tetapan dan mesej laluan isyarat diterjemahkan ke dalam {languages} bahasa selain bahasa Inggeris.",
+        "body": [
+          "Daripada bahasa Ukraine, Jerman dan Jepun hingga Swahili, Tamil dan Hausa, dengan bentuk jamak dan format nombor tempatan, serta bahasa Cina Ringkas, Tradisional dan Hong Kong, masing-masing dengan kosa kata tersendiri. Bahasa Arab, Ibrani, Parsi dan Urdu mendapat susun atur kanan ke kiri.",
+          "Cara terjemahan disemak: semakan automatik pada setiap perubahan mengesahkan bahawa setiap rentetan dalam aplikasi wujud dalam kesemua 44 bahasa dengan pemegang tempat yang sama dan bentuk jamak yang diperlukan oleh setiap bahasa, dan skrin utama telah disemak dalam beberapa bahasa untuk teks yang terpotong atau bertindih serta pencerminan kanan ke kiri. Terjemahan ini bermula sebagai terjemahan mesin yang teliti, jadi pembetulan daripada penutur asli amat dialu-alukan di <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
+        ],
+        "alt": "Vespertine ditulis dalam setiap satu daripada {languagesTotal} bahasa antara mukanya, daripada ヴェスパタイン dan Веспертайн hingga فسبرتاين dan वेस्परटाइन, dalam pelbagai saiz dan muka taip.",
+        "wallLabel": "Vespertine dalam setiap bahasanya"
+      }
+    },
+    "formats": {
+      "eyebrow": "Format",
+      "title": "Fail bunyi keliling, tanpa kehilangan dan berkehilangan.",
+      "text": "Stereo dan berbilang saluran, PCM dan DSD, imej cakera dan fail biasa, semuanya dengan sokongan helaian CUE.",
+      "caption": "Format yang dimainkan Vespertine, dan caranya",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Kadar dan kedalaman asli sehingga 32-bit dan kadar yang dijalankan oleh DAC anda (diuji hingga 768 kHz); PCM 32-bit tanpa sebarang perubahan memerlukan mod integer. Imej helaian CUE."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF dan DSDIFF, dimampatkan DST atau biasa. DoP bergantung pada DAC dan kadar pembawa; jika tidak, PCM. DoP diuji hingga DSD256; DSD512 melalui DoP belum diuji pada perkakasan."
+        },
+        {
+          "name": "Imej SACD",
+          "text": "Kawasan stereo dan berbilang saluran, DST atau biasa, terus daripada imej; setiap lagu disenaraikan sekali bersama versi stereo dan 5.1nya."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16, 20 dan 24-bit pada 48 dan 96 kHz, 1 hingga 8 saluran, bit demi bit; satu album bagi setiap tajuk, satu trek bagi setiap bab. DVD-Audio tidak disokong."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus dengan Atmos, dirender oleh perender objek macOS, atau lapisan saluran asasnya yang telah dinyahkod."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Tanpa kehilangan, boleh menjadi bit-perfect; TrueHD Atmos memainkan lapisan saluran asasnya, objeknya tidak dirender."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA adalah tanpa kehilangan dan boleh menjadi bit-perfect; DTS:X memainkan lapisan saluran asasnya. DTS mentah dinyahkod; bitstream DTS-CD ialah laluan berasingan."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Dinyahkod oleh macOS. Bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
+        },
+        {
+          "name": "CD DTS dan DTS-WAV",
+          "text": "Dikenal pasti dan dinyahkod kepada 5.1, termasuk album yang dipecahkan dengan CUE."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Tanpa kehilangan. DSD di dalam WavPack tidak disokong."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Dinyahkod dan ditanda sebagai berkehilangan."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Perbandingan",
+      "title": "Bagaimana ia bersaing.",
+      "intro": "Beberapa pemain Mac menawarkan main balik bit-perfect. Perbandingan ini berdasarkan apa yang dinyatakan oleh dokumentasi atau kod sumber setiap pemain itu sendiri. “Tidak didokumenkan” bermaksud vendor tidak menyatakan sama ada ya atau tidak, bukan bermaksud ciri itu tiada. Konvolusi Vespertine adalah untuk pembetulan bilik; ia tidak mempunyai pemalam kesan audio atau perkhidmatan penstriman.",
+      "hint": "Tatal untuk melihat lagi →",
+      "region": "Jadual perbandingan (boleh ditatal ke sisi)",
+      "caption": "Vespertine berbanding tujuh pemain muzik Mac lain, berdasarkan dokumentasi atau kod sumber setiap pemain itu sendiri",
+      "feature": "Ciri",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Kod sumber",
+          "GPL-3.0",
+          "Tertutup",
+          "Tertutup",
+          "Tertutup",
+          "Tertutup",
+          "Tertutup",
+          "GPL-2.0",
+          "Tertutup"
+        ],
+        [
+          "Fail FLAC / DSD",
+          "Ya / Ya",
+          "Tidak / Tidak",
+          "Ya / Ya",
+          "Ya / Ya",
+          "Ya / Ya",
+          "Ya / Ya",
+          "Ya / Ya",
+          "Ya / Tidak⁴"
+        ],
+        [
+          "Penukaran kadar DAC automatik",
+          "Ya",
+          "Tidak",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Tidak didokumenkan"
+        ],
+        [
+          "Mod eksklusif (hog)",
+          "Ya",
+          "Tidak",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Ya"
+        ],
+        [
+          "PCM 16/24-bit tanpa perubahan sampel",
+          "Syarat + ujian",
+          "macOS 27: ujian pihak ketiga¹",
+          "Dakwaan vendor",
+          "Dakwaan vendor",
+          "Ujian gelung balik dalam apl",
+          "Dakwaan vendor",
+          "Penunjuk dalam apl",
+          "Tidak didokumenkan"
+        ],
+        [
+          "Fail bunyi keliling setempat",
+          "Ya²",
+          "Tidak didokumenkan",
+          "Ya",
+          "Ya",
+          "Ya",
+          "Tidak didokumenkan",
+          "Ya",
+          "Tidak didokumenkan"
+        ],
+        [
+          "Audio Ruang Apple untuk bunyi keliling setempat",
+          "Ya",
+          "Atmos katalog sahaja³",
+          "Tidak didokumenkan",
+          "Tidak didokumenkan",
+          "Tidak didokumenkan",
+          "Tidak didokumenkan",
+          "Ya",
+          "Tidak didokumenkan"
+        ],
+        [
+          "Analisis fail hi-res",
+          "Ya",
+          "Tidak",
+          "AudioScan",
+          "Julat dinamik, kekuatan bunyi",
+          "Ya",
+          "Tidak didokumenkan",
+          "Tidak (spektrum langsung sahaja)",
+          "Tidak (spektrum langsung sahaja)"
+        ],
+        [
+          "SACD ISO",
+          "Ya",
+          "Tidak",
+          "Ya",
+          "Tidak (DSF/DFF sahaja)",
+          "Ya",
+          "Tidak",
+          "Tidak",
+          "Tidak⁴"
+        ],
+        [
+          "Pembetulan bilik",
+          "Diukur dalam aplikasi (mikrofon USB), atau import REW / APO dan respons impuls",
+          "Tidak",
+          "Melalui konvolusi (Origin: pilihan berbayar) atau Audio Units",
+          "Melalui konvolusi",
+          "Tidak (sengaja direka begitu)",
+          "Tidak didokumenkan",
+          "Tidak",
+          "Tidak didokumenkan"
+        ],
+        [
+          "Konvolusi / pemalam kesan audio",
+          "Ya (pembetulan bilik) / Tidak",
+          "Tidak / Tidak",
+          "Ya (Origin: pilihan berbayar) / Audio Units",
+          "Ya / Tidak",
+          "Tidak / Tidak",
+          "Tidak didokumenkan / Tidak didokumenkan",
+          "Tidak / Tidak",
+          "Tidak didokumenkan / Audio Units"
+        ],
+        [
+          "Perkhidmatan penstriman",
+          "Tidak",
+          "Apple Music",
+          "Studio: ya; Origin: tidak",
+          "Ya",
+          "Tidak (setempat + UPnP)",
+          "Tidak (radio internet)",
+          "Tidak (radio internet)",
+          "Tidak (radio internet)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music pada macOS 27 adalah sama bit demi bit pada 16/24-bit dalam <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">ujian gelung balik pihak ketiga yang dilaporkan di ASR</a>, pada kelantangan 100%. Ini bukan pengukuran Vespertine; laporan asal tidak dapat disemak semula secara bebas untuk kemas kini ini. Masih tiada penukaran kadar automatik, mod hog, FLAC atau DSD pada Mac.",
+        "² Output DAC berbilang saluran dan bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan.",
+        "³ Apple mendokumenkan Audio Ruang dengan penjejakan kepala untuk trek Dolby Atmos dalam katalog Apple Music, bukan pemaparan ruang bagi fail berbilang saluran anda sendiri.",
+        "⁴ Diuji pada foobar2000 2.26 (macOS 27.0.1), tanpa sebarang komponen: fail DSF, DFF dan SACD ISO gagal dengan “Unsupported file format”. DSF dan DFF hanya dimainkan sebagai PCM 352.8 kHz selepas FFmpeg dipasang secara berasingan dan kedua-duanya ditambah pada FFmpeg Decoder Wrapper foobar2000; SACD ISO masih gagal."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Sumber dan skop</a>. Pembetulan dialu-alukan: <a href=\"{href.issues}\">buka isu</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Apa yang baharu",
+      "title": "Apa yang baharu dalam {version}.",
+      "latest": "Keluaran terkini",
+      "fullNotes": "Nota keluaran penuh",
+      "meta": "sudah dipasang? Ia mengemas kini dirinya sendiri, atau {brewUpgrade}",
+      "earlier": "Keluaran terdahulu",
+      "every": "Semua keluaran",
+      "inEnglish": "Nota keluaran ini belum diterjemahkan, jadi ia dipaparkan dalam bahasa Inggeris."
+    },
+    "faq": {
+      "eyebrow": "Soalan Lazim",
+      "title": "Soalan anda, dijawab.",
+      "items": [
+        {
+          "q": "Adakah ia benar-benar percuma?",
+          "a": "Ya. Vespertine percuma dan sumber terbuka di bawah GPL-3.0. Tiada akaun, tiada langganan, tiada iklan dan tiada telemetri (<a href=\"{href.privacy}\">privasi</a>). Ia hanya bersambung ke internet untuk menyemak kemas kini dan, apabila anda memintanya, untuk menghubungi MusicBrainz, Cover Art Archive atau ListenBrainz, atau untuk mencari kulit album bagi status Discord anda."
+        },
+        {
+          "q": "Apa yang saya perlukan?",
+          "a": "macOS {minMacOS} ({minMacOSName}) atau lebih baharu, pada Apple silicon atau Intel. Perkakasan Intel belum diuji; binaan Intel telah dijalankan di bawah Rosetta, dan laporan daripada Mac Intel sebenar dialu-alukan."
+        },
+        {
+          "q": "Bagaimana cara memasang dan mengemas kininya?",
+          "a": "Muat turun DMG, bukanya dan alihkan Vespertine ke folder Aplikasi. Ia ditandatangani dengan Developer ID dan dinotarikan oleh Apple, dan ia mengemas kini dirinya sendiri; setiap kemas kini ditandatangani. Dengan Homebrew: {brew}, kemudian {brewUpgrade} atau kemas kini terbina dalam apl itu sendiri."
+        },
+        {
+          "q": "Adakah ia menstrim daripada Qobuz, TIDAL atau Apple Music?",
+          "a": "Tidak. Vespertine memainkan muzik milik anda, pada Mac anda, pada pemacu luaran atau pada perkongsian rangkaian. Muat turun langganan Apple Music yang dilindungi DRM tidak boleh dimainkan."
+        },
+        {
+          "q": "Bagaimana saya tahu ia benar-benar bit-perfect?",
+          "a": "Laluan isyarat membaca semula apa yang sebenarnya dilakukan oleh Core Audio: kadar nominal peranti, format fizikalnya dan siapa yang memegangnya. Penyahkod mempunyai ujian automatik (TrueHD berbanding sumbernya, DTS berbanding penyahkod FFmpeg sendiri), ujian gelung balik terbina dalam menyemak laluan perisian sampel demi sampel, dan <span class=\"mono nowrap\">vespertine-probe</span> membolehkan anda menyemak perkakasan anda sendiri. <a href=\"{href.verification}\">Cara mengesahkannya sendiri</a>."
+        },
+        {
+          "q": "Adakah ia menyokong pembetulan bilik?",
+          "a": "Ya. Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur di satu hingga lima titik di sekeliling tempat duduk anda, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara serta menyelaraskan kelewatan dan aras setiap satunya, dalam stereo atau 5.1. Ia juga mengimport penapis REW dan Equalizer APO serta respons impuls. Ciri ini dimatikan secara lalai, main balik kekal bit-perfect semasa ia dimatikan, dan laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span> semasa ia dihidupkan. <a href=\"{href.roomCorrection}\">Cara pembetulan bilik berfungsi</a>."
+        },
+        {
+          "q": "Bolehkah ia memainkan cakera SACD dan DVD?",
+          "a": "Ia memainkan imejnya. Imej SACD <code>.iso</code>, stereo dan berbilang saluran, dimampatkan DST atau biasa, serta muzik LPCM pada imej DVD-Video atau folder <code>VIDEO_TS</code> dimainkan terus daripada imej, tanpa apa-apa diekstrak. DVD-Audio tidak disokong, dan DVD yang disulitkan (CSS) memerlukan salinan yang telah dinyahsulit."
+        },
+        {
+          "q": "Adakah ia memainkan Dolby Atmos?",
+          "a": "Dolby Digital Plus dengan Atmos dimainkan melalui perender objek macOS, sebagai Audio Ruang dengan penjejakan kepala pada AirPods. TrueHD Atmos dan DTS:X memainkan lapisan saluran asas tanpa kehilangannya; objeknya tidak dirender. Bitstream ke penerima AV adalah eksperimental, belum diuji pada penerima sebenar; laporan diperlukan."
+        },
+        {
+          "q": "Adakah ia akan mengubah fail saya?",
+          "a": "Hanya apabila anda mengedit tag, dan ketika itu setiap fail disandarkan dahulu dan boleh dikembalikan dalam satu langkah. Folder dirujuk di tempat asalnya; pengimportan membuat klon APFS yang tidak menggunakan ruang tambahan."
+        },
+        {
+          "q": "Perkakasan apa yang telah digunakan untuk mengujinya?",
+          "a": "Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11, yang juga digunakan untuk menguji mod integer. Ia juga telah diuji pada AirPods Max melalui USB-C dan Bluetooth, pembesar suara MacBook Pro, dan TV Sony melalui HDMI dalam 5.1. Perkakasan Intel belum diuji. Bitstream ke penerima dan output DAC berbilang saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); <a href=\"{href.dacReport}\">laporan diperlukan</a>."
+        },
+        {
+          "q": "Adakah ia dalam bahasa saya?",
+          "a": "Mungkin: antara mukanya tersedia dalam bahasa Inggeris dan {languages} bahasa lain, termasuk bahasa kanan-ke-kiri iaitu Arab, Ibrani, Parsi dan Urdu. Vespertine mengikut bahasa yang ditetapkan untuknya dalam Tetapan Sistem. Pembetulan daripada penutur asli dialu-alukan di <a href=\"{href.newIssue}\">GitHub</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Sokongan",
+      "title": "Bantu Vespertine berkembang.",
+      "text": "Ia percuma, sumber terbuka dan dibina secara terbuka. Begini cara anda boleh membantu.",
+      "cards": [
+        {
+          "title": "Taja di GitHub",
+          "text": "Vespertine percuma. Jika ia berguna kepada anda, tajaan di GitHub menyokong pembangunannya.",
+          "cta": "Jadi penaja"
+        },
+        {
+          "title": "Laporkan DAC anda",
+          "text": "Beritahu kami apa yang dilakukan oleh DAC, antara muka audio atau penerima anda. Setiap laporan peranti meluaskan apa yang telah disemak pada perkakasan sebenar.",
+          "cta": "Hantar laporan peranti"
+        },
+        {
+          "title": "Betulkan terjemahan",
+          "text": "Terjumpa frasa yang janggal dalam salah satu daripada {languages} bahasa? Buka isu dengan susunan kata yang lebih baik.",
+          "cta": "Cadangkan pembetulan"
+        },
+        {
+          "title": "Baca kodnya",
+          "text": "Laporan pepijat, pull request dan soalan dialu-alukan. Syarat laluan isyarat dan ujiannya semuanya ada dalam repositori.",
+          "cta": "Kod sumber di GitHub"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Muat Turun",
+      "title": "Mainkan koleksi bunyi keliling anda di Mac anda.",
+      "meta": [
+        "Percuma",
+        "sumber terbuka",
+        "versi {version}",
+        "macOS {minMacOS} atau lebih baharu"
+      ]
+    }
+  },
+  "press": {
+    "title": "Kit media: Vespertine, pemain muzik bunyi keliling dan hi-res untuk Mac",
+    "description": "Fakta, logo, seni utama, tangkapan skrin sebenar dan treler Vespertine, pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res.",
+    "ogAlt": "Kit media Vespertine: lembaran fakta, logo, seni utama, tangkapan skrin sebenar dan treler, di atas tiga tangkapan skrin sebenar aplikasi.",
+    "eyebrow": "Kit media",
+    "heading": "Semua yang anda perlukan untuk menulis tentang {name}.",
+    "lede": "Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, trek SACD 5.1 yang diekstrak, CD DTS serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka, dengan Audio Ruang berpenjejakan kepala pada AirPods. Laluan Isyarat menunjukkan setiap langkah daripada fail hingga ke output, dengan syarat dan ujian dalam kod sumber GPL yang boleh diaudit oleh sesiapa sahaja.",
+    "fine": "Output saluran demi saluran dan bitstream ke penerima masih eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya.",
+    "facts": {
+      "eyebrow": "Lembaran fakta",
+      "title": "Fakta.",
+      "name": "Nama",
+      "formerly": "(dikenali sebagai {formerName} sehingga versi 0.6.0)",
+      "developer": "Pembangun",
+      "developerValue": "{author}, pembangun bebas",
+      "price": "Harga",
+      "priceValue": "Percuma. Sumber terbuka di bawah GPL-3.0; tiada akaun, langganan, iklan atau telemetri",
+      "platform": "Platform",
+      "platformValue": "macOS {minMacOS} {minMacOSName} atau lebih baharu, Apple silicon dan Intel",
+      "current": "Versi semasa",
+      "currentValue": "{version}, dikeluarkan pada {date}",
+      "currentFine": "DMG yang ditandatangani dan dinotarikan ({size}), mengemas kini dirinya sendiri",
+      "first": "Keluaran pertama",
+      "firstFine": "(sebagai {formerName} 0.1.0)",
+      "languages": "Bahasa",
+      "languagesValue": "Bahasa Inggeris dan {languages} bahasa lain, termasuk bahasa Ukraine, Arab, Ibrani, Jepun dan tiga jenis bahasa Cina",
+      "install": "Pasang",
+      "installValue": "<a href=\"{href.dmg}\">Muat turun DMG</a> atau {brew}",
+      "tested": "Diuji dengan",
+      "testedValue": "Fosi Audio ZD3 (PCM hingga 768 kHz, DSD256 melalui DoP), FiiO K11 (PCM hingga 384 kHz, DSD128 melalui DoP, mod integer), AirPods Max melalui USB-C dan Bluetooth, pembesar suara MacBook Pro",
+      "links": "Pautan",
+      "website": "Laman web",
+      "source": "Kod sumber",
+      "releaseNotes": "Nota keluaran",
+      "verify": "Cara mengesahkan main balik bit-perfect"
+    },
+    "angle": {
+      "eyebrow": "Sudut",
+      "title": "Fokus utamanya.",
+      "list": [
+        "Muzik bunyi keliling dalam satu pustaka Mac, daripada imej SACD dan DVD-Video, rip dan CD DTS hinggalah TrueHD dan DD+ Atmos, dengan Audio Ruang pada AirPods.",
+        "Kod sumber GPL-3.0 percuma yang boleh dibaca, dibina dan diubah oleh sesiapa sahaja.",
+        "Laluan isyarat yang menunjukkan kadar sampel, panjang kata, gandaan dan pemprosesan saluran. Syarat bit-perfect ditetapkan dalam kod, berserta ujian, ujian gelung balik terbina dalam dan <a href=\"{href.verification}\">panduan pengesahan</a>."
+      ],
+      "text": "Analisis fail hi-res turut disertakan. Pengesanan pad sifar adalah tepat; keputusan spektrum ialah anggaran yang ada batasannya. VeraVox dan Audirvana AudioScan juga menawarkan analisis. <a href=\"{href.comparison}\">Sumber perbandingan</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Treler.",
+      "text": "44 saat, 16:9, 1080p pada 60 fps, dengan bunyi. <a href=\"{href.trailerDownload}\" download>Muat turun MP4</a> ({size}). Master 4K boleh didapati atas permintaan.",
+      "fallback": "Muat turun treler (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Jenama",
+      "title": "Logo.",
+      "text": "Sentiasa dalam huruf kecil, bulan sabitnya sentiasa berwarna loyang. Sila jangan ubah warnanya, regangkannya atau susun semula hurufnya. <a href=\"{href.brandGuide}\">Panduan jenama (PDF)</a>.",
+      "primaryAlt": "Gabungan logo Vespertine: bulan sabit berwarna loyang dan perkataan vespertine",
+      "stackedAlt": "Gabungan logo Vespertine bertindan",
+      "primary": "Utama",
+      "stacked": "Bertindan",
+      "onLight": "atas latar cerah:",
+      "crescent": "bulan sabit sahaja:"
+    },
+    "art": {
+      "eyebrow": "Seni utama",
+      "title": "Satu imej bagi setiap ciri.",
+      "text": "Dalam tiga saiz: 2400×1350, 1600×900 dan 1270×760.",
+      "items": {
+        "bit-perfect": "Bit-perfect apabila syaratnya dipenuhi",
+        "fake-hi-res": "Pengesanan hi-res palsu",
+        "spatial-audio": "Bunyi keliling sebagai Audio Ruang pada AirPods",
+        "native-dsd": "DSD asli melalui DoP",
+        "stereo-and-surround": "Versi stereo dan bunyi keliling",
+        "sacd-iso": "Imej SACD, dimainkan terus",
+        "languages": "{languages} bahasa"
+      }
+    },
+    "shots": {
+      "eyebrow": "Tangkapan skrin",
+      "title": "Aplikasi sebenar.",
+      "text": "Pada pustaka milik pembangun sendiri, 2400×1500. Kulit album adalah hak milik pemiliknya masing-masing.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24-bit / 96 kHz, bit-perfect pada Fosi Audio ZD3: Lazar Berman, Les jeux d’eaux à la Villa d’Este karya Liszt",
+        "multichannel-albums": "Album yang ditapis kepada berbilang saluran",
+        "stereo-and-surround-versions": "Trek SACD yang diekstrak dengan versi stereo dan 5.1",
+        "spatial-audio-airpods-max": "Album 5.1 24/88.2 (Elton John, Goodbye Yellow Brick Road) sebagai Audio Ruang pada AirPods Max",
+        "fake-hi-res-detection": "“Remaster” 24/192 yang terhenti pada 16 kHz (palsu yang disengajakan: muzik treler itu sendiri, dikodkan ke MP3 lalu dinaikkan kadar sampelnya, dengan nama kumpulan rekaan)",
+        "dsd-native-dop": "DSD128 melalui DoP pada 352.8 kHz pada Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "Fail .iso SACD, dimainkan daripada imej: Dire Straits, Brothers In Arms",
+        "genres": "Genre",
+        "search": "Cari",
+        "smart-playlist": "Senarai Main Pintar, bit-perfect pada AirPods Max melalui USB-C",
+        "loopback-test": "Ujian Gelung Balik: semakan perisian bagi laluan output, sampel demi sampel",
+        "setup-welcome": "Persediaan kali pertama: selamat datang",
+        "setup-output": "Persediaan kali pertama: memilih output untuk diingati",
+        "output-settings": "Tetapan output: output yang diingati, output ganti, padanan 16-bit",
+        "equalizer": "EQ parametrik dengan pratetap AutoEQ"
+      }
+    },
+    "contact": {
+      "eyebrow": "Hubungi",
+      "title": "Hubungi kami.",
+      "text": "Media, soalan dan permintaan temu bual: {email}. Soalan komuniti: <a href=\"{href.discussions}\">GitHub Discussions</a>. Pepijat dan laporan peranti: <a href=\"{href.issues}\">isu GitHub</a>."
+    }
+  },
+  "privacy": {
+    "title": "Privasi: Vespertine tidak mengumpul apa-apa",
+    "description": "Aplikasi Vespertine tidak mengumpul apa-apa: tiada akaun, analitik, telemetri, laporan ranap atau iklan. Apa yang disambungkan oleh aplikasi dan laman web ini, dan sebabnya.",
+    "ogAlt": "Privasi Vespertine: Vespertine tidak mengumpul apa-apa. Tiada akaun, analitik, telemetri, laporan ranap atau pengiklanan.",
+    "eyebrow": "Privasi",
+    "heading": "Vespertine tidak mengumpul",
+    "headingBrass": "apa-apa.",
+    "updated": "Berkuat kuasa {effective} (menambah penggunaan mikrofon oleh pembetulan bilik, untuk versi 0.14). Perubahan terdahulu: status Discord pilihan, {discordUpdated}; bahagian “Laman web ini”, {statsUpdated}, apabila laman ini mula mengira lawatan dengan statistik tanpa kuki yang dihoskan sendiri. Pada {langUpdated}, bahagian “Laman web ini” juga mula menerangkan menu bahasa, yang mengingati pilihan anda pada peranti anda.",
+    "intro": "Vespertine ialah pemain muzik percuma dan sumber terbuka. Aplikasi ini tiada akaun, tiada analitik, tiada telemetri, tiada laporan ranap dan tiada pengiklanan. Pembangun tidak menerima sebarang maklumat tentang anda atau muzik anda. Oleh sebab kod sumbernya terbuka kepada umum, anda boleh menyemak setiap kenyataan di halaman ini.",
+    "staysTitle": "Apa yang kekal di Mac anda",
+    "stays": "Pangkalan data pustaka, senarai main, kiraan main, hasil analisis fail, cache karya seni dan tetapan anda disimpan dalam folder Library pengguna anda pada Mac. Kata laluan untuk perkongsian rangkaian dan token ListenBrainz anda, jika anda menambahnya, disimpan dalam Rantai Kunci macOS. Pembetulan bilik menggunakan mikrofon pengukuran anda hanya semasa anda menjalankan pengukuran, dan menyimpan rakaman dalam folder Dokumen anda. Tiada satu pun daripadanya dimuat naik ke mana-mana.",
+    "onlineTitle": "Apabila aplikasi bersambung ke internet",
+    "online": [
+      "<strong>Semakan kemas kini.</strong> Vespertine meminta suapan kemas kininya daripada GitHub kira-kira sekali sehari, dan apabila anda memilih Semak Kemas Kini. GitHub dapat melihat alamat IP anda, sama seperti mana-mana muat turun. Anda boleh mematikan semakan automatik dalam Tetapan.",
+      "<strong>MusicBrainz dan Cover Art Archive.</strong> Hanya apabila anda menggunakan Cari di MusicBrainz atau Perkayakan Metadata (Cari Muzik pada Mac Ini menawarkan Perkayakan untuk muzik yang ditambahnya, sebagai kotak semak yang boleh anda nyahtanda), Vespertine menghantar nama album, artis dan trek yang dicarinya ke musicbrainz.org. Apabila “Ambil kulit album” dihidupkan dalam Tetapan, ia memuat turun kulit album daripada coverartarchive.org, yang menyajikannya daripada Internet Archive (archive.org). MusicBrainz dan Cover Art Archive dikendalikan oleh MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Hanya jika anda menghidupkan scrobbling dan memasukkan token anda, Vespertine menghantar lagu yang anda mainkan ke listenbrainz.org: tajuk, artis, album, tempoh dan ID MusicBrainz lagu tersebut apabila fail anda memilikinya. Ia menghantar “sedang dimainkan” apabila lagu bermula, dan satu rekod pendengaran berserta masanya sebaik sahaja anda telah mendengar separuh daripadanya atau empat minit.",
+      "<strong>Discord.</strong> Hanya jika anda menghidupkan status Discord dalam Tetapan, Vespertine memberitahu aplikasi Discord pada Mac anda, melalui sambungan yang kekal di Mac anda, apa yang sedang dimainkan: tajuk, artis, album, format dan kemajuan. Discord memaparkannya sebagai status anda kepada orang yang boleh melihat aktiviti anda. Untuk memaparkan kulit album, Vespertine mencarinya mengikut nama, kerana Discord hanya boleh memaparkan imej dari web: di coverartarchive.org apabila fail anda mengandungi ID keluaran MusicBrainz, jika tidak di iTunes Search milik Apple (itunes.apple.com), yang menerima nama artis dan album. Discord kemudian memuat turun kulit album dari situ. Anda boleh mematikan paparan kulit album, dan fail anda serta kulit albumnya tidak pernah dimuat naik.",
+      "<strong>Perkongsian rangkaian.</strong> Vespertine menyambung ke pelayan yang anda tambah, dan tidak ke tempat lain, untuk membaca muzik anda. Semasa perkongsian bersambung, ia menyemak kira-kira setiap minit bahawa pelayan masih menjawab, dan mencari muzik baharu setiap setengah jam (tidak sekali-kali semasa anda sedang memainkan muzik daripadanya)."
+    ],
+    "websiteTitle": "Laman web ini",
+    "website": [
+      "Laman ini dihoskan di GitHub Pages, yang mungkin merekod alamat IP pelawat; lihat <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">penyata privasi GitHub</a>. Butang muat turun memaut ke keluaran aplikasi di GitHub. Laman ini tidak menetapkan sebarang kuki dan memuatkan fon, imej dan videonya daripada laman ini sendiri.",
+      "Untuk mengetahui halaman dan butang yang digunakan orang, laman ini mengira lawatan dengan <a href=\"https://umami.is\">Umami</a>, perisian mesra privasi yang kami jalankan sendiri di stats.szeremeta.org. Ia tidak menetapkan kuki, tidak menyimpan apa-apa pada peranti anda, tidak menyimpan alamat IP anda, dan tidak berkongsi apa-apa dengan pengiklan atau mana-mana syarikat lain. Ia merekod halaman, laman yang anda datangi sebelumnya, anggaran negara anda, pelayar, sistem pengendalian, saiz skrin dan bahasa anda, serta klik pada butang muat turun, GitHub dan Homebrew. Ia tidak boleh menjejaki anda merentas laman web atau mengenal pasti anda, dan ia mengabaikan pelawat yang pelayarnya menghantar Do Not Track. <strong>Aplikasi tidak pernah menghubunginya.</strong>",
+      "Jika anda memilih bahasa melalui menu bahasa laman ini, pelayar anda mengingati pilihan itu pada peranti anda (dalam storan setempatnya), supaya laman ini tidak menukar anda kembali. Pilihan itu tidak pernah dihantar ke mana-mana, dan laman ini berfungsi sama sahaja tanpanya."
+    ],
+    "changesTitle": "Perubahan dan cara menghubungi",
+    "changes": "Jika perkara ini berubah, halaman ini dan nota keluaran akan memaklumkannya terlebih dahulu. Soalan dialu-alukan sebagai <a href=\"{href.issues}\">isu GitHub</a>."
+  },
+  "terms": {
+    "title": "Terma: Vespertine ialah perisian bebas di bawah GPL",
+    "description": "Vespertine ialah perisian bebas di bawah GNU General Public License, versi 3 atau lebih baharu: tanpa kos, tanpa pendaftaran, tanpa waranti.",
+    "ogAlt": "Terma Vespertine: perisian bebas, secara terus terang. GNU General Public License, versi 3 atau lebih baharu.",
+    "eyebrow": "Terma",
+    "heading": "Perisian bebas,",
+    "headingBrass": "terus terang.",
+    "updated": "Berkuat kuasa {effective}",
+    "licenseTitle": "Lesen",
+    "license": "Vespertine ialah perisian bebas di bawah <a href=\"{href.license}\">GNU General Public License, versi 3 atau lebih baharu</a>. Anda boleh menggunakannya untuk apa jua tujuan, mengkaji dan mengubah kod sumbernya, serta berkongsi salinannya, termasuk yang telah diubah suai, di bawah lesen yang sama. Ia tidak dikenakan sebarang bayaran, dan tiada apa-apa yang perlu didaftar.",
+    "warrantyTitle": "Tiada waranti",
+    "warranty": "Seperti yang dinyatakan dalam lesen, Vespertine disediakan “sebagaimana adanya”, tanpa sebarang jenis waranti, setakat yang dibenarkan oleh undang-undang. Simpan sandaran muzik anda. Vespertine hanya mengubah fail apabila anda mengedit tagnya, dan membuat sandaran setiap fail terlebih dahulu, tetapi anda menggunakannya atas risiko anda sendiri.",
+    "musicTitle": "Muzik anda dan perkhidmatan lain",
+    "music": "Anda bertanggungjawab memastikan anda berhak memainkan muzik yang anda tambah. Vespertine tidak boleh memainkan fail yang dilindungi DRM dan tidak cuba berbuat demikian. MusicBrainz, Cover Art Archive dan ListenBrainz ialah perkhidmatan bebas dengan terma mereka sendiri, yang terpakai apabila anda menggunakannya melalui Vespertine.",
+    "trademarksTitle": "Tanda dagangan",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus dan Dolby TrueHD ialah tanda dagangan Dolby Laboratories. DTS, DTS-HD Master Audio dan DTS:X ialah tanda dagangan DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS dan Audio Ruang ialah tanda dagangan Apple Inc. Vespertine menamakannya hanya untuk menerangkan apa yang dimainkannya dan di mana. Vespertine tidak diperakui, dilesenkan atau disokong oleh Dolby, DTS atau Apple.",
+    "contactTitle": "Hubungi",
+    "contact": "Pepijat, soalan dan permintaan: <a href=\"{href.issues}\">isu GitHub</a>.",
+    "englishNote": "Ini ialah terjemahan untuk kemudahan anda. GNU General Public License itu sendiri ialah teks yang mengikat, dan ia dalam bahasa Inggeris."
+  },
+  "notFound": {
+    "title": "Halaman tidak ditemui: Vespertine",
+    "description": "Halaman ini tiada di sini. Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res.",
+    "ogAlt": "Vespertine: pemain Mac percuma dan sumber terbuka untuk muzik bunyi keliling dan hi-res.",
+    "eyebrow": "404 · Tiada isyarat",
+    "heading": "Halaman ini",
+    "headingBrass": "tiada di sini.",
+    "lede": "Pautan itu mungkin sudah lama, atau alamatnya tersalah taip. Segala-galanya tentang Vespertine bermula di halaman utama.",
+    "home": "Pergi ke halaman utama"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} atau lebih baharu",
+    "processor": "Apple silicon (arm64) atau Intel (x86-64)",
+    "subCategory": "Pemain muzik",
+    "sourceName": "Kod sumber Vespertine",
+    "trailerName": "Treler Vespertine",
+    "trailerDescription": "Lawatan 44 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, bunyi keliling sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
+    "keywords": "bit-perfect, audio hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, CD DTS, Audio Ruang, AirPods Max, FLAC, pemain muzik, macOS, sumber terbuka"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 menambah pembetulan bilik: ukur pembesar suara anda dengan mikrofon UMIK-1 dan dengar melalui penapis yang dibuat untuk bilik anda. Ia juga memastikan main balik rangkaian tidak kehabisan data.",
+      "notes": "### Pembetulan bilik\n- **Ukur bilik anda.** Letakkan mikrofon UMIK-1 yang telah ditentukur di tempat duduk pendengaran dan Vespertine akan memainkan sapuan ujian melalui setiap pembesar suara secara bergilir, di 1 hingga 5 kedudukan (5 secara lalai: tempat duduk itu, kemudian kiri, kanan, di hadapan dan di belakang). Ia menyemak aras dan laluan ke setiap pembesar suara terlebih dahulu, menolak larian yang buruk dan membolehkan anda mencuba semula atau menyambung dari tempat anda berhenti. Stereo dan 5.1 kedua-duanya disokong.\n- **Penapis untuk setiap pembesar suara.** Daripada pengukuran itu, Vespertine membina satu set kecil penapis bagi setiap pembesar suara, kebanyakannya potongan untuk puncak bes yang ditambah oleh bilik. Pilih sasaran (Hangat ialah lalai, atau Condong lembut atau Rata) dan julat (bes sahaja, atau julat penuh) dan penapis akan dipadankan semula daripada pengukuran yang disimpan tanpa perlu mengukur semula. Graf menunjukkan apa yang diukur, apa yang diramalkan selepas pembetulan dan sasarannya, dan ramalan itu dilabel sebagai ramalan.\n- **Penjajaran kelewatan dan aras.** Kelewatan dan aras setiap pembesar suara turut diukur, jadi pembesar suara yang lebih dekat ditahan sehingga bunyi daripada pembesar suara yang paling jauh tiba, dan pembesar suara yang lebih kuat diperlahankan supaya sepadan dengan yang paling perlahan.\n- **Gunakan penapis anda sendiri.** Import fail penapis Equalizer APO atau REW (kelewatan, aras dan penapis bagi setiap pembesar suara), atau import respons impuls (WAV, AIFF, CAF atau FLAC) untuk dimainkan sebagai penapis konvolusi. Eksport profil sebagai teks Equalizer APO atau sebagai profil Vespertine. Baris yang tidak dapat dimainkan oleh Vespertine ditolak beserta nombor barisnya dan tidak dimainkan sebagai sesuatu yang lain.\n- **Mati secara lalai, jadi bit-perfect kekal bit-perfect.** Pembetulan bilik dihidupkan bagi setiap output secara berasingan dan terikat pada output tempat ia diukur. Semasa ia mengubah sampel, laluan isyarat memaparkan PEMBETULAN BILIK dan strim tidak lagi ditanda sebagai bit-perfect. Apabila ia dimatikan, main balik tidak diusik langsung. Mod integer dan Padankan 16-bit kekal mati semasa ia hidup.\n- **Apa yang diliputinya.** PCM stereo dan 5.1 yang dirender oleh Vespertine. Bagi bitstream Dolby dan DTS, Atmos dan bilangan saluran lain, pembetulan mengundur diri dan laluan isyarat menyatakan sebabnya. DSD pada DAC DoP ditukar kepada PCM semasa pembetulan hidup supaya ia turut dibetulkan; tandakan Kekalkan DSD asli pada output itu untuk menghantarnya secara asli tanpa pembetulan.\n- **Satu tetingkap.** Paparan → Pembetulan Bilik, juga dari tetingkap Penyama dan tetapan setiap output, menempatkan suis, Ukur, Import, Eksport, profil, graf sebelum dan selepas, sasaran dan julat, serta kelewatan, aras dan penapis setiap pembesar suara. Ini menggantikan tetingkap Pengukuran Bilik beta yang terdahulu. Kaedahnya diterangkan dalam `docs/ROOM-CORRECTION.md`.\n\n### Main balik rangkaian\n- **Kurang keciciran daripada NAS.** Trek pada perkongsian rangkaian kini disalin ke Mac anda sebelum dimainkan, dan trek seterusnya disalin lebih awal, jadi gangguan kecil pada rangkaian tidak lagi menghentikan muzik. Fail DSD yang besar dibaca dengan cara yang memastikan data yang cukup jauh di hadapan sentiasa tersedia.\n- **Gelang pemuatan pada butang main.** Semasa Vespertine menunggu data daripada rangkaian, butang main/jeda memaparkan gelang kecil yang berputar (pegun apabila Kurangkan gerakan dihidupkan). Kegagalan baca yang singkat dicuba semula.\n- **Had.** Gangguan yang sangat lama, atau sambungan yang lebih perlahan daripada muzik, masih boleh menyebabkan main balik dijeda untuk mengisi semula. Salinan cache menggunakan paling banyak 8 GB, dan sumber yang lebih besar daripada itu gagal dengan mesej yang jelas. Lihat `docs/NETWORK-PLAYBACK.md`.\n\n### Juga baharu\n- **DoP hidup secara lalai untuk DAC yang dikenali.** FiiO K11 dan Fosi Audio ZD3 bermula dengan DoP dihidupkan. Jika anda mematikannya, Vespertine akan mengingatinya.\n- **Ditambah Baru-baru Ini memaparkan 150 album**, naik daripada 60, jadi import yang besar tidak menolak album yang ditambah sejurus sebelumnya keluar daripada senarai.\n- **Fosi Audio ZD3.** ZD3 kini tersenarai dalam senarai peranti yang disokong dan tangkapan skrin laman web telah diambil semula menggunakannya.\n- **Laman web.** Baris “Beri bintang di GitHub” dan “Sertai perbincangan” kini terletak di bawah butang muat turun.\n\n### Pengesahan\n- Suite ujian enjin, pustaka dan apl lulus, termasuk ujian baharu untuk reka bentuk penapis bilik, untuk main balik melalui peringkat pembetulan dan penapis konvolusi, untuk langkah pengukuran terhadap bilik simulasi, untuk format import dan untuk cache rangkaian. Kod audio masa nyata juga disemak di bawah sanitizer alamat, bebenang dan tingkah laku tidak tertakrif.\n- Disemak pada perkakasan sebenar: pengukuran penuh dengan UMIK-1 di tempat duduk pendengaran, penapis yang dibina daripadanya, dan main balik melalui pembetulan bilik pada Fosi Audio ZD3 dengan pembesar suara stereo."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 memainkan DSD 5.1 dalam Audio Ruang pada AirPods, memberitahu anda apabila audio ditukar atau dimiks turun, dan tidak lagi tergantung semasa keluar.",
+      "notes": "### Audio Ruang\n- **DSD 5.1 kini dimainkan dalam Audio Ruang.** Fail DSD 5.1 (DSF, DSDIFF, DSDIFF yang dimampatkan DST atau imej SACD) ditukar kepada PCM dan setiap saluran diletakkan di tempat sepatutnya, jadi saluran LFE dan bunyi keliling tidak lagi hilang. Sebelum ini, saluran DSDIFF diskret boleh berakhir pada lapisan saluran asas tiga pembesar suara dan saluran belakang hilang.\n- **Ia memberitahu apa yang berlaku pada audio.** Laluan isyarat memaparkan **DSD → PCM** di sebelah RUANG atau campuran turun, dan dua notis baharu, “Ditukar daripada DSD” dan “Dimiks turun ke stereo”, muncul apabila berkenaan. Kedua-duanya diterjemahkan ke dalam kesemua 44 bahasa.\n- Disemak oleh pembangun pada AirPods Max.\n\n### Dibetulkan\n- **Keluar tidak lagi tergantung.** Cmd-Q boleh menyebabkan kursor berputar sementara Vespertine menunggu peranti audio. Kini ia keluar serta-merta.\n- **Fail berbilang saluran dibaca dengan betul.** Fail RF64 dan Wave64 dibuka dengan betul, nama saluran DSD dibaca daripada fail, dan penghalaan berbilang saluran diskret mengikut susun atur saluran fail itu sendiri.\n\n### Pengesahan\n- Suite ujian enjin, pustaka dan apl lulus, termasuk ujian baharu yang memainkan setiap format DSD 5.1 melalui Audio Ruang dan menyemak bahawa setiap saluran tiba di tempatnya. Semakan penempatan kiri/kanan hanya dijalankan pada Mac sebenar; mesin ujian GitHub melangkau semakan yang satu itu."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine kini memberitahu apabila penyama tidak dapat mengubah apa yang sedang dimainkan, menawarkan penyama rujukan pilihan untuk setiap model AirPods Max USB-C, dan mempunyai keputusan berbilang saluran pertamanya pada perkakasan sebenar."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine kini menyimpan sejarah apa yang telah anda mainkan, memberikan panel tersendiri kepada Seterusnya di sebelah pustaka, memaparkan setiap edisi album pada satu kad, dan boleh memaparkan apa yang sedang anda mainkan sebagai status Discord anda."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine kini berfungsi dengan betul dalam Mod Cerah, membolehkan output tanpa kawalan kelantangan menggunakan kelantangan Vespertine, dan terus menganalisis pustaka anda semasa anda mendengar daripada perkongsian rangkaian."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine kini memainkan muzik dengan lancar daripada perkongsian rangkaian yang perlahan, menganalisis pustaka besar dengan lebih pantas termasuk perkongsian rangkaian, memainkan hi-res pada DAC USB-C kecil pada kadar tertinggi yang ditawarkannya, dan mengekalkan papan kekunci serta pilihan berbilang di tempat yang anda jangkakan."
+    }
+  }
+}

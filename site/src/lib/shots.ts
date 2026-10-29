@@ -2,7 +2,8 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { SITE } from '../data/app';
-import { scenes } from '../data/content';
+import { content } from '../data/content';
+import type { Lang } from '../i18n';
 
 const files = import.meta.glob<{ default: ImageMetadata }>('../assets/shots/*.jpg', { eager: true });
 export const shot = (name: string) => {
@@ -11,8 +12,8 @@ export const shot = (name: string) => {
   return f.default;
 };
 
-export const sceneShots = () =>
-  Promise.all(scenes.map(async (s) => ({ url: SITE + (await getImage({ src: shot(s.shot), width: 1600, format: 'webp', quality: 78 })).src, caption: s.alt })));
+export const sceneShots = (lang: Lang = 'en') =>
+  Promise.all(content(lang).scenes.map(async (s) => ({ url: SITE + (await getImage({ src: shot(s.shot), width: 1600, format: 'webp', quality: 78 })).src, caption: s.alt })));
 
 export const trailerPoster = () => getImage({ src: shot('trailer-poster'), width: 1280, format: 'webp', quality: 70 });
 export const TRAILER = '/assets/trailer/vespertine-trailer.mp4';

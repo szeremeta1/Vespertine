@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { SITE, app, latest, releases, links, longDate, megabytes, releaseSummary } from '../data/app';
 import { description, hero, pillars, scenes, formats, compare, faq } from '../data/content';
 import { markdownish, plain } from './text';
+import { CODES, pagePath } from '../i18n';
 
 const install = [
   `- [Download Vespertine ${latest.version} for Mac](${latest.dmg.url}) (${latest.dmg.name}, ${megabytes(latest.dmg.size)}, released ${longDate(latest.date)}). Open the DMG and move Vespertine to Applications. Signed with a Developer ID and notarized by Apple; it updates itself, and every update is EdDSA-signed.`,
@@ -19,6 +20,7 @@ const keyLinks = [
   `- [Press kit](${SITE}/press.html): fact sheet, logos, key art, screenshots, trailer, press contact`,
   `- [Privacy](${SITE}/privacy.html): Vespertine collects nothing; what the app and website connect to`,
   `- [Terms](${SITE}/terms.html): GPL-3.0-or-later, no warranty, trademarks`,
+  `- The site in the app's ${app.languages} other languages: ${CODES.filter((c) => c !== 'en').map((c) => `[${c}](${SITE}${pagePath(c, 'home')})`).join(', ')}; each page links its other-language versions as hreflang alternates`,
   `- [Source code on GitHub](${links.repo})`,
   `- [Release notes](${links.releases})`,
   `- [All features, in detail](${links.features})`,

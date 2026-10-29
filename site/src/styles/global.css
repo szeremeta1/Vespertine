@@ -133,7 +133,11 @@ main:focus, [tabindex="-1"]:focus { outline: none; }
 .nav__brand { display: flex; align-items: center; margin-right: auto; padding: 6px 0; border-radius: 6px; }
 /* The lockup's SVG carries clear space on every side; pull the crescent back to the column edge. */
 .nav__brand img { height: 40px; width: auto; margin-left: -10px; }
-.nav__links { display: flex; gap: 26px; }
+/* Links that don't fit on one line wrap onto a clipped second row; main.ts then hides them (.is-squeezed) so they
+   can't take focus. The padding keeps focus rings inside the clip. */
+.nav nav { min-width: 0; }
+.nav__links { display: flex; flex-wrap: wrap; gap: 26px; height: 54px; padding: 6px; margin: -6px; overflow: hidden; }
+.nav__links .is-squeezed { display: none; }
 .nav__links a { display: inline-block; padding: 10px 0; font-size: 14px; color: var(--muted); text-decoration: none; transition: color .15s; }
 .nav__links a:hover, .nav__links a[aria-current] { color: var(--ink); }
 .nav__meter { position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; overflow: hidden; }
@@ -221,7 +225,9 @@ html:not(.js) .features::before {
 .hero__title {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(46px, 8vw, 128px);
+  /* --fit (and --fit-s on phones) shrink a headline whose lines run longer than the English ones (Home.astro);
+     --shrink is the last step, set by main.ts when a line still wraps with the device's fonts. */
+  font-size: calc(clamp(46px, 8vw, 128px) * var(--fit, 1) * var(--shrink, 1));
   line-height: .94;
   letter-spacing: -.035em;
   font-variation-settings: "opsz" 72;
@@ -309,7 +315,7 @@ html:not(.js) .features::before {
   /* Separators would start a wrapped line; the three facts read as tags instead. */
   .hero__eyebrow { font-size: 11px; letter-spacing: .12em; margin-bottom: 20px; gap: 6px 16px; }
   .hero__eyebrow span + span::before { display: none; }
-  .hero__title { font-size: clamp(42px, 13.2vw, 64px); }
+  .hero__title { font-size: calc(clamp(42px, 13.2vw, 64px) * var(--fit-s, 1) * var(--shrink, 1)); }
   .hero__cta .btn { flex: 1 1 auto; }
   .patchbay { gap: 14px; }
   .jack { font-size: 13px; }
@@ -641,3 +647,126 @@ html:not(.js) .features::before {
 .nw--tone1 .nw__name { color: var(--brass); }
 .nw--tone2 .nw__name { color: #cfc8bb; }
 .nw--tone3 .nw__name { color: var(--brass-hi); }
+
+/* ---------- Language menu (LangMenu.astro) ---------- */
+.lang { position: relative; flex: none; }
+.lang__btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 10px; border-radius: 999px;
+  border: 1px solid var(--line-2); color: var(--muted); font: 500 11px/1 var(--mono); letter-spacing: .08em;
+  cursor: pointer; list-style: none; transition: color .15s, border-color .15s;
+}
+.lang__btn::-webkit-details-marker { display: none; }
+.lang__btn svg { width: 15px; height: 15px; flex: none; }
+.lang__btn:hover, .lang[open] .lang__btn { color: var(--ink); border-color: var(--brass-lo); }
+.lang__panel {
+  position: absolute; inset-inline-end: 0; top: calc(100% + 10px); z-index: 60; width: min(300px, calc(100vw - 2 * var(--gutter)));
+  padding: 12px; border-radius: 12px; background: var(--surface); box-shadow: 0 0 0 1px var(--line-2), 0 24px 60px -20px rgba(0, 0, 0, .9);
+}
+.lang__title { font: 500 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 2px 6px 8px; }
+.lang__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 6px; max-height: min(60vh, 460px); overflow-y: auto; overscroll-behavior: contain; }
+.lang__list a { display: block; padding: 6px 8px; border-radius: 7px; font-size: 14px; line-height: 1.35; color: var(--muted); text-decoration: none; }
+.lang__list a:hover, .lang__list a:focus-visible { color: var(--ink); background: rgba(236, 230, 218, .05); }
+.lang__list a[aria-current] { color: var(--brass-hi); }
+.lang__list a[aria-current]::after { content: " ✓" / ""; }
+/* Phones: the panel spans the bar, gutter to gutter, so it never runs off the screen. */
+@media (max-width: 760px) {
+  .lang { position: static; }
+  .lang__panel { inset-inline: var(--gutter); width: auto; top: calc(100% + 6px); }
+}
+@media (max-width: 400px) { .lang__btn { padding: 0 8px; } .lang__code { display: none; } }
+
+/* English release notes on a translated page (a release published before its translation). */
+.release__english { font-size: 13px; color: var(--dim); }
+
+/* ---------- Other scripts ----------
+   The web fonts cover Latin (and the language wall's names are set per script by lang). Text in other scripts
+   falls back to each system's own faces; these stacks pick the good ones on macOS, iOS, Windows and Android, keeping
+   Newsreader, Inter and JetBrains Mono for the Latin words inside. No extra downloads. */
+/* An element in another language (a name in the language menu) starts from the default faces, not the page
+   language's: Greek or Cyrillic set in a Japanese face come out full-width. The language wall keeps exactly the
+   faces it has on the English page, in every language. */
+[lang], .namewall { --serif: "Newsreader", "Newsreader fallback", "Iowan Old Style", Georgia, serif; --sans: "Inter", "Inter fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "JetBrains Mono", "JetBrains Mono fallback", ui-monospace, "SF Mono", Menlo, monospace; }
+/* The mono face has Latin only; text in other scripts set in mono (labels, meta lines) falls back to the script's own
+   UI face, so Arabic stays joined and Indic clusters stay whole. */
+:is(:lang(ar), :lang(fa), :lang(ur)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "SF Arabic", "Geeza Pro", "Segoe UI", "Noto Sans Arabic", ui-monospace, Menlo, monospace; }
+:lang(he):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "SF Hebrew", "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", ui-monospace, Menlo, monospace; }
+:is(:lang(hi), :lang(mr)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Kohinoor Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", ui-monospace, Menlo, monospace; }
+:is(:lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", system-ui, -apple-system, "Nirmala UI", sans-serif; }
+:lang(th):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Thonburi", "Leelawadee UI", "Noto Sans Thai", ui-monospace, Menlo, monospace; }
+:lang(am):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Kefa", "Noto Sans Ethiopic", "Ebrima", ui-monospace, Menlo, monospace; }
+:lang(ja):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", ui-monospace, Menlo, monospace; }
+:lang(ko):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", ui-monospace, Menlo, monospace; }
+:lang(zh-Hans):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", ui-monospace, Menlo, monospace; }
+:is(:lang(zh-Hant), :lang(zh-HK)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", ui-monospace, Menlo, monospace; }
+:lang(ja):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --sans: "Inter", "Inter fallback", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif; }
+:lang(zh-Hans):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif; --sans: "Inter", "Inter fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+:lang(zh-Hant):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif TC", "PMingLiU", serif; --sans: "Inter", "Inter fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
+:lang(zh-HK):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif HK", "Noto Serif TC", "MingLiU_HKSCS", serif; --sans: "Inter", "Inter fallback", "PingFang HK", "Microsoft JhengHei", "Noto Sans HK", "Noto Sans TC", sans-serif; }
+:lang(ko):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "AppleMyungjo", "Nanum Myeongjo", "Noto Serif KR", "Batang", serif; --sans: "Inter", "Inter fallback", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+:lang(ar):not(.namewall, .namewall *), :lang(ur):not(.namewall, .namewall *), :lang(fa):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Geeza Pro", "Noto Naskh Arabic", "Times New Roman", serif; --sans: "Inter", "Inter fallback", "SF Arabic", "Geeza Pro", "Segoe UI", "Noto Sans Arabic", sans-serif; }
+:lang(ur):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Noto Nastaliq Urdu", "Geeza Pro", "Noto Naskh Arabic", serif; }
+:lang(he):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Times New Roman", "Noto Serif Hebrew", "David", serif; --sans: "Inter", "Inter fallback", "SF Hebrew", "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", sans-serif; }
+:lang(hi):not(.namewall, .namewall *), :lang(mr):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "ITF Devanagari", "Kohinoor Devanagari", "Noto Serif Devanagari", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", sans-serif; }
+:lang(bn):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Bangla MN", "Noto Serif Bengali", "Nirmala UI", serif; --sans: "Inter", "Inter fallback", "Kohinoor Bangla", "Bangla Sangam MN", "Nirmala UI", "Noto Sans Bengali", sans-serif; }
+:lang(th):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Thonburi", "Noto Serif Thai", "Leelawadee UI", serif; --sans: "Inter", "Inter fallback", "Thonburi", "Sukhumvit Set", "Leelawadee UI", "Noto Sans Thai", sans-serif; }
+:lang(am):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Kefa", "Noto Serif Ethiopic", "Nyala", serif; --sans: "Inter", "Inter fallback", "Kefa", "Noto Sans Ethiopic", "Ebrima", sans-serif; }
+
+/* Headings: no negative tracking or synthetic italics outside Latin, Greek and Cyrillic, room for tall marks
+   (Thai, Indic and Arabic vowels and stacks), and long compound words may hyphenate instead of overflowing. */
+html:not([lang="en"]) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title, .release__v) { hyphens: auto; overflow-wrap: break-word; }
+:is(:lang(ja), :lang(zh), :lang(ko), :lang(th), :lang(ar), :lang(fa), :lang(ur), :lang(he), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(am)) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title, .marquee__track, .scene__num, .release__v, .press-block h2) { letter-spacing: 0; }
+:is(:lang(ja), :lang(zh), :lang(ko), :lang(th), :lang(ar), :lang(fa), :lang(ur), :lang(he), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(am)) .brass-italic { font-style: normal; }
+/* Tracking pulls Arabic letters apart and spreads Indic, Thai and Ethiopic clusters: none, anywhere, in those. */
+html:is(:lang(ar), :lang(fa), :lang(ur), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(th), :lang(am)) *:not(.nw__name) { letter-spacing: normal; }
+:is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) .hero__title { line-height: 1.22; }
+:is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) :is(.section-title, .scene__title, .closing__title, .page-title) { line-height: 1.3; }
+:is(:lang(th), :lang(hi), :lang(mr), :lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml), :lang(ar), :lang(fa), :lang(ur), :lang(am)) .rw { padding-block: .12em .2em; margin-block: -.12em -.2em; }
+:is(:lang(ja), :lang(zh), :lang(ko)) :is(.hero__title, .closing__title, .page-title) { line-height: 1.12; }
+:is(:lang(ja), :lang(zh), :lang(ko)) :is(.section-title, .scene__title) { line-height: 1.18; }
+:lang(ur) :is(.hero__title, .section-title, .scene__title, .closing__title, .page-title) { line-height: 1.6; }
+/* Korean wraps between words (at the spaces), not between syllables. */
+:lang(ko) { word-break: keep-all; overflow-wrap: break-word; }
+/* Japanese headings wrap between phrases (bunsetsu), not inside them ("スピーカーごと|に"); browsers without it ignore it. */
+:lang(ja) :is(.section-title, .scene__title, .closing__title, .page-title, .press-block h2) { word-break: auto-phrase; }
+
+/* ---------- Right to left (ar, fa, he, ur): the layout mirrors ---------- */
+[dir="rtl"] .skip { left: auto; right: 12px; }
+[dir="rtl"] .nav__brand { margin-right: 0; margin-left: auto; }
+[dir="rtl"] .nav__brand img, [dir="rtl"] .footer__brand img { margin-left: 0; margin-right: -10px; }
+[dir="rtl"] .nav__meter span { transform-origin: 100% 50%; background: linear-gradient(270deg, transparent, var(--brass) 70%, var(--brass-hi)); }
+[dir="rtl"] .route { transform: scaleX(-1); }
+[dir="rtl"] .features::before { left: auto; right: var(--trunk-x); }
+[dir="rtl"] .node { left: auto; right: -27px; }
+@media (max-width: 900px) { [dir="rtl"] .node { left: auto; right: calc(var(--trunk-x) - var(--gutter) - 6.5px); } }
+[dir="rtl"] .hero__glow { inset: -10% auto auto 0; }
+[dir="rtl"] .hero__title { margin: 0 -.04em 30px 0; }
+[dir="rtl"] .hero__eyebrow span + span::before { margin-right: 0; margin-left: 18px; }
+[dir="rtl"] .live::before, [dir="rtl"] .float-card figcaption::before { margin-right: 0; margin-left: 8px; }
+[dir="rtl"] .brew__cmd { padding: 0 14px 0 6px; }
+[dir="rtl"] .jack { padding: 0 8px 0 14px; }
+[dir="rtl"] .badge.brass::before, [dir="rtl"] .badge.copper::before { margin-right: 0; margin-left: 8px; }
+[dir="rtl"] .scene__num { right: auto; left: var(--gutter); }
+[dir="rtl"] .scene--flip .scene__num { left: auto; right: calc(var(--gutter) + 24px); }
+[dir="rtl"] .scene::after { right: auto; left: -10vw; }
+[dir="rtl"] .scene--flip::after { left: auto; right: -10vw; }
+[dir="rtl"] .ticks li { padding: 10px 22px 10px 0; }
+[dir="rtl"] .ticks li::before { left: auto; right: 2px; }
+[dir="rtl"] .float-card { left: auto; right: -7%; }
+[dir="rtl"] .scene--flip .float-card { right: auto; left: -7%; }
+@media (max-width: 900px) {
+  [dir="rtl"] .scene--flip .scene__num { right: auto; left: var(--gutter); }
+  [dir="rtl"] .float-card, [dir="rtl"] .scene--flip .float-card { right: auto; left: -2%; }
+}
+[dir="rtl"] .display__stand::after { margin-left: 0; margin-right: -40%; }
+[dir="rtl"] .table th, [dir="rtl"] .table td, [dir="rtl"] .compare tbody th { text-align: right; }
+[dir="rtl"] .compare thead th:first-child, [dir="rtl"] .compare tbody th { left: auto; right: 0; }
+[dir="rtl"] .compare-wrap.more-left .compare thead th:first-child, [dir="rtl"] .compare-wrap.more-left .compare tbody th { box-shadow: -12px 0 14px -12px rgba(0, 0, 0, .9); }
+[dir="rtl"] .compare-wrap::after { right: auto; left: 1px; border-radius: var(--radius) 0 0 var(--radius); background: linear-gradient(to left, rgba(13, 13, 15, 0), var(--bg-2)); }
+[dir="rtl"] .closing { text-align: right; }
+[dir="rtl"] .closing__glow { background: radial-gradient(60% 70% at 80% 30%, rgba(200, 166, 106, .14), transparent 70%); }
+[dir="rtl"] .footer__ukraine { padding-left: 0; padding-right: 12px; border-left: 0; border-right: 4px solid; }
+[dir="rtl"] .links a { background-position: 100% 100%; }
+[dir="rtl"] .ext-arrow { display: inline-block; transform: scaleX(-1); }
+[dir="rtl"] code, [dir="rtl"] .ext { direction: ltr; unicode-bidi: isolate; }
+@media (prefers-reduced-motion: no-preference) { [dir="rtl"].motion .patchbay__jacks li { animation-name: slide-10-rtl; } }
+@keyframes slide-10-rtl { from { transform: translateX(10px); opacity: 0; } }
