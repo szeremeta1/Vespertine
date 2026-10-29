@@ -98,8 +98,8 @@ export const scenes: Scene[] = [
     ],
     note: 'The “after” curve is predicted from the measurement and the filters, not measured. To see what the room really does, measure again with correction on.',
     links: [{ href: links.roomCorrection, text: 'How room correction works' }],
-    shot: 'room-correction-predicted',
-    alt: 'Vespertine’s predicted room correction for a stereo pair with the Warm target: for each speaker, the measured response, the target and the predicted response after correction, with a room peak near 120 Hz cut by 14 and 18 dB, and each speaker’s filters.',
+    shot: 'room-correction-fosi-zd3',
+    alt: 'Vespertine’s Room Correction window with a real measurement of a stereo pair on a Fosi Audio ZD3, made with a UMIK-1 microphone (its serial number blacked out): the measured and predicted response of the left and right speakers against the dashed Warm target, with a room peak near 125 Hz cut by 14 and 18 dB.',
     float: { shot: 'room-correction-portrait-detail', alt: 'The Room Portrait in the measurement wizard: left and right speakers, the seat, and five microphone spots around it, the first with the microphone on it.', caption: 'Room Portrait' },
   },
   {
