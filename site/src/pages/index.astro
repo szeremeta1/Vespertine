@@ -33,7 +33,7 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
   description={description}
   path="/"
   og="home"
-  ogAlt={`Vespertine: the free, open-source Mac player for surround and hi-res music. Its signal path shows a 24-bit / 96 kHz FLAC playing bit-perfect on a FiiO K11. Version ${latest.version}, macOS ${app.minMacOS} or later.`}
+  ogAlt={`Vespertine: the free, open-source Mac player for surround and hi-res music. Its signal path shows a 24-bit / 96 kHz FLAC playing bit-perfect on a Fosi Audio ZD3. Version ${latest.version}, macOS ${app.minMacOS} or later.`}
   jsonLd={jsonLd}
 >
 <link slot="head" rel="preload" as="font" type="font/woff2" crossorigin href={italicFont}>
@@ -96,18 +96,18 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
       <figure class="hero__panel">
         <div class="panel">
           <Pic
-            src={shot('bit-perfect-fiio-24-96-detail')}
+            src={shot('bit-perfect-fosi-zd3-24-96-detail')}
             widths={[360, 542]}
             sizes="(max-width: 900px) min(340px, calc(100vw - 52px)), 380px"
             priority
             avifQuality={64}
             webpQuality={82}
-            alt="Vespertine’s Now Playing inspector: Liszt’s Les jeux d’eaux à la Villa d’Este by Lazar Berman, marked HI-RES LOSSLESS and BIT-PERFECT, exclusive, 32 / 96, with its signal path from a 24-bit / 96 kHz FLAC through libFLAC at the native rate and unity volume to a FiiO K11."
+            alt="Vespertine’s Now Playing inspector: Liszt’s Les jeux d’eaux à la Villa d’Este by Lazar Berman, marked HI-RES LOSSLESS and BIT-PERFECT, exclusive, 32 / 96, with its signal path from a 24-bit / 96 kHz FLAC through libFLAC at the native rate and unity volume to a Fosi Audio ZD3."
           />
         </div>
         <figcaption class="mono panel__cap">
           <span class="live">Signal path</span>
-          <span>FiiO K11 · 24 / 96</span>
+          <span>Fosi Audio ZD3 · 24 / 96</span>
         </figcaption>
       </figure>
     </div>

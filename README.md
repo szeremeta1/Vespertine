@@ -28,7 +28,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a FiiO K11, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
+  <img src="docs/screenshots/tour.gif" width="800" alt="Vespertine's surround library, bit-perfect signal path on a Fosi Audio ZD3, DSD over DoP, 5.1 as Spatial Audio on AirPods Max, and hi-res file analysis">
 </p>
 
 ## Highlights

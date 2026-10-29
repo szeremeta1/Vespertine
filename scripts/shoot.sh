@@ -26,8 +26,8 @@ common=(-ApplePersistenceIgnoreState YES -VespertineWindowSize 1440x900 -autoAna
 typeset -A output settle title args
 output[multichannel-albums]=k11-idle;              settle[multichannel-albums]=12
 args[multichannel-albums]='-VespertineFormatFilter multichannel -VespertineShowInspector NO'
-output[bit-perfect-fiio-24-96]=k11;           settle[bit-perfect-fiio-24-96]=10
-args[bit-perfect-fiio-24-96]="-VespertinePlaySong \"jeux d'eaux à la Villa|Lazar Berman\" -VespertineInspectorTab now"
+output[bit-perfect-fosi-zd3-24-96]=k11;           settle[bit-perfect-fosi-zd3-24-96]=10
+args[bit-perfect-fosi-zd3-24-96]="-VespertinePlaySong \"jeux d'eaux à la Villa|Lazar Berman\" -VespertineInspectorTab now"
 output[dsd-native-dop]=k11;                   settle[dsd-native-dop]=20
 args[dsd-native-dop]='-VespertinePlaySong "Love for the Sake of Love|Claudja Barry|DSD" -VespertineInspectorTab now'
 output[sacd-iso]=k11;                         settle[sacd-iso]=20
@@ -119,7 +119,7 @@ device_args() {   # the launch arguments that point the app at a scene's output,
   return 0
 }
 
-scenes=(${@:-multichannel-albums bit-perfect-fiio-24-96 dsd-native-dop sacd-iso stereo-and-surround-versions spatial-audio-airpods-max fake-hi-res-detection search genres smart-playlist mini-player output-settings equalizer loopback-test setup-welcome setup-output languages})
+scenes=(${@:-multichannel-albums bit-perfect-fosi-zd3-24-96 dsd-native-dop sacd-iso stereo-and-surround-versions spatial-audio-airpods-max fake-hi-res-detection search genres smart-playlist mini-player output-settings equalizer loopback-test setup-welcome setup-output languages})
 for scene in $scenes; do
   print "== $scene"
   if [[ $scene == languages ]]; then

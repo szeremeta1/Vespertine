@@ -15,7 +15,7 @@ struct Feature {
 enum Chip { case brass, copper, plain }
 
 let features = [
-    Feature(id: "bit-perfect", shot: "bit-perfect-fiio-24-96",
+    Feature(id: "bit-perfect", shot: "bit-perfect-fosi-zd3-24-96",
             headline: "Every sample, untouched.",
             sub: "Vespertine switches your DAC to the file’s rate and shows the signal path. Bit-perfect conditions and tests are in the source.",
             chips: [("● BIT-PERFECT", .brass), ("EXCLUSIVE", .plain), ("24-BIT · 96 kHz", .plain)], focus: CGRect(x: 1826, y: 885, width: 564, height: 500)),
@@ -30,7 +30,7 @@ let features = [
             trademarks: "AirPods is a trademark of Apple Inc. Vespertine is not affiliated with Apple."),
     Feature(id: "native-dsd", shot: "dsd-native-dop",
             headline: "Native DSD, not a conversion.",
-            sub: "DSD128 over DoP, checked on a FiiO K11. DSD64–512 files decode; native output depends on the DAC and carrier rate.",
+            sub: "DSD128 over DoP, shown on a Fosi Audio ZD3. DSD64–512 files decode; native output depends on the DAC and carrier rate.",
             chips: [("● NATIVE DSD · DoP", .brass), ("DSD128 · 5.6 MHz", .plain), ("32 / 352.8", .plain)], focus: CGRect(x: 1826, y: 800, width: 564, height: 550)),
     Feature(id: "fake-hi-res", shot: "fake-hi-res-detection",
             headline: "Know when hi-res isn’t.",
