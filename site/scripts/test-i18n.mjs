@@ -160,7 +160,7 @@ for (const [langs, want] of cases) {
 
 // ---- Layout: mirrored RTL, nothing wider than the screen ----
 for (const width of [390, 1440]) {
-  for (const lang of ['en', 'de', 'fi', 'ta', 'ml', 'kn', 'te', 'am', 'ar', 'ur', 'ja', 'th']) {
+  for (const lang of ['en', 'de', 'fi', 'el', 'ta', 'ml', 'kn', 'te', 'bn', 'am', 'ar', 'ur', 'ja', 'th', 'zh-Hant', 'zh-HK']) {
     const ctx = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
     const page = await ctx.newPage();
     await page.goto(`${BASE}${lang === 'en' ? '/' : `/${lang}/`}`, { waitUntil: 'load' });
@@ -188,6 +188,14 @@ for (const width of [390, 1440]) {
       return links && [...nav.querySelectorAll('.lang__btn, .nav > .btn')].every((e) => inBar(e.getBoundingClientRect()));
     });
     check(`${lang} at ${width}px: nav items fit in the bar`, navOk);
+    // Each of the hero headline's lines stays one line (the size estimate plus main.ts's last step down).
+    await page.evaluate(() => document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))));
+    const wrapped = await page.evaluate(() => {
+      const title = document.querySelector('.hero__title');
+      const lh = parseFloat(getComputedStyle(title).lineHeight) || parseFloat(getComputedStyle(title).fontSize);
+      return [...title.querySelectorAll('.line > span')].filter((s) => s.getBoundingClientRect().height > lh * 1.5).map((s) => s.textContent);
+    });
+    check(`${lang} at ${width}px: each hero headline line fits on one line`, wrapped.length === 0, wrapped.join(' | '));
     await ctx.close();
   }
 }

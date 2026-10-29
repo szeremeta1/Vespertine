@@ -225,8 +225,9 @@ html:not(.js) .features::before {
 .hero__title {
   font-family: var(--serif);
   font-weight: 300;
-  /* --fit (and --fit-s on phones) shrink a headline whose lines run longer than the English ones (Home.astro). */
-  font-size: calc(clamp(46px, 8vw, 128px) * var(--fit, 1));
+  /* --fit (and --fit-s on phones) shrink a headline whose lines run longer than the English ones (Home.astro);
+     --shrink is the last step, set by main.ts when a line still wraps with the device's fonts. */
+  font-size: calc(clamp(46px, 8vw, 128px) * var(--fit, 1) * var(--shrink, 1));
   line-height: .94;
   letter-spacing: -.035em;
   font-variation-settings: "opsz" 72;
@@ -314,7 +315,7 @@ html:not(.js) .features::before {
   /* Separators would start a wrapped line; the three facts read as tags instead. */
   .hero__eyebrow { font-size: 11px; letter-spacing: .12em; margin-bottom: 20px; gap: 6px 16px; }
   .hero__eyebrow span + span::before { display: none; }
-  .hero__title { font-size: calc(clamp(42px, 13.2vw, 64px) * var(--fit-s, 1)); }
+  .hero__title { font-size: calc(clamp(42px, 13.2vw, 64px) * var(--fit-s, 1) * var(--shrink, 1)); }
   .hero__cta .btn { flex: 1 1 auto; }
   .patchbay { gap: 14px; }
   .jack { font-size: 13px; }

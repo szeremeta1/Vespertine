@@ -72,6 +72,26 @@ $$('.nav__links').forEach((list) => {
   fit();
 });
 
+/* ---------- Hero headline on translated pages: the build sizes it from each script's typical glyph widths; if a line
+   still wraps with the fonts this device actually has, step the size down until every line fits on one line ---------- */
+$$('html:not([lang="en"]) .hero__title').forEach((title) => {
+  const lines = $$('.line > span', title);
+  const wraps = () => {
+    const lh = parseFloat(getComputedStyle(title).lineHeight) || parseFloat(getComputedStyle(title).fontSize);
+    return lines.some((s) => s.getBoundingClientRect().height > lh * 1.5);
+  };
+  let width = 0;
+  const fit = () => {
+    if (title.clientWidth === width) return;
+    width = title.clientWidth;
+    title.style.removeProperty('--shrink');
+    for (let k = 1, i = 0; i < 14 && wraps(); i++) { k *= 0.95; title.style.setProperty('--shrink', k.toFixed(3)); }
+  };
+  new ResizeObserver(fit).observe(title);
+  document.fonts?.ready.then(() => { width = 0; fit(); });
+  fit();
+});
+
 /* ---------- Comparison table: mark which edges have more columns (fade, shadow, hint) ---------- */
 $$('.compare-wrap').forEach((wrap) => {
   const table = $('.compare', wrap)!;
