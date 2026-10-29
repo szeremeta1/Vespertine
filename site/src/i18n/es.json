@@ -152,7 +152,7 @@
         "title": "Tus discos 5.1, en la misma biblioteca.",
         "lede": "La música multicanal se reproduce como Audio espacial con seguimiento de la cabeza en AirPods, o se mezcla a estéreo según la disposición de canales en un DAC estéreo.",
         "body": [
-          "Los CD DTS se decodifican a 5.1. Las imágenes SACD, las pistas SACD extraídas, el FLAC multicanal, TrueHD y DTS-HD MA se reproducen como Audio espacial con seguimiento de la cabeza en AirPods o se mezclan a estéreo en un DAC estéreo. Dolby Digital Plus con Atmos usa el renderizador de objetos de macOS; TrueHD Atmos y DTS:X reproducen su lecho de canales (channel bed). La salida canal por canal es experimental y no se ha probado en receptores reales ni en DAC USB multicanal (se ha probado un televisor Sony por HDMI: consulta docs/DEVICES.md); se agradecen informes."
+          "Los CD DTS se decodifican a 5.1. Las imágenes SACD, las pistas SACD extraídas, el FLAC multicanal, TrueHD y DTS-HD MA se reproducen como Audio espacial con seguimiento de la cabeza en AirPods o se mezclan a estéreo en un DAC estéreo. Dolby Digital Plus con Atmos usa el renderizador de objetos de macOS; TrueHD Atmos y DTS:X reproducen su base de canales. La salida canal por canal es experimental y no se ha probado en receptores reales ni en DAC USB multicanal (se ha probado un televisor Sony por HDMI: consulta docs/DEVICES.md); se agradecen informes."
         ],
         "list": [
           "Las versiones estéreo y envolvente de un álbum aparecen una sola vez; Vespertine reproduce la que mejor se adapte a la salida, o la que fijes.",
@@ -426,7 +426,7 @@
           "Apple Music",
           "Studio: sí; Origin: no",
           "Sí",
-          "No (local + UPnP)",
+          "No (local y UPnP)",
           "No (radio por internet)",
           "No (radio por internet)",
           "No (radio por internet)"
@@ -578,7 +578,7 @@
         "Código fuente libre GPL-3.0, que cualquiera puede leer, compilar y modificar.",
         "Una ruta de señal que muestra frecuencia de muestreo, longitud de palabra, ganancia y procesado de canales. Las condiciones de bit-perfect están en el código, con pruebas, una prueba de loopback integrada y una <a href=\"{href.verification}\">guía de verificación</a>."
       ],
-      "text": "También incluye análisis de archivos en alta resolución. La detección del relleno con ceros (zero padding) es exacta; los veredictos espectrales son estimaciones con límites. VeraVox y Audirvana AudioScan también ofrecen análisis. <a href=\"{href.comparison}\">Fuentes de la comparación</a>."
+      "text": "También incluye análisis de archivos en alta resolución. La detección del relleno con ceros es exacta; los veredictos espectrales son estimaciones con límites. VeraVox y Audirvana AudioScan también ofrecen análisis. <a href=\"{href.comparison}\">Fuentes de la comparación</a>."
     },
     "video": {
       "eyebrow": "Vídeo",

@@ -79,10 +79,14 @@ function englishRun(s, lang) {
   return false;
 }
 
+// Values a native reviewer confirmed are written exactly as in English in that language (French "Contact",
+// "Architecture"), per language. Anything else equal to the English is a leftover.
+const SAME_OK = JSON.parse(readFileSync(here('./i18n-same-as-english.json'), 'utf8'));
+
 // Words many languages write the English way (German Trailer, Logo, Screenshots …), so a value may equal the English.
 const SAME = new Set(['version', 'trailer', 'surround', 'download', 'name', 'links', 'website', 'video', 'logo', 'screenshots', 'genres', 'genre',
   'album', 'albums', 'faq', 'stereo', 'mono', 'format', 'formats', 'playlist', 'playlists', 'tags', 'test', 'sponsor', 'support', 'details',
-  'hi-res', 'design', 'analyse', 'spectrum', 'audio', 'radio', 'internet', 'streaming', 'plugins', 'feedback', 'online', 'offline', 'studio', 'origin']);
+  'hi-res', 'design', 'analyse', 'platform', 'spectrum', 'audio', 'radio', 'internet', 'streaming', 'plugins', 'feedback', 'online', 'offline', 'studio', 'origin']);
 // Product and format names and units that appear in values on their own.
 const NAMES = /^(Vespertine|Nocturne|Mac|macOS|Apple|Intel|AirPods|Max|Music|Atmos|Dolby|TrueHD|Digital|Plus|Master|Audio|WavPack|Opus|Vorbis|Musepack|AudioScan|Roon|VeraVox|Colibri|Cog|Audirvana|Studio|Origin|Video|Homebrew|GitHub|Discord|Sonoma|Rosetta|Linux|Bluetooth|Boston|Szeremeta|Alexander|Alex|Sony|FiiO|Fosi|UPnP|Units|kHz|fps|bit|bits|Hi-Res|Spatial|Crown|DoP|DSD\d*|DVD-Video|DVD-Audio)$/;
 
@@ -140,7 +144,7 @@ function walk(a, b, path, lang, out) {
     if (path.startsWith('releases.') && markdown(a) !== markdown(b)) out.push(`${path}: Markdown differs from the English (${markdown(b)} vs ${markdown(a)})`);
     const english = strip(a).match(/[A-Za-z][A-Za-z-]{2,}/g) ?? [];
     const leftover = (w) => !vocab[lang]?.has(w.toLowerCase()) && (EN.has(w.toLowerCase()) || (!SAME.has(w.toLowerCase()) && w !== w.toUpperCase() && !NAMES.test(w)));
-    if (a === b && english.some(leftover)) out.push(`${path}: unchanged English "${a.slice(0, 70)}"`);
+    if (a === b && !(SAME_OK[lang] ?? []).includes(a) && english.some(leftover)) out.push(`${path}: unchanged English "${a.slice(0, 70)}"`);
     else if (englishRun(b, lang)) out.push(`${path}: English left in "${strip(b).replace(/\s+/g, ' ').trim().slice(0, 90)}"`);
     for (const g of glosses(a, b, lang)) out.push(`${path}: English gloss "(${g})"`);
     return;

@@ -160,7 +160,7 @@ for (const [langs, want] of cases) {
 
 // ---- Layout: mirrored RTL, nothing wider than the screen ----
 for (const width of [390, 1440]) {
-  for (const lang of ['en', 'de', 'fi', 'ta', 'ml', 'ar', 'ur', 'ja', 'th']) {
+  for (const lang of ['en', 'de', 'fi', 'ta', 'ml', 'kn', 'te', 'am', 'ar', 'ur', 'ja', 'th']) {
     const ctx = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
     const page = await ctx.newPage();
     await page.goto(`${BASE}${lang === 'en' ? '/' : `/${lang}/`}`, { waitUntil: 'load' });
@@ -181,7 +181,11 @@ for (const width of [390, 1440]) {
     }
     const navOk = await page.evaluate(() => {
       const nav = document.querySelector('.nav'); const r = nav.getBoundingClientRect();
-      return [...nav.querySelectorAll('.nav__links li:not(.is-squeezed) a, .lang__btn, .nav > .btn')].filter((e) => e.offsetParent).every((e) => { const b = e.getBoundingClientRect(); return b.top >= r.top - 1 && b.bottom <= r.bottom + 1 && b.left >= -1 && b.right <= innerWidth + 1; });
+      const clip = document.querySelector('.nav__links').getBoundingClientRect();
+      const inBar = (b) => b.top >= r.top - 1 && b.bottom <= r.bottom + 1 && b.left >= -1 && b.right <= innerWidth + 1;
+      // Links must also sit wholly inside the list's clip box (not cut off at its edge).
+      const links = [...nav.querySelectorAll('.nav__links li:not(.is-squeezed) a')].filter((e) => e.offsetParent).every((e) => { const b = e.getBoundingClientRect(); return inBar(b) && b.left >= clip.left - 1 && b.right <= clip.right + 1 && b.bottom <= clip.bottom + 1; });
+      return links && [...nav.querySelectorAll('.lang__btn, .nav > .btn')].every((e) => inBar(e.getBoundingClientRect()));
     });
     check(`${lang} at ${width}px: nav items fit in the bar`, navOk);
     await ctx.close();

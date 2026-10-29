@@ -131,7 +131,7 @@
           "Výhradní režim (hog) nepustí k zařízení jiné aplikace. Ve sdíleném režimu ovládají hlasitost vašeho DAC klávesy hlasitosti a Digital Crown; ve výhradním režimu mohou také, pokud to zapnete.",
           "Celočíselný režim posílá nezpracované 32bitové PCM přímo do DAC, které přijímají celá čísla.",
           "Volba Přizpůsobit 16bitovým zdrojům (ve výchozím stavu vypnutá) posílá 16bitové soubory do DAC se skutečným 16bitovým režimem jako 16bitové, ne doplněné nulami.",
-          "Přehrávání bez mezer (gapless), včetně alb rozdělených podle CUE sheetu z jednoho souboru.",
+          "Přehrávání bez mezer, včetně alb rozdělených podle CUE sheetu z jednoho souboru.",
           "Pamatuje si váš DAC. Pokud není připojený, hudba hraje na nejlepším připojeném výstupu, a jakmile se DAC vrátí, přesune se zpět na něj.",
           "Výstupy bez vlastního ovládání hlasitosti (HDMI, optický, linkový výstup) mohou používat hlasitost Vespertine, nastavitelnou pro každý výstup zvlášť. Pod 100 % popisky uvádějí, že už nejde o bit-perfect.",
           "Když Vespertine ukončíte, vrátí vašemu DAC vzorkovací frekvenci a bitovou hloubku, které měl předtím.",
@@ -152,7 +152,7 @@
         "title": "Vaše disky 5.1 ve stejné knihovně.",
         "lede": "Vícekanálová hudba hraje na AirPods jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC provede downmix podle rozložení kanálů.",
         "body": [
-          "DTS CD se dekódují do 5.1. Obrazy SACD, extrahované stopy SACD, vícekanálový FLAC, TrueHD a DTS-HD MA se na AirPods vykreslí jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC downmixují. Dolby Digital Plus s Atmosem využívá objektový renderer macOS; TrueHD Atmos a DTS:X přehrávají svou kanálovou vrstvu (channel bed). Výstup kanál po kanálu je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
+          "DTS CD se dekódují do 5.1. Obrazy SACD, extrahované stopy SACD, vícekanálový FLAC, TrueHD a DTS-HD MA se na AirPods vykreslí jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC downmixují. Dolby Digital Plus s Atmosem využívá objektový renderer macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu. Výstup kanál po kanálu je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
         ],
         "list": [
           "Stereo a surround verze alba jsou uvedeny jednou; Vespertine přehraje tu, která se hodí k výstupu, nebo tu, kterou si připnete.",
@@ -541,7 +541,7 @@
     "eyebrow": "Tiskové materiály",
     "heading": "Vše, co k psaní potřebujete",
     "lede": "Vespertine je bezplatný open-source přehrávač pro Mac určený pro sbírky surround a hi-res hudby. Obrazy disků SACD a DVD-Video, extrahované skladby SACD v 5.1, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu a ve sluchátkách AirPods hrají jako Prostorový zvuk se sledováním hlavy. Signálová cesta ukazuje každý krok od souboru až po výstup, s podmínkami a testy ve zdrojovém kódu pod GPL, který si může kdokoli prověřit.",
-    "fine": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nejsou otestované na skutečných receiverech ani vícekanálových USB DAC (otestován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Objekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos a DTS:X přehrávají svou kanálovou vrstvu (channel bed).",
+    "fine": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nejsou otestované na skutečných receiverech ani vícekanálových USB DAC (otestován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Objekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu.",
     "facts": {
       "eyebrow": "Přehled faktů",
       "title": "Fakta.",
@@ -578,7 +578,7 @@
         "Svobodný zdrojový kód pod GPL-3.0, který si kdokoli může přečíst, sestavit a upravit.",
         "Signálová cesta, která ukazuje vzorkovací frekvenci, bitovou hloubku, zisk a zpracování kanálů. Podmínky bit-perfect přehrávání jsou zakotvené v kódu, s testy, vestavěným testem loopbacku a <a href=\"{href.verification}\">návodem k ověření</a>."
       ],
-      "text": "Součástí je i analýza hi-res souborů. Detekce doplnění nulami (zero padding) je přesná; spektrální výsledky jsou odhady s omezeními. Analýzu nabízejí také VeraVox a Audirvana AudioScan. <a href=\"{href.comparison}\">Zdroje srovnání</a>."
+      "text": "Součástí je i analýza hi-res souborů. Detekce doplnění nulami je přesná; spektrální výsledky jsou odhady s omezeními. Analýzu nabízejí také VeraVox a Audirvana AudioScan. <a href=\"{href.comparison}\">Zdroje srovnání</a>."
     },
     "video": {
       "eyebrow": "Video",

@@ -54,10 +54,18 @@ $$<HTMLDetailsElement>('[data-lang-menu]').forEach((menu) => {
 /* ---------- Nav: links that don't fit on one line (long words in some languages) hide, rather than overflow ---------- */
 $$('.nav__links').forEach((list) => {
   const items = $$('li', list);
+  // Hiding a link narrows the nav (its flex basis shrinks), which can push the next one out, so re-measure until
+  // nothing more needs hiding. A link is out when it wrapped onto the clipped second row or is cut off at the edge.
   const fit = () => {
     items.forEach((li) => li.classList.remove('is-squeezed'));
-    const top = items.find((li) => li.offsetParent)?.offsetTop ?? 0;
-    items.forEach((li) => li.classList.toggle('is-squeezed', !!li.offsetParent && li.offsetTop > top + 4));
+    for (let pass = 0; pass < items.length; pass++) {
+      const box = list.getBoundingClientRect();
+      const shown = items.filter((li) => li.offsetParent && !li.classList.contains('is-squeezed'));
+      const top = shown[0]?.offsetTop ?? 0;
+      const out = shown.filter((li) => { const r = li.getBoundingClientRect(); return li.offsetTop > top + 4 || r.right > box.right - 5 || r.left < box.left + 5; });
+      if (!out.length) break;
+      out.forEach((li) => li.classList.add('is-squeezed'));
+    }
   };
   new ResizeObserver(fit).observe(list.closest('.nav') ?? list);
   document.fonts?.ready.then(fit);

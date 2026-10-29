@@ -1,0 +1,741 @@
+{
+  "common": {
+    "skip": "Gå til innholdet",
+    "tagline": "Den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikksamlinger.",
+    "requires": "macOS {minMacOS} eller nyere.",
+    "arch": "Apple silicon og Intel",
+    "download": "Last ned for Mac",
+    "downloadVersion": "Last ned {version}",
+    "sourceOnGitHub": "Kildekode på GitHub",
+    "reportIssue": "Rapporter et problem",
+    "brewLead": "Eller med Homebrew:",
+    "copy": "Kopier",
+    "copyLabel": "Kopier Homebrew-kommandoen",
+    "copied": "Kopiert",
+    "copyFailed": "Marker den",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus og Dolby TrueHD er varemerker for Dolby Laboratories. DTS, DTS-HD Master Audio og DTS:X er varemerker for DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS og Spatial Audio er varemerker for Apple Inc. Vespertine nevner dem bare for å beskrive hva appen spiller av og hvor; den er ikke sertifisert, lisensiert eller godkjent av Dolby, DTS eller Apple.",
+    "trailerLabel": "Vespertine-trailer, 44 sekunder",
+    "untested": "Kanal-for-kanal-utgang og bitstrøm til receiver er eksperimentelle og ikke testet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes."
+  },
+  "nav": {
+    "label": "Hovednavigasjon",
+    "home": "Vespertine, hjem",
+    "top": "Vespertine, til toppen",
+    "features": "Funksjoner",
+    "formats": "Formater",
+    "compare": "Sammenlign",
+    "whatsNew": "Nyheter",
+    "faq": "Spørsmål og svar",
+    "press": "Pressemateriell",
+    "download": "Last ned",
+    "downloadLabel": "Last ned Vespertine {version} for Mac"
+  },
+  "lang": {
+    "label": "Språk",
+    "menuLabel": "Velg et språk",
+    "current": "Gjeldende språk"
+  },
+  "footer": {
+    "project": "Prosjekt",
+    "about": "Om",
+    "releaseNotes": "Versjonsmerknader",
+    "sponsor": "Sponsor",
+    "discussions": "Diskusjoner",
+    "architecture": "Arkitektur",
+    "privacy": "Personvern",
+    "terms": "Vilkår",
+    "license": "Lisens (GPL-3.0)",
+    "notices": "Tredjepartsmerknader",
+    "ukraine": "<strong>Vespertine står sammen med Ukraina.</strong> Gi gjerne en gave via {orgs}.",
+    "copyright": "© {year} Vespertine-bidragsytere",
+    "free": "Fri programvare under GPL",
+    "madeIn": "Laget i Boston av {author}",
+    "backToTop": "Til toppen",
+    "home": "Hjem"
+  },
+  "home": {
+    "title": "Vespertine: musikkspiller for surround og hi-res på Mac",
+    "description": "Gratis Mac-spiller med åpen kildekode for surround- og hi-res-samlinger: SACD- og DVD-Video-platebilder, DSD, DTS-CD-er, DTS-HD MA-, TrueHD- og Dolby Atmos-filer, romlig lyd på AirPods og en bitperfekt signalvei du kan inspisere.",
+    "ogAlt": "Vespertine: den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikk. Signalveien viser en 24-bit / 96 kHz FLAC som spilles bitperfekt på en Fosi Audio ZD3. Versjon {version}, macOS {minMacOS} eller nyere.",
+    "hero": {
+      "eyebrow": [
+        "Gratis og åpen kildekode",
+        "macOS {minMacOS}+",
+        "Apple silicon og Intel"
+      ],
+      "titleSr": "Surround- og hi-res-musikk, på Macen din.",
+      "titleLines": [
+        "Surround- og",
+        "hi-res-musikk,"
+      ],
+      "titleBrass": "på Macen din.",
+      "lede": "Den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikksamlinger. SACD- og DVD-Video-platebilder, DSD, DTS-CD-er og DTS-HD MA-, TrueHD- og Atmos-filer deler ett bibliotek med stereoalbumene dine, med hodesporet romlig lyd på AirPods. En signalvei viser hvert steg fra fil til utgang. På engelsk og {languages} andre språk.",
+      "ask": "Liker du den?",
+      "star": "Gi den en stjerne på GitHub",
+      "discuss": "Bli med i diskusjonen",
+      "version": "Versjon {version}",
+      "signed": "signert og notarisert",
+      "releaseNotes": "Versjonsmerknader",
+      "privacy": "Personvern: ingenting samles inn.",
+      "panelAlt": "Spilles nå-inspektøren i Vespertine: Liszts Les jeux d’eaux à la Villa d’Este spilt av Lazar Berman, merket HI-RES TAPSFRI og BITPERFEKT, eksklusiv, 32 / 96, med signalveien fra en 24-bit / 96 kHz FLAC via libFLAC ved opprinnelig samplingsfrekvens og fullt volum til en Fosi Audio ZD3.",
+      "panelCaption": "Signalvei",
+      "followSignal": "Følg signalet"
+    },
+    "trailer": {
+      "eyebrow": "Trailer",
+      "title": "Se den på 44 sekunder.",
+      "text": "Skru på lyden. Alt i den er den ekte appen, tatt opp med utviklerens eget bibliotek.",
+      "fallback": "Se traileren (MP4)",
+      "caption": "44 s · 1080p · albumomslagene tilhører sine eiere"
+    },
+    "features": {
+      "eyebrow": "Hvorfor Vespertine",
+      "title": "Laget for surroundsamlingen din.",
+      "text": "Surround- og stereomusikk i ett bibliotek, og en spiller som viser nøyaktig hva den gjorde med signalet.",
+      "badgesLabel": "Signalveistatuser appen viser"
+    },
+    "pillars": [
+      {
+        "title": "Surround i ett bibliotek",
+        "text": "SACD-platebilder og -rips, DVD-Video-plater, DTS-CD-er, DTS-HD MA og TrueHD står side om side med stereoalbumene dine og spilles som hodesporet romlig lyd på AirPods. Finnes et album i begge versjoner, vises hver sang én gang, og riktig versjon spilles for utgangen din."
+      },
+      {
+        "title": "En signalvei du kan kontrollere",
+        "text": "Samplingsfrekvenser, ordlengder, forsterkning og kanalbehandling, lest tilbake fra Core Audio. Betingelsene for bitperfekt avspilling står i kildekoden, med automatiserte tester, en loopbacktest og en veiledning for verifisering på maskinvare."
+      },
+      {
+        "title": "Sjekker hi-res-filer",
+        "text": "Analysen flagger utfylt bitdybde og mulig oppsampling eller tapsbasert opphav. Spektrale konklusjoner er anslag, vist med bevisene og begrensningene sine. Den samme analysen kjører på en Linux-server ved siden av filene dine."
+      },
+      {
+        "title": "Åpen kildekode du kan granske",
+        "text": "Gratis under GPL. Les, bygg og endre spilleren, også utgangsbetingelsene og testene. Ingen konto, abonnement, reklame eller telemetri."
+      }
+    ],
+    "badges": {
+      "bitPerfect": "Bitperfekt",
+      "exclusive": "Eksklusiv",
+      "spatial": "Romlig · hodesporet",
+      "synthetic": "Syntetiske høye frekvenser?"
+    },
+    "scenes": {
+      "signal-path": {
+        "jack": "Signalvei",
+        "kicker": "Bitperfekt",
+        "title": "Hvert spor med sin opprinnelige frekvens og bitdybde.",
+        "lede": "Signalveien viser hvert steg fra filen til DAC-en din, lest tilbake fra Core Audio, og sier fra når noe endret samplene.",
+        "body": [
+          "Vespertine bytter enheten til hver fils samplingsfrekvens og sampler om, med Apples konverterer i mastringskvalitet, bare når DAC-en ikke kan kjøre den. <span class=\"mono nowrap\">BIT-PERFECT</span> vises bare når betingelsene i kildekoden er oppfylt: opprinnelig samplingsfrekvens, ingenting som endrer samplene, en ordlengde som passer, og en enhet som er eksklusiv eller ikke deles med en annen app. PCM-avspilling er testet opptil 384 kHz på en FiiO K11."
+        ],
+        "list": [
+          "Eksklusiv modus (hog) holder andre apper unna enheten. I delt modus justerer volumtastene og Digital Crown DAC-en din; i eksklusiv modus kan de også det, hvis du slår det på.",
+          "Heltallsmodus sender ubehandlet 32-bit PCM rett til DAC-er som tar imot heltall.",
+          "Tilpass til 16-bit-kilder (av som standard) sender 16-bit-filer som 16-bit til DAC-er med en ekte 16-bit-modus, ikke utfylt med nuller.",
+          "Gapløs avspilling, også av CUE-ark-album delt opp fra én fil.",
+          "Husker DAC-en din. Er den ikke tilkoblet, spilles musikken på den beste tilkoblede utgangen og flyttes tilbake når DAC-en kommer tilbake.",
+          "Utganger uten egen volumkontroll (HDMI, optisk, linjeutgang) kan bruke Vespertines volum, valgt per utgang. Under 100 % sier etikettene at avspillingen ikke lenger er bitperfekt.",
+          "Gir DAC-en tilbake med samme frekvens og bitdybde som den hadde før, når Vespertine avsluttes.",
+          "En innebygd loopbacktest sammenligner hvert sampel Vespertine sender til en virtuell enhet. Det er en programvaresjekk, merket som det, og den endrer aldri <span class=\"mono nowrap\">BIT-PERFECT</span>-merket."
+        ],
+        "links": [
+          "Betingelsene i koden",
+          "Verifiser selv",
+          "Hva loopbacktesten beviser"
+        ],
+        "alt": "Vespertine spiller Lazar Bermans Liszt, Années de pèlerinage, fra en 24-bit / 96 kHz FLAC: inspektøren merker den som bitperfekt og eksklusiv på en Fosi Audio ZD3, med hvert steg i signalveien.",
+        "floatAlt": "Loopbacktest-arket: 24-bit ved 44,1 og 96 kHz, utfylt 16-bit og et gapløst par, alle bitnøyaktige.",
+        "floatCaption": "Loopbacktest · programvaresjekk"
+      },
+      "surround": {
+        "jack": "Surround",
+        "kicker": "Surround og romlig lyd",
+        "title": "5.1-platene dine, i samme bibliotek.",
+        "lede": "Flerkanalsmusikk spilles som hodesporet romlig lyd på AirPods, eller mikses ned etter kanaloppsett på en stereo-DAC.",
+        "body": [
+          "DTS-CD-er dekodes til 5.1. SACD-platebilder, utpakkede SACD-spor, flerkanals FLAC, TrueHD og DTS-HD MA gjengis som hodesporet romlig lyd på AirPods eller mikses ned på en stereo-DAC. Dolby Digital Plus med Atmos bruker objektrendereren i macOS; TrueHD Atmos og DTS:X spiller av kanalbedet sitt. Kanal-for-kanal-utgang er eksperimentell og ikke testet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes."
+        ],
+        "list": [
+          "Stereo- og surroundversjoner av et album vises én gang; Vespertine spiller den som passer utgangen, eller den du har festet.",
+          "Bitstrøm av Dolby Digital, DD+ og DTS-CD til receiver er eksperimentell og ikke testet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes. Testene av bærersignalet bruker S/PDIF-leseren i FFmpeg. Passthrough av TrueHD og DTS-HD MA støttes ikke på macOS.",
+          "Eksporter for romlig lyd som binaural stereo for hodetelefoner eller flerkanals ALAC for Apple-enheter, med tagger og omslagsbilder."
+        ],
+        "alt": "Elton Johns Goodbye Yellow Brick Road, et 24-bit / 88,2 kHz 5.1-album, spilles som hodesporet romlig lyd på AirPods Max, med signalveien og en måler for hver kanal.",
+        "floatAlt": "Et album med stereo- og 5.1-versjoner av hver sang, vist én gang.",
+        "floatCaption": "Stereo og 5.1, vist én gang"
+      },
+      "discs": {
+        "jack": "Platebilder og DSD",
+        "kicker": "SACD, DVD-Video og DSD",
+        "title": "Spill av selve platebildet.",
+        "lede": "Pek Vespertine mot et SACD- eller DVD-Video-platebilde, så spiller den musikken rett fra det, uten at noe monteres, pakkes ut eller skrives.",
+        "body": [
+          "SACD-platebilder i <span class=\"mono\">.iso</span>-format spiller av stereo- og 5.1-områdene sine, DST-komprimert eller ukomprimert, med titler fra platens egen tekst. DST dekodes tilbake til nøyaktig samme DSD, så stereo går til DAC-en din som nativ DSD over DoP der DAC-en støtter det, og 5.1 spilles som hodesporet romlig lyd på AirPods. LPCM-musikken på DVD-Video-plater (en <span class=\"mono\">.iso</span> eller en <span class=\"mono\">VIDEO_TS</span>-mappe) spilles bit for bit, ett album per tittel og ett spor per kapittel."
+        ],
+        "list": [
+          "Samsvarte bit for bit med sacd_extract på to ekte plater. Plater med et 5.0-område, bare et flerkanalsområde eller DSD128 og høyere er så langt bare dekket av syntetiske testbilder.",
+          "DSF og DSDIFF fra DSD64 til DSD512, inkludert DST-komprimert DSDIFF, sendes som DoP til DAC-er som tar imot bærefrekvensen, eller konverteres til PCM med høy samplingsfrekvens. DoP er bekreftet på en FiiO K11; bærefrekvenser over 384 kHz er ikke testet på maskinvare.",
+          "DVD-Video LPCM med 16, 20 og 24 bit, 48 og 96 kHz, opptil 8 kanaler. DVD-Audio støttes ikke, og krypterte plater (CSS) krever en dekryptert kopi."
+        ],
+        "links": [
+          "Detaljer om DVD-Video"
+        ],
+        "alt": "Brothers In Arms med Dire Straits spilles rett fra SACD-platebildet: stereo DSD64 over DoP til en FiiO K11, med merket NATIV DSD · DoP og dekoderfeltet SACD-platebilde, DST (tapsfri).",
+        "floatAlt": "Claudja Barrys Love for the Sake of Love som DSD128 over DoP til en Fosi Audio ZD3, ved 352,8 kHz.",
+        "floatCaption": "DSD128 · DoP · 352,8 kHz"
+      },
+      "analysis": {
+        "jack": "Analyse",
+        "kicker": "Avsløring av falsk hi-res og spekter",
+        "title": "Finn ut hvilke «hi-res»-filer som ikke er det.",
+        "lede": "Hver fil kan analyseres for sin reelle bitdybde, sin reelle båndbredde og fingeravtrykk etter tapsbaserte kodere og omsamplere.",
+        "body": [
+          "Konklusjonene kommer med bevisene sine og nevner hva annet som kan forklare funnet, og spillelisten <em>Tvilsom hi-res</em> samler dem. Bare nullutfylling er eksakt: de spektrale konklusjonene er merket som spørsmål, fordi noen tapsbaserte filer med høy bitrate går gjennom som ekte, og bratte mastringsfiltre, FM-kilder og overføringer fra bånd eller vinyl kan se mistenkelige ut. Mens musikken spilles, viser målere og et sanntidsspekter hva som sendes ut, DoP inkludert."
+        ],
+        "list": [
+          "16-bit-lyd utfylt i 24-bit-beholdere",
+          "Sannsynligvis oppsamplede mastere i CD-kvalitet solgt som 96 eller 192 kHz",
+          "Sannsynlig tapsbasert opphav: MP3 eller AAC omkodet til FLAC",
+          "Sannsynlige syntetiske høye frekvenser fra SBR eller «AI-forbedring»",
+          "<span class=\"mono\">vespertine-analyze</span> kjører den samme analysen på en Linux-server ved siden av filene dine; appen importerer resultatene."
+        ],
+        "note": "Filen i dette skjermbildet er en bevisst forfalskning: trailerens egen musikk, kodet til MP3 og oppsamplet til 24/192 under et oppdiktet bandnavn.",
+        "links": [
+          "Slik fungerer analysen, og hvor den bommer"
+        ],
+        "alt": "Analyse-fanen flagger en 24/192-«remaster» for sannsynlig tapsbasert opphav: langtidsspekteret stopper ved 16 kHz."
+      },
+      "airpods": {
+        "jack": "AirPods Max",
+        "kicker": "AirPods Max via USB-C",
+        "title": "Tapsfritt på AirPods Max, og det står der.",
+        "lede": "Koblet til med USB-C-kabelen gjenkjennes AirPods Max som en tapsfri enhet med 24-bit / 48 kHz.",
+        "body": [
+          "Musikk i 48 kHz spilles bitperfekt, og alt annet konverteres med Apples omsampler i mastringskvalitet, helt synlig. Over Bluetooth forteller Vespertine deg at forbindelsen er AAC. Dette bygger på Apples beskrivelse av kabelveien og tilbakelesingen fra Core Audio, siden AirPods ikke har noen digital utgang som kan brukes til loopback."
+        ],
+        "alt": "En smart spilleliste med spor i 24-bit / 48 kHz, avgrenset til Oasis, spilles bitperfekt på AirPods Max via USB-C."
+      },
+      "library": {
+        "jack": "Bibliotek",
+        "kicker": "Bibliotek",
+        "title": "Bla som i Apple Music. Ordne som en bibliotekar.",
+        "lede": "Album, artister, sanger og sjangre, hver med filtre du kan kombinere, og Bland for alle sammen.",
+        "list": [
+          "Filtre for format, 24-bit, 88,2 kHz og høyere, flerkanal, sjanger, år, samplingsfrekvens, kanaler og analysekonklusjon. Søk skiller ikke mellom store og små bokstaver eller aksenter.",
+          "Smarte spillelister i enhetene du tenker i: 24-bit, 88,2 kHz.",
+          "Remastere, mono- og stereoutgivelser og SACD-er av ett album deler ett kort; velg utgave når du åpner det.",
+          "Favoritter og antall avspillinger, lagret i biblioteket og aldri skrevet til filene dine. Importerer M3U- og Apple Music-spillelister, antall avspillinger og favoritter.",
+          "Tagredigering med sikkerhetskopier og tilbakestilling i ett steg, pluss MusicBrainz-berikelse som viser hvor sikker den er før noe skrives.",
+          "Nettverksdelinger over SMB, NFS eller WebDAV, med hurtigbuffer, Behold frakoblet og avspilling laget for trege servere.",
+          "Finn musikk søker gjennom alle disker etter den ekte musikken din og lar rotet ligge. Et kort oppsett ved første oppstart velger utgangen din og forklarer hva eksklusiv tilgang og ReplayGain gjør.",
+          "Parametrisk EQ per utgang som importerer forhåndsinnstillinger fra AutoEQ og Equalizer APO. Av som standard; når den er på, viser signalveien <span class=\"mono nowrap\">EQUALIZER</span> i stedet for <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "Minispiller, menylinjeobjekt, medietaster, ReplayGain og automatiske, signerte oppdateringer."
+        ],
+        "links": [
+          "Alle funksjoner i detalj"
+        ],
+        "alt": "Sjangre-siden: en flis per sjanger med en mosaikk av omslagene."
+      },
+      "languages": {
+        "jack": "Språk",
+        "kicker": "{languages} språk",
+        "title": "Snakker ditt språk.",
+        "lede": "Hver meny, innstilling og signalveimelding er oversatt til {languages} språk i tillegg til engelsk.",
+        "body": [
+          "Fra ukrainsk, tysk og japansk til swahili, tamil og hausa, med lokale flertallsformer og tallformater, og forenklet, tradisjonell og hongkongkinesisk, hver med sitt eget ordforråd. Arabisk, hebraisk, persisk og urdu får oppsett fra høyre mot venstre.",
+          "Slik kontrolleres oversettelsene: en automatisk sjekk ved hver endring bekrefter at hver streng i appen finnes på alle {languages} språkene, med de samme plassholderne og flertallsformene hvert språk trenger, og hvert skjermbilde er gjennomgått på hvert språk for avkuttet eller overlappende tekst og speiling fra høyre mot venstre. De startet som grundige maskinoversettelser, så rettelser fra morsmålsbrukere er svært velkomne på <a href=\"{href.newIssue}\">GitHub</a>."
+        ],
+        "alt": "Vespertine skrevet på hvert av de {languagesTotal} grensesnittspråkene, fra ヴェスパタイン og Веспертайн til فسبرتاين og वेस्परटाइन, i blandede størrelser og skrifttyper.",
+        "wallLabel": "Vespertine på hvert av språkene sine"
+      }
+    },
+    "formats": {
+      "eyebrow": "Formater",
+      "title": "Surround, tapsfrie og tapsbaserte filer.",
+      "text": "Stereo og flerkanal, PCM og DSD, platebilder og vanlige filer, med CUE-filer overalt.",
+      "caption": "Formater Vespertine spiller, og hvordan",
+      "rows": [
+        {
+          "name": "FLAC, ALAC, WAV, AIFF",
+          "text": "Opprinnelig samplingsfrekvens og ordlengde, opptil 32-bit og den frekvensen DAC-en din kjører (testet til 384 kHz); uendret 32-bit PCM krever heltallsmodus. Platebilder med CUE-fil."
+        },
+        {
+          "name": "DSD64 – DSD512",
+          "text": "DSF og DSDIFF, DST-komprimert eller ukomprimert. DoP avhenger av DAC-en og bærefrekvensen, ellers PCM. DoP-bærefrekvenser over 384 kHz er utestet på maskinvare."
+        },
+        {
+          "name": "SACD-platebilder",
+          "text": "Stereo- og flerkanalsområder, DST eller ukomprimert, rett fra platebildet; hver sang vises én gang med stereo- og 5.1-versjonen sin."
+        },
+        {
+          "name": "DVD-Video LPCM",
+          "text": "16-, 20- og 24-bit ved 48 og 96 kHz, 1 til 8 kanaler, bit for bit; ett album per tittel, ett spor per kapittel. DVD-Audio støttes ikke."
+        },
+        {
+          "name": "Dolby Atmos",
+          "text": "Dolby Digital Plus med Atmos, gjengitt av objektrendereren i macOS, eller det dekodede kanalbedet."
+        },
+        {
+          "name": "Dolby TrueHD, MLP",
+          "text": "Tapsfri, kan være bitperfekt; TrueHD Atmos spiller kanalbedet, objektene gjengis ikke."
+        },
+        {
+          "name": "DTS-HD Master Audio, DTS-HD HR, DTS",
+          "text": "MA er tapsfri og kan være bitperfekt; DTS:X spiller kanalbedet. Rå DTS dekodes; DTS-CD som bitstrøm går en egen vei."
+        },
+        {
+          "name": "Dolby Digital (Plus)",
+          "text": "Dekodes av macOS. Bitstrøm til receiver er eksperimentelt, utestet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes."
+        },
+        {
+          "name": "DTS-CD-er og DTS-WAV",
+          "text": "Gjenkjennes og dekodes til 5.1, også album som er delt med CUE-filer."
+        },
+        {
+          "name": "APE, WavPack, TTA",
+          "text": "Tapsfri. DSD i WavPack støttes ikke."
+        },
+        {
+          "name": "Opus, Vorbis, Musepack, MP3, AAC",
+          "text": "Dekodes og merkes som tapsbasert."
+        }
+      ]
+    },
+    "compare": {
+      "eyebrow": "Sammenligning",
+      "title": "Slik står den seg.",
+      "intro": "Flere Mac-spillere tilbyr bitperfekt avspilling. Denne sammenligningen bygger på det hver spillers egen dokumentasjon eller kildekode sier. «Ikke dokumentert» betyr at leverandøren ikke sier noe om det, ikke at funksjonen mangler. Vespertine har ikke konvolusjon, lydeffekt-plugins eller strømmetjenester.",
+      "hint": "Rull for mer →",
+      "region": "Sammenligningstabell (rulles sidelengs)",
+      "caption": "Vespertine sammenlignet med sju andre musikkspillere for Mac, basert på hver spillers egen dokumentasjon eller kildekode",
+      "feature": "Funksjon",
+      "appleMusic": "Apple Music (Mac)",
+      "rows": [
+        [
+          "Kildekode",
+          "GPL-3.0",
+          "Lukket",
+          "Lukket",
+          "Lukket",
+          "Lukket",
+          "Lukket",
+          "GPL-2.0",
+          "Lukket"
+        ],
+        [
+          "FLAC-/DSD-filer",
+          "Ja / Ja",
+          "Nei / Nei",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Ja",
+          "Ja / Nei⁴"
+        ],
+        [
+          "Automatisk bytte av samplingsfrekvens på DAC-en",
+          "Ja",
+          "Nei",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ikke dokumentert"
+        ],
+        [
+          "Eksklusiv modus (hog)",
+          "Ja",
+          "Nei",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ja"
+        ],
+        [
+          "16/24-bit PCM uten at samplene endres",
+          "Betingelser + tester",
+          "macOS 27: tredjepartstester¹",
+          "Leverandørens påstand",
+          "Leverandørens påstand",
+          "Loopbacktest i appen",
+          "Leverandørens påstand",
+          "Indikator i appen",
+          "Ikke dokumentert"
+        ],
+        [
+          "Lokale surroundfiler",
+          "Ja²",
+          "Ikke dokumentert",
+          "Ja",
+          "Ja",
+          "Ja",
+          "Ikke dokumentert",
+          "Ja",
+          "Ikke dokumentert"
+        ],
+        [
+          "Romlig lyd fra Apple for lokal surround",
+          "Ja",
+          "Bare Atmos fra katalogen³",
+          "Ikke dokumentert",
+          "Ikke dokumentert",
+          "Ikke dokumentert",
+          "Ikke dokumentert",
+          "Ja",
+          "Ikke dokumentert"
+        ],
+        [
+          "Analyse av hi-res-filer",
+          "Ja",
+          "Nei",
+          "AudioScan",
+          "Dynamikkområde, lydstyrke",
+          "Ja",
+          "Ikke dokumentert",
+          "Nei (bare sanntidsspektrum)",
+          "Nei (bare sanntidsspektrum)"
+        ],
+        [
+          "SACD ISO",
+          "Ja",
+          "Nei",
+          "Ja",
+          "Nei (bare DSF/DFF)",
+          "Ja",
+          "Nei",
+          "Nei",
+          "Nei⁴"
+        ],
+        [
+          "Konvolusjon / lydeffekt-plugins",
+          "Nei / Nei",
+          "Nei / Nei",
+          "Ja (Origin: betalt tillegg) / Audio Units",
+          "Ja / Nei",
+          "Nei / Nei",
+          "Ikke dokumentert / Ikke dokumentert",
+          "Nei / Nei",
+          "Ikke dokumentert / Audio Units"
+        ],
+        [
+          "Strømmetjenester",
+          "Nei",
+          "Apple Music",
+          "Studio: ja; Origin: nei",
+          "Ja",
+          "Nei (lokalt + UPnP)",
+          "Nei (nettradio)",
+          "Nei (nettradio)",
+          "Nei (nettradio)"
+        ]
+      ],
+      "notes": [
+        "¹ Apple Music på macOS 27 var bitnøyaktig ved 16/24-bit i <a href=\"https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/\">loopbacktester fra tredjeparter rapportert på ASR</a>, ved 100 % volum. Dette er ikke en måling gjort av Vespertine; den opprinnelige rapporten kunne ikke etterprøves uavhengig for denne oppdateringen. Det finnes fortsatt ikke automatisk bytte av samplingsfrekvens, hog-modus, FLAC eller DSD på Mac.",
+        "² Flerkanalsutgang til DAC og bitstrøm til receiver er eksperimentelt, utestet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes.",
+        "³ Apple dokumenterer Romlig lyd med hodesporing for Dolby Atmos-spor i Apple Music-katalogen, ikke romlig gjengivelse av dine egne flerkanalsfiler.",
+        "⁴ Testet på foobar2000 2.26 (macOS 27.0.1) uten komponenter: DSF-, DFF- og SACD ISO-filer feiler med «Unsupported file format». DSF og DFF spilles bare som 352,8 kHz PCM etter at FFmpeg er installert separat og filtypene er lagt til i FFmpeg Decoder Wrapper; SACD ISO feiler fortsatt."
+      ],
+      "sources": "<a href=\"{href.comparison}\">Kilder og avgrensning</a>. Rettelser mottas gjerne: <a href=\"{href.issues}\">opprett en sak</a>."
+    },
+    "whatsNew": {
+      "eyebrow": "Nytt",
+      "title": "Nytt i {version}.",
+      "latest": "Siste versjon",
+      "fullNotes": "Fullstendige versjonsnotater",
+      "meta": "allerede installert? Den oppdaterer seg selv, eller {brewUpgrade}",
+      "earlier": "Tidligere versjoner",
+      "every": "Alle versjoner",
+      "inEnglish": "Disse versjonsnotatene er ikke oversatt ennå, så de vises på engelsk."
+    },
+    "faq": {
+      "eyebrow": "Vanlige spørsmål",
+      "title": "Det du lurer på.",
+      "items": [
+        {
+          "q": "Er den virkelig gratis?",
+          "a": "Ja. Vespertine er gratis og åpen kildekode under GPL-3.0. Ingen konto, ingen abonnement, ingen reklame og ingen telemetri (<a href=\"{href.privacy}\">personvern</a>). Den går bare på nett for å se etter oppdateringer, og for å nå MusicBrainz, Cover Art Archive eller ListenBrainz, eller for å finne omslag til Discord-statusen din, når du ber om det."
+        },
+        {
+          "q": "Hva trenger jeg?",
+          "a": "macOS {minMacOS} ({minMacOSName}) eller nyere, på Apple silicon eller Intel. Intel-maskinvare er utestet; Intel-versjonen har kjørt under Rosetta, og rapporter fra ekte Intel-Mac-er mottas gjerne."
+        },
+        {
+          "q": "Hvordan installerer og oppdaterer jeg den?",
+          "a": "Last ned DMG-filen, åpne den og flytt Vespertine til Programmer. Den er signert med en Developer ID og notarisert av Apple, og den oppdaterer seg selv; hver oppdatering er signert. Med Homebrew: {brew}, deretter {brewUpgrade} eller appens egne oppdateringer."
+        },
+        {
+          "q": "Strømmer den fra Qobuz, TIDAL eller Apple Music?",
+          "a": "Nei. Vespertine spiller musikk du eier, på Mac-en din, på eksterne disker eller på en nettverksdeling. DRM-beskyttede nedlastinger fra et Apple Music-abonnement kan ikke spilles av."
+        },
+        {
+          "q": "Hvordan vet jeg at den faktisk er bitperfekt?",
+          "a": "Signalveien leser tilbake hva Core Audio faktisk gjorde: enhetens nominelle samplingsfrekvens, det fysiske formatet og hvem som holder den. Dekoderne har automatiserte tester (TrueHD mot kilden, DTS mot FFmpegs egen dekoder), en innebygd loopbacktest sjekker programvareveien sample for sample, og med <span class=\"mono nowrap\">vespertine-probe</span> kan du sjekke din egen maskinvare. <a href=\"{href.verification}\">Slik verifiserer du det selv</a>."
+        },
+        {
+          "q": "Kan den spille SACD- og DVD-plater?",
+          "a": "Den spiller platebildene deres. SACD-platebilder i <code>.iso</code>, stereo og flerkanal, DST-komprimert eller ukomprimert, og LPCM-musikken på DVD-Video-platebilder eller i <code>VIDEO_TS</code>-mapper spilles rett fra platebildet, uten at noe pakkes ut. DVD-Audio støttes ikke, og krypterte (CSS) DVD-er krever en dekryptert kopi."
+        },
+        {
+          "q": "Spiller den Dolby Atmos?",
+          "a": "Dolby Digital Plus med Atmos spilles gjennom objektrendereren i macOS, som Romlig lyd med hodesporing på AirPods. TrueHD Atmos og DTS:X spiller det tapsfrie kanalbedet; objektene gjengis ikke. Bitstrøm til en AV-receiver er eksperimentelt, utestet på ekte receivere; rapporter ønskes."
+        },
+        {
+          "q": "Endrer den filene mine?",
+          "a": "Bare når du redigerer tagger, og da sikkerhetskopieres hver fil først og kan tilbakestilles i ett trinn. Mapper refereres på stedet; import lager APFS-kloner som ikke tar ekstra plass."
+        },
+        {
+          "q": "Hvilken maskinvare er den testet på?",
+          "a": "Avspilling er testet på en FiiO K11 ved frekvenser opptil 384 kHz, med DoP og heltallsmodus; AirPods Max over USB-C og Bluetooth; høyttalerne i MacBook Pro; og en Sony-TV over HDMI i 5.1. Intel-maskinvare er utestet. Bitstrøm til receiver og flerkanalsutgang til DAC er eksperimentelt, utestet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter ønskes</a>."
+        },
+        {
+          "q": "Finnes den på mitt språk?",
+          "a": "Sannsynligvis: grensesnittet finnes på engelsk og {languages} andre språk, blant dem arabisk, hebraisk, persisk og urdu, som skrives fra høyre mot venstre. Vespertine følger språket som er valgt for den i Systeminnstillinger. Rettelser fra morsmålsbrukere mottas gjerne på <a href=\"{href.newIssue}\">GitHub</a>."
+        }
+      ]
+    },
+    "support": {
+      "eyebrow": "Støtte",
+      "title": "Hjelp Vespertine å vokse.",
+      "text": "Den er gratis, åpen kildekode og utvikles helt åpent. Slik kan du hjelpe.",
+      "cards": [
+        {
+          "title": "Spons på GitHub",
+          "text": "Vespertine er gratis. Hvis du har nytte av den, støtter et sponsorat på GitHub utviklingen.",
+          "cta": "Bli sponsor"
+        },
+        {
+          "title": "Rapporter DAC-en din",
+          "text": "Fortell oss hva DAC-en, lydkortet eller receiveren din gjorde. Hver enhetsrapport utvider det som er sjekket på ekte maskinvare.",
+          "cta": "Send inn en enhetsrapport"
+        },
+        {
+          "title": "Rett en oversettelse",
+          "text": "Ser du en klønete formulering på ett av de {languages} språkene? Opprett en sak med en bedre ordlyd.",
+          "cta": "Foreslå en rettelse"
+        },
+        {
+          "title": "Les koden",
+          "text": "Feilrapporter, pull requests og spørsmål er velkomne. Betingelsene for signalveien og testene for dem ligger i repositoriet.",
+          "cta": "Kildekode på GitHub"
+        }
+      ]
+    },
+    "closing": {
+      "eyebrow": "Last ned",
+      "title": "Spill surroundsamlingen din på Mac-en.",
+      "meta": [
+        "Gratis",
+        "åpen kildekode",
+        "versjon {version}",
+        "macOS {minMacOS} eller nyere"
+      ]
+    }
+  },
+  "press": {
+    "title": "Pressesett: Vespertine, musikkspilleren for surround og hi-res på Mac",
+    "description": "Fakta, logoer, nøkkelbilder, ekte skjermbilder og traileren for Vespertine, den gratis Mac-spilleren med åpen kildekode for samlinger med surround- og hi-res-musikk.",
+    "ogAlt": "Pressesett for Vespertine: faktaark, logoer, nøkkelbilder, ekte skjermbilder og traileren, over tre ekte skjermbilder av appen.",
+    "eyebrow": "Pressesett",
+    "heading": "Alt du trenger for å skrive om Vespertine",
+    "lede": "Vespertine er den gratis Mac-spilleren med åpen kildekode for samlinger med surround- og hi-res-musikk. Diskavbilder av SACD og DVD-Video, utpakkede SACD-spor i 5.1, DTS CD-er og DTS-HD MA-, TrueHD- og Atmos-filer deler ett bibliotek, med hodesporet Romlig lyd på AirPods. Signalveien viser hvert trinn fra fil til utgang, med vilkår og tester i GPL-kildekode som alle kan granske.",
+    "fine": "Kanal-for-kanal-utgang og bitstrøm til AV-receiver er eksperimentelle og utestet på ekte receivere og flerkanals USB-DAC-er (én Sony-TV over HDMI er testet: se docs/DEVICES.md); rapporter ønskes. Atmos-objekter i Dolby Digital Plus gjengis av macOS; TrueHD Atmos og DTS:X spiller av kanalbedet sitt.",
+    "facts": {
+      "eyebrow": "Faktaark",
+      "title": "Fakta.",
+      "name": "Navn",
+      "formerly": "(het {formerName} frem til versjon 0.6.0)",
+      "developer": "Utvikler",
+      "developerValue": "{author}, uavhengig utvikler",
+      "price": "Pris",
+      "priceValue": "Gratis. Åpen kildekode under GPL-3.0; ingen konto, abonnement, reklame eller telemetri",
+      "platform": "Plattform",
+      "platformValue": "macOS {minMacOS} {minMacOSName} eller nyere, Apple silicon og Intel",
+      "current": "Gjeldende versjon",
+      "currentValue": "{version}, utgitt {date}",
+      "currentFine": "Signert og notarisert DMG ({size}), oppdaterer seg selv",
+      "first": "Første utgivelse",
+      "firstFine": "(som {formerName} 0.1.0)",
+      "languages": "Språk",
+      "languagesValue": "Engelsk og {languages} til, blant dem ukrainsk, arabisk, hebraisk, japansk og tre varianter av kinesisk",
+      "install": "Installasjon",
+      "installValue": "<a href=\"{href.dmg}\">Last ned DMG-filen</a> eller {brew}",
+      "tested": "Testet med",
+      "testedValue": "FiiO K11 (alle samplingsfrekvenser opp til 384 kHz, DoP, heltallsmodus), AirPods Max over USB-C og Bluetooth, MacBook Pro-høyttalere",
+      "links": "Lenker",
+      "website": "Nettsted",
+      "source": "Kildekode",
+      "releaseNotes": "Utgivelsesnotater",
+      "verify": "Slik bekrefter du bitperfekt avspilling"
+    },
+    "angle": {
+      "eyebrow": "Vinkling",
+      "title": "Dette fokuserer den på.",
+      "list": [
+        "Surroundmusikk i ett Mac-bibliotek, fra SACD- og DVD-Video-avbilder, rippede plater og DTS CD-er til TrueHD og DD+ Atmos, med Romlig lyd på AirPods.",
+        "Gratis GPL-3.0-kildekode som alle kan lese, bygge og endre.",
+        "En signalvei som viser samplingsfrekvens, ordlengde, forsterkning og kanalbehandling. Vilkårene for bitperfekt avspilling ligger i koden, med tester, en innebygd loopbacktest og en <a href=\"{href.verification}\">verifiseringsveiledning</a>."
+      ],
+      "text": "Analyse av hi-res-filer følger også med. Påvisning av nullutfylling er eksakt; spektrale vurderinger er anslag med begrensninger. VeraVox og Audirvana AudioScan tilbyr også analyse. <a href=\"{href.comparison}\">Kilder for sammenligningen</a>."
+    },
+    "video": {
+      "eyebrow": "Video",
+      "title": "Trailer.",
+      "text": "44 sekunder, 16:9, 1080p i 60 fps, med lyd. <a href=\"{href.trailerDownload}\" download>Last ned MP4-filen</a> ({size}). En 4K-master er tilgjengelig på forespørsel.",
+      "fallback": "Last ned traileren (MP4)"
+    },
+    "logo": {
+      "eyebrow": "Merkevare",
+      "title": "Logo.",
+      "text": "Alltid med små bokstaver, månesigden alltid i messing. Vennligst ikke farg den om, strekk den eller sett den opp på nytt. <a href=\"{href.brandGuide}\">Merkevareguide (PDF)</a>.",
+      "primaryAlt": "Vespertine-logoen: en månesigd i messing og ordet vespertine",
+      "stackedAlt": "Den stablede Vespertine-logoen",
+      "primary": "Primær",
+      "stacked": "Stablet",
+      "onLight": "på lys bakgrunn:",
+      "crescent": "bare månesigden:"
+    },
+    "art": {
+      "eyebrow": "Nøkkelbilder",
+      "title": "Ett bilde per funksjon.",
+      "text": "I tre størrelser: 2400×1350, 1600×900 og 1270×760.",
+      "items": {
+        "bit-perfect": "Bitperfekt når vilkårene er oppfylt",
+        "fake-hi-res": "Avsløring av falsk hi-res",
+        "spatial-audio": "Surround som Romlig lyd på AirPods",
+        "native-dsd": "Nativ DSD over DoP",
+        "stereo-and-surround": "Stereo- og surroundversjoner",
+        "sacd-iso": "SACD-avbilder, spilt av direkte",
+        "languages": "{languages} språk"
+      }
+    },
+    "shots": {
+      "eyebrow": "Skjermbilder",
+      "title": "Den ekte appen.",
+      "text": "Fra utviklerens eget bibliotek, 2400×1500. Albumomslagene tilhører rettighetshaverne.",
+      "items": {
+        "bit-perfect-fosi-zd3-24-96": "24-bit / 96 kHz, bitperfekt på en Fosi Audio ZD3: Lazar Berman, Liszts Les jeux d’eaux à la Villa d’Este",
+        "multichannel-albums": "Album filtrert til flerkanal",
+        "stereo-and-surround-versions": "Utpakkede SACD-spor med stereo- og 5.1-versjoner",
+        "spatial-audio-airpods-max": "Et 24/88,2 5.1-album (Elton John, Goodbye Yellow Brick Road) som Romlig lyd på AirPods Max",
+        "fake-hi-res-detection": "En 24/192-«remaster» som stopper ved 16 kHz (en bevisst forfalskning: trailerens egen musikk, kodet til MP3 og oppsamplet, under et oppdiktet bandnavn)",
+        "dsd-native-dop": "DSD128 over DoP ved 352,8 kHz på en Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
+        "sacd-iso": "En SACD-.iso, spilt av fra avbildet: Dire Straits, Brothers In Arms",
+        "genres": "Sjangre",
+        "search": "Søk",
+        "smart-playlist": "En smart spilleliste, bitperfekt på AirPods Max over USB-C",
+        "loopback-test": "Loopbacktesten: en programvarekontroll av utgangsveien, sampel for sampel",
+        "setup-welcome": "Oppsett ved første oppstart: velkommen",
+        "setup-output": "Oppsett ved første oppstart: valg av utgangen som skal huskes",
+        "output-settings": "Utgangsinnstillinger: husket utgang, reserveutgang, 16-bit-tilpasning",
+        "equalizer": "Den parametriske EQ-en med en AutoEQ-forhåndsinnstilling"
+      }
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Ta kontakt.",
+      "text": "Presse, spørsmål og intervjuforespørsler: {email}. Spørsmål til fellesskapet: <a href=\"{href.discussions}\">GitHub Discussions</a>. Feil og enhetsrapporter: <a href=\"{href.issues}\">GitHub-saker</a>."
+    }
+  },
+  "privacy": {
+    "title": "Personvern: Vespertine samler ikke inn noe",
+    "description": "Vespertine-appen samler ikke inn noe: ingen kontoer, analyse, telemetri, krasjrapportering eller reklame. Hva appen og dette nettstedet kobler seg til, og hvorfor.",
+    "ogAlt": "Personvern i Vespertine: Vespertine samler ikke inn noe. Ingen kontoer, analyse, telemetri, krasjrapportering eller reklame.",
+    "eyebrow": "Personvern",
+    "heading": "Vespertine samler inn",
+    "headingBrass": "ingenting.",
+    "updated": "Gjelder fra {effective} (legger til den valgfrie Discord-statusen). Delen «Dette nettstedet» ble oppdatert {statsUpdated}, da nettstedet begynte å telle besøk med egendriftet statistikk uten informasjonskapsler, og {langUpdated}, da språkmenyen begynte å huske valget ditt på enheten din.",
+    "intro": "Vespertine er en gratis musikkspiller med åpen kildekode. Appen har ingen kontoer, ingen analyse, ingen telemetri, ingen krasjrapportering og ingen reklame. Utvikleren mottar ingen informasjon om deg eller musikken din. Fordi kildekoden er offentlig, kan du kontrollere hver eneste påstand på denne siden.",
+    "staysTitle": "Dette blir på Macen din",
+    "stays": "Bibliotekdatabasen, spillelistene, avspillingstellerne, resultatene fra filanalysen, bufferen for omslagsbilder og innstillingene dine lagres i Bibliotek-mappen til brukeren din på Macen. Passord for nettverksdelinger og ListenBrainz-tokenet ditt, hvis du legger inn et, lagres i nøkkelringen i macOS. Ingenting av det lastes opp noe sted.",
+    "onlineTitle": "Når appen kobler seg til nettet",
+    "online": [
+      "<strong>Oppdateringssjekker.</strong> Vespertine ber GitHub om oppdateringsfeeden sin omtrent én gang om dagen, og når du velger Se etter oppdateringer. GitHub ser IP-adressen din, som ved enhver nedlasting. Du kan slå av automatiske sjekker i Innstillinger.",
+      "<strong>MusicBrainz og Cover Art Archive.</strong> Bare når du bruker Slå opp på MusicBrainz eller Berik metadata (Finn musikk på denne Macen tilbyr Berik for musikken den legger til, som en avkrysningsrute du kan fjerne haken fra), sender Vespertine album-, artist- og spornavnene den leter etter, til musicbrainz.org. Med «Hent albumomslag» slått på i Innstillinger laster den ned omslag fra coverartarchive.org, som leverer dem fra Internet Archive (archive.org). MusicBrainz og Cover Art Archive drives av MetaBrainz Foundation.",
+      "<strong>ListenBrainz.</strong> Bare hvis du slår på scrobbling og legger inn tokenet ditt, sender Vespertine sangene du spiller, til listenbrainz.org: tittel, artist, album, varighet og MusicBrainz-ID-ene deres når filene dine har dem. Den sender «spilles nå» når en sang starter, og en lytting med tidspunkt når du har hørt halvparten av sangen eller fire minutter.",
+      "<strong>Discord.</strong> Bare hvis du slår på Discord-statusen i Innstillinger, forteller Vespertine Discord-appen på Macen din, over en tilkobling som ikke forlater Macen, hva som spilles: tittel, artist, album, format og fremdrift. Discord viser det som statusen din for dem som kan se aktiviteten din. For å vise albumomslaget slår Vespertine det opp etter navn, fordi Discord bare kan vise bilder fra nettet: på coverartarchive.org når filene dine har en MusicBrainz-utgivelses-ID, ellers i Apples iTunes Search (itunes.apple.com), som mottar artist- og albumnavnene. Discord laster deretter ned omslaget derfra. Du kan slå av omslag, og filene dine og omslagene deres lastes aldri opp.",
+      "<strong>Nettverksdelinger.</strong> Vespertine kobler seg til serverne du legger til, og ingen andre steder, for å lese musikken din. Mens en deling er tilkoblet, sjekker den omtrent hvert minutt at serveren fortsatt svarer, og ser etter ny musikk hver halvtime (aldri mens du spiller av fra den)."
+    ],
+    "websiteTitle": "Dette nettstedet",
+    "website": [
+      "Dette nettstedet ligger på GitHub Pages, som kan logge besøkendes IP-adresser; se <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">GitHubs personvernerklæring</a>. Nedlastingsknappene lenker til appens utgivelser på GitHub. Nettstedet setter ingen informasjonskapsler og laster inn skrifter, bilder og video fra dette nettstedet.",
+      "For å finne ut hvilke sider og knapper folk bruker, teller nettstedet besøk med <a href=\"https://umami.is\">Umami</a>, personvernvennlig programvare vi drifter selv på stats.szeremeta.org. Den setter ingen informasjonskapsler, lagrer ingenting på enheten din, beholder ikke IP-adressen din og deler ingenting med annonsører eller noe annet selskap. Den registrerer siden, nettstedet du kom fra, omtrent hvilket land du er i, nettleseren din, operativsystemet, skjermstørrelsen og språket ditt, og klikk på knappene for nedlasting, GitHub og Homebrew. Den kan ikke følge deg på tvers av nettsteder eller identifisere deg, og den hopper over besøkende med nettlesere som sender Do Not Track. <strong>Appen kontakter den aldri.</strong>",
+      "Hvis du velger et språk i nettstedets språkmeny, husker nettleseren valget på enheten din (i den lokale lagringen sin), slik at nettstedet ikke bytter deg tilbake. Valget sendes aldri noe sted, og nettstedet fungerer likt uten det."
+    ],
+    "changesTitle": "Endringer og kontakt",
+    "changes": "Hvis dette noen gang endres, vil denne siden og utgivelsesnotatene si fra først. Spørsmål tas gjerne imot som en <a href=\"{href.issues}\">GitHub-sak</a>."
+  },
+  "terms": {
+    "title": "Vilkår: Vespertine er fri programvare under GPL",
+    "description": "Vespertine er fri programvare under GNU General Public License, versjon 3 eller nyere: ingen kostnad, ingen registrering, ingen garanti.",
+    "ogAlt": "Vilkår for Vespertine: fri programvare, enkelt og greit. GNU General Public License, versjon 3 eller nyere.",
+    "eyebrow": "Vilkår",
+    "heading": "Fri programvare,",
+    "headingBrass": "enkelt og greit.",
+    "updated": "Gjelder fra {effective}",
+    "licenseTitle": "Lisens",
+    "license": "Vespertine er fri programvare under <a href=\"{href.license}\">GNU General Public License, versjon 3 eller nyere</a>. Du kan bruke den til hvilket som helst formål, studere og endre kildekoden og dele kopier, også endrede, under samme lisens. Den koster ingenting, og det er ingenting å registrere seg for.",
+    "warrantyTitle": "Ingen garanti",
+    "warranty": "Som lisensen sier, leveres Vespertine «som den er», uten noen form for garanti, i den grad loven tillater det. Ta sikkerhetskopier av musikken din. Vespertine endrer bare filer når du redigerer taggene deres, og tar sikkerhetskopi av hver fil først, men du bruker den på egen risiko.",
+    "musicTitle": "Musikken din og andre tjenester",
+    "music": "Du er selv ansvarlig for å ha rett til å spille av musikken du legger til. Vespertine kan ikke spille av DRM-beskyttede filer og prøver ikke på det. MusicBrainz, Cover Art Archive og ListenBrainz er uavhengige tjenester med egne vilkår, som gjelder når du bruker dem gjennom Vespertine.",
+    "trademarksTitle": "Varemerker",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus og Dolby TrueHD er varemerker for Dolby Laboratories. DTS, DTS-HD Master Audio og DTS:X er varemerker for DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS og Romlig lyd (Spatial Audio) er varemerker for Apple Inc. Vespertine nevner dem bare for å beskrive hva den spiller av, og hvor. Den er ikke sertifisert, lisensiert eller godkjent av Dolby, DTS eller Apple.",
+    "contactTitle": "Kontakt",
+    "contact": "Feil, spørsmål og forespørsler: <a href=\"{href.issues}\">GitHub-saker</a>.",
+    "englishNote": "Denne oversettelsen er ment som en hjelp. Det er selve GNU General Public License som er den bindende teksten, og den er på engelsk."
+  },
+  "notFound": {
+    "title": "Fant ikke siden: Vespertine",
+    "description": "Denne siden finnes ikke. Vespertine er den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikksamlinger.",
+    "ogAlt": "Vespertine: den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikk.",
+    "eyebrow": "404 · Ingen signal",
+    "heading": "Denne siden",
+    "headingBrass": "finnes ikke.",
+    "lede": "Lenken kan være gammel, eller adressen feilskrevet. Alt om Vespertine begynner på forsiden.",
+    "home": "Gå til forsiden"
+  },
+  "seo": {
+    "operatingSystem": "macOS {minMacOS} eller nyere",
+    "processor": "Apple silicon (arm64) eller Intel (x86-64)",
+    "subCategory": "Musikkspiller",
+    "sourceName": "Kildekoden til Vespertine",
+    "trailerName": "Vespertine-trailer",
+    "trailerDescription": "En 44 sekunder lang omvisning i Vespertine, tatt opp fra den ekte appen på utviklerens eget bibliotek: den bitperfekte signalveien, DSD over DoP, surround som Romlig lyd på AirPods og analyse av hi-res-filer.",
+    "keywords": "bitperfekt, hi-res-lyd, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Romlig lyd, AirPods Max, FLAC, musikkspiller, macOS, åpen kildekode"
+  },
+  "releases": {
+    "0.14.0": {
+      "hash": "13646de5db46",
+      "summary": "Vespertine 0.14.0 legger til romkorrigering: mål høyttalerne dine med en UMIK-1-mikrofon og spill gjennom filtre laget for rommet ditt. Den sørger også for at avspilling over nettverk ikke går tom.",
+      "notes": "### Romkorrigering\n- **Mål rommet ditt.** Sett en kalibrert UMIK-1-mikrofon på lytteplassen, så spiller Vespertine testsveip gjennom hver høyttaler etter tur, på 1 til 5 punkter (5 som standard: lytteplassen, deretter til venstre, til høyre, foran og bak). Den sjekker først nivået og ruten til hver høyttaler, avviser en mislykket måling og lar deg prøve igjen eller fortsette der du slapp. Både stereo og 5.1 støttes.\n- **Filtre for hver høyttaler.** Ut fra målingen lager Vespertine et lite sett filtre per høyttaler, for det meste kutt for basstoppene et rom legger til. Velg et mål (Varm er standard, ellers Mild helning eller Flat) og et område (bare bass eller fullt register), så tilpasses filtrene på nytt fra den lagrede målingen uten at du må måle igjen. Grafen viser hva som ble målt, hva som er predikert etter korrigering og målet, og prediksjonen er merket som en prediksjon.\n- **Justering av forsinkelse og nivå.** Forsinkelsen og nivået til hver høyttaler måles også, slik at nærmere høyttalere holdes tilbake til lyden fra den fjerneste kommer frem, og de som spiller høyere, dempes ned til nivået til den som spiller lavest.\n- **Ta med dine egne filtre.** Importer en filterfil fra Equalizer APO eller REW (forsinkelse, nivå og filtre per høyttaler), eller importer impulsresponser (WAV, AIFF, CAF eller FLAC) som spilles av som konvolusjonsfiltre. Eksporter en profil som Equalizer APO-tekst eller som en Vespertine-profil. Linjer Vespertine ikke kan spille av, avvises med linjenummeret i stedet for å bli spilt av som noe annet.\n- **Av som standard, så bitperfekt forblir bitperfekt.** Romkorrigering slås på per utgang og er knyttet til utgangen den ble målt på. Når den endrer samplene, viser signalveien ROMKORRIGERING, og strømmen merkes ikke lenger som bitperfekt. Når den er av, er avspillingen urørt. Heltallsmodus og Match 16-bit forblir av mens den er på.\n- **Hva den dekker.** Stereo- og 5.1-PCM som Vespertine gjengir. For Dolby- og DTS-bitstrømmer, Atmos og andre kanalantall trer den til side, og signalveien sier hvorfor. DSD på en DoP-DAC konverteres til PCM mens korrigeringen er på, slik at også den blir korrigert; kryss av for Behold nativ DSD på den utgangen for i stedet å sende den nativt og ukorrigert.\n- **Ett vindu.** Vis → Romkorrigering, som også nås fra Equalizer-vinduet og innstillingene for hver utgang, samler bryteren, knappene Mål, Importer og Eksporter, profilene, før-og-etter-grafen, målet og området, og forsinkelsen, nivået og filtrene for hver høyttaler. Dette erstatter det tidligere betavinduet Rommåling. Metoden er beskrevet i `docs/ROOM-CORRECTION.md`.\n\n### Avspilling over nettverk\n- **Færre utfall fra en NAS.** Spor på en nettverksdeling kopieres nå til Mac-en din før de spilles, og neste spor kopieres på forhånd, så en hikke på nettverket stopper ikke lenger musikken. Store DSD-filer leses på en måte som holder et langt forsprang klart.\n- **En lastering på avspillingsknappen.** Mens Vespertine venter på data fra nettverket, viser spill/pause-knappen en liten roterende ring (stillestående når Reduser bevegelse er på). Korte lesefeil prøves på nytt.\n- **Begrensninger.** Et svært langt brudd, eller en forbindelse som er tregere enn musikken, kan fortsatt få avspillingen til å pause for å fylle opp igjen. Bufrede kopier bruker høyst 8 GB, og en kilde som er større enn det, feiler med en tydelig melding. Se `docs/NETWORK-PLAYBACK.md`.\n\n### Også nytt\n- **DoP på som standard for kjente DAC-er.** FiiO K11 og Fosi Audio ZD3 starter med DoP slått på. Hvis du slår det av, husker Vespertine det.\n- **Nylig lagt til viser 150 album**, opp fra 60, så en stor import ikke skyver albumene rett før den ut av listen.\n- **Fosi Audio ZD3.** ZD3 er nå på listen over støttede enheter, og skjermbildene på nettstedet er tatt på nytt med den.\n- **Nettsted.** En linje med «Gi en stjerne på GitHub» og «Bli med i diskusjonen» ligger under nedlastingsknappene.\n\n### Verifisering\n- Testpakkene for motoren, biblioteket og appen består, inkludert nye tester for designet av romfiltrene, for avspilling gjennom korrigeringstrinnet og konvolusjonsfilteret, for måletrinnene mot et simulert rom, for importformatene og for nettverksbufferen. Sanntidslydkoden kontrolleres også med sanitizere for adresser, tråder og udefinert oppførsel.\n- Sjekket på ekte maskinvare: en fullstendig måling med en UMIK-1 på lytteplassen, filtrene som ble laget ut fra den, og avspilling gjennom romkorrigering på en Fosi Audio ZD3 med stereohøyttalere."
+    },
+    "0.13.2": {
+      "hash": "f78ea179d3a9",
+      "summary": "Vespertine 0.13.2 spiller 5.1-DSD i Romlig lyd på AirPods, sier fra når lyden konverteres eller nedmikses, og henger ikke lenger ved avslutning.",
+      "notes": "### Romlig lyd\n- **5.1-DSD spilles nå i Romlig lyd.** En 5.1-DSD-fil (DSF, DSDIFF, DST-komprimert DSDIFF eller et SACD-platebilde) konverteres til PCM, og hver kanal plasseres der den hører hjemme, så LFE- og surroundkanalene går ikke lenger tapt. Før kunne diskrete DSDIFF-kanaler havne på et kanalbed med tre høyttalere, og bakkanalene forsvant.\n- **Den sier hva som skjedde med lyden.** Signalveien viser **DSD → PCM** ved siden av ROMLIG eller en nedmiks, og to nye meldinger, «Konvertert fra DSD» og «Nedmikset til stereo», vises når de gjelder. Begge er oversatt til alle de 44 språkene.\n- Sjekket av utvikleren på AirPods Max.\n\n### Rettet\n- **Avslutning henger ikke lenger.** Cmd-Q kunne etterlate en snurrende markør mens Vespertine ventet på lydenheten. Nå avslutter den med en gang.\n- **Flerkanalsfiler leses riktig.** RF64- og Wave64-filer åpnes som de skal, DSD-kanalnavn leses fra filen, og diskret flerkanalsruting følger filens eget kanaloppsett.\n\n### Verifisering\n- Testpakkene for motoren, biblioteket og appen består, inkludert nye tester som spiller hvert 5.1-DSD-format gjennom Romlig lyd og sjekker at hver kanal havner på sin plass. Kontrollen av venstre/høyre-plassering kjøres bare på ekte Mac-er; GitHubs testmaskiner hopper over akkurat den ene kontrollen."
+    },
+    "0.13.1": {
+      "hash": "60b7a86a49b9",
+      "summary": "Vespertine sier nå fra når equalizeren ikke kan endre det som spilles, tilbyr en valgfri referanse-equalizer for hver USB-C-modell av AirPods Max, og har sitt første flerkanalsresultat på ekte maskinvare."
+    },
+    "0.13.0": {
+      "hash": "3a618b344990",
+      "summary": "Vespertine fører nå historikk over det du har spilt, gir Neste et eget panel ved siden av biblioteket, viser alle utgaver av et album på ett kort, og kan vise det du spiller som Discord-statusen din."
+    },
+    "0.12.2": {
+      "hash": "061c50f44ec0",
+      "summary": "Vespertine fungerer nå som det skal med lyst utseende, lar utganger uten volumkontroll bruke Vespertines volum, og fortsetter å analysere biblioteket ditt mens du lytter fra en nettverksdeling."
+    },
+    "0.12.1": {
+      "hash": "45e9b01884e3",
+      "summary": "Vespertine spiller nå jevnt fra trege nettverksdelinger, analyserer store biblioteker raskere med delinger inkludert, spiller hi-res på små USB-C-DAC-er ved den høyeste frekvensen de tilbyr, og beholder tastaturet og flervalg der du forventer dem."
+    },
+    "0.12.0": {
+      "hash": "f25478b5e324",
+      "summary": "Vespertine spiller nå DST-komprimerte DSDIFF-filer og LPCM-musikken på DVD-Video-plater direkte, beholder hvert spor i EAC-CUE-filer, og starter sanger fra en nettverksdeling med en gang, selv mens en biblioteksskanning pågår."
+    }
+  }
+}

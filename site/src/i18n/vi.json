@@ -49,7 +49,7 @@
     "ukraine": "<strong>Vespertine đứng về phía Ukraine.</strong> Hãy quyên góp qua {orgs}.",
     "copyright": "© {year} Những người đóng góp cho Vespertine",
     "free": "Phần mềm tự do theo giấy phép GPL",
-    "madeIn": "Được làm tại Boston bởi {author}",
+    "madeIn": "Do {author} thực hiện tại Boston",
     "backToTop": "Về đầu trang",
     "home": "Trang chủ"
   },
@@ -74,7 +74,7 @@
       "star": "Gắn sao trên GitHub",
       "discuss": "Tham gia thảo luận",
       "version": "Phiên bản {version}",
-      "signed": "đã ký số và notarize",
+      "signed": "đã ký số và công chứng",
       "releaseNotes": "Ghi chú phát hành",
       "privacy": "Quyền riêng tư: không thu thập gì.",
       "panelAlt": "Bộ kiểm tra Đang phát của Vespertine: Les jeux d’eaux à la Villa d’Este của Liszt do Lazar Berman trình bày, được đánh dấu HI-RES KHÔNG TỔN HAO và BIT-PERFECT, độc quyền, 32 / 96, cùng đường tín hiệu từ một tệp FLAC 24 bit / 96 kHz qua libFLAC ở tần số gốc và âm lượng 100% đến Fosi Audio ZD3.",
@@ -156,7 +156,7 @@
         ],
         "list": [
           "Phiên bản stereo và âm thanh vòm của một album chỉ được liệt kê một lần; Vespertine phát bản phù hợp với đầu ra, hoặc bản bạn đã ghim.",
-          "Bitstream Dolby Digital, DD+ và DTS-CD tới receiver là tính năng thử nghiệm, chưa được kiểm tra trên receiver thật và DAC USB đa kênh (mới thử với một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Các bài kiểm tra tín hiệu mang dùng bộ đọc S/PDIF của FFmpeg. Passthrough TrueHD và DTS-HD MA không được hỗ trợ trên macOS.",
+          "Bitstream Dolby Digital, DD+ và DTS-CD tới receiver là tính năng thử nghiệm, chưa được kiểm tra trên receiver thật và DAC USB đa kênh (mới thử với một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Các bài kiểm tra sóng mang dùng bộ đọc S/PDIF của FFmpeg. Passthrough TrueHD và DTS-HD MA không được hỗ trợ trên macOS.",
           "Xuất cho Âm thanh không gian dưới dạng stereo binaural cho tai nghe hoặc ALAC đa kênh cho thiết bị Apple, kèm thẻ và ảnh bìa."
         ],
         "alt": "Goodbye Yellow Brick Road của Elton John, một album 5.1 24 bit / 88,2 kHz, đang phát dưới dạng Âm thanh không gian theo dõi chuyển động đầu trên AirPods Max, kèm đường tín hiệu và đồng hồ đo cho từng kênh.",
@@ -173,7 +173,7 @@
         ],
         "list": [
           "Khớp từng bit với sacd_extract trên hai đĩa thật. Các đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên cho đến nay mới chỉ được kiểm tra bằng ảnh đĩa thử nghiệm tổng hợp.",
-          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số tín hiệu mang, hoặc được chuyển đổi thành PCM tần số cao. DoP đã được xác nhận trên FiiO K11; các tần số tín hiệu mang trên 384 kHz chưa được kiểm tra trên phần cứng.",
+          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang, hoặc được chuyển đổi thành PCM tần số cao. DoP đã được xác nhận trên FiiO K11; các tần số sóng mang trên 384 kHz chưa được kiểm tra trên phần cứng.",
           "DVD-Video LPCM ở 16, 20 và 24 bit, 48 và 96 kHz, tối đa 8 kênh. DVD-Audio không được hỗ trợ, và đĩa mã hóa (CSS) cần một bản sao đã giải mã."
         ],
         "links": [
@@ -207,7 +207,7 @@
       "airpods": {
         "jack": "AirPods Max",
         "kicker": "AirPods Max qua USB-C",
-        "title": "Không tổn hao trên AirPods Max, và nói rõ điều đó.",
+        "title": "Không tổn hao trên AirPods Max, và ứng dụng nói rõ điều đó.",
         "lede": "Khi kết nối bằng cáp USB-C, AirPods Max được nhận diện là thiết bị không tổn hao 24 bit / 48 kHz.",
         "body": [
           "Nhạc 48 kHz phát bit-perfect, mọi thứ khác được chuyển đổi bằng bộ resample chất lượng mastering của Apple, hiển thị rõ ràng. Qua Bluetooth, Vespertine cho bạn biết kết nối là AAC. Điều này dựa trên mô tả của Apple về đường truyền qua cáp và kết quả đọc lại từ Core Audio, vì AirPods không có đầu ra số để loopback."
@@ -222,12 +222,12 @@
         "list": [
           "Bộ lọc theo định dạng, 24 bit, từ 88,2 kHz trở lên, đa kênh, thể loại, năm, tần số lấy mẫu, số kênh và kết luận phân tích. Tìm kiếm không phân biệt chữ hoa, chữ thường và dấu.",
           "Danh sách phát thông minh theo đúng đơn vị bạn quen nghĩ: 24 bit, 88,2 kHz.",
-          "Các bản remaster, bản phát hành mono và stereo cùng các bản SACD của một album dùng chung một ô; chọn phiên bản khi bạn mở.",
+          "Các bản remaster, bản phát hành mono và stereo cùng các bản SACD của một album dùng chung một thẻ; chọn phiên bản khi bạn mở.",
           "Mục ưa thích và số lần phát được lưu trong thư viện, không bao giờ ghi vào tệp của bạn. Nhập danh sách phát M3U và Apple Music, cùng số lần phát và mục ưa thích.",
-          "Trình sửa thẻ có sao lưu và hoàn nguyên một bước, cùng tính năng bổ sung dữ liệu từ MusicBrainz cho biết độ tin cậy trước khi ghi bất cứ thứ gì.",
+          "Trình sửa thẻ có sao lưu và hoàn nguyên một bước, cùng tính năng bổ sung siêu dữ liệu từ MusicBrainz, cho biết độ tin cậy trước khi ghi bất cứ thứ gì.",
           "Thư mục chia sẻ qua mạng SMB, NFS hoặc WebDAV, có bộ nhớ đệm, Giữ ngoại tuyến và cơ chế phát lại được thiết kế cho máy chủ chậm.",
           "Tính năng Tìm nhạc quét mọi ổ đĩa để lọc ra nhạc thật của bạn và bỏ lại những thứ lộn xộn. Một bước thiết lập ngắn ở lần khởi chạy đầu tiên sẽ chọn đầu ra và giải thích truy cập độc quyền và ReplayGain có tác dụng gì.",
-          "EQ tham số theo từng đầu ra, nhập được preset AutoEQ và Equalizer APO. Mặc định tắt; khi bật, đường tín hiệu hiển thị <span class=\"mono nowrap\">EQUALIZER</span> thay vì <span class=\"mono nowrap\">BIT-PERFECT</span>.",
+          "EQ tham số theo từng đầu ra, nhập được preset AutoEQ và Equalizer APO. Mặc định tắt; khi bật, đường tín hiệu hiển thị <span class=\"mono nowrap\">BỘ CHỈNH ÂM</span> thay vì <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Trình phát mini, tiện ích trên thanh menu, phím media, ReplayGain và cập nhật tự động có chữ ký."
         ],
         "links": [
@@ -377,7 +377,7 @@
           "Không nêu trong tài liệu"
         ],
         [
-          "Âm thanh không gian của Apple cho tệp vòm cục bộ",
+          "Âm thanh không gian của Apple cho tệp âm thanh vòm cục bộ",
           "Có",
           "Chỉ Atmos trong kho nhạc³",
           "Không nêu trong tài liệu",
@@ -536,12 +536,12 @@
   },
   "press": {
     "title": "Bộ tài liệu báo chí: Vespertine, trình phát nhạc âm thanh vòm và hi-res cho Mac",
-    "description": "Thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và trailer của Vespertine, trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res.",
-    "ogAlt": "Bộ tài liệu báo chí Vespertine: bảng thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và trailer, trên nền ba ảnh chụp màn hình thật của ứng dụng.",
+    "description": "Thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu của Vespertine, trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res.",
+    "ogAlt": "Bộ tài liệu báo chí Vespertine: bảng thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu, trên nền ba ảnh chụp màn hình thật của ứng dụng.",
     "eyebrow": "Tài liệu báo chí",
     "heading": "Mọi thứ bạn cần để viết bài",
     "lede": "Vespertine là trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, các bản nhạc SACD 5.1 đã trích xuất, CD DTS, tệp DTS-HD MA, TrueHD và Atmos cùng nằm trong một thư viện, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Đường tín hiệu cho thấy từng bước từ tệp đến đầu ra, với các điều kiện và bài kiểm thử nằm trong mã nguồn GPL mà ai cũng có thể kiểm tra.",
-    "fine": "Xuất đúng từng kênh (channel-for-channel) và bitstream tới bộ thu là tính năng thử nghiệm, chưa được kiểm thử trên bộ thu thật và DAC USB đa kênh (mới thử một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Đối tượng Atmos trong Dolby Digital Plus do macOS kết xuất; TrueHD Atmos và DTS:X phát lớp kênh nền (channel bed) của chúng.",
+    "fine": "Xuất đúng từng kênh (channel-for-channel) và bitstream tới receiver là tính năng thử nghiệm, chưa được kiểm thử trên receiver thật và DAC USB đa kênh (mới thử một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Đối tượng Atmos trong Dolby Digital Plus do macOS kết xuất; TrueHD Atmos và DTS:X phát lớp kênh nền (channel bed) của chúng.",
     "facts": {
       "eyebrow": "Bảng thông tin",
       "title": "Thông tin chính.",
@@ -559,7 +559,7 @@
       "first": "Phát hành đầu tiên",
       "firstFine": "(với tên {formerName} 0.1.0)",
       "languages": "Ngôn ngữ",
-      "languagesValue": "Tiếng Anh và {languages} ngôn ngữ khác, gồm tiếng Ukraina, tiếng Ả Rập, tiếng Hebrew, tiếng Nhật và ba dạng tiếng Trung",
+      "languagesValue": "Tiếng Anh và {languages} ngôn ngữ khác, gồm tiếng Ukraina, tiếng Ả Rập, tiếng Do Thái, tiếng Nhật và ba dạng tiếng Trung",
       "install": "Cài đặt",
       "installValue": "<a href=\"{href.dmg}\">Tải tệp DMG</a> hoặc {brew}",
       "tested": "Đã thử với",
@@ -576,15 +576,15 @@
       "list": [
         "Nhạc âm thanh vòm trong một thư viện trên Mac, từ ảnh đĩa SACD và DVD-Video, bản rip và CD DTS đến TrueHD và DD+ Atmos, kèm Âm thanh không gian trên AirPods.",
         "Mã nguồn GPL-3.0 miễn phí mà ai cũng có thể đọc, tự biên dịch và chỉnh sửa.",
-        "Đường tín hiệu hiển thị tần số lấy mẫu, độ sâu bit (word length), mức tăng và xử lý kênh. Các điều kiện bit-perfect nằm ngay trong mã, có bài kiểm thử, công cụ kiểm tra loopback tích hợp và <a href=\"{href.verification}\">hướng dẫn kiểm chứng</a>."
+        "Đường tín hiệu hiển thị tần số lấy mẫu, độ dài từ (word length), mức tăng và xử lý kênh. Các điều kiện bit-perfect nằm ngay trong mã, có bài kiểm thử, công cụ kiểm tra loopback tích hợp và <a href=\"{href.verification}\">hướng dẫn kiểm chứng</a>."
       ],
-      "text": "Ứng dụng cũng có phân tích tệp hi-res. Phát hiện đệm số 0 (zero padding) là chính xác; kết luận dựa trên phổ chỉ là ước tính và có giới hạn. VeraVox và Audirvana AudioScan cũng có tính năng phân tích. <a href=\"{href.comparison}\">Nguồn so sánh</a>."
+      "text": "Ứng dụng cũng có phân tích tệp hi-res. Phát hiện chèn 0 (zero padding) là chính xác; kết luận dựa trên phổ chỉ là ước tính và có giới hạn. VeraVox và Audirvana AudioScan cũng có tính năng phân tích. <a href=\"{href.comparison}\">Nguồn so sánh</a>."
     },
     "video": {
       "eyebrow": "Video",
-      "title": "Trailer.",
+      "title": "Đoạn giới thiệu.",
       "text": "44 giây, 16:9, 1080p ở 60 fps, có âm thanh. <a href=\"{href.trailerDownload}\" download>Tải tệp MP4</a> ({size}). Có bản master 4K nếu bạn yêu cầu.",
-      "fallback": "Tải trailer (MP4)"
+      "fallback": "Tải đoạn giới thiệu (MP4)"
     },
     "logo": {
       "eyebrow": "Thương hiệu",
@@ -620,7 +620,7 @@
         "multichannel-albums": "Album được lọc theo đa kênh",
         "stereo-and-surround-versions": "Các bản nhạc SACD đã trích xuất, có phiên bản stereo và 5.1",
         "spatial-audio-airpods-max": "Một album 5.1 24/88,2 (Elton John, Goodbye Yellow Brick Road) dưới dạng Âm thanh không gian trên AirPods Max",
-        "fake-hi-res-detection": "Một bản “remaster” 24/192 mà phổ dừng ở 16 kHz (cố ý làm giả: chính nhạc của trailer, mã hóa sang MP3 rồi upsampling, dưới tên một ban nhạc bịa ra)",
+        "fake-hi-res-detection": "Một bản “remaster” 24/192 mà phổ dừng ở 16 kHz (cố ý làm giả: chính nhạc của đoạn giới thiệu, mã hóa sang MP3 rồi upsample, dưới tên một ban nhạc bịa ra)",
         "dsd-native-dop": "DSD128 qua DoP ở 352,8 kHz trên Fosi Audio ZD3: Claudja Barry, Love for the Sake of Love",
         "sacd-iso": "Một tệp SACD .iso, phát thẳng từ ảnh đĩa: Dire Straits, Brothers In Arms",
         "genres": "Thể loại",
@@ -661,8 +661,8 @@
     "websiteTitle": "Trang web này",
     "website": [
       "Trang này được lưu trữ trên GitHub Pages, nơi có thể ghi lại địa chỉ IP của khách truy cập; xem <a href=\"https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement\">tuyên bố về quyền riêng tư của GitHub</a>. Các nút tải xuống liên kết tới các bản phát hành của ứng dụng trên GitHub. Trang không đặt cookie và tải phông chữ, hình ảnh và video từ chính trang này.",
-      "Để biết mọi người dùng những trang và nút nào, trang đếm lượt truy cập bằng <a href=\"https://umami.is\">Umami</a>, phần mềm tôn trọng quyền riêng tư do chúng tôi tự vận hành tại stats.szeremeta.org. Công cụ này không đặt cookie, không lưu gì trên thiết bị của bạn, không giữ địa chỉ IP của bạn và không chia sẻ gì với nhà quảng cáo hay bất kỳ công ty nào khác. Nó ghi lại trang, trang web bạn đến từ đó, quốc gia gần đúng của bạn, trình duyệt, hệ điều hành, kích thước màn hình và ngôn ngữ, cùng các lượt nhấp vào nút tải xuống, GitHub và Homebrew. Nó không thể theo dõi bạn giữa các trang web hay nhận dạng bạn, và bỏ qua những khách truy cập có trình duyệt gửi tín hiệu Do Not Track. <strong>Ứng dụng không bao giờ liên lạc với nó.</strong>",
-      "Nếu bạn chọn ngôn ngữ bằng menu ngôn ngữ của trang, trình duyệt sẽ ghi nhớ lựa chọn đó trên thiết bị của bạn (trong bộ nhớ cục bộ), để trang không chuyển bạn về lại ngôn ngữ cũ. Lựa chọn này không bao giờ được gửi đi đâu, và trang vẫn hoạt động như vậy khi không có nó."
+      "Để biết mọi người dùng những trang và nút nào, trang đếm lượt truy cập bằng <a href=\"https://umami.is\">Umami</a>, phần mềm tôn trọng quyền riêng tư do chúng tôi tự vận hành tại stats.szeremeta.org. Công cụ này không đặt cookie, không lưu gì trên thiết bị của bạn, không giữ địa chỉ IP của bạn và không chia sẻ gì với nhà quảng cáo hay bất kỳ công ty nào khác. Nó ghi lại trang, trang web đã dẫn bạn tới đây, quốc gia gần đúng của bạn, trình duyệt, hệ điều hành, kích thước màn hình và ngôn ngữ, cùng các lượt nhấp vào nút tải xuống, GitHub và Homebrew. Nó không thể theo dõi bạn giữa các trang web hay nhận dạng bạn, và bỏ qua những khách truy cập có trình duyệt gửi tín hiệu Do Not Track. <strong>Ứng dụng không bao giờ liên lạc với nó.</strong>",
+      "Nếu bạn chọn ngôn ngữ bằng menu ngôn ngữ của trang, trình duyệt sẽ ghi nhớ lựa chọn đó trên thiết bị của bạn (trong bộ nhớ cục bộ), để trang không chuyển bạn về lại ngôn ngữ cũ. Lựa chọn này không bao giờ được gửi đi đâu, và trang vẫn hoạt động bình thường khi không có nó."
     ],
     "changesTitle": "Thay đổi và liên hệ",
     "changes": "Nếu điều này có thay đổi, trang này và ghi chú phát hành sẽ thông báo trước tiên. Mọi câu hỏi xin gửi dưới dạng một <a href=\"{href.issues}\">GitHub issue</a>."
@@ -682,7 +682,7 @@
     "musicTitle": "Nhạc của bạn và các dịch vụ khác",
     "music": "Bạn có trách nhiệm bảo đảm mình có quyền phát nhạc mà bạn thêm vào. Vespertine không phát được tệp có bảo vệ DRM và cũng không cố làm vậy. MusicBrainz, Cover Art Archive và ListenBrainz là các dịch vụ độc lập với điều khoản riêng, được áp dụng khi bạn dùng chúng thông qua Vespertine.",
     "trademarksTitle": "Nhãn hiệu",
-    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus và Dolby TrueHD là nhãn hiệu của Dolby Laboratories. DTS, DTS-HD Master Audio và DTS:X là nhãn hiệu của DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS và Âm thanh không gian (Spatial Audio) là nhãn hiệu của Apple Inc. Vespertine nhắc đến các tên này chỉ để mô tả những gì ứng dụng phát và phát ở đâu. Vespertine không được Dolby, DTS hay Apple chứng nhận, cấp phép hay xác nhận.",
+    "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus và Dolby TrueHD là nhãn hiệu của Dolby Laboratories. DTS, DTS-HD Master Audio và DTS:X là nhãn hiệu của DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS và Âm thanh không gian (Spatial Audio) là nhãn hiệu của Apple Inc. Vespertine nhắc đến các tên này chỉ để mô tả những gì ứng dụng phát và phát ở đâu. Vespertine không được Dolby, DTS hay Apple chứng nhận, cấp phép hay bảo trợ.",
     "contactTitle": "Liên hệ",
     "contact": "Lỗi, câu hỏi và yêu cầu: <a href=\"{href.issues}\">GitHub issues</a>.",
     "englishNote": "Đây là bản dịch để bạn tiện theo dõi. Văn bản có giá trị ràng buộc là chính Giấy phép Công cộng GNU, bằng tiếng Anh."

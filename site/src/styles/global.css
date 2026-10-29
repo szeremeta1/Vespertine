@@ -679,7 +679,19 @@ html:not(.js) .features::before {
 /* An element in another language (a name in the language menu) starts from the default faces, not the page
    language's: Greek or Cyrillic set in a Japanese face come out full-width. The language wall keeps exactly the
    faces it has on the English page, in every language. */
-[lang], .namewall { --serif: "Newsreader", "Newsreader fallback", "Iowan Old Style", Georgia, serif; --sans: "Inter", "Inter fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+[lang], .namewall { --serif: "Newsreader", "Newsreader fallback", "Iowan Old Style", Georgia, serif; --sans: "Inter", "Inter fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "JetBrains Mono", "JetBrains Mono fallback", ui-monospace, "SF Mono", Menlo, monospace; }
+/* The mono face has Latin only; text in other scripts set in mono (labels, meta lines) falls back to the script's own
+   UI face, so Arabic stays joined and Indic clusters stay whole. */
+:is(:lang(ar), :lang(fa), :lang(ur)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "SF Arabic", "Geeza Pro", "Segoe UI", "Noto Sans Arabic", ui-monospace, Menlo, monospace; }
+:lang(he):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "SF Hebrew", "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", ui-monospace, Menlo, monospace; }
+:is(:lang(hi), :lang(mr)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Kohinoor Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", ui-monospace, Menlo, monospace; }
+:is(:lang(bn), :lang(gu), :lang(pa), :lang(ta), :lang(te), :lang(kn), :lang(ml)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", system-ui, -apple-system, "Nirmala UI", sans-serif; }
+:lang(th):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Thonburi", "Leelawadee UI", "Noto Sans Thai", ui-monospace, Menlo, monospace; }
+:lang(am):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Kefa", "Noto Sans Ethiopic", "Ebrima", ui-monospace, Menlo, monospace; }
+:lang(ja):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", ui-monospace, Menlo, monospace; }
+:lang(ko):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", ui-monospace, Menlo, monospace; }
+:lang(zh-Hans):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", ui-monospace, Menlo, monospace; }
+:is(:lang(zh-Hant), :lang(zh-HK)):not(.namewall, .namewall *) { --mono: "JetBrains Mono", "JetBrains Mono fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", ui-monospace, Menlo, monospace; }
 :lang(ja):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; --sans: "Inter", "Inter fallback", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif; }
 :lang(zh-Hans):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti SC", "STSong", "Noto Serif SC", "SimSun", serif; --sans: "Inter", "Inter fallback", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
 :lang(zh-Hant):not(.namewall, .namewall *) { --serif: "Newsreader", "Newsreader fallback", "Songti TC", "Noto Serif TC", "PMingLiU", serif; --sans: "Inter", "Inter fallback", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif; }
