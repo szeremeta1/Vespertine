@@ -96,6 +96,10 @@ p.lede { font-size: 21px; line-height: 1.5; color: #c9c2b5; margin: 24px 0 0; wi
 .lang-ur h1 { line-height: 1.6; }
 .lang-ko { word-break: keep-all; }
 .lang-ja h1 { word-break: auto-phrase; }
+/* Chinese headlines break only where the site's hero breaks its lines (<wbr>), never inside a word. */
+.lang-zh-Hans h1, .lang-zh-Hant h1, .lang-zh-HK h1 { word-break: keep-all; }
+/* No one-character last lines (Chinese and Japanese ledes); the English cards keep their original wrapping. */
+.l10n p.lede { text-wrap: pretty; }
 `;
 
 const lockup = url('../src/assets/brand/logo.svg');
@@ -103,7 +107,9 @@ const shot = (n) => url(`../src/assets/shots/${n}.jpg`);
 const press = (n) => url(`../src/assets/press/${n}.jpg`);
 const mark = url('../../docs/brand/mark.svg');
 const brass = (s) => `<span class="brass-italic">${esc(s)}</span>`;
-const bdi = (s) => `<bdi>${esc(s)}</bdi>`;
+// An isolated run in the foot reads right to left if it has any Hebrew or Arabic-script letter ("Apple silicon وIntel"),
+// as runDir in src/i18n/index.ts does on the pages.
+const bdi = (s) => `<bdi dir="${/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(s) ? 'rtl' : 'ltr'}">${esc(s)}</bdi>`;
 
 /** The four cards' HTML in one language, from its locale file (the English cards are the originals, word for word). */
 function cards(lang) {
@@ -122,7 +128,7 @@ function cards(lang) {
     home: `
     <div class="copy">
       <img class="lockup" src="${lockup}" alt="">
-      <h1>${before(h.titleSr, h.titleBrass)}${brass(h.titleBrass)}</h1>
+      <h1>${lang.startsWith('zh-') ? `${h.titleLines.map(esc).join('<wbr>')}<wbr>` : before(h.titleSr, h.titleBrass)}${brass(h.titleBrass)}</h1>
       <p class="lede">${esc(og.homeLede)}</p>
       <div class="chips"><span class="chip brass">${esc(s.home.badges.bitPerfect)}</span><span class="chip" dir="ltr">SACD ISO</span><span class="chip" dir="ltr">DSD · DoP</span><span class="chip">${esc(og.spatial)}</span></div>
     </div>
@@ -189,7 +195,7 @@ const problems = [];
 for (const lang of langs) {
   const loc = LOCALES.find((l) => l.code === lang);
   const dir = loc.rtl ? 'rtl' : 'ltr';
-  const cls = [`lang-${lang}`, NO_ITALIC.has(lang) && 'no-italic', UNTRACKED.has(lang) && 'untracked', CJK.has(lang) && 'cjk'].filter(Boolean).join(' ');
+  const cls = [`lang-${lang}`, lang !== DEFAULT_LOCALE && 'l10n', NO_ITALIC.has(lang) && 'no-italic', UNTRACKED.has(lang) && 'untracked', CJK.has(lang) && 'cjk'].filter(Boolean).join(' ');
   const dest = lang === DEFAULT_LOCALE ? out : `${out}${lang}/`;
   mkdirSync(dest, { recursive: true });
   for (const [name, body] of Object.entries(cards(lang))) {
