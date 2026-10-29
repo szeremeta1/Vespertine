@@ -67,7 +67,29 @@ enum DeveloperHooks {
                 print("[qa] equalizer import failed: \(error.localizedDescription)")
             }
         }
-        // `-VespertineOpenWindow equalizer|mini`: opens one of the app's other windows.
+        // `-VespertineRoomProfile <file>`: imports a room correction (room-profile.json, Equalizer APO text, or an
+        // impulse response) for the output in use and turns it on, as Import in the Room Correction window does.
+        if let path = d.string(forKey: "VespertineRoomProfile"), let device = model.activeDevice {
+            let url = URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
+            let name = url.deletingPathExtension().lastPathComponent
+            do {
+                var profile: RoomProfile
+                switch url.pathExtension.lowercased() {
+                case "json": profile = try RoomCorrectionCoding.decodeProfile(try Data(contentsOf: url))
+                case "txt": profile = try RoomAPO.profile(try String(contentsOf: url, encoding: .utf8), name: name, deviceUID: device.uid)
+                default: profile = try RoomImpulseImport.profile(files: [url], name: name, deviceUID: device.uid)
+                }
+                profile.deviceUID = device.uid
+                model.settings.saveRoomProfile(profile)
+                model.settings.setRoomProfile(profile.id, for: device.uid)
+                model.syncEngine()
+                print("[qa] room correction: \(profile.name), \(profile.layout.speakers.count) speakers")
+            } catch {
+                print("[qa] room correction import failed: \(error.localizedDescription)")
+            }
+        }
+        // `-VespertineOpenWindow equalizer|mini|room-correction`: opens one of the app's other windows.
+        // `-VespertineOpenSheet room-measure`: opens the measurement wizard at its first step, without starting it.
         if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
         if d.string(forKey: "VespertineOpenSheet")?.hasPrefix("loopback") == true { model.showLoopbackTest = true }   // loopback-run also starts it
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing

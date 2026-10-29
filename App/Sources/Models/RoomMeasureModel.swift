@@ -1,6 +1,7 @@
 //
 // Vespertine — room measurement: finds the microphone and the output, runs the measurement state machine, writes
-// everything it learns to ~/Documents/Vespertine Room Measurements/<timestamp>/ and designs a room correction profile
+// everything it learns to ~/Documents/Vespertine Room Measurements/<timestamp>/ (under the data directory in isolated
+// QA runs) and designs a room correction profile
 // from the result (offered for saving; nothing plays through it until it is saved and switched on).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -27,6 +28,16 @@ final class RoomMeasureModel {
         UserDefaults.standard.string(forKey: "roomCalibrationPath") ?? "~/Documents/UMIK-1/"
     }
 
+    /// Where measurement folders go: Documents, or the data directory of an isolated QA run (`-VespertineDataDirectory`).
+    static var measurementsRoot: URL {
+        if let data = LaunchArguments().string(forKey: "VespertineDataDirectory") {
+            return URL(fileURLWithPath: (data as NSString).expandingTildeInPath, isDirectory: true)
+                .appendingPathComponent("Room Measurements", isDirectory: true)
+        }
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Vespertine Room Measurements", isDirectory: true)
+    }
+
     @ObservationIgnored let launch: RoomMeasureLaunch?
     var phase = Phase.ready
     var headline = String(localized: "Ready to measure")
@@ -38,7 +49,10 @@ final class RoomMeasureModel {
     var folder: URL?
     var plot: NSImage?
     var calibrationPath: String
-    var positions = 1
+    /// Microphone positions around the seat (the first is the seat itself).
+    var positions = RoomMeasureLaunch.maxPositions
+    /// The speakers measured: stereo, or 5.1 on an output with six channels or more.
+    var layout = RoomLayout.stereo
     var simulate = false
     var attempt = 1
     /// The profile designed from a completed run, until it is saved or discarded.
@@ -62,7 +76,7 @@ final class RoomMeasureModel {
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         launch = RoomMeasureLaunch.parse(arguments)
         calibrationPath = launch?.calibrationPath ?? Self.defaultCalibration
-        positions = launch?.positions ?? 1
+        positions = launch?.positions ?? RoomMeasureLaunch.maxPositions
         simulate = launch?.simulate ?? false
     }
 
@@ -163,7 +177,10 @@ final class RoomMeasureModel {
             mic = found
             output = out
         }
-        guard output.channels >= 2 else { return fail(String(localized: "\(output.name) has \(output.channels) output channel(s); a stereo measurement needs two.")) }
+        let needed = layout.speakers.count
+        guard output.channels >= needed else {
+            return fail(String(localized: "\(output.name) has \(output.channels) output channel(s); this measurement needs \(needed)."))
+        }
         let rate = output.nominalRate
         guard rate >= 8_000 else { return fail(String(localized: "Couldn't read the sample rate of \(output.name).")) }
 
@@ -177,7 +194,7 @@ final class RoomMeasureModel {
 
         // Folder, session, controller.
         let stamp = Self.timestamp()
-        let root = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Vespertine Room Measurements", isDirectory: true)
+        let root = Self.measurementsRoot
         let folder = root.appendingPathComponent(stamp, isDirectory: true)
         do { try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true) }
         catch { return fail(String(localized: "Couldn't create \(folder.path): \(error.localizedDescription)")) }
@@ -187,7 +204,7 @@ final class RoomMeasureModel {
         var settings = RoomMeasurementSettings(inputDevice: mic.id, outputDevice: output.id)
         settings.sampleRate = rate
         settings.positions = positions
-        let session = RoomSession(id: UUID(), createdAt: Date(), deviceUID: output.uid, layout: .stereo, channelMap: .standard(.stereo),
+        let session = RoomSession(id: UUID(), createdAt: Date(), deviceUID: output.uid, layout: layout, channelMap: .standard(layout),
                                   mic: cal.mic(orientation: .upward), target: RoomFilterDesignOptions.default.target.roomTarget)
         outputName = output.name
         micSerial = serial
@@ -203,8 +220,8 @@ final class RoomMeasureModel {
         steps = Self.plan(speakers: speakers, positions: positions).map { StepRow(step: $0, status: .pending) }
         deviceLines = [
             String(localized: "Microphone: \(mic.name) (serial \(serial), \(Int(cal.points.count)) calibration points, mic pointing up)"),
-            String(localized: "Output: \(output.name) at \(Int(rate)) Hz, left on channel 1, right on channel 2 (unverified wiring)"),
-            String(localized: "Saving to \(folder.path)"),
+            String(localized: "Output: \(output.name) at \(Int(rate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
+            String(localized: "Saving to \((folder.path as NSString).abbreviatingWithTildeInPath)"),
         ]
         try? "\(folder.path)\n".write(to: root.appendingPathComponent("last-run.txt"), atomically: true, encoding: .utf8)
         startPolling()
@@ -321,6 +338,33 @@ final class RoomMeasureModel {
         }
     }
 
+    // MARK: Room Portrait
+
+    /// The microphone position being measured (or the next one), 0 = the seat.
+    var currentPosition: Int {
+        if let active = steps.first(where: { $0.status == .active || $0.status == .problem }), case .sweep(_, let p) = active.step { return p }
+        let done = steps.filter { if case .sweep = $0.step { $0.status == .done } else { false } }
+        guard let last = done.last, case .sweep(_, let p) = last.step else { return 0 }
+        let complete = speakers.allSatisfy { s in done.contains { $0.step == .sweep(s, p) } }
+        return complete && phase != .finished ? min(p + 1, positions - 1) : p
+    }
+
+    /// The speaker playing now, if any.
+    var activeSpeaker: RoomSpeaker? {
+        guard phase == .running, let active = steps.first(where: { $0.status == .active }) else { return nil }
+        switch active.step {
+        case .levelCheck: return speakers.first
+        case .routeCheck(let s), .sweep(let s, _): return s
+        }
+    }
+
+    /// Positions whose sweeps are all done.
+    var measuredPositions: Set<Int> {
+        Set((0..<positions).filter { p in
+            !speakers.isEmpty && speakers.allSatisfy { s in steps.contains { $0.step == .sweep(s, p) && $0.status == .done } }
+        })
+    }
+
     // MARK: Results
 
     private func publishResults() async {
@@ -330,34 +374,18 @@ final class RoomMeasureModel {
         let calibration = calibration
         let session = controller.session
         let recordings = controller.acceptedRecordings
-        let positionOf: [Date: Int] = Dictionary(session.captures.map { ($0.recordedAt, $0.position) }, uniquingKeysWith: { a, _ in a })
-        let map = session.channelMap
         do {
             let name = String(localized: "\(outputName) · \(Date().formatted(date: .abbreviated, time: .shortened))", comment: "Room correction profile name: output name and when it was measured.")
             let serial = micSerial
             let (written, profile): ([RoomResponseFiles.Written], RoomProfile) = try await Task.detached(priority: .userInitiated) {
-                var byPosition: [Int: [RoomSpeaker: RoomMagnitudeResponse]] = [:]
-                for recording in recordings {
-                    guard let speaker = map.entries.first(where: { $0.output == recording.request.outputChannel })?.speaker else { continue }
-                    let position = positionOf[recording.startedAt] ?? 0
-                    byPosition[position, default: [:]][speaker] = try RoomMagnitudeResponse.compute(recording: recording, calibration: calibration)
+                let result = try RoomMeasurementResult.make(recordings: recordings, session: session, calibration: calibration, name: name, micSerial: serial)
+                let written = try result.responses.keys.sorted().map {
+                    try RoomResponseFiles.write(result.responses[$0] ?? [:], to: folder, name: "response-p\($0 + 1)")
                 }
-                let written = try byPosition.keys.sorted().map { try RoomResponseFiles.write(byPosition[$0] ?? [:], to: folder, name: "response-p\($0 + 1)") }
-                // Each speaker on its own: its positions averaged in power, never mixed with another speaker.
-                var curves: [RoomSpeaker: RoomCurve] = [:]
-                for speaker in map.entries.map(\.speaker) {
-                    let measured = try byPosition.keys.sorted().compactMap { byPosition[$0]?[speaker] }.map { try RoomCurve($0) }
-                    if !measured.isEmpty { curves[speaker] = try RoomCurve.powerAverage(measured) }
-                }
-                let options = RoomFilterDesignOptions.default
-                let design = try RoomFilterDesigner.design(channels: curves, options: options)
-                var profile = design.profile(name: name, sessionID: session.id, deviceUID: session.deviceUID, channelMap: map, micSerial: serial,
-                                             calibrationSHA256: session.mic.calibrationSHA256)
-                profile.measured = curves
-                profile.designOptions = options
-                try RoomCorrectionCoding.encode(profile).write(to: folder.appendingPathComponent("room-profile.json"), options: .atomic)
-                try RoomCorrectionPreview(design: design).renderPNG(title: name).write(to: folder.appendingPathComponent("room-correction-predicted.png"), options: .atomic)
-                return (written, profile)
+                try RoomCorrectionCoding.encode(result.profile).write(to: folder.appendingPathComponent("room-profile.json"), options: .atomic)
+                try RoomCorrectionPreview(design: result.design).renderPNG(title: name)
+                    .write(to: folder.appendingPathComponent("room-correction-predicted.png"), options: .atomic)
+                return (written, result.profile)
             }.value
             if let first = written.first { plot = NSImage(contentsOf: first.plot) }
             draft = profile

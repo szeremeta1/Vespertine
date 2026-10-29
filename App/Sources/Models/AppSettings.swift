@@ -125,11 +125,14 @@ final class AppSettings {
     var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
     /// The preset each output plays with (device UID → preset ID, or Off). Outputs that aren't listed play without one.
     var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
-    /// Room correction profiles, measured here. Each belongs to the output it was measured on.
+    /// Room correction profiles, measured here or imported. Each belongs to the output it was measured on (or imported for).
     var roomProfiles: [RoomProfile] { didSet { defaults.set(try? RoomCorrectionCoding.encodeProfiles(roomProfiles), forKey: "roomProfiles") } }
     /// The profile each output plays with while room correction is on for it (device UID → profile ID). Off unless
     /// switched on: outputs that aren't listed play without it.
     var roomAssignments: [String: String] { didSet { defaults.set(roomAssignments, forKey: "roomAssignments") } }
+    /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
+    /// converted to PCM while correction is on, so it's corrected too.
+    var roomNativeDSDDeviceUIDs: Set<String> { didSet { defaults.set(roomNativeDSDDeviceUIDs.sorted(), forKey: "roomNativeDSD") } }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
@@ -202,6 +205,7 @@ final class AppSettings {
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
         roomProfiles = defaults.data(forKey: "roomProfiles").flatMap { try? RoomCorrectionCoding.decodeProfiles($0) } ?? []
         roomAssignments = defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]
+        roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
         if let dataDirectory {
             self.dataDirectory = dataDirectory
@@ -251,8 +255,12 @@ final class AppSettings {
     }
 
     func deleteRoomProfile(_ id: UUID) {
+        let removed = roomProfiles.first { $0.id == id }
         roomProfiles.removeAll { $0.id == id }
         roomAssignments = roomAssignments.filter { $0.value != id.uuidString }
+        // Its measured filters go too, unless another profile still uses them.
+        let kept = Set(roomProfiles.flatMap { ($0.impulses ?? [:]).values.map(\.file) })
+        for impulse in Set((removed?.impulses ?? [:]).values) where !kept.contains(impulse.file) { impulse.delete() }
     }
 
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
@@ -268,6 +276,7 @@ final class AppSettings {
             roomProfiles = roomProfiles.map { var p = $0; if p.deviceUID == old { p.deviceUID = new }; return p }
         }
         if roomAssignments[new] == nil, let profile = roomAssignments[old] { roomAssignments[new] = profile }
+        if roomNativeDSDDeviceUIDs.contains(old) { roomNativeDSDDeviceUIDs.insert(new) }
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
     }
@@ -324,6 +333,7 @@ final class AppSettings {
         s.roomCorrections = Dictionary(uniqueKeysWithValues: roomAssignments.keys.compactMap { uid in
             roomProfile(for: uid).map { (uid, RoomCorrectionPlayback(profile: $0)) }
         })
+        s.roomNativeDSDDeviceUIDs = roomNativeDSDDeviceUIDs
         return s
     }
 }
