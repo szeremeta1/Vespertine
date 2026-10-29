@@ -54,8 +54,8 @@
     "home": "Simula"
   },
   "home": {
-    "title": "Vespertine: surround at hi-res na music player para sa Mac",
-    "description": "Libre at open-source na Mac player para sa mga koleksyong surround at hi-res: mga disc image ng SACD at DVD-Video, DSD, mga DTS CD, mga file na DTS-HD MA, TrueHD at Dolby Atmos, Spatial Audio sa AirPods, room correction na sinusukat sa sarili mong kuwarto, at bit-perfect na signal path na masusuri mo.",
+    "title": "Vespertine: libreng hi-res at surround na music player para sa Mac",
+    "description": "Libre at open-source na music player para sa Mac: SACD ISO at DVD-Video, DSD, multichannel na surround sa DTS-HD MA, TrueHD at Dolby Atmos, bit-perfect na hi-res, Spatial Audio sa AirPods at room correction.",
     "ogAlt": "Vespertine: ang libre at open-source na Mac player para sa surround at hi-res na musika. Ipinapakita ng signal path nito ang isang 24-bit / 96 kHz na FLAC na nagpe-play nang bit-perfect sa isang Fosi Audio ZD3. Bersyon {version}, macOS {minMacOS} o mas bago.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Bakit Vespertine",
-      "title": "Ginawa para sa koleksyon mong surround.",
+      "title": "Isang music player para sa Mac, ginawa para sa surround at hi-res.",
       "text": "Surround at stereo na musika sa iisang library, at player na ipinapakita kung ano mismo ang ginawa nito sa signal.",
       "badgesLabel": "Mga estado ng signal path na ipinapakita ng app"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Source code ng Vespertine",
     "trailerName": "Trailer ng Vespertine",
     "trailerDescription": "Isang 44-segundong paglilibot sa Vespertine, ni-record mula sa totoong app gamit ang sariling library ng developer: ang bit-perfect na signal path, DSD sa DoP, surround bilang Spatial Audio sa AirPods at pagsusuri ng hi-res na file.",
-    "keywords": "bit-perfect, hi-res na audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, music player, macOS, open source"
+    "keywords": "music player para sa Mac, hi-res player sa Mac, DSD player, SACD ISO, multichannel na audio, surround na musika, Dolby Atmos, DTS-HD Master Audio, bit-perfect na playback, room correction, Spatial Audio, FLAC player, libre, open source"
+  },
+  "og": {
+    "homeLede": "Mga image ng SACD at DVD-Video, DSD, Dolby Atmos, TrueHD at DTS sa iisang library, may signal path na masusuri mo.",
+    "spatial": "Spatial Audio",
+    "pressLede": "Fact sheet, mga logo, key art, totoong screenshot at ang trailer.",
+    "privacyLede": "Walang account, analytics, telemetry, crash reporting o advertising. Pampubliko ang source code, kaya masusuri mo ito.",
+    "termsLede": "Ang GNU General Public License, bersyon 3 o mas bago. Walang babayaran, walang kailangang i-sign up."
   },
   "releases": {
     "0.14.0": {

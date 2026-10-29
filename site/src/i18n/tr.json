@@ -54,8 +54,8 @@
     "home": "Ana sayfa"
   },
   "home": {
-    "title": "Vespertine: Mac için surround ve hi-res müzik oynatıcısı",
-    "description": "Surround ve hi-res koleksiyonlar için ücretsiz, açık kaynak Mac oynatıcısı: SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Dolby Atmos dosyaları, AirPods’ta Uzamsal Ses, kendi odanızda ölçülen oda düzeltmesi ve inceleyebileceğiniz bit-perfect bir sinyal yolu.",
+    "title": "Vespertine: Mac için ücretsiz hi-res ve surround müzik çalar",
+    "description": "Mac için ücretsiz, açık kaynak müzik oynatıcısı: SACD ISO ve DVD-Video, DSD, DTS-HD MA, TrueHD ve Dolby Atmos ile çok kanallı surround, bit-perfect hi-res, AirPods’ta Uzamsal Ses ve oda düzeltmesi.",
     "ogAlt": "Vespertine: surround ve hi-res müzik için ücretsiz, açık kaynak Mac oynatıcısı. Sinyal yolu, bir Fosi Audio ZD3 üzerinde bit-perfect çalan 24 bit / 96 kHz bir FLAC dosyasını gösteriyor. Sürüm {version}, macOS {minMacOS} veya üstü.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Neden Vespertine",
-      "title": "Surround koleksiyonunuz için tasarlandı.",
+      "title": "Surround ve hi-res için tasarlanmış bir Mac müzik çalar.",
       "text": "Surround ve stereo müzik tek bir arşivde; üstelik sinyale tam olarak ne yaptığını gösteren bir oynatıcıyla.",
       "badgesLabel": "Uygulamanın gösterdiği sinyal yolu durumları"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Vespertine kaynak kodu",
     "trailerName": "Vespertine fragmanı",
     "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 44 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve hi-res dosya analizi.",
-    "keywords": "bit-perfect, hi-res ses, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Uzamsal Ses, AirPods Max, FLAC, müzik oynatıcı, macOS, açık kaynak"
+    "keywords": "Mac müzik çalar, hi-res müzik çalar, DSD çalar, SACD ISO oynatma, çok kanallı ses, surround müzik, Dolby Atmos, DTS-HD Master Audio, bit-perfect çalma, oda düzeltmesi, Uzamsal Ses, FLAC çalar, ücretsiz, açık kaynak"
+  },
+  "og": {
+    "homeLede": "SACD ve DVD-Video görüntüleri, DSD, Dolby Atmos, TrueHD ve DTS tek arşivde; üstelik kontrol edebileceğiniz bir sinyal yoluyla.",
+    "spatial": "Uzamsal Ses",
+    "pressLede": "Bilgi sayfası, logolar, tanıtım görselleri, gerçek ekran görüntüleri ve fragman.",
+    "privacyLede": "Hesap, analitik, telemetri, çökme raporu veya reklam yok. Kaynak kodu herkese açık, kendiniz kontrol edebilirsiniz.",
+    "termsLede": "GNU General Public License, sürüm 3 veya sonrası. Ödenecek bir şey yok, kayıt yok."
   },
   "releases": {
     "0.14.0": {

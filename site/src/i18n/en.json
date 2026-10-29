@@ -54,8 +54,8 @@
     "home": "Home"
   },
   "home": {
-    "title": "Vespertine: surround and hi-res music player for Mac",
-    "description": "Free, open-source Mac player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, room correction measured in your own room, and a bit-perfect signal path you can inspect.",
+    "title": "Vespertine: free surround and hi-res music player for Mac",
+    "description": "Free, open-source Mac music player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, room correction measured in your own room, and a bit-perfect signal path you can inspect.",
     "ogAlt": "Vespertine: the free, open-source Mac player for surround and hi-res music. Its signal path shows a 24-bit / 96 kHz FLAC playing bit-perfect on a Fosi Audio ZD3. Version {version}, macOS {minMacOS} or later.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Why Vespertine",
-      "title": "Built for your surround collection.",
+      "title": "A Mac music player built for surround and hi-res.",
       "text": "Surround and stereo music in one library, and a player that shows exactly what it did to the signal.",
       "badgesLabel": "Signal path states the app shows"
     },
@@ -743,7 +743,7 @@
     "sourceName": "Vespertine source code",
     "trailerName": "Vespertine trailer",
     "trailerDescription": "A 44-second tour of Vespertine, recorded from the real app on the developer’s own library: the bit-perfect signal path, DSD over DoP, surround as Spatial Audio on AirPods and hi-res file analysis.",
-    "keywords": "bit-perfect, hi-res audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, music player, macOS, open source"
+    "keywords": "hi-res music player for Mac, surround music player, SACD ISO player, DSD player for Mac, multichannel audio, Dolby Atmos music, DTS-HD Master Audio, DVD-Video LPCM, bit-perfect playback, room correction, Spatial Audio, AirPods Max, FLAC player, free, open source"
   },
   "og": {
     "homeLede": "SACD and DVD-Video images, DSD, Dolby Atmos, TrueHD and DTS in one library, with a signal path you can check.",

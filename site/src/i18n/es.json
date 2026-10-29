@@ -54,8 +54,8 @@
     "home": "Inicio"
   },
   "home": {
-    "title": "Vespertine: reproductor de música envolvente y en alta resolución para Mac",
-    "description": "Reproductor para Mac gratuito y de código abierto para colecciones envolventes y en alta resolución: imágenes de disco SACD y DVD-Video, DSD, CD DTS, archivos DTS-HD MA, TrueHD y Dolby Atmos, Audio espacial en AirPods, corrección de sala medida en tu propia sala y una ruta de señal bit-perfect que puedes inspeccionar.",
+    "title": "Vespertine: reproductor de música hi-res y multicanal para Mac",
+    "description": "Reproductor de música gratuito y de código abierto para Mac: SACD ISO y DVD-Video, DSD, sonido envolvente multicanal en DTS-HD MA, TrueHD y Dolby Atmos, alta resolución bit-perfect, Audio espacial en AirPods y corrección de sala.",
     "ogAlt": "Vespertine: el reproductor para Mac gratuito y de código abierto para música envolvente y en alta resolución. Su ruta de señal muestra un FLAC de 24 bits / 96 kHz reproduciéndose bit-perfect en un Fosi Audio ZD3. Versión {version}, macOS {minMacOS} o posterior.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Por qué Vespertine",
-      "title": "Pensado para tu colección envolvente.",
+      "title": "Un reproductor de música para Mac, pensado para multicanal y alta resolución.",
       "text": "Música envolvente y estéreo en una sola biblioteca, y un reproductor que muestra exactamente qué le ha hecho a la señal.",
       "badgesLabel": "Estados de la ruta de señal que muestra la app"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Código fuente de Vespertine",
     "trailerName": "Tráiler de Vespertine",
     "trailerDescription": "Un recorrido de 44 segundos por Vespertine, grabado con la app real sobre la biblioteca del propio desarrollador: la ruta de señal bit-perfect, DSD por DoP, música envolvente como Audio espacial en los AirPods y el análisis de archivos en alta resolución.",
-    "keywords": "bit-perfect, audio de alta resolución, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Audio espacial, AirPods Max, FLAC, reproductor de música, macOS, código abierto"
+    "keywords": "reproductor de música para Mac, reproductor hi-res Mac, reproductor DSD, reproducir SACD ISO, audio multicanal, sonido envolvente, Dolby Atmos, DTS-HD Master Audio, reproducción bit-perfect, corrección de sala, audio espacial, reproductor FLAC, gratis, código abierto"
+  },
+  "og": {
+    "homeLede": "Imágenes SACD y DVD-Video, DSD, Dolby Atmos, TrueHD y DTS en una sola biblioteca, con una ruta de señal que puedes comprobar.",
+    "spatial": "Audio espacial",
+    "pressLede": "Ficha de datos, logotipos, imágenes promocionales, capturas reales y el tráiler.",
+    "privacyLede": "Ni cuentas, ni analíticas, ni telemetría, ni informes de fallos, ni publicidad. El código es público: puedes comprobarlo.",
+    "termsLede": "La Licencia Pública General de GNU, versión 3 o posterior. Nada que pagar, sin registro."
   },
   "releases": {
     "0.14.0": {

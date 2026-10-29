@@ -54,8 +54,8 @@
     "home": "Acasă"
   },
   "home": {
-    "title": "Vespertine: player de muzică surround și hi-res pentru Mac",
-    "description": "Player gratuit și open source pentru Mac, pentru colecții surround și hi-res: imagini de disc SACD și DVD-Video, DSD, CD-uri DTS, fișiere DTS-HD MA, TrueHD și Dolby Atmos, Audio spațial pe AirPods, corecția camerei măsurată chiar în camera dumneavoastră și o cale a semnalului bit-perfect pe care o puteți inspecta.",
+    "title": "Vespertine: player de muzică hi-res și surround gratuit pentru Mac",
+    "description": "Player de muzică gratuit și open source pentru Mac: SACD ISO și DVD-Video, DSD, surround multicanal în DTS-HD MA, TrueHD și Dolby Atmos, hi-res bit-perfect, Audio spațial pe AirPods și corecția camerei.",
     "ogAlt": "Vespertine: playerul gratuit și open source pentru Mac, creat pentru muzica surround și hi-res. Calea semnalului arată un FLAC de 24 de biți / 96 kHz redat bit-perfect pe un Fosi Audio ZD3. Versiunea {version}, macOS {minMacOS} sau o versiune ulterioară.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "De ce Vespertine",
-      "title": "Creat pentru colecția dumneavoastră surround.",
+      "title": "Un player de muzică pentru Mac, creat pentru surround și hi-res.",
       "text": "Muzică surround și stereo într-o singură bibliotecă și un player care arată exact ce a făcut cu semnalul.",
       "badgesLabel": "Stările căii semnalului afișate de aplicație"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Codul sursă Vespertine",
     "trailerName": "Trailer Vespertine",
     "trailerDescription": "Un tur de 44 de secunde prin Vespertine, înregistrat din aplicația reală, pe biblioteca proprie a dezvoltatorului: calea semnalului bit-perfect, DSD prin DoP, surround ca Audio spațial pe AirPods și analiza fișierelor hi-res.",
-    "keywords": "bit-perfect, audio hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Audio spațial, AirPods Max, FLAC, player muzical, macOS, open source"
+    "keywords": "player de muzică pentru Mac, player hi-res Mac, player DSD, redare SACD ISO, audio multicanal, muzică surround, Dolby Atmos, DTS-HD Master Audio, redare bit-perfect, corecția camerei, audio spațial, player FLAC, gratuit, open source"
+  },
+  "og": {
+    "homeLede": "Imagini SACD și DVD-Video, DSD, Dolby Atmos, TrueHD și DTS într-o singură bibliotecă, cu o cale a semnalului pe care o puteți verifica.",
+    "spatial": "Audio spațial",
+    "pressLede": "Fișă tehnică, logouri, imagini de prezentare, capturi de ecran reale și trailerul.",
+    "privacyLede": "Fără conturi, analiză de utilizare, telemetrie, raportarea blocărilor sau publicitate. Codul sursă este public, deci puteți verifica.",
+    "termsLede": "GNU General Public License, versiunea 3 sau ulterioară. Nimic de plătit, fără înregistrare."
   },
   "releases": {
     "0.14.0": {
