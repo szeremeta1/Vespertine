@@ -153,12 +153,12 @@
         "title": "Mål dit rum. Korriger hver højttaler.",
         "lede": "Mål dit rum med en UMIK-1 eller en anden kalibreret USB-mikrofon, så tilpasser Vespertine filtre til hver højttaler ud fra det, den hører ved din plads.",
         "body": [
-          "Sweeps afspilles gennem én højttaler ad gangen, på ét til fem steder omkring din lytteplads. Hver højttaler får sine egne filtre, designet ud fra målingen. Det er primært dæmpninger: De tager rummets toppe ned og løfter kun brede dyk forsigtigt. Den samme måling indstiller hver højttalers forsinkelse og niveau, så alle højttalere når din plads på samme tid og med samme lydstyrke. Rumkorrektion er slået fra som standard, og afspilningen forbliver bitperfekt, mens den er slået fra. Når den er slået til, viser signalvejen <span class=\"mono nowrap\">RUMKORREKTION</span>."
+          "Sweeps afspilles gennem én højttaler ad gangen, på ét til fem steder omkring din lytteplads. Hver højttaler får sine egne filtre, designet ud fra målingen. Det er primært dæmpninger: De tager rummets toppe ned og løfter brede dyk kun forsigtigt. Den samme måling indstiller hver højttalers forsinkelse og niveau, så alle højttalere når din plads på samme tid og med samme lydstyrke. Rumkorrektion er slået fra som standard, og afspilningen forbliver bitperfekt, mens den er slået fra. Når den er slået til, viser signalvejen <span class=\"mono nowrap\">RUMKORREKTION</span>."
         ],
         "list": [
           "Tre målkurver: Warm (standard), Gentle tilt og Flat. Korriger kun bassen eller det fulde register, og design filtrene om senere uden at måle igen.",
           "Importerer filtre fra REW eller Equalizer APO med hver højttalers forsinkelse og niveau og eksporterer tekst til Equalizer APO.",
-          "Importerer impulsresponser (WAV, AIFF, CAF eller FLAC) og afspiller dem via konvolution.",
+          "Importerer impulsresponser (WAV, AIFF, CAF eller FLAC) og anvender dem ved afspilning via konvolution.",
           "Stereo og 5.1.",
           "Rumportrættet viser højttalerne, din plads og hver mikrofonplacering, efterhånden som den måles. Derefter forvandler kurveovergangen den målte respons til den forudsagte, og en før/efter-kontakt sammenligner dem."
         ],
@@ -197,7 +197,7 @@
         ],
         "list": [
           "Matchede sacd_extract bit for bit på to rigtige diske. Diske med et 5.0-område, kun et flerkanalsområde eller DSD128 og derover er indtil videre kun dækket af syntetiserede testbilleder.",
-          "DSF og DSDIFF fra DSD64 til DSD512, inklusive DST-komprimeret DSDIFF, sendes som DoP til DAC'er, der tager bærefrekvensen, eller konverteres til PCM med høj frekvens. DoP er bekræftet op til DSD256 på en Fosi Audio ZD3 og op til DSD128 på en FiiO K11; DSD512 via DoP er utestet på hardware.",
+          "DSF og DSDIFF fra DSD64 til DSD512, inklusive DST-komprimeret DSDIFF, sendes som DoP til DAC'er, der understøtter bærefrekvensen, eller konverteres til PCM med høj samplingfrekvens. DoP er bekræftet op til DSD256 på en Fosi Audio ZD3 og op til DSD128 på en FiiO K11; DSD512 via DoP er utestet på hardware.",
           "DVD-Video LPCM i 16, 20 og 24 bit, 48 og 96 kHz, op til 8 kanaler. DVD-Audio understøttes ikke, og krypterede (CSS) diske kræver en dekrypteret kopi."
         ],
         "links": [
@@ -435,7 +435,7 @@
         ],
         [
           "Rumkorrektion",
-          "Målt i appen (USB-mikrofon) eller import fra REW / APO og af impulsresponser",
+          "Måling i appen (USB-mikrofon) eller import fra REW / APO og af impulsresponser",
           "Nej",
           "Via konvolution (Origin: betalt tilvalg) eller Audio Units",
           "Via konvolution",
@@ -527,7 +527,7 @@
         },
         {
           "q": "Hvilken hardware er den testet på?",
-          "a": "PCM-afspilning er testet op til 768 kHz og DSD256 på en Fosi Audio ZD3 og op til 384 kHz og DSD128 på en FiiO K11, hvor heltalstilstand også er testet. Afspilning er desuden testet på AirPods Max via USB-C og Bluetooth, højttalerne i en MacBook Pro og et Sony-tv over HDMI i 5.1. Intel-hardware er ikke testet. Bitstream til receiver og flerkanals DAC-output er eksperimentelle, utestede på rigtige receivere og flerkanals-USB-DAC’er (ét Sony-tv over HDMI er testet: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
+          "a": "PCM-afspilning er testet op til 768 kHz og DSD256 på en Fosi Audio ZD3 og op til 384 kHz og DSD128 på en FiiO K11, hvor heltalstilstand også er testet. Afspilning er desuden testet på AirPods Max via USB-C og Bluetooth, højttalerne i en MacBook Pro og et Sony-tv over HDMI i 5.1. Intel-hardware er ikke testet. Bitstream til receiver og flerkanals-DAC-output er eksperimentelle og ikke testet på rigtige receivere og flerkanals-USB-DAC’er (ét Sony-tv over HDMI er testet: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
         },
         {
           "q": "Findes den på mit sprog?",
@@ -688,7 +688,7 @@
     "updated": "Gælder fra {effective} (tilføjer rumkorrektionens brug af mikrofonen, til version 0.14). Tidligere ændringer: den valgfrie Discord-status, {discordUpdated}; afsnittet »Dette websted«, {statsUpdated}, da webstedet begyndte at tælle besøg med selvhostet, cookiefri statistik. Den {langUpdated} begyndte afsnittet »Dette websted« også at beskrive sprogmenuen, som husker dit valg på din enhed.",
     "intro": "Vespertine er en gratis open source-musikafspiller. Appen har ingen konti, ingen analyse, ingen telemetri, ingen nedbrudsrapportering og ingen reklamer. Udvikleren modtager ingen oplysninger om dig eller din musik. Fordi kildekoden er offentlig, kan du selv efterprøve hvert eneste udsagn på denne side.",
     "staysTitle": "Det, der bliver på din Mac",
-    "stays": "Din biblioteksdatabase, spillelister, afspilningstællere, resultater af filanalyser, omslagscache og indstillinger gemmes i mappen Bibliotek i din brugermappe på din Mac. Adgangskoder til netværksdelinger og dit ListenBrainz-token, hvis du tilføjer et, gemmes i macOS-nøgleringen. Rumkorrektion bruger kun din målemikrofon, mens du udfører en måling, og gemmer optagelserne i din mappe Dokumenter. Intet af det uploades nogen steder.",
+    "stays": "Din biblioteksdatabase, spillelister, afspilningstællere, resultater af filanalyser, omslagscache og indstillinger gemmes i mappen Bibliotek i din brugermappe på din Mac. Adgangskoder til netværksdelinger og dit ListenBrainz-token, hvis du tilføjer et, gemmes i macOS-nøgleringen. Rumkorrektion bruger kun din målemikrofon, mens du udfører en måling, og gemmer optagelserne i mappen Dokumenter. Intet af det uploades nogen steder.",
     "onlineTitle": "Når appen går online",
     "online": [
       "<strong>Søgning efter opdateringer.</strong> Vespertine beder GitHub om sit opdateringsfeed cirka én gang om dagen, og når du vælger Søg efter opdateringer. GitHub ser din IP-adresse, som ved enhver anden download. Du kan slå automatisk søgning fra i Indstillinger.",

@@ -126,7 +126,7 @@
         "title": "Mỗi bản nhạc ở đúng tần số và độ sâu gốc.",
         "lede": "Đường tín hiệu liệt kê từng bước từ tệp đến DAC của bạn, được đọc lại từ Core Audio, và cho biết khi có thứ gì đó làm thay đổi các mẫu âm thanh.",
         "body": [
-          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ resample, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát lại đã được kiểm tra với PCM đến 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM đến 384 kHz và DSD128 trên FiiO K11."
+          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ lấy mẫu lại, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát lại đã được kiểm thử với PCM đến 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM đến 384 kHz và DSD128 trên FiiO K11."
         ],
         "list": [
           "Chế độ độc quyền (hog) ngăn các ứng dụng khác dùng thiết bị. Ở chế độ chia sẻ, phím âm lượng và Digital Crown điều chỉnh DAC của bạn; ở chế độ độc quyền chúng cũng làm được vậy nếu bạn bật tùy chọn đó.",
@@ -439,7 +439,7 @@
           "Không",
           "Qua xử lý tích chập (Origin: tùy chọn trả phí) hoặc Audio Units",
           "Qua xử lý tích chập",
-          "Không (theo thiết kế)",
+          "Không (có chủ ý)",
           "Không nêu trong tài liệu",
           "Không",
           "Không nêu trong tài liệu"
@@ -527,7 +527,7 @@
         },
         {
           "q": "Đã được kiểm thử trên phần cứng nào?",
-          "a": "Phát lại đã được kiểm thử với PCM tới 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM tới 384 kHz và DSD128 trên FiiO K11, thiết bị mà chế độ số nguyên cũng đã được kiểm thử. Ứng dụng cũng đã được kiểm thử trên AirPods Max qua USB-C và Bluetooth, loa MacBook Pro, và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
+          "a": "Phát lại đã được kiểm thử với PCM tới 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM tới 384 kHz và DSD128 trên FiiO K11; trên thiết bị này, chế độ số nguyên cũng đã được kiểm thử. Ứng dụng cũng đã được kiểm thử trên AirPods Max qua USB-C và Bluetooth, loa MacBook Pro, và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
         },
         {
           "q": "Có ngôn ngữ của tôi không?",

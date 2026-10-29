@@ -439,7 +439,7 @@
           "Não",
           "Por convolução (Origin: opção paga) ou Audio Units",
           "Por convolução",
-          "Não (por conceção)",
+          "Não (intencionalmente)",
           "Não documentado",
           "Não",
           "Não documentado"
@@ -511,7 +511,7 @@
         },
         {
           "q": "Faz correção de sala?",
-          "a": "Sim. Meça a sua sala com um UMIK-1 ou outro microfone USB calibrado, em um a cinco pontos à volta do seu lugar, e o Vespertine ajusta filtros a cada altifalante e alinha o atraso e o nível de cada um, em estéreo ou 5.1. Também importa filtros e respostas a impulso do REW e do Equalizer APO. A correção de sala está desativada por predefinição, a reprodução mantém-se bit-perfect enquanto está desativada e o caminho do sinal indica <span class=\"mono nowrap\">CORREÇÃO DE SALA</span> enquanto está ativada. <a href=\"{href.roomCorrection}\">Como funciona a correção de sala</a>."
+          "a": "Sim. Meça a sua sala com um UMIK-1 ou outro microfone USB calibrado, em um a cinco pontos à volta do seu lugar, e o Vespertine ajusta filtros a cada altifalante e alinha o atraso e o nível de cada um, em estéreo ou 5.1. Também importa filtros do REW e do Equalizer APO, bem como respostas a impulso. A correção de sala está desativada por predefinição, a reprodução mantém-se bit-perfect enquanto está desativada e o caminho do sinal indica <span class=\"mono nowrap\">CORREÇÃO DE SALA</span> enquanto está ativada. <a href=\"{href.roomCorrection}\">Como funciona a correção de sala</a>."
         },
         {
           "q": "Reproduz discos SACD e DVD?",

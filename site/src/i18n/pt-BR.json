@@ -156,7 +156,7 @@
           "As varreduras tocam por um alto-falante de cada vez, em um a cinco pontos ao redor do seu lugar de audição. Cada alto-falante recebe os próprios filtros, projetados a partir da medição. Eles são, em sua maioria, cortes: atenuam os picos da sala e só reforçam de leve as quedas amplas. A mesma medição define o atraso e o nível de cada alto-falante, para que o som de todos chegue ao seu lugar ao mesmo tempo e com a mesma intensidade. A correção de sala vem desativada por padrão, e a reprodução continua bit-perfect enquanto ela está desativada. Quando está ativada, o caminho do sinal mostra <span class=\"mono nowrap\">CORREÇÃO DE SALA</span>."
         ],
         "list": [
-          "Três metas: Warm (a padrão), Gentle tilt e Flat. Corrija apenas os graves ou a faixa completa, e reprojete os filtros depois, sem medir de novo.",
+          "Três metas: Warm (padrão), Gentle tilt e Flat. Corrija apenas os graves ou a faixa completa, e reprojete os filtros depois, sem medir de novo.",
           "Importa filtros do REW ou do Equalizer APO, com o atraso e o nível de cada alto-falante, e exporta no formato de texto do Equalizer APO.",
           "Importa respostas ao impulso (WAV, AIFF, CAF ou FLAC) e as reproduz por convolução.",
           "Estéreo e 5.1.",
@@ -448,7 +448,7 @@
           "Convolução / plugins de efeitos de áudio",
           "Sim (correção de sala) / Não",
           "Não / Não",
-          "Sim (Origin: opcional pago) / Audio Units",
+          "Sim (Origin: opção paga) / Audio Units",
           "Sim / Não",
           "Não / Não",
           "Não documentado / Não documentado",

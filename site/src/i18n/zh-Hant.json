@@ -197,7 +197,7 @@
         ],
         "list": [
           "已在兩張實體光碟上與 sacd_extract 的結果逐位元比對一致。具有 5.0 區段、只有多聲道區段，或 DSD128 以上的光碟，目前僅以合成測試映像檔驗證。",
-          "DSD64 至 DSD512 的 DSF 與 DSDIFF（包括 DST 壓縮的 DSDIFF），可以 DoP 送往支援該載波取樣率的 DAC，或轉換為高取樣率 PCM。DoP 已在 Fosi Audio ZD3 上確認可用至 DSD256，在 FiiO K11 上確認可用至 DSD128；透過 DoP 播放 DSD512 尚未在硬體上測試。",
+          "DSD64 至 DSD512 的 DSF 與 DSDIFF（包括 DST 壓縮的 DSDIFF），可透過 DoP 送往支援該載波取樣率的 DAC，或轉換為高取樣率 PCM。DoP 已在 Fosi Audio ZD3 上確認可用至 DSD256，在 FiiO K11 上確認可用至 DSD128；透過 DoP 播放 DSD512 尚未在硬體上測試。",
           "DVD-Video LPCM 支援 16、20 與 24 位元、48 與 96 kHz，最多 8 聲道。不支援 DVD-Audio，加密（CSS）光碟需要使用已解密的拷貝。"
         ],
         "links": [
@@ -448,7 +448,7 @@
           "卷積 / 音訊效果外掛",
           "是（房間校正） / 否",
           "否 / 否",
-          "是（Origin：付費選項）/ Audio Units",
+          "是（Origin：付費選項） / Audio Units",
           "是 / 否",
           "否 / 否",
           "未記載 / 未記載",
@@ -527,7 +527,7 @@
         },
         {
           "q": "已在哪些硬體上測試過？",
-          "a": "已在 Fosi Audio ZD3 上測試 PCM 最高 768 kHz 與 DSD256 的播放，並在 FiiO K11 上測試 PCM 最高 384 kHz 與 DSD128 的播放，整數模式也在 FiiO K11 上測試過。另外也已在透過 USB-C 與藍牙連接的 AirPods Max、MacBook Pro 揚聲器，以及透過 HDMI 以 5.1 播放的 Sony 電視上測試。Intel 硬體尚未測試。輸出位元流至 AV 擴大機與多聲道 DAC 輸出為實驗性功能，尚未在實際擴大機與多聲道 USB DAC 上測試（已測試過一台透過 HDMI 連接的 Sony 電視：見 docs/DEVICES.md）；<a href=\"{href.dacReport}\">徵求使用回報</a>。"
+          "a": "已在 Fosi Audio ZD3 上測試 PCM 最高 768 kHz 與 DSD256 的播放，並在 FiiO K11 上測試 PCM 最高 384 kHz 與 DSD128 的播放，整數模式也在 FiiO K11 上測試過。另外也已在透過 USB-C 與藍牙連接的 AirPods Max、MacBook Pro 揚聲器，以及透過 HDMI 以 5.1 播放的 Sony 電視上測試。Intel 硬體尚未測試。將位元流輸出至 AV 擴大機，以及多聲道 DAC 輸出，皆為實驗性功能，尚未在實際擴大機與多聲道 USB DAC 上測試（已測試過一台透過 HDMI 連接的 Sony 電視：見 docs/DEVICES.md）；<a href=\"{href.dacReport}\">徵求使用回報</a>。"
         },
         {
           "q": "有我的語言嗎？",

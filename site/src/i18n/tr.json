@@ -69,7 +69,7 @@
         "hi-res müzik,"
       ],
       "titleBrass": "Mac’inizde.",
-      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur; AirPods’ta baş takipli Uzamsal Ses desteğiyle. Oda düzeltmesi, odanızı bir USB mikrofonla ölçer ve her hoparlörü ayrı ayrı düzeltir; siz açana kadar kapalı kalır. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
+      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur ve AirPods’ta baş takipli Uzamsal Ses ile dinlenebilir. Oda düzeltmesi, odanızı bir USB mikrofonla ölçer ve her hoparlörü ayrı ayrı düzeltir; siz açana kadar kapalı kalır. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
       "ask": "Beğendiniz mi?",
       "star": "GitHub’da yıldız verin",
       "discuss": "Tartışmaya katılın",
@@ -153,10 +153,10 @@
         "title": "Odanızı ölçün. Her hoparlörü düzeltin.",
         "lede": "Odanızı bir UMIK-1 ya da kalibre edilmiş başka bir USB mikrofonla ölçün; Vespertine, koltuğunuzda duyduklarına göre her hoparlör için filtreler hesaplar.",
         "body": [
-          "Taramalar, dinleme koltuğunuzun çevresinde bir ila beş noktada, her seferinde tek bir hoparlörden çalınır. Her hoparlör, ölçümden tasarlanan kendi filtrelerini alır. Bu filtreler çoğunlukla azaltma yapar: odanın tepelerini bastırır, geniş çukurları ise yalnızca hafifçe yükseltir. Aynı ölçüm her hoparlörün gecikmesini ve seviyesini de ayarlar; böylece her hoparlörün sesi koltuğunuza aynı anda ve aynı yükseklikte ulaşır. Oda düzeltmesi varsayılan olarak kapalıdır ve kapalıyken oynatma bit-perfect kalır. Açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar."
+          "Taramalar, dinleme koltuğunuzun çevresinde bir ila beş noktada, her seferinde tek bir hoparlörden çalınır. Her hoparlör, ölçümden tasarlanan kendi filtrelerini alır. Bu filtreler çoğunlukla azaltma yapar: odanın tepelerini bastırır, geniş çukurları ise yalnızca hafifçe yükseltir. Aynı ölçüm her hoparlörün gecikmesini ve seviyesini de ayarlar; böylece her hoparlörün sesi koltuğunuza aynı anda ve aynı ses yüksekliğinde ulaşır. Oda düzeltmesi varsayılan olarak kapalıdır ve kapalıyken oynatma bit-perfect kalır. Açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar."
         ],
         "list": [
-          "Üç hedef: Warm (varsayılan), Gentle tilt ve Flat. Yalnızca bas bölgesini ya da tam aralığı düzeltin; filtreleri daha sonra yeniden ölçüm yapmadan yeniden tasarlayın.",
+          "Üç hedef: Warm (varsayılan), Gentle tilt ve Flat. Yalnızca bas bölgesini ya da tam aralığı düzeltin; filtreleri sonradan, ölçümü tekrarlamadan yeniden tasarlayın.",
           "REW veya Equalizer APO filtrelerini, her hoparlörün gecikmesi ve seviyesiyle birlikte içe aktarır; Equalizer APO metni olarak dışa aktarır.",
           "Dürtü yanıtlarını (WAV, AIFF, CAF veya FLAC) içe aktarır ve konvolüsyonla çalar.",
           "Stereo ve 5.1.",

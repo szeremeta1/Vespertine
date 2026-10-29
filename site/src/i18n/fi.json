@@ -153,10 +153,10 @@
         "title": "Mittaa huoneesi. Korjaa jokainen kaiutin.",
         "lede": "Mittaa huoneesi UMIK-1:llä tai muulla kalibroidulla USB-mikrofonilla. Vespertine sovittaa suodattimet jokaiselle kaiuttimelle sen perusteella, mitä se kuulee kuuntelupaikallasi.",
         "body": [
-          "Pyyhkäisyt soivat yhden kaiuttimen kautta kerrallaan, yhdestä viiteen kohdassa kuuntelupaikkasi ympärillä. Jokainen kaiutin saa omat suodattimensa, jotka suunnitellaan mittauksen perusteella. Ne ovat enimmäkseen vaimennuksia: ne laskevat huoneen korostumia ja nostavat leveitä notkoja vain maltillisesti. Sama mittaus asettaa jokaisen kaiuttimen viiveen ja tason, joten jokaisen kaiuttimen ääni saapuu kuuntelupaikallesi samaan aikaan ja samalla voimakkuudella. Huonekorjaus on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>."
+          "Pyyhkäisyt soivat yhden kaiuttimen kautta kerrallaan, yhdessä–viidessä kohdassa kuuntelupaikkasi ympärillä. Jokainen kaiutin saa omat suodattimensa, jotka suunnitellaan mittauksen perusteella. Ne ovat enimmäkseen vaimennuksia: ne laskevat huoneen korostumia ja nostavat leveitä notkoja vain maltillisesti. Sama mittaus asettaa jokaisen kaiuttimen viiveen ja tason, joten jokaisen kaiuttimen ääni saapuu kuuntelupaikallesi samaan aikaan ja samalla voimakkuudella. Huonekorjaus on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>."
         ],
         "list": [
-          "Kolme tavoitetta: Warm (oletus), Gentle tilt ja Flat. Korjaa vain basso tai koko alue, ja suunnittele suodattimet myöhemmin uudelleen mittaamatta uudestaan.",
+          "Kolme tavoitetta: Warm (oletus), Gentle tilt ja Flat. Korjaa vain basso tai koko alue, ja suunnittele suodattimet myöhemmin uudelleen ilman uutta mittausta.",
           "Tuo suodattimet REW:stä tai Equalizer APO:sta kunkin kaiuttimen viiveineen ja tasoineen ja vie suodattimia Equalizer APO -tekstimuodossa.",
           "Tuo impulssivasteita (WAV, AIFF, CAF tai FLAC) ja toistaa ne konvoluutiolla.",
           "Stereo ja 5.1.",
@@ -448,7 +448,7 @@
           "Konvoluutio / ääniefektilaajennukset",
           "Kyllä (huonekorjaus) / Ei",
           "Ei / Ei",
-          "Kyllä (Origin: maksullinen lisä) / Audio Units",
+          "Kyllä (Origin: maksullinen lisävalinta) / Audio Units",
           "Kyllä / Ei",
           "Ei / Ei",
           "Ei dokumentoitu / Ei dokumentoitu",
@@ -685,7 +685,7 @@
     "eyebrow": "Tietosuoja",
     "heading": "Vespertine ei kerää",
     "headingBrass": "mitään.",
-    "updated": "Voimassa {effective} alkaen (lisää huonekorjauksen mikrofoninkäytön, koskee versiota 0.14). Aiemmat muutokset: valinnainen Discord-tila {discordUpdated}. ”Tämä verkkosivusto” -osio päivitettiin {statsUpdated}, kun sivusto alkoi laskea käyntejä itse ylläpidetyllä, evästeettömällä tilastoinnilla. ”Tämä verkkosivusto” -osioon lisättiin {langUpdated} myös kuvaus kielivalikosta, joka muistaa valintasi laitteellasi.",
+    "updated": "Voimassa {effective} alkaen (lisätty kuvaus huonekorjauksen mikrofonin käytöstä, koskee versiota 0.14). Aiemmat muutokset: valinnainen Discord-tila {discordUpdated}. ”Tämä verkkosivusto” -osio päivitettiin {statsUpdated}, kun sivusto alkoi laskea käyntejä itse ylläpidetyllä, evästeettömällä tilastoinnilla. ”Tämä verkkosivusto” -osioon lisättiin {langUpdated} myös kuvaus kielivalikosta, joka muistaa valintasi laitteellasi.",
     "intro": "Vespertine on ilmainen, avoimen lähdekoodin musiikkisoitin. Sovelluksessa ei ole tilejä, analytiikkaa, telemetriaa, kaatumisraportointia eikä mainontaa. Kehittäjä ei saa mitään tietoja sinusta tai musiikistasi. Koska lähdekoodi on julkinen, voit tarkistaa jokaisen tämän sivun väitteen.",
     "staysTitle": "Mikä pysyy Macillasi",
     "stays": "Kirjastotietokantasi, soittolistasi, soittokertasi, tiedostoanalyysien tulokset, kansikuvien välimuisti ja asetukset tallennetaan Macisi käyttäjäkohtaiseen Kirjasto-kansioon. Verkkojakojen salasanat ja ListenBrainz-käyttöoikeustunnuksesi, jos lisäät sellaisen, tallennetaan macOS:n Avainnippuun. Huonekorjaus käyttää mittausmikrofoniasi vain mittauksen aikana ja säilyttää tallenteet Dokumentit-kansiossasi. Mitään niistä ei lähetetä minnekään.",

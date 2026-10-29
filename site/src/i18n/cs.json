@@ -153,7 +153,7 @@
         "title": "Změřte svou místnost. Korigujte každý reproduktor.",
         "lede": "Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem a Vespertine podle toho, co slyší na vašem místě, navrhne filtry na míru každému reproduktoru.",
         "body": [
-          "Rozmítání hraje postupně z každého reproduktoru zvlášť, na jednom až pěti bodech kolem vašeho poslechového místa. Každý reproduktor dostane vlastní filtry navržené podle měření. Většinou jde o útlum: snižují špičky místnosti a široké propady zdvihají jen mírně. Stejné měření nastaví zpoždění a úroveň každého reproduktoru, aby zvuk z každého z nich dorazil k vašemu místu ve stejnou chvíli a se stejnou hlasitostí. Korekce místnosti je ve výchozím stavu vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect. Když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>."
+          "Rozmítání hraje postupně z každého reproduktoru zvlášť, v jednom až pěti bodech kolem vašeho poslechového místa. Každý reproduktor dostane vlastní filtry navržené podle měření. Většinou ubírají: tlumí špičky místnosti a široké propady zdvihají jen mírně. Stejné měření nastaví zpoždění a úroveň každého reproduktoru, aby zvuk z každého z nich dorazil k vašemu místu ve stejnou chvíli a se stejnou hlasitostí. Korekce místnosti je ve výchozím stavu vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect. Když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>."
         ],
         "list": [
           "Tři cíle: Warm (výchozí), Gentle tilt a Flat. Korigujte jen basy, nebo celé pásmo, a filtry později navrhněte znovu bez nového měření.",
@@ -448,7 +448,7 @@
           "Konvoluce / pluginy zvukových efektů",
           "Ano (korekce místnosti) / Ne",
           "Ne / Ne",
-          "Ano (Origin: placená volba) / Audio Units",
+          "Ano (Origin: placená možnost) / Audio Units",
           "Ano / Ne",
           "Ne / Ne",
           "Nezdokumentováno / Nezdokumentováno",
@@ -511,7 +511,7 @@
         },
         {
           "q": "Umí korekci místnosti?",
-          "a": "Ano. Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem na jednom až pěti bodech kolem svého poslechového místa a Vespertine navrhne filtry na míru každému reproduktoru a srovná jejich zpoždění a úroveň, ve stereu i v 5.1. Importuje také filtry z REW a Equalizer APO a impulzní odezvy. Ve výchozím stavu je vypnutá, dokud je vypnutá, zůstává přehrávání bit-perfect, a když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>. <a href=\"{href.roomCorrection}\">Jak korekce místnosti funguje</a>."
+          "a": "Ano. Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem v jednom až pěti bodech kolem svého poslechového místa a Vespertine navrhne filtry na míru každému reproduktoru a srovná jejich zpoždění a úroveň, ve stereu i v 5.1. Importuje také filtry z REW a Equalizer APO a impulzní odezvy. Ve výchozím stavu je vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect; když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>. <a href=\"{href.roomCorrection}\">Jak korekce místnosti funguje</a>."
         },
         {
           "q": "Přehraje disky SACD a DVD?",
@@ -685,7 +685,7 @@
     "eyebrow": "Soukromí",
     "heading": "Vespertine neshromažďuje",
     "headingBrass": "nic.",
-    "updated": "Platné od {effective} (přidává používání mikrofonu korekcí místnosti, pro verzi 0.14). Dřívější změny: volitelný stav na Discordu, {discordUpdated}; sekce „Tento web“, {statsUpdated}, kdy web začal počítat návštěvy pomocí statistik bez cookies hostovaných na vlastním serveru. Od {langUpdated} sekce „Tento web“ popisuje také nabídku jazyků, která si pamatuje vaši volbu ve vašem zařízení.",
+    "updated": "Platné od {effective} (doplňuje informace o tom, jak korekce místnosti používá mikrofon; pro verzi 0.14). Dřívější změny: volitelný stav na Discordu, {discordUpdated}; sekce „Tento web“, {statsUpdated}, kdy web začal počítat návštěvy pomocí statistik bez cookies hostovaných na vlastním serveru. Od {langUpdated} sekce „Tento web“ popisuje také nabídku jazyků, která si pamatuje vaši volbu ve vašem zařízení.",
     "intro": "Vespertine je bezplatný open-source hudební přehrávač. Aplikace nemá žádné účty, analytiku, telemetrii, hlášení pádů ani reklamy. Vývojář o vás ani o vaší hudbě nedostává žádné informace. Protože je zdrojový kód veřejný, můžete si každé tvrzení na této stránce ověřit.",
     "staysTitle": "Co zůstává ve vašem Macu",
     "stays": "Databáze knihovny, playlisty, počty přehrání, výsledky analýzy souborů, mezipaměť obalů a nastavení se ukládají do vaší uživatelské složky Knihovna ve vašem Macu. Hesla k síťovým sdílením a váš token ListenBrainz, pokud ho přidáte, se ukládají do Klíčenky macOS. Korekce místnosti používá váš měřicí mikrofon jen během měření, které sami spustíte, a nahrávky ukládá do vaší složky Dokumenty. Nic z toho se nikam nenahrává.",

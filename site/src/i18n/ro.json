@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: player de muzică surround și hi-res pentru Mac",
-    "description": "Player gratuit și open source pentru Mac, pentru colecții surround și hi-res: imagini de disc SACD și DVD-Video, DSD, CD-uri DTS, fișiere DTS-HD MA, TrueHD și Dolby Atmos, Audio spațial pe AirPods, corecția camerei măsurată chiar în camera dumneavoastră și o cale a semnalului pe care o puteți inspecta.",
+    "description": "Player gratuit și open source pentru Mac, pentru colecții surround și hi-res: imagini de disc SACD și DVD-Video, DSD, CD-uri DTS, fișiere DTS-HD MA, TrueHD și Dolby Atmos, Audio spațial pe AirPods, corecția camerei măsurată chiar în camera dumneavoastră și o cale a semnalului bit-perfect pe care o puteți inspecta.",
     "ogAlt": "Vespertine: playerul gratuit și open source pentru Mac, creat pentru muzica surround și hi-res. Calea semnalului arată un FLAC de 24 de biți / 96 kHz redat bit-perfect pe un Fosi Audio ZD3. Versiunea {version}, macOS {minMacOS} sau o versiune ulterioară.",
     "hero": {
       "eyebrow": [
@@ -160,7 +160,7 @@
           "Importă filtre din REW sau Equalizer APO, cu întârzierea și nivelul fiecărui difuzor, și exportă text pentru Equalizer APO.",
           "Importă răspunsuri la impuls (WAV, AIFF, CAF sau FLAC) și le redă prin convoluție.",
           "Stereo și 5.1.",
-          "Portretul camerei arată difuzoarele, locul dumneavoastră și fiecare punct de microfon pe măsură ce este măsurat. Apoi, Dezvăluirea curbei transformă răspunsul măsurat în cel prezis, iar un comutator înainte/după le compară."
+          "Portretul camerei arată difuzoarele, locul dumneavoastră și fiecare punct de microfon pe măsură ce este măsurat. Apoi, curba răspunsului măsurat se transformă în cea a răspunsului prezis, iar un comutator înainte/după le compară."
         ],
         "note": "Curba „după” este prezisă pe baza măsurătorii și a filtrelor, nu măsurată. Ca să vedeți ce face cu adevărat camera, măsurați din nou cu corecția activată.",
         "links": [
@@ -435,7 +435,7 @@
         ],
         [
           "Corecția camerei",
-          "Măsurată în aplicație (microfon USB) sau prin import din REW / APO și de răspunsuri la impuls",
+          "Măsurată în aplicație (microfon USB) sau prin importul filtrelor REW / APO și al răspunsurilor la impuls",
           "Nu",
           "Prin convoluție (Origin: opțiune plătită) sau Audio Units",
           "Prin convoluție",
@@ -448,7 +448,7 @@
           "Convoluție / pluginuri de efecte audio",
           "Da (corecția camerei) / Nu",
           "Nu / Nu",
-          "Da (Origin: opțiune contra cost) / Audio Units",
+          "Da (Origin: opțiune plătită) / Audio Units",
           "Da / Nu",
           "Nu / Nu",
           "Nedocumentat / Nedocumentat",

@@ -437,7 +437,7 @@
           "روم کریکشن",
           "ایپ کے اندر پیمائش (USB مائیکروفون)، یا REW / APO اور امپلس ریسپانس کی درآمد",
           "نہیں",
-          "کنوولوشن کے ذریعے (Origin: بامعاوضہ آپشن) یا Audio Units",
+          "کنوولوشن کے ذریعے (Origin: ادائیگی والا آپشن) یا Audio Units",
           "کنوولوشن کے ذریعے",
           "نہیں (دانستہ طور پر)",
           "دستاویز میں درج نہیں",
@@ -527,7 +527,7 @@
         },
         {
           "q": "یہ کس ہارڈ ویئر پر ٹیسٹ ہو چکا ہے؟",
-          "a": "PCM پلے بیک Fosi Audio ZD3 پر 768 kHz اور DSD256 تک، اور FiiO K11 پر 384 kHz اور DSD128 تک ٹیسٹ ہو چکا ہے، جہاں انٹیجر موڈ بھی ٹیسٹ کیا گیا۔ یہ USB-C اور Bluetooth کے ذریعے AirPods Max، MacBook Pro کے اسپیکرز، اور HDMI کے ذریعے 5.1 میں ایک Sony TV پر بھی ٹیسٹ ہو چکا ہے۔ Intel ہارڈ ویئر ٹیسٹ نہیں ہوا۔ ریسیور کو بٹ اسٹریم اور ملٹی چینل DAC آؤٹ پٹ تجرباتی ہیں، اصل ریسیورز اور ملٹی چینل USB DACs پر ٹیسٹ نہیں ہوئے (HDMI کے ذریعے ایک Sony TV پر ٹیسٹ ہو چکا ہے: دیکھیں docs/DEVICES.md)؛ <a href=\"{href.dacReport}\">رپورٹس درکار ہیں</a>۔"
+          "a": "PCM پلے بیک Fosi Audio ZD3 پر 768 kHz اور DSD256 تک، اور FiiO K11 پر 384 kHz اور DSD128 تک ٹیسٹ ہو چکا ہے، جہاں انٹیجر موڈ بھی ٹیسٹ کیا گیا۔ یہ USB-C اور بلوٹوتھ کے ذریعے AirPods Max، MacBook Pro کے اسپیکرز، اور HDMI کے ذریعے 5.1 میں ایک Sony TV پر بھی ٹیسٹ ہو چکا ہے۔ Intel ہارڈ ویئر ٹیسٹ نہیں ہوا۔ ریسیور کو بٹ اسٹریم اور ملٹی چینل DAC آؤٹ پٹ تجرباتی ہیں، اصل ریسیورز اور ملٹی چینل USB DACs پر ٹیسٹ نہیں ہوئے (HDMI کے ذریعے ایک Sony TV پر ٹیسٹ ہو چکا ہے: دیکھیں docs/DEVICES.md)؛ <a href=\"{href.dacReport}\">رپورٹس درکار ہیں</a>۔"
         },
         {
           "q": "کیا یہ میری زبان میں ہے؟",
@@ -602,7 +602,7 @@
       "install": "انسٹال",
       "installValue": "<a href=\"{href.dmg}\">DMG ڈاؤن لوڈ کریں</a> یا {brew}",
       "tested": "جن کے ساتھ جانچا گیا",
-      "testedValue": "Fosi Audio ZD3 (768 kHz تک PCM، DoP پر DSD256)، FiiO K11 (384 kHz تک PCM، DoP پر DSD128، انٹیجر موڈ)، USB-C اور Bluetooth پر AirPods Max، MacBook Pro کے اسپیکرز",
+      "testedValue": "Fosi Audio ZD3 (768 kHz تک PCM، DoP پر DSD256)، FiiO K11 (384 kHz تک PCM، DoP پر DSD128، انٹیجر موڈ)، USB-C اور بلوٹوتھ پر AirPods Max، MacBook Pro کے اسپیکرز",
       "links": "لنکس",
       "website": "ویب سائٹ",
       "source": "سورس کوڈ",

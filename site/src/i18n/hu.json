@@ -435,7 +435,7 @@
         ],
         [
           "Szobakorrekció",
-          "Az alkalmazásban mérve (USB-mikrofonnal), vagy REW / APO- és impulzusválasz-importálás",
+          "Mérés az alkalmazásban (USB-mikrofonnal), vagy REW-/APO-szűrők és impulzusválaszok importálása",
           "Nem",
           "Konvolúcióval (Origin: fizetős opció) vagy Audio Unitokkal",
           "Konvolúcióval",
@@ -527,7 +527,7 @@
         },
         {
           "q": "Milyen hardveren tesztelték?",
-          "a": "A PCM-lejátszást 768 kHz-ig és DSD256-ig tesztelték egy Fosi Audio ZD3-on, valamint 384 kHz-ig és DSD128-ig egy FiiO K11-en, ahol az egész számos módot is tesztelték. Tesztelték továbbá AirPods Maxon USB-C-n és Bluetooth-on, MacBook Pro hangszórókon, valamint egy Sony TV-n HDMI-n keresztül, 5.1-ben. Intel hardveren nincs tesztelve. Az AV-erősítőre küldött bitstream és a többcsatornás DAC-kimenet kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); <a href=\"{href.dacReport}\">visszajelzéseket várunk</a>."
+          "a": "A PCM-lejátszást 768 kHz-ig és DSD256-ig tesztelték egy Fosi Audio ZD3-on, valamint 384 kHz-ig és DSD128-ig egy FiiO K11-en, ahol az egész számos módot is tesztelték. Tesztelték továbbá AirPods Maxon USB-C-n és Bluetoothon, MacBook Pro-hangszórókon, valamint egy Sony TV-n HDMI-n keresztül, 5.1-ben. Intel-hardveren nincs tesztelve. Az AV-erősítőre küldött bitstream és a többcsatornás DAC-kimenet kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); <a href=\"{href.dacReport}\">visszajelzéseket várunk</a>."
         },
         {
           "q": "Elérhető az én nyelvemen?",

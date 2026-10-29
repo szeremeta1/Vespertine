@@ -153,11 +153,11 @@
         "title": "Misura la tua stanza. Correggi ogni altoparlante.",
         "lede": "Misura la tua stanza con un UMIK-1 o un altro microfono USB calibrato, e Vespertine crea filtri su misura per ciascun altoparlante in base a ciò che sente dal tuo posto d’ascolto.",
         "body": [
-          "Gli sweep vengono riprodotti da un altoparlante alla volta, da uno a cinque punti attorno al tuo posto d’ascolto. Ogni altoparlante riceve i propri filtri, progettati a partire dalla misurazione. Sono per lo più attenuazioni: abbassano i picchi della stanza e rinforzano solo con delicatezza gli avvallamenti ampi. La stessa misurazione imposta il ritardo e il livello di ciascun altoparlante, così ogni altoparlante raggiunge il tuo posto nello stesso istante e con lo stesso volume. La correzione ambiente è disattivata per impostazione predefinita e la riproduzione resta bit-perfect finché è disattivata. Quando è attiva, il percorso del segnale indica <span class=\"mono nowrap\">CORREZIONE AMBIENTE</span>."
+          "Gli sweep vengono riprodotti da un altoparlante alla volta e misurati in un numero di punti compreso tra uno e cinque attorno al tuo posto d’ascolto. Ogni altoparlante riceve i propri filtri, progettati a partire dalla misurazione. Sono per lo più attenuazioni: abbassano i picchi della stanza e rinforzano solo con delicatezza gli avvallamenti ampi. La stessa misurazione imposta il ritardo e il livello di ciascun altoparlante, così ogni altoparlante raggiunge il tuo posto nello stesso istante e con lo stesso volume. La correzione ambiente è disattivata per impostazione predefinita e la riproduzione resta bit-perfect finché è disattivata. Quando è attiva, il percorso del segnale indica <span class=\"mono nowrap\">CORREZIONE AMBIENTE</span>."
         ],
         "list": [
           "Tre obiettivi: Warm (predefinito), Gentle tilt e Flat. Correggi solo i bassi o la gamma completa, e riprogetta i filtri in seguito senza misurare di nuovo.",
-          "Importa filtri da REW o Equalizer APO, con il ritardo e il livello di ciascun altoparlante, ed esporta testo per Equalizer APO.",
+          "Importa filtri da REW o Equalizer APO, con il ritardo e il livello di ciascun altoparlante, ed esporta i filtri in formato testo di Equalizer APO.",
           "Importa risposte all’impulso (WAV, AIFF, CAF o FLAC) e le applica in riproduzione tramite convoluzione.",
           "Stereo e 5.1.",
           "Il Ritratto della stanza mostra gli altoparlanti, il tuo posto d’ascolto e ciascun punto del microfono man mano che viene misurato. L’animazione della curva trasforma poi la risposta misurata in quella prevista, e un selettore prima/dopo le mette a confronto."
@@ -327,7 +327,7 @@
     "compare": {
       "eyebrow": "Confronto",
       "title": "Come si posiziona.",
-      "intro": "Diversi player per Mac offrono la riproduzione bit-perfect. Questo confronto riporta ciò che dicono la documentazione o il codice sorgente di ciascun player. «Non documentato» significa che il produttore non si pronuncia né in un senso né nell’altro, non che la funzione manchi. La convoluzione di Vespertine serve alla correzione ambiente; non ha plugin di effetti audio né servizi di streaming.",
+      "intro": "Diversi player per Mac offrono la riproduzione bit-perfect. Questo confronto riporta ciò che dicono la documentazione o il codice sorgente di ciascun player. «Non documentato» significa che il produttore non si pronuncia né in un senso né nell’altro, non che la funzione manchi. La convoluzione di Vespertine serve alla correzione ambiente; Vespertine non ha plugin di effetti audio né servizi di streaming.",
       "hint": "Scorri per vedere altro →",
       "region": "Tabella di confronto (scorre lateralmente)",
       "caption": "Vespertine a confronto con altri sette player musicali per Mac, secondo la documentazione o il codice sorgente di ciascun player",
@@ -435,7 +435,7 @@
         ],
         [
           "Correzione ambiente",
-          "Misurata nell’app (microfono USB) oppure importazione da REW / APO e di risposte all’impulso",
+          "Misurata nell’app (microfono USB) o importata da REW / APO e da risposte all’impulso",
           "No",
           "Tramite convoluzione (Origin: opzione a pagamento) o Audio Units",
           "Tramite convoluzione",

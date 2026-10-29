@@ -117,7 +117,7 @@
       "exclusive": "Kipekee",
       "spatial": "Spatial · ufuatiliaji wa kichwa",
       "synthetic": "Masafa ya juu ya kutengenezwa?",
-      "roomCorrection": "Urekebishaji wa chumba"
+      "roomCorrection": "Room correction"
     },
     "scenes": {
       "signal-path": {
@@ -602,7 +602,7 @@
       "install": "Usakinishaji",
       "installValue": "<a href=\"{href.dmg}\">Pakua DMG</a> au {brew}",
       "tested": "Imejaribiwa kwenye",
-      "testedValue": "Fosi Audio ZD3 (PCM hadi 768 kHz, DSD256 kupitia DoP), FiiO K11 (PCM hadi 384 kHz, DSD128 kupitia DoP, Hali ya integer), AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM hadi 768 kHz, DSD256 kupitia DoP), FiiO K11 (PCM hadi 384 kHz, DSD128 kupitia DoP, hali ya integer), AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro",
       "links": "Viungo",
       "website": "Tovuti",
       "source": "Msimbo wa chanzo",

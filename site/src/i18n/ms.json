@@ -153,7 +153,7 @@
         "title": "Ukur bilik anda. Betulkan setiap pembesar suara.",
         "lede": "Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara berdasarkan apa yang didengarnya di tempat duduk anda.",
         "body": [
-          "Sapuan dimainkan melalui satu pembesar suara pada satu masa, di satu hingga lima titik di sekeliling tempat duduk mendengar anda. Setiap pembesar suara mendapat penapisnya sendiri, yang direka berdasarkan pengukuran. Kebanyakannya ialah potongan: penapis ini menurunkan puncak bilik dan hanya menaikkan lekukan yang luas secara lembut. Pengukuran yang sama menetapkan kelewatan dan aras setiap pembesar suara, supaya bunyi setiap pembesar suara tiba di tempat duduk anda pada masa yang sama dan dengan kekuatan yang sama. Pembetulan bilik dimatikan secara lalai, dan main balik kekal bit-perfect semasa ia dimatikan. Apabila ia dihidupkan, laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span>."
+          "Sapuan dimainkan melalui satu pembesar suara pada satu masa, di satu hingga lima titik di sekeliling tempat duduk mendengar anda. Setiap pembesar suara mendapat penapisnya sendiri, yang direka berdasarkan pengukuran. Kebanyakannya berupa pemotongan: penapis ini menurunkan puncak bilik dan menaikkan lekukan yang luas secara sederhana sahaja. Pengukuran yang sama menetapkan kelewatan dan aras setiap pembesar suara, supaya bunyi setiap pembesar suara tiba di tempat duduk anda pada masa yang sama dan dengan kekuatan yang sama. Pembetulan bilik dimatikan secara lalai, dan main balik kekal bit-perfect semasa ia dimatikan. Apabila ia dihidupkan, laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span>."
         ],
         "list": [
           "Tiga sasaran: Warm (lalai), Gentle tilt dan Flat. Betulkan bes sahaja atau julat penuh, dan reka semula penapis kemudian tanpa perlu mengukur semula.",
@@ -439,7 +439,7 @@
           "Tidak",
           "Melalui konvolusi (Origin: pilihan berbayar) atau Audio Units",
           "Melalui konvolusi",
-          "Tidak (mengikut reka bentuk)",
+          "Tidak (sengaja direka begitu)",
           "Tidak didokumenkan",
           "Tidak",
           "Tidak didokumenkan"
@@ -511,7 +511,7 @@
         },
         {
           "q": "Adakah ia menyokong pembetulan bilik?",
-          "a": "Ya. Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur di satu hingga lima titik di sekeliling tempat duduk anda, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara serta menyelaraskan kelewatan dan aras setiap satunya, dalam stereo atau 5.1. Ia juga mengimport penapis dan respons impuls daripada REW dan Equalizer APO. Ciri ini dimatikan secara lalai, main balik kekal bit-perfect semasa ia dimatikan, dan laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span> semasa ia dihidupkan. <a href=\"{href.roomCorrection}\">Cara pembetulan bilik berfungsi</a>."
+          "a": "Ya. Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur di satu hingga lima titik di sekeliling tempat duduk anda, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara serta menyelaraskan kelewatan dan aras setiap satunya, dalam stereo atau 5.1. Ia juga mengimport penapis REW dan Equalizer APO serta respons impuls. Ciri ini dimatikan secara lalai, main balik kekal bit-perfect semasa ia dimatikan, dan laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span> semasa ia dihidupkan. <a href=\"{href.roomCorrection}\">Cara pembetulan bilik berfungsi</a>."
         },
         {
           "q": "Bolehkah ia memainkan cakera SACD dan DVD?",

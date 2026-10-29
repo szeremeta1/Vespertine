@@ -160,9 +160,9 @@
           "Nag-i-import ng mga filter mula sa REW o Equalizer APO, kasama ang delay at level ng bawat speaker, at nag-e-export ng text para sa Equalizer APO.",
           "Nag-i-import ng mga impulse response (WAV, AIFF, CAF o FLAC) at pinapatugtog ang mga ito sa pamamagitan ng convolution.",
           "Stereo at 5.1.",
-          "Ipinapakita ng Larawan ng Kuwarto ang mga speaker, ang upuan mo at ang bawat puwesto ng microphone habang sinusukat ito. Pagkatapos, ginagawang hinulaang response ng animasyong Pagbabago ng Kurba ang nasukat na response, at pinaghahambing ang dalawa ng switch na Bago/Pagkatapos."
+          "Ipinapakita ng Larawan ng Kuwarto ang mga speaker, ang upuan mo at ang bawat puwesto ng microphone habang sinusukat ito. Pagkatapos, ipinapakita ng isang animasyon ng kurba ang pagbabago ng nasukat na response tungo sa hinulaang response, at pinaghahambing ang dalawa ng switch na Bago/Pagkatapos."
         ],
-        "note": "Hinulaan ang kurbang “pagkatapos” mula sa pagsukat at sa mga filter, hindi sinukat. Para makita ang talagang nangyayari sa kuwarto, sumukat ulit habang naka-on ang pagwawasto.",
+        "note": "Hinulaan ang kurbang “pagkatapos” mula sa pagsukat at sa mga filter, hindi sinukat. Para makita ang talagang nangyayari sa kuwarto, sumukat ulit habang naka-on ang room correction.",
         "links": [
           "Paano gumagana ang room correction"
         ],
@@ -284,7 +284,7 @@
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF at DSDIFF, DST-compressed o plain. Nakadepende ang DoP sa DAC at sa carrier rate; kung hindi, PCM. Nasubukan ang DoP hanggang DSD256; hindi pa nasusubukan sa hardware ang DSD512 sa DoP."
+          "text": "DSF at DSDIFF, DST-compressed o hindi naka-compress. Nakadepende ang DoP sa DAC at sa carrier rate; kung hindi, PCM. Nasubukan ang DoP hanggang DSD256; hindi pa nasusubukan sa hardware ang DSD512 sa DoP."
         },
         {
           "name": "Mga SACD image",
@@ -435,7 +435,7 @@
         ],
         [
           "Room correction",
-          "Sinusukat sa app (USB mic), o pag-import mula sa REW / APO at ng mga impulse response",
+          "Sinusukat sa app (USB mic), o ini-import mula sa REW / APO at mga impulse response",
           "Hindi",
           "Sa pamamagitan ng convolution (Origin: bayad na opsyon) o Audio Units",
           "Sa pamamagitan ng convolution",
@@ -685,7 +685,7 @@
     "eyebrow": "Privacy",
     "heading": "Ang kinokolekta ng Vespertine:",
     "headingBrass": "wala.",
-    "updated": "May bisa simula {effective} (idinadagdag ang paggamit ng room correction sa microphone, para sa bersyon 0.14). Mga naunang pagbabago: ang opsyonal na Discord status, {discordUpdated}; ang seksiyong “Ang website na ito”, {statsUpdated}, nang magsimulang bilangin ng site ang mga pagbisita gamit ang self-hosted na statistics na walang cookie. Noong {langUpdated}, nagsimula ring ilarawan ng seksiyong “Ang website na ito” ang menu ng wika, na tumatandaan ng pinili mo sa iyong device.",
+    "updated": "May bisa simula {effective} (idinadagdag ang paggamit ng microphone sa room correction, para sa bersyon 0.14). Mga naunang pagbabago: ang opsyonal na Discord status, {discordUpdated}; ang seksiyong “Ang website na ito”, {statsUpdated}, nang magsimulang bilangin ng site ang mga pagbisita gamit ang self-hosted na statistics na walang cookie. Noong {langUpdated}, nagsimula ring ilarawan ng seksiyong “Ang website na ito” ang menu ng wika, na tumatandaan ng pinili mo sa iyong device.",
     "intro": "Libre at open-source na music player ang Vespertine. Walang account, walang analytics, walang telemetry, walang crash reporting at walang advertising ang app. Walang natatanggap na impormasyon ang developer tungkol sa iyo o sa musika mo. Dahil pampubliko ang source code, masusuri mo ang bawat pahayag sa pahinang ito.",
     "staysTitle": "Ang nananatili sa Mac mo",
     "stays": "Naka-store sa user Library mo sa Mac ang database ng library mo, mga playlist, bilang ng pag-play, mga resulta ng pagsusuri ng file, artwork cache at mga setting. Naka-store sa macOS Keychain ang mga password para sa mga network share at ang ListenBrainz token mo, kung magdagdag ka nito. Ginagamit lang ng room correction ang measurement microphone mo habang nagsasagawa ka ng pagsukat, at itinatago nito ang mga recording sa folder na Documents mo. Wala sa mga ito ang ina-upload kahit saan.",

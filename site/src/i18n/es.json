@@ -153,7 +153,7 @@
         "title": "Mide tu sala. Corrige cada altavoz.",
         "lede": "Mide tu sala con un UMIK-1 u otro micrófono USB calibrado, y Vespertine ajusta filtros para cada altavoz a partir de lo que capta en tu asiento.",
         "body": [
-          "Los barridos suenan por un altavoz cada vez, en entre uno y cinco puntos alrededor de tu asiento de escucha. Cada altavoz recibe sus propios filtros, diseñados a partir de la medición. Son sobre todo atenuaciones: reducen los picos de la sala y solo realzan con suavidad las caídas amplias. La misma medición fija el retardo y el nivel de cada altavoz, para que todos lleguen a tu asiento al mismo tiempo y con el mismo volumen. La corrección de sala está desactivada de forma predeterminada, y la reproducción sigue siendo bit-perfect mientras está desactivada. Cuando está activada, la ruta de señal indica <span class=\"mono nowrap\">CORRECCIÓN DE SALA</span>."
+          "Los barridos suenan por un altavoz cada vez, en un punto o hasta en cinco alrededor de tu asiento de escucha. Cada altavoz recibe sus propios filtros, diseñados a partir de la medición. Son sobre todo atenuaciones: reducen los picos de la sala y solo realzan con suavidad las caídas amplias. La misma medición fija el retardo y el nivel de cada altavoz, para que todos lleguen a tu asiento al mismo tiempo y con el mismo volumen. La corrección de sala está desactivada de forma predeterminada, y la reproducción sigue siendo bit-perfect mientras está desactivada. Cuando está activada, la ruta de señal indica <span class=\"mono nowrap\">CORRECCIÓN DE SALA</span>."
         ],
         "list": [
           "Tres objetivos: Warm (el predeterminado), Gentle tilt y Flat. Corrige solo los graves o el rango completo, y rediseña los filtros más adelante sin volver a medir.",
@@ -327,7 +327,7 @@
     "compare": {
       "eyebrow": "Comparativa",
       "title": "Cómo se compara.",
-      "intro": "Varios reproductores para Mac ofrecen reproducción bit-perfect. Esta comparativa recoge lo que dice la propia documentación o el código fuente de cada reproductor. «No documentado» significa que el fabricante no se pronuncia, no que falte la función. En Vespertine, la convolución sirve para la corrección de sala; no tiene plugins de efectos de audio ni servicios de streaming.",
+      "intro": "Varios reproductores para Mac ofrecen reproducción bit-perfect. Esta comparativa recoge lo que dice la propia documentación o el código fuente de cada reproductor. «No documentado» significa que el fabricante no se pronuncia, no que falte la función. La convolución de Vespertine sirve para la corrección de sala; la app no tiene plugins de efectos de audio ni servicios de streaming.",
       "hint": "Desplázate para ver más →",
       "region": "Tabla comparativa (se desplaza horizontalmente)",
       "caption": "Vespertine frente a otros siete reproductores de música para Mac, según la documentación o el código fuente de cada uno",
@@ -511,7 +511,7 @@
         },
         {
           "q": "¿Ofrece corrección de sala?",
-          "a": "Sí. Mide tu sala con un UMIK-1 u otro micrófono USB calibrado en entre uno y cinco puntos alrededor de tu asiento, y Vespertine ajusta filtros para cada altavoz y alinea su retardo y su nivel, en estéreo o en 5.1. También importa filtros de REW y Equalizer APO, así como respuestas al impulso. Está desactivada de forma predeterminada, la reproducción sigue siendo bit-perfect mientras está desactivada y la ruta de señal indica <span class=\"mono nowrap\">CORRECCIÓN DE SALA</span> mientras está activada. <a href=\"{href.roomCorrection}\">Cómo funciona la corrección de sala</a>."
+          "a": "Sí. Mide tu sala con un UMIK-1 u otro micrófono USB calibrado en un punto o hasta en cinco alrededor de tu asiento, y Vespertine ajusta filtros para cada altavoz y alinea su retardo y su nivel, en estéreo o en 5.1. También importa filtros de REW y Equalizer APO, así como respuestas al impulso. Está desactivada de forma predeterminada, la reproducción sigue siendo bit-perfect mientras está desactivada y la ruta de señal indica <span class=\"mono nowrap\">CORRECCIÓN DE SALA</span> mientras está activada. <a href=\"{href.roomCorrection}\">Cómo funciona la corrección de sala</a>."
         },
         {
           "q": "¿Puede reproducir discos SACD y DVD?",

@@ -153,7 +153,7 @@
         "title": "Miss deinen Raum. Korrigiere jeden Lautsprecher.",
         "lede": "Miss deinen Raum mit einem UMIK-1 oder einem anderen kalibrierten USB-Mikrofon ein, und Vespertine berechnet für jeden Lautsprecher passende Filter – aus dem, was es an deinem Platz hört.",
         "body": [
-          "Die Sweeps laufen nacheinander über jeweils einen Lautsprecher, an einer bis fünf Stellen rund um deinen Hörplatz. Jeder Lautsprecher bekommt eigene Filter, die anhand der Messung entworfen werden. Größtenteils sind es Absenkungen: Sie senken die Überhöhungen des Raums ab und heben breite Senken nur behutsam an. Dieselbe Messung legt Verzögerung und Pegel jedes Lautsprechers fest, sodass jeder Lautsprecher deinen Platz zur selben Zeit und mit derselben Lautstärke erreicht. Die Raumkorrektur ist standardmäßig ausgeschaltet, und die Wiedergabe bleibt bit-perfekt, solange sie aus ist. Ist sie eingeschaltet, zeigt der Signalweg <span class=\"mono nowrap\">RAUMKORREKTUR</span> an."
+          "Die Sweeps laufen nacheinander über jeweils einen Lautsprecher, an einer bis fünf Stellen rund um deinen Hörplatz. Jeder Lautsprecher bekommt eigene Filter, die anhand der Messung entworfen werden. Größtenteils sind es Absenkungen: Sie nehmen die Überhöhungen des Raums zurück und heben breite Einbrüche nur behutsam an. Dieselbe Messung legt Verzögerung und Pegel jedes Lautsprechers fest, sodass jeder Lautsprecher deinen Platz zur selben Zeit und mit derselben Lautstärke erreicht. Die Raumkorrektur ist standardmäßig ausgeschaltet, und die Wiedergabe bleibt bit-perfekt, solange sie aus ist. Ist sie eingeschaltet, zeigt der Signalweg <span class=\"mono nowrap\">RAUMKORREKTUR</span> an."
         ],
         "list": [
           "Drei Zielkurven: Warm (der Standard), Gentle tilt und Flat. Korrigiere nur den Bass oder den Gesamtbereich, und berechne die Filter später neu, ohne erneut zu messen.",
@@ -162,12 +162,12 @@
           "Stereo und 5.1.",
           "Das Raumporträt zeigt die Lautsprecher, deinen Platz und jede Mikrofonposition, während dort gemessen wird. Die Kurvenanimation verwandelt danach den gemessenen Frequenzgang in den vorhergesagten, und ein Vorher-Nachher-Schalter vergleicht beide."
         ],
-        "note": "Die „Nachher“-Kurve ist aus der Messung und den Filtern vorhergesagt, nicht gemessen. Um zu sehen, was der Raum wirklich macht, miss erneut mit eingeschalteter Korrektur.",
+        "note": "Die „Nachher“-Kurve ist eine Vorhersage aus der Messung und den Filtern, keine Messung. Um zu sehen, was der Raum wirklich macht, miss erneut mit eingeschalteter Korrektur.",
         "links": [
           "So funktioniert die Raumkorrektur"
         ],
-        "alt": "Die vorhergesagte Raumkorrektur von Vespertine für ein Stereopaar mit dem Ziel „Warm“: für jeden Lautsprecher der gemessene Frequenzgang, das Ziel und der vorhergesagte Frequenzgang nach der Korrektur, mit einer Raumüberhöhung bei etwa 120 Hz, die um 14 und 18 dB abgesenkt wird, sowie die Filter jedes Lautsprechers.",
-        "floatAlt": "Das Raumporträt im Messassistenten: linker und rechter Lautsprecher, der Platz und fünf Mikrofonpositionen rund um ihn, auf der ersten steht das Mikrofon.",
+        "alt": "Die vorhergesagte Raumkorrektur von Vespertine für ein Stereopaar mit dem Ziel „Warm“: für jeden Lautsprecher der gemessene Frequenzgang, das Ziel und der vorhergesagte Frequenzgang nach der Korrektur, mit einer Raumüberhöhung bei etwa 120 Hz, die um 14 bzw. 18 dB abgesenkt wird, sowie die Filter jedes Lautsprechers.",
+        "floatAlt": "Das Raumporträt im Messassistenten: linker und rechter Lautsprecher, der Platz und fünf Mikrofonpositionen darum herum; auf der ersten steht das Mikrofon.",
         "floatCaption": "Raumporträt"
       },
       "surround": {
@@ -327,7 +327,7 @@
     "compare": {
       "eyebrow": "Vergleich",
       "title": "Im Vergleich.",
-      "intro": "Mehrere Player für den Mac bieten bit-perfekte Wiedergabe. Dieser Vergleich stützt sich darauf, was die eigene Dokumentation oder der Quellcode des jeweiligen Players sagt. „Nicht dokumentiert“ heißt, dass sich der Hersteller weder in die eine noch in die andere Richtung äußert, nicht, dass die Funktion fehlt. Die Faltung in Vespertine dient der Raumkorrektur; Audioeffekt-Plug-ins und Streamingdienste gibt es nicht.",
+      "intro": "Mehrere Player für den Mac bieten bit-perfekte Wiedergabe. Dieser Vergleich stützt sich darauf, was die eigene Dokumentation oder der Quellcode des jeweiligen Players sagt. „Nicht dokumentiert“ heißt, dass sich der Hersteller weder in die eine noch in die andere Richtung äußert, nicht, dass die Funktion fehlt. Die Faltung in Vespertine dient der Raumkorrektur; Audioeffekt-Plug-ins und Streamingdienste bietet Vespertine nicht.",
       "hint": "Für mehr scrollen →",
       "region": "Vergleichstabelle (seitlich scrollbar)",
       "caption": "Vespertine im Vergleich mit sieben anderen Musikplayern für den Mac, laut der eigenen Dokumentation oder dem Quellcode des jeweiligen Players",
@@ -435,10 +435,10 @@
         ],
         [
           "Raumkorrektur",
-          "In der App gemessen (USB-Mikrofon) oder per Import aus REW / APO und von Impulsantworten",
+          "In der App gemessen (USB-Mikrofon) oder per Import (REW / APO, Impulsantworten)",
           "Nein",
-          "Über Faltung (Origin: kostenpflichtige Option) oder Audio Units",
-          "Über Faltung",
+          "Per Faltung (Origin: kostenpflichtige Option) oder Audio Units",
+          "Per Faltung",
           "Nein (bewusst nicht)",
           "Nicht dokumentiert",
           "Nein",
@@ -527,7 +527,7 @@
         },
         {
           "q": "Auf welcher Hardware wurde es getestet?",
-          "a": "Die PCM-Wiedergabe wurde auf einem Fosi Audio ZD3 bis 768 kHz und DSD256 getestet und auf einem FiiO K11 bis 384 kHz und DSD128, wo auch der Integer-Modus getestet wurde. Außerdem wurde sie auf AirPods Max über USB-C und Bluetooth, auf den Lautsprechern eines MacBook Pro und auf einem Sony-Fernseher über HDMI in 5.1 getestet. Intel-Hardware ist ungetestet. Bitstream an Receiver und Mehrkanal-Ausgabe an DACs sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); <a href=\"{href.dacReport}\">Berichte erwünscht</a>."
+          "a": "Die PCM-Wiedergabe wurde auf einem Fosi Audio ZD3 bis 768 kHz und DSD256 getestet und auf einem FiiO K11 bis 384 kHz und DSD128, an dem auch der Integer-Modus getestet wurde. Außerdem wurde sie auf AirPods Max über USB-C und Bluetooth, auf den Lautsprechern eines MacBook Pro und auf einem Sony-Fernseher über HDMI in 5.1 getestet. Intel-Hardware ist ungetestet. Bitstream an Receiver und Mehrkanal-Ausgabe an DACs sind experimentell und an echten Receivern und Mehrkanal-USB-DACs ungetestet (getestet wurde ein Sony-Fernseher über HDMI: siehe docs/DEVICES.md); <a href=\"{href.dacReport}\">Berichte erwünscht</a>."
         },
         {
           "q": "Gibt es Vespertine in meiner Sprache?",

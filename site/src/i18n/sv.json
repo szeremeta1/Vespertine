@@ -167,7 +167,7 @@
           "Så fungerar rumskorrigeringen"
         ],
         "alt": "Vespertines förutsagda rumskorrigering för ett stereopar med målkurvan Warm: för varje högtalare den uppmätta responsen, målet och den förutsagda responsen efter korrigering, med en topp från rummet nära 120 Hz som sänks med 14 och 18 dB, samt varje högtalares filter.",
-        "floatAlt": "Rumsporträttet i mätguiden: vänster och höger högtalare, platsen och fem mikrofonpunkter runt den, den första med mikrofonen på.",
+        "floatAlt": "Rumsporträttet i mätguiden: vänster och höger högtalare, platsen och fem mikrofonpunkter runt den, med mikrofonen placerad på den första.",
         "floatCaption": "Rumsporträtt"
       },
       "surround": {
@@ -435,7 +435,7 @@
         ],
         [
           "Rumskorrigering",
-          "Mäts i appen (USB-mikrofon), eller import från REW / APO och av impulssvar",
+          "Mätning i appen (USB-mikrofon) eller import från REW / APO och av impulssvar",
           "Nej",
           "Via faltning (Origin: betaltillval) eller Audio Units",
           "Via faltning",
@@ -511,7 +511,7 @@
         },
         {
           "q": "Har Vespertine rumskorrigering?",
-          "a": "Ja. Mät ditt rum med en UMIK-1 eller en annan kalibrerad USB-mikrofon på en till fem punkter runt din lyssningsplats, så anpassar Vespertine filter till varje högtalare och jämkar deras fördröjning och nivå, i stereo eller 5.1. Appen kan också importera filter från REW och Equalizer APO samt impulssvar. Funktionen är avstängd som standard, uppspelningen förblir bitperfekt när den är avstängd, och signalvägen visar <span class=\"mono nowrap\">RUMSKORRIGERING</span> när den är på. <a href=\"{href.roomCorrection}\">Så fungerar rumskorrigeringen</a>."
+          "a": "Ja. Mät ditt rum med en UMIK-1 eller en annan kalibrerad USB-mikrofon på en till fem punkter runt din lyssningsplats, så anpassar Vespertine filter till varje högtalare och samordnar deras fördröjning och nivå, i stereo eller 5.1. Appen kan också importera filter från REW och Equalizer APO samt impulssvar. Funktionen är avstängd som standard, uppspelningen förblir bitperfekt när den är avstängd, och signalvägen visar <span class=\"mono nowrap\">RUMSKORRIGERING</span> när den är på. <a href=\"{href.roomCorrection}\">Så fungerar rumskorrigeringen</a>."
         },
         {
           "q": "Kan den spela SACD- och DVD-skivor?",
@@ -527,7 +527,7 @@
         },
         {
           "q": "Vilken hårdvara har den testats på?",
-          "a": "PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11, där även heltalsläge testades. Uppspelning har också testats på AirPods Max via USB-C och Bluetooth, högtalarna i en MacBook Pro och en Sony-tv via HDMI i 5.1. Intel-hårdvara är otestad. Bitström till receiver och utgång till flerkanals-DAC är experimentella, otestade på riktiga receivrar och flerkanaliga USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
+          "a": "PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11, där även heltalsläge testades. Uppspelning har också testats på AirPods Max via USB-C och Bluetooth, högtalarna i en MacBook Pro och en Sony-tv via HDMI i 5.1. Intel-hårdvara är otestad. Bitström till receiver och utgång till flerkanals-DAC är experimentella, otestade på riktiga receivrar och flerkanals-USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
         },
         {
           "q": "Finns den på mitt språk?",

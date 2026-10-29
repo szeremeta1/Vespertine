@@ -117,7 +117,7 @@
       "exclusive": "Keɓe",
       "spatial": "Spatial · bin motsin kai",
       "synthetic": "Mitocin sama na ƙirƙira?",
-      "roomCorrection": "Gyaran sautin ɗaki"
+      "roomCorrection": "Room correction"
     },
     "scenes": {
       "signal-path": {
@@ -126,7 +126,7 @@
         "title": "Kowace waƙa a ƙimar samfurinta da zurfin bit nata na asali.",
         "lede": "Hanyar Sigina tana jera kowane mataki daga fayil zuwa DAC ɗinku, bisa abin da aka karanto daga Core Audio, kuma tana faɗa idan wani abu ya canza samfuran.",
         "body": [
-          "Vespertine yana sauya na'urar zuwa ƙimar samfurin kowane fayil, kuma yana sake samfurawa da mai juyawar Apple mai ingancin mastering ne kawai idan DAC ba zai iya amfani da ƙimar ba. <span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan an cika sharuɗɗan da ke cikin lambar tushe: ƙimar samfuri ta asali, babu abin da yake canza samfuran, tsawon kalmar bit da ya dace, da na'ura da aka keɓe ko wadda babu wata manhaja da ke amfani da ita tare. An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11."
+          "Vespertine yana sauya na'urar zuwa ƙimar samfurin kowane fayil, kuma yana sake samfurawa da mai juyawar Apple mai ingancin mastering ne kawai idan DAC ba zai iya amfani da ƙimar ba. <span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan an cika sharuɗɗan da ke cikin lambar tushe: ƙimar samfuri ta asali, babu abin da yake canza samfuran, tsawon kalmar bit da ya dace, da na'urar da aka keɓe ko wadda babu wata manhaja da ke amfani da ita tare. An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11."
         ],
         "list": [
           "Yanayin keɓe (hog) yana hana sauran manhajoji amfani da na'urar. A yanayin rabawa, maɓallan ƙarar sauti da Digital Crown suna daidaita DAC ɗinku; a yanayin keɓe ma za su iya, idan kun kunna hakan.",
@@ -446,9 +446,9 @@
         ],
         [
           "Convolution / ƙarin manhajojin tasirin sauti",
-          "Ee (gyaran sautin ɗaki) / A'a",
+          "I (gyaran sautin ɗaki) / A'a",
           "A'a / A'a",
-          "I (Origin: zaɓi na kuɗi) / Audio Units",
+          "I (Origin: zaɓi da ake biya) / Audio Units",
           "I / A'a",
           "A'a / A'a",
           "Ba a bayyana a takardu ba / Ba a bayyana a takardu ba",

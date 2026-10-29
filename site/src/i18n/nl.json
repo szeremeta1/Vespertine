@@ -153,7 +153,7 @@
         "title": "Meet je ruimte. Corrigeer elke luidspreker.",
         "lede": "Meet je ruimte met een UMIK-1 of een andere gekalibreerde USB-microfoon, en Vespertine berekent filters voor elke luidspreker op basis van wat het op je zitplaats hoort.",
         "body": [
-          "Sweeps klinken via één luidspreker tegelijk, op één tot vijf plekken rond je zitplaats. Elke luidspreker krijgt eigen filters, ontworpen op basis van de meting. Het zijn vooral verlagingen: ze halen de pieken van de ruimte omlaag en versterken brede dalen maar voorzichtig. Dezelfde meting bepaalt de vertraging en het niveau van elke luidspreker, zodat elke luidspreker je zitplaats tegelijk en even luid bereikt. Ruimtecorrectie staat standaard uit, en afspelen blijft bitperfect zolang ze uitstaat. Staat ze aan, dan toont het signaalpad <span class=\"mono nowrap\">RUIMTECORRECTIE</span>."
+          "Sweeps klinken via één luidspreker tegelijk, op één tot vijf plekken rond je zitplaats. Elke luidspreker krijgt eigen filters, ontworpen op basis van de meting. Het zijn vooral verlagingen: ze halen de pieken van de ruimte omlaag en versterken brede dalen slechts voorzichtig. Dezelfde meting bepaalt de vertraging en het niveau van elke luidspreker, zodat elke luidspreker je zitplaats tegelijk en even luid bereikt. Ruimtecorrectie staat standaard uit, en afspelen blijft bitperfect zolang ze uitstaat. Staat ze aan, dan toont het signaalpad <span class=\"mono nowrap\">RUIMTECORRECTIE</span>."
         ],
         "list": [
           "Drie doelcurves: Warm (de standaard), Gentle tilt en Flat. Corrigeer alleen de bas of het volledige bereik, en ontwerp de filters later opnieuw zonder opnieuw te meten.",

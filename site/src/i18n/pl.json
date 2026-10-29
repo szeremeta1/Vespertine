@@ -153,11 +153,11 @@
         "title": "Zmierz swoje pomieszczenie. Skoryguj każdy głośnik.",
         "lede": "Zmierz swoje pomieszczenie mikrofonem UMIK-1 lub innym skalibrowanym mikrofonem USB, a Vespertine dopasuje filtry do każdego głośnika na podstawie tego, co mikrofon słyszy w twoim miejscu odsłuchowym.",
         "body": [
-          "Przemiatania są odtwarzane przez jeden głośnik naraz, w jednym do pięciu punktach wokół twojego miejsca odsłuchowego. Każdy głośnik dostaje własne filtry, zaprojektowane na podstawie pomiaru. To głównie obniżenia: zbijają podbicia wywołane przez pomieszczenie, a szerokie doliny podnoszą tylko delikatnie. Ten sam pomiar ustala opóźnienie i poziom każdego głośnika, tak aby dźwięk z każdego z nich docierał do twojego miejsca w tym samym czasie i z tą samą głośnością. Korekcja pomieszczenia jest domyślnie wyłączona, a dopóki jest wyłączona, odtwarzanie pozostaje bit-perfect. Gdy jest włączona, ścieżka sygnału pokazuje <span class=\"mono nowrap\">KOREKCJA POMIESZCZENIA</span>."
+          "Przemiatania są odtwarzane kolejno przez każdy głośnik, w jednym do pięciu punktach wokół twojego miejsca odsłuchowego. Każdy głośnik dostaje własne filtry, zaprojektowane na podstawie pomiaru. To głównie obniżenia: zbijają podbicia wywołane przez pomieszczenie, a szerokie doliny podnoszą tylko delikatnie. Ten sam pomiar ustala opóźnienie i poziom każdego głośnika, tak aby dźwięk z każdego z nich docierał do twojego miejsca w tym samym czasie i z tą samą głośnością. Korekcja pomieszczenia jest domyślnie wyłączona, a dopóki jest wyłączona, odtwarzanie pozostaje bit-perfect. Gdy jest włączona, ścieżka sygnału pokazuje <span class=\"mono nowrap\">KOREKCJA POMIESZCZENIA</span>."
         ],
         "list": [
           "Trzy krzywe docelowe: Warm (domyślna), Gentle tilt i Flat. Koryguj tylko bas albo pełne pasmo, a filtry możesz później zaprojektować na nowo bez ponownego pomiaru.",
-          "Importuje filtry z REW lub Equalizer APO wraz z opóźnieniem i poziomem każdego głośnika, a eksportuje je jako tekst dla Equalizer APO.",
+          "Importuje filtry z REW lub Equalizer APO wraz z opóźnieniem i poziomem każdego głośnika, a eksportuje filtry w formacie tekstowym Equalizer APO.",
           "Importuje odpowiedzi impulsowe (WAV, AIFF, CAF lub FLAC) i odtwarza je przez konwolucję.",
           "Stereo i 5.1.",
           "Portret pomieszczenia pokazuje głośniki, twoje miejsce i każdy punkt mikrofonu w trakcie jego pomiaru. Następnie animacja krzywej przekształca zmierzoną charakterystykę w przewidywaną, a przełącznik przed/po pozwala je porównać."
@@ -437,7 +437,7 @@
           "Korekcja pomieszczenia",
           "Pomiar w aplikacji (mikrofon USB) lub import z REW / APO i import odpowiedzi impulsowych",
           "Nie",
-          "Przez konwolucję (Origin: opcja płatna) lub Audio Units",
+          "Przez konwolucję (Origin: płatna opcja) lub Audio Units",
           "Przez konwolucję",
           "Nie (z założenia)",
           "Nieudokumentowane",
@@ -685,7 +685,7 @@
     "eyebrow": "Prywatność",
     "heading": "Vespertine nie zbiera",
     "headingBrass": "niczego.",
-    "updated": "Obowiązuje od {effective} (dodaje korzystanie z mikrofonu przez korekcję pomieszczenia, dla wersji 0.14). Wcześniejsze zmiany: opcjonalny status w Discordzie, {discordUpdated}; sekcja „Ta strona”, {statsUpdated}, gdy strona zaczęła liczyć odwiedziny za pomocą hostowanych samodzielnie statystyk bez plików cookie. Dnia {langUpdated} sekcja „Ta strona” zaczęła też opisywać menu języka, które zapamiętuje twój wybór na twoim urządzeniu.",
+    "updated": "Obowiązuje od {effective} (uwzględnia korzystanie z mikrofonu przez korekcję pomieszczenia w wersji 0.14). Wcześniejsze zmiany: opcjonalny status w Discordzie, {discordUpdated}; sekcja „Ta strona”, {statsUpdated}, gdy strona zaczęła liczyć odwiedziny za pomocą hostowanych samodzielnie statystyk bez plików cookie. Dnia {langUpdated} sekcja „Ta strona” zaczęła też opisywać menu języka, które zapamiętuje twój wybór na twoim urządzeniu.",
     "intro": "Vespertine to darmowy, otwartoźródłowy odtwarzacz muzyki. Aplikacja nie ma kont, analityki, telemetrii, raportowania awarii ani reklam. Twórca nie otrzymuje żadnych informacji o tobie ani o twojej muzyce. Ponieważ kod źródłowy jest publiczny, możesz sprawdzić każde stwierdzenie na tej stronie.",
     "staysTitle": "Co zostaje na twoim Macu",
     "stays": "Baza danych biblioteki, playlisty, liczniki odtworzeń, wyniki analizy plików, pamięć podręczna okładek i ustawienia są przechowywane w folderze Biblioteki twojego konta użytkownika na Macu. Hasła do zasobów sieciowych i token ListenBrainz, jeśli go dodasz, są przechowywane w pęku kluczy macOS. Korekcja pomieszczenia korzysta z mikrofonu pomiarowego tylko podczas wykonywania pomiaru, a nagrania przechowuje w folderze Dokumenty. Nic z tego nie jest nigdzie wysyłane.",

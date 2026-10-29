@@ -435,7 +435,7 @@
         ],
         [
           "Romkorrigering",
-          "Måles i appen (USB-mikrofon), eller import fra REW / APO og av impulsresponser",
+          "Måling i appen (USB-mikrofon) eller import fra REW / APO og av impulsresponser",
           "Nei",
           "Via konvolusjon (Origin: betalt tilvalg) eller Audio Units",
           "Via konvolusjon",
@@ -448,7 +448,7 @@
           "Konvolusjon / lydeffekt-plugins",
           "Ja (romkorrigering) / Nei",
           "Nei / Nei",
-          "Ja (Origin: betalt tillegg) / Audio Units",
+          "Ja (Origin: betalt tilvalg) / Audio Units",
           "Ja / Nei",
           "Nei / Nei",
           "Ikke dokumentert / Ikke dokumentert",

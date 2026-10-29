@@ -435,7 +435,7 @@
         ],
         [
           "Correction de salle",
-          "Mesurée dans l’application (micro USB), ou import REW / APO et de réponses impulsionnelles",
+          "Mesurée dans l’application (micro USB), ou import de fichiers REW / APO et de réponses impulsionnelles",
           "Non",
           "Par convolution (Origin : option payante) ou via des Audio Units",
           "Par convolution",
@@ -527,7 +527,7 @@
         },
         {
           "q": "Sur quel matériel a-t-il été testé ?",
-          "a": "La lecture PCM a été testée jusqu’à 768 kHz et en DSD256 sur un Fosi Audio ZD3, et jusqu’à 384 kHz et en DSD128 sur un FiiO K11, sur lequel le mode entier a également été testé. Elle a aussi été testée sur des AirPods Max en USB-C et en Bluetooth, sur les haut-parleurs d’un MacBook Pro et sur un téléviseur Sony en HDMI en 5.1. Le matériel Intel n’a pas été testé. Le bitstream vers un ampli-tuner et la sortie DAC multicanal sont expérimentaux, non testés sur de vrais amplis-tuners et DAC USB multicanaux (un téléviseur Sony en HDMI a été testé : voir docs/DEVICES.md) ; <a href=\"{href.dacReport}\">retours souhaités</a>."
+          "a": "La lecture PCM a été testée jusqu’à 768 kHz et en DSD256 sur un Fosi Audio ZD3, et jusqu’à 384 kHz et en DSD128 sur un FiiO K11, sur lequel le mode entier a également été testé. Elle a aussi été testée sur des AirPods Max en USB-C et en Bluetooth, sur les haut-parleurs d’un MacBook Pro et sur un téléviseur Sony en 5.1 via HDMI. Le matériel Intel n’a pas été testé. Le bitstream vers un ampli-tuner et la sortie DAC multicanal sont expérimentaux, non testés sur de vrais amplis-tuners et DAC USB multicanaux (un téléviseur Sony en HDMI a été testé : voir docs/DEVICES.md) ; <a href=\"{href.dacReport}\">retours souhaités</a>."
         },
         {
           "q": "Est-il disponible dans ma langue ?",
