@@ -112,6 +112,36 @@ struct NetworkPlaybackCacheTests {
         #expect(try next.read(at: 0, count: 8192).count == 8192)
     }
 
+    @Test("Cache cleanup respects another live session's lease")
+    func liveSessionIsNotRemoved() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let first = NetworkPlaybackCache(directory: dir, budget: 1 << 20)
+        let share = SlowShare(count: 8192)
+        let entry = try first.entry(key: "live", url: URL(fileURLWithPath: "/live.flac"), reader: share)
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        let second = NetworkPlaybackCache(directory: dir, budget: 1 << 20)
+        #expect(first.directory != second.directory)
+        #expect(FileManager.default.fileExists(atPath: entry.url.path))
+        #expect(try entry.read(at: 0, count: 8192) == share.bytes)
+    }
+
+    @Test("DVD folder staging keeps named IFO and VOB files together and byte exact")
+    func dvdFolder() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let source = dir.appendingPathComponent("VIDEO_TS")
+        try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
+        let ifo = source.appendingPathComponent("VIDEO_TS.IFO")
+        let vob = source.appendingPathComponent("VTS_01_1.VOB")
+        try Data([1, 2, 3]).write(to: ifo)
+        try Data([4, 5, 6, 7]).write(to: vob)
+        let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("cache"), budget: 1 << 20)
+        let folder = try cache.directoryEntry(for: ifo, cancelled: { false })
+        #expect(folder.url.lastPathComponent == "VIDEO_TS.IFO")
+        #expect(try Data(contentsOf: folder.url) == Data([1, 2, 3]))
+        #expect(try Data(contentsOf: folder.url.deletingLastPathComponent().appendingPathComponent(vob.lastPathComponent)) == Data([4, 5, 6, 7]))
+        #expect(cache.reservedBytes == 7)
+    }
+
     @Test("Staged PCM renders the whole track with zero underruns while its share is stalled")
     func renderWithoutNetwork() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

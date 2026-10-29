@@ -576,9 +576,9 @@ final class PlayerController {
     /// Library scans of network shares go one request at a time while the song you're starting, seeking or
     /// playing streams from a share (no complete local copy yet): a scan at full width queues the song's reads
     /// behind dozens of its own, and starting a song took 40 s with stalls every few seconds after.
-    private func yieldShareToPlayback() {
+    private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
-        let streaming = active && current.map { shares.isNetwork($0.track) && !shares.cache.isAvailable($0.track) } ?? false
+        let streaming = active && (snap.readingFromShare || (requested != nil && current.map { shares.isNetwork($0.track) } == true))
         let limit = streaming ? ShareIOGate.whileStreaming : nil
         if ShareIOGate.shared.maxInFlight != limit { ShareIOGate.shared.maxInFlight = limit }
     }
@@ -638,7 +638,7 @@ final class PlayerController {
         syncVolumeRelay()
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
-        yieldShareToPlayback()
+        yieldShareToPlayback(snap)
         yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
         if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {

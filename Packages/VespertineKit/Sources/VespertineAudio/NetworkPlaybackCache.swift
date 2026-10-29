@@ -28,7 +28,16 @@ private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
 final class NetworkPlaybackCache: @unchecked Sendable {
     static let shared = NetworkPlaybackCache(directory: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
-    enum Failure: Error { case budgetExceeded, unexpectedEOF, cancelled }
+    enum Failure: LocalizedError {
+        case budgetExceeded, unexpectedEOF, cancelled
+        var errorDescription: String? {
+            switch self {
+            case .budgetExceeded: CocoaError(.fileReadTooLarge).localizedDescription
+            case .unexpectedEOF: CocoaError(.fileReadCorruptFile).localizedDescription
+            case .cancelled: CocoaError(.userCancelled).localizedDescription
+            }
+        }
+    }
     private final class WeakEntry { weak var value: Entry?; init(_ value: Entry) { self.value = value } }
     private static let registry = Locked([String: WeakEntry]())
     static func lookup(_ url: URL) -> Entry? { registry.withLock { $0[url.path]?.value } }
@@ -80,6 +89,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         return try lock.withLock {
             if let existing = entries[key]?.value { return existing }
             guard source.size >= 0, source.size <= budget - reservedBytes else { throw Failure.budgetExceeded }
+            if let attributes = try? FileManager.default.attributesOfFileSystem(forPath: directory.path),
+               let free = attributes[.systemFreeSize] as? NSNumber,
+               source.size > max(0, free.int64Value - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
             let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
             let size = source.size
             let storage = try Storage(url: path, reader: source, chunk: chunk, session: session) { [weak self] in
@@ -181,10 +193,15 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 storage.resumeAt = min(storage.blocks, Int(storage.cursor / Int64(storage.chunk)))
             }
             var data = Data(count: count)
-            let n = data.withUnsafeMutableBytes { buffer in
-                pread(storage.file.fileDescriptor, buffer.baseAddress, count, off_t(offset))
+            try data.withUnsafeMutableBytes { buffer in
+                var done = 0
+                while done < count {
+                    let n = pread(storage.file.fileDescriptor, buffer.baseAddress!.advanced(by: done), count - done, off_t(offset) + off_t(done))
+                    if n < 0, errno == EINTR { continue }
+                    guard n > 0 else { throw CocoaError(.fileReadUnknown) }
+                    done += n
+                }
             }
-            guard n == count else { throw CocoaError(.fileReadUnknown) }
             return data
         }
     }

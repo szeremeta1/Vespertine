@@ -123,7 +123,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         set { callbacks.withLock { $0.resolver = newValue } }
     }
     private func resolve(_ item: PlayableItem) -> URL {
-        staged[cacheKey(item)]?.url ?? urlResolver?(item) ?? item.url
+        if let folder = stagedFolder, folder.key == cacheKey(item) { return folder.entry.url }
+        return staged[cacheKey(item)]?.url ?? urlResolver?(item) ?? item.url
     }
     private func cacheKey(_ item: PlayableItem) -> String { item.cacheKey ?? item.url.path }
     private var staged: [String: NetworkPlaybackCache.Entry] = [:]
@@ -310,6 +311,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Read live from a network share: a file of a share with no complete local copy, or any file on a volume
     /// macOS doesn't mark local (a share mounted in the Finder and added as a folder, a DVD folder on a share).
     private func isStreaming(_ item: PlayableItem) -> Bool {
+        if stagedFolder?.key == cacheKey(item) { return false }
         if let entry = staged[cacheKey(item)] { return !entry.isComplete }
         let url = resolve(item)
         return item.cacheKey != nil ? url == item.url : Self.isOnNetworkVolume(url)
@@ -1147,7 +1149,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// whose output after a seek is identical to continuous decoding (lossless PCM and DoP).
     private func switchToLocalCopyIfReady() {
         // A staged decoder already reads through the local cache, including lossy and DSD→PCM paths.
-        if let decoding, staged[cacheKey(decoding.item)] != nil { return }
+        if let decoding, let entry = staged[cacheKey(decoding.item)] {
+            if entry.isComplete { decoding.streaming = false }
+            return
+        }
         guard let decoding, decoding.streaming, !decoding.staysOnShare, !decoding.finished, !decoding.inputExhausted,
               Date().timeIntervalSince(localCopyCheckedAt) >= 1 else { return }
         localCopyCheckedAt = Date()
@@ -1217,9 +1222,27 @@ public final class PlaybackEngine: @unchecked Sendable {
             guard let ahead = decoding?.decoder as? ReadAheadDecoder, Date() < giveUp else { break }
             ahead.waitForAudio(timeout: 0.05)
         }
-        if let decoding, let entry = staged[cacheKey(decoding.item)], !entry.isComplete {
+        if let decoding { try primeNetworkLead(decoding) }
+        // The first decode may have become ready while the disk lead was being filled. Populate the
+        // output ring now too; starting an empty output and filling it on the next tick creates a stall.
+        while let decoding, !decoding.finished, session.readableFrames < target, !hasPendingCommands {
+            if fill() { continue }
+            guard let ahead = decoding.decoder as? ReadAheadDecoder, !ahead.hasEnded else { break }
+            ahead.waitForAudio(timeout: 0.05)
+        }
+    }
+
+    private func primeNetworkLead(_ decoding: Decoding) throws {
+        if let entry = staged[cacheKey(decoding.item)], !entry.isComplete {
             shared.withLock { $0.snapshot.isBuffering = true }
             defer { shared.withLock { $0.snapshot.isBuffering = false } }
+            // Header parsers may have visited the end of a container. Wait for the decoder's first
+            // actual audio read so a CUE/SACD seek primes the region that will play, not a tag at EOF.
+            if let ahead = decoding.decoder as? ReadAheadDecoder {
+                while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
+                    if superseded { throw Superseded() }
+                }
+            }
             // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
             // these are the original compressed/container bytes. Reads beyond the lead remain guarded.
             let format = decoding.probed.format
@@ -1347,6 +1370,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
                     d.streaming = streaming
+                    try primeNetworkLead(d)
                     decoding = d
                     segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten,
                                             startOffsetSeconds: 0, durationSeconds: d.durationSeconds))
@@ -1356,6 +1380,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                     draining = true
                     nrt_context_set_draining(session.context, true)
                 }
+                return
+            } catch is Superseded {
+                teardownDecoding()
                 return
             } catch {
                 emit(.failed(next, error.localizedDescription))
