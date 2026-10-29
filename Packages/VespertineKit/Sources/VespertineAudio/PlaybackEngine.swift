@@ -1461,6 +1461,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func releaseStaging() {
+        unusedProbe = nil
+        carried = nil
         guard !staged.isEmpty || stagedFolder != nil else { return }
         stagedFolder = nil
         for entry in staged.values { entry.cancel() }

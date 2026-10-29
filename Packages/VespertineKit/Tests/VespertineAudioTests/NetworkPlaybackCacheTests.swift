@@ -198,6 +198,32 @@ struct NetworkPlaybackCacheTests {
         #expect(nrt_context_take_underruns(context) == 0)
     }
 
+    @Test("A native PCM probe retains its cache lease after the engine stages another source")
+    func nativeDecoderLease() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("source.wav")
+        let format = AVAudioFormat(standardFormatWithSampleRate: 48000, channels: 2)!
+        do {
+            let file = try AVAudioFile(forWriting: url, settings: format.settings)
+            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 48)!
+            buffer.frameLength = 48
+            for c in 0..<2 { for f in 0..<48 { buffer.floatChannelData![c][f] = 0 } }
+            try file.write(from: buffer)
+        }
+        let share = SlowShare(data: try Data(contentsOf: url))
+        let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("cache"), budget: 1 << 20)
+        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "lease", url: url, reader: share)
+        try entry!.prepare(full: true, lead: 0, cancelled: { false })
+        weak var lease = entry
+        let probed = try SourceOpener.probe(entry!.url)
+        entry = nil
+        withExtendedLifetime(probed) {
+            #expect(lease != nil)
+            #expect(cache.reservedBytes == Int64(share.bytes.count))
+            #expect(FileManager.default.fileExists(atPath: probed.url.path))
+        }
+    }
+
     @Test("Guarded FFmpeg DSD→PCM and DoP match direct decoding byte for byte", arguments: [false, true])
     func dsdDecoderIdentity(dop: Bool) throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

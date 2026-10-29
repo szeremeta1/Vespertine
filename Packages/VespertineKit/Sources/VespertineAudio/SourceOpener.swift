@@ -61,6 +61,9 @@ public enum SourceOpenerError: Error, LocalizedError {
 /// Opened source before a plan is known.
 final class ProbedSource: @unchecked Sendable {
     let url: URL
+    /// Native decoders hold file descriptors too: retain the disk reservation until they release them,
+    /// including a fully decoded source still alive while the engine opens the next track.
+    private let cacheLease: NetworkPlaybackCache.Entry?
     let format: SourceFormat
     let decoderName: String
     fileprivate let pcm: PCMDecoding?
@@ -71,6 +74,7 @@ final class ProbedSource: @unchecked Sendable {
 
     fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil) {
         self.url = url
+        cacheLease = NetworkPlaybackCache.lookup(url)
         var format = format
         if format.channelLabels == nil {
             let layout = pcm?.processingFormat.channelLayout ?? dsd?.processingFormat.channelLayout
