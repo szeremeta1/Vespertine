@@ -4,7 +4,7 @@
 Vespertine's own and free to use anywhere the trailer goes.
 
 Timed to the cut in Sources/TrailerStage/Timeline.swift: 130 BPM (two bars to each of the trailer's 65 BPM bars),
-first downbeat at 3.657 s, the end card from bar 10, 44.017 s in all. A lounge progression in D-flat
+first downbeat at 3.657 s, the end card from bar 11, 47.709 s in all. A lounge progression in D-flat
 (Dbmaj9, Bbm9, Gbmaj9, Ab13sus4) on a Rhodes-like FM piano, a warm pad, sub bass and soft half-time drums.
 Mastered gently: a light 1.5:1 bus compressor and a soft tanh saturation with headroom (it warms, never clips),
 then -14 LUFS integrated with true peaks under -1.5 dBTP, the limiter only shaving the odd peak by a fraction of a dB.
@@ -33,8 +33,8 @@ BEAT = 60 / 130
 MBAR = 4 * BEAT
 FIRST_DOWNBEAT = 3.657            # Music.firstDownbeat: musical bar 2
 T0 = FIRST_DOWNBEAT - 2 * MBAR    # musical bar 0 (a few ms before the file starts)
-DURATION = 44.017                 # Music.duration
-END_BAR = 20                      # the end card (trailer bar 10)
+DURATION = 47.709                 # Music.duration
+END_BAR = 22                      # the end card (trailer bar 11)
 N = int(DURATION * SR)
 RNG = np.random.default_rng(1729)
 
@@ -49,14 +49,14 @@ def midi(n):
 
 
 # One chord per musical bar. The intro sits on the subdominant and the suspended dominant, so the first downbeat
-# lands on the tonic; bars 18-19 do the same into the end card.
+# lands on the tonic; bars 20-21 do the same into the end card.
 DB, BBM, GB, AB = (
     (37, [53, 56, 60, 63]),       # Dbmaj9: F Ab C Eb over Db
     (34, [56, 60, 61, 65]),       # Bbm9: Ab C Db F over Bb
     (30, [58, 61, 65, 68]),       # Gbmaj9: Bb Db F Ab over Gb
     (32, [54, 58, 61, 65]),       # Ab13sus4: Gb Bb Db F over Ab
 )
-CHORDS = [GB, AB] + [DB, BBM, GB, AB] * 4 + [GB, AB] + [DB] * 4
+CHORDS = [GB, AB] + [DB, BBM, GB, AB] * 4 + [DB, BBM] + [GB, AB] + [DB] * 4
 
 
 def stereo(mono, pan=0.0):
@@ -200,8 +200,8 @@ for bar, (root, notes) in enumerate(CHORDS):
         break
     final = bar == END_BAR
     length = (DURATION - start - 0.5) if final else MBAR
-    # Pad: darker in the intro, opening up as the groove arrives, widest for Spatial Audio (bars 12-13).
-    cutoff = 900 + 1500 * bar / 2 if bar < 2 else (3400 if bar in (12, 13) else 2600)
+    # Pad: darker in the intro, opening up as the groove arrives, widest for Spatial Audio (bars 14-15).
+    cutoff = 900 + 1500 * bar / 2 if bar < 2 else (3400 if bar in (14, 15) else 2600)
     place(pads, pad(notes + [root + 24], length + 0.3, cutoff=cutoff, attack=1.4 if bar == 0 else 0.5,
                     release=2.5 if final else 0.9), start - 0.15)
     # Piano.

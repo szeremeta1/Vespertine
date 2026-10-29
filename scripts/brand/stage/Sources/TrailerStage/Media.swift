@@ -92,8 +92,8 @@ func firstFrame(of url: URL, at seconds: Double) -> CGImage {
 }
 
 /// Crops a rectangle given in window points out of a 2× frame.
-func crop(_ image: CGImage, _ rect: CGRect) -> CGImage {
-    let s = CGFloat(image.width) / AppWindow.size.width
+func crop(_ image: CGImage, _ rect: CGRect, windowWidth: CGFloat = AppWindow.size.width) -> CGImage {
+    let s = CGFloat(image.width) / windowWidth
     return image.cropping(to: CGRect(x: rect.minX * s, y: rect.minY * s, width: rect.width * s, height: rect.height * s).integral)!
 }
 
