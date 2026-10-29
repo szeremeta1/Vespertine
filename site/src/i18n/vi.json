@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: trình phát nhạc âm thanh vòm và hi-res cho Mac",
-    "description": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập âm thanh vòm và hi-res: ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Dolby Atmos, Âm thanh không gian trên AirPods, cùng một đường tín hiệu bit-perfect mà bạn có thể kiểm tra.",
+    "description": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập âm thanh vòm và hi-res: ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Dolby Atmos, Âm thanh không gian trên AirPods, hiệu chỉnh phòng được đo ngay trong căn phòng của bạn, cùng một đường tín hiệu bit-perfect mà bạn có thể kiểm tra.",
     "ogAlt": "Vespertine: trình phát miễn phí, mã nguồn mở cho Mac dành cho nhạc âm thanh vòm và hi-res. Đường tín hiệu cho thấy một tệp FLAC 24 bit / 96 kHz đang phát bit-perfect trên Fosi Audio ZD3. Phiên bản {version}, macOS {minMacOS} trở lên.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "và hi-res,"
       ],
       "titleBrass": "ngay trên Mac của bạn.",
-      "lede": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Atmos nằm chung một thư viện với các album stereo của bạn, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Đường tín hiệu hiển thị từng bước từ tệp đến đầu ra. Có bằng tiếng Anh và {languages} ngôn ngữ khác.",
+      "lede": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Atmos nằm chung một thư viện với các album stereo của bạn, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Hiệu chỉnh phòng đo căn phòng của bạn bằng micro USB và hiệu chỉnh từng loa; tính năng này luôn tắt cho đến khi bạn bật lên. Đường tín hiệu hiển thị từng bước từ tệp đến đầu ra. Có bằng tiếng Anh và {languages} ngôn ngữ khác.",
       "ask": "Bạn thấy thích?",
       "star": "Gắn sao trên GitHub",
       "discuss": "Tham gia thảo luận",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Độc quyền",
       "spatial": "Không gian · theo dõi đầu",
-      "synthetic": "Tần số cao tổng hợp?"
+      "synthetic": "Tần số cao tổng hợp?",
+      "roomCorrection": "Hiệu chỉnh phòng"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Mỗi bản nhạc ở đúng tần số và độ sâu gốc.",
         "lede": "Đường tín hiệu liệt kê từng bước từ tệp đến DAC của bạn, được đọc lại từ Core Audio, và cho biết khi có thứ gì đó làm thay đổi các mẫu âm thanh.",
         "body": [
-          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ resample, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát PCM đã được kiểm tra đến 384 kHz trên FiiO K11."
+          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ resample, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát lại đã được kiểm tra với PCM đến 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM đến 384 kHz và DSD128 trên FiiO K11."
         ],
         "list": [
           "Chế độ độc quyền (hog) ngăn các ứng dụng khác dùng thiết bị. Ở chế độ chia sẻ, phím âm lượng và Digital Crown điều chỉnh DAC của bạn; ở chế độ độc quyền chúng cũng làm được vậy nếu bạn bật tùy chọn đó.",
@@ -145,6 +146,29 @@
         "alt": "Vespertine đang phát Années de pèlerinage của Liszt do Lazar Berman trình bày, từ một tệp FLAC 24 bit / 96 kHz: bộ kiểm tra đánh dấu bản phát là bit-perfect và độc quyền trên Fosi Audio ZD3, kèm từng bước của đường tín hiệu.",
         "floatAlt": "Bảng kết quả kiểm tra loopback: 24 bit ở 44,1 và 96 kHz, 16 bit chèn 0 và một cặp bài liền mạch, mỗi mục đều khớp từng bit.",
         "floatCaption": "Kiểm tra loopback · kiểm tra bằng phần mềm"
+      },
+      "room-correction": {
+        "jack": "Hiệu chỉnh phòng",
+        "kicker": "Hiệu chỉnh phòng",
+        "title": "Đo căn phòng của bạn. Hiệu chỉnh từng loa.",
+        "lede": "Đo căn phòng của bạn bằng UMIK-1 hoặc một micro USB đã hiệu chuẩn khác, và Vespertine sẽ thiết kế bộ lọc phù hợp cho từng loa dựa trên những gì nó nghe được tại chỗ ngồi của bạn.",
+        "body": [
+          "Tiếng quét được phát qua từng loa một, tại một đến năm vị trí quanh chỗ ngồi nghe của bạn. Mỗi loa có bộ lọc riêng, được thiết kế dựa trên kết quả đo. Phần lớn đó là các bộ lọc cắt giảm: chúng hạ các đỉnh do phòng gây ra và chỉ tăng nhẹ ở những chỗ trũng rộng. Cũng chính phép đo đó đặt độ trễ và mức của từng loa, để âm thanh từ mọi loa đến chỗ ngồi của bạn cùng lúc và với cùng độ lớn. Hiệu chỉnh phòng tắt theo mặc định, và phát lại vẫn bit-perfect khi tính năng này tắt. Khi bật, đường tín hiệu hiển thị <span class=\"mono nowrap\">HIỆU CHỈNH PHÒNG</span>."
+        ],
+        "list": [
+          "Ba mục tiêu: Warm (mặc định), Gentle tilt và Flat. Chỉ hiệu chỉnh âm trầm hoặc hiệu chỉnh toàn dải, và thiết kế lại bộ lọc sau này mà không cần đo lại.",
+          "Nhập bộ lọc từ REW hoặc Equalizer APO, kèm độ trễ và mức của từng loa, và xuất văn bản Equalizer APO.",
+          "Nhập đáp ứng xung (WAV, AIFF, CAF hoặc FLAC) và phát chúng bằng xử lý tích chập.",
+          "Stereo và 5.1.",
+          "Chân dung căn phòng hiển thị các loa, chỗ ngồi của bạn và từng vị trí đặt micro khi vị trí đó được đo. Sau đó, hoạt ảnh chuyển đường cong biến đáp tuyến đo được thành đáp tuyến dự đoán, và một nút chuyển trước/sau giúp so sánh hai đường."
+        ],
+        "note": "Đường cong “sau” được dự đoán từ phép đo và các bộ lọc, không phải được đo thực tế. Để biết căn phòng thực sự tác động thế nào, hãy đo lại khi đã bật hiệu chỉnh.",
+        "links": [
+          "Cách hiệu chỉnh phòng hoạt động"
+        ],
+        "alt": "Hiệu chỉnh phòng dự đoán của Vespertine cho một cặp loa stereo với mục tiêu Warm: với mỗi loa là đáp tuyến đo được, đường mục tiêu và đáp tuyến dự đoán sau khi hiệu chỉnh, trong đó một đỉnh do phòng gây ra gần 120 Hz được cắt giảm 14 và 18 dB, cùng các bộ lọc của từng loa.",
+        "floatAlt": "Chân dung căn phòng trong trình hướng dẫn đo: loa trái và loa phải, chỗ ngồi, và năm vị trí đặt micro xung quanh, vị trí đầu tiên đang có micro.",
+        "floatCaption": "Chân dung căn phòng"
       },
       "surround": {
         "jack": "Âm thanh vòm",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Khớp từng bit với sacd_extract trên hai đĩa thật. Các đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên cho đến nay mới chỉ được kiểm tra bằng ảnh đĩa thử nghiệm tổng hợp.",
-          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang, hoặc được chuyển đổi thành PCM tần số cao. DoP đã được xác nhận trên FiiO K11; các tần số sóng mang trên 384 kHz chưa được kiểm tra trên phần cứng.",
+          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang, hoặc được chuyển đổi thành PCM tần số cao. DoP đã được xác nhận tới DSD256 trên Fosi Audio ZD3 và tới DSD128 trên FiiO K11; DSD512 qua DoP chưa được kiểm tra trên phần cứng.",
           "DVD-Video LPCM ở 16, 20 và 24 bit, 48 và 96 kHz, tối đa 8 kênh. DVD-Audio không được hỗ trợ, và đĩa mã hóa (CSS) cần một bản sao đã giải mã."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Các bản remaster, bản phát hành mono và stereo cùng các bản SACD của một album dùng chung một thẻ; chọn phiên bản khi bạn mở.",
           "Mục ưa thích và số lần phát được lưu trong thư viện, không bao giờ ghi vào tệp của bạn. Nhập danh sách phát M3U và Apple Music, cùng số lần phát và mục ưa thích.",
           "Trình sửa thẻ có sao lưu và hoàn nguyên một bước, cùng tính năng bổ sung siêu dữ liệu từ MusicBrainz, cho biết độ tin cậy trước khi ghi bất cứ thứ gì.",
-          "Thư mục chia sẻ qua mạng SMB, NFS hoặc WebDAV, có bộ nhớ đệm, Giữ ngoại tuyến và cơ chế phát lại được thiết kế cho máy chủ chậm.",
+          "Thư mục chia sẻ qua mạng SMB, NFS hoặc WebDAV, có bộ nhớ đệm, Giữ ngoại tuyến và cơ chế phát lại được thiết kế cho máy chủ chậm: các bài được nạp sẵn vào bộ đệm trên máy Mac trước khi phát, và trong lúc đó nút phát hiển thị một vòng tải.",
           "Tính năng Tìm nhạc quét mọi ổ đĩa để lọc ra nhạc thật của bạn và bỏ lại những thứ lộn xộn. Một bước thiết lập ngắn ở lần khởi chạy đầu tiên sẽ chọn đầu ra và giải thích truy cập độc quyền và ReplayGain có tác dụng gì.",
           "EQ tham số theo từng đầu ra, nhập được preset AutoEQ và Equalizer APO. Mặc định tắt; khi bật, đường tín hiệu hiển thị <span class=\"mono nowrap\">BỘ CHỈNH ÂM</span> thay vì <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Trình phát mini, tiện ích trên thanh menu, phím media, ReplayGain và cập nhật tự động có chữ ký."
@@ -242,7 +266,7 @@
         "lede": "Mọi menu, cài đặt và thông báo về đường tín hiệu đều được dịch sang {languages} ngôn ngữ ngoài tiếng Anh.",
         "body": [
           "Từ tiếng Ukraina, tiếng Đức và tiếng Nhật đến tiếng Swahili, tiếng Tamil và tiếng Hausa, với dạng số nhiều và định dạng số theo từng địa phương, cùng tiếng Trung Giản thể, Phồn thể và tiếng Trung Hồng Kông, mỗi loại có từ vựng riêng. Tiếng Ả Rập, tiếng Do Thái, tiếng Ba Tư và tiếng Urdu có bố cục từ phải sang trái.",
-          "Cách kiểm tra bản dịch: một bước kiểm tra tự động ở mỗi lần thay đổi xác nhận rằng mọi chuỗi trong ứng dụng đều có mặt ở cả {languages} ngôn ngữ với cùng các biến giữ chỗ và các dạng số nhiều mà mỗi ngôn ngữ cần, và mọi màn hình đều đã được rà soát ở mọi ngôn ngữ để phát hiện chữ bị cắt hoặc chồng lấn và lỗi lật bố cục từ phải sang trái. Ban đầu đây là các bản dịch máy được thực hiện cẩn thận, nên mọi chỉnh sửa từ người bản ngữ đều rất được hoan nghênh trên <a href=\"{href.newIssue}\">GitHub</a>."
+          "Cách kiểm tra bản dịch: một bước kiểm tra tự động ở mỗi lần thay đổi xác nhận rằng mọi chuỗi trong ứng dụng đều có mặt ở cả 44 ngôn ngữ với cùng các biến giữ chỗ và các dạng số nhiều mà mỗi ngôn ngữ cần, và các màn hình chính đã được kiểm tra ở một số ngôn ngữ để phát hiện chữ bị cắt hoặc chồng lấn và lỗi lật bố cục từ phải sang trái. Ban đầu đây là các bản dịch máy được thực hiện cẩn thận, nên mọi chỉnh sửa từ người bản ngữ đều rất được hoan nghênh trên <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Chữ Vespertine được viết bằng từng ngôn ngữ trong {languagesTotal} ngôn ngữ giao diện, từ ヴェスパタイン và Веспертайн đến فسبرتاين và वेस्परटाइन, với nhiều cỡ chữ và kiểu chữ khác nhau.",
         "wallLabel": "Vespertine trong từng ngôn ngữ của ứng dụng"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Giữ nguyên tần số lấy mẫu và độ sâu bit gốc, tới 32 bit và tới tần số mà DAC của bạn chạy được (đã kiểm thử tới 384 kHz); PCM 32 bit không bị thay đổi cần chế độ số nguyên. Ảnh đĩa dùng CUE sheet."
+          "text": "Giữ nguyên tần số lấy mẫu và độ sâu bit gốc, tới 32 bit và tới tần số mà DAC của bạn chạy được (đã kiểm thử tới 768 kHz); PCM 32 bit không bị thay đổi cần chế độ số nguyên. Ảnh đĩa dùng CUE sheet."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF và DSDIFF, nén DST hoặc không nén. DoP tùy vào DAC và tần số sóng mang, nếu không thì dùng PCM. Tần số sóng mang DoP trên 384 kHz chưa được kiểm thử trên phần cứng."
+          "text": "DSF và DSDIFF, nén DST hoặc không nén. DoP tùy vào DAC và tần số sóng mang, nếu không thì dùng PCM. DoP đã được kiểm thử tới DSD256; DSD512 qua DoP chưa được kiểm thử trên phần cứng."
         },
         {
           "name": "Ảnh đĩa SACD",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "So sánh",
       "title": "Đặt lên bàn cân.",
-      "intro": "Một số trình phát nhạc trên Mac có phát bit-perfect. Bảng này so sánh những gì tài liệu hoặc mã nguồn của chính từng trình phát ghi nhận. “Không nêu trong tài liệu” nghĩa là hãng không nói có hay không, chứ không có nghĩa là thiếu tính năng đó. Vespertine không có xử lý tích chập, plugin hiệu ứng âm thanh hay dịch vụ phát trực tuyến.",
+      "intro": "Một số trình phát nhạc trên Mac có phát bit-perfect. Bảng này so sánh những gì tài liệu hoặc mã nguồn của chính từng trình phát ghi nhận. “Không nêu trong tài liệu” nghĩa là hãng không nói có hay không, chứ không có nghĩa là thiếu tính năng đó. Xử lý tích chập của Vespertine dùng cho hiệu chỉnh phòng; ứng dụng không có plugin hiệu ứng âm thanh hay dịch vụ phát trực tuyến.",
       "hint": "Cuộn để xem thêm →",
       "region": "Bảng so sánh (cuộn ngang)",
       "caption": "So sánh Vespertine với bảy trình phát nhạc khác trên Mac, dựa trên tài liệu hoặc mã nguồn của chính từng trình phát",
@@ -410,8 +434,19 @@
           "Không⁴"
         ],
         [
+          "Hiệu chỉnh phòng",
+          "Đo ngay trong ứng dụng (micro USB), hoặc nhập từ REW / APO và nhập đáp ứng xung",
+          "Không",
+          "Qua xử lý tích chập (Origin: tùy chọn trả phí) hoặc Audio Units",
+          "Qua xử lý tích chập",
+          "Không (theo thiết kế)",
+          "Không nêu trong tài liệu",
+          "Không",
+          "Không nêu trong tài liệu"
+        ],
+        [
           "Tích chập / plugin hiệu ứng âm thanh",
-          "Không / Không",
+          "Có (hiệu chỉnh phòng) / Không",
           "Không / Không",
           "Có (Origin: tùy chọn trả phí) / Audio Units",
           "Có / Không",
@@ -475,6 +510,10 @@
           "a": "Đường tín hiệu đọc lại những gì Core Audio thực sự đã làm: tần số danh định của thiết bị, định dạng vật lý của nó và ai đang chiếm giữ thiết bị. Các bộ giải mã có kiểm thử tự động (TrueHD đối chiếu với nguồn của nó, DTS đối chiếu với bộ giải mã riêng của FFmpeg), một bài kiểm tra loopback tích hợp sẵn kiểm tra đường phần mềm theo từng mẫu, và <span class=\"mono nowrap\">vespertine-probe</span> cho phép bạn kiểm tra phần cứng của chính mình. <a href=\"{href.verification}\">Cách tự kiểm chứng</a>."
         },
         {
+          "q": "Ứng dụng có hiệu chỉnh phòng không?",
+          "a": "Có. Hãy đo căn phòng của bạn bằng UMIK-1 hoặc một micro USB đã hiệu chuẩn khác tại một đến năm vị trí quanh chỗ ngồi, và Vespertine sẽ thiết kế bộ lọc phù hợp cho từng loa, đồng thời căn chỉnh độ trễ và mức của các loa, ở cấu hình stereo hoặc 5.1. Ứng dụng cũng nhập được bộ lọc REW và Equalizer APO, cùng các đáp ứng xung. Tính năng này tắt theo mặc định, phát lại vẫn bit-perfect khi tính năng tắt, và đường tín hiệu hiển thị <span class=\"mono nowrap\">HIỆU CHỈNH PHÒNG</span> khi tính năng bật. <a href=\"{href.roomCorrection}\">Cách hiệu chỉnh phòng hoạt động</a>."
+        },
+        {
           "q": "Có phát được đĩa SACD và DVD không?",
           "a": "Phát được ảnh đĩa của chúng. Ảnh đĩa SACD <code>.iso</code>, stereo và đa kênh, nén DST hoặc không nén, cùng nhạc LPCM trên ảnh đĩa DVD-Video hoặc thư mục <code>VIDEO_TS</code> đều phát thẳng từ ảnh đĩa, không cần trích xuất thứ gì. Không hỗ trợ DVD-Audio, và DVD có mã hóa (CSS) cần một bản sao đã giải mã."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Đã được kiểm thử trên phần cứng nào?",
-          "a": "Phát lại đã được kiểm thử trên FiiO K11 ở tần số tới 384 kHz, với DoP và chế độ số nguyên; AirPods Max qua USB-C và Bluetooth; loa MacBook Pro; và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
+          "a": "Phát lại đã được kiểm thử với PCM tới 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM tới 384 kHz và DSD128 trên FiiO K11, thiết bị mà chế độ số nguyên cũng đã được kiểm thử. Ứng dụng cũng đã được kiểm thử trên AirPods Max qua USB-C và Bluetooth, loa MacBook Pro, và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
         },
         {
           "q": "Có ngôn ngữ của tôi không?",
@@ -563,7 +602,7 @@
       "install": "Cài đặt",
       "installValue": "<a href=\"{href.dmg}\">Tải tệp DMG</a> hoặc {brew}",
       "tested": "Đã thử với",
-      "testedValue": "FiiO K11 (mọi tần số lấy mẫu đến 384 kHz, DoP, chế độ số nguyên), AirPods Max qua USB-C và Bluetooth, loa MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM đến 768 kHz, DSD256 qua DoP), FiiO K11 (PCM đến 384 kHz, DSD128 qua DoP, chế độ số nguyên), AirPods Max qua USB-C và Bluetooth, loa MacBook Pro",
       "links": "Liên kết",
       "website": "Trang web",
       "source": "Mã nguồn",
@@ -646,10 +685,10 @@
     "eyebrow": "Quyền riêng tư",
     "heading": "Vespertine không thu thập",
     "headingBrass": "bất cứ thứ gì.",
-    "updated": "Có hiệu lực từ {effective} (bổ sung trạng thái Discord tùy chọn). Mục “Trang web này” được cập nhật ngày {statsUpdated}, khi trang bắt đầu đếm lượt truy cập bằng công cụ thống kê tự lưu trữ, không dùng cookie, và ngày {langUpdated}, khi menu ngôn ngữ bắt đầu ghi nhớ lựa chọn của bạn ngay trên thiết bị của bạn.",
+    "updated": "Có hiệu lực từ {effective} (bổ sung việc dùng micro của tính năng hiệu chỉnh phòng, cho phiên bản 0.14). Các thay đổi trước đó: trạng thái Discord tùy chọn, ngày {discordUpdated}; mục “Trang web này”, ngày {statsUpdated}, khi trang bắt đầu đếm lượt truy cập bằng công cụ thống kê tự lưu trữ, không dùng cookie. Vào ngày {langUpdated}, mục “Trang web này” cũng bắt đầu mô tả menu ngôn ngữ, vốn ghi nhớ lựa chọn của bạn ngay trên thiết bị của bạn.",
     "intro": "Vespertine là trình phát nhạc miễn phí, mã nguồn mở. Ứng dụng không có tài khoản, không có số liệu phân tích, không telemetry, không báo cáo sự cố và không quảng cáo. Nhà phát triển không nhận được bất kỳ thông tin nào về bạn hay âm nhạc của bạn. Vì mã nguồn công khai, bạn có thể tự kiểm chứng mọi điều trên trang này.",
     "staysTitle": "Những gì ở lại trên máy Mac của bạn",
-    "stays": "Cơ sở dữ liệu thư viện, danh sách phát, số lần phát, kết quả phân tích tệp, bộ nhớ đệm ảnh bìa và cài đặt của bạn được lưu trong thư mục Library của người dùng trên máy Mac. Mật khẩu cho các thư mục chia sẻ mạng và token ListenBrainz (nếu bạn thêm) được lưu trong Chuỗi khóa của macOS. Không có gì trong số đó được tải lên bất cứ đâu.",
+    "stays": "Cơ sở dữ liệu thư viện, danh sách phát, số lần phát, kết quả phân tích tệp, bộ nhớ đệm ảnh bìa và cài đặt của bạn được lưu trong thư mục Library của người dùng trên máy Mac. Mật khẩu cho các thư mục chia sẻ mạng và token ListenBrainz (nếu bạn thêm) được lưu trong Chuỗi khóa của macOS. Hiệu chỉnh phòng chỉ dùng micro đo của bạn trong lúc bạn tiến hành đo, và lưu các bản ghi âm trong thư mục Tài liệu của bạn. Không có gì trong số đó được tải lên bất cứ đâu.",
     "onlineTitle": "Khi ứng dụng kết nối mạng",
     "online": [
       "<strong>Kiểm tra cập nhật.</strong> Vespertine lấy nguồn cập nhật của mình từ GitHub khoảng mỗi ngày một lần, và khi bạn chọn Kiểm tra cập nhật. GitHub thấy địa chỉ IP của bạn, như với bất kỳ lượt tải xuống nào. Bạn có thể tắt tự động kiểm tra trong Cài đặt.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Vespertine giờ phát mượt từ các chia sẻ mạng chậm, phân tích thư viện lớn nhanh hơn kể cả khi có chia sẻ mạng, phát hi-res trên các DAC USB-C nhỏ ở tần số cao nhất mà chúng hỗ trợ, và giữ bàn phím cũng như vùng chọn nhiều mục ở đúng chỗ bạn mong đợi."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Vespertine giờ phát nguyên bản các tệp DSDIFF nén DST và nhạc LPCM trên đĩa DVD-Video, giữ lại mọi bài của CUE sheet EAC, và bắt đầu phát bài hát từ chia sẻ mạng ngay lập tức kể cả khi đang quét thư viện."
     }
   }
 }

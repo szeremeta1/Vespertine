@@ -6,8 +6,8 @@ interface Props { lang: Lang; }
 const { lang } = Astro.props;
 const p = t(lang).privacy;
 const f = (s: string) => fill(s, vars(lang));
-// Effective date of the policy, and the two later updates to the "This website" section.
-const updated = fill(p.updated, { effective: longDate(lang, '2026-10-18T12:00:00-04:00'), statsUpdated: longDate(lang, '2026-10-23T12:00:00-04:00'), langUpdated: longDate(lang, '2026-10-29T12:00:00-04:00'), websiteUpdated: longDate(lang, '2026-10-23T12:00:00-04:00') /* TEMP until delta */ });
+// Effective date of the policy (0.14: room correction's microphone), and the dates of the earlier changes.
+const updated = fill(p.updated, { effective: longDate(lang, '2026-10-29T12:00:00-04:00'), discordUpdated: longDate(lang, '2026-10-18T12:00:00-04:00'), statsUpdated: longDate(lang, '2026-10-23T12:00:00-04:00'), langUpdated: longDate(lang, '2026-10-29T12:00:00-04:00') });
 ---
 <Doc
   lang={lang}

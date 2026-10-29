@@ -9,7 +9,7 @@
 
 ## Tested hardware and experimental paths
 
-Playback has been checked on a FiiO K11 at rates up to 384 kHz, including DoP and integer mode; AirPods Max over USB-C and Bluetooth; and MacBook Pro speakers. The Intel build has run under Rosetta, not on an Intel Mac. DoP carrier rates above 384 kHz have not been tested on hardware. DSD64–512 file decoding is not proof of native DSD output at every rate.
+PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11. Integer mode has been checked on the FiiO K11. Playback has also been checked on AirPods Max over USB-C and Bluetooth and on MacBook Pro speakers. The Intel build has run under Rosetta, not on an Intel Mac. DSD512 over DoP has not been tested on hardware. DSD64–512 file decoding is not proof of native DSD output at every rate.
 
 Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check; IEC 61937 carriers are checked with FFmpeg's S/PDIF reader. Those checks do not establish receiver or interface compatibility.
 

@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: kicheza muziki wa sauti ya kuzunguka na hi-res kwa Mac",
-    "description": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya sauti ya kuzunguka na hi-res: nakala za diski za SACD na DVD-Video, DSD, CD za DTS, faili za DTS-HD MA, TrueHD na Dolby Atmos, Spatial Audio kwenye AirPods, na njia ya mawimbi ya bit-perfect unayoweza kuikagua.",
+    "description": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya sauti ya kuzunguka na hi-res: nakala za diski za SACD na DVD-Video, DSD, CD za DTS, faili za DTS-HD MA, TrueHD na Dolby Atmos, Spatial Audio kwenye AirPods, urekebishaji wa chumba unaopimwa ndani ya chumba chako mwenyewe, na njia ya mawimbi ya bit-perfect unayoweza kuikagua.",
     "ogAlt": "Vespertine: kicheza muziki cha Mac, bila malipo na programu huria, kwa muziki wa sauti ya kuzunguka na hi-res. Njia yake ya mawimbi inaonyesha FLAC ya biti 24 / 96 kHz ikicheza bit-perfect kwenye Fosi Audio ZD3. Toleo {version}, macOS {minMacOS} au mpya zaidi.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "ya kuzunguka na hi-res,"
       ],
       "titleBrass": "kwenye Mac yako.",
-      "lede": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, DSD, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos hukaa kwenye maktaba moja pamoja na albamu zako za stereo, na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Njia ya mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti. Kwa Kiingereza na lugha nyingine {languages}.",
+      "lede": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, DSD, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos hukaa kwenye maktaba moja pamoja na albamu zako za stereo, na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Urekebishaji wa chumba hupima chumba chako kwa maikrofoni ya USB na kurekebisha kila spika; umezimwa hadi utakapouwasha. Njia ya mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti. Kwa Kiingereza na lugha nyingine {languages}.",
       "ask": "Umeipenda?",
       "star": "Ipe nyota kwenye GitHub",
       "discuss": "Jiunge na majadiliano",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Kipekee",
       "spatial": "Spatial · ufuatiliaji wa kichwa",
-      "synthetic": "Masafa ya juu ya kutengenezwa?"
+      "synthetic": "Masafa ya juu ya kutengenezwa?",
+      "roomCorrection": "Urekebishaji wa chumba"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Kila wimbo kwa kiwango na kina chake asilia.",
         "lede": "Njia ya mawimbi huorodhesha kila hatua kutoka kwenye faili hadi DAC yako, ikisomwa tena kutoka Core Audio, na hukuambia kitu kinapobadilisha sampuli.",
         "body": [
-          "Vespertine hubadilisha kifaa kitumie kiwango cha sampuli cha kila faili, na hubadilisha kiwango cha sampuli (resampling), kwa kigeuzi cha Apple chenye ubora wa mastering, pale tu DAC isipoweza kutumia kiwango hicho. <span class=\"mono nowrap\">BIT-PERFECT</span> huonekana pale tu masharti yaliyo kwenye msimbo chanzo yanapotimizwa: kiwango asilia, hakuna kinachobadilisha sampuli, urefu wa neno unaotoshea, na kifaa kilicho katika hali ya kipekee au kisichoshirikiwa na programu nyingine. Uchezaji wa PCM umejaribiwa hadi 384 kHz kwenye FiiO K11."
+          "Vespertine hubadilisha kifaa kitumie kiwango cha sampuli cha kila faili, na hubadilisha kiwango cha sampuli (resampling), kwa kigeuzi cha Apple chenye ubora wa mastering, pale tu DAC isipoweza kutumia kiwango hicho. <span class=\"mono nowrap\">BIT-PERFECT</span> huonekana pale tu masharti yaliyo kwenye msimbo chanzo yanapotimizwa: kiwango asilia, hakuna kinachobadilisha sampuli, urefu wa neno unaotoshea, na kifaa kilicho katika hali ya kipekee au kisichoshirikiwa na programu nyingine. Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11."
         ],
         "list": [
           "Hali ya kipekee (hog) huzuia programu nyingine kutumia kifaa. Katika hali ya kushirikiwa, vitufe vya kiwango cha sauti na Digital Crown hurekebisha DAC yako; katika hali ya kipekee navyo vinaweza, ukiwasha hilo.",
@@ -145,6 +146,29 @@
         "alt": "Vespertine ikicheza Années de pèlerinage ya Liszt, kwa uchezaji wa Lazar Berman, kutoka FLAC ya biti 24 / 96 kHz: kikaguzi kinaionyesha kuwa bit-perfect na ya kipekee kwenye Fosi Audio ZD3, pamoja na kila hatua ya njia ya mawimbi.",
         "floatAlt": "Dirisha la jaribio la loopback: biti 24 kwa 44.1 na 96 kHz, biti 16 iliyojazwa na jozi isiyo na mapengo, kila moja sawa biti kwa biti.",
         "floatCaption": "Jaribio la Loopback · ukaguzi wa kiprogramu"
+      },
+      "room-correction": {
+        "jack": "Urekebishaji wa chumba",
+        "kicker": "Urekebishaji wa chumba",
+        "title": "Pima chumba chako. Rekebisha kila spika.",
+        "lede": "Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa, na Vespertine hutengeneza vichujio vinavyolingana na kila spika kutokana na kile inachosikia kwenye kiti chako.",
+        "body": [
+          "Sauti zinazopanda huchezwa kupitia spika moja baada ya nyingine, katika sehemu moja hadi tano kuzunguka kiti chako cha kusikilizia. Kila spika hupata vichujio vyake, vilivyobuniwa kutokana na kipimo. Kwa sehemu kubwa ni vya kupunguza: hushusha vilele vya chumba na huinua mabonde mapana kwa upole tu. Kipimo hicho hicho huweka ucheleweshaji na kiwango cha kila spika, ili sauti ya kila spika ifike kwenye kiti chako kwa wakati mmoja na kwa ukubwa uleule. Urekebishaji wa chumba umezimwa kwa chaguo-msingi, na uchezaji hubaki bit-perfect ukiwa umezimwa. Ukiwa umewashwa, njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span>."
+        ],
+        "list": [
+          "Malengo matatu: Warm (chaguo-msingi), Gentle tilt na Flat. Rekebisha besi pekee au masafa kamili, na ubuni upya vichujio baadaye bila kupima tena.",
+          "Huingiza vichujio kutoka REW au Equalizer APO, pamoja na ucheleweshaji na kiwango cha kila spika, na hutoa maandishi ya Equalizer APO.",
+          "Huingiza miitikio ya msukumo (WAV, AIFF, CAF au FLAC) na kuicheza kwa convolution.",
+          "Stereo na 5.1.",
+          "Picha ya Chumba huonyesha spika, kiti chako na kila sehemu ya maikrofoni inapopimwa. Kisha Ufunuo wa Mkunjo hubadilisha mwitikio uliopimwa kuwa ule uliotabiriwa, na swichi ya kabla/baada huilinganisha."
+        ],
+        "note": "Mkunjo wa “baada” umetabiriwa kutokana na kipimo na vichujio, haujapimwa. Ili kuona kile chumba kinachofanya kwa kweli, pima tena urekebishaji ukiwa umewashwa.",
+        "links": [
+          "Jinsi urekebishaji wa chumba unavyofanya kazi"
+        ],
+        "alt": "Urekebishaji wa chumba uliotabiriwa na Vespertine kwa jozi ya spika za stereo kwa lengo la Warm: kwa kila spika, mwitikio uliopimwa, lengo na mwitikio uliotabiriwa baada ya urekebishaji, kilele cha chumba karibu na 120 Hz kikiwa kimepunguzwa kwa dB 14 na 18, pamoja na vichujio vya kila spika.",
+        "floatAlt": "Picha ya Chumba katika mwongozo wa kupima: spika za kushoto na kulia, kiti, na sehemu tano za maikrofoni kukizunguka, ya kwanza ikiwa na maikrofoni juu yake.",
+        "floatCaption": "Picha ya Chumba"
       },
       "surround": {
         "jack": "Sauti ya kuzunguka",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Matokeo yamelingana na sacd_extract biti kwa biti kwenye diski mbili halisi. Diski zenye eneo la 5.0, zenye eneo la chaneli nyingi pekee, au DSD128 na zaidi, hadi sasa zimejaribiwa tu kwa nakala za majaribio zilizotengenezwa kisintetiki.",
-          "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier, au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. DoP imethibitishwa kwenye FiiO K11; viwango vya carrier zaidi ya 384 kHz havijajaribiwa kwenye maunzi.",
+          "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier, au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. DoP imethibitishwa hadi DSD256 kwenye Fosi Audio ZD3 na hadi DSD128 kwenye FiiO K11; DSD512 kupitia DoP haijajaribiwa kwenye maunzi.",
           "DVD-Video LPCM ya biti 16, 20 na 24, 48 na 96 kHz, hadi chaneli 8. DVD-Audio haitumiki, na diski zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Remaster, matoleo ya mono na stereo, na SACD za albamu moja hushiriki kadi moja; chagua toleo unapoifungua.",
           "Vipendwa na idadi ya mara zilizochezwa, vinavyohifadhiwa kwenye maktaba na kamwe haviandikwi kwenye faili zako. Huingiza orodha za nyimbo za M3U na Apple Music, idadi ya mara zilizochezwa na vipendwa.",
           "Kihariri cha tagi chenye nakala rudufu na kurejesha kwa hatua moja, pamoja na kujaza taarifa kutoka MusicBrainz kunakoonyesha kiwango chake cha uhakika kabla ya kuandika chochote.",
-          "Folda za mtandao kupitia SMB, NFS au WebDAV, zenye akiba ya faili, Hifadhi Nje ya Mtandao na uchezaji ulioundwa kwa ajili ya seva za polepole.",
+          "Folda za mtandao kupitia SMB, NFS au WebDAV, zenye akiba ya faili, Hifadhi Nje ya Mtandao na uchezaji ulioundwa kwa ajili ya seva za polepole: nyimbo huhifadhiwa kwa muda kwenye Mac yako kabla ya kuchezwa, huku pete ya upakiaji ikionekana kwenye kitufe cha kucheza wakati huo.",
           "Tafuta Muziki hutafuta kila diski ili kupata muziki wako halisi na huacha takataka nyuma. Mipangilio mifupi wakati wa kufungua kwa mara ya kwanza huchagua kifaa chako cha kutoa sauti na hueleza ufikiaji wa kipekee na ReplayGain hufanya nini.",
           "EQ ya parametric kwa kila kifaa cha kutoa sauti, inayoingiza mipangilio iliyoandaliwa tayari ya AutoEQ na Equalizer APO. Imezimwa kwa chaguo-msingi; ikiwashwa, njia ya mawimbi husema <span class=\"mono nowrap\">KISAWAZISHI</span> badala ya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Kicheza Kidogo, kipengele cha upau wa menyu, vitufe vya media, ReplayGain na masasisho ya kiotomatiki yaliyotiwa sahihi."
@@ -242,7 +266,7 @@
         "lede": "Kila menyu, mpangilio na ujumbe wa njia ya mawimbi umetafsiriwa katika lugha {languages} mbali na Kiingereza.",
         "body": [
           "Kuanzia Kiukreni, Kijerumani na Kijapani hadi Kiswahili, Kitamil na Kihausa, zikiwa na maumbo ya wingi na mifumo ya namba ya kila eneo, na Kichina Kilichorahisishwa, Kichina cha Jadi na Kichina cha Hong Kong, kila kimoja na msamiati wake. Kiarabu, Kiebrania, Kiajemi na Kiurdu hupata mpangilio wa kulia kwenda kushoto.",
-          "Jinsi tafsiri zinavyokaguliwa: ukaguzi wa kiotomatiki kwenye kila badiliko huthibitisha kuwa kila maandishi kwenye programu yapo katika lugha zote {languages} yakiwa na vishika-nafasi vilevile na maumbo ya wingi yanayohitajika na kila lugha, na kila skrini ilikaguliwa katika kila lugha kuona maandishi yaliyokatwa au yanayopishana na uakisi wa kulia kwenda kushoto. Zilianza kama tafsiri za mashine zilizofanywa kwa uangalifu, kwa hiyo masahihisho kutoka kwa wazungumzaji asilia yanakaribishwa sana kwenye <a href=\"{href.newIssue}\">GitHub</a>."
+          "Jinsi tafsiri zinavyokaguliwa: ukaguzi wa kiotomatiki kwenye kila badiliko huthibitisha kuwa kila maandishi kwenye programu yapo katika lugha zote 44 yakiwa na vishika-nafasi vilevile na maumbo ya wingi yanayohitajika na kila lugha, na skrini kuu zilikaguliwa katika lugha kadhaa kuona maandishi yaliyokatwa au yanayopishana na uakisi wa kulia kwenda kushoto. Zilianza kama tafsiri za mashine zilizofanywa kwa uangalifu, kwa hiyo masahihisho kutoka kwa wazungumzaji asilia yanakaribishwa sana kwenye <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Vespertine imeandikwa katika kila moja ya lugha zake {languagesTotal} za kiolesura, kuanzia ヴェスパタイン na Веспертайн hadi فسبرتاين na वेस्परटाइन, kwa ukubwa na mitindo tofauti ya herufi.",
         "wallLabel": "Vespertine katika kila moja ya lugha zake"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Kiwango cha sampuli na kina cha biti asilia, hadi biti 32 na hadi kiwango ambacho DAC yako hutumia (kimejaribiwa hadi 384 kHz); PCM ya biti 32 isiyobadilishwa inahitaji hali ya integer. Nakala za diski zenye CUE sheet."
+          "text": "Kiwango cha sampuli na kina cha biti asilia, hadi biti 32 na hadi kiwango ambacho DAC yako hutumia (kimejaribiwa hadi 768 kHz); PCM ya biti 32 isiyobadilishwa inahitaji hali ya integer. Nakala za diski zenye CUE sheet."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF na DSDIFF, zilizobanwa kwa DST au za kawaida. DoP inategemea DAC na kiwango cha carrier, vinginevyo PCM. Viwango vya carrier vya DoP vilivyo juu ya 384 kHz havijajaribiwa kwenye maunzi."
+          "text": "DSF na DSDIFF, zilizobanwa kwa DST au za kawaida. DoP inategemea DAC na kiwango cha carrier, vinginevyo PCM. DoP imejaribiwa hadi DSD256; DSD512 kupitia DoP haijajaribiwa kwenye maunzi."
         },
         {
           "name": "Nakala za SACD",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Linganisha",
       "title": "Inavyolinganishwa na vingine.",
-      "intro": "Vicheza muziki kadhaa vya Mac hutoa uchezaji wa bit-perfect. Ulinganisho huu unaonyesha kile ambacho nyaraka au msimbo chanzo wa kila kicheza muziki unasema wenyewe. “Haijaandikwa” inamaanisha mtengenezaji hasemi lolote kuhusu hilo, si kwamba kipengele hakipo. Vespertine haina convolution, programu-jalizi za athari za sauti wala huduma za kutiririsha.",
+      "intro": "Vicheza muziki kadhaa vya Mac hutoa uchezaji wa bit-perfect. Ulinganisho huu unaonyesha kile ambacho nyaraka au msimbo chanzo wa kila kicheza muziki unasema wenyewe. “Haijaandikwa” inamaanisha mtengenezaji hasemi lolote kuhusu hilo, si kwamba kipengele hakipo. Convolution ya Vespertine ni kwa ajili ya urekebishaji wa chumba; haina programu-jalizi za athari za sauti wala huduma za kutiririsha.",
       "hint": "Sogeza kuona zaidi →",
       "region": "Jedwali la ulinganisho (husogezwa kando)",
       "caption": "Vespertine ikilinganishwa na vicheza muziki vingine saba vya Mac, kutoka kwenye nyaraka au msimbo chanzo wa kila kicheza muziki",
@@ -410,8 +434,19 @@
           "Hapana⁴"
         ],
         [
+          "Urekebishaji wa chumba",
+          "Hupimwa ndani ya programu (maikrofoni ya USB), au kwa kuingiza REW / APO na miitikio ya msukumo",
+          "Hapana",
+          "Kupitia convolution (Origin: chaguo la kulipia) au Audio Units",
+          "Kupitia convolution",
+          "Hapana (kwa makusudi)",
+          "Haijaandikwa",
+          "Hapana",
+          "Haijaandikwa"
+        ],
+        [
           "Convolution / programu-jalizi za athari za sauti",
-          "Hapana / Hapana",
+          "Ndiyo (urekebishaji wa chumba) / Hapana",
           "Hapana / Hapana",
           "Ndiyo (Origin: chaguo la kulipia) / Audio Units",
           "Ndiyo / Hapana",
@@ -475,6 +510,10 @@
           "a": "Njia ya mawimbi husoma tena kile ambacho Core Audio ilifanya hasa: kiwango rasmi cha sampuli cha kifaa, fomati yake ya kimaunzi na nani anayekishikilia. Visimbuaji vina majaribio ya kiotomatiki (TrueHD dhidi ya chanzo chake, DTS dhidi ya kisimbuaji cha FFmpeg chenyewe), jaribio la loopback lililojengwa ndani hukagua njia ya programu sampuli kwa sampuli, na <span class=\"mono nowrap\">vespertine-probe</span> hukuwezesha kukagua maunzi yako mwenyewe. <a href=\"{href.verification}\">Jinsi ya kuthibitisha mwenyewe</a>."
         },
         {
+          "q": "Je, ina urekebishaji wa chumba?",
+          "a": "Ndiyo. Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa katika sehemu moja hadi tano kuzunguka kiti chako, na Vespertine hutengeneza vichujio vinavyolingana na kila spika na kulinganisha ucheleweshaji na kiwango chao, kwa stereo au 5.1. Pia huingiza vichujio vya REW na Equalizer APO pamoja na miitikio ya msukumo. Umezimwa kwa chaguo-msingi, uchezaji hubaki bit-perfect ukiwa umezimwa, na njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span> ukiwa umewashwa. <a href=\"{href.roomCorrection}\">Jinsi urekebishaji wa chumba unavyofanya kazi</a>."
+        },
+        {
           "q": "Je, inaweza kucheza diski za SACD na DVD?",
           "a": "Hucheza nakala zake. Nakala za SACD <code>.iso</code>, stereo na chaneli nyingi, zilizobanwa kwa DST au za kawaida, pamoja na muziki wa LPCM kwenye nakala za DVD-Video au folda za <code>VIDEO_TS</code>, hucheza moja kwa moja kutoka kwenye nakala, bila kutoa chochote nje. DVD-Audio haitumiki, na DVD zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Imejaribiwa kwenye maunzi gani?",
-          "a": "Uchezaji umejaribiwa kwenye FiiO K11 kwa viwango hadi 384 kHz, kwa DoP na hali ya integer; AirPods Max kupitia USB-C na Bluetooth; spika za MacBook Pro; na TV ya Sony kupitia HDMI kwa 5.1. Maunzi ya Intel hayajajaribiwa. Bitstream kwa resiva na utoaji wa sauti wa chaneli nyingi kwa DAC ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); <a href=\"{href.dacReport}\">ripoti zinahitajika</a>."
+          "a": "Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11, ambapo hali ya integer ilijaribiwa pia. Pia umejaribiwa kwenye AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro, na TV ya Sony kupitia HDMI kwa 5.1. Maunzi ya Intel hayajajaribiwa. Bitstream kwa resiva na utoaji wa sauti wa chaneli nyingi kwa DAC ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); <a href=\"{href.dacReport}\">ripoti zinahitajika</a>."
         },
         {
           "q": "Je, inapatikana kwa lugha yangu?",
@@ -563,7 +602,7 @@
       "install": "Usakinishaji",
       "installValue": "<a href=\"{href.dmg}\">Pakua DMG</a> au {brew}",
       "tested": "Imejaribiwa kwenye",
-      "testedValue": "FiiO K11 (kila kiwango cha sampuli hadi 384 kHz, DoP, Hali ya integer), AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM hadi 768 kHz, DSD256 kupitia DoP), FiiO K11 (PCM hadi 384 kHz, DSD128 kupitia DoP, Hali ya integer), AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro",
       "links": "Viungo",
       "website": "Tovuti",
       "source": "Msimbo wa chanzo",
@@ -646,10 +685,10 @@
     "eyebrow": "Faragha",
     "heading": "Vespertine haikusanyi",
     "headingBrass": "chochote.",
-    "updated": "Inatumika kuanzia {effective} (inaongeza hali ya Discord, ambayo si lazima). Sehemu ya “Tovuti hii” ilisasishwa tarehe {statsUpdated}, tovuti ilipoanza kuhesabu ziara kwa takwimu zisizotumia vidakuzi, zinazopangishwa na sisi wenyewe, na tarehe {langUpdated}, menyu ya lugha ilipoanza kukumbuka chaguo lako kwenye kifaa chako.",
+    "updated": "Inatumika kuanzia {effective} (inaongeza matumizi ya maikrofoni katika urekebishaji wa chumba, kwa toleo la 0.14). Mabadiliko ya awali: hali ya Discord, ambayo si lazima, {discordUpdated}; sehemu ya “Tovuti hii”, {statsUpdated}, tovuti ilipoanza kuhesabu ziara kwa takwimu zisizotumia vidakuzi, zinazopangishwa na sisi wenyewe. Mnamo {langUpdated}, sehemu ya “Tovuti hii” pia ilianza kueleza menyu ya lugha, ambayo hukumbuka chaguo lako kwenye kifaa chako.",
     "intro": "Vespertine ni kicheza muziki kisicho na malipo na huria. Programu haina akaunti, takwimu za matumizi, telemetry, ripoti za kuanguka kwa programu wala matangazo. Msanidi hapokei taarifa yoyote kukuhusu wewe au muziki wako. Kwa kuwa msimbo wa chanzo uko wazi kwa umma, unaweza kukagua kila kauli kwenye ukurasa huu.",
     "staysTitle": "Kinachobaki kwenye Mac yako",
-    "stays": "Hifadhidata ya maktaba yako, orodha za nyimbo, idadi ya mara nyimbo zilizochezwa, matokeo ya uchambuzi wa faili, akiba ya majalada na mipangilio huhifadhiwa kwenye folda ya Library ya mtumiaji wako kwenye Mac yako. Nenosiri za folda za mtandao zinazoshirikiwa na tokeni yako ya ListenBrainz, ukiiongeza, huhifadhiwa kwenye Keychain ya macOS. Hakuna kati ya hivi kinachopakiwa popote.",
+    "stays": "Hifadhidata ya maktaba yako, orodha za nyimbo, idadi ya mara nyimbo zilizochezwa, matokeo ya uchambuzi wa faili, akiba ya majalada na mipangilio huhifadhiwa kwenye folda ya Library ya mtumiaji wako kwenye Mac yako. Nenosiri za folda za mtandao zinazoshirikiwa na tokeni yako ya ListenBrainz, ukiiongeza, huhifadhiwa kwenye Keychain ya macOS. Urekebishaji wa chumba hutumia maikrofoni yako ya kupimia wakati tu unapofanya kipimo, na huhifadhi rekodi kwenye folda yako ya Documents. Hakuna kati ya hivi kinachopakiwa popote.",
     "onlineTitle": "Programu inapounganishwa na mtandao",
     "online": [
       "<strong>Ukaguzi wa masasisho.</strong> Vespertine huiomba GitHub mlisho wake wa masasisho takriban mara moja kwa siku, na unapochagua Angalia Masasisho. GitHub huona anwani yako ya IP, kama ilivyo kwa upakuaji wowote. Unaweza kuzima ukaguzi wa kiotomatiki kwenye Mipangilio.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Vespertine sasa hucheza bila kukwama kutoka kwenye folda za mtandao zilizo polepole, huchambua maktaba kubwa haraka zaidi huku folda za mtandao zikijumuishwa, hucheza hi-res kwenye DAC ndogo za USB-C kwa kiwango cha juu zaidi zinachotoa, na huweka kibodi na uteuzi wa vipengee vingi pale unapotarajia."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Vespertine sasa hucheza kiasili faili za DSDIFF zilizobanwa kwa DST na muziki wa LPCM kwenye diski za DVD-Video, huhifadhi kila wimbo wa CUE sheet za EAC, na huanzisha nyimbo kutoka kwenye folda ya mtandao mara moja hata wakati uchanganuzi wa maktaba unaendelea."
     }
   }
 }

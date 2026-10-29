@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: Mac için surround ve hi-res müzik oynatıcısı",
-    "description": "Surround ve hi-res koleksiyonlar için ücretsiz, açık kaynak Mac oynatıcısı: SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Dolby Atmos dosyaları, AirPods’ta Uzamsal Ses ve inceleyebileceğiniz bit-perfect bir sinyal yolu.",
+    "description": "Surround ve hi-res koleksiyonlar için ücretsiz, açık kaynak Mac oynatıcısı: SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Dolby Atmos dosyaları, AirPods’ta Uzamsal Ses, kendi odanızda ölçülen oda düzeltmesi ve inceleyebileceğiniz bit-perfect bir sinyal yolu.",
     "ogAlt": "Vespertine: surround ve hi-res müzik için ücretsiz, açık kaynak Mac oynatıcısı. Sinyal yolu, bir Fosi Audio ZD3 üzerinde bit-perfect çalan 24 bit / 96 kHz bir FLAC dosyasını gösteriyor. Sürüm {version}, macOS {minMacOS} veya üstü.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "hi-res müzik,"
       ],
       "titleBrass": "Mac’inizde.",
-      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur; AirPods’ta baş takipli Uzamsal Ses desteğiyle. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
+      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur; AirPods’ta baş takipli Uzamsal Ses desteğiyle. Oda düzeltmesi, odanızı bir USB mikrofonla ölçer ve her hoparlörü ayrı ayrı düzeltir; siz açana kadar kapalı kalır. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
       "ask": "Beğendiniz mi?",
       "star": "GitHub’da yıldız verin",
       "discuss": "Tartışmaya katılın",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Özel",
       "spatial": "Uzamsal · baş takipli",
-      "synthetic": "Sentetik yüksek frekanslar?"
+      "synthetic": "Sentetik yüksek frekanslar?",
+      "roomCorrection": "Oda düzeltmesi"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Her parça kendi hızında ve derinliğinde.",
         "lede": "Sinyal yolu, dosyadan DAC’ınıza kadar her adımı Core Audio’dan geri okuyarak listeler ve örnekleri bir şey değiştirdiğinde bunu söyler.",
         "body": [
-          "Vespertine, aygıtı her dosyanın örnekleme hızına geçirir; yalnızca DAC o hızda çalışamadığında Apple’ın mastering kalitesindeki dönüştürücüsüyle yeniden örnekleme yapar. <span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kaynak koddaki koşullar sağlandığında görünür: yerel hız, örnekleri değiştiren hiçbir şeyin olmaması, uygun bir sözcük uzunluğu ve özel modda olan ya da başka bir uygulamayla paylaşılmayan bir aygıt. PCM oynatma, bir FiiO K11 üzerinde 384 kHz’e kadar test edildi."
+          "Vespertine, aygıtı her dosyanın örnekleme hızına geçirir; yalnızca DAC o hızda çalışamadığında Apple’ın mastering kalitesindeki dönüştürücüsüyle yeniden örnekleme yapar. <span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kaynak koddaki koşullar sağlandığında görünür: yerel hız, örnekleri değiştiren hiçbir şeyin olmaması, uygun bir sözcük uzunluğu ve özel modda olan ya da başka bir uygulamayla paylaşılmayan bir aygıt. PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi."
         ],
         "list": [
           "Özel (hog) mod, diğer uygulamaları aygıttan uzak tutar. Paylaşımlı modda ses tuşları ve Digital Crown DAC’ınızı ayarlar; özel modda da bu seçeneği açarsanız ayarlayabilir.",
@@ -145,6 +146,29 @@
         "alt": "Vespertine, Lazar Berman’ın Liszt yorumu Années de pèlerinage’ı 24 bit / 96 kHz bir FLAC dosyasından çalıyor: denetçi, bir Fosi Audio ZD3 üzerinde bit-perfect ve özel olarak işaretliyor ve sinyal yolunun her adımını gösteriyor.",
         "floatAlt": "Loopback testi penceresi: 44,1 ve 96 kHz’de 24 bit, doldurulmuş 16 bit ve bir boşluksuz çift; her biri bit düzeyinde aynı.",
         "floatCaption": "Loopback Testi · yazılım denetimi"
+      },
+      "room-correction": {
+        "jack": "Oda düzeltmesi",
+        "kicker": "Oda düzeltmesi",
+        "title": "Odanızı ölçün. Her hoparlörü düzeltin.",
+        "lede": "Odanızı bir UMIK-1 ya da kalibre edilmiş başka bir USB mikrofonla ölçün; Vespertine, koltuğunuzda duyduklarına göre her hoparlör için filtreler hesaplar.",
+        "body": [
+          "Taramalar, dinleme koltuğunuzun çevresinde bir ila beş noktada, her seferinde tek bir hoparlörden çalınır. Her hoparlör, ölçümden tasarlanan kendi filtrelerini alır. Bu filtreler çoğunlukla azaltma yapar: odanın tepelerini bastırır, geniş çukurları ise yalnızca hafifçe yükseltir. Aynı ölçüm her hoparlörün gecikmesini ve seviyesini de ayarlar; böylece her hoparlörün sesi koltuğunuza aynı anda ve aynı yükseklikte ulaşır. Oda düzeltmesi varsayılan olarak kapalıdır ve kapalıyken oynatma bit-perfect kalır. Açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar."
+        ],
+        "list": [
+          "Üç hedef: Warm (varsayılan), Gentle tilt ve Flat. Yalnızca bas bölgesini ya da tam aralığı düzeltin; filtreleri daha sonra yeniden ölçüm yapmadan yeniden tasarlayın.",
+          "REW veya Equalizer APO filtrelerini, her hoparlörün gecikmesi ve seviyesiyle birlikte içe aktarır; Equalizer APO metni olarak dışa aktarır.",
+          "Dürtü yanıtlarını (WAV, AIFF, CAF veya FLAC) içe aktarır ve konvolüsyonla çalar.",
+          "Stereo ve 5.1.",
+          "Oda Portresi, hoparlörleri, koltuğunuzu ve ölçüldükçe her mikrofon noktasını gösterir. Ardından eğri dönüşümü animasyonu, ölçülen yanıtı öngörülen yanıta çevirir; önce/sonra anahtarı ise ikisini karşılaştırır."
+        ],
+        "note": "“Sonra” eğrisi ölçülmez; ölçümden ve filtrelerden öngörülür. Odanın gerçekte ne yaptığını görmek için düzeltme açıkken yeniden ölçün.",
+        "links": [
+          "Oda düzeltmesi nasıl çalışır"
+        ],
+        "alt": "Vespertine’in Warm hedefiyle bir stereo hoparlör çifti için öngördüğü oda düzeltmesi: her hoparlör için ölçülen yanıt, hedef ve düzeltme sonrası öngörülen yanıt; 120 Hz civarındaki bir oda tepesi 14 ve 18 dB azaltılmış; ayrıca her hoparlörün filtreleri.",
+        "floatAlt": "Ölçüm sihirbazındaki Oda Portresi: sol ve sağ hoparlörler, koltuk ve çevresindeki beş mikrofon noktası; ilk noktada mikrofon duruyor.",
+        "floatCaption": "Oda Portresi"
       },
       "surround": {
         "jack": "Surround",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "İki gerçek diskte sacd_extract ile bit bit aynı sonucu verdi. 5.0 alanı olan, yalnızca çok kanallı alanı olan ya da DSD128 ve üzeri diskler şimdilik yalnızca sentezlenmiş test görüntüleriyle kapsanıyor.",
-          "DSD64’ten DSD512’ye kadar DSF ve DSDIFF, DST sıkıştırmalı DSDIFF dâhil, taşıyıcı hızını kabul eden DAC’lara DoP olarak gider ya da yüksek hızlı PCM’e dönüştürülür. DoP bir FiiO K11 üzerinde doğrulandı; 384 kHz’in üzerindeki taşıyıcı hızları donanımda test edilmedi.",
+          "DSD64’ten DSD512’ye kadar DSF ve DSDIFF, DST sıkıştırmalı DSDIFF dâhil, taşıyıcı hızını kabul eden DAC’lara DoP olarak gider ya da yüksek hızlı PCM’e dönüştürülür. DoP, bir Fosi Audio ZD3 üzerinde DSD256’ya, bir FiiO K11 üzerinde ise DSD128’e kadar doğrulandı; DoP üzerinden DSD512 donanımda test edilmedi.",
           "16, 20 ve 24 bit, 48 ve 96 kHz, 8 kanala kadar DVD-Video LPCM. DVD-Audio desteklenmez; şifreli (CSS) diskler için şifresi çözülmüş bir kopya gerekir."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Bir albümün remaster’ları, mono ve stereo yayınları ve SACD’leri tek bir kartı paylaşır; açtığınızda baskıyı seçin.",
           "Favoriler ve çalma sayıları arşivde tutulur, dosyalarınıza asla yazılmaz. M3U ve Apple Music çalma listelerini, çalma sayılarını ve favorileri içe aktarır.",
           "Yedekleme ve tek adımda geri döndürme özellikli etiket düzenleyici; ayrıca bir şey yazmadan önce güven düzeyini gösteren MusicBrainz zenginleştirmesi.",
-          "SMB, NFS veya WebDAV üzerinden ağ paylaşımları; önbellekleme, Çevrimdışı Tut ve yavaş sunucular için tasarlanmış oynatma.",
+          "SMB, NFS veya WebDAV üzerinden ağ paylaşımları; önbellekleme, Çevrimdışı Tut ve yavaş sunucular için tasarlanmış oynatma: parçalar çalmadan önce Mac’inizde arabelleğe alınır, bu sırada oynatma düğmesinde bir yükleme halkası görünür.",
           "“Bu Mac’teki Müzikleri Bul”, gerçek müziğinizi bulmak için her sürücüyü tarar ve karmaşayı geride bırakır. İlk açılıştaki kısa kurulum çıkışınızı seçer ve özel erişimin ve ReplayGain’in ne işe yaradığını açıklar.",
           "Çıkış başına parametrik EQ; AutoEQ ve Equalizer APO ön ayarlarını içe aktarır. Varsayılan olarak kapalıdır; açıkken sinyal yolunda <span class=\"mono nowrap\">EKOLAYZIR</span> yerine <span class=\"mono nowrap\">BIT-PERFECT</span> yazar.",
           "Mini Oynatıcı, menü çubuğu öğesi, medya tuşları, ReplayGain ve otomatik, imzalı güncellemeler."
@@ -242,7 +266,7 @@
         "lede": "Her menü, ayar ve sinyal yolu mesajı, İngilizcenin yanı sıra {languages} dile çevrildi.",
         "body": [
           "Ukraynaca, Almanca ve Japoncadan Svahiliceye, Tamilceye ve Hausacaya; yerel çoğul biçimleri ve sayı biçimleriyle. Basitleştirilmiş, Geleneksel ve Hong Kong Çincesi ise her biri kendi sözcük dağarcığıyla. Arapça, İbranice, Farsça ve Urducada sağdan sola düzen kullanılır.",
-          "Çevirilerin nasıl denetlendiği: her değişiklikte çalışan otomatik bir denetim, uygulamadaki her dizenin {languages} dilin tümünde aynı yer tutucularla ve her dilin gerektirdiği çoğul biçimleriyle bulunduğunu doğrular; her ekran da her dilde kırpılmış ya da üst üste binen metin ve sağdan sola yansıtma açısından gözden geçirildi. Çeviriler özenli makine çevirileri olarak başladı; bu yüzden ana dili bu diller olan kişilerin düzeltmelerini <a href=\"{href.newIssue}\">GitHub</a>’da memnuniyetle karşılıyoruz."
+          "Çevirilerin nasıl denetlendiği: her değişiklikte çalışan otomatik bir denetim, uygulamadaki her dizenin 44 dilin tümünde aynı yer tutucularla ve her dilin gerektirdiği çoğul biçimleriyle bulunduğunu doğrular; ana ekranlar da birkaç dilde kırpılmış ya da üst üste binen metin ve sağdan sola yansıtma açısından denetlendi. Çeviriler özenli makine çevirileri olarak başladı; bu yüzden ana dili bu diller olan kişilerin düzeltmelerini <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>’da memnuniyetle karşılıyoruz."
         ],
         "alt": "Vespertine, {languagesTotal} arayüz dilinin her birinde yazılmış: ヴェスパタイン ve Веспертайн gibi yazımlardan فسبرتاين ve वेस्परटाइन gibi yazımlara kadar, karışık boyut ve yazı tiplerinde.",
         "wallLabel": "Vespertine, her dilinde"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "32 bit’e ve DAC’ınızın çalıştığı hıza kadar özgün örnekleme hızı ve bit derinliği (384 kHz’e kadar test edildi); 32 bit PCM’in değiştirilmeden çalınması tam sayı modu gerektirir. CUE sayfalı görüntüler."
+          "text": "32 bit’e ve DAC’ınızın çalıştığı hıza kadar özgün örnekleme hızı ve bit derinliği (768 kHz’e kadar test edildi); 32 bit PCM’in değiştirilmeden çalınması tam sayı modu gerektirir. CUE sayfalı görüntüler."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF ve DSDIFF, DST sıkıştırmalı veya sıkıştırmasız. DoP, DAC’a ve taşıyıcı hızına bağlıdır; aksi hâlde PCM kullanılır. 384 kHz üzerindeki DoP taşıyıcı hızları donanımda test edilmedi."
+          "text": "DSF ve DSDIFF, DST sıkıştırmalı veya sıkıştırmasız. DoP, DAC’a ve taşıyıcı hızına bağlıdır; aksi hâlde PCM kullanılır. DoP, DSD256’ya kadar test edildi; DoP üzerinden DSD512 donanımda test edilmedi."
         },
         {
           "name": "SACD görüntüleri",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Karşılaştırma",
       "title": "Rakipleri karşısında nerede duruyor?",
-      "intro": "Birçok Mac oynatıcısı bit-perfect oynatma sunuyor. Bu karşılaştırma, her oynatıcının kendi belgelerinin veya kaynak kodunun söylediklerine dayanır. “Belgelenmemiş”, özelliğin olmadığı anlamına gelmez; üreticinin bu konuda olumlu ya da olumsuz bir şey söylemediği anlamına gelir. Vespertine’de konvolüsyon, ses efekti eklentileri veya akış hizmetleri yoktur.",
+      "intro": "Birçok Mac oynatıcısı bit-perfect oynatma sunuyor. Bu karşılaştırma, her oynatıcının kendi belgelerinin veya kaynak kodunun söylediklerine dayanır. “Belgelenmemiş”, özelliğin olmadığı anlamına gelmez; üreticinin bu konuda olumlu ya da olumsuz bir şey söylemediği anlamına gelir. Vespertine’deki konvolüsyon oda düzeltmesi içindir; ses efekti eklentileri veya akış hizmetleri ise yoktur.",
       "hint": "Devamı için kaydırın →",
       "region": "Karşılaştırma tablosu (yana kayar)",
       "caption": "Vespertine ile diğer yedi Mac müzik oynatıcısının, her oynatıcının kendi belgelerine veya kaynak koduna dayanan karşılaştırması",
@@ -410,8 +434,19 @@
           "Hayır⁴"
         ],
         [
+          "Oda düzeltmesi",
+          "Uygulamada ölçüm (USB mikrofon) ya da REW / APO ve dürtü yanıtı içe aktarma",
+          "Hayır",
+          "Konvolüsyon (Origin: ücretli seçenek) veya Audio Units ile",
+          "Konvolüsyon ile",
+          "Hayır (tasarım gereği)",
+          "Belgelenmemiş",
+          "Hayır",
+          "Belgelenmemiş"
+        ],
+        [
           "Konvolüsyon / ses efekti eklentileri",
-          "Hayır / Hayır",
+          "Evet (oda düzeltmesi) / Hayır",
           "Hayır / Hayır",
           "Evet (Origin: ücretli seçenek) / Audio Units",
           "Evet / Hayır",
@@ -475,6 +510,10 @@
           "a": "Sinyal yolu, Core Audio’nun gerçekte ne yaptığını geri okur: aygıtın nominal hızını, fiziksel biçimini ve aygıtı kimin tuttuğunu. Kod çözücülerin otomatik testleri vardır (TrueHD kaynağıyla, DTS ise FFmpeg’in kendi kod çözücüsüyle karşılaştırılarak); yerleşik bir loopback testi yazılım yolunu örnek örnek denetler ve <span class=\"mono nowrap\">vespertine-probe</span> kendi donanımınızı denetlemenizi sağlar. <a href=\"{href.verification}\">Kendiniz nasıl doğrularsınız</a>."
         },
         {
+          "q": "Oda düzeltmesi yapıyor mu?",
+          "a": "Evet. Odanızı bir UMIK-1 ya da kalibre edilmiş başka bir USB mikrofonla, koltuğunuzun çevresinde bir ila beş noktada ölçün; Vespertine, stereo ya da 5.1’de, her hoparlör için filtreler hesaplar ve hoparlörlerin gecikmesini ve seviyesini hizalar. Ayrıca REW ve Equalizer APO filtrelerini ve dürtü yanıtlarını içe aktarır. Varsayılan olarak kapalıdır, kapalıyken oynatma bit-perfect kalır ve açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar. <a href=\"{href.roomCorrection}\">Oda düzeltmesi nasıl çalışır</a>."
+        },
+        {
           "q": "SACD ve DVD disklerini çalabilir mi?",
           "a": "Disk görüntülerini çalar. Stereo ve çok kanallı, DST sıkıştırmalı veya sıkıştırmasız SACD <code>.iso</code> görüntüleri ile DVD-Video görüntülerindeki ya da <code>VIDEO_TS</code> klasörlerindeki LPCM müzik, hiçbir şey çıkarılmadan doğrudan görüntüden çalınır. DVD-Audio desteklenmez; şifreli (CSS) DVD’ler için şifresi çözülmüş bir kopya gerekir."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Hangi donanımlarda test edildi?",
-          "a": "Oynatma şu donanımlarda test edildi: 384 kHz’e kadar hızlarda, DoP ve tam sayı moduyla bir FiiO K11; USB-C ve Bluetooth üzerinden AirPods Max; MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV. Intel donanımı test edilmedi. Alıcıya bitstream aktarımı ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
+          "a": "PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi; tam sayı modu da FiiO K11’de test edildi. Ayrıca USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV üzerinde de test edildi. Intel donanımı test edilmedi. Alıcıya bitstream aktarımı ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
         },
         {
           "q": "Benim dilimde mi?",
@@ -563,7 +602,7 @@
       "install": "Kurulum",
       "installValue": "<a href=\"{href.dmg}\">DMG’yi indirin</a> veya {brew}",
       "tested": "Test edildiği cihazlar",
-      "testedValue": "FiiO K11 (384 kHz’e kadar tüm örnekleme hızları, DoP, tam sayı modu), USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri",
+      "testedValue": "Fosi Audio ZD3 (768 kHz’e kadar PCM, DoP üzerinden DSD256), FiiO K11 (384 kHz’e kadar PCM, DoP üzerinden DSD128, tam sayı modu), USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri",
       "links": "Bağlantılar",
       "website": "Web sitesi",
       "source": "Kaynak kod",
@@ -646,10 +685,10 @@
     "eyebrow": "Gizlilik",
     "heading": "Vespertine",
     "headingBrass": "hiçbir şey toplamaz.",
-    "updated": "Yürürlük tarihi: {effective} (isteğe bağlı Discord durumu eklendi). “Bu web sitesi” bölümü {statsUpdated} tarihinde (site, ziyaretleri kendi barındırdığımız, çerezsiz istatistiklerle saymaya başladığında) ve {langUpdated} tarihinde (dil menüsü seçiminizi aygıtınızda hatırlamaya başladığında) güncellendi.",
+    "updated": "Yürürlük tarihi: {effective} (0.14 sürümü için oda düzeltmesinin mikrofon kullanımı eklendi). Önceki değişiklikler: isteğe bağlı Discord durumu, {discordUpdated}; “Bu web sitesi” bölümü, {statsUpdated} (site, ziyaretleri kendi barındırdığımız, çerezsiz istatistiklerle saymaya başladığında). {langUpdated} tarihinde “Bu web sitesi” bölümü, seçiminizi aygıtınızda hatırlayan dil menüsünü de açıklamaya başladı.",
     "intro": "Vespertine ücretsiz, açık kaynak bir müzik oynatıcısıdır. Uygulamada hesap, analitik, telemetri, çökme raporu ve reklam yoktur. Geliştiriciye sizin veya müziğiniz hakkında hiçbir bilgi ulaşmaz. Kaynak kod herkese açık olduğundan bu sayfadaki her ifadeyi kendiniz doğrulayabilirsiniz.",
     "staysTitle": "Mac’inizde kalanlar",
-    "stays": "Arşiv veritabanınız, çalma listeleriniz, çalma sayılarınız, dosya analizi sonuçlarınız, kapak görseli önbelleğiniz ve ayarlarınız Mac’inizdeki kullanıcı Kitaplık klasörünüzde saklanır. Ağ paylaşımlarının parolaları ve eklediyseniz ListenBrainz erişim belirteciniz macOS Anahtar Zinciri’nde saklanır. Bunların hiçbiri hiçbir yere yüklenmez.",
+    "stays": "Arşiv veritabanınız, çalma listeleriniz, çalma sayılarınız, dosya analizi sonuçlarınız, kapak görseli önbelleğiniz ve ayarlarınız Mac’inizdeki kullanıcı Kitaplık klasörünüzde saklanır. Ağ paylaşımlarının parolaları ve eklediyseniz ListenBrainz erişim belirteciniz macOS Anahtar Zinciri’nde saklanır. Oda düzeltmesi, ölçüm mikrofonunuzu yalnızca siz ölçüm yaparken kullanır ve kayıtları Belgeler klasörünüzde saklar. Bunların hiçbiri hiçbir yere yüklenmez.",
     "onlineTitle": "Uygulama ne zaman internete bağlanır",
     "online": [
       "<strong>Güncelleme denetimleri.</strong> Vespertine güncelleme akışını yaklaşık günde bir kez ve siz Güncellemeleri Denetle’yi seçtiğinizde GitHub’dan ister. Her indirmede olduğu gibi GitHub IP adresinizi görür. Otomatik denetimleri Ayarlar’dan kapatabilirsiniz.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Vespertine artık yavaş ağ paylaşımlarından akıcı biçimde çalıyor, büyük arşivleri paylaşımlar dahil daha hızlı analiz ediyor, küçük USB-C DAC’larda Hi-Res sesi sundukları en yüksek hızda çalıyor ve klavyeyi ve çoklu seçimleri beklediğiniz yerde tutuyor."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Vespertine artık DST sıkıştırmalı DSDIFF dosyalarını ve DVD-Video disklerindeki LPCM müziği yerel olarak çalıyor, EAC CUE sayfalarının tüm parçalarını koruyor ve bir arşiv taraması sürerken bile ağ paylaşımındaki şarkıları hemen başlatıyor."
     }
   }
 }

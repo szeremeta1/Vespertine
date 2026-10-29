@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine : lecteur de musique surround et haute résolution pour Mac",
-    "description": "Lecteur Mac libre et gratuit pour les collections surround et haute résolution : images disque SACD et DVD-Video, DSD, CD DTS, fichiers DTS-HD MA, TrueHD et Dolby Atmos, audio spatial sur AirPods et un chemin du signal bit-perfect que vous pouvez inspecter.",
+    "description": "Lecteur Mac libre et gratuit pour les collections surround et haute résolution : images disque SACD et DVD-Video, DSD, CD DTS, fichiers DTS-HD MA, TrueHD et Dolby Atmos, audio spatial sur AirPods, une correction de salle mesurée dans votre propre pièce et un chemin du signal bit-perfect que vous pouvez inspecter.",
     "ogAlt": "Vespertine : le lecteur Mac libre et gratuit pour la musique surround et haute résolution. Son chemin du signal montre un FLAC 24 bits / 96 kHz lu en bit-perfect sur un Fosi Audio ZD3. Version {version}, macOS {minMacOS} ou version ultérieure.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "et haute résolution,"
       ],
       "titleBrass": "sur votre Mac.",
-      "lede": "Le lecteur Mac libre et gratuit pour les collections musicales surround et haute résolution. Images disque SACD et DVD-Video, DSD, CD DTS, fichiers DTS-HD MA, TrueHD et Atmos partagent une même bibliothèque avec vos albums stéréo, et l’audio spatial avec suivi de la tête est au rendez-vous sur AirPods. Un chemin du signal détaille chaque étape, du fichier à la sortie. En anglais et dans {languages} autres langues.",
+      "lede": "Le lecteur Mac libre et gratuit pour les collections musicales surround et haute résolution. Images disque SACD et DVD-Video, DSD, CD DTS, fichiers DTS-HD MA, TrueHD et Atmos partagent une même bibliothèque avec vos albums stéréo, et l’audio spatial avec suivi de la tête est au rendez-vous sur AirPods. La correction de salle mesure votre pièce avec un microphone USB et corrige chaque haut-parleur ; elle reste désactivée tant que vous ne l’activez pas. Un chemin du signal détaille chaque étape, du fichier à la sortie. En anglais et dans {languages} autres langues.",
       "ask": "Vous aimez ?",
       "star": "Ajoutez une étoile sur GitHub",
       "discuss": "Rejoignez la discussion",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Exclusif",
       "spatial": "Spatial · suivi de la tête",
-      "synthetic": "Hautes fréquences synthétiques ?"
+      "synthetic": "Hautes fréquences synthétiques ?",
+      "roomCorrection": "Correction de salle"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Chaque piste à sa fréquence et sa résolution natives.",
         "lede": "Le chemin du signal liste chaque étape du fichier jusqu’à votre DAC, telle que relue depuis Core Audio, et signale quand quelque chose a modifié les échantillons.",
         "body": [
-          "Vespertine bascule l’appareil sur la fréquence de chaque fichier et ne rééchantillonne, avec le convertisseur de qualité mastering d’Apple, que lorsque le DAC ne peut pas la prendre en charge. <span class=\"mono nowrap\">BIT-PERFECT</span> n’apparaît que si les conditions inscrites dans le code source sont remplies : une fréquence native, rien qui modifie les échantillons, une longueur de mot adaptée et un appareil en mode exclusif ou non partagé avec une autre application. La lecture PCM a été testée jusqu’à 384 kHz sur un FiiO K11."
+          "Vespertine bascule l’appareil sur la fréquence de chaque fichier et ne rééchantillonne, avec le convertisseur de qualité mastering d’Apple, que lorsque le DAC ne peut pas la prendre en charge. <span class=\"mono nowrap\">BIT-PERFECT</span> n’apparaît que si les conditions inscrites dans le code source sont remplies : une fréquence native, rien qui modifie les échantillons, une longueur de mot adaptée et un appareil en mode exclusif ou non partagé avec une autre application. La lecture PCM a été testée jusqu’à 768 kHz et en DSD256 sur un Fosi Audio ZD3, et jusqu’à 384 kHz et en DSD128 sur un FiiO K11."
         ],
         "list": [
           "Le mode exclusif (hog) tient les autres applications à l’écart de l’appareil. En mode partagé, les touches de volume et la Digital Crown règlent votre DAC ; en mode exclusif aussi, si vous activez cette option.",
@@ -145,6 +146,29 @@
         "alt": "Vespertine lit Liszt par Lazar Berman, Années de pèlerinage, depuis un FLAC 24 bits / 96 kHz : l’inspecteur l’indique bit-perfect et exclusif sur un Fosi Audio ZD3, avec chaque étape du chemin du signal.",
         "floatAlt": "La fiche du test de bouclage : 24 bits à 44,1 et 96 kHz, 16 bits complété et une paire enchaînée sans blanc, chacun exact au bit près.",
         "floatCaption": "Test de bouclage · vérification logicielle"
+      },
+      "room-correction": {
+        "jack": "Correction de salle",
+        "kicker": "Correction de salle",
+        "title": "Mesurez votre pièce. Corrigez chaque haut-parleur.",
+        "lede": "Mesurez votre pièce avec un UMIK-1 ou un autre microphone USB étalonné, et Vespertine ajuste des filtres pour chaque haut-parleur d’après ce qu’il capte à votre place d’écoute.",
+        "body": [
+          "Des balayages sont diffusés par un haut-parleur à la fois, en un à cinq points autour de votre place d’écoute. Chaque haut-parleur reçoit ses propres filtres, conçus à partir de la mesure. Il s’agit surtout d’atténuations : ils abaissent les pics de la pièce et ne relèvent que légèrement les creux larges. La même mesure règle le retard et le niveau de chaque haut-parleur, pour que tous atteignent votre place au même moment et au même volume. La correction de salle est désactivée par défaut, et la lecture reste bit-perfect tant qu’elle est désactivée. Lorsqu’elle est activée, le chemin du signal indique <span class=\"mono nowrap\">CORRECTION DE SALLE</span>."
+        ],
+        "list": [
+          "Trois cibles : Warm (par défaut), Gentle tilt et Flat. Corrigez uniquement les graves ou la gamme complète, et recalculez les filtres plus tard sans refaire de mesure.",
+          "Importe des filtres depuis REW ou Equalizer APO, avec le retard et le niveau de chaque haut-parleur, et exporte au format texte d’Equalizer APO.",
+          "Importe des réponses impulsionnelles (WAV, AIFF, CAF ou FLAC) et les applique par convolution à la lecture.",
+          "Stéréo et 5.1.",
+          "Le Portrait de la pièce montre les haut-parleurs, votre place et chaque emplacement de micro au fil des mesures. L’animation des courbes transforme ensuite la réponse mesurée en réponse prédite, et un sélecteur avant/après permet de les comparer."
+        ],
+        "note": "La courbe « après » est prédite à partir de la mesure et des filtres, pas mesurée. Pour voir ce que fait réellement la pièce, refaites une mesure avec la correction activée.",
+        "links": [
+          "Fonctionnement de la correction de salle"
+        ],
+        "alt": "Correction de salle prédite par Vespertine pour une paire stéréo avec la cible Warm : pour chaque haut-parleur, la réponse mesurée, la cible et la réponse prédite après correction, avec un pic de la pièce vers 120 Hz atténué de 14 et 18 dB, ainsi que les filtres de chaque haut-parleur.",
+        "floatAlt": "Le Portrait de la pièce dans l’assistant de mesure : les haut-parleurs gauche et droit, la place d’écoute et cinq emplacements de micro autour d’elle, le premier occupé par le microphone.",
+        "floatCaption": "Portrait de la pièce"
       },
       "surround": {
         "jack": "Surround",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Identique bit pour bit à sacd_extract sur deux vrais disques. Les disques avec une zone 5.0, avec uniquement une zone multicanale, ou en DSD128 et au-delà ne sont couverts pour l’instant que par des images de test synthétisées.",
-          "Les DSF et DSDIFF du DSD64 au DSD512, DSDIFF compressés en DST compris, sortent en DoP vers les DAC qui acceptent la fréquence porteuse, ou sont convertis en PCM à haute fréquence d’échantillonnage. Le DoP est confirmé sur un FiiO K11 ; les fréquences porteuses supérieures à 384 kHz n’ont pas été testées sur du matériel.",
+          "Les DSF et DSDIFF du DSD64 au DSD512, DSDIFF compressés en DST compris, sortent en DoP vers les DAC qui acceptent la fréquence porteuse, ou sont convertis en PCM à haute fréquence d’échantillonnage. Le DoP est confirmé jusqu’au DSD256 sur un Fosi Audio ZD3 et jusqu’au DSD128 sur un FiiO K11 ; le DSD512 en DoP n’a pas été testé sur du matériel.",
           "DVD-Video LPCM en 16, 20 et 24 bits, à 48 et 96 kHz, jusqu’à 8 canaux. Le DVD-Audio n’est pas pris en charge, et les disques chiffrés (CSS) nécessitent une copie déchiffrée."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Remasters, éditions mono et stéréo et SACD d’un même album partagent une même fiche ; choisissez l’édition en l’ouvrant.",
           "Favoris et compteurs de lecture, conservés dans la bibliothèque et jamais écrits dans vos fichiers. Importe les playlists M3U et Apple Music, ainsi que les compteurs de lecture et les favoris.",
           "Éditeur de tags avec sauvegardes et restauration en une seule étape, plus un enrichissement MusicBrainz qui affiche son niveau de confiance avant d’écrire quoi que ce soit.",
-          "Partages réseau en SMB, NFS ou WebDAV, avec mise en cache, « Conserver hors ligne » et une lecture conçue pour les serveurs lents.",
+          "Partages réseau en SMB, NFS ou WebDAV, avec mise en cache, « Conserver hors ligne » et une lecture conçue pour les serveurs lents : les morceaux sont mis en mémoire tampon sur votre Mac avant d’être lus, et un anneau de chargement s’affiche sur le bouton de lecture pendant ce temps.",
           "« Rechercher de la musique sur ce Mac » parcourt tous les disques à la recherche de votre vraie musique et laisse le fouillis de côté. Une courte configuration au premier lancement vous fait choisir votre sortie et explique le rôle de l’accès exclusif et de ReplayGain.",
           "Égaliseur paramétrique par sortie, qui importe les préréglages AutoEQ et Equalizer APO. Désactivé par défaut ; une fois activé, le chemin du signal affiche <span class=\"mono nowrap\">ÉGALISEUR</span> au lieu de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Mini-lecteur, icône dans la barre des menus, touches multimédias, ReplayGain et mises à jour automatiques et signées."
@@ -242,7 +266,7 @@
         "lede": "Chaque menu, réglage et message du chemin du signal est traduit en {languages} langues en plus de l’anglais.",
         "body": [
           "De l’ukrainien, de l’allemand et du japonais jusqu’au swahili, au tamoul et au haoussa, avec les pluriels et formats de nombres propres à chaque langue, et le chinois simplifié, traditionnel et de Hong Kong, chacun avec son propre vocabulaire. L’arabe, l’hébreu, le persan et l’ourdou bénéficient d’une mise en page de droite à gauche.",
-          "Comment les traductions sont vérifiées : à chaque modification, un contrôle automatique confirme que chaque chaîne de l’application existe dans les {languages} langues, avec les mêmes variables et les formes plurielles requises par chaque langue, et chaque écran a été relu dans chaque langue pour repérer les textes tronqués ou qui se chevauchent et contrôler la mise en miroir de droite à gauche. Il s’agissait au départ de traductions automatiques soignées : les corrections de locuteurs natifs sont donc très appréciées sur <a href=\"{href.newIssue}\">GitHub</a>."
+          "Comment les traductions sont vérifiées : à chaque modification, un contrôle automatique confirme que chaque chaîne de l’application existe dans les 44 langues, avec les mêmes variables et les formes plurielles requises par chaque langue, et les principaux écrans ont été vérifiés dans plusieurs langues pour repérer les textes tronqués ou qui se chevauchent et contrôler la mise en miroir de droite à gauche. Il s’agissait au départ de traductions automatiques soignées : les corrections de locuteurs natifs sont donc très appréciées sur <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Vespertine écrit dans chacune de ses {languagesTotal} langues d’interface, de ヴェスパタイン et Веспертайн à فسبرتاين et वेस्परटाइन, en tailles et polices variées.",
         "wallLabel": "Vespertine dans chacune de ses langues"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Fréquence et résolution natives, jusqu’à 32 bits et jusqu’à la fréquence de votre DAC (testé jusqu’à 384 kHz) ; le PCM 32 bits inchangé nécessite le mode entier. Images avec feuille CUE."
+          "text": "Fréquence et résolution natives, jusqu’à 32 bits et jusqu’à la fréquence de votre DAC (testé jusqu’à 768 kHz) ; le PCM 32 bits inchangé nécessite le mode entier. Images avec feuille CUE."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF et DSDIFF, compressés en DST ou non. DoP selon le DAC et la fréquence porteuse, sinon PCM. Les fréquences porteuses DoP supérieures à 384 kHz n’ont pas été testées sur du matériel."
+          "text": "DSF et DSDIFF, compressés en DST ou non. DoP selon le DAC et la fréquence porteuse, sinon PCM. Le DoP est testé jusqu’au DSD256 ; le DSD512 en DoP n’a pas été testé sur du matériel."
         },
         {
           "name": "Images SACD",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Comparatif",
       "title": "Face aux autres.",
-      "intro": "Plusieurs lecteurs Mac proposent une lecture bit-perfect. Ce comparatif s’appuie sur ce qu’indique la documentation ou le code source de chaque lecteur. « Non documenté » signifie que l’éditeur ne se prononce pas, pas que la fonction est absente. Vespertine ne propose ni convolution, ni plug-ins d’effets audio, ni services de streaming.",
+      "intro": "Plusieurs lecteurs Mac proposent une lecture bit-perfect. Ce comparatif s’appuie sur ce qu’indique la documentation ou le code source de chaque lecteur. « Non documenté » signifie que l’éditeur ne se prononce pas, pas que la fonction est absente. Dans Vespertine, la convolution sert à la correction de salle ; l’application ne propose ni plug-ins d’effets audio, ni services de streaming.",
       "hint": "Faites défiler pour en voir plus →",
       "region": "Tableau comparatif (défilement horizontal)",
       "caption": "Vespertine comparé à sept autres lecteurs de musique pour Mac, d’après la documentation ou le code source de chaque lecteur",
@@ -410,8 +434,19 @@
           "Non⁴"
         ],
         [
+          "Correction de salle",
+          "Mesurée dans l’application (micro USB), ou import REW / APO et de réponses impulsionnelles",
+          "Non",
+          "Par convolution (Origin : option payante) ou via des Audio Units",
+          "Par convolution",
+          "Non (choix délibéré)",
+          "Non documenté",
+          "Non",
+          "Non documenté"
+        ],
+        [
           "Convolution / plug-ins d’effets audio",
-          "Non / Non",
+          "Oui (correction de salle) / Non",
           "Non / Non",
           "Oui (Origin : option payante) / Audio Units",
           "Oui / Non",
@@ -475,6 +510,10 @@
           "a": "Le chemin du signal relit ce que Core Audio a réellement fait : la fréquence nominale du périphérique, son format physique et qui le détient. Les décodeurs disposent de tests automatisés (TrueHD comparé à sa source, DTS comparé au décodeur de FFmpeg), un test de bouclage intégré vérifie le chemin logiciel échantillon par échantillon, et <span class=\"mono nowrap\">vespertine-probe</span> vous permet de vérifier votre propre matériel. <a href=\"{href.verification}\">Comment le vérifier vous-même</a>."
         },
         {
+          "q": "Vespertine propose-t-il une correction de salle ?",
+          "a": "Oui. Mesurez votre pièce avec un UMIK-1 ou un autre microphone USB étalonné, en un à cinq points autour de votre place d’écoute, et Vespertine ajuste des filtres pour chaque haut-parleur et aligne leur retard et leur niveau, en stéréo ou en 5.1. Il importe aussi des filtres REW et Equalizer APO ainsi que des réponses impulsionnelles. La correction est désactivée par défaut, la lecture reste bit-perfect tant qu’elle est désactivée, et le chemin du signal indique <span class=\"mono nowrap\">CORRECTION DE SALLE</span> lorsqu’elle est activée. <a href=\"{href.roomCorrection}\">Fonctionnement de la correction de salle</a>."
+        },
+        {
           "q": "Peut-il lire les SACD et les DVD ?",
           "a": "Il lit leurs images. Les images SACD <code>.iso</code>, stéréo et multicanal, compressées en DST ou non, ainsi que la musique LPCM des images DVD-Video ou des dossiers <code>VIDEO_TS</code>, sont lues directement depuis l’image, sans rien extraire. Le DVD-Audio n’est pas pris en charge, et les DVD chiffrés (CSS) nécessitent une copie déchiffrée."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Sur quel matériel a-t-il été testé ?",
-          "a": "La lecture a été testée sur un FiiO K11 à des fréquences allant jusqu’à 384 kHz, avec le DoP et le mode entier ; sur des AirPods Max en USB-C et en Bluetooth ; sur les haut-parleurs d’un MacBook Pro ; et sur un téléviseur Sony en HDMI en 5.1. Le matériel Intel n’a pas été testé. Le bitstream vers un ampli-tuner et la sortie DAC multicanal sont expérimentaux, non testés sur de vrais amplis-tuners et DAC USB multicanaux (un téléviseur Sony en HDMI a été testé : voir docs/DEVICES.md) ; <a href=\"{href.dacReport}\">retours souhaités</a>."
+          "a": "La lecture PCM a été testée jusqu’à 768 kHz et en DSD256 sur un Fosi Audio ZD3, et jusqu’à 384 kHz et en DSD128 sur un FiiO K11, sur lequel le mode entier a également été testé. Elle a aussi été testée sur des AirPods Max en USB-C et en Bluetooth, sur les haut-parleurs d’un MacBook Pro et sur un téléviseur Sony en HDMI en 5.1. Le matériel Intel n’a pas été testé. Le bitstream vers un ampli-tuner et la sortie DAC multicanal sont expérimentaux, non testés sur de vrais amplis-tuners et DAC USB multicanaux (un téléviseur Sony en HDMI a été testé : voir docs/DEVICES.md) ; <a href=\"{href.dacReport}\">retours souhaités</a>."
         },
         {
           "q": "Est-il disponible dans ma langue ?",
@@ -563,7 +602,7 @@
       "install": "Installation",
       "installValue": "<a href=\"{href.dmg}\">Téléchargez le DMG</a> ou {brew}",
       "tested": "Testé avec",
-      "testedValue": "FiiO K11 (toutes les fréquences jusqu’à 384 kHz, DoP, mode entier), AirPods Max en USB-C et Bluetooth, haut-parleurs du MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM jusqu’à 768 kHz, DSD256 en DoP), FiiO K11 (PCM jusqu’à 384 kHz, DSD128 en DoP, mode entier), AirPods Max en USB-C et Bluetooth, haut-parleurs du MacBook Pro",
       "links": "Liens",
       "website": "Site web",
       "source": "Code source",
@@ -646,10 +685,10 @@
     "eyebrow": "Confidentialité",
     "heading": "Vespertine ne collecte",
     "headingBrass": "rien.",
-    "updated": "En vigueur depuis le {effective} (ajout du statut Discord facultatif). La section « Ce site web » a été mise à jour le {statsUpdated}, lorsque le site a commencé à compter les visites à l’aide de statistiques auto-hébergées, sans cookies, puis le {langUpdated}, lorsque le menu des langues a commencé à mémoriser votre choix sur votre appareil.",
+    "updated": "En vigueur depuis le {effective} (ajout de l’utilisation du microphone par la correction de salle, pour la version 0.14). Modifications antérieures : le statut Discord facultatif, le {discordUpdated} ; la section « Ce site web », le {statsUpdated}, lorsque le site a commencé à compter les visites à l’aide de statistiques auto-hébergées, sans cookies. Le {langUpdated}, la section « Ce site web » a également commencé à décrire le menu des langues, qui mémorise votre choix sur votre appareil.",
     "intro": "Vespertine est un lecteur de musique libre et gratuit. L’app n’a ni comptes, ni statistiques d’utilisation, ni télémétrie, ni rapports de plantage, ni publicité. Le développeur ne reçoit aucune information sur vous ou votre musique. Le code source étant public, vous pouvez vérifier chaque affirmation de cette page.",
     "staysTitle": "Ce qui reste sur votre Mac",
-    "stays": "La base de données de votre bibliothèque, vos playlists, le nombre de lectures, les résultats d’analyse des fichiers, le cache des pochettes et vos réglages sont stockés dans le dossier Bibliothèque de votre compte utilisateur sur votre Mac. Les mots de passe des partages réseau et votre jeton ListenBrainz, si vous en ajoutez un, sont stockés dans le trousseau macOS. Rien de tout cela n’est envoyé où que ce soit.",
+    "stays": "La base de données de votre bibliothèque, vos playlists, le nombre de lectures, les résultats d’analyse des fichiers, le cache des pochettes et vos réglages sont stockés dans le dossier Bibliothèque de votre compte utilisateur sur votre Mac. Les mots de passe des partages réseau et votre jeton ListenBrainz, si vous en ajoutez un, sont stockés dans le trousseau macOS. La correction de salle n’utilise votre microphone de mesure que pendant une mesure, et conserve les enregistrements dans votre dossier Documents. Rien de tout cela n’est envoyé où que ce soit.",
     "onlineTitle": "Quand l’app se connecte à Internet",
     "online": [
       "<strong>Recherche de mises à jour.</strong> Vespertine demande à GitHub son flux de mises à jour environ une fois par jour, ainsi que lorsque vous choisissez Rechercher les mises à jour. GitHub voit votre adresse IP, comme pour tout téléchargement. Vous pouvez désactiver la recherche automatique dans les Réglages.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Vespertine lit désormais de façon fluide depuis les partages réseau lents, analyse plus vite les grandes bibliothèques, partages compris, lit la haute résolution sur les petits DAC USB-C à la fréquence la plus élevée qu’ils proposent, et garde le focus clavier et les sélections multiples là où vous les attendez."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Vespertine lit désormais nativement les fichiers DSDIFF compressés en DST et la musique LPCM des disques DVD-Video, conserve toutes les pistes des feuilles CUE d’EAC, et lance immédiatement les morceaux depuis un partage réseau, même pendant l’indexation de la bibliothèque."
     }
   }
 }

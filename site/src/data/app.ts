@@ -27,7 +27,7 @@ export const app = {
   languages: 44,
   /** Every interface language, as BCP 47 codes. */
   languageCodes: ['en', 'am', 'ar', 'bn', 'cs', 'da', 'de', 'el', 'es', 'fa', 'fi', 'fil', 'fr', 'gu', 'ha', 'he', 'hi', 'hu', 'id', 'it', 'ja', 'kn', 'ko', 'ml', 'mr', 'ms', 'nb', 'nl', 'pa', 'pl', 'pt-BR', 'pt-PT', 'ro', 'sv', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur', 'vi', 'zh-HK', 'zh-Hans', 'zh-Hant'],
-  tested: ['FiiO K11 (every rate to 384 kHz, DoP, integer mode)', 'AirPods Max over USB-C and Bluetooth', 'MacBook Pro speakers'],
+  tested: ['Fosi Audio ZD3 (PCM to 768 kHz, DSD256 over DoP)', 'FiiO K11 (PCM to 384 kHz, DSD128 over DoP, integer mode)', 'AirPods Max over USB-C and Bluetooth', 'MacBook Pro speakers'],
   author: {
     name: 'Alexander Szeremeta',
     short: 'Alex Szeremeta',
@@ -57,6 +57,7 @@ export const links = {
   loopback: `${BLOB}/docs/LOOPBACK.md`,
   architecture: `${BLOB}/docs/ARCHITECTURE.md`,
   dvd: `${BLOB}/docs/DVD-VIDEO-LPCM.md`,
+  roomCorrection: `${BLOB}/docs/ROOM-CORRECTION.md`,
   development: `${BLOB}/docs/DEVELOPMENT.md`,
   contributing: `${BLOB}/CONTRIBUTING.md`,
   signalPath: `${BLOB}/Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift`,

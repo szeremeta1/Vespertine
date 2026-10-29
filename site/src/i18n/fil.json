@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: surround at hi-res na music player para sa Mac",
-    "description": "Libre at open-source na Mac player para sa mga koleksyong surround at hi-res: mga disc image ng SACD at DVD-Video, DSD, mga DTS CD, mga file na DTS-HD MA, TrueHD at Dolby Atmos, Spatial Audio sa AirPods, at bit-perfect na signal path na masusuri mo.",
+    "description": "Libre at open-source na Mac player para sa mga koleksyong surround at hi-res: mga disc image ng SACD at DVD-Video, DSD, mga DTS CD, mga file na DTS-HD MA, TrueHD at Dolby Atmos, Spatial Audio sa AirPods, room correction na sinusukat sa sarili mong kuwarto, at bit-perfect na signal path na masusuri mo.",
     "ogAlt": "Vespertine: ang libre at open-source na Mac player para sa surround at hi-res na musika. Ipinapakita ng signal path nito ang isang 24-bit / 96 kHz na FLAC na nagpe-play nang bit-perfect sa isang Fosi Audio ZD3. Bersyon {version}, macOS {minMacOS} o mas bago.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "hi-res na musika,"
       ],
       "titleBrass": "sa Mac mo.",
-      "lede": "Ang libre at open-source na Mac player para sa mga koleksyon ng surround at hi-res na musika. Nasa iisang library kasama ng mga stereo album mo ang mga disc image ng SACD at DVD-Video, DSD, mga DTS CD, at mga file na DTS-HD MA, TrueHD at Atmos, na may head-tracked na Spatial Audio sa AirPods. Ipinapakita ng signal path ang bawat hakbang mula file hanggang output. Sa Ingles at sa {languages} pang wika.",
+      "lede": "Ang libre at open-source na Mac player para sa mga koleksyon ng surround at hi-res na musika. Nasa iisang library kasama ng mga stereo album mo ang mga disc image ng SACD at DVD-Video, DSD, mga DTS CD, at mga file na DTS-HD MA, TrueHD at Atmos, na may head-tracked na Spatial Audio sa AirPods. Sinusukat ng room correction ang kuwarto mo gamit ang USB microphone at itinatama ang bawat speaker; naka-off ito hangga't hindi mo ito ino-on. Ipinapakita ng signal path ang bawat hakbang mula file hanggang output. Sa Ingles at sa {languages} pang wika.",
       "ask": "Gusto mo?",
       "star": "I-star sa GitHub",
       "discuss": "Sumali sa talakayan",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Eksklusibo",
       "spatial": "Spatial · head tracked",
-      "synthetic": "Synthetic na mataas na frequency?"
+      "synthetic": "Synthetic na mataas na frequency?",
+      "roomCorrection": "Room correction"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Bawat track sa native nitong rate at depth.",
         "lede": "Inililista ng signal path ang bawat hakbang mula sa file hanggang sa DAC mo, binabasa pabalik mula sa Core Audio, at sinasabi kung may nagbago sa mga sample.",
         "body": [
-          "Inililipat ng Vespertine ang device sa rate ng bawat file, at nagre-resample lang ito, gamit ang mastering-quality converter ng Apple, kapag hindi kaya ng DAC ang rate na iyon. Lumalabas lang ang <span class=\"mono nowrap\">BIT-PERFECT</span> kapag natugunan ang mga kondisyon sa source: native na rate, walang nagbabago sa mga sample, word length na kasya, at device na eksklusibo o hindi ibinabahagi sa ibang app. Nasubok ang PCM playback hanggang 384 kHz sa isang FiiO K11."
+          "Inililipat ng Vespertine ang device sa rate ng bawat file, at nagre-resample lang ito, gamit ang mastering-quality converter ng Apple, kapag hindi kaya ng DAC ang rate na iyon. Lumalabas lang ang <span class=\"mono nowrap\">BIT-PERFECT</span> kapag natugunan ang mga kondisyon sa source: native na rate, walang nagbabago sa mga sample, word length na kasya, at device na eksklusibo o hindi ibinabahagi sa ibang app. Nasubok ang PCM playback hanggang 768 kHz, pati ang DSD256, sa isang Fosi Audio ZD3, at hanggang 384 kHz, pati ang DSD128, sa isang FiiO K11."
         ],
         "list": [
           "Pinipigilan ng eksklusibong (hog) mode ang ibang app na gamitin ang device. Sa nakabahaging mode, inaayos ng mga volume key at ng Digital Crown ang DAC mo; sa eksklusibong mode, kaya rin nila ito kung io-on mo iyon.",
@@ -145,6 +146,29 @@
         "alt": "Pine-play ng Vespertine ang Liszt ni Lazar Berman, Années de pèlerinage, mula sa isang 24-bit / 96 kHz na FLAC: minamarkahan ito ng inspector na bit-perfect at eksklusibo sa isang Fosi Audio ZD3, kasama ang bawat hakbang ng signal path.",
         "floatAlt": "Ang sheet ng loopback test: 24-bit sa 44.1 at 96 kHz, 16-bit na padded at isang gapless na pares, bawat isa bit-exact.",
         "floatCaption": "Loopback test · software check"
+      },
+      "room-correction": {
+        "jack": "Room correction",
+        "kicker": "Room correction",
+        "title": "Sukatin ang kuwarto mo. Itama ang bawat speaker.",
+        "lede": "Sukatin ang kuwarto mo gamit ang UMIK-1 o ibang calibrated na USB microphone, at iaangkop ng Vespertine ang mga filter sa bawat speaker batay sa naririnig nito sa upuan mo.",
+        "body": [
+          "Tumutugtog ang mga sweep sa isang speaker sa bawat pagkakataon, sa isa hanggang limang puwesto sa paligid ng upuan mo sa pakikinig. May sariling mga filter ang bawat speaker, na idinisenyo mula sa pagsukat. Karamihan sa mga ito ay pagbabawas: ibinababa nila ang mga peak ng kuwarto at bahagya lang na pinalalakas ang malalapad na dip. Ang parehong pagsukat din ang nagtatakda ng delay at level ng bawat speaker, kaya sabay at pareho ang lakas ng pagdating ng bawat speaker sa upuan mo. Naka-off ang room correction bilang default, at nananatiling bit-perfect ang playback habang naka-off ito. Kapag naka-on ito, nakasaad sa signal path ang <span class=\"mono nowrap\">ROOM CORRECTION</span>."
+        ],
+        "list": [
+          "Tatlong target: Warm (ang default), Gentle tilt at Flat. Itama ang bass lang o ang buong saklaw, at idisenyo muli ang mga filter sa ibang pagkakataon nang hindi na sumusukat ulit.",
+          "Nag-i-import ng mga filter mula sa REW o Equalizer APO, kasama ang delay at level ng bawat speaker, at nag-e-export ng text para sa Equalizer APO.",
+          "Nag-i-import ng mga impulse response (WAV, AIFF, CAF o FLAC) at pinapatugtog ang mga ito sa pamamagitan ng convolution.",
+          "Stereo at 5.1.",
+          "Ipinapakita ng Larawan ng Kuwarto ang mga speaker, ang upuan mo at ang bawat puwesto ng microphone habang sinusukat ito. Pagkatapos, ginagawang hinulaang response ng animasyong Pagbabago ng Kurba ang nasukat na response, at pinaghahambing ang dalawa ng switch na Bago/Pagkatapos."
+        ],
+        "note": "Hinulaan ang kurbang “pagkatapos” mula sa pagsukat at sa mga filter, hindi sinukat. Para makita ang talagang nangyayari sa kuwarto, sumukat ulit habang naka-on ang pagwawasto.",
+        "links": [
+          "Paano gumagana ang room correction"
+        ],
+        "alt": "Ang hinulaang room correction ng Vespertine para sa isang stereo pair na may Warm na target: para sa bawat speaker, ang nasukat na response, ang target at ang hinulaang response pagkatapos ng pagwawasto, na may room peak malapit sa 120 Hz na ibinaba nang 14 at 18 dB, at ang mga filter ng bawat speaker.",
+        "floatAlt": "Ang Larawan ng Kuwarto sa wizard ng pagsukat: ang kaliwa at kanang speaker, ang upuan, at limang puwesto ng microphone sa paligid nito, at nasa una ang microphone.",
+        "floatCaption": "Larawan ng Kuwarto"
       },
       "surround": {
         "jack": "Surround",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Tumugma nang bit-for-bit sa sacd_extract sa dalawang totoong disc. Ang mga disc na may 5.0 area, area na multichannel lamang, o DSD128 pataas ay sakop lang ng mga synthesized na test image sa ngayon.",
-          "Ang DSF at DSDIFF mula DSD64 hanggang DSD512, kasama ang DST-compressed na DSDIFF, ay ipinapadala bilang DoP sa mga DAC na tumatanggap ng carrier rate, o kino-convert sa high-rate na PCM. Kumpirmado ang DoP sa isang FiiO K11; hindi pa nasusubok sa hardware ang mga carrier rate na lampas sa 384 kHz.",
+          "Ang DSF at DSDIFF mula DSD64 hanggang DSD512, kasama ang DST-compressed na DSDIFF, ay ipinapadala bilang DoP sa mga DAC na tumatanggap ng carrier rate, o kino-convert sa high-rate na PCM. Kumpirmado ang DoP hanggang DSD256 sa isang Fosi Audio ZD3 at hanggang DSD128 sa isang FiiO K11; hindi pa nasusubok sa hardware ang DSD512 sa DoP.",
           "DVD-Video LPCM sa 16, 20 at 24 bit, 48 at 96 kHz, hanggang 8 channel. Hindi suportado ang DVD-Audio, at kailangan ng decrypted na kopya ang mga encrypted (CSS) na disc."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Iisang card ang pinagsasaluhan ng mga remaster, mono at stereo na release at mga SACD ng isang album; piliin ang edisyon kapag binuksan mo ito.",
           "Mga paborito at bilang ng pag-play, itinatago sa library at hindi kailanman isinusulat sa mga file mo. Nag-i-import ng mga playlist ng M3U at Apple Music, mga bilang ng pag-play at mga paborito.",
           "Tag editor na may mga backup at isang-hakbang na pagbabalik, at MusicBrainz enrichment na ipinapakita ang kumpiyansa nito bago magsulat ng kahit ano.",
-          "Mga network share sa SMB, NFS o WebDAV, na may caching, Panatilihing Offline at playback na ginawa para sa mabagal na server.",
+          "Mga network share sa SMB, NFS o WebDAV, na may caching, Panatilihing Offline at playback na ginawa para sa mabagal na server: bina-buffer muna sa Mac mo ang mga track bago tumugtog, at may loading ring sa play button habang ginagawa ito.",
           "Hinahanap ng “Maghanap ng Musika” sa bawat drive ang totoong musika mo at iniiwan ang kalat. Sa unang pagbukas, pinipili ng isang maikling setup ang output mo at ipinapaliwanag kung ano ang ginagawa ng eksklusibong access at ReplayGain.",
           "Parametric EQ kada output na nag-i-import ng mga preset ng AutoEQ at Equalizer APO. Naka-off bilang default; kapag naka-on, <span class=\"mono nowrap\">EQUALIZER</span> ang sinasabi ng signal path sa halip na <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Mini Player, menu-bar extra, mga media key, ReplayGain at mga awtomatiko at naka-sign na update."
@@ -242,7 +266,7 @@
         "lede": "Isinalin ang bawat menu, setting at mensahe ng signal path sa {languages} wika bukod sa Ingles.",
         "body": [
           "Mula Ukranyano, Aleman at Hapones hanggang Swahili, Tamil at Hausa, na may lokal na plural at format ng numero, at Pinasimpleng Tsino, Tradisyonal na Tsino at Tsino ng Hong Kong na may kani-kaniyang bokabularyo. May right-to-left na layout ang Arabe, Hebreo, Persyano at Urdu.",
-          "Paano sinusuri ang mga salin: sa bawat pagbabago, kinukumpirma ng isang awtomatikong pagsusuri na umiiral ang bawat string ng app sa lahat ng {languages} wika na may parehong mga placeholder at mga plural form na kailangan ng bawat wika, at sinuri ang bawat screen sa bawat wika para sa naputol o nagpapatong na text at right-to-left na mirroring. Nagsimula ang mga ito bilang maingat na machine translation, kaya malugod na tinatanggap sa <a href=\"{href.newIssue}\">GitHub</a> ang mga pagwawasto mula sa mga katutubong nagsasalita."
+          "Paano sinusuri ang mga salin: sa bawat pagbabago, kinukumpirma ng isang awtomatikong pagsusuri na umiiral ang bawat string ng app sa lahat ng 44 na wika na may parehong mga placeholder at mga plural form na kailangan ng bawat wika, at sinuri ang mga pangunahing screen sa ilang wika para sa naputol o nagpapatong na text at right-to-left na mirroring. Nagsimula ang mga ito bilang maingat na machine translation, kaya malugod na tinatanggap sa <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a> ang mga pagwawasto mula sa mga katutubong nagsasalita."
         ],
         "alt": "Ang Vespertine na nakasulat sa bawat isa sa {languagesTotal} wika ng interface nito, mula ヴェスパタイン at Веспертайн hanggang فسبرتاين at वेस्परटाइन, sa iba’t ibang laki at typeface.",
         "wallLabel": "Vespertine sa bawat wika nito"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Native na rate at depth hanggang 32-bit at ang rate na pinapatakbo ng DAC mo (sinubukan hanggang 384 kHz); kailangan ng integer mode para sa di-binagong 32-bit PCM. Mga CUE-sheet image."
+          "text": "Native na rate at depth hanggang 32-bit at ang rate na pinapatakbo ng DAC mo (sinubukan hanggang 768 kHz); kailangan ng integer mode para sa di-binagong 32-bit PCM. Mga CUE-sheet image."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF at DSDIFF, DST-compressed o plain. Nakadepende ang DoP sa DAC at sa carrier rate; kung hindi, PCM. Hindi pa nasusubukan sa hardware ang mga DoP carrier rate na lampas sa 384 kHz."
+          "text": "DSF at DSDIFF, DST-compressed o plain. Nakadepende ang DoP sa DAC at sa carrier rate; kung hindi, PCM. Nasubukan ang DoP hanggang DSD256; hindi pa nasusubukan sa hardware ang DSD512 sa DoP."
         },
         {
           "name": "Mga SACD image",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Paghahambing",
       "title": "Paano ito nakikipagsabayan.",
-      "intro": "Ilang Mac player ang nag-aalok ng bit-perfect na playback. Inihahambing dito ang sinasabi ng sariling dokumentasyon o source code ng bawat player. Ang “Hindi nakadokumento” ay nangangahulugang walang sinasabi ang vendor kung mayroon o wala, hindi na wala ang feature. Walang convolution, audio effect plugin o streaming service ang Vespertine.",
+      "intro": "Ilang Mac player ang nag-aalok ng bit-perfect na playback. Inihahambing dito ang sinasabi ng sariling dokumentasyon o source code ng bawat player. Ang “Hindi nakadokumento” ay nangangahulugang walang sinasabi ang vendor kung mayroon o wala, hindi na wala ang feature. Para sa room correction ang convolution ng Vespertine; wala itong audio effect plugin o streaming service.",
       "hint": "Mag-scroll para sa iba pa →",
       "region": "Talahanayan ng paghahambing (nag-i-scroll pagilid)",
       "caption": "Ang Vespertine kumpara sa pito pang Mac music player, batay sa sariling dokumentasyon o source ng bawat player",
@@ -410,8 +434,19 @@
           "Hindi⁴"
         ],
         [
+          "Room correction",
+          "Sinusukat sa app (USB mic), o pag-import mula sa REW / APO at ng mga impulse response",
+          "Hindi",
+          "Sa pamamagitan ng convolution (Origin: bayad na opsyon) o Audio Units",
+          "Sa pamamagitan ng convolution",
+          "Hindi (sadyang wala)",
+          "Hindi nakadokumento",
+          "Hindi",
+          "Hindi nakadokumento"
+        ],
+        [
           "Convolution / audio effect plugin",
-          "Hindi / Hindi",
+          "Oo (room correction) / Hindi",
           "Hindi / Hindi",
           "Oo (Origin: bayad na opsyon) / Audio Units",
           "Oo / Hindi",
@@ -475,6 +510,10 @@
           "a": "Binabasa ng signal path kung ano talaga ang ginawa ng Core Audio: ang nominal rate ng device, ang physical format nito at kung sino ang may hawak nito. May mga automated test ang mga decoder (TrueHD laban sa source nito, DTS laban sa sariling decoder ng FFmpeg), sinusuri ng built-in na loopback test ang software path bawat sample, at sa <span class=\"mono nowrap\">vespertine-probe</span> ay masusuri mo ang sarili mong hardware. <a href=\"{href.verification}\">Paano mo ito mabe-verify mismo</a>."
         },
         {
+          "q": "May room correction ba ito?",
+          "a": "Oo. Sukatin ang kuwarto mo gamit ang UMIK-1 o ibang calibrated na USB microphone sa isa hanggang limang puwesto sa paligid ng upuan mo, at iaangkop ng Vespertine ang mga filter sa bawat speaker at ihahanay ang delay at level ng mga ito, sa stereo o 5.1. Nag-i-import din ito ng mga filter mula sa REW at Equalizer APO at ng mga impulse response. Naka-off ito bilang default, nananatiling bit-perfect ang playback habang naka-off ito, at nakasaad sa signal path ang <span class=\"mono nowrap\">ROOM CORRECTION</span> habang naka-on ito. <a href=\"{href.roomCorrection}\">Paano gumagana ang room correction</a>."
+        },
+        {
           "q": "Kaya ba nitong mag-play ng mga SACD at DVD disc?",
           "a": "Pine-play nito ang mga image ng mga ito. Ang mga SACD <code>.iso</code> image, stereo at multichannel, DST-compressed o plain, at ang LPCM na musika sa mga DVD-Video image o mga folder na <code>VIDEO_TS</code> ay direktang pine-play mula sa image, nang walang ine-extract. Hindi suportado ang DVD-Audio, at kailangan ng decrypted na kopya para sa mga encrypted (CSS) na DVD."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Saang hardware na ito nasubukan?",
-          "a": "Nasubukan na ang playback sa isang FiiO K11 sa mga rate hanggang 384 kHz, na may DoP at integer mode; sa AirPods Max sa USB-C at Bluetooth; sa mga speaker ng MacBook Pro; at sa isang Sony TV sa HDMI sa 5.1. Hindi pa nasusubukan ang Intel hardware. Eksperimental ang bitstream papunta sa receiver at ang multichannel DAC output, at hindi pa nasusubukan sa mga totoong receiver at multichannel USB DAC (isang Sony TV sa HDMI ang nasubukan na: tingnan ang docs/DEVICES.md); <a href=\"{href.dacReport}\">hinihiling ang mga ulat</a>."
+          "a": "Nasubukan na ang PCM playback hanggang 768 kHz, pati ang DSD256, sa isang Fosi Audio ZD3, at hanggang 384 kHz, pati ang DSD128, sa isang FiiO K11, kung saan nasubukan din ang integer mode. Nasubukan na rin ito sa AirPods Max sa USB-C at Bluetooth, sa mga speaker ng MacBook Pro, at sa isang Sony TV sa HDMI sa 5.1. Hindi pa nasusubukan ang Intel hardware. Eksperimental ang bitstream papunta sa receiver at ang multichannel DAC output, at hindi pa nasusubukan sa mga totoong receiver at multichannel USB DAC (isang Sony TV sa HDMI ang nasubukan na: tingnan ang docs/DEVICES.md); <a href=\"{href.dacReport}\">hinihiling ang mga ulat</a>."
         },
         {
           "q": "Nasa wika ko ba ito?",
@@ -563,7 +602,7 @@
       "install": "I-install",
       "installValue": "<a href=\"{href.dmg}\">I-download ang DMG</a> o {brew}",
       "tested": "Nasubukan sa",
-      "testedValue": "FiiO K11 (bawat rate hanggang 384 kHz, DoP, integer mode), AirPods Max sa USB-C at Bluetooth, mga speaker ng MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM hanggang 768 kHz, DSD256 sa DoP), FiiO K11 (PCM hanggang 384 kHz, DSD128 sa DoP, integer mode), AirPods Max sa USB-C at Bluetooth, mga speaker ng MacBook Pro",
       "links": "Mga link",
       "website": "Website",
       "source": "Pinagmulang code",
@@ -646,10 +685,10 @@
     "eyebrow": "Privacy",
     "heading": "Ang kinokolekta ng Vespertine:",
     "headingBrass": "wala.",
-    "updated": "May bisa simula {effective} (idinadagdag ang opsyonal na Discord status). In-update ang seksiyong “Ang website na ito” noong {statsUpdated}, nang magsimulang bilangin ng site ang mga pagbisita gamit ang self-hosted na statistics na walang cookie, at noong {langUpdated}, nang magsimulang tandaan ng menu ng wika ang pinili mo sa iyong device.",
+    "updated": "May bisa simula {effective} (idinadagdag ang paggamit ng room correction sa microphone, para sa bersyon 0.14). Mga naunang pagbabago: ang opsyonal na Discord status, {discordUpdated}; ang seksiyong “Ang website na ito”, {statsUpdated}, nang magsimulang bilangin ng site ang mga pagbisita gamit ang self-hosted na statistics na walang cookie. Noong {langUpdated}, nagsimula ring ilarawan ng seksiyong “Ang website na ito” ang menu ng wika, na tumatandaan ng pinili mo sa iyong device.",
     "intro": "Libre at open-source na music player ang Vespertine. Walang account, walang analytics, walang telemetry, walang crash reporting at walang advertising ang app. Walang natatanggap na impormasyon ang developer tungkol sa iyo o sa musika mo. Dahil pampubliko ang source code, masusuri mo ang bawat pahayag sa pahinang ito.",
     "staysTitle": "Ang nananatili sa Mac mo",
-    "stays": "Naka-store sa user Library mo sa Mac ang database ng library mo, mga playlist, bilang ng pag-play, mga resulta ng pagsusuri ng file, artwork cache at mga setting. Naka-store sa macOS Keychain ang mga password para sa mga network share at ang ListenBrainz token mo, kung magdagdag ka nito. Wala sa mga ito ang ina-upload kahit saan.",
+    "stays": "Naka-store sa user Library mo sa Mac ang database ng library mo, mga playlist, bilang ng pag-play, mga resulta ng pagsusuri ng file, artwork cache at mga setting. Naka-store sa macOS Keychain ang mga password para sa mga network share at ang ListenBrainz token mo, kung magdagdag ka nito. Ginagamit lang ng room correction ang measurement microphone mo habang nagsasagawa ka ng pagsukat, at itinatago nito ang mga recording sa folder na Documents mo. Wala sa mga ito ang ina-upload kahit saan.",
     "onlineTitle": "Kapag nag-online ang app",
     "online": [
       "<strong>Pag-check ng update.</strong> Humihingi ang Vespertine sa GitHub ng update feed nito mga isang beses sa isang araw, at kapag pinili mo ang Tingnan ang mga Update. Nakikita ng GitHub ang IP address mo, gaya ng sa anumang download. Puwede mong i-off ang mga awtomatikong check sa Settings.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Maayos nang nagpe-play ang Vespertine mula sa mabagal na network share, mas mabilis na sinusuri ang malalaking library kasama ang mga share, nagpe-play ng hi-res sa maliliit na USB-C DAC sa pinakamataas na rate na inaalok nila, at pinananatili ang keyboard at mga multi-selection kung saan mo inaasahan ang mga ito."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Native nang pine-play ng Vespertine ang mga DST-compressed na DSDIFF file at ang LPCM na musika sa mga DVD-Video disc, pinananatili ang bawat track ng mga EAC CUE sheet, at agad na sinisimulan ang mga kanta mula sa isang network share kahit habang tumatakbo ang pag-scan ng library."
     }
   }
 }

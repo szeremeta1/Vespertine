@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: player de muzică surround și hi-res pentru Mac",
-    "description": "Player gratuit și open source pentru Mac, pentru colecții surround și hi-res: imagini de disc SACD și DVD-Video, DSD, CD-uri DTS, fișiere DTS-HD MA, TrueHD și Dolby Atmos, Audio spațial pe AirPods și o cale a semnalului pe care o puteți inspecta.",
+    "description": "Player gratuit și open source pentru Mac, pentru colecții surround și hi-res: imagini de disc SACD și DVD-Video, DSD, CD-uri DTS, fișiere DTS-HD MA, TrueHD și Dolby Atmos, Audio spațial pe AirPods, corecția camerei măsurată chiar în camera dumneavoastră și o cale a semnalului pe care o puteți inspecta.",
     "ogAlt": "Vespertine: playerul gratuit și open source pentru Mac, creat pentru muzica surround și hi-res. Calea semnalului arată un FLAC de 24 de biți / 96 kHz redat bit-perfect pe un Fosi Audio ZD3. Versiunea {version}, macOS {minMacOS} sau o versiune ulterioară.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "și hi-res,"
       ],
       "titleBrass": "pe Mac-ul dumneavoastră.",
-      "lede": "Playerul gratuit și open source pentru Mac, creat pentru colecțiile de muzică surround și hi-res. Imaginile de disc SACD și DVD-Video, DSD-ul, CD-urile DTS și fișierele DTS-HD MA, TrueHD și Atmos stau în aceeași bibliotecă cu albumele dumneavoastră stereo, iar pe AirPods se redau ca Audio spațial cu urmărirea capului. Calea semnalului arată fiecare pas, de la fișier la ieșire. În engleză și în alte {languages} de limbi.",
+      "lede": "Playerul gratuit și open source pentru Mac, creat pentru colecțiile de muzică surround și hi-res. Imaginile de disc SACD și DVD-Video, DSD-ul, CD-urile DTS și fișierele DTS-HD MA, TrueHD și Atmos stau în aceeași bibliotecă cu albumele dumneavoastră stereo, iar pe AirPods se redau ca Audio spațial cu urmărirea capului. Corecția camerei vă măsoară camera cu un microfon USB și corectează fiecare difuzor; rămâne dezactivată până când o activați. Calea semnalului arată fiecare pas, de la fișier la ieșire. În engleză și în alte {languages} de limbi.",
       "ask": "Vă place?",
       "star": "Dați-i o stea pe GitHub",
       "discuss": "Participați la discuții",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Exclusiv",
       "spatial": "Spațial · urmărirea capului",
-      "synthetic": "Frecvențe înalte sintetice?"
+      "synthetic": "Frecvențe înalte sintetice?",
+      "roomCorrection": "Corecția camerei"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Fiecare piesă la rata și adâncimea ei native.",
         "lede": "Calea semnalului enumeră fiecare pas de la fișier la DAC, citit înapoi din Core Audio, și vă spune când ceva a modificat eșantioanele.",
         "body": [
-          "Vespertine comută dispozitivul pe rata fiecărui fișier și reeșantionează, cu convertorul Apple de calitate mastering, doar când DAC-ul nu poate funcționa la acea rată. <span class=\"mono nowrap\">BIT-PERFECT</span> apare doar când sunt îndeplinite condițiile din codul sursă: o rată nativă, nimic care să modifice eșantioanele, o lungime de cuvânt potrivită și un dispozitiv exclusiv sau nepartajat cu altă aplicație. Redarea PCM a fost testată până la 384 kHz pe un FiiO K11."
+          "Vespertine comută dispozitivul pe rata fiecărui fișier și reeșantionează, cu convertorul Apple de calitate mastering, doar când DAC-ul nu poate funcționa la acea rată. <span class=\"mono nowrap\">BIT-PERFECT</span> apare doar când sunt îndeplinite condițiile din codul sursă: o rată nativă, nimic care să modifice eșantioanele, o lungime de cuvânt potrivită și un dispozitiv exclusiv sau nepartajat cu altă aplicație. Redarea PCM a fost testată până la 768 kHz și DSD256 pe un Fosi Audio ZD3 și până la 384 kHz și DSD128 pe un FiiO K11."
         ],
         "list": [
           "Modul exclusiv (hog) ține celelalte aplicații departe de dispozitiv. În modul partajat, tastele de volum și Digital Crown reglează DAC-ul; în modul exclusiv pot face și ele acest lucru, dacă activați opțiunea.",
@@ -145,6 +146,29 @@
         "alt": "Vespertine redă Années de pèlerinage de Liszt, în interpretarea lui Lazar Berman, dintr-un FLAC de 24 de biți / 96 kHz: inspectorul îl marchează bit-perfect și exclusiv pe un Fosi Audio ZD3, cu fiecare pas al căii semnalului.",
         "floatAlt": "Fișa testului loopback: 24 de biți la 44,1 și 96 kHz, 16 biți completați și o pereche fără pauze, fiecare identic bit cu bit.",
         "floatCaption": "Test loopback · verificare software"
+      },
+      "room-correction": {
+        "jack": "Corecția camerei",
+        "kicker": "Corecția camerei",
+        "title": "Măsurați camera. Corectați fiecare difuzor.",
+        "lede": "Măsurați camera cu un UMIK-1 sau cu alt microfon USB calibrat, iar Vespertine calculează filtre pentru fiecare difuzor pe baza a ceea ce aude la locul dumneavoastră.",
+        "body": [
+          "Baleiajele sunt redate pe rând prin câte un difuzor, în unul până la cinci puncte din jurul locului dumneavoastră de ascultare. Fiecare difuzor primește propriile filtre, proiectate pe baza măsurătorii. Acestea sunt în mare parte atenuări: reduc vârfurile camerei și ridică doar ușor golurile largi. Aceeași măsurătoare stabilește întârzierea și nivelul fiecărui difuzor, astfel încât sunetul fiecăruia să ajungă la locul dumneavoastră în același moment și la același volum. Corecția camerei este dezactivată implicit, iar redarea rămâne bit-perfect cât timp este dezactivată. Când este activată, calea semnalului afișează <span class=\"mono nowrap\">CORECȚIA CAMEREI</span>."
+        ],
+        "list": [
+          "Trei ținte: Warm (implicită), Gentle tilt și Flat. Corectați doar basul sau gama completă și reproiectați filtrele mai târziu, fără să măsurați din nou.",
+          "Importă filtre din REW sau Equalizer APO, cu întârzierea și nivelul fiecărui difuzor, și exportă text pentru Equalizer APO.",
+          "Importă răspunsuri la impuls (WAV, AIFF, CAF sau FLAC) și le redă prin convoluție.",
+          "Stereo și 5.1.",
+          "Portretul camerei arată difuzoarele, locul dumneavoastră și fiecare punct de microfon pe măsură ce este măsurat. Apoi, Dezvăluirea curbei transformă răspunsul măsurat în cel prezis, iar un comutator înainte/după le compară."
+        ],
+        "note": "Curba „după” este prezisă pe baza măsurătorii și a filtrelor, nu măsurată. Ca să vedeți ce face cu adevărat camera, măsurați din nou cu corecția activată.",
+        "links": [
+          "Cum funcționează corecția camerei"
+        ],
+        "alt": "Corecția camerei prezisă de Vespertine pentru o pereche stereo cu ținta Warm: pentru fiecare difuzor, răspunsul măsurat, ținta și răspunsul prezis după corecție, cu un vârf al camerei în jur de 120 Hz atenuat cu 14 și cu 18 dB, precum și filtrele fiecărui difuzor.",
+        "floatAlt": "Portretul camerei în asistentul de măsurare: difuzoarele stânga și dreapta, locul de ascultare și cinci puncte de microfon în jurul lui, primul cu microfonul așezat pe el.",
+        "floatCaption": "Portretul camerei"
       },
       "surround": {
         "jack": "Surround",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Rezultatele coincid bit cu bit cu sacd_extract pe două discuri reale. Discurile cu o zonă 5.0, doar cu o zonă multicanal sau în DSD128 și peste sunt acoperite deocamdată doar de imagini de test sintetizate.",
-          "DSF și DSDIFF de la DSD64 la DSD512, inclusiv DSDIFF comprimat DST, ajung ca DoP la DAC-urile care acceptă rata purtătoare sau sunt convertite în PCM la rată înaltă. DoP este confirmat pe un FiiO K11; ratele purtătoare de peste 384 kHz sunt netestate pe hardware.",
+          "DSF și DSDIFF de la DSD64 la DSD512, inclusiv DSDIFF comprimat DST, ajung ca DoP la DAC-urile care acceptă rata purtătoare sau sunt convertite în PCM la rată înaltă. DoP este confirmat până la DSD256 pe un Fosi Audio ZD3 și până la DSD128 pe un FiiO K11; DSD512 prin DoP este netestat pe hardware.",
           "DVD-Video LPCM pe 16, 20 și 24 de biți, la 48 și 96 kHz, până la 8 canale. DVD-Audio nu este acceptat, iar discurile criptate (CSS) necesită o copie decriptată."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Remasterizările, edițiile mono și stereo și SACD-urile aceluiași album au un singur card; alegeți ediția când îl deschideți.",
           "Favorite și numărul de redări, păstrate în bibliotecă și niciodată scrise în fișierele dumneavoastră. Importă playlisturi M3U și Apple Music, numărul de redări și favoritele.",
           "Editor de etichete cu copii de rezervă și restabilire dintr-un singur pas, plus îmbogățire din MusicBrainz care își arată nivelul de încredere înainte de a scrie ceva.",
-          "Partajări de rețea prin SMB, NFS sau WebDAV, cu cache, Păstrează offline și redare concepută pentru servere lente.",
+          "Partajări de rețea prin SMB, NFS sau WebDAV, cu cache, Păstrează offline și redare concepută pentru servere lente: piesele sunt preîncărcate pe Mac înainte de a fi redate, iar între timp butonul de redare afișează un inel de încărcare.",
           "Găsește muzică caută pe toate unitățile muzica reală și lasă deoparte fișierele inutile. O scurtă configurare la prima lansare alege ieșirea și explică ce fac accesul exclusiv și ReplayGain.",
           "EQ parametric pentru fiecare ieșire, care importă presetări AutoEQ și Equalizer APO. Dezactivat implicit; când este activat, calea semnalului afișează <span class=\"mono nowrap\">EGALIZATOR</span> în loc de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
           "Mini player, pictogramă în bara de meniu, taste media, ReplayGain și actualizări automate, semnate."
@@ -242,7 +266,7 @@
         "lede": "Fiecare meniu, setare și mesaj al căii semnalului este tradus în {languages} de limbi, pe lângă engleză.",
         "body": [
           "De la ucraineană, germană și japoneză la swahili, tamilă și hausa, cu forme de plural și formate numerice locale, iar chineza simplificată, tradițională și cea din Hong Kong au fiecare propriul vocabular. Araba, ebraica, persana și urdu au o interfață de la dreapta la stânga.",
-          "Cum sunt verificate traducerile: la fiecare modificare, o verificare automată confirmă că fiecare șir din aplicație există în toate cele {languages} de limbi, cu aceiași substituenți și cu formele de plural de care are nevoie fiecare limbă, iar fiecare ecran a fost revizuit în fiecare limbă pentru text tăiat sau suprapus și pentru oglindirea de la dreapta la stânga. Au pornit ca traduceri automate atente, așa că corecturile vorbitorilor nativi sunt foarte binevenite pe <a href=\"{href.newIssue}\">GitHub</a>."
+          "Cum sunt verificate traducerile: la fiecare modificare, o verificare automată confirmă că fiecare șir din aplicație există în toate cele 44 de limbi, cu aceiași substituenți și cu formele de plural de care are nevoie fiecare limbă, iar ecranele principale au fost verificate în mai multe limbi pentru text tăiat sau suprapus și pentru oglindirea de la dreapta la stânga. Au pornit ca traduceri automate atente, așa că corecturile vorbitorilor nativi sunt foarte binevenite pe <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Vespertine scris în fiecare dintre cele {languagesTotal} de limbi ale interfeței, de la ヴェスパタイン și Веспертайн la فسبرتاين și वेस्परटाइन, în dimensiuni și fonturi diferite.",
         "wallLabel": "Vespertine în fiecare dintre limbile sale"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Rata și adâncimea native, până la 32 de biți și rata la care funcționează DAC-ul (testat până la 384 kHz). Pentru PCM pe 32 de biți nemodificat este necesar modul întreg. Imagini cu fișier CUE."
+          "text": "Rata și adâncimea native, până la 32 de biți și rata la care funcționează DAC-ul (testat până la 768 kHz). Pentru PCM pe 32 de biți nemodificat este necesar modul întreg. Imagini cu fișier CUE."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF și DSDIFF, cu compresie DST sau necomprimate. DoP, în funcție de DAC și de rata purtătoare, altfel PCM. Ratele purtătoare DoP de peste 384 kHz nu au fost testate pe hardware."
+          "text": "DSF și DSDIFF, cu compresie DST sau necomprimate. DoP, în funcție de DAC și de rata purtătoare, altfel PCM. DoP este testat până la DSD256; DSD512 prin DoP nu a fost testat pe hardware."
         },
         {
           "name": "Imagini SACD",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Comparație",
       "title": "Cum se compară.",
-      "intro": "Mai multe playere pentru Mac oferă redare bit-perfect. Această comparație se bazează pe ce spun documentația sau codul sursă al fiecărui player. „Nedocumentat” înseamnă că producătorul nu precizează nimic în niciun sens, nu că funcția lipsește. Vespertine nu are convoluție, pluginuri de efecte audio sau servicii de streaming.",
+      "intro": "Mai multe playere pentru Mac oferă redare bit-perfect. Această comparație se bazează pe ce spun documentația sau codul sursă al fiecărui player. „Nedocumentat” înseamnă că producătorul nu precizează nimic în niciun sens, nu că funcția lipsește. Vespertine folosește convoluția pentru corecția camerei; nu are pluginuri de efecte audio sau servicii de streaming.",
       "hint": "Derulați pentru mai multe →",
       "region": "Tabel comparativ (se derulează lateral)",
       "caption": "Vespertine comparat cu alte șapte playere de muzică pentru Mac, pe baza documentației sau a codului sursă al fiecărui player",
@@ -410,8 +434,19 @@
           "Nu⁴"
         ],
         [
+          "Corecția camerei",
+          "Măsurată în aplicație (microfon USB) sau prin import din REW / APO și de răspunsuri la impuls",
+          "Nu",
+          "Prin convoluție (Origin: opțiune plătită) sau Audio Units",
+          "Prin convoluție",
+          "Nu (deliberat)",
+          "Nedocumentat",
+          "Nu",
+          "Nedocumentat"
+        ],
+        [
           "Convoluție / pluginuri de efecte audio",
-          "Nu / Nu",
+          "Da (corecția camerei) / Nu",
           "Nu / Nu",
           "Da (Origin: opțiune contra cost) / Audio Units",
           "Da / Nu",
@@ -475,6 +510,10 @@
           "a": "Calea semnalului citește din Core Audio ce s-a întâmplat de fapt: frecvența nominală a dispozitivului, formatul său fizic și cine îl deține. Decodoarele au teste automate (TrueHD comparat cu sursa, DTS comparat cu decodorul propriu al FFmpeg). Un test loopback integrat verifică eșantion cu eșantion calea software, iar <span class=\"mono nowrap\">vespertine-probe</span> vă permite să vă verificați propriul hardware. <a href=\"{href.verification}\">Cum verificați singur</a>."
         },
         {
+          "q": "Oferă corecția camerei?",
+          "a": "Da. Măsurați camera cu un UMIK-1 sau cu alt microfon USB calibrat, în unul până la cinci puncte din jurul locului dumneavoastră de ascultare, iar Vespertine calculează filtre pentru fiecare difuzor și le aliniază întârzierea și nivelul, în stereo sau 5.1. Importă și filtre din REW și Equalizer APO, precum și răspunsuri la impuls. Este dezactivată implicit, redarea rămâne bit-perfect cât timp este dezactivată, iar calea semnalului afișează <span class=\"mono nowrap\">CORECȚIA CAMEREI</span> cât timp este activată. <a href=\"{href.roomCorrection}\">Cum funcționează corecția camerei</a>."
+        },
+        {
           "q": "Poate reda discuri SACD și DVD?",
           "a": "Le redă imaginile. Imaginile SACD <code>.iso</code>, stereo și multicanal, cu compresie DST sau necomprimate, precum și muzica LPCM din imaginile DVD-Video sau din dosarele <code>VIDEO_TS</code>, se redau direct din imagine, fără a extrage nimic. DVD-Audio nu este acceptat, iar DVD-urile criptate (CSS) necesită o copie decriptată."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Pe ce hardware a fost testat?",
-          "a": "Redarea a fost testată pe un FiiO K11 la frecvențe de până la 384 kHz, cu DoP și modul întreg, pe AirPods Max prin USB-C și Bluetooth, pe difuzoarele unui MacBook Pro și pe un televizor Sony prin HDMI, în 5.1. Hardware-ul Intel nu a fost testat. Bitstreamul către receiver și ieșirea DAC multicanal sunt experimentale și netestate pe receivere reale și pe DAC-uri USB multicanal (a fost testat un televizor Sony prin HDMI: vedeți docs/DEVICES.md). <a href=\"{href.dacReport}\">Așteptăm rapoarte</a>."
+          "a": "Redarea PCM a fost testată până la 768 kHz și DSD256 pe un Fosi Audio ZD3 și până la 384 kHz și DSD128 pe un FiiO K11, unde a fost testat și modul întreg. A mai fost testată pe AirPods Max prin USB-C și Bluetooth, pe difuzoarele unui MacBook Pro și pe un televizor Sony prin HDMI, în 5.1. Hardware-ul Intel nu a fost testat. Bitstreamul către receiver și ieșirea DAC multicanal sunt experimentale și netestate pe receivere reale și pe DAC-uri USB multicanal (a fost testat un televizor Sony prin HDMI: vedeți docs/DEVICES.md). <a href=\"{href.dacReport}\">Așteptăm rapoarte</a>."
         },
         {
           "q": "Este disponibil în limba mea?",
@@ -563,7 +602,7 @@
       "install": "Instalare",
       "installValue": "<a href=\"{href.dmg}\">Descărcați DMG-ul</a> sau {brew}",
       "tested": "Testat cu",
-      "testedValue": "FiiO K11 (toate frecvențele până la 384 kHz, DoP, mod întreg), AirPods Max prin USB-C și Bluetooth, difuzoarele unui MacBook Pro",
+      "testedValue": "Fosi Audio ZD3 (PCM până la 768 kHz, DSD256 prin DoP), FiiO K11 (PCM până la 384 kHz, DSD128 prin DoP, mod întreg), AirPods Max prin USB-C și Bluetooth, difuzoarele unui MacBook Pro",
       "links": "Linkuri",
       "website": "Site web",
       "source": "Cod sursă",
@@ -646,10 +685,10 @@
     "eyebrow": "Confidențialitate",
     "heading": "Vespertine nu colectează",
     "headingBrass": "nimic.",
-    "updated": "În vigoare din {effective} (adaugă statusul Discord opțional). Secțiunea „Acest site” a fost actualizată pe {statsUpdated}, când site-ul a început să numere vizitele cu statistici găzduite pe propriul server, fără cookie-uri, și pe {langUpdated}, când meniul de limbă a început să vă rețină alegerea pe dispozitiv.",
+    "updated": "În vigoare din {effective} (adaugă utilizarea microfonului de către corecția camerei, pentru versiunea 0.14). Modificări anterioare: statusul Discord opțional, {discordUpdated}; secțiunea „Acest site”, {statsUpdated}, când site-ul a început să numere vizitele cu statistici găzduite pe propriul server, fără cookie-uri. Pe {langUpdated}, secțiunea „Acest site” a început să descrie și meniul de limbă, care vă reține alegerea pe dispozitiv.",
     "intro": "Vespertine este un player de muzică gratuit și open source. Aplicația nu are conturi, nici analiză de utilizare, nici telemetrie, nici raportarea blocărilor, nici publicitate. Dezvoltatorul nu primește nicio informație despre dumneavoastră sau despre muzica dumneavoastră. Deoarece codul sursă este public, puteți verifica fiecare afirmație de pe această pagină.",
     "staysTitle": "Ce rămâne pe Mac-ul dumneavoastră",
-    "stays": "Baza de date a bibliotecii, playlisturile, numărul de redări, rezultatele analizei fișierelor, cache-ul de coperte și setările sunt stocate în dosarul Library al utilizatorului, pe Mac. Parolele pentru partajările de rețea și tokenul ListenBrainz, dacă adăugați unul, sunt stocate în Keychain-ul macOS. Nimic din toate acestea nu este încărcat nicăieri.",
+    "stays": "Baza de date a bibliotecii, playlisturile, numărul de redări, rezultatele analizei fișierelor, cache-ul de coperte și setările sunt stocate în dosarul Library al utilizatorului, pe Mac. Parolele pentru partajările de rețea și tokenul ListenBrainz, dacă adăugați unul, sunt stocate în Keychain-ul macOS. Corecția camerei folosește microfonul de măsurare doar cât timp efectuați o măsurătoare și păstrează înregistrările în dosarul Documente. Nimic din toate acestea nu este încărcat nicăieri.",
     "onlineTitle": "Când aplicația se conectează la internet",
     "online": [
       "<strong>Verificarea actualizărilor.</strong> Vespertine cere de la GitHub fluxul de actualizări cam o dată pe zi, precum și atunci când alegeți Caută actualizări. GitHub vă vede adresa IP, ca la orice descărcare. Puteți dezactiva verificările automate din Setări.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "Vespertine redă acum fluent de pe partajări de rețea lente, analizează mai repede bibliotecile mari, inclusiv partajările, redă hi-res pe DAC-urile USB-C mici la cea mai mare frecvență pe care o oferă, iar tastatura și selecțiile multiple rămân acolo unde vă așteptați."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "Vespertine redă acum nativ fișierele DSDIFF cu compresie DST și muzica LPCM de pe discurile DVD-Video, păstrează fiecare piesă din fișierele CUE EAC și pornește imediat melodiile de pe o partajare de rețea, chiar și în timp ce rulează o scanare a bibliotecii."
     }
   }
 }

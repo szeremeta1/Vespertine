@@ -33,6 +33,7 @@ const icons = [
 /** The screenshots, links and layout of each scene; the words come from the locale. */
 const sceneData: { id: string; shot: string; links?: string[]; float?: string; wall?: boolean }[] = [
   { id: 'signal-path', shot: 'bit-perfect-fosi-zd3-24-96', links: [links.signalPath, links.verification, links.loopback], float: 'loopback-test' },
+  { id: 'room-correction', shot: 'room-correction-predicted', links: [links.roomCorrection], float: 'room-correction-portrait-detail' },
   { id: 'surround', shot: 'spatial-audio-airpods-max', float: 'stereo-and-surround-versions' },
   { id: 'discs', shot: 'sacd-iso', links: [links.dvd], float: 'dsd-native-dop-detail' },
   { id: 'analysis', shot: 'fake-hi-res-detection', links: [links.analysis] },
@@ -58,6 +59,7 @@ export function vars(lang: Lang) {
     'href.privacy': pagePath(lang, 'privacy'),
     'href.verification': links.verification,
     'href.dacReport': links.dacReport,
+    'href.roomCorrection': links.roomCorrection,
     'href.newIssue': links.newIssue,
     'href.issues': links.issues,
     'href.comparison': links.comparison,
@@ -103,6 +105,7 @@ export function content(lang: Lang) {
       { text: '32 / 192' },
       { text: '44.1 → 48 <span class="unit">kHz</span>', tone: 'copper' },
       { text: 'DSD 128 · <span class="unit">DoP</span>' },
+      { text: d.badges.roomCorrection, tone: 'copper' },
       { text: d.badges.spatial },
       { text: d.badges.synthetic, tone: 'copper' },
     ] as { text: string; tone?: string }[],

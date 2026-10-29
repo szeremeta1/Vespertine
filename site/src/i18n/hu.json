@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: surround és hi-res zenelejátszó Macre",
-    "description": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res gyűjteményekhez: SACD- és DVD-Video-lemezképek, DSD, DTS CD-k, DTS-HD MA-, TrueHD- és Dolby Atmos-fájlok, Térhatású hang AirPodson és ellenőrizhető bit-perfect jelút.",
+    "description": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res gyűjteményekhez: SACD- és DVD-Video-lemezképek, DSD, DTS CD-k, DTS-HD MA-, TrueHD- és Dolby Atmos-fájlok, Térhatású hang AirPodson, a saját szobájában bemért szobakorrekció és ellenőrizhető bit-perfect jelút.",
     "ogAlt": "Vespertine: ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenéhez. A jelút egy 24 bit / 96 kHz-es FLAC bit-perfect lejátszását mutatja egy Fosi Audio ZD3 eszközön. {version} verzió, macOS {minMacOS} vagy újabb.",
     "hero": {
       "eyebrow": [
@@ -69,7 +69,7 @@
         "hi-res zene"
       ],
       "titleBrass": "a Macjén.",
-      "lede": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez. Az SACD- és DVD-Video-lemezképek, a DSD, a DTS CD-k, valamint a DTS-HD MA-, TrueHD- és Atmos-fájlok egy könyvtárban kapnak helyet a sztereó albumokkal, AirPodson pedig fejkövetéses Térhatású hang szólal meg. A jelút a fájltól a kimenetig minden lépést megmutat. Angolul és további {languages} nyelven.",
+      "lede": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez. Az SACD- és DVD-Video-lemezképek, a DSD, a DTS CD-k, valamint a DTS-HD MA-, TrueHD- és Atmos-fájlok egy könyvtárban kapnak helyet a sztereó albumokkal, AirPodson pedig fejkövetéses Térhatású hang szólal meg. A szobakorrekció USB-mikrofonnal méri be a szobát, és minden hangszórót külön korrigál; kikapcsolva marad, amíg Ön be nem kapcsolja. A jelút a fájltól a kimenetig minden lépést megmutat. Angolul és további {languages} nyelven.",
       "ask": "Tetszik?",
       "star": "Adjon csillagot a GitHubon",
       "discuss": "Csatlakozzon a beszélgetéshez",
@@ -116,7 +116,8 @@
       "bitPerfect": "Bit-perfect",
       "exclusive": "Kizárólagos",
       "spatial": "Térhatású · fejkövetés",
-      "synthetic": "Szintetikus magas frekvenciák?"
+      "synthetic": "Szintetikus magas frekvenciák?",
+      "roomCorrection": "Szobakorrekció"
     },
     "scenes": {
       "signal-path": {
@@ -125,7 +126,7 @@
         "title": "Minden szám a saját mintavételi frekvenciáján és bitmélységén.",
         "lede": "A jelút a fájltól a DAC-ig minden lépést felsorol a Core Audio rendszerből visszaolvasott adatok alapján, és jelzi, ha valami megváltoztatta a mintákat.",
         "body": [
-          "A Vespertine minden fájl mintavételi frekvenciájára átállítja az eszközt, és csak akkor végez újramintavételezést az Apple maszterelési minőségű konverterével, ha a DAC nem tud ezen a frekvencián működni. A <span class=\"mono nowrap\">BIT-PERFECT</span> jelölés csak akkor jelenik meg, ha teljesülnek a forráskódban rögzített feltételek: eredeti mintavételi frekvencia, változatlan minták, a forrás szóhosszát befogadó kimeneti szóhossz, valamint kizárólagosan használt vagy más alkalmazással meg nem osztott eszköz. A PCM-lejátszást 384 kHz-ig teszteltük egy FiiO K11 eszközön."
+          "A Vespertine minden fájl mintavételi frekvenciájára átállítja az eszközt, és csak akkor végez újramintavételezést az Apple maszterelési minőségű konverterével, ha a DAC nem tud ezen a frekvencián működni. A <span class=\"mono nowrap\">BIT-PERFECT</span> jelölés csak akkor jelenik meg, ha teljesülnek a forráskódban rögzített feltételek: eredeti mintavételi frekvencia, változatlan minták, a forrás szóhosszát befogadó kimeneti szóhossz, valamint kizárólagosan használt vagy más alkalmazással meg nem osztott eszköz. A PCM-lejátszást 768 kHz-ig és DSD256-ig teszteltük egy Fosi Audio ZD3 eszközön, valamint 384 kHz-ig és DSD128-ig egy FiiO K11 eszközön."
         ],
         "list": [
           "A kizárólagos (hog) mód megakadályozza, hogy más alkalmazások használják az eszközt. Megosztott módban a hangerőgombok és a Digital Crown a DAC hangerejét állítják; kizárólagos módban is képesek erre, ha bekapcsolja ezt a lehetőséget.",
@@ -145,6 +146,29 @@
         "alt": "A Vespertine Liszt Années de pèlerinage című művét játssza Lazar Berman előadásában, 24 bit / 96 kHz-es FLAC-ból: az infópanel bit-perfect lejátszást és kizárólagos hozzáférést jelez egy Fosi Audio ZD3 eszközön, a jelút minden lépésével.",
         "floatAlt": "A loopback-teszt panelje: 24 bit 44,1 és 96 kHz-en, kitöltött 16 bites jel és egy szünetmentesen lejátszott számpár; mindegyik bitre pontos.",
         "floatCaption": "Loopback-teszt · szoftveres ellenőrzés"
+      },
+      "room-correction": {
+        "jack": "Szobakorrekció",
+        "kicker": "Szobakorrekció",
+        "title": "Mérje be a szobáját. Korrigálja egyenként a hangszórókat.",
+        "lede": "Mérje be a szobáját egy UMIK-1-gyel vagy más kalibrált USB-mikrofonnal, és a Vespertine abból, amit a hallgatási helyén hall, minden hangszóróhoz szűrőket illeszt.",
+        "body": [
+          "A sweepek egyszerre mindig csak egy hangszórón szólalnak meg, az Ön hallgatási helye körüli egy–öt ponton. Minden hangszóró saját, a mérés alapján tervezett szűrőket kap. Ezek többnyire vágások: lecsökkentik a szoba csúcsait, a széles bemélyedéseket pedig csak óvatosan emelik meg. Ugyanez a mérés állítja be az egyes hangszórók késleltetését és szintjét, így minden hangszóró hangja egyszerre és azonos hangerővel ér el a hallgatási helyhez. A szobakorrekció alapértelmezés szerint ki van kapcsolva, és kikapcsolt állapotban a lejátszás bit-perfect marad. Bekapcsolt állapotban a jelút <span class=\"mono nowrap\">SZOBAKORREKCIÓ</span> jelzést mutat."
+        ],
+        "list": [
+          "Három cél: Warm (az alapértelmezett), Gentle tilt és Flat. Korrigálhatja csak a basszust vagy a teljes tartományt, a szűrőket pedig később, új mérés nélkül is újratervezheti.",
+          "Szűrőket importál REW-ből vagy Equalizer APO-ból, az egyes hangszórók késleltetésével és szintjével együtt, és Equalizer APO-szöveget exportál.",
+          "Impulzusválaszokat importál (WAV, AIFF, CAF vagy FLAC), és lejátszáskor konvolúcióval alkalmazza őket.",
+          "Sztereó és 5.1.",
+          "A Szobaportré mutatja a hangszórókat, az Ön hallgatási helyét és az egyes mikrofonpontokat, ahogy sorra kerülnek a mérésben. Ezután a görbeanimáció a mért frekvenciaválaszt átalakítja az előre jelzetté, egy Előtte/utána kapcsolóval pedig összehasonlíthatja a kettőt."
+        ],
+        "note": "Az „utána” görbe a mérésből és a szűrőkből előre jelzett, nem mért. Ha látni szeretné, mit csinál valójában a szoba, mérjen újra bekapcsolt korrekcióval.",
+        "links": [
+          "Hogyan működik a szobakorrekció"
+        ],
+        "alt": "A Vespertine előre jelzett szobakorrekciója egy sztereó hangszórópárhoz, Warm céllal: hangszórónként a mért frekvenciaválasz, a cél és a korrekció utáni előre jelzett frekvenciaválasz, egy 120 Hz körüli szobacsúccsal, amelyet a korrekció 14, illetve 18 dB-lel csökkent, valamint az egyes hangszórók szűrői.",
+        "floatAlt": "A Szobaportré a mérési varázslóban: a bal és a jobb hangszóró, a hallgatási hely és körülötte öt mikrofonpont, az elsőn a mikrofonnal.",
+        "floatCaption": "Szobaportré"
       },
       "surround": {
         "jack": "Surround",
@@ -173,7 +197,7 @@
         ],
         "list": [
           "Két valódi lemezen bitre pontosan egyezett a sacd_extract kimenetével. Az 5.0-s területtel, kizárólag többcsatornás területtel, illetve DSD128 vagy magasabb formátummal rendelkező lemezeket eddig csak mesterségesen előállított tesztlemezképekkel ellenőriztük.",
-          "A DSF és DSDIFF DSD64-től DSD512-ig, a DST-tömörítésű DSDIFF-et is beleértve, DoP-ként jut a vivőjel mintavételi frekvenciáját fogadó DAC-okra, vagy magas mintavételi frekvenciájú PCM-mé alakul. A DoP működését egy FiiO K11 eszközön igazoltuk; a 384 kHz feletti mintavételi frekvenciájú vivőjelet hardveren nem teszteltük.",
+          "A DSF és DSDIFF DSD64-től DSD512-ig, a DST-tömörítésű DSDIFF-et is beleértve, DoP-ként jut a vivőjel mintavételi frekvenciáját fogadó DAC-okra, vagy magas mintavételi frekvenciájú PCM-mé alakul. A DoP működését egy Fosi Audio ZD3 eszközön DSD256-ig, egy FiiO K11 eszközön DSD128-ig igazoltuk; a DoP-n keresztüli DSD512-t hardveren nem teszteltük.",
           "DVD-Video LPCM 16, 20 és 24 biten, 48 és 96 kHz-en, legfeljebb 8 csatornával. A DVD-Audio nem támogatott, a titkosított (CSS) lemezekhez pedig visszafejtett másolat szükséges."
         ],
         "links": [
@@ -225,7 +249,7 @@
           "Egy album remaszterei, monó és sztereó kiadásai, valamint SACD-változatai közös kártyán jelennek meg; megnyitáskor választhatja ki a kiadást.",
           "Kedvencek és lejátszásszámok, a könyvtárban tárolva, soha nem a fájlokba írva. M3U- és Apple Music-lejátszási listákat, lejátszásszámokat és kedvenceket importál.",
           "Címkeszerkesztő biztonsági mentésekkel és egylépéses visszaállítással, valamint MusicBrainz-adatkiegészítés, amely minden írás előtt jelzi a találat megbízhatóságát.",
-          "SMB-, NFS- vagy WebDAV-hálózati megosztások, gyorsítótárazással, Megtartás offline funkcióval és lassú szerverekhez tervezett lejátszással.",
+          "SMB-, NFS- vagy WebDAV-hálózati megosztások, gyorsítótárazással, Megtartás offline funkcióval és lassú szerverekhez tervezett lejátszással: a számok lejátszás előtt pufferelődnek a Macen, és eközben töltésjelző gyűrű látszik a lejátszás gombon.",
           "A Zene keresése funkció minden meghajtón megkeresi a valódi zenéit, a felesleges fájlokat pedig kihagyja. Az első indítás rövid beállítása során kiválaszthatja a kimenetet, és megtudhatja, mire való a kizárólagos hozzáférés és a ReplayGain.",
           "Kimenetenkénti parametrikus hangszínszabályzó, amely AutoEQ- és Equalizer APO-beállításokat importál. Alapértelmezés szerint ki van kapcsolva; bekapcsolva a jelút <span class=\"mono nowrap\">HANGSZÍNSZABÁLYZÓ</span> feliratot mutat a <span class=\"mono nowrap\">BIT-PERFECT</span> helyett.",
           "Minilejátszó, menüsoros kiegészítő, médiabillentyűk, ReplayGain és automatikus, aláírt frissítések."
@@ -242,7 +266,7 @@
         "lede": "Minden menü, beállítás és jelútüzenet elérhető az angol mellett további {languages} nyelven.",
         "body": [
           "Az ukrántól, némettől és japántól a szuahéliig, tamilig és hausza nyelvig, az adott nyelv többes számú alakjaival és számformátumaival; az egyszerűsített, hagyományos és hongkongi kínai pedig külön szókinccsel. Az arab, héber, perzsa és urdu jobbról balra haladó elrendezést kap.",
-          "Így ellenőrizzük a fordításokat: minden módosításnál automatikus ellenőrzés igazolja, hogy az alkalmazás minden szövege mind a {languages} nyelven létezik, azonos helyőrzőkkel és az adott nyelvhez szükséges többes számú alakokkal. Emellett minden képernyőt minden nyelven átnéztünk, ellenőrizve a levágott vagy egymást fedő szövegeket és a jobbról balra haladó elrendezés tükrözését. A fordítások gondosan elkészített gépi fordításként indultak, ezért örömmel fogadjuk az anyanyelvi beszélők javításait a <a href=\"{href.newIssue}\">GitHubon</a>."
+          "Így ellenőrizzük a fordításokat: minden módosításnál automatikus ellenőrzés igazolja, hogy az alkalmazás minden szövege mind a 44 nyelven létezik, azonos helyőrzőkkel és az adott nyelvhez szükséges többes számú alakokkal. Emellett a fő képernyőket több nyelven is ellenőriztük, levágott vagy egymást fedő szövegek és a jobbról balra haladó elrendezés tükrözése szempontjából. A fordítások gondosan elkészített gépi fordításként indultak, ezért örömmel fogadjuk az anyanyelvi beszélők javításait a <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHubon</a>."
         ],
         "alt": "A Vespertine neve a kezelőfelület mind a {languagesTotal} nyelvén, a ヴェスパタイン és Веспертайн alakoktól a فسبرتاين és वेस्परटाइन alakokig, különböző méretekben és betűtípusokkal.",
         "wallLabel": "Vespertine minden elérhető nyelven"
@@ -256,11 +280,11 @@
       "rows": [
         {
           "name": "FLAC, ALAC, WAV, AIFF",
-          "text": "Natív mintavételi frekvencia és bitmélység, legfeljebb 32 bitig, illetve a DAC által használt frekvenciáig (384 kHz-ig tesztelve); a változatlan 32 bites PCM-hez egész számos mód kell. CUE-lapos lemezképek."
+          "text": "Natív mintavételi frekvencia és bitmélység, legfeljebb 32 bitig, illetve a DAC által használt frekvenciáig (768 kHz-ig tesztelve); a változatlan 32 bites PCM-hez egész számos mód kell. CUE-lapos lemezképek."
         },
         {
           "name": "DSD64 – DSD512",
-          "text": "DSF és DSDIFF, DST-tömörítéssel vagy tömörítetlenül. A DoP a DAC-tól és a vivőjel mintavételi frekvenciájától függ, egyébként PCM. A 384 kHz feletti mintavételi frekvenciájú DoP-vivőjel hardveren nincs tesztelve."
+          "text": "DSF és DSDIFF, DST-tömörítéssel vagy tömörítetlenül. A DoP a DAC-tól és a vivőjel mintavételi frekvenciájától függ, egyébként PCM. A DoP DSD256-ig tesztelve; a DoP-n keresztüli DSD512 hardveren nincs tesztelve."
         },
         {
           "name": "SACD-lemezképek",
@@ -303,7 +327,7 @@
     "compare": {
       "eyebrow": "Összehasonlítás",
       "title": "Hol áll a mezőnyben?",
-      "intro": "Több Mac-lejátszó is kínál bit-perfect lejátszást. Ez az összehasonlítás azt veti össze, amit az egyes lejátszók saját dokumentációja vagy forráskódja állít. A „Nincs dokumentálva” azt jelenti, hogy a gyártó egyik irányban sem nyilatkozik, nem azt, hogy a funkció hiányzik. A Vespertine-ben nincs konvolúció, hangeffekt-bővítmény és streamingszolgáltatás.",
+      "intro": "Több Mac-lejátszó is kínál bit-perfect lejátszást. Ez az összehasonlítás azt veti össze, amit az egyes lejátszók saját dokumentációja vagy forráskódja állít. A „Nincs dokumentálva” azt jelenti, hogy a gyártó egyik irányban sem nyilatkozik, nem azt, hogy a funkció hiányzik. A Vespertine konvolúciója a szobakorrekciót szolgálja; hangeffekt-bővítmény és streamingszolgáltatás nincs benne.",
       "hint": "Görgessen a továbbiakért →",
       "region": "Összehasonlító táblázat (oldalra görgethető)",
       "caption": "A Vespertine hét másik Mac-zenelejátszóval összevetve, az egyes lejátszók saját dokumentációja vagy forráskódja alapján",
@@ -410,8 +434,19 @@
           "Nem⁴"
         ],
         [
+          "Szobakorrekció",
+          "Az alkalmazásban mérve (USB-mikrofonnal), vagy REW / APO- és impulzusválasz-importálás",
+          "Nem",
+          "Konvolúcióval (Origin: fizetős opció) vagy Audio Unitokkal",
+          "Konvolúcióval",
+          "Nem (szándékosan)",
+          "Nincs dokumentálva",
+          "Nem",
+          "Nincs dokumentálva"
+        ],
+        [
           "Konvolúció / hangeffekt-bővítmények",
-          "Nem / Nem",
+          "Igen (szobakorrekció) / Nem",
           "Nem / Nem",
           "Igen (Origin: fizetős opció) / Audio Units",
           "Igen / Nem",
@@ -475,6 +510,10 @@
           "a": "A jelút visszaolvassa, mit csinált ténylegesen a Core Audio: az eszköz névleges frekvenciáját, fizikai formátumát, és hogy ki foglalja le. A dekóderekhez automatizált tesztek tartoznak (a TrueHD a forrásával, a DTS az FFmpeg saját dekóderével összevetve), a beépített loopback-teszt mintáról mintára ellenőrzi a szoftveres jelutat, a <span class=\"mono nowrap\">vespertine-probe</span> segítségével pedig a saját hardverét ellenőrizheti. <a href=\"{href.verification}\">Így ellenőrizheti saját maga</a>."
         },
         {
+          "q": "Van benne szobakorrekció?",
+          "a": "Igen. Mérje be a szobáját egy UMIK-1-gyel vagy más kalibrált USB-mikrofonnal a hallgatási helye körüli egy–öt ponton, és a Vespertine minden hangszóróhoz szűrőket illeszt, valamint összehangolja a késleltetésüket és a szintjüket, sztereóban vagy 5.1-ben. REW- és Equalizer APO-szűrőket, valamint impulzusválaszokat is importál. Alapértelmezés szerint ki van kapcsolva, kikapcsolt állapotban a lejátszás bit-perfect marad, bekapcsolt állapotban pedig a jelút <span class=\"mono nowrap\">SZOBAKORREKCIÓ</span> jelzést mutat. <a href=\"{href.roomCorrection}\">Hogyan működik a szobakorrekció</a>."
+        },
+        {
           "q": "Lejátssza az SACD- és DVD-lemezeket?",
           "a": "A lemezképeiket játssza le. Az SACD <code>.iso</code> lemezképek – sztereó és többcsatornás, DST-tömörített vagy tömörítetlen –, valamint a DVD-Video lemezképeken vagy <code>VIDEO_TS</code> mappákban lévő LPCM-zene közvetlenül a lemezképből szól, semmit sem kell kibontani. A DVD-Audio nem támogatott, a titkosított (CSS) DVD-khez pedig visszafejtett másolat kell."
         },
@@ -488,7 +527,7 @@
         },
         {
           "q": "Milyen hardveren tesztelték?",
-          "a": "A lejátszást tesztelték FiiO K11-en 384 kHz-ig, DoP-vel és egész számos móddal; AirPods Maxon USB-C-n és Bluetooth-on; MacBook Pro hangszórókon; valamint egy Sony TV-n HDMI-n keresztül, 5.1-ben. Intel hardveren nincs tesztelve. Az AV-erősítőre küldött bitstream és a többcsatornás DAC-kimenet kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); <a href=\"{href.dacReport}\">visszajelzéseket várunk</a>."
+          "a": "A PCM-lejátszást 768 kHz-ig és DSD256-ig tesztelték egy Fosi Audio ZD3-on, valamint 384 kHz-ig és DSD128-ig egy FiiO K11-en, ahol az egész számos módot is tesztelték. Tesztelték továbbá AirPods Maxon USB-C-n és Bluetooth-on, MacBook Pro hangszórókon, valamint egy Sony TV-n HDMI-n keresztül, 5.1-ben. Intel hardveren nincs tesztelve. Az AV-erősítőre küldött bitstream és a többcsatornás DAC-kimenet kísérleti, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); <a href=\"{href.dacReport}\">visszajelzéseket várunk</a>."
         },
         {
           "q": "Elérhető az én nyelvemen?",
@@ -563,7 +602,7 @@
       "install": "Telepítés",
       "installValue": "<a href=\"{href.dmg}\">Töltse le a DMG-t</a>, vagy: {brew}",
       "tested": "Tesztelt eszközök",
-      "testedValue": "FiiO K11 (minden mintavételi frekvencia 384 kHz-ig, DoP, egész számos mód), AirPods Max USB-C-n és Bluetoothon keresztül, a MacBook Pro hangszórói",
+      "testedValue": "Fosi Audio ZD3 (PCM 768 kHz-ig, DSD256 DoP-n keresztül), FiiO K11 (PCM 384 kHz-ig, DSD128 DoP-n keresztül, egész számos mód), AirPods Max USB-C-n és Bluetoothon keresztül, a MacBook Pro hangszórói",
       "links": "Linkek",
       "website": "Weboldal",
       "source": "Forráskód",
@@ -646,10 +685,10 @@
     "eyebrow": "Adatvédelem",
     "heading": "A Vespertine",
     "headingBrass": "semmit sem gyűjt.",
-    "updated": "Hatályos: {effective} (kiegészítve a nem kötelező Discord-állapottal). Az „Ez a weboldal” szakasz frissítve: {statsUpdated}, amikor a webhely saját üzemeltetésű, sütik nélküli statisztikával kezdte számolni a látogatásokat, valamint {langUpdated}, amikor a nyelvválasztó menü elkezdte megjegyezni a választását az Ön eszközén.",
+    "updated": "Hatályos: {effective} (kiegészítve a szobakorrekció mikrofonhasználatával, a 0.14-es verzióhoz). Korábbi változások: a nem kötelező Discord-állapot, {discordUpdated}; az „Ez a weboldal” szakasz, {statsUpdated}, amikor a webhely saját üzemeltetésű, sütik nélküli statisztikával kezdte számolni a látogatásokat. {langUpdated} dátummal az „Ez a weboldal” szakasz a nyelvválasztó menüt is elkezdte ismertetni, amely az Ön eszközén megjegyzi a választását.",
     "intro": "A Vespertine ingyenes, nyílt forráskódú zenelejátszó. Az alkalmazásban nincs fiók, analitika, telemetria, összeomlás-jelentés és reklám. A fejlesztő semmilyen információt nem kap Önről vagy a zenéiről. Mivel a forráskód nyilvános, az oldal minden állítását ellenőrizheti.",
     "staysTitle": "Ami a Macen marad",
-    "stays": "A könyvtár adatbázisa, a lejátszási listák, a lejátszásszámlálók, a fájlelemzések eredményei, a borítók gyorsítótára és a beállítások a Macen, az Ön felhasználói Könyvtár mappájában tárolódnak. A hálózati megosztások jelszavai és a ListenBrainz-tokenje, ha megad egyet, a macOS Kulcskarikájában tárolódnak. Ezekből semmi sem töltődik fel sehová.",
+    "stays": "A könyvtár adatbázisa, a lejátszási listák, a lejátszásszámlálók, a fájlelemzések eredményei, a borítók gyorsítótára és a beállítások a Macen, az Ön felhasználói Könyvtár mappájában tárolódnak. A hálózati megosztások jelszavai és a ListenBrainz-tokenje, ha megad egyet, a macOS Kulcskarikájában tárolódnak. A szobakorrekció csak mérés közben használja az Ön mérőmikrofonját, a felvételeket pedig az Ön Dokumentumok mappájában tárolja. Ezekből semmi sem töltődik fel sehová.",
     "onlineTitle": "Amikor az alkalmazás az internethez kapcsolódik",
     "online": [
       "<strong>Frissítés-ellenőrzés.</strong> A Vespertine nagyjából naponta egyszer, valamint amikor a Frissítések keresése parancsot választja, lekéri a frissítési hírcsatornáját a GitHubtól. A GitHub – mint bármely letöltésnél – látja az IP-címét. Az automatikus ellenőrzést a Beállításokban kikapcsolhatja.",
@@ -732,10 +771,6 @@
     "0.12.1": {
       "hash": "45e9b01884e3",
       "summary": "A Vespertine mostantól akadás nélkül játszik lassú hálózati megosztásokról, a nagy könyvtárakat a megosztásokkal együtt is gyorsabban elemzi, a kis USB-C-s DAC-okon a legmagasabb elérhető frekvencián játssza a hi-res anyagot, és a billentyűzetes fókusz és a többes kijelölések ott maradnak, ahol várja."
-    },
-    "0.12.0": {
-      "hash": "f25478b5e324",
-      "summary": "A Vespertine mostantól natívan lejátssza a DST-tömörített DSDIFF-fájlokat és a DVD-Video lemezek LPCM-zenéjét, megtartja az EAC CUE-lapok minden sávját, és a hálózati megosztásról indított dalok azonnal elindulnak, akkor is, ha épp könyvtárbeolvasás fut."
     }
   }
 }
