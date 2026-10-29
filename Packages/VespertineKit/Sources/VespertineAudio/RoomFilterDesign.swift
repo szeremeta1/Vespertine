@@ -311,8 +311,10 @@ public enum RoomFilterDesigner {
         let grid = (0..<n).map { low * pow(2, Double($0) / pointsPerOctave) }
         let error0 = grid.map { smooth.value(at: $0) - target($0) }
         let broadError = grid.map { broad.value(at: $0) - target($0) }
-        let checkGrid = (0...400).map { 10 * pow(2, Double($0) / 40) }   // 10 Hz to 10.24 kHz … and on
-            + (1...40).map { 10_240 * pow(2, Double($0) / 40) }.filter { $0 <= 20_000 }
+        // 10 Hz to 10.24 kHz … and on.
+        let lowCheck: [Double] = (0...400).map { (i: Int) -> Double in 10 * pow(2, Double(i) / 40) }
+        let highCheck: [Double] = (1...40).map { (i: Int) -> Double in 10_240 * pow(2, Double(i) / 40) }.filter { $0 <= 20_000 }
+        let checkGrid: [Double] = lowCheck + highCheck
 
         var fitter = Fitter(grid: grid, error0: error0, checkGrid: checkGrid, rollOff: rollOff, options: options)
         let maxBands = min(options.maxBands, EQPreset.maxBands)
@@ -353,10 +355,12 @@ public enum RoomFilterDesigner {
             for k in fitter.bands.indices { fitter.refine(k) }
         }
 
-        var bands = fitter.bands
-            .map { b in
-                EQBand(kind: .peak, frequency: (pow(2, b.logF) * 10).rounded() / 10, gainDB: (b.gain * 10).rounded() / 10,
-                       q: (pow(2, b.logQ) * 100).rounded() / 100)
+        var bands: [EQBand] = fitter.bands
+            .map { b -> EQBand in
+                let frequencyHz: Double = (pow(2, b.logF) * 10).rounded() / 10
+                let gainDB: Double = (b.gain * 10).rounded() / 10
+                let q: Double = (pow(2, b.logQ) * 100).rounded() / 100
+                return EQBand(kind: .peak, frequency: frequencyHz, gainDB: gainDB, q: q)
             }
             .filter { abs($0.gainDB) >= 0.3 }
             .sorted { $0.frequency < $1.frequency }
