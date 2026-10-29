@@ -100,7 +100,7 @@ export const scenes: Scene[] = [
     links: [{ href: links.roomCorrection, text: 'How room correction works' }],
     shot: 'room-correction-predicted',
     alt: 'Vespertine’s predicted room correction for a stereo pair with the Warm target: for each speaker, the measured response, the target and the predicted response after correction, with a room peak near 120 Hz cut by 14 and 18 dB, and each speaker’s filters.',
-    float: { shot: 'room-correction-portrait-detail', alt: 'The Room Portrait in the measurement wizard: left and right speakers, the seat, and five microphone spots around it, the first with the microphone on it.', caption: 'Room Portrait · 5 spots' },
+    float: { shot: 'room-correction-portrait-detail', alt: 'The Room Portrait in the measurement wizard: left and right speakers, the seat, and five microphone spots around it, the first with the microphone on it.', caption: 'Room Portrait' },
   },
   {
     id: 'surround',
