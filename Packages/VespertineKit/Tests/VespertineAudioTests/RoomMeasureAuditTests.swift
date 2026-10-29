@@ -29,7 +29,8 @@ struct RoomMeasureAuditTests {
         let end = await controller.run()
         #expect(end == .completed)
         return try RoomMeasurementResult.make(recordings: controller.acceptedRecordings, session: controller.session, calibration: nil,
-                                              name: "Audit", micSerial: "0000001")
+                                              name: "Audit", micSerial: "0000001",
+                                              options: RoomFilterDesignOptions(target: .gentleTilt))   // thresholds set against Gentle tilt; Warm (default since 10-29) lifts the bass
     }
 
     @Test("Delays, levels and the bass mode of a simulated two-speaker room come back, and the profile lines the speakers up")
