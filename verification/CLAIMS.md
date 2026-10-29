@@ -38,7 +38,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:21` — "Vespertine switches the device's nominal rate and reads it back from Core Audio. It doesn't trust its own request."
 - **Text:** `docs/VERIFICATION.md:42` — "The device values are read from Core Audio after playback starts:"
-- **Text:** `site/src/data/content.ts:260` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
+- **Text:** `site/src/data/content.ts:261` — "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
 - **Property:** the rate, physical format and hog owner that the verdict uses are the values Core Audio returned (`kAudioDevicePropertyNominalSampleRate`, `kAudioStreamPropertyPhysicalFormat`, `kAudioDevicePropertyHogMode`). If a readback fails, the verdict must not fall back to what Vespertine asked for.
 - **Governed by:** vespertine-rule; the meaning of each property comes from Apple's Core Audio headers (spec for the property semantics only).
 - **Route:** spec-traced (verdict group: a failed or stale readback must not yield BIT-PERFECT); source review recorded in `FINDINGS.md` (F-01). The readback itself happens in `OutputSession`, which needs a real device; see `hardware/LOOPBACK.md` step P1.
@@ -470,7 +470,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DEC-01 <a id="dec-lossless"></a>Lossless decoders are exact
 
 - **Text:** `docs/ARCHITECTURE.md:58` — "A test checks TrueHD decodes identically to the 24-bit source it was encoded from."
-- **Text:** `site/src/data/content.ts:209` — "Lossless, can be bit-perfect"
+- **Text:** `site/src/data/content.ts:210` — "Lossless, can be bit-perfect"
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.
