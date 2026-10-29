@@ -42,7 +42,8 @@ const en = (english: boolean) => (english ? { lang: 'en', dir: 'ltr' } : {});
 // or Tamil words) scale the headline down so each line still fits, estimated from each script's typical glyph width.
 const ems = (line: string) => [...line].reduce((w, c) =>
   w + (/\p{Mn}/u.test(c) ? 0 : /[\u1100-\u11FF\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFF00-\uFFEF]/u.test(c) ? 1 : /[\u0B80-\u0D7F\u1200-\u139F]/u.test(c) ? 0.68 : /[\u0600-\u06FF\u0750-\u077F\uFB50-\uFEFF]/u.test(c) ? 0.36 : /[฀-๿]/u.test(c) ? 0.58 : /[A-Z]/.test(c) ? 0.62 : /\s/.test(c) ? 0.24 : /[.,·:;!?'’]/.test(c) ? 0.24 : 0.47), 0);
-const longest = Math.max(...[...h.hero.titleLines, h.hero.titleBrass].map(ems));
+// Urdu is set in Nastaliq, which runs about a third wider than the Naskh the Arabic estimate is based on.
+const longest = Math.max(...[...h.hero.titleLines, h.hero.titleBrass].map(ems)) * (lang === 'ur' ? 1.35 : 1);
 const fit = (room: number) => Math.min(1, room / longest).toFixed(3);
 const heroFit = lang === DEFAULT_LOCALE ? undefined : `--fit:${fit(6)};--fit-s:${fit(6.4)}`;
 
