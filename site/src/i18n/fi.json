@@ -54,8 +54,8 @@
     "home": "Etusivu"
   },
   "home": {
-    "title": "Vespertine: surround- ja hi-res-musiikkisoitin Macille",
-    "description": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-kokoelmille: SACD- ja DVD-Video-levykuvat, DSD, DTS CD -levyt, DTS-HD MA -, TrueHD- ja Dolby Atmos -tiedostot, tilaääni AirPods-kuulokkeilla, omassa huoneessasi mitattu huonekorjaus ja bittitarkka signaalipolku, jonka voit tarkistaa.",
+    "title": "Vespertine: ilmainen hi-res- ja surround-musiikkisoitin Macille",
+    "description": "Ilmainen, avoimen lähdekoodin musiikkisoitin Macille: SACD ISO ja DVD-Video, DSD, monikanavainen surround DTS-HD MA-, TrueHD- ja Dolby Atmos -muodoissa, bittitarkka hi-res, tilaääni AirPodsilla ja huonekorjaus.",
     "ogAlt": "Vespertine: ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikille. Signaalipolku näyttää 24-bit / 96 kHz FLAC -tiedoston soivan bittitarkasti Fosi Audio ZD3:lla. Versio {version}, macOS {minMacOS} tai uudempi.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Miksi Vespertine",
-      "title": "Tehty surround-kokoelmallesi.",
+      "title": "Musiikkisoitin Macille, tehty surround- ja hi-res-musiikille.",
       "text": "Surround- ja stereomusiikki samassa kirjastossa, ja soitin, joka näyttää tarkalleen, mitä se teki signaalille.",
       "badgesLabel": "Sovelluksen näyttämät signaalipolun tilat"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Vespertinen lähdekoodi",
     "trailerName": "Vespertinen traileri",
     "trailerDescription": "44 sekunnin esittely Vespertinestä, tallennettu oikeasta sovelluksesta kehittäjän omalla kirjastolla. Siinä näkyvät bittitarkka signaalipolku, DSD DoP:n kautta, surround Tilaäänenä AirPodseilla ja hi-res-tiedostojen analyysi.",
-    "keywords": "bittitarkka, hi-res-ääni, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Tilaääni, AirPods Max, FLAC, musiikkisoitin, macOS, avoin lähdekoodi"
+    "keywords": "musiikkisoitin Macille, hi-res-soitin Mac, DSD-soitin, SACD ISO, monikanavaääni, surround-musiikki, Dolby Atmos, DTS-HD Master Audio, bittitarkka toisto, huonekorjaus, tilaääni, FLAC-soitin, ilmainen, avoin lähdekoodi"
+  },
+  "og": {
+    "homeLede": "SACD- ja DVD-Video-levykuvat, DSD, Dolby Atmos, TrueHD ja DTS samassa kirjastossa, ja signaalipolku, jonka voit tarkistaa.",
+    "spatial": "Tilaääni",
+    "pressLede": "Tietolehti, logot, mainoskuvat, aidot kuvakaappaukset ja traileri.",
+    "privacyLede": "Ei tilejä, analytiikkaa, telemetriaa, kaatumisraportointia eikä mainontaa. Lähdekoodi on julkinen, joten voit tarkistaa sen itse.",
+    "termsLede": "GNU General Public License, versio 3 tai uudempi. Ei maksuja, ei rekisteröitymistä."
   },
   "releases": {
     "0.14.0": {

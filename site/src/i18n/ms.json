@@ -54,8 +54,8 @@
     "home": "Laman utama"
   },
   "home": {
-    "title": "Vespertine: pemain muzik bunyi keliling dan hi-res untuk Mac",
-    "description": "Pemain Mac percuma dan sumber terbuka untuk koleksi bunyi keliling dan hi-res: imej cakera SACD dan DVD-Video, DSD, CD DTS, fail DTS-HD MA, TrueHD dan Dolby Atmos, Audio Ruang pada AirPods, pembetulan bilik yang diukur di bilik anda sendiri, serta laluan isyarat bit-perfect yang boleh anda periksa.",
+    "title": "Vespertine: pemain muzik hi-res dan bunyi keliling untuk Mac",
+    "description": "Pemain muzik percuma dan sumber terbuka untuk Mac: SACD ISO dan DVD-Video, DSD, bunyi keliling berbilang saluran DTS-HD MA, TrueHD dan Dolby Atmos, hi-res bit-perfect, Audio Ruang pada AirPods dan pembetulan bilik.",
     "ogAlt": "Vespertine: pemain Mac percuma dan sumber terbuka untuk muzik bunyi keliling dan hi-res. Laluan isyaratnya menunjukkan FLAC 24-bit / 96 kHz dimainkan secara bit-perfect pada Fosi Audio ZD3. Versi {version}, macOS {minMacOS} atau lebih baharu.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Mengapa Vespertine",
-      "title": "Dibina untuk koleksi bunyi keliling anda.",
+      "title": "Pemain muzik untuk Mac, dibina untuk bunyi keliling dan hi-res.",
       "text": "Muzik bunyi keliling dan stereo dalam satu pustaka, dan pemain yang menunjukkan dengan tepat apa yang dilakukannya pada isyarat.",
       "badgesLabel": "Keadaan laluan isyarat yang ditunjukkan oleh aplikasi"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Kod sumber Vespertine",
     "trailerName": "Treler Vespertine",
     "trailerDescription": "Lawatan 44 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, bunyi keliling sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
-    "keywords": "bit-perfect, audio hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, CD DTS, Audio Ruang, AirPods Max, FLAC, pemain muzik, macOS, sumber terbuka"
+    "keywords": "pemain muzik Mac, pemain hi-res Mac, pemain DSD, SACD ISO, audio berbilang saluran, bunyi keliling, surround, Dolby Atmos, DTS-HD Master Audio, main balik bit-perfect, pembetulan bilik, Audio Ruang, pemain FLAC, percuma, sumber terbuka"
+  },
+  "og": {
+    "homeLede": "Imej SACD dan DVD-Video, DSD, Dolby Atmos, TrueHD dan DTS dalam satu pustaka, dengan laluan isyarat yang boleh anda semak.",
+    "spatial": "Audio Ruang",
+    "pressLede": "Lembaran fakta, logo, seni utama, tangkapan skrin sebenar dan treler.",
+    "privacyLede": "Tiada akaun, analitik, telemetri, laporan ranap atau pengiklanan. Kod sumbernya terbuka kepada umum, jadi anda boleh menyemaknya.",
+    "termsLede": "GNU General Public License, versi 3 atau lebih baharu. Tiada bayaran, tiada pendaftaran."
   },
   "releases": {
     "0.14.0": {

@@ -54,8 +54,8 @@
     "home": "Início"
   },
   "home": {
-    "title": "Vespertine: leitor de música surround e hi-res para Mac",
-    "description": "Leitor gratuito e de código aberto para Mac, para coleções surround e hi-res: imagens de discos SACD e DVD-Video, DSD, CDs DTS, ficheiros DTS-HD MA, TrueHD e Dolby Atmos, Áudio espacial nos AirPods, correção de sala medida na sua própria sala e um caminho do sinal bit-perfect que pode inspecionar.",
+    "title": "Vespertine: leitor de música hi-res e surround gratuito para Mac",
+    "description": "Leitor de música gratuito e de código aberto para Mac: SACD ISO e DVD-Video, DSD, surround multicanal em DTS-HD MA, TrueHD e Dolby Atmos, hi-res bit-perfect, Áudio espacial nos AirPods e correção de sala.",
     "ogAlt": "Vespertine: o leitor gratuito e de código aberto para Mac, para música surround e hi-res. O caminho do sinal mostra um FLAC de 24 bits / 96 kHz a ser reproduzido em bit-perfect num Fosi Audio ZD3. Versão {version}, macOS {minMacOS} ou posterior.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Porquê o Vespertine",
-      "title": "Feito para a sua coleção surround.",
+      "title": "Um leitor de música para Mac, feito para surround e hi-res.",
       "text": "Música surround e estéreo numa só biblioteca, e um leitor que mostra exatamente o que fez ao sinal.",
       "badgesLabel": "Estados do caminho do sinal que a aplicação mostra"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Código-fonte do Vespertine",
     "trailerName": "Trailer do Vespertine",
     "trailerDescription": "Uma visita de 44 segundos ao Vespertine, gravada na app real com a biblioteca do próprio programador: o caminho do sinal bit-perfect, DSD por DoP, surround como Áudio espacial nos AirPods e a análise de ficheiros Hi-Res.",
-    "keywords": "bit-perfect, áudio de alta resolução, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Áudio espacial, AirPods Max, FLAC, leitor de música, macOS, código aberto"
+    "keywords": "leitor de música para Mac, leitor hi-res Mac, leitor DSD, reproduzir SACD ISO, áudio multicanal, música surround, Dolby Atmos, DTS-HD Master Audio, reprodução bit-perfect, correção de sala, Áudio espacial, leitor FLAC, gratuito, código aberto"
+  },
+  "og": {
+    "homeLede": "Imagens SACD e DVD-Video, DSD, Dolby Atmos, TrueHD e DTS numa só biblioteca, com um caminho do sinal que pode verificar.",
+    "spatial": "Áudio espacial",
+    "pressLede": "Ficha técnica, logótipos, imagens promocionais, capturas de ecrã reais e o trailer.",
+    "privacyLede": "Sem contas, estatísticas, telemetria, relatórios de falhas nem publicidade. O código é público, por isso pode verificar.",
+    "termsLede": "A GNU General Public License, versão 3 ou posterior. Nada a pagar, nenhum registo."
   },
   "releases": {
     "0.14.0": {

@@ -54,8 +54,8 @@
     "home": "Accueil"
   },
   "home": {
-    "title": "Vespertine : lecteur de musique surround et haute résolution pour Mac",
-    "description": "Lecteur Mac libre et gratuit pour les collections surround et haute résolution : images disque SACD et DVD-Video, DSD, CD DTS, fichiers DTS-HD MA, TrueHD et Dolby Atmos, audio spatial sur AirPods, une correction de salle mesurée dans votre propre pièce et un chemin du signal bit-perfect que vous pouvez inspecter.",
+    "title": "Vespertine : lecteur audio hi-res et multicanal gratuit pour Mac",
+    "description": "Lecteur audio libre et gratuit pour Mac : SACD ISO et DVD-Video, DSD, surround multicanal en DTS-HD MA, TrueHD et Dolby Atmos, haute résolution bit-perfect, audio spatial sur AirPods et correction de salle.",
     "ogAlt": "Vespertine : le lecteur Mac libre et gratuit pour la musique surround et haute résolution. Son chemin du signal montre un FLAC 24 bits / 96 kHz lu en bit-perfect sur un Fosi Audio ZD3. Version {version}, macOS {minMacOS} ou version ultérieure.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Pourquoi Vespertine",
-      "title": "Pensé pour votre collection surround.",
+      "title": "Un lecteur audio pour Mac, pensé pour le surround et la haute résolution.",
       "text": "La musique surround et stéréo dans une même bibliothèque, et un lecteur qui montre exactement ce qu’il a fait au signal.",
       "badgesLabel": "États du chemin du signal affichés par l’application"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Code source de Vespertine",
     "trailerName": "Bande-annonce de Vespertine",
     "trailerDescription": "Une visite de Vespertine en 44 secondes, enregistrée dans l’app réelle sur la bibliothèque personnelle du développeur : le chemin du signal bit-perfect, le DSD en DoP, le surround en Audio spatial sur AirPods et l’analyse des fichiers haute résolution.",
-    "keywords": "bit-perfect, audio haute résolution, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, CD DTS, Audio spatial, AirPods Max, FLAC, lecteur de musique, macOS, open source"
+    "keywords": "lecteur audio Mac, lecteur hi-res Mac, lecteur haute résolution, lecteur DSD Mac, lire des SACD ISO, audio multicanal, musique surround, Dolby Atmos, DTS-HD Master Audio, lecture bit-perfect, correction de salle, audio spatial, lecteur FLAC, gratuit, logiciel libre"
+  },
+  "og": {
+    "homeLede": "Images SACD et DVD-Video, DSD, Dolby Atmos, TrueHD et DTS dans une seule bibliothèque, avec un chemin du signal que vous pouvez vérifier.",
+    "spatial": "Audio spatial",
+    "pressLede": "Fiche technique, logos, visuels, captures d’écran réelles et bande-annonce.",
+    "privacyLede": "Ni comptes, ni statistiques d’utilisation, ni télémétrie, ni rapports de plantage, ni publicité. Le code source est public : vous pouvez vérifier.",
+    "termsLede": "La licence publique générale GNU, version 3 ou ultérieure. Rien à payer, aucune inscription."
   },
   "releases": {
     "0.14.0": {

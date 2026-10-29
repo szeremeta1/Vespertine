@@ -54,8 +54,8 @@
     "home": "Trang chủ"
   },
   "home": {
-    "title": "Vespertine: trình phát nhạc âm thanh vòm và hi-res cho Mac",
-    "description": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập âm thanh vòm và hi-res: ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Dolby Atmos, Âm thanh không gian trên AirPods, hiệu chỉnh phòng được đo ngay trong căn phòng của bạn, cùng một đường tín hiệu bit-perfect mà bạn có thể kiểm tra.",
+    "title": "Vespertine: phần mềm nghe nhạc hi-res và âm thanh vòm cho Mac",
+    "description": "Trình phát nhạc miễn phí, mã nguồn mở cho Mac: SACD ISO và DVD-Video, DSD, âm thanh vòm đa kênh DTS-HD MA, TrueHD và Dolby Atmos, hi-res bit-perfect, Âm thanh không gian trên AirPods và hiệu chỉnh phòng.",
     "ogAlt": "Vespertine: trình phát miễn phí, mã nguồn mở cho Mac dành cho nhạc âm thanh vòm và hi-res. Đường tín hiệu cho thấy một tệp FLAC 24 bit / 96 kHz đang phát bit-perfect trên Fosi Audio ZD3. Phiên bản {version}, macOS {minMacOS} trở lên.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Vì sao chọn Vespertine",
-      "title": "Sinh ra cho bộ sưu tập âm thanh vòm của bạn.",
+      "title": "Trình phát nhạc cho Mac, sinh ra cho âm thanh vòm và hi-res.",
       "text": "Nhạc âm thanh vòm và stereo trong cùng một thư viện, cùng một trình phát cho thấy chính xác nó đã làm gì với tín hiệu.",
       "badgesLabel": "Các trạng thái đường tín hiệu mà ứng dụng hiển thị"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Mã nguồn Vespertine",
     "trailerName": "Video giới thiệu Vespertine",
     "trailerDescription": "Video giới thiệu Vespertine dài 44 giây, quay từ ứng dụng thật trên thư viện nhạc của chính nhà phát triển: đường tín hiệu bit-perfect, DSD qua DoP, âm thanh vòm dưới dạng Âm thanh không gian trên AirPods và phân tích tệp hi-res.",
-    "keywords": "bit-perfect, âm thanh hi-res, âm thanh vòm, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Âm thanh không gian, AirPods Max, FLAC, trình phát nhạc, macOS, mã nguồn mở"
+    "keywords": "phần mềm nghe nhạc cho Mac, trình phát nhạc hi-res, nghe nhạc lossless trên Mac, phát DSD, SACD ISO, âm thanh vòm đa kênh, Dolby Atmos, DTS-HD Master Audio, bit-perfect, hiệu chỉnh phòng, Âm thanh không gian, FLAC, miễn phí, mã nguồn mở"
+  },
+  "og": {
+    "homeLede": "Ảnh đĩa SACD và DVD-Video, DSD, Dolby Atmos, TrueHD và DTS trong cùng một thư viện, với đường tín hiệu bạn có thể kiểm tra.",
+    "spatial": "Âm thanh không gian",
+    "pressLede": "Bảng thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu.",
+    "privacyLede": "Không tài khoản, số liệu phân tích, telemetry, báo cáo sự cố hay quảng cáo. Mã nguồn công khai, nên bạn có thể tự kiểm tra.",
+    "termsLede": "Giấy phép Công cộng GNU, phiên bản 3 hoặc mới hơn. Không mất phí, không cần đăng ký."
   },
   "releases": {
     "0.14.0": {

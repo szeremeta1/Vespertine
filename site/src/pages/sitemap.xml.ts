@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { SITE, latest, isoDay } from '../data/app';
 import { escapeHtml as x } from '../lib/text';
 import { sceneShots, trailerPoster, TRAILER } from '../lib/shots';
-import { CODES, pagePath, t, type Page } from '../i18n';
+import { CODES, hreflangOf, pagePath, t, type Page } from '../i18n';
 
 export const GET: APIRoute = async () => {
   const poster = await trailerPoster();
@@ -17,7 +17,7 @@ export const GET: APIRoute = async () => {
   ];
   const urls: string[] = [];
   for (const p of pages) {
-    const alternates = [...CODES.map((c) => `<xhtml:link rel="alternate" hreflang="${c}" href="${SITE}${pagePath(c, p.page)}"/>`), `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${pagePath('en', p.page)}"/>`].join('');
+    const alternates = [...CODES.map((c) => `<xhtml:link rel="alternate" hreflang="${hreflangOf(c)}" href="${SITE}${pagePath(c, p.page)}"/>`), `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${pagePath('en', p.page)}"/>`].join('');
     for (const lang of CODES) {
       const extra: string[] = [];
       if (p.page === 'home') {

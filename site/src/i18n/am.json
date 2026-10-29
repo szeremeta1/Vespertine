@@ -54,8 +54,8 @@
     "home": "መነሻ"
   },
   "home": {
-    "title": "Vespertine፦ ለMac የሰራውንድ እና የhi-res ሙዚቃ ማጫወቻ",
-    "description": "ለሰራውንድ እና ለhi-res ስብስቦች የተሠራ ነፃና ክፍት ምንጭ የMac ማጫወቻ፦ የSACD እና የDVD-Video ዲስክ ኢሜጆች፣ DSD፣ DTS ሲዲዎች፣ DTS-HD MA፣ TrueHD እና Dolby Atmos ፋይሎች፣ Spatial Audio በAirPods ላይ፣ በራስዎ ክፍል ውስጥ የሚለካ የክፍል ማስተካከያ፣ እንዲሁም ሊፈትሹት የሚችሉት ቢት-ፍጹም የሲግናል መንገድ።",
+    "title": "Vespertine፦ ነፃ የሰራውንድ እና የhi-res ሙዚቃ ማጫወቻ ለMac",
+    "description": "ነፃና ክፍት ምንጭ የMac ሙዚቃ ማጫወቻ፦ SACD ISO እና DVD-Video፣ DSD፣ ባለብዙ ቻናል ሰራውንድ በDTS-HD MA፣ TrueHD እና Dolby Atmos፣ ቢት-ፍጹም hi-res፣ Spatial Audio በAirPods ላይ እና የክፍል ማስተካከያ።",
     "ogAlt": "Vespertine፦ ለሰራውንድ እና ለhi-res ሙዚቃ የተሠራ ነፃና ክፍት ምንጭ የMac ማጫወቻ። የሲግናል መንገዱ አንድ 24-bit / 96 kHz FLAC በFosi Audio ZD3 ላይ ቢት-ፍጹም ሆኖ ሲጫወት ያሳያል። ስሪት {version}፣ macOS {minMacOS} ወይም ከዚያ በኋላ።",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "ለምን Vespertine",
-      "title": "ለሰራውንድ ስብስብዎ የተሠራ።",
+      "title": "ለሰራውንድ እና ለhi-res የተሠራ የMac ሙዚቃ ማጫወቻ።",
       "text": "የሰራውንድ እና የስቴሪዮ ሙዚቃ በአንድ ቤተ-መጻሕፍት፣ እንዲሁም በሲግናሉ ላይ በትክክል ምን እንዳደረገ የሚያሳይ ማጫወቻ።",
       "badgesLabel": "መተግበሪያው የሚያሳያቸው የሲግናል መንገድ ሁኔታዎች"
     },
@@ -743,7 +743,14 @@
     "sourceName": "የVespertine ምንጭ ኮድ",
     "trailerName": "የVespertine ማስተዋወቂያ ቪዲዮ",
     "trailerDescription": "በገንቢው የራሱ ቤተ-መጻሕፍት ላይ ከእውነተኛው መተግበሪያ የተቀረጸ የ44 ሰከንድ የVespertine ጉብኝት፦ ቢት-ፍጹም የሲግናል መንገድ፣ DSD በDoP፣ ሰራውንድ እንደ Spatial Audio በAirPods ላይ፣ እና የHi-Res ፋይል ትንተና።",
-    "keywords": "ቢት-ፍጹም, Hi-Res ኦዲዮ, ሰራውንድ, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, የሙዚቃ ማጫወቻ, macOS, ክፍት ምንጭ"
+    "keywords": "የMac ሙዚቃ ማጫወቻ, hi-res ማጫወቻ, DSD ማጫወቻ, SACD ISO, ባለብዙ ቻናል ድምፅ, ሰራውንድ, Dolby Atmos, DTS-HD Master Audio, ቢት-ፍጹም, የክፍል ማስተካከያ, Spatial Audio, FLAC, ነፃ, ክፍት ምንጭ"
+  },
+  "og": {
+    "homeLede": "የSACD እና የDVD-Video ኢሜጆች፣ DSD፣ Dolby Atmos፣ TrueHD እና DTS በአንድ ቤተ-መጻሕፍት፣ ሊፈትሹት ከሚችሉት የሲግናል መንገድ ጋር።",
+    "spatial": "Spatial Audio",
+    "pressLede": "የእውነታ ሰነድ፣ አርማዎች፣ ዋና ምስሎች፣ እውነተኛ ቅጽበታዊ ገጽ እይታዎች እና የማስተዋወቂያ ቪዲዮ።",
+    "privacyLede": "አካውንት፣ የአጠቃቀም ክትትል፣ ቴሌሜትሪ፣ የብልሽት ሪፖርት ወይም ማስታወቂያ የለም። የምንጭ ኮዱ ይፋ ስለሆነ ራስዎ ማረጋገጥ ይችላሉ።",
+    "termsLede": "GNU General Public License፣ ስሪት 3 ወይም ከዚያ በኋላ። የሚከፈል ነገር የለም፣ ምዝገባ የለም።"
   },
   "releases": {
     "0.14.0": {

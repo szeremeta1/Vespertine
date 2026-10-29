@@ -7,7 +7,7 @@ import romanFont from '../assets/fonts/newsreader-roman.woff2?url';
 import interFont from '../assets/fonts/inter.woff2?url';
 import { HEAD_CLASSES, LANG_REDIRECT } from '../inline-scripts.mjs';
 import { app } from '../data/app';
-import { CODES, DEFAULT_LOCALE, dir, ogLocale, pagePath, type Lang, type Page } from '../i18n';
+import { CODES, DEFAULT_LOCALE, dir, hreflangOf, ogCard, ogLocale, pagePath, t, type Card, type Lang, type Page } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -15,8 +15,8 @@ interface Props {
   page: Page;
   title: string;
   description: string;
-  /** Name of the social card in public/og/ (made by scripts/make-og.mjs). */
-  og: string;
+  /** Which social card, in this page's language (public/og/, made by scripts/make-og.mjs). */
+  og: Card;
   ogAlt: string;
   /** schema.org graph for this page. */
   jsonLd?: object;
@@ -27,10 +27,14 @@ const { lang, page, title, description, og, ogAlt, jsonLd, noindex = false } = A
 const site = Astro.site ?? new URL('https://vespertineapp.com');
 const canonical = new URL(pagePath(lang, page), site).href;
 // Every language's version of this page (the 404 page has none: GitHub Pages serves one 404.html for every path).
-const alternates = page === '404' ? [] : CODES.map((c) => ({ lang: c, href: new URL(pagePath(c, page), site).href }));
-// The card's content hash in the URL, so a redesigned card isn't hidden behind a scraper's cached copy.
-const card = readFileSync(join(process.cwd(), 'public/og', `${og}.jpg`));
-const ogImage = new URL(`/og/${og}.jpg?v=${createHash('sha256').update(card).digest('hex').slice(0, 8)}`, site).href;
+const alternates = page === '404' ? [] : CODES.map((c) => ({ lang: c, hreflang: hreflangOf(c), href: new URL(pagePath(c, page), site).href }));
+// The card in this page's language, with its content hash in the URL, so a redesigned card isn't hidden behind a
+// scraper's cached copy.
+const cardPath = ogCard(lang, og);
+const card = readFileSync(join(process.cwd(), 'public', cardPath));
+const ogImage = new URL(`${cardPath}?v=${createHash('sha256').update(card).digest('hex').slice(0, 8)}`, site).href;
+// The home page's search phrases in this language (seo.keywords): Google ignores the tag; some other engines may not.
+const keywords = page === 'home' ? t(lang).seo.keywords : undefined;
 const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 ---
 <!doctype html>
@@ -42,9 +46,11 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
-{alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href}>)}
+{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href}>)}
 {alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={alternates[0].href}>}
 <meta name="robots" content={robots}>
+<meta http-equiv="content-language" content={lang}>
+{keywords && <meta name="keywords" content={keywords}>}
 <meta name="author" content={app.author.name}>
 <meta name="application-name" content="Vespertine">
 <meta name="theme-color" content="#09090a">
@@ -57,7 +63,7 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vespertine">
 <meta property="og:locale" content={ogLocale(lang)}>
-{alternates.filter((a) => a.lang !== lang).map((a) => <meta property="og:locale:alternate" content={ogLocale(a.lang)}>)}
+{CODES.filter((c) => c !== lang).map((c) => <meta property="og:locale:alternate" content={ogLocale(c)}>)}
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={canonical}>

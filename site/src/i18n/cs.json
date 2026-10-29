@@ -54,8 +54,8 @@
     "home": "Domů"
   },
   "home": {
-    "title": "Vespertine: přehrávač surround a hi-res hudby pro Mac",
-    "description": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac: obrazy disků SACD a DVD-Video, DSD, DTS CD, soubory DTS-HD MA, TrueHD a Dolby Atmos, prostorový zvuk na AirPods, korekce místnosti změřená přímo ve vaší místnosti a bit-perfect signálová cesta, kterou si můžete prozkoumat.",
+    "title": "Vespertine: bezplatný přehrávač hi-res a surround hudby pro Mac",
+    "description": "Bezplatný open-source přehrávač hudby pro Mac: SACD ISO a DVD-Video, DSD, vícekanálový surround v DTS-HD MA, TrueHD a Dolby Atmos, bit-perfect hi-res, prostorový zvuk na AirPods a korekce místnosti.",
     "ogAlt": "Vespertine: bezplatný open-source přehrávač surround a hi-res hudby pro Mac. Jeho signálová cesta ukazuje FLAC 24 bitů / 96 kHz přehrávaný bit-perfect na Fosi Audio ZD3. Verze {version}, macOS {minMacOS} nebo novější.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Proč Vespertine",
-      "title": "Stvořený pro vaši surround sbírku.",
+      "title": "Hudební přehrávač pro Mac, stvořený pro surround a hi-res.",
       "text": "Surround a stereo hudba v jedné knihovně a přehrávač, který přesně ukazuje, co se signálem udělal.",
       "badgesLabel": "Stavy signálové cesty, které aplikace zobrazuje"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Zdrojový kód Vespertine",
     "trailerName": "Trailer Vespertine",
     "trailerDescription": "44sekundová prohlídka Vespertine nahraná ve skutečné aplikaci na vlastní knihovně vývojáře: bit-perfect signálová cesta, DSD přes DoP, surround jako Prostorový zvuk na AirPods a analýza hi-res souborů.",
-    "keywords": "bit-perfect, hi-res audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Prostorový zvuk, AirPods Max, FLAC, hudební přehrávač, macOS, open source"
+    "keywords": "přehrávač hudby pro Mac, hi-res přehrávač Mac, přehrávač DSD, SACD ISO, vícekanálový zvuk, surround hudba, Dolby Atmos, DTS-HD Master Audio, bit-perfect přehrávání, korekce místnosti, prostorový zvuk, přehrávač FLAC, zdarma, open source"
+  },
+  "og": {
+    "homeLede": "Obrazy SACD a DVD-Video, DSD, Dolby Atmos, TrueHD a DTS v jedné knihovně, se signálovou cestou, kterou si můžete ověřit.",
+    "spatial": "Prostorový zvuk",
+    "pressLede": "Přehled faktů, loga, klíčové vizuály, skutečné snímky obrazovky a trailer.",
+    "privacyLede": "Žádné účty, analytika, telemetrie, hlášení pádů ani reklama. Zdrojový kód je veřejný, takže si to můžete ověřit.",
+    "termsLede": "GNU General Public License, verze 3 nebo novější. Nic se neplatí, nikde se neregistrujete."
   },
   "releases": {
     "0.14.0": {

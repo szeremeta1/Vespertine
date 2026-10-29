@@ -54,8 +54,8 @@
     "home": "Beranda"
   },
   "home": {
-    "title": "Vespertine: pemutar musik surround dan hi-res untuk Mac",
-    "description": "Pemutar Mac gratis dan open source untuk koleksi surround dan hi-res: image disk SACD dan DVD-Video, DSD, CD DTS, file DTS-HD MA, TrueHD, dan Dolby Atmos, Audio Spasial di AirPods, koreksi ruangan yang diukur di ruangan Anda sendiri, serta jalur sinyal bit-perfect yang dapat Anda periksa.",
+    "title": "Vespertine: pemutar musik hi-res dan surround gratis untuk Mac",
+    "description": "Pemutar musik gratis dan open source untuk Mac: SACD ISO dan DVD-Video, DSD, surround multikanal DTS-HD MA, TrueHD, dan Dolby Atmos, hi-res bit-perfect, Audio Spasial di AirPods, serta koreksi ruangan.",
     "ogAlt": "Vespertine: pemutar Mac gratis dan open source untuk musik surround dan hi-res. Jalur sinyalnya menunjukkan FLAC 24-bit / 96 kHz yang diputar secara bit-perfect di Fosi Audio ZD3. Versi {version}, macOS {minMacOS} atau yang lebih baru.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Mengapa Vespertine",
-      "title": "Dibuat untuk koleksi surround Anda.",
+      "title": "Pemutar musik untuk Mac, dibuat untuk surround dan hi-res.",
       "text": "Musik surround dan stereo dalam satu perpustakaan, dan pemutar yang menunjukkan dengan tepat apa yang dilakukannya pada sinyal.",
       "badgesLabel": "Status jalur sinyal yang ditampilkan aplikasi"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Kode sumber Vespertine",
     "trailerName": "Trailer Vespertine",
     "trailerDescription": "Tur 44 detik tentang Vespertine, direkam dari aplikasi aslinya pada perpustakaan milik pengembang sendiri: jalur sinyal bit-perfect, DSD melalui DoP, surround sebagai Audio Spasial di AirPods, dan analisis file hi-res.",
-    "keywords": "bit-perfect, audio hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Audio Spasial, AirPods Max, FLAC, pemutar musik, macOS, open source"
+    "keywords": "pemutar musik Mac, pemutar hi-res Mac, pemutar DSD, SACD ISO, audio multikanal, musik surround, Dolby Atmos, DTS-HD Master Audio, pemutaran bit-perfect, koreksi ruangan, Audio Spasial, pemutar FLAC, gratis, open source"
+  },
+  "og": {
+    "homeLede": "Image SACD dan DVD-Video, DSD, Dolby Atmos, TrueHD, dan DTS dalam satu perpustakaan, dengan jalur sinyal yang dapat Anda periksa.",
+    "spatial": "Audio Spasial",
+    "pressLede": "Lembar fakta, logo, key art, tangkapan layar asli, dan trailer.",
+    "privacyLede": "Tanpa akun, analitik, telemetri, pelaporan crash, atau iklan. Kode sumbernya publik, jadi Anda bisa memeriksanya.",
+    "termsLede": "GNU General Public License, versi 3 atau yang lebih baru. Tanpa biaya, tanpa pendaftaran."
   },
   "releases": {
     "0.14.0": {

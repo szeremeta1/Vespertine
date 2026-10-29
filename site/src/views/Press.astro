@@ -15,7 +15,7 @@ import { vars } from '../data/content';
 import { innerGraph } from '../lib/seo';
 import { escapeHtml } from '../lib/text';
 import { sceneShots, TRAILER } from '../lib/shots';
-import { t, fill, longDate, megabytes, pagePath, type Lang } from '../i18n';
+import { t, fill, longDate, megabytes, ogCard, pagePath, type Lang } from '../i18n';
 
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
@@ -40,7 +40,7 @@ const trailerDownload = '/assets/trailer/vespertine-trailer-1080p.mp4';
 const keyArt = Object.entries(p.art.items).map(([k, text]) => [k, f(text)]);
 const screenshots = Object.entries(p.shots.items);
 const poster = await getImage({ src: posterSrc, width: 1280, format: 'webp', quality: 70 });
-const jsonLd = innerGraph({ lang, path, title, crumb: p.eyebrow, description, dateModified: isoDay(latest.date), image: `${SITE}/og/press.jpg`, screenshots: await sceneShots(lang), trailer: { url: SITE + TRAILER, poster: SITE + poster.src } });
+const jsonLd = innerGraph({ lang, path, title, crumb: p.eyebrow, description, dateModified: isoDay(latest.date), image: `${SITE}${ogCard(lang, 'press')}`, screenshots: await sceneShots(lang), trailer: { url: SITE + TRAILER, poster: SITE + poster.src } });
 const facts = p.facts;
 // The heading puts the name where the language needs it ("… about {name}.", "{name}の記事に…"); the name and the
 // full stop right after it are set in brass italic.

@@ -54,8 +54,8 @@
     "home": "Start"
   },
   "home": {
-    "title": "Vespertine: musikspelare för surround och hi-res på Mac",
-    "description": "Kostnadsfri Mac-spelare med öppen källkod för samlingar i surround och hi-res: skivavbilder av SACD och DVD-Video, DSD, DTS-cd-skivor, DTS-HD MA-, TrueHD- och Dolby Atmos-filer, rumsligt ljud i AirPods, rumskorrigering uppmätt i ditt eget rum och en bitperfekt signalväg som du kan granska.",
+    "title": "Vespertine: gratis musikspelare för hi-res och surround på Mac",
+    "description": "Kostnadsfri musikspelare med öppen källkod för Mac: SACD ISO och DVD-Video, DSD, flerkanalig surround i DTS-HD MA, TrueHD och Dolby Atmos, bitperfekt hi-res, rumsligt ljud i AirPods och rumskorrigering.",
     "ogAlt": "Vespertine: den kostnadsfria Mac-spelaren med öppen källkod för musik i surround och hi-res. Signalvägen visar en FLAC i 24 bitar / 96 kHz som spelas bitperfekt på en Fosi Audio ZD3. Version {version}, macOS {minMacOS} eller senare.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Varför Vespertine",
-      "title": "Byggd för din surroundsamling.",
+      "title": "En musikspelare för Mac, byggd för surround och hi-res.",
       "text": "Surround- och stereomusik i ett och samma bibliotek, och en spelare som visar exakt vad den har gjort med signalen.",
       "badgesLabel": "Signalvägslägen som appen visar"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Källkoden till Vespertine",
     "trailerName": "Trailer för Vespertine",
     "trailerDescription": "En 44 sekunder lång rundtur i Vespertine, inspelad från den riktiga appen med utvecklarens eget bibliotek: den bitperfekta signalvägen, DSD via DoP, surround som rumsligt ljud på AirPods och analys av hi-res-filer.",
-    "keywords": "bitperfekt, hi-res-ljud, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, rumsligt ljud, AirPods Max, FLAC, musikspelare, macOS, öppen källkod"
+    "keywords": "musikspelare för Mac, hi-res-spelare Mac, DSD-spelare, SACD ISO, flerkanalsljud, surroundmusik, Dolby Atmos, DTS-HD Master Audio, bitperfekt uppspelning, rumskorrigering, rumsligt ljud, FLAC-spelare, gratis, öppen källkod"
+  },
+  "og": {
+    "homeLede": "SACD- och DVD-Video-avbilder, DSD, Dolby Atmos, TrueHD och DTS i ett bibliotek, med en signalväg som du kan granska.",
+    "spatial": "Rumsligt ljud",
+    "pressLede": "Faktablad, logotyper, nyckelbilder, riktiga skärmbilder och trailern.",
+    "privacyLede": "Inga konton, ingen analys, ingen telemetri, ingen kraschrapportering och ingen reklam. Källkoden är öppen, så du kan kontrollera själv.",
+    "termsLede": "GNU General Public License, version 3 eller senare. Inget att betala, ingen registrering."
   },
   "releases": {
     "0.14.0": {

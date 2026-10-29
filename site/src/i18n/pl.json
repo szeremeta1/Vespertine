@@ -54,8 +54,8 @@
     "home": "Strona główna"
   },
   "home": {
-    "title": "Vespertine: odtwarzacz muzyki surround i hi-res na Maca",
-    "description": "Darmowy, otwartoźródłowy odtwarzacz na Maca do kolekcji surround i hi-res: obrazy płyt SACD i DVD-Video, DSD, płyty DTS CD, pliki DTS-HD MA, TrueHD i Dolby Atmos, Dźwięk przestrzenny na AirPods, korekcja pomieszczenia oparta na pomiarach w twoim własnym pomieszczeniu oraz ścieżka sygnału bit-perfect, którą możesz sprawdzić.",
+    "title": "Vespertine: darmowy odtwarzacz muzyki hi-res i surround na Maca",
+    "description": "Darmowy, otwartoźródłowy odtwarzacz muzyki na Maca: SACD ISO i DVD-Video, DSD, wielokanałowy surround w DTS-HD MA, TrueHD i Dolby Atmos, hi-res bit-perfect, Dźwięk przestrzenny na AirPods i korekcja pomieszczenia.",
     "ogAlt": "Vespertine: darmowy, otwartoźródłowy odtwarzacz muzyki surround i hi-res na Maca. Ścieżka sygnału pokazuje plik FLAC 24-bit / 96 kHz odtwarzany w trybie bit-perfect na Fosi Audio ZD3. Wersja {version}, macOS {minMacOS} lub nowszy.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Dlaczego Vespertine",
-      "title": "Stworzony dla kolekcji surround.",
+      "title": "Odtwarzacz muzyki na Maca, stworzony z myślą o surround i hi-res.",
       "text": "Muzyka surround i stereo w jednej bibliotece oraz odtwarzacz, który pokazuje dokładnie, co zrobił z sygnałem.",
       "badgesLabel": "Stany ścieżki sygnału pokazywane przez aplikację"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Kod źródłowy Vespertine",
     "trailerName": "Zwiastun Vespertine",
     "trailerDescription": "44-sekundowa prezentacja Vespertine nagrana w prawdziwej aplikacji, na własnej bibliotece twórcy: ścieżka sygnału bit-perfect, DSD przez DoP, surround jako Dźwięk przestrzenny na AirPods i analiza plików hi-res.",
-    "keywords": "bit-perfect, dźwięk hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Dźwięk przestrzenny, AirPods Max, FLAC, odtwarzacz muzyki, macOS, otwartoźródłowy"
+    "keywords": "odtwarzacz muzyki na Maca, odtwarzacz hi-res Mac, odtwarzacz DSD, SACD ISO, dźwięk wielokanałowy, muzyka surround, Dolby Atmos, DTS-HD Master Audio, odtwarzanie bit-perfect, korekcja pomieszczenia, dźwięk przestrzenny, odtwarzacz FLAC, za darmo, open source"
+  },
+  "og": {
+    "homeLede": "Obrazy SACD i DVD-Video, DSD, Dolby Atmos, TrueHD i DTS w jednej bibliotece, ze ścieżką sygnału, którą możesz sprawdzić.",
+    "spatial": "Dźwięk przestrzenny",
+    "pressLede": "Karta informacyjna, logotypy, grafiki promocyjne, prawdziwe zrzuty ekranu i zwiastun.",
+    "privacyLede": "Żadnych kont, analityki, telemetrii, raportów o awariach ani reklam. Kod źródłowy jest publiczny, więc możesz to sprawdzić.",
+    "termsLede": "GNU General Public License w wersji 3 lub nowszej. Nic do zapłacenia, żadnej rejestracji."
   },
   "releases": {
     "0.14.0": {

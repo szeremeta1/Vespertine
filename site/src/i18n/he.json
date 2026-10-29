@@ -54,8 +54,8 @@
     "home": "דף הבית"
   },
   "home": {
-    "title": "Vespertine: נגן מוזיקה בסראונד וב־Hi-Res ל־Mac",
-    "description": "נגן חינמי בקוד פתוח ל־Mac לאוספי סראונד ו־Hi-Res: תמונות דיסק של SACD ו־DVD-Video, DSD, תקליטורי DTS, קובצי DTS-HD MA, TrueHD ו־Dolby Atmos, שמע מרחבי ב־AirPods, תיקון חדר שנמדד בחדר שלך ונתיב אות מדויק לסיבית שאפשר לבחון.",
+    "title": "Vespertine: נגן מוזיקה חינמי בסראונד וב־Hi-Res ל־Mac",
+    "description": "נגן מוזיקה חינמי בקוד פתוח ל־Mac: תמונות SACD ISO ו־DVD-Video, DSD, סראונד רב־ערוצי ב־DTS-HD MA, TrueHD ו־Dolby Atmos, Hi-Res מדויק לסיבית, שמע מרחבי ב־AirPods ותיקון חדר.",
     "ogAlt": "Vespertine: נגן המוזיקה החינמי בקוד פתוח ל־Mac למוזיקה בסראונד וב־Hi-Res. נתיב האות שלו מציג קובץ FLAC של 24 סיביות / 96 kHz שמתנגן באופן מדויק לסיבית ב־Fosi Audio ZD3. גרסה {version}, macOS {minMacOS} ואילך.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "למה Vespertine",
-      "title": "נבנה בשביל אוסף הסראונד שלך.",
+      "title": "נגן מוזיקה ל־Mac, שנבנה בשביל סראונד ו־Hi-Res.",
       "text": "מוזיקת סראונד וסטריאו בספריה אחת, ונגן שמראה בדיוק מה הוא עשה לאות.",
       "badgesLabel": "מצבי נתיב האות שהאפליקציה מציגה"
     },
@@ -743,7 +743,14 @@
     "sourceName": "קוד המקור של Vespertine",
     "trailerName": "הטריילר של Vespertine",
     "trailerDescription": "סיור של 44 שניות ב־Vespertine, שהוקלט מהאפליקציה האמיתית על הספריה של המפתח עצמו: נתיב האות המדויק לסיבית, DSD דרך DoP, סראונד כשמע מרחבי ב־AirPods וניתוח קבצי Hi-Res.",
-    "keywords": "מדויק לסיבית, שמע Hi-Res, סראונד, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, שמע מרחבי, AirPods Max, FLAC, נגן מוזיקה, macOS, קוד פתוח"
+    "keywords": "נגן מוזיקה למק, נגן מוזיקה ל־Mac, נגן Hi-Res, נגן DSD, ניגון SACD ISO, שמע רב־ערוצי, סראונד, Dolby Atmos, DTS-HD Master Audio, ניגון מדויק לסיבית, תיקון חדר, שמע מרחבי, נגן FLAC, חינם, קוד פתוח"
+  },
+  "og": {
+    "homeLede": "תמונות SACD ו־DVD-Video, DSD, Dolby Atmos, TrueHD ו־DTS בספריה אחת, עם נתיב אות שאפשר לבדוק.",
+    "spatial": "שמע מרחבי",
+    "pressLede": "דף עובדות, לוגואים, תמונות מפתח, צילומי מסך אמיתיים והטריילר.",
+    "privacyLede": "ללא חשבונות, אנליטיקה, טלמטריה, דיווחי קריסה או פרסום. קוד המקור פתוח לכולם, כך שאפשר לבדוק.",
+    "termsLede": "GNU General Public License, גרסה 3 ואילך. אין מה לשלם, אין הרשמה."
   },
   "releases": {
     "0.14.0": {

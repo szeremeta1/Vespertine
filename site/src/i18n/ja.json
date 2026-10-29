@@ -54,8 +54,8 @@
     "home": "ホーム"
   },
   "home": {
-    "title": "Vespertine：Mac用サラウンド＆ハイレゾ音楽プレーヤー",
-    "description": "サラウンドとハイレゾのコレクションのための、無料・オープンソースのMac用プレーヤー。SACDとDVD-Videoのディスクイメージ、DSD、DTS CD、DTS-HD MA・TrueHD・Dolby Atmosのファイル、AirPodsでの空間オーディオ、自分の部屋で測定するルーム補正、そして中身を確かめられるビットパーフェクトな信号経路。",
+    "title": "Vespertine：Mac用の無料ハイレゾ・サラウンド音楽プレーヤー",
+    "description": "Mac用の無料・オープンソース音楽再生ソフト。SACD ISOやDVD-Video、DSD、DTS-HD MA・TrueHD・Dolby Atmosのマルチチャンネルサラウンド、ビットパーフェクトなハイレゾ再生、AirPodsの空間オーディオ、ルーム補正に対応。",
     "ogAlt": "Vespertine：サラウンドとハイレゾ音楽のための、無料・オープンソースのMac用プレーヤー。信号経路には、24ビット / 96 kHzのFLACがFosi Audio ZD3でビットパーフェクト再生されている様子が表示されています。バージョン{version}、macOS {minMacOS}以降。",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Vespertineを選ぶ理由",
-      "title": "サラウンドのコレクションのために。",
+      "title": "サラウンドとハイレゾのための、Mac用音楽プレーヤー。",
       "text": "サラウンドもステレオも、ひとつのライブラリに。そして、信号に何をしたのかを正確に示すプレーヤー。",
       "badgesLabel": "アプリが表示する信号経路の状態"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Vespertineのソースコード",
     "trailerName": "Vespertineのトレーラー",
     "trailerDescription": "Vespertineを44秒で紹介する映像。開発者自身のライブラリを使い、実際のアプリから収録しました。ビットパーフェクトな信号経路、DoPによるDSD、AirPodsの空間オーディオで聴くサラウンド、ハイレゾファイルの解析を紹介します。",
-    "keywords": "ビットパーフェクト, ハイレゾオーディオ, サラウンド, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, 空間オーディオ, AirPods Max, FLAC, 音楽プレーヤー, macOS, オープンソース"
+    "keywords": "Mac 音楽再生ソフト, ハイレゾ 再生 Mac, DSD 再生, SACD ISO 再生, マルチチャンネル 再生, サラウンド, Dolby Atmos, DTS-HD Master Audio, ビットパーフェクト, ルーム補正, 空間オーディオ, FLAC 再生, 無料, オープンソース"
+  },
+  "og": {
+    "homeLede": "SACDとDVD-Videoのイメージ、DSD、Dolby Atmos、TrueHD、DTSをひとつのライブラリに。信号経路は自分で確かめられます。",
+    "spatial": "空間オーディオ",
+    "pressLede": "ファクトシート、ロゴ、キーアート、実際のスクリーンショット、トレーラー。",
+    "privacyLede": "アカウント、アクセス解析、テレメトリ、クラッシュレポート、広告はありません。ソースコードは公開されているので、自分で確かめられます。",
+    "termsLede": "GNU General Public Licenseバージョン3以降。支払いも登録も不要です。"
   },
   "releases": {
     "0.14.0": {

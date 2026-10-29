@@ -7,13 +7,20 @@
 //  - a page's <html lang> or dir doesn't match its folder (/de/…), or it lacks an hreflang link to every language's
 //    version (and x-default), or its canonical isn't its own URL,
 //  - a page's og:image or twitter:image isn't a 1200×630 file in dist/, or its JSON-LD doesn't parse,
+//  - a page's social tags aren't in its own language: og:locale and its 44 og:locale:alternate, og:title,
+//    og:description and the twitter: copies matching its <title> and description, og:url its canonical, its card the
+//    one made for its language (/og/<code>/…), content-language its language; or its JSON-LD lacks the app
+//    (SoftwareApplication: free offer, macOS, inLanguage, a description and that card) or a WebPage in its language,
+//  - an hreflang alternate isn't the absolute URL of that language's version of the page (so every pair links back),
 //  - a page carries a noai/noimageai robots directive, or is noindex without being the 404 page,
 //  - a root-relative link or asset points at a file that isn't in dist/,
-//  - robots.txt, sitemap.xml, llms.txt, llms-full.txt or CNAME is missing.
+//  - robots.txt, sitemap.xml, llms.txt, llms-full.txt or CNAME is missing, robots.txt blocks anything or doesn't name
+//    the sitemap, or sitemap.xml doesn't list exactly the indexable pages (absolute URLs, a lastmod date, and the same
+//    alternates, every language and x-default, as each page's own <head>).
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, relative, sep } from 'node:path';
-import { CODES, LOCALES } from '../src/i18n/locales.mjs';
+import { CODES, LOCALES, hreflangOf } from '../src/i18n/locales.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://vespertineapp.com';
@@ -27,6 +34,13 @@ const files = [];
 })(DIST);
 
 const problems = [];
+// The indexable pages' URLs and their hreflang alternates, to compare with sitemap.xml.
+const pageAlternates = new Map();
+const urlOf = (rel) => `${SITE}/${rel.join('/')}`.replace(/\/index\.html$/, '/');
+/** The URL of a page (its path after the language folder, "index.html", "press.html" …) in another language. */
+const urlIn = (code, rest) => `${SITE}/${code === 'en' ? '' : `${code}/`}${rest}`.replace(/\/index\.html$/, '/');
+const metas = (html, key) => [...html.matchAll(new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`, 'g'))].map((m) => m[1]);
+const decode = (s) => s?.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const seen = { title: new Map(), description: new Map() };
 const rtl = new Set(LOCALES.filter((l) => l.rtl).map((l) => l.code));
 const attr = (html, re) => html.match(re)?.[1];
@@ -51,12 +65,57 @@ for (const file of files) {
   const lang = rel.length > 1 && CODES.includes(rel[0]) ? rel[0] : 'en';
   if (attr(html, /<html lang="([^"]+)"/) !== lang) problems.push(`${file}: <html lang> isn't ${lang}`);
   if (attr(html, /<html lang="[^"]+" dir="([^"]+)"/) !== (rtl.has(lang) ? 'rtl' : 'ltr')) problems.push(`${file}: dir isn't ${rtl.has(lang) ? 'rtl' : 'ltr'}`);
+  const own = urlOf(rel);
+  const rest = (lang === 'en' ? rel : rel.slice(1)).join('/');
   if (!is404) {
-    const alts = new Set([...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => m[1]));
-    for (const c of [...CODES, 'x-default']) if (!alts.has(c)) problems.push(`${file}: no hreflang ${c}`);
+    const alts = new Map([...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]));
+    const want = new Map([...CODES.map((c) => [hreflangOf(c), urlIn(c, rest)]), ['x-default', urlIn('en', rest)]]);
+    for (const [h, href] of want) {
+      if (!alts.has(h)) problems.push(`${file}: no hreflang ${h}`);
+      else if (alts.get(h) !== href) problems.push(`${file}: hreflang ${h} is ${alts.get(h)}, expected ${href}`);
+    }
+    for (const h of alts.keys()) if (!want.has(h)) problems.push(`${file}: unexpected hreflang ${h}`);
+    if (alts.get(hreflangOf(lang)) !== own) problems.push(`${file}: its own hreflang (${hreflangOf(lang)}) isn't its URL`);
+    pageAlternates.set(own, alts);
     const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/) ?? '';
-    const own = `${SITE}/${rel.join('/')}`.replace(/\/index\.html$/, '/');
     if (canonical !== own) problems.push(`${file}: canonical ${canonical}, expected ${own}`);
+  }
+  // Social and language tags, in the page's own language.
+  {
+    const loc = LOCALES.find((l) => l.code === lang);
+    const one = (key) => { const v = metas(html, key); if (v.length !== 1) problems.push(`${file}: ${v.length} ${key} tags`); return decode(v[0]); };
+    if (one('og:locale') !== loc.og) problems.push(`${file}: og:locale isn't ${loc.og}`);
+    const others = metas(html, 'og:locale:alternate');
+    const wantOthers = LOCALES.filter((l) => l.code !== lang).map((l) => l.og);
+    if (others.length !== wantOthers.length || wantOthers.some((o) => !others.includes(o))) problems.push(`${file}: og:locale:alternate isn't every other language (${others.length})`);
+    const title = decode(attr(html, /<title>([^<]+)<\/title>/));
+    const description = decode(attr(html, /<meta name="description" content="([^"]+)"/));
+    for (const k of ['og:title', 'twitter:title']) if (one(k) !== title) problems.push(`${file}: ${k} isn't the page title`);
+    for (const k of ['og:description', 'twitter:description']) if (one(k) !== description) problems.push(`${file}: ${k} isn't the page description`);
+    if (!is404 && one('og:url') !== own) problems.push(`${file}: og:url isn't ${own}`);
+    if (one('twitter:card') !== 'summary_large_image') problems.push(`${file}: twitter:card isn't summary_large_image`);
+    const image = one('og:image');
+    if (one('twitter:image') !== image || one('og:image:secure_url') !== image) problems.push(`${file}: twitter:image or og:image:secure_url isn't og:image`);
+    const cardDir = image ? new URL(image).pathname.split('/').slice(2, -1).join('/') : '';
+    if (cardDir !== (lang === 'en' ? '' : lang)) problems.push(`${file}: og:image ${image} isn't the ${lang} card`);
+    for (const k of ['og:image:alt', 'twitter:image:alt']) if (!one(k)?.trim()) problems.push(`${file}: no ${k}`);
+    if (one('og:image:width') !== '1200' || one('og:image:height') !== '630') problems.push(`${file}: og:image width/height aren't 1200×630`);
+    if (attr(html, /<meta http-equiv="content-language" content="([^"]+)"/) !== lang) problems.push(`${file}: content-language isn't ${lang}`);
+    if (!is404) {
+      const ld = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => { try { return JSON.parse(m[1]); } catch { return {}; } });
+      const nodes = ld.flatMap((g) => g['@graph'] ?? [g]);
+      const app = nodes.find((n) => n['@type'] === 'SoftwareApplication');
+      if (!app) problems.push(`${file}: no SoftwareApplication in JSON-LD`);
+      else {
+        if (app.offers?.price !== '0' || !app.isAccessibleForFree) problems.push(`${file}: SoftwareApplication isn't offered free`);
+        if (!/macOS/.test(app.operatingSystem ?? '')) problems.push(`${file}: SoftwareApplication operatingSystem lacks macOS`);
+        if (!Array.isArray(app.inLanguage) || !CODES.every((c) => app.inLanguage.includes(c))) problems.push(`${file}: SoftwareApplication inLanguage isn't every language`);
+        if (!app.description) problems.push(`${file}: SoftwareApplication has no description`);
+        if (app.image?.split('?')[0] !== `${SITE}/og/${lang === 'en' ? '' : `${lang}/`}home.jpg`) problems.push(`${file}: SoftwareApplication image isn't the ${lang} card`);
+      }
+      const webpage = nodes.find((n) => [].concat(n['@type']).includes('WebPage'));
+      if (webpage?.inLanguage !== lang) problems.push(`${file}: WebPage inLanguage isn't ${lang}`);
+    }
   }
   const csp = attr(html, /http-equiv="content-security-policy" content="([^"]+)"/) ?? '';
   const allowed = new Set([...csp.matchAll(/'(sha256-[^']+)'/g)].map((m) => m[1]));
@@ -103,8 +162,32 @@ for (const file of files) {
 for (const f of ['robots.txt', 'sitemap.xml', 'llms.txt', 'llms-full.txt', 'CNAME', 'site.webmanifest', 'favicon.ico', '404.html']) {
   if (!existsSync(join(DIST, f))) problems.push(`missing dist/${f}`);
 }
+// robots.txt lets everything be crawled and names the sitemap.
+if (existsSync(join(DIST, 'robots.txt'))) {
+  const robots = readFileSync(join(DIST, 'robots.txt'), 'utf8');
+  if (/^\s*Disallow:\s*\S/im.test(robots)) problems.push('robots.txt disallows something');
+  if (!robots.includes(`Sitemap: ${SITE}/sitemap.xml`)) problems.push('robots.txt doesn\'t name the sitemap');
+}
+// sitemap.xml lists exactly the indexable pages, each with a lastmod and the alternates its <head> has.
+if (existsSync(join(DIST, 'sitemap.xml'))) {
+  const xml = readFileSync(join(DIST, 'sitemap.xml'), 'utf8');
+  const listed = new Set();
+  for (const [, body] of xml.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+    const loc = body.match(/<loc>([^<]+)<\/loc>/)?.[1];
+    if (!loc?.startsWith(`${SITE}/`)) { problems.push(`sitemap.xml: loc ${loc} isn't absolute`); continue; }
+    if (listed.has(loc)) problems.push(`sitemap.xml: ${loc} listed twice`);
+    listed.add(loc);
+    if (!/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(body)) problems.push(`sitemap.xml: ${loc} has no lastmod date`);
+    const head = pageAlternates.get(loc);
+    if (!head) { problems.push(`sitemap.xml: ${loc} isn't an indexable page in dist`); continue; }
+    const alts = new Map([...body.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)].map((m) => [m[1], m[2]]));
+    if (alts.size !== head.size || [...head].some(([h, href]) => alts.get(h) !== href)) problems.push(`sitemap.xml: ${loc}'s alternates differ from its page's`);
+    for (const href of alts.values()) if (!pageAlternates.has(href)) problems.push(`sitemap.xml: ${loc} has an alternate that isn't a page: ${href}`);
+  }
+  for (const url of pageAlternates.keys()) if (!listed.has(url)) problems.push(`sitemap.xml: ${url} isn't listed`);
+}
 if (problems.length) {
   console.error(problems.join('\n'));
   process.exit(1);
 }
-console.log(`check-dist: ${files.length} pages OK (CSP hashes, alt text, lang and dir, canonical, hreflang, one h1, unique titles, social cards, JSON-LD, local links)`);
+console.log(`check-dist: ${files.length} pages OK (CSP hashes, alt text, lang and dir, canonical, hreflang both ways, one h1, unique titles, social cards and tags in each page's language, JSON-LD, local links, robots.txt, sitemap.xml)`);

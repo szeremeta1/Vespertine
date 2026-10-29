@@ -55,7 +55,7 @@
   },
   "home": {
     "title": "Vespertine: kicheza muziki wa sauti ya kuzunguka na hi-res kwa Mac",
-    "description": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya sauti ya kuzunguka na hi-res: nakala za diski za SACD na DVD-Video, DSD, CD za DTS, faili za DTS-HD MA, TrueHD na Dolby Atmos, Spatial Audio kwenye AirPods, urekebishaji wa chumba unaopimwa ndani ya chumba chako mwenyewe, na njia ya mawimbi ya bit-perfect unayoweza kuikagua.",
+    "description": "Kicheza muziki cha Mac, bila malipo na programu huria: SACD ISO na DVD-Video, DSD, sauti ya kuzunguka ya chaneli nyingi katika DTS-HD MA, TrueHD na Dolby Atmos, hi-res ya bit-perfect, Spatial Audio kwenye AirPods na urekebishaji wa chumba.",
     "ogAlt": "Vespertine: kicheza muziki cha Mac, bila malipo na programu huria, kwa muziki wa sauti ya kuzunguka na hi-res. Njia yake ya mawimbi inaonyesha FLAC ya biti 24 / 96 kHz ikicheza bit-perfect kwenye Fosi Audio ZD3. Toleo {version}, macOS {minMacOS} au mpya zaidi.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Kwa nini Vespertine",
-      "title": "Imeundwa kwa mkusanyiko wako wa sauti ya kuzunguka.",
+      "title": "Kicheza muziki cha Mac, kilichoundwa kwa sauti ya kuzunguka na hi-res.",
       "text": "Muziki wa sauti ya kuzunguka na wa stereo katika maktaba moja, na kicheza muziki kinachoonyesha hasa kilichofanya kwa mawimbi.",
       "badgesLabel": "Hali za njia ya mawimbi zinazoonyeshwa na programu"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Msimbo chanzo wa Vespertine",
     "trailerName": "Trela ya Vespertine",
     "trailerDescription": "Ziara ya sekunde 44 ya Vespertine, iliyorekodiwa kutoka kwenye programu halisi ikitumia maktaba ya msanidi mwenyewe: njia ya mawimbi ya bit-perfect, DSD kupitia DoP, sauti ya kuzunguka kama Spatial Audio kwenye AirPods na uchambuzi wa faili za hi-res.",
-    "keywords": "bit-perfect, sauti ya hi-res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, kicheza muziki, macOS, programu huria"
+    "keywords": "kicheza muziki cha Mac, kicheza hi-res, kicheza DSD, SACD ISO, sauti ya chaneli nyingi, sauti ya kuzunguka, surround, Dolby Atmos, DTS-HD Master Audio, uchezaji wa bit-perfect, urekebishaji wa chumba, Spatial Audio, FLAC, bila malipo, programu huria"
+  },
+  "og": {
+    "homeLede": "Nakala za SACD na DVD-Video, DSD, Dolby Atmos, TrueHD na DTS katika maktaba moja, pamoja na njia ya mawimbi unayoweza kuikagua.",
+    "spatial": "Spatial Audio",
+    "pressLede": "Karatasi ya taarifa, nembo, picha kuu, picha halisi za skrini na trela.",
+    "privacyLede": "Hakuna akaunti, takwimu za matumizi, telemetry, ripoti za kuanguka kwa programu wala matangazo. Msimbo wa chanzo uko wazi, kwa hivyo unaweza kukagua.",
+    "termsLede": "GNU General Public License, toleo la 3 au la baadaye. Hakuna cha kulipa, hakuna kujisajili."
   },
   "releases": {
     "0.14.0": {
