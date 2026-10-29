@@ -2,7 +2,7 @@
 // Vespertine written in every interface language, at mixed sizes and faces. Live text, so it stays sharp and each
 // name is set in its own script's font (lang picks it). The same data draws the press art and the trailer scene.
 import data from '../data/names.json';
-const { label = 'Vespertine in each of its languages' } = Astro.props;
+const { label = 'Vespertine in each of its languages' } = Astro.props as { label?: string };
 const rtl = new Set(['ar', 'fa', 'he', 'ur']);
 ---
 <ul class="namewall" aria-label={label} data-reveal>

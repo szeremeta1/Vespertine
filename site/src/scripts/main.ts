@@ -2,23 +2,66 @@
    This is the only script on the critical path; GSAP + Lenis load later from ./motion, and only on the home page. */
 import { $, $$, state } from './dom';
 import { initRoute } from './route';
+import { STORAGE_KEY } from '../i18n/locales.mjs';
 
 const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
 const reduce = reduceMQ.matches;
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-/* ---------- Copy the Homebrew command ---------- */
+const rtl = document.documentElement.dir === 'rtl';
+
+/* ---------- Copy the Homebrew command (labels in the page's language) ---------- */
 $$<HTMLButtonElement>('[data-copy]').forEach((b) => {
+  const label = b.textContent;
   b.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(b.dataset.copy ?? '');
-      b.textContent = 'Copied';
+      b.textContent = b.dataset.copied ?? 'Copied';
       b.classList.add('is-done');
     } catch {
-      b.textContent = 'Select it';
+      b.textContent = b.dataset.failed ?? 'Select it';
     }
-    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('is-done'); }, 2200);
+    setTimeout(() => { b.textContent = label; b.classList.remove('is-done'); }, 2200);
   });
+});
+
+/* ---------- Language menu: remember the choice, keep the section, close on Esc or a click outside ---------- */
+$$<HTMLDetailsElement>('[data-lang-menu]').forEach((menu) => {
+  const summary = $('summary', menu)!;
+  $$<HTMLAnchorElement>('[data-lang-choice]', menu).forEach((a) => {
+    a.addEventListener('click', () => {
+      try { localStorage.setItem(STORAGE_KEY, a.dataset.langChoice!); } catch { /* private mode: the link still works */ }
+      if (location.hash.length > 1) a.href = a.href.split('#')[0] + location.hash;
+    });
+  });
+  menu.addEventListener('toggle', () => {
+    if (menu.open) ($('a[aria-current]', menu) ?? $('a', menu))?.scrollIntoView({ block: 'nearest' });
+  });
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); }
+    if (!menu.open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+    // Arrow keys move through the list, like a menu; Tab still works as usual.
+    const items = $$<HTMLAnchorElement>('a', menu);
+    const i = items.indexOf(document.activeElement as HTMLAnchorElement);
+    const next = e.key === 'ArrowDown' ? (i + 1) % items.length : (i <= 0 ? items.length - 1 : i - 1);
+    items[next].focus();
+    e.preventDefault();
+  });
+  document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target as Node)) menu.open = false; });
+  menu.addEventListener('focusout', (e) => { if (menu.open && e.relatedTarget && !menu.contains(e.relatedTarget as Node)) menu.open = false; });
+});
+
+/* ---------- Nav: links that don't fit on one line (long words in some languages) hide, rather than overflow ---------- */
+$$('.nav__links').forEach((list) => {
+  const items = $$('li', list);
+  const fit = () => {
+    items.forEach((li) => li.classList.remove('is-squeezed'));
+    const top = items.find((li) => li.offsetParent)?.offsetTop ?? 0;
+    items.forEach((li) => li.classList.toggle('is-squeezed', !!li.offsetParent && li.offsetTop > top + 4));
+  };
+  new ResizeObserver(fit).observe(list.closest('.nav') ?? list);
+  document.fonts?.ready.then(fit);
+  fit();
 });
 
 /* ---------- Comparison table: mark which edges have more columns (fade, shadow, hint) ---------- */
@@ -26,8 +69,10 @@ $$('.compare-wrap').forEach((wrap) => {
   const table = $('.compare', wrap)!;
   const update = () => {
     const max = table.scrollWidth - table.clientWidth;
-    wrap.classList.toggle('more-left', max > 1 && table.scrollLeft > 1);
-    wrap.classList.toggle('more-right', max > 1 && table.scrollLeft < max - 1);
+    // Distance scrolled from the start edge (right-to-left pages scroll to negative scrollLeft).
+    const pos = rtl ? -table.scrollLeft : table.scrollLeft;
+    wrap.classList.toggle('more-left', max > 1 && pos > 1);
+    wrap.classList.toggle('more-right', max > 1 && pos < max - 1);
   };
   table.addEventListener('scroll', update, { passive: true });
   new ResizeObserver(update).observe(table);

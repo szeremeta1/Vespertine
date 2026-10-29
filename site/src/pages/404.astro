@@ -1,27 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
-import DownloadButton from '../components/DownloadButton.astro';
+// GitHub Pages serves this one file for every missing path; src/scripts/notfound.ts swaps in the visitor's language.
+import NotFound from '../views/NotFound.astro';
 ---
-<Base title="Page not found: Vespertine" description="This page isn’t here. Vespertine is the free, open-source Mac player for surround and hi-res music collections." path="/404.html" og="home" ogAlt="Vespertine: the free, open-source Mac player for surround and hi-res music." noindex>
-<a class="skip" href="#main">Skip to content</a>
-<Nav />
-<main id="main" tabindex="-1" class="plain">
-  <div class="grain" aria-hidden="true"></div>
-  <div class="hero__glow" aria-hidden="true"></div>
-  <div class="wrap">
-    <p class="eyebrow">404 · No signal</p>
-    <h1 class="page-title">This page <span class="brass-italic">isn’t here.</span></h1>
-    <p class="page-lede">The link may be old, or the address mistyped. Everything about Vespertine starts on the home page.</p>
-    <div class="hero__cta" style="margin-top:32px">
-      <a class="btn btn--ghost" href="/">Go to the home page</a>
-      <DownloadButton />
-    </div>
-  </div>
-</main>
-<Footer />
-<script>
-  import '../scripts/main';
-</script>
-</Base>
+<NotFound lang="en" />
