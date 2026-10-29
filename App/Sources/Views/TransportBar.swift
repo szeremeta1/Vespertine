@@ -269,6 +269,7 @@ struct DeviceSettings: View {
             // Put the device-specific sound correction above lower-priority controls so it remains visible in the
             // bounded output popover. This is especially useful for the AirPods Max factory default.
             EqualizerChoice(device: device)
+            RoomCorrectionChoice(device: device)
             HStack {
                 Text("Sample rate").layoutPriority(1)
                 Spacer()

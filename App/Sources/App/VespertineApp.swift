@@ -11,6 +11,7 @@ import SwiftUI
 struct VespertineApp: App {
     @State private var startup = LibraryStartup()
     @State private var updater = AppUpdater()
+    @State private var roomMeasure = RoomMeasureModel()
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
@@ -22,6 +23,8 @@ struct VespertineApp: App {
                     .frame(minWidth: 1080, minHeight: 680)
                     .preferredColorScheme(.dark)
             }
+            // Started with --room-measure: bring up Room Correction (whose wizard starts the run).
+            .onAppear { if roomMeasure.launch != nil { openWindow(id: "room-correction") } }
         }
         .defaultSize(width: 1440, height: 900)
         .windowToolbarStyle(.unified(showsTitle: false))
@@ -55,6 +58,13 @@ struct VespertineApp: App {
             }
         }
         .defaultSize(width: 860, height: 600)
+
+        Window("Room Correction", id: "room-correction") {
+            LibraryContent(startup: startup) { model in
+                RoomCorrectionWindow().environment(model).environment(roomMeasure).preferredColorScheme(.dark)
+            }
+        }
+        .defaultSize(width: 780, height: 820)
 
         MenuBarExtra {
             LibraryContent(startup: startup) { model in
@@ -157,6 +167,7 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut("m", modifiers: [.command, .shift])
             Button("Equalizer") { openWindow(id: "equalizer") }
                 .keyboardShortcut("e", modifiers: [.command, .option])
+            Button("Room Correction") { openWindow(id: "room-correction") }
         }
     }
 }

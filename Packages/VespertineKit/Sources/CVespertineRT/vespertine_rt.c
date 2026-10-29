@@ -149,6 +149,13 @@ typedef struct {
 
 #define NRT_EQ_FRESH 0x80000000u
 
+typedef struct {
+    NRTBiquad sections[NRT_ROOM_MAX_CHANNELS][NRT_ROOM_MAX_SECTIONS];
+    uint32_t counts[NRT_ROOM_MAX_CHANNELS];
+    uint32_t channels;
+    double preamp;
+} NRTRoomBank;
+
 struct NRTRenderContext {
     NRTRing *ring;
     float *scratch;
@@ -189,6 +196,14 @@ struct NRTRenderContext {
     uint32_t eqFront;        // render thread only
     double *eqState;         // render thread only: channels × NRT_EQ_MAX_SECTIONS × 2
     uint32_t eqStateCount;   // render thread only: the section count eqState belongs to
+
+    // Room correction: per-channel sections, published the same way as the equalizer.
+    NRTRoomBank roomBanks[3];
+    _Atomic uint32_t roomMiddle;
+    uint32_t roomBack;       // writer only
+    uint32_t roomFront;      // render thread only
+    double *roomState;       // render thread only: NRT_ROOM_MAX_CHANNELS × NRT_ROOM_MAX_SECTIONS × 2
+    uint32_t roomStateCounts[NRT_ROOM_MAX_CHANNELS];   // render thread only
 
     // Optional processor (set while stopped): scratch (ring channels) → processed (processedChannels).
     NRTProcessFn processor;
@@ -231,6 +246,12 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->eqMiddle, 1);
     ctx->eqBack = 2;
     ctx->eqStateCount = 0;
+    ctx->roomState = calloc((size_t)NRT_ROOM_MAX_CHANNELS * NRT_ROOM_MAX_SECTIONS * 2, sizeof(double));
+    if (!ctx->roomState) { free(ctx->eqState); free(ctx->scratch); free(ctx); return NULL; }
+    for (uint32_t i = 0; i < 3; i++) { memset(&ctx->roomBanks[i], 0, sizeof(NRTRoomBank)); ctx->roomBanks[i].preamp = 1.0; }
+    ctx->roomFront = 0;
+    atomic_init(&ctx->roomMiddle, 1);
+    ctx->roomBack = 2;
     return ctx;
 }
 
@@ -252,6 +273,7 @@ bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *use
 void nrt_context_destroy(NRTRenderContext *ctx) {
     if (!ctx) return;
     free(ctx->processed);
+    free(ctx->roomState);
     free(ctx->eqState);
     free(ctx->scratch);
     free(ctx);
@@ -291,6 +313,49 @@ static const NRTEQBank *take_eq(NRTRenderContext *ctx) {
     }
     return &ctx->eqBanks[ctx->eqFront];
 }
+void nrt_context_set_room(NRTRenderContext *ctx, const NRTBiquad *sections, const uint32_t *counts, uint32_t channels, double preamp) {
+    NRTRoomBank *bank = &ctx->roomBanks[ctx->roomBack];
+    if (!sections || !counts) channels = 0;
+    if (channels > NRT_ROOM_MAX_CHANNELS) channels = NRT_ROOM_MAX_CHANNELS;
+    for (uint32_t c = 0; c < NRT_ROOM_MAX_CHANNELS; c++) {
+        uint32_t kept = 0;
+        if (c < channels) {
+            const uint32_t n = counts[c] > NRT_ROOM_MAX_SECTIONS ? NRT_ROOM_MAX_SECTIONS : counts[c];
+            for (uint32_t i = 0; i < n; i++) {
+                const NRTBiquad b = sections[(size_t)c * NRT_ROOM_MAX_SECTIONS + i];
+                if (isfinite(b.b0) && isfinite(b.b1) && isfinite(b.b2) && isfinite(b.a1) && isfinite(b.a2)) bank->sections[c][kept++] = b;
+            }
+        }
+        bank->counts[c] = kept;
+    }
+    bank->channels = channels;
+    bank->preamp = channels > 0 && isfinite(preamp) && preamp >= 0 ? preamp : 1.0;
+    const uint32_t previous = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomBack | NRT_EQ_FRESH, memory_order_acq_rel);
+    ctx->roomBack = previous & ~NRT_EQ_FRESH;
+}
+
+// The room correction for this slice: the newest the writer published, if any came in since the last slice.
+static const NRTRoomBank *take_room(NRTRenderContext *ctx) {
+    if (atomic_load_explicit(&ctx->roomMiddle, memory_order_acquire) & NRT_EQ_FRESH) {
+        const uint32_t fresh = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomFront, memory_order_acq_rel);
+        ctx->roomFront = fresh & ~NRT_EQ_FRESH;
+        const NRTRoomBank *bank = &ctx->roomBanks[ctx->roomFront];
+        for (uint32_t c = 0; c < NRT_ROOM_MAX_CHANNELS; c++) {
+            if (bank->counts[c] != ctx->roomStateCounts[c]) {
+                memset(ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2, 0, NRT_ROOM_MAX_SECTIONS * 2 * sizeof(double));
+                ctx->roomStateCounts[c] = bank->counts[c];
+            }
+        }
+    }
+    return &ctx->roomBanks[ctx->roomFront];
+}
+
+static inline bool room_active(const NRTRoomBank *room) {
+    if (room->preamp != 1.0) return true;
+    for (uint32_t c = 0; c < room->channels; c++) if (room->counts[c] > 0) return true;
+    return false;
+}
+
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
 void nrt_context_set_dop(NRTRenderContext *ctx, bool d) {
@@ -533,13 +598,29 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
     const NRTEQBank *eq = take_eq(ctx);
     const bool equalize = !integer && (eq->count > 0 || eq->preamp != 1.0);
-    if (gain != 1.0 || equalize) {
+    const NRTRoomBank *room = take_room(ctx);
+    const bool correct = !integer && room_active(room);
+    if (gain != 1.0 || equalize || correct) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
         for (uint32_t f = 0; f < got; f++) {
             float *frame = ctx->scratch + (size_t)f * ch;
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
+                if (correct) {
+                    s *= room->preamp;
+                    if (c < NRT_ROOM_MAX_CHANNELS) {
+                        double *z = ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2;
+                        const uint32_t n = room->counts[c];
+                        for (uint32_t k = 0; k < n; k++, z += 2) {
+                            const NRTBiquad *b = &room->sections[c][k];
+                            const double y = b->b0 * s + z[0];
+                            z[0] = b->b1 * s - b->a1 * y + z[1];
+                            z[1] = b->b2 * s - b->a2 * y;
+                            s = y;
+                        }
+                    }
+                }
                 if (equalize) {
                     s *= eq->preamp;
                     double *z = ctx->eqState + (size_t)c * NRT_EQ_MAX_SECTIONS * 2;
@@ -561,6 +642,10 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             // Decaying filter memory would otherwise end in denormals, which are slow on Intel.
             const size_t states = (size_t)ch * NRT_EQ_MAX_SECTIONS * 2;
             for (size_t i = 0; i < states; i++) if (fabs(ctx->eqState[i]) < 1e-30) ctx->eqState[i] = 0;
+        }
+        if (correct) {
+            const size_t states = (size_t)NRT_ROOM_MAX_CHANNELS * NRT_ROOM_MAX_SECTIONS * 2;
+            for (size_t i = 0; i < states; i++) if (fabs(ctx->roomState[i]) < 1e-30) ctx->roomState[i] = 0;
         }
     }
 

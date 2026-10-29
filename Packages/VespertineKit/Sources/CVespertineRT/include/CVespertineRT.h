@@ -119,6 +119,20 @@ typedef struct {
 /// and is cleared otherwise. Never applied to passthrough (DoP) or integer samples. One caller at a time.
 void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullable sections, uint32_t count, double preamp);
 
+// MARK: - Room correction, run on the I/O thread before the equalizer
+
+#define NRT_ROOM_MAX_CHANNELS 8u
+#define NRT_ROOM_MAX_SECTIONS 16u
+
+/// Sets room correction while the device runs: every channel is scaled by `preamp` (linear), then channel c runs
+/// through its own `counts[c]` sections, read from `sections[c * NRT_ROOM_MAX_SECTIONS …]`, in double precision,
+/// ahead of the equalizer, gain and dither. Channels at or beyond `channels` (or NRT_ROOM_MAX_CHANNELS) get the
+/// preamp only. No sections and a preamp of exactly 1.0 (or `channels` 0) turns it off and keeps the bit-transparent
+/// path. Same publication rules as the equalizer: next I/O cycle, memory kept while the counts are unchanged, never
+/// on passthrough (DoP) or integer samples, one caller at a time.
+void nrt_context_set_room(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullable sections, const uint32_t *_Nullable counts,
+                          uint32_t channels, double preamp);
+
 #define NRT_METER_CHANNELS 16u
 
 /// Peak (absolute, linear) since the last call, per decoded channel (0 … NRT_METER_CHANNELS-1).

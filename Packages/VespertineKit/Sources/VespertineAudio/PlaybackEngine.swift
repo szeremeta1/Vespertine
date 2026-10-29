@@ -91,8 +91,24 @@ public struct EngineSettings: Sendable, Equatable {
     public var matchSixteenBit = false
     /// Parametric equalizer per device UID. A flat preset counts as none.
     public var equalizers: [String: EQPreset] = [:]
+    /// Room correction per device UID, present only where it is switched on. One that changes nothing counts as none.
+    public var roomCorrections: [String: RoomCorrectionPlayback] = [:]
 
     public init() {}
+
+    /// The room correction chosen for `device`; nil = none (or one that changes nothing). Whether it applies to a
+    /// given stream is `roomCorrection(for:plan:)`.
+    public func roomCorrection(for device: OutputDevice?) -> RoomCorrectionPlayback? {
+        guard let device, let c = roomCorrections[device.uid], !c.isFlat else { return nil }
+        return c
+    }
+
+    /// The room correction that runs for `plan` on `device`: PCM Vespertine renders, no Spatial Audio, and the
+    /// channel count it was measured for. nil otherwise (the signal path then names it as bypassed).
+    public func roomCorrection(for device: OutputDevice?, plan: OutputPlan) -> RoomCorrectionPlayback? {
+        guard plan.mode == .pcm, plan.spatial == .off, let c = roomCorrection(for: device), c.applies(channels: plan.channels) else { return nil }
+        return c
+    }
 
     /// The equalizer that plays on `device`; nil = none (or one that changes nothing).
     public func equalizer(for device: OutputDevice?) -> EQPreset? {
@@ -664,7 +680,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
             // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
             let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
-                && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil)
+                && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
+                    || new.roomCorrection(for: sessionDevice) != nil)
             if deviceChanged || leavesInteger, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
@@ -973,7 +990,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                           deviceName: device.name, deviceUID: device.uid, deviceProfile: device.profile, volume: volume,
                           replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil,
                           equalizer: plan.mode == .pcm ? settings.equalizer(for: device)?.name : nil,
-                          bypassedEqualizer: plan.mode == .pcm ? nil : settings.equalizer(for: device)?.name)
+                          bypassedEqualizer: plan.mode == .pcm ? nil : settings.equalizer(for: device)?.name,
+                          roomCorrection: settings.roomCorrection(for: device, plan: plan)?.name,
+                          bypassedRoomCorrection: settings.roomCorrection(for: device, plan: plan) == nil ? settings.roomCorrection(for: device)?.name : nil)
     }
 
     private func applyGain() {
@@ -988,6 +1007,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         sections.withUnsafeBufferPointer { buffer in
             nrt_context_set_eq(session.context, buffer.baseAddress, UInt32(buffer.count), eq?.preampGain ?? 1)
         }
+        // Room correction: same rules, and only for the channel layout it was measured with.
+        let room = session.applied.integerMode ? nil : settings.roomCorrection(for: sessionDevice, plan: session.plan)
+        RoomCorrectionPlayback.install(room, on: session.context, sampleRate: session.applied.sampleRate)
     }
 
     private func teardownDecoding() {
@@ -1098,6 +1120,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         return settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
+            && settings.roomCorrection(for: device) == nil
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
@@ -1106,6 +1129,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func mayMatchSixteenBit(item: PlayableItem, device: OutputDevice) -> Bool {
         settings.matchSixteenBit && settings.exclusive && !device.alwaysShared
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
+            && settings.roomCorrection(for: device) == nil
     }
 
     /// The item playing (or paused), whichever path plays it.
@@ -1505,6 +1529,11 @@ public final class PlaybackEngine: @unchecked Sendable {
             path?.equalizer = integer ? nil : settings.equalizer(for: sessionDevice)?.name
         } else if path != nil {
             path?.bypassedEqualizer = settings.equalizer(for: sessionDevice)?.name
+        }
+        if let plan = path?.plan {
+            let room = path?.applied.integerMode == true ? nil : settings.roomCorrection(for: sessionDevice, plan: plan)
+            path?.roomCorrection = room?.name
+            path?.bypassedRoomCorrection = room == nil ? settings.roomCorrection(for: sessionDevice)?.name : nil
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

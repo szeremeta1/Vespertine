@@ -20,7 +20,7 @@ final class AppUpdater: NSObject {
         // release feed's updates aren't its to install. A feed given for testing (launch arguments only: a value saved
         // in the settings must never switch updates off for good) turns them on.
         let arguments = LaunchArguments()
-        let development = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+        let development = Bundle.main.bundleIdentifier.map { $0.hasSuffix(".dev") || $0.hasSuffix(".roomtest") } == true
         isEnabled = (arguments.string(forKey: "VespertineDataDirectory") == nil && !development)
             || arguments.string(forKey: "VespertineUpdateFeedOverride") != nil
         super.init()
