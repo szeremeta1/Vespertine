@@ -13,6 +13,10 @@
 
 struct NFFDecoder {
     AVFormatContext *fmt;
+    AVIOContext *cacheIO;
+    NFFReadAt cacheRead;
+    void *cacheOpaque;
+    int64_t cacheSize, cacheOffset;
     AVCodecContext *ctx;
     AVPacket *packet;
     AVFrame *frame;
@@ -40,9 +44,38 @@ static void fail(char *error, int size, const char *msg, int code) {
     snprintf(error, (size_t)size, "%s%s%s", msg, code < 0 ? ": " : "", text);
 }
 
-NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
+static int cache_read(void *opaque, uint8_t *buffer, int count) {
+    NFFDecoder *d = opaque;
+    int n = d->cacheRead(d->cacheOpaque, d->cacheOffset, buffer, count);
+    if (n > 0) { d->cacheOffset += n; return n; }
+    return n == 0 ? AVERROR_EOF : AVERROR(EIO);
+}
+
+static int64_t cache_seek(void *opaque, int64_t offset, int whence) {
+    NFFDecoder *d = opaque;
+    if (whence == AVSEEK_SIZE) return d->cacheSize;
+    whence &= ~AVSEEK_FORCE;
+    int64_t base = whence == SEEK_SET ? 0 : whence == SEEK_CUR ? d->cacheOffset : whence == SEEK_END ? d->cacheSize : -1;
+    if (base < 0 || offset < -base || offset > d->cacheSize - base) return AVERROR(EINVAL);
+    d->cacheOffset = base + offset;
+    return d->cacheOffset;
+}
+
+static NFFDecoder *open_source(const char *path, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
     NFFDecoder *d = calloc(1, sizeof *d);
     if (!d) return NULL;
+    if (readAt) {
+        d->cacheRead = readAt; d->cacheOpaque = opaque; d->cacheSize = size;
+        unsigned char *buffer = av_malloc(32768);
+        d->fmt = avformat_alloc_context();
+        d->cacheIO = buffer ? avio_alloc_context(buffer, 32768, 0, d, cache_read, NULL, cache_seek) : NULL;
+        if (!d->fmt || !d->cacheIO) {
+            if (!d->cacheIO) av_free(buffer);
+            nff_close(d); return NULL;
+        }
+        d->fmt->pb = d->cacheIO;
+        d->fmt->flags |= AVFMT_FLAG_CUSTOM_IO;
+    }
     // Every format opened here describes itself in its header or first frames (DSF/DSDIFF headers, DTS and
     // TrueHD frames carry their layout). FFmpeg's default analysis reads up to 5 MB / 5 s first, which on a
     // busy network share takes many seconds, every time a song starts or moves to another output.
@@ -51,7 +84,7 @@ NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     av_dict_set(&options, "analyzeduration", "100000", 0);   // microseconds
     int r = avformat_open_input(&d->fmt, path, NULL, &options);
     av_dict_free(&options);
-    if (r < 0) { fail(error, errorSize, "open", r); free(d); return NULL; }
+    if (r < 0) { fail(error, errorSize, "open", r); nff_close(d); return NULL; }
     // The DSF and DSDIFF readers leave the file at the start of the audio data once the header is read.
     d->dataStart = d->fmt->pb ? avio_tell(d->fmt->pb) : -1;
     if ((r = avformat_find_stream_info(d->fmt, NULL)) < 0) { fail(error, errorSize, "read stream info", r); nff_close(d); return NULL; }
@@ -94,12 +127,21 @@ NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
     return d;
 }
 
+NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
+    return open_source(path, NULL, 0, NULL, error, errorSize);
+}
+
+NFFDecoder *nff_open_cached(const char *path, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
+    return open_source(path, opaque, size, readAt, error, errorSize);
+}
+
 void nff_close(NFFDecoder *d) {
     if (!d) return;
     avcodec_free_context(&d->ctx);
     av_packet_free(&d->packet);
     av_frame_free(&d->frame);
     if (d->fmt) avformat_close_input(&d->fmt);
+    if (d->cacheIO) { av_freep(&d->cacheIO->buffer); avio_context_free(&d->cacheIO); }
     free(d->fifo);
     free(d->dsd);
     free(d);

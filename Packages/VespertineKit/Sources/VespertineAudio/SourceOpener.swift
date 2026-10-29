@@ -110,7 +110,7 @@ enum SourceOpener {
 
     /// The speakers of a DSF file's channel type (DSF specification 1.01, format chunk): nil for mono and stereo.
     static func dsfLabels(_ url: URL) -> [AudioChannelLabel]? {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return nil }
         defer { try? file.close() }
         guard let head = try? file.read(upToCount: 52), head.count == 52,
               String(decoding: head[0..<4], as: UTF8.self) == "DSD ", String(decoding: head[28..<32], as: UTF8.self) == "fmt " else { return nil }
@@ -368,7 +368,7 @@ enum SourceOpener {
 
     /// RF64 / BW64 (EBU Tech 3306, ITU-R BS.2088) or Sony Wave64, by the file's first bytes.
     static func isLargeWAV(_ url: URL) -> Bool {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return false }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return false }
         defer { try? file.close() }
         guard let head = try? file.read(upToCount: 12), head.count == 12 else { return false }
         let bytes = [UInt8](head)

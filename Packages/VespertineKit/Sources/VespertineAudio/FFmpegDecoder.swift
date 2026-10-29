@@ -14,6 +14,7 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
 
     let url: URL
     private var handle: OpaquePointer?
+    private var cacheEntry: NetworkPlaybackCache.Entry?
     var rawHandle: OpaquePointer? { handle }
     private(set) var isOpen = false
     private var format: AVAudioFormat?
@@ -77,7 +78,21 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
     func open() throws {
         guard !isOpen else { return }
         var error = [CChar](repeating: 0, count: 256)
-        guard let h = nff_open(url.path, &error, Int32(error.count)) else {
+        cacheEntry = NetworkPlaybackCache.lookup(url)
+        let opened: OpaquePointer?
+        if let entry = cacheEntry, !entry.isComplete {
+            opened = nff_open_cached(url.path, Unmanaged.passUnretained(entry).toOpaque(), entry.size, { opaque, offset, buffer, count in
+                let entry = Unmanaged<NetworkPlaybackCache.Entry>.fromOpaque(opaque).takeUnretainedValue()
+                do {
+                    let data = try entry.read(at: offset, count: Int(count))
+                    data.copyBytes(to: buffer, count: data.count)
+                    return Int32(data.count)
+                } catch { return -1 }
+            }, &error, Int32(error.count))
+        } else {
+            opened = nff_open(url.path, &error, Int32(error.count))
+        }
+        guard let h = opened else {
             throw DTSError.unsupported(String(cString: error))
         }
         handle = h

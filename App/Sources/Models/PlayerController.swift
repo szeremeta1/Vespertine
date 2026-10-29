@@ -119,6 +119,7 @@ final class PlayerController {
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
     var isPlaying: Bool { state == .playing }
+    var loading: Bool { buffering || (requested != nil && current.map { shares.isNetwork($0.track) } == true) }
     var upcoming: ArraySlice<QueueEntry> {
         guard let i = currentIndex, i + 1 < queue.count else { return [] }
         return queue[(i + 1)...]
@@ -371,7 +372,9 @@ final class PlayerController {
 
     /// Starts copying the current and next network tracks locally (when the cache is on).
     private func prefetchNetworkTracks() {
-        shares.prefetch(current: current?.track, upcoming: upcoming.map(\.track))
+        // The engine stages current/next before decoding. An independent copy of the same playing file
+        // would compete for the connection; explicit Keep Offline jobs remain owned by NetworkCache.
+        shares.cache.keepOnly([])
     }
 
     private func syncMirror(reloadCurrent: Bool = false) {
@@ -450,6 +453,7 @@ final class PlayerController {
     }
 
     func togglePlayPause() {
+        if loading { stop(); return }
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
         switch state {

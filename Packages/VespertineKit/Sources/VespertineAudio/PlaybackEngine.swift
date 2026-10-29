@@ -122,7 +122,59 @@ public final class PlaybackEngine: @unchecked Sendable {
         get { callbacks.withLock { $0.resolver } }
         set { callbacks.withLock { $0.resolver = newValue } }
     }
-    private func resolve(_ item: PlayableItem) -> URL { urlResolver?(item) ?? item.url }
+    private func resolve(_ item: PlayableItem) -> URL {
+        staged[cacheKey(item)]?.url ?? urlResolver?(item) ?? item.url
+    }
+    private func cacheKey(_ item: PlayableItem) -> String { item.cacheKey ?? item.url.path }
+    private var staged: [String: NetworkPlaybackCache.Entry] = [:]
+    private var stagedFolder: (key: String, entry: NetworkPlaybackCache.DirectoryEntry)?
+    private lazy var playbackCache = NetworkPlaybackCache.shared
+
+    /// Stage bytes before opening a decoder. Regular tracks start only after the ENTIRE source is local.
+    /// Large DSD uses guarded cache I/O and a substantial on-disk lead (see prefill).
+    private func prepareFile(_ item: PlayableItem) throws -> URL {
+        let key = cacheKey(item)
+        if let folder = stagedFolder, folder.key == key { return folder.entry.url }
+        if let entry = staged[key], entry.isComplete { return entry.url }
+        let resolved = urlResolver?(item) ?? item.url
+        guard resolved == item.url, item.cacheKey != nil || Self.isOnNetworkVolume(resolved) else { return resolved }
+        shared.withLock { $0.snapshot.isBuffering = true }
+        defer { shared.withLock { $0.snapshot.isBuffering = false } }
+        stagedFolder = nil
+        if resolved.pathExtension.lowercased() == "ifo" {
+            for entry in staged.values { entry.cancel() }
+            staged.removeAll()
+            playbackCache.discardPrefetch()
+            do {
+                let folder = try playbackCache.directoryEntry(for: resolved, cancelled: { self.superseded })
+                stagedFolder = (key, folder)
+                return folder.url
+            } catch is CancellationError { throw Superseded() }
+        }
+        // Release the previous source's staging lease before reserving another large file. Open decoder
+        // file descriptors keep its bytes alive until they finish; a prefetched matching next is retained.
+        if staged[key] == nil {
+            for entry in staged.values { entry.cancel() }
+            staged.removeAll()
+        }
+        playbackCache.discardPrefetch(except: key)
+        let entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved)
+        // Keep current, and let the prefetched next lease survive until it is taken by entry().
+        staged = [key: entry]
+        let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
+            || (item.sacdArea != nil && item.dvd == nil)
+        let progressive = dsd && entry.size > 512 << 20
+        do {
+            try entry.prepare(full: !progressive, lead: 16 << 20, cancelled: { self.superseded })
+        } catch is CancellationError { throw Superseded() }
+        let next = nextItemProvider?(item)
+        if let next, next.id != item.id, next.cacheKey != nil || Self.isOnNetworkVolume(next.url) {
+            // A progressive current track gets the whole link until its copy is finished. Copying the next
+            // huge file concurrently would reduce its reserve precisely when the connection is strained.
+            if entry.isComplete { playbackCache.prefetch(key: cacheKey(next), url: urlResolver?(next) ?? next.url) }
+        } else { playbackCache.prefetch(key: nil, url: nil) }
+        return entry.url
+    }
     /// Delivered on the main queue.
     public var eventHandler: (@Sendable @MainActor (EngineEvent) -> Void)? {
         get { callbacks.withLock { $0.event } }
@@ -258,6 +310,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Read live from a network share: a file of a share with no complete local copy, or any file on a volume
     /// macOS doesn't mark local (a share mounted in the Finder and added as a folder, a DVD folder on a share).
     private func isStreaming(_ item: PlayableItem) -> Bool {
+        if let entry = staged[cacheKey(item)] { return !entry.isComplete }
         let url = resolve(item)
         return item.cacheKey != nil ? url == item.url : Self.isOnNetworkVolume(url)
     }
@@ -484,6 +537,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 followFormatChange()
             } else if state == .playing {
                 switchToLocalCopyIfReady()
+                prefetchStagedNext()
                 didWork = fill()
                 checkTransitions()
                 updateRebuffering()
@@ -547,6 +601,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             shared.withLock { $0.snapshot.lastError = nil }
             carried = nil
             teardownDecoding()
+            for (key, entry) in staged where key != cacheKey(item) { entry.cancel() }
+            staged = staged.filter { $0.key == cacheKey(item) }
             session?.flush()
             parked = nil
             start(item, at: 0, autoplay: true)
@@ -583,6 +639,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             standingIn = nil
             state = .stopped
             lastAudibleSegmentID = nil
+            releaseStaging()
         case .seek(let seconds):
             guard let current = currentItem() else { return }
             let resume = state == .playing || awaitingDevice != nil
@@ -814,7 +871,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         mark("device")
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.
-        let url = resolve(item)
+        let url = try prepareFile(item)
         let probed: ProbedSource
         let carry = carried.flatMap { $0.item == item.id && $0.probed.url == url ? $0 : nil }
         if carried != nil, carry == nil { carried = nil }
@@ -876,7 +933,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         draining = false
         nrt_context_set_draining(session.context, false)
         lastAudibleSegmentID = nil
-        prefill()
+        try prefill()
+        if superseded { throw Superseded() }
         mark("prefill")
     }
 
@@ -1088,6 +1146,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// the rest of the track no longer depends on the network or the server's disks. Only for decoders
     /// whose output after a seek is identical to continuous decoding (lossless PCM and DoP).
     private func switchToLocalCopyIfReady() {
+        // A staged decoder already reads through the local cache, including lossy and DSD→PCM paths.
+        if let decoding, staged[cacheKey(decoding.item)] != nil { return }
         guard let decoding, decoding.streaming, !decoding.staysOnShare, !decoding.finished, !decoding.inputExhausted,
               Date().timeIntervalSince(localCopyCheckedAt) >= 1 else { return }
         localCopyCheckedAt = Date()
@@ -1138,7 +1198,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
 
-    private func prefill() {
+    private func prefill() throws {
         guard let session else { return }
         // Network files (streamed, not yet cached) start with more in hand: a slow first read from
         // a share must not become an audible gap.
@@ -1156,6 +1216,16 @@ public final class PlaybackEngine: @unchecked Sendable {
             // still goes first, and not for ever (the output then starts and rebuffers).
             guard let ahead = decoding?.decoder as? ReadAheadDecoder, Date() < giveUp else { break }
             ahead.waitForAudio(timeout: 0.05)
+        }
+        if let decoding, let entry = staged[cacheKey(decoding.item)], !entry.isComplete {
+            shared.withLock { $0.snapshot.isBuffering = true }
+            defer { shared.withLock { $0.snapshot.isBuffering = false } }
+            // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
+            // these are the original compressed/container bytes. Reads beyond the lead remain guarded.
+            let format = decoding.probed.format
+            let lead = min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
+            do { try entry.prepare(full: false, lead: lead, at: min(entry.lastRead, entry.size), cancelled: { self.superseded }) }
+            catch is CancellationError { throw Superseded() }
         }
     }
 
@@ -1254,7 +1324,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         while let next = candidate, attempts < 8 {
             attempts += 1
             do {
-                let probed = try SourceOpener.probe(resolve(next), area: next.sacdArea, dvd: next.dvd)
+                let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
                 let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
                 if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
                     // macOS renders Atmos: let this track play out, then hand the next one over.
@@ -1339,7 +1409,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 segments = [Segment(item: pending.item, path: d.path, startRingFrame: session.totalWritten,
                                     startOffsetSeconds: 0, durationSeconds: d.durationSeconds)]
                 draining = false
-                prefill()
+                try prefill()
                 try session.start()
                 log.notice("Next song plays on \(pending.device.name, privacy: .public) at \(SampleRate.format(session.applied.sampleRate), privacy: .public) kHz after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
             } catch {
@@ -1358,6 +1428,23 @@ public final class PlaybackEngine: @unchecked Sendable {
         state = .stopped
         lastAudibleSegmentID = nil
         emit(.queueEnded)
+        releaseStaging()
+    }
+
+    private func releaseStaging() {
+        guard !staged.isEmpty || stagedFolder != nil else { return }
+        stagedFolder = nil
+        for entry in staged.values { entry.cancel() }
+        staged.removeAll()
+        playbackCache.discardPrefetch()
+    }
+
+    private func prefetchStagedNext() {
+        guard let item = decoding?.item, let entry = staged[cacheKey(item)], entry.isComplete else { return }
+        let next = nextItemProvider?(item)
+        if let next, next.id != item.id, next.cacheKey != nil || Self.isOnNetworkVolume(next.url) {
+            playbackCache.prefetch(key: cacheKey(next), url: urlResolver?(next) ?? next.url)
+        } else { playbackCache.prefetch(key: nil, url: nil) }
     }
 
     // MARK: Position
@@ -1416,6 +1503,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
+                || (st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true)
             s.snapshot.waitingForDevice = waiting
             s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare

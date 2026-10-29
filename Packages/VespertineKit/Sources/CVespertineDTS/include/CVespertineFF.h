@@ -11,6 +11,10 @@ typedef struct NFFDecoder NFFDecoder;
 
 /// Opens the best audio stream of a file. NULL (and a message in `error`) if there's none it can decode.
 NFFDecoder *_Nullable nff_open(const char *_Nonnull path, char *_Nullable error, int errorSize);
+/// Byte-exact guarded cache reads. readAt returns bytes, zero at EOF, negative on error.
+typedef int (*NFFReadAt)(void *_Nonnull opaque, int64_t offset, uint8_t *_Nonnull data, int count);
+NFFDecoder *_Nullable nff_open_cached(const char *_Nonnull path, void *_Nonnull opaque, int64_t size,
+                                    NFFReadAt _Nonnull readAt, char *_Nullable error, int errorSize);
 void nff_close(NFFDecoder *_Nullable d);
 
 int nff_channels(const NFFDecoder *_Nonnull d);
