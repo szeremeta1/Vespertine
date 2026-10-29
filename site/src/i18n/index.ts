@@ -1,10 +1,10 @@
 // The site's words in every language: src/i18n/<code>.json, English (en.json) the source. Pages take a `lang` and
 // read their strings, paths, numbers and dates from here. scripts/check-i18n.mjs keeps every locale complete.
 import en from './en.json';
-import { LOCALES, CODES, DEFAULT_LOCALE } from './locales.mjs';
+import { LOCALES, CODES, DEFAULT_LOCALE, hreflangOf } from './locales.mjs';
 import { notesHash, releaseParts } from './release-parts.mjs';
 
-export { LOCALES, CODES, DEFAULT_LOCALE };
+export { LOCALES, CODES, DEFAULT_LOCALE, hreflangOf };
 export type Lang = string;
 export type Dict = typeof en;
 type Release = { version: string; body: string; date: string };
@@ -43,6 +43,10 @@ export function pagePath(lang: Lang, page: Page) {
   const prefix = lang === DEFAULT_LOCALE ? '/' : `/${lang}/`;
   return page === 'home' ? prefix : `${prefix}${page}.html`;
 }
+
+/** A page's social card (scripts/make-og.mjs): /og/home.jpg … in English, /og/<code>/home.jpg … in the others. */
+export type Card = 'home' | 'press' | 'privacy' | 'terms';
+export const ogCard = (lang: Lang, card: Card) => (lang === DEFAULT_LOCALE ? `/og/${card}.jpg` : `/og/${lang}/${card}.jpg`);
 
 // Numbers and dates in the locale's own digits, separators and calendar.
 export const num = (lang: Lang, n: number) => new Intl.NumberFormat(lang).format(n);
