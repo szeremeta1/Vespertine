@@ -57,6 +57,7 @@ export const links = {
   loopback: `${BLOB}/docs/LOOPBACK.md`,
   architecture: `${BLOB}/docs/ARCHITECTURE.md`,
   dvd: `${BLOB}/docs/DVD-VIDEO-LPCM.md`,
+  roomCorrection: `${BLOB}/docs/ROOM-CORRECTION.md`,
   development: `${BLOB}/docs/DEVELOPMENT.md`,
   contributing: `${BLOB}/CONTRIBUTING.md`,
   signalPath: `${BLOB}/Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift`,

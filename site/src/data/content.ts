@@ -4,10 +4,10 @@
 import { app, links } from './app';
 
 export const description =
-  'Free, open-source Mac player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, and a bit-perfect signal path you can inspect.';
+  'Free, open-source Mac player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, room correction measured in your own room, and a bit-perfect signal path you can inspect.';
 
 export const hero = {
-  lede: `The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. A signal path shows each step from file to output. In English and ${app.languages} other languages.`,
+  lede: `The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. Room correction measures your room with a USB microphone and corrects each speaker; it’s off until you turn it on. A signal path shows each step from file to output. In English and ${app.languages} other languages.`,
   fine: 'Channel-for-channel output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted.',
 };
 
@@ -79,6 +79,28 @@ export const scenes: Scene[] = [
     shot: 'bit-perfect-fosi-zd3-24-96',
     alt: 'Vespertine playing Lazar Berman’s Liszt, Années de pèlerinage, from a 24-bit / 96 kHz FLAC: the inspector marks it bit-perfect and exclusive on a Fosi Audio ZD3, with each step of the signal path.',
     float: { shot: 'loopback-test', alt: 'The loopback test sheet: 24-bit at 44.1 and 96 kHz, 16-bit padded and a gapless pair, each bit-exact.', caption: 'Loopback test · software check' },
+  },
+  {
+    id: 'room-correction',
+    jack: 'Room correction',
+    kicker: 'Room correction',
+    title: 'Measure your room. Correct each speaker.',
+    lede: 'Measure your room with a UMIK-1 or another calibrated USB microphone, and Vespertine fits filters to each speaker from what it hears at your seat.',
+    body: [
+      'Sweeps play through one speaker at a time, at one to five spots around your listening seat. Each speaker gets its own filters, designed from the measurement. They are mostly cuts: they take down the room’s peaks and boost broad dips only gently. The same measurement sets each speaker’s delay and level, so every speaker reaches your seat at the same time and the same loudness. Room correction is off by default, and playback stays bit-perfect while it’s off. When it’s on, the signal path says <span class="mono nowrap">ROOM CORRECTION</span>.',
+    ],
+    list: [
+      'Three targets: Warm (the default), Gentle tilt and Flat. Correct the bass only or the full range, and redesign the filters later without measuring again.',
+      'Imports filters from REW or Equalizer APO, with each speaker’s delay and level, and exports Equalizer APO text.',
+      'Imports impulse responses (WAV, AIFF, CAF or FLAC) and plays them by convolution.',
+      'Stereo and 5.1.',
+      'The Room Portrait shows the speakers, your seat and each microphone spot as it’s measured. The Curve Reveal then turns the measured response into the predicted one, and a before/after switch compares them.',
+    ],
+    note: 'The “after” curve is predicted from the measurement and the filters, not measured. To see what the room really does, measure again with correction on.',
+    links: [{ href: links.roomCorrection, text: 'How room correction works' }],
+    shot: 'room-correction-predicted',
+    alt: 'Vespertine’s predicted room correction for a stereo pair with the Warm target: for each speaker, the measured response, the target and the predicted response after correction, with a room peak near 120 Hz cut by 14 and 18 dB, and each speaker’s filters.',
+    float: { shot: 'room-correction-portrait-detail', alt: 'The Room Portrait in the measurement wizard: left and right speakers, the seat, and five microphone spots around it, the first with the microphone on it.', caption: 'Room Portrait · 5 spots' },
   },
   {
     id: 'surround',
@@ -195,6 +217,7 @@ export const badges = [
   { text: '32 / 192' },
   { text: '44.1 → 48 <span class="unit">kHz</span>', tone: 'copper' },
   { text: 'DSD 128 · <span class="unit">DoP</span>' },
+  { text: 'Room correction', tone: 'copper' },
   { text: 'Spatial · head tracked' },
   { text: 'Synthetic high frequencies?', tone: 'copper' },
 ];
@@ -228,6 +251,7 @@ export const compare = {
     ['Apple Spatial Audio for local surround', 'Yes', 'Catalog Atmos only³', 'Not documented', 'Not documented', 'Not documented', 'Not documented', 'Yes', 'Not documented'],
     ['Hi-res file analysis', 'Yes', 'No', 'AudioScan', 'Dynamic range, loudness', 'Yes', 'Not documented', 'No (live spectrum only)', 'No (live spectrum only)'],
     ['SACD ISO', 'Yes', 'No', 'Yes', 'No (DSF/DFF only)', 'Yes', 'No', 'No', 'No⁴'],
+    ['Room correction', 'Measured in the app (USB mic), or REW / APO and impulse-response import', 'No', 'Via convolution (Origin: paid option) or Audio Units', 'Via convolution', 'No (by design)', 'Not documented', 'No', 'Not documented'],
     ['Convolution / audio effect plugins', 'Yes (room correction) / No', 'No / No', 'Yes (Origin: paid option) / Audio Units', 'Yes / No', 'No / No', 'Not documented / Not documented', 'No / No', 'Not documented / Audio Units'],
     ['Streaming services', 'No', 'Apple Music', 'Studio: yes; Origin: no', 'Yes', 'No (local + UPnP)', 'No (internet radio)', 'No (internet radio)', 'No (internet radio)'],
   ],
@@ -259,6 +283,10 @@ export const faq = [
   {
     q: 'How do I know it’s actually bit-perfect?',
     a: `The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it. The decoders have automated tests (TrueHD against its source, DTS against FFmpeg’s own decoder), a built-in loopback test checks the software path sample by sample, and <span class="mono nowrap">vespertine-probe</span> lets you check your own hardware. <a href="${links.verification}">How to verify it yourself</a>.`,
+  },
+  {
+    q: 'Does it do room correction?',
+    a: `Yes. Measure your room with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level, in stereo or 5.1. It also imports REW and Equalizer APO filters and impulse responses. It’s off by default, playback stays bit-perfect while it’s off, and the signal path says <span class="mono nowrap">ROOM CORRECTION</span> while it’s on. <a href="${links.roomCorrection}">How room correction works</a>.`,
   },
   {
     q: 'Can it play SACD and DVD discs?',
