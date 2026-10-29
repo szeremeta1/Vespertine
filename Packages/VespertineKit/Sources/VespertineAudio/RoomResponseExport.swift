@@ -20,6 +20,11 @@ public struct RoomMagnitudeResponse: Sendable {
     /// `calibratedDB` with its mean over 200 Hz to 2 kHz taken out, for plotting.
     public let normalisedDB: [Double]
     public let clockDriftPPM: Double
+    /// The calibrated level over 200 Hz to 2 kHz (dB): how loud this speaker is at the microphone.
+    public let levelDB: Double
+    /// When the speaker's sound arrived, in milliseconds after the speaker that played the timing references (0 when
+    /// it played them itself, give or take the filters' own delay, which every speaker shares).
+    public let arrivalMs: Double
 
     /// Points per octave of the log frequency grid.
     public static let pointsPerOctave = 24.0
@@ -38,8 +43,10 @@ public struct RoomMagnitudeResponse: Sendable {
         let centre = frequencies.indices.filter { frequencies[$0] >= 200 && frequencies[$0] <= 2_000 }
         let basis = centre.isEmpty ? Array(calibrated.indices) : centre
         let mean = basis.map { calibrated[$0] }.reduce(0, +) / Double(max(1, basis.count))
+        let arrival: Double = (impulse.arrivalSamples - Double(analysis.leadSamples)) / layout.sampleRate * 1000
         return RoomMagnitudeResponse(frequencies: frequencies, rawDB: raw, micCompensationDB: compensation, calibratedDB: calibrated,
-                                     normalisedDB: calibrated.map { $0 - mean }, clockDriftPPM: analysis.drift.ppm)
+                                     normalisedDB: calibrated.map { $0 - mean }, clockDriftPPM: analysis.drift.ppm,
+                                     levelDB: mean, arrivalMs: arrival)
     }
 
     /// `normalisedDB` averaged in power over a sixth of an octave either side, for reading the shape through the ripple.

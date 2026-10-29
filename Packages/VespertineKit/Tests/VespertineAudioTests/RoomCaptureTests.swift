@@ -17,7 +17,7 @@ final class FakeRoomDevice: RoomCaptureDevice, @unchecked Sendable {
     private let lock = NSLock()
     private var script: [Step] = []
     private var cursor = 0
-    private(set) var startedWith: (request: RoomCaptureRequest, stimulus: [Float])?
+    private(set) var startedWith: (request: RoomCaptureRequest, stimulus: RoomStimulus)?
     private(set) var startCount = 0
     private(set) var stopCount = 0
     var startError: Error?
@@ -27,13 +27,13 @@ final class FakeRoomDevice: RoomCaptureDevice, @unchecked Sendable {
 
     func load(_ steps: [Step]) { lock.withLock { script = steps; cursor = 0 } }
 
-    func start(request: RoomCaptureRequest, stimulus: [Float]) throws {
+    func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws {
         if let startError { throw startError }
         lock.withLock {
             startCount += 1
             startedWith = (request, stimulus)
             if let room {
-                let recording = room(stimulus)
+                let recording = room(stimulus.mixed)
                 script = stride(from: 0, to: recording.count, by: chunk).map {
                     .frames(Array(recording[$0..<min($0 + chunk, recording.count)]))
                 }
@@ -179,7 +179,7 @@ struct RoomCaptureTests {
         let recording = try await s.record(request(l))
         #expect(device.startedWith?.request.inputDevice == 91 && device.startedWith?.request.outputDevice == 72)
         #expect(device.startedWith?.request.inputChannel == 1 && device.startedWith?.request.outputChannel == 2)
-        #expect(device.startedWith?.stimulus == l.stimulus())
+        #expect(device.startedWith?.stimulus == RoomStimulus(tracks: [.init(channel: 2, samples: l.stimulus())]))
         #expect(device.stopCount >= 1)
         #expect(s.state == .idle)
         #expect(recording.samples.count == l.recordingFrames && recording.surplusFrames == 0)
@@ -189,8 +189,22 @@ struct RoomCaptureTests {
         let analysis = try recording.analyse()
         #expect(abs(analysis.drift.ppm - Self.ppm) < 1, "drift \(analysis.drift.ppm)")
         let ir = try l.sweep.recover(recording: analysis.sweepSegment)
-        #expect(abs(ir.delaySamples) <= 1)
+        #expect(abs(ir.delaySamples - analysis.leadSamples) <= 1)   // the segment starts a lead before the sweep
         #expect(abs(ir.response(at: 1_000).magnitudeDB - 20 * log10(Self.gain)) < 0.5)
+    }
+
+    @Test("With a reference channel, the references play there and the sweep on the output channel, from the same frame")
+    func referenceChannel() throws {
+        let l = try layout(sweep: 1)
+        let r = RoomCaptureRequest(inputDevice: 91, outputDevice: 72, inputChannel: 0, outputChannel: 1, referenceChannel: 0, layout: l)
+        let stimulus = r.stimulus()
+        #expect(stimulus.tracks.map(\.channel) == [0, 1])
+        #expect(stimulus.tracks[0].samples == l.referenceStimulus() && stimulus.tracks[1].samples == l.sweepStimulus())
+        #expect(stimulus.mixed == l.stimulus())
+        #expect(stimulus.tracks[1].samples[l.firstReferenceStart + 100] == 0 && stimulus.tracks[0].samples[l.sweepStart + 100] == 0)
+        // The reference speaker measuring itself is the plain mono capture.
+        let own = RoomCaptureRequest(inputDevice: 91, outputDevice: 72, inputChannel: 0, outputChannel: 0, referenceChannel: 0, layout: l)
+        #expect(own.referenceChannel == nil && own.stimulus().tracks.count == 1)
     }
 
     @Test("Buffers are bounded: a device that delivers more than planned is clipped to the plan and the surplus is counted")

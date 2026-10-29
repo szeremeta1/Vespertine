@@ -54,6 +54,8 @@ public struct RoomMeasurementSettings: Equatable, Sendable {
     public var requireDistinctRoutes = true
     /// Failed tries of one step before the run gives up on it.
     public var maxAttempts = 3
+    /// The sweeps take their timing references from one speaker (the left), so the speakers' delays can be lined up.
+    public var timeAgainstReference = true
 
     public init(inputDevice: UInt32, outputDevice: UInt32) {
         self.inputDevice = inputDevice
@@ -325,13 +327,21 @@ public final class RoomMeasurementController: @unchecked Sendable {
 
     // MARK: Steps
 
-    private func request(for speaker: RoomSpeaker, seconds: Double, level: Double) throws -> RoomCaptureRequest {
-        guard let entry = session.channelMap.entries.first(where: { $0.speaker == speaker }) else {
-            throw RoomCorrectionError.speakerNotInMap(speaker)
-        }
+    /// The speaker that plays the timing references during the sweeps: the left one (else the first in the map).
+    var referenceSpeaker: RoomSpeaker? {
+        let entries = session.channelMap.entries
+        return entries.first(where: { $0.speaker == .left })?.speaker ?? entries.min(by: { $0.output < $1.output })?.speaker
+    }
+
+    /// `timed`: the timing references come from the reference speaker (the sweeps, whose arrivals line the speakers
+    /// up); otherwise from the speaker itself (the level and route checks, which time each speaker on its own).
+    private func request(for speaker: RoomSpeaker, seconds: Double, level: Double, timed: Bool) throws -> RoomCaptureRequest {
+        let entries = session.channelMap.entries
+        guard let entry = entries.first(where: { $0.speaker == speaker }) else { throw RoomCorrectionError.speakerNotInMap(speaker) }
+        let reference = timed && settings.timeAgainstReference ? entries.first(where: { $0.speaker == referenceSpeaker })?.output : nil
         let layout = try RoomCaptureLayout(sampleRate: settings.sampleRate, sweepDuration: seconds, level: level)
-        return RoomCaptureRequest(inputDevice: settings.inputDevice, outputDevice: settings.outputDevice,
-                                  inputChannel: settings.inputChannel, outputChannel: entry.output, layout: layout)
+        return RoomCaptureRequest(inputDevice: settings.inputDevice, outputDevice: settings.outputDevice, inputChannel: settings.inputChannel,
+                                  outputChannel: entry.output, referenceChannel: reference, layout: layout)
     }
 
     private enum Capture {
@@ -344,7 +354,8 @@ public final class RoomMeasurementController: @unchecked Sendable {
         let attempt = inner.withLock { ($0.attempts[step] ?? 0) + 1 }
         set(.running(step, attempt: attempt))
         let req: RoomCaptureRequest
-        do { req = try request(for: speaker, seconds: seconds, level: level) }
+        let timed: Bool = if case .sweep = step { true } else { false }
+        do { req = try request(for: speaker, seconds: seconds, level: level, timed: timed) }
         catch { return .stop(fail(step, [.other(error.localizedDescription)], file: nil, level: level, metrics: nil)) }
         do {
             let recording = try await capturer.record(req)

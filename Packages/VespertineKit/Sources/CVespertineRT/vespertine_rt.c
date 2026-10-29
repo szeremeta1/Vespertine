@@ -139,6 +139,387 @@ void nrt_ring_reset(NRTRing *ring) {
     atomic_store(&ring->readPos, 0);
 }
 
+// Set on a triple buffer's middle index when the writer has published settings the render thread hasn't taken.
+#define NRT_EQ_FRESH 0x80000000u
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+// MARK: - FIR filters: two-stage partitioned overlap-save convolution
+//
+// A filter's first FIR_HEAD_TAPS taps run in NRT_FIR_BLOCK-frame partitions, all computed each block: that sets the
+// latency, one block. The rest, the tail, runs in FIR_TAIL_BLOCK-frame partitions, which cost far less per tap, and
+// each tail block's work is spread over the FIR_STEPS head blocks after it, so no single I/O cycle carries all of it.
+// A tail block's output is due two tail blocks after its input arrives, which is why the head covers the taps of the
+// first two. Delay lines hold the input's spectra, which don't depend on the filters, so new filters apply to the
+// whole history at once.
+
+#define FIR_N (2u * NRT_FIR_BLOCK)                          // head transform size
+#define FIR_BINS (NRT_FIR_BLOCK + 1u)                       // bins kept of a real signal's spectrum
+#define FIR_TAIL_BLOCK 4096u
+#define FIR_TAIL_N (2u * FIR_TAIL_BLOCK)
+#define FIR_TAIL_BINS (FIR_TAIL_BLOCK + 1u)
+#define FIR_STEPS (FIR_TAIL_BLOCK / NRT_FIR_BLOCK)          // head blocks per tail block: a tail period
+#define FIR_HEAD_TAPS (2u * FIR_TAIL_BLOCK)
+#define FIR_HEAD_PARTS (FIR_HEAD_TAPS / NRT_FIR_BLOCK)
+#define FIR_TAIL_PARTS ((NRT_FIR_MAX_TAPS - FIR_HEAD_TAPS + FIR_TAIL_BLOCK - 1) / FIR_TAIL_BLOCK)
+#define FIR_MAC_STEPS (FIR_STEPS - 2u)                      // step 0 transforms the input, the last the output
+#define FIR_MAC_PER_STEP ((FIR_TAIL_PARTS + FIR_MAC_STEPS - 1) / FIR_MAC_STEPS)
+#define FIR_BANKS 4u
+
+typedef struct {
+    uint32_t headParts[NRT_METER_CHANNELS];   // 0 = unfiltered
+    uint32_t tailParts[NRT_METER_CHANNELS];
+    float *head;    // filtered × FIR_HEAD_PARTS × (FIR_BINS re, FIR_BINS im), prescaled by 1/FIR_N
+    float *tail;    // filtered × FIR_TAIL_PARTS × (FIR_TAIL_BINS re, FIR_TAIL_BINS im), prescaled by 1/FIR_TAIL_N
+} NRTFIRBank;
+
+typedef struct {
+    uint32_t channels;    // the ring's channels: all are held back by the block, filtered or not
+    uint32_t filtered;    // the first channels that can have a filter: min(channels, NRT_METER_CHANNELS)
+    double *cosT, *sinT;  // FIR_TAIL_N / 2 each; smaller transforms read them strided
+    uint32_t *rev, *revTail;  // bit reversal for the half-size complex transforms: FIR_N / 2, FIR_TAIL_N / 2
+
+    // Settings: four banks. The writer fills `back` and swaps it into `middle`, marked NRT_EQ_FRESH. The render thread
+    // swaps its spare in for a fresh one, and keeps the old one until the new filters have fully taken over.
+    NRTFIRBank banks[FIR_BANKS];
+    _Atomic uint32_t middle;
+    uint32_t back;        // writer only
+    double *wre, *wim;    // writer only: FIR_TAIL_N each
+
+    // Render thread only.
+    uint32_t front, spare, next;
+    uint32_t transition;  // 0; 1: this tail period makes the tails of both `front` and `next`; 2: the next block fades
+    float *fdl;           // head delay line: filtered × FIR_HEAD_PARTS × 2 × FIR_BINS, newest at fdlPos
+    uint32_t fdlPos;
+    float *prev;          // filtered × NRT_FIR_BLOCK: the block before the one being collected
+    float *in;            // channels × NRT_FIR_BLOCK: the block being collected
+    float *out;           // channels × NRT_FIR_BLOCK: the block being played
+    uint32_t fill;
+    float *tailFdl;       // tail delay line: filtered × FIR_TAIL_PARTS × 2 × FIR_TAIL_BINS, newest at tailPos
+    uint32_t tailPos;
+    float *tailIn;        // 3 × filtered × FIR_TAIL_BLOCK: the tail block being filled, the last one, the one before
+    uint32_t tailFill, tailCur, tailPrev;
+    float *tailAcc;       // 2 (new, old) × filtered × 2 × FIR_TAIL_BINS: spectra being summed
+    float *tailOut;       // 2 × filtered × FIR_TAIL_BLOCK: the tail playing this period, and the next one's
+    bool tailLive[2][NRT_METER_CHANNELS];
+    float *tailOld;       // filtered × NRT_FIR_BLOCK: the old filters' tail for the block that fades
+    bool tailOldLive[NRT_METER_CHANNELS];
+    uint32_t step;        // head block within the tail period
+    uint32_t parity;      // which half of tailOut is playing
+    double *re, *im;      // FIR_TAIL_N each
+    float *acc;           // 2 × FIR_BINS
+    double *yOld, *yNew;  // NRT_FIR_BLOCK each
+    double *tailY;        // FIR_TAIL_BLOCK
+} NRTFIR;
+
+static void fir_destroy(NRTFIR *f) {
+    if (!f) return;
+    for (uint32_t i = 0; i < FIR_BANKS; i++) { free(f->banks[i].head); free(f->banks[i].tail); }
+    free(f->cosT); free(f->sinT); free(f->rev); free(f->revTail); free(f->wre); free(f->wim);
+    free(f->fdl); free(f->prev); free(f->in); free(f->out); free(f->tailFdl); free(f->tailIn); free(f->tailAcc);
+    free(f->tailOut); free(f->tailOld); free(f->re); free(f->im); free(f->acc); free(f->yOld); free(f->yNew); free(f->tailY);
+    free(f);
+}
+
+static void fir_bit_reverse_table(uint32_t *rev, uint32_t n) {
+    uint32_t bits = 0;
+    while ((1u << bits) < n) bits++;
+    for (uint32_t i = 0; i < n; i++) {
+        uint32_t r = 0;
+        for (uint32_t b = 0; b < bits; b++) if (i & (1u << b)) r |= 1u << (bits - 1 - b);
+        rev[i] = r;
+    }
+}
+
+static NRTFIR *fir_create(uint32_t channels) {
+    NRTFIR *f = calloc(1, sizeof(NRTFIR));
+    if (!f) return NULL;
+    f->channels = channels;
+    const uint32_t k = f->filtered = channels < NRT_METER_CHANNELS ? channels : NRT_METER_CHANNELS;
+    bool ok = true;
+    for (uint32_t i = 0; i < FIR_BANKS; i++) {
+        ok &= (f->banks[i].head = calloc((size_t)k * FIR_HEAD_PARTS * 2 * FIR_BINS, sizeof(float))) != NULL;
+        ok &= (f->banks[i].tail = calloc((size_t)k * FIR_TAIL_PARTS * 2 * FIR_TAIL_BINS, sizeof(float))) != NULL;
+    }
+    ok &= (f->cosT = calloc(FIR_TAIL_N / 2, sizeof(double))) != NULL;
+    ok &= (f->sinT = calloc(FIR_TAIL_N / 2, sizeof(double))) != NULL;
+    ok &= (f->rev = calloc(FIR_N / 2, sizeof(uint32_t))) != NULL;
+    ok &= (f->revTail = calloc(FIR_TAIL_N / 2, sizeof(uint32_t))) != NULL;
+    ok &= (f->wre = calloc(FIR_TAIL_N, sizeof(double))) != NULL;
+    ok &= (f->wim = calloc(FIR_TAIL_N, sizeof(double))) != NULL;
+    ok &= (f->fdl = calloc((size_t)k * FIR_HEAD_PARTS * 2 * FIR_BINS, sizeof(float))) != NULL;
+    ok &= (f->prev = calloc((size_t)k * NRT_FIR_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->in = calloc((size_t)channels * NRT_FIR_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->out = calloc((size_t)channels * NRT_FIR_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->tailFdl = calloc((size_t)k * FIR_TAIL_PARTS * 2 * FIR_TAIL_BINS, sizeof(float))) != NULL;
+    ok &= (f->tailIn = calloc((size_t)3 * k * FIR_TAIL_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->tailAcc = calloc((size_t)2 * k * 2 * FIR_TAIL_BINS, sizeof(float))) != NULL;
+    ok &= (f->tailOut = calloc((size_t)2 * k * FIR_TAIL_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->tailOld = calloc((size_t)k * NRT_FIR_BLOCK, sizeof(float))) != NULL;
+    ok &= (f->re = calloc(FIR_TAIL_N, sizeof(double))) != NULL;
+    ok &= (f->im = calloc(FIR_TAIL_N, sizeof(double))) != NULL;
+    ok &= (f->acc = calloc(2 * FIR_BINS, sizeof(float))) != NULL;
+    ok &= (f->yOld = calloc(NRT_FIR_BLOCK, sizeof(double))) != NULL;
+    ok &= (f->yNew = calloc(NRT_FIR_BLOCK, sizeof(double))) != NULL;
+    ok &= (f->tailY = calloc(FIR_TAIL_BLOCK, sizeof(double))) != NULL;
+    if (!ok) { fir_destroy(f); return NULL; }
+    for (uint32_t i = 0; i < FIR_TAIL_N / 2; i++) {
+        f->cosT[i] = cos(2 * M_PI * i / FIR_TAIL_N);
+        f->sinT[i] = sin(2 * M_PI * i / FIR_TAIL_N);
+    }
+    fir_bit_reverse_table(f->rev, FIR_N / 2);
+    fir_bit_reverse_table(f->revTail, FIR_TAIL_N / 2);
+    f->front = 0; f->spare = 1; atomic_init(&f->middle, 2); f->back = 3;
+    f->tailFill = 0; f->tailCur = 1; f->tailPrev = 2;
+    return f;
+}
+
+// In-place radix-2 complex FFT of n (FIR_N / 2 or FIR_TAIL_N / 2) points: forward e^(−iωt), inverse e^(+iωt), unscaled.
+static void fir_fft(const NRTFIR *f, double *re, double *im, uint32_t n, bool inverse) {
+    const uint32_t *rev = n == FIR_N / 2 ? f->rev : f->revTail;
+    for (uint32_t i = 0; i < n; i++) {
+        const uint32_t j = rev[i];
+        if (i < j) { double t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+    }
+    for (uint32_t len = 2; len <= n; len <<= 1) {
+        const uint32_t half = len / 2, stride = FIR_TAIL_N / len;
+        for (uint32_t i = 0; i < n; i += len) {
+            for (uint32_t k = 0; k < half; k++) {
+                const double wr = f->cosT[k * stride], wi = inverse ? f->sinT[k * stride] : -f->sinT[k * stride];
+                const uint32_t a = i + k, b = a + half;
+                const double tr = re[b] * wr - im[b] * wi, ti = re[b] * wi + im[b] * wr;
+                re[b] = re[a] - tr; im[b] = im[a] - ti;
+                re[a] += tr; im[a] += ti;
+            }
+        }
+    }
+}
+
+// Real signals of n points go through complex transforms of n / 2, as pairs: zr[q] = x[2q], zi[q] = x[2q + 1].
+// Forward: in place, the pairs become the spectrum's bins 0…n/2 (zr, zi need n/2 + 1 entries), unscaled.
+static void fir_rfft(const NRTFIR *f, double *zr, double *zi, uint32_t n) {
+    const uint32_t m = n / 2, stride = FIR_TAIL_N / n;
+    fir_fft(f, zr, zi, m, false);
+    const double r0 = zr[0], i0 = zi[0];
+    zr[0] = r0 + i0; zi[0] = 0;
+    zr[m] = r0 - i0; zi[m] = 0;
+    for (uint32_t k = 1; k <= m / 2; k++) {
+        // X[k] = E + W^k O, with E and O the even and odd samples' spectra, unpicked from Z[k] and Z[m − k].
+        const uint32_t j = m - k;
+        const double ar = zr[k], ai = zi[k], br = zr[j], bi = zi[j];
+        const double er = (ar + br) / 2, ei = (ai - bi) / 2, or_ = (ai + bi) / 2, oi = (br - ar) / 2;
+        const double c = f->cosT[k * stride], s = f->sinT[k * stride];   // W^k = c − is
+        zr[k] = er + c * or_ + s * oi;  zi[k] = ei + c * oi - s * or_;
+        zr[j] = er - c * or_ - s * oi;  zi[j] = -ei + c * oi - s * or_;
+    }
+}
+
+// Inverse: bins 0…n/2 of a real signal's spectrum become the signal × n, as pairs, in place.
+static void fir_irfft(const NRTFIR *f, double *zr, double *zi, uint32_t n) {
+    const uint32_t m = n / 2, stride = FIR_TAIL_N / n;
+    const double x0 = zr[0], xm = zr[m];
+    zr[0] = x0 + xm; zi[0] = x0 - xm;
+    for (uint32_t k = 1; k <= m / 2; k++) {
+        // Z[k] = (X[k] + conj X[m − k]) + i conj(W^k) (X[k] − conj X[m − k])
+        const uint32_t j = m - k;
+        const double ar = zr[k], ai = zi[k], br = zr[j], bi = zi[j];
+        const double sr = ar + br, si = ai - bi, dr = ar - br, di = ai + bi;
+        const double c = f->cosT[k * stride], s = f->sinT[k * stride];
+        const double tr = dr * c - di * s, ti = dr * s + di * c;
+        zr[k] = sr - ti;  zi[k] = si + tr;
+        zr[j] = sr + ti;  zi[j] = -si + tr;
+    }
+    fir_fft(f, zr, zi, m, true);
+}
+
+// Writer: the spectrum of taps [start, end) of `h`, zero-padded to n points and scaled by 1/n, into dst (re, then im).
+static void fir_transform_taps(NRTFIR *f, const float *h, uint32_t start, uint32_t end, uint32_t n, float *dst) {
+    memset(f->wre, 0, (n / 2 + 1) * sizeof(double));
+    memset(f->wim, 0, (n / 2 + 1) * sizeof(double));
+    for (uint32_t i = start; i < end; i++) (((i - start) & 1) ? f->wim : f->wre)[(i - start) / 2] = (double)h[i] / n;
+    fir_rfft(f, f->wre, f->wim, n);
+    const uint32_t bins = n / 2 + 1;
+    for (uint32_t k = 0; k < bins; k++) { dst[k] = (float)f->wre[k]; dst[bins + k] = (float)f->wim[k]; }
+}
+
+// acc += Σ over partitions [first, last) of the filter's spectrum × the delay line's (newest at pos), split complex.
+// The costly part of convolving: float and split, so the compiler vectorizes it.
+static void fir_mac(float *restrict accRe, float *restrict accIm, const float *spectra, const float *line,
+                    uint32_t first, uint32_t last, uint32_t pos, uint32_t ring, uint32_t bins) {
+    for (uint32_t p = first; p < last; p++) {
+        const float *restrict hr = spectra + (size_t)p * 2 * bins, *restrict hi = hr + bins;
+        const float *restrict xr = line + (size_t)((pos + ring - p) % ring) * 2 * bins, *restrict xi = xr + bins;
+        for (uint32_t k = 0; k < bins; k++) {
+            accRe[k] += hr[k] * xr[k] - hi[k] * xi[k];
+            accIm[k] += hr[k] * xi[k] + hi[k] * xr[k];
+        }
+    }
+}
+
+// The last half of the inverse transform of a summed spectrum, overlap-save's output, into y (n / 2 samples).
+static void fir_inverse(NRTFIR *f, const float *accRe, const float *accIm, uint32_t n, double *y) {
+    const uint32_t half = n / 2;
+    double *re = f->re, *im = f->im;
+    for (uint32_t k = 0; k <= half; k++) { re[k] = accRe[k]; im[k] = accIm[k]; }
+    fir_irfft(f, re, im, n);
+    for (uint32_t q = 0; q < half / 2; q++) { y[2 * q] = re[half / 2 + q]; y[2 * q + 1] = im[half / 2 + q]; }
+}
+
+// The spectrum of [prev | cur], two blocks of n / 2 samples, into dst (n / 2 + 1 bins, re then im).
+static void fir_forward(NRTFIR *f, const float *prev, const float *cur, uint32_t n, float *dst) {
+    const uint32_t half = n / 2, bins = half + 1;
+    double *re = f->re, *im = f->im;
+    for (uint32_t q = 0; q < half / 2; q++) {
+        re[q] = prev[2 * q]; im[q] = prev[2 * q + 1];
+        re[half / 2 + q] = cur[2 * q]; im[half / 2 + q] = cur[2 * q + 1];
+    }
+    fir_rfft(f, re, im, n);
+    for (uint32_t k = 0; k < bins; k++) { dst[k] = (float)re[k]; dst[bins + k] = (float)im[k]; }
+}
+
+// Channel c's head output for the block just collected, through `bank` (its spectrum is already in the delay line).
+static void fir_head(NRTFIR *f, const NRTFIRBank *bank, uint32_t c, double *y) {
+    const uint32_t parts = c < f->filtered ? bank->headParts[c] : 0;
+    const float *x = f->in + (size_t)c * NRT_FIR_BLOCK;
+    if (parts == 0) {   // unfiltered: the block itself, exactly
+        for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) y[i] = x[i];
+        return;
+    }
+    memset(f->acc, 0, 2 * FIR_BINS * sizeof(float));
+    fir_mac(f->acc, f->acc + FIR_BINS, bank->head + (size_t)c * FIR_HEAD_PARTS * 2 * FIR_BINS,
+            f->fdl + (size_t)c * FIR_HEAD_PARTS * 2 * FIR_BINS, 0, parts, f->fdlPos, FIR_HEAD_PARTS, FIR_BINS);
+    fir_inverse(f, f->acc, f->acc + FIR_BINS, FIR_N, y);
+}
+
+// One step of the tail work for the tail block that just finished: 0 transforms it into the delay line, the next
+// FIR_MAC_STEPS sum the partitions, the last transforms the result into next period's tail. While the filters are
+// changing it makes both the old and the new filters' tails.
+static void fir_tail_step(NRTFIR *f) {
+    const uint32_t s = f->step;
+    const bool both = f->transition == 1;
+    const NRTFIRBank *now = &f->banks[both ? f->next : f->front], *old = &f->banks[f->front];
+    if (s == 0) f->tailPos = (f->tailPos + 1) % FIR_TAIL_PARTS;
+    for (uint32_t c = 0; c < f->filtered; c++) {
+        float *accNew = f->tailAcc + (size_t)c * 2 * FIR_TAIL_BINS;
+        float *accOld = f->tailAcc + ((size_t)f->filtered + c) * 2 * FIR_TAIL_BINS;
+        const size_t spectra = (size_t)c * FIR_TAIL_PARTS * 2 * FIR_TAIL_BINS;
+        if (s == 0) {
+            const float *prev = f->tailIn + ((size_t)f->tailPrev * f->filtered + c) * FIR_TAIL_BLOCK;
+            const float *cur = f->tailIn + ((size_t)f->tailCur * f->filtered + c) * FIR_TAIL_BLOCK;
+            fir_forward(f, prev, cur, FIR_TAIL_N, f->tailFdl + spectra + (size_t)f->tailPos * 2 * FIR_TAIL_BINS);
+            memset(accNew, 0, 2 * FIR_TAIL_BINS * sizeof(float));
+            memset(accOld, 0, 2 * FIR_TAIL_BINS * sizeof(float));
+        } else if (s <= FIR_MAC_STEPS) {
+            const uint32_t first = (s - 1) * FIR_MAC_PER_STEP;
+            uint32_t last = first + FIR_MAC_PER_STEP < now->tailParts[c] ? first + FIR_MAC_PER_STEP : now->tailParts[c];
+            if (first < last)
+                fir_mac(accNew, accNew + FIR_TAIL_BINS, now->tail + spectra, f->tailFdl + spectra, first, last,
+                        f->tailPos, FIR_TAIL_PARTS, FIR_TAIL_BINS);
+            last = first + FIR_MAC_PER_STEP < old->tailParts[c] ? first + FIR_MAC_PER_STEP : old->tailParts[c];
+            if (both && first < last)
+                fir_mac(accOld, accOld + FIR_TAIL_BINS, old->tail + spectra, f->tailFdl + spectra, first, last,
+                        f->tailPos, FIR_TAIL_PARTS, FIR_TAIL_BINS);
+        } else {
+            const uint32_t half = f->parity ^ 1;
+            f->tailLive[half][c] = now->tailParts[c] > 0;
+            if (f->tailLive[half][c]) {
+                fir_inverse(f, accNew, accNew + FIR_TAIL_BINS, FIR_TAIL_N, f->tailY);
+                float *out = f->tailOut + ((size_t)half * f->filtered + c) * FIR_TAIL_BLOCK;
+                for (uint32_t i = 0; i < FIR_TAIL_BLOCK; i++) out[i] = (float)f->tailY[i];
+            }
+            f->tailOldLive[c] = both && old->tailParts[c] > 0;
+            if (f->tailOldLive[c]) {
+                fir_inverse(f, accOld, accOld + FIR_TAIL_BINS, FIR_TAIL_N, f->tailY);
+                float *out = f->tailOld + (size_t)c * NRT_FIR_BLOCK;
+                for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) out[i] = (float)f->tailY[i];
+            }
+        }
+    }
+}
+
+// Channel c's whole output for the block just collected: its head through `bank`, plus the tail made for it.
+static void fir_output(NRTFIR *f, const NRTFIRBank *bank, uint32_t c, bool oldTail, double *y) {
+    fir_head(f, bank, c, y);
+    if (c >= f->filtered) return;
+    if (oldTail) {
+        if (!f->tailOldLive[c]) return;
+        const float *t = f->tailOld + (size_t)c * NRT_FIR_BLOCK;
+        for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) y[i] += t[i];
+    } else {
+        if (!f->tailLive[f->parity][c]) return;
+        const float *t = f->tailOut + ((size_t)f->parity * f->filtered + c) * FIR_TAIL_BLOCK + (size_t)f->step * NRT_FIR_BLOCK;
+        for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) y[i] += t[i];
+    }
+}
+
+// A full block has been collected: transform it into the delay lines, do this block's share of the tail work, and
+// make the block to play.
+static void fir_process(NRTFIR *f) {
+    f->fdlPos = (f->fdlPos + 1) % FIR_HEAD_PARTS;
+    for (uint32_t c = 0; c < f->filtered; c++) {
+        float *prev = f->prev + (size_t)c * NRT_FIR_BLOCK;
+        const float *cur = f->in + (size_t)c * NRT_FIR_BLOCK;
+        fir_forward(f, prev, cur, FIR_N, f->fdl + ((size_t)c * FIR_HEAD_PARTS + f->fdlPos) * 2 * FIR_BINS);
+        memcpy(prev, cur, NRT_FIR_BLOCK * sizeof(float));
+        memcpy(f->tailIn + ((size_t)f->tailFill * f->filtered + c) * FIR_TAIL_BLOCK + (size_t)f->step * NRT_FIR_BLOCK,
+               cur, NRT_FIR_BLOCK * sizeof(float));
+    }
+    // New filters are taken at the start of a tail period: this period makes both tails, the next one fades over.
+    if (f->step == 0 && f->transition == 0 && (atomic_load_explicit(&f->middle, memory_order_acquire) & NRT_EQ_FRESH)) {
+        const uint32_t taken = atomic_exchange_explicit(&f->middle, f->spare, memory_order_acq_rel);
+        f->next = taken & ~NRT_EQ_FRESH;
+        f->transition = 1;
+    }
+    fir_tail_step(f);
+    const bool fade = f->step == 0 && f->transition == 2;
+    for (uint32_t c = 0; c < f->channels; c++) {
+        float *out = f->out + (size_t)c * NRT_FIR_BLOCK;
+        if (fade) {
+            fir_output(f, &f->banks[f->front], c, true, f->yOld);
+            fir_output(f, &f->banks[f->next], c, false, f->yNew);
+            for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) {
+                const double w = (i + 0.5) / NRT_FIR_BLOCK;
+                out[i] = (float)(f->yOld[i] + (f->yNew[i] - f->yOld[i]) * w);
+            }
+        } else {
+            fir_output(f, &f->banks[f->front], c, false, f->yNew);
+            for (uint32_t i = 0; i < NRT_FIR_BLOCK; i++) out[i] = (float)f->yNew[i];
+        }
+    }
+    if (fade) { f->spare = f->front; f->front = f->next; f->transition = 0; }
+    if (++f->step == FIR_STEPS) {
+        f->step = 0;
+        f->parity ^= 1;
+        const uint32_t freed = f->tailPrev;
+        f->tailPrev = f->tailCur; f->tailCur = f->tailFill; f->tailFill = freed;
+        if (f->transition == 1) f->transition = 2;
+    }
+}
+
+// Whether any channel is filtered now (or fading to or from a filter), so the samples are no longer the input's.
+static bool fir_filtering(const NRTFIR *f) {
+    for (uint32_t c = 0; c < f->filtered; c++) {
+        if (f->banks[f->front].headParts[c] > 0) return true;
+        if (f->transition != 0 && f->banks[f->next].headParts[c] > 0) return true;
+    }
+    return false;
+}
+
+// Each frame goes into the block being collected and comes out of the block being played, NRT_FIR_BLOCK frames later.
+static void fir_run(NRTFIR *f, float *frames, uint32_t count, uint32_t ch) {
+    for (uint32_t n = 0; n < count; n++) {
+        float *frame = frames + (size_t)n * ch;
+        for (uint32_t c = 0; c < ch; c++) {
+            const size_t at = (size_t)c * NRT_FIR_BLOCK + f->fill;
+            f->in[at] = frame[c];
+            frame[c] = f->out[at];
+        }
+        if (++f->fill == NRT_FIR_BLOCK) { fir_process(f); f->fill = 0; }
+    }
+}
+
 // MARK: - Render context
 
 typedef struct {
@@ -147,13 +528,9 @@ typedef struct {
     double preamp;
 } NRTEQBank;
 
-#define NRT_EQ_FRESH 0x80000000u
-
 typedef struct {
-    NRTBiquad sections[NRT_ROOM_MAX_CHANNELS][NRT_ROOM_MAX_SECTIONS];
-    uint32_t counts[NRT_ROOM_MAX_CHANNELS];
-    uint32_t channels;
-    double preamp;
+    NRTRoomChannel channels[NRT_ROOM_MAX_CHANNELS];
+    uint32_t count;
 } NRTRoomBank;
 
 struct NRTRenderContext {
@@ -197,13 +574,21 @@ struct NRTRenderContext {
     double *eqState;         // render thread only: channels × NRT_EQ_MAX_SECTIONS × 2
     uint32_t eqStateCount;   // render thread only: the section count eqState belongs to
 
-    // Room correction: per-channel sections, published the same way as the equalizer.
-    NRTRoomBank roomBanks[3];
+    // Room correction: a triple buffer of settings, exchanged like the equalizer's (heap: the banks are large).
+    NRTRoomBank *roomBanks;  // 3
     _Atomic uint32_t roomMiddle;
     uint32_t roomBack;       // writer only
     uint32_t roomFront;      // render thread only
-    double *roomState;       // render thread only: NRT_ROOM_MAX_CHANNELS × NRT_ROOM_MAX_SECTIONS × 2
-    uint32_t roomStateCounts[NRT_ROOM_MAX_CHANNELS];   // render thread only
+    uint32_t roomChannels;   // render thread only: min(ring channels, NRT_ROOM_MAX_CHANNELS)
+    double *roomState;       // render thread only: roomChannels × NRT_ROOM_MAX_SECTIONS × 2
+    uint32_t roomStateCount[NRT_ROOM_MAX_CHANNELS];   // render thread only: the section count each channel's state belongs to
+    float *roomDelay;        // render thread only: roomChannels × NRT_ROOM_MAX_DELAY, a circular history per channel
+    uint32_t roomDelayWrite; // render thread only
+    bool roomWasOn;          // render thread only
+
+    // FIR filters: allocated by the first nrt_context_set_fir that has any, never taken away before destroy.
+    _Atomic(NRTFIR *) fir;
+
 
     // Optional processor (set while stopped): scratch (ring channels) → processed (processedChannels).
     NRTProcessFn processor;
@@ -246,12 +631,18 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->eqMiddle, 1);
     ctx->eqBack = 2;
     ctx->eqStateCount = 0;
-    ctx->roomState = calloc((size_t)NRT_ROOM_MAX_CHANNELS * NRT_ROOM_MAX_SECTIONS * 2, sizeof(double));
-    if (!ctx->roomState) { free(ctx->eqState); free(ctx->scratch); free(ctx); return NULL; }
-    for (uint32_t i = 0; i < 3; i++) { memset(&ctx->roomBanks[i], 0, sizeof(NRTRoomBank)); ctx->roomBanks[i].preamp = 1.0; }
+    const uint32_t ringChannels = nrt_ring_channels(ring);
+    ctx->roomChannels = ringChannels < NRT_ROOM_MAX_CHANNELS ? ringChannels : NRT_ROOM_MAX_CHANNELS;
+    ctx->roomBanks = calloc(3, sizeof(NRTRoomBank));
+    ctx->roomState = calloc((size_t)ctx->roomChannels * NRT_ROOM_MAX_SECTIONS * 2, sizeof(double));
+    ctx->roomDelay = calloc((size_t)ctx->roomChannels * NRT_ROOM_MAX_DELAY, sizeof(float));
+    if (!ctx->roomBanks || !ctx->roomState || !ctx->roomDelay) { nrt_context_destroy(ctx); return NULL; }
     ctx->roomFront = 0;
     atomic_init(&ctx->roomMiddle, 1);
     ctx->roomBack = 2;
+    ctx->roomDelayWrite = 0;
+    ctx->roomWasOn = false;
+    atomic_init(&ctx->fir, NULL);
     return ctx;
 }
 
@@ -273,7 +664,10 @@ bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *use
 void nrt_context_destroy(NRTRenderContext *ctx) {
     if (!ctx) return;
     free(ctx->processed);
+    fir_destroy(atomic_load(&ctx->fir));
+    free(ctx->roomDelay);
     free(ctx->roomState);
+    free(ctx->roomBanks);
     free(ctx->eqState);
     free(ctx->scratch);
     free(ctx);
@@ -313,47 +707,107 @@ static const NRTEQBank *take_eq(NRTRenderContext *ctx) {
     }
     return &ctx->eqBanks[ctx->eqFront];
 }
-void nrt_context_set_room(NRTRenderContext *ctx, const NRTBiquad *sections, const uint32_t *counts, uint32_t channels, double preamp) {
+void nrt_context_set_room(NRTRenderContext *ctx, const NRTRoomChannel *channels, uint32_t count) {
     NRTRoomBank *bank = &ctx->roomBanks[ctx->roomBack];
-    if (!sections || !counts) channels = 0;
-    if (channels > NRT_ROOM_MAX_CHANNELS) channels = NRT_ROOM_MAX_CHANNELS;
-    for (uint32_t c = 0; c < NRT_ROOM_MAX_CHANNELS; c++) {
+    if (!channels) count = 0;
+    if (count > NRT_ROOM_MAX_CHANNELS) count = NRT_ROOM_MAX_CHANNELS;
+    for (uint32_t c = 0; c < count; c++) {
+        const NRTRoomChannel in = channels[c];
+        NRTRoomChannel *out = &bank->channels[c];
+        out->delayFrames = in.delayFrames < NRT_ROOM_MAX_DELAY ? in.delayFrames : NRT_ROOM_MAX_DELAY - 1;
+        out->gain = isfinite(in.gain) && in.gain >= 0 ? in.gain : 1.0;
+        const uint32_t n = in.count < NRT_ROOM_MAX_SECTIONS ? in.count : NRT_ROOM_MAX_SECTIONS;
         uint32_t kept = 0;
-        if (c < channels) {
-            const uint32_t n = counts[c] > NRT_ROOM_MAX_SECTIONS ? NRT_ROOM_MAX_SECTIONS : counts[c];
-            for (uint32_t i = 0; i < n; i++) {
-                const NRTBiquad b = sections[(size_t)c * NRT_ROOM_MAX_SECTIONS + i];
-                if (isfinite(b.b0) && isfinite(b.b1) && isfinite(b.b2) && isfinite(b.a1) && isfinite(b.a2)) bank->sections[c][kept++] = b;
-            }
+        for (uint32_t i = 0; i < n; i++) {
+            const NRTBiquad b = in.sections[i];
+            if (isfinite(b.b0) && isfinite(b.b1) && isfinite(b.b2) && isfinite(b.a1) && isfinite(b.a2)) out->sections[kept++] = b;
         }
-        bank->counts[c] = kept;
+        out->count = kept;
     }
-    bank->channels = channels;
-    bank->preamp = channels > 0 && isfinite(preamp) && preamp >= 0 ? preamp : 1.0;
+    bank->count = count;
     const uint32_t previous = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomBack | NRT_EQ_FRESH, memory_order_acq_rel);
     ctx->roomBack = previous & ~NRT_EQ_FRESH;
 }
 
-// The room correction for this slice: the newest the writer published, if any came in since the last slice.
+// The room correction for this slice, taken like the equalizer's (see take_eq). Clears the filter memory of every
+// channel whose number of sections changed.
 static const NRTRoomBank *take_room(NRTRenderContext *ctx) {
     if (atomic_load_explicit(&ctx->roomMiddle, memory_order_acquire) & NRT_EQ_FRESH) {
         const uint32_t fresh = atomic_exchange_explicit(&ctx->roomMiddle, ctx->roomFront, memory_order_acq_rel);
         ctx->roomFront = fresh & ~NRT_EQ_FRESH;
         const NRTRoomBank *bank = &ctx->roomBanks[ctx->roomFront];
-        for (uint32_t c = 0; c < NRT_ROOM_MAX_CHANNELS; c++) {
-            if (bank->counts[c] != ctx->roomStateCounts[c]) {
+        for (uint32_t c = 0; c < ctx->roomChannels; c++) {
+            const uint32_t count = c < bank->count ? bank->channels[c].count : 0;
+            if (count != ctx->roomStateCount[c]) {
                 memset(ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2, 0, NRT_ROOM_MAX_SECTIONS * 2 * sizeof(double));
-                ctx->roomStateCounts[c] = bank->counts[c];
+                ctx->roomStateCount[c] = count;
             }
         }
     }
     return &ctx->roomBanks[ctx->roomFront];
 }
 
-static inline bool room_active(const NRTRoomBank *room) {
-    if (room->preamp != 1.0) return true;
-    for (uint32_t c = 0; c < room->channels; c++) if (room->counts[c] > 0) return true;
-    return false;
+bool nrt_context_set_fir(NRTRenderContext *ctx, const float *const *impulses, uint32_t count, uint32_t length) {
+    NRTFIR *f = atomic_load_explicit(&ctx->fir, memory_order_acquire);
+    if (!f) {
+        if (!impulses || count == 0) return true;   // nothing to filter: stay on the plain path, no latency
+        f = fir_create(nrt_ring_channels(ctx->ring));
+        if (!f) return false;
+        atomic_store_explicit(&ctx->fir, f, memory_order_release);
+    }
+    if (!impulses) count = 0;
+    if (count > f->filtered) count = f->filtered;
+    if (length > NRT_FIR_MAX_TAPS) length = NRT_FIR_MAX_TAPS;
+    NRTFIRBank *bank = &f->banks[f->back];
+    for (uint32_t c = 0; c < f->filtered; c++) {
+        const float *h = c < count ? impulses[c] : NULL;
+        bool usable = h && length > 0;
+        for (uint32_t i = 0; usable && i < length; i++) usable = isfinite(h[i]);
+        const uint32_t headTaps = usable ? (length < FIR_HEAD_TAPS ? length : FIR_HEAD_TAPS) : 0;
+        const uint32_t tailTaps = usable && length > FIR_HEAD_TAPS ? length - FIR_HEAD_TAPS : 0;
+        bank->headParts[c] = (headTaps + NRT_FIR_BLOCK - 1) / NRT_FIR_BLOCK;
+        bank->tailParts[c] = (tailTaps + FIR_TAIL_BLOCK - 1) / FIR_TAIL_BLOCK;
+        for (uint32_t p = 0; p < bank->headParts[c]; p++) {
+            const uint32_t start = p * NRT_FIR_BLOCK, end = start + NRT_FIR_BLOCK < headTaps ? start + NRT_FIR_BLOCK : headTaps;
+            fir_transform_taps(f, h, start, end, FIR_N, bank->head + ((size_t)c * FIR_HEAD_PARTS + p) * 2 * FIR_BINS);
+        }
+        for (uint32_t p = 0; p < bank->tailParts[c]; p++) {
+            const uint32_t start = FIR_HEAD_TAPS + p * FIR_TAIL_BLOCK;
+            const uint32_t end = start + FIR_TAIL_BLOCK < length ? start + FIR_TAIL_BLOCK : length;
+            fir_transform_taps(f, h, start, end, FIR_TAIL_N, bank->tail + ((size_t)c * FIR_TAIL_PARTS + p) * 2 * FIR_TAIL_BINS);
+        }
+    }
+    const uint32_t previous = atomic_exchange_explicit(&f->middle, f->back | NRT_EQ_FRESH, memory_order_acq_rel);
+    f->back = previous & ~NRT_EQ_FRESH;
+    return true;
+}
+
+uint32_t nrt_context_fir_latency(const NRTRenderContext *ctx) {
+    return atomic_load_explicit(&ctx->fir, memory_order_acquire) ? NRT_FIR_BLOCK : 0;
+}
+
+void nrt_context_reset_history(NRTRenderContext *ctx) {
+    memset(ctx->roomDelay, 0, (size_t)ctx->roomChannels * NRT_ROOM_MAX_DELAY * sizeof(float));
+    memset(ctx->roomState, 0, (size_t)ctx->roomChannels * NRT_ROOM_MAX_SECTIONS * 2 * sizeof(double));
+    NRTFIR *f = atomic_load_explicit(&ctx->fir, memory_order_acquire);
+    if (!f) return;
+    const size_t k = f->filtered;
+    memset(f->fdl, 0, k * FIR_HEAD_PARTS * 2 * FIR_BINS * sizeof(float));
+    memset(f->prev, 0, k * NRT_FIR_BLOCK * sizeof(float));
+    memset(f->in, 0, (size_t)f->channels * NRT_FIR_BLOCK * sizeof(float));
+    memset(f->out, 0, (size_t)f->channels * NRT_FIR_BLOCK * sizeof(float));
+    memset(f->tailFdl, 0, k * FIR_TAIL_PARTS * 2 * FIR_TAIL_BINS * sizeof(float));
+    memset(f->tailIn, 0, 3 * k * FIR_TAIL_BLOCK * sizeof(float));
+    memset(f->tailAcc, 0, 2 * k * 2 * FIR_TAIL_BINS * sizeof(float));
+    memset(f->tailOut, 0, 2 * k * FIR_TAIL_BLOCK * sizeof(float));
+    memset(f->tailOld, 0, k * NRT_FIR_BLOCK * sizeof(float));
+    memset(f->tailLive, 0, sizeof f->tailLive);
+    memset(f->tailOldLive, 0, sizeof f->tailOldLive);
+    f->fill = 0;
+    f->step = 0;
+    f->parity = 0;
+    // A change under way finishes from silence: both tails start over with the history.
+    if (f->transition == 2) f->transition = 1;
 }
 
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
@@ -595,32 +1049,59 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     }
     if (atomic_load_explicit(&ctx->passthrough, memory_order_relaxed) && !integer) return;
 
+    NRTFIR *fir = integer ? NULL : atomic_load_explicit(&ctx->fir, memory_order_acquire);
+    if (fir && fir->channels != ch) fir = NULL;
+
     const double gain = integer ? 1.0 : atomic_load_explicit(&ctx->gain, memory_order_relaxed);
     const NRTEQBank *eq = take_eq(ctx);
     const bool equalize = !integer && (eq->count > 0 || eq->preamp != 1.0);
     const NRTRoomBank *room = take_room(ctx);
-    const bool correct = !integer && room_active(room);
-    if (gain != 1.0 || equalize || correct) {
+    const uint32_t roomed = integer ? 0 : (room->count < ctx->roomChannels ? room->count : ctx->roomChannels);
+    if (roomed > 0 && !ctx->roomWasOn) {
+        // Delay lines start from silence, not from whatever played the last time correction was on.
+        memset(ctx->roomDelay, 0, (size_t)ctx->roomChannels * NRT_ROOM_MAX_DELAY * sizeof(float));
+    }
+    ctx->roomWasOn = roomed > 0;
+    // Room correction holds sound back. At the end of the queue, the silence after the last frame plays it out; in an
+    // underrun, it waits for the music to come back, so nothing is lost.
+    uint32_t processed = got;
+    if ((fir || roomed > 0) && atomic_load_explicit(&ctx->draining, memory_order_relaxed)) processed = frames;
+
+    // Room correction, per channel: delay, gain, sections (transposed direct form II, in double precision).
+    if (roomed > 0) {
+        for (uint32_t f = 0; f < processed; f++) {
+            float *frame = ctx->scratch + (size_t)f * ch;
+            const uint32_t w = (ctx->roomDelayWrite + f) & (NRT_ROOM_MAX_DELAY - 1);
+            for (uint32_t c = 0; c < roomed; c++) {
+                const NRTRoomChannel *r = &room->channels[c];
+                float *line = ctx->roomDelay + (size_t)c * NRT_ROOM_MAX_DELAY;
+                line[w] = frame[c];
+                double s = (double)line[(w - r->delayFrames) & (NRT_ROOM_MAX_DELAY - 1)] * r->gain;
+                double *z = ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2;
+                for (uint32_t k = 0; k < r->count; k++, z += 2) {
+                    const NRTBiquad *b = &r->sections[k];
+                    const double y = b->b0 * s + z[0];
+                    z[0] = b->b1 * s - b->a1 * y + z[1];
+                    z[1] = b->b2 * s - b->a2 * y;
+                    s = y;
+                }
+                frame[c] = (float)s;
+            }
+        }
+        ctx->roomDelayWrite = (ctx->roomDelayWrite + processed) & (NRT_ROOM_MAX_DELAY - 1);
+        const size_t states = (size_t)roomed * NRT_ROOM_MAX_SECTIONS * 2;
+        for (size_t i = 0; i < states; i++) if (fabs(ctx->roomState[i]) < 1e-30) ctx->roomState[i] = 0;
+    }
+    // Then the measured filters (convolution), a block late once there have been any.
+    if (fir) fir_run(fir, ctx->scratch, processed, ch);
+
+    if (gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir))) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
-        for (uint32_t f = 0; f < got; f++) {
+        for (uint32_t f = 0; f < processed; f++) {
             float *frame = ctx->scratch + (size_t)f * ch;
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
-                if (correct) {
-                    s *= room->preamp;
-                    if (c < NRT_ROOM_MAX_CHANNELS) {
-                        double *z = ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2;
-                        const uint32_t n = room->counts[c];
-                        for (uint32_t k = 0; k < n; k++, z += 2) {
-                            const NRTBiquad *b = &room->sections[c][k];
-                            const double y = b->b0 * s + z[0];
-                            z[0] = b->b1 * s - b->a1 * y + z[1];
-                            z[1] = b->b2 * s - b->a2 * y;
-                            s = y;
-                        }
-                    }
-                }
                 if (equalize) {
                     s *= eq->preamp;
                     double *z = ctx->eqState + (size_t)c * NRT_EQ_MAX_SECTIONS * 2;
@@ -643,17 +1124,13 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             const size_t states = (size_t)ch * NRT_EQ_MAX_SECTIONS * 2;
             for (size_t i = 0; i < states; i++) if (fabs(ctx->eqState[i]) < 1e-30) ctx->eqState[i] = 0;
         }
-        if (correct) {
-            const size_t states = (size_t)NRT_ROOM_MAX_CHANNELS * NRT_ROOM_MAX_SECTIONS * 2;
-            for (size_t i = 0; i < states; i++) if (fabs(ctx->roomState[i]) < 1e-30) ctx->roomState[i] = 0;
-        }
     }
 
     // Meters (every decoded channel, up to NRT_METER_CHANNELS) and spectrum tap (L/R), post-gain.
     float peaks[NRT_METER_CHANNELS] = {0};
     const uint32_t metered = ch < NRT_METER_CHANNELS ? ch : NRT_METER_CHANNELS;
     uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
-    for (uint32_t f = 0; f < got; f++) {
+    for (uint32_t f = 0; f < processed; f++) {
         const float *frame = ctx->scratch + (size_t)f * ch;
         float values[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];
         for (uint32_t c = 0; c < metered || c < 2; c++) {

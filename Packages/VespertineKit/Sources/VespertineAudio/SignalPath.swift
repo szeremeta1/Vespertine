@@ -27,9 +27,11 @@ public struct SignalPath: Sendable, Hashable {
     public var bypassedEqualizer: String? = nil
     /// The room correction profile applied (its name), nil = none.
     public var roomCorrection: String? = nil
-    /// The room correction chosen for this output that doesn't apply to this stream (DoP, bitstream, not two
-    /// channels), by name; nil = none chosen.
+    /// The room correction chosen for this output that doesn't apply to this stream (native DSD kept, bitstream,
+    /// channels that don't match its speakers), by name; nil = none chosen.
     public var bypassedRoomCorrection: String? = nil
+    /// A speaker's measured room correction filter is too long for this sample rate, so it's left out.
+    public var roomFiltersSkipped = false
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).

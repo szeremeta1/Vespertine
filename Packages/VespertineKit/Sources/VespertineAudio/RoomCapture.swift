@@ -111,8 +111,23 @@ public struct RoomCaptureLayout: Equatable, Sendable {
     /// Frames of wake noise at the start of the lead-in.
     public var wakeFrames: Int { max(0, firstReferenceStart - Int((Self.wakeQuietSeconds * sampleRate).rounded())) }
 
-    /// The mono signal to play.
+    /// The mono signal to play: the wake noise, both timing references and the sweep, all from one speaker.
     public func stimulus() -> [Float] {
+        var out = referenceStimulus()
+        for (n, v) in sweep.samples.enumerated() { out[sweepStart + n] += Float(v * level) }
+        return out
+    }
+
+    /// The sweep alone, silent elsewhere.
+    public func sweepStimulus() -> [Float] {
+        var out = [Float](repeating: 0, count: totalFrames)
+        for (n, v) in sweep.samples.enumerated() { out[sweepStart + n] = Float(v * level) }
+        return out
+    }
+
+    /// The wake noise and both timing references, without the sweep: what a reference speaker plays while another
+    /// one plays the sweep, so every speaker's arrival is timed against the same speaker.
+    public func referenceStimulus() -> [Float] {
         var out = [Float](repeating: 0, count: totalFrames)
         // Deterministic, so a capture can be replayed exactly.
         var seed: UInt64 = 0x2545_F491_4F6C_DD1D
@@ -125,7 +140,31 @@ public struct RoomCaptureLayout: Equatable, Sendable {
             out[firstReferenceStart + n] += Float(v * scale)
             out[secondReferenceStart + n] += Float(v * scale)
         }
-        for (n, v) in sweep.samples.enumerated() { out[sweepStart + n] += Float(v * scale) }
+        return out
+    }
+}
+
+/// What the output plays during one capture: one track per output channel used, all the same length.
+public struct RoomStimulus: Equatable, Sendable {
+    public struct Track: Equatable, Sendable {
+        public let channel: Int
+        public let samples: [Float]
+        public init(channel: Int, samples: [Float]) {
+            self.channel = channel
+            self.samples = samples
+        }
+    }
+
+    public let tracks: [Track]
+
+    public init(tracks: [Track]) { self.tracks = tracks }
+
+    /// Every track summed: what plays in all, whichever speaker it comes from.
+    public var mixed: [Float] {
+        guard var out = tracks.first?.samples else { return [] }
+        for track in tracks.dropFirst() {
+            for (n, v) in track.samples.enumerated() where n < out.count { out[n] += v }
+        }
         return out
     }
 }
@@ -133,8 +172,14 @@ public struct RoomCaptureLayout: Equatable, Sendable {
 /// The recording after the clock mismatch between input and output is taken out.
 public struct RoomCaptureAnalysis: Sendable {
     public let drift: ClockDriftEstimate
-    /// Starts where the sweep starts, on the output's time axis, long enough for the sweep and its decay.
+    /// Starts `leadSamples` before where the sweep would arrive from the speaker that played the timing references,
+    /// on the output's time axis, long enough for the sweep and its decay. The lead keeps the sweep whole when it
+    /// comes from a nearer speaker than the references.
     public let sweepSegment: [Double]
+    public let leadSamples: Int
+
+    /// How far the lead reaches: 20 ms, about 7 m of path difference.
+    public static let leadSeconds = 0.02
 }
 
 // MARK: - Device and permission
@@ -146,14 +191,27 @@ public struct RoomCaptureRequest: Equatable, Sendable {
     /// Zero-based channel of the input to record and of the output to play on.
     public let inputChannel: Int
     public let outputChannel: Int
+    /// The output channel that plays the timing references, when it isn't `outputChannel`: every speaker is then
+    /// timed against the same one, so the differences in their arrival survive the jitter in when a capture starts.
+    public let referenceChannel: Int?
     public let layout: RoomCaptureLayout
 
-    public init(inputDevice: UInt32, outputDevice: UInt32, inputChannel: Int, outputChannel: Int, layout: RoomCaptureLayout) {
+    public init(inputDevice: UInt32, outputDevice: UInt32, inputChannel: Int, outputChannel: Int, referenceChannel: Int? = nil,
+                layout: RoomCaptureLayout) {
         self.inputDevice = inputDevice
         self.outputDevice = outputDevice
         self.inputChannel = inputChannel
         self.outputChannel = outputChannel
+        self.referenceChannel = referenceChannel == outputChannel ? nil : referenceChannel
         self.layout = layout
+    }
+
+    /// What plays: everything on the output channel, or the references on the reference channel and the sweep on the
+    /// output channel.
+    public func stimulus() -> RoomStimulus {
+        guard let referenceChannel else { return RoomStimulus(tracks: [.init(channel: outputChannel, samples: layout.stimulus())]) }
+        return RoomStimulus(tracks: [.init(channel: referenceChannel, samples: layout.referenceStimulus()),
+                                     .init(channel: outputChannel, samples: layout.sweepStimulus())])
     }
 }
 
@@ -173,8 +231,9 @@ public struct RoomCaptureChunk: Sendable {
 }
 
 public protocol RoomCaptureDevice: AnyObject, Sendable {
-    /// Starts recording the input channel and playing `stimulus` (mono, at the layout's rate) on the output channel.
-    func start(request: RoomCaptureRequest, stimulus: [Float]) throws
+    /// Starts recording the input channel and playing each of `stimulus`'s tracks (at the layout's rate) on its output
+    /// channel, all from the same frame.
+    func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws
     /// Up to `maxFrames` frames of the recorded channel, without waiting.
     func readAvailable(maxFrames: Int) -> RoomCaptureChunk
     /// Stops both directions and releases them. Safe to call again.
@@ -233,9 +292,10 @@ public struct RoomRecording: Sendable {
         let layout = request.layout
         let recording = samples.map(Double.init)
         let drift = try ClockDriftEstimate.estimate(recording: recording, reference: layout.reference, nominalSpacing: layout.nominalSpacing)
-        let start = drift.position(afterFirst: layout.sweepOffset)
-        let count = layout.sweep.samples.count + Int(0.5 * layout.sampleRate)
-        return RoomCaptureAnalysis(drift: drift, sweepSegment: drift.resampled(recording, from: start, count: count))
+        let lead = Int((RoomCaptureAnalysis.leadSeconds * layout.sampleRate).rounded())
+        let start = drift.position(afterFirst: layout.sweepOffset - lead)
+        let count = layout.sweep.samples.count + Int(0.5 * layout.sampleRate) + lead
+        return RoomCaptureAnalysis(drift: drift, sweepSegment: drift.resampled(recording, from: start, count: count), leadSamples: lead)
     }
 }
 
@@ -282,7 +342,8 @@ public final class RoomCaptureSession: @unchecked Sendable {
         guard claimed else { throw RoomCaptureError.busy }
         defer { guarded.withLock { $0 = (.idle, false) } }
 
-        guard request.inputDevice != 0, request.outputDevice != 0, request.inputChannel >= 0, request.outputChannel >= 0 else {
+        guard request.inputDevice != 0, request.outputDevice != 0, request.inputChannel >= 0, request.outputChannel >= 0,
+              (request.referenceChannel ?? 0) >= 0 else {
             throw RoomCaptureError.invalidRequest
         }
         switch permission.status {
@@ -298,7 +359,7 @@ public final class RoomCaptureSession: @unchecked Sendable {
         let planned = layout.recordingFrames
         let startedAt = now()
         do {
-            try device.start(request: request, stimulus: layout.stimulus())
+            try device.start(request: request, stimulus: request.stimulus())
         } catch {
             device.stop()
             throw RoomCaptureError.startFailed((error as? CoreAudioError)?.description ?? error.localizedDescription)
@@ -343,6 +404,8 @@ public struct RoomRecordingInfo: Codable, Equatable, Sendable {
     public var outputDevice: UInt32
     public var inputChannel: Int
     public var outputChannel: Int
+    /// The output channel that played the timing references, when it wasn't `outputChannel`.
+    public var referenceChannel: Int?
     /// The `ClockDriftEstimate` inputs for this layout, in output samples.
     public var nominalSpacing: Int
     public var sweepOffset: Int
@@ -372,7 +435,8 @@ public enum RoomRecordingFile {
             file: url.lastPathComponent, sha256: digest, startedAt: recording.startedAt, sampleRate: recording.sampleRate,
             frames: recording.samples.count, durationSeconds: Double(recording.samples.count) / recording.sampleRate,
             inputDevice: recording.inputDevice, outputDevice: recording.outputDevice, inputChannel: recording.request.inputChannel,
-            outputChannel: recording.request.outputChannel, nominalSpacing: layout.nominalSpacing, sweepOffset: layout.sweepOffset)
+            outputChannel: recording.request.outputChannel, referenceChannel: recording.request.referenceChannel,
+            nominalSpacing: layout.nominalSpacing, sweepOffset: layout.sweepOffset)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601

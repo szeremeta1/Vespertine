@@ -171,3 +171,33 @@ public struct RoomCorrectionPreview: Sendable {
         return data as Data
     }
 }
+
+/// What a profile's correction itself does per speaker: its bands, level and preamp, plus a measured filter's
+/// magnitude. For profiles with no measurement to draw a before and after from (imported ones).
+public struct RoomCorrectionCurves: Sendable {
+    public struct Channel: Sendable {
+        public let speaker: RoomSpeaker
+        public let frequencies: [Double]
+        public let db: [Double]
+    }
+
+    public let channels: [Channel]
+
+    /// 20 Hz to 20 kHz, twelve points an octave.
+    public static let frequencies: [Double] = (0...120).map { 20 * pow(2, Double($0) / 12) }
+
+    /// Reads measured filters from `impulseDirectory` (slow for long ones: build it off the main thread).
+    public init(profile: RoomProfile, impulseDirectory: URL = RoomImpulse.defaultDirectory) {
+        let playback = RoomCorrectionPlayback(profile: profile, impulseDirectory: impulseDirectory)
+        let rate = RoomFilterDesigner.designRate
+        let freqs = Self.frequencies
+        channels = profile.channelMap.entries.sorted { $0.output < $1.output }.compactMap { entry in
+            guard entry.output < playback.channels.count else { return nil }
+            var db = playback.responseDB(channel: entry.output, at: freqs, sampleRate: rate)
+            if let impulse = playback.channels[entry.output].impulse, let filter = impulse.responseDB(at: freqs, in: impulseDirectory) {
+                db = zip(db, filter).map { $0 + $1 }
+            }
+            return Channel(speaker: entry.speaker, frequencies: freqs, db: db)
+        }
+    }
+}

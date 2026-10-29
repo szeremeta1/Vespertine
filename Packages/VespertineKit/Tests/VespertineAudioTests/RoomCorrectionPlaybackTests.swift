@@ -16,7 +16,12 @@ private func output(_ uid: String) -> OutputDevice {
 }
 
 private func correction(left: [EQBand], right: [EQBand], preampDB: Double = 0) -> RoomCorrectionPlayback {
-    RoomCorrectionPlayback(profileID: UUID(), name: "Desk", preampDB: preampDB, channels: [left, right])
+    RoomCorrectionPlayback(profileID: UUID(), name: "Desk", preampDB: preampDB, bands: [left, right])
+}
+
+private func sections(_ channel: NRTRoomChannel) -> [NRTBiquad] {
+    var copy = channel
+    return withUnsafeBytes(of: &copy.sections) { Array($0.bindMemory(to: NRTBiquad.self).prefix(Int(channel.count))) }
 }
 
 /// Stereo tone: `fl` Hz on the left, `fr` Hz on the right, 0.25 peak.
@@ -29,7 +34,7 @@ private func stereoTone(_ fl: Double, _ fr: Double, frames: Int) -> [Float] {
 
 private func render(_ input: [Float], channels: UInt32 = 2, setUp: (OpaquePointer) -> Void) -> [Float] {
     let frames = UInt32(input.count) / channels
-    let ring = nrt_ring_create(16_384, channels)!
+    let ring = nrt_ring_create(UInt32(max(16_384, 2 * Int(frames))), channels)!
     let context = nrt_context_create(ring, 512)!
     defer { nrt_context_destroy(context); nrt_ring_destroy(ring) }
     nrt_context_set_gain(context, 1, 32)
@@ -41,13 +46,7 @@ private func render(_ input: [Float], channels: UInt32 = 2, setUp: (OpaquePointe
 }
 
 private func install(_ c: RoomCorrectionPlayback?, on context: OpaquePointer, rate: Double = 48_000) {
-    guard let c else { nrt_context_set_room(context, nil, nil, 0, 1); return }
-    let bank = c.bank(sampleRate: rate)
-    bank.sections.withUnsafeBufferPointer { s in
-        bank.counts.withUnsafeBufferPointer { n in
-            nrt_context_set_room(context, s.baseAddress, n.baseAddress, UInt32(bank.counts.count), bank.preamp)
-        }
-    }
+    RoomCorrectionPlayback.install(c, on: context, sampleRate: rate, channelCount: 2)
 }
 
 private func settledPeak(_ out: [Float], channel: Int) -> Float {
@@ -122,7 +121,7 @@ struct RoomCorrectionPlaybackTests {
         for rate in [44_100.0, 48_000, 96_000] {
             #expect(abs(c.responseDB(channel: 0, at: [120], sampleRate: rate)[0] + 10) < 0.05)
             #expect(abs(c.responseDB(channel: 1, at: [120], sampleRate: rate)[0]) < 1e-9)
-            #expect(c.bank(sampleRate: rate).counts == [1, 0])
+            #expect(c.renderChannels(sampleRate: rate, channelCount: 2).map(\.count) == [1, 0])
         }
     }
 
@@ -169,10 +168,128 @@ struct RoomCorrectionPlaybackTests {
         #expect(p.roomCorrection == nil && p.isBitPerfect && p.equalizerBypass == .dopBypass)
     }
 
-    @Test("Room correction applies to stereo PCM only: other channel counts bypass it")
-    func stereoOnly() {
+    @Test("A stereo profile applies to stereo only; a 5.1 profile to 5.1, and to stereo music through its front pair")
+    func layouts() {
         let c = correction(left: [EQBand(kind: .peak, frequency: 120, gainDB: -10, q: 4)], right: [])
         #expect(c.applies(channels: 2))
         #expect(!c.applies(channels: 1) && !c.applies(channels: 6))
+        let surround = RoomCorrectionPlayback(profileID: UUID(), name: "5.1", preampDB: 0, bands: Array(repeating: [], count: 6))
+        #expect(surround.applies(channels: 6) && surround.applies(channels: 2))
+        #expect(!surround.applies(channels: 1) && !surround.applies(channels: 8))
+    }
+
+    @Test("What the I/O thread gets: delay in frames at the device's rate, preamp and level as one gain, rate-designed sections")
+    func renderChannels() {
+        let c = RoomCorrectionPlayback(profileID: UUID(), name: "x", preampDB: -6, channels: [
+            RoomChannelPlayback(delayMs: 2, levelDB: 6, bands: [EQBand(kind: .peak, frequency: 40, gainDB: -10, q: 5)]),
+            RoomChannelPlayback(),
+        ])
+        let at48 = c.renderChannels(sampleRate: 48_000, channelCount: 3)
+        #expect(at48.count == 3)
+        #expect(at48[0].delayFrames == 96 && abs(at48[0].gain - 1) < 1e-9 && at48[0].count == 1)
+        #expect(at48[1].delayFrames == 0 && abs(at48[1].gain - pow(10, -6.0 / 20)) < 1e-12 && at48[1].count == 0)
+        #expect(abs(at48[2].gain - pow(10, -6.0 / 20)) < 1e-12)   // past the profile: the preamp only
+        let at192 = c.renderChannels(sampleRate: 192_000, channelCount: 2)
+        #expect(at192[0].delayFrames == 384)
+        #expect(sections(at192[0])[0].b1 != sections(at48[0])[0].b1)   // the same band, designed for each rate
+        // Delays past what a profile may hold are clamped to 40 ms.
+        let far = RoomCorrectionPlayback(profileID: UUID(), name: "x", preampDB: 0, channels: [RoomChannelPlayback(delayMs: 1000)])
+        #expect(far.renderChannels(sampleRate: 768_000, channelCount: 1)[0].delayFrames == 40 * 768)
+        #expect(abs(far.maxDelaySeconds - 0.04) < 1e-12)
+    }
+
+    @Test("Each speaker's own delay and level, through the real I/O-thread code")
+    func delayAndLevel() {
+        let c = RoomCorrectionPlayback(profileID: UUID(), name: "x", preampDB: 0, channels: [
+            RoomChannelPlayback(delayMs: 1), RoomChannelPlayback(levelDB: -6.020599913279624),
+        ])
+        var input = [Float](repeating: 0, count: 2 * 256)
+        input[0] = 1; input[1] = 1
+        let out = render(input) { install(c, on: $0) }
+        #expect(out[0] == 0 && out[2 * 48] == 1)          // left: the impulse 1 ms (48 frames) late
+        #expect(abs(out[1] - 0.5) < 1e-6 && out[3] == 0)  // right: at once, at half level
+    }
+
+    @Test("A profile's alignment and filters land on the outputs its channel map names")
+    func profileAlignment() throws {
+        var profile = RoomProfile.imported(name: "Desk", deviceUID: "zd3", layout: .stereo, source: .measured,
+                                           filters: RoomFilterSet(version: 1, channels: [.right: [EQBand(frequency: 120, gainDB: -6, q: 4)]]))
+        profile.alignment = [.left: RoomSpeakerAlignment(delayMs: 0.5, levelDB: -1.5)]
+        let playback = RoomCorrectionPlayback(profile: profile)
+        #expect(playback.channels[0] == RoomChannelPlayback(delayMs: 0.5, levelDB: -1.5))
+        #expect(playback.channels[1].delayMs == 0 && playback.channels[1].bands.count == 1)
+        #expect(!playback.isFlat)
+        // Alignment alone is a correction too.
+        var aligned = RoomProfile.imported(name: "x", deviceUID: "zd3", layout: .stereo, source: .measured, filters: RoomFilterSet(version: 1, channels: [:]))
+        #expect(RoomCorrectionPlayback(profile: aligned).isFlat)
+        aligned.alignment = [.right: RoomSpeakerAlignment(delayMs: 0.2)]
+        #expect(!RoomCorrectionPlayback(profile: aligned).isFlat)
+        // Saved and read back, alignment and source survive.
+        let back = try RoomCorrectionCoding.decodeProfile(RoomCorrectionCoding.encode(profile))
+        #expect(back.alignment == profile.alignment && back.origin == .measured)
+    }
+
+    @Test("Speakers line up at the seat: the nearer ones wait for the farthest, the louder ones come down to the quietest")
+    func alignmentRule() {
+        let a = RoomSpeakerAlignment.align(arrivalMs: [.left: 3.0, .right: 4.25], levelDB: [.left: -40.0, .right: -42.5])
+        #expect(a[.left] == RoomSpeakerAlignment(delayMs: 1.25, levelDB: -2.5))
+        #expect(a[.right] == RoomSpeakerAlignment(delayMs: 0, levelDB: 0))
+        // Never a boost, and never past what playback holds.
+        let far = RoomSpeakerAlignment.align(arrivalMs: [.left: 0, .right: 90], levelDB: [.left: 0, .right: -50])
+        #expect(far[.left]?.delayMs == 40 && far[.left]?.levelDB == -30 && far[.right]?.levelDB == 0)
+    }
+
+    @Test("Measured filters (impulse responses) play through the convolver, a block late, each on its own channel")
+    func impulseFilters() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("room-ir-\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        // A filter that is a pure gain of 0.5, 10 samples in.
+        var taps = [Float](repeating: 0, count: 11)
+        taps[10] = 0.5
+        let impulse = RoomImpulse(file: "half.f32", name: "half", sampleRate: 48_000, frames: taps.count)
+        try taps.withUnsafeBytes { try Data($0).write(to: folder.appendingPathComponent("half.f32")) }
+        let c = RoomCorrectionPlayback(profileID: UUID(), name: "IR", preampDB: 0,
+                                       channels: [RoomChannelPlayback(impulse: impulse), RoomChannelPlayback()], impulseDirectory: folder)
+        #expect(!c.isFlat)
+        let loaded = try #require(c.impulseTaps(sampleRate: 48_000, channelCount: 2))
+        #expect(loaded.count == 2 && loaded[0] == taps && loaded[1] == nil)
+        #expect(c.impulseKey(sampleRate: 48_000, channelCount: 2) != c.impulseKey(sampleRate: 96_000, channelCount: 2))
+        // New filters take over within two 4,096-frame periods; the impulse comes after that.
+        var input = [Float](repeating: 0, count: 2 * 12_000)
+        let at = 9_500
+        input[2 * at] = 1; input[2 * at + 1] = 1
+        let out = render(input) { context in
+            install(c, on: context)
+            #expect(RoomCorrectionPlayback.installFilters(loaded, on: context))
+        }
+        let late = at + Int(NRT_FIR_BLOCK)
+        #expect(abs(out[2 * (late + 10)] - 0.5) < 1e-6)          // left: through the filter
+        #expect(out[2 * late + 1] == 1)                           // right: unfiltered, bit-exact, a block late too
+        // Too long for a rate: left out there, and said so.
+        let long = RoomImpulse(file: "none.f32", name: "Long", sampleRate: 48_000, frames: 200_000)
+        let longPlayback = RoomCorrectionPlayback(profileID: UUID(), name: "Long", preampDB: 0, channels: [RoomChannelPlayback(impulse: long)])
+        #expect(!longPlayback.filtersTooLong(sampleRate: 48_000, channelCount: 2) && longPlayback.filtersTooLong(sampleRate: 96_000, channelCount: 2))
+    }
+
+    @Test("With room correction on, DSD is converted to PCM (and says so), unless the output keeps native DSD")
+    func dsdRule() {
+        var s = EngineSettings()
+        let zd3 = output("zd3")
+        #expect(!s.convertsDSDForRoom(zd3))
+        s.roomCorrections["zd3"] = correction(left: [EQBand(kind: .peak, frequency: 120, gainDB: -10, q: 4)], right: [])
+        #expect(s.convertsDSDForRoom(zd3) && !s.convertsDSDForRoom(output("k11")))
+        s.roomNativeDSDDeviceUIDs = ["zd3"]
+        #expect(!s.convertsDSDForRoom(zd3) && s.roomCorrection(for: zd3) != nil)
+
+        let dsd = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        let formats = [PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 24, isInteger: true, isMixable: true, channels: 2)]
+        let dac = DeviceCapabilities(sampleRates: [44_100, 88_200, 176_400, 352_800], physicalFormats: formats, outputChannels: 2, supportsDoP: true)
+        #expect(FormatPlanner.plan(source: dsd, device: dac).mode == .dop)
+        let corrected = FormatPlanner.plan(source: dsd, device: dac, dsdToPCMForRoom: true)
+        #expect(corrected.mode == .pcm && corrected.dsdConvertedToPCM && corrected.reason.contains("Room correction"))
+        // PCM sources plan exactly as before.
+        let pcm = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 88_200, bitDepth: 24, channels: 2)
+        #expect(FormatPlanner.plan(source: pcm, device: dac, dsdToPCMForRoom: true) == FormatPlanner.plan(source: pcm, device: dac))
     }
 }

@@ -26,29 +26,34 @@ public struct SystemMicrophonePermission: MicrophonePermission {
     public func request() async -> Bool { await AVCaptureDevice.requestAccess(for: .audio) }
 }
 
-/// Plays a mono buffer on one channel of an output device, once. The IOProc only reads a buffer allocated before it
-/// starts and advances a position it alone writes: no allocation, locks or Objective-C on the audio thread.
+/// Plays mono buffers on channels of an output device, once, all from the same frame. The IOProc only reads buffers
+/// allocated before it starts and advances a position it alone writes: no allocation, locks or Objective-C on the audio
+/// thread.
 final class RoomStimulusPlayer: @unchecked Sendable {
     let device: AudioObjectID
+    /// Every track's samples, one after another, `count` each.
     private let samples: UnsafeMutablePointer<Float>
     private let count: Int
-    private let channel: Int
+    private let channels: [Int]
     private let position = UnsafeMutablePointer<Int>.allocate(capacity: 1)
     private var procID: AudioDeviceIOProcID?
     private let queue = DispatchQueue(label: "org.szeremeta.vespertine.room-player", qos: .userInteractive)
 
-    init(device: AudioObjectID, stimulus: [Float], channel: Int, rate: Double) throws {
+    init(device: AudioObjectID, stimulus: RoomStimulus, rate: Double) throws {
         self.device = device
-        self.channel = channel
-        count = stimulus.count
+        channels = stimulus.tracks.map(\.channel)
+        count = stimulus.tracks.map(\.samples.count).min() ?? 0
         let name = HAL.getString(device, .global(kAudioObjectPropertyName)) ?? "The output"
         let actual = (try? HAL.get(device, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
         // Changing the device's rate would change the listener's setup, so the measurement refuses instead.
         guard abs(actual - rate) < 0.5 else { throw CoreAudioError(-1, "\(name) runs at \(Int(actual)) Hz, the measurement needs \(Int(rate)) Hz; set it in Audio MIDI Setup. Output") }
         let configured = try Self.channelCount(device)
-        guard channel < configured else { throw CoreAudioError(-1, "\(name) has \(configured) output channels, not \(channel + 1). Output") }
-        samples = .allocate(capacity: max(1, stimulus.count))
-        samples.initialize(from: stimulus, count: stimulus.count)
+        let highest = channels.max() ?? 0
+        guard highest < configured else { throw CoreAudioError(-1, "\(name) has \(configured) output channels, not \(highest + 1). Output") }
+        samples = .allocate(capacity: max(1, count * channels.count))
+        for (t, track) in stimulus.tracks.enumerated() {
+            (samples + t * count).initialize(from: track.samples, count: count)
+        }
         position.initialize(to: 0)
     }
 
@@ -70,7 +75,7 @@ final class RoomStimulusPlayer: @unchecked Sendable {
     }
 
     func start() throws {
-        let samples = samples, count = count, channel = channel
+        let samples = samples, count = count, channels = channels
         position.pointee = 0
         let position = position
         var id: AudioDeviceIOProcID?
@@ -78,18 +83,18 @@ final class RoomStimulusPlayer: @unchecked Sendable {
             let list = UnsafeMutableAudioBufferListPointer(outputData)
             var firstChannel = 0
             for buffer in list {
-                let channels = Int(buffer.mNumberChannels)
-                guard let data = buffer.mData?.assumingMemoryBound(to: Float.self), channels > 0 else { continue }
-                let frames = Int(buffer.mDataByteSize) / (MemoryLayout<Float>.size * channels)
+                let width = Int(buffer.mNumberChannels)
+                guard let data = buffer.mData?.assumingMemoryBound(to: Float.self), width > 0 else { continue }
+                let frames = Int(buffer.mDataByteSize) / (MemoryLayout<Float>.size * width)
                 memset(buffer.mData, 0, Int(buffer.mDataByteSize))
-                if channel >= firstChannel, channel < firstChannel + channels {
-                    let column = channel - firstChannel
+                for (t, channel) in channels.enumerated() where channel >= firstChannel && channel < firstChannel + width {
+                    let column = channel - firstChannel, track = samples + t * count
                     for f in 0..<frames {
                         let p = position.pointee + f
-                        if p < count { data[f * channels + column] = samples[p] }
+                        if p < count { data[f * width + column] = track[p] }
                     }
                 }
-                firstChannel += channels
+                firstChannel += width
             }
             position.pointee += list.first.map { Int($0.mDataByteSize) / (MemoryLayout<Float>.size * max(1, Int($0.mNumberChannels))) } ?? 0
         }, "AudioDeviceCreateIOProcIDWithBlock (output)")
@@ -105,7 +110,7 @@ final class RoomStimulusPlayer: @unchecked Sendable {
     }
 }
 
-/// Records one input channel with the existing capture ring and plays the stimulus on one output channel.
+/// Records one input channel with the existing capture ring and plays the stimulus on its output channels.
 public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
     private let lock = NSLock()
     private var recorder: LoopbackRecorder?
@@ -117,7 +122,7 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
 
     public init() {}
 
-    public func start(request: RoomCaptureRequest, stimulus: [Float]) throws {
+    public func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws {
         lock.lock(); defer { lock.unlock() }
         stopLocked()
         let rate = request.layout.sampleRate
@@ -125,7 +130,7 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
         guard request.inputChannel < recorder.channels else {
             throw CoreAudioError(-1, "The input has \(recorder.channels) channels, not \(request.inputChannel + 1). Input")
         }
-        let player = try RoomStimulusPlayer(device: request.outputDevice, stimulus: stimulus, channel: request.outputChannel, rate: rate)
+        let player = try RoomStimulusPlayer(device: request.outputDevice, stimulus: stimulus, rate: rate)
         self.recorder = recorder
         self.player = player
         channel = request.inputChannel
@@ -238,28 +243,43 @@ public final class SimulatedRoomDevice: RoomCaptureDevice, @unchecked Sendable {
 
     public init() {}
 
-    public func start(request: RoomCaptureRequest, stimulus: [Float]) throws {
-        let rate = request.layout.sampleRate
-        let g = gain[request.outputChannel] ?? 0.04
-        let shift = Int(((delaySeconds[request.outputChannel] ?? 0.009) * rate).rounded())
-        // Peaking filter (RBJ cookbook) for a room mode, then a one-pole low-pass.
-        let f0 = request.outputChannel == 0 ? 63.0 : 71.0, q = 3.0, boost = 7.0
-        let a = pow(10, boost / 40), w = 2 * Double.pi * f0 / rate, alpha = sin(w) / (2 * q)
-        let b0 = 1 + alpha * a, b1 = -2 * cos(w), b2 = 1 - alpha * a, a0 = 1 + alpha / a, a1 = -2 * cos(w), a2 = 1 - alpha / a
-        let lp = exp(-2 * Double.pi * 7_000 / rate)
-        var x1 = 0.0, x2 = 0.0, y1 = 0.0, y2 = 0.0, l = 0.0
+    public func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws {
+        let frames = request.layout.recordingFrames
+        var out = [Double](repeating: 0, count: frames)
+        for track in stimulus.tracks {
+            let heard = speaker(track.channel, playing: track.samples, rate: request.layout.sampleRate, frames: frames)
+            for n in 0..<frames { out[n] += heard[n] }
+        }
         var seed: UInt64 = 0x9E37_79B9_7F4A_7C15
-        var out = [Float](repeating: 0, count: request.layout.recordingFrames)
-        for n in 0..<out.count {
-            let x = n - shift >= 0 && n - shift < stimulus.count ? Double(stimulus[n - shift]) : 0
-            let y = (b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2) / a0
+        let recorded = out.map { v -> Float in
+            seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17
+            return Float(v + (Double(seed >> 11) / Double(1 << 53) - 0.5) * 2e-5)
+        }
+        lock.withLock { recording = recorded; cursor = 0 }
+    }
+
+    /// What the microphone hears of output `channel` playing `samples`: a delay, a gain, a room mode (a peaking filter,
+    /// RBJ cookbook) and a one-pole treble roll-off.
+    private func speaker(_ channel: Int, playing samples: [Float], rate: Double, frames: Int) -> [Double] {
+        let g = gain[channel] ?? 0.04
+        let shift = Int(((delaySeconds[channel] ?? 0.009) * rate).rounded())
+        let f0 = channel == 0 ? 63.0 : 71.0, q = 3.0, boost = 7.0
+        let a: Double = pow(10, boost / 40), w: Double = 2 * Double.pi * f0 / rate
+        let alpha: Double = sin(w) / (2 * q), cw: Double = cos(w)
+        let b0: Double = 1 + alpha * a, b1: Double = -2 * cw, b2: Double = 1 - alpha * a
+        let a0: Double = 1 + alpha / a, a1: Double = -2 * cw, a2: Double = 1 - alpha / a
+        let lp: Double = exp(-2 * Double.pi * 7_000 / rate)
+        var x1 = 0.0, x2 = 0.0, y1 = 0.0, y2 = 0.0, l = 0.0
+        var out = [Double](repeating: 0, count: frames)
+        for n in 0..<frames {
+            let x: Double = n - shift >= 0 && n - shift < samples.count ? Double(samples[n - shift]) : 0
+            let feed: Double = b0 * x + b1 * x1 + b2 * x2
+            let y: Double = (feed - a1 * y1 - a2 * y2) / a0
             x2 = x1; x1 = x; y2 = y1; y1 = y
             l = (1 - lp) * y + lp * l
-            seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17
-            let noise = (Double(seed >> 11) / Double(1 << 53) - 0.5) * 2e-5
-            out[n] = Float(g * l + noise)
+            out[n] = g * l
         }
-        lock.withLock { recording = out; cursor = 0 }
+        return out
     }
 
     public func readAvailable(maxFrames: Int) -> RoomCaptureChunk {

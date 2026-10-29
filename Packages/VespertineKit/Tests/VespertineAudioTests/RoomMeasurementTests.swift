@@ -44,22 +44,29 @@ struct TestRoom: Sendable {
 
     func record(_ request: RoomCaptureRequest, noiseSeed: UInt64 = 7) -> [Float] {
         let layout = request.layout
-        var stimulus = layout.stimulus()
-        if dropReferences {
-            for n in 0..<layout.reference.samples.count {
-                stimulus[layout.firstReferenceStart + n] = 0
-                stimulus[layout.secondReferenceStart + n] = 0
+        // Every track from its own speaker: its own delay (not a whole number of samples) and gain.
+        var heard = [Double](repeating: 0, count: layout.recordingFrames)
+        for track in request.stimulus().tracks {
+            var stimulus = track.samples
+            if dropReferences {
+                for n in 0..<layout.reference.samples.count {
+                    stimulus[layout.firstReferenceStart + n] = 0
+                    stimulus[layout.secondReferenceStart + n] = 0
+                }
+            }
+            let g = gain[track.channel] ?? 0
+            let shift = (delay[track.channel] ?? 0) * layout.sampleRate
+            for n in heard.indices {
+                let x = Double(n) - shift
+                let i = Int(x.rounded(.down)), f = x - Double(i)
+                let a = i >= 0 && i < stimulus.count ? Double(stimulus[i]) : 0
+                let b = i + 1 >= 0 && i + 1 < stimulus.count ? Double(stimulus[i + 1]) : 0
+                heard[n] += g * (a + f * (b - a))
             }
         }
-        let g = gain[request.outputChannel] ?? 0
-        let shift = (delay[request.outputChannel] ?? 0) * layout.sampleRate
         var generator = SeededGenerator(seed: noiseSeed)
-        return (0..<layout.recordingFrames).map { n in
-            let x = Double(n) - shift
-            let i = Int(x.rounded(.down)), f = x - Double(i)
-            let a = i >= 0 && i < stimulus.count ? Double(stimulus[i]) : 0
-            let b = i + 1 >= 0 && i + 1 < stimulus.count ? Double(stimulus[i + 1]) : 0
-            var v = g * (a + f * (b - a))
+        return heard.map { value in
+            var v = value
             if noise > 0 { v += noise * generator.gaussian() }
             if let clipAt { v = max(-clipAt, min(clipAt, v * 3_000)) }
             return Float(v)
@@ -509,14 +516,16 @@ struct RealChainRoom: Sendable {
 
     func record(_ request: RoomCaptureRequest) -> [Float] {
         let layout = request.layout
-        var played = layout.stimulus().map(Double.init)
-        for n in 0..<min(Int(muteSeconds * layout.sampleRate), played.count) { played[n] = 0 }
-        let heard = RoomFFT.convolve(played, Self.impulse)
-        let g = gain[request.outputChannel] ?? 0, shift = Self.delay + (extraDelay[request.outputChannel] ?? 0)
+        // Each track from its own speaker (the references and the sweep can come from different ones).
+        let speakers: [(heard: [Double], gain: Double, shift: Int)] = request.stimulus().tracks.map { track in
+            var played = track.samples.map(Double.init)
+            for n in 0..<min(Int(muteSeconds * layout.sampleRate), played.count) { played[n] = 0 }
+            return (RoomFFT.convolve(played, Self.impulse), gain[track.channel] ?? 0, Self.delay + (extraDelay[track.channel] ?? 0))
+        }
         return (0..<layout.recordingFrames).map { n in
             var v = Self.noise[n % Self.noise.count]
             if n < Self.startTransient.count { v += Self.startTransient[n] }
-            if n - shift >= 0, n - shift < heard.count { v += g * heard[n - shift] }
+            for s in speakers where n - s.shift >= 0 && n - s.shift < s.heard.count { v += s.gain * s.heard[n - s.shift] }
             return Float(v)
         }
     }

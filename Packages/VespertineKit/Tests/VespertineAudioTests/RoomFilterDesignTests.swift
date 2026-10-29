@@ -178,7 +178,8 @@ struct RoomFilterDesignTests {
         #expect(decoded == profile)
         let playback = RoomCorrectionPlayback(profile: decoded)
         #expect(playback.channels.count == 2)
-        #expect(playback.channels[0] == design.channels[.left]!.bands && playback.channels[1] == design.channels[.right]!.bands)
+        #expect(playback.channels[0].bands == design.channels[.left]!.bands)
+        #expect(playback.channels[1].bands == design.channels[.right]!.bands)
         #expect(playback.preampDB == design.preampDB && playback.profileID == profile.id && playback.name == "Desk")
     }
 

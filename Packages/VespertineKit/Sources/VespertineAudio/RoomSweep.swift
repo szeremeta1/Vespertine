@@ -140,6 +140,17 @@ public struct ImpulseResponse: Sendable {
         return best - origin
     }
 
+    /// Where the linear impulse peaks, to a fraction of a sample (a parabola through the peak and its neighbours), in
+    /// samples from the origin.
+    public var arrivalSamples: Double {
+        let delay = delaySamples, i = origin + delay
+        guard i > 0, i + 1 < samples.count else { return Double(delay) }
+        let a = abs(samples[i - 1]), b = abs(samples[i]), c = abs(samples[i + 1])
+        let curve = a - 2 * b + c
+        let shift = curve == 0 ? 0 : 0.5 * (a - c) / curve
+        return Double(delay) + min(max(shift, -0.5), 0.5)
+    }
+
     /// The linear impulse from `preSamples` before the peak (default: as far as the 2nd harmonic allows, since the
     /// low end of a band-limited impulse rings for a long time), `length` samples long, ending in a short half-cosine
     /// taper.

@@ -255,6 +255,13 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
     public var measured: [RoomSpeaker: RoomCurve]?
     /// The options the filters were fitted with.
     public var designOptions: RoomFilterDesignOptions?
+    /// Each speaker's delay and level trim, so every speaker reaches the seat at the same time and level. Missing
+    /// speakers (and profiles saved before schema 3) get none.
+    public var alignment: [RoomSpeaker: RoomSpeakerAlignment]?
+    /// Each speaker's measured correction filter (an impulse response, convolved after its delay, level and bands).
+    public var impulses: [RoomSpeaker: RoomImpulse]?
+    /// Where the profile came from; nil in profiles saved before schema 3 (all measured here).
+    public var source: RoomProfileSource?
 
     public init(id: UUID, name: String, createdAt: Date, sessionID: UUID, deviceUID: String, layout: RoomLayout, channelMap: RoomChannelMap,
                 micSerial: String, calibrationSHA256: String?, target: RoomTarget, filters: RoomFilterSet) {
@@ -271,15 +278,72 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
         self.filters = filters
     }
 
+    /// Where it came from: measured here unless it says otherwise.
+    public var origin: RoomProfileSource { source ?? .measured }
+
+    /// The delay and level trim of `speaker` (none if the profile has no alignment for it).
+    public func alignment(for speaker: RoomSpeaker) -> RoomSpeakerAlignment { alignment?[speaker] ?? RoomSpeakerAlignment() }
+
     /// A profile is valid for the device, layout and wiring it was measured on, and for nothing else.
     public func applies(deviceUID: String, layout: RoomLayout, channelMap: RoomChannelMap) -> Bool {
         self.deviceUID == deviceUID && self.layout == layout && Set(self.channelMap.entries) == Set(channelMap.entries)
     }
 }
 
+/// One speaker's time and level alignment.
+public struct RoomSpeakerAlignment: Codable, Hashable, Sendable {
+    /// How long the speaker's sound is held back, in milliseconds (to line it up with the farthest speaker).
+    public var delayMs: Double
+    /// Level trim in dB (to match the quietest speaker).
+    public var levelDB: Double
+
+    public static let delayRange: ClosedRange<Double> = 0...40
+    public static let levelRange: ClosedRange<Double> = -30...12
+
+    public init(delayMs: Double = 0, levelDB: Double = 0) {
+        self.delayMs = delayMs
+        self.levelDB = levelDB
+    }
+
+    public var isActive: Bool { delayMs > 0 || levelDB != 0 }
+
+    /// Both values held to what playback can run.
+    public var clamped: RoomSpeakerAlignment {
+        let delay = min(max(delayMs, Self.delayRange.lowerBound), Self.delayRange.upperBound)
+        let level = min(max(levelDB, Self.levelRange.lowerBound), Self.levelRange.upperBound)
+        return RoomSpeakerAlignment(delayMs: delay, levelDB: level)
+    }
+
+    /// Lines speakers up at the seat: each is held back until the farthest one's sound arrives, and turned down to
+    /// the quietest one's level (never up, so alignment can't clip). `arrivalMs` and `levelDB` are per speaker, measured
+    /// against the same reference; speakers missing from either get only what's known.
+    public static func align(arrivalMs: [RoomSpeaker: Double], levelDB: [RoomSpeaker: Double]) -> [RoomSpeaker: RoomSpeakerAlignment] {
+        let latest = arrivalMs.values.max() ?? 0
+        let quietest = levelDB.values.min() ?? 0
+        var out: [RoomSpeaker: RoomSpeakerAlignment] = [:]
+        for speaker in Set(arrivalMs.keys).union(levelDB.keys) {
+            let delay: Double = arrivalMs[speaker].map { latest - $0 } ?? 0
+            let level: Double = levelDB[speaker].map { quietest - $0 } ?? 0
+            out[speaker] = RoomSpeakerAlignment(delayMs: (delay * 100).rounded() / 100, levelDB: (level * 10).rounded() / 10).clamped
+        }
+        return out
+    }
+}
+
+/// Where a room profile's correction came from.
+public enum RoomProfileSource: String, Codable, Hashable, Sendable {
+    /// Measured here with a microphone.
+    case measured
+    /// Parametric filters (and delays and levels) from an Equalizer APO configuration, as REW exports it.
+    case equalizerAPO
+    /// Impulse responses (convolution filters) from WAV, AIFF, CAF or FLAC files.
+    case impulseResponse
+}
+
 public enum RoomCorrectionCoding {
     /// Bump when the stored shape changes, and add the step that upgrades the previous one to `migrate`.
-    public static let currentSchema = 2
+    /// 3: per-speaker alignment, impulse responses and the profile's source (all optional, so 2 reads as is).
+    public static let currentSchema = 3
 
     private static var encoder: JSONEncoder {
         let e = JSONEncoder()
