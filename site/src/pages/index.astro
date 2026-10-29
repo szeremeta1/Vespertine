@@ -87,6 +87,7 @@ const display = { widths: [480, 720, 960, 1280, 1600, 2000], sizes: '(max-width:
           <DownloadButton />
           <GitHubButton />
         </div>
+        <p class="hero__ask">Like it? <a href={links.repo}>Star it on GitHub</a> · <a href={links.discussions}>Join the discussion</a></p>
         <p class="hero__meta mono"><b>Version {latest.version}</b> · {megabytes(latest.dmg.size)} · {longDate(latest.date)} · signed and notarized · <a href={latest.url} class="nowrap">Release notes</a></p>
         <Brew />
         <p class="hero__fine">{hero.fine} <a href="/privacy.html">Privacy: nothing collected.</a></p>
