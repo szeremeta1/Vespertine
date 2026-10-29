@@ -539,7 +539,7 @@
     "description": "서라운드와 하이레즈 음악 컬렉션을 위한 무료 오픈 소스 Mac 플레이어 Vespertine의 기본 정보, 로고, 키 아트, 실제 스크린샷과 트레일러입니다.",
     "ogAlt": "Vespertine 프레스 키트: 팩트 시트, 로고, 키 아트, 실제 스크린샷과 트레일러. 앱의 실제 스크린샷 세 장을 배경으로 표시됩니다.",
     "eyebrow": "프레스 키트",
-    "heading": "기사에 필요한 모든 것",
+    "heading": "{name}에 관한 기사에 필요한 모든 것.",
     "lede": "Vespertine은 서라운드와 하이레즈 음악 컬렉션을 위한 무료 오픈 소스 Mac 플레이어입니다. SACD 및 DVD-Video 디스크 이미지, 추출한 SACD 5.1 트랙, DTS CD, DTS-HD MA, TrueHD, Atmos 파일을 하나의 보관함에서 함께 관리하며, AirPods에서는 머리 추적을 지원하는 공간 음향으로 들을 수 있습니다. 신호 경로에는 파일에서 출력까지의 각 단계가 표시되며, 관련 조건과 테스트는 누구나 검토할 수 있는 GPL 소스 코드에 공개되어 있습니다.",
     "fine": "개별 채널 출력과 리시버 비트스트림 출력은 실험적 기능이며, 실제 리시버와 멀티채널 USB DAC에서는 테스트되지 않았습니다(HDMI로 연결한 Sony TV 한 대에서는 테스트함: docs/DEVICES.md 참조). 사용 보고를 기다립니다. Dolby Digital Plus Atmos 오브젝트는 macOS가 렌더링하며, TrueHD Atmos와 DTS:X는 채널 베드를 재생합니다.",
     "facts": {

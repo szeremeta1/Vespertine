@@ -539,7 +539,7 @@
     "description": "Adatok, logók, kulcsgrafikák, valódi képernyőképek és előzetes a Vespertine-ről, az ingyenes, nyílt forráskódú Mac-lejátszóról surround és hi-res zenegyűjteményekhez.",
     "ogAlt": "A Vespertine sajtócsomagja: adatlap, logók, kulcsgrafikák, valódi képernyőképek és az előzetes, az alkalmazás három valódi képernyőképe fölött.",
     "eyebrow": "Sajtócsomag",
-    "heading": "Minden, ami egy cikkhez kell",
+    "heading": "Minden, ami egy {name}-ről szóló cikkhez kell.",
     "lede": "A Vespertine ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenegyűjteményekhez. Az SACD- és DVD-Video-lemezképek, a kinyert SACD 5.1-es sávok, a DTS CD-k, valamint a DTS-HD MA-, TrueHD- és Atmos-fájlok egyetlen könyvtárban férnek meg, AirPodson fejkövetéses Térhatású hanggal. A jelút a fájltól a kimenetig minden lépést megmutat; a feltételek és a tesztek a GPL-forráskódban vannak, amelyet bárki ellenőrizhet.",
     "fine": "A csatornánkénti kimenet és az AV-erősítőre küldött bitstream kísérleti funkció, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); visszajelzéseket várunk. A Dolby Digital Plus Atmos objektumait a macOS rendereli; a TrueHD Atmosnak és a DTS:X-nek a csatornaalapú rétege szól.",
     "facts": {

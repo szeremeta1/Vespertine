@@ -539,7 +539,7 @@
     "description": "Taarifa muhimu, nembo, picha kuu, picha halisi za skrini na trela ya Vespertine, kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res.",
     "ogAlt": "Vifaa vya wanahabari vya Vespertine: karatasi ya taarifa, nembo, picha kuu, picha halisi za skrini na trela, juu ya picha tatu halisi za skrini za programu.",
     "eyebrow": "Vifaa vya wanahabari",
-    "heading": "Kila kitu unachohitaji ili kuandika kuihusu",
+    "heading": "Kila kitu unachohitaji ili kuandika kuhusu {name}.",
     "lede": "Vespertine ni kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, nyimbo za SACD 5.1 zilizotolewa kwenye diski, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos zinakaa katika maktaba moja, pamoja na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Njia ya Mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti, huku masharti na majaribio yakiwa katika msimbo chanzo wa GPL ambao mtu yeyote anaweza kuukagua.",
     "fine": "Utoaji wa chaneli kwa chaneli na bitstream kwenda kwa resiva ni vya majaribio, havijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika. Vitu vya Dolby Digital Plus Atmos huchakatwa na macOS; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi.",
     "facts": {

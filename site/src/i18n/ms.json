@@ -539,7 +539,7 @@
     "description": "Fakta, logo, seni utama, tangkapan skrin sebenar dan treler Vespertine, pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res.",
     "ogAlt": "Kit media Vespertine: lembaran fakta, logo, seni utama, tangkapan skrin sebenar dan treler, di atas tiga tangkapan skrin sebenar aplikasi.",
     "eyebrow": "Kit media",
-    "heading": "Semua yang anda perlukan untuk menulis tentangnya",
+    "heading": "Semua yang anda perlukan untuk menulis tentang {name}.",
     "lede": "Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, trek SACD 5.1 yang diekstrak, CD DTS serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka, dengan Audio Ruang berpenjejakan kepala pada AirPods. Laluan Isyarat menunjukkan setiap langkah daripada fail hingga ke output, dengan syarat dan ujian dalam kod sumber GPL yang boleh diaudit oleh sesiapa sahaja.",
     "fine": "Output saluran demi saluran dan bitstream ke penerima masih eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya.",
     "facts": {

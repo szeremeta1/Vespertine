@@ -539,7 +539,7 @@
     "description": "Fiche technique, logos, visuels, captures d’écran réelles et bande-annonce de Vespertine, le lecteur Mac libre et gratuit pour les collections de musique surround et Hi-Res.",
     "ogAlt": "Kit presse de Vespertine : fiche technique, logos, visuels, captures d’écran réelles et bande-annonce, sur fond de trois captures d’écran réelles de l’app.",
     "eyebrow": "Kit presse",
-    "heading": "Tout pour parler de",
+    "heading": "Tout pour parler de {name}.",
     "lede": "Vespertine est le lecteur Mac libre et gratuit pour les collections de musique surround et Hi-Res. Images de disques SACD et DVD-Video, pistes SACD 5.1 extraites, CD DTS, fichiers DTS-HD MA, TrueHD et Atmos se retrouvent dans une même bibliothèque, avec l’audio spatial et le suivi de la tête sur AirPods. Le chemin du signal détaille chaque étape, du fichier à la sortie, avec des conditions et des tests dans un code source sous GPL que chacun peut auditer.",
     "fine": "La sortie canal par canal et le bitstream vers un ampli-tuner sont expérimentaux, non testés sur de vrais amplis-tuners ni sur des DAC USB multicanaux (un téléviseur Sony en HDMI a été testé : voir docs/DEVICES.md) ; retours souhaités. Les objets Dolby Digital Plus Atmos sont rendus par macOS ; pour TrueHD Atmos et DTS:X, seul le lit de canaux est lu.",
     "facts": {

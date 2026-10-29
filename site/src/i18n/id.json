@@ -539,7 +539,7 @@
     "description": "Fakta, logo, key art, tangkapan layar asli, dan trailer Vespertine, pemutar Mac gratis dan open source untuk koleksi musik surround dan hi-res.",
     "ogAlt": "Kit pers Vespertine: lembar fakta, logo, key art, tangkapan layar asli, dan trailer, di atas tiga tangkapan layar asli aplikasi.",
     "eyebrow": "Kit pers",
-    "heading": "Semua bahan untuk tulisan Anda",
+    "heading": "Semua bahan untuk tulisan Anda tentang {name}.",
     "lede": "Vespertine adalah pemutar Mac gratis dan open source untuk koleksi musik surround dan hi-res. Image disk SACD dan DVD-Video, trek SACD 5.1 hasil ekstraksi, CD DTS, serta file DTS-HD MA, TrueHD, dan Atmos berkumpul dalam satu perpustakaan, dengan Audio Spasial berpelacakan kepala di AirPods. Jalur sinyal menampilkan setiap tahap dari file hingga output, dengan kondisi dan pengujian dalam kode sumber GPL yang dapat diaudit siapa saja.",
     "fine": "Output saluran demi saluran dan bitstream ke receiver masih eksperimental, belum diuji pada receiver dan DAC USB multisaluran sungguhan (satu TV Sony melalui HDMI sudah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memutar channel bed-nya.",
     "facts": {

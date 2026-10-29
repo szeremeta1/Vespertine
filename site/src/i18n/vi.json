@@ -539,7 +539,7 @@
     "description": "Thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu của Vespertine, trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res.",
     "ogAlt": "Bộ tài liệu báo chí Vespertine: bảng thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu, trên nền ba ảnh chụp màn hình thật của ứng dụng.",
     "eyebrow": "Tài liệu báo chí",
-    "heading": "Mọi thứ bạn cần để viết bài",
+    "heading": "Mọi thứ bạn cần để viết bài về {name}.",
     "lede": "Vespertine là trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, các bản nhạc SACD 5.1 đã trích xuất, CD DTS, tệp DTS-HD MA, TrueHD và Atmos cùng nằm trong một thư viện, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Đường tín hiệu cho thấy từng bước từ tệp đến đầu ra, với các điều kiện và bài kiểm thử nằm trong mã nguồn GPL mà ai cũng có thể kiểm tra.",
     "fine": "Xuất tín hiệu đúng từng kênh và bitstream tới receiver là tính năng thử nghiệm, chưa được kiểm thử trên receiver thật và DAC USB đa kênh (mới thử một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Đối tượng Atmos trong Dolby Digital Plus do macOS kết xuất; TrueHD Atmos và DTS:X phát lớp kênh nền của chúng.",
     "facts": {

@@ -539,7 +539,7 @@
     "description": "Fakty, logotypy, grafiki promocyjne, prawdziwe zrzuty ekranu i zwiastun Vespertine, darmowego, otwartoźródłowego odtwarzacza na Maca dla kolekcji muzyki surround i hi-res.",
     "ogAlt": "Materiały prasowe Vespertine: karta informacyjna, logotypy, grafiki promocyjne, prawdziwe zrzuty ekranu i zwiastun, na tle trzech prawdziwych zrzutów ekranu aplikacji.",
     "eyebrow": "Materiały prasowe",
-    "heading": "Wszystko, czego potrzeba do artykułu",
+    "heading": "Wszystko, czego potrzeba do artykułu o {name}.",
     "lede": "Vespertine to darmowy, otwartoźródłowy odtwarzacz na Maca dla kolekcji muzyki surround i hi-res. Obrazy płyt SACD i DVD-Video, wyodrębnione ścieżki SACD 5.1, płyty DTS CD oraz pliki DTS-HD MA, TrueHD i Atmos trafiają do jednej biblioteki, a na AirPods działa Dźwięk przestrzenny ze śledzeniem ruchów głowy. Ścieżka sygnału pokazuje każdy etap od pliku do wyjścia, a warunki i testy są w kodzie źródłowym na licencji GPL, który każdy może zweryfikować.",
     "fine": "Wyjście kanał w kanał i bitstream do amplitunera są eksperymentalne, nieprzetestowane na prawdziwych amplitunerach i wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); czekamy na zgłoszenia. Obiekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos i DTS:X odtwarzają swoją podstawową warstwę kanałową.",
     "facts": {

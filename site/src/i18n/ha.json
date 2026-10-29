@@ -539,7 +539,7 @@
     "description": "Bayanai, tambura, manyan zane-zane, hotunan allo na gaske da bidiyon gabatarwa na Vespertine, manhajar Mac kyauta mai buɗaɗɗen tushe don tarin waƙoƙin kewaye da Hi-Res.",
     "ogAlt": "Kayan 'yan jarida na Vespertine: takardar bayanai, tambura, manyan zane-zane, hotunan allo na gaske da bidiyon gabatarwa, a kan hotunan allo uku na gaske na manhajar.",
     "eyebrow": "Kayan 'yan jarida",
-    "heading": "Duk abin da kuke buƙata don yin rubutu",
+    "heading": "Duk abin da kuke buƙata don yin rubutu game da {name}.",
     "lede": "Vespertine manhajar Mac ce kyauta, mai buɗaɗɗen tushe, don tarin waƙoƙin kewaye da Hi-Res. Kwafin faifan SACD da DVD-Video, waƙoƙin SACD 5.1 da aka ciro, CD na DTS, da fayilolin DTS-HD MA, TrueHD da Atmos suna raba laburare ɗaya, tare da Spatial Audio mai bin motsin kai a AirPods. Hanyar Sigina tana nuna kowane mataki daga fayil zuwa fitarwa, tare da sharuɗɗa da gwaje-gwaje a cikin lambar tushe ta GPL wadda kowa zai iya bincika.",
     "fine": "Fitarwa tasha-zuwa-tasha da bitstream zuwa risiva na gwaji ne, kuma ba a gwada su ba a kan risiva na gaske da DAC na USB masu tashoshi da yawa (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni. macOS ne ke tsara sautin abubuwan Dolby Digital Plus Atmos; TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu.",
     "facts": {

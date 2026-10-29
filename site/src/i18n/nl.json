@@ -539,7 +539,7 @@
     "description": "Feiten, logo’s, key art, echte screenshots en de trailer van Vespertine, de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac.",
     "ogAlt": "Perskit van Vespertine: factsheet, logo’s, key art, echte screenshots en de trailer, op een achtergrond van drie echte screenshots van de app.",
     "eyebrow": "Perskit",
-    "heading": "Alles wat je nodig hebt om erover te schrijven",
+    "heading": "Alles wat je nodig hebt om over {name} te schrijven.",
     "lede": "Vespertine is de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac. Schijfkopieën van SACD’s en DVD-Video, uit SACD’s geëxtraheerde 5.1-tracks, DTS-cd’s en DTS-HD MA-, TrueHD- en Atmos-bestanden delen één bibliotheek, met ruimtelijke audio met hoofdtracking op AirPods. Het signaalpad toont elke stap van bestand tot uitvoer, met de voorwaarden en tests in GPL-broncode die iedereen kan controleren.",
     "fine": "Uitvoer kanaal voor kanaal en bitstream naar een receiver zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht. Atmos-objecten in Dolby Digital Plus worden door macOS gerenderd; TrueHD Atmos en DTS:X spelen hun kanaalbed af.",
     "facts": {

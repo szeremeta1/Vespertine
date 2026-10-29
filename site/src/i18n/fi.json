@@ -539,7 +539,7 @@
     "description": "Faktat, logot, mainoskuvat, aidot kuvakaappaukset ja traileri Vespertinestä, ilmaisesta avoimen lähdekoodin Mac-soittimesta surround- ja hi-res-musiikkikokoelmille.",
     "ogAlt": "Vespertinen lehdistöpaketti: tietolehti, logot, mainoskuvat, aidot kuvakaappaukset ja traileri kolmen sovelluksesta otetun aidon kuvakaappauksen päällä.",
     "eyebrow": "Lehdistöpaketti",
-    "heading": "Kaikki, mitä tarvitset juttuasi varten",
+    "heading": "Kaikki, mitä tarvitset kirjoittaaksesi {name}-sovelluksesta.",
     "lede": "Vespertine on ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, puretut SACD-levyjen 5.1-raidat, DTS CD:t sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa, ja AirPodeilla ne soivat pään liikkeitä seuraavana Tilaäänenä. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon, ja ehdot ja testit ovat GPL-lähdekoodissa, jonka kuka tahansa voi tarkastaa.",
     "fine": "Kanava kanavaan -ulostulo ja bittivirta vastaanottimelle ovat kokeellisia, eikä niitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan. Dolby Digital Plus Atmosin objektit renderöi macOS; TrueHD Atmosista ja DTS:X:stä toistetaan niiden kanavapohja.",
     "facts": {

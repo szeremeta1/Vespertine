@@ -539,7 +539,7 @@
     "description": "Vespertine 的基本信息、标志、主视觉、真实截图和预告片。Vespertine 是一款免费开源的 Mac 播放器，专为环绕声与高解析度音乐收藏打造。",
     "ogAlt": "Vespertine 媒体资料包：资料表、标志、主视觉、真实截图和预告片，叠加在三张应用的真实截图之上。",
     "eyebrow": "媒体资料包",
-    "heading": "撰写报道所需的一切",
+    "heading": "撰写 {name} 相关报道所需的一切。",
     "lede": "Vespertine 是一款免费开源的 Mac 播放器，专为环绕声与高解析度音乐收藏打造。SACD 和 DVD-Video 光盘映像、提取出的 SACD 5.1 音轨、DTS CD，以及 DTS-HD MA、TrueHD 和 Atmos 文件，都汇集在同一个资料库中，并可在 AirPods 上以支持头部追踪的空间音频播放。信号路径会显示从文件到输出的每一步，相关条件和测试都写在任何人都能审查的 GPL 源代码中。",
     "fine": "逐声道输出和向功放输出比特流均为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已测试过一台通过 HDMI 连接的 Sony 电视：见 docs/DEVICES.md）；欢迎反馈测试结果。Dolby Digital Plus Atmos 的对象由 macOS 渲染；TrueHD Atmos 和 DTS:X 播放其声道床。",
     "facts": {

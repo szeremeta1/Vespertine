@@ -539,7 +539,7 @@
     "description": "Mac için ücretsiz, açık kaynak surround ve hi-res müzik koleksiyonu oynatıcısı Vespertine’in temel bilgileri, logoları, tanıtım görselleri, gerçek ekran görüntüleri ve fragmanı.",
     "ogAlt": "Vespertine basın kiti: bilgi sayfası, logolar, tanıtım görselleri, gerçek ekran görüntüleri ve fragman; arka planda uygulamanın üç gerçek ekran görüntüsü.",
     "eyebrow": "Basın kiti",
-    "heading": "Hakkında yazmak için ihtiyacınız olan her şey",
+    "heading": "{name} hakkında yazmak için ihtiyacınız olan her şey.",
     "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk görüntüleri, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta baş takipli Uzamsal Ses de var. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
     "fine": "Kanalı kanalına çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz. Dolby Digital Plus Atmos nesnelerini macOS işler; TrueHD Atmos ve DTS:X kendi temel kanal katmanlarını çalar.",
     "facts": {

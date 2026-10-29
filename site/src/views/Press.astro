@@ -42,6 +42,11 @@ const screenshots = Object.entries(p.shots.items);
 const poster = await getImage({ src: posterSrc, width: 1280, format: 'webp', quality: 70 });
 const jsonLd = innerGraph({ lang, path, title, crumb: p.eyebrow, description, dateModified: isoDay(latest.date), image: `${SITE}/og/press.jpg`, screenshots: await sceneShots(lang), trailer: { url: SITE + TRAILER, poster: SITE + poster.src } });
 const facts = p.facts;
+// The heading puts the name where the language needs it ("… about {name}.", "{name}の記事に…"); the name and the
+// full stop right after it are set in brass italic.
+const [headBefore, headRest = ''] = p.heading.split('{name}');
+const headStop = headRest.match(/^[.。।۔።]?/)![0];
+const headAfter = headRest.slice(headStop.length);
 ---
 <Base lang={lang} page="press" title={title} description={description} og="press" ogAlt={p.ogAlt} jsonLd={jsonLd}>
 <a class="skip" href="#main">{s.common.skip}</a>
@@ -52,7 +57,7 @@ const facts = p.facts;
     <div class="hero__glow" aria-hidden="true"></div>
     <div class="wrap">
       <p class="eyebrow">{p.eyebrow}</p>
-      <h1 class="page-title">{p.heading} <span class="brass-italic">Vespertine.</span></h1>
+      <h1 class="page-title">{headBefore}<span class="brass-italic">Vespertine{headStop}</span>{headAfter}</h1>
       <p class="page-lede">{p.lede}</p>
       <p class="fine">{p.fine}</p>
     </div>

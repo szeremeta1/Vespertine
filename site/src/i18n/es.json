@@ -539,7 +539,7 @@
     "description": "Datos, logotipos, imágenes promocionales, capturas reales y el tráiler de Vespertine, el reproductor gratuito y de código abierto para Mac pensado para colecciones de música envolvente y en alta resolución.",
     "ogAlt": "Kit de prensa de Vespertine: ficha de datos, logotipos, imágenes promocionales, capturas reales y el tráiler, sobre tres capturas reales de la app.",
     "eyebrow": "Kit de prensa",
-    "heading": "Todo lo que necesitas para escribir sobre Vespertine",
+    "heading": "Todo lo que necesitas para escribir sobre {name}.",
     "lede": "Vespertine es el reproductor gratuito y de código abierto para Mac pensado para colecciones de música envolvente y en alta resolución. Imágenes de disco SACD y DVD-Video, pistas SACD 5.1 extraídas, CD DTS y archivos DTS-HD MA, TrueHD y Atmos comparten una sola biblioteca, con Audio espacial con seguimiento de la cabeza en los AirPods. La ruta de señal muestra cada paso del archivo a la salida, con condiciones y pruebas en un código fuente GPL que cualquiera puede auditar.",
     "fine": "La salida canal por canal y el bitstream al receptor son experimentales y no se han probado en receptores reales ni en DAC USB multicanal (se ha probado un televisor Sony por HDMI: consulta docs/DEVICES.md); se agradecen informes. Los objetos Atmos de Dolby Digital Plus los renderiza macOS; TrueHD Atmos y DTS:X reproducen su lecho de canales.",
     "facts": {

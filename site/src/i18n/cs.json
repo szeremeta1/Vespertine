@@ -539,7 +539,7 @@
     "description": "Fakta, loga, klíčové vizuály, skutečné snímky obrazovky a trailer k Vespertine, bezplatnému open-source přehrávači pro Mac určenému pro sbírky surround a hi-res hudby.",
     "ogAlt": "Tiskové materiály Vespertine: přehled faktů, loga, klíčové vizuály, skutečné snímky obrazovky a trailer, na pozadí tří skutečných snímků aplikace.",
     "eyebrow": "Tiskové materiály",
-    "heading": "Vše, co k psaní potřebujete",
+    "heading": "Vše, co potřebujete k psaní o {name}.",
     "lede": "Vespertine je bezplatný open-source přehrávač pro Mac určený pro sbírky surround a hi-res hudby. Obrazy disků SACD a DVD-Video, extrahované skladby SACD v 5.1, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu a ve sluchátkách AirPods hrají jako Prostorový zvuk se sledováním hlavy. Signálová cesta ukazuje každý krok od souboru až po výstup, s podmínkami a testy ve zdrojovém kódu pod GPL, který si může kdokoli prověřit.",
     "fine": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nejsou otestované na skutečných receiverech ani vícekanálových USB DAC (otestován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Objekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu.",
     "facts": {
