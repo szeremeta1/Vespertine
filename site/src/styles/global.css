@@ -515,8 +515,15 @@ html:not(.js) .features::before {
 @media (max-width: 900px) { .faq { grid-template-columns: 1fr; } }
 
 /* ---------- Closing ---------- */
-.closing { position: relative; isolation: isolate; padding: clamp(90px, 12vw, 170px) 0; border-top: 1px solid var(--line); overflow: clip; text-align: left; }
+.closing { position: relative; isolation: isolate; padding: clamp(90px, 12vw, 170px) 0; border-top: 1px solid transparent; overflow: clip; text-align: left; }
 .closing__glow { position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 70% at 20% 30%, rgba(200, 166, 106, .14), transparent 70%); }
+/* Fade the warm glow and grain in from the page background (smoothstep-eased, 0 -> 1 over the top 340px) so the support/download boundary has no edge. */
+.closing__glow, .closing .grain {
+  --fade-in: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, .006) 40px, rgba(0, 0, 0, .03) 80px, rgba(0, 0, 0, .09) 120px, rgba(0, 0, 0, .2) 160px, rgba(0, 0, 0, .35) 200px, rgba(0, 0, 0, .55) 240px, rgba(0, 0, 0, .78) 290px, #000 340px);
+  -webkit-mask-image: var(--fade-in); mask-image: var(--fade-in);
+}
+.closing .grain { -webkit-mask-image: var(--fade-in), linear-gradient(180deg, #000 60%, transparent); mask-image: var(--fade-in), linear-gradient(180deg, #000 60%, transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
+#support { padding-bottom: clamp(80px, 11vw, 140px); }
 .closing__title { font: 300 clamp(48px, 8.4vw, 140px)/.95 var(--serif); letter-spacing: -.035em; margin: 16px 0 34px; font-variation-settings: "opsz" 72; max-width: 12em; }
 .closing .hero__meta { margin-top: 18px; }
 
