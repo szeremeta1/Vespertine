@@ -230,12 +230,15 @@ extension AppModel {
 
     // MARK: Albums
 
+    /// How many of the newest albums Recently Added shows.
+    static let recentlyAddedLimit = 150
+
     /// The albums a page lists before its filter, in its order.
     func baseAlbums(_ scope: FilterScope) -> [Album] {
         let albums = library.albums
         switch scope {
         case .sidebar(.recentlyAdded):
-            return Array(albums.sorted { $0.addedAt > $1.addedAt }.prefix(60))
+            return Array(albums.sorted { $0.addedAt > $1.addedAt }.prefix(Self.recentlyAddedLimit))
         case .sidebar(.genres):
             return albums.filter { !$0.facts.genres.isEmpty }
         case .sidebar(.artists):
