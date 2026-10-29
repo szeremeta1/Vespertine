@@ -71,7 +71,7 @@ const cards = {
       <p class="lede">SACD and DVD-Video images, DSD, Dolby Atmos, TrueHD and DTS in one library, with a signal path you can check.</p>
       <div class="chips"><span class="chip brass">Bit-perfect</span><span class="chip">SACD ISO</span><span class="chip">DSD · DoP</span><span class="chip">Spatial Audio</span></div>
     </div>
-    <div class="panel"><img src="${shot('bit-perfect-fiio-24-96-detail')}" alt=""></div>
+    <div class="panel"><img src="${shot('bit-perfect-fosi-zd3-24-96-detail')}" alt=""></div>
     ${foot}`,
   press: `
     <div class="copy" style="width:560px">

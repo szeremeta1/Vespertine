@@ -76,8 +76,8 @@ export const scenes: Scene[] = [
       { href: links.verification, text: 'Verify it yourself' },
       { href: links.loopback, text: 'What the loopback test proves' },
     ],
-    shot: 'bit-perfect-fiio-24-96',
-    alt: 'Vespertine playing Lazar Berman’s Liszt, Années de pèlerinage, from a 24-bit / 96 kHz FLAC: the inspector marks it bit-perfect and exclusive on a FiiO K11, with each step of the signal path.',
+    shot: 'bit-perfect-fosi-zd3-24-96',
+    alt: 'Vespertine playing Lazar Berman’s Liszt, Années de pèlerinage, from a 24-bit / 96 kHz FLAC: the inspector marks it bit-perfect and exclusive on a Fosi Audio ZD3, with each step of the signal path.',
     float: { shot: 'loopback-test', alt: 'The loopback test sheet: 24-bit at 44.1 and 96 kHz, 16-bit padded and a gapless pair, each bit-exact.', caption: 'Loopback test · software check' },
   },
   {
@@ -115,7 +115,7 @@ export const scenes: Scene[] = [
     links: [{ href: links.dvd, text: 'DVD-Video details' }],
     shot: 'sacd-iso',
     alt: 'Brothers In Arms by Dire Straits playing straight from its SACD disc image: stereo DSD64 over DoP to a FiiO K11, with the NATIVE DSD · DoP badge and the decoder reading SACD image, DST (lossless).',
-    float: { shot: 'dsd-native-dop-detail', alt: 'Claudja Barry’s Love for the Sake of Love as DSD128 over DoP to a FiiO K11, at 352.8 kHz.', caption: 'DSD128 · DoP · 352.8 kHz' },
+    float: { shot: 'dsd-native-dop-detail', alt: 'Claudja Barry’s Love for the Sake of Love as DSD128 over DoP to a Fosi Audio ZD3, at 352.8 kHz.', caption: 'DSD128 · DoP · 352.8 kHz' },
   },
   {
     id: 'analysis',

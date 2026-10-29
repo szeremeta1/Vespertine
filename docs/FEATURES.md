@@ -30,7 +30,7 @@ Shared-mode checks poll about once a second. Short sounds and activity Core Audi
 
 The [loopback test](LOOPBACK.md) (Settings › Playback, or Controls › Loopback Test…) plays a test signal through a virtual loopback device and checks that every sample comes back unchanged. It covers 44.1 to 384 kHz, 16-, 24- and 32-bit, gapless joins and 16-bit matching. Copy Report gives a Markdown report. It is a software-path check of the decoder, the engine and Core Audio, not of a DAC, so its results appear in the signal path as "Loopback (software check)" and never change the BIT-PERFECT badge.
 
-![24-bit / 96 kHz FLAC, bit-perfect on a FiiO K11, with its signal path](screenshots/bit-perfect-fiio-24-96.png)
+![24-bit / 96 kHz FLAC, bit-perfect on a Fosi Audio ZD3, with its signal path](screenshots/bit-perfect-fosi-zd3-24-96.png)
 
 Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 384 kHz on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate. Per-device settings can match the source, use the device maximum, or force a rate.
 
@@ -48,7 +48,7 @@ Vespertine remembers the output you chose. If it isn't connected, Settings › P
 
 DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DoP has only been confirmed on a FiiO K11; carrier rates above 384 kHz have not been tested on hardware. DSD256/512 file support does not establish native playback at those rates on a real DAC.
 
-![A DSD128 file playing natively over DoP on a FiiO K11](screenshots/dsd-native-dop.png)
+![A DSD128 file playing natively over DoP on a Fosi Audio ZD3](screenshots/dsd-native-dop.png)
 
 AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz. This rests on Apple's description of the cable path and Core Audio readback, since AirPods have no digital output for a loopback test. Over Bluetooth the signal path reports AAC. AirPods Max 2 detection is implemented by name but untested.
 

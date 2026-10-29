@@ -15,16 +15,16 @@ site=$root/site/src/assets
 
 jpeg() { ffmpeg -loglevel error -y -i "$1" -vf "$2" -q:v 4 "$3"; }   # q 4: the site's JPEG quality
 
-full=(genres spatial-audio-airpods-max bit-perfect-fiio-24-96 sacd-iso fake-hi-res-detection smart-playlist loopback-test stereo-and-surround-versions)
+full=(genres spatial-audio-airpods-max bit-perfect-fosi-zd3-24-96 sacd-iso fake-hi-res-detection smart-playlist loopback-test stereo-and-surround-versions)
 typeset -A detail=(
   [smart-playlist]="crop=1300:1100:1100:110"
   [dsd-native-dop]="crop=1300:1100:1100:110"
   [sacd-iso]="crop=1300:1100:1100:110"
   [spatial-audio-airpods-max]="crop=1260:1140:1140:160"
   [fake-hi-res-detection]="crop=1333:1128:1067:147,scale=1300:1100:flags=lanczos"
-  [bit-perfect-fiio-24-96]="crop=542:824:1830:548"
+  [bit-perfect-fosi-zd3-24-96]="crop=542:824:1830:548"
 )
-thumbs=(bit-perfect-fiio-24-96 dsd-native-dop fake-hi-res-detection genres multichannel-albums search smart-playlist
+thumbs=(bit-perfect-fosi-zd3-24-96 dsd-native-dop fake-hi-res-detection genres multichannel-albums search smart-playlist
         spatial-audio-airpods-max stereo-and-surround-versions sacd-iso output-settings equalizer loopback-test
         setup-welcome setup-output)
 
