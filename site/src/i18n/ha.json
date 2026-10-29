@@ -54,8 +54,8 @@
     "home": "Shafin farko"
   },
   "home": {
-    "title": "Vespertine: mai kunna kiɗan kewaye da hi-res don Mac",
-    "description": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res: kwafin faifan SACD da DVD-Video, DSD, DTS CD, fayilolin DTS-HD MA, TrueHD da Dolby Atmos, Spatial Audio a AirPods, gyaran sautin ɗaki da ake aunawa a cikin ɗakinku na kanku, da hanyar sigina ta bit-perfect da za ku iya bincika.",
+    "title": "Vespertine: mai kunna kiɗan kewaye da hi-res don Mac, kyauta",
+    "description": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe: SACD ISO da DVD-Video, DSD, kiɗan kewaye mai tashoshi da yawa a DTS-HD MA, TrueHD da Dolby Atmos, hi-res na bit-perfect, Spatial Audio a AirPods da gyaran sautin ɗaki.",
     "ogAlt": "Vespertine: mai kunna kiɗan kewaye da hi-res na Mac, kyauta kuma buɗaɗɗen tushe. Hanyar Sigina tasa tana nuna FLAC na bit 24 / 96 kHz yana kunnawa bit-perfect a Fosi Audio ZD3. Siga {version}, macOS {minMacOS} ko na gaba.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Me ya sa Vespertine",
-      "title": "An gina shi don tarin kiɗanku na kewaye.",
+      "title": "Mai kunna kiɗa na Mac, an gina shi don kiɗan kewaye da hi-res.",
       "text": "Kiɗan kewaye da na stereo a laburare ɗaya, da mai kunnawa da yake nuna ainihin abin da ya yi wa siginar.",
       "badgesLabel": "Yanayin Hanyar Sigina da manhajar ke nunawa"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Lambar tushen Vespertine",
     "trailerName": "Bidiyon gabatar da Vespertine",
     "trailerDescription": "Yawon Vespertine na daƙiƙa 44, da aka ɗauka daga ainihin manhajar a laburaren mai haɓaka ta: Hanyar Sigina ta bit-perfect, DSD ta DoP, kiɗan kewaye a matsayin Spatial Audio a AirPods da nazarin fayilolin hi-res.",
-    "keywords": "bit-perfect, sautin hi-res, sautin kewaye, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Spatial Audio, AirPods Max, FLAC, manhajar kunna kiɗa, macOS, buɗaɗɗen tushe"
+    "keywords": "mai kunna kiɗa na Mac, mai kunna hi-res, mai kunna DSD, SACD ISO, sauti mai tashoshi da yawa, kiɗan kewaye, surround, Dolby Atmos, DTS-HD Master Audio, bit-perfect, gyaran sautin ɗaki, Spatial Audio, FLAC, kyauta, buɗaɗɗen tushe"
+  },
+  "og": {
+    "homeLede": "Kwafin faifan SACD da DVD-Video, DSD, Dolby Atmos, TrueHD da DTS a laburare ɗaya, tare da hanyar sigina da za ku iya bincika.",
+    "spatial": "Spatial Audio",
+    "pressLede": "Takardar bayanai, tambura, manyan zane-zane, hotunan allo na gaske da bidiyon gabatarwa.",
+    "privacyLede": "Babu asusu, ƙididdigar amfani, aika bayanan amfani, rahoton faɗuwar manhaja ko tallace-tallace. Lambar tushe a buɗe take, don haka za ku iya bincika.",
+    "termsLede": "GNU General Public License, siga ta 3 ko wadda ta biyo baya. Babu abin biya, babu rajista."
   },
   "releases": {
     "0.14.0": {

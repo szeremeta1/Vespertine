@@ -54,8 +54,8 @@
     "home": "Αρχική"
   },
   "home": {
-    "title": "Vespertine: πρόγραμμα αναπαραγωγής μουσικής surround και hi-res για Mac",
-    "description": "Δωρεάν πρόγραμμα αναπαραγωγής ανοιχτού κώδικα για Mac, για συλλογές surround και hi-res: είδωλα δίσκων SACD και DVD-Video, DSD, DTS CD, αρχεία DTS-HD MA, TrueHD και Dolby Atmos, Χωρικός ήχος στα AirPods, διόρθωση δωματίου με μέτρηση στον δικό σας χώρο και μια διαδρομή σήματος bit-perfect που μπορείτε να ελέγξετε.",
+    "title": "Vespertine: πρόγραμμα αναπαραγωγής μουσικής hi-res και surround για Mac",
+    "description": "Δωρεάν πρόγραμμα αναπαραγωγής μουσικής ανοιχτού κώδικα για Mac: SACD ISO και DVD-Video, DSD, πολυκαναλικός ήχος surround σε DTS-HD MA, TrueHD και Dolby Atmos, hi-res bit-perfect, Χωρικός ήχος στα AirPods και διόρθωση δωματίου.",
     "ogAlt": "Vespertine: το δωρεάν πρόγραμμα αναπαραγωγής ανοιχτού κώδικα για Mac, για μουσική surround και hi-res. Η διαδρομή σήματος δείχνει ένα FLAC 24-bit / 96 kHz να αναπαράγεται bit-perfect σε ένα Fosi Audio ZD3. Έκδοση {version}, macOS {minMacOS} ή νεότερη.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Γιατί Vespertine",
-      "title": "Φτιαγμένο για τη συλλογή σας surround.",
+      "title": "Ένα πρόγραμμα αναπαραγωγής μουσικής για Mac, φτιαγμένο για surround και hi-res.",
       "text": "Μουσική surround και στερεοφωνική σε μία βιβλιοθήκη, και ένα πρόγραμμα αναπαραγωγής που δείχνει ακριβώς τι έκανε στο σήμα.",
       "badgesLabel": "Καταστάσεις διαδρομής σήματος που δείχνει η εφαρμογή"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Πηγαίος κώδικας του Vespertine",
     "trailerName": "Τρέιλερ του Vespertine",
     "trailerDescription": "Μια περιήγηση 44 δευτερολέπτων στο Vespertine, καταγεγραμμένη από την πραγματική εφαρμογή με τη βιβλιοθήκη του ίδιου του δημιουργού: η διαδρομή σήματος bit-perfect, DSD μέσω DoP, surround ως Χωρικός ήχος στα AirPods και ανάλυση αρχείων Hi-Res.",
-    "keywords": "bit-perfect, ήχος Hi-Res, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Χωρικός ήχος, AirPods Max, FLAC, πρόγραμμα αναπαραγωγής μουσικής, macOS, ανοιχτός κώδικας"
+    "keywords": "πρόγραμμα αναπαραγωγής μουσικής για Mac, player μουσικής Mac, hi-res player, DSD player, αναπαραγωγή SACD ISO, πολυκαναλικός ήχος, μουσική surround, Dolby Atmos, DTS-HD Master Audio, αναπαραγωγή bit-perfect, διόρθωση δωματίου, Χωρικός ήχος, FLAC, δωρεάν, ανοιχτός κώδικας"
+  },
+  "og": {
+    "homeLede": "Είδωλα SACD και DVD-Video, DSD, Dolby Atmos, TrueHD και DTS σε μία βιβλιοθήκη, με μια διαδρομή σήματος που μπορείτε να ελέγξετε.",
+    "spatial": "Χωρικός ήχος",
+    "pressLede": "Δελτίο στοιχείων, λογότυπα, βασικά γραφικά, πραγματικά στιγμιότυπα οθόνης και το τρέιλερ.",
+    "privacyLede": "Χωρίς λογαριασμούς, στατιστικά χρήσης, τηλεμετρία, αναφορές κατάρρευσης ή διαφημίσεις. Ο κώδικας είναι δημόσιος, οπότε μπορείτε να το ελέγξετε.",
+    "termsLede": "Η Γενική Άδεια Δημόσιας Χρήσης GNU, έκδοση 3 ή νεότερη. Καμία χρέωση, καμία εγγραφή."
   },
   "releases": {
     "0.14.0": {

@@ -4,7 +4,10 @@
 
 export const DEFAULT_LOCALE = 'en';
 
-/** code: BCP 47 tag, URL segment and file name (src/i18n/<code>.json); og: Open Graph locale. */
+/**
+ * code: BCP 47 tag, URL segment and file name (src/i18n/<code>.json); og: Open Graph locale; hreflang: the value search
+ * engines take, where it differs from the code (Google takes ISO 639-1 languages only, and lists Filipino as tl).
+ */
 export const LOCALES = [
   { code: 'en', og: 'en_US' },
   { code: 'am', og: 'am_ET' },
@@ -17,7 +20,7 @@ export const LOCALES = [
   { code: 'es', og: 'es_ES' },
   { code: 'fa', og: 'fa_IR', rtl: true },
   { code: 'fi', og: 'fi_FI' },
-  { code: 'fil', og: 'fil_PH' },
+  { code: 'fil', og: 'tl_PH', hreflang: 'tl' },
   { code: 'fr', og: 'fr_FR' },
   { code: 'gu', og: 'gu_IN' },
   { code: 'ha', og: 'ha_NG' },
@@ -54,6 +57,17 @@ export const LOCALES = [
 ];
 
 export const CODES = LOCALES.map((l) => l.code);
+
+/** A locale's hreflang value (sitemap.xml and every page's alternates). */
+export const hreflangOf = (code) => LOCALES.find((l) => l.code === code)?.hreflang ?? code;
+
+/**
+ * Crawlers and link-preview fetchers, by user agent (a case-insensitive pattern): the first-visit redirect leaves them
+ * on the page they asked for, so / is indexed and previewed as the English page it is. Most of them run no scripts
+ * at all; this is for the ones that do (Googlebot, Bingbot, YandexBot, Baiduspider, Naver's Yeti, SeznamBot, Applebot
+ * …). Only crawler names: in-app browsers (LINE, KakaoTalk, Baidu, Yandex) are people, and are redirected.
+ */
+export const BOT_UA = 'bot|crawl|spider|slurp|yeti|daumoa|archiver|mediapartners|facebookexternalhit|embedly|preview|lighthouse|inspectiontool|google-';
 
 /** Where the localStorage choice lives (the language menu writes it; the redirect on / reads it). */
 export const STORAGE_KEY = 'vespertine-lang';

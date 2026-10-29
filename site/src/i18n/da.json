@@ -54,8 +54,8 @@
     "home": "Forside"
   },
   "home": {
-    "title": "Vespertine: musikafspiller til surround og hi-res på Mac",
-    "description": "Gratis open source-afspiller til Mac for surround- og hi-res-samlinger: SACD- og DVD-Video-diskbilleder, DSD, DTS-cd'er, DTS-HD MA-, TrueHD- og Dolby Atmos-filer, rumlig lyd på AirPods, rumkorrektion målt i dit eget rum og en bitperfekt signalvej, du kan efterprøve.",
+    "title": "Vespertine: gratis musikafspiller til hi-res og surround på Mac",
+    "description": "Gratis open source-musikafspiller til Mac: SACD ISO og DVD-Video, DSD, flerkanals surround i DTS-HD MA, TrueHD og Dolby Atmos, bitperfekt hi-res, rumlig lyd på AirPods og rumkorrektion.",
     "ogAlt": "Vespertine: den gratis open source-afspiller til Mac for surround- og hi-res-musik. Signalvejen viser en 24-bit / 96 kHz FLAC, der afspilles bitperfekt på en Fosi Audio ZD3. Version {version}, macOS {minMacOS} eller nyere.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Hvorfor Vespertine",
-      "title": "Bygget til din surroundsamling.",
+      "title": "En musikafspiller til Mac, bygget til surround og hi-res.",
       "text": "Surround- og stereomusik i ét bibliotek og en afspiller, der viser præcis, hvad den har gjort ved signalet.",
       "badgesLabel": "Signalvejstilstande, som appen viser"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Kildekoden til Vespertine",
     "trailerName": "Vespertine-trailer",
     "trailerDescription": "En rundtur i Vespertine på 44 sekunder, optaget fra den rigtige app på udviklerens eget bibliotek: den bitperfekte signalvej, DSD via DoP, surround som rumlig lyd på AirPods og analyse af hi-res-filer.",
-    "keywords": "bitperfekt, hi-res-lyd, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Rumlig lyd, AirPods Max, FLAC, musikafspiller, macOS, open source"
+    "keywords": "musikafspiller til Mac, hi-res-afspiller Mac, DSD-afspiller, SACD ISO, flerkanalslyd, surroundmusik, Dolby Atmos, DTS-HD Master Audio, bitperfekt afspilning, rumkorrektion, rumlig lyd, FLAC-afspiller, gratis, open source"
+  },
+  "og": {
+    "homeLede": "SACD- og DVD-Video-billeder, DSD, Dolby Atmos, TrueHD og DTS i ét bibliotek, med en signalvej, du kan efterprøve.",
+    "spatial": "Rumlig lyd",
+    "pressLede": "Faktaark, logoer, key art, rigtige skærmbilleder og traileren.",
+    "privacyLede": "Ingen konti, analyse, telemetri, nedbrudsrapportering eller reklamer. Kildekoden er offentlig, så du selv kan tjekke det.",
+    "termsLede": "GNU General Public License, version 3 eller nyere. Intet at betale, ingen tilmelding."
   },
   "releases": {
     "0.14.0": {

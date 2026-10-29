@@ -54,8 +54,8 @@
     "home": "Főoldal"
   },
   "home": {
-    "title": "Vespertine: surround és hi-res zenelejátszó Macre",
-    "description": "Ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res gyűjteményekhez: SACD- és DVD-Video-lemezképek, DSD, DTS CD-k, DTS-HD MA-, TrueHD- és Dolby Atmos-fájlok, Térhatású hang AirPodson, a saját szobájában bemért szobakorrekció és ellenőrizhető bit-perfect jelút.",
+    "title": "Vespertine: ingyenes hi-res és surround zenelejátszó Macre",
+    "description": "Ingyenes, nyílt forráskódú zenelejátszó Macre: SACD ISO és DVD-Video, DSD, többcsatornás surround DTS-HD MA, TrueHD és Dolby Atmos formátumban, bit-perfect hi-res, Térhatású hang AirPodson és szobakorrekció.",
     "ogAlt": "Vespertine: ingyenes, nyílt forráskódú Mac-lejátszó surround és hi-res zenéhez. A jelút egy 24 bit / 96 kHz-es FLAC bit-perfect lejátszását mutatja egy Fosi Audio ZD3 eszközön. {version} verzió, macOS {minMacOS} vagy újabb.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Miért a Vespertine?",
-      "title": "Surround gyűjteményéhez készült.",
+      "title": "Macre készült zenelejátszó surround és hi-res zenéhez.",
       "text": "Surround és sztereó zene egy könyvtárban, olyan lejátszóval, amely pontosan megmutatja, mit tett a jellel.",
       "badgesLabel": "Az alkalmazásban megjelenő jelútállapotok"
     },
@@ -743,7 +743,14 @@
     "sourceName": "A Vespertine forráskódja",
     "trailerName": "A Vespertine előzetese",
     "trailerDescription": "44 másodperces bemutató a Vespertine-ről, a valódi alkalmazásból rögzítve, a fejlesztő saját könyvtárán: a bit-perfect jelút, DSD DoP-n keresztül, surround Térhatású hangként AirPodson és hi-res fájlelemzés.",
-    "keywords": "bit-perfect, hi-res hang, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Térhatású hang, AirPods Max, FLAC, zenelejátszó, macOS, nyílt forráskód"
+    "keywords": "zenelejátszó Macre, hi-res lejátszó Mac, DSD lejátszó, SACD ISO, többcsatornás hang, surround zene, Dolby Atmos, DTS-HD Master Audio, bit-perfect lejátszás, szobakorrekció, térhatású hang, FLAC lejátszó, ingyenes, nyílt forráskódú"
+  },
+  "og": {
+    "homeLede": "SACD- és DVD-Video-lemezképek, DSD, Dolby Atmos, TrueHD és DTS egy könyvtárban, ellenőrizhető jelúttal.",
+    "spatial": "Térhatású hang",
+    "pressLede": "Adatlap, logók, kulcsgrafikák, valódi képernyőképek és az előzetes.",
+    "privacyLede": "Nincs fiók, analitika, telemetria, összeomlás-jelentés vagy reklám. A forráskód nyilvános, így ellenőrizheti.",
+    "termsLede": "A GNU General Public License 3-as vagy újabb verziója. Nincs mit fizetni, nem kell regisztrálni."
   },
   "releases": {
     "0.14.0": {

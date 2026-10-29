@@ -2,7 +2,7 @@
 // search engines and AI crawlers can join what the pages say about them.
 import { SITE, app, latest, links, isoDay, megabytes, releases } from '../data/app';
 import { content } from '../data/content';
-import { t, fill, pagePath, CODES, type Lang } from '../i18n';
+import { t, fill, pagePath, ogCard, CODES, type Lang } from '../i18n';
 import { plain } from './text';
 
 export const ids = {
@@ -44,7 +44,7 @@ export function appNode(lang: Lang, screenshots: { url: string; caption: string 
     alternateName: app.formerName,
     description: content(lang).description,
     url: `${SITE}${pagePath(lang, 'home')}`,
-    image: `${SITE}/og/home.jpg`,
+    image: `${SITE}${ogCard(lang, 'home')}`,
     applicationCategory: 'MultimediaApplication',
     applicationSubCategory: seo.subCategory,
     operatingSystem: fill(seo.operatingSystem, { minMacOS: app.minMacOS }),
@@ -66,6 +66,7 @@ export function appNode(lang: Lang, screenshots: { url: string; caption: string 
     publisher: { '@id': ids.author },
     sameAs: [links.repo],
     keywords: seo.keywords,
+    featureList: content(lang).scenes.map((s) => plain(s.kicker)),
   };
 }
 
@@ -132,7 +133,7 @@ export const graph = (...nodes: object[]) => ({ '@context': 'https://schema.org'
 export function homeGraph(o: { lang: Lang; title: string; screenshots: { url: string; caption: string }[]; trailer: string; poster: string }) {
   return graph(
     website(o.lang),
-    page(o.lang, pagePath(o.lang, 'home'), o.title, content(o.lang).description, { about: { '@id': ids.app }, primaryImageOfPage: `${SITE}/og/home.jpg`, dateModified: isoDay(latest.date) }),
+    page(o.lang, pagePath(o.lang, 'home'), o.title, content(o.lang).description, { about: { '@id': ids.app }, primaryImageOfPage: `${SITE}${ogCard(o.lang, 'home')}`, dateModified: isoDay(latest.date) }),
     appNode(o.lang, o.screenshots),
     sourceNode(o.lang),
     trailerNode(o.lang, o.trailer, o.poster),

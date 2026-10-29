@@ -54,8 +54,8 @@
     "home": "Hjem"
   },
   "home": {
-    "title": "Vespertine: musikkspiller for surround og hi-res på Mac",
-    "description": "Gratis Mac-spiller med åpen kildekode for surround- og hi-res-samlinger: SACD- og DVD-Video-platebilder, DSD, DTS-CD-er, DTS-HD MA-, TrueHD- og Dolby Atmos-filer, romlig lyd på AirPods, romkorrigering målt i ditt eget rom og en bitperfekt signalvei du kan inspisere.",
+    "title": "Vespertine: gratis musikkspiller for hi-res og surround på Mac",
+    "description": "Gratis musikkspiller med åpen kildekode for Mac: SACD ISO og DVD-Video, DSD, flerkanals surround i DTS-HD MA, TrueHD og Dolby Atmos, bitperfekt hi-res, romlig lyd på AirPods og romkorrigering.",
     "ogAlt": "Vespertine: den gratis Mac-spilleren med åpen kildekode for surround- og hi-res-musikk. Signalveien viser en 24-bit / 96 kHz FLAC som spilles bitperfekt på en Fosi Audio ZD3. Versjon {version}, macOS {minMacOS} eller nyere.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Hvorfor Vespertine",
-      "title": "Laget for surroundsamlingen din.",
+      "title": "En musikkspiller for Mac, laget for surround og hi-res.",
       "text": "Surround- og stereomusikk i ett bibliotek, og en spiller som viser nøyaktig hva den gjorde med signalet.",
       "badgesLabel": "Signalveistatuser appen viser"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Kildekoden til Vespertine",
     "trailerName": "Vespertine-trailer",
     "trailerDescription": "En 44 sekunder lang omvisning i Vespertine, tatt opp fra den ekte appen på utviklerens eget bibliotek: den bitperfekte signalveien, DSD over DoP, surround som romlig lyd på AirPods og analyse av hi-res-filer.",
-    "keywords": "bitperfekt, hi-res-lyd, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, Romlig lyd, AirPods Max, FLAC, musikkspiller, macOS, åpen kildekode"
+    "keywords": "musikkspiller for Mac, hi-res-spiller Mac, DSD-spiller, SACD ISO, flerkanalslyd, surroundmusikk, Dolby Atmos, DTS-HD Master Audio, bitperfekt avspilling, romkorrigering, romlig lyd, FLAC-spiller, gratis, åpen kildekode"
+  },
+  "og": {
+    "homeLede": "SACD- og DVD-Video-bilder, DSD, Dolby Atmos, TrueHD og DTS i ett bibliotek, med en signalvei du kan kontrollere.",
+    "spatial": "Romlig lyd",
+    "pressLede": "Faktaark, logoer, nøkkelbilder, ekte skjermbilder og traileren.",
+    "privacyLede": "Ingen kontoer, analyse, telemetri, krasjrapportering eller reklame. Kildekoden er offentlig, så du kan sjekke selv.",
+    "termsLede": "GNU General Public License, versjon 3 eller nyere. Ingenting å betale, ingen registrering."
   },
   "releases": {
     "0.14.0": {

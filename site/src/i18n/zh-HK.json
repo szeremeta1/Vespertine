@@ -54,8 +54,8 @@
     "home": "首頁"
   },
   "home": {
-    "title": "Vespertine：Mac 上的環繞聲及 Hi-Res 音樂播放器",
-    "description": "免費開源的 Mac 播放器，專為環繞聲及 Hi-Res 收藏而設：SACD 及 DVD-Video 光碟映像、DSD、DTS CD、DTS-HD MA、TrueHD 及 Dolby Atmos 檔案、AirPods 上的空間音訊、在你自己房間實測的房間校正，還有可供你檢視的位元完美訊號路徑。",
+    "title": "Vespertine：Mac 免費 Hi-Res 無損音樂播放器，支援 DSD 及多聲道環繞聲",
+    "description": "免費開源的 Mac 音樂播放器：播放 SACD ISO 及 DVD-Video、DSD，以及 DTS-HD MA、TrueHD 及 Dolby Atmos 多聲道環繞聲，位元完美的 Hi-Res 無損播放，支援 AirPods 空間音訊及房間校正。",
     "ogAlt": "Vespertine：免費開源的 Mac 播放器，專為環繞聲及 Hi-Res 音樂而設。其訊號路徑顯示一個 24 位元 / 96 kHz FLAC 檔案正在 Fosi Audio ZD3 上以位元完美播放。版本 {version}，macOS {minMacOS} 或以上。",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "為何選擇 Vespertine",
-      "title": "為你的環繞聲收藏而設。",
+      "title": "為環繞聲及 Hi-Res 而設的 Mac 音樂播放器。",
       "text": "環繞聲與立體聲音樂共用一個資料庫，播放器亦會清楚顯示它對訊號做過甚麼。",
       "badgesLabel": "App 顯示的訊號路徑狀態"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Vespertine 原始碼",
     "trailerName": "Vespertine 預告片",
     "trailerDescription": "44 秒的 Vespertine 導覽，以開發者自己的資料庫在真正的 App 上錄製：位元完美的訊號路徑、經 DoP 傳送的 DSD、在 AirPods 上以空間音訊播放環繞聲，以及 Hi-Res 檔案分析。",
-    "keywords": "位元完美, 高解析度音訊, 環繞聲, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, 空間音訊, AirPods Max, FLAC, 音樂播放器, macOS, 開源"
+    "keywords": "Mac 音樂播放器, Hi-Res 播放器, 無損音樂播放器, DSD 播放器, SACD ISO 播放, 多聲道環繞聲, 杜比全景聲, Dolby Atmos, DTS-HD Master Audio, 位元完美, 房間校正, 空間音訊, FLAC 播放器, 免費, 開源"
+  },
+  "og": {
+    "homeLede": "SACD 及 DVD-Video 映像、DSD、Dolby Atmos、TrueHD 及 DTS 盡在同一個資料庫，訊號路徑一清二楚，隨時可以查證。",
+    "spatial": "空間音訊",
+    "pressLede": "資料表、標誌、主視覺、真實截圖及預告片。",
+    "privacyLede": "沒有帳戶、分析、遙測、當機報告或廣告。原始碼公開，你可以親自查證。",
+    "termsLede": "GNU General Public License 第 3 版或更新版本。毋須付費，毋須登記。"
   },
   "releases": {
     "0.14.0": {

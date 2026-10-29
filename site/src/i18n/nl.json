@@ -54,8 +54,8 @@
     "home": "Startpagina"
   },
   "home": {
-    "title": "Vespertine: surround- en hi-res-muziekspeler voor de Mac",
-    "description": "Gratis opensource-speler voor de Mac, voor collecties in surround en hi-res: SACD- en DVD-Video-schijfkopieën, DSD, DTS-cd’s, bestanden in DTS-HD MA, TrueHD en Dolby Atmos, ruimtelijke audio op AirPods, ruimtecorrectie op basis van metingen in je eigen ruimte en een bitperfect signaalpad dat je kunt inspecteren.",
+    "title": "Vespertine: gratis hi-res- en surround-muziekspeler voor de Mac",
+    "description": "Gratis opensource-muziekspeler voor de Mac: SACD ISO en DVD-Video, DSD, meerkanaals surround in DTS-HD MA, TrueHD en Dolby Atmos, bitperfect hi-res, ruimtelijke audio op AirPods en ruimtecorrectie.",
     "ogAlt": "Vespertine: de gratis opensource-speler voor de Mac, voor muziek in surround en hi-res. Het signaalpad toont een FLAC van 24 bit / 96 kHz die bitperfect speelt op een Fosi Audio ZD3. Versie {version}, macOS {minMacOS} of nieuwer.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Waarom Vespertine",
-      "title": "Gemaakt voor je surroundcollectie.",
+      "title": "Een muziekspeler voor de Mac, gemaakt voor surround en hi-res.",
       "text": "Surround- en stereomuziek in één bibliotheek, en een speler die precies laat zien wat hij met het signaal heeft gedaan.",
       "badgesLabel": "Statussen van het signaalpad die de app toont"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Broncode van Vespertine",
     "trailerName": "Trailer van Vespertine",
     "trailerDescription": "Een rondleiding van 44 seconden door Vespertine, opgenomen in de echte app met de eigen bibliotheek van de ontwikkelaar: het bitperfecte signaalpad, DSD via DoP, surround als ruimtelijke audio op AirPods en analyse van hi-res-bestanden.",
-    "keywords": "bitperfect, hi-res audio, surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS-cd, ruimtelijke audio, AirPods Max, FLAC, muziekspeler, macOS, open source"
+    "keywords": "muziekspeler voor Mac, hi-res speler Mac, DSD-speler, SACD ISO afspelen, meerkanaals audio, surroundmuziek, Dolby Atmos, DTS-HD Master Audio, bitperfect afspelen, ruimtecorrectie, ruimtelijke audio, FLAC-speler, gratis, open source"
+  },
+  "og": {
+    "homeLede": "SACD- en DVD-Video-schijfkopieën, DSD, Dolby Atmos, TrueHD en DTS in één bibliotheek, met een signaalpad dat je kunt controleren.",
+    "spatial": "Ruimtelijke audio",
+    "pressLede": "Factsheet, logo’s, key art, echte screenshots en de trailer.",
+    "privacyLede": "Geen accounts, analytics, telemetrie, crashrapportage of advertenties. De broncode is openbaar, dus je kunt het zelf nagaan.",
+    "termsLede": "De GNU General Public License, versie 3 of later. Niets te betalen, geen account nodig."
   },
   "releases": {
     "0.14.0": {

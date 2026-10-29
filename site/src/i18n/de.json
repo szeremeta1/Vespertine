@@ -54,8 +54,8 @@
     "home": "Startseite"
   },
   "home": {
-    "title": "Vespertine: Surround- und Hi-Res-Musikplayer für den Mac",
-    "description": "Kostenloser Open-Source-Player für Surround- und Hi-Res-Sammlungen auf dem Mac: SACD- und DVD-Video-Disc-Images, DSD, DTS-CDs, Dateien in DTS-HD MA, TrueHD und Dolby Atmos, 3D-Audio auf AirPods, Raumkorrektur, eingemessen in deinem eigenen Raum, und ein bit-perfekter Signalweg, den du nachprüfen kannst.",
+    "title": "Vespertine: kostenloser Hi-Res- und Surround-Musikplayer für Mac",
+    "description": "Kostenloser Open-Source-Musikplayer für den Mac: SACD-ISO und DVD-Video, DSD, Mehrkanal-Surround in DTS-HD MA, TrueHD und Dolby Atmos, bit-perfektes Hi-Res, 3D-Audio auf AirPods und Raumkorrektur.",
     "ogAlt": "Vespertine: der kostenlose Open-Source-Player für Surround- und Hi-Res-Musik auf dem Mac. Sein Signalweg zeigt eine FLAC-Datei mit 24 Bit / 96 kHz, die bit-perfekt auf einem Fosi Audio ZD3 läuft. Version {version}, macOS {minMacOS} oder neuer.",
     "hero": {
       "eyebrow": [
@@ -90,7 +90,7 @@
     },
     "features": {
       "eyebrow": "Warum Vespertine",
-      "title": "Gebaut für deine Surround-Sammlung.",
+      "title": "Ein Musikplayer für den Mac, gebaut für Surround und Hi-Res.",
       "text": "Surround- und Stereomusik in einer Mediathek und ein Player, der genau zeigt, was er mit dem Signal gemacht hat.",
       "badgesLabel": "Zustände des Signalwegs, die die App anzeigt"
     },
@@ -743,7 +743,14 @@
     "sourceName": "Quellcode von Vespertine",
     "trailerName": "Vespertine-Trailer",
     "trailerDescription": "Eine 44-sekündige Tour durch Vespertine, aufgenommen in der echten App mit der eigenen Mediathek des Entwicklers: der bit-perfekte Signalweg, DSD über DoP, Surround als 3D-Audio auf AirPods und die Analyse von Hi-Res-Dateien.",
-    "keywords": "bit-perfekt, Hi-Res-Audio, Surround, SACD ISO, DSD, DoP, DVD-Video LPCM, Dolby Atmos, TrueHD, DTS-HD Master Audio, DTS CD, 3D-Audio, AirPods Max, FLAC, Musikplayer, macOS, Open Source"
+    "keywords": "Musikplayer für Mac, Hi-Res-Player Mac, DSD-Player Mac, SACD-ISO abspielen, Mehrkanal-Audio, Surround-Musik, Dolby Atmos, DTS-HD Master Audio, bit-perfekte Wiedergabe, Raumkorrektur, 3D-Audio, FLAC-Player, kostenlos, Open Source"
+  },
+  "og": {
+    "homeLede": "SACD- und DVD-Video-Images, DSD, Dolby Atmos, TrueHD und DTS in einer Mediathek, mit einem Signalweg, den du nachprüfen kannst.",
+    "spatial": "3D-Audio",
+    "pressLede": "Datenblatt, Logos, Key Art, echte Screenshots und der Trailer.",
+    "privacyLede": "Keine Konten, keine Analysen, keine Telemetrie, keine Absturzberichte, keine Werbung. Der Quellcode ist öffentlich, du kannst es nachprüfen.",
+    "termsLede": "Die GNU General Public License, Version 3 oder neuer. Nichts zu bezahlen, keine Anmeldung."
   },
   "releases": {
     "0.14.0": {
