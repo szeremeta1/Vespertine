@@ -92,16 +92,23 @@ struct NetworkPlaybackCacheTests {
         share.stall(true)
         let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
         let entry = try cache.entry(key: "wait", url: URL(fileURLWithPath: "/share/song.dsf"), reader: share)
+        let started = DispatchSemaphore(value: 0)
         let finished = DispatchSemaphore(value: 0)
         let result = Locked<Data?>(nil)
-        DispatchQueue.global().async {
+        // A dedicated thread, not the global queue: under a loaded runner the shared pool can take seconds to start a
+        // block (measured 1.5 s with 24 busy processes), which made the waits below time out although the cache was fine.
+        let reader = Thread {
+            started.signal()
             result.withLock { $0 = try? entry.read(at: 98304, count: 4096) }
             finished.signal()
         }
+        reader.start()
+        #expect(started.wait(timeout: .now() + 30) == .success)
         #expect(finished.wait(timeout: .now() + 0.03) == .timedOut)
         #expect(entry.isWaiting)
         share.stall(false)
-        #expect(finished.wait(timeout: .now() + 2) == .success)
+        // A hang detector, not a latency bound: the copy takes milliseconds when the machine is idle.
+        #expect(finished.wait(timeout: .now() + 30) == .success)
         #expect(result.withLock { $0 } == share.bytes[98304..<102400])
         #expect(!entry.isWaiting)
     }
