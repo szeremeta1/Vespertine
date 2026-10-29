@@ -16,6 +16,9 @@ for (const c of CODES) if (!dicts[c]) throw new Error(`src/i18n/${c}.json is mis
 export const t = (lang: Lang): Dict => dicts[lang];
 export const isRtl = (lang: Lang) => !!LOCALES.find((l) => l.code === lang)?.rtl;
 export const dir = (lang: Lang) => (isRtl(lang) ? 'rtl' : 'ltr');
+/** Direction for an isolated run (<bdi>) inside a translated page: any Hebrew or Arabic-script letter makes it
+ *  rtl, otherwise ltr. Unlike dir="auto" this keeps "Apple silicon ו־Intel" right to left on a Hebrew page. */
+export const runDir = (text: string) => (/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(text) ? 'rtl' : 'ltr');
 export const ogLocale = (lang: Lang) => LOCALES.find((l) => l.code === lang)!.og;
 /** Non-English locales, for getStaticPaths. */
 export const localePaths = () => CODES.filter((c) => c !== DEFAULT_LOCALE).map((lang) => ({ params: { lang } }));
