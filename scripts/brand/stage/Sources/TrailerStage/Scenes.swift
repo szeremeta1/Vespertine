@@ -371,41 +371,6 @@ struct DSDScene: View {
     }
 }
 
-// MARK: - SACD image
-
-struct SACDScene: View {
-    let t: Double
-    let size: CGSize
-    let assets: Assets
-    let frame: CGImage?
-
-    // 0.11.1: Dire Straits' Brothers In Arms, played from the 2005 SACD image's stereo area over DoP on the FiiO K11. Its
-    // title fits one line, so the badges sit 13 pt higher than DSD's; the lifted step is the decoder ("SACD image · DST").
-    static let badges = CGRect(x: 1104, y: 419, width: 196, height: 110)
-    static let path = CGRect(x: 1104, y: 614, width: 306, height: 50)
-
-    var body: some View {
-        let g = Geo(size: size)
-        let s = Scene.sacd.range.lowerBound
-        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
-        let pose = featurePose(g, t: t, s: s, right: true, dim: 0.55 * lifted)
-        let cue = Cue.for(.sacd)!
-        ZStack(alignment: .topLeading) {
-            WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose)
-            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Play the disc\nimage itself.", right: true)
-            Lift(image: frame, region: SACDScene.badges, pose: pose,
-                 to: g.at((0.23, 0.6), square: (0.3, 0.44), tall: (0.5, 0.52)),
-                 toScale: g.pick(1.75, square: 1.7, tall: 1.45) * g.u,
-                 p: spring(t, start: s + b * 0.55, response: 0.8, damping: 0.8))
-            Lift(image: frame, region: SACDScene.path, pose: pose,
-                 to: g.at((0.25, 0.83), square: (0.36, 0.66), tall: (0.5, 0.7)),
-                 toScale: g.pick(1.5, square: 1.35, tall: 1.2) * g.u,
-                 p: spring(t, start: s + b * 1.15, response: 0.8, damping: 0.8))
-        }
-        .frame(width: g.W, height: g.H)
-    }
-}
-
 // MARK: - Languages
 
 struct LanguagesScene: View {
@@ -649,7 +614,7 @@ struct LibraryScene: View {
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose,
                       windowOverlay: AnyView(covers(s, dim: pose.contentDim)))
             FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Your whole\nlibrary.",
-                        label: "FLAC · ALAC · WAV · AIFF", label2: "DSD · Dolby · DTS", right: true)
+                        label: "FLAC · ALAC · WAV · AIFF", label2: "SACD · DSD · Dolby · DTS", right: true)
         }
         .frame(width: g.W, height: g.H)
     }

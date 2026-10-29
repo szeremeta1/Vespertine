@@ -17,11 +17,10 @@ struct Cue {
 
     static let all: [Cue] = [
         Cue(scene: .bitPerfect, recording: "bitperfect", sourceStart: 0.8),
+        Cue(scene: .dsd, recording: "dsd", sourceStart: 2.0),
         // The Room Correction window (780 × 877 pt) recorded from the 0.14 app: its Curve Reveal starts 3.29 s in, which
         // lands on beat 1.5 of the scene.
         Cue(scene: .room, recording: "room", sourceStart: 1.905),
-        Cue(scene: .dsd, recording: "dsd", sourceStart: 2.0),
-        Cue(scene: .sacd, recording: "sacd", sourceStart: 2.0),
         Cue(scene: .versions, recording: "versions", sourceStart: 2.0),
         Cue(scene: .spatial, recording: "spatial", sourceStart: 2.0),
         Cue(scene: .analysis, recording: "analysis", sourceStart: 2.0),
