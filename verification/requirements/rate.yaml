@@ -47,7 +47,7 @@
   quote_sha256: 0f73ab34bcbf2768bcd405bd0abe63f068cc2bbb0522626957ba8ef86f955660
   kind: vespertine-rule
   testable: true
-  gap: "DoP 1.1 says only that the first method \"can easily be extended\" to higher DSD rates by raising the PCM rate; it names no rate above 352.8 kHz. The docs also say carrier rates above 384 kHz are untested on hardware."
+  gap: "DoP 1.1 says only that the first method \"can easily be extended\" to higher DSD rates by raising the PCM rate; it names no rate above 352.8 kHz. PCM to 768 kHz and DoP to DSD256 are tested on a Fosi Audio ZD3; DSD512 over DoP is untested on hardware."
   interface: "contracts/rate-plan.md (dopCarrierRate)"
 
 - id: RATE-004

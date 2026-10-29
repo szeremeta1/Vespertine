@@ -188,7 +188,6 @@ export const scenes: Scene[] = [
       'Network shares over SMB, NFS or WebDAV, with caching, Keep Offline and playback built for slow servers: tracks are buffered on your Mac before they play, with a loading ring on the play button while they do.',
       'Find Music searches every drive for your real music and leaves the clutter behind. A short setup on first launch picks your output and explains what exclusive access and ReplayGain do.',
       'Parametric EQ per output that imports AutoEQ and Equalizer APO presets. Off by default; when it’s on, the signal path says <span class="mono nowrap">EQUALIZER</span> instead of <span class="mono nowrap">BIT-PERFECT</span>.',
-      'Room correction, off by default: measure each speaker at your seat with a miniDSP UMIK-1, and Vespertine lines the speakers up in delay and level and fits filters to a Warm, Gentle tilt or Flat target, in stereo or 5.1. It also plays REW and Equalizer APO filters and impulse responses. While it’s on, the signal path says <span class="mono nowrap">ROOM CORRECTION</span> instead of <span class="mono nowrap">BIT-PERFECT</span>.',
       'Mini player, menu-bar extra, media keys, ReplayGain and automatic, signed updates.',
     ],
     links: [{ href: links.features, text: 'Every feature, in detail' }],
@@ -203,7 +202,7 @@ export const scenes: Scene[] = [
     lede: `Every menu, setting and signal-path message is translated into ${app.languages} languages besides English.`,
     body: [
       'From Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats, and Simplified, Traditional and Hong Kong Chinese each with their own vocabulary. Arabic, Hebrew, Persian and Urdu get a right-to-left layout.',
-      'How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and every screen was reviewed in every language for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
+      'How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and the main screens were checked in several languages for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href="https://github.com/szeremeta1/Vespertine/issues/new/choose">GitHub</a>.',
     ],
     wall: true,
     shot: 'languages',
