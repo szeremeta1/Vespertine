@@ -444,9 +444,18 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         strobe *= Float(exp(-dt / 0.045))
         if strobe < 0.003 || !strobeAllowed { strobe = 0 }
 
-        // Meters: the peak lights come on near full scale and stay lit a moment.
+        // Meters: the peak lights come on near full scale (as the sensitivity control shows it) and stay lit a moment.
         let lightFall = Float(exp(-dt / 0.25))
-        peakLights = SIMD2(frame.peakDB.x > -1 ? 1 : peakLights.x * lightFall, frame.peakDB.y > -1 ? 1 : peakLights.y * lightFall)
+        let over = Self.peakLit(peakDB: frame.peakDB, sensitivity: settings.sensitivity)
+        peakLights = SIMD2(over.x ? 1 : peakLights.x * lightFall, over.y ? 1 : peakLights.y * lightFall)
+    }
+
+    /// Whether each meter's peak light is on for a frame's sample peaks (dBFS): above -1 dBFS, or above it once raised
+    /// by the sensitivity control's gain, as the other styles show it. Turning the control down never hides a clip.
+    static func peakLit(peakDB: SIMD2<Float>, sensitivity: Double) -> (x: Bool, y: Bool) {
+        let gain = Float(20 * log10(max(sensitivity, 0.01)))
+        let threshold: Float = -1 - max(0, gain)
+        return (peakDB.x > threshold, peakDB.y > threshold)
     }
 
     /// At most one flash every 0.4 s (2.5 a second), under the 3 a second that photosensitivity guidelines (WCAG 2.3.1,
