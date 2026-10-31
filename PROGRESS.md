@@ -20,5 +20,6 @@ Branch `feat/visualizer`. Brief: BRIEF-visualizer.md (local, untracked). Delete 
 - [x] Docs: docs/VISUALIZER.md, FEATURES.md, ARCHITECTURE.md.
 
 ## Next
-- [ ] Full test run, app tests, recordings/stills into ./out (.scratch/record.sh), RESULT-visualizer.md, draft PR.
+- [x] Full test run (Kit 395, Analysis 45, App 30), recordings + stills in ./out, RESULT-visualizer.md (local), draft PR.
+- Phase 1 done. Phase 2: see "Left for phase 2" in RESULT-visualizer.md / the PR.
 - Scripts kept local in .scratch/ (perf.sh, record.sh, l10n_visualizer.py); .scratch and out are git-excluded.
