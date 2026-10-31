@@ -245,6 +245,11 @@ struct PlaybackSettings: View {
                 Text("Applied in 64-bit with TPDF dither at the DAC's word length. At anything below 100% the output is no longer bit-perfect, and Vespertine says so.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            Section("Visualizer") {
+                Toggle("Visualizer window", isOn: $s.visualizerEnabled)
+                Text("Adds Window > Visualizer (⌥⌘V) and a toolbar button: a spectrum analyzer, a spectrogram, the album on a spinning record and club lights, in a window of its own that can go full screen on another display. It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Section("ReplayGain") {
                 Picker("Mode", selection: $s.replayGain) { ForEach(ReplayGainMode.allCases) { Text($0.label).tag($0) } }
                 Slider(value: $s.replayGainPreampDB, in: -12...6, step: 0.5) { Text("Pre-amp \(s.replayGainPreampDB, specifier: "%+.1f") dB") }

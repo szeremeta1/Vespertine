@@ -6,6 +6,7 @@
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineVisualizer
 import Observation
 
 enum ReplayGainMode: String, CaseIterable, Identifiable {
@@ -133,6 +134,12 @@ final class AppSettings {
     /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
     /// converted to PCM while correction is on, so it's corrected too.
     var roomNativeDSDDeviceUIDs: Set<String> { didSet { defaults.set(roomNativeDSDDeviceUIDs.sorted(), forKey: "roomNativeDSD") } }
+    /// The visualizer window (Window > Visualizer): off unless switched on in Settings.
+    var visualizerEnabled: Bool { didSet { defaults.set(visualizerEnabled, forKey: "visualizerEnabled") } }
+    /// How the visualizer draws: style, colours and options.
+    var visualizer: VisualizerSettings { didSet { if visualizer != oldValue { visualizer.save(to: defaults) } } }
+    /// Where the visualizer window was (display, frame, full screen).
+    var visualizerWindow: VisualizerWindowState? { didSet { if visualizerWindow != oldValue { visualizerWindow?.save(to: defaults) } } }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
@@ -147,7 +154,7 @@ final class AppSettings {
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore",
+            "deviceOnQuit": "restore", "visualizerEnabled": false,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
@@ -207,6 +214,9 @@ final class AppSettings {
         roomAssignments = defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]
         roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
+        visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
+        visualizer = VisualizerSettings.load(from: defaults)
+        visualizerWindow = VisualizerWindowState.load(from: defaults)
         if let dataDirectory {
             self.dataDirectory = dataDirectory
         } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {

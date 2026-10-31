@@ -5,6 +5,7 @@
 //
 
 import VespertineLibrary
+import VespertineVisualizer
 import SwiftUI
 
 @main
@@ -65,6 +66,16 @@ struct VespertineApp: App {
             }
         }
         .defaultSize(width: 780, height: 820)
+
+        // Optional (Settings > Playback): its menu item and shortcut are VespertineCommands', shown only while it's on.
+        Window("Visualizer", id: "visualizer") {
+            LibraryContent(startup: startup) { model in
+                VisualizerWindow().environment(model).preferredColorScheme(.dark)
+            }
+        }
+        .defaultSize(width: VisualizerWindowState.defaultSize.width, height: VisualizerWindowState.defaultSize.height)
+        .windowStyle(.hiddenTitleBar)
+        .commandsRemoved()
 
         MenuBarExtra {
             LibraryContent(startup: startup) { model in
@@ -168,6 +179,13 @@ struct VespertineCommands: Commands {
             Button("Equalizer") { openWindow(id: "equalizer") }
                 .keyboardShortcut("e", modifiers: [.command, .option])
             Button("Room Correction") { openWindow(id: "room-correction") }
+        }
+        CommandGroup(before: .windowList) {
+            if model.settings.visualizerEnabled {
+                Button("Visualizer") { openWindow(id: "visualizer") }
+                    .keyboardShortcut("v", modifiers: [.command, .option])
+                Divider()
+            }
         }
     }
 }

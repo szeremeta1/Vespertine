@@ -1,0 +1,387 @@
+//
+// Vespertine — the visualizer window: a Metal view of the music, its controls, and a window that remembers its display.
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+
+import AppKit
+import MetalKit
+import SwiftUI
+import VespertineLibrary
+import VespertineVisualizer
+
+extension VisualizerStyle {
+    var label: String {
+        switch self {
+        case .bars: String(localized: "Spectrum", comment: "Visualizer style: bar spectrum analyzer.")
+        case .spectrogram: String(localized: "Spectrogram", comment: "Visualizer style: scrolling spectrogram.")
+        case .vinyl: String(localized: "Vinyl", comment: "Visualizer style: the album on a spinning record.")
+        case .club: String(localized: "Club", comment: "Visualizer style: club lights, rings and lasers pulsing with the beat.")
+        }
+    }
+}
+
+extension VisualizerTheme {
+    var label: String {
+        switch self {
+        case .brass: String(localized: "Brass", comment: "Visualizer colours: the app's own brass on black.")
+        case .neon: String(localized: "Neon", comment: "Visualizer colours: magenta, violet and cyan.")
+        case .aurora: String(localized: "Aurora", comment: "Visualizer colours: teal, green and pale violet.")
+        case .ember: String(localized: "Ember", comment: "Visualizer colours: red, orange and gold.")
+        case .ice: String(localized: "Ice", comment: "Visualizer colours: blues and white.")
+        case .mono: String(localized: "Mono", comment: "Visualizer colours: white on black.")
+        }
+    }
+}
+
+extension VisualizerLabels {
+    static let localized = VisualizerLabels(
+        hertz: { String(localized: "\($0) Hz", comment: "Visualizer axis: a frequency in hertz, e.g. 500 Hz.") },
+        kilohertz: { String(localized: "\($0.formatted(.number.precision(.fractionLength(0...1)))) kHz", comment: "Visualizer axis: a frequency in kilohertz, e.g. 2 kHz.") },
+        decibels: { String(localized: "\($0) dB", comment: "Visualizer axis: a level in decibels, e.g. -24 dB.") },
+        secondsAgo: { String(localized: "\(-$0) s", comment: "Visualizer axis: seconds ago on the spectrogram, e.g. -10 s (0 is now).") })
+}
+
+/// Holds the renderer, made once per window (it compiles the shaders).
+@MainActor
+final class VisualizerHolder {
+    lazy var renderer: VisualizerRenderer? = VisualizerRenderer()
+}
+
+struct VisualizerWindow: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var holder = VisualizerHolder()
+    @State private var controlsShown = true
+    @State private var hovering = false
+    @State private var hide: Task<Void, Never>?
+    @State private var fullScreen = false
+    @State private var window: NSWindow?
+
+    var body: some View {
+        @Bindable var settings = model.settings
+        ZStack(alignment: .bottom) {
+            if let renderer = holder.renderer {
+                VisualizerMetalView(renderer: renderer, model: model)
+                    .accessibilityLabel(Text("Visualizer"))
+                    .accessibilityValue(Text(model.settings.visualizer.style.label))
+            } else {
+                Text("This Mac can't draw the visualizer: Metal isn't available.")
+                    .font(Typeface.ui(13)).foregroundStyle(Palette.text2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            if controlsShown {
+                VisualizerControls(settings: $settings.visualizer, fullScreen: fullScreen, reduceMotion: reduceMotion) {
+                    window?.toggleFullScreen(nil)
+                }
+                .padding(.bottom, 22)
+                .onHover { hovering = $0; if !$0 { scheduleHide() } }
+                .transition(.opacity)
+            }
+        }
+        .frame(minWidth: VisualizerWindowState.minimumSize.width, minHeight: VisualizerWindowState.minimumSize.height)
+        .background(Color.black)
+        .ignoresSafeArea()
+        .background(VisualizerWindowAccessor(model: model, fullScreen: $fullScreen, window: $window))
+        .onContinuousHover { phase in
+            if case .active = phase { showControls() }
+        }
+        .onAppear { scheduleHide() }
+        .focusable()
+        .focusEffectDisabled()
+        .onKeyPress(.space) { model.player.togglePlayPause(); return .handled }
+        .onKeyPress(characters: .decimalDigits) { press in
+            guard let n = Int(press.characters), (1...VisualizerStyle.allCases.count).contains(n) else { return .ignored }
+            model.settings.visualizer.style = VisualizerStyle.allCases[n - 1]
+            showControls()
+            return .handled
+        }
+        .onChange(of: model.settings.visualizer, initial: true) { _, new in
+            holder.renderer?.settings = new
+            model.visualizer.apply(new)
+        }
+        .onChange(of: reduceMotion, initial: true) { _, new in holder.renderer?.reduceMotion = new }
+        .onChange(of: model.settings.visualizerEnabled) { _, on in if !on { dismissWindow(id: "visualizer") } }
+        .task(id: model.artworkKey(model.player.current?.track)) {
+            holder.renderer?.labels = .localized
+            guard let key = model.artworkKey(model.player.current?.track) else { holder.renderer?.setArtwork(nil); return }
+            let image = await ArtworkCache.shared.image(key, size: 1200)
+            guard !Task.isCancelled else { return }
+            holder.renderer?.setArtwork(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        }
+        .animation(.easeInOut(duration: 0.25), value: controlsShown)
+    }
+
+    private func showControls() {
+        if !controlsShown { controlsShown = true }
+        scheduleHide()
+    }
+
+    /// The controls fade out after a few seconds without the pointer moving (and, in full screen, so does the pointer).
+    private func scheduleHide() {
+        hide?.cancel()
+        hide = Task {
+            try? await Task.sleep(for: .seconds(2.5))
+            guard !Task.isCancelled, !hovering else { return }
+            controlsShown = false
+            if fullScreen { NSCursor.setHiddenUntilMouseMoves(true) }
+        }
+    }
+}
+
+/// The controls along the bottom of the visualizer: style, colours, sensitivity, options and full screen.
+struct VisualizerControls: View {
+    @Binding var settings: VisualizerSettings
+    var fullScreen: Bool
+    var reduceMotion: Bool
+    var toggleFullScreen: () -> Void
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Picker("Style", selection: $settings.style) {
+                ForEach(VisualizerStyle.allCases) { Text($0.label).tag($0) }
+            }
+            .pickerStyle(.segmented).labelsHidden().fixedSize()
+            Menu {
+                Picker("Colors", selection: $settings.theme) {
+                    ForEach(VisualizerTheme.allCases) { Text($0.label).tag($0) }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Image(systemName: "paintpalette")
+            }
+            .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+            .help("Colors")
+            .accessibilityLabel(Text("Colors"))
+            HStack(spacing: 6) {
+                Image(systemName: "dial.low").foregroundStyle(Palette.text2)
+                // Logarithmic: the middle is 1 (as measured), the ends a quarter and four times.
+                Slider(value: Binding(get: { log2(settings.sensitivity) }, set: { settings.sensitivity = pow(2, $0) }), in: -2...2)
+                    .frame(width: 110)
+                    .accessibilityLabel(Text("Sensitivity"))
+            }
+            .help("Sensitivity")
+            Menu {
+                options
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+            }
+            .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+            .help("Options")
+            .accessibilityLabel(Text("Options"))
+            Button(action: toggleFullScreen) {
+                Image(systemName: fullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+            }
+            .buttonStyle(.borderless)
+            .help(fullScreen ? String(localized: "Exit Full Screen") : String(localized: "Enter Full Screen"))
+            .accessibilityLabel(fullScreen ? Text("Exit Full Screen") : Text("Enter Full Screen"))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 9)
+        .background(.ultraThinMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(.white.opacity(0.08), lineWidth: 0.5))
+        .environment(\.colorScheme, .dark)
+    }
+
+    @ViewBuilder private var options: some View {
+        switch settings.style {
+        case .bars:
+            Toggle("Decibel Scale", isOn: $settings.decibelScale)
+            Toggle("Peak Caps", isOn: $settings.peakCaps)
+            Picker("Bands", selection: $settings.bandCount) {
+                ForEach(VisualizerSettings.bandCounts, id: \.self) { Text("\($0)").tag($0) }
+            }
+        case .spectrogram:
+            Picker("History", selection: $settings.spectrogramSeconds) {
+                ForEach([6.0, 12, 20, 30], id: \.self) { Text("\(Int($0)) seconds").tag($0) }
+            }
+        case .vinyl:
+            Toggle("Tonearm", isOn: $settings.tonearm)
+            Picker("Speed", selection: $settings.rpm) {
+                Text("33⅓ RPM").tag(100.0 / 3)
+                Text("45 RPM").tag(45.0)
+            }
+        case .club:
+            Toggle("Beat Strobe", isOn: $settings.strobe).disabled(reduceMotion)
+            if reduceMotion { Text("No strobe while Reduce Motion is on.") }
+        }
+        Divider()
+        Toggle("Show Song Title", isOn: $settings.showsTrackInfo)
+    }
+}
+
+/// The Metal view: drawn at the display's refresh rate (120 Hz on ProMotion) while the window is on screen, and not at
+/// all while it's closed, minimized or covered.
+struct VisualizerMetalView: NSViewRepresentable {
+    let renderer: VisualizerRenderer
+    let model: AppModel
+
+    func makeNSView(context: Context) -> VisualizerMTKView {
+        let view = VisualizerMTKView(frame: .zero, device: renderer.device)
+        view.colorPixelFormat = .bgra8Unorm
+        view.framebufferOnly = true
+        view.delegate = renderer
+        view.visualizer = model.visualizer
+        renderer.frameSource = { [weak model] in
+            guard let model else { return (.silent(bands: 64, fine: 512), VisualizerScene()) }
+            let player = model.player
+            let track = player.current?.track
+            let duration = player.duration > 0 ? player.duration : (track?.duration ?? 0)
+            let scene = VisualizerScene(title: track?.title, artist: track?.displayArtist.libraryDisplayName,
+                                        progress: track == nil ? nil : duration > 0 ? player.position / duration : 0,
+                                        isPlaying: player.isPlaying)
+            return (model.visualizer.feed.frame, scene)
+        }
+        return view
+    }
+
+    func updateNSView(_ view: VisualizerMTKView, context: Context) {}
+
+    static func dismantleNSView(_ view: VisualizerMTKView, coordinator: ()) {
+        view.setShowing(false)
+    }
+}
+
+final class VisualizerMTKView: MTKView {
+    weak var visualizer: VisualizerModel?
+    private var showing = false
+    nonisolated(unsafe) private var observers: [NSObjectProtocol] = []
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        observers.forEach(NotificationCenter.default.removeObserver)
+        observers = []
+        guard let window else { setShowing(false); return }
+        let names: [Notification.Name] = [NSWindow.didChangeOcclusionStateNotification, NSWindow.didMiniaturizeNotification,
+                                          NSWindow.didDeminiaturizeNotification, NSWindow.didChangeScreenNotification,
+                                          NSWindow.willCloseNotification]
+        for name in names {
+            observers.append(NotificationCenter.default.addObserver(forName: name, object: window, queue: .main) { [weak self] note in
+                let closing = note.name == NSWindow.willCloseNotification
+                MainActor.assumeIsolated {
+                    if closing { self?.setShowing(false) } else { self?.refresh() }
+                }
+            })
+        }
+        refresh()
+    }
+
+    /// The display's own refresh rate: 120 on ProMotion, 60 on most others.
+    private var displayRate: Int { max(30, window?.screen?.maximumFramesPerSecond ?? 60) }
+
+    private func refresh() {
+        guard let window else { return }
+        let rate = displayRate
+        if preferredFramesPerSecond != rate {
+            preferredFramesPerSecond = rate
+            if showing { visualizer?.rateChanged(Double(rate)) }
+        }
+        setShowing(window.isVisible && !window.isMiniaturized && window.occlusionState.contains(.visible))
+    }
+
+    func setShowing(_ on: Bool) {
+        guard on != showing else { return }
+        showing = on
+        isPaused = !on
+        if on { visualizer?.began(rate: Double(displayRate)) } else { visualizer?.ended() }
+    }
+
+    deinit {
+        observers.forEach(NotificationCenter.default.removeObserver)
+    }
+}
+
+/// Configures the visualizer's window: full screen on any display, black behind the picture, and back where it was
+/// (display, size, full screen) each time it opens.
+struct VisualizerWindowAccessor: NSViewRepresentable {
+    let model: AppModel
+    @Binding var fullScreen: Bool
+    @Binding var window: NSWindow?
+
+    final class Probe: NSView {
+        var configure: ((NSWindow) -> Void)?
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let window { configure?(window) }
+        }
+    }
+
+    final class Coordinator {
+        nonisolated(unsafe) var observers: [NSObjectProtocol] = []
+        var configured: NSWindow?
+        /// The frame before full screen: what to come back to.
+        var windowedFrame: CGRect?
+        deinit { observers.forEach(NotificationCenter.default.removeObserver) }
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeNSView(context: Context) -> Probe {
+        let probe = Probe()
+        let coordinator = context.coordinator
+        probe.configure = { window in
+            MainActor.assumeIsolated { configure(window, coordinator) }
+        }
+        return probe
+    }
+
+    func updateNSView(_ view: Probe, context: Context) {}
+
+    @MainActor
+    private func configure(_ window: NSWindow, _ c: Coordinator) {
+        guard c.configured !== window else { return }
+        c.configured = window
+        self.window = window
+        window.collectionBehavior.insert(.fullScreenPrimary)
+        window.backgroundColor = .black
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.isMovableByWindowBackground = true
+        window.isRestorable = false   // placed from its own saved state below
+        window.appearance = NSAppearance(named: .darkAqua)
+        window.minSize = VisualizerWindowState.minimumSize
+
+        let saved = model.settings.visualizerWindow
+        if let saved, let placed = saved.placement(among: Self.displays()) {
+            window.setFrame(placed.frame, display: true)
+            if saved.fullScreen, !window.styleMask.contains(.fullScreen) {
+                DispatchQueue.main.async { window.toggleFullScreen(nil) }
+            }
+        }
+        let center = NotificationCenter.default
+        let save: @Sendable (Notification) -> Void = { [weak window] note in
+            let name = note.name
+            MainActor.assumeIsolated {
+                guard let window else { return }
+                switch name {
+                case NSWindow.willEnterFullScreenNotification: c.windowedFrame = window.frame
+                case NSWindow.didEnterFullScreenNotification: fullScreen = true
+                case NSWindow.didExitFullScreenNotification: fullScreen = false; c.windowedFrame = nil
+                default: break
+                }
+                // While closing, it's still in or out of full screen as the person left it.
+                let inFullScreen = window.styleMask.contains(.fullScreen)
+                let screen = window.screen
+                let id = (screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+                model.settings.visualizerWindow = VisualizerWindowState(
+                    frame: inFullScreen ? (c.windowedFrame ?? model.settings.visualizerWindow?.frame ?? window.frame) : window.frame,
+                    displayID: id, displayName: screen?.localizedName, fullScreen: inFullScreen)
+            }
+        }
+        for name in [NSWindow.didMoveNotification, NSWindow.didEndLiveResizeNotification, NSWindow.willEnterFullScreenNotification,
+                     NSWindow.didEnterFullScreenNotification, NSWindow.didExitFullScreenNotification,
+                     NSWindow.didChangeScreenNotification, NSWindow.willCloseNotification] {
+            c.observers.append(center.addObserver(forName: name, object: window, queue: .main, using: save))
+        }
+        fullScreen = window.styleMask.contains(.fullScreen)
+    }
+
+    /// The connected displays, the main one (with the menu bar) first.
+    @MainActor
+    static func displays() -> [VisualizerWindowState.Display] {
+        NSScreen.screens.map { screen in
+            let id = (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value ?? 0
+            return VisualizerWindowState.Display(id: id, name: screen.localizedName, frame: screen.frame, visibleFrame: screen.visibleFrame)
+        }
+    }
+}

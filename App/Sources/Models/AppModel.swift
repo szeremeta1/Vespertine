@@ -155,6 +155,7 @@ final class AppModel {
     let shares: NetworkShareManager
     let analysis: AnalysisQueue
     let loopback: LoopbackTest
+    let visualizer: VisualizerModel
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -236,6 +237,7 @@ final class AppModel {
         // the relay can take them as they are.
         DeviceRestore.afterCrash()
         player = PlayerController(library: library, settings: settings, shares: shares)
+        visualizer = VisualizerModel(engine: player.engine)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
