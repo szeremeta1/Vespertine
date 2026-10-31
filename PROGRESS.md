@@ -23,3 +23,16 @@ Branch `feat/visualizer`. Brief: BRIEF-visualizer.md (local, untracked). Delete 
 - [x] Full test run (Kit 395, Analysis 45, App 30), recordings + stills in ./out, RESULT-visualizer.md (local), draft PR.
 - Phase 1 done. Phase 2: see "Left for phase 2" in RESULT-visualizer.md / the PR.
 - Scripts kept local in .scratch/ (perf.sh, record.sh, l10n_visualizer.py); .scratch and out are git-excluded.
+
+# Phase 2 (run 2, 2026-10-30). Brief: BRIEF-visualizer2.md (local)
+
+- [x] Defaults: vinyl, new "Vespertine" theme (brand tokens: surface #16161A, copper #C98B5B, brass #C8A66A, ivory #ECE6DA).
+- [x] Strobe: off by default; needs `strobeWarningAccepted` (one-time alert, normalized() forces it off otherwise);
+      blocked by Reduce Motion and Dim Flashing Lights (MADimFlashingLightsEnabled); help text in menu + Settings toggle.
+- [x] Styles: scope (goniometer/oscilloscope, phosphor trail, correlation bar), meters (VU IEC 60268-17 / PPM BBC
+      Type IIa, auto or fixed reference), particles (GPU compute, curl flow, beat ripples), mirrored (circle/line).
+- [x] Tests: VisualizerMetersTests + renderer/settings additions (38 visualizer tests pass).
+- [x] tests/rt-audit.c: concurrent tap test (ASan/UBSan + TSan clean). audit.sh on phase 1 HEAD: all passed.
+- [x] l10n: 22 keys × 44 (.scratch/l10n_visualizer2.py), check-localizations passes.
+- [ ] Release perf numbers, clips in ./out (vinyl Vespertine, scope, meters, particles, mirrored), strobe dialog still.
+- [ ] Docs (VISUALIZER.md, FEATURES.md), RESULT-visualizer.md, PR-BODY-visualizer.md, full audit.sh on final code.
