@@ -72,7 +72,7 @@ struct VisualizerWindow: View {
             }
             if controlsShown {
                 VisualizerControls(settings: $settings.visualizer, fullScreen: fullScreen, reduceMotion: reduceMotion) {
-                    window?.toggleFullScreen(nil)
+                    if let window { VisualizerWindowAccessor.allowFullScreen(window); window.toggleFullScreen(nil) }
                 }
                 .padding(.bottom, 22)
                 .onHover { hovering = $0; if !$0 { scheduleHide() } }
@@ -344,7 +344,7 @@ struct VisualizerWindowAccessor: NSViewRepresentable {
         guard c.configured !== window else { return }
         c.configured = window
         self.window = window
-        window.collectionBehavior.insert(.fullScreenPrimary)
+        Self.allowFullScreen(window)
         window.backgroundColor = .black
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
@@ -356,8 +356,19 @@ struct VisualizerWindowAccessor: NSViewRepresentable {
         let saved = model.settings.visualizerWindow
         if let saved, let placed = saved.placement(among: Self.displays()) {
             window.setFrame(placed.frame, display: true)
-            if saved.fullScreen, !window.styleMask.contains(.fullScreen) {
-                DispatchQueue.main.async { window.toggleFullScreen(nil) }
+            if saved.fullScreen {
+                // Full screen only takes once the window is on screen, which is a moment after it's configured.
+                Task { @MainActor [weak window] in
+                    for _ in 0..<40 {
+                        guard let window else { return }
+                        if window.isVisible {
+                            Self.allowFullScreen(window)
+                            if !window.styleMask.contains(.fullScreen) { window.toggleFullScreen(nil) }
+                            return
+                        }
+                        try? await Task.sleep(for: .milliseconds(50))
+                    }
+                }
             }
         }
         let center = NotificationCenter.default
@@ -386,6 +397,14 @@ struct VisualizerWindowAccessor: NSViewRepresentable {
             c.observers.append(center.addObserver(forName: name, object: window, queue: .main, using: save))
         }
         fullScreen = window.styleMask.contains(.fullScreen)
+    }
+
+    /// SwiftUI makes a secondary `Window` scene's window an auxiliary one, which can only join another window's full
+    /// screen. The visualizer goes full screen on a display of its own.
+    @MainActor
+    static func allowFullScreen(_ window: NSWindow) {
+        window.collectionBehavior.remove([.auxiliary, .fullScreenAuxiliary, .fullScreenNone])
+        window.collectionBehavior.insert([.primary, .fullScreenPrimary])
     }
 
     /// The connected displays, the main one (with the menu bar) first.
