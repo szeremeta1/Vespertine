@@ -202,24 +202,55 @@ final class SystemBedDecoder: @unchecked Sendable {
         let firstFrame = Int64((max(0, seconds) * Self.sampleRate).rounded())
         tap.reset(at: firstFrame)
         queue.async { [self] in
-            guard let reader = try? makeReader(seconds) else { return }
-            do { try reader.start() } catch { return }
-            defer { reader.cancel() }
             var next = firstFrame
-            var scratch = [Float](repeating: 0, count: 1 << 15)
-            while isCurrent(gen), let buffer = try? reader.next() {
+            let reader: BedReading
+            do {
+                reader = try makeReader(seconds)
+                try reader.start()
+            } catch {
+                fail(gen, error, at: next)
+                return
+            }
+            defer { reader.cancel() }
+            var scratch = [Float](repeating: 0, count: 2 * Self.chunkFrames)
+            while isCurrent(gen) {
+                let buffer: BedBuffer
+                do {
+                    guard let read = try reader.next() else { return }   // the end of the file
+                    buffer = read
+                } catch {
+                    fail(gen, error, at: next)
+                    return
+                }
                 // Wait for the playhead before decoding further than a second ahead.
                 while isCurrent(gen), Double(next) / Self.sampleRate - playhead() > Self.lookahead {
                     Thread.sleep(forTimeInterval: 0.02)
                 }
                 guard isCurrent(gen) else { return }
-                let frames = buffer.frames
-                guard frames > 0, frames * 2 <= scratch.count else { continue }
-                guard scratch.withUnsafeMutableBufferPointer({ buffer.copy(0, frames, $0.baseAddress!) }) else { return }
-                scratch.withUnsafeBufferPointer { tap.append(interleaved: $0.baseAddress!, frames: frames, at: next) }
-                next += Int64(frames)
+                // Whatever the buffer's size, all of it is stored, a chunk at a time, so `next` follows the reader.
+                var done = 0
+                while done < buffer.frames {
+                    let count = min(Self.chunkFrames, buffer.frames - done)
+                    guard scratch.withUnsafeMutableBufferPointer({ buffer.copy(done, count, $0.baseAddress!) }) else {
+                        fail(gen, BedError.copyFailed(atFrame: next), at: next)
+                        return
+                    }
+                    scratch.withUnsafeBufferPointer { tap.append(interleaved: $0.baseAddress!, frames: count, at: next) }
+                    next += Int64(count)
+                    done += count
+                }
             }
         }
+    }
+
+    /// Records why a run ended before the end of the file (unless it was stopped or replaced meanwhile, which isn't a failure).
+    private func fail(_ gen: Int, _ error: Error, at frame: Int64) {
+        lock.lock()
+        let current = gen == generation
+        if current { failure = error }
+        lock.unlock()
+        guard current else { return }
+        log.error("Atmos bed decoder stopped at frame \(frame, privacy: .public): \(String(describing: error), privacy: .public)")
     }
 
     func stop() {
