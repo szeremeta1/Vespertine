@@ -24,7 +24,7 @@ public enum VisualizerTheme: String, CaseIterable, Codable, Sendable, Identifiab
     case brass
     /// Magenta, violet and cyan.
     case neon
-    /// Green, teal and violet.
+    /// Teal, green and pale violet.
     case aurora
     /// Red, orange and gold.
     case ember
@@ -40,7 +40,7 @@ public enum VisualizerTheme: String, CaseIterable, Codable, Sendable, Identifiab
         switch self {
         case .brass: [Self.rgb(0x16110A), Self.rgb(0x7C6541), Self.rgb(0xC8A66A), Self.rgb(0xF6E7C4)]
         case .neon: [Self.rgb(0x12021F), Self.rgb(0x7A1FD6), Self.rgb(0xFF2D95), Self.rgb(0x4CF2FF)]
-        case .aurora: [Self.rgb(0x03141A), Self.rgb(0x0F7B6C), Self.rgb(0x3FE0A0), Self.rgb(0xB89CFF)]
+        case .aurora: [Self.rgb(0x03141A), Self.rgb(0x0F7B6C), Self.rgb(0x3FE0A0), Self.rgb(0xE4DCFF)]
         case .ember: [Self.rgb(0x1A0503), Self.rgb(0x9C1C0E), Self.rgb(0xFF6A1A), Self.rgb(0xFFE08A)]
         case .ice: [Self.rgb(0x020A1C), Self.rgb(0x1D4ED8), Self.rgb(0x5CC8FF), Self.rgb(0xF0FAFF)]
         case .mono: [Self.rgb(0x050505), Self.rgb(0x4A4A4A), Self.rgb(0xB5B5B5), Self.rgb(0xFFFFFF)]

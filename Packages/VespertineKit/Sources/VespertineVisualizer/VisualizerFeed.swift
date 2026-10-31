@@ -102,6 +102,12 @@ public final class VisualizerFeed: @unchecked Sendable {
         }
     }
 
+    /// Lets tests call `tick()` without the timer.
+    func prepareForTesting() {
+        running = true
+        lastTick = DispatchTime.now().uptimeNanoseconds
+    }
+
     /// One analysis, on the feed's thread. Public for offline rendering and tests, which call it directly.
     func tick() {
         guard running else { return }
