@@ -12,6 +12,7 @@ let package = Package(
     products: [
         .library(name: "VespertineAudio", targets: ["VespertineAudio"]),
         .library(name: "VespertineLibrary", targets: ["VespertineLibrary"]),
+        .library(name: "VespertineVisualizer", targets: ["VespertineVisualizer"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
@@ -60,6 +61,13 @@ let package = Package(
             ],
             linkerSettings: [.linkedFramework("NetFS")]
         ),
+        // The visualizer window's analysis (FFT, bands, beats) and Metal renderer. Reads a copy of the samples only.
+        .target(
+            name: "VespertineVisualizer",
+            linkerSettings: [.linkedFramework("Accelerate"), .linkedFramework("Metal"), .linkedFramework("MetalKit")]
+        ),
+        // Renders the visualizer offline from a decoded file, frame by frame (screenshots, recordings, timing).
+        .executableTarget(name: "vespertine-visualize", dependencies: ["VespertineVisualizer"]),
         // Generates a demo library of original, synthesized music with artwork (for development and screenshots).
         .executableTarget(
             name: "vespertine-demo",
@@ -77,6 +85,7 @@ let package = Package(
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport",
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],
     swiftLanguageModes: [.v6],
