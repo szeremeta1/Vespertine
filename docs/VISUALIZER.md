@@ -4,6 +4,10 @@ An optional window that draws the music: the album on a spinning record, a bar s
 
 It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.
 
+![The Vinyl style: the album cover as the label of a record on a turntable, the tonearm over the groove and a ring of light around the platter showing the spectrum](screenshots/visualizer-vinyl.png)
+
+![The Meters style: two backlit analogue VU meters, left and right, with needles and a peak light](screenshots/visualizer-meters-vu.png)
+
 ## Styles
 
 - **Spectrum.** 32 to 128 log-spaced bands from 20 Hz to 20 kHz, smoothed (fast rise, slower fall), with held peak caps that fall away after 0.7 s. Heights in dB (the default: 0 dB at the top, -72 dB at the floor, a grid every 12 dB) or in linear amplitude.
