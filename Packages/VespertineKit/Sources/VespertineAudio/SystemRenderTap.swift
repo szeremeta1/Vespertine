@@ -83,70 +83,139 @@ final class SystemBedTap: @unchecked Sendable {
     }
 }
 
+/// One buffer of interleaved stereo float frames from a `BedReading`.
+struct BedBuffer {
+    var frames: Int
+    /// Copies `count` frames starting at frame `first` of this buffer into `destination`; false when the data isn't there.
+    var copy: (_ first: Int, _ count: Int, _ destination: UnsafeMutablePointer<Float>) -> Bool
+}
+
+/// Where `SystemBedDecoder` gets the decoded bed from: an `AVAssetReader` in the app, a fake in tests.
+protocol BedReading: AnyObject {
+    /// Begins reading; throws when it can't.
+    func start() throws
+    /// The next buffer, or nil at the end of the file. Throws when the reader fails.
+    func next() throws -> BedBuffer?
+    func cancel()
+}
+
+/// Reads a track's Dolby bed through an `AVAssetReader`, decoded to 48 kHz stereo float by the system.
+final class AssetBedReader: BedReading {
+    private let reader: AVAssetReader
+    private let output: AVAssetReaderTrackOutput
+
+    init(asset: AVAsset, track: AVAssetTrack, origin: CMTime, seconds: TimeInterval) throws {
+        reader = try AVAssetReader(asset: asset)
+        var layout = AudioChannelLayout()
+        layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo
+        output = AVAssetReaderTrackOutput(track: track, outputSettings: [
+            AVFormatIDKey: kAudioFormatLinearPCM,
+            AVSampleRateKey: SystemBedDecoder.sampleRate,
+            AVNumberOfChannelsKey: 2,
+            AVChannelLayoutKey: Data(bytes: &layout, count: MemoryLayout<AudioChannelLayout>.size),
+            AVLinearPCMBitDepthKey: 32,
+            AVLinearPCMIsFloatKey: true,
+            AVLinearPCMIsBigEndianKey: false,
+            AVLinearPCMIsNonInterleaved: false,
+        ])
+        output.alwaysCopiesSampleData = false
+        reader.timeRange = CMTimeRange(start: CMTimeAdd(origin, CMTime(seconds: max(0, seconds), preferredTimescale: 48_000)),
+                                       duration: .positiveInfinity)
+        reader.add(output)
+    }
+
+    func start() throws {
+        guard reader.startReading() else { throw reader.error ?? BedError.couldNotStart }
+    }
+
+    func next() throws -> BedBuffer? {
+        guard let buffer = output.copyNextSampleBuffer() else {
+            if reader.status == .failed { throw reader.error ?? BedError.readerFailed }
+            return nil
+        }
+        let frames = CMSampleBufferGetNumSamples(buffer)
+        guard frames > 0 else { return BedBuffer(frames: 0) { _, _, _ in true } }
+        guard let block = CMSampleBufferGetDataBuffer(buffer), CMBlockBufferGetDataLength(block) >= frames * 8 else {
+            throw BedError.noData(frames: frames)
+        }
+        return BedBuffer(frames: frames) { first, count, destination in
+            CMBlockBufferCopyDataBytes(block, atOffset: first * 8, dataLength: count * 8, destination: destination) == kCMBlockBufferNoErr
+        }
+    }
+
+    func cancel() { reader.cancelReading() }
+}
+
+enum BedError: Error, CustomStringConvertible {
+    case couldNotStart, readerFailed, noData(frames: Int), copyFailed(atFrame: Int64)
+
+    var description: String {
+        switch self {
+        case .couldNotStart: "the bed reader could not start"
+        case .readerFailed: "the bed reader failed"
+        case .noData(let frames): "a bed buffer of \(frames) frames has no data"
+        case .copyFailed(let frame): "copying the bed at frame \(frame) failed"
+        }
+    }
+}
+
 /// Decodes a Dolby track to a stereo downmix of its bed into a `SystemBedTap`, a little ahead of the playhead, from a
 /// second reader of its own: the renderer takes the compressed frames untouched. Runs only between `start` and `stop`.
 final class SystemBedDecoder: @unchecked Sendable {
     static let sampleRate = 48_000.0
     /// How far ahead of the playhead it decodes, in seconds.
     static let lookahead = 1.0
+    /// Frames copied into the tap at a time; a bigger buffer from the reader is stored in several pieces.
+    static let chunkFrames = 1 << 14
 
-    private let asset: AVAsset
-    private let track: AVAssetTrack
-    private let origin: CMTime
+    /// Makes the reader for a start at `seconds` into the file.
+    private let makeReader: (TimeInterval) throws -> BedReading
     let tap: SystemBedTap
     private let queue = DispatchQueue(label: "org.szeremeta.vespertine.atmos-bed", qos: .userInitiated)
     private let lock = NSLock()
     private var generation = 0
+    private var failure: Error?
 
     init(asset: AVAsset, track: AVAssetTrack, origin: CMTime) {
-        self.asset = asset
-        self.track = track
-        self.origin = origin
+        makeReader = { try AssetBedReader(asset: asset, track: track, origin: origin, seconds: $0) }
+        tap = SystemBedTap(sampleRate: Self.sampleRate)
+    }
+
+    /// For tests: decodes from `makeReader` instead of an asset.
+    init(makeReader: @escaping (TimeInterval) throws -> BedReading) {
+        self.makeReader = makeReader
         tap = SystemBedTap(sampleRate: Self.sampleRate)
     }
 
     deinit { stop() }
+
+    /// Why the last run ended before the end of the file (a reader failure or missing data); nil otherwise.
+    var error: Error? { lock.lock(); defer { lock.unlock() }; return failure }
 
     /// Decodes from `seconds` into the file (the renderer's own time base) on; `playhead` says how far playback has got.
     func start(at seconds: TimeInterval, playhead: @escaping @Sendable () -> TimeInterval) {
         lock.lock()
         generation += 1
         let gen = generation
+        failure = nil
         lock.unlock()
         let firstFrame = Int64((max(0, seconds) * Self.sampleRate).rounded())
         tap.reset(at: firstFrame)
         queue.async { [self] in
-            guard let reader = try? AVAssetReader(asset: asset) else { return }
-            var layout = AudioChannelLayout()
-            layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo
-            let output = AVAssetReaderTrackOutput(track: track, outputSettings: [
-                AVFormatIDKey: kAudioFormatLinearPCM,
-                AVSampleRateKey: Self.sampleRate,
-                AVNumberOfChannelsKey: 2,
-                AVChannelLayoutKey: Data(bytes: &layout, count: MemoryLayout<AudioChannelLayout>.size),
-                AVLinearPCMBitDepthKey: 32,
-                AVLinearPCMIsFloatKey: true,
-                AVLinearPCMIsBigEndianKey: false,
-                AVLinearPCMIsNonInterleaved: false,
-            ])
-            output.alwaysCopiesSampleData = false
-            reader.timeRange = CMTimeRange(start: CMTimeAdd(origin, CMTime(seconds: max(0, seconds), preferredTimescale: 48_000)),
-                                           duration: .positiveInfinity)
-            reader.add(output)
-            guard reader.startReading() else { return }
-            defer { reader.cancelReading() }
+            guard let reader = try? makeReader(seconds) else { return }
+            do { try reader.start() } catch { return }
+            defer { reader.cancel() }
             var next = firstFrame
             var scratch = [Float](repeating: 0, count: 1 << 15)
-            while isCurrent(gen), let buffer = output.copyNextSampleBuffer() {
+            while isCurrent(gen), let buffer = try? reader.next() {
                 // Wait for the playhead before decoding further than a second ahead.
                 while isCurrent(gen), Double(next) / Self.sampleRate - playhead() > Self.lookahead {
                     Thread.sleep(forTimeInterval: 0.02)
                 }
-                guard isCurrent(gen), let block = CMSampleBufferGetDataBuffer(buffer) else { return }
-                let frames = CMSampleBufferGetNumSamples(buffer)
-                let bytes = min(CMBlockBufferGetDataLength(block), scratch.count * MemoryLayout<Float>.size)
-                guard frames > 0, frames * 2 <= scratch.count, bytes >= frames * 8 else { continue }
-                _ = scratch.withUnsafeMutableBytes { CMBlockBufferCopyDataBytes(block, atOffset: 0, dataLength: frames * 8, destination: $0.baseAddress!) }
+                guard isCurrent(gen) else { return }
+                let frames = buffer.frames
+                guard frames > 0, frames * 2 <= scratch.count else { continue }
+                guard scratch.withUnsafeMutableBufferPointer({ buffer.copy(0, frames, $0.baseAddress!) }) else { return }
                 scratch.withUnsafeBufferPointer { tap.append(interleaved: $0.baseAddress!, frames: frames, at: next) }
                 next += Int64(frames)
             }

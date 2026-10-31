@@ -30,6 +30,37 @@ private final class FakeAtmosRender: SystemRenderTap, @unchecked Sendable {
     }
 }
 
+/// A bed reader that hands out `buffers` buffers of `frames` frames each (left = the frame number, right = its negative), then
+/// either ends or, when `failAfter` is set, throws after that many buffers.
+private final class FakeBedReader: BedReading, @unchecked Sendable {
+    struct Failure: Error {}
+    let frames: Int, buffers: Int, failAfter: Int?, firstFrame: Int64
+    private(set) var cancelled = false
+    private var handedOut = 0
+
+    init(frames: Int, buffers: Int, failAfter: Int? = nil, firstFrame: Int64 = 0) {
+        self.frames = frames; self.buffers = buffers; self.failAfter = failAfter; self.firstFrame = firstFrame
+    }
+
+    func start() throws {}
+    func cancel() { cancelled = true }
+
+    func next() throws -> BedBuffer? {
+        if let failAfter, handedOut == failAfter { throw Failure() }
+        guard handedOut < buffers else { return nil }
+        let base = firstFrame + Int64(handedOut * frames)
+        handedOut += 1
+        return BedBuffer(frames: frames) { first, count, destination in
+            for i in 0..<count {
+                let f = Float(base + Int64(first + i))
+                destination[2 * i] = f
+                destination[2 * i + 1] = -f
+            }
+            return true
+        }
+    }
+}
+
 @Suite("Visualizer while macOS renders Dolby Atmos")
 struct AtmosVisualizerTests {
     @Test("The engine's visualizer tap reads the Atmos render's samples instead of reporting nothing")
@@ -134,6 +165,86 @@ struct AtmosVisualizerTests {
         #expect(l.contains { abs($0) > 0.01 })
         var early = [Float](repeating: 0, count: 2048), earlyR = early
         #expect(decoder.tap.copy(left: &early, right: &earlyR, playhead: 20_000) == nil)   // before the seek target
+    }
+
+    @Test("Buffers bigger than a chunk are stored whole, in order, never skipped")
+    func largeBuffersAreStored() throws {
+        let reader = FakeBedReader(frames: 32_768, buffers: 3)
+        let decoder = SystemBedDecoder(makeReader: { _ in reader })
+        decoder.start(at: 0) { 100 }
+        defer { decoder.stop() }
+        try Self.waitForBed(decoder, through: 3 * 32_768, timeout: 20)
+        #expect(decoder.error == nil)
+        var l = [Float](repeating: 0, count: 64), r = l
+        let playheads: [Int64] = [32_768, 32_775, 65_536, 98_304]          // across and inside the buffer boundaries
+        for playhead in playheads {
+            let read = try #require(decoder.tap.copy(left: &l, right: &r, playhead: playhead))
+            #expect(read.frames == 64)
+            let expected: [Float] = (0..<64).map { (i: Int) -> Float in Float(playhead - 64 + Int64(i)) }
+            #expect(l == expected, "playhead \(playhead)")
+            #expect(r == l.map { -$0 })
+        }
+    }
+
+    @Test("A big buffer doesn't hold the lookahead open: the decoder still waits for the playhead")
+    func largeBuffersKeepTheLookahead() throws {
+        let decoder = SystemBedDecoder(makeReader: { _ in FakeBedReader(frames: 32_768, buffers: 10) })
+        let playhead = Locked(0.0)
+        decoder.start(at: 0) { playhead.value }
+        defer { decoder.stop() }
+        try Self.waitForBed(decoder, through: 2 * 32_768, timeout: 20)
+        Thread.sleep(forTimeInterval: 0.3)
+        #expect(decoder.tap.endFrame == 2 * 32_768)           // 1.37 s in, so it holds until the playhead catches up
+        playhead.value = 10
+        try Self.waitForBed(decoder, through: 10 * 32_768, timeout: 20)
+    }
+
+    @Test("A reader that fails mid-stream ends the decoder with the error recorded, keeping what it had stored")
+    func readerFailureIsRecorded() throws {
+        let reader = FakeBedReader(frames: 8192, buffers: 10, failAfter: 3)
+        let decoder = SystemBedDecoder(makeReader: { _ in reader })
+        decoder.start(at: 0) { 100 }
+        defer { decoder.stop() }
+        try Self.waitForBed(decoder, through: 3 * 8192, timeout: 20)
+        let deadline = Date().addingTimeInterval(20)
+        while decoder.error == nil, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(decoder.error is FakeBedReader.Failure)
+        #expect(decoder.tap.endFrame == 3 * 8192)
+        #expect(reader.cancelled)
+        // A new start clears the error and decodes again.
+        decoder.start(at: 0) { 100 }
+        #expect(decoder.error == nil)
+    }
+
+    @Test("A buffer without data ends the decoder with an error instead of silently")
+    func missingDataIsRecorded() throws {
+        final class EmptyReader: BedReading {
+            var handed = 0
+            func start() throws {}
+            func cancel() {}
+            func next() throws -> BedBuffer? {
+                handed += 1
+                if handed == 1 { return BedBuffer(frames: 4096) { _, count, d in d.update(repeating: 0.5, count: 2 * count); return true } }
+                return BedBuffer(frames: 4096) { _, _, _ in false }
+            }
+        }
+        let decoder = SystemBedDecoder(makeReader: { _ in EmptyReader() })
+        decoder.start(at: 0) { 100 }
+        defer { decoder.stop() }
+        let deadline = Date().addingTimeInterval(20)
+        while decoder.error == nil, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(decoder.error != nil)
+        #expect(decoder.tap.endFrame == 4096)
+    }
+
+    @Test("A reader that can't be made or started is recorded too")
+    func startFailureIsRecorded() throws {
+        let decoder = SystemBedDecoder(makeReader: { _ in throw FakeBedReader.Failure() })
+        decoder.start(at: 0) { 0 }
+        defer { decoder.stop() }
+        let deadline = Date().addingTimeInterval(20)
+        while decoder.error == nil, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(decoder.error is FakeBedReader.Failure)
     }
 }
 
