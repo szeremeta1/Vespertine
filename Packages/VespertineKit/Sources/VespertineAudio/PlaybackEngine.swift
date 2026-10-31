@@ -567,6 +567,15 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Guarded by `sessionLock`.
     private var visualizerTap = false
 
+    /// Where the visualizer reads while macOS renders Dolby Atmos (there's no `session` then). Guarded by `sessionLock`.
+    private var systemTap: (any SystemRenderTap)?
+
+    /// Puts `tap` where the Atmos session's own tap goes: tests stand in for macOS's renderer with it.
+    func attachSystemTapForTesting(_ tap: (any SystemRenderTap)?) {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        systemTap = tap
+    }
+
     /// A probed file whose start failed before its decoder was used (the output wasn't ready).
     private var unusedProbe: (item: UUID, probed: ProbedSource)?
     /// The open decoder of the song that's restarting on another output. Opening the file again is the slow
