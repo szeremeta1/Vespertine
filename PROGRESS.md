@@ -37,4 +37,7 @@ Branch `feat/visualizer`. Brief: BRIEF-visualizer.md (local, untracked). Delete 
 - [x] Release perf numbers (offline), clips in ./out (vinyl Vespertine, scope, meters, particles, mirrored), strobe dialog still,
       live app captures, 56 stills. Strobe capped at 2.5 flashes/s. Meters only run while shown.
 - [x] Docs (VISUALIZER.md, FEATURES.md, ARCHITECTURE.md), PR-BODY-visualizer.md drafted.
-- [ ] Full audit.sh on final code (.scratch/audit-final.out, .scratch/audit-src2), then fill test numbers in PR body/RESULT.
+- [x] Full audit.sh on the final code (3a8cc37): all passed (Kit 583 Debug + Release, Analysis 45, App 30, ASan/UBSan, TSan,
+      DST fuzz, static analysis, universal Release build). Test numbers in PR-BODY-visualizer.md and RESULT-visualizer.md.
+- [x] Meter clips re-rendered from the final code (same pictures; clean timing files).
+- Run 2 done. Draft PR #118 body: PR-BODY-visualizer.md (local); Vesper updates the PR.
