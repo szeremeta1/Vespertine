@@ -444,18 +444,24 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         strobe *= Float(exp(-dt / 0.045))
         if strobe < 0.003 || !strobeAllowed { strobe = 0 }
 
-        // Meters: the peak lights come on near full scale (as the sensitivity control shows it) and stay lit a moment.
+        // Meters: the peak lights come on when the needle is in the red or the signal clips, and stay lit a moment.
         let lightFall = Float(exp(-dt / 0.25))
-        let over = Self.peakLit(peakDB: frame.peakDB, sensitivity: settings.sensitivity)
+        let over = Self.peakLit(peakDB: frame.peakDB, vu: frame.vu, ppm: frame.ppm, kind: settings.meterKind)
         peakLights = SIMD2(over.x ? 1 : peakLights.x * lightFall, over.y ? 1 : peakLights.y * lightFall)
     }
 
-    /// Whether each meter's peak light is on for a frame's sample peaks (dBFS): above -1 dBFS, or above it once raised
-    /// by the sensitivity control's gain, as the other styles show it. Turning the control down never hides a clip.
-    static func peakLit(peakDB: SIMD2<Float>, sensitivity: Double) -> (x: Bool, y: Bool) {
-        let gain = Float(20 * log10(max(sensitivity, 0.01)))
-        let threshold: Float = -1 - max(0, gain)
-        return (peakDB.x > threshold, peakDB.y > threshold)
+    /// Whether each meter's peak light is on for a frame: the needle (after the sensitivity control, which moves the
+    /// reference) has entered the red zone, or the raw sample peak (dBFS) is at -1 dBFS or above, a true clip that the
+    /// control can't hide. The VU's red zone is the band from 0 VU as printed on the dial; the PPM, which has no red
+    /// printed, uses `VisualizerMeters.ppmRedMark`.
+    static func peakLit(peakDB: SIMD2<Float>, vu: SIMD2<Float>, ppm: SIMD2<Float>, kind: VisualizerMeterKind) -> (x: Bool, y: Bool) {
+        func inRed(_ c: Int) -> Bool {
+            switch kind {
+            case .vu: return Double(vu[c]) >= VisualizerMeters.zeroVU
+            case .ppm: return VisualizerMeters.ppmTravel(decibels: Double(ppm[c])) >= VisualizerMeters.ppmMark(VisualizerMeters.ppmRedMark)
+            }
+        }
+        return (peakDB.x >= -1 || inRed(0), peakDB.y >= -1 || inRed(1))
     }
 
     /// At most one flash every 0.4 s (2.5 a second), under the 3 a second that photosensitivity guidelines (WCAG 2.3.1,
