@@ -28,17 +28,17 @@ extension VisualizerTheme {
         case .aurora: String(localized: "Aurora", comment: "Visualizer colours: teal, green and pale violet.")
         case .ember: String(localized: "Ember", comment: "Visualizer colours: red, orange and gold.")
         case .ice: String(localized: "Ice", comment: "Visualizer colours: blues and white.")
-        case .mono: String(localized: "Mono", comment: "Visualizer colours: white on black.")
+        case .mono: String(localized: "Monochrome", comment: "Visualizer colours: white on black.")
         }
     }
 }
 
 extension VisualizerLabels {
     static let localized = VisualizerLabels(
-        hertz: { String(localized: "\($0) Hz", comment: "Visualizer axis: a frequency in hertz, e.g. 500 Hz.") },
+        hertz: { String(localized: "\(String($0)) Hz", comment: "Visualizer axis: a frequency in hertz, e.g. 500 Hz.") },
         kilohertz: { String(localized: "\($0.formatted(.number.precision(.fractionLength(0...1)))) kHz", comment: "Visualizer axis: a frequency in kilohertz, e.g. 2 kHz.") },
-        decibels: { String(localized: "\($0) dB", comment: "Visualizer axis: a level in decibels, e.g. -24 dB.") },
-        secondsAgo: { String(localized: "\(-$0) s", comment: "Visualizer axis: seconds ago on the spectrogram, e.g. -10 s (0 is now).") })
+        decibels: { String(localized: "\(String($0)) dB", comment: "Visualizer axis: a level in decibels, e.g. -24 dB.") },
+        secondsAgo: { String(localized: "\(String(-$0)) s", comment: "Visualizer axis: seconds ago on the spectrogram, e.g. -10 s (0 is now).") })
 }
 
 /// Holds the renderer, made once per window (it compiles the shaders).
@@ -110,6 +110,18 @@ struct VisualizerWindow: View {
             holder.renderer?.setArtwork(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
         }
         .animation(.easeInOut(duration: 0.25), value: controlsShown)
+        .task {
+            // QA: -VespertineVisualizerStats YES logs what the analysis and drawing cost, every 10 s.
+            guard LaunchArguments().bool(forKey: "VespertineVisualizerStats") else { return }
+            while !Task.isCancelled {
+                holder.renderer?.resetStats()
+                try? await Task.sleep(for: .seconds(10))
+                let feed = model.visualizer.feed.stats, gpu = holder.renderer?.gpuStats ?? .init()
+                print(String(format: "visualizer %@: analysis %.1f µs/frame (%d frames, %d dropped), GPU %.2f ms/frame, %.0f frames/s",
+                             model.settings.visualizer.style.rawValue, feed.averageMicroseconds, feed.frames, feed.dropped,
+                             gpu.averageMilliseconds, Double(gpu.frames) / 10))
+            }
+        }
     }
 
     private func showControls() {
@@ -189,11 +201,11 @@ struct VisualizerControls: View {
             Toggle("Decibel Scale", isOn: $settings.decibelScale)
             Toggle("Peak Caps", isOn: $settings.peakCaps)
             Picker("Bands", selection: $settings.bandCount) {
-                ForEach(VisualizerSettings.bandCounts, id: \.self) { Text("\($0)").tag($0) }
+                ForEach(VisualizerSettings.bandCounts, id: \.self) { Text(verbatim: "\($0)").tag($0) }
             }
         case .spectrogram:
-            Picker("History", selection: $settings.spectrogramSeconds) {
-                ForEach([6.0, 12, 20, 30], id: \.self) { Text("\(Int($0)) seconds").tag($0) }
+            Picker("Time Span", selection: $settings.spectrogramSeconds) {
+                ForEach([6.0, 12, 20, 30], id: \.self) { Text("\(String(Int($0))) s", comment: "Spectrogram history length, e.g. 12 s").tag($0) }
             }
         case .vinyl:
             Toggle("Tonearm", isOn: $settings.tonearm)

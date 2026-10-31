@@ -48,6 +48,7 @@ public final class VisualizerFeed: @unchecked Sendable {
         public var dropped = 0
         public var seconds: Double = 0
         public var averageMicroseconds: Double { frames > 0 ? seconds / Double(frames) * 1e6 : 0 }
+        public init() {}
     }
 
     // Analysis thread only.

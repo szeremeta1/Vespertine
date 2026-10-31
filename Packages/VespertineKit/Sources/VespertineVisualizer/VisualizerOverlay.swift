@@ -85,7 +85,9 @@ enum VisualizerOverlay {
                     .font: NSFont.systemFont(ofSize: 12.5, weight: .regular), .foregroundColor: text.withAlphaComponent(0.5),
                 ]))
             }
-            line.draw(with: CGRect(x: m.left, y: 12, width: size.width - m.left - m.right, height: 18),
+            // Clear of the window's close, minimize and zoom buttons at the top left.
+            let x = max(m.left, 88)
+            line.draw(with: CGRect(x: x, y: 12, width: size.width - x - m.right, height: 18),
                       options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         case .vinyl, .club:
             let serif = NSFont.systemFont(ofSize: 24, weight: .regular).fontDescriptor.withDesign(.serif)

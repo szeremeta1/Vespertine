@@ -109,6 +109,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         public var frames = 0
         public var seconds: Double = 0
         public var averageMilliseconds: Double { frames > 0 ? seconds / Double(frames) * 1000 : 0 }
+        public init() {}
     }
     private let gpu = OSAllocatedUnfairLock(initialState: GPUStats())
     public var gpuStats: GPUStats { gpu.withLock { $0 } }
