@@ -88,7 +88,7 @@
     version: "98cad1a"
     section: "line 91"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 91, from: "the IOProc plays silence and takes nothing from the ring", to: "resumes exactly where it went quiet." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 93, from: "the IOProc plays silence and takes nothing from the ring", to: "resumes exactly where it went quiet." }
   requirement: "While muted, nothing written is consumed: after unmuting, the next music frame out is the first written frame that had not been output before the mute."
   quote_sha256: 96c59c70767ecae201ce1fa121c7440bc0bbb73c05f4b8150875e6fa15d0e0ab
   kind: vespertine-rule
