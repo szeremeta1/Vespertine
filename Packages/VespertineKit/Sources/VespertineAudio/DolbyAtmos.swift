@@ -102,7 +102,7 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
         self.track = track
         origin = start
         duration = max(0, CMTimeGetSeconds(total) - max(0, CMTimeGetSeconds(start)))
-        bed = SystemBedDecoder(asset: asset, track: track, origin: start)
+        bed = SystemBedDecoder(url: url)
     }
 
     deinit { stop() }
@@ -177,6 +177,7 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
 
     func copy(left: inout [Float], right: inout [Float]) -> PlaybackEngine.VisualizerTapRead? {
         guard let bed else { return nil }
+        bed.restartIfStalled()
         let playhead = Int64((position * bed.tap.sampleRate).rounded())
         return bed.tap.copy(left: &left, right: &right, playhead: playhead)
     }

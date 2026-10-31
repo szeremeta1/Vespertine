@@ -150,9 +150,11 @@ final class AssetBedReader: BedReading {
 
 enum BedError: Error, CustomStringConvertible {
     case couldNotStart, readerFailed, noData(frames: Int), copyFailed(atFrame: Int64), endedEarly(status: Int)
+    case stalled(seconds: Double)
 
     var description: String {
         switch self {
+        case .stalled(let seconds): "a bed read has not returned for \(String(format: "%.1f", seconds)) s"
         case .endedEarly(let status): "the bed reader stopped without finishing (AVAssetReader status \(status))"
         case .couldNotStart: "the bed reader could not start"
         case .readerFailed: "the bed reader failed"
@@ -170,6 +172,8 @@ final class SystemBedDecoder: @unchecked Sendable {
     static let lookahead = 1.0
     /// Frames copied into the tap at a time; a bigger buffer from the reader is stored in several pieces.
     static let chunkFrames = 1 << 14
+    /// How long a read may take before it counts as stalled.
+    static let stallLimit = 3.0
 
     /// Makes the reader for a start at `seconds` into the file.
     private let makeReader: (TimeInterval) throws -> BedReading
@@ -179,16 +183,29 @@ final class SystemBedDecoder: @unchecked Sendable {
     private var generation = 0
     private var failure: Error?
 
-    init(asset: AVAsset, track: AVAssetTrack, origin: CMTime) {
-        makeReader = { try AssetBedReader(asset: asset, track: track, origin: origin, seconds: $0) }
+    private let stallLimit: TimeInterval
+
+    /// Decodes the file at `url`.
+    convenience init(url: URL) {
+        self.init(makeReader: { try Self.reader(for: url, at: $0) })
+    }
+
+    /// For tests: decodes from `makeReader` instead of a file, with reads stalled after `stallLimit` seconds.
+    init(makeReader: @escaping (TimeInterval) throws -> BedReading, stallLimit: TimeInterval = SystemBedDecoder.stallLimit) {
+        self.makeReader = makeReader
+        self.stallLimit = stallLimit
         tap = SystemBedTap(sampleRate: Self.sampleRate)
     }
 
-    /// For tests: decodes from `makeReader` instead of an asset.
-    init(makeReader: @escaping (TimeInterval) throws -> BedReading) {
-        self.makeReader = makeReader
-        tap = SystemBedTap(sampleRate: Self.sampleRate)
+    /// The reader for a start at `seconds` into the file at `url`.
+    static func reader(for url: URL, at seconds: TimeInterval) throws -> BedReading {
+        let asset = AVURLAsset(url: url)
+        guard let info = LoadedAudioTrack(asset) else { throw SourceOpenerError.unsupported(url) }
+        return try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds)
     }
+
+    /// Called whenever the visualizer reads the tap.
+    func restartIfStalled() {}
 
     deinit { stop() }
 

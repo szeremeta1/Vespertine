@@ -61,7 +61,48 @@ private final class FakeBedReader: BedReading, @unchecked Sendable {
     }
 }
 
-/// Wraps the real asset reader and notes what it did and when, so that a decoder that stalls on a CI machine says where.
+/// A bed reader whose first read doesn't return until `release()`, as `AVAssetReader`'s first buffer didn't while every
+/// thread of Swift's concurrency pool was taken. What it hands out then is marked (9999), so a stale write would show.
+private final class StuckBedReader: BedReading, @unchecked Sendable {
+    private let entered = DispatchSemaphore(value: 0)
+    private let gate = DispatchSemaphore(value: 0)
+    private let lock = NSLock()
+    private var wasCancelled = false
+
+    var cancelled: Bool { lock.lock(); defer { lock.unlock() }; return wasCancelled }
+    func start() throws {}
+    func cancel() { lock.lock(); wasCancelled = true; lock.unlock() }
+    func next() throws -> BedBuffer? {
+        entered.signal()
+        gate.wait()
+        return BedBuffer(frames: 8192) { _, count, destination in destination.update(repeating: 9999, count: 2 * count); return true }
+    }
+    /// Waits until a read has begun.
+    func waitUntilReading(timeout: TimeInterval = 20) -> Bool { entered.wait(timeout: .now() + timeout) == .success }
+    func release() { gate.signal() }
+}
+
+/// Hands the decoder the given readers in turn (then readers that end at once), noting where each run started.
+private final class Readers: @unchecked Sendable {
+    private let lock = NSLock()
+    private var queue: [BedReading]
+    private var made: [TimeInterval] = []
+
+    init(_ readers: [BedReading]) { queue = readers }
+    var starts: [TimeInterval] { lock.lock(); defer { lock.unlock() }; return made }
+    func make(_ seconds: TimeInterval) -> BedReading {
+        lock.lock(); defer { lock.unlock() }
+        made.append(seconds)
+        return queue.isEmpty ? FakeBedReader(frames: 0, buffers: 0) : queue.removeFirst()
+    }
+}
+
+private func isStall(_ error: Error?) -> Bool {
+    if case .stalled? = error as? BedError { return true }
+    return false
+}
+
+/// Wraps the real file reader and notes what it did and when, so that a decoder that stalls on a CI machine says where.
 private final class TracingBedReader: BedReading, @unchecked Sendable {
     private let inner: BedReading
     private let lock = NSLock()
@@ -125,10 +166,19 @@ struct AtmosVisualizerTests {
         return (s1 * s1 + s2 * s2 - c * s1 * s2) / Double(signal.count * signal.count)
     }
 
-    /// Waits until the decoder has stored the bed up to `frame`. The first buffer comes out of AVFoundation's decoder on
-    /// its own threads, and when the rest of the suite keeps every core busy (a release run, or a small CI machine) that
-    /// takes more than ten seconds, so the bound is generous: the poll ends the moment the frames are there, and only a
-    /// decoder that has really stopped makes it fail, with the frame it stopped at.
+    /// A decoder of the Dolby Digital Plus fixture whose reads are traced in `tracing`.
+    private static func fixtureDecoder(_ tracing: TraceBox) -> SystemBedDecoder {
+        let url = Bundle.module.url(forResource: "dolby-digital-plus-tones.m4a", withExtension: nil, subdirectory: "Fixtures")!
+        return SystemBedDecoder(makeReader: { seconds in
+            let reader = TracingBedReader(try SystemBedDecoder.reader(for: url, at: seconds))
+            tracing.reader = reader
+            return reader
+        })
+    }
+
+    /// Waits until the decoder has stored the bed up to `frame`. When the rest of the suite keeps every core busy (a
+    /// release run, or a small CI machine) decoding is slow, so the bound is generous: the poll ends the moment the frames
+    /// are there, and only a decoder that has really stopped makes it fail, with the frame it stopped at.
     private static func waitForBed(_ decoder: SystemBedDecoder, through frame: Int64, timeout: TimeInterval = 120,
                                    trace: @autoclosure () -> String = "") throws {
         let deadline = Date().addingTimeInterval(timeout)
@@ -167,15 +217,8 @@ struct AtmosVisualizerTests {
 
     @Test("A real Dolby Digital Plus file decodes to a stereo bed downmix that follows the playhead")
     func decodesBed() throws {
-        let url = Bundle.module.url(forResource: "dolby-digital-plus-tones.m4a", withExtension: nil, subdirectory: "Fixtures")!
-        let asset = AVURLAsset(url: url)
-        let info = try #require(LoadedAudioTrack(asset))
         let tracing = TraceBox()
-        let decoder = SystemBedDecoder(makeReader: { seconds in
-            let reader = TracingBedReader(try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds))
-            tracing.reader = reader
-            return reader
-        })
+        let decoder = Self.fixtureDecoder(tracing)
         let playhead = Locked(0.5)
         decoder.start(at: 0) { playhead.value }
         defer { decoder.stop() }
@@ -196,15 +239,8 @@ struct AtmosVisualizerTests {
 
     @Test("Seeking restarts the bed at the new position")
     func seekRestarts() throws {
-        let url = Bundle.module.url(forResource: "dolby-digital-plus-tones.m4a", withExtension: nil, subdirectory: "Fixtures")!
-        let asset = AVURLAsset(url: url)
-        let info = try #require(LoadedAudioTrack(asset))
         let tracing = TraceBox()
-        let decoder = SystemBedDecoder(makeReader: { seconds in
-            let reader = TracingBedReader(try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds))
-            tracing.reader = reader
-            return reader
-        })
+        let decoder = Self.fixtureDecoder(tracing)
         let playhead = Locked(1.0)
         decoder.start(at: 1.0) { playhead.value }
         defer { decoder.stop() }
@@ -215,6 +251,88 @@ struct AtmosVisualizerTests {
         #expect(l.contains { abs($0) > 0.01 })
         var early = [Float](repeating: 0, count: 2048), earlyR = early
         #expect(decoder.tap.copy(left: &early, right: &earlyR, playhead: 20_000) == nil)   // before the seek target
+    }
+
+    @Test("The real file's bed decodes while every thread of Swift's concurrency pool is blocked")
+    func decodesWhilePoolIsBlocked() throws {
+        // AVAssetReader's first buffer waited for a free pool thread: on a 3-core CI machine running the suite, for over
+        // two minutes. Block every pool thread there is (whichever this test doesn't hold now take one as it frees up).
+        let width = ProcessInfo.processInfo.activeProcessorCount
+        let gate = DispatchSemaphore(value: 0)
+        for _ in 0..<width { Task.detached { Self.hold(gate) } }
+        defer { for _ in 0..<width { gate.signal() } }
+        let tracing = TraceBox()
+        let decoder = Self.fixtureDecoder(tracing)
+        decoder.start(at: 0) { 2 }
+        defer { decoder.stop() }
+        try Self.waitForBed(decoder, through: 60_000, timeout: 30, trace: tracing.trace)
+        #expect(decoder.error == nil)
+    }
+
+    /// Keeps the calling thread until `gate` is signalled (a pool thread, from a task).
+    private static func hold(_ gate: DispatchSemaphore) { gate.wait() }
+
+    @Test("A seek doesn't wait for a read that is stuck: the new position decodes at once, and the stuck run stores nothing")
+    func seekDoesNotWaitForStuckRead() throws {
+        let stuck = StuckBedReader()
+        let readers = Readers([stuck, FakeBedReader(frames: 8192, buffers: 4, firstFrame: 48_000)])
+        let decoder = SystemBedDecoder(makeReader: readers.make)
+        defer { decoder.stop(); stuck.release() }
+        decoder.start(at: 0) { 100 }
+        #expect(stuck.waitUntilReading())
+        decoder.start(at: 1) { 100 }
+        let end = Int64(48_000 + 4 * 8192)
+        try Self.waitForBed(decoder, through: end, timeout: 20)
+        // Once its read returns, the replaced run cancels its reader without storing what it got.
+        stuck.release()
+        let deadline = Date().addingTimeInterval(20)
+        while !stuck.cancelled, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(stuck.cancelled)
+        Thread.sleep(forTimeInterval: 0.05)
+        var l = [Float](repeating: 0, count: 64), r = l
+        _ = try #require(decoder.tap.copy(left: &l, right: &r, playhead: end))
+        #expect(l == (0..<64).map { Float(end - 64 + Int64($0)) })
+        #expect(decoder.tap.endFrame == end)
+        #expect(decoder.error == nil)
+    }
+
+    @Test("A read that doesn't return is recorded as a stall, and the decoder starts over at the playhead")
+    func stalledReadRestarts() throws {
+        let stuck = StuckBedReader()
+        let readers = Readers([stuck, FakeBedReader(frames: 8192, buffers: 4, firstFrame: 24_000)])
+        let decoder = SystemBedDecoder(makeReader: readers.make, stallLimit: 0.2)
+        defer { decoder.stop(); stuck.release() }
+        decoder.start(at: 0) { 0.5 }
+        #expect(stuck.waitUntilReading())
+        // The visualizer's reads of the tap are what notice the stall.
+        let end = Int64(24_000 + 4 * 8192)
+        let deadline = Date().addingTimeInterval(20)
+        while decoder.tap.endFrame < end, Date() < deadline {
+            decoder.restartIfStalled()
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+        #expect(decoder.tap.endFrame == end)
+        #expect(readers.starts == [0, 0.5])
+        #expect(isStall(decoder.error))
+    }
+
+    @Test("A restart that stalls too isn't retried until the next start")
+    func stalledRestartGivesUp() throws {
+        let first = StuckBedReader(), second = StuckBedReader()
+        let readers = Readers([first, second])
+        let decoder = SystemBedDecoder(makeReader: readers.make, stallLimit: 0.1)
+        defer { decoder.stop(); first.release(); second.release() }
+        decoder.start(at: 0) { 0 }
+        #expect(first.waitUntilReading())
+        let deadline = Date().addingTimeInterval(20)
+        while readers.starts.count < 2, Date() < deadline {
+            decoder.restartIfStalled()
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+        #expect(second.waitUntilReading())
+        for _ in 0..<50 { decoder.restartIfStalled(); Thread.sleep(forTimeInterval: 0.01) }   // five more limits
+        #expect(readers.starts.count == 2)
+        #expect(isStall(decoder.error))
     }
 
     @Test("Buffers bigger than a chunk are stored whole, in order, never skipped")
