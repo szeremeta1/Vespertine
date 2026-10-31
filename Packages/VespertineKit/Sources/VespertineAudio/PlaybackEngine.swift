@@ -521,6 +521,17 @@ public final class PlaybackEngine: @unchecked Sendable {
         return (0..<n).map { nrt_context_take_peak(session.context, UInt32($0)) }
     }
 
+    /// One read of the visualizer tap (`copyVisualizerTap`).
+    public struct VisualizerTapRead: Sendable, Equatable {
+        /// Frames copied: the count asked for, or 0 when the copy was overtaken.
+        public var frames: Int
+        /// Frames tapped so far on this output. It stands still while nothing plays (paused, muted, holding for data).
+        public var position: UInt64
+        public var sampleRate: Double
+        /// DoP: the samples are levels read from the DSD bits, good to about 20 kHz.
+        public var isDSD: Bool
+    }
+
     /// Copies the latest mono samples sent to the DAC. Returns the device sample rate, or nil when idle.
     public func copyTap(into buffer: inout [Float]) -> Double? {
         sessionLock.lock(); defer { sessionLock.unlock() }
@@ -529,6 +540,32 @@ public final class PlaybackEngine: @unchecked Sendable {
         buffer.withUnsafeMutableBufferPointer { _ = nrt_context_copy_tap(session.context, $0.baseAddress!, n) }
         return session.applied.sampleRate
     }
+
+    /// Switches the visualizer tap on or off, for this output and every one after it. Off, it costs the I/O thread
+    /// nothing; on, it copies the samples the meters read (see `nrt_context_copy_viz`), never changing them.
+    public func setVisualizerTap(_ on: Bool) {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        visualizerTap = on
+        if let session { nrt_context_set_viz(session.context, on) }
+    }
+
+    /// Copies the newest `left.count` frames from the visualizer tap (at most `NRT_VIZ_TAP_SIZE / 2`), or returns nil
+    /// when nothing plays through Vespertine's own output (idle, or macOS rendering Atmos) or the stream isn't PCM
+    /// the visualizer can read (bitstream). A copy the I/O thread overtook comes back with `frames` 0.
+    public func copyVisualizerTap(left: inout [Float], right: inout [Float]) -> VisualizerTapRead? {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        guard let session, visualizerTap, session.plan.mode != .bitstream, !left.isEmpty, left.count == right.count else { return nil }
+        let n = UInt32(min(left.count, Int(NRT_VIZ_TAP_SIZE / 2)))
+        var position: UInt64 = 0
+        let got = left.withUnsafeMutableBufferPointer { l in
+            right.withUnsafeMutableBufferPointer { r in nrt_context_copy_viz(session.context, l.baseAddress!, r.baseAddress!, n, &position) }
+        }
+        return VisualizerTapRead(frames: Int(got), position: position, sampleRate: session.applied.sampleRate,
+                                 isDSD: session.plan.mode == .dop)
+    }
+
+    /// Guarded by `sessionLock`.
+    private var visualizerTap = false
 
     /// A probed file whose start failed before its decoder was used (the output wasn't ready).
     private var unusedProbe: (item: UUID, probed: ProbedSource)?
@@ -989,6 +1026,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.lock()
         session = new
         sessionDevice = device
+        nrt_context_set_viz(new.context, visualizerTap)
         sessionLock.unlock()
         applyGain()
     }
