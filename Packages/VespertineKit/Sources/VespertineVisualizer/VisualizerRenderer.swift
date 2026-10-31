@@ -143,6 +143,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var armAngle: Double?
     private var laserAngle: Double = 0
     private var strobe: Float = 0
+    /// Seconds since the last flash.
+    private var sinceFlash: Double = 1
     private var signal: Float = 0
     private var rings: [SIMD4<Float>] = []
     private var ringColour: Float = 0.55
@@ -434,7 +436,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
         let spin = reduceMotion ? 0.08 : 0.22 + 0.9 * Double(frame.mid)
         laserAngle = (laserAngle + dt * spin + (frame.beat && !reduceMotion ? 0.12 : 0)).truncatingRemainder(dividingBy: 2 * .pi)
-        if strobeAllowed && frame.beat && frame.bass > 0.8 { strobe = 0.6 }
+        sinceFlash += dt
+        if strobeAllowed && frame.beat && frame.bass > 0.8 && sinceFlash >= Self.flashInterval {
+            strobe = 0.6
+            sinceFlash = 0
+        }
         strobe *= Float(exp(-dt / 0.045))
         if strobe < 0.003 || !strobeAllowed { strobe = 0 }
 
@@ -442,6 +448,13 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         let lightFall = Float(exp(-dt / 0.25))
         peakLights = SIMD2(frame.peakDB.x > -1 ? 1 : peakLights.x * lightFall, frame.peakDB.y > -1 ? 1 : peakLights.y * lightFall)
     }
+
+    /// At most one flash every 0.4 s (2.5 a second), under the 3 a second that photosensitivity guidelines (WCAG 2.3.1,
+    /// Ofcom/Harding) allow, however fast the beats come.
+    static let flashInterval = 0.4
+
+    /// The strobe's brightness this frame, 0…0.6 (tests).
+    var strobeLevel: Float { strobe }
 
     /// The strobe only flashes when it's switched on, its warning was accepted, and neither Reduce Motion nor Dim
     /// Flashing Lights is on.

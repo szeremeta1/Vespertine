@@ -6,6 +6,11 @@
 //       --start 30 --seconds 8 --fps 60 --size 1920x1080 --raw | ffmpeg -f rawvideo -pix_fmt bgra -s 1920x1080 -r 60 -i - …
 //   vespertine-visualize song.f32 --rate 48000 --style bars --still 42 --png bars.png
 //
+// Styles: vinyl (the default), bars, spectrogram, club, scope, meters, particles, mirrored. Themes: vespertine (the
+// default), brass, neon, aurora, ember, ice, mono. Per style: --scope goniometer|oscilloscope, --meter vu|ppm,
+// --reference <dBFS> (meters; automatic without), --layout circle|line (mirrored), --no-trails (particles), --strobe
+// (club; as if its warning had been accepted).
+//
 // Prints the analysis and GPU time per frame to stderr.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

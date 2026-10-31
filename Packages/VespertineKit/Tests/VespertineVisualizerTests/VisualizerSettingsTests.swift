@@ -194,6 +194,25 @@ struct VisualizerRendererTests {
         #expect(!renderer.strobeAllowed)
     }
 
+    @Test("However fast the beats come, the strobe flashes at most 2.5 times a second")
+    func strobeRate() throws {
+        guard let renderer = VisualizerRenderer() else { return }
+        renderer.settings.style = .club
+        renderer.settings.strobeWarningAccepted = true
+        renderer.settings.strobe = true
+        var frame = VisualizerFrame.silent(bands: 64, fine: 512)
+        frame.beat = true
+        frame.bass = 1
+        frame.hasSignal = true
+        var flashes = 0, last: Float = 0
+        for _ in 0..<240 {   // 4 s at 60 frames a second, a beat in every frame
+            _ = renderer.renderOffscreen(frame: frame, scene: VisualizerScene(isPlaying: true), size: CGSize(width: 32, height: 18), scale: 1, dt: 1.0 / 60)
+            if renderer.strobeLevel > last + 0.1 { flashes += 1 }
+            last = renderer.strobeLevel
+        }
+        #expect(flashes >= 9 && flashes <= 10, "\(flashes) flashes in 4 s")
+    }
+
     @Test("Goniometer: mono is upright, left alone leans left, right alone leans right, out of phase lies across")
     func goniometer() {
         var frame = VisualizerFrame.silent(bands: 64, fine: 512)

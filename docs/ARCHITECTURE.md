@@ -150,7 +150,7 @@ The analysis core lives in `Packages/VespertineAnalysis` (plain Swift and Founda
 | Thread | Owns |
 |---|---|
 | Core Audio I/O | C only: ring read, gain, meters, taps |
-| `Vespertine Visualizer` | only while a visualizer window shows: reads the visualizer tap, FFT, bands and beats |
+| `Vespertine Visualizer` | only while a visualizer window shows: reads the visualizer tap, FFT, bands, beats, correlation and the meters' ballistics |
 | `Vespertine Engine` | decoders, converters, device configuration, segments |
 | Main actor | UI and stores. The engine is controlled via posted commands and observed via a snapshot polled at ~15 Hz |
 | GRDB | database reads and writes, with `ValueObservation` streaming changes to the UI |
