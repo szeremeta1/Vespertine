@@ -83,6 +83,8 @@ public final class VisualizerAnalyzer {
         public var peakGravity: Float = 2.2
         /// The meters' reference (the sine RMS that reads 0 VU and PPM 4), in dBFS; nil follows the music's loudness.
         public var meterReferenceDB: Float?
+        /// Run the meters' ballistics (sample by sample); off while no meter is shown.
+        public var meters = true
 
         public init() {}
     }
@@ -269,7 +271,9 @@ public final class VisualizerAnalyzer {
             if power > 1e-5 { loudness += (power - loudness) * Double(Self.coefficient(dt, 3)) }
         }
         let reference = meterReference
-        if live {
+        if !configuration.meters {
+            meters = VisualizerMeters()   // off: the needles start from rest when the meters are shown again
+        } else if live {
             meters.process(left: UnsafeBufferPointer(rebasing: left[(left.count - newFrames)...]),
                            right: UnsafeBufferPointer(rebasing: right[(right.count - newFrames)...]),
                            sampleRate: currentRate, referenceDBFS: reference)

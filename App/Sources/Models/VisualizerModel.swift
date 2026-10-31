@@ -55,6 +55,7 @@ final class VisualizerModel {
         c.sensitivity = Float(settings.sensitivity)
         c.linear = !settings.decibelScale
         c.meterReferenceDB = settings.meterReference.map(Float.init)
+        c.meters = settings.style == .meters
         feed.update(configuration: c)
     }
 }

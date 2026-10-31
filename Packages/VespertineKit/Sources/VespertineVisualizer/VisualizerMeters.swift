@@ -65,20 +65,26 @@ public struct VisualizerMeters: Sendable, Equatable {
         // Rectified sample to needle drive: a sine at the reference averages to 0 VU.
         let drive = Self.zeroVU / (reference * Self.averageOverRMS)
         let dt = 1 / rate, w = Self.vuNaturalFrequency, z = Self.vuDamping
+        let stiffness = w * w * dt, damping = 2 * z * w * dt
+        let low = Self.vuTravel.lowerBound, high = Self.vuTravel.upperBound
         let count = min(left.count, right.count)
-        func step(_ x: SIMD2<Double>) {
-            // Semi-implicit Euler: the needle's acceleration, then its speed, then where it is.
-            let u = x * drive
-            vuVelocity += (w * w * (u - vu) - 2 * z * w * vuVelocity) * dt
-            vu += vuVelocity * dt
-            for c in 0..<2 {
-                if vu[c] < Self.vuTravel.lowerBound { vu[c] = Self.vuTravel.lowerBound; vuVelocity[c] = max(0, vuVelocity[c]) }
-                if vu[c] > Self.vuTravel.upperBound { vu[c] = Self.vuTravel.upperBound; vuVelocity[c] = -0.2 * abs(vuVelocity[c]) }
-                ppmLevel[c] = x[c] > ppmLevel[c] ? ppmLevel[c] + (x[c] - ppmLevel[c]) * attack : ppmLevel[c] * fall
+        // Each channel on its own, in plain scalars (this runs for every sample).
+        for c in 0..<2 {
+            let samples = c == 0 ? left : right
+            var position = vu[c], speed = vuVelocity[c], level = ppmLevel[c]
+            for i in 0..<(count + max(0, silentFrames)) {
+                let x = i < count ? Double(abs(samples[i])) : 0
+                // Semi-implicit Euler: the needle's acceleration, then its speed, then where it is.
+                speed += stiffness * (x * drive - position) - damping * speed
+                position += speed * dt
+                if position < low { position = low; speed = max(0, speed) }
+                if position > high { position = high; speed = -0.2 * abs(speed) }
+                level = x > level ? level + (x - level) * attack : level * fall
             }
+            vu[c] = position
+            vuVelocity[c] = speed
+            ppmLevel[c] = level
         }
-        for i in 0..<count { step(SIMD2(Double(abs(left[i])), Double(abs(right[i])))) }
-        for _ in 0..<max(0, silentFrames) { step(.zero) }
     }
 
     /// The PPM's reading in dB against the reference (0 is PPM 4; each mark is 4 dB), floor -40.
