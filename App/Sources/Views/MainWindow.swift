@@ -54,6 +54,12 @@ struct MainWindow: View {
                     .keyboardShortcut("[", modifiers: .command)
                     .help("Back (⌘[)")
             }
+            if model.settings.visualizerEnabled {
+                ToolbarItem(placement: .primaryAction) {
+                    Button { openWindow(id: "visualizer") } label: { Label("Visualizer", systemImage: "waveform") }
+                        .help("Visualizer (⌥⌘V)")
+                }
+            }
         }
         // SACD images (.iso) are disk images, not audio, to macOS.
         .fileImporter(isPresented: $model.showImporter, allowedContentTypes: [.folder, .audio] + [UTType(filenameExtension: "iso")].compactMap { $0 },

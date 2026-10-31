@@ -169,7 +169,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/ARCHITECTURE.md:14` — "integer PCM up to 24 bits maps exactly into Float32, which a unit test verifies sample-for-sample."
 - **Text:** `docs/ARCHITECTURE.md:15` — "Gain of exactly 1.0 with no equalizer is a straight copy."
 - **Text:** `docs/FEATURES.md:39` — "The float path preserves up to 24 significant bits."
-- **Text:** `docs/ARCHITECTURE.md:155` — "Elsewhere Vespertine renders Float32, which is exact up to 24 bits."
+- **Text:** `docs/ARCHITECTURE.md:160` — "Elsewhere Vespertine renders Float32, which is exact up to 24 bits."
 - **Text:** `docs/VERIFICATION.md:25` — "In the normal float pipeline, up to 24 bits pass through exactly."
 - **Property:** for each of the 2^24 values k in [-2^23, 2^23 − 1], the Float32 k / 2^23 written into the ring comes out of the render stage with the identical bit pattern, at unity gain with no equalizer, on every channel and at every position in a buffer. Separately, the int → Float32 mapping (Apple's `AVAudioConverter`) is exact and invertible for 24-bit input.
 - **Governed by:** vespertine-rule. That Float32 holds every 24-bit integer exactly is arithmetic (a 24-bit significand), checked exhaustively rather than cited.

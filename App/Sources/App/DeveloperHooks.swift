@@ -104,6 +104,13 @@ enum DeveloperHooks {
                 }
             }
         }
+        // `-VespertineQuitAfter 60`: quits after that many seconds (timed runs, such as the visualizer's measurements).
+        if d.double(forKey: "VespertineQuitAfter") > 0 {
+            Task {
+                try? await Task.sleep(for: .seconds(d.double(forKey: "VespertineQuitAfter")))
+                NSApp.terminate(nil)
+            }
+        }
         if let path = d.string(forKey: "VespertineSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "VespertineSnapshotDelay"), repeats: max(1, d.integer(forKey: "VespertineSnapshotCount"))) }
         }

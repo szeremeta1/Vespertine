@@ -105,6 +105,10 @@ A path is marked bit-perfect only when all of these hold:
 - For PCM: the source is lossless, it isn't resampled or converted from DSD, the source is at most 24-bit (32-bit with integer mode, which skips the Float32 step), and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float).
 - For DoP: the device is held exclusively (DoP always takes it, whatever the exclusive setting, and doesn't play without it), and the carrier runs at the planned rate with at least 24 bits.
 
+## Visualizer
+
+The visualizer window reads its own tap, a stereo copy of the samples the meters read (after room correction, the equalizer and gain, scaled back by 1 / gain), written by the I/O proc only while a window shows it. The reader takes the newest frames and drops what it missed, so it can't hold up the I/O thread, and the output is bit-identical with the tap on or off. Analysis runs on a thread of its own and drawing in Metal. See [VISUALIZER.md](VISUALIZER.md).
+
 ## Library
 
 The library is SQLite via GRDB:
@@ -145,7 +149,8 @@ The analysis core lives in `Packages/VespertineAnalysis` (plain Swift and Founda
 
 | Thread | Owns |
 |---|---|
-| Core Audio I/O | C only: ring read, gain, meters, tap |
+| Core Audio I/O | C only: ring read, gain, meters, taps |
+| `Vespertine Visualizer` | only while a visualizer window shows: reads the visualizer tap, FFT, bands, beats, correlation and the meters' ballistics |
 | `Vespertine Engine` | decoders, converters, device configuration, segments |
 | Main actor | UI and stores. The engine is controlled via posted commands and observed via a snapshot polled at ~15 Hz |
 | GRDB | database reads and writes, with `ValueObservation` streaming changes to the UI |

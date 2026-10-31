@@ -172,6 +172,9 @@ struct SettingsView: View {
 struct PlaybackSettings: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var dimFlashing = false
+    @State private var askingStrobe = false
 
     var body: some View {
         @Bindable var s = model.settings
@@ -245,6 +248,16 @@ struct PlaybackSettings: View {
                 Text("Applied in 64-bit with TPDF dither at the DAC's word length. At anything below 100% the output is no longer bit-perfect, and Vespertine says so.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            Section("Visualizer") {
+                Toggle("Visualizer window", isOn: $s.visualizerEnabled)
+                Text("Adds Window > Visualizer (⌥⌘V) and a toolbar button: the album on a spinning record, a spectrum analyzer, a spectrogram, club lights, a stereo scope, VU and PPM meters, a particle field and mirrored bars, in a window of its own that can go full screen on another display. It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.")
+                    .font(.caption).foregroundStyle(.secondary)
+                StrobeToggle(settings: $s.visualizer, asking: $askingStrobe, reduceMotion: reduceMotion, dimFlashing: dimFlashing,
+                             label: "Beat strobe in the Club style")
+                    .disabled(!s.visualizerEnabled)
+                Text("The beat strobe flashes the whole screen on strong beats. Flashing lights may trigger seizures in people with photosensitive epilepsy. If you or anyone watching has epilepsy or has ever had a seizure, leave it off. If you feel dizzy or unwell while it flashes, look away and turn it off.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Section("ReplayGain") {
                 Picker("Mode", selection: $s.replayGain) { ForEach(ReplayGainMode.allCases) { Text($0.label).tag($0) } }
                 Slider(value: $s.replayGainPreampDB, in: -12...6, step: 0.5) { Text("Pre-amp \(s.replayGainPreampDB, specifier: "%+.1f") dB") }
@@ -263,6 +276,8 @@ struct PlaybackSettings: View {
         .onChange(of: s.allowDigitalVolume) { s.appVolumeChoices = [:]; model.syncEngine() }
         .onChange(of: s.replayGain) { model.player.refreshReplayGain() }
         .onChange(of: s.replayGainPreampDB) { model.player.refreshReplayGain() }
+        .readsDimFlashingLights($dimFlashing)
+        .strobeWarning(isPresented: $askingStrobe, settings: $s.visualizer)
     }
 
     private func fallbackNote(_ fallback: OutputFallback) -> String {

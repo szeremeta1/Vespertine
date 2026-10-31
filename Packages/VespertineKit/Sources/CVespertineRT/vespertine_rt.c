@@ -563,6 +563,11 @@ struct NRTRenderContext {
     _Atomic float tap[NRT_TAP_SIZE];
     _Atomic uint32_t tapWrite;
 
+    // Visualizer tap: interleaved L/R, NRT_VIZ_TAP_SIZE frames (heap), written only while `viz` is set.
+    _Atomic bool viz;
+    _Atomic float *vizTap;
+    _Atomic uint64_t vizWrite;
+
     uint64_t rng; // render-thread only
 
     // Equalizer: a triple buffer of settings. The writer fills `eqBack` and swaps it into `eqMiddle` (marked fresh);
@@ -623,9 +628,13 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     for (uint32_t i = 0; i < NRT_METER_CHANNELS; i++) atomic_init(&ctx->peak[i], 0.f);
     atomic_init(&ctx->tapWrite, 0);
     for (uint32_t i = 0; i < NRT_TAP_SIZE; i++) atomic_init(&ctx->tap[i], 0.f);
+    atomic_init(&ctx->viz, false);
+    atomic_init(&ctx->vizWrite, 0);
+    ctx->vizTap = calloc((size_t)NRT_VIZ_TAP_SIZE * 2, sizeof(_Atomic float));
+    if (!ctx->vizTap) { free(ctx->scratch); free(ctx); return NULL; }
     ctx->rng = 0x9E3779B97F4A7C15ull;
     ctx->eqState = calloc((size_t)nrt_ring_channels(ring) * NRT_EQ_MAX_SECTIONS * 2, sizeof(double));
-    if (!ctx->eqState) { free(ctx->scratch); free(ctx); return NULL; }
+    if (!ctx->eqState) { free((void *)ctx->vizTap); free(ctx->scratch); free(ctx); return NULL; }
     for (uint32_t i = 0; i < 3; i++) { ctx->eqBanks[i].count = 0; ctx->eqBanks[i].preamp = 1.0; }
     ctx->eqFront = 0;
     atomic_init(&ctx->eqMiddle, 1);
@@ -670,6 +679,7 @@ void nrt_context_destroy(NRTRenderContext *ctx) {
     free(ctx->roomBanks);
     free(ctx->eqState);
     free(ctx->scratch);
+    free((void *)ctx->vizTap);
     free(ctx);
 }
 
@@ -848,6 +858,32 @@ uint32_t nrt_context_copy_tap(const NRTRenderContext *ctx, float *out, uint32_t 
     return count;
 }
 
+void nrt_context_set_viz(NRTRenderContext *ctx, bool on) { atomic_store(&ctx->viz, on); }
+bool nrt_context_viz(const NRTRenderContext *ctx) { return atomic_load(&ctx->viz); }
+
+uint32_t nrt_context_copy_viz(const NRTRenderContext *ctx, float *left, float *right, uint32_t count, uint64_t *position) {
+    if (count > NRT_VIZ_TAP_SIZE / 2) count = NRT_VIZ_TAP_SIZE / 2;
+    const uint64_t w = atomic_load_explicit(&ctx->vizWrite, memory_order_acquire);
+    if (position) *position = w;
+    const uint64_t start = w - count;   // wraps before the first `count` frames: those slots are still zero
+    for (uint32_t i = 0; i < count; i++) {
+        const size_t slot = (size_t)((start + i) & (NRT_VIZ_TAP_SIZE - 1)) * 2;
+        left[i] = atomic_load_explicit(&ctx->vizTap[slot], memory_order_relaxed);
+        right[i] = atomic_load_explicit(&ctx->vizTap[slot + 1], memory_order_relaxed);
+    }
+    // The writer may have lapped the oldest frames copied: then the copy mixes two moments, and is dropped.
+    const uint64_t after = atomic_load_explicit(&ctx->vizWrite, memory_order_acquire);
+    if (after - start > NRT_VIZ_TAP_SIZE) return 0;
+    return count;
+}
+
+// I/O thread: one frame into the visualizer tap at `w` (the caller publishes vizWrite once per slice).
+static inline void viz_store(NRTRenderContext *ctx, uint64_t w, float l, float r) {
+    const size_t slot = (size_t)(w & (NRT_VIZ_TAP_SIZE - 1)) * 2;
+    atomic_store_explicit(&ctx->vizTap[slot], l, memory_order_relaxed);
+    atomic_store_explicit(&ctx->vizTap[slot + 1], r, memory_order_relaxed);
+}
+
 static inline double tpdf(uint64_t *state) {
     // xorshift64*, two uniforms → triangular distribution in (-1, 1)
     uint64_t x = *state;
@@ -880,6 +916,8 @@ static void meter_dop(NRTRenderContext *ctx, uint32_t got, uint32_t ch, bool int
     float peaks[NRT_METER_CHANNELS] = {0};
     const uint32_t metered = ch < NRT_METER_CHANNELS ? ch : NRT_METER_CHANNELS;
     uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
+    const bool viz = atomic_load_explicit(&ctx->viz, memory_order_relaxed);
+    uint64_t vw = atomic_load_explicit(&ctx->vizWrite, memory_order_relaxed);
     bool primed = atomic_load_explicit(&ctx->dopPrimed, memory_order_relaxed);
     for (uint32_t f = 0; f < got; f++) {
         const float *frame = ctx->scratch + (size_t)f * ch;
@@ -900,10 +938,12 @@ static void meter_dop(NRTRenderContext *ctx, uint32_t got, uint32_t ch, bool int
         const float l = values[0], r = ch > 1 ? values[1] : l;
         atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
+        if (viz) viz_store(ctx, vw++, l, r);
         primed = true;
     }
     if (got > 0) atomic_store_explicit(&ctx->dopPrimed, true, memory_order_relaxed);
     atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
+    if (viz) atomic_store_explicit(&ctx->vizWrite, vw, memory_order_release);
     for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
 }
 
@@ -1130,6 +1170,10 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     float peaks[NRT_METER_CHANNELS] = {0};
     const uint32_t metered = ch < NRT_METER_CHANNELS ? ch : NRT_METER_CHANNELS;
     uint32_t tw = atomic_load_explicit(&ctx->tapWrite, memory_order_relaxed);
+    const bool viz = atomic_load_explicit(&ctx->viz, memory_order_relaxed);
+    uint64_t vw = atomic_load_explicit(&ctx->vizWrite, memory_order_relaxed);
+    // The visualizer sees the music at the same size whatever the volume (integer samples carry no gain).
+    const float vizScale = integer ? 1.f : (gain > 0 ? (float)(1.0 / gain) : 0.f);
     for (uint32_t f = 0; f < processed; f++) {
         const float *frame = ctx->scratch + (size_t)f * ch;
         float values[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];
@@ -1145,8 +1189,10 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
         const float l = values[0], r = ch > 1 ? values[1] : l;
         atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
+        if (viz) viz_store(ctx, vw++, l * vizScale, r * vizScale);
     }
     atomic_store_explicit(&ctx->tapWrite, tw, memory_order_release);
+    if (viz) atomic_store_explicit(&ctx->vizWrite, vw, memory_order_release);
     for (uint32_t c = 0; c < metered; c++) store_peak_max(&ctx->peak[c], peaks[c]);
 }
 

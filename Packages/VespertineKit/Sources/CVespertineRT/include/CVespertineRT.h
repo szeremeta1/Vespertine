@@ -178,6 +178,27 @@ float nrt_context_take_peak(NRTRenderContext *_Nonnull ctx, uint32_t channel);
 /// Copies the most recent `count` mono samples (≤ NRT_TAP_SIZE) oldest-first.
 uint32_t nrt_context_copy_tap(const NRTRenderContext *_Nonnull ctx, float *_Nonnull out, uint32_t count);
 
+// MARK: - Visualizer tap
+//
+// A stereo copy of what the meters read (after room correction, the equalizer and gain, so what the DAC gets), for
+// the visualizer window. Off unless switched on, and then two stores per frame on the I/O thread; the samples that go
+// out are never touched. The reader always takes the newest frames: whatever it didn't get to is overwritten, so a
+// slow reader drops frames instead of holding anything up.
+
+/// Frames the tap keeps (a power of two): 85 ms at 384 kHz, 0.68 s at 48 kHz.
+#define NRT_VIZ_TAP_SIZE 32768u
+
+/// Switches the visualizer tap on or off. Any thread.
+void nrt_context_set_viz(NRTRenderContext *_Nonnull ctx, bool on);
+bool nrt_context_viz(const NRTRenderContext *_Nonnull ctx);
+
+/// Copies the newest `count` frames (≤ NRT_VIZ_TAP_SIZE / 2), oldest first, left into `left` and right into `right`
+/// (a mono source into both). Each is scaled by 1 / gain, so digital volume and ReplayGain don't change what the
+/// visualizer shows. `position` gets the number of frames tapped so far (it stands still while nothing plays).
+/// Returns `count`, or 0 when the I/O thread overwrote part of the copy while it was taken (try again next time).
+uint32_t nrt_context_copy_viz(const NRTRenderContext *_Nonnull ctx, float *_Nonnull left, float *_Nonnull right,
+                              uint32_t count, uint64_t *_Nullable position);
+
 /// Total frames delivered to the device (including silence while dry).
 uint64_t nrt_context_frames_rendered(const NRTRenderContext *_Nonnull ctx);
 
