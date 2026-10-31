@@ -9,7 +9,7 @@ let shots = Brand.repo.appendingPathComponent("docs/screenshots")
 struct Feature {
     var id: String, shot: String, headline: String, sub: String
     var chips: [(String, Chip)]
-    var focus: CGRect    // the readout to magnify, in screenshot pixels (2400×1500, top-left origin)
+    var focus: CGRect?   // the readout to magnify, in screenshot pixels (2400×1500, top-left origin); nil when the window already fills the frame
     var trademarks: String? = nil
 }
 enum Chip { case brass, copper, plain }
@@ -22,11 +22,11 @@ let features = [
     Feature(id: "stereo-and-surround", shot: "stereo-and-surround-versions",
             headline: "Stereo and surround in one library.",
             sub: "Extracted SACD tracks list each song once, in stereo or 5.1. Surround renders as Spatial Audio on AirPods.",
-            chips: [("DSD64 · 5.1", .plain), ("+ STEREO", .plain), ("○ SPATIAL · HEAD TRACKED", .copper)], focus: CGRect(x: 370, y: 860, width: 1100, height: 340)),
+            chips: [("DSD64 · 5.1", .plain), ("+ STEREO", .plain), ("○ SPATIAL · HEAD TRACKED", .copper)], focus: CGRect(x: 370, y: 775, width: 1100, height: 325)),
     Feature(id: "spatial-audio", shot: "spatial-audio-airpods-max",
-            headline: "Your 5.1 albums, all around you.",
-            sub: "Surround albums play as head-tracked Spatial Audio on AirPods, each channel placed where it belongs.",
-            chips: [("5.1 · 6 CHANNELS", .plain), ("○ SPATIAL · HEAD TRACKED", .copper), ("32 / 48", .plain)], focus: CGRect(x: 1826, y: 255, width: 564, height: 650),
+            headline: "Your surround albums, all around you.",
+            sub: "5.1 and 7.1 albums play as head-tracked Spatial Audio on AirPods, each channel placed where it belongs.",
+            chips: [("7.1 · 8 CHANNELS", .plain), ("○ SPATIAL · HEAD TRACKED", .copper), ("32 / 48", .plain)], focus: CGRect(x: 1826, y: 530, width: 564, height: 800),
             trademarks: "AirPods is a trademark of Apple Inc. Vespertine is not affiliated with Apple."),
     Feature(id: "native-dsd", shot: "dsd-native-dop",
             headline: "Native DSD, not a conversion.",
@@ -40,6 +40,14 @@ let features = [
             headline: "Play the disc image itself.",
             sub: "SACD .iso images play as they are: stereo or 5.1, DST decoded, no extracting. Here as native DSD over DoP on a FiiO K11.",
             chips: [("● NATIVE DSD · DoP", .brass), ("SACD IMAGE · DSD64", .plain), ("32 / 176.4", .plain)], focus: CGRect(x: 1826, y: 770, width: 564, height: 600)),
+    Feature(id: "room-correction", shot: "room-correction-fosi-zd3",
+            headline: "Measured in your room.",
+            sub: "Measure with a calibrated microphone and Vespertine tames the room's bass, per speaker. Off unless you turn it on; while it's on, playback isn't bit-perfect.",
+            chips: [("● ROOM CORRECTION", .brass), ("KEEP NATIVE DSD", .plain), ("MEASURED · PREDICTED", .plain)], focus: nil),
+    Feature(id: "visualizer", shot: "visualizer-vinyl",
+            headline: "Watch the music turn.",
+            sub: "An optional window that draws what plays: a record on a turntable, spectrum, scope, VU and PPM meters and more. It reads a copy and never changes the sound.",
+            chips: [("● VINYL", .brass), ("8 STYLES", .plain), ("OFF BY DEFAULT", .plain)], focus: nil),
     // The languages art is the language wall, drawn by site/scripts/make-languages-art.mjs.
 ]
 
@@ -87,10 +95,10 @@ func render(_ f: Feature, W: Int, H: Int, name: String) {
     let fade = CGGradient(colorsSpace: nil, colors: [Brand.color(Brand.base, 0.9), Brand.color(Brand.base, 0)] as CFArray, locations: [0, 1])!
     ctx.drawLinearGradient(fade, start: CGPoint(x: shotX - 1, y: 0), end: CGPoint(x: shotX + 90 * u, y: 0), options: [.drawsBeforeStartLocation])
     // Magnified readout, overlapping the window's lower left, with a brass hairline.
-    if let crop = image.cropping(to: f.focus) {
-        let maxW = shotW * (f.focus.width > f.focus.height * 1.6 ? 0.62 : 0.4), maxH = h * 0.46
-        let scale = min(maxW / f.focus.width, maxH / f.focus.height)
-        let iw = f.focus.width * scale, ih = f.focus.height * scale
+    if let focus = f.focus, let crop = image.cropping(to: focus) {
+        let maxW = shotW * (focus.width > focus.height * 1.6 ? 0.62 : 0.4), maxH = h * 0.46
+        let scale = min(maxW / focus.width, maxH / focus.height)
+        let iw = focus.width * scale, ih = focus.height * scale
         let inset = CGRect(x: shotX - shotW * 0.09, y: max(margin * 1.5, shotY - ih * 0.28), width: iw, height: ih)
         let r2 = 12 * u
         ctx.saveGState()
