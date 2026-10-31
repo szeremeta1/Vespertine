@@ -15,7 +15,6 @@ protocol SystemRenderTap: AnyObject, Sendable {
 }
 
 import AVFoundation
-import CoreMedia
 
 /// The stereo downmix of the decoded Dolby bed, kept for the last second or so, indexed by frame from the start of the
 /// file. macOS renders Atmos in its own path and hands nothing back, so this is what the visualizer analyses: the
@@ -90,7 +89,7 @@ struct BedBuffer {
     var copy: (_ first: Int, _ count: Int, _ destination: UnsafeMutablePointer<Float>) -> Bool
 }
 
-/// Where `SystemBedDecoder` gets the decoded bed from: an `AVAssetReader` in the app, a fake in tests.
+/// Where `SystemBedDecoder` gets the decoded bed from: Audio Toolbox in the app, a fake in tests.
 protocol BedReading: AnyObject {
     /// Begins reading; throws when it can't.
     func start() throws
@@ -99,73 +98,146 @@ protocol BedReading: AnyObject {
     func cancel()
 }
 
-/// Reads a track's Dolby bed through an `AVAssetReader`, decoded to 48 kHz stereo float by the system.
-final class AssetBedReader: BedReading {
-    private let reader: AVAssetReader
-    private let output: AVAssetReaderTrackOutput
+/// Reads a Dolby track's bed with Audio Toolbox's `ExtAudioFile`, which decodes on the calling thread, and folds it to
+/// stereo as macOS does for any app (Lo/Ro: centre and surrounds at -3 dB, LFE left out).
+///
+/// Not `AVAssetReader`: its first buffer waits for a free thread of Swift's concurrency pool (as the async `load` does,
+/// see `LoadedAudioTrack`). While the app or a test keeps every pool thread busy or blocked, the bed didn't start until
+/// they freed up; on a 3-core CI machine running the suite, not within two minutes.
+final class AudioFileBedReader: BedReading {
+    static let framesPerRead = 8192
+    private let file: ExtAudioFileRef
+    private let channels: Int
+    /// What each of the file's channels adds to the left and the right.
+    private let gains: [(left: Float, right: Float)]
+    private let firstFrame: Int64
+    private var decoded: [Float]
 
-    init(asset: AVAsset, track: AVAssetTrack, origin: CMTime, seconds: TimeInterval) throws {
-        reader = try AVAssetReader(asset: asset)
-        var layout = AudioChannelLayout()
-        layout.mChannelLayoutTag = kAudioChannelLayoutTag_Stereo
-        output = AVAssetReaderTrackOutput(track: track, outputSettings: [
-            AVFormatIDKey: kAudioFormatLinearPCM,
-            AVSampleRateKey: SystemBedDecoder.sampleRate,
-            AVNumberOfChannelsKey: 2,
-            AVChannelLayoutKey: Data(bytes: &layout, count: MemoryLayout<AudioChannelLayout>.size),
-            AVLinearPCMBitDepthKey: 32,
-            AVLinearPCMIsFloatKey: true,
-            AVLinearPCMIsBigEndianKey: false,
-            AVLinearPCMIsNonInterleaved: false,
-        ])
-        output.alwaysCopiesSampleData = false
-        reader.timeRange = CMTimeRange(start: CMTimeAdd(origin, CMTime(seconds: max(0, seconds), preferredTimescale: 48_000)),
-                                       duration: .positiveInfinity)
-        reader.add(output)
+    init(url: URL, seconds: TimeInterval) throws {
+        var opened: ExtAudioFileRef?
+        try Self.check(ExtAudioFileOpenURL(url as CFURL, &opened), "open")
+        guard let opened else { throw BedError.audioToolbox(step: "open", status: kAudio_FileNotFoundError) }
+        file = opened
+        do {
+            var format = AudioStreamBasicDescription()
+            var size = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
+            try Self.check(ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileDataFormat, &size, &format), "format")
+            channels = max(1, Int(format.mChannelsPerFrame))
+            gains = Self.labels(of: file, channels: channels).map(Self.gains)
+            var client = AudioStreamBasicDescription(
+                mSampleRate: SystemBedDecoder.sampleRate, mFormatID: kAudioFormatLinearPCM,
+                mFormatFlags: kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked, mBytesPerPacket: UInt32(4 * channels),
+                mFramesPerPacket: 1, mBytesPerFrame: UInt32(4 * channels), mChannelsPerFrame: UInt32(channels),
+                mBitsPerChannel: 32, mReserved: 0)
+            try Self.check(ExtAudioFileSetProperty(file, kExtAudioFileProperty_ClientDataFormat,
+                                                   UInt32(MemoryLayout<AudioStreamBasicDescription>.size), &client), "client format")
+        } catch {
+            ExtAudioFileDispose(file)
+            throw error
+        }
+        firstFrame = Int64((max(0, seconds) * SystemBedDecoder.sampleRate).rounded())
+        decoded = [Float](repeating: 0, count: Self.framesPerRead * channels)
     }
 
-    func start() throws {
-        guard reader.startReading() else { throw reader.error ?? BedError.couldNotStart }
-    }
+    deinit { ExtAudioFileDispose(file) }
+
+    func start() throws { try Self.check(ExtAudioFileSeek(file, firstFrame), "seek") }
 
     func next() throws -> BedBuffer? {
-        guard let buffer = output.copyNextSampleBuffer() else {
-            if reader.status == .failed { throw reader.error ?? BedError.readerFailed }
-            // Only a completed reader has reached the end of the file; a nil from any other state is a stop to report.
-            if reader.status != .completed { throw BedError.endedEarly(status: reader.status.rawValue) }
-            return nil
+        var frames = UInt32(Self.framesPerRead)
+        let channels = channels
+        let status = decoded.withUnsafeMutableBytes { raw in
+            var list = AudioBufferList(mNumberBuffers: 1, mBuffers: AudioBuffer(
+                mNumberChannels: UInt32(channels), mDataByteSize: UInt32(raw.count), mData: raw.baseAddress))
+            return ExtAudioFileRead(file, &frames, &list)
         }
-        let frames = CMSampleBufferGetNumSamples(buffer)
-        guard frames > 0 else { return BedBuffer(frames: 0) { _, _, _ in true } }
-        guard let block = CMSampleBufferGetDataBuffer(buffer), CMBlockBufferGetDataLength(block) >= frames * 8 else {
-            throw BedError.noData(frames: frames)
+        try Self.check(status, "read")
+        let n = Int(frames)
+        guard n > 0 else { return nil }   // the end of the file
+        var stereo = [Float](repeating: 0, count: 2 * n)
+        for i in 0..<n {
+            var l: Float = 0, r: Float = 0
+            for c in 0..<channels {
+                let x = decoded[i * channels + c]
+                l += x * gains[c].left
+                r += x * gains[c].right
+            }
+            stereo[2 * i] = l
+            stereo[2 * i + 1] = r
         }
-        return BedBuffer(frames: frames) { first, count, destination in
-            CMBlockBufferCopyDataBytes(block, atOffset: first * 8, dataLength: count * 8, destination: destination) == kCMBlockBufferNoErr
+        return BedBuffer(frames: n) { first, count, destination in
+            stereo.withUnsafeBufferPointer { destination.update(from: $0.baseAddress! + 2 * first, count: 2 * count) }
+            return true
         }
     }
 
-    func cancel() { reader.cancelReading() }
+    func cancel() {}
+
+    private static func check(_ status: OSStatus, _ step: String) throws {
+        guard status == noErr else { throw BedError.audioToolbox(step: step, status: status) }
+    }
+
+    /// The speaker of each channel, as the file names it (L R when it doesn't say).
+    private static func labels(of file: ExtAudioFileRef, channels: Int) -> [AudioChannelLabel] {
+        var size: UInt32 = 0
+        var labels: [AudioChannelLabel] = []
+        if ExtAudioFileGetPropertyInfo(file, kExtAudioFileProperty_FileChannelLayout, &size, nil) == noErr,
+           size >= UInt32(MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!) {
+            let raw = UnsafeMutableRawPointer.allocate(byteCount: max(Int(size), MemoryLayout<AudioChannelLayout>.size),
+                                                       alignment: MemoryLayout<AudioChannelLayout>.alignment)
+            defer { raw.deallocate() }
+            if ExtAudioFileGetProperty(file, kExtAudioFileProperty_FileChannelLayout, &size, raw) == noErr {
+                labels = AVAudioChannelLayout(layout: raw.assumingMemoryBound(to: AudioChannelLayout.self)).channelLabels
+            }
+        }
+        if !labels.contains(where: AVAudioChannelLayout.isSpeaker) {
+            labels = channels == 1 ? [kAudioChannelLabel_Mono] : [kAudioChannelLabel_Left, kAudioChannelLabel_Right]
+        }
+        return (0..<channels).map { $0 < labels.count ? labels[$0] : kAudioChannelLabel_Unused }
+    }
+
+    /// Lo/Ro: a speaker on the left goes to the left, at -3 dB unless it's the front left; centres go to both at -3 dB;
+    /// the LFE and anything unnamed stay out.
+    private static func gains(_ label: AudioChannelLabel) -> (left: Float, right: Float) {
+        let h: Float = 0.70710677
+        switch label {
+        case kAudioChannelLabel_Left: return (1, 0)
+        case kAudioChannelLabel_Right: return (0, 1)
+        case kAudioChannelLabel_Mono: return (1, 1)
+        case kAudioChannelLabel_Center, kAudioChannelLabel_CenterSurround, kAudioChannelLabel_VerticalHeightCenter,
+             kAudioChannelLabel_TopCenterSurround, kAudioChannelLabel_TopBackCenter:
+            return (h, h)
+        case kAudioChannelLabel_LeftSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RearSurroundLeft,
+             kAudioChannelLabel_LeftWide, kAudioChannelLabel_LeftCenter, kAudioChannelLabel_VerticalHeightLeft,
+             kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_LeftTopMiddle, kAudioChannelLabel_LeftTopRear:
+            return (h, 0)
+        case kAudioChannelLabel_RightSurround, kAudioChannelLabel_RightSurroundDirect, kAudioChannelLabel_RearSurroundRight,
+             kAudioChannelLabel_RightWide, kAudioChannelLabel_RightCenter, kAudioChannelLabel_VerticalHeightRight,
+             kAudioChannelLabel_TopBackRight, kAudioChannelLabel_RightTopMiddle, kAudioChannelLabel_RightTopRear:
+            return (0, h)
+        default: return (0, 0)
+        }
+    }
 }
 
 enum BedError: Error, CustomStringConvertible {
-    case couldNotStart, readerFailed, noData(frames: Int), copyFailed(atFrame: Int64), endedEarly(status: Int)
-    case stalled(seconds: Double)
+    case audioToolbox(step: String, status: OSStatus), copyFailed(atFrame: Int64), stalled(seconds: Double)
 
     var description: String {
         switch self {
-        case .stalled(let seconds): "a bed read has not returned for \(String(format: "%.1f", seconds)) s"
-        case .endedEarly(let status): "the bed reader stopped without finishing (AVAssetReader status \(status))"
-        case .couldNotStart: "the bed reader could not start"
-        case .readerFailed: "the bed reader failed"
-        case .noData(let frames): "a bed buffer of \(frames) frames has no data"
+        case .audioToolbox(let step, let status): "the bed reader's \(step) failed (Audio Toolbox error \(status))"
         case .copyFailed(let frame): "copying the bed at frame \(frame) failed"
+        case .stalled(let seconds): "a bed read has not returned for \(String(format: "%.1f", seconds)) s"
         }
     }
 }
 
 /// Decodes a Dolby track to a stereo downmix of its bed into a `SystemBedTap`, a little ahead of the playhead, from a
 /// second reader of its own: the renderer takes the compressed frames untouched. Runs only between `start` and `stop`.
+///
+/// Each run reads on a thread of its own, so a read that doesn't return holds up nothing else: a seek starts the new
+/// position at once, and the stuck run ends, storing nothing, when its read returns. A read that takes longer than
+/// `stallLimit` is recorded as a stall and the decoder starts over at the playhead, once per start.
 final class SystemBedDecoder: @unchecked Sendable {
     static let sampleRate = 48_000.0
     /// How far ahead of the playhead it decodes, in seconds.
@@ -178,12 +250,16 @@ final class SystemBedDecoder: @unchecked Sendable {
     /// Makes the reader for a start at `seconds` into the file.
     private let makeReader: (TimeInterval) throws -> BedReading
     let tap: SystemBedTap
-    private let queue = DispatchQueue(label: "org.szeremeta.vespertine.atmos-bed", qos: .userInitiated)
+    private let stallLimit: TimeInterval
     private let lock = NSLock()
     private var generation = 0
     private var failure: Error?
-
-    private let stallLimit: TimeInterval
+    /// The current run's playhead, for a restart.
+    private var playhead: (@Sendable () -> TimeInterval)?
+    /// When the current run's read (or its reader's opening) began, while one is under way.
+    private var readingSince: Date?
+    /// Whether the current run is already the restart after a stall.
+    private var restarted = false
 
     /// Decodes the file at `url`.
     convenience init(url: URL) {
@@ -199,82 +275,118 @@ final class SystemBedDecoder: @unchecked Sendable {
 
     /// The reader for a start at `seconds` into the file at `url`.
     static func reader(for url: URL, at seconds: TimeInterval) throws -> BedReading {
-        let asset = AVURLAsset(url: url)
-        guard let info = LoadedAudioTrack(asset) else { throw SourceOpenerError.unsupported(url) }
-        return try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds)
+        try AudioFileBedReader(url: url, seconds: seconds)
     }
-
-    /// Called whenever the visualizer reads the tap.
-    func restartIfStalled() {}
 
     deinit { stop() }
 
-    /// Why the last run ended before the end of the file (a reader failure or missing data); nil otherwise.
+    /// Why the last run ended before the end of the file (a reader failure or missing data) or stalled; nil otherwise.
     var error: Error? { lock.lock(); defer { lock.unlock() }; return failure }
 
     /// Decodes from `seconds` into the file (the renderer's own time base) on; `playhead` says how far playback has got.
     func start(at seconds: TimeInterval, playhead: @escaping @Sendable () -> TimeInterval) {
+        begin(at: seconds, playhead: playhead, replacing: nil)
+    }
+
+    /// Starts a run; as a restart (`replacing` the stalled run's generation) only while that run is still the current one.
+    private func begin(at seconds: TimeInterval, playhead: @escaping @Sendable () -> TimeInterval, replacing stalled: Int?) {
         lock.lock()
+        if let stalled, stalled != generation { lock.unlock(); return }
         generation += 1
         let gen = generation
-        failure = nil
+        if stalled == nil { failure = nil }
+        restarted = stalled != nil
+        self.playhead = playhead
+        readingSince = nil
         lock.unlock()
         let firstFrame = Int64((max(0, seconds) * Self.sampleRate).rounded())
         tap.reset(at: firstFrame)
-        queue.async { [self] in
-            var next = firstFrame
-            let reader: BedReading
+        let thread = Thread { [self] in run(gen, at: seconds, from: firstFrame, playhead: playhead) }
+        thread.name = "org.szeremeta.vespertine.atmos-bed"
+        thread.qualityOfService = .userInitiated
+        thread.start()
+    }
+
+    private func run(_ gen: Int, at seconds: TimeInterval, from firstFrame: Int64, playhead: @Sendable () -> TimeInterval) {
+        var next = firstFrame
+        let reader: BedReading
+        reading(gen, true)
+        do {
+            reader = try makeReader(seconds)
+            try reader.start()
+        } catch {
+            fail(gen, error, at: next)
+            return
+        }
+        reading(gen, false)
+        defer { reader.cancel() }
+        var scratch = [Float](repeating: 0, count: 2 * Self.chunkFrames)
+        while isCurrent(gen) {
+            let buffer: BedBuffer
+            reading(gen, true)
             do {
-                reader = try makeReader(seconds)
-                try reader.start()
+                let read = try reader.next()
+                reading(gen, false)
+                guard let read else { return }   // the end of the file
+                buffer = read
             } catch {
                 fail(gen, error, at: next)
                 return
             }
-            defer { reader.cancel() }
-            var scratch = [Float](repeating: 0, count: 2 * Self.chunkFrames)
-            while isCurrent(gen) {
-                let buffer: BedBuffer
-                do {
-                    guard let read = try reader.next() else { return }   // the end of the file
-                    buffer = read
-                } catch {
-                    fail(gen, error, at: next)
+            // Wait for the playhead before decoding further than a second ahead.
+            while isCurrent(gen), Double(next) / Self.sampleRate - playhead() > Self.lookahead {
+                Thread.sleep(forTimeInterval: 0.02)
+            }
+            guard isCurrent(gen) else { return }
+            // Whatever the buffer's size, all of it is stored, a chunk at a time, so `next` follows the reader.
+            var done = 0
+            while done < buffer.frames {
+                let count = min(Self.chunkFrames, buffer.frames - done)
+                guard scratch.withUnsafeMutableBufferPointer({ buffer.copy(done, count, $0.baseAddress!) }) else {
+                    fail(gen, BedError.copyFailed(atFrame: next), at: next)
                     return
                 }
-                // Wait for the playhead before decoding further than a second ahead.
-                while isCurrent(gen), Double(next) / Self.sampleRate - playhead() > Self.lookahead {
-                    Thread.sleep(forTimeInterval: 0.02)
-                }
-                guard isCurrent(gen) else { return }
-                // Whatever the buffer's size, all of it is stored, a chunk at a time, so `next` follows the reader.
-                var done = 0
-                while done < buffer.frames {
-                    let count = min(Self.chunkFrames, buffer.frames - done)
-                    guard scratch.withUnsafeMutableBufferPointer({ buffer.copy(done, count, $0.baseAddress!) }) else {
-                        fail(gen, BedError.copyFailed(atFrame: next), at: next)
-                        return
-                    }
-                    scratch.withUnsafeBufferPointer { tap.append(interleaved: $0.baseAddress!, frames: count, at: next) }
-                    next += Int64(count)
-                    done += count
-                }
+                scratch.withUnsafeBufferPointer { tap.append(interleaved: $0.baseAddress!, frames: count, at: next) }
+                next += Int64(count)
+                done += count
             }
         }
+    }
+
+    /// Starts over at the playhead when the current run's read has taken longer than `stallLimit`, recording the stall.
+    /// Only once per start: a restart that stalls too is recorded and left to finish (or to the next start). Called
+    /// whenever the visualizer reads the tap, so it costs a lock.
+    func restartIfStalled() {
+        lock.lock()
+        guard let since = readingSince, let playhead, Date().timeIntervalSince(since) > stallLimit else { lock.unlock(); return }
+        let waited = Date().timeIntervalSince(since)
+        let gen = generation, retry = !restarted
+        failure = BedError.stalled(seconds: waited)
+        readingSince = nil   // reported once
+        lock.unlock()
+        log.error("Atmos bed decoder stalled: a read has not returned for \(waited, format: .fixed(precision: 1), privacy: .public) s; \(retry ? "starting over at the playhead" : "waiting for the next start", privacy: .public)")
+        if retry { begin(at: playhead(), playhead: playhead, replacing: gen) }
+    }
+
+    /// Notes when the current run's read begins and ends.
+    private func reading(_ gen: Int, _ busy: Bool) {
+        lock.lock()
+        if gen == generation { readingSince = busy ? Date() : nil }
+        lock.unlock()
     }
 
     /// Records why a run ended before the end of the file (unless it was stopped or replaced meanwhile, which isn't a failure).
     private func fail(_ gen: Int, _ error: Error, at frame: Int64) {
         lock.lock()
         let current = gen == generation
-        if current { failure = error }
+        if current { failure = error; readingSince = nil }
         lock.unlock()
         guard current else { return }
         log.error("Atmos bed decoder stopped at frame \(frame, privacy: .public): \(String(describing: error), privacy: .public)")
     }
 
     func stop() {
-        lock.lock(); generation += 1; lock.unlock()
+        lock.lock(); generation += 1; readingSince = nil; lock.unlock()
     }
 
     private func isCurrent(_ gen: Int) -> Bool {
