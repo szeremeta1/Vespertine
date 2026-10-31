@@ -2849,6 +2849,275 @@
         }
       }
     },
+    "%@ dBFS": {
+      "comment": "Visualizer option: a level in decibels relative to full scale, e.g. -18 dBFS.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dBFS"
+          }
+        }
+      }
+    },
     "%@ decibels": {
       "localizations": {
         "am": {
@@ -71607,271 +71876,271 @@
         }
       }
     },
-    "Adds Window > Visualizer (⌥⌘V) and a toolbar button: a spectrum analyzer, a spectrogram, the album on a spinning record and club lights, in a window of its own that can go full screen on another display. It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.": {
+    "Adds Window > Visualizer (⌥⌘V) and a toolbar button: the album on a spinning record, a spectrum analyzer, a spectrogram, club lights, a stereo scope, VU and PPM meters, a particle field and mirrored bars, in a window of its own that can go full screen on another display. It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.": {
       "comment": "Settings: explains the visualizer window toggle.",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fügt Fenster > Visualizer (⌥⌘V) und eine Taste in der Symbolleiste hinzu: ein Spektrumanalysator, ein Spektrogramm, das Album auf einer sich drehenden Schallplatte und Clublichter, in einem eigenen Fenster, das auch auf einem anderen Bildschirm im Vollbild laufen kann. Es liest eine Kopie dessen, was spielt, und verändert den Klang nie. Bei geschlossenem Fenster kostet es nichts."
+            "value": "Fügt Fenster > Visualizer (⌥⌘V) und eine Taste in der Symbolleiste hinzu: das Album auf einer sich drehenden Schallplatte, ein Spektrumanalysator, ein Spektrogramm, Clublichter, ein Stereo-Oszilloskop, VU- und PPM-Meter, ein Partikelfeld und gespiegelte Balken, in einem eigenen Fenster, das auch auf einem anderen Bildschirm im Vollbild laufen kann. Es liest eine Kopie dessen, was spielt, und verändert den Klang nie. Bei geschlossenem Fenster kostet es nichts."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ajoute Fenêtre > Visualiseur (⌥⌘V) et un bouton dans la barre d’outils : un analyseur de spectre, un spectrogramme, l’album sur un disque qui tourne et des lumières de club, dans une fenêtre à part qui peut passer en plein écran sur un autre écran. Il lit une copie de ce qui joue et ne modifie jamais le son. Fenêtre fermée, il ne coûte rien."
+            "value": "Ajoute Fenêtre > Visualiseur (⌥⌘V) et un bouton dans la barre d’outils : l’album sur un disque qui tourne, un analyseur de spectre, un spectrogramme, des lumières de club, un oscilloscope stéréo, des vumètres VU et PPM, un champ de particules et des barres en miroir, dans une fenêtre à part qui peut passer en plein écran sur un autre écran. Il lit une copie de ce qui joue et ne modifie jamais le son. Fenêtre fermée, il ne coûte rien."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Añade Ventana > Visualizador (⌥⌘V) y un botón en la barra de herramientas: un analizador de espectro, un espectrograma, el álbum en un disco que gira y luces de club, en una ventana propia que puede ir a pantalla completa en otra pantalla. Lee una copia de lo que suena y nunca cambia el sonido. Con la ventana cerrada, no cuesta nada."
+            "value": "Añade Ventana > Visualizador (⌥⌘V) y un botón en la barra de herramientas: el álbum en un disco que gira, un analizador de espectro, un espectrograma, luces de club, un osciloscopio estéreo, vúmetros VU y PPM, un campo de partículas y barras en espejo, en una ventana propia que puede ir a pantalla completa en otra pantalla. Lee una copia de lo que suena y nunca cambia el sonido. Con la ventana cerrada, no cuesta nada."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aggiunge Finestra > Visualizzatore (⌥⌘V) e un pulsante nella barra degli strumenti: un analizzatore di spettro, uno spettrogramma, l’album su un disco che gira e luci da club, in una finestra propria che può andare a tutto schermo su un altro schermo. Legge una copia di ciò che suona e non cambia mai il suono. Con la finestra chiusa, non costa nulla."
+            "value": "Aggiunge Finestra > Visualizzatore (⌥⌘V) e un pulsante nella barra degli strumenti: l’album su un disco che gira, un analizzatore di spettro, uno spettrogramma, luci da club, un oscilloscopio stereo, indicatori VU e PPM, un campo di particelle e barre a specchio, in una finestra propria che può andare a tutto schermo su un altro schermo. Legge una copia di ciò che suona e non cambia mai il suono. Con la finestra chiusa, non costa nulla."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adiciona Janela > Visualizador (⌥⌘V) e um botão na barra de ferramentas: um analisador de espectro, um espectrograma, o álbum num disco girando e luzes de balada, numa janela própria que pode ir para tela cheia em outra tela. Ele lê uma cópia do que toca e nunca altera o som. Com a janela fechada, não custa nada."
+            "value": "Adiciona Janela > Visualizador (⌥⌘V) e um botão na barra de ferramentas: o álbum num disco girando, um analisador de espectro, um espectrograma, luzes de balada, um osciloscópio estéreo, medidores VU e PPM, um campo de partículas e barras espelhadas, numa janela própria que pode ir para tela cheia em outra tela. Ele lê uma cópia do que toca e nunca altera o som. Com a janela fechada, não custa nada."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adiciona Janela > Visualizador (⌥⌘V) e um botão na barra de ferramentas: um analisador de espectro, um espectrograma, o álbum num disco a girar e luzes de discoteca, numa janela própria que pode passar a ecrã completo noutro ecrã. Lê uma cópia do que está a tocar e nunca altera o som. Com a janela fechada, não custa nada."
+            "value": "Adiciona Janela > Visualizador (⌥⌘V) e um botão na barra de ferramentas: o álbum num disco a girar, um analisador de espectro, um espectrograma, luzes de discoteca, um osciloscópio estéreo, medidores VU e PPM, um campo de partículas e barras espelhadas, numa janela própria que pode passar a ecrã completo noutro ecrã. Lê uma cópia do que está a tocar e nunca altera o som. Com a janela fechada, não custa nada."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Voegt Venster > Visualizer (⌥⌘V) en een knop in de knoppenbalk toe: een spectrumanalyser, een spectrogram, het album op een draaiende plaat en clublichten, in een eigen venster dat ook op een ander scherm schermvullend kan. Het leest een kopie van wat er speelt en verandert het geluid nooit. Met het venster dicht kost het niets."
+            "value": "Voegt Venster > Visualizer (⌥⌘V) en een knop in de knoppenbalk toe: het album op een draaiende plaat, een spectrumanalyser, een spectrogram, clublichten, een stereoscoop, VU- en PPM-meters, een deeltjesveld en gespiegelde balken, in een eigen venster dat ook op een ander scherm schermvullend kan. Het leest een kopie van wat er speelt en verandert het geluid nooit. Met het venster dicht kost het niets."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lägger till Fönster > Visualiserare (⌥⌘V) och en knapp i verktygsfältet: en spektrumanalysator, ett spektrogram, albumet på en snurrande skiva och klubbljus, i ett eget fönster som kan gå i helskärm på en annan skärm. Den läser en kopia av det som spelas och ändrar aldrig ljudet. Med fönstret stängt kostar den ingenting."
+            "value": "Lägger till Fönster > Visualiserare (⌥⌘V) och en knapp i verktygsfältet: albumet på en snurrande skiva, en spektrumanalysator, ett spektrogram, klubbljus, ett stereooscilloskop, VU- och PPM-mätare, ett partikelfält och speglade staplar, i ett eget fönster som kan gå i helskärm på en annan skärm. Den läser en kopia av det som spelas och ändrar aldrig ljudet. Med fönstret stängt kostar den ingenting."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tilføjer Vindue > Visualisering (⌥⌘V) og en knap på værktøjslinjen: en spektrumanalysator, et spektrogram, albummet på en roterende plade og klublys, i sit eget vindue, der kan gå i fuld skærm på en anden skærm. Den læser en kopi af det, der spiller, og ændrer aldrig lyden. Med vinduet lukket koster den intet."
+            "value": "Tilføjer Vindue > Visualisering (⌥⌘V) og en knap på værktøjslinjen: albummet på en roterende plade, en spektrumanalysator, et spektrogram, klublys, et stereooscilloskop, VU- og PPM-målere, et partikelfelt og spejlede søjler, i sit eget vindue, der kan gå i fuld skærm på en anden skærm. Den læser en kopi af det, der spiller, og ændrer aldrig lyden. Med vinduet lukket koster den intet."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Legger til Vindu > Visualisering (⌥⌘V) og en knapp i verktøylinjen: en spektrumanalysator, et spektrogram, albumet på en snurrende plate og klubblys, i et eget vindu som kan gå i fullskjerm på en annen skjerm. Den leser en kopi av det som spilles, og endrer aldri lyden. Med vinduet lukket koster den ingenting."
+            "value": "Legger til Vindu > Visualisering (⌥⌘V) og en knapp i verktøylinjen: albumet på en snurrende plate, en spektrumanalysator, et spektrogram, klubblys, et stereooscilloskop, VU- og PPM-målere, et partikkelfelt og speilede søyler, i et eget vindu som kan gå i fullskjerm på en annen skjerm. Den leser en kopi av det som spilles, og endrer aldri lyden. Med vinduet lukket koster den ingenting."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lisää Ikkuna > Visualisoija (⌥⌘V) ja painikkeen työkalupalkkiin: spektrianalysaattori, spektrogrammi, albumi pyörivällä levyllä ja klubivalot omassa ikkunassaan, joka voi mennä koko näytölle toisella näytöllä. Se lukee kopion soivasta äänestä eikä koskaan muuta ääntä. Ikkunan ollessa kiinni se ei maksa mitään."
+            "value": "Lisää Ikkuna > Visualisoija (⌥⌘V) ja painikkeen työkalupalkkiin: albumi pyörivällä levyllä, spektrianalysaattori, spektrogrammi, klubivalot, stereo-oskilloskooppi, VU- ja PPM-mittarit, hiukkaskenttä ja peilatut palkit omassa ikkunassaan, joka voi mennä koko näytölle toisella näytöllä. Se lukee kopion soivasta äänestä eikä koskaan muuta ääntä. Ikkunan ollessa kiinni se ei maksa mitään."
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dodaje Okno > Wizualizator (⌥⌘V) i przycisk na pasku narzędzi: analizator widma, spektrogram, album na obracającej się płycie i światła klubowe, we własnym oknie, które może przejść na pełny ekran na innym monitorze. Czyta kopię tego, co gra, i nigdy nie zmienia dźwięku. Przy zamkniętym oknie nic nie kosztuje."
+            "value": "Dodaje Okno > Wizualizator (⌥⌘V) i przycisk na pasku narzędzi: album na obracającej się płycie, analizator widma, spektrogram, światła klubowe, oscyloskop stereo, mierniki VU i PPM, pole cząsteczek i lustrzane słupki, we własnym oknie, które może przejść na pełny ekran na innym monitorze. Czyta kopię tego, co gra, i nigdy nie zmienia dźwięku. Przy zamkniętym oknie nic nie kosztuje."
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Přidá Okno > Vizualizér (⌥⌘V) a tlačítko na nástrojovou lištu: spektrální analyzátor, spektrogram, album na točící se desce a klubová světla, ve vlastním okně, které může jít na celou obrazovku na jiném displeji. Čte kopii toho, co hraje, a zvuk nikdy nemění. Se zavřeným oknem nic nestojí."
+            "value": "Přidá Okno > Vizualizér (⌥⌘V) a tlačítko na nástrojovou lištu: album na točící se desce, spektrální analyzátor, spektrogram, klubová světla, stereo osciloskop, měřiče VU a PPM, pole částic a zrcadlené sloupce, ve vlastním okně, které může jít na celou obrazovku na jiném displeji. Čte kopii toho, co hraje, a zvuk nikdy nemění. Se zavřeným oknem nic nestojí."
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hozzáadja az Ablak > Vizualizáló (⌥⌘V) menüpontot és egy gombot az eszközsorhoz: spektrumanalizátor, spektrogram, az album egy forgó lemezen és klubfények, saját ablakban, amely egy másik kijelzőn teljes képernyőre is válthat. A lejátszott hang másolatát olvassa, és sosem változtat a hangon. Bezárt ablakkal semmibe sem kerül."
+            "value": "Hozzáadja az Ablak > Vizualizáló (⌥⌘V) menüpontot és egy gombot az eszközsorhoz: az album egy forgó lemezen, spektrumanalizátor, spektrogram, klubfények, sztereó oszcilloszkóp, VU- és PPM-mérők, részecskemező és tükrözött oszlopok, saját ablakban, amely egy másik kijelzőn teljes képernyőre is válthat. A lejátszott hang másolatát olvassa, és sosem változtat a hangon. Bezárt ablakkal semmibe sem kerül."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adaugă Fereastră > Vizualizator (⌥⌘V) și un buton în bara de instrumente: un analizor de spectru, o spectrogramă, albumul pe un disc care se învârte și lumini de club, într-o fereastră proprie care poate trece pe ecran complet pe alt monitor. Citește o copie a ceea ce se redă și nu schimbă niciodată sunetul. Cu fereastra închisă, nu costă nimic."
+            "value": "Adaugă Fereastră > Vizualizator (⌥⌘V) și un buton în bara de instrumente: albumul pe un disc care se învârte, un analizor de spectru, o spectrogramă, lumini de club, un osciloscop stereo, indicatoare VU și PPM, un câmp de particule și bare în oglindă, într-o fereastră proprie care poate trece pe ecran complet pe alt monitor. Citește o copie a ceea ce se redă și nu schimbă niciodată sunetul. Cu fereastra închisă, nu costă nimic."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pencere > Görselleştirici (⌥⌘V) ve araç çubuğuna bir düğme ekler: spektrum analizörü, spektrogram, dönen bir plak üzerinde albüm ve kulüp ışıkları; başka bir ekranda tam ekran olabilen kendi penceresinde. Çalanın bir kopyasını okur ve sesi asla değiştirmez. Pencere kapalıyken hiçbir maliyeti yoktur."
+            "value": "Pencere > Görselleştirici (⌥⌘V) ve araç çubuğuna bir düğme ekler: dönen bir plak üzerinde albüm, spektrum analizörü, spektrogram, kulüp ışıkları, stereo osiloskop, VU ve PPM göstergeleri, bir parçacık alanı ve aynalı çubuklar; başka bir ekranda tam ekran olabilen kendi penceresinde. Çalanın bir kopyasını okur ve sesi asla değiştirmez. Pencere kapalıyken hiçbir maliyeti yoktur."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Додає Вікно > Візуалізатор (⌥⌘V) і кнопку на панелі інструментів: аналізатор спектра, спектрограму, альбом на платівці, що обертається, і клубне світло, в окремому вікні, яке може перейти на весь екран на іншому дисплеї. Він читає копію того, що грає, і ніколи не змінює звук. Коли вікно закрите, він нічого не коштує."
+            "value": "Додає Вікно > Візуалізатор (⌥⌘V) і кнопку на панелі інструментів: альбом на платівці, що обертається, аналізатор спектра, спектрограму, клубне світло, стереоосцилограф, індикатори VU і PPM, поле частинок і дзеркальні стовпчики, в окремому вікні, яке може перейти на весь екран на іншому дисплеї. Він читає копію того, що грає, і ніколи не змінює звук. Коли вікно закрите, він нічого не коштує."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Προσθέτει Παράθυρο > Οπτικοποιητής (⌥⌘V) και ένα κουμπί στη γραμμή εργαλείων: αναλυτή φάσματος, φασματογράφημα, το άλμπουμ σε δίσκο που γυρίζει και φώτα κλαμπ, σε δικό του παράθυρο που μπορεί να πάει σε πλήρη οθόνη σε άλλη οθόνη. Διαβάζει ένα αντίγραφο όσων παίζουν και δεν αλλάζει ποτέ τον ήχο. Με το παράθυρο κλειστό, δεν κοστίζει τίποτα."
+            "value": "Προσθέτει Παράθυρο > Οπτικοποιητής (⌥⌘V) και ένα κουμπί στη γραμμή εργαλείων: το άλμπουμ σε δίσκο που γυρίζει, αναλυτή φάσματος, φασματογράφημα, φώτα κλαμπ, στερεοφωνικό παλμογράφο, μετρητές VU και PPM, πεδίο σωματιδίων και κατοπτρικές μπάρες, σε δικό του παράθυρο που μπορεί να πάει σε πλήρη οθόνη σε άλλη οθόνη. Διαβάζει ένα αντίγραφο όσων παίζουν και δεν αλλάζει ποτέ τον ήχο. Με το παράθυρο κλειστό, δεν κοστίζει τίποτα."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「ウインドウ」>「ビジュアライザ」（⌥⌘V）とツールバーのボタンを追加します。スペクトラムアナライザ、スペクトログラム、回転するレコードに載ったアルバム、クラブのライトを専用のウインドウに表示し、別のディスプレイでフルスクリーンにもできます。再生中の音のコピーを読むだけで、音は一切変えません。ウインドウを閉じているあいだは負荷はかかりません。"
+            "value": "「ウインドウ」>「ビジュアライザ」（⌥⌘V）とツールバーのボタンを追加します。回転するレコードに載ったアルバム、スペクトラムアナライザ、スペクトログラム、クラブのライト、ステレオスコープ、VUメーターとPPMメーター、パーティクル、ミラーバーを専用のウインドウに表示し、別のディスプレイでフルスクリーンにもできます。再生中の音のコピーを読むだけで、音は一切変えません。ウインドウを閉じているあいだは負荷はかかりません。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "윈도우 > 비주얼라이저(⌥⌘V)와 도구 막대 버튼을 추가합니다. 스펙트럼 분석기, 스펙트로그램, 돌아가는 레코드 위의 앨범, 클럽 조명을 별도의 윈도우에 보여 주며, 다른 디스플레이에서 전체 화면으로 볼 수도 있습니다. 재생 중인 소리의 사본만 읽으며 소리는 절대 바꾸지 않습니다. 윈도우를 닫아 두면 부담이 전혀 없습니다."
+            "value": "윈도우 > 비주얼라이저(⌥⌘V)와 도구 막대 버튼을 추가합니다. 돌아가는 레코드 위의 앨범, 스펙트럼 분석기, 스펙트로그램, 클럽 조명, 스테레오 스코프, VU 및 PPM 미터, 파티클 필드, 미러 막대를 별도의 윈도우에 보여 주며, 다른 디스플레이에서 전체 화면으로 볼 수도 있습니다. 재생 중인 소리의 사본만 읽으며 소리는 절대 바꾸지 않습니다. 윈도우를 닫아 두면 부담이 전혀 없습니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "添加“窗口”>“可视化”（⌥⌘V）和工具栏按钮：频谱分析仪、频谱图、在转动的唱片上的专辑，以及夜店灯光，显示在独立的窗口中，可在另一台显示器上全屏。它只读取播放内容的副本，从不改变声音。窗口关闭时毫无开销。"
+            "value": "添加“窗口”>“可视化”（⌥⌘V）和工具栏按钮：在转动的唱片上的专辑、频谱分析仪、频谱图、夜店灯光、立体声示波器、VU 和 PPM 表、粒子场以及镜像柱，显示在独立的窗口中，可在另一台显示器上全屏。它只读取播放内容的副本，从不改变声音。窗口关闭时毫无开销。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "加入「視窗」>「視覺效果」（⌥⌘V）和工具列按鈕：頻譜分析儀、頻譜圖、在轉動唱片上的專輯，以及夜店燈光，顯示在獨立的視窗中，可在另一部顯示器上全螢幕。它只讀取播放內容的副本，絕不改變聲音。視窗關閉時毫無負擔。"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "加入「視窗」>「視覺效果」（⌥⌘V）和工具列按鈕：頻譜分析儀、頻譜圖、在轉動唱片上的專輯，以及夜店燈光，顯示在獨立的視窗中，可在另一部顯示器上全螢幕。它只讀取播放內容的副本，絕不改變聲音。視窗關閉時毫無負擔。"
+            "value": "加入「視窗」>「視覺效果」（⌥⌘V）和工具列按鈕：在轉動唱片上的專輯、頻譜分析儀、頻譜圖、夜店燈光、立體聲示波器、VU 與 PPM 表、粒子場以及鏡像長條，顯示在獨立的視窗中，可在另一部顯示器上全螢幕。它只讀取播放內容的副本，絕不改變聲音。視窗關閉時毫無負擔。"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Thêm Cửa sổ > Trình hiển thị (⌥⌘V) và một nút trên thanh công cụ: máy phân tích phổ, phổ đồ, album trên đĩa than đang quay và đèn câu lạc bộ, trong một cửa sổ riêng có thể toàn màn hình trên màn hình khác. Nó đọc một bản sao của những gì đang phát và không bao giờ thay đổi âm thanh. Khi đóng cửa sổ, nó không tốn gì."
+            "value": "Thêm Cửa sổ > Trình hiển thị (⌥⌘V) và một nút trên thanh công cụ: album trên đĩa than đang quay, máy phân tích phổ, phổ đồ, đèn câu lạc bộ, máy hiện sóng stereo, đồng hồ VU và PPM, trường hạt và các thanh đối xứng, trong một cửa sổ riêng có thể toàn màn hình trên màn hình khác. Nó đọc một bản sao của những gì đang phát và không bao giờ thay đổi âm thanh. Khi đóng cửa sổ, nó không tốn gì."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Menambahkan Jendela > Visualizer (⌥⌘V) dan tombol di bar alat: penganalisis spektrum, spektrogram, album di atas piringan hitam yang berputar, dan lampu klub, di jendelanya sendiri yang bisa layar penuh di layar lain. Ia membaca salinan dari yang diputar dan tidak pernah mengubah suara. Saat jendela ditutup, tidak ada biayanya."
+            "value": "Menambahkan Jendela > Visualizer (⌥⌘V) dan tombol di bar alat: album di atas piringan hitam yang berputar, penganalisis spektrum, spektrogram, lampu klub, osiloskop stereo, meter VU dan PPM, medan partikel, dan batang cermin, di jendelanya sendiri yang bisa layar penuh di layar lain. Ia membaca salinan dari yang diputar dan tidak pernah mengubah suara. Saat jendela ditutup, tidak ada biayanya."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Menambah Tetingkap > Pemvisual (⌥⌘V) dan butang bar alat: penganalisis spektrum, spektrogram, album pada piring hitam yang berputar dan lampu kelab, dalam tetingkapnya sendiri yang boleh menjadi skrin penuh pada paparan lain. Ia membaca salinan apa yang dimainkan dan tidak pernah mengubah bunyi. Apabila tetingkap ditutup, ia tidak menelan apa-apa."
+            "value": "Menambah Tetingkap > Pemvisual (⌥⌘V) dan butang bar alat: album pada piring hitam yang berputar, penganalisis spektrum, spektrogram, lampu kelab, osiloskop stereo, meter VU dan PPM, medan zarah dan bar cermin, dalam tetingkapnya sendiri yang boleh menjadi skrin penuh pada paparan lain. Ia membaca salinan apa yang dimainkan dan tidak pernah mengubah bunyi. Apabila tetingkap ditutup, ia tidak menelan apa-apa."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nagdaragdag ng Window > Visualizer (⌥⌘V) at isang button sa toolbar: spectrum analyzer, spectrogram, ang album sa isang umiikot na plaka at mga ilaw ng club, sa sarili nitong window na puwedeng mag-full screen sa ibang display. Kopya lang ng tumutugtog ang binabasa nito at hindi kailanman binabago ang tunog. Kapag nakasara ang window, wala itong gastos."
+            "value": "Nagdaragdag ng Window > Visualizer (⌥⌘V) at isang button sa toolbar: ang album sa isang umiikot na plaka, spectrum analyzer, spectrogram, mga ilaw ng club, stereo scope, VU at PPM meter, isang field ng mga particle at mga naka-mirror na bar, sa sarili nitong window na puwedeng mag-full screen sa ibang display. Kopya lang ng tumutugtog ang binabasa nito at hindi kailanman binabago ang tunog. Kapag nakasara ang window, wala itong gastos."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Huongeza Dirisha > Kionyeshi (⌥⌘V) na kitufe kwenye upau wa zana: kichanganuzi cha masafa, spektrogramu, albamu kwenye santuri inayozunguka na taa za klabu, katika dirisha lake lenyewe linaloweza kujaa skrini kwenye onyesho lingine. Husoma nakala ya kinachocheza na kamwe haibadilishi sauti. Dirisha likiwa limefungwa, haligharimu chochote."
+            "value": "Huongeza Dirisha > Kionyeshi (⌥⌘V) na kitufe kwenye upau wa zana: albamu kwenye santuri inayozunguka, kichanganuzi cha masafa, spektrogramu, taa za klabu, skopu ya stereo, mita za VU na PPM, uwanja wa chembe na pau za kioo, katika dirisha lake lenyewe linaloweza kujaa skrini kwenye onyesho lingine. Husoma nakala ya kinachocheza na kamwe haibadilishi sauti. Dirisha likiwa limefungwa, haligharimu chochote."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yana ƙara Taga > Mai nuna sauti (⌥⌘V) da maɓalli a sandar kayan aiki: mai nazarin bakan sauti, hoton bakan sauti, kundin a kan faifai mai juyawa da fitilun kulob, a tagarsa ta kansa wadda za ta iya cika allo a wani allo. Yana karanta kwafin abin da ke kunnawa kuma ba ya taɓa canza sautin. Idan taga a rufe take, ba ya cin komai."
+            "value": "Yana ƙara Taga > Mai nuna sauti (⌥⌘V) da maɓalli a sandar kayan aiki: kundin a kan faifai mai juyawa, mai nazarin bakan sauti, hoton bakan sauti, fitilun kulob, na'urar duba sitiriyo, mitocin VU da PPM, filin ƙwayoyi da sanduna masu madubi, a tagarsa ta kansa wadda za ta iya cika allo a wani allo. Yana karanta kwafin abin da ke kunnawa kuma ba ya taɓa canza sautin. Idan taga a rufe take, ba ya cin komai."
           }
         },
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "መስኮት > ምስላዊ ማሳያ (⌥⌘V) እና በመሣሪያ አሞሌ ላይ አዝራር ያክላል፦ የስፔክትረም ተንታኝ፣ ስፔክትሮግራም፣ በሚሽከረከር ሸክላ ላይ ያለው አልበም እና የክለብ መብራቶች፣ በሌላ ማሳያ ላይ ሙሉ ማያ ገጽ ሊሆን በሚችል የራሱ መስኮት። የሚጫወተውን ቅጂ ብቻ ያነባል፣ ድምፁን በጭራሽ አይቀይርም። መስኮቱ ሲዘጋ ምንም አያስከፍልም።"
+            "value": "መስኮት > ምስላዊ ማሳያ (⌥⌘V) እና በመሣሪያ አሞሌ ላይ አዝራር ያክላል፦ በሚሽከረከር ሸክላ ላይ ያለው አልበም፣ የስፔክትረም ተንታኝ፣ ስፔክትሮግራም፣ የክለብ መብራቶች፣ የስቴሪዮ ስኮፕ፣ የVU እና PPM መለኪያዎች፣ የቅንጣቶች መስክ እና የመስታወት አሞሌዎች፣ በሌላ ማሳያ ላይ ሙሉ ማያ ገጽ ሊሆን በሚችል የራሱ መስኮት። የሚጫወተውን ቅጂ ብቻ ያነባል፣ ድምፁን በጭራሽ አይቀይርም። መስኮቱ ሲዘጋ ምንም አያስከፍልም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يضيف نافذة > المؤثرات المرئية (⌥⌘V) وزرًا في شريط الأدوات: محلل طيف، ومخطط طيفي، والألبوم على أسطوانة تدور، وأضواء نادٍ ليلي، في نافذة مستقلة يمكن عرضها بملء الشاشة على شاشة أخرى. يقرأ نسخة مما يُشغَّل ولا يغيّر الصوت أبدًا. وعندما تكون النافذة مغلقة لا يكلّف شيئًا."
+            "value": "يضيف نافذة > المؤثرات المرئية (⌥⌘V) وزرًا في شريط الأدوات: الألبوم على أسطوانة تدور، ومحلل طيف، ومخطط طيفي، وأضواء نادٍ ليلي، وراسم إشارات استريو، ومقاييس VU وPPM، وحقل جسيمات، وأشرطة متناظرة، في نافذة مستقلة يمكن عرضها بملء الشاشة على شاشة أخرى. يقرأ نسخة مما يُشغَّل ولا يغيّر الصوت أبدًا. وعندما تكون النافذة مغلقة لا يكلّف شيئًا."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "پنجره > نمایشگر تصویری (⌥⌘V) و یک دکمه در نوار ابزار اضافه می‌کند: تحلیلگر طیف، طیف‌نگار، آلبوم روی صفحه‌ای که می‌چرخد و نورهای کلاب، در پنجره‌ای جداگانه که می‌تواند روی نمایشگری دیگر تمام‌صفحه شود. فقط رونوشتی از آنچه پخش می‌شود را می‌خواند و هرگز صدا را تغییر نمی‌دهد. وقتی پنجره بسته است، هزینه‌ای ندارد."
+            "value": "پنجره > نمایشگر تصویری (⌥⌘V) و یک دکمه در نوار ابزار اضافه می‌کند: آلبوم روی صفحه‌ای که می‌چرخد، تحلیلگر طیف، طیف‌نگار، نورهای کلاب، اسیلوسکوپ استریو، نشانگرهای VU و PPM، میدانی از ذرات و میله‌های قرینه، در پنجره‌ای جداگانه که می‌تواند روی نمایشگری دیگر تمام‌صفحه شود. فقط رونوشتی از آنچه پخش می‌شود را می‌خواند و هرگز صدا را تغییر نمی‌دهد. وقتی پنجره بسته است، هزینه‌ای ندارد."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "מוסיף חלון > ויזואלייזר (⌥⌘V) וכפתור בסרגל הכלים: מנתח ספקטרום, ספקטרוגרמה, האלבום על תקליט מסתובב ואורות מועדון, בחלון משלו שיכול לעבור למסך מלא בצג אחר. הוא קורא עותק של מה שמתנגן ולעולם אינו משנה את הצליל. כשהחלון סגור, הוא לא עולה דבר."
+            "value": "מוסיף חלון > ויזואלייזר (⌥⌘V) וכפתור בסרגל הכלים: האלבום על תקליט מסתובב, מנתח ספקטרום, ספקטרוגרמה, אורות מועדון, סקופ סטריאו, מדי VU ו־PPM, שדה חלקיקים ועמודות במראה, בחלון משלו שיכול לעבור למסך מלא בצג אחר. הוא קורא עותק של מה שמתנגן ולעולם אינו משנה את הצליל. כשהחלון סגור, הוא לא עולה דבר."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ونڈو > بصری نمائش (⌥⌘V) اور ٹول بار میں ایک بٹن شامل کرتا ہے: اسپیکٹرم اینالائزر، اسپیکٹروگرام، گھومتے ریکارڈ پر البم اور کلب کی روشنیاں، اپنی الگ ونڈو میں جو کسی دوسرے ڈسپلے پر فل اسکرین ہو سکتی ہے۔ یہ جو چل رہا ہے اس کی نقل پڑھتا ہے اور آواز کبھی نہیں بدلتا۔ ونڈو بند ہو تو اس کا کوئی بوجھ نہیں۔"
+            "value": "ونڈو > بصری نمائش (⌥⌘V) اور ٹول بار میں ایک بٹن شامل کرتا ہے: گھومتے ریکارڈ پر البم، اسپیکٹرم اینالائزر، اسپیکٹروگرام، کلب کی روشنیاں، اسٹیریو اسکوپ، VU اور PPM میٹر، ذرات کا میدان اور آئینہ دار بارز، اپنی الگ ونڈو میں جو کسی دوسرے ڈسپلے پر فل اسکرین ہو سکتی ہے۔ یہ جو چل رہا ہے اس کی نقل پڑھتا ہے اور آواز کبھی نہیں بدلتا۔ ونڈو بند ہو تو اس کا کوئی بوجھ نہیں۔"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "विंडो > विज़ुअलाइज़र (⌥⌘V) और टूलबार में एक बटन जोड़ता है: स्पेक्ट्रम एनालाइज़र, स्पेक्ट्रोग्राम, घूमते रिकॉर्ड पर एल्बम और क्लब की रोशनी, अपनी अलग विंडो में जो किसी दूसरे डिस्प्ले पर फ़ुल स्क्रीन हो सकती है। यह जो बज रहा है उसकी एक कॉपी पढ़ता है और आवाज़ कभी नहीं बदलता। विंडो बंद होने पर इसका कोई भार नहीं।"
+            "value": "विंडो > विज़ुअलाइज़र (⌥⌘V) और टूलबार में एक बटन जोड़ता है: घूमते रिकॉर्ड पर एल्बम, स्पेक्ट्रम एनालाइज़र, स्पेक्ट्रोग्राम, क्लब की रोशनी, स्टीरियो स्कोप, VU और PPM मीटर, कणों का क्षेत्र और दर्पण बार, अपनी अलग विंडो में जो किसी दूसरे डिस्प्ले पर फ़ुल स्क्रीन हो सकती है। यह जो बज रहा है उसकी एक कॉपी पढ़ता है और आवाज़ कभी नहीं बदलता। विंडो बंद होने पर इसका कोई भार नहीं।"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "উইন্ডো > ভিজ্যুয়ালাইজার (⌥⌘V) এবং টুলবারে একটি বোতাম যোগ করে: স্পেকট্রাম অ্যানালাইজার, স্পেকট্রোগ্রাম, ঘুরন্ত রেকর্ডে অ্যালবাম এবং ক্লাবের আলো, নিজস্ব উইন্ডোতে যা অন্য ডিসপ্লেতে পূর্ণ স্ক্রিন হতে পারে। যা বাজছে তার একটি কপি পড়ে এবং কখনও শব্দ বদলায় না। উইন্ডো বন্ধ থাকলে এর কোনো খরচ নেই।"
+            "value": "উইন্ডো > ভিজ্যুয়ালাইজার (⌥⌘V) এবং টুলবারে একটি বোতাম যোগ করে: ঘুরন্ত রেকর্ডে অ্যালবাম, স্পেকট্রাম অ্যানালাইজার, স্পেকট্রোগ্রাম, ক্লাবের আলো, স্টেরিও স্কোপ, VU ও PPM মিটার, কণার ক্ষেত্র এবং আয়না বার, নিজস্ব উইন্ডোতে যা অন্য ডিসপ্লেতে পূর্ণ স্ক্রিন হতে পারে। যা বাজছে তার একটি কপি পড়ে এবং কখনও শব্দ বদলায় না। উইন্ডো বন্ধ থাকলে এর কোনো খরচ নেই।"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਵਿੰਡੋ > ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ (⌥⌘V) ਅਤੇ ਟੂਲਬਾਰ ਵਿੱਚ ਇੱਕ ਬਟਨ ਜੋੜਦਾ ਹੈ: ਸਪੈਕਟ੍ਰਮ ਵਿਸ਼ਲੇਸ਼ਕ, ਸਪੈਕਟ੍ਰੋਗ੍ਰਾਮ, ਘੁੰਮਦੇ ਰਿਕਾਰਡ ਉੱਤੇ ਐਲਬਮ ਅਤੇ ਕਲੱਬ ਦੀਆਂ ਰੋਸ਼ਨੀਆਂ, ਆਪਣੀ ਵੱਖਰੀ ਵਿੰਡੋ ਵਿੱਚ ਜੋ ਕਿਸੇ ਹੋਰ ਡਿਸਪਲੇ ਉੱਤੇ ਪੂਰੀ ਸਕ੍ਰੀਨ ਹੋ ਸਕਦੀ ਹੈ। ਇਹ ਜੋ ਵੱਜ ਰਿਹਾ ਹੈ ਉਸ ਦੀ ਕਾਪੀ ਪੜ੍ਹਦਾ ਹੈ ਅਤੇ ਆਵਾਜ਼ ਕਦੇ ਨਹੀਂ ਬਦਲਦਾ। ਵਿੰਡੋ ਬੰਦ ਹੋਣ ਤੇ ਇਸ ਦਾ ਕੋਈ ਭਾਰ ਨਹੀਂ।"
+            "value": "ਵਿੰਡੋ > ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ (⌥⌘V) ਅਤੇ ਟੂਲਬਾਰ ਵਿੱਚ ਇੱਕ ਬਟਨ ਜੋੜਦਾ ਹੈ: ਘੁੰਮਦੇ ਰਿਕਾਰਡ ਉੱਤੇ ਐਲਬਮ, ਸਪੈਕਟ੍ਰਮ ਵਿਸ਼ਲੇਸ਼ਕ, ਸਪੈਕਟ੍ਰੋਗ੍ਰਾਮ, ਕਲੱਬ ਦੀਆਂ ਰੋਸ਼ਨੀਆਂ, ਸਟੀਰੀਓ ਸਕੋਪ, VU ਅਤੇ PPM ਮੀਟਰ, ਕਣਾਂ ਦਾ ਖੇਤਰ ਅਤੇ ਸ਼ੀਸ਼ੇ ਵਾਲੀਆਂ ਬਾਰਾਂ, ਆਪਣੀ ਵੱਖਰੀ ਵਿੰਡੋ ਵਿੱਚ ਜੋ ਕਿਸੇ ਹੋਰ ਡਿਸਪਲੇ ਉੱਤੇ ਪੂਰੀ ਸਕ੍ਰੀਨ ਹੋ ਸਕਦੀ ਹੈ। ਇਹ ਜੋ ਵੱਜ ਰਿਹਾ ਹੈ ਉਸ ਦੀ ਕਾਪੀ ਪੜ੍ਹਦਾ ਹੈ ਅਤੇ ਆਵਾਜ਼ ਕਦੇ ਨਹੀਂ ਬਦਲਦਾ। ਵਿੰਡੋ ਬੰਦ ਹੋਣ ਤੇ ਇਸ ਦਾ ਕੋਈ ਭਾਰ ਨਹੀਂ।"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "વિન્ડો > વિઝ્યુઅલાઇઝર (⌥⌘V) અને ટૂલબારમાં એક બટન ઉમેરે છે: સ્પેક્ટ્રમ વિશ્લેષક, સ્પેક્ટ્રોગ્રામ, ફરતી રેકોર્ડ પર આલ્બમ અને ક્લબની લાઇટો, પોતાની અલગ વિન્ડોમાં જે બીજા ડિસ્પ્લે પર પૂર્ણ સ્ક્રીન થઈ શકે છે. જે વાગે છે તેની નકલ વાંચે છે અને અવાજ ક્યારેય બદલતું નથી. વિન્ડો બંધ હોય ત્યારે તેનો કોઈ ભાર નથી."
+            "value": "વિન્ડો > વિઝ્યુઅલાઇઝર (⌥⌘V) અને ટૂલબારમાં એક બટન ઉમેરે છે: ફરતી રેકોર્ડ પર આલ્બમ, સ્પેક્ટ્રમ વિશ્લેષક, સ્પેક્ટ્રોગ્રામ, ક્લબની લાઇટો, સ્ટીરિયો સ્કોપ, VU અને PPM મીટર, કણોનું ક્ષેત્ર અને અરીસા જેવા બાર, પોતાની અલગ વિન્ડોમાં જે બીજા ડિસ્પ્લે પર પૂર્ણ સ્ક્રીન થઈ શકે છે. જે વાગે છે તેની નકલ વાંચે છે અને અવાજ ક્યારેય બદલતું નથી. વિન્ડો બંધ હોય ત્યારે તેનો કોઈ ભાર નથી."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "विंडो > व्हिज्युअलायझर (⌥⌘V) आणि टूलबारमध्ये एक बटण जोडते: स्पेक्ट्रम विश्लेषक, स्पेक्ट्रोग्राम, फिरत्या रेकॉर्डवरील अल्बम आणि क्लबचे दिवे, स्वतःच्या विंडोमध्ये जी दुसऱ्या डिस्प्लेवर पूर्ण स्क्रीन होऊ शकते. जे वाजत आहे त्याची प्रत वाचते आणि आवाज कधीही बदलत नाही. विंडो बंद असताना त्याचा काहीही भार नाही."
+            "value": "विंडो > व्हिज्युअलायझर (⌥⌘V) आणि टूलबारमध्ये एक बटण जोडते: फिरत्या रेकॉर्डवरील अल्बम, स्पेक्ट्रम विश्लेषक, स्पेक्ट्रोग्राम, क्लबचे दिवे, स्टिरिओ स्कोप, VU आणि PPM मीटर, कणांचे क्षेत्र आणि आरशासारखे बार, स्वतःच्या विंडोमध्ये जी दुसऱ्या डिस्प्लेवर पूर्ण स्क्रीन होऊ शकते. जे वाजत आहे त्याची प्रत वाचते आणि आवाज कधीही बदलत नाही. विंडो बंद असताना त्याचा काहीही भार नाही."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "சாளரம் > காட்சிப்படுத்தி (⌥⌘V) மற்றும் கருவிப்பட்டியில் ஒரு பொத்தானைச் சேர்க்கிறது: ஸ்பெக்ட்ரம் பகுப்பாய்வி, ஸ்பெக்ட்ரோகிராம், சுழலும் இசைத்தட்டில் ஆல்பம் மற்றும் கிளப் விளக்குகள், வேறொரு திரையில் முழுத் திரையாகக்கூடிய தனிச் சாளரத்தில். ஒலிப்பதன் நகலை மட்டுமே படிக்கிறது, ஒலியை ஒருபோதும் மாற்றாது. சாளரம் மூடியிருக்கும்போது இதற்கு எந்தச் சுமையும் இல்லை."
+            "value": "சாளரம் > காட்சிப்படுத்தி (⌥⌘V) மற்றும் கருவிப்பட்டியில் ஒரு பொத்தானைச் சேர்க்கிறது: சுழலும் இசைத்தட்டில் ஆல்பம், ஸ்பெக்ட்ரம் பகுப்பாய்வி, ஸ்பெக்ட்ரோகிராம், கிளப் விளக்குகள், ஸ்டீரியோ ஸ்கோப், VU மற்றும் PPM மீட்டர்கள், துகள் புலம் மற்றும் கண்ணாடி பட்டைகள், வேறொரு திரையில் முழுத் திரையாகக்கூடிய தனிச் சாளரத்தில். ஒலிப்பதன் நகலை மட்டுமே படிக்கிறது, ஒலியை ஒருபோதும் மாற்றாது. சாளரம் மூடியிருக்கும்போது இதற்கு எந்தச் சுமையும் இல்லை."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "విండో > విజువలైజర్ (⌥⌘V) మరియు టూల్‌బార్‌లో ఒక బటన్‌ను జోడిస్తుంది: స్పెక్ట్రమ్ విశ్లేషకం, స్పెక్ట్రోగ్రామ్, తిరిగే రికార్డుపై ఆల్బమ్ మరియు క్లబ్ దీపాలు, మరో డిస్‌ప్లేపై పూర్తి స్క్రీన్ కాగల సొంత విండోలో. ప్లే అవుతున్న దాని నకలును మాత్రమే చదువుతుంది, ధ్వనిని ఎప్పుడూ మార్చదు. విండో మూసి ఉన్నప్పుడు దీనికి ఎలాంటి భారం లేదు."
+            "value": "విండో > విజువలైజర్ (⌥⌘V) మరియు టూల్‌బార్‌లో ఒక బటన్‌ను జోడిస్తుంది: తిరిగే రికార్డుపై ఆల్బమ్, స్పెక్ట్రమ్ విశ్లేషకం, స్పెక్ట్రోగ్రామ్, క్లబ్ దీపాలు, స్టీరియో స్కోప్, VU మరియు PPM మీటర్లు, కణాల క్షేత్రం మరియు అద్దం బార్లు, మరో డిస్‌ప్లేపై పూర్తి స్క్రీన్ కాగల సొంత విండోలో. ప్లే అవుతున్న దాని నకలును మాత్రమే చదువుతుంది, ధ్వనిని ఎప్పుడూ మార్చదు. విండో మూసి ఉన్నప్పుడు దీనికి ఎలాంటి భారం లేదు."
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ವಿಂಡೋ > ದೃಶ್ಯೀಕರಣ (⌥⌘V) ಮತ್ತು ಟೂಲ್‌ಬಾರ್‌ನಲ್ಲಿ ಒಂದು ಬಟನ್ ಸೇರಿಸುತ್ತದೆ: ಸ್ಪೆಕ್ಟ್ರಮ್ ವಿಶ್ಲೇಷಕ, ಸ್ಪೆಕ್ಟ್ರೋಗ್ರಾಮ್, ತಿರುಗುವ ರೆಕಾರ್ಡ್ ಮೇಲಿನ ಆಲ್ಬಮ್ ಮತ್ತು ಕ್ಲಬ್ ದೀಪಗಳು, ಬೇರೆ ಡಿಸ್‌ಪ್ಲೇಯಲ್ಲಿ ಪೂರ್ಣ ಪರದೆಯಾಗಬಲ್ಲ ತನ್ನದೇ ವಿಂಡೋದಲ್ಲಿ. ಪ್ಲೇ ಆಗುತ್ತಿರುವುದರ ನಕಲನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಧ್ವನಿಯನ್ನು ಎಂದಿಗೂ ಬದಲಾಯಿಸುವುದಿಲ್ಲ. ವಿಂಡೋ ಮುಚ್ಚಿದ್ದಾಗ ಇದಕ್ಕೆ ಯಾವ ಹೊರೆಯೂ ಇಲ್ಲ."
+            "value": "ವಿಂಡೋ > ದೃಶ್ಯೀಕರಣ (⌥⌘V) ಮತ್ತು ಟೂಲ್‌ಬಾರ್‌ನಲ್ಲಿ ಒಂದು ಬಟನ್ ಸೇರಿಸುತ್ತದೆ: ತಿರುಗುವ ರೆಕಾರ್ಡ್ ಮೇಲಿನ ಆಲ್ಬಮ್, ಸ್ಪೆಕ್ಟ್ರಮ್ ವಿಶ್ಲೇಷಕ, ಸ್ಪೆಕ್ಟ್ರೋಗ್ರಾಮ್, ಕ್ಲಬ್ ದೀಪಗಳು, ಸ್ಟೀರಿಯೋ ಸ್ಕೋಪ್, VU ಮತ್ತು PPM ಮೀಟರ್‌ಗಳು, ಕಣಗಳ ಕ್ಷೇತ್ರ ಮತ್ತು ಕನ್ನಡಿ ಬಾರ್‌ಗಳು, ಬೇರೆ ಡಿಸ್‌ಪ್ಲೇಯಲ್ಲಿ ಪೂರ್ಣ ಪರದೆಯಾಗಬಲ್ಲ ತನ್ನದೇ ವಿಂಡೋದಲ್ಲಿ. ಪ್ಲೇ ಆಗುತ್ತಿರುವುದರ ನಕಲನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಧ್ವನಿಯನ್ನು ಎಂದಿಗೂ ಬದಲಾಯಿಸುವುದಿಲ್ಲ. ವಿಂಡೋ ಮುಚ್ಚಿದ್ದಾಗ ಇದಕ್ಕೆ ಯಾವ ಹೊರೆಯೂ ಇಲ್ಲ."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "വിൻഡോ > വിഷ്വലൈസർ (⌥⌘V)‌ഉം ടൂൾബാറിൽ ഒരു ബട്ടണും ചേർക്കുന്നു: സ്പെക്ട്രം അനലൈസർ, സ്പെക്ട്രോഗ്രാം, കറങ്ങുന്ന റെക്കോർഡിലെ ആൽബം, ക്ലബ് വിളക്കുകൾ, മറ്റൊരു ഡിസ്‌പ്ലേയിൽ പൂർണ്ണ സ്ക്രീൻ ആകാവുന്ന സ്വന്തം വിൻഡോയിൽ. പ്ലേ ചെയ്യുന്നതിന്റെ പകർപ്പ് മാത്രം വായിക്കുന്നു, ശബ്ദം ഒരിക്കലും മാറ്റുന്നില്ല. വിൻഡോ അടച്ചിരിക്കുമ്പോൾ ഇതിന് ഒരു ഭാരവുമില്ല."
+            "value": "വിൻഡോ > വിഷ്വലൈസർ (⌥⌘V)‌ഉം ടൂൾബാറിൽ ഒരു ബട്ടണും ചേർക്കുന്നു: കറങ്ങുന്ന റെക്കോർഡിലെ ആൽബം, സ്പെക്ട്രം അനലൈസർ, സ്പെക്ട്രോഗ്രാം, ക്ലബ് വിളക്കുകൾ, സ്റ്റീരിയോ സ്കോപ്പ്, VU, PPM മീറ്ററുകൾ, കണങ്ങളുടെ മണ്ഡലം, കണ്ണാടി ബാറുകൾ, മറ്റൊരു ഡിസ്‌പ്ലേയിൽ പൂർണ്ണ സ്ക്രീൻ ആകാവുന്ന സ്വന്തം വിൻഡോയിൽ. പ്ലേ ചെയ്യുന്നതിന്റെ പകർപ്പ് മാത്രം വായിക്കുന്നു, ശബ്ദം ഒരിക്കലും മാറ്റുന്നില്ല. വിൻഡോ അടച്ചിരിക്കുമ്പോൾ ഇതിന് ഒരു ഭാരവുമില്ല."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "เพิ่ม หน้าต่าง > ภาพเคลื่อนไหวตามเสียง (⌥⌘V) และปุ่มในแถบเครื่องมือ: ตัววิเคราะห์สเปกตรัม สเปกโตรแกรม อัลบั้มบนแผ่นเสียงที่หมุน และไฟคลับ ในหน้าต่างของตัวเองที่เต็มหน้าจอบนจอภาพอื่นได้ อ่านเพียงสำเนาของสิ่งที่กำลังเล่นและไม่เปลี่ยนเสียงเลย เมื่อปิดหน้าต่างก็ไม่สิ้นเปลืองอะไร"
+            "value": "เพิ่ม หน้าต่าง > ภาพเคลื่อนไหวตามเสียง (⌥⌘V) และปุ่มในแถบเครื่องมือ: อัลบั้มบนแผ่นเสียงที่หมุน ตัววิเคราะห์สเปกตรัม สเปกโตรแกรม ไฟคลับ สโคปสเตอริโอ มาตรวัด VU และ PPM สนามอนุภาค และแท่งสะท้อน ในหน้าต่างของตัวเองที่เต็มหน้าจอบนจอภาพอื่นได้ อ่านเพียงสำเนาของสิ่งที่กำลังเล่นและไม่เปลี่ยนเสียงเลย เมื่อปิดหน้าต่างก็ไม่สิ้นเปลืองอะไร"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入「視窗」>「視覺效果」（⌥⌘V）和工具列按鈕：在轉動唱片上的專輯、頻譜分析儀、頻譜圖、夜店燈光、立體聲示波器、VU 與 PPM 表、粒子場以及鏡像長條，顯示在獨立的視窗中，可在另一部顯示器上全螢幕。它只讀取播放內容的副本，絕不改變聲音。視窗關閉時毫無負擔。"
           }
         }
       }
@@ -88501,6 +88770,275 @@
         }
       }
     },
+    "Automatic": {
+      "comment": "Visualizer option: the meters' reference follows the music's loudness.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatique"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automático"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatico"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automático"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automático"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisk"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisk"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisk"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automaattinen"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatyczny"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automaticky"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatikus"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automat"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomatik"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Автоматично"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτόματα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomatis"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatik"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Awtomatiko"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiotomatiki"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kai tsaye"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ራስ-ሰር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تلقائي"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خودکار"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אוטומטית"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خودکار"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्वचालित"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্বয়ংক্রিয়"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਟੋਮੈਟਿਕ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આપમેળે"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्वयंचलित"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தானியங்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్వయంచాలకం"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ವಯಂಚಾಲಿತ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്വയമേവ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัตโนมัติ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        }
+      }
+    },
     "Automatic updates": {
       "extractionState": "manual",
       "localizations": {
@@ -90918,6 +91456,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "แสงแฟลชตามจังหวะ"
+          }
+        }
+      }
+    },
+    "Beat strobe in the Club style": {
+      "comment": "Settings toggle: the visualizer's beat strobe.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beat-Stroboskop im Club-Stil"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboscope sur le rythme dans le style Club"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estroboscopio al ritmo en el estilo Club"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboscopio a tempo nello stile Club"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estroboscópio na batida no estilo Balada"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estroboscópio no ritmo no estilo Discoteca"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboscoop op de beat in de stijl Club"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop i takt i stilen Klubb"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop i takt i stilen Klub"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop i takt i stilen Klubb"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahtistrobo Klubi-tyylissä"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop w rytm w stylu Klub"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop do rytmu ve stylu Klub"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ütemre villogó fény a Klub stílusban"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboscop pe ritm în stilul Club"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kulüp stilinde ritimle çakar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стробоскоп у ритм у стилі «Клуб»"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Στροβοσκόπιο στον ρυθμό στο στιλ Κλαμπ"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラブスタイルでビートでストロボ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "클럽 스타일에서 비트 스트로브"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "夜店风格中的节拍频闪"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "夜店風格中的節拍閃光"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nháy theo nhịp ở kiểu Câu lạc bộ"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strobo mengikuti ketukan di gaya Klub"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strob mengikut rentak dalam gaya Kelab"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strobe sa beat sa istilong Club"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mwako wa mdundo katika mtindo wa Klabu"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walƙiya a kan bugu a salon Kulob"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በክለብ ስልት በምት የሚያበራ ብልጭታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الوميض مع الإيقاع في نمط النادي الليلي"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چشمک با ضرب در سبک کلاب"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סטרובוסקופ בקצב בסגנון מועדון"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کلب انداز میں تال پر اسٹروب"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "क्लब शैली में ताल पर स्ट्रोब"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ক্লাব শৈলীতে তালে স্ট্রোব"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਲੱਬ ਸ਼ੈਲੀ ਵਿੱਚ ਤਾਲ ਤੇ ਸਟ੍ਰੋਬ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ક્લબ શૈલીમાં તાલ પર સ્ટ્રોબ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "क्लब शैलीत तालावर स्ट्रोब"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கிளப் பாணியில் தாளத்தில் ஸ்ட்ரோப்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "క్లబ్ శైలిలో తాళానికి స్ట్రోబ్"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕ್ಲಬ್ ಶೈಲಿಯಲ್ಲಿ ತಾಳಕ್ಕೆ ಸ್ಟ್ರೋಬ್"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ക്ലബ് ശൈലിയിൽ താളത്തിൽ സ്ട്രോബ്"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แสงแฟลชตามจังหวะในสไตล์คลับ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "夜店風格中的節拍閃光"
           }
         }
       }
@@ -109268,6 +110075,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "選擇…"
+          }
+        }
+      }
+    },
+    "Circle": {
+      "comment": "Visualizer option: mirrored bars around a circle.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kreis"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cercle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Círculo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerchio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Círculo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Círculo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cirkel"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cirkel"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cirkel"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sirkel"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ympyrä"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okrąg"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kruh"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kör"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerc"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daire"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коло"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κύκλος"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "円"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "원"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "圆形"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "圓形"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hình tròn"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lingkaran"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bulatan"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilog"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duara"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da'ira"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ክብ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دائرة"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دایره"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עיגול"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دائرہ"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वृत्त"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বৃত্ত"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਚੱਕਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વર્તુળ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वर्तुळ"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வட்டம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వృత్తం"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವೃತ್ತ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വൃത്തം"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "วงกลม"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "圓形"
           }
         }
       }
@@ -140176,6 +141252,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "關閉"
+          }
+        }
+      }
+    },
+    "Display": {
+      "comment": "Visualizer option: what the scope shows (goniometer or oscilloscope).",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anzeige"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affichage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualización"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizzazione"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exibição"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualização"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weergave"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visning"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visning"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visning"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Näkymä"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widok"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zobrazení"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Megjelenítés"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afișare"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görünüm"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показ"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Προβολή"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表示"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "표시"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiển thị"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tampilan"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paparan"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ipakita"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onyesho"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuni"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ማሳያ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العرض"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمایش"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תצוגה"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمائش"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रदर्शन"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রদর্শন"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਡਿਸਪਲੇ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પ્રદર્શન"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रदर्शन"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "காட்சி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రదర్శన"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರದರ್ಶನ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്രദർശനം"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การแสดง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示"
           }
         }
       }
@@ -175085,6 +176430,275 @@
         }
       }
     },
+    "Goniometer": {
+      "comment": "Visualizer scope: left against right (a stereo Lissajous figure).",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniomètre"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniómetro"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometro"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniômetro"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniómetro"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometri"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometr"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometr"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniométer"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometru"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometre"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Гоніометр"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Γωνιόμετρο"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゴニオメーター"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고니오미터"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相位仪"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相位儀"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy đo pha"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniometer"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniomita"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goniomita"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ጎኒዮሜትር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقياس الطور"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گونیومتر"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "גוניומטר"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گونیومیٹر"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गोनियोमीटर"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "গোনিওমিটার"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੋਨੀਓਮੀਟਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગોનિયોમીટર"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गोनिओमीटर"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கோனியோமீட்டர்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "గోనియోమీటర్"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಗೋನಿಯೋಮೀಟರ್"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഗോണിയോമീറ്റർ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "โกนิโอมิเตอร์"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相位儀"
+          }
+        }
+      }
+    },
     "Grouping": {
       "comment": "Tag field.",
       "extractionState": "manual",
@@ -196452,6 +198066,275 @@
         }
       }
     },
+    "Line": {
+      "comment": "Visualizer option: mirrored bars up and down from a line.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligne"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Línea"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linea"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linha"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linha"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lijn"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linje"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linje"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linje"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Viiva"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linia"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Čára"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vonal"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çizgi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Лінія"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Γραμμή"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライン"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "선"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直线"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直線"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đường thẳng"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garis"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garisan"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linya"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mstari"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layi"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መስመር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خط"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خط"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קו"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لکیر"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रेखा"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রেখা"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰੇਖਾ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રેખા"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रेषा"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கோடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రేఖ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ರೇಖೆ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "രേഖ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เส้น"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直線"
+          }
+        }
+      }
+    },
     "Line %@ of the calibration file has a frequency that isn't above 0 Hz.": {
       "localizations": {
         "am": {
@@ -212668,6 +214551,275 @@
         }
       }
     },
+    "May trigger seizures in people with photosensitive epilepsy.": {
+      "comment": "Visualizer: help for the beat strobe option.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kann bei Menschen mit fotosensitiver Epilepsie Anfälle auslösen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peut déclencher des crises chez les personnes atteintes d’épilepsie photosensible."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puede provocar crisis en personas con epilepsia fotosensible."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Può scatenare crisi nelle persone con epilessia fotosensibile."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pode provocar crises em pessoas com epilepsia fotossensível."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pode provocar crises em pessoas com epilepsia fotossensível."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan aanvallen veroorzaken bij mensen met fotosensitieve epilepsie."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan utlösa anfall hos personer med fotosensitiv epilepsi."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan udløse anfald hos personer med fotosensitiv epilepsi."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan utløse anfall hos personer med fotosensitiv epilepsi."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voi laukaista kohtauksia ihmisillä, joilla on valoherkkä epilepsia."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Może wywołać napady u osób z padaczką fotogenną."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Může u lidí s fotosenzitivní epilepsií vyvolat záchvat."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fényérzékeny epilepsziában szenvedőknél rohamot válthat ki."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poate declanșa crize la persoanele cu epilepsie fotosensibilă."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Işığa duyarlı epilepsisi olan kişilerde nöbetleri tetikleyebilir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Може спричинити напади в людей із фоточутливою епілепсією."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μπορεί να προκαλέσει κρίσεις σε άτομα με φωτοευαίσθητη επιληψία."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光過敏性てんかんのある人に発作を引き起こすことがあります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광과민성 뇌전증이 있는 사람에게 발작을 일으킬 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可能会诱发光敏性癫痫患者发作。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可能會誘發光敏性癲癇患者發作。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có thể gây co giật ở người mắc chứng động kinh nhạy cảm với ánh sáng."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dapat memicu kejang pada orang dengan epilepsi fotosensitif."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boleh mencetuskan sawan pada orang yang menghidap epilepsi fotosensitif."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maaaring magdulot ng seizure sa mga taong may photosensitive epilepsy."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kinaweza kusababisha kifafa kwa watu wenye kifafa kinachochochewa na mwanga."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na iya jawo farfaɗiya ga mutanen da ke da farfaɗiyar da haske ke tayarwa."
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በብርሃን የሚቀሰቀስ የሚጥል በሽታ ባለባቸው ሰዎች ላይ መናድ ሊያስከትል ይችላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قد يؤدي إلى نوبات لدى المصابين بالصرع الحساس للضوء."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ممکن است در افراد مبتلا به صرع حساس به نور باعث تشنج شود."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עלול לגרום להתקפים אצל אנשים עם אפילפסיה רגישה לאור."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روشنی سے حساس مرگی والے لوگوں میں دورے کا سبب بن سکتا ہے۔"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रकाश-संवेदी मिर्गी वाले लोगों में दौरे ला सकता है।"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আলোক-সংবেদী মৃগীরোগে আক্রান্ত মানুষের খিঁচুনি ঘটাতে পারে।"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰੋਸ਼ਨੀ ਪ੍ਰਤੀ ਸੰਵੇਦਨਸ਼ੀਲ ਮਿਰਗੀ ਵਾਲੇ ਲੋਕਾਂ ਵਿੱਚ ਦੌਰੇ ਲਿਆ ਸਕਦਾ ਹੈ।"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પ્રકાશ-સંવેદનશીલ વાઈ ધરાવતા લોકોમાં હુમલો લાવી શકે છે."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रकाश-संवेदनशील अपस्मार असलेल्या लोकांमध्ये झटके आणू शकतो."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒளி உணர்திறன் வலிப்பு உள்ளவர்களுக்கு வலிப்பைத் தூண்டக்கூடும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కాంతి సున్నితత్వ మూర్ఛ ఉన్నవారిలో మూర్ఛను కలిగించవచ్చు."
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೆಳಕಿಗೆ ಸಂವೇದನಾಶೀಲ ಅಪಸ್ಮಾರ ಇರುವವರಲ್ಲಿ ಸೆಳವು ಉಂಟುಮಾಡಬಹುದು."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്രകാശ സംവേദനക്ഷമമായ അപസ്മാരമുള്ളവരിൽ അപസ്മാരം ഉണ്ടാക്കിയേക്കാം."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อาจกระตุ้นให้เกิดอาการชักในผู้ที่เป็นโรคลมชักที่ไวต่อแสง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可能會誘發光敏性癲癇患者發作。"
+          }
+        }
+      }
+    },
     "Measure the room": {
       "localizations": {
         "am": {
@@ -214544,6 +216696,544 @@
         }
       }
     },
+    "Meter": {
+      "comment": "Visualizer option: which meter (VU or PPM).",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messgerät"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicateur"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidor"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicatore"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidor"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidor"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mätare"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måler"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måler"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mittari"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miernik"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Měřič"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mérő"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicator"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gösterge"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Індикатор"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μετρητής"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メーター"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미터"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng hồ"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mita"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mita"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መለኪያ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقياس"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشانگر"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מד"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹر"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मीटर"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মিটার"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੀਟਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મીટર"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मीटर"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மீட்டர்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీటర్"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮೀಟರ್"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മീറ്റർ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "มาตรวัด"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "表"
+          }
+        }
+      }
+    },
+    "Meters": {
+      "comment": "Visualizer style: a pair of analogue VU or PPM meters with needles.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messinstrumente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vumètres"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vúmetros"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicatori"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidores"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medidores"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meters"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mätare"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Målere"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Målere"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mittarit"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mierniki"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Měřiče"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mérők"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indicatoare"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Göstergeler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Індикатори"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μετρητές"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メーター"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미터"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "电平表"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "電平表"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đồng hồ đo"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meter"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Meter"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mita"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitoci"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መለኪያዎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقاييس"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشانگرها"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מדים"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹرز"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मीटर"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মিটার"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੀਟਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મીટર"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मीटर"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மீட்டர்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీటర్లు"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮೀಟರ್‌ಗಳು"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മീറ്ററുകൾ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "มาตรวัด"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "電平表"
+          }
+        }
+      }
+    },
     "Microphone %@ · measured %@ · preamp %@ dB": {
       "localizations": {
         "am": {
@@ -216416,6 +219106,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "迷你播放器（⇧⌘M）"
+          }
+        }
+      }
+    },
+    "Mirrored": {
+      "comment": "Visualizer style: the bar spectrum mirrored, around a circle or across a line.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespiegelt"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miroir"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espejo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Specchio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espelhado"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espelhado"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespiegeld"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speglad"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spejlet"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speilet"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peilattu"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lustrzane"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zrcadlené"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tükrözött"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "În oglindă"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aynalı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дзеркально"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κατοπτρικό"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミラー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미러"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "镜像"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鏡像"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đối xứng"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cermin"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cermin"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-mirror"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kioo"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Madubi"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መስታወት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متناظر"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرینه"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מראה"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آئینہ دار"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दर्पण"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আয়না"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸ਼ੀਸ਼ਾ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અરીસો"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आरसा"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கண்ணாடி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అద్దం"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕನ್ನಡಿ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണ്ണാടി"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สะท้อน"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "鏡像"
           }
         }
       }
@@ -237790,6 +240749,275 @@
         }
       }
     },
+    "No strobe while Dim Flashing Lights is on.": {
+      "comment": "Visualizer: why the strobe option is unavailable (the macOS accessibility setting Dim Flashing Lights).",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Stroboskop, solange „Blinkende Lichter abdunkeln“ an ist."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas de stroboscope quand « Atténuer les lumières clignotantes » est activé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin estroboscopio mientras «Atenuar luces intermitentes» esté activado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niente stroboscopio con “Attenua luci lampeggianti” attivo."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem estroboscópio enquanto “Atenuar luzes piscantes” estiver ativado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem estroboscópio enquanto “Atenuar luzes intermitentes” estiver ativo."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen stroboscoop zolang ‘Dim knipperende lichten’ aan staat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inget stroboskop när Dämpa blinkande ljus är på."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intet stroboskop, mens Dæmp blinkende lys er slået til."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen stroboskop mens Demp blinkende lys er på."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei stroboa, kun Himmennä välkkyviä valoja on päällä."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bez stroboskopu, gdy włączone jest Przyciemnij migające światła."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bez stroboskopu, když je zapnuté Ztlumit blikající světla."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nincs villogás, amíg a Villogó fények tompítása be van kapcsolva."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fără stroboscop cât timp Atenuare lumini intermitente este activată."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yanıp Sönen Işıkları Karart açıkken çakar yok."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Без стробоскопа, поки ввімкнено «Приглушення миготливого світла»."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Χωρίς στροβοσκόπιο όσο είναι ενεργή η Μείωση φώτων που αναβοσβήνουν."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「点滅する光を暗くする」がオンのあいだはストロボは使えません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "깜박이는 빛 어둡게 하기가 켜져 있는 동안에는 스트로브를 쓸 수 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“减弱闪烁的光线”打开时不使用频闪。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「調暗閃爍的光線」開啟時不使用閃光。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không nháy khi Làm mờ đèn nhấp nháy đang bật."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada strobo saat Redupkan Cahaya Berkedip aktif."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada strob semasa Malapkan Cahaya Berkelip dihidupkan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang strobe habang naka-on ang Dim Flashing Lights."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna mwako wakati Fifisha Taa Zinazomulika umewashwa."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu walƙiya yayin da Rage Fitilun Walƙiya ke kunne."
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የሚያብለጨልጩ መብራቶችን አደብዝዝ በርቶ ሳለ ብልጭታ የለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا وميض أثناء تشغيل تخفيف الأضواء الوامضة."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تا وقتی «کم‌نور کردن نورهای چشمک‌زن» روشن است، چشمک‌زن نیست."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין סטרובוסקופ כש״עמעום אורות מהבהבים״ פעיל."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چمکتی روشنیاں مدھم کریں آن ہونے تک اسٹروب نہیں۔"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चमकती रोशनी धीमी करें चालू रहने तक स्ट्रोब नहीं।"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ঝলকানো আলো ম্লান করুন চালু থাকলে স্ট্রোব নেই।"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਚਮਕਦੀਆਂ ਰੋਸ਼ਨੀਆਂ ਮੱਧਮ ਕਰੋ ਚਾਲੂ ਹੋਣ ਤੱਕ ਸਟ੍ਰੋਬ ਨਹੀਂ।"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ઝબકતી લાઇટો ઝાંખી કરો ચાલુ હોય ત્યાં સુધી સ્ટ્રોબ નહીં."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चमकणारे दिवे मंद करा सुरू असताना स्ट्रोब नाही."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மின்னும் விளக்குகளை மங்கச்செய் இயக்கத்தில் இருக்கும்போது ஸ்ட்ரோப் இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మెరిసే దీపాలను మసకబార్చు ఆన్‌లో ఉన్నంతవరకు స్ట్రోబ్ ఉండదు."
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮಿನುಗುವ ದೀಪಗಳನ್ನು ಮಂದಗೊಳಿಸಿ ಆನ್ ಇರುವಾಗ ಸ್ಟ್ರೋಬ್ ಇಲ್ಲ."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മിന്നുന്ന വെളിച്ചം മങ്ങിക്കുക ഓണായിരിക്കുമ്പോൾ സ്ട്രോബ് ഇല്ല."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มีแสงแฟลชขณะเปิดหรี่แสงกะพริบ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「調暗閃爍的光線」開啟時不使用閃光。"
+          }
+        }
+      }
+    },
     "No strobe while Reduce Motion is on.": {
       "comment": "Visualizer: why the strobe option is unavailable.",
       "localizations": {
@@ -254813,6 +258041,275 @@
         }
       }
     },
+    "Oscilloscope": {
+      "comment": "Visualizer scope: left and right waveforms against time.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitverlauf"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscope temporel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscopio temporal"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscopio nel tempo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscópio no tempo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscópio no tempo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscoop"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop över tid"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop over tid"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop over tid"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aikatason oskilloskooppi"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscyloskop w czasie"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Časový osciloskop"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Időalapú oszcilloszkóp"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscop în timp"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaman osiloskobu"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Часовий осцилограф"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παλμογράφος χρόνου"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オシロスコープ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오실로스코프"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时域示波器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時域示波器"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dao động ký"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop waktu"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop masa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscope"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskopu"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ኦሲሎስኮፕ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "راسم الموجات"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسیلوسکوپ زمانی"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אוסצילוסקופ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آسیلوسکوپ"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ऑसिलोस्कोप"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অসিলোস্কোপ"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਔਸਿਲੋਸਕੋਪ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ઓસિલોસ્કોપ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ऑसिलोस्कोप"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அலைக்காட்டி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆసిలోస్కోప్"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಸಿಲೋಸ್ಕೋಪ್"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓസിലോസ്കോപ്പ്"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ออสซิลโลสโคป"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "時域示波器"
+          }
+        }
+      }
+    },
     "Other": {
       "comment": "How an audio device is connected: some other way.",
       "extractionState": "manual",
@@ -260766,6 +264263,275 @@
         }
       }
     },
+    "Particles": {
+      "comment": "Visualizer style: a field of particles moving with the music.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partikel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Particules"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partículas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Particelle"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partículas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partículas"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deeltjes"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partiklar"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partikler"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partikler"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiukkaset"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cząsteczki"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Částice"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Részecskék"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Particule"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parçacıklar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Частинки"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σωματίδια"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パーティクル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파티클"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粒子"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粒子"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hạt"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partikel"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zarah"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Particle"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chembe"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙwayoyi"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቅንጣቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الجسيمات"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذرات"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חלקיקים"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذرات"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कण"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কণা"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਣ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કણો"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कण"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "துகள்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కణాలు"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕಣಗಳು"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കണങ്ങൾ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อนุภาค"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粒子"
+          }
+        }
+      }
+    },
     "Password": {
       "localizations": {
         "am": {
@@ -261836,6 +265602,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "เครื่องหมายจุดสูงสุด"
+          }
+        }
+      }
+    },
+    "Photosensitivity Warning": {
+      "comment": "Visualizer: title of the warning shown before the strobe is first turned on.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warnung zur Lichtempfindlichkeit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avertissement de photosensibilité"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aviso de fotosensibilidad"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avviso di fotosensibilità"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aviso de fotossensibilidade"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aviso de fotossensibilidade"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waarschuwing voor lichtgevoeligheid"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varning för ljuskänslighet"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advarsel om lysfølsomhed"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Advarsel om lysfølsomhet"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valoherkkyysvaroitus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ostrzeżenie o nadwrażliwości na światło"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varování před citlivostí na světlo"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fényérzékenységi figyelmeztetés"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avertisment de fotosensibilitate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Işık Hassasiyeti Uyarısı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Попередження про світлочутливість"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Προειδοποίηση φωτοευαισθησίας"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光過敏性に関する警告"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "광과민성 경고"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光敏性警告"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光敏性警告"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cảnh báo nhạy cảm ánh sáng"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peringatan Fotosensitivitas"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amaran Fotosensitiviti"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babala sa Photosensitivity"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onyo la Unyeti wa Mwanga"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gargaɗin Saurin Jin Haske"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የብርሃን ትብነት ማስጠንቀቂያ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تحذير من الحساسية للضوء"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هشدار حساسیت به نور"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אזהרת רגישות לאור"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روشنی سے حساسیت کی تنبیہ"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रकाश संवेदनशीलता चेतावनी"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আলোক সংবেদনশীলতা সতর্কতা"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰੋਸ਼ਨੀ ਸੰਵੇਦਨਸ਼ੀਲਤਾ ਚੇਤਾਵਨੀ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પ્રકાશ સંવેદનશીલતા ચેતવણી"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रकाश संवेदनशीलता चेतावणी"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒளி உணர்திறன் எச்சரிக்கை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కాంతి సున్నితత్వ హెచ్చరిక"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೆಳಕಿನ ಸಂವೇದನೆ ಎಚ್ಚರಿಕೆ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്രകാശ സംവേദനക്ഷമത മുന്നറിയിപ്പ്"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คำเตือนเรื่องความไวต่อแสง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光敏性警告"
           }
         }
       }
@@ -275839,6 +279874,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "原地參照"
+          }
+        }
+      }
+    },
+    "Reference Level": {
+      "comment": "Visualizer option: the level the meters read as 0 VU / PPM 4.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bezugspegel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niveau de référence"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nivel de referencia"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livello di riferimento"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nível de referência"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nível de referência"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referentieniveau"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referensnivå"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referenceniveau"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referansenivå"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertailutaso"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poziom odniesienia"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referenční úroveň"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referenciaszint"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nivel de referință"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Referans Seviyesi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Опорний рівень"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Στάθμη αναφοράς"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "基準レベル"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기준 레벨"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参考电平"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "參考電平"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mức tham chiếu"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Level Referensi"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paras Rujukan"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reference Level"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiwango cha Marejeo"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matakin Tunani"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የማጣቀሻ ደረጃ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستوى المرجعي"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سطح مرجع"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רמת ייחוס"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حوالہ سطح"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संदर्भ स्तर"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রেফারেন্স স্তর"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਵਾਲਾ ਪੱਧਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સંદર્ભ સ્તર"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संदर्भ पातळी"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "குறிப்பு நிலை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సూచన స్థాయి"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಉಲ್ಲೇಖ ಮಟ್ಟ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "റഫറൻസ് നില"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระดับอ้างอิง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "參考電平"
           }
         }
       }
@@ -294777,6 +299081,275 @@
         }
       }
     },
+    "Scope": {
+      "comment": "Visualizer style: a stereo goniometer or oscilloscope on a phosphor screen.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oszilloskop"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscope"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscopio"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloscopio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscópio"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscópio"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scoop"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscilloskop"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oskilloskooppi"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscyloskop"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloskop"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oszcilloszkóp"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Осцилограф"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παλμογράφος"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スコープ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스코프"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "示波器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "示波器"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy hiện sóng"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osiloskop"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scope"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skopu"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na'urar duba"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስኮፕ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "راسم الإشارات"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسیلوسکوپ"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סקופ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسکوپ"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्कोप"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্কোপ"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਕੋਪ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્કોપ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्कोप"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்கோப்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్కోప్"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಕೋಪ್"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്കോപ്പ്"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สโคป"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "示波器"
+          }
+        }
+      }
+    },
     "Search": {
       "localizations": {
         "am": {
@@ -303678,6 +308251,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "多個版本被合併為一張專輯"
+          }
+        }
+      }
+    },
+    "Shape": {
+      "comment": "Visualizer option: how the mirrored bars are laid out (circle or line).",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Form"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forme"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forma"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forma"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forma"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forma"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorm"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Form"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Form"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Form"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muoto"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kształt"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tvar"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forma"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Formă"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şekil"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Форма"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σχήμα"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "形"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모양"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "形状"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "形狀"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hình dạng"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bentuk"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bentuk"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hugis"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umbo"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siffa"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቅርጽ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الشكل"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شکل"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צורה"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شکل"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आकार"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আকার"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਕਾਰ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આકાર"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आकार"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வடிவம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆకారం"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಕಾರ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആകൃതി"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รูปทรง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "形狀"
           }
         }
       }
@@ -327974,6 +332816,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "無法解碼音訊。"
+          }
+        }
+      }
+    },
+    "The beat strobe flashes the whole screen on strong beats. Flashing lights may trigger seizures in people with photosensitive epilepsy. If you or anyone watching has epilepsy or has ever had a seizure, leave it off. If you feel dizzy or unwell while it flashes, look away and turn it off.": {
+      "comment": "Visualizer: the photosensitivity warning shown before the strobe is first turned on, and under its setting.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Beat-Stroboskop lässt bei starken Beats den ganzen Bildschirm aufblitzen. Blitzende Lichter können bei Menschen mit fotosensitiver Epilepsie Anfälle auslösen. Wenn du oder jemand, der zusieht, Epilepsie hat oder schon einmal einen Anfall hatte, lass es aus. Wenn dir beim Blitzen schwindlig oder unwohl wird, schau weg und schalte es aus."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le stroboscope fait clignoter tout l’écran sur les temps forts. Les lumières clignotantes peuvent déclencher des crises chez les personnes atteintes d’épilepsie photosensible. Si vous ou une personne qui regarde êtes épileptique ou avez déjà fait une crise, laissez-le désactivé. Si vous vous sentez étourdi ou mal pendant qu’il clignote, détournez le regard et désactivez-le."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El estroboscopio hace destellar toda la pantalla en los golpes fuertes. Las luces intermitentes pueden provocar crisis en personas con epilepsia fotosensible. Si tú o alguien que esté mirando tiene epilepsia o ha tenido alguna vez una crisis, déjalo apagado. Si te mareas o te encuentras mal mientras destella, aparta la vista y apágalo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo stroboscopio fa lampeggiare tutto lo schermo sui battiti forti. Le luci lampeggianti possono scatenare crisi nelle persone con epilessia fotosensibile. Se tu o qualcuno che guarda soffrite di epilessia o avete mai avuto una crisi, lascialo spento. Se ti senti stordito o poco bene mentre lampeggia, distogli lo sguardo e spegnilo."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O estroboscópio pisca a tela inteira nas batidas fortes. Luzes piscando podem provocar crises em pessoas com epilepsia fotossensível. Se você ou alguém assistindo tem epilepsia ou já teve uma crise, deixe desligado. Se sentir tontura ou mal-estar enquanto pisca, desvie o olhar e desligue."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O estroboscópio faz piscar o ecrã inteiro nas batidas fortes. Luzes intermitentes podem provocar crises em pessoas com epilepsia fotossensível. Se você ou alguém a ver tem epilepsia ou já teve uma crise, deixe-o desligado. Se se sentir tonto ou mal disposto enquanto pisca, desvie o olhar e desligue-o."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De stroboscoop laat het hele scherm flitsen op sterke beats. Flitsende lichten kunnen aanvallen veroorzaken bij mensen met fotosensitieve epilepsie. Als jij of iemand die meekijkt epilepsie heeft of ooit een aanval heeft gehad, laat hem dan uit. Als je je duizelig of onwel voelt terwijl hij flitst, kijk weg en zet hem uit."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskopet blixtrar med hela skärmen på kraftiga taktslag. Blinkande ljus kan utlösa anfall hos personer med fotosensitiv epilepsi. Om du eller någon som tittar har epilepsi eller någon gång har haft ett anfall, låt det vara av. Om du känner dig yr eller mår dåligt medan det blinkar, titta bort och stäng av det."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskopet lader hele skærmen blinke på kraftige slag. Blinkende lys kan udløse anfald hos personer med fotosensitiv epilepsi. Hvis du eller nogen, der ser med, har epilepsi eller nogensinde har haft et anfald, så lad det være slået fra. Hvis du føler dig svimmel eller utilpas, mens det blinker, så se væk og slå det fra."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskopet får hele skjermen til å blinke på kraftige slag. Blinkende lys kan utløse anfall hos personer med fotosensitiv epilepsi. Hvis du eller noen som ser på har epilepsi eller noen gang har hatt et anfall, la det være av. Hvis du blir svimmel eller uvel mens det blinker, se bort og slå det av."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahtistrobo välkyttää koko näyttöä voimakkailla iskuilla. Välkkyvät valot voivat laukaista kohtauksia ihmisillä, joilla on valoherkkä epilepsia. Jos sinulla tai jollakulla katsojalla on epilepsia tai on joskus ollut kohtaus, pidä se pois päältä. Jos sinua huimaa tai voit huonosti sen välkkyessä, katso muualle ja laita se pois päältä."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop rozbłyska całym ekranem na mocnych uderzeniach. Migające światła mogą wywołać napady u osób z padaczką fotogenną. Jeśli ty lub ktoś, kto patrzy, choruje na padaczkę albo miał kiedyś napad, nie włączaj go. Jeśli podczas migania poczujesz zawroty głowy lub złe samopoczucie, odwróć wzrok i wyłącz go."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop rozbliká celou obrazovku na silných dobách. Blikající světla mohou u lidí s fotosenzitivní epilepsií vyvolat záchvat. Pokud vy nebo někdo, kdo se dívá, máte epilepsii nebo jste někdy měli záchvat, nechte ho vypnutý. Pokud se vám při blikání zatočí hlava nebo je vám špatně, podívejte se jinam a vypněte ho."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az ütemre villogó fény az erős ütemeknél az egész képernyőt felvillantja. A villogó fények fényérzékeny epilepsziában szenvedőknél rohamot válthatnak ki. Ha neked vagy valakinek, aki nézi, epilepsziája van, vagy volt már rohama, hagyd kikapcsolva. Ha villogás közben szédülsz vagy rosszul érzed magad, nézz félre, és kapcsold ki."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboscopul face tot ecranul să clipească pe bătăile puternice. Luminile intermitente pot declanșa crize la persoanele cu epilepsie fotosensibilă. Dacă tu sau cineva care privește are epilepsie sau a avut vreodată o criză, lasă-l oprit. Dacă te simți amețit sau rău cât timp clipește, privește în altă parte și oprește-l."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritimle çakar, güçlü vuruşlarda tüm ekranı yakıp söndürür. Yanıp sönen ışıklar ışığa duyarlı epilepsisi olan kişilerde nöbetleri tetikleyebilir. Sizde veya izleyen birinde epilepsi varsa ya da daha önce nöbet geçirildiyse kapalı bırakın. Yanıp sönerken başınız döner veya kendinizi kötü hissederseniz başka yere bakın ve kapatın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стробоскоп спалахує всім екраном на сильних долях. Миготливе світло може спричинити напади в людей із фоточутливою епілепсією. Якщо у вас чи в когось, хто дивиться, є епілепсія або колись був напад, не вмикайте його. Якщо під час спалахів у вас паморочиться в голові чи стає зле, відведіть погляд і вимкніть його."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το στροβοσκόπιο αναβοσβήνει όλη την οθόνη στους δυνατούς χτύπους. Τα φώτα που αναβοσβήνουν μπορεί να προκαλέσουν κρίσεις σε άτομα με φωτοευαίσθητη επιληψία. Αν εσύ ή κάποιος που βλέπει έχει επιληψία ή έχει πάθει ποτέ κρίση, άφησέ το κλειστό. Αν ζαλιστείς ή νιώσεις αδιαθεσία ενώ αναβοσβήνει, κοίτα αλλού και κλείσ’ το."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビートでストロボは、強いビートで画面全体を点滅させます。点滅する光は、光過敏性てんかんのある人に発作を引き起こすことがあります。あなたや一緒に見ている人にてんかんがある、または発作を起こしたことがある場合は、オフのままにしてください。点滅中にめまいや気分の悪さを感じたら、目をそらしてオフにしてください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비트 스트로브는 강한 비트에 맞춰 화면 전체를 번쩍이게 합니다. 깜박이는 빛은 광과민성 뇌전증이 있는 사람에게 발작을 일으킬 수 있습니다. 본인이나 함께 보는 사람이 뇌전증이 있거나 발작을 겪은 적이 있다면 끈 채로 두십시오. 번쩍이는 동안 어지럽거나 몸이 좋지 않으면 시선을 돌리고 끄십시오."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "节拍频闪会在强拍时让整个屏幕闪烁。闪烁的光线可能会诱发光敏性癫痫患者发作。如果你或正在观看的人患有癫痫或曾经发作过，请保持关闭。如果在闪烁时感到头晕或不适，请移开视线并将其关闭。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "節拍閃光會在強拍時讓整個螢幕閃爍。閃爍的光線可能會誘發光敏性癲癇患者發作。如果你或正在觀看的人患有癲癇或曾經發作過，請保持關閉。如果在閃爍時感到頭暈或不適，請移開視線並將其關閉。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nháy theo nhịp làm cả màn hình lóe sáng ở những nhịp mạnh. Ánh sáng nhấp nháy có thể gây co giật ở người mắc chứng động kinh nhạy cảm với ánh sáng. Nếu bạn hoặc ai đó đang xem bị động kinh hoặc từng lên cơn co giật, hãy để tắt. Nếu bạn thấy chóng mặt hoặc khó chịu khi nó nháy, hãy nhìn đi chỗ khác và tắt nó."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strobo mengikuti ketukan membuat seluruh layar berkedip pada ketukan kuat. Cahaya berkedip dapat memicu kejang pada orang dengan epilepsi fotosensitif. Jika Anda atau orang yang menonton mengidap epilepsi atau pernah kejang, biarkan mati. Jika Anda merasa pusing atau tidak enak badan saat berkedip, alihkan pandangan dan matikan."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strob mengikut rentak membuatkan seluruh skrin berkelip pada rentak kuat. Cahaya berkelip boleh mencetuskan sawan pada orang yang menghidap epilepsi fotosensitif. Jika anda atau sesiapa yang menonton menghidap epilepsi atau pernah diserang sawan, biarkan ia dimatikan. Jika anda berasa pening atau tidak sihat semasa ia berkelip, alihkan pandangan dan matikannya."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinapakislap ng strobe sa beat ang buong screen sa malalakas na beat. Ang kumikislap na ilaw ay maaaring magdulot ng seizure sa mga taong may photosensitive epilepsy. Kung ikaw o sinumang nanonood ay may epilepsy o nagka-seizure na kailanman, hayaan itong naka-off. Kung nahihilo ka o masama ang pakiramdam habang kumikislap ito, tumingin sa iba at i-off ito."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mwako wa mdundo huimulika skrini nzima kwenye midundo mikali. Taa zinazomulika zinaweza kusababisha kifafa kwa watu wenye kifafa kinachochochewa na mwanga. Ikiwa wewe au mtu yeyote anayetazama ana kifafa au amewahi kupata kifafa, kiache kimezimwa. Ukihisi kizunguzungu au huna raha kinapomulika, tazama pembeni na ukizime."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walƙiya a kan bugu tana sa dukan allon ya yi walƙiya a kan bugu masu ƙarfi. Fitilun da ke walƙiya na iya jawo farfaɗiya ga mutanen da ke da farfaɗiyar da haske ke tayarwa. Idan kai ko wani da ke kallo yana da farfaɗiya ko ya taɓa yin farfaɗiya, bar ta a kashe. Idan ka ji jiri ko rashin lafiya yayin da take walƙiya, kau da kai ka kashe ta."
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በምት የሚያበራ ብልጭታ በጠንካራ ምቶች ላይ መላውን ማያ ገጽ ያበራል። የሚያብለጨልጩ መብራቶች በብርሃን የሚቀሰቀስ የሚጥል በሽታ ባለባቸው ሰዎች ላይ መናድ ሊያስከትሉ ይችላሉ። እርስዎ ወይም የሚመለከት ሰው የሚጥል በሽታ ካለበት ወይም መናድ አጋጥሞት የሚያውቅ ከሆነ ጠፍቶ ይተዉት። ሲያበራ የማዞር ወይም የመታመም ስሜት ከተሰማዎት ዓይንዎን ያዙሩ እና ያጥፉት።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجعل الوميض مع الإيقاع الشاشة كلها تومض مع الضربات القوية. قد تؤدي الأضواء الوامضة إلى نوبات لدى المصابين بالصرع الحساس للضوء. إذا كنت أنت أو أي شخص يشاهد مصابًا بالصرع أو أصيب بنوبة من قبل، فاتركه متوقفًا. إذا شعرت بدوار أو توعك أثناء الوميض، فأبعد نظرك وأوقفه."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چشمک با ضرب، کل صفحه را روی ضرب‌های قوی روشن و خاموش می‌کند. نورهای چشمک‌زن ممکن است در افراد مبتلا به صرع حساس به نور باعث تشنج شوند. اگر شما یا کسی که تماشا می‌کند صرع دارد یا تا به حال تشنج کرده است، آن را خاموش نگه دارید. اگر هنگام چشمک زدن دچار سرگیجه یا حال بد شدید، نگاهتان را برگردانید و آن را خاموش کنید."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסטרובוסקופ בקצב מהבהב את כל המסך בפעמות חזקות. אורות מהבהבים עלולים לגרום להתקפים אצל אנשים עם אפילפסיה רגישה לאור. אם לך או למישהו שצופה יש אפילפסיה או שהיה לו פעם התקף, השאר אותו כבוי. אם אתה מרגיש סחרחורת או לא טוב בזמן שהוא מהבהב, הסט את המבט וכבה אותו."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تال پر اسٹروب مضبوط تھاپ پر پوری اسکرین کو چمکاتا ہے۔ چمکتی روشنیاں روشنی سے حساس مرگی والے لوگوں میں دورے کا سبب بن سکتی ہیں۔ اگر آپ یا دیکھنے والے کسی شخص کو مرگی ہے یا کبھی دورہ پڑا ہے تو اسے بند رہنے دیں۔ اگر چمکنے کے دوران آپ کو چکر آئے یا طبیعت خراب لگے تو نظر ہٹا لیں اور اسے بند کر دیں۔"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ताल पर स्ट्रोब तेज़ बीट पर पूरी स्क्रीन को चमकाता है। चमकती रोशनी प्रकाश-संवेदी मिर्गी वाले लोगों में दौरे ला सकती है। अगर आपको या देखने वाले किसी व्यक्ति को मिर्गी है या कभी दौरा पड़ा है, तो इसे बंद रहने दें। अगर चमकते समय आपको चक्कर आए या तबीयत ठीक न लगे, तो नज़र हटा लें और इसे बंद कर दें।"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "তালে স্ট্রোব জোরালো বিটে পুরো স্ক্রিন ঝলকায়। ঝলকানো আলো আলোক-সংবেদী মৃগীরোগে আক্রান্ত মানুষের খিঁচুনি ঘটাতে পারে। আপনার বা যিনি দেখছেন তাঁর মৃগীরোগ থাকলে বা কখনও খিঁচুনি হয়ে থাকলে, এটি বন্ধ রাখুন। ঝলকানোর সময় মাথা ঘোরালে বা অসুস্থ বোধ করলে, চোখ সরিয়ে নিন এবং এটি বন্ধ করুন।"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤਾਲ ਤੇ ਸਟ੍ਰੋਬ ਤੇਜ਼ ਬੀਟਾਂ ਤੇ ਪੂਰੀ ਸਕ੍ਰੀਨ ਨੂੰ ਚਮਕਾਉਂਦਾ ਹੈ। ਚਮਕਦੀਆਂ ਰੋਸ਼ਨੀਆਂ ਰੋਸ਼ਨੀ ਪ੍ਰਤੀ ਸੰਵੇਦਨਸ਼ੀਲ ਮਿਰਗੀ ਵਾਲੇ ਲੋਕਾਂ ਵਿੱਚ ਦੌਰੇ ਲਿਆ ਸਕਦੀਆਂ ਹਨ। ਜੇ ਤੁਹਾਨੂੰ ਜਾਂ ਦੇਖ ਰਹੇ ਕਿਸੇ ਵਿਅਕਤੀ ਨੂੰ ਮਿਰਗੀ ਹੈ ਜਾਂ ਕਦੇ ਦੌਰਾ ਪਿਆ ਹੈ, ਤਾਂ ਇਸ ਨੂੰ ਬੰਦ ਰਹਿਣ ਦਿਓ। ਜੇ ਚਮਕਣ ਦੌਰਾਨ ਤੁਹਾਨੂੰ ਚੱਕਰ ਆਵੇ ਜਾਂ ਤਬੀਅਤ ਠੀਕ ਨਾ ਲੱਗੇ, ਤਾਂ ਨਜ਼ਰ ਹਟਾ ਲਓ ਅਤੇ ਇਸ ਨੂੰ ਬੰਦ ਕਰ ਦਿਓ।"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તાલ પર સ્ટ્રોબ જોરદાર બીટ પર આખી સ્ક્રીનને ઝબકાવે છે. ઝબકતી લાઇટો પ્રકાશ-સંવેદનશીલ વાઈ ધરાવતા લોકોમાં હુમલો લાવી શકે છે. જો તમને અથવા જોનાર કોઈને વાઈ હોય અથવા ક્યારેય હુમલો આવ્યો હોય, તો તેને બંધ રહેવા દો. ઝબકતી વખતે ચક્કર આવે અથવા તબિયત સારી ન લાગે, તો નજર ફેરવી લો અને તેને બંધ કરો."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तालावर स्ट्रोब जोरदार बीटवर संपूर्ण स्क्रीन चमकवतो. चमकणारे दिवे प्रकाश-संवेदनशील अपस्मार असलेल्या लोकांमध्ये झटके आणू शकतात. तुम्हाला किंवा पाहणाऱ्या कोणाला अपस्मार असेल किंवा कधी झटका आला असेल, तर तो बंदच ठेवा. चमकताना चक्कर आली किंवा बरे वाटत नसेल, तर नजर दुसरीकडे वळवा आणि तो बंद करा."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தாளத்தில் ஸ்ட்ரோப் வலுவான துடிப்புகளில் முழுத் திரையையும் மின்னச் செய்கிறது. மின்னும் விளக்குகள் ஒளி உணர்திறன் வலிப்பு உள்ளவர்களுக்கு வலிப்பைத் தூண்டக்கூடும். உங்களுக்கோ பார்க்கும் யாருக்கோ வலிப்பு நோய் இருந்தால் அல்லது எப்போதாவது வலிப்பு வந்திருந்தால், அதை அணைத்தே வையுங்கள். மின்னும்போது தலைச்சுற்றல் அல்லது உடல்நலக்குறைவு தோன்றினால், பார்வையைத் திருப்பி அதை அணைத்துவிடுங்கள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "తాళానికి స్ట్రోబ్ బలమైన బీట్‌లపై మొత్తం స్క్రీన్‌ను మెరిపిస్తుంది. మెరిసే దీపాలు కాంతి సున్నితత్వ మూర్ఛ ఉన్నవారిలో మూర్ఛను కలిగించవచ్చు. మీకు లేదా చూస్తున్న ఎవరికైనా మూర్ఛ వ్యాధి ఉంటే లేదా ఎప్పుడైనా మూర్ఛ వచ్చి ఉంటే, దాన్ని ఆఫ్‌లోనే ఉంచండి. మెరుస్తున్నప్పుడు తల తిరిగినా లేదా అస్వస్థతగా అనిపించినా, చూపు మళ్లించి దాన్ని ఆఫ్ చేయండి."
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ತಾಳಕ್ಕೆ ಸ್ಟ್ರೋಬ್ ಬಲವಾದ ಬೀಟ್‌ಗಳಲ್ಲಿ ಇಡೀ ಪರದೆಯನ್ನು ಮಿನುಗಿಸುತ್ತದೆ. ಮಿನುಗುವ ದೀಪಗಳು ಬೆಳಕಿಗೆ ಸಂವೇದನಾಶೀಲ ಅಪಸ್ಮಾರ ಇರುವವರಲ್ಲಿ ಸೆಳವು ಉಂಟುಮಾಡಬಹುದು. ನಿಮಗೆ ಅಥವಾ ನೋಡುತ್ತಿರುವ ಯಾರಿಗಾದರೂ ಅಪಸ್ಮಾರ ಇದ್ದರೆ ಅಥವಾ ಎಂದಾದರೂ ಸೆಳವು ಬಂದಿದ್ದರೆ, ಅದನ್ನು ಆಫ್ ಆಗಿಯೇ ಇರಿಸಿ. ಮಿನುಗುವಾಗ ತಲೆ ತಿರುಗಿದರೆ ಅಥವಾ ಅಸ್ವಸ್ಥ ಎನಿಸಿದರೆ, ದೃಷ್ಟಿ ಬೇರೆಡೆ ತಿರುಗಿಸಿ ಅದನ್ನು ಆಫ್ ಮಾಡಿ."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "താളത്തിൽ സ്ട്രോബ് ശക്തമായ ബീറ്റുകളിൽ സ്ക്രീൻ മുഴുവൻ മിന്നിക്കുന്നു. മിന്നുന്ന വെളിച്ചം പ്രകാശ സംവേദനക്ഷമമായ അപസ്മാരമുള്ളവരിൽ അപസ്മാരം ഉണ്ടാക്കിയേക്കാം. നിങ്ങൾക്കോ കാണുന്ന ആർക്കെങ്കിലുമോ അപസ്മാരമുണ്ടെങ്കിൽ അല്ലെങ്കിൽ എപ്പോഴെങ്കിലും അപസ്മാരം വന്നിട്ടുണ്ടെങ്കിൽ, അത് ഓഫായി തന്നെ വയ്ക്കുക. മിന്നുമ്പോൾ തലകറക്കമോ അസ്വസ്ഥതയോ തോന്നിയാൽ, നോട്ടം മാറ്റി അത് ഓഫാക്കുക."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แสงแฟลชตามจังหวะจะทำให้ทั้งหน้าจอกะพริบเมื่อจังหวะหนัก แสงกะพริบอาจกระตุ้นให้เกิดอาการชักในผู้ที่เป็นโรคลมชักที่ไวต่อแสง หากคุณหรือผู้ที่ดูอยู่เป็นโรคลมชักหรือเคยชัก ให้ปิดไว้ หากรู้สึกเวียนศีรษะหรือไม่สบายขณะที่กะพริบ ให้มองไปทางอื่นแล้วปิด"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "節拍閃光會在強拍時讓整個螢幕閃爍。閃爍的光線可能會誘發光敏性癲癇患者發作。如果你或正在觀看的人患有癲癇或曾經發作過，請保持關閉。如果在閃爍時感到頭暈或不適，請移開視線並將其關閉。"
           }
         }
       }
@@ -356044,6 +361155,275 @@
         }
       }
     },
+    "Trails": {
+      "comment": "Visualizer option: particles leave short trails.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spuren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traînées"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estelas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rastros"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rastos"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sporen"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spår"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spor"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spor"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vanat"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smugi"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stopy"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csóvák"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urme"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İzler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сліди"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ίχνη"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "軌跡"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잔상"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖尾"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖尾"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vệt"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jejak"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jejak"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Bakas"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vijia"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sawu"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዱካዎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آثار"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ردها"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שובלים"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشانات"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "निशान"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রেখাচিহ্ন"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਨਿਸ਼ਾਨ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "નિશાન"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रेषाखुणा"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தடங்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "జాడలు"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಜಾಡುಗಳು"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പാടുകൾ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รอยทาง"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖尾"
+          }
+        }
+      }
+    },
     "TRUE %lld": {
       "localizations": {
         "am": {
@@ -356844,6 +362224,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "重試"
+          }
+        }
+      }
+    },
+    "Turn On Strobe": {
+      "comment": "Visualizer: button in the photosensitivity warning that turns the strobe on.",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroboskop einschalten"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activer le stroboscope"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activar estroboscopio"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva stroboscopio"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar estroboscópio"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativar estroboscópio"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet stroboscoop aan"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå på stroboskop"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå stroboskop til"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå på stroboskop"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laita strobo päälle"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Włącz stroboskop"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapnout stroboskop"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Villogás bekapcsolása"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pornește stroboscopul"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çakarı Aç"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Увімкнути стробоскоп"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ενεργοποίηση στροβοσκοπίου"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ストロボをオンにする"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스트로브 켜기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开频闪"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟閃光"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật nháy"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyalakan Strobo"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidupkan Strob"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-on ang Strobe"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Washa Mwako"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunna Walƙiya"
+          }
+        },
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ብልጭታን አብራ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشغيل الوميض"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روشن کردن چشمک‌زن"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפעל סטרובוסקופ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹروب آن کریں"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्ट्रोब चालू करें"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্ট্রোব চালু করুন"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਟ੍ਰੋਬ ਚਾਲੂ ਕਰੋ"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્ટ્રોબ ચાલુ કરો"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्ट्रोब सुरू करा"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்ட்ரோபை இயக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్ట్రోబ్‌ను ఆన్ చేయి"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಟ್ರೋಬ್ ಆನ್ ಮಾಡಿ"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്ട്രോബ് ഓണാക്കുക"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิดแสงแฟลช"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟閃光"
           }
         }
       }
