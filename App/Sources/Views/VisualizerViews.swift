@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import MediaAccessibility
 import MetalKit
 import SwiftUI
 import VespertineLibrary
@@ -16,6 +17,10 @@ extension VisualizerStyle {
         case .spectrogram: String(localized: "Spectrogram", comment: "Visualizer style: scrolling spectrogram.")
         case .vinyl: String(localized: "Vinyl", comment: "Visualizer style: the album on a spinning record.")
         case .club: String(localized: "Club", comment: "Visualizer style: club lights, rings and lasers pulsing with the beat.")
+        case .scope: String(localized: "Scope", comment: "Visualizer style: a stereo goniometer or oscilloscope on a phosphor screen.")
+        case .meters: String(localized: "Meters", comment: "Visualizer style: a pair of analogue VU or PPM meters with needles.")
+        case .particles: String(localized: "Particles", comment: "Visualizer style: a field of particles moving with the music.")
+        case .mirrored: String(localized: "Mirrored", comment: "Visualizer style: the bar spectrum mirrored, around a circle or across a line.")
         }
     }
 }
@@ -23,6 +28,7 @@ extension VisualizerStyle {
 extension VisualizerTheme {
     var label: String {
         switch self {
+        case .vespertine: String(localized: "Vespertine", comment: "Visualizer colours: the app's brand colours (obsidian, copper, brass, ivory). Also the app's name.")
         case .brass: String(localized: "Brass", comment: "Visualizer colours: the app's own brass on black.")
         case .neon: String(localized: "Neon", comment: "Visualizer colours: magenta, violet and cyan.")
         case .aurora: String(localized: "Aurora", comment: "Visualizer colours: teal, green and pale violet.")
@@ -41,6 +47,75 @@ extension VisualizerLabels {
         secondsAgo: { String(localized: "\(String(-$0)) s", comment: "Visualizer axis: seconds ago on the spectrogram, e.g. -10 s (0 is now).") })
 }
 
+extension VisualizerScopeMode {
+    var label: String {
+        switch self {
+        case .goniometer: String(localized: "Goniometer", comment: "Visualizer scope: left against right (a stereo Lissajous figure).")
+        case .oscilloscope: String(localized: "Oscilloscope", comment: "Visualizer scope: left and right waveforms against time.")
+        }
+    }
+}
+
+extension VisualizerMirrorLayout {
+    var label: String {
+        switch self {
+        case .circle: String(localized: "Circle", comment: "Visualizer option: mirrored bars around a circle.")
+        case .line: String(localized: "Line", comment: "Visualizer option: mirrored bars up and down from a line.")
+        }
+    }
+}
+
+/// The beat strobe's safeguards: it's off by default, turning it on asks first (once), its option says what it can
+/// do, and it stays off while Reduce Motion or Dim Flashing Lights is on.
+struct StrobeToggle: View {
+    @Binding var settings: VisualizerSettings
+    @Binding var asking: Bool
+    var reduceMotion: Bool
+    var dimFlashing: Bool
+    var label: LocalizedStringKey = "Beat Strobe"
+
+    var body: some View {
+        let blocked = reduceMotion || dimFlashing
+        Toggle(label, isOn: Binding(get: { settings.strobe && !blocked }, set: { on in
+            if on && !settings.strobeWarningAccepted { asking = true } else { settings.strobe = on }
+        }))
+        .disabled(blocked)
+        .help(Text("May trigger seizures in people with photosensitive epilepsy."))
+        if reduceMotion {
+            Text("No strobe while Reduce Motion is on.")
+        } else if dimFlashing {
+            Text("No strobe while Dim Flashing Lights is on.")
+        }
+    }
+}
+
+extension View {
+    /// Asks before the strobe is turned on for the first time: a photosensitivity warning that has to be accepted.
+    func strobeWarning(isPresented: Binding<Bool>, settings: Binding<VisualizerSettings>) -> some View {
+        alert("Photosensitivity Warning", isPresented: isPresented) {
+            Button("Turn On Strobe", role: .destructive) {
+                settings.wrappedValue.strobeWarningAccepted = true
+                settings.wrappedValue.strobe = true
+            }
+            Button("Cancel", role: .cancel) {}
+                .keyboardShortcut(.defaultAction)
+        } message: {
+            Text("The beat strobe flashes the whole screen on strong beats. Flashing lights may trigger seizures in people with photosensitive epilepsy. If you or anyone watching has epilepsy or has ever had a seizure, leave it off. If you feel dizzy or unwell while it flashes, look away and turn it off.")
+        }
+    }
+
+    /// Keeps `dimmed` in step with Dim Flashing Lights (System Settings > Accessibility > Display).
+    func readsDimFlashingLights(_ dimmed: Binding<Bool>) -> some View {
+        onAppear { dimmed.wrappedValue = MADimFlashingLightsEnabled() }
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name(kMADimFlashingLightsChangedNotification as String))) { _ in
+                dimmed.wrappedValue = MADimFlashingLightsEnabled()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                dimmed.wrappedValue = MADimFlashingLightsEnabled()
+            }
+    }
+}
+
 /// Holds the renderer, made once per window (it compiles the shaders).
 @MainActor
 final class VisualizerHolder {
@@ -57,6 +132,8 @@ struct VisualizerWindow: View {
     @State private var hide: Task<Void, Never>?
     @State private var fullScreen = false
     @State private var window: NSWindow?
+    @State private var dimFlashing = false
+    @State private var askingStrobe = false
 
     var body: some View {
         @Bindable var settings = model.settings
@@ -71,7 +148,8 @@ struct VisualizerWindow: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             if controlsShown {
-                VisualizerControls(settings: $settings.visualizer, fullScreen: fullScreen, reduceMotion: reduceMotion) {
+                VisualizerControls(settings: $settings.visualizer, askingStrobe: $askingStrobe, fullScreen: fullScreen,
+                                   reduceMotion: reduceMotion, dimFlashing: dimFlashing) {
                     if let window { VisualizerWindowAccessor.allowFullScreen(window); window.toggleFullScreen(nil) }
                 }
                 .padding(.bottom, 22)
@@ -101,6 +179,10 @@ struct VisualizerWindow: View {
             model.visualizer.apply(new)
         }
         .onChange(of: reduceMotion, initial: true) { _, new in holder.renderer?.reduceMotion = new }
+        .readsDimFlashingLights($dimFlashing)
+        .onChange(of: dimFlashing, initial: true) { _, new in holder.renderer?.reduceFlashing = new }
+        .strobeWarning(isPresented: $askingStrobe, settings: $settings.visualizer)
+        .onChange(of: askingStrobe) { _, asking in if asking { showControls() } }
         .onChange(of: model.settings.visualizerEnabled) { _, on in if !on { dismissWindow(id: "visualizer") } }
         .task(id: model.artworkKey(model.player.current?.track)) {
             holder.renderer?.labels = .localized
@@ -110,6 +192,12 @@ struct VisualizerWindow: View {
             holder.renderer?.setArtwork(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
         }
         .animation(.easeInOut(duration: 0.25), value: controlsShown)
+        .task {
+            // QA: -VespertineVisualizerAsk strobe shows the strobe's warning, as turning it on the first time does.
+            guard LaunchArguments().string(forKey: "VespertineVisualizerAsk") == "strobe" else { return }
+            try? await Task.sleep(for: .seconds(1.5))
+            askingStrobe = true
+        }
         .task {
             // QA: -VespertineVisualizerStats YES logs what the analysis and drawing cost, every 10 s.
             guard LaunchArguments().bool(forKey: "VespertineVisualizerStats") else { return }
@@ -144,8 +232,10 @@ struct VisualizerWindow: View {
 /// The controls along the bottom of the visualizer: style, colours, sensitivity, options and full screen.
 struct VisualizerControls: View {
     @Binding var settings: VisualizerSettings
+    @Binding var askingStrobe: Bool
     var fullScreen: Bool
     var reduceMotion: Bool
+    var dimFlashing: Bool
     var toggleFullScreen: () -> Void
 
     var body: some View {
@@ -153,7 +243,7 @@ struct VisualizerControls: View {
             Picker("Style", selection: $settings.style) {
                 ForEach(VisualizerStyle.allCases) { Text($0.label).tag($0) }
             }
-            .pickerStyle(.segmented).labelsHidden().fixedSize()
+            .pickerStyle(.menu).labelsHidden().fixedSize()
             Menu {
                 Picker("Colors", selection: $settings.theme) {
                     ForEach(VisualizerTheme.allCases) { Text($0.label).tag($0) }
@@ -214,8 +304,31 @@ struct VisualizerControls: View {
                 Text("45 RPM").tag(45.0)
             }
         case .club:
-            Toggle("Beat Strobe", isOn: $settings.strobe).disabled(reduceMotion)
-            if reduceMotion { Text("No strobe while Reduce Motion is on.") }
+            StrobeToggle(settings: $settings, asking: $askingStrobe, reduceMotion: reduceMotion, dimFlashing: dimFlashing)
+            Text("May trigger seizures in people with photosensitive epilepsy.")
+        case .scope:
+            Picker("Display", selection: $settings.scopeMode) {
+                ForEach(VisualizerScopeMode.allCases) { Text($0.label).tag($0) }
+            }
+        case .meters:
+            Picker("Meter", selection: $settings.meterKind) {
+                Text(verbatim: "VU").tag(VisualizerMeterKind.vu)
+                Text(verbatim: "PPM").tag(VisualizerMeterKind.ppm)
+            }
+            Picker("Reference Level", selection: $settings.meterReference) {
+                Text("Automatic").tag(Double?.none)
+                ForEach(VisualizerSettings.meterReferences, id: \.self) { Text("\(String(Int($0))) dBFS").tag(Double?.some($0)) }
+            }
+        case .particles:
+            Toggle("Trails", isOn: $settings.particleTrails)
+        case .mirrored:
+            Picker("Shape", selection: $settings.mirrorLayout) {
+                ForEach(VisualizerMirrorLayout.allCases) { Text($0.label).tag($0) }
+            }
+            Toggle("Peak Caps", isOn: $settings.peakCaps)
+            Picker("Bands", selection: $settings.bandCount) {
+                ForEach(VisualizerSettings.bandCounts, id: \.self) { Text(verbatim: "\($0)").tag($0) }
+            }
         }
         Divider()
         Toggle("Show Song Title", isOn: $settings.showsTrackInfo)

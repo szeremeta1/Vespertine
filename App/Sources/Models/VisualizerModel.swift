@@ -54,6 +54,7 @@ final class VisualizerModel {
         c.bandCount = settings.bandCount
         c.sensitivity = Float(settings.sensitivity)
         c.linear = !settings.decibelScale
+        c.meterReferenceDB = settings.meterReference.map(Float.init)
         feed.update(configuration: c)
     }
 }

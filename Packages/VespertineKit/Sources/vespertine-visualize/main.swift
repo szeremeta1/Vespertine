@@ -41,14 +41,19 @@ func parse() -> Options {
         let a = next()
         switch a {
         case "--rate": o.rate = Double(next()) ?? o.rate
-        case "--style": o.settings.style = VisualizerStyle(rawValue: next()) ?? .bars
-        case "--theme": o.settings.theme = VisualizerTheme(rawValue: next()) ?? .brass
+        case "--style": o.settings.style = VisualizerStyle(rawValue: next()) ?? .vinyl
+        case "--theme": o.settings.theme = VisualizerTheme(rawValue: next()) ?? .vespertine
         case "--sensitivity": o.settings.sensitivity = Double(next()) ?? 1
         case "--bands": o.settings.bandCount = Int(next()) ?? 64
         case "--linear": o.settings.decibelScale = false
         case "--no-peaks": o.settings.peakCaps = false
         case "--no-tonearm": o.settings.tonearm = false
-        case "--strobe": o.settings.strobe = true
+        case "--strobe": o.settings.strobe = true; o.settings.strobeWarningAccepted = true
+        case "--scope": o.settings.scopeMode = VisualizerScopeMode(rawValue: next()) ?? .goniometer
+        case "--meter": o.settings.meterKind = VisualizerMeterKind(rawValue: next()) ?? .vu
+        case "--reference": o.settings.meterReference = Double(next())
+        case "--layout": o.settings.mirrorLayout = VisualizerMirrorLayout(rawValue: next()) ?? .circle
+        case "--no-trails": o.settings.particleTrails = false
         case "--no-info": o.settings.showsTrackInfo = false
         case "--history": o.settings.spectrogramSeconds = Double(next()) ?? 12
         case "--art": o.art = next()
@@ -110,6 +115,7 @@ func run() -> Int32 {
     configuration.bandCount = o.settings.bandCount
     configuration.sensitivity = Float(o.settings.sensitivity)
     configuration.linear = !o.settings.decibelScale
+    configuration.meterReferenceDB = o.settings.meterReference.map(Float.init)
     let analyzer = VisualizerAnalyzer(configuration: configuration)
     let n = VisualizerAnalyzer.fftSize(for: o.rate)
     let dt = 1 / o.fps

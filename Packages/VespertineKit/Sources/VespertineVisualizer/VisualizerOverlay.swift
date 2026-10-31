@@ -66,6 +66,34 @@ enum VisualizerOverlay {
                 let w = s.size().width
                 s.draw(at: CGPoint(x: min(max(x - w / 2, plot.minX), plot.maxX - w), y: plot.maxY + 12))
             }
+        case .scope where settings.scopeMode == .goniometer:
+            // The axes' ends (left, right, mono), and the correlation bar's scale.
+            let g = VisualizerLayout.goniometer(in: size)
+            let letter: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 11, weight: .semibold), .foregroundColor: text.withAlphaComponent(0.55),
+            ]
+            let d = g.radius + 14
+            for (s, at) in [("L", CGPoint(x: g.centre.x - d * 0.7071, y: g.centre.y - d * 0.7071)),
+                            ("R", CGPoint(x: g.centre.x + d * 0.7071, y: g.centre.y - d * 0.7071)),
+                            ("M", CGPoint(x: g.centre.x, y: g.centre.y - d))] where g.radius > 30 {
+                let a = NSAttributedString(string: s, attributes: letter)
+                let b = a.size()
+                a.draw(at: CGPoint(x: at.x - b.width / 2, y: at.y - b.height / 2))
+            }
+            for (value, s) in [(-1.0, "-1"), (0, "0"), (1, "+1")] {
+                let a = NSAttributedString(string: s, attributes: axis)
+                let b = a.size()
+                a.draw(at: CGPoint(x: g.bar.midX + value * g.bar.width / 2 - b.width / 2, y: g.bar.maxY + 8))
+            }
+        case .scope:
+            let screen = VisualizerLayout.oscilloscope(in: size)
+            let letter: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: 11, weight: .semibold), .foregroundColor: text.withAlphaComponent(0.55),
+            ]
+            for (s, f) in [("L", 0.25), ("R", 0.75)] where screen.height > 60 {
+                let a = NSAttributedString(string: s, attributes: letter)
+                a.draw(at: CGPoint(x: screen.minX - 8 - a.size().width, y: screen.minY + screen.height * f - a.size().height / 2))
+            }
         default:
             break
         }
@@ -89,7 +117,7 @@ enum VisualizerOverlay {
             let x = max(m.left, 88)
             line.draw(with: CGRect(x: x, y: 12, width: size.width - x - m.right, height: 18),
                       options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
-        case .vinyl, .club:
+        default:
             let serif = NSFont.systemFont(ofSize: 24, weight: .regular).fontDescriptor.withDesign(.serif)
                 .flatMap { NSFont(descriptor: $0, size: 24) } ?? NSFont.systemFont(ofSize: 24)
             let width = min(size.width * 0.45, 520)

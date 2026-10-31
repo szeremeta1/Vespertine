@@ -34,12 +34,28 @@ public struct VisualizerFrame: Sendable, Equatable {
     public var hasSignal: Bool
     /// The analysis clock, in seconds.
     public var time: Double
+    /// The newest samples, left and right (-1…1), oldest first: `stereoCount` of them, about 43 ms (every sample at
+    /// 44.1 and 48 kHz, every other one at 88.2 and 96, every fourth above). For the scope.
+    public var stereo: [SIMD2<Float>] = []
+    /// The time between `stereo`'s samples, in seconds.
+    public var stereoInterval: Double = 1.0 / 48_000
+    /// How alike left and right are, -1…1: +1 mono, 0 unrelated, -1 out of phase (lightly smoothed).
+    public var correlation: Float = 0
+    /// The VU needles, as a fraction of their travel (see `VisualizerMeters`).
+    public var vu = SIMD2<Float>(0, 0)
+    /// The peak programme meters, in dB against the reference (0 is PPM 4).
+    public var ppm = SIMD2<Float>(-40, -40)
+    /// The level the meters read as 0 VU and PPM 4 (dBFS, sine RMS), after sensitivity.
+    public var meterReferenceDB: Float = -18
+
+    public static let stereoCount = 2048
 
     public static func silent(bands: Int, fine: Int, waveform: Int = VisualizerAnalyzer.waveformCount) -> VisualizerFrame {
         VisualizerFrame(fine: .init(repeating: 0, count: fine), bands: .init(repeating: 0, count: bands),
                         peaks: .init(repeating: 0, count: bands), waveform: .init(repeating: 0, count: waveform),
                         rmsDB: .init(-100, -100), peakDB: .init(-100, -100), bass: 0, mid: 0, treble: 0, beat: false,
-                        beatPulse: 0, tempo: nil, hasSignal: false, time: 0)
+                        beatPulse: 0, tempo: nil, hasSignal: false, time: 0,
+                        stereo: .init(repeating: .zero, count: stereoCount))
     }
 }
 
@@ -65,6 +81,8 @@ public final class VisualizerAnalyzer {
         /// Seconds a peak is held before it falls, and how fast it then falls (display units per second²).
         public var peakHold: Double = 0.7
         public var peakGravity: Float = 2.2
+        /// The meters' reference (the sine RMS that reads 0 VU and PPM 4), in dBFS; nil follows the music's loudness.
+        public var meterReferenceDB: Float?
 
         public init() {}
     }
@@ -114,6 +132,13 @@ public final class VisualizerAnalyzer {
     private var beatTimes: [Double] = []
     private var loudest = SIMD3<Float>(repeating: 1e-6)
     private var smoothedBands = SIMD3<Float>(repeating: 0)
+
+    // Scope and meters
+    private var stereo = [SIMD2<Float>](repeating: .zero, count: VisualizerFrame.stereoCount)
+    private var correlation: Float = 0
+    private var meters = VisualizerMeters()
+    /// The music's recent loudness (mean square, full scale 1), for the meters' automatic reference.
+    private var loudness: Double = pow(10, -19.0 / 10)
 
     public init(configuration: Configuration = Configuration()) {
         self.configuration = configuration
@@ -208,6 +233,50 @@ public final class VisualizerAnalyzer {
             peak = SIMD2(Self.decibels(vDSP.maximumMagnitude(l)), Self.decibels(vDSP.maximumMagnitude(r)))
         }
         if max(rms.x, rms.y) > -80 { lastSignal = time }
+
+        // Scope: the newest samples, thinned to about 48 kHz.
+        let thin = Self.stereoStride(for: rate > 0 ? rate : 48_000)
+        let stereoCount = VisualizerFrame.stereoCount
+        if live {
+            let from = left.count - stereoCount * thin, fromR = right.count - stereoCount * thin
+            for i in 0..<stereoCount { stereo[i] = SIMD2(left[from + i * thin], right[fromR + i * thin]) }
+        } else {
+            for i in 0..<stereoCount { stereo[i] = .zero }
+        }
+
+        // Correlation over the newest ~40 ms: +1 mono, -1 out of phase. Nothing to compare (silence, or one side
+        // silent) eases back to 0.
+        var correlationTarget: Float = 0
+        if live {
+            let m = min(n, stereoCount * thin)
+            let l = UnsafeBufferPointer(rebasing: left[(left.count - m)...])
+            let r = UnsafeBufferPointer(rebasing: right[(right.count - m)...])
+            let lr = vDSP.dot(l, r), ll = vDSP.sumOfSquares(l), rr = vDSP.sumOfSquares(r)
+            let floor = Float(m) * 1e-8   // about -80 dBFS
+            if ll > floor, rr > floor { correlationTarget = min(1, max(-1, lr / (ll * rr).squareRoot())) }
+        }
+        correlation += (correlationTarget - correlation) * Self.coefficient(dt, 0.2)
+
+        // Meters: only the samples that are new since the last frame (about `dt` of them), so the needles see each
+        // sample once.
+        let currentRate = rate > 0 ? rate : 48_000
+        let newFrames = min(n, max(1, Int((dt * currentRate).rounded())))
+        if live {
+            let l = UnsafeBufferPointer(rebasing: left[(left.count - newFrames)...])
+            let r = UnsafeBufferPointer(rebasing: right[(right.count - newFrames)...])
+            let power = Double(max(vDSP.meanSquare(l), vDSP.meanSquare(r)))
+            // Loudness follows the music over a few seconds, ignoring silence between songs.
+            if power > 1e-5 { loudness += (power - loudness) * Double(Self.coefficient(dt, 3)) }
+        }
+        let reference = meterReference
+        if live {
+            meters.process(left: UnsafeBufferPointer(rebasing: left[(left.count - newFrames)...]),
+                           right: UnsafeBufferPointer(rebasing: right[(right.count - newFrames)...]),
+                           sampleRate: currentRate, referenceDBFS: reference)
+        } else {
+            meters.process(left: UnsafeBufferPointer(start: nil, count: 0), right: UnsafeBufferPointer(start: nil, count: 0),
+                           silentFrames: newFrames, sampleRate: currentRate, referenceDBFS: reference)
+        }
 
         // Waveform: the newest samples, every other one.
         let stride = 2, count = Self.waveformCount
@@ -319,7 +388,25 @@ public final class VisualizerAnalyzer {
         return VisualizerFrame(fine: fine, bands: bands, peaks: peaks, waveform: waveform, rmsDB: rms, peakDB: peak,
                                bass: smoothedBands.x, mid: smoothedBands.y, treble: smoothedBands.z, beat: beat,
                                beatPulse: beatPulse, tempo: Self.tempo(beatTimes), hasSignal: time - lastSignal < 0.5,
-                               time: time)
+                               time: time, stereo: stereo, stereoInterval: Double(thin) / currentRate, correlation: correlation,
+                               vu: SIMD2(Float(meters.vu.x), Float(meters.vu.y)),
+                               ppm: SIMD2<Float>(meters.ppm(referenceDBFS: reference)), meterReferenceDB: Float(reference))
+    }
+
+    /// The meters' reference in dBFS: as set, or 1 dB over the music's recent loudness, so the needles swing around
+    /// the top of the scale whatever the master's level; then raised or lowered by the sensitivity.
+    var meterReference: Double {
+        let base = configuration.meterReferenceDB.map(Double.init) ?? min(-6, max(-30, 10 * log10(loudness) + 1))
+        return base - 20 * log10(Double(max(configuration.sensitivity, 0.01)))
+    }
+
+    /// Every how many samples the scope takes one, to keep about 48 kHz.
+    public static func stereoStride(for sampleRate: Double) -> Int {
+        switch sampleRate {
+        case ..<56_000: 1
+        case ..<112_000: 2
+        default: 4
+        }
     }
 
     /// Convenience for arrays.

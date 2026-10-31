@@ -409,6 +409,72 @@ static void test_concurrent_rewind(void) {
     nrt_ring_destroy(rewind_ring);
 }
 
+// The visualizer tap: the I/O thread writes it while another thread copies the newest frames out as fast as it can.
+// Frame n carries n (left) and -n (right): a copy the reader keeps must be consecutive frames, left and right from the
+// same frame, never a mix of two moments (a copy the writer overtook is returned as 0 frames). Then the tap is switched
+// on and off while both run, for the sanitizers.
+#define VIZ_SLICES 6000u
+#define VIZ_SLICE 512u
+static NRTRenderContext *viz_ctx;
+static atomic_bool viz_done;
+static atomic_bool viz_check;
+static atomic_uint_fast64_t viz_kept;
+
+static void *viz_reader(void *unused) {
+    (void)unused;
+    static float l[NRT_VIZ_TAP_SIZE / 2], r[NRT_VIZ_TAP_SIZE / 2];
+    uint64_t kept = 0, last = 0;
+    while (!atomic_load(&viz_done)) {
+        uint64_t position = 0;
+        const uint32_t got = nrt_context_copy_viz(viz_ctx, l, r, NRT_VIZ_TAP_SIZE / 2, &position);
+        if (got == 0 || !atomic_load(&viz_check)) continue;
+        assert(got == NRT_VIZ_TAP_SIZE / 2 && position >= last);
+        last = position;
+        if (l[0] <= 0) continue;                        // before the first full window
+        for (uint32_t i = 1; i < got; i++) assert(l[i] == l[i - 1] + 1 && r[i] == -l[i]);
+        kept++;
+        atomic_store(&viz_kept, kept);
+    }
+    return NULL;
+}
+
+static void test_concurrent_viz(void) {
+    NRTRing *ring = nrt_ring_create(4096, 2);
+    viz_ctx = nrt_context_create(ring, VIZ_SLICE);
+    assert(ring && viz_ctx);
+    nrt_context_set_gain(viz_ctx, 1.0, 32);             // no dither: the tap holds exactly what was written
+    nrt_context_set_viz(viz_ctx, true);
+    atomic_store(&viz_done, false);
+    atomic_store(&viz_check, true);
+    atomic_store(&viz_kept, 0);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, viz_reader, NULL);
+    assert(!started); (void)started;
+    static float in[2 * VIZ_SLICE], out[2 * VIZ_SLICE];
+    float next = 1;
+    for (unsigned s = 0; s < VIZ_SLICES; s++) {
+        for (uint32_t i = 0; i < VIZ_SLICE; i++) { in[2 * i] = next + (float)i; in[2 * i + 1] = -(next + (float)i); }
+        next += VIZ_SLICE;                              // 3.1 M frames: exact in Float32
+        const uint32_t wrote = nrt_ring_write(ring, in, VIZ_SLICE);
+        assert(wrote == VIZ_SLICE); (void)wrote;
+        nrt_context_render_interleaved(viz_ctx, out, VIZ_SLICE, 2);
+        // The tap is a copy: what plays is what was written.
+        for (uint32_t i = 0; i < 2 * VIZ_SLICE; i++) assert(out[i] == in[i]);
+    }
+    // Switched on and off while it runs (frames then jump, so they aren't checked).
+    while (atomic_load(&viz_kept) == 0) sched_yield();  // the reader checked at least one whole window
+    atomic_store(&viz_check, false);
+    for (unsigned s = 0; s < 2000; s++) {
+        if (s % 7 == 0) nrt_context_set_viz(viz_ctx, s % 14 == 0);
+        nrt_ring_write(ring, in, VIZ_SLICE);
+        nrt_context_render_interleaved(viz_ctx, out, VIZ_SLICE, 2);
+    }
+    atomic_store(&viz_done, true);
+    pthread_join(thread, NULL);
+    nrt_context_destroy(viz_ctx);
+    nrt_ring_destroy(ring);
+}
+
 // The equalizer is replaced from another thread while the I/O thread renders: every slice must come out with one
 // whole setting (here a preamp and a matching number of pass-through sections), never a mix of two.
 #define EQ_ROUNDS 20000u
@@ -905,6 +971,7 @@ int main(void) {
     test_dop_threads();
     test_concurrent_rewind();
     test_concurrent_eq();
+    test_concurrent_viz();
     test_room();
     test_concurrent_room();
     test_fir();

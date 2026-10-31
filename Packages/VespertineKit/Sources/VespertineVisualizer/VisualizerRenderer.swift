@@ -10,6 +10,19 @@ import MetalKit
 import QuartzCore
 import os
 
+/// A small seeded random number generator (SplitMix64), so the particles start the same way every time.
+struct SplitMix64: RandomNumberGenerator {
+    private var state: UInt64
+    init(seed: UInt64) { state = seed }
+    mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        return z ^ (z >> 31)
+    }
+}
+
 /// What's playing, as the visualizer shows it.
 public struct VisualizerScene: Sendable, Equatable {
     public var title: String?
@@ -61,6 +74,9 @@ struct VisualizerUniforms {
     var d = SIMD4<Float>.zero
     var e = SIMD4<Float>.zero
     var f = SIMD4<Float>.zero
+    var g = SIMD4<Float>.zero
+    var h = SIMD4<Float>.zero
+    var k = SIMD4<Float>.zero
     var stops: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) = (.zero, .zero, .zero, .zero)
     var rings: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>,
                 SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) =
@@ -71,8 +87,10 @@ struct VisualizerUniforms {
 public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     public let device: MTLDevice
     public var settings = VisualizerSettings() { didSet { overlayKey = "" } }
-    /// Reduce Motion: no strobe, and calmer lasers.
+    /// Reduce Motion: no strobe, calmer lasers and particles.
     public var reduceMotion = false
+    /// Dim Flashing Lights (Accessibility > Display): no strobe.
+    public var reduceFlashing = false
     public var labels = VisualizerLabels.english { didSet { overlayKey = "" } }
     /// Called once per drawn frame (on the main thread) for the newest analysis and what's playing.
     public var frameSource: (() -> (VisualizerFrame, VisualizerScene))?
@@ -80,6 +98,31 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private let queue: MTLCommandQueue
     private var pipelines: [VisualizerStyle: MTLRenderPipelineState] = [:]
     private let pixelFormat: MTLPixelFormat = .bgra8Unorm
+
+    // Trails (scope and particles): light drawn additively into a texture that fades a little each frame.
+    private let trailFormat: MTLPixelFormat = .rgba16Float
+    private var fadePipeline: MTLRenderPipelineState?
+    private var beamPipeline: MTLRenderPipelineState?
+    private var spritePipeline: MTLRenderPipelineState?
+    private var particleStep: MTLComputePipelineState?
+    private var trail: MTLTexture?
+    private var trailStyle: VisualizerStyle?
+
+    // Scope: the trace's points, in a few buffers taken in turn (the GPU may still be reading the last one).
+    static let beamPoints = 2 * 1024 + 2
+    private var beamBuffers: [MTLBuffer] = []
+    private var beamIndex = 0
+    private var scopeEnvelope: Float = 0
+    private var points: [SIMD4<Float>] = []
+
+    // Particles
+    public static let particleCount = 20_000
+    private var particles: MTLBuffer?
+
+    // Meters: the printed faces, redrawn when the window's size or the meter changes.
+    private var meterFace: MTLTexture?
+    private var meterFaceKey = ""
+    private var peakLights = SIMD2<Float>(0, 0)
 
     // Spectrogram history: one column of fine bins per step, written in place (a ring across the texture's width).
     static let historyWidth = 1024
@@ -123,13 +166,43 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         do {
             let library = try device.makeLibrary(source: VisualizerShaders.source, options: nil)
             guard let vertex = library.makeFunction(name: "vz_vertex") else { return nil }
-            let names: [VisualizerStyle: String] = [.bars: "vz_bars", .spectrogram: "vz_spectrogram", .vinyl: "vz_vinyl", .club: "vz_club"]
+            let names: [VisualizerStyle: String] = [.bars: "vz_bars", .spectrogram: "vz_spectrogram", .vinyl: "vz_vinyl", .club: "vz_club",
+                                                    .scope: "vz_scope", .meters: "vz_meters", .particles: "vz_particles",
+                                                    .mirrored: "vz_mirror"]
             for (style, name) in names {
                 let d = MTLRenderPipelineDescriptor()
                 d.vertexFunction = vertex
                 d.fragmentFunction = library.makeFunction(name: name)
                 d.colorAttachments[0].pixelFormat = pixelFormat
                 pipelines[style] = try device.makeRenderPipelineState(descriptor: d)
+            }
+            // The fade keeps a set fraction of what's there (the blend colour); beams and sprites add light.
+            let fade = MTLRenderPipelineDescriptor()
+            fade.vertexFunction = vertex
+            fade.fragmentFunction = library.makeFunction(name: "vz_fade")
+            fade.colorAttachments[0].pixelFormat = trailFormat
+            fade.colorAttachments[0].isBlendingEnabled = true
+            fade.colorAttachments[0].sourceRGBBlendFactor = .zero
+            fade.colorAttachments[0].sourceAlphaBlendFactor = .zero
+            fade.colorAttachments[0].destinationRGBBlendFactor = .blendColor
+            fade.colorAttachments[0].destinationAlphaBlendFactor = .blendAlpha
+            fadePipeline = try device.makeRenderPipelineState(descriptor: fade)
+            func additive(_ vertexName: String, _ fragmentName: String) throws -> MTLRenderPipelineState {
+                let d = MTLRenderPipelineDescriptor()
+                d.vertexFunction = library.makeFunction(name: vertexName)
+                d.fragmentFunction = library.makeFunction(name: fragmentName)
+                d.colorAttachments[0].pixelFormat = trailFormat
+                d.colorAttachments[0].isBlendingEnabled = true
+                d.colorAttachments[0].sourceRGBBlendFactor = .one
+                d.colorAttachments[0].destinationRGBBlendFactor = .one
+                d.colorAttachments[0].sourceAlphaBlendFactor = .one
+                d.colorAttachments[0].destinationAlphaBlendFactor = .one
+                return try device.makeRenderPipelineState(descriptor: d)
+            }
+            beamPipeline = try additive("vz_beam_vertex", "vz_beam_fragment")
+            spritePipeline = try additive("vz_sprite_vertex", "vz_sprite_fragment")
+            if let step = library.makeFunction(name: "vz_particles_step") {
+                particleStep = try device.makeComputePipelineState(function: step)
             }
         } catch {
             Logger(subsystem: "org.szeremeta.Vespertine", category: "Visualizer").error("Shaders didn't compile: \(error)")
@@ -142,6 +215,24 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         blank = device.makeTexture(descriptor: b)
         var clear: UInt32 = 0
         blank?.replace(region: MTLRegionMake2D(0, 0, 1, 1), mipmapLevel: 0, withBytes: &clear, bytesPerRow: 4)
+        beamBuffers = (0..<3).compactMap { _ in
+            device.makeBuffer(length: Self.beamPoints * MemoryLayout<SIMD4<Float>>.stride, options: .storageModeShared)
+        }
+        points.reserveCapacity(Self.beamPoints)
+    }
+
+    /// The particles' starting state: spread over a disc, still, their lives staggered so they don't all renew at
+    /// once. Seeded, so offline renders come out the same every time.
+    private func makeParticles() -> MTLBuffer? {
+        var rng = SplitMix64(seed: 0x5EED_CAFE)
+        var data = [SIMD4<Float>](repeating: .zero, count: Self.particleCount * 2)
+        for i in 0..<Self.particleCount {
+            let a = Float.random(in: 0..<(2 * .pi), using: &rng), r = 0.9 * Float.random(in: 0..<1, using: &rng).squareRoot()
+            let life = Float.random(in: 0.5..<10, using: &rng)
+            data[2 * i] = SIMD4(cos(a) * r * 1.6, sin(a) * r * 1.6, 0, 0)
+            data[2 * i + 1] = SIMD4(0, life, Float.random(in: 0..<100, using: &rng), life + 1)
+        }
+        return device.makeBuffer(bytes: data, length: data.count * MemoryLayout<SIMD4<Float>>.stride, options: .storageModeShared)
     }
 
     /// Sets the album cover the record's label shows (nil: a plain label in the theme's colours).
@@ -208,6 +299,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
               let buffer = queue.makeCommandBuffer() else { return nil }
         advance(frame: frame, scene: scene, dt: dt)
         updateOverlay(size: size, scale: scale, scene: scene)
+        let style = settings.style
 
         var u = VisualizerUniforms()
         u.a = SIMD4(Float(size.width), Float(size.height), Float(frame.time), Float(scale))
@@ -225,6 +317,40 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             for i in 0..<16 { slots[i] = i < rings.count ? rings[i] : .zero }
         }
 
+        // The styles with passes of their own before the picture.
+        let px = { (r: CGRect) in SIMD4<Float>(Float(r.minX * scale), Float(r.minY * scale), Float(r.width * scale), Float(r.height * scale)) }
+        let points = CGSize(width: size.width / scale, height: size.height / scale)
+        switch style {
+        case .scope:
+            u.g = SIMD4(Float(1.1 * scale), settings.scopeMode == .oscilloscope ? 1 : 0, frame.correlation, 0)
+            if settings.scopeMode == .goniometer {
+                let g = VisualizerLayout.goniometer(in: points)
+                u.h = SIMD4(Float(g.centre.x * scale), Float(g.centre.y * scale), Float(g.radius * scale), 0)
+                u.k = SIMD4(Float(g.bar.minX * scale), Float(g.bar.midY * scale), Float(g.bar.maxX * scale), Float(g.bar.height * scale))
+            } else {
+                let s = VisualizerLayout.oscilloscope(in: points)
+                u.h = SIMD4(Float(s.minX * scale), Float(s.minY * scale), Float(s.maxX * scale), Float(s.maxY * scale))
+            }
+            encodeScope(buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt)
+        case .particles:
+            u.g = SIMD4(Float(dt), Float(size.width / size.height), reduceMotion ? 1 : 0, Float(Self.particleCount))
+            encodeParticles(buffer, uniforms: &u, size: size, dt: dt)
+        case .meters:
+            let faces = VisualizerLayout.meterFaces(in: points)
+            u.g = px(faces[0])
+            u.h = px(faces[1])
+            let ppm = settings.meterKind == .ppm
+            let travel = ppm ? SIMD2(Float(VisualizerMeters.ppmTravel(decibels: Double(frame.ppm.x))),
+                                     Float(VisualizerMeters.ppmTravel(decibels: Double(frame.ppm.y)))) : frame.vu
+            u.k = SIMD4(travel.x, travel.y, ppm ? 1 : 0, 0)
+            u.c = SIMD4(peakLights.x, peakLights.y, 0, 0)
+            updateMeterFace(size: size, scale: scale)
+        case .mirrored:
+            u.g = SIMD4(settings.mirrorLayout == .line ? 1 : 0, frame.bass * frame.beatPulse + 0.5 * frame.bass, 0, 0)
+        default:
+            break
+        }
+
         guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass) else { return nil }
         encoder.setRenderPipelineState(pipeline)
         encoder.setFragmentBytes(&u, length: MemoryLayout<VisualizerUniforms>.stride, index: 0)
@@ -237,6 +363,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         encoder.setFragmentTexture(overlay ?? blank, index: 0)
         encoder.setFragmentTexture(history, index: 1)
         encoder.setFragmentTexture(artwork ?? blank, index: 2)
+        encoder.setFragmentTexture(trail ?? blank, index: 3)
+        encoder.setFragmentTexture(meterFace ?? blank, index: 4)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
         encoder.endEncoding()
         let gpu = self.gpu
@@ -306,9 +434,186 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
         let spin = reduceMotion ? 0.08 : 0.22 + 0.9 * Double(frame.mid)
         laserAngle = (laserAngle + dt * spin + (frame.beat && !reduceMotion ? 0.12 : 0)).truncatingRemainder(dividingBy: 2 * .pi)
-        if settings.strobe && !reduceMotion && frame.beat && frame.bass > 0.8 { strobe = 0.6 }
+        if strobeAllowed && frame.beat && frame.bass > 0.8 { strobe = 0.6 }
         strobe *= Float(exp(-dt / 0.045))
-        if strobe < 0.003 || reduceMotion || !settings.strobe { strobe = 0 }
+        if strobe < 0.003 || !strobeAllowed { strobe = 0 }
+
+        // Meters: the peak lights come on near full scale and stay lit a moment.
+        let lightFall = Float(exp(-dt / 0.25))
+        peakLights = SIMD2(frame.peakDB.x > -1 ? 1 : peakLights.x * lightFall, frame.peakDB.y > -1 ? 1 : peakLights.y * lightFall)
+    }
+
+    /// The strobe only flashes when it's switched on, its warning was accepted, and neither Reduce Motion nor Dim
+    /// Flashing Lights is on.
+    public var strobeAllowed: Bool {
+        settings.strobe && settings.strobeWarningAccepted && !reduceMotion && !reduceFlashing
+    }
+
+    // MARK: Trails
+
+    /// The trail texture at the drawable's size, cleared when it's new or another style used it last.
+    private func prepareTrail(size: CGSize, for style: VisualizerStyle, buffer: MTLCommandBuffer) -> MTLTexture? {
+        let w = Int(size.width), h = Int(size.height)
+        var fresh = trailStyle != style
+        if trail?.width != w || trail?.height != h {
+            let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: trailFormat, width: w, height: h, mipmapped: false)
+            d.usage = [.renderTarget, .shaderRead]
+            d.storageMode = .private
+            trail = device.makeTexture(descriptor: d)
+            fresh = true
+        }
+        trailStyle = style
+        guard let trail else { return nil }
+        if fresh {
+            let pass = MTLRenderPassDescriptor()
+            pass.colorAttachments[0].texture = trail
+            pass.colorAttachments[0].loadAction = .clear
+            pass.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+            pass.colorAttachments[0].storeAction = .store
+            buffer.makeRenderCommandEncoder(descriptor: pass)?.endEncoding()
+        }
+        return trail
+    }
+
+    /// A pass into the trail: everything there fades to `keep`, then `draw` adds the new light.
+    private func trailPass(_ buffer: MTLCommandBuffer, trail: MTLTexture, keep: Double, draw: (MTLRenderCommandEncoder) -> Void) {
+        let pass = MTLRenderPassDescriptor()
+        pass.colorAttachments[0].texture = trail
+        pass.colorAttachments[0].loadAction = .load
+        pass.colorAttachments[0].storeAction = .store
+        guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass), let fadePipeline else { return }
+        encoder.setRenderPipelineState(fadePipeline)
+        encoder.setBlendColor(red: Float(keep), green: Float(keep), blue: Float(keep), alpha: Float(keep))
+        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        draw(encoder)
+        encoder.endEncoding()
+    }
+
+    // MARK: Scope
+
+    /// The trace's points for this frame, in pixels: the goniometer's newest samples (left against right, turned
+    /// 45°), or the two channels against time from a rising zero crossing. The gain follows the music's recent peak
+    /// (like a scope's automatic gain), so quiet and loud masters fill the screen alike.
+    static func scopePoints(frame: VisualizerFrame, mode: VisualizerScopeMode, size points: CGSize, scale: CGFloat,
+                            gain: Float, brightness: Float, into out: inout [SIMD4<Float>]) {
+        out.removeAll(keepingCapacity: true)
+        let samples = frame.stereo
+        guard samples.count >= 2 else { return }
+        let s = Float(scale)
+        switch mode {
+        case .goniometer:
+            let g = VisualizerLayout.goniometer(in: points)
+            let c = SIMD2(Float(g.centre.x) * s, Float(g.centre.y) * s), radius = Float(g.radius) * s
+            let k = gain * Float(0.5.squareRoot()) * radius
+            for p in samples.suffix(1024) {
+                // Mono upright, left to the upper left, right to the upper right, out of phase across.
+                out.append(SIMD4(c.x + (p.y - p.x) * k, c.y - (p.x + p.y) * k, brightness, 0))
+            }
+        case .oscilloscope:
+            let screen = VisualizerLayout.oscilloscope(in: points)
+            let span = min(1024, samples.count / 2)
+            // The newest rising zero crossing that still leaves a full sweep after it; else free-running.
+            var start = samples.count - span
+            var i = samples.count - span
+            while i > 1 {
+                let a = samples[i - 1].x + samples[i - 1].y, b = samples[i].x + samples[i].y
+                if a < 0 && b >= 0 { start = i; break }
+                i -= 1
+            }
+            let x0 = Float(screen.minX) * s, width = Float(screen.width) * s
+            let height = Float(screen.height) * s, top = Float(screen.minY) * s
+            let amplitude = gain * height * 0.22
+            for channel in 0..<2 {
+                let base = top + height * (channel == 0 ? 0.25 : 0.75)
+                for j in 0..<span {
+                    let p = samples[start + j]
+                    out.append(SIMD4(x0 + width * Float(j) / Float(span - 1), base - (channel == 0 ? p.x : p.y) * amplitude,
+                                     brightness, Float(channel + 1)))
+                }
+            }
+        }
+    }
+
+    private func encodeScope(_ buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
+                             size: CGSize, scale: CGFloat, dt: Double) {
+        guard let trail = prepareTrail(size: size, for: .scope, buffer: buffer), let beamPipeline, !beamBuffers.isEmpty else { return }
+        // Automatic gain: up at once to the newest peak, back down over a couple of seconds, at most +30 dB.
+        var peak: Float = 0
+        for p in frame.stereo.suffix(1024) { peak = max(peak, abs(p.x), abs(p.y)) }
+        scopeEnvelope = max(peak, scopeEnvelope * Float(exp(-dt / 2)))
+        let gain = Float(settings.sensitivity) * 0.8 / max(scopeEnvelope, 0.0316)
+        let goniometer = settings.scopeMode == .goniometer
+        // Every sample leaves the same light whatever the frame rate: the goniometer redraws the newest 1,024
+        // samples each frame, so each is drawn about 1,024 / (new samples per frame) times.
+        let perFrame = max(1, dt / max(frame.stereoInterval, 1e-6))
+        let brightness = Float(goniometer ? min(1, perFrame / 1024) * 0.22 : dt * 60 * 0.3) * (frame.hasSignal ? 1 : 0.4)
+        Self.scopePoints(frame: frame, mode: settings.scopeMode, size: CGSize(width: size.width / scale, height: size.height / scale),
+                         scale: scale, gain: gain, brightness: brightness, into: &points)
+        beamIndex = (beamIndex + 1) % beamBuffers.count
+        let target = beamBuffers[beamIndex]
+        let count = min(points.count, Self.beamPoints)
+        points.withUnsafeBytes { raw in
+            if let base = raw.baseAddress { target.contents().copyMemory(from: base, byteCount: count * MemoryLayout<SIMD4<Float>>.stride) }
+        }
+        let keep = exp(-dt / (goniometer ? 0.07 : 0.05))
+        var uniforms = u
+        trailPass(buffer, trail: trail, keep: keep) { encoder in
+            guard count >= 2 else { return }
+            encoder.setRenderPipelineState(beamPipeline)
+            encoder.setVertexBuffer(target, offset: 0, index: 0)
+            encoder.setVertexBytes(&uniforms, length: MemoryLayout<VisualizerUniforms>.stride, index: 1)
+            encoder.setFragmentBytes(&uniforms, length: MemoryLayout<VisualizerUniforms>.stride, index: 0)
+            if goniometer {
+                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: count - 1)
+            } else {
+                // Two sweeps, one per channel, not joined.
+                let sweep = count / 2
+                for channel in 0..<2 {
+                    encoder.setVertexBufferOffset(channel * sweep * MemoryLayout<SIMD4<Float>>.stride, index: 0)
+                    encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: sweep - 1)
+                }
+            }
+        }
+    }
+
+    // MARK: Particles
+
+    private func encodeParticles(_ buffer: MTLCommandBuffer, uniforms u: inout VisualizerUniforms, size: CGSize, dt: Double) {
+        if particles == nil { particles = makeParticles() }
+        guard let particles, let particleStep, let spritePipeline,
+              let trail = prepareTrail(size: size, for: .particles, buffer: buffer) else { return }
+        var uniforms = u
+        if let compute = buffer.makeComputeCommandEncoder() {
+            compute.setComputePipelineState(particleStep)
+            compute.setBuffer(particles, offset: 0, index: 0)
+            compute.setBytes(&uniforms, length: MemoryLayout<VisualizerUniforms>.stride, index: 1)
+            let width = min(256, particleStep.maxTotalThreadsPerThreadgroup)
+            compute.dispatchThreadgroups(MTLSize(width: (Self.particleCount + width - 1) / width, height: 1, depth: 1),
+                                         threadsPerThreadgroup: MTLSize(width: width, height: 1, depth: 1))
+            compute.endEncoding()
+        }
+        let keep = settings.particleTrails ? exp(-dt / 0.22) : 0
+        trailPass(buffer, trail: trail, keep: keep) { encoder in
+            encoder.setRenderPipelineState(spritePipeline)
+            encoder.setVertexBuffer(particles, offset: 0, index: 0)
+            encoder.setVertexBytes(&uniforms, length: MemoryLayout<VisualizerUniforms>.stride, index: 1)
+            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: Self.particleCount)
+        }
+    }
+
+    // MARK: Meters
+
+    private func updateMeterFace(size: CGSize, scale: CGFloat) {
+        let w = Int(size.width), h = Int(size.height)
+        let key = "\(w)x\(h)@\(scale) \(settings.meterKind)"
+        guard key != meterFaceKey else { return }
+        meterFaceKey = key
+        guard let bytes = VisualizerMeterFace.render(width: w, height: h, scale: scale, kind: settings.meterKind) else { return }
+        let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: w, height: h, mipmapped: false)
+        d.usage = .shaderRead
+        guard let texture = device.makeTexture(descriptor: d) else { return }
+        texture.replace(region: MTLRegionMake2D(0, 0, w, h), mipmapLevel: 0, withBytes: bytes, bytesPerRow: w * 4)
+        meterFace = texture
     }
 
     // MARK: Labels
