@@ -61,6 +61,45 @@ private final class FakeBedReader: BedReading, @unchecked Sendable {
     }
 }
 
+/// Wraps the real asset reader and notes what it did and when, so that a decoder that stalls on a CI machine says where.
+private final class TracingBedReader: BedReading, @unchecked Sendable {
+    private let inner: BedReading
+    private let lock = NSLock()
+    private let began = Date()
+    private var lines: [String] = []
+
+    init(_ inner: BedReading) { self.inner = inner; note("made") }
+
+    var trace: String { lock.lock(); defer { lock.unlock() }; return lines.joined(separator: ", ") }
+    private func note(_ line: String) {
+        lock.lock(); lines.append(String(format: "%.2fs %@", Date().timeIntervalSince(began), line)); lock.unlock()
+    }
+
+    func start() throws {
+        note("start")
+        do { try inner.start(); note("started") } catch { note("start threw \(error)"); throw error }
+    }
+    func next() throws -> BedBuffer? {
+        note("next")
+        do {
+            let buffer = try inner.next()
+            note(buffer.map { "got \($0.frames) frames" } ?? "got the end")
+            return buffer
+        } catch { note("next threw \(error)"); throw error }
+    }
+    func cancel() { note("cancel"); inner.cancel() }
+}
+
+private final class TraceBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var current: TracingBedReader?
+    var reader: TracingBedReader? {
+        get { lock.lock(); defer { lock.unlock() }; return current }
+        set { lock.lock(); current = newValue; lock.unlock() }
+    }
+    var trace: String { reader?.trace ?? "no reader was made" }
+}
+
 @Suite("Visualizer while macOS renders Dolby Atmos")
 struct AtmosVisualizerTests {
     @Test("The engine's visualizer tap reads the Atmos render's samples instead of reporting nothing")
@@ -90,11 +129,12 @@ struct AtmosVisualizerTests {
     /// its own threads, and when the rest of the suite keeps every core busy (a release run, or a small CI machine) that
     /// takes more than ten seconds, so the bound is generous: the poll ends the moment the frames are there, and only a
     /// decoder that has really stopped makes it fail, with the frame it stopped at.
-    private static func waitForBed(_ decoder: SystemBedDecoder, through frame: Int64, timeout: TimeInterval = 120) throws {
+    private static func waitForBed(_ decoder: SystemBedDecoder, through frame: Int64, timeout: TimeInterval = 120,
+                                   trace: @autoclosure () -> String = "") throws {
         let deadline = Date().addingTimeInterval(timeout)
         while decoder.tap.endFrame < frame {
             guard Date() < deadline else {
-                throw BedTimeout(description: "the bed decoder had stored up to frame \(decoder.tap.endFrame) of \(frame) after \(Int(timeout)) s")
+                throw BedTimeout(description: "the bed decoder had stored up to frame \(decoder.tap.endFrame) of \(frame) after \(Int(timeout)) s; decoder error: \(decoder.error.map { String(describing: $0) } ?? "none"); reader: \(trace())")
             }
             Thread.sleep(forTimeInterval: 0.01)
         }
@@ -130,12 +170,17 @@ struct AtmosVisualizerTests {
         let url = Bundle.module.url(forResource: "dolby-digital-plus-tones.m4a", withExtension: nil, subdirectory: "Fixtures")!
         let asset = AVURLAsset(url: url)
         let info = try #require(LoadedAudioTrack(asset))
-        let decoder = SystemBedDecoder(asset: asset, track: info.track, origin: info.timeRange.start)
+        let tracing = TraceBox()
+        let decoder = SystemBedDecoder(makeReader: { seconds in
+            let reader = TracingBedReader(try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds))
+            tracing.reader = reader
+            return reader
+        })
         let playhead = Locked(0.5)
         decoder.start(at: 0) { playhead.value }
         defer { decoder.stop() }
         // Wait for the first second of the bed (the fixture is 1.5 s long and decoding stays a second ahead).
-        try Self.waitForBed(decoder, through: 36_000)
+        try Self.waitForBed(decoder, through: 36_000, trace: tracing.trace)
         playhead.value = 0.75
         var l = [Float](repeating: 0, count: 4096), r = l
         let read = try #require(decoder.tap.copy(left: &l, right: &r, playhead: 36_000))
@@ -154,11 +199,16 @@ struct AtmosVisualizerTests {
         let url = Bundle.module.url(forResource: "dolby-digital-plus-tones.m4a", withExtension: nil, subdirectory: "Fixtures")!
         let asset = AVURLAsset(url: url)
         let info = try #require(LoadedAudioTrack(asset))
-        let decoder = SystemBedDecoder(asset: asset, track: info.track, origin: info.timeRange.start)
+        let tracing = TraceBox()
+        let decoder = SystemBedDecoder(makeReader: { seconds in
+            let reader = TracingBedReader(try AssetBedReader(asset: asset, track: info.track, origin: info.timeRange.start, seconds: seconds))
+            tracing.reader = reader
+            return reader
+        })
         let playhead = Locked(1.0)
         decoder.start(at: 1.0) { playhead.value }
         defer { decoder.stop() }
-        try Self.waitForBed(decoder, through: 60_000)
+        try Self.waitForBed(decoder, through: 60_000, trace: tracing.trace)
         var l = [Float](repeating: 0, count: 2048), r = l
         let read = decoder.tap.copy(left: &l, right: &r, playhead: 60_000)
         #expect(read != nil)

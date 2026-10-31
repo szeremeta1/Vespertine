@@ -131,6 +131,8 @@ final class AssetBedReader: BedReading {
     func next() throws -> BedBuffer? {
         guard let buffer = output.copyNextSampleBuffer() else {
             if reader.status == .failed { throw reader.error ?? BedError.readerFailed }
+            // Only a completed reader has reached the end of the file; a nil from any other state is a stop to report.
+            if reader.status != .completed { throw BedError.endedEarly(status: reader.status.rawValue) }
             return nil
         }
         let frames = CMSampleBufferGetNumSamples(buffer)
@@ -147,10 +149,11 @@ final class AssetBedReader: BedReading {
 }
 
 enum BedError: Error, CustomStringConvertible {
-    case couldNotStart, readerFailed, noData(frames: Int), copyFailed(atFrame: Int64)
+    case couldNotStart, readerFailed, noData(frames: Int), copyFailed(atFrame: Int64), endedEarly(status: Int)
 
     var description: String {
         switch self {
+        case .endedEarly(let status): "the bed reader stopped without finishing (AVAssetReader status \(status))"
         case .couldNotStart: "the bed reader could not start"
         case .readerFailed: "the bed reader failed"
         case .noData(let frames): "a bed buffer of \(frames) frames has no data"
