@@ -13,7 +13,12 @@ Branch `feat/visualizer`. Brief: BRIEF-visualizer.md (local, untracked). Delete 
 - [x] `vespertine-visualize` CLI: offline renders from f32le audio (stills, raw BGRA for ffmpeg), prints µs/GPU ms.
 - [x] Tests: VespertineVisualizerTests (24) all pass.
 
+- [x] App: Settings > Playback > Visualizer (off by default), Window > Visualizer ⌥⌘V, toolbar button, controls,
+      window state (display, frame, full screen), pauses when hidden. QA hooks: -VespertineVisualizerStats, -VespertineQuitAfter.
+- [x] l10n: 34 keys × 44 languages (catalog change is additive only; check-localizations.py passes).
+- [x] Perf measured (see RESULT-visualizer.md); club/vinyl shaders optimized ~30%.
+- [x] Docs: docs/VISUALIZER.md, FEATURES.md, ARCHITECTURE.md.
+
 ## Next
-- [ ] App: setting (off by default), Window > Visualizer (⌥⌘V), toolbar button, window persistence, controls
-- [ ] Perf numbers (window open/closed), screenshots + recordings to ./out (local only, not committed: music is copyrighted)
-- [ ] l10n, docs (ARCHITECTURE, FEATURES), RESULT-visualizer.md, draft PR
+- [ ] Full test run, app tests, recordings/stills into ./out (.scratch/record.sh), RESULT-visualizer.md, draft PR.
+- Scripts kept local in .scratch/ (perf.sh, record.sh, l10n_visualizer.py); .scratch and out are git-excluded.

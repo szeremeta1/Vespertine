@@ -2,6 +2,7 @@ import AVFAudio
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineVisualizer
 import Testing
 @testable import Vespertine
 
@@ -32,6 +33,29 @@ struct AppAuditTests {
         settings.matchSixteenBit = true
         #expect(settings.engineSettings().matchSixteenBit)
         #expect(AppSettings(defaults: defaults, dataDirectory: root).matchSixteenBit)
+    }
+    @Test("The visualizer is off until turned on; its style, options and window come back after a relaunch")
+    func visualizerSettings() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-visualizer-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(!settings.visualizerEnabled)
+        #expect(settings.visualizer == VisualizerSettings())
+        #expect(settings.visualizerWindow == nil)
+        settings.visualizerEnabled = true
+        settings.visualizer.style = .vinyl
+        settings.visualizer.theme = .ember
+        settings.visualizer.tonearm = false
+        let window = VisualizerWindowState(frame: CGRect(x: 1600, y: 100, width: 1920, height: 1080), displayID: 5,
+                                           displayName: "Studio Display", fullScreen: true)
+        settings.visualizerWindow = window
+        let again = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(again.visualizerEnabled)
+        #expect(again.visualizer.style == .vinyl && again.visualizer.theme == .ember && !again.visualizer.tonearm)
+        #expect(again.visualizerWindow == window)
     }
     @Test("Volume keys reach the exclusively held device only once turned on")
     func relayVolumeKeysSetting() throws {

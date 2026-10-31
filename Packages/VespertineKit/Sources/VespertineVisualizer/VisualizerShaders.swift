@@ -16,7 +16,7 @@ struct U {
     float4 c;        // level, record angle, tonearm angle (radians from the pivot), tonearm shown 0/1
     float4 d;        // band count, fine count, history width, history head (column, with its fraction)
     float4 e;        // peak caps 0/1, has artwork 0/1, strobe 0…1, signal 0…1
-    float4 f;        // laser angle, platter speed 0…1, hue drift, unused
+    float4 f;        // laser angle, platter speed 0…1, unused, beat rings in use
     float4 stops[4]; // the theme, dark to bright
     float4 rings[16];// club: radius, strength, width, colour index
 };
@@ -331,7 +331,9 @@ fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], cons
     col = mix(col, spindleCol, spindle);
 
     // The tonearm.
-    if (showArm) {
+    // (Only near the arm: everywhere else it can't reach, shadow included.)
+    float2 armDir = float2(cos(u.c.z), sin(u.c.z));
+    if (showArm && segmentDistance(q, float2(1.08, 0.72) - armDir * 0.25, float2(1.08, 0.72) + armDir * 1.02) < 0.22) {
         float2 pivot = float2(1.08, 0.72);
         Tonearm t = tonearm(q, aa, u.c.z, pivot, 1.02, float3(0.78, 0.78, 0.8));
         col *= 1 - t.shadow;
@@ -368,26 +370,32 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     col += ramp(u, 0.5) * tunnelLine * (0.4 + 0.6 * mid) * signal;
 
     // Lasers: thin beams turning around the centre, brighter with the highs.
+    // Two fans of five beams, turning opposite ways. Only the nearest beam of each fan can light a pixel, so each
+    // fan is one evaluation rather than five.
     float laserAngle = u.f.x;
-    const int beams = 10;
-    for (int i = 0; i < beams; i++) {
-        float a = laserAngle * (i % 2 == 0 ? 1.0 : -0.7) + float(i) * (2 * M_PI_F / float(beams));
-        float diff = fmod(theta - a + 3 * M_PI_F, 2 * M_PI_F) - M_PI_F;
-        float d = abs(diff) * r;
+    const float spacing = 2 * M_PI_F / 5;
+    float reach = smoothstep(0.08, 0.3, r) * exp(-r * 0.6);
+    float haze = smoothstep(0.1, 0.4, r) * 0.035 * treble;
+    for (int fan = 0; fan < 2; fan++) {
+        float a0 = fan == 0 ? laserAngle : -0.7 * laserAngle + spacing * 0.5;
+        float rel = theta - a0;
+        float index = floor(rel / spacing + 0.5);
+        float d = abs(rel - index * spacing) * r;
         float width = 0.004 + 0.004 * r;
-        float beam = exp(-pow(d / width, 2.0)) * smoothstep(0.08, 0.3, r) * exp(-r * 0.6);
-        float flicker = 0.55 + 0.45 * sin(time * 17.0 + float(i) * 2.1);
-        float3 c = i % 2 == 0 ? u.stops[2].rgb : u.stops[3].rgb;
-        col += c * beam * (0.25 + 1.6 * treble) * flicker * signal;
-        col += c * exp(-d / (0.06 + 0.1 * treble)) * 0.035 * treble * signal * smoothstep(0.1, 0.4, r);
+        float x = d / width;
+        float flicker = 0.55 + 0.45 * sin(time * 17.0 + (index * 2 + float(fan)) * 2.1);
+        float3 c = fan == 0 ? u.stops[2].rgb : u.stops[3].rgb;
+        col += c * (exp(-x * x) * reach * (0.25 + 1.6 * treble) * flicker + exp(-d / (0.06 + 0.1 * treble)) * haze) * signal;
     }
 
     // Rings sent out by each beat.
-    for (int i = 0; i < 16; i++) {
+    int ringCount = min(int(u.f.w), 16);
+    for (int i = 0; i < ringCount; i++) {
         float4 ring = u.rings[i];
-        if (ring.y <= 0.001) continue;
         float d = abs(r - ring.x);
-        float shape = exp(-pow(d / ring.z, 2.0));
+        if (d > ring.z * 30) continue;      // too far for its halo to show
+        float x = d / ring.z;
+        float shape = exp(-x * x);
         float halo = exp(-d / (ring.z * 6));
         float3 c = ramp(u, ring.w);
         col += c * (shape * 1.1 + halo * 0.25) * ring.y;

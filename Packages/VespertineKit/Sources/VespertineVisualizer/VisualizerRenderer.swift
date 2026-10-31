@@ -217,7 +217,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         u.d = SIMD4(Float(frame.bands.count), Float(frame.fine.count), Float(Self.historyWidth),
                     Float(Double(historyHead) + historyFraction))
         u.e = SIMD4(settings.peakCaps ? 1 : 0, artwork != nil ? 1 : 0, strobe, signal)
-        u.f = SIMD4(Float(laserAngle), Float(platterSpeed), 0, 0)
+        u.f = SIMD4(Float(laserAngle), Float(platterSpeed), 0, Float(min(rings.count, 16)))
         let stops = settings.theme.stops.map { SIMD4<Float>($0, 1) }
         u.stops = (stops[0], stops[1], stops[2], stops[3])
         withUnsafeMutableBytes(of: &u.rings) { raw in
