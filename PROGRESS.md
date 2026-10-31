@@ -34,5 +34,7 @@ Branch `feat/visualizer`. Brief: BRIEF-visualizer.md (local, untracked). Delete 
 - [x] Tests: VisualizerMetersTests + renderer/settings additions (38 visualizer tests pass).
 - [x] tests/rt-audit.c: concurrent tap test (ASan/UBSan + TSan clean). audit.sh on phase 1 HEAD: all passed.
 - [x] l10n: 22 keys × 44 (.scratch/l10n_visualizer2.py), check-localizations passes.
-- [ ] Release perf numbers, clips in ./out (vinyl Vespertine, scope, meters, particles, mirrored), strobe dialog still.
-- [ ] Docs (VISUALIZER.md, FEATURES.md), RESULT-visualizer.md, PR-BODY-visualizer.md, full audit.sh on final code.
+- [x] Release perf numbers (offline), clips in ./out (vinyl Vespertine, scope, meters, particles, mirrored), strobe dialog still,
+      live app captures, 56 stills. Strobe capped at 2.5 flashes/s. Meters only run while shown.
+- [x] Docs (VISUALIZER.md, FEATURES.md, ARCHITECTURE.md), PR-BODY-visualizer.md drafted.
+- [ ] Full audit.sh on final code (.scratch/audit-final.out, .scratch/audit-src2), then fill test numbers in PR body/RESULT.
