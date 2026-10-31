@@ -76,8 +76,10 @@ private let zd3: AudioObjectID = 61, airPodsMax: AudioObjectID = 92, microphone:
 
 @Suite("Device hot-plug")
 struct DeviceHotplugTests {
-    private func monitor(_ provider: FakeDeviceProvider, changes: Locked<Int>) -> DeviceMonitor {
-        DeviceMonitor(provider: provider, queue: DispatchQueue(label: "test.devices")) { change in
+    /// `window`: how long a new device is re-checked. Long by default, so a test held up on a busy machine (the full
+    /// suite runs in parallel) can't outlast it; the re-check interval is the app's.
+    private func monitor(_ provider: FakeDeviceProvider, changes: Locked<Int>, window: TimeInterval = 600) -> DeviceMonitor {
+        DeviceMonitor(provider: provider, queue: DispatchQueue(label: "test.devices"), recheckWindow: window) { change in
             if case .devices = change { changes.withLock { $0 += 1 } }
         }
     }
@@ -109,6 +111,22 @@ struct DeviceHotplugTests {
         withExtendedLifetime(m) {}
     }
 
+    @Test("Re-checking ends after its window; the stream listener still catches a late device")
+    func recheckWindowEnds() async {
+        let hal = FakeDeviceProvider([zd3: true])
+        let changes = Locked(0)
+        let m = monitor(hal, changes: changes, window: 0.2)
+        hal.add(airPodsMax, hasOutput: false)
+        #expect(await waitUntil { changes.withLock { $0 } == 1 })
+        try? await Task.sleep(for: .milliseconds(700))
+        hal.publishStreams(of: airPodsMax, notify: false)
+        try? await Task.sleep(for: .milliseconds(600))
+        #expect(changes.withLock { $0 } == 1)
+        hal.publishStreams(of: airPodsMax, notify: true)
+        #expect(await waitUntil { changes.withLock { $0 } == 2 })
+        withExtendedLifetime(m) {}
+    }
+
     @Test("An input-only device causes no extra changes, and its listener goes when it does")
     func inputOnlyDevice() async {
         let hal = FakeDeviceProvider([zd3: true])
@@ -135,6 +153,36 @@ struct DeviceHotplugTests {
         #expect(await waitUntil { changes.withLock { $0 } == 2 })
         #expect(await waitUntil { hal.streamObservers(of: airPodsMax) == 0 })
         #expect(hal.streamObservers(of: zd3) == 0)
+        withExtendedLifetime(m) {}
+    }
+
+    /// The same on Core Audio: a private aggregate device joins the list with no output streams and gets them when
+    /// a sub-device is added, as a device that publishes its streams late does. The aggregate is visible to this
+    /// process only and goes away with it. Set VESPERTINE_HOTPLUG_SUBDEVICE to an output's name (e.g. "BlackHole 2ch").
+    @Test("Core Audio: an output whose streams arrive late is listed within a second",
+          .enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HOTPLUG_SUBDEVICE"] != nil))
+    func halLateStreams() async throws {
+        let name = ProcessInfo.processInfo.environment["VESPERTINE_HOTPLUG_SUBDEVICE"] ?? ""
+        let sub = try #require(OutputDevices.list().first { $0.name == name }, "no output named \(name)")
+        let uid = "org.szeremeta.vespertine.hotplug-test.\(getpid())"
+        let changes = Locked(0)
+        let m = DeviceMonitor { if case .devices = $0 { changes.withLock { $0 += 1 } } }
+        var aggregate = AudioObjectID(0)
+        let description: [String: Any] = [kAudioAggregateDeviceUIDKey: uid, kAudioAggregateDeviceNameKey: "Hot-plug test",
+                                          kAudioAggregateDeviceIsPrivateKey: 1]
+        try check(AudioHardwareCreateAggregateDevice(description as CFDictionary, &aggregate), "create aggregate")
+        defer { AudioHardwareDestroyAggregateDevice(aggregate) }
+        #expect(await waitUntil { changes.withLock { $0 } >= 1 })
+        #expect(DeviceQuery.outputChannelCount(aggregate) == 0)
+        #expect(!OutputDevices.list().contains { $0.uid == uid }, "listed before it has output")
+        try? await Task.sleep(for: .milliseconds(300))
+        let before = changes.withLock { $0 }
+        var subDevices = [sub.uid] as CFArray
+        var address = AudioObjectPropertyAddress.global(kAudioAggregateDevicePropertyFullSubDeviceList)
+        try check(AudioObjectSetPropertyData(aggregate, &address, 0, nil, UInt32(MemoryLayout<CFArray>.size), &subDevices),
+                  "set sub-devices")
+        #expect(await waitUntil(.seconds(1)) { changes.withLock { $0 } > before }, "no device change after streams arrived")
+        #expect(OutputDevices.list().contains { $0.uid == uid })
         withExtendedLifetime(m) {}
     }
 }
