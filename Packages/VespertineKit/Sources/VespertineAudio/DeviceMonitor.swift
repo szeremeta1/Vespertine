@@ -15,35 +15,80 @@ public enum OutputDevices {
     }
 }
 
-public final class DeviceMonitor: @unchecked Sendable {
-    public enum Change: Sendable { case devices, volume }
+/// What `DeviceMonitor` reads and listens to: Core Audio in the app, a fake in tests.
+protocol DeviceProvider: AnyObject, Sendable {
+    func deviceIDs() -> [AudioObjectID]
+    /// Whether the device has output channels now, the test `DeviceQuery.snapshot` lists a device by.
+    func hasOutput(_ device: AudioObjectID) -> Bool
+    /// Calls `action` on `queue` when the device list or the default output changes; the result stops it.
+    func observeSystem(on queue: DispatchQueue, _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void
+    /// Calls `action` on `queue` when the device's output streams or their channels change; the result stops it.
+    func observeStreams(of device: AudioObjectID, on queue: DispatchQueue,
+                        _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void
+}
 
-    private let queue = DispatchQueue(label: "org.szeremeta.vespertine.devices")
-    private let onChange: @Sendable (Change) -> Void
-    private var systemBlock: AudioObjectPropertyListenerBlock?
-    private var volumeBlock: AudioObjectPropertyListenerBlock?
-    private var watchedVolume: (device: AudioObjectID, elements: [UInt32])?
-
+final class HALDeviceProvider: DeviceProvider {
     private static let systemAddresses: [AudioObjectPropertyAddress] = [
         .global(kAudioHardwarePropertyDevices),
         .global(kAudioHardwarePropertyDefaultOutputDevice),
     ]
+    private static let streamAddresses: [AudioObjectPropertyAddress] = [
+        .output(kAudioDevicePropertyStreams),
+        .output(kAudioDevicePropertyStreamConfiguration),
+    ]
 
-    public init(onChange: @escaping @Sendable (Change) -> Void) {
-        self.onChange = onChange
-        let block: AudioObjectPropertyListenerBlock = { [onChange] _, _ in onChange(.devices) }
-        systemBlock = block
-        for var address in Self.systemAddresses {
-            AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue, block)
+    func deviceIDs() -> [AudioObjectID] { DeviceQuery.allDeviceIDs() }
+    func hasOutput(_ device: AudioObjectID) -> Bool { DeviceQuery.outputChannelCount(device) > 0 }
+
+    func observeSystem(on queue: DispatchQueue, _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+        Self.listen(AudioObjectID(kAudioObjectSystemObject), Self.systemAddresses, queue, action)
+    }
+
+    func observeStreams(of device: AudioObjectID, on queue: DispatchQueue,
+                        _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+        Self.listen(device, Self.streamAddresses, queue, action)
+    }
+
+    private static func listen(_ object: AudioObjectID, _ addresses: [AudioObjectPropertyAddress], _ queue: DispatchQueue,
+                               _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+        let block: @Sendable (UInt32, UnsafePointer<AudioObjectPropertyAddress>) -> Void = { _, _ in action() }
+        let added = addresses.filter { address in
+            var a = address
+            return AudioObjectAddPropertyListenerBlock(object, &a, queue, block) == noErr
         }
+        return {
+            for address in added {
+                var a = address
+                AudioObjectRemovePropertyListenerBlock(object, &a, queue, block)
+            }
+        }
+    }
+}
+
+public final class DeviceMonitor: @unchecked Sendable {
+    public enum Change: Sendable { case devices, volume }
+
+    private let queue: DispatchQueue
+    private let provider: DeviceProvider
+    private let onChange: @Sendable (Change) -> Void
+    private var stopSystem: (@Sendable () -> Void)?
+    private var volumeBlock: AudioObjectPropertyListenerBlock?
+    private var watchedVolume: (device: AudioObjectID, elements: [UInt32])?
+
+    public convenience init(onChange: @escaping @Sendable (Change) -> Void) {
+        self.init(provider: HALDeviceProvider(), queue: DispatchQueue(label: "org.szeremeta.vespertine.devices"),
+                  onChange: onChange)
+    }
+
+    init(provider: DeviceProvider, queue: DispatchQueue, onChange: @escaping @Sendable (Change) -> Void) {
+        self.provider = provider
+        self.queue = queue
+        self.onChange = onChange
+        stopSystem = provider.observeSystem(on: queue) { onChange(.devices) }
     }
 
     deinit {
-        if let systemBlock {
-            for var address in Self.systemAddresses {
-                AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &address, queue, systemBlock)
-            }
-        }
+        stopSystem?()
         unwatchVolume()
     }
 
