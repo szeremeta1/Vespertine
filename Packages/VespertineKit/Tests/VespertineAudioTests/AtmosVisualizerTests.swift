@@ -55,6 +55,20 @@ struct AtmosVisualizerTests {
         return (s1 * s1 + s2 * s2 - c * s1 * s2) / Double(signal.count * signal.count)
     }
 
+    /// Waits until the decoder has stored the bed up to `frame`. The first buffer comes out of AVFoundation's decoder on
+    /// its own threads, and when the rest of the suite keeps every core busy (a release run, or a small CI machine) that
+    /// takes more than ten seconds, so the bound is generous: the poll ends the moment the frames are there, and only a
+    /// decoder that has really stopped makes it fail, with the frame it stopped at.
+    private static func waitForBed(_ decoder: SystemBedDecoder, through frame: Int64, timeout: TimeInterval = 120) throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        while decoder.tap.endFrame < frame {
+            guard Date() < deadline else {
+                throw BedTimeout(description: "the bed decoder had stored up to frame \(decoder.tap.endFrame) of \(frame) after \(Int(timeout)) s")
+            }
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+    }
+
     @Test("The bed tap returns the frames before the playhead, zeros where nothing was decoded, and nil when it has nothing")
     func bedTapWindow() {
         let tap = SystemBedTap(sampleRate: 48_000, capacity: 1024)
@@ -90,8 +104,7 @@ struct AtmosVisualizerTests {
         decoder.start(at: 0) { playhead.value }
         defer { decoder.stop() }
         // Wait for the first second of the bed (the fixture is 1.5 s long and decoding stays a second ahead).
-        let deadline = Date().addingTimeInterval(10)
-        while decoder.tap.endFrame < 36_000, Date() < deadline { Thread.sleep(forTimeInterval: 0.02) }
+        try Self.waitForBed(decoder, through: 36_000)
         playhead.value = 0.75
         var l = [Float](repeating: 0, count: 4096), r = l
         let read = try #require(decoder.tap.copy(left: &l, right: &r, playhead: 36_000))
@@ -114,8 +127,7 @@ struct AtmosVisualizerTests {
         let playhead = Locked(1.0)
         decoder.start(at: 1.0) { playhead.value }
         defer { decoder.stop() }
-        let deadline = Date().addingTimeInterval(10)
-        while decoder.tap.endFrame < 60_000, Date() < deadline { Thread.sleep(forTimeInterval: 0.02) }
+        try Self.waitForBed(decoder, through: 60_000)
         var l = [Float](repeating: 0, count: 2048), r = l
         let read = decoder.tap.copy(left: &l, right: &r, playhead: 60_000)
         #expect(read != nil)
@@ -124,6 +136,8 @@ struct AtmosVisualizerTests {
         #expect(decoder.tap.copy(left: &early, right: &earlyR, playhead: 20_000) == nil)   // before the seek target
     }
 }
+
+private struct BedTimeout: Error, CustomStringConvertible { var description: String }
 
 private final class Locked<Value: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
