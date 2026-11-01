@@ -140,6 +140,9 @@ final class AppSettings {
     var visualizer: VisualizerSettings { didSet { if visualizer != oldValue { visualizer.save(to: defaults) } } }
     /// Where the visualizer window was (display, frame, full screen).
     var visualizerWindow: VisualizerWindowState? { didSet { if visualizerWindow != oldValue { visualizerWindow?.save(to: defaults) } } }
+    /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Not passed to
+    /// the engine yet: playback is the same either way.
+    var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
@@ -217,6 +220,7 @@ final class AppSettings {
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
         visualizer = VisualizerSettings.load(from: defaults)
         visualizerWindow = VisualizerWindowState.load(from: defaults)
+        transitions = TransitionSettings.load(from: defaults)
         if let dataDirectory {
             self.dataDirectory = dataDirectory
         } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
