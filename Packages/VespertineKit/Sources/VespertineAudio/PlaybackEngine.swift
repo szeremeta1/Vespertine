@@ -1500,7 +1500,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// frames (room for the longest crossfade and the silence scan). Songs of unknown length are joined as today.
     private func planBoundaryIfDue(_ session: OutputSession, _ a: Decoding) {
         guard let total = a.expectedFrames else {
+            // Joined at its end as today; the signal path says why there's no crossfade.
             boundary = (a.item.id, nil, nil)
+            if nextItemProvider?(a.item) != nil { note(.cut(.unknownLength), after: a.item.id) }
             return
         }
         let lead = TransitionTiming.planningLead(crossfadeSeconds: settings.transitions.crossfadeSeconds, rate: a.path.plan.deviceSampleRate)
