@@ -29,7 +29,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-02 <a id="bp-pcm-native-rate"></a>PCM at its own rate, nothing resampled or converted
 
 - **Text:** `docs/VERIFICATION.md:20` — "**The source is PCM** and plays at its own sample rate. Nothing is resampled and no DSD is converted to PCM."
-- **Text:** `docs/ARCHITECTURE.md:105` — "For PCM: the source is lossless, it isn't resampled or converted from DSD"
+- **Text:** `docs/ARCHITECTURE.md:107` — "For PCM: the source is lossless, it isn't resampled or converted from DSD"
 - **Property:** the PCM verdict is false when the source is lossy or DSD, when the plan resamples, when DSD is converted to PCM, or when the device rate read back differs from the source rate.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -48,7 +48,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/VERIFICATION.md:23` — "An integer DAC needs at least the file's bit depth."
 - **Text:** `docs/VERIFICATION.md:24` — "A float device needs a full 32-bit float."
 - **Text:** `docs/VERIFICATION.md:25` — "In the normal float pipeline, up to 24 bits pass through exactly. 32-bit integer files need **integer mode**"
-- **Text:** `docs/ARCHITECTURE.md:105` — "the source is at most 24-bit (32-bit with integer mode, which skips the Float32 step), and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float)."
+- **Text:** `docs/ARCHITECTURE.md:107` — "the source is at most 24-bit (32-bit with integer mode, which skips the Float32 step), and the device's physical format can hold it (an integer format at least as deep as the source, or 32-bit float)."
 - **Property:** PCM verdict false when source bits > 24 without integer mode, > 32 with it, when an integer physical format is narrower than the source, or when a float physical format is narrower than 32 bits.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -58,7 +58,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/VERIFICATION.md:26` — "**No gain is applied anywhere in software.**"
 - **Text:** `docs/VERIFICATION.md:28` — "Digital volume must be off or at exactly 0 dB."
 - **Text:** `docs/VERIFICATION.md:29` — "ReplayGain must be off or at 0 dB."
-- **Text:** `docs/ARCHITECTURE.md:103` — "No software gain is applied (neither ReplayGain nor digital volume)."
+- **Text:** `docs/ARCHITECTURE.md:105` — "No software gain is applied (neither ReplayGain nor digital volume)."
 - **Property:** verdict false whenever digital volume or ReplayGain is non-zero, or an equalizer preset is applied.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -66,7 +66,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-06 <a id="bp-channels"></a>No spatial or channel processing
 
 - **Text:** `docs/VERIFICATION.md:30` — "**No spatial or channel processing is applied.** The device has at least as many channels as the file."
-- **Text:** `docs/ARCHITECTURE.md:102` — "No Spatial Audio rendering or downmix."
+- **Text:** `docs/ARCHITECTURE.md:104` — "No Spatial Audio rendering or downmix."
 - **Property:** verdict false when Spatial Audio is on, when the plan's channel count differs from the source's, or when the device has fewer channels than the source.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -76,7 +76,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/VERIFICATION.md:32` — "Either Vespertine has the device to itself (exclusive \"hog\" mode),"
 - **Text:** `docs/VERIFICATION.md:33` — "or no other app is playing to it at the same moment."
 - **Text:** `docs/VERIFICATION.md:126` — "Vespertine looks for this about once a second, through Core Audio's list of processes that are playing to the device (`DeviceControl.otherProcessesPlaying`), and drops the badge when it finds one."
-- **Text:** `docs/ARCHITECTURE.md:101` — "The device is held exclusively, or (shared mode, PCM only) no other process is currently sending audio to it (Core Audio process objects, checked about once a second)."
+- **Text:** `docs/ARCHITECTURE.md:103` — "The device is held exclusively, or (shared mode, PCM only) no other process is currently sending audio to it (Core Audio process objects, checked about once a second)."
 - **Property:** verdict false when the device is not held exclusively and another process is playing to it. Shared mode is a route for PCM only: DoP needs the device held (CL-BP-12). "Held exclusively" means the hog-mode owner read back from Core Audio is Vespertine's process ID.
 - **Governed by:** vespertine-rule; hog-mode semantics from Apple's `AudioHardware.h`.
 - **Route:** spec-traced (verdict group). The once-a-second polling and its blind spots are inventory only (documented limit, `docs/VERIFICATION.md:126`).
@@ -85,7 +85,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:35` — "Bluetooth devices never can, because macOS re-encodes the audio for the radio link. AirPlay can't either."
 - **Text:** `docs/FEATURES.md:37` — "Speakers and virtual or aggregate devices are not labelled BIT-PERFECT."
-- **Text:** `docs/ARCHITECTURE.md:100` — "The device profile can be bit-perfect (i.e. not Bluetooth or AirPlay)."
+- **Text:** `docs/ARCHITECTURE.md:102` — "The device profile can be bit-perfect (i.e. not Bluetooth or AirPlay)."
 - **Property:** verdict false whenever the device class cannot be bit-perfect, regardless of every other condition.
 - **Governed by:** vespertine-rule. How a device's class is detected (`DeviceProfile`) is inventory: it reads Core Audio transport types and the IORegistry, which need real devices.
 - **Route:** spec-traced (verdict group, given the class); inventory (class detection).
@@ -101,7 +101,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-BP-10 <a id="bp-damaged-frames"></a>Concealed SACD frames remove the badge
 
-- **Text:** `docs/ARCHITECTURE.md:104` — "The decoder hasn't replaced any damaged frames of the track with silence (SACD images)."
+- **Text:** `docs/ARCHITECTURE.md:106` — "The decoder hasn't replaced any damaged frames of the track with silence (SACD images)."
 - **Text:** `docs/ARCHITECTURE.md:31` — "which turns BIT-PERFECT off (\"DAMAGED FRAMES SILENCED\")"
 - **Property:** verdict false, and the status reads DAMAGED FRAMES SILENCED, whenever the concealed-frame count is above zero.
 - **Governed by:** vespertine-rule.
@@ -117,7 +117,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-BP-12 <a id="bp-dop-conditions"></a>DoP has its own badge and conditions
 
-- **Text:** `docs/ARCHITECTURE.md:106` — "For DoP: the device is held exclusively (DoP always takes it, whatever the exclusive setting, and doesn't play without it), and the carrier runs at the planned rate with at least 24 bits."
+- **Text:** `docs/ARCHITECTURE.md:108` — "For DoP: the device is held exclusively (DoP always takes it, whatever the exclusive setting, and doesn't play without it), and the carrier runs at the planned rate with at least 24 bits."
 - **Text:** `docs/FEATURES.md:37` — "DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play."
 - **Text:** `docs/VERIFICATION.md:38` — "DSD over DoP and the experimental Dolby/DTS bitstream path have their own badges and their own conditions"
 - **Property:** NATIVE DSD · DoP only when the common conditions hold, the player holds the device exclusively, the device rate read back equals the planned carrier rate, and the physical format is at least 24 bits.
@@ -169,7 +169,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Text:** `docs/ARCHITECTURE.md:14` — "integer PCM up to 24 bits maps exactly into Float32, which a unit test verifies sample-for-sample."
 - **Text:** `docs/ARCHITECTURE.md:15` — "Gain of exactly 1.0 with no equalizer is a straight copy."
 - **Text:** `docs/FEATURES.md:39` — "The float path preserves up to 24 significant bits."
-- **Text:** `docs/ARCHITECTURE.md:160` — "Elsewhere Vespertine renders Float32, which is exact up to 24 bits."
+- **Text:** `docs/ARCHITECTURE.md:162` — "Elsewhere Vespertine renders Float32, which is exact up to 24 bits."
 - **Text:** `docs/VERIFICATION.md:25` — "In the normal float pipeline, up to 24 bits pass through exactly."
 - **Property:** for each of the 2^24 values k in [-2^23, 2^23 − 1], the Float32 k / 2^23 written into the ring comes out of the render stage with the identical bit pattern, at unity gain with no equalizer, on every channel and at every position in a buffer. Separately, the int → Float32 mapping (Apple's `AVAudioConverter`) is exact and invertible for 24-bit input.
 - **Governed by:** vespertine-rule. That Float32 holds every 24-bit integer exactly is arithmetic (a 24-bit significand), checked exhaustively rather than cited.
