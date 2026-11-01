@@ -16,12 +16,13 @@ struct U {
     float4 c;        // level, record angle, tonearm angle (radians from the pivot), tonearm shown 0/1
     float4 d;        // band count, fine count, history width, history head (column, with its fraction)
     float4 e;        // peak caps 0/1, has artwork 0/1, strobe 0…1, signal 0…1
-    float4 f;        // laser angle, platter speed 0…1, unused, beat rings in use
+    float4 f;        // laser angle, platter speed 0…1, Album Art ramp weight 0…1, beat rings in use
     float4 g;        // per style (scope, meters, particles, mirrored bars): see each
     float4 h;
     float4 k;
     float4 stops[4]; // the theme, dark to bright
     float4 rings[16];// club: radius, strength, width, colour index
+    float4 palette[6]; // Album Art: the cover's colours, dark to bright, six along the gradients
 };
 
 struct VOut {
@@ -41,9 +42,15 @@ constexpr sampler linearClamp(filter::linear, mip_filter::linear, address::clamp
 constexpr sampler linearRepeatX(filter::linear, s_address::repeat, t_address::clamp_to_edge);
 
 static float3 ramp(constant U &u, float t) {
-    t = saturate(t) * 3;
-    int i = min(int(t), 2);
-    return mix(u.stops[i].rgb, u.stops[i + 1].rgb, t - float(i));
+    t = saturate(t);
+    float s = t * 3;
+    int i = min(int(s), 2);
+    float3 base = mix(u.stops[i].rgb, u.stops[i + 1].rgb, s - float(i));
+    if (u.f.z <= 0) return base;
+    // Album Art: the gradient runs through all of the cover's colours.
+    float p = t * 5;
+    int j = min(int(p), 4);
+    return mix(base, mix(u.palette[j].rgb, u.palette[j + 1].rgb, p - float(j)), u.f.z);
 }
 
 static float hash21(float2 p) {

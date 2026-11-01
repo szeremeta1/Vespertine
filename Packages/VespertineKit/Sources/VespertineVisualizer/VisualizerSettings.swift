@@ -73,6 +73,9 @@ public enum VisualizerTheme: String, CaseIterable, Codable, Sendable, Identifiab
     case ice
     /// White on black.
     case mono
+    /// The colours of the cover of whatever is playing (up to five, dark to bright). The default colours when there's
+    /// no cover, or it has no colour to speak of: see `AlbumArtPalette`.
+    case albumArt
 
     public var id: String { rawValue }
 
@@ -86,6 +89,8 @@ public enum VisualizerTheme: String, CaseIterable, Codable, Sendable, Identifiab
         case .ember: [Self.rgb(0x1A0503), Self.rgb(0x9C1C0E), Self.rgb(0xFF6A1A), Self.rgb(0xFFE08A)]
         case .ice: [Self.rgb(0x020A1C), Self.rgb(0x1D4ED8), Self.rgb(0x5CC8FF), Self.rgb(0xF0FAFF)]
         case .mono: [Self.rgb(0x050505), Self.rgb(0x4A4A4A), Self.rgb(0xB5B5B5), Self.rgb(0xFFFFFF)]
+        // Without a palette, Album Art draws as the default theme (`VisualizerColors` swaps in the cover's colours).
+        case .albumArt: Self.vespertine.stops
         }
     }
 

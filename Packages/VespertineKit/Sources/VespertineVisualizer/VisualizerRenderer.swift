@@ -81,6 +81,9 @@ struct VisualizerUniforms {
     var rings: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>,
                 SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) =
         (.zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero)
+    /// The Album Art ramp, dark to bright (used by the gradients when `f.z` is above 0).
+    var palette: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) =
+        (.zero, .zero, .zero, .zero, .zero, .zero)
 }
 
 @MainActor
@@ -132,6 +135,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var column: [UInt8] = []
 
     private var artwork: MTLTexture?
+    private var colorFade = VisualizerColorFade()
     private var blank: MTLTexture?
     private var overlay: MTLTexture?
     private var overlayKey = ""
@@ -247,6 +251,12 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         ])
     }
 
+    /// Sets the colours of the cover for the Album Art theme (nil: the default colours), fading from the last ones
+    /// unless `animated` is false. Other themes ignore it.
+    public func setAlbumPalette(_ palette: AlbumArtPalette?, animated: Bool = true) {
+        colorFade.set(palette, animated: animated)
+    }
+
     // MARK: MTKViewDelegate
 
     public nonisolated func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
@@ -311,9 +321,13 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         u.d = SIMD4(Float(frame.bands.count), Float(frame.fine.count), Float(Self.historyWidth),
                     Float(Double(historyHead) + historyFraction))
         u.e = SIMD4(settings.peakCaps ? 1 : 0, artwork != nil ? 1 : 0, strobe, signal)
-        u.f = SIMD4(Float(laserAngle), Float(platterSpeed), 0, Float(min(rings.count, 16)))
-        let stops = settings.theme.stops.map { SIMD4<Float>($0, 1) }
+        colorFade.advance(by: dt)
+        let colours = colorFade.current(theme: settings.theme)
+        u.f = SIMD4(Float(laserAngle), Float(platterSpeed), colours.rampWeight, Float(min(rings.count, 16)))
+        let stops = colours.stops.map { SIMD4<Float>($0, 1) }
         u.stops = (stops[0], stops[1], stops[2], stops[3])
+        let ramp = colours.ramp.map { SIMD4<Float>($0, 1) }
+        u.palette = (ramp[0], ramp[1], ramp[2], ramp[3], ramp[4], ramp[5])
         withUnsafeMutableBytes(of: &u.rings) { raw in
             let slots = raw.bindMemory(to: SIMD4<Float>.self)
             for i in 0..<16 { slots[i] = i < rings.count ? rings[i] : .zero }

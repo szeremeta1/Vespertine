@@ -35,6 +35,7 @@ extension VisualizerTheme {
         case .ember: String(localized: "Ember", comment: "Visualizer colours: red, orange and gold.")
         case .ice: String(localized: "Ice", comment: "Visualizer colours: blues and white.")
         case .mono: String(localized: "Monochrome", comment: "Visualizer colours: white on black.")
+        case .albumArt: String(localized: "Album Art", comment: "Visualizer colours: the colours of the cover of whatever is playing.")
         }
     }
 }
@@ -190,6 +191,13 @@ struct VisualizerWindow: View {
             let image = await ArtworkCache.shared.image(key, size: 1200)
             guard !Task.isCancelled else { return }
             holder.renderer?.setArtwork(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
+        }
+        .task(id: model.artworkKey(model.player.current?.track)) {
+            // The Album Art colours: worked out in the background, then faded to (the old song's stay until then).
+            guard let key = model.artworkKey(model.player.current?.track) else { holder.renderer?.setAlbumPalette(nil); return }
+            let palette = await ArtworkCache.shared.albumPalette(key)
+            guard !Task.isCancelled else { return }
+            holder.renderer?.setAlbumPalette(palette)
         }
         .animation(.easeInOut(duration: 0.25), value: controlsShown)
         .task {

@@ -15,7 +15,17 @@ It reads a copy of what plays and never changes the sound. With the window close
 - **Particles.** 20,000 particles on the GPU, carried by a flow that is the curl of a slowly changing noise field (so it never gathers them into seams or thins them out), faster with the mids. The bass breathes the whole field in and out; each beat sends a ripple out from the middle that the particles ride and flare in; the highs make them sparkle. Short trails, optional.
 - **Mirrored.** The bar spectrum mirrored: around a **circle** (lows at the top, mirrored left and right, the album cover in the middle growing a little on the beat) or up and down from a **line** across the middle (lows at the centre). Peak caps and 32 to 128 bands as for Spectrum.
 
-Every style has seven colour themes and a sensitivity control (a quarter to four times, logarithmic). **Vespertine**, the default, is the app's own palette (from `App/Sources/Theme/Theme.swift`, the site's tokens and `docs/brand`): obsidian surface `#16161A`, copper `#C98B5B`, brass `#C8A66A` and ivory `#ECE6DA`, dark to bright. The others are Brass, Neon, Aurora, Ember, Ice and Monochrome. The default style is Vinyl. The style is picked from a menu in the controls; the controls fade after a few seconds without the pointer moving, and in full screen the pointer hides too. Keys 1 to 8 pick a style (in the menu's order) and Space plays or pauses.
+Every style has eight colour themes and a sensitivity control (a quarter to four times, logarithmic). **Vespertine**, the default, is the app's own palette (from `App/Sources/Theme/Theme.swift`, the site's tokens and `docs/brand`): obsidian surface `#16161A`, copper `#C98B5B`, brass `#C8A66A` and ivory `#ECE6DA`, dark to bright. The others are Brass, Neon, Aurora, Ember, Ice and Monochrome, and **Album Art**, which draws in the colours of the cover of whatever is playing (see [Album Art colours](#album-art-colours)). The default style is Vinyl. The style is picked from a menu in the controls; the controls fade after a few seconds without the pointer moving, and in full screen the pointer hides too. Keys 1 to 8 pick a style (in the menu's order) and Space plays or pauses.
+
+## Album Art colours
+
+The **Album Art** theme (Colors menu, last in the list) draws in the colours of the cover of the song playing, in every style. When the song changes the colours fade to the new cover's over 0.8 s, and an unchanged cover keeps its colours.
+
+- **Extraction** (`AlbumArtPalette`, in `VisualizerAlbumArt.swift`). The cover is drawn into a 48 × 48 bitmap, and the pixels that are neither grey nor black (chroma of at least 0.08, brightness of at least 0.18) are split into boxes in OKLab, always cutting the box with the most spread next, so a small patch of a different colour (a logo, a stripe) is set apart before a big field is cut finer. Then six rounds of k-means refine the centres. Colours closer than 0.09 in OKLab are one colour, and a cluster under 2.5 % of the colour is dropped. The result is one to five colours, dark to bright. There is no randomness: the same cover always gives the same palette. It runs once per artwork key on a background task (`ArtworkCache.albumPalette`) and is cached with the artwork.
+- **Readable.** Every colour is lightened toward white, if need be, until its brightness (Rec. 709 weights on the sRGB values) is at least 0.30, about as bright as the mid blue of the Ice theme, so bars and lines stand out from the dark background.
+- **Mapping.** The shaders already draw everything through one dark-to-bright gradient (bars, mirrored bars, the spectrogram's colour map, the Vinyl rim lights, the Club rings, the particles) and four role colours (surface tint, mid, accent, highlight). Album Art gives that gradient six stops: a dark tint of the palette's darkest colour at the bottom, then the cover's colours spread evenly up to the brightest. A single colour runs up to a paler tint of itself. The four role colours are taken from the same six. Only the gradient's source changes; the layout, the peak caps and the rest of each style are as with any theme.
+- **Unchanged.** The VU and PPM peak lights and the red zone, and the scope's red tint for out-of-phase sound, are fixed colours and don't follow any theme.
+- **Fallback.** No cover, a cover that is grayscale, blank or too dark (under 4 % of its pixels are colour), or a track with no artwork draws in the default Vespertine colours, and fades back to them from a cover's. The theme's name stays selected either way.
 
 ## The strobe
 
@@ -87,7 +97,7 @@ cd Packages/VespertineKit && swift build -c release --product vespertine-visuali
 .build/release/vespertine-visualize song.f32 --rate 44100 --style vinyl --art cover.jpg --still 60 --png vinyl.png
 ```
 
-Options: `--style vinyl|bars|spectrogram|club|scope|meters|particles|mirrored`, `--theme vespertine|brass|neon|aurora|ember|ice|mono`, `--scope goniometer|oscilloscope`, `--meter vu|ppm`, `--reference <dBFS>`, `--layout circle|line`, `--no-trails`, `--strobe`, and the others listed at the top of `main.swift`.
+Options: `--style vinyl|bars|spectrogram|club|scope|meters|particles|mirrored`, `--theme vespertine|brass|neon|aurora|ember|ice|mono|art` (`art` takes its colours from `--art`'s cover), `--scope goniometer|oscilloscope`, `--meter vu|ppm`, `--reference <dBFS>`, `--layout circle|line`, `--no-trails`, `--strobe`, and the others listed at the top of `main.swift`.
 
 ### Cost
 
