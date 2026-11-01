@@ -132,6 +132,7 @@ struct UpNextList: View {
                 .help("Repeat")
                 .accessibilityLabel("Repeat")
                 .accessibilityValue(player.repeatMode.spokenName)
+            TransitionsButton(size: 12)
             Button(String(localized: "Clear", comment: "Clears the upcoming queue")) { player.clearUpcoming() }
                 .buttonStyle(QuietButtonStyle(compact: true))
                 .disabled(player.upcoming.isEmpty)

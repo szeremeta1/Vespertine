@@ -250718,7 +250718,7 @@
       }
     },
     "Off": {
-      "comment": "DoP is off\nEqualizer choice: no equalizer\nRepeat mode\nRepeat mode, read by VoiceOver: repeat is off.\nReplayGain mode: no volume adjustment.\nShuffle state",
+      "comment": "DoP is off\nEqualizer choice: no equalizer\nRepeat mode\nRepeat mode, read by VoiceOver: repeat is off.\nReplayGain mode: no volume adjustment.\nShuffle state\nTransitions state",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -252595,7 +252595,7 @@
       }
     },
     "On": {
-      "comment": "Column header: whether an equalizer band is enabled\nShuffle state",
+      "comment": "Column header: whether an equalizer band is enabled\nShuffle state\nTransitions state",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -411719,6 +411719,813 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ Hz  Q %@"
+          }
+        }
+      }
+    },
+    "Transitions": {
+      "comment": "Song transitions (crossfades between songs): the master switch in the Controls menu, the Transitions button's spoken name and the title of the note shown when it's first turned on.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሽግግሮች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الانتقالات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ট্রানজিশন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přechody"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgange"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übergänge"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μεταβάσεις"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transiciones"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گذارها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siirtymät"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga transition"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transitions"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટ્રાન્ઝિશન"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauye-sauye"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מעברים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रांज़िशन"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Átmenetek"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transisi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transizioni"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トランジション"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಟ್ರಾನ್ಸಿಷನ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전환"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ട്രാൻസിഷനുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रान्झिशन"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peralihan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overganger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgangen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transições"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transições"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tranziții"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Övergångar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mipito"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "டிரான்சிஷன்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ట్రాన్సిషన్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเปลี่ยนเพลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçişler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переходи"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹرانزیشنز"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển tiếp"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "过渡"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場"
+          }
+        }
+      }
+    },
+    "Transitions (⌥⌘X)": {
+      "comment": "Tooltip of the Transitions button (transport bar, Up Next): turns song transitions on or off; keep the shortcut glyphs as they are.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሽግግሮች (⌥⌘X)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الانتقالات (⌥⌘X)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ট্রানজিশন (⌥⌘X)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přechody (⌥⌘X)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgange (⌥⌘X)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übergänge (⌥⌘X)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μεταβάσεις (⌥⌘X)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transiciones (⌥⌘X)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گذارها (⌥⌘X)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siirtymät (⌥⌘X)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga transition (⌥⌘X)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transitions (⌥⌘X)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટ્રાન્ઝિશન (⌥⌘X)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauye-sauye (⌥⌘X)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מעברים (⌥⌘X)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रांज़िशन (⌥⌘X)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Átmenetek (⌥⌘X)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transisi (⌥⌘X)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transizioni (⌥⌘X)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トランジション (⌥⌘X)"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಟ್ರಾನ್ಸಿಷನ್‌ಗಳು (⌥⌘X)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전환 (⌥⌘X)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ട്രാൻസിഷനുകൾ (⌥⌘X)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रान्झिशन (⌥⌘X)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peralihan (⌥⌘X)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overganger (⌥⌘X)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgangen (⌥⌘X)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ (⌥⌘X)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejścia (⌥⌘X)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transições (⌥⌘X)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transições (⌥⌘X)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tranziții (⌥⌘X)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Övergångar (⌥⌘X)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mipito (⌥⌘X)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "டிரான்சிஷன்கள் (⌥⌘X)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ట్రాన్సిషన్‌లు (⌥⌘X)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเปลี่ยนเพลง (⌥⌘X)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçişler (⌥⌘X)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переходи (⌥⌘X)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹرانزیشنز (⌥⌘X)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển tiếp (⌥⌘X)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場 (⌥⌘X)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "过渡 (⌥⌘X)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場 (⌥⌘X)"
+          }
+        }
+      }
+    },
+    "Transitions change the sound only during each fade; the rest of every song stays bit-perfect.": {
+      "comment": "Shown once, the first time song transitions are turned on.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሽግግሮች ድምፁን የሚቀይሩት በእያንዳንዱ ፌድ ወቅት ብቻ ነው፤ የእያንዳንዱ ዘፈን ቀሪ ክፍል ቢት-ፍጹም ሆኖ ይቆያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا تغيّر الانتقالات الصوت إلا خلال كل تلاشٍ؛ ويبقى باقي كل أغنية مطابقًا للبتات."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ট্রানজিশন শুধু প্রতিটি ফেডের সময় শব্দ বদলায়; প্রতিটি গানের বাকি অংশ বিট-পারফেক্ট থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přechody mění zvuk jen během každého prolnutí; zbytek každé skladby zůstává bit-perfect."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgange ændrer kun lyden under hver fade; resten af hver sang forbliver bitperfekt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übergänge verändern den Klang nur während jeder Blende; der Rest jedes Songs bleibt bit-perfekt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι μεταβάσεις αλλάζουν τον ήχο μόνο κατά τη διάρκεια κάθε σβησίματος· το υπόλοιπο κάθε τραγουδιού μένει bit-perfect."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las transiciones cambian el sonido solo durante cada fundido; el resto de cada canción sigue siendo bit-perfect."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گذارها صدا را فقط در طول هر محوشدن تغییر می‌دهند؛ بقیهٔ هر آهنگ بیت‌به‌بیت می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siirtymät muuttavat ääntä vain jokaisen häivytyksen aikana; kappaleiden muu osa pysyy bittitarkkana."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binabago lang ng mga transition ang tunog habang may fade; nananatiling bit-perfect ang natitirang bahagi ng bawat kanta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les transitions ne modifient le son que pendant chaque fondu ; le reste de chaque morceau reste bit-perfect."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટ્રાન્ઝિશન ફક્ત દરેક ફેડ દરમિયાન અવાજ બદલે છે; દરેક ગીતનો બાકીનો ભાગ બિટ-પરફેક્ટ રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauye-sauye suna canza sauti ne kawai yayin kowane dushewa; sauran kowace waƙa tana kasancewa bit-perfect."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מעברים משנים את הצליל רק במהלך כל עמעום; שאר כל שיר נשאר מדויק לסיבית."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रांज़िशन सिर्फ़ हर फ़ेड के दौरान आवाज़ बदलते हैं; हर गाने का बाकी हिस्सा बिट-परफ़ेक्ट रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az átmenetek csak az egyes áttűnések alatt változtatják meg a hangot; minden dal többi része bit-perfect marad."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transisi hanya mengubah suara selama setiap fade; bagian lain setiap lagu tetap bit-perfect."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le transizioni cambiano il suono solo durante ogni dissolvenza; il resto di ogni brano resta bit-perfect."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トランジションが音を変えるのは各フェードの間だけで、それ以外の部分はどの曲もビットパーフェクトのままです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಟ್ರಾನ್ಸಿಷನ್‌ಗಳು ಪ್ರತಿ ಫೇಡ್ ಸಮಯದಲ್ಲಿ ಮಾತ್ರ ಧ್ವನಿಯನ್ನು ಬದಲಾಯಿಸುತ್ತವೆ; ಪ್ರತಿ ಹಾಡಿನ ಉಳಿದ ಭಾಗ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿಯೇ ಇರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전환은 각 페이드 동안에만 소리를 바꾸며, 모든 노래의 나머지 부분은 비트 퍼펙트로 유지됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ട്രാൻസിഷനുകൾ ഓരോ ഫേഡിലും മാത്രമാണ് ശബ്ദം മാറ്റുന്നത്; ഓരോ പാട്ടിന്റെയും ബാക്കി ഭാഗം ബിറ്റ്-പെർഫെക്റ്റ് ആയി തുടരും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रान्झिशन फक्त प्रत्येक फेडदरम्यान आवाज बदलतात; प्रत्येक गाण्याचा उरलेला भाग बिट-परफेक्ट राहतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peralihan hanya mengubah bunyi semasa setiap fade; selebihnya setiap lagu kekal bit-perfect."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overganger endrer lyden bare under hver overtoning; resten av hver sang forblir bitperfekt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgangen veranderen het geluid alleen tijdens elke fade; de rest van elk nummer blijft bitperfect."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ ਸਿਰਫ਼ ਹਰ ਫ਼ੇਡ ਦੌਰਾਨ ਆਵਾਜ਼ ਬਦਲਦੇ ਹਨ; ਹਰ ਗੀਤ ਦਾ ਬਾਕੀ ਹਿੱਸਾ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejścia zmieniają dźwięk tylko podczas każdego przenikania; reszta każdego utworu pozostaje bit-perfect."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As transições mudam o som só durante cada fade; o restante de cada música continua bit-perfect."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As transições alteram o som apenas durante cada fade; o resto de cada música mantém-se bit-perfect."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tranzițiile schimbă sunetul doar în timpul fiecărei estompări; restul fiecărei piese rămâne bit-perfect."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Övergångar ändrar ljudet bara under varje övertoning; resten av varje låt förblir bitperfekt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mipito hubadilisha sauti wakati wa kila fifisho tu; sehemu iliyobaki ya kila wimbo hubaki bit-perfect."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "டிரான்சிஷன்கள் ஒவ்வொரு ஃபேடின்போதும் மட்டுமே ஒலியை மாற்றுகின்றன; ஒவ்வொரு பாடலின் மீதிப் பகுதி பிட்-பெர்ஃபெக்டாகவே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ట్రాన్సిషన్‌లు ప్రతి ఫేడ్ సమయంలో మాత్రమే ధ్వనిని మారుస్తాయి; ప్రతి పాట మిగిలిన భాగం బిట్-పర్ఫెక్ట్‌గానే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเปลี่ยนเพลงจะเปลี่ยนเสียงเฉพาะช่วงเฟดแต่ละครั้งเท่านั้น ส่วนที่เหลือของทุกเพลงยังคงเป็นบิตเพอร์เฟกต์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçişler sesi yalnızca her fade sırasında değiştirir; her şarkının geri kalanı bit-perfect kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переходи змінюють звук лише під час кожного згасання; решта кожної пісні лишається біт-у-біт."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹرانزیشنز صرف ہر فیڈ کے دوران آواز بدلتے ہیں؛ ہر گانے کا باقی حصہ بٹ پرفیکٹ رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển tiếp chỉ thay đổi âm thanh trong mỗi lần fade; phần còn lại của mỗi bài hát vẫn bit-perfect."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場只會在每次淡入淡出期間改變聲音；每首歌的其餘部分仍保持位元完美。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "过渡只在每次淡入淡出期间改变声音；每首歌的其余部分保持比特完美。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場只會在每次淡入淡出期間改變聲音；每首歌的其餘部分仍維持位元完美。"
           }
         }
       }

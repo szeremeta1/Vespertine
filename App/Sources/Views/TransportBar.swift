@@ -22,6 +22,7 @@ struct TransportBar: View {
             HStack(spacing: 12) {
                 DeviceChip(showDevices: $showDevices)
                 VolumeControl()
+                TransitionsButton()
                 Button { model.showQueue.toggle() } label: { Image(systemName: "list.bullet").font(.system(size: 14)) }
                     .buttonStyle(TransportIconStyle(active: model.showQueue))
                     .help("Up Next (⌥⌘U)")

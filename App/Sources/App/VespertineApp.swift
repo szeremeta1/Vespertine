@@ -162,6 +162,8 @@ struct VespertineCommands: Commands {
                 Text("All", comment: "Repeat mode").tag(RepeatMode.all)
                 Text("One", comment: "Repeat mode").tag(RepeatMode.one)
             }
+            Toggle("Transitions", isOn: Binding(get: { model.settings.transitions.enabled }, set: { model.setTransitions($0) }))
+                .keyboardShortcut("x", modifiers: [.command, .option])
             Divider()
             Toggle("Exclusive Mode", isOn: Binding(get: { model.settings.exclusiveMode },
                                                    set: { model.settings.exclusiveMode = $0; model.syncEngine() }))
