@@ -31,6 +31,8 @@ cd Packages/VespertineAnalysis && swift test
 
 `scripts/audit.sh` runs everything above plus the app tests, sanitizer builds of the real-time C code and a release build.
 
+The golden PCM tests (`GoldenPCMTests.swift`) render a fixed set of files (gapless pairs, 44.1/48/96 kHz, mono to 5.1, 16/24/32-bit and float, DoP, Dolby and DTS bitstream, a CUE sheet, a silent tail) through the engine's decode, convert, ring and render steps with no device, and compare SHA-256 hashes of the exact output with `Tests/VespertineAudioTests/Fixtures/golden-pcm.json`. A change that is meant to alter the output is re-recorded with `VESPERTINE_GOLDEN_RECORD=1 swift test --filter GoldenPCM`, and the pull request says why.
+
 The FFmpeg decoders for DTS, TrueHD and DSD ship prebuilt in `Packages/VespertineKit/Vendor/FFmpegDCA.xcframework`. To rebuild them from FFmpeg's release tarball (checksum-verified, only those decoders enabled):
 
 ```bash
