@@ -174,8 +174,8 @@ enum GoldenRender {
 
     /// The signal path the engine would make for `probed` (PlaybackEngine.makePath): `Decoding` reads its plan and
     /// whether the session is in integer mode.
-    static func path(_ probed: ProbedSource, item: PlayableItem, session: Session, settings: Settings) -> SignalPath {
-        let plan = session.plan
+    static func path(_ probed: ProbedSource, item: PlayableItem, session: Session, settings: Settings, plan: OutputPlan? = nil) -> SignalPath {
+        let plan = plan ?? session.plan
         let applied = AppliedFormat(sampleRate: plan.deviceSampleRate, physicalBitDepth: plan.physicalBitDepth, physicalIsInteger: true,
                                     virtualChannels: session.device.streamChannels, exclusive: settings.exclusive,
                                     bufferFrames: session.device.bufferFrames, integerMode: session.integerMode)
@@ -188,9 +188,8 @@ enum GoldenRender {
     /// PlaybackEngine.Decoding for `item` on `session`.
     static func decoding(_ item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, session: Session, settings: Settings,
                          plan: OutputPlan? = nil) throws -> Decoding {
-        var p = path(probed, item: item, session: session, settings: settings)
-        if let plan { p.plan = plan }
-        return try Decoding(item: item, probed: probed, decoder: decoder, path: p, chunk: chunkFrames, layout: session.layout)
+        try Decoding(item: item, probed: probed, decoder: decoder, path: path(probed, item: item, session: session, settings: settings, plan: plan),
+                     chunk: chunkFrames, layout: session.layout)
     }
 
     /// PlaybackEngine.fill with transitions off: one chunk into the ring.
@@ -236,5 +235,156 @@ enum GoldenRender {
             sessions.append(session.output)
         }
         return Output(sessions: sessions)
+    }
+
+    // MARK: Transitions on
+
+    /// A transition, in ring frames of its session: where its samples are changed.
+    struct Mixed: Equatable, CustomStringConvertible {
+        enum Kind: String { case overlap, dipOut, dipIn }
+        var session: Int
+        var ringFrame: UInt64
+        var length: Int
+        var kind: Kind
+        var description: String { "\(kind.rawValue) session \(session) at \(ringFrame) for \(length)" }
+    }
+
+    struct TransitionOutput {
+        var output: Output
+        var mixes: [Mixed]
+        var decisions: [TransitionDecision]
+    }
+
+    /// Plays `items` with transitions on, as the engine does (PlaybackEngine.fillWithTransitions, planBoundaryIfDue,
+    /// planBoundary, finishCrossfade, handOver, advance's dip and checkTransitions' fade in), on the engine's own pieces:
+    /// TransitionPlanner, Crossfade.prepare (silence scan and placement), Crossfade, FrameRamp and Decoding. `dither`:
+    /// the mixer dithers at the device's depth, as the engine does on an integer DAC with nothing after the ring.
+    static func render(_ items: [PlayableItem], device: Device, settings: Settings = Settings(), transitions: TransitionSettings,
+                       dither: Bool) throws -> TransitionOutput {
+        var sessions: [SessionOutput] = [], mixes: [Mixed] = [], decisions: [TransitionDecision] = []
+        var session: Session?
+        var index = 0
+        var deck: Decoding?
+        var deckRing: UInt64 = 0          // ring frame of the deck's frame 0
+        var crossfade: Crossfade?
+        var planned = false
+        var fadeIn: (seconds: Double, curve: TransitionCurve)?
+        while index < items.count {
+            if deck == nil {
+                // begin / advance / checkTransitions: open the next song, on a new session if its plan needs one.
+                let item = items[index]
+                let probed = try SourceOpener.probe(item.url, area: item.sacdArea, dvd: item.dvd)
+                let plan = plan(probed, item: item, device: device, settings: settings)
+                if let current = session, !current.plan.isDeviceCompatible(with: plan) {
+                    current.render()
+                    sessions.append(current.output)
+                    session = nil
+                }
+                var ramp: FrameRamp?
+                if session == nil {
+                    session = try Session(plan: plan, device: device, settings: settings)
+                    if let f = fadeIn { ramp = FrameRamp.fadeIn(seconds: f.seconds, curve: f.curve, rate: plan.deviceSampleRate) }
+                }
+                fadeIn = nil
+                let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
+                alignDoPMarkers(decoder, at: session!.totalWritten)
+                let d = try decoding(item, probed: probed, decoder: decoder, session: session!, settings: settings, plan: plan)
+                d.rampIn = ramp
+                if let ramp { mixes.append(Mixed(session: sessions.count, ringFrame: session!.totalWritten, length: ramp.length, kind: .dipIn)) }
+                deck = d
+                deckRing = session!.totalWritten
+                planned = false
+            }
+            guard let a = deck, let s = session else { break }
+            if a.finished {
+                if let cf = crossfade, cf.started {
+                    // finishCrossfade
+                    while !cf.done {
+                        while Int(nrt_ring_writable(s.ring)) < Int(chunkFrames) * 2 { s.render(upTo: device.bufferFrames) }
+                        cf.finishAlone(maxFrames: Int(chunkFrames)) { _ = nrt_ring_write(s.ring, $0, UInt32($1)) }
+                    }
+                    cf.flushIncoming { _ = nrt_ring_write(s.ring, $0, UInt32($1)) }
+                    deck = cf.incoming
+                    crossfade = nil
+                    index += 1
+                    planned = false
+                    continue
+                }
+                crossfade = nil
+                if let error = a.error { throw Failure(description: "\(a.item.url.lastPathComponent): \(error)") }
+                deck = nil
+                index += 1
+                continue
+            }
+            // planBoundaryIfDue / planBoundary
+            if !planned, let total = a.expectedFrames,
+               total - Int64(a.framesProduced) <= TransitionTiming.planningLead(crossfadeSeconds: transitions.crossfadeSeconds, rate: a.path.plan.deviceSampleRate) {
+                planned = true
+                if index + 1 < items.count {
+                    let next = items[index + 1]
+                    let probed = try SourceOpener.probe(next.url, area: next.sacdArea, dvd: next.dvd)
+                    let planB = plan(probed, item: next, device: device, settings: settings)
+                    var planA = a.path.plan
+                    planA.integerSamples = a.path.applied.integerMode || planA.integerSamples
+                    let decision = TransitionPlanner.decide(transitions, from: a.item, format: .plan(planA), to: next, format: .plan(planB),
+                                                            compatible: s.plan.isDeviceCompatible(with: planB))
+                    decisions.append(decision)
+                    switch decision {
+                    case .overlap(let seconds, let curve):
+                        crossfade = try Crossfade.prepare(outgoing: a, total: total, next: next, probed: probed, plan: planB,
+                                                          path: path(probed, item: next, session: s, settings: settings, plan: planB),
+                                                          seconds: seconds, curve: curve, trimSilence: transitions.trimSilence,
+                                                          ditherBits: dither ? planB.physicalBitDepth : 0, chunk: chunkFrames, layout: s.layout,
+                                                          reopenOutgoing: {
+                                                              try SourceOpener.decoder(for: SourceOpener.probe(a.item.url, area: a.item.sacdArea, dvd: a.item.dvd),
+                                                                                       plan: a.path.plan, item: a.item)
+                                                          })
+                    case .dip(let seconds, let curve):
+                        if let ramp = FrameRamp.fadeOut(seconds: seconds, curve: curve, total: total, produced: a.framesProduced, rate: a.path.plan.deviceSampleRate) {
+                            a.rampOut = ramp
+                            mixes.append(Mixed(session: sessions.count, ringFrame: deckRing + ramp.start, length: ramp.length, kind: .dipOut))
+                        }
+                        fadeIn = (seconds, curve)
+                    case .gapless, .cut:
+                        break
+                    }
+                }
+            }
+            // fillWithTransitions
+            while Int(nrt_ring_writable(s.ring)) < Int(chunkFrames) * (crossfade != nil ? 2 : 1) { s.render(upTo: device.bufferFrames) }
+            let first = a.framesProduced
+            let chunk = a.convertChunk()
+            let channels = a.path.plan.channels
+            if chunk.frames > 0, let data = chunk.data {
+                a.rampIn?.apply(data, frames: Int(chunk.frames), first: first, channels: channels)
+                a.rampOut?.apply(data, frames: Int(chunk.frames), first: first, channels: channels)
+                if let cf = crossfade {
+                    let before = s.totalWritten
+                    if let offset = cf.feed(data, frames: Int(chunk.frames), first: first, write: { _ = nrt_ring_write(s.ring, $0, UInt32($1)) }) {
+                        mixes.append(Mixed(session: sessions.count, ringFrame: before + UInt64(offset), length: cf.length, kind: .overlap))
+                    }
+                } else {
+                    _ = nrt_ring_write(s.ring, data, chunk.frames)
+                }
+            }
+            if chunk.ended {
+                a.finished = true
+                if let e = chunk.error { a.error = a.error ?? e }
+            }
+            if let cf = crossfade, cf.done {
+                // handOver
+                cf.flushIncoming { _ = nrt_ring_write(s.ring, $0, UInt32($1)) }
+                deck = cf.incoming
+                deckRing = mixes.last { $0.kind == .overlap }?.ringFrame ?? deckRing
+                crossfade = nil
+                index += 1
+                planned = false
+            }
+        }
+        if let session {
+            session.render()
+            sessions.append(session.output)
+        }
+        return TransitionOutput(output: Output(sessions: sessions), mixes: mixes, decisions: decisions)
     }
 }

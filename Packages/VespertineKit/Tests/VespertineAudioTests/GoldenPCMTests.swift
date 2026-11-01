@@ -229,10 +229,25 @@ enum GoldenCases {
         return url
     }
 
-    static func item(_ url: URL, start: Int64? = nil, length: Int64? = nil, replayGain: Double? = nil) -> PlayableItem {
+    static func item(_ url: URL, start: Int64? = nil, length: Int64? = nil, replayGain: Double? = nil,
+                     album: TransitionContext? = nil) -> PlayableItem {
         // A fixed id: nothing in the output may depend on it, and a run is then the same every time.
         PlayableItem(id: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!, url: url,
-                     regionStartFrame: start, regionFrameLength: length, replayGainDB: replayGain)
+                     regionStartFrame: start, regionFrameLength: length, replayGainDB: replayGain, context: album)
+    }
+
+    /// Track `number` of one album (what the queue knows about it; the output doesn't depend on it with transitions off).
+    static func track(_ number: Int) -> TransitionContext { TransitionContext(albumKey: "golden album", discNumber: 1, trackNumber: number) }
+
+    /// Set while the cases run with transitions on (TransitionGoldenTests): the queue then plays as the engine plays it
+    /// with the master switch on.
+    @TaskLocal static var transitions: TransitionSettings?
+
+    static func render(_ items: [PlayableItem], device: GoldenRender.Device, settings: GoldenRender.Settings = .init()) throws -> GoldenRender.Output {
+        if let transitions {
+            return try GoldenRender.render(items, device: device, settings: settings, transitions: transitions, dither: true).output
+        }
+        return try GoldenRender.render(items, device: device, settings: settings)
     }
 
     static func run(_ c: GoldenCase) throws -> GoldenRun {
@@ -248,11 +263,11 @@ enum GoldenCases {
                 try AudioConverter.convert(w, to: f)
                 flacs.append(f)
             }
-            return GoldenRun(output: try R.render(flacs.map { item($0) }, device: GoldenDevices.dac), expected: [(s, 16)])
+            return GoldenRun(output: try render(flacs.enumerated().map { item($1, album: track($0 + 1)) }, device: GoldenDevices.dac), expected: [(s, 16)])
         case "rate-44k1-24", "rate-48k-24", "rate-96k-24":
             let rate = ["rate-44k1-24": 44_100, "rate-48k-24": 48_000, "rate-96k-24": 96_000][c.name]!
             let s = GoldenFixtures.samples(frames: rate / 4, channels: 2, bits: 24, seed: UInt64(rate))
-            return GoldenRun(output: try R.render([item(try wav("\(c.name).wav", s, bits: 24, rate: rate))], device: GoldenDevices.dac),
+            return GoldenRun(output: try render([item(try wav("\(c.name).wav", s, bits: 24, rate: rate))], device: GoldenDevices.dac),
                              expected: [(s, 24)])
         case "rate-change-queue":
             var urls: [URL] = [], expected: [(samples: [[Int32]], bits: Int)?] = []
@@ -261,23 +276,23 @@ enum GoldenCases {
                 urls.append(try wav("queue-\(rate).wav", s, bits: 24, rate: rate))
                 expected.append((s, 24))
             }
-            return GoldenRun(output: try R.render(urls.map { item($0) }, device: GoldenDevices.dac), expected: expected)
+            return GoldenRun(output: try render(urls.map { item($0) }, device: GoldenDevices.dac), expected: expected)
         case "mono-16-48k":
             let s = GoldenFixtures.samples(frames: 12_000, channels: 1, bits: 16, seed: 3)
-            return GoldenRun(output: try R.render([item(try wav("mono.wav", s, bits: 16, rate: 48_000))], device: GoldenDevices.dac),
+            return GoldenRun(output: try render([item(try wav("mono.wav", s, bits: 16, rate: 48_000))], device: GoldenDevices.dac),
                              expected: [(s, 16)])
         case "surround-51-24-48k-discrete", "surround-51-24-48k-downmix":
             let s = GoldenFixtures.samples(frames: 12_000, channels: 6, bits: 24, seed: 51)
             let url = try wav("\(c.name).wav", s, bits: 24, rate: 48_000)
             let discrete = c.name.hasSuffix("discrete")
-            return GoldenRun(output: try R.render([item(url)], device: discrete ? GoldenDevices.sixOut : GoldenDevices.dac),
+            return GoldenRun(output: try render([item(url)], device: discrete ? GoldenDevices.sixOut : GoldenDevices.dac),
                              expected: [discrete ? (s, 24) : nil])
         case "int16-44k1", "int16-44k1-matched":
             let s = GoldenFixtures.samples(frames: 20_000, channels: 2, bits: 16, seed: 16)
             let matched = c.name.hasSuffix("matched")
             var settings = R.Settings()
             settings.matchSixteenBit = matched
-            let out = try R.render([item(try wav("\(c.name).wav", s, bits: 16, rate: 44_100))],
+            let out = try render([item(try wav("\(c.name).wav", s, bits: 16, rate: 44_100))],
                                    device: matched ? GoldenDevices.integerDAC : GoldenDevices.dac, settings: settings)
             return GoldenRun(output: out, expected: [(s, 16)])
         case "int32-96k-float-path", "int32-96k-integer-mode":
@@ -285,7 +300,7 @@ enum GoldenCases {
             let integer = c.name.hasSuffix("integer-mode")
             var settings = R.Settings()
             settings.integerMode = integer
-            let out = try R.render([item(try wav("\(c.name).wav", s, bits: 32, rate: 96_000))],
+            let out = try render([item(try wav("\(c.name).wav", s, bits: 32, rate: 96_000))],
                                    device: integer ? GoldenDevices.integerDAC : GoldenDevices.dac, settings: settings)
             return GoldenRun(output: out, expected: [integer ? (s, 32) : nil])
         case "float32-48k":
@@ -294,7 +309,7 @@ enum GoldenCases {
             floats[0][300] = 1.5; floats[1][300] = -1.25; floats[0][301] = 0.1; floats[1][301] = .leastNonzeroMagnitude
             let url = file("float.wav")
             try GoldenFixtures.writeWAV(floats: floats, bits: 32, rate: 48_000, to: url)
-            var run = GoldenRun(output: try R.render([item(url)], device: GoldenDevices.dac))
+            var run = GoldenRun(output: try render([item(url)], device: GoldenDevices.dac))
             run.expectedFloats = floats
             return run
         case "dop-dsd64", "dop-dsd64-gapless-pair", "dsd64-to-pcm":
@@ -307,11 +322,12 @@ enum GoldenCases {
                 try DSDFiles.writeDSF(GoldenFixtures.dsdPlanes(bits: bits, channels: 2, seed: i), rate: 2_822_400, to: url)
                 urls.append(url)
             }
-            return GoldenRun(output: try R.render(urls.map { item($0) }, device: c.name == "dsd64-to-pcm" ? GoldenDevices.dac : GoldenDevices.dopDAC))
+            return GoldenRun(output: try render(urls.enumerated().map { item($1, album: track($0 + 1)) },
+                                                device: c.name == "dsd64-to-pcm" ? GoldenDevices.dac : GoldenDevices.dopDAC))
         case "bitstream-ac3":
-            return GoldenRun(output: try R.render([item(fixture("dolby-digital-tones.ac3"))], device: GoldenDevices.receiver))
+            return GoldenRun(output: try render([item(fixture("dolby-digital-tones.ac3"))], device: GoldenDevices.receiver))
         case "bitstream-dts-cd":
-            return GoldenRun(output: try R.render([item(fixture("dts-cd-tones.wav"))], device: GoldenDevices.receiver))
+            return GoldenRun(output: try render([item(fixture("dts-cd-tones.wav"))], device: GoldenDevices.receiver))
         case "cue-3-tracks-16-44k1":
             // 2 s of CD audio, tracks at 0, 0:00:37 and 0:01:12 (CD frames of 1/75 s).
             let s = GoldenFixtures.samples(frames: 88_200, channels: 2, bits: 16, seed: 75)
@@ -326,25 +342,25 @@ enum GoldenCases {
             let items = starts.indices.map { i in
                 item(url, start: starts[i], length: (i + 1 < starts.count ? starts[i + 1] : Int64(s[0].count)) - starts[i])
             }
-            return GoldenRun(output: try R.render(items, device: GoldenDevices.dac), expected: [(s, 16)])
+            return GoldenRun(output: try render(items, device: GoldenDevices.dac), expected: [(s, 16)])
         case "silence-tail-pair":
             let a = GoldenFixtures.silenceTail(frames: 30_000, musicFrames: 14_000, channels: 2, bits: 24, seed: 5)
             var b = GoldenFixtures.samples(frames: 20_000, channels: 2, bits: 24, seed: 6)
             for c in 0..<2 { for n in 0..<6_000 { b[c][n] = 0 } }
             let urls = [try wav("tail-a.wav", a, bits: 24, rate: 48_000), try wav("tail-b.wav", b, bits: 24, rate: 48_000)]
-            return GoldenRun(output: try R.render(urls.map { item($0) }, device: GoldenDevices.dac),
+            return GoldenRun(output: try render(urls.map { item($0) }, device: GoldenDevices.dac),
                              expected: [(GoldenFixtures.joined([a, b]), 24)])
         case "replaygain-minus-6":
             let s = GoldenFixtures.samples(frames: 12_000, channels: 2, bits: 24, seed: 66)
-            return GoldenRun(output: try R.render([item(try wav("rg.wav", s, bits: 24, rate: 48_000), replayGain: -6)], device: GoldenDevices.dac))
+            return GoldenRun(output: try render([item(try wav("rg.wav", s, bits: 24, rate: 48_000), replayGain: -6)], device: GoldenDevices.dac))
         case "digital-volume-minus-10":
             let s = GoldenFixtures.samples(frames: 12_000, channels: 2, bits: 24, seed: 10)
             var settings = R.Settings()
             settings.digitalVolumeDB = -10
-            return GoldenRun(output: try R.render([item(try wav("dv.wav", s, bits: 24, rate: 48_000))], device: GoldenDevices.dac, settings: settings))
+            return GoldenRun(output: try render([item(try wav("dv.wav", s, bits: 24, rate: 48_000))], device: GoldenDevices.dac, settings: settings))
         case "src-44k1-on-48k-only":
             let s = GoldenFixtures.samples(frames: 11_025, channels: 2, bits: 24, seed: 441)
-            return GoldenRun(output: try R.render([item(try wav("src.wav", s, bits: 24, rate: 44_100))], device: GoldenDevices.only48))
+            return GoldenRun(output: try render([item(try wav("src.wav", s, bits: 24, rate: 44_100))], device: GoldenDevices.only48))
         default:
             throw GoldenRender.Failure(description: "unknown case \(c.name)")
         }
