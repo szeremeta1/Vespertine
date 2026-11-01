@@ -7,9 +7,9 @@
 //   vespertine-visualize song.f32 --rate 48000 --style bars --still 42 --png bars.png
 //
 // Styles: vinyl (the default), bars, spectrogram, club, scope, meters, particles, mirrored. Themes: vespertine (the
-// default), brass, neon, aurora, ember, ice, mono. Per style: --scope goniometer|oscilloscope, --meter vu|ppm,
-// --reference <dBFS> (meters; automatic without), --layout circle|line (mirrored), --no-trails (particles), --strobe
-// (club; as if its warning had been accepted).
+// default), brass, neon, aurora, ember, ice, mono, art (the colours of --art's cover; the default's without one).
+// Per style: --scope goniometer|oscilloscope, --meter vu|ppm, --reference <dBFS> (meters; automatic without),
+// --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted).
 //
 // Prints the analysis and GPU time per frame to stderr.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -47,7 +47,9 @@ func parse() -> Options {
         switch a {
         case "--rate": o.rate = Double(next()) ?? o.rate
         case "--style": o.settings.style = VisualizerStyle(rawValue: next()) ?? .vinyl
-        case "--theme": o.settings.theme = VisualizerTheme(rawValue: next()) ?? .vespertine
+        case "--theme":
+            let name = next()
+            o.settings.theme = VisualizerTheme(rawValue: name == "art" ? "albumArt" : name) ?? .vespertine
         case "--sensitivity": o.settings.sensitivity = Double(next()) ?? 1
         case "--bands": o.settings.bandCount = Int(next()) ?? 64
         case "--linear": o.settings.decibelScale = false
@@ -115,6 +117,7 @@ func run() -> Int32 {
     renderer.settings = o.settings
     if let art = o.art, let image = NSImage(contentsOfFile: art)?.cgImage(forProposedRect: nil, context: nil, hints: nil) {
         renderer.setArtwork(image)
+        renderer.setAlbumPalette(AlbumArtPalette.extract(from: image), animated: false)
     }
     var configuration = VisualizerAnalyzer.Configuration()
     configuration.bandCount = o.settings.bandCount

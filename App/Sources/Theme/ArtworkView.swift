@@ -5,6 +5,7 @@
 
 import AppKit
 import VespertineLibrary
+import VespertineVisualizer
 import SwiftUI
 
 @MainActor
@@ -12,6 +13,8 @@ final class ArtworkCache {
     static let shared = ArtworkCache()
     private let cache = NSCache<NSString, NSImage>()
     private var colors: [String: Color] = [:]
+    /// The visualizer's Album Art palettes by artwork key; a cover with no colour to speak of is cached as nil.
+    private var palettes: [String: AlbumArtPalette?] = [:]
     var store: ArtworkStore?
 
     init() { cache.countLimit = 600 }
@@ -40,6 +43,18 @@ final class ArtworkCache {
         let color = Color(.sRGB, red: Double(pixel[0]) / 255, green: Double(pixel[1]) / 255, blue: Double(pixel[2]) / 255)
         colors[key] = color
         return color
+    }
+}
+
+extension ArtworkCache {
+    /// The cover's colours for the visualizer's Album Art theme, worked out once per artwork key off the main thread
+    /// (nil: no cover, or grayscale or too dark to have any, so the default colours are used).
+    func albumPalette(_ key: String) async -> AlbumArtPalette? {
+        if let hit = palettes[key] { return hit }
+        guard let cg = await image(key, size: 160)?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let palette = await Task.detached(priority: .utility) { AlbumArtPalette.extract(from: cg) }.value
+        palettes[key] = .some(palette)
+        return palette
     }
 }
 
