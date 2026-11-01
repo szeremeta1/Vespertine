@@ -66,7 +66,7 @@ public struct SystemRendering: Sendable, Equatable {
 /// Plays a Dolby Atmos file through macOS's own renderer, which turns its objects into what the device
 /// can play: head-tracked Spatial Audio on AirPods, virtualized height on Mac speakers, the channels of a
 /// multichannel device. The Dolby Digital Plus frames go to the renderer untouched.
-final class SystemRendererSession: @unchecked Sendable {
+final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     let item: PlayableItem
     let url: URL
     let rendering: SystemRendering
@@ -83,6 +83,9 @@ final class SystemRendererSession: @unchecked Sendable {
     /// The first frame's time in the file (some containers don't start at zero).
     private var origin = CMTime.zero
     private var generation = 0
+    /// The visualizer's view of the bed (see `SystemBedDecoder`); it decodes only while `tapping`.
+    private var bed: SystemBedDecoder?
+    private var tapping = false
 
     init(item: PlayableItem, url: URL, deviceUID: String?, spatial: Bool, volume: Float) throws {
         self.item = item
@@ -99,6 +102,7 @@ final class SystemRendererSession: @unchecked Sendable {
         self.track = track
         origin = start
         duration = max(0, CMTimeGetSeconds(total) - max(0, CMTimeGetSeconds(start)))
+        bed = SystemBedDecoder(url: url)
     }
 
     deinit { stop() }
@@ -124,6 +128,7 @@ final class SystemRendererSession: @unchecked Sendable {
         enqueuedEnd = target
         lock.unlock()
         synchronizer.setRate(0, time: target)
+        startBed(at: seconds)
         renderer.requestMediaDataWhenReady(on: queue) { [weak self] in
             guard let self else { return }
             self.lock.lock(); defer { self.lock.unlock() }
@@ -147,10 +152,34 @@ final class SystemRendererSession: @unchecked Sendable {
 
     func stop() {
         lock.lock(); generation += 1; lock.unlock()
+        bed?.stop()
         synchronizer.rate = 0
         renderer.stopRequestingMediaData()
         renderer.flush()
         reader?.cancelReading()
+    }
+
+    // MARK: Visualizer
+
+    func setTapping(_ on: Bool) {
+        lock.lock()
+        let was = tapping
+        tapping = on
+        lock.unlock()
+        if on, !was { startBed(at: position) } else if !on { bed?.stop() }
+    }
+
+    private func startBed(at seconds: TimeInterval) {
+        lock.lock(); let on = tapping; lock.unlock()
+        guard on, let bed else { return }
+        bed.start(at: seconds) { [weak self] in self?.position ?? 0 }
+    }
+
+    func copy(left: inout [Float], right: inout [Float]) -> PlaybackEngine.VisualizerTapRead? {
+        guard let bed else { return nil }
+        bed.restartIfStalled()
+        let playhead = Int64((position * bed.tap.sampleRate).rounded())
+        return bed.tap.copy(left: &left, right: &right, playhead: playhead)
     }
 
     var position: TimeInterval {

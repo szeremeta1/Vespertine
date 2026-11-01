@@ -547,13 +547,17 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.lock(); defer { sessionLock.unlock() }
         visualizerTap = on
         if let session { nrt_context_set_viz(session.context, on) }
+        systemTap?.setTapping(on)
     }
 
     /// Copies the newest `left.count` frames from the visualizer tap (at most `NRT_VIZ_TAP_SIZE / 2`), or returns nil
-    /// when nothing plays through Vespertine's own output (idle, or macOS rendering Atmos) or the stream isn't PCM
-    /// the visualizer can read (bitstream). A copy the I/O thread overtook comes back with `frames` 0.
+    /// when nothing is playing (idle) or the stream isn't PCM the visualizer can read (bitstream). While macOS
+    /// renders Atmos it reads the decoded bed's stereo downmix instead (`SystemBedTap`). A copy the I/O thread overtook comes back with `frames` 0.
     public func copyVisualizerTap(left: inout [Float], right: inout [Float]) -> VisualizerTapRead? {
         sessionLock.lock(); defer { sessionLock.unlock() }
+        if let systemTap, visualizerTap, !left.isEmpty, left.count == right.count {
+            return systemTap.copy(left: &left, right: &right)
+        }
         guard let session, visualizerTap, session.plan.mode != .bitstream, !left.isEmpty, left.count == right.count else { return nil }
         let n = UInt32(min(left.count, Int(NRT_VIZ_TAP_SIZE / 2)))
         var position: UInt64 = 0
@@ -566,6 +570,15 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Guarded by `sessionLock`.
     private var visualizerTap = false
+
+    /// Where the visualizer reads while macOS renders Dolby Atmos (there's no `session` then). Guarded by `sessionLock`.
+    private var systemTap: (any SystemRenderTap)?
+
+    /// Puts `tap` where the Atmos session's own tap goes: tests stand in for macOS's renderer with it.
+    func attachSystemTapForTesting(_ tap: (any SystemRenderTap)?) {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        systemTap = tap
+    }
 
     /// A probed file whose start failed before its decoder was used (the output wasn't ready).
     private var unusedProbe: (item: UUID, probed: ProbedSource)?
@@ -959,6 +972,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         atmos?.stop()
         atmos = nil
+        sessionLock.lock(); systemTap = nil; sessionLock.unlock()
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream,
@@ -1098,6 +1112,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         atmos?.stop()
         atmos = nil
         sessionLock.lock()
+        systemTap = nil
         let old = session
         session = nil
         sessionDevice = nil
@@ -1218,8 +1233,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         try session.prepare(at: seconds)
         sessionLock.lock()
         atmos = session
+        systemTap = session
         sessionDevice = device
+        let tapping = visualizerTap
         sessionLock.unlock()
+        if tapping { session.setTapping(true) }
         lastAudibleSegmentID = nil
     }
 
