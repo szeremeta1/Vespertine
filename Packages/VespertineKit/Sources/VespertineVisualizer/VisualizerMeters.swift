@@ -24,6 +24,8 @@ public struct VisualizerMeters: Sendable, Equatable {
     public static let zeroVU = 1 / pow(10, 3.0 / 20)
     /// The needle's stops: resting on the left pin, pegged on the right one.
     public static let vuTravel = 0.0...1.08
+    /// The PPM mark where the peak light starts (6, the BBC's highest permitted peak; the face prints no red).
+    public static let ppmRedMark = 6.0
     public static let ppmAttack = 0.00276
     public static let ppmFallDBPerSecond = 24 / 2.8
 
