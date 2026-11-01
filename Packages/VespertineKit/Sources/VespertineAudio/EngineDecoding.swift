@@ -1,7 +1,7 @@
 //
 // Vespertine — one song being decoded for the output: decoder → AVAudioConverter (format, and SRC only when needed)
-// → Spatial Audio bed routing → ReplayGain, a chunk at a time, as the engine writes it to the ring. The golden PCM
-// tests run this same code with no device.
+// → Spatial Audio bed routing → ReplayGain, a chunk at a time. The engine writes each chunk to the ring; while a
+// crossfade runs, two of these (the outgoing and the incoming song) feed one ring (TransitionMixer.swift).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -81,6 +81,22 @@ final class Decoding {
     var durationSeconds: Double {
         let rate = decoder.processingFormat.sampleRate
         return rate > 0 ? Double(decoder.length) / rate : 0
+    }
+
+    // MARK: Transitions (none of this is used while the master switch is off)
+
+    /// The source frame decoding started from (a seek, or a crossfade's trimmed head): `framesProduced` counts from here.
+    var startSourceFrame: Int64 = 0
+    /// Gain ramps on this song's frames before the ring: a dip's fade out at its end, and its fade in at its start.
+    var rampOut: FrameRamp?
+    var rampIn: FrameRamp?
+
+    /// Frames this decoding produces in all, at the device rate: the rest of the song from `startSourceFrame`. nil
+    /// when the decoder doesn't know its length.
+    var expectedFrames: Int64? {
+        let length = decoder.length, rate = decoder.processingFormat.sampleRate
+        guard length > 0, rate > 0 else { return nil }
+        return Int64((Double(max(0, length - startSourceFrame)) * path.plan.deviceSampleRate / rate).rounded())
     }
 
     /// One converted chunk: what `fill` hands the ring.

@@ -36,6 +36,30 @@ public struct SignalPath: Sendable, Hashable {
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
     public var concealedFrames = 0
+    /// Song transitions, while their master switch is on; nil while it's off.
+    public var transition: TransitionStage? = nil
+
+    /// Song transitions in the signal path: what the next boundary does, and whether a crossfade is heard right now.
+    public struct TransitionStage: Sendable, Hashable {
+        public var style: TransitionStyle
+        /// The boundary after this song, once known.
+        public var next: TransitionDecision?
+        /// A crossfade or a dip's fade is being heard (held a moment longer so the badge doesn't flicker). Only then are
+        /// the samples changed; before and after, the song plays as it would with transitions off.
+        public var audible = false
+
+        public init(style: TransitionStyle, next: TransitionDecision? = nil, audible: Bool = false) {
+            self.style = style
+            self.next = next
+            self.audible = audible
+        }
+
+        /// The badge while it's audible: CROSSFADE for a crossfade, MIXING for Smart Mix and Live Set.
+        public var badge: String {
+            style == .crossfade ? String(localized: "CROSSFADE", comment: "Status badge (short, uppercase): two songs are crossfading right now.")
+                                : String(localized: "MIXING", comment: "Status badge (short, uppercase): Smart Mix or Live Set is blending two songs right now.")
+        }
+    }
 
     public var isResampling: Bool { plan.resamples }
 
@@ -58,7 +82,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
+        guard transition?.audible != true, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
         else { return false }
         switch plan.mode {
@@ -80,6 +104,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// One-line state for badges and the menu bar (in the current language; English without a string table).
     public var statusLine: String {
+        if let transition, transition.audible { return transition.badge }
         if isBitPerfect {
             switch plan.mode {
             case .dop: return String(localized: "NATIVE DSD · DoP", comment: "Status badge (short, uppercase).")
