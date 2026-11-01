@@ -62,6 +62,10 @@ The reader (`PlaybackEngine.copyVisualizerTap`) always takes the newest frames. 
 
 **Atmos rendered by macOS.** `AVSampleBufferAudioRenderer` takes the compressed Dolby Digital Plus frames and gives nothing back, so there's no session and no I/O proc to tap. While a visualizer window is showing, the session decodes the same track with a second `AVAssetReader` into a stereo downmix of the 5.1/7.1 bed (`SystemBedDecoder`, never more than a second ahead of the playhead), keeps it in a ring (`SystemBedTap`), and the visualizer reads the frames just before the renderer's playhead. The picture therefore shows the bed (the objects' height and position aren't in it), with no Spatial Audio processing, and may be a few tens of milliseconds ahead of the device's own latency. With the window closed, nothing is decoded.
 
+![The Spectrum style moving on an Atmos track rendered by macOS: bars and peak caps drawn from the decoded Dolby bed of "I'm Still Standing"](screenshots/visualizer-bars-atmos.png)
+
+![The main window on the Fosi Audio ZD3 playing the same Atmos track: the "Objects rendered by macOS" badge and a signal path that ends with frames handed to macOS untouched](screenshots/atmos-macos-rendered-zd3.png)
+
 ## Analysis
 
 `VisualizerAnalyzer` (in `Packages/VespertineKit/Sources/VespertineVisualizer`) runs on a thread of its own (`VisualizerFeed`, a user-interactive dispatch timer at the display's refresh rate), never on the main thread or the audio thread, and only while a visualizer window is on screen. It also stops while the window is minimized or fully covered.
