@@ -19,7 +19,7 @@
 //    alternates, every language and x-default, as each page's own <head>).
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join, relative, sep } from 'node:path';
+import { basename, join, relative, sep } from 'node:path';
 import { CODES, LOCALES, hreflangOf } from '../src/i18n/locales.mjs';
 
 const DIST = 'dist';
@@ -59,6 +59,8 @@ const exists = (url) => {
 };
 
 for (const file of files) {
+  // Search-engine ownership files (Google Search Console) are plain tokens, not pages.
+  if (/^google[0-9a-f]+\.html$/.test(basename(file))) continue;
   const html = readFileSync(file, 'utf8');
   const is404 = file.endsWith('404.html');
   const rel = relative(DIST, file).split(sep);
