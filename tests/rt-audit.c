@@ -922,6 +922,63 @@ static void capture_audit(void) {
     nrt_ring_destroy(ring);
 }
 
+
+// MARK: - Transitions' fader: commands from other threads while the I/O thread renders
+
+static NRTRenderContext *fade_ctx;
+static atomic_bool fade_done;
+
+static void *fade_commander(void *unused) {
+    (void)unused;
+    for (unsigned i = 0; !atomic_load(&fade_done); i++) {
+        switch (i % 4) {
+        case 0: nrt_context_fade(fade_ctx, false, 300 + i % 500, false, true); break;
+        case 1: nrt_context_set_muted(fade_ctx, false); nrt_context_fade(fade_ctx, true, 200, true, false); break;
+        case 2: nrt_context_fade(fade_ctx, true, 0, false, false); break;
+        default: (void)nrt_context_fading(fade_ctx); (void)nrt_context_is_muted(fade_ctx); break;
+        }
+        sched_yield();
+    }
+    return NULL;
+}
+
+// Every sample out stays between silence and the sample in (a level in 0…1), whatever the commands' order; idle again,
+// the output is the input bit for bit.
+static void test_concurrent_fade(void) {
+    NRTRing *ring = nrt_ring_create(4096, 2);
+    assert(ring);
+    fade_ctx = nrt_context_create(ring, 512);
+    assert(fade_ctx);
+    nrt_context_set_gain(fade_ctx, 1.0, 0);
+    atomic_store(&fade_done, false);
+    pthread_t thread;
+    int started = pthread_create(&thread, NULL, fade_commander, NULL);
+    assert(!started); (void)started;
+    float in[2 * 512], out[2 * 512];
+    for (int i = 0; i < 2 * 512; i++) in[i] = (i % 2 ? -0.75f : 0.5f);
+    for (int round = 0; round < 20000; round++) {
+        nrt_ring_write(ring, in, 512);
+        nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+        for (int i = 0; i < 2 * 512; i++) {
+            const float x = out[i], limit = in[i];
+            assert(x == 0.f || (limit > 0 ? x > 0 && x <= limit : x < 0 && x >= limit));
+            (void)x; (void)limit;
+        }
+    }
+    atomic_store(&fade_done, true);
+    pthread_join(thread, NULL);
+    nrt_context_set_muted(fade_ctx, false);
+    nrt_context_fade(fade_ctx, true, 0, false, false);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);    // takes the command
+    (void)nrt_context_discard(fade_ctx);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+    nrt_ring_write(ring, in, 512);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+    assert(memcmp(in, out, sizeof in) == 0);
+    nrt_context_destroy(fade_ctx);
+    nrt_ring_destroy(ring);
+}
+
 int main(void) {
     capture_audit();
     alarm(30);
@@ -977,5 +1034,6 @@ int main(void) {
     test_fir();
     test_concurrent_fir();
     test_room_then_fir();
+    test_concurrent_fade();
     return 0;
 }

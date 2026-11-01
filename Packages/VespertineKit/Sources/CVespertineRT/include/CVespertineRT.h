@@ -71,6 +71,16 @@ void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthroug
 /// skip, seek, pause or output change is asked for, so the old song stops at once instead of playing on
 /// from the buffer until the engine thread gets to the request (it may be waiting on a network read).
 void nrt_context_set_muted(NRTRenderContext *_Nonnull ctx, bool muted);
+/// Transitions' fader, folded into the gain stage: a ramp to full level (`up`) or to silence over `frames` frames,
+/// starting from silence (`fromSilence`) or from wherever the level is. `thenMute`: when a ramp down ends, the context
+/// mutes itself (as `nrt_context_set_muted(true)`) and the level goes back to full for the next unmute. Any thread; the
+/// newest command wins. Idle (full level, no ramp) the I/O thread never enters the gain loop for it, so output is
+/// bit-identical; native DSD (DoP), passthrough and integer output take a command at once (no ramp, a ramp down with
+/// `thenMute` mutes), never touching their words.
+void nrt_context_fade(NRTRenderContext *_Nonnull ctx, bool up, uint32_t frames, bool fromSilence, bool thenMute);
+/// A fade command is waiting or a ramp is running.
+bool nrt_context_fading(const NRTRenderContext *_Nonnull ctx);
+bool nrt_context_is_muted(const NRTRenderContext *_Nonnull ctx);
 
 /// The DSD idle pattern (01101001: as many ones as zeros, so a DAC reads it as silence). DSD silence is this, not
 /// all-zero bits.
