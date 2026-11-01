@@ -4,6 +4,10 @@ An optional window that draws the music: the album on a spinning record, a bar s
 
 It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.
 
+![The Vinyl style: the album cover as the label of a record on a turntable, the tonearm over the groove and a ring of light around the platter showing the spectrum](screenshots/visualizer-vinyl.png)
+
+![The Meters style: two backlit analogue VU meters, left and right, with needles and a peak light](screenshots/visualizer-meters-vu.png)
+
 ## Styles
 
 - **Spectrum.** 32 to 128 log-spaced bands from 20 Hz to 20 kHz, smoothed (fast rise, slower fall), with held peak caps that fall away after 0.7 s. Heights in dB (the default: 0 dB at the top, -72 dB at the floor, a grid every 12 dB) or in linear amplitude.
@@ -57,6 +61,10 @@ The reader (`PlaybackEngine.copyVisualizerTap`) always takes the newest frames. 
 **Modes.** Nothing about the tap depends on shared or exclusive (hog) mode: it reads the render context, not the device. In integer mode it reads the 32-bit words as integers, as the meters do. In DoP it reads the levels the meters already take from the DSD bits (good to about 20 kHz), and the DoP frames still go out untouched. Bitstream (IEC 61937) carries no PCM to look at, so the visualizer shows nothing. Atmos rendered by macOS doesn't pass through Vespertine's I/O proc either, and its output can't be read back, so the tap reads the Dolby bed instead (below). With Spatial Audio, the tap reads the decoded channels before the spatial mixer. With more than two channels it reads the front left and right.
 
 **Atmos rendered by macOS.** `AVSampleBufferAudioRenderer` takes the compressed Dolby Digital Plus frames and gives nothing back, so there's no session and no I/O proc to tap. While a visualizer window is showing, the session decodes the same track with a second `AVAssetReader` into a stereo downmix of the 5.1/7.1 bed (`SystemBedDecoder`, never more than a second ahead of the playhead), keeps it in a ring (`SystemBedTap`), and the visualizer reads the frames just before the renderer's playhead. The picture therefore shows the bed (the objects' height and position aren't in it), with no Spatial Audio processing, and may be a few tens of milliseconds ahead of the device's own latency. With the window closed, nothing is decoded.
+
+![The Spectrum style moving on an Atmos track rendered by macOS: bars and peak caps drawn from the decoded Dolby bed of "I'm Still Standing"](screenshots/visualizer-bars-atmos.png)
+
+![The main window on the Fosi Audio ZD3 playing the same Atmos track: the "Objects rendered by macOS" badge and a signal path that ends with frames handed to macOS untouched](screenshots/atmos-macos-rendered-zd3.png)
 
 ## Analysis
 
