@@ -239,79 +239,6 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Engine-thread state
 
-    private final class Decoding {
-        let item: PlayableItem
-        /// Read live from a network share (not a local cached copy): may stall and need rebuffering.
-        var streaming = false
-        /// Streaming, and can't move to the local copy (lossy, DSD converted to PCM, or the copy didn't match).
-        var staysOnShare = false
-        /// Both are replaced when playback moves from the share to a finished local copy.
-        var probed: ProbedSource
-        var decoder: PCMDecoding
-        let converter: AVAudioConverter
-        let input: AVAudioPCMBuffer
-        let output: AVAudioPCMBuffer
-        let path: SignalPath
-        let gain: Float
-        /// Spatial Audio on the source's own speakers: the converter keeps the file's channel order and this
-        /// places each channel on the bed (`routed` is what reaches the ring).
-        let router: BedRouter?
-        let routed: AVAudioPCMBuffer?
-        var inputExhausted = false
-        var finished = false
-        var framesProduced: UInt64 = 0
-        var error: Error?
-
-        init(item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, path: SignalPath, chunk: AVAudioFrameCount,
-             layout: AVAudioChannelLayout? = nil) throws {
-            self.item = item
-            self.probed = probed
-            self.decoder = decoder
-            self.path = path
-            let own = decoder.processingFormat.channelLayout
-            var router: BedRouter?
-            let channels = Int(decoder.processingFormat.channelCount)
-            if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
-               let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.standardLabels(channels: channels) {
-                router = BedRouter(source: speakers, bed: bed)
-            }
-            self.router = router
-            // Integer mode: straight to 32-bit integers (the device takes them as they are).
-            let float = router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
-                ?? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
-            let integer = float.flatMap { f in
-                AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
-                              ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
-            }
-            guard let outFormat = path.applied.integerMode ? integer : float,
-                  let converter = OutputSession.converter(from: decoder.processingFormat, to: outFormat, plan: path.plan) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            self.converter = converter
-            let inCapacity = AVAudioFrameCount(Double(chunk) * decoder.processingFormat.sampleRate / path.plan.deviceSampleRate) + 1024
-            guard let inBuffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity),
-                  let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            input = inBuffer
-            output = outBuffer
-            routed = router.flatMap { r in
-                AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: r.bedChannels, interleaved: true, layout: layout)
-                    .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
-            }
-            if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm {
-                gain = Float(pow(10, db / 20))
-            } else {
-                gain = 1
-            }
-        }
-
-        var durationSeconds: Double {
-            let rate = decoder.processingFormat.sampleRate
-            return rate > 0 ? Double(decoder.length) / rate : 0
-        }
-    }
-
     private struct Segment {
         let id = UUID()
         let item: PlayableItem
@@ -1382,51 +1309,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         guard session.writableFrames >= Int(chunkFrames) else { return false }
 
-        decoding.output.frameLength = 0
-        var conversionError: NSError?
-        var waiting = false
-        let status = decoding.converter.convert(to: decoding.output, error: &conversionError) { requested, inputStatus in
-            if decoding.inputExhausted {
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            decoding.input.frameLength = 0
-            do {
-                try decoding.decoder.decode(into: decoding.input, length: min(requested, decoding.input.frameCapacity))
-            } catch is ReadAheadDecoder.Starved {
-                // The share hasn't delivered the next audio yet: convert what's here, and try again shortly.
-                waiting = true
-                inputStatus.pointee = .noDataNow
-                return nil
-            } catch {
-                decoding.error = error
-                decoding.inputExhausted = true
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            if decoding.input.frameLength == 0 {
-                decoding.inputExhausted = true
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            inputStatus.pointee = .haveData
-            return decoding.input
-        }
-
-        let frames = decoding.output.frameLength
-        var raw = decoding.output.floatChannelData?[0]
-            ?? decoding.output.int32ChannelData.map { UnsafeMutableRawPointer($0[0]).assumingMemoryBound(to: Float.self) }
-        if let router = decoding.router, let routed = decoding.routed, let source = raw, let bed = routed.floatChannelData?[0] {
-            router.route(source, into: bed, frames: Int(frames))
-            raw = bed
-        }
-        if frames > 0, let data = raw {
-            decoding.framesProduced += UInt64(frames)
+        let chunk = decoding.convertChunk()
+        let frames = chunk.frames
+        if frames > 0, let data = chunk.data {
             emptyTransitions = 0
-            if decoding.gain != 1, !decoding.path.applied.integerMode {
-                var g = decoding.gain
-                vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(decoding.path.plan.channels))
-            }
             _ = nrt_ring_write(session.ring, data, frames)
         }
         // Damaged frames played as silence (SACD images): the track's signal path stops claiming bit-perfect.
@@ -1434,14 +1320,14 @@ public final class PlaybackEngine: @unchecked Sendable {
            let index = segments.lastIndex(where: { $0.item.id == decoding.item.id }) {
             segments[index].path.concealedFrames = concealing.concealedFrames
         }
-        if status == .error || status == .endOfStream || (decoding.inputExhausted && frames == 0) {
+        if chunk.ended {
             decoding.finished = true
-            if let error = conversionError ?? decoding.error {
+            if let error = chunk.error {
                 emit(.failed(decoding.item, error.localizedDescription))
             }
         }
         // Waiting on a share with nothing new: no work done, so the engine thread rests a moment.
-        return frames > 0 || !waiting || decoding.finished
+        return frames > 0 || !chunk.waiting || decoding.finished
     }
 
     /// The current item is fully decoded: line up the next one gaplessly, or wait for a device change.

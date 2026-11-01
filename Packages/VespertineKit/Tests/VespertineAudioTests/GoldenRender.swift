@@ -2,9 +2,10 @@
 // Vespertine — golden PCM: what today's engine hands the device, byte for byte, rendered offline with no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Runs a queue through the engine's own pieces in the engine's order (PlaybackEngine.begin, Decoding.init, fill,
-// advance): FormatPlanner → SourceOpener's decoder → OutputSession.converter (4096-frame chunks) → ReplayGain →
-// nrt_ring_write → nrt_context_render_interleaved, the function the I/O proc calls, in 512-frame device buffers.
+// Runs a queue through the engine's own pieces in the engine's order (PlaybackEngine.begin, fill, advance):
+// FormatPlanner → SourceOpener's decoder → the engine's Decoding (OutputSession.converter in 4096-frame chunks, then
+// ReplayGain: `Decoding.convertChunk`, exactly what fill() writes) → nrt_ring_write → nrt_context_render_interleaved,
+// the function the I/O proc calls, in 512-frame device buffers.
 // A gapless join continues into the same ring; a plan the device can't take without reconfiguring starts a new
 // session, as the engine's drain + replaceSession does. The settings and decisions the engine keeps private
 // (integer mode, "Match 16-bit sources", DoP marker alignment, the gain stage) are mirrored here line for line;
@@ -169,93 +170,36 @@ enum GoldenRender {
         }
     }
 
-    // MARK: Decoding (PlaybackEngine.Decoding.init and fill)
+    // MARK: Decoding (the engine's own: EngineDecoding.swift)
 
-    final class Decoding {
-        let item: PlayableItem
-        let decoder: PCMDecoding
-        let converter: AVAudioConverter
-        let input: AVAudioPCMBuffer
-        let output: AVAudioPCMBuffer
-        let gain: Float
-        let integerMode: Bool
-        let channels: Int
-        var inputExhausted = false
-        var finished = false
-        var framesProduced: UInt64 = 0
-        var error: Error?
+    /// The signal path the engine would make for `probed` (PlaybackEngine.makePath): `Decoding` reads its plan and
+    /// whether the session is in integer mode.
+    static func path(_ probed: ProbedSource, item: PlayableItem, session: Session, settings: Settings) -> SignalPath {
+        let plan = session.plan
+        let applied = AppliedFormat(sampleRate: plan.deviceSampleRate, physicalBitDepth: plan.physicalBitDepth, physicalIsInteger: true,
+                                    virtualChannels: session.device.streamChannels, exclusive: settings.exclusive,
+                                    bufferFrames: session.device.bufferFrames, integerMode: session.integerMode)
+        return SignalPath(source: probed.format, decoderName: probed.decoderName, plan: plan, applied: applied,
+                          deviceName: session.device.name, deviceUID: session.device.name,
+                          deviceProfile: DeviceProfile(kind: .usbDAC, tag: "", canBeBitPerfect: true, symbol: "x"), volume: .fixed,
+                          replayGainDB: plan.mode == .pcm ? item.replayGainDB : nil)
+    }
 
-        init(item: PlayableItem, decoder: PCMDecoding, session: Session) throws {
-            self.item = item
-            self.decoder = decoder
-            let plan = session.plan
-            integerMode = session.integerMode
-            channels = plan.channels
-            let float = AudioFormats.float32(sampleRate: plan.deviceSampleRate, channels: plan.channels, interleaved: true, layout: session.layout)
-            let integer = float.flatMap { f in
-                AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
-                              ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
-            }
-            guard let outFormat = integerMode ? integer : float,
-                  let converter = OutputSession.converter(from: decoder.processingFormat, to: outFormat, plan: plan) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            self.converter = converter
-            let inCapacity = AVAudioFrameCount(Double(chunkFrames) * decoder.processingFormat.sampleRate / plan.deviceSampleRate) + 1024
-            guard let inBuffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity),
-                  let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunkFrames) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            input = inBuffer
-            output = outBuffer
-            if let db = item.replayGainDB, db != 0, plan.mode == .pcm {
-                gain = Float(pow(10, db / 20))
-            } else {
-                gain = 1
-            }
-        }
+    /// PlaybackEngine.Decoding for `item` on `session`.
+    static func decoding(_ item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, session: Session, settings: Settings,
+                         plan: OutputPlan? = nil) throws -> Decoding {
+        var p = path(probed, item: item, session: session, settings: settings)
+        if let plan { p.plan = plan }
+        return try Decoding(item: item, probed: probed, decoder: decoder, path: p, chunk: chunkFrames, layout: session.layout)
+    }
 
-        /// One chunk into the ring (PlaybackEngine.fill).
-        func fill(_ session: Session) {
-            output.frameLength = 0
-            var conversionError: NSError?
-            let status = converter.convert(to: output, error: &conversionError) { requested, inputStatus in
-                if self.inputExhausted {
-                    inputStatus.pointee = .endOfStream
-                    return nil
-                }
-                self.input.frameLength = 0
-                do {
-                    try self.decoder.decode(into: self.input, length: min(requested, self.input.frameCapacity))
-                } catch {
-                    self.error = error
-                    self.inputExhausted = true
-                    inputStatus.pointee = .endOfStream
-                    return nil
-                }
-                if self.input.frameLength == 0 {
-                    self.inputExhausted = true
-                    inputStatus.pointee = .endOfStream
-                    return nil
-                }
-                inputStatus.pointee = .haveData
-                return self.input
-            }
-            let frames = output.frameLength
-            let raw = output.floatChannelData?[0]
-                ?? output.int32ChannelData.map { UnsafeMutableRawPointer($0[0]).assumingMemoryBound(to: Float.self) }
-            if frames > 0, let data = raw {
-                framesProduced += UInt64(frames)
-                if gain != 1, !integerMode {
-                    var g = gain
-                    vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(channels))
-                }
-                _ = nrt_ring_write(session.ring, data, frames)
-            }
-            if status == .error || status == .endOfStream || (inputExhausted && frames == 0) {
-                finished = true
-                if let e = conversionError { error = error ?? e }
-            }
+    /// PlaybackEngine.fill with transitions off: one chunk into the ring.
+    static func fill(_ decoding: Decoding, _ session: Session) {
+        let chunk = decoding.convertChunk()
+        if chunk.frames > 0, let data = chunk.data { _ = nrt_ring_write(session.ring, data, chunk.frames) }
+        if chunk.ended {
+            decoding.finished = true
+            if let e = chunk.error { decoding.error = decoding.error ?? e }
         }
     }
 
@@ -278,11 +222,11 @@ enum GoldenRender {
             guard let session else { break }
             let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
             alignDoPMarkers(decoder, at: session.totalWritten)
-            let decoding = try Decoding(item: item, decoder: decoder, session: session)
+            let decoding = try decoding(item, probed: probed, decoder: decoder, session: session, settings: settings)
             while !decoding.finished {
                 // fill() waits for room for a whole chunk; the device plays meanwhile.
                 while Int(nrt_ring_writable(session.ring)) < Int(chunkFrames) { session.render(upTo: device.bufferFrames) }
-                decoding.fill(session)
+                fill(decoding, session)
             }
             if let error = decoding.error { throw Failure(description: "\(item.url.lastPathComponent): \(error)") }
             if decoding.framesProduced == 0 { throw Failure(description: "\(item.url.lastPathComponent): nothing decoded") }
