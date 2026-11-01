@@ -26,11 +26,14 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public let sacdArea: SACDArea?
     /// DVD-Video discs: the LPCM run (a VOB's audio) to play. The region is then in sample frames of that run.
     public let dvd: DVDStreamRef?
+    /// Album, track number and genre, for deciding how it joins its neighbours while transitions are on; nil = unknown.
+    public let context: TransitionContext?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
                 regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil,
-                dvd: DVDStreamRef? = nil) {
+                dvd: DVDStreamRef? = nil, context: TransitionContext? = nil) {
         self.cacheKey = cacheKey
+        self.context = context
         self.sacdArea = sacdArea
         self.dvd = dvd
         self.id = id
