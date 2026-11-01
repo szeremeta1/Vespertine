@@ -165,3 +165,12 @@ The analysis core lives in `Packages/VespertineAnalysis` (plain Swift and Founda
 - **Resampler.** SRC uses Apple's mastering-quality converter. libsoxr is a candidate alternative.
 - **DoP support** can't be detected from the device, so it is opt-in per device.
 - **AirPods Max over USB-C.** macOS keeps the AirPods on their *Bluetooth* Core Audio device even when audio flows over the cable. Bluetooth stays connected as the control link, and the cable can't be used without it. The HAL exposes no "USB" property for this, so Vespertine treats the path as USB-C lossless when the AirPods' `AirPods Max USB Audio` interface is present in the IORegistry. (Measured on hardware: output latency is 480 frames / 10 ms, as expected of USB.) The device also lists a 24 kHz rate, but that is the mono hands-free format, and the planner ignores rates that can't carry the source's channel count. Reference equalizer presets for AirPods Max USB-C (1st generation) and AirPods Max 2 are offered in the preset list but never chosen automatically, so the AirPods stay bit-perfect until one is picked for them.
+
+## Transitions
+
+Crossfades and fades between songs, off by default (details: [TRANSITIONS.md](TRANSITIONS.md)). With the master switch off, none of what follows runs.
+
+- **Planning.** While the last crossfade + 16 s of a song are decoded, the engine asks `nextItemProvider` early, probes and plans the next song as `advance` would, and `TransitionPlanner.decide` picks gapless, a cut (DoP, bitstream, Atmos by macOS, integer, 16-bit), a dip (another rate or channel count) or an overlap.
+- **Mixing** happens on the engine thread before the ring (`TransitionMixer.swift`): two `Decoding`s (EngineDecoding.swift), each with its own converter and ReplayGain, mixed a chunk at a time, the outgoing song's silent tail and the incoming song's silent head trimmed. A dip ramps the outgoing song's last second before the ring, then the usual drain and reconfigure, then ramps the next song's first second.
+- **Segments.** The incoming song's segment starts at the overlap and becomes audible (trackStarted, Now Playing) at its middle. `replanUpcoming` rewinds a baked overlap to its start and decodes the outgoing song again when that is exact; otherwise the overlap plays as mixed.
+- **Real time.** `nrt_context_fade` ramps the existing gain stage for play, pause, stop, skip and seek; idle it is never entered. It never touches DoP, passthrough or integer words.

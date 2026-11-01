@@ -20,7 +20,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-01 <a id="bp-definition"></a>The badge means every sample arrives unaltered
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:59` — "/// True only when every sample reaches the DAC unaltered."
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:83` — "/// True only when every sample reaches the DAC unaltered."
 - **Text:** `README.md:40` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
@@ -474,6 +474,32 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.
+
+---
+
+## Transitions
+
+### CL-TR-01 <a id="transitions-off"></a>With transitions off, output is identical to 0.14
+
+- **Text:** `docs/TRANSITIONS.md:7` — "With the switch off, playback is exactly what it was before transitions existed: the same code path and the same bytes."
+- **Property:** with the master switch off, the words handed to the device for every golden case equal the SHA-256 recorded on `main` at `664e421` (0.14.2) before any engine change; the engine's settings are the defaults whatever transitions choices are stored.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`VespertineAudioTests` Golden PCM and Transition golden PCM, rendered through the engine's own `Decoding`, ring and I/O stage; `App/Tests/TransitionsTests.swift`; not one of the harness groups yet).
+
+### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
+
+- **Text:** `docs/TRANSITIONS.md:62` — "Only while it's heard is the music not bit-perfect"
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:85` — "guard transition?.audible != true"
+- **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants still to add).
+
+### CL-TR-03 <a id="transitions-cuts"></a>Native DSD, bitstream, Atmos, integer and 16-bit words are never mixed or faded
+
+- **Text:** `docs/TRANSITIONS.md:18` — "integer mode, or a 16-bit word"
+- **Property:** a boundary with any of these on either side is byte-identical to transitions off, and the real-time fader never scales those words.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`TransitionGoldenTests.swift` cuts, `FaderTests.swift` bypass).
 
 ---
 
