@@ -3,8 +3,8 @@ import Testing
 import VespertineAudio
 @testable import Vespertine
 
-/// Transitions in the app: the setting is kept like the others, starts off for everyone, and doesn't reach the
-/// engine yet (playback is the same with it on or off).
+/// Transitions in the app: the setting is kept like the others, starts off for everyone, and reaches the engine only
+/// while its master switch is on (off, the engine gets exactly what it got before transitions).
 @Suite("Transitions setting", .serialized) @MainActor
 struct TransitionsTests {
     private func scratch() throws -> (root: URL, defaults: UserDefaults, suite: String) {
@@ -59,25 +59,45 @@ struct TransitionsTests {
         #expect(AppSettings(defaults: defaults, dataDirectory: root).transitions == TransitionSettings())
     }
 
-    @Test("The engine gets the same settings with transitions on or off, whatever is chosen")
-    func inert() throws {
+    @Test("Off, the engine gets exactly the settings it got before transitions, whatever is chosen; on, it gets the choices")
+    func reachesTheEngineOnlyWhenOn() throws {
         let (root, defaults, suite) = try scratch()
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         let before = settings.engineSettings()
+        #expect(before.transitions == TransitionSettings())
         for style in TransitionStyle.allCases {
             for curve in TransitionCurve.allCases {
                 for skip in SkipTransition.allCases {
-                    settings.transitions.setEnabled(true)
+                    settings.transitions.setEnabled(false)
                     settings.transitions.style = style
                     settings.transitions.curve = curve
                     settings.transitions.skip = skip
                     settings.transitions.crossfadeSeconds = 12
+                    settings.transitions.trimSilence = false
+                    settings.transitions.excludedGenres = ["Jazz"]
                     #expect(settings.engineSettings() == before)
+                    settings.transitions.setEnabled(true)
+                    let on = settings.engineSettings().transitions
+                    #expect(on.enabled && on.style == style && on.curve == curve && on.skip == skip && on.crossfadeSeconds == 12)
+                    #expect(!on.trimSilence && on.excludedGenres == ["Jazz"] && !on.explainerSeen)
+                    // Nothing but transitions differs.
+                    var rest = settings.engineSettings()
+                    rest.transitions = TransitionSettings()
+                    #expect(rest == before)
                 }
             }
         }
         settings.transitions.setEnabled(false)
         #expect(settings.engineSettings() == before)
+    }
+
+    @Test("Queued songs carry their album (when they have one), place on it and genre")
+    func queueContext() {
+        let c = PlayerController.transitionContext(album: "Kind of Blue", albumKey: "miles davis\u{1F}kind of blue", disc: 1, track: 2, genre: "Jazz")
+        #expect(c == TransitionContext(albumKey: "miles davis\u{1F}kind of blue", discNumber: 1, trackNumber: 2, genre: "Jazz"))
+        // No album tag: every such song of an artist would share "Unknown Album", so none is claimed.
+        #expect(PlayerController.transitionContext(album: nil, albumKey: "x\u{1F}Unknown Album", disc: nil, track: 1, genre: nil).albumKey == nil)
+        #expect(PlayerController.transitionContext(album: "  ", albumKey: "x\u{1F}  ", disc: nil, track: 1, genre: nil).albumKey == nil)
     }
 }

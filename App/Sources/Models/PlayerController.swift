@@ -410,7 +410,18 @@ final class PlayerController {
         PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
                      regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
                      cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
-                     sacdArea: track.sacdArea, dvd: track.dvdStream)
+                     sacdArea: track.sacdArea, dvd: track.dvdStream, context: Self.transitionContext(track))
+    }
+
+    /// What transitions need to know about a song: its album (only when it has one: songs without an album tag would
+    /// all share the artist's "Unknown Album"), its place on it, and its genre.
+    nonisolated static func transitionContext(_ track: Track) -> TransitionContext {
+        transitionContext(album: track.album, albumKey: track.albumKey, disc: track.discNumber, track: track.trackNumber, genre: track.genre)
+    }
+
+    nonisolated static func transitionContext(album: String?, albumKey: String, disc: Int?, track: Int?, genre: String?) -> TransitionContext {
+        let hasAlbum = !(album ?? "").trimmingCharacters(in: .whitespaces).isEmpty
+        return TransitionContext(albumKey: hasAlbum ? albumKey : nil, discNumber: disc, trackNumber: track, genre: genre)
     }
 
     /// ReplayGain adjustment with peak protection (never pushes the peak over 0 dBFS).

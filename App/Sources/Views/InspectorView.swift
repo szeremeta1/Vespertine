@@ -224,6 +224,13 @@ struct SignalPathView: View {
             s.append(Step(title: "ReplayGain", detail: String(localized: "Loudness normalisation"),
                           value: "\(rg.formatted(.number.precision(.fractionLength(1)).sign(strategy: .always()))) dB", tone: .changed))
         }
+        // Transitions (switch on): what the end of this song does, and when a crossfade is heard, that it's mixing now.
+        if let transition = path.transition, transition.audible || transition.next != nil {
+            s.append(Step(title: String(localized: "Transitions"), detail: transition.next?.summary ?? "",
+                          value: transition.audible ? transition.badge
+                              : String(localized: "after this song", comment: "Signal path, Transitions row: the transition described happens at the end of the song playing."),
+                          tone: transition.audible ? .changed : .plain))
+        }
         if let room = path.roomCorrection {
             s.append(Step(title: String(localized: "Room correction"), detail: String(localized: "\(room) · per speaker: delay, level, 64-bit filters"),
                           value: String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on"), tone: .changed))

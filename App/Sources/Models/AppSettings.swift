@@ -140,8 +140,8 @@ final class AppSettings {
     var visualizer: VisualizerSettings { didSet { if visualizer != oldValue { visualizer.save(to: defaults) } } }
     /// Where the visualizer window was (display, frame, full screen).
     var visualizerWindow: VisualizerWindowState? { didSet { if visualizerWindow != oldValue { visualizerWindow?.save(to: defaults) } } }
-    /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Not passed to
-    /// the engine yet: playback is the same either way.
+    /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
+    /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
@@ -348,6 +348,9 @@ final class AppSettings {
             roomProfile(for: uid).map { (uid, RoomCorrectionPlayback(profile: $0)) }
         })
         s.roomNativeDSDDeviceUIDs = roomNativeDSDDeviceUIDs
+        // Transitions reach the engine only while their master switch is on: off, it gets the defaults whatever else is
+        // chosen, so nothing about playback changes (and the explainer flag never reaches it).
+        s.transitions = transitions.enabled ? transitions.engineRelevant : TransitionSettings()
         return s
     }
 }

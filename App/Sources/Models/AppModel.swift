@@ -392,10 +392,11 @@ final class AppModel {
         }
     }
 
-    /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). The engine doesn't
-    /// take it yet, so playback is the same either way. The first time it's turned on, a note says what it changes.
+    /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
+    /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
     func setTransitions(_ on: Bool) {
         if settings.transitions.setEnabled(on) { showTransitionsExplainer = true }
+        syncEngine()
     }
 
     func toggleTransitions() { setTransitions(!settings.transitions.enabled) }
