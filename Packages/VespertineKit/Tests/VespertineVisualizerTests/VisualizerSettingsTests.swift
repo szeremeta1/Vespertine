@@ -31,7 +31,10 @@ struct VisualizerSettingsTests {
         // App/Sources/Theme/Theme.swift, site/src/styles/global.css and docs/brand: surface #16161A, copper #C98B5B,
         // brass #C8A66A, ivory #ECE6DA.
         #expect(VisualizerTheme.vespertine.stops == [0x16161A, 0xC98B5B, 0xC8A66A, 0xECE6DA].map(VisualizerTheme.rgb))
-        #expect(Set(VisualizerTheme.allCases.map(\.stops)).count == VisualizerTheme.allCases.count)
+        // Album Art without a cover is the default colours, so it's the one theme that repeats another's stops.
+        let fixed = VisualizerTheme.allCases.filter { $0 != .albumArt }
+        #expect(Set(fixed.map(\.stops)).count == fixed.count)
+        #expect(VisualizerTheme.albumArt.stops == VisualizerTheme.vespertine.stops)
     }
 
     @Test("The strobe can't be on until its warning is accepted, even from a hand-edited file")

@@ -26,6 +26,8 @@ struct AlbumArtPaletteTests {
     }
 
     private func luminance(_ c: SIMD3<Float>) -> Float { 0.2126 * c.x + 0.7152 * c.y + 0.0722 * c.z }
+    /// Dark to bright, give or take the rounding of colours lifted to the same floor.
+    private func isAscending(_ l: [Float]) -> Bool { zip(l, l.dropFirst()).allSatisfy { $0 <= $1 + 1e-4 } }
     private func hue(_ c: SIMD3<Float>) -> Float {
         let mx = max(c.x, c.y, c.z), mn = min(c.x, c.y, c.z), d = mx - mn
         guard d > 0 else { return 0 }
@@ -49,7 +51,7 @@ struct AlbumArtPaletteTests {
         let palette = try #require(AlbumArtPalette.extract(from: img))
         #expect(palette.colors.count == 2)
         let l = palette.colors.map(luminance)
-        #expect(l == l.sorted())
+        #expect(isAscending(l))
         let reds = palette.colors.filter { hue($0) < 30 || hue($0) > 330 }, blues = palette.colors.filter { abs(hue($0) - 225) < 30 }
         #expect(reds.count == 1 && blues.count == 1)
         #expect(simd_distance(palette.colors[0], palette.colors[1]) > 0.2)
@@ -105,11 +107,11 @@ struct AlbumArtPaletteTests {
             let palette = try #require(AlbumArtPalette.extract(from: img))
             #expect(palette.ramp.count == AlbumArtPalette.rampSize)
             let l = palette.ramp.map(luminance)
-            #expect(l == l.sorted())
+            #expect(isAscending(l))
             #expect(luminance(palette.ramp[0]) < 0.06, "the lowest stop stays a dark background")
             #expect(palette.stops.count == 4)
             let ls = palette.stops.map(luminance)
-            #expect(ls == ls.sorted())
+            #expect(isAscending(ls))
             #expect(palette.ramp.allSatisfy { $0.x.isFinite && $0.y.isFinite && $0.z.isFinite && $0.min() >= 0 && $0.max() <= 1 })
         }
     }
