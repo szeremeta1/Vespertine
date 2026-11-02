@@ -14,7 +14,7 @@
     "copied": "已拷贝",
     "copyFailed": "请手动选中",
     "trademarks": "Dolby、Dolby Atmos、Dolby Digital、Dolby Digital Plus 和 Dolby TrueHD 是 Dolby Laboratories 的商标。DTS、DTS-HD Master Audio 和 DTS:X 是 DTS, Inc. 的商标。Apple、AirPods、AirPods Max、Mac、macOS 和空间音频是 Apple Inc. 的商标。Vespertine 提及这些名称，仅用于说明它能播放什么、在哪里播放；Vespertine 未获得 Dolby、DTS 或 Apple 的认证、授权或背书。",
-    "trailerLabel": "Vespertine 预告片，44 秒",
+    "trailerLabel": "Vespertine 预告片，55 秒",
     "untested": "逐声道输出和向功放输出比特流均为实验性功能，尚未在真实功放和多声道 USB DAC 上测试（已通过 HDMI 测试过一台 Sony 电视，详见 docs/DEVICES.md）；欢迎提交测试报告。"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "预告片",
-      "title": "44 秒，一览全貌。",
+      "title": "55 秒，一览全貌。",
       "text": "请打开声音。片中的一切都来自真实的应用，录制于开发者自己的资料库。",
       "fallback": "观看预告片（MP4）",
-      "caption": "44 秒 · 1080p · 专辑封面归其所有者所有"
+      "caption": "55 秒 · 1080p · 专辑封面归其所有者所有"
     },
     "features": {
       "eyebrow": "为什么选择 Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "视频",
       "title": "预告片。",
-      "text": "44 秒，16:9，1080p 60 fps，带声音。<a href=\"{href.trailerDownload}\" download>下载 MP4</a>（{size}）。如有需要，可索取 4K 母版。",
+      "text": "55 秒，16:9，1080p 60 fps，带声音。<a href=\"{href.trailerDownload}\" download>下载 MP4</a>（{size}）。如有需要，可索取 4K 母版。",
       "fallback": "下载预告片（MP4）"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "音乐播放器",
     "sourceName": "Vespertine 源代码",
     "trailerName": "Vespertine 预告片",
-    "trailerDescription": "44 秒的 Vespertine 导览，录制自真实应用和开发者自己的资料库：比特完美信号路径、通过 DoP 传输的 DSD、在 AirPods 上以空间音频播放环绕声，以及高解析度文件分析。",
+    "trailerDescription": "55 秒的 Vespertine 导览，录制自真实应用和开发者自己的资料库：比特完美信号路径、通过 DoP 传输的 DSD、在 AirPods 上以空间音频播放环绕声，以及高解析度文件分析。",
     "keywords": "Mac 音乐播放器, Mac 无损音乐播放器, 高解析度音乐播放器, Hi-Res 播放器, DSD 播放器, SACD ISO 播放, 多声道环绕声, 杜比全景声, Dolby Atmos, DTS-HD Master Audio, 比特完美, 房间校正, 空间音频, FLAC 播放器, 免费, 开源"
   },
   "og": {

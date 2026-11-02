@@ -14,7 +14,7 @@
     "copied": "Zkopírováno",
     "copyFailed": "Označte ho",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus a Dolby TrueHD jsou ochranné známky společnosti Dolby Laboratories. DTS, DTS-HD Master Audio a DTS:X jsou ochranné známky společnosti DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS a Spatial Audio (prostorový zvuk) jsou ochranné známky společnosti Apple Inc. Vespertine je uvádí jen proto, aby popsal, co a kde přehrává; není certifikován, licencován ani schválen společnostmi Dolby, DTS ani Apple.",
-    "trailerLabel": "Upoutávka na Vespertine, 44 sekund",
+    "trailerLabel": "Upoutávka na Vespertine, 55 sekund",
     "untested": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nebyly otestovány se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Upoutávka",
-      "title": "Vespertine za 44 sekund.",
+      "title": "Vespertine za 55 sekund.",
       "text": "Zapněte si zvuk. Vše, co v ní uvidíte, je skutečná aplikace, nahraná na vývojářově vlastní knihovně.",
       "fallback": "Přehrát upoutávku (MP4)",
-      "caption": "44 s · 1080p · obaly alb patří jejich vlastníkům"
+      "caption": "55 s · 1080p · obaly alb patří jejich vlastníkům"
     },
     "features": {
       "eyebrow": "Proč Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 sekund, 16:9, 1080p při 60 fps, se zvukem. <a href=\"{href.trailerDownload}\" download>Stáhnout MP4</a> ({size}). Master ve 4K poskytneme na vyžádání.",
+      "text": "55 sekund, 16:9, 1080p při 60 fps, se zvukem. <a href=\"{href.trailerDownload}\" download>Stáhnout MP4</a> ({size}). Master ve 4K poskytneme na vyžádání.",
       "fallback": "Stáhnout trailer (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Hudební přehrávač",
     "sourceName": "Zdrojový kód Vespertine",
     "trailerName": "Trailer Vespertine",
-    "trailerDescription": "44sekundová prohlídka Vespertine nahraná ve skutečné aplikaci na vlastní knihovně vývojáře: bit-perfect signálová cesta, DSD přes DoP, surround jako Prostorový zvuk na AirPods a analýza hi-res souborů.",
+    "trailerDescription": "55sekundová prohlídka Vespertine nahraná ve skutečné aplikaci na vlastní knihovně vývojáře: bit-perfect signálová cesta, DSD přes DoP, surround jako Prostorový zvuk na AirPods a analýza hi-res souborů.",
     "keywords": "přehrávač hudby pro Mac, hi-res přehrávač Mac, přehrávač DSD, SACD ISO, vícekanálový zvuk, surround hudba, Dolby Atmos, DTS-HD Master Audio, bit-perfect přehrávání, korekce místnosti, prostorový zvuk, přehrávač FLAC, zdarma, open source"
   },
   "og": {

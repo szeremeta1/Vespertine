@@ -14,7 +14,7 @@
     "copied": "کپی شد",
     "copyFailed": "آن را انتخاب کنید",
     "trademarks": "Dolby، Dolby Atmos، Dolby Digital، Dolby Digital Plus و Dolby TrueHD علائم تجاری Dolby Laboratories هستند. DTS، DTS-HD Master Audio و DTS:X علائم تجاری DTS, Inc. هستند. Apple، AirPods، AirPods Max، Mac، macOS و Spatial Audio (صدای فضایی) علائم تجاری Apple Inc. هستند. Vespertine این نام‌ها را فقط برای توصیف آنچه پخش می‌کند و جایی که پخش می‌کند به کار می‌برد؛ Vespertine از سوی Dolby، DTS یا Apple گواهی، مجوز یا تأیید نشده است.",
-    "trailerLabel": "تریلر Vespertine، ۴۴ ثانیه",
+    "trailerLabel": "تریلر Vespertine، ۵۵ ثانیه",
     "untested": "خروجی کانال‌به‌کانال و بیت‌استریم به گیرنده آزمایشی‌اند و روی گیرنده‌های واقعی و DACهای USB چندکاناله آزموده نشده‌اند (یک تلویزیون Sony از طریق HDMI آزمایش شده است: docs/DEVICES.md را ببینید)؛ منتظر گزارش‌های شما هستیم."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "تریلر",
-      "title": "در ۴۴ ثانیه ببینید.",
+      "title": "در ۵۵ ثانیه ببینید.",
       "text": "صدا را روشن کنید. هرچه در آن می‌بینید خودِ برنامهٔ واقعی است که روی کتابخانهٔ شخصی توسعه‌دهنده ضبط شده است.",
       "fallback": "تماشای تریلر (MP4)",
-      "caption": "۴۴ ثانیه · ۱۰۸۰p · تصاویر جلد آلبوم‌ها متعلق به صاحبانشان است"
+      "caption": "۵۵ ثانیه · ۱۰۸۰p · تصاویر جلد آلبوم‌ها متعلق به صاحبانشان است"
     },
     "features": {
       "eyebrow": "چرا Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "ویدیو",
       "title": "تریلر.",
-      "text": "۴۴ ثانیه، ۱۶:۹، 1080p با ۶۰ فریم بر ثانیه، همراه با صدا. <a href=\"{href.trailerDownload}\" download>MP4 را دانلود کنید</a> ({size}). نسخهٔ مادر 4K در صورت درخواست در دسترس است.",
+      "text": "۵۵ ثانیه، ۱۶:۹، 1080p با ۶۰ فریم بر ثانیه، همراه با صدا. <a href=\"{href.trailerDownload}\" download>MP4 را دانلود کنید</a> ({size}). نسخهٔ مادر 4K در صورت درخواست در دسترس است.",
       "fallback": "دانلود تریلر (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "پخش‌کنندهٔ موسیقی",
     "sourceName": "کد منبع Vespertine",
     "trailerName": "تریلر Vespertine",
-    "trailerDescription": "گشتی ۴۴ ثانیه‌ای در Vespertine، ضبط‌شده از برنامهٔ واقعی روی کتابخانهٔ شخصی توسعه‌دهنده: مسیر سیگنال بیت‌به‌بیت، DSD از طریق DoP، صدای فراگیر به‌صورت صدای فضایی روی AirPods و تحلیل فایل‌های وضوح بالا.",
+    "trailerDescription": "گشتی ۵۵ ثانیه‌ای در Vespertine، ضبط‌شده از برنامهٔ واقعی روی کتابخانهٔ شخصی توسعه‌دهنده: مسیر سیگنال بیت‌به‌بیت، DSD از طریق DoP، صدای فراگیر به‌صورت صدای فضایی روی AirPods و تحلیل فایل‌های وضوح بالا.",
     "keywords": "پخش کننده موسیقی برای مک, پلیر موزیک مک, پخش‌کنندهٔ وضوح بالا, پخش DSD, پخش SACD ISO, صدای چندکاناله, صدای فراگیر, Dolby Atmos, DTS-HD Master Audio, پخش بیت‌به‌بیت, تصحیح اتاق, صدای فضایی, پخش FLAC, رایگان, متن‌باز"
   },
   "og": {

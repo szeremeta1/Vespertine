@@ -14,7 +14,7 @@
     "copied": "Gekopieerd",
     "copyFailed": "Selecteer het",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus en Dolby TrueHD zijn handelsmerken van Dolby Laboratories. DTS, DTS-HD Master Audio en DTS:X zijn handelsmerken van DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS en Ruimtelijke audio zijn handelsmerken van Apple Inc. Vespertine noemt ze alleen om te beschrijven wat het afspeelt en waarop; het is niet gecertificeerd, gelicentieerd of goedgekeurd door Dolby, DTS of Apple.",
-    "trailerLabel": "Trailer van Vespertine, 44 seconden",
+    "trailerLabel": "Trailer van Vespertine, 55 seconden",
     "untested": "Uitvoer kanaal voor kanaal en bitstream naar een receiver zijn experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "Bekijk het in 44 seconden.",
+      "title": "Bekijk het in 55 seconden.",
       "text": "Zet het geluid aan. Alles wat je ziet is de echte app, opgenomen met de eigen bibliotheek van de ontwikkelaar.",
       "fallback": "Bekijk de trailer (MP4)",
-      "caption": "44 s · 1080p · albumillustraties behoren toe aan hun eigenaars"
+      "caption": "55 s · 1080p · albumillustraties behoren toe aan hun eigenaars"
     },
     "features": {
       "eyebrow": "Waarom Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 seconden, 16:9, 1080p bij 60 fps, met geluid. <a href=\"{href.trailerDownload}\" download>Download de MP4</a> ({size}). Een 4K-master is op aanvraag beschikbaar.",
+      "text": "55 seconden, 16:9, 1080p bij 60 fps, met geluid. <a href=\"{href.trailerDownload}\" download>Download de MP4</a> ({size}). Een 4K-master is op aanvraag beschikbaar.",
       "fallback": "Download de trailer (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Muziekspeler",
     "sourceName": "Broncode van Vespertine",
     "trailerName": "Trailer van Vespertine",
-    "trailerDescription": "Een rondleiding van 44 seconden door Vespertine, opgenomen in de echte app met de eigen bibliotheek van de ontwikkelaar: het bitperfecte signaalpad, DSD via DoP, surround als ruimtelijke audio op AirPods en analyse van hi-res-bestanden.",
+    "trailerDescription": "Een rondleiding van 55 seconden door Vespertine, opgenomen in de echte app met de eigen bibliotheek van de ontwikkelaar: het bitperfecte signaalpad, DSD via DoP, surround als ruimtelijke audio op AirPods en analyse van hi-res-bestanden.",
     "keywords": "muziekspeler voor Mac, hi-res speler Mac, DSD-speler, SACD ISO afspelen, meerkanaals audio, surroundmuziek, Dolby Atmos, DTS-HD Master Audio, bitperfect afspelen, ruimtecorrectie, ruimtelijke audio, FLAC-speler, gratis, open source"
   },
   "og": {

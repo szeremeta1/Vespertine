@@ -14,7 +14,7 @@
     "copied": "Nakopya",
     "copyFailed": "Piliin ito",
     "trademarks": "Ang Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus at Dolby TrueHD ay mga trademark ng Dolby Laboratories. Ang DTS, DTS-HD Master Audio at DTS:X ay mga trademark ng DTS, Inc. Ang Apple, AirPods, AirPods Max, Mac, macOS at Spatial Audio ay mga trademark ng Apple Inc. Binabanggit lang ng Vespertine ang mga ito para ilarawan kung ano ang pine-play nito at saan; hindi ito sertipikado, lisensyado o ineendorso ng Dolby, DTS o Apple.",
-    "trailerLabel": "Trailer ng Vespertine, 44 segundo",
+    "trailerLabel": "Trailer ng Vespertine, 55 segundo",
     "untested": "Eksperimental ang channel-for-channel na output at ang bitstream papunta sa receiver, at hindi pa nasusubok sa mga totoong receiver at multichannel USB DAC (isang Sony TV sa HDMI ang nasubok na: tingnan ang docs/DEVICES.md); hinihiling ang mga ulat."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "Panoorin sa loob ng 44 segundo.",
+      "title": "Panoorin sa loob ng 55 segundo.",
       "text": "Buksan ang tunog. Lahat ng makikita rito ay ang totoong app, na ni-record sa sariling library ng developer.",
       "fallback": "Panoorin ang trailer (MP4)",
-      "caption": "44 s · 1080p · pag-aari ng mga may-ari nito ang album art"
+      "caption": "55 s · 1080p · pag-aari ng mga may-ari nito ang album art"
     },
     "features": {
       "eyebrow": "Bakit Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 na segundo, 16:9, 1080p sa 60 fps, may tunog. <a href=\"{href.trailerDownload}\" download>I-download ang MP4</a> ({size}). May makukuhang 4K master kapag hiniling.",
+      "text": "55 na segundo, 16:9, 1080p sa 60 fps, may tunog. <a href=\"{href.trailerDownload}\" download>I-download ang MP4</a> ({size}). May makukuhang 4K master kapag hiniling.",
       "fallback": "I-download ang trailer (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Music player",
     "sourceName": "Source code ng Vespertine",
     "trailerName": "Trailer ng Vespertine",
-    "trailerDescription": "Isang 44-segundong paglilibot sa Vespertine, ni-record mula sa totoong app gamit ang sariling library ng developer: ang bit-perfect na signal path, DSD sa DoP, surround bilang Spatial Audio sa AirPods at pagsusuri ng hi-res na file.",
+    "trailerDescription": "Isang 55-segundong paglilibot sa Vespertine, ni-record mula sa totoong app gamit ang sariling library ng developer: ang bit-perfect na signal path, DSD sa DoP, surround bilang Spatial Audio sa AirPods at pagsusuri ng hi-res na file.",
     "keywords": "music player para sa Mac, hi-res player sa Mac, DSD player, SACD ISO, multichannel na audio, surround na musika, Dolby Atmos, DTS-HD Master Audio, bit-perfect na playback, room correction, Spatial Audio, FLAC player, libre, open source"
   },
   "og": {

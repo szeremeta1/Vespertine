@@ -14,7 +14,7 @@
     "copied": "コピーしました",
     "copyFailed": "選択してください",
     "trademarks": "Dolby、Dolby Atmos、Dolby Digital、Dolby Digital PlusおよびDolby TrueHDは、Dolby Laboratoriesの商標です。DTS、DTS-HD Master AudioおよびDTS:Xは、DTS, Inc.の商標です。Apple、AirPods、AirPods Max、Mac、macOSおよび空間オーディオは、Apple Inc.の商標です。Vespertineがこれらの名称を用いるのは、何をどこで再生できるかを説明するためだけです。Vespertineは、Dolby、DTS、Appleのいずれからも認証、ライセンス供与、推奨を受けていません。",
-    "trailerLabel": "Vespertineのトレーラー（44秒）",
+    "trailerLabel": "Vespertineのトレーラー（55秒）",
     "untested": "各チャンネルをそのまま出力する機能とレシーバーへのビットストリーム出力は実験的なもので、実際のレシーバーやマルチチャンネルUSB DACではテストされていません（HDMI接続のSony製テレビ1台でテスト済み。docs/DEVICES.mdを参照）。動作報告を募集しています。"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "トレーラー",
-      "title": "44秒でご覧ください。",
+      "title": "55秒でご覧ください。",
       "text": "音声をオンにしてご覧ください。映っているのはすべて実際のアプリで、開発者自身のライブラリで収録したものです。",
       "fallback": "トレーラーを見る（MP4）",
-      "caption": "44秒 · 1080p · アルバムアートの権利は各所有者に帰属します"
+      "caption": "55秒 · 1080p · アルバムアートの権利は各所有者に帰属します"
     },
     "features": {
       "eyebrow": "Vespertineを選ぶ理由",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "動画",
       "title": "トレーラー",
-      "text": "44秒、16:9、1080p・60 fps、音声付き。<a href=\"{href.trailerDownload}\" download>MP4をダウンロード</a>（{size}）。4Kマスターはご要望に応じて提供します。",
+      "text": "55秒、16:9、1080p・60 fps、音声付き。<a href=\"{href.trailerDownload}\" download>MP4をダウンロード</a>（{size}）。4Kマスターはご要望に応じて提供します。",
       "fallback": "トレーラーをダウンロード（MP4）"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "音楽プレーヤー",
     "sourceName": "Vespertineのソースコード",
     "trailerName": "Vespertineのトレーラー",
-    "trailerDescription": "Vespertineを44秒で紹介する映像。開発者自身のライブラリを使い、実際のアプリから収録しました。ビットパーフェクトな信号経路、DoPによるDSD、AirPodsの空間オーディオで聴くサラウンド、ハイレゾファイルの解析を紹介します。",
+    "trailerDescription": "Vespertineを55秒で紹介する映像。開発者自身のライブラリを使い、実際のアプリから収録しました。ビットパーフェクトな信号経路、DoPによるDSD、AirPodsの空間オーディオで聴くサラウンド、ハイレゾファイルの解析を紹介します。",
     "keywords": "Mac 音楽再生ソフト, ハイレゾ 再生 Mac, DSD 再生, SACD ISO 再生, マルチチャンネル 再生, サラウンド, Dolby Atmos, DTS-HD Master Audio, ビットパーフェクト, ルーム補正, 空間オーディオ, FLAC 再生, 無料, オープンソース"
   },
   "og": {

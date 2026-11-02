@@ -14,7 +14,7 @@
     "copied": "Скопійовано",
     "copyFailed": "Виділіть її",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus і Dolby TrueHD — торговельні марки Dolby Laboratories. DTS, DTS-HD Master Audio і DTS:X — торговельні марки DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS і Spatial Audio — торговельні марки Apple Inc. Vespertine згадує їх лише для того, щоб описати, що він відтворює і де; він не має сертифікації, ліцензії чи схвалення від Dolby, DTS або Apple.",
-    "trailerLabel": "Трейлер Vespertine, 44 секунди",
+    "trailerLabel": "Трейлер Vespertine, 55 секунд",
     "untested": "Поканальний вивід і бітстрим на ресивер — експериментальні функції, не перевірені на реальних ресиверах і багатоканальних USB-ЦАП (перевірено один телевізор Sony через HDMI: див. docs/DEVICES.md); чекаємо на ваші звіти."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Трейлер",
-      "title": "Погляньте за 44 секунди.",
+      "title": "Погляньте за 55 секунд.",
       "text": "Увімкніть звук. Усе в ньому — справжній застосунок, знятий на власній медіатеці розробника.",
       "fallback": "Дивитися трейлер (MP4)",
-      "caption": "44 с · 1080p · обкладинки належать їхнім власникам"
+      "caption": "55 с · 1080p · обкладинки належать їхнім власникам"
     },
     "features": {
       "eyebrow": "Чому Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Відео",
       "title": "Трейлер.",
-      "text": "44 секунди, 16:9, 1080p, 60 fps, зі звуком. <a href=\"{href.trailerDownload}\" download>Завантажте MP4</a> ({size}). Мастер-копію в 4K надамо на запит.",
+      "text": "55 секунд, 16:9, 1080p, 60 fps, зі звуком. <a href=\"{href.trailerDownload}\" download>Завантажте MP4</a> ({size}). Мастер-копію в 4K надамо на запит.",
       "fallback": "Завантажити трейлер (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Музичний плеєр",
     "sourceName": "Вихідний код Vespertine",
     "trailerName": "Трейлер Vespertine",
-    "trailerDescription": "44-секундний огляд Vespertine, записаний у справжньому застосунку на власній медіатеці розробника: шлях сигналу біт-у-біт, DSD через DoP, об’ємний звук як просторове аудіо на AirPods і аналіз hi-res-файлів.",
+    "trailerDescription": "55-секундний огляд Vespertine, записаний у справжньому застосунку на власній медіатеці розробника: шлях сигналу біт-у-біт, DSD через DoP, об’ємний звук як просторове аудіо на AirPods і аналіз hi-res-файлів.",
     "keywords": "музичний плеєр для Mac, hi-res плеєр Mac, DSD плеєр, SACD ISO, багатоканальний звук, об’ємний звук, surround, Dolby Atmos, DTS-HD Master Audio, відтворення біт-у-біт, корекція кімнати, просторове аудіо, FLAC плеєр, безплатно, відкритий код"
   },
   "og": {

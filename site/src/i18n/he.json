@@ -14,7 +14,7 @@
     "copied": "הועתק",
     "copyFailed": "סמן אותה",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ו־Dolby TrueHD הם סימנים מסחריים של Dolby Laboratories. DTS, DTS-HD Master Audio ו־DTS:X הם סימנים מסחריים של DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS ושמע מרחבי הם סימנים מסחריים של Apple Inc. Vespertine מזכיר אותם רק כדי לתאר מה הוא מנגן והיכן; הוא אינו מוסמך, מורשה או מאושר על ידי Dolby, DTS או Apple.",
-    "trailerLabel": "טריילר של Vespertine, 44 שניות",
+    "trailerLabel": "טריילר של Vespertine, 55 שניות",
     "untested": "פלט ערוץ־לערוץ והעברת bitstream למקלט הם ניסיוניים, ולא נבדקו על מקלטים אמיתיים ולא על ממירי DAC רב־ערוציים ב־USB (נבדקה טלוויזיה אחת של Sony דרך HDMI: ראה docs/DEVICES.md); נשמח לדיווחים."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "טריילר",
-      "title": "צפה בו ב־44 שניות.",
+      "title": "צפה בו ב־55 שניות.",
       "text": "הפעל את הקול. כל מה שמופיע בו הוא האפליקציה האמיתית, שהוקלטה על הספריה האישית של המפתח.",
       "fallback": "צפה בטריילר (MP4)",
-      "caption": "44 שנ׳ · 1080p · עטיפות האלבומים שייכות לבעליהן"
+      "caption": "55 שנ׳ · 1080p · עטיפות האלבומים שייכות לבעליהן"
     },
     "features": {
       "eyebrow": "למה Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "וידאו",
       "title": "טריילר.",
-      "text": "44 שניות, 16:9, 1080p ב־60 fps, עם סאונד. <a href=\"{href.trailerDownload}\" download>הורד את ה־MP4</a> ({size}). מאסטר ב־4K זמין לפי בקשה.",
+      "text": "55 שניות, 16:9, 1080p ב־60 fps, עם סאונד. <a href=\"{href.trailerDownload}\" download>הורד את ה־MP4</a> ({size}). מאסטר ב־4K זמין לפי בקשה.",
       "fallback": "הורד את הטריילר (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "נגן מוזיקה",
     "sourceName": "קוד המקור של Vespertine",
     "trailerName": "הטריילר של Vespertine",
-    "trailerDescription": "סיור של 44 שניות ב־Vespertine, שהוקלט מהאפליקציה האמיתית על הספריה של המפתח עצמו: נתיב האות המדויק לסיבית, DSD דרך DoP, סראונד כשמע מרחבי ב־AirPods וניתוח קבצי Hi-Res.",
+    "trailerDescription": "סיור של 55 שניות ב־Vespertine, שהוקלט מהאפליקציה האמיתית על הספריה של המפתח עצמו: נתיב האות המדויק לסיבית, DSD דרך DoP, סראונד כשמע מרחבי ב־AirPods וניתוח קבצי Hi-Res.",
     "keywords": "נגן מוזיקה למק, נגן מוזיקה ל־Mac, נגן Hi-Res, נגן DSD, ניגון SACD ISO, שמע רב־ערוצי, סראונד, Dolby Atmos, DTS-HD Master Audio, ניגון מדויק לסיבית, תיקון חדר, שמע מרחבי, נגן FLAC, חינם, קוד פתוח"
   },
   "og": {

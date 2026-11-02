@@ -14,7 +14,7 @@
     "copied": "Disalin",
     "copyFailed": "Pilihnya",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus dan Dolby TrueHD ialah tanda dagangan Dolby Laboratories. DTS, DTS-HD Master Audio dan DTS:X ialah tanda dagangan DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS dan Audio Ruang ialah tanda dagangan Apple Inc. Vespertine menamakannya hanya untuk menerangkan apa yang dimainkannya dan di mana; ia tidak diperakui, dilesenkan atau disokong oleh Dolby, DTS atau Apple.",
-    "trailerLabel": "Treler Vespertine, 44 saat",
+    "trailerLabel": "Treler Vespertine, 55 saat",
     "untested": "Output saluran demi saluran dan bitstream ke penerima adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Treler",
-      "title": "Lihat dalam 44 saat.",
+      "title": "Lihat dalam 55 saat.",
       "text": "Hidupkan bunyi. Semua yang dipaparkan ialah aplikasi sebenar, dirakam pada pustaka milik pembangun sendiri.",
       "fallback": "Tonton treler (MP4)",
-      "caption": "44 s · 1080p · seni album milik pemiliknya masing-masing"
+      "caption": "55 s · 1080p · seni album milik pemiliknya masing-masing"
     },
     "features": {
       "eyebrow": "Mengapa Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Treler.",
-      "text": "44 saat, 16:9, 1080p pada 60 fps, dengan bunyi. <a href=\"{href.trailerDownload}\" download>Muat turun MP4</a> ({size}). Master 4K boleh didapati atas permintaan.",
+      "text": "55 saat, 16:9, 1080p pada 60 fps, dengan bunyi. <a href=\"{href.trailerDownload}\" download>Muat turun MP4</a> ({size}). Master 4K boleh didapati atas permintaan.",
       "fallback": "Muat turun treler (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Pemain muzik",
     "sourceName": "Kod sumber Vespertine",
     "trailerName": "Treler Vespertine",
-    "trailerDescription": "Lawatan 44 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, bunyi keliling sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
+    "trailerDescription": "Lawatan 55 saat ke Vespertine, dirakam daripada apl sebenar pada pustaka pembangun sendiri: laluan isyarat bit-perfect, DSD melalui DoP, bunyi keliling sebagai Audio Ruang pada AirPods dan analisis fail hi-res.",
     "keywords": "pemain muzik Mac, pemain hi-res Mac, pemain DSD, SACD ISO, audio berbilang saluran, bunyi keliling, surround, Dolby Atmos, DTS-HD Master Audio, main balik bit-perfect, pembetulan bilik, Audio Ruang, pemain FLAC, percuma, sumber terbuka"
   },
   "og": {

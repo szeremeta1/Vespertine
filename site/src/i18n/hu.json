@@ -14,7 +14,7 @@
     "copied": "Másolva",
     "copyFailed": "Jelölje ki",
     "trademarks": "A Dolby, a Dolby Atmos, a Dolby Digital, a Dolby Digital Plus és a Dolby TrueHD a Dolby Laboratories védjegyei. A DTS, a DTS-HD Master Audio és a DTS:X a DTS, Inc. védjegyei. Az Apple, az AirPods, az AirPods Max, a Mac, a macOS és a Spatial Audio az Apple Inc. védjegyei. A Vespertine kizárólag annak leírására említi őket, hogy mit és milyen eszközön játszik le; a Vespertine-t a Dolby, a DTS és az Apple nem tanúsította, nem licencelte és nem hagyta jóvá.",
-    "trailerLabel": "A Vespertine előzetese, 44 másodperc",
+    "trailerLabel": "A Vespertine előzetese, 55 másodperc",
     "untested": "A csatornánkénti kimenet és az AV-erősítőre küldött bitstream kísérleti funkció, valódi AV-erősítőkön és többcsatornás USB DAC-okon nincs tesztelve (egy HDMI-n csatlakozó Sony TV-n tesztelték: lásd docs/DEVICES.md); visszajelzéseket várunk."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Előzetes",
-      "title": "Nézze meg 44 másodpercben.",
+      "title": "Nézze meg 55 másodpercben.",
       "text": "Kapcsolja be a hangot. A videó végig a valódi alkalmazást mutatja, a fejlesztő saját zenekönyvtárával rögzítve.",
       "fallback": "Az előzetes megtekintése (MP4)",
-      "caption": "44 s · 1080p · az albumborítók joga a tulajdonosaiké"
+      "caption": "55 s · 1080p · az albumborítók joga a tulajdonosaiké"
     },
     "features": {
       "eyebrow": "Miért a Vespertine?",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Videó",
       "title": "Előzetes.",
-      "text": "44 másodperc, 16:9, 1080p 60 fps-sel, hanggal. <a href=\"{href.trailerDownload}\" download>Töltse le az MP4-et</a> ({size}). Kérésre 4K-s master is elérhető.",
+      "text": "55 másodperc, 16:9, 1080p 60 fps-sel, hanggal. <a href=\"{href.trailerDownload}\" download>Töltse le az MP4-et</a> ({size}). Kérésre 4K-s master is elérhető.",
       "fallback": "Az előzetes letöltése (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Zenelejátszó",
     "sourceName": "A Vespertine forráskódja",
     "trailerName": "A Vespertine előzetese",
-    "trailerDescription": "44 másodperces bemutató a Vespertine-ről, a valódi alkalmazásból rögzítve, a fejlesztő saját könyvtárán: a bit-perfect jelút, DSD DoP-n keresztül, surround Térhatású hangként AirPodson és hi-res fájlelemzés.",
+    "trailerDescription": "55 másodperces bemutató a Vespertine-ről, a valódi alkalmazásból rögzítve, a fejlesztő saját könyvtárán: a bit-perfect jelút, DSD DoP-n keresztül, surround Térhatású hangként AirPodson és hi-res fájlelemzés.",
     "keywords": "zenelejátszó Macre, hi-res lejátszó Mac, DSD lejátszó, SACD ISO, többcsatornás hang, surround zene, Dolby Atmos, DTS-HD Master Audio, bit-perfect lejátszás, szobakorrekció, térhatású hang, FLAC lejátszó, ingyenes, nyílt forráskódú"
   },
   "og": {

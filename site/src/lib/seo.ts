@@ -91,8 +91,8 @@ export function trailerNode(lang: Lang, contentUrl: string, thumbnailUrl: string
     thumbnailUrl,
     contentUrl,
     // The current cut (git log -- site/public/assets/trailer); the first one went up on 29 September.
-    uploadDate: '2026-10-13',
-    duration: 'PT44S',
+    uploadDate: '2026-11-01',
+    duration: 'PT55S',
     width: 1920,
     height: 1080,
     // The trailer has music, no speech or on-screen text to translate.
