@@ -217,7 +217,13 @@ enum GoldenCases {
         return url
     }()
 
-    static func file(_ name: String) -> URL { folder.appendingPathComponent(name) }
+    /// A folder of its own for each file: the same case runs in several suites at once (off, Crossfade, Smart Mix), and
+    /// one shared name let a run read a fixture while another was rewriting it.
+    static func file(_ name: String) -> URL {
+        let dir = folder.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent(name)
+    }
 
     static func fixture(_ name: String) -> URL {
         Bundle.module.url(forResource: name, withExtension: nil, subdirectory: "Fixtures")!
