@@ -176,12 +176,17 @@ struct AlbumCard: View {
         // VoiceOver (and other assistive tech) can open the album and play it.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(album.title.libraryDisplayName), \(album.artist.libraryDisplayName)")
-        .accessibilityValue(model.library.copyCounts[album.key].map { album.formatSummary + ", " + String(localized: "\($0) COPIES") } ?? album.formatSummary)
+        .accessibilityValue(accessibilityValue)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbum(album.key) }
         .accessibilityAction(named: "Play") { model.player.play(model.playableTracks(albumKey: album.key), shuffled: false) }
         .contextMenu { AlbumMenu(album: album) }
         .draggable(model.playableTracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
+    }
+
+    private var accessibilityValue: String {
+        guard let copies = model.library.copyCounts[album.key] else { return album.formatSummary }
+        return "\(album.formatSummary), \(String(localized: "\(copies) COPIES"))"
     }
 }
 
@@ -299,7 +304,8 @@ struct AlbumFamilyDetailView: View {
                                             .foregroundStyle(Palette.text).lineLimit(2)
                                         FormatLabel(summary: edition.formatSummary, highlight: edition.isHiRes)
                                         // What kind of edition it is, and how many copies of it the library has.
-                                        let kinds = EditionKind.of(edition).map(\.name) + (model.library.copyCounts[edition.key].map { [String(localized: "\($0) COPIES")] } ?? [])
+                                        let copies: [String] = model.library.copyCounts[edition.key].map { [String(localized: "\($0) COPIES")] } ?? []
+                                        let kinds: [String] = EditionKind.of(edition).map(\.name) + copies
                                         if !kinds.isEmpty {
                                             Text(kinds.joined(separator: " · ")).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.5)
                                                 .foregroundStyle(Palette.text3).lineLimit(1)
