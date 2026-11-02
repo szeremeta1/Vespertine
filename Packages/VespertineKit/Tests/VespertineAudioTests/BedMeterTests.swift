@@ -30,7 +30,30 @@ private final class FakeBedChannels: BedReading, @unchecked Sendable {
                          copyChannels: { _, count, destination in
             for i in 0..<count { for c in 0..<n { destination[i * n + c] = level(c) } }
             return true
-        })
+        }, channels: n)
+    }
+}
+
+/// Hands over buffers `width` channels wide while naming `channelLabels.count` of them: what a wrapper that forgot to pass
+/// the labels on did. Notes whether the decoder asked for the channels, and writes only where a buffer of the named width has room.
+private final class FakeMismatchedBed: BedReading, @unchecked Sendable {
+    let channelLabels: [AudioChannelLabel] = [kAudioChannelLabel_Left, kAudioChannelLabel_Right]
+    let width: Int
+    let asked = Box(0)
+    private var handedOut = 0
+    init(width: Int) { self.width = width }
+    func start() throws {}
+    func cancel() {}
+    func next() throws -> BedBuffer? {
+        guard handedOut < 4 else { return nil }
+        handedOut += 1
+        let width = width, asked = asked
+        return BedBuffer(frames: 8192, copy: { _, count, destination in destination.update(repeating: 0.25, count: 2 * count); return true },
+                         copyChannels: { _, count, destination in
+            asked.value += 1
+            destination.update(repeating: 0.5, count: width * count)   // an overflow of the decoder's buffer, if it let this run
+            return true
+        }, channels: width)
     }
 }
 
@@ -186,6 +209,20 @@ struct BedMeterTests {
         let peaks = try #require(source.takeChannelPeaks())
         #expect(peaks.count == 6)
         for c in 0..<6 { #expect(abs(peaks[c] - Float(c + 1) / 10) < 1e-6) }
+    }
+
+    @Test("A reader whose buffers are wider than the channels it names is stored as stereo, and its channels are never copied")
+    func wideBufferNamedNarrow() throws {
+        let reader = FakeMismatchedBed(width: 6)
+        let decoder = SystemBedDecoder(makeReader: { _ in reader })
+        decoder.start(at: 0, playhead: { 0 })
+        defer { decoder.stop() }
+        let deadline = Date().addingTimeInterval(30)
+        while decoder.tap.endFrame < 4 * 8192, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(decoder.tap.endFrame == 4 * 8192)
+        #expect(reader.asked.value == 0)
+        #expect(decoder.tap.takePeaks(playhead: 8192)?.allSatisfy { $0 == 0 } ?? true)
+        #expect(decoder.error == nil)
     }
 
     @Test("Nobody asking for the bed: nothing is decoded")

@@ -178,6 +178,9 @@ struct BedBuffer {
     /// The same for the bed's channels, interleaved (`BedReading.channelLabels.count` wide), for the meters; nil when
     /// the reader only has the downmix.
     var copyChannels: ((_ first: Int, _ count: Int, _ destination: UnsafeMutablePointer<Float>) -> Bool)? = nil
+    /// How many channels `copyChannels` writes per frame. The decoder only calls it when this is the width of the layout
+    /// it gave the tap, so a reader that names fewer channels than it hands over can't write past the decoder's buffer.
+    var channels = 0
 }
 
 /// Where `SystemBedDecoder` gets the decoded bed from: Audio Toolbox in the app, a fake in tests.
@@ -272,7 +275,7 @@ final class AudioFileBedReader: BedReading {
         }, copyChannels: { [channels] first, count, destination in
             bed.withUnsafeBufferPointer { destination.update(from: $0.baseAddress! + channels * first, count: channels * count) }
             return true
-        })
+        }, channels: channels)
     }
 
     func cancel() {}
@@ -405,7 +408,7 @@ final class PCMBedReader: BedReading {
         }, copyChannels: { [channels] first, count, destination in
             bed.withUnsafeBufferPointer { destination.update(from: $0.baseAddress! + channels * first, count: channels * count) }
             return true
-        })
+        }, channels: channels)
     }
 
     func cancel() {}
@@ -592,6 +595,7 @@ final class SystemBedDecoder: @unchecked Sendable {
         tap.setLayout(labels)
         var scratch = [Float](repeating: 0, count: 2 * Self.chunkFrames)
         var bedScratch = [Float](repeating: 0, count: labels.count * Self.chunkFrames)
+        let bedWidth = labels.count
         while isCurrent(gen) {
             let buffer: BedBuffer
             reading(gen, true)
@@ -618,7 +622,11 @@ final class SystemBedDecoder: @unchecked Sendable {
                     return
                 }
                 // The bed's own channels, for the meters, where the reader has them.
-                let hasBed = buffer.copyChannels.map { copy in bedScratch.withUnsafeMutableBufferPointer { copy(done, count, $0.baseAddress!) } } ?? false
+                // Only a buffer as wide as the layout named: `bedScratch` holds `bedWidth` channels per frame, no more.
+                var hasBed = false
+                if let copy = buffer.copyChannels, buffer.channels == bedWidth {
+                    hasBed = bedScratch.withUnsafeMutableBufferPointer { copy(done, count, $0.baseAddress!) }
+                }
                 scratch.withUnsafeBufferPointer { stereo in
                     bedScratch.withUnsafeBufferPointer { tap.append(interleaved: stereo.baseAddress!, frames: count, at: next, bed: hasBed ? $0.baseAddress! : nil) }
                 }

@@ -129,6 +129,7 @@ private final class TracingBedReader: BedReading, @unchecked Sendable {
         } catch { note("next threw \(error)"); throw error }
     }
     func cancel() { note("cancel"); inner.cancel() }
+    var channelLabels: [AudioChannelLabel] { inner.channelLabels }
 }
 
 private final class TraceBox: @unchecked Sendable {
