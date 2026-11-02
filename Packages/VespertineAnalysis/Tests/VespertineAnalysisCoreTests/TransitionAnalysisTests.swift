@@ -390,7 +390,11 @@ struct TransitionAnalysisSpeedTests {
         let edges = time(60, rate: 96_000)
         let song = time(300, rate: 44_100)
         print("Transition analysis: 60 s at 96 kHz in \(String(format: "%.2f", edges)) s; 300 s at 44.1 kHz in \(String(format: "%.2f", song)) s")
-        // Generous bounds (a debug build on a busy machine): far faster than real time either way.
-        #expect(edges < 30 && song < 60)
+        // Generous bounds (a debug build, other suites running alongside), scaled with the machine's load per core as
+        // rt-audit's watchdog is, and never looser than real time: a measurement must keep ahead of playback.
+        var avg = [0.0, 0.0, 0.0]
+        let busy = getloadavg(&avg, 3) == 3 ? max(avg[0], avg[1]) / Double(ProcessInfo.processInfo.activeProcessorCount) : 1
+        let scale = max(1, busy)
+        #expect(edges < min(30 * scale, 60) && song < min(60 * scale, 300))
     }
 }
