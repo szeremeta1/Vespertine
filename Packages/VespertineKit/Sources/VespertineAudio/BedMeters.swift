@@ -25,3 +25,28 @@ public struct BedMeterLayout: Sendable, Equatable {
         layout = ChannelLayouts.name(labels: labels, channels: labels.count)
     }
 }
+
+extension ChannelLayouts {
+    /// The order the meters show a bed's channels in, whatever order the decoder produced them in (Core Audio gives a
+    /// Dolby bed as L C R Ls Rs LFE): the one the other surround tracks use, L R C LFE, then the surround pairs, the wide
+    /// and centre-side speakers, then the heights front to back. `order[i]` is the decoder's channel shown `i`-th; channels
+    /// without a place keep their relative order, last.
+    static func meterOrder(_ labels: [AudioChannelLabel]) -> [Int] {
+        func rank(_ label: AudioChannelLabel) -> Int {
+            let places: [[AudioChannelLabel]] = [
+                [kAudioChannelLabel_Left], [kAudioChannelLabel_Right], [kAudioChannelLabel_Center, kAudioChannelLabel_Mono],
+                [kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3],
+                [kAudioChannelLabel_LeftSurround, kAudioChannelLabel_LeftSurroundDirect], [kAudioChannelLabel_RightSurround, kAudioChannelLabel_RightSurroundDirect],
+                [kAudioChannelLabel_RearSurroundLeft], [kAudioChannelLabel_RearSurroundRight], [kAudioChannelLabel_CenterSurround],
+                [kAudioChannelLabel_LeftCenter], [kAudioChannelLabel_RightCenter], [kAudioChannelLabel_LeftWide], [kAudioChannelLabel_RightWide],
+                [kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_LeftTopFront], [kAudioChannelLabel_VerticalHeightRight, kAudioChannelLabel_RightTopFront],
+                [kAudioChannelLabel_VerticalHeightCenter, kAudioChannelLabel_CenterTopFront],
+                [kAudioChannelLabel_LeftTopMiddle], [kAudioChannelLabel_RightTopMiddle], [kAudioChannelLabel_CenterTopMiddle, kAudioChannelLabel_TopCenterSurround],
+                [kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_LeftTopRear], [kAudioChannelLabel_TopBackRight, kAudioChannelLabel_RightTopRear],
+                [kAudioChannelLabel_TopBackCenter, kAudioChannelLabel_CenterTopRear],
+            ]
+            return places.firstIndex { $0.contains(label) } ?? places.count
+        }
+        return labels.indices.sorted { (rank(labels[$0]), $0) < (rank(labels[$1]), $1) }
+    }
+}

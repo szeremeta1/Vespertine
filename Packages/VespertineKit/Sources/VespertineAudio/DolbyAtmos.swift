@@ -85,6 +85,8 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     private var generation = 0
     /// The visualizer's and the meters' view of the bed (see `SystemBedDecoder`); it decodes only while one of them is showing.
     private var meter: BedMeterSource?
+    /// Tests: sees each compressed buffer as it goes to the renderer (never changes it).
+    var enqueueObserver: (@Sendable (CMSampleBuffer) -> Void)?
 
     init(item: PlayableItem, url: URL, deviceUID: String?, spatial: Bool, volume: Float) throws {
         self.item = item
@@ -138,6 +140,7 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
                     self.renderer.stopRequestingMediaData()
                     return
                 }
+                self.enqueueObserver?(buffer)
                 self.renderer.enqueue(buffer)
                 let end = CMTimeAdd(CMSampleBufferGetPresentationTimeStamp(buffer), CMSampleBufferGetDuration(buffer))
                 if end.isValid { self.enqueuedEnd = CMTimeMaximum(self.enqueuedEnd, end) }
@@ -179,6 +182,9 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
         lock.lock(); defer { lock.unlock() }
         return inputDone && CMTimeCompare(synchronizer.currentTime(), enqueuedEnd) >= 0
     }
+
+    /// Whether every compressed frame has been handed to the renderer (tests).
+    var inputExhausted: Bool { lock.lock(); defer { lock.unlock() }; return inputDone }
 
     var failure: Error? { renderer.status == .failed ? (renderer.error ?? SourceOpenerError.unsupported(url)) : nil }
 }

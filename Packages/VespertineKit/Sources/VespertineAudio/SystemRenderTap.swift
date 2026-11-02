@@ -49,6 +49,9 @@ final class SystemBedTap: @unchecked Sendable {
     /// What the decoded bed's channels are, and the peak of each in every block of `peakBlock` frames (block `b` in
     /// slot `b % blocks`, valid while `blockIDs[slot] == b`).
     private var labels: [AudioChannelLabel]?
+    private var sourceLabels: [AudioChannelLabel]?
+    /// Where each of the decoder's channels is shown (`ChannelLayouts.meterOrder`).
+    private var position: [Int] = []
     private var peaks: [Float] = []
     private var blockIDs: [Int64]
     private let blocks: Int
@@ -73,11 +76,16 @@ final class SystemBedTap: @unchecked Sendable {
         peaksTakenTo = nil
     }
 
-    /// The speakers of the channels `append(…channels:)` will bring (replacing what was known).
+    /// The speakers of the channels `append(…bed:)` will bring, in the decoder's order (replacing what was known). The
+    /// peaks and `channelLabels` follow the meters' order (`ChannelLayouts.meterOrder`).
     func setLayout(_ labels: [AudioChannelLabel]) {
         lock.lock(); defer { lock.unlock() }
-        guard labels != self.labels else { return }
-        self.labels = labels
+        guard labels != sourceLabels else { return }
+        sourceLabels = labels
+        let order = ChannelLayouts.meterOrder(labels)
+        self.labels = order.map { labels[$0] }
+        position = [Int](repeating: 0, count: labels.count)
+        for (shown, source) in order.enumerated() { position[source] = shown }
         peaks = [Float](repeating: 0, count: blocks * labels.count)
         for i in blockIDs.indices { blockIDs[i] = -1 }
     }
@@ -109,7 +117,10 @@ final class SystemBedTap: @unchecked Sendable {
                     blockIDs[slot] = block
                     for c in 0..<channels { peaks[slot * channels + c] = 0 }
                 }
-                for c in 0..<channels { peaks[slot * channels + c] = max(peaks[slot * channels + c], abs(bed[i * channels + c])) }
+                for c in 0..<channels {
+                    let at = slot * channels + position[c]
+                    peaks[at] = max(peaks[at], abs(bed[i * channels + c]))
+                }
             }
         }
         end = at + Int64(frames)
