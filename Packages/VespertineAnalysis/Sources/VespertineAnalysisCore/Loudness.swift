@@ -58,6 +58,7 @@ public struct LoudnessMeter: Sendable {
 
     private var shelves: [Biquad]
     private var highPasses: [Biquad]
+    private var energy: [Double] = []
     private var sum = 0.0
     private var inStep = 0
     /// The weighted mean square of each complete 100 ms step.
@@ -85,24 +86,36 @@ public struct LoudnessMeter: Sendable {
 
     /// Adds `frames` interleaved frames.
     public mutating func add(_ samples: UnsafePointer<Float>, frames: Int) {
-        var f = 0
-        while f < frames {
-            let n = min(frames - f, stepFrames - inStep)
-            for i in f..<(f + n) {
-                let base = samples + i * channels
-                var frameSum = 0.0
-                for c in 0..<channels where weights[c] != 0 {
-                    let y = highPasses[c].process(shelves[c].process(Double(base[c])))
-                    frameSum += weights[c] * y * y
+        guard frames > 0 else { return }
+        // Each channel through its two filters over the whole chunk (state in locals), into one weighted energy per
+        // frame; then the frames into 100 ms steps. Same arithmetic, in the same order per frame, as frame by frame.
+        if energy.count < frames { energy = [Double](repeating: 0, count: frames) }
+        let ch = channels
+        energy.withUnsafeMutableBufferPointer { e in
+            for f in 0..<frames { e[f] = 0 }
+            for c in 0..<ch where weights[c] != 0 {
+                let w = weights[c]
+                var a = shelves[c], b = highPasses[c]
+                var p = samples + c
+                for f in 0..<frames {
+                    let y = b.process(a.process(Double(p.pointee)))
+                    e[f] += w * y * y
+                    p += ch
                 }
-                sum += frameSum
+                shelves[c] = a
+                highPasses[c] = b
             }
-            inStep += n
-            f += n
-            if inStep == stepFrames {
-                steps.append(sum / Double(stepFrames))
-                sum = 0
-                inStep = 0
+            var f = 0
+            while f < frames {
+                let n = min(frames - f, stepFrames - inStep)
+                for i in f..<(f + n) { sum += e[i] }
+                inStep += n
+                f += n
+                if inStep == stepFrames {
+                    steps.append(sum / Double(stepFrames))
+                    sum = 0
+                    inStep = 0
+                }
             }
         }
     }

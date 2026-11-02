@@ -296,3 +296,21 @@ struct BeatTests {
         #expect(short.head?.tempo == nil)
     }
 }
+
+@Suite("Transition analysis speed")
+struct TransitionAnalysisSpeedTests {
+    @Test("A just-in-time measurement (40 s tail + 20 s head, 96 kHz stereo) and a whole 5-minute song: timed")
+    func speed() {
+        func time(_ seconds: Double, rate: Double) -> Double {
+            let x = Synth.noise(seconds, dbfs: -16, rate: rate)
+            let start = Date()
+            _ = Synth.profile(x, rate: rate)
+            return Date().timeIntervalSince(start)
+        }
+        let edges = time(60, rate: 96_000)
+        let song = time(300, rate: 44_100)
+        print("Transition analysis: 60 s at 96 kHz in \(String(format: "%.2f", edges)) s; 300 s at 44.1 kHz in \(String(format: "%.2f", song)) s")
+        // Generous bounds (a debug build on a busy machine): far faster than real time either way.
+        #expect(edges < 30 && song < 60)
+    }
+}

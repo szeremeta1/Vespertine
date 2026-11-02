@@ -158,24 +158,28 @@ public final class TransitionAnalyzer {
     public func add(_ samples: UnsafePointer<Float>, frames: Int) {
         guard frames > 0 else { return }
         meter.add(samples, frames: frames)
-        for f in 0..<frames {
-            let base = samples + f * channels
-            var energy = 0.0
-            var loud = false
-            for c in 0..<channels {
-                let x = base[c]
-                energy += Double(x) * Double(x)
-                if abs(x) > silenceThreshold { loud = true }
-            }
-            if loud {
-                let frame = startFrame + framesAdded + Int64(f)
-                if firstLoudFrame == nil { firstLoudFrame = frame }
-                lastLoudFrame = frame
-            }
-            hopSum += energy
-            inHop += 1
+        let ch = channels, count = frames * ch, limit = silenceThreshold
+        // The first and last sample above the threshold, as frames.
+        var first = -1, last = -1
+        for i in 0..<count where abs(samples[i]) > limit { first = i; break }
+        if first >= 0 {
+            var i = count - 1
+            while i >= first { if abs(samples[i]) > limit { last = i; break }; i -= 1 }
+            let base = startFrame + framesAdded
+            if firstLoudFrame == nil { firstLoudFrame = base + Int64(first / ch) }
+            lastLoudFrame = base + Int64(last / ch)
+        }
+        // Energy per 10 ms hop, for the onsets.
+        var f = 0
+        while f < frames {
+            let n = min(frames - f, hop - inHop)
+            var e = 0.0
+            for i in (f * ch)..<((f + n) * ch) { let x = Double(samples[i]); e += x * x }
+            hopSum += e
+            inHop += n
+            f += n
             if inHop == hop {
-                let logEnergy = log10(hopSum / Double(hop * channels) + 1e-10)
+                let logEnergy = log10(hopSum / Double(hop * ch) + 1e-10)
                 onsets.append(Float(max(0, logEnergy - (lastLogEnergy ?? logEnergy))))
                 lastLogEnergy = logEnergy
                 hopSum = 0
