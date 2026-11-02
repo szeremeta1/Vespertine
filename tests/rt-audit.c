@@ -427,7 +427,9 @@ static void test_concurrent_peek(void) {
     assert(!started); (void)started;
     static float chunk[512], peeked[4096];
     unsigned rewound = 0, copied = 0;
-    for (unsigned round = 0; round < PEEK_ROUNDS; round++) {
+    // The reader keeps reading while this peeks and checks: `from` leaves it room to move, or the rewind (rightly)
+    // refuses every round on a slow or loaded machine. Past PEEK_ROUNDS, keep going until a rewind has gone through.
+    for (unsigned round = 0; round < PEEK_ROUNDS || (rewound == 0 && round < 20 * PEEK_ROUNDS); round++) {
         while (nrt_ring_writable(rewind_ring) < 4096) sched_yield();
         for (unsigned k = 0; k < 8; k++) {
             const uint64_t w = nrt_ring_total_written(rewind_ring);
@@ -437,7 +439,7 @@ static void test_concurrent_peek(void) {
             assert(wrote == 512); (void)wrote;
         }
         const uint64_t w = nrt_ring_total_written(rewind_ring);
-        const uint64_t from = nrt_ring_total_read(rewind_ring) + 64;
+        const uint64_t from = nrt_ring_total_read(rewind_ring) + 64 + 2048;
         if (from >= w) continue;
         const uint32_t got = nrt_ring_peek(rewind_ring, from, peeked, 4096);
         assert(got == (w - from < 4096 ? w - from : 4096));
