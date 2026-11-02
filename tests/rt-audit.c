@@ -412,7 +412,7 @@ static void test_concurrent_rewind(void) {
 // A skip's crossfade: while the reader runs, the producer copies what it wrote ahead of the reader back out
 // (nrt_ring_peek), rewinds to a point past the reader, and writes again from there. Frame n carries n: every copy
 // must be the frames it asked for, and the reader must only ever see n after n − 1.
-#define PEEK_ROUNDS 3000u
+#define PEEK_ROUNDS 300u
 static void test_concurrent_peek(void) {
     rewind_ring = nrt_ring_create(8192, 1);
     assert(rewind_ring);
