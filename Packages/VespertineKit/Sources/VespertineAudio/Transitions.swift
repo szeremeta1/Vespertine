@@ -144,6 +144,13 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
     /// Seconds of silence put between songs instead of a crossfade (0: none), never inside albums.
     public var gapSeconds: Double = 0
     public var policy: TransitionPolicy = .bitPerfectFirst
+    /// Live Set: the output's one rate for the session (48 or 96 kHz), so a change of rate never gaps.
+    public var liveSetRate: Double = 48_000
+    /// Live Set: songs with steady, matching beats blend beat on beat (see `LiveSetPlanner`).
+    public var beatBlends = true
+    /// Live Set: in a beat-matched blend the outgoing song's bass gives way to the incoming one's at the middle,
+    /// instead of both basslines sounding together. Off by default.
+    public var bassSwap = false
 
     /// Consecutive tracks of one album, the tracks of one CUE sheet and adjacent SACD tracks always play gaplessly,
     /// in playlists too. A rule, not a choice: there's no setting that turns it off.
@@ -152,6 +159,7 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
     public static let crossfadeRange = 1.0...12.0
     public static let crossfadeStep = 0.5
     public static let gapRange = 0.0...10.0
+    public static let liveSetRates: [Double] = [48_000, 96_000]
     public static let defaultExcludedGenres = ["Classical", "Opera", "Soundtrack", "Spoken Word"]
 
     /// Fades the real-time stage plays around a listener's action (only with the master switch on, and never on native
@@ -188,6 +196,7 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case enabled, style, crossfadeSeconds, curve, skip, excludedGenres, explainerSeen, trimSilence, gapSeconds, policy
+        case liveSetRate, beatBlends, bassSwap
     }
 
     public init(from decoder: Decoder) throws {
@@ -203,6 +212,9 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
         trimSilence = (try? c.decodeIfPresent(Bool.self, forKey: .trimSilence)) ?? d.trimSilence
         gapSeconds = (try? c.decodeIfPresent(Double.self, forKey: .gapSeconds)) ?? d.gapSeconds
         policy = (try? c.decodeIfPresent(TransitionPolicy.self, forKey: .policy)) ?? d.policy
+        liveSetRate = (try? c.decodeIfPresent(Double.self, forKey: .liveSetRate)) ?? d.liveSetRate
+        beatBlends = (try? c.decodeIfPresent(Bool.self, forKey: .beatBlends)) ?? d.beatBlends
+        bassSwap = (try? c.decodeIfPresent(Bool.self, forKey: .bassSwap)) ?? d.bassSwap
         self = normalized
     }
 
@@ -211,6 +223,7 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
         var s = self
         s.crossfadeSeconds = Self.crossfadeLength(s.crossfadeSeconds)
         s.gapSeconds = Self.gapLength(s.gapSeconds)
+        if !Self.liveSetRates.contains(s.liveSetRate) { s.liveSetRate = Self.liveSetRates[0] }
         var seen = Set<String>()
         s.excludedGenres = s.excludedGenres.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && seen.insert(Self.genreKey($0)).inserted }
@@ -231,8 +244,13 @@ public struct TransitionSettings: Codable, Sendable, Equatable {
         return min(max(stepped, gapRange.lowerBound), gapRange.upperBound)
     }
 
-    /// Integer mode and Match 16-bit aren't used (so songs can blend): the switch is on with "transitions first".
-    public var avoidsUnmixableModes: Bool { enabled && policy == .transitionsFirst }
+    /// Integer mode and Match 16-bit aren't used (so songs can blend): the switch is on with "transitions first", or
+    /// in Live Set (hosting: every boundary should blend).
+    public var avoidsUnmixableModes: Bool { enabled && (policy == .transitionsFirst || style == .liveSet) }
+
+    /// The Live Set session's fixed output rate: while the switch is on in Live Set, every PCM song plays at it
+    /// (resampled when it's another rate), so changes of rate never gap. nil otherwise (the output follows the songs).
+    public var fixedRate: Double? { enabled && style == .liveSet ? liveSetRate : nil }
 
     /// Turns the master switch on or off. Returns true the first time it's turned on, when the explainer is due (and
     /// is then marked seen, so it's shown once).
@@ -414,6 +432,37 @@ public struct SmartMix: Sendable, Hashable {
         case trimmed
         /// Not sure what the songs do: a plain crossfade of the chosen length.
         case crossfade
+        /// Live Set: both songs have steady, matching beats, so they blend beat on beat (`beat`).
+        case beatMatched
+    }
+
+    /// A beat-matched blend (Live Set): where each song is when it starts, and over how many beats.
+    public struct BeatAlignment: Sendable, Hashable {
+        /// Beats of the outgoing song the blend lasts (8 or 16).
+        public var beats: Int
+        /// The outgoing song's tempo, the blend's (rounded, for display).
+        public var bpm: Double
+        /// The blend's length, seconds: `beats` of the outgoing song's beats.
+        public var seconds: Double
+        /// Where the blend starts in the outgoing song, seconds from its start: on one of its downbeats.
+        public var outgoingStart: Double
+        /// Where the incoming song starts playing, seconds from its start (its first downbeat after its silence, moved
+        /// so its beats meet the outgoing song's in the middle of the blend).
+        public var incomingStart: Double
+        /// How far apart the two songs' beats get at the blend's ends (seconds; they meet in the middle).
+        public var drift: Double
+        /// The outgoing song's bass gives way to the incoming one's at the middle (`TransitionSettings.bassSwap`).
+        public var bassSwap: Bool
+
+        public init(beats: Int, bpm: Double, seconds: Double, outgoingStart: Double, incomingStart: Double, drift: Double, bassSwap: Bool) {
+            self.beats = beats
+            self.bpm = bpm
+            self.seconds = seconds
+            self.outgoingStart = outgoingStart
+            self.incomingStart = incomingStart
+            self.drift = drift
+            self.bassSwap = bassSwap
+        }
     }
 
     public var kind: Kind
@@ -427,14 +476,18 @@ public struct SmartMix: Sendable, Hashable {
     /// The outgoing song's level minus the incoming one's (dB, within ±`maximumMatch`): over the overlap the first is
     /// brought down and the second up by this much in all, each back to its own level where it plays alone.
     public var matchDB: Double
+    /// A beat-matched blend's placement (`beatMatched` only).
+    public var beat: BeatAlignment?
 
-    public init(kind: Kind, seconds: Double, outCurve: TransitionCurve?, inSeconds: Double, inCurve: TransitionCurve, matchDB: Double) {
+    public init(kind: Kind, seconds: Double, outCurve: TransitionCurve?, inSeconds: Double, inCurve: TransitionCurve, matchDB: Double,
+                beat: BeatAlignment? = nil) {
         self.kind = kind
         self.seconds = seconds
         self.outCurve = outCurve
         self.inSeconds = inSeconds
         self.inCurve = inCurve
         self.matchDB = matchDB
+        self.beat = beat
     }
 
     public static let maximumMatch = 6.0
@@ -460,6 +513,10 @@ public struct SmartMix: Sendable, Hashable {
         case .coldCut: return String(localized: "Smart Mix: quick cut", comment: "Signal path, next transition: both songs stop and start abruptly, so they meet in a short overlap of half a second.")
         case .trimmed: return String(localized: "Smart Mix: silence trimmed, \(length) s blend", comment: "Signal path, next transition: the silence at the end or start is left out, then a short crossfade; the length in seconds.")
         case .crossfade: return String(localized: "Smart Mix: crossfade, \(length) s", comment: "Signal path, next transition: Smart Mix couldn't tell how the songs end and start, so it uses a plain crossfade; the length in seconds.")
+        case .beatMatched:
+            let beats = beat?.beats ?? 0
+            let bpm = (beat?.bpm ?? 0).formatted(.number.precision(.fractionLength(0)))
+            return String(localized: "Live Set: beat-matched, \(beats) beats at \(bpm) BPM", comment: "Signal path, next transition: the two songs blend with their beats lined up; the number of beats the blend lasts, then the tempo in beats per minute, e.g. “Live Set: beat-matched, 16 beats at 128 BPM”.")
         }
     }
 }
@@ -508,6 +565,102 @@ public enum SmartMixPlanner {
             return SmartMix(kind: .coldCut, seconds: coldCutSeconds, outCurve: settings.curve, inSeconds: coldCutRise,
                             inCurve: settings.curve, matchDB: match)
         }
+    }
+}
+
+/// Live Set's beat-matched blends: where two songs with steady beats overlap so their beats land together. Pure: the
+/// same inputs give the same placement. It never stretches time: songs whose tempos differ blend only as long as their
+/// beats stay within `maximumDrift` of each other (they meet in the middle of the blend and drift apart towards its
+/// ends); otherwise there's no beat-matched blend and Smart Mix decides as usual.
+public enum LiveSetPlanner {
+    /// Both songs' beats must be at least this sure (the dogfood pass over a real library: from 0.4 on, the beat
+    /// agreed with an independent tracker 95% of the time; between 0.3 and 0.4, 85%).
+    public static let tempoConfidenceNeeded = 0.4
+    /// A downbeat is used from this confidence on (else the blend lines up beats, not bars).
+    public static let downbeatConfidenceNeeded = 0.3
+    /// Tempos within this fraction of each other (or of half or double) can blend.
+    public static let tempoTolerance = 0.06
+    /// The most the two songs' beats may drift apart at either end of the blend, in seconds.
+    public static let maximumDrift = 0.02
+    /// Blend lengths tried, longest first, in beats of the outgoing song.
+    public static let blendBeats = [16, 8]
+
+    /// The incoming song's beat period as it lines up with the outgoing one's: its own, or halved or doubled when
+    /// it's in half or double time. nil when the two aren't within `tempoTolerance`.
+    public static func matchedPeriod(outgoing a: Double, incoming b: Double) -> Double? {
+        for factor in [1.0, 0.5, 2.0] {
+            let p = b * factor
+            if abs(p - a) <= tempoTolerance * a { return p }
+        }
+        return nil
+    }
+
+    /// The blend of the song ending (its tail's beat `a`, its music ending `aMusicEnd` seconds from its start) into the
+    /// next (its head's beat `b`, its music starting `bLead` seconds in, `bMusicSeconds` of it), starting no earlier
+    /// than `aEarliest` (what's already been played or written). Times are seconds from each song's start. nil when
+    /// either beat isn't sure enough, the tempos don't match, the beats would drift apart, or there's no room.
+    public static func align(outgoing a: TransitionProfile.Tempo, incoming b: TransitionProfile.Tempo, aMusicEnd: Double, aEarliest: Double,
+                             bLead: Double, bMusicSeconds: Double, bassSwap: Bool) -> SmartMix.BeatAlignment? {
+        guard a.confidence >= tempoConfidenceNeeded, b.confidence >= tempoConfidenceNeeded, a.bpm > 0, b.bpm > 0,
+              let pb = matchedPeriod(outgoing: a.period, incoming: b.period) else { return nil }
+        let pa = a.period
+        let aGrid = trusted(a), bGrid = trusted(b)
+        // The incoming song's first downbeat (or beat) once its music has started.
+        let bDown = bGrid.firstDownbeat(atOrAfter: bLead - 0.01)
+        for beats in blendBeats {
+            let length = Double(beats) * pa
+            // The beats meet in the middle: half the blend's difference in period on either side.
+            let drift = Double(beats) / 2 * abs(pb - pa)
+            guard drift <= maximumDrift else { continue }
+            // The latest downbeat of the outgoing song from which the whole blend fits before its music ends.
+            let bar = aGrid.downbeat == nil ? pa : 4 * pa
+            let anchor = aGrid.downbeat ?? aGrid.beat
+            let start = anchor + ((aMusicEnd - length - anchor) / bar).rounded(.down) * bar
+            guard start >= aEarliest, start + length <= aMusicEnd + 0.001 else { continue }
+            // The incoming song starts so that its beat `beats / 2` after its downbeat meets the outgoing song's.
+            let incomingStart = bDown + Double(beats) / 2 * (pb - pa)
+            guard incomingStart >= 0, bMusicSeconds - (incomingStart - bLead) >= 2 * length else { continue }
+            return SmartMix.BeatAlignment(beats: beats, bpm: rounded(a.bpm), seconds: length, outgoingStart: start, incomingStart: incomingStart,
+                                          drift: drift, bassSwap: bassSwap)
+        }
+        return nil
+    }
+
+    /// The settings for a beat-matched blend from `a` into `b` (the playlist's own transitions applied), when it's Live
+    /// Set with beat blends on; nil otherwise.
+    public static func beatSettings(_ settings: TransitionSettings, a: PlayableItem, b: PlayableItem) -> TransitionSettings? {
+        guard settings.enabled, let s = TransitionPlanner.effective(settings, a: a, b: b), s.style == .liveSet, s.beatBlends else { return nil }
+        return s
+    }
+
+    /// How far past what's already written a blend may start, seconds (the engine writes a chunk at a time).
+    public static let writeMargin = 0.5
+
+    /// The beat at the end of the song ending, from its stored profile: only when the song's start and end agree on it
+    /// (a steady song; a song whose tempo changes isn't beat-matched).
+    public static func outgoingBeat(_ profile: TransitionProfile?) -> TransitionProfile.Tempo? {
+        profile?.tempo == nil ? nil : profile?.tail?.tempo
+    }
+
+    /// The beat at the start of the next song, likewise.
+    public static func incomingBeat(_ profile: TransitionProfile?) -> TransitionProfile.Tempo? {
+        profile?.tempo == nil ? nil : profile?.head?.tempo
+    }
+
+    /// `tempo` with its downbeat only when it's sure enough.
+    static func trusted(_ tempo: TransitionProfile.Tempo) -> TransitionProfile.Tempo {
+        var t = tempo
+        if (t.downbeatConfidence ?? 0) < downbeatConfidenceNeeded { t.downbeat = nil }
+        return t
+    }
+
+    static func rounded(_ x: Double) -> Double { (x * 100).rounded() / 100 }
+
+    /// Smart Mix's choice `mix`, made beat-matched with `beat`: the outgoing song's curve over the blend's whole length
+    /// and the incoming one rising over all of it, the loudness match kept.
+    public static func mix(_ settings: TransitionSettings, beat: SmartMix.BeatAlignment, matchDB: Double) -> SmartMix {
+        SmartMix(kind: .beatMatched, seconds: beat.seconds, outCurve: settings.curve, inSeconds: beat.seconds, inCurve: settings.curve,
+                        matchDB: matchDB, beat: beat)
     }
 }
 

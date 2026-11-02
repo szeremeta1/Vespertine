@@ -48,8 +48,8 @@ struct SmartMixPlannerTests {
         case .trimmed:
             #expect(mix.seconds == 1 && mix.outCurve == .equalPower)
             #expect(mix.inSeconds == (b == .fade || b == .silence ? 0 : 1))
-        case .crossfade:
-            Issue.record("no plain crossfade expected")
+        case .crossfade, .beatMatched:
+            Issue.record("no plain crossfade or beat-matched blend expected")
         }
     }
 
@@ -123,7 +123,8 @@ struct SmartMixPlannerTests {
             TransitionDecision.mix(SmartMix(kind: $0, seconds: 6, outCurve: nil, inSeconds: 1, inCurve: .linear, matchDB: 0)).summary
         }
         #expect(Set(kinds).count == SmartMix.Kind.allCases.count)
-        #expect(kinds.allSatisfy { $0.hasPrefix("Smart Mix") })
+        // Live Set's beat-matched blend names its style.
+        #expect(kinds.allSatisfy { $0.hasPrefix("Smart Mix") || $0.hasPrefix("Live Set") })
         #expect(TransitionDecision.gap(seconds: 2.5).summary.contains("2.5"))
         #expect(TransitionDecision.gapless(.segue).summary != TransitionDecision.gapless(.playlist).summary)
         #expect(!TransitionDecision.gap(seconds: 2).changesSamples && TransitionDecision.mix(SmartMixPlanner.plan(Self.smart, tail: nil, head: nil)!).changesSamples)

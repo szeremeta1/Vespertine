@@ -97,6 +97,8 @@ final class Crossfade {
     /// The incoming song's rise, as a fraction of the overlap (Smart Mix).
     private let inFraction: Double
     private let limiter: OverlapLimiter?
+    /// Live Set's bass swap in a beat-matched blend; nil otherwise.
+    private var swap: BassSwap?
     private var dither: TransitionDither?
     /// Overlap frames written so far.
     private(set) var mixed = 0
@@ -121,6 +123,7 @@ final class Crossfade {
         let rate = incoming.path.plan.deviceSampleRate
         inFraction = shape.map { min(1, $0.inSeconds * rate / Double(max(1, length))) } ?? 0
         limiter = shape == nil ? nil : OverlapLimiter(channels: channels, sampleRate: rate)
+        if let beat = shape?.beat, beat.bassSwap { swap = BassSwap(channels: channels, sampleRate: rate, beats: beat.beats) }
         dither = TransitionDither(bits: ditherBits)
         pending.reserveCapacity(Int(incoming.output.frameCapacity) * 2 * channels)
     }
@@ -211,9 +214,13 @@ final class Crossfade {
     /// library has them, else from the audio, just in time), asks `decide` what to do with what was measured and, for
     /// a mix, lines it up like `prepare` with Smart Mix's shape. Silence is always trimmed. The decision comes back
     /// with the crossfade (nil when the decision isn't a mix, or there's too little to overlap).
+    /// Live Set (`beatMatch`, with the settings and the two songs' stored profiles): when their beats are steady and
+    /// match, the mix becomes a beat-matched blend (`LiveSetPlanner`): it starts on a downbeat of the outgoing song and
+    /// the incoming one starts on its own, lined up, instead of where silence trimming would put them.
     static func prepareSmart(outgoing a: Decoding, total: Int64, next: PlayableItem, probed: ProbedSource, plan: OutputPlan,
                              path: SignalPath, ditherBits: Int, chunk: AVAudioFrameCount, layout: AVAudioChannelLayout?,
                              stored: (outgoing: TransitionProfile?, incoming: TransitionProfile?),
+                             beatMatch: TransitionSettings? = nil,
                              decide: ((tail: TransitionProfile.Edge?, head: TransitionProfile.Edge?), (a: Double, b: Double)) -> TransitionDecision,
                              reopenOutgoing: () throws -> PCMDecoding) throws -> (decision: TransitionDecision, crossfade: Crossfade?) {
         let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
@@ -246,12 +253,34 @@ final class Crossfade {
             lead = min(AVAudioFramePosition(Double(leading) * decoder.processingFormat.sampleRate / plan.deviceSampleRate), decoder.length - 1)
             try decoder.seek(to: lead)
         }
-        let decision = decide((tail, head), (gainA, gainB))
-        guard case .mix(let mix) = decision else { return (decision, nil) }
+        var decision = decide((tail, head), (gainA, gainB))
+        guard case .mix(var mix) = decision else { return (decision, nil) }
+        var beatTiming: (start: UInt64, length: Int)?
+        if let settings = beatMatch, tail != nil, head != nil, a.decoder.supportsSeeking, !a.streaming, decoder.supportsSeeking, decoder.length > 0,
+           let ta = LiveSetPlanner.outgoingBeat(stored.outgoing), let tb = LiveSetPlanner.incomingBeat(stored.incoming) {
+            let rateA = a.decoder.processingFormat.sampleRate, rateB = decoder.processingFormat.sampleRate, device = plan.deviceSampleRate
+            // Song seconds of the outgoing decoding's first frame (a seek moves it).
+            let aOffset = Double(a.startSourceFrame) / rateA
+            let bLead = Double(lead) / rateB
+            if let beat = LiveSetPlanner.align(outgoing: ta, incoming: tb, aMusicEnd: aOffset + Double(total - trailing) / device,
+                                               aEarliest: aOffset + Double(a.framesProduced) / device + LiveSetPlanner.writeMargin,
+                                               bLead: bLead, bMusicSeconds: Double(decoder.length) / rateB - bLead, bassSwap: settings.bassSwap) {
+                let start = Int64(((beat.outgoingStart - aOffset) * device).rounded())
+                let length = Int((beat.seconds * device).rounded())
+                let bFrame = AVAudioFramePosition((beat.incomingStart * rateB).rounded())
+                if start >= Int64(a.framesProduced), start + Int64(length) <= total, bFrame >= 0, bFrame < decoder.length {
+                    try decoder.seek(to: bFrame)
+                    lead = bFrame
+                    mix = LiveSetPlanner.mix(settings, beat: beat, matchDB: mix.matchDB)
+                    decision = .mix(mix)
+                    beatTiming = (UInt64(start), length)
+                }
+            }
+        }
         let b = try Decoding(item: next, probed: probed, decoder: decoder, path: path, chunk: chunk, layout: layout)
         b.startSourceFrame = lead
-        guard let timing = TransitionTiming.overlap(seconds: mix.seconds, rate: plan.deviceSampleRate, aTotal: total,
-                                                    aProduced: a.framesProduced, aTrailing: trailing, bMusic: b.expectedFrames) else {
+        guard let timing = beatTiming ?? TransitionTiming.overlap(seconds: mix.seconds, rate: plan.deviceSampleRate, aTotal: total,
+                                                                  aProduced: a.framesProduced, aTrailing: trailing, bMusic: b.expectedFrames) else {
             return (decision, nil)
         }
         return (decision, Crossfade(incoming: b, start: timing.start, length: timing.length, curve: mix.inCurve, ditherBits: ditherBits, shape: mix))
@@ -276,10 +305,13 @@ final class Crossfade {
             pending.withUnsafeBufferPointer { buffer in
                 let b = buffer.baseAddress! + pendingOffset
                 for i in 0..<frames {
-                    let g = shape.gains(at: Double(mixed + i) / Double(length), inFraction: inFraction)
+                    let t = Double(mixed + i) / Double(length)
+                    let g = shape.gains(at: t, inFraction: inFraction)
                     let ga = Float(g.out), gb = Float(g.in)
                     let o = out + i * channels
-                    if i < available {
+                    if swap != nil {
+                        swap!.mix(o, i < available ? b + i * channels : nil, t: t, ga: ga, gb: gb)
+                    } else if i < available {
                         let s = b + i * channels
                         for c in 0..<channels { o[c] = o[c] * ga + s[c] * gb }
                     } else {
@@ -337,6 +369,69 @@ final class Crossfade {
                 break
             }
         }
+    }
+}
+
+/// A beat-matched blend's bass swap: the outgoing song's bass gives way to the incoming one's over one beat in the
+/// middle of the blend, so the two basslines never sound together. Each song plays as `k · x + (1 − k) · highs(x)`:
+/// itself, exactly, while its `k` is 1; only above 150 Hz (a fourth-order Butterworth high-pass, 24 dB an octave)
+/// while it's 0. Frame by frame, so any chunking gives the same.
+struct BassSwap {
+    let channels: Int
+    /// The swap's width, as a fraction of the blend: one beat.
+    let width: Double
+    /// The two biquads of the high-pass: b0, b1, b2, a1, a2 each.
+    private let stages: [(b0: Float, b1: Float, b2: Float, a1: Float, a2: Float)]
+    /// Filter states, per song, stage and channel: x1, x2, y1, y2.
+    private var outgoing: [Float]
+    private var incoming: [Float]
+
+    static let crossover = 150.0
+
+    init(channels: Int, sampleRate: Double, beats: Int) {
+        self.channels = channels
+        width = 1 / Double(max(1, beats))
+        // A fourth-order Butterworth as two second-order sections (Q 0.5412 and 1.3066), RBJ's high-pass.
+        let w = 2 * Double.pi * Self.crossover / sampleRate
+        stages = [0.541_196_100_146_197, 1.306_562_964_876_376_5].map { q in
+            let alpha = sin(w) / (2 * q), a0 = 1 + alpha
+            return (Float((1 + cos(w)) / 2 / a0), Float(-(1 + cos(w)) / a0), Float((1 + cos(w)) / 2 / a0),
+                    Float(-2 * cos(w) / a0), Float((1 - alpha) / a0))
+        }
+        outgoing = [Float](repeating: 0, count: 8 * channels)
+        incoming = [Float](repeating: 0, count: 8 * channels)
+    }
+
+    /// How much of the outgoing song's lows play at `t` (0…1 through the blend): all of them until half a beat before
+    /// the middle, none from half a beat after, a raised cosine between. The incoming song's: the rest.
+    func outgoingLows(at t: Double) -> Float {
+        let from = 0.5 - width / 2
+        guard t > from else { return 1 }
+        guard t < from + width else { return 0 }
+        return Float((1 + cos(.pi * (t - from) / width)) / 2)
+    }
+
+    /// One frame: `o` holds the outgoing song's samples and gets the mix; `b` the incoming one's (nil: it has ended).
+    mutating func mix(_ o: UnsafeMutablePointer<Float>, _ b: UnsafePointer<Float>?, t: Double, ga: Float, gb: Float) {
+        let ka = outgoingLows(at: t), kb = 1 - ka
+        for c in 0..<channels {
+            let a = o[c], x = b?[c] ?? 0
+            let ha = highs(&outgoing, c, a), hb = highs(&incoming, c, x)
+            o[c] = (ka * a + (1 - ka) * ha) * ga + (kb * x + (1 - kb) * hb) * gb
+        }
+    }
+
+    /// `x` through the high-pass, for channel `c` of one song's states.
+    private func highs(_ state: inout [Float], _ c: Int, _ x: Float) -> Float {
+        var v = x
+        for (n, f) in stages.enumerated() {
+            let k = 4 * (n * channels + c)
+            let y = f.b0 * v + f.b1 * state[k] + f.b2 * state[k + 1] - f.a1 * state[k + 2] - f.a2 * state[k + 3]
+            state[k + 1] = state[k]; state[k] = v
+            state[k + 3] = state[k + 2]; state[k + 2] = y
+            v = y
+        }
+        return v
     }
 }
 

@@ -140,6 +140,18 @@ struct TransitionsSettingsSection: View {
                 Text(t.gapSeconds > 0 ? String(localized: "Gap between songs: \(Self.seconds(t.gapSeconds)) s", comment: "Transitions setting: seconds of silence between songs instead of a crossfade.")
                                       : String(localized: "Gap between songs: none", comment: "Transitions setting: no silence is put between songs."))
             }
+            if t.style == .liveSet {
+                Picker("Live Set output rate", selection: $s.transitions.liveSetRate) {
+                    ForEach(TransitionSettings.liveSetRates, id: \.self) { rate in
+                        Text("\((rate / 1000).formatted(.number.precision(.fractionLength(0)))) kHz").tag(rate)
+                    }
+                }
+                Toggle("Beat-matched blends", isOn: $s.transitions.beatBlends)
+                Toggle("Bass swap in beat-matched blends", isOn: $s.transitions.bassSwap)
+                    .disabled(!t.beatBlends)
+                Text("Live Set plays every song at one output rate, so a change of rate never gaps. Songs with steady, matching beats in the library’s analysis blend beat on beat, over 16 or 8 beats; the others blend as in Smart Mix.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Picker("When a transition needs a change to the signal", selection: $s.transitions.policy) {
                 ForEach(TransitionPolicy.allCases) { Text($0.label).tag($0) }
             }

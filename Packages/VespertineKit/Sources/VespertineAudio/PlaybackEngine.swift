@@ -753,6 +753,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
                 || old.matchSixteenBit != new.matchSixteenBit
+                // Live Set's fixed rate, set or changed: the output is set up again at it (or back to following songs).
+                || old.transitions.fixedRate != new.transitions.fixedRate
                 || (old.convertsDSDForRoom(sessionDevice) != new.convertsDSDForRoom(sessionDevice)
                     && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true))
                 // Transitions first, turned on or off: DSD, integer and 16-bit output are planned again.
@@ -1208,6 +1210,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func ratePolicy(for device: OutputDevice) -> RatePolicy {
+        // Live Set: one rate for the whole session, whatever the songs' own.
+        if let rate = settings.transitions.fixedRate { return .fixed(rate) }
         if let held = heldRate, held.uid == device.uid, Date() < held.until { return .fixed(held.rate) }
         return settings.ratePolicies[device.uid] ?? .matchSource
     }
@@ -1599,6 +1603,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                     path: makePath(probed: probed, plan: planB, device: device, session: session, item: next),
                     ditherBits: mixDitherBits(device, session: session), chunk: chunkFrames, layout: session.decodedLayout,
                     stored: (provider?(a.item), provider?(next)),
+                    beatMatch: LiveSetPlanner.beatSettings(s, a: a.item, b: next),
                     decide: { profiles, gains in
                         TransitionPlanner.decide(s, from: a.item, format: .plan(planA), to: next, format: formatB, compatible: compatible,
                                                  profiles: profiles, gains: gains)

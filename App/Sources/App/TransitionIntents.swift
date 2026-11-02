@@ -65,3 +65,32 @@ struct UseTransitionStyleIntent: AppIntent {
         return .result()
     }
 }
+
+/// Starts a Live Set: transitions on, in the Live Set style (one output rate, beat-matched blends, skips that blend).
+struct StartLiveSetIntent: AppIntent {
+    static let title: LocalizedStringResource = "Start Live Set"
+    static let description = IntentDescription("Turns on Vespertine’s transitions in Live Set: one output rate, beat-matched blends, skips that always blend.")
+    static let openAppWhenRun = true
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        model.settings.transitions.style = .liveSet
+        model.setTransitions(true)
+        return .result()
+    }
+}
+
+/// Ends a Live Set: transitions off if they're in Live Set (otherwise nothing changes).
+struct StopLiveSetIntent: AppIntent {
+    static let title: LocalizedStringResource = "Stop Live Set"
+    static let description = IntentDescription("Turns off Vespertine’s transitions if they’re in Live Set.")
+    static let openAppWhenRun = true
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        if model.settings.transitions.style == .liveSet { model.setTransitions(false) }
+        return .result()
+    }
+}

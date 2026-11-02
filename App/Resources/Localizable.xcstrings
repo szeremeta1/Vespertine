@@ -91192,6 +91192,275 @@
         }
       }
     },
+    "Bass swap in beat-matched blends": {
+      "comment": "Settings › Playback › Transitions, Live Set: in a beat-matched blend the outgoing song's bass gives way to the incoming song's in the middle, instead of both basslines playing together.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በምት በተዛመዱ ቅልቅሎች ውስጥ የባስ መለዋወጥ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبديل الجهير في المزج بمطابقة الإيقاع"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বিট মিলিয়ে মিশ্রণে বেস বদল"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výměna basů při prolínání podle beatu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basbytte i beatmatchede overgange"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bass-Tausch bei beatgenauen Übergängen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εναλλαγή μπάσων στις μίξεις με ταίριασμα ρυθμού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intercambio de graves en las mezclas a ritmo"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جابه‌جایی بیس در ترکیب‌های هم‌ضرب"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bassonvaihto tahtiin sovitetuissa sekoituksissa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bass swap sa mga blend na tugma ang beat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échange des basses dans les enchaînements calés sur le tempo"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીટ મેળવેલા મિશ્રણમાં બાસ બદલ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musayar bas a cikin haɗuwa bisa daidaitaccen bugu"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "החלפת בס במיזוגים מותאמי פעימה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बीट मिलाए मिश्रण में बेस बदलना"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basszuscsere az ütemre illesztett átúsztatásban"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tukar bass dalam paduan selaras ketukan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scambio dei bassi nei mixaggi a tempo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビートを合わせたブレンドでのベーススワップ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೀಟ್ ಹೊಂದಿಸಿದ ಮಿಶ್ರಣಗಳಲ್ಲಿ ಬೇಸ್ ಬದಲಾವಣೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비트 맞춤 블렌드의 베이스 스왑"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ബീറ്റ് ഒത്തുചേർത്ത മിശ്രണങ്ങളിൽ ബേസ് മാറ്റം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बीट जुळवलेल्या मिश्रणात बेसची अदलाबदल"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tukar bes dalam adunan sepadan rentak"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bassbytte i beatmatchede overganger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baswissel bij overgangen op de beat"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬੀਟ ਮਿਲਾਏ ਮਿਸ਼ਰਣ ਵਿੱਚ ਬੇਸ ਬਦਲਣਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zamiana basu w przejściach zgranych z rytmem"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Troca de graves nas mixagens no tempo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Troca de graves nas misturas a tempo"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schimbarea basului în mixajele pe ritm"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basbyte i beatmatchade övergångar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kubadilishana besi katika michanganyiko inayolingana kwa mdundo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பீட் பொருத்திய கலவைகளில் பேஸ் மாற்றம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "బీట్ సరిపోల్చిన మిశ్రమాల్లో బేస్ మార్పిడి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สลับเบสในการผสานแบบตรงจังหวะ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuruşa denk geçişlerde bas değişimi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обмін басами в переходах у такт"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیٹ ملے امتزاج میں بیس کا تبادلہ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi bass khi hòa trộn khớp nhịp"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "對準節拍混合時的低音交換"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对齐节拍混合时的低音交换"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "對齊節拍混合時的低音交換"
+          }
+        }
+      }
+    },
     "Bass, 20–500 Hz": {
       "localizations": {
         "am": {
@@ -91994,6 +92263,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "夜店風格中的節拍閃光"
+          }
+        }
+      }
+    },
+    "Beat-matched blends": {
+      "comment": "Settings › Playback › Transitions, Live Set: songs with steady, matching beats blend with their beats lined up.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በምት የተዛመዱ ቅልቅሎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزج بمطابقة الإيقاع"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বিট মিলিয়ে মিশ্রণ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prolínání podle beatu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beatmatchede overgange"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beatgenaue Übergänge"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μίξεις με ταίριασμα ρυθμού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mezclas a ritmo"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ترکیب هم‌ضرب"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahtiin sovitetut sekoitukset"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga blend na tugma ang beat"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enchaînements calés sur le tempo"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીટ મેળવીને મિશ્રણ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗuwa bisa daidaitaccen bugu"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מיזוגים מותאמי פעימה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बीट मिलाकर मिश्रण"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ütemre illesztett átúsztatás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paduan selaras ketukan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixaggi a tempo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビートを合わせたブレンド"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೀಟ್ ಹೊಂದಿಸಿದ ಮಿಶ್ರಣಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비트 맞춤 블렌드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ബീറ്റ് ഒത്തുചേർത്ത മിശ്രണങ്ങൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बीट जुळवून मिश्रण"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adunan sepadan rentak"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beatmatchede overganger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgangen op de beat"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬੀਟ ਮਿਲਾ ਕੇ ਮਿਸ਼ਰਣ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejścia zgrane z rytmem"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixagens no tempo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Misturas a tempo"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixaje pe ritm"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beatmatchade övergångar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Michanganyiko inayolingana kwa mdundo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பீட் பொருத்திய கலவைகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "బీట్ సరిపోల్చిన మిశ్రమాలు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การผสานแบบตรงจังหวะ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuruşa denk geçişler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переходи в такт"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیٹ ملا کر امتزاج"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hòa trộn khớp nhịp"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "對準節拍的混合"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对齐节拍的混合"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "對齊節拍的混合"
           }
         }
       }
@@ -209923,6 +210461,814 @@
           "stringUnit": {
             "state": "translated",
             "value": "Live Set"
+          }
+        }
+      }
+    },
+    "Live Set output rate": {
+      "comment": "Settings › Playback › Transitions, Live Set: the one sample rate the output runs at for the whole session (48 or 96 kHz).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የLive Set ውጤት ፍጥነት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل إخراج Live Set"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set আউটপুট রেট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výstupní vzorkovací frekvence Live Set"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set-outputfrekvens"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgaberate für Live Set"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ρυθμός εξόδου Live Set"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frecuencia de salida de Live Set"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نرخ خروجی Live Set"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Setin lähtötaajuus"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output rate ng Live Set"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fréquence de sortie de Live Set"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set આઉટપુટ રેટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙimar fitarwa ta Live Set"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קצב הפלט של Live Set"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set आउटपुट रेट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set kimeneti mintavétel"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laju output Live Set"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frequenza di uscita di Live Set"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set の出力サンプルレート"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ಔಟ್‌ಪುಟ್ ದರ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 출력 샘플레이트"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ഔട്ട്പുട്ട് നിരക്ക്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set आउटपुट दर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kadar output Live Set"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgangsfrekvens for Live Set"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitvoerfrequentie van Live Set"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ਆਊਟਪੁੱਟ ਦਰ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Częstotliwość wyjściowa Live Set"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa de saída do Live Set"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa de saída do Live Set"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frecvența de ieșire Live Set"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utfrekvens för Live Set"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiwango cha utoaji cha Live Set"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set வெளியீட்டு விகிதம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set అవుట్‌పుట్ రేట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัตราเอาต์พุตของ Live Set"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set çıkış hızı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вихідна частота Live Set"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set آؤٹ پٹ ریٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tốc độ đầu ra của Live Set"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 輸出取樣率"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 输出采样率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 輸出取樣率"
+          }
+        }
+      }
+    },
+    "Live Set plays every song at one output rate, so a change of rate never gaps. Songs with steady, matching beats in the library’s analysis blend beat on beat, over 16 or 8 beats; the others blend as in Smart Mix.": {
+      "comment": "Settings › Playback › Transitions: explains the Live Set settings above.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set እያንዳንዱን ዘፈን በአንድ የውጤት ፍጥነት ያጫውታል፣ ስለዚህ የፍጥነት ለውጥ ክፍተት አይፈጥርም። በቤተ-መጽሐፍቱ ትንተና ቋሚ እና የሚዛመድ ምት ያላቸው ዘፈኖች ምት በምት ይቀላቀላሉ፣ በ16 ወይም በ8 ምቶች፤ ሌሎቹ እንደ Smart Mix ይቀላቀላሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل Live Set كل أغنية بمعدل إخراج واحد، فلا يُحدث تغيير المعدل فجوة أبدًا. الأغاني ذات الإيقاع الثابت والمتطابق في تحليل المكتبة تمتزج نبضةً بنبضة، على مدى 16 أو 8 نبضات؛ والبقية تمتزج كما في Smart Mix."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set প্রতিটি গান একটি আউটপুট রেটে বাজায়, তাই রেট বদলালে কখনো ফাঁক পড়ে না। লাইব্রেরির বিশ্লেষণে স্থির ও মিলে যাওয়া বিটের গানগুলো বিটে বিটে মেশে, 16 বা 8 বিট ধরে; বাকিগুলো Smart Mix-এর মতো মেশে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set přehrává každou skladbu na jedné výstupní frekvenci, takže změna frekvence nikdy nevytvoří mezeru. Skladby se stálým a odpovídajícím beatem podle analýzy knihovny se prolnou beat na beat, přes 16 nebo 8 dob; ostatní se prolnou jako ve Smart Mix."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set afspiller hver sang ved én outputfrekvens, så et frekvensskift aldrig giver en pause. Sange med fast, matchende beat i biblioteksanalysen blandes beat for beat over 16 eller 8 slag; de andre blandes som i Smart Mix."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set spielt jeden Titel mit einer Ausgaberate, damit ein Ratenwechsel nie eine Lücke macht. Titel mit gleichmäßigem, passendem Beat laut Bibliotheksanalyse gehen Beat auf Beat ineinander über, über 16 oder 8 Schläge; die übrigen wie bei Smart Mix."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Live Set παίζει κάθε τραγούδι σε έναν ρυθμό εξόδου, ώστε μια αλλαγή ρυθμού να μην αφήνει ποτέ κενό. Τραγούδια με σταθερό, ταιριαστό ρυθμό στην ανάλυση της βιβλιοθήκης αναμειγνύονται χτύπο προς χτύπο, σε 16 ή 8 χτύπους· τα υπόλοιπα όπως στο Smart Mix."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set reproduce cada canción a una sola frecuencia de salida, así que un cambio de frecuencia nunca deja un hueco. Las canciones con un ritmo estable y compatible según el análisis de la biblioteca se mezclan pulso a pulso, durante 16 u 8 pulsos; las demás, como en Smart Mix."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set هر آهنگ را با یک نرخ خروجی پخش می‌کند، پس تغییر نرخ هرگز فاصله ایجاد نمی‌کند. آهنگ‌هایی که در تحلیل کتابخانه ضرب ثابت و هم‌خوان دارند ضرب‌به‌ضرب ترکیب می‌شوند، در ۱۶ یا ۸ ضرب؛ بقیه مانند Smart Mix."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set soittaa jokaisen kappaleen yhdellä lähtötaajuudella, joten taajuuden vaihto ei koskaan tee taukoa. Kappaleet, joilla on kirjaston analyysissa tasainen ja yhteensopiva tahti, sekoittuvat isku iskulta 16 tai 8 iskun ajan; muut kuten Smart Mixissä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinapatugtog ng Live Set ang bawat kanta sa iisang output rate, kaya hindi kailanman nagkakaroon ng puwang kapag nagbago ang rate. Ang mga kantang may tuloy-tuloy at magkatugmang beat ayon sa analysis ng library ay naghahalo nang beat sa beat, sa loob ng 16 o 8 beat; ang iba ay naghahalo gaya sa Smart Mix."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set joue chaque morceau à une seule fréquence de sortie : un changement de fréquence ne crée jamais de blanc. Les morceaux au tempo régulier et compatible selon l’analyse de la bibliothèque s’enchaînent temps sur temps, sur 16 ou 8 temps ; les autres comme dans Smart Mix."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set દરેક ગીતને એક જ આઉટપુટ રેટ પર વગાડે છે, તેથી રેટ બદલાય તો ક્યારેય ગેપ પડતો નથી. લાઇબ્રેરીના વિશ્લેષણમાં સ્થિર અને મેળ ખાતા બીટવાળાં ગીતો બીટે બીટે ભળે છે, 16 અથવા 8 બીટ સુધી; બાકીનાં Smart Mix જેમ ભળે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set yana kunna kowace waƙa a ƙimar fitarwa ɗaya, don haka canjin ƙima ba ya barin tazara. Waƙoƙin da ke da tsayayyen bugu mai daidaito a binciken ɗakin karatu suna haɗewa bugu da bugu, cikin bugu 16 ko 8; sauran suna haɗewa kamar a Smart Mix."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set מנגן כל שיר בקצב פלט אחד, כך ששינוי קצב לעולם לא יוצר הפסקה. שירים עם פעימה יציבה ותואמת לפי ניתוח הספרייה מתמזגים פעימה על פעימה, לאורך 16 או 8 פעימות; השאר מתמזגים כמו ב-Smart Mix."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set हर गाने को एक ही आउटपुट रेट पर बजाता है, इसलिए रेट बदलने पर कभी अंतराल नहीं आता। लाइब्रेरी के विश्लेषण में स्थिर और मेल खाती बीट वाले गाने बीट पर बीट मिलते हैं, 16 या 8 बीट तक; बाकी Smart Mix की तरह मिलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Live Set minden dalt egy kimeneti mintavételi frekvencián játszik, így a frekvencia váltása soha nem okoz szünetet. A könyvtár elemzése szerint egyenletes, egymáshoz illő ütemű dalok ütemre úsztatnak át, 16 vagy 8 ütésen át; a többiek úgy, mint a Smart Mixben."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set memutar setiap lagu pada satu laju output, sehingga perubahan laju tidak pernah menimbulkan jeda. Lagu dengan ketukan stabil yang cocok menurut analisis perpustakaan berbaur ketukan demi ketukan, selama 16 atau 8 ketukan; yang lain berbaur seperti di Smart Mix."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set riproduce ogni brano a un’unica frequenza di uscita, così un cambio di frequenza non lascia mai un vuoto. I brani con un ritmo regolare e compatibile secondo l’analisi della libreria si fondono battito su battito, per 16 o 8 battiti; gli altri come in Smart Mix."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set はすべての曲を1つの出力レートで再生するため、レートが変わっても途切れません。ライブラリの解析でビートが安定して合う曲どうしは、16拍または8拍かけてビートを揃えてブレンドします。それ以外は Smart Mix と同じようにブレンドします。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ಪ್ರತಿ ಹಾಡನ್ನು ಒಂದೇ ಔಟ್‌ಪುಟ್ ದರದಲ್ಲಿ ನುಡಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ದರ ಬದಲಾದರೂ ಎಂದಿಗೂ ಅಂತರವಾಗುವುದಿಲ್ಲ. ಲೈಬ್ರರಿಯ ವಿಶ್ಲೇಷಣೆಯಲ್ಲಿ ಸ್ಥಿರ ಮತ್ತು ಹೊಂದುವ ಬೀಟ್ ಇರುವ ಹಾಡುಗಳು ಬೀಟ್‌ಗೆ ಬೀಟ್ ಬೆರೆಯುತ್ತವೆ, 16 ಅಥವಾ 8 ಬೀಟ್‌ಗಳವರೆಗೆ; ಉಳಿದವು Smart Mix ನಂತೆ ಬೆರೆಯುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set은 모든 곡을 하나의 출력 레이트로 재생하므로 레이트가 바뀌어도 끊기지 않습니다. 보관함 분석에서 비트가 일정하고 서로 맞는 곡은 16비트 또는 8비트에 걸쳐 비트를 맞춰 블렌드하고, 나머지는 Smart Mix처럼 블렌드합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ഓരോ പാട്ടും ഒരേ ഔട്ട്പുട്ട് നിരക്കിൽ പ്ലേ ചെയ്യുന്നു, അതിനാൽ നിരക്ക് മാറിയാലും ഒരിക്കലും വിടവ് ഉണ്ടാകില്ല. ലൈബ്രറിയുടെ വിശകലനത്തിൽ സ്ഥിരവും പൊരുത്തപ്പെടുന്നതുമായ ബീറ്റുള്ള പാട്ടുകൾ ബീറ്റിനൊത്ത് മിശ്രണം ചെയ്യുന്നു, 16 അല്ലെങ്കിൽ 8 ബീറ്റുകളിലൂടെ; മറ്റുള്ളവ Smart Mix-ലെ പോലെ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set प्रत्येक गाणे एकाच आउटपुट दराने वाजवतो, त्यामुळे दर बदलला तरी कधीही खंड पडत नाही. लायब्ररीच्या विश्लेषणात स्थिर आणि जुळणारी बीट असलेली गाणी बीटवर बीट मिसळतात, 16 किंवा 8 बीटपर्यंत; बाकीची Smart Mix प्रमाणे मिसळतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set memainkan setiap lagu pada satu kadar output, jadi perubahan kadar tidak pernah meninggalkan sela. Lagu dengan rentak stabil yang sepadan dalam analisis pustaka diadun rentak demi rentak, selama 16 atau 8 rentak; yang lain diadun seperti dalam Smart Mix."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set spiller hver sang med én utgangsfrekvens, så et frekvensskifte aldri gir et opphold. Sanger med jevnt, matchende beat i bibliotekanalysen blandes slag for slag over 16 eller 8 slag; de andre blandes som i Smart Mix."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set speelt elk nummer op één uitvoerfrequentie, zodat een wisseling van frequentie nooit een gat geeft. Nummers met een vaste, passende beat volgens de bibliotheekanalyse vloeien tel voor tel in elkaar over, over 16 of 8 tellen; de rest zoals bij Smart Mix."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ਹਰ ਗੀਤ ਨੂੰ ਇੱਕੋ ਆਊਟਪੁੱਟ ਦਰ ’ਤੇ ਵਜਾਉਂਦਾ ਹੈ, ਇਸ ਲਈ ਦਰ ਬਦਲਣ ’ਤੇ ਕਦੇ ਵਿੱਥ ਨਹੀਂ ਪੈਂਦੀ। ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਵਿਸ਼ਲੇਸ਼ਣ ਵਿੱਚ ਸਥਿਰ ਅਤੇ ਮੇਲ ਖਾਂਦੀ ਬੀਟ ਵਾਲੇ ਗੀਤ ਬੀਟ ’ਤੇ ਬੀਟ ਘੁਲਦੇ ਹਨ, 16 ਜਾਂ 8 ਬੀਟਾਂ ਤੱਕ; ਬਾਕੀ Smart Mix ਵਾਂਗ ਘੁਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set odtwarza każdy utwór z jedną częstotliwością wyjściową, więc zmiana częstotliwości nigdy nie robi przerwy. Utwory o równym, pasującym rytmie według analizy biblioteki przenikają się uderzenie w uderzenie, przez 16 lub 8 uderzeń; pozostałe jak w Smart Mix."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Live Set toca cada música em uma única taxa de saída, então uma mudança de taxa nunca deixa um intervalo. Músicas com batida estável e compatível na análise da biblioteca se misturam batida a batida, por 16 ou 8 batidas; as outras, como no Smart Mix."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Live Set reproduz cada música a uma única taxa de saída, pelo que uma mudança de taxa nunca deixa uma pausa. As músicas com batida estável e compatível na análise da biblioteca misturam-se batida a batida, ao longo de 16 ou 8 batidas; as restantes, como no Smart Mix."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set redă fiecare melodie la o singură frecvență de ieșire, așa că o schimbare de frecvență nu lasă niciodată o pauză. Melodiile cu ritm constant și potrivit în analiza bibliotecii se mixează bătaie pe bătaie, pe 16 sau 8 bătăi; celelalte ca în Smart Mix."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set spelar varje låt med en utfrekvens, så ett frekvensbyte ger aldrig ett uppehåll. Låtar med jämnt, matchande beat i biblioteksanalysen blandas slag för slag över 16 eller 8 slag; de andra blandas som i Smart Mix."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set hucheza kila wimbo kwa kiwango kimoja cha utoaji, kwa hivyo mabadiliko ya kiwango hayaachi pengo kamwe. Nyimbo zenye mdundo thabiti unaolingana katika uchanganuzi wa maktaba huchanganyika mdundo kwa mdundo, kwa midundo 16 au 8; nyingine huchanganyika kama katika Smart Mix."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ஒவ்வொரு பாடலையும் ஒரே வெளியீட்டு விகிதத்தில் இசைக்கிறது, எனவே விகிதம் மாறினாலும் இடைவெளி ஏற்படாது. நூலக பகுப்பாய்வில் நிலையான, பொருந்தும் பீட் கொண்ட பாடல்கள் பீட்டுக்கு பீட் கலக்கின்றன, 16 அல்லது 8 பீட்களில்; மற்றவை Smart Mix போல் கலக்கின்றன."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ప్రతి పాటను ఒకే అవుట్‌పుట్ రేట్‌లో ప్లే చేస్తుంది, కాబట్టి రేట్ మారినా ఎప్పుడూ ఖాళీ రాదు. లైబ్రరీ విశ్లేషణలో స్థిరమైన, సరిపోలే బీట్ ఉన్న పాటలు బీట్‌కు బీట్ కలుస్తాయి, 16 లేదా 8 బీట్‌ల పాటు; మిగతావి Smart Mix లాగా కలుస్తాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set เล่นทุกเพลงที่อัตราเอาต์พุตเดียว การเปลี่ยนอัตราจึงไม่ทำให้เกิดช่วงเงียบ เพลงที่มีจังหวะคงที่และเข้ากันตามการวิเคราะห์ของคลังจะผสานกันตรงจังหวะ ตลอด 16 หรือ 8 จังหวะ ส่วนเพลงอื่นจะผสานแบบ Smart Mix"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set her şarkıyı tek bir çıkış hızında çalar, böylece hız değişimi asla boşluk bırakmaz. Arşiv analizinde sabit ve uyumlu vuruşu olan şarkılar 16 ya da 8 vuruş boyunca vuruşu vuruşuna karışır; diğerleri Smart Mix’teki gibi karışır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set відтворює кожну пісню з однією вихідною частотою, тож зміна частоти ніколи не дає паузи. Пісні з рівним, сумісним ритмом за аналізом медіатеки змішуються удар в удар, упродовж 16 або 8 ударів; решта — як у Smart Mix."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ہر گانا ایک ہی آؤٹ پٹ ریٹ پر چلاتا ہے، اس لیے ریٹ بدلنے پر کبھی وقفہ نہیں آتا۔ لائبریری کے تجزیے میں مستحکم اور ملتی بیٹ والے گانے بیٹ پر بیٹ گھلتے ہیں، 16 یا 8 بیٹس تک؛ باقی Smart Mix کی طرح گھلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set phát mọi bài ở một tốc độ đầu ra, nên đổi tốc độ không bao giờ tạo khoảng lặng. Các bài có nhịp ổn định và khớp nhau theo phân tích thư viện sẽ hòa trộn theo từng nhịp, trong 16 hoặc 8 nhịp; các bài khác hòa trộn như Smart Mix."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 以同一個輸出取樣率播放每首歌，所以轉換取樣率時永不會中斷。資料庫分析中節拍穩定又相配的歌曲會逐拍混合，歷時 16 或 8 拍；其他歌曲則按 Smart Mix 混合。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 以同一个输出采样率播放每首歌，因此切换采样率时绝不会中断。资料库分析中节拍稳定且相配的歌曲会逐拍混合，持续 16 或 8 拍；其他歌曲按 Smart Mix 混合。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 以同一個輸出取樣率播放每首歌，因此切換取樣率時絕不會中斷。資料庫分析中節拍穩定且相配的歌曲會逐拍混合，持續 16 或 8 拍；其他歌曲依 Smart Mix 混合。"
+          }
+        }
+      }
+    },
+    "Live Set: beat-matched, %lld beats at %@ BPM": {
+      "comment": "Signal path, next transition: the two songs blend with their beats lined up; the number of beats the blend lasts, then the tempo in beats per minute, e.g. “Live Set: beat-matched, 16 beats at 128 BPM”.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set፦ በምት የተዛመደ፣ %lld ምቶች በ%@ BPM"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: بمطابقة الإيقاع، %lld نبضة عند %@ BPM"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: বিট মিলিয়ে, %lld বিট, %@ BPM-এ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: podle beatu, %lld dob při %@ BPM"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: beatmatchet, %lld slag ved %@ BPM"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: beatgenau, %lld Schläge bei %@ BPM"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: με ταίριασμα ρυθμού, %lld χτύποι στα %@ BPM"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: a ritmo, %lld pulsos a %@ BPM"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: هم‌ضرب، %lld ضرب با %@ BPM"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: tahtiin sovitettu, %lld iskua, %@ BPM"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: tugma ang beat, %lld beat sa %@ BPM"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set : calé sur le tempo, %lld temps à %@ BPM"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: બીટ મેળવેલ, %lld બીટ %@ BPM પર"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: bisa daidaitaccen bugu, bugu %lld a %@ BPM"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: מותאם פעימה, %lld פעימות ב-%@ BPM"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: बीट मिलाकर, %lld बीट %@ BPM पर"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: ütemre illesztve, %lld ütés, %@ BPM"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: selaras ketukan, %lld ketukan pada %@ BPM"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: a tempo, %lld battiti a %@ BPM"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set：ビート合わせ、%lld拍（%@ BPM）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: ಬೀಟ್ ಹೊಂದಿಸಿದ, %lld ಬೀಟ್‌ಗಳು %@ BPM ನಲ್ಲಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: 비트 맞춤, %lld비트, %@ BPM"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: ബീറ്റ് ഒത്തുചേർത്ത്, %lld ബീറ്റുകൾ %@ BPM-ൽ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: बीट जुळवलेले, %lld बीट %@ BPM वर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: sepadan rentak, %lld rentak pada %@ BPM"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: beatmatchet, %lld slag ved %@ BPM"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: op de beat, %lld tellen op %@ BPM"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: ਬੀਟ ਮਿਲਾ ਕੇ, %lld ਬੀਟਾਂ %@ BPM ’ਤੇ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: zgrane z rytmem, uderzenia: %lld, %@ BPM"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: no tempo, %lld batidas a %@ BPM"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: a tempo, %lld batidas a %@ BPM"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: pe ritm, %lld bătăi la %@ BPM"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: beatmatchad, %lld slag vid %@ BPM"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: inayolingana kwa mdundo, midundo %lld kwa %@ BPM"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: பீட் பொருத்தியது, %lld பீட்கள் %@ BPM இல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: బీట్ సరిపోల్చినది, %lld బీట్‌లు %@ BPM వద్ద"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: ตรงจังหวะ %lld จังหวะที่ %@ BPM"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: vuruşa denk, %lld vuruş, %@ BPM"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: у такт, ударів: %lld, %@ BPM"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: بیٹ ملا کر، %lld بیٹس %@ BPM پر"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set: khớp nhịp, %lld nhịp ở %@ BPM"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set：對準節拍，%lld 拍，%@ BPM"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set：对齐节拍，%lld 拍，%@ BPM"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set：對齊節拍，%lld 拍，%@ BPM"
           }
         }
       }
@@ -336579,6 +337925,275 @@
         }
       }
     },
+    "Start Live Set": {
+      "comment": "Shortcuts action: turns transitions on in the Live Set style.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ጀምር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء Live Set"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set শুরু করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spustit Live Set"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Live Set"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set starten"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έναρξη Live Set"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar Live Set"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شروع Live Set"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aloita Live Set"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simulan ang Live Set"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancer Live Set"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set શરૂ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fara Live Set"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התחלת Live Set"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set शुरू करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set indítása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mulai Live Set"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia Live Set"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set を開始"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ಪ್ರಾರಂಭಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 시작"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ആരംഭിക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set सुरू करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mulakan Live Set"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Live Set"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Live Set"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ਸ਼ੁਰੂ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rozpocznij Live Set"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar Live Set"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar Live Set"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pornește Live Set"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starta Live Set"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anza Live Set"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ஐத் தொடங்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ప్రారంభించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เริ่ม Live Set"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set’i Başlat"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Почати Live Set"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set شروع کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bắt đầu Live Set"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 Live Set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始 Live Set"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始 Live Set"
+          }
+        }
+      }
+    },
     "Start measurement": {
       "localizations": {
         "am": {
@@ -340364,6 +341979,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "停止分析"
+          }
+        }
+      }
+    },
+    "Stop Live Set": {
+      "comment": "Shortcuts action: turns transitions off when they're in the Live Set style.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set አቁም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف Live Set"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set থামান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zastavit Live Set"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop Live Set"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set beenden"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Διακοπή Live Set"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener Live Set"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توقف Live Set"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lopeta Live Set"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ihinto ang Live Set"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter Live Set"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set બંધ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dakatar da Live Set"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עצירת Live Set"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set रोकें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set leállítása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hentikan Live Set"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompi Live Set"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set を停止"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ನಿಲ್ಲಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set 중지"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set നിർത്തുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set थांबवा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hentikan Live Set"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stopp Live Set"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop Live Set"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ਰੋਕੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zakończ Live Set"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parar Live Set"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parar Live Set"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oprește Live Set"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stoppa Live Set"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simamisha Live Set"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ஐ நிறுத்து"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set ఆపు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "หยุด Live Set"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set’i Durdur"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зупинити Live Set"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Set روکیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dừng Live Set"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止 Live Set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止 Live Set"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止 Live Set"
           }
         }
       }
@@ -377853,6 +379737,544 @@
           "stringUnit": {
             "state": "translated",
             "value": "開啟或關閉轉場"
+          }
+        }
+      }
+    },
+    "Turns off Vespertine’s transitions if they’re in Live Set.": {
+      "comment": "Shortcuts action description for Stop Live Set.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የVespertine ሽግግሮች በLive Set ውስጥ ከሆኑ ያጠፋቸዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يوقف انتقالات Vespertine إذا كانت بنمط Live Set."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এর ট্রানজিশন Live Set-এ থাকলে বন্ধ করে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vypne přechody Vespertine, pokud jsou ve stylu Live Set."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår Vespertines overgange fra, hvis de er i Live Set."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schaltet die Übergänge von Vespertine aus, wenn sie im Stil Live Set sind."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Απενεργοποιεί τις μεταβάσεις του Vespertine αν είναι σε Live Set."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactiva las transiciones de Vespertine si están en Live Set."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتقال‌های Vespertine را اگر در Live Set باشند خاموش می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poistaa Vespertinen siirtymät käytöstä, jos ne ovat Live Set -tyylillä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ino-off ang mga transition ng Vespertine kung nasa Live Set ang mga ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactive les transitions de Vespertine si elles sont en Live Set."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine નાં ટ્રાન્ઝિશન Live Set માં હોય તો બંધ કરે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana kashe sauye-sauyen Vespertine idan suna cikin Live Set."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מכבה את המעברים של Vespertine אם הם ב-Live Set."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine के ट्रांज़िशन Live Set में हों तो उन्हें बंद करता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kikapcsolja a Vespertine átmeneteit, ha Live Set stílusban vannak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mematikan transisi Vespertine jika sedang dalam Live Set."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disattiva le transizioni di Vespertine se sono in Live Set."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine のトランジションが Live Set のときにオフにします。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನ ಪರಿವರ್ತನೆಗಳು Live Set ನಲ್ಲಿದ್ದರೆ ಅವುಗಳನ್ನು ಆಫ್ ಮಾಡುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine의 트랜지션이 Live Set이면 끕니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ന്റെ ട്രാൻസിഷനുകൾ Live Set-ൽ ആണെങ്കിൽ അവ ഓഫാക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine चे ट्रान्झिशन Live Set मध्ये असल्यास ते बंद करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mematikan peralihan Vespertine jika ia dalam Live Set."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår av Vespertines overganger hvis de er i Live Set."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet de overgangen van Vespertine uit als ze in Live Set staan."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਦੇ ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ Live Set ਵਿੱਚ ਹੋਣ ਤਾਂ ਉਹਨਾਂ ਨੂੰ ਬੰਦ ਕਰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyłącza przejścia Vespertine, jeśli są w stylu Live Set."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativa as transições do Vespertine se estiverem no Live Set."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativa as transições do Vespertine se estiverem no Live Set."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dezactivează tranzițiile Vespertine dacă sunt în Live Set."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår av Vespertines övergångar om de är i Live Set."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huzima mabadiliko ya Vespertine ikiwa yako katika Live Set."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine இன் மாற்றங்கள் Live Set இல் இருந்தால் அவற்றை அணைக்கிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine పరివర్తనలు Live Set‌లో ఉంటే వాటిని ఆఫ్ చేస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ปิดการเปลี่ยนเพลงของ Vespertine หากอยู่ในแบบ Live Set"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine geçişleri Live Set’teyse kapatır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вимикає переходи Vespertine, якщо вони в стилі Live Set."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine کی ٹرانزیشنز Live Set میں ہوں تو انہیں بند کرتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tắt chuyển tiếp của Vespertine nếu đang ở Live Set."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如 Vespertine 的過渡正處於 Live Set，就將其關閉。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如果 Vespertine 的过渡处于 Live Set，则将其关闭。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "若 Vespertine 的過渡處於 Live Set，就將其關閉。"
+          }
+        }
+      }
+    },
+    "Turns on Vespertine’s transitions in Live Set: one output rate, beat-matched blends, skips that always blend.": {
+      "comment": "Shortcuts action description for Start Live Set.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የVespertineን ሽግግሮች በLive Set ያበራል፦ አንድ የውጤት ፍጥነት፣ በምት የተዛመዱ ቅልቅሎች፣ ሁልጊዜ የሚቀላቀሉ መዝለሎች።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل انتقالات Vespertine بنمط Live Set: معدل إخراج واحد، ومزج بمطابقة الإيقاع، وتخطٍّ يمتزج دائمًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এর ট্রানজিশন Live Set-এ চালু করে: একটি আউটপুট রেট, বিট মিলিয়ে মিশ্রণ, স্কিপ সবসময় মেশে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapne přechody Vespertine ve stylu Live Set: jedna výstupní frekvence, prolínání podle beatu, přeskočení se vždy prolne."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår Vespertines overgange til i Live Set: én outputfrekvens, beatmatchede overgange, spring der altid blandes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schaltet die Übergänge von Vespertine im Stil Live Set ein: eine Ausgaberate, beatgenaue Übergänge, übersprungene Titel blenden immer über."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ενεργοποιεί τις μεταβάσεις του Vespertine σε Live Set: ένας ρυθμός εξόδου, μίξεις με ταίριασμα ρυθμού, παραλείψεις που πάντα αναμειγνύονται."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa las transiciones de Vespertine en Live Set: una sola frecuencia de salida, mezclas a ritmo y saltos que siempre se mezclan."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتقال‌های Vespertine را در Live Set روشن می‌کند: یک نرخ خروجی، ترکیب‌های هم‌ضرب، پرش‌هایی که همیشه ترکیب می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottaa Vespertinen siirtymät käyttöön Live Set -tyylillä: yksi lähtötaajuus, tahtiin sovitetut sekoitukset, ohitukset sekoittuvat aina."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ino-on ang mga transition ng Vespertine sa Live Set: iisang output rate, mga blend na tugma ang beat, mga laktaw na laging naghahalo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active les transitions de Vespertine en Live Set : une seule fréquence de sortie, des enchaînements calés sur le tempo, des sauts toujours fondus."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine નાં ટ્રાન્ઝિશન Live Set માં ચાલુ કરે છે: એક આઉટપુટ રેટ, બીટ મેળવેલા મિશ્રણ, હંમેશાં ભળતા સ્કિપ."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana kunna sauye-sauyen Vespertine a Live Set: ƙimar fitarwa ɗaya, haɗuwa bisa daidaitaccen bugu, tsallakewa da koyaushe ke haɗewa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מפעיל את המעברים של Vespertine ב-Live Set: קצב פלט אחד, מיזוגים מותאמי פעימה, דילוגים שתמיד מתמזגים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine के ट्रांज़िशन Live Set में चालू करता है: एक आउटपुट रेट, बीट मिलाकर मिश्रण, स्किप हमेशा घुलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bekapcsolja a Vespertine átmeneteit Live Set stílusban: egy kimeneti frekvencia, ütemre illesztett átúsztatás, mindig átúsztató léptetés."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menyalakan transisi Vespertine dalam Live Set: satu laju output, paduan selaras ketukan, lompatan yang selalu berbaur."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva le transizioni di Vespertine in Live Set: un’unica frequenza di uscita, mixaggi a tempo, salti che si fondono sempre."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine のトランジションを Live Set でオンにします：1つの出力レート、ビートを合わせたブレンド、常にブレンドするスキップ。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನ ಪರಿವರ್ತನೆಗಳನ್ನು Live Set ನಲ್ಲಿ ಆನ್ ಮಾಡುತ್ತದೆ: ಒಂದೇ ಔಟ್‌ಪುಟ್ ದರ, ಬೀಟ್ ಹೊಂದಿಸಿದ ಮಿಶ್ರಣಗಳು, ಯಾವಾಗಲೂ ಬೆರೆಯುವ ಸ್ಕಿಪ್‌ಗಳು."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine의 트랜지션을 Live Set으로 켭니다. 하나의 출력 레이트, 비트 맞춤 블렌드, 항상 블렌드되는 건너뛰기."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-ന്റെ ട്രാൻസിഷനുകൾ Live Set-ൽ ഓണാക്കുന്നു: ഒരേ ഔട്ട്പുട്ട് നിരക്ക്, ബീറ്റ് ഒത്തുചേർത്ത മിശ്രണങ്ങൾ, എപ്പോഴും മിശ്രണം ചെയ്യുന്ന സ്കിപ്പുകൾ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine चे ट्रान्झिशन Live Set मध्ये सुरू करते: एक आउटपुट दर, बीट जुळवलेले मिश्रण, नेहमी मिसळणारे स्किप."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menghidupkan peralihan Vespertine dalam Live Set: satu kadar output, adunan sepadan rentak, langkauan yang sentiasa diadun."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår på Vespertines overganger i Live Set: én utgangsfrekvens, beatmatchede overganger, hopp som alltid blandes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet de overgangen van Vespertine aan in Live Set: één uitvoerfrequentie, overgangen op de beat, overslaan vloeit altijd over."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਦੇ ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ Live Set ਵਿੱਚ ਚਾਲੂ ਕਰਦਾ ਹੈ: ਇੱਕ ਆਊਟਪੁੱਟ ਦਰ, ਬੀਟ ਮਿਲਾਏ ਮਿਸ਼ਰਣ, ਹਮੇਸ਼ਾ ਘੁਲਣ ਵਾਲੇ ਸਕਿੱਪ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Włącza przejścia Vespertine w stylu Live Set: jedna częstotliwość wyjściowa, przejścia zgrane z rytmem, przeskoki zawsze się przenikają."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativa as transições do Vespertine no Live Set: uma única taxa de saída, mixagens no tempo e pulos que sempre se misturam."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativa as transições do Vespertine no Live Set: uma única taxa de saída, misturas a tempo e saltos que misturam sempre."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activează tranzițiile Vespertine în Live Set: o singură frecvență de ieșire, mixaje pe ritm, salturi care se mixează mereu."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slår på Vespertines övergångar i Live Set: en utfrekvens, beatmatchade övergångar, hopp som alltid blandas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huwasha mabadiliko ya Vespertine katika Live Set: kiwango kimoja cha utoaji, michanganyiko inayolingana kwa mdundo, kuruka ambako huchanganyika kila wakati."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine இன் மாற்றங்களை Live Set இல் இயக்குகிறது: ஒரே வெளியீட்டு விகிதம், பீட் பொருத்திய கலவைகள், எப்போதும் கலக்கும் தாவல்கள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine పరివర్తనలను Live Set‌లో ఆన్ చేస్తుంది: ఒకే అవుట్‌పుట్ రేట్, బీట్ సరిపోల్చిన మిశ్రమాలు, ఎప్పుడూ కలిసే స్కిప్‌లు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิดการเปลี่ยนเพลงของ Vespertine แบบ Live Set: อัตราเอาต์พุตเดียว การผสานแบบตรงจังหวะ และการข้ามเพลงที่ผสานเสมอ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine geçişlerini Live Set olarak açar: tek çıkış hızı, vuruşa denk geçişler, her zaman karışan atlamalar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вмикає переходи Vespertine у стилі Live Set: одна вихідна частота, переходи в такт, пропуски завжди змішуються."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine کی ٹرانزیشنز Live Set میں آن کرتا ہے: ایک آؤٹ پٹ ریٹ، بیٹ ملے امتزاج، ہمیشہ گھلنے والے اسکپ۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật chuyển tiếp của Vespertine ở Live Set: một tốc độ đầu ra, hòa trộn khớp nhịp, bỏ qua bài luôn được hòa trộn."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 Live Set 開啟 Vespertine 的過渡：同一個輸出取樣率、對準節拍的混合、跳過時一律混合。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 Live Set 打开 Vespertine 的过渡：同一个输出采样率、对齐节拍的混合、跳过时总会混合。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 Live Set 開啟 Vespertine 的過渡：同一個輸出取樣率、對齊節拍的混合、跳過時一律混合。"
           }
         }
       }

@@ -38,6 +38,10 @@ enum GoldenRender {
         var matchSixteenBit = false
         var digitalVolumeDB: Double?
         var exclusive = true
+        /// PlaybackEngine.ratePolicy: Live Set's fixed rate, else the source's.
+        var ratePolicy: RatePolicy = .matchSource
+        /// TransitionSettings.avoidsUnmixableModes ("transitions first", or Live Set): DSD as PCM, no integer or 16-bit.
+        var avoidsUnmixableModes = false
     }
 
     /// One configured device format: what the I/O proc wrote, as the device's words.
@@ -81,7 +85,7 @@ enum GoldenRender {
     /// PlaybackEngine.wantsIntegerMode (digital volume, ReplayGain, EQ and room correction are the only processing).
     static func wantsIntegerMode(_ plan: OutputPlan, probed: ProbedSource, item: PlayableItem, device: Device, settings: Settings) -> Bool {
         let source = probed.format
-        return settings.integerMode && settings.exclusive && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+        return settings.integerMode && !settings.avoidsUnmixableModes && settings.exclusive && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolumeDB == nil && (item.replayGainDB ?? 0) == 0
             && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
@@ -89,14 +93,15 @@ enum GoldenRender {
 
     /// PlaybackEngine.mayMatchSixteenBit.
     static func mayMatchSixteenBit(item: PlayableItem, settings: Settings) -> Bool {
-        settings.matchSixteenBit && settings.exclusive && settings.digitalVolumeDB == nil && (item.replayGainDB ?? 0) == 0
+        settings.matchSixteenBit && !settings.avoidsUnmixableModes && settings.exclusive && settings.digitalVolumeDB == nil && (item.replayGainDB ?? 0) == 0
     }
 
     /// PlaybackEngine.begin / advance: the plan for `probed` on `device`.
     static func plan(_ probed: ProbedSource, item: PlayableItem, device: Device, settings: Settings) -> OutputPlan {
         let bitstream = device.bitstream && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
-        var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: .matchSource,
-                                      spatial: .off, bitstream: bitstream, dsdToPCMForRoom: false)
+        var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: settings.ratePolicy,
+                                      spatial: .off, bitstream: bitstream, dsdToPCMForRoom: false,
+                                      dsdToPCMForTransitions: settings.avoidsUnmixableModes)
         plan.integerSamples = wantsIntegerMode(plan, probed: probed, item: item, device: device, settings: settings)
         plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                              eligible: mayMatchSixteenBit(item: item, settings: settings))
@@ -263,6 +268,10 @@ enum GoldenRender {
     /// advance's gap of silence.
     static func render(_ items: [PlayableItem], device: Device, settings: Settings = Settings(), transitions: TransitionSettings,
                        dither: Bool, profiles: ((PlayableItem) -> TransitionProfile?)? = nil) throws -> TransitionOutput {
+        // PlaybackEngine.ratePolicy and the eligibility checks: Live Set's fixed rate, and "transitions first".
+        var settings = settings
+        if let rate = transitions.fixedRate { settings.ratePolicy = .fixed(rate) }
+        settings.avoidsUnmixableModes = settings.avoidsUnmixableModes || transitions.avoidsUnmixableModes
         var sessions: [SessionOutput] = [], mixes: [Mixed] = [], decisions: [TransitionDecision] = []
         var session: Session?
         var index = 0
@@ -352,6 +361,7 @@ enum GoldenRender {
                             path: path(probed, item: next, session: s, settings: settings, plan: planB),
                             ditherBits: dither ? planB.physicalBitDepth : 0, chunk: chunkFrames, layout: s.layout,
                             stored: (profiles?(a.item), profiles?(next)),
+                            beatMatch: LiveSetPlanner.beatSettings(transitions, a: a.item, b: next),
                             decide: { profiles, gains in
                                 TransitionPlanner.decide(transitions, from: a.item, format: .plan(planA), to: next, format: .plan(planB),
                                                          compatible: compatible, profiles: profiles, gains: gains)
