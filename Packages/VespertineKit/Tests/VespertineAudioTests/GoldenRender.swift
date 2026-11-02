@@ -259,8 +259,10 @@ enum GoldenRender {
     /// planBoundary, finishCrossfade, handOver, advance's dip and checkTransitions' fade in), on the engine's own pieces:
     /// TransitionPlanner, Crossfade.prepare (silence scan and placement), Crossfade, FrameRamp and Decoding. `dither`:
     /// the mixer dithers at the device's depth, as the engine does on an integer DAC with nothing after the ring.
+    /// Smart Mix and gaps as well: `Crossfade.prepareSmart` (with `profiles` standing for the library's stored ones), and
+    /// advance's gap of silence.
     static func render(_ items: [PlayableItem], device: Device, settings: Settings = Settings(), transitions: TransitionSettings,
-                       dither: Bool) throws -> TransitionOutput {
+                       dither: Bool, profiles: ((PlayableItem) -> TransitionProfile?)? = nil) throws -> TransitionOutput {
         var sessions: [SessionOutput] = [], mixes: [Mixed] = [], decisions: [TransitionDecision] = []
         var session: Session?
         var index = 0
@@ -269,6 +271,7 @@ enum GoldenRender {
         var crossfade: Crossfade?
         var planned = false
         var fadeIn: (seconds: Double, curve: TransitionCurve)?
+        var gap = 0
         while index < items.count {
             if deck == nil {
                 // begin / advance / checkTransitions: open the next song, on a new session if its plan needs one.
@@ -312,13 +315,24 @@ enum GoldenRender {
                 }
                 crossfade = nil
                 if let error = a.error { throw Failure(description: "\(a.item.url.lastPathComponent): \(error)") }
+                // advance / writeGap: the gap's silence goes into the ring ahead of the next song.
+                if gap > 0, index + 1 < items.count {
+                    let zeros = [Float](repeating: 0, count: Int(chunkFrames) * a.path.plan.channels)
+                    while gap > 0 {
+                        while Int(nrt_ring_writable(s.ring)) < Int(chunkFrames) { s.render(upTo: device.bufferFrames) }
+                        let n = min(gap, Int(chunkFrames))
+                        zeros.withUnsafeBufferPointer { _ = nrt_ring_write(s.ring, $0.baseAddress!, UInt32(n)) }
+                        gap -= n
+                    }
+                }
+                gap = 0
                 deck = nil
                 index += 1
                 continue
             }
             // planBoundaryIfDue / planBoundary
             if !planned, let total = a.expectedFrames,
-               total - Int64(a.framesProduced) <= TransitionTiming.planningLead(crossfadeSeconds: transitions.crossfadeSeconds, rate: a.path.plan.deviceSampleRate) {
+               total - Int64(a.framesProduced) <= TransitionTiming.planningLead(transitions, rate: a.path.plan.deviceSampleRate) {
                 planned = true
                 if index + 1 < items.count {
                     let next = items[index + 1]
@@ -326,8 +340,26 @@ enum GoldenRender {
                     let planB = plan(probed, item: next, device: device, settings: settings)
                     var planA = a.path.plan
                     planA.integerSamples = a.path.applied.integerMode || planA.integerSamples
-                    let decision = TransitionPlanner.decide(transitions, from: a.item, format: .plan(planA), to: next, format: .plan(planB),
-                                                            compatible: s.plan.isDeviceCompatible(with: planB))
+                    let compatible = s.plan.isDeviceCompatible(with: planB)
+                    let reopen = {
+                        try SourceOpener.decoder(for: SourceOpener.probe(a.item.url, area: a.item.sacdArea, dvd: a.item.dvd), plan: a.path.plan, item: a.item)
+                    }
+                    var decision = TransitionPlanner.decide(transitions, from: a.item, format: .plan(planA), to: next, format: .plan(planB),
+                                                            compatible: compatible)
+                    if case .mix = decision {
+                        let smart = try Crossfade.prepareSmart(
+                            outgoing: a, total: total, next: next, probed: probed, plan: planB,
+                            path: path(probed, item: next, session: s, settings: settings, plan: planB),
+                            ditherBits: dither ? planB.physicalBitDepth : 0, chunk: chunkFrames, layout: s.layout,
+                            stored: (profiles?(a.item), profiles?(next)),
+                            decide: { profiles, gains in
+                                TransitionPlanner.decide(transitions, from: a.item, format: .plan(planA), to: next, format: .plan(planB),
+                                                         compatible: compatible, profiles: profiles, gains: gains)
+                            },
+                            reopenOutgoing: reopen)
+                        decision = smart.decision
+                        crossfade = smart.crossfade
+                    }
                     decisions.append(decision)
                     switch decision {
                     case .overlap(let seconds, let curve):
@@ -345,7 +377,9 @@ enum GoldenRender {
                             mixes.append(Mixed(session: sessions.count, ringFrame: deckRing + ramp.start, length: ramp.length, kind: .dipOut))
                         }
                         fadeIn = (seconds, curve)
-                    case .gapless, .cut:
+                    case .gap(let seconds):
+                        gap = Int((seconds * planB.deviceSampleRate).rounded())
+                    case .gapless, .cut, .mix:
                         break
                     }
                 }

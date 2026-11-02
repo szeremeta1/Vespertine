@@ -91,6 +91,12 @@ final class Crossfade {
     let length: Int
     let curve: TransitionCurve
     let channels: Int
+    /// Smart Mix's gains (its curves and loudness match) and limiter; nil for a plain crossfade, mixed exactly as
+    /// before Smart Mix.
+    let shape: SmartMix?
+    /// The incoming song's rise, as a fraction of the overlap (Smart Mix).
+    private let inFraction: Double
+    private let limiter: OverlapLimiter?
     private var dither: TransitionDither?
     /// Overlap frames written so far.
     private(set) var mixed = 0
@@ -105,12 +111,16 @@ final class Crossfade {
     var done: Bool { mixed >= length }
 
     /// `ditherBits`: the device's word length when nothing after the ring dithers (0: no dither).
-    init(incoming: Decoding, start: UInt64, length: Int, curve: TransitionCurve, ditherBits: Int = 0) {
+    init(incoming: Decoding, start: UInt64, length: Int, curve: TransitionCurve, ditherBits: Int = 0, shape: SmartMix? = nil) {
         self.incoming = incoming
         self.start = start
         self.length = max(1, length)
         self.curve = curve
+        self.shape = shape
         channels = incoming.path.plan.channels
+        let rate = incoming.path.plan.deviceSampleRate
+        inFraction = shape.map { min(1, $0.inSeconds * rate / Double(max(1, length))) } ?? 0
+        limiter = shape == nil ? nil : OverlapLimiter(channels: channels, sampleRate: rate)
         dither = TransitionDither(bits: ditherBits)
         pending.reserveCapacity(Int(incoming.output.frameCapacity) * 2 * channels)
     }
@@ -125,8 +135,22 @@ final class Crossfade {
         guard count > 0 else { return nil }
         let startsHere = mixed == 0 ? before : nil
         mix(into: a + before * channels, frames: count)
-        write(a + before * channels, count)
+        emit(a + before * channels, frames: count, write: write)
         return startsHere
+    }
+
+    /// Hands mixed frames on: as they are for a plain crossfade; through the limiter (which holds a few milliseconds
+    /// back to see what's coming) and then dither for Smart Mix, all of it once the overlap is complete.
+    private func emit(_ frames: UnsafeMutablePointer<Float>, frames count: Int, write: (UnsafePointer<Float>, Int) -> Void) {
+        guard let limiter else { write(frames, count); return }
+        let out: (UnsafeMutablePointer<Float>, Int) -> Void = { p, n in
+            if self.dither != nil {
+                for i in 0..<(n * self.channels) { p[i] += self.dither!.next() }
+            }
+            write(p, n)
+        }
+        limiter.process(frames, frames: count, write: out)
+        if done { limiter.flush(write: out) }
     }
 
     /// The outgoing song ended before the overlap did (its length was a little shorter than its decoder said): the rest
@@ -139,7 +163,7 @@ final class Crossfade {
             let p = buffer.baseAddress!
             p.update(repeating: 0, count: count * channels)
             mix(into: p, frames: count)
-            write(p, count)
+            emit(p, frames: count, write: write)
         }
     }
 
@@ -170,6 +194,58 @@ final class Crossfade {
         return Crossfade(incoming: b, start: timing.start, length: timing.length, curve: curve, ditherBits: ditherBits)
     }
 
+    /// Smart Mix's boundary: measures the end of `a` and the start of `next` (from their stored profiles when the
+    /// library has them, else from the audio, just in time), asks `decide` what to do with what was measured and, for
+    /// a mix, lines it up like `prepare` with Smart Mix's shape. Silence is always trimmed. The decision comes back
+    /// with the crossfade (nil when the decision isn't a mix, or there's too little to overlap).
+    static func prepareSmart(outgoing a: Decoding, total: Int64, next: PlayableItem, probed: ProbedSource, plan: OutputPlan,
+                             path: SignalPath, ditherBits: Int, chunk: AVAudioFrameCount, layout: AVAudioChannelLayout?,
+                             stored: (outgoing: TransitionProfile?, incoming: TransitionProfile?),
+                             decide: ((tail: TransitionProfile.Edge?, head: TransitionProfile.Edge?), (a: Double, b: Double)) -> TransitionDecision,
+                             reopenOutgoing: () throws -> PCMDecoding) throws -> (decision: TransitionDecision, crossfade: Crossfade?) {
+        let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
+        // The end of the outgoing song: what the library knows (at the file's own level, so its ReplayGain is added),
+        // or measured now from the audio as it plays (gain included).
+        var tail: TransitionProfile.Edge?, gainA = 0.0, trailing: Int64 = 0
+        if a.decoder.supportsSeeking, !a.streaming {
+            if let stored = stored.outgoing?.tail {
+                tail = stored
+                gainA = decibels(a.gain)
+                trailing = SilenceScan.trailing(of: a, open: reopenOutgoing, layout: layout) ?? 0
+            } else if let measured = EdgeScan.tail(of: a, open: reopenOutgoing, layout: layout) {
+                tail = measured.edge
+                trailing = measured.trailing
+            }
+        }
+        var head: TransitionProfile.Edge?, gainB = 0.0, lead: AVAudioFramePosition = 0
+        let probe = try Decoding(item: next, probed: probed, decoder: decoder, path: path, chunk: chunk, layout: layout)
+        if decoder.supportsSeeking, decoder.length > 0 {
+            var leading: Int64
+            if let stored = stored.incoming?.head {
+                head = stored
+                gainB = decibels(probe.gain)
+                leading = SilenceScan.leading(of: probe, layout: layout)
+            } else {
+                let measured = EdgeScan.head(of: probe)
+                head = measured.edge
+                leading = measured.leading
+            }
+            lead = min(AVAudioFramePosition(Double(leading) * decoder.processingFormat.sampleRate / plan.deviceSampleRate), decoder.length - 1)
+            try decoder.seek(to: lead)
+        }
+        let decision = decide((tail, head), (gainA, gainB))
+        guard case .mix(let mix) = decision else { return (decision, nil) }
+        let b = try Decoding(item: next, probed: probed, decoder: decoder, path: path, chunk: chunk, layout: layout)
+        b.startSourceFrame = lead
+        guard let timing = TransitionTiming.overlap(seconds: mix.seconds, rate: plan.deviceSampleRate, aTotal: total,
+                                                    aProduced: a.framesProduced, aTrailing: trailing, bMusic: b.expectedFrames) else {
+            return (decision, nil)
+        }
+        return (decision, Crossfade(incoming: b, start: timing.start, length: timing.length, curve: mix.inCurve, ditherBits: ditherBits, shape: mix))
+    }
+
+    static func decibels(_ gain: Float) -> Double { gain > 0 ? 20 * log10(Double(gain)) : 0 }
+
     /// After the overlap: the incoming frames converted but not mixed (the incoming song carries on alone from here).
     func flushIncoming(write: (UnsafePointer<Float>, Int) -> Void) {
         let frames = (pending.count - pendingOffset) / channels
@@ -183,6 +259,24 @@ final class Crossfade {
     private func mix(into out: UnsafeMutablePointer<Float>, frames: Int) {
         fillPending(frames)
         let available = (pending.count - pendingOffset) / channels
+        if let shape {
+            pending.withUnsafeBufferPointer { buffer in
+                let b = buffer.baseAddress! + pendingOffset
+                for i in 0..<frames {
+                    let g = shape.gains(at: Double(mixed + i) / Double(length), inFraction: inFraction)
+                    let ga = Float(g.out), gb = Float(g.in)
+                    let o = out + i * channels
+                    if i < available {
+                        let s = b + i * channels
+                        for c in 0..<channels { o[c] = o[c] * ga + s[c] * gb }
+                    } else {
+                        for c in 0..<channels { o[c] *= ga }
+                    }
+                }
+            }
+            consume(frames, available: available)
+            return
+        }
         pending.withUnsafeBufferPointer { buffer in
             let b = buffer.baseAddress! + pendingOffset
             for i in 0..<frames {
@@ -201,6 +295,10 @@ final class Crossfade {
                 }
             }
         }
+        consume(frames, available: available)
+    }
+
+    private func consume(_ frames: Int, available: Int) {
         pendingOffset += min(frames, available) * channels
         mixed += frames
         if pendingOffset == pending.count {
@@ -225,6 +323,114 @@ final class Crossfade {
             } else if chunk.frames == 0 && chunk.waiting {
                 break
             }
+        }
+    }
+}
+
+/// A lookahead peak limiter for an overlap's frames (Smart Mix): two songs at full level, summed, can go over full
+/// scale mid-blend. Each frame's gain is the mean, over the last `lookahead` frames, of a gain that has already seen
+/// `lookahead` frames ahead (and recovers over `release`), so the gain is never above what any frame within reach
+/// needs: no output frame goes over `ceiling`, and the gain moves smoothly (back up to 1 in `release` at most). Frames that need nothing are passed on
+/// untouched; the output is the input `lookahead` frames later (`flush` hands on the rest at the overlap's end, as
+/// if what follows needed nothing). Deterministic: the same frames give the same bytes.
+final class OverlapLimiter {
+    /// −0.3 dBFS.
+    static let ceiling: Float = 0.966
+    static let lookaheadSeconds = 0.005
+    static let releaseSeconds = 0.05
+
+    let channels: Int
+    let lookahead: Int
+    /// How much the gain may rise per frame.
+    private let release: Double
+    /// Frames waiting for their lookahead, interleaved, and each one's needed gain.
+    private var frames: [Float] = []
+    private var needed: [Double] = []
+    private var head = 0
+    /// How many waiting frames need less than 1 (when none do, the window's minimum is 1 without looking).
+    private var loud = 0
+    private var held = 1.0
+    /// The last `lookahead + 1` held gains, as 1 − gain, with their sum and how many aren't 0.
+    private var history: [Double]
+    private var historyIndex = 0
+    private var historyCount = 0
+    private var reduction = 0.0
+    private var reducing = 0
+    private var out: [Float] = []
+    /// The greatest gain reduction applied so far (1 = none): for tests and the log.
+    private(set) var lowestGain = 1.0
+
+    init(channels: Int, sampleRate: Double) {
+        self.channels = max(1, channels)
+        lookahead = max(1, Int((Self.lookaheadSeconds * sampleRate).rounded()))
+        release = 1 / (Self.releaseSeconds * sampleRate)
+        history = [Double](repeating: 0, count: lookahead + 1)
+    }
+
+    /// Takes `count` frames; hands on those whose lookahead is now complete.
+    func process(_ input: UnsafePointer<Float>, frames count: Int, write: (UnsafeMutablePointer<Float>, Int) -> Void) {
+        for f in 0..<count {
+            var peak: Float = 0
+            for c in 0..<channels {
+                let x = input[f * channels + c]
+                frames.append(x)
+                peak = max(peak, abs(x))
+            }
+            let need = peak > Self.ceiling ? Double(Self.ceiling) / Double(peak) : 1
+            needed.append(need)
+            if need < 1 { loud += 1 }
+        }
+        drain(keeping: lookahead, write: write)
+    }
+
+    /// Hands on every frame still held (the overlap is over).
+    func flush(write: (UnsafeMutablePointer<Float>, Int) -> Void) {
+        drain(keeping: 0, write: write)
+        frames.removeAll(keepingCapacity: true)
+        needed.removeAll(keepingCapacity: true)
+        head = 0
+    }
+
+    private func drain(keeping: Int, write: (UnsafeMutablePointer<Float>, Int) -> Void) {
+        let ready = needed.count - head - keeping
+        guard ready > 0 else { return }
+        if out.count < ready * channels { out = [Float](repeating: 0, count: ready * channels) }
+        out.withUnsafeMutableBufferPointer { o in
+            for k in 0..<ready {
+                let j = head + k
+                // The least gain any frame within the lookahead needs.
+                var m = 1.0
+                if loud > 0 {
+                    for i in j..<min(needed.count, j + lookahead + 1) where needed[i] < m { m = needed[i] }
+                }
+                held = min(m, held + release, 1)
+                // The mean of the last lookahead + 1 held gains.
+                let old = history[historyIndex]
+                if old != 0 { reducing -= 1 }
+                reduction -= old
+                history[historyIndex] = 1 - held
+                if held < 1 { reducing += 1 }
+                reduction += 1 - held
+                historyIndex = (historyIndex + 1) % history.count
+                historyCount = min(historyCount + 1, history.count)
+                if reducing == 0 { reduction = 0 }
+                let gain = reducing == 0 ? 1 : 1 - reduction / Double(historyCount)
+                lowestGain = min(lowestGain, gain)
+                let g = Float(gain), ceiling = Self.ceiling
+                for c in 0..<channels {
+                    let x = frames[j * channels + c]
+                    // Clamped too: the gain is exact in Double, but its product in Float can round a hair over.
+                    o[k * channels + c] = gain == 1 ? x : min(max(x * g, -ceiling), ceiling)
+                }
+                if needed[j] < 1 { loud -= 1 }
+            }
+            write(o.baseAddress!, ready)
+        }
+        head += ready
+        if head > 4096 && head * 2 > needed.count {
+            frames.removeFirst(head * channels)
+            needed.removeFirst(head)
+            head = 0
         }
     }
 }
@@ -281,7 +487,7 @@ enum SilenceScan {
         return min(produced, window)
     }
 
-    private static func reader(_ decoding: Decoding, open: () throws -> PCMDecoding, layout: AVAudioChannelLayout?) throws -> Decoding {
+    static func reader(_ decoding: Decoding, open: () throws -> PCMDecoding, layout: AVAudioChannelLayout?) throws -> Decoding {
         try Decoding(item: decoding.item, probed: decoding.probed, decoder: open(), path: decoding.path,
                      chunk: decoding.output.frameCapacity, layout: layout)
     }
@@ -301,6 +507,53 @@ enum SilenceScan {
     }
 }
 
+/// Smart Mix's measurements made just in time, for a song the library has no profile of: the analysis
+/// (`TransitionAnalyzer`) of the audio as it plays (at the output's rate, ReplayGain applied), over a song's last
+/// `tailSeconds` and first `headSeconds`. Silence is found exactly as `SilenceScan` finds it.
+enum EdgeScan {
+    /// Room for the longest fade looked for, and ten seconds of music before it.
+    static let tailSeconds = TransitionAnalyzer.fadeWindow + TransitionAnalyzer.loudnessWindow
+    static let headSeconds = 20.0
+
+    /// The end of the song `decoding` plays, read with a decoder of its own (`open`), and its silence in frames.
+    static func tail(of decoding: Decoding, open: () throws -> PCMDecoding, layout: AVAudioChannelLayout?) -> (edge: TransitionProfile.Edge, trailing: Int64)? {
+        guard let total = decoding.expectedFrames, let scan = try? SilenceScan.reader(decoding, open: open, layout: layout) else { return nil }
+        let rate = scan.decoder.processingFormat.sampleRate
+        let length = scan.decoder.length
+        let from = max(decoding.startSourceFrame, length - Int64(tailSeconds * rate))
+        guard scan.decoder.supportsSeeking, length > 0, (try? scan.decoder.seek(to: from)) != nil else { return nil }
+        let deviceRate = decoding.path.plan.deviceSampleRate
+        let startFrame = Int64((Double(from - decoding.startSourceFrame) * deviceRate / rate).rounded())
+        let analyzer = TransitionAnalyzer(sampleRate: deviceRate, channels: decoding.path.plan.channels, startFrame: startFrame,
+                                          silenceThreshold: SilenceScan.threshold * max(decoding.gain, .leastNormalMagnitude))
+        while true {
+            let chunk = scan.convertChunk()
+            if chunk.frames > 0, let data = chunk.data { analyzer.add(data, frames: Int(chunk.frames)) }
+            if chunk.ended || (chunk.frames == 0 && chunk.waiting) { break }
+        }
+        guard analyzer.framesAdded > 0, let edge = analyzer.finish(totalFrames: startFrame + analyzer.framesAdded).tail else { return nil }
+        let end = startFrame + analyzer.framesAdded
+        let trailing = end - (analyzer.lastLoudFrame.map { $0 + 1 } ?? startFrame)
+        return (edge, min(total, trailing))
+    }
+
+    /// The start of `decoding`'s song (read from where it is, its start), and its silence in frames.
+    static func head(of decoding: Decoding) -> (edge: TransitionProfile.Edge?, leading: Int64) {
+        let analyzer = TransitionAnalyzer(sampleRate: decoding.path.plan.deviceSampleRate, channels: decoding.path.plan.channels,
+                                          silenceThreshold: SilenceScan.threshold * max(decoding.gain, .leastNormalMagnitude))
+        let window = Int64(headSeconds * decoding.path.plan.deviceSampleRate)
+        var ended = false
+        while analyzer.framesAdded < window {
+            let chunk = decoding.convertChunk()
+            if chunk.frames > 0, let data = chunk.data { analyzer.add(data, frames: Int(chunk.frames)) }
+            if chunk.ended || (chunk.frames == 0 && chunk.waiting) { ended = chunk.ended; break }
+        }
+        let leading = min(analyzer.firstLoudFrame ?? analyzer.framesAdded, window)
+        guard analyzer.framesAdded > 0 else { return (nil, 0) }
+        return (analyzer.finish(totalFrames: analyzer.framesAdded + (ended ? 0 : 1)).head, leading)
+    }
+}
+
 /// Where an overlap goes.
 enum TransitionTiming {
     /// The shortest overlap worth mixing; anything shorter is joined as it is.
@@ -310,6 +563,11 @@ enum TransitionTiming {
     /// the longest crossfade, plus a second.
     static func planningLead(crossfadeSeconds: Double, rate: Double) -> Int64 {
         Int64((crossfadeSeconds + SilenceScan.tailSeconds + 1) * rate)
+    }
+
+    /// The lead for `settings`: Smart Mix's longest overlap is 12 s, whatever the crossfade length.
+    static func planningLead(_ settings: TransitionSettings, rate: Double) -> Int64 {
+        planningLead(crossfadeSeconds: settings.isSmart ? SmartMixPlanner.fadeRange.upperBound : settings.crossfadeSeconds, rate: rate)
     }
 
     /// The overlap for a crossfade of `seconds`: it ends where the outgoing song's music ends (`aTotal` frames less

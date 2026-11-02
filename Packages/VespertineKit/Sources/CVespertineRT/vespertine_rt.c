@@ -133,6 +133,21 @@ bool nrt_ring_rewind(NRTRing *ring, uint64_t totalWritten, uint32_t margin) {
     return ok;
 }
 
+uint32_t nrt_ring_peek(const NRTRing *ring, uint64_t from, float *dst, uint32_t frames) {
+    // Only the producer writes `data`, and this runs on its thread: what it wrote stays until it writes over it.
+    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_relaxed);
+    if (from > w || w - from > ring->capacity) return 0;
+    if (frames > w - from) frames = (uint32_t)(w - from);
+    if (frames == 0) return 0;
+    uint32_t start = (uint32_t)(from & ring->mask);
+    uint32_t first = ring->capacity - start;
+    if (first > frames) first = frames;
+    size_t ch = ring->channels;
+    memcpy(dst, ring->data + start * ch, first * ch * sizeof(float));
+    if (frames > first) memcpy(dst + first * ch, ring->data, (frames - first) * ch * sizeof(float));
+    return frames;
+}
+
 void nrt_ring_reset(NRTRing *ring) {
     atomic_store(&ring->readLimit, UINT64_MAX);
     atomic_store(&ring->writePos, 0);

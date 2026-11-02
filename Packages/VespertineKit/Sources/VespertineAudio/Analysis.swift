@@ -16,6 +16,14 @@ extension FileAnalyzer {
     /// `shouldContinue` is polled between chunks; returning false stops with `AnalysisError.cancelled`.
     public static func analyze(url: URL, maxSeconds: Double = 600,
                                shouldContinue: (() -> Bool)? = nil) throws -> FileAnalysis {
+        try analyzeWithProfile(url: url, maxSeconds: maxSeconds, shouldContinue: shouldContinue).analysis
+    }
+
+    /// `analyze`, plus the song's transition profile from the same decoded samples (nil for sources the analysis
+    /// doesn't read: lossy, DSD). A song longer than `maxSeconds` gets a profile of its start only; the player
+    /// measures its end when it's about to play it.
+    public static func analyzeWithProfile(url: URL, maxSeconds: Double = 600,
+                                          shouldContinue: (() -> Bool)? = nil) throws -> (analysis: FileAnalysis, profile: TransitionProfile?) {
         guard maxSeconds.isFinite, maxSeconds > 0 else { throw SourceOpenerError.unsupported(url) }
         let probed = try SourceOpener.probe(url)
         let format = probed.format
@@ -25,8 +33,8 @@ extension FileAnalyzer {
                              physicalBitDepth: 32, channels: format.channels, dsdConvertedToPCM: false, reason: ""),
             item: PlayableItem(url: url)) else {
             // Stored in English, like the server's; `FileAnalysis.localizedSummary` translates these two for display.
-            return .notApplicable(claimedBitDepth: format.bitDepth, sampleRate: format.sampleRate,
-                                  summary: format.encoding == .dsd ? "DSD source: bit depth analysis doesn't apply." : "Lossy source: analysis doesn't apply.")
+            return (.notApplicable(claimedBitDepth: format.bitDepth, sampleRate: format.sampleRate,
+                                   summary: format.encoding == .dsd ? "DSD source: bit depth analysis doesn't apply." : "Lossy source: analysis doesn't apply."), nil)
         }
 
         let channels = max(1, format.channels)
@@ -43,6 +51,7 @@ extension FileAnalyzer {
 
         let accumulator = AnalysisAccumulator(sampleRate: format.sampleRate, channels: channels,
                                               claimedBitDepth: format.bitDepth, maxSeconds: maxSeconds)
+        let profile = TransitionAnalyzer(sampleRate: format.sampleRate, channels: channels)
         var exhausted = false
         while !exhausted && accumulator.wantsMore {
             if let shouldContinue, !shouldContinue() { throw AnalysisError.cancelled }
@@ -66,12 +75,15 @@ extension FileAnalyzer {
             if n == 0 || status != .haveData { exhausted = true }
             guard n > 0, let data = output.floatChannelData else { continue }
             do {
-                try accumulator.add(planar: (0..<channels).map { UnsafePointer(data[$0]) }, frames: n)
+                let planes = (0..<channels).map { UnsafePointer(data[$0]) }
+                try accumulator.add(planar: planes, frames: n)
+                profile.add(planar: planes, frames: n)
             } catch AnalysisError.invalidSample {
                 throw SourceOpenerError.unsupported(url)
             }
         }
-        return accumulator.finish()
+        let total = decoderPCM.length > 0 ? Int64(decoderPCM.length) : (exhausted ? profile.framesAdded : nil)
+        return (accumulator.finish(), profile.finish(totalFrames: total))
     }
 }
 

@@ -228,11 +228,11 @@ struct TransitionPlannerTests {
         #expect(decide(Self.item(Self.url), .plan(Self.plan()), Self.item(), .unknown) == .overlap(seconds: 6, curve: .equalPower))
     }
 
-    @Test("Smart Mix and Live Set crossfade for now (their analysis comes later)", arguments: [TransitionStyle.smartMix, .liveSet])
+    @Test("Smart Mix and Live Set plan a mix; before the songs are measured, it's the plain crossfade", arguments: [TransitionStyle.smartMix, .liveSet])
     func otherStyles(_ style: TransitionStyle) {
         var s = Self.on
         s.style = style
-        #expect(decide(settings: s) == .overlap(seconds: 6, curve: .equalPower))
+        #expect(decide(settings: s) == .mix(SmartMix(kind: .crossfade, seconds: 6, outCurve: .equalPower, inSeconds: 6, inCurve: .equalPower, matchDB: 0)))
     }
 
     @Test("Only dips and overlaps change samples")

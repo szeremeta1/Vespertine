@@ -47,11 +47,20 @@ public struct SignalPath: Sendable, Hashable {
         /// A crossfade or a dip's fade is being heard (held a moment longer so the badge doesn't flicker). Only then are
         /// the samples changed; before and after, the song plays as it would with transitions off.
         public var audible = false
+        /// "Transitions first": integer mode and Match 16-bit aren't used, DSD plays as PCM, and a song at another rate
+        /// may be resampled to blend.
+        public var transitionsFirst = false
 
-        public init(style: TransitionStyle, next: TransitionDecision? = nil, audible: Bool = false) {
+        public init(style: TransitionStyle, next: TransitionDecision? = nil, audible: Bool = false, transitionsFirst: Bool = false) {
             self.style = style
             self.next = next
             self.audible = audible
+            self.transitionsFirst = transitionsFirst
+        }
+
+        /// What "transitions first" changes, for the signal path; nil with bit-perfect first.
+        public var policyNote: String? {
+            transitionsFirst ? String(localized: "Transitions first: no integer or 16-bit output, DSD as PCM, the next song resampled if it must be to blend", comment: "Signal path, transitions row: what the “Transitions first” choice changes while transitions are on.") : nil
         }
 
         /// The badge while it's audible: CROSSFADE for a crossfade, MIXING for Smart Mix and Live Set.

@@ -1,0 +1,10 @@
+{
+  "cases" : {
+    "cold-cut" : "ac83f8fcc947330a5fb04932aa401f6e72ddf2dc238693ea1ea890aec3d09ceb",
+    "gap" : "2098b1bf482d364b3c3236a0bc512d99b8145263d695f31746628e41942df2c1",
+    "inside-fade" : "95fa7340115e71e06e3e24b111552050d6e5c970640b315fcb81e8efcd8d14d3",
+    "limited" : "edee476e1cbb2e43762183d2fbcc20102d6773c6881e3cde297773aa6bb424d0",
+    "trimmed" : "eb8b57dcd0d022dda2dfd1ed951f54812e2d469dae960cbae4e8d1cbfdf1979b"
+  },
+  "recordedOn" : "arm64 macOS 27"
+}

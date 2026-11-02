@@ -409,6 +409,58 @@ static void test_concurrent_rewind(void) {
     nrt_ring_destroy(rewind_ring);
 }
 
+// A skip's crossfade: while the reader runs, the producer copies what it wrote ahead of the reader back out
+// (nrt_ring_peek), rewinds to a point past the reader, and writes again from there. Frame n carries n: every copy
+// must be the frames it asked for, and the reader must only ever see n after n − 1.
+#define PEEK_ROUNDS 3000u
+static void test_concurrent_peek(void) {
+    rewind_ring = nrt_ring_create(8192, 1);
+    assert(rewind_ring);
+    rewind_ctx = nrt_context_create(rewind_ring, 512);
+    assert(rewind_ctx);
+    nrt_context_set_passthrough(rewind_ctx, true);
+    nrt_context_set_draining(rewind_ctx, true);
+    atomic_store(&rewind_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, rewind_reader, NULL);
+    assert(!started); (void)started;
+    static float chunk[512], peeked[4096];
+    unsigned rewound = 0, copied = 0;
+    for (unsigned round = 0; round < PEEK_ROUNDS; round++) {
+        while (nrt_ring_writable(rewind_ring) < 4096) sched_yield();
+        for (unsigned k = 0; k < 8; k++) {
+            const uint64_t w = nrt_ring_total_written(rewind_ring);
+            assert(w + 512 < (1u << 24));
+            for (uint32_t i = 0; i < 512; i++) chunk[i] = (float)(w + i);
+            const uint32_t wrote = nrt_ring_write(rewind_ring, chunk, 512);
+            assert(wrote == 512); (void)wrote;
+        }
+        const uint64_t w = nrt_ring_total_written(rewind_ring);
+        const uint64_t from = nrt_ring_total_read(rewind_ring) + 64;
+        if (from >= w) continue;
+        const uint32_t got = nrt_ring_peek(rewind_ring, from, peeked, 4096);
+        assert(got == (w - from < 4096 ? w - from : 4096));
+        for (uint32_t i = 0; i < got; i++) assert(peeked[i] == (float)(from + i));
+        copied += got;
+        // Out of range: past the write position, or more than a capacity back.
+        assert(nrt_ring_peek(rewind_ring, w + 1, peeked, 1) == 0);
+        assert(w < 8192 || nrt_ring_peek(rewind_ring, w - 8193, peeked, 1) == 0);
+        if (nrt_ring_rewind(rewind_ring, from, 64)) {
+            rewound++;
+            // Write the same frames again from there (as the mix would be written).
+            for (uint32_t i = 0; i < got && i < 512; i++) chunk[i] = (float)(from + i);
+            const uint32_t again = got < 512 ? got : 512;
+            const uint32_t wrote = nrt_ring_write(rewind_ring, chunk, again);
+            assert(wrote == again); (void)wrote;
+        }
+    }
+    atomic_store(&rewind_done, true);
+    pthread_join(thread, NULL);
+    assert(rewound > 0 && copied > 0);
+    nrt_context_destroy(rewind_ctx);
+    nrt_ring_destroy(rewind_ring);
+}
+
 // The visualizer tap: the I/O thread writes it while another thread copies the newest frames out as fast as it can.
 // Frame n carries n (left) and -n (right): a copy the reader keeps must be consecutive frames, left and right from the
 // same frame, never a mix of two moments (a copy the writer overtook is returned as 0 frames). Then the tap is switched
@@ -1035,5 +1087,6 @@ int main(void) {
     test_concurrent_fir();
     test_room_then_fir();
     test_concurrent_fade();
+    test_concurrent_peek();
     return 0;
 }

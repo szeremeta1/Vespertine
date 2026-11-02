@@ -50,6 +50,12 @@ void nrt_ring_reset(NRTRing *_Nonnull ring);
 /// one read (or render pass) already under way.
 bool nrt_ring_rewind(NRTRing *_Nonnull ring, uint64_t totalWritten, uint32_t margin);
 
+/// Producer side, safe while the consumer runs: copies `frames` frames it wrote, from ring position `from`, into `dst`
+/// (a skip's crossfade takes the outgoing song's next seconds back out before rewinding). Only frames still held:
+/// `from` no further back than one capacity from the write position, and `from + frames` no further than it. Returns
+/// the frames copied (0 when the range isn't held). Never touches the read side.
+uint32_t nrt_ring_peek(const NRTRing *_Nonnull ring, uint64_t from, float *_Nonnull dst, uint32_t frames);
+
 // MARK: - Render context driven by a HAL IOProc
 
 #define NRT_TAP_SIZE 8192u
