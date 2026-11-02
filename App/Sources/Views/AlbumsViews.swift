@@ -131,12 +131,16 @@ struct AlbumCard: View {
                             RoundedRectangle(cornerRadius: 6).strokeBorder(Palette.brass, lineWidth: 1.5)
                         }
                     }
+                    .overlay(alignment: .bottomLeading) {
+                        // The library has this album more than once (a download and a vinyl transfer, stereo and 5.1).
+                        if let n = model.library.copyCounts[album.key] { CopiesPill(count: n).padding(9) }
+                    }
                 if isPlaying {
                     PlayingBars(active: model.player.isPlaying)
                         .padding(8)
                 } else if hovering {
                     Button {
-                        model.player.play(model.library.tracks(albumKey: album.key), shuffled: false)
+                        model.player.play(model.playableTracks(albumKey: album.key), shuffled: false)
                     } label: {
                         Image(systemName: "play.fill")
                             .font(.system(size: 13))
@@ -172,12 +176,27 @@ struct AlbumCard: View {
         // VoiceOver (and other assistive tech) can open the album and play it.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(album.title.libraryDisplayName), \(album.artist.libraryDisplayName)")
-        .accessibilityValue(album.formatSummary)
+        .accessibilityValue(model.library.copyCounts[album.key].map { album.formatSummary + ", " + String(localized: "\($0) COPIES") } ?? album.formatSummary)
         .accessibilityAddTraits(.isButton)
         .accessibilityAction { model.openAlbum(album.key) }
-        .accessibilityAction(named: "Play") { model.player.play(model.library.tracks(albumKey: album.key), shuffled: false) }
+        .accessibilityAction(named: "Play") { model.player.play(model.playableTracks(albumKey: album.key), shuffled: false) }
         .contextMenu { AlbumMenu(album: album) }
-        .draggable(model.library.tracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
+        .draggable(model.playableTracks(albumKey: album.key).compactMap(\.id).map(String.init).joined(separator: ","))
+    }
+}
+
+/// "3 COPIES" on an album's artwork: the library has the album in that many folders, formats or layouts.
+struct CopiesPill: View {
+    let count: Int
+    var body: some View {
+        Text("\(count) COPIES")
+            .font(Typeface.mono(9, weight: .semibold))
+            .letterSpacing(0.5)
+            .foregroundStyle(Palette.text)
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .background(Palette.surface.opacity(0.92), in: RoundedRectangle(cornerRadius: 4))
+            .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Palette.hairlineStrong))
+            .accessibilityLabel(Text("\(count) COPIES"))
     }
 }
 
@@ -279,10 +298,16 @@ struct AlbumFamilyDetailView: View {
                                         Text(edition.title.libraryDisplayName).font(Typeface.ui(12, weight: .medium))
                                             .foregroundStyle(Palette.text).lineLimit(2)
                                         FormatLabel(summary: edition.formatSummary, highlight: edition.isHiRes)
+                                        // What kind of edition it is, and how many copies of it the library has.
+                                        let kinds = EditionKind.of(edition).map(\.name) + (model.library.copyCounts[edition.key].map { [String(localized: "\($0) COPIES")] } ?? [])
+                                        if !kinds.isEmpty {
+                                            Text(kinds.joined(separator: " · ")).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.5)
+                                                .foregroundStyle(Palette.text3).lineLimit(1)
+                                        }
                                     }
                                     Spacer(minLength: 0)
                                 }
-                                .frame(width: 280, height: 58)
+                                .frame(width: 280, height: 66)
                                 .padding(7)
                                 .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
                                 .overlay(RoundedRectangle(cornerRadius: 6)
@@ -344,12 +369,14 @@ struct AlbumMenu: View {
     let album: Album
 
     var body: some View {
+        // Playing, queueing and playlists take the copy that plays; the rest acts on every copy.
         let tracks = model.library.tracks(albumKey: album.key)
-        Button("Play") { model.player.play(tracks, shuffled: false) }
-        Button("Shuffle") { model.player.play(tracks, shuffled: true) }
-        Button("Play Next") { model.player.playNext(tracks) }
-        Button("Add to Queue") { model.player.addToQueue(tracks) }
-        AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
+        let playable = model.playableTracks(albumKey: album.key)
+        Button("Play") { model.player.play(playable, shuffled: false) }
+        Button("Shuffle") { model.player.play(playable, shuffled: true) }
+        Button("Play Next") { model.player.playNext(playable) }
+        Button("Add to Queue") { model.player.addToQueue(playable) }
+        AddToPlaylistMenu(trackIDs: playable.compactMap(\.id))
         Divider()
         Button("Get Info") {
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
@@ -404,23 +431,31 @@ struct AlbumDetailView: View {
     @Environment(AppModel.self) private var model
     let albumKey: String
     @State private var tracks: [Track] = []
+    @State private var copies = AlbumCopies.empty
 
     var body: some View {
         let album = model.library.album(key: albumKey)
-        // A song in several versions (an SACD's stereo and 5.1 layers) or copies (the same file in two places, two
-        // editions with one title) shows once: the one that plays, with the others named beside it.
-        let groups = TrackVersions.group(tracks)
+        // An album in several copies (a 24/192 download, a vinyl transfer, an Atmos mix; an SACD's stereo and 5.1 areas)
+        // lists one of them, the one chosen or else the best for the output, with every copy named above the list; or,
+        // bundled, each song once in the copy that suits the output. A song's other copies are a click away on its row.
         let wanted = model.outputWantsMultichannel() ?? true
         let shares = model.shares
-        let shown = groups.map { TrackVersions.choose($0, multichannel: wanted, isLocal: { !shares.isNetwork($0) }) ?? $0[0] }
-        let others = Self.otherVersions(of: groups, shown: shown)
+        let choice = model.library.copyChoice(albumKey: albumKey)
+        let selected = copies.copies.isEmpty ? nil : copies.selected(choice, multichannel: wanted, isLocal: { !$0.tracks.contains(where: shares.isNetwork) })
+        let shown: [Track] = copies.copies.isEmpty ? tracks : selected?.tracks ?? copies.songs.map {
+            TrackVersions.choose($0.tracks, multichannel: wanted, isLocal: { !shares.isNetwork($0) }, isPreferred: model.library.isPreferredCopy) ?? $0.lead
+        }
+        let songCopies = Self.copies(of: shown, in: copies)
         VStack(spacing: 0) {
             if let album {
-                hero(album, shown: shown)
+                hero(album, shown: shown, copy: copies.copies.count > 1 ? selected : nil, bundled: copies.copies.count > 1 && selected == nil)
+                if copies.copies.count > 1 {
+                    AlbumCopiesStrip(albumKey: albumKey, copies: copies, selected: selected, choice: choice)
+                }
                 Hairline()
             }
             TrackTable(tracks: shown, showAlbum: false, showArtist: shown.contains { $0.artist != album?.artist && $0.artist != nil },
-                       otherVersions: others)
+                       copies: songCopies)
         }
         .background(Palette.window)
         .navigationTitle(album?.title ?? String(localized: "Album"))
@@ -433,35 +468,19 @@ struct AlbumDetailView: View {
                 return
             }
             tracks = found
+            copies = LibraryCopies.analyze(found)
         }
     }
 
-    /// For each song shown in several versions, the others named beside the one shown: track ID → "+ STEREO", "+ 5.1".
-    static func otherVersions(of songs: [[Track]], shown: [Track]) -> [Int64: String] {
-        Dictionary(zip(songs, shown).compactMap { song, chosen in
-            guard song.count > 1, let id = chosen.id else { return nil }
-            let names = song.filter { $0.id != chosen.id }.map { versionName($0, beside: chosen) }
-            return (id, "+ " + Array(Set(names)).sorted().joined(separator: " · "))
+    /// For each song shown that the album has in several copies: track ID → every copy of it.
+    static func copies(of shown: [Track], in copies: AlbumCopies) -> [Int64: [Track]] {
+        Dictionary(shown.compactMap { t in
+            guard let id = t.id, let song = copies.song(of: t), song.tracks.count > 1 else { return nil }
+            return (id, song.tracks)
         }, uniquingKeysWith: { a, _ in a })
     }
 
-    /// How another version of a song is named beside the one that plays: its layout ("STEREO", "5.1"), or for a
-    /// copy in the same layout its format ("DSD64", "16/44.1", "MP3"), or "COPY" when it's the same file.
-    static func versionName(_ other: Track, beside chosen: Track) -> String {
-        if other.isMultichannel != chosen.isMultichannel {
-            return other.isMultichannel ? ChannelLayouts.name(channels: other.channels)
-                : String(localized: "STEREO", comment: "Tag beside a song: it is also on the album in a stereo version")
-        }
-        if other.fileSize == chosen.fileSize && abs(other.duration - chosen.duration) < 0.01 {
-            return String(localized: "COPY", comment: "Tag beside a song: the album also holds an identical copy of the file")
-        }
-        if other.isDSD { return "DSD\(Int((other.sampleRate / 44_100).rounded()))" }
-        if !other.isLossless { return other.codec.uppercased() }
-        let rate = other.sampleRate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(other.sampleRate / 1000)) : (other.sampleRate / 1000).formatted(.number.precision(.fractionLength(1)))
-        return "\(other.bitDepth ?? 16)/\(rate)"
-    }
-
-    private func hero(_ album: Album, shown: [Track]) -> some View {
+    private func hero(_ album: Album, shown: [Track], copy: AlbumCopy?, bundled: Bool) -> some View {
         HStack(alignment: .top, spacing: 28) {
             ArtworkView(key: album.artworkKey, size: 600, cornerRadius: 7)
                 .frame(width: 220, height: 220)
@@ -483,7 +502,7 @@ struct AlbumDetailView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 6)
-                Text(subline(album))
+                Text(subline(album, copy: copy, bundled: bundled))
                     .font(Typeface.ui(12.5))
                     .foregroundStyle(Palette.text2)
                     .lineLimit(1)
@@ -529,16 +548,25 @@ struct AlbumDetailView: View {
         return parts.joined(separator: " · ")
     }
 
-    private func subline(_ a: Album) -> String {
+    private func subline(_ a: Album, copy: AlbumCopy?, bundled: Bool) -> String {
         var parts: [String] = []
         let genres = Genres.split(a.genre)
         if !genres.isEmpty { parts.append(genres.joined(separator: ", ")) }
+        // One copy of several listed: its own format, size and place, not the whole album's.
+        if let copy {
+            parts.append(copy.format.replacingOccurrences(of: "/", with: "-bit / ").appending(copy.isDSD || !copy.format.contains("/") ? "" : " kHz")
+                         + (copy.layout == .stereo || copy.layout == .atmos ? "" : " · " + copy.layout.name))
+            parts.append(copy.size.byteString)
+            parts.append(model.library.albumLocation(copy.folder))
+            return parts.joined(separator: " · ")
+        }
         // "FLAC · 24/88.2 · 5.1" → "FLAC · 24-bit / 88.2 kHz · 5.1"
         let channelText = a.isMultichannel ? " · " + ChannelLayouts.name(channels: a.maxChannels) : ""
         let base = channelText.isEmpty ? a.formatSummary : String(a.formatSummary.dropLast(channelText.count))
         parts.append(base.replacingOccurrences(of: "/", with: "-bit / ").appending(a.isDSD || !base.contains("/") ? "" : " kHz") + channelText)
         parts.append(a.totalSize.byteString)
-        if let p = a.sourcePath { parts.append(model.library.albumLocation(p)) }
+        if bundled { parts.append(String(localized: "Copies bundled", comment: "Album page: its copies play as one, each song in the copy the output supports best.")) }
+        else if let p = a.sourcePath { parts.append(model.library.albumLocation(p)) }
         return parts.joined(separator: " · ")
     }
 }

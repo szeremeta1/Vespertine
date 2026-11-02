@@ -111,7 +111,7 @@ public struct AlbumCopies: Sendable {
     private let copyByLocation: [String: Int]
     private let songByLocation: [String: Int]
 
-    init(copies: [AlbumCopy], songs: [SongCopies]) {
+    public init(copies: [AlbumCopy], songs: [SongCopies]) {
         self.copies = copies
         self.songs = songs
         var copyBy: [String: Int] = [:], songBy: [String: Int] = [:]
@@ -220,7 +220,7 @@ public enum LibraryCopies {
 
     // MARK: Copies
 
-    struct RawCopy {
+    public struct RawCopy: Sendable {
         var id: String
         var tracks: [Track]
         var folder: String
@@ -233,7 +233,7 @@ public enum LibraryCopies {
     /// Splits an album's tracks into copies: by album folder and layout, then by format where one folder holds the
     /// same songs twice (a WAV and a FLAC of each), then whatever is still twice (the same file copied in) into a copy of
     /// its own. Ordered most complete first, then best.
-    static func partition(_ tracks: [Track]) -> [RawCopy] {
+    public static func partition(_ tracks: [Track]) -> [RawCopy] {
         var order: [String] = []
         var groups: [String: [Track]] = [:]
         for t in tracks {

@@ -738,7 +738,7 @@ public extension LibraryDatabase {
         try writer.read { db in try Self.copyChoices(db) }
     }
 
-    static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
+    public static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
         var choices: [String: AlbumCopyChoice] = [:]
         for row in try Row.fetchAll(db, sql: "SELECT albumKey, copyId, bundled FROM albumCopyChoice") {
             let key: String = row["albumKey"], copy: String? = row["copyId"], bundled: Bool = row["bundled"]

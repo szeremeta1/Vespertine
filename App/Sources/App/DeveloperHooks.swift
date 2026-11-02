@@ -184,7 +184,7 @@ enum DeveloperHooks {
         }
         if d.bool(forKey: "VespertineOpenMini") { openWindow?(id: "mini") }
         if let play, let album = model.library.albums.first(where: { $0.title == play }) {
-            let tracks = model.library.tracks(albumKey: album.key)
+            let tracks = model.playableTracks(albumKey: album.key)
             model.player.play(tracks, startAt: d.integer(forKey: "VespertinePlayTrack"))
             if d.double(forKey: "VespertinePauseAfter") > 0 {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
@@ -203,7 +203,8 @@ enum DeveloperHooks {
                     && (parts.count < 4 || t.filePath.localizedCaseInsensitiveContains(parts[3]))   // e.g. ".iso"
             }
             if let song = model.library.allTracks().first(where: matches) {
-                let tracks = model.library.tracks(albumKey: song.albumKey)
+                // The copy of the album the song is in, so the queue goes on in that copy.
+                let tracks = model.library.albumCopies(albumKey: song.albumKey).copy(of: song)?.tracks ?? [song]
                 if d.string(forKey: "VespertineSidebar") == nil { model.openAlbum(song.albumKey) }   // else stay on that page
                 model.player.play(tracks, startAt: tracks.firstIndex { $0.id == song.id } ?? 0)
                 print("[qa] play song: \(song.displayAlbumArtist) — \(song.displayAlbum) — \(song.title) · \(song.formatSummary)")

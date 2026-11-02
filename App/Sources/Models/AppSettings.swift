@@ -65,6 +65,9 @@ final class AppSettings {
     var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
     /// Songs with a stereo and a multichannel version: which to play.
     var versionPreference: TrackVersions.Preference { didSet { defaults.set(versionPreference.rawValue, forKey: "versionPreference") } }
+    /// Albums in several copies (a download, a vinyl transfer, an Atmos mix) play as one, each song in the copy the
+    /// output supports best, unless an album has its own choice. Off by default: one copy plays and the others stay copies.
+    var bundleCopies: Bool { didSet { defaults.set(bundleCopies, forKey: "bundleCopies") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     /// The chosen output as last seen, to name it while it's unplugged and find it again under a new UID.
@@ -154,11 +157,12 @@ final class AppSettings {
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "bundleCopies": false,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
         versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
+        bundleCopies = defaults.bool(forKey: "bundleCopies")
         integerMode = defaults.bool(forKey: "integerMode")
         matchSixteenBit = defaults.bool(forKey: "matchSixteenBit")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")

@@ -161,8 +161,11 @@ final class PlayerController {
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
-    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) -> [QueueEntry] {
-        let versions = library.versions(of: tracks).enumerated().map { i, versions in
+    /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
+    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) -> [QueueEntry] {
+        // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
+        let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
+            if exactly.contains(tracks[i].location) { return [tracks[i]] }
             guard let allowing, versions.count > 1 else { return versions }
             return versions.filter { $0.location == tracks[i].location || allowing($0) }
         }
@@ -175,7 +178,8 @@ final class PlayerController {
             }
             // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
             let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
-            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal) ?? track : track
+            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal,
+                                                                   isPreferred: library.isPreferredCopy) ?? track : track
             return QueueEntry(item: makeItem(chosen), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }
@@ -188,7 +192,8 @@ final class PlayerController {
         var changed = false
         func resolve(_ entry: QueueEntry) -> QueueEntry {
             guard entry.versions.count > 1,
-                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
+                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) },
+                                                    isPreferred: library.isPreferredCopy),
                   chosen.id != entry.track.id else { return entry }
             changed = true
             return entry.replacing(chosen, item: makeItem(chosen, id: entry.id))
@@ -200,10 +205,11 @@ final class PlayerController {
     }
 
     /// Plays `tracks` from `index`. `shuffled` turns shuffle on (starting at a random song) or off (in order, as
-    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`: see `entries`.
-    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil) {
+    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`, `exactly`: see `entries`.
+    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil,
+              exactly: Set<String> = []) {
         guard !tracks.isEmpty else { return }
-        let entries = entries(tracks, allowing: allowing)
+        let entries = entries(tracks, allowing: allowing, exactly: exactly)
         guard !entries.isEmpty else { return }
         if let shuffled, shuffled != shuffle {
             settingShuffle = true
