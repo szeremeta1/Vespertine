@@ -170485,270 +170485,270 @@
         }
       }
     },
-    "Frames go to macOS untouched; Vespertine's meters don't apply": {
+    "Frames go to macOS untouched; the spectrum and channel meters don't apply, but the Visualizer shows the decoded bed": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ፍሬሞች ሳይነኩ ወደ macOS ይሄዳሉ፤ የVespertine መለኪያዎች አይሠሩም"
+            "value": "ፍሬሞች ሳይነኩ ወደ macOS ይሄዳሉ፤ ስፔክትረሙና የቻናል መለኪያዎች አይሠሩም፣ ነገር ግን ምስላዊ ማሳያው ዲኮድ የተደረገውን መሠረት ያሳያል"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تذهب الإطارات إلى macOS دون تعديل؛ لا تنطبق مقاييس Vespertine"
+            "value": "تذهب الإطارات إلى macOS دون تعديل؛ لا ينطبق الطيف ولا مقاييس القنوات، لكن المؤثرات المرئية تعرض القاعدة بعد فك ترميزها"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "অডিও ফ্রেম অপরিবর্তিত অবস্থায় macOS-এ যায়; Vespertine-এর মিটার প্রযোজ্য নয়"
+            "value": "অডিও ফ্রেম অপরিবর্তিত অবস্থায় macOS-এ যায়; স্পেকট্রাম ও চ্যানেল মিটার প্রযোজ্য নয়, তবে ভিজ্যুয়ালাইজার ডিকোড করা বেড দেখায়"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rámce jdou do macOS nedotčené; měřiče Vespertine se neuplatňují"
+            "value": "Rámce jdou do macOS nedotčené; spektrum a kanálové měřiče se neuplatňují, ale Vizualizér ukazuje dekódovaný základ"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames sendes uberørte til macOS; Vespertines målere gælder ikke"
+            "value": "Frames sendes uberørte til macOS; spektrum og kanalmålere gælder ikke, men Visualisering viser den afkodede base"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames gehen unverändert an macOS; Vespertines Pegelanzeigen gelten nicht"
+            "value": "Frames gehen unverändert an macOS; Spektrum und Kanal-Pegelanzeigen gelten nicht, aber der Visualizer zeigt das dekodierte Bed"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Τα πλαίσια ήχου πηγαίνουν ανέγγιχτα στο macOS· οι μετρητές του Vespertine δεν ισχύουν"
+            "value": "Τα πλαίσια ήχου πηγαίνουν ανέγγιχτα στο macOS· το φάσμα και οι μετρητές καναλιών δεν ισχύουν, αλλά ο Οπτικοποιητής δείχνει τα αποκωδικοποιημένα κανάλια βάσης"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las tramas llegan intactas a macOS; los medidores de Vespertine no se aplican"
+            "value": "Las tramas llegan intactas a macOS; el espectro y los medidores de canales no se aplican, pero el Visualizador muestra la base decodificada"
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "فریم‌ها دست‌نخورده به macOS می‌روند؛ نمایشگرهای سطح Vespertine اعمال نمی‌شوند"
+            "value": "فریم‌ها دست‌نخورده به macOS می‌روند؛ طیف و نمایشگرهای سطح کانال‌ها اعمال نمی‌شوند، اما نمایشگر تصویری بستر رمزگشایی‌شده را نشان می‌دهد"
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kehykset menevät macOS:lle koskemattomina; Vespertinen mittarit eivät ole käytössä"
+            "value": "Kehykset menevät macOS:lle koskemattomina; spektri ja kanavamittarit eivät ole käytössä, mutta Visualisoija näyttää puretun pohjan"
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pumupunta sa macOS ang mga frame nang hindi ginagalaw; hindi saklaw ng mga meter ng Vespertine"
+            "value": "Pumupunta sa macOS ang mga frame nang hindi ginagalaw; hindi saklaw ang spectrum at mga channel meter, pero ipinapakita ng Visualizer ang na-decode na bed"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les trames sont transmises intactes à macOS ; les indicateurs de niveau de Vespertine ne s’appliquent pas"
+            "value": "Les trames sont transmises intactes à macOS ; le spectre et les indicateurs de niveau des canaux ne s’appliquent pas, mais le Visualiseur montre le bed décodé"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "ઑડિયો ફ્રેમ અકબંધ રીતે macOS ને જાય છે; Vespertine નાં મીટર લાગુ પડતાં નથી"
+            "value": "ઑડિયો ફ્રેમ અકબંધ રીતે macOS ને જાય છે; સ્પેક્ટ્રમ અને ચૅનલ મીટર લાગુ પડતાં નથી, પણ વિઝ્યુઅલાઇઝર ડીકોડ કરેલો બેડ બતાવે છે"
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Firam suna zuwa macOS ba tare da an taɓa su ba; mita na Vespertine ba sa aiki"
+            "value": "Firam suna zuwa macOS ba tare da an taɓa su ba; bakan sauti da mita na tashoshi ba sa aiki, amma Mai nuna sauti yana nuna gadon da aka warware"
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "הפריימים מגיעים ל־macOS ללא שינוי; המדים של Vespertine אינם חלים"
+            "value": "הפריימים מגיעים ל־macOS ללא שינוי; הספקטרום ומדי הערוצים אינם חלים, אך הויזואלייזר מציג את הבסיס המפוענח"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "ऑडियो फ़्रेम बिना बदलाव के macOS तक जाते हैं; Vespertine के मीटर लागू नहीं होते"
+            "value": "ऑडियो फ़्रेम बिना बदलाव के macOS तक जाते हैं; स्पेक्ट्रम और चैनल मीटर लागू नहीं होते, लेकिन विज़ुअलाइज़र डिकोड किया हुआ बेड दिखाता है"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A keretek érintetlenül jutnak a macOS-hez; a Vespertine mérői nem érvényesek"
+            "value": "A keretek érintetlenül jutnak a macOS-hez; a spektrum és a csatornamérők nem érvényesek, de a Vizualizáló a dekódolt alapot mutatja"
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frame dikirim ke macOS tanpa diubah; meter Vespertine tidak berlaku"
+            "value": "Frame dikirim ke macOS tanpa diubah; spektrum dan meter saluran tidak berlaku, tetapi Visualizer menampilkan bed yang sudah didekode"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "I frame arrivano a macOS intatti; gli indicatori di livello di Vespertine non si applicano"
+            "value": "I frame arrivano a macOS intatti; lo spettro e gli indicatori di livello dei canali non si applicano, ma il Visualizzatore mostra il bed decodificato"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "フレームはそのままmacOSに渡されます。Vespertineのメーターは適用されません"
+            "value": "フレームはそのままmacOSに渡されます。スペクトラムとチャンネルメーターは適用されませんが、ビジュアライザはデコードしたベッドを表示します"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಆಡಿಯೋ ಫ್ರೇಮ್‌ಗಳು ಬದಲಾಗದೆ macOS ಗೆ ಹೋಗುತ್ತವೆ; Vespertine ನ ಮೀಟರ್‌ಗಳು ಅನ್ವಯಿಸುವುದಿಲ್ಲ"
+            "value": "ಆಡಿಯೋ ಫ್ರೇಮ್‌ಗಳು ಬದಲಾಗದೆ macOS ಗೆ ಹೋಗುತ್ತವೆ; ಸ್ಪೆಕ್ಟ್ರಮ್ ಮತ್ತು ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಅನ್ವಯಿಸುವುದಿಲ್ಲ, ಆದರೆ ದೃಶ್ಯೀಕರಣವು ಡೀಕೋಡ್ ಮಾಡಿದ ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತದೆ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "프레임은 그대로 macOS로 전달됨, Vespertine의 미터는 적용되지 않음"
+            "value": "프레임은 그대로 macOS로 전달됨, 스펙트럼과 채널 미터는 적용되지 않지만 비주얼라이저는 디코딩한 베드를 표시함"
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഫ്രെയിമുകൾ മാറ്റമില്ലാതെ macOS-ലേക്ക് പോകുന്നു; Vespertine-ന്റെ മീറ്ററുകൾ ബാധകമല്ല"
+            "value": "ഫ്രെയിമുകൾ മാറ്റമില്ലാതെ macOS-ലേക്ക് പോകുന്നു; സ്പെക്ട്രവും ചാനൽ മീറ്ററുകളും ബാധകമല്ല, എന്നാൽ വിഷ്വലൈസർ ഡീകോഡ് ചെയ്ത ബെഡ് കാണിക്കുന്നു"
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "ऑडिओ फ्रेम अपरिवर्तित स्वरूपात macOS कडे जातात; Vespertine चे मीटर लागू होत नाहीत"
+            "value": "ऑडिओ फ्रेम अपरिवर्तित स्वरूपात macOS कडे जातात; स्पेक्ट्रम आणि चॅनेल मीटर लागू होत नाहीत, पण व्हिज्युअलायझर डीकोड केलेला बेड दाखवतो"
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bingkai dihantar ke macOS tanpa diusik; meter Vespertine tidak terpakai"
+            "value": "Bingkai dihantar ke macOS tanpa diusik; spektrum dan meter saluran tidak terpakai, tetapi Pemvisual menunjukkan lapisan yang telah dinyahkod"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rammer sendes urørt til macOS; Vespertines målere gjelder ikke"
+            "value": "Rammer sendes urørt til macOS; spektrum og kanalmålere gjelder ikke, men Visualisering viser den dekodede basen"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames gaan onaangetast naar macOS; de meters van Vespertine gelden niet"
+            "value": "Frames gaan onaangetast naar macOS; het spectrum en de kanaalmeters gelden niet, maar de Visualizer toont het gedecodeerde bed"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਆਡੀਓ ਫ਼੍ਰੇਮ ਬਿਨਾਂ ਛੇੜੇ macOS ਨੂੰ ਜਾਂਦੇ ਹਨ; Vespertine ਦੇ ਮੀਟਰ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ"
+            "value": "ਆਡੀਓ ਫ਼੍ਰੇਮ ਬਿਨਾਂ ਛੇੜੇ macOS ਨੂੰ ਜਾਂਦੇ ਹਨ; ਸਪੈਕਟ੍ਰਮ ਅਤੇ ਚੈਨਲ ਮੀਟਰ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ, ਪਰ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਡੀਕੋਡ ਕੀਤਾ ਬੈੱਡ ਦਿਖਾਉਂਦਾ ਹੈ"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ramki trafiają do macOS nienaruszone; mierniki Vespertine nie mają zastosowania"
+            "value": "Ramki trafiają do macOS nienaruszone; widmo i mierniki kanałów nie mają zastosowania, ale Wizualizator pokazuje zdekodowaną podstawę kanałową"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Os quadros chegam intactos ao macOS; os medidores do Vespertine não se aplicam"
+            "value": "Os quadros chegam intactos ao macOS; o espectro e os medidores de canais não se aplicam, mas o Visualizador mostra a base decodificada"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "As tramas vão intactas para o macOS; os medidores do Vespertine não se aplicam"
+            "value": "As tramas vão intactas para o macOS; o espectro e os medidores de canais não se aplicam, mas o Visualizador mostra a base descodificada"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cadrele ajung neatinse la macOS; indicatoarele Vespertine nu se aplică"
+            "value": "Cadrele ajung neatinse la macOS; spectrul și indicatoarele canalelor nu se aplică, dar Vizualizatorul arată baza decodată"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ramarna går orörda till macOS; Vespertines mätare gäller inte"
+            "value": "Ramarna går orörda till macOS; spektrum och kanalmätare gäller inte, men Visualiserare visar den avkodade bädden"
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fremu huenda kwa macOS bila kuguswa; mita za Vespertine hazitumiki"
+            "value": "Fremu huenda kwa macOS bila kuguswa; masafa na mita za chaneli hazitumiki, lakini Kionyeshi huonyesha kitanda kilichosimbuliwa"
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "ஆடியோ ஃபிரேம்கள் மாற்றமின்றி macOS-க்குச் செல்கின்றன; Vespertine-இன் மீட்டர்கள் பொருந்தாது"
+            "value": "ஆடியோ ஃபிரேம்கள் மாற்றமின்றி macOS-க்குச் செல்கின்றன; ஸ்பெக்ட்ரமும் சேனல் மீட்டர்களும் பொருந்தாது, ஆனால் காட்சிப்படுத்தி டிகோட் செய்த படுகையைக் காட்டுகிறது"
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఆడియో ఫ్రేమ్‌లు మార్పు లేకుండా macOSకు వెళ్తాయి; Vespertine మీటర్‌లు వర్తించవు"
+            "value": "ఆడియో ఫ్రేమ్‌లు మార్పు లేకుండా macOSకు వెళ్తాయి; స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు వర్తించవు, కానీ విజువలైజర్ డీకోడ్ చేసిన బెడ్‌ను చూపుతుంది"
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "เฟรมส่งไปยัง macOS โดยไม่ถูกแตะต้อง มิเตอร์ของ Vespertine ไม่มีผล"
+            "value": "เฟรมส่งไปยัง macOS โดยไม่ถูกแตะต้อง สเปกตรัมและมิเตอร์ช่องสัญญาณไม่มีผล แต่ภาพเคลื่อนไหวตามเสียงจะแสดงช่องสัญญาณพื้นฐานที่ถอดรหัสแล้ว"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Çerçeveler macOS’e dokunulmadan gider; Vespertine’in ölçerleri geçerli değildir"
+            "value": "Çerçeveler macOS’e dokunulmadan gider; spektrum ve kanal ölçerleri geçerli değildir, ancak Görselleştirici kodu çözülmüş tabanı gösterir"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Аудіокадри надходять у macOS без змін; індикатори Vespertine не застосовуються"
+            "value": "Аудіокадри надходять у macOS без змін; спектр і індикатори каналів не застосовуються, але Візуалізатор показує декодовану основу"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "فریمز بغیر تبدیلی کے macOS کو جاتے ہیں؛ Vespertine کے میٹرز لاگو نہیں ہوتے"
+            "value": "فریمز بغیر تبدیلی کے macOS کو جاتے ہیں؛ اسپیکٹرم اور چینل میٹرز لاگو نہیں ہوتے، لیکن بصری نمائش ڈی کوڈ کیا ہوا بیڈ دکھاتی ہے"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Khung âm thanh được gửi nguyên vẹn đến macOS; đồng hồ đo của Vespertine không áp dụng"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "幀原封不動傳送至 macOS；Vespertine 的電平表不適用"
+            "value": "Khung âm thanh được gửi nguyên vẹn đến macOS; phổ và đồng hồ đo kênh không áp dụng, nhưng Trình hiển thị cho thấy lớp kênh nền đã giải mã"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "帧原样交给 macOS；Vespertine 的电平表不适用"
+            "value": "帧原样交给 macOS；频谱和声道电平表不适用，但可视化会显示解码后的声道床"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "訊框原封不動交給 macOS；Vespertine 的電平表不適用"
+            "value": "訊框原封不動交給 macOS；頻譜和聲道電平表不適用，但視覺效果會顯示解碼後的聲道床"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "幀原封不動傳送至 macOS；頻譜和聲道電平表不適用，但視覺效果會顯示解碼後的聲道床"
           }
         }
       }
@@ -211228,270 +211228,270 @@
         }
       }
     },
-    "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path and meters don't apply to these tracks.": {
+    "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path, spectrum and channel meters don't apply to these tracks. The Visualizer shows the decoded 5.1 or 7.1 bed instead, not the objects.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የራስ እንቅስቃሴን የሚከታተል Spatial Audio፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። የVespertine የራሱ የሲግናል መንገድና መለኪያዎች ለእነዚህ ትራኮች አይሠሩም።"
+            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የራስ እንቅስቃሴን የሚከታተል Spatial Audio፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። የVespertine የራሱ የሲግናል መንገድ፣ ስፔክትረምና የቻናል መለኪያዎች ለእነዚህ ትራኮች አይሠሩም። ይልቁንም ምስላዊ ማሳያው ዲኮድ የተደረገውን 5.1 ወይም 7.1 መሠረት ያሳያል፣ objectsን አይደለም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: صوت مكاني مع تتبع حركة الرأس على AirPods، وقنوات ارتفاع على جهاز متعدد القنوات. لا ينطبق مسار الإشارة والمقاييس الخاصة بـ Vespertine على هذه المقطوعات."
+            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: صوت مكاني مع تتبع حركة الرأس على AirPods، وقنوات ارتفاع على جهاز متعدد القنوات. لا ينطبق مسار الإشارة والطيف ومقاييس القنوات الخاصة بـ Vespertine على هذه المقطوعات. تعرض المؤثرات المرئية بدلًا من ذلك القاعدة 5.1 أو 7.1 بعد فك ترميزها، لا الكائنات."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ হেড-ট্র্যাকড স্পেশিয়াল অডিও, মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। Vespertine-এর নিজস্ব সিগন্যাল পাথ ও মিটার এই ট্র্যাকগুলোতে প্রযোজ্য নয়।"
+            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ হেড-ট্র্যাকড স্পেশিয়াল অডিও, মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। Vespertine-এর নিজস্ব সিগন্যাল পাথ, স্পেকট্রাম ও চ্যানেল মিটার এই ট্র্যাকগুলোতে প্রযোজ্য নয়। এর বদলে ভিজ্যুয়ালাইজার ডিকোড করা 5.1 বা 7.1 বেড দেখায়, অবজেক্ট নয়।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk se sledováním hlavy na AirPodech, výškové kanály na vícekanálovém zařízení. Vlastní signálová cesta a měřiče Vespertine se na tyto skladby nevztahují."
+            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk se sledováním hlavy na AirPodech, výškové kanály na vícekanálovém zařízení. Vlastní signálová cesta, spektrum a kanálové měřiče Vespertine se na tyto skladby nevztahují. Vizualizér místo toho ukazuje dekódovaný základ 5.1 nebo 7.1, ne objekty."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: rumlig lyd med hovedsporing på AirPods og højdekanaler på en flerkanalsenhed. Vespertines egen signalvej og målere gælder ikke for disse numre."
+            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: rumlig lyd med hovedsporing på AirPods og højdekanaler på en flerkanalsenhed. Vespertines egen signalvej, spektrum og kanalmålere gælder ikke for disse numre. Visualisering viser i stedet den afkodede 5.1- eller 7.1-base, ikke objekterne."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: 3D-Audio mit Kopfbewegungserkennung auf AirPods, Höhenkanäle auf einem Mehrkanalgerät. Vespertines eigener Signalweg und die Pegelanzeigen gelten für diese Titel nicht."
+            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: 3D-Audio mit Kopfbewegungserkennung auf AirPods, Höhenkanäle auf einem Mehrkanalgerät. Vespertines eigener Signalweg, das Spektrum und die Kanal-Pegelanzeigen gelten für diese Titel nicht. Der Visualizer zeigt stattdessen das dekodierte 5.1- oder 7.1-Bed, nicht die Objekte."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: Χωρικός ήχος με παρακολούθηση κεφαλής στα AirPods, κανάλια ύψους σε πολυκαναλική συσκευή. Η διαδρομή σήματος και οι μετρητές του Vespertine δεν ισχύουν για αυτά τα κομμάτια."
+            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: Χωρικός ήχος με παρακολούθηση κεφαλής στα AirPods, κανάλια ύψους σε πολυκαναλική συσκευή. Η διαδρομή σήματος, το φάσμα και οι μετρητές καναλιών του Vespertine δεν ισχύουν για αυτά τα κομμάτια. Ο Οπτικοποιητής δείχνει όμως τα αποκωδικοποιημένα κανάλια βάσης 5.1 ή 7.1, όχι τα αντικείμενα."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: audio espacial con seguimiento de la cabeza en los AirPods y canales de altura en un dispositivo multicanal. La ruta de señal y los medidores de Vespertine no se aplican a estas pistas."
+            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: audio espacial con seguimiento de la cabeza en los AirPods y canales de altura en un dispositivo multicanal. La ruta de señal, el espectro y los medidores de canales de Vespertine no se aplican a estas pistas. El Visualizador muestra en su lugar la base 5.1 o 7.1 decodificada, no los objetos."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: صدای فضایی با ردیابی سر روی AirPods، و کانال‌های ارتفاعی روی دستگاه چندکاناله. مسیر سیگنال و نمایشگرهای سطح خود Vespertine برای این قطعه‌ها اعمال نمی‌شوند."
+            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: صدای فضایی با ردیابی سر روی AirPods، و کانال‌های ارتفاعی روی دستگاه چندکاناله. مسیر سیگنال، طیف و نمایشگرهای سطح کانال‌های خود Vespertine برای این قطعه‌ها اعمال نمی‌شوند. نمایشگر تصویری به‌جای آن بستر ۵٫۱ یا ۷٫۱ رمزگشایی‌شده را نشان می‌دهد، نه اشیا را."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: pään liikkeitä seuraava tilaääni AirPodeissa, korkeuskanavat monikanavaisessa laitteessa. Vespertinen oma signaalipolku ja mittarit eivät koske näitä raitoja."
+            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: pään liikkeitä seuraava tilaääni AirPodeissa, korkeuskanavat monikanavaisessa laitteessa. Vespertinen oma signaalipolku, spektri ja kanavamittarit eivät koske näitä raitoja. Visualisoija näyttää sen sijaan puretun 5.1- tai 7.1-pohjan, ei objekteja."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: head-tracked na Spatial Audio sa AirPods, mga height channel sa multichannel na device. Hindi saklaw ng sariling signal path at mga meter ng Vespertine ang mga track na ito."
+            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: head-tracked na Spatial Audio sa AirPods, mga height channel sa multichannel na device. Hindi saklaw ng sariling signal path, spectrum at mga channel meter ng Vespertine ang mga track na ito. Sa halip, ipinapakita ng Visualizer ang na-decode na 5.1 o 7.1 na bed, hindi ang mga object."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : audio spatial avec suivi de la tête sur les AirPods, canaux d’élévation sur un appareil multicanal. Le chemin du signal et les indicateurs de niveau de Vespertine ne s’appliquent pas à ces morceaux."
+            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : audio spatial avec suivi de la tête sur les AirPods, canaux d’élévation sur un appareil multicanal. Le chemin du signal, le spectre et les indicateurs de niveau des canaux de Vespertine ne s’appliquent pas à ces morceaux. Le Visualiseur montre à la place le bed 5.1 ou 7.1 décodé, pas les objets."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર હેડ-ટ્રૅક થયેલો સ્પેશિયલ ઑડિયો, મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. Vespertine નો પોતાનો સિગ્નલ માર્ગ અને મીટર આ ટ્રૅકને લાગુ પડતાં નથી."
+            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર હેડ-ટ્રૅક થયેલો સ્પેશિયલ ઑડિયો, મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. Vespertine નો પોતાનો સિગ્નલ માર્ગ, સ્પેક્ટ્રમ અને ચૅનલ મીટર આ ટ્રૅકને લાગુ પડતાં નથી. તેના બદલે વિઝ્યુઅલાઇઝર ડીકોડ કરેલો 5.1 કે 7.1 બેડ બતાવે છે, ઑબ્જેક્ટ નહીં."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: Spatial Audio mai bin motsin kai a kan AirPods, tashoshin tsawo a na'ura mai tashoshi da yawa. Hanyar sigina da mita na Vespertine ba sa aiki kan waɗannan waƙoƙin."
+            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: Spatial Audio mai bin motsin kai a kan AirPods, tashoshin tsawo a na'ura mai tashoshi da yawa. Hanyar sigina, bakan sauti da mita na tashoshi na Vespertine ba sa aiki kan waɗannan waƙoƙin. Maimakon haka, Mai nuna sauti yana nuna gadon 5.1 ko 7.1 da aka warware, ba abubuwan ba."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: שמע מרחבי עם מעקב אחר תנועות הראש ב־AirPods, וערוצי גובה בהתקן רב־ערוצי. נתיב האות והמדים של Vespertine אינם חלים על רצועות אלה."
+            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: שמע מרחבי עם מעקב אחר תנועות הראש ב־AirPods, וערוצי גובה בהתקן רב־ערוצי. נתיב האות, הספקטרום ומדי הערוצים של Vespertine אינם חלים על רצועות אלה. במקומם הויזואלייזר מציג את בסיס 5.1 או 7.1 המפוענח, לא את האובייקטים."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर हेड-ट्रैक्ड स्पेशियल ऑडियो, मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। Vespertine का अपना सिग्नल पथ और मीटर इन ट्रैक पर लागू नहीं होते।"
+            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर हेड-ट्रैक्ड स्पेशियल ऑडियो, मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। Vespertine का अपना सिग्नल पथ, स्पेक्ट्रम और चैनल मीटर इन ट्रैक पर लागू नहीं होते। इसके बजाय विज़ुअलाइज़र डिकोड किया हुआ 5.1 या 7.1 बेड दिखाता है, ऑब्जेक्ट नहीं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: fejkövetéses térhatású hang AirPodson, magassági csatornák többcsatornás eszközön. A Vespertine saját jelútja és mérői ezekre a számokra nem vonatkoznak."
+            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: fejkövetéses térhatású hang AirPodson, magassági csatornák többcsatornás eszközön. A Vespertine saját jelútja, spektruma és csatornamérői ezekre a számokra nem vonatkoznak. A Vizualizáló ehelyett a dekódolt 5.1-es vagy 7.1-es alapot mutatja, nem az objektumokat."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Spasial dengan pelacakan kepala di AirPods, saluran ketinggian di perangkat multisaluran. Jalur sinyal dan meter Vespertine sendiri tidak berlaku untuk trek ini."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Spasial dengan pelacakan kepala di AirPods, saluran ketinggian di perangkat multisaluran. Jalur sinyal, spektrum, dan meter saluran Vespertine sendiri tidak berlaku untuk trek ini. Sebagai gantinya, Visualizer menampilkan bed 5.1 atau 7.1 yang sudah didekode, bukan objeknya."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: audio spaziale con rilevamento della testa su AirPods, canali di altezza su un dispositivo multicanale. Il percorso del segnale e gli indicatori di livello di Vespertine non si applicano a questi brani."
+            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: audio spaziale con rilevamento della testa su AirPods, canali di altezza su un dispositivo multicanale. Il percorso del segnale, lo spettro e gli indicatori di livello dei canali di Vespertine non si applicano a questi brani. Il Visualizzatore mostra invece il bed 5.1 o 7.1 decodificato, non gli oggetti."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではヘッドトラッキング付きの空間オーディオ、マルチチャンネルデバイスではハイトチャンネルになります。これらのトラックにはVespertine独自の信号経路とメーターは適用されません。"
+            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではヘッドトラッキング付きの空間オーディオ、マルチチャンネルデバイスではハイトチャンネルになります。これらのトラックにはVespertine独自の信号経路、スペクトラム、チャンネルメーターは適用されません。代わりにビジュアライザには、オブジェクトではなく、デコードした5.1または7.1のベッドが表示されます。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕ್ಡ್ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ, ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. Vespertine ನ ಸ್ವಂತ ಸಿಗ್ನಲ್ ಪಥ ಮತ್ತು ಮೀಟರ್‌ಗಳು ಈ ಟ್ರ್ಯಾಕ್‌ಗಳಿಗೆ ಅನ್ವಯಿಸುವುದಿಲ್ಲ."
+            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕ್ಡ್ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ, ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. Vespertine ನ ಸ್ವಂತ ಸಿಗ್ನಲ್ ಪಥ, ಸ್ಪೆಕ್ಟ್ರಮ್ ಮತ್ತು ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಈ ಟ್ರ್ಯಾಕ್‌ಗಳಿಗೆ ಅನ್ವಯಿಸುವುದಿಲ್ಲ. ಬದಲಿಗೆ ದೃಶ್ಯೀಕರಣವು ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನಲ್ಲ, ಡೀಕೋಡ್ ಮಾಡಿದ 5.1 ಅಥವಾ 7.1 ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತದೆ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 머리 추적 공간 음향으로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 이러한 트랙에는 Vespertine 자체의 신호 경로와 미터가 적용되지 않습니다."
+            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 머리 추적 공간 음향으로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 이러한 트랙에는 Vespertine 자체의 신호 경로, 스펙트럼, 채널 미터가 적용되지 않습니다. 대신 비주얼라이저는 오브젝트가 아니라 디코딩한 5.1 또는 7.1 베드를 표시합니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ ഹെഡ്-ട്രാക്ക് ചെയ്ത സ്പേഷ്യൽ ഓഡിയോ, മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. Vespertine-ന്റെ സ്വന്തം സിഗ്നൽ പാതയും മീറ്ററുകളും ഈ ട്രാക്കുകൾക്ക് ബാധകമല്ല."
+            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ ഹെഡ്-ട്രാക്ക് ചെയ്ത സ്പേഷ്യൽ ഓഡിയോ, മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. Vespertine-ന്റെ സ്വന്തം സിഗ്നൽ പാതയും സ്പെക്ട്രവും ചാനൽ മീറ്ററുകളും ഈ ട്രാക്കുകൾക്ക് ബാധകമല്ല. പകരം വിഷ്വലൈസർ ഒബ്ജക്റ്റുകളല്ല, ഡീകോഡ് ചെയ്ത 5.1 അല്ലെങ്കിൽ 7.1 ബെഡ് ആണ് കാണിക്കുന്നത്."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर हेड-ट्रॅक केलेला स्पेशियल ऑडिओ, मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. Vespertine चा स्वतःचा सिग्नल मार्ग आणि मीटर या ट्रॅकना लागू होत नाहीत."
+            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर हेड-ट्रॅक केलेला स्पेशियल ऑडिओ, मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. Vespertine चा स्वतःचा सिग्नल मार्ग, स्पेक्ट्रम आणि चॅनेल मीटर या ट्रॅकना लागू होत नाहीत. त्याऐवजी व्हिज्युअलायझर ऑब्जेक्ट्स नव्हे, तर डीकोड केलेला 5.1 किंवा 7.1 बेड दाखवतो."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Ruang dengan penjejakan kepala pada AirPods, saluran ketinggian pada peranti berbilang saluran. Laluan isyarat dan meter Vespertine sendiri tidak terpakai pada trek ini."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Ruang dengan penjejakan kepala pada AirPods, saluran ketinggian pada peranti berbilang saluran. Laluan isyarat, spektrum dan meter saluran Vespertine sendiri tidak terpakai pada trek ini. Sebaliknya, Pemvisual menunjukkan lapisan 5.1 atau 7.1 yang telah dinyahkod, bukan objek."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: romlig lyd med hodesporing på AirPods og høydekanaler på en flerkanalsenhet. Vespertines egen signalvei og målere gjelder ikke for disse sporene."
+            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: romlig lyd med hodesporing på AirPods og høydekanaler på en flerkanalsenhet. Vespertines egen signalvei, spektrum og kanalmålere gjelder ikke for disse sporene. Visualisering viser i stedet den dekodede 5.1- eller 7.1-basen, ikke objektene."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: ruimtelijke audio met hoofdtracking op AirPods, hoogtekanalen op een meerkanaalsapparaat. Het eigen signaalpad en de meters van Vespertine gelden niet voor deze nummers."
+            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: ruimtelijke audio met hoofdtracking op AirPods, hoogtekanalen op een meerkanaalsapparaat. Het eigen signaalpad, het spectrum en de kanaalmeters van Vespertine gelden niet voor deze nummers. De Visualizer toont in plaats daarvan het gedecodeerde 5.1- of 7.1-bed, niet de objecten."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ ਹੈੱਡ-ਟ੍ਰੈਕਡ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। Vespertine ਦਾ ਆਪਣਾ ਸਿਗਨਲ ਮਾਰਗ ਅਤੇ ਮੀਟਰ ਇਹਨਾਂ ਟਰੈਕਾਂ ’ਤੇ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ।"
+            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ ਹੈੱਡ-ਟ੍ਰੈਕਡ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। Vespertine ਦਾ ਆਪਣਾ ਸਿਗਨਲ ਮਾਰਗ, ਸਪੈਕਟ੍ਰਮ ਅਤੇ ਚੈਨਲ ਮੀਟਰ ਇਹਨਾਂ ਟਰੈਕਾਂ ’ਤੇ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ। ਇਸ ਦੀ ਥਾਂ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਆਬਜੈਕਟ ਨਹੀਂ, ਸਗੋਂ ਡੀਕੋਡ ਕੀਤਾ 5.1 ਜਾਂ 7.1 ਬੈੱਡ ਦਿਖਾਉਂਦਾ ਹੈ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods, kanały wysokości na urządzeniu wielokanałowym. Ścieżka sygnału i mierniki Vespertine nie dotyczą tych utworów."
+            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods, kanały wysokości na urządzeniu wielokanałowym. Ścieżka sygnału, widmo i mierniki kanałów Vespertine nie dotyczą tych utworów. Wizualizator pokazuje natomiast zdekodowaną podstawę kanałową 5.1 lub 7.1, a nie obiekty."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: Áudio Espacial com rastreamento de cabeça nos AirPods e canais de altura em um dispositivo multicanal. O caminho do sinal e os medidores do Vespertine não se aplicam a essas faixas."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: Áudio Espacial com rastreamento de cabeça nos AirPods e canais de altura em um dispositivo multicanal. O caminho do sinal, o espectro e os medidores de canais do Vespertine não se aplicam a essas faixas. O Visualizador mostra, em vez disso, a base 5.1 ou 7.1 decodificada, não os objetos."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: áudio espacial com seguimento da cabeça nos AirPods, canais de altura num dispositivo multicanal. O caminho do sinal e os medidores do Vespertine não se aplicam a estas faixas."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: áudio espacial com seguimento da cabeça nos AirPods, canais de altura num dispositivo multicanal. O caminho do sinal, o espectro e os medidores de canais do Vespertine não se aplicam a estas faixas. O Visualizador mostra, em vez disso, a base 5.1 ou 7.1 descodificada, não os objetos."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: Audio spațial cu urmărirea mișcării capului pe AirPods, canale de înălțime pe un dispozitiv multicanal. Calea semnalului și indicatoarele Vespertine nu se aplică acestor piese."
+            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: Audio spațial cu urmărirea mișcării capului pe AirPods, canale de înălțime pe un dispozitiv multicanal. Calea semnalului, spectrul și indicatoarele canalelor Vespertine nu se aplică acestor piese. În schimb, Vizualizatorul arată baza 5.1 sau 7.1 decodată, nu obiectele."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: rumsligt ljud med huvudspårning i AirPods, höjdkanaler på en flerkanalsenhet. Vespertines egen signalväg och mätare gäller inte för de här spåren."
+            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: rumsligt ljud med huvudspårning i AirPods, höjdkanaler på en flerkanalsenhet. Vespertines egen signalväg, spektrum och kanalmätare gäller inte för de här spåren. Visualiserare visar i stället den avkodade 5.1- eller 7.1-bädden, inte objekten."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, chaneli za kimo kwenye kifaa cha chaneli nyingi. Njia ya mawimbi na mita za Vespertine hazitumiki kwa nyimbo hizi."
+            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, chaneli za kimo kwenye kifaa cha chaneli nyingi. Njia ya mawimbi, masafa na mita za chaneli za Vespertine hazitumiki kwa nyimbo hizi. Badala yake, Kionyeshi huonyesha kitanda cha 5.1 au 7.1 kilichosimbuliwa, si vitu."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் தலை கண்காணிப்புடன் கூடிய ஸ்பேஷியல் ஆடியோ, மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். Vespertine-இன் சொந்த சிக்னல் பாதையும் மீட்டர்களும் இந்த டிராக்குகளுக்குப் பொருந்தாது."
+            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் தலை கண்காணிப்புடன் கூடிய ஸ்பேஷியல் ஆடியோ, மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். Vespertine-இன் சொந்த சிக்னல் பாதை, ஸ்பெக்ட்ரம், சேனல் மீட்டர்கள் இந்த டிராக்குகளுக்குப் பொருந்தாது. அதற்குப் பதிலாக காட்சிப்படுத்தி ஆப்ஜெக்ட்களை அல்ல, டிகோட் செய்த 5.1 அல்லது 7.1 படுகையைக் காட்டுகிறது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో హెడ్-ట్రాక్డ్ స్పేషియల్ ఆడియో, మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. Vespertine సొంత సిగ్నల్ పాత్, మీటర్‌లు ఈ ట్రాక్‌లకు వర్తించవు."
+            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో హెడ్-ట్రాక్డ్ స్పేషియల్ ఆడియో, మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. Vespertine సొంత సిగ్నల్ పాత్, స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు ఈ ట్రాక్‌లకు వర్తించవు. బదులుగా విజువలైజర్ ఆబ్జెక్ట్‌లను కాదు, డీకోడ్ చేసిన 5.1 లేదా 7.1 బెడ్‌ను చూపుతుంది."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: เสียงตามตำแหน่งที่ติดตามศีรษะบน AirPods และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณ เส้นทางสัญญาณและมิเตอร์ของ Vespertine เองจะไม่มีผลกับแทร็กเหล่านี้"
+            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: เสียงตามตำแหน่งที่ติดตามศีรษะบน AirPods และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณ เส้นทางสัญญาณ สเปกตรัม และมิเตอร์ช่องสัญญาณของ Vespertine เองจะไม่มีผลกับแทร็กเหล่านี้ ภาพเคลื่อนไหวตามเสียงจะแสดงช่องสัญญาณพื้นฐาน 5.1 หรือ 7.1 ที่ถอดรหัสแล้วแทน ไม่ใช่ออบเจ็กต์"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta baş takipli Uzamsal Ses, çok kanallı bir aygıtta yükseklik kanalları. Vespertine’in kendi sinyal yolu ve ölçerleri bu parçalar için geçerli değildir."
+            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta baş takipli Uzamsal Ses, çok kanallı bir aygıtta yükseklik kanalları. Vespertine’in kendi sinyal yolu, spektrumu ve kanal ölçerleri bu parçalar için geçerli değildir. Görselleştirici bunun yerine nesneleri değil, kodu çözülmüş 5.1 veya 7.1 tabanını gösterir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: просторове аудіо з відстеженням рухів голови на AirPods, канали висоти на багатоканальному пристрої. Власний шлях сигналу та індикатори Vespertine на ці треки не поширюються."
+            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: просторове аудіо з відстеженням рухів голови на AirPods, канали висоти на багатоканальному пристрої. Власний шлях сигналу, спектр та індикатори каналів Vespertine на ці треки не поширюються. Візуалізатор натомість показує декодовану основу 5.1 або 7.1, а не об’єкти."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر ہیڈ ٹریکنگ والا اسپیشل آڈیو، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ Vespertine کا اپنا سگنل پاتھ اور میٹرز ان ٹریکس پر لاگو نہیں ہوتے۔"
+            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر ہیڈ ٹریکنگ والا اسپیشل آڈیو، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ Vespertine کا اپنا سگنل پاتھ، اسپیکٹرم اور چینل میٹرز ان ٹریکس پر لاگو نہیں ہوتے۔ اس کے بجائے بصری نمائش آبجیکٹس کو نہیں، بلکہ ڈی کوڈ کیا ہوا 5.1 یا 7.1 بیڈ دکھاتی ہے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: Âm thanh không gian có theo dõi chuyển động đầu trên AirPods, kênh độ cao trên thiết bị đa kênh. Đường tín hiệu và đồng hồ đo của Vespertine không áp dụng cho các bản nhạc này."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上提供頭部追蹤空間音訊，在多聲道裝置上提供高度聲道。Vespertine 自己的訊號路徑和電平表不適用於這些曲目。"
+            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: Âm thanh không gian có theo dõi chuyển động đầu trên AirPods, kênh độ cao trên thiết bị đa kênh. Đường tín hiệu, phổ và đồng hồ đo kênh của Vespertine không áp dụng cho các bản nhạc này. Thay vào đó, Trình hiển thị cho thấy lớp kênh nền 5.1 hoặc 7.1 đã giải mã, không phải các đối tượng."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上提供带头部追踪的空间音频，在多声道设备上提供高度声道。Vespertine 自己的信号路径和电平表不适用于这些曲目。"
+            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上提供带头部追踪的空间音频，在多声道设备上提供高度声道。Vespertine 自己的信号路径、频谱和声道电平表不适用于这些曲目。可视化改为显示解码后的 5.1 或 7.1 声道床，而不是对象。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上提供具頭部追蹤的空間音訊，在多聲道裝置上提供高度聲道。Vespertine 本身的訊號路徑和電平表不適用於這些曲目。"
+            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上提供具頭部追蹤的空間音訊，在多聲道裝置上提供高度聲道。Vespertine 本身的訊號路徑、頻譜和聲道電平表不適用於這些曲目。視覺效果改為顯示解碼後的 5.1 或 7.1 聲道床，而不是物件。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上提供頭部追蹤空間音訊，在多聲道裝置上提供高度聲道。Vespertine 自己的訊號路徑、頻譜和聲道電平表不適用於這些曲目。視覺效果改為顯示解碼後的 5.1 或 7.1 聲道床，而不是物件。"
           }
         }
       }

@@ -34,7 +34,7 @@ Vespertine's output device panel showed the same facts: 6 channels, speakers L R
 
 ![5.1 DSD64 played to the Sony TV as DSD to PCM, with the decimation and sample-rate conversion named in the signal path and a six-channel readout](screenshots/multichannel-sony-tv-hdmi-dsd-to-pcm.png)
 
-**Dolby Atmos (tentative).** Elton John, "I'm Still Standing" (Dolby Digital Plus with Atmos, 5.1 bed) played with the badge **OBJECTS RENDERED BY MACOS**: the signal path shows macOS rendering the Atmos objects to the TV's own speaker layout, with the frames going to macOS untouched and Vespertine's meters not applying. The developer's note is that Atmos "also works, I think", so treat it as playing and unconfirmed by listening notes. It was **not** sent as a bitstream to the TV; Atmos bitstream to this device is not supported or tested.
+**Dolby Atmos (tentative).** Elton John, "I'm Still Standing" (Dolby Digital Plus with Atmos, 5.1 bed) played with the badge **OBJECTS RENDERED BY MACOS**: the signal path shows macOS rendering the Atmos objects to the TV's own speaker layout, with the frames going to macOS untouched and Vespertine's spectrum and channel meters not applying (the Visualizer, which draws the decoded Dolby bed, came later). The developer's note is that Atmos "also works, I think", so treat it as playing and unconfirmed by listening notes. It was **not** sent as a bitstream to the TV; Atmos bitstream to this device is not supported or tested.
 
 ![Dolby Atmos played to the Sony TV with objects rendered by macOS, the output's own speaker layout, and frames passed to macOS untouched](screenshots/multichannel-sony-tv-hdmi-atmos-macos-rendered.png)
 

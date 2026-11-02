@@ -362,7 +362,7 @@ struct SystemRenderingView: View {
                       value: rendering.spatial ? String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on")
                           : String(localized: "channels", comment: "Audio goes out as the output's channels"),
                       tone: rendering.spatial ? .changed : .plain),
-                .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; Vespertine's meters don't apply"),
+                .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; the spectrum and channel meters don't apply, but the Visualizer shows the decoded bed"),
                       value: String(localized: "system", comment: "The macOS system renderer handles this step")),
             ] + (bypassedEqualizer.map { [.init(title: String(localized: "Equalizer"), detail: "\($0) · \(EqualizerStatus.Bypass.systemRendered.explanation)",
                                                value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream"))] } ?? []))
