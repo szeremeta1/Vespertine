@@ -32,15 +32,18 @@ struct TransitionsButton: View {
     var size: CGFloat = 14
 
     var body: some View {
-        let on = model.settings.transitions.enabled
-        Button { model.toggleTransitions() } label: {
-            TransitionsGlyph().frame(width: size + 3, height: size + 3)
+        // Nothing at all while the feature is off in Settings.
+        if model.settings.transitionsFeature {
+            let on = model.settings.transitions.enabled
+            Button { model.toggleTransitions() } label: {
+                TransitionsGlyph().frame(width: size + 3, height: size + 3)
+            }
+            .buttonStyle(TransportIconStyle(active: on))
+            .help("Transitions (⌥⌘X)")
+            .contextMenu { TransitionsStyleMenu() }
+            .accessibilityLabel("Transitions")
+            .accessibilityValue(on ? String(localized: "On", comment: "Transitions state") : String(localized: "Off", comment: "Transitions state"))
         }
-        .buttonStyle(TransportIconStyle(active: on))
-        .help("Transitions (⌥⌘X)")
-        .contextMenu { TransitionsStyleMenu() }
-        .accessibilityLabel("Transitions")
-        .accessibilityValue(on ? String(localized: "On", comment: "Transitions state") : String(localized: "Off", comment: "Transitions state"))
     }
 }
 
@@ -119,51 +122,55 @@ struct TransitionsSettingsSection: View {
         @Bindable var s = model.settings
         let t = s.transitions
         Section("Transitions") {
-            Toggle("Transitions (⌥⌘X)", isOn: Binding(get: { model.settings.transitions.enabled }, set: { model.setTransitions($0) }))
-            Picker("Style", selection: $s.transitions.style) {
-                ForEach(TransitionStyle.allCases) { Text($0.label).tag($0) }
-            }
-            Text(styleNote(t.style)).font(.caption).foregroundStyle(.secondary)
-            Slider(value: $s.transitions.crossfadeSeconds, in: TransitionSettings.crossfadeRange, step: TransitionSettings.crossfadeStep) {
-                Text("Crossfade length: \(Self.seconds(t.crossfadeSeconds)) s")
-            }
-            Picker("Curve", selection: $s.transitions.curve) {
-                ForEach(TransitionCurve.allCases) { Text($0.name).tag($0) }
-            }
-            Picker("Skipping to another song", selection: $s.transitions.skip) {
-                ForEach(SkipTransition.allCases) { Text($0.label).tag($0) }
-            }
-            .disabled(t.style == .liveSet)
-            Toggle("Trim silence at the ends of songs", isOn: $s.transitions.trimSilence)
-                .disabled(t.isSmart)
-            Slider(value: $s.transitions.gapSeconds, in: TransitionSettings.gapRange, step: TransitionSettings.crossfadeStep) {
-                Text(t.gapSeconds > 0 ? String(localized: "Gap between songs: \(Self.seconds(t.gapSeconds)) s", comment: "Transitions setting: seconds of silence between songs instead of a crossfade.")
-                                      : String(localized: "Gap between songs: none", comment: "Transitions setting: no silence is put between songs."))
-            }
-            if t.style == .liveSet {
-                Picker("Live Set output rate", selection: $s.transitions.liveSetRate) {
-                    ForEach(TransitionSettings.liveSetRates, id: \.self) { rate in
-                        Text("\((rate / 1000).formatted(.number.precision(.fractionLength(0)))) kHz").tag(rate)
-                    }
+            Toggle("Transitions", isOn: Binding(get: { model.settings.transitionsFeature }, set: { model.setTransitionsFeature($0) }))
+            Text("Adds Crossfade, Smart Mix and Live Set, with controls in the transport bar, menus and Shortcuts. Off, none of it is in the app and every song plays as before.")
+                .font(.caption).foregroundStyle(.secondary)
+            if s.transitionsFeature {
+                Picker("Style", selection: $s.transitions.style) {
+                    ForEach(TransitionStyle.allCases) { Text($0.label).tag($0) }
                 }
-                Toggle("Beat-matched blends", isOn: $s.transitions.beatBlends)
-                Toggle("Bass swap in beat-matched blends", isOn: $s.transitions.bassSwap)
-                    .disabled(!t.beatBlends)
-                Text("Live Set plays every song at one output rate, so a change of rate never gaps. Songs with steady, matching beats in the library’s analysis blend beat on beat, over 16 or 8 beats; the others blend as in Smart Mix.")
+                Text(styleNote(t.style)).font(.caption).foregroundStyle(.secondary)
+                Slider(value: $s.transitions.crossfadeSeconds, in: TransitionSettings.crossfadeRange, step: TransitionSettings.crossfadeStep) {
+                    Text("Crossfade length: \(Self.seconds(t.crossfadeSeconds)) s")
+                }
+                Picker("Curve", selection: $s.transitions.curve) {
+                    ForEach(TransitionCurve.allCases) { Text($0.name).tag($0) }
+                }
+                Picker("Skipping to another song", selection: $s.transitions.skip) {
+                    ForEach(SkipTransition.allCases) { Text($0.label).tag($0) }
+                }
+                .disabled(t.style == .liveSet)
+                Toggle("Trim silence at the ends of songs", isOn: $s.transitions.trimSilence)
+                    .disabled(t.isSmart)
+                Slider(value: $s.transitions.gapSeconds, in: TransitionSettings.gapRange, step: TransitionSettings.crossfadeStep) {
+                    Text(t.gapSeconds > 0 ? String(localized: "Gap between songs: \(Self.seconds(t.gapSeconds)) s", comment: "Transitions setting: seconds of silence between songs instead of a crossfade.")
+                                          : String(localized: "Gap between songs: none", comment: "Transitions setting: no silence is put between songs."))
+                }
+                if t.style == .liveSet {
+                    Picker("Live Set output rate", selection: $s.transitions.liveSetRate) {
+                        ForEach(TransitionSettings.liveSetRates, id: \.self) { rate in
+                            Text("\((rate / 1000).formatted(.number.precision(.fractionLength(0)))) kHz").tag(rate)
+                        }
+                    }
+                    Toggle("Beat-matched blends", isOn: $s.transitions.beatBlends)
+                    Toggle("Bass swap in beat-matched blends", isOn: $s.transitions.bassSwap)
+                        .disabled(!t.beatBlends)
+                    Text("Live Set plays every song at one output rate, so a change of rate never gaps. Songs with steady, matching beats in the library’s analysis blend beat on beat, over 16 or 8 beats; the others blend as in Smart Mix.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Picker("When a transition needs a change to the signal", selection: $s.transitions.policy) {
+                    ForEach(TransitionPolicy.allCases) { Text($0.label).tag($0) }
+                }
+                Text("Bit-perfect first never changes the output format: songs at another rate fade out and in, and DSD, integer and 16-bit output play without transitions. Transitions first resamples, plays DSD as PCM and turns integer and 16-bit output off while transitions are on.")
+                    .font(.caption).foregroundStyle(.secondary)
+                LabeledContent("Genres that play without transitions") {
+                    TextField("Genres that play without transitions", text: $genres)
+                        .labelsHidden()
+                        .onSubmit { applyGenres() }
+                }
+                Text("Separate genres with commas. Albums, CUE sheets and SACDs always play gaplessly. A playlist can have its own transitions, in its menu in the sidebar.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            Picker("When a transition needs a change to the signal", selection: $s.transitions.policy) {
-                ForEach(TransitionPolicy.allCases) { Text($0.label).tag($0) }
-            }
-            Text("Bit-perfect first never changes the output format: songs at another rate fade out and in, and DSD, integer and 16-bit output play without transitions. Transitions first resamples, plays DSD as PCM and turns integer and 16-bit output off while transitions are on.")
-                .font(.caption).foregroundStyle(.secondary)
-            LabeledContent("Genres that play without transitions") {
-                TextField("Genres that play without transitions", text: $genres)
-                    .labelsHidden()
-                    .onSubmit { applyGenres() }
-            }
-            Text("Separate genres with commas. Albums, CUE sheets and SACDs always play gaplessly. A playlist can have its own transitions, in its menu in the sidebar.")
-                .font(.caption).foregroundStyle(.secondary)
         }
         .onAppear { genres = model.settings.transitions.excludedGenres.joined(separator: ", ") }
         .onDisappear { applyGenres() }
@@ -218,6 +225,10 @@ struct PlaylistTransitionsMenu: View {
     let playlist: Playlist
 
     var body: some View {
+        if model.settings.transitionsFeature { menu }
+    }
+
+    @ViewBuilder private var menu: some View {
         let chosen = playlist.id.flatMap { model.library.playlistTransitions[$0] }
         let length = model.settings.transitions.crossfadeSeconds
         Picker("Transitions", selection: Binding(get: { Choice(chosen) }, set: { model.library.setTransitions($0.override(length: length), for: playlist) })) {

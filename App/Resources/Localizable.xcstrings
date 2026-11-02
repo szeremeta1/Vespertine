@@ -71608,6 +71608,275 @@
         }
       }
     },
+    "Adds Crossfade, Smart Mix and Live Set, with controls in the transport bar, menus and Shortcuts. Off, none of it is in the app and every song plays as before.": {
+      "comment": "Settings › Playback › Transitions: the caption under the switch that brings Crossfade, Smart Mix and Live Set into the app.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ክሮስፌድ፣ ስማርት ሚክስ እና Live Set ያክላል፤ መቆጣጠሪያዎቹ በማጫወቻ አሞሌ፣ በምናሌዎች እና በShortcuts ውስጥ ይታያሉ። ሲጠፋ ከእነዚህ ውስጥ አንዳቸውም በመተግበሪያው ውስጥ አይኖሩም፤ ሁሉም ዘፈን እንደ ቀድሞው ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يضيف Crossfade وSmart Mix وLive Set، مع عناصر تحكم في شريط التشغيل والقوائم وShortcuts. عند الإيقاف لا يظهر أي منها في التطبيق وتُشغَّل كل أغنية كما كانت."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix ও Live Set যোগ করে; নিয়ন্ত্রণগুলো ট্রান্সপোর্ট বার, মেনু ও Shortcuts-এ থাকে। বন্ধ থাকলে এগুলোর কিছুই অ্যাপে থাকে না এবং প্রতিটি গান আগের মতোই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přidá Crossfade, Smart Mix a Live Set s ovládáním v panelu přehrávání, v nabídkách a v Zkratkách. Když je vypnuto, nic z toho v aplikaci není a každá skladba hraje jako dřív."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilføjer Crossfade, Smart Mix og Live Set med betjening i afspilningslinjen, menuerne og Genveje. Slået fra er intet af det i appen, og hver sang afspilles som før."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fügt Crossfade, Smart Mix und Live Set hinzu, mit Bedienelementen in der Transportleiste, in den Menüs und in Kurzbefehle. Ausgeschaltet ist nichts davon in der App, und jeder Song spielt wie zuvor."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Προσθέτει Crossfade, Smart Mix και Live Set, με χειριστήρια στη γραμμή αναπαραγωγής, στα μενού και στις Συντομεύσεις. Όταν είναι απενεργοποιημένο, τίποτα από αυτά δεν υπάρχει στην εφαρμογή και κάθε τραγούδι παίζει όπως πριν."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añade Crossfade, Smart Mix y Live Set, con controles en la barra de reproducción, los menús y Atajos. Desactivado, nada de esto aparece en la app y cada canción suena como antes."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade، Smart Mix و Live Set را اضافه می‌کند، با کنترل‌هایی در نوار پخش، منوها و Shortcuts. وقتی خاموش باشد، هیچ‌کدام در برنامه نیست و هر آهنگ مثل قبل پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisää Crossfaden, Smart Mixin ja Live Setin sekä niiden hallinnat soittopalkkiin, valikoihin ja Oikoteihin. Pois päältä mitään niistä ei ole sovelluksessa, ja jokainen kappale soi kuten ennenkin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagdaragdag ng Crossfade, Smart Mix at Live Set, na may mga kontrol sa transport bar, mga menu at Shortcuts. Kapag naka-off, wala sa mga ito ang nasa app at tumutugtog ang bawat kanta tulad ng dati."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajoute Crossfade, Smart Mix et Live Set, avec des commandes dans la barre de lecture, les menus et Raccourcis. Désactivé, rien de tout cela n’est dans l’app et chaque morceau joue comme avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix અને Live Set ઉમેરે છે, નિયંત્રણો ટ્રાન્સપોર્ટ બાર, મેનુ અને Shortcuts માં. બંધ હોય ત્યારે તેમાંનું કંઈ ઍપમાં હોતું નથી અને દરેક ગીત પહેલાની જેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana ƙara Crossfade, Smart Mix da Live Set, tare da maɓallan sarrafawa a sandar kunnawa, menu da Shortcuts. Idan a kashe yake, babu ɗayansu a cikin manhajar kuma kowace waƙa tana kunnawa kamar da."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מוסיף Crossfade, Smart Mix ו-Live Set, עם פקדים בסרגל הנגינה, בתפריטים וב-Shortcuts. כשהאפשרות כבויה, שום דבר מזה אינו באפליקציה וכל שיר מתנגן כמו קודם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix और Live Set जोड़ता है, जिनके नियंत्रण ट्रांसपोर्ट बार, मेनू और Shortcuts में होते हैं। बंद होने पर इनमें से कुछ भी ऐप में नहीं होता और हर गाना पहले की तरह बजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hozzáadja a Crossfade, Smart Mix és Live Set funkciókat, vezérlőkkel a lejátszósávban, a menükben és a Parancsikonokban. Kikapcsolva ezekből semmi sincs az appban, és minden dal úgy szól, mint eddig."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menambahkan Crossfade, Smart Mix, dan Live Set, dengan kontrol di bilah transport, menu, dan Pintasan. Saat mati, tidak satu pun ada di app dan setiap lagu diputar seperti sebelumnya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiunge Crossfade, Smart Mix e Live Set, con i comandi nella barra di riproduzione, nei menu e in Comandi rapidi. Disattivato, nulla di tutto ciò è nell’app e ogni brano suona come prima."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade、Smart Mix、Live Set を追加し、操作をトランスポートバー、メニュー、ショートカットに表示します。オフのときはどれもアプリに現れず、どの曲も今までどおり再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix ಮತ್ತು Live Set ಸೇರಿಸುತ್ತದೆ; ನಿಯಂತ್ರಣಗಳು ಟ್ರಾನ್ಸ್‌ಪೋರ್ಟ್ ಬಾರ್, ಮೆನುಗಳು ಮತ್ತು Shortcuts ನಲ್ಲಿರುತ್ತವೆ. ಆಫ್ ಆಗಿದ್ದಾಗ ಅವುಗಳಲ್ಲಿ ಯಾವುದೂ ಆ್ಯಪ್‌ನಲ್ಲಿ ಇರುವುದಿಲ್ಲ ಮತ್ತು ಪ್ರತಿ ಹಾಡು ಮೊದಲಿನಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix, Live Set을 추가하며, 컨트롤은 재생 막대, 메뉴, 단축어에 나타납니다. 끄면 이 중 어느 것도 앱에 없고 모든 곡이 이전과 똑같이 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix, Live Set എന്നിവ ചേർക്കുന്നു; നിയന്ത്രണങ്ങൾ ട്രാൻസ്പോർട്ട് ബാർ, മെനുകൾ, Shortcuts എന്നിവയിൽ. ഓഫ് ആയിരിക്കുമ്പോൾ ഇവയൊന്നും ആപ്പിൽ ഉണ്ടാകില്ല, ഓരോ പാട്ടും മുമ്പത്തെപ്പോലെ പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix आणि Live Set जोडते; नियंत्रणे ट्रान्सपोर्ट बार, मेनू आणि Shortcuts मध्ये असतात. बंद असताना यातील काहीही ॲपमध्ये नसते आणि प्रत्येक गाणे पूर्वीसारखेच वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menambah Crossfade, Smart Mix dan Live Set, dengan kawalan dalam bar transport, menu dan Pintasan. Apabila dimatikan, tiada satu pun ada dalam apl dan setiap lagu dimainkan seperti sebelumnya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legger til Crossfade, Smart Mix og Live Set, med kontroller i avspillingslinjen, menyene og Snarveier. Slått av er ingenting av det i appen, og hver sang spilles som før."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voegt Crossfade, Smart Mix en Live Set toe, met bediening in de afspeelbalk, de menu’s en Opdrachten. Uitgeschakeld is niets daarvan in de app en klinkt elk nummer zoals voorheen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix ਅਤੇ Live Set ਜੋੜਦਾ ਹੈ, ਨਿਯੰਤਰਣ ਟ੍ਰਾਂਸਪੋਰਟ ਬਾਰ, ਮੀਨੂ ਅਤੇ Shortcuts ਵਿੱਚ। ਬੰਦ ਹੋਣ 'ਤੇ ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕੁਝ ਵੀ ਐਪ ਵਿੱਚ ਨਹੀਂ ਹੁੰਦਾ ਅਤੇ ਹਰ ਗੀਤ ਪਹਿਲਾਂ ਵਾਂਗ ਵੱਜਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dodaje Crossfade, Smart Mix i Live Set, ze sterowaniem na pasku odtwarzania, w menu i w Skrótach. Po wyłączeniu nic z tego nie ma w aplikacji, a każdy utwór gra jak dotąd."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiciona Crossfade, Smart Mix e Live Set, com controles na barra de reprodução, nos menus e em Atalhos. Desativado, nada disso aparece no app e cada música toca como antes."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adiciona Crossfade, Smart Mix e Live Set, com controlos na barra de reprodução, nos menus e em Atalhos. Desativado, nada disto aparece na app e cada música toca como antes."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaugă Crossfade, Smart Mix și Live Set, cu comenzi în bara de redare, în meniuri și în Comenzi rapide. Dezactivat, nimic din toate acestea nu e în aplicație, iar fiecare piesă se redă ca înainte."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägger till Crossfade, Smart Mix och Live Set, med kontroller i spelfältet, menyerna och Genvägar. När det är av finns inget av det i appen, och varje låt spelas som förut."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huongeza Crossfade, Smart Mix na Live Set, zikiwa na vidhibiti kwenye upau wa kucheza, menyu na Njia za mkato. Ikizimwa, hakuna kati ya hivyo kilicho kwenye programu na kila wimbo unachezwa kama awali."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix, Live Set ஆகியவற்றைச் சேர்க்கிறது; கட்டுப்பாடுகள் டிரான்ஸ்போர்ட் பார், மெனுக்கள், Shortcuts இல் இருக்கும். முடக்கினால் இவற்றில் எதுவும் ஆப்ஸில் இருக்காது; ஒவ்வொரு பாடலும் முன்பு போலவே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix, Live Set జోడిస్తుంది; నియంత్రణలు ట్రాన్స్‌పోర్ట్ బార్, మెనూలు, Shortcuts లో ఉంటాయి. ఆఫ్‌లో ఉన్నప్పుడు వీటిలో ఏదీ యాప్‌లో ఉండదు, ప్రతి పాట ముందులాగే ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพิ่ม Crossfade, Smart Mix และ Live Set พร้อมตัวควบคุมในแถบเล่น เมนู และคำสั่งลัด เมื่อปิด จะไม่มีสิ่งเหล่านี้ในแอปเลย และทุกเพลงเล่นเหมือนเดิม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade, Smart Mix ve Live Set ekler; denetimler oynatma çubuğunda, menülerde ve Kestirmeler’de yer alır. Kapalıyken bunların hiçbiri uygulamada olmaz ve her şarkı eskisi gibi çalar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Додає Crossfade, Smart Mix і Live Set з елементами керування в панелі відтворення, меню та Швидких командах. Коли вимкнено, нічого з цього немає в застосунку, а кожна пісня звучить як раніше."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crossfade، Smart Mix اور Live Set شامل کرتا ہے، جن کے کنٹرول ٹرانسپورٹ بار، مینیوز اور Shortcuts میں ہوتے ہیں۔ بند ہونے پر ان میں سے کچھ بھی ایپ میں نہیں ہوتا اور ہر گانا پہلے کی طرح چلتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm Crossfade, Smart Mix và Live Set, với các nút điều khiển trên thanh phát, trong menu và Phím tắt. Khi tắt, không có gì trong số đó xuất hiện trong ứng dụng và mọi bài hát phát như trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入 Crossfade、Smart Mix 同 Live Set，控制項位於播放列、選單同捷徑入面。關閉時，App 入面冇其中任何一項，每首歌嘅播放同以往完全一樣。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Crossfade、Smart Mix 和 Live Set，控件位于播放栏、菜单和快捷指令中。关闭时，应用里没有其中任何一项，每首歌的播放与以前完全一样。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入 Crossfade、Smart Mix 與 Live Set，控制項位於播放列、選單與捷徑中。關閉時，App 中不會有其中任何一項，每首歌的播放與以往完全相同。"
+          }
+        }
+      }
+    },
     "Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files.": {
       "localizations": {
         "am": {
@@ -377856,6 +378125,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "轉場風格"
+          }
+        }
+      }
+    },
+    "Transitions are off in Vespertine’s Settings.": {
+      "comment": "Shortcuts error: a Transitions action was run while the feature is switched off in Settings.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሽግግሮች በVespertine ቅንብሮች ውስጥ ጠፍተዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الانتقالات متوقفة في إعدادات Vespertine."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine-এর সেটিংসে ট্রানজিশন বন্ধ আছে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přechody jsou vypnuté v nastavení Vespertine."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgange er slået fra i Vespertines indstillinger."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übergänge sind in den Einstellungen von Vespertine ausgeschaltet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι μεταβάσεις είναι απενεργοποιημένες στις Ρυθμίσεις του Vespertine."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las transiciones están desactivadas en los Ajustes de Vespertine."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گذارها در تنظیمات Vespertine خاموش هستند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siirtymät ovat pois päältä Vespertinen asetuksissa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-off ang mga transition sa Mga Setting ng Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les transitions sont désactivées dans les Réglages de Vespertine."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ની સેટિંગ્સમાં ટ્રાન્ઝિશન બંધ છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kashe sauye-sauye a Saitunan Vespertine."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המעברים כבויים בהגדרות של Vespertine."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine की सेटिंग्स में ट्रांज़िशन बंद हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az átmenetek ki vannak kapcsolva a Vespertine beállításaiban."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transisi dimatikan di Pengaturan Vespertine."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le transizioni sono disattivate nelle Impostazioni di Vespertine."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トランジションは Vespertine の設定でオフになっています。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಟ್ರಾನ್ಸಿಷನ್‌ಗಳು ಆಫ್ ಆಗಿವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전환이 Vespertine 설정에서 꺼져 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ക്രമീകരണങ്ങളിൽ ട്രാൻസിഷനുകൾ ഓഫാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine च्या सेटिंग्जमध्ये ट्रान्झिशन बंद आहेत."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peralihan dimatikan dalam Tetapan Vespertine."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overganger er slått av i innstillingene til Vespertine."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overgangen staan uit in de instellingen van Vespertine."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਦੀਆਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਟ੍ਰਾਂਜ਼ੀਸ਼ਨ ਬੰਦ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejścia są wyłączone w ustawieniach Vespertine."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As transições estão desativadas nos Ajustes do Vespertine."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As transições estão desativadas nas Definições do Vespertine."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tranzițiile sunt dezactivate în Setările Vespertine."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Övergångar är avstängda i Vespertines inställningar."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mipito imezimwa katika Mipangilio ya Vespertine."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine அமைப்புகளில் டிரான்சிஷன்கள் அணைக்கப்பட்டுள்ளன."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine సెట్టింగ్‌లలో ట్రాన్సిషన్‌లు ఆఫ్‌లో ఉన్నాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเปลี่ยนเพลงปิดอยู่ในการตั้งค่าของ Vespertine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçişler Vespertine Ayarları’nda kapalı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переходи вимкнено в налаштуваннях Vespertine."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine کی سیٹنگز میں ٹرانزیشنز بند ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển tiếp đang tắt trong Cài đặt của Vespertine."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場已喺 Vespertine 設定中關閉。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "过渡已在 Vespertine 设置中关闭。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轉場已在 Vespertine 設定中關閉。"
           }
         }
       }

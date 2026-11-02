@@ -28,7 +28,18 @@ enum TransitionStyleOption: String, AppEnum, CaseIterable {
 }
 
 struct TransitionsIntentError: Error, CustomLocalizedStringResourceConvertible {
-    var localizedStringResource: LocalizedStringResource { "Vespertine’s library isn’t open." }
+    var featureOff = false
+    var localizedStringResource: LocalizedStringResource {
+        featureOff ? "Transitions are off in Vespertine’s Settings." : "Vespertine’s library isn’t open."
+    }
+}
+
+/// The model, only while the Transitions feature is on in Settings; off, these actions do nothing at all.
+@MainActor
+private func transitionsModel() throws -> AppModel {
+    guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+    guard model.settings.transitionsFeature else { throw TransitionsIntentError(featureOff: true) }
+    return model
 }
 
 /// Turns transitions on or off, as Controls › Transitions does.
@@ -42,7 +53,7 @@ struct SetTransitionsIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        let model = try transitionsModel()
         model.setTransitions(on)
         return .result()
     }
@@ -59,7 +70,7 @@ struct UseTransitionStyleIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        let model = try transitionsModel()
         model.settings.transitions.style = style.style
         model.setTransitions(true)
         return .result()
@@ -74,7 +85,7 @@ struct StartLiveSetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        let model = try transitionsModel()
         model.settings.transitions.style = .liveSet
         model.setTransitions(true)
         return .result()
@@ -89,7 +100,7 @@ struct StopLiveSetIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        guard let model = LibraryStartup.current?.model else { throw TransitionsIntentError() }
+        let model = try transitionsModel()
         if model.settings.transitions.style == .liveSet { model.setTransitions(false) }
         return .result()
     }

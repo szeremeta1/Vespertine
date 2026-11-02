@@ -423,7 +423,7 @@ final class PlayerController {
     /// How `entry` joins the song before it in the queue, while transitions are on: what the engine planned for the
     /// boundary after the song playing, else what can be told before the songs are opened (albums, genres, playlists).
     func join(before entry: QueueEntry) -> TransitionDecision? {
-        guard settings.transitions.enabled, let i = queue.firstIndex(where: { $0.id == entry.id }), i > 0 else { return nil }
+        guard settings.transitionsOn, let i = queue.firstIndex(where: { $0.id == entry.id }), i > 0 else { return nil }
         let previous = queue[i - 1]
         if previous.id == current?.id, let planned = signalPath?.transition?.next { return planned }
         return TransitionPlanner.decide(settings.transitions, from: previous.item, format: .unknown, to: entry.item, format: .unknown)

@@ -30,6 +30,25 @@ struct TransitionsTests {
         #expect(defaults.object(forKey: TransitionSettings.defaultsKey) == nil)
     }
 
+    @Test("The feature is off for a new install and an upgrade; off, a stored playback switch does nothing and nothing is written")
+    func featureOffByDefault() throws {
+        let (root, defaults, suite) = try scratch()
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        defaults.set(true, forKey: "setupCompleted")
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(!settings.transitionsFeature && !settings.transitionsOn)
+        #expect(defaults.object(forKey: "transitionsFeature") == nil)
+        // A playback switch left on in a stored value still does nothing without the feature.
+        var stored = TransitionSettings()
+        stored.setEnabled(true)
+        stored.save(to: defaults)
+        let again = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(again.transitions.enabled && !again.transitionsOn)
+        #expect(again.engineSettings() == AppSettings(defaults: UserDefaults(suiteName: suite + ".other")!, dataDirectory: root).engineSettings())
+        again.transitionsFeature = true
+        #expect(AppSettings(defaults: defaults, dataDirectory: root).transitionsOn)
+    }
+
     @Test("What's chosen is kept across launches")
     func persists() throws {
         let (root, defaults, suite) = try scratch()
@@ -66,6 +85,13 @@ struct TransitionsTests {
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         let before = settings.engineSettings()
         #expect(before.transitions == TransitionSettings())
+        // The feature switch in Settings is what makes the playback switch count: without it, nothing reaches the engine.
+        settings.transitions.setEnabled(true)
+        settings.transitions.style = .liveSet
+        #expect(!settings.transitionsOn && settings.engineSettings() == before)
+        settings.transitions.setEnabled(false)
+        settings.transitions.style = TransitionSettings().style
+        settings.transitionsFeature = true
         for style in TransitionStyle.allCases {
             for curve in TransitionCurve.allCases {
                 for skip in SkipTransition.allCases {

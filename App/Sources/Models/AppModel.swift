@@ -395,11 +395,25 @@ final class AppModel {
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
     /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
     func setTransitions(_ on: Bool) {
+        guard settings.transitionsFeature else { return }
         if settings.transitions.setEnabled(on) { showTransitionsExplainer = true }
         syncEngine()
     }
 
     func toggleTransitions() { setTransitions(!settings.transitions.enabled) }
+
+    /// The Settings switch that brings transitions into the app (or removes them). Turning it on starts them on, with
+    /// the note; turning it off puts the playback switch away too and the engine gets today's settings.
+    func setTransitionsFeature(_ on: Bool) {
+        settings.transitionsFeature = on
+        if on {
+            if settings.transitions.setEnabled(true) { showTransitionsExplainer = true }
+        } else {
+            _ = settings.transitions.setEnabled(false)
+            showTransitionsExplainer = false
+        }
+        syncEngine()
+    }
 
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {

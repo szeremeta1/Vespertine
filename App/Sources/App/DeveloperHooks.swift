@@ -93,7 +93,7 @@ enum DeveloperHooks {
         // `-VespertineOpenSheet transitions`: the note shown the first time transitions are turned on (nothing is changed).
         if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
         if d.string(forKey: "VespertineOpenSheet")?.hasPrefix("loopback") == true { model.showLoopbackTest = true }   // loopback-run also starts it
-        if d.string(forKey: "VespertineOpenSheet") == "transitions" { model.showTransitionsExplainer = true }
+        if d.string(forKey: "VespertineOpenSheet") == "transitions", model.settings.transitionsFeature { model.showTransitionsExplainer = true }
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
         // whatever frame the window last saved.
         if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
