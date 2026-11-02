@@ -40,6 +40,9 @@ public struct EngineSnapshot: Sendable {
     public var bufferFill: Double = 0
     /// Set while macOS itself renders the track (Dolby Atmos); there's no Vespertine signal path then.
     public var systemRendering: SystemRendering?
+    /// The channels of the bed Vespertine decodes beside the output while macOS renders the track or a receiver gets it
+    /// as a bitstream (the meters' own channels then; `takeChannelPeaks` reads their levels). nil otherwise.
+    public var bedMeters: BedMeterLayout?
 }
 
 public enum EngineEvent: Sendable {
@@ -516,6 +519,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// order (see `SignalPath.channelLabels`). Up to 16 channels.
     public func takeChannelPeaks() -> [Float] {
         sessionLock.lock(); defer { sessionLock.unlock() }
+        // macOS renders, or a receiver decodes: the bed decoded beside the output, in the order of `bedMeters`.
+        if let systemTap { return systemTap.takeChannelPeaks() ?? [] }
         guard let session else { return [] }
         let n = min(session.plan.channels, Int(NRT_METER_CHANNELS))
         return (0..<n).map { nrt_context_take_peak(session.context, UInt32($0)) }
@@ -535,6 +540,14 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Copies the latest mono samples sent to the DAC. Returns the device sample rate, or nil when idle.
     public func copyTap(into buffer: inout [Float]) -> Double? {
         sessionLock.lock(); defer { sessionLock.unlock() }
+        // The bed decoded beside the output, folded to mono, when macOS renders or a receiver decodes.
+        if let systemTap, meterTap || visualizerTap, !buffer.isEmpty {
+            let n = min(buffer.count, Int(NRT_TAP_SIZE))
+            var left = [Float](repeating: 0, count: n), right = left
+            guard let read = systemTap.copy(left: &left, right: &right), read.frames == n else { return nil }
+            for i in 0..<n { buffer[i] = 0.5 * (left[i] + right[i]) }
+            return read.sampleRate
+        }
         guard let session, !buffer.isEmpty else { return nil }
         let n = UInt32(min(buffer.count, Int(NRT_TAP_SIZE)))
         buffer.withUnsafeMutableBufferPointer { _ = nrt_context_copy_tap(session.context, $0.baseAddress!, n) }
@@ -570,6 +583,21 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Guarded by `sessionLock`.
     private var visualizerTap = false
+
+    /// Whether the main window's meters want the bed decode beside the output (macOS-rendered Atmos, bitstream). Guarded by
+    /// `sessionLock`. On unless switched off: the decode costs the output nothing, whatever it does.
+    private var meterTap = true
+
+    /// Switches the meters' side decode on or off, for this output and every one after it. Nothing that reaches the
+    /// output depends on it.
+    public func setMeterTap(_ on: Bool) {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        meterTap = on
+        systemTap?.setMetering(on)
+    }
+
+    /// The Dolby/DTS stream sent to a receiver as a bitstream, decoded again beside it for the meters and the visualizer.
+    private var bitstreamMeter: (item: UUID, source: BedMeterSource)?
 
     /// Where the visualizer reads while macOS renders Dolby Atmos (there's no `session` then). Guarded by `sessionLock`.
     private var systemTap: (any SystemRenderTap)?
@@ -972,6 +1000,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         atmos?.stop()
         atmos = nil
+        dropBitstreamMeter()
         sessionLock.lock(); systemTap = nil; sessionLock.unlock()
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
@@ -1017,9 +1046,34 @@ public final class PlaybackEngine: @unchecked Sendable {
         draining = false
         nrt_context_set_draining(session.context, false)
         lastAudibleSegmentID = nil
+        if plan.mode == .bitstream { startBitstreamMeter(item, url: probed.url, at: actualOffset) }
         try prefill()
         if superseded { throw Superseded() }
         mark("prefill")
+    }
+
+    /// Decodes `item` a second time, as PCM, beside the bitstream going to the receiver, for the meters and the visualizer.
+    /// It follows the position of what is playing; the receiver's own decoding delay isn't known, so the levels may run
+    /// a little ahead of what it plays.
+    private func startBitstreamMeter(_ item: PlayableItem, url: URL, at seconds: TimeInterval) {
+        dropBitstreamMeter()
+        sessionLock.lock()
+        let shared = shared
+        let source = BedMeterSource(decoder: SystemBedDecoder(decodingWith: url), tapping: visualizerTap, metering: meterTap,
+                                    position: { shared.withLock { $0.snapshot.position } })
+        bitstreamMeter = (item.id, source)
+        systemTap = source
+        sessionLock.unlock()
+        source.start(at: seconds)
+    }
+
+    private func dropBitstreamMeter() {
+        guard let old = bitstreamMeter else { return }
+        bitstreamMeter = nil
+        sessionLock.lock()
+        if systemTap === old.source { systemTap = nil }
+        sessionLock.unlock()
+        old.source.stop()
     }
 
     private func replaceSession(device: OutputDevice, plan: OutputPlan) throws {
@@ -1111,6 +1165,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         teardownDecoding()
         atmos?.stop()
         atmos = nil
+        bitstreamMeter?.source.stop()
+        bitstreamMeter = nil
         sessionLock.lock()
         systemTap = nil
         let old = session
@@ -1235,9 +1291,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         atmos = session
         systemTap = session
         sessionDevice = device
-        let tapping = visualizerTap
+        let tapping = visualizerTap, metering = meterTap
         sessionLock.unlock()
         if tapping { session.setTapping(true) }
+        if metering { session.setMetering(true) }
         lastAudibleSegmentID = nil
     }
 
@@ -1645,6 +1702,14 @@ public final class PlaybackEngine: @unchecked Sendable {
         let fromShare = decoding?.streaming == true
         let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0
         let system = atmos
+        // A bitstream that moved on to the next song (gapless) is decoded again from its start.
+        if let meter = bitstreamMeter, let segment, segment.item.id != meter.item {
+            startBitstreamMeter(segment.item, url: resolve(segment.item), at: segment.startOffsetSeconds)
+        }
+        sessionLock.lock()
+        let bedLabels = systemTap?.channelLabels
+        sessionLock.unlock()
+        let bed = bedLabels.map(BedMeterLayout.init(labels:))
         let sourceItem = segment?.item ?? system?.item
         let localSource = sourceItem.flatMap { item -> URL? in
             guard stagedFolder == nil else { return nil }
@@ -1658,6 +1723,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.position = segment == nil && system == nil ? (parkedItem?.position ?? 0) : position
             s.snapshot.duration = segment?.durationSeconds ?? system?.duration ?? s.snapshot.duration
             s.snapshot.systemRendering = system?.rendering
+            s.snapshot.bedMeters = bed
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
