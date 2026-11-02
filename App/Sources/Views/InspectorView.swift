@@ -115,9 +115,9 @@ struct NowPlayingPanel: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
-        .task(id: player.signalPath != nil) {
+        .task(id: player.signalPath != nil || player.systemRendering != nil) {
             // QA: `-VespertineScrollInspector YES` scrolls to the meters for snapshots.
-            guard player.signalPath != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
+            guard player.signalPath != nil || player.systemRendering != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
             try? await Task.sleep(for: .milliseconds(300))
             scroller.scrollTo("spectrum", anchor: .bottom)
         }

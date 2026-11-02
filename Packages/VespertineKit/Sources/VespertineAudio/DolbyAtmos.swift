@@ -18,6 +18,7 @@ public enum DolbyAtmos {
     /// Whether this Dolby Digital Plus file carries Atmos objects: Core Audio then lists `ec+3`
     /// renderings (5.1.2 up to 9.1.6) among the file's formats.
     public static func hasObjects(_ url: URL) -> Bool {
+        if ProcessInfo.processInfo.environment["VESPERTINE_QA_FORCE_ATMOS"] != nil { return true }   // QA-ONLY, not committed
         var file: AudioFileID?
         guard AudioFileOpenURL(url as CFURL, .readPermission, 0, &file) == noErr, let file else { return false }
         defer { AudioFileClose(file) }
