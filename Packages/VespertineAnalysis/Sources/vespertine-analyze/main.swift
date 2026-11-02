@@ -30,6 +30,8 @@ struct IndexRecord: Codable {
     var size: Int64
     var mtime: Double         // seconds since 1970
     var analysis: FileAnalysis
+    /// How the song starts and ends, for Smart Mix (absent from records written before it).
+    var transition: TransitionProfile?
 }
 
 struct Status: Codable {
@@ -155,18 +157,20 @@ func drained<T>(_ body: () throws -> T) rethrows -> T {
 }
 
 /// Decodes up to `maxSeconds` with ffmpeg and feeds the accumulator.
-func analyze(path: String, maxSeconds: Double, portable: Bool) throws -> FileAnalysis {
+/// Also returns the song's transition profile from the same samples (nil where the analysis doesn't apply).
+func analyzeWithProfile(path: String, maxSeconds: Double, portable: Bool) throws -> (analysis: FileAnalysis, transition: TransitionProfile?) {
     let info = try probe(path)
     guard !info.isDSD else {
-        return .notApplicable(claimedBitDepth: nil, sampleRate: info.sampleRate, summary: "DSD source: bit depth analysis doesn't apply.")
+        return (.notApplicable(claimedBitDepth: nil, sampleRate: info.sampleRate, summary: "DSD source: bit depth analysis doesn't apply."), nil)
     }
     guard info.isLossless else {
-        return .notApplicable(claimedBitDepth: info.claimedBits, sampleRate: info.sampleRate, summary: "Lossy source: analysis doesn't apply.")
+        return (.notApplicable(claimedBitDepth: info.claimedBits, sampleRate: info.sampleRate, summary: "Lossy source: analysis doesn't apply."), nil)
     }
     guard info.sampleRate > 0, info.channels > 0, info.channels <= 64 else { throw Failure.unsupported("\(info.codec) \(info.channels) ch") }
 
     let accumulator = AnalysisAccumulator(sampleRate: info.sampleRate, channels: info.channels, claimedBitDepth: info.claimedBits,
                                           maxSeconds: maxSeconds, forcePortableFFT: portable)
+    let profile = TransitionAnalyzer(sampleRate: info.sampleRate, channels: info.channels)
     let p = Process()
     p.executableURL = URL(fileURLWithPath: "/usr/bin/env")
     // Integers as s32 (exact for every word length up to 32 bits), floats as f32.
@@ -209,14 +213,20 @@ func analyze(path: String, maxSeconds: Double, portable: Bool) throws -> FileAna
         // buffer alive, so memory would grow with the length of the file).
         pending = Data(pending[(pending.startIndex + frames * frameBytes)...])
         do {
-            try floats.withUnsafeBufferPointer { try accumulator.add(interleaved: UnsafeBufferPointer(rebasing: $0[0..<count]), frames: frames) }
+            try floats.withUnsafeBufferPointer {
+                try accumulator.add(interleaved: UnsafeBufferPointer(rebasing: $0[0..<count]), frames: frames)
+                profile.add($0.baseAddress!, frames: frames)
+            }
         } catch { failure = error }
     }
     p.waitUntilExit()
     if watchdog.finish() { throw Failure.timedOut("ffmpeg ran over \(Int(limit)) s") }
     if let failure { throw failure }
     guard p.terminationStatus == 0 || accumulator.framesDone > 0 else { throw Failure.decode("ffmpeg exited \(p.terminationStatus)") }
-    return accumulator.finish()
+    // ffmpeg stops at `maxSeconds`: a song that ended before then was read to its end.
+    let whole = p.terminationStatus == 0 && Double(profile.framesAdded) < maxSeconds * info.sampleRate - 1
+    // Cut short: the end wasn't read, so the profile describes the start only.
+    return (accumulator.finish(), profile.finish(totalFrames: profile.framesAdded + (whole ? 0 : 1)))
 }
 
 /// Rounds the stored spectrum to 0.1 dB (plenty for display; keeps the index small).
@@ -508,8 +518,8 @@ case "file":
     var failed = false
     for path in args {
         do {
-            let a = try analyze(path: path, maxSeconds: maxSeconds, portable: portable)
-            print(String(decoding: try encoder.encode(IndexRecord(path: path, size: stat(path)?.size ?? 0, mtime: stat(path)?.mtime ?? 0, analysis: a)), as: UTF8.self))
+            let (a, t) = try analyzeWithProfile(path: path, maxSeconds: maxSeconds, portable: portable)
+            print(String(decoding: try encoder.encode(IndexRecord(path: path, size: stat(path)?.size ?? 0, mtime: stat(path)?.mtime ?? 0, analysis: a, transition: t)), as: UTF8.self))
         } catch {
             stderr("\(path): \(error)"); failed = true
         }
@@ -561,8 +571,8 @@ case "index":
 
             var ok = true
             do {
-                let a = try analyze(path: root.appendingPathComponent(item.rel).path, maxSeconds: maxSeconds, portable: false)
-                try index.append(IndexRecord(path: item.key, size: item.size, mtime: item.mtime, analysis: compact(a)))
+                let (a, t) = try analyzeWithProfile(path: root.appendingPathComponent(item.rel).path, maxSeconds: maxSeconds, portable: false)
+                try index.append(IndexRecord(path: item.key, size: item.size, mtime: item.mtime, analysis: compact(a), transition: t))
             } catch {
                 ok = false
                 stderr("\(item.rel): \(error)")
