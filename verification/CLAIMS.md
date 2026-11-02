@@ -488,7 +488,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
 
-- **Text:** `docs/TRANSITIONS.md:84` — "Only while it's heard is the music not bit-perfect"
+- **Text:** `docs/TRANSITIONS.md:105` — "Only while it's heard is the music not bit-perfect"
 - **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:94` — "guard transition?.audible != true"
 - **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
 - **Governed by:** vespertine-rule.
@@ -511,16 +511,30 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-TR-05 <a id="transitions-gap"></a>A gap leaves both songs whole
 
 - **Text:** `docs/TRANSITIONS.md:25` — "That much silence between the songs, each whole and untouched"
-- **Property:** with a gap set, the words handed to the device are the first song's samples, then exactly that many frames of zeros, then the second song's samples; inside an album the bytes are those of transitions off.
+- **Property:** with a gap set, the words handed to the device are the first song's samples, then exactly that many frames of zeros (on native DSD: DoP idle frames, see CL-TR-08), then the second song's samples; inside an album the bytes are those of transitions off.
 - **Governed by:** vespertine-rule.
-- **Route:** inventory (`SmartMixGoldenTests.swift` gap).
+- **Route:** inventory (`SmartMixGoldenTests.swift` gap, `TransitionDoPGapTests.swift`).
 
 ### CL-TR-06 <a id="transitions-first"></a>"Transitions first" applies only while the switch is on
 
-- **Text:** `docs/TRANSITIONS.md:89` — "Settings › Playback › Transitions ›"
+- **Text:** `docs/TRANSITIONS.md:110` — "Settings › Playback › Transitions ›"
 - **Property:** with the master switch off, or "bit-perfect first", the output plan (rate, DoP, integer and 16-bit modes) is what it is without transitions; "transitions first" changes it only while the switch is on, and the signal path says so.
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (`SmartMixTests.swift` settings; the golden cases with the switch off and on). Not yet covered by an engine-level test of the resampled boundary (deferred).
+
+### CL-TR-07 <a id="transitions-live-set"></a>Live Set's beat-matched blends change only the blend
+
+- **Text:** `docs/TRANSITIONS.md:58` — "the blend starts on a downbeat of the outgoing song"
+- **Property:** with Live Set and stored profiles whose beats are steady, sure and matching, the overlap starts at the outgoing song's downbeat frame on its grid (the latest from which the blend ends with its music) and lasts 16 (or 8) of its beats; the incoming song starts at its first downbeat after its silence, moved by half the blend's difference in period; frames before and after the blend are the sources' samples bit for bit and, without the bass swap, the blend is the closed-form mix of the curves and loudness match. Beats too far apart, unsure, or from songs whose tempo changes give Smart Mix's own choice; albums, a playlist set to off and the switch off are the off bytes. Nothing is time-stretched.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`LiveSetGoldenTests.swift` closed-form placements and stored hashes, `LiveSetTests.swift` planner tables). The analysis's beat grid on real music is measured, not proven (docs/TRANSITIONS.md, "Analysis on a real library").
+
+### CL-TR-08 <a id="transitions-dsd-gap"></a>A gap on native DSD keeps the DAC in DSD
+
+- **Text:** `docs/TRANSITIONS.md:25` — "DoP idle frames, the markers alternating through the gap"
+- **Property:** with a gap set between two native DSD songs at the same rate, the words handed to the device are the first song's DoP words, then DoP idle frames (0x69 0x69 behind each marker) for the gap, then the second song's words; the markers alternate 0x05/0xFA through every frame; inside an album or an SACD, and with no gap set, the bytes are those of transitions off.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`TransitionDoPGapTests.swift`). Not through hardware.
 
 ---
 

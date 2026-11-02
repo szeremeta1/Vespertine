@@ -15,16 +15,16 @@ The engine plans the end of each song while its last crossfade + 16 seconds are 
 | Situation | Result |
 |---|---|
 | Switch off | Gapless, as before |
-| Native DSD (DoP), bitstream (Dolby/DTS to a receiver), Dolby Atmos rendered by macOS, integer mode, or a 16-bit word ("Match 16-bit sources") on either side | No transition: never mixed or faded |
+| Native DSD (DoP), bitstream (Dolby/DTS to a receiver), Dolby Atmos rendered by macOS, integer mode, or a 16-bit word ("Match 16-bit sources") on either side | No transition: never mixed or faded. One exception: a gap between two native DSD songs at the same rate (the rules below first), as DSD silence |
 | The next region of the same file (CUE sheet, DVD title) or SACD area | Gapless |
 | The next track of the same album (the next number, or track 1 of the next disc), playlists included | Gapless |
 | A song of an excluded genre on either side (Classical, Opera, Soundtrack, Spoken Word by default) | Gapless |
 | The playlist the songs were queued from plays without transitions (its own setting) | Gapless |
 | The next song is read live from a network share | Gapless |
 | The next song needs another rate or channel count | A dip: the last second fades out, the output is set up again (the short gap there is anyway), the next song's first second fades in. With "transitions first", a PCM song at another rate is resampled to the one playing instead, and blends |
-| A gap is set (0–10 s) | That much silence between the songs, each whole and untouched |
+| A gap is set (0–10 s) | That much silence between the songs, each whole and untouched (on native DSD: DoP idle frames, the markers alternating through the gap, so the DAC stays locked in DSD) |
 | Anything else, Crossfade | A crossfade of the chosen length (1 to 12 s, 6 by default) and curve |
-| Anything else, Smart Mix or Live Set | Smart Mix's choice for the two songs (below) |
+| Anything else, Smart Mix or Live Set | Smart Mix's choice for the two songs (below); in Live Set, a beat-matched blend where both songs' beats allow |
 
 A playlist can have its own transitions (its menu in the sidebar): the app's setting, off, a crossfade of a length, Smart Mix or Live Set. The master switch still rules: off, a playlist's choice changes nothing.
 
@@ -34,7 +34,7 @@ Silence is trimmed (on by default): the outgoing song's last 15 s and the next s
 
 ## Smart Mix
 
-Each song's ends are measured (`TransitionAnalyzer`, `VespertineAnalysisCore`, plain Swift so `vespertine-analyze` makes the same profile on a server): the silence at each end, a fade-in or fade-out (the best "steady, then a straight line in dB" split over 30 s, at least 10 dB over 3 s, with a confidence), the loudness (ITU-R BS.1770-4) of the ten seconds of music next to each end and of its first or last second, and the end's type: cold, fade, silence, or segue (loud to the last sample, or from the first). Where the beat is steady, its tempo and one beat's time are kept too (used from Live Set on, not yet). The library computes the profile in the same pass as file analysis and keeps it (`transitionProfile`, made stale by a changed file or analyzer); a server's index carries it; a song with none is measured just in time from its last 40 s and its next song's first 20 s (`EdgeScan`).
+Each song's ends are measured (`TransitionAnalyzer`, `VespertineAnalysisCore`, plain Swift so `vespertine-analyze` makes the same profile on a server): the silence at each end, a fade-in or fade-out (the best "steady, then a straight line in dB" split over 30 s, at least 10 dB over 3 s, with a confidence), the loudness (ITU-R BS.1770-4) of the ten seconds of music next to each end and of its first or last second, and the end's type: cold, fade, silence, or segue (loud to the last sample, or from the first). Where the beat is steady, its tempo, one beat's time (to a fraction of the 10 ms analysis hop) and a downbeat guess (the beat of every four where the low end, below about 150 Hz, rises most, with a confidence) are kept too, for Live Set. The library computes the profile in the same pass as file analysis and keeps it (`transitionProfile`, made stale by a changed file or analyzer); a server's index carries it; a song with none is measured just in time from its last 40 s and its next song's first 20 s (`EdgeScan`).
 
 `SmartMixPlanner` then chooses, for the end of A and the start of B:
 
@@ -47,7 +47,28 @@ Each song's ends are measured (`TransitionAnalyzer`, `VespertineAnalysisCore`, p
 | cold or segue | cold or segue | A quick cut: 0.5 s, B rising over 0.1 s |
 | unsure (no profile, or a fade confidence of 0.3–0.6) | | A plain crossfade of the chosen length and curve |
 
-Loudness: over the overlap, A goes from its own level to *m* dB down and B from *m* dB up to its own, *m* being A's level less B's (ReplayGain included) within ±6 dB, so the two sound at one level throughout and each is at its own where it plays alone. A lookahead limiter (5 ms ahead, 50 ms release, ceiling −0.3 dBFS) catches peaks two loud songs make together; it touches only overlap frames, and passes frames that need nothing untouched. Live Set is Smart Mix with skips that always blend.
+Loudness: over the overlap, A goes from its own level to *m* dB down and B from *m* dB up to its own, *m* being A's level less B's (ReplayGain included) within ±6 dB, so the two sound at one level throughout and each is at its own where it plays alone. A lookahead limiter (5 ms ahead, 50 ms release, ceiling −0.3 dBFS) catches peaks two loud songs make together; it touches only overlap frames, and passes frames that need nothing untouched.
+
+## Live Set
+
+Live Set is Smart Mix for hosting, with these on top (all only while the switch is on in Live Set; off by default like everything here):
+
+- **One output rate** for the session, 48 or 96 kHz (a setting): every PCM song is resampled to it, so a change of rate never gaps or dips; DSD plays as PCM and the integer and 16-bit modes aren't used ("transitions first" is implied). The signal path says RESAMPLED where it resamples.
+- **Skips always blend.**
+- **Beat-matched blends** (on by default within Live Set) from the library's stored profiles (`LiveSetPlanner`): when both songs' beats are steady (the song's head and tail agree on the tempo within 2%, each beat with a confidence of 0.4 or more) and match (within 6%, or half or double time), the blend starts on a downbeat of the outgoing song, the latest from which it ends with that song's music, and lasts 16 of its beats (8 when that's all there's room for, or when 16 would drift). The incoming song starts on its first downbeat after its silence, moved so the two songs' beats meet in the middle of the blend. Nothing is time-stretched, so a blend is used only while the beats stay within 20 ms of each other at its ends; otherwise Smart Mix decides as usual. A downbeat is used from a confidence of 0.3; below that the blend lines up beats, not bars. The curve is the chosen one over the whole blend, the loudness match is Smart Mix's, and the limiter runs on it as on any Smart Mix overlap.
+- **Bass swap** (off by default): in a beat-matched blend the outgoing song's lows give way to the incoming song's over one beat in the middle (each song is `k·x + (1−k)·highpass(x)`, a fourth-order Butterworth at 150 Hz), so the two basslines don't sound together.
+
+The rules before any blend are unchanged: albums, CUE sheets, SACDs, excluded genres, network songs, a playlist set to off, segues, and the formats that are never mixed. Not in Live Set yet: a loudness target for whole songs, keep playing when the queue ends, host lock, tempo glide (time-stretch), key preference, a transition editor.
+
+## Analysis on a real library
+
+A dogfood pass ran `vespertine-analyze` over about 200 FLACs from a real library (pop, rock, soul, reggae, hip-hop, electronic, folk, jazz, classical; 1957–2025; 44.1–192 kHz), read-only, with librosa's beat tracker as an independent reference for the tempo. What it showed, and what changed:
+
+- **Tempo:** found on about half of all song ends. Where found, it agreed with the reference (within 4%) about 95% of the time from a confidence of 0.4, about 85% between 0.3 and 0.4, and about 55% below 0.3, where it isn't kept. Its estimates were steadier than the reference's own (which moves in quantized steps). So 0.3 stays the bar for keeping a beat and Live Set asks for 0.4.
+- **Beat placement:** the beat was placed 3–7 ms early: an onset in a 10 ms hop was timed at the hop's start. It's now timed at the hop's middle and fitted to a fraction of a hop (tests: within 3 ms over 40 s at tempos whose beats fall between hops).
+- **Downbeats** are weak on real music (median confidence about 0.2; about one in five reach 0.3), so most real beat-matched blends line up beats rather than bars.
+- **Fades:** long fade-outs are found with plausible lengths (often longer than the 12 s Smart Mix uses). A cold ending's reverb or a last chord ringing out (falling 15–20 dB a second into silence) also reads as a short fade (about 3.5 s): Smart Mix then starts the next song as the last chord rings out, which sounds intended, so it's left as it is (a real 4 s fade-out and a ring-out look the same to this measurement).
+- **Segues:** songs that really run into the next were found (an album intro into its first song, songs joined on an album). A song that starts at full level with no silence also reads as a segue at its start; a segue join needs both songs, so that alone changes nothing.
 
 ## Where it happens
 
@@ -102,4 +123,8 @@ A crossfade is mixed 20–30 s before it's heard. A queue change, or a change to
 - `SmartMixGoldenTests.swift`: into a fade, a quick cut, trimmed silence, a stored profile, the limiter, checked sample by sample against references from the sources and the decision; a segue, a gap, a playlist set to off and every golden case with Smart Mix on byte-identical where nothing should mix; five stored hashes (`Fixtures/golden-pcm-smartmix.json`).
 - `TransitionProfileStoreTests.swift`: profiles stored, made stale, imported from a server; a playlist's own transitions.
 - `tests/rt-audit.c` `test_concurrent_peek`: peek and rewind while the reader runs, under the sanitizers. Harness mutants: a fade's gain left on (float), a float mix of integer words, a fade-in on DoP music.
+- `LiveSetTests.swift`: Live Set's settings (defaults, older settings, the fixed rate), the beat-matched placement (same tempo, a small difference meeting in the middle, too much drift for 16 or 8 beats, half and double time, confidence and room gates, beats without a sure downbeat, steady songs only), the bass swap's crossover response and swap curve.
+- `LiveSetGoldenTests.swift`: beat-matched blends placed from stored grids (same tempo, half time, 120 against 120.5 BPM), checked sample by sample; the fallbacks; albums and a playlist set to off still the off bytes; the bass swap; the fixed rate (44.1 then 48 kHz on one 48 kHz session); four stored hashes (`Fixtures/golden-pcm-liveset.json`).
+- `TransitionDoPGapTests.swift`: a gap between two native DSD songs is DoP idle frames, the markers alternating through it and into the next song, both songs' words untouched; albums and SACDs still gapless.
+- `TransitionStateTests.swift`: a starved read-ahead decoder as the incoming song (the mix waits, exact); through the engine on the loopback device (opt-in): a skip, a seek and a pause inside an overlap being heard, a queue edit inside an overlap baked but not heard (A → C exactly) and one being heard (plays as mixed).
 - The loopback self-test forces transitions off.
