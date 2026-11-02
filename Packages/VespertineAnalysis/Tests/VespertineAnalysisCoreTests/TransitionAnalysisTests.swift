@@ -72,6 +72,37 @@ enum Synth {
         return x
     }
 
+    /// Drum-like hits (a 2 kHz tone, struck and decaying over about 60 ms) on every beat, over quiet noise.
+    static func hits(bpm: Double, seconds: Double, rate: Double = 44_100, firstBeat: Double = 0.25) -> [Float] {
+        var x = noise(seconds, dbfs: -50, rate: rate, channels: 1, seed: 9)
+        let period = 60 / bpm * rate
+        var t = firstBeat * rate
+        while Int(t) < x.count {
+            let start = Int(t.rounded())
+            for i in 0..<Int(0.12 * rate) where start + i < x.count {
+                x[start + i] += Float(0.8 * exp(-Double(i) / (0.02 * rate)) * sin(2 * .pi * 2000 * Double(i) / rate))
+            }
+            t += period
+        }
+        return x
+    }
+
+    /// A click track with a kick (a 60 Hz thump, 80 ms) on every fourth beat from beat `downbeat` (0–3).
+    static func bars(bpm: Double, seconds: Double, rate: Double = 44_100, firstBeat: Double = 0.25, downbeat: Int = 0) -> [Float] {
+        var x = clicks(bpm: bpm, seconds: seconds, rate: rate, firstBeat: firstBeat)
+        let period = 60 / bpm * rate
+        var t = (firstBeat + Double(downbeat) * 60 / bpm) * rate
+        while Int(t) < x.count {
+            let start = Int(t.rounded())
+            for i in 0..<Int(0.08 * rate) where start + i < x.count {
+                let env = exp(-Double(i) / (0.025 * rate))
+                x[start + i] += Float(0.7 * env * sin(2 * .pi * 60 * Double(i) / rate))
+            }
+            t += 4 * period
+        }
+        return x
+    }
+
     static func profile(_ x: [Float], rate: Double = 48_000, channels: Int = 2, chunk: Int = 4096) -> TransitionProfile {
         let analyzer = TransitionAnalyzer(sampleRate: rate, channels: channels)
         x.withUnsafeBufferPointer { b in
@@ -286,6 +317,55 @@ struct BeatTests {
         let phase = (head.beat - 0.25).truncatingRemainder(dividingBy: 60 / bpm)
         #expect(min(abs(phase), abs(phase - 60 / bpm)) < 0.015, "beat at \(head.beat)")
         #expect(p.tempo != nil)
+    }
+
+    @Test("The beat is placed to well under a 10 ms hop, at tempos whose beats fall between hops", arguments: [97.3, 123.7, 141.1])
+    func fractionalBeat(bpm: Double) throws {
+        let rate = 44_100.0
+        let first = 0.2537
+        let p = Synth.profile(Synth.hits(bpm: bpm, seconds: 40, rate: rate, firstBeat: first), rate: rate, channels: 1)
+        for tempo in [try #require(p.head?.tempo), try #require(p.tail?.tempo)] {
+            #expect(abs(tempo.bpm - bpm) <= 0.05, "\(tempo.bpm)")
+            // Every beat of the grid within 3 ms of a click, over the whole 40 s (the period and the phase both right).
+            for k in stride(from: 0, to: Int(38 / (60 / bpm)), by: 7) {
+                let click = first + Double(k) * 60 / bpm
+                #expect(abs(tempo.nearestBeat(to: click) - click) < 0.003, "beat \(k): grid \(tempo.nearestBeat(to: click)), click \(click)")
+            }
+        }
+    }
+
+    @Test("The downbeat: the beat of four with the kick on it, whichever it is", arguments: [0, 1, 2, 3])
+    func downbeat(on beat: Int) throws {
+        let rate = 44_100.0, bpm = 124.0, first = 0.25
+        let p = Synth.profile(Synth.bars(bpm: bpm, seconds: 40, rate: rate, firstBeat: first, downbeat: beat), rate: rate, channels: 1)
+        let period = 60 / bpm
+        for tempo in [try #require(p.head?.tempo), try #require(p.tail?.tempo)] {
+            let down = try #require(tempo.downbeat)
+            #expect((tempo.downbeatConfidence ?? 0) >= 0.3)
+            // On a kick: (down - first) / period is beat ≡ `beat` mod 4.
+            let n = ((down - first) / period).rounded()
+            #expect(abs(down - (first + n * period)) < 0.003)
+            #expect(((Int(n) % 4) + 4) % 4 == beat, "downbeat at beat \(Int(n))")
+            // The first downbeat after 10 s is a kick too.
+            let next = tempo.firstDownbeat(atOrAfter: 10)
+            let m = Int(((next - first) / period).rounded())
+            #expect(next >= 10 - 0.001 && next < 10 + 4 * period && ((m % 4) + 4) % 4 == beat)
+        }
+    }
+
+    @Test("Clicks with nothing in the low end: a beat, but no downbeat to speak of")
+    func noDownbeatWithoutLowEnd() throws {
+        let p = Synth.profile(Synth.clicks(bpm: 120, seconds: 40, rate: 44_100), rate: 44_100, channels: 1)
+        let tempo = try #require(p.head?.tempo)
+        #expect(tempo.downbeat == nil || (tempo.downbeatConfidence ?? 0) < 0.3)
+    }
+
+    @Test("A profile from before downbeats (version 1 JSON) still reads, without them")
+    func olderTempoJSON() throws {
+        let json = #"{"bpm":120,"confidence":0.8,"beat":0.25}"#
+        let t = try JSONDecoder().decode(TransitionProfile.Tempo.self, from: Data(json.utf8))
+        #expect(t.bpm == 120 && t.downbeat == nil && t.downbeatConfidence == nil)
+        #expect(t.firstDownbeat(atOrAfter: 1) == 1.25)
     }
 
     @Test("Noise has no beat; under ten seconds is too short to tell")

@@ -13,7 +13,8 @@ import Foundation
 /// A song's ends, as Smart Mix sees them.
 public struct TransitionProfile: Sendable, Hashable, Codable {
     /// Bumped when the analysis learns something new, so older profiles are made again.
-    public static let currentVersion = 1
+    /// 2: the beat to a fraction of a 10 ms hop, and a downbeat guess (Live Set's beat-aligned blends).
+    public static let currentVersion = 2
 
     public var version = TransitionProfile.currentVersion
     /// The song's length in seconds.
@@ -65,20 +66,41 @@ public struct TransitionProfile: Sendable, Hashable, Codable {
         }
     }
 
-    /// A steady beat: beats per minute, how sure, and where one beat falls (seconds from the song's start).
+    /// A steady beat: beats per minute, how sure, and where one beat falls (seconds from the song's start). With the
+    /// period that's a beat grid over the span measured (a steady beat: the grid doesn't follow tempo changes).
     public struct Tempo: Sendable, Hashable, Codable {
         public var bpm: Double
         public var confidence: Double
         public var beat: Double
+        /// A beat that starts a bar of four (seconds from the song's start): the beat position whose low end (below
+        /// about 150 Hz: kick drum, bass) hits hardest, every fourth beat. A guess; nil when the low end says nothing.
+        public var downbeat: Double?
+        /// How much harder that beat hits than the other three, 0…1.
+        public var downbeatConfidence: Double?
 
-        public init(bpm: Double, confidence: Double, beat: Double) {
+        public init(bpm: Double, confidence: Double, beat: Double, downbeat: Double? = nil, downbeatConfidence: Double? = nil) {
             self.bpm = bpm
             self.confidence = confidence
             self.beat = beat
+            self.downbeat = downbeat
+            self.downbeatConfidence = downbeatConfidence
         }
 
         /// Seconds between beats.
         public var period: Double { 60 / bpm }
+
+        /// The beat nearest `seconds` (from the song's start) on this grid.
+        public func nearestBeat(to seconds: Double) -> Double {
+            beat + ((seconds - beat) / period).rounded() * period
+        }
+
+        /// The first downbeat at or after `seconds` on this grid (every fourth beat from `downbeat`), or the first beat
+        /// when there's no downbeat.
+        public func firstDownbeat(atOrAfter seconds: Double) -> Double {
+            let anchor = downbeat ?? beat
+            let bar = downbeat == nil ? period : 4 * period
+            return anchor + ((seconds - anchor) / bar).rounded(.up) * bar
+        }
     }
 
     public init(seconds: Double, head: Edge? = nil, tail: Edge? = nil, integratedLUFS: Double? = nil) {
@@ -122,6 +144,12 @@ public final class TransitionAnalyzer {
     private var lastLogEnergy: Double?
     /// Onset strength per 10 ms hop: how much the level rose since the hop before (log energy, rises only).
     private var onsets: [Float] = []
+    /// The same for the low end (the channels' mean through a 150 Hz low-pass), for the downbeat.
+    private var lowOnsets: [Float] = []
+    private var lowSum = 0.0
+    private var lastLowLogEnergy: Double?
+    private let lowPass: (b0: Double, b1: Double, b2: Double, a1: Double, a2: Double)
+    private var lowState = (x1: 0.0, x2: 0.0, y1: 0.0, y2: 0.0)
     public private(set) var framesAdded: Int64 = 0
     /// The first and last frame above `silenceThreshold`, as song frames.
     public private(set) var firstLoudFrame: Int64?
@@ -152,6 +180,9 @@ public final class TransitionAnalyzer {
         self.silenceThreshold = silenceThreshold
         meter = LoudnessMeter(sampleRate: sampleRate, channels: channels, weights: weights)
         hop = max(1, Int((sampleRate / 100).rounded()))
+        // A second-order Butterworth low-pass at 150 Hz (RBJ's cookbook).
+        let w = 2 * Double.pi * 150 / sampleRate, alpha = sin(w) / (2 * 0.5.squareRoot()), a0 = 1 + alpha
+        lowPass = ((1 - cos(w)) / 2 / a0, (1 - cos(w)) / a0, (1 - cos(w)) / 2 / a0, -2 * cos(w) / a0, (1 - alpha) / a0)
     }
 
     /// Adds `frames` interleaved frames.
@@ -169,23 +200,40 @@ public final class TransitionAnalyzer {
             if firstLoudFrame == nil { firstLoudFrame = base + Int64(first / ch) }
             lastLoudFrame = base + Int64(last / ch)
         }
-        // Energy per 10 ms hop, for the onsets.
+        // Energy per 10 ms hop, for the onsets, and the low end's.
         var f = 0
+        let lp = lowPass, scale = 1 / Double(ch)
+        var st = lowState
         while f < frames {
             let n = min(frames - f, hop - inHop)
-            var e = 0.0
+            var e = 0.0, low = 0.0
             for i in (f * ch)..<((f + n) * ch) { let x = Double(samples[i]); e += x * x }
+            for frame in f..<(f + n) {
+                var m = 0.0
+                for c in 0..<ch { m += Double(samples[frame * ch + c]) }
+                m *= scale
+                let y = lp.b0 * m + lp.b1 * st.x1 + lp.b2 * st.x2 - lp.a1 * st.y1 - lp.a2 * st.y2
+                st = (m, st.x1, y, st.y1)
+                low += y * y
+            }
             hopSum += e
+            lowSum += low
             inHop += n
             f += n
             if inHop == hop {
                 let logEnergy = log10(hopSum / Double(hop * ch) + 1e-10)
                 onsets.append(Float(max(0, logEnergy - (lastLogEnergy ?? logEnergy))))
                 lastLogEnergy = logEnergy
+                // Floored at −60 dB: below that, noise would read as onsets (a log of next to nothing swings widely).
+                let lowLog = log10(lowSum / Double(hop) + 1e-6)
+                lowOnsets.append(Float(max(0, lowLog - (lastLowLogEnergy ?? lowLog))))
+                lastLowLogEnergy = lowLog
                 hopSum = 0
+                lowSum = 0
                 inHop = 0
             }
         }
+        lowState = st
         framesAdded += Int64(frames)
     }
 
@@ -248,7 +296,7 @@ public final class TransitionAnalyzer {
         let type = Self.type(silence: silence, fadeConfidence: fade?.confidence ?? 0, loudness: loudness, edgeLoudness: edgeLoudness)
         let tempoHops = Int(Self.tempoWindow * 100)
         let firstHop = Int((first - startFrame) / Int64(hop))
-        let tempo = Self.tempo(onsets, range: firstHop ..< min(onsets.count, firstHop + tempoHops), hopSeconds: Double(hop) / sampleRate,
+        let tempo = Self.tempo(onsets, low: lowOnsets, range: firstHop ..< min(onsets.count, firstHop + tempoHops), hopSeconds: Double(hop) / sampleRate,
                                offset: Double(startFrame) / sampleRate)
         return .init(silence: Self.rounded(silence, places: 4), fade: fade.map { Self.rounded($0.seconds) }, fadeConfidence: Self.rounded(fade?.confidence ?? 0),
                      loudness: loudness.map(Self.rounded), edgeLoudness: edgeLoudness.map(Self.rounded), type: type, tempo: tempo)
@@ -271,7 +319,7 @@ public final class TransitionAnalyzer {
         let type = Self.type(silence: silence, fadeConfidence: fade?.confidence ?? 0, loudness: loudness, edgeLoudness: edgeLoudness)
         let tempoHops = Int(Self.tempoWindow * 100)
         let lastHop = min(onsets.count, Int((last + 1 - startFrame) / Int64(hop)))
-        let tempo = Self.tempo(onsets, range: max(0, lastHop - tempoHops) ..< lastHop, hopSeconds: Double(hop) / sampleRate,
+        let tempo = Self.tempo(onsets, low: lowOnsets, range: max(0, lastHop - tempoHops) ..< lastHop, hopSeconds: Double(hop) / sampleRate,
                                offset: Double(startFrame) / sampleRate)
         return .init(silence: Self.rounded(silence, places: 4), fade: fade.map { Self.rounded($0.seconds) }, fadeConfidence: Self.rounded(fade?.confidence ?? 0),
                      loudness: loudness.map(Self.rounded), edgeLoudness: edgeLoudness.map(Self.rounded), type: type, tempo: tempo)
@@ -343,8 +391,9 @@ public final class TransitionAnalyzer {
 
     /// The beat of the onsets in `range` (10 ms hops): the period whose multiples line up best (autocorrelation over
     /// 70–180 BPM, each candidate scored with its 2nd–4th multiples so half time doesn't win), refined by fitting a
-    /// line through the strongest onset near each beat. nil when under 10 s, or the beat isn't steady.
-    static func tempo(_ onsets: [Float], range: Range<Int>, hopSeconds: Double, offset: Double) -> TransitionProfile.Tempo? {
+    /// line through the strongest onset near each beat. nil when under 10 s, or the beat isn't steady. With `low` (the
+    /// low end's onsets), a downbeat guess: the one of every four beats where the low end rises most.
+    static func tempo(_ onsets: [Float], low: [Float]? = nil, range: Range<Int>, hopSeconds: Double, offset: Double) -> TransitionProfile.Tempo? {
         let r = range.clamped(to: 0..<onsets.count)
         guard r.count >= 1000 else { return nil }
         let x = onsets[r].map(Double.init)
@@ -399,18 +448,51 @@ public final class TransitionAnalyzer {
             if let k = window.max(by: { x[$0] < x[$1] }), x[k] > mean { beats.append((n, Double(k))) }
             n += 1
         }
+        var phase = Double(bestPhase)
         if beats.count >= 8 {
             let m = Double(beats.count)
             let mn = beats.reduce(0) { $0 + $1.n } / m, ma = beats.reduce(0) { $0 + $1.at } / m
             let cov = beats.reduce(0) { $0 + ($1.n - mn) * ($1.at - ma) }, varN = beats.reduce(0) { $0 + ($1.n - mn) * ($1.n - mn) }
             if varN > 0 {
                 let fitted = cov / varN
-                if abs(fitted - period) < period * 0.03 { period = fitted; bestPhase = Int((ma - mn * fitted).rounded()) }
+                if abs(fitted - period) < period * 0.03 {
+                    period = fitted
+                    // The line's own intercept, to a fraction of a hop (a grid placed to the nearest hop drifts by up
+                    // to 5 ms, enough to smear a beat-aligned blend).
+                    phase = ma - mn * fitted
+                    if phase < 0 { phase += period * (-phase / period).rounded(.up) }
+                }
             }
         }
         let bpm = 60 / (period * hopSeconds)
-        let beat = offset + (Double(r.lowerBound) + Double(max(0, bestPhase))) * hopSeconds
-        return .init(bpm: rounded(bpm, places: 2), confidence: rounded(confidence), beat: rounded(beat, places: 3))
+        // An onset in a hop happened somewhere within it: its expected time is the hop's middle, half a hop on.
+        let beat = offset + (Double(r.lowerBound) + phase + 0.5) * hopSeconds
+        var downbeat: Double?, downbeatConfidence: Double?
+        if let low, let bar = downbeatPhase(low, range: r, phase: phase, period: period) {
+            downbeat = rounded(offset + (Double(r.lowerBound) + phase + 0.5 + Double(bar.beat) * period) * hopSeconds, places: 4)
+            downbeatConfidence = rounded(bar.confidence)
+        }
+        return .init(bpm: rounded(bpm, places: 3), confidence: rounded(confidence), beat: rounded(beat, places: 4),
+                     downbeat: downbeat, downbeatConfidence: downbeatConfidence)
+    }
+
+    /// Which of every four beats (0–3, counted from the beat at `phase`) the low end rises most on, and how much more
+    /// than on the other three (0…1). nil with fewer than four bars, or no low end at all.
+    static func downbeatPhase(_ low: [Float], range r: Range<Int>, phase: Double, period: Double) -> (beat: Int, confidence: Double)? {
+        let r = r.clamped(to: 0..<low.count)
+        var accent = [Double](repeating: 0, count: 4)
+        var k = 0
+        let reach = max(1, Int((period / 8).rounded()))
+        while true {
+            let at = Int((phase + Double(k) * period).rounded())
+            if at >= r.count { break }
+            let lo = max(0, at - reach), hi = min(r.count - 1, at + reach)
+            if lo <= hi { accent[k % 4] += Double((lo...hi).map { low[r.lowerBound + $0] }.max() ?? 0) }
+            k += 1
+        }
+        guard k >= 16, let best = accent.indices.max(by: { accent[$0] < accent[$1] }), accent[best] > 0 else { return nil }
+        let others = (accent.reduce(0, +) - accent[best]) / 3
+        return (best, max(0, min(1, (accent[best] - others) / accent[best])))
     }
 
     static func rounded(_ x: Double) -> Double { rounded(x, places: 2) }
