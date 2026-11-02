@@ -683,9 +683,11 @@ public enum TransitionPlanner {
         guard base.enabled else { return .gapless(.off) }
         // A playlist's own transitions (the incoming song's, else the outgoing one's).
         guard let settings = effective(base, a: a, b: b) else { return .gapless(.playlist) }
-        // Formats nothing may touch, on either side.
+        // Formats nothing may touch, on either side. Native DSD on both sides can still have a gap: DSD silence between
+        // the two, each song untouched (the rules below still come first: never inside an album or an SACD).
+        let dsdGap = settings.gapSeconds > 0 && compatible && isNativeDSD(formatA) && isNativeDSD(formatB)
         for format in [formatA, formatB] {
-            if let reason = cutReason(format) { return .cut(reason) }
+            if let reason = cutReason(format), !(dsdGap && reason == .nativeDSD) { return .cut(reason) }
         }
         // Albums, CUE sheets and SACDs play as they were made.
         if a.url == b.url, a.sacdArea == b.sacdArea, a.dvd == b.dvd, let start = a.regionStartFrame, let length = a.regionFrameLength,
@@ -695,6 +697,7 @@ public enum TransitionPlanner {
         if let ca = a.context, let cb = b.context, ca.isFollowed(onAlbumBy: cb) { return .gapless(.sameAlbum) }
         if settings.excludes(genre: a.context?.genre) || settings.excludes(genre: b.context?.genre) { return .gapless(.excludedGenre) }
         if nextStreams { return .gapless(.network) }
+        if dsdGap { return lengthKnown ? .gap(seconds: settings.gapSeconds) : .cut(.unknownLength) }
         if case .unknown = formatB { return blend(settings, profiles: profiles, gains: gains) }
         if !compatible { return .dip(seconds: dipSeconds, curve: settings.curve) }
         if !lengthKnown { return .cut(.unknownLength) }
@@ -716,6 +719,12 @@ public enum TransitionPlanner {
             return .gapless(.segue)
         }
         return .mix(mix)
+    }
+
+    /// DSD sent natively as DoP.
+    static func isNativeDSD(_ format: BoundaryFormat) -> Bool {
+        if case .plan(let plan) = format { return plan.mode == .dop }
+        return false
     }
 
     /// Native DSD, bitstream, macOS's Atmos renderer, integer samples and 16-bit words are never mixed or faded.

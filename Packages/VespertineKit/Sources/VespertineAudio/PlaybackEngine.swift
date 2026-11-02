@@ -1676,12 +1676,34 @@ public final class PlaybackEngine: @unchecked Sendable {
         let frames = min(gapOwed, Int64(chunkFrames), Int64(session.writableFrames))
         guard frames > 0 else { return false }
         let samples = Int(frames) * session.plan.channels
-        if gapSilence.count < samples { gapSilence = [Float](repeating: 0, count: samples) }
-        gapSilence.withUnsafeBufferPointer { _ = nrt_ring_write(session.ring, $0.baseAddress!, UInt32(frames)) }
+        if session.plan.mode == .dop {
+            // DSD silence: DoP idle frames whose markers carry on the ring's alternation (the next song's are lined up
+            // after the gap, `alignDoPMarkers`), so the DAC stays locked in DSD through the gap.
+            let idle = Self.dopIdle(frames: Int(frames), channels: session.plan.channels, from: session.totalWritten,
+                                    integer: session.applied.integerMode)
+            idle.withUnsafeBufferPointer { _ = nrt_ring_write(session.ring, $0.baseAddress!, UInt32(frames)) }
+        } else {
+            if gapSilence.count < samples { gapSilence = [Float](repeating: 0, count: samples) }
+            gapSilence.withUnsafeBufferPointer { _ = nrt_ring_write(session.ring, $0.baseAddress!, UInt32(frames)) }
+        }
         gapOwed -= frames
         return true
     }
     private var gapSilence: [Float] = []
+
+    /// `frames` DoP idle frames (the DSD idle pattern behind each frame's marker) for ring frames from `ringFrame`: the
+    /// marker by the ring frame's parity, 0x05 on even frames, as `alignDoPMarkers` lines songs up. `integer`: the 32-bit
+    /// word's bit pattern, else the 24-bit word as a float sample (as RawDoPDecoder writes them).
+    static func dopIdle(frames: Int, channels: Int, from ringFrame: UInt64, integer: Bool) -> [Float] {
+        var out = [Float](repeating: 0, count: frames * channels)
+        for f in 0..<frames {
+            let marker: UInt32 = (ringFrame + UInt64(f)) & 1 == 0 ? 0x05 : 0xFA
+            let word = (marker << 16 | UInt32(DoP.silence) << 8 | UInt32(DoP.silence)) << 8
+            let sample = integer ? Float(bitPattern: word) : Float(Int32(bitPattern: word)) / 2_147_483_648
+            for c in 0..<channels { out[f * channels + c] = sample }
+        }
+        return out
+    }
 
     /// The longest the next song may take to open for a skip to blend; after that it's a quick fade.
     static let skipOpenBudget: TimeInterval = 0.4
@@ -1876,8 +1898,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
                 if session.plan.isDeviceCompatible(with: plan) {
-                    // Transitions: a gap between the songs is silence written ahead of the next one (never on native
-                    // DSD or bitstream, which the planner leaves alone).
+                    // Transitions: a gap between the songs is silence written ahead of the next one (DSD silence on
+                    // native DSD; never on bitstream, which the planner leaves alone).
                     if settings.transitions.enabled {
                         let decision = planned?.next?.id == next.id ? planned?.decision
                             : TransitionPlanner.decide(settings.transitions, from: finished, format: .plan(session.plan), to: next, format: .plan(plan))

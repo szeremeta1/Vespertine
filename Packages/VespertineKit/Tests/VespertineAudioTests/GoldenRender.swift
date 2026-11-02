@@ -324,13 +324,16 @@ enum GoldenRender {
                 }
                 crossfade = nil
                 if let error = a.error { throw Failure(description: "\(a.item.url.lastPathComponent): \(error)") }
-                // advance / writeGap: the gap's silence goes into the ring ahead of the next song.
+                // advance / writeGap: the gap's silence goes into the ring ahead of the next song (DoP idle frames on
+                // native DSD, PlaybackEngine.dopIdle).
                 if gap > 0, index + 1 < items.count {
                     let zeros = [Float](repeating: 0, count: Int(chunkFrames) * a.path.plan.channels)
                     while gap > 0 {
                         while Int(nrt_ring_writable(s.ring)) < Int(chunkFrames) { s.render(upTo: device.bufferFrames) }
                         let n = min(gap, Int(chunkFrames))
-                        zeros.withUnsafeBufferPointer { _ = nrt_ring_write(s.ring, $0.baseAddress!, UInt32(n)) }
+                        let silence = s.plan.mode == .dop
+                            ? PlaybackEngine.dopIdle(frames: n, channels: a.path.plan.channels, from: s.totalWritten, integer: s.integerMode) : zeros
+                        silence.withUnsafeBufferPointer { _ = nrt_ring_write(s.ring, $0.baseAddress!, UInt32(n)) }
                         gap -= n
                     }
                 }
