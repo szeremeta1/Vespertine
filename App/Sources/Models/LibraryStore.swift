@@ -30,6 +30,8 @@ final class LibraryStore {
     private(set) var genres: [GenreSummary] = []
     private(set) var artists: [LibraryDatabase.ArtistSummary] = []
     private(set) var playlists: [Playlist] = []
+    /// Playlists with their own transitions (Smart Mix's per-playlist choice), by id.
+    private(set) var playlistTransitions: [Int64: TransitionOverride] = [:]
     /// Every favorite song's track ID (missing files included, so their heart stays filled).
     private(set) var favoriteIDs: Set<Int64> = []
     /// Favorite songs whose files are present (a song in stereo and 5.1 counts once): the number in the sidebar.
@@ -139,6 +141,7 @@ final class LibraryStore {
         sources = state.0
         playlists = state.1
         if let stats = state.2 { self.stats = stats }
+        loadPlaylistTransitions()
     }
 
     private nonisolated static func fetchSources(_ db: Database) throws -> [LibrarySource] {
@@ -180,7 +183,12 @@ final class LibraryStore {
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking(Self.fetchPlaylists)
-            do { for try await value in obs.values(in: writer) where self?.playlists != value { self?.playlists = value } } catch {}
+            do {
+                for try await value in obs.values(in: writer) where self?.playlists != value {
+                    self?.playlists = value
+                    self?.loadPlaylistTransitions()     // a deleted playlist's choice goes with it
+                }
+            } catch {}
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in
@@ -471,6 +479,18 @@ final class LibraryStore {
     }
 
     func deletePlaylist(_ playlist: Playlist) { if let id = playlist.id { try? database.deletePlaylist(id) } }
+    /// A playlist's own transitions; nil follows the app's setting.
+    func setTransitions(_ choice: TransitionOverride?, for playlist: Playlist) {
+        guard let id = playlist.id else { return }
+        try? database.setTransitionStyle(choice?.storedValue, forPlaylist: id)
+        loadPlaylistTransitions()
+    }
+
+    private func loadPlaylistTransitions() {
+        let stored = (try? database.playlistTransitionStyles()) ?? [:]
+        playlistTransitions = stored.compactMapValues { TransitionOverride(storedValue: $0) }
+    }
+
     func renamePlaylist(_ playlist: Playlist, to name: String) { if let id = playlist.id { try? database.renamePlaylist(id, to: name) } }
     func updateRules(_ playlist: Playlist, _ rules: SmartRules) {
         if let id = playlist.id { try? database.updateSmartRules(id, rules); revision += 1 }

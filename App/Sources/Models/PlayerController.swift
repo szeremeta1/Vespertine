@@ -140,6 +140,9 @@ final class PlayerController {
         engine.nextItemProvider = { finished in mirror.item(after: finished.id) }
         // Network files play from their local copy whenever one is complete (cached or kept offline).
         engine.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
+        // Smart Mix: what the library has measured of a song's ends (none yet: the engine measures them as it plays).
+        let database = library.database
+        engine.transitionProfileProvider = { @Sendable item in item.trackID.flatMap { try? database.transitionProfile(trackID: $0) } }
         engine.eventHandler = { [weak self] event in self?.handle(event) }
         setupRemoteCommands()
         pollTask = Task { [weak self] in
@@ -161,7 +164,7 @@ final class PlayerController {
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
-    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) -> [QueueEntry] {
+    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil) -> [QueueEntry] {
         let versions = library.versions(of: tracks).enumerated().map { i, versions in
             guard let allowing, versions.count > 1 else { return versions }
             return versions.filter { $0.location == tracks[i].location || allowing($0) }
@@ -176,7 +179,7 @@ final class PlayerController {
             // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
             let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
             let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal) ?? track : track
-            return QueueEntry(item: makeItem(chosen), track: chosen, versions: versions.count > 1 ? versions : [])
+            return QueueEntry(item: makeItem(chosen, transitions: transitions), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }
 
@@ -191,7 +194,7 @@ final class PlayerController {
                   let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
                   chosen.id != entry.track.id else { return entry }
             changed = true
-            return entry.replacing(chosen, item: makeItem(chosen, id: entry.id))
+            return entry.replacing(chosen, item: makeItem(chosen, id: entry.id, transitions: entry.item.context?.override))
         }
         let upcomingIDs = Set(queue.indices.filter { $0 >= start }.map { queue[$0].id })
         queue = queue.enumerated().map { $0.offset >= start ? resolve($0.element) : $0.element }
@@ -201,9 +204,11 @@ final class PlayerController {
 
     /// Plays `tracks` from `index`. `shuffled` turns shuffle on (starting at a random song) or off (in order, as
     /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`: see `entries`.
-    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil) {
+    /// `transitions`: the playlist's own transitions, when it's a playlist that has them (they go with its songs).
+    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil,
+              transitions: TransitionOverride? = nil) {
         guard !tracks.isEmpty else { return }
-        let entries = entries(tracks, allowing: allowing)
+        let entries = entries(tracks, allowing: allowing, transitions: transitions)
         guard !entries.isEmpty else { return }
         if let shuffled, shuffled != shuffle {
             settingShuffle = true
@@ -391,7 +396,7 @@ final class PlayerController {
         let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         func remap(_ entry: QueueEntry) -> QueueEntry {
             guard let old = entry.track.id, let new = moves[old], let track = byID[new] else { return entry }
-            return entry.replacing(track, item: makeItem(track, id: entry.id))
+            return entry.replacing(track, item: makeItem(track, id: entry.id, transitions: entry.item.context?.override))
         }
         let remapped = queue.map(remap)
         guard remapped != queue else { return }
@@ -401,16 +406,27 @@ final class PlayerController {
     }
 
     func refreshReplayGain() {
-        queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
-        originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
+        queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
+        originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
         syncMirror(reloadCurrent: true)
     }
 
-    private func makeItem(_ track: Track, id: UUID = UUID()) -> PlayableItem {
-        PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
-                     regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
-                     cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
-                     sacdArea: track.sacdArea, dvd: track.dvdStream, context: Self.transitionContext(track))
+    private func makeItem(_ track: Track, id: UUID = UUID(), transitions: TransitionOverride? = nil) -> PlayableItem {
+        var context = Self.transitionContext(track)
+        context.override = transitions
+        return PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
+                            regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
+                            cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
+                            sacdArea: track.sacdArea, dvd: track.dvdStream, context: context)
+    }
+
+    /// How `entry` joins the song before it in the queue, while transitions are on: what the engine planned for the
+    /// boundary after the song playing, else what can be told before the songs are opened (albums, genres, playlists).
+    func join(before entry: QueueEntry) -> TransitionDecision? {
+        guard settings.transitions.enabled, let i = queue.firstIndex(where: { $0.id == entry.id }), i > 0 else { return nil }
+        let previous = queue[i - 1]
+        if previous.id == current?.id, let planned = signalPath?.transition?.next { return planned }
+        return TransitionPlanner.decide(settings.transitions, from: previous.item, format: .unknown, to: entry.item, format: .unknown)
     }
 
     /// What transitions need to know about a song: its album (only when it has one: songs without an album tag would

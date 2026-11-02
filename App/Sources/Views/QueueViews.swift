@@ -212,6 +212,15 @@ struct QueueRow: View {
         let track = entry.track
         HStack(spacing: 10) {
             ArtworkView(key: model.artworkKey(track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
+                .overlay(alignment: .topLeading) {
+                    // How it joins the song before it, while transitions are on.
+                    if !isCurrent, let join = model.player.join(before: entry) {
+                        BoundaryGlyph(decision: join)
+                            .padding(2)
+                            .background(Palette.panel.opacity(0.85), in: RoundedRectangle(cornerRadius: 3))
+                            .offset(x: -6, y: -6)
+                    }
+                }
             VStack(alignment: .leading, spacing: 1) {
                 Text(track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
                 Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)

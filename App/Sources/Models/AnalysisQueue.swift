@@ -267,9 +267,13 @@ final class AnalysisQueue {
                 // result is saved there too, so the main thread only counts it.
                 let outcome = await withCheckedContinuation { (continuation: CheckedContinuation<Result<FileAnalysis, Error>, Never>) in
                     Self.analysisThreads.async {
-                        let result = Result { try FileAnalyzer.analyze(url: resolved, shouldContinue: readsNetwork ? { !gate.isBusy } : nil) }
-                        if case .success(let analysis) = result { try? database.saveAnalysis(analysis, filePath: path) }
-                        continuation.resume(returning: result)
+                        let result = Result { try FileAnalyzer.analyzeWithProfile(url: resolved, shouldContinue: readsNetwork ? { !gate.isBusy } : nil) }
+                        if case .success(let done) = result {
+                            try? database.saveAnalysis(done.analysis, filePath: path)
+                            // How the song starts and ends, from the same pass (Smart Mix).
+                            if let profile = done.profile { try? database.saveTransitionProfiles([(profile, path)]) }
+                        }
+                        continuation.resume(returning: result.map(\.analysis))
                     }
                 }
                 active.remove(path)

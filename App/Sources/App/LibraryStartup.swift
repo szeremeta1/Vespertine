@@ -7,8 +7,11 @@ final class LibraryStartup {
     var model: AppModel?
     var error: String?
     private var selectedDirectory: URL?
+    /// The app's one startup, for what runs outside its windows (Shortcuts' actions).
+    private(set) static weak var current: LibraryStartup?
 
     init() {
+        Self.current = self
         // Vespertine is drawn dark only. Without this, whatever SwiftUI's preferredColorScheme doesn't reach (the menu
         // bar window, popovers, alerts, open and save panels, menus, the About panel) followed the Mac's Light Mode and
         // could show dark text on Vespertine's dark backgrounds (issue #68). Set before the migration alerts can appear.

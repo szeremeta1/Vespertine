@@ -90,6 +90,20 @@ struct TransitionsTests {
         }
         settings.transitions.setEnabled(false)
         #expect(settings.engineSettings() == before)
+        // Smart Mix's gap and "transitions first": off, they don't reach the engine either.
+        settings.transitions.gapSeconds = 4
+        settings.transitions.policy = .transitionsFirst
+        #expect(settings.engineSettings() == before)
+        settings.transitions.setEnabled(true)
+        let on = settings.engineSettings().transitions
+        #expect(on.gapSeconds == 4 && on.policy == .transitionsFirst && on.avoidsUnmixableModes)
+        settings.transitions.setEnabled(false)
+        #expect(settings.engineSettings() == before)
+    }
+
+    @Test("Shortcuts: the style action covers every style")
+    func intentStyles() {
+        #expect(TransitionStyleOption.allCases.map(\.style) == TransitionStyle.allCases)
     }
 
     @Test("Queued songs carry their album (when they have one), place on it and genre")
