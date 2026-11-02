@@ -79,6 +79,8 @@ final class PlayerController {
     private(set) var signalPath: SignalPath?
     /// Set while macOS renders the track itself (Dolby Atmos).
     private(set) var systemRendering: SystemRendering?
+    /// The channels of the bed decoded beside the output while macOS renders Atmos or a receiver decodes a bitstream.
+    private(set) var bedMeters: BedMeterLayout?
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
@@ -481,6 +483,7 @@ final class PlayerController {
         // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
         signalPath = nil
         systemRendering = nil
+        bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
         engine.play(entry.item)
@@ -665,6 +668,7 @@ final class PlayerController {
         if requested == nil {
             if signalPath != snap.signalPath { signalPath = snap.signalPath }
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
+            if bedMeters != snap.bedMeters { bedMeters = snap.bedMeters }
         }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
@@ -681,7 +685,12 @@ final class PlayerController {
         yieldShareToPlayback(snap)
         yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
-        if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
+        if state == .playing, requested == nil, let bed = bedMeters, bed.names.count > 2 {
+            // macOS renders, or a receiver decodes: the bed decoded beside the output.
+            let peaks = engine.takeChannelPeaks()
+            if channelLevels.count != peaks.count { channelLevels = peaks }
+            else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }
+        } else if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
             let peaks = engine.takeChannelPeaks()
             if channelLevels.count != peaks.count { channelLevels = peaks }
             else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }

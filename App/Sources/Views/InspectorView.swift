@@ -82,12 +82,17 @@ struct NowPlayingPanel: View {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
-                        if path.plan.channels > 2 || path.source.channels > 2 {
+                        if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
+                            ChannelMetersView(bed: bed, bitstream: true, levels: model.player.channelLevels).padding(.top, 14)
+                        } else if path.plan.channels > 2 || path.source.channels > 2 {
                             ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
                         }
                     } else if let system = player.systemRendering {
                         SystemRenderingView(rendering: system, device: player.outputDevice?.name,
                                             bypassedEqualizer: player.outputDevice.flatMap { model.settings.eqPreset(for: $0) }.flatMap { $0.isFlat ? nil : $0.name }).padding(.top, 16)
+                        if let bed = player.bedMeters, bed.names.count > 2 {
+                            ChannelMetersView(bed: bed, bitstream: false, levels: model.player.channelLevels).padding(.top, 14)
+                        }
                     } else {
                         Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
@@ -110,9 +115,9 @@ struct NowPlayingPanel: View {
             .padding(20)
         }
         .scrollContentBackground(.hidden)
-        .task(id: player.signalPath != nil) {
+        .task(id: player.signalPath != nil || player.systemRendering != nil) {
             // QA: `-VespertineScrollInspector YES` scrolls to the meters for snapshots.
-            guard player.signalPath != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
+            guard player.signalPath != nil || player.systemRendering != nil, LaunchArguments().bool(forKey: "VespertineScrollInspector") else { return }
             try? await Task.sleep(for: .milliseconds(300))
             scroller.scrollTo("spectrum", anchor: .bottom)
         }
@@ -369,7 +374,7 @@ struct SystemRenderingView: View {
                       value: rendering.spatial ? String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on")
                           : String(localized: "channels", comment: "Audio goes out as the output's channels"),
                       tone: rendering.spatial ? .changed : .plain),
-                .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; the spectrum and channel meters don't apply, but the Visualizer shows the decoded bed"),
+                .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; the meters and the Visualizer read a separate decode of the bed"),
                       value: String(localized: "system", comment: "The macOS system renderer handles this step")),
             ] + (bypassedEqualizer.map { [.init(title: String(localized: "Equalizer"), detail: "\($0) · \(EqualizerStatus.Bypass.systemRendered.explanation)",
                                                value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream"))] } ?? []))
@@ -380,13 +385,32 @@ struct SystemRenderingView: View {
 
 /// Live level of every channel Vespertine sends, labelled by speaker, plus where they go.
 struct ChannelMetersView: View {
-    let path: SignalPath
+    let names: [String]
+    let title: String
+    let summary: String
     let levels: [Float]
 
+    init(path: SignalPath, levels: [Float]) {
+        self.levels = levels
+        names = path.applied.channelNames
+        title = path.plan.spatial != .off ? String(localized: "Channels · Spatial Audio") : String(localized: "Channels")
+        summary = Self.summary(for: path)
+    }
+
+    /// The bed Vespertine decodes beside the output while macOS renders the track (`bitstream` false) or a receiver
+    /// decodes the frames it is sent untouched (`bitstream` true): its own channels, named as for any other surround track.
+    init(bed: BedMeterLayout, bitstream: Bool, levels: [Float]) {
+        self.levels = levels
+        names = bed.names
+        title = String(localized: "Channels · \(bed.layout) bed", comment: "Section title above the channel meters; %@ is a speaker layout like 5.1 or 7.1.")
+        summary = bitstream
+            ? String(localized: "Decoded again beside the bitstream for these meters; the receiver gets the frames untouched.")
+            : String(localized: "Decoded again beside the output for these meters. macOS renders the objects, so their height and position aren't shown; what macOS plays is untouched.")
+    }
+
     var body: some View {
-        let names = path.applied.channelNames
         VStack(alignment: .leading, spacing: 10) {
-            SectionLabel(text: path.plan.spatial != .off ? String(localized: "Channels · Spatial Audio") : String(localized: "Channels"))
+            SectionLabel(text: title)
             HStack(alignment: .bottom, spacing: 6) {
                 ForEach(Array(names.enumerated()), id: \.offset) { i, name in
                     VStack(spacing: 4) {
@@ -410,7 +434,7 @@ struct ChannelMetersView: View {
         }
     }
 
-    private var summary: String {
+    private static func summary(for path: SignalPath) -> String {
         let src = ChannelLayouts.name(labels: path.source.channelLabels, channels: path.source.channels)
         if path.plan.spatial != .off {
             return String(localized: "\(src) placed as virtual speakers around you and rendered for \(path.deviceName).")
@@ -544,13 +568,15 @@ struct SpectrumView: View {
     }
 
     private func update() {
-        guard let path = model.player.signalPath, path.plan.mode != .bitstream,
+        // macOS-rendered Atmos and bitstreams have no samples of their own to read: the bed decoded beside them.
+        let beside = model.player.bedMeters != nil
+        guard beside || model.player.signalPath.map({ $0.plan.mode != .bitstream }) == true,
               let rate = model.player.engine.copyTap(into: &buffer) else {
             bands = bands.map { $0 * 0.85 }
             return
         }
         // DoP levels come from the DSD bits: past 20 kHz they're mostly the modulator's noise, not music.
-        let fresh = analyzer.bands(buffer, sampleRate: rate, count: bands.count, highHz: min(rate / 2, path.plan.mode == .dop ? 20_000 : 40_000))
+        let fresh = analyzer.bands(buffer, sampleRate: rate, count: bands.count, highHz: min(rate / 2, !beside && model.player.signalPath?.plan.mode == .dop ? 20_000 : 40_000))
         bands = zip(bands, fresh).map { old, new in new > old ? new : old * 0.82 + new * 0.18 }
     }
 }

@@ -426,6 +426,15 @@ enum SourceOpener {
     }
 }
 
+extension SourceOpener {
+    /// A new decoder on the file for reading it as PCM, as the engine would when not sending it untouched (the meters'
+    /// own decode of a bitstream); throws for sources that aren't PCM.
+    static func pcmDecoder(for url: URL) throws -> PCMDecoding {
+        guard let pcm = try probe(url).pcm else { throw SourceOpenerError.unsupported(url) }
+        return pcm
+    }
+}
+
 /// Public, read-only inspection used by the library scanner.
 public enum SourceInspector {
     public static var supportedExtensions: Set<String> { SourceOpener.supportedExtensions }

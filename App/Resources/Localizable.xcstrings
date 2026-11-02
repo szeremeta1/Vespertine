@@ -180152,270 +180152,1074 @@
         }
       }
     },
-    "Frames go to macOS untouched; the spectrum and channel meters don't apply, but the Visualizer shows the decoded bed": {
+    "Frames go to macOS untouched; the meters and the Visualizer read a separate decode of the bed": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ፍሬሞች ሳይነኩ ወደ macOS ይሄዳሉ፤ ስፔክትረሙና የቻናል መለኪያዎች አይሠሩም፣ ነገር ግን ምስላዊ ማሳያው ዲኮድ የተደረገውን መሠረት ያሳያል"
+            "value": "ፍሬሞች ሳይነኩ ወደ macOS ይሄዳሉ፤ መለኪያዎቹና ምስላዊ ማሳያው የመሠረቱን የተለየ ዲኮድ ያነባሉ"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تذهب الإطارات إلى macOS دون تعديل؛ لا ينطبق الطيف ولا مقاييس القنوات، لكن المؤثرات المرئية تعرض القاعدة بعد فك ترميزها"
+            "value": "تذهب الإطارات إلى macOS دون تعديل؛ تقرأ المقاييس والمؤثرات المرئية فك ترميز منفصلًا للقاعدة"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "অডিও ফ্রেম অপরিবর্তিত অবস্থায় macOS-এ যায়; স্পেকট্রাম ও চ্যানেল মিটার প্রযোজ্য নয়, তবে ভিজ্যুয়ালাইজার ডিকোড করা বেড দেখায়"
+            "value": "অডিও ফ্রেম অপরিবর্তিত অবস্থায় macOS-এ যায়; মিটার ও ভিজ্যুয়ালাইজার বেডের আলাদা ডিকোড পড়ে"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rámce jdou do macOS nedotčené; spektrum a kanálové měřiče se neuplatňují, ale Vizualizér ukazuje dekódovaný základ"
+            "value": "Rámce jdou do macOS nedotčené; měřiče a Vizualizér čtou samostatné dekódování základu"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames sendes uberørte til macOS; spektrum og kanalmålere gælder ikke, men Visualisering viser den afkodede base"
+            "value": "Frames sendes uberørte til macOS; målerne og Visualisering læser en separat afkodning af basen"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames gehen unverändert an macOS; Spektrum und Kanal-Pegelanzeigen gelten nicht, aber der Visualizer zeigt das dekodierte Bed"
+            "value": "Frames gehen unverändert an macOS; die Pegelanzeigen und der Visualizer lesen eine separate Dekodierung des Beds"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Τα πλαίσια ήχου πηγαίνουν ανέγγιχτα στο macOS· το φάσμα και οι μετρητές καναλιών δεν ισχύουν, αλλά ο Οπτικοποιητής δείχνει τα αποκωδικοποιημένα κανάλια βάσης"
+            "value": "Τα πλαίσια ήχου πηγαίνουν ανέγγιχτα στο macOS· οι μετρητές και ο Οπτικοποιητής διαβάζουν μια ξεχωριστή αποκωδικοποίηση των καναλιών βάσης"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las tramas llegan intactas a macOS; el espectro y los medidores de canales no se aplican, pero el Visualizador muestra la base decodificada"
+            "value": "Las tramas llegan intactas a macOS; los medidores y el Visualizador leen una decodificación aparte de la base"
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "فریم‌ها دست‌نخورده به macOS می‌روند؛ طیف و نمایشگرهای سطح کانال‌ها اعمال نمی‌شوند، اما نمایشگر تصویری بستر رمزگشایی‌شده را نشان می‌دهد"
+            "value": "فریم‌ها دست‌نخورده به macOS می‌روند؛ نمایشگرهای سطح و نمایشگر تصویری یک رمزگشایی جداگانهٔ بستر را می‌خوانند"
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kehykset menevät macOS:lle koskemattomina; spektri ja kanavamittarit eivät ole käytössä, mutta Visualisoija näyttää puretun pohjan"
+            "value": "Kehykset menevät macOS:lle koskemattomina; mittarit ja Visualisoija lukevat pohjan erillistä purkua"
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pumupunta sa macOS ang mga frame nang hindi ginagalaw; hindi saklaw ang spectrum at mga channel meter, pero ipinapakita ng Visualizer ang na-decode na bed"
+            "value": "Pumupunta sa macOS ang mga frame nang hindi ginagalaw; binabasa ng mga meter at ng Visualizer ang hiwalay na decode ng bed"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les trames sont transmises intactes à macOS ; le spectre et les indicateurs de niveau des canaux ne s’appliquent pas, mais le Visualiseur montre le bed décodé"
+            "value": "Les trames sont transmises intactes à macOS ; les indicateurs de niveau et le Visualiseur lisent un décodage séparé du bed"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "ઑડિયો ફ્રેમ અકબંધ રીતે macOS ને જાય છે; સ્પેક્ટ્રમ અને ચૅનલ મીટર લાગુ પડતાં નથી, પણ વિઝ્યુઅલાઇઝર ડીકોડ કરેલો બેડ બતાવે છે"
+            "value": "ઑડિયો ફ્રેમ અકબંધ રીતે macOS ને જાય છે; મીટર અને વિઝ્યુઅલાઇઝર બેડનું અલગ ડીકોડ વાંચે છે"
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Firam suna zuwa macOS ba tare da an taɓa su ba; bakan sauti da mita na tashoshi ba sa aiki, amma Mai nuna sauti yana nuna gadon da aka warware"
+            "value": "Firam suna zuwa macOS ba tare da an taɓa su ba; mitoci da Mai nuna sauti suna karanta wani warwarewa na daban na gadon"
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "הפריימים מגיעים ל־macOS ללא שינוי; הספקטרום ומדי הערוצים אינם חלים, אך הויזואלייזר מציג את הבסיס המפוענח"
+            "value": "הפריימים מגיעים ל־macOS ללא שינוי; המדים והויזואלייזר קוראים פענוח נפרד של הבסיס"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "ऑडियो फ़्रेम बिना बदलाव के macOS तक जाते हैं; स्पेक्ट्रम और चैनल मीटर लागू नहीं होते, लेकिन विज़ुअलाइज़र डिकोड किया हुआ बेड दिखाता है"
+            "value": "ऑडियो फ़्रेम बिना बदलाव के macOS तक जाते हैं; मीटर और विज़ुअलाइज़र बेड का अलग डिकोड पढ़ते हैं"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A keretek érintetlenül jutnak a macOS-hez; a spektrum és a csatornamérők nem érvényesek, de a Vizualizáló a dekódolt alapot mutatja"
+            "value": "A keretek érintetlenül jutnak a macOS-hez; a mérők és a Vizualizáló az alap külön dekódolását olvassák"
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frame dikirim ke macOS tanpa diubah; spektrum dan meter saluran tidak berlaku, tetapi Visualizer menampilkan bed yang sudah didekode"
+            "value": "Frame dikirim ke macOS tanpa diubah; meter dan Visualizer membaca dekode terpisah dari bed"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "I frame arrivano a macOS intatti; lo spettro e gli indicatori di livello dei canali non si applicano, ma il Visualizzatore mostra il bed decodificato"
+            "value": "I frame arrivano a macOS intatti; gli indicatori di livello e il Visualizzatore leggono una decodifica separata del bed"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "フレームはそのままmacOSに渡されます。スペクトラムとチャンネルメーターは適用されませんが、ビジュアライザはデコードしたベッドを表示します"
+            "value": "フレームはそのままmacOSに渡されます。メーターとビジュアライザは、ベッドを別にデコードしたものを読み取ります"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಆಡಿಯೋ ಫ್ರೇಮ್‌ಗಳು ಬದಲಾಗದೆ macOS ಗೆ ಹೋಗುತ್ತವೆ; ಸ್ಪೆಕ್ಟ್ರಮ್ ಮತ್ತು ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಅನ್ವಯಿಸುವುದಿಲ್ಲ, ಆದರೆ ದೃಶ್ಯೀಕರಣವು ಡೀಕೋಡ್ ಮಾಡಿದ ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತದೆ"
+            "value": "ಆಡಿಯೋ ಫ್ರೇಮ್‌ಗಳು ಬದಲಾಗದೆ macOS ಗೆ ಹೋಗುತ್ತವೆ; ಮೀಟರ್‌ಗಳು ಮತ್ತು ದೃಶ್ಯೀಕರಣವು ಬೆಡ್‌ನ ಪ್ರತ್ಯೇಕ ಡೀಕೋಡ್ ಅನ್ನು ಓದುತ್ತವೆ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "프레임은 그대로 macOS로 전달됨, 스펙트럼과 채널 미터는 적용되지 않지만 비주얼라이저는 디코딩한 베드를 표시함"
+            "value": "프레임은 그대로 macOS로 전달되며, 미터와 비주얼라이저는 베드를 따로 디코딩한 것을 읽습니다"
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഫ്രെയിമുകൾ മാറ്റമില്ലാതെ macOS-ലേക്ക് പോകുന്നു; സ്പെക്ട്രവും ചാനൽ മീറ്ററുകളും ബാധകമല്ല, എന്നാൽ വിഷ്വലൈസർ ഡീകോഡ് ചെയ്ത ബെഡ് കാണിക്കുന്നു"
+            "value": "ഫ്രെയിമുകൾ മാറ്റമില്ലാതെ macOS-ലേക്ക് പോകുന്നു; മീറ്ററുകളും വിഷ്വലൈസറും ബെഡിന്റെ പ്രത്യേക ഡീകോഡ് വായിക്കുന്നു"
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "ऑडिओ फ्रेम अपरिवर्तित स्वरूपात macOS कडे जातात; स्पेक्ट्रम आणि चॅनेल मीटर लागू होत नाहीत, पण व्हिज्युअलायझर डीकोड केलेला बेड दाखवतो"
+            "value": "ऑडिओ फ्रेम अपरिवर्तित स्वरूपात macOS कडे जातात; मीटर आणि व्हिज्युअलायझर बेडचे वेगळे डीकोड वाचतात"
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bingkai dihantar ke macOS tanpa diusik; spektrum dan meter saluran tidak terpakai, tetapi Pemvisual menunjukkan lapisan yang telah dinyahkod"
+            "value": "Bingkai dihantar ke macOS tanpa diusik; meter dan Pemvisual membaca nyahkod berasingan bagi lapisan itu"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rammer sendes urørt til macOS; spektrum og kanalmålere gjelder ikke, men Visualisering viser den dekodede basen"
+            "value": "Rammer sendes urørt til macOS; målerne og Visualisering leser en separat avkoding av basen"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frames gaan onaangetast naar macOS; het spectrum en de kanaalmeters gelden niet, maar de Visualizer toont het gedecodeerde bed"
+            "value": "Frames gaan onaangetast naar macOS; de meters en de Visualizer lezen een aparte decodering van het bed"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਆਡੀਓ ਫ਼੍ਰੇਮ ਬਿਨਾਂ ਛੇੜੇ macOS ਨੂੰ ਜਾਂਦੇ ਹਨ; ਸਪੈਕਟ੍ਰਮ ਅਤੇ ਚੈਨਲ ਮੀਟਰ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ, ਪਰ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਡੀਕੋਡ ਕੀਤਾ ਬੈੱਡ ਦਿਖਾਉਂਦਾ ਹੈ"
+            "value": "ਆਡੀਓ ਫ਼੍ਰੇਮ ਬਿਨਾਂ ਛੇੜੇ macOS ਨੂੰ ਜਾਂਦੇ ਹਨ; ਮੀਟਰ ਅਤੇ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਬੈੱਡ ਦਾ ਵੱਖਰਾ ਡੀਕੋਡ ਪੜ੍ਹਦੇ ਹਨ"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ramki trafiają do macOS nienaruszone; widmo i mierniki kanałów nie mają zastosowania, ale Wizualizator pokazuje zdekodowaną podstawę kanałową"
+            "value": "Ramki trafiają do macOS nienaruszone; mierniki i Wizualizator czytają osobne dekodowanie podstawy kanałowej"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Os quadros chegam intactos ao macOS; o espectro e os medidores de canais não se aplicam, mas o Visualizador mostra a base decodificada"
+            "value": "Os quadros chegam intactos ao macOS; os medidores e o Visualizador leem uma decodificação separada da base"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "As tramas vão intactas para o macOS; o espectro e os medidores de canais não se aplicam, mas o Visualizador mostra a base descodificada"
+            "value": "As tramas vão intactas para o macOS; os medidores e o Visualizador leem uma descodificação separada da base"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cadrele ajung neatinse la macOS; spectrul și indicatoarele canalelor nu se aplică, dar Vizualizatorul arată baza decodată"
+            "value": "Cadrele ajung neatinse la macOS; indicatoarele și Vizualizatorul citesc o decodare separată a bazei"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ramarna går orörda till macOS; spektrum och kanalmätare gäller inte, men Visualiserare visar den avkodade bädden"
+            "value": "Ramarna går orörda till macOS; mätarna och Visualiserare läser en separat avkodning av bädden"
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fremu huenda kwa macOS bila kuguswa; masafa na mita za chaneli hazitumiki, lakini Kionyeshi huonyesha kitanda kilichosimbuliwa"
+            "value": "Fremu huenda kwa macOS bila kuguswa; mita na Kionyeshi husoma usimbuaji tofauti wa kitanda"
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "ஆடியோ ஃபிரேம்கள் மாற்றமின்றி macOS-க்குச் செல்கின்றன; ஸ்பெக்ட்ரமும் சேனல் மீட்டர்களும் பொருந்தாது, ஆனால் காட்சிப்படுத்தி டிகோட் செய்த படுகையைக் காட்டுகிறது"
+            "value": "ஆடியோ ஃபிரேம்கள் மாற்றமின்றி macOS-க்குச் செல்கின்றன; மீட்டர்களும் காட்சிப்படுத்தியும் படுகையின் தனி டிகோடைப் படிக்கின்றன"
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఆడియో ఫ్రేమ్‌లు మార్పు లేకుండా macOSకు వెళ్తాయి; స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు వర్తించవు, కానీ విజువలైజర్ డీకోడ్ చేసిన బెడ్‌ను చూపుతుంది"
+            "value": "ఆడియో ఫ్రేమ్‌లు మార్పు లేకుండా macOSకు వెళ్తాయి; మీటర్‌లు, విజువలైజర్ బెడ్ యొక్క ప్రత్యేక డీకోడ్‌ను చదువుతాయి"
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "เฟรมส่งไปยัง macOS โดยไม่ถูกแตะต้อง สเปกตรัมและมิเตอร์ช่องสัญญาณไม่มีผล แต่ภาพเคลื่อนไหวตามเสียงจะแสดงช่องสัญญาณพื้นฐานที่ถอดรหัสแล้ว"
+            "value": "เฟรมส่งไปยัง macOS โดยไม่ถูกแตะต้อง มิเตอร์และภาพเคลื่อนไหวตามเสียงอ่านจากการถอดรหัสช่องสัญญาณพื้นฐานแยกต่างหาก"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Çerçeveler macOS’e dokunulmadan gider; spektrum ve kanal ölçerleri geçerli değildir, ancak Görselleştirici kodu çözülmüş tabanı gösterir"
+            "value": "Çerçeveler macOS’e dokunulmadan gider; ölçerler ve Görselleştirici tabanın ayrı bir kod çözümünü okur"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Аудіокадри надходять у macOS без змін; спектр і індикатори каналів не застосовуються, але Візуалізатор показує декодовану основу"
+            "value": "Аудіокадри надходять у macOS без змін; індикатори та Візуалізатор читають окреме декодування основи"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "فریمز بغیر تبدیلی کے macOS کو جاتے ہیں؛ اسپیکٹرم اور چینل میٹرز لاگو نہیں ہوتے، لیکن بصری نمائش ڈی کوڈ کیا ہوا بیڈ دکھاتی ہے"
+            "value": "فریمز بغیر تبدیلی کے macOS کو جاتے ہیں؛ میٹرز اور بصری نمائش بیڈ کی الگ ڈی کوڈنگ پڑھتے ہیں"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Khung âm thanh được gửi nguyên vẹn đến macOS; phổ và đồng hồ đo kênh không áp dụng, nhưng Trình hiển thị cho thấy lớp kênh nền đã giải mã"
+            "value": "Khung âm thanh được gửi nguyên vẹn đến macOS; đồng hồ đo và Trình hiển thị đọc một bản giải mã riêng của lớp kênh nền"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "帧原样交给 macOS；频谱和声道电平表不适用，但可视化会显示解码后的声道床"
+            "value": "帧原样交给 macOS；电平表和可视化读取另行解码的声道床"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "訊框原封不動交給 macOS；頻譜和聲道電平表不適用，但視覺效果會顯示解碼後的聲道床"
+            "value": "訊框原封不動交給 macOS；電平表和視覺效果讀取另行解碼的聲道床"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "幀原封不動傳送至 macOS；頻譜和聲道電平表不適用，但視覺效果會顯示解碼後的聲道床"
+            "value": "幀原封不動傳送至 macOS；電平表和視覺效果讀取另行解碼的聲道床"
+          }
+        }
+      }
+    },
+    "Channels · %@ bed": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቻናሎች · %@ መሠረት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "القنوات · قاعدة %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "চ্যানেল · %@ বেড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanály · základ %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanaler · %@-base"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanäle · %@-Bed"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κανάλια · βάση %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canales · base %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کانال‌ها · بستر %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanavat · %@-pohja"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga channel · %@ bed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canaux · bed %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ચૅનલ · %@ બેડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tashoshi · gadon %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ערוצים · בסיס %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चैनल · %@ बेड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatornák · %@ alap"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran · bed %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canali · bed %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "チャンネル · %@ベッド"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಚಾನೆಲ್‌ಗಳು · %@ ಬೆಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "채널 · %@ 베드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ചാനലുകൾ · %@ ബെഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चॅनेल · %@ बेड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran · lapisan %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanaler · %@-base"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanalen · %@-bed"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਚੈਨਲ · %@ ਬੈੱਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanały · podstawa %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais · base %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais · base %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canale · baza %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanaler · %@-bädd"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaneli · kitanda cha %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சேனல்கள் · %@ படுகை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఛానెల్‌లు · %@ బెడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ช่องสัญญาณ · พื้นฐาน %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanallar · %@ tabanı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Канали · основа %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چینلز · %@ بیڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kênh · lớp nền %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "声道 · %@ 声道床"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲道 · %@ 聲道床"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲道 · %@ 聲道床"
+          }
+        }
+      }
+    },
+    "Decoded again beside the bitstream for these meters; the receiver gets the frames untouched.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለእነዚህ መለኪያዎች ብቻ ከቢትስትሪሙ ጎን እንደገና ዲኮድ ተደርጓል፤ ተቀባዩ ፍሬሞቹን ሳይነኩ ይቀበላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فُكّ ترميزها مرة أخرى بجانب تدفق البتات، لهذه المقاييس فقط؛ يستلم جهاز الاستقبال الإطارات دون تعديل."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "শুধু এই মিটারগুলোর জন্য বিটস্ট্রিমের পাশে আবার ডিকোড করা হয়েছে; রিসিভার ফ্রেম অপরিবর্তিত অবস্থায় পায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dekódováno znovu vedle bitstreamu, jen pro tyto měřiče; přijímač dostává rámce nedotčené."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afkodet en ekstra gang ved siden af bitstreamen, kun til disse målere; modtageren får frames uberørte."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zusätzlich neben dem Bitstream dekodiert, nur für diese Pegelanzeigen; der Receiver bekommt die Frames unverändert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποκωδικοποιημένο ξανά δίπλα στο bitstream, μόνο για αυτούς τους μετρητές· ο δέκτης λαμβάνει τα πλαίσια ανέγγιχτα."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificado de nuevo junto al bitstream, solo para estos medidores; el receptor recibe las tramas intactas."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یک بار دیگر در کنار بیت‌استریم رمزگشایی شده، فقط برای این نمایشگرها؛ گیرنده فریم‌ها را دست‌نخورده دریافت می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purettu uudelleen bittivirran rinnalla vain näitä mittareita varten; vastaanotin saa kehykset koskemattomina."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinecode ulit sa tabi ng bitstream, para lang sa mga meter na ito; natatanggap ng receiver ang mga frame nang hindi ginagalaw."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Décodé une seconde fois à côté du bitstream, pour ces indicateurs seulement ; le récepteur reçoit les trames intactes."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફક્ત આ મીટર માટે બિટસ્ટ્રીમની બાજુમાં ફરીથી ડીકોડ કર્યું; રિસીવરને ફ્રેમ અકબંધ મળે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An sake warwarewa kusa da bitstream, domin waɗannan mitoci kawai; mai karɓa yana samun firam ba tare da an taɓa su ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מפוענח שוב לצד זרם הביטים, למדים האלה בלבד; המקלט מקבל את הפריימים ללא שינוי."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इन मीटरों के लिए ही बिटस्ट्रीम के बगल में दोबारा डिकोड किया गया; रिसीवर को फ़्रेम बिना बदलाव के मिलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újra dekódolva a bitfolyam mellett, csak ezeknek a mérőknek; a vevő érintetlenül kapja a kereteket."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Didekode lagi di samping bitstream, hanya untuk meter ini; receiver menerima frame tanpa diubah."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificato di nuovo accanto al bitstream, solo per questi indicatori; il ricevitore riceve i frame intatti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これらのメーターのためだけに、ビットストリームと並行してもう一度デコードしています。レシーバーにはフレームがそのまま届きます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಮೀಟರ್‌ಗಳಿಗಾಗಿ ಮಾತ್ರ ಬಿಟ್‌ಸ್ಟ್ರೀಮ್‌ನ ಪಕ್ಕದಲ್ಲಿ ಮತ್ತೆ ಡೀಕೋಡ್ ಮಾಡಲಾಗಿದೆ; ರಿಸೀವರ್‌ಗೆ ಫ್ರೇಮ್‌ಗಳು ಬದಲಾಗದೆ ಸಿಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 미터만을 위해 비트스트림 옆에서 한 번 더 디코딩합니다. 리시버에는 프레임이 그대로 전달됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ മീറ്ററുകൾക്കായി മാത്രം ബിറ്റ്സ്ട്രീമിന് അരികിൽ വീണ്ടും ഡീകോഡ് ചെയ്തത്; റിസീവറിന് ഫ്രെയിമുകൾ മാറ്റമില്ലാതെ ലഭിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फक्त या मीटरसाठी बिटस्ट्रीमच्या बाजूला पुन्हा डीकोड केले; रिसीव्हरला फ्रेम अपरिवर्तित मिळतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinyahkod sekali lagi di sebelah bitstream, untuk meter ini sahaja; penerima mendapat bingkai tanpa diusik."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avkodet en gang til ved siden av bitstrømmen, bare for disse målerne; mottakeren får rammene urørt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opnieuw gedecodeerd naast de bitstream, alleen voor deze meters; de ontvanger krijgt de frames onaangetast."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਿਰਫ਼ ਇਹਨਾਂ ਮੀਟਰਾਂ ਲਈ ਬਿੱਟਸਟ੍ਰੀਮ ਦੇ ਨਾਲ ਦੁਬਾਰਾ ਡੀਕੋਡ ਕੀਤਾ ਗਿਆ; ਰਿਸੀਵਰ ਨੂੰ ਫ਼੍ਰੇਮ ਬਿਨਾਂ ਛੇੜੇ ਮਿਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zdekodowane jeszcze raz obok strumienia bitowego, tylko dla tych mierników; odbiornik dostaje ramki nienaruszone."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificado de novo ao lado do bitstream, só para estes medidores; o receptor recebe os quadros intactos."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descodificado de novo junto ao bitstream, só para estes medidores; o recetor recebe as tramas intactas."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodat încă o dată lângă bitstream, doar pentru aceste indicatoare; receptorul primește cadrele neatinse."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avkodad en gång till vid sidan av bitströmmen, bara för de här mätarna; mottagaren får ramarna orörda."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimesimbuliwa tena kando ya bitstream, kwa mita hizi tu; kipokezi hupokea fremu bila kuguswa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த மீட்டர்களுக்காக மட்டும் பிட்ஸ்ட்ரீமுக்கு அருகே மீண்டும் டிகோட் செய்யப்பட்டது; ரிசீவருக்கு ஃபிரேம்கள் மாற்றமின்றி கிடைக்கின்றன."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ మీటర్‌ల కోసం మాత్రమే బిట్‌స్ట్రీమ్ పక్కన మళ్లీ డీకోడ్ చేశారు; రిసీవర్‌కు ఫ్రేమ్‌లు మార్పు లేకుండా అందుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถอดรหัสซ้ำอีกครั้งควบคู่กับบิตสตรีม เพื่อมิเตอร์เหล่านี้เท่านั้น ตัวรับได้รับเฟรมโดยไม่ถูกแตะต้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitstream’in yanında yeniden çözüldü, yalnızca bu ölçerler için; alıcı çerçeveleri dokunulmadan alır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Декодовано ще раз поряд із бітстримом, лише для цих індикаторів; приймач отримує кадри без змін."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بٹ سٹریم کے ساتھ ایک بار پھر ڈی کوڈ کیا گیا، صرف ان میٹرز کے لیے؛ ریسیور کو فریمز بغیر تبدیلی کے ملتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giải mã lại bên cạnh bitstream, chỉ cho các đồng hồ đo này; bộ thu nhận khung nguyên vẹn."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在比特流旁再解码一次，仅供这些电平表使用；接收器收到的帧原封不动。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在位元串流旁再解碼一次，僅供這些電平表使用；接收器收到的訊框原封不動。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在位元流旁再解碼一次，僅供這些電平表使用；接收器收到的幀原封不動。"
+          }
+        }
+      }
+    },
+    "Decoded again beside the output for these meters. macOS renders the objects, so their height and position aren't shown; what macOS plays is untouched.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለእነዚህ መለኪያዎች ብቻ ከውጤቱ ጎን እንደገና ዲኮድ ተደርጓል። macOS ነገሮቹን ያሳያል፣ ስለዚህ ቁመታቸውና ቦታቸው አይታይም፤ macOS የሚጫወተው አይነካም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فُكّ ترميزها مرة أخرى بجانب المخرج، لهذه المقاييس فقط. يعرض macOS الكائنات، لذا لا يظهر ارتفاعها ولا موضعها، وما يشغّله macOS يبقى دون مساس."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "শুধু এই মিটারগুলোর জন্য আউটপুটের পাশে আবার ডিকোড করা হয়েছে। macOS অবজেক্ট রেন্ডার করে, তাই তাদের উচ্চতা ও অবস্থান দেখানো হয় না, আর macOS যা চালায় তা অক্ষত থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dekódováno znovu vedle výstupu, jen pro tyto měřiče. macOS objekty vykresluje, takže jejich výška a poloha se nezobrazují, a to, co macOS přehrává, zůstává nedotčené."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afkodet en ekstra gang ved siden af udgangen, kun til disse målere. macOS renderer objekterne, så deres højde og position vises ikke, og det macOS afspiller, er uberørt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zusätzlich neben der Ausgabe dekodiert, nur für diese Pegelanzeigen. macOS rendert die Objekte, daher werden ihre Höhe und Position nicht gezeigt; was macOS wiedergibt, bleibt unverändert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποκωδικοποιημένο ξανά δίπλα στην έξοδο, μόνο για αυτούς τους μετρητές. Το macOS αποδίδει τα αντικείμενα, οπότε το ύψος και η θέση τους δεν εμφανίζονται, και ό,τι παίζει το macOS μένει ανέγγιχτο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificado de nuevo junto a la salida, solo para estos medidores. macOS procesa los objetos, así que no se muestran su altura ni su posición, y lo que macOS reproduce queda intacto."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یک بار دیگر در کنار خروجی رمزگشایی شده، فقط برای این نمایشگرها. macOS اشیا را رندر می‌کند، پس ارتفاع و موقعیت آن‌ها نشان داده نمی‌شود و آنچه macOS پخش می‌کند دست‌نخورده می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purettu uudelleen ulostulon rinnalla vain näitä mittareita varten. macOS renderöi objektit, joten niiden korkeutta ja sijaintia ei näytetä, ja macOS:n toistama pysyy koskemattomana."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinecode ulit sa tabi ng output, para lang sa mga meter na ito. Ang macOS ang nagre-render ng mga object, kaya hindi ipinapakita ang taas at posisyon ng mga ito, at hindi ginagalaw ang pinapatugtog ng macOS."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Décodé une seconde fois à côté de la sortie, pour ces indicateurs seulement. macOS effectue le rendu des objets : leur hauteur et leur position ne sont donc pas affichées, et ce que macOS lit reste intact."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફક્ત આ મીટર માટે આઉટપુટની બાજુમાં ફરીથી ડીકોડ કર્યું. macOS ઑબ્જેક્ટ રેન્ડર કરે છે, તેથી તેમની ઊંચાઈ અને સ્થિતિ બતાવાતી નથી, અને macOS જે વગાડે છે તે અકબંધ રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An sake warwarewa kusa da fitarwa, domin waɗannan mitoci kawai. macOS yana yin rendering na abubuwan, don haka ba a nuna tsayinsu da wurinsu ba, kuma abin da macOS ke kunnawa ba a taɓa shi ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מפוענח שוב לצד היציאה, למדים האלה בלבד. macOS מעבד את האובייקטים, ולכן הגובה והמיקום שלהם לא מוצגים, ומה ש־macOS מנגן נשאר ללא שינוי."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इन मीटरों के लिए ही आउटपुट के बगल में दोबारा डिकोड किया गया। macOS ऑब्जेक्ट रेंडर करता है, इसलिए उनकी ऊँचाई और स्थिति नहीं दिखती, और macOS जो चलाता है वह अछूता रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újra dekódolva a kimenet mellett, csak ezeknek a mérőknek. A macOS rendereli az objektumokat, ezért a magasságuk és a helyzetük nem látszik, és amit a macOS lejátszik, az érintetlen marad."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Didekode lagi di samping output, hanya untuk meter ini. macOS merender objek, jadi ketinggian dan posisinya tidak ditampilkan, dan yang diputar macOS tidak tersentuh."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificato di nuovo accanto all’uscita, solo per questi indicatori. macOS renderizza gli oggetti, quindi altezza e posizione non vengono mostrate, e ciò che macOS riproduce resta intatto."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これらのメーターのためだけに、出力と並行してもう一度デコードしています。オブジェクトはmacOSがレンダリングするため、その高さや位置は表示されず、macOSが再生する音には手を加えません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಮೀಟರ್‌ಗಳಿಗಾಗಿ ಮಾತ್ರ ಔಟ್‌ಪುಟ್‌ನ ಪಕ್ಕದಲ್ಲಿ ಮತ್ತೆ ಡೀಕೋಡ್ ಮಾಡಲಾಗಿದೆ. macOS ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ, ಆದ್ದರಿಂದ ಅವುಗಳ ಎತ್ತರ ಮತ್ತು ಸ್ಥಾನ ತೋರಿಸುವುದಿಲ್ಲ, ಮತ್ತು macOS ಪ್ಲೇ ಮಾಡುವುದು ಬದಲಾಗದೆ ಉಳಿಯುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 미터만을 위해 출력 옆에서 한 번 더 디코딩합니다. 오브젝트는 macOS가 렌더링하므로 높이와 위치는 표시되지 않으며, macOS가 재생하는 소리는 그대로입니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ മീറ്ററുകൾക്കായി മാത്രം ഔട്ട്പുട്ടിന് അരികിൽ വീണ്ടും ഡീകോഡ് ചെയ്തത്. macOS ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നതിനാൽ അവയുടെ ഉയരവും സ്ഥാനവും കാണിക്കുന്നില്ല, macOS പ്ലേ ചെയ്യുന്നത് മാറ്റമില്ലാതെ തുടരുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फक्त या मीटरसाठी आउटपुटच्या बाजूला पुन्हा डीकोड केले. macOS ऑब्जेक्ट रेंडर करते, त्यामुळे त्यांची उंची आणि स्थान दाखवले जात नाही, आणि macOS जे वाजवते ते अस्पर्श राहते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinyahkod sekali lagi di sebelah output, untuk meter ini sahaja. macOS merender objek, jadi ketinggian dan kedudukannya tidak ditunjukkan, dan apa yang dimainkan macOS tidak disentuh."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avkodet en gang til ved siden av utgangen, bare for disse målerne. macOS rendrer objektene, så høyde og posisjon vises ikke, og det macOS spiller av, er urørt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opnieuw gedecodeerd naast de uitvoer, alleen voor deze meters. macOS rendert de objecten, dus hun hoogte en positie worden niet getoond, en wat macOS afspeelt blijft onaangetast."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਿਰਫ਼ ਇਹਨਾਂ ਮੀਟਰਾਂ ਲਈ ਆਊਟਪੁੱਟ ਦੇ ਨਾਲ ਦੁਬਾਰਾ ਡੀਕੋਡ ਕੀਤਾ ਗਿਆ। macOS ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਇਸ ਲਈ ਉਹਨਾਂ ਦੀ ਉਚਾਈ ਅਤੇ ਸਥਿਤੀ ਨਹੀਂ ਦਿਖਾਈ ਜਾਂਦੀ, ਅਤੇ macOS ਜੋ ਵਜਾਉਂਦਾ ਹੈ ਉਹ ਛੇੜਿਆ ਨਹੀਂ ਜਾਂਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zdekodowane jeszcze raz obok wyjścia, tylko dla tych mierników. macOS renderuje obiekty, więc ich wysokość i położenie nie są pokazane, a to, co gra macOS, pozostaje nienaruszone."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodificado de novo ao lado da saída, só para estes medidores. O macOS renderiza os objetos, então a altura e a posição deles não aparecem, e o que o macOS toca fica intacto."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descodificado de novo junto à saída, só para estes medidores. O macOS renderiza os objetos, por isso a altura e a posição deles não aparecem, e o que o macOS reproduz fica intacto."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decodat încă o dată lângă ieșire, doar pentru aceste indicatoare. macOS randează obiectele, deci înălțimea și poziția lor nu sunt afișate, iar ceea ce redă macOS rămâne neatins."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avkodad en gång till vid sidan av utgången, bara för de här mätarna. macOS renderar objekten, så deras höjd och position visas inte, och det macOS spelar upp är orört."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimesimbuliwa tena kando ya pato, kwa mita hizi tu. macOS huchakata vitu, kwa hivyo urefu na mahali pake havionyeshwi, na kile macOS inachocheza hakiguswi."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த மீட்டர்களுக்காக மட்டும் வெளியீட்டுக்கு அருகே மீண்டும் டிகோட் செய்யப்பட்டது. macOS பொருள்களை ரெண்டர் செய்கிறது, எனவே அவற்றின் உயரமும் இடமும் காட்டப்படுவதில்லை; macOS இயக்குவது மாற்றமின்றி இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ మీటర్‌ల కోసం మాత్రమే అవుట్‌పుట్ పక్కన మళ్లీ డీకోడ్ చేశారు. macOS ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది, కాబట్టి వాటి ఎత్తు, స్థానం చూపబడవు, macOS ప్లే చేసేది మార్పు లేకుండా ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถอดรหัสซ้ำอีกครั้งควบคู่กับเอาต์พุต เพื่อมิเตอร์เหล่านี้เท่านั้น macOS เป็นผู้เรนเดอร์ออบเจกต์ จึงไม่แสดงความสูงและตำแหน่งของออบเจกต์ และสิ่งที่ macOS เล่นยังคงไม่ถูกแตะต้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışın yanında yeniden çözüldü, yalnızca bu ölçerler için. macOS nesneleri işler, bu yüzden yükseklikleri ve konumları gösterilmez; macOS’in çaldığı şey de dokunulmadan kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Декодовано ще раз поряд із виходом, лише для цих індикаторів. macOS рендерить об’єкти, тому їхні висота й позиція не показуються, а те, що відтворює macOS, лишається без змін."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ کے ساتھ ایک بار پھر ڈی کوڈ کیا گیا، صرف ان میٹرز کے لیے۔ macOS آبجیکٹس کو رینڈر کرتا ہے، اس لیے ان کی اونچائی اور مقام نہیں دکھائے جاتے، اور جو macOS چلاتا ہے وہ بغیر تبدیلی کے رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giải mã lại bên cạnh đầu ra, chỉ cho các đồng hồ đo này. macOS kết xuất các đối tượng, nên độ cao và vị trí của chúng không được hiển thị, và những gì macOS phát vẫn nguyên vẹn."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在输出旁再解码一次，仅供这些电平表使用。macOS 负责渲染对象，因此不显示其高度和位置，macOS 播放的内容保持原样。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在輸出旁再解碼一次，僅供這些電平表使用。macOS 負責渲染物件，因此不顯示其高度和位置，macOS 播放的內容維持原樣。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在輸出旁再解碼一次，僅供這些電平表使用。macOS 負責渲染物件，因此不顯示其高度和位置，macOS 播放的內容維持原樣。"
           }
         }
       }
@@ -226559,270 +227363,270 @@
         }
       }
     },
-    "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path, spectrum and channel meters don't apply to these tracks. The Visualizer shows the decoded 5.1 or 7.1 bed instead, not the objects.": {
+    "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. The spectrum, channel meters and Visualizer show the 5.1 or 7.1 bed from a separate decode (not the objects), which never touches what macOS plays.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የራስ እንቅስቃሴን የሚከታተል Spatial Audio፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። የVespertine የራሱ የሲግናል መንገድ፣ ስፔክትረምና የቻናል መለኪያዎች ለእነዚህ ትራኮች አይሠሩም። ይልቁንም ምስላዊ ማሳያው ዲኮድ የተደረገውን 5.1 ወይም 7.1 መሠረት ያሳያል፣ objectsን አይደለም።"
+            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የራስ እንቅስቃሴን የሚከታተል Spatial Audio፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። ስፔክትረሙ፣ የቻናል መለኪያዎቹና ምስላዊ ማሳያው ከተለየ ዲኮድ የ5.1 ወይም 7.1 መሠረትን ያሳያሉ (ነገሮችን አይደለም)፤ ይህም macOS የሚጫወተውን ፈጽሞ አይነካም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: صوت مكاني مع تتبع حركة الرأس على AirPods، وقنوات ارتفاع على جهاز متعدد القنوات. لا ينطبق مسار الإشارة والطيف ومقاييس القنوات الخاصة بـ Vespertine على هذه المقطوعات. تعرض المؤثرات المرئية بدلًا من ذلك القاعدة 5.1 أو 7.1 بعد فك ترميزها، لا الكائنات."
+            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: صوت مكاني مع تتبع حركة الرأس على AirPods، وقنوات ارتفاع على جهاز متعدد القنوات. يعرض الطيف ومقاييس القنوات والمؤثرات المرئية القاعدة 5.1 أو 7.1 من فك ترميز منفصل (وليس الكائنات)، ولا يمسّ أبدًا ما يشغّله macOS."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ হেড-ট্র্যাকড স্পেশিয়াল অডিও, মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। Vespertine-এর নিজস্ব সিগন্যাল পাথ, স্পেকট্রাম ও চ্যানেল মিটার এই ট্র্যাকগুলোতে প্রযোজ্য নয়। এর বদলে ভিজ্যুয়ালাইজার ডিকোড করা 5.1 বা 7.1 বেড দেখায়, অবজেক্ট নয়।"
+            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ হেড-ট্র্যাকড স্পেশিয়াল অডিও, মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। স্পেকট্রাম, চ্যানেল মিটার ও ভিজ্যুয়ালাইজার আলাদা ডিকোড থেকে 5.1 বা 7.1 বেড দেখায় (অবজেক্ট নয়), যা macOS যা চালায় তা কখনও স্পর্শ করে না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk se sledováním hlavy na AirPodech, výškové kanály na vícekanálovém zařízení. Vlastní signálová cesta, spektrum a kanálové měřiče Vespertine se na tyto skladby nevztahují. Vizualizér místo toho ukazuje dekódovaný základ 5.1 nebo 7.1, ne objekty."
+            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk se sledováním hlavy na AirPodech, výškové kanály na vícekanálovém zařízení. Spektrum, kanálové měřiče a Vizualizér ukazují základ 5.1 nebo 7.1 ze samostatného dekódování (ne objekty), které se nikdy nedotkne toho, co macOS přehrává."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: rumlig lyd med hovedsporing på AirPods og højdekanaler på en flerkanalsenhed. Vespertines egen signalvej, spektrum og kanalmålere gælder ikke for disse numre. Visualisering viser i stedet den afkodede 5.1- eller 7.1-base, ikke objekterne."
+            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: rumlig lyd med hovedsporing på AirPods og højdekanaler på en flerkanalsenhed. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat afkodning (ikke objekterne), som aldrig rører det, macOS afspiller."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: 3D-Audio mit Kopfbewegungserkennung auf AirPods, Höhenkanäle auf einem Mehrkanalgerät. Vespertines eigener Signalweg, das Spektrum und die Kanal-Pegelanzeigen gelten für diese Titel nicht. Der Visualizer zeigt stattdessen das dekodierte 5.1- oder 7.1-Bed, nicht die Objekte."
+            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: 3D-Audio mit Kopfbewegungserkennung auf AirPods, Höhenkanäle auf einem Mehrkanalgerät. Spektrum, Kanal-Pegelanzeigen und Visualizer zeigen das 5.1- oder 7.1-Bed aus einer separaten Dekodierung (nicht die Objekte); sie berührt nie, was macOS wiedergibt."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: Χωρικός ήχος με παρακολούθηση κεφαλής στα AirPods, κανάλια ύψους σε πολυκαναλική συσκευή. Η διαδρομή σήματος, το φάσμα και οι μετρητές καναλιών του Vespertine δεν ισχύουν για αυτά τα κομμάτια. Ο Οπτικοποιητής δείχνει όμως τα αποκωδικοποιημένα κανάλια βάσης 5.1 ή 7.1, όχι τα αντικείμενα."
+            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: Χωρικός ήχος με παρακολούθηση κεφαλής στα AirPods, κανάλια ύψους σε πολυκαναλική συσκευή. Το φάσμα, οι μετρητές καναλιών και ο Οπτικοποιητής δείχνουν τη βάση 5.1 ή 7.1 από ξεχωριστή αποκωδικοποίηση (όχι τα αντικείμενα), η οποία δεν αγγίζει ποτέ ό,τι παίζει το macOS."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: audio espacial con seguimiento de la cabeza en los AirPods y canales de altura en un dispositivo multicanal. La ruta de señal, el espectro y los medidores de canales de Vespertine no se aplican a estas pistas. El Visualizador muestra en su lugar la base 5.1 o 7.1 decodificada, no los objetos."
+            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: audio espacial con seguimiento de la cabeza en los AirPods y canales de altura en un dispositivo multicanal. El espectro, los medidores de canales y el Visualizador muestran la base 5.1 o 7.1 de una decodificación aparte (no los objetos), que nunca toca lo que reproduce macOS."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: صدای فضایی با ردیابی سر روی AirPods، و کانال‌های ارتفاعی روی دستگاه چندکاناله. مسیر سیگنال، طیف و نمایشگرهای سطح کانال‌های خود Vespertine برای این قطعه‌ها اعمال نمی‌شوند. نمایشگر تصویری به‌جای آن بستر ۵٫۱ یا ۷٫۱ رمزگشایی‌شده را نشان می‌دهد، نه اشیا را."
+            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: صدای فضایی با ردیابی سر روی AirPods، و کانال‌های ارتفاعی روی دستگاه چندکاناله. طیف، نمایشگرهای سطح کانال‌ها و نمایشگر تصویری، بستر 5.1 یا 7.1 را از یک رمزگشایی جداگانه نشان می‌دهند (نه اشیا)، که هرگز به آنچه macOS پخش می‌کند دست نمی‌زند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: pään liikkeitä seuraava tilaääni AirPodeissa, korkeuskanavat monikanavaisessa laitteessa. Vespertinen oma signaalipolku, spektri ja kanavamittarit eivät koske näitä raitoja. Visualisoija näyttää sen sijaan puretun 5.1- tai 7.1-pohjan, ei objekteja."
+            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: pään liikkeitä seuraava tilaääni AirPodeissa, korkeuskanavat monikanavaisessa laitteessa. Spektri, kanavamittarit ja Visualisoija näyttävät 5.1- tai 7.1-pohjan erillisestä purusta (eivät objekteja), joka ei koskaan kosketa sitä, mitä macOS toistaa."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: head-tracked na Spatial Audio sa AirPods, mga height channel sa multichannel na device. Hindi saklaw ng sariling signal path, spectrum at mga channel meter ng Vespertine ang mga track na ito. Sa halip, ipinapakita ng Visualizer ang na-decode na 5.1 o 7.1 na bed, hindi ang mga object."
+            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: head-tracked na Spatial Audio sa AirPods, mga height channel sa multichannel na device. Ipinapakita ng spectrum, mga channel meter at Visualizer ang 5.1 o 7.1 bed mula sa hiwalay na decode (hindi ang mga object), na hindi kailanman ginagalaw ang pinapatugtog ng macOS."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : audio spatial avec suivi de la tête sur les AirPods, canaux d’élévation sur un appareil multicanal. Le chemin du signal, le spectre et les indicateurs de niveau des canaux de Vespertine ne s’appliquent pas à ces morceaux. Le Visualiseur montre à la place le bed 5.1 ou 7.1 décodé, pas les objets."
+            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : audio spatial avec suivi de la tête sur les AirPods, canaux d’élévation sur un appareil multicanal. Le spectre, les indicateurs de niveau des canaux et le Visualiseur montrent le bed 5.1 ou 7.1 issu d’un décodage séparé (pas les objets), qui ne touche jamais à ce que macOS lit."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર હેડ-ટ્રૅક થયેલો સ્પેશિયલ ઑડિયો, મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. Vespertine નો પોતાનો સિગ્નલ માર્ગ, સ્પેક્ટ્રમ અને ચૅનલ મીટર આ ટ્રૅકને લાગુ પડતાં નથી. તેના બદલે વિઝ્યુઅલાઇઝર ડીકોડ કરેલો 5.1 કે 7.1 બેડ બતાવે છે, ઑબ્જેક્ટ નહીં."
+            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર હેડ-ટ્રૅક થયેલો સ્પેશિયલ ઑડિયો, મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. સ્પેક્ટ્રમ, ચૅનલ મીટર અને વિઝ્યુઅલાઇઝર અલગ ડીકોડમાંથી 5.1 કે 7.1 બેડ બતાવે છે (ઑબ્જેક્ટ નહીં), જે macOS જે વગાડે છે તેને ક્યારેય સ્પર્શતું નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: Spatial Audio mai bin motsin kai a kan AirPods, tashoshin tsawo a na'ura mai tashoshi da yawa. Hanyar sigina, bakan sauti da mita na tashoshi na Vespertine ba sa aiki kan waɗannan waƙoƙin. Maimakon haka, Mai nuna sauti yana nuna gadon 5.1 ko 7.1 da aka warware, ba abubuwan ba."
+            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: Spatial Audio mai bin motsin kai a kan AirPods, tashoshin tsawo a na'ura mai tashoshi da yawa. Bakan sauti, mitocin tashoshi da Mai nuna sauti suna nuna gadon 5.1 ko 7.1 daga warwarewa na daban (ba abubuwan ba), wanda ba ya taɓa abin da macOS ke kunnawa har abada."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: שמע מרחבי עם מעקב אחר תנועות הראש ב־AirPods, וערוצי גובה בהתקן רב־ערוצי. נתיב האות, הספקטרום ומדי הערוצים של Vespertine אינם חלים על רצועות אלה. במקומם הויזואלייזר מציג את בסיס 5.1 או 7.1 המפוענח, לא את האובייקטים."
+            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: שמע מרחבי עם מעקב אחר תנועות הראש ב־AirPods, וערוצי גובה בהתקן רב־ערוצי. הספקטרום, מדי הערוצים והויזואלייזר מציגים את בסיס ה־5.1 או ה־7.1 מפענוח נפרד (לא את האובייקטים), שלעולם אינו נוגע במה ש־macOS מנגן."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर हेड-ट्रैक्ड स्पेशियल ऑडियो, मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। Vespertine का अपना सिग्नल पथ, स्पेक्ट्रम और चैनल मीटर इन ट्रैक पर लागू नहीं होते। इसके बजाय विज़ुअलाइज़र डिकोड किया हुआ 5.1 या 7.1 बेड दिखाता है, ऑब्जेक्ट नहीं।"
+            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर हेड-ट्रैक्ड स्पेशियल ऑडियो, मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। स्पेक्ट्रम, चैनल मीटर और विज़ुअलाइज़र अलग डिकोड से 5.1 या 7.1 बेड दिखाते हैं (ऑब्जेक्ट नहीं), जो macOS जो चलाता है उसे कभी नहीं छूता।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: fejkövetéses térhatású hang AirPodson, magassági csatornák többcsatornás eszközön. A Vespertine saját jelútja, spektruma és csatornamérői ezekre a számokra nem vonatkoznak. A Vizualizáló ehelyett a dekódolt 5.1-es vagy 7.1-es alapot mutatja, nem az objektumokat."
+            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: fejkövetéses térhatású hang AirPodson, magassági csatornák többcsatornás eszközön. A spektrum, a csatornamérők és a Vizualizáló az 5.1-es vagy 7.1-es alapot mutatják egy külön dekódolásból (nem az objektumokat), amely sosem érinti azt, amit a macOS lejátszik."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Spasial dengan pelacakan kepala di AirPods, saluran ketinggian di perangkat multisaluran. Jalur sinyal, spektrum, dan meter saluran Vespertine sendiri tidak berlaku untuk trek ini. Sebagai gantinya, Visualizer menampilkan bed 5.1 atau 7.1 yang sudah didekode, bukan objeknya."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Spasial dengan pelacakan kepala di AirPods, saluran ketinggian di perangkat multisaluran. Spektrum, meter saluran, dan Visualizer menampilkan bed 5.1 atau 7.1 dari dekode terpisah (bukan objeknya), yang tidak pernah menyentuh apa yang diputar macOS."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: audio spaziale con rilevamento della testa su AirPods, canali di altezza su un dispositivo multicanale. Il percorso del segnale, lo spettro e gli indicatori di livello dei canali di Vespertine non si applicano a questi brani. Il Visualizzatore mostra invece il bed 5.1 o 7.1 decodificato, non gli oggetti."
+            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: audio spaziale con rilevamento della testa su AirPods, canali di altezza su un dispositivo multicanale. Lo spettro, gli indicatori di livello dei canali e il Visualizzatore mostrano il bed 5.1 o 7.1 di una decodifica separata (non gli oggetti), che non tocca mai ciò che macOS riproduce."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではヘッドトラッキング付きの空間オーディオ、マルチチャンネルデバイスではハイトチャンネルになります。これらのトラックにはVespertine独自の信号経路、スペクトラム、チャンネルメーターは適用されません。代わりにビジュアライザには、オブジェクトではなく、デコードした5.1または7.1のベッドが表示されます。"
+            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではヘッドトラッキング付きの空間オーディオ、マルチチャンネルデバイスではハイトチャンネルになります。スペクトラム、チャンネルメーター、ビジュアライザには、別にデコードした5.1または7.1のベッド（オブジェクトではありません）が表示され、macOSが再生する音には一切触れません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕ್ಡ್ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ, ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. Vespertine ನ ಸ್ವಂತ ಸಿಗ್ನಲ್ ಪಥ, ಸ್ಪೆಕ್ಟ್ರಮ್ ಮತ್ತು ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಈ ಟ್ರ್ಯಾಕ್‌ಗಳಿಗೆ ಅನ್ವಯಿಸುವುದಿಲ್ಲ. ಬದಲಿಗೆ ದೃಶ್ಯೀಕರಣವು ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನಲ್ಲ, ಡೀಕೋಡ್ ಮಾಡಿದ 5.1 ಅಥವಾ 7.1 ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತದೆ."
+            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕ್ಡ್ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ, ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. ಸ್ಪೆಕ್ಟ್ರಮ್, ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಮತ್ತು ದೃಶ್ಯೀಕರಣವು ಪ್ರತ್ಯೇಕ ಡೀಕೋಡ್‌ನಿಂದ 5.1 ಅಥವಾ 7.1 ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತವೆ (ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನಲ್ಲ), ಇದು macOS ಪ್ಲೇ ಮಾಡುವುದನ್ನು ಎಂದಿಗೂ ಮುಟ್ಟುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 머리 추적 공간 음향으로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 이러한 트랙에는 Vespertine 자체의 신호 경로, 스펙트럼, 채널 미터가 적용되지 않습니다. 대신 비주얼라이저는 오브젝트가 아니라 디코딩한 5.1 또는 7.1 베드를 표시합니다."
+            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 머리 추적 공간 음향으로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 스펙트럼, 채널 미터, 비주얼라이저는 따로 디코딩한 5.1 또는 7.1 베드(오브젝트 아님)를 표시하며, macOS가 재생하는 소리에는 전혀 손대지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ ഹെഡ്-ട്രാക്ക് ചെയ്ത സ്പേഷ്യൽ ഓഡിയോ, മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. Vespertine-ന്റെ സ്വന്തം സിഗ്നൽ പാതയും സ്പെക്ട്രവും ചാനൽ മീറ്ററുകളും ഈ ട്രാക്കുകൾക്ക് ബാധകമല്ല. പകരം വിഷ്വലൈസർ ഒബ്ജക്റ്റുകളല്ല, ഡീകോഡ് ചെയ്ത 5.1 അല്ലെങ്കിൽ 7.1 ബെഡ് ആണ് കാണിക്കുന്നത്."
+            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ ഹെഡ്-ട്രാക്ക് ചെയ്ത സ്പേഷ്യൽ ഓഡിയോ, മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. സ്പെക്ട്രം, ചാനൽ മീറ്ററുകൾ, വിഷ്വലൈസർ എന്നിവ പ്രത്യേക ഡീകോഡിൽ നിന്നുള്ള 5.1 അല്ലെങ്കിൽ 7.1 ബെഡ് കാണിക്കുന്നു (ഒബ്ജക്റ്റുകളല്ല); അത് macOS പ്ലേ ചെയ്യുന്നതിനെ ഒരിക്കലും തൊടുന്നില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर हेड-ट्रॅक केलेला स्पेशियल ऑडिओ, मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. Vespertine चा स्वतःचा सिग्नल मार्ग, स्पेक्ट्रम आणि चॅनेल मीटर या ट्रॅकना लागू होत नाहीत. त्याऐवजी व्हिज्युअलायझर ऑब्जेक्ट्स नव्हे, तर डीकोड केलेला 5.1 किंवा 7.1 बेड दाखवतो."
+            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर हेड-ट्रॅक केलेला स्पेशियल ऑडिओ, मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. स्पेक्ट्रम, चॅनेल मीटर आणि व्हिज्युअलायझर वेगळ्या डीकोडमधून 5.1 किंवा 7.1 बेड दाखवतात (ऑब्जेक्ट नाही), जे macOS जे वाजवते त्याला कधीही स्पर्श करत नाही."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Ruang dengan penjejakan kepala pada AirPods, saluran ketinggian pada peranti berbilang saluran. Laluan isyarat, spektrum dan meter saluran Vespertine sendiri tidak terpakai pada trek ini. Sebaliknya, Pemvisual menunjukkan lapisan 5.1 atau 7.1 yang telah dinyahkod, bukan objek."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Ruang dengan penjejakan kepala pada AirPods, saluran ketinggian pada peranti berbilang saluran. Spektrum, meter saluran dan Pemvisual menunjukkan lapisan 5.1 atau 7.1 daripada nyahkod berasingan (bukan objek), yang tidak pernah menyentuh apa yang dimainkan macOS."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: romlig lyd med hodesporing på AirPods og høydekanaler på en flerkanalsenhet. Vespertines egen signalvei, spektrum og kanalmålere gjelder ikke for disse sporene. Visualisering viser i stedet den dekodede 5.1- eller 7.1-basen, ikke objektene."
+            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: romlig lyd med hodesporing på AirPods og høydekanaler på en flerkanalsenhet. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat avkoding (ikke objektene), som aldri rører det macOS spiller av."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: ruimtelijke audio met hoofdtracking op AirPods, hoogtekanalen op een meerkanaalsapparaat. Het eigen signaalpad, het spectrum en de kanaalmeters van Vespertine gelden niet voor deze nummers. De Visualizer toont in plaats daarvan het gedecodeerde 5.1- of 7.1-bed, niet de objecten."
+            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: ruimtelijke audio met hoofdtracking op AirPods, hoogtekanalen op een meerkanaalsapparaat. Het spectrum, de kanaalmeters en de Visualizer tonen het 5.1- of 7.1-bed uit een aparte decodering (niet de objecten), die nooit raakt aan wat macOS afspeelt."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ ਹੈੱਡ-ਟ੍ਰੈਕਡ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। Vespertine ਦਾ ਆਪਣਾ ਸਿਗਨਲ ਮਾਰਗ, ਸਪੈਕਟ੍ਰਮ ਅਤੇ ਚੈਨਲ ਮੀਟਰ ਇਹਨਾਂ ਟਰੈਕਾਂ ’ਤੇ ਲਾਗੂ ਨਹੀਂ ਹੁੰਦੇ। ਇਸ ਦੀ ਥਾਂ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਆਬਜੈਕਟ ਨਹੀਂ, ਸਗੋਂ ਡੀਕੋਡ ਕੀਤਾ 5.1 ਜਾਂ 7.1 ਬੈੱਡ ਦਿਖਾਉਂਦਾ ਹੈ।"
+            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ ਹੈੱਡ-ਟ੍ਰੈਕਡ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। ਸਪੈਕਟ੍ਰਮ, ਚੈਨਲ ਮੀਟਰ ਅਤੇ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਵੱਖਰੇ ਡੀਕੋਡ ਤੋਂ 5.1 ਜਾਂ 7.1 ਬੈੱਡ ਦਿਖਾਉਂਦੇ ਹਨ (ਆਬਜੈਕਟ ਨਹੀਂ), ਜੋ macOS ਜੋ ਵਜਾਉਂਦਾ ਹੈ ਉਸ ਨੂੰ ਕਦੇ ਨਹੀਂ ਛੂਹਦਾ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods, kanały wysokości na urządzeniu wielokanałowym. Ścieżka sygnału, widmo i mierniki kanałów Vespertine nie dotyczą tych utworów. Wizualizator pokazuje natomiast zdekodowaną podstawę kanałową 5.1 lub 7.1, a nie obiekty."
+            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods, kanały wysokości na urządzeniu wielokanałowym. Widmo, mierniki kanałów i Wizualizator pokazują podstawę 5.1 lub 7.1 z osobnego dekodowania (nie obiekty), które nigdy nie dotyka tego, co gra macOS."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: Áudio Espacial com rastreamento de cabeça nos AirPods e canais de altura em um dispositivo multicanal. O caminho do sinal, o espectro e os medidores de canais do Vespertine não se aplicam a essas faixas. O Visualizador mostra, em vez disso, a base 5.1 ou 7.1 decodificada, não os objetos."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: Áudio Espacial com rastreamento de cabeça nos AirPods e canais de altura em um dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma decodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: áudio espacial com seguimento da cabeça nos AirPods, canais de altura num dispositivo multicanal. O caminho do sinal, o espectro e os medidores de canais do Vespertine não se aplicam a estas faixas. O Visualizador mostra, em vez disso, a base 5.1 ou 7.1 descodificada, não os objetos."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: áudio espacial com seguimento da cabeça nos AirPods, canais de altura num dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma descodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: Audio spațial cu urmărirea mișcării capului pe AirPods, canale de înălțime pe un dispozitiv multicanal. Calea semnalului, spectrul și indicatoarele canalelor Vespertine nu se aplică acestor piese. În schimb, Vizualizatorul arată baza 5.1 sau 7.1 decodată, nu obiectele."
+            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: Audio spațial cu urmărirea mișcării capului pe AirPods, canale de înălțime pe un dispozitiv multicanal. Spectrul, indicatoarele canalelor și Vizualizatorul arată baza 5.1 sau 7.1 dintr-o decodare separată (nu obiectele), care nu atinge niciodată ceea ce redă macOS."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: rumsligt ljud med huvudspårning i AirPods, höjdkanaler på en flerkanalsenhet. Vespertines egen signalväg, spektrum och kanalmätare gäller inte för de här spåren. Visualiserare visar i stället den avkodade 5.1- eller 7.1-bädden, inte objekten."
+            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: rumsligt ljud med huvudspårning i AirPods, höjdkanaler på en flerkanalsenhet. Spektrum, kanalmätare och Visualiserare visar 5.1- eller 7.1-bädden från en separat avkodning (inte objekten), som aldrig rör det macOS spelar upp."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, chaneli za kimo kwenye kifaa cha chaneli nyingi. Njia ya mawimbi, masafa na mita za chaneli za Vespertine hazitumiki kwa nyimbo hizi. Badala yake, Kionyeshi huonyesha kitanda cha 5.1 au 7.1 kilichosimbuliwa, si vitu."
+            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, chaneli za kimo kwenye kifaa cha chaneli nyingi. Masafa, mita za chaneli na Kionyeshi huonyesha kitanda cha 5.1 au 7.1 kutoka usimbuaji tofauti (si vitu), ambao haugusi kamwe kile macOS inachocheza."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் தலை கண்காணிப்புடன் கூடிய ஸ்பேஷியல் ஆடியோ, மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். Vespertine-இன் சொந்த சிக்னல் பாதை, ஸ்பெக்ட்ரம், சேனல் மீட்டர்கள் இந்த டிராக்குகளுக்குப் பொருந்தாது. அதற்குப் பதிலாக காட்சிப்படுத்தி ஆப்ஜெக்ட்களை அல்ல, டிகோட் செய்த 5.1 அல்லது 7.1 படுகையைக் காட்டுகிறது."
+            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் தலை கண்காணிப்புடன் கூடிய ஸ்பேஷியல் ஆடியோ, மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். ஸ்பெக்ட்ரம், சேனல் மீட்டர்கள், காட்சிப்படுத்தி ஆகியவை தனி டிகோடிலிருந்து 5.1 அல்லது 7.1 படுகையைக் காட்டுகின்றன (பொருள்களை அல்ல); அது macOS இயக்குவதை ஒருபோதும் தொடாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో హెడ్-ట్రాక్డ్ స్పేషియల్ ఆడియో, మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. Vespertine సొంత సిగ్నల్ పాత్, స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు ఈ ట్రాక్‌లకు వర్తించవు. బదులుగా విజువలైజర్ ఆబ్జెక్ట్‌లను కాదు, డీకోడ్ చేసిన 5.1 లేదా 7.1 బెడ్‌ను చూపుతుంది."
+            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో హెడ్-ట్రాక్డ్ స్పేషియల్ ఆడియో, మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు, విజువలైజర్ ప్రత్యేక డీకోడ్ నుండి 5.1 లేదా 7.1 బెడ్‌ను చూపుతాయి (ఆబ్జెక్ట్‌లను కాదు); అది macOS ప్లే చేసే దానిని ఎప్పుడూ తాకదు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: เสียงตามตำแหน่งที่ติดตามศีรษะบน AirPods และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณ เส้นทางสัญญาณ สเปกตรัม และมิเตอร์ช่องสัญญาณของ Vespertine เองจะไม่มีผลกับแทร็กเหล่านี้ ภาพเคลื่อนไหวตามเสียงจะแสดงช่องสัญญาณพื้นฐาน 5.1 หรือ 7.1 ที่ถอดรหัสแล้วแทน ไม่ใช่ออบเจ็กต์"
+            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: เสียงตามตำแหน่งที่ติดตามศีรษะบน AirPods และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณสเปกตรัม มิเตอร์ช่องสัญญาณ และภาพเคลื่อนไหวตามเสียงแสดงช่องสัญญาณพื้นฐาน 5.1 หรือ 7.1 จากการถอดรหัสแยกต่างหาก (ไม่ใช่ออบเจกต์) ซึ่งไม่แตะต้องสิ่งที่ macOS เล่นเลย"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta baş takipli Uzamsal Ses, çok kanallı bir aygıtta yükseklik kanalları. Vespertine’in kendi sinyal yolu, spektrumu ve kanal ölçerleri bu parçalar için geçerli değildir. Görselleştirici bunun yerine nesneleri değil, kodu çözülmüş 5.1 veya 7.1 tabanını gösterir."
+            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta baş takipli Uzamsal Ses, çok kanallı bir aygıtta yükseklik kanalları. Spektrum, kanal ölçerleri ve Görselleştirici, ayrı bir kod çözümünden 5.1 veya 7.1 tabanını gösterir (nesneleri değil); bu çözüm macOS’in çaldığına asla dokunmaz."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: просторове аудіо з відстеженням рухів голови на AirPods, канали висоти на багатоканальному пристрої. Власний шлях сигналу, спектр та індикатори каналів Vespertine на ці треки не поширюються. Візуалізатор натомість показує декодовану основу 5.1 або 7.1, а не об’єкти."
+            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: просторове аудіо з відстеженням рухів голови на AirPods, канали висоти на багатоканальному пристрої. Спектр, індикатори каналів і Візуалізатор показують основу 5.1 або 7.1 з окремого декодування (не об’єкти), яке ніколи не торкається того, що відтворює macOS."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر ہیڈ ٹریکنگ والا اسپیشل آڈیو، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ Vespertine کا اپنا سگنل پاتھ، اسپیکٹرم اور چینل میٹرز ان ٹریکس پر لاگو نہیں ہوتے۔ اس کے بجائے بصری نمائش آبجیکٹس کو نہیں، بلکہ ڈی کوڈ کیا ہوا 5.1 یا 7.1 بیڈ دکھاتی ہے۔"
+            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر ہیڈ ٹریکنگ والا اسپیشل آڈیو، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ اسپیکٹرم، چینل میٹرز اور بصری نمائش الگ ڈی کوڈنگ سے 5.1 یا 7.1 بیڈ دکھاتے ہیں (آبجیکٹس نہیں)، جو macOS کے چلائے ہوئے کو کبھی نہیں چھوتی۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: Âm thanh không gian có theo dõi chuyển động đầu trên AirPods, kênh độ cao trên thiết bị đa kênh. Đường tín hiệu, phổ và đồng hồ đo kênh của Vespertine không áp dụng cho các bản nhạc này. Thay vào đó, Trình hiển thị cho thấy lớp kênh nền 5.1 hoặc 7.1 đã giải mã, không phải các đối tượng."
+            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: Âm thanh không gian có theo dõi chuyển động đầu trên AirPods, kênh độ cao trên thiết bị đa kênh. Phổ, đồng hồ đo kênh và Trình hiển thị cho thấy lớp kênh nền 5.1 hoặc 7.1 từ một bản giải mã riêng (không phải các đối tượng), không bao giờ chạm vào những gì macOS phát."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上提供带头部追踪的空间音频，在多声道设备上提供高度声道。Vespertine 自己的信号路径、频谱和声道电平表不适用于这些曲目。可视化改为显示解码后的 5.1 或 7.1 声道床，而不是对象。"
+            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上提供带头部追踪的空间音频，在多声道设备上提供高度声道。频谱、声道电平表和可视化显示另行解码的 5.1 或 7.1 声道床（不是对象），绝不会触及 macOS 播放的内容。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上提供具頭部追蹤的空間音訊，在多聲道裝置上提供高度聲道。Vespertine 本身的訊號路徑、頻譜和聲道電平表不適用於這些曲目。視覺效果改為顯示解碼後的 5.1 或 7.1 聲道床，而不是物件。"
+            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上提供具頭部追蹤的空間音訊，在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上提供頭部追蹤空間音訊，在多聲道裝置上提供高度聲道。Vespertine 自己的訊號路徑、頻譜和聲道電平表不適用於這些曲目。視覺效果改為顯示解碼後的 5.1 或 7.1 聲道床，而不是物件。"
+            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上提供頭部追蹤空間音訊，在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
           }
         }
       }
