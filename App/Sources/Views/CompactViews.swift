@@ -241,6 +241,10 @@ struct PlaybackSettings: View {
                 .onChange(of: s.versionPreference) { model.player.resolveVersions() }
                 Text("For albums that have each song in stereo and in surround, such as an SACD's two layers. Matching the output plays surround on a multichannel device or with Spatial Audio on, and stereo on a stereo DAC or with Spatial Audio off. Upcoming songs switch when you change outputs.")
                     .font(.caption).foregroundStyle(.secondary)
+                Toggle("Bundle copies of an album", isOn: $s.bundleCopies)
+                    .onChange(of: s.bundleCopies) { model.library.bundlesCopiesByDefault = s.bundleCopies; model.player.resolveVersions() }
+                Text("When your library has an album more than once (a 24/192 download and a vinyl transfer, a stereo and a 5.1 mix, a WAV and a FLAC), its page lists every copy. Off, one copy plays: the one you pick there, or the best for the output, and a heart is for that copy only. On, the copies play as one album, each song in the copy the output supports best. Each album can also choose on its page.")
+                    .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {
                 Toggle("Mac sound output follows Vespertine while playing", isOn: $s.systemOutputFollowsPlayback)

@@ -12,9 +12,11 @@ Channel-for-channel output to multichannel interfaces and AV receivers is experi
 
 ![Albums filtered to multichannel: extracted SACD tracks, DTS CDs and 5.1 FLAC](screenshots/multichannel-albums.png)
 
-When an album contains stereo and surround versions, each song is listed once. Vespertine chooses the version for your output, or you can pin a version in Settings. Switching from a stereo DAC to AirPods changes the upcoming songs' selection.
+When the library has an album more than once (a 24/192 download and a vinyl transfer, a stereo and a 5.1 or Atmos mix, an SACD's two areas, a WAV import beside the FLAC on a share), its page lists every copy: format, layout, the edition its folder names, how many of the album's songs it has and where it is. Copies are found automatically by folder, layout and format, and songs are matched across them by MusicBrainz recording, ISRC, title and length, so a one-disc CD and a two-disc SACD pair up song by song. The page lists and plays one copy, the one you pick or else the best for your output, and a heart is for that copy only. A song in several copies has a COPIES button to play, favorite or star any one of them. Bundle an album's copies (on its page, or for every album in Settings) and each song plays the copy your output supports best: surround on a multichannel device or with Spatial Audio, stereo elsewhere. Switching from a stereo DAC to AirPods then changes the upcoming songs' selection.
 
-![Extracted stereo and 5.1 SACD tracks listed once, with a + STEREO label](screenshots/stereo-and-surround-versions.png)
+![An album with three copies (24/192 download, vinyl transfer, 5.1 mix) and one song's copies open to play, favorite or star](screenshots/editions-and-copies.png)
+
+![An SACD album and its CD with the copies bundled: each song plays the copy the output supports, and a song's copies are still listed](screenshots/copies-bundled.png)
 
 DTS CDs and DTS-WAV files store a DTS stream in what looks like stereo PCM. Vespertine detects the stream and decodes it to 5.1, including CUE-split albums. Ordinary PCM playback of that data would be noise. Format badges name the codec and channel layout, and the signal path has a meter for each channel.
 

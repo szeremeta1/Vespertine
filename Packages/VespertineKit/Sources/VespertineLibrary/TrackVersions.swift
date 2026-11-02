@@ -1,7 +1,7 @@
 //
 // Vespertine — one song in several versions on the same album (an SACD's stereo and 5.1 layers, a
 // Blu-ray's stereo and surround mixes) or several copies (the same file twice, two editions): which tracks
-// they are, and which one to play.
+// they are, and which one to play when the album's copies are bundled.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -17,26 +17,27 @@ public enum TrackVersions {
         public var id: String { rawValue }
     }
 
-    /// Tracks of one album grouped into songs: a song's versions (stereo and 5.1) and its copies (the same song
-    /// twice in one layout: a file in your own folder and the album on a share, a CD and an SACD layer, two
-    /// editions with one title) are one song. Songs come in disc and track order when every song has its own
-    /// number, so a stray copy can't jump to the top; otherwise (numbers missing, or two different songs on one
-    /// number: two editions with different track lists) in the given order.
+    /// Tracks grouped into songs, album by album: a song's versions (stereo and 5.1) and its copies (the same song
+    /// twice in one layout: a file in your own folder and the album on a share, a CD and an SACD layer, two editions
+    /// with one title) are one song, matched across the album's copies (`LibraryCopies`) by recording, title and
+    /// length rather than by number, so a one-disc CD and a two-disc SACD of the same album pair up song by song.
+    /// Songs come in disc and track order when every song has its own number, so a stray copy can't jump to the top;
+    /// otherwise (numbers missing, or two different songs on one number: two editions with different track lists) in
+    /// the given order. A song's tracks keep the given order.
     public static func group(_ tracks: [Track]) -> [[Track]] {
-        var order: [String] = []
-        var groups: [String: [Track]] = [:]
+        var position: [String: Int] = [:]
+        for (i, t) in tracks.enumerated() where position[t.location] == nil { position[t.location] = i }
+        var albumOrder: [String] = []
+        var byAlbum: [String: [Track]] = [:]
         for t in tracks {
-            let key = songKey(t) ?? "#\(t.id ?? 0)-\(t.location)"
-            if groups[key] == nil { order.append(key) }
-            groups[key, default: []].append(t)
+            if byAlbum[t.albumKey] == nil { albumOrder.append(t.albumKey) }
+            byAlbum[t.albumKey, default: []].append(t)
         }
-        let songs = order.compactMap { groups[$0] }
-        let numbers = songs.map { s in s[0].trackNumber.map { "\(s[0].discNumber ?? 1)-\($0)" } }
-        guard numbers.allSatisfy({ $0 != nil }), Set(numbers).count == numbers.count else { return songs }
-        return songs.enumerated().sorted { a, b in
-            let x = a.element[0], y = b.element[0]
-            return ((x.discNumber ?? 1), x.trackNumber ?? 0, a.offset) < ((y.discNumber ?? 1), y.trackNumber ?? 0, b.offset)
-        }.map(\.element)
+        return albumOrder.flatMap { key in
+            LibraryCopies.analyze(byAlbum[key] ?? []).songs.map { song in
+                song.tracks.sorted { (position[$0.location] ?? 0) < (position[$1.location] ?? 0) }
+            }
+        }
     }
 
     /// The other versions of `track` among `albumTracks` (including itself), or just `[track]`.
@@ -47,11 +48,13 @@ public enum TrackVersions {
     /// The version to play: multichannel when the output wants it, else stereo. Among copies of that kind, the
     /// best: lossless, then the most channels the output asked for, then the highest rate and depth, then one
     /// that `isLocal` (no network needed), then the first. With one version, that one.
+    /// A copy the listener preferred (`isPreferred`) wins among those of the kind the output wants.
     public static func choose(_ versions: [Track], multichannel wantsMultichannel: Bool,
-                              isLocal: (Track) -> Bool = { _ in true }) -> Track? {
+                              isLocal: (Track) -> Bool = { _ in true }, isPreferred: (Track) -> Bool = { _ in false }) -> Track? {
         guard versions.count > 1 else { return versions.first }
         let match = versions.filter { $0.isMultichannel == wantsMultichannel }
         let pool = match.isEmpty ? versions : match
+        if let preferred = pool.first(where: isPreferred) { return preferred }
         func rank(_ t: Track) -> (Int, Int, Double, Int, Int) {
             (t.isLossless ? 1 : 0, t.channels, t.sampleRate, t.bitDepth ?? (t.isDSD ? 1 : 0), isLocal(t) ? 1 : 0)
         }
@@ -59,17 +62,5 @@ public enum TrackVersions {
             let (ra, rb) = (rank(a.element), rank(b.element))
             return ra != rb ? ra < rb : a.offset > b.offset   // equal: the first wins
         }?.element
-    }
-
-    /// Same disc, same number, same title (ignoring case, punctuation and a "(5.1 mix)", "(2012 Remaster)" or
-    /// "(50th Anniversary Edition)" suffix; "(Live)", "(Demo)" or "(2026 Mix)" stay: they're other recordings).
-    static func songKey(_ t: Track) -> String? {
-        guard let number = t.trackNumber else { return nil }
-        var title = t.title.lowercased()
-        title = title.replacingOccurrences(of: #"\s*[\(\[][^\)\]]*(stereo|surround|5\.1|7\.1|multichannel|quad|remaster|anniversary|edition)[^\)\]]*[\)\]]"#,
-                                           with: "", options: .regularExpression)
-        title = String(title.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) })
-        guard !title.isEmpty else { return nil }
-        return "\(t.albumKey)\u{1F}\(t.discNumber ?? 1)\u{1F}\(number)\u{1F}\(title)"
     }
 }

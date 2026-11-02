@@ -22,6 +22,7 @@ final class LibraryStore {
         didSet {
             genres = Genres.summarize(albums)
             albumsByKey = Dictionary(albums.map { ($0.key, $0) }, uniquingKeysWith: { a, _ in a })
+            countCopies()
         }
     }
     /// The same albums by key.
@@ -39,6 +40,79 @@ final class LibraryStore {
     /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
     private(set) var favoriteAlbumKeys: Set<String> = []
     private(set) var sources: [LibrarySource] = []
+
+    // MARK: Copies
+
+    /// Which copy of each album plays, for albums where one was chosen (`AlbumCopyChoice`).
+    private(set) var copyChoices: [String: AlbumCopyChoice] = [:]
+    /// Tracks that are the preferred copy of their song.
+    private(set) var preferredCopyIDs: Set<Int64> = []
+    /// How many copies each album has, for albums with more than one (the "3 COPIES" on its card). Worked out in the
+    /// background after the library changes.
+    private(set) var copyCounts: [String: Int] = [:]
+    /// Whether `copyCounts` has been worked out once.
+    private(set) var copyCountsReady = false
+    /// Settings › Playback › "Bundle copies of an album": albums with no choice of their own play as one, the output picking
+    /// the copy. Off by default: one copy plays, the best for the output, and every other copy stays a copy.
+    var bundlesCopiesByDefault = false {
+        didSet { if bundlesCopiesByDefault != oldValue { favoriteVersions() } }
+    }
+    @ObservationIgnored private var copyCountTask: Task<Void, Never>?
+
+    /// What plays for an album: a chosen copy, all copies bundled, or (no choice) the best copy for the output.
+    func copyChoice(albumKey: String) -> AlbumCopyChoice {
+        copyChoices[albumKey] ?? (bundlesCopiesByDefault ? .bundled : .automatic)
+    }
+
+    func isBundled(albumKey: String) -> Bool { copyChoice(albumKey: albumKey) == .bundled }
+
+    /// The album's copies and its songs across them.
+    func albumCopies(albumKey: String) -> AlbumCopies { LibraryCopies.analyze(tracks(albumKey: albumKey)) }
+
+    func setCopyChoice(_ choice: AlbumCopyChoice, albumKey: String) {
+        do { try database.setCopyChoice(choice, albumKey: albumKey) } catch { lastError = error.localizedDescription }
+    }
+
+    /// Makes `track` the copy its song plays whenever the output can, or (`preferred` false) no copy in particular.
+    func setPreferredCopy(_ preferred: Bool, track: Track) {
+        guard let id = track.id else { return }
+        let song = versions(of: [track]).first?.compactMap(\.id) ?? []
+        do { try database.setPreferredCopy(preferred, trackID: id, songTrackIDs: song) } catch { lastError = error.localizedDescription }
+    }
+
+    func isPreferredCopy(_ track: Track) -> Bool { track.id.map(preferredCopyIDs.contains) ?? false }
+
+    /// For each track, the versions playback may pick among: every copy of its song when its album's copies are bundled,
+    /// else just the track (a copy chosen plays as itself, on any output).
+    func playbackVersions(of tracks: [Track]) -> [[Track]] {
+        let bundled = tracks.map { isBundled(albumKey: $0.albumKey) }
+        guard bundled.contains(true) else { return tracks.map { [$0] } }
+        let songs = versions(of: tracks)
+        return zip(tracks, zip(bundled, songs)).map { t, b in b.0 ? b.1 : [t] }
+    }
+
+    private func countCopies() {
+        let first = copyCountTask == nil
+        copyCountTask?.cancel()
+        let database = database
+        copyCountTask = Task { [weak self] in
+            // A scan changes albums many times a second: count once things settle.
+            if !first { try? await Task.sleep(for: .seconds(1)) }
+            guard !Task.isCancelled else { return }
+            let counts = await Task.detached(priority: .utility) { () -> [String: Int] in
+                let tracks = (try? database.allTracks()) ?? []
+                var counts: [String: Int] = [:]
+                for (key, album) in Dictionary(grouping: tracks.filter { !$0.isMissing }, by: \.albumKey) {
+                    let n = LibraryCopies.partition(album).count
+                    if n > 1 { counts[key] = n }
+                }
+                return counts
+            }.value
+            guard !Task.isCancelled, let self else { return }
+            self.copyCountsReady = true
+            if self.copyCounts != counts { self.copyCounts = counts }
+        }
+    }
 
     /// A location as people should see it: files on a network share read "High-Res Music › Artist/Album"
     /// (never the mount folder, which carries the server's address); local files use ~ paths.
@@ -120,6 +194,7 @@ final class LibraryStore {
     deinit {
         albumTask?.cancel()
         favoriteVersionsTask?.cancel()
+        copyCountTask?.cancel()
         for task in tasks { task.cancel() }
     }
 
@@ -200,6 +275,18 @@ final class LibraryStore {
                     self?.favoriteIDs = Set(value.map(\.id))
                     self?.favoriteAlbumKeys = Set(value.filter { !$0.missing }.compactMap(\.album))
                     self?.favoriteVersions()
+                }
+            } catch {}
+        })
+        tasks.append(Task { [weak self] in
+            let obs = ValueObservation.tracking { db in (try LibraryDatabase.copyChoices(db), Set(try Int64.fetchAll(db, sql: "SELECT trackId FROM preferredCopy"))) }
+            do {
+                for try await (choices, preferred) in obs.values(in: writer) {
+                    guard let self else { continue }
+                    let bundlingChanged = self.copyChoices.filter { $0.value == .bundled } != choices.filter { $0.value == .bundled }
+                    self.copyChoices = choices
+                    self.preferredCopyIDs = preferred
+                    if bundlingChanged { self.favoriteVersions() }
                 }
             } catch {}
         })
@@ -546,8 +633,9 @@ final class LibraryStore {
     func isFavorite(_ track: Track?) -> Bool { track?.id.map(favoriteIDs.contains) ?? false }
     func favoriteTracks() -> [Track] { (try? database.favoriteTracks()) ?? [] }
 
-    /// Favoriting one version of a song (its stereo version, heard on headphones) favorites them all, and a
-    /// version scanned later joins in. Off the main thread, and once a scan's flurry of changes settles.
+    /// Where an album's copies are bundled, favoriting one copy of a song (its stereo copy, heard on headphones) favorites
+    /// them all, and a copy scanned later joins in; elsewhere a favorite is the copy hearted. Counts favorite songs for the
+    /// sidebar. Off the main thread, and once a scan's flurry of changes settles.
     private func favoriteVersions() {
         let first = favoriteVersionsTask == nil
         favoriteVersionsTask?.cancel()
@@ -555,7 +643,8 @@ final class LibraryStore {
         favoriteVersionsTask = Task { [weak self] in
             if !first { try? await Task.sleep(for: .milliseconds(300)) }
             guard !Task.isCancelled else { return }
-            let songs = await Task.detached(priority: .utility) { try? database.favoriteEveryVersion() }.value
+            let bundled = self?.bundlesCopiesByDefault ?? false
+            let songs = await Task.detached(priority: .utility) { try? database.favoriteEveryVersion(bundledByDefault: bundled) }.value
             guard !Task.isCancelled, let songs else { return }
             self?.favoriteCount = songs
         }

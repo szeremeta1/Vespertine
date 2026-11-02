@@ -307,11 +307,34 @@ extension AppModel {
         }
     }
 
-    /// The songs of `albums`, album by album, that a page's filter lets through.
+    /// The songs of `albums`, album by album, that a page's filter lets through: of an album in several copies, the
+    /// copy that plays (its chosen one, else the best for the output) when it passes the filter, else the best copy
+    /// that does; of an album whose copies are bundled, every copy (the player picks each song's).
     func songs(of albums: [Album], filter: LibraryFilter) -> [Track] {
         let tracks = library.tracks(albumKeys: albums.map(\.key))
-        guard let allowing = allowing(filter, perAlbum: true) else { return tracks }
-        return tracks.filter(allowing)
+        let allowing = allowing(filter, perAlbum: true)
+        // Albums known to be in one copy skip the work (all of them, usually); until the copies are counted, every album is looked at.
+        let inCopies: (String) -> Bool = { [library] key in !library.copyCountsReady || library.copyCounts[key] != nil }
+        guard albums.contains(where: { inCopies($0.key) }) else { return allowing.map { tracks.filter($0) } ?? tracks }
+        let wanted = outputWantsMultichannel() ?? true
+        var byAlbum = Dictionary(grouping: tracks, by: \.albumKey)
+        var order: [String] = []
+        for t in tracks where order.last != t.albumKey && !order.contains(t.albumKey) { order.append(t.albumKey) }
+        return order.flatMap { key -> [Track] in
+            let album = byAlbum.removeValue(forKey: key) ?? []
+            let passing = allowing.map { album.filter($0) } ?? album
+            guard inCopies(key), !library.isBundled(albumKey: key) else { return passing }
+            let copies = LibraryCopies.analyze(album)
+            guard copies.copies.count > 1 else { return passing }
+            let isLocal: (AlbumCopy) -> Bool = { [shares] in !$0.tracks.contains(where: shares.isNetwork) }
+            let pass = Set(passing.map(\.location))
+            if let chosen = copies.selected(library.copyChoice(albumKey: key), multichannel: wanted, isLocal: isLocal),
+               chosen.tracks.contains(where: { pass.contains($0.location) }) {
+                return chosen.tracks.filter { pass.contains($0.location) }
+            }
+            let candidates = AlbumCopies(copies: copies.copies.filter { $0.tracks.contains { pass.contains($0.location) } }, songs: copies.songs)
+            return candidates.bestCopy(multichannel: wanted, isLocal: isLocal)?.tracks.filter { pass.contains($0.location) } ?? passing
+        }
     }
 
     /// The songs a page of songs lists before its filter; nil for pages of albums.

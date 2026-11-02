@@ -91,7 +91,7 @@ struct FavoritesTests {
         #expect(SmartRule.Field.isFavorite.operators == [.isTrue, .isFalse])
     }
 
-    @Test("A favorite is a song: its stereo and 5.1 versions are favorites together, and count once")
+    @Test("A favorite is the copy hearted; bundled copies are favorites together; a song counts once")
     func versionsTogether() throws {
         let db = try LibraryDatabase.inMemory()
         let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
@@ -107,9 +107,15 @@ struct FavoritesTests {
         let ids = try db.writer.write { db in try tracks.map { t -> Int64 in var t = t; try t.insert(db); return t.id! } }
         #expect(try db.favoriteEveryVersion() == 0)
 
-        // Favorited on headphones: only the stereo version was hearted.
+        // Favorited on headphones: only the stereo copy was hearted, and only it is a favorite while the album's copies
+        // are separate (the default: hearting one copy never makes the other one a favorite).
         let date = Date(timeIntervalSince1970: 3_000_000)
         try db.setFavorite(true, trackIDs: [ids[1]], at: date)
+        #expect(try db.favoriteEveryVersion() == 1)
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[1]])
+
+        // Bundled, the song is one favorite whichever copy plays: the 5.1 copy joins, from the day the song was.
+        try db.setCopyChoice(.bundled, albumKey: tracks[0].albumKey)
         #expect(try db.favoriteEveryVersion() == 1)
         #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[0], ids[1]])
         let dates = try db.writer.read { db in try Date.fetchAll(db, sql: "SELECT favoritedAt FROM favorite") }
@@ -117,5 +123,11 @@ struct FavoritesTests {
 
         #expect(try db.favoriteEveryVersion() == 1, "nothing more to add")
         #expect(try db.favoriteTracks().count == 2)
+
+        // No choice for the album: copies are separate, unless bundling is the app's default.
+        try db.setCopyChoice(.automatic, albumKey: tracks[0].albumKey)
+        try db.setFavorite(false, trackIDs: [ids[0]])
+        #expect(try db.favoriteEveryVersion() == 1 && db.favoriteTracks().count == 1)
+        #expect(try db.favoriteEveryVersion(bundledByDefault: true) == 1 && db.favoriteTracks().count == 2)
     }
 }
