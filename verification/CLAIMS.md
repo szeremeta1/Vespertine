@@ -20,7 +20,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-01 <a id="bp-definition"></a>The badge means every sample arrives unaltered
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:83` — "/// True only when every sample reaches the DAC unaltered."
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:92` — "/// True only when every sample reaches the DAC unaltered."
 - **Text:** `README.md:40` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
@@ -488,11 +488,11 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
 
-- **Text:** `docs/TRANSITIONS.md:62` — "Only while it's heard is the music not bit-perfect"
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:85` — "guard transition?.audible != true"
+- **Text:** `docs/TRANSITIONS.md:84` — "Only while it's heard is the music not bit-perfect"
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:94` — "guard transition?.audible != true"
 - **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
 - **Governed by:** vespertine-rule.
-- **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants still to add).
+- **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift` and `SmartMixGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants C-FLT-001-tr, C-INT-001-tr and C-DOPS-004-tr, killed by the float, integer and DoP groups' checks).
 
 ### CL-TR-03 <a id="transitions-cuts"></a>Native DSD, bitstream, Atmos, integer and 16-bit words are never mixed or faded
 
@@ -500,6 +500,27 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Property:** a boundary with any of these on either side is byte-identical to transitions off, and the real-time fader never scales those words.
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (`TransitionGoldenTests.swift` cuts, `FaderTests.swift` bypass).
+
+### CL-TR-04 <a id="transitions-smart-mix"></a>Smart Mix and its limiter change only the overlap
+
+- **Text:** `docs/TRANSITIONS.md:50` — "it touches only overlap frames, and passes frames that need nothing untouched"
+- **Property:** with Smart Mix, frames before and after an overlap are the sources' samples bit for bit; the overlap is the closed-form mix of the decision's curves and loudness match; the limiter leaves frames that need no reduction untouched, never outputs a sample above its ceiling, and changes only frames within its lookahead before, and its release after, a frame that would exceed it. A segue is byte-identical to transitions off.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`SmartMixGoldenTests.swift` closed-form checks and stored hashes, `SmartMixTests.swift` limiter tests).
+
+### CL-TR-05 <a id="transitions-gap"></a>A gap leaves both songs whole
+
+- **Text:** `docs/TRANSITIONS.md:25` — "That much silence between the songs, each whole and untouched"
+- **Property:** with a gap set, the words handed to the device are the first song's samples, then exactly that many frames of zeros, then the second song's samples; inside an album the bytes are those of transitions off.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`SmartMixGoldenTests.swift` gap).
+
+### CL-TR-06 <a id="transitions-first"></a>"Transitions first" applies only while the switch is on
+
+- **Text:** `docs/TRANSITIONS.md:89` — "Settings › Playback › Transitions ›"
+- **Property:** with the master switch off, or "bit-perfect first", the output plan (rate, DoP, integer and 16-bit modes) is what it is without transitions; "transitions first" changes it only while the switch is on, and the signal path says so.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`SmartMixTests.swift` settings; the golden cases with the switch off and on). Not yet covered by an engine-level test of the resampled boundary (deferred).
 
 ---
 

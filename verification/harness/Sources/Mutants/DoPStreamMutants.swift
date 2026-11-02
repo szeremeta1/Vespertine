@@ -135,6 +135,11 @@ public enum DoPStreamMutants {
                summary: "A gain other than 1.0 scales the 16 DSD bits of music words as a signed sample (markers kept)") { base in
             FlawedMaker(base: base, flaw: .gainScalesMusic)
         },
+        // Transitions: the fade-in on resume applied to DoP music words (Smart Mix, phase 3).
+        Mutant("C-DOPS-004-tr", targets: ["DOPS-004"],
+               summary: "After unmuting, the first 64 music frames are faded in: their 16 DSD bits scaled as a signed sample by k/64") { base in
+            FlawedMaker(base: base, flaw: .fadeInAfterUnmute(frames: 64))
+        },
         Mutant("C-DOPS-007-b", targets: ["DOPS-007", "DOPS-004"],
                summary: "With the equalizer on, the lowest DSD bit of every music word is cleared") { base in
             FlawedMaker(base: base, flaw: .eqClearsLowBit)
@@ -183,6 +188,7 @@ private enum Flaw: Sendable, Equatable {
     case muteOneCallLate
     case muteAtChunkBoundary
     case gainScalesMusic
+    case fadeInAfterUnmute(frames: Int)
     case eqClearsLowBit
     case eqComplementSilence
     case zeroGainZeroesMusic
@@ -237,6 +243,9 @@ private final class FlawedStage: DoPStage {
     private var injectHead = 0
 
     private var muted = false
+    /// fadeInAfterUnmute: music frames still to fade in, of how many.
+    private var fadeLeft = 0
+    private var fadeLength = 1
     private var gain = 1.0
     private var eq = false
 
@@ -556,6 +565,7 @@ private final class FlawedStage: DoPStage {
             underran = false
         }
         if !m && muted {
+            if case .fadeInAfterUnmute(let k) = flaw { fadeLeft = k; fadeLength = k }
             lateMuteCalls = 0
             if case .gapAfterUnmute(let k) = flaw { gap = k }
         }
@@ -585,6 +595,10 @@ private final class FlawedStage: DoPStage {
             if musicCount > 0 && musicCount % wrapEvery == 0 { out[start + ch - 1] ^= 0x100 }
         case .gainScalesMusic where gain != 1.0:
             for j in start ..< start + ch { out[j] = Self.scaled(out[j], by: gain) }
+        case .fadeInAfterUnmute where fadeLeft > 0 && fromBase:
+            let g = Double(fadeLength - fadeLeft) / Double(fadeLength)
+            for j in start ..< start + ch { out[j] = Self.scaled(out[j], by: g) }
+            fadeLeft -= 1
         case .eqClearsLowBit where eq:
             for j in start ..< start + ch { out[j] &= ~UInt32(0x100) }
         case .zeroGainZeroesMusic where gain == 0:
