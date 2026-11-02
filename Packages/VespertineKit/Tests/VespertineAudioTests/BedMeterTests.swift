@@ -346,7 +346,8 @@ struct BedMeterTests {
         defer { session.stop() }
         // At volume 0 the renderer plays the 1.5 s fixture through (silently), taking every frame.
         session.play()
-        let deadline = Date().addingTimeInterval(30)
+        // Generous: the suite's hardware tests share the output device, and under a sanitizer a session takes minutes.
+        let deadline = Date().addingTimeInterval(180)
         while !session.inputExhausted, Date() < deadline { Thread.sleep(forTimeInterval: 0.02) }
         #expect(session.inputExhausted, "the renderer was handed the whole stream")
         #expect(count.value >= 1 && total.value > 2000, "\(count.value) buffers, \(total.value) bytes")
