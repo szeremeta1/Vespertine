@@ -335,8 +335,9 @@ public final class TransitionAnalyzer {
     /// The momentary loudness (400 ms) starting at each step whose block lies within `steps`, floored at −70 LUFS.
     static func levels(_ steps: [Double]) -> [Double] {
         guard steps.count >= 4 else { return [] }
-        return (0...(steps.count - 4)).map { k in
-            max(-70, LoudnessMeter.lufs((steps[k] + steps[k + 1] + steps[k + 2] + steps[k + 3]) / 4))
+        return (0...(steps.count - 4)).map { k -> Double in
+            let sum: Double = steps[k] + steps[k + 1] + steps[k + 2] + steps[k + 3]   // typed apart, as in `blocks`
+            return max(-70, LoudnessMeter.lufs(sum / 4))
         }
     }
 

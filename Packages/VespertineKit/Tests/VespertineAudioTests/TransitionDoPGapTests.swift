@@ -90,7 +90,8 @@ struct TransitionDoPGapTests {
         #expect(Array(words.prefix(lengthA * 2)) == Array(offWords.prefix(lengthA * 2)))
         let idle = PlaybackEngine.dopIdle(frames: gap, channels: 2, from: UInt64(lengthA), integer: false).map(\.bitPattern)
         #expect(Array(words[(lengthA * 2)..<((lengthA + gap) * 2)]) == idle)
-        #expect(Array(words.suffix(offWords.count - lengthA * 2)) == Array(offWords.suffix(offWords.count - lengthA * 2)))
+        let rest: Int = offWords.count - lengthA * 2   // typed apart: one expression is slow to check
+        #expect(Array(words.suffix(rest)) == Array(offWords.suffix(rest)))
         // The gap is DSD silence (0x69 0x69 behind each marker) and the markers never repeat, anywhere.
         let gapWords = words[(lengthA * 2)..<((lengthA + gap) * 2)]
         #expect(gapWords.allSatisfy { Self.dopWord($0) & 0xFFFF == 0x6969 })

@@ -216,8 +216,9 @@ struct OverlapLimiterTests {
         }
         #expect(biggest < 0.25, "\(biggest)")
         // Well after the burst and the spike (release 50 ms), frames are untouched again.
-        #expect(Array(out[(46_000 * 2)...]).map(\.bitPattern) == Array(x[(46_000 * 2)...]).map(\.bitPattern))
-        #expect(Array(out[..<(19_000 * 2)]).map(\.bitPattern) == Array(x[..<(19_000 * 2)]).map(\.bitPattern))
+        let bits: (ArraySlice<Float>) -> [UInt32] = { $0.map(\.bitPattern) }   // typed apart: one expression is slow to check
+        #expect(bits(out[(46_000 * 2)...]) == bits(x[(46_000 * 2)...]))
+        #expect(bits(out[..<(19_000 * 2)]) == bits(x[..<(19_000 * 2)]))
         // The same input in any chunking gives the same bytes.
         #expect(Self.run(x, chunk: 1).out.map(\.bitPattern) == out.map(\.bitPattern))
     }

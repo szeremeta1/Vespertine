@@ -128,7 +128,11 @@ public struct LoudnessMeter: Sendable {
     /// The mean square of each 400 ms block (four steps), one per step from the fourth on.
     public static func blocks(_ steps: [Double]) -> [Double] {
         guard steps.count >= 4 else { return [] }
-        return (3..<steps.count).map { (steps[$0 - 3] + steps[$0 - 2] + steps[$0 - 1] + steps[$0]) / 4 }
+        // Typed one step at a time: as one expression, the type checker on CI gave up on it.
+        return (3..<steps.count).map { i -> Double in
+            let sum: Double = steps[i - 3] + steps[i - 2] + steps[i - 1] + steps[i]
+            return sum / 4
+        }
     }
 
     /// Integrated loudness of the steps in `range` (all by default): blocks below −70 LUFS are left out, then those
