@@ -295,6 +295,22 @@ public final class LibraryDatabase: Sendable {
             // Songs played before there was a history start it with the last time each was played.
             try db.execute(sql: "INSERT INTO playHistory (trackId, playedAt) SELECT id, lastPlayedAt FROM track WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt")
         }
+        m.registerMigration("v19-transitions") { db in
+            // How each song starts and ends, for Smart Mix: the same shape and invalidation as `analysis`.
+            try db.create(table: "transitionProfile") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("fileSize", .integer).notNull()
+                t.column("modifiedAt", .datetime).notNull()
+                t.column("version", .integer).notNull()
+                t.column("data", .blob).notNull()
+            }
+            // A playlist's own transitions (`TransitionOverride.storedValue`); no row follows the app's setting. A table
+            // of its own, not a playlist column: older migrations save `Playlist` records, which must keep their shape.
+            try db.create(table: "playlistTransition") { t in
+                t.primaryKey("playlistId", .integer).references("playlist", onDelete: .cascade)
+                t.column("transitionStyle", .text).notNull()
+            }
+        }
         return m
     }
 }
@@ -830,6 +846,74 @@ public extension LibraryDatabase {
                                    arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
                 }
             }
+        }
+    }
+
+    /// Saves transition profiles, each for the tracks that play all of its file (a CUE sheet's or a disc image's
+    /// tracks are parts of one, so the file's ends aren't theirs: the player measures those as they play).
+    public func saveTransitionProfiles(_ items: [(TransitionProfile, String)]) throws {
+        guard !items.isEmpty else { return }
+        let encoder = JSONEncoder()
+        let encoded = try items.map { (try encoder.encode($0.0), $0.0.version, $0.1) }
+        try writer.write { db in
+            for (data, version, filePath) in encoded {
+                for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) where track.cueStartFrame == nil {
+                    guard let id = track.id, track.sacdArea == nil, track.dvdStream == nil else { continue }
+                    try db.execute(sql: """
+                        INSERT OR REPLACE INTO transitionProfile (trackId, fileSize, modifiedAt, version, data)
+                        VALUES (?, ?, ?, ?, ?)
+                        """, arguments: [id, track.fileSize, track.modifiedAt, version, data])
+                }
+            }
+        }
+    }
+
+    /// The transition profile of the track with this id, when it's current (the player asks, on its own thread).
+    public func transitionProfile(trackID: Int64) throws -> TransitionProfile? {
+        try writer.read { db in
+            guard let data = try Data.fetchOne(db, sql: """
+                SELECT p.data FROM transitionProfile p JOIN track t ON t.id = p.trackId
+                WHERE p.trackId = ? AND p.version >= ? AND p.fileSize = t.fileSize AND p.modifiedAt = t.modifiedAt
+                """, arguments: [trackID, TransitionProfile.currentVersion]) else { return nil }
+            return try? JSONDecoder().decode(TransitionProfile.self, from: data)
+        }
+    }
+
+    /// A playlist's own transitions (`TransitionOverride.storedValue`), nil when it follows the app's setting.
+    public func transitionStyle(forPlaylist id: Int64) throws -> String? {
+        try writer.read { db in
+            try String.fetchOne(db, sql: "SELECT transitionStyle FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+        }
+    }
+
+    /// Every playlist that has its own transitions, by id.
+    public func playlistTransitionStyles() throws -> [Int64: String] {
+        try writer.read { db in
+            Dictionary(try Row.fetchAll(db, sql: "SELECT playlistId, transitionStyle FROM playlistTransition").map { ($0["playlistId"], $0["transitionStyle"]) },
+                       uniquingKeysWith: { a, _ in a })
+        }
+    }
+
+    /// Sets a playlist's own transitions; nil goes back to the app's setting.
+    public func setTransitionStyle(_ style: String?, forPlaylist id: Int64) throws {
+        try writer.write { db in
+            if let style {
+                try db.execute(sql: "INSERT OR REPLACE INTO playlistTransition (playlistId, transitionStyle) VALUES (?, ?)", arguments: [id, style])
+            } else {
+                try db.execute(sql: "DELETE FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+            }
+        }
+    }
+
+    /// The track's transition profile, when one is stored for the file as it is now and by the current analyzer.
+    public func transitionProfile(for track: Track) throws -> TransitionProfile? {
+        guard let id = track.id else { return nil }
+        return try writer.read { db in
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM transitionProfile WHERE trackId = ?", arguments: [id]) else { return nil }
+            let size: Int64 = row["fileSize"], modified: Date = row["modifiedAt"], version: Int = row["version"]
+            guard version >= TransitionProfile.currentVersion, size == track.fileSize,
+                  abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001 else { return nil }
+            return try? JSONDecoder().decode(TransitionProfile.self, from: row["data"] as Data)
         }
     }
 

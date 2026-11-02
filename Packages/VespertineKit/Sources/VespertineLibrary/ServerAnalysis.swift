@@ -25,6 +25,8 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
         var size: Int64
         var mtime: Double
         var analysis: FileAnalysis
+        /// How the song starts and ends (servers from before Smart Mix write none).
+        var transition: TransitionProfile?
     }
 
     /// What matching a record to a track needs: decoded from every line, leaving the analysis (a spectrum of
@@ -130,6 +132,7 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
         var bySize: [Int64: [(path: String, entry: Entry)]] = [:]
         for (path, e) in entries where !known.contains(path) { bySize[e.size, default: []].append((path, e)) }
         var matched: [(FileAnalysis, String)] = []
+        var profiles: [(TransitionProfile, String)] = []
         for track in try database.tracksNeedingAnalysis() where track.sourceId == sourceID {
             guard track.filePath.hasPrefix(base) else { continue }
             let rel = String(track.filePath.dropFirst(base.count)).precomposedStringWithCanonicalMapping
@@ -143,8 +146,10 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
             let analysis = FileAnalyzer.rejudged(r.analysis)
             guard analysis.version >= FileAnalysis.currentVersion else { continue }
             matched.append((analysis, track.filePath))
+            if let profile = r.transition, profile.version >= TransitionProfile.currentVersion { profiles.append((profile, track.filePath)) }
         }
         try database.saveAnalyses(matched)
+        try database.saveTransitionProfiles(profiles)
         return matched.count
     }
 
