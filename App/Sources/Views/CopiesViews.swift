@@ -100,12 +100,12 @@ private struct CopyCard: View {
                             .font(Typeface.mono(8, weight: .semibold)).letterSpacing(0.5).foregroundStyle(Palette.brassHi).lineLimit(1)
                     }
                 }
-                Text(copy.edition ?? model.library.albumLocation(copy.folder))
+                Text(copy.edition ?? (copy.folder as NSString).lastPathComponent + (copy.place.map { " › " + $0 } ?? ""))
                     .font(Typeface.ui(12, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1).truncationMode(.middle)
                 Text(detail).font(Typeface.mono(9.5)).foregroundStyle(copy.isComplete ? Palette.text3 : Palette.copper).lineLimit(1)
-                    .truncationMode(.middle)
+                    .truncationMode(.tail)
             }
-            .frame(width: 250, height: 58, alignment: .leading)
+            .frame(width: 270, height: 58, alignment: .leading)
             .padding(.horizontal, 10).padding(.vertical, 7)
             .background(Palette.surface, in: RoundedRectangle(cornerRadius: 6))
             .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(isSelected ? Palette.brass : Palette.hairlineStrong, lineWidth: 1))
@@ -127,7 +127,7 @@ private struct CopyCard: View {
     private var detail: String {
         var parts = [copy.isComplete ? String(localized: "\(copy.songCount) songs") : String(localized: "\(copy.songCount) of \(copy.albumSongCount) songs"),
                      copy.size.byteString]
-        if copy.edition != nil { parts.append(model.library.albumLocation(copy.folder)) }
+        parts.append(model.library.albumLocation(copy.folder))
         return parts.joined(separator: " · ")
     }
 }
@@ -162,6 +162,8 @@ struct SongCopiesButton: View {
         .fixedSize()
         .help(String(localized: "Also in your library as \(others). Click to play, favorite or prefer a copy."))
         .accessibilityLabel(Text("\(copies.count) COPIES"))
+        // Developer aid: `-VespertineShowCopies "<title>"` opens the copies of the song with that title (screenshots).
+        .onAppear { if LaunchArguments().string(forKey: "VespertineShowCopies") == track.title { showing = true } }
         .popover(isPresented: $showing, arrowEdge: .bottom) {
             SongCopiesPopover(model: model, track: track, copies: copies, list: list)
         }
@@ -195,10 +197,13 @@ struct SongCopiesPopover: View {
                  ? "This album's copies are bundled: the song plays the starred copy when your output supports it, else the best one it supports."
                  : "Play plays that copy here, then the list goes on. A heart is for that copy only. The starred copy plays wherever this album's copies are bundled.")
                 .font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                .lineLimit(4)
                 .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
                 .padding(.horizontal, 14).padding(.vertical, 10)
         }
         .frame(width: 430)
+        .fixedSize(horizontal: false, vertical: true)
         .background(Palette.raised)
     }
 
