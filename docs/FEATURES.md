@@ -16,7 +16,7 @@ When the library has an album more than once (a 24/192 download and a vinyl tran
 
 ![An album with three copies (24/192 download, vinyl transfer, 5.1 mix) and one song's copies open to play, favorite or star](screenshots/editions-and-copies.png)
 
-![The same page with the copies bundled: each song plays the copy the output supports](screenshots/copies-bundled.png)
+![An SACD album and its CD with the copies bundled: each song plays the copy the output supports, and a song's copies are still listed](screenshots/copies-bundled.png)
 
 DTS CDs and DTS-WAV files store a DTS stream in what looks like stereo PCM. Vespertine detects the stream and decodes it to 5.1, including CUE-split albums. Ordinary PCM playback of that data would be noise. Format badges name the codec and channel layout, and the signal path has a meter for each channel.
 
