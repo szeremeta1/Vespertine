@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <stdatomic.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -405,6 +406,60 @@ static void test_concurrent_rewind(void) {
     atomic_store(&rewind_done, true);
     pthread_join(thread, NULL);
     assert(rewound > 0);
+    nrt_context_destroy(rewind_ctx);
+    nrt_ring_destroy(rewind_ring);
+}
+
+// A skip's crossfade: while the reader runs, the producer copies what it wrote ahead of the reader back out
+// (nrt_ring_peek), rewinds to a point past the reader, and writes again from there. Frame n carries n: every copy
+// must be the frames it asked for, and the reader must only ever see n after n − 1.
+#define PEEK_ROUNDS 300u
+static void test_concurrent_peek(void) {
+    rewind_ring = nrt_ring_create(8192, 1);
+    assert(rewind_ring);
+    rewind_ctx = nrt_context_create(rewind_ring, 512);
+    assert(rewind_ctx);
+    nrt_context_set_passthrough(rewind_ctx, true);
+    nrt_context_set_draining(rewind_ctx, true);
+    atomic_store(&rewind_done, false);
+    pthread_t thread;
+    const int started = pthread_create(&thread, NULL, rewind_reader, NULL);
+    assert(!started); (void)started;
+    static float chunk[512], peeked[4096];
+    unsigned rewound = 0, copied = 0;
+    // The reader keeps reading while this peeks and checks: `from` leaves it room to move, or the rewind (rightly)
+    // refuses every round on a slow or loaded machine. Past PEEK_ROUNDS, keep going until a rewind has gone through.
+    for (unsigned round = 0; round < PEEK_ROUNDS || (rewound == 0 && round < 20 * PEEK_ROUNDS); round++) {
+        while (nrt_ring_writable(rewind_ring) < 4096) sched_yield();
+        for (unsigned k = 0; k < 8; k++) {
+            const uint64_t w = nrt_ring_total_written(rewind_ring);
+            assert(w + 512 < (1u << 24));
+            for (uint32_t i = 0; i < 512; i++) chunk[i] = (float)(w + i);
+            const uint32_t wrote = nrt_ring_write(rewind_ring, chunk, 512);
+            assert(wrote == 512); (void)wrote;
+        }
+        const uint64_t w = nrt_ring_total_written(rewind_ring);
+        const uint64_t from = nrt_ring_total_read(rewind_ring) + 64 + 2048;
+        if (from >= w) continue;
+        const uint32_t got = nrt_ring_peek(rewind_ring, from, peeked, 4096);
+        assert(got == (w - from < 4096 ? w - from : 4096));
+        for (uint32_t i = 0; i < got; i++) assert(peeked[i] == (float)(from + i));
+        copied += got;
+        // Out of range: past the write position, or more than a capacity back.
+        assert(nrt_ring_peek(rewind_ring, w + 1, peeked, 1) == 0);
+        assert(w < 8192 || nrt_ring_peek(rewind_ring, w - 8193, peeked, 1) == 0);
+        if (nrt_ring_rewind(rewind_ring, from, 64)) {
+            rewound++;
+            // Write the same frames again from there (as the mix would be written).
+            for (uint32_t i = 0; i < got && i < 512; i++) chunk[i] = (float)(from + i);
+            const uint32_t again = got < 512 ? got : 512;
+            const uint32_t wrote = nrt_ring_write(rewind_ring, chunk, again);
+            assert(wrote == again); (void)wrote;
+        }
+    }
+    atomic_store(&rewind_done, true);
+    pthread_join(thread, NULL);
+    assert(rewound > 0 && copied > 0);
     nrt_context_destroy(rewind_ctx);
     nrt_ring_destroy(rewind_ring);
 }
@@ -922,9 +977,83 @@ static void capture_audit(void) {
     nrt_ring_destroy(ring);
 }
 
+
+// MARK: - Transitions' fader: commands from other threads while the I/O thread renders
+
+static NRTRenderContext *fade_ctx;
+static atomic_bool fade_done;
+
+static void *fade_commander(void *unused) {
+    (void)unused;
+    for (unsigned i = 0; !atomic_load(&fade_done); i++) {
+        switch (i % 4) {
+        case 0: nrt_context_fade(fade_ctx, false, 300 + i % 500, false, true); break;
+        case 1: nrt_context_set_muted(fade_ctx, false); nrt_context_fade(fade_ctx, true, 200, true, false); break;
+        case 2: nrt_context_fade(fade_ctx, true, 0, false, false); break;
+        default: (void)nrt_context_fading(fade_ctx); (void)nrt_context_is_muted(fade_ctx); break;
+        }
+        sched_yield();
+    }
+    return NULL;
+}
+
+// Every sample out stays between silence and the sample in (a level in 0…1), whatever the commands' order; idle again,
+// the output is the input bit for bit.
+static void test_concurrent_fade(void) {
+    NRTRing *ring = nrt_ring_create(4096, 2);
+    assert(ring);
+    fade_ctx = nrt_context_create(ring, 512);
+    assert(fade_ctx);
+    nrt_context_set_gain(fade_ctx, 1.0, 0);
+    atomic_store(&fade_done, false);
+    pthread_t thread;
+    int started = pthread_create(&thread, NULL, fade_commander, NULL);
+    assert(!started); (void)started;
+    float in[2 * 512], out[2 * 512];
+    for (int i = 0; i < 2 * 512; i++) in[i] = (i % 2 ? -0.75f : 0.5f);
+    for (int round = 0; round < 20000; round++) {
+        nrt_ring_write(ring, in, 512);
+        nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+        for (int i = 0; i < 2 * 512; i++) {
+            const float x = out[i], limit = in[i];
+            assert(x == 0.f || (limit > 0 ? x > 0 && x <= limit : x < 0 && x >= limit));
+            (void)x; (void)limit;
+        }
+    }
+    atomic_store(&fade_done, true);
+    pthread_join(thread, NULL);
+    nrt_context_set_muted(fade_ctx, false);
+    nrt_context_fade(fade_ctx, true, 0, false, false);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);    // takes the command
+    (void)nrt_context_discard(fade_ctx);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+    nrt_ring_write(ring, in, 512);
+    nrt_context_render_interleaved(fade_ctx, out, 512, 2);
+    assert(memcmp(in, out, sizeof in) == 0);
+    nrt_context_destroy(fade_ctx);
+    nrt_ring_destroy(ring);
+}
+
+// The watchdog that ends a hung run: 30 s on an idle machine, scaled with the load per core (the larger of the 1- and
+// 5-minute averages, as the load can climb during a run) and capped at 10 minutes. ThreadSanitizer on a busy machine
+// needs far more than 30 s for the same work (a load of 100 on 8 cores took about 50-100 s), and a fixed 30 s alarm
+// made the audit fail there with nothing wrong. RT_AUDIT_WATCHDOG=<seconds> sets it outright.
+static unsigned watchdog_seconds(void) {
+    const char *forced = getenv("RT_AUDIT_WATCHDOG");
+    if (forced && atoi(forced) > 0) return (unsigned)atoi(forced);
+    double load[2] = {0, 0};
+    long cores = sysconf(_SC_NPROCESSORS_ONLN);
+    if (cores < 1) cores = 1;
+    double perCore = getloadavg(load, 2) == 2 ? fmax(load[0], load[1]) / (double)cores : 1;
+    double seconds = 30 * fmax(1, perCore);
+    return (unsigned)fmin(600, ceil(seconds));
+}
+
 int main(void) {
     capture_audit();
-    alarm(30);
+    const unsigned watchdog = watchdog_seconds();
+    fprintf(stderr, "rt-audit: watchdog %u s\n", watchdog);
+    alarm(watchdog);
     concurrent_ring = nrt_ring_create(256, 1);
     assert(concurrent_ring);
     pthread_t thread;
@@ -977,5 +1106,7 @@ int main(void) {
     test_fir();
     test_concurrent_fir();
     test_room_then_fir();
+    test_concurrent_fade();
+    test_concurrent_peek();
     return 0;
 }

@@ -125,7 +125,7 @@ struct TrackTable: View {
             // song the set happens to list first (else the first selected, in the order shown).
             let clicked = Self.clickedRow().flatMap { rows.indices.contains($0) && ids.contains(rows[$0].id) ? $0 : nil }
             guard let index = clicked ?? rows.firstIndex(where: { ids.contains($0.id) }) else { return }
-            model.player.play(rows.map(\.track), startAt: index)
+            model.player.play(rows.map(\.track), startAt: index, transitions: model.playlistTransitions(.sidebar(model.sidebar)))
         }
         .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id))) }
         .onChange(of: model.selectedTrackIDs) { _, new in
@@ -157,7 +157,7 @@ struct TrackTable: View {
         }
         .onKeyPress(.return) {
             guard let index = rows.firstIndex(where: { selection.contains($0.id) }) else { return .ignored }
-            model.player.play(rows.map(\.track), startAt: index)
+            model.player.play(rows.map(\.track), startAt: index, transitions: model.playlistTransitions(.sidebar(model.sidebar)))
             return .handled
         }
     }

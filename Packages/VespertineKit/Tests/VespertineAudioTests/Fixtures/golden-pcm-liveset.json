@@ -1,0 +1,9 @@
+{
+  "cases" : {
+    "bass-swap" : "3d81fbd4eb451890af883fabd3975fd005aa639daee32cfe9e662da3262c2fd8",
+    "beat-matched" : "f6beb48d8c05477e0f9bbf8dc0e95dc5550478610863642651a9e0ef185203ff",
+    "fixed-rate" : "988047cdc22069315624af22bc26ce73f20cba0ab1331d5c535d38b69d88d40f",
+    "half-time" : "d6c0353fd2c68c4b7cfb10157e9fcbffc1664d3fd8b7de2669503afc8822b20f"
+  },
+  "recordedOn" : "arm64 macOS 27"
+}

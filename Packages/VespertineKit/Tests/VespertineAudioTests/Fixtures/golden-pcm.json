@@ -1,0 +1,191 @@
+{
+  "cases" : {
+    "bitstream-ac3" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=bitstream rate=48000 channels=2 out=2 depth=24 integer=false frames=72192"
+      ],
+      "sha256" : "e472ef08b70a61a422da4983d6a8f68a36e52873a39460dc4f69cd15dc21328f",
+      "summary" : "Dolby Digital sent to a receiver as IEC 61937"
+    },
+    "bitstream-dts-cd" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=bitstream rate=44100 channels=2 out=2 depth=24 integer=false frames=110592"
+      ],
+      "sha256" : "431d2eead355644950cb07d063fdba1f7ff2b184628b8ca67e0a734f4ed71976",
+      "summary" : "a DTS CD (DTS in a 16-bit WAV) sent to a receiver as stored"
+    },
+    "cue-3-tracks-16-44k1" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=24 integer=false frames=88200"
+      ],
+      "sha256" : "81481f65dcba0c6f41c7134c5f8264a6fd4573319ff475a92738763f19f5bc3d",
+      "summary" : "one WAV split into three tracks by a CUE sheet, played in order"
+    },
+    "digital-volume-minus-10" : {
+      "portable" : false,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "a68ba03d3cf1919a705b0632e46fd3a6ed87edc06ab42c0fa05e3713f6c4d59d",
+      "summary" : "24/48 at −10 dB digital volume (gain and TPDF dither in the I/O proc)"
+    },
+    "dop-dsd64" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=dop rate=176400 channels=2 out=2 depth=24 integer=false frames=52921"
+      ],
+      "sha256" : "78e4d0d69736eb163303934ce997e459fe29ed7550902fa081e5ea50da5e5c49",
+      "summary" : "DSD64 DSF as DoP at 176.4 kHz"
+    },
+    "dop-dsd64-gapless-pair" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=dop rate=176400 channels=2 out=2 depth=24 integer=false frames=105841"
+      ],
+      "sha256" : "745cd9690bcb26dca086dd1cc0c20b0b2a845d70cbebf03e6828e4a844efc798",
+      "summary" : "two DSD64 DSF tracks joined as DoP (markers keep alternating)"
+    },
+    "dsd64-to-pcm" : {
+      "portable" : false,
+      "sessions" : [
+        "session mode=pcm rate=176400 channels=2 out=2 depth=24 integer=false frames=52921"
+      ],
+      "sha256" : "619e3e3d5ce081e6a72beeb2d67ef2d554f03990ca09aeae6493a5191cb450f7",
+      "summary" : "DSD64 DSF converted to PCM on a DAC without DoP"
+    },
+    "float32-48k" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "3d95da5a35c718f818b262eed4a2ee19308946026e5a811509cdcd47bdfce562",
+      "summary" : "32-bit float WAV, including values over full scale"
+    },
+    "gapless-album-flac-16-44k1" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=24 integer=false frames=30000"
+      ],
+      "sha256" : "eebe9bb6ee22b81345c281297a6da113fa34d418f31a5d7d95e88356915562e6",
+      "summary" : "two FLAC tracks of one album, split mid-chunk, joined gaplessly"
+    },
+    "int16-44k1" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=24 integer=false frames=20000"
+      ],
+      "sha256" : "6f2b534036082212e588892e5a42f61ccfe29d0e9552b813aa8607f9b28a2822",
+      "summary" : "16-bit stereo, zero-padded to the DAC's 24"
+    },
+    "int16-44k1-matched" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=16 integer=false frames=20000"
+      ],
+      "sha256" : "1ef07b19d20e8e0becd6434387ab2a9e6ac6ef78024685eff97925cc7557a94a",
+      "summary" : "16-bit stereo, \"Match 16-bit sources\" on a DAC with a 16-bit mode"
+    },
+    "int32-96k-float-path" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=96000 channels=2 out=2 depth=24 integer=false frames=24000"
+      ],
+      "sha256" : "7eb61b666be758a52049379cbb34eaa8b3898bd961432dcbff27fae536ed7e44",
+      "summary" : "32-bit integer WAV through the float path"
+    },
+    "int32-96k-integer-mode" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=96000 channels=2 out=2 depth=32 integer=true frames=24000"
+      ],
+      "sha256" : "46da3e31fc9f79aa6001e2f605d9e34e324e9746d89fbaaa0a8b554164b4e0ca",
+      "summary" : "32-bit integer WAV in integer mode (words untouched)"
+    },
+    "mono-16-48k" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=1 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "19f6dea700e2a2a4f0c99a45305ea7457dce6b0d3efa54b20e5c1e01661fb81f",
+      "summary" : "16-bit mono, sent to both channels"
+    },
+    "rate-44k1-24" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=24 integer=false frames=11025"
+      ],
+      "sha256" : "fc900653b0948f3efd0cf5c58817ae38b4a2f7c99cf57a20fba8f4a27a032072",
+      "summary" : "24-bit stereo WAV at 44.1 kHz"
+    },
+    "rate-48k-24" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "694a0db4c991b26c4778ec3a2bb02b8dd4c1be90337bc076eb9e786fc4cf2b88",
+      "summary" : "24-bit stereo WAV at 48 kHz"
+    },
+    "rate-96k-24" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=96000 channels=2 out=2 depth=24 integer=false frames=24000"
+      ],
+      "sha256" : "09313c7421e620c46e50d16050509708561ee61f49b35c37941487b872dbbfbe",
+      "summary" : "24-bit stereo WAV at 96 kHz"
+    },
+    "rate-change-queue" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=44100 channels=2 out=2 depth=24 integer=false frames=8820",
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=9600",
+        "session mode=pcm rate=96000 channels=2 out=2 depth=24 integer=false frames=19200"
+      ],
+      "sha256" : "80bd13d7e3b0fd0d53ce54fabe281d881fdb069c1425e669ebb863d578212287",
+      "summary" : "44.1 → 48 → 96 kHz: three device formats, reconfigured between"
+    },
+    "replaygain-minus-6" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "45e8bafa1727a11821002228456e1641b2bd6564ac0c0a25e83bdd24e8b2a980",
+      "summary" : "24/48 with −6 dB ReplayGain (applied before the ring)"
+    },
+    "silence-tail-pair" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=50000"
+      ],
+      "sha256" : "cff4f86b19a754629efdbcc95ac5363991ec4ab84b7d9595afbf291fcec4dc3d",
+      "summary" : "a track ending in −70 dBFS then digital silence, then one starting silent"
+    },
+    "src-44k1-on-48k-only" : {
+      "portable" : false,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "53f690230a225ab8d4d8c588c7fbffad62e720d6086329e365638f2fdfcb2dff",
+      "summary" : "44.1 kHz on a 48 kHz-only output (resampled)"
+    },
+    "surround-51-24-48k-discrete" : {
+      "portable" : true,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=6 out=6 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "d138809f4b29aabb6f7b78ee52b43d728b3c4abb3cefcdbda2fa1227f428c56e",
+      "summary" : "5.1 WAV to six discrete outputs"
+    },
+    "surround-51-24-48k-downmix" : {
+      "portable" : false,
+      "sessions" : [
+        "session mode=pcm rate=48000 channels=2 out=2 depth=24 integer=false frames=12000"
+      ],
+      "sha256" : "9e67095148122bf9daacf0e930e77c5c37d86b0c346a70d80e403ff9fbb4f32d",
+      "summary" : "5.1 WAV downmixed to a stereo DAC"
+    }
+  },
+  "recordedOn" : "arm64 macOS 27"
+}

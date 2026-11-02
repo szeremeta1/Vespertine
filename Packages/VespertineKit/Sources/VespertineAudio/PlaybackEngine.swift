@@ -96,6 +96,8 @@ public struct EngineSettings: Sendable, Equatable {
     /// Outputs that keep native DSD (DoP) while room correction is on, playing it uncorrected. Elsewhere DSD is
     /// converted to PCM there so it can be corrected.
     public var roomNativeDSDDeviceUIDs: Set<String> = []
+    /// Song transitions (crossfade) and their master switch. Off, nothing about playback changes.
+    public var transitions = TransitionSettings()
 
     public init() {}
 
@@ -148,6 +150,12 @@ public final class PlaybackEngine: @unchecked Sendable {
     public var urlResolver: (@Sendable (PlayableItem) -> URL)? {
         get { callbacks.withLock { $0.resolver } }
         set { callbacks.withLock { $0.resolver = newValue } }
+    }
+    /// Smart Mix: the library's profile of a song (how it starts and ends), called on the engine thread when a
+    /// boundary is planned. nil (or no provider): the engine measures the song's ends from the audio itself.
+    public var transitionProfileProvider: (@Sendable (PlayableItem) -> TransitionProfile?)? {
+        get { callbacks.withLock { $0.profile } }
+        set { callbacks.withLock { $0.profile = newValue } }
     }
     private func resolve(_ item: PlayableItem) -> URL {
         if let folder = stagedFolder, folder.key == cacheKey(item) { return folder.entry.url }
@@ -212,6 +220,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var next: (@Sendable (PlayableItem) -> PlayableItem?)?
         var event: (@Sendable @MainActor (EngineEvent) -> Void)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
+        var profile: (@Sendable (PlayableItem) -> TransitionProfile?)?
     }
     private let callbacks = Locked(Callbacks())
 
@@ -239,79 +248,6 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Engine-thread state
 
-    private final class Decoding {
-        let item: PlayableItem
-        /// Read live from a network share (not a local cached copy): may stall and need rebuffering.
-        var streaming = false
-        /// Streaming, and can't move to the local copy (lossy, DSD converted to PCM, or the copy didn't match).
-        var staysOnShare = false
-        /// Both are replaced when playback moves from the share to a finished local copy.
-        var probed: ProbedSource
-        var decoder: PCMDecoding
-        let converter: AVAudioConverter
-        let input: AVAudioPCMBuffer
-        let output: AVAudioPCMBuffer
-        let path: SignalPath
-        let gain: Float
-        /// Spatial Audio on the source's own speakers: the converter keeps the file's channel order and this
-        /// places each channel on the bed (`routed` is what reaches the ring).
-        let router: BedRouter?
-        let routed: AVAudioPCMBuffer?
-        var inputExhausted = false
-        var finished = false
-        var framesProduced: UInt64 = 0
-        var error: Error?
-
-        init(item: PlayableItem, probed: ProbedSource, decoder: PCMDecoding, path: SignalPath, chunk: AVAudioFrameCount,
-             layout: AVAudioChannelLayout? = nil) throws {
-            self.item = item
-            self.probed = probed
-            self.decoder = decoder
-            self.path = path
-            let own = decoder.processingFormat.channelLayout
-            var router: BedRouter?
-            let channels = Int(decoder.processingFormat.channelCount)
-            if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
-               let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.standardLabels(channels: channels) {
-                router = BedRouter(source: speakers, bed: bed)
-            }
-            self.router = router
-            // Integer mode: straight to 32-bit integers (the device takes them as they are).
-            let float = router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
-                ?? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
-            let integer = float.flatMap { f in
-                AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
-                              ?? AVAudioChannelLayout(layoutTag: f.channelCount == 1 ? kAudioChannelLayoutTag_Mono : kAudioChannelLayoutTag_Stereo)!)
-            }
-            guard let outFormat = path.applied.integerMode ? integer : float,
-                  let converter = OutputSession.converter(from: decoder.processingFormat, to: outFormat, plan: path.plan) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            self.converter = converter
-            let inCapacity = AVAudioFrameCount(Double(chunk) * decoder.processingFormat.sampleRate / path.plan.deviceSampleRate) + 1024
-            guard let inBuffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: inCapacity),
-                  let outBuffer = AVAudioPCMBuffer(pcmFormat: outFormat, frameCapacity: chunk) else {
-                throw SourceOpenerError.unsupported(item.url)
-            }
-            input = inBuffer
-            output = outBuffer
-            routed = router.flatMap { r in
-                AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: r.bedChannels, interleaved: true, layout: layout)
-                    .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
-            }
-            if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm {
-                gain = Float(pow(10, db / 20))
-            } else {
-                gain = 1
-            }
-        }
-
-        var durationSeconds: Double {
-            let rate = decoder.processingFormat.sampleRate
-            return rate > 0 ? Double(decoder.length) / rate : 0
-        }
-    }
-
     private struct Segment {
         let id = UUID()
         let item: PlayableItem
@@ -319,6 +255,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         let startRingFrame: UInt64
         let startOffsetSeconds: Double
         let durationSeconds: Double
+        /// Transitions: where it becomes the song that's playing (Now Playing, scrobbles), the middle of the crossfade
+        /// into it. nil: where it starts.
+        var switchRingFrame: UInt64? = nil
+        var audibleFrom: UInt64 { switchRingFrame ?? startRingFrame }
     }
 
     private var session: OutputSession?
@@ -428,6 +368,28 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Names of outputs seen, for messages about ones that are gone.
     private var deviceNames: [String: String] = [:]
     private var lastAudibleSegmentID: UUID?
+
+    // Transitions (engine thread). All empty while the master switch is off.
+    /// The decision for the end of the song being decoded, once it's planned (see `planBoundaryIfDue`).
+    private var boundary: (after: UUID, next: PlayableItem?, decision: TransitionDecision?)?
+    /// The incoming song of a crossfade, lined up or being mixed in.
+    private var crossfade: Crossfade?
+    /// The song a crossfade left, kept until the overlap has been heard: a queue change can still take the overlap back
+    /// and decode its end again (`replanBoundary`).
+    private var outgoing: (decoding: Decoding, overlapStart: UInt64, ringFrame: UInt64)?
+    /// A dip's fade in, for the next song once the output is set up for it.
+    private var pendingFadeIn: (item: UUID, seconds: Double, curve: TransitionCurve)?
+    /// Frames of silence still to be written before the next song (a gap between songs).
+    private var gapOwed: Int64 = 0
+    /// Ring frames of this session whose samples a transition changed (mixed or faded).
+    private var transitionWindows: [Range<UInt64>] = []
+    /// The latest decisions, by the song they follow (shown in the signal path).
+    private var decisions: [(after: UUID, decision: TransitionDecision)] = []
+    /// When the badge last started saying CROSSFADE: it stays at least `badgeHold`, so it doesn't flicker.
+    private var badgeSince: Date?
+    static let badgeHold: TimeInterval = 2
+    private var preview: (item: UUID, at: Date, decision: TransitionDecision?)?
+
     private var underrunTotal = 0
     private var emptyTransitions = 0
     private let chunkFrames: AVAudioFrameCount = 4096
@@ -460,20 +422,71 @@ public final class PlaybackEngine: @unchecked Sendable {
     // Skip, seek, pause, stop and a change of output silence the old audio right away, on the caller's
     // thread: the engine thread may be busy (a network read) and the buffer holds 20–30 s. It clears the
     // mute when it starts (or resumes) playing.
-    public func play(_ item: PlayableItem) { silenceNow(); post(.play(item)) }
-    public func pause() { silenceNow(); post(.pause) }
+    // With transitions on, the real-time fader fades the old audio out instead (as quickly; it then mutes itself).
+    /// Transitions, skip set to crossfade: the old song isn't faded here, the engine thread blends it into the new one
+    /// (`blendSkip`), or fades it if it can't.
+    public func play(_ item: PlayableItem) {
+        if !skipMayBlend() { fadeOutNow(pausing: false) }
+        post(.play(item))
+    }
+    public func pause() { fadeOutNow(pausing: true); post(.pause) }
     public func resume() { post(.resume) }
-    public func stop() { silenceNow(); post(.stop) }
+    public func stop() { fadeOutNow(pausing: true); post(.stop) }
 
     private func silenceNow() {
         sessionLock.lock(); defer { sessionLock.unlock() }
         if let session { nrt_context_set_muted(session.context, true) }
     }
 
-    /// The engine thread is about to play: let the audio through again.
-    private func unmute() {
+    /// Transitions: a fade out on the real-time fader, then it mutes itself; `silenceNow` when transitions are off, the
+    /// output isn't running or it's native DSD, bitstream or integer words (never faded).
+    private func fadeOutNow(pausing: Bool) {
+        let seconds = shared.withLock { $0.settings.transitions.fadeOutSeconds(pausing: pausing) }
         sessionLock.lock(); defer { sessionLock.unlock() }
-        if let session { nrt_context_set_muted(session.context, false) }
+        guard let session else { return }
+        guard seconds > 0, session.isRunning, Self.fades(session), !nrt_context_is_muted(session.context) else {
+            nrt_context_set_muted(session.context, true)
+            return
+        }
+        nrt_context_fade(session.context, false, UInt32(seconds * session.applied.sampleRate), false, true)
+    }
+
+    /// A skip may crossfade (caller's thread): transitions on, skips set to blend, and a song playing on PCM output.
+    private func skipMayBlend() -> Bool {
+        let t = shared.withLock { $0.settings.transitions }
+        guard t.enabled, t.effectiveSkip == .crossfade else { return false }
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        guard let session else { return false }
+        return session.isRunning && Self.fades(session) && !nrt_context_is_muted(session.context)
+    }
+
+    /// The real-time fader may run on this output: PCM Vespertine renders, as floats.
+    private static func fades(_ session: OutputSession) -> Bool {
+        !session.plan.isPassthrough && !session.applied.integerMode
+    }
+
+    /// Engine thread, before acting on a skip, pause, seek or stop: lets a fade out started by `fadeOutNow` finish
+    /// (it's short), then makes sure the output is muted and the fader back at full level.
+    private func awaitFadeOut() {
+        guard let session, nrt_context_fading(session.context) else { return }
+        let deadline = Date().addingTimeInterval(TransitionSettings.pauseFadeSeconds + 0.25)
+        while nrt_context_fading(session.context), !nrt_context_is_muted(session.context), Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        nrt_context_set_muted(session.context, true)
+        nrt_context_fade(session.context, true, 0, false, false)
+    }
+
+    /// The engine thread is about to play: let the audio through again. `fadeIn`: with transitions on, from silence
+    /// on the real-time fader (play, resume, seek).
+    private func unmute(fadeIn: Bool = false) {
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        guard let session else { return }
+        let seconds = fadeIn ? settings.transitions.startFadeSeconds : 0
+        if seconds > 0, Self.fades(session) {
+            nrt_context_fade(session.context, true, UInt32(seconds * session.applied.sampleRate), true, false)
+        }
+        nrt_context_set_muted(session.context, false)
     }
     /// Stops and releases the device, waiting (up to `timeout`) until it's done. For quitting.
     public func stopAndWait(timeout: TimeInterval = 2) {
@@ -484,7 +497,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
     public func seek(to seconds: TimeInterval) {
         guard seconds.isFinite else { return }
-        silenceNow()
+        fadeOutNow(pausing: false)
         post(.seek(max(0, seconds)))
     }
     /// Discards decoded look-ahead after the play order changes.
@@ -677,6 +690,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .barrier(let done):
             done.signal()
         case .play(let item):
+            if blendSkip(to: item) { return }
+            awaitFadeOut()
             shared.withLock { $0.snapshot.lastError = nil }
             carried = nil
             teardownDecoding()
@@ -688,6 +703,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .pause:
             awaitingDevice = nil
             guard state == .playing else { return }
+            awaitFadeOut()
             atmos?.pause()
             if let session, session.isDoP {
                 // DoP keeps running, muted: the DAC gets DSD silence and stays locked in DSD, so resuming doesn't pop.
@@ -704,13 +720,14 @@ public final class PlaybackEngine: @unchecked Sendable {
             } else if state == .paused, let session, session.formatChanged() {
                 followFormatChange(autoplay: true)
             } else if state == .paused, let session {
-                do { try session.start(); unmute(); state = .playing; pausedAt = nil }
+                do { try session.start(); unmute(fadeIn: true); state = .playing; pausedAt = nil }
                 catch { restartFromCurrentPosition(autoplay: true) }   // reopened to play, as asked, not paused again
             } else if state == .paused || state == .stopped, let parked {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true)
             }
         case .stop:
+            awaitFadeOut()
             carried = nil
             teardown(releaseHog: true, idle: true)
             parked = nil
@@ -722,6 +739,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .seek(let seconds):
             guard let current = currentItem() else { return }
             let resume = state == .playing || awaitingDevice != nil
+            awaitFadeOut()
             teardownDecoding()
             session?.flush()
             parked = nil
@@ -735,8 +753,14 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
                 || old.matchSixteenBit != new.matchSixteenBit
+                // Live Set's fixed rate, set or changed: the output is set up again at it (or back to following songs).
+                || old.transitions.fixedRate != new.transitions.fixedRate
                 || (old.convertsDSDForRoom(sessionDevice) != new.convertsDSDForRoom(sessionDevice)
                     && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true))
+                // Transitions first, turned on or off: DSD, integer and 16-bit output are planned again.
+                || (old.transitions.avoidsUnmixableModes != new.transitions.avoidsUnmixableModes
+                    && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true || session?.applied.integerMode == true
+                        || session?.plan.integerSamples == true || session?.plan.sixteenBit == .requested))
             // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
             // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
             // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
@@ -749,6 +773,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             } else if outputSwitched, state == .playing {
                 // Switched away and back before this ran (A → B → A): silenced on the way, nothing to restart.
                 unmute()
+            }
+            if old.transitions.engineRelevant != new.transitions.engineRelevant, !(deviceChanged || leavesInteger), state != .stopped,
+               let session {
+                // The next boundary is planned again; one already mixed into the ring is taken back if it still can be.
+                _ = replanBoundary(session)
+                preview = nil
             }
         case .queueChanged(let reloadCurrent):
             guard state != .stopped else { return }
@@ -887,7 +917,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                         throw error
                     }
                     log.notice("Playing on \(self.sessionDevice?.name ?? "?", privacy: .public) from \(String(format: "%.1f", offset), privacy: .public) s after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
-                    unmute()
+                    unmute(fadeIn: true)
                     state = .playing
                 } else {
                     state = .paused
@@ -976,7 +1006,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream,
-                                      dsdToPCMForRoom: settings.convertsDSDForRoom(device))
+                                      dsdToPCMForRoom: settings.convertsDSDForRoom(device),
+                                      dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
         plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
         plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                              eligible: mayMatchSixteenBit(item: item, device: device))
@@ -998,11 +1029,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         let decoder = try reused ?? SourceOpener.decoder(for: probed, plan: plan, item: item)
         mark(reused == nil ? "decoder" : "decoder (kept open)")
         var actualOffset = 0.0
+        var startFrame: AVAudioFramePosition = 0
         if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
             let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
             let frame = AVAudioFramePosition(bounded)
             try decoder.seek(to: frame)
             actualOffset = Double(frame) / decoder.processingFormat.sampleRate
+            startFrame = frame
         }
         Self.alignDoPMarkers(decoder, at: session.totalWritten)
         let streaming = isStreaming(item)
@@ -1011,6 +1044,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                     chunk: chunkFrames, layout: session.decodedLayout)
         mark("seek+converter")
         decoding.streaming = streaming
+        decoding.startSourceFrame = startFrame
         self.decoding = decoding
         segments = [Segment(item: item, path: decoding.path, startRingFrame: session.totalWritten,
                             startOffsetSeconds: actualOffset, durationSeconds: decoding.durationSeconds)]
@@ -1037,6 +1071,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Moving to another output lets the old one go: it gets its own rate back (a DoP carrier rate is no music rate).
         old?.invalidate(releaseHog: !keep, restoreFormat: !keep, idle: old.map { $0.deviceID != device.id } ?? false)
         let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive)
+        transitionWindows.removeAll()
         sessionLock.lock()
         session = new
         sessionDevice = device
@@ -1098,6 +1133,13 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func teardownDecoding() {
         decoding = nil
+        crossfade = nil
+        outgoing = nil
+        boundary = nil
+        pendingFadeIn = nil
+        gapOwed = 0
+        transitionWindows.removeAll()
+        badgeSince = nil
         pending = nil
         pendingSystem = nil
         segments.removeAll()
@@ -1168,6 +1210,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func ratePolicy(for device: OutputDevice) -> RatePolicy {
+        // Live Set: one rate for the whole session, whatever the songs' own.
+        if let rate = settings.transitions.fixedRate { return .fixed(rate) }
         if let held = heldRate, held.uid == device.uid, Date() < held.until { return .fixed(held.rate) }
         return settings.ratePolicies[device.uid] ?? .matchSource
     }
@@ -1177,13 +1221,20 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func replanUpcoming() {
         // Parked or not started: the next start reads the new queue anyway.
         guard let session, let audible = audibleSegment() else { return }
+        if replanBoundary(session) { return }
         let read = session.totalRead
         if let next = segments.first(where: { $0.startRingFrame > read }) {
-            // The next song is already partly decoded into the ring. Take it back, unless it's about to be
-            // heard (then it plays, and the new order applies from the song after it).
-            let margin = max(UInt32(session.applied.sampleRate / 4), UInt32(session.applied.bufferFrames * 4))
-            guard nrt_ring_rewind(session.ring, next.startRingFrame, margin) else { return }
-            segments.removeAll { $0.startRingFrame >= next.startRingFrame }
+            if next.startRingFrame > session.totalWritten {
+                // Transitions: a gap before it is still being written. The rest of the gap stays; the song after it
+                // is chosen again.
+                segments.removeAll { $0.startRingFrame >= next.startRingFrame }
+            } else {
+                // The next song is already partly decoded into the ring. Take it back, unless it's about to be
+                // heard (then it plays, and the new order applies from the song after it).
+                let margin = max(UInt32(session.applied.sampleRate / 4), UInt32(session.applied.bufferFrames * 4))
+                guard nrt_ring_rewind(session.ring, next.startRingFrame, margin) else { return }
+                segments.removeAll { $0.startRingFrame >= next.startRingFrame }
+            }
         } else if !draining {
             // Still decoding the song that's playing: the next one is picked from the new queue when it ends.
             return
@@ -1202,7 +1253,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Float files aren't integers, so they'd be changed on the way: they keep the float path (and its label).
     private func wantsIntegerMode(_ plan: OutputPlan, source probed: ProbedSource, item: PlayableItem, device: OutputDevice) -> Bool {
         let source = probed.format
-        return settings.integerMode && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
+        return settings.integerMode && !settings.transitions.avoidsUnmixableModes && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && settings.roomCorrection(for: device) == nil
@@ -1212,7 +1263,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The engine's half of "Match 16-bit sources" (the plan's half is `FormatPlanner.matchSixteenBit`): the setting
     /// is on, the output is held exclusively and isn't the built-in one, and nothing changes the samples.
     private func mayMatchSixteenBit(item: PlayableItem, device: OutputDevice) -> Bool {
-        settings.matchSixteenBit && settings.exclusive && !device.alwaysShared
+        settings.matchSixteenBit && !settings.transitions.avoidsUnmixableModes && settings.exclusive && !device.alwaysShared
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && settings.roomCorrection(for: device) == nil
     }
@@ -1373,60 +1424,28 @@ public final class PlaybackEngine: @unchecked Sendable {
     @discardableResult
     private func fill() -> Bool {
         guard let session else { return false }
+        if gapOwed > 0 { return writeGap(session) }
         guard let decoding else {
             return false
         }
         if decoding.finished {
+            if let crossfade, crossfade.started {
+                // The outgoing song ended inside the overlap: the incoming one fades in over silence for the rest of it.
+                return finishCrossfade(crossfade, session: session)
+            }
+            crossfade = nil      // ended before its overlap: joined as with transitions off
             advance(after: decoding.item, produced: decoding.framesProduced)
             return true
         }
+        if settings.transitions.enabled || crossfade != nil || decoding.rampIn != nil || decoding.rampOut != nil {
+            return fillWithTransitions(session, decoding)
+        }
         guard session.writableFrames >= Int(chunkFrames) else { return false }
 
-        decoding.output.frameLength = 0
-        var conversionError: NSError?
-        var waiting = false
-        let status = decoding.converter.convert(to: decoding.output, error: &conversionError) { requested, inputStatus in
-            if decoding.inputExhausted {
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            decoding.input.frameLength = 0
-            do {
-                try decoding.decoder.decode(into: decoding.input, length: min(requested, decoding.input.frameCapacity))
-            } catch is ReadAheadDecoder.Starved {
-                // The share hasn't delivered the next audio yet: convert what's here, and try again shortly.
-                waiting = true
-                inputStatus.pointee = .noDataNow
-                return nil
-            } catch {
-                decoding.error = error
-                decoding.inputExhausted = true
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            if decoding.input.frameLength == 0 {
-                decoding.inputExhausted = true
-                inputStatus.pointee = .endOfStream
-                return nil
-            }
-            inputStatus.pointee = .haveData
-            return decoding.input
-        }
-
-        let frames = decoding.output.frameLength
-        var raw = decoding.output.floatChannelData?[0]
-            ?? decoding.output.int32ChannelData.map { UnsafeMutableRawPointer($0[0]).assumingMemoryBound(to: Float.self) }
-        if let router = decoding.router, let routed = decoding.routed, let source = raw, let bed = routed.floatChannelData?[0] {
-            router.route(source, into: bed, frames: Int(frames))
-            raw = bed
-        }
-        if frames > 0, let data = raw {
-            decoding.framesProduced += UInt64(frames)
+        let chunk = decoding.convertChunk()
+        let frames = chunk.frames
+        if frames > 0, let data = chunk.data {
             emptyTransitions = 0
-            if decoding.gain != 1, !decoding.path.applied.integerMode {
-                var g = decoding.gain
-                vDSP_vsmul(data, 1, &g, data, 1, vDSP_Length(frames) * vDSP_Length(decoding.path.plan.channels))
-            }
             _ = nrt_ring_write(session.ring, data, frames)
         }
         // Damaged frames played as silence (SACD images): the track's signal path stops claiming bit-perfect.
@@ -1434,19 +1453,419 @@ public final class PlaybackEngine: @unchecked Sendable {
            let index = segments.lastIndex(where: { $0.item.id == decoding.item.id }) {
             segments[index].path.concealedFrames = concealing.concealedFrames
         }
-        if status == .error || status == .endOfStream || (decoding.inputExhausted && frames == 0) {
+        if chunk.ended {
             decoding.finished = true
-            if let error = conversionError ?? decoding.error {
+            if let error = chunk.error {
                 emit(.failed(decoding.item, error.localizedDescription))
             }
         }
         // Waiting on a share with nothing new: no work done, so the engine thread rests a moment.
-        return frames > 0 || !waiting || decoding.finished
+        return frames > 0 || !chunk.waiting || decoding.finished
+    }
+
+    // MARK: Transitions
+
+    /// `fill` while transitions are on (or a dip's ramp is still to be written): the same chunk, with the boundary's
+    /// ramps and overlap. Until a boundary is planned, and for a gapless one, it writes exactly what `fill` does.
+    private func fillWithTransitions(_ session: OutputSession, _ decoding: Decoding) -> Bool {
+        if boundary?.after != decoding.item.id, settings.transitions.enabled { planBoundaryIfDue(session, decoding) }
+        // An overlap can write a chunk of the mix and what's left of the incoming song's last chunk.
+        guard session.writableFrames >= Int(chunkFrames) * (crossfade != nil ? 2 : 1) else { return false }
+        // An incoming song still waiting on a share holds the outgoing one back (see `Crossfade.incomingReady`).
+        if let crossfade, !crossfade.incomingReady(first: decoding.framesProduced, frames: Int(chunkFrames)) { return false }
+        let first = decoding.framesProduced
+        let chunk = decoding.convertChunk()
+        let frames = chunk.frames
+        let channels = decoding.path.plan.channels
+        if frames > 0, let data = chunk.data {
+            emptyTransitions = 0
+            decoding.rampIn?.apply(data, frames: Int(frames), first: first, channels: channels)
+            decoding.rampOut?.apply(data, frames: Int(frames), first: first, channels: channels)
+            if let crossfade {
+                let before = session.totalWritten
+                if let offset = crossfade.feed(data, frames: Int(frames), first: first, write: { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }) {
+                    overlapStarted(crossfade, outgoing: decoding, ringFrame: before + UInt64(offset))
+                }
+            } else {
+                _ = nrt_ring_write(session.ring, data, frames)
+            }
+        }
+        if let concealing = decoding.decoder as? ConcealingDecoder, concealing.concealedFrames > 0,
+           let index = segments.lastIndex(where: { $0.item.id == decoding.item.id }) {
+            segments[index].path.concealedFrames = concealing.concealedFrames
+        }
+        if chunk.ended {
+            decoding.finished = true
+            if let error = chunk.error { emit(.failed(decoding.item, error.localizedDescription)) }
+        }
+        if let crossfade, crossfade.done { handOver(crossfade, session: session) }
+        return frames > 0 || !chunk.waiting || decoding.finished
+    }
+
+    /// The outgoing song ended inside its overlap: the rest of the overlap, a chunk at a time, then the hand-over.
+    private func finishCrossfade(_ crossfade: Crossfade, session: OutputSession) -> Bool {
+        guard session.writableFrames >= Int(chunkFrames) * 2,
+              crossfade.incomingReady(first: crossfade.start + UInt64(crossfade.mixed), frames: Int(chunkFrames)) else { return false }
+        crossfade.finishAlone(maxFrames: Int(chunkFrames)) { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }
+        if crossfade.done { handOver(crossfade, session: session) }
+        return true
+    }
+
+    /// The first frame of an overlap is in the ring: the incoming song's segment starts there, and becomes the one
+    /// playing at the middle of the overlap.
+    private func overlapStarted(_ crossfade: Crossfade, outgoing a: Decoding, ringFrame: UInt64) {
+        let b = crossfade.incoming
+        let rate = b.decoder.processingFormat.sampleRate
+        var segment = Segment(item: b.item, path: b.path, startRingFrame: ringFrame,
+                              startOffsetSeconds: rate > 0 ? Double(b.startSourceFrame) / rate : 0, durationSeconds: b.durationSeconds)
+        segment.switchRingFrame = ringFrame + UInt64(crossfade.length / 2)
+        segments.append(segment)
+        transitionWindows.append(ringFrame ..< ringFrame + UInt64(crossfade.length))
+        outgoing = (a, crossfade.start, ringFrame)
+    }
+
+    /// The overlap is written: the incoming song carries on alone.
+    private func handOver(_ crossfade: Crossfade, session: OutputSession) {
+        crossfade.flushIncoming { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }
+        if let error = crossfade.incomingError { emit(.failed(crossfade.incoming.item, error.localizedDescription)) }
+        self.crossfade = nil
+        decoding = crossfade.incoming
+        emptyTransitions = 0
+    }
+
+    /// Notes the decision for the boundary after `item` (the signal path shows it).
+    private func note(_ decision: TransitionDecision?, after item: UUID) {
+        decisions.removeAll { $0.after == item }
+        if let decision { decisions.append((item, decision)) }
+        if decisions.count > 8 { decisions.removeFirst(decisions.count - 8) }
+    }
+
+    /// Plans the end of the song being decoded once it's close enough: its last `TransitionTiming.planningLead`
+    /// frames (room for the longest crossfade and the silence scan). Songs of unknown length are joined as today.
+    private func planBoundaryIfDue(_ session: OutputSession, _ a: Decoding) {
+        guard let total = a.expectedFrames else {
+            // Joined at its end as today; the signal path says why there's no crossfade.
+            boundary = (a.item.id, nil, nil)
+            if nextItemProvider?(a.item) != nil { note(.cut(.unknownLength), after: a.item.id) }
+            return
+        }
+        let lead = TransitionTiming.planningLead(settings.transitions, rate: a.path.plan.deviceSampleRate)
+        guard total - Int64(a.framesProduced) <= lead else { return }
+        planBoundary(session, a, total: total)
+    }
+
+    private func planBoundary(_ session: OutputSession, _ a: Decoding, total: Int64) {
+        let s = settings.transitions
+        boundary = (a.item.id, nil, nil)
+        guard let device = sessionDevice, let next = nextItemProvider?(a.item), next.id != a.item.id else { return }
+        let integerA = a.path.applied.integerMode || a.path.plan.integerSamples
+        var planA = a.path.plan
+        planA.integerSamples = integerA
+        if isStreaming(next) {
+            let decision = TransitionPlanner.decide(s, from: a.item, format: .plan(planA), to: next, format: .unknown, nextStreams: true)
+            boundary = (a.item.id, next, decision)
+            note(decision, after: a.item.id)
+            return
+        }
+        do {
+            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
+            let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+            var formatB = BoundaryFormat.systemRenderer
+            var planB: OutputPlan?
+            if !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) {
+                var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
+                                              spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                              dsdToPCMForRoom: settings.convertsDSDForRoom(device),
+                                              dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
+                plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
+                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                                     eligible: mayMatchSixteenBit(item: next, device: device))
+                formatB = .plan(plan)
+                planB = plan
+            }
+            var compatible = planB.map { session.plan.isDeviceCompatible(with: $0) } ?? false
+            // Transitions first: a song at another rate is resampled to the one playing, when that lets it blend.
+            if !compatible, let native = planB, let resampled = resampledToSession(native, probed: probed, item: next, device: device, session: session) {
+                let blended = TransitionPlanner.decide(s, from: a.item, format: .plan(planA), to: next, format: .plan(resampled))
+                if blended.changesSamples {
+                    planB = resampled
+                    formatB = .plan(resampled)
+                    compatible = true
+                }
+            }
+            var decision = TransitionPlanner.decide(s, from: a.item, format: .plan(planA), to: next, format: formatB,
+                                                    compatible: compatible)
+            if case .mix = decision, let planB {
+                // Smart Mix: measure how A ends and B starts (or ask the library), then decide again with that.
+                let provider = transitionProfileProvider
+                let smart = try Crossfade.prepareSmart(
+                    outgoing: a, total: total, next: next, probed: probed, plan: planB,
+                    path: makePath(probed: probed, plan: planB, device: device, session: session, item: next),
+                    ditherBits: mixDitherBits(device, session: session), chunk: chunkFrames, layout: session.decodedLayout,
+                    stored: (provider?(a.item), provider?(next)),
+                    beatMatch: LiveSetPlanner.beatSettings(s, a: a.item, b: next),
+                    decide: { profiles, gains in
+                        TransitionPlanner.decide(s, from: a.item, format: .plan(planA), to: next, format: formatB, compatible: compatible,
+                                                 profiles: profiles, gains: gains)
+                    },
+                    reopenOutgoing: { [self] in
+                        try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd),
+                                                 plan: a.path.plan, item: a.item)
+                    })
+                decision = smart.decision
+                crossfade = smart.crossfade
+            }
+            boundary = (a.item.id, next, decision)
+            note(decision, after: a.item.id)
+            switch decision {
+            case .overlap(let seconds, let curve):
+                guard let planB else { return }
+                let path = makePath(probed: probed, plan: planB, device: device, session: session, item: next)
+                let dither = mixDitherBits(device, session: session)
+                crossfade = try Crossfade.prepare(outgoing: a, total: total, next: next, probed: probed, plan: planB, path: path,
+                                                  seconds: seconds, curve: curve, trimSilence: s.trimSilence, ditherBits: dither,
+                                                  chunk: chunkFrames, layout: session.decodedLayout,
+                                                  reopenOutgoing: { [self] in
+                                                      try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd),
+                                                                               plan: a.path.plan, item: a.item)
+                                                  })
+            case .dip(let seconds, let curve):
+                guard let ramp = FrameRamp.fadeOut(seconds: seconds, curve: curve, total: total, produced: a.framesProduced,
+                                                   rate: a.path.plan.deviceSampleRate) else { return }
+                a.rampOut = ramp
+                if let segment = segments.last(where: { $0.item.id == a.item.id }) {
+                    let from = segment.startRingFrame + ramp.start
+                    transitionWindows.append(from ..< from + UInt64(ramp.length))
+                }
+            case .gapless, .cut, .mix, .gap:
+                break
+            }
+        } catch is Superseded {
+            return
+        } catch {
+            // The next song couldn't be opened ahead: it's tried again (and reported) when this one ends, as today.
+            log.info("Transition not planned: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Transitions first: `plan` for the next song, at the session's rate instead of its own (resampled), when that's
+    /// all that keeps it from playing on the output as it's set up. nil otherwise (bit-perfect first, PCM only).
+    private func resampledToSession(_ plan: OutputPlan, probed: ProbedSource, item: PlayableItem, device: OutputDevice,
+                                    session: OutputSession) -> OutputPlan? {
+        guard settings.transitions.avoidsUnmixableModes, plan.mode == .pcm, session.plan.mode == .pcm,
+              plan.deviceSampleRate != session.plan.deviceSampleRate else { return nil }
+        let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+        var resampled = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: .fixed(session.plan.deviceSampleRate),
+                                           spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                           dsdToPCMForRoom: settings.convertsDSDForRoom(device), dsdToPCMForTransitions: true)
+        resampled.integerSamples = false
+        guard resampled.mode == .pcm, session.plan.isDeviceCompatible(with: resampled) else { return nil }
+        return resampled
+    }
+
+    /// The word length the mixer dithers to: the device's, when it takes integers and nothing after the ring changes
+    /// the samples (no digital volume, EQ or room correction, which dither themselves). 0: no dither.
+    private func mixDitherBits(_ device: OutputDevice, session: OutputSession) -> Int {
+        session.applied.physicalIsInteger && settings.digitalVolume(for: device) == nil
+            && settings.equalizer(for: device) == nil && settings.roomCorrection(for: device, plan: session.plan) == nil
+            ? session.applied.physicalBitDepth : 0
+    }
+
+    /// Writes the silence of a gap between songs, a chunk at a time.
+    private func writeGap(_ session: OutputSession) -> Bool {
+        let frames = min(gapOwed, Int64(chunkFrames), Int64(session.writableFrames))
+        guard frames > 0 else { return false }
+        let samples = Int(frames) * session.plan.channels
+        if session.plan.mode == .dop {
+            // DSD silence: DoP idle frames whose markers carry on the ring's alternation (the next song's are lined up
+            // after the gap, `alignDoPMarkers`), so the DAC stays locked in DSD through the gap.
+            let idle = Self.dopIdle(frames: Int(frames), channels: session.plan.channels, from: session.totalWritten,
+                                    integer: session.applied.integerMode)
+            idle.withUnsafeBufferPointer { _ = nrt_ring_write(session.ring, $0.baseAddress!, UInt32(frames)) }
+        } else {
+            if gapSilence.count < samples { gapSilence = [Float](repeating: 0, count: samples) }
+            gapSilence.withUnsafeBufferPointer { _ = nrt_ring_write(session.ring, $0.baseAddress!, UInt32(frames)) }
+        }
+        gapOwed -= frames
+        return true
+    }
+    private var gapSilence: [Float] = []
+
+    /// `frames` DoP idle frames (the DSD idle pattern behind each frame's marker) for ring frames from `ringFrame`: the
+    /// marker by the ring frame's parity, 0x05 on even frames, as `alignDoPMarkers` lines songs up. `integer`: the 32-bit
+    /// word's bit pattern, else the 24-bit word as a float sample (as RawDoPDecoder writes them).
+    static func dopIdle(frames: Int, channels: Int, from ringFrame: UInt64, integer: Bool) -> [Float] {
+        var out = [Float](repeating: 0, count: frames * channels)
+        for f in 0..<frames {
+            let marker: UInt32 = (ringFrame + UInt64(f)) & 1 == 0 ? 0x05 : 0xFA
+            let word = (marker << 16 | UInt32(DoP.silence) << 8 | UInt32(DoP.silence)) << 8
+            let sample = integer ? Float(bitPattern: word) : Float(Int32(bitPattern: word)) / 2_147_483_648
+            for c in 0..<channels { out[f * channels + c] = sample }
+        }
+        return out
+    }
+
+    /// The longest the next song may take to open for a skip to blend; after that it's a quick fade.
+    static let skipOpenBudget: TimeInterval = 0.4
+
+    /// Transitions, skip set to crossfade: the song playing blends into `next`. The ring already holds its next
+    /// seconds: they're copied out (`nrt_ring_peek`) from a quarter second ahead of what's heard, the ring is taken back
+    /// to there (`nrt_ring_rewind`), and the copy is mixed with the new song's start and written in its place; the new
+    /// song plays on from there. Only on PCM output, when the new song plays on it as it's set up, isn't read live from a
+    /// share and opens within `skipOpenBudget`; otherwise false, with the quick fade started (the skip then cuts as
+    /// with transitions off, after it).
+    private func blendSkip(to next: PlayableItem) -> Bool {
+        let t = settings.transitions
+        guard t.enabled, t.effectiveSkip == .crossfade else { return false }
+        guard state == .playing, let session, let device = sessionDevice, session.isRunning, Self.fades(session),
+              !nrt_context_is_muted(session.context), !nrt_context_fading(session.context), atmos == nil, !buffering,
+              !isStreaming(next), let current = audibleSegment(), TransitionPlanner.cutReason(.plan(current.path.plan)) == nil,
+              !current.path.applied.integerMode else { return skipFades(session) }
+        let opening = Date()
+        let rate = session.plan.deviceSampleRate
+        do {
+            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
+            let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+            guard !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) else { return skipFades(session) }
+            var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
+                                          spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                          dsdToPCMForRoom: settings.convertsDSDForRoom(device),
+                                          dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
+            plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
+            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                                 eligible: mayMatchSixteenBit(item: next, device: device))
+            if !session.plan.isDeviceCompatible(with: plan),
+               let resampled = resampledToSession(plan, probed: probed, item: next, device: device, session: session) { plan = resampled }
+            guard session.plan.isDeviceCompatible(with: plan), TransitionPlanner.cutReason(.plan(plan)) == nil else { return skipFades(session) }
+            let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
+            let b = try Decoding(item: next, probed: probed, decoder: decoder,
+                                 path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
+                                 chunk: chunkFrames, layout: session.decodedLayout)
+            guard Date().timeIntervalSince(opening) <= Self.skipOpenBudget else { return skipFades(session) }
+            // What's in the ring a quarter second on from what's heard, as much as the crossfade wants.
+            let margin = max(UInt32(session.applied.sampleRate / 4), UInt32(session.applied.bufferFrames * 4))
+            let cut = session.totalRead + UInt64(margin)
+            let written = session.totalWritten
+            guard written > cut else { return skipFades(session) }
+            let length = min(Int(t.crossfadeSeconds * rate), Int(written - cut))
+            guard length >= Int(TransitionTiming.minimumSeconds * rate) else { return skipFades(session) }
+            let channels = session.plan.channels
+            var tail = [Float](repeating: 0, count: length * channels)
+            let copied = tail.withUnsafeMutableBufferPointer { nrt_ring_peek(session.ring, cut, $0.baseAddress!, UInt32(length)) }
+            guard copied == UInt32(length), nrt_ring_rewind(session.ring, cut, margin) else { return skipFades(session) }
+            // The ring now ends at `cut`: what was lined up after it goes.
+            for (key, entry) in staged where key != cacheKey(next) { entry.cancel() }
+            staged = staged.filter { $0.key == cacheKey(next) }
+            carried = nil
+            decoding = nil
+            crossfade = nil
+            outgoing = nil
+            boundary = nil
+            pending = nil
+            pendingSystem = nil
+            pendingFadeIn = nil
+            gapOwed = 0
+            draining = false
+            drainedAt = nil
+            nrt_context_set_draining(session.context, false)
+            segments.removeAll { $0.startRingFrame >= cut }
+            transitionWindows.removeAll { $0.lowerBound >= cut }
+            var segment = Segment(item: next, path: b.path, startRingFrame: cut, startOffsetSeconds: 0, durationSeconds: b.durationSeconds)
+            segment.switchRingFrame = cut + UInt64(length / 2)
+            segments.append(segment)
+            transitionWindows.append(cut ..< cut + UInt64(length))
+            let blend = Crossfade(incoming: b, start: 0, length: length, curve: t.curve, ditherBits: mixDitherBits(device, session: session))
+            tail.withUnsafeMutableBufferPointer { p in
+                _ = blend.feed(p.baseAddress!, frames: length, first: 0) { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }
+            }
+            handOver(blend, session: session)
+            log.info("Skip blended into \(next.url.lastPathComponent, privacy: .public) over \(length) frames")
+            return true
+        } catch is Superseded {
+            return skipFades(session)
+        } catch {
+            // Opened again (and reported) by the plain skip that follows.
+            log.info("Skip couldn't blend: \(error.localizedDescription, privacy: .public)")
+            return skipFades(session)
+        }
+    }
+
+    /// A skip that can't blend: the quick fade (the caller's thread left the song playing), then the plain skip.
+    private func skipFades(_ session: OutputSession?) -> Bool {
+        guard let session else { return false }
+        sessionLock.lock(); defer { sessionLock.unlock() }
+        guard session.isRunning, !nrt_context_is_muted(session.context), !nrt_context_fading(session.context) else { return false }
+        if Self.fades(session) {
+            nrt_context_fade(session.context, false, UInt32(TransitionSettings.skipFadeSeconds * session.applied.sampleRate), false, true)
+        } else {
+            nrt_context_set_muted(session.context, true)
+        }
+        return false
+    }
+
+    /// The queue or the transition settings changed: a boundary planned but not yet in the ring is planned again; an
+    /// overlap already in the ring and not heard yet is taken back to its start, and the outgoing song's end decoded
+    /// again, when it can be exactly (lossless PCM, no resampling, a seekable local file). Otherwise it plays as mixed
+    /// and the change applies from the next boundary, the rule for queue changes close to a boundary. Returns true when
+    /// a transition was involved (nothing more to do).
+    private func replanBoundary(_ session: OutputSession) -> Bool {
+        if let crossfade, !crossfade.started {
+            self.crossfade = nil
+            boundary = nil
+            return true
+        }
+        if let decoding, let ramp = decoding.rampOut, decoding.framesProduced < ramp.start {
+            decoding.rampOut = nil
+            transitionWindows.removeLast()
+            boundary = nil
+            return true
+        }
+        let read = session.totalRead
+        guard let out = outgoing, let next = segments.first(where: { $0.startRingFrame > read }), next.startRingFrame == out.ringFrame else {
+            if crossfade != nil || outgoing != nil { return true }   // being heard: plays as mixed
+            boundary = boundary.flatMap { $0.decision?.changesSamples == true ? $0 : nil }
+            return false
+        }
+        guard let again = Self.decodeAgain(out.decoding, from: out.overlapStart, chunk: chunkFrames, layout: session.decodedLayout) else { return true }
+        let margin = max(UInt32(session.applied.sampleRate / 4), UInt32(session.applied.bufferFrames * 4))
+        guard nrt_ring_rewind(session.ring, next.startRingFrame, margin) else { return true }
+        segments.removeAll { $0.startRingFrame >= next.startRingFrame }
+        transitionWindows.removeAll { $0.lowerBound >= next.startRingFrame }
+        crossfade = nil
+        outgoing = nil
+        boundary = nil
+        pending = nil
+        pendingSystem = nil
+        pendingFadeIn = nil
+        draining = false
+        drainedAt = nil
+        nrt_context_set_draining(session.context, false)
+        decoding = again
+        log.info("Transition taken back: \(again.item.url.lastPathComponent, privacy: .public) decoded again from its overlap")
+        return true
+    }
+
+    /// The song `decoding` played, from its frame `frame` on, exactly as the first time: only for lossless PCM at its
+    /// own rate from a seekable local decoder (others carry state across a seek). nil otherwise.
+    static func decodeAgain(_ decoding: Decoding, from frame: UInt64, chunk: AVAudioFrameCount, layout: AVAudioChannelLayout?) -> Decoding? {
+        let decoder = decoding.decoder
+        guard decoding.probed.format.encoding == .pcm, !decoding.path.plan.resamples, !decoding.streaming,
+              !(decoder is ReadAheadDecoder), decoder.supportsSeeking, decoder.length > 0 else { return nil }
+        let position = decoding.startSourceFrame + AVAudioFramePosition(frame)
+        guard position < decoder.length, (try? decoder.seek(to: position)) != nil, decoder.position == position,
+              let again = try? Decoding(item: decoding.item, probed: decoding.probed, decoder: decoder, path: decoding.path,
+                                        chunk: chunk, layout: layout) else { return nil }
+        again.startSourceFrame = decoding.startSourceFrame
+        again.framesProduced = frame
+        return again
     }
 
     /// The current item is fully decoded: line up the next one gaplessly, or wait for a device change.
     private func advance(after finished: PlayableItem, produced: UInt64) {
         decoding = nil
+        let planned = boundary?.after == finished.id ? boundary : nil
+        boundary = nil
+        crossfade = nil
         guard let session, let device = sessionDevice else { return }
         if produced == 0 {
             emptyTransitions += 1
@@ -1473,13 +1892,21 @@ public final class PlaybackEngine: @unchecked Sendable {
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                               policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream,
-                                              dsdToPCMForRoom: settings.convertsDSDForRoom(device))
+                                              dsdToPCMForRoom: settings.convertsDSDForRoom(device),
+                                              dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
                 if session.plan.isDeviceCompatible(with: plan) {
+                    // Transitions: a gap between the songs is silence written ahead of the next one (DSD silence on
+                    // native DSD; never on bitstream, which the planner leaves alone).
+                    if settings.transitions.enabled {
+                        let decision = planned?.next?.id == next.id ? planned?.decision
+                            : TransitionPlanner.decide(settings.transitions, from: finished, format: .plan(session.plan), to: next, format: .plan(plan))
+                        if case .gap(let seconds) = decision, gapOwed == 0 { gapOwed = Int64((seconds * session.plan.deviceSampleRate).rounded()) }
+                    }
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
-                    Self.alignDoPMarkers(decoder, at: session.totalWritten)
+                    Self.alignDoPMarkers(decoder, at: session.totalWritten + UInt64(gapOwed))
                     let streaming = isStreaming(next)
                     let d = try Decoding(item: next, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
@@ -1487,11 +1914,19 @@ public final class PlaybackEngine: @unchecked Sendable {
                     d.streaming = streaming
                     try primeNetworkLead(d)
                     decoding = d
-                    segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten,
+                    segments.append(Segment(item: next, path: d.path, startRingFrame: session.totalWritten + UInt64(gapOwed),
                                             startOffsetSeconds: 0, durationSeconds: d.durationSeconds))
+                    if settings.transitions.enabled, planned?.next?.id != next.id {
+                        note(TransitionPlanner.decide(settings.transitions, from: finished, format: .plan(session.plan), to: next,
+                                                      format: .plan(plan)), after: finished.id)
+                    }
                 } else {
                     // Different rate/format: let the ring play out, then reconfigure (a short gap is unavoidable).
                     pending = (next, probed, plan, device)
+                    // Transitions: a dip fades the next song in once the output is set up for it.
+                    if let planned, planned.next?.id == next.id, case .dip(let seconds, let curve) = planned.decision {
+                        pendingFadeIn = (next.id, seconds, curve)
+                    }
                     draining = true
                     nrt_context_set_draining(session.context, true)
                 }
@@ -1517,9 +1952,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             emit(.trackStarted(segment.item))
             // Drop segments that are fully in the past.
             let read = session.totalRead
-            if let index = segments.lastIndex(where: { $0.startRingFrame <= read }), index > 0 {
+            if let index = segments.lastIndex(where: { $0.audibleFrom <= read }), index > 0 {
                 segments.removeFirst(index)
             }
+            // A crossfade's outgoing song can't be decoded again once the overlap is heard.
+            if let outgoing, outgoing.ringFrame <= read { self.outgoing = nil }
+
         }
 
         guard draining, session.readableFrames == 0 else { drainedAt = nil; return }
@@ -1546,6 +1984,12 @@ public final class PlaybackEngine: @unchecked Sendable {
                                                     session: session, item: pending.item),
                                      chunk: chunkFrames, layout: session.decodedLayout)
                 d.streaming = streaming
+                if let fade = pendingFadeIn, fade.item == pending.item.id,
+                   let ramp = FrameRamp.fadeIn(seconds: fade.seconds, curve: fade.curve, rate: pending.plan.deviceSampleRate) {
+                    d.rampIn = ramp
+                    transitionWindows.append(session.totalWritten ..< session.totalWritten + UInt64(ramp.length))
+                }
+                pendingFadeIn = nil
                 decoding = d
                 buffering = false
                 segments = [Segment(item: pending.item, path: d.path, startRingFrame: session.totalWritten,
@@ -1596,7 +2040,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func audibleSegment() -> Segment? {
         guard let session else { return segments.first }
         let read = session.totalRead
-        return segments.last(where: { $0.startRingFrame <= read }) ?? segments.first
+        return segments.last(where: { $0.audibleFrom <= read }) ?? segments.first
     }
 
     private func currentPosition() -> TimeInterval {
@@ -1605,6 +2049,35 @@ public final class PlaybackEngine: @unchecked Sendable {
         let read = session.totalRead
         let played = read > segment.startRingFrame ? Double(read - segment.startRingFrame) / session.applied.sampleRate : 0
         return min(segment.startOffsetSeconds + played, segment.durationSeconds)
+    }
+
+    /// The signal path's transition stage for the song that's playing: nil while the master switch is off.
+    private func transitionStage(for segment: Segment?) -> SignalPath.TransitionStage? {
+        guard settings.transitions.enabled || !transitionWindows.isEmpty, let segment else {
+            badgeSince = nil
+            return nil
+        }
+        let read = session?.totalRead ?? 0
+        transitionWindows.removeAll { $0.upperBound <= read && badgeSince == nil }
+        let now = Date()
+        if transitionWindows.contains(where: { $0.contains(read) }) {
+            if badgeSince == nil { badgeSince = now }
+        } else if let since = badgeSince, now.timeIntervalSince(since) >= Self.badgeHold {
+            badgeSince = nil
+        }
+        var decision = decisions.last(where: { $0.after == segment.item.id })?.decision
+        if decision == nil, settings.transitions.enabled {
+            // Not planned yet: what the rules say from what's known now (the next song's format isn't).
+            if preview?.item != segment.item.id || now.timeIntervalSince(preview!.at) > 1 {
+                let next = nextItemProvider?(segment.item)
+                preview = (segment.item.id, now, next.map {
+                    TransitionPlanner.decide(settings.transitions, from: segment.item, format: .plan(segment.path.plan), to: $0, format: .unknown)
+                })
+            }
+            decision = preview?.decision
+        }
+        return SignalPath.TransitionStage(style: settings.transitions.style, next: decision, audible: badgeSince != nil,
+                                          transitionsFirst: settings.transitions.avoidsUnmixableModes)
     }
 
     private func publishSnapshot() {
@@ -1636,6 +2109,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             othersPlaying = false
         }
         path?.otherAppsPlaying = othersPlaying
+        if path != nil { path?.transition = transitionStage(for: segment) }
         let device = sessionDevice
         let st = state
         let underruns = underrunTotal
