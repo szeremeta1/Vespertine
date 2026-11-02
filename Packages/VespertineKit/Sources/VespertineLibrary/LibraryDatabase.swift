@@ -295,6 +295,21 @@ public final class LibraryDatabase: Sendable {
             // Songs played before there was a history start it with the last time each was played.
             try db.execute(sql: "INSERT INTO playHistory (trackId, playedAt) SELECT id, lastPlayedAt FROM track WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt")
         }
+        m.registerMigration("v20-copy-choices") { db in
+            // Which copy of an album plays (a 24/192 download, a vinyl transfer, its Atmos mix), or that its copies are
+            // bundled and the output picks; no row: one copy, the best for the output (AlbumCopyChoice). Library state.
+            try db.create(table: "albumCopyChoice") { t in
+                t.primaryKey("albumKey", .text)
+                t.column("copyId", .text)
+                t.column("bundled", .boolean).notNull().defaults(to: false)
+                t.column("chosenAt", .datetime).notNull()
+            }
+            // The copy of a song to play whenever the output can (one per song, kept on the track).
+            try db.create(table: "preferredCopy") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("preferredAt", .datetime).notNull()
+            }
+        }
         return m
     }
 }
@@ -682,12 +697,13 @@ public extension LibraryDatabase {
         }
     }
 
-    /// A favorite is a song, not a file: every version and copy of a favorite song on its album (its stereo and
-    /// 5.1 versions, the same song on a share) is a favorite too, from the date the song first was. Covers songs
-    /// favorited one version at a time and versions added since. Returns how many favorite songs there are
-    /// (present files only), the number the sidebar shows.
+    /// A favorite is the copy that was hearted: a 24/96 vinyl transfer, not the 24/192 download beside it. Where an
+    /// album's copies are bundled (AlbumCopyChoice.bundled, or `bundledByDefault` for albums with no choice) the song
+    /// is one favorite whichever copy plays, so every copy of a favorite song there is a favorite too, from the date
+    /// the song first was. Returns how many favorite songs there are (present files only; copies of one song count
+    /// once), the number the sidebar shows.
     @discardableResult
-    func favoriteEveryVersion() throws -> Int {
+    func favoriteEveryVersion(bundledByDefault: Bool = false) throws -> Int {
         try writer.write { db in
             let rows = try Row.fetchAll(db, sql: """
                 SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date
@@ -697,18 +713,70 @@ public extension LibraryDatabase {
             var dates: [Int64: Date] = [:]
             for row in rows { dates[row["id"] as Int64] = row["date"] as Date }
             let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
+            let choices = try Self.copyChoices(db)
             let tracks = Self.inAlbumOrder(try Self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
             var songs = 0
             for album in Dictionary(grouping: tracks, by: \.albumKey).values {
+                let bundled = (choices[album[0].albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
                 for song in TrackVersions.group(album) {
                     guard let date = song.compactMap({ $0.id.flatMap { dates[$0] } }).min() else { continue }
                     songs += 1
+                    guard bundled else { continue }
                     for id in song.compactMap(\.id) where dates[id] == nil {
                         try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt) VALUES (?, ?)", arguments: [id, date])
                     }
                 }
             }
             return songs
+        }
+    }
+
+    // MARK: Copies
+
+    /// Every album's copy choice, by album key (albums with none play one copy, the best for the output).
+    func copyChoices() throws -> [String: AlbumCopyChoice] {
+        try writer.read { db in try Self.copyChoices(db) }
+    }
+
+    static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
+        var choices: [String: AlbumCopyChoice] = [:]
+        for row in try Row.fetchAll(db, sql: "SELECT albumKey, copyId, bundled FROM albumCopyChoice") {
+            let key: String = row["albumKey"], copy: String? = row["copyId"], bundled: Bool = row["bundled"]
+            choices[key] = bundled ? .bundled : copy.map(AlbumCopyChoice.copy) ?? .automatic
+        }
+        return choices
+    }
+
+    /// Sets which copy of an album plays; `.automatic` forgets the choice.
+    func setCopyChoice(_ choice: AlbumCopyChoice, albumKey: String, at date: Date = .now) throws {
+        try writer.write { db in
+            switch choice {
+            case .automatic:
+                try db.execute(sql: "DELETE FROM albumCopyChoice WHERE albumKey = ?", arguments: [albumKey])
+            case .bundled:
+                try db.execute(sql: "INSERT OR REPLACE INTO albumCopyChoice (albumKey, copyId, bundled, chosenAt) VALUES (?, NULL, 1, ?)",
+                               arguments: [albumKey, date])
+            case .copy(let id):
+                try db.execute(sql: "INSERT OR REPLACE INTO albumCopyChoice (albumKey, copyId, bundled, chosenAt) VALUES (?, ?, 0, ?)",
+                               arguments: [albumKey, id, date])
+            }
+        }
+    }
+
+    /// The tracks that are the preferred copy of their song.
+    func preferredCopyIDs() throws -> Set<Int64> {
+        try writer.read { db in Set(try Int64.fetchAll(db, sql: "SELECT trackId FROM preferredCopy")) }
+    }
+
+    /// Makes `trackID` the preferred copy of its song (the other copies, `songTrackIDs`, stop being preferred), or with
+    /// `preferred` false, none of them.
+    func setPreferredCopy(_ preferred: Bool, trackID: Int64, songTrackIDs: [Int64], at date: Date = .now) throws {
+        try writer.write { db in
+            for id in Set(songTrackIDs + [trackID]) { try db.execute(sql: "DELETE FROM preferredCopy WHERE trackId = ?", arguments: [id]) }
+            if preferred {
+                try db.execute(sql: "INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT id, ? FROM track WHERE id = ?",
+                               arguments: [date, trackID])
+            }
         }
     }
 
@@ -1015,6 +1083,9 @@ extension LibraryDatabase {
             try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: """
                 INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT ?, favoritedAt FROM favorite WHERE trackId = ?
+                """, arguments: [new, old])
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT ?, preferredAt FROM preferredCopy WHERE trackId = ?
                 """, arguments: [new, old])
             try db.execute(sql: """
                 UPDATE track SET

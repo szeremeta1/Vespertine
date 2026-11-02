@@ -166,7 +166,8 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
 
     public var formatSummary: String { baseFormatSummary + channelSuffix }
 
-    private var baseFormatSummary: String {
+    /// "FLAC · 24/96", "DSD128", "MP3 · 320k": the format without the layout.
+    var baseFormatSummary: String {
         if isDSD { return "DSD\(Int((sampleRate / 44_100).rounded()))" }
         let rate = sampleRate.truncatingRemainder(dividingBy: 1000) == 0
             ? String(Int(sampleRate / 1000)) : String(format: "%.1f", sampleRate / 1000)
