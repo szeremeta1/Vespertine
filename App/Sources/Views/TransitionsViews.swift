@@ -123,7 +123,7 @@ struct TransitionsSettingsSection: View {
         let t = s.transitions
         Section("Transitions") {
             Toggle("Transitions", isOn: Binding(get: { model.settings.transitionsFeature }, set: { model.setTransitionsFeature($0) }))
-            Text("Adds Crossfade, Smart Mix and Live Set, with controls in the transport bar, menus and Shortcuts. Off, none of it is in the app and every song plays as before.")
+            Text("Adds Crossfade, Smart Mix and Live Set, with controls in the transport bar and menus. Off, none of it is in the app and every song plays as before.")
                 .font(.caption).foregroundStyle(.secondary)
             if s.transitionsFeature {
                 Picker("Style", selection: $s.transitions.style) {
