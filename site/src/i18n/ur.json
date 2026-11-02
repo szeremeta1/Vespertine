@@ -14,7 +14,7 @@
     "copied": "کاپی ہو گیا",
     "copyFailed": "اسے منتخب کریں",
     "trademarks": "Dolby، Dolby Atmos، Dolby Digital، Dolby Digital Plus اور Dolby TrueHD، Dolby Laboratories کے ٹریڈ مارکس ہیں۔ DTS، DTS-HD Master Audio اور DTS:X، DTS, Inc. کے ٹریڈ مارکس ہیں۔ Apple، AirPods، AirPods Max، Mac، macOS اور اسپیشل آڈیو، Apple Inc. کے ٹریڈ مارکس ہیں۔ Vespertine ان کے نام صرف یہ بتانے کے لیے لیتا ہے کہ وہ کیا چلاتا ہے اور کہاں؛ یہ Dolby، DTS یا Apple سے سرٹیفائیڈ، لائسنس یافتہ یا توثیق شدہ نہیں ہے۔",
-    "trailerLabel": "Vespertine کا ٹریلر، 44 سیکنڈ",
+    "trailerLabel": "Vespertine کا ٹریلر، 55 سیکنڈ",
     "untested": "چینل بہ چینل آؤٹ پٹ اور ریسیور بٹ اسٹریم تجرباتی ہیں، اور اصلی ریسیورز اور ملٹی چینل USB DACs پر غیر آزمودہ ہیں (HDMI کے ذریعے ایک Sony TV پر جانچ ہو چکی ہے: docs/DEVICES.md دیکھیں)؛ رپورٹس درکار ہیں۔"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "ٹریلر",
-      "title": "44 سیکنڈ میں دیکھیں۔",
+      "title": "55 سیکنڈ میں دیکھیں۔",
       "text": "آواز آن کریں۔ اس میں سب کچھ اصل ایپ ہے، جو ڈویلپر کی اپنی لائبریری پر ریکارڈ کی گئی ہے۔",
       "fallback": "ٹریلر دیکھیں (MP4)",
-      "caption": "44 سیکنڈ · 1080p · البم آرٹ اپنے مالکان کی ملکیت ہے"
+      "caption": "55 سیکنڈ · 1080p · البم آرٹ اپنے مالکان کی ملکیت ہے"
     },
     "features": {
       "eyebrow": "Vespertine کیوں",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "ویڈیو",
       "title": "ٹریلر۔",
-      "text": "44 سیکنڈ، 16:9، 60 fps پر 1080p، آواز کے ساتھ۔ <a href=\"{href.trailerDownload}\" download>MP4 ڈاؤن لوڈ کریں</a> ({size})۔ 4K ماسٹر درخواست پر دستیاب ہے۔",
+      "text": "55 سیکنڈ، 16:9، 60 fps پر 1080p، آواز کے ساتھ۔ <a href=\"{href.trailerDownload}\" download>MP4 ڈاؤن لوڈ کریں</a> ({size})۔ 4K ماسٹر درخواست پر دستیاب ہے۔",
       "fallback": "ٹریلر ڈاؤن لوڈ کریں (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "میوزک پلیئر",
     "sourceName": "Vespertine کا سورس کوڈ",
     "trailerName": "Vespertine کا ٹریلر",
-    "trailerDescription": "Vespertine کا 44 سیکنڈ کا تعارفی دورہ، جو ڈویلپر کی اپنی لائبریری پر اصل ایپ سے ریکارڈ کیا گیا: بٹ پرفیکٹ سگنل پاتھ، DoP کے ذریعے DSD، AirPods پر اسپیشل آڈیو کے طور پر سراؤنڈ، اور ہائی ریز فائلوں کا تجزیہ۔",
+    "trailerDescription": "Vespertine کا 55 سیکنڈ کا تعارفی دورہ، جو ڈویلپر کی اپنی لائبریری پر اصل ایپ سے ریکارڈ کیا گیا: بٹ پرفیکٹ سگنل پاتھ، DoP کے ذریعے DSD، AirPods پر اسپیشل آڈیو کے طور پر سراؤنڈ، اور ہائی ریز فائلوں کا تجزیہ۔",
     "keywords": "Mac کے لیے میوزک پلیئر, ہائی ریز پلیئر, DSD پلیئر, SACD ISO, ملٹی چینل آڈیو, سراؤنڈ ساؤنڈ, Dolby Atmos, DTS-HD Master Audio, بٹ پرفیکٹ پلے بیک, روم کریکشن, اسپیشل آڈیو, FLAC پلیئر, مفت, اوپن سورس"
   },
   "og": {

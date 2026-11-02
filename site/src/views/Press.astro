@@ -93,7 +93,7 @@ const headAfter = headRest.slice(headStop.length);
     <section class="press-block" aria-labelledby="trailer-title">
       <p class="eyebrow">{p.video.eyebrow}</p>
       <h2 id="trailer-title">{p.video.title}</h2>
-      <p set:html={f(p.video.text, { 'href.trailerDownload': trailerDownload, size: megabytes(lang, 23e6) })} />
+      <p set:html={f(p.video.text, { 'href.trailerDownload': trailerDownload, size: megabytes(lang, 34e6) })} />
       <figure class="video">
         <video controls playsinline preload="none" poster={poster.src} width="1920" height="1080" aria-label={s.common.trailerLabel}>
           <source src="/assets/trailer/vespertine-trailer.mp4" type="video/mp4">

@@ -181,9 +181,11 @@ struct SignalPulse: View {
     // 0.14: the Fosi Audio ZD3 screenshot (docs/screenshots/bit-perfect-fosi-zd3-24-96.png, 2400 px wide, scaled to 2×). Volume's
     // note now takes two lines ("Fixed output; use the DAC or amplifier"), so the output's ring sits 13.6 pt lower; measured
     // the same way (ring edges, without the line) the others moved 0.4 pt up in the scaling.
-    static let nodes: [CGFloat] = [625.35, 664.35, 703.35, 756.35, 809.35].map { $0 - AppWindow.inspector.minY }
+    // 0.14.2: the ZD3 recording of the same track (2880 px, no scaling) has the screenshot's layout until its inspector glides
+    // down; from 4.44 s every ring and the badge sit exactly 111.0 pt higher (measured the same way on both frames).
+    static let nodes: [CGFloat] = [514.35, 553.35, 592.35, 645.35, 698.35].map { $0 - AppWindow.inspector.minY }
     static let ring: CGFloat = 7.5
-    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 539.25 - AppWindow.inspector.minY, width: 106, height: 22)
+    static let badge = CGRect(x: 1112.25 - AppWindow.inspector.minX, y: 428.25 - AppWindow.inspector.minY, width: 106, height: 22)
 
     var body: some View {
         let travel = easeInOutCubic(progress(t, start, start + b * 1.9))
@@ -345,8 +347,9 @@ struct DSDScene: View {
     let frame: CGImage?
 
     // 1.0: Claudja Barry's DSD128 recording; its title wraps to two lines, so both sit 28 pt lower.
-    static let badges = CGRect(x: 1104, y: 432, width: 196, height: 110)
-    static let path = CGRect(x: 1104, y: 666, width: 306, height: 48)
+    // 0.14.2: the ZD3 recording, after its inspector has glided down 84 pt to the signal path.
+    static let badges = CGRect(x: 1104, y: 348, width: 196, height: 110)
+    static let path = CGRect(x: 1104, y: 582, width: 306, height: 48)
 
     var body: some View {
         let g = Geo(size: size)
@@ -403,8 +406,10 @@ struct VersionsScene: View {
 
     // 1.0: Oasis's Morning Glory SACD on the FiiO K11, the playing row 4 of 12 and the stereo version's source line.
     // 0.11.1 re-recording: the album now opens under its three-edition picker, so the rows sit 165 pt lower.
-    static let rows = CGRect(x: 292, y: 583, width: 484, height: 70)
-    static let source = CGRect(x: 1104, y: 591, width: 306, height: 34)
+    // 0.14.1 reshoot (docs/screenshots, #125): Elton John's Honky Château, no edition picker; the playing row (9 of 11) sits
+    // 24.8 pt higher and the source line 31.0 pt lower.
+    static let rows = CGRect(x: 292, y: 558, width: 484, height: 70)
+    static let source = CGRect(x: 1104, y: 622, width: 306, height: 34)
 
     var body: some View {
         let g = Geo(size: size)
@@ -429,7 +434,8 @@ struct VersionsScene: View {
     }
 }
 
-// MARK: - Spatial Audio: the six channel meters become six glass speakers around you.
+// MARK: - Spatial Audio (two bars): the eight channel meters become eight glass speakers around you, then the ring
+// tilts into the 7.1 layout in 3D, each speaker lit by its own meter.
 
 struct SpatialScene: View {
     let t: Double
@@ -438,78 +444,177 @@ struct SpatialScene: View {
     let frame: CGImage?
     let meters: [Double]
 
-    /// Speaker angles (degrees, 0 = in front) and distance (fraction of the ring), in meter order.
-    static let layout: [(label: String, angle: Double, r: CGFloat)] = [
-        ("L", -32, 1), ("R", 32, 1), ("C", 0, 1), ("LFE", 180, 0.42), ("Ls", -112, 1), ("Rs", 112, 1),
+    /// Speaker angles (degrees, 0 = in front) and distance (fraction of the ring), in meter order, and whether it stands
+    /// on the floor: 7.1 as it is laid out, fronts at ±30°, side surrounds at ±100°, rear surrounds at ±145°, the LFE
+    /// on the floor behind the listener (where the 5.1 scene had it).
+    static let layout: [(label: String, angle: Double, r: CGFloat, floor: Bool)] = [
+        ("L", -30, 1, false), ("R", 30, 1, false), ("C", 0, 1, false), ("LFE", 180, 0.45, true),
+        ("Ls", -100, 1, false), ("Rs", 100, 1, false), ("Lrs", -145, 1, false), ("Rrs", 145, 1, false),
     ]
+    /// How far the floor is below the speakers, as a fraction of the ring.
+    static let floorDrop: CGFloat = 0.42
 
     var body: some View {
         let g = Geo(size: size)
         let s = Scene.spatial.range.lowerBound
         let away = easeInOutCubic(progress(t, s + b * 0.8, s + b * 1.8))
+        // The second bar: the ring tilts from straight above into the room, and the camera keeps turning slowly.
+        let tilt = easeInOutCubic(progress(t, s + b * 3.75, s + b * 5.35))
+        let yaw = -26 * easeInOutCubic(progress(t, s + b * 4.1, s + b * 8.75))
         var pose = featurePose(g, t: t, s: s, right: true)
         pose.center = mix(pose.center, g.at((0.27, 0.62), square: (0.28, 0.72), tall: (0.5, 0.5)), away)
         pose.scale *= CGFloat(mix(1, 0.8, away))
-        pose.opacity = mix(1, 0.4, away)
-        pose.contentBlur = CGFloat(6 * away)
+        pose.opacity = mix(1, 0.4, away) * mix(1, 0.6, tilt)
+        pose.contentBlur = CGFloat(6 * away + 4 * tilt)
         let cue = Cue.for(.spatial)!
-        let ringCenter = g.at((0.71, 0.53), square: (0.68, 0.58), tall: (0.5, 0.56))
-        let ringR = g.pick(g.H * 0.27, square: g.H * 0.22, tall: g.W * 0.34)
+        let ringCenter = mix(g.at((0.71, 0.53), square: (0.68, 0.58), tall: (0.5, 0.56)),
+                             g.at((0.7, 0.47), square: (0.66, 0.6), tall: (0.5, 0.58)), tilt)
+        let ringR = g.pick(g.H * 0.27, square: g.H * 0.22, tall: g.W * 0.34) * CGFloat(mix(1, 1.22, tilt))
         let lift = spring(t, start: s + b * 0.25, response: 0.75, damping: 0.85)
         let burst = spring(t, start: s + b * 1.05, response: 0.9, damping: 0.72)
 
         return ZStack(alignment: .topLeading) {
             WindowRig(frame: frame, sidebar: assets.sidebars[cue.recording], sidebarColor: assets.sidebarColor[cue.recording] ?? .gray, pose: pose)
-            FeatureCopy(g: g, t: t, start: s + b * 1.1, tagline: "Your 5.1 albums,\nall around you.",
-                        label: "Spatial · head tracked · 6 channels", copper: true, right: true)
+            FeatureCopy(g: g, t: t, start: s + b * 1.1, tagline: "Your 7.1 albums,\nall around you.",
+                        label: "Spatial · head tracked · 8 channels", copper: true, right: true)
             // The meters lift out of Now Playing…
             Lift(image: frame, region: Meters.region, pose: pose, to: ringCenter, toScale: 2.0 * g.u, p: lift,
                  fade: 1 - smooth(progress(t, s + b * 1.02, s + b * 1.3)))
-            // …and become speakers placed around the listener.
-            ring(center: ringCenter, radius: ringR, g: g, appear: burst)
+            // …and become speakers placed around the listener, then the room they stand in.
+            ring(center: ringCenter, radius: ringR, g: g, appear: burst, tilt: tilt, yaw: yaw)
+            // Not an app screen: the layout is drawn here, lit by the recording's own meters.
+            BrandLabel(text: "7.1 layout · each speaker lit by its meter", size: g.pick(g.W * 0.0085, square: g.W * 0.0125, tall: g.W * 0.019))
+                .arrive(t, at: s + b * 5.0)
+                .position(g.at((0.705, 0.885), square: (0.66, 0.93), tall: (0.5, 0.86)))
         }
         .frame(width: g.W, height: g.H)
     }
 
-    func ring(center: CGPoint, radius: CGFloat, g: Geo, appear: Double) -> some View {
+    /// A point of the room (x right, y up, z to the front, stage points from the listener) as the camera sees it:
+    /// turned `yaw` degrees about the listener, then tipped `pitch` degrees from straight above, with perspective.
+    static func project(_ x: CGFloat, _ y: CGFloat, _ z: CGFloat, center: CGPoint, pitch: Double, yaw: Double, focal: CGFloat) -> (point: CGPoint, k: CGFloat, depth: CGFloat) {
+        let ψ = yaw * .pi / 180, θ = pitch * .pi / 180
+        let x1 = x * CGFloat(cos(ψ)) - z * CGFloat(sin(ψ)), z1 = x * CGFloat(sin(ψ)) + z * CGFloat(cos(ψ))
+        let up = z1 * CGFloat(cos(θ)) + y * CGFloat(sin(θ))
+        let depth = y * CGFloat(cos(θ)) - z1 * CGFloat(sin(θ))   // towards the camera
+        let k = focal / (focal - depth)
+        return (CGPoint(x: center.x + x1 * k, y: center.y - up * k), k, depth)
+    }
+
+    /// A circle of the room's horizontal plane at height `y`, as seen.
+    static func circle(radius: CGFloat, y: CGFloat, center: CGPoint, pitch: Double, yaw: Double, focal: CGFloat) -> Path {
+        var path = Path()
+        for i in 0...96 {
+            let a = Double(i) / 96 * 2 * .pi
+            let p = project(radius * CGFloat(sin(a)), y, radius * CGFloat(cos(a)), center: center, pitch: pitch, yaw: yaw, focal: focal).point
+            if i == 0 { path.move(to: p) } else { path.addLine(to: p) }
+        }
+        return path
+    }
+
+    func ring(center: CGPoint, radius: CGFloat, g: Geo, appear: Double, tilt: Double, yaw: Double) -> some View {
         let orb = g.pick(66, square: 58, tall: 54) * g.u
+        let pitch = 58 * tilt
+        let focal = radius * 5.5
+        let floor = -SpatialScene.floorDrop * radius * CGFloat(tilt)
+        func at(_ x: CGFloat, _ y: CGFloat, _ z: CGFloat) -> (point: CGPoint, k: CGFloat, depth: CGFloat) {
+            SpatialScene.project(x, y, z, center: center, pitch: pitch, yaw: yaw, focal: focal)
+        }
+        let room = clamp01(tilt * 1.4)
+        let listener = at(0, 0, 0)
         return ZStack {
-            Circle().strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                .frame(width: radius * 2, height: radius * 2)
-                .scaleEffect(CGFloat(mix(0.6, 1, appear)))
-                .opacity(clamp01(appear))
-                .position(center)
-            // The listener.
-            Circle().strokeBorder(Brand.ivory.opacity(0.5), lineWidth: 1.2).frame(width: orb * 0.5, height: orb * 0.5)
-                .overlay(Circle().fill(Brand.ivory.opacity(0.8)).frame(width: orb * 0.12, height: orb * 0.12))
-                .opacity(clamp01(appear))
-                .position(center)
-            ForEach(Array(SpatialScene.layout.enumerated()), id: \.offset) { i, spk in
-                let level = i < meters.count ? meters[i] : 0
-                let a = spk.angle * .pi / 180
-                let home = CGPoint(x: center.x + CGFloat(sin(a)) * radius * spk.r, y: center.y - CGFloat(cos(a)) * radius * spk.r)
-                let origin = CGPoint(x: center.x + (Meters.columns[i] - Meters.region.midX) * 2 * g.u,
-                                     y: center.y + ((Meters.top + Meters.bottom) / 2 - Meters.region.midY) * 2 * g.u)
-                let d = orb * (spk.label == "LFE" ? 0.8 : 1)
-                // Each speaker leaves its meter as a disc exactly as wide as the bar (14 pt, lifted at 2×),
-                // then grows on its way out; its name appears once it has nearly arrived.
-                let grow = mix(14 * 2 * g.u / d, 1, clamp01(appear))
-                let at = mix(origin, home, appear)
-                ZStack {
-                    Circle().fill(Brand.brass.opacity(0.18 + 0.5 * level))
-                        .frame(width: d * CGFloat(0.3 + 0.55 * level), height: d * CGFloat(0.3 + 0.55 * level))
-                        .blur(radius: d * 0.12)
-                    Circle().fill(.clear).frame(width: d, height: d)
-                        .glassEffect(.regular.tint(Brand.brass.opacity(0.06 + 0.22 * level)), in: Circle())
-                    Circle().strokeBorder(Brand.brassHi.opacity(0.25 + 0.5 * level), lineWidth: 1).frame(width: d, height: d)
-                }
-                .scaleEffect(grow * (1 + 0.12 * CGFloat(level)))
-                .position(at)
-                .opacity(clamp01(appear * 4))
-                Text(spk.label).font(Font(BrandFont.mono(11 * g.u, 500))).kerning(1.2 * g.u).foregroundStyle(Brand.ash)
-                    .position(x: at.x, y: at.y + d / 2 + 14.5 * g.u)
-                    .opacity(smooth(clamp01((appear - 0.6) / 0.35)))
+            // The floor: rings around the listener, and each speaker's shadow.
+            ForEach([0.5, 1.0, 1.2], id: \.self) { (r: CGFloat) in
+                SpatialScene.circle(radius: radius * r, y: floor, center: center, pitch: pitch, yaw: yaw, focal: focal)
+                    .stroke(Color.white.opacity((r == 1 ? 0.1 : 0.06) * room), lineWidth: 1)
             }
+            .zIndex(-1000)
+            // The ring the speakers stand on, at ear height.
+            SpatialScene.circle(radius: radius * CGFloat(mix(0.6, 1, appear)), y: 0, center: center, pitch: pitch, yaw: yaw, focal: focal)
+                .stroke(Color.white.opacity(0.08 + 0.06 * room), lineWidth: 1)
+                .opacity(clamp01(appear))
+                .zIndex(-999)
+            ForEach(Array(SpatialScene.layout.enumerated()), id: \.offset) { i, spk in
+                // The 7.1 recording's meters ride high (0.6 to 1 of their height), so the top 55 % of each is spread over the
+                // speaker's whole range of light.
+                let level = clamp01(((i < meters.count ? meters[i] : 0) - 0.45) / 0.55)
+                let a = spk.angle * .pi / 180
+                let x = CGFloat(sin(a)) * radius * spk.r, z = CGFloat(cos(a)) * radius * spk.r
+                let y = spk.floor ? floor + orb * 0.4 * CGFloat(tilt) : 0
+                let home = at(x, y, z)
+                let foot = at(x, floor, z)
+                // A stand down to the floor and a soft shadow under it; a thread of light to the listener, as bright as the channel.
+                let underName = CGPoint(x: home.point.x, y: home.point.y + orb / 2 * home.k + 32 * g.u * sqrt(home.k))
+                Path { p in p.move(to: underName); p.addLine(to: CGPoint(x: foot.point.x, y: max(foot.point.y, underName.y))) }
+                    .stroke(LinearGradient(colors: [Brand.brassHi.opacity(0.45), Brand.brass.opacity(0.05)], startPoint: .top, endPoint: .bottom), lineWidth: 1.2)
+                    .opacity(spk.floor ? 0 : room * clamp01(appear))
+                    .zIndex(Double(foot.depth) - 500)
+                Ellipse().fill(Color.black.opacity(0.55))
+                    .frame(width: orb * 0.9 * foot.k, height: orb * 0.9 * foot.k * CGFloat(sin(pitch * .pi / 180)) * 0.9 + 0.01)
+                    .blur(radius: orb * 0.12)
+                    .position(foot.point)
+                    .opacity(room * clamp01(appear))
+                    .zIndex(Double(foot.depth) - 600)
+                Path { p in p.move(to: home.point); p.addLine(to: listener.point) }
+                    .stroke(Brand.brass.opacity(0.04 + 0.4 * level), lineWidth: 1.2)
+                    .opacity(room * clamp01(appear))
+                    .zIndex(-400)
+                speaker(home: home, level: level, label: spk.label, i: i, g: g, orb: orb, appear: appear, tilt: tilt, from: CGPoint(
+                    x: center.x + (Meters.columns[i] - Meters.region.midX) * 2 * g.u,
+                    y: center.y + ((Meters.top + Meters.bottom) / 2 - Meters.region.midY) * 2 * g.u))
+                    .zIndex(Double(home.depth))
+            }
+            // The listener.
+            ZStack {
+                Ellipse().fill(Color.black.opacity(0.5)).frame(width: orb * 0.55, height: orb * 0.25).blur(radius: orb * 0.08)
+                    .offset(y: at(0, floor, 0).point.y - listener.point.y).opacity(room)
+                Circle().strokeBorder(Brand.ivory.opacity(0.5), lineWidth: 1.2).frame(width: orb * 0.5, height: orb * 0.5)
+                    .overlay(Circle().fill(Brand.ivory.opacity(0.8)).frame(width: orb * 0.12, height: orb * 0.12))
+            }
+            .scaleEffect(listener.k)
+            .opacity(clamp01(appear))
+            .position(listener.point)
+            .zIndex(Double(listener.depth))
+        }
+    }
+
+    func speaker(home: (point: CGPoint, k: CGFloat, depth: CGFloat), level: Double, label: String, i: Int, g: Geo, orb: CGFloat,
+                 appear: Double, tilt: Double, from origin: CGPoint) -> some View {
+        let d = orb * (label == "LFE" ? 0.8 : 1)
+        // Each speaker leaves its meter as a disc exactly as wide as the bar (14 pt, lifted at 2×), then grows on its
+        // way out; its name and level appear once it has nearly arrived.
+        let grow = mix(14 * 2 * g.u / d, 1, clamp01(appear)) * mix(1, home.k, clamp01(appear))
+        let p = mix(origin, home.point, appear)
+        let named = smooth(clamp01((appear - 0.6) / 0.35))
+        return ZStack {
+            ZStack {
+                Circle().fill(Brand.brass.opacity(0.18 + 0.5 * level))
+                    .frame(width: d * CGFloat(0.3 + 0.55 * level), height: d * CGFloat(0.3 + 0.55 * level))
+                    .blur(radius: d * 0.12)
+                Circle().fill(.clear).frame(width: d, height: d)
+                    .glassEffect(.regular.tint(Brand.brass.opacity(0.06 + 0.22 * level)), in: Circle())
+                // In the room the glass reads as a sphere: light from above and to the left.
+                Circle().fill(RadialGradient(colors: [Color.white.opacity(0.26), Color.white.opacity(0)], center: UnitPoint(x: 0.34, y: 0.28),
+                                             startRadius: 0, endRadius: d * 0.55))
+                    .frame(width: d, height: d)
+                    .opacity(tilt)
+                Circle().strokeBorder(Brand.brassHi.opacity(0.25 + 0.5 * level), lineWidth: 1).frame(width: d, height: d)
+            }
+            .scaleEffect(grow * (1 + 0.12 * CGFloat(level)))
+            .position(p)
+            .opacity(clamp01(appear * 4))
+            VStack(spacing: 5 * g.u) {
+                Text(label).font(Font(BrandFont.mono(11 * g.u, 500))).kerning(1.2 * g.u).foregroundStyle(Brand.ash)
+                // The channel's level, from its meter.
+                Capsule().fill(Color.white.opacity(0.1)).frame(width: 30 * g.u, height: 3 * g.u)
+                    .overlay(alignment: .leading) {
+                        Capsule().fill(Brand.brass).frame(width: 30 * g.u * CGFloat(clamp01(level)), height: 3 * g.u)
+                    }
+            }
+            // Names keep to a readable size however far back their speaker is.
+            .scaleEffect(mix(1, sqrt(home.k), clamp01(appear)))
+            .position(x: p.x, y: p.y + d / 2 * mix(1, home.k, clamp01(appear)) + 18 * g.u * mix(1, sqrt(home.k), clamp01(appear)))
+            .opacity(named)
         }
     }
 }
@@ -660,6 +765,103 @@ struct LibraryScene: View {
     }
 }
 
+// MARK: - The Visualizer window
+
+/// The Visualizer window (1440 × 900 pt like the main one, recorded at 2×). It has no sidebar, so macOS's capture
+/// indicator is painted out with the window's own background and its buttons are redrawn where they sit.
+struct VisualizerRig: View {
+    let frame: CGImage?
+    let background: Color
+    let pose: RigPose
+
+    var body: some View {
+        WindowRig(frame: frame, sidebar: nil, sidebarColor: .clear, pose: pose, windowOverlay: AnyView(chrome))
+    }
+
+    // Measured on the Visualizer screenshot (docs/screenshots/visualizer-bars-atmos.png): 12.5 pt buttons, centres 16, 39
+    // and 62 pt in, 16 pt down. The indicator covers 6…72 × 6…26 pt.
+    var chrome: some View {
+        ZStack(alignment: .topLeading) {
+            background.frame(width: 78, height: 30).offset(x: 1, y: 1)
+            HStack(spacing: 10.5) {
+                light(0xFF5F57, 0xE2463F); light(0xFEBC2E, 0xDFA023); light(0x28C840, 0x1AAB29)
+            }
+            .offset(x: 9.75, y: 9.75)
+            // The window body's dimming, which this sits above.
+            Color.black.opacity(0.45 * pose.contentDim).frame(width: 80, height: 32)
+        }
+        .frame(width: AppWindow.size.width, height: AppWindow.size.height, alignment: .topLeading)
+    }
+
+    func light(_ fill: UInt32, _ edge: UInt32) -> some View {
+        Circle().fill(Color(hex: fill)).overlay(Circle().strokeBorder(Color(hex: edge), lineWidth: 0.5)).frame(width: 12.5, height: 12.5)
+    }
+}
+
+// MARK: - Atmos in the Visualizer: the spectrum lifts out of the window.
+
+struct AtmosScene: View {
+    let t: Double
+    let size: CGSize
+    let assets: Assets
+    let frame: CGImage?
+
+    // Spectrum on Elton John's I'm Still Standing (Dolby Atmos rendered by macOS, drawn from the decoded bed): the bands
+    // from about 100 Hz to 5 kHz, down to the frequency labels.
+    static let bars = CGRect(x: 380, y: 380, width: 800, height: 510)
+
+    var body: some View {
+        let g = Geo(size: size)
+        let s = Scene.atmos.range.lowerBound
+        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
+        let pose = featurePose(g, t: t, s: s, right: true, dim: 0.55 * lifted)
+        let cue = Cue.for(.atmos)!
+        ZStack(alignment: .topLeading) {
+            VisualizerRig(frame: frame, background: assets.chromeColor[cue.recording] ?? .black, pose: pose)
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "See the music,\nAtmos too.",
+                        label: "Visualizer · Spectrum", label2: "Dolby Atmos · decoded bed", brass: true, right: true)
+            Lift(image: frame, region: AtmosScene.bars, pose: pose,
+                 to: g.at((0.27, 0.7), square: (0.35, 0.62), tall: (0.5, 0.62)),
+                 toScale: g.pick(0.75, square: 0.8, tall: 0.55) * g.u,
+                 p: spring(t, start: s + b * 0.55, response: 0.85, damping: 0.8))
+        }
+        .frame(width: g.W, height: g.H)
+    }
+}
+
+// MARK: - Vinyl: the record's label, the album cover, lifts off the turntable still turning.
+
+struct VinylScene: View {
+    let t: Double
+    let size: CGSize
+    let assets: Assets
+    let frame: CGImage?
+
+    // Hall & Oates's Rich Girl on the Vinyl style: the label (the cover, 256 pt across, centred at 645, 450.5) with a
+    // ring of the record around it.
+    static let label = CGRect(x: 509, y: 314.5, width: 272, height: 272)
+
+    var body: some View {
+        let g = Geo(size: size)
+        let s = Scene.vinyl.range.lowerBound
+        let lifted = smooth(progress(t, s + b * 0.4, s + b * 1.4))
+        let pose = featurePose(g, t: t, s: s, right: false, dim: 0.55 * lifted)
+        let cue = Cue.for(.vinyl)!
+        ZStack(alignment: .topLeading) {
+            VisualizerRig(frame: frame, background: assets.chromeColor[cue.recording] ?? .black, pose: pose)
+            FeatureCopy(g: g, t: t, start: s + b * 0.35, tagline: "Your cover,\non a turning record.",
+                        label: "Visualizer · Vinyl", label2: "Never changes the sound", brass: true, right: false)
+            // A round plate: corners of half the region make the lift a disc.
+            Lift(image: frame, region: VinylScene.label, pose: pose,
+                 to: g.at((0.77, 0.66), square: (0.5, 0.62), tall: (0.5, 0.62)),
+                 toScale: g.pick(1.25, square: 1.3, tall: 0.95) * g.u,
+                 p: spring(t, start: s + b * 0.55, response: 0.85, damping: 0.8),
+                 corner: VinylScene.label.width / 2)
+        }
+        .frame(width: g.W, height: g.H)
+    }
+}
+
 // MARK: - End card
 
 struct EndScene: View {
@@ -683,7 +885,7 @@ struct EndScene: View {
                 .blur(radius: CGFloat(1 - clamp01(logoIn)) * 16)
                 .opacity(clamp01(logoIn * 1.4))
                 .offset(y: -g.H * g.pick(0.07, square: 0.07, tall: 0.1))
-            Text("Version 0.14. Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
+            Text("Version 0.14.2. Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
                 .arrive(t, at: s + 0.9)
                 .offset(y: g.H * g.pick(0.1, square: 0.08, tall: 0.03))
             Text("vespertineapp.com").font(Font(BrandFont.mono(small * 0.72, 500))).kerning(small * 0.07)

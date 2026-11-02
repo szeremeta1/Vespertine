@@ -14,7 +14,7 @@
     "copied": "Skopiowano",
     "copyFailed": "Zaznacz je",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus i Dolby TrueHD są znakami towarowymi Dolby Laboratories. DTS, DTS-HD Master Audio i DTS:X są znakami towarowymi DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS i Spatial Audio (Dźwięk przestrzenny) są znakami towarowymi Apple Inc. Vespertine wymienia je wyłącznie po to, by opisać, co i gdzie odtwarza; nie jest certyfikowany, licencjonowany ani rekomendowany przez Dolby, DTS ani Apple.",
-    "trailerLabel": "Zwiastun Vespertine, 44 sekundy",
+    "trailerLabel": "Zwiastun Vespertine, 55 sekund",
     "untested": "Wyjście kanał w kanał i bitstream do amplitunera są eksperymentalne, nietestowane na prawdziwych amplitunerach i wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); czekamy na zgłoszenia."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Zwiastun",
-      "title": "Zobacz w 44 sekundy.",
+      "title": "Zobacz w 55 sekund.",
       "text": "Włącz dźwięk. Wszystko, co zobaczysz, to prawdziwa aplikacja, nagrana na własnej bibliotece autora.",
       "fallback": "Obejrzyj zwiastun (MP4)",
-      "caption": "44 s · 1080p · okładki albumów należą do ich właścicieli"
+      "caption": "55 s · 1080p · okładki albumów należą do ich właścicieli"
     },
     "features": {
       "eyebrow": "Dlaczego Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Wideo",
       "title": "Zwiastun.",
-      "text": "44 sekundy, 16:9, 1080p przy 60 kl./s, z dźwiękiem. <a href=\"{href.trailerDownload}\" download>Pobierz MP4</a> ({size}). Master 4K dostępny na życzenie.",
+      "text": "55 sekund, 16:9, 1080p przy 60 kl./s, z dźwiękiem. <a href=\"{href.trailerDownload}\" download>Pobierz MP4</a> ({size}). Master 4K dostępny na życzenie.",
       "fallback": "Pobierz zwiastun (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Odtwarzacz muzyki",
     "sourceName": "Kod źródłowy Vespertine",
     "trailerName": "Zwiastun Vespertine",
-    "trailerDescription": "44-sekundowa prezentacja Vespertine nagrana w prawdziwej aplikacji, na własnej bibliotece twórcy: ścieżka sygnału bit-perfect, DSD przez DoP, surround jako Dźwięk przestrzenny na AirPods i analiza plików hi-res.",
+    "trailerDescription": "55-sekundowa prezentacja Vespertine nagrana w prawdziwej aplikacji, na własnej bibliotece twórcy: ścieżka sygnału bit-perfect, DSD przez DoP, surround jako Dźwięk przestrzenny na AirPods i analiza plików hi-res.",
     "keywords": "odtwarzacz muzyki na Maca, odtwarzacz hi-res Mac, odtwarzacz DSD, SACD ISO, dźwięk wielokanałowy, muzyka surround, Dolby Atmos, DTS-HD Master Audio, odtwarzanie bit-perfect, korekcja pomieszczenia, dźwięk przestrzenny, odtwarzacz FLAC, za darmo, open source"
   },
   "og": {

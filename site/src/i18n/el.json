@@ -14,7 +14,7 @@
     "copied": "Αντιγράφηκε",
     "copyFailed": "Επιλέξτε την",
     "trademarks": "Τα Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus και Dolby TrueHD είναι εμπορικά σήματα της Dolby Laboratories. Τα DTS, DTS-HD Master Audio και DTS:X είναι εμπορικά σήματα της DTS, Inc. Τα Apple, AirPods, AirPods Max, Mac, macOS και Χωρικός ήχος είναι εμπορικά σήματα της Apple Inc. Το Vespertine τα αναφέρει μόνο για να περιγράψει τι αναπαράγει και πού· δεν είναι πιστοποιημένο, αδειοδοτημένο ούτε εγκεκριμένο από την Dolby, την DTS ή την Apple.",
-    "trailerLabel": "Τρέιλερ του Vespertine, 44 δευτερόλεπτα",
+    "trailerLabel": "Τρέιλερ του Vespertine, 55 δευτερόλεπτα",
     "untested": "Η έξοδος κανάλι προς κανάλι και το bitstream προς δέκτη είναι πειραματικά, μη δοκιμασμένα σε πραγματικούς δέκτες και πολυκαναλικούς USB DAC (έχει δοκιμαστεί μία τηλεόραση Sony μέσω HDMI: δείτε το docs/DEVICES.md)· ζητούνται αναφορές."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Τρέιλερ",
-      "title": "Δείτε το σε 44 δευτερόλεπτα.",
+      "title": "Δείτε το σε 55 δευτερόλεπτα.",
       "text": "Ανοίξτε τον ήχο. Όλα όσα βλέπετε είναι η πραγματική εφαρμογή, καταγεγραμμένη στη βιβλιοθήκη του ίδιου του προγραμματιστή.",
       "fallback": "Δείτε το τρέιλερ (MP4)",
-      "caption": "44 δευτ. · 1080p · τα εξώφυλλα ανήκουν στους κατόχους τους"
+      "caption": "55 δευτ. · 1080p · τα εξώφυλλα ανήκουν στους κατόχους τους"
     },
     "features": {
       "eyebrow": "Γιατί Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Βίντεο",
       "title": "Τρέιλερ.",
-      "text": "44 δευτερόλεπτα, 16:9, 1080p στα 60 fps, με ήχο. <a href=\"{href.trailerDownload}\" download>Κατεβάστε το MP4</a> ({size}). Master σε 4K διατίθεται κατόπιν αιτήματος.",
+      "text": "55 δευτερόλεπτα, 16:9, 1080p στα 60 fps, με ήχο. <a href=\"{href.trailerDownload}\" download>Κατεβάστε το MP4</a> ({size}). Master σε 4K διατίθεται κατόπιν αιτήματος.",
       "fallback": "Κατεβάστε το τρέιλερ (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Πρόγραμμα αναπαραγωγής μουσικής",
     "sourceName": "Πηγαίος κώδικας του Vespertine",
     "trailerName": "Τρέιλερ του Vespertine",
-    "trailerDescription": "Μια περιήγηση 44 δευτερολέπτων στο Vespertine, καταγεγραμμένη από την πραγματική εφαρμογή με τη βιβλιοθήκη του ίδιου του δημιουργού: η διαδρομή σήματος bit-perfect, DSD μέσω DoP, surround ως Χωρικός ήχος στα AirPods και ανάλυση αρχείων Hi-Res.",
+    "trailerDescription": "Μια περιήγηση 55 δευτερολέπτων στο Vespertine, καταγεγραμμένη από την πραγματική εφαρμογή με τη βιβλιοθήκη του ίδιου του δημιουργού: η διαδρομή σήματος bit-perfect, DSD μέσω DoP, surround ως Χωρικός ήχος στα AirPods και ανάλυση αρχείων Hi-Res.",
     "keywords": "πρόγραμμα αναπαραγωγής μουσικής για Mac, player μουσικής Mac, hi-res player, DSD player, αναπαραγωγή SACD ISO, πολυκαναλικός ήχος, μουσική surround, Dolby Atmos, DTS-HD Master Audio, αναπαραγωγή bit-perfect, διόρθωση δωματίου, Χωρικός ήχος, FLAC, δωρεάν, ανοιχτός κώδικας"
   },
   "og": {

@@ -14,7 +14,7 @@
     "copied": "Kopierat",
     "copyFailed": "Markera det",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus och Dolby TrueHD är varumärken som tillhör Dolby Laboratories. DTS, DTS-HD Master Audio och DTS:X är varumärken som tillhör DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS och Spatial Audio är varumärken som tillhör Apple Inc. Vespertine nämner dem bara för att beskriva vad appen spelar och var; den är inte certifierad, licensierad eller godkänd av Dolby, DTS eller Apple.",
-    "trailerLabel": "Vespertines trailer, 44 sekunder",
+    "trailerLabel": "Vespertines trailer, 55 sekunder",
     "untested": "Utmatning kanal för kanal och bitström till receiver är experimentella, otestade på riktiga receivrar och flerkanaliga USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); rapporter efterlyses."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "Se den på 44 sekunder.",
+      "title": "Se den på 55 sekunder.",
       "text": "Slå på ljudet. Allt du ser är den riktiga appen, inspelad med utvecklarens eget bibliotek.",
       "fallback": "Se trailern (MP4)",
-      "caption": "44 s · 1080p · albumomslagen tillhör sina respektive ägare"
+      "caption": "55 s · 1080p · albumomslagen tillhör sina respektive ägare"
     },
     "features": {
       "eyebrow": "Varför Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 sekunder, 16:9, 1080p i 60 fps, med ljud. <a href=\"{href.trailerDownload}\" download>Ladda ner MP4-filen</a> ({size}). En 4K-master finns att få på begäran.",
+      "text": "55 sekunder, 16:9, 1080p i 60 fps, med ljud. <a href=\"{href.trailerDownload}\" download>Ladda ner MP4-filen</a> ({size}). En 4K-master finns att få på begäran.",
       "fallback": "Ladda ner trailern (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Musikspelare",
     "sourceName": "Källkoden till Vespertine",
     "trailerName": "Trailer för Vespertine",
-    "trailerDescription": "En 44 sekunder lång rundtur i Vespertine, inspelad från den riktiga appen med utvecklarens eget bibliotek: den bitperfekta signalvägen, DSD via DoP, surround som rumsligt ljud på AirPods och analys av hi-res-filer.",
+    "trailerDescription": "En 55 sekunder lång rundtur i Vespertine, inspelad från den riktiga appen med utvecklarens eget bibliotek: den bitperfekta signalvägen, DSD via DoP, surround som rumsligt ljud på AirPods och analys av hi-res-filer.",
     "keywords": "musikspelare för Mac, hi-res-spelare Mac, DSD-spelare, SACD ISO, flerkanalsljud, surroundmusik, Dolby Atmos, DTS-HD Master Audio, bitperfekt uppspelning, rumskorrigering, rumsligt ljud, FLAC-spelare, gratis, öppen källkod"
   },
   "og": {

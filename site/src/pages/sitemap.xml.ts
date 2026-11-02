@@ -24,7 +24,7 @@ export const GET: APIRoute = async () => {
         const shots = await sceneShots(lang);
         const seo = t(lang).seo;
         extra.push(...shots.map((s) => `<image:image><image:loc>${x(s.url)}</image:loc></image:image>`));
-        extra.push(`<video:video><video:thumbnail_loc>${SITE}${poster.src}</video:thumbnail_loc><video:title>${x(seo.trailerName)}</video:title><video:description>${x(seo.trailerDescription)}</video:description><video:content_loc>${SITE}${TRAILER}</video:content_loc><video:duration>44</video:duration><video:publication_date>2026-10-13</video:publication_date><video:family_friendly>yes</video:family_friendly></video:video>`);
+        extra.push(`<video:video><video:thumbnail_loc>${SITE}${poster.src}</video:thumbnail_loc><video:title>${x(seo.trailerName)}</video:title><video:description>${x(seo.trailerDescription)}</video:description><video:content_loc>${SITE}${TRAILER}</video:content_loc><video:duration>55</video:duration><video:publication_date>2026-11-01</video:publication_date><video:family_friendly>yes</video:family_friendly></video:video>`);
       }
       urls.push(`<url><loc>${SITE}${pagePath(lang, p.page)}</loc><lastmod>${p.lastmod}</lastmod>${alternates}${extra.join('')}</url>`);
     }

@@ -14,7 +14,7 @@
     "copied": "Đã sao chép",
     "copyFailed": "Hãy tự chọn lệnh",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus và Dolby TrueHD là nhãn hiệu của Dolby Laboratories. DTS, DTS-HD Master Audio và DTS:X là nhãn hiệu của DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS và Âm thanh không gian là nhãn hiệu của Apple Inc. Vespertine nêu tên các nhãn hiệu này chỉ để mô tả những gì ứng dụng phát và phát trên thiết bị nào; Vespertine không được Dolby, DTS hay Apple chứng nhận, cấp phép hoặc bảo trợ.",
-    "trailerLabel": "Đoạn giới thiệu Vespertine, 44 giây",
+    "trailerLabel": "Đoạn giới thiệu Vespertine, 55 giây",
     "untested": "Xuất tín hiệu đúng từng kênh và bitstream tới receiver là tính năng thử nghiệm, chưa được kiểm tra trên receiver thật và DAC USB đa kênh (mới thử với một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Đoạn giới thiệu",
-      "title": "Xem trong 44 giây.",
+      "title": "Xem trong 55 giây.",
       "text": "Hãy bật tiếng. Mọi thứ trong video đều là ứng dụng thật, được ghi lại trên chính thư viện nhạc của nhà phát triển.",
       "fallback": "Xem đoạn giới thiệu (MP4)",
-      "caption": "44 giây · 1080p · ảnh bìa album thuộc về chủ sở hữu"
+      "caption": "55 giây · 1080p · ảnh bìa album thuộc về chủ sở hữu"
     },
     "features": {
       "eyebrow": "Vì sao chọn Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Đoạn giới thiệu.",
-      "text": "44 giây, 16:9, 1080p ở 60 fps, có âm thanh. <a href=\"{href.trailerDownload}\" download>Tải tệp MP4</a> ({size}). Có bản master 4K nếu bạn yêu cầu.",
+      "text": "55 giây, 16:9, 1080p ở 60 fps, có âm thanh. <a href=\"{href.trailerDownload}\" download>Tải tệp MP4</a> ({size}). Có bản master 4K nếu bạn yêu cầu.",
       "fallback": "Tải đoạn giới thiệu (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Trình phát nhạc",
     "sourceName": "Mã nguồn Vespertine",
     "trailerName": "Video giới thiệu Vespertine",
-    "trailerDescription": "Video giới thiệu Vespertine dài 44 giây, quay từ ứng dụng thật trên thư viện nhạc của chính nhà phát triển: đường tín hiệu bit-perfect, DSD qua DoP, âm thanh vòm dưới dạng Âm thanh không gian trên AirPods và phân tích tệp hi-res.",
+    "trailerDescription": "Video giới thiệu Vespertine dài 55 giây, quay từ ứng dụng thật trên thư viện nhạc của chính nhà phát triển: đường tín hiệu bit-perfect, DSD qua DoP, âm thanh vòm dưới dạng Âm thanh không gian trên AirPods và phân tích tệp hi-res.",
     "keywords": "phần mềm nghe nhạc cho Mac, trình phát nhạc hi-res, nghe nhạc lossless trên Mac, phát DSD, SACD ISO, âm thanh vòm đa kênh, Dolby Atmos, DTS-HD Master Audio, bit-perfect, hiệu chỉnh phòng, Âm thanh không gian, FLAC, miễn phí, mã nguồn mở"
   },
   "og": {

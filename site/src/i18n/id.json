@@ -14,7 +14,7 @@
     "copied": "Disalin",
     "copyFailed": "Pilih teksnya",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus, dan Dolby TrueHD adalah merek dagang Dolby Laboratories. DTS, DTS-HD Master Audio, dan DTS:X adalah merek dagang DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS, dan Spatial Audio adalah merek dagang Apple Inc. Vespertine menyebut nama-nama tersebut hanya untuk menjelaskan apa yang diputarnya dan di mana; Vespertine tidak disertifikasi, dilisensikan, atau didukung oleh Dolby, DTS, maupun Apple.",
-    "trailerLabel": "Trailer Vespertine, 44 detik",
+    "trailerLabel": "Trailer Vespertine, 55 detik",
     "untested": "Output saluran demi saluran dan bitstream ke receiver bersifat eksperimental, belum diuji pada receiver sungguhan maupun DAC USB multisaluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); kami menantikan laporan Anda."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "Lihat dalam 44 detik.",
+      "title": "Lihat dalam 55 detik.",
       "text": "Nyalakan suaranya. Semua yang tampil di dalamnya adalah aplikasi aslinya, direkam pada perpustakaan milik pengembangnya sendiri.",
       "fallback": "Tonton trailernya (MP4)",
-      "caption": "44 detik · 1080p · sampul album adalah milik pemiliknya masing-masing"
+      "caption": "55 detik · 1080p · sampul album adalah milik pemiliknya masing-masing"
     },
     "features": {
       "eyebrow": "Mengapa Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 detik, 16:9, 1080p pada 60 fps, dengan suara. <a href=\"{href.trailerDownload}\" download>Unduh MP4</a> ({size}). Master 4K tersedia atas permintaan.",
+      "text": "55 detik, 16:9, 1080p pada 60 fps, dengan suara. <a href=\"{href.trailerDownload}\" download>Unduh MP4</a> ({size}). Master 4K tersedia atas permintaan.",
       "fallback": "Unduh trailer (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Pemutar musik",
     "sourceName": "Kode sumber Vespertine",
     "trailerName": "Trailer Vespertine",
-    "trailerDescription": "Tur 44 detik tentang Vespertine, direkam dari aplikasi aslinya pada perpustakaan milik pengembang sendiri: jalur sinyal bit-perfect, DSD melalui DoP, surround sebagai Audio Spasial di AirPods, dan analisis file hi-res.",
+    "trailerDescription": "Tur 55 detik tentang Vespertine, direkam dari aplikasi aslinya pada perpustakaan milik pengembang sendiri: jalur sinyal bit-perfect, DSD melalui DoP, surround sebagai Audio Spasial di AirPods, dan analisis file hi-res.",
     "keywords": "pemutar musik Mac, pemutar hi-res Mac, pemutar DSD, SACD ISO, audio multikanal, musik surround, Dolby Atmos, DTS-HD Master Audio, pemutaran bit-perfect, koreksi ruangan, Audio Spasial, pemutar FLAC, gratis, open source"
   },
   "og": {

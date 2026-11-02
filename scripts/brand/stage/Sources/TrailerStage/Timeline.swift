@@ -10,16 +10,16 @@ enum Music {
     static let beat = 60.0 / 65.0            // 0.923 s
     static let bar = beat * 4                // 3.692 s
     static let firstDownbeat = 3.657
-    static let duration = 44.017              // 36.633 + two bars (room correction, languages)
+    static let duration = 55.094              // 36.633 + five bars (room correction, languages, 7.1 layout, Atmos, vinyl)
     /// Start of bar `k` (bar 0 is the intro, which begins at 0).
     static func bar(_ k: Int) -> Double { k == 0 ? 0 : firstDownbeat + Double(k - 1) * bar }
     /// Beat `n` counted from the first downbeat (fractional beats allowed).
     static func beat(_ n: Double) -> Double { firstDownbeat + n * beat }
 }
 
-/// The trailer's scenes, one per bar except the two-bar opening shot and the end card.
+/// The trailer's scenes, one per bar except the two-bar opening shot, the two-bar Spatial Audio scene and the end card.
 enum Scene: CaseIterable {
-    case intro, bitPerfect, dsd, room, versions, spatial, analysis, languages, library, end
+    case intro, bitPerfect, dsd, room, versions, spatial, analysis, languages, library, atmos, vinyl, end
 
     var range: ClosedRange<Double> {
         switch self {
@@ -28,11 +28,15 @@ enum Scene: CaseIterable {
         case .dsd: return Music.bar(3)...Music.bar(4)
         case .room: return Music.bar(4)...Music.bar(5)
         case .versions: return Music.bar(5)...Music.bar(6)
-        case .spatial: return Music.bar(6)...Music.bar(7)
-        case .analysis: return Music.bar(7)...Music.bar(8)
-        case .languages: return Music.bar(8)...Music.bar(9)
-        case .library: return Music.bar(9)...Music.bar(10)
-        case .end: return Music.bar(10)...Music.duration
+        // 0.14.2: two bars, the second for the 7.1 layout in 3D; every scene after it moves one bar later.
+        case .spatial: return Music.bar(6)...Music.bar(8)
+        case .analysis: return Music.bar(8)...Music.bar(9)
+        case .languages: return Music.bar(9)...Music.bar(10)
+        case .library: return Music.bar(10)...Music.bar(11)
+        // 0.14.2: the Visualizer window, after the library.
+        case .atmos: return Music.bar(11)...Music.bar(12)
+        case .vinyl: return Music.bar(12)...Music.bar(13)
+        case .end: return Music.bar(13)...Music.duration
         }
     }
 }
