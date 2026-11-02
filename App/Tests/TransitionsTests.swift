@@ -37,7 +37,8 @@ struct TransitionsTests {
         defaults.set(true, forKey: "setupCompleted")
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         #expect(!settings.transitionsFeature && !settings.transitionsOn)
-        #expect(defaults.object(forKey: "transitionsFeature") == nil)
+        // Nothing stored (`object(forKey:)` would answer with the registered default, false).
+        #expect(defaults.persistentDomain(forName: suite)?["transitionsFeature"] == nil)
         // A playback switch left on in a stored value still does nothing without the feature.
         var stored = TransitionSettings()
         stored.setEnabled(true)
