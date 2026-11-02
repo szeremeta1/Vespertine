@@ -39,6 +39,8 @@ struct StageView: View {
         case .languages: return g.at((0.66, 0.5), square: (0.5, 0.5), tall: (0.5, 0.55))
         case .versions: return g.at((0.72, 0.62), square: (0.5, 0.5), tall: (0.5, 0.55))
         case .spatial: return g.at((0.71, 0.53), square: (0.68, 0.58), tall: (0.5, 0.56))
+        case .vinyl: return g.at((0.74, 0.62), square: (0.5, 0.5), tall: (0.5, 0.55))
+        case .atmos: return g.at((0.3, 0.66), square: (0.35, 0.6), tall: (0.5, 0.6))
         case .end: return g.at((0.5, 0.42))
         default: return g.at((0.72, 0.42))
         }
@@ -59,6 +61,8 @@ struct StageView: View {
         case .analysis: AnalysisScene(t: t, size: size, assets: assets, frame: video(.analysis))
         case .languages: LanguagesScene(t: t, size: size, assets: assets, frame: video(.languages))
         case .library: LibraryScene(t: t, size: size, assets: assets, frame: video(.library))
+        case .atmos: AtmosScene(t: t, size: size, assets: assets, frame: video(.atmos))
+        case .vinyl: VinylScene(t: t, size: size, assets: assets, frame: video(.vinyl))
         case .end: EndScene(t: t, size: size, assets: assets)
         }
     }
@@ -105,6 +109,9 @@ struct Transition {
         Transition(into: .analysis, center: UnitPoint(x: 0.64, y: 0.56), shape: .capsule(aspect: 1.9)),
         Transition(into: .languages, center: UnitPoint(x: 0.36, y: 0.5)),
         Transition(into: .library, center: UnitPoint(x: 0.62, y: 0.5)),
+        // 0.14.2: each opens where the new scene's first lift lands.
+        Transition(into: .atmos, center: UnitPoint(x: 0.27, y: 0.7), shape: .capsule(aspect: 2.4)),
+        Transition(into: .vinyl, center: UnitPoint(x: 0.77, y: 0.66)),
         Transition(into: .end, center: UnitPoint(x: 0.5, y: 0.45), duration: 1.15),
     ]
     static func into(_ scene: Scene) -> Transition? { all.first { $0.into == scene } }

@@ -161,18 +161,20 @@ enum BrandFont {
 
 // MARK: - Live readouts
 
-/// The six channel meters in the Spatial Audio recording (window points): L R C LFE Ls Rs.
+/// The eight channel meters in the Spatial Audio recording (window points): L R C LFE Ls Rs Lrs Rrs.
+/// 0.14.2: the 7.1 recording has the 5.1 one's six columns where they were and two more (measured the same way,
+/// brass pixels across the bars); its Lrs / Rrs letters end at 1270.5.
 enum Meters {
-    static let columns: [CGFloat] = [1118.75, 1138.75, 1158.75, 1179.75, 1200.75, 1220.75]
+    static let columns: [CGFloat] = [1118.75, 1138.75, 1158.75, 1179.75, 1200.75, 1220.75, 1241.75, 1263.75]
     static let top: CGFloat = 642, bottom: CGFloat = 712
     /// The meters and their letters, without the "CHANNELS · SPATIAL AUDIO" caption above them (621–630).
-    static let region = CGRect(x: 1108, y: 634, width: 124, height: 98)
+    static let region = CGRect(x: 1108, y: 634, width: 170, height: 98)
 
     /// How full each meter is (0…1) in this frame, read from the brass fill.
     static func levels(_ frame: CGImage) -> [Double] {
         let s = CGFloat(frame.width) / AppWindow.size.width
         let area = CGRect(x: columns.first! * s - 4, y: top * s, width: (columns.last! - columns.first!) * s + 8, height: (bottom - top) * s).integral
-        guard let cut = frame.cropping(to: area) else { return Array(repeating: 0, count: 6) }
+        guard let cut = frame.cropping(to: area) else { return Array(repeating: 0, count: columns.count) }
         let w = cut.width, h = cut.height
         let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4, space: CGColorSpace(name: CGColorSpace.sRGB)!,
                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!

@@ -16,16 +16,25 @@ struct Cue {
     }
 
     static let all: [Cue] = [
-        Cue(scene: .bitPerfect, recording: "bitperfect", sourceStart: 0.8),
-        Cue(scene: .dsd, recording: "dsd", sourceStart: 2.0),
+        // 0.14.2: real recordings on the Fosi Audio ZD3. The inspector glides down to the signal path (Lazar Berman:
+        // 1.59-4.44 s, 111 pt; Claudja Barry: 1.47-3.87 s, 84 pt): bit-perfect's glide ends before the push into
+        // Now Playing, DSD's before its scene appears, so the lifts and the light land on a still page.
+        Cue(scene: .bitPerfect, recording: "bitperfect", sourceStart: 2.5),
+        Cue(scene: .dsd, recording: "dsd", sourceStart: 4.7),
         // The Room Correction window (780 × 877 pt) recorded from the 0.14 app: its Curve Reveal starts 3.11 s in, which
         // lands on beat 1.5 of the scene.
         Cue(scene: .room, recording: "room", sourceStart: 1.722),
         Cue(scene: .versions, recording: "versions", sourceStart: 2.0),
+        // 0.14.2: Billie Eilish's 7.1 album on AirPods Max, Spatial · head tracked, all eight meters (the same page as the
+        // 5.1 recording it replaces; it stays still, only the meters and spectrum move).
         Cue(scene: .spatial, recording: "spatial", sourceStart: 2.0),
         Cue(scene: .analysis, recording: "analysis", sourceStart: 2.0),
         Cue(scene: .languages, recording: "languages", sourceStart: 1.0),
         Cue(scene: .library, recording: "albums", sourceStart: 0.6),
+        // The Visualizer window: Spectrum on a Dolby Atmos track rendered by macOS, and Vinyl. The Vinyl recording (~56 fps,
+        // uneven) goes through vinyl-even.py first, so its label turns by the same angle on every frame of the trailer.
+        Cue(scene: .atmos, recording: "atmos", sourceStart: 3.0),
+        Cue(scene: .vinyl, recording: "vinyl", sourceStart: 3.0),
     ]
     static func `for`(_ scene: Scene) -> Cue? { all.first { $0.scene == scene } }
 }
@@ -38,6 +47,7 @@ final class Assets {
     var sidebars: [String: CGImage] = [:]      // keyed sidebar per recording, for floating over glass
     var sidebarColor: [String: Color] = [:]    // the sidebar's own background, to patch the capture indicator
     var poster: [String: CGImage] = [:]        // a representative frame per recording
+    var chromeColor: [String: Color] = [:]     // the window's background beside its buttons (the Visualizer has no sidebar)
     let languageWall: CGImage  // Vespertine in every interface language
 
     init(_ paths: Paths) {
@@ -51,6 +61,8 @@ final class Assets {
             let bg = sampleColor(frame, at: CGRect(x: 110, y: 14, width: 60, height: 24))
             sidebarColor[cue.recording] = Color(.sRGB, red: bg.r, green: bg.g, blue: bg.b)
             sidebars[cue.recording] = keyedSidebar(frame, background: bg)
+            let chrome = sampleColor(frame, at: CGRect(x: 76, y: 2, width: 8, height: 28))
+            chromeColor[cue.recording] = Color(.sRGB, red: chrome.r, green: chrome.g, blue: chrome.b)
         }
     }
 

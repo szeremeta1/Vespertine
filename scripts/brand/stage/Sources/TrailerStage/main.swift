@@ -69,7 +69,7 @@ final class Frame: ObservableObject {
     @Published var t: Double = 0
     @Published var video: [String: CGImage] = [:]
     /// The Spatial Audio recording's channel meters, with a meter-like release.
-    @Published var meters: [Double] = Array(repeating: 0, count: 6)
+    @Published var meters: [Double] = Array(repeating: 0, count: Meters.columns.count)
     /// The frame number shown under the stage for the streamed capture (see Capture.swift).
     @Published var stamp: Int = Stamp.none
 }
@@ -141,7 +141,9 @@ final class Renderer {
         }
         var meters = frame.meters
         if let key = Cue.for(.spatial)?.key, let image = video[key] {
-            meters = zip(Meters.levels(image), meters).map { max($0, $1 * 0.88) }
+            // The release is 0.88 a frame at 60 fps, and the same per second at any other rate.
+            let release = pow(0.88, 60 / options.fps)
+            meters = zip(Meters.levels(image), meters).map { max($0, $1 * release) }
         }
         var tx = Transaction(); tx.disablesAnimations = true
         withTransaction(tx) {
