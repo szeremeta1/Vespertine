@@ -885,7 +885,7 @@ struct EndScene: View {
                 .blur(radius: CGFloat(1 - clamp01(logoIn)) * 16)
                 .opacity(clamp01(logoIn * 1.4))
                 .offset(y: -g.H * g.pick(0.07, square: 0.07, tall: 0.1))
-            Text("Version 0.14.2. Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
+            Text("Free and open source for macOS.").font(Font(BrandFont.sans(small, 400))).foregroundStyle(Brand.ash)
                 .arrive(t, at: s + 0.9)
                 .offset(y: g.H * g.pick(0.1, square: 0.08, tall: 0.03))
             Text("vespertineapp.com").font(Font(BrandFont.mono(small * 0.72, 500))).kerning(small * 0.07)
