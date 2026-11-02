@@ -370,7 +370,14 @@ struct AtmosVisualizerTests {
     @Test("A reader that fails mid-stream ends the decoder with the error recorded, keeping what it had stored")
     func readerFailureIsRecorded() throws {
         let reader = FakeBedReader(frames: 8192, buffers: 10, failAfter: 3)
-        let decoder = SystemBedDecoder(makeReader: { _ in reader })
+        // The second start gets a reader of its own that doesn't fail. (Handing the failed reader out again made it fail
+        // at once on the new run's thread, which under load could happen before the check below: a race in the test.)
+        let second = FakeBedReader(frames: 8192, buffers: 10)
+        let made = Locked(0)   // the second start comes after the first run has ended, so the two calls never overlap
+        let decoder = SystemBedDecoder(makeReader: { _ in
+            made.value += 1
+            return made.value == 1 ? reader : second
+        })
         decoder.start(at: 0) { 100 }
         defer { decoder.stop() }
         try Self.waitForBed(decoder, through: 3 * 8192, timeout: 20)
@@ -381,6 +388,8 @@ struct AtmosVisualizerTests {
         #expect(reader.cancelled)
         // A new start clears the error and decodes again.
         decoder.start(at: 0) { 100 }
+        #expect(decoder.error == nil)
+        try Self.waitForBed(decoder, through: 10 * 8192, timeout: 20)
         #expect(decoder.error == nil)
     }
 

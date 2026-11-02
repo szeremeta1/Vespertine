@@ -1467,6 +1467,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         if boundary?.after != decoding.item.id, settings.transitions.enabled { planBoundaryIfDue(session, decoding) }
         // An overlap can write a chunk of the mix and what's left of the incoming song's last chunk.
         guard session.writableFrames >= Int(chunkFrames) * (crossfade != nil ? 2 : 1) else { return false }
+        // An incoming song still waiting on a share holds the outgoing one back (see `Crossfade.incomingReady`).
+        if let crossfade, !crossfade.incomingReady(first: decoding.framesProduced, frames: Int(chunkFrames)) { return false }
         let first = decoding.framesProduced
         let chunk = decoding.convertChunk()
         let frames = chunk.frames
@@ -1498,7 +1500,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// The outgoing song ended inside its overlap: the rest of the overlap, a chunk at a time, then the hand-over.
     private func finishCrossfade(_ crossfade: Crossfade, session: OutputSession) -> Bool {
-        guard session.writableFrames >= Int(chunkFrames) * 2 else { return false }
+        guard session.writableFrames >= Int(chunkFrames) * 2,
+              crossfade.incomingReady(first: crossfade.start + UInt64(crossfade.mixed), frames: Int(chunkFrames)) else { return false }
         crossfade.finishAlone(maxFrames: Int(chunkFrames)) { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }
         if crossfade.done { handOver(crossfade, session: session) }
         return true

@@ -139,6 +139,19 @@ final class Crossfade {
         return startsHere
     }
 
+    /// Whether the incoming song has converted what the overlap frames of an outgoing chunk at `first` (at most `frames`
+    /// long) need, converting more of it first. False only while its read-ahead decoder waits on a share
+    /// (`ReadAheadDecoder.Starved`): the engine then holds the outgoing chunk back and tries again, so a late incoming
+    /// song is never mixed in with a hole where its samples should be (the frames come later, in their place). Only
+    /// when more is converted changes; the mix is the same frames either way.
+    func incomingReady(first: UInt64, frames: Int) -> Bool {
+        let before = start > first ? min(frames, Int(start - first)) : 0
+        let need = min(frames - before, length - mixed)
+        guard need > 0 else { return true }
+        fillPending(need)
+        return incoming.finished || (pending.count - pendingOffset) / channels >= need
+    }
+
     /// Hands mixed frames on: as they are for a plain crossfade; through the limiter (which holds a few milliseconds
     /// back to see what's coming) and then dither for Smart Mix, all of it once the overlap is complete.
     private func emit(_ frames: UnsafeMutablePointer<Float>, frames count: Int, write: (UnsafePointer<Float>, Int) -> Void) {

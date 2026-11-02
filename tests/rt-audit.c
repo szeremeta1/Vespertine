@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <stdatomic.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -1031,9 +1032,26 @@ static void test_concurrent_fade(void) {
     nrt_ring_destroy(ring);
 }
 
+// The watchdog that ends a hung run: 30 s on an idle machine, scaled with the load per core (the larger of the 1- and
+// 5-minute averages, as the load can climb during a run) and capped at 10 minutes. ThreadSanitizer on a busy machine
+// needs far more than 30 s for the same work (a load of 100 on 8 cores took about 50-100 s), and a fixed 30 s alarm
+// made the audit fail there with nothing wrong. RT_AUDIT_WATCHDOG=<seconds> sets it outright.
+static unsigned watchdog_seconds(void) {
+    const char *forced = getenv("RT_AUDIT_WATCHDOG");
+    if (forced && atoi(forced) > 0) return (unsigned)atoi(forced);
+    double load[2] = {0, 0};
+    long cores = sysconf(_SC_NPROCESSORS_ONLN);
+    if (cores < 1) cores = 1;
+    double perCore = getloadavg(load, 2) == 2 ? fmax(load[0], load[1]) / (double)cores : 1;
+    double seconds = 30 * fmax(1, perCore);
+    return (unsigned)fmin(600, ceil(seconds));
+}
+
 int main(void) {
     capture_audit();
-    alarm(30);
+    const unsigned watchdog = watchdog_seconds();
+    fprintf(stderr, "rt-audit: watchdog %u s\n", watchdog);
+    alarm(watchdog);
     concurrent_ring = nrt_ring_create(256, 1);
     assert(concurrent_ring);
     pthread_t thread;

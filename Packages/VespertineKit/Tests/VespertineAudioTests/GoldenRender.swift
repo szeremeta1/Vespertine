@@ -386,6 +386,9 @@ enum GoldenRender {
             }
             // fillWithTransitions
             while Int(nrt_ring_writable(s.ring)) < Int(chunkFrames) * (crossfade != nil ? 2 : 1) { s.render(upTo: device.bufferFrames) }
+            if let cf = crossfade, !cf.incomingReady(first: a.framesProduced, frames: Int(chunkFrames)) {
+                throw Failure(description: "the incoming song waited on a share (nothing streams here)")
+            }
             let first = a.framesProduced
             let chunk = a.convertChunk()
             let channels = a.path.plan.channels
