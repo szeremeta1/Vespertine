@@ -50,3 +50,8 @@ ls -l
 # Not made here: xhe-stereo.m4a (build xhe-aac-enc from github.com/mstorsjo/fdk-aac with -DBUILD_PROGRAMS=ON, then
 #   ffmpeg -i stereo24.wav -c:a pcm_s16le stereo16.wav; xhe-aac-enc -r 64000 -l -23 stereo16.wav x.loas; afconvert -f m4af -d 0 x.loas xhe-stereo.m4a)
 # and tak-excerpt.tak (the first 74,493 bytes of FATE's tak/luckynight-partial.tak: its header and four whole frames).
+# MQA stand-ins (no MQA audio: a tag, and the one synchronisation pattern the detector looks for):
+cp stereo24.flac mqa-tagged.flac
+metaflac --set-tag="MQAENCODER=MQAEncode v1.1, 2.4.2+uuid" --set-tag="ORIGINALSAMPLERATE=96000" mqa-tagged.flac
+# python3 docs/fixtures/make-mqa-sync-fixture.py mqa-sync.s24 && ffmpeg -f s24le -ar 48000 -ac 2 -i mqa-sync.s24 -c:a flac mqa-sync.flac
+# PCM WavPack: wavpack -y stereo24.wav -o pcm-stereo24.wv (WavPack 5.8.1)
