@@ -164,6 +164,7 @@ public enum LoopbackError: LocalizedError, Sendable {
     case noInput(String)
     case inputBlocked(String)
     case inputFormat(String)
+    case inputRate(String, Double)
     case permissionDenied
 
     public var errorDescription: String? {
@@ -175,7 +176,8 @@ public enum LoopbackError: LocalizedError, Sendable {
         case .noInput(let name): return "\(name) has no input to record from."
         case .inputBlocked(let name):
             return "macOS didn't start recording from \(name). It is usually waiting for microphone permission that nobody can answer: allow the app that runs the test (Vespertine, or Terminal for vespertine-probe) in System Settings › Privacy & Security › Microphone, then run it again."
-        case .inputFormat(let name): return "\(name)'s input can't be set to Float32 at the test's rate."
+        case .inputFormat(let name): return "\(name)'s input has no sample format at this rate that Vespertine can record (linear PCM, 16 to 32 bits, or Float32/Float64)."
+        case .inputRate(let name, let rate): return "\(name) wouldn't switch to \(SampleRate.format(rate)) kHz for the recording."
         case .permissionDenied:
             return "Vespertine isn't allowed to record audio input, so nothing can be recorded from the loopback device. Allow it in System Settings › Privacy & Security › Microphone."
         }
@@ -272,39 +274,144 @@ final class LoopbackRecorder {
     /// left allocated and the HAL isn't touched again.
     private(set) var blocked = false
 
-    init(device: AudioObjectID, rate: Double, maxChannels: Int = 8) throws {
+    /// The rate the input records at (the rate asked for, or the one the planner chose).
+    let captureRate: Double
+    /// The input device's rate before it was moved to `captureRate`, put back by `restore()`.
+    private var changedRate: Double?
+
+    /// Records at exactly `rate`: for a loopback device that is already at it. Any readable sample format is accepted.
+    convenience init(device: AudioObjectID, rate: Double, maxChannels: Int = 8) throws {
+        try self.init(device: device, outputRate: rate, fixedRate: true, onlyRate: nil, maxChannels: maxChannels)
+    }
+
+    /// Records at a rate the input supports, whatever the output runs at: `outputRate` only decides between rates the
+    /// input offers. The input's own rate is moved to it for the recording (restored by `restore()`).
+    /// `onlyRate`: record at exactly that rate (the one `plan` chose earlier), moving the input to it if it offers it.
+    convenience init(measuring device: AudioObjectID, outputRate: Double, onlyRate: Double? = nil, sharesDeviceWithOutput: Bool,
+                     maxChannels: Int = 8) throws {
+        try self.init(device: device, outputRate: outputRate, fixedRate: sharesDeviceWithOutput, onlyRate: onlyRate, maxChannels: maxChannels)
+    }
+
+    /// What Core Audio says the input offers (read-only).
+    static func describe(_ device: AudioObjectID, fixedRate: Double?, onlyRate: Double? = nil) throws -> CaptureInputDescription {
+        let name = HAL.getString(device, .global(kAudioObjectPropertyName)) ?? "The input"
+        let streams = (try? HAL.getArray(device, .input(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? []
+        guard !streams.isEmpty else { throw LoopbackError.noInput(name) }
+        let nominal = (try? HAL.get(device, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+        let described: [CaptureInputDescription.Stream] = try streams.map { stream in
+            guard let current = try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) else {
+                throw LoopbackError.inputFormat(name)
+            }
+            let available = (try? HAL.getArray(stream, .global(kAudioStreamPropertyAvailableVirtualFormats), of: AudioStreamRangedDescription.self)) ?? []
+            return .init(current: CaptureStreamFormat(current), available: available.map {
+                var f = CaptureStreamFormat($0.mFormat)
+                f.rateMin = $0.mSampleRateRange.mMinimum
+                f.rateMax = $0.mSampleRateRange.mMaximum
+                return f
+            })
+        }
+        var rates = DeviceQuery.nominalRates(device)
+        if let onlyRate { rates = rates.filter { abs($0 - onlyRate) < 0.5 } }
+        if let fixedRate {
+            return CaptureInputDescription(name: name, nominalRate: fixedRate, supportedRates: [fixedRate], streams: described, sharesDeviceWithOutput: true)
+        }
+        return CaptureInputDescription(name: name, nominalRate: nominal, supportedRates: rates.isEmpty && onlyRate == nil ? [nominal] : rates, streams: described)
+    }
+
+    /// The plan for `device` without touching it.
+    static func plan(for device: AudioObjectID, outputRate: Double, sharesDeviceWithOutput: Bool) throws -> CaptureInputPlan {
+        do { return try CaptureInputPlanner.plan(describe(device, fixedRate: sharesDeviceWithOutput ? outputRate : nil), outputRate: outputRate) }
+        catch let error as CaptureInputError { throw RoomHardwareError(error.errorDescription ?? "") }
+    }
+
+    /// What `prepare` set up on the input.
+    private struct Setup {
+        var rate: Double
+        var kinds: [CaptureSampleKind]
+        var channels: Int
+        var formats: [(AudioStreamID, AudioStreamBasicDescription)] = []
+        var changedRate: Double?
+
+        func undo(_ device: AudioObjectID) {
+            for (stream, format) in formats { try? HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), format) }
+            if let changedRate { try? DeviceControl.setNominalRate(changedRate, on: device) }
+        }
+    }
+
+    /// Plans the recording and puts the input in the planned rate and format. Puts it back if anything fails.
+    private static func prepare(_ device: AudioObjectID, name: String, outputRate: Double, fixedRate: Bool, onlyRate: Double?) throws -> Setup {
+        let description = try describe(device, fixedRate: fixedRate ? outputRate : nil, onlyRate: onlyRate)
+        let plan: CaptureInputPlan
+        do { plan = try CaptureInputPlanner.plan(description, outputRate: outputRate) }
+        catch let error as CaptureInputError {
+            // The loopback test asks for exactly one rate, and says what it couldn't set.
+            if fixedRate { throw LoopbackError.inputFormat(name) }
+            throw RoomHardwareError(error.errorDescription ?? "")
+        }
+        let rate = plan.captureRate
+        let streams = (try? HAL.getArray(device, .input(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? []
+        var setup = Setup(rate: rate, kinds: plan.kinds, channels: 0)
+        do {
+            if plan.changesNominalRate {
+                setup.changedRate = description.nominalRate
+                do { try DeviceControl.setNominalRate(rate, on: device) } catch { setup.changedRate = nil; throw LoopbackError.inputRate(name, rate) }
+            }
+            for (i, stream) in streams.enumerated() {
+                guard var current = try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) else {
+                    throw LoopbackError.inputFormat(name)
+                }
+                // The stream follows the device's rate, but may have been left on a format that isn't the planned one.
+                if let wanted = plan.streamChanges[i], !(CaptureStreamFormat(current).isFloat32 && abs(current.mSampleRate - rate) < 0.5) {
+                    var change = current
+                    change.mSampleRate = rate
+                    // Take the HAL's own description of the format (flags, packet sizes), at the rate chosen.
+                    let available = (try? HAL.getArray(stream, .global(kAudioStreamPropertyAvailableVirtualFormats), of: AudioStreamRangedDescription.self)) ?? []
+                    if let match = available.first(where: {
+                        let f = CaptureStreamFormat($0.mFormat)
+                        return f.sampleKind == wanted.sampleKind && f.channels == wanted.channels && f.interleaved == wanted.interleaved
+                            && $0.mSampleRateRange.mMinimum - 0.5 <= rate && rate <= $0.mSampleRateRange.mMaximum + 0.5
+                    }) { change = match.mFormat; change.mSampleRate = rate }
+                    do {
+                        try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), change)
+                        setup.formats.append((stream, current))
+                        current = change
+                    } catch {
+                        // Not settable (an aggregate, say): fine when it is readable as it is.
+                        guard CaptureStreamFormat(current).sampleKind != nil, abs(current.mSampleRate - rate) < 0.5 else { throw LoopbackError.inputFormat(name) }
+                    }
+                }
+                guard abs(current.mSampleRate - rate) < 0.5, let read = CaptureStreamFormat(current).sampleKind else { throw LoopbackError.inputFormat(name) }
+                setup.kinds[i] = read
+                setup.channels += Int(current.mChannelsPerFrame)
+            }
+        } catch {
+            setup.undo(device)
+            throw error
+        }
+        return setup
+    }
+
+    private init(device: AudioObjectID, outputRate: Double, fixedRate: Bool, onlyRate: Double?, maxChannels: Int) throws {
         self.device = device
         let name = HAL.getString(device, .global(kAudioObjectPropertyName)) ?? "The input"
         self.name = name
-        let streams = (try? HAL.getArray(device, .input(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? []
-        guard !streams.isEmpty else { throw LoopbackError.noInput(name) }
-        // The IOProc reads Float32: put each input stream on Float32 at the test's rate.
-        var total = 0
-        for stream in streams {
-            guard var current = try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) else {
-                throw LoopbackError.inputFormat(name)
-            }
-            if !Self.isFloat32(current, rate: rate) {
-                let available = (try? HAL.getArray(stream, .global(kAudioStreamPropertyAvailableVirtualFormats), of: AudioStreamRangedDescription.self)) ?? []
-                guard var float = available.first(where: {
-                    Self.isFloat32($0.mFormat, rate: nil) && $0.mFormat.mChannelsPerFrame == current.mChannelsPerFrame
-                        && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
-                })?.mFormat else { throw LoopbackError.inputFormat(name) }
-                float.mSampleRate = rate
-                changedFormats.append((stream, current))
-                do { try HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), float) } catch { throw LoopbackError.inputFormat(name) }
-                current = float
-            }
-            total += Int(current.mChannelsPerFrame)
-        }
-        channels = max(1, min(total, maxChannels))
+        let setup = try Self.prepare(device, name: name, outputRate: outputRate, fixedRate: fixedRate, onlyRate: onlyRate)
+        captureRate = setup.rate
+        changedRate = setup.changedRate
+        changedFormats = setup.formats
+        channels = max(1, min(setup.channels, maxChannels))
         let maxSlice = (try? HAL.get(device, .global(kAudioDevicePropertyBufferFrameSizeRange), initial: AudioValueRange()))
             .map { UInt32(min(max($0.mMaximum, 4096), 65_536)) } ?? 16_384
-        guard let ring = nrt_ring_create(UInt32(max(rate, 44_100) * 4), UInt32(channels)) else { throw CoreAudioError(-1, "allocate capture ring") }
+        guard let ring = nrt_ring_create(UInt32(max(setup.rate, 44_100) * 4), UInt32(channels)) else {
+            setup.undo(device)
+            throw CoreAudioError(-1, "allocate capture ring")
+        }
         guard let capture = nrt_capture_create(ring, maxSlice) else {
             nrt_ring_destroy(ring)
+            setup.undo(device)
             throw CoreAudioError(-1, "allocate capture")
         }
+        for (i, kind) in setup.kinds.enumerated() { nrt_capture_set_kind(capture, UInt32(i), kind.rawValue) }
         self.ring = ring
         self.capture = capture
         interleaved = [Float](repeating: 0, count: 8192 * channels)
@@ -384,6 +491,8 @@ final class LoopbackRecorder {
         guard !blocked else { return }
         for (stream, format) in changedFormats { try? HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), format) }
         changedFormats = []
+        if let rate = changedRate { try? DeviceControl.setNominalRate(rate, on: device) }
+        changedRate = nil
     }
 
     deinit {

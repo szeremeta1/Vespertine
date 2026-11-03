@@ -5,6 +5,7 @@
 //
 
 import CoreAudio
+import CVespertineRT
 import Foundation
 import Testing
 @testable import VespertineAudio
@@ -187,5 +188,52 @@ struct RoomCaptureInputTests {
         let assessment = RoomCaptureAssessment.assess(recording, limits: RoomQualityLimits())
         #expect(assessment.accepted, "\(assessment.rejections)")
         #expect(abs(assessment.metrics.driftPPM ?? 1_000) < 50, "drift \(assessment.metrics.driftPPM ?? .nan) ppm")
+    }
+
+    // MARK: The capture's conversion to Float32
+
+    /// Runs the real capture IOProc on one buffer of `bytes` and returns the interleaved Float32 it wrote to the ring.
+    private func capture(kind: CaptureSampleKind, channels: UInt32, frames: Int, bytes: [UInt8]) throws -> [Float] {
+        let ring = try #require(nrt_ring_create(4_096, channels))
+        defer { nrt_ring_destroy(ring) }
+        let capture = try #require(nrt_capture_create(ring, 1_024))
+        defer { nrt_capture_destroy(capture) }
+        nrt_capture_set_kind(capture, 0, kind.rawValue)
+        var data = bytes
+        var out = [Float](repeating: -9, count: frames * Int(channels))
+        data.withUnsafeMutableBytes { raw in
+            var list = AudioBufferList(mNumberBuffers: 1, mBuffers: AudioBuffer(mNumberChannels: channels, mDataByteSize: UInt32(raw.count), mData: raw.baseAddress))
+            var now = AudioTimeStamp(), input = AudioTimeStamp(), output = AudioTimeStamp(), unused = AudioBufferList()
+            _ = nrt_capture_ioproc(1, &now, &list, &input, &unused, &output, UnsafeMutableRawPointer(capture))
+        }
+        #expect(nrt_ring_read(ring, &out, UInt32(frames)) == UInt32(frames))
+        return out
+    }
+
+    private func le(_ values: [Int32], bytes: Int) -> [UInt8] {
+        values.flatMap { v in (0..<bytes).map { UInt8(truncatingIfNeeded: UInt32(bitPattern: v) >> (8 * UInt32($0))) } }
+    }
+
+    @Test("The capture converts 16-, 24- and 32-bit integer and 64-bit float samples to Float32")
+    func ioprocConverts() throws {
+        let i16 = try capture(kind: .int16, channels: 1, frames: 4, bytes: le([0, 16_384, -32_768, 32_767], bytes: 2))
+        #expect(i16 == [0, 0.5, -1, Float(32_767) / 32_768])
+        let i24 = try capture(kind: .int24, channels: 1, frames: 4, bytes: le([0, 4_194_304, -8_388_608, 8_388_607], bytes: 3))
+        #expect(i24 == [0, 0.5, -1, Float(8_388_607) / 8_388_608])
+        let i32 = try capture(kind: .int32, channels: 1, frames: 3, bytes: le([0, 1 << 30, Int32.min], bytes: 4))
+        #expect(i32 == [0, 0.5, -1])
+        var doubles: [UInt8] = []
+        for v in [0.25, -0.5] as [Double] { withUnsafeBytes(of: v) { doubles += $0 } }
+        #expect(try capture(kind: .float64, channels: 1, frames: 2, bytes: doubles) == [0.25, -0.5])
+        var floats: [UInt8] = []
+        for v in [0.125, -0.75] as [Float] { withUnsafeBytes(of: v) { floats += $0 } }
+        #expect(try capture(kind: .float32, channels: 1, frames: 2, bytes: floats) == [0.125, -0.75])
+    }
+
+    @Test("Interleaved integer channels stay in order")
+    func ioprocInterleaves() throws {
+        // Two channels, three frames: L = 0.5, 0.25, 0 ; R = -0.5, -0.25, -1.
+        let out = try capture(kind: .int16, channels: 2, frames: 3, bytes: le([16_384, -16_384, 8_192, -8_192, 0, -32_768], bytes: 2))
+        #expect(out == [0.5, -0.5, 0.25, -0.25, 0, -1])
     }
 }

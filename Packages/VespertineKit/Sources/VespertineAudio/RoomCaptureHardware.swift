@@ -39,20 +39,35 @@ final class RoomStimulusPlayer: @unchecked Sendable {
     private var procID: AudioDeviceIOProcID?
     private let queue = DispatchQueue(label: "org.szeremeta.vespertine.room-player", qos: .userInteractive)
 
+    /// `rate` is the rate the stimulus was made at (the measurement's, which is the microphone's). The output keeps the
+    /// rate it runs at, and the stimulus is converted to it here, before anything plays.
     init(device: AudioObjectID, stimulus: RoomStimulus, rate: Double) throws {
         self.device = device
         channels = stimulus.tracks.map(\.channel)
-        count = stimulus.tracks.map(\.samples.count).min() ?? 0
         let name = HAL.getString(device, .global(kAudioObjectPropertyName)) ?? "The output"
         let actual = (try? HAL.get(device, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
-        // Changing the device's rate would change the listener's setup, so the measurement refuses instead.
-        guard abs(actual - rate) < 0.5 else { throw CoreAudioError(-1, "\(name) runs at \(Int(actual)) Hz, the measurement needs \(Int(rate)) Hz; set it in Audio MIDI Setup. Output") }
+        guard actual >= 8_000 else { throw RoomHardwareError("\(name)'s sample rate couldn't be read.") }
+        // The IOProc writes Float32; every output stream has to be on it.
+        for stream in (try? HAL.getArray(device, .output(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? [] {
+            guard let format = try? HAL.get(stream, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()),
+                  CaptureStreamFormat(format).isFloat32 else {
+                throw RoomHardwareError("\(name)'s output isn't on Float32 (set it in Audio MIDI Setup).")
+            }
+        }
+        var converted: [[Float]] = []
+        for track in stimulus.tracks {
+            guard let samples = RoomStimulusRate.convert(track.samples, from: rate, to: actual) else {
+                throw RoomHardwareError("The stimulus couldn't be converted to \(Int(actual)) Hz for \(name).")
+            }
+            converted.append(samples)
+        }
+        count = converted.map(\.count).min() ?? 0
         let configured = try Self.channelCount(device)
         let highest = channels.max() ?? 0
-        guard highest < configured else { throw CoreAudioError(-1, "\(name) has \(configured) output channels, not \(highest + 1). Output") }
+        guard highest < configured else { throw RoomHardwareError("\(name) has \(configured) output channels, not \(highest + 1).") }
         samples = .allocate(capacity: max(1, count * channels.count))
-        for (t, track) in stimulus.tracks.enumerated() {
-            (samples + t * count).initialize(from: track.samples, count: count)
+        for (t, track) in converted.enumerated() {
+            (samples + t * count).initialize(from: track, count: count)
         }
         position.initialize(to: 0)
     }
@@ -122,15 +137,31 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
 
     public init() {}
 
+    /// The rate to measure at: one the microphone supports (its own, never the output's), so a 48 kHz USB microphone can
+    /// measure through a DAC at 176.4 kHz. Read-only; the output's rate is not touched.
+    public static func measurementRate(inputDevice: UInt32, outputDevice: UInt32) throws -> Double {
+        let outputRate = (try? HAL.get(outputDevice, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+        return try LoopbackRecorder.plan(for: inputDevice, outputRate: outputRate, sharesDeviceWithOutput: inputDevice == outputDevice).captureRate
+    }
+
     public func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws {
         lock.lock(); defer { lock.unlock() }
         stopLocked()
         let rate = request.layout.sampleRate
-        let recorder = try LoopbackRecorder(device: request.inputDevice, rate: rate)
-        guard request.inputChannel < recorder.channels else {
-            throw CoreAudioError(-1, "The input has \(recorder.channels) channels, not \(request.inputChannel + 1). Input")
+        // The microphone records at a rate it supports (the layout's, chosen by `measurementRate`); the output keeps its own.
+        let recorder = try LoopbackRecorder(measuring: request.inputDevice, outputRate: rate, onlyRate: rate, sharesDeviceWithOutput: request.inputDevice == request.outputDevice,
+                                            maxChannels: min(64, max(8, request.inputChannel + 1)))
+        guard abs(recorder.captureRate - rate) < 0.5 else {
+            recorder.restore()
+            throw RoomHardwareError("The microphone records at \(Int(recorder.captureRate)) Hz, not the measurement's \(Int(rate)) Hz.")
         }
-        let player = try RoomStimulusPlayer(device: request.outputDevice, stimulus: stimulus, rate: rate)
+        guard request.inputChannel < recorder.channels else {
+            recorder.restore()
+            throw RoomHardwareError("The input has \(recorder.channels) channels, not \(request.inputChannel + 1).")
+        }
+        let player: RoomStimulusPlayer
+        do { player = try RoomStimulusPlayer(device: request.outputDevice, stimulus: stimulus, rate: rate) }
+        catch { recorder.restore(); throw error }
         self.recorder = recorder
         self.player = player
         channel = request.inputChannel

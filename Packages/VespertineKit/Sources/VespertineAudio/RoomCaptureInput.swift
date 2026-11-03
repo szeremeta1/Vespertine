@@ -118,6 +118,14 @@ public struct CaptureInputDescription: Equatable, Sendable {
     }
 }
 
+/// A hardware problem that reads as a sentence (no Core Audio code behind it).
+public struct RoomHardwareError: Error, LocalizedError, Equatable, CustomStringConvertible, Sendable {
+    public let message: String
+    public init(_ message: String) { self.message = message }
+    public var errorDescription: String? { message }
+    public var description: String { message }
+}
+
 public enum CaptureInputError: Error, Equatable, LocalizedError {
     case noStreams(String)
     /// The input has no rate the measurement can use (it needs room for a 20 kHz sweep).
@@ -177,7 +185,7 @@ public enum CaptureInputPlanner {
         guard !input.streams.isEmpty else { throw CaptureInputError.noStreams(input.name) }
         // An input that is also the output keeps the rate it has: moving it would change the listener's setup.
         let rates = input.sharesDeviceWithOutput ? [input.nominalRate] : input.supportedRates
-        let candidates = [outputRate]  // LEGACY (pre-fix) policy, to show the tests fail first
+        let candidates = input.sharesDeviceWithOutput ? [input.nominalRate] : Self.candidates(supported: rates, nominal: input.nominalRate, outputRate: outputRate)
         guard !candidates.isEmpty else { throw CaptureInputError.noUsableRate(input.name, offered: input.supportedRates) }
         var lastFormatFailure: Double?
         for rate in candidates {
@@ -195,12 +203,14 @@ public enum CaptureInputPlanner {
             let atRate = stream.available.filter { $0.supports(rate: rate) && $0.channels == stream.current.channels && $0.sampleKind != nil }
             let best = atRate.min { $0.preference < $1.preference }
             let current = stream.current
-            let currentReadable = current.sampleKind != nil
+            // Readable as it is: a format the capture knows, already at this rate (or with no list of others to go by,
+            // when the stream follows the device's rate on its own).
+            let readableNow = current.sampleKind != nil && (current.supports(rate: rate) || stream.available.isEmpty)
             // Float32 is read without conversion, so it is worth changing to when the stream isn't on it already.
-            if let best, best.isFloat32, !current.isFloat32 {
+            if let best, best.isFloat32, !(current.isFloat32 && current.supports(rate: rate)) {
                 changes[i] = best
                 kinds.append(.float32)
-            } else if currentReadable {
+            } else if readableNow {
                 kinds.append(current.sampleKind!)
             } else if let best {
                 changes[i] = best

@@ -181,8 +181,17 @@ final class RoomMeasureModel {
         guard output.channels >= needed else {
             return fail(String(localized: "\(output.name) has \(output.channels) output channel(s); this measurement needs \(needed)."))
         }
-        let rate = output.nominalRate
-        guard rate >= 8_000 else { return fail(String(localized: "Couldn't read the sample rate of \(output.name).")) }
+        let outputRate = output.nominalRate
+        guard outputRate >= 8_000 else { return fail(String(localized: "Couldn't read the sample rate of \(output.name).")) }
+        // The measurement runs at a rate the microphone supports (a UMIK-1 only does 48 kHz), not at the output's: the
+        // output keeps its rate and the stimulus is converted to it.
+        let rate: Double
+        if simulate {
+            rate = outputRate
+        } else {
+            do { rate = try CoreAudioRoomDevice.measurementRate(inputDevice: mic.id, outputDevice: output.id) }
+            catch { return fail(String(localized: "\(mic.name) can't be recorded for this measurement: \(error.localizedDescription)")) }
+        }
 
         // Calibration file.
         let path = (calibrationPath as NSString).expandingTildeInPath
@@ -220,7 +229,8 @@ final class RoomMeasureModel {
         steps = Self.plan(speakers: speakers, positions: positions).map { StepRow(step: $0, status: .pending) }
         deviceLines = [
             String(localized: "Microphone: \(mic.name) (serial \(serial), \(Int(cal.points.count)) calibration points, mic pointing up)"),
-            String(localized: "Output: \(output.name) at \(Int(rate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
+            String(localized: "Output: \(output.name) at \(Int(outputRate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
+            String(localized: "Measuring at \(Int(rate)) Hz, the rate the microphone records at; the output keeps its own rate."),
             String(localized: "Saving to \((folder.path as NSString).abbreviatingWithTildeInPath)"),
         ]
         try? "\(folder.path)\n".write(to: root.appendingPathComponent("last-run.txt"), atomically: true, encoding: .utf8)
