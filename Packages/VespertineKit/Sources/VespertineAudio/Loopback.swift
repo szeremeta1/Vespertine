@@ -511,13 +511,16 @@ public final class LoopbackRunner: @unchecked Sendable {
         s.equalizers = [:]
         s.integerMode = c.integerMode
         s.matchSixteenBit = c.matchSixteenBit
+        // No crossfades or fades: the capture must be the signal, sample for sample.
+        s.transitions = TransitionSettings()
         return s
     }
 
     static func describe(_ s: EngineSettings) -> [String: String] {
         ["Exclusive access": s.exclusive ? "on" : "off", "Rate": "match source", "Digital volume": "off", "Equalizer": "off",
          "ReplayGain": "off", "Spatial Audio": "off", "Bitstream": "off", "DoP": "off", "Downmix": "none (stereo to stereo)",
-         "Integer mode": s.integerMode ? "on" : "off", "Match 16-bit sources": s.matchSixteenBit ? "on" : "off"]
+         "Integer mode": s.integerMode ? "on" : "off", "Match 16-bit sources": s.matchSixteenBit ? "on" : "off",
+         "Transitions": s.transitions.enabled ? "on" : "off"]
     }
 
     func runCase(_ c: LoopbackCase, mode: LoopbackMode) -> LoopbackCaseResult {

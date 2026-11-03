@@ -74,12 +74,13 @@ struct NetworkTests {
         #expect(stuck.value == "fallback")
         #expect(stuck.after < 1.5)
         #expect(await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" } == "fallback")
-        // Work that finishes in time returns its own result.
-        #expect(await NetworkVolume.blocking(timeout: 5, otherwise: 0) { 42 } == 42)
+        // Work that finishes in time returns its own result. A long deadline: the work waits for a GCD thread, and
+        // `deadlineWithAFullPool`, running alongside, holds them all for a moment (5 s ran out on a loaded CI machine).
+        #expect(await NetworkVolume.blocking(timeout: 60, otherwise: 0) { 42 } == 42)
         // Main-actor callers aren't blocked meanwhile: the work runs on a GCD thread.
         let onMain = await MainActor.run { Thread.isMainThread }
         #expect(onMain)
-        let workerIsMain = await NetworkVolume.blocking(timeout: 5, otherwise: true) { Thread.isMainThread }
+        let workerIsMain = await NetworkVolume.blocking(timeout: 60, otherwise: true) { Thread.isMainThread }
         #expect(!workerIsMain)
     }
 

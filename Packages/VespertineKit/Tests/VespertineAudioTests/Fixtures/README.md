@@ -26,3 +26,9 @@ deconvolution over 40 Hz-20 kHz, using only the sweep and the second timing tone
 (80 ms) after playback started. The noise is 0.25 s of the microphone with nothing playing (about -63 dBFS rms, mostly
 below 200 Hz); the start transient is the first 0.25 s of a capture, the thump the UMIK-1 records as its stream starts
 (peak -31 dBFS). No speech or other room sound is audible in them.
+
+`golden-pcm.json`: SHA-256 hashes of what the engine sends the device for each case in `GoldenPCMTests.swift`, with
+the device formats each case ran in. The files those cases play are made by the test itself (integer arithmetic only,
+so the same bytes on every Mac), apart from the Dolby and DTS fixtures above. Recorded with
+`VESPERTINE_GOLDEN_RECORD=1 swift test --filter GoldenPCM`; `recordedOn` names the Mac the float-processing cases
+(resampling, downmix, DSD to PCM, digital volume) were recorded on, the only kind of Mac they're compared on.

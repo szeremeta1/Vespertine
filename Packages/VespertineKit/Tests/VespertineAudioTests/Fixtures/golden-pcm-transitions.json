@@ -1,0 +1,11 @@
+{
+  "cases" : {
+    "crossfade-equalPower" : "a35ddd2f6fcde610d27a29f9595b24c224292d3b11469ebee4a05f32705549a0",
+    "crossfade-linear" : "b13138147fc2fa2464fc0289f39a46e8415eec7a020311e90c7488616a0ed021",
+    "crossfade-sCurve" : "23eabedbd8c458b3ba889333d5774f1dec536f8f6a4544221f4edee9d5a317f6",
+    "dip-44k1-48k" : "32db2ee43e99e5528788c1f1e4afe031dd046ba837dad92d39ddc51f16677f8f",
+    "dithered-24" : "a6ec71b4acc0d2a4759d9f0759223c9e1f1151d355aad860c101f2119edea1e2",
+    "trimmed" : "42e424159a2ebdc0a5deb74dbd6f4af4c50e6f990294e2fa1cfbea479868ef55"
+  },
+  "recordedOn" : "arm64 macOS 27"
+}

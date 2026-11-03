@@ -82,7 +82,7 @@ let package = Package(
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
         .target(name: "VespertineTestSupport", path: "Tests/VespertineTestSupport"),
-        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport",
+        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport", "VespertineLibrary",
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),

@@ -210,6 +210,8 @@ final class AppModel {
     var showFindMusic = false
     var showConnectServer = false
     var showLoopbackTest = false
+    /// The note shown the first time transitions are turned on.
+    var showTransitionsExplainer = false
     /// What a playlist import did, shown in an alert until dismissed.
     var playlistReport: String?
     /// Address to pre-fill in Connect to Server (e.g. to enter a password for an existing share).
@@ -388,6 +390,29 @@ final class AppModel {
             settings.selectedDeviceUID = device.uid
             settings.selectedDevice = OutputIdentity(device)
         }
+    }
+
+    /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
+    /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
+    func setTransitions(_ on: Bool) {
+        guard settings.transitionsFeature else { return }
+        if settings.transitions.setEnabled(on) { showTransitionsExplainer = true }
+        syncEngine()
+    }
+
+    func toggleTransitions() { setTransitions(!settings.transitions.enabled) }
+
+    /// The Settings switch that brings transitions into the app (or removes them). Turning it on starts them on, with
+    /// the note; turning it off puts the playback switch away too and the engine gets today's settings.
+    func setTransitionsFeature(_ on: Bool) {
+        settings.transitionsFeature = on
+        if on {
+            if settings.transitions.setEnabled(true) { showTransitionsExplainer = true }
+        } else {
+            _ = settings.transitions.setEnabled(false)
+            showTransitionsExplainer = false
+        }
+        syncEngine()
     }
 
     /// Push preference changes into the engine and device watchers.

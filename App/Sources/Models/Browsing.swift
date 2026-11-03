@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import VespertineAudio
 import VespertineLibrary
 
 /// The page a filter belongs to.
@@ -342,7 +343,14 @@ extension AppModel {
 
     /// Plays a page in order (`shuffled` false, as a Play button does) or shuffled from a random song.
     func play(_ scope: FilterScope, shuffled: Bool) {
-        player.play(playableTracks(scope), shuffled: shuffled, allowing: allowing(filter(scope), perAlbum: !scope.listsSongs))
+        player.play(playableTracks(scope), shuffled: shuffled, allowing: allowing(filter(scope), perAlbum: !scope.listsSongs),
+                    transitions: playlistTransitions(scope))
+    }
+
+    /// A playlist's own transitions, when `scope` is a playlist that has them.
+    func playlistTransitions(_ scope: FilterScope) -> TransitionOverride? {
+        guard case .sidebar(.playlist(let id)) = scope else { return nil }
+        return library.playlistTransitions[id]
     }
 
     /// Plays albums through a filter (an artist's or a genre's albums from its tile).

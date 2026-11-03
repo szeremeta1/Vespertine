@@ -90,6 +90,8 @@ EQ does not process DoP, system-rendered Atmos, or the experimental receiver bit
 
 Meters and the live spectrum include DoP monitoring. An optional visualizer window (from 0.14.1, off until switched on in Settings) draws the album on a spinning record, a bar spectrum analyzer, a scrolling spectrogram, club lights pulsing with the beat, a stereo goniometer or oscilloscope, analogue VU and PPM meters with true ballistics, a particle field or mirrored bars, in eight colour themes (one of them takes its colours from the cover of whatever is playing), at the display's refresh rate, on any display and in full screen. It reads a copy of what the DAC gets and never changes the sound; see [VISUALIZER.md](VISUALIZER.md). A mini player, menu-bar extra, Now Playing integration and media keys keep playback controls available. Codec-library exceptions become playback errors where possible; a deeper decoder crash still needs a report.
 
+Optional transitions (from 0.15.0, off until switched on in Settings › Playback; off, they aren't in the app and every song plays as before, bit for bit) blend one song into the next: Crossfade (1 to 12 seconds, a curve you choose, silence trimmed or a gap instead), Smart Mix (a blend chosen for each pair from how the songs end and start), and Live Set (one output rate for the session, skips that blend, and beat-matched blends between songs with a steady tempo). Albums, CUE sheets, SACDs, excluded genres and songs read live from a network share always play gapless, and by default a transition never changes the output format; see [TRANSITIONS.md](TRANSITIONS.md).
+
 <p align="center"><img src="screenshots/mini-player.png" width="520" alt="Vespertine's mini player"></p>
 
 ## Network collections

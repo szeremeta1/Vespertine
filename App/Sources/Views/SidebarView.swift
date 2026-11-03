@@ -55,6 +55,7 @@ struct SidebarView: View {
                             if playlist.isSmart { Button("Edit Rules…") { model.smartEditorPlaylist = playlist } }
                             Button("Rename…") { newName = playlist.name.libraryDisplayName; renaming = playlist }
                             playMenu(.playlist(id))
+                            PlaylistTransitionsMenu(playlist: playlist)
                             Button("Export Playlist…") { model.exportPlaylist(playlist) }
                             Divider()
                             Button("Delete Playlist", role: .destructive) { deletingPlaylist = playlist }

@@ -42,6 +42,13 @@ public enum FloatMutants {
             frame >= 1 << 20 ? x * largest24 : x
         },
 
+        // Transitions: a crossfade or fade whose gain isn't brought back to exactly 1 where it ends (Smart Mix, phase 3).
+        sampleMutant("C-FLT-001-tr", ["FLT-001", "FLT-002"],
+                     "a fade's gain left on after its end: from the 4096th frame written on, every sample × (1 − 2^−20)") {
+            x, _, _, frame in
+            frame >= 4096 ? x * (1 - 1.0 / 1_048_576) : x
+        },
+
         // MARK: FLT-002: any finite sample in −1.0 … +1.0 comes out unchanged.
         // These leave every k ÷ 2^23 value alone, so FLT-001 still holds.
 

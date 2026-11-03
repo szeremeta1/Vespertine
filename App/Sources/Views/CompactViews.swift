@@ -31,6 +31,7 @@ struct MiniPlayerView: View {
                     Spacer()
                     HStack(spacing: 14) {
                         TransportControls(compact: true)
+                        TransitionsButton(size: 11)
                         Spacer(minLength: 4)
                         if let path = player.signalPath {
                             Text(path.isResampling
@@ -117,6 +118,7 @@ struct MenuBarView: View {
             }
             Scrubber()
             HStack { Spacer(); TransportControls(compact: true); Spacer() }
+                .overlay(alignment: .trailing) { TransitionsButton(size: 12) }
             Hairline()
             DevicePicker()
                 .padding(-12)
@@ -221,6 +223,7 @@ struct PlaybackSettings: View {
                 Text("Plays a test signal through a virtual loopback device and checks every sample comes back unchanged. A check of Vespertine's software path, not of your DAC.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            TransitionsSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
                     Text("Rendered by macOS (objects)").tag(true)
