@@ -209,7 +209,15 @@ struct ContainerFormatTests {
 
     // MARK: xHE-AAC and APAC
 
-    @Test("xHE-AAC (USAC) in MP4 plays in tune")
+    /// Whether this macOS can open the xHE-AAC fixture at all. Core Audio's USAC support is the system's: GitHub's macos-26
+    /// runner image rejects the file ("format not recognized"), a development Mac plays it, so the tone test only runs where
+    /// the system decoder exists (a failure to open here is the machine's, not the player's).
+    static let systemDecodesXHE: Bool = {
+        guard let url = Bundle.module.url(forResource: "xhe-stereo", withExtension: "m4a", subdirectory: "Fixtures/Formats") else { return false }
+        return (try? AVAudioFile(forReading: url)) != nil
+    }()
+
+    @Test("xHE-AAC (USAC) in MP4 plays in tune", .enabled(if: ContainerFormatTests.systemDecodesXHE))
     func xheAAC() throws {
         let (format, _, audio, _) = try Self.decode("xhe-stereo.m4a")
         #expect(format.encoding == .lossy && format.channels == 2 && format.sampleRate == 48_000)
