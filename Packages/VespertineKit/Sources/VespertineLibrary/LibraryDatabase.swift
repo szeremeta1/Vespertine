@@ -326,6 +326,11 @@ public final class LibraryDatabase: Sendable {
                 t.column("preferredAt", .datetime).notNull()
             }
         }
+        m.registerMigration("v21-borrowed-favorites") { db in
+            // A favorite a bundled album lends to the other copies of a hearted song, as opposed to a copy hearted
+            // itself: it goes when the song stops being bundled or its own favorite goes, so bundling never rewrites hearts.
+            try db.alter(table: "favorite") { t in t.add(column: "borrowed", .boolean).notNull().defaults(to: false) }
+        }
         return m
     }
 }
@@ -706,6 +711,8 @@ public extension LibraryDatabase {
                     try db.execute(sql: """
                         INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT id, ? FROM track WHERE id = ?
                         """, arguments: [date, id])
+                    // Hearting a copy a bundled album had lent a heart makes it a favorite of its own.
+                    try db.execute(sql: "UPDATE favorite SET borrowed = 0 WHERE trackId = ? AND borrowed = 1", arguments: [id])
                 } else {
                     try db.execute(sql: "DELETE FROM favorite WHERE trackId = ?", arguments: [id])
                 }
@@ -716,18 +723,24 @@ public extension LibraryDatabase {
     /// A favorite is the copy that was hearted: a 24/96 vinyl transfer, not the 24/192 download beside it. Where an
     /// album's copies are bundled (AlbumCopyChoice.bundled, or `bundledByDefault` for albums with no choice) the song
     /// is one favorite whichever copy plays, so every copy of a favorite song there is a favorite too, from the date
-    /// the song first was. Returns how many favorite songs there are (present files only; copies of one song count
-    /// once), the number the sidebar shows.
+    /// the song first was. Those other copies' hearts are borrowed: kept apart from the copies hearted themselves and
+    /// dropped again when the album stops being bundled or the song's own favorite goes, so toggling bundling never
+    /// changes which copy was hearted. Returns how many favorite songs there are (present files only; copies of one
+    /// song count once), the number the sidebar shows.
     @discardableResult
     func favoriteEveryVersion(bundledByDefault: Bool = false) throws -> Int {
         try writer.write { db in
             let rows = try Row.fetchAll(db, sql: """
-                SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date
+                SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date, favorite.borrowed AS borrowed
                 FROM favorite JOIN track ON track.id = favorite.trackId WHERE track.isMissing = 0
                 """)
             guard !rows.isEmpty else { return 0 }
-            var dates: [Int64: Date] = [:]
-            for row in rows { dates[row["id"] as Int64] = row["date"] as Date }
+            var dates: [Int64: Date] = [:], own: [Int64: Date] = [:], borrowed: Set<Int64> = []
+            for row in rows {
+                let id: Int64 = row["id"], date: Date = row["date"]
+                dates[id] = date
+                if row["borrowed"] as Bool { borrowed.insert(id) } else { own[id] = date }
+            }
             let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
             let choices = try Self.copyChoices(db)
             let tracks = Self.inAlbumOrder(try Self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
@@ -735,11 +748,15 @@ public extension LibraryDatabase {
             for album in Dictionary(grouping: tracks, by: \.albumKey).values {
                 let bundled = (choices[album[0].albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
                 for song in TrackVersions.group(album) {
-                    guard let date = song.compactMap({ $0.id.flatMap { dates[$0] } }).min() else { continue }
-                    songs += 1
-                    guard bundled else { continue }
-                    for id in song.compactMap(\.id) where dates[id] == nil {
-                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt) VALUES (?, ?)", arguments: [id, date])
+                    let ids = song.compactMap(\.id)
+                    let date = ids.compactMap { own[$0] }.min()
+                    if date != nil { songs += 1 }
+                    for id in ids where borrowed.contains(id) && !(bundled && date != nil) {
+                        try db.execute(sql: "DELETE FROM favorite WHERE trackId = ? AND borrowed = 1", arguments: [id])
+                    }
+                    guard bundled, let date else { continue }
+                    for id in ids where dates[id] == nil {
+                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) VALUES (?, ?, 1)", arguments: [id, date])
                     }
                 }
             }
@@ -1166,7 +1183,7 @@ extension LibraryDatabase {
             try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: """
-                INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT ?, favoritedAt FROM favorite WHERE trackId = ?
+                INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) SELECT ?, favoritedAt, borrowed FROM favorite WHERE trackId = ?
                 """, arguments: [new, old])
             try db.execute(sql: """
                 INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT ?, preferredAt FROM preferredCopy WHERE trackId = ?
