@@ -124,10 +124,48 @@ struct FavoritesTests {
         #expect(try db.favoriteEveryVersion() == 1, "nothing more to add")
         #expect(try db.favoriteTracks().count == 2)
 
-        // No choice for the album: copies are separate, unless bundling is the app's default.
+        // Bundling only reads the hearts: switching back to separate copies leaves exactly the copy that was hearted.
         try db.setCopyChoice(.automatic, albumKey: tracks[0].albumKey)
-        try db.setFavorite(false, trackIDs: [ids[0]])
-        #expect(try db.favoriteEveryVersion() == 1 && db.favoriteTracks().count == 1)
+        #expect(try db.favoriteEveryVersion() == 1)
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[1]], "the 5.1 copy's heart was only borrowed")
+
+        // No choice for the album: copies are separate, unless bundling is the app's default.
         #expect(try db.favoriteEveryVersion(bundledByDefault: true) == 1 && db.favoriteTracks().count == 2)
+        #expect(try db.favoriteEveryVersion() == 1 && Set(try db.favoriteTracks().compactMap(\.id)) == [ids[1]])
+    }
+
+    @Test("A copy hearted on its own stays a favorite when bundling ends; unhearting the real favorite takes the borrowed ones")
+    func borrowedHeartsFollowTheRealOne() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try db.addSource(LibrarySource(path: "/m", mode: .reference))
+        func track(_ folder: String) -> Track {
+            var t = Track.stub(path: "/m/A/B/\(folder)/1.flac")
+            t.sourceId = source.id
+            t.album = "B"; t.albumArtist = "A"; t.trackNumber = 1; t.title = "One"
+            t.channels = folder == "Multichannel" ? 6 : 2
+            return t
+        }
+        let tracks = [track("Multichannel"), track("Stereo")]
+        let ids = try db.writer.write { db in try tracks.map { t -> Int64 in var t = t; try t.insert(db); return t.id! } }
+        let album = tracks[0].albumKey
+        try db.setFavorite(true, trackIDs: [ids[1]])
+        try db.setCopyChoice(.bundled, albumKey: album)
+        try db.favoriteEveryVersion()
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[0], ids[1]])
+
+        // Hearting the borrowed copy for real makes it a favorite of its own.
+        try db.setFavorite(true, trackIDs: [ids[0]])
+        try db.setFavorite(false, trackIDs: [ids[1]])
+        try db.setCopyChoice(.automatic, albumKey: album)
+        #expect(try db.favoriteEveryVersion() == 1)
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[0]])
+
+        // Bundled again, then the only real favorite goes: nothing borrowed stays behind.
+        try db.setCopyChoice(.bundled, albumKey: album)
+        try db.favoriteEveryVersion()
+        #expect(Set(try db.favoriteTracks().compactMap(\.id)) == [ids[0], ids[1]])
+        try db.setFavorite(false, trackIDs: [ids[0]])
+        #expect(try db.favoriteEveryVersion() == 0)
+        #expect(try db.favoriteTracks().isEmpty)
     }
 }
