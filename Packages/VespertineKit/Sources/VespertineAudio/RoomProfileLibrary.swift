@@ -66,6 +66,12 @@ public struct RoomProfileTags: Codable, Hashable, Sendable {
 
     public var isEmpty: Bool { speakers.isEmpty && room.isEmpty && position.isEmpty }
 
+    /// The same labels trimmed and capped, or nil when none is left.
+    var cleaned: RoomProfileTags? {
+        let tags = RoomProfileTags(speakers: speakers, room: room, position: position)
+        return tags.isEmpty ? nil : tags
+    }
+
     /// The labels that are filled in, joined for a list row.
     public var summary: String { [speakers, room, position].filter { !$0.isEmpty }.joined(separator: " · ") }
 
@@ -151,6 +157,7 @@ public struct RoomProfileBook: Equatable, Sendable {
         if profiles.contains(where: { $0.id == p.id }) { p = p.withID(UUID()) }
         let cleaned = Self.tidy(p.name)
         p.name = freeName(cleaned.isEmpty ? String(localized: "Room correction") : String(cleaned.prefix(Self.maxNameLength - 6)), on: p.deviceUID, except: nil)
+        p.tags = p.tags?.cleaned
         profiles.append(p)
         if makeChosen { chosen[p.deviceUID] = p.id }
         return p
@@ -173,7 +180,7 @@ public struct RoomProfileBook: Equatable, Sendable {
         var p = profiles[index]
         let name = p.name, device = p.deviceUID, identifier = p.id
         try change(&p)
-        if p.tags?.isEmpty == true { p.tags = nil }
+        p.tags = p.tags?.cleaned
         // Name, output and id change through their own calls only.
         guard p.name == name, p.deviceUID == device, p.id == identifier else { return }
         profiles[index] = p

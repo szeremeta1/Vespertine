@@ -284,6 +284,9 @@ final class AppSettings {
         roomBook.setEnabled(true, for: uid)
     }
 
+    /// Makes `profile` the one `uid` plays with when correction is on, without switching it on or off.
+    func chooseRoomProfile(_ profile: UUID, for uid: String) { roomBook.choose(profile, for: uid) }
+
     /// Adds a new profile (a measurement, an import) and returns it as stored: its name may have been numbered.
     @discardableResult
     func saveRoomProfile(_ profile: RoomProfile) -> RoomProfile { roomBook.add(profile) }
