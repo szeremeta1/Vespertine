@@ -1,0 +1,389 @@
+Building for debugging...
+[Computing dependencies]
+[Constructing description]
+[Pre-planning 1 / 1039]
+[Planning 1 / 1039]
+[Planning deferred tasks]
+[Constructing 576 / 2906]
+[Starting]
+[1 / 3]
+[4 / 8] VespertineAudio
+[5 / 9] VespertineAudio
+[11 / 15] VespertineLibrary
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:774:5: [1;33mwarning: [1;39m'public' modifier is redundant for static method declared in a public extension[0;0m
+ [0;36m772 |[0;0m     }
+ [0;36m773 |[0;0m 
+ [0;36m774 |[0;0m     public static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for static method declared in a public extension[0;0m
+ [0;36m775 |[0;0m         var choices: [String: AlbumCopyChoice] = [:]
+ [0;36m776 |[0;0m         for row in try Row.fetchAll(db, sql: "SELECT albumKey, copyId, bundled FROM albumCopyChoice") {
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:816:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m814 |[0;0m     }
+ [0;36m815 |[0;0m 
+ [0;36m816 |[0;0m     public func sources() throws -> [LibrarySource] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m817 |[0;0m         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
+ [0;36m818 |[0;0m     }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:853:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m851 |[0;0m     /// Points a source (and every track in it) at a new local root, e.g. when a share
+ [0;36m852 |[0;0m     /// comes back mounted somewhere else. Library state (plays, ratings, playlists) is kept.
+ [0;36m853 |[0;0m     public func relinkSource(_ id: Int64, to newPath: String) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m854 |[0;0m         try writer.write { db in
+ [0;36m855 |[0;0m             guard let source = try LibrarySource.fetchOne(db, key: id), source.path != newPath else { return }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:866:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m864 |[0;0m 
+ [0;36m865 |[0;0m     /// The sidebar name; nil or empty goes back to the default.
+ [0;36m866 |[0;0m     public func renameSource(_ id: Int64, to name: String?) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m867 |[0;0m         let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines)
+ [0;36m868 |[0;0m         try writer.write { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:873:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m871 |[0;0m     }
+ [0;36m872 |[0;0m 
+ [0;36m873 |[0;0m     public func setSourceOnline(_ id: Int64, _ online: Bool) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m874 |[0;0m         try writer.write { db in try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, id]) }
+ [0;36m875 |[0;0m     }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:894:5: [1;33mwarning: [1;39m'public' modifier is redundant for struct declared in a public extension[0;0m
+ [0;36m892 |[0;0m 
+ [0;36m893 |[0;0m     /// A saved analysis and whether it still describes the file (same file, same analyzer).
+ [0;36m894 |[0;0m     public struct StoredAnalysis: Sendable {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for struct declared in a public extension[0;0m
+ [0;36m895 |[0;0m         public var analysis: FileAnalysis
+ [0;36m896 |[0;0m         public var analyzedAt: Date
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:901:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m899 |[0;0m 
+ [0;36m900 |[0;0m     /// Saves a full analysis for every track that plays from `filePath` (CUE tracks share a file).
+ [0;36m901 |[0;0m     public func saveAnalysis(_ analysis: FileAnalysis, filePath: String) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m902 |[0;0m         let data = try JSONEncoder().encode(analysis)
+ [0;36m903 |[0;0m         try writer.write { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:917:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m915 |[0;0m 
+ [0;36m916 |[0;0m     /// Saves many results in one transaction (e.g. imported from a server's analysis index).
+ [0;36m917 |[0;0m     public func saveAnalyses(_ items: [(FileAnalysis, String)]) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m918 |[0;0m         guard !items.isEmpty else { return }
+ [0;36m919 |[0;0m         let encoder = JSONEncoder()
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:939:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m937 |[0;0m     /// Saves transition profiles, each for the tracks that play all of its file (a CUE sheet's or a disc image's
+ [0;36m938 |[0;0m     /// tracks are parts of one, so the file's ends aren't theirs: the player measures those as they play).
+ [0;36m939 |[0;0m     public func saveTransitionProfiles(_ items: [(TransitionProfile, String)]) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m940 |[0;0m         guard !items.isEmpty else { return }
+ [0;36m941 |[0;0m         let encoder = JSONEncoder()
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:957:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m955 |[0;0m 
+ [0;36m956 |[0;0m     /// The transition profile of the track with this id, when it's current (the player asks, on its own thread).
+ [0;36m957 |[0;0m     public func transitionProfile(trackID: Int64) throws -> TransitionProfile? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m958 |[0;0m         try writer.read { db in
+ [0;36m959 |[0;0m             guard let data = try Data.fetchOne(db, sql: """
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:968:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m966 |[0;0m 
+ [0;36m967 |[0;0m     /// A playlist's own transitions (`TransitionOverride.storedValue`), nil when it follows the app's setting.
+ [0;36m968 |[0;0m     public func transitionStyle(forPlaylist id: Int64) throws -> String? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m969 |[0;0m         try writer.read { db in
+ [0;36m970 |[0;0m             try String.fetchOne(db, sql: "SELECT transitionStyle FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:975:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m973 |[0;0m 
+ [0;36m974 |[0;0m     /// Every playlist that has its own transitions, by id.
+ [0;36m975 |[0;0m     public func playlistTransitionStyles() throws -> [Int64: String] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m976 |[0;0m         try writer.read { db in
+ [0;36m977 |[0;0m             Dictionary(try Row.fetchAll(db, sql: "SELECT playlistId, transitionStyle FROM playlistTransition").map { ($0["playlistId"], $0["transitionStyle"]) },
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:983:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m981 |[0;0m 
+ [0;36m982 |[0;0m     /// Sets a playlist's own transitions; nil goes back to the app's setting.
+ [0;36m983 |[0;0m     public func setTransitionStyle(_ style: String?, forPlaylist id: Int64) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m984 |[0;0m         try writer.write { db in
+ [0;36m985 |[0;0m             if let style {
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:994:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m992 |[0;0m 
+ [0;36m993 |[0;0m     /// The track's transition profile, when one is stored for the file as it is now and by the current analyzer.
+ [0;36m994 |[0;0m     public func transitionProfile(for track: Track) throws -> TransitionProfile? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m995 |[0;0m         guard let id = track.id else { return nil }
+ [0;36m996 |[0;0m         return try writer.read { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1005:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1003 |[0;0m     }
+[0;36m1004 |[0;0m 
+[0;36m1005 |[0;0m     public func storedAnalysis(for track: Track) throws -> StoredAnalysis? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1006 |[0;0m         guard let id = track.id else { return nil }
+[0;36m1007 |[0;0m         return try writer.read { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1023:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1021 |[0;0m     /// call it off the main thread, before asking what needs analyzing. Returns how many were brought up to date.
+[0;36m1022 |[0;0m     @discardableResult
+[0;36m1023 |[0;0m     public func rejudgeStoredAnalyses(batchSize: Int = 500) throws -> Int {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1024 |[0;0m         let key = "rejudgedForAnalyzerVersion", version = FileAnalysis.currentVersion
+[0;36m1025 |[0;0m         let done = try writer.read { db in try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: [key]) }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1058:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1056 |[0;0m     /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
+[0;36m1057 |[0;0m     /// analyzed by an older version). One track per file. `among`: only these tracks (a selection).
+[0;36m1058 |[0;0m     public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = [], among ids: Set<Int64>? = nil) throws -> [Track] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1059 |[0;0m         try writer.read { db in
+[0;36m1060 |[0;0m             let rows = try Track.fetchAll(db, sql: """
+[12 / 16] VespertineLibrary
+[17 / 28] AVFAudioExtensions
+[22 / 27] VespertineAudio
+[26 / 31] VespertineAudio
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineAudio/DolbyAtmos.swift:138:36: [1;33mwarning: [1;39mcapture of 'output' with non-Sendable type 'AVAssetReaderTrackOutput' in a '@Sendable' closure[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures\SendableClosureCaptures]8;;\]
+[0;36m136 |[0;0m             guard gen == self.generation else { return }
+[0;36m137 |[0;0m             while self.renderer.isReadyForMoreMediaData {
+[0;36m138 |[0;0m                 guard let buffer = output.copyNextSampleBuffer() else {
+    [0;36m|[0;0m                                    `- [1;33mwarning: [1;39mcapture of 'output' with non-Sendable type 'AVAssetReaderTrackOutput' in a '@Sendable' closure[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures\SendableClosureCaptures]8;;\]
+[0;36m139 |[0;0m                     self.inputDone = true
+[0;36m140 |[0;0m                     self.renderer.stopRequestingMediaData()
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk/System/Library/Frameworks/AVFoundation.framework/Headers/AVAssetReaderOutput.h:203:12: [1;39mnote: [1;39mclass 'AVAssetReaderTrackOutput' does not conform to the 'Sendable' protocol[0;0m
+[0;36m201 |[0;0m  */
+[0;36m202 |[0;0m API_AVAILABLE(macos(10.7), ios(4.1), tvos(9.0), visionos(1.0)) API_UNAVAILABLE(watchos)
+[0;36m203 |[0;0m @interface AVAssetReaderTrackOutput : AVAssetReaderOutput
+    [0;36m|[0;0m            `- [1;39mnote: [1;39mclass 'AVAssetReaderTrackOutput' does not conform to the 'Sendable' protocol[0;0m
+[0;36m204 |[0;0m {
+[0;36m205 |[0;0m @private
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[28 / 31] VespertineAudio
+[36 / 40] VespertineLibrary
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:774:5: [1;33mwarning: [1;39m'public' modifier is redundant for static method declared in a public extension[0;0m
+ [0;36m772 |[0;0m     }
+ [0;36m773 |[0;0m 
+ [0;36m774 |[0;0m     public static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for static method declared in a public extension[0;0m
+ [0;36m775 |[0;0m         var choices: [String: AlbumCopyChoice] = [:]
+ [0;36m776 |[0;0m         for row in try Row.fetchAll(db, sql: "SELECT albumKey, copyId, bundled FROM albumCopyChoice") {
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:816:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m814 |[0;0m     }
+ [0;36m815 |[0;0m 
+ [0;36m816 |[0;0m     public func sources() throws -> [LibrarySource] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m817 |[0;0m         try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
+ [0;36m818 |[0;0m     }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:853:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m851 |[0;0m     /// Points a source (and every track in it) at a new local root, e.g. when a share
+ [0;36m852 |[0;0m     /// comes back mounted somewhere else. Library state (plays, ratings, playlists) is kept.
+ [0;36m853 |[0;0m     public func relinkSource(_ id: Int64, to newPath: String) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m854 |[0;0m         try writer.write { db in
+ [0;36m855 |[0;0m             guard let source = try LibrarySource.fetchOne(db, key: id), source.path != newPath else { return }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:866:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m864 |[0;0m 
+ [0;36m865 |[0;0m     /// The sidebar name; nil or empty goes back to the default.
+ [0;36m866 |[0;0m     public func renameSource(_ id: Int64, to name: String?) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m867 |[0;0m         let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines)
+ [0;36m868 |[0;0m         try writer.write { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:873:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m871 |[0;0m     }
+ [0;36m872 |[0;0m 
+ [0;36m873 |[0;0m     public func setSourceOnline(_ id: Int64, _ online: Bool) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m874 |[0;0m         try writer.write { db in try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, id]) }
+ [0;36m875 |[0;0m     }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:894:5: [1;33mwarning: [1;39m'public' modifier is redundant for struct declared in a public extension[0;0m
+ [0;36m892 |[0;0m 
+ [0;36m893 |[0;0m     /// A saved analysis and whether it still describes the file (same file, same analyzer).
+ [0;36m894 |[0;0m     public struct StoredAnalysis: Sendable {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for struct declared in a public extension[0;0m
+ [0;36m895 |[0;0m         public var analysis: FileAnalysis
+ [0;36m896 |[0;0m         public var analyzedAt: Date
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:901:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m899 |[0;0m 
+ [0;36m900 |[0;0m     /// Saves a full analysis for every track that plays from `filePath` (CUE tracks share a file).
+ [0;36m901 |[0;0m     public func saveAnalysis(_ analysis: FileAnalysis, filePath: String) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m902 |[0;0m         let data = try JSONEncoder().encode(analysis)
+ [0;36m903 |[0;0m         try writer.write { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:917:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m915 |[0;0m 
+ [0;36m916 |[0;0m     /// Saves many results in one transaction (e.g. imported from a server's analysis index).
+ [0;36m917 |[0;0m     public func saveAnalyses(_ items: [(FileAnalysis, String)]) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m918 |[0;0m         guard !items.isEmpty else { return }
+ [0;36m919 |[0;0m         let encoder = JSONEncoder()
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:939:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m937 |[0;0m     /// Saves transition profiles, each for the tracks that play all of its file (a CUE sheet's or a disc image's
+ [0;36m938 |[0;0m     /// tracks are parts of one, so the file's ends aren't theirs: the player measures those as they play).
+ [0;36m939 |[0;0m     public func saveTransitionProfiles(_ items: [(TransitionProfile, String)]) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m940 |[0;0m         guard !items.isEmpty else { return }
+ [0;36m941 |[0;0m         let encoder = JSONEncoder()
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:957:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m955 |[0;0m 
+ [0;36m956 |[0;0m     /// The transition profile of the track with this id, when it's current (the player asks, on its own thread).
+ [0;36m957 |[0;0m     public func transitionProfile(trackID: Int64) throws -> TransitionProfile? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m958 |[0;0m         try writer.read { db in
+ [0;36m959 |[0;0m             guard let data = try Data.fetchOne(db, sql: """
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:968:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m966 |[0;0m 
+ [0;36m967 |[0;0m     /// A playlist's own transitions (`TransitionOverride.storedValue`), nil when it follows the app's setting.
+ [0;36m968 |[0;0m     public func transitionStyle(forPlaylist id: Int64) throws -> String? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m969 |[0;0m         try writer.read { db in
+ [0;36m970 |[0;0m             try String.fetchOne(db, sql: "SELECT transitionStyle FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:975:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m973 |[0;0m 
+ [0;36m974 |[0;0m     /// Every playlist that has its own transitions, by id.
+ [0;36m975 |[0;0m     public func playlistTransitionStyles() throws -> [Int64: String] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m976 |[0;0m         try writer.read { db in
+ [0;36m977 |[0;0m             Dictionary(try Row.fetchAll(db, sql: "SELECT playlistId, transitionStyle FROM playlistTransition").map { ($0["playlistId"], $0["transitionStyle"]) },
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:983:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m981 |[0;0m 
+ [0;36m982 |[0;0m     /// Sets a playlist's own transitions; nil goes back to the app's setting.
+ [0;36m983 |[0;0m     public func setTransitionStyle(_ style: String?, forPlaylist id: Int64) throws {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m984 |[0;0m         try writer.write { db in
+ [0;36m985 |[0;0m             if let style {
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:994:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m992 |[0;0m 
+ [0;36m993 |[0;0m     /// The track's transition profile, when one is stored for the file as it is now and by the current analyzer.
+ [0;36m994 |[0;0m     public func transitionProfile(for track: Track) throws -> TransitionProfile? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+ [0;36m995 |[0;0m         guard let id = track.id else { return nil }
+ [0;36m996 |[0;0m         return try writer.read { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1005:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1003 |[0;0m     }
+[0;36m1004 |[0;0m 
+[0;36m1005 |[0;0m     public func storedAnalysis(for track: Track) throws -> StoredAnalysis? {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1006 |[0;0m         guard let id = track.id else { return nil }
+[0;36m1007 |[0;0m         return try writer.read { db in
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1023:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1021 |[0;0m     /// call it off the main thread, before asking what needs analyzing. Returns how many were brought up to date.
+[0;36m1022 |[0;0m     @discardableResult
+[0;36m1023 |[0;0m     public func rejudgeStoredAnalyses(batchSize: Int = 500) throws -> Int {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1024 |[0;0m         let key = "rejudgedForAnalyzerVersion", version = FileAnalysis.currentVersion
+[0;36m1025 |[0;0m         let done = try writer.read { db in try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: [key]) }
+
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift:1058:5: [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1056 |[0;0m     /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
+[0;36m1057 |[0;0m     /// analyzed by an older version). One track per file. `among`: only these tracks (a selection).
+[0;36m1058 |[0;0m     public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = [], among ids: Set<Int64>? = nil) throws -> [Track] {
+     [0;36m|[0;0m     `- [1;33mwarning: [1;39m'public' modifier is redundant for instance method declared in a public extension[0;0m
+[0;36m1059 |[0;0m         try writer.read { db in
+[0;36m1060 |[0;0m             let rows = try Track.fetchAll(db, sql: """
+[39 / 41] VespertineAudioTests-product
+[48 / 50] VespertineAudioTests-product
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Tests/VespertineAudioTests/DeviceHotplugTests.swift:182:111: [1;33mwarning: [1;39mforming 'UnsafeRawPointer' to a variable of type 'CFArray'; this is likely incorrect because 'CFArray' may contain an object reference.[0;0m
+[0;36m180 |[0;0m         var subDevices = [sub.uid] as CFArray
+[0;36m181 |[0;0m         var address = AudioObjectPropertyAddress.global(kAudioAggregateDevicePropertyFullSubDeviceList)
+[0;36m182 |[0;0m         try check(AudioObjectSetPropertyData(aggregate, &address, 0, nil, UInt32(MemoryLayout<CFArray>.size), &subDevices),
+    [0;36m|[0;0m                                                                                                               `- [1;33mwarning: [1;39mforming 'UnsafeRawPointer' to a variable of type 'CFArray'; this is likely incorrect because 'CFArray' may contain an object reference.[0;0m
+[0;36m183 |[0;0m                   "set sub-devices")
+[0;36m184 |[0;0m         #expect(await waitUntil(.seconds(1)) { changes.withLock { $0 } > before }, "no device change after streams arrived")
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Tests/VespertineAudioTests/NetworkPlaybackCacheTests.swift:224:18: [1;33mwarning: [1;39mweak variable 'lease' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\::]8;;https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability\WeakMutability]8;;\]
+[0;36m222 |[0;0m         var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "lease", url: url, reader: share)
+[0;36m223 |[0;0m         try entry!.prepare(full: true, lead: 0, cancelled: { false })
+[0;36m224 |[0;0m         weak var lease = entry
+    [0;36m|[0;0m                  `- [1;33mwarning: [1;39mweak variable 'lease' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\::]8;;https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability\WeakMutability]8;;\]
+[0;36m225 |[0;0m         let probed = try SourceOpener.probe(entry!.url)
+[0;36m226 |[0;0m         entry = nil
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>
+[52 / 53] VespertineAudioTests-product
+[55 / 55] VespertineAudioTests-product
+[56 / 58] VespertineLibraryTests-product
+[65 / 67] VespertineLibraryTests-product
+/Users/szeremeta/Workspace/scratch/2026-11-02-vt-sinatra-mp4/vt/Packages/VespertineKit/Tests/VespertineLibraryTests/AuditRegressionTests.swift:357:32: [1;33mwarning: [1;39m'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination.[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration\DeprecatedDeclaration]8;;\]
+[0;36m355 |[0;0m             var buffer = [CChar](repeating: 0, count: 4096)
+[0;36m356 |[0;0m             let count = nvt_property_get(url.path, key, &buffer, Int32(buffer.count))
+[0;36m357 |[0;0m             return count > 0 ? String(cString: buffer).components(separatedBy: "\n") : []
+    [0;36m|[0;0m                                `- [1;33mwarning: [1;39m'init(cString:)' is deprecated: Use String(decoding: array, as: UTF8.self) instead, after truncating the null termination.[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration\DeprecatedDeclaration]8;;\]
+[0;36m358 |[0;0m         }
+[0;36m359 |[0;0m         let ids = ["5d3b3f2c-0000-4000-8000-000000000001", "5d3b3f2c-0000-4000-8000-000000000002"]
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+[67 / 68] VespertineLibraryTests-product
+[72 / 72] VespertineLibraryTests-product
+[76 / 78] vespertine-probe-product
+[78 / 80] vespertine-probe-product
+[80 / 81] vespertine-probe-product
+[85 / 87] vespertine-library-product
+[87 / 89] vespertine-library-product
+[89 / 90] vespertine-library-product
+[93 / 94] vespertine-demo-product
+Build complete! (67.57 sec)
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Dolby files in the library" started.
+◇ Suite "Dolby AC-4 files in the library" started.
+◇ Test "Dolby Digital and Dolby Digital Plus files are read" started.
+◇ Test "DTS and TrueHD files are read, with Matroska tags" started.
+◇ Test "A DTS CD shows no bitrate: the file's 1411k belongs to the PCM carrier" started.
+◇ Test "Rows saved with the old fallback label are read again, so they pick up the real format" started.
+◇ Test case passing 2 arguments name → "dolby-digital-tones.ac3", codec → "Dolby Digital" to "Dolby Digital and Dolby Digital Plus files are read" started.
+◇ Test "An AC-4 MP4 is lossy Dolby AC-4, not a lossless 16/48 'MP4'" started.
+◇ Test case passing 4 arguments name → "dts-tones.mka", codec → "DTS", lossless → false, title → "DTS Tones" to "DTS and TrueHD files are read, with Matroska tags" started.
+◇ Test case passing 4 arguments name → "dts-tones.dts", codec → "DTS", lossless → false, title → nil to "DTS and TrueHD files are read, with Matroska tags" started.
+◇ Test case passing 2 arguments name → "dolby-digital-plus-tones.m4a", codec → "Dolby Digital Plus" to "Dolby Digital and Dolby Digital Plus files are read" started.
+◇ Test case passing 4 arguments name → "truehd-tones.thd", codec → "Dolby TrueHD", lossless → true, title → nil to "DTS and TrueHD files are read, with Matroska tags" started.
+◇ Test case passing 2 arguments name → "dolby-digital-plus-tones.ec3", codec → "Dolby Digital Plus" to "Dolby Digital and Dolby Digital Plus files are read" started.
+◇ Test case passing 4 arguments name → "truehd-tones.mka", codec → "Dolby TrueHD", lossless → true, title → nil to "DTS and TrueHD files are read, with Matroska tags" started.
+[dts @ 0x7b4ecb0780] Estimating duration from bitrate, this may be inaccurate
+[dts @ 0x7b4ecb0780] Estimating duration from bitrate, this may be inaccurate
+✔ Test "Rows saved with the old fallback label are read again, so they pick up the real format" passed after 0.009 seconds.
+✔ Test "DTS and TrueHD files are read, with Matroska tags" with 4 test cases passed after 0.011 seconds.
+✔ Test "Dolby Digital and Dolby Digital Plus files are read" with 3 test cases passed after 0.032 seconds.
+✔ Test "A DTS CD shows no bitrate: the file's 1411k belongs to the PCM carrier" passed after 0.036 seconds.
+✔ Suite "Dolby files in the library" passed after 0.036 seconds.
+✔ Test "An AC-4 MP4 is lossy Dolby AC-4, not a lossless 16/48 'MP4'" passed after 0.043 seconds.
+✔ Suite "Dolby AC-4 files in the library" passed after 0.043 seconds.
+✔ Test run with 5 tests in 2 suites passed after 0.043 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Dolby AC-4" started.
+◇ Test "Its format is reported as lossy Dolby AC-4, 48 kHz stereo, with no bit depth" started.
+◇ Test "Ordinary files are not mistaken for it" started.
+◇ Test "Opening it says it is Dolby AC-4 and that this Mac can't decode it" started.
+◇ Test case passing 1 argument name → "dolby-digital-plus-tones.m4a" to "Ordinary files are not mistaken for it" started.
+◇ Test case passing 1 argument name → "dolby-digital-tones.ac3" to "Ordinary files are not mistaken for it" started.
+◇ Test case passing 1 argument name → "dts-tones.mka" to "Ordinary files are not mistaken for it" started.
+✔ Test "Its format is reported as lossy Dolby AC-4, 48 kHz stereo, with no bit depth" passed after 0.022 seconds.
+✔ Test "Ordinary files are not mistaken for it" with 3 test cases passed after 0.026 seconds.
+✔ Test "Opening it says it is Dolby AC-4 and that this Mac can't decode it" passed after 0.028 seconds.
+✔ Suite "Dolby AC-4" passed after 0.028 seconds.
+✔ Test run with 3 tests in 1 suite passed after 0.028 seconds.
