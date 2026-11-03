@@ -51,6 +51,61 @@ Float32. The microphone's own rate is put back afterwards. Every measurement fol
 (`~/Documents/Vespertine Room Measurements/<date-time>/`) keeps the raw recordings, the session, the calibrated
 responses (CSV and plot), `room-profile.json` and `room-correction-predicted.png`.
 
+## Profiles
+
+Every measurement or import is a **profile**: a name you give it, optional labels for the speakers, room and position
+("KEF LS50 Meta", "Study", "Desk, near field"), and everything below. An output can have as many profiles as you like.
+
+- **Choose** one in the window's profile menu. Each output remembers its own choice and uses it whenever that output is
+  selected, so switching from the desk speakers to the living-room receiver switches the correction with it. Turning
+  correction off keeps the choice for when you turn it back on.
+- **Name and Labels…** renames it (names are trimmed, kept to 80 characters and unique per output) and sets the labels.
+  After a measurement the same fields are on the result page, before you save.
+- **Duplicate** makes an independent copy ("Desk copy") to try changes on; **Delete Profile…** asks first, and removes
+  measured filter files no other profile uses.
+- **Export** writes a Vespertine room profile (`.json`) or Equalizer APO text. A profile made of impulse responses is
+  exported with the filters' samples inside, so it works on another Mac. **Import → Vespertine Room Profile…** adds it
+  to the *selected output* (it needs at least as many channels as the profile's speakers), under a new id, so importing
+  your own export gives you a copy and never replaces the original. A file that names filters it doesn't carry, or
+  whose filter data is damaged, is refused.
+- The library is the file `Room Profiles.json` in Vespertine's data folder, with the previous version beside it as
+  `Room Profiles.previous.json`. A file that can't be read is set aside (`…damaged-<time>.json`), never overwritten.
+  Profiles saved by a newer Vespertine than the one running are kept in the file untouched, not dropped. Profiles
+  from earlier versions are carried over as they were (schema 4 only adds optional fields) and the old preferences are
+  read once, then no longer.
+
+## Simple and Pro
+
+The switch at the top of the window chooses what is shown; it changes nothing about how the sound is made.
+
+**Simple** (the default): measure, then the profile's graph (before, and the predicted result), **Strength**, and a
+**Compare** switch. Strength scales every filter's gain from 0 (the music as it is) to 100% (the full correction);
+frequencies and Q stay, delays and levels are not scaled, and the preamp is worked out again from the scaled filters so
+the music still can't clip. A profile made of impulse responses can't be turned down and says so. Compare flips the
+output between **A · As it is** and **B · Corrected**; B plays quieter by the preamp, which the window states: match the
+level by ear before judging.
+
+**Pro** adds:
+
+- **Target and limits**: the target (Gentle tilt, Flat, Warm, or **Load House Curve…**, a text file with a frequency in
+  Hz and a level in dB per line, as REW writes targets, 5 Hz to 40 kHz, within ±30 dB; only its shape counts, as the
+  target is fitted to your measurement's own 200 Hz to 2 kHz level), the range the correction acts on (low and high
+  cutoff, 10 Hz to 20 kHz), the largest cut (to 30 dB) and boost (to 12 dB) and the number of filters per speaker (1 to
+  24). **Apply** fits the filters again from the stored measurement. Values are clamped to what playback can run, the
+  boost below each speaker's roll-off stays at +0.5 dB, and the preamp keeps the result from clipping, whatever the limits.
+- **Measured positions**: which positions go into each speaker's power average. Leave one out (the microphone was
+  knocked) and the filters are fitted again; at least one stays. Profiles measured before this version didn't keep
+  their positions, so the list isn't shown for them.
+- **Every filter, per speaker**: on/off, type (peak, shelves, low and high pass), frequency, gain, Q, add and remove,
+  up to 24; and the speaker's **delay and level trim** (0 to 40 ms, −30 to +12 dB). Values are clamped, not-a-number is
+  refused, and the shared preamp follows the edited filters. A profile with hand-edited filters is marked; applying a
+  new target or limits asks before it replaces your edits.
+- **The graph** with Measured, Target and Corrected switched on and off.
+- **Microphone**: the serial and the calibration file's checksum. The calibration file itself is chosen when measuring.
+
+Imported profiles (Equalizer APO, impulse responses) have no measurement, so Target, limits and positions don't apply to
+them; their filters and trims are editable (not the convolution filters themselves).
+
 ## Lining the speakers up
 
 During the sweeps the timing tones always come from the left speaker while the measured speaker plays the sweep, so
