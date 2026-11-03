@@ -208,8 +208,7 @@ enum SourceOpener {
             let layout = wavPackLayout(source)
             let format = SourceFormat(encoding: .dsd, codec: "WavPack", sampleRate: source.dsdRate, bitDepth: 1, channels: source.channelCount,
                                       channelLabels: ChannelLayouts.speakerLabels(layout))
-            return ProbedSource(url: url, format: format, decoderName: String(localized: "WavPack · DSD bitstream", comment: "The decoder, in the signal path."),
-                                pcm: nil, dsd: nil, wavPackDSD: true)
+            return ProbedSource(url: url, format: format, decoderName: "WavPack · DSD", pcm: nil, dsd: nil, wavPackDSD: true)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
             // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.

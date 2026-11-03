@@ -28,19 +28,17 @@ public enum UndecodedFormat: String, Sendable, Hashable, CaseIterable {
         switch self {
         case .mqa: String(localized: "Played as FLAC, not unfolded", comment: "Badge note under MQA: Vespertine can't decode MQA, so the file plays as the plain FLAC it contains.")
         case .auro3D: String(localized: "Played as PCM, not decoded", comment: "Badge note under Auro-3D: Vespertine can't decode the Auro-3D height channels, so the file plays as the ordinary surround PCM it contains.")
-        case .ac4: String(localized: "Can't be decoded here", comment: "Badge note under Dolby AC-4 and MPEG-H: no decoder is available to Vespertine, so the file can't play.")
-        case .mpegH: String(localized: "Can't be decoded here", comment: "Badge note under Dolby AC-4 and MPEG-H: no decoder is available to Vespertine, so the file can't play.")
+        case .ac4, .mpegH: String(localized: "Can't be decoded here", comment: "Badge note under Dolby AC-4 and MPEG-H: no decoder is available to Vespertine, so the file can't play.")
         }
     }
 
     /// What a file that can't play says when played.
     public var failure: String {
         switch self {
-        case .ac4: String(localized: "Dolby AC-4 can't be played: macOS has no decoder for it and Vespertine doesn't include one.",
-                          comment: "Why a file can't be played, in “This file can't be played (…).” AC-4 is a Dolby audio format.")
-        case .mpegH: String(localized: "MPEG-H 3D Audio can't be played: macOS has no decoder for it and Vespertine doesn't include one.",
-                            comment: "Why a file can't be played, in “This file can't be played (…).” MPEG-H is an audio format (also used by Sony 360 Reality Audio).")
-        case .mqa, .auro3D: String(localized: "This file plays as ordinary PCM.", comment: "Why a file that carries MQA or Auro-3D plays anyway.")
+        case .ac4, .mpegH:
+            String(localized: "\(name) can't be played: macOS has no decoder for it and Vespertine doesn't include one.",
+                   comment: "Why a file can't be played, in “This file can't be played (…).” %@ is an audio format: Dolby AC-4, or MPEG-H 3D Audio (also used by Sony 360 Reality Audio).")
+        case .mqa, .auro3D: note
         }
     }
 
