@@ -271,7 +271,8 @@ struct RoomProfileSchemaTests {
         let data = try RoomCorrectionCoding.encode(p)
         let back = try RoomCorrectionCoding.decodeProfile(data)
         #expect(back == p)
-        #expect(try RoomCorrectionCoding.encode(back) == data)
+        // (Dictionaries keyed by speaker encode in no fixed order, so compare values, not bytes.)
+        #expect(try RoomCorrectionCoding.decodeProfile(RoomCorrectionCoding.encode(back)) == p)
     }
 
     @Test("A newer schema is refused rather than half-read")
