@@ -18,7 +18,15 @@ public enum MetadataReader {
         // Bare Dolby streams (.ac3/.ec3) have no tag format: take what the decoder knows and the file name.
         let file: AudioFile?
         do { file = try AudioFile(readingPropertiesAndMetadataFrom: url) }
-        catch { guard SourceInspector.untaggedExtensions.contains(url.pathExtension.lowercased()) else { throw error }; file = nil }
+        catch {
+            if let standIn = url.pathExtension.lowercased() == "dsf" ? DSFStandIn.make(for: url) : nil {
+                // A DSF whose header total size is larger than the file: read its header and tag from a consistent copy.
+                defer { try? FileManager.default.removeItem(at: standIn) }
+                file = try AudioFile(readingPropertiesAndMetadataFrom: standIn)
+            } else {
+                guard SourceInspector.untaggedExtensions.contains(url.pathExtension.lowercased()) else { throw error }; file = nil
+            }
+        }
         let props = file?.properties
         let md = file?.metadata ?? containerMetadata(url)
 
