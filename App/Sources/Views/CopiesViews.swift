@@ -117,8 +117,8 @@ private struct CopyCard: View {
         .accessibilityValue(String(localized: "\(copy.songCount) of \(copy.albumSongCount) songs"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .contextMenu {
-            Button("Play This Copy") { model.player.play(copy.tracks, shuffled: false) }
-            Button("Add This Copy to Queue") { model.player.addToQueue(copy.tracks) }
+            Button("Play This Copy") { model.player.play(copy.tracks, shuffled: false, exactly: Set(copy.tracks.map(\.location))) }
+            Button("Add This Copy to Queue") { model.player.addToQueue(copy.tracks, exactly: Set(copy.tracks.map(\.location))) }
             Divider()
             Button("Show in Finder") { model.showInFinder(Array(copy.tracks.prefix(1))) }
         }

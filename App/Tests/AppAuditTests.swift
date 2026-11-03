@@ -260,6 +260,20 @@ struct AppAuditTests {
         player.clearUpcoming()
         #expect(player.upcoming.isEmpty && player.current?.id == current)
     }
+    /// The sidebar can still show a playlist while the table lists something else (an album opened from search, search
+    /// results): only the playlist a table lists lends it its own transitions.
+    @Test func playlistTransitionsBelongToTheListPlayed() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-playlist-transitions-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
+        let party = try #require(library.createPlaylist(name: "Party")), plain = try #require(library.createPlaylist(name: "Plain"))
+        library.setTransitions(.liveSet, for: party)
+        #expect(library.transitions(of: party) == .liveSet)
+        #expect(library.transitions(of: plain) == nil, "a playlist with no choice follows the app's setting")
+        #expect(library.transitions(of: nil) == nil, "a list that isn't a playlist never gets one")
+    }
+
     /// A copy plays as itself, on any output, unless the album's copies are bundled; then the output picks, except for a
     /// copy asked for by hand. Album playback takes one copy, never every copy of every song.
     @Test func copiesPlayAsChosen() throws {
@@ -325,6 +339,15 @@ struct AppAuditTests {
         #expect(player.queue[0].track.location == download[0].location)
         player.play(vinyl, startAt: 1, exactly: Set(vinyl.map(\.location)))
         #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+
+        // Adding a copy by hand to the queue keeps it as that copy too (the copy card's Add This Copy to Queue).
+        player.wantsMultichannel = { true }
+        player.play(surround)
+        player.addToQueue(vinyl, exactly: Set(vinyl.map(\.location)))
+        player.playNext(download, exactly: Set(download.map(\.location)))
+        #expect(player.queue.dropFirst().map(\.track.location) == download.map(\.location) + vinyl.map(\.location) + [surround[1].location],
+                "copies added by hand stay the copy asked for; the rest of the album follows the output")
+        #expect(player.queue.dropFirst().prefix(4).allSatisfy { $0.versions.isEmpty })
     }
 
     @Test func launchArgumentsIgnoreOtherDefaultsDomains() {

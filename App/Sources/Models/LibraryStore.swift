@@ -573,6 +573,10 @@ final class LibraryStore {
         loadPlaylistTransitions()
     }
 
+    /// The own transitions of the playlist a list belongs to, nil for a list that isn't one (search results, an album
+    /// opened while a playlist is still selected in the sidebar) or a playlist that follows the app's setting.
+    func transitions(of playlist: Playlist?) -> TransitionOverride? { playlist?.id.flatMap { playlistTransitions[$0] } }
+
     private func loadPlaylistTransitions() {
         let stored = (try? database.playlistTransitionStyles()) ?? [:]
         playlistTransitions = stored.compactMapValues { TransitionOverride(storedValue: $0) }

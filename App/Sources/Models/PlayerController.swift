@@ -239,10 +239,10 @@ final class PlayerController {
         if let current { start(current) }
     }
 
-    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next.
-    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next. `exactly`: see `entries`.
+    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
         syncMirror()
@@ -250,9 +250,10 @@ final class PlayerController {
 
     /// Adds `tracks` to the end of Playing Next: after the songs already added, before the rest of what was
     /// playing (as Apple Music's Play Last does), so they're heard without first sitting through the whole album.
-    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// `exactly`: see `entries`.
+    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1 + playingNext.count)
         originalOrder.append(contentsOf: entries)
         syncMirror()
