@@ -225,6 +225,70 @@ struct VisualizerFeedTests {
     }
 }
 
+@Suite("Visualizer feed across a window closing and showing again")
+struct VisualizerFeedReopenTests {
+    /// Waits (bounded) until `condition` holds.
+    private static func wait(_ seconds: TimeInterval = 20, _ condition: () -> Bool) -> Bool {
+        let deadline = Date().addingTimeInterval(seconds)
+        while !condition() {
+            if Date() > deadline { return false }
+            Thread.sleep(forTimeInterval: 0.01)
+        }
+        return true
+    }
+
+    @Test("Stopped, the source switched to the next song (position back at 0, another rate), started again: frames come again")
+    func restartsOnTheNextSong() {
+        let position = Locked<UInt64>(0)
+        let rate = Locked(44_100.0)
+        let tone = Locked(0.2)
+        let feed = VisualizerFeed { left, right in
+            position.value += 1024       // a moving song: a new position every read
+            let w = tone.value
+            for i in left.indices { left[i] = Float(0.5 * sin(Double(i) * w)); right[i] = left[i] }
+            return VisualizerTapRead(frames: left.count, position: position.value, sampleRate: rate.value, isDSD: false)
+        }
+        feed.start(rate: 120)
+        #expect(Self.wait { feed.stats.frames > 20 })
+        #expect(feed.frame.hasSignal)
+        feed.stop()
+        // The song is skipped while the window is closed: the next one is on another output (new position, another rate).
+        Thread.sleep(forTimeInterval: 0.2)
+        let stopped = feed.stats.frames
+        Thread.sleep(forTimeInterval: 0.2)
+        #expect(feed.stats.frames == stopped, "the feed kept analysing with no window")
+        position.value = 0
+        rate.value = 96_000
+        tone.value = 0.05
+        let timeBefore = feed.frame.time
+        feed.start(rate: 60)
+        #expect(Self.wait { feed.stats.frames > 20 }, "no frames after the window showed again")
+        #expect(feed.frame.time > timeBefore)
+        #expect(feed.frame.hasSignal)
+        // It goes on, not once.
+        let n = feed.stats.frames
+        #expect(Self.wait { feed.stats.frames > n + 20 })
+    }
+
+    @Test("A source with nothing yet (idle between songs) and then a song: the feed picks it up without a restart")
+    func picksUpASongAfterNothing() {
+        let live = Locked(false)
+        let position = Locked<UInt64>(0)
+        let feed = VisualizerFeed { left, right in
+            guard live.value else { return nil }
+            position.value += 512
+            for i in left.indices { left[i] = Float(0.5 * sin(Double(i) * 0.3)); right[i] = left[i] }
+            return VisualizerTapRead(frames: left.count, position: position.value, sampleRate: 48_000, isDSD: false)
+        }
+        feed.start(rate: 120)
+        #expect(Self.wait { feed.stats.frames > 10 })
+        #expect(!feed.frame.hasSignal)
+        live.value = true
+        #expect(Self.wait { feed.frame.hasSignal }, "the feed never saw the song that started")
+        feed.stop()
+    }
+}
+
 final class Locked<Value: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
     private var stored: Value

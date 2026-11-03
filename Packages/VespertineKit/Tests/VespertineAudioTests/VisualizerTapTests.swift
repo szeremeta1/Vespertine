@@ -126,6 +126,141 @@ struct VisualizerTapTests {
         #expect(r.allSatisfy { abs($0) < 1e-6 })
     }
 
+    /// The newest `count` frames of the tap, and the position it reports.
+    private static func read(_ ctx: OpaquePointer, count: Int = 64) -> (left: [Float], position: UInt64, got: UInt32) {
+        var l = [Float](repeating: 0, count: count), r = l
+        var position: UInt64 = 0
+        let got = nrt_context_copy_viz(ctx, &l, &r, UInt32(count), &position)
+        return (l, position, got)
+    }
+
+    @Test("Closed, a song skipped to on the same output, shown again: the tap carries the new song and moves on")
+    func reopenAfterSkipOnTheSameOutput() {
+        let ring = nrt_ring_create(16384, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_viz(ctx, true)
+        _ = nrt_ring_write(ring, Self.ramp(from: 1, count: 1000), 1000)
+        _ = Self.render(ctx, frames: 1000)
+        let open = Self.read(ctx)
+        #expect(open.position == 1000 && open.left.last == 1000)
+        // The window closes: the tap stops, and the song goes on being rendered, then a skip (the ring is flushed).
+        nrt_context_set_viz(ctx, false)
+        _ = nrt_ring_write(ring, Self.ramp(from: 1001, count: 500), 500)
+        _ = Self.render(ctx, frames: 500)
+        #expect(Self.read(ctx).position == 1000, "the closed tap moved")
+        nrt_ring_reset(ring)
+        nrt_context_reset_history(ctx)
+        _ = nrt_ring_write(ring, Self.ramp(from: 90_001, count: 700), 700)
+        _ = Self.render(ctx, frames: 300)
+        #expect(Self.read(ctx).position == 1000, "the closed tap moved")
+        // The window shows again.
+        nrt_context_set_viz(ctx, true)
+        _ = Self.render(ctx, frames: 200)
+        let reopened = Self.read(ctx)
+        #expect(reopened.got == 64)
+        #expect(reopened.position == 1200, "the tap didn't go on from where it stopped")
+        #expect(abs((reopened.left.last ?? 0) - 90_500) < 0.5, "the tap shows another song than the one playing")
+        _ = Self.render(ctx, frames: 200)
+        let later = Self.read(ctx)
+        #expect(later.position == 1400 && abs((later.left.last ?? 0) - 90_700) < 0.5)
+    }
+
+    @Test("Closed, a skip to a song on a new output session (another rate), shown again: the new session's tap starts moving")
+    func reopenAfterSkipToANewSession() {
+        let ringA = nrt_ring_create(8192, 2)!
+        let a = nrt_context_create(ringA, 512)!
+        nrt_context_set_viz(a, true)
+        _ = nrt_ring_write(ringA, Self.ramp(from: 1, count: 600), 600)
+        _ = Self.render(a, frames: 600)
+        #expect(Self.read(a).position == 600)
+        // Closed: the engine remembers the choice (off) and gives the next session that.
+        nrt_context_set_viz(a, false)
+        nrt_context_destroy(a); nrt_ring_destroy(ringA)
+        let ringB = nrt_ring_create(8192, 2)!
+        let b = nrt_context_create(ringB, 512)!
+        defer { nrt_context_destroy(b); nrt_ring_destroy(ringB) }
+        nrt_context_set_viz(b, false)
+        _ = nrt_ring_write(ringB, Self.ramp(from: 5001, count: 1200), 1200)
+        _ = Self.render(b, frames: 400)
+        #expect(Self.read(b).position == 0)
+        // Shown again.
+        nrt_context_set_viz(b, true)
+        _ = Self.render(b, frames: 256)
+        let first = Self.read(b)
+        #expect(first.got == 64 && first.position == 256 && abs((first.left.last ?? 0) - 5_656) < 0.5)
+        _ = Self.render(b, frames: 256)
+        #expect(Self.read(b).position == 512)
+    }
+
+    @Test("Skipping with the tap on: the position never goes back and the picture changes song")
+    func skipWhileOpen() {
+        let ring = nrt_ring_create(16384, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_viz(ctx, true)
+        _ = nrt_ring_write(ring, Self.ramp(from: 1, count: 800), 800)
+        _ = Self.render(ctx, frames: 800)
+        let before = Self.read(ctx)
+        nrt_ring_reset(ring)
+        nrt_context_reset_history(ctx)
+        _ = nrt_ring_write(ring, Self.ramp(from: 70_001, count: 800), 800)
+        _ = Self.render(ctx, frames: 400)
+        let after = Self.read(ctx)
+        #expect(after.position == before.position + 400)
+        #expect(abs((after.left.last ?? 0) - 70_400) < 0.5)
+    }
+
+    @Test("Gapless: the tap runs on across the end of one song into the next, in order, with the position unbroken")
+    func gaplessIntoTheNextSong() {
+        let ring = nrt_ring_create(16384, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_viz(ctx, true)
+        // Song A ends at frame 300 and B follows at once (both queued before the I/O thread gets to them).
+        _ = nrt_ring_write(ring, Self.ramp(from: 1, count: 300), 300)
+        _ = nrt_ring_write(ring, Self.ramp(from: 10_001, count: 500), 500)
+        _ = Self.render(ctx, frames: 400)
+        let r = Self.read(ctx, count: 400)
+        #expect(r.position == 400)
+        #expect(Array(r.left[0..<300]) == (1...300).map(Float.init))
+        #expect(Array(r.left[300..<400]) == (10_001...10_100).map(Float.init))
+    }
+
+    @Test("DoP: closed, skipped, shown again, the tap reads the new song's DSD levels and moves")
+    func dopReopenAfterSkip() {
+        let ring = nrt_ring_create(8192, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_passthrough(ctx, true)
+        nrt_context_set_dop(ctx, true)
+        func dop(_ bits: [UInt32], frames: Int) -> [Float] {
+            var out: [Float] = []
+            for i in 0..<frames {
+                let marker: UInt32 = i % 2 == 0 ? 0x05 : 0xFA
+                for b in bits { out.append(Float(Int32(bitPattern: (marker << 16 | b) << 8) >> 8) / 8_388_608) }
+            }
+            return out
+        }
+        nrt_context_set_viz(ctx, true)
+        _ = nrt_ring_write(ring, dop([0xFFFF, 0x5555], frames: 256), 256)
+        _ = Self.render(ctx, frames: 256)
+        let open = Self.read(ctx, count: 128)
+        #expect(open.position == 256 && open.got == 128)
+        nrt_context_set_viz(ctx, false)                      // closed
+        _ = nrt_ring_write(ring, dop([0x0000, 0x5555], frames: 256), 256)   // the next song, DSD of the other sign
+        _ = Self.render(ctx, frames: 256)
+        #expect(Self.read(ctx).position == 256)
+        nrt_context_set_viz(ctx, true)                       // shown again
+        _ = nrt_ring_write(ring, dop([0x0000, 0x5555], frames: 256), 256)
+        _ = Self.render(ctx, frames: 256)
+        var l = [Float](repeating: 0, count: 128), r = l
+        var position: UInt64 = 0
+        #expect(nrt_context_copy_viz(ctx, &l, &r, 128, &position) == 128)
+        #expect(position == 512)
+        #expect(l.allSatisfy { abs($0 + 1) < 1e-6 }, "the tap still shows the song before the skip")
+    }
+
     /// The render context and ring, shared with the threads below. The threads hold it, and it destroys the context and
     /// ring only once the last of them lets go: a race that gives up on a slow worker must not free what that worker
     /// is still using. `onDestroy` is told how many threads were still working with it (none, if this holds).
