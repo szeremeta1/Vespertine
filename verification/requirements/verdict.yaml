@@ -236,7 +236,7 @@
     version: "98cad1a, with the F-05 docs change"
     section: "line 106"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 108, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 112, from: "For DoP: the device is held exclusively", to: "with at least 24 bits." }
   requirement: "For DoP the badge is \"NATIVE DSD · DoP\" exactly when the player holds the device (BPV-009), the nominal rate read back equals the planned carrier rate, the physical format has ≥24 bits, and BPV-006 to BPV-011 and BPV-013 hold."
   quote_sha256: fce73c5cb9df36e13899619fc5f4b472bb7577033b28222c70ad87ffd5a712e1
   kind: vespertine-rule
@@ -251,7 +251,7 @@
     version: "98cad1a, with the F-05 docs change"
     section: "line 64"
     availability: repository
-    cache: { repo: docs/ARCHITECTURE.md, lines: 64, from: "Dolby and DTS-CD sources plan as mode", to: "integer ≥ 16-bit, no gain." }
+    cache: { repo: docs/ARCHITECTURE.md, lines: 68, from: "Dolby and DTS-CD sources plan as mode", to: "integer ≥ 16-bit, no gain." }
   requirement: "For bitstream the badge starts \"BITSTREAM · \" only when the player holds the device (BPV-009), the nominal rate read back equals the planned rate, the physical format is integer with at least 16 bits, and the shared conditions hold."
   quote_sha256: 6a25cb3ab7bc7c5aef0215c836dcc95cfa7cbb48e78d3b6321d1cd0da1546d8d
   kind: vespertine-rule
