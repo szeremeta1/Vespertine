@@ -78,7 +78,9 @@ public actor LibraryScanner {
         SourceInspector.supportedExtensions.subtracting(["cue", "txt", "log"])
     }
 
-    static func isFallbackLabel(_ codec: String) -> Bool { false }
+    /// What the tag reader called a file no decoder opened ("MP4"; the decoders' own names never are). Rows saved with it
+    /// before the file's real format could be read are read again, once the scanner knows better.
+    static func isFallbackLabel(_ codec: String) -> Bool { codec == "MP4" }
 
     /// Rescans a source. Unchanged files (same size and modification date) are skipped.
     @discardableResult
@@ -114,11 +116,11 @@ public actor LibraryScanner {
             return signatures
         }
 
-        struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool; var hasArt: Bool }
+        struct Known: Sendable { var id: Int64; var codec: String; var size: Int64; var modified: Date; var isMissing: Bool; var hasArt: Bool }
         let known: [String: Known] = try await database.writer.read { db in
             var map: [String: Known] = [:]
-            for row in try Row.fetchAll(db, sql: "SELECT id, location, fileSize, modifiedAt, isMissing, artworkKey IS NOT NULL AS hasArt FROM track WHERE sourceId = ?", arguments: [sourceID]) {
-                map[row["location"]] = Known(id: row["id"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"], hasArt: row["hasArt"])
+            for row in try Row.fetchAll(db, sql: "SELECT id, location, codec, fileSize, modifiedAt, isMissing, artworkKey IS NOT NULL AS hasArt FROM track WHERE sourceId = ?", arguments: [sourceID]) {
+                map[row["location"]] = Known(id: row["id"], codec: row["codec"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"], hasArt: row["hasArt"])
             }
             return map
         }
@@ -162,7 +164,8 @@ public actor LibraryScanner {
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url) { continue }
+                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url),
+                   !Self.isFallbackLabel(k.codec) { continue }
                 toRead.append(url)
             }
         }

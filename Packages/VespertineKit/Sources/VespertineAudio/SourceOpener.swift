@@ -47,10 +47,15 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
 
 public enum SourceOpenerError: Error, LocalizedError {
     case unsupported(URL)
+    /// A codec macOS and Vespertine can name but not decode (Dolby AC-4).
+    case undecodable(URL, codec: String)
     case invalidRegion(URL, start: Int64, length: Int64?, available: Int64)
     public var errorDescription: String? {
         switch self {
         case .unsupported(let url): String(localized: "Unsupported file: \(url.lastPathComponent)")
+        case .undecodable(let url, let codec):
+            String(localized: "“\(url.lastPathComponent)” is \(codec), which macOS can’t decode, so Vespertine can’t play it.",
+                   comment: "The codec is a name such as Dolby AC-4.")
         case .invalidRegion(let url, let start, let length?, let available):
             String(localized: "CUE track is outside \(url.lastPathComponent): start \(start), length \(length), file length \(available) frames",
                    comment: "Positions and lengths in audio frames.")
@@ -251,6 +256,8 @@ enum SourceOpener {
                     return (raw, decoder)
                 } catch { failure = error }
             }
+            // A codec the container names but no decoder here opens: say which, rather than "not recognized".
+            if let known = DolbyAC4.format(of: url) { throw SourceOpenerError.undecodable(url, codec: known.codec) }
             throw failure ?? SourceOpenerError.unsupported(url)
         }
         var (raw, decoder) = try openDecoder()
@@ -400,6 +407,7 @@ enum SourceOpener {
         case kAudioFormatOpus: return "Opus"
         case kAudioFormatAC3: return "Dolby Digital"
         case kAudioFormatEnhancedAC3: return "Dolby Digital Plus"
+        case DolbyAC4.formatID: return DolbyAC4.codecName
         default: break
         }
         switch ext {
@@ -479,8 +487,8 @@ public enum SourceInspector {
         return (probed.format, probed.decoderName)
     }
 
-    /// The format of a file no decoder opens but whose codec is known (Dolby AC-4).
-    public static func undecodableFormat(_ url: URL) -> SourceFormat? { nil }
+    /// The format of a file no decoder opens but whose container names its codec (Dolby AC-4): nil for any other file.
+    public static func undecodableFormat(_ url: URL) -> SourceFormat? { DolbyAC4.format(of: url) }
 
     /// Format plus duration in seconds (from the decoder's frame/packet count).
     public static func inspectWithDuration(_ url: URL) throws -> (format: SourceFormat, duration: Double) {

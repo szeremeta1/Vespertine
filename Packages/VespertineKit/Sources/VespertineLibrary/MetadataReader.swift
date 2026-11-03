@@ -31,7 +31,9 @@ public enum MetadataReader {
         let md = file?.metadata ?? containerMetadata(url)
 
         let inspected = try? SourceInspector.inspectWithDuration(url)
-        let format = inspected?.format
+        // No decoder opened it, but the container may still say what it is (Dolby AC-4): better than the tag reader's guess,
+        // whose "MP4" and the sample entry's stock 16 bits read as a lossless 16-bit file.
+        let format = inspected?.format ?? SourceInspector.undecodableFormat(url)
         let codec = format?.codec ?? (props?.formatName ?? url.pathExtension.uppercased())
         let isDSD = format?.encoding == .dsd
         let isLossless = format.map { $0.encoding != .lossy } ?? !lossyCodecs.contains(codec)
