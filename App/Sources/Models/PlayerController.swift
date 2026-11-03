@@ -426,7 +426,7 @@ final class PlayerController {
         return PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
                             regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
                             cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
-                            sacdArea: track.sacdArea, dvd: track.dvdStream, context: context)
+                            sacdArea: track.sacdArea, dvd: track.dvdStream, context: context, audioStream: track.audioStream)
     }
 
     /// How `entry` joins the song before it in the queue, while transitions are on: what the engine planned for the

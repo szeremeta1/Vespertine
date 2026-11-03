@@ -84,22 +84,9 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
         return d
     }
 
-    /// One audio stream of a container, as a stream picker lists it.
-    struct AudioStream: Sendable, Hashable {
-        var index: Int
-        var codec: String
-        var channels: Int
-        var sampleRate: Double
-        var bits: Int?
-        var title: String?
-        var language: String?
-        var isDefault: Bool
-        var lossless: Bool
-    }
-
     /// Every audio stream of the file, in file order; [] when it can't be opened. Streams FFmpeg can't decode here are
     /// left out.
-    static func audioStreams(in url: URL) -> [AudioStream] {
+    static func audioStreams(in url: URL) -> [ContainerAudioStream] {
         let decoder = FFmpegDecoder(url: url)
         guard (try? decoder.open()) != nil, let handle = decoder.handle else { return [] }
         let capacity = 64
@@ -111,7 +98,7 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
             }
             let d = describe(codec: text(info.codec), profile: text(info.profile), bits: Int(info.bits))
             let title = text(info.title), language = text(info.language)
-            return AudioStream(index: Int(info.index), codec: d.codec, channels: Int(info.channels), sampleRate: Double(info.sampleRate),
+            return ContainerAudioStream(index: Int(info.index), codec: d.codec, channels: Int(info.channels), sampleRate: Double(info.sampleRate),
                                bits: d.bits, title: title.isEmpty ? nil : title, language: language.isEmpty ? nil : language,
                                isDefault: info.isDefault != 0, lossless: d.lossless)
         }
@@ -339,4 +326,41 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         try source.seekDSD(to: max(0, target) * 2)
         frame = max(0, target)
     }
+}
+
+/// One audio stream of a container (Matroska, WebM), as a stream picker lists it.
+public struct ContainerAudioStream: Sendable, Hashable {
+    /// The stream's index in the file: what `PlayableItem.audioStream` takes.
+    public var index: Int
+    public var codec: String
+    public var channels: Int
+    public var sampleRate: Double
+    public var bits: Int?
+    public var title: String?
+    public var language: String?
+    public var isDefault: Bool
+    public var lossless: Bool
+
+    public init(index: Int, codec: String, channels: Int, sampleRate: Double, bits: Int?, title: String?, language: String?,
+                isDefault: Bool, lossless: Bool) {
+        self.index = index; self.codec = codec; self.channels = channels; self.sampleRate = sampleRate; self.bits = bits
+        self.title = title; self.language = language; self.isDefault = isDefault; self.lossless = lossless
+    }
+}
+
+/// A library track that is one audio stream of a container with several: its location is "<path>#audio-<index>".
+public struct AudioStreamRef: Sendable, Hashable {
+    public let index: Int
+    public init(index: Int) { self.index = index }
+    public init?(location: String) {
+        guard let hash = location.lastIndex(of: "#"), location[location.index(after: hash)...].hasPrefix("audio-"),
+              let index = Int(location[location.index(hash, offsetBy: 7)...]), index >= 0 else { return nil }
+        self.index = index
+    }
+    public static func location(path: String, index: Int) -> String { "\(path)#audio-\(index)" }
+}
+
+extension SourceInspector {
+    /// The audio streams of a Matroska or WebM file (and any other FFmpeg container), when it has more than one to choose from.
+    public static func audioStreams(in url: URL) -> [ContainerAudioStream] { FFmpegDecoder.audioStreams(in: url) }
 }

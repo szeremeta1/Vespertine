@@ -331,6 +331,16 @@ public final class LibraryDatabase: Sendable {
             // itself: it goes when the song stops being bundled or its own favorite goes, so bundling never rewrites hearts.
             try db.alter(table: "favorite") { t in t.add(column: "borrowed", .boolean).notNull().defaults(to: false) }
         }
+        m.registerMigration("v22-matroska-audio") { db in
+            // Matroska audio was described as DTS whatever its codec, and a file with several audio streams listed one; a
+            // file with a CUESHEET tag listed one track where the sheet names several. Their unchanged size/mtime must
+            // not keep that after the upgrade. (A FLAC with only a CUESHEET block is split when it next changes.)
+            try db.execute(sql: """
+                UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'
+                WHERE isMissing = 0 AND location = filePath
+                  AND (lower(filePath) LIKE '%.mka' OR (json_valid(extraTags) AND json_extract(extraTags, '$.CUESHEET') IS NOT NULL))
+                """)
+        }
         return m
     }
 }
