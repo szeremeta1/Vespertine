@@ -129,11 +129,13 @@ final class AppSettings {
     var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
     /// The preset each output plays with (device UID → preset ID, or Off). Outputs that aren't listed play without one.
     var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
-    /// Room correction profiles, measured here or imported. Each belongs to the output it was measured on (or imported for).
-    var roomProfiles: [RoomProfile] { didSet { defaults.set(try? RoomCorrectionCoding.encodeProfiles(roomProfiles), forKey: "roomProfiles") } }
-    /// The profile each output plays with while room correction is on for it (device UID → profile ID). Off unless
-    /// switched on: outputs that aren't listed play without it.
-    var roomAssignments: [String: String] { didSet { defaults.set(roomAssignments, forKey: "roomAssignments") } }
+    /// Room correction profiles, measured here or imported, and which one each output plays. Each profile belongs to
+    /// the output it was measured on (or imported for). Correction is off unless switched on for an output.
+    var roomBook: RoomProfileBook { didSet { saveRoomBook() } }
+    /// Profiles from a newer Vespertine that this one can't read: kept as they are and written back with the rest.
+    @ObservationIgnored private var roomUnreadable: [Any] = []
+    /// Room Correction shows the simple controls unless this is on (View → Room Correction → Pro).
+    var roomProMode: Bool { didSet { defaults.set(roomProMode, forKey: "roomProMode") } }
     /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
     /// converted to PCM while correction is on, so it's corrected too.
     var roomNativeDSDDeviceUIDs: Set<String> { didSet { defaults.set(roomNativeDSDDeviceUIDs.sorted(), forKey: "roomNativeDSD") } }
@@ -222,8 +224,15 @@ final class AppSettings {
             if allOffered != offered { defaults.set(allOffered.sorted(), forKey: "eqOfferedPresets") }
         }
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
-        roomProfiles = defaults.data(forKey: "roomProfiles").flatMap { try? RoomCorrectionCoding.decodeProfiles($0) } ?? []
-        roomAssignments = defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]
+        let storedRoom = defaults.data(forKey: "roomProfiles")
+        let readRoom = storedRoom.flatMap { try? RoomCorrectionCoding.decodeProfilesKeepingUnreadable($0) }
+        // Data that isn't a list of profiles at all is set aside before the first save could replace it.
+        if let storedRoom, readRoom == nil { defaults.set(storedRoom, forKey: "roomProfiles.unreadable") }
+        roomUnreadable = readRoom?.unreadable ?? []
+        roomBook = RoomProfileBook(profiles: readRoom?.profiles ?? [],
+                                   choices: defaults.dictionary(forKey: "roomChoices") as? [String: String] ?? [:],
+                                   assignments: defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:])
+        roomProMode = defaults.bool(forKey: "roomProMode")
         roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
@@ -260,31 +269,42 @@ final class AppSettings {
     private static let equalizerOff = "__off__"
 
     /// The profiles measured on `uid`, newest first.
-    func roomProfiles(for uid: String) -> [RoomProfile] {
-        roomProfiles.filter { $0.deviceUID == uid }.sorted { $0.createdAt > $1.createdAt }
-    }
+    func roomProfiles(for uid: String) -> [RoomProfile] { roomBook.profiles(for: uid) }
 
     /// The room correction `uid` plays with: only while it's switched on, and only a profile measured on that output.
-    func roomProfile(for uid: String) -> RoomProfile? {
-        guard let id = roomAssignments[uid] else { return nil }
-        return roomProfiles.first { $0.id.uuidString == id && $0.deviceUID == uid }
+    func roomProfile(for uid: String) -> RoomProfile? { roomBook.active(for: uid) }
+
+    /// The profile `uid` would play, on or off.
+    func chosenRoomProfile(for uid: String) -> RoomProfile? { roomBook.chosenID(for: uid).flatMap { roomBook.profile($0) } }
+
+    /// Switches room correction on for `uid` with `profile`, or off (nil). Off keeps the choice for switching back on.
+    func setRoomProfile(_ profile: UUID?, for uid: String) {
+        guard let profile else { roomBook.setEnabled(false, for: uid); return }
+        roomBook.choose(profile, for: uid)
+        roomBook.setEnabled(true, for: uid)
     }
 
-    /// Switches room correction on for `uid` with `profile`, or off (nil).
-    func setRoomProfile(_ profile: UUID?, for uid: String) { roomAssignments[uid] = profile?.uuidString }
+    /// Adds a new profile (a measurement, an import) and returns it as stored: its name may have been numbered.
+    @discardableResult
+    func saveRoomProfile(_ profile: RoomProfile) -> RoomProfile { roomBook.add(profile) }
 
-    /// Replaces a stored profile (a redesign) or adds a new one.
-    func saveRoomProfile(_ profile: RoomProfile) {
-        if let i = roomProfiles.firstIndex(where: { $0.id == profile.id }) { roomProfiles[i] = profile } else { roomProfiles.append(profile) }
-    }
+    /// Changes a stored profile in place; nothing changes if `change` throws.
+    func updateRoomProfile(_ id: UUID, _ change: (inout RoomProfile) throws -> Void) throws { try roomBook.update(id, change) }
+
+    func renameRoomProfile(_ id: UUID, to name: String) throws { try roomBook.rename(id, to: name) }
+
+    @discardableResult
+    func duplicateRoomProfile(_ id: UUID) throws -> RoomProfile { try roomBook.duplicate(id) }
 
     func deleteRoomProfile(_ id: UUID) {
-        let removed = roomProfiles.first { $0.id == id }
-        roomProfiles.removeAll { $0.id == id }
-        roomAssignments = roomAssignments.filter { $0.value != id.uuidString }
         // Its measured filters go too, unless another profile still uses them.
-        let kept = Set(roomProfiles.flatMap { ($0.impulses ?? [:]).values.map(\.file) })
-        for impulse in Set((removed?.impulses ?? [:]).values) where !kept.contains(impulse.file) { impulse.delete() }
+        for impulse in roomBook.delete(id) { impulse.delete() }
+    }
+
+    private func saveRoomBook() {
+        defaults.set(try? RoomCorrectionCoding.encodeProfiles(roomBook.profiles, keeping: roomUnreadable), forKey: "roomProfiles")
+        defaults.set(roomBook.assignments, forKey: "roomAssignments")
+        defaults.set(roomBook.choices, forKey: "roomChoices")
     }
 
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
@@ -296,10 +316,7 @@ final class AppSettings {
         if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
         if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
         // Room profiles belong to the output, not to a USB port: the same DAC under a new UID keeps them.
-        if roomProfiles.contains(where: { $0.deviceUID == old }) {
-            roomProfiles = roomProfiles.map { var p = $0; if p.deviceUID == old { p.deviceUID = new }; return p }
-        }
-        if roomAssignments[new] == nil, let profile = roomAssignments[old] { roomAssignments[new] = profile }
+        roomBook.moveDevice(from: old, to: new)
         if roomNativeDSDDeviceUIDs.contains(old) { roomNativeDSDDeviceUIDs.insert(new) }
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
@@ -354,7 +371,7 @@ final class AppSettings {
         s.integerMode = integerMode
         s.matchSixteenBit = matchSixteenBit
         s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
-        s.roomCorrections = Dictionary(uniqueKeysWithValues: roomAssignments.keys.compactMap { uid in
+        s.roomCorrections = Dictionary(uniqueKeysWithValues: roomBook.assignments.keys.compactMap { uid in
             roomProfile(for: uid).map { (uid, RoomCorrectionPlayback(profile: $0)) }
         })
         s.roomNativeDSDDeviceUIDs = roomNativeDSDDeviceUIDs
