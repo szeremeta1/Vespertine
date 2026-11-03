@@ -61,7 +61,7 @@ static int64_t cache_seek(void *opaque, int64_t offset, int whence) {
     return d->cacheOffset;
 }
 
-static NFFDecoder *open_source(const char *path, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
+static NFFDecoder *open_source(const char *path, int wanted, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
     NFFDecoder *d = calloc(1, sizeof *d);
     if (!d) return NULL;
     if (readAt) {
@@ -89,7 +89,13 @@ static NFFDecoder *open_source(const char *path, void *opaque, int64_t size, NFF
     d->dataStart = d->fmt->pb ? avio_tell(d->fmt->pb) : -1;
     if ((r = avformat_find_stream_info(d->fmt, NULL)) < 0) { fail(error, errorSize, "read stream info", r); nff_close(d); return NULL; }
     const AVCodec *codec = NULL;
-    d->stream = av_find_best_stream(d->fmt, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+    if (wanted >= 0) {
+        // A stream the caller picked: it must exist, be audio and have a decoder here.
+        d->stream = (unsigned)wanted < d->fmt->nb_streams && d->fmt->streams[wanted]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO ? wanted : AVERROR_STREAM_NOT_FOUND;
+        if (d->stream >= 0) codec = avcodec_find_decoder(d->fmt->streams[d->stream]->codecpar->codec_id);
+    } else {
+        d->stream = av_find_best_stream(d->fmt, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+    }
     if (d->stream < 0 || !codec) { fail(error, errorSize, "no audio stream FFmpeg can decode here", d->stream); nff_close(d); return NULL; }
     AVStream *st = d->fmt->streams[d->stream];
     for (unsigned i = 0; i < d->fmt->nb_streams; i++) if ((int)i != d->stream) d->fmt->streams[i]->discard = AVDISCARD_ALL;
@@ -128,11 +134,19 @@ static NFFDecoder *open_source(const char *path, void *opaque, int64_t size, NFF
 }
 
 NFFDecoder *nff_open(const char *path, char *error, int errorSize) {
-    return open_source(path, NULL, 0, NULL, error, errorSize);
+    return open_source(path, -1, NULL, 0, NULL, error, errorSize);
 }
 
 NFFDecoder *nff_open_cached(const char *path, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
-    return open_source(path, opaque, size, readAt, error, errorSize);
+    return open_source(path, -1, opaque, size, readAt, error, errorSize);
+}
+
+NFFDecoder *nff_open_stream(const char *path, int stream, char *error, int errorSize) {
+    return open_source(path, stream, NULL, 0, NULL, error, errorSize);
+}
+
+NFFDecoder *nff_open_cached_stream(const char *path, int stream, void *opaque, int64_t size, NFFReadAt readAt, char *error, int errorSize) {
+    return open_source(path, stream, opaque, size, readAt, error, errorSize);
 }
 
 void nff_close(NFFDecoder *d) {
@@ -155,6 +169,38 @@ const char *nff_codec(const NFFDecoder *d) { return d->ctx->codec->name; }
 const char *nff_profile(const NFFDecoder *d) { return d->profile; }
 int nff_bits(const NFFDecoder *d) { return d->bits; }
 int64_t nff_position(const NFFDecoder *d) { return d->position; }
+
+int nff_stream_index(const NFFDecoder *d) { return d->stream; }
+
+static void copy_tag(char *to, size_t size, AVDictionary *metadata, const char *key) {
+    AVDictionaryEntry *e = av_dict_get(metadata, key, NULL, 0);
+    snprintf(to, size, "%s", e ? e->value : "");
+}
+
+int nff_audio_streams(const NFFDecoder *d, NFFStreamInfo *out, int max) {
+    int count = 0;
+    for (unsigned i = 0; i < d->fmt->nb_streams; i++) {
+        AVStream *st = d->fmt->streams[i];
+        if (st->codecpar->codec_type != AVMEDIA_TYPE_AUDIO) continue;
+        if (count < max) {
+            NFFStreamInfo *s = &out[count];
+            memset(s, 0, sizeof *s);
+            s->index = (int)i;
+            s->channels = st->codecpar->ch_layout.nb_channels;
+            s->sampleRate = st->codecpar->sample_rate;
+            s->bits = st->codecpar->bits_per_raw_sample;
+            s->isDefault = (st->disposition & AV_DISPOSITION_DEFAULT) != 0;
+            s->decodable = avcodec_find_decoder(st->codecpar->codec_id) != NULL;
+            snprintf(s->codec, sizeof s->codec, "%s", avcodec_get_name(st->codecpar->codec_id));
+            const char *profile = avcodec_profile_name(st->codecpar->codec_id, st->codecpar->profile);
+            snprintf(s->profile, sizeof s->profile, "%s", profile ? profile : "");
+            copy_tag(s->title, sizeof s->title, st->metadata, "title");
+            copy_tag(s->language, sizeof s->language, st->metadata, "language");
+        }
+        count++;
+    }
+    return count;
+}
 
 const char *nff_tag(const NFFDecoder *d, const char *key) {
     AVDictionaryEntry *e = av_dict_get(d->fmt->metadata, key, NULL, 0);
@@ -187,6 +233,10 @@ static bool append(NFFDecoder *d, const AVFrame *f) {
             case AV_SAMPLE_FMT_S32:  v = (float)(((const int32_t *)f->extended_data[0])[i * ch + c] / 2147483648.0); break;
             case AV_SAMPLE_FMT_S16P: v = ((const int16_t *)f->extended_data[c])[i] / 32768.0f; break;
             case AV_SAMPLE_FMT_S16:  v = ((const int16_t *)f->extended_data[0])[i * ch + c] / 32768.0f; break;
+            case AV_SAMPLE_FMT_U8P:  v = (((const uint8_t *)f->extended_data[c])[i] - 128) / 128.0f; break;
+            case AV_SAMPLE_FMT_U8:   v = (((const uint8_t *)f->extended_data[0])[i * ch + c] - 128) / 128.0f; break;
+            case AV_SAMPLE_FMT_DBLP: v = (float)((const double *)f->extended_data[c])[i]; break;
+            case AV_SAMPLE_FMT_DBL:  v = (float)((const double *)f->extended_data[0])[i * ch + c]; break;
             default: v = 0;
             }
             out[(size_t)s * ch + c] = v;

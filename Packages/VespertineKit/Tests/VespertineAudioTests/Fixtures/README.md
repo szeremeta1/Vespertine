@@ -32,3 +32,25 @@ the device formats each case ran in. The files those cases play are made by the 
 so the same bytes on every Mac), apart from the Dolby and DTS fixtures above. Recorded with
 `VESPERTINE_GOLDEN_RECORD=1 swift test --filter GoldenPCM`; `recordedOn` names the Mac the float-processing cases
 (resampling, downmix, DSD to PCM, digital volume) were recorded on, the only kind of Mac they're compared on.
+
+`Formats/`: 0.15.1 format fixtures, all synthesized tones (no recordings) except `tak-excerpt.tak`. Made with the
+script in `docs/fixtures/make-format-fixtures.sh`.
+- `stereo24.flac`, `surround16.flac`: 1 s of tones, 24-bit stereo (L 440 Hz, R 550) and 16-bit 5.1 (FL 440, FR 550, FC 660,
+  LFE 60, SL 770, SR 880), the sources the lossless Matroska files must decode to exactly.
+- `flac-stereo.mka`, `alac-stereo.mka`: the stereo source as FLAC and ALAC in Matroska (title, artist, album tags on the first).
+  `two-streams.mka`: the stereo source (title "Stereo mix") and the 5.1 source (title "Surround mix") as two FLAC streams.
+  `aac-stereo.mkv`, `mp3-stereo.mka`, `vorbis-stereo.webm`: the stereo source as AAC (FFmpeg), MP3 (LAME) and Vorbis (FFmpeg).
+  `opus-51.mka` / `.webm` / `.opus`: the 5.1 source as Opus (libopus, channel mapping family 1, so the side pair is the rear pair).
+- `gapless.mp3`, `gapless.m4a`, `gapless.opus`: exactly 2 s (96,000 samples at 48 kHz) of a 440 Hz cosine starting on its
+  peak, encoded with LAME (Xing/LAME tag), Apple's AAC encoder (`afconvert`, priming and remainder in the MP4) and libopus
+  (pre-skip). A decoder that keeps the encoder's delay or padding shows in the length and in the first samples.
+- `cue-block.flac` (a FLAC CUESHEET block) and `cue-tag.flac` (a `CUESHEET=` Vorbis comment): the stereo source split into
+  "First" (0:00) and "Second" (0:37), for the embedded-CUE import.
+- `xhe-stereo.m4a`: the stereo source as real xHE-AAC (USAC), encoded with the xHE-AAC encoder in
+  github.com/mstorsjo/fdk-aac (Apache-2.0 + Fraunhofer licence; a tool for making this file, not shipped) at 64 kb/s,
+  then copied into MP4 with `afconvert`.
+- `apac-51.caf`: the 5.1 source as Apple Positional Audio Codec (`afconvert -d apac`).
+- `tak-excerpt.tak`: the first 1 s (4 whole frames, 44.1 kHz stereo 16-bit) of FFmpeg's FATE sample `tak/luckynight-partial.tak`,
+  fetched from a GitHub mirror of the FATE suite (luke-cha/fate-suite; FFmpeg's samples server was unreachable). It is
+  the only recorded music here, one second of it; its sample count in the TAK header is the original's (9.5 s). The
+  expected PCM hash in the test comes from FFmpeg's own TAK decoder with every frame's CRC checked.

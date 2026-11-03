@@ -28,10 +28,13 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public let dvd: DVDStreamRef?
     /// Album, track number and genre, for deciding how it joins its neighbours while transitions are on; nil = unknown.
     public let context: TransitionContext?
+    /// Matroska, WebM and other containers with several audio streams: the stream (its index in the file) to play; nil = the best one.
+    public let audioStream: Int?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
                 regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil,
-                dvd: DVDStreamRef? = nil, context: TransitionContext? = nil) {
+                dvd: DVDStreamRef? = nil, context: TransitionContext? = nil, audioStream: Int? = nil) {
+        self.audioStream = audioStream
         self.cacheKey = cacheKey
         self.context = context
         self.sacdArea = sacdArea
@@ -149,8 +152,8 @@ enum SourceOpener {
     static let dolbyExtensions: Set<String> = ["ac3", "ec3", "eac3"]
 
     /// `area` picks an SACD image's area (stereo when nil), `dvd` a DVD-Video's LPCM run (its first track's when
-    /// nil); other files ignore them.
-    static func probe(_ url: URL, area: SACDArea? = nil, dvd: DVDStreamRef? = nil) throws -> ProbedSource {
+    /// nil), `audioStream` a Matroska or WebM file's audio stream (the best one when nil); other files ignore them.
+    static func probe(_ url: URL, area: SACDArea? = nil, dvd: DVDStreamRef? = nil, audioStream: Int? = nil) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
         if dvd != nil || dvdFolderExtensions.contains(ext) || (sacdExtensions.contains(ext) && !SACDImage.isSACD(url) && DVDVideoDisc.isDVDVideo(url)) {
             // DVD-Video LPCM: a run of one VOB's audio, decoded here (tracks are regions of it).
@@ -201,8 +204,8 @@ enum SourceOpener {
             return ProbedSource(url: url, format: format, decoderName: String(localized: "Native DSD reader", comment: "The decoder, in the signal path."), pcm: nil, dsd: decoder)
         }
         if FFmpegDecoder.extensions.contains(ext) {
-            // DTS / DTS-HD MA / Dolby TrueHD: FFmpeg.
-            let decoder = FFmpegDecoder(url: url)
+            // DTS / DTS-HD MA / Dolby TrueHD, TAK, and the audio of Matroska and WebM: FFmpeg.
+            let decoder = FFmpegDecoder(url: url, stream: audioStream)
             try decoder.open()
             let d = decoder.describe
             let format = SourceFormat(encoding: d.lossless ? .pcm : .lossy, codec: d.codec, sampleRate: d.sampleRate,
