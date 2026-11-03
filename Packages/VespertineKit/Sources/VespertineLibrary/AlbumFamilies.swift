@@ -114,3 +114,38 @@ public enum AlbumFamilies {
         return String(folded.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) })
     }
 }
+
+/// What kind of edition an album is, from its title's edition label ("(Super Deluxe)", "[MoFi 2012 SACD DSD64]", "(2019
+/// Remaster)") and its format: the words on its card in an album's editions.
+public enum EditionKind: String, Sendable, CaseIterable, Hashable {
+    case deluxe, anniversary, remaster, live, mono, surround, atmos, hiRes
+
+    public var name: String {
+        switch self {
+        case .deluxe: String(localized: "DELUXE", comment: "Kind of album edition: deluxe, expanded or with bonus tracks.")
+        case .anniversary: String(localized: "ANNIVERSARY", comment: "Kind of album edition.")
+        case .remaster: String(localized: "REMASTER", comment: "Kind of album edition: a remaster or audiophile reissue.")
+        case .live: String(localized: "LIVE", comment: "Kind of album edition.")
+        case .mono: String(localized: "MONO", comment: "Kind of album edition.")
+        case .surround: String(localized: "SURROUND", comment: "Kind of album edition: a 5.1, 7.1 or quad mix.")
+        case .atmos: String(localized: "ATMOS", comment: "Kind of album edition: a Dolby Atmos or spatial mix.")
+        case .hiRes: String(localized: "HI-RES", comment: "Kind of album edition: high resolution (more than CD).")
+        }
+    }
+
+    /// The kinds an edition is, in this order; none for a plain album.
+    public static func of(_ album: Album) -> [EditionKind] {
+        let title = album.title.lowercased()
+        func has(_ pattern: String) -> Bool { title.range(of: pattern, options: .regularExpression) != nil }
+        var kinds: [EditionKind] = []
+        if has(#"deluxe|expanded|bonus|special edition|collector|box"#) { kinds.append(.deluxe) }
+        if has(#"anniversary|\b\d{2}th\b"#) { kinds.append(.anniversary) }
+        if has(#"remaster|reissue|mofi|mobile fidelity|mfsl|\bhdcd\b|\bxrcd|\bshm\b|uhqcd|blu.?spec|\bgold\b|audiophile|\bdcc\b"#) { kinds.append(.remaster) }
+        if has(#"\blive\b"#) { kinds.append(.live) }
+        if has(#"\bmono\b"#) { kinds.append(.mono) }
+        if has(#"atmos|spatial"#) { kinds.append(.atmos) }
+        else if album.isMultichannel || has(#"surround|\b5\.1\b|\b7\.1\b|quad|multi.?channel|\bdts\b"#) { kinds.append(.surround) }
+        if album.isHiRes { kinds.append(.hiRes) }
+        return kinds
+    }
+}

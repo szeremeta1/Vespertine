@@ -19,8 +19,9 @@ struct TrackTable: View {
     var showAlbum = true
     var showArtist = true
     var reorderable: Playlist? = nil
-    /// Songs that also exist in another version on the album: track ID → "+ STEREO", "+ 5.1".
-    var otherVersions: [Int64: String] = [:]
+    /// Songs the library has in several copies (a 24/192 and a vinyl transfer, stereo and 5.1): track ID → every copy,
+    /// the row's among them. Their rows say how many, and open the list of them.
+    var copies: [Int64: [Track]] = [:]
     /// A filtered playlist: each row's place in the whole playlist, and the whole (so edits keep what's hidden).
     var positions: [Int]? = nil
     var allTracks: [Track]? = nil
@@ -88,12 +89,8 @@ struct TrackTable: View {
                     Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
-                    if let other = row.track.id.flatMap({ otherVersions[$0] }) {
-                        Text(other).font(Typeface.mono(8.5, weight: .semibold)).letterSpacing(0.6).rowForeground(Palette.text2)
-                            .padding(.horizontal, 5).padding(.vertical, 2)
-                            .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
-                            .fixedSize()
-                            .help("This song is also on the album in another version; Vespertine plays the one that suits your output")
+                    if let copies = row.track.id.flatMap({ self.copies[$0] }) {
+                        SongCopiesButton(model: model, track: row.track, copies: copies, list: tracks)
                     }
                 }
             }
@@ -125,7 +122,7 @@ struct TrackTable: View {
             // song the set happens to list first (else the first selected, in the order shown).
             let clicked = Self.clickedRow().flatMap { rows.indices.contains($0) && ids.contains(rows[$0].id) ? $0 : nil }
             guard let index = clicked ?? rows.firstIndex(where: { ids.contains($0.id) }) else { return }
-            model.player.play(rows.map(\.track), startAt: index, transitions: model.playlistTransitions(.sidebar(model.sidebar)))
+            model.player.play(rows.map(\.track), startAt: index, transitions: model.library.transitions(of: reorderable))
         }
         .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id))) }
         .onChange(of: model.selectedTrackIDs) { _, new in
@@ -157,7 +154,7 @@ struct TrackTable: View {
         }
         .onKeyPress(.return) {
             guard let index = rows.firstIndex(where: { selection.contains($0.id) }) else { return .ignored }
-            model.player.play(rows.map(\.track), startAt: index, transitions: model.playlistTransitions(.sidebar(model.sidebar)))
+            model.player.play(rows.map(\.track), startAt: index, transitions: model.library.transitions(of: reorderable))
             return .handled
         }
     }
@@ -324,6 +321,8 @@ struct SongList {
     /// into `songs`, and every song's versions. nil on pages that list every file.
     var songOf: [Int]? = nil
     var songs: [[Track]] = []
+    /// Every copy of each song in the library, listed or not.
+    var allCopies: [[Track]] = []
 
     init() {}
     @MainActor init(_ tracks: [Track], model: AppModel) {
@@ -331,18 +330,22 @@ struct SongList {
         facts = model.trackFacts(tracks)
     }
 
-    /// `tracks` as songs: each with all its versions on its album (the 5.1 one beside the stereo one that was
-    /// favorited), in the order the songs first appear.
+    /// `tracks` as songs, in the order the songs first appear: each listed once, by the copies of it among `tracks` (a
+    /// favorite is the copy hearted; where an album's copies are bundled, all of them are), with every copy of it in the
+    /// library a click away (`allCopies`).
     @MainActor init(songs tracks: [Track], model: AppModel) {
         var index: [String: Int] = [:]
         var listed: [Track] = [], songOf: [Int] = []
+        let given = Set(tracks.map(\.location))
         for song in model.library.versions(of: tracks) {
             let key = song.map(\.location).sorted().joined(separator: "\u{1F}")
             guard index[key] == nil else { continue }
+            let mine = song.filter { given.contains($0.location) }
             index[key] = songs.count
-            listed += song
-            songOf += Array(repeating: songs.count, count: song.count)
-            songs.append(song)
+            listed += mine
+            songOf += Array(repeating: songs.count, count: mine.count)
+            songs.append(mine)
+            allCopies.append(song)
         }
         self.tracks = listed
         self.songOf = songOf
@@ -368,7 +371,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
         let favorites = model.library.favoriteIDs
         let indices = filter.isEmpty || list.facts.count != list.tracks.count ? Array(list.tracks.indices)
             : list.tracks.indices.filter { filter.matches(list.facts[$0], favorite: favorites.contains(list.tracks[$0].id ?? -1)) }
-        let (shown, others): ([Track], [Int64: String]) = list.songOf.map { oneVersionEach(indices, songOf: $0) } ?? (indices.map { list.tracks[$0] }, [:])
+        let (shown, others): ([Track], [Int64: [Track]]) = list.songOf.map { oneVersionEach(indices, songOf: $0) } ?? (indices.map { list.tracks[$0] }, [:])
         VStack(spacing: 0) {
             PageHeader(title: title, meta: meta(shown, filtered: !filter.isEmpty)) {
                 extra
@@ -387,7 +390,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
                 } else {
                     // A filtered playlist keeps its own numbers, and edits through it keep the songs out of view.
                     let partial = !filter.isEmpty && playlist?.isSmart == false
-                    TrackTable(tracks: shown, reorderable: playlist, otherVersions: others,
+                    TrackTable(tracks: shown, reorderable: playlist, copies: others,
                                positions: partial ? indices : nil, allTracks: partial ? list.tracks : nil)
                 }
             }
@@ -395,9 +398,9 @@ struct SongsPage<Extra: View, Empty: View>: View {
         .background(Palette.window)
     }
 
-    /// A song in several versions shows once, as album pages show it: the version that plays on this output among
-    /// those the filter lets through (the 5.1 one when the page asks for multichannel), the others named beside it.
-    private func oneVersionEach(_ indices: [Int], songOf: [Int]) -> ([Track], [Int64: String]) {
+    /// A song in several copies shows once: the copy listed (a favorite copy, on Favorites) that plays on this output among
+    /// those the filter lets through (the 5.1 one when the page asks for multichannel), its other copies a click away.
+    private func oneVersionEach(_ indices: [Int], songOf: [Int]) -> ([Track], [Int64: [Track]]) {
         var order: [Int] = []
         var passing: [Int: [Track]] = [:]
         for i in indices {
@@ -408,9 +411,13 @@ struct SongsPage<Extra: View, Empty: View>: View {
         let shares = model.shares
         let shown = order.map { s in
             let versions = passing[s] ?? []
-            return TrackVersions.choose(versions, multichannel: wanted, isLocal: { !shares.isNetwork($0) }) ?? versions[0]
+            return TrackVersions.choose(versions, multichannel: wanted, isLocal: { !shares.isNetwork($0) }, isPreferred: model.library.isPreferredCopy) ?? versions[0]
         }
-        return (shown, AlbumDetailView.otherVersions(of: order.map { list.songs[$0] }, shown: shown))
+        let all = order.map { list.allCopies.indices.contains($0) ? list.allCopies[$0] : list.songs[$0] }
+        return (shown, Dictionary(zip(shown, all).compactMap { t, copies in
+            guard let id = t.id, copies.count > 1 else { return nil }
+            return (id, copies)
+        }, uniquingKeysWith: { a, _ in a }))
     }
 
     private func meta(_ shown: [Track], filtered: Bool) -> String {

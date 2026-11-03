@@ -79,6 +79,8 @@ final class PlayerController {
     private(set) var signalPath: SignalPath?
     /// Set while macOS renders the track itself (Dolby Atmos).
     private(set) var systemRendering: SystemRendering?
+    /// The channels of the bed decoded beside the output while macOS renders Atmos or a receiver decodes a bitstream.
+    private(set) var bedMeters: BedMeterLayout?
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
@@ -164,8 +166,12 @@ final class PlayerController {
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
-    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil) -> [QueueEntry] {
-        let versions = library.versions(of: tracks).enumerated().map { i, versions in
+    /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
+    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil,
+                         exactly: Set<String> = []) -> [QueueEntry] {
+        // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
+        let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
+            if exactly.contains(tracks[i].location) { return [tracks[i]] }
             guard let allowing, versions.count > 1 else { return versions }
             return versions.filter { $0.location == tracks[i].location || allowing($0) }
         }
@@ -178,7 +184,8 @@ final class PlayerController {
             }
             // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
             let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
-            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal) ?? track : track
+            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal,
+                                                                   isPreferred: library.isPreferredCopy) ?? track : track
             return QueueEntry(item: makeItem(chosen, transitions: transitions), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }
@@ -191,7 +198,8 @@ final class PlayerController {
         var changed = false
         func resolve(_ entry: QueueEntry) -> QueueEntry {
             guard entry.versions.count > 1,
-                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
+                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) },
+                                                    isPreferred: library.isPreferredCopy),
                   chosen.id != entry.track.id else { return entry }
             changed = true
             return entry.replacing(chosen, item: makeItem(chosen, id: entry.id, transitions: entry.item.context?.override))
@@ -203,12 +211,12 @@ final class PlayerController {
     }
 
     /// Plays `tracks` from `index`. `shuffled` turns shuffle on (starting at a random song) or off (in order, as
-    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`: see `entries`.
+    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`, `exactly`: see `entries`.
     /// `transitions`: the playlist's own transitions, when it's a playlist that has them (they go with its songs).
     func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil,
-              transitions: TransitionOverride? = nil) {
+              transitions: TransitionOverride? = nil, exactly: Set<String> = []) {
         guard !tracks.isEmpty else { return }
-        let entries = entries(tracks, allowing: allowing, transitions: transitions)
+        let entries = entries(tracks, allowing: allowing, transitions: transitions, exactly: exactly)
         guard !entries.isEmpty else { return }
         if let shuffled, shuffled != shuffle {
             settingShuffle = true
@@ -231,10 +239,10 @@ final class PlayerController {
         if let current { start(current) }
     }
 
-    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next.
-    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next. `exactly`: see `entries`.
+    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
         syncMirror()
@@ -242,9 +250,10 @@ final class PlayerController {
 
     /// Adds `tracks` to the end of Playing Next: after the songs already added, before the rest of what was
     /// playing (as Apple Music's Play Last does), so they're heard without first sitting through the whole album.
-    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// `exactly`: see `entries`.
+    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1 + playingNext.count)
         originalOrder.append(contentsOf: entries)
         syncMirror()
@@ -475,6 +484,7 @@ final class PlayerController {
         // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
         signalPath = nil
         systemRendering = nil
+        bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
         engine.play(entry.item)
@@ -659,6 +669,7 @@ final class PlayerController {
         if requested == nil {
             if signalPath != snap.signalPath { signalPath = snap.signalPath }
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
+            if bedMeters != snap.bedMeters { bedMeters = snap.bedMeters }
         }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
@@ -675,7 +686,12 @@ final class PlayerController {
         yieldShareToPlayback(snap)
         yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
-        if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
+        if state == .playing, requested == nil, let bed = bedMeters, bed.names.count > 2 {
+            // macOS renders, or a receiver decodes: the bed decoded beside the output.
+            let peaks = engine.takeChannelPeaks()
+            if channelLevels.count != peaks.count { channelLevels = peaks }
+            else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }
+        } else if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
             let peaks = engine.takeChannelPeaks()
             if channelLevels.count != peaks.count { channelLevels = peaks }
             else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }

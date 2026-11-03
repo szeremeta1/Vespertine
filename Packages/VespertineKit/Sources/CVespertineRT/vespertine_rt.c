@@ -574,6 +574,7 @@ struct NRTRenderContext {
     _Atomic uint64_t discardTo;    // ring position the I/O thread drops everything before (0: none asked)
     _Atomic bool draining;
     _Atomic bool integer;
+    _Atomic bool unscaled;         // matched 16-bit output: the fader never scales its words
     _Atomic uint32_t underruns;
     _Atomic uint64_t framesRendered;
 
@@ -649,6 +650,7 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->discardTo, 0);
     atomic_init(&ctx->draining, false);
     atomic_init(&ctx->integer, false);
+    atomic_init(&ctx->unscaled, false);
     atomic_init(&ctx->underruns, 0);
     atomic_init(&ctx->framesRendered, 0);
     atomic_init(&ctx->resumeFrames, 0);
@@ -866,7 +868,7 @@ bool nrt_context_fading(const NRTRenderContext *ctx) {
     return (command >> 35) != atomic_load(&ctx->fadeTaken) || atomic_load(&ctx->fadeRunning);
 }
 
-// Takes a new fade command (once per slice). `bypass`: DoP, passthrough or integer output, whose words are never scaled.
+// Takes a new fade command (once per slice). `bypass`: DoP, passthrough, integer or matched 16-bit output, whose words are never scaled.
 static void take_fade(NRTRenderContext *ctx, bool bypass) {
     const uint64_t command = atomic_load_explicit(&ctx->fadeCommand, memory_order_acquire);
     const uint64_t serial = command >> 35;
@@ -923,6 +925,7 @@ uint64_t nrt_context_discard(NRTRenderContext *ctx) {
 }
 void nrt_context_cancel_discard(NRTRenderContext *ctx) { atomic_store(&ctx->discardTo, 0); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
+void nrt_context_set_unscaled(NRTRenderContext *ctx, bool u) { atomic_store(&ctx->unscaled, u); }
 void nrt_context_set_integer(NRTRenderContext *ctx, bool i) { atomic_store(&ctx->integer, i); if (i) atomic_store(&ctx->passthrough, true); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
 void nrt_context_set_rebuffer(NRTRenderContext *ctx, uint32_t resumeFrames) {
@@ -1147,7 +1150,8 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     take_discard(ctx);
     const bool dop = atomic_load_explicit(&ctx->dop, memory_order_relaxed);
     const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
-    take_fade(ctx, dop || integer || atomic_load_explicit(&ctx->passthrough, memory_order_relaxed));
+    take_fade(ctx, dop || integer || atomic_load_explicit(&ctx->passthrough, memory_order_relaxed)
+                       || atomic_load_explicit(&ctx->unscaled, memory_order_relaxed));
     if (atomic_load_explicit(&ctx->muted, memory_order_relaxed)) {
         hold_silence(ctx, frames, ch, dop, integer);
         return;
@@ -1227,12 +1231,19 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
 
     // The fader: idle (full level, no ramp) leaves this test as it was, so the copy path stays a copy.
     const bool fading = ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0;
-    if (gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir)) || fading) {
+    const bool processing = gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir));
+    if (processing || fading) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
         double frameLevel = 1.0;
         for (uint32_t f = 0; f < processed; f++) {
             float *frame = ctx->scratch + (size_t)f * ch;
+            // The fader is part of this frame only while it ramps or holds a level other than full: once a ramp has
+            // ended inside the slice, a fade in leaves the rest as the copy it is (unless gain, filters or the equalizer
+            // change it anyway), and a fade out leaves exact silence, not dither.
+            const bool scaled = fading && (ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0);
+            if (fading && !processing && !scaled) continue;
+            const bool silent = fading && ctx->fadeLeft == 0 && ctx->fadeLevel == 0.0;
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
                 if (equalize) {
@@ -1247,13 +1258,13 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
                         s = y;
                     }
                 }
-                if (fading) {
+                if (scaled) {
                     if (c == 0) frameLevel = fade_frame(ctx);
                     s *= gain * frameLevel;
                 } else {
                     s *= gain;
                 }
-                if (lsb > 0) s += tpdf(&ctx->rng) * lsb;
+                if (lsb > 0 && !silent) s += tpdf(&ctx->rng) * lsb;
                 frame[c] = (float)s;
             }
         }

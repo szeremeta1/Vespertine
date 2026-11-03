@@ -271,6 +271,7 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        library.bundlesCopiesByDefault = settings.bundleCopies
         syncEngine()
         shares.start()
         analysis.start()
@@ -424,6 +425,21 @@ final class AppModel {
         player.resolveVersions()
     }
 
+    /// What an album plays: its chosen copy, else the best copy for the output; with its copies bundled, each song once
+    /// (the player picks each song's copy for the output as it queues it).
+    func playableTracks(albumKey: String) -> [Track] {
+        let copies = library.albumCopies(albumKey: albumKey)
+        guard copies.copies.count > 1 else { return copies.copies.first?.tracks ?? library.tracks(albumKey: albumKey) }
+        let wanted = outputWantsMultichannel() ?? true
+        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) }) {
+            return copy.tracks
+        }
+        return copies.songs.map { song in
+            TrackVersions.choose(song.tracks, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) },
+                                 isPreferred: library.isPreferredCopy) ?? song.lead
+        }
+    }
+
     /// Whether songs with a stereo and a multichannel version should play the multichannel one: on an output
     /// with more than two channels (an interface, a receiver's speaker layout) or with Spatial Audio on
     /// (AirPods, Beats). nil while the chosen output is missing (reconnecting AirPods): keep what's queued.
@@ -452,14 +468,15 @@ final class AppModel {
 
     var selectedTracks: [Track] { library.tracks(ids: Array(selectedTrackIDs)) }
 
-    /// Adds songs to Favorites, or removes them when every one already is a favorite. A song is all its
-    /// versions: favoriting its stereo version on headphones favorites its 5.1 one too. Undoable in the
+    /// Adds songs to Favorites, or removes them when every one already is a favorite. A favorite is the copy hearted
+    /// (the 24/96 vinyl transfer, not the 24/192 download beside it); where an album's copies are bundled, a song is
+    /// all its copies: favoriting its stereo copy on headphones favorites its 5.1 one too. Undoable in the
     /// window you're in (⌘Z brings back a heart clicked by mistake); SwiftUI's own undo manager is nil in
     /// these windows, so it's the AppKit window's.
     func toggleFavorite(_ tracks: [Track]) {
         guard tracks.contains(where: { $0.id != nil }) else { return }
         let favorite = !tracks.filter { $0.id != nil }.allSatisfy(library.isFavorite)
-        let ids = Array(Set(library.versions(of: tracks).flatMap { $0 }.compactMap(\.id) + tracks.compactMap(\.id)))
+        let ids = Array(Set(library.playbackVersions(of: tracks).flatMap { $0 }.compactMap(\.id) + tracks.compactMap(\.id)))
         // Only the songs that change, so undo restores exactly what was there.
         let changed = ids.filter { library.favoriteIDs.contains($0) != favorite }
         setFavorite(favorite, trackIDs: changed, undoManager: NSApp.keyWindow?.undoManager ?? NSApp.mainWindow?.undoManager)

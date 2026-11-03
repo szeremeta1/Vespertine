@@ -230,7 +230,7 @@ struct PlaybackSettings: View {
                     Text("Channel bed through Vespertine").tag(false)
                 }
                 (s.atmosBySystem
-                     ? Text("macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. Vespertine's own signal path, spectrum and channel meters don't apply to these tracks. The Visualizer shows the decoded 5.1 or 7.1 bed instead, not the objects.")
+                     ? Text("macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. The spectrum, channel meters and Visualizer show the 5.1 or 7.1 bed from a separate decode (not the objects), which never touches what macOS plays.")
                      : Text("Vespertine decodes the Dolby Digital Plus 5.1 or 7.1 bed itself (without the Atmos objects), with its own signal path, meters and Spatial Audio."))
                     .font(.caption).foregroundStyle(.secondary)
                 Picker("Stereo and surround versions", selection: $s.versionPreference) {
@@ -240,6 +240,10 @@ struct PlaybackSettings: View {
                 }
                 .onChange(of: s.versionPreference) { model.player.resolveVersions() }
                 Text("For albums that have each song in stereo and in surround, such as an SACD's two layers. Matching the output plays surround on a multichannel device or with Spatial Audio on, and stereo on a stereo DAC or with Spatial Audio off. Upcoming songs switch when you change outputs.")
+                    .font(.caption).foregroundStyle(.secondary)
+                Toggle("Bundle copies of an album", isOn: $s.bundleCopies)
+                    .onChange(of: s.bundleCopies) { model.library.bundlesCopiesByDefault = s.bundleCopies; model.player.resolveVersions() }
+                Text("When your library has an album more than once (a 24/192 download and a vinyl transfer, a stereo and a 5.1 mix, a WAV and a FLAC), its page lists every copy. Off, one copy plays: the one you pick there, or the best for the output, and a heart is for that copy only. On, the copies play as one album, each song in the copy the output supports best. Each album can also choose on its page.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section("Volume") {

@@ -129,6 +129,7 @@ private final class TracingBedReader: BedReading, @unchecked Sendable {
         } catch { note("next threw \(error)"); throw error }
     }
     func cancel() { note("cancel"); inner.cancel() }
+    var channelLabels: [AudioChannelLabel] { inner.channelLabels }
 }
 
 private final class TraceBox: @unchecked Sendable {
@@ -156,6 +157,33 @@ struct AtmosVisualizerTests {
         #expect(read?.frames == 4096)
         #expect(read?.sampleRate == 48_000)
         #expect(l.contains { abs($0) > 0.4 })
+    }
+
+    @Test("Closed, the next Atmos song started, shown again: the tap is on for the new render and reads it")
+    func reopenAfterSkip() {
+        let engine = PlaybackEngine()
+        let first = FakeAtmosRender()
+        engine.attachSystemTapForTesting(first)
+        engine.setVisualizerTap(true)
+        first.advance(by: 48_000)
+        var l = [Float](repeating: 0, count: 2048), r = l
+        #expect(engine.copyVisualizerTap(left: &l, right: &r)?.position == 48_000)
+        // The window closes: nothing is read, and the render doesn't tap.
+        engine.setVisualizerTap(false)
+        #expect(!first.tapping)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r) == nil)
+        // The next song starts while it's closed: a render of its own, made with the tap off.
+        let second = FakeAtmosRender()
+        engine.attachSystemTapForTesting(second)
+        second.advance(by: 4_800)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r) == nil)
+        // The window shows again.
+        engine.setVisualizerTap(true)
+        #expect(second.tapping)
+        let read = engine.copyVisualizerTap(left: &l, right: &r)
+        #expect(read?.position == 4_800 && read?.frames == 2048)
+        second.advance(by: 4_800)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r)?.position == 9_600)
     }
 
     /// Energy of `signal` at `hz` (Goertzel).

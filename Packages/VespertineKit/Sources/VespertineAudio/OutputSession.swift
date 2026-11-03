@@ -178,6 +178,7 @@ final class OutputSession: @unchecked Sendable {
         nrt_context_set_passthrough(ctx, plan.isPassthrough)
         nrt_context_set_dop(ctx, plan.mode == .dop)
         nrt_context_set_integer(ctx, integerMode)
+        nrt_context_set_unscaled(ctx, plan.sixteenBit == .requested)
 
         // Multichannel routing.
         decodedLayout = routeLayout

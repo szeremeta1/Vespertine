@@ -260,6 +260,96 @@ struct AppAuditTests {
         player.clearUpcoming()
         #expect(player.upcoming.isEmpty && player.current?.id == current)
     }
+    /// The sidebar can still show a playlist while the table lists something else (an album opened from search, search
+    /// results): only the playlist a table lists lends it its own transitions.
+    @Test func playlistTransitionsBelongToTheListPlayed() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-playlist-transitions-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
+        let party = try #require(library.createPlaylist(name: "Party")), plain = try #require(library.createPlaylist(name: "Plain"))
+        library.setTransitions(.liveSet, for: party)
+        #expect(library.transitions(of: party) == .liveSet)
+        #expect(library.transitions(of: plain) == nil, "a playlist with no choice follows the app's setting")
+        #expect(library.transitions(of: nil) == nil, "a list that isn't a playlist never gets one")
+    }
+
+    /// A copy plays as itself, on any output, unless the album's copies are bundled; then the output picks, except for a
+    /// copy asked for by hand. Album playback takes one copy, never every copy of every song.
+    @Test func copiesPlayAsChosen() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-copies-\(UUID())")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let url = root.appendingPathComponent("sample.wav")
+        do {
+            let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
+                AVSampleRateKey: 48000.0, AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 16])
+            let b = try #require(AVAudioPCMBuffer(pcmFormat: f.processingFormat, frameCapacity: 480))
+            b.frameLength = 480
+            for c in 0..<2 { for i in 0..<480 { b.floatChannelData![c][i] = 0 } }
+            try f.write(from: b)
+        }
+        let original = try MetadataReader.read(url: url, artwork: nil)
+        // Nonexistent paths exercise queue logic without playing anything on the user's DAC.
+        try FileManager.default.removeItem(at: url)
+        func copy(_ folder: String, _ n: Int, _ title: String, channels: Int, rate: Double) -> Track {
+            var t = original
+            t.id = nil; t.title = title; t.trackNumber = n; t.discNumber = 1; t.album = "Night Ferry"; t.albumArtist = "The Lanterns"
+            t.location = "/nowhere/The Lanterns/\(folder)/\(n).flac"; t.filePath = t.location; t.channels = channels; t.sampleRate = rate
+            t.duration = 200 + Double(n)
+            return t
+        }
+        let (defaults, suite) = try scratchDefaults(in: root)
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let settings = AppSettings(defaults: defaults)
+        let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
+        let shares = NetworkShareManager(library: library, settings: settings, dataDirectory: root.appendingPathComponent("database"))
+        let player = PlayerController(library: library, settings: settings, shares: shares)
+        defer { player.stop() }
+        let inserted = try library.database.writer.write { db in
+            try [copy("Night Ferry (2002)", 1, "Harbour Lights", channels: 2, rate: 192_000),
+                 copy("Night Ferry (2002)", 2, "Ninth Street", channels: 2, rate: 192_000),
+                 copy("Night Ferry (2002) [Vinyl Transfer 24-96]", 1, "Harbour Lights", channels: 2, rate: 96_000),
+                 copy("Night Ferry (2002) [Vinyl Transfer 24-96]", 2, "Ninth Street", channels: 2, rate: 96_000),
+                 copy("Night Ferry (2002) [5.1 Mix]", 1, "Harbour Lights (5.1 mix)", channels: 6, rate: 96_000),
+                 copy("Night Ferry (2002) [5.1 Mix]", 2, "Ninth Street (5.1 mix)", channels: 6, rate: 96_000)]
+                .map { t -> Track in var t = t; try t.insert(db); return t }
+        }
+        let download = Array(inserted[0...1]), vinyl = Array(inserted[2...3]), surround = Array(inserted[4...5])
+        player.wantsMultichannel = { true }
+
+        // Separate copies (the default): the vinyl transfer plays as itself, even on a surround output.
+        player.play(vinyl)
+        #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+        #expect(player.queue.allSatisfy { $0.versions.isEmpty })
+
+        // The album has three copies, each whole, every song in all three.
+        let copies = library.albumCopies(albumKey: download[0].albumKey)
+        #expect(copies.copies.count == 3 && copies.songs.count == 2 && copies.songs.allSatisfy { $0.tracks.count == 3 })
+        #expect(copies.copies.first { $0.layout.isMultichannel }?.edition == "5.1 Mix")
+
+        // Bundled: the output picks (5.1 here), and a copy picked by hand still plays as itself.
+        library.bundlesCopiesByDefault = true
+        player.play(download)
+        #expect(player.queue.map(\.track.location) == surround.map(\.location))
+        player.wantsMultichannel = { false }
+        player.resolveVersions()
+        #expect(player.queue[1].track.location == download[1].location, "upcoming songs follow the output")
+        player.play(download, exactly: [download[0].location])
+        #expect(player.queue[0].track.location == download[0].location)
+        player.play(vinyl, startAt: 1, exactly: Set(vinyl.map(\.location)))
+        #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+
+        // Adding a copy by hand to the queue keeps it as that copy too (the copy card's Add This Copy to Queue).
+        player.wantsMultichannel = { true }
+        player.play(surround)
+        player.addToQueue(vinyl, exactly: Set(vinyl.map(\.location)))
+        player.playNext(download, exactly: Set(download.map(\.location)))
+        #expect(player.queue.dropFirst().map(\.track.location) == download.map(\.location) + vinyl.map(\.location) + [surround[1].location],
+                "copies added by hand stay the copy asked for; the rest of the album follows the output")
+        #expect(player.queue.dropFirst().prefix(4).allSatisfy { $0.versions.isEmpty })
+    }
+
     @Test func launchArgumentsIgnoreOtherDefaultsDomains() {
         // A value UserDefaults knows from elsewhere (registered here: in memory, never saved, like one left in the
         // app's settings) is not a launch argument, so no QA hook acts on it.

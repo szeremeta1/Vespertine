@@ -20,7 +20,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-01 <a id="bp-definition"></a>The badge means every sample arrives unaltered
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:92` — "/// True only when every sample reaches the DAC unaltered."
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:95` — "/// True only when every sample reaches the DAC unaltered."
 - **Text:** `README.md:40` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
@@ -489,7 +489,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
 
 - **Text:** `docs/TRANSITIONS.md:107` — "Only while it's heard is the music not bit-perfect"
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:94` — "guard transition?.audible != true"
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:97` — "guard transition?.audible != true"
 - **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift` and `SmartMixGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants C-FLT-001-tr, C-INT-001-tr and C-DOPS-004-tr, killed by the float, integer and DoP groups' checks).

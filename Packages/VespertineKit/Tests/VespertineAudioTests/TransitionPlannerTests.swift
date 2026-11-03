@@ -390,6 +390,16 @@ struct TransitionSignalPathTests {
         #expect(path(heard, profile: speakers).statusLine == "CROSSFADE")
     }
 
+    @Test("The fader for play, pause and seek scales the samples while it ramps: not bit-perfect then, though no crossfade is heard")
+    func faderRamp() {
+        var ramping = path(SignalPath.TransitionStage(style: .smartMix, audible: false))
+        #expect(ramping.isBitPerfect)
+        ramping.faderRamping = true
+        #expect(!ramping.isBitPerfect && ramping.statusLine == "DIGITAL GAIN")
+        ramping.faderRamping = false
+        #expect(ramping.isBitPerfect && ramping.statusLine == "BIT-PERFECT")
+    }
+
     @Test("Master switch off: the path is exactly as without transitions")
     func off() {
         #expect(path(nil) == {
