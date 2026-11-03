@@ -158,6 +158,27 @@ struct RoomCaptureInputTests {
         #expect(CaptureStreamFormat(d).sampleKind == nil, "unsigned integer")
     }
 
+    @Test("An aggregate device that lists no formats is recorded as it is, at a rate it offers")
+    func aggregateWithoutFormatList() throws {
+        // Aggregates often hide their format list; the stream follows the device's rate and keeps its format.
+        let input = Self.umik(rates: [44_100, 48_000, 96_000], nominal: 96_000, current: Self.float(96_000), available: [])
+        let plan = try CaptureInputPlanner.plan(input, outputRate: 192_000)
+        #expect(plan.captureRate == 48_000)
+        #expect(plan.changesNominalRate)
+        #expect(plan.streamChanges.isEmpty)
+        #expect(plan.kinds == [.float32])
+        let odd = CaptureStreamFormat(rate: 96_000, channels: 1, isFloat: false, bits: 24, bigEndian: true)
+        #expect(throws: CaptureInputError.self) { try CaptureInputPlanner.plan(Self.umik(rates: [48_000], nominal: 96_000, current: odd, available: []), outputRate: 48_000) }
+    }
+
+    @Test("A Float32 stream left at another rate is moved to the recording's (the loopback and shared-device case)")
+    func staleStreamRate() throws {
+        let input = Self.umik(rates: [48_000], nominal: 48_000, current: Self.float(44_100), available: [Self.float(44_100), Self.float(48_000)], shares: true)
+        let plan = try CaptureInputPlanner.plan(input, outputRate: 48_000)
+        #expect(plan.captureRate == 48_000)
+        #expect(plan.streamChanges[0] == Self.float(48_000))
+    }
+
     // MARK: Stimulus at the output's rate
 
     @Test("A 48 kHz stimulus played by a 176.4 kHz output keeps its length, level and pitch")
