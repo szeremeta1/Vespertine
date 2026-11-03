@@ -134,6 +134,9 @@ final class AppSettings {
     var roomBook: RoomProfileBook { didSet { saveRoomBook() } }
     /// Profiles from a newer Vespertine that this one can't read: kept as they are and written back with the rest.
     @ObservationIgnored private var roomUnreadable: [Any] = []
+    @ObservationIgnored private let roomStore: RoomProfileStore
+    /// Set when the library came from the old preferences: written to its file at the end of start-up.
+    @ObservationIgnored private var roomLoadedFromLegacy = false
     /// Room Correction shows the simple controls unless this is on (View → Room Correction → Pro).
     var roomProMode: Bool { didSet { defaults.set(roomProMode, forKey: "roomProMode") } }
     /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
@@ -161,6 +164,19 @@ final class AppSettings {
 
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
         self.defaults = defaults
+        let resolvedDataDirectory: URL
+        if let dataDirectory {
+            resolvedDataDirectory = dataDirectory
+        } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
+            resolvedDataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
+        } else {
+            let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
+            // Development builds keep their own library beside the real one.
+            // The room measurement test build has its own, too.
+            let side = Bundle.main.bundleIdentifier.flatMap { $0.hasSuffix(".dev") ? "Vespertine Dev" : $0.hasSuffix(".roomtest") ? "Vespertine Room Test" : nil }
+            resolvedDataDirectory = side.map { standard.deletingLastPathComponent().appendingPathComponent($0, isDirectory: true) } ?? standard
+        }
+        roomStore = RoomProfileStore(directory: resolvedDataDirectory)
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
@@ -224,14 +240,13 @@ final class AppSettings {
             if allOffered != offered { defaults.set(allOffered.sorted(), forKey: "eqOfferedPresets") }
         }
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
-        let storedRoom = defaults.data(forKey: "roomProfiles")
-        let readRoom = storedRoom.flatMap { try? RoomCorrectionCoding.decodeProfilesKeepingUnreadable($0) }
-        // Data that isn't a list of profiles at all is set aside before the first save could replace it.
-        if let storedRoom, readRoom == nil { defaults.set(storedRoom, forKey: "roomProfiles.unreadable") }
-        roomUnreadable = readRoom?.unreadable ?? []
-        roomBook = RoomProfileBook(profiles: readRoom?.profiles ?? [],
-                                   choices: defaults.dictionary(forKey: "roomChoices") as? [String: String] ?? [:],
-                                   assignments: defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:])
+        // The library is a file in the data folder; the old preferences are read only until it exists.
+        let loadedRoom = roomStore.load(legacy: .init(profiles: defaults.data(forKey: "roomProfiles"),
+                                                      choices: defaults.dictionary(forKey: "roomChoices") as? [String: String] ?? [:],
+                                                      assignments: defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]))
+        roomUnreadable = loadedRoom?.unreadable ?? []
+        roomBook = loadedRoom?.book ?? RoomProfileBook()
+        roomLoadedFromLegacy = loadedRoom != nil && !FileManager.default.fileExists(atPath: roomStore.fileURL.path)
         roomProMode = defaults.bool(forKey: "roomProMode")
         roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
@@ -240,17 +255,9 @@ final class AppSettings {
         visualizerWindow = VisualizerWindowState.load(from: defaults)
         transitionsFeature = defaults.bool(forKey: "transitionsFeature")
         transitions = TransitionSettings.load(from: defaults)
-        if let dataDirectory {
-            self.dataDirectory = dataDirectory
-        } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
-            self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
-        } else {
-            let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
-            // Development builds keep their own library beside the real one.
-            // The room measurement test build has its own, too.
-            let side = Bundle.main.bundleIdentifier.flatMap { $0.hasSuffix(".dev") ? "Vespertine Dev" : $0.hasSuffix(".roomtest") ? "Vespertine Room Test" : nil }
-            self.dataDirectory = side.map { standard.deletingLastPathComponent().appendingPathComponent($0, isDirectory: true) } ?? standard
-        }
+        self.dataDirectory = resolvedDataDirectory
+        // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).
+        if roomLoadedFromLegacy { saveRoomBook() }
     }
 
     var networkCacheLimitBytes: Int64 { Int64(networkCacheLimitGB * 1_000_000_000) }
@@ -305,9 +312,8 @@ final class AppSettings {
     }
 
     private func saveRoomBook() {
-        defaults.set(try? RoomCorrectionCoding.encodeProfiles(roomBook.profiles, keeping: roomUnreadable), forKey: "roomProfiles")
-        defaults.set(roomBook.assignments, forKey: "roomAssignments")
-        defaults.set(roomBook.choices, forKey: "roomChoices")
+        do { try roomStore.save(roomBook, unreadable: roomUnreadable) }
+        catch { NSLog("Vespertine: the room correction library couldn't be saved: \(error.localizedDescription)") }
     }
 
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
