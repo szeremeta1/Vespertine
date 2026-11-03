@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Testing
 import VespertineAudio
 @testable import Vespertine
@@ -140,5 +141,97 @@ struct TransitionsTests {
         // No album tag: every such song of an artist would share "Unknown Album", so none is claimed.
         #expect(PlayerController.transitionContext(album: nil, albumKey: "x\u{1F}Unknown Album", disc: nil, track: 1, genre: nil).albumKey == nil)
         #expect(PlayerController.transitionContext(album: "  ", albumKey: "x\u{1F}  ", disc: nil, track: 1, genre: nil).albumKey == nil)
+    }
+}
+
+/// Turning transitions on for the first time shows a note. It belongs in the window the switch was turned on in: shown
+/// on the main window while Settings was in use, it raised that window over Settings and Settings seemed to close
+/// (QA, 0.15.0: Settings' window order went 0 → 2 the moment the switch was turned on there).
+@Suite("Transitions first-time note", .serialized) @MainActor
+struct TransitionsNoteTests {
+    @Test("Nothing is shown until the switch is turned on for the first time")
+    func startsHidden() {
+        let note = TransitionsNote()
+        #expect(!note.isShown(in: .main) && !note.isShown(in: .settings))
+    }
+
+    @Test("Turned on in Settings, the note is Settings' sheet and the main window gets none")
+    func fromSettings() {
+        var note = TransitionsNote()
+        note.show(in: .settings)
+        #expect(note.isShown(in: .settings))
+        #expect(!note.isShown(in: .main))
+        note.dismiss()
+        #expect(!note.isShown(in: .settings) && !note.isShown(in: .main))
+    }
+
+    @Test("Turned on from the menu, the transport bar or a shortcut, the note is the main window's")
+    func fromMain() {
+        var note = TransitionsNote()
+        note.show(in: .main)
+        #expect(note.isShown(in: .main) && !note.isShown(in: .settings))
+    }
+
+    @Test("Turning the feature off takes a note that's up away")
+    func offTakesItAway() {
+        var note = TransitionsNote()
+        note.show(in: .settings)
+        note.dismiss()
+        #expect(note == TransitionsNote())
+    }
+}
+
+/// The note's logo is Vespertine's one moon (docs/brand/mark-flat.svg), not the Transitions glyph's two crescents.
+@Suite("Transitions note logo") @MainActor
+struct TransitionsNoteLogoTests {
+    /// Connected regions of a shape drawn into a square bitmap.
+    static func regions(of shape: some Shape, side: Int = 160) -> Int {
+        var pixels = [UInt8](repeating: 0, count: side * side)
+        pixels.withUnsafeMutableBytes { raw in
+            let context = CGContext(data: raw.baseAddress, width: side, height: side, bitsPerComponent: 8, bytesPerRow: side,
+                                    space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+            context.translateBy(x: 0, y: CGFloat(side)); context.scaleBy(x: 1, y: -1)
+            context.setFillColor(gray: 1, alpha: 1)
+            context.addPath(shape.path(in: CGRect(x: 0, y: 0, width: side, height: side)).cgPath)
+            context.fillPath()
+        }
+        var seen = [Bool](repeating: false, count: side * side)
+        var count = 0
+        for start in 0..<side * side where pixels[start] > 127 && !seen[start] {
+            count += 1
+            var stack = [start]
+            seen[start] = true
+            while let p = stack.popLast() {
+                let x = p % side, y = p / side
+                for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                    let nx = x + dx, ny = y + dy
+                    guard nx >= 0, ny >= 0, nx < side, ny < side else { continue }
+                    let q = ny * side + nx
+                    if pixels[q] > 127 && !seen[q] { seen[q] = true; stack.append(q) }
+                }
+            }
+        }
+        return count
+    }
+
+    @Test("The brand moon is one region; the Transitions glyph is two")
+    func oneMoon() {
+        #expect(Self.regions(of: VespertineMoon()) == 1)
+        #expect(Self.regions(of: TransitionsGlyph()) == 2)
+    }
+
+    @Test("The note shows the brand moon")
+    func noteLogo() {
+        #expect(Self.regions(of: TransitionsExplainerSheet.Logo()) == 1)
+    }
+
+    @Test("The moon is the brand mark: a crescent, open towards the upper right")
+    func shape() {
+        let box = VespertineMoon().path(in: CGRect(x: 0, y: 0, width: 512, height: 512)).boundingRect
+        #expect(abs(box.minX) < 1 && abs(box.minY) < 1 && abs(box.maxY - 512) < 1 && abs(box.maxX - 474) < 1)
+        // The disc's centre is empty (the cut-out), its lower left is moon.
+        let path = VespertineMoon().path(in: CGRect(x: 0, y: 0, width: 512, height: 512))
+        #expect(!path.contains(CGPoint(x: 330, y: 190)))
+        #expect(path.contains(CGPoint(x: 90, y: 400)))
     }
 }

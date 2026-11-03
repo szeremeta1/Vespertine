@@ -145,6 +145,17 @@ final class DeviceStore {
     }
 }
 
+/// Where the first-time transitions note is up: the window the switch was turned on in. (On the main window while
+/// Settings was in use, it raised that window over Settings, which seemed to close.)
+struct TransitionsNote: Equatable {
+    enum Window { case main, settings }
+    private(set) var window: Window?
+
+    func isShown(in other: Window) -> Bool { window == other }
+    mutating func show(in window: Window) { self.window = window }
+    mutating func dismiss() { window = nil }
+}
+
 @Observable
 @MainActor
 final class AppModel {
@@ -210,8 +221,8 @@ final class AppModel {
     var showFindMusic = false
     var showConnectServer = false
     var showLoopbackTest = false
-    /// The note shown the first time transitions are turned on.
-    var showTransitionsExplainer = false
+    /// The note shown the first time transitions are turned on, and the window it's shown in.
+    var transitionsNote = TransitionsNote()
     /// What a playlist import did, shown in an alert until dismissed.
     var playlistReport: String?
     /// Address to pre-fill in Connect to Server (e.g. to enter a password for an existing share).
@@ -397,7 +408,7 @@ final class AppModel {
     /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
     func setTransitions(_ on: Bool) {
         guard settings.transitionsFeature else { return }
-        if settings.transitions.setEnabled(on) { showTransitionsExplainer = true }
+        if settings.transitions.setEnabled(on) { transitionsNote.show(in: .main) }
         syncEngine()
     }
 
@@ -408,10 +419,10 @@ final class AppModel {
     func setTransitionsFeature(_ on: Bool) {
         settings.transitionsFeature = on
         if on {
-            if settings.transitions.setEnabled(true) { showTransitionsExplainer = true }
+            if settings.transitions.setEnabled(true) { transitionsNote.show(in: .settings) }
         } else {
             _ = settings.transitions.setEnabled(false)
-            showTransitionsExplainer = false
+            transitionsNote.dismiss()
         }
         syncEngine()
     }

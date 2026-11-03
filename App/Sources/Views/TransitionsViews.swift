@@ -26,6 +26,26 @@ nonisolated struct TransitionsGlyph: Shape {
     }
 }
 
+/// Vespertine's one moon, the brand mark (docs/brand/mark-flat.svg, a 512-unit square): a disc with a smaller disc cut
+/// from its upper right.
+nonisolated struct VespertineMoon: Shape {
+    func path(in rect: CGRect) -> Path {
+        let k = min(rect.width, rect.height) / 512
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * k, y: rect.minY + y * k) }
+        var path = Path()
+        path.move(to: point(473.82, 390.01))
+        path.addCurve(to: point(363.52, 419.84), control1: point(441.48, 409.04), control2: point(403.76, 419.84))
+        path.addCurve(to: point(143.36, 199.68), control1: point(241.93, 419.84), control2: point(143.36, 321.27))
+        path.addCurve(to: point(269.78, 0.70), control1: point(143.36, 111.66), control2: point(195.01, 35.71))
+        path.addCurve(to: point(256, 0), control1: point(265.28, 0.12), control2: point(260.65, 0))
+        path.addCurve(to: point(0, 256), control1: point(114.62, 0), control2: point(0, 114.62))
+        path.addCurve(to: point(256, 512), control1: point(0, 397.38), control2: point(114.62, 512))
+        path.addCurve(to: point(473.82, 390.01), control1: point(348.18, 512), control2: point(428.99, 463.28))
+        path.closeSubpath()
+        return path
+    }
+}
+
 /// The master switch as an icon, lit while transitions are on (transport bar, Up Next).
 struct TransitionsButton: View {
     @Environment(AppModel.self) private var model
@@ -47,14 +67,17 @@ struct TransitionsButton: View {
     }
 }
 
-/// Shown once, the first time transitions are turned on.
+/// Shown once, the first time transitions are turned on, in the window they were turned on in.
 struct TransitionsExplainerSheet: View {
     @Environment(\.dismiss) private var dismiss
+
+    /// The note's logo: Vespertine's one moon (the Transitions glyph's two crescents are the switch's icon).
+    typealias Logo = VespertineMoon
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top, spacing: 14) {
-                TransitionsGlyph()
+                Logo()
                     .frame(width: 30, height: 30)
                     .foregroundStyle(Palette.brass)
                     .accessibilityHidden(true)
@@ -123,6 +146,11 @@ struct TransitionsSettingsSection: View {
         let t = s.transitions
         Section("Transitions") {
             Toggle("Transitions", isOn: Binding(get: { model.settings.transitionsFeature }, set: { model.setTransitionsFeature($0) }))
+                // The first-time note comes up on this window, where the switch was turned on, not on the main window
+                // (which would be raised over Settings).
+                .sheet(isPresented: Binding(get: { model.transitionsNote.isShown(in: .settings) }, set: { if !$0 { model.transitionsNote.dismiss() } })) {
+                    TransitionsExplainerSheet()
+                }
             Text("Adds Crossfade, Smart Mix and Live Set, with controls in the transport bar and menus. Off, none of it is in the app and every song plays as before.")
                 .font(.caption).foregroundStyle(.secondary)
             if s.transitionsFeature {
