@@ -92,14 +92,17 @@ struct ContainerFormatTests {
 
     // MARK: Matroska lossless
 
-    @Test("Lossless audio in Matroska decodes to exactly what was put in", arguments: [("flac-stereo.mka", "FLAC"), ("alac-stereo.mka", "ALAC")])
-    func losslessMatroska(name: String, codec: String) throws {
+    @Test("Lossless audio in Matroska decodes to exactly what was put in", arguments: [
+        ("flac-stereo.mka", "FLAC", 48_000), ("alac-stereo.mka", "ALAC", 48_000), ("wavpack-stereo.mka", "WavPack", 48_000),
+        ("tta-stereo.mka", "TTA", 48_000), ("pcm-stereo.mka", "PCM", 12_000),
+    ])
+    func losslessMatroska(name: String, codec: String, frames: Int) throws {
         let (format, _, audio, _) = try Self.decode(name)
         #expect(format.codec == codec && format.encoding == .pcm && format.bitDepth == 24)
         #expect(format.channels == 2 && format.sampleRate == 48_000)
         let (_, _, reference, _) = try Self.decode("stereo24.flac")
-        #expect(audio[0].count == reference[0].count && audio[0].count == 48_000)
-        #expect(audio == reference, "\(name) differs from the 24-bit source")
+        #expect(audio[0].count == frames, "\(audio[0].count) frames")
+        #expect(audio == reference.map { Array($0.prefix(frames)) }, "\(name) differs from the 24-bit source")
     }
 
     @Test("Matroska tags are read for any codec", arguments: ["flac-stereo.mka"])

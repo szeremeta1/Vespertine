@@ -37,7 +37,7 @@ so the same bytes on every Mac), apart from the Dolby and DTS fixtures above. Re
 script in `docs/fixtures/make-format-fixtures.sh`.
 - `stereo24.flac`, `surround16.flac`: 1 s of tones, 24-bit stereo (L 440 Hz, R 550) and 16-bit 5.1 (FL 440, FR 550, FC 660,
   LFE 60, SL 770, SR 880), the sources the lossless Matroska files must decode to exactly.
-- `flac-stereo.mka`, `alac-stereo.mka`: the stereo source as FLAC and ALAC in Matroska (title, artist, album tags on the first).
+- `flac-stereo.mka`, `alac-stereo.mka`, `wavpack-stereo.mka`, `tta-stereo.mka`, `pcm-stereo.mka` (0.25 s): the stereo source as FLAC, ALAC, WavPack, TTA and PCM in Matroska (title, artist, album tags on the first).
   `two-streams.mka`: the stereo source (title "Stereo mix") and the 5.1 source (title "Surround mix") as two FLAC streams.
   `aac-stereo.mkv`, `mp3-stereo.mka`, `vorbis-stereo.webm`: the stereo source as AAC (FFmpeg), MP3 (LAME) and Vorbis (FFmpeg).
   `opus-51.mka` / `.webm` / `.opus`: the 5.1 source as Opus (libopus, channel mapping family 1, so the side pair is the rear pair).

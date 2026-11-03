@@ -55,3 +55,7 @@ cp stereo24.flac mqa-tagged.flac
 metaflac --set-tag="MQAENCODER=MQAEncode v1.1, 2.4.2+uuid" --set-tag="ORIGINALSAMPLERATE=96000" mqa-tagged.flac
 # python3 docs/fixtures/make-mqa-sync-fixture.py mqa-sync.s24 && ffmpeg -f s24le -ar 48000 -ac 2 -i mqa-sync.s24 -c:a flac mqa-sync.flac
 # PCM WavPack: wavpack -y stereo24.wav -o pcm-stereo24.wv (WavPack 5.8.1)
+# More lossless Matroska (decoded and compared with stereo24.flac):
+F -i stereo24.flac -c:a wavpack -bits_per_raw_sample 24 wavpack-stereo.mka
+F -i stereo24.wav -c:a tta tta-stereo.mka
+F -i stereo24.wav -t 0.25 -c:a pcm_s24le pcm-stereo.mka
