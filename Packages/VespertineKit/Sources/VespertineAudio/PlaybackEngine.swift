@@ -1093,7 +1093,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         dropBitstreamMeter()
         sessionLock.lock()
         let shared = shared
-        let source = BedMeterSource(decoder: SystemBedDecoder(decodingWith: url), tapping: visualizerTap, metering: meterTap,
+        let source = BedMeterSource(decoder: SystemBedDecoder(decodingWith: url, item: item), tapping: visualizerTap, metering: meterTap,
                                     position: { shared.withLock { $0.snapshot.position } })
         bitstreamMeter = (item.id, source)
         systemTap = source

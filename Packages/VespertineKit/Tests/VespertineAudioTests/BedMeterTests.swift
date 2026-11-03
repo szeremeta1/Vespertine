@@ -294,6 +294,23 @@ struct BedMeterTests {
         Self.expectTones(try Self.channels(of: reader, frames: 16_384), labels: reader.channelLabels, rate: 48_000)   // converted to 48 kHz
     }
 
+    @Test("A track of a CUE-split DTS CD: the meters' decode covers the track's own stretch, as the engine's does, not the file from its start")
+    func dtsCDTrackRegion() throws {
+        let url = fixture("dts-cd-tones.wav")
+        let native = try SourceOpener.probe(url).format.sampleRate
+        let whole = try SourceOpener.pcmDecoder(for: url)
+        let item = PlayableItem(url: url, regionStartFrame: Int64(native * 0.5), regionFrameLength: Int64(native * 0.75))
+        let track = try SourceOpener.pcmDecoder(for: url, item: item)
+        let rate = track.processingFormat.sampleRate
+        #expect(abs(track.length - Int64(0.75 * rate)) <= 2, "the track's three quarters of a second, not the whole file (\(whole.length) frames)")
+        #expect(track.length < whole.length)
+        // And it reads: all six channels of the region carry their tones, at the layout the meters expect.
+        let reader = try PCMBedReader(decoder: track, seconds: 0)
+        #expect(BedMeterLayout(labels: reader.channelLabels).layout == "5.1")
+        let read = try Self.channels(of: reader, frames: 16_384)
+        #expect(read.count == 6 && read.allSatisfy { ($0.map(abs).max() ?? 0) > 0.05 })
+    }
+
     @Test("DTS and TrueHD in Matroska, and raw Dolby Digital, give a 5.1 bed too", arguments: [
         "dts-tones.mka", "truehd-tones.mka", "dolby-digital-tones.ac3", "dts-tones.dts", "truehd-tones.thd",
     ])

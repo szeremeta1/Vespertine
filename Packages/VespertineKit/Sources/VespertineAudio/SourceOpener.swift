@@ -340,6 +340,13 @@ enum SourceOpener {
         } else {
             throw SourceOpenerError.unsupported(probed.url)
         }
+        decoder = try applyingRegion(of: item, to: decoder, probed: probed)
+        return decoder
+    }
+
+    /// `decoder` limited to the item's region (a CUE track's stretch of the file), or as it is for a whole file.
+    static func applyingRegion(of item: PlayableItem, to decoder: PCMDecoding, probed: ProbedSource) throws -> PCMDecoding {
+        var decoder = decoder
         if let sourceStart = item.regionStartFrame {
             // Library CUE offsets are in the file's native sample frames. DSD is decoded at 1/8
             // its bit rate for PCM, or packed into DoP at 1/16. Convert before seeking the wrapped
@@ -429,9 +436,12 @@ enum SourceOpener {
 extension SourceOpener {
     /// A new decoder on the file for reading it as PCM, as the engine would when not sending it untouched (the meters'
     /// own decode of a bitstream); throws for sources that aren't PCM.
-    static func pcmDecoder(for url: URL) throws -> PCMDecoding {
-        guard let pcm = try probe(url).pcm else { throw SourceOpenerError.unsupported(url) }
-        return pcm
+    /// With an `item` that plays a region of the file (a CUE track), the decoder is limited to it, as the engine's is.
+    static func pcmDecoder(for url: URL, item: PlayableItem? = nil) throws -> PCMDecoding {
+        let probed = try probe(url)
+        guard let pcm = probed.pcm else { throw SourceOpenerError.unsupported(url) }
+        guard let item else { return pcm }
+        return try applyingRegion(of: item, to: pcm, probed: probed)
     }
 }
 

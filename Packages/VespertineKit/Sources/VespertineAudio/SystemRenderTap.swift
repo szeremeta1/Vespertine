@@ -531,9 +531,10 @@ final class SystemBedDecoder: @unchecked Sendable {
 
     /// Decodes the file at `url` as Vespertine's own engine does when it isn't sending the frames to a receiver untouched:
     /// opened again with `SourceOpener`, so a DTS CD's carrier goes through FFmpeg.
-    convenience init(decodingWith url: URL) {
+    /// `item`: the song played, so a track of a CUE-split file is read from its own stretch, not from the file's start.
+    convenience init(decodingWith url: URL, item: PlayableItem? = nil) {
         self.init(makeReader: { seconds in
-            try PCMBedReader(decoder: try SourceOpener.pcmDecoder(for: url), seconds: seconds)
+            try PCMBedReader(decoder: try SourceOpener.pcmDecoder(for: url, item: item), seconds: seconds)
         })
     }
 
