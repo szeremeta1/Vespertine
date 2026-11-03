@@ -2167,6 +2167,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         path?.otherAppsPlaying = othersPlaying
         if path != nil { path?.transition = transitionStage(for: segment) }
+        if let session, let plan = path?.plan, !plan.isPassthrough, !session.applied.integerMode, plan.sixteenBit != .requested {
+            path?.faderRamping = nrt_context_fading(session.context)
+        }
         let device = sessionDevice
         let st = state
         let underruns = underrunTotal

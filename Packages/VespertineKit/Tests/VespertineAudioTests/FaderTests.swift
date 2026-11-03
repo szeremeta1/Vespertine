@@ -119,13 +119,14 @@ struct FaderTests {
         #expect(render(ctx, 100).allSatisfy { abs($0 - 0.4) < 1e-7 })
     }
 
-    @Test("Native DSD, passthrough and integer words are never scaled: a command applies at once", arguments: ["dop", "passthrough", "integer"])
+    @Test("Native DSD, passthrough, integer and matched 16-bit words are never scaled: a command applies at once", arguments: ["dop", "passthrough", "integer", "sixteen"])
     func bypass(_ kind: String) {
         let ring = nrt_ring_create(8192, 2)!, ctx = nrt_context_create(ring, 512)!
         defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
         switch kind {
         case "dop": nrt_context_set_dop(ctx, true)
         case "passthrough": nrt_context_set_passthrough(ctx, true)
+        case "sixteen": nrt_context_set_unscaled(ctx, true)   // "Match 16-bit sources": float samples, dithered at 16 bits when scaled
         default: nrt_context_set_integer(ctx, true)
         }
         // Words that are DoP frames with alternating markers (valid for every kind).
@@ -144,5 +145,24 @@ struct FaderTests {
         nrt_context_set_muted(ctx, false)
         let after = render(ctx, 500)
         if kind != "dop" { #expect(after.map(\.bitPattern) == input[2000..<3000].map(\.bitPattern)) }
+    }
+
+    @Test("When a ramp ends inside a slice, the rest of the slice is what it would be without a fader: dither only while the level moves")
+    func rampEndsMidSlice() {
+        let ring = nrt_ring_create(8192, 2)!, ctx = nrt_context_create(ring, 4096)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        let input = signal(3000)     // dither is on at 24 bits (the default)
+        #expect(nrt_ring_write(ring, input, 3000) == 3000)
+        nrt_context_fade(ctx, true, 100, true, false)
+        // One slice: the ramp is the first 100 frames, the other 1900 are at full level, which is a copy.
+        let up = render(ctx, 2000)
+        #expect(up[200...].map(\.bitPattern) == input[200..<4000].map(\.bitPattern), "full level after the ramp is untouched, not dithered")
+        #expect(!nrt_context_fading(ctx))
+
+        // A fade out that mutes: its silence is silence, not dither noise, to the end of the slice.
+        nrt_context_fade(ctx, false, 100, false, true)
+        let down = render(ctx, 1000)
+        #expect(down[200...].allSatisfy { $0 == 0 }, "silence after the ramp is exact")
+        #expect(nrt_context_is_muted(ctx))
     }
 }

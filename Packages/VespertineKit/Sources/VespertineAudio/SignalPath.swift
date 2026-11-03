@@ -38,6 +38,9 @@ public struct SignalPath: Sendable, Hashable {
     public var concealedFrames = 0
     /// Song transitions, while their master switch is on; nil while it's off.
     public var transition: TransitionStage? = nil
+    /// The fader for play, pause, stop, skip and seek is ramping the samples right now (never for words it doesn't scale:
+    /// DSD, bitstream, integer, matched 16-bit). While it does, the samples are no longer the file's.
+    public var faderRamping = false
 
     /// Song transitions in the signal path: what the next boundary does, and whether a crossfade is heard right now.
     public struct TransitionStage: Sendable, Hashable {
@@ -91,7 +94,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        guard transition?.audible != true, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
+        guard transition?.audible != true, !faderRamping, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
         else { return false }
         switch plan.mode {
@@ -144,7 +147,7 @@ public struct SignalPath: Sendable, Hashable {
         if !applied.exclusive, otherAppsPlaying { return String(localized: "MIXED WITH OTHER APPS", comment: "Status badge (short, uppercase).") }
         if roomCorrection != nil { return String(localized: "ROOM CORRECTION", comment: "Status badge (short, uppercase).") }
         if equalizer != nil { return String(localized: "EQUALIZER", comment: "Status badge (short, uppercase).") }
-        if modifiesSamples { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
+        if modifiesSamples || faderRamping { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
         if !applied.physicalFormatKnown { return String(localized: "FORMAT UNCONFIRMED", comment: "Status badge (short, uppercase).") }
         return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
     }

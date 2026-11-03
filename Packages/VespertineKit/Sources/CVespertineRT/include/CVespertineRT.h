@@ -111,6 +111,9 @@ void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);
 /// Integer mode: the ring carries 32-bit integer samples (bit patterns in the float slots) for a device set
 /// to a non-mixable Int32 format. They're copied untouched (implies passthrough); meters read them as integers.
 void nrt_context_set_integer(NRTRenderContext *_Nonnull ctx, bool integer);
+/// "Match 16-bit sources": the output's words are the file's own (float samples carrying 16-bit words), so the fader
+/// for play, pause and seek never scales them: a command applies at once, as in integer mode.
+void nrt_context_set_unscaled(NRTRenderContext *_Nonnull ctx, bool unscaled);
 uint32_t nrt_context_take_underruns(NRTRenderContext *_Nonnull ctx);
 /// Network streams: hold in silence (consuming nothing) when the ring can't fill a slice, and resume
 /// once `resumeFrames` are buffered. 0 turns it off. Clamped to ¾ of the ring.
