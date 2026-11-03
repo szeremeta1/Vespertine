@@ -181,7 +181,7 @@ struct TransitionsNoteTests {
     }
 }
 
-/// The note's logo is Vespertine's one moon (docs/brand/mark-flat.svg), not the Transitions glyph's two crescents.
+/// The note's logo is Vespertine's one moon (docs/brand/mark-flat.svg), .
 @Suite("Transitions note logo") @MainActor
 struct TransitionsNoteLogoTests {
     /// Connected regions of a shape drawn into a square bitmap.
@@ -214,10 +214,18 @@ struct TransitionsNoteLogoTests {
         return count
     }
 
-    @Test("The brand moon is one region; the Transitions glyph is two")
+    @Test("The brand moon is one region, at every size the icon is drawn")
     func oneMoon() {
         #expect(Self.regions(of: VespertineMoon()) == 1)
-        #expect(Self.regions(of: TransitionsGlyph()) == 2)
+        #expect(Self.regions(of: VespertineMoon(centered: true)) == 1)
+    }
+
+    @Test("The icon's moon sits centred in its square")
+    func centred() {
+        for side in [9.0, 17, 30, 512] as [CGFloat] {
+            let box = VespertineMoon(centered: true).path(in: CGRect(x: 0, y: 0, width: side, height: side)).boundingRect
+            #expect(abs(box.midX - side / 2) < side * 0.002 && abs(box.midY - side / 2) < side * 0.002)
+        }
     }
 
     @Test("The note shows the brand moon")
@@ -233,5 +241,37 @@ struct TransitionsNoteLogoTests {
         let path = VespertineMoon().path(in: CGRect(x: 0, y: 0, width: 512, height: 512))
         #expect(!path.contains(CGPoint(x: 330, y: 190)))
         #expect(path.contains(CGPoint(x: 90, y: 400)))
+    }
+
+    /// Draws the icon's moon at each size it's used (and larger, for inspection) in light and dark, checks the pixels,
+    /// and writes the PNGs to $VT_SNAPSHOT_DIR when it's set.
+    @Test("Snapshot: the icon's moon renders at every size, light and dark")
+    func snapshots() throws {
+        let dir = ProcessInfo.processInfo.environment["VT_SNAPSHOT_DIR"].map { URL(fileURLWithPath: $0) }
+        if let dir { try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true) }
+        for (name, scheme, ink, ground) in [("light", ColorScheme.light, Color.black, Color.white), ("dark", .dark, Color.white, Color.black)] {
+            for side in [9.0, 14, 17, 30, 128, 512] as [CGFloat] {
+                let view = VespertineMoon(centered: true).fill(ink).frame(width: side, height: side)
+                    .padding(side * 0.1).background(ground).environment(\.colorScheme, scheme)
+                let renderer = ImageRenderer(content: view)
+                renderer.scale = side < 100 ? 8 : 1
+                let image = try #require(renderer.cgImage)
+                if let dir {
+                    let rep = NSBitmapImageRep(cgImage: image)
+                    try rep.representation(using: .png, properties: [:])?.write(to: dir.appendingPathComponent("moon-\(name)-\(Int(side)).png"))
+                }
+                // Ink bounds: centred, and neither empty nor clipped.
+                let rep = NSBitmapImageRep(cgImage: image)
+                var minX = image.width, maxX = -1, minY = image.height, maxY = -1
+                for y in 0..<image.height { for x in 0..<image.width {
+                    let l = rep.colorAt(x: x, y: y)?.usingColorSpace(.deviceGray)?.whiteComponent ?? 0
+                    if abs(l - (name == "light" ? 1 : 0)) > 0.5 { minX = min(minX, x); maxX = max(maxX, x); minY = min(minY, y); maxY = max(maxY, y) }
+                } }
+                #expect(maxX > minX && maxY > minY, "\(name) \(side): nothing drawn")
+                let w = CGFloat(image.width)
+                #expect(abs(CGFloat(minX + maxX + 1) / 2 - w / 2) < w * 0.02, "\(name) \(side): not centred horizontally")
+                #expect(abs(CGFloat(minY + maxY + 1) / 2 - w / 2) < w * 0.02, "\(name) \(side): not centred vertically")
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 //
-// Vespertine — the transitions switch: its glyph, its button and the note shown the first time it's turned on.
+// Vespertine — the transitions switch: its icon, its button and the note shown the first time it's turned on.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -7,31 +7,20 @@ import SwiftUI
 import VespertineAudio
 import VespertineLibrary
 
-/// Two of Vespertine's crescents, one passing into the other. Each is the logo's moon: a disc with a disc 0.86 its
-/// size cut from it, set 0.42 of its radius right and 0.22 up (docs/brand/logo-mono-ivory.svg). A thin gap keeps the
-/// front one apart from the one behind it.
-nonisolated struct TransitionsGlyph: Shape {
-    func path(in rect: CGRect) -> Path {
-        let side = min(rect.width, rect.height)
-        let r = side * 0.34
-        func crescent(_ cx: CGFloat, _ cy: CGFloat) -> Path {
-            let moon = Path(ellipseIn: CGRect(x: cx - r, y: cy - r, width: 2 * r, height: 2 * r))
-            let cut = r * 0.86, x = cx + r * 0.42, y = cy - r * 0.22
-            return moon.subtracting(Path(ellipseIn: CGRect(x: x - cut, y: y - cut, width: 2 * cut, height: 2 * cut)))
-        }
-        let back = crescent(rect.midX - side * 0.15, rect.midY + side * 0.05)
-        let front = crescent(rect.midX + side * 0.15, rect.midY - side * 0.05)
-        let gap = front.strokedPath(StrokeStyle(lineWidth: side * 0.09, lineJoin: .round))
-        return back.subtracting(gap).union(front)
-    }
-}
-
 /// Vespertine's one moon, the brand mark (docs/brand/mark-flat.svg, a 512-unit square): a disc with a smaller disc cut
 /// from its upper right.
+///
+/// `centered` slides it sideways so the crescent itself, not its 512-unit square, sits in the middle of `rect`
+/// (the mark is 474 units wide); icons use that.
 nonisolated struct VespertineMoon: Shape {
+    var centered = false
+
     func path(in rect: CGRect) -> Path {
-        let k = min(rect.width, rect.height) / 512
-        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + x * k, y: rect.minY + y * k) }
+        let side = min(rect.width, rect.height)
+        let k = side / 512
+        let dx = (rect.width - side) / 2 + (centered ? (512 - 473.82) / 2 * k : 0)
+        let dy = (rect.height - side) / 2
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: rect.minX + dx + x * k, y: rect.minY + dy + y * k) }
         var path = Path()
         path.move(to: point(473.82, 390.01))
         path.addCurve(to: point(363.52, 419.84), control1: point(441.48, 409.04), control2: point(403.76, 419.84))
@@ -56,7 +45,7 @@ struct TransitionsButton: View {
         if model.settings.transitionsFeature {
             let on = model.settings.transitions.enabled
             Button { model.toggleTransitions() } label: {
-                TransitionsGlyph().frame(width: size + 3, height: size + 3)
+                VespertineMoon(centered: true).frame(width: size, height: size)
             }
             .buttonStyle(TransportIconStyle(active: on))
             .help("Transitions (⌥⌘X)")
@@ -71,7 +60,7 @@ struct TransitionsButton: View {
 struct TransitionsExplainerSheet: View {
     @Environment(\.dismiss) private var dismiss
 
-    /// The note's logo: Vespertine's one moon (the Transitions glyph's two crescents are the switch's icon).
+    /// The note's logo: Vespertine's one moon, the same mark as the switch's icon.
     typealias Logo = VespertineMoon
 
     var body: some View {
@@ -304,7 +293,7 @@ struct BoundaryGlyph: View {
         Group {
             switch decision {
             case .overlap, .mix, .dip:
-                TransitionsGlyph().frame(width: 10, height: 10)
+                VespertineMoon(centered: true).frame(width: 9, height: 9)
             case .gapless:
                 Image(systemName: "link").font(.system(size: 8, weight: .semibold))
             case .gap:
