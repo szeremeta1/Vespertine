@@ -392397,6 +392397,282 @@
         }
       }
     },
+    "“%@” is %@, which macOS can’t decode, so Vespertine can’t play it.": {
+      "comment": "The codec is a name such as Dolby AC-4.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ነው፤ macOS ሊፈታው አይችልም፣ ስለዚህ Vespertine ሊያጫውተው አይችልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‏«%@» بصيغة %@، ولا يستطيع macOS فك ترميزها، لذلك لا يستطيع Vespertine تشغيلها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” হলো %@, যা macOS ডিকোড করতে পারে না, তাই Vespertine এটি চালাতে পারে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ je ve formátu %@, který macOS neumí dekódovat, takže ho Vespertine nemůže přehrát."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” er %@, som macOS ikke kan afkode, så Vespertine kan ikke afspille den."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist %@. macOS kann das nicht dekodieren, daher kann Vespertine es nicht wiedergeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το «%@» είναι %@, το οποίο το macOS δεν μπορεί να αποκωδικοποιήσει, οπότε το Vespertine δεν μπορεί να το αναπαραγάγει."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” is %@, which macOS can’t decode, so Vespertine can’t play it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» es %@, que macOS no puede decodificar, así que Vespertine no puede reproducirlo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» در قالب %@ است که macOS نمی‌تواند رمزگشایی کند، بنابراین Vespertine نمی‌تواند آن را پخش کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” on %@, jota macOS ei osaa purkaa, joten Vespertine ei voi toistaa sitä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang “%@” ay %@, na hindi ma-decode ng macOS, kaya hindi ito mapapatugtog ng Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est du %@, que macOS ne sait pas décoder ; Vespertine ne peut donc pas le lire."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ છે, જેને macOS ડીકોડ કરી શકતું નથી, તેથી Vespertine તેને ચલાવી શકતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ita ce %@, wadda macOS ba za ta iya yankewa ba, don haka Vespertine ba za ta iya kunna ta ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” הוא %@, ש-macOS לא יכולה לפענח, ולכן Vespertine לא יכולה לנגן אותו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ है, जिसे macOS डिकोड नहीं कर सकता, इसलिए Vespertine इसे नहीं चला सकता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) „%@” fájl %@ formátumú, amelyet a macOS nem tud dekódolni, ezért a Vespertine nem tudja lejátszani."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” adalah %@, yang tidak dapat didekode macOS, sehingga Vespertine tidak dapat memutarnya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” è in formato %@, che macOS non può decodificare, quindi Vespertine non può riprodurlo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」は%@で、macOS がデコードできないため、Vespertine では再生できません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ಆಗಿದೆ, ಇದನ್ನು macOS ಡಿಕೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ Vespertine ಇದನ್ನು ಪ್ಲೇ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”은(는) %@이며, macOS에서 디코딩할 수 없으므로 Vespertine에서 재생할 수 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ആണ്, ഇത് macOS-ന് ഡീകോഡ് ചെയ്യാൻ കഴിയില്ല, അതിനാൽ Vespertine-ന് ഇത് പ്ലേ ചെയ്യാൻ കഴിയില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” हे %@ आहे, जे macOS डीकोड करू शकत नाही, त्यामुळे Vespertine ते प्ले करू शकत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ialah %@, yang tidak dapat dinyahkod oleh macOS, jadi Vespertine tidak dapat memainkannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» er %@, som macOS ikke kan dekode, så Vespertine kan ikke spille den av."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’ is %@, wat macOS niet kan decoderen, dus Vespertine kan het niet afspelen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ਹੈ, ਜਿਸਨੂੰ macOS ਡੀਕੋਡ ਨਹੀਂ ਕਰ ਸਕਦਾ, ਇਸ ਲਈ Vespertine ਇਸਨੂੰ ਚਲਾ ਨਹੀਂ ਸਕਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” to %@, którego macOS nie potrafi zdekodować, więc Vespertine nie może go odtworzyć."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” é %@, que o macOS não consegue decodificar, então o Vespertine não consegue reproduzi-lo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” é %@, que o macOS não consegue descodificar, por isso o Vespertine não o consegue reproduzir."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” este %@, pe care macOS nu îl poate decoda, așa că Vespertine nu îl poate reda."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” är %@, vilket macOS inte kan avkoda, så Vespertine kan inte spela upp den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ni %@, ambayo macOS haiwezi kuisimbua, kwa hiyo Vespertine haiwezi kuicheza."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” என்பது %@ ஆகும்; இதை macOS டிகோட் செய்ய முடியாது, எனவே Vespertine இதை இயக்க முடியாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” అనేది %@, దీనిని macOS డీకోడ్ చేయలేదు, కాబట్టి Vespertine దీనిని ప్లే చేయలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” เป็น %@ ซึ่ง macOS ถอดรหัสไม่ได้ Vespertine จึงเล่นไฟล์นี้ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” bir %@ dosyası; macOS bunun kodunu çözemediği için Vespertine oynatamaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» — це %@, який macOS не може декодувати, тому Vespertine не може його відтворити."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ہے، جسے macOS ڈی کوڈ نہیں کر سکتا، اس لیے Vespertine اسے چلا نہیں سکتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” là %@, macOS không thể giải mã nên Vespertine không phát được."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」為 %@，macOS 無法解碼，因此 Vespertine 無法播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”是 %@，macOS 无法解码，因此 Vespertine 无法播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」為 %@，macOS 無法解碼，因此 Vespertine 無法播放。"
+          }
+        }
+      }
+    },
     "Untitled": {
       "extractionState": "manual",
       "localizations": {
