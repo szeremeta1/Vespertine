@@ -44,7 +44,10 @@ plus filters. "After" is **predicted**, not measured: to see what the room reall
 on. Imported profiles have no measurement to compare against: the graph shows what their correction does to each
 speaker.
 
-The output is measured at the sample rate it is set to; nothing on the device is changed. Every measurement folder
+The output is measured at the sample rate it is set to and nothing on it is changed. The measurement itself runs at a rate
+the microphone supports (a UMIK-1 records at 48 kHz, some units at 44.1 kHz), not the output's: the stimulus is converted
+to the output's rate before it plays, and the microphone is recorded in whatever PCM format it offers and converted to
+Float32. The microphone's own rate is put back afterwards. Every measurement folder
 (`~/Documents/Vespertine Room Measurements/<date-time>/`) keeps the raw recordings, the session, the calibrated
 responses (CSV and plot), `room-profile.json` and `room-correction-predicted.png`.
 
