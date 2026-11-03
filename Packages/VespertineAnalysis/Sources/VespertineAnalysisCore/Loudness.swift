@@ -73,13 +73,15 @@ public struct LoudnessMeter: Sendable {
         highPasses = Array(repeating: .kHighPass(sampleRate: sampleRate), count: max(1, channels))
     }
 
-    /// The weights for an interleaved layout in WAVE / SMPTE order (L R C LFE Ls Rs …): 5.1 and 7.1 have their LFE
-    /// fourth and their surrounds after it; mono, stereo and 3.0 count every channel once.
+    /// The weights for an interleaved layout in WAVE / SMPTE order (L R C LFE Ls Rs …), from its channel count: every
+    /// layout of six or more channels (5.1, 6.1, 7.1, 5.1.2, 7.1.2, 7.1.4, …) has the LFE fourth, left out, and the
+    /// channels after it as surrounds; mono, stereo and 3.0 count every channel once. Four channels may be a quad
+    /// or a 3.1, and five a 5.0, so those are read as having no LFE. Callers that know the layout pass `weights`.
     public static func defaultWeights(channels: Int) -> [Double] {
         guard channels >= 4 else { return Array(repeating: 1, count: channels) }
         return (0..<channels).map { c in
             if c < 3 { return 1 }
-            if c == 3 && (channels == 6 || channels == 8) { return 0 }
+            if c == 3 && channels >= 6 { return 0 }
             return 1.41
         }
     }

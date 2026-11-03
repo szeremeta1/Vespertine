@@ -126,6 +126,22 @@ struct LoudnessTests {
         return meter.integratedLoudness
     }
 
+    @Test("The LFE is left out of every layout that has one in the WAVE / SMPTE place (fourth), height layouts included",
+          arguments: [(6, 3), (7, 3), (8, 3), (10, 3), (12, 3), (16, 3)])
+    func lfeIsLeftOut(channels: Int, lfe: Int) {
+        let weights = LoudnessMeter.defaultWeights(channels: channels)
+        #expect(weights.count == channels)
+        #expect(weights[lfe] == 0, "\(channels) channels: the LFE counts")
+        #expect(weights[0...2].allSatisfy { $0 == 1 })
+    }
+
+    @Test("Layouts with no LFE count every front channel once; the surrounds of a 5.0 get theirs")
+    func noLFE() {
+        #expect(LoudnessMeter.defaultWeights(channels: 2) == [1, 1])
+        #expect(LoudnessMeter.defaultWeights(channels: 5) == [1, 1, 1, 1.41, 1.41])
+        #expect(LoudnessMeter.defaultWeights(channels: 4).count == 4, "four channels are a quad or a 3.1: not guessed at")
+    }
+
     @Test("Tech 3341 case 1: stereo 1 kHz at −23 dBFS reads −23.0 LUFS", arguments: [44_100.0, 48_000, 96_000, 192_000])
     func case1(rate: Double) throws {
         let l = try #require(integrated(Synth.sine(20, dbfs: -23, rate: rate), rate: rate))
