@@ -78,6 +78,8 @@ public actor LibraryScanner {
         SourceInspector.supportedExtensions.subtracting(["cue", "txt", "log"])
     }
 
+    static func isFallbackLabel(_ codec: String) -> Bool { false }
+
     /// Rescans a source. Unchanged files (same size and modification date) are skipped.
     @discardableResult
     public func scan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {

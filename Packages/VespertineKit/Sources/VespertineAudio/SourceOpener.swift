@@ -479,6 +479,9 @@ public enum SourceInspector {
         return (probed.format, probed.decoderName)
     }
 
+    /// The format of a file no decoder opens but whose codec is known (Dolby AC-4).
+    public static func undecodableFormat(_ url: URL) -> SourceFormat? { nil }
+
     /// Format plus duration in seconds (from the decoder's frame/packet count).
     public static func inspectWithDuration(_ url: URL) throws -> (format: SourceFormat, duration: Double) {
         let probed = try SourceOpener.probe(url)

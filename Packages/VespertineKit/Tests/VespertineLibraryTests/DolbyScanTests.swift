@@ -45,3 +45,29 @@ struct DolbyScanTests {
         #expect(track.formatSummary == "DTS · 44.1 kHz · 5.1")
     }
 }
+
+@Suite("Dolby AC-4 files in the library")
+struct DolbyAC4ScanTests {
+    private let stub = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        .deletingLastPathComponent().appendingPathComponent("VespertineAudioTests/Fixtures/dolby-ac4-ims-stub.mp4")
+
+    @Test("An AC-4 MP4 is lossy Dolby AC-4, not a lossless 16/48 'MP4'")
+    func readsAsAC4() throws {
+        let track = try MetadataReader.read(url: stub, artwork: nil)
+        #expect(track.codec == "Dolby AC-4")
+        #expect(!track.isLossless)
+        #expect(track.bitDepth == nil)
+        #expect(track.sampleRate == 48_000)
+        #expect(track.channels == 2)
+        #expect(track.title == "Stub" && track.artist == "Nocturne Test" && track.album == "Fixtures")
+        #expect(!track.formatSummary.contains("16"), "\(track.formatSummary)")
+        #expect(!track.isHiRes)
+    }
+
+    @Test("Rows saved with the old fallback label are read again, so they pick up the real format")
+    func oldFallbackRowsAreReread() {
+        #expect(LibraryScanner.isFallbackLabel("MP4"))
+        #expect(!LibraryScanner.isFallbackLabel("Dolby AC-4"))
+        #expect(!LibraryScanner.isFallbackLabel("ALAC"))
+    }
+}
