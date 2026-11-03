@@ -77,8 +77,11 @@ final class ProbedSource: @unchecked Sendable {
     /// An SACD image's area, opened per track by `SourceOpener.decoder`.
     let sacd: SACDImage.Area?
     let dstDSDIFF: DSTDSDIFFInfo?
+    /// A WavPack file's DSD, opened again per decoder by `SourceOpener.decoder`.
+    let wavPackDSD: Bool
 
-    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil) {
+    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil,
+                     wavPackDSD: Bool = false) {
         self.url = url
         cacheLease = NetworkPlaybackCache.lookup(url)
         var format = format
@@ -94,6 +97,7 @@ final class ProbedSource: @unchecked Sendable {
         self.dsd = dsd
         self.sacd = sacd
         self.dstDSDIFF = dstDSDIFF
+        self.wavPackDSD = wavPackDSD
     }
 
     /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
@@ -137,6 +141,19 @@ enum SourceOpener {
         }
     }
 
+    /// The layout a WavPack DSD file's speaker mask names (WAVE order); the standard layout for its channel count otherwise.
+    private static func wavPackLayout(_ source: WavPackDSDSource) -> AVAudioChannelLayout? {
+        guard source.channelCount > 2 else { return nil }
+        if source.channelMask != 0, source.channelMask.nonzeroBitCount == source.channelCount {
+            var bitmap = AudioChannelLayout()
+            bitmap.mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelBitmap
+            bitmap.mChannelBitmap = AudioChannelBitmap(rawValue: source.channelMask)
+            let labels = AVAudioChannelLayout(layout: &bitmap).channelLabels
+            if labels.count == source.channelCount, let named = ChannelLayouts.layout(labels: labels) { return named }
+        }
+        return ChannelLayouts.layout(channels: source.channelCount)
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
             .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions)
@@ -177,6 +194,14 @@ enum SourceOpener {
         if ["dff", "dsdiff"].contains(ext), let info = try DSTDSDIFFInfo.read(url) {
             let format = SourceFormat(encoding: .dsd, codec: "DSDIFF", sampleRate: Double(info.rate), bitDepth: 1, channels: info.channels, channelLabels: dsdiffLabels(info.channelIDs))
             return ProbedSource(url: url, format: format, decoderName: "DSDIFF · DST", pcm: nil, dsd: nil, dstDSDIFF: info)
+        }
+        if ext == "wv", let source = try WavPackDSDSource(url: url) {
+            // DSD stored in WavPack: libwavpack hands over the bitstream, which goes out as DoP or converts like DSDIFF.
+            let layout = wavPackLayout(source)
+            let format = SourceFormat(encoding: .dsd, codec: "WavPack", sampleRate: source.dsdRate, bitDepth: 1, channels: source.channelCount,
+                                      channelLabels: ChannelLayouts.speakerLabels(layout))
+            return ProbedSource(url: url, format: format, decoderName: String(localized: "WavPack · DSD bitstream", comment: "The decoder, in the signal path."),
+                                pcm: nil, dsd: nil, wavPackDSD: true)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
             // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.
@@ -316,7 +341,11 @@ enum SourceOpener {
             return plan.mode == .dop ? try RawDoPDecoder(source: SACDSource(url: probed.url, area: area, frames: frames))
                                      : try SACDPCMDecoder(url: probed.url, area: area, frames: frames)
         }
-        if let info = probed.dstDSDIFF {
+        if probed.wavPackDSD {
+            guard let source = try WavPackDSDSource(url: probed.url) else { throw SourceOpenerError.unsupported(probed.url) }
+            let layout = wavPackLayout(source)
+            decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
+        } else if let info = probed.dstDSDIFF {
             let source = try DSTDSDIFFSource(url: probed.url, info: info)
             let layout = probed.format.channelLabels.flatMap { ChannelLayouts.layout(labels: $0) }
             decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
@@ -490,6 +519,8 @@ public enum SourceInspector {
             seconds = Double(area.frameRange.count) / Double(SACDImage.framesPerSecond)
         } else if let info = probed.dstDSDIFF {
             seconds = Double(info.frameCount) / 75
+        } else if probed.wavPackDSD, let source = try? WavPackDSDSource(url: url) {
+            seconds = Double(source.dsdLength) * 8 / source.dsdRate
         } else if let pcm = probed.pcm {
             let rate = pcm.processingFormat.sampleRate
             if rate > 0, pcm.length > 0 { seconds = Double(pcm.length) / rate }

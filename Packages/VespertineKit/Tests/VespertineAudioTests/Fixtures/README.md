@@ -54,3 +54,11 @@ script in `docs/fixtures/make-format-fixtures.sh`.
   fetched from a GitHub mirror of the FATE suite (luke-cha/fate-suite; FFmpeg's samples server was unreachable). It is
   the only recorded music here, one second of it; its sample count in the TAK header is the original's (9.5 s). The
   expected PCM hash in the test comes from FFmpeg's own TAK decoder with every frame's CRC checked.
+
+`Formats/*.wv`: DSD in WavPack, made with WavPack 5.8.1's `wavpack` from DSD synthesized by
+`docs/fixtures/make-wavpack-dsd-fixtures.py` (a 2nd-order sigma-delta of one tone per channel, written as DSDIFF and as DSF):
+`dsd64-stereo-from-dsdiff.wv` and `dsd64-stereo-from-dsf.wv` (the same DSD from a DSDIFF file and from a DSF file, which
+stores bytes least significant bit first; 6 SACD frames, 0.08 s), `dsd128-stereo.wv` (3 frames at DSD128) and
+`dsd64-5.1.wv` (3 frames, L R C LFE Ls Rs). The tests hold the SHA-256 of the DSD each was made from; `wvunpack --dff`
+returns the DSDIFF files byte for byte. `pcm-stereo24.wv` is the 24-bit stereo source as ordinary WavPack, to check the
+DSD reader leaves PCM files to the PCM decoder.
