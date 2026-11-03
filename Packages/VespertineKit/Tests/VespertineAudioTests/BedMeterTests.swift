@@ -360,26 +360,23 @@ struct BedMeterTests {
 
     /// `renderedDigest` on a thread of its own, given up on after `patience` seconds. The session's lock is held by the
     /// decoder while it reads, so a read that never returns (on a CI runner it didn't, for 8 minutes) also stalls
-    /// `inputExhausted`, and with it the 180 s deadline above; a test thread blocked there would take a thread of the
-    /// cooperative pool with it, and starve the tests that need one. Here the test fails after `patience` instead, and
-    /// the stuck thread (and its session, which `stop()` would wait on) is left behind.
-    private static func boundedDigest(metering on: Bool, visualizer: Bool, patience: TimeInterval = 300) -> Rendered? {
-        let done = DispatchSemaphore(value: 0)
+    /// `inputExhausted`, and with it the 180 s deadline above. The wait here is `await`ed, so it never holds a thread of
+    /// the cooperative pool (a test blocked on one starves every other test that needs a thread); the test fails after
+    /// `patience` instead, and the stuck thread (and its session, which `stop()` would wait on) is left behind.
+    private static func boundedDigest(metering on: Bool, visualizer: Bool, patience: TimeInterval = 150) async -> Rendered? {
         let result = Box<Result<Rendered, Error>?>(nil)
-        Thread.detachNewThread {
-            result.value = Result { try renderedDigest(metering: on, visualizer: visualizer) }
-            done.signal()
-        }
-        guard done.wait(timeout: .now() + patience) == .success else { return nil }
+        Thread.detachNewThread { result.value = Result { try renderedDigest(metering: on, visualizer: visualizer) } }
+        let deadline = Date().addingTimeInterval(patience)
+        while result.value == nil, Date() < deadline { try? await Task.sleep(nanoseconds: 50_000_000) }
         return try? result.value?.get()
     }
 
     @Test("The compressed frames macOS is handed are byte-identical with the meters and the visualizer on or off",
           .enabled(if: !DeviceQuery.outputUIDs().isEmpty, "needs an output device for the renderer"))
-    func rendererInputUntouched() throws {
+    func rendererInputUntouched() async throws {
         var runs: [Rendered] = []
         for (metering, visualizer) in [(false, false), (true, false), (true, true)] {
-            let run = try #require(Self.boundedDigest(metering: metering, visualizer: visualizer),
+            let run = try #require(await Self.boundedDigest(metering: metering, visualizer: visualizer),
                                    "the renderer was not handed the stream, or the read of it never returned (metering \(metering), visualizer \(visualizer))")
             #expect(run.exhausted, "the renderer was handed the whole stream (metering \(metering), visualizer \(visualizer))")
             #expect(run.buffers >= 1 && run.bytes > 2000, "\(run.buffers) buffers, \(run.bytes) bytes")
