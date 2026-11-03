@@ -126,10 +126,26 @@ struct VisualizerTapTests {
         #expect(r.allSatisfy { abs($0) < 1e-6 })
     }
 
-    /// The render context and ring, shared with the threads below.
-    private struct Shared: @unchecked Sendable {
+    /// The render context and ring, shared with the threads below. The threads hold it, and it destroys the context and
+    /// ring only once the last of them lets go: a race that gives up on a slow worker must not free what that worker
+    /// is still using. `onDestroy` is told how many threads were still working with it (none, if this holds).
+    private final class Rig: @unchecked Sendable {
         let ring: OpaquePointer
         let ctx: OpaquePointer
+        let working = Locked(0)
+        private let onDestroy: @Sendable (Int) -> Void
+
+        init(onDestroy: @escaping @Sendable (Int) -> Void = { _ in }) {
+            ring = nrt_ring_create(65536, 2)!
+            ctx = nrt_context_create(ring, 512)!
+            self.onDestroy = onDestroy
+        }
+
+        deinit {
+            onDestroy(working.value)
+            nrt_context_destroy(ctx)
+            nrt_ring_destroy(ring)
+        }
     }
 
     /// What the reader and the writer saw in one race.
@@ -142,14 +158,17 @@ struct VisualizerTapTests {
     /// The I/O side renders `slices` slices while a reader copies the tap as fast as it can, checking every copy it
     /// keeps. Both run on threads of their own, never the cooperative pool: a reader that spins until the writer
     /// is done must not depend on the pool giving the writer a thread (a busy pool starved it for the whole job).
-    /// Blocks the caller; gives up (`finished == false`) after `patience` seconds.
-    private static func race(_ shared: Shared, slices: Int, slice: Int, patience: TimeInterval = 120) -> Race {
+    /// Blocks the caller; gives up (`finished == false`) after `patience` seconds, leaving the rig to the threads still
+    /// running (they stop at their next slice). `slowdown` makes the writer take that long per slice.
+    private static func race(_ shared: Rig, slices: Int, slice: Int, patience: TimeInterval = 120, slowdown: TimeInterval = 0) -> Race {
         let stop = Locked(false)
         let readerDone = DispatchSemaphore(value: 0), writerDone = DispatchSemaphore(value: 0)
         let outcome = Locked(Race())
 
         // The reader copies as fast as it can, the largest windows the tap allows.
+        shared.working.withLock { $0 += 2 }
         Thread.detachNewThread {
+            defer { shared.working.withLock { $0 -= 1 } }
             var l = [Float](repeating: 0, count: Int(NRT_VIZ_TAP_SIZE / 2)), r = l
             var seen = Race()
             while !stop.value {
@@ -165,10 +184,12 @@ struct VisualizerTapTests {
 
         // The I/O side: decode-and-render loops, as fast as they go. Its time per slice shouldn't depend on the reader.
         Thread.detachNewThread {
+            defer { shared.working.withLock { $0 -= 1 } }
             var out = [Float](repeating: 0, count: slice * 2)
             var next = 1
             let start = Date()
             for _ in 0..<slices where !stop.value {
+                if slowdown > 0 { Thread.sleep(forTimeInterval: slowdown) }
                 let input = (0..<slice).flatMap { [Float(next + $0), -Float(next + $0)] }
                 next += slice
                 if next > 1 << 23 { next = 1 }   // stay exact in Float32
@@ -196,11 +217,22 @@ struct VisualizerTapTests {
 
     @Test("The I/O side never waits for the reader, and every copy the reader keeps is one moment, never torn")
     func neverBlocksNeverTears() {
-        let ring = nrt_ring_create(65536, 2)!
-        let ctx = nrt_context_create(ring, 512)!
-        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
-        nrt_context_set_viz(ctx, true)
-        Self.expectRace(Self.race(Shared(ring: ring, ctx: ctx), slices: 8000, slice: 512))
+        let rig = Rig()
+        nrt_context_set_viz(rig.ctx, true)
+        Self.expectRace(Self.race(rig, slices: 8000, slice: 512))
+    }
+
+    @Test("A race that gives up on a slow writer leaves the context and ring to the threads still using them")
+    func timeoutKeepsTheRigAlive() {
+        let destroyedWith = Locked<Int?>(nil)
+        var rig: Rig? = Rig { destroyedWith.value = $0 }
+        nrt_context_set_viz(rig!.ctx, true)
+        let result = Self.race(rig!, slices: 50, slice: 512, patience: 0.05, slowdown: 0.3)
+        #expect(!result.finished)
+        rig = nil   // the test lets go; the threads that are still running keep it
+        let deadline = Date().addingTimeInterval(30)
+        while destroyedWith.value == nil, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(destroyedWith.value == 0, "the context and ring were freed while a thread was still using them")
     }
 
     /// Holds the calling thread until `gate` is signalled (a blocking call, which `Task` bodies can't make directly).
@@ -211,10 +243,8 @@ struct VisualizerTapTests {
 
     @Test("The same race finishes while every thread of the cooperative pool is held by blocked tasks")
     func notStarvedByABusyPool() {
-        let ring = nrt_ring_create(65536, 2)!
-        let ctx = nrt_context_create(ring, 512)!
-        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
-        nrt_context_set_viz(ctx, true)
+        let rig = Rig()
+        nrt_context_set_viz(rig.ctx, true)
         // More blockers than the pool has threads, held until the race is over: what blocking tests of a loaded suite do.
         let gate = DispatchSemaphore(value: 0)
         let blockers = ProcessInfo.processInfo.activeProcessorCount + 2
@@ -222,7 +252,7 @@ struct VisualizerTapTests {
         for _ in 0..<blockers { Task.detached { Self.hold(gate, counting: held) } }
         let deadline = Date().addingTimeInterval(10)
         while held.value < min(blockers, ProcessInfo.processInfo.activeProcessorCount - 1), Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
-        let result = Self.race(Shared(ring: ring, ctx: ctx), slices: 2000, slice: 512)
+        let result = Self.race(rig, slices: 2000, slice: 512)
         for _ in 0..<blockers { gate.signal() }
         Self.expectRace(result)
     }
