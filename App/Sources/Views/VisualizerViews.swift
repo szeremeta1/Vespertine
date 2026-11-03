@@ -353,9 +353,12 @@ struct VisualizerMetalView: NSViewRepresentable {
         let view = VisualizerMTKView(frame: .zero, device: renderer.device)
         view.colorPixelFormat = .bgra8Unorm
         view.framebufferOnly = true
+        view.isPaused = true   // the view draws on its own display link, while its window shows (`VisualizerMTKView`)
+        view.enableSetNeedsDisplay = false
         view.delegate = renderer
         view.visualizer = model.visualizer
-        renderer.frameSource = { [weak model] in
+        renderer.frameSource = { [weak model, weak view] in
+            view?.drawCount += 1
             guard let model else { return (.silent(bands: 64, fine: 512), VisualizerScene()) }
             let player = model.player
             let track = player.current?.track
@@ -415,8 +418,49 @@ final class VisualizerMTKView: MTKView {
     func setShowing(_ on: Bool) {
         guard on != showing else { return }
         showing = on
-        isPaused = !on
-        if on { visualizer?.began(rate: Double(displayRate)) } else { visualizer?.ended() }
+        if on {
+            startDrawing()
+            visualizer?.began(rate: Double(displayRate))
+        } else {
+            stopDrawing()
+            visualizer?.ended()
+        }
+    }
+
+    /// Draws on a display link of this view's own, made each time the window shows. MTKView's own loop (`isPaused`) is
+    /// left off: after its window was closed and shown again it could stay stopped with `isPaused` false, and the picture
+    /// stayed on the last frame the closed window drew (the old song's title and all).
+    private var link: CADisplayLink?
+    /// Draws since the view was made.
+    var drawCount = 0
+
+    private func startDrawing() {
+        isPaused = true
+        enableSetNeedsDisplay = false
+        link?.invalidate()
+        let link = displayLink(target: DrawTarget(self), selector: #selector(DrawTarget.tick))
+        let rate = Float(displayRate)
+        link.preferredFrameRateRange = CAFrameRateRange(minimum: min(30, rate), maximum: rate, preferred: rate)
+        link.add(to: .main, forMode: .common)
+        self.link = link
+        draw()   // the current song at once, before the first tick
+    }
+
+    private func stopDrawing() {
+        link?.invalidate()
+        link = nil
+    }
+
+    fileprivate func tick() {
+        guard showing else { return }
+        draw()
+    }
+
+    /// What the display link holds on to, so that it doesn't keep the view alive.
+    private final class DrawTarget: NSObject {
+        private weak var view: VisualizerMTKView?
+        init(_ view: VisualizerMTKView) { self.view = view }
+        @MainActor @objc func tick() { view?.tick() }
     }
 
     deinit {

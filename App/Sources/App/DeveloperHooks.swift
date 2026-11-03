@@ -106,6 +106,13 @@ enum DeveloperHooks {
                 }
             }
         }
+        // `-VespertineVizScript "play,open,wait:3,probe,close,wait:1,next,wait:2,open,wait:1,probe,shot:reopened"`: drives the
+        // visualizer window the way a person does (open it, close it, skip, open it again) and says what the analysis sees
+        // after each step. `play` waits for a song playing; `probe` prints the feed's frames, the tap's position and the
+        // loudness; `shot:<name>` prints the window's number for an outside `screencapture -l`.
+        if let script = d.string(forKey: "VespertineVizScript") {
+            Task { await runVisualizerScript(script, model: model, openWindow: openWindow) }
+        }
         // `-VespertineQuitAfter 60`: quits after that many seconds (timed runs, such as the visualizer's measurements).
         if d.double(forKey: "VespertineQuitAfter") > 0 {
             Task {
@@ -283,6 +290,68 @@ enum DeveloperHooks {
             }
         default: break
         }
+    }
+
+    /// The visualizer window, when there is one on screen.
+    private static var visualizerWindow: NSWindow? { NSApp.windows.first { $0.title == "Visualizer" } }
+
+    private static func metalView(in view: NSView?) -> VisualizerMTKView? {
+        guard let view else { return nil }
+        if let metal = view as? VisualizerMTKView { return metal }
+        for sub in view.subviews { if let found = metalView(in: sub) { return found } }
+        return nil
+    }
+
+    private static func menuItem(titled title: String, in menu: NSMenu?) -> NSMenuItem? {
+        for item in menu?.items ?? [] {
+            if item.title == title, item.action != nil || item.hasSubmenu == false { return item }
+            if let found = menuItem(titled: title, in: item.submenu) { return found }
+        }
+        return nil
+    }
+
+    static func runVisualizerScript(_ script: String, model: AppModel, openWindow: OpenWindowAction?) async {
+        setvbuf(stdout, nil, _IOLBF, 0)
+        model.settings.visualizerEnabled = true
+        var left = [Float](repeating: 0, count: 2048), right = left
+        for step in script.split(separator: ",").map({ $0.trimmingCharacters(in: .whitespaces) }) {
+            let name = step.split(separator: ":", maxSplits: 1).first.map(String.init) ?? step
+            let arg = step.split(separator: ":", maxSplits: 1).dropFirst().first.map(String.init)
+            switch name {
+            case "play":
+                for _ in 0..<240 where model.player.current == nil || !model.player.isPlaying { try? await Task.sleep(for: .milliseconds(250)) }
+                print("[viz] \(step): playing \(model.player.current?.track.title ?? "nothing")")
+            case "wait": try? await Task.sleep(for: .seconds(Double(arg ?? "1") ?? 1))
+            case "open":
+                // The Window menu's Visualizer item, as a click on it does (the hooks may not have an `openWindow`).
+                if let openWindow { openWindow(id: "visualizer"); print("[viz] open requested") }
+                else if let item = menuItem(titled: "Visualizer", in: NSApp.mainMenu), let menu = item.menu {
+                    menu.performActionForItem(at: menu.index(of: item)); print("[viz] open requested (menu)")
+                } else { print("[viz] open: no Visualizer menu item") }
+            case "close":
+                if let w = visualizerWindow { w.performClose(nil); print("[viz] close requested") } else { print("[viz] close: no window") }
+            case "next": model.player.next(); print("[viz] next → \(model.player.current?.track.title ?? "-")")
+            case "prev": model.player.previous(); print("[viz] previous → \(model.player.current?.track.title ?? "-")")
+            case "probe":
+                let frame = model.visualizer.feed.frame, stats = model.visualizer.feed.stats
+                let read = model.player.engine.copyVisualizerTap(left: &left, right: &right)
+                let window = visualizerWindow
+                let metal = window.flatMap { metalView(in: $0.contentView) }
+                print("[viz] view: isPaused \(metal.map { String($0.isPaused) } ?? "no view") · occlusion visible \(window.map { String($0.occlusionState.contains(.visible)) } ?? "-") · frames drawn \(metal?.drawCount ?? -1)")
+                print(String(format: "[viz] probe %@: song %@ · showing %d · window %@ visible %@ · feed frames %d · frame.time %.3f · bands Σ %.3f · rms %.1f/%.1f dB · tap position %@ rate %.0f",
+                             arg ?? "", model.player.current?.track.title ?? "-", model.visualizer.showing,
+                             window.map { "#\($0.windowNumber)" } ?? "none", window.map { String($0.isVisible) } ?? "-", stats.frames, frame.time,
+                             frame.bands.reduce(0, +), frame.rmsDB.x, frame.rmsDB.y,
+                             read.map { String($0.position) } ?? "nil", read?.sampleRate ?? 0))
+            case "shot":
+                let window = visualizerWindow
+                print("[viz] shot \(arg ?? "") window \(window.map { String($0.windowNumber) } ?? "none")")
+                try? await Task.sleep(for: .seconds(1.5))   // time for an outside capture
+            case "quit": NSApp.terminate(nil)
+            default: print("[viz] unknown step \(step)")
+            }
+        }
+        print("[viz] script done")
     }
 
     /// "genre=Jazz|Blues;decade=1970;sampleRate=96000;format=flac|dsd;flags=bits24,favorite" → a filter.
