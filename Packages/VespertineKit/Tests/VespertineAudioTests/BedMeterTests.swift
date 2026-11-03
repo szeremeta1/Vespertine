@@ -322,8 +322,13 @@ struct BedMeterTests {
 
     // MARK: The output isn't touched
 
-    /// A digest of every compressed buffer macOS's renderer is handed for the fixture, with the meters `on` or off.
-    private static func renderedDigest(metering on: Bool, visualizer: Bool) throws -> String {
+    /// What macOS's renderer was handed for the fixture: a digest of every compressed buffer, and whether it took them all.
+    private struct Rendered {
+        var digest = "", exhausted = false, buffers = 0, bytes = 0
+    }
+
+    /// Renders the fixture through macOS's renderer with the meters `on` or off.
+    private static func renderedDigest(metering on: Bool, visualizer: Bool) throws -> Rendered {
         let session = try SystemRendererSession(item: PlayableItem(url: fixture("dolby-digital-plus-tones.m4a")), url: fixture("dolby-digital-plus-tones.m4a"),
                                                 deviceUID: DeviceQuery.outputUIDs().sorted().first, spatial: false, volume: 0)
         let hasher = Box(SHA256())
@@ -349,18 +354,39 @@ struct BedMeterTests {
         // Generous: the suite's hardware tests share the output device, and under a sanitizer a session takes minutes.
         let deadline = Date().addingTimeInterval(180)
         while !session.inputExhausted, Date() < deadline { Thread.sleep(forTimeInterval: 0.02) }
-        #expect(session.inputExhausted, "the renderer was handed the whole stream")
-        #expect(count.value >= 1 && total.value > 2000, "\(count.value) buffers, \(total.value) bytes")
-        return hasher.withLock { $0 }.finalize().map { String(format: "%02x", $0) }.joined() + " \(count.value) buffers, \(total.value) bytes"
+        let digest = hasher.withLock { $0 }.finalize().map { String(format: "%02x", $0) }.joined()
+        return Rendered(digest: digest, exhausted: session.inputExhausted, buffers: count.value, bytes: total.value)
+    }
+
+    /// `renderedDigest` on a thread of its own, given up on after `patience` seconds. The session's lock is held by the
+    /// decoder while it reads, so a read that never returns (on a CI runner it didn't, for 8 minutes) also stalls
+    /// `inputExhausted`, and with it the 180 s deadline above; a test thread blocked there would take a thread of the
+    /// cooperative pool with it, and starve the tests that need one. Here the test fails after `patience` instead, and
+    /// the stuck thread (and its session, which `stop()` would wait on) is left behind.
+    private static func boundedDigest(metering on: Bool, visualizer: Bool, patience: TimeInterval = 300) -> Rendered? {
+        let done = DispatchSemaphore(value: 0)
+        let result = Box<Result<Rendered, Error>?>(nil)
+        Thread.detachNewThread {
+            result.value = Result { try renderedDigest(metering: on, visualizer: visualizer) }
+            done.signal()
+        }
+        guard done.wait(timeout: .now() + patience) == .success else { return nil }
+        return try? result.value?.get()
     }
 
     @Test("The compressed frames macOS is handed are byte-identical with the meters and the visualizer on or off",
           .enabled(if: !DeviceQuery.outputUIDs().isEmpty, "needs an output device for the renderer"))
     func rendererInputUntouched() throws {
-        let off = try Self.renderedDigest(metering: false, visualizer: false)
-        let metersOn = try Self.renderedDigest(metering: true, visualizer: false)
-        let allOn = try Self.renderedDigest(metering: true, visualizer: true)
-        #expect(off == metersOn)
-        #expect(off == allOn)
+        var runs: [Rendered] = []
+        for (metering, visualizer) in [(false, false), (true, false), (true, true)] {
+            let run = try #require(Self.boundedDigest(metering: metering, visualizer: visualizer),
+                                   "the renderer was not handed the stream, or the read of it never returned (metering \(metering), visualizer \(visualizer))")
+            #expect(run.exhausted, "the renderer was handed the whole stream (metering \(metering), visualizer \(visualizer))")
+            #expect(run.buffers >= 1 && run.bytes > 2000, "\(run.buffers) buffers, \(run.bytes) bytes")
+            runs.append(run)
+        }
+        let summary = runs.map { "\($0.digest) \($0.buffers) buffers, \($0.bytes) bytes" }
+        #expect(summary[0] == summary[1])
+        #expect(summary[0] == summary[2])
     }
 }

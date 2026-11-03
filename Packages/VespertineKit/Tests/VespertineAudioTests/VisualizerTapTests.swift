@@ -132,52 +132,99 @@ struct VisualizerTapTests {
         let ctx: OpaquePointer
     }
 
-    @Test("The I/O side never waits for the reader, and every copy the reader keeps is one moment, never torn")
-    func neverBlocksNeverTears() async {
-        let ring = nrt_ring_create(65536, 2)!
-        let ctx = nrt_context_create(ring, 512)!
-        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
-        nrt_context_set_viz(ctx, true)
-        let shared = Shared(ring: ring, ctx: ctx)
-        let slices = 8000, slice = 512
-        let stop = Locked(false)
+    /// What the reader and the writer saw in one race.
+    private struct Race {
+        var kept = 0, dropped = 0, torn = 0
+        var elapsed = Double.infinity
+        var finished = false
+    }
 
-        // The reader copies as fast as it can, the largest windows the tap allows, checking every copy it keeps.
-        let reader = Task.detached { () -> (kept: Int, dropped: Int, torn: Int) in
+    /// The I/O side renders `slices` slices while a reader copies the tap as fast as it can, checking every copy it
+    /// keeps. Both run on threads of their own, never the cooperative pool: a reader that spins until the writer
+    /// is done must not depend on the pool giving the writer a thread (a busy pool starved it for the whole job).
+    /// Blocks the caller; gives up (`finished == false`) after `patience` seconds.
+    private static func race(_ shared: Shared, slices: Int, slice: Int, patience: TimeInterval = 120) -> Race {
+        let stop = Locked(false)
+        let readerDone = DispatchSemaphore(value: 0), writerDone = DispatchSemaphore(value: 0)
+        let outcome = Locked(Race())
+
+        // The reader copies as fast as it can, the largest windows the tap allows.
+        Thread.detachNewThread {
             var l = [Float](repeating: 0, count: Int(NRT_VIZ_TAP_SIZE / 2)), r = l
-            var kept = 0, dropped = 0, torn = 0
+            var seen = Race()
             while !stop.value {
                 let got = nrt_context_copy_viz(shared.ctx, &l, &r, UInt32(l.count), nil)
-                if got == 0 { dropped += 1; continue }
+                if got == 0 { seen.dropped += 1; continue }
                 guard let first = l.first, first > 0 else { continue }   // before the first full window
-                kept += 1
-                for i in 1..<l.count where l[i] != l[i - 1] + 1 || r[i] != -l[i] { torn += 1; break }
+                seen.kept += 1
+                for i in 1..<l.count where l[i] != l[i - 1] + 1 || r[i] != -l[i] { seen.torn += 1; break }
             }
-            return (kept, dropped, torn)
+            outcome.withLock { $0.kept = seen.kept; $0.dropped = seen.dropped; $0.torn = seen.torn }
+            readerDone.signal()
         }
 
         // The I/O side: decode-and-render loops, as fast as they go. Its time per slice shouldn't depend on the reader.
-        let writer = Task.detached { () -> Double in
+        Thread.detachNewThread {
             var out = [Float](repeating: 0, count: slice * 2)
             var next = 1
             let start = Date()
-            for _ in 0..<slices {
+            for _ in 0..<slices where !stop.value {
                 let input = (0..<slice).flatMap { [Float(next + $0), -Float(next + $0)] }
                 next += slice
                 if next > 1 << 23 { next = 1 }   // stay exact in Float32
                 _ = nrt_ring_write(shared.ring, input, UInt32(slice))
                 out.withUnsafeMutableBufferPointer { nrt_context_render_interleaved(shared.ctx, $0.baseAddress!, UInt32(slice), 2) }
             }
-            return Date().timeIntervalSince(start)
+            outcome.withLock { $0.elapsed = Date().timeIntervalSince(start) }
+            writerDone.signal()
         }
-        let elapsed = await writer.value
+
+        let wrote = writerDone.wait(timeout: .now() + patience) == .success
         stop.value = true
-        let result = await reader.value
-        #expect(result.torn == 0)
-        #expect(result.kept > 0)
+        let read = readerDone.wait(timeout: .now() + 30) == .success
+        return outcome.withLock { var seen = $0; seen.finished = wrote && read; return seen }
+    }
+
+    private static func expectRace(_ result: Race, sourceLocation: SourceLocation = #_sourceLocation) {
+        #expect(result.finished, "the writer or the reader never finished", sourceLocation: sourceLocation)
+        #expect(result.torn == 0, sourceLocation: sourceLocation)
+        #expect(result.kept > 0, sourceLocation: sourceLocation)
         // 8000 slices of 512 frames is 93 s of 44.1 kHz audio; rendering it with the reader racing must stay far
         // faster than real time (a reader that could hold the I/O thread up would show here).
-        #expect(elapsed < 20)
+        #expect(result.elapsed < 20, sourceLocation: sourceLocation)
+    }
+
+    @Test("The I/O side never waits for the reader, and every copy the reader keeps is one moment, never torn")
+    func neverBlocksNeverTears() {
+        let ring = nrt_ring_create(65536, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_viz(ctx, true)
+        Self.expectRace(Self.race(Shared(ring: ring, ctx: ctx), slices: 8000, slice: 512))
+    }
+
+    /// Holds the calling thread until `gate` is signalled (a blocking call, which `Task` bodies can't make directly).
+    private static func hold(_ gate: DispatchSemaphore, counting held: Locked<Int>) {
+        held.withLock { $0 += 1 }
+        gate.wait()
+    }
+
+    @Test("The same race finishes while every thread of the cooperative pool is held by blocked tasks")
+    func notStarvedByABusyPool() {
+        let ring = nrt_ring_create(65536, 2)!
+        let ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_viz(ctx, true)
+        // More blockers than the pool has threads, held until the race is over: what blocking tests of a loaded suite do.
+        let gate = DispatchSemaphore(value: 0)
+        let blockers = ProcessInfo.processInfo.activeProcessorCount + 2
+        let held = Locked(0)
+        for _ in 0..<blockers { Task.detached { Self.hold(gate, counting: held) } }
+        let deadline = Date().addingTimeInterval(10)
+        while held.value < min(blockers, ProcessInfo.processInfo.activeProcessorCount - 1), Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        let result = Self.race(Shared(ring: ring, ctx: ctx), slices: 2000, slice: 512)
+        for _ in 0..<blockers { gate.signal() }
+        Self.expectRace(result)
     }
 }
 
@@ -190,4 +237,5 @@ private final class Locked<Value: Sendable>: @unchecked Sendable {
         get { lock.lock(); defer { lock.unlock() }; return stored }
         set { lock.lock(); stored = newValue; lock.unlock() }
     }
+    func withLock<R>(_ body: (inout Value) -> R) -> R { lock.lock(); defer { lock.unlock() }; return body(&stored) }
 }
