@@ -15,15 +15,22 @@ private final class SlowLink: @unchecked Sendable {
     private let wire = DispatchQueue(label: "test.slow-link")
     private let lock = NSLock()
     private var log: [(kind: Kind, at: Date)] = []
+    private var order: [Kind] = []
 
     init(latency: TimeInterval) { self.latency = latency }
 
     func request(_ kind: Kind) {
         wire.sync {
             Thread.sleep(forTimeInterval: latency)
-            lock.withLock { log.append((kind, Date())) }
+            lock.withLock { log.append((kind, Date())); order.append(kind) }
         }
     }
+
+    /// How many requests have gone over the link so far, in order: a position to measure from, with no clock.
+    var position: Int { lock.withLock { order.count } }
+
+    /// The order the requests went over the link in, from `start` on.
+    func sequence(from start: Int = 0) -> [Kind] { lock.withLock { Array(order[start...]) } }
 
     func count(_ kind: Kind, from start: Date = .distantPast, to end: Date = .distantFuture) -> Int {
         lock.withLock { log.filter { $0.kind == kind && $0.at >= start && $0.at <= end }.count }
@@ -93,20 +100,17 @@ struct NetworkPriorityTests {
     }
 
     /// Press play: the staging copy of the song starts and the engine waits for all of it (output starts after).
-    private func timeToAudioReady(link: SlowLink, gate: ShareIOGate) throws -> TimeInterval {
+    private func copySong(link: SlowLink, gate: ShareIOGate) throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: Self.chunk, gate: gate)
         let reader = LinkReader(link: link, chunks: Self.chunks, chunk: Self.chunk)
-        let pressed = Date()
         let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: reader)
         try entry.prepare(full: true, lead: 0, cancelled: { false })
-        return Date().timeIntervalSince(pressed)
     }
 
-    @Test("With a scan in flight, a play request is ready about as fast as with none (the scan makes way)")
+    @Test("With a scan in flight, the song's copy goes over the link without the scan's requests between (the scan makes way)")
     func playbackPreemptsScan() async throws {
         let link = SlowLink(latency: Self.latency)
-        let idle = try timeToAudioReady(link: link, gate: ShareIOGate())
 
         // What the player does once a song is requested from a share: scans down to one request in flight.
         let gate = ShareIOGate()
@@ -115,15 +119,21 @@ struct NetworkPriorityTests {
         defer { Task { await scan.stop() } }
         while link.count(.scan) < 5 { try await Task.sleep(for: .milliseconds(5)) }   // the scan is under way
 
-        let pressed = Date()
-        let busy = try timeToAudioReady(link: link, gate: gate)
-        let during = link.count(.scan, from: pressed, to: Date())
+        // Where on the wire play is pressed, and what goes over it until the song is local. Counted in requests,
+        // not seconds: a starved test machine stretches every round trip, never the order they go in.
+        let pressed = link.position
+        try copySong(link: link, gate: gate)
+        let wire = link.sequence(from: pressed)
         await scan.stop()
 
-        // Before the fix the scan's requests alternate with the song's on the wire: about twice as long.
-        #expect(busy < idle * 1.3 + 0.03, "ready after \(busy) s with a scan, \(idle) s without")
-        // Only requests already on their way when play was pressed may still go through.
-        #expect(during <= 2, "\(during) scan requests went over the link while the song was being copied")
+        // Before the fix the scan's requests alternate with the song's on the wire, ten of them in the copy.
+        // Only requests already on their way when play was pressed may still go through (the gate admits one).
+        let songs = wire.indices.filter { wire[$0] == .playback }
+        #expect(songs.count == Self.chunks, "the song's copy didn't go over the link in full: \(wire)")
+        guard let first = songs.first, let last = songs.last else { return }
+        #expect(first <= 2, "\(first) scan requests went first over the link after play was pressed: \(wire)")
+        let between = wire[first...last].filter { $0 == .scan }.count
+        #expect(between == 0, "\(between) scan requests went over the link in the middle of the song's copy: \(wire)")
     }
 
     private func settle(_ seconds: TimeInterval = 15, until condition: () -> Bool) async {
