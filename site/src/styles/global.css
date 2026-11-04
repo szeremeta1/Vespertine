@@ -523,6 +523,10 @@ html:not(.js) .features::before {
 .guide__cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 0; }
 .guide__shot { margin: 28px 0 24px; max-width: 900px; border-radius: var(--radius); overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
 .guide .table { margin: 0 0 24px; }
+/* /compare/ pages: the two-player table (the .compare table styles come from the home page) and the "choose" headings */
+.guide .compare { margin: 0 0 20px; }
+.guide .compare table { min-width: 0; }
+.guide__h3 { font: 400 clamp(20px, 1.6vw, 24px)/1.3 var(--serif); margin: 28px 0 0; }
 .guide__faq { max-width: 46em; border-bottom: 1px solid var(--line); margin: 0 0 24px; }
 .guide__faq details { border-top: 1px solid var(--line); padding: 18px 0; }
 .guide__faq summary { cursor: pointer; font: 400 clamp(19px, 1.5vw, 22px)/1.3 var(--serif); list-style: none; padding-right: 28px; position: relative; }
