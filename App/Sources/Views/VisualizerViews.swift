@@ -57,6 +57,31 @@ extension VisualizerScopeMode {
     }
 }
 
+extension VisualizerVUDesign {
+    var label: String {
+        switch self {
+        case .original: String(localized: "Original", comment: "Visualizer meter design: Vespertine's own meters, as they were first drawn.")
+        case .broadcast: String(localized: "Broadcast", comment: "Visualizer meter design: 1940s broadcast VU meters on a grey studio panel.")
+        case .console: String(localized: "Console", comment: "Visualizer meter design: backlit VU meters in a studio mixing console's meter bridge.")
+        case .tape: String(localized: "Tape Recorder", comment: "Visualizer meter design: the VU meters of a reel-to-reel tape recorder in a wooden case.")
+        case .cassette: String(localized: "Cassette Deck", comment: "Visualizer meter design: the VU meters of a 1970s hi-fi cassette deck in a wooden case.")
+        }
+    }
+}
+
+extension VisualizerPPMDesign {
+    var label: String {
+        switch self {
+        case .original: String(localized: "Original", comment: "Visualizer meter design: Vespertine's own meters, as they were first drawn.")
+        case .bbc: "BBC"
+        case .bbcStereo: String(localized: "BBC Stereo", comment: "Visualizer meter design: BBC peak programme meters with two needles each (left and right, sum and difference). BBC is a name.")
+        case .ebu: "EBU"
+        case .din: "DIN"
+        case .nordic: String(localized: "Nordic", comment: "Visualizer meter design: peak programme meters with the Nordic scale (as used in the Nordic countries).")
+        }
+    }
+}
+
 extension VisualizerMirrorLayout {
     var label: String {
         switch self {
@@ -322,6 +347,15 @@ struct VisualizerControls: View {
             Picker("Meter", selection: $settings.meterKind) {
                 Text(verbatim: "VU").tag(VisualizerMeterKind.vu)
                 Text(verbatim: "PPM").tag(VisualizerMeterKind.ppm)
+            }
+            if settings.meterKind == .vu {
+                Picker("Design", selection: $settings.vuDesign) {
+                    ForEach(VisualizerVUDesign.allCases) { Text($0.label).tag($0) }
+                }
+            } else {
+                Picker("Design", selection: $settings.ppmDesign) {
+                    ForEach(VisualizerPPMDesign.allCases) { Text($0.label).tag($0) }
+                }
             }
             Picker("Reference Level", selection: $settings.meterReference) {
                 Text("Automatic").tag(Double?.none)

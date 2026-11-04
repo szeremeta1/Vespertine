@@ -559,7 +559,7 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
             col = screw(px, hs.xy + float2(inset, hs.w - inset), sr, 2.3, nickel, col);
             col = screw(px, hs.xy + hs.zw - inset, sr, 0.9, nickel, col);
         }
-        if (l.bezel == 1) col = screw(px, float2(w.x + w.z * 0.5, w.y + w.w + 0.29 * unit), 0.07 * unit, 1.45, float3(0.09), col);
+        if (l.bezel == 1) col = screw(px, float2(w.x + w.z * 0.5, w.y + w.w + 0.34 * unit), 0.07 * unit, 1.45, float3(0.09), col);
         if (l.bezel == 5) {
             // The DIN case's knob on top.
             float2 k = float2(hs.x + hs.z * 0.5, hs.y + 0.02 * unit);

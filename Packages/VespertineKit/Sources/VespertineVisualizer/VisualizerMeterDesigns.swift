@@ -544,7 +544,7 @@ enum VisualizerMeterPrinting {
             func key(_ layer: Layer, _ text: String, at x: CGFloat, strength: CGFloat = 1) {
                 pen.rect(layer, CGRect(x: x - swatch.width / 2, y: y - swatch.height / 2, width: swatch.width, height: swatch.height),
                          radius: 0.012 * u, strength: strength)
-                pen.text(.legend, text, at: CGPoint(x: x + swatch.width / 2 + 0.03 * u + text.size(legend) / 2, y: y), font: legend, kern: 0.006 * u)
+                pen.text(.legend, text, at: CGPoint(x: x + swatch.width / 2 + 0.06 * u + text.size(legend) / 2, y: y), font: legend, kern: 0.006 * u)
             }
             switch m.kind {
             case .twinAB:
