@@ -61,8 +61,8 @@ static MLook meterLook(int d) {
         l.needleWidth = 0.011;
         break;
     case 2: // console: amber, lit hard from behind, black bridge
-        l.face = float3(1.0, 0.80, 0.22);
-        l.lamp = float3(1.0, 0.92, 0.7);
+        l.face = float3(1.0, 0.84, 0.26);
+        l.lamp = float3(1.0, 0.95, 0.78);
         l.panel = 1;
         l.bezel = 2;
         l.second = float3(0.36, 0.62, 0.98);
@@ -91,16 +91,16 @@ static MLook meterLook(int d) {
         l.needleWidth = 0.008;
         break;
     case 14: // DIN light-pointer: white scale in glossy black cases on an oak desk
-        l.face = float3(0.93, 0.92, 0.88);
+        l.face = float3(0.9, 0.89, 0.85);
         l.backlight = 0.2;
         l.panel = 5;
         l.cabinet = 3;
         l.bezel = 5;
         l.legend = float3(0.75, 0.72, 0.66);
-        l.lamp = float3(1.0, 0.97, 0.88);
+        l.lamp = float3(1.0, 0.93, 0.76);
         break;
     default: // the BBC family: matt black faces, white printing and needles, a grey panel, lit by the room
-        l.face = float3(0.045, 0.045, 0.048);
+        l.face = float3(0.075, 0.075, 0.078);
         l.ink = float3(0.93, 0.92, 0.88);
         l.darkFace = true;
         l.backlight = 0.1;
@@ -125,15 +125,21 @@ static float fbm(float2 p) {
     return v;
 }
 
-// Wood, its grain running across (p in units). `light` and `dark` are the early and late wood.
+// Wood, its grain running across (p in units: x along the grain, y across it). `light` and `dark` are the early and
+// late wood of each growth ring.
 static float3 wood(float2 p, float3 light, float3 dark) {
-    float warp = fbm(p * float2(0.25, 1.4)) * 2.2 + 0.6 * sin(p.x * 0.7 + fbm(p * 0.3) * 3);
-    float rings = fract(p.y * 5.5 + warp);
-    float late = smoothstep(0.55, 0.95, rings) * (1 - smoothstep(0.95, 1.0, rings));
-    float fibre = noise(float2(p.x * 1.2, p.y * 90)) * 0.6 + noise(float2(p.x * 3, p.y * 260)) * 0.4;
-    float pores = step(0.86, hash21(floor(p * float2(120, 900))));
-    float3 c = mix(light, dark, saturate(0.65 * late + 0.35 * fibre + 0.25 * (fbm(p * float2(0.4, 6)) - 0.5)));
-    return c * (1 - 0.18 * pores);
+    float2 q = p * float2(0.16, 1.0);
+    // The rings, cut at a slant through a log that wanders: long arches and stripes, never evenly spaced.
+    float warp = fbm(q * float2(1.0, 0.9) + 3.1) * 1.9 + 0.4 * sin(p.x * 0.38 + 2.2 * fbm(q * 0.6 + 7.0));
+    float ring = fract(p.y * 2.6 + warp);
+    float late = smoothstep(0.45, 0.92, ring) * (1 - smoothstep(0.92, 1.0, ring));
+    // Fine fibres along the grain, and the colour drifting from board to board.
+    float fibre = noise(float2(p.x * 0.9, p.y * 64)) * 0.55 + noise(float2(p.x * 3.1, p.y * 190)) * 0.45;
+    float tone = fbm(float2(p.x * 0.12, p.y * 0.5) + 11.0);
+    float3 c = mix(light, dark, saturate(0.55 * late + 0.28 * fibre + 0.5 * (tone - 0.45)));
+    // Pores: short dark dashes along the grain.
+    float pore = step(0.94, hash21(floor(float2(p.x * 7.0 + floor(p.y * 240) * 0.37, p.y * 240))));
+    return c * (1 - 0.1 * pore);
 }
 
 // Brushed metal, the strokes running across (px, u: the unit in px).
@@ -160,10 +166,12 @@ static float bevelLight(float d, float2 n, float bevel, float gloss, thread floa
     return 0.55 + 0.65 * diffuse;
 }
 
+// The outward direction from a rounded box's nearest edge (exact, so it's never undefined on the box's middle lines).
 static float2 boxGradient(float2 p, float2 halfSize, float radius) {
-    float e = 0.75;
-    return normalize(float2(boxDistance(p + float2(e, 0), halfSize, radius) - boxDistance(p - float2(e, 0), halfSize, radius),
-                            boxDistance(p + float2(0, e), halfSize, radius) - boxDistance(p - float2(0, e), halfSize, radius)) + 1e-5);
+    float2 q = abs(p) - halfSize + radius;
+    float2 sgn = float2(p.x < 0 ? -1.0 : 1.0, p.y < 0 ? -1.0 : 1.0);
+    if (q.x > 0 && q.y > 0) return sgn * normalize(q);
+    return q.x > q.y ? float2(sgn.x, 0) : float2(0, sgn.y);
 }
 
 // A screw head: domed, with a slot at `slot` radians.
@@ -184,10 +192,11 @@ static float3 panelMaterial(int kind, float2 px, float u, float4 panel) {
     float y = (px.y - panel.y) / max(panel.w, 1.0);
     float3 c;
     switch (kind) {
-    case 0: { // grey hammer finish
-        float hammer = fbm(p * 18);
-        float dimples = noise(p * 55);
-        c = float3(0.58, 0.59, 0.585) * (0.9 + 0.12 * hammer + 0.05 * dimples);
+    case 0: { // grey hammer finish: shallow dimples catching the light, a fine metallic flake
+        float2 cell = p * 26;
+        float dimple = noise(cell) - noise(cell + float2(0.08, 0.11));
+        float flake = hash21(floor(px / max(1.0, 0.003 * u)));
+        c = float3(0.60, 0.61, 0.605) * (0.95 + 0.35 * dimple + 0.04 * (flake - 0.5)) * (0.97 + 0.05 * noise(p * 3));
         break;
     }
     case 1: // black anodised aluminium
@@ -198,7 +207,7 @@ static float3 panelMaterial(int kind, float2 px, float u, float4 panel) {
         break;
     case 3: // brushed silver
         c = brushed(px, u, float3(0.74, 0.74, 0.72));
-        c += float3(0.08) * exp(-pow((y - 0.18) / 0.22, 2.0));
+        c += float3(0.08) * exp(-((y - 0.18) / 0.22) * ((y - 0.18) / 0.22));
         break;
     default: // the BBC's dark grey
         c = float3(0.23, 0.235, 0.24) * (0.93 + 0.1 * noise(p * 120) + 0.04 * fbm(p * 3));
@@ -228,8 +237,32 @@ static float3 glass(float3 f, float2 px, float4 w, float u, float strength) {
     return f;
 }
 
+// The DIN scale where the band runs: the grey track, lit up to `level` (0…1 of the scale) by the lamp's image, with
+// the printing over it (ink stays dark in the light; the red zone glows red where it's lit). b: left, right, centre y,
+// half height.
+static float3 bandFace(float2 px, MLook l, float4 b, float level, float3 face, float room, float su, float lamp, float4 printing) {
+    float trackD = max(abs(px.y - b.z) - b.w, max(b.x - px.x, px.x - b.y));
+    float reach = b.x + (b.y - b.x) * level;
+    float on = step(0.002, level);
+    float3 track = float3(0.6, 0.6, 0.58) * room;
+    float edge = (1 - smoothstep(-0.008 * su, 0.008 * su, px.x - reach)) * on;
+    float across = 1 - pow(saturate(abs(px.y - b.z) / b.w), 4);
+    float3 light = l.lamp * (0.92 + 0.12 * across) * lamp;
+    float inTrack = 1 - smoothstep(-0.5, 0.5, trackD);
+    float3 f = mix(face, mix(track, light, edge), inTrack);
+    f = mix(f, l.ink, printing.r * 0.95);
+    f = mix(f, mix(l.red * 0.75 * room, float3(1.0, 0.18, 0.1) * 1.3 * lamp, edge), printing.g * inTrack * 0.92);
+    f = mix(f, l.red * room, printing.g * (1 - inTrack) * 0.95);
+    // A glow spilling past the band's tip.
+    f += l.lamp * 0.12 * exp(-abs(px.x - reach) / (0.04 * su)) * exp(-abs(px.y - b.z) / b.w) * on * lamp;
+    return f;
+}
+
+// The light on a face at px: its lamp, low behind the bezel's lower edge, and the room.
+static float faceRoom(float2 px, float4 w) { return 0.82 + 0.18 * (1 - (px.y - w.y) / w.w); }
+
 static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int design, float unit, float lamp, float4 printing,
-                             float3 col) {
+                             float3 col, bool needles) {
     float4 w = u.m[4 + 4 * i], hs = u.m[5 + 4 * i], pv = u.m[6 + 4 * i], nd = u.m[7 + 4 * i];
     int kind = int(nd.z + 0.5);
     float2 hc = hs.xy + hs.zw * 0.5, hh = hs.zw * 0.5;
@@ -261,13 +294,18 @@ static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int desig
         float2 n = boxGradient(px - hc, hh, housingR);
         float3 c;
         if (l.bezel == 4) {
-            // A well: four walls leaning back to the face, mirrors that catch the face's light.
+            // A well: four mirrored walls leaning back to the face. The side walls show the lit face again, fading
+            // with depth; the top wall is in the shade of the panel's edge; the bottom catches the lamp.
             float2 q = (px - wc) / wh;
-            float wall = max(abs(q.x) - 1.0, 0.0) * wh.x / max(hh.x - wh.x, 1.0) + max(abs(q.y) - 1.0, 0.0) * wh.y / max(hh.y - wh.y, 1.0);
-            float3 mirror = l.face * l.lamp * (0.55 + 0.4 * (1 - wall)) * lamp;
-            mirror *= (abs(q.x) > 1 ? 1.0 : 0.8);
-            c = mix(float3(0.35), mirror, 0.75) * (0.85 + 0.15 * noise(px / (0.01 * su)));
-            c += float3(0.15) * (1 - smoothstep(0.0, 2.0, abs(hd + 1.0)));
+            float ox = max(abs(q.x) - 1.0, 0.0) * wh.x / max(hh.x - wh.x, 1.0);
+            float oy = max(abs(q.y) - 1.0, 0.0) * wh.y / max(hh.y - wh.y, 1.0);
+            bool side = ox > oy;
+            float depth = side ? ox : oy;   // 0 at the face, 1 at the panel
+            float3 reflected = l.face * l.lamp * lamp * (0.95 - 0.55 * depth);
+            float3 wall = side ? reflected * 0.9 : (q.y < 0 ? reflected * 0.42 : reflected * 1.05);
+            c = mix(wall, float3(0.62), 0.18) + float3(0.25) * exp(-(1 - depth) * 18.0) * (side ? 0.6 : 1.0);
+            // The corners where two walls meet.
+            c *= 1 - 0.25 * exp(-abs(ox - oy) * 30.0) * step(0.02, min(ox, oy) + 0.02);
         } else if (l.bezel == 3) {
             // A polished chrome rim: it reflects a bright band and a dark one.
             float lightTerm = bevelLight(hd, n, bevel, gloss, spec);
@@ -301,26 +339,7 @@ static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int desig
     float3 f;
     if (kind == 3) {
         // DIN: the white scale, a grey track across it, and the light where the band reaches.
-        f = face;
-        float4 b = pv;   // left, right, centre y, half height
-        float trackD = max(abs(px.y - b.z) - b.w, max(b.x - px.x, px.x - b.y));
-        float level = nd.x;
-        float reach = b.x + (b.y - b.x) * level;
-        float3 track = float3(0.55, 0.55, 0.53) * room;
-        float edge = 1 - smoothstep(-0.008 * su, 0.008 * su, px.x - reach);
-        // The lamp's image: brighter in the middle of the band, soft at its tip.
-        float across = 1 - pow(saturate(abs(px.y - b.z) / b.w), 4);
-        float3 light = l.lamp * (1.15 + 0.25 * across) * lamp;
-        float inTrack = 1 - smoothstep(-0.5, 0.5, trackD);
-        float3 band = mix(track, light, edge * step(0.002, level));
-        f = mix(f, band, inTrack);
-        // The printing: ink stays dark in the light; the red zone glows red where it's lit.
-        float redLit = printing.g * inTrack;
-        f = mix(f, l.ink, printing.r * 0.95);
-        f = mix(f, mix(l.red * 0.75 * room, float3(1.0, 0.18, 0.1) * 1.3 * lamp, edge * step(0.002, level)), redLit * 0.92);
-        f = mix(f, l.red * room, printing.g * (1 - inTrack) * 0.95);
-        // A glow spilling past the band's tip.
-        f += l.lamp * 0.12 * exp(-abs(px.x - reach) / (0.04 * su)) * exp(-abs(px.y - b.z) / b.w) * step(0.002, level) * lamp;
+        f = bandFace(px, l, pv, needles ? nd.x : 0.0, face, room, su, lamp, printing);
     } else {
         float3 inkC = l.darkFace ? l.ink * mix(room, 1.0, 0.3) : l.ink;
         f = mix(face, inkC, printing.r * 0.95);
@@ -332,6 +351,7 @@ static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int desig
 
         // The needles (A over B, so the left one is on top), and their shadows on the face.
         float2 pivot = pv.xy;
+        if (!needles) nd.xy = float2(-10, -10);
         float r0 = pv.z, r1 = pv.w;
         float base = max(0.6, l.needleWidth * su), tip = max(0.45, base * 0.35);
         float2 shadowOffset = (l.backlight > 0.5 ? float2(0.004, -0.012) : float2(0.012, 0.02)) * su;
@@ -339,16 +359,15 @@ static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int desig
         float3 colA = l.needleA, colB = l.needleB;
         if (kind == 2) { colA = float3(0.96, 0.95, 0.92); colB = float3(0.98, 0.82, 0.16); }   // M white, S yellow
         if (kind == 4) { colA = l.darkFace ? l.ink : float3(0.05); }
-        bool twin = nd.y > -9;
+        bool twin = nd.y > -9, single = nd.x > -9;
         if (twin) shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.y, r0, r1, base * 2.2, tip * 3));
-        shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.x, r0, r1, base * 2.2, tip * 3));
+        if (single) shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.x, r0, r1, base * 2.2, tip * 3));
         f *= 1 - (l.darkFace ? 0.5 : 0.25) * shadow;
         if (twin) {
             float nb = needleMask(px, pivot, nd.y, r0, r1, base, tip);
             f = mix(f, colB * (0.85 + 0.15 * room), nb);
         }
-        float na = needleMask(px, pivot, nd.x, r0, r1, base, tip);
-        f = mix(f, colA * (0.85 + 0.15 * room), na);
+        if (single) f = mix(f, colA * (0.85 + 0.15 * room), needleMask(px, pivot, nd.x, r0, r1, base, tip));
 
         // The cover over the pivot, where the window shows it.
         float cover = nd.w * su;
@@ -368,8 +387,66 @@ static float3 drawInstrument(float2 px, constant U &u, int i, MLook l, int desig
     return mix(col, f, 1 - smoothstep(-0.5, 0.5, wd));
 }
 
+// The parts that move, over the cached picture of the rest: the needles and their shadows (under the pivot's cover),
+// and the light band, with the bezel's lip and the glass over them as over the face.
+static float3 movingParts(float2 px, constant U &u, int i, MLook l, float unit, float lamp, float4 printing, float vignette,
+                          float3 col) {
+    float4 w = u.m[4 + 4 * i], pv = u.m[6 + 4 * i], nd = u.m[7 + 4 * i];
+    int kind = int(nd.z + 0.5);
+    float su = kind == 4 ? unit * 0.55 : unit;
+    float2 wc = w.xy + w.zw * 0.5, wh = w.zw * 0.5;
+    float wd = boxDistance(px - wc, wh, (l.bezel == 0 ? 0.06 : 0.02) * su);
+    if (wd > 0.5) return col;
+    float inside = 1 - smoothstep(-0.5, 0.5, wd);
+    float lip = boxDistance(px - wc - float2(0, 0.02 * su), wh, 0.02 * su);
+    float lipLight = (0.62 + 0.38 * smoothstep(0.0, 0.07 * su, -lip)) * vignette;
+    float3 sheen = glass(float3(0), px, w, su, l.darkFace ? 0.7 : 1.0) * vignette;
+    float room = faceRoom(px, w);
+    if (kind == 3) {
+        if (abs(px.y - pv.z) > pv.w * 3) return col;
+        float2 lampAt = float2(wc.x, w.y + w.w * 1.1);
+        float glow = exp(-length((px - lampAt) / float2(1.5, 1.0)) / (0.75 * w.w));
+        float lit = mix(room, (0.42 + 0.9 * glow) * lamp, l.backlight);
+        float3 face = l.face * mix(float3(1), l.lamp, l.backlight) * lit * (0.985 + 0.03 * noise(px / (0.006 * su)));
+        float3 f = bandFace(px, l, pv, nd.x, face, room, su, lamp, printing) * lipLight + sheen;
+        return mix(col, f, inside);
+    }
+    float2 pivot = pv.xy;
+    float r0 = pv.z, r1 = pv.w;
+    float base = max(0.6, l.needleWidth * su), tip = max(0.45, base * 0.35);
+    float2 shadowOffset = (l.backlight > 0.5 ? float2(0.004, -0.012) : float2(0.012, 0.02)) * su;
+    float3 colA = l.needleA, colB = l.needleB;
+    if (kind == 2) { colA = float3(0.96, 0.95, 0.92); colB = float3(0.98, 0.82, 0.16); }   // M white, S yellow
+    if (kind == 4) colA = l.darkFace ? l.ink : float3(0.05);
+    bool twin = nd.y > -9;
+    // Nothing shows under the pivot's cover.
+    float cover = nd.w * su;
+    float open = cover > 0 ? smoothstep(-0.6, 0.6, length(px - pivot) - cover) : 1.0;
+    float shadow = needleMask(px - shadowOffset, pivot, nd.x, r0, r1, base * 2.2, tip * 3);
+    if (twin) shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.y, r0, r1, base * 2.2, tip * 3));
+    col *= 1 - (l.darkFace ? 0.5 : 0.25) * shadow * open * inside;
+    if (twin) col = mix(col, colB * (0.85 + 0.15 * room) * lipLight + sheen, needleMask(px, pivot, nd.y, r0, r1, base, tip) * open * inside);
+    col = mix(col, colA * (0.85 + 0.15 * room) * lipLight + sheen, needleMask(px, pivot, nd.x, r0, r1, base, tip) * open * inside);
+    return col;
+}
+
+// A peak light's lens, lit to `level`, and its glow.
+static float3 peakLight(float2 px, float4 led, float3 col, bool lit) {
+    float d = length(px - led.xy);
+    float level = lit ? led.w : 0.0;
+    if (d < led.z + 1) {
+        float3 lens = mix(float3(0.22, 0.02, 0.02), float3(1.0, 0.16, 0.08) * 1.25, level);
+        lens *= 0.75 + 0.35 * (1 - saturate(d / led.z));
+        lens += float3(0.5) * exp(-length(px - led.xy + led.z * float2(0.35, 0.4)) / (0.18 * led.z));
+        col = mix(col, lens, 1 - smoothstep(-0.5, 0.5, d - led.z));
+    }
+    return col + float3(1.0, 0.15, 0.08) * level * 0.35 * exp(-d / (led.z * 2.2));
+}
+
+// m[3].z: 1 draws everything that stays still (into a texture kept until the window's size or the design changes),
+// 2 lays what moves over that.
 fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]], texture2d<float> overlay [[texture(0)]],
-                               texture2d<float> printingTex [[texture(4)]]) {
+                               texture2d<float> printingTex [[texture(4)]], texture2d<float> still [[texture(5)]]) {
     float2 size = u.a.xy;
     float2 px = in.uv * size;
     int design = int(u.m[0].x + 0.5);
@@ -378,6 +455,18 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
     int count = int(u.m[0].w + 0.5);
     MLook l = meterLook(design);
     float4 printing = printingTex.sample(linearClamp, in.uv);
+    float vignette = 1 - 0.25 * pow(length(in.uv - 0.5) * 1.25, 2.5);
+
+    if (u.m[3].z > 1.5) {
+        float3 col = still.sample(linearClamp, in.uv).rgb;
+        for (int i = 0; i < min(count, 4); i++) col = movingParts(px, u, i, l, unit, lamp, printing, vignette, col);
+        for (int j = 0; j < 4; j++) {
+            float4 led = u.m[20 + j];
+            if (led.z > 0 && length(px - led.xy) < led.z * 10) col = peakLight(px, led, col, true);
+        }
+        float4 ov = overlay.sample(linearClamp, in.uv);
+        return overlayOver(col, ov);
+    }
 
     // The room: dark, warmed by the theme, lit from above.
     float3 col = mix(float3(0.03, 0.028, 0.03), u.stops[0].rgb * 0.8, 0.5) * (1.15 - 0.6 * in.uv.y);
@@ -391,6 +480,9 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
             float3 oak = wood(float2(px.x / unit * 0.35, px.y / unit * 0.9 + 3), float3(0.62, 0.43, 0.24), float3(0.36, 0.22, 0.11));
             oak *= 0.75 + 0.35 * (1 - t);
             oak += float3(0.12, 0.09, 0.06) * exp(-(px.y - cab.y) / (0.03 * unit));
+            // The cases' shadow on the desk, close under them.
+            float under = boxDistance(float2(px.x - (panel.x + panel.z * 0.5), 0), float2(panel.z * 0.5 - 0.1 * unit, 1), 0);
+            oak *= 1 - 0.7 * exp(-(px.y - cab.y) / (0.09 * unit)) * (1 - smoothstep(-0.1 * unit, 0.25 * unit, under));
             col = oak * (1 - 0.35 * smoothstep(0.7, 1.0, t));
         }
     } else if (l.cabinet > 0) {
@@ -453,7 +545,7 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
         }
     }
 
-    for (int i = 0; i < min(count, 4); i++) col = drawInstrument(px, u, i, l, design, unit, lamp, printing, col);
+    for (int i = 0; i < min(count, 4); i++) col = drawInstrument(px, u, i, l, design, unit, lamp, printing, col, false);
 
     // Screws on the cases: the moulded case's four, the Sifam's zero adjuster under the window.
     for (int i = 0; i < min(count, 4); i++) {
@@ -477,7 +569,7 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
         }
     }
 
-    // The peak lights: a red lens in a bright ring, glowing when lit.
+    // The peak lights: a red lens in a bright ring (unlit here; lit over this as they come on).
     for (int j = 0; j < 4; j++) {
         float4 led = u.m[20 + j];
         if (led.z <= 0) continue;
@@ -487,17 +579,11 @@ fragment float4 vz_meters_real(VOut in [[stage_in]], constant U &u [[buffer(0)]]
             float spec = 0;
             float3 bezel = float3(0.7, 0.7, 0.72) * bevelLight(d - ring, normalize(px - led.xy + 1e-4), led.z * 0.4, 1.0, spec) + spec;
             col = mix(col, bezel, 1 - smoothstep(-0.5, 0.5, d - ring));
-            float3 lens = mix(float3(0.22, 0.02, 0.02), float3(1.0, 0.16, 0.08) * 1.25, led.w);
-            lens *= 0.75 + 0.35 * (1 - saturate(d / led.z));
-            lens += float3(0.5) * exp(-length(px - led.xy + led.z * float2(0.35, 0.4)) / (0.18 * led.z));
-            col = mix(col, lens, 1 - smoothstep(-0.5, 0.5, d - led.z));
+            col = peakLight(px, led, col, false);
         }
-        col += float3(1.0, 0.15, 0.08) * led.w * 0.35 * exp(-d / (led.z * 2.2));
     }
 
-    col *= 1 - 0.25 * pow(length(in.uv - 0.5) * 1.25, 2.5);
-    float4 ov = overlay.sample(linearClamp, in.uv);
-    return overlayOver(col + dither(px), ov);
+    return float4(col * vignette + dither(px), 1);
 }
 """#
 }

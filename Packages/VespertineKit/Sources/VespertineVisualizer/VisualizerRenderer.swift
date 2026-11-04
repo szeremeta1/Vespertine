@@ -137,6 +137,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var balance = VisualizerBalanceNeedle()
     private var lamp: Float = 0
     private var lampDesign: MeterDesign?
+    /// Everything in a design that stays still, drawn once into a texture; each frame draws only what moves over it.
+    private var designStill: MTLTexture?
+    private var designStillKey = ""
 
     // Spectrogram history: one column of fine bins per step, written in place (a ring across the texture's width).
     static let historyWidth = 1024
@@ -370,7 +373,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             u.g = SIMD4(Float(dt), Float(size.width / size.height), reduceMotion ? 1 : 0, Float(Self.particleCount))
             encodeParticles(buffer, uniforms: &u, size: size, dt: dt)
         case .meters where design != nil:
-            if let design { encodeDesign(design, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt) }
+            if let design { encodeDesign(design, buffer: buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt) }
         case .meters:
             let faces = VisualizerLayout.meterFaces(in: points)
             u.g = px(faces[0])
@@ -401,6 +404,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         encoder.setFragmentTexture(artwork ?? blank, index: 2)
         encoder.setFragmentTexture(trail ?? blank, index: 3)
         encoder.setFragmentTexture(meterFace ?? blank, index: 4)
+        encoder.setFragmentTexture(designStill ?? blank, index: 5)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
         encoder.endEncoding()
         let gpu = self.gpu
@@ -666,8 +670,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     // MARK: Meters
 
     /// The uniforms for a meter design: where its instruments are, where their needles point, its lamps and lights.
-    private func encodeDesign(_ design: MeterDesign, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms, size: CGSize,
-                              scale: CGFloat, dt: Double) {
+    private func encodeDesign(_ design: MeterDesign, buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
+                              size: CGSize, scale: CGFloat, dt: Double) {
         let points = CGSize(width: size.width / scale, height: size.height / scale)
         let plan = MeterPlan.make(design, in: points)
         updateDesignPrinting(plan: plan, size: size, scale: scale)
@@ -697,10 +701,48 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
                 ledSlot += 1
             }
         }
+        // What stays still: drawn again only when the window's size, the design or the colours change, or while the lamps
+        // warm up.
+        let room = u.stops.0 + u.stops.1 * 7
+        let stillKey = "\(Int(size.width))x\(Int(size.height)) \(design.rawValue) \(Int(room.x * 255)) \(Int(room.y * 255)) \(Int(room.z * 255))"
+        if stillKey != designStillKey || lamp < 1 || designStill == nil {
+            slots[3].z = 1
+            drawStill(buffer: buffer, uniforms: u, slots: slots, size: size)
+            designStillKey = lamp < 1 ? "" : stillKey
+        }
+        slots[3].z = 2
         withUnsafeMutableBytes(of: &u.meter) { raw in
             let m = raw.bindMemory(to: SIMD4<Float>.self)
             for i in 0..<24 { m[i] = slots[i] }
         }
+    }
+
+    private func drawStill(buffer: MTLCommandBuffer, uniforms: VisualizerUniforms, slots: [SIMD4<Float>], size: CGSize) {
+        let w = Int(size.width), h = Int(size.height)
+        if designStill?.width != w || designStill?.height != h {
+            let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: pixelFormat, width: w, height: h, mipmapped: false)
+            d.usage = [.renderTarget, .shaderRead]
+            d.storageMode = .private
+            designStill = device.makeTexture(descriptor: d)
+        }
+        guard let designStill, let designPipeline else { return }
+        var u = uniforms
+        withUnsafeMutableBytes(of: &u.meter) { raw in
+            let m = raw.bindMemory(to: SIMD4<Float>.self)
+            for i in 0..<24 { m[i] = slots[i] }
+        }
+        let pass = MTLRenderPassDescriptor()
+        pass.colorAttachments[0].texture = designStill
+        pass.colorAttachments[0].loadAction = .dontCare
+        pass.colorAttachments[0].storeAction = .store
+        guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass) else { return }
+        encoder.setRenderPipelineState(designPipeline)
+        encoder.setFragmentBytes(&u, length: MemoryLayout<VisualizerUniforms>.stride, index: 0)
+        encoder.setFragmentTexture(blank, index: 0)
+        encoder.setFragmentTexture(meterFace ?? blank, index: 4)
+        encoder.setFragmentTexture(blank, index: 5)
+        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        encoder.endEncoding()
     }
 
     /// Where an instrument's needles point (radians from upright, clockwise), or how far its band of light reaches
@@ -741,6 +783,18 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         guard key != meterFaceKey else { return }
         meterFaceKey = key
         guard let bytes = VisualizerMeterPrinting.render(width: w, height: h, scale: scale, plan: plan) else { return }
+        if let dump = ProcessInfo.processInfo.environment["VZ_DUMP_MASK"] { // DEBUG-REMOVE
+            for k in 0..<4 {
+                var g = [UInt8](repeating: 0, count: w * h)
+                for i in 0..<(w * h) { g[i] = bytes[4 * i + k] }
+                let cs = CGColorSpaceCreateDeviceGray()
+                if let ctx = CGContext(data: &g, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w, space: cs, bitmapInfo: 0),
+                   let img = ctx.makeImage() {
+                    let rep = NSBitmapImageRep(cgImage: img)
+                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dump + "\(k).png"))
+                }
+            }
+        }
         let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: w, height: h, mipmapped: false)
         d.usage = .shaderRead
         guard let texture = device.makeTexture(descriptor: d) else { return }

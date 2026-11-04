@@ -147,7 +147,7 @@ struct MeterPlan: Sendable, Equatable {
             if design == .bbcStereo { kind = i == 0 ? .twinAB : .twinMS }
             instruments.append(MeterInstrument(kind: kind, window: window, housing: housing,
                                                pivot: CGPoint(x: window.midX, y: window.minY + 1.22 * u),
-                                               needle: (0.24 * u, 1.075 * u), channel: i))
+                                               needle: (0.18 * u, 1.075 * u), channel: i))
         }
     }
 
@@ -215,7 +215,7 @@ struct MeterPlan: Sendable, Equatable {
             let window = housing.insetBy(dx: bezel * u, dy: bezel * u)
             instruments.append(MeterInstrument(kind: .needle, window: window, housing: housing,
                                                pivot: CGPoint(x: window.midX, y: window.minY + 1.3 * u),
-                                               needle: (0.36 * u, 1.13 * u),
+                                               needle: (0.25 * u, 1.13 * u),
                                                led: CGPoint(x: housing.midX + 0.5 * u, y: housing.maxY + 0.27 * u),
                                                ledRadius: 0.045 * u, channel: i))
         }
@@ -230,10 +230,10 @@ struct MeterPlan: Sendable, Equatable {
     /// anthracite panel, a brushed aluminium strip across the top, all in a teak case.
     private mutating func layoutTape(area: CGRect, wide: Bool) {
         let ww: CGFloat = 1.45, gapW: CGFloat = 0.08, rim: CGFloat = 0.06
-        let wood: CGFloat = 0.2, strip: CGFloat = 0.42, margin: CGFloat = 0.32, legend: CGFloat = 0.3
+        let wood: CGFloat = 0.2, strip: CGFloat = 0.42, margin: CGFloat = 0.32, legend: CGFloat = 0.32
         let opening = wide ? CGSize(width: 2 * ww + gapW + 2 * rim, height: 1 + 2 * rim)
                            : CGSize(width: ww + 2 * rim, height: 2 + gapW + 2 * rim)
-        let panelW = opening.width + 2 * margin, panelH = strip + legend + opening.height + margin + 0.2
+        let panelW = opening.width + 2 * margin, panelH = strip + legend + opening.height + margin
         let blockW = panelW + 2 * wood, blockH = panelH + 2 * wood
         let (u, o) = Self.fit(blockW, blockH, in: area)
         unit = u
@@ -245,7 +245,7 @@ struct MeterPlan: Sendable, Equatable {
             let window = wide
                 ? CGRect(x: open.minX + (rim + CGFloat(i) * (ww + gapW)) * u, y: open.minY + rim * u, width: ww * u, height: u)
                 : CGRect(x: open.minX + rim * u, y: open.minY + (rim + CGFloat(i) * (1 + gapW)) * u, width: ww * u, height: u)
-            instruments.append(MeterInstrument(kind: .needle, window: window, housing: open,
+            instruments.append(MeterInstrument(kind: .needle, window: window, housing: window.insetBy(dx: -rim * u, dy: -rim * u),
                                                pivot: CGPoint(x: window.midX, y: window.minY + 1.16 * u),
                                                needle: (0.3 * u, 0.98 * u), channel: i))
         }
@@ -273,7 +273,7 @@ struct MeterPlan: Sendable, Equatable {
             let ledY = wide ? housing.maxY + 0.3 * u : panel.minY + (top + 2 * h + gap + 0.3) * u
             instruments.append(MeterInstrument(kind: .needle, window: window, housing: housing,
                                                pivot: CGPoint(x: window.midX, y: window.minY + 1.2 * u),
-                                               needle: (0.3 * u, 1.04 * u),
+                                               needle: (0.15 * u, 1.04 * u),
                                                led: CGPoint(x: ledX, y: ledY), ledRadius: 0.042 * u, channel: i))
         }
     }
@@ -594,7 +594,7 @@ enum VisualizerMeterPrinting {
                 pen.tick(.ink, p, a, rp, rp - (major ? 0.04 : 0.025) * u, width: line * 0.8, strength: 0.85)
                 if major { pen.text(.ink, "\(Int(pct))", pivot: p, angle: a, radius: rp - 0.085 * u, font: font("Futura-Medium", 0.042 * u), strength: 0.85) }
             }
-            pen.text(.ink, "VU", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.6 * u), font: font("Futura-Bold", 0.15 * u))
+            pen.text(.ink, "VU", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.715 * u), font: font("Futura-Bold", 0.13 * u))
             pen.crescent(.ink, CGPoint(x: m.window.minX + 0.11 * u, y: m.window.maxY - 0.1 * u), 0.03 * u, strength: 0.7)
             pen.text(.ink, "vespertine", at: CGPoint(x: m.window.minX + 0.29 * u, y: m.window.maxY - 0.1 * u),
                      font: font("Futura-Medium", 0.035 * u), strength: 0.7)
@@ -684,7 +684,7 @@ enum VisualizerMeterPrinting {
             pen.text(.ink, "%", pivot: p, angle: angle(1.5), radius: r - 0.085 * u, font: font("Helvetica", 0.042 * u), strength: 0.8)
             pen.text(.ink, "VU", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.62 * u), font: font("Helvetica-Bold", 0.11 * u))
             // The legend over each meter, engraved white in the panel.
-            let x = m.window.midX, y = m.housing.minY - 0.15 * u
+            let x = m.window.midX, y = m.housing.minY - 0.16 * u
             pen.text(.legend, m.channel == 0 ? "CHANNEL  I" : "CHANNEL  II", at: CGPoint(x: x, y: y), font: font("Helvetica-Bold", 0.062 * u),
                      kern: 0.006 * u)
         }
