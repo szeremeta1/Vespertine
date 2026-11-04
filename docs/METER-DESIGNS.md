@@ -80,7 +80,16 @@ Eleven sub-designs, the two originals included. Each one keeps its standard's ba
 - **Studer A80, Ampex, Otari, Neve, SSL**: Studer's A80 VU module and Neve/SSL bridges look like the Console design (backlit yellow rectangles); no close-up good enough to copy a specific face was found, so the Console design is the composite of the API bridge and TL Audio/Sifam photos instead of a claimed Studer or Neve copy.
 - **Nagra modulometer**: a Nagra-specific instrument (its own ballistics), not one of the IEC types.
 
-Faces carry Vespertine's own crescent and name where the real makers put theirs; no maker's logo is reproduced.
+Each design carries the word "vespertine" where its maker put its own name, lettered the way that maker lettered it (no crescent; the Original designs keep the app's own mark). No maker's logo or name is reproduced, and no font file is added: the closest typefaces that ship with macOS are used, or the letters are drawn.
+
+| Design | The maker's lettering on the real device | Vespertine's |
+|---|---|---|
+| Broadcast | Weston 862 card: the maker's line across the top and "MODEL 862" bottom left, in small bold geometric capitals ([600-dpi scan](https://www.preservationsound.com/?p=9246)) | VESPERTINE across the top, TYPE A bottom left, Futura Bold |
+| Console | API faces: a small mark top left, printed in thin outline | vespertine top left, Futura Bold as an outline only |
+| Tape Recorder | Revox A77 strip: the name in blue, wide heavy flared capitals with the vowels set smaller, a widely spaced line of small black capitals under it | VESPERTINE in Skia Black Extended, vowels smaller, blue; VU - STEREO - METER under it |
+| Cassette Deck | Marantz 5030: heavy, very wide lower case with flat serifs, large on the panel and small on each card under "dB"; a Spencerian script for "Stereo Cassette Deck" (custom logo; the faceplates used Metropolis and Davison Spencerian, [Fonts In Use](https://fontsinuse.com/uses/4675/marantz-receivers-1970s)) | vespertine in Superclarendon Black widened 140 %, on the panel and the cards; "Stereo Meters" in Snell Roundhand Bold |
+| BBC, BBC Stereo, EBU, Nordic | Sifam 34A: bottom left, an S built of even squared strokes with rounded corners, the type in small squarish figures beside it | VESPERTINE drawn as paths in that construction; the type and PPM in DIN Alternate |
+| DIN | Siemens & Halske: tiny black print bottom left and right on the scale; Siemens' corporate lettering is a heavy open sans (Neuzeit S was made for Siemens, [Wikipedia](https://en.wikipedia.org/wiki/Neuzeit_S)) | VESPERTINE in Lucida Grande Bold, thickened and widened, bottom left; DIN 45406 bottom right |
 
 ## 4. Telling left and right apart, without breaking the standards
 
@@ -100,3 +109,4 @@ The standard needles are untouched: a test runs the meters with and without ever
 - The DIN scale positions are measured from two photos (section 2), not taken from the DIN 45406 text.
 - IEC 60268-10's exact tolerances (e.g. on the 10 ms burst for Type I) were not read in the standard itself; Type I is calibrated to the integration-time definition (5 ms burst at 5 kHz reads -2 dB, tested within 0.5 dB) and the return time (20 dB in 1.7 s, tested within 0.5 dB).
 - Revox A77 face details (exact numerals) are read from small photos.
+- No source names the typefaces of the Revox, Sifam, API or Siemens & Halske marks; the matches in section 3 are made by eye from the photos.

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AppKit
 import Foundation
 import Testing
 @testable import VespertineVisualizer
@@ -284,5 +285,12 @@ struct VisualizerMeterDesignTests {
         s.style = .vinyl
         #expect(s.meterExtras.isEmpty)
         #expect(MeterDesign(VisualizerSettings()) == nil)
+    }
+
+    @Test("The makers' lettering loads in its own typeface on macOS, not a fallback")
+    func typefaces() {
+        for name in VisualizerMeterPrinting.typefaces {
+            #expect(NSFont(name: name, size: 12)?.fontName == name, "\(name)")
+        }
     }
 }

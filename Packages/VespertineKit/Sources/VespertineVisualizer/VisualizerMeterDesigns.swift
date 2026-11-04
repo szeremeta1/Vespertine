@@ -538,6 +538,12 @@ enum VisualizerMeterPrinting {
         }
     }
 
+    /// Every typeface the faces use, all shipped with macOS: the scales' (Helvetica, Futura, DIN Alternate) and the
+    /// makers' lettering (Skia for the tape recorder's nameplate, Superclarendon and Snell Roundhand for the cassette
+    /// deck's, Lucida Grande for the DIN instrument's). A test checks each one loads rather than falling back.
+    static let typefaces = ["Helvetica", "Helvetica-Bold", "Futura-Medium", "Futura-Bold", "DINAlternate-Bold",
+                            "Skia-Regular_Black-Extended", "Superclarendon-Black", "SnellRoundhand-Bold", "LucidaGrande-Bold"]
+
     static func font(_ name: String, _ size: CGFloat, fallback weight: NSFont.Weight = .medium) -> NSFont {
         NSFont(name: name, size: size) ?? NSFont(name: "Helvetica", size: size) ?? NSFont.systemFont(ofSize: size, weight: weight)
     }
@@ -762,7 +768,7 @@ enum VisualizerMeterPrinting {
         let runs = "VESPERTINE".map { c in (String(c), "AEIOU".contains(c) ? small : big) }
         pen.lettering(.second, runs, at: name, kern: 0.004 * u)
         pen.lettering(.ink, [("VU - STEREO - METER", font("Helvetica-Bold", 0.034 * u))], at: CGPoint(x: name.x, y: name.y + 0.12 * u),
-                      kern: 0.05 * u, strength: 0.85)
+                      kern: 0.032 * u, strength: 0.85)
     }
 
     // MARK: Cassette deck
@@ -870,7 +876,7 @@ enum VisualizerMeterPrinting {
             pen.lettering(.ink, [("VESPERTINE", font("LucidaGrande-Bold", 0.05 * u))],
                           at: CGPoint(x: m.window.minX + 0.42 * u, y: m.window.maxY - 0.075 * u), kern: 0.002 * u, widen: 1.08, embolden: 4, strength: 0.75)
             pen.text(.ink, "DIN 45406", at: CGPoint(x: m.window.maxX - 0.35 * u, y: m.window.maxY - 0.075 * u),
-                     font: font("DINAlternate-Bold", 0.04 * u), strength: 0.6)
+                     font: font("DINAlternate-Bold", 0.046 * u), strength: 0.7)
             pen.text(.legend, m.channel == 0 ? "L" : "R", at: CGPoint(x: m.housing.minX + 0.16 * u, y: m.window.midY),
                      font: font("DINAlternate-Bold", 0.16 * u))
         }
