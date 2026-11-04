@@ -3,6 +3,7 @@ import logo from '../assets/brand/logo.svg';
 import { app, latest, links } from '../data/app';
 import { t, fill, orList, pagePath, year as yearOf, type Lang, type Page } from '../i18n';
 import { escapeHtml } from '../lib/text';
+import { guides } from '../data/guides';
 interface Props { lang: Lang; page: Page; home?: boolean; }
 const { lang, home = false } = Astro.props;
 const s = t(lang);
@@ -24,6 +25,8 @@ const cols = [
     { href: links.license, text: f.license }, { href: links.notices, text: f.notices }, { href: '/llms.txt', text: 'llms.txt' },
   ] },
 ];
+// English-only guide pages (src/views/Guide.astro) are linked from the English footer only.
+if (lang === 'en') for (const g of guides) cols[0].items.push({ href: g.path, text: g.linkText });
 const orgs = orList(lang, links.ukraine.map((u) => `<a href="${u.url}">${escapeHtml(u.name)}</a>`));
 const author = `<a href="${app.author.url}">${escapeHtml(app.author.name)}</a>`;
 ---

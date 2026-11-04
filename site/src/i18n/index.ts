@@ -37,9 +37,12 @@ export function nativeName(lang: Lang) {
   return name.charAt(0).toLocaleUpperCase(lang) + name.slice(1);
 }
 
-/** Pages: home, press, privacy, terms. English at /, /press.html …; others at /de/, /de/press.html … */
-export type Page = 'home' | 'press' | 'privacy' | 'terms' | '404';
+/** Pages: home, press, privacy, terms. English at /, /press.html …; others at /de/, /de/press.html …
+ *  'article' stands for the English-only guide pages (src/views/Guide.astro): they pass their own `path` to the
+ *  layout, have no other-language versions and no language menu. */
+export type Page = 'home' | 'press' | 'privacy' | 'terms' | '404' | 'article';
 export function pagePath(lang: Lang, page: Page) {
+  if (page === 'article') throw new Error("an English-only guide page has its own path; pass it to the layout as `path`");
   const prefix = lang === DEFAULT_LOCALE ? '/' : `/${lang}/`;
   return page === 'home' ? prefix : `${prefix}${page}.html`;
 }
