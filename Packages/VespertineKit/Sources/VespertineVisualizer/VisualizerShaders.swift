@@ -23,6 +23,7 @@ struct U {
     float4 stops[4]; // the theme, dark to bright
     float4 rings[16];// club: radius, strength, width, colour index
     float4 palette[6]; // Album Art: the cover's colours, dark to bright, six along the gradients
+    float4 m[24];    // the meter designs (VisualizerMeterShaders): see there
 };
 
 struct VOut {

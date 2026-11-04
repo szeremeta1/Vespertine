@@ -47,6 +47,11 @@ public struct VisualizerFrame: Sendable, Equatable {
     public var ppm = SIMD2<Float>(-40, -40)
     /// The level the meters read as 0 VU and PPM 4 (dBFS, sine RMS), after sensitivity.
     public var meterReferenceDB: Float = -18
+    /// The meter designs' extra readings, when asked for (`Configuration.meterExtras`): VU needles on a scale to +6
+    /// (as `vu`), Type I PPMs (DIN, Nordic) and Type IIa PPMs on M and S (dB against the reference, as `ppm`).
+    public var vuWide = SIMD2<Float>(0, 0)
+    public var ppmTypeI = SIMD2<Float>(-40, -40)
+    public var ppmMidSide = SIMD2<Float>(-40, -40)
 
     public static let stereoCount = 2048
 
@@ -85,6 +90,8 @@ public final class VisualizerAnalyzer {
         public var meterReferenceDB: Float?
         /// Run the meters' ballistics (sample by sample); off while no meter is shown.
         public var meters = true
+        /// Ballistics the meter design needs besides the VU and Type IIa pair (none by default).
+        public var meterExtras: VisualizerMeters.Extras = []
 
         public init() {}
     }
@@ -274,10 +281,12 @@ public final class VisualizerAnalyzer {
         if !configuration.meters {
             meters = VisualizerMeters()   // off: the needles start from rest when the meters are shown again
         } else if live {
+            meters.extras = configuration.meterExtras
             meters.process(left: UnsafeBufferPointer(rebasing: left[(left.count - newFrames)...]),
                            right: UnsafeBufferPointer(rebasing: right[(right.count - newFrames)...]),
                            sampleRate: currentRate, referenceDBFS: reference)
         } else {
+            meters.extras = configuration.meterExtras
             meters.process(left: UnsafeBufferPointer(start: nil, count: 0), right: UnsafeBufferPointer(start: nil, count: 0),
                            silentFrames: newFrames, sampleRate: currentRate, referenceDBFS: reference)
         }
@@ -394,7 +403,10 @@ public final class VisualizerAnalyzer {
                                beatPulse: beatPulse, tempo: Self.tempo(beatTimes), hasSignal: time - lastSignal < 0.5,
                                time: time, stereo: stereo, stereoInterval: Double(thin) / currentRate, correlation: correlation,
                                vu: SIMD2(Float(meters.vu.x), Float(meters.vu.y)),
-                               ppm: SIMD2<Float>(meters.ppm(referenceDBFS: reference)), meterReferenceDB: Float(reference))
+                               ppm: SIMD2<Float>(meters.ppm(referenceDBFS: reference)), meterReferenceDB: Float(reference),
+                               vuWide: SIMD2(Float(meters.vuWide.x), Float(meters.vuWide.y)),
+                               ppmTypeI: SIMD2<Float>(meters.ppmTypeI(referenceDBFS: reference)),
+                               ppmMidSide: SIMD2<Float>(meters.ppmMidSide(referenceDBFS: reference)))
     }
 
     /// The meters' reference in dBFS: as set, or 1 dB over the music's recent loudness, so the needles swing around
