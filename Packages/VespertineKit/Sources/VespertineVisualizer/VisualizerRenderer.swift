@@ -161,6 +161,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     // Spectrum's Smooth mode, and the Vinyl cover between its label and its sleeve.
     private var smoother = VisualizerSpectrumSmoother()
     private var cover = VisualizerCoverMotion()
+    private var vinylShown = false
     /// The room kept for the song's title under the sleeve, in points, as last drawn.
     private var vinylTitleRoom: CGFloat = 0
 
@@ -537,12 +538,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             smoother.reset()
         }
 
-        // Vinyl: the cover moves to where it was asked to be; out of sight, it's there already.
+        // Vinyl: the cover moves to where it was asked to be. On the first frame of the style (the window opening, or
+        // switched to from another), it's there already.
         if settings.style == .vinyl {
-            cover.advance(toward: settings.vinylCover, dt: dt, calm: reduceMotion)
-        } else {
-            cover.settle(at: settings.vinylCover)
+            if vinylShown {
+                cover.advance(toward: settings.vinylCover, dt: dt, calm: reduceMotion)
+            } else {
+                cover.settle(at: settings.vinylCover)
+            }
         }
+        vinylShown = settings.style == .vinyl
 
         // Club's Waves: the ripples run along the beams faster with the mids; the sway drifts on its own slow clock.
         let calmWaves = reduceMotion ? 0.35 : 1

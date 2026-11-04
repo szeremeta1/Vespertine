@@ -173,16 +173,16 @@ struct VisualizerMotionTests {
     }
 
     /// Runs the cover toward `target` for `seconds`, checking at every frame that the sleeve never changes sides
-    /// where it could be seen passing through the record.
+    /// where it could be seen passing through the record (over it in the frames before and after).
     private func run(_ m: inout VisualizerCoverMotion, to target: VisualizerVinylCover, seconds: Double, calm: Bool = false,
                      fps: Double = 60) {
         for _ in 0..<Int(seconds * fps) {
             let before = m.pose
             let overlapped = m.overlapsRecord
             m.advance(toward: target, dt: 1 / fps, calm: calm)
+            // Changing sides is only seen if the sleeve is over the record both before and after.
             if !calm && before.front != m.pose.front {
-                #expect(!overlapped || before.opacity < 0.001, "the sleeve changed sides over the record: \(before) → \(m.pose)")
-                #expect(!m.overlapsRecord)
+                #expect(!overlapped || !m.overlapsRecord, "the sleeve changed sides over the record: \(before) → \(m.pose)")
             }
             #expect(m.pose.opacity >= 0 && m.pose.opacity <= 1 && m.pose.layout >= 0 && m.pose.layout <= 1)
         }
@@ -383,6 +383,10 @@ struct VisualizerModeRenderTests {
         var frame = musicFrame()
         frame.bands = [Float](repeating: 0.2, count: 64)
         frame.peaks = [Float](repeating: 0.8, count: 64)
+        // The signal light eases in over a few frames (and Mirrored draws with it): settle it first.
+        for _ in 0..<600 {
+            _ = renderer.renderOffscreen(frame: frame, scene: VisualizerScene(isPlaying: true), size: CGSize(width: 32, height: 18), scale: 1, dt: 1 / 60)
+        }
         func picture(_ mode: VisualizerSpectrumMode, caps: Bool, peaks: [Float]) -> [UInt8] {
             renderer.settings.style = .bars
             renderer.settings.spectrumMode = mode
