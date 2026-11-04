@@ -280,16 +280,33 @@ struct VisualizerVinylLayoutTests {
     static let sizes = [CGSize(width: 1280, height: 720), CGSize(width: 480, height: 300), CGSize(width: 600, height: 900),
                         CGSize(width: 2560, height: 1080), CGSize(width: 3024, height: 1964), CGSize(width: 900, height: 900)]
 
-    @Test("On the label, the turntable is exactly where it always was")
+    @Test("On the label, the turntable is exactly where it always was (wherever that fitted)")
     func labelLayoutUnchanged() {
         for size in Self.sizes {
             for arm in [true, false] {
-                let l = VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 0)
                 let unit = 0.5 * min(size.width, size.height) * 0.92
+                // Where the ring of light or the tonearm used to reach past the window's edges (a window about as wide
+                // as it's high, or narrower), it's now fitted (below).
+                let x = size.width * 0.5 - (arm ? unit * 0.18 * min(1, size.width / size.height) : 0)
+                if x - unit < 0 || x + (arm ? VisualizerLayout.armReach : 1) * unit > size.width { continue }
+                let l = VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 0)
                 #expect(abs(l.unit - unit) < 1e-9)
                 #expect(abs(l.centre.x - (size.width * 0.5 - (arm ? unit * 0.18 * min(1, size.width / size.height) : 0))) < 1e-9)
                 #expect(abs(l.centre.y - size.height * 0.5) < 1e-9)
             }
+        }
+    }
+
+    @Test("On the label in a square or tall window, the ring of light and the tonearm stay inside it")
+    func tallWindowArm() {
+        for size in [CGSize(width: 480, height: 900), CGSize(width: 600, height: 900), CGSize(width: 480, height: 2000),
+                     CGSize(width: 1000, height: 1040), CGSize(width: 900, height: 900), CGSize(width: 1100, height: 1000)] {
+            let l = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 0)
+            let left = l.centre.x - VisualizerLayout.ringReach * l.unit, right = l.centre.x + VisualizerLayout.armReach * l.unit
+            #expect(left >= 0 && right <= size.width, "\(size): \(left)…\(right)")
+            #expect(l.centre.y - l.unit >= 0 && l.centre.y + l.unit <= size.height)
+            // No smaller than it must be.
+            #expect(l.unit >= 0.95 * min(0.46 * size.width, 0.96 * size.width / (VisualizerLayout.ringReach + VisualizerLayout.armReach)))
         }
     }
 

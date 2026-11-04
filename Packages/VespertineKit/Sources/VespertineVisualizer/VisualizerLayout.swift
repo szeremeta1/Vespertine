@@ -115,12 +115,19 @@ enum VisualizerLayout {
     static func vinyl(in size: CGSize, tonearm: Bool, sleeve: CGFloat, place: CGFloat = 0,
                       titleRoom: CGFloat = 0) -> (centre: CGPoint, unit: CGFloat) {
         let w = max(size.width, 1), h = max(size.height, 1)
-        let unit0 = 0.5 * min(w, h) * 0.92
-        let centre0 = CGPoint(x: w * 0.5 - (tonearm ? unit0 * 0.18 * min(1, w / h) : 0), y: h * 0.5)
+        var unit0 = 0.5 * min(w, h) * 0.92
+        var centre0 = CGPoint(x: w * 0.5 - (tonearm ? unit0 * 0.18 * min(1, w / h) : 0), y: h * 0.5)
+        let right = tonearm ? armReach : ringReach
+        // In a window not much wider than it's high (or narrower), the ring of light (left) or the tonearm (right)
+        // would reach past its edges: there the turntable is made to fit, centred with its arm.
+        if centre0.x - ringReach * unit0 < 0 || centre0.x + right * unit0 > w {
+            unit0 = min(unit0, 0.98 * w / (ringReach + right))
+            centre0.x = w * 0.5 - (right - ringReach) * 0.5 * unit0
+        }
         let t = min(max(sleeve.isFinite ? sleeve : 0, 0), 1)
         guard t > 0 else { return (centre0, unit0) }
         let rest = sleeveRest(place: place), reach = sleeveReach(tilt: rest.tilt)
-        let left = rest.x - reach - 0.04, right = tonearm ? armReach : ringReach
+        let left = rest.x - reach - 0.04
         let room = max(0, titleRoom.isFinite ? titleRoom : 0), edge = 0.02 * h
         // The ring of light reaches 1 above and below the centre, the sleeve `reach` below it.
         let unit1 = max(1, min(unit0, 0.96 * w / (right - left), (h - room - edge) / (1 + reach)))
