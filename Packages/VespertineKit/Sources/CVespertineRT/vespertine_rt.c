@@ -1429,7 +1429,35 @@ struct NRTCapture {
     _Atomic uint64_t events[NRT_CAPTURE_MAX_EVENTS];
     double nextSampleTime;      // I/O thread only
     bool started;               // I/O thread only
+    int32_t kinds[NRT_CAPTURE_MAX_BUFFERS];   // set before the IOProc starts
 };
+
+void nrt_capture_set_kind(NRTCapture *c, uint32_t index, int32_t kind) {
+    if (c && index < NRT_CAPTURE_MAX_BUFFERS) c->kinds[index] = kind;
+}
+
+uint32_t nrt_sample_bytes(int32_t kind) {
+    switch (kind) {
+        case NRT_SAMPLE_FLOAT64: return 8;
+        case NRT_SAMPLE_INT16: return 2;
+        case NRT_SAMPLE_INT24: return 3;
+        default: return 4;
+    }
+}
+
+float nrt_sample_to_float(const void *src, int32_t kind) {
+    switch (kind) {
+        case NRT_SAMPLE_FLOAT64: { double d; memcpy(&d, src, sizeof d); return (float)d; }
+        case NRT_SAMPLE_INT16: { int16_t v; memcpy(&v, src, sizeof v); return (float)v * (1.0f / 32768.0f); }
+        case NRT_SAMPLE_INT24: {
+            const uint8_t *p = (const uint8_t *)src;
+            int32_t v = (int32_t)((uint32_t)p[0] << 8 | (uint32_t)p[1] << 16 | (uint32_t)p[2] << 24) >> 8;
+            return (float)v * (1.0f / 8388608.0f);
+        }
+        case NRT_SAMPLE_INT32: { int32_t v; memcpy(&v, src, sizeof v); return (float)((double)v * (1.0 / 2147483648.0)); }
+        default: { float f; memcpy(&f, src, sizeof f); return f; }
+    }
+}
 
 NRTCapture *nrt_capture_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
     if (!ring || maxFramesPerSlice == 0) return NULL;
@@ -1472,7 +1500,7 @@ OSStatus nrt_capture_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow,
     if (!c || !inInputData || inInputData->mNumberBuffers == 0) return noErr;
     const AudioBuffer *first = &inInputData->mBuffers[0];
     const uint32_t firstCh = first->mNumberChannels ? first->mNumberChannels : 1;
-    uint32_t frames = first->mDataByteSize / (uint32_t)(sizeof(float) * firstCh);
+    uint32_t frames = first->mDataByteSize / (nrt_sample_bytes(c->kinds[0]) * firstCh);
     if (frames > c->scratchFrames) frames = c->scratchFrames;
     if (frames == 0) return noErr;
     const uint64_t at = atomic_load_explicit(&c->frames, memory_order_relaxed);
@@ -1491,12 +1519,19 @@ OSStatus nrt_capture_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow,
     for (uint32_t bi = 0; bi < inInputData->mNumberBuffers && deviceChannel < ch; bi++) {
         const AudioBuffer *b = &inInputData->mBuffers[bi];
         const uint32_t bch = b->mNumberChannels ? b->mNumberChannels : 1;
-        const uint32_t available = b->mDataByteSize / (uint32_t)(sizeof(float) * bch);
-        const float *in = (const float *)b->mData;
-        if (in) {
+        const int32_t kind = bi < NRT_CAPTURE_MAX_BUFFERS ? c->kinds[bi] : NRT_SAMPLE_FLOAT32;
+        const uint32_t width = nrt_sample_bytes(kind);
+        const uint32_t available = b->mDataByteSize / (width * bch);
+        const uint8_t *in = (const uint8_t *)b->mData;
+        if (in && kind == NRT_SAMPLE_FLOAT32) {
+            const float *fin = (const float *)b->mData;
             for (uint32_t f = 0; f < frames && f < available; f++)
                 for (uint32_t k = 0; k < bch && deviceChannel + k < ch; k++)
-                    c->scratch[(size_t)f * ch + deviceChannel + k] = in[(size_t)f * bch + k];
+                    c->scratch[(size_t)f * ch + deviceChannel + k] = fin[(size_t)f * bch + k];
+        } else if (in) {
+            for (uint32_t f = 0; f < frames && f < available; f++)
+                for (uint32_t k = 0; k < bch && deviceChannel + k < ch; k++)
+                    c->scratch[(size_t)f * ch + deviceChannel + k] = nrt_sample_to_float(in + ((size_t)f * bch + k) * width, kind);
         }
         deviceChannel += bch;
     }

@@ -273,6 +273,17 @@ uint32_t nrt_capture_discontinuities(const NRTCapture *_Nonnull capture, uint64_
 /// Frames dropped because the ring was full.
 uint64_t nrt_capture_overflow(const NRTCapture *_Nonnull capture);
 
+/// How samples sit in an input buffer; the capture converts each to Float32. Float32 unless set.
+enum { NRT_SAMPLE_FLOAT32 = 0, NRT_SAMPLE_FLOAT64 = 1, NRT_SAMPLE_INT16 = 2, NRT_SAMPLE_INT24 = 3, NRT_SAMPLE_INT32 = 4 };
+#define NRT_CAPTURE_MAX_BUFFERS 32u
+
+/// Sets how the samples of input buffer `index` (in the IOProc's buffer list) are read. Call before the IOProc starts.
+void nrt_capture_set_kind(NRTCapture *_Nonnull capture, uint32_t index, int32_t kind);
+/// One sample of `kind` at `src` (native byte order; INT24 is three packed bytes) as Float32 in -1...1.
+float nrt_sample_to_float(const void *_Nonnull src, int32_t kind);
+/// Bytes one sample of `kind` takes.
+uint32_t nrt_sample_bytes(int32_t kind);
+
 /// Pass to AudioDeviceCreateIOProcID with the capture as client data. Reads the input only; writes no output.
 OSStatus nrt_capture_ioproc(AudioObjectID inDevice,
                             const AudioTimeStamp *_Nonnull inNow,

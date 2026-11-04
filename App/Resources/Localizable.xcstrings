@@ -2312,6 +2312,282 @@
         }
       }
     },
+    "%@ can't be played: macOS has no decoder for it and Vespertine doesn't include one.": {
+      "comment": "Why a file can't be played, in “This file can't be played (…).” %@ is an audio format: Dolby AC-4, or MPEG-H 3D Audio (also used by Sony 360 Reality Audio).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ሊጫወት አይችልም፦ macOS ለእሱ ዲኮደር የለውም፣ Vespertine ደግሞ አያካትትም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن تشغيل %@: لا يوجد في macOS مُفكّك ترميز له ولا يتضمن Vespertine واحدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ চালানো যাচ্ছে না: macOS-এ এর জন্য কোনো ডিকোডার নেই এবং Vespertine-এও নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nelze přehrát: macOS pro něj nemá dekodér a Vespertine žádný nezahrnuje."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke afspilles: macOS har ingen afkoder til det, og Vespertine medfølger ingen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ lässt sich nicht abspielen: macOS hat keinen Decoder dafür und Vespertine bringt keinen mit."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ δεν μπορεί να αναπαραχθεί: το macOS δεν έχει αποκωδικοποιητή γι' αυτό και το Vespertine δεν περιλαμβάνει κανέναν."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ can't be played: macOS has no decoder for it and Vespertine doesn't include one."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede reproducir %@: macOS no tiene un decodificador para él y Vespertine no incluye ninguno."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ قابل پخش نیست: macOS برای آن رمزگشایی ندارد و Vespertine هم چنین چیزی را همراه ندارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muotoa %@ ei voi toistaa: macOS:llä ei ole sille dekooderia, eikä Vespertine sisällä sellaista."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi mapapatugtog ang %@: walang decoder ang macOS para dito at wala ring kasama ang Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne peut pas être lu : macOS n'a pas de décodeur pour ce format et Vespertine n'en inclut aucun."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ વગાડી શકાતું નથી: macOS પાસે તેના માટે ડીકોડર નથી અને Vespertine માં પણ નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya kunna %@ ba: macOS ba shi da na'urar warwarewa a gare shi, Vespertine kuma bai ƙunshi ɗaya ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להשמיע את %@: ל-macOS אין מפענח עבורו ו-Vespertine אינו כולל כזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ चलाया नहीं जा सकता: macOS में इसके लिए कोई डीकोडर नहीं है और Vespertine में भी नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ nem játszható le: a macOS-nek nincs hozzá dekódere, és a Vespertine sem tartalmaz ilyet."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat diputar: macOS tidak punya dekoder untuknya dan Vespertine tidak menyertakannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non può essere riprodotto: macOS non ha un decodificatore per questo formato e Vespertine non ne include uno."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ は再生できません。macOS にはこの形式のデコーダがなく、Vespertine にも含まれていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಅನ್ನು ಪ್ಲೇ ಮಾಡಲಾಗುವುದಿಲ್ಲ: macOS ನಲ್ಲಿ ಇದಕ್ಕೆ ಡಿಕೋಡರ್ ಇಲ್ಲ ಮತ್ತು Vespertine ನಲ್ಲಿಯೂ ಇಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 형식은 재생할 수 없습니다. macOS에 디코더가 없고 Vespertine에도 포함되어 있지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ പ്ലേ ചെയ്യാൻ കഴിയില്ല: macOS-ൽ ഇതിന് ഡീകോഡർ ഇല്ല, Vespertine-ലും ഇല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ वाजवता येत नाही: macOS मध्ये त्यासाठी डीकोडर नाही आणि Vespertine मध्येही नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat dimainkan: macOS tiada penyahkod untuknya dan Vespertine tidak menyertakannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke spilles av: macOS har ingen dekoder for det, og Vespertine har ingen med."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan niet worden afgespeeld: macOS heeft er geen decoder voor en Vespertine bevat er geen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਚਲਾਇਆ ਨਹੀਂ ਜਾ ਸਕਦਾ: macOS ਕੋਲ ਇਸ ਲਈ ਡੀਕੋਡਰ ਨਹੀਂ ਹੈ ਅਤੇ Vespertine ਵਿੱਚ ਵੀ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można odtworzyć formatu %@: macOS nie ma dla niego dekodera, a Vespertine żadnego nie zawiera."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não pode ser reproduzido: o macOS não tem decodificador para ele e o Vespertine não inclui nenhum."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não pode ser reproduzido: o macOS não tem descodificador para ele e o Vespertine não inclui nenhum."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu poate fi redat: macOS nu are un decodor pentru el, iar Vespertine nu include niciunul."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan inte spelas: macOS har ingen avkodare för det och Vespertine innehåller ingen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haiwezi kuchezwa: macOS haina kisimbuzi chake na Vespertine haijumuishi chochote."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ஐ இயக்க முடியாது: macOS-இல் இதற்கான டிகோடர் இல்லை, Vespertine-லும் இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ప్లే చేయడం సాధ్యం కాదు: macOS లో దీనికి డీకోడర్ లేదు, Vespertine లో కూడా లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่น %@ ไม่ได้: macOS ไม่มีตัวถอดรหัสสำหรับรูปแบบนี้ และ Vespertine ก็ไม่ได้รวมมาให้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ oynatılamıyor: macOS'te bunun için bir kod çözücü yok ve Vespertine de içermiyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ не можна відтворити: у macOS немає декодера для нього, а Vespertine його не містить."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ نہیں چلایا جا سکتا: macOS میں اس کا کوئی ڈی کوڈر نہیں ہے اور Vespertine میں بھی شامل نہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể phát %@: macOS không có bộ giải mã cho định dạng này và Vespertine cũng không đi kèm bộ nào."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法播放 %@：macOS 沒有它的解碼器，Vespertine 也未內建。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法播放 %@：macOS 没有它的解码器，Vespertine 也未内置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法播放 %@：macOS 沒有它的解碼器，Vespertine 也未內建。"
+          }
+        }
+      }
+    },
     "%@ Copy": {
       "comment": "Name of a duplicated equalizer preset",
       "localizations": {
@@ -105937,6 +106213,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "校正檔案"
+          }
+        }
+      }
+    },
+    "Can't be decoded here": {
+      "comment": "Badge note under Dolby AC-4 and MPEG-H: no decoder is available to Vespertine, so the file can't play.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እዚህ ሊፈታ አይችልም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن فك ترميزه هنا"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এখানে ডিকোড করা যায় না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zde nelze dekódovat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke afkodes her"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kann hier nicht dekodiert werden"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν μπορεί να αποκωδικοποιηθεί εδώ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can't be decoded here"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede decodificar aquí"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در اینجا قابل رمزگشایی نیست"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei voida dekoodata täällä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ma-decode dito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne peut pas être décodé ici"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અહીં ડીકોડ થઈ શકતું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya warware shi a nan ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לפענח כאן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यहाँ डीकोड नहीं किया जा सकता"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itt nem dekódolható"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat didekode di sini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non può essere decodificato qui"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここではデコードできません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇಲ್ಲಿ ಡಿಕೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "여기서는 디코딩할 수 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇവിടെ ഡീകോഡ് ചെയ്യാൻ കഴിയില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "येथे डीकोड करता येत नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat dinyahkod di sini"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke dekodes her"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan hier niet worden gedecodeerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇੱਥੇ ਡੀਕੋਡ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można tu zdekodować"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não pode ser decodificado aqui"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não pode ser descodificado aqui"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu poate fi decodat aici"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan inte avkodas här"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haiwezi kusimbuliwa hapa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இங்கே டிகோட் செய்ய முடியாது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇక్కడ డీకోడ్ చేయలేము"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถอดรหัสที่นี่ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burada çözülemiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тут не можна декодувати"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہاں ڈی کوڈ نہیں کیا جا سکتا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể giải mã ở đây"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法在此解碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法在此解码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法在此解碼"
           }
         }
       }
@@ -287400,6 +287952,558 @@
         }
       }
     },
+    "Played as FLAC, not unfolded": {
+      "comment": "Badge note under MQA: Vespertine can't decode MQA, so the file plays as the plain FLAC it contains.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደ FLAC ተጫውቷል፣ አልተዘረጋም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُشغَّل كملف FLAC دون فكّ طيّه"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC হিসেবে চলছে, আনফোল্ড করা হয়নি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehráno jako FLAC, bez rozbalení"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspillet som FLAC, ikke foldet ud"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als FLAC abgespielt, nicht entfaltet"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαράγεται ως FLAC, χωρίς ξεδίπλωμα"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Played as FLAC, not unfolded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducido como FLAC, sin desplegar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "به‌صورت FLAC پخش شد، بدون بازشدن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaan FLAC-muodossa, ei avattu"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinatugtog bilang FLAC, hindi inunfold"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lu comme du FLAC, sans dépliage"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC તરીકે વગાડ્યું, અનફોલ્ડ કર્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kunna shi a matsayin FLAC, ba a buɗe shi ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופעל כ-FLAC, ללא פריסה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC के रूप में चलाया गया, अनफ़ोल्ड नहीं किया गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC-ként lejátszva, kibontás nélkül"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diputar sebagai FLAC, tidak dibuka lipatannya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprodotto come FLAC, non spiegato"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLACとして再生（展開なし）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ಆಗಿ ಪ್ಲೇ ಮಾಡಲಾಗಿದೆ, ಅನ್‌ಫೋಲ್ಡ್ ಮಾಡಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC로 재생, 펼치기 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ആയി പ്ലേ ചെയ്തു, അൺഫോൾഡ് ചെയ്തിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC म्हणून वाजवले, अनफोल्ड केलेले नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimainkan sebagai FLAC, tidak dibuka lipatan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spilt som FLAC, ikke foldet ut"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgespeeld als FLAC, niet ontvouwen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ਵਜੋਂ ਚਲਾਇਆ ਗਿਆ, ਅਨਫੋਲਡ ਨਹੀਂ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzane jako FLAC, bez rozwijania"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como FLAC, sem desdobrar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como FLAC, sem desdobrar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redat ca FLAC, fără despachetare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelas som FLAC, inte utvikt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imechezwa kama FLAC, haikufunuliwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ஆக இயக்கப்பட்டது, விரிக்கப்படவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC గా ప్లే చేయబడింది, అన్‌ఫోల్డ్ చేయలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเป็น FLAC ไม่ได้คลี่ออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC olarak çalındı, açılmadı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворено як FLAC, без розгортання"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC کے طور پر چلایا گیا، کھولا نہیں گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát như FLAC, không giải mở"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 FLAC 播放，未展開"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 FLAC 播放，未展开"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 FLAC 播放，未展開"
+          }
+        }
+      }
+    },
+    "Played as PCM, not decoded": {
+      "comment": "Badge note under Auro-3D: Vespertine can't decode the Auro-3D height channels, so the file plays as the ordinary surround PCM it contains.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደ PCM ተጫውቷል፣ አልተፈታም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُشغَّل كـ PCM دون فك ترميزه"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM হিসেবে চলছে, ডিকোড করা হয়নি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehráno jako PCM, bez dekódování"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspillet som PCM, ikke afkodet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als PCM abgespielt, nicht dekodiert"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαράγεται ως PCM, χωρίς αποκωδικοποίηση"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Played as PCM, not decoded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducido como PCM, sin decodificar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "به‌صورت PCM پخش شد، بدون رمزگشایی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaan PCM-muodossa, ei dekoodattu"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinatugtog bilang PCM, hindi dinecode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lu comme du PCM, non décodé"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM તરીકે વગાડ્યું, ડીકોડ કર્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kunna shi a matsayin PCM, ba a warware shi ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופעל כ-PCM, ללא פענוח"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM के रूप में चलाया गया, डीकोड नहीं किया गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM-ként lejátszva, dekódolás nélkül"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diputar sebagai PCM, tidak didekode"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprodotto come PCM, non decodificato"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCMとして再生（デコードなし）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ಆಗಿ ಪ್ಲೇ ಮಾಡಲಾಗಿದೆ, ಡಿಕೋಡ್ ಮಾಡಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM으로 재생, 디코딩 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ആയി പ്ലേ ചെയ്തു, ഡീകോഡ് ചെയ്തിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM म्हणून वाजवले, डीकोड केलेले नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimainkan sebagai PCM, tidak dinyahkod"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spilt som PCM, ikke dekodet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgespeeld als PCM, niet gedecodeerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ਵਜੋਂ ਚਲਾਇਆ ਗਿਆ, ਡੀਕੋਡ ਨਹੀਂ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzane jako PCM, bez dekodowania"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como PCM, sem decodificar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como PCM, sem descodificar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redat ca PCM, fără decodare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelas som PCM, inte avkodad"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imechezwa kama PCM, haikusimbuliwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ஆக இயக்கப்பட்டது, டிகோட் செய்யப்படவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM గా ప్లే చేయబడింది, డీకోడ్ చేయలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเป็น PCM ไม่ได้ถอดรหัส"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM olarak çalındı, çözülmedi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворено як PCM, без декодування"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM کے طور پر چلایا گیا، ڈی کوڈ نہیں کیا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát như PCM, không giải mã"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 PCM 播放，未解碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 PCM 播放，未解码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 PCM 播放，未解碼"
+          }
+        }
+      }
+    },
     "Playing": {
       "localizations": {
         "am": {
@@ -392397,6 +393501,282 @@
         }
       }
     },
+    "“%@” is %@, which macOS can’t decode, so Vespertine can’t play it.": {
+      "comment": "The codec is a name such as Dolby AC-4.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ነው፤ macOS ሊፈታው አይችልም፣ ስለዚህ Vespertine ሊያጫውተው አይችልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‏«%@» بصيغة %@، ولا يستطيع macOS فك ترميزها، لذلك لا يستطيع Vespertine تشغيلها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” হলো %@, যা macOS ডিকোড করতে পারে না, তাই Vespertine এটি চালাতে পারে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ je ve formátu %@, který macOS neumí dekódovat, takže ho Vespertine nemůže přehrát."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” er %@, som macOS ikke kan afkode, så Vespertine kan ikke afspille den."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ ist %@. macOS kann das nicht dekodieren, daher kann Vespertine es nicht wiedergeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το «%@» είναι %@, το οποίο το macOS δεν μπορεί να αποκωδικοποιήσει, οπότε το Vespertine δεν μπορεί να το αναπαραγάγει."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” is %@, which macOS can’t decode, so Vespertine can’t play it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» es %@, que macOS no puede decodificar, así que Vespertine no puede reproducirlo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» در قالب %@ است که macOS نمی‌تواند رمزگشایی کند، بنابراین Vespertine نمی‌تواند آن را پخش کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” on %@, jota macOS ei osaa purkaa, joten Vespertine ei voi toistaa sitä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang “%@” ay %@, na hindi ma-decode ng macOS, kaya hindi ito mapapatugtog ng Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » est du %@, que macOS ne sait pas décoder ; Vespertine ne peut donc pas le lire."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ છે, જેને macOS ડીકોડ કરી શકતું નથી, તેથી Vespertine તેને ચલાવી શકતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ita ce %@, wadda macOS ba za ta iya yankewa ba, don haka Vespertine ba za ta iya kunna ta ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” הוא %@, ש-macOS לא יכולה לפענח, ולכן Vespertine לא יכולה לנגן אותו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ है, जिसे macOS डिकोड नहीं कर सकता, इसलिए Vespertine इसे नहीं चला सकता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) „%@” fájl %@ formátumú, amelyet a macOS nem tud dekódolni, ezért a Vespertine nem tudja lejátszani."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” adalah %@, yang tidak dapat didekode macOS, sehingga Vespertine tidak dapat memutarnya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” è in formato %@, che macOS non può decodificare, quindi Vespertine non può riprodurlo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」は%@で、macOS がデコードできないため、Vespertine では再生できません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ಆಗಿದೆ, ಇದನ್ನು macOS ಡಿಕೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ Vespertine ಇದನ್ನು ಪ್ಲೇ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”은(는) %@이며, macOS에서 디코딩할 수 없으므로 Vespertine에서 재생할 수 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ആണ്, ഇത് macOS-ന് ഡീകോഡ് ചെയ്യാൻ കഴിയില്ല, അതിനാൽ Vespertine-ന് ഇത് പ്ലേ ചെയ്യാൻ കഴിയില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” हे %@ आहे, जे macOS डीकोड करू शकत नाही, त्यामुळे Vespertine ते प्ले करू शकत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ialah %@, yang tidak dapat dinyahkod oleh macOS, jadi Vespertine tidak dapat memainkannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» er %@, som macOS ikke kan dekode, så Vespertine kan ikke spille den av."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’ is %@, wat macOS niet kan decoderen, dus Vespertine kan het niet afspelen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ਹੈ, ਜਿਸਨੂੰ macOS ਡੀਕੋਡ ਨਹੀਂ ਕਰ ਸਕਦਾ, ਇਸ ਲਈ Vespertine ਇਸਨੂੰ ਚਲਾ ਨਹੀਂ ਸਕਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” to %@, którego macOS nie potrafi zdekodować, więc Vespertine nie może go odtworzyć."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” é %@, que o macOS não consegue decodificar, então o Vespertine não consegue reproduzi-lo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” é %@, que o macOS não consegue descodificar, por isso o Vespertine não o consegue reproduzir."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” este %@, pe care macOS nu îl poate decoda, așa că Vespertine nu îl poate reda."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” är %@, vilket macOS inte kan avkoda, så Vespertine kan inte spela upp den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ni %@, ambayo macOS haiwezi kuisimbua, kwa hiyo Vespertine haiwezi kuicheza."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” என்பது %@ ஆகும்; இதை macOS டிகோட் செய்ய முடியாது, எனவே Vespertine இதை இயக்க முடியாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” అనేది %@, దీనిని macOS డీకోడ్ చేయలేదు, కాబట్టి Vespertine దీనిని ప్లే చేయలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” เป็น %@ ซึ่ง macOS ถอดรหัสไม่ได้ Vespertine จึงเล่นไฟล์นี้ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” bir %@ dosyası; macOS bunun kodunu çözemediği için Vespertine oynatamaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» — це %@, який macOS не може декодувати, тому Vespertine не може його відтворити."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” %@ ہے، جسے macOS ڈی کوڈ نہیں کر سکتا، اس لیے Vespertine اسے چلا نہیں سکتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” là %@, macOS không thể giải mã nên Vespertine không phát được."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」為 %@，macOS 無法解碼，因此 Vespertine 無法播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”是 %@，macOS 无法解码，因此 Vespertine 无法播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」為 %@，macOS 無法解碼，因此 Vespertine 無法播放。"
+          }
+        }
+      }
+    },
     "Untitled": {
       "extractionState": "manual",
       "localizations": {
@@ -441329,6 +442709,1626 @@
           "stringUnit": {
             "state": "translated",
             "value": "轉場只會在每次淡入淡出期間改變聲音；每首歌的其餘部分仍維持位元完美。"
+          }
+        }
+      }
+    },
+    "%@ can't be recorded for this measurement: %@": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ለዚህ መለኪያ መቅዳት አይቻልም፦ %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن التسجيل من %@ لهذا القياس: %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই পরিমাপের জন্য %@ থেকে রেকর্ড করা যাচ্ছে না: %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Z %@ nelze pro toto měření nahrávat: %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke optages til denne måling: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kann für diese Messung nicht aufgenommen werden: %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν είναι δυνατή η εγγραφή από το %@ για αυτή τη μέτρηση: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede grabar %@ para esta medición: %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضبط از %@ برای این اندازه‌گیری ممکن نیست: %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laitteesta %@ ei voi tallentaa tähän mittaukseen: %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ma-record ang %@ para sa pagsukat na ito: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’enregistrer %@ pour cette mesure : %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ માપ માટે %@ માંથી રેકોર્ડ કરી શકાતું નથી: %@"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya yin rikodi daga %@ don wannan aunawa ba: %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להקליט מ-%@ עבור המדידה הזו: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस माप के लिए %@ से रिकॉर्ड नहीं किया जा सकता: %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ nem rögzíthető ehhez a méréshez: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat direkam untuk pengukuran ini: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile registrare %@ per questa misurazione: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この測定では%@を録音できません: %@"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಅಳತೆಗಾಗಿ %@ ನಿಂದ ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 측정에는 %@을(를) 녹음할 수 없습니다: %@"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ അളവിനായി %@ ൽ നിന്ന് റെക്കോർഡ് ചെയ്യാൻ കഴിയില്ല: %@"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या मापनासाठी %@ वरून रेकॉर्ड करता येत नाही: %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak boleh dirakam untuk pengukuran ini: %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke tas opp for denne målingen: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan niet worden opgenomen voor deze meting: %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਮਾਪ ਲਈ %@ ਤੋਂ ਰਿਕਾਰਡ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można nagrywać z urządzenia %@ na potrzeby tego pomiaru: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível gravar %@ para esta medição: %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível gravar %@ para esta medição: %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu poate fi înregistrat pentru această măsurare: %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan inte spelas in för den här mätningen: %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haiwezi kurekodiwa kwa kipimo hiki: %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த அளவீட்டுக்கு %@ இலிருந்து பதிவு செய்ய முடியாது: %@"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ కొలత కోసం %@ నుండి రికార్డ్ చేయలేరు: %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถบันทึกเสียงจาก %@ สำหรับการวัดนี้ได้: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu ölçüm için %@ kaydedilemiyor: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Із %@ не можна записувати для цього вимірювання: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس پیمائش کے لیے %@ سے ریکارڈ نہیں کیا جا سکتا: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể ghi từ %@ cho phép đo này: %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法為今次量度錄製%@：%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法为此次测量录制%@：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法為此次量測錄製%@：%@"
+          }
+        }
+      }
+    },
+    "Measuring at %@ Hz, the rate the microphone records at; the output keeps its own rate.": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በ%@ Hz እየለካ ነው፤ ማይክሮፎኑ የሚቀዳበት ተመን ነው፤ ውጤቱ የራሱን ተመን ይይዛል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "القياس بمعدل %@ Hz، وهو المعدل الذي يسجّل به الميكروفون؛ ويحتفظ الخرج بمعدله الخاص."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz-এ পরিমাপ চলছে, মাইক্রোফোন যে রেটে রেকর্ড করে সেটিই; আউটপুট নিজের রেট বজায় রাখে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Měří se na %@ Hz, tedy na frekvenci, na které mikrofon nahrává; výstup si ponechává vlastní frekvenci."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måler ved %@ Hz, den hastighed mikrofonen optager med; udgangen beholder sin egen hastighed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemessen wird mit %@ Hz, der Rate, mit der das Mikrofon aufnimmt; der Ausgang behält seine eigene Rate."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η μέτρηση γίνεται στα %@ Hz, τον ρυθμό με τον οποίο εγγράφει το μικρόφωνο· η έξοδος κρατά τον δικό της ρυθμό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Midiendo a %@ Hz, la frecuencia a la que graba el micrófono; la salida conserva la suya."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اندازه‌گیری با %@ Hz انجام می‌شود، یعنی نرخی که میکروفون با آن ضبط می‌کند؛ خروجی نرخ خودش را نگه می‌دارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitataan taajuudella %@ Hz, jolla mikrofoni tallentaa; lähtö säilyttää oman taajuutensa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sumusukat sa %@ Hz, ang rate kung saan nagre-record ang mikropono; pinananatili ng output ang sarili nitong rate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesure à %@ Hz, la fréquence à laquelle le micro enregistre ; la sortie garde la sienne."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz પર માપ લેવાઈ રહ્યું છે, જે દરે માઇક્રોફોન રેકોર્ડ કરે છે; આઉટપુટ પોતાનો દર જાળવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana aunawa a %@ Hz, adadin da makirufo ke yin rikodi da shi; fitarwa tana riƙe da nata adadin."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מודדים ב-%@ Hz, הקצב שבו המיקרופון מקליט; היציאה שומרת על הקצב שלה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz पर माप हो रहा है, यानी उस दर पर जिस पर माइक्रोफ़ोन रिकॉर्ड करता है; आउटपुट अपनी दर बनाए रखता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mérés %@ Hz-en, azon a mintavételi frekvencián, amelyen a mikrofon rögzít; a kimenet megtartja a sajátját."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengukur pada %@ Hz, laju rekam mikrofon; keluaran tetap memakai lajunya sendiri."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Misurazione a %@ Hz, la frequenza a cui registra il microfono; l’uscita mantiene la propria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hzで測定しています。これはマイクが録音するレートで、出力は自身のレートのままです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz ನಲ್ಲಿ ಅಳೆಯಲಾಗುತ್ತಿದೆ, ಮೈಕ್ರೊಫೋನ್ ರೆಕಾರ್ಡ್ ಮಾಡುವ ದರ ಇದು; ಔಟ್‌ಪುಟ್ ತನ್ನದೇ ದರವನ್ನು ಉಳಿಸಿಕೊಳ್ಳುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz로 측정 중입니다. 마이크가 녹음하는 레이트이며, 출력은 자체 레이트를 유지합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz ൽ അളക്കുന്നു, മൈക്രോഫോൺ റെക്കോർഡ് ചെയ്യുന്ന നിരക്കാണിത്; ഔട്ട്പുട്ട് സ്വന്തം നിരക്ക് നിലനിർത്തുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz वर मापन होत आहे, म्हणजे मायक्रोफोन ज्या दराने रेकॉर्ड करतो; आउटपुट स्वतःचा दर राखतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengukur pada %@ Hz, kadar rakaman mikrofon; output mengekalkan kadarnya sendiri."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Måler ved %@ Hz, frekvensen mikrofonen tar opp med; utgangen beholder sin egen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meten op %@ Hz, de frequentie waarmee de microfoon opneemt; de uitgang houdt zijn eigen frequentie."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz ’ਤੇ ਮਾਪ ਹੋ ਰਿਹਾ ਹੈ, ਜਿਸ ਦਰ ’ਤੇ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਰਿਕਾਰਡ ਕਰਦਾ ਹੈ; ਆਊਟਪੁੱਟ ਆਪਣੀ ਦਰ ਰੱਖਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pomiar przy %@ Hz, czyli częstotliwości, z jaką nagrywa mikrofon; wyjście zachowuje własną."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medindo a %@ Hz, a taxa em que o microfone grava; a saída mantém a sua própria taxa."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A medir a %@ Hz, a taxa a que o microfone grava; a saída mantém a sua própria taxa."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se măsoară la %@ Hz, frecvența la care înregistrează microfonul; ieșirea își păstrează frecvența proprie."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mäter vid %@ Hz, den frekvens mikrofonen spelar in med; utgången behåller sin egen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inapima kwa %@ Hz, kiwango ambacho maikrofoni hurekodi; pato linabaki na kiwango chake."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz இல் அளவிடப்படுகிறது, இது மைக்ரோஃபோன் பதிவு செய்யும் வீதம்; வெளியீடு தனது சொந்த வீதத்தை வைத்திருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz వద్ద కొలుస్తోంది, మైక్రోఫోన్ రికార్డ్ చేసే రేటు ఇదే; అవుట్‌పుట్ తన సొంత రేటును ఉంచుకుంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังวัดที่ %@ Hz ซึ่งเป็นอัตราที่ไมโครโฟนบันทึก ส่วนเอาต์พุตยังคงใช้อัตราของตัวเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz ile ölçülüyor; bu, mikrofonun kayıt yaptığı hızdır, çıkış kendi hızını korur."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вимірювання на %@ Гц, тобто на частоті, на якій записує мікрофон; вихід зберігає власну частоту."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Hz پر پیمائش ہو رہی ہے، یعنی اس شرح پر جس پر مائیکروفون ریکارڈ کرتا ہے؛ آؤٹ پٹ اپنی شرح برقرار رکھتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang đo ở %@ Hz, tốc độ mà micrô ghi; đầu ra giữ tốc độ riêng của nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在以 %@ Hz 量度，即咪高峰的錄音取樣率；輸出維持其自身的取樣率。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在以 %@ Hz 测量，即麦克风的录音采样率；输出保持其自身的采样率。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在以 %@ Hz 量測，也就是麥克風的錄音取樣率；輸出維持其自身的取樣率。"
+          }
+        }
+      }
+    },
+    "%@ has no input to record from.": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ የሚቀዳበት ግብዓት የለውም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد مدخل للتسجيل في %@."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-এ রেকর্ড করার মতো কোনো ইনপুট নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nemá žádný vstup, ze kterého by šlo nahrávat."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ har ingen indgang at optage fra."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hat keinen Eingang, von dem aufgenommen werden kann."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ δεν έχει είσοδο για εγγραφή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no tiene ninguna entrada desde la que grabar."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ورودی‌ای برای ضبط ندارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laitteessa %@ ei ole tuloa, josta voisi tallentaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang input ang %@ na mapagre-recordan."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’a aucune entrée à enregistrer."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ પાસે રેકોર્ડ કરવા માટે કોઈ ઇનપુટ નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ba shi da mashigar da za a yi rikodi daga gare ta."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ל-%@ אין כניסה שאפשר להקליט ממנה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ में रिकॉर्ड करने के लिए कोई इनपुट नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ eszköznek nincs rögzíthető bemenete."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak punya input untuk direkam."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non ha alcun ingresso da cui registrare."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@には録音できる入力がありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಲು ಯಾವುದೇ ಇನ್‌ಪುಟ್ ಇಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에는 녹음할 입력이 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ന് റെക്കോർഡ് ചെയ്യാൻ ഇൻപുട്ട് ഇല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ कडे रेकॉर्ड करण्यासाठी इनपुट नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tiada input untuk dirakam."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ har ingen inngang å ta opp fra."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ heeft geen ingang om van op te nemen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਕੋਲ ਰਿਕਾਰਡ ਕਰਨ ਲਈ ਕੋਈ ਇਨਪੁੱਟ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenie %@ nie ma wejścia, z którego można nagrywać."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não tem entrada para gravar."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não tem entrada para gravar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu are nicio intrare de pe care să se înregistreze."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ har ingen ingång att spela in från."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haina ingizo la kurekodi kutoka kwake."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ இல் பதிவு செய்ய உள்ளீடு இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@కు రికార్డ్ చేయడానికి ఇన్‌పుట్ లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ไม่มีอินพุตให้บันทึกเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ aygıtında kayıt yapılacak giriş yok."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У %@ немає входу, з якого можна записувати."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ میں ریکارڈ کرنے کے لیے کوئی ان پٹ نہیں ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ không có đầu vào để ghi."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@沒有可錄製的輸入。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@没有可录制的输入。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@沒有可錄製的輸入。"
+          }
+        }
+      }
+    },
+    "%@ offers no sample rate the measurement can record at (it needs 44.1 kHz or more; the input offers %@).": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ መለኪያው ሊቀዳበት የሚችል የናሙና ተመን አያቀርብም (44.1 kHz ወይም ከዚያ በላይ ያስፈልጋል፤ ግብዓቱ የሚያቀርበው %@ ነው)።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوفّر %@ معدّل عيّنات يمكن للقياس التسجيل به (يلزم 44.1 kHz أو أكثر؛ يوفّر المدخل %@)."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ এমন কোনো স্যাম্পল রেট দেয় না যাতে পরিমাপ রেকর্ড করা যায় (৪৪.১ kHz বা তার বেশি দরকার; ইনপুট দেয় %@)।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nenabízí žádnou vzorkovací frekvenci, na které by měření mohlo nahrávat (potřebuje 44,1 kHz nebo víc; vstup nabízí %@)."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tilbyder ingen samplingsfrekvens, målingen kan optage med (den kræver 44,1 kHz eller mere; indgangen tilbyder %@)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ bietet keine Abtastrate, mit der die Messung aufnehmen kann (sie braucht 44,1 kHz oder mehr; der Eingang bietet %@)."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ δεν προσφέρει ρυθμό δειγματοληψίας με τον οποίο μπορεί να γίνει η μέτρηση (απαιτεί 44,1 kHz ή περισσότερο· η είσοδος προσφέρει %@)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no ofrece ninguna frecuencia de muestreo con la que la medición pueda grabar (necesita 44,1 kHz o más; la entrada ofrece %@)."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ نرخ نمونه‌برداری‌ای که اندازه‌گیری بتواند با آن ضبط کند ارائه نمی‌دهد (به ۴۴٫۱ kHz یا بیشتر نیاز دارد؛ ورودی %@ ارائه می‌دهد)."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ei tarjoa näytteenottotaajuutta, jolla mittaus voisi tallentaa (tarvitaan vähintään 44,1 kHz; tulo tarjoaa %@)."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang inaalok na sample rate ang %@ na magagamit ng pagsukat sa pagre-record (kailangan nito ng 44.1 kHz o higit pa; ang inaalok ng input ay %@)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne propose aucune fréquence d’échantillonnage à laquelle la mesure peut enregistrer (il faut 44,1 kHz ou plus ; l’entrée propose %@)."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ એવો કોઈ સેમ્પલ રેટ આપતું નથી જેના પર માપ રેકોર્ડ કરી શકે (તેને 44.1 kHz કે વધુ જોઈએ; ઇનપુટ %@ આપે છે)."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ba ya bayar da adadin samfur da aunawa za ta iya yin rikodi da shi (tana buƙatar 44.1 kHz ko fiye; mashigar tana bayar da %@)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ לא מציע קצב דגימה שהמדידה יכולה להקליט בו (נדרש 44.1 kHz ומעלה; הכניסה מציעה %@)."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ कोई ऐसी सैंपल दर नहीं देता जिस पर माप रिकॉर्ड कर सके (इसे 44.1 kHz या अधिक चाहिए; इनपुट %@ देता है)।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ nem kínál olyan mintavételi frekvenciát, amelyen a mérés rögzíthetne (legalább 44,1 kHz kell; a bemenet ezt kínálja: %@)."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak menawarkan laju sampel yang dapat dipakai pengukuran untuk merekam (butuh 44,1 kHz atau lebih; input menawarkan %@)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non offre alcuna frequenza di campionamento con cui la misurazione possa registrare (serve 44,1 kHz o più; l’ingresso offre %@)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@には、測定が録音できるサンプルレートがありません(44.1 kHz以上が必要です。この入力が対応するのは%@です)。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಅಳತೆ ರೆಕಾರ್ಡ್ ಮಾಡಬಹುದಾದ ಯಾವುದೇ ಸ್ಯಾಂಪಲ್ ದರವನ್ನು ನೀಡುವುದಿಲ್ಲ (ಇದಕ್ಕೆ 44.1 kHz ಅಥವಾ ಹೆಚ್ಚು ಬೇಕು; ಇನ್‌ಪುಟ್ %@ ನೀಡುತ್ತದೆ)."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@은(는) 측정이 녹음할 수 있는 샘플 레이트를 제공하지 않습니다(44.1 kHz 이상이 필요하며, 입력이 제공하는 값은 %@입니다)."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അളവിന് റെക്കോർഡ് ചെയ്യാവുന്ന ഒരു സാമ്പിൾ നിരക്കും %@ നൽകുന്നില്ല (44.1 kHz അല്ലെങ്കിൽ കൂടുതൽ വേണം; ഇൻപുട്ട് നൽകുന്നത് %@)."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ असा कोणताही सॅम्पल रेट देत नाही ज्यावर मापन रेकॉर्ड करू शकते (त्याला 44.1 kHz किंवा अधिक हवा; इनपुट %@ देते)."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak menawarkan kadar sampel yang boleh dirakam oleh pengukuran (ia memerlukan 44.1 kHz atau lebih; input menawarkan %@)."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tilbyr ingen samplingsfrekvens målingen kan ta opp med (den trenger 44,1 kHz eller mer; inngangen tilbyr %@)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ biedt geen samplefrequentie waarmee de meting kan opnemen (die heeft 44,1 kHz of meer nodig; de ingang biedt %@)."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਕੋਈ ਅਜਿਹੀ ਸੈਂਪਲ ਦਰ ਨਹੀਂ ਦਿੰਦਾ ਜਿਸ ’ਤੇ ਮਾਪ ਰਿਕਾਰਡ ਕਰ ਸਕੇ (ਇਸ ਨੂੰ 44.1 kHz ਜਾਂ ਵੱਧ ਚਾਹੀਦਾ ਹੈ; ਇਨਪੁੱਟ %@ ਦਿੰਦਾ ਹੈ)।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenie %@ nie oferuje częstotliwości próbkowania, z którą pomiar mógłby nagrywać (wymaga 44,1 kHz lub więcej; wejście oferuje %@)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não oferece nenhuma taxa de amostragem em que a medição possa gravar (precisa de 44,1 kHz ou mais; a entrada oferece %@)."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não oferece nenhuma taxa de amostragem a que a medição possa gravar (precisa de 44,1 kHz ou mais; a entrada oferece %@)."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu oferă nicio frecvență de eșantionare la care măsurarea să poată înregistra (necesită 44,1 kHz sau mai mult; intrarea oferă %@)."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ erbjuder ingen samplingsfrekvens som mätningen kan spela in med (den kräver 44,1 kHz eller mer; ingången erbjuder %@)."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haitoi kiwango cha sampuli ambacho kipimo kinaweza kurekodi (kinahitaji 44.1 kHz au zaidi; ingizo linatoa %@)."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அளவீடு பதிவு செய்யக்கூடிய மாதிரி வீதம் எதையும் %@ வழங்கவில்லை (இதற்கு 44.1 kHz அல்லது அதற்கு மேல் தேவை; உள்ளீடு வழங்குவது %@)."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కొలత రికార్డ్ చేయగల ఏ శాంపిల్ రేటునూ %@ అందించదు (దీనికి 44.1 kHz లేదా అంతకంటే ఎక్కువ కావాలి; ఇన్‌పుట్ అందించేది %@)."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ไม่มีอัตราสุ่มตัวอย่างที่การวัดสามารถบันทึกได้ (ต้องใช้ 44.1 kHz ขึ้นไป อินพุตมีให้ %@)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, ölçümün kayıt yapabileceği hiçbir örnekleme hızı sunmuyor (44,1 kHz veya üzeri gerekir; giriş şunu sunuyor: %@)."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ не пропонує жодної частоти дискретизації, на якій вимірювання могло б записувати (потрібно 44,1 кГц або більше; вхід пропонує %@)."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کوئی ایسی سیمپل ریٹ پیش نہیں کرتا جس پر پیمائش ریکارڈ کر سکے (اسے 44.1 kHz یا زیادہ درکار ہے؛ ان پٹ %@ پیش کرتا ہے)۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ không cung cấp tốc độ lấy mẫu nào mà phép đo có thể ghi (cần 44,1 kHz trở lên; đầu vào cung cấp %@)."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@沒有量度可用於錄製的取樣率（需要 44.1 kHz 或更高；該輸入提供 %@）。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@没有测量可用于录制的采样率（需要 44.1 kHz 或更高；该输入提供 %@）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@沒有量測可用於錄製的取樣率（需要 44.1 kHz 或更高；該輸入提供 %@）。"
+          }
+        }
+      }
+    },
+    "%@ can't be recorded at %@ kHz: none of its sample formats is one Vespertine can read (linear PCM, 16 to 32 bits, or Float32/Float64).": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ በ%@ kHz መቅዳት አይቻልም፦ ከናሙና ቅርጸቶቹ ውስጥ Vespertine ሊያነበው የሚችል የለም (ሊኒየር PCM፣ ከ16 እስከ 32 ቢት፣ ወይም Float32/Float64)።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن التسجيل من %@ بمعدل %@ kHz: لا يوجد بين صيغ العيّنات فيه ما يستطيع Vespertine قراءته (PCM خطي من 16 إلى 32 بت، أو Float32/Float64)."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ থেকে %@ kHz-এ রেকর্ড করা যাচ্ছে না: এর স্যাম্পল ফরম্যাটগুলোর কোনোটিই Vespertine পড়তে পারে না (লিনিয়ার PCM, ১৬ থেকে ৩২ বিট, বা Float32/Float64)।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Z %@ nelze nahrávat na %@ kHz: žádný z jeho formátů vzorků neumí Vespertine přečíst (lineární PCM, 16 až 32 bitů, nebo Float32/Float64)."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke optages ved %@ kHz: ingen af dens samplingsformater kan Vespertine læse (lineær PCM, 16 til 32 bit eller Float32/Float64)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kann bei %@ kHz nicht aufgenommen werden: Keines seiner Abtastformate kann Vespertine lesen (lineares PCM, 16 bis 32 Bit oder Float32/Float64)."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν είναι δυνατή η εγγραφή από το %@ στα %@ kHz: κανένας από τους τύπους δειγμάτων του δεν μπορεί να διαβαστεί από το Vespertine (γραμμικό PCM, 16 έως 32 bit ή Float32/Float64)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede grabar %@ a %@ kHz: ninguno de sus formatos de muestra es uno que Vespertine pueda leer (PCM lineal, de 16 a 32 bits, o Float32/Float64)."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضبط از %@ با %@ kHz ممکن نیست: هیچ‌یک از قالب‌های نمونه‌اش را Vespertine نمی‌تواند بخواند (PCM خطی، ۱۶ تا ۳۲ بیت، یا Float32/Float64)."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laitteesta %@ ei voi tallentaa taajuudella %@ kHz: mikään sen näytemuodoista ei ole sellainen, jonka Vespertine osaa lukea (lineaarinen PCM, 16–32 bittiä tai Float32/Float64)."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ma-record ang %@ sa %@ kHz: wala sa mga sample format nito ang nababasa ng Vespertine (linear PCM, 16 hanggang 32 bit, o Float32/Float64)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d’enregistrer %@ à %@ kHz : aucun de ses formats d’échantillon n’est lisible par Vespertine (PCM linéaire, 16 à 32 bits, ou Float32/Float64)."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ને %@ kHz પર રેકોર્ડ કરી શકાતું નથી: તેના સેમ્પલ ફોર્મેટમાંથી કોઈ Vespertine વાંચી શકતું નથી (લિનિયર PCM, 16 થી 32 બિટ, અથવા Float32/Float64)."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya yin rikodi daga %@ a %@ kHz ba: babu ɗaya daga tsarin samfurinsa da Vespertine zai iya karantawa (linear PCM, 16 zuwa 32 bit, ko Float32/Float64)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להקליט מ-%@ ב-%@ kHz: אף אחד מפורמטי הדגימה שלו אינו פורמט ש-Vespertine יכול לקרוא (PCM ליניארי, 16 עד 32 ביט, או Float32/Float64)."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ को %@ kHz पर रिकॉर्ड नहीं किया जा सकता: इसके सैंपल फ़ॉर्मैट में से कोई भी ऐसा नहीं है जिसे Vespertine पढ़ सके (लीनियर PCM, 16 से 32 बिट, या Float32/Float64)।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ nem rögzíthető %@ kHz-en: egyik mintaformátumát sem tudja a Vespertine beolvasni (lineáris PCM, 16–32 bit, vagy Float32/Float64)."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat direkam pada %@ kHz: tidak ada format sampelnya yang dapat dibaca Vespertine (PCM linear, 16 sampai 32 bit, atau Float32/Float64)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile registrare %@ a %@ kHz: nessuno dei suoi formati di campione è leggibile da Vespertine (PCM lineare, da 16 a 32 bit, o Float32/Float64)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を%@ kHzで録音できません: サンプル形式のどれもVespertineが読み取れるものではありません(リニアPCMの16〜32ビット、またはFloat32/Float64)。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಅನ್ನು %@ kHz ನಲ್ಲಿ ರೆಕಾರ್ಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ: ಅದರ ಯಾವುದೇ ಸ್ಯಾಂಪಲ್ ಸ್ವರೂಪವನ್ನು Vespertine ಓದಲಾಗುವುದಿಲ್ಲ (ಲೀನಿಯರ್ PCM, 16 ರಿಂದ 32 ಬಿಟ್, ಅಥವಾ Float32/Float64)."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@을(를) %@ kHz로 녹음할 수 없습니다: 샘플 형식 중 Vespertine이 읽을 수 있는 것이 없습니다(선형 PCM 16~32비트 또는 Float32/Float64)."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ നെ %@ kHz ൽ റെക്കോർഡ് ചെയ്യാൻ കഴിയില്ല: അതിന്റെ സാമ്പിൾ ഫോർമാറ്റുകളിൽ ഒന്നും Vespertine ന് വായിക്കാവുന്നതല്ല (ലീനിയർ PCM, 16 മുതൽ 32 ബിറ്റ്, അല്ലെങ്കിൽ Float32/Float64)."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ला %@ kHz वर रेकॉर्ड करता येत नाही: त्याचे कोणतेही सॅम्पल फॉरमॅट Vespertine वाचू शकत नाही (लिनियर PCM, 16 ते 32 बिट, किंवा Float32/Float64)."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak boleh dirakam pada %@ kHz: tiada satu pun format sampelnya yang boleh dibaca oleh Vespertine (PCM linear, 16 hingga 32 bit, atau Float32/Float64)."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke tas opp ved %@ kHz: ingen av samplingsformatene kan Vespertine lese (lineær PCM, 16 til 32 bit eller Float32/Float64)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan niet op %@ kHz worden opgenomen: geen van de sampleformaten kan Vespertine lezen (lineaire PCM, 16 tot 32 bits of Float32/Float64)."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਨੂੰ %@ kHz ’ਤੇ ਰਿਕਾਰਡ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ: ਇਸ ਦਾ ਕੋਈ ਵੀ ਸੈਂਪਲ ਫਾਰਮੈਟ Vespertine ਪੜ੍ਹ ਨਹੀਂ ਸਕਦਾ (ਲੀਨੀਅਰ PCM, 16 ਤੋਂ 32 ਬਿਟ, ਜਾਂ Float32/Float64)।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można nagrywać z urządzenia %@ przy %@ kHz: żaden z jego formatów próbek nie jest odczytywalny przez Vespertine (liniowy PCM, od 16 do 32 bitów lub Float32/Float64)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível gravar %@ a %@ kHz: nenhum dos formatos de amostra dele é legível pelo Vespertine (PCM linear, de 16 a 32 bits, ou Float32/Float64)."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível gravar %@ a %@ kHz: nenhum dos formatos de amostra é legível pelo Vespertine (PCM linear, de 16 a 32 bits, ou Float32/Float64)."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu poate fi înregistrat la %@ kHz: niciunul dintre formatele sale de eșantion nu poate fi citit de Vespertine (PCM liniar, de la 16 la 32 de biți, sau Float32/Float64)."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan inte spelas in vid %@ kHz: inget av dess samplingsformat kan Vespertine läsa (linjär PCM, 16 till 32 bitar eller Float32/Float64)."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haiwezi kurekodiwa kwa %@ kHz: hakuna umbizo lake la sampuli ambalo Vespertine inaweza kusoma (linear PCM, biti 16 hadi 32, au Float32/Float64)."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ஐ %@ kHz இல் பதிவு செய்ய முடியாது: அதன் மாதிரி வடிவங்களில் எதையும் Vespertine படிக்க முடியாது (லீனியர் PCM, 16 முதல் 32 பிட், அல்லது Float32/Float64)."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ను %@ kHz వద్ద రికార్డ్ చేయలేరు: దాని శాంపిల్ ఫార్మాట్లలో ఏదీ Vespertine చదవగలది కాదు (లీనియర్ PCM, 16 నుండి 32 బిట్, లేదా Float32/Float64)."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถบันทึก %@ ที่ %@ kHz ได้: ไม่มีรูปแบบตัวอย่างใดของอุปกรณ์ที่ Vespertine อ่านได้ (linear PCM 16 ถึง 32 บิต หรือ Float32/Float64)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ aygıtı %@ kHz ile kaydedilemiyor: örnek biçimlerinden hiçbiri Vespertine’in okuyabileceği türden değil (doğrusal PCM, 16 ila 32 bit veya Float32/Float64)."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Із %@ не можна записувати на %@ кГц: жоден з його форматів семплів не може прочитати Vespertine (лінійний PCM, від 16 до 32 біт, або Float32/Float64)."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کو %@ kHz پر ریکارڈ نہیں کیا جا سکتا: اس کا کوئی بھی سیمپل فارمیٹ ایسا نہیں جسے Vespertine پڑھ سکے (لینیئر PCM، 16 سے 32 بٹ، یا Float32/Float64)۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể ghi %@ ở %@ kHz: không định dạng mẫu nào của nó mà Vespertine đọc được (PCM tuyến tính, 16 đến 32 bit, hoặc Float32/Float64)."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法以 %2$@ kHz 錄製%1$@：其取樣格式沒有一種是 Vespertine 能讀取的（線性 PCM，16 至 32 位元，或 Float32/Float64）。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法以 %2$@ kHz 录制%1$@：其采样格式没有一种是 Vespertine 能读取的（线性 PCM，16 至 32 位，或 Float32/Float64）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法以 %2$@ kHz 錄製%1$@：其取樣格式沒有一種是 Vespertine 能讀取的（線性 PCM，16 至 32 位元，或 Float32/Float64）。"
+          }
+        }
+      }
+    },
+    "none": {
+      "comment": "Room Correction capture message.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ምንም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا شيء"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কিছুই না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "žádné"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ingen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "keine"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "κανένα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ninguna"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هیچ"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ei mitään"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "wala"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aucune"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કોઈ નહીં"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "babu"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई नहीं"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nincs"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tidak ada"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nessuna"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "なし"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಯಾವುದೂ ಇಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒന്നുമില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "काहीही नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tiada"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ingen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "geen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਨਹੀਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "brak"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nenhuma"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nenhuma"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "niciuna"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ingen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hakuna"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "எதுவும் இல்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఏదీ లేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มี"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yok"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "немає"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی نہیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "không có"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無"
           }
         }
       }

@@ -1,0 +1,1 @@
+WavPack 5.8.1 with ENABLE_DSD (decoder, no threads, no legacy formats), every global symbol prefixed vtwv_, built 2026-11-03

@@ -93,7 +93,7 @@ enum DeveloperHooks {
         // `-VespertineOpenSheet transitions`: the note shown the first time transitions are turned on (nothing is changed).
         if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
         if d.string(forKey: "VespertineOpenSheet")?.hasPrefix("loopback") == true { model.showLoopbackTest = true }   // loopback-run also starts it
-        if d.string(forKey: "VespertineOpenSheet") == "transitions", model.settings.transitionsFeature { model.showTransitionsExplainer = true }
+        if d.string(forKey: "VespertineOpenSheet") == "transitions", model.settings.transitionsFeature { model.transitionsNote.show(in: .main) }
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
         // whatever frame the window last saved.
         if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
@@ -117,6 +117,38 @@ enum DeveloperHooks {
         if d.double(forKey: "VespertineQuitAfter") > 0 {
             Task {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertineQuitAfter")))
+                NSApp.terminate(nil)
+            }
+        }
+        // QA ONLY: `-VespertineQAEnableTransitions <dir>` opens Settings, flips the Transitions toggle's model call, and
+        // reports and shoots every window before and after.
+        if let path = d.string(forKey: "VespertineQAEnableTransitions") {
+            Task { @MainActor in
+                @MainActor func note(_ line: String) {
+                    print(line); fflush(stdout)
+                }
+                @MainActor func report(_ tag: String) {
+                    for w in NSApp.windows where w.frame.width > 100 {
+                        note("[qa-win] \(tag) title='\(w.title)' id=\(w.identifier?.rawValue ?? "-") visible=\(w.isVisible) key=\(w.isKeyWindow) main=\(w.isMainWindow) mini=\(w.isMiniaturized) sheet=\(w.attachedSheet != nil) order=\(NSApp.orderedWindows.firstIndex(of: w) ?? -1)")
+                    }
+                }
+                @MainActor func shoot(_ tag: String) {
+                    let dir = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
+                    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                    for (i, w) in NSApp.windows.enumerated() where w.isVisible && w.frame.width > 200 {
+                        guard let v = w.contentView?.superview ?? w.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { continue }
+                        v.cacheDisplay(in: v.bounds, to: rep)
+                        try? rep.representation(using: .png, properties: [:])?.write(to: dir.appendingPathComponent("\(tag)-\(i)-\(w.title.isEmpty ? "sheet" : w.title).png"))
+                    }
+                }
+                try? await Task.sleep(for: .seconds(3))
+                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                try? await Task.sleep(for: .seconds(2))
+                report("before"); shoot("before")
+                model.setTransitionsFeature(true)
+                note("[qa-win] flag note main=\(model.transitionsNote.isShown(in: .main)) settings=\(model.transitionsNote.isShown(in: .settings))")
+                try? await Task.sleep(for: .seconds(2))
+                report("after"); shoot("after")
                 NSApp.terminate(nil)
             }
         }
