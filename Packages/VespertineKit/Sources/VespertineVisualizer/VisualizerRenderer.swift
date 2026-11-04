@@ -747,7 +747,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
 
     /// Where an instrument's needles point (radians from upright, clockwise), or how far its band of light reaches
     /// (0…1 of the scale), for a frame.
-    static func needles(design: MeterDesign, instrument m: MeterInstrument, frame: VisualizerFrame,
+    nonisolated static func needles(design: MeterDesign, instrument m: MeterInstrument, frame: VisualizerFrame,
                         balance: Double) -> (a: Double, b: Double?) {
         let c = m.channel
         switch m.kind {
@@ -768,7 +768,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     }
 
     /// The cover over the needle's pivot, where the window shows it (in units).
-    static func coverRadius(_ design: MeterDesign, _ m: MeterInstrument) -> Double {
+    nonisolated static func coverRadius(_ design: MeterDesign, _ m: MeterInstrument) -> Double {
         switch design {
         case .broadcast: m.kind == .balance ? 0.22 : 0.34
         case .tape: 0.3

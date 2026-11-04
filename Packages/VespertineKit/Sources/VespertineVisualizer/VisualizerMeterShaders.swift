@@ -398,36 +398,48 @@ static float3 movingParts(float2 px, constant U &u, int i, MLook l, float unit, 
     float wd = boxDistance(px - wc, wh, (l.bezel == 0 ? 0.06 : 0.02) * su);
     if (wd > 0.5) return col;
     float inside = 1 - smoothstep(-0.5, 0.5, wd);
-    float lip = boxDistance(px - wc - float2(0, 0.02 * su), wh, 0.02 * su);
-    float lipLight = (0.62 + 0.38 * smoothstep(0.0, 0.07 * su, -lip)) * vignette;
-    float3 sheen = glass(float3(0), px, w, su, l.darkFace ? 0.7 : 1.0) * vignette;
     float room = faceRoom(px, w);
+    float3 colA = l.needleA, colB = l.needleB;
+    float na = 0, nb = 0, shadow = 0;
+    float3 f;
     if (kind == 3) {
         if (abs(px.y - pv.z) > pv.w * 3) return col;
         float2 lampAt = float2(wc.x, w.y + w.w * 1.1);
         float glow = exp(-length((px - lampAt) / float2(1.5, 1.0)) / (0.75 * w.w));
         float lit = mix(room, (0.42 + 0.9 * glow) * lamp, l.backlight);
         float3 face = l.face * mix(float3(1), l.lamp, l.backlight) * lit * (0.985 + 0.03 * noise(px / (0.006 * su)));
-        float3 f = bandFace(px, l, pv, nd.x, face, room, su, lamp, printing) * lipLight + sheen;
-        return mix(col, f, inside);
+        f = bandFace(px, l, pv, nd.x, face, room, su, lamp, printing);
+    } else {
+        float2 pivot = pv.xy;
+        float r0 = pv.z, r1 = pv.w;
+        // Only near the needles: anything farther from the pivot's line than a shadow's width is left as it is.
+        float base = max(0.6, l.needleWidth * su), tip = max(0.45, base * 0.35);
+        float2 shadowOffset = (l.backlight > 0.5 ? float2(0.004, -0.012) : float2(0.012, 0.02)) * su;
+        if (kind == 2) { colA = float3(0.96, 0.95, 0.92); colB = float3(0.98, 0.82, 0.16); }   // M white, S yellow
+        if (kind == 4) colA = l.darkFace ? l.ink : float3(0.05);
+        bool twin = nd.y > -9;
+        float cover = nd.w * su;
+        float open = cover > 0 ? smoothstep(-0.6, 0.6, length(px - pivot) - cover) : 1.0;
+        shadow = needleMask(px - shadowOffset, pivot, nd.x, r0, r1, base * 2.2, tip * 3);
+        na = needleMask(px, pivot, nd.x, r0, r1, base, tip);
+        if (twin) {
+            shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.y, r0, r1, base * 2.2, tip * 3));
+            nb = needleMask(px, pivot, nd.y, r0, r1, base, tip);
+        }
+        shadow *= open * inside;
+        na *= open * inside;
+        nb *= open * inside;
+        if (max(shadow, max(na, nb)) < 1e-3) return col;
+        col *= 1 - (l.darkFace ? 0.5 : 0.25) * shadow;
+        if (max(na, nb) < 1e-3) return col;
     }
-    float2 pivot = pv.xy;
-    float r0 = pv.z, r1 = pv.w;
-    float base = max(0.6, l.needleWidth * su), tip = max(0.45, base * 0.35);
-    float2 shadowOffset = (l.backlight > 0.5 ? float2(0.004, -0.012) : float2(0.012, 0.02)) * su;
-    float3 colA = l.needleA, colB = l.needleB;
-    if (kind == 2) { colA = float3(0.96, 0.95, 0.92); colB = float3(0.98, 0.82, 0.16); }   // M white, S yellow
-    if (kind == 4) colA = l.darkFace ? l.ink : float3(0.05);
-    bool twin = nd.y > -9;
-    // Nothing shows under the pivot's cover.
-    float cover = nd.w * su;
-    float open = cover > 0 ? smoothstep(-0.6, 0.6, length(px - pivot) - cover) : 1.0;
-    float shadow = needleMask(px - shadowOffset, pivot, nd.x, r0, r1, base * 2.2, tip * 3);
-    if (twin) shadow = max(shadow, needleMask(px - shadowOffset, pivot, nd.y, r0, r1, base * 2.2, tip * 3));
-    col *= 1 - (l.darkFace ? 0.5 : 0.25) * shadow * open * inside;
-    if (twin) col = mix(col, colB * (0.85 + 0.15 * room) * lipLight + sheen, needleMask(px, pivot, nd.y, r0, r1, base, tip) * open * inside);
-    col = mix(col, colA * (0.85 + 0.15 * room) * lipLight + sheen, needleMask(px, pivot, nd.x, r0, r1, base, tip) * open * inside);
-    return col;
+    // What's drawn over the face sits under the bezel's lip and the glass, as the face does.
+    float lip = boxDistance(px - wc - float2(0, 0.02 * su), wh, 0.02 * su);
+    float lipLight = (0.62 + 0.38 * smoothstep(0.0, 0.07 * su, -lip)) * vignette;
+    float3 sheen = glass(float3(0), px, w, su, l.darkFace ? 0.7 : 1.0) * vignette;
+    if (kind == 3) return mix(col, f * lipLight + sheen, inside);
+    col = mix(col, colB * (0.85 + 0.15 * room) * lipLight + sheen, nb);
+    return mix(col, colA * (0.85 + 0.15 * room) * lipLight + sheen, na);
 }
 
 // A peak light's lens, lit to `level`, and its glow.
