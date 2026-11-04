@@ -53,6 +53,25 @@ struct RoomLibraryTests {
         #expect(reloaded.chosenRoomProfile(for: "airplay")?.id == kitchen.id)
     }
 
+    @Test("After a restart the engine gets exactly the corrections it had, per output, at the strength set; other outputs none")
+    func engineAfterRestart() throws {
+        let (root, defaults, suite) = try scratch()
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        let desk = settings.saveRoomProfile(profile("Desk")), sofa = settings.saveRoomProfile(profile("Sofa", device: "k11"))
+        let copy = try settings.duplicateRoomProfile(desk.id)
+        try settings.updateRoomProfile(copy.id) { $0.strength = 0.5 }
+        settings.setRoomProfile(copy.id, for: "zd3")
+        settings.setRoomProfile(sofa.id, for: "k11")
+        let before = settings.engineSettings().roomCorrections
+        #expect(before.count == 2 && before["zd3"]?.profileID == copy.id && before["k11"]?.profileID == sofa.id)
+        #expect(before["zd3"]?.channels.first?.bands.first?.gainDB == -3, "half of the -6 dB band")
+        let restarted = AppSettings(defaults: defaults, dataDirectory: root)
+        #expect(restarted.roomBook == settings.roomBook)
+        #expect(restarted.engineSettings().roomCorrections == before)
+        #expect(restarted.engineSettings().roomCorrections["airplay"] == nil)
+    }
+
     @Test("Saving never drops a profile written by a newer Vespertine")
     func keepsNewerProfiles() throws {
         let (root, defaults, suite) = try scratch()
