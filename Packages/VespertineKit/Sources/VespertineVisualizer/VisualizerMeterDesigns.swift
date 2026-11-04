@@ -468,12 +468,73 @@ enum VisualizerMeterPrinting {
             context.fillEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r))
         }
 
-        /// Vespertine's crescent, `r` points across its circle: a disc with a second one taken out of it.
-        func crescent(_ l: Layer, _ c: CGPoint, _ r: CGFloat, strength: CGFloat = 1) {
+        /// The name set the way a maker set its own: runs of type on one baseline (each in its own font, so some letters
+        /// can be smaller), widened by `widen`, filled, thickened by `embolden` or only outlined by `outline` (both in
+        /// per cent of the size, as AppKit's stroke width), centred on `p`.
+        func lettering(_ l: Layer, _ runs: [(String, NSFont)], at p: CGPoint, kern: CGFloat = 0, widen: CGFloat = 1,
+                       embolden: CGFloat = 0, outline: CGFloat = 0, strength: CGFloat = 1) {
             guard on(l, strength) else { return }
-            context.fillEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r))
-            context.setFillColor(gray: 0, alpha: 1)
-            context.fillEllipse(in: CGRect(x: c.x - r * 0.55, y: c.y - r * 1.15, width: 2 * r, height: 2 * r))
+            let colour = NSColor(white: strength, alpha: 1)
+            let t = NSMutableAttributedString()
+            for (s, f) in runs {
+                var a: [NSAttributedString.Key: Any] = [.font: f, .kern: kern, .foregroundColor: colour]
+                if outline > 0 { a[.strokeWidth] = outline; a[.strokeColor] = colour }
+                else if embolden > 0 { a[.strokeWidth] = -embolden; a[.strokeColor] = colour }
+                t.append(NSAttributedString(string: s, attributes: a))
+            }
+            let b = t.size()
+            context.saveGState()
+            context.translateBy(x: p.x, y: p.y)
+            context.scaleBy(x: widen, y: 1)
+            t.draw(at: CGPoint(x: -(b.width - kern) / 2, y: -b.height / 2))
+            context.restoreGState()
+        }
+
+        /// Squared lettering drawn as strokes, `height` points tall, centred on `p`: even strokes, square bowls with
+        /// rounded corners, as the Sifam maker's mark on the BBC meters is built. It knows the letters of VESPERTINE.
+        func squared(_ l: Layer, _ word: String, at p: CGPoint, height: CGFloat, strength: CGFloat = 1) {
+            guard on(l, strength) else { return }
+            let t: CGFloat = 0.2, w: CGFloat = 0.72, space: CGFloat = 0.24, corner: CGFloat = 0.16
+            let a = t / 2, b = w - t / 2, top = t / 2, bottom = 1 - t / 2, mid: CGFloat = 0.5   // y runs down
+            typealias Stroke = (points: [CGPoint], rounded: Bool)
+            func P(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x, y: y) }
+            func glyph(_ c: Character) -> (width: CGFloat, strokes: [Stroke]) {
+                switch c {
+                case "V": return (w, [([P(a, 0), P(w / 2, bottom), P(b, 0)], false)])
+                case "E": return (w, [([P(w, top), P(a, top), P(a, bottom), P(w, bottom)], true), ([P(a, mid), P(w - 0.08, mid)], false)])
+                case "S": return (w, [([P(w, top), P(a, top), P(a, mid), P(b, mid), P(b, bottom), P(0, bottom)], true)])
+                case "P": return (w, [([P(a, 1), P(a, top), P(b, top), P(b, mid + 0.02), P(a, mid + 0.02)], true)])
+                case "R": return (w, [([P(a, 1), P(a, top), P(b, top), P(b, mid + 0.02), P(a, mid + 0.02)], true),
+                                      ([P(w * 0.4, mid + 0.02), P(b + 0.02, 1)], false)])
+                case "T": return (w, [([P(0, top), P(w, top)], false), ([P(w / 2, 0), P(w / 2, 1)], false)])
+                case "I": return (t, [([P(a, 0), P(a, 1)], false)])
+                case "N": return (w, [([P(a, 1), P(a, top), P(b, bottom), P(b, 0)], false)])
+                default: return (w, [])
+                }
+            }
+            let glyphs = word.uppercased().map(glyph)
+            let total = glyphs.reduce(0) { $0 + $1.width } + space * CGFloat(max(0, glyphs.count - 1))
+            var x = p.x - total * height / 2
+            let y = p.y - height / 2
+            context.setLineWidth(t * height)
+            context.setLineCap(.butt)
+            context.setLineJoin(.miter)
+            context.setMiterLimit(3)
+            for g in glyphs {
+                for s in g.strokes {
+                    let q = s.points.map { CGPoint(x: x + $0.x * height, y: y + $0.y * height) }
+                    context.move(to: q[0])
+                    for i in 1..<q.count {
+                        if s.rounded, i < q.count - 1 {
+                            context.addArc(tangent1End: q[i], tangent2End: q[i + 1], radius: corner * height)
+                        } else {
+                            context.addLine(to: q[i])
+                        }
+                    }
+                    context.strokePath()
+                }
+                x += (g.width + space) * height
+            }
         }
     }
 
@@ -528,13 +589,14 @@ enum VisualizerMeterPrinting {
             }
             // The short mark at the stop, past the top of the scale.
             pen.tick(.ink, p, MeterPlan.sifamStop, 0.99 * u, 1.06 * u, width: bar)
-            // Maker's corner: the crescent and the type, small and grey, as the real one carries its maker's mark.
-            let w = m.window
-            pen.crescent(.ink, CGPoint(x: w.minX + 0.12 * u, y: w.maxY - 0.13 * u), 0.035 * u, strength: 0.75)
-            let type = plan.design.isPPM && plan.design == .nordic ? "TYPE I" : (plan.design == .ebu ? "TYPE IIb" : "TYPE IIa")
-            pen.text(.ink, type, at: CGPoint(x: w.minX + 0.27 * u, y: w.maxY - 0.13 * u), font: font("Helvetica-Bold", 0.034 * u), strength: 0.75)
+            // The maker's corner, bottom left as on the 34A: the name in Sifam's squared strokes, the type beside it
+            // and a small print at the right, in the scale's white.
+            let w = m.window, corner = w.maxY - 0.13 * u
+            pen.squared(.ink, "VESPERTINE", at: CGPoint(x: w.minX + 0.36 * u, y: corner), height: 0.05 * u, strength: 0.9)
+            let type = plan.design == .nordic ? "TYPE I" : (plan.design == .ebu ? "TYPE IIb" : "TYPE IIa")
+            pen.text(.ink, type, at: CGPoint(x: w.minX + 0.81 * u, y: corner), font: font("DINAlternate-Bold", 0.038 * u), strength: 0.8)
             if m.kind == .needle || m.kind == .twinAB || m.kind == .twinMS {
-                pen.text(.ink, "PPM", at: CGPoint(x: w.maxX - 0.17 * u, y: w.maxY - 0.13 * u), font: font("Helvetica-Bold", 0.036 * u), strength: 0.75)
+                pen.text(.ink, "PPM", at: CGPoint(x: w.maxX - 0.17 * u, y: corner), font: font("DINAlternate-Bold", 0.038 * u), strength: 0.8)
             }
 
             // The panel's legend under each meter, with the colour of its needle where it has two.
@@ -595,9 +657,11 @@ enum VisualizerMeterPrinting {
                 if major { pen.text(.ink, "\(Int(pct))", pivot: p, angle: a, radius: rp - 0.085 * u, font: font("Futura-Medium", 0.042 * u), strength: 0.85) }
             }
             pen.text(.ink, "VU", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.715 * u), font: font("Futura-Bold", 0.13 * u))
-            pen.crescent(.ink, CGPoint(x: m.window.minX + 0.11 * u, y: m.window.maxY - 0.1 * u), 0.03 * u, strength: 0.7)
-            pen.text(.ink, "vespertine", at: CGPoint(x: m.window.minX + 0.29 * u, y: m.window.maxY - 0.1 * u),
-                     font: font("Futura-Medium", 0.035 * u), strength: 0.7)
+            // The maker's line across the top of the card and the model at the bottom left, in the small bold
+            // geometric capitals of the Weston 862's.
+            let maker = font("Futura-Bold", 0.04 * u)
+            pen.lettering(.ink, [("VESPERTINE", maker)], at: CGPoint(x: m.window.midX, y: m.window.minY + 0.075 * u), kern: 0.006 * u)
+            pen.lettering(.ink, [("TYPE A", maker)], at: CGPoint(x: m.window.minX + 0.2 * u, y: m.window.maxY - 0.08 * u), kern: 0.004 * u)
             // The panel's engraved legend.
             pen.text(.legend, m.channel == 0 ? "LEFT  CHANNEL" : "RIGHT  CHANNEL",
                      at: CGPoint(x: m.housing.midX, y: m.housing.maxY + 0.16 * u), font: font("Futura-Medium", 0.07 * u), kern: 0.01 * u)
@@ -645,7 +709,9 @@ enum VisualizerMeterPrinting {
             pen.text(.ink, "−", pivot: p, angle: angle(-20) - MeterPlan.deg(4), radius: r + 0.02 * u, font: font("Helvetica", 0.09 * u))
             pen.text(.red, "+", pivot: p, angle: angle(3) + MeterPlan.deg(4), radius: r + 0.02 * u, font: font("Helvetica", 0.09 * u))
             pen.text(.ink, "VU", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.66 * u), font: font("Helvetica", 0.1 * u))
-            pen.crescent(.ink, CGPoint(x: m.window.minX + 0.11 * u, y: m.window.minY + 0.12 * u), 0.04 * u, strength: 0.8)
+            // The maker's mark, top left: printed in thin outline as the API faces print theirs.
+            pen.lettering(.ink, [("vespertine", font("Futura-Bold", 0.06 * u))], at: CGPoint(x: m.window.minX + 0.3 * u, y: m.window.minY + 0.11 * u),
+                          kern: 0.003 * u, outline: 4)
             // The bridge's legend: the channel, large, the name under it in blue, and the peak light's.
             let label = CGPoint(x: m.housing.midX, y: m.housing.maxY + 0.2 * u)
             pen.text(.legend, m.channel == 0 ? "L" : "R", at: CGPoint(x: label.x - 0.38 * u, y: label.y + 0.06 * u), font: font("Helvetica-Bold", 0.17 * u))
@@ -688,12 +754,15 @@ enum VisualizerMeterPrinting {
             pen.text(.legend, m.channel == 0 ? "CHANNEL  I" : "CHANNEL  II", at: CGPoint(x: x, y: y), font: font("Helvetica-Bold", 0.062 * u),
                      kern: 0.006 * u)
         }
-        // The aluminium strip: the name, in blue, and what it is, engraved.
+        // The aluminium strip, as the A77's: the name in blue, wide flared capitals with the vowels set small, and
+        // under it what it is, in small black capitals spaced right out.
         let strip = CGRect(x: plan.panel.minX, y: plan.panel.minY, width: plan.panel.width, height: 0.42 * u)
-        pen.crescent(.second, CGPoint(x: strip.maxX - 1.12 * u, y: strip.midY - 0.02 * u), 0.06 * u)
-        pen.text(.second, "vespertine", at: CGPoint(x: strip.maxX - 0.62 * u, y: strip.midY - 0.02 * u), font: font("Futura-Medium", 0.13 * u))
-        pen.text(.ink, "STEREO  ·  VU", at: CGPoint(x: strip.minX + 0.75 * u, y: strip.midY), font: font("Helvetica", 0.05 * u),
-                 strength: 0.85, kern: 0.01 * u)
+        let name = CGPoint(x: strip.minX + 0.66 * strip.width, y: strip.minY + 0.15 * u)
+        let big = font("Skia-Regular_Black-Extended", 0.115 * u), small = font("Skia-Regular_Black-Extended", 0.084 * u)
+        let runs = "VESPERTINE".map { c in (String(c), "AEIOU".contains(c) ? small : big) }
+        pen.lettering(.second, runs, at: name, kern: 0.004 * u)
+        pen.lettering(.ink, [("VU - STEREO - METER", font("Helvetica-Bold", 0.034 * u))], at: CGPoint(x: name.x, y: name.y + 0.12 * u),
+                      kern: 0.05 * u, strength: 0.85)
     }
 
     // MARK: Cassette deck
@@ -728,14 +797,16 @@ enum VisualizerMeterPrinting {
                 pen.text(.second, "\(Int(pct))", pivot: p, angle: a, radius: r - 0.09 * u, font: font("Helvetica", 0.043 * u))
             }
             pen.text(.second, "dB", at: CGPoint(x: m.window.midX, y: m.window.minY + 0.62 * u), font: font("Helvetica", 0.06 * u))
-            pen.crescent(.ink, CGPoint(x: m.window.midX - 0.36 * u, y: m.window.minY + 0.76 * u), 0.04 * u)
-            pen.text(.ink, "vespertine", at: CGPoint(x: m.window.midX + 0.03 * u, y: m.window.minY + 0.76 * u),
-                     font: font("Futura-Bold", 0.085 * u))
+            // The maker's name under "dB", as the 5030 prints its own: heavy, very wide lower case with flat serifs.
+            pen.lettering(.ink, [("vespertine", font("Superclarendon-Black", 0.07 * u))],
+                          at: CGPoint(x: m.window.midX + 0.05 * u, y: m.window.minY + 0.73 * u), widen: 1.4)
         }
-        // The panel's printing: what it is, top right, and the peak lights' legend.
+        // The panel's printing: the name large, top left, the script top right, and the peak lights' legend.
         let pf = font("Helvetica", 0.065 * u)
-        pen.text(.ink, "STEREO METERS", at: CGPoint(x: plan.panel.maxX - 0.95 * u, y: plan.panel.minY + 0.22 * u),
-                 font: font("Futura-MediumItalic", 0.1 * u), strength: 0.9)
+        pen.lettering(.ink, [("vespertine", font("Superclarendon-Black", 0.17 * u))],
+                      at: CGPoint(x: plan.panel.minX + 1.1 * u, y: plan.panel.minY + 0.2 * u), kern: -0.003 * u, widen: 1.4)
+        pen.text(.ink, "Stereo Meters", at: CGPoint(x: plan.panel.maxX - 0.9 * u, y: plan.panel.minY + 0.2 * u),
+                 font: font("SnellRoundhand-Bold", 0.155 * u), strength: 0.9)
         let leds = plan.instruments.compactMap(\.led)
         if leds.count == 2 {
             let y = leds[0].y - 0.13 * u, mid = (leds[0].x + leds[1].x) / 2
@@ -794,9 +865,11 @@ enum VisualizerMeterPrinting {
             pen.tick(.red, CGPoint(x: x(-40), y: band.maxY + 0.1 * u), 0, 0, band.height + 0.3 * u, width: 0.012 * u)
             // The red zone, printed on the band's track above 0 dB.
             pen.rect(.red, CGRect(x: x(0), y: band.minY, width: x(5.6) - x(0), height: band.height), radius: 0.02 * u)
-            // Maker's line, bottom right, and the channel on the case.
-            pen.crescent(.ink, CGPoint(x: m.window.maxX - 0.95 * u, y: m.window.maxY - 0.09 * u), 0.026 * u, strength: 0.6)
-            pen.text(.ink, "vespertine  ·  DIN 45406", at: CGPoint(x: m.window.maxX - 0.52 * u, y: m.window.maxY - 0.09 * u),
+            // The maker's name bottom left, in heavy, open corporate capitals like Siemens' own, and the standard
+            // bottom right where the instrument prints its type number.
+            pen.lettering(.ink, [("VESPERTINE", font("LucidaGrande-Bold", 0.05 * u))],
+                          at: CGPoint(x: m.window.minX + 0.42 * u, y: m.window.maxY - 0.075 * u), kern: 0.002 * u, widen: 1.08, embolden: 4, strength: 0.75)
+            pen.text(.ink, "DIN 45406", at: CGPoint(x: m.window.maxX - 0.35 * u, y: m.window.maxY - 0.075 * u),
                      font: font("DINAlternate-Bold", 0.04 * u), strength: 0.6)
             pen.text(.legend, m.channel == 0 ? "L" : "R", at: CGPoint(x: m.housing.minX + 0.16 * u, y: m.window.midY),
                      font: font("DINAlternate-Bold", 0.16 * u))
