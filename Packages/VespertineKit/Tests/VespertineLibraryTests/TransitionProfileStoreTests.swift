@@ -57,6 +57,32 @@ struct TransitionProfileStoreTests {
         #expect(left == 0)
     }
 
+    @Test("A song analyzed before it had a profile is queued once for one (Live Set's beat grid); a CUE sheet's tracks aren't")
+    func profileBackfill() async throws {
+        let (db, _, dir) = try await scanned(["a.wav", "b.wav"])
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let tracks = try db.allTracks()
+        let a = try #require(tracks.first { $0.filePath.hasSuffix("a.wav") })
+        let b = try #require(tracks.first { $0.filePath.hasSuffix("b.wav") })
+        // Both analyzed by a Vespertine from before profiles (0.14 and earlier): a current analysis and no profile.
+        for t in [a, b] { try db.saveAnalysis(try FileAnalyzer.analyze(url: t.fileURL), filePath: t.filePath) }
+        #expect(Set(try db.tracksNeedingAnalysis().map(\.id)) == [a.id, b.id])
+        #expect(try db.tracksNeedingAnalysis(among: [try #require(a.id)]).map(\.id) == [a.id])
+        // Each is queued until it has its profile, then never again.
+        try db.saveTransitionProfiles([(Self.profile, a.filePath)])
+        #expect(try db.tracksNeedingAnalysis().map(\.id) == [b.id])
+        try db.saveTransitionProfiles([(Self.profile, b.filePath)])
+        #expect(try db.tracksNeedingAnalysis().isEmpty)
+        // A profile from an older analyzer is no profile.
+        var old = Self.profile
+        old.version = TransitionProfile.currentVersion - 1
+        try db.saveTransitionProfiles([(old, b.filePath)])
+        #expect(try db.tracksNeedingAnalysis().map(\.id) == [b.id])
+        // A CUE sheet's tracks never get the file's profile, so asking for one would queue them forever.
+        try await db.writer.write { db in try db.execute(sql: "UPDATE track SET cueStartFrame = 0, cueFrameLength = 100 WHERE id = ?", arguments: [b.id]) }
+        #expect(try db.tracksNeedingAnalysis().isEmpty)
+    }
+
     @Test("A CUE sheet's tracks don't get the file's profile (their ends aren't the file's)")
     func cueTracksSkipped() async throws {
         let (db, _, dir) = try await scanned(["a.wav"])

@@ -115,6 +115,7 @@ struct SmartRulesTests {
         let reread = try #require(try db.tracks(ids: [songID]).first)
         let analysis = try FileAnalyzer.analyze(url: URL(fileURLWithPath: reread.filePath))
         try db.saveAnalysis(analysis, filePath: reread.filePath)
+        try db.saveTransitionProfiles([(TransitionProfileStoreTests.profile, reread.filePath)])
 
         // A library manager reorganizes everything: Artist/Album (1973)/CD 01/Artist - Album - 01 - Song.wav,
         // and one file is deleted outright.
@@ -137,6 +138,7 @@ struct SmartRulesTests {
         #expect(moved.addedAt == song.addedAt)
         #expect(moved.analysisVerdict == analysis.verdict.rawValue)
         #expect(try db.tracksNeedingAnalysis().allSatisfy { $0.id != moved.id })   // the analysis still counts
+        #expect(try db.transitionProfile(for: moved) == TransitionProfileStoreTests.profile)   // and so do the song's ends
         #expect(try db.allTracks().count == 2)                                  // no duplicates left behind
     }
 
@@ -191,6 +193,7 @@ struct SmartRulesTests {
         let track = try #require(try db.allTracks().first)
         let analysis = try FileAnalyzer.analyze(url: track.fileURL)
         try db.saveAnalysis(analysis, filePath: track.filePath)
+        try db.saveTransitionProfiles([(TransitionProfileStoreTests.profile, track.filePath)])
         try await db.writer.write { try $0.execute(sql: "UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'") }
         let summary = try await scanner.scan(source)
         #expect(summary.updated == 1)
@@ -207,6 +210,7 @@ struct SmartRulesTests {
         let done = try #require(tracks.first { $0.filePath.hasSuffix("a48.wav") })
         let other = try #require(tracks.first { $0.filePath.hasSuffix("b441.wav") })
         try db.saveAnalysis(try FileAnalyzer.analyze(url: done.fileURL), filePath: done.filePath)
+        try db.saveTransitionProfiles([(TransitionProfileStoreTests.profile, done.filePath)])
         let chosen = Set([done, other].compactMap(\.id))
         #expect(try db.tracksNeedingAnalysis(among: chosen).map(\.id) == [other.id])
         #expect(try db.tracksNeedingAnalysis(among: []).isEmpty)
@@ -226,6 +230,7 @@ struct SmartRulesTests {
         let track = try #require(try db.allTracks().first)
         let analysis = try FileAnalyzer.analyze(url: track.fileURL)
         try db.saveAnalysis(analysis, filePath: track.filePath)
+        try db.saveTransitionProfiles([(TransitionProfileStoreTests.profile, track.filePath)])
         // The state 68 tracks were found in: a current stored analysis, no verdict on the track.
         try await db.writer.write { try $0.execute(sql: "UPDATE track SET analysisVerdict = NULL, effectiveBitDepth = NULL, bandwidthHz = NULL") }
         #expect(try db.tracksNeedingAnalysis().isEmpty, "a current analysis is never fetched again, so the badge would stay lost")
