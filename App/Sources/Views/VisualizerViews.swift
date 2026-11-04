@@ -451,6 +451,16 @@ final class VisualizerMTKView: MTKView {
         pressedAt = point
     }
 
+    override func mouseDragged(with event: NSEvent) {
+        guard let start = pressedAt else { super.mouseDragged(with: event); return }
+        // Dragged from the cover rather than clicked: it moves the window, as a drag anywhere else does.
+        let point = viewPoint(event)
+        if hypot(point.x - start.x, point.y - start.y) >= 6 {
+            pressedAt = nil
+            window?.performDrag(with: event)
+        }
+    }
+
     override func mouseUp(with event: NSEvent) {
         guard let start = pressedAt else { super.mouseUp(with: event); return }
         pressedAt = nil
