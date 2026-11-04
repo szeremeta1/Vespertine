@@ -9,7 +9,9 @@
 // Styles: vinyl (the default), bars, spectrogram, club, scope, meters, particles, mirrored. Themes: vespertine (the
 // default), brass, neon, aurora, ember, ice, mono, art (the colours of --art's cover; the default's without one).
 // Per style: --scope goniometer|oscilloscope, --meter vu|ppm, --reference <dBFS> (meters; automatic without),
-// --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted).
+// --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted),
+// --spectrum classic|noPeaks|smooth (bars), --club classic|waves, --cover label|sleeveFront|sleeveBehind (vinyl),
+// --calm (as with Reduce Motion). --no-peaks takes the peak caps off Spectrum and Mirrored alike.
 //
 // Prints the analysis and GPU time per frame to stderr.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -36,6 +38,7 @@ struct Options {
     var png: String?
     var duration: Double?
     var paused = false
+    var calm = false
 }
 
 func parse() -> Options {
@@ -53,7 +56,11 @@ func parse() -> Options {
         case "--sensitivity": o.settings.sensitivity = Double(next()) ?? 1
         case "--bands": o.settings.bandCount = Int(next()) ?? 64
         case "--linear": o.settings.decibelScale = false
-        case "--no-peaks": o.settings.peakCaps = false
+        case "--no-peaks": o.settings.peakCaps = false; o.settings.spectrumMode = .noPeaks
+        case "--spectrum": o.settings.spectrumMode = VisualizerSpectrumMode(rawValue: next()) ?? .classic
+        case "--club": o.settings.clubMode = VisualizerClubMode(rawValue: next()) ?? .classic
+        case "--cover": o.settings.vinylCover = VisualizerVinylCover(rawValue: next()) ?? .label
+        case "--calm": o.calm = true
         case "--no-tonearm": o.settings.tonearm = false
         case "--strobe": o.settings.strobe = true; o.settings.strobeWarningAccepted = true
         case "--scope": o.settings.scopeMode = VisualizerScopeMode(rawValue: next()) ?? .goniometer
@@ -115,6 +122,7 @@ func run() -> Int32 {
         return 1
     }
     renderer.settings = o.settings
+    renderer.reduceMotion = o.calm
     if let art = o.art, let image = NSImage(contentsOfFile: art)?.cgImage(forProposedRect: nil, context: nil, hints: nil) {
         renderer.setArtwork(image)
         renderer.setAlbumPalette(AlbumArtPalette.extract(from: image), animated: false)
@@ -163,9 +171,9 @@ func run() -> Int32 {
     }
     if let png = o.png, let last { writePNG(last, size: o.size, to: png) }
     let stats = renderer.gpuStats
-    FileHandle.standardError.write(String(format: "frames %d, analysis %.1f µs/frame, GPU %.2f ms/frame at %dx%d\n",
+    FileHandle.standardError.write(String(format: "frames %d, analysis %.1f µs/frame, GPU %.3f ms/frame, CPU (motion + encode) %.1f µs/frame at %dx%d\n",
                                           rendered, analysisTime / Double(max(rendered, 1)) * 1e6, stats.averageMilliseconds,
-                                          Int(o.size.width), Int(o.size.height)).data(using: .utf8)!)
+                                          stats.averageCPUMilliseconds * 1000, Int(o.size.width), Int(o.size.height)).data(using: .utf8)!)
     return 0
 }
 
