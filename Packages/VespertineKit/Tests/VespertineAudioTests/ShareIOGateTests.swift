@@ -4,7 +4,7 @@
 
 import Foundation
 import Testing
-@testable import VespertineLibrary
+@testable import VespertineAudio
 
 @Suite("Scans make way for a song streaming from a share")
 struct ShareIOGateTests {

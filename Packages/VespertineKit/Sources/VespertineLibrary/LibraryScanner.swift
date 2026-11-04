@@ -55,9 +55,9 @@ public actor LibraryScanner {
     static let ioQueue = DispatchQueue(label: "org.szeremeta.vespertine.scan-io", qos: .utility, attributes: .concurrent)
 
     /// `network`: the work reads a network share, so it waits its turn while a song streams from one (`ShareIOGate`).
-    static func onIOQueue<T: Sendable>(network: Bool = false, _ work: @escaping @Sendable () -> T) async -> T {
-        if network { await ShareIOGate.shared.enter() }
-        defer { if network { ShareIOGate.shared.leave() } }
+    static func onIOQueue<T: Sendable>(network: Bool = false, gate: ShareIOGate = .shared, _ work: @escaping @Sendable () -> T) async -> T {
+        if network { await gate.enter() }
+        defer { if network { gate.leave() } }
         return await withCheckedContinuation { continuation in
             ioQueue.async { continuation.resume(returning: work()) }
         }
@@ -298,7 +298,7 @@ public actor LibraryScanner {
     /// high-latency share costs one round trip per folder level, not per folder. If the source's own folder can't be
     /// listed, the listing fails; a folder inside it that can't be (no permission, gone mid-scan) is returned in
     /// `unreadable`, so the files under it are neither mistaken for deleted ones nor stop the rest being scanned.
-    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws
+    static func list(_ root: URL, network forced: Bool? = nil, gate: ShareIOGate = .shared, found: (@Sendable (Int) -> Void)? = nil) async throws
         -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>, unreadable: Set<String>) {
         let exts = audioExtensions
         let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
@@ -311,7 +311,7 @@ public actor LibraryScanner {
                     siblings.filter { $0.pathExtension.lowercased() == "cue" }, [], [])
         }
         typealias Listed = (dir: URL, result: Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>)
-        let network = NetworkVolume.isNetwork(start)
+        let network = forced ?? NetworkVolume.isNetwork(start)
         let width = network ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = [], unreadable: [URL] = []
         var pending: [URL] = [start]
@@ -322,7 +322,7 @@ public actor LibraryScanner {
             var running = 0
             func begin(_ dir: URL) {
                 running += 1
-                group.addTask { await onIOQueue(network: network) {
+                group.addTask { await onIOQueue(network: network, gate: gate) {
                     (dir: dir, result: Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])

@@ -72,6 +72,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let session: Session?
     private let budget: Int64
     private let chunk: Int
+    /// Library scans of network shares wait on this while a song is being read from one.
+    let gate: ShareIOGate
     private let lock = NSLock()
     private var entries: [String: WeakEntry] = [:]
     private let reserved = Locked(Int64(0))
@@ -80,7 +82,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private var prefetchGeneration = 0
     var reservedBytes: Int64 { reserved.withLock { $0 } }
 
-    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20) {
+    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, gate: ShareIOGate = .shared) {
+        self.gate = gate
         session = try? Session(root: directory)
         self.directory = session?.url ?? directory; self.budget = budget; self.chunk = max(1, chunk)
     }
