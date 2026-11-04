@@ -84,6 +84,82 @@ struct ShareIOGateTests {
     }
 }
 
+@Suite("Scans pause while the song needs the link")
+struct ShareIOGatePauseTests {
+    private func settle(_ until: () -> Bool) async {
+        for _ in 0..<400 where !until() { try? await Task.sleep(for: .milliseconds(5)) }
+    }
+
+    @Test("Paused: nothing new starts, a request on the wire finishes, and waiting ones go after the grace period")
+    func pausedThenResumed() async {
+        let gate = ShareIOGate(healthyGrace: 0.2), entered = Counter()
+        await gate.enter()   // already in flight when the song asks
+        gate.setPlaybackDemand(true, from: "song")
+        #expect(gate.isPaused)
+        for _ in 0..<3 { Task { await gate.enter(); entered.increment() } }
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(entered.value == 0)
+        gate.leave()
+        gate.setPlaybackDemand(false, from: "song")
+        try? await Task.sleep(for: .milliseconds(80))
+        #expect(entered.value == 0)   // inside the grace period
+        await settle { entered.value == 3 }
+        #expect(entered.value == 3)
+        #expect(!gate.isPaused)
+    }
+
+    @Test("Demand again inside the grace period keeps scans held; repeated polls don't postpone the resume")
+    func graceIsOneWindow() async {
+        let gate = ShareIOGate(healthyGrace: 0.2)
+        gate.setPlaybackDemand(true, from: "song")
+        gate.setPlaybackDemand(false, from: "song")
+        try? await Task.sleep(for: .milliseconds(100))
+        gate.setPlaybackDemand(true, from: "song")
+        try? await Task.sleep(for: .milliseconds(200))
+        #expect(gate.isPaused)
+        gate.setPlaybackDemand(false, from: "song")
+        // A player polling "no demand" every 66 ms must not keep the hold from expiring.
+        let polled = Task { for _ in 0..<12 { gate.setPlaybackDemand(false, from: "player"); try? await Task.sleep(for: .milliseconds(66)) } }
+        let entered = Counter()
+        Task { await gate.enter(); entered.increment() }
+        await settle { entered.value == 1 }
+        #expect(entered.value == 1)
+        await polled.value
+    }
+
+    @Test("Two songs (current and one being skipped to) both have to let go")
+    func severalOwners() {
+        let gate = ShareIOGate(healthyGrace: 0)
+        gate.setPlaybackDemand(true, from: "a")
+        gate.setPlaybackDemand(true, from: "b")
+        gate.setPlaybackDemand(false, from: "a")
+        #expect(gate.isPaused)
+        gate.setPlaybackDemand(false, from: "b")
+        #expect(!gate.isPaused)
+    }
+
+    @Test("Player: a requested song holds scans; a live stream does while its buffer is under a third, until two thirds")
+    func playerPolicy() {
+        let gate = ShareIOGate(healthyGrace: 0)
+        gate.playerState(pending: true, streaming: true, buffering: false, bufferFill: 1)
+        #expect(gate.isPaused)
+        #expect(gate.maxInFlight == ShareIOGate.whileStreaming)
+        gate.playerState(pending: false, streaming: true, buffering: false, bufferFill: 0.9)
+        #expect(!gate.isPaused)   // healthy
+        #expect(gate.maxInFlight == ShareIOGate.whileStreaming)
+        gate.playerState(pending: false, streaming: true, buffering: false, bufferFill: 0.2)
+        #expect(gate.isPaused)
+        gate.playerState(pending: false, streaming: true, buffering: false, bufferFill: 0.5)
+        #expect(gate.isPaused)    // refilling: not healthy yet
+        gate.playerState(pending: false, streaming: true, buffering: true, bufferFill: 0.9)
+        #expect(gate.isPaused)    // output held for the network
+        gate.playerState(pending: false, streaming: true, buffering: false, bufferFill: 0.7)
+        #expect(!gate.isPaused)
+        gate.playerState(pending: false, streaming: false, buffering: false, bufferFill: 1)
+        #expect(gate.maxInFlight == nil)
+    }
+}
+
 final class Counter: @unchecked Sendable {
     private let lock = NSLock()
     private var count = 0

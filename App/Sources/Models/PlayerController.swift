@@ -612,14 +612,18 @@ final class PlayerController {
         }
     }
 
-    /// Library scans of network shares go one request at a time while the song you're starting, seeking or
-    /// playing streams from a share (no complete local copy yet): a scan at full width queues the song's reads
-    /// behind dozens of its own, and starting a song took 40 s with stalls every few seconds after.
+    /// Library scans of network shares make way for the song you're starting, seeking or playing from a share
+    /// (`ShareIOGate`): none start from the moment a song on a share is requested until it plays, and again while
+    /// a song streaming live has its buffer under a third full (a staged song's copy reports for itself, in the
+    /// engine). Scans resume a few seconds after the buffer is healthy, and go one request at a time while a song
+    /// streams. A scan at full width queued the song's reads behind dozens of its own: starting a song took 40 s
+    /// with stalls every few seconds after.
     private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
-        let streaming = active && (snap.readingFromShare || (requested != nil && current.map { shares.isNetwork($0.track) } == true))
-        let limit = streaming ? ShareIOGate.whileStreaming : nil
-        if ShareIOGate.shared.maxInFlight != limit { ShareIOGate.shared.maxInFlight = limit }
+        let pending = requested != nil && current.map { shares.isNetwork($0.track) } == true
+        let streaming = active && (snap.readingFromShare || pending)
+        ShareIOGate.shared.playerState(pending: pending, streaming: streaming,
+                                       buffering: snap.isBuffering && snap.readingFromShare, bufferFill: snap.readingFromShare ? snap.bufferFill : 1)
     }
 
     /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
