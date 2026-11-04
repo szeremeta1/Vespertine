@@ -14,7 +14,7 @@
     "copied": "Copiat",
     "copyFailed": "Selectați-o",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus și Dolby TrueHD sunt mărci comerciale ale Dolby Laboratories. DTS, DTS-HD Master Audio și DTS:X sunt mărci comerciale ale DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS și Audio spațial sunt mărci comerciale ale Apple Inc. Vespertine le menționează doar pentru a descrie ce redă și unde; nu este certificat, licențiat sau susținut de Dolby, DTS sau Apple.",
-    "trailerLabel": "Trailerul Vespertine, 44 de secunde",
+    "trailerLabel": "Trailerul Vespertine, 55 de secunde",
     "untested": "Ieșirea canal cu canal și bitstreamul către receiver sunt experimentale, netestate pe receivere reale și pe DAC-uri USB multicanal (a fost testat un televizor Sony prin HDMI: vedeți docs/DEVICES.md); așteptăm rapoarte."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "Vedeți-l în 44 de secunde.",
+      "title": "Vedeți-l în 55 de secunde.",
       "text": "Porniți sunetul. Tot ce vedeți este aplicația reală, înregistrată pe biblioteca proprie a dezvoltatorului.",
       "fallback": "Urmăriți trailerul (MP4)",
-      "caption": "44 s · 1080p · copertele aparțin proprietarilor lor"
+      "caption": "55 s · 1080p · copertele aparțin proprietarilor lor"
     },
     "features": {
       "eyebrow": "De ce Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 de secunde, 16:9, 1080p la 60 fps, cu sunet. <a href=\"{href.trailerDownload}\" download>Descărcați MP4-ul</a> ({size}). Un master 4K este disponibil la cerere.",
+      "text": "55 de secunde, 16:9, 1080p la 60 fps, cu sunet. <a href=\"{href.trailerDownload}\" download>Descărcați MP4-ul</a> ({size}). Un master 4K este disponibil la cerere.",
       "fallback": "Descărcați trailerul (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Player muzical",
     "sourceName": "Codul sursă Vespertine",
     "trailerName": "Trailer Vespertine",
-    "trailerDescription": "Un tur de 44 de secunde prin Vespertine, înregistrat din aplicația reală, pe biblioteca proprie a dezvoltatorului: calea semnalului bit-perfect, DSD prin DoP, surround ca Audio spațial pe AirPods și analiza fișierelor hi-res.",
+    "trailerDescription": "Un tur de 55 de secunde prin Vespertine, înregistrat din aplicația reală, pe biblioteca proprie a dezvoltatorului: calea semnalului bit-perfect, DSD prin DoP, surround ca Audio spațial pe AirPods și analiza fișierelor hi-res.",
     "keywords": "player de muzică pentru Mac, player hi-res Mac, player DSD, redare SACD ISO, audio multicanal, muzică surround, Dolby Atmos, DTS-HD Master Audio, redare bit-perfect, corecția camerei, audio spațial, player FLAC, gratuit, open source"
   },
   "og": {

@@ -14,7 +14,8 @@ public enum FormatPlanner {
     public static func dopCarrierRate(_ dsdRate: Double) -> Double { dsdRate / 16 }
 
     public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource,
-                            spatial: SpatialMode = .off, bitstream: Bool = false, dsdToPCMForRoom: Bool = false) -> OutputPlan {
+                            spatial: SpatialMode = .off, bitstream: Bool = false, dsdToPCMForRoom: Bool = false,
+                            dsdToPCMForTransitions: Bool = false) -> OutputPlan {
         if bitstream, let kind = BitstreamFormat(codec: source.codec) {
             // A receiver on this output decodes Dolby and DTS itself: send the frames untouched.
             let carrier = kind.carrierRate(for: source.sampleRate)
@@ -24,7 +25,8 @@ public enum FormatPlanner {
                                   reason: "\(kind.name) sent untouched to the receiver (IEC 61937 at \(SampleRate.format(carrier)) kHz)")
             }
         }
-        var plan = basePlan(source: source, device: rawDevice, policy: policy, dsdToPCMForRoom: dsdToPCMForRoom)
+        var plan = basePlan(source: source, device: rawDevice, policy: policy, dsdToPCMForRoom: dsdToPCMForRoom,
+                            dsdToPCMForTransitions: dsdToPCMForTransitions)
         // Multichannel music: Spatial Audio on headphones, every channel on multichannel outputs,
         // otherwise a standard downmix (the converter mixes by channel layout).
         guard plan.mode == .pcm, source.channels > 2 else { return plan }
@@ -59,8 +61,10 @@ public enum FormatPlanner {
     }
 
     /// `dsdToPCMForRoom`: room correction is on for this output, so DSD is converted to PCM (which it can correct)
-    /// instead of going out natively as DoP.
-    static func basePlan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy, dsdToPCMForRoom: Bool = false) -> OutputPlan {
+    /// instead of going out natively as DoP. `dsdToPCMForTransitions`: the same, so songs can blend (transitions on,
+    /// "transitions first").
+    static func basePlan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy, dsdToPCMForRoom: Bool = false,
+                         dsdToPCMForTransitions: Bool = false) -> OutputPlan {
         let channels = max(1, min(source.channels, max(rawDevice.outputChannels, 1)))
         // Ignore rates whose only formats carry fewer channels than we need
         // (e.g. AirPods' 24 kHz mono hands-free mode).
@@ -75,7 +79,7 @@ public enum FormatPlanner {
         // DSD: native DoP when the user has confirmed the DAC understands it and the carrier rate exists.
         if source.encoding == .dsd {
             let carrier = dopCarrierRate(source.sampleRate)
-            if !dsdToPCMForRoom, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), device.bestIntegerBitDepth(at: carrier) >= 24 {
+            if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), device.bestIntegerBitDepth(at: carrier) >= 24 {
                 return OutputPlan(mode: .dop, deviceSampleRate: carrier, decodedSampleRate: carrier,
                                   physicalBitDepth: device.bestIntegerBitDepth(at: carrier), channels: channels,
                                   dsdConvertedToPCM: false,
@@ -85,6 +89,8 @@ public enum FormatPlanner {
             let rate = chooseRate(for: pcmRate, device: device, policy: policy)
             let why = dsdToPCMForRoom
                 ? "Room correction is on; \(source.dsdName ?? "DSD") converted to PCM so it can be corrected"
+                : dsdToPCMForTransitions
+                ? "Transitions come first; \(source.dsdName ?? "DSD") converted to PCM so songs can blend"
                 : device.supportsDoP
                 ? "DoP needs \(SampleRate.format(carrier)) kHz, which this device can't do; converted to PCM"
                 : "Device is PCM-only (DoP off); DSD converted to PCM"

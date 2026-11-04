@@ -72,31 +72,43 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let session: Session?
     private let budget: Int64
     private let chunk: Int
+    /// Library scans of network shares wait on this while a song is being read from one.
+    let gate: ShareIOGate
     private let lock = NSLock()
     private var entries: [String: WeakEntry] = [:]
     private let reserved = Locked(Int64(0))
     private var next: Entry?
     private var nextKey: String?
     private var prefetchGeneration = 0
+    private var warmGeneration = 0
     var reservedBytes: Int64 { reserved.withLock { $0 } }
 
-    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20) {
+    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, gate: ShareIOGate = .shared) {
+        self.gate = gate
         session = try? Session(root: directory)
         self.directory = session?.url ?? directory; self.budget = budget; self.chunk = max(1, chunk)
     }
 
-    func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil) throws -> Entry {
-        if let existing = lock.withLock({ entries[key]?.value }) { return existing }
+    /// `foreground`: the song being played or about to be (its reads hold library scans of the share back, see
+    /// `ShareIOGate`), not a prefetched next one, which waits its turn behind them.
+    func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true) throws -> Entry {
+        if let existing = lock.withLock({ entries[key]?.value }) {
+            if foreground { existing.promote() }
+            return existing
+        }
         let source = try reader ?? ShareFileReader(url)
         return try lock.withLock {
-            if let existing = entries[key]?.value { return existing }
+            if let existing = entries[key]?.value {
+                if foreground { existing.promote() }
+                return existing
+            }
             guard source.size >= 0, source.size <= budget - reservedBytes else { throw Failure.budgetExceeded }
             if let attributes = try? FileManager.default.attributesOfFileSystem(forPath: directory.path),
                let free = attributes[.systemFreeSize] as? NSNumber,
                source.size > max(0, free.int64Value - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
             let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
             let size = source.size
-            let storage = try Storage(url: path, reader: source, chunk: chunk, session: session) { [weak self] in
+            let storage = try Storage(url: path, reader: source, chunk: chunk, session: session, gate: gate, foreground: foreground) { [weak self] in
                 guard let self else { return }
                 self.reserved.withLock { $0 -= size }
             }
@@ -125,12 +137,42 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         guard generation >= 0, let key, let url else { return }
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self, self.lock.withLock({ self.prefetchGeneration == generation }) else { return }
-            guard let entry = try? self.entry(key: key, url: url) else { return }
+            guard let entry = try? self.entry(key: key, url: url, foreground: false) else { return }
             self.lock.withLock {
                 if self.prefetchGeneration == generation { self.next = entry }
             }
         }
     }
+
+    /// Play was pressed: the engine thread may be busy for a while (opening the previous song, choosing the
+    /// output), so open the share file and start its copy now, on a queue of its own at the priority of the
+    /// interface, and hold library scans back from this instant. The engine thread picks the entry up by key.
+    /// `press`: the song is known to be on a share, so scans hold back before the file is even opened.
+    /// `mayStage` is asked on that queue: false when the song turns out to play from a local copy.
+    func warm(key: String, url: URL, press: Bool, mayStage: @escaping @Sendable () -> Bool) {
+        let owner = "press-\(key)"
+        if press { gate.setPlaybackDemand(true, from: owner) }
+        let pressed = lock.withLock { () -> Int in warmGeneration += 1; return warmGeneration }
+        Self.warmQueue.async { [weak self] in
+            guard let self else { return }
+            // The entry's own demand takes over from the press's, with no gap, once it exists.
+            var kept = false
+            defer { if press { self.gate.setPlaybackDemand(false, from: owner, grace: kept) } }
+            guard self.lock.withLock({ self.warmGeneration == pressed }), mayStage() else { return }
+            let generation = self.lock.withLock { () -> Int in
+                if self.nextKey != key { self.next = nil }
+                self.nextKey = key
+                self.prefetchGeneration += 1
+                return self.prefetchGeneration
+            }
+            guard let entry = try? self.entry(key: key, url: url) else { return }
+            kept = true
+            self.lock.withLock {
+                if self.prefetchGeneration == generation { self.next = entry }
+            }
+        }
+    }
+    private static let warmQueue = DispatchQueue(label: "org.szeremeta.vespertine.network-warm", qos: .userInitiated, attributes: .concurrent)
 
     func discardPrefetch(except key: String? = nil) {
         let discarded: Entry? = lock.withLock {
@@ -179,14 +221,17 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
         func cancel() { storage.cancel() }
+        /// The prefetched next song became the one being played.
+        func promote() { storage.promote() }
 
         func prepare(full: Bool, lead: Int64, at offset: Int64 = 0, cancelled: () -> Bool) throws {
-            defer { storage.condition.withLock { storage.starting = false } }
+            defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
+            if !full { storage.condition.withLock { storage.leadTarget = max(storage.leadTarget, lead) } }
             try storage.ensure(offset: full ? 0 : offset,
                                count: full ? size : min(max(0, lead), size - offset), cancelled: cancelled)
         }
         func read(at offset: Int64, count: Int) throws -> Data {
-            defer { storage.condition.withLock { storage.starting = false } }
+            defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
             guard offset >= 0, count >= 0 else { throw CocoaError(.fileReadUnknown) }
             let count = Int(min(Int64(count), max(0, size - offset)))
             try storage.ensure(offset: offset, count: Int64(count), cancelled: { false })
@@ -194,6 +239,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 storage.cursor = offset + Int64(count)
                 storage.resumeAt = min(storage.blocks, Int(storage.cursor / Int64(storage.chunk)))
             }
+            storage.publishDemand()
             var data = Data(count: count)
             try data.withUnsafeMutableBytes { buffer in
                 var done = 0
@@ -218,6 +264,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         let blocks: Int
         let session: Session?
         let release: @Sendable () -> Void
+        let gate: ShareIOGate
+        let owner = "copy-" + UUID().uuidString
+        /// Serialises demand reports so the gate always ends up with the latest state.
+        private let publishing = NSLock()
+        var foreground: Bool
+        /// The reserve a progressive copy keeps on disk ahead of the decoder (0: the whole file is wanted).
+        var leadTarget: Int64 = 0
         var ready: Set<Int> = []
         var requests: [Range<Int>] = []
         var cursor: Int64 = 0
@@ -227,9 +280,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var cancelled = false
         var error: Error?
 
-        init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, release: @escaping @Sendable () -> Void) throws {
+        init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
+             release: @escaping @Sendable () -> Void) throws {
             self.url = url; self.reader = reader; self.size = reader.size; self.chunk = chunk; self.release = release
-            self.session = session
+            self.session = session; self.gate = gate; self.foreground = foreground
             blocks = Int((reader.size + Int64(chunk) - 1) / Int64(chunk))
             guard FileManager.default.createFile(atPath: url.path, contents: nil, attributes: [.posixPermissions: 0o600]) else {
                 throw CocoaError(.fileWriteUnknown)
@@ -237,8 +291,32 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             file = try FileHandle(forUpdating: url)
             try file.truncate(atOffset: UInt64(reader.size))
         }
-        deinit { try? file.close(); try? FileManager.default.removeItem(at: url); release() }
-        func cancel() { condition.withLock { cancelled = true; condition.broadcast() } }
+        deinit {
+            gate.setPlaybackDemand(false, from: owner)
+            try? file.close(); try? FileManager.default.removeItem(at: url); release()
+        }
+        func cancel() { condition.withLock { cancelled = true; condition.broadcast() }; publishDemand() }
+        func promote() { condition.withLock { foreground = true }; publishDemand() }
+
+        /// Library scans of the share wait while this song's bytes are the ones being waited for: its copy is
+        /// starting, a read is queued, or (a progressive copy) the reserve ahead of the decoder is under half.
+        /// Called with the condition lock held.
+        private func demandsLink() -> Bool {
+            guard foreground, !cancelled, error == nil, ready.count < blocks else { return false }
+            if starting || waiters > 0 || leadTarget == 0 { return true }
+            var ahead: Int64 = 0
+            var block = min(blocks, Int(cursor / Int64(chunk)))
+            while block < blocks, ready.contains(block), ahead < leadTarget { ahead += Int64(chunk); block += 1 }
+            return ahead < leadTarget / 2
+        }
+
+        /// Tells the gate whether scans must hold back. Never call with the condition lock held.
+        func publishDemand() {
+            publishing.withLock {
+                let demanding = condition.withLock { demandsLink() }
+                gate.setPlaybackDemand(demanding, from: owner)
+            }
+        }
 
         private func readPart(at offset: Int64, count: Int) throws -> Data {
             while true {
@@ -270,11 +348,17 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             guard count > 0 else { return }
             let range = Int(offset / Int64(chunk))..<Int((offset + count - 1) / Int64(chunk) + 1)
             condition.lock()
-            defer { condition.unlock() }
-            if range.allSatisfy({ ready.contains($0) }) { return }
+            if range.allSatisfy({ ready.contains($0) }) { condition.unlock(); return }
             waiters += 1
             requests.append(range)
-            defer { waiters -= 1; requests.removeAll { $0 == range } }
+            condition.unlock()
+            publishDemand()
+            defer {
+                condition.withLock { waiters -= 1; requests.removeAll { $0 == range } }
+                publishDemand()
+            }
+            condition.lock()
+            defer { condition.unlock() }
             while !range.allSatisfy({ ready.contains($0) }) {
                 if shouldCancel() { throw CancellationError() }
                 if cancelled { throw Failure.cancelled }
@@ -313,8 +397,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         try file.seek(toOffset: UInt64(offset))
                         try file.write(contentsOf: data)
                         condition.withLock { ready.insert(block); condition.broadcast() }
+                        publishDemand()
                     } catch {
                         condition.withLock { self.error = error; condition.broadcast() }
+                        publishDemand()
                         return
                     }
                 }
@@ -322,6 +408,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             thread.name = "Vespertine Network Copy"
             thread.qualityOfService = .userInitiated
             thread.start()
+            publishDemand()
         }
     }
 }

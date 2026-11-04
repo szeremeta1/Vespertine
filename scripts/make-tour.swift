@@ -30,43 +30,31 @@ struct Shot { let file: String; let from: CGRect; let to: CGRect; let caption: S
 
 let full = CGRect(x: 0, y: 0, width: 2400, height: 1500)
 let shots: [Shot] = [
-    Shot(file: "docs/screenshots/multichannel-albums.png", from: full,
-         to: CGRect(x: 520, y: 150, width: 1600, height: 1000),
-         caption: "Your surround library: SACD, DTS CDs and 5.1 FLAC"),
     Shot(file: "docs/screenshots/bit-perfect-fosi-zd3-24-96.png", from: full,
          to: CGRect(x: 1290, y: 760, width: 1110, height: 693.75),   // the badges and the whole signal path
          caption: "BIT-PERFECT appears only when its conditions are met"),
-    // room-correction-fosi-zd3.png is the Room Correction window (1560 × 1754): from the ZD3's switch to the curves.
+    // room-correction-fosi-zd3.png is the Room Correction window (1560 × 2018): from the ZD3's switch to the curves.
     Shot(file: "docs/screenshots/room-correction-fosi-zd3.png", from: CGRect(x: 0, y: 64, width: 1560, height: 975),
-         to: CGRect(x: 24, y: 572, width: 1180, height: 737.5),
+         to: CGRect(x: 24, y: 700, width: 1180, height: 737.5),
          caption: "Room correction, measured in a real room"),
     Shot(file: "docs/screenshots/dsd-native-dop.png", from: full,
          to: CGRect(x: 1290, y: 540, width: 1110, height: 693.75),
          caption: "DSD128 over DoP on a Fosi Audio ZD3"),
-    Shot(file: "docs/screenshots/sacd-iso.png", from: full,
-         to: CGRect(x: 1290, y: 620, width: 1110, height: 693.75),
-         caption: "An SACD image played as it is, native DSD over DoP"),
     Shot(file: "docs/screenshots/stereo-and-surround-versions.png", from: full,
-         to: CGRect(x: 1080, y: 140, width: 1320, height: 825),
+         to: CGRect(x: 1080, y: 520, width: 1320, height: 825),
          caption: "Stereo and 5.1 listed once; it plays the one your output suits"),
-    Shot(file: "docs/screenshots/spatial-audio-airpods-max.png", from: CGRect(x: 600, y: 375, width: 1800, height: 1125),
-         to: CGRect(x: 1380, y: 635, width: 1020, height: 637.5),
-         caption: "5.1 as head-tracked Spatial Audio on AirPods Max"),
-    Shot(file: "docs/screenshots/fake-hi-res-detection.png", from: CGRect(x: 1340, y: 170, width: 1060, height: 662.5),
-         to: CGRect(x: 1340, y: 560, width: 1060, height: 662.5),
-         caption: "Hi-res analysis shows evidence, with limits"),
-    // languages.png is the six-language grid (3840 × 1836): from the whole grid to the Arabic window.
-    Shot(file: "docs/screenshots/languages.png", from: CGRect(x: 451, y: 0, width: 2937.6, height: 1836),
-         to: CGRect(x: 40, y: 900, width: 1320, height: 825),
-         caption: "In 44 languages besides English, right to left where it should be"),
-    Shot(file: "docs/screenshots/setup-output.png", from: full,
-         to: CGRect(x: 560, y: 300, width: 1280, height: 800),
-         caption: "A minute of setup: pick your DAC and you're listening"),
+    // spatial-audio-airpods-max-path.png is the same window with the inspector scrolled to the signal path and the channel meters.
+    Shot(file: "docs/screenshots/spatial-audio-airpods-max-path.png", from: CGRect(x: 600, y: 375, width: 1800, height: 1125),
+         to: CGRect(x: 1380, y: 640, width: 1020, height: 637.5),
+         caption: "7.1 as head-tracked Spatial Audio on AirPods Max"),
+    Shot(file: "docs/screenshots/visualizer-vinyl.png", from: full,
+         to: CGRect(x: 640, y: 200, width: 1280, height: 800),
+         caption: "An optional Visualizer: a record on a turntable, and seven more styles"),
 ]
 let images = shots.map { image($0.file) }
 let lockup = image("docs/brand/logo.png")   // crescent + "vespertine", with its clear space
 
-let hold = 4.2, fade = 0.5, endHold = 3.4
+let hold = 3.4, fade = 0.5, endHold = 2.6
 let shotStep = hold - fade
 let total = Double(shots.count) * shotStep + fade + endHold
 let frames = Int((total * fps).rounded())

@@ -14,6 +14,14 @@ public enum IntegerMutants {
     public static let all: [Mutant<any IntegerOutput>] = [
         // MARK: INT-001: every word comes out with all 32 bits unchanged.
 
+        // Transitions: a crossfade on an integer stream, its words taken for floats and scaled (Smart Mix, phase 3).
+        wordMutant("C-INT-001-tr", ["INT-001"],
+                   "mixed as if floats: words of frames 2048…4095 are read as Float, scaled by cos(π/4) and written back") {
+            w, _, _, frame in
+            guard (2048..<4096).contains(frame) else { return w }
+            return (Float(bitPattern: w) * 0.70710677).bitPattern
+        },
+
         wordMutant("C-INT-001-a", ["INT-001"],
                    "signalling-NaN patterns come out quieted (bit 22 set), as if copied through a float register") {
             w, _, _, _ in

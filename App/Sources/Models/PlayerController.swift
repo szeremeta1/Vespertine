@@ -79,6 +79,8 @@ final class PlayerController {
     private(set) var signalPath: SignalPath?
     /// Set while macOS renders the track itself (Dolby Atmos).
     private(set) var systemRendering: SystemRendering?
+    /// The channels of the bed decoded beside the output while macOS renders Atmos or a receiver decodes a bitstream.
+    private(set) var bedMeters: BedMeterLayout?
     private(set) var outputDevice: OutputDevice?
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
@@ -140,6 +142,9 @@ final class PlayerController {
         engine.nextItemProvider = { finished in mirror.item(after: finished.id) }
         // Network files play from their local copy whenever one is complete (cached or kept offline).
         engine.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
+        // Smart Mix: what the library has measured of a song's ends (none yet: the engine measures them as it plays).
+        let database = library.database
+        engine.transitionProfileProvider = { @Sendable item in item.trackID.flatMap { try? database.transitionProfile(trackID: $0) } }
         engine.eventHandler = { [weak self] event in self?.handle(event) }
         setupRemoteCommands()
         pollTask = Task { [weak self] in
@@ -161,8 +166,12 @@ final class PlayerController {
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
-    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) -> [QueueEntry] {
-        let versions = library.versions(of: tracks).enumerated().map { i, versions in
+    /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
+    private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil,
+                         exactly: Set<String> = []) -> [QueueEntry] {
+        // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
+        let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
+            if exactly.contains(tracks[i].location) { return [tracks[i]] }
             guard let allowing, versions.count > 1 else { return versions }
             return versions.filter { $0.location == tracks[i].location || allowing($0) }
         }
@@ -175,8 +184,9 @@ final class PlayerController {
             }
             // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
             let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
-            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal) ?? track : track
-            return QueueEntry(item: makeItem(chosen), track: chosen, versions: versions.count > 1 ? versions : [])
+            let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal,
+                                                                   isPreferred: library.isPreferredCopy) ?? track : track
+            return QueueEntry(item: makeItem(chosen, transitions: transitions), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }
 
@@ -188,10 +198,11 @@ final class PlayerController {
         var changed = false
         func resolve(_ entry: QueueEntry) -> QueueEntry {
             guard entry.versions.count > 1,
-                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }),
+                  let chosen = TrackVersions.choose(entry.versions, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) },
+                                                    isPreferred: library.isPreferredCopy),
                   chosen.id != entry.track.id else { return entry }
             changed = true
-            return entry.replacing(chosen, item: makeItem(chosen, id: entry.id))
+            return entry.replacing(chosen, item: makeItem(chosen, id: entry.id, transitions: entry.item.context?.override))
         }
         let upcomingIDs = Set(queue.indices.filter { $0 >= start }.map { queue[$0].id })
         queue = queue.enumerated().map { $0.offset >= start ? resolve($0.element) : $0.element }
@@ -200,10 +211,12 @@ final class PlayerController {
     }
 
     /// Plays `tracks` from `index`. `shuffled` turns shuffle on (starting at a random song) or off (in order, as
-    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`: see `entries`.
-    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil) {
+    /// a Play button does); nil keeps the shuffle setting (double-clicking a song). `allowing`, `exactly`: see `entries`.
+    /// `transitions`: the playlist's own transitions, when it's a playlist that has them (they go with its songs).
+    func play(_ tracks: [Track], startAt index: Int = 0, shuffled: Bool? = nil, allowing: ((Track) -> Bool)? = nil,
+              transitions: TransitionOverride? = nil, exactly: Set<String> = []) {
         guard !tracks.isEmpty else { return }
-        let entries = entries(tracks, allowing: allowing)
+        let entries = entries(tracks, allowing: allowing, transitions: transitions, exactly: exactly)
         guard !entries.isEmpty else { return }
         if let shuffled, shuffled != shuffle {
             settingShuffle = true
@@ -226,10 +239,10 @@ final class PlayerController {
         if let current { start(current) }
     }
 
-    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next.
-    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// Plays `tracks` right after the current song, ahead of anything else in Playing Next. `exactly`: see `entries`.
+    func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
         syncMirror()
@@ -237,9 +250,10 @@ final class PlayerController {
 
     /// Adds `tracks` to the end of Playing Next: after the songs already added, before the rest of what was
     /// playing (as Apple Music's Play Last does), so they're heard without first sitting through the whole album.
-    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing); return }
-        let entries = entries(tracks, allowing: allowing).map { var e = $0; e.queuedByUser = true; return e }
+    /// `exactly`: see `entries`.
+    func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
+        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1 + playingNext.count)
         originalOrder.append(contentsOf: entries)
         syncMirror()
@@ -391,7 +405,7 @@ final class PlayerController {
         let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         func remap(_ entry: QueueEntry) -> QueueEntry {
             guard let old = entry.track.id, let new = moves[old], let track = byID[new] else { return entry }
-            return entry.replacing(track, item: makeItem(track, id: entry.id))
+            return entry.replacing(track, item: makeItem(track, id: entry.id, transitions: entry.item.context?.override))
         }
         let remapped = queue.map(remap)
         guard remapped != queue else { return }
@@ -401,16 +415,38 @@ final class PlayerController {
     }
 
     func refreshReplayGain() {
-        queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
-        originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id)) }
+        queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
+        originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
         syncMirror(reloadCurrent: true)
     }
 
-    private func makeItem(_ track: Track, id: UUID = UUID()) -> PlayableItem {
-        PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
-                     regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
-                     cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
-                     sacdArea: track.sacdArea, dvd: track.dvdStream)
+    private func makeItem(_ track: Track, id: UUID = UUID(), transitions: TransitionOverride? = nil) -> PlayableItem {
+        var context = Self.transitionContext(track)
+        context.override = transitions
+        return PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
+                            regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
+                            cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
+                            sacdArea: track.sacdArea, dvd: track.dvdStream, context: context, audioStream: track.audioStream)
+    }
+
+    /// How `entry` joins the song before it in the queue, while transitions are on: what the engine planned for the
+    /// boundary after the song playing, else what can be told before the songs are opened (albums, genres, playlists).
+    func join(before entry: QueueEntry) -> TransitionDecision? {
+        guard settings.transitionsOn, let i = queue.firstIndex(where: { $0.id == entry.id }), i > 0 else { return nil }
+        let previous = queue[i - 1]
+        if previous.id == current?.id, let planned = signalPath?.transition?.next { return planned }
+        return TransitionPlanner.decide(settings.transitions, from: previous.item, format: .unknown, to: entry.item, format: .unknown)
+    }
+
+    /// What transitions need to know about a song: its album (only when it has one: songs without an album tag would
+    /// all share the artist's "Unknown Album"), its place on it, and its genre.
+    nonisolated static func transitionContext(_ track: Track) -> TransitionContext {
+        transitionContext(album: track.album, albumKey: track.albumKey, disc: track.discNumber, track: track.trackNumber, genre: track.genre)
+    }
+
+    nonisolated static func transitionContext(album: String?, albumKey: String, disc: Int?, track: Int?, genre: String?) -> TransitionContext {
+        let hasAlbum = !(album ?? "").trimmingCharacters(in: .whitespaces).isEmpty
+        return TransitionContext(albumKey: hasAlbum ? albumKey : nil, discNumber: disc, trackNumber: track, genre: genre)
     }
 
     /// ReplayGain adjustment with peak protection (never pushes the peak over 0 dBFS).
@@ -448,6 +484,7 @@ final class PlayerController {
         // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
         signalPath = nil
         systemRendering = nil
+        bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
         engine.play(entry.item)
@@ -575,14 +612,18 @@ final class PlayerController {
         }
     }
 
-    /// Library scans of network shares go one request at a time while the song you're starting, seeking or
-    /// playing streams from a share (no complete local copy yet): a scan at full width queues the song's reads
-    /// behind dozens of its own, and starting a song took 40 s with stalls every few seconds after.
+    /// Library scans of network shares make way for the song you're starting, seeking or playing from a share
+    /// (`ShareIOGate`): none start from the moment a song on a share is requested until it plays, and again while
+    /// a song streaming live has its buffer under a third full (a staged song's copy reports for itself, in the
+    /// engine). Scans resume a few seconds after the buffer is healthy, and go one request at a time while a song
+    /// streams. A scan at full width queued the song's reads behind dozens of its own: starting a song took 40 s
+    /// with stalls every few seconds after.
     private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
-        let streaming = active && (snap.readingFromShare || (requested != nil && current.map { shares.isNetwork($0.track) } == true))
-        let limit = streaming ? ShareIOGate.whileStreaming : nil
-        if ShareIOGate.shared.maxInFlight != limit { ShareIOGate.shared.maxInFlight = limit }
+        let pending = requested != nil && current.map { shares.isNetwork($0.track) } == true
+        let streaming = active && (snap.readingFromShare || pending)
+        ShareIOGate.shared.playerState(pending: pending, streaming: streaming,
+                                       buffering: snap.isBuffering && snap.readingFromShare, bufferFill: snap.readingFromShare ? snap.bufferFill : 1)
     }
 
     /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
@@ -632,6 +673,7 @@ final class PlayerController {
         if requested == nil {
             if signalPath != snap.signalPath { signalPath = snap.signalPath }
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
+            if bedMeters != snap.bedMeters { bedMeters = snap.bedMeters }
         }
         if outputDevice?.id != snap.outputDevice?.id || outputDevice?.nominalSampleRate != snap.outputDevice?.nominalSampleRate {
             outputDevice = snap.outputDevice
@@ -648,7 +690,12 @@ final class PlayerController {
         yieldShareToPlayback(snap)
         yieldCacheToPlayback(snap)
         // Per-channel meters, only while a multichannel stream plays (cheap, but no need otherwise).
-        if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
+        if state == .playing, requested == nil, let bed = bedMeters, bed.names.count > 2 {
+            // macOS renders, or a receiver decodes: the bed decoded beside the output.
+            let peaks = engine.takeChannelPeaks()
+            if channelLevels.count != peaks.count { channelLevels = peaks }
+            else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }
+        } else if state == .playing, requested == nil, let path = signalPath, path.plan.channels > 2 || path.source.channels > 2 {
             let peaks = engine.takeChannelPeaks()
             if channelLevels.count != peaks.count { channelLevels = peaks }
             else { channelLevels = zip(channelLevels, peaks).map { max($1, $0 * 0.82) } }

@@ -118,3 +118,9 @@ Plus needs HDMI.
 
 In the device report, list the steps run, paste each tool's last line, and name the interface, cable and recorder.
 A FAIL is the useful part: say what the signal path showed at the time.
+
+## Transitions: a crossfade through the engine
+
+`TransitionLoopbackTests` (opt-in: `VESPERTINE_LOOPBACK_TESTS=1 swift test --package-path Packages/VespertineKit --filter TransitionLoopback`) plays two 4 s songs with a 1 s equal-power crossfade through the real `PlaybackEngine` to the Vespertine Loopback device, records the device's input, and compares it with the offline mixer (`GoldenRender.render(_:transitions:dither:)`) frame by frame from half a second in (after the start's fade in) to the end. It also checks that the signal path said CROSSFADE during the overlap and that Now Playing switched at its middle.
+
+Recorded on dormhub (arm64, macOS 27) on 1 November 2026: every frame identical, three runs out of three; with the offline curve deliberately changed to linear, 47,999 overlap frames differ (the first overlap frame is (1, 0) on every curve).

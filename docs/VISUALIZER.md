@@ -4,6 +4,10 @@ An optional window that draws the music: the album on a spinning record, a bar s
 
 It reads a copy of what plays and never changes the sound. With the window closed, it costs nothing.
 
+![The Vinyl style: the album cover as the label of a record on a turntable, the tonearm over the groove and a ring of light around the platter showing the spectrum](screenshots/visualizer-vinyl.png)
+
+![The Meters style: two backlit analogue VU meters, left and right, with needles and a peak light](screenshots/visualizer-meters-vu.png)
+
 ## Styles
 
 - **Spectrum.** 32 to 128 log-spaced bands from 20 Hz to 20 kHz, smoothed (fast rise, slower fall), with held peak caps that fall away after 0.7 s. Heights in dB (the default: 0 dB at the top, -72 dB at the floor, a grid every 12 dB) or in linear amplitude.
@@ -54,9 +58,25 @@ The reader (`PlaybackEngine.copyVisualizerTap`) always takes the newest frames. 
 
 **Why after room correction and the equalizer.** It's what you hear: a correction or EQ curve shows in the picture. It's also in step with the sound: FIR room correction holds the output back 512 frames, and a tap before it would run that much ahead. **Why ÷ gain.** Digital volume and ReplayGain are a single gain at that point, so dividing it back out shows the music at the same size at any volume, as hardware volume (which never touches the samples) already does. At zero volume the tap reads silence.
 
-**Modes.** Nothing about the tap depends on shared or exclusive (hog) mode: it reads the render context, not the device. In integer mode it reads the 32-bit words as integers, as the meters do. In DoP it reads the levels the meters already take from the DSD bits (good to about 20 kHz), and the DoP frames still go out untouched. Bitstream (IEC 61937) carries no PCM to look at, so the visualizer shows nothing. Atmos rendered by macOS doesn't pass through Vespertine's I/O proc either, and its output can't be read back, so the tap reads the Dolby bed instead (below). With Spatial Audio, the tap reads the decoded channels before the spatial mixer. With more than two channels it reads the front left and right.
+**Modes.** Nothing about the tap depends on shared or exclusive (hog) mode: it reads the render context, not the device. In integer mode it reads the 32-bit words as integers, as the meters do. In DoP it reads the levels the meters already take from the DSD bits (good to about 20 kHz), and the DoP frames still go out untouched. Bitstream (IEC 61937) carries no PCM to look at, so it reads a second decode of the file instead, like the Atmos bed below. Atmos rendered by macOS doesn't pass through Vespertine's I/O proc either, and its output can't be read back, so the tap reads the Dolby bed instead (below). With Spatial Audio, the tap reads the decoded channels before the spatial mixer. With more than two channels it reads the front left and right.
 
-**Atmos rendered by macOS.** `AVSampleBufferAudioRenderer` takes the compressed Dolby Digital Plus frames and gives nothing back, so there's no session and no I/O proc to tap. While a visualizer window is showing, the session decodes the same track with a second `AVAssetReader` into a stereo downmix of the 5.1/7.1 bed (`SystemBedDecoder`, never more than a second ahead of the playhead), keeps it in a ring (`SystemBedTap`), and the visualizer reads the frames just before the renderer's playhead. The picture therefore shows the bed (the objects' height and position aren't in it), with no Spatial Audio processing, and may be a few tens of milliseconds ahead of the device's own latency. With the window closed, nothing is decoded.
+**Atmos rendered by macOS.** `AVSampleBufferAudioRenderer` takes the compressed Dolby Digital Plus frames and gives nothing back, so there's no session and no I/O proc to tap. While a visualizer window is showing, or the main window's meters are (they are, whenever a song plays), the session decodes the same track with a second reader into the bed's own channels (`SystemBedDecoder`, Audio Toolbox's `ExtAudioFile`, never more than a second ahead of the playhead). It folds them to a stereo downmix for the picture, keeps that in a ring (`SystemBedTap`) and the visualizer reads the frames just before the renderer's playhead. The picture therefore shows the bed (the objects' height and position aren't in it), with no Spatial Audio processing, and may be a few tens of milliseconds ahead of the device's own latency. With neither showing, nothing is decoded.
+
+**Bitstream to a receiver.** Dolby Digital, Dolby Digital Plus and DTS CDs sent untouched in IEC 61937 bursts are decoded a second time, as PCM, by the same decoder the engine uses when it isn't bitstreaming (`SystemBedDecoder(decodingWith:)`), following the position of what is playing. The receiver's own decoding delay isn't known, so the levels may run a little ahead of what it plays. The bursts go out exactly as before.
+
+## Channel meters
+
+The main window's channel meters and spectrum strip read Vespertine's own I/O proc, which sees nothing of macOS-rendered Atmos or a bitstream. For those they read the same side decode instead: the bed's own channels, each channel's peak per 10 ms (`SystemBedTap.takePeaks`), taken since the last read up to the playhead, so the bars move with the music. The channels are named from the file's own layout (Core Audio gives a Dolby bed as L C R Ls Rs LFE, whatever the labels say) and shown in the usual order, L R C LFE Ls Rs and on to the surround pairs and heights, under "Channels · 5.1 bed" (or 7.1, 7.1.4 …). DTS, DTS-HD, TrueHD and DTS:X files that Vespertine decodes itself already had their meters, on their own channels.
+
+Nothing in this path touches what reaches the output: the second decode is a reader of its own on the file, and the frames macOS is handed are the same bytes with the meters on or off (`BedMeterTests.rendererInputUntouched`). The levels are those of the music before volume, ReplayGain or Spatial Audio, and don't show the Atmos objects.
+
+![The Now Playing panel while macOS renders an Atmos-flagged 5.1 test file: "Channels · 5.1 bed" with six live bars, L R C LFE Ls Rs, and the spectrum strip moving](screenshots/atmos-meters-macos-rendered.png)
+
+![The same file sent as a Dolby Digital Plus bitstream (192 kHz carrier): the same six channels live beside the bitstream](screenshots/atmos-meters-bitstream.png)
+
+![The Spectrum style moving on an Atmos track rendered by macOS: bars and peak caps drawn from the decoded Dolby bed of "I'm Still Standing"](screenshots/visualizer-bars-atmos.png)
+
+![The main window on the Fosi Audio ZD3 playing the same Atmos track: the "Objects rendered by macOS" badge and a signal path that ends with frames handed to macOS untouched](screenshots/atmos-macos-rendered-zd3.png)
 
 ## Analysis
 

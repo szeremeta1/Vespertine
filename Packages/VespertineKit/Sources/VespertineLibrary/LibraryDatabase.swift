@@ -295,6 +295,52 @@ public final class LibraryDatabase: Sendable {
             // Songs played before there was a history start it with the last time each was played.
             try db.execute(sql: "INSERT INTO playHistory (trackId, playedAt) SELECT id, lastPlayedAt FROM track WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt")
         }
+        m.registerMigration("v19-transitions") { db in
+            // How each song starts and ends, for Smart Mix: the same shape and invalidation as `analysis`.
+            try db.create(table: "transitionProfile") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("fileSize", .integer).notNull()
+                t.column("modifiedAt", .datetime).notNull()
+                t.column("version", .integer).notNull()
+                t.column("data", .blob).notNull()
+            }
+            // A playlist's own transitions (`TransitionOverride.storedValue`); no row follows the app's setting. A table
+            // of its own, not a playlist column: older migrations save `Playlist` records, which must keep their shape.
+            try db.create(table: "playlistTransition") { t in
+                t.primaryKey("playlistId", .integer).references("playlist", onDelete: .cascade)
+                t.column("transitionStyle", .text).notNull()
+            }
+        }
+        m.registerMigration("v20-copy-choices") { db in
+            // Which copy of an album plays (a 24/192 download, a vinyl transfer, its Atmos mix), or that its copies are
+            // bundled and the output picks; no row: one copy, the best for the output (AlbumCopyChoice). Library state.
+            try db.create(table: "albumCopyChoice") { t in
+                t.primaryKey("albumKey", .text)
+                t.column("copyId", .text)
+                t.column("bundled", .boolean).notNull().defaults(to: false)
+                t.column("chosenAt", .datetime).notNull()
+            }
+            // The copy of a song to play whenever the output can (one per song, kept on the track).
+            try db.create(table: "preferredCopy") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("preferredAt", .datetime).notNull()
+            }
+        }
+        m.registerMigration("v21-borrowed-favorites") { db in
+            // A favorite a bundled album lends to the other copies of a hearted song, as opposed to a copy hearted
+            // itself: it goes when the song stops being bundled or its own favorite goes, so bundling never rewrites hearts.
+            try db.alter(table: "favorite") { t in t.add(column: "borrowed", .boolean).notNull().defaults(to: false) }
+        }
+        m.registerMigration("v22-matroska-audio") { db in
+            // Matroska audio was described as DTS whatever its codec, and a file with several audio streams listed one; a
+            // file with a CUESHEET tag listed one track where the sheet names several. Their unchanged size/mtime must
+            // not keep that after the upgrade. (A FLAC with only a CUESHEET block is split when it next changes.)
+            try db.execute(sql: """
+                UPDATE track SET modifiedAt = '1970-01-01 00:00:00.000'
+                WHERE isMissing = 0 AND location = filePath
+                  AND (lower(filePath) LIKE '%.mka' OR (json_valid(extraTags) AND json_extract(extraTags, '$.CUESHEET') IS NOT NULL))
+                """)
+        }
         return m
     }
 }
@@ -675,6 +721,8 @@ public extension LibraryDatabase {
                     try db.execute(sql: """
                         INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT id, ? FROM track WHERE id = ?
                         """, arguments: [date, id])
+                    // Hearting a copy a bundled album had lent a heart makes it a favorite of its own.
+                    try db.execute(sql: "UPDATE favorite SET borrowed = 0 WHERE trackId = ? AND borrowed = 1", arguments: [id])
                 } else {
                     try db.execute(sql: "DELETE FROM favorite WHERE trackId = ?", arguments: [id])
                 }
@@ -682,33 +730,96 @@ public extension LibraryDatabase {
         }
     }
 
-    /// A favorite is a song, not a file: every version and copy of a favorite song on its album (its stereo and
-    /// 5.1 versions, the same song on a share) is a favorite too, from the date the song first was. Covers songs
-    /// favorited one version at a time and versions added since. Returns how many favorite songs there are
-    /// (present files only), the number the sidebar shows.
+    /// A favorite is the copy that was hearted: a 24/96 vinyl transfer, not the 24/192 download beside it. Where an
+    /// album's copies are bundled (AlbumCopyChoice.bundled, or `bundledByDefault` for albums with no choice) the song
+    /// is one favorite whichever copy plays, so every copy of a favorite song there is a favorite too, from the date
+    /// the song first was. Those other copies' hearts are borrowed: kept apart from the copies hearted themselves and
+    /// dropped again when the album stops being bundled or the song's own favorite goes, so toggling bundling never
+    /// changes which copy was hearted. Returns how many favorite songs there are (present files only; copies of one
+    /// song count once), the number the sidebar shows.
     @discardableResult
-    func favoriteEveryVersion() throws -> Int {
+    func favoriteEveryVersion(bundledByDefault: Bool = false) throws -> Int {
         try writer.write { db in
             let rows = try Row.fetchAll(db, sql: """
-                SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date
+                SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date, favorite.borrowed AS borrowed
                 FROM favorite JOIN track ON track.id = favorite.trackId WHERE track.isMissing = 0
                 """)
             guard !rows.isEmpty else { return 0 }
-            var dates: [Int64: Date] = [:]
-            for row in rows { dates[row["id"] as Int64] = row["date"] as Date }
+            var dates: [Int64: Date] = [:], own: [Int64: Date] = [:], borrowed: Set<Int64> = []
+            for row in rows {
+                let id: Int64 = row["id"], date: Date = row["date"]
+                dates[id] = date
+                if row["borrowed"] as Bool { borrowed.insert(id) } else { own[id] = date }
+            }
             let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
+            let choices = try Self.copyChoices(db)
             let tracks = Self.inAlbumOrder(try Self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
             var songs = 0
             for album in Dictionary(grouping: tracks, by: \.albumKey).values {
+                let bundled = (choices[album[0].albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
                 for song in TrackVersions.group(album) {
-                    guard let date = song.compactMap({ $0.id.flatMap { dates[$0] } }).min() else { continue }
-                    songs += 1
-                    for id in song.compactMap(\.id) where dates[id] == nil {
-                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt) VALUES (?, ?)", arguments: [id, date])
+                    let ids = song.compactMap(\.id)
+                    let date = ids.compactMap { own[$0] }.min()
+                    if date != nil { songs += 1 }
+                    for id in ids where borrowed.contains(id) && !(bundled && date != nil) {
+                        try db.execute(sql: "DELETE FROM favorite WHERE trackId = ? AND borrowed = 1", arguments: [id])
+                    }
+                    guard bundled, let date else { continue }
+                    for id in ids where dates[id] == nil {
+                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) VALUES (?, ?, 1)", arguments: [id, date])
                     }
                 }
             }
             return songs
+        }
+    }
+
+    // MARK: Copies
+
+    /// Every album's copy choice, by album key (albums with none play one copy, the best for the output).
+    func copyChoices() throws -> [String: AlbumCopyChoice] {
+        try writer.read { db in try Self.copyChoices(db) }
+    }
+
+    public static func copyChoices(_ db: Database) throws -> [String: AlbumCopyChoice] {
+        var choices: [String: AlbumCopyChoice] = [:]
+        for row in try Row.fetchAll(db, sql: "SELECT albumKey, copyId, bundled FROM albumCopyChoice") {
+            let key: String = row["albumKey"], copy: String? = row["copyId"], bundled: Bool = row["bundled"]
+            choices[key] = bundled ? .bundled : copy.map(AlbumCopyChoice.copy) ?? .automatic
+        }
+        return choices
+    }
+
+    /// Sets which copy of an album plays; `.automatic` forgets the choice.
+    func setCopyChoice(_ choice: AlbumCopyChoice, albumKey: String, at date: Date = .now) throws {
+        try writer.write { db in
+            switch choice {
+            case .automatic:
+                try db.execute(sql: "DELETE FROM albumCopyChoice WHERE albumKey = ?", arguments: [albumKey])
+            case .bundled:
+                try db.execute(sql: "INSERT OR REPLACE INTO albumCopyChoice (albumKey, copyId, bundled, chosenAt) VALUES (?, NULL, 1, ?)",
+                               arguments: [albumKey, date])
+            case .copy(let id):
+                try db.execute(sql: "INSERT OR REPLACE INTO albumCopyChoice (albumKey, copyId, bundled, chosenAt) VALUES (?, ?, 0, ?)",
+                               arguments: [albumKey, id, date])
+            }
+        }
+    }
+
+    /// The tracks that are the preferred copy of their song.
+    func preferredCopyIDs() throws -> Set<Int64> {
+        try writer.read { db in Set(try Int64.fetchAll(db, sql: "SELECT trackId FROM preferredCopy")) }
+    }
+
+    /// Makes `trackID` the preferred copy of its song (the other copies, `songTrackIDs`, stop being preferred), or with
+    /// `preferred` false, none of them.
+    func setPreferredCopy(_ preferred: Bool, trackID: Int64, songTrackIDs: [Int64], at date: Date = .now) throws {
+        try writer.write { db in
+            for id in Set(songTrackIDs + [trackID]) { try db.execute(sql: "DELETE FROM preferredCopy WHERE trackId = ?", arguments: [id]) }
+            if preferred {
+                try db.execute(sql: "INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT id, ? FROM track WHERE id = ?",
+                               arguments: [date, trackID])
+            }
         }
     }
 
@@ -830,6 +941,74 @@ public extension LibraryDatabase {
                                    arguments: [analysis.effectiveBitDepth, analysis.bandwidthHz, analysis.verdict.rawValue, id])
                 }
             }
+        }
+    }
+
+    /// Saves transition profiles, each for the tracks that play all of its file (a CUE sheet's or a disc image's
+    /// tracks are parts of one, so the file's ends aren't theirs: the player measures those as they play).
+    public func saveTransitionProfiles(_ items: [(TransitionProfile, String)]) throws {
+        guard !items.isEmpty else { return }
+        let encoder = JSONEncoder()
+        let encoded = try items.map { (try encoder.encode($0.0), $0.0.version, $0.1) }
+        try writer.write { db in
+            for (data, version, filePath) in encoded {
+                for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) where track.cueStartFrame == nil {
+                    guard let id = track.id, track.sacdArea == nil, track.dvdStream == nil else { continue }
+                    try db.execute(sql: """
+                        INSERT OR REPLACE INTO transitionProfile (trackId, fileSize, modifiedAt, version, data)
+                        VALUES (?, ?, ?, ?, ?)
+                        """, arguments: [id, track.fileSize, track.modifiedAt, version, data])
+                }
+            }
+        }
+    }
+
+    /// The transition profile of the track with this id, when it's current (the player asks, on its own thread).
+    public func transitionProfile(trackID: Int64) throws -> TransitionProfile? {
+        try writer.read { db in
+            guard let data = try Data.fetchOne(db, sql: """
+                SELECT p.data FROM transitionProfile p JOIN track t ON t.id = p.trackId
+                WHERE p.trackId = ? AND p.version >= ? AND p.fileSize = t.fileSize AND p.modifiedAt = t.modifiedAt
+                """, arguments: [trackID, TransitionProfile.currentVersion]) else { return nil }
+            return try? JSONDecoder().decode(TransitionProfile.self, from: data)
+        }
+    }
+
+    /// A playlist's own transitions (`TransitionOverride.storedValue`), nil when it follows the app's setting.
+    public func transitionStyle(forPlaylist id: Int64) throws -> String? {
+        try writer.read { db in
+            try String.fetchOne(db, sql: "SELECT transitionStyle FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+        }
+    }
+
+    /// Every playlist that has its own transitions, by id.
+    public func playlistTransitionStyles() throws -> [Int64: String] {
+        try writer.read { db in
+            Dictionary(try Row.fetchAll(db, sql: "SELECT playlistId, transitionStyle FROM playlistTransition").map { ($0["playlistId"], $0["transitionStyle"]) },
+                       uniquingKeysWith: { a, _ in a })
+        }
+    }
+
+    /// Sets a playlist's own transitions; nil goes back to the app's setting.
+    public func setTransitionStyle(_ style: String?, forPlaylist id: Int64) throws {
+        try writer.write { db in
+            if let style {
+                try db.execute(sql: "INSERT OR REPLACE INTO playlistTransition (playlistId, transitionStyle) VALUES (?, ?)", arguments: [id, style])
+            } else {
+                try db.execute(sql: "DELETE FROM playlistTransition WHERE playlistId = ?", arguments: [id])
+            }
+        }
+    }
+
+    /// The track's transition profile, when one is stored for the file as it is now and by the current analyzer.
+    public func transitionProfile(for track: Track) throws -> TransitionProfile? {
+        guard let id = track.id else { return nil }
+        return try writer.read { db in
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM transitionProfile WHERE trackId = ?", arguments: [id]) else { return nil }
+            let size: Int64 = row["fileSize"], modified: Date = row["modifiedAt"], version: Int = row["version"]
+            guard version >= TransitionProfile.currentVersion, size == track.fileSize,
+                  abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001 else { return nil }
+            return try? JSONDecoder().decode(TransitionProfile.self, from: row["data"] as Data)
         }
     }
 
@@ -1014,7 +1193,10 @@ extension LibraryDatabase {
             try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [new, old])
             try db.execute(sql: """
-                INSERT OR IGNORE INTO favorite (trackId, favoritedAt) SELECT ?, favoritedAt FROM favorite WHERE trackId = ?
+                INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) SELECT ?, favoritedAt, borrowed FROM favorite WHERE trackId = ?
+                """, arguments: [new, old])
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT ?, preferredAt FROM preferredCopy WHERE trackId = ?
                 """, arguments: [new, old])
             try db.execute(sql: """
                 UPDATE track SET

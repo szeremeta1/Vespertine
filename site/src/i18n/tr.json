@@ -14,7 +14,7 @@
     "copied": "Kopyalandı",
     "copyFailed": "Elle seçin",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ve Dolby TrueHD, Dolby Laboratories’in ticari markalarıdır. DTS, DTS-HD Master Audio ve DTS:X, DTS, Inc.’in ticari markalarıdır. Apple, AirPods, AirPods Max, Mac, macOS ve Uzamsal Ses, Apple Inc.’in ticari markalarıdır. Vespertine bu adları yalnızca neyi ve nerede çaldığını tanımlamak için kullanır; Dolby, DTS veya Apple tarafından sertifikalandırılmamış, lisanslanmamış ya da onaylanmamıştır.",
-    "trailerLabel": "Vespertine fragmanı, 44 saniye",
+    "trailerLabel": "Vespertine fragmanı, 55 saniye",
     "untested": "Kanal kanal çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Fragman",
-      "title": "44 saniyede izleyin.",
+      "title": "55 saniyede izleyin.",
       "text": "Sesi açın. Gördüğünüz her şey gerçek uygulamadır ve geliştiricinin kendi arşivinde kaydedildi.",
       "fallback": "Fragmanı izleyin (MP4)",
-      "caption": "44 sn · 1080p · albüm kapakları sahiplerine aittir"
+      "caption": "55 sn · 1080p · albüm kapakları sahiplerine aittir"
     },
     "features": {
       "eyebrow": "Neden Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Fragman.",
-      "text": "44 saniye, 16:9, 60 fps’de 1080p, sesli. <a href=\"{href.trailerDownload}\" download>MP4’ü indirin</a> ({size}). İstek üzerine 4K master da sağlanabilir.",
+      "text": "55 saniye, 16:9, 60 fps’de 1080p, sesli. <a href=\"{href.trailerDownload}\" download>MP4’ü indirin</a> ({size}). İstek üzerine 4K master da sağlanabilir.",
       "fallback": "Fragmanı indirin (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Müzik oynatıcı",
     "sourceName": "Vespertine kaynak kodu",
     "trailerName": "Vespertine fragmanı",
-    "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 44 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve hi-res dosya analizi.",
+    "trailerDescription": "Gerçek uygulamadan, geliştiricinin kendi arşivinde kaydedilmiş 55 saniyelik bir Vespertine turu: bit-perfect sinyal yolu, DoP üzerinden DSD, AirPods’ta Uzamsal Ses olarak surround ve hi-res dosya analizi.",
     "keywords": "Mac müzik çalar, hi-res müzik çalar, DSD çalar, SACD ISO oynatma, çok kanallı ses, surround müzik, Dolby Atmos, DTS-HD Master Audio, bit-perfect çalma, oda düzeltmesi, Uzamsal Ses, FLAC çalar, ücretsiz, açık kaynak"
   },
   "og": {

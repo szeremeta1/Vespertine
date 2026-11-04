@@ -133,6 +133,21 @@ bool nrt_ring_rewind(NRTRing *ring, uint64_t totalWritten, uint32_t margin) {
     return ok;
 }
 
+uint32_t nrt_ring_peek(const NRTRing *ring, uint64_t from, float *dst, uint32_t frames) {
+    // Only the producer writes `data`, and this runs on its thread: what it wrote stays until it writes over it.
+    const uint64_t w = atomic_load_explicit(&ring->writePos, memory_order_relaxed);
+    if (from > w || w - from > ring->capacity) return 0;
+    if (frames > w - from) frames = (uint32_t)(w - from);
+    if (frames == 0) return 0;
+    uint32_t start = (uint32_t)(from & ring->mask);
+    uint32_t first = ring->capacity - start;
+    if (first > frames) first = frames;
+    size_t ch = ring->channels;
+    memcpy(dst, ring->data + start * ch, first * ch * sizeof(float));
+    if (frames > first) memcpy(dst + first * ch, ring->data, (frames - first) * ch * sizeof(float));
+    return frames;
+}
+
 void nrt_ring_reset(NRTRing *ring) {
     atomic_store(&ring->readLimit, UINT64_MAX);
     atomic_store(&ring->writePos, 0);
@@ -543,12 +558,23 @@ struct NRTRenderContext {
     _Atomic bool passthrough;
     _Atomic bool dop;
     _Atomic bool muted;
+    // Transitions' fader. The command: serial << 35 | thenMute << 34 | fromSilence << 33 | up << 32 | frames.
+    _Atomic uint64_t fadeCommand;
+    _Atomic uint64_t fadeTaken;    // the serial the I/O thread last took
+    _Atomic bool fadeRunning;
+    // I/O thread only.
+    double fadeLevel;              // 1: idle
+    double fadeStep;
+    uint32_t fadeLeft;
+    bool fadeUp;
+    bool fadeMute;
     uint16_t dopPrevious[NRT_METER_CHANNELS > 2 ? NRT_METER_CHANNELS : 2];   // render thread only
     _Atomic bool dopPrimed;
     _Atomic uint32_t dopLast;      // DoP: marker of the last frame sent, music or idle (0 before the first)
     _Atomic uint64_t discardTo;    // ring position the I/O thread drops everything before (0: none asked)
     _Atomic bool draining;
     _Atomic bool integer;
+    _Atomic bool unscaled;         // matched 16-bit output: the fader never scales its words
     _Atomic uint32_t underruns;
     _Atomic uint64_t framesRendered;
 
@@ -615,11 +641,16 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->passthrough, false);
     atomic_init(&ctx->dop, false);
     atomic_init(&ctx->muted, false);
+    atomic_init(&ctx->fadeCommand, 0);
+    atomic_init(&ctx->fadeTaken, 0);
+    atomic_init(&ctx->fadeRunning, false);
+    ctx->fadeLevel = 1.0;
     atomic_init(&ctx->dopPrimed, false);
     atomic_init(&ctx->dopLast, 0);
     atomic_init(&ctx->discardTo, 0);
     atomic_init(&ctx->draining, false);
     atomic_init(&ctx->integer, false);
+    atomic_init(&ctx->unscaled, false);
     atomic_init(&ctx->underruns, 0);
     atomic_init(&ctx->framesRendered, 0);
     atomic_init(&ctx->resumeFrames, 0);
@@ -822,6 +853,66 @@ void nrt_context_reset_history(NRTRenderContext *ctx) {
 
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) { atomic_store(&ctx->muted, m); }
+bool nrt_context_is_muted(const NRTRenderContext *ctx) { return atomic_load(&ctx->muted); }
+
+void nrt_context_fade(NRTRenderContext *ctx, bool up, uint32_t frames, bool fromSilence, bool thenMute) {
+    uint64_t current = atomic_load(&ctx->fadeCommand), next;
+    do {
+        const uint64_t serial = ((current >> 35) + 1) & ((1ull << 29) - 1);
+        next = serial << 35 | (uint64_t)thenMute << 34 | (uint64_t)fromSilence << 33 | (uint64_t)up << 32 | frames;
+    } while (!atomic_compare_exchange_weak(&ctx->fadeCommand, &current, next));
+}
+
+bool nrt_context_fading(const NRTRenderContext *ctx) {
+    const uint64_t command = atomic_load(&ctx->fadeCommand);
+    return (command >> 35) != atomic_load(&ctx->fadeTaken) || atomic_load(&ctx->fadeRunning);
+}
+
+// Takes a new fade command (once per slice). `bypass`: DoP, passthrough, integer or matched 16-bit output, whose words are never scaled.
+static void take_fade(NRTRenderContext *ctx, bool bypass) {
+    const uint64_t command = atomic_load_explicit(&ctx->fadeCommand, memory_order_acquire);
+    const uint64_t serial = command >> 35;
+    if (serial == atomic_load_explicit(&ctx->fadeTaken, memory_order_relaxed)) return;
+    const bool thenMute = (command >> 34) & 1, fromSilence = (command >> 33) & 1, up = (command >> 32) & 1;
+    const uint32_t frames = (uint32_t)command;
+    if (fromSilence) ctx->fadeLevel = 0.0;
+    ctx->fadeUp = up;
+    ctx->fadeMute = thenMute && !up;
+    if (bypass || frames == 0) {
+        ctx->fadeLevel = up ? 1.0 : 0.0;
+        ctx->fadeLeft = 0;
+        if (ctx->fadeMute || bypass) {
+            if (ctx->fadeMute) atomic_store_explicit(&ctx->muted, true, memory_order_relaxed);
+            ctx->fadeLevel = 1.0;   // bypassed output is never left scaled
+        }
+    } else {
+        ctx->fadeLeft = frames;
+        ctx->fadeStep = ((up ? 1.0 : 0.0) - ctx->fadeLevel) / (double)frames;
+    }
+    atomic_store_explicit(&ctx->fadeRunning, ctx->fadeLeft > 0, memory_order_relaxed);
+    atomic_store_explicit(&ctx->fadeTaken, serial, memory_order_release);
+}
+
+// One frame of the fader: the level for this frame, then the step to the next. Returns the level.
+static inline double fade_frame(NRTRenderContext *ctx) {
+    const double level = ctx->fadeLevel;
+    if (ctx->fadeLeft > 0) {
+        ctx->fadeLevel += ctx->fadeStep;
+        if (--ctx->fadeLeft == 0) ctx->fadeLevel = ctx->fadeUp ? 1.0 : 0.0;
+    }
+    return level;
+}
+
+// After a slice: a ramp down that has ended mutes (the rest of the slice was silent already) and resets to full level.
+static void settle_fade(NRTRenderContext *ctx) {
+    if (ctx->fadeLeft > 0) return;
+    if (ctx->fadeMute && ctx->fadeLevel == 0.0) {
+        atomic_store_explicit(&ctx->muted, true, memory_order_relaxed);
+        ctx->fadeLevel = 1.0;
+        ctx->fadeMute = false;
+    }
+    atomic_store_explicit(&ctx->fadeRunning, false, memory_order_relaxed);
+}
 void nrt_context_set_dop(NRTRenderContext *ctx, bool d) {
     atomic_store(&ctx->dopPrimed, false);
     atomic_store(&ctx->dopLast, 0);
@@ -834,6 +925,7 @@ uint64_t nrt_context_discard(NRTRenderContext *ctx) {
 }
 void nrt_context_cancel_discard(NRTRenderContext *ctx) { atomic_store(&ctx->discardTo, 0); }
 void nrt_context_set_draining(NRTRenderContext *ctx, bool d) { atomic_store(&ctx->draining, d); }
+void nrt_context_set_unscaled(NRTRenderContext *ctx, bool u) { atomic_store(&ctx->unscaled, u); }
 void nrt_context_set_integer(NRTRenderContext *ctx, bool i) { atomic_store(&ctx->integer, i); if (i) atomic_store(&ctx->passthrough, true); }
 uint32_t nrt_context_take_underruns(NRTRenderContext *ctx) { return atomic_exchange(&ctx->underruns, 0); }
 void nrt_context_set_rebuffer(NRTRenderContext *ctx, uint32_t resumeFrames) {
@@ -1058,6 +1150,8 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     take_discard(ctx);
     const bool dop = atomic_load_explicit(&ctx->dop, memory_order_relaxed);
     const bool integer = atomic_load_explicit(&ctx->integer, memory_order_relaxed);
+    take_fade(ctx, dop || integer || atomic_load_explicit(&ctx->passthrough, memory_order_relaxed)
+                       || atomic_load_explicit(&ctx->unscaled, memory_order_relaxed));
     if (atomic_load_explicit(&ctx->muted, memory_order_relaxed)) {
         hold_silence(ctx, frames, ch, dop, integer);
         return;
@@ -1135,11 +1229,21 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
     // Then the measured filters (convolution), a block late once there have been any.
     if (fir) fir_run(fir, ctx->scratch, processed, ch);
 
-    if (gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir))) {
+    // The fader: idle (full level, no ramp) leaves this test as it was, so the copy path stays a copy.
+    const bool fading = ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0;
+    const bool processing = gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir));
+    if (processing || fading) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
+        double frameLevel = 1.0;
         for (uint32_t f = 0; f < processed; f++) {
             float *frame = ctx->scratch + (size_t)f * ch;
+            // The fader is part of this frame only while it ramps or holds a level other than full: once a ramp has
+            // ended inside the slice, a fade in leaves the rest as the copy it is (unless gain, filters or the equalizer
+            // change it anyway), and a fade out leaves exact silence, not dither.
+            const bool scaled = fading && (ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0);
+            if (fading && !processing && !scaled) continue;
+            const bool silent = fading && ctx->fadeLeft == 0 && ctx->fadeLevel == 0.0;
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
                 if (equalize) {
@@ -1154,8 +1258,13 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
                         s = y;
                     }
                 }
-                s *= gain;
-                if (lsb > 0) s += tpdf(&ctx->rng) * lsb;
+                if (scaled) {
+                    if (c == 0) frameLevel = fade_frame(ctx);
+                    s *= gain * frameLevel;
+                } else {
+                    s *= gain;
+                }
+                if (lsb > 0 && !silent) s += tpdf(&ctx->rng) * lsb;
                 frame[c] = (float)s;
             }
         }
@@ -1164,6 +1273,7 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             const size_t states = (size_t)ch * NRT_EQ_MAX_SECTIONS * 2;
             for (size_t i = 0; i < states; i++) if (fabs(ctx->eqState[i]) < 1e-30) ctx->eqState[i] = 0;
         }
+        if (fading) settle_fade(ctx);
     }
 
     // Meters (every decoded channel, up to NRT_METER_CHANNELS) and spectrum tap (L/R), post-gain.
@@ -1319,7 +1429,35 @@ struct NRTCapture {
     _Atomic uint64_t events[NRT_CAPTURE_MAX_EVENTS];
     double nextSampleTime;      // I/O thread only
     bool started;               // I/O thread only
+    int32_t kinds[NRT_CAPTURE_MAX_BUFFERS];   // set before the IOProc starts
 };
+
+void nrt_capture_set_kind(NRTCapture *c, uint32_t index, int32_t kind) {
+    if (c && index < NRT_CAPTURE_MAX_BUFFERS) c->kinds[index] = kind;
+}
+
+uint32_t nrt_sample_bytes(int32_t kind) {
+    switch (kind) {
+        case NRT_SAMPLE_FLOAT64: return 8;
+        case NRT_SAMPLE_INT16: return 2;
+        case NRT_SAMPLE_INT24: return 3;
+        default: return 4;
+    }
+}
+
+float nrt_sample_to_float(const void *src, int32_t kind) {
+    switch (kind) {
+        case NRT_SAMPLE_FLOAT64: { double d; memcpy(&d, src, sizeof d); return (float)d; }
+        case NRT_SAMPLE_INT16: { int16_t v; memcpy(&v, src, sizeof v); return (float)v * (1.0f / 32768.0f); }
+        case NRT_SAMPLE_INT24: {
+            const uint8_t *p = (const uint8_t *)src;
+            int32_t v = (int32_t)((uint32_t)p[0] << 8 | (uint32_t)p[1] << 16 | (uint32_t)p[2] << 24) >> 8;
+            return (float)v * (1.0f / 8388608.0f);
+        }
+        case NRT_SAMPLE_INT32: { int32_t v; memcpy(&v, src, sizeof v); return (float)((double)v * (1.0 / 2147483648.0)); }
+        default: { float f; memcpy(&f, src, sizeof f); return f; }
+    }
+}
 
 NRTCapture *nrt_capture_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
     if (!ring || maxFramesPerSlice == 0) return NULL;
@@ -1362,7 +1500,7 @@ OSStatus nrt_capture_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow,
     if (!c || !inInputData || inInputData->mNumberBuffers == 0) return noErr;
     const AudioBuffer *first = &inInputData->mBuffers[0];
     const uint32_t firstCh = first->mNumberChannels ? first->mNumberChannels : 1;
-    uint32_t frames = first->mDataByteSize / (uint32_t)(sizeof(float) * firstCh);
+    uint32_t frames = first->mDataByteSize / (nrt_sample_bytes(c->kinds[0]) * firstCh);
     if (frames > c->scratchFrames) frames = c->scratchFrames;
     if (frames == 0) return noErr;
     const uint64_t at = atomic_load_explicit(&c->frames, memory_order_relaxed);
@@ -1381,12 +1519,19 @@ OSStatus nrt_capture_ioproc(AudioObjectID inDevice, const AudioTimeStamp *inNow,
     for (uint32_t bi = 0; bi < inInputData->mNumberBuffers && deviceChannel < ch; bi++) {
         const AudioBuffer *b = &inInputData->mBuffers[bi];
         const uint32_t bch = b->mNumberChannels ? b->mNumberChannels : 1;
-        const uint32_t available = b->mDataByteSize / (uint32_t)(sizeof(float) * bch);
-        const float *in = (const float *)b->mData;
-        if (in) {
+        const int32_t kind = bi < NRT_CAPTURE_MAX_BUFFERS ? c->kinds[bi] : NRT_SAMPLE_FLOAT32;
+        const uint32_t width = nrt_sample_bytes(kind);
+        const uint32_t available = b->mDataByteSize / (width * bch);
+        const uint8_t *in = (const uint8_t *)b->mData;
+        if (in && kind == NRT_SAMPLE_FLOAT32) {
+            const float *fin = (const float *)b->mData;
             for (uint32_t f = 0; f < frames && f < available; f++)
                 for (uint32_t k = 0; k < bch && deviceChannel + k < ch; k++)
-                    c->scratch[(size_t)f * ch + deviceChannel + k] = in[(size_t)f * bch + k];
+                    c->scratch[(size_t)f * ch + deviceChannel + k] = fin[(size_t)f * bch + k];
+        } else if (in) {
+            for (uint32_t f = 0; f < frames && f < available; f++)
+                for (uint32_t k = 0; k < bch && deviceChannel + k < ch; k++)
+                    c->scratch[(size_t)f * ch + deviceChannel + k] = nrt_sample_to_float(in + ((size_t)f * bch + k) * width, kind);
         }
         deviceChannel += bch;
     }

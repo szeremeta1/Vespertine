@@ -145,6 +145,17 @@ final class DeviceStore {
     }
 }
 
+/// Where the first-time transitions note is up: the window the switch was turned on in. (On the main window while
+/// Settings was in use, it raised that window over Settings, which seemed to close.)
+struct TransitionsNote: Equatable {
+    enum Window { case main, settings }
+    private(set) var window: Window?
+
+    func isShown(in other: Window) -> Bool { window == other }
+    mutating func show(in window: Window) { self.window = window }
+    mutating func dismiss() { window = nil }
+}
+
 @Observable
 @MainActor
 final class AppModel {
@@ -210,6 +221,8 @@ final class AppModel {
     var showFindMusic = false
     var showConnectServer = false
     var showLoopbackTest = false
+    /// The note shown the first time transitions are turned on, and the window it's shown in.
+    var transitionsNote = TransitionsNote()
     /// What a playlist import did, shown in an alert until dismissed.
     var playlistReport: String?
     /// Address to pre-fill in Connect to Server (e.g. to enter a password for an existing share).
@@ -269,6 +282,7 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        library.bundlesCopiesByDefault = settings.bundleCopies
         syncEngine()
         shares.start()
         analysis.start()
@@ -390,6 +404,29 @@ final class AppModel {
         }
     }
 
+    /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
+    /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
+    func setTransitions(_ on: Bool) {
+        guard settings.transitionsFeature else { return }
+        if settings.transitions.setEnabled(on) { transitionsNote.show(in: .main) }
+        syncEngine()
+    }
+
+    func toggleTransitions() { setTransitions(!settings.transitions.enabled) }
+
+    /// The Settings switch that brings transitions into the app (or removes them). Turning it on starts them on, with
+    /// the note; turning it off puts the playback switch away too and the engine gets today's settings.
+    func setTransitionsFeature(_ on: Bool) {
+        settings.transitionsFeature = on
+        if on {
+            if settings.transitions.setEnabled(true) { transitionsNote.show(in: .settings) }
+        } else {
+            _ = settings.transitions.setEnabled(false)
+            transitionsNote.dismiss()
+        }
+        syncEngine()
+    }
+
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
@@ -397,6 +434,21 @@ final class AppModel {
         player.engine.update(settings: settings.engineSettings())
         devices.watchVolume(of: device)
         player.resolveVersions()
+    }
+
+    /// What an album plays: its chosen copy, else the best copy for the output; with its copies bundled, each song once
+    /// (the player picks each song's copy for the output as it queues it).
+    func playableTracks(albumKey: String) -> [Track] {
+        let copies = library.albumCopies(albumKey: albumKey)
+        guard copies.copies.count > 1 else { return copies.copies.first?.tracks ?? library.tracks(albumKey: albumKey) }
+        let wanted = outputWantsMultichannel() ?? true
+        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) }) {
+            return copy.tracks
+        }
+        return copies.songs.map { song in
+            TrackVersions.choose(song.tracks, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) },
+                                 isPreferred: library.isPreferredCopy) ?? song.lead
+        }
     }
 
     /// Whether songs with a stereo and a multichannel version should play the multichannel one: on an output
@@ -427,14 +479,15 @@ final class AppModel {
 
     var selectedTracks: [Track] { library.tracks(ids: Array(selectedTrackIDs)) }
 
-    /// Adds songs to Favorites, or removes them when every one already is a favorite. A song is all its
-    /// versions: favoriting its stereo version on headphones favorites its 5.1 one too. Undoable in the
+    /// Adds songs to Favorites, or removes them when every one already is a favorite. A favorite is the copy hearted
+    /// (the 24/96 vinyl transfer, not the 24/192 download beside it); where an album's copies are bundled, a song is
+    /// all its copies: favoriting its stereo copy on headphones favorites its 5.1 one too. Undoable in the
     /// window you're in (⌘Z brings back a heart clicked by mistake); SwiftUI's own undo manager is nil in
     /// these windows, so it's the AppKit window's.
     func toggleFavorite(_ tracks: [Track]) {
         guard tracks.contains(where: { $0.id != nil }) else { return }
         let favorite = !tracks.filter { $0.id != nil }.allSatisfy(library.isFavorite)
-        let ids = Array(Set(library.versions(of: tracks).flatMap { $0 }.compactMap(\.id) + tracks.compactMap(\.id)))
+        let ids = Array(Set(library.playbackVersions(of: tracks).flatMap { $0 }.compactMap(\.id) + tracks.compactMap(\.id)))
         // Only the songs that change, so undo restores exactly what was there.
         let changed = ids.filter { library.favoriteIDs.contains($0) != favorite }
         setFavorite(favorite, trackIDs: changed, undoManager: NSApp.keyWindow?.undoManager ?? NSApp.mainWindow?.undoManager)

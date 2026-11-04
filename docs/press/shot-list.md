@@ -27,8 +27,9 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 
 - **Trailer** (`site/public/assets/trailer`): re-record the window clips (`scripts/brand/stage/raw`, ScreenCaptureKit, window
   only) on the same tracks as the stills, re-measure the overlay positions in `Scenes.swift` for each new recording,
-  then `render.sh`, the Final Cut Pro edit and `deliver.sh`. Needs the FiiO K11 and AirPods Max for the bit-perfect,
-  DSD and Spatial scenes.
+  then `render.sh`, the Final Cut Pro edit and `deliver.sh`. Needs the Fosi Audio ZD3 and AirPods Max for the bit-perfect,
+  DSD and Spatial scenes, and the Visualizer window (Spectrum on a Dolby Atmos track, Vinyl); run the Vinyl recording
+  through `vinyl-even.py`.
 - **Tour GIF** (`docs/screenshots/tour.gif`): `scripts/make-tour-gif.sh` from the stills.
 
 ## Derived

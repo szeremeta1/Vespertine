@@ -14,7 +14,7 @@
     "copied": "An kwafa",
     "copyFailed": "Zaɓe shi",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus da Dolby TrueHD alamomin kasuwanci ne na Dolby Laboratories. DTS, DTS-HD Master Audio da DTS:X alamomin kasuwanci ne na DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS da Spatial Audio alamomin kasuwanci ne na Apple Inc. Vespertine yana ambatonsu ne kawai don bayyana abin da yake kunnawa da inda yake kunnawa; Dolby, DTS ko Apple ba su tabbatar da shi, ba shi lasisi ko amincewa da shi ba.",
-    "trailerLabel": "Bidiyon gabatarwar Vespertine, daƙiƙa 44",
+    "trailerLabel": "Bidiyon gabatarwar Vespertine, daƙiƙa 55",
     "untested": "Fitar da kowace tasha zuwa tashar da ta dace da aika bitstream zuwa risiva na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Bidiyon gabatarwa",
-      "title": "Ku kalle shi cikin daƙiƙa 44.",
+      "title": "Ku kalle shi cikin daƙiƙa 55.",
       "text": "Kunna sautin. Duk abin da ke ciki daga ainihin manhajar ne, an ɗauka daga laburaren mai ƙera ta.",
       "fallback": "Kalli bidiyon gabatarwa (MP4)",
-      "caption": "44 s · 1080p · hotunan bangon kundi mallakin masu su ne"
+      "caption": "55 s · 1080p · hotunan bangon kundi mallakin masu su ne"
     },
     "features": {
       "eyebrow": "Me ya sa Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Bidiyo",
       "title": "Bidiyon gabatarwa.",
-      "text": "Daƙiƙa 44, 16:9, 1080p a 60 fps, tare da sauti. <a href=\"{href.trailerDownload}\" download>Sauke MP4 ɗin</a> ({size}). Akwai babban kwafin 4K idan an nema.",
+      "text": "Daƙiƙa 55, 16:9, 1080p a 60 fps, tare da sauti. <a href=\"{href.trailerDownload}\" download>Sauke MP4 ɗin</a> ({size}). Akwai babban kwafin 4K idan an nema.",
       "fallback": "Sauke bidiyon gabatarwa (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Manhajar kunna kiɗa",
     "sourceName": "Lambar tushen Vespertine",
     "trailerName": "Bidiyon gabatar da Vespertine",
-    "trailerDescription": "Yawon Vespertine na daƙiƙa 44, da aka ɗauka daga ainihin manhajar a laburaren mai haɓaka ta: Hanyar Sigina ta bit-perfect, DSD ta DoP, kiɗan kewaye a matsayin Spatial Audio a AirPods da nazarin fayilolin hi-res.",
+    "trailerDescription": "Yawon Vespertine na daƙiƙa 55, da aka ɗauka daga ainihin manhajar a laburaren mai haɓaka ta: Hanyar Sigina ta bit-perfect, DSD ta DoP, kiɗan kewaye a matsayin Spatial Audio a AirPods da nazarin fayilolin hi-res.",
     "keywords": "mai kunna kiɗa na Mac, mai kunna hi-res, mai kunna DSD, SACD ISO, sauti mai tashoshi da yawa, kiɗan kewaye, surround, Dolby Atmos, DTS-HD Master Audio, bit-perfect, gyaran sautin ɗaki, Spatial Audio, FLAC, kyauta, buɗaɗɗen tushe"
   },
   "og": {

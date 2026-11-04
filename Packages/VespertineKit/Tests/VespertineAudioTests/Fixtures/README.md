@@ -26,3 +26,39 @@ deconvolution over 40 Hz-20 kHz, using only the sweep and the second timing tone
 (80 ms) after playback started. The noise is 0.25 s of the microphone with nothing playing (about -63 dBFS rms, mostly
 below 200 Hz); the start transient is the first 0.25 s of a capture, the thump the UMIK-1 records as its stream starts
 (peak -31 dBFS). No speech or other room sound is audible in them.
+
+`golden-pcm.json`: SHA-256 hashes of what the engine sends the device for each case in `GoldenPCMTests.swift`, with
+the device formats each case ran in. The files those cases play are made by the test itself (integer arithmetic only,
+so the same bytes on every Mac), apart from the Dolby and DTS fixtures above. Recorded with
+`VESPERTINE_GOLDEN_RECORD=1 swift test --filter GoldenPCM`; `recordedOn` names the Mac the float-processing cases
+(resampling, downmix, DSD to PCM, digital volume) were recorded on, the only kind of Mac they're compared on.
+
+`Formats/`: 0.15.1 format fixtures, all synthesized tones (no recordings) except `tak-excerpt.tak`. Made with the
+script in `docs/fixtures/make-format-fixtures.sh`.
+- `stereo24.flac`, `surround16.flac`: 1 s of tones, 24-bit stereo (L 440 Hz, R 550) and 16-bit 5.1 (FL 440, FR 550, FC 660,
+  LFE 60, SL 770, SR 880), the sources the lossless Matroska files must decode to exactly.
+- `flac-stereo.mka`, `alac-stereo.mka`, `wavpack-stereo.mka`, `tta-stereo.mka`, `pcm-stereo.mka` (0.25 s): the stereo source as FLAC, ALAC, WavPack, TTA and PCM in Matroska (title, artist, album tags on the first).
+  `two-streams.mka`: the stereo source (title "Stereo mix") and the 5.1 source (title "Surround mix") as two FLAC streams.
+  `aac-stereo.mkv`, `mp3-stereo.mka`, `vorbis-stereo.webm`: the stereo source as AAC (FFmpeg), MP3 (LAME) and Vorbis (FFmpeg).
+  `opus-51.mka` / `.webm` / `.opus`: the 5.1 source as Opus (libopus, channel mapping family 1, so the side pair is the rear pair).
+- `gapless.mp3`, `gapless.m4a`, `gapless.opus`: exactly 2 s (96,000 samples at 48 kHz) of a 440 Hz cosine starting on its
+  peak, encoded with LAME (Xing/LAME tag), Apple's AAC encoder (`afconvert`, priming and remainder in the MP4) and libopus
+  (pre-skip). A decoder that keeps the encoder's delay or padding shows in the length and in the first samples.
+- `cue-block.flac` (a FLAC CUESHEET block) and `cue-tag.flac` (a `CUESHEET=` Vorbis comment): the stereo source split into
+  "First" (0:00) and "Second" (0:37), for the embedded-CUE import.
+- `xhe-stereo.m4a`: the stereo source as real xHE-AAC (USAC), encoded with the xHE-AAC encoder in
+  github.com/mstorsjo/fdk-aac (Apache-2.0 + Fraunhofer licence; a tool for making this file, not shipped) at 64 kb/s,
+  then copied into MP4 with `afconvert`.
+- `apac-51.caf`: the 5.1 source as Apple Positional Audio Codec (`afconvert -d apac`).
+- `tak-excerpt.tak`: the first 1 s (4 whole frames, 44.1 kHz stereo 16-bit) of FFmpeg's FATE sample `tak/luckynight-partial.tak`,
+  fetched from a GitHub mirror of the FATE suite (luke-cha/fate-suite; FFmpeg's samples server was unreachable). It is
+  the only recorded music here, one second of it; its sample count in the TAK header is the original's (9.5 s). The
+  expected PCM hash in the test comes from FFmpeg's own TAK decoder with every frame's CRC checked.
+
+`Formats/*.wv`: DSD in WavPack, made with WavPack 5.8.1's `wavpack` from DSD synthesized by
+`docs/fixtures/make-wavpack-dsd-fixtures.py` (a 2nd-order sigma-delta of one tone per channel, written as DSDIFF and as DSF):
+`dsd64-stereo-from-dsdiff.wv` and `dsd64-stereo-from-dsf.wv` (the same DSD from a DSDIFF file and from a DSF file, which
+stores bytes least significant bit first; 6 SACD frames, 0.08 s), `dsd128-stereo.wv` (3 frames at DSD128) and
+`dsd64-5.1.wv` (3 frames, L R C LFE Ls Rs). The tests hold the SHA-256 of the DSD each was made from; `wvunpack --dff`
+returns the DSDIFF files byte for byte. `pcm-stereo24.wv` is the 24-bit stereo source as ordinary WavPack, to check the
+DSD reader leaves PCM files to the PCM decoder.

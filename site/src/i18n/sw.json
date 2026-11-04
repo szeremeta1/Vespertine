@@ -14,7 +14,7 @@
     "copied": "Imenakiliwa",
     "copyFailed": "Ichague",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus na Dolby TrueHD ni alama za biashara za Dolby Laboratories. DTS, DTS-HD Master Audio na DTS:X ni alama za biashara za DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS na Spatial Audio ni alama za biashara za Apple Inc. Vespertine inazitaja tu ili kueleza inachocheza na inapocheza; haina cheti, leseni wala uidhinishaji kutoka kwa Dolby, DTS au Apple.",
-    "trailerLabel": "Trela ya Vespertine, sekunde 44",
+    "trailerLabel": "Trela ya Vespertine, sekunde 55",
     "untested": "Utoaji wa sauti chaneli kwa chaneli na bitstream kwa resiva ni vya kimajaribio, havijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trela",
-      "title": "Ione kwa sekunde 44.",
+      "title": "Ione kwa sekunde 55.",
       "text": "Washa sauti. Kila kitu ndani yake ni programu halisi, iliyorekodiwa kwenye maktaba ya msanidi mwenyewe.",
       "fallback": "Tazama trela (MP4)",
-      "caption": "sekunde 44 · 1080p · majalada ya albamu ni mali ya wamiliki wake"
+      "caption": "sekunde 55 · 1080p · majalada ya albamu ni mali ya wamiliki wake"
     },
     "features": {
       "eyebrow": "Kwa nini Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trela.",
-      "text": "Sekunde 44, 16:9, 1080p kwa 60 fps, pamoja na sauti. <a href=\"{href.trailerDownload}\" download>Pakua MP4</a> ({size}). Nakala kuu ya 4K inapatikana ukiiomba.",
+      "text": "Sekunde 55, 16:9, 1080p kwa 60 fps, pamoja na sauti. <a href=\"{href.trailerDownload}\" download>Pakua MP4</a> ({size}). Nakala kuu ya 4K inapatikana ukiiomba.",
       "fallback": "Pakua trela (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Kicheza muziki",
     "sourceName": "Msimbo chanzo wa Vespertine",
     "trailerName": "Trela ya Vespertine",
-    "trailerDescription": "Ziara ya sekunde 44 ya Vespertine, iliyorekodiwa kutoka kwenye programu halisi ikitumia maktaba ya msanidi mwenyewe: njia ya mawimbi ya bit-perfect, DSD kupitia DoP, sauti ya kuzunguka kama Spatial Audio kwenye AirPods na uchambuzi wa faili za hi-res.",
+    "trailerDescription": "Ziara ya sekunde 55 ya Vespertine, iliyorekodiwa kutoka kwenye programu halisi ikitumia maktaba ya msanidi mwenyewe: njia ya mawimbi ya bit-perfect, DSD kupitia DoP, sauti ya kuzunguka kama Spatial Audio kwenye AirPods na uchambuzi wa faili za hi-res.",
     "keywords": "kicheza muziki cha Mac, kicheza hi-res, kicheza DSD, SACD ISO, sauti ya chaneli nyingi, sauti ya kuzunguka, surround, Dolby Atmos, DTS-HD Master Audio, uchezaji wa bit-perfect, urekebishaji wa chumba, Spatial Audio, FLAC, bila malipo, programu huria"
   },
   "og": {

@@ -14,7 +14,7 @@
     "copied": "कॉपी किया गया",
     "copyFailed": "इसे चुनें",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus और Dolby TrueHD, Dolby Laboratories के ट्रेडमार्क हैं। DTS, DTS-HD Master Audio और DTS:X, DTS, Inc. के ट्रेडमार्क हैं। Apple, AirPods, AirPods Max, Mac, macOS और स्पेशियल ऑडियो, Apple Inc. के ट्रेडमार्क हैं। Vespertine इनके नाम सिर्फ़ यह बताने के लिए लेता है कि वह क्या चलाता है और कहाँ; यह Dolby, DTS या Apple द्वारा प्रमाणित, लाइसेंस-प्राप्त या समर्थित नहीं है।",
-    "trailerLabel": "Vespertine ट्रेलर, 44 सेकंड",
+    "trailerLabel": "Vespertine ट्रेलर, 55 सेकंड",
     "untested": "चैनल-दर-चैनल आउटपुट और रिसीवर बिटस्ट्रीम प्रायोगिक हैं, असली रिसीवरों और मल्टीचैनल USB DAC पर इनका परीक्षण नहीं हुआ है (HDMI के ज़रिए एक Sony TV पर परीक्षण हुआ है: docs/DEVICES.md देखें); रिपोर्ट आमंत्रित हैं।"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "ट्रेलर",
-      "title": "44 सेकंड में देखें।",
+      "title": "55 सेकंड में देखें।",
       "text": "आवाज़ चालू करें। इसमें दिखने वाला सब कुछ असली ऐप है, जिसे डेवलपर की अपनी लाइब्रेरी पर रिकॉर्ड किया गया है।",
       "fallback": "ट्रेलर देखें (MP4)",
-      "caption": "44 s · 1080p · एल्बम आर्ट उसके मालिकों का है"
+      "caption": "55 s · 1080p · एल्बम आर्ट उसके मालिकों का है"
     },
     "features": {
       "eyebrow": "Vespertine क्यों",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "वीडियो",
       "title": "ट्रेलर।",
-      "text": "44 सेकंड, 16:9, 60 fps पर 1080p, आवाज़ के साथ। <a href=\"{href.trailerDownload}\" download>MP4 डाउनलोड करें</a> ({size})। 4K मास्टर अनुरोध पर उपलब्ध है।",
+      "text": "55 सेकंड, 16:9, 60 fps पर 1080p, आवाज़ के साथ। <a href=\"{href.trailerDownload}\" download>MP4 डाउनलोड करें</a> ({size})। 4K मास्टर अनुरोध पर उपलब्ध है।",
       "fallback": "ट्रेलर डाउनलोड करें (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "म्यूज़िक प्लेयर",
     "sourceName": "Vespertine का सोर्स कोड",
     "trailerName": "Vespertine ट्रेलर",
-    "trailerDescription": "Vespertine की 44 सेकंड की झलक, जो डेवलपर की अपनी लाइब्रेरी पर असली ऐप से रिकॉर्ड की गई है: बिट-परफ़ेक्ट सिग्नल पथ, DoP पर DSD, AirPods पर स्पेशियल ऑडियो के रूप में सराउंड, और हाई-रेज़ फ़ाइल विश्लेषण।",
+    "trailerDescription": "Vespertine की 55 सेकंड की झलक, जो डेवलपर की अपनी लाइब्रेरी पर असली ऐप से रिकॉर्ड की गई है: बिट-परफ़ेक्ट सिग्नल पथ, DoP पर DSD, AirPods पर स्पेशियल ऑडियो के रूप में सराउंड, और हाई-रेज़ फ़ाइल विश्लेषण।",
     "keywords": "मैक के लिए म्यूज़िक प्लेयर, Mac म्यूज़िक प्लेयर, हाई-रेज़ ऑडियो प्लेयर, DSD प्लेयर, SACD ISO, मल्टीचैनल ऑडियो, सराउंड साउंड, Dolby Atmos, DTS-HD Master Audio, बिट-परफ़ेक्ट प्लेबैक, रूम करेक्शन, स्पेशियल ऑडियो, FLAC प्लेयर, मुफ़्त, ओपन सोर्स"
   },
   "og": {

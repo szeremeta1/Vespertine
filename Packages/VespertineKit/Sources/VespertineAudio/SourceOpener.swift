@@ -26,11 +26,17 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
     public let sacdArea: SACDArea?
     /// DVD-Video discs: the LPCM run (a VOB's audio) to play. The region is then in sample frames of that run.
     public let dvd: DVDStreamRef?
+    /// Album, track number and genre, for deciding how it joins its neighbours while transitions are on; nil = unknown.
+    public let context: TransitionContext?
+    /// Matroska, WebM and other containers with several audio streams: the stream (its index in the file) to play; nil = the best one.
+    public let audioStream: Int?
 
     public init(id: UUID = UUID(), url: URL, trackID: Int64? = nil, regionStartFrame: Int64? = nil,
                 regionFrameLength: Int64? = nil, replayGainDB: Double? = nil, cacheKey: String? = nil, sacdArea: SACDArea? = nil,
-                dvd: DVDStreamRef? = nil) {
+                dvd: DVDStreamRef? = nil, context: TransitionContext? = nil, audioStream: Int? = nil) {
+        self.audioStream = audioStream
         self.cacheKey = cacheKey
+        self.context = context
         self.sacdArea = sacdArea
         self.dvd = dvd
         self.id = id
@@ -44,10 +50,13 @@ public struct PlayableItem: Sendable, Hashable, Identifiable {
 
 public enum SourceOpenerError: Error, LocalizedError {
     case unsupported(URL)
+    /// A format Vespertine has no decoder for, named.
+    case undecodable(UndecodedFormat, URL)
     case invalidRegion(URL, start: Int64, length: Int64?, available: Int64)
     public var errorDescription: String? {
         switch self {
         case .unsupported(let url): String(localized: "Unsupported file: \(url.lastPathComponent)")
+        case .undecodable(let format, _): format.failure
         case .invalidRegion(let url, let start, let length?, let available):
             String(localized: "CUE track is outside \(url.lastPathComponent): start \(start), length \(length), file length \(available) frames",
                    comment: "Positions and lengths in audio frames.")
@@ -71,8 +80,11 @@ final class ProbedSource: @unchecked Sendable {
     /// An SACD image's area, opened per track by `SourceOpener.decoder`.
     let sacd: SACDImage.Area?
     let dstDSDIFF: DSTDSDIFFInfo?
+    /// A WavPack file's DSD, opened again per decoder by `SourceOpener.decoder`.
+    let wavPackDSD: Bool
 
-    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil) {
+    fileprivate init(url: URL, format: SourceFormat, decoderName: String, pcm: PCMDecoding?, dsd: DSDDecoding?, sacd: SACDImage.Area? = nil, dstDSDIFF: DSTDSDIFFInfo? = nil,
+                     wavPackDSD: Bool = false) {
         self.url = url
         cacheLease = NetworkPlaybackCache.lookup(url)
         var format = format
@@ -88,6 +100,7 @@ final class ProbedSource: @unchecked Sendable {
         self.dsd = dsd
         self.sacd = sacd
         self.dstDSDIFF = dstDSDIFF
+        self.wavPackDSD = wavPackDSD
     }
 
     /// The decoder hands over the file's integer samples exactly, so an integer output can take them unchanged:
@@ -131,9 +144,22 @@ enum SourceOpener {
         }
     }
 
+    /// The layout a WavPack DSD file's speaker mask names (WAVE order); the standard layout for its channel count otherwise.
+    private static func wavPackLayout(_ source: WavPackDSDSource) -> AVAudioChannelLayout? {
+        guard source.channelCount > 2 else { return nil }
+        if source.channelMask != 0, source.channelMask.nonzeroBitCount == source.channelCount {
+            var bitmap = AudioChannelLayout()
+            bitmap.mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelBitmap
+            bitmap.mChannelBitmap = AudioChannelBitmap(rawValue: source.channelMask)
+            let labels = AVAudioChannelLayout(layout: &bitmap).channelLabels
+            if labels.count == source.channelCount, let named = ChannelLayouts.layout(labels: labels) { return named }
+        }
+        return ChannelLayouts.layout(channels: source.channelCount)
+    }
+
     static var supportedExtensions: Set<String> {
         AudioDecoder.supportedPathExtensions.union(DSDDecoder.supportedPathExtensions).union(dolbyExtensions)
-            .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions)
+            .union(FFmpegDecoder.extensions).union(sacdExtensions).union(dvdFolderExtensions).union(undecodableExtensions)
     }
 
     /// Disc images: SACD, or DVD-Video (read in place).
@@ -145,9 +171,13 @@ enum SourceOpener {
     /// decoder would otherwise claim `.ac3` by its extension.
     static let dolbyExtensions: Set<String> = ["ac3", "ec3", "eac3"]
 
+    /// Streams of formats nothing here decodes (Dolby AC-4, MPEG-H 3D Audio): listed in the library, with their name, and
+    /// refused with a plain reason when played.
+    static let undecodableExtensions: Set<String> = ["ac4", "mhas"]
+
     /// `area` picks an SACD image's area (stereo when nil), `dvd` a DVD-Video's LPCM run (its first track's when
-    /// nil); other files ignore them.
-    static func probe(_ url: URL, area: SACDArea? = nil, dvd: DVDStreamRef? = nil) throws -> ProbedSource {
+    /// nil), `audioStream` a Matroska or WebM file's audio stream (the best one when nil); other files ignore them.
+    static func probe(_ url: URL, area: SACDArea? = nil, dvd: DVDStreamRef? = nil, audioStream: Int? = nil) throws -> ProbedSource {
         let ext = url.pathExtension.lowercased()
         if dvd != nil || dvdFolderExtensions.contains(ext) || (sacdExtensions.contains(ext) && !SACDImage.isSACD(url) && DVDVideoDisc.isDVDVideo(url)) {
             // DVD-Video LPCM: a run of one VOB's audio, decoded here (tracks are regions of it).
@@ -171,6 +201,14 @@ enum SourceOpener {
         if ["dff", "dsdiff"].contains(ext), let info = try DSTDSDIFFInfo.read(url) {
             let format = SourceFormat(encoding: .dsd, codec: "DSDIFF", sampleRate: Double(info.rate), bitDepth: 1, channels: info.channels, channelLabels: dsdiffLabels(info.channelIDs))
             return ProbedSource(url: url, format: format, decoderName: "DSDIFF · DST", pcm: nil, dsd: nil, dstDSDIFF: info)
+        }
+        if let format = UndecodedFormat.undecodable(at: url) { throw SourceOpenerError.undecodable(format, url) }
+        if ext == "wv", let source = try WavPackDSDSource(url: url) {
+            // DSD stored in WavPack: libwavpack hands over the bitstream, which goes out as DoP or converts like DSDIFF.
+            let layout = wavPackLayout(source)
+            let format = SourceFormat(encoding: .dsd, codec: "WavPack", sampleRate: source.dsdRate, bitDepth: 1, channels: source.channelCount,
+                                      channelLabels: ChannelLayouts.speakerLabels(layout))
+            return ProbedSource(url: url, format: format, decoderName: "WavPack · DSD", pcm: nil, dsd: nil, wavPackDSD: true)
         }
         if FFmpegDecoder.dsdExtensions.contains(ext) {
             // DSD at any rate (DSF and DSDIFF): converted to PCM by FFmpeg, or sent as DoP from the raw stream.
@@ -198,8 +236,8 @@ enum SourceOpener {
             return ProbedSource(url: url, format: format, decoderName: String(localized: "Native DSD reader", comment: "The decoder, in the signal path."), pcm: nil, dsd: decoder)
         }
         if FFmpegDecoder.extensions.contains(ext) {
-            // DTS / DTS-HD MA / Dolby TrueHD: FFmpeg.
-            let decoder = FFmpegDecoder(url: url)
+            // DTS / DTS-HD MA / Dolby TrueHD, TAK, and the audio of Matroska and WebM: FFmpeg.
+            let decoder = FFmpegDecoder(url: url, stream: audioStream)
             try decoder.open()
             let d = decoder.describe
             let format = SourceFormat(encoding: d.lossless ? .pcm : .lossy, codec: d.codec, sampleRate: d.sampleRate,
@@ -293,7 +331,12 @@ enum SourceOpener {
                                   codec: codec,
                                   sampleRate: processing.mSampleRate, bitDepth: bits,
                                   channels: Int(processing.mChannelsPerFrame))
-        return ProbedSource(url: url, format: format, decoderName: decoderName(for: raw), pcm: decoder, dsd: nil)
+        var name = decoderName(for: raw)
+        // MQA and Auro-3D are ordinary PCM to everything here: it plays as that, and the signal path says so.
+        if lossless, let carried = pcmCarriedFormat(url: url, ext: ext, open: { try openDecoder().decoder }, bits: bits, channels: format.channels) {
+            name = carried.decoderName(name)
+        }
+        return ProbedSource(url: url, format: format, decoderName: name, pcm: decoder, dsd: nil)
     }
 
     /// Wraps the probed decoder for the plan (DoP / DSD→PCM) and applies a CUE region.
@@ -310,7 +353,11 @@ enum SourceOpener {
             return plan.mode == .dop ? try RawDoPDecoder(source: SACDSource(url: probed.url, area: area, frames: frames))
                                      : try SACDPCMDecoder(url: probed.url, area: area, frames: frames)
         }
-        if let info = probed.dstDSDIFF {
+        if probed.wavPackDSD {
+            guard let source = try WavPackDSDSource(url: probed.url) else { throw SourceOpenerError.unsupported(probed.url) }
+            let layout = wavPackLayout(source)
+            decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
+        } else if let info = probed.dstDSDIFF {
             let source = try DSTDSDIFFSource(url: probed.url, info: info)
             let layout = probed.format.channelLabels.flatMap { ChannelLayouts.layout(labels: $0) }
             decoder = plan.mode == .dop ? try RawDoPDecoder(source: source, channelLayout: layout) : try SACDPCMDecoder(source: source, channelLayout: layout)
@@ -337,6 +384,13 @@ enum SourceOpener {
         } else {
             throw SourceOpenerError.unsupported(probed.url)
         }
+        decoder = try applyingRegion(of: item, to: decoder, probed: probed)
+        return decoder
+    }
+
+    /// `decoder` limited to the item's region (a CUE track's stretch of the file), or as it is for a whole file.
+    static func applyingRegion(of item: PlayableItem, to decoder: PCMDecoding, probed: ProbedSource) throws -> PCMDecoding {
+        var decoder = decoder
         if let sourceStart = item.regionStartFrame {
             // Library CUE offsets are in the file's native sample frames. DSD is decoded at 1/8
             // its bit rate for PCM, or packed into DoP at 1/16. Convert before seeking the wrapped
@@ -370,6 +424,34 @@ enum SourceOpener {
         return decoder
     }
 
+    /// MQA or Auro-3D inside a lossless PCM file: MQA by the FLAC's own tags, or by its synchronisation word in the first
+    /// samples of a 24-bit stereo file (read through a decoder of its own, so the one that plays stays at the start);
+    /// Auro-3D by the release's name.
+    static func pcmCarriedFormat(url: URL, ext: String, open: () throws -> GuardedDecoder, bits: Int?, channels: Int) -> UndecodedFormat? {
+        guard ["flac", "wav", "w64", "rf64", "bwf"].contains(ext) else { return nil }
+        let tags = ext == "flac" ? UndecodedFormat.flacComments(url) : [:]
+        if ext == "flac", UndecodedFormat.isMQA(tags: tags) { return .mqa }
+        if channels >= 6 {
+            let words = [url.deletingLastPathComponent().lastPathComponent, url.lastPathComponent] + Array(tags.values)
+            return UndecodedFormat.isAuro3DByName(words, channels: channels) ? .auro3D : nil
+        }
+        guard ext == "flac", bits == 24, channels == 2, let scan = try? open() else { return nil }
+        defer { try? scan.close() }
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: scan.processingFormat, frameCapacity: 8_192) else { return nil }
+        var left: [Int32] = [], right: [Int32] = []
+        // The first 32,768 frames, whatever size the decoder hands them over in, as 24-bit integers (libFLAC's come as
+        // 32-bit integers with the 24 bits at the top; Float32 ones are exact).
+        while left.count < 32_768, (try? scan.decode(into: buffer, length: 8_192)) != nil, buffer.frameLength > 0 {
+            let n = Int(buffer.frameLength)
+            if let ints = buffer.int32ChannelData {
+                for i in 0..<n { left.append(ints[0][i] >> 8); right.append(ints[1][i] >> 8) }
+            } else if let floats = buffer.floatChannelData {
+                for i in 0..<n { left.append(Int32((floats[0][i] * 8_388_608).rounded())); right.append(Int32((floats[1][i] * 8_388_608).rounded())) }
+            } else { return nil }
+        }
+        return UndecodedFormat.hasMQASync(left: left, right: right) ? .mqa : nil
+    }
+
     /// RF64 / BW64 (EBU Tech 3306, ITU-R BS.2088) or Sony Wave64, by the file's first bytes.
     static func isLargeWAV(_ url: URL) -> Bool {
         guard let file = try? PlaybackFile(forReadingFrom: url) else { return false }
@@ -390,6 +472,7 @@ enum SourceOpener {
         case kAudioFormatOpus: return "Opus"
         case kAudioFormatAC3: return "Dolby Digital"
         case kAudioFormatEnhancedAC3: return "Dolby Digital Plus"
+        case DolbyAC4.formatID: return DolbyAC4.codecName
         default: break
         }
         switch ext {
@@ -423,11 +506,28 @@ enum SourceOpener {
     }
 }
 
+extension SourceOpener {
+    /// A new decoder on the file for reading it as PCM, as the engine would when not sending it untouched (the meters'
+    /// own decode of a bitstream); throws for sources that aren't PCM.
+    /// With an `item` that plays a region of the file (a CUE track), the decoder is limited to it, as the engine's is.
+    static func pcmDecoder(for url: URL, item: PlayableItem? = nil) throws -> PCMDecoding {
+        let probed = try probe(url)
+        guard let pcm = probed.pcm else { throw SourceOpenerError.unsupported(url) }
+        guard let item else { return pcm }
+        return try applyingRegion(of: item, to: pcm, probed: probed)
+    }
+}
+
 /// Public, read-only inspection used by the library scanner.
 public enum SourceInspector {
     public static var supportedExtensions: Set<String> { SourceOpener.supportedExtensions }
     /// Formats with no tag container of their own (read from the decoder and the file name).
-    public static var untaggedExtensions: Set<String> { SourceOpener.dolbyExtensions.union(FFmpegDecoder.extensions) }
+    public static var untaggedExtensions: Set<String> { SourceOpener.dolbyExtensions.union(FFmpegDecoder.extensions).union(SourceOpener.undecodableExtensions) }
+
+    /// The format of a file that can't be played because nothing here decodes it (Dolby AC-4, MPEG-H 3D Audio), or nil.
+    public static func undecodable(_ url: URL) -> UndecodedFormat? {
+        UndecodedFormat.undecodable(at: url)
+    }
     /// Disc images that hold several tracks (SACD), which the library splits by their own table of contents.
     public static var discImageExtensions: Set<String> { SourceOpener.sacdExtensions }
     /// A DVD-Video VIDEO_TS folder's entry file (VIDEO_TS.IFO), which the library splits by the disc's navigation.
@@ -457,6 +557,9 @@ public enum SourceInspector {
         return (probed.format, probed.decoderName)
     }
 
+    /// The format of a file no decoder opens but whose container names its codec (Dolby AC-4): nil for any other file.
+    public static func undecodableFormat(_ url: URL) -> SourceFormat? { DolbyAC4.format(of: url) }
+
     /// Format plus duration in seconds (from the decoder's frame/packet count).
     public static func inspectWithDuration(_ url: URL) throws -> (format: SourceFormat, duration: Double) {
         let probed = try SourceOpener.probe(url)
@@ -465,6 +568,8 @@ public enum SourceInspector {
             seconds = Double(area.frameRange.count) / Double(SACDImage.framesPerSecond)
         } else if let info = probed.dstDSDIFF {
             seconds = Double(info.frameCount) / 75
+        } else if probed.wavPackDSD, let source = try? WavPackDSDSource(url: url) {
+            seconds = Double(source.dsdLength) * 8 / source.dsdRate
         } else if let pcm = probed.pcm {
             let rate = pcm.processingFormat.sampleRate
             if rate > 0, pcm.length > 0 { seconds = Double(pcm.length) / rate }

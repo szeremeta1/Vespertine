@@ -14,7 +14,7 @@
     "copied": "Copied",
     "copyFailed": "Select it",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus and Dolby TrueHD are trademarks of Dolby Laboratories. DTS, DTS-HD Master Audio and DTS:X are trademarks of DTS, Inc. Apple, AirPods, AirPods Max, Mac, macOS and Spatial Audio are trademarks of Apple Inc. Vespertine names them only to describe what it plays and where; it isn’t certified, licensed or endorsed by Dolby, DTS or Apple.",
-    "trailerLabel": "Vespertine trailer, 44 seconds",
+    "trailerLabel": "Vespertine trailer, 55 seconds",
     "untested": "Channel-for-channel output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Trailer",
-      "title": "See it in 44 seconds.",
+      "title": "See it in 55 seconds.",
       "text": "Turn the sound on. Everything in it is the real app, recorded on the developer’s own library.",
       "fallback": "Watch the trailer (MP4)",
-      "caption": "44 s · 1080p · album art belongs to its owners"
+      "caption": "55 s · 1080p · album art belongs to its owners"
     },
     "features": {
       "eyebrow": "Why Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Trailer.",
-      "text": "44 seconds, 16:9, 1080p at 60 fps, with sound. <a href=\"{href.trailerDownload}\" download>Download the MP4</a> ({size}). A 4K master is available on request.",
+      "text": "55 seconds, 16:9, 1080p at 60 fps, with sound. <a href=\"{href.trailerDownload}\" download>Download the MP4</a> ({size}). A 4K master is available on request.",
       "fallback": "Download the trailer (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Music player",
     "sourceName": "Vespertine source code",
     "trailerName": "Vespertine trailer",
-    "trailerDescription": "A 44-second tour of Vespertine, recorded from the real app on the developer’s own library: the bit-perfect signal path, DSD over DoP, surround as Spatial Audio on AirPods and hi-res file analysis.",
+    "trailerDescription": "A 55-second tour of Vespertine, recorded from the real app on the developer’s own library: the bit-perfect signal path, DSD over DoP, surround as Spatial Audio on AirPods and hi-res file analysis.",
     "keywords": "hi-res music player for Mac, surround music player, SACD ISO player, DSD player for Mac, multichannel audio, Dolby Atmos music, DTS-HD Master Audio, DVD-Video LPCM, bit-perfect playback, room correction, Spatial Audio, AirPods Max, FLAC player, free, open source"
   },
   "og": {

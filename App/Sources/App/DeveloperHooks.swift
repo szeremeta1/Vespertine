@@ -90,8 +90,10 @@ enum DeveloperHooks {
         }
         // `-VespertineOpenWindow equalizer|mini|room-correction`: opens one of the app's other windows.
         // `-VespertineOpenSheet room-measure`: opens the measurement wizard at its first step, without starting it.
+        // `-VespertineOpenSheet transitions`: the note shown the first time transitions are turned on (nothing is changed).
         if let id = d.string(forKey: "VespertineOpenWindow") { openWindow?(id: id) }
         if d.string(forKey: "VespertineOpenSheet")?.hasPrefix("loopback") == true { model.showLoopbackTest = true }   // loopback-run also starts it
+        if d.string(forKey: "VespertineOpenSheet") == "transitions", model.settings.transitionsFeature { model.transitionsNote.show(in: .main) }
         // `-VespertineWindowSize 1440x900`: sizes the main window (in points), so every screenshot has one framing
         // whatever frame the window last saved.
         if let size = d.string(forKey: "VespertineWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
@@ -104,10 +106,49 @@ enum DeveloperHooks {
                 }
             }
         }
+        // `-VespertineVizScript "play,open,wait:3,probe,close,wait:1,next,wait:2,open,wait:1,probe,shot:reopened"`: drives the
+        // visualizer window the way a person does (open it, close it, skip, open it again) and says what the analysis sees
+        // after each step. `play` waits for a song playing; `probe` prints the feed's frames, the tap's position and the
+        // loudness; `shot:<name>` prints the window's number for an outside `screencapture -l`.
+        if let script = d.string(forKey: "VespertineVizScript") {
+            Task { await runVisualizerScript(script, model: model, openWindow: openWindow) }
+        }
         // `-VespertineQuitAfter 60`: quits after that many seconds (timed runs, such as the visualizer's measurements).
         if d.double(forKey: "VespertineQuitAfter") > 0 {
             Task {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertineQuitAfter")))
+                NSApp.terminate(nil)
+            }
+        }
+        // QA ONLY: `-VespertineQAEnableTransitions <dir>` opens Settings, flips the Transitions toggle's model call, and
+        // reports and shoots every window before and after.
+        if let path = d.string(forKey: "VespertineQAEnableTransitions") {
+            Task { @MainActor in
+                @MainActor func note(_ line: String) {
+                    print(line); fflush(stdout)
+                }
+                @MainActor func report(_ tag: String) {
+                    for w in NSApp.windows where w.frame.width > 100 {
+                        note("[qa-win] \(tag) title='\(w.title)' id=\(w.identifier?.rawValue ?? "-") visible=\(w.isVisible) key=\(w.isKeyWindow) main=\(w.isMainWindow) mini=\(w.isMiniaturized) sheet=\(w.attachedSheet != nil) order=\(NSApp.orderedWindows.firstIndex(of: w) ?? -1)")
+                    }
+                }
+                @MainActor func shoot(_ tag: String) {
+                    let dir = URL(fileURLWithPath: (path as NSString).expandingTildeInPath, isDirectory: true)
+                    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                    for (i, w) in NSApp.windows.enumerated() where w.isVisible && w.frame.width > 200 {
+                        guard let v = w.contentView?.superview ?? w.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { continue }
+                        v.cacheDisplay(in: v.bounds, to: rep)
+                        try? rep.representation(using: .png, properties: [:])?.write(to: dir.appendingPathComponent("\(tag)-\(i)-\(w.title.isEmpty ? "sheet" : w.title).png"))
+                    }
+                }
+                try? await Task.sleep(for: .seconds(3))
+                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                try? await Task.sleep(for: .seconds(2))
+                report("before"); shoot("before")
+                model.setTransitionsFeature(true)
+                note("[qa-win] flag note main=\(model.transitionsNote.isShown(in: .main)) settings=\(model.transitionsNote.isShown(in: .settings))")
+                try? await Task.sleep(for: .seconds(2))
+                report("after"); shoot("after")
                 NSApp.terminate(nil)
             }
         }
@@ -184,7 +225,7 @@ enum DeveloperHooks {
         }
         if d.bool(forKey: "VespertineOpenMini") { openWindow?(id: "mini") }
         if let play, let album = model.library.albums.first(where: { $0.title == play }) {
-            let tracks = model.library.tracks(albumKey: album.key)
+            let tracks = model.playableTracks(albumKey: album.key)
             model.player.play(tracks, startAt: d.integer(forKey: "VespertinePlayTrack"))
             if d.double(forKey: "VespertinePauseAfter") > 0 {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
@@ -203,7 +244,8 @@ enum DeveloperHooks {
                     && (parts.count < 4 || t.filePath.localizedCaseInsensitiveContains(parts[3]))   // e.g. ".iso"
             }
             if let song = model.library.allTracks().first(where: matches) {
-                let tracks = model.library.tracks(albumKey: song.albumKey)
+                // The copy of the album the song is in, so the queue goes on in that copy.
+                let tracks = model.library.albumCopies(albumKey: song.albumKey).copy(of: song)?.tracks ?? [song]
                 if d.string(forKey: "VespertineSidebar") == nil { model.openAlbum(song.albumKey) }   // else stay on that page
                 model.player.play(tracks, startAt: tracks.firstIndex { $0.id == song.id } ?? 0)
                 print("[qa] play song: \(song.displayAlbumArtist) — \(song.displayAlbum) — \(song.title) · \(song.formatSummary)")
@@ -280,6 +322,68 @@ enum DeveloperHooks {
             }
         default: break
         }
+    }
+
+    /// The visualizer window, when there is one on screen.
+    private static var visualizerWindow: NSWindow? { NSApp.windows.first { $0.title == "Visualizer" } }
+
+    private static func metalView(in view: NSView?) -> VisualizerMTKView? {
+        guard let view else { return nil }
+        if let metal = view as? VisualizerMTKView { return metal }
+        for sub in view.subviews { if let found = metalView(in: sub) { return found } }
+        return nil
+    }
+
+    private static func menuItem(titled title: String, in menu: NSMenu?) -> NSMenuItem? {
+        for item in menu?.items ?? [] {
+            if item.title == title, item.action != nil || item.hasSubmenu == false { return item }
+            if let found = menuItem(titled: title, in: item.submenu) { return found }
+        }
+        return nil
+    }
+
+    static func runVisualizerScript(_ script: String, model: AppModel, openWindow: OpenWindowAction?) async {
+        setvbuf(stdout, nil, _IOLBF, 0)
+        model.settings.visualizerEnabled = true
+        var left = [Float](repeating: 0, count: 2048), right = left
+        for step in script.split(separator: ",").map({ $0.trimmingCharacters(in: .whitespaces) }) {
+            let name = step.split(separator: ":", maxSplits: 1).first.map(String.init) ?? step
+            let arg = step.split(separator: ":", maxSplits: 1).dropFirst().first.map(String.init)
+            switch name {
+            case "play":
+                for _ in 0..<240 where model.player.current == nil || !model.player.isPlaying { try? await Task.sleep(for: .milliseconds(250)) }
+                print("[viz] \(step): playing \(model.player.current?.track.title ?? "nothing")")
+            case "wait": try? await Task.sleep(for: .seconds(Double(arg ?? "1") ?? 1))
+            case "open":
+                // The Window menu's Visualizer item, as a click on it does (the hooks may not have an `openWindow`).
+                if let openWindow { openWindow(id: "visualizer"); print("[viz] open requested") }
+                else if let item = menuItem(titled: "Visualizer", in: NSApp.mainMenu), let menu = item.menu {
+                    menu.performActionForItem(at: menu.index(of: item)); print("[viz] open requested (menu)")
+                } else { print("[viz] open: no Visualizer menu item") }
+            case "close":
+                if let w = visualizerWindow { w.performClose(nil); print("[viz] close requested") } else { print("[viz] close: no window") }
+            case "next": model.player.next(); print("[viz] next → \(model.player.current?.track.title ?? "-")")
+            case "prev": model.player.previous(); print("[viz] previous → \(model.player.current?.track.title ?? "-")")
+            case "probe":
+                let frame = model.visualizer.feed.frame, stats = model.visualizer.feed.stats
+                let read = model.player.engine.copyVisualizerTap(left: &left, right: &right)
+                let window = visualizerWindow
+                let metal = window.flatMap { metalView(in: $0.contentView) }
+                print("[viz] view: isPaused \(metal.map { String($0.isPaused) } ?? "no view") · occlusion visible \(window.map { String($0.occlusionState.contains(.visible)) } ?? "-") · frames drawn \(metal?.drawCount ?? -1)")
+                print(String(format: "[viz] probe %@: song %@ · showing %d · window %@ visible %@ · feed frames %d · frame.time %.3f · bands Σ %.3f · rms %.1f/%.1f dB · tap position %@ rate %.0f",
+                             arg ?? "", model.player.current?.track.title ?? "-", model.visualizer.showing,
+                             window.map { "#\($0.windowNumber)" } ?? "none", window.map { String($0.isVisible) } ?? "-", stats.frames, frame.time,
+                             frame.bands.reduce(0, +), frame.rmsDB.x, frame.rmsDB.y,
+                             read.map { String($0.position) } ?? "nil", read?.sampleRate ?? 0))
+            case "shot":
+                let window = visualizerWindow
+                print("[viz] shot \(arg ?? "") window \(window.map { String($0.windowNumber) } ?? "none")")
+                try? await Task.sleep(for: .seconds(1.5))   // time for an outside capture
+            case "quit": NSApp.terminate(nil)
+            default: print("[viz] unknown step \(step)")
+            }
+        }
+        print("[viz] script done")
     }
 
     /// "genre=Jazz|Blues;decade=1970;sampleRate=96000;format=flac|dsd;flags=bits24,favorite" → a filter.

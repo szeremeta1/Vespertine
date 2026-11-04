@@ -161,12 +161,15 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var sacdArea: SACDArea? { SACDArea(location: location) }
     /// For a track of a DVD-Video (image or VIDEO_TS folder), the LPCM run it's a range of ("<disc>#dvd-…").
     public var dvdStream: DVDStreamRef? { DVDStreamRef(location: location) }
+    /// For one audio stream of a Matroska or WebM file with several, the stream ("<file>#audio-<index>").
+    public var audioStream: Int? { AudioStreamRef(location: location)?.index }
     /// A track of a VIDEO_TS folder: its file is the folder's VIDEO_TS.IFO, which can't be copied or cached on its own.
     public var isDVDFolderTrack: Bool { dvdStream != nil && (filePath as NSString).pathExtension.lowercased() == "ifo" }
 
     public var formatSummary: String { baseFormatSummary + channelSuffix }
 
-    private var baseFormatSummary: String {
+    /// "FLAC · 24/96", "DSD128", "MP3 · 320k": the format without the layout.
+    var baseFormatSummary: String {
         if isDSD { return "DSD\(Int((sampleRate / 44_100).rounded()))" }
         let rate = sampleRate.truncatingRemainder(dividingBy: 1000) == 0
             ? String(Int(sampleRate / 1000)) : String(format: "%.1f", sampleRate / 1000)

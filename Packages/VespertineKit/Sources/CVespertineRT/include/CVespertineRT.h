@@ -50,6 +50,12 @@ void nrt_ring_reset(NRTRing *_Nonnull ring);
 /// one read (or render pass) already under way.
 bool nrt_ring_rewind(NRTRing *_Nonnull ring, uint64_t totalWritten, uint32_t margin);
 
+/// Producer side, safe while the consumer runs: copies `frames` frames it wrote, from ring position `from`, into `dst`
+/// (a skip's crossfade takes the outgoing song's next seconds back out before rewinding). Only frames still held:
+/// `from` no further back than one capacity from the write position, and `from + frames` no further than it. Returns
+/// the frames copied (0 when the range isn't held). Never touches the read side.
+uint32_t nrt_ring_peek(const NRTRing *_Nonnull ring, uint64_t from, float *_Nonnull dst, uint32_t frames);
+
 // MARK: - Render context driven by a HAL IOProc
 
 #define NRT_TAP_SIZE 8192u
@@ -71,6 +77,16 @@ void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthroug
 /// skip, seek, pause or output change is asked for, so the old song stops at once instead of playing on
 /// from the buffer until the engine thread gets to the request (it may be waiting on a network read).
 void nrt_context_set_muted(NRTRenderContext *_Nonnull ctx, bool muted);
+/// Transitions' fader, folded into the gain stage: a ramp to full level (`up`) or to silence over `frames` frames,
+/// starting from silence (`fromSilence`) or from wherever the level is. `thenMute`: when a ramp down ends, the context
+/// mutes itself (as `nrt_context_set_muted(true)`) and the level goes back to full for the next unmute. Any thread; the
+/// newest command wins. Idle (full level, no ramp) the I/O thread never enters the gain loop for it, so output is
+/// bit-identical; native DSD (DoP), passthrough and integer output take a command at once (no ramp, a ramp down with
+/// `thenMute` mutes), never touching their words.
+void nrt_context_fade(NRTRenderContext *_Nonnull ctx, bool up, uint32_t frames, bool fromSilence, bool thenMute);
+/// A fade command is waiting or a ramp is running.
+bool nrt_context_fading(const NRTRenderContext *_Nonnull ctx);
+bool nrt_context_is_muted(const NRTRenderContext *_Nonnull ctx);
 
 /// The DSD idle pattern (01101001: as many ones as zeros, so a DAC reads it as silence). DSD silence is this, not
 /// all-zero bits.
@@ -95,6 +111,9 @@ void nrt_context_set_draining(NRTRenderContext *_Nonnull ctx, bool draining);
 /// Integer mode: the ring carries 32-bit integer samples (bit patterns in the float slots) for a device set
 /// to a non-mixable Int32 format. They're copied untouched (implies passthrough); meters read them as integers.
 void nrt_context_set_integer(NRTRenderContext *_Nonnull ctx, bool integer);
+/// "Match 16-bit sources": the output's words are the file's own (float samples carrying 16-bit words), so the fader
+/// for play, pause and seek never scales them: a command applies at once, as in integer mode.
+void nrt_context_set_unscaled(NRTRenderContext *_Nonnull ctx, bool unscaled);
 uint32_t nrt_context_take_underruns(NRTRenderContext *_Nonnull ctx);
 /// Network streams: hold in silence (consuming nothing) when the ring can't fill a slice, and resume
 /// once `resumeFrames` are buffered. 0 turns it off. Clamped to ¾ of the ring.
@@ -253,6 +272,17 @@ uint64_t nrt_capture_frames(const NRTCapture *_Nonnull capture);
 uint32_t nrt_capture_discontinuities(const NRTCapture *_Nonnull capture, uint64_t *_Nullable positions, uint32_t max);
 /// Frames dropped because the ring was full.
 uint64_t nrt_capture_overflow(const NRTCapture *_Nonnull capture);
+
+/// How samples sit in an input buffer; the capture converts each to Float32. Float32 unless set.
+enum { NRT_SAMPLE_FLOAT32 = 0, NRT_SAMPLE_FLOAT64 = 1, NRT_SAMPLE_INT16 = 2, NRT_SAMPLE_INT24 = 3, NRT_SAMPLE_INT32 = 4 };
+#define NRT_CAPTURE_MAX_BUFFERS 32u
+
+/// Sets how the samples of input buffer `index` (in the IOProc's buffer list) are read. Call before the IOProc starts.
+void nrt_capture_set_kind(NRTCapture *_Nonnull capture, uint32_t index, int32_t kind);
+/// One sample of `kind` at `src` (native byte order; INT24 is three packed bytes) as Float32 in -1...1.
+float nrt_sample_to_float(const void *_Nonnull src, int32_t kind);
+/// Bytes one sample of `kind` takes.
+uint32_t nrt_sample_bytes(int32_t kind);
 
 /// Pass to AudioDeviceCreateIOProcID with the capture as client data. Reads the input only; writes no output.
 OSStatus nrt_capture_ioproc(AudioObjectID inDevice,

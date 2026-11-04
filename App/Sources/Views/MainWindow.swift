@@ -91,6 +91,9 @@ struct MainWindow: View {
         .sheet(isPresented: $model.showLoopbackTest) {
             LoopbackTestSheet().environment(model)
         }
+        .sheet(isPresented: Binding(get: { model.transitionsNote.isShown(in: .main) }, set: { if !$0 { model.transitionsNote.dismiss() } })) {
+            TransitionsExplainerSheet()
+        }
         .sheet(isPresented: Binding(get: { model.enrichAlbumKeys != nil }, set: { if !$0 { model.enrichAlbumKeys = nil } })) {
             EnrichSheet(albumKeys: model.enrichAlbumKeys ?? []).environment(model)
         }

@@ -14,7 +14,7 @@
     "copied": "ਕਾਪੀ ਕੀਤਾ ਗਿਆ",
     "copyFailed": "ਇਸ ਨੂੰ ਚੁਣੋ",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ਅਤੇ Dolby TrueHD, Dolby Laboratories ਦੇ ਟ੍ਰੇਡਮਾਰਕ ਹਨ। DTS, DTS-HD Master Audio ਅਤੇ DTS:X, DTS, Inc. ਦੇ ਟ੍ਰੇਡਮਾਰਕ ਹਨ। Apple, AirPods, AirPods Max, Mac, macOS ਅਤੇ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, Apple Inc. ਦੇ ਟ੍ਰੇਡਮਾਰਕ ਹਨ। Vespertine ਇਹਨਾਂ ਦੇ ਨਾਂ ਸਿਰਫ਼ ਇਹ ਦੱਸਣ ਲਈ ਲੈਂਦਾ ਹੈ ਕਿ ਇਹ ਕੀ ਚਲਾਉਂਦਾ ਹੈ ਅਤੇ ਕਿੱਥੇ; ਇਹ Dolby, DTS ਜਾਂ Apple ਵੱਲੋਂ ਪ੍ਰਮਾਣਿਤ, ਲਾਇਸੈਂਸਸ਼ੁਦਾ ਜਾਂ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ।",
-    "trailerLabel": "Vespertine ਟ੍ਰੇਲਰ, 44 ਸਕਿੰਟ",
+    "trailerLabel": "Vespertine ਟ੍ਰੇਲਰ, 55 ਸਕਿੰਟ",
     "untested": "ਚੈਨਲ-ਦਰ-ਚੈਨਲ ਆਉਟਪੁੱਟ ਅਤੇ ਰਿਸੀਵਰ ਬਿੱਟਸਟ੍ਰੀਮ ਪ੍ਰਯੋਗਾਤਮਕ ਹਨ, ਅਤੇ ਅਸਲ ਰਿਸੀਵਰਾਂ ਅਤੇ ਮਲਟੀਚੈਨਲ USB DAC ’ਤੇ ਪਰਖੇ ਨਹੀਂ ਗਏ (HDMI ਰਾਹੀਂ ਇੱਕ Sony ਟੀਵੀ ’ਤੇ ਪਰਖ ਕੀਤੀ ਗਈ ਹੈ: docs/DEVICES.md ਦੇਖੋ); ਰਿਪੋਰਟਾਂ ਦੀ ਲੋੜ ਹੈ।"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "ਟ੍ਰੇਲਰ",
-      "title": "44 ਸਕਿੰਟਾਂ ਵਿੱਚ ਦੇਖੋ।",
+      "title": "55 ਸਕਿੰਟਾਂ ਵਿੱਚ ਦੇਖੋ।",
       "text": "ਆਵਾਜ਼ ਚਾਲੂ ਕਰੋ। ਇਸ ਵਿੱਚ ਦਿਸਦਾ ਸਭ ਕੁਝ ਅਸਲ ਐਪ ਹੈ, ਡਿਵੈਲਪਰ ਦੀ ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ’ਤੇ ਰਿਕਾਰਡ ਕੀਤਾ ਹੋਇਆ।",
       "fallback": "ਟ੍ਰੇਲਰ ਦੇਖੋ (MP4)",
-      "caption": "44 ਸਕਿੰਟ · 1080p · ਐਲਬਮ ਆਰਟ ਆਪਣੇ ਮਾਲਕਾਂ ਦੀ ਹੈ"
+      "caption": "55 ਸਕਿੰਟ · 1080p · ਐਲਬਮ ਆਰਟ ਆਪਣੇ ਮਾਲਕਾਂ ਦੀ ਹੈ"
     },
     "features": {
       "eyebrow": "Vespertine ਕਿਉਂ",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "ਵੀਡੀਓ",
       "title": "ਟ੍ਰੇਲਰ।",
-      "text": "44 ਸਕਿੰਟ, 16:9, 60 fps ’ਤੇ 1080p, ਆਵਾਜ਼ ਸਮੇਤ। <a href=\"{href.trailerDownload}\" download>MP4 ਡਾਊਨਲੋਡ ਕਰੋ</a> ({size})। 4K ਮਾਸਟਰ ਬੇਨਤੀ ’ਤੇ ਉਪਲਬਧ ਹੈ।",
+      "text": "55 ਸਕਿੰਟ, 16:9, 60 fps ’ਤੇ 1080p, ਆਵਾਜ਼ ਸਮੇਤ। <a href=\"{href.trailerDownload}\" download>MP4 ਡਾਊਨਲੋਡ ਕਰੋ</a> ({size})। 4K ਮਾਸਟਰ ਬੇਨਤੀ ’ਤੇ ਉਪਲਬਧ ਹੈ।",
       "fallback": "ਟ੍ਰੇਲਰ ਡਾਊਨਲੋਡ ਕਰੋ (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "ਸੰਗੀਤ ਪਲੇਅਰ",
     "sourceName": "Vespertine ਸੋਰਸ ਕੋਡ",
     "trailerName": "Vespertine ਟ੍ਰੇਲਰ",
-    "trailerDescription": "Vespertine ਦਾ 44 ਸਕਿੰਟਾਂ ਦਾ ਦੌਰਾ, ਡਿਵੈਲਪਰ ਦੀ ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ’ਤੇ ਅਸਲ ਐਪ ਤੋਂ ਰਿਕਾਰਡ ਕੀਤਾ: ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਸਿਗਨਲ ਮਾਰਗ, DoP ਰਾਹੀਂ DSD, AirPods ’ਤੇ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਵਜੋਂ ਸਰਾਊਂਡ, ਅਤੇ ਹਾਈ-ਰੈਜ਼ ਫ਼ਾਈਲ ਵਿਸ਼ਲੇਸ਼ਣ।",
+    "trailerDescription": "Vespertine ਦਾ 55 ਸਕਿੰਟਾਂ ਦਾ ਦੌਰਾ, ਡਿਵੈਲਪਰ ਦੀ ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ’ਤੇ ਅਸਲ ਐਪ ਤੋਂ ਰਿਕਾਰਡ ਕੀਤਾ: ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਸਿਗਨਲ ਮਾਰਗ, DoP ਰਾਹੀਂ DSD, AirPods ’ਤੇ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਵਜੋਂ ਸਰਾਊਂਡ, ਅਤੇ ਹਾਈ-ਰੈਜ਼ ਫ਼ਾਈਲ ਵਿਸ਼ਲੇਸ਼ਣ।",
     "keywords": "Mac ਲਈ ਮਿਊਜ਼ਿਕ ਪਲੇਅਰ, ਸੰਗੀਤ ਪਲੇਅਰ, ਹਾਈ-ਰੈਜ਼ ਪਲੇਅਰ, DSD ਪਲੇਅਰ, SACD ISO, ਮਲਟੀਚੈਨਲ ਆਡੀਓ, ਸਰਾਊਂਡ ਸਾਊਂਡ, Dolby Atmos, DTS-HD Master Audio, ਬਿੱਟ-ਪਰਫ਼ੈਕਟ, ਰੂਮ ਕਰੈਕਸ਼ਨ, ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, FLAC ਪਲੇਅਰ, ਮੁਫ਼ਤ, ਓਪਨ ਸੋਰਸ"
   },
   "og": {

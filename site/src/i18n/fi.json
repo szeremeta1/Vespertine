@@ -14,7 +14,7 @@
     "copied": "Kopioitu",
     "copyFailed": "Valitse teksti",
     "trademarks": "Dolby, Dolby Atmos, Dolby Digital, Dolby Digital Plus ja Dolby TrueHD ovat Dolby Laboratoriesin tavaramerkkejä. DTS, DTS-HD Master Audio ja DTS:X ovat DTS, Inc:n tavaramerkkejä. Apple, AirPods, AirPods Max, Mac, macOS ja Tilaääni (Spatial Audio) ovat Apple Inc:n tavaramerkkejä. Vespertine mainitsee ne vain kertoakseen, mitä se toistaa ja missä; Dolby, DTS tai Apple ei ole sertifioinut, lisensoinut eikä hyväksynyt sitä.",
-    "trailerLabel": "Vespertine-traileri, 44 sekuntia",
+    "trailerLabel": "Vespertine-traileri, 55 sekuntia",
     "untested": "Kanava kanavaan -ulostulo ja bittivirta vastaanottimelle ovat kokeellisia, eikä niitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan."
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "Traileri",
-      "title": "Vespertine 44 sekunnissa.",
+      "title": "Vespertine 55 sekunnissa.",
       "text": "Laita äänet päälle. Kaikki videossa on oikeaa sovellusta, kuvattuna kehittäjän omalla kirjastolla.",
       "fallback": "Katso traileri (MP4)",
-      "caption": "44 s · 1080p · kansikuvat kuuluvat oikeudenhaltijoilleen"
+      "caption": "55 s · 1080p · kansikuvat kuuluvat oikeudenhaltijoilleen"
     },
     "features": {
       "eyebrow": "Miksi Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "Video",
       "title": "Traileri.",
-      "text": "44 sekuntia, 16:9, 1080p 60 fps:llä, ääni mukana. <a href=\"{href.trailerDownload}\" download>Lataa MP4</a> ({size}). 4K-master on saatavilla pyynnöstä.",
+      "text": "55 sekuntia, 16:9, 1080p 60 fps:llä, ääni mukana. <a href=\"{href.trailerDownload}\" download>Lataa MP4</a> ({size}). 4K-master on saatavilla pyynnöstä.",
       "fallback": "Lataa traileri (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "Musiikkisoitin",
     "sourceName": "Vespertinen lähdekoodi",
     "trailerName": "Vespertinen traileri",
-    "trailerDescription": "44 sekunnin esittely Vespertinestä, tallennettu oikeasta sovelluksesta kehittäjän omalla kirjastolla. Siinä näkyvät bittitarkka signaalipolku, DSD DoP:n kautta, surround Tilaäänenä AirPodseilla ja hi-res-tiedostojen analyysi.",
+    "trailerDescription": "55 sekunnin esittely Vespertinestä, tallennettu oikeasta sovelluksesta kehittäjän omalla kirjastolla. Siinä näkyvät bittitarkka signaalipolku, DSD DoP:n kautta, surround Tilaäänenä AirPodseilla ja hi-res-tiedostojen analyysi.",
     "keywords": "musiikkisoitin Macille, hi-res-soitin Mac, DSD-soitin, SACD ISO, monikanavaääni, surround-musiikki, Dolby Atmos, DTS-HD Master Audio, bittitarkka toisto, huonekorjaus, tilaääni, FLAC-soitin, ilmainen, avoin lähdekoodi"
   },
   "og": {

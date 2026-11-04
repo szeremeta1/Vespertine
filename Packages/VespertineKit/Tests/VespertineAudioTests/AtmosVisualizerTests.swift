@@ -129,6 +129,7 @@ private final class TracingBedReader: BedReading, @unchecked Sendable {
         } catch { note("next threw \(error)"); throw error }
     }
     func cancel() { note("cancel"); inner.cancel() }
+    var channelLabels: [AudioChannelLabel] { inner.channelLabels }
 }
 
 private final class TraceBox: @unchecked Sendable {
@@ -156,6 +157,33 @@ struct AtmosVisualizerTests {
         #expect(read?.frames == 4096)
         #expect(read?.sampleRate == 48_000)
         #expect(l.contains { abs($0) > 0.4 })
+    }
+
+    @Test("Closed, the next Atmos song started, shown again: the tap is on for the new render and reads it")
+    func reopenAfterSkip() {
+        let engine = PlaybackEngine()
+        let first = FakeAtmosRender()
+        engine.attachSystemTapForTesting(first)
+        engine.setVisualizerTap(true)
+        first.advance(by: 48_000)
+        var l = [Float](repeating: 0, count: 2048), r = l
+        #expect(engine.copyVisualizerTap(left: &l, right: &r)?.position == 48_000)
+        // The window closes: nothing is read, and the render doesn't tap.
+        engine.setVisualizerTap(false)
+        #expect(!first.tapping)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r) == nil)
+        // The next song starts while it's closed: a render of its own, made with the tap off.
+        let second = FakeAtmosRender()
+        engine.attachSystemTapForTesting(second)
+        second.advance(by: 4_800)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r) == nil)
+        // The window shows again.
+        engine.setVisualizerTap(true)
+        #expect(second.tapping)
+        let read = engine.copyVisualizerTap(left: &l, right: &r)
+        #expect(read?.position == 4_800 && read?.frames == 2048)
+        second.advance(by: 4_800)
+        #expect(engine.copyVisualizerTap(left: &l, right: &r)?.position == 9_600)
     }
 
     /// Energy of `signal` at `hz` (Goertzel).
@@ -370,7 +398,14 @@ struct AtmosVisualizerTests {
     @Test("A reader that fails mid-stream ends the decoder with the error recorded, keeping what it had stored")
     func readerFailureIsRecorded() throws {
         let reader = FakeBedReader(frames: 8192, buffers: 10, failAfter: 3)
-        let decoder = SystemBedDecoder(makeReader: { _ in reader })
+        // The second start gets a reader of its own that doesn't fail. (Handing the failed reader out again made it fail
+        // at once on the new run's thread, which under load could happen before the check below: a race in the test.)
+        let second = FakeBedReader(frames: 8192, buffers: 10)
+        let made = Locked(0)   // the second start comes after the first run has ended, so the two calls never overlap
+        let decoder = SystemBedDecoder(makeReader: { _ in
+            made.value += 1
+            return made.value == 1 ? reader : second
+        })
         decoder.start(at: 0) { 100 }
         defer { decoder.stop() }
         try Self.waitForBed(decoder, through: 3 * 8192, timeout: 20)
@@ -381,6 +416,8 @@ struct AtmosVisualizerTests {
         #expect(reader.cancelled)
         // A new start clears the error and decodes again.
         decoder.start(at: 0) { 100 }
+        #expect(decoder.error == nil)
+        try Self.waitForBed(decoder, through: 10 * 8192, timeout: 20)
         #expect(decoder.error == nil)
     }
 

@@ -110,7 +110,8 @@ struct LoopbackRunnerTests {
         #expect(s.spatialModes["Vespertine Loopback"] == .off && s.bitstreamDeviceUIDs.isEmpty && s.dopDeviceUIDs.isEmpty)
         #expect(s.ratePolicies["Vespertine Loopback"] == .matchSource && s.matchSixteenBit && !s.integerMode)
         let described = LoopbackRunner.describe(s)
-        for key in ["Digital volume", "Equalizer", "ReplayGain", "Spatial Audio", "Bitstream"] { #expect(described[key] == "off") }
+        for key in ["Digital volume", "Equalizer", "ReplayGain", "Spatial Audio", "Bitstream", "Transitions"] { #expect(described[key] == "off") }
+        #expect(!s.transitions.enabled)
         #expect(described["Match 16-bit sources"] == "on")
     }
 

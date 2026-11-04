@@ -65,6 +65,9 @@ final class AppSettings {
     var atmosBySystem: Bool { didSet { defaults.set(atmosBySystem, forKey: "atmosBySystem") } }
     /// Songs with a stereo and a multichannel version: which to play.
     var versionPreference: TrackVersions.Preference { didSet { defaults.set(versionPreference.rawValue, forKey: "versionPreference") } }
+    /// Albums in several copies (a download, a vinyl transfer, an Atmos mix) play as one, each song in the copy the
+    /// output supports best, unless an album has its own choice. Off by default: one copy plays and the others stay copies.
+    var bundleCopies: Bool { didSet { defaults.set(bundleCopies, forKey: "bundleCopies") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     /// The chosen output as last seen, to name it while it's unplugged and find it again under a new UID.
@@ -140,6 +143,14 @@ final class AppSettings {
     var visualizer: VisualizerSettings { didSet { if visualizer != oldValue { visualizer.save(to: defaults) } } }
     /// Where the visualizer window was (display, frame, full screen).
     var visualizerWindow: VisualizerWindowState? { didSet { if visualizerWindow != oldValue { visualizerWindow?.save(to: defaults) } } }
+    /// Song transitions exist in the app only while this is on (Settings › Playback › Transitions), off by default: off,
+    /// there is no menu item, button, setting, Shortcuts action or string for them, and playback is untouched.
+    var transitionsFeature: Bool { didSet { defaults.set(transitionsFeature, forKey: "transitionsFeature") } }
+    /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
+    /// engine only while the switch is on (`engineSettings()`).
+    var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
+    /// Transitions are available and their playback switch is on. Everything that reads "are transitions on" uses this.
+    var transitionsOn: Bool { transitionsFeature && transitions.enabled }
     /// First-run setup has been finished (or skipped) once.
     var setupCompleted: Bool { didSet { defaults.set(setupCompleted, forKey: "setupCompleted") } }
 
@@ -154,11 +165,12 @@ final class AppSettings {
             "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "bundleCopies": false,
         ])
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
         versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
+        bundleCopies = defaults.bool(forKey: "bundleCopies")
         integerMode = defaults.bool(forKey: "integerMode")
         matchSixteenBit = defaults.bool(forKey: "matchSixteenBit")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
@@ -217,6 +229,8 @@ final class AppSettings {
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
         visualizer = VisualizerSettings.load(from: defaults)
         visualizerWindow = VisualizerWindowState.load(from: defaults)
+        transitionsFeature = defaults.bool(forKey: "transitionsFeature")
+        transitions = TransitionSettings.load(from: defaults)
         if let dataDirectory {
             self.dataDirectory = dataDirectory
         } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
@@ -344,6 +358,9 @@ final class AppSettings {
             roomProfile(for: uid).map { (uid, RoomCorrectionPlayback(profile: $0)) }
         })
         s.roomNativeDSDDeviceUIDs = roomNativeDSDDeviceUIDs
+        // Transitions reach the engine only while their master switch is on: off, it gets the defaults whatever else is
+        // chosen, so nothing about playback changes (and the explainer flag never reaches it).
+        s.transitions = transitionsOn ? transitions.engineRelevant : TransitionSettings()
         return s
     }
 }

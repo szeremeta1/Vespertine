@@ -14,7 +14,7 @@
     "copied": "ተቀድቷል",
     "copyFailed": "ይምረጡት",
     "trademarks": "Dolby፣ Dolby Atmos፣ Dolby Digital፣ Dolby Digital Plus እና Dolby TrueHD የDolby Laboratories የንግድ ምልክቶች ናቸው። DTS፣ DTS-HD Master Audio እና DTS:X የDTS, Inc. የንግድ ምልክቶች ናቸው። Apple፣ AirPods፣ AirPods Max፣ Mac፣ macOS እና Spatial Audio የApple Inc. የንግድ ምልክቶች ናቸው። Vespertine እነዚህን ስሞች የሚጠቅሰው ምን እንደሚያጫውትና የት እንደሚያጫውት ለመግለጽ ብቻ ነው፤ በDolby፣ በDTS ወይም በApple የተረጋገጠ፣ ፈቃድ የተሰጠው ወይም የተደገፈ አይደለም።",
-    "trailerLabel": "የVespertine ማስተዋወቂያ ቪዲዮ፣ 44 ሰከንድ",
+    "trailerLabel": "የVespertine ማስተዋወቂያ ቪዲዮ፣ 55 ሰከንድ",
     "untested": "ቻናል-በቻናል ውፅዓት እና ወደ ተቀባይ የሚላክ bitstream በሙከራ ደረጃ ላይ ያሉ ናቸው፤ በእውነተኛ ተቀባዮችና በባለብዙ ቻናል USB DACዎች ላይ አልተፈተኑም (በHDMI የተገናኘ አንድ Sony ቲቪ ተፈትኗል፦ docs/DEVICES.md ይመልከቱ)፤ ሪፖርቶች ይፈለጋሉ።"
   },
   "nav": {
@@ -83,10 +83,10 @@
     },
     "trailer": {
       "eyebrow": "ማስተዋወቂያ ቪዲዮ",
-      "title": "በ44 ሰከንድ ይመልከቱት።",
+      "title": "በ55 ሰከንድ ይመልከቱት።",
       "text": "ድምፁን ያብሩ። በውስጡ የሚታየው ሁሉ እውነተኛው መተግበሪያ ነው፤ የተቀረጸውም በገንቢው የራሱ ቤተ-መጻሕፍት ላይ ነው።",
       "fallback": "ማስተዋወቂያ ቪዲዮውን ይመልከቱ (MP4)",
-      "caption": "44 ሰከንድ · 1080p · የአልበም ሥዕሎቹ የባለቤቶቻቸው ናቸው"
+      "caption": "55 ሰከንድ · 1080p · የአልበም ሥዕሎቹ የባለቤቶቻቸው ናቸው"
     },
     "features": {
       "eyebrow": "ለምን Vespertine",
@@ -622,7 +622,7 @@
     "video": {
       "eyebrow": "ቪዲዮ",
       "title": "የማስተዋወቂያ ቪዲዮ።",
-      "text": "44 ሰከንድ፣ 16:9፣ 1080p በ60 fps፣ ከድምፅ ጋር። <a href=\"{href.trailerDownload}\" download>MP4 ፋይሉን ያውርዱ</a> ({size})። የ4K ማስተር ቅጂ በጥያቄ ይገኛል።",
+      "text": "55 ሰከንድ፣ 16:9፣ 1080p በ60 fps፣ ከድምፅ ጋር። <a href=\"{href.trailerDownload}\" download>MP4 ፋይሉን ያውርዱ</a> ({size})። የ4K ማስተር ቅጂ በጥያቄ ይገኛል።",
       "fallback": "የማስተዋወቂያ ቪዲዮውን ያውርዱ (MP4)"
     },
     "logo": {
@@ -742,7 +742,7 @@
     "subCategory": "የሙዚቃ ማጫወቻ",
     "sourceName": "የVespertine ምንጭ ኮድ",
     "trailerName": "የVespertine ማስተዋወቂያ ቪዲዮ",
-    "trailerDescription": "በገንቢው የራሱ ቤተ-መጻሕፍት ላይ ከእውነተኛው መተግበሪያ የተቀረጸ የ44 ሰከንድ የVespertine ጉብኝት፦ ቢት-ፍጹም የሲግናል መንገድ፣ DSD በDoP፣ ሰራውንድ እንደ Spatial Audio በAirPods ላይ፣ እና የHi-Res ፋይል ትንተና።",
+    "trailerDescription": "በገንቢው የራሱ ቤተ-መጻሕፍት ላይ ከእውነተኛው መተግበሪያ የተቀረጸ የ55 ሰከንድ የVespertine ጉብኝት፦ ቢት-ፍጹም የሲግናል መንገድ፣ DSD በDoP፣ ሰራውንድ እንደ Spatial Audio በAirPods ላይ፣ እና የHi-Res ፋይል ትንተና።",
     "keywords": "የMac ሙዚቃ ማጫወቻ, hi-res ማጫወቻ, DSD ማጫወቻ, SACD ISO, ባለብዙ ቻናል ድምፅ, ሰራውንድ, Dolby Atmos, DTS-HD Master Audio, ቢት-ፍጹም, የክፍል ማስተካከያ, Spatial Audio, FLAC, ነፃ, ክፍት ምንጭ"
   },
   "og": {

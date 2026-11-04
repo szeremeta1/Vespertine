@@ -31,6 +31,10 @@ let package = Package(
         // DTS CDs / DTS-in-WAV: FFmpeg's DTS decoder only (scripts/build-dts-decoder.sh).
         .binaryTarget(name: "FFmpegDCA", path: "Vendor/FFmpegDCA.xcframework"),
         .target(name: "CVespertineDTS", dependencies: ["FFmpegDCA"]),
+        // libwavpack with DSD support, prefixed so it can't meet the WavPack inside SFBAudioEngine, which leaves DSD out
+        // (scripts/build-wavpack-dsd.sh).
+        .binaryTarget(name: "WavPackDSD", path: "Vendor/WavPackDSD.xcframework"),
+        .target(name: "CVespertineWavPack", dependencies: ["WavPackDSD"]),
         // Decoder calls with C++/Objective-C exceptions caught (a damaged file must not crash the app).
         .target(name: "CVespertineGuard", linkerSettings: [.linkedFramework("AVFAudio"), .linkedLibrary("c++")]),
         // Every value of multi-valued tags (several artists, genres, MusicBrainz IDs), which SFBAudioEngine's writer cuts to one.
@@ -42,6 +46,7 @@ let package = Package(
                 "CVespertineDTS",
                 "CVespertineGuard",
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
+                "CVespertineWavPack",
                 .product(name: "VespertineAnalysisCore", package: "VespertineAnalysis"),
             ],
             linkerSettings: [
@@ -82,7 +87,7 @@ let package = Package(
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
         .target(name: "VespertineTestSupport", path: "Tests/VespertineTestSupport"),
-        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport",
+        .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport", "VespertineLibrary",
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
