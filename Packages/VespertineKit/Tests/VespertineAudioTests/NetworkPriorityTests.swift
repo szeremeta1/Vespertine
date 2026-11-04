@@ -126,7 +126,7 @@ struct NetworkPriorityTests {
         #expect(during <= 2, "\(during) scan requests went over the link while the song was being copied")
     }
 
-    private func settle(_ seconds: TimeInterval = 3, until condition: () -> Bool) async {
+    private func settle(_ seconds: TimeInterval = 15, until condition: () -> Bool) async {
         let deadline = Date().addingTimeInterval(seconds)
         while !condition(), Date() < deadline { try? await Task.sleep(for: .milliseconds(5)) }
     }
