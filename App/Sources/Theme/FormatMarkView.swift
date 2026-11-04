@@ -40,12 +40,12 @@ struct FormatMarkView: View {
         }
     }
 
-    /// Surround formats in silver, audiophile ones in brass.
+    /// Surround formats in silver, audiophile ones in brass, formats Vespertine doesn't decode muted.
     private var ink: Color {
         switch mark.family {
         case .dolby, .dts: Palette.text
         case .dsd, .hiRes: Palette.brassHi
-        case .lossless: Palette.text2
+        case .lossless, .notDecoded: Palette.text2
         }
     }
 }

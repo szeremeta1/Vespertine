@@ -15,7 +15,31 @@ NFFDecoder *_Nullable nff_open(const char *_Nonnull path, char *_Nullable error,
 typedef int (*NFFReadAt)(void *_Nonnull opaque, int64_t offset, uint8_t *_Nonnull data, int count);
 NFFDecoder *_Nullable nff_open_cached(const char *_Nonnull path, void *_Nonnull opaque, int64_t size,
                                     NFFReadAt _Nonnull readAt, char *_Nullable error, int errorSize);
+/// As above, for the container stream `stream` (an index in the file, not a count of audio streams) instead of the best one.
+/// NULL if that stream isn't audio or can't be decoded here.
+NFFDecoder *_Nullable nff_open_stream(const char *_Nonnull path, int stream, char *_Nullable error, int errorSize);
+NFFDecoder *_Nullable nff_open_cached_stream(const char *_Nonnull path, int stream, void *_Nonnull opaque, int64_t size,
+                                           NFFReadAt _Nonnull readAt, char *_Nullable error, int errorSize);
 void nff_close(NFFDecoder *_Nullable d);
+
+/// One audio stream of a container.
+typedef struct {
+    int index;                 ///< the stream's index in the file
+    int channels, sampleRate;
+    int bits;                  ///< significant bits per sample, 0 if unknown
+    int isDefault;             ///< flagged as the default stream
+    int decodable;             ///< FFmpeg here has a decoder for it
+    char codec[32];            ///< FFmpeg's codec name ("flac", "aac", "truehd", …)
+    char profile[64];          ///< FFmpeg's profile name, or ""
+    char title[256];           ///< the stream's title tag, or ""
+    char language[16];         ///< the stream's language tag ("eng"), or ""
+} NFFStreamInfo;
+
+/// Fills `out` with up to `max` of the file's audio streams, in file order; returns how many the file has (which may
+/// exceed `max`), or -1 if it can't be opened.
+int nff_audio_streams(const NFFDecoder *_Nonnull d, NFFStreamInfo *_Nonnull out, int max);
+/// The stream this decoder reads.
+int nff_stream_index(const NFFDecoder *_Nonnull d);
 
 int nff_channels(const NFFDecoder *_Nonnull d);
 int nff_sample_rate(const NFFDecoder *_Nonnull d);

@@ -2312,6 +2312,282 @@
         }
       }
     },
+    "%@ can't be played: macOS has no decoder for it and Vespertine doesn't include one.": {
+      "comment": "Why a file can't be played, in “This file can't be played (…).” %@ is an audio format: Dolby AC-4, or MPEG-H 3D Audio (also used by Sony 360 Reality Audio).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ሊጫወት አይችልም፦ macOS ለእሱ ዲኮደር የለውም፣ Vespertine ደግሞ አያካትትም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن تشغيل %@: لا يوجد في macOS مُفكّك ترميز له ولا يتضمن Vespertine واحدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ চালানো যাচ্ছে না: macOS-এ এর জন্য কোনো ডিকোডার নেই এবং Vespertine-এও নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nelze přehrát: macOS pro něj nemá dekodér a Vespertine žádný nezahrnuje."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke afspilles: macOS har ingen afkoder til det, og Vespertine medfølger ingen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ lässt sich nicht abspielen: macOS hat keinen Decoder dafür und Vespertine bringt keinen mit."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ δεν μπορεί να αναπαραχθεί: το macOS δεν έχει αποκωδικοποιητή γι' αυτό και το Vespertine δεν περιλαμβάνει κανέναν."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ can't be played: macOS has no decoder for it and Vespertine doesn't include one."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede reproducir %@: macOS no tiene un decodificador para él y Vespertine no incluye ninguno."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ قابل پخش نیست: macOS برای آن رمزگشایی ندارد و Vespertine هم چنین چیزی را همراه ندارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muotoa %@ ei voi toistaa: macOS:llä ei ole sille dekooderia, eikä Vespertine sisällä sellaista."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi mapapatugtog ang %@: walang decoder ang macOS para dito at wala ring kasama ang Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne peut pas être lu : macOS n'a pas de décodeur pour ce format et Vespertine n'en inclut aucun."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ વગાડી શકાતું નથી: macOS પાસે તેના માટે ડીકોડર નથી અને Vespertine માં પણ નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya kunna %@ ba: macOS ba shi da na'urar warwarewa a gare shi, Vespertine kuma bai ƙunshi ɗaya ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להשמיע את %@: ל-macOS אין מפענח עבורו ו-Vespertine אינו כולל כזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ चलाया नहीं जा सकता: macOS में इसके लिए कोई डीकोडर नहीं है और Vespertine में भी नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ nem játszható le: a macOS-nek nincs hozzá dekódere, és a Vespertine sem tartalmaz ilyet."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat diputar: macOS tidak punya dekoder untuknya dan Vespertine tidak menyertakannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ non può essere riprodotto: macOS non ha un decodificatore per questo formato e Vespertine non ne include uno."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ は再生できません。macOS にはこの形式のデコーダがなく、Vespertine にも含まれていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಅನ್ನು ಪ್ಲೇ ಮಾಡಲಾಗುವುದಿಲ್ಲ: macOS ನಲ್ಲಿ ಇದಕ್ಕೆ ಡಿಕೋಡರ್ ಇಲ್ಲ ಮತ್ತು Vespertine ನಲ್ಲಿಯೂ ಇಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 형식은 재생할 수 없습니다. macOS에 디코더가 없고 Vespertine에도 포함되어 있지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ പ്ലേ ചെയ്യാൻ കഴിയില്ല: macOS-ൽ ഇതിന് ഡീകോഡർ ഇല്ല, Vespertine-ലും ഇല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ वाजवता येत नाही: macOS मध्ये त्यासाठी डीकोडर नाही आणि Vespertine मध्येही नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tidak dapat dimainkan: macOS tiada penyahkod untuknya dan Vespertine tidak menyertakannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan ikke spilles av: macOS har ingen dekoder for det, og Vespertine har ingen med."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan niet worden afgespeeld: macOS heeft er geen decoder voor en Vespertine bevat er geen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਚਲਾਇਆ ਨਹੀਂ ਜਾ ਸਕਦਾ: macOS ਕੋਲ ਇਸ ਲਈ ਡੀਕੋਡਰ ਨਹੀਂ ਹੈ ਅਤੇ Vespertine ਵਿੱਚ ਵੀ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można odtworzyć formatu %@: macOS nie ma dla niego dekodera, a Vespertine żadnego nie zawiera."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não pode ser reproduzido: o macOS não tem decodificador para ele e o Vespertine não inclui nenhum."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ não pode ser reproduzido: o macOS não tem descodificador para ele e o Vespertine não inclui nenhum."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nu poate fi redat: macOS nu are un decodor pentru el, iar Vespertine nu include niciunul."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kan inte spelas: macOS har ingen avkodare för det och Vespertine innehåller ingen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ haiwezi kuchezwa: macOS haina kisimbuzi chake na Vespertine haijumuishi chochote."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ஐ இயக்க முடியாது: macOS-இல் இதற்கான டிகோடர் இல்லை, Vespertine-லும் இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ప్లే చేయడం సాధ్యం కాదు: macOS లో దీనికి డీకోడర్ లేదు, Vespertine లో కూడా లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่น %@ ไม่ได้: macOS ไม่มีตัวถอดรหัสสำหรับรูปแบบนี้ และ Vespertine ก็ไม่ได้รวมมาให้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ oynatılamıyor: macOS'te bunun için bir kod çözücü yok ve Vespertine de içermiyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ не можна відтворити: у macOS немає декодера для нього, а Vespertine його не містить."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ نہیں چلایا جا سکتا: macOS میں اس کا کوئی ڈی کوڈر نہیں ہے اور Vespertine میں بھی شامل نہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể phát %@: macOS không có bộ giải mã cho định dạng này và Vespertine cũng không đi kèm bộ nào."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法播放 %@：macOS 沒有它的解碼器，Vespertine 也未內建。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法播放 %@：macOS 没有它的解码器，Vespertine 也未内置。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法播放 %@：macOS 沒有它的解碼器，Vespertine 也未內建。"
+          }
+        }
+      }
+    },
     "%@ Copy": {
       "comment": "Name of a duplicated equalizer preset",
       "localizations": {
@@ -105937,6 +106213,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "校正檔案"
+          }
+        }
+      }
+    },
+    "Can't be decoded here": {
+      "comment": "Badge note under Dolby AC-4 and MPEG-H: no decoder is available to Vespertine, so the file can't play.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እዚህ ሊፈታ አይችልም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن فك ترميزه هنا"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এখানে ডিকোড করা যায় না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zde nelze dekódovat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke afkodes her"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kann hier nicht dekodiert werden"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν μπορεί να αποκωδικοποιηθεί εδώ"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can't be decoded here"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede decodificar aquí"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در اینجا قابل رمزگشایی نیست"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei voida dekoodata täällä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ma-decode dito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne peut pas être décodé ici"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અહીં ડીકોડ થઈ શકતું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya warware shi a nan ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן לפענח כאן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यहाँ डीकोड नहीं किया जा सकता"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itt nem dekódolható"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat didekode di sini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non può essere decodificato qui"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここではデコードできません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇಲ್ಲಿ ಡಿಕೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "여기서는 디코딩할 수 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇവിടെ ഡീകോഡ് ചെയ്യാൻ കഴിയില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "येथे डीकोड करता येत नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat dinyahkod di sini"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke dekodes her"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan hier niet worden gedecodeerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇੱਥੇ ਡੀਕੋਡ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można tu zdekodować"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não pode ser decodificado aqui"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não pode ser descodificado aqui"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu poate fi decodat aici"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan inte avkodas här"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haiwezi kusimbuliwa hapa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இங்கே டிகோட் செய்ய முடியாது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇక్కడ డీకోడ్ చేయలేము"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถอดรหัสที่นี่ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burada çözülemiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тут не можна декодувати"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہاں ڈی کوڈ نہیں کیا جا سکتا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể giải mã ở đây"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法在此解碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法在此解码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法在此解碼"
           }
         }
       }
@@ -287396,6 +287948,558 @@
           "stringUnit": {
             "state": "translated",
             "value": "測試執行期間會暫停播放。你的設定不會變更：測試使用自己的引擎，並在結束後還原裝置的取樣率。由於測試會錄製迴路裝置的輸入，macOS 會要求一次錄音權限。"
+          }
+        }
+      }
+    },
+    "Played as FLAC, not unfolded": {
+      "comment": "Badge note under MQA: Vespertine can't decode MQA, so the file plays as the plain FLAC it contains.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደ FLAC ተጫውቷል፣ አልተዘረጋም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُشغَّل كملف FLAC دون فكّ طيّه"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC হিসেবে চলছে, আনফোল্ড করা হয়নি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehráno jako FLAC, bez rozbalení"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspillet som FLAC, ikke foldet ud"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als FLAC abgespielt, nicht entfaltet"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαράγεται ως FLAC, χωρίς ξεδίπλωμα"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Played as FLAC, not unfolded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducido como FLAC, sin desplegar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "به‌صورت FLAC پخش شد، بدون بازشدن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaan FLAC-muodossa, ei avattu"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinatugtog bilang FLAC, hindi inunfold"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lu comme du FLAC, sans dépliage"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC તરીકે વગાડ્યું, અનફોલ્ડ કર્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kunna shi a matsayin FLAC, ba a buɗe shi ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופעל כ-FLAC, ללא פריסה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC के रूप में चलाया गया, अनफ़ोल्ड नहीं किया गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC-ként lejátszva, kibontás nélkül"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diputar sebagai FLAC, tidak dibuka lipatannya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprodotto come FLAC, non spiegato"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLACとして再生（展開なし）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ಆಗಿ ಪ್ಲೇ ಮಾಡಲಾಗಿದೆ, ಅನ್‌ಫೋಲ್ಡ್ ಮಾಡಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC로 재생, 펼치기 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ആയി പ്ലേ ചെയ്തു, അൺഫോൾഡ് ചെയ്തിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC म्हणून वाजवले, अनफोल्ड केलेले नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimainkan sebagai FLAC, tidak dibuka lipatan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spilt som FLAC, ikke foldet ut"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgespeeld als FLAC, niet ontvouwen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ਵਜੋਂ ਚਲਾਇਆ ਗਿਆ, ਅਨਫੋਲਡ ਨਹੀਂ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzane jako FLAC, bez rozwijania"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como FLAC, sem desdobrar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como FLAC, sem desdobrar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redat ca FLAC, fără despachetare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelas som FLAC, inte utvikt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imechezwa kama FLAC, haikufunuliwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC ஆக இயக்கப்பட்டது, விரிக்கப்படவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC గా ప్లే చేయబడింది, అన్‌ఫోల్డ్ చేయలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเป็น FLAC ไม่ได้คลี่ออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC olarak çalındı, açılmadı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворено як FLAC, без розгортання"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FLAC کے طور پر چلایا گیا، کھولا نہیں گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát như FLAC, không giải mở"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 FLAC 播放，未展開"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 FLAC 播放，未展开"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 FLAC 播放，未展開"
+          }
+        }
+      }
+    },
+    "Played as PCM, not decoded": {
+      "comment": "Badge note under Auro-3D: Vespertine can't decode the Auro-3D height channels, so the file plays as the ordinary surround PCM it contains.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደ PCM ተጫውቷል፣ አልተፈታም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُشغَّل كـ PCM دون فك ترميزه"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM হিসেবে চলছে, ডিকোড করা হয়নি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehráno jako PCM, bez dekódování"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspillet som PCM, ikke afkodet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als PCM abgespielt, nicht dekodiert"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαράγεται ως PCM, χωρίς αποκωδικοποίηση"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Played as PCM, not decoded"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducido como PCM, sin decodificar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "به‌صورت PCM پخش شد، بدون رمزگشایی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaan PCM-muodossa, ei dekoodattu"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinatugtog bilang PCM, hindi dinecode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lu comme du PCM, non décodé"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM તરીકે વગાડ્યું, ડીકોડ કર્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kunna shi a matsayin PCM, ba a warware shi ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופעל כ-PCM, ללא פענוח"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM के रूप में चलाया गया, डीकोड नहीं किया गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM-ként lejátszva, dekódolás nélkül"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diputar sebagai PCM, tidak didekode"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprodotto come PCM, non decodificato"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCMとして再生（デコードなし）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ಆಗಿ ಪ್ಲೇ ಮಾಡಲಾಗಿದೆ, ಡಿಕೋಡ್ ಮಾಡಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM으로 재생, 디코딩 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ആയി പ്ലേ ചെയ്തു, ഡീകോഡ് ചെയ്തിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM म्हणून वाजवले, डीकोड केलेले नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimainkan sebagai PCM, tidak dinyahkod"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spilt som PCM, ikke dekodet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afgespeeld als PCM, niet gedecodeerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ਵਜੋਂ ਚਲਾਇਆ ਗਿਆ, ਡੀਕੋਡ ਨਹੀਂ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzane jako PCM, bez dekodowania"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como PCM, sem decodificar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzido como PCM, sem descodificar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redat ca PCM, fără decodare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelas som PCM, inte avkodad"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imechezwa kama PCM, haikusimbuliwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM ஆக இயக்கப்பட்டது, டிகோட் செய்யப்படவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM గా ప్లే చేయబడింది, డీకోడ్ చేయలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเป็น PCM ไม่ได้ถอดรหัส"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM olarak çalındı, çözülmedi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворено як PCM, без декодування"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PCM کے طور پر چلایا گیا، ڈی کوڈ نہیں کیا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát như PCM, không giải mã"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 PCM 播放，未解碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 PCM 播放，未解码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以 PCM 播放，未解碼"
           }
         }
       }

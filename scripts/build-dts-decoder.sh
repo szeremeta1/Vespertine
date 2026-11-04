@@ -2,7 +2,10 @@
 # Builds the FFmpeg pieces Vespertine uses for formats macOS can't decode: the DTS decoder (DTS CDs,
 # DTS-WAV, DTS-HD Master Audio), Dolby TrueHD, the Dolby Digital modes macOS's own decoder scrambles
 # (2/1, 3/0+LFE, 3/1+LFE; everything else stays with Apple's), the containers they come in (.dts, .dtshd,
-# .thd/.mlp, .ac3/.ec3, Matroska) and DSD at any rate (.dsf/.dff: FFmpeg's DSD to PCM conversion). Only those decoders, parsers and demuxers (LGPL-2.1+), static, universal
+# .thd/.mlp, .ac3/.ec3, Matroska) and DSD at any rate (.dsf/.dff: FFmpeg's DSD to PCM conversion). Also TAK
+# (.tak) and the codecs Matroska/WebM audio carries (FLAC, ALAC, AAC incl. xHE-AAC/USAC, MP3, Vorbis, Opus,
+# WavPack, TTA, Monkey's, PCM; FFmpeg's Opus decoder needs libswresample, so that is linked too). DST is not built: FFmpeg's decoder returns PCM, and `vespertine_dst.c` decodes it to
+# DSD for DoP. Only those decoders, parsers and demuxers (LGPL-2.1+), static, universal
 # (arm64 + x86_64), packaged as Packages/VespertineKit/Vendor/FFmpegDCA.xcframework.
 #
 #   scripts/build-dts-decoder.sh [path/to/ffmpeg-X.Y.Z.tar.xz]
@@ -16,6 +19,12 @@ sha256=8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
 out=Packages/VespertineKit/Vendor/FFmpegDCA.xcframework
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
+
+decoders=dca,truehd,mlp,ac3,eac3,dsd_lsbf,dsd_msbf,dsd_lsbf_planar,dsd_msbf_planar,tak
+decoders+=,flac,alac,aac,mp3float,vorbis,opus,wavpack,tta,ape
+decoders+=,pcm_u8,pcm_s16le,pcm_s16be,pcm_s24le,pcm_s24be,pcm_s32le,pcm_s32be,pcm_f32le,pcm_f32be,pcm_f64le,pcm_f64be
+parsers=dca,mlp,ac3,tak,flac,aac,aac_latm,mpegaudio,opus,vorbis
+demuxers=dts,dtshd,truehd,mlp,ac3,eac3,matroska,dsf,iff,tak
 
 tarball=${1:-}
 if [[ -z $tarball ]]; then
@@ -34,13 +43,13 @@ for arch in arm64 x86_64; do
     --cc="clang -arch $arch -mmacosx-version-min=14.0" \
     --enable-static --disable-shared --disable-programs --disable-doc --disable-network \
     --disable-autodetect --disable-everything --disable-avdevice --disable-avfilter \
-    --disable-swscale --disable-swresample --disable-x86asm \
-    --enable-decoder=dca,truehd,mlp,ac3,eac3,dsd_lsbf,dsd_msbf,dsd_lsbf_planar,dsd_msbf_planar --enable-parser=dca,mlp,ac3 \
-    --enable-demuxer=dts,dtshd,truehd,mlp,ac3,eac3,matroska,dsf,iff --enable-protocol=file >/dev/null)
+    --disable-swscale --disable-x86asm \
+    --enable-decoder=$decoders --enable-parser=$parsers \
+    --enable-demuxer=$demuxers --enable-protocol=file >/dev/null)
   make -C "$build" -j"$(sysctl -n hw.ncpu)" >/dev/null
   make -C "$build" install >/dev/null
   libtool -static -o "$work/libffmpegdca-$arch.a" "$work/install-$arch/lib/libavformat.a" "$work/install-$arch/lib/libavcodec.a" \
-    "$work/install-$arch/lib/libavutil.a" 2>/dev/null
+    "$work/install-$arch/lib/libavutil.a" "$work/install-$arch/lib/libswresample.a" 2>/dev/null
 done
 
 lipo -create "$work/libffmpegdca-arm64.a" "$work/libffmpegdca-x86_64.a" -output "$work/libffmpegdca.a"
@@ -61,5 +70,5 @@ EOF
 rm -rf "$out"
 xcodebuild -create-xcframework -library "$work/libffmpegdca.a" -headers "$headers" -output "$out" >/dev/null
 cp "$src/COPYING.LGPLv2.1" "$out/LICENSE.FFmpeg-LGPL-2.1.txt"
-echo "FFmpeg $version (dca, truehd, mlp, ac3, eac3 and DSD decoders; dca, mlp, ac3 parsers; dts, dtshd, truehd, mlp, ac3, eac3, matroska, dsf, iff demuxers), built $(date -u +%Y-%m-%d)" > "$out/VERSION.txt"
+echo "FFmpeg $version (decoders: ${decoders//,/ }; parsers: ${parsers//,/ }; demuxers: ${demuxers//,/ }), built $(date -u +%Y-%m-%d)" > "$out/VERSION.txt"
 echo "Built $out"

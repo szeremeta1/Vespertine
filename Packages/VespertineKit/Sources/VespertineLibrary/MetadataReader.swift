@@ -24,7 +24,9 @@ public enum MetadataReader {
                 defer { try? FileManager.default.removeItem(at: standIn) }
                 file = try AudioFile(readingPropertiesAndMetadataFrom: standIn)
             } else {
-                guard SourceInspector.untaggedExtensions.contains(url.pathExtension.lowercased()) else { throw error }; file = nil
+                // Bare streams have no tags; so do AC-4 and MPEG-H in an MP4 the tag reader can't open.
+                guard SourceInspector.untaggedExtensions.contains(url.pathExtension.lowercased()) || SourceInspector.undecodable(url) != nil else { throw error }
+                file = nil
             }
         }
         let props = file?.properties
@@ -34,9 +36,11 @@ public enum MetadataReader {
         // No decoder opened it, but the container may still say what it is (Dolby AC-4): better than the tag reader's guess,
         // whose "MP4" and the sample entry's stock 16 bits read as a lossless 16-bit file.
         let format = inspected?.format ?? SourceInspector.undecodableFormat(url)
-        let codec = format?.codec ?? (props?.formatName ?? url.pathExtension.uppercased())
+        // A file nothing here decodes (AC-4, MPEG-H) is listed under its name rather than as a failed or unnamed file.
+        let undecodable = inspected == nil ? SourceInspector.undecodable(url) : nil
+        let codec = undecodable?.name ?? format?.codec ?? (props?.formatName ?? url.pathExtension.uppercased())
         let isDSD = format?.encoding == .dsd
-        let isLossless = format.map { $0.encoding != .lossy } ?? !lossyCodecs.contains(codec)
+        let isLossless = undecodable == nil && (format.map { $0.encoding != .lossy } ?? !lossyCodecs.contains(codec))
 
         var extra: [String: String] = [:]
         if let additional = md.additionalMetadata as? [String: Any] {

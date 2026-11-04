@@ -4,11 +4,12 @@
 //
 
 import Foundation
+import VespertineAudio
 
 /// A format's name for badges. Vespertine never draws Dolby's or DTS's logos or lettering (trademarks licensed
 /// only with certified products); it names the format of the file, as any player's format column does.
 public struct FormatMark: Sendable, Hashable {
-    public enum Family: Sendable, Hashable { case dolby, dts, dsd, hiRes, lossless }
+    public enum Family: Sendable, Hashable { case dolby, dts, dsd, hiRes, lossless, notDecoded }
 
     public var family: Family
     /// The bold half: "DOLBY", "DTS-HD", "DSD", "HI-RES".
@@ -47,7 +48,20 @@ public struct FormatMark: Sendable, Hashable {
 }
 
 public extension Track {
+    /// A format this track carries that Vespertine doesn't decode: AC-4 and MPEG-H files (which don't play), MQA (by the
+    /// file's own tags) and Auro-3D (by the release's name), which play as the PCM they hold.
+    var undecodedFormat: UndecodedFormat? {
+        if let named = UndecodedFormat.allCases.first(where: { !$0.playsAsPCM && $0.name == codec }) { return named }
+        guard isLossless, !isDSD else { return nil }
+        if codec == "FLAC", UndecodedFormat.isMQA(tags: extraTags) { return .mqa }
+        let words = [(filePath as NSString).deletingLastPathComponent.components(separatedBy: "/").last ?? "",
+                     (filePath as NSString).lastPathComponent] + Array(extraTags.values)
+        return UndecodedFormat.isAuro3DByName(words, channels: channels) ? .auro3D : nil
+    }
+
     var formatMark: FormatMark? {
+        // What it is named after: not decoded, so not "Hi-Res" or a lossless badge for what it isn't.
+        if let format = undecodedFormat { return .init(family: .notDecoded, brand: format.name.uppercased(), product: "", carrier: format.note) }
         // DSF and DSDIFF side by side are still one DSD album.
         guard codec != Album.mixedCodec || isDSD else { return nil }
         return FormatMark.of(codec: codec, lossless: isLossless, dsd: isDSD, sampleRate: sampleRate, bitDepth: bitDepth)

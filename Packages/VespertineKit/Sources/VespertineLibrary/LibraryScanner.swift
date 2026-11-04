@@ -125,10 +125,18 @@ public actor LibraryScanner {
             return map
         }
 
-        // Disc images' tracks, by image: SACD "<image>#2ch-1" … "<image>#mch-6", DVD-Video "<image or VIDEO_TS.IFO>#dvd-…".
+        // Files that list several tracks of their own, by file: a disc image's (SACD "<image>#2ch-1" … "<image>#mch-6",
+        // DVD-Video "<image or VIDEO_TS.IFO>#dvd-…"), a Matroska file's audio streams ("<file>#audio-1"), and the tracks of
+        // a CUE sheet inside the file ("<file>#2"), told from an external sheet's by there having been none.
         var imageTracks: [String: [String]] = [:]
-        for location in known.keys where SACDArea(location: location) != nil || DVDStreamRef(location: location) != nil {
-            imageTracks[String(location[..<location.lastIndex(of: "#")!]), default: []].append(location)
+        for location in known.keys {
+            guard let hash = location.lastIndex(of: "#") else { continue }
+            let path = String(location[..<hash])
+            let suffix = location[location.index(after: hash)...]
+            if SACDArea(location: location) != nil || DVDStreamRef(location: location) != nil || AudioStreamRef(location: location) != nil
+                || (!suffix.isEmpty && suffix.allSatisfy(\.isNumber) && priorCues[path] == nil) {
+                imageTracks[path, default: []].append(location)
+            }
         }
 
         // Decide what needs reading. Size and date come from the listing (no per-file stat).
@@ -448,18 +456,28 @@ public actor LibraryScanner {
             read = try? MetadataReader.read(url: url, artwork: artwork, folderArt: folderArt)
         }
         guard let base = read else { return nil }
-        guard let cue else { return [base] }
+        // No sheet beside the file: one inside it (a FLAC CUESHEET block, a CUESHEET tag), or several audio streams.
+        var cue = cue
+        if cue == nil, let embedded = EmbeddedCue.sheet(for: url, tags: base.extraTags), let file = embedded.files.first {
+            cue = (embedded, file.tracks, "embedded")
+        }
+        guard let cue else {
+            if remote == nil, ["mka", "mkv", "webm"].contains(ext) {
+                return ContainerStreamTracks.split(base, url: url, streams: SourceInspector.audioStreams(in: url))
+            }
+            return [base]
+        }
         let rate = base.sampleRate
         let frameCount = base.duration * rate
         guard rate.isFinite, rate > 0, frameCount.isFinite, frameCount > 0,
               frameCount < Double(Int64.max) else { return [base] }
         let totalFrames = Int64(frameCount)
-        guard cue.tracks.allSatisfy({ CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate) < totalFrames }) else { return [base] }
+        guard cue.tracks.allSatisfy({ ($0.startSample ?? CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate)) < totalFrames }) else { return [base] }
         return cue.tracks.enumerated().map { index, entry in
             var t = base
-            let start = CueSheet.sampleFrame(cdFrames: entry.startCDFrames, sampleRate: rate)
-            let end = index + 1 < cue.tracks.count
-                ? CueSheet.sampleFrame(cdFrames: cue.tracks[index + 1].startCDFrames, sampleRate: rate) : totalFrames
+            func sample(_ e: CueSheet.Entry) -> Int64 { e.startSample ?? CueSheet.sampleFrame(cdFrames: e.startCDFrames, sampleRate: rate) }
+            let start = sample(entry)
+            let end = index + 1 < cue.tracks.count ? sample(cue.tracks[index + 1]) : totalFrames
             t.location = "\(url.path)#\(entry.number)"
             t.cueStartFrame = start
             t.cueFrameLength = max(0, end - start)
