@@ -55,9 +55,9 @@ public actor LibraryScanner {
     static let ioQueue = DispatchQueue(label: "org.szeremeta.vespertine.scan-io", qos: .utility, attributes: .concurrent)
 
     /// `network`: the work reads a network share, so it waits its turn while a song streams from one (`ShareIOGate`).
-    static func onIOQueue<T: Sendable>(network: Bool = false, _ work: @escaping @Sendable () -> T) async -> T {
-        if network { await ShareIOGate.shared.enter() }
-        defer { if network { ShareIOGate.shared.leave() } }
+    static func onIOQueue<T: Sendable>(network: Bool = false, gate: ShareIOGate = .shared, _ work: @escaping @Sendable () -> T) async -> T {
+        if network { await gate.enter() }
+        defer { if network { gate.leave() } }
         return await withCheckedContinuation { continuation in
             ioQueue.async { continuation.resume(returning: work()) }
         }
@@ -77,6 +77,10 @@ public actor LibraryScanner {
     public static var audioExtensions: Set<String> {
         SourceInspector.supportedExtensions.subtracting(["cue", "txt", "log"])
     }
+
+    /// What the tag reader called a file no decoder opened ("MP4"; the decoders' own names never are). Rows saved with it
+    /// before the file's real format could be read are read again, once the scanner knows better.
+    static func isFallbackLabel(_ codec: String) -> Bool { codec == "MP4" }
 
     /// Rescans a source. Unchanged files (same size and modification date) are skipped.
     @discardableResult
@@ -112,19 +116,27 @@ public actor LibraryScanner {
             return signatures
         }
 
-        struct Known: Sendable { var id: Int64; var size: Int64; var modified: Date; var isMissing: Bool; var hasArt: Bool }
+        struct Known: Sendable { var id: Int64; var codec: String; var size: Int64; var modified: Date; var isMissing: Bool; var hasArt: Bool }
         let known: [String: Known] = try await database.writer.read { db in
             var map: [String: Known] = [:]
-            for row in try Row.fetchAll(db, sql: "SELECT id, location, fileSize, modifiedAt, isMissing, artworkKey IS NOT NULL AS hasArt FROM track WHERE sourceId = ?", arguments: [sourceID]) {
-                map[row["location"]] = Known(id: row["id"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"], hasArt: row["hasArt"])
+            for row in try Row.fetchAll(db, sql: "SELECT id, location, codec, fileSize, modifiedAt, isMissing, artworkKey IS NOT NULL AS hasArt FROM track WHERE sourceId = ?", arguments: [sourceID]) {
+                map[row["location"]] = Known(id: row["id"], codec: row["codec"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: row["isMissing"], hasArt: row["hasArt"])
             }
             return map
         }
 
-        // Disc images' tracks, by image: SACD "<image>#2ch-1" … "<image>#mch-6", DVD-Video "<image or VIDEO_TS.IFO>#dvd-…".
+        // Files that list several tracks of their own, by file: a disc image's (SACD "<image>#2ch-1" … "<image>#mch-6",
+        // DVD-Video "<image or VIDEO_TS.IFO>#dvd-…"), a Matroska file's audio streams ("<file>#audio-1"), and the tracks of
+        // a CUE sheet inside the file ("<file>#2"), told from an external sheet's by there having been none.
         var imageTracks: [String: [String]] = [:]
-        for location in known.keys where SACDArea(location: location) != nil || DVDStreamRef(location: location) != nil {
-            imageTracks[String(location[..<location.lastIndex(of: "#")!]), default: []].append(location)
+        for location in known.keys {
+            guard let hash = location.lastIndex(of: "#") else { continue }
+            let path = String(location[..<hash])
+            let suffix = location[location.index(after: hash)...]
+            if SACDArea(location: location) != nil || DVDStreamRef(location: location) != nil || AudioStreamRef(location: location) != nil
+                || (!suffix.isEmpty && suffix.allSatisfy(\.isNumber) && priorCues[path] == nil) {
+                imageTracks[path, default: []].append(location)
+            }
         }
 
         // Decide what needs reading. Size and date come from the listing (no per-file stat).
@@ -160,7 +172,8 @@ public actor LibraryScanner {
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url) { continue }
+                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url),
+                   !Self.isFallbackLabel(k.codec) { continue }
                 toRead.append(url)
             }
         }
@@ -285,7 +298,7 @@ public actor LibraryScanner {
     /// high-latency share costs one round trip per folder level, not per folder. If the source's own folder can't be
     /// listed, the listing fails; a folder inside it that can't be (no permission, gone mid-scan) is returned in
     /// `unreadable`, so the files under it are neither mistaken for deleted ones nor stop the rest being scanned.
-    static func list(_ root: URL, found: (@Sendable (Int) -> Void)? = nil) async throws
+    static func list(_ root: URL, network forced: Bool? = nil, gate: ShareIOGate = .shared, found: (@Sendable (Int) -> Void)? = nil) async throws
         -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>, unreadable: Set<String>) {
         let exts = audioExtensions
         let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
@@ -298,7 +311,7 @@ public actor LibraryScanner {
                     siblings.filter { $0.pathExtension.lowercased() == "cue" }, [], [])
         }
         typealias Listed = (dir: URL, result: Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>)
-        let network = NetworkVolume.isNetwork(start)
+        let network = forced ?? NetworkVolume.isNetwork(start)
         let width = network ? 12 : 4
         var audio: [ListedFile] = [], cue: [URL] = [], imageDirs: [URL] = [], unreadable: [URL] = []
         var pending: [URL] = [start]
@@ -309,7 +322,7 @@ public actor LibraryScanner {
             var running = 0
             func begin(_ dir: URL) {
                 running += 1
-                group.addTask { await onIOQueue(network: network) {
+                group.addTask { await onIOQueue(network: network, gate: gate) {
                     (dir: dir, result: Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
                         let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
@@ -443,18 +456,28 @@ public actor LibraryScanner {
             read = try? MetadataReader.read(url: url, artwork: artwork, folderArt: folderArt)
         }
         guard let base = read else { return nil }
-        guard let cue else { return [base] }
+        // No sheet beside the file: one inside it (a FLAC CUESHEET block, a CUESHEET tag), or several audio streams.
+        var cue = cue
+        if cue == nil, let embedded = EmbeddedCue.sheet(for: url, tags: base.extraTags), let file = embedded.files.first {
+            cue = (embedded, file.tracks, "embedded")
+        }
+        guard let cue else {
+            if remote == nil, ["mka", "mkv", "webm"].contains(ext) {
+                return ContainerStreamTracks.split(base, url: url, streams: SourceInspector.audioStreams(in: url))
+            }
+            return [base]
+        }
         let rate = base.sampleRate
         let frameCount = base.duration * rate
         guard rate.isFinite, rate > 0, frameCount.isFinite, frameCount > 0,
               frameCount < Double(Int64.max) else { return [base] }
         let totalFrames = Int64(frameCount)
-        guard cue.tracks.allSatisfy({ CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate) < totalFrames }) else { return [base] }
+        guard cue.tracks.allSatisfy({ ($0.startSample ?? CueSheet.sampleFrame(cdFrames: $0.startCDFrames, sampleRate: rate)) < totalFrames }) else { return [base] }
         return cue.tracks.enumerated().map { index, entry in
             var t = base
-            let start = CueSheet.sampleFrame(cdFrames: entry.startCDFrames, sampleRate: rate)
-            let end = index + 1 < cue.tracks.count
-                ? CueSheet.sampleFrame(cdFrames: cue.tracks[index + 1].startCDFrames, sampleRate: rate) : totalFrames
+            func sample(_ e: CueSheet.Entry) -> Int64 { e.startSample ?? CueSheet.sampleFrame(cdFrames: e.startCDFrames, sampleRate: rate) }
+            let start = sample(entry)
+            let end = index + 1 < cue.tracks.count ? sample(cue.tracks[index + 1]) : totalFrames
             t.location = "\(url.path)#\(entry.number)"
             t.cueStartFrame = start
             t.cueFrameLength = max(0, end - start)

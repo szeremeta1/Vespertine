@@ -1,6 +1,7 @@
 //
-// Vespertine — DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp, .mka), and the
-// Dolby Digital modes macOS decodes wrongly (DolbyModes), decoded with FFmpeg.
+// Vespertine — DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp), TAK, the audio of
+// Matroska and WebM files (.mka, .mkv, .webm) whatever codec it is in, and the Dolby Digital modes macOS decodes
+// wrongly (DolbyModes), decoded with FFmpeg.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -10,16 +11,18 @@ import Foundation
 import SFBAudioEngine
 
 final class FFmpegDecoder: NSObject, PCMDecoding {
-    static let extensions: Set<String> = ["dts", "dtshd", "thd", "mlp", "mka"]
+    static let extensions: Set<String> = ["dts", "dtshd", "thd", "mlp", "mka", "mkv", "webm", "tak"]
 
     let url: URL
+    /// The container stream to read (an index in the file), or nil for the best audio stream.
+    let stream: Int?
     private var handle: OpaquePointer?
     private var cacheEntry: NetworkPlaybackCache.Entry?
     var rawHandle: OpaquePointer? { handle }
     private(set) var isOpen = false
     private var format: AVAudioFormat?
 
-    init(url: URL) { self.url = url }
+    init(url: URL, stream: Int? = nil) { self.url = url; self.stream = stream }
     deinit { if let handle { nff_close(handle) } }
 
     /// What the file holds, for the library and the signal path.
@@ -34,30 +37,71 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
 
     var describe: Description {
         guard let handle else { return Description(codec: "", lossless: false, bits: nil, channels: 0, sampleRate: 0, hasObjects: false) }
-        let codec = String(cString: nff_codec(handle)), profile = String(cString: nff_profile(handle))
-        let bits = Int(nff_bits(handle))
-        var d = Description(codec: "DTS", lossless: false, bits: nil, channels: Int(nff_channels(handle)),
-                            sampleRate: Double(nff_sample_rate(handle)), hasObjects: false)
-        if codec == "ac3" || codec == "eac3" {
-            d.codec = codec == "ac3" ? "Dolby Digital" : "Dolby Digital Plus"
-        } else if codec == "truehd" || codec == "mlp" {
+        var d = Self.describe(codec: String(cString: nff_codec(handle)), profile: String(cString: nff_profile(handle)),
+                              bits: Int(nff_bits(handle)))
+        d.channels = Int(nff_channels(handle))
+        d.sampleRate = Double(nff_sample_rate(handle))
+        return d
+    }
+
+    /// What FFmpeg's codec name and profile say the stream is. `channels` and `sampleRate` are left for the caller.
+    static func describe(codec: String, profile: String, bits: Int) -> Description {
+        var d = Description(codec: "DTS", lossless: false, bits: nil, channels: 0, sampleRate: 0, hasObjects: false)
+        switch codec {
+        case "ac3": d.codec = "Dolby Digital"
+        case "eac3": d.codec = "Dolby Digital Plus"
+        case "truehd", "mlp":
             d.lossless = true
             d.hasObjects = profile.localizedCaseInsensitiveContains("atmos")
             d.codec = d.hasObjects ? "Dolby Atmos (TrueHD)" : (codec == "mlp" ? "MLP Lossless" : "Dolby TrueHD")
-        } else if profile.contains("DTS:X") || profile.contains("DTS-X") {
-            d.lossless = profile.contains("MA")
-            d.hasObjects = true
-            d.codec = "DTS:X"
-        } else if profile.contains("MA") {
-            d.lossless = true
-            d.codec = "DTS-HD Master Audio"
-        } else if profile.contains("HRA") || profile.contains("HR") {
-            d.codec = "DTS-HD High Resolution"
-        } else if profile.contains("Express") {
-            d.codec = "DTS Express"
+        case "dca", "dts":
+            if profile.contains("DTS:X") || profile.contains("DTS-X") {
+                d.lossless = profile.contains("MA")
+                d.hasObjects = true
+                d.codec = "DTS:X"
+            } else if profile.contains("MA") {
+                d.lossless = true
+                d.codec = "DTS-HD Master Audio"
+            } else if profile.contains("HRA") || profile.contains("HR") {
+                d.codec = "DTS-HD High Resolution"
+            } else if profile.contains("Express") {
+                d.codec = "DTS Express"
+            }
+        case "tak": (d.codec, d.lossless) = ("TAK", true)
+        case "flac": (d.codec, d.lossless) = ("FLAC", true)
+        case "alac": (d.codec, d.lossless) = ("ALAC", true)
+        case "wavpack": (d.codec, d.lossless) = ("WavPack", true)
+        case "ape": (d.codec, d.lossless) = ("APE", true)
+        case "tta": (d.codec, d.lossless) = ("TTA", true)
+        case "aac": d.codec = profile.hasPrefix("xHE-AAC") ? "xHE-AAC" : "AAC"
+        case "mp3", "mp3float": d.codec = "MP3"
+        case "vorbis": d.codec = "Vorbis"
+        case "opus": d.codec = "Opus"
+        case let pcm where pcm.hasPrefix("pcm_"): (d.codec, d.lossless) = ("PCM", true)
+        default: d.codec = codec.uppercased()
         }
         if d.lossless { d.bits = bits > 0 ? bits : 24 }
         return d
+    }
+
+    /// Every audio stream of the file, in file order; [] when it can't be opened. Streams FFmpeg can't decode here are
+    /// left out.
+    static func audioStreams(in url: URL) -> [ContainerAudioStream] {
+        let decoder = FFmpegDecoder(url: url)
+        guard (try? decoder.open()) != nil, let handle = decoder.handle else { return [] }
+        let capacity = 64
+        var infos = [NFFStreamInfo](repeating: NFFStreamInfo(), count: capacity)
+        let count = min(Int(nff_audio_streams(handle, &infos, Int32(capacity))), capacity)
+        return infos.prefix(count).filter { $0.decodable != 0 }.map { info in
+            func text<T>(_ field: T) -> String {
+                withUnsafeBytes(of: field) { String(cString: $0.bindMemory(to: CChar.self).baseAddress!) }
+            }
+            let d = describe(codec: text(info.codec), profile: text(info.profile), bits: Int(info.bits))
+            let title = text(info.title), language = text(info.language)
+            return ContainerAudioStream(index: Int(info.index), codec: d.codec, channels: Int(info.channels), sampleRate: Double(info.sampleRate),
+                               bits: d.bits, title: title.isEmpty ? nil : title, language: language.isEmpty ? nil : language,
+                               isDefault: info.isDefault != 0, lossless: d.lossless)
+        }
     }
 
     /// Tags from the container (Matroska tags, …).
@@ -81,7 +125,7 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
         cacheEntry = NetworkPlaybackCache.lookup(url)
         let opened: OpaquePointer?
         if let entry = cacheEntry, !entry.isComplete {
-            opened = nff_open_cached(url.path, Unmanaged.passUnretained(entry).toOpaque(), entry.size, { opaque, offset, buffer, count in
+            opened = nff_open_cached_stream(url.path, Int32(stream ?? -1), Unmanaged.passUnretained(entry).toOpaque(), entry.size, { opaque, offset, buffer, count in
                 let entry = Unmanaged<NetworkPlaybackCache.Entry>.fromOpaque(opaque).takeUnretainedValue()
                 do {
                     let data = try entry.read(at: offset, count: Int(count))
@@ -90,7 +134,7 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
                 } catch { return -1 }
             }, &error, Int32(error.count))
         } else {
-            opened = nff_open(url.path, &error, Int32(error.count))
+            opened = nff_open_stream(url.path, Int32(stream ?? -1), &error, Int32(error.count))
         }
         guard let h = opened else {
             throw DTSError.unsupported(String(cString: error))
@@ -282,4 +326,41 @@ final class RawDoPDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         try source.seekDSD(to: max(0, target) * 2)
         frame = max(0, target)
     }
+}
+
+/// One audio stream of a container (Matroska, WebM), as a stream picker lists it.
+public struct ContainerAudioStream: Sendable, Hashable {
+    /// The stream's index in the file: what `PlayableItem.audioStream` takes.
+    public var index: Int
+    public var codec: String
+    public var channels: Int
+    public var sampleRate: Double
+    public var bits: Int?
+    public var title: String?
+    public var language: String?
+    public var isDefault: Bool
+    public var lossless: Bool
+
+    public init(index: Int, codec: String, channels: Int, sampleRate: Double, bits: Int?, title: String?, language: String?,
+                isDefault: Bool, lossless: Bool) {
+        self.index = index; self.codec = codec; self.channels = channels; self.sampleRate = sampleRate; self.bits = bits
+        self.title = title; self.language = language; self.isDefault = isDefault; self.lossless = lossless
+    }
+}
+
+/// A library track that is one audio stream of a container with several: its location is "<path>#audio-<index>".
+public struct AudioStreamRef: Sendable, Hashable {
+    public let index: Int
+    public init(index: Int) { self.index = index }
+    public init?(location: String) {
+        guard let hash = location.lastIndex(of: "#"), location[location.index(after: hash)...].hasPrefix("audio-"),
+              let index = Int(location[location.index(hash, offsetBy: 7)...]), index >= 0 else { return nil }
+        self.index = index
+    }
+    public static func location(path: String, index: Int) -> String { "\(path)#audio-\(index)" }
+}
+
+extension SourceInspector {
+    /// The audio streams of a Matroska or WebM file (and any other FFmpeg container), when it has more than one to choose from.
+    public static func audioStreams(in url: URL) -> [ContainerAudioStream] { FFmpegDecoder.audioStreams(in: url) }
 }

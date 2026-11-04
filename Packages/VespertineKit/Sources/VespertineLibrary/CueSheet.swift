@@ -13,6 +13,9 @@ public struct CueSheet: Sendable, Hashable {
         public var isrc: String?
         /// INDEX 01 in CD frames (1/75 s).
         public var startCDFrames: Int
+        /// Where the track starts in the file's own samples, when the sheet says (a FLAC CUESHEET block does): exact for
+        /// offsets that aren't a whole number of CD frames.
+        public var startSample: Int64? = nil
     }
 
     public struct File: Sendable, Hashable {

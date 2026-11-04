@@ -79,7 +79,7 @@ Measure your room with a UMIK-1 (or another calibrated USB microphone) from one 
 - **Network shares:** SMB, NFS and WebDAV, with caching and Keep Offline. Library scans step aside for the song you're playing.
 - **Everyday:** Mini player, menu-bar extra, media keys, an optional Discord status with cover and format, ReplayGain, a short setup assistant and automatic updates.
 
-**Formats:** FLAC, ALAC, WAV, AIFF, DSF, DSDIFF, SACD ISO, DVD-Video LPCM, Dolby Digital, Dolby Digital Plus with Atmos, Dolby TrueHD, MLP, DTS, DTS-HD MA, DTS CDs, APE, WavPack, TTA, Opus, Vorbis, Musepack, MP3 and AAC, plus CUE sheets.
+**Formats:** FLAC, ALAC, WAV, AIFF, DSF, DSDIFF, SACD ISO, DVD-Video LPCM, Dolby Digital, Dolby Digital Plus with Atmos, Dolby TrueHD, MLP, DTS, DTS-HD MA, DTS CDs, APE, WavPack (including DSD), TTA, TAK, Opus, Vorbis, Musepack, MP3 and AAC, the audio of Matroska and WebM files, plus CUE sheets (beside the file, or inside a FLAC).
 
 [All features, formats and screenshots](docs/FEATURES.md)
 
@@ -119,7 +119,7 @@ PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and u
 - Channel-for-channel output is confirmed on one real device, a Sony TV over HDMI (5.1 and a 7.1 to 5.1 downmix; see [Tested devices](docs/DEVICES.md)). Multichannel USB DACs and Dolby/DTS bitstream to receivers are untested on real hardware; reports wanted.
 - Intel Macs are untested (the Intel build has run under Rosetta). DoP is confirmed up to DSD256 on the Fosi Audio ZD3 and up to DSD128 on the FiiO K11; DSD512 over DoP is untested on hardware.
 - No audio effect plugins, streaming services or UPnP/DLNA. Convolution is only part of room correction.
-- No DVD-Audio, DSD inside WavPack or DRM-protected Apple Music downloads. TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
+- No DVD-Audio or DRM-protected Apple Music downloads. Dolby AC-4 and MPEG-H 3D Audio (Sony 360 Reality Audio) files are listed and named but not decoded, MQA plays as the plain FLAC it contains, and Auro-3D as ordinary surround PCM (no decoder for any of them; see [docs/FEATURES.md](docs/FEATURES.md)). TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
 ## Building
 

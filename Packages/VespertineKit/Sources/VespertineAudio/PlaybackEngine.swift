@@ -167,7 +167,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func cacheKey(_ item: PlayableItem) -> String { item.cacheKey ?? item.url.path }
     private var staged: [String: NetworkPlaybackCache.Entry] = [:]
     private var stagedFolder: (key: String, entry: NetworkPlaybackCache.DirectoryEntry)?
-    private lazy var playbackCache = NetworkPlaybackCache.shared
+    private var playbackCache: NetworkPlaybackCache { .shared }
 
     /// Stage bytes before opening a decoder. Regular tracks start only after the ENTIRE source is local.
     /// Large DSD uses guarded cache I/O and a substantial on-disk lead (see prefill).
@@ -430,7 +430,25 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// (`blendSkip`), or fades it if it can't.
     public func play(_ item: PlayableItem) {
         if !skipMayBlend() { fadeOutNow(pausing: false) }
+        warmStaging(item)
         post(.play(item))
+    }
+
+    /// Caller's thread, play pressed: a song on a share starts copying now, before the engine thread gets to it
+    /// (it may be busy with the previous song) and before the output is prepared, and library scans of the
+    /// share make way from this instant. Nothing here waits on the network.
+    private func warmStaging(_ item: PlayableItem) {
+        // Shares added by the app carry a cache key; a Finder-mounted volume is only told apart by statfs, which
+        // can block on a dead mount, so that is asked off this thread.
+        let key = cacheKey(item)
+        let url = item.url
+        let resolver = urlResolver
+        let sharedItem = item.cacheKey != nil
+        guard url.pathExtension.lowercased() != "ifo" else { return }
+        playbackCache.warm(key: key, url: url, press: sharedItem) {
+            guard (resolver?(item) ?? url) == url else { return false }
+            return sharedItem || Self.isOnNetworkVolume(url)
+        }
     }
     public func pause() { fadeOutNow(pausing: true); post(.pause) }
     public func resume() { post(.resume) }
@@ -1017,7 +1035,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         if carried != nil, carry == nil { carried = nil }
         if let carry { probed = carry.probed }
         else if let reuse = unusedProbe, reuse.item == item.id, reuse.probed.url == url { probed = reuse.probed }
-        else { probed = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd) }
+        else { probed = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd, audioStream: item.audioStream) }
         unusedProbe = (item.id, probed)
         mark("probe")
         // Opening the file is the slow part on a busy share: if you've skipped on meanwhile, stop here,
@@ -1403,7 +1421,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                        item: PlayableItem) throws -> (ProbedSource, PCMDecoding)? {
         guard probed.format.encoding == .pcm || (probed.format.encoding == .dsd && plan.mode == .dop),
               current.supportsSeeking else { return nil }
-        let local = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd)
+        let local = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd, audioStream: item.audioStream)
         guard local.format == probed.format else { return nil }
         let decoder = try SourceOpener.decoder(for: local, plan: plan, item: item)
         let position = current.position
@@ -1625,7 +1643,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             return
         }
         do {
-            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
+            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd, audioStream: next.audioStream)
             let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
             var formatB = BoundaryFormat.systemRenderer
             var planB: OutputPlan?
@@ -1666,7 +1684,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                                  profiles: profiles, gains: gains)
                     },
                     reopenOutgoing: { [self] in
-                        try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd),
+                        try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd, audioStream: a.item.audioStream),
                                                  plan: a.path.plan, item: a.item)
                     })
                 decision = smart.decision
@@ -1683,7 +1701,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                                   seconds: seconds, curve: curve, trimSilence: s.trimSilence, ditherBits: dither,
                                                   chunk: chunkFrames, layout: session.decodedLayout,
                                                   reopenOutgoing: { [self] in
-                                                      try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd),
+                                                      try SourceOpener.decoder(for: SourceOpener.probe(resolve(a.item), area: a.item.sacdArea, dvd: a.item.dvd, audioStream: a.item.audioStream),
                                                                                plan: a.path.plan, item: a.item)
                                                   })
             case .dip(let seconds, let curve):
@@ -1781,7 +1799,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let opening = Date()
         let rate = session.plan.deviceSampleRate
         do {
-            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
+            let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd, audioStream: next.audioStream)
             let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
             guard !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) else { return skipFades(session) }
             var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
@@ -1937,7 +1955,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         while let next = candidate, attempts < 8 {
             attempts += 1
             do {
-                let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd)
+                let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd, audioStream: next.audioStream)
                 let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
                 if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
                     // macOS renders Atmos: let this track play out, then hand the next one over.

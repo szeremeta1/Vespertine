@@ -13,7 +13,7 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 | TagLib (CXXTagLib 2.3.2) | LGPL-2.1 / MPL-1.1 | Reading and writing tags | https://taglib.org |
 | libFLAC, libogg, libvorbis, libopus, opusfile | BSD-3-Clause | FLAC, Ogg Vorbis and Opus | https://xiph.org |
 | Speex (CSpeex 1.2.1) | BSD-3-Clause | Speex | https://www.speex.org |
-| WavPack | BSD-3-Clause | WavPack | https://www.wavpack.com |
+| WavPack | BSD-3-Clause | WavPack (SFBAudioEngine's build); a second, prefixed build with DSD support for WavPack DSD (`Vendor/WavPackDSD.xcframework`, WavPack 5.8.1) | https://www.wavpack.com |
 | Monkey's Audio (CXXMonkeysAudio 12.13.0) | BSD-3-Clause | APE | https://monkeysaudio.com |
 | Musepack decoder | BSD-3-Clause | Musepack | https://www.musepack.net |
 | mpg123 | LGPL-2.1 | MP3 | https://www.mpg123.de |
@@ -21,7 +21,7 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 | LAME | LGPL-2.0 | MP3, from SFBAudioEngine's bundled libraries | https://lame.sourceforge.io |
 | TTA | LGPL-3.0 | True Audio | https://sourceforge.net/projects/tta/ |
 | DUMB (CDUMB 2.0.3) | DUMB license (zlib-like) | Tracker formats | https://github.com/kode54/dumb |
-| FFmpeg 9.0.2 (a subset) | LGPL-2.1-or-later | DTS, DTS-HD, TrueHD/MLP, Dolby Digital modes macOS gets wrong, Matroska, DSD | https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz |
+| FFmpeg 9.0.2 (a subset) | LGPL-2.1-or-later | DTS, DTS-HD, TrueHD/MLP, Dolby Digital modes macOS gets wrong, TAK, Matroska/WebM audio (FLAC, ALAC, AAC, MP3, Vorbis, Opus, WavPack, TTA, APE, PCM), DSD | https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz |
 | DST decoder, from FFmpeg's `libavcodec/dstdec.c` (Copyright (c) 2014 Peter Ross) | LGPL-2.1-or-later | DST-compressed SACD audio | [`Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c`](Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c) |
 
 Versions are the ones in the app's lockfile, [`App/Package.resolved`](App/Package.resolved), which release builds are held to. The full license and copyright text of every component ships inside the app, in `Contents/Resources/Licenses` (from [`App/Licenses`](App/Licenses), including SFBAudioEngine's `ACKNOWLEDGMENTS.md` at the shipped version). The FFmpeg source the decoders are built from is attached to every GitHub release; the other LGPL libraries' sources are linked above, and the prebuilt ones come from SFBAudioEngine's `*-binary-xcframework` packages, whose repositories hold the build scripts.
@@ -32,12 +32,18 @@ The SFBAudioEngine dependencies ship as prebuilt xcframeworks and are embedded i
 
 Vespertine links a small, static build of FFmpeg 9.0.2, made from FFmpeg's unmodified release tarball (SHA-256 `8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e`) by [`scripts/build-dts-decoder.sh`](scripts/build-dts-decoder.sh), which verifies the checksum. The build uses `--disable-everything` and enables only these pieces:
 
-- decoders: `dca`, `truehd`, `mlp`, `ac3`, `eac3`, `dsd_lsbf`, `dsd_msbf`, `dsd_lsbf_planar`, `dsd_msbf_planar`
-- parsers: `dca`, `mlp`, `ac3`
-- demuxers: `dts`, `dtshd`, `truehd`, `mlp`, `ac3`, `eac3`, `matroska`, `dsf`, `iff`
+- decoders: `dca`, `truehd`, `mlp`, `ac3`, `eac3`, `dsd_lsbf`, `dsd_msbf`, `dsd_lsbf_planar`, `dsd_msbf_planar`, `tak`, `flac`, `alac`, `aac`, `mp3float`, `vorbis`, `opus`, `wavpack`, `tta`, `ape`, `pcm_u8`, `pcm_s16le`, `pcm_s16be`, `pcm_s24le`, `pcm_s24be`, `pcm_s32le`, `pcm_s32be`, `pcm_f32le`, `pcm_f32be`, `pcm_f64le`, `pcm_f64be`
+- parsers: `dca`, `mlp`, `ac3`, `tak`, `flac`, `aac`, `aac_latm`, `mpegaudio`, `opus`, `vorbis`
+- demuxers: `dts`, `dtshd`, `truehd`, `mlp`, `ac3`, `eac3`, `matroska` (which also reads WebM), `dsf`, `iff`, `tak`
+- libraries: `libswresample`, which FFmpeg's Opus decoder needs
+- the xHE-AAC (USAC) support is part of FFmpeg's `aac` decoder; macOS plays xHE-AAC itself
 - protocol: `file`
 
 It is built without `--enable-gpl` or `--enable-nonfree`, so it stays LGPL. To use your own FFmpeg build, run the script and it regenerates `Packages/VespertineKit/Vendor/FFmpegDCA.xcframework`; then rebuild Vespertine as described in the README.
+
+## WavPack with DSD
+
+SFBAudioEngine's prebuilt WavPack is compiled without DSD support, so [`scripts/build-wavpack-dsd.sh`](scripts/build-wavpack-dsd.sh) builds libwavpack 5.8.1 from WavPack's unmodified release tarball (SHA-256 `7322775498602c8850afcfc1ae38f99df4cbcd51386e873d6b0f8047e55c0c26`, BSD-3-Clause, Copyright (c) David Bryant) with `ENABLE_DSD`, static and universal, into `Packages/VespertineKit/Vendor/WavPackDSD.xcframework`. Every global symbol is renamed with a `vtwv_` prefix at compile time so it can't be confused with the WavPack in SFBAudioEngine. Its licence text ships in the xcframework and as `WavPack.txt`.
 
 ## DST decoder
 

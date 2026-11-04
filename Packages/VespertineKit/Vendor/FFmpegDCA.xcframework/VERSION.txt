@@ -1,1 +1,1 @@
-FFmpeg 9.0.2 (dca, truehd, mlp, ac3, eac3 and DSD decoders; dca, mlp, ac3 parsers; dts, dtshd, truehd, mlp, ac3, eac3, matroska, dsf, iff demuxers), built 2026-10-08
+FFmpeg 9.0.2 (decoders: dca truehd mlp ac3 eac3 dsd_lsbf dsd_msbf dsd_lsbf_planar dsd_msbf_planar tak flac alac aac mp3float vorbis opus wavpack tta ape pcm_u8 pcm_s16le pcm_s16be pcm_s24le pcm_s24be pcm_s32le pcm_s32be pcm_f32le pcm_f32be pcm_f64le pcm_f64be; parsers: dca mlp ac3 tak flac aac aac_latm mpegaudio opus vorbis; demuxers: dts dtshd truehd mlp ac3 eac3 matroska dsf iff tak), built 2026-11-03
