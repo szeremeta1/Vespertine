@@ -34,6 +34,19 @@ struct RoomProfileStoreTests {
         #expect(loaded.book.active(for: "zd3")?.name == "Desk")
     }
 
+    @Test("A profile added or copied now loads back exactly as it was kept: its time is held to the second the file stores")
+    func wholeSecondTimes() throws {
+        let (store, dir) = try store()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var book = RoomProfileBook()
+        let desk = book.add(try ProfileFixtures.profile(name: "Desk", at: Date(timeIntervalSince1970: 1_793_000_000.75)))
+        let copy = try book.duplicate(desk.id)
+        try store.save(book, unreadable: [])
+        let loaded = try #require(store.load()).book
+        #expect(loaded == book)
+        #expect(loaded.profile(desk.id)?.createdAt == desk.createdAt && loaded.profile(copy.id)?.createdAt == copy.createdAt)
+    }
+
     @Test("Nothing saved yet loads as nothing, not as an error")
     func empty() throws {
         let (store, dir) = try store()
