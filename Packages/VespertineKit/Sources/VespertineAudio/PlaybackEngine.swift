@@ -167,7 +167,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func cacheKey(_ item: PlayableItem) -> String { item.cacheKey ?? item.url.path }
     private var staged: [String: NetworkPlaybackCache.Entry] = [:]
     private var stagedFolder: (key: String, entry: NetworkPlaybackCache.DirectoryEntry)?
-    private lazy var playbackCache = NetworkPlaybackCache.shared
+    private var playbackCache: NetworkPlaybackCache { .shared }
 
     /// Stage bytes before opening a decoder. Regular tracks start only after the ENTIRE source is local.
     /// Large DSD uses guarded cache I/O and a substantial on-disk lead (see prefill).
@@ -430,7 +430,25 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// (`blendSkip`), or fades it if it can't.
     public func play(_ item: PlayableItem) {
         if !skipMayBlend() { fadeOutNow(pausing: false) }
+        warmStaging(item)
         post(.play(item))
+    }
+
+    /// Caller's thread, play pressed: a song on a share starts copying now, before the engine thread gets to it
+    /// (it may be busy with the previous song) and before the output is prepared, and library scans of the
+    /// share make way from this instant. Nothing here waits on the network.
+    private func warmStaging(_ item: PlayableItem) {
+        // Shares added by the app carry a cache key; a Finder-mounted volume is only told apart by statfs, which
+        // can block on a dead mount, so that is asked off this thread.
+        let key = cacheKey(item)
+        let url = item.url
+        let resolver = urlResolver
+        let sharedItem = item.cacheKey != nil
+        guard url.pathExtension.lowercased() != "ifo" else { return }
+        playbackCache.warm(key: key, url: url, press: sharedItem) {
+            guard (resolver?(item) ?? url) == url else { return false }
+            return sharedItem || Self.isOnNetworkVolume(url)
+        }
     }
     public func pause() { fadeOutNow(pausing: true); post(.pause) }
     public func resume() { post(.resume) }
