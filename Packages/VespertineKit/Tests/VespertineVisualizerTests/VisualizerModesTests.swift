@@ -509,6 +509,27 @@ struct VisualizerModeRenderTests {
         #expect(difference(mirrored(caps: true, peaks: none), mirrored(caps: true, peaks: high)) > 0.05)
     }
 
+    @Test("Paused or silent, Waves rests as faint beams (as Classic keeps its core), not a black window")
+    func wavesIdle() throws {
+        func brightest(playing: Bool) -> Double? {
+            guard let renderer = VisualizerRenderer() else { return nil }
+            renderer.settings.style = .club
+            renderer.settings.clubMode = .waves
+            let frame = playing ? musicFrame() : VisualizerFrame.silent(bands: 64, fine: 512)
+            var bytes: [UInt8] = []
+            for _ in 0..<180 {   // 3 s: long enough for the signal light to settle
+                bytes = renderer.renderOffscreen(frame: frame, scene: VisualizerScene(isPlaying: playing), size: CGSize(width: 320, height: 180),
+                                                 scale: 1, dt: 1 / 60) ?? []
+            }
+            // The brightest 0.5 % of the pixels (BGRA: the largest channel of each).
+            let lum = stride(from: 0, to: bytes.count - 3, by: 4).map { Int(max(bytes[$0], bytes[$0 + 1], bytes[$0 + 2])) }.sorted()
+            return lum.isEmpty ? nil : Double(lum[Int(Double(lum.count - 1) * 0.995)])
+        }
+        guard let idle = brightest(playing: false), let playing = brightest(playing: true) else { return }
+        #expect(idle >= 28, "idle beams at \(idle) / 255")
+        #expect(idle < playing * 0.6, "idle \(idle), playing \(playing)")
+    }
+
     @Test("Waves move less from frame to frame with Reduce Motion")
     func wavesCalm() throws {
         func motion(calm: Bool) -> Double? {

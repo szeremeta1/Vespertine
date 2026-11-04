@@ -524,7 +524,7 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     float orb = 1 - smoothstep(core - 0.01, core + 0.01, r);
     float glow = exp(-max(0.0, r - core) / (0.05 + 0.15 * bass));
     col = mix(col, mix(u.stops[2].rgb, float3(1), 0.35 + 0.4 * pulse), orb * (0.6 + 0.4 * signal));
-    col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.3 + 0.7 * signal);
+    col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.4 + 0.6 * signal);
 
     // Strobe (only when switched on, never with Reduce Motion).
     col += float3(u.e.z) * 0.85;
@@ -600,9 +600,10 @@ fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]],
     float sheet = exp(-sd * sd / 0.00012) * 0.5 + exp(-abs(sd) / 0.05) * 0.12 * haze + step(sd, 0.0) * exp(sd / 0.25) * 0.05 * haze;
     light += ramp(u, 0.75) * sheet * (0.3 + 0.7 * bass) * smoothstep(halfW + 0.1, halfW * 0.4, abs(q.x));
 
-    col += light * (0.7 + 0.45 * bass + 0.25 * pulse * (1 - calm)) * (0.06 + 0.94 * signal);
+    // Paused or silent, the beams rest faintly where they are (as Classic keeps its core), so the window isn't black.
+    col += light * (0.7 + 0.45 * bass + 0.25 * pulse * (1 - calm)) * (0.4 + 0.6 * signal);
     // The emitter on the floor glows with the bass.
-    col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass) * signal;
+    col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass) * (0.35 + 0.65 * signal);
 
     // Strobe (only when switched on, never with Reduce Motion).
     col += float3(u.e.z) * 0.85;
