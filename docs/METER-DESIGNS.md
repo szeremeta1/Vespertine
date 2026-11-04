@@ -62,7 +62,7 @@ Eleven sub-designs, the two originals included. Each one keeps its standard's ba
 **VU (IEC 60268-17 ballistics, unchanged)**
 1. **Original**: Vespertine's existing pair, untouched, still the default.
 2. **Broadcast**: the 1940 standard itself, as the BSTJ paper describes it: a light orange-yellow Type A card (VU numerals black, per cent scale small under the arc, red warning band from 0 to +3), black moulded case with nickel screws, on a light grey hammer-finish panel (the paper's "light grey" case), engraved LEFT/RIGHT CHANNEL, with a centre-zero balance meter between the two (see section 4).
-3. **Console**: studio meter bridge in the API/Sifam style: bright amber faces lit hard from behind, 20 … 3 with a red arc, thin glossy bezels, a black anodised bridge with big L/R legends, blue names and PEAK lamps under each meter; balance meter between.
+3. **Console**: studio meter bridge in the API/Sifam style: bright amber faces lit hard from behind, 20 … 3 with a red arc, thin glossy bezels, a dark slate-grey hammer-finish bridge with big L/R legends, blue names and PEAK lamps under each meter; balance meter between.
 4. **Tape Recorder**: modelled on the Revox A77: two backlit cream meters side by side under chrome rims in an anthracite panel, a brushed aluminium strip across the top, CHANNEL I / CHANNEL II, in a teak case (the A77's wooden case).
 5. **Cassette Deck**: modelled on the Marantz 5030: brushed silver front, deep wells with mirrored walls, cream face with the blue scale to +1 and the red one to +6, "VU" at both ends, "dB", PEAK L R lamps under a bracket, in a walnut case. Its +6 scale puts 0 VU at half the travel; the needle is the same VU movement (tested: 300 ms, 1-1.5 % overshoot).
 

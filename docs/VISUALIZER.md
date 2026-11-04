@@ -110,7 +110,7 @@ Besides the original pair, each meter has designs modelled on real instruments, 
 | Meter | Design | Modelled on | Ballistics |
 |---|---|---|---|
 | VU | Broadcast | The 1940 standard volume indicator: a light orange-yellow Type A card (VU in black, per cent small under the arc, a red warning band past 0), black moulded cases on a grey hammer-finish panel | VU |
-| VU | Console | A studio console's meter bridge: amber faces lit hard from behind, thin black bezels, a black bridge with legends and peak lights | VU |
+| VU | Console | A studio console's meter bridge: amber faces lit hard from behind, thin black bezels, a slate-grey bridge with legends and peak lights | VU |
 | VU | Tape Recorder | A Swiss reel-to-reel recorder of the 1960s: two small backlit meters under chrome rims, an anthracite panel with an aluminium strip, a teak case | VU |
 | VU | Cassette Deck | A 1970s hi-fi cassette deck: deep wells with mirrored walls in a brushed silver front, blue scale to +1 and red to +6, peak lights, a walnut case | VU, on a scale to +6 (0 VU at half the travel) |
 | PPM | BBC | The BBC's Sifam-type meter: matt black face, white bars and numerals 1 to 7, the zero adjuster under the window | Type IIa |

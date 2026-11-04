@@ -56,7 +56,7 @@ public enum VisualizerVUDesign: String, CaseIterable, Codable, Sendable, Identif
     /// The 1940 standard volume indicator: a light orange-yellow Type A scale card in a black moulded case, on a grey
     /// broadcast panel, with a centre-zero balance meter between the two.
     case broadcast
-    /// Studio console meters: rectangular, lit bright amber from behind, in a black meter bridge, with a balance meter.
+    /// Studio console meters: rectangular, lit bright amber from behind, in a slate-grey meter bridge, with a balance meter.
     case console
     /// A Swiss-style reel-to-reel recorder: two small backlit meters in an anthracite panel, in a teak case.
     case tape

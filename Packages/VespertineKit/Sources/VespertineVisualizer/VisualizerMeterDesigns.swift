@@ -187,7 +187,7 @@ struct MeterPlan: Sendable, Equatable {
                                            needle: (0.16 * u, 0.5 * u)))
     }
 
-    /// Console meters: a window 1.6 wide in a thin black bezel, lit from behind, in a black bridge with legends and a
+    /// Console meters: a window 1.6 wide in a thin black bezel, lit from behind, in a slate-grey bridge with legends and a
     /// peak light under each; a small balance meter between.
     private mutating func layoutConsole(area: CGRect, wide: Bool) {
         let ww: CGFloat = 1.6, bezel: CGFloat = 0.075

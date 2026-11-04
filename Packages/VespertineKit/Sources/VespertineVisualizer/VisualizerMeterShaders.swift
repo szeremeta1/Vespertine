@@ -26,7 +26,7 @@ struct MLook {
     float3 needleB;
     float3 lamp;       // the lamp's light
     float backlight;   // 0 lit from the room, 1 by its own lamp behind the face
-    int panel;         // 0 grey hammer finish, 1 black anodised, 2 anthracite, 3 brushed silver, 4 BBC grey, 5 none
+    int panel;         // 0 grey hammer finish, 1 slate console bridge, 2 anthracite, 3 brushed silver, 4 BBC grey, 5 none
     int cabinet;       // 0 none, 1 teak, 2 walnut, 3 oak desk
     int bezel;         // 0 moulded black, 1 matt black (Sifam), 2 thin gloss black, 3 chrome rim, 4 mirrored well, 5 DIN case
     float needleWidth; // at its base, in units
@@ -60,7 +60,7 @@ static MLook meterLook(int d) {
         l.second = float3(0.10, 0.36, 0.20);
         l.needleWidth = 0.011;
         break;
-    case 2: // console: amber, lit hard from behind, black bridge
+    case 2: // console: amber, lit hard from behind, a slate-grey bridge
         l.face = float3(1.0, 0.84, 0.26);
         l.lamp = float3(1.0, 0.95, 0.78);
         l.panel = 1;
@@ -69,9 +69,9 @@ static MLook meterLook(int d) {
         l.legend = float3(0.93, 0.93, 0.9);
         l.needleWidth = 0.009;
         break;
-    case 3: // tape recorder: warm cream lit from behind, anthracite panel, teak case
-        l.face = float3(0.97, 0.86, 0.62);
-        l.lamp = float3(1.0, 0.8, 0.5);
+    case 3: // tape recorder: a white card lit warm from behind (the lamp, not the card, is yellow), anthracite panel, teak
+        l.face = float3(0.97, 0.95, 0.89);
+        l.lamp = float3(1.0, 0.86, 0.6);
         l.panel = 2;
         l.cabinet = 1;
         l.bezel = 3;
@@ -199,8 +199,12 @@ static float3 panelMaterial(int kind, float2 px, float u, float4 panel) {
         c = float3(0.60, 0.61, 0.605) * (0.95 + 0.35 * dimple + 0.04 * (flake - 0.5)) * (0.97 + 0.05 * noise(p * 3));
         break;
     }
-    case 1: // black anodised aluminium
-        c = float3(0.045, 0.045, 0.05) * (0.9 + 0.2 * noise(p * 140)) + float3(0.02) * (1 - y);
+    case 1: { // a console's meter bridge: dark slate-blue hammer finish
+        float2 cell = p * 30;
+        float dimple = noise(cell) - noise(cell + float2(0.08, 0.11));
+        c = float3(0.115, 0.13, 0.155) * (0.94 + 0.3 * dimple + 0.06 * noise(p * 140)) + float3(0.015) * (1 - y);
+        break;
+    }
         break;
     case 2: // anthracite paint
         c = float3(0.17, 0.175, 0.18) * (0.92 + 0.12 * noise(p * 160) + 0.05 * fbm(p * 4));
