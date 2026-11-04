@@ -97,25 +97,37 @@ struct VisualizerCoverPose: Equatable, Sendable {
     var layout: Double
     /// How much of the sleeve shows, 0…1.
     var opacity: Double
-    /// The sleeve's offset to the left of where it rests, in the record's units (the record's radius is 0.86).
+    /// How far the sleeve is slid to the right of where it rests (left is negative), in the record's units (the
+    /// record's radius is 0.86).
     var offset: Double
-    /// In front of the record (1) or behind it (0); between the two only while it dissolves (Reduce Motion).
+    /// In front of the record (1) or behind it (0); always one or the other.
     var front: Double
+    /// Where it rests: 0 in front (upright, level with the record), 1 behind (further left, turned 4°); between the
+    /// two only on its way from one to the other (see `VisualizerLayout.sleeveRest`).
+    var place: Double
 
-    static let label = VisualizerCoverPose(layout: 0, opacity: 0, offset: VisualizerCoverMotion.away, front: 1)
+    static let label = VisualizerCoverPose(layout: 0, opacity: 0, offset: VisualizerCoverMotion.away, front: 1, place: 0)
+
+    /// How far right the sleeve reaches (its corners), in the record's units.
+    var rightEdge: Double {
+        let rest = VisualizerLayout.sleeveRest(place: CGFloat(place))
+        return Double(rest.x + VisualizerLayout.sleeveReach(tilt: rest.tilt)) + offset
+    }
 }
 
 /// Moves the cover between its three places. The sleeve slides in from the left and out again; going from in front
 /// of the record to behind it (or back), it's pulled out to the left until it's clear of the record and platter,
-/// changes sides there, and slides back, so it never passes through them. With Reduce Motion nothing slides: the
-/// layout changes at once and the sleeve fades in, out, or from one side to the other.
+/// changes sides there, and slides back into its other place, turning as it goes, so it never passes through them.
+/// With Reduce Motion nothing slides or turns: the sleeve fades out where it is, everything moves at once, and it
+/// fades in where it goes.
 struct VisualizerCoverMotion {
-    /// Where the sleeve is drawn from when it slides in (and goes to when it slides out): off to the left.
+    /// Where the sleeve is drawn from when it slides in (and goes to when it slides out): this far left of its rest.
     static let away = -1.2
-    /// Pulled this far left, the sleeve is clear of the platter (its right edge left of -0.95).
-    static let clear = -1.1
-    /// How far it's pulled to change sides (a little past `clear`, so the spring gets there briskly).
-    static let pull = -1.3
+    /// With its right edge left of this, the sleeve is clear of the platter (radius 0.95), so it can change sides.
+    static let clearEdge = -0.97
+    /// How far it's pulled to change sides: its right edge to here (a little past `clearEdge`, so the spring gets
+    /// there briskly).
+    static let pullEdge = -1.3
     static let omega = 16.0
     /// Reduce Motion's fades, per second.
     static let fadeRate = 1 / 0.3
@@ -124,8 +136,12 @@ struct VisualizerCoverMotion {
     private var layout = CriticalSpring(0)
     private var opacity = CriticalSpring(0)
     private var offset = CriticalSpring(away)
+    private var place = CriticalSpring(0)
 
     init(_ cover: VisualizerVinylCover = .label) { settle(at: cover) }
+
+    private static func place(of cover: VisualizerVinylCover) -> Double { cover == .sleeveBehind ? 1 : 0 }
+    private static func front(of cover: VisualizerVinylCover) -> Double { cover == .sleeveBehind ? 0 : 1 }
 
     /// Puts the cover straight in place, with no motion.
     mutating func settle(at cover: VisualizerVinylCover) {
@@ -133,40 +149,52 @@ struct VisualizerCoverMotion {
         layout = CriticalSpring(sleeve ? 1 : 0)
         opacity = CriticalSpring(sleeve ? 1 : 0)
         offset = CriticalSpring(sleeve ? 0 : Self.away)
+        place = CriticalSpring(Self.place(of: cover))
         pose = VisualizerCoverPose(layout: layout.value, opacity: opacity.value, offset: offset.value,
-                                   front: cover == .sleeveBehind ? 0 : 1)
+                                   front: Self.front(of: cover), place: place.value)
     }
 
     /// Whether the sleeve, as it is now, could overlap the record or the platter.
-    var overlapsRecord: Bool { pose.opacity > 0.001 && pose.offset > Self.clear }
+    var overlapsRecord: Bool { pose.opacity > 0.001 && pose.rightEdge > Self.clearEdge }
 
     mutating func advance(toward cover: VisualizerVinylCover, dt: Double, calm: Bool) {
         let dt = min(max(dt, 0), 0.25)
         let sleeve = cover != .label
-        let wantFront: Double = cover == .sleeveBehind ? 0 : 1
+        let wantFront = Self.front(of: cover), wantPlace = Self.place(of: cover)
         var front = pose.front
+        // Out of sight, it's wherever it's going next.
+        if opacity.value <= 0.001 {
+            front = wantFront
+            if sleeve { place = CriticalSpring(wantPlace) }
+        }
         if calm {
-            // Nothing slides: the layout changes at once and the sleeve fades in or out where it rests, or dissolves
-            // from one side of the record to the other.
+            // Nothing slides or turns: it fades out where it is, and once it's gone everything moves at once (the
+            // turntable too) and it fades in where it's going.
             let fade = Self.fadeRate * dt
-            layout = CriticalSpring(sleeve ? 1 : 0)
-            let o = sleeve ? min(1, opacity.value + fade) : max(0, opacity.value - fade)
-            if sleeve {
-                front = opacity.value <= 0.001 ? wantFront : front < wantFront ? min(wantFront, front + fade) : max(wantFront, front - fade)
+            let there = sleeve && front == wantFront && abs(place.value - wantPlace) < 1e-9
+            if there || opacity.value <= 0.001 {
+                layout = CriticalSpring(sleeve ? 1 : 0)
+                opacity = CriticalSpring(sleeve ? min(1, opacity.value + fade) : 0)
+            } else {
+                opacity = CriticalSpring(max(0, opacity.value - fade))
             }
-            opacity = CriticalSpring(o)
-            offset = CriticalSpring(sleeve || o > 0 ? 0 : Self.away)
+            offset = CriticalSpring(sleeve || opacity.value > 0 ? 0 : Self.away)
         } else {
             // A sleeve that's on the wrong side changes sides only where it can't be seen passing the record.
             if sleeve && front != wantFront && !overlapsRecord { front = wantFront }
             let switching = sleeve && front != wantFront
             layout.step(toward: sleeve ? 1 : 0, omega: Self.omega, dt: dt)
             opacity.step(toward: sleeve ? 1 : 0, omega: Self.omega * 1.4, dt: dt)
-            offset.step(toward: switching ? Self.pull : sleeve ? 0 : Self.away, omega: Self.omega, dt: dt)
+            // Pulled out, it keeps its turn; back in, it turns to its new place as it slides there.
+            if sleeve && !switching { place.step(toward: wantPlace, omega: Self.omega, dt: dt) }
+            place.value = min(max(place.value, 0), 1)
+            let pull = Self.pullEdge - VisualizerCoverPose(layout: 0, opacity: 0, offset: 0, front: front, place: place.value).rightEdge
+            offset.step(toward: switching ? pull : sleeve ? 0 : Self.away, omega: Self.omega, dt: dt)
             layout.value = min(max(layout.value, 0), 1)
             opacity.value = min(max(opacity.value, 0), 1)
         }
-        pose = VisualizerCoverPose(layout: layout.value, opacity: opacity.value, offset: offset.value, front: front)
+        pose = VisualizerCoverPose(layout: layout.value, opacity: opacity.value, offset: offset.value, front: front,
+                                   place: place.value)
         if !calm && sleeve && pose.front != wantFront && !overlapsRecord { pose.front = wantFront }
     }
 }

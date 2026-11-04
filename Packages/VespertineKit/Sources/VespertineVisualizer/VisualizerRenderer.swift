@@ -410,9 +410,10 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             let pose = cover.pose
             vinylTitleRoom = settings.showsTrackInfo && !(scene.title ?? "").isEmpty ? VisualizerLayout.vinylTitleRoom : 0
             let layout = VisualizerLayout.vinyl(in: size, tonearm: settings.tonearm, sleeve: CGFloat(pose.layout),
-                                                titleRoom: vinylTitleRoom * scale)
+                                                place: CGFloat(pose.place), titleRoom: vinylTitleRoom * scale)
+            let rest = VisualizerLayout.sleeveRest(place: CGFloat(pose.place))
             u.g = SIMD4(Float(layout.centre.x), Float(layout.centre.y), Float(layout.unit), 0)
-            u.h = SIMD4(Float(pose.offset), Float(pose.front), Float(pose.opacity), Float(pose.layout))
+            u.h = SIMD4(Float(rest.x + CGFloat(pose.offset)), Float(pose.front), Float(pose.opacity), Float(rest.tilt))
         case .club where settings.clubMode == .waves:
             // The ripples grow with the mids and swell a little on the beat (not with Reduce Motion, which halves them).
             let amp = (0.02 + 0.045 * frame.mid * signal + (reduceMotion ? 0 : 0.02 * frame.beatPulse * signal)) * (reduceMotion ? 0.5 : 1)

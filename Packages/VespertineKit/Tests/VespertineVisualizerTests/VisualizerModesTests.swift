@@ -194,16 +194,29 @@ struct VisualizerMotionTests {
         #expect(m.pose == VisualizerCoverPose.label)
         run(&m, to: .sleeveFront, seconds: 1)
         #expect(abs(m.pose.layout - 1) < 1e-3 && abs(m.pose.opacity - 1) < 1e-3 && abs(m.pose.offset) < 1e-3 && m.pose.front == 1)
-        // Front to behind: pulled out left, past the platter, before it changes sides.
-        var deepest = 0.0
+        // Front to behind: pulled out left, past the platter, before it changes sides; upright until then, and turned
+        // to its place behind only on the way back in.
+        var deepest = 1.0
         var probe = m
         for _ in 0..<90 {
             probe.advance(toward: .sleeveBehind, dt: 1.0 / 60, calm: false)
-            deepest = min(deepest, probe.pose.offset)
+            deepest = min(deepest, probe.pose.rightEdge)
+            if probe.pose.front == 1 { #expect(probe.pose.place == 0) }
         }
-        #expect(deepest <= VisualizerCoverMotion.clear)
+        #expect(deepest <= VisualizerCoverMotion.clearEdge)
         run(&m, to: .sleeveBehind, seconds: 1.5)
-        #expect(m.pose.front == 0 && abs(m.pose.offset) < 1e-3 && abs(m.pose.opacity - 1) < 1e-3)
+        #expect(m.pose.front == 0 && abs(m.pose.offset) < 1e-3 && abs(m.pose.opacity - 1) < 1e-3 && abs(m.pose.place - 1) < 1e-3)
+        // And back: pulled out still turned, upright again on the way in.
+        probe = m
+        deepest = 1.0
+        let turned = m.pose.place
+        for _ in 0..<90 {
+            probe.advance(toward: .sleeveFront, dt: 1.0 / 60, calm: false)
+            deepest = min(deepest, probe.pose.rightEdge)
+            if probe.pose.front == 0 { #expect(probe.pose.place == turned) }
+        }
+        #expect(deepest <= VisualizerCoverMotion.clearEdge)
+        #expect(probe.pose.front == 1 && abs(probe.pose.place) < 1e-3 && abs(probe.pose.offset) < 1e-3)
         run(&m, to: .label, seconds: 1.5)
         #expect(m.pose.opacity < 1e-3 && m.pose.layout < 1e-3)
         // Clicked again while it's still moving, it goes where it was last asked.
@@ -213,9 +226,16 @@ struct VisualizerMotionTests {
         run(&m, to: .sleeveFront, seconds: 0.15)
         run(&m, to: .sleeveBehind, seconds: 2)
         #expect(m.pose.front == 0 && abs(m.pose.offset) < 1e-3 && abs(m.pose.opacity - 1) < 1e-3 && abs(m.pose.layout - 1) < 1e-3)
+        #expect(abs(m.pose.place - 1) < 1e-3)
+        // From the label straight to behind (the Options picker): it slides in already turned, behind the record.
+        var direct = VisualizerCoverMotion(.label)
+        direct.advance(toward: .sleeveBehind, dt: 1.0 / 60, calm: false)
+        #expect(direct.pose.front == 0 && direct.pose.place == 1)
+        run(&direct, to: .sleeveBehind, seconds: 1.5)
+        #expect(direct.pose == VisualizerCoverMotion(.sleeveBehind).pose || abs(direct.pose.offset) < 1e-3)
     }
 
-    @Test("Reduce Motion: nothing slides; the layout changes at once and the sleeve fades")
+    @Test("Reduce Motion: nothing slides or turns; the sleeve fades out where it was and in where it goes")
     func coverCalm() {
         var m = VisualizerCoverMotion(.label)
         m.advance(toward: .sleeveFront, dt: 1.0 / 60, calm: true)
@@ -225,15 +245,21 @@ struct VisualizerMotionTests {
             #expect(m.pose.offset == 0)
         }
         #expect(m.pose.opacity == 1)
-        // Front to behind: a dissolve where it lies.
-        m.advance(toward: .sleeveBehind, dt: 1.0 / 60, calm: true)
-        #expect(m.pose.front > 0 && m.pose.front < 1 && m.pose.offset == 0)
-        for _ in 0..<30 { m.advance(toward: .sleeveBehind, dt: 1.0 / 60, calm: true) }
-        #expect(m.pose.front == 0 && m.pose.offset == 0)
+        // Front to behind: out where it lies, then in, turned, behind the record. Never anywhere in between.
+        var sawGone = false
+        for _ in 0..<60 {
+            m.advance(toward: .sleeveBehind, dt: 1.0 / 60, calm: true)
+            #expect(m.pose.offset == 0 && (m.pose.place == 0 || m.pose.place == 1) && (m.pose.front == 0 || m.pose.front == 1))
+            // Seen only where it was, or where it's going.
+            if m.pose.opacity > 0 { #expect((m.pose.front == 1 && m.pose.place == 0) || (m.pose.front == 0 && m.pose.place == 1)) }
+            sawGone = sawGone || m.pose.opacity == 0
+        }
+        #expect(sawGone && m.pose.front == 0 && m.pose.place == 1 && m.pose.opacity == 1 && m.pose.layout == 1)
+        // To the label: it fades where it is, and the turntable moves back once it's gone.
         m.advance(toward: .label, dt: 1.0 / 60, calm: true)
-        #expect(m.pose.layout == 0 && m.pose.offset == 0)
+        #expect(m.pose.layout == 1 && m.pose.offset == 0 && m.pose.opacity < 1)
         for _ in 0..<30 { m.advance(toward: .label, dt: 1.0 / 60, calm: true) }
-        #expect(m.pose.opacity == 0)
+        #expect(m.pose.opacity == 0 && m.pose.layout == 0)
     }
 
     @Test("Settled where it was left, with no motion (the window opening, another style shown)")
@@ -241,7 +267,7 @@ struct VisualizerMotionTests {
         for c in VisualizerVinylCover.allCases {
             let m = VisualizerCoverMotion(c)
             #expect(m.pose.layout == (c == .label ? 0 : 1) && m.pose.opacity == (c == .label ? 0 : 1))
-            #expect(m.pose.front == (c == .sleeveBehind ? 0 : 1))
+            #expect(m.pose.front == (c == .sleeveBehind ? 0 : 1) && m.pose.place == (c == .sleeveBehind ? 1 : 0))
             var still = m
             still.advance(toward: c, dt: 1.0 / 60, calm: false)
             #expect(abs(still.pose.offset - m.pose.offset) < 1e-9 && abs(still.pose.layout - m.pose.layout) < 1e-9)
@@ -271,13 +297,17 @@ struct VisualizerVinylLayoutTests {
     func sleeveFits() {
         for size in Self.sizes {
             for arm in [true, false] {
-                let l = VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 1)
-                let left = l.centre.x + (VisualizerLayout.sleeveCentre - VisualizerLayout.sleeveHalf) * l.unit
-                let right = l.centre.x + (arm ? VisualizerLayout.armReach : VisualizerLayout.ringReach) * l.unit
-                #expect(left >= 0 && right <= size.width, "\(size) arm \(arm): \(left)…\(right)")
-                #expect(l.centre.y - l.unit >= 0 && l.centre.y + l.unit <= size.height, "\(size)")
-                // Never larger than without the sleeve.
-                #expect(l.unit <= VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 0).unit + 1e-9)
+                for place in [0.0, 0.5, 1.0] {
+                    let l = VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 1, place: place)
+                    let rest = VisualizerLayout.sleeveRest(place: place), reach = VisualizerLayout.sleeveReach(tilt: rest.tilt)
+                    let left = l.centre.x + (rest.x - reach) * l.unit
+                    let right = l.centre.x + (arm ? VisualizerLayout.armReach : VisualizerLayout.ringReach) * l.unit
+                    #expect(left >= 0 && right <= size.width, "\(size) arm \(arm) place \(place): \(left)…\(right)")
+                    #expect(l.centre.y - l.unit >= 0 && l.centre.y + l.unit <= size.height, "\(size)")
+                    #expect(l.centre.y + reach * l.unit <= size.height, "\(size): the sleeve's bottom corner")
+                    // Never larger than without the sleeve.
+                    #expect(l.unit <= VisualizerLayout.vinyl(in: size, tonearm: arm, sleeve: 0).unit + 1e-9)
+                }
             }
         }
         // Halfway, it's between the two.
@@ -300,21 +330,72 @@ struct VisualizerVinylLayoutTests {
         let label = VisualizerCoverMotion(.label).pose, front = VisualizerCoverMotion(.sleeveFront).pose
         let behind = VisualizerCoverMotion(.sleeveBehind).pose
         let l0 = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 0), l1 = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 1)
+        let l2 = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 1, place: 1)
         func hit(_ p: CGPoint, _ pose: VisualizerCoverPose) -> Bool { VisualizerLayout.vinylCoverHit(p, in: size, tonearm: true, pose: pose) }
         // The label.
         #expect(hit(point(0.2, 0.1, l0), label))
-        #expect(hit(point(0.25, -0.1, l1), front) && hit(point(0.25, -0.1, l1), behind))
+        #expect(hit(point(0.25, -0.1, l1), front) && hit(point(0.25, -0.1, l2), behind))
         // The grooves, the platter, the background: not the cover.
         #expect(!hit(point(0.6, 0, l0), label))
         #expect(!hit(point(-1.3, 0, l0), label))
         #expect(!hit(CGPoint(x: 4, y: 4), label))
-        // The sleeve's left half shows either way; its right half only in front of the record.
-        #expect(hit(point(-1.4, 0.5, l1), front) && hit(point(-1.4, 0.5, l1), behind))
+        // The sleeve's left part shows either way; the part under the record only in front of it.
+        #expect(hit(point(-1.4, 0.5, l1), front) && hit(point(-1.4, 0.5, l2), behind))
         #expect(hit(point(-0.5, 0.2, l1), front))
-        #expect(!hit(point(-0.5, 0.2, l1), behind))
+        #expect(!hit(point(-0.7, 0.2, l2), behind))
         // Past the sleeve's edge, or below it.
         #expect(!hit(point(-1.85, 0, l1), front))
         #expect(!hit(point(-1.0, -0.95, l1), front))
+        // Behind, it's turned 4° anticlockwise: its top left corner is lower and further left than upright, its top
+        // right corner higher.
+        let c = -1.385, h = 0.883, t = 4 * Double.pi / 180
+        func corner(_ x: Double, _ y: Double) -> (CGFloat, CGFloat) { (c + x * cos(t) - y * sin(t), x * sin(t) + y * cos(t)) }
+        let tl = corner(-h + 0.02, h - 0.02), bl = corner(-h + 0.02, -h + 0.02)
+        #expect(hit(point(tl.0, tl.1, l2), behind) && hit(point(bl.0, bl.1, l2), behind))
+        // Upright, (c - h + 0.02, -h + 0.02) would be on it; turned, that corner has swung right of there.
+        #expect(!hit(point(c - h + 0.01, -h + 0.01, l2), behind))
+    }
+}
+
+@Suite("Visualizer modes: the sleeve where MD Vinyl puts it")
+struct VisualizerSleeveReferenceTests {
+    // Measured from Alex's MD Vinyl screenshots (2796×1290): the record's radius is 509 px in both. In front, the
+    // sleeve is 1046 px square, its right edge through the record's centre, level with it; behind, the same size,
+    // its centre 822 px left of the record's, level, turned 4.0° anticlockwise.
+    static let r = Double(VisualizerLayout.recordRadius)
+
+    @Test("In front: upright, level with the record, its right edge through the record's centre, a touch larger")
+    func front() {
+        let rest = VisualizerLayout.sleeveRest(place: 0)
+        #expect(rest.tilt == 0)
+        #expect(abs(Double(rest.x + VisualizerLayout.sleeveHalf)) < 1e-9)
+        #expect(abs(Double(VisualizerLayout.sleeveHalf) / Self.r - 523.0 / 509) < 0.01)
+    }
+
+    @Test("Behind: the same sleeve, 1.61 record radii left, turned 4° anticlockwise, the record over its right edge")
+    func behind() {
+        let rest = VisualizerLayout.sleeveRest(place: 1)
+        #expect(abs(Double(rest.tilt) * 180 / .pi - 4) < 0.1)
+        #expect(abs(-Double(rest.x) / Self.r - 822.0 / 509) < 0.02)
+        // The record covers its right edge, by about 0.4 of its radius (150 px in the references), and never its centre.
+        let overlap = Double(rest.x + VisualizerLayout.sleeveHalf) + Self.r
+        #expect(abs(overlap / Self.r - 0.42) < 0.06)
+        #expect(Double(rest.x) < -Self.r)
+    }
+
+    @Test("Sleeve, record and tonearm sit together in the middle of the window, as in MD Vinyl")
+    func centred() {
+        let size = CGSize(width: 2796, height: 1290)
+        for place in [0.0, 1.0] {
+            let l = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 1, place: place)
+            let rest = VisualizerLayout.sleeveRest(place: place)
+            let left = l.centre.x + (rest.x - VisualizerLayout.sleeveReach(tilt: rest.tilt)) * l.unit
+            let right = l.centre.x + VisualizerLayout.armReach * l.unit
+            #expect(abs((left + right) / 2 - size.width / 2) < size.width * 0.02, "place \(place)")
+            #expect(abs(l.centre.y - size.height / 2) < 1)
+            // The record as large as without the sleeve, as in the references (radius 0.39 of the height there).
+            #expect(abs(Double(VisualizerLayout.recordRadius * l.unit / size.height) - 509.0 / 1290) < 0.01)
+        }
     }
 }
 
@@ -440,8 +521,9 @@ struct VisualizerModeRenderTests {
         _ = renderer.renderOffscreen(frame: musicFrame(), scene: VisualizerScene(isPlaying: true), size: size, scale: 1, dt: 1 / 60)
         // Switched to while another style showed, it's already in place: no slide on the first frame.
         #expect(renderer.coverPose == VisualizerCoverMotion(.sleeveBehind).pose)
-        let l = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 1)
+        let l = VisualizerLayout.vinyl(in: size, tonearm: true, sleeve: 1, place: 1)
         #expect(renderer.vinylCoverHit(at: l.centre, in: size))
+        #expect(renderer.vinylCoverHit(at: CGPoint(x: l.centre.x - 1.6 * l.unit, y: l.centre.y), in: size))
         renderer.settings.style = .bars
         #expect(!renderer.vinylCoverHit(at: l.centre, in: size))
         // A click (the setting moving on) slides it, and it settles.

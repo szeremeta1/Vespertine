@@ -265,22 +265,26 @@ static Tonearm tonearm(float2 q, float aa, float armAngle, float2 pivot, float r
     return t;
 }
 
-// The album's sleeve, beside the record (record units, y up): it rests with its right edge at the record's centre,
-// moved `offset` to the right of that.
+// The album's sleeve, beside the record (record units, y up): its centre `centreX` along from the record's (level with
+// it) and turned `tilt` anticlockwise. As in MD Vinyl: a square card a touch larger than the record, with slightly
+// rounded corners and a soft shadow that falls mostly straight down.
 struct Sleeve {
     float coverage;
     float3 colour;
-    float shadow;   // the shadow it casts, down and to the right
+    float shadow;   // the shadow it casts, a little down and to the right
 };
 
-static Sleeve sleeve(float2 q, float aa, float offset, constant U &u, texture2d<float> art) {
-    const float halfSize = 0.90;
-    float2 sq = q - float2(-0.90 + offset, 0);
+static Sleeve sleeve(float2 q, float aa, float centreX, float tilt, constant U &u, texture2d<float> art) {
+    const float halfSize = 0.883;
+    const float2 shadowAt = float2(0.008, -0.035);
     Sleeve s = {0, float3(0), 0};
-    if (any(abs(sq - float2(0.03, -0.045)) > halfSize + 0.12)) return s;   // past the sleeve and its shadow
-    float d = boxDistance(sq, float2(halfSize), 0.012);
+    // Past the sleeve (turned, its corners reach a little further) and its shadow.
+    float2 w = q - float2(centreX, 0);
+    if (any(abs(w - shadowAt) > halfSize * (cos(tilt) + abs(sin(tilt))) + 0.14)) return s;
+    float2 sq = rotate(w, -tilt);                  // the sleeve's own frame
+    float d = boxDistance(sq, float2(halfSize), 0.017);
     s.coverage = 1 - smoothstep(-aa, aa, d);
-    s.shadow = (1 - smoothstep(-0.05, 0.09, boxDistance(sq - float2(0.03, -0.045), float2(halfSize), 0.03))) * 0.5;
+    s.shadow = (1 - smoothstep(-0.06, 0.10, boxDistance(rotate(w - shadowAt, -tilt), float2(halfSize), 0.03))) * 0.45;
     float2 lq = sq / halfSize;
     float3 c;
     if (u.e.y > 0.5) {
@@ -302,7 +306,8 @@ static Sleeve sleeve(float2 q, float aa, float offset, constant U &u, texture2d<
 
 fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], constant float *fine [[buffer(3)]],
                          texture2d<float> art [[texture(2)]], texture2d<float> overlay [[texture(0)]]) {
-    // g: the record's centre (px, y down), px per unit; h: the sleeve's offset, in front 0…1, opacity 0…1, layout 0…1
+    // g: the record's centre (px, y down), px per unit; h: the sleeve's centre (x, record units), in front 0 or 1,
+    // opacity 0…1, its turn (radians, anticlockwise)
     float2 size = u.a.xy;
     float unit = max(u.g.z, 1.0);
     bool showArm = u.c.w > 0.5;
@@ -355,12 +360,14 @@ fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], cons
     float sleeveOpacity = u.h.z, sleeveFront = u.h.y;
     Sleeve sl = {0, float3(0), 0};
     if (sleeveOpacity > 0.001) {
-        sl = sleeve(q, aa, u.h.x, u, art);
+        sl = sleeve(q, aa, u.h.x, u.h.w, u, art);
         float behind = sleeveOpacity * (1 - sleeveFront);
         if (behind > 0) {
             col *= 1 - sl.shadow * behind;
-            col = mix(col, sl.colour, sl.coverage * behind);
-            float recordShadow = 1 - smoothstep(recordR - 0.03, recordR + 0.07, length(q - float2(0.025, -0.04)));
+            // In the record's shade, a little darker than in front.
+            col = mix(col, sl.colour * 0.92, sl.coverage * behind);
+            // The record's own shadow on it: soft, all round its edge, a little more below.
+            float recordShadow = 1 - smoothstep(recordR - 0.02, recordR + 0.09, length(q - float2(0.004, -0.022)));
             col *= 1 - 0.5 * recordShadow * sl.coverage * behind;
         }
     }
