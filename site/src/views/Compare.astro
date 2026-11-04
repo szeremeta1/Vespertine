@@ -1,0 +1,135 @@
+---
+// /compare/ and /compare/<player>/ (English only). The tables are the home page's comparison table, narrowed to
+// Vespertine and one player; see src/data/compare.ts for where every word comes from.
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import { DEFER_IMAGES } from '../inline-scripts.mjs';
+import { SITE, latest } from '../data/app';
+import { compare } from '../data/content';
+import { rivals, tableFor, comparison, CHECKED, type Rival } from '../data/compare';
+import { guides } from '../data/guides';
+import { innerGraph } from '../lib/seo';
+import { sceneShots } from '../lib/shots';
+
+interface Props { rival?: Rival; }
+const { rival } = Astro.props;
+const path = rival ? `/compare/${rival.slug}/` : '/compare/';
+const updated = guides.find((g) => g.path === path)!.updated;
+const hub = {
+  title: 'Vespertine compared with other Mac music players',
+  description: 'How Vespertine, a free open-source Mac music player, compares with Audirvana, Roon, Colibri, Cog, foobar2000 and Apple Music, feature by feature, from each product’s own documentation.',
+  h1: 'Vespertine compared with other Mac music players.',
+  lede: compare.intro,
+};
+const title = rival ? rival.title : hub.title;
+const description = rival ? rival.description : hub.description;
+const h1 = rival ? `Vespertine and ${rival.name}, compared.` : hub.h1;
+const table = rival ? tableFor(rival) : undefined;
+const parent = rival ? { name: 'Compare', path: '/compare/' } : undefined;
+const jsonLd = innerGraph({
+  lang: 'en', path, title, crumb: rival ? rival.name : 'Compare', parent, description, dateModified: updated,
+  image: `${SITE}/og/home.jpg`, screenshots: await sceneShots('en'),
+  extra: rival ? [] : [{
+    '@type': 'ItemList',
+    name: 'Mac music players compared with Vespertine',
+    itemListElement: rivals.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.name, url: `${SITE}/compare/${r.slug}/` })),
+  }],
+});
+---
+<Base lang="en" page="article" path={path} title={title} description={description} og="home" ogAlt={`Vespertine, a free open-source Mac player, compared with other Mac music players.`} jsonLd={jsonLd}>
+<a class="skip" href="#main">Skip to content</a>
+<Nav lang="en" page="article" />
+<main id="main" tabindex="-1" class="press guide" data-placement={rival ? 'compare-page' : 'compare-hub'}>
+  <header class="page-head">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">{rival ? 'Compare' : 'Compare Mac players'}</p>
+      <h1 class="page-title">{h1}</h1>
+      <p class="page-lede">{rival ? rival.summary : hub.lede}</p>
+      <p class="fine">Compared from each player’s own documentation or source code. “Not documented” means the vendor doesn’t say either way, not that the feature is missing. Table last updated {CHECKED.text}; its cells were checked {CHECKED.cells}.</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+    {!rival && (
+      <section class="press-block" aria-labelledby="players-title">
+        <p class="eyebrow">Players</p>
+        <h2 id="players-title">Pick a player.</h2>
+        <ul class="cards">
+          {rivals.map((r) => (
+            <li class="card spot">
+              <h3>{r.name}</h3>
+              <p>{r.summary}</p>
+              <p class="links"><a href={`/compare/${r.slug}/`} data-compare={r.slug}>Vespertine and {r.name} <span aria-hidden="true">→</span></a></p>
+            </li>
+          ))}
+        </ul>
+        <p>Every page uses the same table as the <a href="/#compare">home page</a>. <a href={comparison.sources}>Sources and scope</a>.</p>
+      </section>
+    )}
+
+    {rival && table && (
+      <>
+        <section class="press-block" aria-labelledby="table-title">
+          <p class="eyebrow">Feature by feature</p>
+          <h2 id="table-title">The table.</h2>
+          <div class="compare" role="region" aria-label={`Vespertine and ${rival.name}, feature by feature (scrolls sideways)`} tabindex="0">
+            <table>
+              <caption class="sr-only">Vespertine compared with {rival.name}, from each product’s own documentation or source</caption>
+              <thead><tr><th scope="col">Feature</th><th scope="col" class="us">Vespertine</th><th scope="col">{rival.name}</th></tr></thead>
+              <tbody>
+                {table.rows.map(([label, us, them]) => <tr><th scope="row">{label}</th><td class="us">{us}</td><td>{them}</td></tr>)}
+              </tbody>
+            </table>
+          </div>
+          <div class="compare-note">
+            {table.notes.map((n) => <p set:html={n} />)}
+          </div>
+        </section>
+
+        <section class="press-block" aria-labelledby="choose-title">
+          <p class="eyebrow">Which one</p>
+          <h2 id="choose-title">Which to choose.</h2>
+          <h3 class="guide__h3">Choose {rival.name} if…</h3>
+          <ul class="ticks">{rival.chooseThem.map((x) => <li>{x}</li>)}</ul>
+          <h3 class="guide__h3">Choose Vespertine if…</h3>
+          <ul class="ticks">{rival.chooseUs.map((x) => <li>{x}</li>)}</ul>
+          <p>Vespertine is free and open source (GPL-3.0). Price isn’t part of this comparison, and sound quality isn’t ranked.</p>
+        </section>
+
+        <section class="press-block" aria-labelledby="sources-title">
+          <p class="eyebrow">Sources</p>
+          <h2 id="sources-title">Where this comes from.</h2>
+          <ul class="ticks">
+            {rival.sources.map((s) => <li><a href={s.url}>{s.text}</a></li>)}
+            <li><a href={comparison.sources}>Comparison sources and scope</a> (docs/COMPARISON.md in the repository): the full list and what was checked.</li>
+          </ul>
+          <p>A documented feature is not a Vespertine hardware test of {rival.name}. Something wrong or out of date? <a href={comparison.issues}>Open an issue</a> and it will be corrected.</p>
+        </section>
+
+        <section class="press-block" aria-labelledby="more-title">
+          <p class="eyebrow">More</p>
+          <h2 id="more-title">Other comparisons.</h2>
+          <ul class="ticks">
+            <li><a href="/compare/" data-compare="hub">All comparisons</a></li>
+            {rivals.filter((r) => r.slug !== rival.slug).map((r) => <li><a href={`/compare/${r.slug}/`} data-compare={r.slug}>Vespertine and {r.name}</a></li>)}
+            <li><a href="/hi-res-audio-player-for-mac/">Vespertine as a hi-res audio player for Mac</a></li>
+          </ul>
+          <div class="contact-card">
+            <p>Vespertine {latest.version} is free, signed and notarized.</p>
+            <DownloadButton lang="en" />
+          </div>
+        </section>
+      </>
+    )}
+  </div>
+</main>
+<Footer lang="en" page="article" />
+<script>
+  import '../scripts/main';
+</script>
+<script is:inline set:html={DEFER_IMAGES} />
+</Base>

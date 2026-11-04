@@ -26,7 +26,10 @@ import { CODES, LOCALES, hreflangOf } from '../src/i18n/locales.mjs';
 const DIST = 'dist';
 const SITE = 'https://vespertineapp.com';
 // English-only guide pages (src/data/guides.ts): English and x-default hreflang only, no og:locale:alternate.
-const guideRest = new Set(readFileSync('src/data/guides.ts', 'utf8').matchAll(/path: '\/([^']+)\/'/g).map((m) => `${m[1]}/index.html`));
+const guideRest = new Set([
+  ...readFileSync('src/data/guides.ts', 'utf8').matchAll(/path: '\/([^']+)\/'/g).map((m) => `${m[1]}/index.html`),
+  ...readFileSync('src/data/compare.ts', 'utf8').matchAll(/slug: '([^']+)'/g).map((m) => `compare/${m[1]}/index.html`),
+]);
 const files = [];
 (function walk(dir) {
   for (const f of readdirSync(dir)) {
