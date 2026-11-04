@@ -150,11 +150,12 @@ public struct RoomProfileBook: Equatable, Sendable {
     // MARK: Changing
 
     /// Adds a profile. A name already used on its output gets a number, and an id already in the library a fresh one
-    /// (an imported copy of a profile never replaces the original).
+    /// (an imported copy of a profile never replaces the original). Its time is held to the second the file keeps.
     @discardableResult
     public mutating func add(_ profile: RoomProfile, makeChosen: Bool = true) -> RoomProfile {
         var p = profile
         if profiles.contains(where: { $0.id == p.id }) { p = p.withID(UUID()) }
+        p.createdAt = p.createdAt.wholeSecond
         let cleaned = Self.tidy(p.name)
         p.name = freeName(cleaned.isEmpty ? String(localized: "Room correction") : String(cleaned.prefix(Self.maxNameLength - 6)), on: p.deviceUID, except: nil)
         p.tags = p.tags?.cleaned
@@ -191,7 +192,7 @@ public struct RoomProfileBook: Equatable, Sendable {
     public mutating func duplicate(_ id: UUID) throws -> RoomProfile {
         guard let original = profile(id) else { throw RoomProfileError.notFound }
         var copy = original.withID(UUID())
-        copy.createdAt = Date()
+        copy.createdAt = Date().wholeSecond
         copy.name = freeName(String(Self.tidy(original.name).prefix(Self.maxNameLength - 12)) + " " + String(localized: "copy"), on: original.deviceUID, except: nil)
         profiles.append(copy)
         return copy
@@ -254,6 +255,12 @@ public struct RoomProfileBook: Equatable, Sendable {
         while taken.contains("\(base) \(n)".lowercased()) { n += 1 }
         return "\(base) \(n)"
     }
+}
+
+private extension Date {
+    /// The time to the second, as the library file stores it (ISO 8601, no fractions), so a profile kept in memory and
+    /// the same profile read back after a restart are equal.
+    var wholeSecond: Date { Date(timeIntervalSince1970: timeIntervalSince1970.rounded(.down)) }
 }
 
 // MARK: - What a profile can do
