@@ -124,7 +124,7 @@ Options: `--style vinyl|bars|spectrogram|club|scope|meters|particles|mirrored`, 
 
 ### Cost
 
-Offline at 2560 × 1440 on an M1 Pro (GPU time per frame from the command buffers' own timestamps; analysis on the CPU, meters included): Vinyl 1.7 ms, Scope 1.9 ms (oscilloscope 1.5), Meters 1.3, Particles 1.4, Mirrored 1.1 to 1.4, against a frame budget of 8.3 ms at 120 Hz. Analysis is 45 to 60 µs a frame. VESPERTINE_COST_MODES
+Offline at 2560 × 1440 on an M1 Pro (GPU time per frame from the command buffers' own timestamps; analysis on the CPU, meters included): Vinyl 1.7 ms, Scope 1.9 ms (oscilloscope 1.5), Meters 1.3, Particles 1.4, Mirrored 1.1 to 1.4, against a frame budget of 8.3 ms at 120 Hz. Analysis is 45 to 60 µs a frame. Measured the same way (this machine, three 6 s runs each, so allow for a few tenths of a millisecond of noise): Spectrum 1.1 to 1.3 ms in Classic or No Peaks and 2.0 to 2.2 in Smooth (its curve and veil); Club 2.2 to 2.7 in Classic and 3.0 to 4.0 in Waves (each beam's ripple is worked out at every pixel near it); Vinyl 1.9 to 2.2 with the cover on the label and 2.0 to 2.5 with the sleeve. The modes leave the CPU time where it was, about 0.1 ms a frame.
 
 ## The window
 

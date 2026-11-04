@@ -100,8 +100,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
 
     private let queue: MTLCommandQueue
     private var pipelines: [VisualizerStyle: MTLRenderPipelineState] = [:]
-    /// Club's Waves mode.
+    /// Club's Waves mode, and Spectrum's Smooth (the bars' function specialized).
     private var wavesPipeline: MTLRenderPipelineState?
+    private var smoothBarsPipeline: MTLRenderPipelineState?
     private let pixelFormat: MTLPixelFormat = .bgra8Unorm
 
     // Trails (scope and particles): light drawn additively into a texture that fades a little each frame.
@@ -191,10 +192,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             let names: [VisualizerStyle: String] = [.bars: "vz_bars", .spectrogram: "vz_spectrogram", .vinyl: "vz_vinyl", .club: "vz_club",
                                                     .scope: "vz_scope", .meters: "vz_meters", .particles: "vz_particles",
                                                     .mirrored: "vz_mirror"]
+            func specialized(_ name: String, smooth: Bool) throws -> MTLFunction {
+                let constants = MTLFunctionConstantValues()
+                var on = smooth
+                constants.setConstantValue(&on, type: .bool, index: 0)
+                return try library.makeFunction(name: name, constantValues: constants)
+            }
             for (style, name) in names {
                 let d = MTLRenderPipelineDescriptor()
                 d.vertexFunction = vertex
-                d.fragmentFunction = library.makeFunction(name: name)
+                d.fragmentFunction = style == .bars ? try specialized(name, smooth: false) : library.makeFunction(name: name)
                 d.colorAttachments[0].pixelFormat = pixelFormat
                 pipelines[style] = try device.makeRenderPipelineState(descriptor: d)
             }
@@ -203,6 +210,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             waves.fragmentFunction = library.makeFunction(name: "vz_club_waves")
             waves.colorAttachments[0].pixelFormat = pixelFormat
             wavesPipeline = try device.makeRenderPipelineState(descriptor: waves)
+            let smoothBars = MTLRenderPipelineDescriptor()
+            smoothBars.vertexFunction = vertex
+            smoothBars.fragmentFunction = try specialized("vz_bars", smooth: true)
+            smoothBars.colorAttachments[0].pixelFormat = pixelFormat
+            smoothBarsPipeline = try device.makeRenderPipelineState(descriptor: smoothBars)
             // The fade keeps a set fraction of what's there (the blend colour); beams and sprites add light.
             let fade = MTLRenderPipelineDescriptor()
             fade.vertexFunction = vertex
@@ -334,7 +346,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             gpu.withLock { $0.cpuFrames += 1; $0.cpuSeconds += spent }
         }
         let waves = settings.style == .club && settings.clubMode == .waves
-        guard size.width >= 1, size.height >= 1, let pipeline = waves ? wavesPipeline : pipelines[settings.style],
+        let smoothBars = settings.style == .bars && settings.spectrumMode == .smooth
+        guard size.width >= 1, size.height >= 1,
+              let pipeline = waves ? wavesPipeline : smoothBars ? smoothBarsPipeline : pipelines[settings.style],
               let buffer = queue.makeCommandBuffer() else { return nil }
         advance(frame: frame, scene: scene, dt: dt)
         updateOverlay(size: size, scale: scale, scene: scene)
@@ -392,8 +406,6 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             updateMeterFace(size: size, scale: scale)
         case .mirrored:
             u.g = SIMD4(settings.mirrorLayout == .line ? 1 : 0, frame.bass * frame.beatPulse + 0.5 * frame.bass, 0, 0)
-        case .bars:
-            u.g = SIMD4(settings.spectrumMode == .smooth ? 1 : 0, 0, 0, 0)
         case .vinyl:
             let pose = cover.pose
             vinylTitleRoom = settings.showsTrackInfo && !(scene.title ?? "").isEmpty ? VisualizerLayout.vinylTitleRoom : 0

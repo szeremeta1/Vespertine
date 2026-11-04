@@ -72,7 +72,9 @@ static float4 overlayOver(float3 rgb, float4 overlay) {
 static float dither(float2 px) { return (hash21(px) - 0.5) / 255.0; }
 
 // MARK: Bars
-// g: Smooth mode 0/1, unused, unused, unused
+// Spectrum's Smooth mode is the same function specialized (a function constant), so Classic and No Peaks compile
+// without it.
+constant bool smoothBars [[function_constant(0)]];
 
 static float boxDistance(float2 p, float2 halfSize, float radius);
 
@@ -106,7 +108,7 @@ fragment float4 vz_bars(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
         float y = (hi.y - px.y) / plotH;            // 0 at the floor, 1 at the top
         float h = bands[i];
         float topEdge = 1.0 / plotH;
-        bool smoothMode = u.g.x > 0.5;
+        bool smoothMode = smoothBars;
         float fill = smoothstep(h + topEdge, h - topEdge, y) * step(0.0, y);
         float bar = fill * inside;
         float curve = 0;
@@ -274,8 +276,9 @@ struct Sleeve {
 static Sleeve sleeve(float2 q, float aa, float offset, constant U &u, texture2d<float> art) {
     const float halfSize = 0.90;
     float2 sq = q - float2(-0.90 + offset, 0);
+    Sleeve s = {0, float3(0), 0};
+    if (any(abs(sq - float2(0.03, -0.045)) > halfSize + 0.12)) return s;   // past the sleeve and its shadow
     float d = boxDistance(sq, float2(halfSize), 0.012);
-    Sleeve s;
     s.coverage = 1 - smoothstep(-aa, aa, d);
     s.shadow = (1 - smoothstep(-0.05, 0.09, boxDistance(sq - float2(0.03, -0.045), float2(halfSize), 0.03))) * 0.5;
     float2 lq = sq / halfSize;
@@ -547,7 +550,7 @@ static float3 beamFan(float2 v, int first, int count, float amp, float haze, con
         da -= 2 * M_PI_F * floor(da / (2 * M_PI_F) + 0.5);
         if (abs(da) > 1.4) continue;                         // behind the emitter, or far round
         float across = rho * sin(da);
-        if (abs(across) > amp + 12 * glowWidth) continue;    // too far for even its glow
+        if (abs(across) > amp + 7 * glowWidth) continue;     // too far for even its glow (under 0.1 %)
         float phase = beam.y * rho + beam.z;
         float lateral = amp * sin(phase) * grow;
         float slope = amp * beam.y * cos(phase) * grow;
