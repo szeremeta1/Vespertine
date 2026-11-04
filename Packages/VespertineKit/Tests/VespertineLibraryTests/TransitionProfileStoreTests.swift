@@ -119,6 +119,32 @@ struct TransitionProfileStoreTests {
         #expect(try db.transitionProfile(for: b) == nil)
     }
 
+    @Test("A song with a current analysis takes only a server record's profile, once; a record without one changes nothing")
+    func serverProfileBackfill() async throws {
+        let (db, source, dir) = try await scanned(["a.wav", "b.wav"], remote: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let tracks = try db.allTracks()
+        let a = try #require(tracks.first { $0.filePath.hasSuffix("a.wav") })
+        let b = try #require(tracks.first { $0.filePath.hasSuffix("b.wav") })
+        for t in [a, b] { try db.saveAnalysis(try FileAnalyzer.analyze(url: t.fileURL), filePath: t.filePath) }
+        let stored = try #require(try db.storedAnalysis(for: a)?.analysis)
+        func line(_ name: String, _ t: Track, profile: TransitionProfile?) throws -> String {
+            var record: [String: Any] = ["path": name, "size": t.fileSize, "mtime": t.modifiedAt.timeIntervalSince1970,
+                                         "analysis": try JSONSerialization.jsonObject(with: JSONEncoder().encode(stored))]
+            if let profile { record["transition"] = try JSONSerialization.jsonObject(with: JSONEncoder().encode(profile)) }
+            return String(decoding: try JSONSerialization.data(withJSONObject: record), as: UTF8.self) + "\n"
+        }
+        let index = dir.appendingPathComponent(".vespertine")
+        try FileManager.default.createDirectory(at: index, withIntermediateDirectories: true)
+        try (try line("a.wav", a, profile: Self.profile) + line("b.wav", b, profile: nil))
+            .write(to: index.appendingPathComponent("analysis.jsonl"), atomically: true, encoding: .utf8)
+        let importer = ServerAnalysisImporter()
+        #expect(try importer.importNew(for: source, into: db) == 1)
+        #expect(try db.transitionProfile(for: a) == Self.profile)
+        #expect(try db.transitionProfile(for: b) == nil)
+        #expect(try ServerAnalysisImporter().importNew(for: source, into: db) == 0, "b's record has no profile: nothing to take, every sync")
+    }
+
     @Test("A playlist keeps its own transitions; nil follows the app; deleting the playlist forgets them")
     func playlistOverride() throws {
         let db = try LibraryDatabase.inMemory()
