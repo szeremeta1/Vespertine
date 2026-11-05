@@ -80,6 +80,9 @@ public struct EngineSettings: Sendable, Equatable {
     public var deviceDigitalVolumes: [String: Double?] = [:]
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
+    /// Spatialize stereo, per device UID: stereo and mono upmixed to 5.1 for Spatial Audio or multichannel speakers. Off
+    /// everywhere unless turned on (the original stays the default).
+    public var spatializeStereoUIDs: Set<String> = []
     /// Dolby Atmos: let macOS render the objects (true), or play the Dolby Digital Plus channel bed
     /// through Vespertine's own path (false).
     public var atmosBySystem = true
@@ -133,6 +136,8 @@ public struct EngineSettings: Sendable, Equatable {
     public func spatialMode(for device: OutputDevice) -> SpatialMode {
         spatialModes[device.uid] ?? (device.isAppleHeadphones ? .headTracked : .off)
     }
+
+    public func spatializesStereo(for device: OutputDevice) -> Bool { spatializeStereoUIDs.contains(device.uid) }
 
     /// The digital volume (dB) applied on `device`; nil = none.
     public func digitalVolume(for device: OutputDevice?) -> Double? {
@@ -798,7 +803,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
                 || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
                 || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
-                || old.matchSixteenBit != new.matchSixteenBit
+                || old.matchSixteenBit != new.matchSixteenBit || old.spatializeStereoUIDs != new.spatializeStereoUIDs
                 // Live Set's fixed rate, set or changed: the output is set up again at it (or back to following songs).
                 || old.transitions.fixedRate != new.transitions.fixedRate
                 || (old.convertsDSDForRoom(sessionDevice) != new.convertsDSDForRoom(sessionDevice)
@@ -1052,7 +1057,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         sessionLock.lock(); systemTap = nil; sessionLock.unlock()
         var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
-                                      spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                      spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                       dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                       dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
         plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
@@ -1649,7 +1654,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             var planB: OutputPlan?
             if !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) {
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
-                                              spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                              spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                               dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
@@ -1731,7 +1736,7 @@ public final class PlaybackEngine: @unchecked Sendable {
               plan.deviceSampleRate != session.plan.deviceSampleRate else { return nil }
         let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
         var resampled = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: .fixed(session.plan.deviceSampleRate),
-                                           spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                           spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                            dsdToPCMForRoom: settings.convertsDSDForRoom(device), dsdToPCMForTransitions: true)
         resampled.integerSamples = false
         guard resampled.mode == .pcm, session.plan.isDeviceCompatible(with: resampled) else { return nil }
@@ -1803,7 +1808,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
             guard !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) else { return skipFades(session) }
             var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
-                                          spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                          spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                           dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                           dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
@@ -1966,7 +1971,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                               policy: ratePolicy(for: device),
-                                              spatial: settings.spatialMode(for: device), bitstream: bitstream,
+                                              spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                               dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)

@@ -5,6 +5,7 @@
 // Pure logic, no Core Audio calls, so every decision is unit-testable.
 //
 
+import CoreAudio
 import Foundation
 
 public enum FormatPlanner {
@@ -14,8 +15,8 @@ public enum FormatPlanner {
     public static func dopCarrierRate(_ dsdRate: Double) -> Double { dsdRate / 16 }
 
     public static func plan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy = .matchSource,
-                            spatial: SpatialMode = .off, bitstream: Bool = false, dsdToPCMForRoom: Bool = false,
-                            dsdToPCMForTransitions: Bool = false) -> OutputPlan {
+                            spatial: SpatialMode = .off, bitstream: Bool = false, spatializeStereo: Bool = false,
+                            dsdToPCMForRoom: Bool = false, dsdToPCMForTransitions: Bool = false) -> OutputPlan {
         if bitstream, let kind = BitstreamFormat(codec: source.codec) {
             // A receiver on this output decodes Dolby and DTS itself: send the frames untouched.
             let carrier = kind.carrierRate(for: source.sampleRate)
@@ -24,6 +25,10 @@ public enum FormatPlanner {
                                   physicalBitDepth: rawDevice.bestIntegerBitDepth(at: carrier), channels: 2, dsdConvertedToPCM: false,
                                   reason: "\(kind.name) sent untouched to the receiver (IEC 61937 at \(SampleRate.format(carrier)) kHz)")
             }
+        }
+        if spatializeStereo, let upmixed = upmixPlan(source: source, device: rawDevice, policy: policy, spatial: spatial,
+                                                     dsdToPCMForRoom: dsdToPCMForRoom, dsdToPCMForTransitions: dsdToPCMForTransitions) {
+            return upmixed
         }
         var plan = basePlan(source: source, device: rawDevice, policy: policy, dsdToPCMForRoom: dsdToPCMForRoom,
                             dsdToPCMForTransitions: dsdToPCMForTransitions)
@@ -56,6 +61,52 @@ public enum FormatPlanner {
         } else {
             plan.routeLabels = ChannelLayouts.discreteLabels(source: source.channelLabels, channels: source.channels)
             plan.reason = "\(name) to \(source.channels) outputs in standard order (L R C LFE Ls Rs…). " + plan.reason
+        }
+        return plan
+    }
+
+    /// Spatialize stereo: a stereo or mono source upmixed to 5.1, for Spatial Audio on headphones, the outputs of a
+    /// multichannel device in standard order (6 or more, no speaker setup), or a speaker setup of 3 or more. nil where it
+    /// doesn't apply (more than two channels, an output with nowhere to put them), and the plan is the usual one.
+    static func upmixPlan(source: SourceFormat, device: DeviceCapabilities, policy: RatePolicy, spatial: SpatialMode,
+                          dsdToPCMForRoom: Bool, dsdToPCMForTransitions: Bool) -> OutputPlan? {
+        guard source.channels >= 1, source.channels <= 2 else { return nil }
+        enum Target { case headphones, speakers(Int), outputs }
+        let target: Target
+        if spatial != .off, device.outputChannels >= 2 { target = .headphones }
+        else if let speakers = device.speakerLayoutChannels, speakers >= 3, speakers <= device.outputChannels { target = .speakers(speakers) }
+        else if device.outputChannels >= 6 { target = .outputs }
+        else { return nil }
+        // The rate is chosen for the channels the device receives (HDMI carries 8 channels at fewer rates than 2); DSD is
+        // converted to PCM, which can be upmixed.
+        var sized = source
+        switch target {
+        case .headphones: break
+        case .speakers(let n): sized.channels = n
+        case .outputs: sized.channels = StereoUpmixer.outputChannels
+        }
+        var plan = basePlan(source: sized, device: device, policy: policy, dsdToPCMForRoom: dsdToPCMForRoom || source.encoding == .dsd,
+                            dsdToPCMForTransitions: dsdToPCMForTransitions)
+        guard plan.mode == .pcm else { return nil }
+        if source.encoding == .dsd, !dsdToPCMForRoom, !dsdToPCMForTransitions {
+            plan.reason = "Spatialize stereo is on; \(source.dsdName ?? "DSD") converted to PCM so it can be upmixed"
+        }
+        plan.upmix = true
+        let name = source.channels == 1 ? "Mono" : "Stereo"
+        switch target {
+        case .headphones:
+            plan.channels = StereoUpmixer.outputChannels
+            plan.spatialBed = kAudioChannelLayoutTag_MPEG_5_1_A
+            plan.deviceChannelCount = 2
+            plan.spatial = spatial
+            plan.reason = "\(name) upmixed to 5.1 and rendered with Spatial Audio (\(spatial == .headTracked ? "head tracked" : "fixed")). " + plan.reason
+        case .speakers(let n):
+            plan.channels = n
+            plan.reason = "\(name) upmixed to 5.1, placed on the \(ChannelLayouts.name(channels: n)) speaker setup. " + plan.reason
+        case .outputs:
+            plan.channels = StereoUpmixer.outputChannels
+            plan.routeLabels = StereoUpmixer.outputLabels
+            plan.reason = "\(name) upmixed to 5.1 on outputs 1–6 (L R C LFE Ls Rs). " + plan.reason
         }
         return plan
     }

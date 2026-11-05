@@ -144,6 +144,9 @@ public struct OutputPlan: Sendable, Hashable {
     /// A discrete multichannel output with no speaker setup: the speaker each output carries (see
     /// `ChannelLayouts.discreteLabels`); the converter sends each source channel to one output, unmixed. nil otherwise.
     public var routeLabels: [UInt32]? = nil
+    /// Spatialize stereo: a stereo or mono source upmixed to 5.1 (`StereoUpmixer`) before the rest of the path (Spatial
+    /// Audio's 5.1 bed, the outputs in standard order, or the speaker setup). `channels` is then the upmixed stream's.
+    public var upmix = false
     /// Integer mode requested: decoded straight to 32-bit integers and sent to a non-mixable Int32 device
     /// format untouched (32-bit sources exact). Only for plain PCM with nothing to change the samples.
     public var integerSamples = false
@@ -157,7 +160,7 @@ public struct OutputPlan: Sendable, Hashable {
     public func isDeviceCompatible(with other: OutputPlan) -> Bool {
         mode == other.mode && integerSamples == other.integerSamples && abs(deviceSampleRate - other.deviceSampleRate) < 0.5
             && physicalBitDepth == other.physicalBitDepth && channels == other.channels
-            && deviceChannels == other.deviceChannels && spatial == other.spatial && spatialBed == other.spatialBed
+            && deviceChannels == other.deviceChannels && spatial == other.spatial && spatialBed == other.spatialBed && upmix == other.upmix
     }
 }
 
