@@ -241,7 +241,7 @@ final class AppModel {
         let isolated = arguments.string(forKey: "VespertineDataDirectory") != nil && !arguments.bool(forKey: "VespertinePersistFilters")
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
-        library = try LibraryStore(dataDirectory: settings.dataDirectory)
+        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)

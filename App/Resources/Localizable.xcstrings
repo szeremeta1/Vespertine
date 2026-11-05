@@ -414478,270 +414478,538 @@
         }
       }
     },
-    "Watch folders for changes": {
+    "Scan for new music automatically": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "አቃፊዎችን ለለውጦች ተከታተል"
+            "value": "አዲስ ሙዚቃን በራስ-ሰር ቃኝ"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مراقبة المجلدات بحثًا عن تغييرات"
+            "value": "فحص الموسيقى الجديدة تلقائيًا"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ফোল্ডারে পরিবর্তনের দিকে নজর রাখুন"
+            "value": "নতুন মিউজিক নিজে থেকে স্ক্যান করুন"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sledovat změny ve složkách"
+            "value": "Automaticky hledat novou hudbu"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Overvåg mapper for ændringer"
+            "value": "Scan automatisk efter ny musik"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ordner auf Änderungen überwachen"
+            "value": "Automatisch nach neuer Musik suchen"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Παρακολούθηση φακέλων για αλλαγές"
+            "value": "Αυτόματη σάρωση για νέα μουσική"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vigilar cambios en las carpetas"
+            "value": "Buscar música nueva automáticamente"
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "پایش تغییرات پوشه‌ها"
+            "value": "اسکن خودکار موسیقی جدید"
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Valvo kansioiden muutoksia"
+            "value": "Skannaa uusi musiikki automaattisesti"
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bantayan ang mga folder para sa mga pagbabago"
+            "value": "Awtomatikong i-scan ang bagong musika"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Surveiller les modifications des dossiers"
+            "value": "Rechercher automatiquement la nouvelle musique"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "ફોલ્ડરમાં થતા ફેરફારો પર નજર રાખો"
+            "value": "નવું સંગીત આપમેળે સ્કૅન કરો"
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sa ido kan canje-canje a foldoji"
+            "value": "Bincika sababbin waƙoƙi kai tsaye"
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "עקוב אחר שינויים בתיקיות"
+            "value": "סרוק מוזיקה חדשה באופן אוטומטי"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "फ़ोल्डरों में बदलावों पर नज़र रखें"
+            "value": "नया संगीत अपने आप स्कैन करें"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mappák figyelése változásokra"
+            "value": "Új zene automatikus keresése"
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pantau perubahan pada folder"
+            "value": "Pindai musik baru secara otomatis"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controlla le modifiche alle cartelle"
+            "value": "Cerca automaticamente la nuova musica"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "フォルダの変更を監視"
+            "value": "新しい音楽を自動的にスキャン"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಬದಲಾವಣೆಗಳಿಗಾಗಿ ಫೋಲ್ಡರ್‌ಗಳನ್ನು ಗಮನಿಸಿ"
+            "value": "ಹೊಸ ಸಂಗೀತವನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "폴더 변경 사항 감시"
+            "value": "새로운 음악 자동으로 스캔"
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഫോൾഡറുകളിലെ മാറ്റങ്ങൾ നിരീക്ഷിക്കുക"
+            "value": "പുതിയ സംഗീതം സ്വയം സ്കാൻ ചെയ്യുക"
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "फोल्डरमधील बदलांवर लक्ष ठेवा"
+            "value": "नवीन संगीत आपोआप स्कॅन करा"
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pantau folder untuk perubahan"
+            "value": "Imbas muzik baharu secara automatik"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Overvåk mapper for endringer"
+            "value": "Skann etter ny musikk automatisk"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Houd mappen in de gaten op wijzigingen"
+            "value": "Automatisch naar nieuwe muziek zoeken"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਫ਼ੋਲਡਰਾਂ ਵਿੱਚ ਬਦਲਾਵਾਂ ’ਤੇ ਨਜ਼ਰ ਰੱਖੋ"
+            "value": "ਨਵਾਂ ਸੰਗੀਤ ਆਪਣੇ-ਆਪ ਸਕੈਨ ਕਰੋ"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Obserwuj zmiany w folderach"
+            "value": "Automatycznie szukaj nowej muzyki"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Monitorar alterações nas pastas"
+            "value": "Escanear músicas novas automaticamente"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vigiar alterações nas pastas"
+            "value": "Procurar música nova automaticamente"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Urmărește modificările din dosare"
+            "value": "Scanează automat muzica nouă"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bevaka ändringar i mappar"
+            "value": "Skanna efter ny musik automatiskt"
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fuatilia mabadiliko kwenye folda"
+            "value": "Changanua muziki mpya kiotomatiki"
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "கோப்புறைகளில் மாற்றங்களைக் கண்காணி"
+            "value": "புதிய இசையைத் தானாக ஸ்கேன்செய்"
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "మార్పుల కోసం ఫోల్డర్‌లను గమనించు"
+            "value": "కొత్త సంగీతాన్ని ఆటోమేటిక్‌గా స్కాన్ చేయి"
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "เฝ้าดูการเปลี่ยนแปลงในโฟลเดอร์"
+            "value": "สแกนเพลงใหม่โดยอัตโนมัติ"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Klasörlerdeki değişiklikleri izle"
+            "value": "Yeni müzikleri otomatik olarak tara"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Стежити за змінами в папках"
+            "value": "Автоматично шукати нову музику"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "فولڈرز میں تبدیلیوں پر نظر رکھیں"
+            "value": "نئی موسیقی خود بخود اسکین کریں"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Theo dõi thay đổi trong thư mục"
+            "value": "Tự động quét nhạc mới"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "監察資料夾的變更"
+            "value": "自動掃描新音樂"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "监视文件夹的更改"
+            "value": "自动扫描新音乐"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "監看檔案夾的變更"
+            "value": "自動掃描新音樂"
+          }
+        }
+      }
+    },
+    "Watches your folders, looks again at launch and rechecks network shares now and then. When it’s off, use Rescan Library.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አቃፊዎችዎን ይከታተላል፣ ሲከፈት እንደገና ይመለከታል፣ የአውታረ መረብ ማጋራቶችንም አልፎ አልፎ ይፈትሻል። ሲጠፋ «ቤተ-መጻሕፍቱን እንደገና ቃኝ»ን ይጠቀሙ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يراقب مجلداتك، ويبحث مجددًا عند التشغيل، ويعيد فحص مشاركات الشبكة من حين إلى آخر. عند إيقافه، استخدم «إعادة فحص المكتبة»."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার ফোল্ডার নজরে রাখে, চালু হওয়ার সময় আবার দেখে এবং মাঝেমধ্যে নেটওয়ার্ক শেয়ার আবার যাচাই করে। বন্ধ থাকলে “লাইব্রেরি আবার স্ক্যান করুন” ব্যবহার করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleduje vaše složky, při spuštění se podívá znovu a čas od času znovu zkontroluje sítová úložiště. Když je vypnuto, použijte Znovu prohledat knihovnu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overvåger dine mapper, kigger igen ved start og tjekker netværksdelinger igen af og til. Når det er slået fra, brug Scan bibliotek igen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überwacht deine Ordner, schaut beim Start erneut nach und prüft Netzwerkfreigaben von Zeit zu Zeit noch einmal. Ist die Option aus, nutze „Mediathek erneut scannen“."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παρακολουθεί τους φακέλους σας, ξανακοιτάζει κατά την εκκίνηση και ελέγχει πού και πού ξανά τις κοινόχρηστες θέσεις δικτύου. Όταν είναι απενεργοποιημένο, χρησιμοποιήστε τη Νέα σάρωση βιβλιοθήκης."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vigila tus carpetas, vuelve a mirar al abrir la app y revisa de vez en cuando los recursos compartidos de red. Si está desactivado, usa Volver a escanear la biblioteca."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پوشه‌های شما را زیر نظر می‌گیرد، هنگام راه‌اندازی دوباره بررسی می‌کند و گه‌گاه اشتراک‌های شبکه را دوباره وارسی می‌کند. وقتی خاموش است، از «اسکن دوبارهٔ کتابخانه» استفاده کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seuraa kansioitasi, katsoo uudelleen käynnistyksessä ja tarkistaa verkkojaot silloin tällöin. Kun asetus on pois päältä, käytä Skannaa kirjasto uudelleen -komentoa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binabantayan ang iyong mga folder, tumitingin ulit sa pagbukas, at paminsan-minsang sinusuri muli ang mga network share. Kapag naka-off, gamitin ang I-scan Muli ang Library."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surveille vos dossiers, regarde de nouveau au lancement et revérifie de temps en temps les partages réseau. Lorsque l’option est désactivée, utilisez Réindexer la bibliothèque."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારા ફોલ્ડર પર નજર રાખે છે, શરૂ થતી વખતે ફરી જુએ છે અને સમયાંતરે નેટવર્ક શેર ફરી તપાસે છે. બંધ હોય ત્યારે “લાઇબ્રેરી ફરી સ્કૅન કરો” વાપરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana sa ido kan manyan fayilolinka, yana sake dubawa a lokacin buɗewa, kuma lokaci zuwa lokaci yana sake duba hanyoyin sadarwa. Idan an kashe shi, yi amfani da Sake Bincika Laburare."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עוקב אחר התיקיות שלך, בודק שוב בהפעלה ובודק מחדש שיתופי רשת מדי פעם. כשהאפשרות כבויה, השתמש ב״סרוק מחדש את הספריה״."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपके फ़ोल्डरों पर नज़र रखता है, लॉन्च पर फिर से देखता है और नेटवर्क शेयर को समय-समय पर दोबारा जाँचता है। बंद होने पर “लाइब्रेरी फिर से स्कैन करें” का उपयोग करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Figyeli a mappáidat, indításkor újra körülnéz, és időnként újra ellenőrzi a hálózati megosztásokat. Kikapcsolt állapotban használd a Könyvtár újraolvasása parancsot."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memantau folder Anda, memeriksa lagi saat dibuka, dan sesekali memeriksa ulang berbagi jaringan. Saat nonaktif, gunakan Pindai Ulang Perpustakaan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlla le tue cartelle, ricontrolla all’apertura e ogni tanto riesamina le condivisioni di rete. Se è disattivata, usa Ripeti scansione della libreria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダを監視し、起動時にもう一度確認し、ネットワーク共有も時々再確認します。オフのときは「ライブラリを再スキャン」を使ってください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಫೋಲ್ಡರ್‌ಗಳನ್ನು ಗಮನಿಸುತ್ತದೆ, ಪ್ರಾರಂಭದಲ್ಲಿ ಮತ್ತೆ ನೋಡುತ್ತದೆ ಮತ್ತು ಆಗಾಗ ನೆಟ್‌ವರ್ಕ್ ಹಂಚಿಕೆಗಳನ್ನು ಮರುಪರಿಶೀಲಿಸುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ “ಲೈಬ್ರರಿಯನ್ನು ಮರುಸ್ಕ್ಯಾನ್ ಮಾಡಿ” ಬಳಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더를 감시하고, 실행할 때 다시 확인하며, 네트워크 공유도 가끔 다시 점검합니다. 끄면 ‘보관함 다시 스캔’을 사용하세요."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ഫോൾഡറുകൾ നിരീക്ഷിക്കുന്നു, തുടങ്ങുമ്പോൾ വീണ്ടും നോക്കുന്നു, നെറ്റ്‌വർക്ക് ഷെയറുകൾ ഇടയ്ക്കിടെ വീണ്ടും പരിശോധിക്കുന്നു. ഓഫ് ആയിരിക്കുമ്പോൾ “ലൈബ്രറി വീണ്ടും സ്കാൻ ചെയ്യുക” ഉപയോഗിക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमच्या फोल्डरवर लक्ष ठेवते, सुरू होताना पुन्हा पाहते आणि नेटवर्क शेअर अधूनमधून पुन्हा तपासते. बंद असताना “लायब्ररी पुन्हा स्कॅन करा” वापरा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memantau folder anda, menyemak semula semasa dibuka dan sesekali menyemak semula kongsi rangkaian. Apabila dimatikan, gunakan Imbas Semula Pustaka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overvåker mappene dine, ser etter på nytt ved oppstart og sjekker nettverksdelinger på nytt av og til. Når den er av, bruk Skann biblioteket på nytt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Houdt je mappen in de gaten, kijkt opnieuw bij het openen en controleert af en toe netwerkshares opnieuw. Als het uit staat, gebruik je Scan bibliotheek opnieuw."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤੁਹਾਡੇ ਫੋਲਡਰਾਂ ਉੱਤੇ ਨਜ਼ਰ ਰੱਖਦਾ ਹੈ, ਖੁੱਲ੍ਹਣ ਵੇਲੇ ਮੁੜ ਵੇਖਦਾ ਹੈ ਅਤੇ ਸਮੇਂ-ਸਮੇਂ ਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰ ਮੁੜ ਜਾਂਚਦਾ ਹੈ। ਬੰਦ ਹੋਣ ਤੇ “ਲਾਇਬ੍ਰੇਰੀ ਮੁੜ ਸਕੈਨ ਕਰੋ” ਵਰਤੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obserwuje foldery, przy uruchomieniu sprawdza je jeszcze raz i co jakiś czas ponownie sprawdza udziały sieciowe. Gdy jest wyłączone, użyj polecenia Skanuj bibliotekę ponownie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Observa suas pastas, confere de novo ao abrir e verifica os compartilhamentos de rede de tempos em tempos. Com a opção desativada, use Escanear a Biblioteca Novamente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vigia as suas pastas, volta a verificar ao abrir e revê de vez em quando as partilhas de rede. Se estiver desativado, use Analisar biblioteca novamente."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urmărește folderele tale, se uită din nou la pornire și reverifică din când în când partajările de rețea. Când este dezactivat, folosește Rescanează biblioteca."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bevakar dina mappar, tittar igen vid start och kontrollerar nätverksresurser på nytt då och då. När det är av, använd Skanna biblioteket igen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hufuatilia folda zako, huangalia tena wakati wa kuanza na hukagua tena folda za mtandao mara kwa mara. Ikizimwa, tumia Changanua Maktaba Upya."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் கோப்புறைகளைக் கண்காணிக்கிறது, தொடங்கும்போது மீண்டும் பார்க்கிறது, நெட்வொர்க் பகிர்வுகளை அவ்வப்போது மீண்டும் சரிபார்க்கிறது. அணைத்திருந்தால் “லைப்ரரியை மீண்டும் ஸ்கேன்செய்” பயன்படுத்தவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ ఫోల్డర్‌లను గమనిస్తుంది, ప్రారంభంలో మళ్లీ చూస్తుంది, నెట్‌వర్క్ షేర్‌లను అప్పుడప్పుడు మళ్లీ తనిఖీ చేస్తుంది. ఆఫ్‌లో ఉంటే “లైబ్రరీని మళ్లీ స్కాన్ చేయి” ఉపయోగించండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เฝ้าดูโฟลเดอร์ของคุณ ตรวจดูอีกครั้งตอนเปิดแอป และตรวจสอบโฟลเดอร์แชร์บนเครือข่ายซ้ำเป็นระยะ เมื่อปิดอยู่ ให้ใช้ “สแกนคลังใหม่”"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasörlerinizi izler, açılışta yeniden bakar ve ağ paylaşımlarını arada bir yeniden denetler. Kapalıyken Arşivi Yeniden Tara’yı kullanın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стежить за вашими папками, перевіряє ще раз під час запуску й час від часу перевіряє мережеві ресурси. Якщо вимкнено, скористайтеся командою «Пересканувати медіатеку»."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے فولڈرز پر نظر رکھتا ہے، شروع ہونے پر دوبارہ دیکھتا ہے اور نیٹ ورک شیئرز کو وقتاً فوقتاً دوبارہ جانچتا ہے۔ بند ہونے پر “لائبریری دوبارہ اسکین کریں” استعمال کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theo dõi các thư mục của bạn, xem lại khi khởi chạy và thỉnh thoảng kiểm tra lại các thư mục chia sẻ mạng. Khi tắt, hãy dùng Quét lại thư viện."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "監看你的檔案夾,在啟動時再檢查一次,並不時重新檢查網絡共享。關閉後,請使用「重新掃描資料庫」。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "监视你的文件夹,在启动时再查看一次,并不时重新检查网络共享。关闭后,请使用“重新扫描资料库”。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "監看你的檔案夾,在啟動時再檢查一次,並不時重新檢查網路共享。關閉後,請使用「重新掃描資料庫」。"
           }
         }
       }

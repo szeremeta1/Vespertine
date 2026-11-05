@@ -172,7 +172,14 @@ final class LibraryStore {
     @ObservationIgnored private(set) var analysesJudged = false
     @ObservationIgnored private var judging: Task<Void, Never>?
 
-    init(dataDirectory: URL) throws {
+    /// Whether the library may look for new music by itself (Settings → Library → Scan for new music automatically):
+    /// the folder watcher and the scan at launch. Asked each time; shares are kept current by NetworkShareManager.
+    @ObservationIgnored var automaticScanning: () -> Bool
+    /// How long the scan at launch waits (the window and the shares come first); tests shorten it.
+    @ObservationIgnored var launchScanDelay: Duration = .seconds(3)
+
+    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }) throws {
+        self.automaticScanning = automaticScanning
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
         artwork = ArtworkStore(directory: dataDirectory.appendingPathComponent("Artwork", isDirectory: true))
         scanner = LibraryScanner(database: database, artwork: artwork)
@@ -395,16 +402,16 @@ final class LibraryStore {
 
     /// The folder watcher reports changes from the moment it starts, so whatever changed while Vespertine was closed
     /// (an album added in Finder, files moved by another app) is looked for once at launch. Incremental: only new or
-    /// changed files are read, and a disk that isn't connected is marked offline, never emptied. Follows Watch Folders;
-    /// shares are kept current by NetworkShareManager.
+    /// changed files are read, and a disk that isn't connected is marked offline, never emptied. Only when automatic
+    /// scanning is on; shares are kept current by NetworkShareManager.
     private func rescanLocalAtLaunch() {
         guard !checkedAtLaunch else { return }
         checkedAtLaunch = true
-        guard UserDefaults.standard.bool(forKey: "watchFolders") else { return }
+        guard automaticScanning() else { return }
         let local = sources.filter { !$0.isNetwork }
         guard !local.isEmpty else { return }
         Task {
-            try? await Task.sleep(for: .seconds(3))   // the window and the shares first
+            try? await Task.sleep(for: launchScanDelay)   // the window and the shares first
             for source in local { await scanWhenFree(source) }
         }
     }
@@ -457,7 +464,7 @@ final class LibraryStore {
                 }
             }
         }
-        watcher?.watch(UserDefaults.standard.bool(forKey: "watchFolders") ? paths : [])
+        watcher?.watch(automaticScanning() ? paths : [])
     }
 
     func clearError() { lastError = nil }

@@ -237,9 +237,9 @@ final class NetworkShareManager {
 
     /// Rescans connected shares whose last scan is older than `rescanInterval` (incremental: only
     /// new or changed files are read; files gone from the server are marked missing). Only while Vespertine is in
-    /// front: in the background, a NAS's disks are left to sleep.
+    /// front: in the background, a NAS's disks are left to sleep. Only with automatic scanning on.
     func rescanStale() async {
-        guard NSApp.isActive else { return }
+        guard settings.watchFolders, NSApp.isActive else { return }
         for source in sources where status(of: source).isConnected {
             let age = source.lastScannedAt.map { Date().timeIntervalSince($0) } ?? .infinity
             guard age > Self.rescanInterval else { continue }
@@ -250,7 +250,7 @@ final class NetworkShareManager {
     /// The server's analysis run (vespertine-analyze) finished after our last scan: its files changed
     /// or were re-checked, so rescan now rather than waiting.
     func serverReported(_ status: ServerAnalysisStatus, for sourceID: Int64) async {
-        guard !status.isRunning, let source = sources.first(where: { $0.id == sourceID }), self.status(of: source).isConnected,
+        guard settings.watchFolders, !status.isRunning, let source = sources.first(where: { $0.id == sourceID }), self.status(of: source).isConnected,
               (source.lastScannedAt ?? .distantPast) < status.updated else { return }
         await rescanWhenIdle(source)
     }
@@ -294,7 +294,8 @@ final class NetworkShareManager {
             // File-system events don't cross the network: index new shares, and look for changes on
             // shares not checked for half an hour (incremental, so only new or changed files are read).
             // A known share waits until Vespertine is in front, so waking the Mac doesn't wake the NAS's disks.
-            let stale = source.lastScannedAt.map { Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
+            // A share never scanned is indexed once, automatic scanning or not; a known one is only rechecked with it on.
+            let stale = source.lastScannedAt.map { settings.watchFolders && Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
             // Never while music plays from a share: the half-hourly check (rescanStale) catches up once it's quiet.
             if scanIfNew, stale, source.lastScannedAt == nil || NSApp.isActive, library.scanProgress == nil, !isStreamingPlayback(),
                var fresh = sources.first(where: { $0.id == id }) {
