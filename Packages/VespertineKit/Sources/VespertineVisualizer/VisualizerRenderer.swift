@@ -84,6 +84,12 @@ struct VisualizerUniforms {
     /// The Album Art ramp, dark to bright (used by the gradients when `f.z` is above 0).
     var palette: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) =
         (.zero, .zero, .zero, .zero, .zero, .zero)
+    /// The meter designs: see `VisualizerMeterShaders`.
+    var meter: (SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>,
+                SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>,
+                SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>, SIMD4<Float>) =
+        (.zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero,
+         .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero, .zero)
 }
 
 @MainActor
@@ -129,6 +135,14 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var meterFace: MTLTexture?
     private var meterFaceKey = ""
     private var peakLights = SIMD2<Float>(0, 0)
+    // The meter designs: their pipeline, the balance meter's needle (a VU movement of its own), the lamps warming up.
+    private var designPipeline: MTLRenderPipelineState?
+    private var balance = VisualizerBalanceNeedle()
+    private var lamp: Float = 0
+    private var lampDesign: MeterDesign?
+    /// Everything in a design that stays still, drawn once into a texture; each frame draws only what moves over it.
+    private var designStill: MTLTexture?
+    private var designStillKey = ""
 
     // Spectrogram history: one column of fine bins per step, written in place (a ring across the texture's width).
     static let historyWidth = 1024
@@ -187,7 +201,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         self.queue = queue
         super.init()
         do {
-            let library = try device.makeLibrary(source: VisualizerShaders.source, options: nil)
+            let library = try device.makeLibrary(source: VisualizerShaders.source + VisualizerMeterShaders.source, options: nil)
             guard let vertex = library.makeFunction(name: "vz_vertex") else { return nil }
             let names: [VisualizerStyle: String] = [.bars: "vz_bars", .spectrogram: "vz_spectrogram", .vinyl: "vz_vinyl", .club: "vz_club",
                                                     .scope: "vz_scope", .meters: "vz_meters", .particles: "vz_particles",
@@ -205,6 +219,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
                 d.colorAttachments[0].pixelFormat = pixelFormat
                 pipelines[style] = try device.makeRenderPipelineState(descriptor: d)
             }
+            let designs = MTLRenderPipelineDescriptor()
+            designs.vertexFunction = vertex
+            designs.fragmentFunction = library.makeFunction(name: "vz_meters_real")
+            designs.colorAttachments[0].pixelFormat = pixelFormat
+            designPipeline = try device.makeRenderPipelineState(descriptor: designs)
             let waves = MTLRenderPipelineDescriptor()
             waves.vertexFunction = vertex
             waves.fragmentFunction = library.makeFunction(name: "vz_club_waves")
@@ -347,8 +366,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
         let waves = settings.style == .club && settings.clubMode == .waves
         let smoothBars = settings.style == .bars && settings.spectrumMode == .smooth
+        let design = settings.style == .meters ? MeterDesign(settings) : nil
         guard size.width >= 1, size.height >= 1,
-              let pipeline = waves ? wavesPipeline : smoothBars ? smoothBarsPipeline : pipelines[settings.style],
+              let pipeline = design != nil ? designPipeline : waves ? wavesPipeline : smoothBars ? smoothBarsPipeline : pipelines[settings.style],
               let buffer = queue.makeCommandBuffer() else { return nil }
         advance(frame: frame, scene: scene, dt: dt)
         updateOverlay(size: size, scale: scale, scene: scene)
@@ -394,6 +414,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         case .particles:
             u.g = SIMD4(Float(dt), Float(size.width / size.height), reduceMotion ? 1 : 0, Float(Self.particleCount))
             encodeParticles(buffer, uniforms: &u, size: size, dt: dt)
+        case .meters where design != nil:
+            if let design { encodeDesign(design, buffer: buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt) }
         case .meters:
             let faces = VisualizerLayout.meterFaces(in: points)
             u.g = px(faces[0])
@@ -443,6 +465,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         encoder.setFragmentTexture(artwork ?? blank, index: 2)
         encoder.setFragmentTexture(trail ?? blank, index: 3)
         encoder.setFragmentTexture(meterFace ?? blank, index: 4)
+        encoder.setFragmentTexture(designStill ?? blank, index: 5)
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
         encoder.endEncoding()
         let gpu = self.gpu
@@ -803,6 +826,139 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     }
 
     // MARK: Meters
+
+    /// The uniforms for a meter design: where its instruments are, where their needles point, its lamps and lights.
+    private func encodeDesign(_ design: MeterDesign, buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
+                              size: CGSize, scale: CGFloat, dt: Double) {
+        let points = CGSize(width: size.width / scale, height: size.height / scale)
+        let plan = MeterPlan.make(design, in: points)
+        updateDesignPrinting(plan: plan, size: size, scale: scale)
+        // The lamps come up over a few tenths of a second when a design is first shown (not with Reduce Motion).
+        if lampDesign != design { lampDesign = design; lamp = reduceMotion ? 1 : 0 }
+        lamp = reduceMotion ? 1 : min(1, lamp + Float(dt / 0.35) * (0.3 + lamp))
+        balance.advance(vu: SIMD2(Double(frame.vu.x), Double(frame.vu.y)), dt: dt)
+        let s = Float(scale)
+        let px = { (r: CGRect) in SIMD4<Float>(Float(r.minX) * s, Float(r.minY) * s, Float(r.width) * s, Float(r.height) * s) }
+        var slots = [SIMD4<Float>](repeating: .zero, count: 24)
+        slots[0] = SIMD4(Float(design.rawValue), Float(plan.unit) * s, lamp, Float(plan.instruments.count))
+        slots[1] = px(plan.cabinet)
+        slots[2] = px(plan.panel)
+        var ledSlot = 20
+        for (i, m) in plan.instruments.prefix(4).enumerated() {
+            let angles = Self.needles(design: design, instrument: m, frame: frame, balance: balance.angle)
+            slots[4 + 4 * i] = px(m.window)
+            slots[5 + 4 * i] = px(m.housing)
+            if m.kind == .band {
+                slots[6 + 4 * i] = SIMD4(Float(m.band.minX) * s, Float(m.band.maxX) * s, Float(m.band.midY) * s, Float(m.band.height / 2) * s)
+            } else {
+                slots[6 + 4 * i] = SIMD4(Float(m.pivot.x) * s, Float(m.pivot.y) * s, Float(m.needle.0) * s, Float(m.needle.1) * s)
+            }
+            slots[7 + 4 * i] = SIMD4(Float(angles.a), Float(angles.b ?? -10), Float(m.kind.rawValue), Float(Self.coverRadius(design, m)))
+            if let led = m.led, ledSlot < 24 {
+                slots[ledSlot] = SIMD4(Float(led.x) * s, Float(led.y) * s, Float(m.ledRadius) * s, m.channel == 0 ? peakLights.x : peakLights.y)
+                ledSlot += 1
+            }
+        }
+        // What stays still: drawn again only when the window's size, the design or the colours change, or while the lamps
+        // warm up.
+        let room = u.stops.0 + u.stops.1 * 7
+        let stillKey = "\(Int(size.width))x\(Int(size.height)) \(design.rawValue) \(Int(room.x * 255)) \(Int(room.y * 255)) \(Int(room.z * 255))"
+        if stillKey != designStillKey || lamp < 1 || designStill == nil {
+            slots[3].z = 1
+            drawStill(buffer: buffer, uniforms: u, slots: slots, size: size)
+            designStillKey = lamp < 1 ? "" : stillKey
+        }
+        slots[3].z = 2
+        withUnsafeMutableBytes(of: &u.meter) { raw in
+            let m = raw.bindMemory(to: SIMD4<Float>.self)
+            for i in 0..<24 { m[i] = slots[i] }
+        }
+    }
+
+    private func drawStill(buffer: MTLCommandBuffer, uniforms: VisualizerUniforms, slots: [SIMD4<Float>], size: CGSize) {
+        let w = Int(size.width), h = Int(size.height)
+        if designStill?.width != w || designStill?.height != h {
+            let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: pixelFormat, width: w, height: h, mipmapped: false)
+            d.usage = [.renderTarget, .shaderRead]
+            d.storageMode = .private
+            designStill = device.makeTexture(descriptor: d)
+        }
+        guard let designStill, let designPipeline else { return }
+        var u = uniforms
+        withUnsafeMutableBytes(of: &u.meter) { raw in
+            let m = raw.bindMemory(to: SIMD4<Float>.self)
+            for i in 0..<24 { m[i] = slots[i] }
+        }
+        let pass = MTLRenderPassDescriptor()
+        pass.colorAttachments[0].texture = designStill
+        pass.colorAttachments[0].loadAction = .dontCare
+        pass.colorAttachments[0].storeAction = .store
+        guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass) else { return }
+        encoder.setRenderPipelineState(designPipeline)
+        encoder.setFragmentBytes(&u, length: MemoryLayout<VisualizerUniforms>.stride, index: 0)
+        encoder.setFragmentTexture(blank, index: 0)
+        encoder.setFragmentTexture(meterFace ?? blank, index: 4)
+        encoder.setFragmentTexture(blank, index: 5)
+        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        encoder.endEncoding()
+    }
+
+    /// Where an instrument's needles point (radians from upright, clockwise), or how far its band of light reaches
+    /// (0…1 of the scale), for a frame.
+    nonisolated static func needles(design: MeterDesign, instrument m: MeterInstrument, frame: VisualizerFrame,
+                        balance: Double) -> (a: Double, b: Double?) {
+        let c = m.channel
+        switch m.kind {
+        case .balance: return (balance, nil)
+        case .twinAB: return (MeterPlan.sifamAngle(ppm: Double(frame.ppm.x)), MeterPlan.sifamAngle(ppm: Double(frame.ppm.y)))
+        case .twinMS: return (MeterPlan.sifamAngle(ppm: Double(frame.ppmMidSide.x)), MeterPlan.sifamAngle(ppm: Double(frame.ppmMidSide.y)))
+        case .band:
+            // DIN: the reference tone reads -9 (alignment level), 0 is the permitted maximum.
+            return (max(0, MeterPlan.dinFraction(Double(frame.ppmTypeI[c]) - 9)), nil)
+        case .needle:
+            switch design {
+            case .bbc, .ebu, .bbcStereo: return (MeterPlan.sifamAngle(ppm: Double(frame.ppm[c])), nil)
+            case .nordic: return (MeterPlan.nordicAngle(Double(frame.ppmTypeI[c])), nil)
+            case .cassette: return (MeterPlan.vuAngle(design, travel: Double(frame.vuWide[c])), nil)
+            default: return (MeterPlan.vuAngle(design, travel: Double(frame.vu[c])), nil)
+            }
+        }
+    }
+
+    /// The cover over the needle's pivot, where the window shows it (in units).
+    nonisolated static func coverRadius(_ design: MeterDesign, _ m: MeterInstrument) -> Double {
+        switch design {
+        case .broadcast: m.kind == .balance ? 0.22 : 0.34
+        case .tape: 0.3
+        case .console: m.kind == .balance ? 0.22 : 0
+        default: 0
+        }
+    }
+
+    private func updateDesignPrinting(plan: MeterPlan, size: CGSize, scale: CGFloat) {
+        let w = Int(size.width), h = Int(size.height)
+        let key = "\(w)x\(h)@\(scale) design \(plan.design.rawValue)"
+        guard key != meterFaceKey else { return }
+        meterFaceKey = key
+        guard let bytes = VisualizerMeterPrinting.render(width: w, height: h, scale: scale, plan: plan) else { return }
+        if let dump = ProcessInfo.processInfo.environment["VZ_DUMP_MASK"] { // DEBUG-REMOVE
+            for k in 0..<4 {
+                var g = [UInt8](repeating: 0, count: w * h)
+                for i in 0..<(w * h) { g[i] = bytes[4 * i + k] }
+                let cs = CGColorSpaceCreateDeviceGray()
+                if let ctx = CGContext(data: &g, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w, space: cs, bitmapInfo: 0),
+                   let img = ctx.makeImage() {
+                    let rep = NSBitmapImageRep(cgImage: img)
+                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dump + "\(k).png"))
+                }
+            }
+        }
+        let d = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm, width: w, height: h, mipmapped: false)
+        d.usage = .shaderRead
+        guard let texture = device.makeTexture(descriptor: d) else { return }
+        texture.replace(region: MTLRegionMake2D(0, 0, w, h), mipmapLevel: 0, withBytes: bytes, bytesPerRow: w * 4)
+        meterFace = texture
+    }
 
     private func updateMeterFace(size: CGSize, scale: CGFloat) {
         let w = Int(size.width), h = Int(size.height)

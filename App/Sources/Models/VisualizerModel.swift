@@ -56,6 +56,7 @@ final class VisualizerModel {
         c.linear = !settings.decibelScale
         c.meterReferenceDB = settings.meterReference.map(Float.init)
         c.meters = settings.style == .meters
+        c.meterExtras = settings.meterExtras
         feed.update(configuration: c)
     }
 }

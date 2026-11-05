@@ -28,12 +28,38 @@ public struct VisualizerMeters: Sendable, Equatable {
     public static let ppmRedMark = 6.0
     public static let ppmAttack = 0.00276
     public static let ppmFallDBPerSecond = 24 / 2.8
+    /// Type I (DIN, Nordic): a 5 ms burst reads 2 dB under a steady tone, and it falls 20 dB in 1.7 s.
+    public static let typeIAttack = 0.001276
+    public static let typeIFallDBPerSecond = 20 / 1.7
+    /// The top of the cassette deck's scale, in VU (0 VU sits at half the travel).
+    public static let wideTop = 6.0
+    public static let wideZeroVU = 1 / pow(10, wideTop / 20)
+
+    /// Ballistics run besides the VU and Type IIa pair, for the designs that need them. Off by default: each costs a
+    /// little for every sample.
+    public struct Extras: OptionSet, Sendable, Equatable {
+        public let rawValue: Int
+        public init(rawValue: Int) { self.rawValue = rawValue }
+        /// A pair of Type I PPMs (DIN, Nordic).
+        public static let typeI = Extras(rawValue: 1)
+        /// Type IIa PPMs on the sum and difference, M = (A + B) / 2 and S = (A − B) / 2: the BBC's M6 alignment, where M
+        /// reads 6 dB under A + B.
+        public static let midSide = Extras(rawValue: 2)
+        /// A pair of VU needles on a scale that runs to +6 VU (the same movement, with 0 VU at half its travel).
+        public static let wideVU = Extras(rawValue: 4)
+    }
+    public var extras: Extras = []
 
     /// The VU needles, as a fraction of their travel (0 at rest, `zeroVU` at 0 VU).
     public private(set) var vu = SIMD2<Double>(0, 0)
     private var vuVelocity = SIMD2<Double>(0, 0)
     /// The PPM's rectifiers, as a linear peak level (1 is full scale).
     private var ppmLevel = SIMD2<Double>(0, 0)
+    /// The extras: VU needles on the +6 scale, Type I rectifiers, and Type IIa rectifiers on M and S.
+    public private(set) var vuWide = SIMD2<Double>(0, 0)
+    private var vuWideVelocity = SIMD2<Double>(0, 0)
+    private var typeILevel = SIMD2<Double>(0, 0)
+    private var midSideLevel = SIMD2<Double>(0, 0)
 
     private var rate: Double = 0
     private var attack: Double = 0
@@ -41,6 +67,9 @@ public struct VisualizerMeters: Sendable, Equatable {
     /// What a steady sine reads on the PPM against its true peak (the rectifier can't quite reach the top of each
     /// half cycle), measured once per rate so the sine reads its level exactly.
     private var ppmCalibration: Double = 1
+    private var typeIAttackStep: Double = 0
+    private var typeIFall: Double = 1
+    private var typeICalibration: Double = 1
 
     public init() {}
 
@@ -56,6 +85,14 @@ public struct VisualizerMeters: Sendable, Equatable {
             level = v > level ? level + (v - level) * attack : level * fall
         }
         ppmCalibration = level > 0.5 ? level : 1
+        typeIAttackStep = 1 - exp(-1 / (r * Self.typeIAttack))
+        typeIFall = pow(10, -Self.typeIFallDBPerSecond / 20 / r)
+        level = 0
+        for n in 0..<Int(r * 0.3) {
+            let v = abs(sin(2 * .pi * 1000 * Double(n) / r))
+            level = v > level ? level + (v - level) * typeIAttackStep : level * typeIFall
+        }
+        typeICalibration = level > 0.5 ? level : 1
     }
 
     /// Runs the meters over new samples (pass empty buffers with `silentFrames` to let them fall while nothing plays).
@@ -87,12 +124,65 @@ public struct VisualizerMeters: Sendable, Equatable {
             vuVelocity[c] = speed
             ppmLevel[c] = level
         }
+        guard !extras.isEmpty else { return }
+        let frames = count + max(0, silentFrames)
+        if extras.contains(.wideVU) {
+            // The same needle as above, driven so 0 VU lands at half the travel.
+            let wideDrive = Self.wideZeroVU / (reference * Self.averageOverRMS)
+            for c in 0..<2 {
+                let samples = c == 0 ? left : right
+                var position = vuWide[c], speed = vuWideVelocity[c]
+                for i in 0..<frames {
+                    let x = i < count ? Double(abs(samples[i])) : 0
+                    speed += stiffness * (x * wideDrive - position) - damping * speed
+                    position += speed * dt
+                    if position < low { position = low; speed = max(0, speed) }
+                    if position > high { position = high; speed = -0.2 * abs(speed) }
+                }
+                vuWide[c] = position
+                vuWideVelocity[c] = speed
+            }
+        }
+        if extras.contains(.typeI) {
+            for c in 0..<2 {
+                let samples = c == 0 ? left : right
+                var level = typeILevel[c]
+                for i in 0..<frames {
+                    let x = i < count ? Double(abs(samples[i])) : 0
+                    level = x > level ? level + (x - level) * typeIAttackStep : level * typeIFall
+                }
+                typeILevel[c] = level
+            }
+        }
+        if extras.contains(.midSide) {
+            var m = midSideLevel.x, s = midSideLevel.y
+            for i in 0..<frames {
+                let a = i < count ? Double(left[i]) : 0, b = i < count ? Double(right[i]) : 0
+                let xm = abs(a + b) * 0.5, xs = abs(a - b) * 0.5
+                m = xm > m ? m + (xm - m) * attack : m * fall
+                s = xs > s ? s + (xs - s) * attack : s * fall
+            }
+            midSideLevel = SIMD2(m, s)
+        }
     }
 
     /// The PPM's reading in dB against the reference (0 is PPM 4; each mark is 4 dB), floor -40.
     public func ppm(referenceDBFS: Double) -> SIMD2<Double> {
         let peak = pow(10, referenceDBFS / 20) * 2.0.squareRoot() * ppmCalibration
         return SIMD2(Self.decibels(ppmLevel.x / peak), Self.decibels(ppmLevel.y / peak))
+    }
+
+    /// The Type I PPMs' reading in dB against the reference (a sine at the reference reads 0), floor -40.
+    public func ppmTypeI(referenceDBFS: Double) -> SIMD2<Double> {
+        let peak = pow(10, referenceDBFS / 20) * 2.0.squareRoot() * typeICalibration
+        return SIMD2(Self.decibels(typeILevel.x / peak), Self.decibels(typeILevel.y / peak))
+    }
+
+    /// The M and S PPMs' readings (Type IIa, M6) in dB against the reference, floor -40: the same tone in both channels
+    /// reads 0 on M and nothing on S; a tone in one channel reads -6 on both.
+    public func ppmMidSide(referenceDBFS: Double) -> SIMD2<Double> {
+        let peak = pow(10, referenceDBFS / 20) * 2.0.squareRoot() * ppmCalibration
+        return SIMD2(Self.decibels(midSideLevel.x / peak), Self.decibels(midSideLevel.y / peak))
     }
 
     static func decibels(_ x: Double) -> Double { x > 1e-5 ? max(-40, 20 * log10(x)) : -40 }

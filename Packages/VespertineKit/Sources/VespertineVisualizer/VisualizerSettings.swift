@@ -48,6 +48,24 @@ public enum VisualizerMeterKind: String, CaseIterable, Codable, Sendable, Identi
     public var id: String { rawValue }
 }
 
+/// Which VU meters to draw. Each is modelled on real instruments (see docs/VISUALIZER.md, "Meter designs"); the needle
+/// always has the IEC 60268-17 ballistics.
+public enum VisualizerVUDesign: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// Vespertine's own backlit pair, as they were first drawn.
+    case original
+    /// The 1940 standard volume indicator: a light orange-yellow Type A scale card in a black moulded case, on a grey
+    /// broadcast panel, with a centre-zero balance meter between the two.
+    case broadcast
+    /// Studio console meters: rectangular, lit bright amber from behind, in a slate-grey meter bridge, with a balance meter.
+    case console
+    /// A Swiss-style reel-to-reel recorder: two small backlit meters in an anthracite panel, in a teak case.
+    case tape
+    /// A 1970s cassette deck: deep mirrored wells in a brushed silver front, blue and red scale to +6, walnut case.
+    case cassette
+
+    public var id: String { rawValue }
+}
+
 /// How the Spectrum style draws its bars.
 public enum VisualizerSpectrumMode: String, CaseIterable, Codable, Sendable, Identifiable {
     /// The bars with held peak caps that fall away after a moment.
@@ -58,6 +76,28 @@ public enum VisualizerSpectrumMode: String, CaseIterable, Codable, Sendable, Ide
     case smooth
 
     public var id: String { rawValue }
+}
+
+/// Which peak programme meters to draw, and so which type of IEC 60268-10 ballistics.
+public enum VisualizerPPMDesign: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// Vespertine's own black pair, as they were first drawn (BBC scale, Type IIa).
+    case original
+    /// Two BBC meters (Type IIa): matt black faces, white bars and numerals 1 to 7, one per channel.
+    case bbc
+    /// Two BBC twin-needle meters (Type IIa): red A (left) and green B (right) on one, white M and yellow S on the other.
+    case bbcStereo
+    /// Two EBU meters (Type IIb): the BBC meter's movement, marked -12 to +12 dB around TEST.
+    case ebu
+    /// German light-pointer instruments (Type I, DIN scale -50 to +5 dB): a band of light across a white scale.
+    case din
+    /// Nordic meters (Type I, Nordic scale -36 to +12 dB around TEST).
+    case nordic
+
+    public var id: String { rawValue }
+
+    /// The ballistics the design's standard calls for: Type I (DIN, Nordic) integrate in 5 ms and fall 20 dB in 1.7 s;
+    /// Type II (BBC, EBU) integrate in 10 ms and fall 24 dB in 2.8 s.
+    public var isTypeI: Bool { self == .din || self == .nordic }
 }
 
 /// How the Club style draws.
@@ -169,6 +209,9 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
     public var clubMode: VisualizerClubMode = .classic
     public var scopeMode: VisualizerScopeMode = .goniometer
     public var meterKind: VisualizerMeterKind = .vu
+    /// The design of each meter (its face, case and, for the PPM, the type of ballistics). Original by default.
+    public var vuDesign: VisualizerVUDesign = .original
+    public var ppmDesign: VisualizerPPMDesign = .original
     /// The level that reads 0 VU (and PPM 4), in dBFS for a sine; nil follows the music's own loudness.
     public var meterReference: Double?
     public var mirrorLayout: VisualizerMirrorLayout = .circle
@@ -189,6 +232,7 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
         case style, theme, sensitivity, decibelScale, bandCount, peakCaps, spectrogramSeconds, tonearm, rpm, strobe, showsTrackInfo
         case strobeWarningAccepted, scopeMode, meterKind, meterReference, mirrorLayout, particleTrails
         case spectrumMode, clubMode, vinylCover
+        case vuDesign, ppmDesign
     }
 
     public init(from decoder: Decoder) throws {
@@ -208,6 +252,8 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
         strobeWarningAccepted = (try? c.decodeIfPresent(Bool.self, forKey: .strobeWarningAccepted)) ?? d.strobeWarningAccepted
         scopeMode = (try? c.decodeIfPresent(VisualizerScopeMode.self, forKey: .scopeMode)) ?? d.scopeMode
         meterKind = (try? c.decodeIfPresent(VisualizerMeterKind.self, forKey: .meterKind)) ?? d.meterKind
+        vuDesign = (try? c.decodeIfPresent(VisualizerVUDesign.self, forKey: .vuDesign)) ?? d.vuDesign
+        ppmDesign = (try? c.decodeIfPresent(VisualizerPPMDesign.self, forKey: .ppmDesign)) ?? d.ppmDesign
         meterReference = (try? c.decodeIfPresent(Double.self, forKey: .meterReference)) ?? d.meterReference
         mirrorLayout = (try? c.decodeIfPresent(VisualizerMirrorLayout.self, forKey: .mirrorLayout)) ?? d.mirrorLayout
         particleTrails = (try? c.decodeIfPresent(Bool.self, forKey: .particleTrails)) ?? d.particleTrails

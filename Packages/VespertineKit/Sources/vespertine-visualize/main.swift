@@ -8,7 +8,8 @@
 //
 // Styles: vinyl (the default), bars, spectrogram, club, scope, meters, particles, mirrored. Themes: vespertine (the
 // default), brass, neon, aurora, ember, ice, mono, art (the colours of --art's cover; the default's without one).
-// Per style: --scope goniometer|oscilloscope, --meter vu|ppm, --reference <dBFS> (meters; automatic without),
+// Per style: --scope goniometer|oscilloscope, --meter vu|ppm, --vu-design original|broadcast|console|tape|cassette,
+// --ppm-design original|bbc|bbcStereo|ebu|din|nordic, --reference <dBFS> (meters; automatic without),
 // --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted),
 // --spectrum classic|noPeaks|smooth (bars), --club classic|waves, --cover label|sleeveFront|sleeveBehind (vinyl),
 // --calm (as with Reduce Motion), --cycle-cover <s> (vinyl: the cover moves on every <s> seconds, as a click does),
@@ -71,6 +72,8 @@ func parse() -> Options {
         case "--scope": o.settings.scopeMode = VisualizerScopeMode(rawValue: next()) ?? .goniometer
         case "--meter": o.settings.meterKind = VisualizerMeterKind(rawValue: next()) ?? .vu
         case "--reference": o.settings.meterReference = Double(next())
+        case "--vu-design": o.settings.vuDesign = VisualizerVUDesign(rawValue: next()) ?? .original
+        case "--ppm-design": o.settings.ppmDesign = VisualizerPPMDesign(rawValue: next()) ?? .original
         case "--layout": o.settings.mirrorLayout = VisualizerMirrorLayout(rawValue: next()) ?? .circle
         case "--no-trails": o.settings.particleTrails = false
         case "--no-info": o.settings.showsTrackInfo = false
@@ -137,6 +140,7 @@ func run() -> Int32 {
     configuration.sensitivity = Float(o.settings.sensitivity)
     configuration.linear = !o.settings.decibelScale
     configuration.meterReferenceDB = o.settings.meterReference.map(Float.init)
+    configuration.meterExtras = o.settings.meterExtras
     let analyzer = VisualizerAnalyzer(configuration: configuration)
     let n = VisualizerAnalyzer.fftSize(for: o.rate)
     let dt = 1 / o.fps
