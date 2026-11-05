@@ -347616,6 +347616,274 @@
         }
       }
     },
+    "Spatialize stereo": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስቲሪዮን ስፓሻል አድርግ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تحويل الستيريو إلى صوت مكاني"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্টেরিওকে স্পেশিয়াল করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prostorové stereo"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rumlig stereo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo räumlich wiedergeben"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Χωρικό στερεοφωνικό"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espacializar estéreo"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فضایی‌سازی استریو"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilastereo"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gawing spatial ang stereo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spatialiser la stéréo"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્ટીરિયોને સ્પેશિયલ બનાવો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mayar da sitiriyo Spatial"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סטריאו מרחבי"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टीरियो को स्पेशियल बनाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Térhatású sztereó"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spasialkan stereo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spazializza stereo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステレオを空間化"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಟೀರಿಯೋವನ್ನು ಸ್ಪೇಷಿಯಲ್ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스테레오 공간화"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്റ്റീരിയോ സ്പേഷ്യലാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टिरिओ स्पेशियल करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruangkan stereo"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Romlig stereo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo ruimtelijk maken"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਟੀਰੀਓ ਨੂੰ ਸਪੇਸ਼ੀਅਲ ਬਣਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przestrzenne stereo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espacializar estéreo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espacializar estéreo"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo spațial"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rumsligt stereo"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fanya stereo kuwa Spatial"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்டீரியோவை ஸ்பேஷியல் ஆக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్టీరియోను స్పేషియల్ చేయండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ทำให้สเตอริโอเป็นเสียงตามตำแหน่ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereoyu uzamsallaştır"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Просторове стерео"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیریو کو اسپیشل بنائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không gian hóa âm thanh nổi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空間化立體聲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空间化立体声"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空間化立體聲"
+          }
+        }
+      }
+    },
     "SPEAKER PROCESSING": {
       "comment": "Status badge (short, uppercase).",
       "extractionState": "manual",
@@ -395380,6 +395648,542 @@
           "stringUnit": {
             "state": "translated",
             "value": "不支援的檔案：%@"
+          }
+        }
+      }
+    },
+    "Upmixes stereo and mono songs to 5.1 for every speaker. Off plays them as they are.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስቲሪዮ እና ሞኖ ዘፈኖችን ለእያንዳንዱ ድምፅ ማጉያ ወደ 5.1 ያሰፋል። ሲጠፋ እንዳሉ ይጫወታሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يحوّل أغاني الستيريو والأحادية إلى 5.1 لكل السماعات. عند الإيقاف تُشغَّل كما هي."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্টেরিও ও মোনো গানকে প্রতিটি স্পিকারের জন্য 5.1-এ আপমিক্স করে। বন্ধ থাকলে যেমন আছে তেমনই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Převádí stereo a mono skladby na 5.1 pro všechny reproduktory. Při vypnutí hrají tak, jak jsou."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opmikser stereo- og mononumre til 5.1 til alle højttalere. Fra afspiller dem, som de er."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mischt Stereo- und Monotitel für alle Lautsprecher auf 5.1 hoch. „Aus“ spielt sie unverändert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μετατρέπει στερεοφωνικά και μονοφωνικά τραγούδια σε 5.1 για όλα τα ηχεία. Όταν είναι ανενεργό, παίζουν όπως είναι."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convierte canciones estéreo y mono a 5.1 para todos los altavoces. Si está desactivado, se reproducen tal cual."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌های استریو و مونو را برای همهٔ بلندگوها به 5.1 تبدیل می‌کند. در حالت خاموش، همان‌طور که هستند پخش می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miksaa stereo- ja monokappaleet 5.1:ksi kaikille kaiuttimille. Pois toistaa ne sellaisinaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ina-upmix ang mga stereo at mono na kanta sa 5.1 para sa bawat speaker. Kapag naka-off, pinapatugtog ang mga ito nang walang pagbabago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convertit les morceaux stéréo et mono en 5.1 pour tous les haut-parleurs. Désactivé, ils sont lus tels quels."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્ટીરિયો અને મોનો ગીતોને દરેક સ્પીકર માટે 5.1માં અપમિક્સ કરે છે. બંધ હોય ત્યારે તે જેમ છે તેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana faɗaɗa waƙoƙin sitiriyo da mono zuwa 5.1 don kowace lasifika. Idan a kashe, ana kunna su yadda suke."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממיר שירי סטריאו ומונו ל־5.1 לכל הרמקולים. כשהאפשרות כבויה, הם מושמעים כפי שהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टीरियो और मोनो गानों को हर स्पीकर के लिए 5.1 में अपमिक्स करता है। बंद होने पर वे जैसे हैं वैसे ही चलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A sztereó és mono dalokat 5.1-re keveri fel minden hangszóróhoz. Kikapcsolva változatlanul szólnak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengubah lagu stereo dan mono menjadi 5.1 untuk semua speaker. Jika mati, lagu diputar apa adanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte i brani stereo e mono in 5.1 per tutti gli altoparlanti. Se disattivato, li riproduce così come sono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステレオとモノラルの曲を5.1にアップミックスし、すべてのスピーカーで再生します。オフにすると、そのまま再生します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಟೀರಿಯೋ ಮತ್ತು ಮೋನೋ ಹಾಡುಗಳನ್ನು ಪ್ರತಿ ಸ್ಪೀಕರ್‌ಗಾಗಿ 5.1 ಗೆ ಅಪ್‌ಮಿಕ್ಸ್ ಮಾಡುತ್ತದೆ. ಆಫ್ ಇದ್ದರೆ ಅವು ಇದ್ದಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스테레오와 모노 곡을 모든 스피커용 5.1로 업믹스합니다. 끄면 원래대로 재생합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്റ്റീരിയോ, മോണോ പാട്ടുകളെ എല്ലാ സ്പീക്കറുകൾക്കുമായി 5.1 ആയി അപ്‌മിക്സ് ചെയ്യുന്നു. ഓഫാണെങ്കിൽ അവ അതേപടി പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टिरिओ आणि मोनो गाणी प्रत्येक स्पीकरसाठी 5.1 मध्ये अपमिक्स करते. बंद असल्यास ती जशी आहेत तशी वाजतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menukar lagu stereo dan mono kepada 5.1 untuk setiap pembesar suara. Mati memainkannya seperti asal."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oppmikser stereo- og monosanger til 5.1 for alle høyttalere. Av spiller dem som de er."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixt stereo- en mononummers op naar 5.1 voor alle luidsprekers. ‘Uit’ speelt ze zoals ze zijn."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਟੀਰੀਓ ਅਤੇ ਮੋਨੋ ਗੀਤਾਂ ਨੂੰ ਹਰ ਸਪੀਕਰ ਲਈ 5.1 ਵਿੱਚ ਅੱਪਮਿਕਸ ਕਰਦਾ ਹੈ। ਬੰਦ ਹੋਣ ’ਤੇ ਉਹ ਜਿਵੇਂ ਹਨ ਉਵੇਂ ਹੀ ਚੱਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przekształca utwory stereo i mono w 5.1 dla wszystkich głośników. Po wyłączeniu grają bez zmian."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono em 5.1 para todos os alto-falantes. Desativado, toca como estão."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono em 5.1 para todos os altifalantes. Desativado reproduz como estão."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transformă melodiile stereo și mono în 5.1 pentru toate difuzoarele. Dezactivat le redă așa cum sunt."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixar upp stereo- och monolåtar till 5.1 för alla högtalare. Av spelar dem som de är."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hupanua nyimbo za stereo na mono hadi 5.1 kwa kila spika. Ikizimwa, huchezwa kama zilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்டீரியோ மற்றும் மோனோ பாடல்களை ஒவ்வொரு ஸ்பீக்கருக்கும் 5.1 ஆக அப்மிக்ஸ் செய்கிறது. ஆஃப் எனில் அவை உள்ளபடியே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్టీరియో, మోనో పాటలను ప్రతి స్పీకర్ కోసం 5.1కి అప్‌మిక్స్ చేస్తుంది. ఆఫ్‌లో ఉంటే అవి ఉన్నట్లుగానే ప్లే అవుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัปมิกซ์เพลงสเตอริโอและโมโนเป็น 5.1 สำหรับลำโพงทุกตัว เมื่อปิด จะเล่นตามต้นฉบับ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo ve mono şarkıları tüm hoparlörler için 5.1'e yükseltir. Kapalıyken oldukları gibi çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перетворює стерео- та монопісні на 5.1 для всіх динаміків. Якщо вимкнено, вони звучать як є."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیریو اور مونو گانوں کو ہر اسپیکر کے لیے 5.1 میں اپ مکس کرتا ہے۔ بند ہونے پر وہ جیسے ہیں ویسے ہی چلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển bài hát stereo và mono thành 5.1 cho mọi loa. Khi tắt, bài hát được phát nguyên bản."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將立體聲及單聲道歌曲升混為 5.1，供所有揚聲器播放。關閉時按原樣播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将立体声和单声道歌曲上混为 5.1，供所有扬声器播放。关闭时按原样播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將立體聲和單聲道歌曲升混為 5.1，供所有揚聲器播放。關閉時按原樣播放。"
+          }
+        }
+      }
+    },
+    "Upmixes stereo and mono songs to 5.1 for Spatial Audio. Needs Spatial Audio on. Off plays them as they are.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስቲሪዮ እና ሞኖ ዘፈኖችን ለSpatial Audio ወደ 5.1 ያሰፋል። Spatial Audio መብራት አለበት። ሲጠፋ እንዳሉ ይጫወታሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يحوّل أغاني الستيريو والأحادية إلى 5.1 للصوت المكاني. يتطلب تشغيل الصوت المكاني. عند الإيقاف تُشغَّل كما هي."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্টেরিও ও মোনো গানকে স্পেশিয়াল অডিওর জন্য 5.1-এ আপমিক্স করে। স্পেশিয়াল অডিও চালু থাকা দরকার। বন্ধ থাকলে যেমন আছে তেমনই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Převádí stereo a mono skladby na 5.1 pro prostorový zvuk. Vyžaduje zapnutý prostorový zvuk. Při vypnutí hrají tak, jak jsou."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opmikser stereo- og mononumre til 5.1 til rumlig lyd. Kræver at rumlig lyd er slået til. Fra afspiller dem, som de er."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mischt Stereo- und Monotitel für 3D-Audio auf 5.1 hoch. 3D-Audio muss eingeschaltet sein. „Aus“ spielt sie unverändert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μετατρέπει στερεοφωνικά και μονοφωνικά τραγούδια σε 5.1 για τον χωρικό ήχο. Απαιτεί ενεργό χωρικό ήχο. Όταν είναι ανενεργό, παίζουν όπως είναι."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convierte canciones estéreo y mono a 5.1 para el audio espacial. Requiere el audio espacial activado. Si está desactivado, se reproducen tal cual."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌های استریو و مونو را برای صدای فضایی به 5.1 تبدیل می‌کند. صدای فضایی باید روشن باشد. در حالت خاموش، همان‌طور که هستند پخش می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miksaa stereo- ja monokappaleet 5.1:ksi tilaääntä varten. Vaatii tilaäänen päälle. Pois toistaa ne sellaisinaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ina-upmix ang mga stereo at mono na kanta sa 5.1 para sa Spatial Audio. Kailangang naka-on ang Spatial Audio. Kapag naka-off, pinapatugtog ang mga ito nang walang pagbabago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convertit les morceaux stéréo et mono en 5.1 pour l’audio spatial. Nécessite l’audio spatial activé. Désactivé, ils sont lus tels quels."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્ટીરિયો અને મોનો ગીતોને સ્પેશિયલ ઑડિયો માટે 5.1માં અપમિક્સ કરે છે. સ્પેશિયલ ઑડિયો ચાલુ હોવો જરૂરી છે. બંધ હોય ત્યારે તે જેમ છે તેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana faɗaɗa waƙoƙin sitiriyo da mono zuwa 5.1 don Spatial Audio. Yana buƙatar kunna Spatial Audio. Idan a kashe, ana kunna su yadda suke."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממיר שירי סטריאו ומונו ל־5.1 לשמע מרחבי. נדרש שמע מרחבי מופעל. כשהאפשרות כבויה, הם מושמעים כפי שהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टीरियो और मोनो गानों को स्पेशियल ऑडियो के लिए 5.1 में अपमिक्स करता है। स्पेशियल ऑडियो चालू होना चाहिए। बंद होने पर वे जैसे हैं वैसे ही चलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A sztereó és mono dalokat 5.1-re keveri fel a térhatású hanghoz. Ehhez a térhatású hangnak bekapcsolva kell lennie. Kikapcsolva változatlanul szólnak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengubah lagu stereo dan mono menjadi 5.1 untuk Audio Spasial. Memerlukan Audio Spasial aktif. Jika mati, lagu diputar apa adanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte i brani stereo e mono in 5.1 per l’audio spaziale. Richiede l’audio spaziale attivo. Se disattivato, li riproduce così come sono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステレオとモノラルの曲を空間オーディオ用に5.1にアップミックスします。空間オーディオをオンにする必要があります。オフにすると、そのまま再生します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಟೀರಿಯೋ ಮತ್ತು ಮೋನೋ ಹಾಡುಗಳನ್ನು ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋಗಾಗಿ 5.1 ಗೆ ಅಪ್‌ಮಿಕ್ಸ್ ಮಾಡುತ್ತದೆ. ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ಆನ್ ಆಗಿರಬೇಕು. ಆಫ್ ಇದ್ದರೆ ಅವು ಇದ್ದಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스테레오와 모노 곡을 공간 음향용 5.1로 업믹스합니다. 공간 음향이 켜져 있어야 합니다. 끄면 원래대로 재생합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്റ്റീരിയോ, മോണോ പാട്ടുകളെ സ്പേഷ്യൽ ഓഡിയോയ്ക്കായി 5.1 ആയി അപ്‌മിക്സ് ചെയ്യുന്നു. സ്പേഷ്യൽ ഓഡിയോ ഓണായിരിക്കണം. ഓഫാണെങ്കിൽ അവ അതേപടി പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्टिरिओ आणि मोनो गाणी स्पेशियल ऑडिओसाठी 5.1 मध्ये अपमिक्स करते. स्पेशियल ऑडिओ सुरू असणे आवश्यक आहे. बंद असल्यास ती जशी आहेत तशी वाजतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menukar lagu stereo dan mono kepada 5.1 untuk Audio Ruang. Memerlukan Audio Ruang dihidupkan. Mati memainkannya seperti asal."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oppmikser stereo- og monosanger til 5.1 for romlig lyd. Krever at romlig lyd er på. Av spiller dem som de er."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixt stereo- en mononummers op naar 5.1 voor ruimtelijke audio. Ruimtelijke audio moet aan staan. ‘Uit’ speelt ze zoals ze zijn."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਟੀਰੀਓ ਅਤੇ ਮੋਨੋ ਗੀਤਾਂ ਨੂੰ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਲਈ 5.1 ਵਿੱਚ ਅੱਪਮਿਕਸ ਕਰਦਾ ਹੈ। ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਚਾਲੂ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ। ਬੰਦ ਹੋਣ ’ਤੇ ਉਹ ਜਿਵੇਂ ਹਨ ਉਵੇਂ ਹੀ ਚੱਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przekształca utwory stereo i mono w 5.1 dla dźwięku przestrzennego. Wymaga włączonego dźwięku przestrzennego. Po wyłączeniu grają bez zmian."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono em 5.1 para o Áudio Espacial. Requer o Áudio Espacial ativado. Desativado, toca como estão."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono em 5.1 para o áudio espacial. Requer o áudio espacial ativado. Desativado reproduz como estão."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transformă melodiile stereo și mono în 5.1 pentru audio spațial. Necesită audio spațial activat. Dezactivat le redă așa cum sunt."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixar upp stereo- och monolåtar till 5.1 för rumsligt ljud. Kräver att rumsligt ljud är på. Av spelar dem som de är."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hupanua nyimbo za stereo na mono hadi 5.1 kwa Spatial Audio. Inahitaji Spatial Audio iwe imewashwa. Ikizimwa, huchezwa kama zilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்டீரியோ மற்றும் மோனோ பாடல்களை ஸ்பேஷியல் ஆடியோவுக்காக 5.1 ஆக அப்மிக்ஸ் செய்கிறது. ஸ்பேஷியல் ஆடியோ இயக்கத்தில் இருக்க வேண்டும். ஆஃப் எனில் அவை உள்ளபடியே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్టీరియో, మోనో పాటలను స్పేషియల్ ఆడియో కోసం 5.1కి అప్‌మిక్స్ చేస్తుంది. స్పేషియల్ ఆడియో ఆన్‌లో ఉండాలి. ఆఫ్‌లో ఉంటే అవి ఉన్నట్లుగానే ప్లే అవుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัปมิกซ์เพลงสเตอริโอและโมโนเป็น 5.1 สำหรับเสียงตามตำแหน่ง ต้องเปิดเสียงตามตำแหน่งไว้ เมื่อปิด จะเล่นตามต้นฉบับ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo ve mono şarkıları Uzamsal Ses için 5.1'e yükseltir. Uzamsal Ses'in açık olması gerekir. Kapalıyken oldukları gibi çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перетворює стерео- та монопісні на 5.1 для просторового аудіо. Потрібне ввімкнене просторове аудіо. Якщо вимкнено, вони звучать як є."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیریو اور مونو گانوں کو اسپیشل آڈیو کے لیے 5.1 میں اپ مکس کرتا ہے۔ اسپیشل آڈیو آن ہونا ضروری ہے۔ بند ہونے پر وہ جیسے ہیں ویسے ہی چلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chuyển bài hát stereo và mono thành 5.1 cho Âm thanh không gian. Cần bật Âm thanh không gian. Khi tắt, bài hát được phát nguyên bản."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將立體聲及單聲道歌曲升混為 5.1，用於空間音訊。需要開啟空間音訊。關閉時按原樣播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将立体声和单声道歌曲上混为 5.1，用于空间音频。需要开启空间音频。关闭时按原样播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將立體聲和單聲道歌曲升混為 5.1，用於空間音訊。需要開啟空間音訊。關閉時按原樣播放。"
           }
         }
       }
