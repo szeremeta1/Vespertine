@@ -150,9 +150,11 @@ struct RoomListeningControls: View {
                 .accessibilityValue(String(localized: "\(Int((strength * 100).rounded())) percent"))
                 Text("\(Int((strength * 100).rounded()))%").font(Typeface.mono(11.5)).foregroundStyle(Palette.text2).frame(width: 44, alignment: .trailing)
             }
+            // The percentages are arguments, so each language writes them its own way (and the catalog's format check
+            // doesn't read "0% le…" as a placeholder).
             Text(profile.supportsStrength
-                 ? "0% leaves the music as it is, 100% is the full correction. Delays and levels stay as they are."
-                 : "This profile is made of measured filters, which play at full strength.")
+                 ? String(localized: "\(0.0.formatted(.percent)) leaves the music as it is, \(1.0.formatted(.percent)) is the full correction. Delays and levels stay as they are.")
+                 : String(localized: "This profile is made of measured filters, which play at full strength."))
                 .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 12) {
                 Text("Compare").font(Typeface.ui(12.5)).foregroundStyle(Palette.text).frame(width: 70, alignment: .leading)
