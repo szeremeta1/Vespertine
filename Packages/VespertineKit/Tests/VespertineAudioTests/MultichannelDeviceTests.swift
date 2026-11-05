@@ -225,3 +225,76 @@ struct MultichannelDeviceTests {
         #expect(second == [0, 1, 2, 3, 4, 5, 6, 7], "7.1 wide: \(second)")
     }
 }
+
+@Suite("Multichannel to a configured speaker setup (Audio MIDI Setup › Configure Speakers, HDMI receivers)")
+struct SpeakerSetupDeviceTests {
+    static let (L, R, C, LFE, Ls, Rs, Lrs, Rrs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                                 kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround,
+                                                 kAudioChannelLabel_RearSurroundLeft, kAudioChannelLabel_RearSurroundRight)
+
+    struct Case: Sendable, CustomTestStringConvertible {
+        let name: String
+        let channels: Int
+        let mask: UInt32
+        let speakers: [AudioChannelLabel]
+        /// The source channel each speaker output carries (-1: silent, nil: a mix of several).
+        let carries: [Int?]
+        var testDescription: String { name }
+    }
+
+    static let mpeg71: [AudioChannelLabel] = [L, R, C, LFE, Ls, Rs, Lrs, Rrs]
+    /// CEA-861 order, as HDMI receivers often report it: L R LFE C Ls Rs Lrs Rrs.
+    static let hdmi71: [AudioChannelLabel] = [L, R, LFE, C, Ls, Rs, Lrs, Rrs]
+    static let mpeg51: [AudioChannelLabel] = [L, R, C, LFE, Ls, Rs]
+
+    static let cases: [Case] = [
+        Case(name: "5.1 (WAV 0x3F) on 7.1 speakers", channels: 6, mask: 0x3F, speakers: mpeg71, carries: [0, 1, 2, 3, 4, 5, -1, -1]),
+        Case(name: "5.1 (no mask) on 7.1 speakers", channels: 6, mask: 0, speakers: mpeg71, carries: [0, 1, 2, 3, 4, 5, -1, -1]),
+        Case(name: "7.1 (WAV 0x63F) on 7.1 speakers", channels: 8, mask: 0x63F, speakers: mpeg71, carries: [0, 1, 2, 3, 6, 7, 4, 5]),
+        Case(name: "7.1 (no mask) on 7.1 speakers", channels: 8, mask: 0, speakers: mpeg71, carries: [0, 1, 2, 3, 6, 7, 4, 5]),
+        Case(name: "5.1 (WAV 0x3F) on 7.1 speakers in HDMI order", channels: 6, mask: 0x3F, speakers: hdmi71, carries: [0, 1, 3, 2, 4, 5, -1, -1]),
+        Case(name: "5.1 (no mask) on 7.1 speakers in HDMI order", channels: 6, mask: 0, speakers: hdmi71, carries: [0, 1, 3, 2, 4, 5, -1, -1]),
+        Case(name: "7.1 (WAV 0x63F) on 7.1 speakers in HDMI order", channels: 8, mask: 0x63F, speakers: hdmi71, carries: [0, 1, 3, 2, 6, 7, 4, 5]),
+        Case(name: "5.1 (no mask) on 5.1 speakers", channels: 6, mask: 0, speakers: mpeg51, carries: [0, 1, 2, 3, 4, 5]),
+        Case(name: "quad (FL FR BL BR) on 5.1 speakers", channels: 4, mask: 0x33, speakers: mpeg51, carries: [0, 1, -1, -1, 2, 3]),
+        // Folded (a speaker for every channel there isn't): front four untouched, the surrounds carry a mix (nil), nothing silent.
+        Case(name: "7.1 (no mask) folded into 5.1 speakers", channels: 8, mask: 0, speakers: mpeg51, carries: [0, 1, 2, 3, nil, nil]),
+        // A labelled 7.1 folded into 5.1 stays with Apple's downmix (SpeakerMappingTests.fold), which lowers the whole mix.
+    ]
+
+    @Test("Each channel reaches its own speaker, bit for bit, whatever order the device names them in", arguments: cases)
+    func placed(_ c: Case) throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("spk-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = 9600
+        try ChannelID.writeWAV(to: url, channels: c.channels, frames: frames, rate: 48_000, mask: c.mask)
+        let speakers = try #require(ChannelLayouts.layout(labels: c.speakers))
+        let device = DeviceCapabilities(sampleRates: GoldenDevices.rates, physicalFormats: [
+            PhysicalFormat(minRate: 44_100, maxRate: 192_000, bitDepth: 24, isInteger: true, isMixable: true, channels: 8)],
+            outputChannels: 8, supportsDoP: false, speakerLayoutChannels: c.speakers.count)
+        let probed = try SourceOpener.probe(url)
+        var plan = FormatPlanner.plan(source: probed.format, device: device)
+        plan.integerSamples = false
+        #expect(plan.channels == c.speakers.count && plan.spatial == .off)
+        // OutputSession.init: the device's own speaker layout is what the stream is converted to.
+        let layout = try #require(OutputSession.routeLayout(plan: plan, speakers: speakers))
+        #expect(layout.channelLabels == c.speakers)
+        let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
+        let path = SignalPath(source: probed.format, decoderName: "test", plan: plan,
+                              applied: AppliedFormat(sampleRate: 48_000, physicalBitDepth: 24, physicalIsInteger: true, virtualChannels: 8,
+                                                     exclusive: true, bufferFrames: 512),
+                              deviceName: "Receiver", deviceUID: "test",
+                              deviceProfile: DeviceProfile(kind: .usbDAC, tag: "", canBeBitPerfect: true, symbol: "x"), volume: .fixed)
+        let decoding = try Decoding(item: PlayableItem(url: url), probed: probed, decoder: decoder, path: path, chunk: 4096, layout: layout)
+        var out: [Float] = []
+        while true {
+            let chunk = decoding.convertChunk()
+            if let data = chunk.data { out += UnsafeBufferPointer(start: data, count: Int(chunk.frames) * plan.channels) }
+            if chunk.ended { break }
+        }
+        let n = plan.channels
+        let carried = ChannelID.identify(out, stride: n, frames: out.count / n, firstFrame: 0)
+        #expect(out.count / n == frames)
+        #expect(carried == c.carries, "\(c.name): \(carried.map { $0.map(String.init) ?? "✗" }) on \(layout.shortNames)")
+    }
+}
