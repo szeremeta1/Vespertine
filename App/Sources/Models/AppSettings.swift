@@ -83,6 +83,8 @@ final class AppSettings {
     var dopOffDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopOffDeviceUIDs), forKey: "dopOffDeviceUIDs") } }
     /// Outputs with an AV receiver: Dolby and DTS are sent to them untouched.
     var bitstreamDeviceUIDs: Set<String> { didSet { defaults.set(Array(bitstreamDeviceUIDs), forKey: "bitstreamDeviceUIDs") } }
+    /// Spatialize stereo, per device (empty = off everywhere: the original stays the default).
+    var spatializeStereoUIDs: Set<String> { didSet { defaults.set(Array(spatializeStereoUIDs), forKey: "spatializeStereoUIDs") } }
     /// Spatial Audio for multichannel music, per device (unset = head tracked on AirPods/Beats, off elsewhere).
     var spatialModes: [String: String] { didSet { defaults.set(spatialModes, forKey: "spatialModes") } }
     var rateChoices: [String: String] { didSet { defaults.set(rateChoices, forKey: "rateChoices") } }
@@ -198,6 +200,7 @@ final class AppSettings {
         dopDeviceUIDs = Set(defaults.stringArray(forKey: "dopDeviceUIDs") ?? [])
         dopOffDeviceUIDs = Set(defaults.stringArray(forKey: "dopOffDeviceUIDs") ?? [])
         bitstreamDeviceUIDs = Set(defaults.stringArray(forKey: "bitstreamDeviceUIDs") ?? [])
+        spatializeStereoUIDs = Set(defaults.stringArray(forKey: "spatializeStereoUIDs") ?? [])
         spatialModes = defaults.dictionary(forKey: "spatialModes") as? [String: String] ?? [:]
         rateChoices = defaults.dictionary(forKey: "rateChoices") as? [String: String] ?? [:]
         replayGain = ReplayGainMode(rawValue: defaults.string(forKey: "replayGain") ?? "off") ?? .off
@@ -321,6 +324,7 @@ final class AppSettings {
         if dopDeviceUIDs.contains(old) { dopDeviceUIDs.insert(new) }
         if dopOffDeviceUIDs.contains(old) { dopOffDeviceUIDs.insert(new) }
         if bitstreamDeviceUIDs.contains(old) { bitstreamDeviceUIDs.insert(new) }
+        if spatializeStereoUIDs.contains(old) { spatializeStereoUIDs.insert(new) }
         if spatialModes[new] == nil, let mode = spatialModes[old] { spatialModes[new] = mode }
         if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
         if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
@@ -370,6 +374,7 @@ final class AppSettings {
         s.outputFallback = outputFallback
         s.dopDeviceUIDs = effectiveDoPUIDs
         s.bitstreamDeviceUIDs = bitstreamDeviceUIDs
+        s.spatializeStereoUIDs = spatializeStereoUIDs
         s.spatialModes = spatialModes.compactMapValues(SpatialMode.init(rawValue:))
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
