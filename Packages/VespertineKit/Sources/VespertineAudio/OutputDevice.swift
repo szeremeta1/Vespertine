@@ -91,7 +91,8 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
 }
 
 enum DeviceQuery {
-    /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers), any channel count.
+    /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers), any channel count. nil when there is none,
+    /// or only a driver's placeholder (`ChannelLayouts.isPlaceholder`).
     public static func speakerLayout(_ device: AudioObjectID) -> AVAudioChannelLayout? {
         var address = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyPreferredChannelLayout,
                                                  mScope: kAudioObjectPropertyScopeOutput, mElement: kAudioObjectPropertyElementMain)
@@ -100,7 +101,8 @@ enum DeviceQuery {
         let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
         defer { raw.deallocate() }
         guard AudioObjectGetPropertyData(device, &address, 0, nil, &size, raw) == noErr else { return nil }
-        return AVAudioChannelLayout(layout: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+        let layout = AVAudioChannelLayout(layout: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+        return ChannelLayouts.isPlaceholder(layout) ? nil : layout
     }
 
     /// The device's speaker arrangement (Audio MIDI Setup → Configure Speakers) for `channels` channels.
