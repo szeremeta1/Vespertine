@@ -137,8 +137,8 @@ final class AppSettings {
     @ObservationIgnored private let roomStore: RoomProfileStore
     /// Set when the library came from the old preferences: written to its file at the end of start-up.
     @ObservationIgnored private var roomLoadedFromLegacy = false
-    /// Room Correction shows the simple controls unless this is on (View → Room Correction → Pro).
-    var roomProMode: Bool { didSet { defaults.set(roomProMode, forKey: "roomProMode") } }
+    /// Room Correction shows the guided controls unless this is on (the Guided | Advanced switch in its window).
+    var roomAdvancedMode: Bool { didSet { defaults.set(roomAdvancedMode, forKey: "roomAdvancedMode") } }
     /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
     /// converted to PCM while correction is on, so it's corrected too.
     var roomNativeDSDDeviceUIDs: Set<String> { didSet { defaults.set(roomNativeDSDDeviceUIDs.sorted(), forKey: "roomNativeDSD") } }
@@ -247,7 +247,7 @@ final class AppSettings {
         roomUnreadable = loadedRoom?.unreadable ?? []
         roomBook = loadedRoom?.book ?? RoomProfileBook()
         roomLoadedFromLegacy = loadedRoom != nil && !FileManager.default.fileExists(atPath: roomStore.fileURL.path)
-        roomProMode = defaults.bool(forKey: "roomProMode")
+        roomAdvancedMode = defaults.bool(forKey: "roomAdvancedMode")
         roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")

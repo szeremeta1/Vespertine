@@ -170,14 +170,14 @@ struct RoomCorrectionWindow: View {
             HStack(alignment: .firstTextBaseline) {
                 Text("Room Correction").font(Typeface.serif(28)).foregroundStyle(Palette.text)
                 Spacer()
-                Picker("Mode", selection: Binding(get: { settings.roomProMode }, set: { settings.roomProMode = $0 })) {
-                    Text("Simple", comment: "Room correction mode: guided, one strength control").tag(false)
-                    Text("Pro", comment: "Room correction mode: every filter, target and limit editable").tag(true)
+                Picker("Mode", selection: Binding(get: { settings.roomAdvancedMode }, set: { settings.roomAdvancedMode = $0 })) {
+                    Text("Guided", comment: "Room correction mode: measure, one strength control, compare").tag(false)
+                    Text("Advanced", comment: "Room correction mode: every filter, target and limit editable").tag(true)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
-                .help("Simple: measure, set how much, compare. Pro: every filter, the target, limits and positions.")
+                .help("Guided: measure, set how much, compare. Advanced: every filter, the target, limits and positions.")
                 .accessibilityLabel("Room correction mode")
             }
             Text("Lines your speakers up at your seat and tames the room's bass, per speaker. Off unless you turn it on; while it's on, playback isn't bit-perfect.")
@@ -357,8 +357,8 @@ struct RoomCorrectionWindow: View {
             Text(summary(profile)).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
             graph(profile)
             RoomListeningControls(profile: profile, device: device, edit: { edit(profile.id, $0) })
-            if settings.roomProMode {
-                RoomProControls(profile: profile, redesigning: redesigning, edit: { edit(profile.id, $0) },
+            if settings.roomAdvancedMode {
+                RoomAdvancedControls(profile: profile, redesigning: redesigning, edit: { edit(profile.id, $0) },
                                 redesign: { redesign(profile, options: $0, excluded: $1) })
             } else {
                 DisclosureGroup("What it does") {
@@ -448,9 +448,9 @@ struct RoomCorrectionWindow: View {
                     .pickerStyle(.segmented)
                     .labelsHidden()
                     .fixedSize()
-                    if model.settings.roomProMode { RoomGraphLayerToggles(layers: $layers) }
+                    if model.settings.roomAdvancedMode { RoomGraphLayerToggles(layers: $layers) }
                 }
-                RoomCurvesView(preview: preview, reveal: showAfter ? 1 : 0, layers: model.settings.roomProMode ? layers : .all).frame(height: 300)
+                RoomCurvesView(preview: preview, reveal: showAfter ? 1 : 0, layers: model.settings.roomAdvancedMode ? layers : .all).frame(height: 300)
                 Text("Thin: measured. Bold: predicted after correction (calculated, not measured). Dashed: target. Measure again with correction on to check it in the room.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }

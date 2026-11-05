@@ -193,7 +193,7 @@ public struct RoomProfileBook: Equatable, Sendable {
         guard let original = profile(id) else { throw RoomProfileError.notFound }
         var copy = original.withID(UUID())
         copy.createdAt = Date().wholeSecond
-        copy.name = freeName(String(Self.tidy(original.name).prefix(Self.maxNameLength - 12)) + " " + String(localized: "copy"), on: original.deviceUID, except: nil)
+        copy.name = freeName(String(Self.tidy(original.name).prefix(Self.maxNameLength - 12)) + " " + String(localized: "copy", comment: "Added to the name of a duplicated room profile: “Desk copy”."), on: original.deviceUID, except: nil)
         profiles.append(copy)
         return copy
     }

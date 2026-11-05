@@ -74,18 +74,18 @@ Every measurement or import is a **profile**: a name you give it, optional label
   from earlier versions are carried over as they were (schema 4 only adds optional fields) and the old preferences are
   read once, then no longer.
 
-## Simple and Pro
+## Guided and Advanced
 
 The switch at the top of the window chooses what is shown; it changes nothing about how the sound is made.
 
-**Simple** (the default): measure, then the profile's graph (before, and the predicted result), **Strength**, and a
+**Guided** (the default): measure, then the profile's graph (before, and the predicted result), **Strength**, and a
 **Compare** switch. Strength scales every filter's gain from 0 (the music as it is) to 100% (the full correction);
 frequencies and Q stay, delays and levels are not scaled, and the preamp is worked out again from the scaled filters so
 the music still can't clip. A profile made of impulse responses can't be turned down and says so. Compare flips the
-output between **A · As it is** and **B · Corrected**; B plays quieter by the preamp, which the window states: match the
-level by ear before judging.
+output between **Original** and **Corrected**; Corrected plays quieter by the preamp, which the window states: match
+the level by ear before judging.
 
-**Pro** adds:
+**Advanced** adds:
 
 - **Target and limits**: the target (Gentle tilt, Flat, Warm, or **Load House Curve…**, a text file with a frequency in
   Hz and a level in dB per line, as REW writes targets, 5 Hz to 40 kHz, within ±30 dB; only its shape counts, as the

@@ -1,6 +1,6 @@
 //
 // Vespertine — Room Correction profile controls: naming and labelling a profile, the strength control and the A/B
-// switch every listener gets, and the Pro section (design target and limits, measured positions, every filter and
+// switch every listener gets, and the Advanced section (design target and limits, measured positions, every filter and
 // each speaker's trim, the microphone).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -124,10 +124,10 @@ struct RoomDraftNaming: View {
     }
 }
 
-// MARK: - Simple: strength and A/B
+// MARK: - Guided: strength and A/B
 
-/// The two controls everyone gets: how much of the correction plays, and a switch between the music as it is (A) and
-/// corrected (B).
+/// The two controls everyone gets: how much of the correction plays, and a switch between the original music and the
+/// corrected music.
 struct RoomListeningControls: View {
     @Environment(AppModel.self) private var model
     let profile: RoomProfile
@@ -161,13 +161,13 @@ struct RoomListeningControls: View {
                     settings.setRoomProfile(new ? profile.id : nil, for: device.uid)
                     model.syncEngine()
                 })) {
-                    Text("A · As it is").tag(false)
-                    Text("B · Corrected").tag(true)
+                    Text("Original", comment: "Room correction A/B switch: the music without correction").tag(false)
+                    Text("Corrected", comment: "Room correction A/B switch: the music with correction").tag(true)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
-                .accessibilityLabel("Compare the music as it is with the corrected music")
+                .accessibilityLabel("Compare the original music with the corrected music")
             }
             if on, playing.filters.preampDB < -0.05 {
                 Text("Corrected plays \(abs(playing.filters.preampDB).formatted(.number.precision(.fractionLength(1)))) dB quieter, so it can't clip. Match the level by ear before judging.")
@@ -188,9 +188,9 @@ struct RoomListeningControls: View {
     }
 }
 
-// MARK: - Pro
+// MARK: - Advanced
 
-struct RoomProControls: View {
+struct RoomAdvancedControls: View {
     let profile: RoomProfile
     let redesigning: Bool
     let edit: ((inout RoomProfile) throws -> Void) -> Void

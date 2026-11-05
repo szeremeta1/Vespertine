@@ -174,7 +174,7 @@ struct RoomProfileStressTests {
         defer { try? FileManager.default.removeItem(at: impulses) }
         let result = try await DeskMeasurement.shared.result()
 
-        // Measured: each speaker's resonance where it is, averaged over both seats, kept per seat for Pro.
+        // Measured: each speaker's resonance where it is, averaged over both seats, kept per seat for Advanced.
         let left = try #require(result.curves[.left]), right = try #require(result.curves[.right])
         #expect(Stress.relative(left, at: 120) > 5 && Stress.relative(left, at: 180) < Stress.relative(left, at: 120) - 3)
         #expect(Stress.relative(right, at: 180) > 4 && Stress.relative(right, at: 120) < Stress.relative(right, at: 180) - 2)
@@ -204,7 +204,7 @@ struct RoomProfileStressTests {
         #expect(full.left < -4, "the 120 Hz resonance is cut")
         #expect(full.right < -3, "the right speaker's 180 Hz resonance is cut")
 
-        // Strength 50 %: about half the cut in dB; 0 %: nothing but level. A / B "as it is": the correction is off.
+        // Strength 50 %: about half the cut in dB; 0 %: nothing but level. Compare on Original: the correction is off.
         try book.update(desk.id) { $0.strength = 0.5 }
         let half = Stress.playedDB(Stress.engine(book, impulses: impulses).roomCorrection(for: Stress.output("zd3")), left: 120, right: 180)
         #expect(half.left > full.left + 1.5 && half.left < -1)
@@ -220,7 +220,7 @@ struct RoomProfileStressTests {
         book.setEnabled(true, for: "zd3")
         #expect(Stress.engine(book, impulses: impulses).roomCorrection(for: Stress.output("zd3")) == playing)
 
-        // Pro: leaving the second seat out refits from the first one alone (a deeper cut: that seat had the bigger peak).
+        // Advanced: leaving the second seat out refits from the first one alone (a deeper cut: that seat had the bigger peak).
         var seatOnly = try #require(book.profile(desk.id))
         try seatOnly.setExcludedPositions([1])
         let refit = try seatOnly.redesigned()
