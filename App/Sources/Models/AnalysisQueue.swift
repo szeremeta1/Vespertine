@@ -136,7 +136,8 @@ final class AnalysisQueue {
         }
     }
 
-    /// Queues everything that has no current analysis (new, changed, or analyzed by an older version). Shares
+    /// Queues everything that has no current analysis (new, changed, or analyzed by an older version), and once, the
+    /// songs analyzed before transition profiles existed (`tracksNeedingAnalysis`). Shares
     /// analyzed by their server are left to the server. `includeNetwork`: nil follows the setting (automatic
     /// analysis); Analyze Library asks for the shares too, since that's what pressing it means.
     func analyzeLibrary(includeNetwork: Bool? = nil) {

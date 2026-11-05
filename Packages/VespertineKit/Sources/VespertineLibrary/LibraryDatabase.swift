@@ -1065,14 +1065,21 @@ public extension LibraryDatabase {
 
     /// Lossless, present tracks without a current analysis (never analyzed, changed since, or
     /// analyzed by an older version). One track per file. `among`: only these tracks (a selection).
+    ///
+    /// Also a song that plays its whole file and has no current transition profile: one analyzed by a Vespertine from
+    /// before profiles (0.14 and earlier) has a current analysis, so it was never read again, and Smart Mix and Live
+    /// Set had no stored ends or beat grid for it. Reading it once saves both; a CUE sheet's or a disc image's tracks
+    /// never get the file's profile (`saveTransitionProfiles`), so they aren't asked for one.
     public func tracksNeedingAnalysis(excludingSources excluded: Set<Int64> = [], among ids: Set<Int64>? = nil) throws -> [Track] {
         try writer.read { db in
             let rows = try Track.fetchAll(db, sql: """
-                SELECT t.* FROM track t LEFT JOIN analysis a ON a.trackId = t.id
+                SELECT t.* FROM track t LEFT JOIN analysis a ON a.trackId = t.id LEFT JOIN transitionProfile p ON p.trackId = t.id
                 WHERE t.isMissing = 0 AND t.isLossless = 1 AND t.isDSD = 0
-                  AND (a.trackId IS NULL OR a.version < ? OR a.fileSize != t.fileSize OR a.modifiedAt != t.modifiedAt)
+                  AND (a.trackId IS NULL OR a.version < ? OR a.fileSize != t.fileSize OR a.modifiedAt != t.modifiedAt
+                       OR (t.cueStartFrame IS NULL AND t.location = t.filePath
+                           AND (p.trackId IS NULL OR p.version < ? OR p.fileSize != t.fileSize OR p.modifiedAt != t.modifiedAt)))
                 ORDER BY t.addedAt DESC
-                """, arguments: [FileAnalysis.currentVersion])
+                """, arguments: [FileAnalysis.currentVersion, TransitionProfile.currentVersion])
             var seen = Set<String>()
             return rows.filter { track in
                 guard ids?.contains(track.id ?? -1) ?? true else { return false }
@@ -1219,6 +1226,13 @@ extension LibraryDatabase {
                       bandwidthHz = (SELECT bandwidthHz FROM track WHERE id = :old),
                       effectiveBitDepth = (SELECT effectiveBitDepth FROM track WHERE id = :old)
                     WHERE id = :new AND analysisVerdict IS NULL
+                    """, arguments: ["old": old, "new": new])
+            }
+            if sameFile, try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM transitionProfile WHERE trackId = ?)", arguments: [new]) == true {
+                // The song's ends and beat grid (Smart Mix, Live Set) still hold too.
+                try db.execute(sql: """
+                    UPDATE transitionProfile SET trackId = :new, modifiedAt = (SELECT modifiedAt FROM track WHERE id = :new)
+                    WHERE trackId = :old AND fileSize = (SELECT fileSize FROM track WHERE id = :new)
                     """, arguments: ["old": old, "new": new])
             }
             try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])

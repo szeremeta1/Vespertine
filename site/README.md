@@ -95,3 +95,11 @@ missing path; it swaps in the visitor's language from `/<code>/404.html`.
 `robots.txt` allows every crawler, and names the AI ones (GPTBot, ClaudeBot, PerplexityBot, Google-Extended,
 Applebot-Extended, CCBot and others) so it's explicit. `/llms.txt` and `/llms-full.txt` describe the app for language
 models, built from the same data as the pages.
+
+## IndexNow
+
+After each deploy, `pages.yml` tells Bing, Yandex and the other [IndexNow](https://www.indexnow.org) engines which pages are
+new or changed (`scripts/indexnow.mjs`: before the deploy it compares `dist/sitemap.xml` with the live one by `lastmod`; after
+it, one POST to `api.indexnow.org`). The key is the public file `public/<key>.txt`, whose content is its own name: it proves
+ownership and is not a secret, and no credentials are involved. The step is best effort and can't fail a deploy. To submit
+by hand: `printf 'https://vespertineapp.com/\n' | node scripts/indexnow.mjs submit` (add `--dry-run` to see it first).

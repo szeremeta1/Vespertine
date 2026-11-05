@@ -5,6 +5,7 @@ import { SITE, latest, isoDay } from '../data/app';
 import { escapeHtml as x } from '../lib/text';
 import { sceneShots, trailerPoster, TRAILER } from '../lib/shots';
 import { CODES, hreflangOf, pagePath, t, type Page } from '../i18n';
+import { guides } from '../data/guides';
 
 export const GET: APIRoute = async () => {
   const poster = await trailerPoster();
@@ -16,6 +17,11 @@ export const GET: APIRoute = async () => {
     { page: 'terms', lastmod: '2026-09-29' },
   ];
   const urls: string[] = [];
+  // English-only guide pages: one URL, hreflang for English and x-default only, lastmod the page's own date.
+  for (const g of guides) {
+    const href = `${SITE}${g.path}`;
+    urls.push(`<url><loc>${href}</loc><lastmod>${g.updated}</lastmod><xhtml:link rel="alternate" hreflang="${hreflangOf('en')}" href="${href}"/><xhtml:link rel="alternate" hreflang="x-default" href="${href}"/></url>`);
+  }
   for (const p of pages) {
     const alternates = [...CODES.map((c) => `<xhtml:link rel="alternate" hreflang="${hreflangOf(c)}" href="${SITE}${pagePath(c, p.page)}"/>`), `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${pagePath('en', p.page)}"/>`].join('');
     for (const lang of CODES) {
