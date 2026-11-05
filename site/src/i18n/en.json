@@ -54,7 +54,7 @@
     "home": "Home"
   },
   "home": {
-    "title": "Vespertine: free surround and hi-res music player for Mac",
+    "title": "Vespertine: free hi-res audio player for Mac",
     "description": "Free, open-source Mac music player for surround and hi-res collections: SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Dolby Atmos files, Spatial Audio on AirPods, room correction measured in your own room, and a bit-perfect signal path you can inspect.",
     "ogAlt": "Vespertine: the free, open-source Mac player for surround and hi-res music. Its signal path shows a 24-bit / 96 kHz FLAC playing bit-perfect on a Fosi Audio ZD3. Version {version}, macOS {minMacOS} or later.",
     "hero": {
