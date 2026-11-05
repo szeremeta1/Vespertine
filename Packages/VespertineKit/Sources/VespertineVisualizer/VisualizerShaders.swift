@@ -72,6 +72,17 @@ static float4 overlayOver(float3 rgb, float4 overlay) {
 static float dither(float2 px) { return (hash21(px) - 0.5) / 255.0; }
 
 // MARK: Bars
+// Spectrum's Smooth mode is the same function specialized (a function constant), so Classic and No Peaks compile
+// without it.
+constant bool smoothBars [[function_constant(0)]];
+
+static float boxDistance(float2 p, float2 halfSize, float radius);
+
+// A Catmull-Rom curve through p1 and p2 (t 0…1 between them), and its slope.
+static float2 catmullRom(float p0, float p1, float p2, float p3, float t) {
+    float a = -p0 + 3 * p1 - 3 * p2 + p3, b = 2 * p0 - 5 * p1 + 4 * p2 - p3, c = -p0 + p2;
+    return 0.5 * float2(((a * t + b) * t + c) * t + 2 * p1, (3 * a * t + 2 * b) * t + c);
+}
 
 fragment float4 vz_bars(VOut in [[stage_in]], constant U &u [[buffer(0)]], constant float *bands [[buffer(1)]],
                         constant float *peaks [[buffer(2)]], texture2d<float> overlay [[texture(0)]]) {
@@ -97,12 +108,36 @@ fragment float4 vz_bars(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
         float y = (hi.y - px.y) / plotH;            // 0 at the floor, 1 at the top
         float h = bands[i];
         float topEdge = 1.0 / plotH;
+        bool smoothMode = smoothBars;
         float fill = smoothstep(h + topEdge, h - topEdge, y) * step(0.0, y);
+        float bar = fill * inside;
+        float curve = 0;
+        if (smoothMode) {
+            // Smooth: the bar's top is rounded (as round as it is wide, once it's that tall), and a curve through the
+            // tops of all the bars, with a soft veil under it, joins them into one shape.
+            float hw = 0.5 * (1 - gap) * w;
+            float cx = lo.x + (float(i) + 0.5) * w;
+            float topPx = hi.y - h * plotH;
+            float2 c = float2(cx, (topPx + hi.y + hw) * 0.5);
+            float d = boxDistance(px - c, float2(hw, (hi.y + hw - topPx) * 0.5), min(hw, h * plotH));
+            bar = (1 - smoothstep(-0.7, 0.7, d)) * step(0.0, y) * step(0.5, h * plotH);
+            float fc = fx - 0.5;
+            int j = int(floor(fc));
+            float2 cr = catmullRom(bands[clamp(j - 1, 0, n - 1)], bands[clamp(j, 0, n - 1)], bands[clamp(j + 1, 0, n - 1)],
+                                   bands[clamp(j + 2, 0, n - 1)], fc - floor(fc));
+            curve = max(cr.x, 0.0);
+            float slope = cr.y * plotH / w;                 // px per px
+            float dy = (y - curve) * plotH / sqrt(1 + slope * slope);
+            float shown = smoothstep(0.004, 0.04, curve) * step(0.0, y);
+            float veil = smoothstep(curve + topEdge, curve - topEdge, y) * (1 - bar);
+            col += ramp(u, 0.35 + 0.5 * saturate(y)) * veil * 0.13 * shown;
+            col += ramp(u, 0.8 + 0.2 * curve) * (exp(-dy * dy / (2.2 * pt * pt)) * 0.55 + exp(-abs(dy) / (9 * pt)) * 0.12) * shown;
+        }
         float3 barCol = ramp(u, 0.3 + 0.7 * saturate(y)) * (0.75 + 0.35 * h);
         // A brighter rim at the top of the bar.
         float rim = exp(-abs(y - h) * plotH / (3 * pt)) * step(y, h + topEdge);
-        barCol += u.stops[3].rgb * rim * 0.35;
-        col = mix(col, barCol, fill * inside);
+        barCol += u.stops[3].rgb * rim * (smoothMode ? 0.2 : 0.35);
+        col = mix(col, barCol, bar);
         // Glow above the bar.
         float above = max(0.0, y - h) * plotH;
         col += ramp(u, 0.6 + 0.4 * h) * exp(-above / (14 * pt)) * 0.10 * h * inside * step(0.0, y);
@@ -116,7 +151,7 @@ fragment float4 vz_bars(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
         if (y < 0) {
             float depth = -y * plotH;
             float r = smoothstep(h * plotH + topEdge, h * plotH - topEdge, depth);
-            col += ramp(u, 0.4) * r * inside * 0.16 * exp(-depth / (18 * pt));
+            col += ramp(u, 0.4) * r * inside * 0.16 * exp(-depth / (18 * pt)) * (smoothMode ? step(0.5, h * plotH) : 1.0);
         }
     }
     float4 ov = overlay.sample(linearClamp, in.uv);
@@ -230,12 +265,53 @@ static Tonearm tonearm(float2 q, float aa, float armAngle, float2 pivot, float r
     return t;
 }
 
+// The album's sleeve, beside the record (record units, y up): its centre `centreX` along from the record's (level with
+// it) and turned `tilt` anticlockwise. As in MD Vinyl: a square card a touch larger than the record, with slightly
+// rounded corners and a soft shadow that falls mostly straight down.
+struct Sleeve {
+    float coverage;
+    float3 colour;
+    float shadow;   // the shadow it casts, a little down and to the right
+};
+
+static Sleeve sleeve(float2 q, float aa, float centreX, float tilt, constant U &u, texture2d<float> art) {
+    const float halfSize = 0.883;
+    const float2 shadowAt = float2(0.008, -0.035);
+    Sleeve s = {0, float3(0), 0};
+    // Past the sleeve (turned, its corners reach a little further) and its shadow.
+    float2 w = q - float2(centreX, 0);
+    if (any(abs(w - shadowAt) > halfSize * (cos(tilt) + abs(sin(tilt))) + 0.14)) return s;
+    float2 sq = rotate(w, -tilt);                  // the sleeve's own frame
+    float d = boxDistance(sq, float2(halfSize), 0.017);
+    s.coverage = 1 - smoothstep(-aa, aa, d);
+    s.shadow = (1 - smoothstep(-0.06, 0.10, boxDistance(rotate(w - shadowAt, -tilt), float2(halfSize), 0.03))) * 0.45;
+    float2 lq = sq / halfSize;
+    float3 c;
+    if (u.e.y > 0.5) {
+        c = art.sample(linearClamp, float2(sq.x, -sq.y) / (2 * halfSize) + 0.5).rgb;
+    } else {
+        // No cover: the theme's colours, printed with a ring.
+        c = mix(u.stops[1].rgb, u.stops[2].rgb, saturate(0.5 + 0.5 * lq.y)) * 0.85;
+        c *= 0.85 + 0.15 * (1 - smoothstep(0.012, 0.03, abs(length(lq) - 0.55)));
+    }
+    // Ring wear: the record inside has rubbed a faint circle into the card.
+    c *= 1 + 0.10 * (1 - smoothstep(0.0, 0.035, abs(length(sq) - 0.82))) * smoothstep(0.75, 0.9, length(sq) / 0.86);
+    // Card: lit from the top left, a broad soft gloss across it, and its edge catching the light.
+    c *= 0.92 + 0.08 * saturate(0.5 - 0.35 * lq.x + 0.35 * lq.y);
+    c += float3(0.05) * pow(saturate(1 - abs(lq.x * 0.7 + lq.y + 0.25) * 1.6), 3.0);
+    c = mix(c, c * 0.6 + 0.25, (1 - smoothstep(0.0, 0.006, -d)) * 0.5);
+    s.colour = c;
+    return s;
+}
+
 fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], constant float *fine [[buffer(3)]],
                          texture2d<float> art [[texture(2)]], texture2d<float> overlay [[texture(0)]]) {
+    // g: the record's centre (px, y down), px per unit; h: the sleeve's centre (x, record units), in front 0 or 1,
+    // opacity 0…1, its turn (radians, anticlockwise)
     float2 size = u.a.xy;
-    float unit = 0.5 * min(size.x, size.y) * 0.92;
+    float unit = max(u.g.z, 1.0);
     bool showArm = u.c.w > 0.5;
-    float2 centre = size * 0.5 - float2(showArm ? unit * 0.18 * min(1.0, size.x / size.y) : 0, 0);
+    float2 centre = u.g.xy;
     float2 px = in.uv * size;
     float2 q = (px - centre) / unit;
     q.y = -q.y;                                    // y up
@@ -278,6 +354,22 @@ fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], cons
         col = mix(col, metal, edge);
         // The record's shadow on the platter.
         col *= 1 - 0.45 * smoothstep(recordR + 0.03, recordR, r) * edge;
+    }
+
+    // The sleeve, when it's behind the record: over the platter, under the record, which casts its shadow on it.
+    float sleeveOpacity = u.h.z, sleeveFront = u.h.y;
+    Sleeve sl = {0, float3(0), 0};
+    if (sleeveOpacity > 0.001) {
+        sl = sleeve(q, aa, u.h.x, u.h.w, u, art);
+        float behind = sleeveOpacity * (1 - sleeveFront);
+        if (behind > 0) {
+            col *= 1 - sl.shadow * behind;
+            // In the record's shade, a little darker than in front.
+            col = mix(col, sl.colour * 0.92, sl.coverage * behind);
+            // The record's own shadow on it: soft, all round its edge, a little more below.
+            float recordShadow = 1 - smoothstep(recordR - 0.02, recordR + 0.09, length(q - float2(0.004, -0.022)));
+            col *= 1 - 0.5 * recordShadow * sl.coverage * behind;
+        }
     }
 
     // The record.
@@ -339,6 +431,13 @@ fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], cons
     float spindle = 1 - smoothstep(0.022 - aa, 0.022 + aa, r);
     float3 spindleCol = float3(0.75, 0.75, 0.78) * (0.6 + 0.4 * smoothstep(0.022, 0.0, length(q - float2(-0.006, 0.006))));
     col = mix(col, spindleCol, spindle);
+
+    // The sleeve in front: the record is half out of it.
+    float inFront = sleeveOpacity * sleeveFront;
+    if (inFront > 0.001) {
+        col *= 1 - sl.shadow * inFront;
+        col = mix(col, sl.colour, sl.coverage * inFront);
+    }
 
     // The tonearm.
     // (Only near the arm: everywhere else it can't reach, shadow included.)
@@ -425,7 +524,7 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     float orb = 1 - smoothstep(core - 0.01, core + 0.01, r);
     float glow = exp(-max(0.0, r - core) / (0.05 + 0.15 * bass));
     col = mix(col, mix(u.stops[2].rgb, float3(1), 0.35 + 0.4 * pulse), orb * (0.6 + 0.4 * signal));
-    col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.3 + 0.7 * signal);
+    col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.4 + 0.6 * signal);
 
     // Strobe (only when switched on, never with Reduce Motion).
     col += float3(u.e.z) * 0.85;
@@ -434,6 +533,86 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     float4 ov = overlay.sample(linearClamp, in.uv);
     return overlayOver(col + dither(px), ov);
 }
+// MARK: Club: Waves
+// g: calm (Reduce Motion) 0/1, ripple phase (radians), sway clock (s), ripple size (record units)
+// rings[0…14]: the beams, worked out on the CPU each frame: aim (radians from straight up, clockwise), ripple
+// wavenumber, ripple phase at the emitter, level 0…1 (its part of the spectrum). Seven from the floor in the middle,
+// four from each top corner.
+
+static float fbm2(float2 p) { return 0.65 * noise(p) + 0.35 * noise(p * 2.03 + float2(1.7, 9.2)); }
+
+static float3 beamFan(float2 v, int first, int count, float amp, float haze, constant U &u) {
+    float3 light = float3(0);
+    float rho = length(v);
+    if (rho < 0.005) return light;
+    float theta = atan2(v.x, v.y);
+    float near = smoothstep(0.0, 0.1, rho) * exp(-rho * 0.4);
+    float grow = smoothstep(0.0, 0.7, rho);
+    float treble = u.b.z, sway = u.g.z;
+    float glowWidth = 0.025 + 0.03 * treble;
+    float coreWidth = 0.002 + 0.0035 * rho;
+    for (int i = first; i < first + count; i++) {
+        float4 beam = u.rings[i];
+        float da = theta - beam.x;
+        da -= 2 * M_PI_F * floor(da / (2 * M_PI_F) + 0.5);
+        if (abs(da) > 1.4) continue;                         // behind the emitter, or far round
+        float across = rho * sin(da);
+        if (abs(across) > amp + 7 * glowWidth) continue;     // too far for even its glow (under 0.1 %)
+        float phase = beam.y * rho + beam.z;
+        float lateral = amp * sin(phase) * grow;
+        float slope = amp * beam.y * cos(phase) * grow;
+        float d = abs(across - lateral) * rsqrt(1 + slope * slope);
+        float x = d / coreWidth;
+        float3 c = ramp(u, 0.62 + 0.36 * sin(float(i) * 2.3 + sway * 0.35));
+        light += c * (exp(-x * x) * (0.35 + 1.2 * beam.w) + exp(-d / glowWidth) * haze * (0.06 + 0.25 * beam.w));
+    }
+    return light * near;
+}
+
+fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]], texture2d<float> overlay [[texture(0)]]) {
+    float2 size = u.a.xy;
+    float unit = 0.5 * min(size.x, size.y);
+    float2 px = in.uv * size;
+    float2 q = (px - size * 0.5) / unit;
+    q.y = -q.y;
+    float halfW = 0.5 * size.x / unit, halfH = 0.5 * size.y / unit;
+    float bass = u.b.x, pulse = u.b.w;
+    float signal = u.e.w;
+    float calm = u.g.x;
+    float sway = u.g.z;
+    float amp = u.g.w;
+
+    // Haze drifting slowly through the room (round a wide circle, so it repeats with the clock); the beams light it.
+    float drift = sway * 0.35 / 30;
+    float fog = fbm2(q * 1.2 + 30 * float2(cos(drift), 0.63 * sin(drift)));
+    float haze = 0.35 + 1.1 * fog * fog;
+    float3 col = u.stops[0].rgb * (0.30 + 0.35 * fog);
+
+    // From the floor in the middle, fanning up; from the top corners, crossing down.
+    float2 floorAt = float2(0, -halfH - 0.05);
+    float3 light = beamFan(q - floorAt, 0, 7, amp, haze, u);
+    light += beamFan(q - float2(-halfW + 0.15, halfH + 0.05), 7, 4, amp, haze, u);
+    light += beamFan(q - float2(halfW - 0.15, halfH + 0.05), 11, 4, amp, haze, u);
+
+    // A sheet of light across the room above, rolling like a slow sea, swelling with the bass.
+    float sea = 0.62 * halfH + 0.06 * sin(q.x * 1.7 - u.g.y * 0.5) + 0.035 * sin(q.x * 3.9 + sway * 1.4) * (0.5 + bass);
+    float sd = q.y - sea;
+    float sheet = exp(-sd * sd / 0.00012) * 0.5 + exp(-abs(sd) / 0.05) * 0.12 * haze + step(sd, 0.0) * exp(sd / 0.25) * 0.05 * haze;
+    light += ramp(u, 0.75) * sheet * (0.3 + 0.7 * bass) * smoothstep(halfW + 0.1, halfW * 0.4, abs(q.x));
+
+    // Paused or silent, the beams rest faintly where they are (as Classic keeps its core), so the window isn't black.
+    col += light * (0.7 + 0.45 * bass + 0.25 * pulse * (1 - calm)) * (0.4 + 0.6 * signal);
+    // The emitter on the floor glows with the bass.
+    col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass) * (0.35 + 0.65 * signal);
+
+    // Strobe (only when switched on, never with Reduce Motion).
+    col += float3(u.e.z) * 0.85;
+    col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
+    col = col / (1 + max(max(col.r, col.g), col.b) * 0.25);
+    float4 ov = overlay.sample(linearClamp, in.uv);
+    return overlayOver(col + dither(px), ov);
+}
+
 // MARK: Trails (scope and particles)
 // Both draw light additively into a half-float texture that fades a little every frame, as phosphor or a long
 // exposure would, and the style's own pass then lays it over its background.
@@ -712,7 +891,10 @@ kernel void vz_particles_step(device Particle *particles [[buffer(0)]], constant
     }
     x += v * dt;
     float life = p.m.y - dt;
-    if (life <= 0 || abs(x.x) > aspect + 0.15 || abs(x.y) > 1.15) {
+    // Gone past the window's edges (its half width and height in the field's units, a unit being half its shorter
+    // side: so a tall window is taller than 1, not narrower).
+    float2 halfSize = float2(max(aspect, 1.0), max(1.0 / max(aspect, 1e-3), 1.0));
+    if (life <= 0 || abs(x.x) > halfSize.x + 0.15 || abs(x.y) > halfSize.y + 0.15) {
         // Born again somewhere in the disc.
         float h1 = hash21(float2(float(id) * 0.0131, fract(time * 0.173) * 97.0 + p.m.z));
         float h2 = hash21(float2(fract(time * 0.371) * 53.0 + p.m.z, float(id) * 0.0713));

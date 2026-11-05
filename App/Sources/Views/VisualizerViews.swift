@@ -57,6 +57,35 @@ extension VisualizerScopeMode {
     }
 }
 
+extension VisualizerSpectrumMode {
+    var label: String {
+        switch self {
+        case .classic: String(localized: "Classic", comment: "Visualizer mode: the original look of a style (Spectrum: bars with peak caps; Club: rings and lasers).")
+        case .noPeaks: String(localized: "No Peaks", comment: "Visualizer Spectrum mode: the bars without the small marks that hold each bar's peak.")
+        case .smooth: String(localized: "Smooth", comment: "Visualizer Spectrum mode: softer, flowing bars joined by a curve.")
+        }
+    }
+}
+
+extension VisualizerClubMode {
+    var label: String {
+        switch self {
+        case .classic: String(localized: "Classic", comment: "Visualizer mode: the original look of a style (Spectrum: bars with peak caps; Club: rings and lasers).")
+        case .waves: String(localized: "Waves", comment: "Visualizer Club mode: wavy laser beams drifting through haze.")
+        }
+    }
+}
+
+extension VisualizerVinylCover {
+    var label: String {
+        switch self {
+        case .label: String(localized: "On the Label", comment: "Visualizer Vinyl option: the album cover shown only as the record's centre label.")
+        case .sleeveFront: String(localized: "Sleeve in Front", comment: "Visualizer Vinyl option: the album cover on its sleeve, in front of the record, which is half out of it.")
+        case .sleeveBehind: String(localized: "Sleeve Behind", comment: "Visualizer Vinyl option: the album cover on its sleeve, behind the record, which lies half over it.")
+        }
+    }
+}
+
 extension VisualizerMirrorLayout {
     var label: String {
         switch self {
@@ -213,9 +242,9 @@ struct VisualizerWindow: View {
                 holder.renderer?.resetStats()
                 try? await Task.sleep(for: .seconds(10))
                 let feed = model.visualizer.feed.stats, gpu = holder.renderer?.gpuStats ?? .init()
-                print(String(format: "visualizer %@: analysis %.1f µs/frame (%d frames, %d dropped), GPU %.2f ms/frame, %.0f frames/s",
+                print(String(format: "visualizer %@: analysis %.1f µs/frame (%d frames, %d dropped), GPU %.2f ms/frame, CPU %.1f µs/frame, %.0f frames/s",
                              model.settings.visualizer.style.rawValue, feed.averageMicroseconds, feed.frames, feed.dropped,
-                             gpu.averageMilliseconds, Double(gpu.frames) / 10))
+                             gpu.averageMilliseconds, gpu.averageCPUMilliseconds * 1000, Double(gpu.frames) / 10))
             }
         }
     }
@@ -296,8 +325,10 @@ struct VisualizerControls: View {
     @ViewBuilder private var options: some View {
         switch settings.style {
         case .bars:
+            Picker("Mode", selection: $settings.spectrumMode) {
+                ForEach(VisualizerSpectrumMode.allCases) { Text($0.label).tag($0) }
+            }
             Toggle("Decibel Scale", isOn: $settings.decibelScale)
-            Toggle("Peak Caps", isOn: $settings.peakCaps)
             Picker("Bands", selection: $settings.bandCount) {
                 ForEach(VisualizerSettings.bandCounts, id: \.self) { Text(verbatim: "\($0)").tag($0) }
             }
@@ -306,12 +337,19 @@ struct VisualizerControls: View {
                 ForEach([6.0, 12, 20, 30], id: \.self) { Text("\(String(Int($0))) s", comment: "Spectrogram history length, e.g. 12 s").tag($0) }
             }
         case .vinyl:
+            // Clicking the cover in the picture goes through these in turn.
+            Picker("Cover", selection: $settings.vinylCover) {
+                ForEach(VisualizerVinylCover.allCases) { Text($0.label).tag($0) }
+            }
             Toggle("Tonearm", isOn: $settings.tonearm)
             Picker("Speed", selection: $settings.rpm) {
                 Text("33⅓ RPM").tag(100.0 / 3)
                 Text("45 RPM").tag(45.0)
             }
         case .club:
+            Picker("Mode", selection: $settings.clubMode) {
+                ForEach(VisualizerClubMode.allCases) { Text($0.label).tag($0) }
+            }
             StrobeToggle(settings: $settings, asking: $askingStrobe, reduceMotion: reduceMotion, dimFlashing: dimFlashing)
             Text("May trigger seizures in people with photosensitive epilepsy.")
         case .scope:
@@ -357,6 +395,12 @@ struct VisualizerMetalView: NSViewRepresentable {
         view.enableSetNeedsDisplay = false
         view.delegate = renderer
         view.visualizer = model.visualizer
+        // Vinyl: a click on the album cover moves it to its next place (label, sleeve in front, sleeve behind).
+        view.coverHit = { [weak renderer] point, size in renderer?.vinylCoverHit(at: point, in: size) ?? false }
+        view.coverClicked = { [weak model] in
+            guard let model else { return }
+            model.settings.visualizer.vinylCover = model.settings.visualizer.vinylCover.next
+        }
         renderer.frameSource = { [weak model, weak view] in
             view?.drawCount += 1
             guard let model else { return (.silent(bands: 64, fine: 512), VisualizerScene()) }
@@ -381,6 +425,48 @@ struct VisualizerMetalView: NSViewRepresentable {
 final class VisualizerMTKView: MTKView {
     weak var visualizer: VisualizerModel?
     private var showing = false
+    /// Whether a point (in points, y down, in a view of the size given) is on something that takes clicks: the Vinyl
+    /// style's album cover. A click there calls `coverClicked`; anywhere else it goes on as before (the window moves by
+    /// its background).
+    var coverHit: ((CGPoint, CGSize) -> Bool)?
+    var coverClicked: (() -> Void)?
+    /// Where the button went down on the cover; it's a click if it comes up on the cover, not far from there.
+    private var pressedAt: CGPoint?
+
+    /// The event's point in the view's own points, y down.
+    private func viewPoint(_ event: NSEvent) -> CGPoint {
+        let p = convert(event.locationInWindow, from: nil)
+        return CGPoint(x: p.x, y: isFlipped ? p.y : bounds.height - p.y)
+    }
+
+    private func onCover(_ point: CGPoint) -> Bool { coverHit?(point, bounds.size) ?? false }
+
+    override func mouseDown(with event: NSEvent) {
+        let point = viewPoint(event)
+        guard onCover(point) else {
+            pressedAt = nil
+            super.mouseDown(with: event)
+            return
+        }
+        pressedAt = point
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard let start = pressedAt else { super.mouseDragged(with: event); return }
+        // Dragged from the cover rather than clicked: it moves the window, as a drag anywhere else does.
+        let point = viewPoint(event)
+        if hypot(point.x - start.x, point.y - start.y) >= 6 {
+            pressedAt = nil
+            window?.performDrag(with: event)
+        }
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        guard let start = pressedAt else { super.mouseUp(with: event); return }
+        pressedAt = nil
+        let point = viewPoint(event)
+        if hypot(point.x - start.x, point.y - start.y) < 6, onCover(point) { coverClicked?() }
+    }
     nonisolated(unsafe) private var observers: [NSObjectProtocol] = []
 
     override func viewDidMoveToWindow() {

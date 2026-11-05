@@ -74,4 +74,83 @@ enum VisualizerLayout {
         let p = pivot(of: face), a = angle(travel: travel), r = radius * face.height
         return CGPoint(x: p.x + r * sin(a), y: p.y - r * cos(a))
     }
+
+    // MARK: Vinyl
+
+    // The turntable in the record's own units (y up, the record's centre at 0): the record, the platter, the ring of
+    // light round it, the label, and the sleeve. Where the sleeve rests follows MD Vinyl's (Alex's references): in front,
+    // upright, a touch larger than the record (as an LP's is) and level with it, its right edge through the record's
+    // centre, so the record shows half out of it; behind, the same sleeve further left, turned 4° anticlockwise, the
+    // record lying over its right edge.
+    static let recordRadius: CGFloat = 0.86
+    static let labelRadius: CGFloat = 0.31
+    static let platterRadius: CGFloat = 0.95
+    static let sleeveHalf: CGFloat = 0.883
+    /// The sleeve's centre in front (`place` 0) and behind (1), and how far it's turned behind (radians, anticlockwise).
+    static let sleeveCentre: CGFloat = -0.883
+    static let sleeveBehindCentre: CGFloat = -1.385
+    static let sleeveBehindTilt: CGFloat = 4 * .pi / 180
+    /// How far right the tonearm reaches (its pivot, plate and counterweight), and the ring of light either side.
+    static let armReach: CGFloat = 1.22
+    static let ringReach: CGFloat = 1.0
+
+    /// The song's title and artist, bottom left (see `VisualizerOverlay`): the height the sleeve keeps clear of, in points.
+    static let vinylTitleRoom: CGFloat = 86
+
+    /// Where the sleeve rests (`place` 0 in front, 1 behind, between the two on the way), before it's slid `offset`
+    /// to the left or right: its centre and how far it's turned.
+    static func sleeveRest(place: CGFloat) -> (x: CGFloat, tilt: CGFloat) {
+        let p = min(max(place.isFinite ? place : 0, 0), 1)
+        return (sleeveCentre + (sleeveBehindCentre - sleeveCentre) * p, sleeveBehindTilt * p)
+    }
+
+    /// How far the sleeve reaches either side of its centre, turned by `tilt` (its corners).
+    static func sleeveReach(tilt: CGFloat) -> CGFloat { sleeveHalf * (cos(tilt) + abs(sin(tilt))) }
+
+    /// Where the record's centre is and how many pixels (or points) one of its units is, in a window of `size`. Without
+    /// a sleeve (`sleeve` 0) it's as it always was; with one (1) the whole turntable moves right, and shrinks if it must,
+    /// so that the sleeve on its left, the record and the tonearm sit together in the middle of the window, as in MD
+    /// Vinyl, with the sleeve's bottom above the song's title (`titleRoom`, in the same units as `size`; 0 with no
+    /// title). In between while the sleeve comes or goes; `place` is where it rests (0 in front, 1 behind).
+    static func vinyl(in size: CGSize, tonearm: Bool, sleeve: CGFloat, place: CGFloat = 0,
+                      titleRoom: CGFloat = 0) -> (centre: CGPoint, unit: CGFloat) {
+        let w = max(size.width, 1), h = max(size.height, 1)
+        var unit0 = 0.5 * min(w, h) * 0.92
+        var centre0 = CGPoint(x: w * 0.5 - (tonearm ? unit0 * 0.18 * min(1, w / h) : 0), y: h * 0.5)
+        let right = tonearm ? armReach : ringReach
+        // In a window not much wider than it's high (or narrower), the ring of light (left) or the tonearm (right)
+        // would reach past its edges: there the turntable is made to fit, centred with its arm.
+        if centre0.x - ringReach * unit0 < 0 || centre0.x + right * unit0 > w {
+            unit0 = min(unit0, 0.98 * w / (ringReach + right))
+            centre0.x = w * 0.5 - (right - ringReach) * 0.5 * unit0
+        }
+        let t = min(max(sleeve.isFinite ? sleeve : 0, 0), 1)
+        guard t > 0 else { return (centre0, unit0) }
+        let rest = sleeveRest(place: place), reach = sleeveReach(tilt: rest.tilt)
+        let left = rest.x - reach - 0.04
+        let room = max(0, titleRoom.isFinite ? titleRoom : 0), edge = 0.02 * h
+        // The ring of light reaches 1 above and below the centre, the sleeve `reach` below it.
+        let unit1 = max(1, min(unit0, 0.96 * w / (right - left), (h - room - edge) / (1 + reach)))
+        let centre1 = CGPoint(x: w * 0.5 - (left + right) * 0.5 * unit1, y: min(h * 0.5, h - room - reach * unit1))
+        // Eased, so the turntable starts and stops moving gently.
+        let e = t * t * (3 - 2 * t)
+        return (CGPoint(x: centre0.x + (centre1.x - centre0.x) * e, y: centre0.y + (centre1.y - centre0.y) * e), unit0 + (unit1 - unit0) * e)
+    }
+
+    /// Whether a click at `point` (y down, in the same units as `size`) is on the album cover: on the record's label,
+    /// or on as much of the sleeve as shows.
+    static func vinylCoverHit(_ point: CGPoint, in size: CGSize, tonearm: Bool, pose: VisualizerCoverPose, titleRoom: CGFloat = 0) -> Bool {
+        let (centre, unit) = vinyl(in: size, tonearm: tonearm, sleeve: CGFloat(pose.layout), place: CGFloat(pose.place),
+                                   titleRoom: titleRoom)
+        let q = CGPoint(x: (point.x - centre.x) / unit, y: -(point.y - centre.y) / unit)
+        let r = (q.x * q.x + q.y * q.y).squareRoot()
+        if r <= labelRadius { return true }
+        guard pose.opacity > 0.5 else { return false }
+        // Into the sleeve's own frame: from its centre, turned back.
+        let rest = sleeveRest(place: CGFloat(pose.place))
+        let dx = q.x - (rest.x + CGFloat(pose.offset)), c = cos(rest.tilt), s = sin(rest.tilt)
+        let onSleeve = abs(c * dx + s * q.y) <= sleeveHalf && abs(-s * dx + c * q.y) <= sleeveHalf
+        // Behind the record, only the part the record doesn't cover.
+        return onSleeve && (pose.front > 0.5 || r > recordRadius)
+    }
 }

@@ -48,6 +48,49 @@ public enum VisualizerMeterKind: String, CaseIterable, Codable, Sendable, Identi
     public var id: String { rawValue }
 }
 
+/// How the Spectrum style draws its bars.
+public enum VisualizerSpectrumMode: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// The bars with held peak caps that fall away after a moment.
+    case classic
+    /// The same bars, without the peak caps.
+    case noPeaks
+    /// Softer and flowing: the bars move as springs and with their neighbours, rounded at the top, joined by a curve.
+    case smooth
+
+    public var id: String { rawValue }
+}
+
+/// How the Club style draws.
+public enum VisualizerClubMode: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// The core, the circular spectrum, the beat rings and the turning fans of lasers.
+    case classic
+    /// Wavy laser beams through drifting haze, swaying with the music.
+    case waves
+
+    public var id: String { rawValue }
+}
+
+/// Where the Vinyl style shows the album cover. Clicking the cover goes to the next.
+public enum VisualizerVinylCover: String, CaseIterable, Codable, Sendable, Identifiable {
+    /// As the record's label only.
+    case label
+    /// On its sleeve, in front of the record, which is half out of it.
+    case sleeveFront
+    /// On its sleeve, behind the record, which lies half over it.
+    case sleeveBehind
+
+    public var id: String { rawValue }
+
+    /// The next placement, as a click on the cover moves it: label, sleeve in front, sleeve behind, and round again.
+    public var next: VisualizerVinylCover {
+        switch self {
+        case .label: .sleeveFront
+        case .sleeveFront: .sleeveBehind
+        case .sleeveBehind: .label
+        }
+    }
+}
+
 /// How the mirrored bars are laid out.
 public enum VisualizerMirrorLayout: String, CaseIterable, Codable, Sendable, Identifiable {
     /// Around a circle, low notes at the top, the album cover in the middle.
@@ -109,17 +152,21 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
     /// Bars: in dB (true) or linear amplitude.
     public var decibelScale = true
     public var bandCount = 64
+    /// Mirrored bars: held peak caps. (Spectrum has its own, in `spectrumMode`.)
     public var peakCaps = true
+    public var spectrumMode: VisualizerSpectrumMode = .classic
     /// Seconds of history across the spectrogram.
     public var spectrogramSeconds: Double = 12
     public var tonearm = true
     /// Record speed: 33⅓ or 45.
     public var rpm: Double = 100.0 / 3
+    public var vinylCover: VisualizerVinylCover = .label
     /// Full-window flashes on strong beats (club). Off by default; only on once the photosensitivity warning has been
     /// accepted, and never while Reduce Motion or Dim Flashing Lights is on.
     public var strobe = false
     /// The strobe's photosensitivity warning was read and accepted (it's shown once, the first time it's turned on).
     public var strobeWarningAccepted = false
+    public var clubMode: VisualizerClubMode = .classic
     public var scopeMode: VisualizerScopeMode = .goniometer
     public var meterKind: VisualizerMeterKind = .vu
     /// The level that reads 0 VU (and PPM 4), in dBFS for a sine; nil follows the music's own loudness.
@@ -141,6 +188,7 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
     enum CodingKeys: String, CodingKey {
         case style, theme, sensitivity, decibelScale, bandCount, peakCaps, spectrogramSeconds, tonearm, rpm, strobe, showsTrackInfo
         case strobeWarningAccepted, scopeMode, meterKind, meterReference, mirrorLayout, particleTrails
+        case spectrumMode, clubMode, vinylCover
     }
 
     public init(from decoder: Decoder) throws {
@@ -163,6 +211,10 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
         meterReference = (try? c.decodeIfPresent(Double.self, forKey: .meterReference)) ?? d.meterReference
         mirrorLayout = (try? c.decodeIfPresent(VisualizerMirrorLayout.self, forKey: .mirrorLayout)) ?? d.mirrorLayout
         particleTrails = (try? c.decodeIfPresent(Bool.self, forKey: .particleTrails)) ?? d.particleTrails
+        // Before the modes, Peak Caps was one switch for Spectrum and Mirrored: switched off, Spectrum stays without them.
+        spectrumMode = (try? c.decodeIfPresent(VisualizerSpectrumMode.self, forKey: .spectrumMode)) ?? (peakCaps ? d.spectrumMode : .noPeaks)
+        clubMode = (try? c.decodeIfPresent(VisualizerClubMode.self, forKey: .clubMode)) ?? d.clubMode
+        vinylCover = (try? c.decodeIfPresent(VisualizerVinylCover.self, forKey: .vinylCover)) ?? d.vinylCover
         self = normalized
     }
 

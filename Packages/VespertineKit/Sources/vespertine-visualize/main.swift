@@ -9,7 +9,10 @@
 // Styles: vinyl (the default), bars, spectrogram, club, scope, meters, particles, mirrored. Themes: vespertine (the
 // default), brass, neon, aurora, ember, ice, mono, art (the colours of --art's cover; the default's without one).
 // Per style: --scope goniometer|oscilloscope, --meter vu|ppm, --reference <dBFS> (meters; automatic without),
-// --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted).
+// --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted),
+// --spectrum classic|noPeaks|smooth (bars), --club classic|waves, --cover label|sleeveFront|sleeveBehind (vinyl),
+// --calm (as with Reduce Motion), --cycle-cover <s> (vinyl: the cover moves on every <s> seconds, as a click does),
+// --frames <dir> (with --start/--seconds: every frame as a PNG there). --no-peaks takes the peak caps off Spectrum and Mirrored alike.
 //
 // Prints the analysis and GPU time per frame to stderr.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -36,6 +39,9 @@ struct Options {
     var png: String?
     var duration: Double?
     var paused = false
+    var calm = false
+    var cycleCover: Double?
+    var frames: String?
 }
 
 func parse() -> Options {
@@ -53,7 +59,13 @@ func parse() -> Options {
         case "--sensitivity": o.settings.sensitivity = Double(next()) ?? 1
         case "--bands": o.settings.bandCount = Int(next()) ?? 64
         case "--linear": o.settings.decibelScale = false
-        case "--no-peaks": o.settings.peakCaps = false
+        case "--no-peaks": o.settings.peakCaps = false; o.settings.spectrumMode = .noPeaks
+        case "--spectrum": o.settings.spectrumMode = VisualizerSpectrumMode(rawValue: next()) ?? .classic
+        case "--club": o.settings.clubMode = VisualizerClubMode(rawValue: next()) ?? .classic
+        case "--cover": o.settings.vinylCover = VisualizerVinylCover(rawValue: next()) ?? .label
+        case "--calm": o.calm = true
+        case "--cycle-cover": o.cycleCover = Double(next())
+        case "--frames": o.frames = next()
         case "--no-tonearm": o.settings.tonearm = false
         case "--strobe": o.settings.strobe = true; o.settings.strobeWarningAccepted = true
         case "--scope": o.settings.scopeMode = VisualizerScopeMode(rawValue: next()) ?? .goniometer
@@ -115,6 +127,7 @@ func run() -> Int32 {
         return 1
     }
     renderer.settings = o.settings
+    renderer.reduceMotion = o.calm
     if let art = o.art, let image = NSImage(contentsOfFile: art)?.cgImage(forProposedRect: nil, context: nil, hints: nil) {
         renderer.setArtwork(image)
         renderer.setAlbumPalette(AlbumArtPalette.extract(from: image), animated: false)
@@ -137,6 +150,8 @@ func run() -> Int32 {
     var analysisTime = 0.0, rendered = 0
     var t = from
     var last: [UInt8]?
+    var nextCycle = o.cycleCover.map { (o.still ?? o.start) + $0 }
+    var written = 0
     renderer.resetStats()
     while t <= until + dt / 2 {
         let end = Int(t * o.rate)
@@ -152,20 +167,28 @@ func run() -> Int32 {
         }
         analysisTime += Date().timeIntervalSince(clock)
         let scene = VisualizerScene(title: o.title, artist: o.artist, progress: min(1, max(0, t / total)), isPlaying: !o.paused)
+        if let every = o.cycleCover, let at = nextCycle, t >= at - dt / 2 {
+            renderer.settings.vinylCover = renderer.settings.vinylCover.next
+            nextCycle = at + every
+        }
         let visible = t >= (o.still ?? o.start) - dt / 2
         guard let bytes = renderer.renderOffscreen(frame: frame, scene: scene, size: o.size, scale: o.scale, dt: dt) else { return 1 }
         rendered += 1
         if visible {
             last = bytes
             if o.raw { bytes.withUnsafeBytes { stdout.write(Data($0)) } }
+            if let dir = o.frames {
+                writePNG(bytes, size: o.size, to: (dir as NSString).appendingPathComponent(String(format: "%05d.png", written)))
+                written += 1
+            }
         }
         t += dt
     }
     if let png = o.png, let last { writePNG(last, size: o.size, to: png) }
     let stats = renderer.gpuStats
-    FileHandle.standardError.write(String(format: "frames %d, analysis %.1f µs/frame, GPU %.2f ms/frame at %dx%d\n",
+    FileHandle.standardError.write(String(format: "frames %d, analysis %.1f µs/frame, GPU %.3f ms/frame, CPU (motion + encode) %.1f µs/frame at %dx%d\n",
                                           rendered, analysisTime / Double(max(rendered, 1)) * 1e6, stats.averageMilliseconds,
-                                          Int(o.size.width), Int(o.size.height)).data(using: .utf8)!)
+                                          stats.averageCPUMilliseconds * 1000, Int(o.size.width), Int(o.size.height)).data(using: .utf8)!)
     return 0
 }
 
