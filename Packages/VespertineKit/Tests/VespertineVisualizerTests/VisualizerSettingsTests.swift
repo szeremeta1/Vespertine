@@ -246,6 +246,30 @@ struct VisualizerRendererTests {
         #expect(points(1, 1).count == 1024)
     }
 
+    @Test("Goniometer: the automatic gain keeps every trace inside the circle, mono and wide alike")
+    func goniometerStaysInside() {
+        var frame = VisualizerFrame.silent(bands: 64, fine: 512)
+        let size = CGSize(width: 800, height: 600)
+        let g = VisualizerLayout.goniometer(in: size)
+        let c = SIMD2(Float(g.centre.x), Float(g.centre.y))
+        for (l, r) in [(Float(1), Float(1)), (1, 0), (0, 1), (1, -1), (1, 0.5)] {
+            frame.stereo = (0..<VisualizerFrame.stereoCount).map { i in
+                let s = Float(sin(Double(i) * 0.05)) * 0.9
+                return SIMD2(s * l, s * r)
+            }
+            let peak = VisualizerRenderer.scopePeak(frame.stereo, mode: .goniometer)
+            let gain = VisualizerRenderer.scopeGain(envelope: peak, sensitivity: 1)
+            var out: [SIMD4<Float>] = []
+            VisualizerRenderer.scopePoints(frame: frame, mode: .goniometer, size: size, scale: 1, gain: gain, brightness: 1, into: &out)
+            let far = out.map { simd_length(SIMD2($0.x, $0.y) - c) }.max()!
+            #expect(far <= Float(g.radius) * 0.81, "L \(l) R \(r): \(far) of \(g.radius)")
+            #expect(far >= Float(g.radius) * 0.79, "L \(l) R \(r): \(far) of \(g.radius)")   // and still fills it
+        }
+        // The oscilloscope keeps its own measure: the louder channel's peak.
+        let wide = [SIMD2<Float>(0.5, -0.25), SIMD2(-0.1, 0.4)]
+        #expect(VisualizerRenderer.scopePeak(wide, mode: .oscilloscope) == 0.5)
+    }
+
     @Test("Oscilloscope: each sweep starts on a rising zero crossing, left above right")
     func oscilloscope() {
         var frame = VisualizerFrame.silent(bands: 64, fine: 512)

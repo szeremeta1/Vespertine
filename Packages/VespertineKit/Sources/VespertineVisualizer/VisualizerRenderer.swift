@@ -708,14 +708,28 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
     }
 
+    /// The peak the automatic gain follows. The oscilloscope draws each channel alone, so the louder channel's peak.
+    /// The goniometer draws the pair as one point, which lies |(L, R)| from the centre (√2 farther for mono than for
+    /// one channel alone), so the longest of those: else mono and out-of-phase music ran past the circle.
+    static func scopePeak<S: Sequence>(_ samples: S, mode: VisualizerScopeMode) -> Float where S.Element == SIMD2<Float> {
+        var peak: Float = 0
+        switch mode {
+        case .goniometer: for p in samples { peak = max(peak, simd_length_squared(p)) }; return peak.squareRoot()
+        case .oscilloscope: for p in samples { peak = max(peak, abs(p.x), abs(p.y)) }; return peak
+        }
+    }
+
+    static func scopeGain(envelope: Float, sensitivity: Double) -> Float {
+        Float(sensitivity) * 0.8 / max(envelope, 0.0316)
+    }
+
     private func encodeScope(_ buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
                              size: CGSize, scale: CGFloat, dt: Double) {
         guard let trail = prepareTrail(size: size, for: .scope, buffer: buffer), let beamPipeline, !beamBuffers.isEmpty else { return }
         // Automatic gain: up at once to the newest peak, back down over a couple of seconds, at most +30 dB.
-        var peak: Float = 0
-        for p in frame.stereo.suffix(1024) { peak = max(peak, abs(p.x), abs(p.y)) }
+        let peak = Self.scopePeak(frame.stereo.suffix(1024), mode: settings.scopeMode)
         scopeEnvelope = max(peak, scopeEnvelope * Float(exp(-dt / 2)))
-        let gain = Float(settings.sensitivity) * 0.8 / max(scopeEnvelope, 0.0316)
+        let gain = Self.scopeGain(envelope: scopeEnvelope, sensitivity: settings.sensitivity)
         let goniometer = settings.scopeMode == .goniometer
         // Every sample leaves the same light whatever the frame rate: the goniometer redraws the newest 1,024
         // samples each frame, so each is drawn about 1,024 / (new samples per frame) times.
