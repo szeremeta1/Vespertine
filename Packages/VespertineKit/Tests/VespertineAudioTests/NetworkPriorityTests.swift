@@ -16,13 +16,37 @@ private final class SlowLink: @unchecked Sendable {
     private let lock = NSLock()
     private var log: [(kind: Kind, at: Date)] = []
     private var order: [Kind] = []
+    private var held: DispatchSemaphore?
+    private var arrived = DispatchSemaphore(value: 0)
+    private var onPlayback: ((Int) -> Void)?
 
     init(latency: TimeInterval) { self.latency = latency }
 
+    /// The next scan request stalls on its way to the wire (a starved thread, a busy queue) until `release`.
+    func holdNextScan() -> DispatchSemaphore {
+        let hold = DispatchSemaphore(value: 0)
+        lock.withLock { held = hold }
+        return hold
+    }
+
+    /// Blocks until the held scan request has reached the point of waiting.
+    func waitUntilHeld() { arrived.wait() }
+
+    /// Runs `body` with the number of song requests that have gone over the link, after each one.
+    func afterEachPlayback(_ body: @escaping (Int) -> Void) { lock.withLock { onPlayback = body } }
+
     func request(_ kind: Kind) {
+        if kind == .scan, let hold = lock.withLock({ () -> DispatchSemaphore? in defer { held = nil }; return held }) {
+            arrived.signal()
+            hold.wait()
+        }
         wire.sync {
             Thread.sleep(forTimeInterval: latency)
             lock.withLock { log.append((kind, Date())); order.append(kind) }
+        }
+        if kind == .playback {
+            let (hook, songs) = lock.withLock { (onPlayback, order.filter { $0 == .playback }.count) }
+            hook?(songs)
         }
     }
 
@@ -132,6 +156,33 @@ struct NetworkPriorityTests {
         #expect(songs.count == Self.chunks, "the song's copy didn't go over the link in full: \(wire)")
         guard let first = songs.first, let last = songs.last else { return }
         #expect(first <= 2, "\(first) scan requests went first over the link after play was pressed: \(wire)")
+        let between = wire[first...last].filter { $0 == .scan }.count
+        #expect(between == 0, "\(between) scan requests went over the link in the middle of the song's copy: \(wire)")
+    }
+
+    @Test("A scan request admitted before play was pressed may still reach the link late, in the middle of the copy")
+    func admittedScanLandsLate() async throws {
+        let link = SlowLink(latency: Self.latency)
+        let gate = ShareIOGate()
+        gate.maxInFlight = ShareIOGate.whileStreaming
+
+        // One scan request has been admitted (the gate lets one through) but is stuck before the wire, as it is on
+        // a starved machine; it is let go once the song's fourth read is over.
+        let hold = link.holdNextScan()
+        link.afterEachPlayback { if $0 == 4 { hold.signal() } }
+        let scan = ScanLoad(link: link, gate: gate, width: 1)
+        defer { Task { await scan.stop() } }
+        link.waitUntilHeld()
+        #expect(gate.running == 1)
+
+        let pressed = link.position
+        try copySong(link: link, gate: gate)
+        let wire = link.sequence(from: pressed)
+        await scan.stop()
+
+        let songs = wire.indices.filter { wire[$0] == .playback }
+        #expect(songs.count == Self.chunks, "the song's copy didn't go over the link in full: \(wire)")
+        guard let first = songs.first, let last = songs.last else { return }
         let between = wire[first...last].filter { $0 == .scan }.count
         #expect(between == 0, "\(between) scan requests went over the link in the middle of the song's copy: \(wire)")
     }
