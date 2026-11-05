@@ -50,27 +50,28 @@ struct MultichannelLoopbackTests {
         return (output, rate)
     }
 
-    static func settings(_ output: OutputDevice, spatial: SpatialMode, policy: RatePolicy = .matchSource) -> EngineSettings {
+    static func settings(_ output: OutputDevice, spatial: SpatialMode, policy: RatePolicy = .matchSource, spatializeStereo: Bool = false) -> EngineSettings {
         var settings = EngineSettings()
         settings.exclusive = false
         settings.deviceUID = output.uid
         settings.deviceName = output.name
         settings.ratePolicies = [output.uid: policy]
         settings.spatialModes = [output.uid: spatial]
+        if spatializeStereo { settings.spatializeStereoUIDs = [output.uid] }
         return settings
     }
 
     /// Plays `url` on `output` and returns the recording (one array per input channel), the device rate seen while
     /// playing, and the signal path.
     static func play(_ url: URL, on output: OutputDevice, rate: Double, spatial: SpatialMode = .off, seconds: Double, item: PlayableItem? = nil,
-                     policy: RatePolicy = .matchSource)
+                     policy: RatePolicy = .matchSource, spatializeStereo: Bool = false)
         throws -> (recorded: [[Float]], rates: Set<Double>, path: SignalPath?, discontinuities: Int) {
         try DeviceControl.setNominalRate(rate, on: output.id)
         let recorder = try LoopbackRecorder(device: output.id, rate: rate, maxChannels: 16)
         try recorder.start()
         defer { recorder.restore() }
         let engine = PlaybackEngine()
-        engine.update(settings: settings(output, spatial: spatial, policy: policy))
+        engine.update(settings: settings(output, spatial: spatial, policy: policy, spatializeStereo: spatializeStereo))
         Thread.sleep(forTimeInterval: 0.2)
         recorder.drain()
         engine.play(item ?? PlayableItem(url: url))
@@ -194,5 +195,33 @@ struct MultichannelLoopbackTests {
                                       from: first + Int(rate * 0.3), count: Int(rate * 0.6))
         #expect(carried == Array(0..<6) + Array(repeating: -1, count: channels - 6), "\(ext) at \(rate) Hz: \(carried)")
         print("dsd \(ext): \(rate) Hz, outputs carried \(carried)")
+    }
+
+    @Test("Spatialize stereo on the device: a stereo file upmixed to outputs 1–6 (the middle on C), the rest silent; off, untouched",
+          arguments: [true, false])
+    func spatializeStereo(_ on: Bool) throws {
+        let (output, originalRate) = try Self.device()
+        defer { try? DeviceControl.setNominalRate(originalRate, on: output.id) }
+        let rate = 48_000.0
+        let url = try StereoSpatializeTests.write(rate: rate, seconds: 1.5)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let run = try Self.play(url, on: output, rate: rate, seconds: 1.5, spatializeStereo: on)
+        #expect(run.rates == [rate])
+        if let path = run.path { #expect(path.plan.upmix == on && path.plan.channels == (on ? 6 : 2), "\(path.plan)") }
+        let rec = run.recorded
+        let first = try #require(rec[0].indices.first { abs(rec[0][$0]) > 1e-4 || abs(rec[2][$0]) > 1e-4 }, "nothing recorded")
+        let from = first + Int(rate * 0.4), count = Int(rate * 0.6)
+        try #require(from + count <= rec[0].count)
+        func level(_ ch: Int, _ hz: Double) -> Double { SpatialProbe.level(rec[ch], stride: 1, offset: 0, frequency: hz, rate: rate, from: from, count: count) }
+        let silentFrom = on ? 6 : 2
+        for ch in silentFrom..<rec.count { #expect(rec[ch].allSatisfy { $0 == 0 }, "output \(ch + 1) isn't silent") }
+        if on {
+            #expect(abs(level(2, 1_000) / (0.1 * 2.0.squareRoot()) - 1) < 0.03, "C: \(level(2, 1_000))")
+            #expect(level(0, 1_000) < 0.001 && level(1, 1_000) < 0.001)
+            #expect(abs(level(0, 600) / 0.1 - 1) < 0.03, "L: \(level(0, 600))")
+            print("spatialize on: C 1 kHz \(level(2, 1_000)), L 600 Hz \(level(0, 600)), L 1 kHz \(level(0, 1_000)), Ls \(level(4, 1_000))")
+        } else {
+            #expect(abs(level(0, 1_000) / 0.1 - 1) < 0.01 && abs(level(1, 1_000) / 0.1 - 1) < 0.01)
+        }
     }
 }
