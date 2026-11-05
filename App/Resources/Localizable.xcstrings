@@ -444332,6 +444332,275 @@
           }
         }
       }
+    },
+    "The scan stopped because the share didn’t answer while reading “%@”. Nothing was marked missing. Rescan to try again.": {
+      "comment": "%@ is the name of the folder or file on a network share that didn't answer during a library scan.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቅኝቱ ቆሟል፤ ማጋሪያው «%@»ን በማንበብ ላይ ሳለ ምላሽ አልሰጠም። ምንም እንደጠፋ አልተመዘገበም። እንደገና ለመሞከር እንደገና ቃኝ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توقف الفحص لأن المشاركة لم تستجب أثناء قراءة “%@”. لم يُعلَّم أي شيء على أنه مفقود. أعد الفحص للمحاولة مرة أخرى."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্ক্যান থেমে গেছে, কারণ “%@” পড়ার সময় শেয়ারটি সাড়া দেয়নি। কিছুই অনুপস্থিত হিসেবে চিহ্নিত করা হয়নি। আবার চেষ্টা করতে আবার স্ক্যান করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prohledávání se zastavilo, protože sdílení při čtení „%@“ neodpovídalo. Nic nebylo označeno jako chybějící. Zkuste to znovu volbou Znovu prohledat."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanningen stoppede, fordi delingen ikke svarede under læsning af “%@”. Intet blev markeret som manglende. Scan igen for at prøve på ny."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Scan wurde angehalten, weil die Freigabe beim Lesen von „%@“ nicht geantwortet hat. Nichts wurde als fehlend markiert. Erneut scannen, um es noch einmal zu versuchen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η σάρωση σταμάτησε επειδή ο κοινόχρηστος φάκελος δεν απάντησε κατά την ανάγνωση του «%@». Τίποτα δεν σημειώθηκε ως ελλείπον. Κάντε νέα σάρωση για να δοκιμάσετε ξανά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El escaneo se detuvo porque el recurso compartido no respondió al leer “%@”. No se marcó nada como no encontrado. Vuelve a escanear para intentarlo de nuevo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسکن متوقف شد، چون اشتراک هنگام خواندن «%@» پاسخ نداد. چیزی گم‌شده علامت نخورد. برای تلاش دوباره، اسکن دوباره کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skannaus pysähtyi, koska verkkojako ei vastannut luettaessa kohdetta ”%@”. Mitään ei merkitty puuttuvaksi. Yritä uudelleen skannaamalla uudelleen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huminto ang pag-scan dahil hindi sumagot ang share habang binabasa ang “%@”. Walang minarkahang nawawala. I-scan muli para subukan ulit."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’indexation s’est arrêtée, car le partage n’a pas répondu pendant la lecture de « %@ ». Rien n’a été marqué comme manquant. Réindexez pour réessayer."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્કૅન અટકી ગયું, કારણ કે “%@” વાંચતી વખતે શેરે જવાબ ન આપ્યો. કંઈ પણ ગુમ થયેલ તરીકે ચિહ્નિત કરાયું નથી. ફરી પ્રયાસ કરવા ફરી સ્કૅન કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binciken ya tsaya saboda foldar cibiyar sadarwar ba ta amsa ba yayin karanta “%@”. Ba a yi wa komai alamar ya ɓace ba. Sake bincika don sake gwadawa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסריקה נעצרה כי השיתוף לא הגיב בזמן קריאת “%@”. שום דבר לא סומן כחסר. סרוק מחדש כדי לנסות שוב."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्कैन रुक गया, क्योंकि “%@” पढ़ते समय शेयर ने जवाब नहीं दिया। कुछ भी गायब के रूप में चिह्नित नहीं किया गया। फिर से कोशिश करने के लिए फिर से स्कैन करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A beolvasás leállt, mert a megosztás nem válaszolt a következő olvasása közben: „%@”. Semmi sem lett hiányzóként megjelölve. Próbálja újra az Újraolvasás paranccsal."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pemindaian berhenti karena share tidak merespons saat membaca “%@”. Tidak ada yang ditandai hilang. Pindai ulang untuk mencoba lagi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La scansione si è interrotta perché la condivisione non ha risposto durante la lettura di “%@”. Nulla è stato segnato come mancante. Ripeti la scansione per riprovare."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」の読み込み中に共有から応答がなかったため、スキャンを停止しました。見つからない項目としてマークされたものはありません。再スキャンしてもう一度お試しください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಓದುತ್ತಿರುವಾಗ ಶೇರ್ ಉತ್ತರಿಸದ ಕಾರಣ ಸ್ಕ್ಯಾನ್ ನಿಂತಿತು. ಯಾವುದನ್ನೂ ಕಾಣೆಯಾಗಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು ಮರುಸ್ಕ್ಯಾನ್ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’ 항목을 읽는 동안 공유가 응답하지 않아 스캔을 중단했습니다. 누락된 것으로 표시된 항목은 없습니다. 다시 시도하려면 다시 스캔하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” വായിക്കുമ്പോൾ ഷെയർ പ്രതികരിക്കാത്തതിനാൽ സ്കാൻ നിർത്തി. ഒന്നും കാണാതായതായി അടയാളപ്പെടുത്തിയിട്ടില്ല. വീണ്ടും ശ്രമിക്കാൻ വീണ്ടും സ്കാൻ ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” वाचताना शेअरने प्रतिसाद न दिल्यामुळे स्कॅन थांबले. काहीही गहाळ म्हणून चिन्हांकित केले नाही. पुन्हा प्रयत्न करण्यासाठी पुन्हा स्कॅन करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imbasan berhenti kerana perkongsian tidak menjawab semasa membaca “%@”. Tiada apa-apa ditandakan sebagai hilang. Imbas semula untuk mencuba lagi."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanningen stoppet fordi delingen ikke svarte mens «%@» ble lest. Ingenting ble merket som manglende. Skann på nytt for å prøve igjen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het scannen is gestopt omdat de share niet antwoordde tijdens het lezen van ‘%@’. Niets is als ontbrekend gemarkeerd. Scan opnieuw om het nog eens te proberen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਕੈਨ ਰੁਕ ਗਿਆ, ਕਿਉਂਕਿ “%@” ਪੜ੍ਹਦੇ ਸਮੇਂ ਸ਼ੇਅਰ ਨੇ ਜਵਾਬ ਨਹੀਂ ਦਿੱਤਾ। ਕੁਝ ਵੀ ਗੁੰਮ ਵਜੋਂ ਨਿਸ਼ਾਨਬੱਧ ਨਹੀਂ ਕੀਤਾ ਗਿਆ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰਨ ਲਈ ਮੁੜ ਸਕੈਨ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanowanie zatrzymało się, ponieważ zasób sieciowy nie odpowiadał podczas odczytu „%@”. Nic nie zostało oznaczone jako brakujące. Skanuj ponownie, aby spróbować jeszcze raz."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A varredura parou porque o compartilhamento não respondeu ao ler “%@”. Nada foi marcado como ausente. Escaneie novamente para tentar de novo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A análise parou porque a partilha não respondeu ao ler “%@”. Nada foi marcado como em falta. Analise novamente para tentar outra vez."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanarea s-a oprit deoarece partajarea nu a răspuns în timpul citirii „%@”. Nimic nu a fost marcat ca lipsă. Rescanează pentru a încerca din nou."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanningen stoppades eftersom nätverksresursen inte svarade när ”%@” lästes. Inget markerades som saknat. Skanna igen för att försöka på nytt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uchanganuzi ulisimama kwa sababu folda ya mtandao haikujibu wakati wa kusoma “%@”. Hakuna kilichowekwa alama kuwa kimepotea. Changanua upya ili kujaribu tena."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ஐப் படிக்கும்போது பகிர்வு பதிலளிக்காததால் ஸ்கேன் நின்றது. எதுவும் காணவில்லை எனக் குறிக்கப்படவில்லை. மீண்டும் முயல மீண்டும் ஸ்கேன்செய்யவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” చదువుతున్నప్పుడు షేర్ స్పందించనందున స్కాన్ ఆగిపోయింది. ఏదీ కనిపించనిదిగా గుర్తించబడలేదు. మళ్లీ ప్రయత్నించడానికి మళ్లీ స్కాన్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การสแกนหยุดลงเพราะแชร์ไม่ตอบสนองขณะอ่าน “%@” ไม่มีรายการใดถูกทำเครื่องหมายว่าหายไป สแกนใหม่เพื่อลองอีกครั้ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” okunurken paylaşım yanıt vermediği için tarama durdu. Hiçbir şey eksik olarak işaretlenmedi. Yeniden denemek için yeniden tarayın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканування зупинилося, бо мережевий ресурс не відповів під час читання «%@». Нічого не позначено як відсутнє. Перескануйте, щоб спробувати ще раз."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسکین رک گیا کیونکہ “%@” پڑھتے وقت شیئر نے جواب نہیں دیا۔ کسی چیز کو غائب نشان زد نہیں کیا گیا۔ دوبارہ کوشش کرنے کے لیے دوبارہ اسکین کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quá trình quét đã dừng vì chia sẻ không phản hồi khi đọc “%@”. Không có gì bị đánh dấu là bị thiếu. Hãy quét lại để thử lần nữa."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讀取「%@」時網絡共享沒有回應，所以掃描已停止。沒有任何項目被標示為遺失。請重新掃描再試一次。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "读取“%@”时网络共享没有响应，因此扫描已停止。没有任何项目被标记为丢失。请重新扫描以再试一次。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讀取「%@」時網路共享沒有回應，因此掃描已停止。沒有任何項目被標示為遺失。請重新掃描以再試一次。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -317,7 +317,7 @@ struct LibrarySettings: View {
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                         Spacer()
-                        Button("Rescan") { Task { await model.library.scan(source) } }
+                        Button("Rescan") { Task { await model.library.scan(source, restart: true) } }
                         Button("Remove") { removingSource = source }
                     }
                 }

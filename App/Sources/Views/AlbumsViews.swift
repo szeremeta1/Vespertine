@@ -680,7 +680,7 @@ struct SourceView: View {
                         Text(source.path).font(Typeface.ui(12)).foregroundStyle(Palette.text2).textSelection(.enabled)
                     }
                     Spacer()
-                    Button("Rescan") { Task { await model.library.scan(source) } }.buttonStyle(QuietButtonStyle())
+                    Button("Rescan") { Task { await model.library.scan(source, restart: true) } }.buttonStyle(QuietButtonStyle())
                     Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }.buttonStyle(QuietButtonStyle())
                 }
                 .padding(24)

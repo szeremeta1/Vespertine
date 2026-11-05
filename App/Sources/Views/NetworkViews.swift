@@ -240,12 +240,15 @@ struct ShareRow: View {
                 Text(source.networkShare?.displayString ?? "").font(.caption).foregroundStyle(.secondary)
                     .lineLimit(1).truncationMode(.middle)
                 ShareStatusText(status: status)
+                if let id = source.id, let failure = model.library.scanFailures[id] {
+                    Text(failure).font(.caption).foregroundStyle(Palette.copper).lineLimit(3)
+                }
             }
             Spacer()
             if case .offline = status {
                 Button("Reconnect") { Task { await model.shares.connect(source) } }
             } else {
-                Button("Rescan") { Task { await model.library.scan(source) } }.disabled(!status.isConnected)
+                Button("Rescan") { Task { await model.library.scan(source, restart: true) } }.disabled(!status.isConnected)
             }
             Button("Remove") { removing = source }
         }
