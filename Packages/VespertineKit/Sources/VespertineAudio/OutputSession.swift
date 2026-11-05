@@ -117,7 +117,8 @@ final class OutputSession: @unchecked Sendable {
     /// Apple's converter, matching by layout, played a file with no speaker names as silence, a 5.1.2 into 5.1 as silence,
     /// and dropped speakers it had no place for. Channels with no names are taken in WAV order (`sourceSpeakers`).
     static func speakerFold(from input: AVAudioFormat, to layout: AVAudioChannelLayout?, plan: OutputPlan) -> BedRouter? {
-        guard plan.spatial == .off, plan.routeLabels == nil, input.channelCount > 2,
+        // PCM only: DoP and bitstream words are copied, never mixed.
+        guard plan.mode == .pcm, plan.spatial == .off, plan.routeLabels == nil, input.channelCount > 2,
               let layout, layout.channelCount > 2, layout.hasSpeakerPositions, let source = sourceSpeakers(input),
               ChannelLayouts.speakerMap(source: source, outputs: layout.channelLabels) == nil else { return nil }
         return BedRouter(source: source, bed: ChannelLayouts.normalizedSurrounds(layout.channelLabels), foldGain: Float(0.5.squareRoot()))
