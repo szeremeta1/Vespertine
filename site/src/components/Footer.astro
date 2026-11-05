@@ -26,7 +26,7 @@ const cols = [
   ] },
 ];
 // English-only guide pages (src/views/Guide.astro) are linked from the English footer only.
-if (lang === 'en') for (const g of guides) cols[0].items.push({ href: g.path, text: g.linkText });
+if (lang === 'en') for (const g of guides.filter((g) => g.footer !== false)) cols[0].items.push({ href: g.path, text: g.linkText });
 const orgs = orList(lang, links.ukraine.map((u) => `<a href="${u.url}">${escapeHtml(u.name)}</a>`));
 const author = `<a href="${app.author.url}">${escapeHtml(app.author.name)}</a>`;
 ---

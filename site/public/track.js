@@ -8,6 +8,7 @@
  *   email-click       mailto: (no address recorded)            {placement, locale}
  *   outbound-click    any other external host                  {host, placement, locale}
  *   brew-copy         the Copy button next to the Homebrew command {placement, locale}
+ *   compare-click     a link between the /compare/ pages           {from, to, placement}
  *   faq-open          a FAQ <details data-faq> opened (the guide pages)   {page, q}
  * placement = the nearest [data-placement], else the enclosing header / nav / footer / main.
  */
@@ -59,6 +60,8 @@
     var a = e.target.closest("a[href]");
     if (!a || a.hasAttribute("data-umami-event")) return; // an explicit data-umami-event wins
     if (e.type === "auxclick" && e.button !== 1) return; // middle click only
+    var to = a.getAttribute("data-compare");
+    if (to) { window.umami.track("compare-click", { from: location.pathname, to: to, placement: placement(a) }); return; }
     var hit = classify(a);
     if (hit) window.umami.track(hit[0], hit[1]);
   }
