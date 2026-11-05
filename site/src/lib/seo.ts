@@ -109,12 +109,21 @@ const faqNode = (lang: Lang) => ({
   mainEntity: content(lang).faq.map((f) => ({ '@type': 'Question', name: plain(f.q), acceptedAnswer: { '@type': 'Answer', text: plain(f.a) } })),
 });
 
-const crumbs = (lang: Lang, name: string, path: string) => ({
+const crumbs = (lang: Lang, name: string, path: string, parent?: { name: string; path: string }) => ({
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Vespertine', item: `${SITE}${pagePath(lang, 'home')}` },
-    { '@type': 'ListItem', position: 2, name, item: `${SITE}${path}` },
+    ...(parent ? [{ '@type': 'ListItem', position: 2, name: parent.name, item: `${SITE}${parent.path}` }] : []),
+    { '@type': 'ListItem', position: parent ? 3 : 2, name, item: `${SITE}${path}` },
   ],
+});
+
+/** A guide page's own FAQ (the questions are on the page, in the same words). */
+export const guideFaqNode = (path: string, items: { q: string; a: string }[]) => ({
+  '@type': 'FAQPage',
+  '@id': `${SITE}${path}#faq`,
+  inLanguage: 'en',
+  mainEntity: items.map((f) => ({ '@type': 'Question', name: plain(f.q), acceptedAnswer: { '@type': 'Answer', text: plain(f.a) } })),
 });
 
 const page = (lang: Lang, path: string, name: string, desc: string, extra: Record<string, unknown> = {}) => ({
@@ -142,18 +151,19 @@ export function homeGraph(o: { lang: Lang; title: string; screenshots: { url: st
   );
 }
 
-export function innerGraph(o: { lang: Lang; path: string; title: string; crumb: string; description: string; type?: string; dateModified?: string; image: string; screenshots: { url: string; caption: string }[]; trailer?: { url: string; poster: string } }) {
+export function innerGraph(o: { lang: Lang; path: string; title: string; crumb: string; description: string; type?: string; dateModified?: string; image: string; screenshots: { url: string; caption: string }[]; trailer?: { url: string; poster: string }; extra?: object[]; parent?: { name: string; path: string } }) {
   return graph(
     website(o.lang),
     page(o.lang, o.path, o.title, o.description, {
       ...(o.type ? { '@type': ['WebPage', o.type] } : {}),
       about: { '@id': ids.app },
-      breadcrumb: crumbs(o.lang, o.crumb, o.path),
+      breadcrumb: crumbs(o.lang, o.crumb, o.path, o.parent),
       primaryImageOfPage: o.image,
       ...(o.dateModified ? { dateModified: o.dateModified } : {}),
     }),
     appNode(o.lang, o.screenshots),
     ...(o.trailer ? [trailerNode(o.lang, o.trailer.url, o.trailer.poster)] : []),
+    ...(o.extra ?? []),
     author,
   );
 }

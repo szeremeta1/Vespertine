@@ -45,6 +45,7 @@ public struct RoomMeasurementResult: Sendable {
         var profile = design.profile(name: name, sessionID: session.id, deviceUID: session.deviceUID, channelMap: map, micSerial: micSerial,
                                      calibrationSHA256: session.mic.calibrationSHA256, createdAt: createdAt)
         profile.measured = curves
+        profile.positionCurves = RoomProfile.positionCurves(from: try responses.mapValues { try $0.mapValues { try RoomCurve($0) } })
         profile.designOptions = options
         profile.source = .measured
         if curves.count > 1 {

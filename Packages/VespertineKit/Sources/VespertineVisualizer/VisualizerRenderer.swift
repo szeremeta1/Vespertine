@@ -106,6 +106,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
 
     private let queue: MTLCommandQueue
     private var pipelines: [VisualizerStyle: MTLRenderPipelineState] = [:]
+    /// Club's Waves mode, and Spectrum's Smooth (the bars' function specialized).
+    private var wavesPipeline: MTLRenderPipelineState?
+    private var smoothBarsPipeline: MTLRenderPipelineState?
     private let pixelFormat: MTLPixelFormat = .bgra8Unorm
 
     // Trails (scope and particles): light drawn additively into a texture that fades a little each frame.
@@ -166,12 +169,26 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var signal: Float = 0
     private var rings: [SIMD4<Float>] = []
     private var ringColour: Float = 0.55
+    // Club's Waves: the beams' ripples travel on one clock and sway on another, both faster with the mids.
+    private var wavePhase: Double = 0
+    private var swayClock: Double = 0
+    private var waveBeams: [SIMD4<Float>] = []
+    // Spectrum's Smooth mode, and the Vinyl cover between its label and its sleeve.
+    private var smoother = VisualizerSpectrumSmoother()
+    private var cover = VisualizerCoverMotion()
+    private var vinylShown = false
+    /// The room kept for the song's title under the sleeve, in points, as last drawn.
+    private var vinylTitleRoom: CGFloat = 0
 
     /// GPU time per frame, averaged (from the command buffers' own timestamps).
     public struct GPUStats: Sendable, Equatable {
         public var frames = 0
         public var seconds: Double = 0
         public var averageMilliseconds: Double { frames > 0 ? seconds / Double(frames) * 1000 : 0 }
+        /// Time on the CPU (the main thread) to step the motion and encode a frame.
+        public var cpuFrames = 0
+        public var cpuSeconds: Double = 0
+        public var averageCPUMilliseconds: Double { cpuFrames > 0 ? cpuSeconds / Double(cpuFrames) * 1000 : 0 }
         public init() {}
     }
     private let gpu = OSAllocatedUnfairLock(initialState: GPUStats())
@@ -189,10 +206,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             let names: [VisualizerStyle: String] = [.bars: "vz_bars", .spectrogram: "vz_spectrogram", .vinyl: "vz_vinyl", .club: "vz_club",
                                                     .scope: "vz_scope", .meters: "vz_meters", .particles: "vz_particles",
                                                     .mirrored: "vz_mirror"]
+            func specialized(_ name: String, smooth: Bool) throws -> MTLFunction {
+                let constants = MTLFunctionConstantValues()
+                var on = smooth
+                constants.setConstantValue(&on, type: .bool, index: 0)
+                return try library.makeFunction(name: name, constantValues: constants)
+            }
             for (style, name) in names {
                 let d = MTLRenderPipelineDescriptor()
                 d.vertexFunction = vertex
-                d.fragmentFunction = library.makeFunction(name: name)
+                d.fragmentFunction = style == .bars ? try specialized(name, smooth: false) : library.makeFunction(name: name)
                 d.colorAttachments[0].pixelFormat = pixelFormat
                 pipelines[style] = try device.makeRenderPipelineState(descriptor: d)
             }
@@ -201,6 +224,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             designs.fragmentFunction = library.makeFunction(name: "vz_meters_real")
             designs.colorAttachments[0].pixelFormat = pixelFormat
             designPipeline = try device.makeRenderPipelineState(descriptor: designs)
+            let waves = MTLRenderPipelineDescriptor()
+            waves.vertexFunction = vertex
+            waves.fragmentFunction = library.makeFunction(name: "vz_club_waves")
+            waves.colorAttachments[0].pixelFormat = pixelFormat
+            wavesPipeline = try device.makeRenderPipelineState(descriptor: waves)
+            let smoothBars = MTLRenderPipelineDescriptor()
+            smoothBars.vertexFunction = vertex
+            smoothBars.fragmentFunction = try specialized("vz_bars", smooth: true)
+            smoothBars.colorAttachments[0].pixelFormat = pixelFormat
+            smoothBarsPipeline = try device.makeRenderPipelineState(descriptor: smoothBars)
             // The fade keeps a set fraction of what's there (the blend colour); beams and sprites add light.
             let fade = MTLRenderPipelineDescriptor()
             fade.vertexFunction = vertex
@@ -326,9 +359,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
 
     private func encode(frame: VisualizerFrame, scene: VisualizerScene, size: CGSize, scale: CGFloat, dt: Double,
                         pass: MTLRenderPassDescriptor) -> MTLCommandBuffer? {
+        let started = CACurrentMediaTime()
+        defer {
+            let spent = CACurrentMediaTime() - started
+            gpu.withLock { $0.cpuFrames += 1; $0.cpuSeconds += spent }
+        }
+        let waves = settings.style == .club && settings.clubMode == .waves
+        let smoothBars = settings.style == .bars && settings.spectrumMode == .smooth
         let design = settings.style == .meters ? MeterDesign(settings) : nil
         guard size.width >= 1, size.height >= 1,
-              let pipeline = design != nil ? designPipeline : pipelines[settings.style],
+              let pipeline = design != nil ? designPipeline : waves ? wavesPipeline : smoothBars ? smoothBarsPipeline : pipelines[settings.style],
               let buffer = queue.makeCommandBuffer() else { return nil }
         advance(frame: frame, scene: scene, dt: dt)
         updateOverlay(size: size, scale: scale, scene: scene)
@@ -341,7 +381,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         u.c = SIMD4(level, Float(recordAngle), Float(armAngle ?? Self.armRest), settings.tonearm ? 1 : 0)
         u.d = SIMD4(Float(frame.bands.count), Float(frame.fine.count), Float(Self.historyWidth),
                     Float(Double(historyHead) + historyFraction))
-        u.e = SIMD4(settings.peakCaps ? 1 : 0, artwork != nil ? 1 : 0, strobe, signal)
+        // Peak caps: Spectrum's come with its Classic mode; Mirrored has its own switch.
+        let caps = style == .bars ? settings.spectrumMode == .classic : settings.peakCaps
+        u.e = SIMD4(caps ? 1 : 0, artwork != nil ? 1 : 0, strobe, signal)
         colorFade.advance(by: dt)
         let colours = colorFade.current(theme: settings.theme)
         u.f = SIMD4(Float(laserAngle), Float(platterSpeed), colours.rampWeight, Float(min(rings.count, 16)))
@@ -386,6 +428,24 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             updateMeterFace(size: size, scale: scale)
         case .mirrored:
             u.g = SIMD4(settings.mirrorLayout == .line ? 1 : 0, frame.bass * frame.beatPulse + 0.5 * frame.bass, 0, 0)
+        case .vinyl:
+            let pose = cover.pose
+            vinylTitleRoom = settings.showsTrackInfo && !(scene.title ?? "").isEmpty ? VisualizerLayout.vinylTitleRoom : 0
+            let layout = VisualizerLayout.vinyl(in: size, tonearm: settings.tonearm, sleeve: CGFloat(pose.layout),
+                                                place: CGFloat(pose.place), titleRoom: vinylTitleRoom * scale)
+            let rest = VisualizerLayout.sleeveRest(place: CGFloat(pose.place))
+            u.g = SIMD4(Float(layout.centre.x), Float(layout.centre.y), Float(layout.unit), 0)
+            u.h = SIMD4(Float(rest.x + CGFloat(pose.offset)), Float(pose.front), Float(pose.opacity), Float(rest.tilt))
+        case .club where settings.clubMode == .waves:
+            // The ripples grow with the mids and swell a little on the beat (not with Reduce Motion, which halves them).
+            let amp = (0.02 + 0.045 * frame.mid * signal + (reduceMotion ? 0 : 0.02 * frame.beatPulse * signal)) * (reduceMotion ? 0.5 : 1)
+            u.g = SIMD4(reduceMotion ? 1 : 0, Float(wavePhase.truncatingRemainder(dividingBy: Self.ripplePeriod)),
+                        Float(swayClock.truncatingRemainder(dividingBy: Self.swayPeriod)), amp)
+            Self.waveBeams(sway: swayClock, ripple: wavePhase, fine: frame.fine, into: &waveBeams)
+            withUnsafeMutableBytes(of: &u.rings) { raw in
+                let slots = raw.bindMemory(to: SIMD4<Float>.self)
+                for i in 0..<16 { slots[i] = i < waveBeams.count ? waveBeams[i] : .zero }
+            }
         default:
             break
         }
@@ -393,7 +453,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         guard let encoder = buffer.makeRenderCommandEncoder(descriptor: pass) else { return nil }
         encoder.setRenderPipelineState(pipeline)
         encoder.setFragmentBytes(&u, length: MemoryLayout<VisualizerUniforms>.stride, index: 0)
-        var bands = frame.bands.isEmpty ? [0] : frame.bands
+        var bands = frame.bands.isEmpty ? [0] : style == .bars && settings.spectrumMode == .smooth ? smoother.values : frame.bands
+        if bands.isEmpty { bands = [0] }
         var peaks = frame.peaks.isEmpty ? [0] : frame.peaks
         var fine = frame.fine.isEmpty ? [0] : frame.fine
         encoder.setFragmentBytes(&bands, length: bands.count * 4, index: 1)
@@ -414,6 +475,51 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
         return buffer
     }
+
+    /// The periods the Waves shader's clocks are wrapped at: every use of each there repeats within them (the sea's roll
+    /// at ripple × 0.5; the beams' colours at sway × 0.35, the haze's circular drift at sway × 0.35 / 30, the sea's
+    /// ripple at sway × 1.4).
+    static let ripplePeriod = 4 * Double.pi
+    static let swayPeriod = 2 * Double.pi * 30 / 0.35
+
+    /// Club's Waves: the fans of beams, from the floor in the middle and the two top corners (count, aim, spread,
+    /// seed, and the part of the spectrum, 0…1 along the fine bins, that lights them).
+    static let waveFans: [(count: Int, aim: Double, spread: Double, seed: Double, from: Double, to: Double)] = [
+        (7, 0, 1.7, 0, 0.04, 0.55), (4, 2.45, 0.7, 11, 0.45, 0.85), (4, -2.45, 0.7, 23, 0.45, 0.85),
+    ]
+
+    /// Each beam's aim, ripple wavenumber, ripple phase and level for this frame. Each drifts on its own, as the sum of
+    /// two slow sines at unrelated rates, so the fans never turn in step like a machine.
+    static func waveBeams(sway: Double, ripple: Double, fine: [Float], into out: inout [SIMD4<Float>]) {
+        out.removeAll(keepingCapacity: true)
+        for fan in waveFans {
+            for i in 0..<fan.count {
+                let across = fan.count > 1 ? Double(i) / Double(fan.count - 1) - 0.5 : 0
+                let s = fan.seed + Double(i) * 1.37
+                let aim = fan.aim + across * fan.spread + 0.16 * sin(sway * 0.83 + s * 3.1) + 0.09 * sin(sway * 1.37 + s * 5.3)
+                let k = 3.5 + 2.0 * (s * 0.731 - (s * 0.731).rounded(.down))
+                let speed = 1 + 0.2 * (s * 0.37 - (s * 0.37).rounded(.down))
+                let phase = (s * 2 - ripple * speed).truncatingRemainder(dividingBy: 2 * .pi)
+                var level: Float = 0
+                if !fine.isEmpty {
+                    let bin = Int((fan.from + (fan.to - fan.from) * (across + 0.5)) * Double(fine.count - 1))
+                    level = fine[min(max(bin, 0), fine.count - 1)]
+                    if !level.isFinite { level = 0 }
+                }
+                out.append(SIMD4(Float(aim), Float(k), Float(phase), min(max(level, 0), 1)))
+            }
+        }
+    }
+
+    /// Whether a click at `point` (in points, y down, in a view of `size` points) is on the Vinyl style's album cover: its
+    /// label, or the part of its sleeve that shows.
+    public func vinylCoverHit(at point: CGPoint, in size: CGSize) -> Bool {
+        settings.style == .vinyl
+            && VisualizerLayout.vinylCoverHit(point, in: size, tonearm: settings.tonearm, pose: cover.pose, titleRoom: vinylTitleRoom)
+    }
+
+    /// The cover as drawn this frame (tests).
+    var coverPose: VisualizerCoverPose { cover.pose }
 
     /// Where the tonearm rests, off the record (radians from its pivot).
     static let armRest = atan2(-1.0, -0.04)
@@ -460,6 +566,31 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         let armTarget = scene.progress.map { Self.armAngle(stylusRadius: 0.83 - min(max($0, 0), 1) * (0.83 - 0.40)) } ?? Self.armRest
         let arm = armAngle ?? Self.armRest
         armAngle = arm + (armTarget - arm) * Double(VisualizerAnalyzer.coefficient(dt, 0.45))
+
+        // Spectrum's Smooth mode: springs that follow the bars (only while it's shown, so it starts where the music is).
+        if settings.style == .bars && settings.spectrumMode == .smooth {
+            _ = smoother.step(frame.bands, dt: dt, calm: reduceMotion)
+        } else {
+            smoother.reset()
+        }
+
+        // Vinyl: the cover moves to where it was asked to be. On the first frame of the style (the window opening, or
+        // switched to from another), it's there already.
+        if settings.style == .vinyl {
+            if vinylShown {
+                cover.advance(toward: settings.vinylCover, dt: dt, calm: reduceMotion)
+            } else {
+                cover.settle(at: settings.vinylCover)
+            }
+        }
+        vinylShown = settings.style == .vinyl
+
+        // Club's Waves: the ripples run along the beams faster with the mids; the sway drifts on its own slow clock.
+        let calmWaves = reduceMotion ? 0.35 : 1
+        // (Not wrapped here: the beams use them at unrelated rates. What the shader gets is wrapped at a period of all
+        // its own uses, so nothing jumps however long the window stays open.)
+        wavePhase += dt * (0.7 + 1.5 * Double(frame.mid * signal)) * calmWaves
+        swayClock += dt * (0.22 + 0.35 * Double(frame.mid * signal)) * calmWaves
 
         // Club: rings out on every beat, lasers turning with the mids.
         for i in rings.indices {
@@ -600,19 +731,46 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
     }
 
+    /// The peak the automatic gain follows. The oscilloscope draws each channel alone, so the louder channel's peak.
+    /// The goniometer draws the pair as one point, which lies |(L, R)| from the centre (√2 farther for mono than for
+    /// one channel alone), so the longest of those: else mono and out-of-phase music ran past the circle.
+    static func scopePeak<S: Sequence>(_ samples: S, mode: VisualizerScopeMode) -> Float where S.Element == SIMD2<Float> {
+        var peak: Float = 0
+        switch mode {
+        case .goniometer: for p in samples { peak = max(peak, simd_length_squared(p)) }; return peak.squareRoot()
+        case .oscilloscope: for p in samples { peak = max(peak, abs(p.x), abs(p.y)) }; return peak
+        }
+    }
+
+    static func scopeGain(envelope: Float, sensitivity: Double) -> Float {
+        Float(sensitivity) * 0.8 / max(envelope, 0.0316)
+    }
+
+    /// The light each sample of the trace leaves. A sweep is always 1,024 samples, so a bigger scope spreads them
+    /// along a longer trace: the light grows with the scope's size (from its look in the usual window), else full
+    /// screen on a big display was a fraction as bright, and a small window burnt out.
+    static func scopeBrightness(mode: VisualizerScopeMode, size points: CGSize, dt: Double, stereoInterval: Double,
+                                hasSignal: Bool) -> Float {
+        let perFrame = max(1, dt / max(stereoInterval, 1e-6))
+        let goniometer = mode == .goniometer
+        let usual = VisualizerWindowState.defaultSize
+        let extent = goniometer ? VisualizerLayout.goniometer(in: points).radius / VisualizerLayout.goniometer(in: usual).radius
+                                : VisualizerLayout.oscilloscope(in: points).width / VisualizerLayout.oscilloscope(in: usual).width
+        return Float(goniometer ? min(1, perFrame / 1024) * 0.22 : dt * 60 * 0.3) * Float(extent) * (hasSignal ? 1 : 0.4)
+    }
+
     private func encodeScope(_ buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
                              size: CGSize, scale: CGFloat, dt: Double) {
         guard let trail = prepareTrail(size: size, for: .scope, buffer: buffer), let beamPipeline, !beamBuffers.isEmpty else { return }
         // Automatic gain: up at once to the newest peak, back down over a couple of seconds, at most +30 dB.
-        var peak: Float = 0
-        for p in frame.stereo.suffix(1024) { peak = max(peak, abs(p.x), abs(p.y)) }
+        let peak = Self.scopePeak(frame.stereo.suffix(1024), mode: settings.scopeMode)
         scopeEnvelope = max(peak, scopeEnvelope * Float(exp(-dt / 2)))
-        let gain = Float(settings.sensitivity) * 0.8 / max(scopeEnvelope, 0.0316)
+        let gain = Self.scopeGain(envelope: scopeEnvelope, sensitivity: settings.sensitivity)
         let goniometer = settings.scopeMode == .goniometer
         // Every sample leaves the same light whatever the frame rate: the goniometer redraws the newest 1,024
         // samples each frame, so each is drawn about 1,024 / (new samples per frame) times.
-        let perFrame = max(1, dt / max(frame.stereoInterval, 1e-6))
-        let brightness = Float(goniometer ? min(1, perFrame / 1024) * 0.22 : dt * 60 * 0.3) * (frame.hasSignal ? 1 : 0.4)
+        let brightness = Self.scopeBrightness(mode: settings.scopeMode, size: CGSize(width: size.width / scale, height: size.height / scale),
+                                              dt: dt, stereoInterval: frame.stereoInterval, hasSignal: frame.hasSignal)
         Self.scopePoints(frame: frame, mode: settings.scopeMode, size: CGSize(width: size.width / scale, height: size.height / scale),
                          scale: scale, gain: gain, brightness: brightness, into: &points)
         beamIndex = (beamIndex + 1) % beamBuffers.count

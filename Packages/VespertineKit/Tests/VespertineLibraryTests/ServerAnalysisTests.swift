@@ -41,6 +41,7 @@ struct ServerAnalysisTests {
         try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
         let track = try #require(try db.allTracks().first)
         try db.saveAnalysis(Self.olderResult(), filePath: track.filePath)
+        try db.saveTransitionProfiles([(TransitionProfileStoreTests.profile, track.filePath)])
         #expect(try db.storedAnalysis(for: track)?.isCurrent == false)
         #expect(try db.rejudgeStoredAnalyses() == 1)
         let stored = try #require(try db.storedAnalysis(for: track))

@@ -94,6 +94,11 @@ public enum AlbumFamilies {
                 title.removeSubrange(range)
                 title = title.trimmingCharacters(in: .whitespacesAndNewlines)
                 hasEditionSuffix = true
+                // "Thriller 25 (Super Deluxe Edition)": the anniversary number is part of the edition's name.
+                if suffix.range(of: #"(?i)deluxe|edition|anniversary|expanded"#, options: .regularExpression) != nil,
+                   let number = title.range(of: #"(?<=\S)\s+"# + anniversaryNumber + "$", options: .regularExpression) {
+                    title.removeSubrange(number)
+                }
             }
         }
         var year = album.year
@@ -108,6 +113,9 @@ public enum AlbumFamilies {
         return Identity(title: title, titleKey: comparable(title), artistKey: comparable(album.artist.replacingOccurrences(of: "&", with: "and")),
                         year: year, originalYear: originalYear, hasEditionSuffix: hasEditionSuffix)
     }
+
+    /// The round anniversaries a deluxe reissue is numbered with, as in "Bad 25" or "Thriller 40".
+    static let anniversaryNumber = #"(?:10|15|20|25|30|35|40|45|50|60|70|75)"#
 
     private static func comparable(_ text: String) -> String {
         let folded = text.folding(options: [.diacriticInsensitive, .widthInsensitive], locale: nil).lowercased()
@@ -139,7 +147,9 @@ public enum EditionKind: String, Sendable, CaseIterable, Hashable {
         func has(_ pattern: String) -> Bool { title.range(of: pattern, options: .regularExpression) != nil }
         var kinds: [EditionKind] = []
         if has(#"deluxe|expanded|bonus|special edition|collector|box"#) { kinds.append(.deluxe) }
-        if has(#"anniversary|\b\d{2}th\b"#) { kinds.append(.anniversary) }
+        if has(#"anniversary|\b\d{2}th\b|\s"# + AlbumFamilies.anniversaryNumber + #"\s*[(\[][^()\[\]]*(?:deluxe|edition|expanded)"#) {
+            kinds.append(.anniversary)
+        }
         if has(#"remaster|reissue|mofi|mobile fidelity|mfsl|\bhdcd\b|\bxrcd|\bshm\b|uhqcd|blu.?spec|\bgold\b|audiophile|\bdcc\b"#) { kinds.append(.remaster) }
         if has(#"\blive\b"#) { kinds.append(.live) }
         if has(#"\bmono\b"#) { kinds.append(.mono) }

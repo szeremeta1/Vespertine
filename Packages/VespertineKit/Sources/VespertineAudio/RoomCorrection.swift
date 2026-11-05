@@ -240,7 +240,7 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
     public var schemaVersion: Int = RoomCorrectionCoding.currentSchema
     public let id: UUID
     public var name: String
-    public let createdAt: Date
+    public var createdAt: Date
     /// The session the filters were fitted from.
     public let sessionID: UUID
     public var deviceUID: String
@@ -262,6 +262,17 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
     public var impulses: [RoomSpeaker: RoomImpulse]?
     /// Where the profile came from; nil in profiles saved before schema 3 (all measured here).
     public var source: RoomProfileSource?
+    /// Optional speakers / room / position labels, so profiles can be told apart (schema 4).
+    public var tags: RoomProfileTags?
+    /// How much of the correction plays, 0 to 1; nil is all of it (schema 4).
+    public var strength: Double?
+    /// Each speaker's response at each measured position, in the order they were measured, so a position can be left
+    /// out of the average later. nil in profiles that didn't keep them (schema 4).
+    public var positionCurves: [RoomSpeaker: [RoomCurve]]?
+    /// Positions (by order measured) left out of `measured`'s average.
+    public var excludedPositions: [Int]?
+    /// True once a band was edited by hand, so a redesign is known to replace the listener's own work (schema 4).
+    public var filtersEdited: Bool?
 
     public init(id: UUID, name: String, createdAt: Date, sessionID: UUID, deviceUID: String, layout: RoomLayout, channelMap: RoomChannelMap,
                 micSerial: String, calibrationSHA256: String?, target: RoomTarget, filters: RoomFilterSet) {
@@ -343,7 +354,8 @@ public enum RoomProfileSource: String, Codable, Hashable, Sendable {
 public enum RoomCorrectionCoding {
     /// Bump when the stored shape changes, and add the step that upgrades the previous one to `migrate`.
     /// 3: per-speaker alignment, impulse responses and the profile's source (all optional, so 2 reads as is).
-    public static let currentSchema = 3
+    /// 4: tags, strength, kept positions, edited mark (all optional, so 3 reads as is).
+    public static let currentSchema = 4
 
     private static var encoder: JSONEncoder {
         let e = JSONEncoder()
@@ -365,6 +377,27 @@ public enum RoomCorrectionCoding {
     public static func encodeProfiles(_ profiles: [RoomProfile]) throws -> Data {
         let objects = try profiles.map { try JSONSerialization.jsonObject(with: encode($0)) }
         return try JSONSerialization.data(withJSONObject: objects, options: [.sortedKeys])
+    }
+
+    /// The saved set plus objects this version couldn't read (a newer Vespertine's profiles), written back untouched.
+    public static func encodeProfiles(_ profiles: [RoomProfile], keeping unreadable: [Any]) throws -> Data {
+        var objects = try profiles.map { try JSONSerialization.jsonObject(with: encode($0)) }
+        objects.append(contentsOf: unreadable)
+        return try JSONSerialization.data(withJSONObject: objects, options: [.sortedKeys])
+    }
+
+    /// Reads `encodeProfiles` output and also returns what couldn't be read, so saving the set again doesn't delete it.
+    public static func decodeProfilesKeepingUnreadable(_ data: Data) throws -> (profiles: [RoomProfile], unreadable: [Any]) {
+        guard let objects = (try? JSONSerialization.jsonObject(with: data)) as? [Any] else { throw RoomCorrectionError.unreadable }
+        var profiles: [RoomProfile] = [], unreadable: [Any] = []
+        for object in objects {
+            if let profile = (try? JSONSerialization.data(withJSONObject: object)).flatMap({ try? decodeProfile($0) }) {
+                profiles.append(profile)
+            } else {
+                unreadable.append(object)
+            }
+        }
+        return (profiles, unreadable)
     }
 
     /// Reads `encodeProfiles` output. Profiles that can't be read (or are from a newer Vespertine) are left out.

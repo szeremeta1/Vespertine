@@ -101,6 +101,12 @@ struct SidebarView: View {
                                         .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                                 } else if model.library.scanProgress?.sourcePath == source.path {
                                     ProgressView().controlSize(.mini)
+                                } else if let failure = model.library.scanFailures[id] {
+                                    // The last scan didn't finish: the reason is in the help text and spoken.
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .font(.system(size: 9))
+                                        .foregroundStyle(Palette.copper)
+                                        .accessibilityLabel(Text(failure))
                                 }
                             }
                         } icon: {
@@ -119,7 +125,7 @@ struct SidebarView: View {
                                 }
                             }
                             Button("Rename…") { newName = source.displayName; renamingSource = source }
-                            Button("Rescan") { Task { await model.library.scan(source) } }
+                            Button("Rescan") { Task { await model.library.scan(source, restart: true) } }
                             Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([source.url]) }
                                 .disabled(!source.isOnline)
                             Divider()
@@ -221,11 +227,12 @@ struct SidebarView: View {
     }
 
     private func sourceHelp(_ source: LibrarySource) -> String {
-        guard let share = source.networkShare else { return source.path }
+        let failure = source.id.flatMap { model.library.scanFailures[$0] }
+        guard let share = source.networkShare else { return [source.path, failure].compactMap { $0 }.joined(separator: "\n") }
         if case .offline(let reason) = model.shares.status(of: source), !reason.isEmpty {
             return "\(share.displayString)\n\(reason)"
         }
-        return share.displayString
+        return [share.displayString, failure].compactMap { $0 }.joined(separator: "\n")
     }
 
     private func newPlaylist(smart: Bool) {
