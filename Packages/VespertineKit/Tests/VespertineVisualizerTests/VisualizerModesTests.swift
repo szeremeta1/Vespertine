@@ -4,6 +4,7 @@
 
 import CoreGraphics
 import Foundation
+import Metal
 import Testing
 @testable import VespertineVisualizer
 
@@ -455,6 +456,12 @@ struct VisualizerModeRenderTests {
         return Double(sum) / Double(a.count)
     }
 
+    @Test("Wherever there's a Metal device, the renderer is made (its shaders compile): the drawing tests can't pass by skipping")
+    func rendererBuilds() {
+        guard MTLCreateSystemDefaultDevice() != nil else { return }
+        #expect(VisualizerRenderer() != nil, "a Metal device, but no renderer: a shader didn't compile")
+    }
+
     @Test("Every new mode draws a picture of its own")
     func newModesDraw() throws {
         guard let classic = render({ $0.style = .bars }) else { return }   // no Metal device
@@ -528,6 +535,38 @@ struct VisualizerModeRenderTests {
         guard let idle = brightest(playing: false), let playing = brightest(playing: true) else { return }
         #expect(idle >= 28, "idle beams at \(idle) / 255")
         #expect(idle < playing * 0.6, "idle \(idle), playing \(playing)")
+    }
+
+    @Test("Particles fill a tall window as they do a wide one (they used to stop in a box inside it)")
+    func particlesTallWindow() throws {
+        guard let renderer = VisualizerRenderer() else { return }
+        renderer.settings.style = .particles
+        renderer.settings.particleTrails = false
+        let w = 200, h = 360, unit = 100.0   // the field's unit is half the window's shorter side
+        var bytes: [UInt8] = []
+        for _ in 0..<240 {
+            bytes = renderer.renderOffscreen(frame: musicFrame(), scene: VisualizerScene(isPlaying: true), size: CGSize(width: w, height: h),
+                                             scale: 1, dt: 1 / 60) ?? []
+        }
+        // The field is round: as far from the middle sideways as up and down, it should be as lit. Both 0.8…0.9 units
+        // out, in a strip through the middle.
+        func light(_ dx: Double, _ dy: Double) -> Double {
+            var sum = 0.0
+            for k in 0..<8 {
+                for side in [-1.0, 1.0] {
+                    for across in -8...8 {
+                        let t = (0.8 + 0.1 * Double(k) / 7) * unit * side
+                        let x = Int(Double(w) / 2 + dx * t + (1 - abs(dx)) * Double(across))
+                        let y = Int(Double(h) / 2 + dy * t + (1 - abs(dy)) * Double(across))
+                        let i = (y * w + x) * 4
+                        sum += Double(max(bytes[i], bytes[i + 1], bytes[i + 2]))
+                    }
+                }
+            }
+            return sum
+        }
+        let sideways = light(1, 0), upDown = light(0, 1)
+        #expect(sideways > upDown * 0.5, "sideways \(sideways), up and down \(upDown)")
     }
 
     @Test("Waves move less from frame to frame with Reduce Motion")

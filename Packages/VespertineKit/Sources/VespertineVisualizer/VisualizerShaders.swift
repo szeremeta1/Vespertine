@@ -891,7 +891,10 @@ kernel void vz_particles_step(device Particle *particles [[buffer(0)]], constant
     }
     x += v * dt;
     float life = p.m.y - dt;
-    if (life <= 0 || abs(x.x) > aspect + 0.15 || abs(x.y) > 1.15) {
+    // Gone past the window's edges (its half width and height in the field's units, a unit being half its shorter
+    // side: so a tall window is taller than 1, not narrower).
+    float2 halfSize = float2(max(aspect, 1.0), max(1.0 / max(aspect, 1e-3), 1.0));
+    if (life <= 0 || abs(x.x) > halfSize.x + 0.15 || abs(x.y) > halfSize.y + 0.15) {
         // Born again somewhere in the disc.
         float h1 = hash21(float2(float(id) * 0.0131, fract(time * 0.173) * 97.0 + p.m.z));
         float h2 = hash21(float2(fract(time * 0.371) * 53.0 + p.m.z, float(id) * 0.0713));
