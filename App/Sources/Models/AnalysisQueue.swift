@@ -82,7 +82,7 @@ final class AnalysisQueue {
             try? await Task.sleep(for: .seconds(8))
             while !Task.isCancelled {
                 // Out of use, the server's index waits: reading it could wake the NAS's disks.
-                if self?.shares.isInUse ?? false { await self?.syncServerResults() }
+                if self?.settings.autoAnalyze == true, self?.shares.isInUse ?? false { await self?.syncServerResults() }
                 try? await Task.sleep(for: .seconds(300))
             }
         })
@@ -139,11 +139,13 @@ final class AnalysisQueue {
     /// Queues everything that has no current analysis (new, changed, or analyzed by an older version), and once, the
     /// songs analyzed before transition profiles existed (`tracksNeedingAnalysis`). Shares
     /// analyzed by their server are left to the server. `includeNetwork`: nil follows the setting (automatic
-    /// analysis); Analyze Library asks for the shares too, since that's what pressing it means.
+    /// analysis); Analyze Library asks for the shares too, since that's what pressing it means, and reads what
+    /// the servers have analyzed first (the periodic sync only runs with automatic analysis on).
     func analyzeLibrary(includeNetwork: Bool? = nil) {
         let network = includeNetwork ?? settings.analyzeNetworkShares
         let database = library.database, generation = generation
         Task { [weak self] in
+            if includeNetwork == true { await self?.syncServerResults() }
             // Results an analyzer update can judge from their measurements (done at launch) aren't queued to be read again.
             await self?.library.storedAnalysesJudged()
             guard let self, self.generation == generation else { return }
