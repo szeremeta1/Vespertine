@@ -156,6 +156,10 @@ final class LibraryStore {
 
     private(set) var scanProgress: ScanProgress?
     private(set) var lastError: String?
+    /// Why the last scan of a source stopped before the end (its share stopped answering, its folder couldn't be read),
+    /// by source ID, until a scan of it finishes. The banner goes after a few seconds; this stays by the source in the
+    /// sidebar and in Settings, so a share whose scans keep failing doesn't look up to date.
+    private(set) var scanFailures: [Int64: String] = [:]
 
     @ObservationIgnored private var albumTask: Task<Void, Never>?
     @ObservationIgnored private var tasks: [Task<Void, Never>] = []
@@ -343,22 +347,38 @@ final class LibraryStore {
         }
     }
 
-    func scan(_ source: LibrarySource) async {
+    /// `restart`: asked for by the user (Rescan), so a scan of the source that has stalled is replaced and one still
+    /// running is followed by another (`LibraryScanner.scan`). Scans the app starts by itself join the one running.
+    func scan(_ source: LibrarySource, restart: Bool = false) async {
         scanProgress = ScanProgress(sourcePath: source.path, processed: 0, total: 0, added: 0, updated: 0)
         do {
-            let summary = try await scanner.scan(source) { [weak self] progress in
+            let summary = try await scanner.scan(source, restart: restart) { [weak self] progress in
                 Task { @MainActor [weak self] in self?.scanProgress = progress }
             }
             if !summary.failed.isEmpty { lastError = String(localized: "Could not read \(summary.failed.count) files or folders: \(summary.failed.prefix(3).joined(separator: ", "))",
                                                          comment: "Followed by up to three of the paths that couldn't be read.") }
             if !summary.movedTracks.isEmpty { onTracksMoved?(summary.movedTracks) }
+            // A share that went away shows as offline instead; anything else that ended has been read through.
+            if !summary.interrupted, let id = source.id { scanFailures[id] = nil }
+        } catch is CancellationError {
+            return   // replaced by a Rescan, which reports for itself
         } catch {
-            lastError = error.localizedDescription
+            let message = Self.scanFailureMessage(error)
+            lastError = message
+            if let id = source.id { scanFailures[id] = message }
         }
         scanProgress = nil
         revision += 1
         onScanFinished?()
         if !changedDuringScan.isEmpty { Task { await scanChangedDuringScan() } }
+    }
+
+    private static func scanFailureMessage(_ error: Error) -> String {
+        if case LibraryScanner.ScanError.notResponding(let path) = error {
+            return String(localized: "The scan stopped because the share didn’t answer while reading “\(URL(fileURLWithPath: path).lastPathComponent)”. Nothing was marked missing. Rescan to try again.",
+                          comment: "%@ is the name of the folder or file on a network share that didn't answer during a library scan.")
+        }
+        return error.localizedDescription
     }
 
     /// Scans `source` now, or once the scan that's running ends.
@@ -408,7 +428,7 @@ final class LibraryStore {
     }
 
     func rescanAll() async {
-        for source in sources { await scan(source) }
+        for source in sources { await scan(source, restart: true) }
     }
 
     func renameSource(_ source: LibrarySource, to name: String) {
@@ -420,6 +440,7 @@ final class LibraryStore {
     func removeSource(_ source: LibrarySource) {
         guard let id = source.id else { return }
         try? database.removeSource(id)
+        scanFailures[id] = nil
         revision += 1
     }
 

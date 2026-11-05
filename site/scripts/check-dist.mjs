@@ -6,6 +6,7 @@
 //    page in its language,
 //  - a page's <html lang> or dir doesn't match its folder (/de/…), or it lacks an hreflang link to every language's
 //    version (and x-default), or its canonical isn't its own URL,
+//  - an English-only guide page (src/data/guides.ts) has anything but English and x-default hreflang or any og:locale:alternate,
 //  - a page's og:image or twitter:image isn't a 1200×630 file in dist/, or its JSON-LD doesn't parse,
 //  - a page's social tags aren't in its own language: og:locale and its 44 og:locale:alternate, og:title,
 //    og:description and the twitter: copies matching its <title> and description, og:url its canonical, its card the
@@ -24,6 +25,11 @@ import { CODES, LOCALES, hreflangOf } from '../src/i18n/locales.mjs';
 
 const DIST = 'dist';
 const SITE = 'https://vespertineapp.com';
+// English-only guide pages (src/data/guides.ts): English and x-default hreflang only, no og:locale:alternate.
+const guideRest = new Set([
+  ...readFileSync('src/data/guides.ts', 'utf8').matchAll(/path: '\/([^']+)\/'/g).map((m) => `${m[1]}/index.html`),
+  ...readFileSync('src/data/compare.ts', 'utf8').matchAll(/slug: '([^']+)'/g).map((m) => `compare/${m[1]}/index.html`),
+]);
 const files = [];
 (function walk(dir) {
   for (const f of readdirSync(dir)) {
@@ -71,7 +77,7 @@ for (const file of files) {
   const rest = (lang === 'en' ? rel : rel.slice(1)).join('/');
   if (!is404) {
     const alts = new Map([...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => [m[1], m[2]]));
-    const want = new Map([...CODES.map((c) => [hreflangOf(c), urlIn(c, rest)]), ['x-default', urlIn('en', rest)]]);
+    const want = new Map([...(guideRest.has(rest) ? ['en'] : CODES).map((c) => [hreflangOf(c), urlIn(c, rest)]), ['x-default', urlIn('en', rest)]]);
     for (const [h, href] of want) {
       if (!alts.has(h)) problems.push(`${file}: no hreflang ${h}`);
       else if (alts.get(h) !== href) problems.push(`${file}: hreflang ${h} is ${alts.get(h)}, expected ${href}`);
@@ -88,7 +94,7 @@ for (const file of files) {
     const one = (key) => { const v = metas(html, key); if (v.length !== 1) problems.push(`${file}: ${v.length} ${key} tags`); return decode(v[0]); };
     if (one('og:locale') !== loc.og) problems.push(`${file}: og:locale isn't ${loc.og}`);
     const others = metas(html, 'og:locale:alternate');
-    const wantOthers = LOCALES.filter((l) => l.code !== lang).map((l) => l.og);
+    const wantOthers = guideRest.has(rest) ? [] : LOCALES.filter((l) => l.code !== lang).map((l) => l.og);
     if (others.length !== wantOthers.length || wantOthers.some((o) => !others.includes(o))) problems.push(`${file}: og:locale:alternate isn't every other language (${others.length})`);
     const title = decode(attr(html, /<title>([^<]+)<\/title>/));
     const description = decode(attr(html, /<meta name="description" content="([^"]+)"/));

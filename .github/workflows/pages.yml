@@ -44,6 +44,9 @@ jobs:
     if: github.event_name != 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      # The pages that are new or changed in this deploy, for IndexNow (empty on pull requests).
+      changed: ${{ steps.changed.outputs.urls }}
     defaults:
       run:
         working-directory: site
@@ -72,6 +75,13 @@ jobs:
       - name: Test the language features
         if: github.event_name == 'pull_request'
         run: node scripts/test-i18n.mjs
+      # Before the deploy replaces it: which pages differ from the live sitemap.xml (new, or another lastmod). Best effort.
+      - name: List the changed pages
+        id: changed
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: |
+          { echo 'urls<<INDEXNOW_EOF'; node scripts/indexnow.mjs changed; echo 'INDEXNOW_EOF'; } >> "$GITHUB_OUTPUT"
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
@@ -93,3 +103,19 @@ jobs:
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # Tell Bing, Yandex and the other IndexNow engines about the pages this deploy added or changed. The key is a public
+  # ownership file (site/public/<key>.txt), not a secret, so no credentials are used. Best effort: it can't fail the deploy.
+  indexnow:
+    if: github.event_name != 'pull_request' && needs.build.outputs.changed != ''
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: node site/scripts/indexnow.mjs submit
+        env:
+          CHANGED_URLS: ${{ needs.build.outputs.changed }}

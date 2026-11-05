@@ -46,9 +46,38 @@ public actor LibraryScanner {
     /// Leave out voice recordings, telephony audio and short clips (same rules as MusicFinder) found in folders the
     /// library only references. The managed folder holds only what was imported on purpose, so it keeps everything.
     public var skipsNonMusic = true
-    private var activeScans: [Int64: Task<ScanSummary, Error>] = [:]
+    private var activeScans: [Int64: RunningScan] = [:]
+
+    /// A scan in progress, and when it last heard from its source.
+    private struct RunningScan {
+        let id = UUID()
+        let task: Task<ScanSummary, Error>
+        let activity: ScanActivity
+    }
+
+    /// How long one request to a source (is it there, list a folder, read a file) may go unanswered before the scan
+    /// stops with `ScanError.notResponding`. On a share that stops answering such a call blocks until the system gives
+    /// up, which can be never: the scan then never ended, and every later scan of the share waited on it.
+    public private(set) var responseTimeout: TimeInterval = 90
+    /// How long a running scan may go without listing a folder or reading a file before a Rescan replaces it.
+    public private(set) var stallLimit: TimeInterval = 20
+    /// Lists a folder's contents (tests stand in a share that stops answering).
+    private(set) var readFolder: FolderReader = LibraryScanner.contentsOfFolder
+
+    public typealias FolderReader = @Sendable (URL, [URLResourceKey]) throws -> [URL]
+    public static let contentsOfFolder: FolderReader = { folder, keys in
+        try FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
+    }
+
+    public enum ScanError: Error, Equatable {
+        /// The source didn't answer within `responseTimeout` while this was being listed or read. The scan stopped
+        /// there and marked nothing missing.
+        case notResponding(path: String)
+    }
 
     public func setSkipsNonMusic(_ value: Bool) { skipsNonMusic = value }
+    func setTimeouts(response: TimeInterval, stall: TimeInterval) { responseTimeout = response; stallLimit = stall }
+    func setFolderReader(_ reader: @escaping FolderReader) { readFolder = reader }
 
     /// Blocking file I/O runs here, not on Swift's cooperative pool (sized to the CPU count, so a
     /// few blocked reads would stall the rest). GCD adds threads while they wait on the network.
@@ -60,6 +89,27 @@ public actor LibraryScanner {
         defer { if network { gate.leave() } }
         return await withCheckedContinuation { continuation in
             ioQueue.async { continuation.resume(returning: work()) }
+        }
+    }
+
+    private static let deadlines = DispatchQueue(label: "org.szeremeta.vespertine.scan-deadlines", qos: .userInitiated)
+
+    /// The same, giving up once the work has run for `timeout` without returning: nil then. The clock starts when the
+    /// work does, so a busy machine's wait for a thread isn't taken for a share that stopped answering. A call blocked
+    /// on such a share can't be interrupted, so its thread is left to return whenever the system lets it.
+    static func onIOQueue<T: Sendable>(network: Bool = false, gate: ShareIOGate = .shared, timeout: TimeInterval,
+                                       _ work: @escaping @Sendable () -> T) async -> T? {
+        if network { await gate.enter() }
+        defer { if network { gate.leave() } }
+        return await withCheckedContinuation { (continuation: CheckedContinuation<T?, Never>) in
+            let once = ResumeOnce()
+            ioQueue.async {
+                deadlines.asyncAfter(deadline: .now() + timeout) {
+                    if once.claim() { continuation.resume(returning: nil) }
+                }
+                let value = work()
+                if once.claim() { continuation.resume(returning: value) }
+            }
         }
     }
 
@@ -83,30 +133,57 @@ public actor LibraryScanner {
     static func isFallbackLabel(_ codec: String) -> Bool { codec == "MP4" }
 
     /// Rescans a source. Unchanged files (same size and modification date) are skipped.
+    ///
+    /// A scan of a source that is already being scanned joins that scan. `restart` (the user pressed Rescan) looks
+    /// again instead: a scan that hasn't heard from its source for `stallLimit` is cancelled and a new one starts;
+    /// one that is still moving is left to finish, then the source is scanned again, so a file added after it listed
+    /// that folder is found. Before, Rescan joined whatever was running, so a scan stuck on a share that stopped
+    /// answering swallowed every Rescan until the app quit.
     @discardableResult
-    public func scan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {
+    public func scan(_ source: LibrarySource, restart: Bool = false,
+                     progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {
         guard let sourceID = source.id else { return ScanSummary() }
-        if let active = activeScans[sourceID] { return try await active.value }
-        let task = Task { try await self.performScan(source, progress: progress) }
-        activeScans[sourceID] = task
-        defer { activeScans[sourceID] = nil }
+        if let running = activeScans[sourceID] {
+            guard restart else { return try await running.task.value }
+            if running.activity.quiet < stallLimit {
+                _ = try? await running.task.value
+                // Someone else's Rescan may have started the next scan meanwhile: one is enough.
+                if let next = activeScans[sourceID], next.id != running.id { return try await next.task.value }
+            } else {
+                // Cancelled, it writes nothing more; a request still blocked returns by its deadline.
+                running.task.cancel()
+            }
+        }
+        let activity = ScanActivity()
+        let task = Task { try await self.performScan(source, activity: activity, progress: progress) }
+        let scan = RunningScan(task: task, activity: activity)
+        activeScans[sourceID] = scan
+        defer { if activeScans[sourceID]?.id == scan.id { activeScans[sourceID] = nil } }
         return try await task.value
     }
 
-    private func performScan(_ source: LibrarySource, progress: (@Sendable (ScanProgress) -> Void)?) async throws -> ScanSummary {
+    private func performScan(_ source: LibrarySource, activity: ScanActivity,
+                             progress: (@Sendable (ScanProgress) -> Void)?) async throws -> ScanSummary {
         guard let sourceID = source.id else { return ScanSummary() }
         var summary = ScanSummary()
         let root = source.url
+        let timeout = responseTimeout, readFolder = readFolder
 
-        let online = Self.isReachable(root)
+        // Whether it's there and whether it's a share: both ask the file system, which a dead share can keep waiting.
+        guard let probe = await Self.onIOQueue(timeout: timeout, { (Self.isReachable(root), NetworkVolume.isNetwork(root)) })
+        else { throw ScanError.notResponding(path: root.path) }
+        let (online, remote) = probe
+        try Task.checkCancellation()
         try await database.writer.write { db in
             try db.execute(sql: "UPDATE source SET isOnline = ? WHERE id = ?", arguments: [online, sourceID])
         }
         guard online else { summary.interrupted = true; return summary }
 
-        let listing = try await Self.list(root) { count in
+        let listing = try await Self.list(root, network: remote, timeout: timeout, found: { count in
+            activity.touch()
             progress?(ScanProgress(phase: .listing, sourcePath: source.path, processed: count, total: 0, added: 0, updated: 0))
-        }
+        }, readFolder: readFolder)
+        try Task.checkCancellation()
         let cueByAudio = Self.cueSheets(listing.cue)
         let priorCues: [String: String] = try await database.writer.read { db in
             var signatures: [String: String] = [:]
@@ -142,7 +219,6 @@ public actor LibraryScanner {
         // Decide what needs reading. Size and date come from the listing (no per-file stat).
         var toRead: [URL] = []
         var listed: [String: ListedFile] = [:]
-        let remote = NetworkVolume.isNetwork(root)
         var seen = Set<String>()
         // A track without a cover is read again once an image turns up in its folder (or above its disc folder).
         func coverAppeared(_ k: Known, _ url: URL) -> Bool {
@@ -191,13 +267,15 @@ public actor LibraryScanner {
 
         try await withThrowingTaskGroup(of: (URL, [Track]?).self) { group in
             var iterator = toRead.makeIterator()
-            for _ in 0..<Self.readWidth(for: root) {
+            for _ in 0..<(remote ? 32 : 6) {
                 guard let url = iterator.next() else { break }
                 let cue = cueByAudio[url.path], file = listed[url.path]
-                group.addTask { (url, await Self.onIOQueue(network: remote) { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
+                group.addTask { try await Self.read(url, network: remote, timeout: timeout) { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) } }
             }
             let skipping = self.skipsNonMusic && source.mode != .managed
             while let (url, tracks) = try await group.next() {
+                try Task.checkCancellation()
+                activity.touch()
                 processed += 1
                 if let tracks {
                     // An invalid CUE may fall back to the whole file. Track what was actually indexed.
@@ -223,16 +301,20 @@ public actor LibraryScanner {
                 }
                 if let next = iterator.next() {
                     let cue = cueByAudio[next.path], file = listed[next.path]
-                    group.addTask { (next, await Self.onIOQueue(network: remote) { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) }) }
+                    group.addTask { try await Self.read(next, network: remote, timeout: timeout) { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) } }
                 }
             }
         }
+        try Task.checkCancellation()
         let (a, u) = try await Self.upsert(batch, sourceID: sourceID, database: database)
         summary.added += a
         summary.updated += u
 
         // A share that dropped mid-scan lists (and reads) nothing: never mistake that for deletions.
-        guard Self.isReachable(root) else {
+        guard let stillThere = await Self.onIOQueue(timeout: timeout, { Self.isReachable(root) })
+        else { throw ScanError.notResponding(path: root.path) }
+        try Task.checkCancellation()
+        guard stillThere else {
             summary.interrupted = true
             try await database.writer.write { db in
                 try db.execute(sql: "UPDATE source SET isOnline = 0 WHERE id = ?", arguments: [sourceID])
@@ -264,6 +346,13 @@ public actor LibraryScanner {
         summary.missing -= min(summary.missing, moved.count)
         progress?(ScanProgress(sourcePath: source.path, processed: total, total: total, added: summary.added, updated: summary.updated))
         return summary
+    }
+
+    /// Reads one file within the deadline; a file the source doesn't answer for stops the scan.
+    private static func read(_ url: URL, network: Bool, timeout: TimeInterval,
+                             _ work: @escaping @Sendable () -> [Track]?) async throws -> (URL, [Track]?) {
+        guard let tracks = await onIOQueue(network: network, timeout: timeout, work) else { throw ScanError.notResponding(path: url.path) }
+        return (url, tracks)
     }
 
     static func interleavedByFolder(_ urls: [URL]) -> [URL] {
@@ -298,18 +387,27 @@ public actor LibraryScanner {
     /// high-latency share costs one round trip per folder level, not per folder. If the source's own folder can't be
     /// listed, the listing fails; a folder inside it that can't be (no permission, gone mid-scan) is returned in
     /// `unreadable`, so the files under it are neither mistaken for deleted ones nor stop the rest being scanned.
-    static func list(_ root: URL, network forced: Bool? = nil, gate: ShareIOGate = .shared, found: (@Sendable (Int) -> Void)? = nil) async throws
+    /// A request the source doesn't answer within `timeout` stops the listing with `ScanError.notResponding`.
+    static func list(_ root: URL, network forced: Bool? = nil, gate: ShareIOGate = .shared, timeout: TimeInterval = 90,
+                     found: (@Sendable (Int) -> Void)? = nil, readFolder: @escaping FolderReader = contentsOfFolder) async throws
         -> (audio: [ListedFile], cue: [URL], imageDirs: Set<String>, unreadable: Set<String>) {
         let exts = audioExtensions
         let keys: [URLResourceKey] = [.isDirectoryKey, .isRegularFileKey, .isPackageKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
-        let start = root.resolvingSymlinksInPath()
         // A single-file source: the file plus any CUE sheets beside it.
-        if try start.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true {
-            let v = try start.resourceValues(forKeys: Set(keys))
-            let siblings = try FileManager.default.contentsOfDirectory(at: start.deletingLastPathComponent(), includingPropertiesForKeys: nil)
-            return ([ListedFile(url: start, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast)],
-                    siblings.filter { $0.pathExtension.lowercased() == "cue" }, [], [])
-        }
+        typealias Single = (start: URL, file: ListedFile?, cues: [URL])
+        guard let first = await onIOQueue(timeout: timeout, { () -> Result<Single, Error> in
+            Result {
+                let start = root.resolvingSymlinksInPath()
+                guard try start.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true else { return (start, nil, []) }
+                let v = try start.resourceValues(forKeys: Set(keys))
+                let siblings = try FileManager.default.contentsOfDirectory(at: start.deletingLastPathComponent(), includingPropertiesForKeys: nil)
+                return (start, ListedFile(url: start, size: Int64(v.fileSize ?? -1), modified: v.contentModificationDate ?? .distantPast),
+                        siblings.filter { $0.pathExtension.lowercased() == "cue" })
+            }
+        }) else { throw ScanError.notResponding(path: root.path) }
+        let single = try first.get()
+        let start = single.start
+        if let file = single.file { return ([file], single.cues, [], []) }
         typealias Listed = (dir: URL, result: Result<(files: [ListedFile], cues: [URL], dirs: [URL], hasImage: URL?), Error>)
         let network = forced ?? NetworkVolume.isNetwork(start)
         let width = network ? 12 : 4
@@ -322,10 +420,10 @@ public actor LibraryScanner {
             var running = 0
             func begin(_ dir: URL) {
                 running += 1
-                group.addTask { await onIOQueue(network: network, gate: gate) {
+                group.addTask { await onIOQueue(network: network, gate: gate, timeout: timeout) {
                     (dir: dir, result: Result {
                         var files: [ListedFile] = [], cues: [URL] = [], dirs: [URL] = [], images: [URL] = []
-                        let items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
+                        let items = try readFolder(dir, keys)
                         for item in items {
                             var url = item
                             // An item that vanished (or can't be read) since the folder was listed is skipped.
@@ -349,12 +447,16 @@ public actor LibraryScanner {
                         }
                         return (files, cues, dirs, ArtworkStore.pickCover(images) != nil ? dir : nil)
                     })
-                } }
+                } ?? (dir: dir, result: .failure(ScanError.notResponding(path: dir.path))) }
             }
             while running < width, let dir = pending.popLast() { begin(dir) }
             while let (dir, result) = await group.next() {
                 running -= 1
                 switch result {
+                case .failure(let error as ScanError):
+                    // The source stopped answering: no point asking it for more folders.
+                    failure = error
+                    pending.removeAll()
                 case .success(let r):
                     audio.append(contentsOf: r.files)
                     cue.append(contentsOf: r.cues)
@@ -367,10 +469,11 @@ public actor LibraryScanner {
                 case .failure:
                     unreadable.append(dir)
                 }
-                while failure == nil, running < width, let dir = pending.popLast() { begin(dir) }
+                while failure == nil, !Task.isCancelled, running < width, let dir = pending.popLast() { begin(dir) }
             }
         }
         if let failure { throw failure }
+        try Task.checkCancellation()
         // Same canonical paths as the rest of the library (resolvingSymlinksInPath, which also
         // drops a leading /private), rewritten by prefix: resolving every file would cost a
         // network round trip each on a share.
@@ -556,4 +659,14 @@ public actor LibraryScanner {
             }
         }
     }
+}
+
+/// When a scan last heard from its source (a folder listed, a file read), readable from any thread.
+final class ScanActivity: @unchecked Sendable {
+    private let lock = NSLock()
+    private var last = Date()
+
+    func touch() { lock.lock(); last = Date(); lock.unlock() }
+    /// Seconds since the source last answered.
+    var quiet: TimeInterval { lock.lock(); defer { lock.unlock() }; return Date().timeIntervalSince(last) }
 }

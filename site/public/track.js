@@ -8,6 +8,8 @@
  *   email-click       mailto: (no address recorded)            {placement, locale}
  *   outbound-click    any other external host                  {host, placement, locale}
  *   brew-copy         the Copy button next to the Homebrew command {placement, locale}
+ *   compare-click     a link between the /compare/ pages           {from, to, placement}
+ *   faq-open          a FAQ <details data-faq> opened (the guide pages)   {page, q}
  * placement = the nearest [data-placement], else the enclosing header / nav / footer / main.
  */
 (function () {
@@ -58,10 +60,21 @@
     var a = e.target.closest("a[href]");
     if (!a || a.hasAttribute("data-umami-event")) return; // an explicit data-umami-event wins
     if (e.type === "auxclick" && e.button !== 1) return; // middle click only
+    var to = a.getAttribute("data-compare");
+    if (to) { window.umami.track("compare-click", { from: location.pathname, to: to, placement: placement(a) }); return; }
     var hit = classify(a);
     if (hit) window.umami.track(hit[0], hit[1]);
   }
 
+  // A FAQ question opened. "toggle" doesn't bubble, so it is caught in the capture phase.
+  function onToggle(e) {
+    var d = e.target;
+    if (!window.umami || !d || !d.matches || !d.matches("details[data-faq]") || !d.open) return;
+    var s = d.querySelector("summary");
+    window.umami.track("faq-open", { page: location.pathname, q: ((s && s.textContent) || "").trim().slice(0, 80) });
+  }
+
   document.addEventListener("click", onClick, true);
   document.addEventListener("auxclick", onClick, true);
+  document.addEventListener("toggle", onToggle, true);
 })();

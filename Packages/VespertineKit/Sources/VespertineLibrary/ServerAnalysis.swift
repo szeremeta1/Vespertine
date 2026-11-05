@@ -133,6 +133,15 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
         for (path, e) in entries where !known.contains(path) { bySize[e.size, default: []].append((path, e)) }
         var matched: [(FileAnalysis, String)] = []
         var profiles: [(TransitionProfile, String)] = []
+        // Songs whose analysis is current and that only lack a profile (analyzed before profiles existed) take just the
+        // record's profile, and nothing when it has none: else they would be imported again at every sync.
+        let analyzed = Set(try database.writer.read { db in
+            try Int64.fetchAll(db, sql: """
+                SELECT a.trackId FROM analysis a JOIN track t ON t.id = a.trackId
+                WHERE t.sourceId = ? AND a.version >= ? AND a.fileSize = t.fileSize AND a.modifiedAt = t.modifiedAt
+                """, arguments: [sourceID, FileAnalysis.currentVersion])
+        })
+        var profilesOnly = 0
         for track in try database.tracksNeedingAnalysis() where track.sourceId == sourceID {
             guard track.filePath.hasPrefix(base) else { continue }
             let rel = String(track.filePath.dropFirst(base.count)).precomposedStringWithCanonicalMapping
@@ -142,6 +151,12 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
             let candidates = (bySize[track.fileSize] ?? []).filter { abs($0.entry.mtime - track.modifiedAt.timeIntervalSince1970) < 0.002 }
             guard let hit = byPath ?? (candidates.count == 1 ? candidates[0] : nil),
                   let r = try Self.record(hit.entry, path: hit.path, in: file) else { continue }
+            if analyzed.contains(track.id ?? -1) {
+                guard let profile = r.transition, profile.version >= TransitionProfile.currentVersion else { continue }
+                profiles.append((profile, track.filePath))
+                profilesOnly += 1
+                continue
+            }
             // A server still on an older analyzer: its results are judged anew here from their measurements.
             let analysis = FileAnalyzer.rejudged(r.analysis)
             guard analysis.version >= FileAnalysis.currentVersion else { continue }
@@ -150,7 +165,7 @@ public final class ServerAnalysisImporter: @unchecked Sendable {
         }
         try database.saveAnalyses(matched)
         try database.saveTransitionProfiles(profiles)
-        return matched.count
+        return matched.count + profilesOnly
     }
 
     /// The whole record on an entry's line, read from the index file the entry came from; nil when it can't be decoded.

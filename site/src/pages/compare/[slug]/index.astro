@@ -1,0 +1,7 @@
+---
+import Compare from '../../../views/Compare.astro';
+import { rivals } from '../../../data/compare';
+export const getStaticPaths = () => rivals.map((rival) => ({ params: { slug: rival.slug }, props: { rival } }));
+const { rival } = Astro.props;
+---
+<Compare rival={rival} />

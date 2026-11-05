@@ -30,7 +30,7 @@ const items = [
       {items.map((i) => <li class={i.cls}><a href={i.href} aria-current={page === 'press' && i.href === press ? 'page' : undefined}>{i.text}</a></li>)}
     </ul>
   </nav>
-  <LangMenu lang={lang} page={page} />
+  {page !== 'article' && <LangMenu lang={lang} page={page} />}
   <a class="btn btn--brass btn--sm" href={latest.dmg.url} aria-label={fill(s.downloadLabel, { version: latest.version })}>{s.download}</a>
   <div class="nav__meter" aria-hidden="true"><span></span></div>
 </header>
