@@ -94,10 +94,13 @@ private final class StallableReader: PlaybackCacheReader, @unchecked Sendable {
     let size: Int64
     private let condition = NSCondition()
     private var stalled = true
+    private var lastRead: ContinuousClock.Instant?
+    var finishedReadingAt: ContinuousClock.Instant? { condition.withLock { lastRead } }
     init(chunks: Int, chunk: Int) { size = Int64(chunks * chunk) }
     func read(at offset: Int64, count: Int) throws -> Data {
         condition.lock(); defer { condition.unlock() }
         while stalled { condition.wait() }
+        if offset + Int64(count) == size { lastRead = ContinuousClock.now }
         return Data(repeating: 7, count: count)
     }
     func release() { condition.lock(); stalled = false; condition.broadcast(); condition.unlock() }
@@ -211,7 +214,7 @@ struct NetworkPriorityTests {
         while !condition(), Date() < deadline { try? await Task.sleep(for: .milliseconds(5)) }
     }
 
-    @Test("Scans start nothing while the song's copy is arriving, and carry on a few seconds after it is local")
+    @Test("Scans start nothing while the song's copy is arriving, and carry on a few seconds after it is local", .timeLimit(.minutes(2)))
     func scanPausesThenResumes() async throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let link = SlowLink(latency: 0.001)
@@ -221,21 +224,32 @@ struct NetworkPriorityTests {
         let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: reader)
         #expect(gate.isPaused)
 
-        let scan = ScanLoad(link: link, gate: gate)
-        defer { Task { await scan.stop() } }
+        // One finite scan operation: await its completion rather than assuming the cooperative executor and
+        // shared utility queue will run it within a wall-clock polling window on a busy CI runner.
+        let scan = Task {
+            await LibraryScanner.onIOQueue(network: true, gate: gate) {
+                let started = ContinuousClock.now
+                let complete = entry.isComplete
+                link.request(.scan)
+                return (started: started, complete: complete)
+            }
+        }
+        defer { reader.release() }
         try await Task.sleep(for: .milliseconds(150))
         #expect(link.count(.scan) == 0, "the scan ran while the song's bytes were still coming")
 
         reader.release()
         try entry.prepare(full: true, lead: 0, cancelled: { false })
-        let local = Date()
         #expect(entry.isComplete)
-        try await Task.sleep(for: .milliseconds(150))
-        #expect(link.count(.scan, from: local) == 0, "scans resumed before the buffer had been healthy for a while")
-        await settle { link.count(.scan, from: local) > 0 }
-        #expect(link.count(.scan, from: local) > 0, "scans never resumed")
+        let resumed = await scan.value
+        #expect(resumed.complete, "the scan started before the song was local")
+        // The last remote read precedes publication of a complete copy, so it is a lower bound for the grace
+        // period's start. Check the actual scan start, not a sleep that may return after the grace has expired.
+        let finished = try #require(reader.finishedReadingAt)
+        #expect(finished.duration(to: resumed.started) >= .seconds(gate.healthyGrace),
+                "scans resumed before the buffer had been healthy for a while")
+        #expect(link.count(.scan) == 1, "the waiting scan never reached the link")
         #expect(!gate.isPaused)
-        await scan.stop()
     }
 
     @Test("A prefetched next song doesn't hold scans back; it does once it is the one playing")
