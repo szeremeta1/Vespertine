@@ -14,6 +14,7 @@ import CoreAudio
 import Foundation
 import Testing
 @testable import VespertineAudio
+import VespertineTestSupport
 
 @Suite("Multichannel loopback", .serialized,
        .enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_MULTICHANNEL_LOOPBACK"] == "1"))
@@ -49,29 +50,30 @@ struct MultichannelLoopbackTests {
         return (output, rate)
     }
 
-    static func settings(_ output: OutputDevice, spatial: SpatialMode) -> EngineSettings {
+    static func settings(_ output: OutputDevice, spatial: SpatialMode, policy: RatePolicy = .matchSource) -> EngineSettings {
         var settings = EngineSettings()
         settings.exclusive = false
         settings.deviceUID = output.uid
         settings.deviceName = output.name
-        settings.ratePolicies = [output.uid: .matchSource]
+        settings.ratePolicies = [output.uid: policy]
         settings.spatialModes = [output.uid: spatial]
         return settings
     }
 
     /// Plays `url` on `output` and returns the recording (one array per input channel), the device rate seen while
     /// playing, and the signal path.
-    static func play(_ url: URL, on output: OutputDevice, rate: Double, spatial: SpatialMode = .off, seconds: Double)
+    static func play(_ url: URL, on output: OutputDevice, rate: Double, spatial: SpatialMode = .off, seconds: Double, item: PlayableItem? = nil,
+                     policy: RatePolicy = .matchSource)
         throws -> (recorded: [[Float]], rates: Set<Double>, path: SignalPath?, discontinuities: Int) {
         try DeviceControl.setNominalRate(rate, on: output.id)
         let recorder = try LoopbackRecorder(device: output.id, rate: rate, maxChannels: 16)
         try recorder.start()
         defer { recorder.restore() }
         let engine = PlaybackEngine()
-        engine.update(settings: settings(output, spatial: spatial))
+        engine.update(settings: settings(output, spatial: spatial, policy: policy))
         Thread.sleep(forTimeInterval: 0.2)
         recorder.drain()
-        engine.play(PlayableItem(url: url))
+        engine.play(item ?? PlayableItem(url: url))
         let started = Date()
         var played = false, rates: Set<Double> = [], path: SignalPath?
         while Date().timeIntervalSince(started) < seconds + 8 {
@@ -168,5 +170,29 @@ struct MultichannelLoopbackTests {
             }
             print("spatial \(mode.rawValue) \(name): L \(String(format: "%.4f", lv)) R \(String(format: "%.4f", rv)) ILD \(String(format: "%+.1f", ild)) dB")
         }
+    }
+
+    @Test("5.1 DSF and SACD ISO: converted to PCM, every channel on its own output, the rest silent", arguments: ["dsf", "iso"])
+    func dsd(ext: String) throws {
+        let (output, originalRate) = try Self.device()
+        defer { try? DeviceControl.setNominalRate(originalRate, on: output.id) }
+        let url = try MultichannelDSDDeviceTests.write(ext)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let item = ext == "iso" ? PlayableItem(url: url, sacdArea: .multichannel) : PlayableItem(url: url)
+        // DSD64 becomes 352.8 kHz PCM, sent at a fixed 88.2 kHz here: the recorder can't keep up with 16 channels at 352.8 kHz
+        // in a debug build (the planner's own choice of rate for DSD is covered offline, MultichannelDSDDeviceTests).
+        let rate = 88_200.0
+        let run = try Self.play(url, on: output, rate: rate, seconds: 1.3, item: item, policy: .fixed(rate))
+        #expect(run.rates == [rate], "device rate while playing: \(run.rates.sorted())")
+        if let path = run.path { #expect(path.plan.dsdConvertedToPCM && path.plan.channels == 6 && path.plan.spatial == .off, "\(path.plan)") }
+        let channels = run.recorded.count
+        let first = try #require(run.recorded[0].indices.first { abs(run.recorded[0][$0]) > 1e-4 }, "nothing recorded")
+        let frames = run.recorded[0].count
+        var interleaved = [Float](repeating: 0, count: frames * channels)
+        for ch in 0..<channels { for f in 0..<frames { interleaved[f * channels + ch] = run.recorded[ch][f] } }
+        let carried = ToneID.identify(interleaved, stride: channels, tones: SpatialProbe.frequencies(MultichannelDSDDeviceTests.names), rate: rate,
+                                      from: first + Int(rate * 0.3), count: Int(rate * 0.6))
+        #expect(carried == Array(0..<6) + Array(repeating: -1, count: channels - 6), "\(ext) at \(rate) Hz: \(carried)")
+        print("dsd \(ext): \(rate) Hz, outputs carried \(carried)")
     }
 }
