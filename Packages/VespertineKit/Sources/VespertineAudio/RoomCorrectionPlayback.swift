@@ -56,7 +56,9 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
     }
 
     /// The profile's correction in output-channel order (from its channel map).
-    public init(profile: RoomProfile, impulseDirectory: URL = RoomImpulse.defaultDirectory) {
+    public init(profile source: RoomProfile, impulseDirectory: URL = RoomImpulse.defaultDirectory) {
+        // The profile as it plays: at its strength.
+        let profile = source.atStrength
         let outputs = (profile.channelMap.entries.map(\.output).max() ?? -1) + 1
         var channels = [RoomChannelPlayback](repeating: RoomChannelPlayback(), count: max(0, min(outputs, Self.maxChannels)))
         for entry in profile.channelMap.entries where entry.output >= 0 && entry.output < channels.count {

@@ -75,12 +75,12 @@ enum DeveloperHooks {
             do {
                 var profile: RoomProfile
                 switch url.pathExtension.lowercased() {
-                case "json": profile = try RoomCorrectionCoding.decodeProfile(try Data(contentsOf: url))
+                case "json": profile = try RoomProfileArchive.decode(try Data(contentsOf: url))
                 case "txt": profile = try RoomAPO.profile(try String(contentsOf: url, encoding: .utf8), name: name, deviceUID: device.uid)
                 default: profile = try RoomImpulseImport.profile(files: [url], name: name, deviceUID: device.uid)
                 }
                 profile.deviceUID = device.uid
-                model.settings.saveRoomProfile(profile)
+                profile = model.settings.saveRoomProfile(profile)
                 model.settings.setRoomProfile(profile.id, for: device.uid)
                 model.syncEngine()
                 print("[qa] room correction: \(profile.name), \(profile.layout.speakers.count) speakers")

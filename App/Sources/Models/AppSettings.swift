@@ -129,11 +129,16 @@ final class AppSettings {
     var eqPresets: [EQPreset] { didSet { defaults.set(try? JSONEncoder().encode(eqPresets), forKey: "eqPresets") } }
     /// The preset each output plays with (device UID → preset ID, or Off). Outputs that aren't listed play without one.
     var eqAssignments: [String: String] { didSet { defaults.set(eqAssignments, forKey: "eqAssignments") } }
-    /// Room correction profiles, measured here or imported. Each belongs to the output it was measured on (or imported for).
-    var roomProfiles: [RoomProfile] { didSet { defaults.set(try? RoomCorrectionCoding.encodeProfiles(roomProfiles), forKey: "roomProfiles") } }
-    /// The profile each output plays with while room correction is on for it (device UID → profile ID). Off unless
-    /// switched on: outputs that aren't listed play without it.
-    var roomAssignments: [String: String] { didSet { defaults.set(roomAssignments, forKey: "roomAssignments") } }
+    /// Room correction profiles, measured here or imported, and which one each output plays. Each profile belongs to
+    /// the output it was measured on (or imported for). Correction is off unless switched on for an output.
+    var roomBook: RoomProfileBook { didSet { saveRoomBook() } }
+    /// Profiles from a newer Vespertine that this one can't read: kept as they are and written back with the rest.
+    @ObservationIgnored private var roomUnreadable: [Any] = []
+    @ObservationIgnored private let roomStore: RoomProfileStore
+    /// Set when the library came from the old preferences: written to its file at the end of start-up.
+    @ObservationIgnored private var roomLoadedFromLegacy = false
+    /// Room Correction shows the guided controls unless this is on (the Guided | Advanced switch in its window).
+    var roomAdvancedMode: Bool { didSet { defaults.set(roomAdvancedMode, forKey: "roomAdvancedMode") } }
     /// Outputs that keep native DSD (DoP) while room correction is on, playing DSD uncorrected. Elsewhere DSD is
     /// converted to PCM while correction is on, so it's corrected too.
     var roomNativeDSDDeviceUIDs: Set<String> { didSet { defaults.set(roomNativeDSDDeviceUIDs.sorted(), forKey: "roomNativeDSD") } }
@@ -159,6 +164,19 @@ final class AppSettings {
 
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
         self.defaults = defaults
+        let resolvedDataDirectory: URL
+        if let dataDirectory {
+            resolvedDataDirectory = dataDirectory
+        } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
+            resolvedDataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
+        } else {
+            let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
+            // Development builds keep their own library beside the real one.
+            // The room measurement test build has its own, too.
+            let side = Bundle.main.bundleIdentifier.flatMap { $0.hasSuffix(".dev") ? "Vespertine Dev" : $0.hasSuffix(".roomtest") ? "Vespertine Room Test" : nil }
+            resolvedDataDirectory = side.map { standard.deletingLastPathComponent().appendingPathComponent($0, isDirectory: true) } ?? standard
+        }
+        roomStore = RoomProfileStore(directory: resolvedDataDirectory)
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
@@ -222,8 +240,14 @@ final class AppSettings {
             if allOffered != offered { defaults.set(allOffered.sorted(), forKey: "eqOfferedPresets") }
         }
         eqAssignments = defaults.dictionary(forKey: "eqAssignments") as? [String: String] ?? [:]
-        roomProfiles = defaults.data(forKey: "roomProfiles").flatMap { try? RoomCorrectionCoding.decodeProfiles($0) } ?? []
-        roomAssignments = defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]
+        // The library is a file in the data folder; the old preferences are read only until it exists.
+        let loadedRoom = roomStore.load(legacy: .init(profiles: defaults.data(forKey: "roomProfiles"),
+                                                      choices: defaults.dictionary(forKey: "roomChoices") as? [String: String] ?? [:],
+                                                      assignments: defaults.dictionary(forKey: "roomAssignments") as? [String: String] ?? [:]))
+        roomUnreadable = loadedRoom?.unreadable ?? []
+        roomBook = loadedRoom?.book ?? RoomProfileBook()
+        roomLoadedFromLegacy = loadedRoom != nil && !FileManager.default.fileExists(atPath: roomStore.fileURL.path)
+        roomAdvancedMode = defaults.bool(forKey: "roomAdvancedMode")
         roomNativeDSDDeviceUIDs = Set(defaults.stringArray(forKey: "roomNativeDSD") ?? [])
         setupCompleted = defaults.bool(forKey: "setupCompleted")
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
@@ -231,17 +255,9 @@ final class AppSettings {
         visualizerWindow = VisualizerWindowState.load(from: defaults)
         transitionsFeature = defaults.bool(forKey: "transitionsFeature")
         transitions = TransitionSettings.load(from: defaults)
-        if let dataDirectory {
-            self.dataDirectory = dataDirectory
-        } else if let override = LaunchArguments().string(forKey: "VespertineDataDirectory") ?? defaults.string(forKey: "LibraryDataDirectory") {
-            self.dataDirectory = URL(fileURLWithPath: (override as NSString).expandingTildeInPath, isDirectory: true)
-        } else {
-            let standard = LibraryDatabase.defaultURL.deletingLastPathComponent()
-            // Development builds keep their own library beside the real one.
-            // The room measurement test build has its own, too.
-            let side = Bundle.main.bundleIdentifier.flatMap { $0.hasSuffix(".dev") ? "Vespertine Dev" : $0.hasSuffix(".roomtest") ? "Vespertine Room Test" : nil }
-            self.dataDirectory = side.map { standard.deletingLastPathComponent().appendingPathComponent($0, isDirectory: true) } ?? standard
-        }
+        self.dataDirectory = resolvedDataDirectory
+        // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).
+        if roomLoadedFromLegacy { saveRoomBook() }
     }
 
     var networkCacheLimitBytes: Int64 { Int64(networkCacheLimitGB * 1_000_000_000) }
@@ -260,31 +276,44 @@ final class AppSettings {
     private static let equalizerOff = "__off__"
 
     /// The profiles measured on `uid`, newest first.
-    func roomProfiles(for uid: String) -> [RoomProfile] {
-        roomProfiles.filter { $0.deviceUID == uid }.sorted { $0.createdAt > $1.createdAt }
-    }
+    func roomProfiles(for uid: String) -> [RoomProfile] { roomBook.profiles(for: uid) }
 
     /// The room correction `uid` plays with: only while it's switched on, and only a profile measured on that output.
-    func roomProfile(for uid: String) -> RoomProfile? {
-        guard let id = roomAssignments[uid] else { return nil }
-        return roomProfiles.first { $0.id.uuidString == id && $0.deviceUID == uid }
+    func roomProfile(for uid: String) -> RoomProfile? { roomBook.active(for: uid) }
+
+    /// The profile `uid` would play, on or off.
+    func chosenRoomProfile(for uid: String) -> RoomProfile? { roomBook.chosenID(for: uid).flatMap { roomBook.profile($0) } }
+
+    /// Switches room correction on for `uid` with `profile`, or off (nil). Off keeps the choice for switching back on.
+    func setRoomProfile(_ profile: UUID?, for uid: String) {
+        guard let profile else { roomBook.setEnabled(false, for: uid); return }
+        roomBook.choose(profile, for: uid)
+        roomBook.setEnabled(true, for: uid)
     }
 
-    /// Switches room correction on for `uid` with `profile`, or off (nil).
-    func setRoomProfile(_ profile: UUID?, for uid: String) { roomAssignments[uid] = profile?.uuidString }
+    /// Makes `profile` the one `uid` plays with when correction is on, without switching it on or off.
+    func chooseRoomProfile(_ profile: UUID, for uid: String) { roomBook.choose(profile, for: uid) }
 
-    /// Replaces a stored profile (a redesign) or adds a new one.
-    func saveRoomProfile(_ profile: RoomProfile) {
-        if let i = roomProfiles.firstIndex(where: { $0.id == profile.id }) { roomProfiles[i] = profile } else { roomProfiles.append(profile) }
-    }
+    /// Adds a new profile (a measurement, an import) and returns it as stored: its name may have been numbered.
+    @discardableResult
+    func saveRoomProfile(_ profile: RoomProfile) -> RoomProfile { roomBook.add(profile) }
+
+    /// Changes a stored profile in place; nothing changes if `change` throws.
+    func updateRoomProfile(_ id: UUID, _ change: (inout RoomProfile) throws -> Void) throws { try roomBook.update(id, change) }
+
+    func renameRoomProfile(_ id: UUID, to name: String) throws { try roomBook.rename(id, to: name) }
+
+    @discardableResult
+    func duplicateRoomProfile(_ id: UUID) throws -> RoomProfile { try roomBook.duplicate(id) }
 
     func deleteRoomProfile(_ id: UUID) {
-        let removed = roomProfiles.first { $0.id == id }
-        roomProfiles.removeAll { $0.id == id }
-        roomAssignments = roomAssignments.filter { $0.value != id.uuidString }
         // Its measured filters go too, unless another profile still uses them.
-        let kept = Set(roomProfiles.flatMap { ($0.impulses ?? [:]).values.map(\.file) })
-        for impulse in Set((removed?.impulses ?? [:]).values) where !kept.contains(impulse.file) { impulse.delete() }
+        for impulse in roomBook.delete(id) { impulse.delete() }
+    }
+
+    private func saveRoomBook() {
+        do { try roomStore.save(roomBook, unreadable: roomUnreadable) }
+        catch { NSLog("Vespertine: the room correction library couldn't be saved: \(error.localizedDescription)") }
     }
 
     /// Carries an output's own settings (rate, DoP, receiver, Spatial Audio, equalizer) over to its new UID.
@@ -296,10 +325,7 @@ final class AppSettings {
         if rateChoices[new] == nil, let choice = rateChoices[old] { rateChoices[new] = choice }
         if eqAssignments[new] == nil, let preset = eqAssignments[old] { eqAssignments[new] = preset }
         // Room profiles belong to the output, not to a USB port: the same DAC under a new UID keeps them.
-        if roomProfiles.contains(where: { $0.deviceUID == old }) {
-            roomProfiles = roomProfiles.map { var p = $0; if p.deviceUID == old { p.deviceUID = new }; return p }
-        }
-        if roomAssignments[new] == nil, let profile = roomAssignments[old] { roomAssignments[new] = profile }
+        roomBook.moveDevice(from: old, to: new)
         if roomNativeDSDDeviceUIDs.contains(old) { roomNativeDSDDeviceUIDs.insert(new) }
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
@@ -354,7 +380,7 @@ final class AppSettings {
         s.integerMode = integerMode
         s.matchSixteenBit = matchSixteenBit
         s.equalizers = eqAssignments.compactMapValues { id in eqPresets.first { $0.id.uuidString == id } }
-        s.roomCorrections = Dictionary(uniqueKeysWithValues: roomAssignments.keys.compactMap { uid in
+        s.roomCorrections = Dictionary(uniqueKeysWithValues: roomBook.assignments.keys.compactMap { uid in
             roomProfile(for: uid).map { (uid, RoomCorrectionPlayback(profile: $0)) }
         })
         s.roomNativeDSDDeviceUIDs = roomNativeDSDDeviceUIDs

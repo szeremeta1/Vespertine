@@ -87,22 +87,39 @@ struct RoomCorrectionChoice: View {
 
 // MARK: - The window
 
+/// What the window does when the mode switch is flipped. Every Advanced section starts below the Compare card, so
+/// without this, Guided to Advanced looks like nothing happened until the user scrolls.
+enum RoomModeReveal {
+    static let advancedAnchor = "room-advanced-start"
+
+    struct Reaction { let scrollTo: String; let hint: String }
+
+    static func reaction(from old: Bool, to new: Bool, hasProfile: Bool) -> Reaction? {
+        guard !old, new, hasProfile else { return nil }
+        return Reaction(scrollTo: advancedAnchor, hint: String(localized: "Advanced controls are below", comment: "Room correction: shown after switching to Advanced; the window scrolls to them"))
+    }
+}
+
 struct RoomCorrectionWindow: View {
-    @Environment(AppModel.self) private var model
+    @Environment(AppModel.self) var model
     @Environment(RoomMeasureModel.self) private var measure
-    @State private var selection: UUID?
     @State private var showWizard = false
-    @State private var redesigning = false
-    @State private var problem: String?
-    @State private var notice: String?
+    @State var redesigning = false
+    @State var problem: String?
+    @State var notice: String?
     @State private var importing: RoomImportKind?
-    @State private var showAfter = true
+    @State var showAfter = true
+    @State private var showDetails = false
+    @State private var confirmDelete = false
+    @State var layers = RoomGraphLayers.all
+    @State private var modeHint: String?
 
     var body: some View {
         let settings = model.settings
         let device = model.activeDevice
         let profiles = device.map { settings.roomProfiles(for: $0.uid) } ?? []
-        let selected = profiles.first { $0.id == selection } ?? device.flatMap { settings.roomProfile(for: $0.uid) } ?? profiles.first
+        let selected = device.flatMap { settings.chosenRoomProfile(for: $0.uid) } ?? profiles.first
+        ScrollViewReader { scroller in
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
@@ -114,25 +131,45 @@ struct RoomCorrectionWindow: View {
                 }
                 if let problem { message(problem, symbol: "exclamationmark.triangle.fill", colour: Palette.copper) }
                 if let notice { message(notice, symbol: "checkmark.circle.fill", colour: Palette.brass) }
-                if let selected {
-                    profileSection(selected, profiles: profiles)
+                if let selected, let device {
+                    profileSection(selected, profiles: profiles, device: device)
                 } else if device != nil {
                     emptyState
                 }
             }
             .padding(24)
         }
+        .onChange(of: settings.roomAdvancedMode) { old, new in
+            guard let reaction = RoomModeReveal.reaction(from: old, to: new, hasProfile: selected != nil) else { modeHint = nil; return }
+            modeHint = reaction.hint
+            withAnimation(.easeInOut(duration: 0.35)) { scroller.scrollTo(reaction.scrollTo, anchor: .top) }
+        }
+        }
         .frame(minWidth: 760, minHeight: 680)
         .background(Palette.window)
         .sheet(isPresented: $showWizard) {
             RoomMeasureWizard(device: device) { profile, turnOn in
-                settings.saveRoomProfile(profile)
-                if turnOn { settings.setRoomProfile(profile.id, for: profile.deviceUID) }
-                selection = profile.id
+                let stored = settings.saveRoomProfile(profile)
+                if turnOn { settings.setRoomProfile(stored.id, for: stored.deviceUID) }
                 model.syncEngine()
                 showWizard = false
             } close: { showWizard = false }
             .environment(measure)
+        }
+        .sheet(isPresented: $showDetails) {
+            if let selected {
+                RoomProfileDetailsSheet(profileID: selected.id) { showDetails = false }
+            }
+        }
+        .confirmationDialog(String(localized: "Delete “\(selected?.name ?? "")”?"), isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete Profile", role: .destructive) {
+                if let selected {
+                    model.settings.deleteRoomProfile(selected.id)
+                    model.syncEngine()
+                }
+            }
+        } message: {
+            Text("Its measurement and filters are removed. This can't be undone.")
         }
         .fileImporter(isPresented: Binding(get: { importing != nil }, set: { if !$0 { importing = nil } }),
                       allowedContentTypes: importing?.types ?? [.json], allowsMultipleSelection: importing == .impulseResponses) { result in
@@ -149,8 +186,24 @@ struct RoomCorrectionWindow: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text("Room Correction").font(Typeface.serif(28)).foregroundStyle(Palette.text)
+        let settings = model.settings
+        return VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Room Correction").font(Typeface.serif(28)).foregroundStyle(Palette.text)
+                Spacer()
+                Picker("Mode", selection: Binding(get: { settings.roomAdvancedMode }, set: { settings.roomAdvancedMode = $0 })) {
+                    Text("Guided", comment: "Room correction mode: measure, one strength control, compare").tag(false)
+                    Text("Advanced", comment: "Room correction mode: every filter, target and limit editable").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+                .help("Guided: measure, set how much, compare. Advanced: every filter, the target, limits and positions.")
+                .accessibilityLabel("Room correction mode")
+            }
+            if let modeHint, settings.roomAdvancedMode {
+                Label(modeHint, systemImage: "arrow.down").font(Typeface.ui(11.5)).foregroundStyle(Palette.brass)
+            }
             Text("Lines your speakers up at your seat and tames the room's bass, per speaker. Off unless you turn it on; while it's on, playback isn't bit-perfect.")
                 .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
         }
@@ -185,7 +238,7 @@ struct RoomCorrectionWindow: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(device.name).font(Typeface.ui(15, weight: .semibold)).foregroundStyle(Palette.text)
-                    Text(statusLine(profiles: profiles, on: on)).font(Typeface.ui(11.5)).foregroundStyle(on ? Palette.brass : Palette.text3)
+                    Text(statusLine(profiles: profiles, on: on, selected: selected)).font(Typeface.ui(11.5)).foregroundStyle(on ? Palette.brass : Palette.text3)
                 }
                 Spacer()
                 Toggle("Room correction", isOn: Binding(get: { on }, set: { new in
@@ -206,9 +259,10 @@ struct RoomCorrectionWindow: View {
         .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(on ? Palette.brassLo : Palette.hairline))
     }
 
-    private func statusLine(profiles: [RoomProfile], on: Bool) -> String {
+    private func statusLine(profiles: [RoomProfile], on: Bool, selected: RoomProfile?) -> String {
         if profiles.isEmpty { return String(localized: "Not set up") }
-        return on ? String(localized: "On") : String(localized: "Off")
+        guard let selected else { return on ? String(localized: "On") : String(localized: "Off") }
+        return on ? String(localized: "On · \(selected.name)") : String(localized: "Off · \(selected.name) ready")
     }
 
     @ViewBuilder
@@ -258,9 +312,10 @@ struct RoomCorrectionWindow: View {
     private func actions(_ device: OutputDevice, selected: RoomProfile?) -> some View {
         HStack(spacing: 10) {
             Button { showWizard = true } label: {
-                Label(selected == nil ? "Measure…" : "Measure Again…", systemImage: "mic")
+                Label(selected == nil ? "Measure…" : "Measure New…", systemImage: "mic")
             }
             .keyboardShortcut(.defaultAction)
+            .help("Measure the room and add a new profile")
             Menu {
                 Button("Equalizer APO or REW Filters…") { importing = .equalizerAPO }
                 Button("Impulse Responses…") { importing = .impulseResponses }
@@ -270,24 +325,8 @@ struct RoomCorrectionWindow: View {
                 Label("Import", systemImage: "square.and.arrow.down")
             }
             .fixedSize()
-            .help("Bring in filters made with REW or another measurement tool")
-            if let selected {
-                Menu {
-                    Button("Equalizer APO Text…") { export(selected, asAPO: true) }
-                    Button("Vespertine Room Profile…") { export(selected, asAPO: false) }
-                } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
-                }
-                .fixedSize()
-            }
+            .help("Bring in filters made with REW or another measurement tool, or a profile exported from Vespertine")
             Spacer()
-            if let selected {
-                Button("Delete Profile", role: .destructive) {
-                    model.settings.deleteRoomProfile(selected.id)
-                    selection = nil
-                    model.syncEngine()
-                }
-            }
         }
     }
 
@@ -299,7 +338,7 @@ struct RoomCorrectionWindow: View {
         guard let device else { return }
         let name = urls[0].deletingPathExtension().lastPathComponent
         do {
-            let profile: RoomProfile
+            var profile: RoomProfile
             switch kind {
             case .equalizerAPO:
                 let text = try String(contentsOf: urls[0], encoding: .utf8)
@@ -307,27 +346,24 @@ struct RoomCorrectionWindow: View {
             case .impulseResponses:
                 profile = try RoomImpulseImport.profile(files: urls, name: name, deviceUID: device.uid)
             case .profile:
-                profile = try RoomCorrectionCoding.decodeProfile(try Data(contentsOf: urls[0]))
+                profile = try RoomProfileArchive.decode(try Data(contentsOf: urls[0]))
+                // A profile brought from another Mac or output is used on this output, if it has the channels.
+                profile = try profile.retargeted(toDevice: device.uid, outputChannels: device.capabilities.outputChannels)
             }
-            model.settings.saveRoomProfile(profile)
-            selection = profile.id
-            if profile.deviceUID != device.uid {
-                notice = String(localized: "Imported. It was measured on another output, so it only appears (and plays) when that output is selected.")
-            } else {
-                notice = String(localized: "Imported “\(profile.name)”. Turn room correction on to hear it.")
-            }
+            let stored = model.settings.saveRoomProfile(profile)
+            notice = String(localized: "Imported “\(stored.name)” for \(device.name). Turn room correction on to hear it.")
         } catch {
             problem = String(localized: "That file couldn't be imported: \(error.localizedDescription)")
         }
     }
 
-    private func export(_ profile: RoomProfile, asAPO: Bool) {
+    func export(_ profile: RoomProfile, asAPO: Bool) {
         let panel = NSSavePanel()
         panel.nameFieldStringValue = profile.name.replacingOccurrences(of: "/", with: "-") + (asAPO ? ".txt" : ".json")
         panel.allowedContentTypes = asAPO ? [.plainText] : [.json]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
-            let data = asAPO ? Data(RoomAPO.text(profile).utf8) : try RoomCorrectionCoding.encode(profile)
+            let data = asAPO ? Data(RoomAPO.text(profile.atStrength).utf8) : try RoomProfileArchive.encode(profile)
             try data.write(to: url, options: .atomic)
             problem = nil
         } catch {
@@ -338,35 +374,86 @@ struct RoomCorrectionWindow: View {
     // MARK: Profile
 
     @ViewBuilder
-    private func profileSection(_ profile: RoomProfile, profiles: [RoomProfile]) -> some View {
+    private func profileSection(_ profile: RoomProfile, profiles: [RoomProfile], device: OutputDevice) -> some View {
         let settings = model.settings
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                if profiles.count > 1 {
-                    Picker("Profile", selection: Binding(get: { profile.id }, set: { id in
-                        selection = id
-                        if settings.roomProfile(for: profile.deviceUID) != nil { settings.setRoomProfile(id, for: profile.deviceUID); model.syncEngine() }
-                    })) {
-                        ForEach(profiles) { Text($0.name).tag($0.id) }
-                    }
-                    .fixedSize()
-                } else {
-                    Text(profile.name).font(Typeface.ui(15, weight: .semibold)).foregroundStyle(Palette.text)
-                }
-                Spacer()
-            }
+        VStack(alignment: .leading, spacing: 16) {
+            profileBar(profile, profiles: profiles, device: device)
             Text(summary(profile)).font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
             graph(profile)
-            if let options = profile.designOptions, profile.measured != nil {
-                designPickers(profile, options: options)
+            RoomListeningControls(profile: profile, device: device, edit: { edit(profile.id, $0) })
+            if settings.roomAdvancedMode {
+                RoomAdvancedControls(profile: profile, redesigning: redesigning, edit: { edit(profile.id, $0) },
+                                redesign: { redesign(profile, options: $0, excluded: $1) })
+                    .id(RoomModeReveal.advancedAnchor)
+            } else {
+                DisclosureGroup("What it does") {
+                    RoomSpeakerTable(profile: profile.atStrength).padding(.top, 8)
+                }
+                .font(Typeface.ui(12))
             }
-            RoomSpeakerTable(profile: profile)
+        }
+    }
+
+    /// The profile's name and the controls that manage it: pick another, rename and label, duplicate, export, delete.
+    private func profileBar(_ profile: RoomProfile, profiles: [RoomProfile], device: OutputDevice) -> some View {
+        let settings = model.settings
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Picker("Profile", selection: Binding(get: { profile.id }, set: { id in
+                    settings.chooseRoomProfile(id, for: device.uid)
+                    model.syncEngine()
+                })) {
+                    ForEach(profiles) { Text($0.name).tag($0.id) }
+                }
+                .labelsHidden()
+                .fixedSize()
+                .accessibilityLabel("Profile")
+                .help("Each output remembers the profile you choose and uses it whenever that output is selected")
+                Menu {
+                    Button("Name and Labels…") { showDetails = true }
+                    Button("Duplicate") { duplicate(profile) }
+                    Divider()
+                    Button("Export as Vespertine Room Profile…") { export(profile, asAPO: false) }
+                    Button("Export as Equalizer APO Text…") { export(profile, asAPO: true) }
+                    Divider()
+                    Button("Delete Profile…", role: .destructive) { confirmDelete = true }
+                } label: {
+                    Label("Profile", systemImage: "ellipsis.circle")
+                }
+                .fixedSize()
+                Spacer()
+            }
+            if let tags = profile.tags, !tags.isEmpty {
+                Text(tags.summary).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2)
+            }
+        }
+    }
+
+    private func duplicate(_ profile: RoomProfile) {
+        do {
+            let copy = try model.settings.duplicateRoomProfile(profile.id)
+            model.settings.chooseRoomProfile(copy.id, for: copy.deviceUID)
+            model.syncEngine()
+            notice = String(localized: "Made “\(copy.name)”. Rename it and change what you like; the original stays as it was.")
+        } catch {
+            problem = error.localizedDescription
+        }
+    }
+
+    /// Changes the stored profile `id` in place and hands it to playback; a refused change shows why and changes nothing.
+    func edit(_ id: UUID, _ change: (inout RoomProfile) throws -> Void) {
+        do {
+            try model.settings.updateRoomProfile(id, change)
+            problem = nil
+            model.syncEngine()
+        } catch {
+            problem = error.localizedDescription
         }
     }
 
     private func summary(_ profile: RoomProfile) -> String {
         let date = profile.createdAt.formatted(date: .abbreviated, time: .shortened)
-        let preamp = profile.filters.preampDB.formatted(.number.precision(.fractionLength(1)))
+        let preamp = profile.atStrength.filters.preampDB.formatted(.number.precision(.fractionLength(1)))
         switch profile.origin {
         case .measured: return String(localized: "Microphone \(profile.micSerial) · measured \(date) · preamp \(preamp) dB")
         case .equalizerAPO: return String(localized: "Imported from Equalizer APO or REW · \(date) · preamp \(preamp) dB")
@@ -376,61 +463,51 @@ struct RoomCorrectionWindow: View {
 
     @ViewBuilder
     private func graph(_ profile: RoomProfile) -> some View {
-        if let preview = RoomCorrectionPreview(profile: profile) {
+        if let preview = RoomCorrectionPreview(profile: profile.atStrength) {
             VStack(alignment: .leading, spacing: 8) {
-                Picker("Graph", selection: $showAfter.animation(.easeInOut(duration: 1.2))) {
-                    Text("Before").tag(false)
-                    Text("After (predicted)").tag(true)
+                HStack(spacing: 14) {
+                    Picker("Graph", selection: $showAfter.animation(.easeInOut(duration: 1.2))) {
+                        Text("Before").tag(false)
+                        Text("After (predicted)").tag(true)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .fixedSize()
+                    if model.settings.roomAdvancedMode { RoomGraphLayerToggles(layers: $layers) }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .fixedSize()
-                RoomCurvesView(preview: preview, reveal: showAfter ? 1 : 0).frame(height: 300)
+                RoomCurvesView(preview: preview, reveal: showAfter ? 1 : 0, layers: model.settings.roomAdvancedMode ? layers : .all).frame(height: 300)
                 Text("Thin: measured. Bold: predicted after correction (calculated, not measured). Dashed: target. Measure again with correction on to check it in the room.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
         } else {
             VStack(alignment: .leading, spacing: 8) {
-                RoomCorrectionCurvesView(profile: profile).frame(height: 240)
+                RoomCorrectionCurvesView(profile: profile.atStrength).frame(height: 240)
                 Text("What the imported correction does to each speaker.")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
         }
     }
 
-    private func designPickers(_ profile: RoomProfile, options: RoomFilterDesignOptions) -> some View {
-        HStack(spacing: 16) {
-            Picker("Target", selection: Binding(get: { options.target }, set: { redesign(profile, target: $0, range: options.range) })) {
-                ForEach(RoomTargetCurve.presets) { Text($0.name).tag($0) }
-            }
-            .fixedSize()
-            Picker("Range", selection: Binding(get: { options.isFullRange }, set: {
-                redesign(profile, target: options.target, range: $0 ? RoomFilterDesignOptions.fullRange : RoomFilterDesignOptions.defaultRange)
-            })) {
-                Text("Bass, 20–500 Hz").tag(false)
-                Text("Full range").tag(true)
-            }
-            .fixedSize()
-            if redesigning { ProgressView().controlSize(.small) }
-        }
-        .disabled(redesigning)
-    }
-
-    private func redesign(_ profile: RoomProfile, target: RoomTargetCurve, range: ClosedRange<Double>) {
-        guard let measured = profile.measured, var chosen = profile.designOptions else { return }
-        chosen.target = target
-        chosen.range = range
-        let options = chosen
+    /// Designs the filters again from the measurement (with new options and/or positions left out) off the main thread.
+    func redesign(_ profile: RoomProfile, options: RoomFilterDesignOptions? = nil, excluded: Set<Int>? = nil) {
+        guard profile.measured != nil else { return }
         redesigning = true
         problem = nil
         Task {
             do {
-                let design = try await Task.detached(priority: .userInitiated) { try RoomFilterDesigner.design(channels: measured, options: options) }.value
-                var updated = profile
-                updated.filters = design.filterSet
-                updated.target = options.target.roomTarget
-                updated.designOptions = options
-                model.settings.saveRoomProfile(updated)
+                let next = try await Task.detached(priority: .userInitiated) { () throws -> RoomProfile in
+                    var p = profile
+                    if let excluded { try p.setExcludedPositions(excluded) }
+                    return try p.redesigned(options: options)
+                }.value
+                try model.settings.updateRoomProfile(profile.id) {
+                    $0.filters = next.filters
+                    $0.target = next.target
+                    $0.designOptions = next.designOptions
+                    $0.measured = next.measured
+                    $0.excludedPositions = next.excludedPositions
+                    $0.filtersEdited = nil
+                }
                 model.syncEngine()
             } catch {
                 problem = error.localizedDescription
@@ -459,6 +536,7 @@ enum RoomImportKind: Hashable {
 struct RoomCurvesView: View, Animatable {
     let preview: RoomCorrectionPreview
     var reveal: Double
+    var layers: RoomGraphLayers = .all
 
     var animatableData: Double {
         get { reveal }
@@ -481,11 +559,17 @@ struct RoomCurvesView: View, Animatable {
             for channel in preview.channels {
                 let colour = channel.speaker.colour
                 let shown: [Double] = zip(channel.measuredDB, channel.predictedDB).map { m, p in m + (p - m) * t }
-                plot.stroke(channel.targetDB, at: channel.frequencies, in: &context,
-                            style: StrokeStyle(lineWidth: 1.2, dash: [5, 4]), colour: colour.opacity(0.55))
-                plot.stroke(channel.measuredDB, at: channel.frequencies, in: &context,
-                            style: StrokeStyle(lineWidth: 1.1), colour: colour.opacity(0.45 * t))
-                plot.stroke(shown, at: channel.frequencies, in: &context, style: StrokeStyle(lineWidth: 2.4), colour: colour)
+                if layers.contains(.target) {
+                    plot.stroke(channel.targetDB, at: channel.frequencies, in: &context,
+                                style: StrokeStyle(lineWidth: 1.2, dash: [5, 4]), colour: colour.opacity(0.55))
+                }
+                if layers.contains(.measured) {
+                    plot.stroke(channel.measuredDB, at: channel.frequencies, in: &context,
+                                style: StrokeStyle(lineWidth: 1.1), colour: colour.opacity(layers.contains(.corrected) ? 0.45 * t : 1))
+                }
+                if layers.contains(.corrected) {
+                    plot.stroke(shown, at: channel.frequencies, in: &context, style: StrokeStyle(lineWidth: 2.4), colour: colour)
+                }
             }
             plot.legend(preview.channels.map(\.speaker), in: &context)
         }
@@ -498,6 +582,35 @@ struct RoomCurvesView: View, Animatable {
             let after = c.rmsErrorAfterDB.formatted(.number.precision(.fractionLength(1)))
             return String(localized: "\(c.speaker.displayName): deviation from target \(before) decibels measured, \(after) predicted")
         }.joined(separator: "; "))
+    }
+}
+
+/// Which of the three curves the graph draws: what was measured, the target, and what the correction should give.
+struct RoomGraphLayers: OptionSet {
+    let rawValue: Int
+    static let measured = RoomGraphLayers(rawValue: 1)
+    static let target = RoomGraphLayers(rawValue: 2)
+    static let corrected = RoomGraphLayers(rawValue: 4)
+    static let all: RoomGraphLayers = [.measured, .target, .corrected]
+}
+
+struct RoomGraphLayerToggles: View {
+    @Binding var layers: RoomGraphLayers
+
+    var body: some View {
+        HStack(spacing: 10) {
+            toggle("Measured", .measured)
+            toggle("Target", .target)
+            toggle("Corrected", .corrected)
+        }
+    }
+
+    private func toggle(_ title: LocalizedStringKey, _ layer: RoomGraphLayers) -> some View {
+        Toggle(title, isOn: Binding(get: { layers.contains(layer) }, set: { on in
+            if on { layers.insert(layer) } else if layers != layer { layers.remove(layer) }
+        }))
+        .toggleStyle(.checkbox)
+        .font(Typeface.ui(11.5))
     }
 }
 
@@ -783,6 +896,7 @@ struct RoomMeasureWizard: View {
                 }
                 Text("Bold lines are predicted, not measured. Target: \(draft.designOptions?.target.name ?? draft.target.name).")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                RoomDraftNaming(model: model)
                 RoomSpeakerTable(profile: draft)
             }
         } else {

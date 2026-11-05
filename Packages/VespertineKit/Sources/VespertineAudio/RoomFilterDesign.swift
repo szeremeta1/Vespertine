@@ -22,6 +22,7 @@
 //     when that peak is above 0 dB. With cuts only it is 0 dB. Stereo shares the lower preamp so the balance holds.
 //
 
+import CVespertineRT
 import Foundation
 
 public enum RoomFilterDesignError: Error, Equatable, LocalizedError {
@@ -141,14 +142,29 @@ public struct RoomTargetCurve: Codable, Hashable, Sendable, Identifiable {
     /// Extra level at the bottom (dB), reached below `bassCornerHz` with a gentle (first-order-like) transition.
     public var bassLiftDB: Double
     public var bassCornerHz: Double
+    /// A house curve: levels at frequencies, straight in dB over log frequency between them. When there are any, they
+    /// are the target and the tilt and bass lift are not used.
+    public var anchors: [RoomTarget.Anchor]
 
     public var id: String { name }
 
-    public init(name: String, tiltDBPerOctave: Double, bassLiftDB: Double = 0, bassCornerHz: Double = 100) {
+    public init(name: String, tiltDBPerOctave: Double, bassLiftDB: Double = 0, bassCornerHz: Double = 100, anchors: [RoomTarget.Anchor] = []) {
         self.name = name
         self.tiltDBPerOctave = tiltDBPerOctave
         self.bassLiftDB = bassLiftDB
         self.bassCornerHz = bassCornerHz
+        self.anchors = anchors
+    }
+
+    private enum CodingKeys: String, CodingKey { case name, tiltDBPerOctave, bassLiftDB, bassCornerHz, anchors }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        tiltDBPerOctave = try c.decode(Double.self, forKey: .tiltDBPerOctave)
+        bassLiftDB = try c.decode(Double.self, forKey: .bassLiftDB)
+        bassCornerHz = try c.decode(Double.self, forKey: .bassCornerHz)
+        anchors = try c.decodeIfPresent([RoomTarget.Anchor].self, forKey: .anchors) ?? []
     }
 
     /// Flat: correct to a straight line.
@@ -160,22 +176,77 @@ public struct RoomTargetCurve: Codable, Hashable, Sendable, Identifiable {
 
     public static let presets = [gentleTilt, flat, warm]
 
+    public var isHouseCurve: Bool { !anchors.isEmpty }
+
     /// The target (dB) at `hz`, 0 at 1 kHz without bass lift.
     public func db(at hz: Double) -> Double {
         guard hz > 0 else { return 0 }
+        if let first = anchors.first, let last = anchors.last {
+            if hz <= first.hz { return first.db }
+            if hz >= last.hz { return last.db }
+            var lo = 0, hi = anchors.count - 1
+            while hi - lo > 1 {
+                let mid = (lo + hi) / 2
+                if anchors[mid].hz <= hz { lo = mid } else { hi = mid }
+            }
+            let t = Foundation.log(hz / anchors[lo].hz) / Foundation.log(anchors[hi].hz / anchors[lo].hz)
+            return anchors[lo].db + t * (anchors[hi].db - anchors[lo].db)
+        }
         let tilt = tiltDBPerOctave * Foundation.log2(hz / 1_000)
         guard bassLiftDB != 0 else { return tilt }
         let r = (bassCornerHz / hz) * (bassCornerHz / hz)
         return tilt + bassLiftDB * r / (1 + r)
     }
 
-    /// As stored in a profile: anchors every octave from 20 Hz to 20 kHz.
+    /// As stored in a profile: anchors every octave from 20 Hz to 20 kHz (a house curve's own anchors).
     public var roomTarget: RoomTarget {
+        if isHouseCurve { return RoomTarget(name: name, version: 2, anchors: anchors) }
         let anchors = (0...10).map { i -> RoomTarget.Anchor in
             let hz = 20 * pow(2, Double(i)) > 20_000 ? 20_000 : 20 * pow(2, Double(i))
             return RoomTarget.Anchor(hz: hz, db: (db(at: hz) * 100).rounded() / 100)
         }
         return RoomTarget(name: name, version: 1, anchors: anchors)
+    }
+
+    /// Frequencies a house curve may name, and the most it may ask for (dB, either way).
+    public static let houseFrequencies: ClosedRange<Double> = 5...40_000
+    public static let houseLevelLimit = 30.0
+
+    /// A house curve from text, as REW writes its targets: a frequency (Hz) and a level (dB) per line, separated by
+    /// spaces, tabs, commas or semicolons. Lines starting with `*` or `#`, and a header before the first point, are
+    /// skipped. Levels are relative: only the shape counts, since the target is fitted to the measurement's own level.
+    public static func house(text: String, name: String) throws -> RoomTargetCurve {
+        var anchors: [RoomTarget.Anchor] = []
+        for (n, raw) in text.components(separatedBy: .newlines).enumerated() {
+            let line = raw.trimmingCharacters(in: .whitespaces)
+            if line.isEmpty || line.hasPrefix("*") || line.hasPrefix("#") { continue }
+            let fields = line.split(whereSeparator: { " \t,;".contains($0) }).map(String.init)
+            guard fields.count >= 2, let hz = Double(fields[0]), let db = Double(fields[1]) else {
+                if anchors.isEmpty { continue }
+                throw RoomTargetError.unreadable(line: n + 1)
+            }
+            guard hz.isFinite, db.isFinite, houseFrequencies.contains(hz), abs(db) <= houseLevelLimit else { throw RoomTargetError.outOfRange(line: n + 1) }
+            if let last = anchors.last, hz <= last.hz { throw RoomTargetError.notAscending(line: n + 1) }
+            anchors.append(RoomTarget.Anchor(hz: hz, db: db))
+        }
+        guard anchors.count >= 2 else { throw RoomTargetError.tooFewPoints }
+        return RoomTargetCurve(name: name, tiltDBPerOctave: 0, anchors: anchors)
+    }
+}
+
+public enum RoomTargetError: Error, Equatable, LocalizedError {
+    case tooFewPoints
+    case unreadable(line: Int)
+    case notAscending(line: Int)
+    case outOfRange(line: Int)
+
+    public var errorDescription: String? {
+        switch self {
+        case .tooFewPoints: String(localized: "A house curve needs at least two points: a frequency and a level on each line.")
+        case .unreadable(let n): String(localized: "Line \(n) of the house curve couldn't be read.")
+        case .notAscending(let n): String(localized: "The frequencies in the house curve must rise: line \(n) doesn't.")
+        case .outOfRange(let n): String(localized: "Line \(n) of the house curve is outside 5 Hz to 40 kHz and ±30 dB.")
+        }
     }
 }
 
@@ -216,6 +287,29 @@ public struct RoomFilterDesignOptions: Codable, Hashable, Sendable {
 
     /// Full range allows more bands, the default range fewer.
     public var isFullRange: Bool { range.upperBound > 1_000 }
+
+    /// The options held to what the filters and the real-time code can run: a range inside 10 Hz to 20 kHz at least
+    /// a tenth of an octave wide, boosts to +12 dB, cuts to 30 dB, 1 to 24 bands, Q within the band's own limits.
+    /// Anything that isn't a number falls back to the default.
+    public var clamped: RoomFilterDesignOptions {
+        let d = RoomFilterDesignOptions.default
+        func limit(_ v: Double, _ range: ClosedRange<Double>, _ fallback: Double) -> Double {
+            v.isFinite ? min(max(v, range.lowerBound), range.upperBound) : fallback
+        }
+        var o = self
+        let low = limit(range.lowerBound, 10...18_000, d.range.lowerBound)
+        let high = limit(range.upperBound, (low * 1.1)...20_000, d.range.upperBound)
+        o.range = low...high
+        o.maxBoostDB = limit(maxBoostDB, 0...12, d.maxBoostDB)
+        o.maxCutDB = limit(maxCutDB, 0...30, d.maxCutDB)
+        o.maxBands = min(max(maxBands, 1), Int(NRT_ROOM_MAX_SECTIONS))
+        o.minQ = limit(minQ, EQBand.qRange, d.minQ)
+        o.maxCutQ = max(limit(maxCutQ, EQBand.qRange, d.maxCutQ), o.minQ)
+        o.maxBoostQ = max(limit(maxBoostQ, EQBand.qRange, d.maxBoostQ), o.minQ)
+        o.toleranceDB = limit(toleranceDB, 0.1...6, d.toleranceDB)
+        o.smoothingOctaves = limit(smoothingOctaves, (1.0 / 48)...1, d.smoothingOctaves)
+        return o
+    }
 }
 
 /// One speaker's correction: the bands, and the curves they were fitted on, for plotting and checks.
