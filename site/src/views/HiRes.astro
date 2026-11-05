@@ -1,0 +1,125 @@
+---
+// /hi-res-audio-player-for-mac/ (English only): the search phrase "hi-res audio player for Mac", answered from what the
+// app documents. Words: src/data/hires.ts. Not translated, so it has no language menu and no hreflang beyond English.
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Pic from '../components/Pic.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import GitHubButton from '../components/GitHubButton.astro';
+import Brew from '../components/Brew.astro';
+import { DEFER_IMAGES } from '../inline-scripts.mjs';
+import { SITE, latest, links, longDate, megabytes, isoDay } from '../data/app';
+import { formats, scenes } from '../data/content';
+import { hires as c } from '../data/hires';
+import { guides } from '../data/guides';
+import { innerGraph, guideFaqNode } from '../lib/seo';
+import { shot, sceneShots } from '../lib/shots';
+
+const updated = guides.find((g) => g.path === c.path)!.updated;
+const rows = c.formats.rows.map((name) => {
+  const row = formats.find((f) => f.name === name);
+  if (!row) throw new Error(`the home page's formats table has no row "${name}"`);
+  return row;
+});
+const signal = scenes[0];
+const jsonLd = innerGraph({
+  lang: 'en',
+  path: c.path,
+  title: c.title,
+  crumb: c.crumb,
+  description: c.description,
+  dateModified: updated,
+  image: `${SITE}/og/home.jpg`,
+  screenshots: await sceneShots('en'),
+  extra: [guideFaqNode(c.path, c.faq)],
+});
+---
+<Base lang="en" page="article" path={c.path} title={c.title} description={c.description} og="home" ogAlt={c.ogAlt} jsonLd={jsonLd}>
+<a class="skip" href="#main">Skip to content</a>
+<Nav lang="en" page="article" />
+<main id="main" tabindex="-1" class="press guide" data-placement="hires-page">
+  <header class="page-head">
+    <div class="grain" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1 class="page-title">{c.h1}</h1>
+      <p class="page-lede">{c.lede}</p>
+      <div class="guide__cta" data-placement="hires-hero">
+        <DownloadButton lang="en" />
+        <GitHubButton lang="en" />
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="press-block" aria-labelledby="rate-title">
+      <p class="eyebrow">Sample rates</p>
+      <h2 id="rate-title">{c.rate.title}</h2>
+      {c.rate.paragraphs.map((p) => <p set:html={p} />)}
+    </section>
+
+    <section class="press-block" aria-labelledby="formats-title">
+      <p class="eyebrow">Formats</p>
+      <h2 id="formats-title">{c.formats.title}</h2>
+      <p set:html={c.formats.lead} />
+      <div class="table formats">
+        <table>
+          <caption class="sr-only">Formats Vespertine plays, and how</caption>
+          <tbody>
+            {rows.map((fm) => <tr><th scope="row">{fm.name}</th><td>{fm.text}<span class="ext" dir="ltr">{fm.ext}</span></td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      <p set:html={c.formats.tail} />
+    </section>
+
+    <section class="press-block" aria-labelledby="bp-title">
+      <p class="eyebrow">Bit-perfect</p>
+      <h2 id="bp-title">{c.bitPerfect.title}</h2>
+      {c.bitPerfect.paragraphs.map((p) => <p set:html={p} />)}
+      <figure class="guide__shot">
+        <Pic src={shot(signal.shot)} alt={signal.alt} widths={[480, 720, 960, 1280]} sizes="(max-width: 900px) calc(100vw - 52px), 900px" />
+      </figure>
+      <p>{c.bitPerfect.needs}</p>
+    </section>
+
+    <section class="press-block" aria-labelledby="fake-title">
+      <p class="eyebrow">File analysis</p>
+      <h2 id="fake-title">{c.fake.title}</h2>
+      {c.fake.paragraphs.map((p) => <p set:html={p} />)}
+    </section>
+
+    <section class="press-block" aria-labelledby="install-title" data-placement="hires-install">
+      <p class="eyebrow">Download</p>
+      <h2 id="install-title">{c.install.title}</h2>
+      <p>{c.install.lead}</p>
+      <div class="contact-card">
+        <p>Vespertine {latest.version}, {longDate(latest.date)}, {megabytes(latest.dmg.size)}. Signed with a Developer ID and notarized by Apple; it updates itself, and every update is signed.</p>
+        <DownloadButton lang="en" />
+      </div>
+      <Brew lang="en" />
+    </section>
+
+    <section class="press-block" aria-labelledby="faq-title">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title">Questions about hi-res playback on a Mac</h2>
+      <div class="guide__faq">
+        {c.faq.map((x) => (
+          <details data-faq>
+            <summary>{x.q}</summary>
+            <p>{x.a}</p>
+          </details>
+        ))}
+      </div>
+      <p class="fine">Page last updated {longDate(`${updated}T12:00:00-05:00`)}. Everything here follows the project’s <a href={links.features}>feature guide</a>, <a href={links.verification}>verification guide</a> and <a href={links.analysis}>analysis notes</a>. Found a mistake? <a href={links.newIssue}>Tell us on GitHub</a>.</p>
+    </section>
+  </div>
+</main>
+<Footer lang="en" page="article" />
+<script>
+  import '../scripts/main';
+</script>
+<script is:inline set:html={DEFER_IMAGES} />
+</Base>

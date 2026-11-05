@@ -117,6 +117,14 @@ const crumbs = (lang: Lang, name: string, path: string) => ({
   ],
 });
 
+/** A guide page's own FAQ (the questions are on the page, in the same words). */
+export const guideFaqNode = (path: string, items: { q: string; a: string }[]) => ({
+  '@type': 'FAQPage',
+  '@id': `${SITE}${path}#faq`,
+  inLanguage: 'en',
+  mainEntity: items.map((f) => ({ '@type': 'Question', name: plain(f.q), acceptedAnswer: { '@type': 'Answer', text: plain(f.a) } })),
+});
+
 const page = (lang: Lang, path: string, name: string, desc: string, extra: Record<string, unknown> = {}) => ({
   '@type': 'WebPage',
   '@id': `${SITE}${path}#webpage`,
@@ -142,7 +150,7 @@ export function homeGraph(o: { lang: Lang; title: string; screenshots: { url: st
   );
 }
 
-export function innerGraph(o: { lang: Lang; path: string; title: string; crumb: string; description: string; type?: string; dateModified?: string; image: string; screenshots: { url: string; caption: string }[]; trailer?: { url: string; poster: string } }) {
+export function innerGraph(o: { lang: Lang; path: string; title: string; crumb: string; description: string; type?: string; dateModified?: string; image: string; screenshots: { url: string; caption: string }[]; trailer?: { url: string; poster: string }; extra?: object[] }) {
   return graph(
     website(o.lang),
     page(o.lang, o.path, o.title, o.description, {
@@ -154,6 +162,7 @@ export function innerGraph(o: { lang: Lang; path: string; title: string; crumb: 
     }),
     appNode(o.lang, o.screenshots),
     ...(o.trailer ? [trailerNode(o.lang, o.trailer.url, o.trailer.poster)] : []),
+    ...(o.extra ?? []),
     author,
   );
 }

@@ -21,13 +21,16 @@ interface Props {
   /** schema.org graph for this page. */
   jsonLd?: object;
   noindex?: boolean;
+  /** An English-only page's own path (page="article"): no other languages, so no hreflang alternates beyond English. */
+  path?: string;
 }
 
-const { lang, page, title, description, og, ogAlt, jsonLd, noindex = false } = Astro.props;
+const { lang, page, title, description, og, ogAlt, jsonLd, noindex = false, path } = Astro.props;
+if ((page === 'article') !== (path !== undefined)) throw new Error('page="article" and `path` go together');
 const site = Astro.site ?? new URL('https://vespertineapp.com');
-const canonical = new URL(pagePath(lang, page), site).href;
+const canonical = new URL(path ?? pagePath(lang, page), site).href;
 // Every language's version of this page (the 404 page has none: GitHub Pages serves one 404.html for every path).
-const alternates = page === '404' ? [] : CODES.map((c) => ({ lang: c, hreflang: hreflangOf(c), href: new URL(pagePath(c, page), site).href }));
+const alternates = page === '404' ? [] : page === 'article' ? [{ lang: 'en', hreflang: hreflangOf('en'), href: canonical }] : CODES.map((c) => ({ lang: c, hreflang: hreflangOf(c), href: new URL(pagePath(c, page), site).href }));
 // The card in this page's language, with its content hash in the URL, so a redesigned card isn't hidden behind a
 // scraper's cached copy.
 const cardPath = ogCard(lang, og);
@@ -63,7 +66,7 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Vespertine">
 <meta property="og:locale" content={ogLocale(lang)}>
-{CODES.filter((c) => c !== lang).map((c) => <meta property="og:locale:alternate" content={ogLocale(c)}>)}
+{(page === 'article' ? [] : CODES.filter((c) => c !== lang)).map((c) => <meta property="og:locale:alternate" content={ogLocale(c)}>)}
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={canonical}>
@@ -82,7 +85,7 @@ const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:l
 <link rel="preload" as="font" type="font/woff2" crossorigin href={romanFont}>
 <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont}>
 <script defer src="https://stats.szeremeta.org/howl.js" data-website-id="a4b69e33-e989-45bd-bbc2-4d6b1036aa63" data-domains="vespertineapp.com,www.vespertineapp.com" data-do-not-track="true"></script>
-<script defer src="/track.js?v=2026-10-23a"></script>
+<script defer src="/track.js?v=2026-11-03a"></script>
 <slot name="head" />
 {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
 </head>

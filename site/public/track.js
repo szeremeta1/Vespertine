@@ -8,6 +8,7 @@
  *   email-click       mailto: (no address recorded)            {placement, locale}
  *   outbound-click    any other external host                  {host, placement, locale}
  *   brew-copy         the Copy button next to the Homebrew command {placement, locale}
+ *   faq-open          a FAQ <details data-faq> opened (the guide pages)   {page, q}
  * placement = the nearest [data-placement], else the enclosing header / nav / footer / main.
  */
 (function () {
@@ -62,6 +63,15 @@
     if (hit) window.umami.track(hit[0], hit[1]);
   }
 
+  // A FAQ question opened. "toggle" doesn't bubble, so it is caught in the capture phase.
+  function onToggle(e) {
+    var d = e.target;
+    if (!window.umami || !d || !d.matches || !d.matches("details[data-faq]") || !d.open) return;
+    var s = d.querySelector("summary");
+    window.umami.track("faq-open", { page: location.pathname, q: ((s && s.textContent) || "").trim().slice(0, 80) });
+  }
+
   document.addEventListener("click", onClick, true);
   document.addEventListener("auxclick", onClick, true);
+  document.addEventListener("toggle", onToggle, true);
 })();
