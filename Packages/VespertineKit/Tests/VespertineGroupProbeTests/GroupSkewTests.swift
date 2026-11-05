@@ -115,6 +115,60 @@ struct GroupSkewTests {
         #expect(GroupSkew.verdict(peakToPeakFrames: 2, rate: 96_000) == .repeatable)
     }
 
+    // MARK: Drift between the two DACs, from one long capture (H2)
+
+    /// A recording made by hand: the references on the leader at the layout's slots, and the follower's chirps a fixed
+    /// number of frames behind each of them, plus `slip` more frames behind the second one (the follower running slow).
+    static func handmade(layout: RoomCaptureLayout, offset: Int, slip: Int) -> [Float] {
+        var out = [Float](repeating: 0, count: layout.recordingFrames)
+        let ref = layout.reference.samples.map { Float($0 * 0.01) }
+        func put(at start: Int) { for (n, v) in ref.enumerated() where start + n < out.count { out[start + n] += v } }
+        let followerFirst = GroupSkew.followerChirpFrames(layout, span: true)
+        put(at: layout.firstReferenceStart + 100)
+        put(at: layout.secondReferenceStart + 100)
+        put(at: followerFirst.first + 100 + offset)
+        put(at: followerFirst.second! + 100 + offset + slip)
+        return out
+    }
+
+    @Test func aLongCaptureGivesTheFollowersSlipAgainstTheLeaderInPPM() throws {
+        let layout = try GroupSkew.layout(rate: Self.rate, leadIn: 1, level: 0.25, span: 120)
+        // 24 frames of slip over the output frames between the two leader references.
+        let m = try GroupSkew.measure(samples: Self.handmade(layout: layout, offset: 60, slip: 24), layout: layout, span: true)
+        #expect(abs(m.skewFrames - 60) < 0.05, "start skew \(m.skewFrames)")
+        let end = try #require(m.endSkewFrames)
+        #expect(abs(end - 84) < 0.05, "end skew \(end)")
+        let ppm = try #require(m.memberDriftPPM)
+        #expect(abs(ppm - 24.0 / Double(layout.nominalSpacing) * 1e6) < 1, "\(ppm)")
+        #expect(abs(ppm - 4.1) < 0.2, "24 frames over 120 s at 48 kHz is about 4.1 ppm: \(ppm)")
+    }
+
+    @Test func noSlipMeansNoDrift() throws {
+        let layout = try GroupSkew.layout(rate: Self.rate, leadIn: 1, level: 0.25, span: 60)
+        let m = try GroupSkew.measure(samples: Self.handmade(layout: layout, offset: -30, slip: 0), layout: layout, span: true)
+        #expect(abs(m.skewFrames + 30) < 0.05)
+        #expect(abs(m.memberDriftPPM ?? 99) < 0.5)
+    }
+
+    @Test func aShortCaptureHasNoEndChirpAndNoDriftFigure() throws {
+        let layout = try Self.layout()
+        #expect(GroupSkew.followerChirpFrames(layout, span: false).second == nil)
+        let stimulus = GroupSkew.stimulus(layout: layout, leaderChannel: 0, followerChannel: 1, control: false, span: false)
+        #expect(stimulus.tracks[1].samples.filter { abs($0) > 0.01 }.count < layout.reference.samples.count)
+    }
+
+    @Test func theSpanStimulusAddsTheFollowersSecondChirpAfterTheSecondReference() throws {
+        let layout = try GroupSkew.layout(rate: Self.rate, leadIn: 1, level: 0.25, span: 30)
+        let stimulus = GroupSkew.stimulus(layout: layout, leaderChannel: 0, followerChannel: 1, control: false, span: true)
+        let slots = GroupSkew.followerChirpFrames(layout, span: true)
+        let follower = stimulus.tracks[1].samples
+        let n = layout.reference.samples.count
+        #expect(follower[slots.first..<slots.first + n].contains { abs($0) > 0.01 })
+        #expect(follower[try #require(slots.second)..<slots.second! + n].contains { abs($0) > 0.01 })
+        #expect(slots.second! > layout.secondReferenceStart + n)
+        #expect(slots.second! + n <= layout.totalFrames)
+    }
+
     // MARK: The whole run on the simulated room
 
     @Test func manyRestartsGiveOneSkewAndAZeroSpread() async throws {

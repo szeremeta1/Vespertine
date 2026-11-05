@@ -41,6 +41,9 @@ public enum GroupProbeCLI {
             --leader-channel K / --follower-channel K   output channels in the group (default: the leader's first, the follower's first)
             --input-channel K  microphone channel (default 0)
             --rate Hz          group rate (default: the microphone's rate if every device offers it)
+            --span S           each capture lasts about S seconds (a second chirp from the follower at the end), and reports the
+                               follower's slip against the leader in ppm: the DACs' drift (H2); use with --no-drift
+            --no-drift         build the aggregate with drift correction off (so the DACs run free and slip)
             --control          every chirp from the leader alone: the method's own zero and spread (one device is enough)
             --exclusive-members  hold every member exclusively while measuring
             --real-hardware    allow real outputs
@@ -161,7 +164,7 @@ extension GroupProbeCLI {
     static func groupSkew(_ arguments: [String]) -> Int32 {
         setvbuf(stdout, nil, _IOLBF, 0)
         var rest = arguments, flags: Set<String> = [], values: [String: String] = [:], positional: [String] = []
-        let withValue: Set<String> = ["--mic", "--runs", "--lead-in", "--pause", "--level", "--leader-channel", "--follower-channel", "--input-channel", "--rate"]
+        let withValue: Set<String> = ["--mic", "--runs", "--lead-in", "--pause", "--level", "--leader-channel", "--follower-channel", "--input-channel", "--rate", "--span"]
         while !rest.isEmpty {
             let a = rest.removeFirst()
             if withValue.contains(a) { guard !rest.isEmpty else { print("\(a) needs a value"); return 2 }; values[a] = rest.removeFirst() }
@@ -214,7 +217,8 @@ extension GroupProbeCLI {
         } else {
             let infos = devices.map(MemberInfo.read)
             do {
-                let made = try PrivateAggregate.create(members: infos.map { .init(uid: $0.uid, clockDomain: $0.clockDomain) }, name: "Vespertine group skew")
+                let made = try PrivateAggregate.create(members: infos.map { .init(uid: $0.uid, clockDomain: $0.clockDomain) }, name: "Vespertine group skew",
+                                                       drift: flags.contains("--no-drift") ? .off : .byClockDomain)
                 aggregate = made; output = made.id
             } catch { print("group-skew failed: \(error)"); return 1 }
             followerDefault = infos[0].outputChannels
@@ -228,6 +232,7 @@ extension GroupProbeCLI {
         config.pauseSeconds = values["--pause"].flatMap(Double.init) ?? 1
         config.level = max(0.001, min(1, values["--level"].flatMap(Double.init) ?? 0.1))
         config.control = control
+        config.spanSeconds = values["--span"].flatMap(Double.init).map { max(2, $0) }
         let json = flags.contains("--json")
         let say: (String) -> Void = { json ? FileHandle.standardError.write(Data(($0 + "\n").utf8)) : print($0) }
         say("group-skew: \(devices.map(\.name).joined(separator: " + ")) → \(mic.name) channel \(config.inputChannel) at \(SampleRate.format(rate))k, \(config.runsPerLeadIn) runs × lead-ins \(config.leadIns)")
