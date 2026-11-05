@@ -79,8 +79,10 @@ final class OutputSession: @unchecked Sendable {
         converter.dither = false
         // A discrete output: each channel to its own output, unmixed. Matched by layout instead, the converter drops
         // speakers the output layout lacks, mixes a side pair onto a back pair at -3 dB, lowers the whole mix when it
-        // folds one in, and plays a file with no speaker names as silence.
-        if plan.routeLabels != nil, plan.spatial == .off, input.channelCount == output.channelCount, let outputs = output.channelLayout?.channelLabels {
+        // folds one in, and plays a file with no speaker names as silence. Above 8 channels (no standard order, so no
+        // route labels) the outputs are plain numbered channels: each source channel goes to its own, in the file's order.
+        let discrete = plan.routeLabels != nil || (output.channelCount > 2 && output.channelLayout?.hasSpeakerPositions != true)
+        if discrete, plan.spatial == .off, input.channelCount == output.channelCount, let outputs = output.channelLayout?.channelLabels {
             converter.downmix = false
             converter.channelMap = ChannelLayouts.discreteMap(source: ChannelLayouts.speakerLabels(input.channelLayout), outputs: outputs)
                 .map { NSNumber(value: $0) }
