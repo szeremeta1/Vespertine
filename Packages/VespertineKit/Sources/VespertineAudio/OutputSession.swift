@@ -86,8 +86,35 @@ final class OutputSession: @unchecked Sendable {
             converter.downmix = false
             converter.channelMap = ChannelLayouts.discreteMap(source: ChannelLayouts.speakerLabels(input.channelLayout), outputs: outputs)
                 .map { NSNumber(value: $0) }
+        } else if let map = speakerMap(from: input, to: output, plan: plan) {
+            // A configured speaker setup with a speaker for every channel: the same, each on its own speaker. Matched by
+            // layout, the converter put a WAV 7.1's back pair on the side speakers and its side pair, mixed, on the back ones.
+            converter.downmix = false
+            converter.channelMap = map.map { NSNumber(value: $0) }
         }
         return converter
+    }
+
+    /// The speakers of a multichannel decoder's output: its own, else WAV order for the count (as the discrete path takes them).
+    static func sourceSpeakers(_ format: AVAudioFormat) -> [AudioChannelLabel]? {
+        ChannelLayouts.speakerLabels(format.channelLayout) ?? ChannelLayouts.wavOrderLabels(channels: Int(format.channelCount))
+    }
+
+    /// The unmixed channel map onto a configured speaker setup (`ChannelLayouts.speakerMap`); nil when it doesn't apply.
+    static func speakerMap(from input: AVAudioFormat, to output: AVAudioFormat, plan: OutputPlan) -> [Int]? {
+        guard plan.spatial == .off, plan.routeLabels == nil, input.channelCount > 2, output.channelCount > 2,
+              let layout = output.channelLayout, layout.hasSpeakerPositions, let source = sourceSpeakers(input) else { return nil }
+        return ChannelLayouts.speakerMap(source: source, outputs: layout.channelLabels)
+    }
+
+    /// A file with no speaker names that has to be folded onto a configured speaker setup (7.1 into a 5.1 room): placed by
+    /// the standard positions for its count, as the converter can't place what it has no names for (it played silence).
+    static func speakerFold(from input: AVAudioFormat, to layout: AVAudioChannelLayout?, plan: OutputPlan) -> BedRouter? {
+        guard plan.spatial == .off, plan.routeLabels == nil, input.channelCount > 2, ChannelLayouts.speakerLabels(input.channelLayout) == nil,
+              let layout, layout.channelCount > 2, layout.hasSpeakerPositions,
+              let source = ChannelLayouts.wavOrderLabels(channels: Int(input.channelCount)),
+              ChannelLayouts.speakerMap(source: source, outputs: layout.channelLabels) == nil else { return nil }
+        return BedRouter(source: source, bed: layout.channelLabels)
     }
 
     /// Configures the device for `plan` and prepares (but does not start) I/O.
