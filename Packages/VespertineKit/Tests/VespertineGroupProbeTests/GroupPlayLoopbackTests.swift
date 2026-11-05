@@ -125,3 +125,94 @@ struct GroupPlayLoopbackTests {
         #expect(b1.1 > 0.09 && a1.1 < b1.1 / 100, "follower channel 2 should be the 1499 Hz sine: \(b1.1) vs \(a1.1)")
     }
 }
+
+// MARK: - group-skew through a real aggregate of two virtual devices
+
+/// Stands in for the microphone: records the aggregate's own inputs (each virtual member's input hears what was played to that
+/// member) and adds the leader's and the follower's together, so one "microphone" hears both, exactly as the UMIK hears two
+/// speakers. Plays through the same stimulus player the room measurement uses.
+final class AggregateLoopbackDevice: RoomCaptureDevice, @unchecked Sendable {
+    private let aggregate: AudioObjectID
+    private let leaderInput: Int
+    private let followerInput: Int
+    private let lock = NSLock()
+    private var recorder: LoopbackRecorder?
+    private var player: RoomStimulusPlayer?
+    private var cursor = 0
+
+    init(aggregate: AudioObjectID, leaderInput: Int, followerInput: Int) {
+        self.aggregate = aggregate; self.leaderInput = leaderInput; self.followerInput = followerInput
+    }
+
+    func start(request: RoomCaptureRequest, stimulus: RoomStimulus) throws {
+        lock.lock(); defer { lock.unlock() }
+        let rate = request.layout.sampleRate
+        let recorder = try LoopbackRecorder(device: aggregate, rate: rate, maxChannels: 4)
+        let player = try RoomStimulusPlayer(device: aggregate, stimulus: stimulus, rate: rate)
+        self.recorder = recorder; self.player = player; cursor = 0
+        try recorder.start()
+        try player.start()
+    }
+
+    func readAvailable(maxFrames: Int) -> RoomCaptureChunk {
+        lock.lock(); defer { lock.unlock() }
+        guard let recorder else { return RoomCaptureChunk(frames: [], lostFrames: 0, alive: false) }
+        recorder.drain()
+        let a = recorder.samples[leaderInput], b = recorder.samples[followerInput]
+        let available = min(a.count, b.count)
+        let take = max(0, min(maxFrames, available - cursor))
+        let frames = (0..<take).map { a[cursor + $0] + b[cursor + $0] }
+        cursor += take
+        return RoomCaptureChunk(frames: frames, lostFrames: 0, alive: true)
+    }
+
+    func stop() {
+        lock.lock(); defer { lock.unlock() }
+        player?.stop(); player = nil
+        recorder?.stop(); recorder?.restore(); recorder = nil
+    }
+}
+
+extension GroupPlayLoopbackTests {
+    struct DriftCase: Sendable, CustomTestStringConvertible {
+        let drift: GroupAggregate.DriftMode
+        let quality: Int
+        var testDescription: String { drift == .off ? "drift off" : "drift on, quality \(quality)" }
+    }
+
+    @Test(arguments: [DriftCase(drift: .off, quality: 127), DriftCase(drift: .byClockDomain, quality: 127), DriftCase(drift: .byClockDomain, quality: 64),
+                      DriftCase(drift: .byClockDomain, quality: 0)])
+    func theSkewBetweenTwoVirtualMembersOfARealAggregateIsMeasuredAndRepeatable(_ c: DriftCase) async throws {
+        let drift = c.drift
+        let devices = OutputDevices.list()
+        let leader = try #require(devices.first { $0.name == Self.leaderName && $0.transport == .virtual }, "no \(Self.leaderName)")
+        let follower = try #require(devices.first { $0.name == Self.followerName && $0.transport == .virtual }, "no \(Self.followerName)")
+        try #require(!LoopbackGuard.inUseByOthers(leader.id) && !LoopbackGuard.inUseByOthers(follower.id), "a device is in use by another process; left alone")
+        try #require(AVAudioApplication.shared.recordPermission != .denied, "audio input access denied")
+        let found = [leader, follower].map { ProbeHAL.nominalRate($0.id) }
+        defer { for (d, r) in zip([leader, follower], found) { ProbeHAL.setNominalRate(r, on: d.id) } }
+        for d in [leader, follower] { ProbeHAL.setNominalRate(Self.rate, on: d.id) }
+        let aggregate = try PrivateAggregate.create(members: [.init(uid: leader.uid, clockDomain: 0), .init(uid: follower.uid, clockDomain: 0)],
+                                                    name: "Vespertine group skew test", drift: drift, quality: c.quality)
+        defer { aggregate.destroy() }
+        try await Task.sleep(for: .milliseconds(500))
+
+        var config = GroupSkewConfig(inputDevice: 1, outputDevice: aggregate.id, leaderChannel: 0, followerChannel: 2, rate: Self.rate)
+        config.runsPerLeadIn = 4
+        config.leadIns = [1.0]
+        config.pauseSeconds = 0.5
+        let id = aggregate.id
+        let report = try await GroupSkewRunner.run(config, makeDevice: { AggregateLoopbackDevice(aggregate: id, leaderInput: 0, followerInput: 2) },
+                                                   permission: AlwaysGrantedMicrophone())
+        print("\(c.testDescription): " + report.text)
+        #expect(report.failures.isEmpty, "\(report.failures)")
+        let overall = try #require(report.overall)
+        #expect(overall.count == 4)
+        // Two virtual devices on the host clock, aligned by the aggregate: the follower lands within a few ms of the leader,
+        // and the same place every start (within the ear's 25 µs, about 1.2 frames).
+        #expect(abs(overall.mean) < 240, "mean skew \(overall.mean) frames")
+        // With no drift correction nothing is added to the follower: the two land together.
+        if drift == .off { #expect(abs(overall.mean) < 1, "no drift correction, yet the follower is \(overall.mean) frames off") }
+        #expect(overall.peakToPeak < 1.2, "peak-to-peak \(overall.peakToPeak) frames")
+    }
+}
