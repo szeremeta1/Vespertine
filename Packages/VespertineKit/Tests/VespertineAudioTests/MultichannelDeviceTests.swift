@@ -32,6 +32,11 @@ enum ChannelID {
 
     /// WAVE_FORMAT_EXTENSIBLE, 24-bit, with `mask` (0: no speaker positions), `channels` × `frames` of the signal.
     static func writeWAV(to url: URL, channels: Int, frames: Int, rate: Double, mask: UInt32) throws {
+        try writeWAV(to: url, channels: channels, frames: frames, rate: rate, mask: mask) { c, f in word(channel: c, frame: f) }
+    }
+
+    /// The same container for any 24-bit signal: `sample(channel, frame)`.
+    static func writeWAV(to url: URL, channels: Int, frames: Int, rate: Double, mask: UInt32, sample: (Int, Int) -> Int32) throws {
         var data = Data()
         func u16(_ v: Int) { withUnsafeBytes(of: UInt16(v).littleEndian) { data.append(contentsOf: $0) } }
         func u32(_ v: UInt32) { withUnsafeBytes(of: v.littleEndian) { data.append(contentsOf: $0) } }
@@ -47,7 +52,7 @@ enum ChannelID {
         data.reserveCapacity(data.count + bytes)
         for f in 0..<frames {
             for c in 0..<channels {
-                let w = UInt32(bitPattern: word(channel: c, frame: f))
+                let w = UInt32(bitPattern: sample(c, f))
                 data.append(contentsOf: [UInt8(w & 0xFF), UInt8(w >> 8 & 0xFF), UInt8(w >> 16 & 0xFF)])
             }
         }
@@ -296,5 +301,100 @@ struct SpeakerSetupDeviceTests {
         let carried = ChannelID.identify(out, stride: n, frames: out.count / n, firstFrame: 0)
         #expect(out.count / n == frames)
         #expect(carried == c.carries, "\(c.name): \(carried.map { $0.map(String.init) ?? "✗" }) on \(layout.shortNames)")
+    }
+}
+
+@Suite("Spatial Audio on the I/O thread")
+struct SpatialIOProcTests {
+    /// Interleaved 5.1 at -20 dBFS, one tone per channel (SpatialProbe's).
+    static func fiveOne(frames: Int, rate: Double) -> (samples: [Float], tones: [Double]) {
+        let tones = SpatialProbe.frequencies(["FL", "FR", "FC", "LFE", "BL", "BR"])
+        var s = [Float](repeating: 0, count: frames * 6)
+        for f in 0..<frames { for c in 0..<6 { s[f * 6 + c] = Float(0.1 * sin(2 * .pi * tones[c] * Double(f) / rate)) } }
+        return (s, tones)
+    }
+
+    @Test("The renderer runs inside the I/O proc: binaural on the first pair, every other output of the device silent",
+          arguments: [2, 8, 16])
+    func ioproc(deviceChannels: Int) throws {
+        let rate = 48_000.0, frames = 48_000, slice = 512
+        let bed = try #require(AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_MPEG_5_1_A))
+        let renderer = try SpatialRenderer(inputLayout: bed, channels: 6, sampleRate: rate, maxFrames: 4096, mode: .headTracked)
+        let ring = try #require(nrt_ring_create(65_536, 6))
+        defer { nrt_ring_destroy(ring) }
+        let context = try #require(nrt_context_create(ring, 4096))
+        defer { nrt_context_destroy(context) }
+        #expect(renderer.attach(to: context))
+        let (source, tones) = Self.fiveOne(frames: frames, rate: rate)
+        _ = source.withUnsafeBufferPointer { nrt_ring_write(ring, $0.baseAddress!, UInt32(frames)) }
+        var out: [Float] = []
+        var buffer = [Float](repeating: 0, count: slice * deviceChannels)
+        for _ in 0..<(frames / slice) {
+            buffer.withUnsafeMutableBytes { raw in
+                var list = AudioBufferList(mNumberBuffers: 1, mBuffers: AudioBuffer(mNumberChannels: UInt32(deviceChannels),
+                                                                                    mDataByteSize: UInt32(raw.count), mData: raw.baseAddress))
+                var now = AudioTimeStamp()
+                var noInput = AudioBufferList()
+                _ = nrt_device_ioproc(0, &now, &noInput, &now, &list, &now, UnsafeMutableRawPointer(context))
+            }
+            out += buffer
+        }
+        let n = out.count / deviceChannels
+        for ch in 2..<deviceChannels { #expect((0..<n).allSatisfy { out[$0 * deviceChannels + ch] == 0 }, "output \(ch + 1) isn't silent") }
+        for (c, tone) in tones.enumerated() {
+            let l = SpatialProbe.level(out, stride: deviceChannels, offset: 0, frequency: tone, rate: rate, from: 9600, count: 28_800)
+            let r = SpatialProbe.level(out, stride: deviceChannels, offset: 1, frequency: tone, rate: rate, from: 9600, count: 28_800)
+            #expect(max(l, r) > 0.1 * 0.03, "channel \(c) not heard after Spatial Audio on a \(deviceChannels)-channel device")
+        }
+    }
+
+    @Test("Multichannel files with no standard layout (above 8 channels, no speaker names) are heard on headphones",
+          arguments: [10, 12, 16])
+    func unlabeledAbove8(channels: Int) throws {
+        let source = SourceFormat(encoding: .pcm, codec: "WAV", sampleRate: 48_000, bitDepth: 24, channels: channels)
+        let headphones = DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        let plan = FormatPlanner.plan(source: source, device: headphones, spatial: .headTracked)
+        #expect(plan.spatial == .headTracked && plan.deviceChannels == 2)
+        let bed = try #require(OutputSession.routeLayout(plan: plan, speakers: nil))
+        let n = Int(bed.channelCount)
+        let renderer = try SpatialRenderer(inputLayout: bed, channels: n, sampleRate: 48_000, maxFrames: 4096, mode: .fixed)
+        // Each channel alone, as Decoding hands it to the ring (BedRouter when the plan has a bed).
+        let labels = ChannelLayouts.wavOrderLabels(channels: channels)
+        let router = plan.spatialBed == nil ? nil : labels.flatMap { BedRouter(source: $0, bed: bed.channelLabels) }
+        var silent: [Int] = []
+        for c in 0..<channels {
+            let frames = 24_000
+            var input = [Float](repeating: 0, count: frames * channels)
+            for f in 0..<frames { input[f * channels + c] = Float(0.1 * sin(2 * .pi * 500 * Double(f) / 48_000)) }
+            var placed = [Float](repeating: 0, count: frames * n)
+            if let router { input.withUnsafeBufferPointer { router.route($0.baseAddress!, into: &placed, frames: frames) } }
+            else { placed = input }
+            let out = renderer.render(interleaved: placed, frames: frames)
+            let level = max(SpatialProbe.level(out, stride: 2, offset: 0, frequency: 500, rate: 48_000, from: 4800, count: 14_400),
+                            SpatialProbe.level(out, stride: 2, offset: 1, frequency: 500, rate: 48_000, from: 4800, count: 14_400))
+            if level < 0.1 * 0.03 { silent.append(c + 1) }
+        }
+        #expect(silent.isEmpty, "\(channels) ch on \(bed.shortNames): channels \(silent) silent after Spatial Audio")
+    }
+}
+
+@Suite("Unlabeled multichannel: one convention on every output")
+struct UnlabeledConventionTests {
+    @Test("A file with no speaker names puts each channel on the same speaker on headphones as on speakers", arguments: [6, 7, 8, 10, 12, 14, 16])
+    func sameOnHeadphonesAndSpeakers(channels: Int) throws {
+        let source = SourceFormat(encoding: .pcm, codec: "WAV", sampleRate: 48_000, bitDepth: 24, channels: channels)
+        let headphones = DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false)
+        let plan = FormatPlanner.plan(source: source, device: headphones, spatial: .fixed)
+        let bed = try #require(OutputSession.routeLayout(plan: plan, speakers: nil))
+        let labels = try #require(ChannelLayouts.wavOrderLabels(channels: channels))
+        let router = try #require(BedRouter(source: labels, bed: bed.channelLabels))
+        #expect(router.dropped == 0, "\(channels) ch: \(router.dropped) channels have no place on \(bed.shortNames)")
+        // On a configured speaker setup of the bed's own layout, each channel goes to the speaker it has on the bed (9.1.x has no
+        // bed of its own: its wides are placed between neighbours, checked above).
+        guard router.approximated == 0 else { return }
+        let map = try #require(ChannelLayouts.speakerMap(source: labels, outputs: bed.channelLabels), "\(channels) ch on \(bed.shortNames)")
+        for (s, routes) in router.routes.enumerated() where routes.count == 1 {
+            #expect(map[routes[0].bed] == s, "\(channels) ch: channel \(s + 1) is \(bed.shortNames[routes[0].bed]) on headphones, output \(map.firstIndex(of: s).map { $0 + 1 } ?? -1) on speakers")
+        }
     }
 }
