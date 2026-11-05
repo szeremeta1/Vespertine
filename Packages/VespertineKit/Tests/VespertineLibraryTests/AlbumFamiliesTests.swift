@@ -70,6 +70,25 @@ struct AlbumFamiliesTests {
         #expect(groups[0].title == "A Night at the Opera")
     }
 
+    @Test("An anniversary number before an edition label belongs to the edition, not the album title")
+    func anniversaryNumber() {
+        let groups = AlbumFamilies.group([album("Thriller (2022 Mobile Fidelity SACD)", artist: "Michael Jackson", year: 1982),
+                                          album("Thriller (24-bit 176.4 kHz FLAC)", artist: "Michael Jackson", year: 1982),
+                                          album("Thriller 25 (Super Deluxe Edition)", artist: "Michael Jackson", year: 2008),
+                                          album("Bad", artist: "Michael Jackson", year: 1987),
+                                          album("Bad 25 [Deluxe]", artist: "Michael Jackson", year: 2012),
+                                          album("21", artist: "Adele", year: 2011),
+                                          album("21 (Deluxe Edition)", artist: "Adele", year: 2011),
+                                          album("Greatest Hits", artist: "Queen", year: 1981),
+                                          album("Greatest Hits 25 (Remastered)", artist: "Queen", year: 2006),
+                                          album("Now That's What I Call Music!", artist: "Various Artists", year: 1983),
+                                          album("Now That's What I Call Music! 25", artist: "Various Artists", year: 1993)])
+        #expect(groups.map(\.title) == ["Thriller", "Bad", "21", "Greatest Hits", "Greatest Hits 25", "Now That's What I Call Music!",
+                                        "Now That's What I Call Music! 25"])
+        #expect(groups.map { $0.editions.count } == [3, 2, 2, 1, 1, 1, 1])
+        #expect(EditionKind.of(album("Thriller 25 (Super Deluxe Edition)", artist: "Michael Jackson")).prefix(2) == [.deluxe, .anniversary])
+    }
+
     @Test("A filtered page keeps one card when the matching editions have different joint credits")
     func filteredJointCredits() {
         let plain = album("Planet Waves", year: 1974)
