@@ -270,6 +270,28 @@ struct VisualizerRendererTests {
         #expect(VisualizerRenderer.scopePeak(wide, mode: .oscilloscope) == 0.5)
     }
 
+    @Test("Scope: the trace is as bright in a small window or full screen on a big display as in the usual window")
+    func scopeBrightnessFollowsSize() {
+        let usual = VisualizerWindowState.defaultSize
+        for mode in [VisualizerScopeMode.goniometer, .oscilloscope] {
+            func brightness(_ size: CGSize) -> Float {
+                VisualizerRenderer.scopeBrightness(mode: mode, size: size, dt: 1.0 / 60, stereoInterval: 1.0 / 48_000, hasSignal: true)
+            }
+            func extent(_ size: CGSize) -> Float {
+                mode == .goniometer ? Float(VisualizerLayout.goniometer(in: size).radius) : Float(VisualizerLayout.oscilloscope(in: size).width)
+            }
+            // The usual window keeps its look.
+            let before: Float = mode == .goniometer ? 0.22 * 800 / 1024 : 0.3
+            #expect(abs(brightness(usual) - before) < 1e-5, "\(mode)")
+            // Each sample's light is spread along a trace as long as the scope is big, so the light per sample grows
+            // with it: the same light per point of trace at every size.
+            for size in [VisualizerWindowState.minimumSize, CGSize(width: 1920, height: 1080), CGSize(width: 3440, height: 1440)] {
+                let ratio = (brightness(size) / extent(size)) / (brightness(usual) / extent(usual))
+                #expect(abs(ratio - 1) < 1e-4, "\(mode) at \(size): \(ratio)")
+            }
+        }
+    }
+
     @Test("Oscilloscope: each sweep starts on a rising zero crossing, left above right")
     func oscilloscope() {
         var frame = VisualizerFrame.silent(bands: 64, fine: 512)

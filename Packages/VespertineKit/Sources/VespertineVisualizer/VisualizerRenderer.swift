@@ -723,6 +723,19 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         Float(sensitivity) * 0.8 / max(envelope, 0.0316)
     }
 
+    /// The light each sample of the trace leaves. A sweep is always 1,024 samples, so a bigger scope spreads them
+    /// along a longer trace: the light grows with the scope's size (from its look in the usual window), else full
+    /// screen on a big display was a fraction as bright, and a small window burnt out.
+    static func scopeBrightness(mode: VisualizerScopeMode, size points: CGSize, dt: Double, stereoInterval: Double,
+                                hasSignal: Bool) -> Float {
+        let perFrame = max(1, dt / max(stereoInterval, 1e-6))
+        let goniometer = mode == .goniometer
+        let usual = VisualizerWindowState.defaultSize
+        let extent = goniometer ? VisualizerLayout.goniometer(in: points).radius / VisualizerLayout.goniometer(in: usual).radius
+                                : VisualizerLayout.oscilloscope(in: points).width / VisualizerLayout.oscilloscope(in: usual).width
+        return Float(goniometer ? min(1, perFrame / 1024) * 0.22 : dt * 60 * 0.3) * Float(extent) * (hasSignal ? 1 : 0.4)
+    }
+
     private func encodeScope(_ buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
                              size: CGSize, scale: CGFloat, dt: Double) {
         guard let trail = prepareTrail(size: size, for: .scope, buffer: buffer), let beamPipeline, !beamBuffers.isEmpty else { return }
@@ -733,8 +746,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         let goniometer = settings.scopeMode == .goniometer
         // Every sample leaves the same light whatever the frame rate: the goniometer redraws the newest 1,024
         // samples each frame, so each is drawn about 1,024 / (new samples per frame) times.
-        let perFrame = max(1, dt / max(frame.stereoInterval, 1e-6))
-        let brightness = Float(goniometer ? min(1, perFrame / 1024) * 0.22 : dt * 60 * 0.3) * (frame.hasSignal ? 1 : 0.4)
+        let brightness = Self.scopeBrightness(mode: settings.scopeMode, size: CGSize(width: size.width / scale, height: size.height / scale),
+                                              dt: dt, stereoInterval: frame.stereoInterval, hasSignal: frame.hasSignal)
         Self.scopePoints(frame: frame, mode: settings.scopeMode, size: CGSize(width: size.width / scale, height: size.height / scale),
                          scale: scale, gain: gain, brightness: brightness, into: &points)
         beamIndex = (beamIndex + 1) % beamBuffers.count
