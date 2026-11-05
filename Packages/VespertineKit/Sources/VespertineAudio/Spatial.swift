@@ -208,15 +208,51 @@ public enum ChannelLayouts {
         return map
     }
 
+    /// A driver's stand-in for "no speaker setup": channel n named with label n (L R C LFE Ls Rs Lc Rc Cs Lsd Rsd Top …), as
+    /// BlackHole and other drivers report before anyone configures speakers. Taken at its word it made an unconfigured 8-channel
+    /// output a front-centres 7.1 room (a 7.1's back pair folded onto its sides, two outputs silent) and a 4-channel one a 3.1.
+    public static func isPlaceholder(_ layout: AVAudioChannelLayout) -> Bool {
+        let labels = layout.channelLabels
+        return labels.count > 2 && labels.enumerated().allSatisfy { $0.element == AudioChannelLabel($0.offset + 1) }
+    }
+
+    /// A multichannel file on a configured speaker setup (any count of either): the source channel each speaker output
+    /// carries (-1: none), when every channel has a speaker of its own, its own position or the nearest single one, and so
+    /// can go out unmixed. nil when one would have to be folded onto others (7.1 into a 5.1 room, a centre onto L and R).
+    static func speakerMap(source: [AudioChannelLabel], outputs: [AudioChannelLabel]) -> [Int]? {
+        guard !source.isEmpty, source.count <= outputs.count else { return nil }
+        // Both in one convention: a setup that names a back pair Ls/Rs beside a side pair Lsd/Rsd (WAVE) is read like a file that does.
+        let wanted = normalizedSurrounds(source).map(canonical), slots = normalizedSurrounds(outputs).map(canonical)
+        var map = [Int](repeating: -1, count: outputs.count), placed = [Bool](repeating: false, count: source.count)
+        func place(_ s: Int, _ candidates: [AudioChannelLabel]) {
+            guard !placed[s], let o = candidates.lazy.compactMap({ label in slots.indices.first { slots[$0] == label && map[$0] < 0 } }).first else { return }
+            map[o] = s
+            placed[s] = true
+        }
+        for s in source.indices { place(s, [wanted[s]]) }
+        for s in source.indices { place(s, nearest(wanted[s]).filter { $0.count == 1 }.map { canonical($0[0]) }) }
+        return placed.allSatisfy { $0 } ? map : nil
+    }
+
     /// The speakers of a WAV file with no channel mask, in the order of the mask's bits as FFmpeg and SMPTE use them for
     /// the count (WAVE labels: the back pair is Ls/Rs, the side pair Lsd/Rsd). 6.1 is FL FR FC LFE BC SL SR and 7.1
     /// FL FR FC LFE BL BR SL SR, where the standard (MPEG) layouts of those counts put the side pair first.
-    static func wavOrderLabels(channels: Int) -> [AudioChannelLabel]? {
+    /// Above 8 channels, FFmpeg's default layout for the count (5.1.4, 7.1.4, 9.1.4; 9.1.6 for 16), in mask-bit order: with
+    /// no names, Apple's spatial mixer heard only the first two.
+    public static func wavOrderLabels(channels: Int) -> [AudioChannelLabel]? {
         let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
                                       kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        let (Lsd, Rsd) = (kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect)
+        let tops = [kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_VerticalHeightRight,
+                    kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_TopBackRight]
         switch channels {
-        case 7: return [L, R, C, LFE, kAudioChannelLabel_CenterSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
-        case 8: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect]
+        case 7: return [L, R, C, LFE, kAudioChannelLabel_CenterSurround, Lsd, Rsd]
+        case 8: return [L, R, C, LFE, Ls, Rs, Lsd, Rsd]
+        case 10: return [L, R, C, LFE, Ls, Rs] + tops                                       // 5.1.4 (side pair)
+        case 12: return [L, R, C, LFE, Ls, Rs, Lsd, Rsd] + tops                             // 7.1.4
+        case 14: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftCenter, kAudioChannelLabel_RightCenter, Lsd, Rsd] + tops   // 9.1.4
+        case 16: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftCenter, kAudioChannelLabel_RightCenter, Lsd, Rsd] + tops
+            + [kAudioChannelLabel_LeftTopMiddle, kAudioChannelLabel_RightTopMiddle]          // 9.1.6
         default: return standardLabels(channels: channels)
         }
     }
@@ -398,7 +434,9 @@ struct BedRouter {
     /// Each source channel's bed speakers and gain.
     let routes: [[(bed: Int, gain: Float)]]
 
-    init?(source: [AudioChannelLabel], bed: [AudioChannelLabel]) {
+    /// `foldGain`: extra gain for a channel placed alone on the nearest speaker of another (a speaker setup's fold, -3 dB as
+    /// ITU-R BS.775 downmixes do; 1 for Spatial Audio beds).
+    init?(source: [AudioChannelLabel], bed: [AudioChannelLabel], foldGain: Float = 1) {
         guard !source.isEmpty, !bed.isEmpty else { return nil }
         let canonicalBed = bed.map(ChannelLayouts.canonical)
         func slots(_ labels: [AudioChannelLabel]) -> [Int]? {
@@ -413,7 +451,8 @@ struct BedRouter {
                 if place != nil { approximated += 1 }
             }
             let targets = place ?? []
-            let gain = targets.isEmpty ? 0 : Float(1 / Double(targets.count).squareRoot())    // equal power between two
+            var gain = targets.isEmpty ? 0 : Float(1 / Double(targets.count).squareRoot())    // equal power between two
+            if targets.count == 1, slots([label]) == nil { gain *= foldGain }
             return targets.map { ($0, gain) }
         }
         self.approximated = approximated

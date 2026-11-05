@@ -26,7 +26,8 @@ final class Decoding {
     let path: SignalPath
     let gain: Float
     /// Spatial Audio on the source's own speakers: the converter keeps the file's channel order and this
-    /// places each channel on the bed (`routed` is what reaches the ring).
+    /// places each channel on the bed (`routed` is what reaches the ring). Also a file with no speaker names folded onto
+    /// a speaker setup with fewer speakers (`OutputSession.speakerFold`).
     let router: BedRouter?
     let routed: AVAudioPCMBuffer?
     var inputExhausted = false
@@ -44,8 +45,10 @@ final class Decoding {
         var router: BedRouter?
         let channels = Int(decoder.processingFormat.channelCount)
         if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
-           let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.standardLabels(channels: channels) {
+           let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.wavOrderLabels(channels: channels) {
             router = BedRouter(source: speakers, bed: bed)
+        } else if !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
+            router = fold
         }
         self.router = router
         // Integer mode: straight to 32-bit integers (the device takes them as they are).

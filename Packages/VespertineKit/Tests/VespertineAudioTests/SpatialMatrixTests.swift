@@ -173,7 +173,7 @@ struct SpatialProbe {
         // As the engine does: converted in the file's own channel order, then placed on the bed.
         let own = decoder.processingFormat.channelLayout
         let router = plan.spatialBed == nil ? nil
-            : (ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.standardLabels(channels: Int(decoder.processingFormat.channelCount)))
+            : (ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.wavOrderLabels(channels: Int(decoder.processingFormat.channelCount)))
                 .flatMap { BedRouter(source: $0, bed: bed.channelLabels) }
         if let router, router.dropped > 0 { result.problems.append("\(router.dropped) channel(s) have no place on the bed") }
         let outFormat = try #require(router.map { AudioFormats.float32(sampleRate: plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
