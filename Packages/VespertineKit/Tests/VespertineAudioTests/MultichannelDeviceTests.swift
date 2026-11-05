@@ -288,6 +288,20 @@ struct SpeakerSetupDeviceTests {
         #expect(!ChannelLayouts.isPlaceholder(try #require(ChannelLayouts.layout(labels: [Self.L, Self.R]))))
     }
 
+    @Test("DoP and bitstream are never folded: their words are copied, never mixed")
+    func noFoldOutsidePCM() throws {
+        let input = try #require(AudioFormats.float32(sampleRate: 176_400, channels: 8, interleaved: true,
+                                                      layout: ChannelLayouts.layout(labels: Self.mpeg71)))
+        let room = try #require(ChannelLayouts.layout(labels: Self.mpeg51))
+        var plan = OutputPlan(mode: .pcm, deviceSampleRate: 176_400, decodedSampleRate: 176_400, physicalBitDepth: 24, channels: 6,
+                              dsdConvertedToPCM: false, reason: "")
+        #expect(OutputSession.speakerFold(from: input, to: room, plan: plan) != nil, "PCM 7.1 into 5.1 folds")
+        for mode in [OutputPlan.Mode.dop, .bitstream] {
+            plan.mode = mode
+            #expect(OutputSession.speakerFold(from: input, to: room, plan: plan) == nil, "\(mode) must not be mixed")
+        }
+    }
+
     @Test("A fold keeps each channel that has its own speaker bit for bit and puts the others at -3 dB on the nearest")
     func foldGains() throws {
         let source: [AudioChannelLabel] = [Self.L, Self.R, Self.C, Self.LFE, Self.Ls, Self.Rs, Self.Lrs, Self.Rrs]
