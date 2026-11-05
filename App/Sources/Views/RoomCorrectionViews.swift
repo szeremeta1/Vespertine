@@ -87,6 +87,19 @@ struct RoomCorrectionChoice: View {
 
 // MARK: - The window
 
+/// What the window does when the mode switch is flipped. Every Advanced section starts below the Compare card, so
+/// without this, Guided to Advanced looks like nothing happened until the user scrolls.
+enum RoomModeReveal {
+    static let advancedAnchor = "room-advanced-start"
+
+    struct Reaction { let scrollTo: String; let hint: String }
+
+    static func reaction(from old: Bool, to new: Bool, hasProfile: Bool) -> Reaction? {
+        guard !old, new, hasProfile else { return nil }
+        return Reaction(scrollTo: advancedAnchor, hint: String(localized: "Advanced controls are below", comment: "Room correction: shown after switching to Advanced; the window scrolls to them"))
+    }
+}
+
 struct RoomCorrectionWindow: View {
     @Environment(AppModel.self) var model
     @Environment(RoomMeasureModel.self) private var measure
@@ -99,12 +112,14 @@ struct RoomCorrectionWindow: View {
     @State private var showDetails = false
     @State private var confirmDelete = false
     @State var layers = RoomGraphLayers.all
+    @State private var modeHint: String?
 
     var body: some View {
         let settings = model.settings
         let device = model.activeDevice
         let profiles = device.map { settings.roomProfiles(for: $0.uid) } ?? []
         let selected = device.flatMap { settings.chosenRoomProfile(for: $0.uid) } ?? profiles.first
+        ScrollViewReader { scroller in
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
@@ -123,6 +138,12 @@ struct RoomCorrectionWindow: View {
                 }
             }
             .padding(24)
+        }
+        .onChange(of: settings.roomAdvancedMode) { old, new in
+            guard let reaction = RoomModeReveal.reaction(from: old, to: new, hasProfile: selected != nil) else { modeHint = nil; return }
+            modeHint = reaction.hint
+            withAnimation(.easeInOut(duration: 0.35)) { scroller.scrollTo(reaction.scrollTo, anchor: .top) }
+        }
         }
         .frame(minWidth: 760, minHeight: 680)
         .background(Palette.window)
@@ -179,6 +200,9 @@ struct RoomCorrectionWindow: View {
                 .fixedSize()
                 .help("Guided: measure, set how much, compare. Advanced: every filter, the target, limits and positions.")
                 .accessibilityLabel("Room correction mode")
+            }
+            if let modeHint, settings.roomAdvancedMode {
+                Label(modeHint, systemImage: "arrow.down").font(Typeface.ui(11.5)).foregroundStyle(Palette.brass)
             }
             Text("Lines your speakers up at your seat and tames the room's bass, per speaker. Off unless you turn it on; while it's on, playback isn't bit-perfect.")
                 .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
@@ -360,6 +384,7 @@ struct RoomCorrectionWindow: View {
             if settings.roomAdvancedMode {
                 RoomAdvancedControls(profile: profile, redesigning: redesigning, edit: { edit(profile.id, $0) },
                                 redesign: { redesign(profile, options: $0, excluded: $1) })
+                    .id(RoomModeReveal.advancedAnchor)
             } else {
                 DisclosureGroup("What it does") {
                     RoomSpeakerTable(profile: profile.atStrength).padding(.top, 8)
