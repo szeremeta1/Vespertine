@@ -45,6 +45,21 @@ public struct EngineSnapshot: Sendable {
     public var bedMeters: BedMeterLayout?
 }
 
+extension EngineSnapshot {
+    /// The engine is opening the output it resolved. What was published about the output it left (waiting for it,
+    /// standing in for another, its signal path) is dropped; a session that carries on keeps its own.
+    mutating func beginOpeningOutput(keepingSession: Bool) {
+        waitingForDevice = nil
+        standingInFor = nil
+        guard !keepingSession else { return }
+        outputDevice = nil
+        signalPath = nil
+        systemRendering = nil
+        bedMeters = nil
+        bufferFill = 0
+    }
+}
+
 public enum EngineEvent: Sendable {
     /// The item became audible (not merely decoded).
     case trackStarted(PlayableItem)
@@ -1032,6 +1047,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         guard let device = try resolveDevice(standIn: standIn) else { throw CoreAudioError(kAudioHardwareBadDeviceError, String(localized: "find an output device", comment: "Followed by “failed: <error code>”.")) }
         mark("device")
+        // Opening the song can keep the engine busy for a long while (a track is copied from a share first) and the
+        // snapshot is only published between commands: say now that the old output isn't what's being waited for.
+        shared.withLock { $0.snapshot.beginOpeningOutput(keepingSession: session != nil) }
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.
         let url = try prepareFile(item)
