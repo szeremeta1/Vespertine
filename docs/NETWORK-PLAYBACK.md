@@ -30,6 +30,8 @@ The transient cache reserves at most **8 GiB per process** across current, prefe
 
 Cache files live in the application's Caches directory under `Playback/<session UUID>`. Leases protect current/next files from deletion. Cancelled kernel network reads cannot always be interrupted, so their files and reservation remain until that read returns. Releasing the final lease deletes its file/session. On startup, advisory session locks permit removal of crash leftovers while protecting another running instance. The original music and metadata are never changed.
 
+Opening the file on the share (and asking whether a Finder-mounted volume is a network volume) is a network call too, and the kernel does not give up on it when the share stops answering. Neither runs on the engine thread: each is asked on its own queue and the engine thread waits in 25 ms steps, so a skip or stop still gets through and ends the wait at once. The open itself finishes, or fails, in the background; the press-time warm-up and the engine thread share one open per file.
+
 The full and compact brass transport replace their glyph with a small rotating ring during an initial network wait or rebuffering. Pressing it cancels the pending start. VoiceOver reports Cancel / BUFFERING; Reduce Motion freezes the ring. The same brass face, dimensions and shadow remain in use. A component snapshot is generated from the production SwiftUI component, not a mock HTML drawing.
 
 ## Validation and manual checks

@@ -160,3 +160,88 @@ struct StuckScanTests {
         #expect(Set(try db.allTracks().map(\.title)) == ["01 - Old", "16 - The World We Knew"])
     }
 }
+
+/// Reads that block on the files a test names (as a read does on a share that stopped answering one of them).
+private final class StallingReads: @unchecked Sendable {
+    private let condition = NSCondition()
+    private let names: Set<String>
+    private var released = false
+
+    init(_ names: Set<String>) { self.names = names }
+    func release() { condition.lock(); released = true; condition.broadcast(); condition.unlock() }
+
+    var hook: @Sendable (URL) -> Void {
+        { [self] url in
+            guard names.contains(url.lastPathComponent) else { return }
+            condition.lock()
+            while !released { condition.wait() }
+            condition.unlock()
+        }
+    }
+}
+
+@Suite("A scan that reads a share with a file that does not answer")
+struct StuckReadTests {
+    private func scanner(_ root: URL, reads: StallingReads, response: TimeInterval = 1) async throws
+        -> (LibraryScanner, LibraryDatabase, LibrarySource) {
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: root.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        await scanner.setTimeouts(response: response, stall: 60)
+        await scanner.setReadHook(reads.hook)
+        return (scanner, db, try db.addSource(LibrarySource(path: root.path, mode: .reference)))
+    }
+
+    @Test("One file that never answers is skipped; the rest of the scan finishes and is saved")
+    func oneHungFileIsSkipped() async throws {
+        let root = try fixture(); defer { try? FileManager.default.removeItem(at: root) }
+        for name in ["01 - A.wav", "02 - B.wav", "03 - C.wav"] { try audio(root.appendingPathComponent("Album/\(name)")) }
+        let reads = StallingReads(["02 - B.wav"]); defer { reads.release() }
+        let (scanner, db, source) = try await scanner(root, reads: reads)
+        let start = Date()
+        let summary = try await scanner.scan(source)
+        #expect(Date().timeIntervalSince(start) < 60)
+        #expect(try db.allTracks().map(\.title).sorted() == ["01 - A", "03 - C"], "the files that answered were lost with the one that did not")
+        #expect(summary.failed.map { URL(fileURLWithPath: $0).lastPathComponent } == ["02 - B.wav"])
+        #expect(try db.sources().first?.lastScannedAt != nil)
+    }
+
+    @Test("A source that answers nothing stops the scan, and what was read before is kept")
+    func silentSourceKeepsWhatWasRead() async throws {
+        let root = try fixture(); defer { try? FileManager.default.removeItem(at: root) }
+        try audio(root.appendingPathComponent("Album/01 - A.wav"))
+        for n in 2...5 { try audio(root.appendingPathComponent("Album/0\(n) - Hung.wav")) }
+        let reads = StallingReads(Set((2...5).map { "0\($0) - Hung.wav" })); defer { reads.release() }
+        let (scanner, db, source) = try await scanner(root, reads: reads)
+        await #expect(throws: LibraryScanner.ScanError.self) { try await scanner.scan(source) }
+        #expect(try db.allTracks().map(\.title) == ["01 - A"], "a stopped scan dropped what it had already read")
+        #expect(try db.sources().first?.lastScannedAt == nil, "a scan that didn't finish counted as finished")
+    }
+}
+
+@Suite("The order a scan reads files in")
+struct ScanReadOrderTests {
+    private func urls(_ paths: [String]) -> [URL] { paths.map { URL(fileURLWithPath: $0) } }
+
+    @Test("Files the library has never seen come before files it only reads again, so a new album is whole first")
+    func newBeforeChanged() {
+        let all = urls(["/m/Old1/1", "/m/Old1/2", "/m/Old2/1", "/m/New/1", "/m/New/2", "/m/New/3", "/m/New/4"])
+        let order = LibraryScanner.readOrder(all, isNew: { $0.path.hasPrefix("/m/New/") }, spreadAcrossFolders: true).map(\.path)
+        #expect(Array(order.prefix(4)) == ["/m/New/1", "/m/New/2", "/m/New/3", "/m/New/4"])
+        #expect(order.suffix(3) == ["/m/Old1/1", "/m/Old2/1", "/m/Old1/2"], "changed files are still spread across folders")
+    }
+
+    @Test("New files in several folders are still spread across them")
+    func newSpread() {
+        let all = urls(["/m/Old/1", "/m/A/1", "/m/A/2", "/m/B/1", "/m/B/2"])
+        let order = LibraryScanner.readOrder(all, isNew: { !$0.path.hasPrefix("/m/Old/") }, spreadAcrossFolders: true).map(\.path)
+        #expect(order == ["/m/A/1", "/m/B/1", "/m/A/2", "/m/B/2", "/m/Old/1"])
+    }
+
+    @Test("On a local disk the order is the listing's, new files first")
+    func local() {
+        let all = urls(["/m/Old/1", "/m/A/1", "/m/Old/2", "/m/A/2"])
+        let order = LibraryScanner.readOrder(all, isNew: { $0.path.hasPrefix("/m/A/") }, spreadAcrossFolders: false).map(\.path)
+        #expect(order == ["/m/A/1", "/m/A/2", "/m/Old/1", "/m/Old/2"])
+    }
+}

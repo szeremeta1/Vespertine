@@ -209,6 +209,11 @@ uint32_t nrt_context_copy_tap(const NRTRenderContext *_Nonnull ctx, float *_Nonn
 
 /// Switches the visualizer tap on or off. Any thread.
 void nrt_context_set_viz(NRTRenderContext *_Nonnull ctx, bool on);
+
+/// How the spectrum tap and the visualizer fold a bed of more than two channels to left and right: `left[c]` and `right[c]`
+/// are the gains of channel c (up to NRT_METER_CHANNELS; the rest 0). Call while stopped. Until then, the standard file order
+/// for the channel count (L R C LFE Ls Rs, and so on) with the centre and surrounds at -3 dB, the LFE at -6 dB.
+void nrt_context_set_tap_mix(NRTRenderContext *_Nonnull ctx, const float *_Nullable left, const float *_Nullable right, uint32_t count);
 bool nrt_context_viz(const NRTRenderContext *_Nonnull ctx);
 
 /// Copies the newest `count` frames (≤ NRT_VIZ_TAP_SIZE / 2), oldest first, left into `left` and right into `right`

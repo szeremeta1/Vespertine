@@ -101,6 +101,9 @@ struct NowPlayingPanel: View {
                         HStack(spacing: 6) {
                             ProgressView().controlSize(.mini)
                             Text("Buffering from the network…").font(Typeface.mono(10)).foregroundStyle(Palette.text2)
+                            if let fraction = player.bufferingFraction {
+                                Text(fraction, format: .percent.precision(.fractionLength(0))).font(Typeface.mono(10)).foregroundStyle(Palette.text2).monospacedDigit()
+                            }
                         }
                         .padding(.top, 8)
                     }

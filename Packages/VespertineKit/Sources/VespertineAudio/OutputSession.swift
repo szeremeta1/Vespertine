@@ -218,6 +218,7 @@ final class OutputSession: @unchecked Sendable {
 
         // Multichannel routing.
         decodedLayout = routeLayout
+        if plan.channels > 2, let labels = routeLayout?.channelLabels, labels.count == plan.channels { applyTapMix(ctx, labels: labels) }
         if plan.spatial != .off {
             let bed = routeLayout
             do {
@@ -589,4 +590,33 @@ public enum DeviceControl {
         guard let element = DeviceQuery.volumeElements(device).first else { return nil }
         return try? HAL.get(device, .output(kAudioDevicePropertyVolumeDecibels, element: element), initial: Float32(0))
     }
+}
+
+/// How the spectrum and visualizer taps fold a bed to left and right, by speaker: the front pair as it is, the centre and
+/// every speaker on a side at -3 dB (the centre on both), the LFE at -6 dB on both, heights and the rest not at all.
+func tapMix(labels: [AudioChannelLabel]) -> (left: [Float], right: [Float]) {
+    let k = Float(0.5.squareRoot())
+    var left = [Float](repeating: 0, count: labels.count), right = left
+    for (c, label) in labels.enumerated() {
+        switch ChannelLayouts.canonical(label) {
+        case kAudioChannelLabel_Left: left[c] = 1
+        case kAudioChannelLabel_Right: right[c] = 1
+        case kAudioChannelLabel_Center: left[c] = k; right[c] = k
+        case kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3: left[c] = 0.5; right[c] = 0.5
+        case kAudioChannelLabel_LeftSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RearSurroundLeft,
+             kAudioChannelLabel_LeftCenter, kAudioChannelLabel_LeftWide: left[c] = k
+        case kAudioChannelLabel_RightSurround, kAudioChannelLabel_RightSurroundDirect, kAudioChannelLabel_RearSurroundRight,
+             kAudioChannelLabel_RightCenter, kAudioChannelLabel_RightWide: right[c] = k
+        case kAudioChannelLabel_CenterSurround: left[c] = 0.5; right[c] = 0.5
+        default: break
+        }
+    }
+    return (left, right)
+}
+
+/// Tells `context`'s taps the order of the bed it plays (see `tapMix`).
+func applyTapMix(_ context: OpaquePointer, labels: [AudioChannelLabel]) {
+    guard labels.count > 2, labels.count <= Int(NRT_METER_CHANNELS) else { return }
+    let mix = tapMix(labels: labels)
+    nrt_context_set_tap_mix(context, mix.left, mix.right, UInt32(labels.count))
 }
