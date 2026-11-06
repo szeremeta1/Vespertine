@@ -6,7 +6,10 @@
 import Foundation
 import CryptoKit
 import GRDB
+import os
 import VespertineAudio
+
+private let scanLog = Logger(subsystem: "org.szeremeta.vespertine.library", category: "scan")
 
 public struct ScanProgress: Sendable {
     public enum Phase: String, Sendable { case listing = "Listing", reading = "Reading" }
@@ -63,6 +66,13 @@ public actor LibraryScanner {
     public private(set) var stallLimit: TimeInterval = 20
     /// Lists a folder's contents (tests stand in a share that stops answering).
     private(set) var readFolder: FolderReader = LibraryScanner.contentsOfFolder
+    /// Runs on the I/O thread just before a file is read (tests stand in a share that stops answering for one file).
+    private(set) var beforeRead: @Sendable (URL) -> Void = { _ in }
+    /// Reads in a row that got no answer within `responseTimeout` before the source is taken for gone. One file that
+    /// doesn't answer is skipped; a source that answers nothing stops the scan.
+    static let silentReadsBeforeStopping = 3
+    /// A scan saves what it has read at least this often, so a scan that ends early leaves what it read behind.
+    static let flushInterval: TimeInterval = 2
 
     public typealias FolderReader = @Sendable (URL, [URLResourceKey]) throws -> [URL]
     public static let contentsOfFolder: FolderReader = { folder, keys in
@@ -78,6 +88,7 @@ public actor LibraryScanner {
     public func setSkipsNonMusic(_ value: Bool) { skipsNonMusic = value }
     func setTimeouts(response: TimeInterval, stall: TimeInterval) { responseTimeout = response; stallLimit = stall }
     func setFolderReader(_ reader: @escaping FolderReader) { readFolder = reader }
+    func setReadHook(_ hook: @escaping @Sendable (URL) -> Void) { beforeRead = hook }
 
     /// Blocking file I/O runs here, not on Swift's cooperative pool (sized to the CPU count, so a
     /// few blocked reads would stall the rest). GCD adds threads while they wait on the network.
@@ -254,61 +265,85 @@ public actor LibraryScanner {
             }
         }
 
-        // On a network share, macOS looks up never-seen files in a folder one at a time, so keep
-        // the reads in flight spread across folders (round-robin) rather than one album at a time.
-        if remote { toRead = Self.interleavedByFolder(toRead) }
+        // Files the library has never seen first, so a new album arrives whole instead of a track per pass behind
+        // thousands of files that only changed. On a network share, macOS looks up never-seen files in a folder one
+        // at a time, so within each group keep the reads in flight spread across folders (round-robin).
+        toRead = Self.readOrder(toRead, isNew: { url in
+            if cueByAudio[url.path] != nil || imageTracks[url.path] != nil { return false }
+            return known[url.path] == nil
+        }, spreadAcrossFolders: remote)
 
         let total = toRead.count
+        scanLog.info("Scanning \(source.path, privacy: .public): \(listing.audio.count) files listed, \(total) to read (\(remote ? "share" : "local", privacy: .public))")
         var processed = 0
         let artwork = self.artwork
         let folderArt = FolderArtCache()
         var batch: [Track] = []
+        var lastFlush = Date()
+        var silentReads = 0
+        var silentPath = ""
         let database = self.database
+        let beforeRead = self.beforeRead
 
-        try await withThrowingTaskGroup(of: (URL, [Track]?).self) { group in
-            var iterator = toRead.makeIterator()
-            for _ in 0..<(remote ? 32 : 6) {
-                guard let url = iterator.next() else { break }
-                let cue = cueByAudio[url.path], file = listed[url.path]
-                group.addTask { try await Self.read(url, network: remote, timeout: timeout) { Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) } }
-            }
-            let skipping = self.skipsNonMusic && source.mode != .managed
-            while let (url, tracks) = try await group.next() {
-                try Task.checkCancellation()
-                activity.touch()
-                processed += 1
-                if let tracks {
-                    // An invalid CUE may fall back to the whole file. Track what was actually indexed.
-                    if let cue = cueByAudio[url.path] {
-                        for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
+        do {
+            try await withThrowingTaskGroup(of: ReadResult.self) { group in
+                var iterator = toRead.makeIterator()
+                func start(_ url: URL) {
+                    let cue = cueByAudio[url.path], file = listed[url.path]
+                    group.addTask {
+                        try await Self.read(url, network: remote, timeout: timeout) {
+                            beforeRead(url)
+                            return Self.readTracks(url, cue: cue, artwork: artwork, folderArt: folderArt, remote: file)
+                        }
                     }
-                    // Likewise an SACD image re-read with fewer tracks (or none: it's no longer an SACD).
-                    for location in imageTracks[url.path] ?? [] { seen.remove(location) }
-                    for track in tracks { seen.insert(track.location) }
-                    let kept = skipping ? tracks.filter(MusicFinder.keepsInLibrary) : tracks
-                    summary.skipped += tracks.count - kept.count
-                    batch.append(contentsOf: kept)
-                } else { summary.failed.append(url.path) }
-                if batch.count >= 200 {
-                    let pending = batch
-                    batch.removeAll()
-                    let (a, u) = try await Self.upsert(pending, sourceID: sourceID, database: database)
-                    summary.added += a
-                    summary.updated += u
                 }
-                if processed % 25 == 0 || processed == total {
-                    progress?(ScanProgress(sourcePath: source.path, processed: processed, total: total, added: summary.added, updated: summary.updated))
+                for _ in 0..<(remote ? 32 : 6) {
+                    guard let url = iterator.next() else { break }
+                    start(url)
                 }
-                if let next = iterator.next() {
-                    let cue = cueByAudio[next.path], file = listed[next.path]
-                    group.addTask { try await Self.read(next, network: remote, timeout: timeout) { Self.readTracks(next, cue: cue, artwork: artwork, folderArt: folderArt, remote: file) } }
+                let skipping = self.skipsNonMusic && source.mode != .managed
+                while let result = try await group.next() {
+                    try Task.checkCancellation()
+                    let url = result.url
+                    processed += 1
+                    if result.answered {
+                        activity.touch()
+                        silentReads = 0
+                    } else {
+                        // The source didn't answer for this file. Skip it (it is read again by the next scan); only a
+                        // source that answers nothing for several files in a row stops the scan.
+                        silentReads += 1
+                        silentPath = url.path
+                        scanLog.error("No answer within \(timeout, format: .fixed(precision: 0)) s reading \(url.path, privacy: .public) (\(silentReads) in a row)")
+                        if silentReads >= Self.silentReadsBeforeStopping { throw ScanError.notResponding(path: silentPath) }
+                    }
+                    if let tracks = result.tracks {
+                        // An invalid CUE may fall back to the whole file. Track what was actually indexed.
+                        if let cue = cueByAudio[url.path] {
+                            for entry in cue.tracks { seen.remove("\(url.path)#\(entry.number)") }
+                        }
+                        // Likewise an SACD image re-read with fewer tracks (or none: it's no longer an SACD).
+                        for location in imageTracks[url.path] ?? [] { seen.remove(location) }
+                        for track in tracks { seen.insert(track.location) }
+                        let kept = skipping ? tracks.filter(MusicFinder.keepsInLibrary) : tracks
+                        summary.skipped += tracks.count - kept.count
+                        batch.append(contentsOf: kept)
+                    } else { summary.failed.append(url.path) }
+                    if batch.count >= 200 || Date().timeIntervalSince(lastFlush) >= Self.flushInterval { try await Self.save(&batch, into: &summary, since: &lastFlush, sourceID: sourceID, database: database) }
+                    if processed % 25 == 0 || processed == total {
+                        progress?(ScanProgress(sourcePath: source.path, processed: processed, total: total, added: summary.added, updated: summary.updated))
+                    }
+                    if let next = iterator.next() { start(next) }
                 }
             }
+        } catch let error as ScanError {
+            // What was read before the source stopped answering is kept; the scan still doesn't count as finished.
+            scanLog.error("Scan of \(source.path, privacy: .public) stopped after \(processed) of \(total) files: \(String(describing: error), privacy: .public)")
+            try? await Self.save(&batch, into: &summary, since: &lastFlush, sourceID: sourceID, database: database)
+            throw error
         }
         try Task.checkCancellation()
-        let (a, u) = try await Self.upsert(batch, sourceID: sourceID, database: database)
-        summary.added += a
-        summary.updated += u
+        try await Self.save(&batch, into: &summary, since: &lastFlush, sourceID: sourceID, database: database)
 
         // A share that dropped mid-scan lists (and reads) nothing: never mistake that for deletions.
         guard let stillThere = await Self.onIOQueue(timeout: timeout, { Self.isReachable(root) })
@@ -348,11 +383,39 @@ public actor LibraryScanner {
         return summary
     }
 
-    /// Reads one file within the deadline; a file the source doesn't answer for stops the scan.
+    /// Writes the tracks read so far (if any) and counts them.
+    private static func save(_ batch: inout [Track], into summary: inout ScanSummary, since lastFlush: inout Date,
+                             sourceID: Int64, database: LibraryDatabase) async throws {
+        guard !batch.isEmpty else { return }
+        let pending = batch
+        batch.removeAll()
+        lastFlush = Date()
+        let (a, u) = try await upsert(pending, sourceID: sourceID, database: database)
+        summary.added += a
+        summary.updated += u
+    }
+
+    /// One file read: its tracks (nil when it can't be read), or `answered: false` when the source didn't answer in time.
+    struct ReadResult: Sendable { var url: URL; var tracks: [Track]?; var answered: Bool }
+
+    /// Reads one file within the deadline. A file the source doesn't answer for comes back unanswered (the caller
+    /// decides whether that ends the scan); its blocked thread returns whenever the system lets it.
     private static func read(_ url: URL, network: Bool, timeout: TimeInterval,
-                             _ work: @escaping @Sendable () -> [Track]?) async throws -> (URL, [Track]?) {
-        guard let tracks = await onIOQueue(network: network, timeout: timeout, work) else { throw ScanError.notResponding(path: url.path) }
-        return (url, tracks)
+                             _ work: @escaping @Sendable () -> [Track]?) async throws -> ReadResult {
+        guard let tracks = await onIOQueue(network: network, timeout: timeout, work) else {
+            return ReadResult(url: url, tracks: nil, answered: false)
+        }
+        return ReadResult(url: url, tracks: tracks, answered: true)
+    }
+
+    /// The order files are read in: those `isNew` (never in the library) first, then the rest. With
+    /// `spreadAcrossFolders` each group is dealt out one file per folder in turn (`interleavedByFolder`).
+    static func readOrder(_ urls: [URL], isNew: (URL) -> Bool, spreadAcrossFolders: Bool) -> [URL] {
+        var fresh: [URL] = [], rest: [URL] = []
+        for url in urls { if isNew(url) { fresh.append(url) } else { rest.append(url) } }
+        guard spreadAcrossFolders else { return fresh + rest }
+        // New files are spread too, but never behind the others: a new folder's files are all in the first group.
+        return interleavedByFolder(fresh) + interleavedByFolder(rest)
     }
 
     static func interleavedByFolder(_ urls: [URL]) -> [URL] {
