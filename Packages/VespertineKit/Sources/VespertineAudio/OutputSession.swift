@@ -590,3 +590,6 @@ public enum DeviceControl {
         return try? HAL.get(device, .output(kAudioDevicePropertyVolumeDecibels, element: element), initial: Float32(0))
     }
 }
+
+/// STUB (tests first): sets how the spectrum and visualizer taps fold a multichannel bed to left and right.
+func applyTapMix(_ context: OpaquePointer, labels: [AudioChannelLabel]) {}
