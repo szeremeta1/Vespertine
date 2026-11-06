@@ -245,4 +245,3 @@ struct ScanReadOrderTests {
         #expect(order == ["/m/A/1", "/m/A/2", "/m/Old/1", "/m/Old/2"])
     }
 }
-
