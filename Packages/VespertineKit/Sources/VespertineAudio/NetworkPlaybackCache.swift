@@ -125,6 +125,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         }
     }
 
+    /// `entry(key:url:)` for a caller that can be told to give up (the engine thread, when another song is asked for).
+    func entry(key: String, url: URL, foreground: Bool = true, cancelled: () -> Bool) throws -> Entry {
+        try entry(key: key, url: url, foreground: foreground)
+    }
+
     /// Current always gets the link first. Prefetch only after its required reserve is on disk.
     func prefetch(key: String?, url: URL?) {
         let generation = lock.withLock { () -> Int in
