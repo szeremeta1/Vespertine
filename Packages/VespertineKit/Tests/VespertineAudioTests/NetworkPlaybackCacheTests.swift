@@ -71,6 +71,23 @@ struct NetworkPlaybackCacheTests {
         #expect(share.readCount == before)
     }
 
+    @Test("A copy reports how much is local as it arrives: never backwards, ending at the whole file")
+    func copyProgress() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = SlowShare(count: 64 * 4096 + 100)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        let seen = Locked([Int64]())
+        share.stall(true)
+        entry.setProgress { copied in seen.withLock { $0.append(copied) } }
+        share.stall(false)
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(entry.copiedBytes == entry.size)
+        let steps = seen.withLock { $0 }
+        #expect(!steps.isEmpty && steps == steps.sorted() && steps.last == entry.size, "\(steps.suffix(3))")
+        entry.setProgress(nil)
+    }
+
     @Test("Large DSD uses a local lead; a stalled producer cannot interrupt reads within that reserve")
     func progressiveLead() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

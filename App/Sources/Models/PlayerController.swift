@@ -85,6 +85,8 @@ final class PlayerController {
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
     private(set) var buffering = false
+    /// While the song is copied from a share before it plays: how much is local (0…1).
+    private(set) var bufferingFraction: Double?
     /// Live level (0…1, linear peak with decay) of every channel Vespertine sends, for multichannel meters.
     private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
@@ -682,6 +684,7 @@ final class PlayerController {
         syncVolumeRelay()
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
+        if bufferingFraction != snap.bufferingFraction { bufferingFraction = snap.bufferingFraction }
         if settings.networkCache, let current, current.id == snap.item?.id, adoptedSource != current.id,
            shares.isNetwork(current.track), !current.track.isDVDFolderTrack, let local = snap.localSourceURL,
            shares.cache.adopt(current.track, from: local) {

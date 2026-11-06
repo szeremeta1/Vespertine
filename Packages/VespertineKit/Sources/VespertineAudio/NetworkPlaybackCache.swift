@@ -220,6 +220,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var isComplete: Bool { storage.condition.withLock { storage.ready.count == storage.blocks } }
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
+        /// Bytes on disk so far.
+        var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
+        /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
+        func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
         func cancel() { storage.cancel() }
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
@@ -279,6 +283,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var waiters = 0
         var cancelled = false
         var error: Error?
+        var progress: (@Sendable (Int64) -> Void)?
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              release: @escaping @Sendable () -> Void) throws {
@@ -396,7 +401,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         }
                         try file.seek(toOffset: UInt64(offset))
                         try file.write(contentsOf: data)
-                        condition.withLock { ready.insert(block); condition.broadcast() }
+                        let (report, copied) = condition.withLock { () -> ((@Sendable (Int64) -> Void)?, Int64) in
+                            ready.insert(block); condition.broadcast()
+                            return (progress, min(size, Int64(ready.count) * Int64(chunk)))
+                        }
+                        report?(copied)
                         publishDemand()
                     } catch {
                         condition.withLock { self.error = error; condition.broadcast() }

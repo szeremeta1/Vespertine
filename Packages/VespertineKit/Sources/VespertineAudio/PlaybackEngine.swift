@@ -28,6 +28,9 @@ public struct EngineSnapshot: Sendable {
     public var lastError: String?
     /// Output is paused while a stalled network read catches up (playback resumes by itself).
     public var isBuffering = false
+    /// While the song is copied from a share before it plays: how much of it is local (0…1). nil when not copying, or when
+    /// the copy is progressive (a large DSD file starts after its first reserve).
+    public var bufferingFraction: Double?
     /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
     public var waitingForDevice: String?
     /// The chosen output (by name) isn't connected and `outputDevice` plays in its place (see `OutputFallback`).
@@ -198,7 +201,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let resolved = urlResolver?(item) ?? item.url
         guard resolved == item.url, item.cacheKey != nil || Self.isOnNetworkVolume(resolved) else { return resolved }
         shared.withLock { $0.snapshot.isBuffering = true }
-        defer { shared.withLock { $0.snapshot.isBuffering = false } }
+        defer { shared.withLock { $0.snapshot.isBuffering = false; $0.snapshot.bufferingFraction = nil } }
         stagedFolder = nil
         if resolved.pathExtension.lowercased() == "ifo" {
             for entry in staged.values { entry.cancel() }
@@ -223,9 +226,21 @@ public final class PlaybackEngine: @unchecked Sendable {
         let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
             || (item.sacdArea != nil && item.dvd == nil)
         let progressive = dsd && entry.size > 512 << 20
+        let copyStarted = Date(), total = entry.size
+        if !progressive, total > 0, !entry.isComplete {
+            entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = Double(copied) / Double(total) } }
+        }
+        defer { entry.setProgress(nil) }
         do {
             try entry.prepare(full: !progressive, lead: 16 << 20, cancelled: { self.superseded })
-        } catch is CancellationError { throw Superseded() }
+        } catch is CancellationError {
+            log.info("Stopped copying \(item.url.lastPathComponent, privacy: .public) from the share at \(entry.copiedBytes >> 20, privacy: .public) of \(total >> 20, privacy: .public) MB after \(Int(Date().timeIntervalSince(copyStarted) * 1000), privacy: .public) ms")
+            throw Superseded()
+        }
+        let copySeconds = Date().timeIntervalSince(copyStarted)
+        if copySeconds > 1 {
+            log.info("Copied \(item.url.lastPathComponent, privacy: .public) from the share: \(entry.copiedBytes >> 20, privacy: .public) MB in \(Int(copySeconds * 1000), privacy: .public) ms (\(String(format: "%.1f", Double(entry.copiedBytes) / 1_048_576 / copySeconds), privacy: .public) MB/s)")
+        }
         let next = nextItemProvider?(item)
         if let next, next.id != item.id, next.cacheKey != nil || Self.isOnNetworkVolume(next.url) {
             // A progressive current track gets the whole link until its copy is finished. Copying the next
@@ -1053,6 +1068,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.
         let url = try prepareFile(item)
+        mark("copy")
         let probed: ProbedSource
         let carry = carried.flatMap { $0.item == item.id && $0.probed.url == url ? $0 : nil }
         if carried != nil, carry == nil { carried = nil }
