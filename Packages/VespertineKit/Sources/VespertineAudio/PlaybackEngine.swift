@@ -199,7 +199,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let folder = stagedFolder, folder.key == key { return folder.entry.url }
         if let entry = staged[key], entry.isComplete { return entry.url }
         let resolved = urlResolver?(item) ?? item.url
-        guard resolved == item.url, item.cacheKey != nil || Self.isOnNetworkVolume(resolved) else { return resolved }
+        guard resolved == item.url, try item.cacheKey != nil || onNetworkVolume(resolved) else { return resolved }
         shared.withLock { $0.snapshot.isBuffering = true }
         defer { shared.withLock { $0.snapshot.isBuffering = false; $0.snapshot.bufferingFraction = nil } }
         stagedFolder = nil
@@ -220,7 +220,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             staged.removeAll()
         }
         playbackCache.discardPrefetch(except: key)
-        let entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved)
+        // Opening the file can stall as long as the share does: skip and stop must still get through.
+        let entry: NetworkPlaybackCache.Entry
+        do { entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved, cancelled: { self.superseded }) }
+        catch is CancellationError { throw Superseded() }
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
         let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
@@ -320,6 +323,21 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let entry = staged[cacheKey(item)] { return !entry.isComplete }
         let url = resolve(item)
         return item.cacheKey != nil ? url == item.url : Self.isOnNetworkVolume(url)
+    }
+
+    /// `isOnNetworkVolume` for the engine thread: `statfs` on a share that has stopped answering waits as long as the
+    /// share does, so it is asked on another queue and skip or stop (`superseded`) can still end the wait.
+    private func onNetworkVolume(_ url: URL) throws -> Bool {
+        let answer = Locked<Bool?>(nil)
+        let answered = DispatchSemaphore(value: 0)
+        DispatchQueue.global(qos: .userInitiated).async {
+            answer.withLock { $0 = Self.isOnNetworkVolume(url) }
+            answered.signal()
+        }
+        while answered.wait(timeout: .now() + 0.025) == .timedOut {
+            if superseded { throw Superseded() }
+        }
+        return answer.withLock { $0 } ?? false
     }
 
     static func isOnNetworkVolume(_ url: URL) -> Bool {
