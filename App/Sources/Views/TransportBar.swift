@@ -322,20 +322,23 @@ struct DeviceSettings: View {
             }
             .font(Typeface.ui(12))
             // Stereo and mono upmixed to 5.1 for Spatial Audio or multichannel speakers. Off by default: the original stays the default.
-            Toggle(isOn: Binding(get: { settings.spatializeStereoUIDs.contains(device.uid) },
-                                 set: { on in
-                                     if on { settings.spatializeStereoUIDs.insert(device.uid) } else { settings.spatializeStereoUIDs.remove(device.uid) }
-                                     model.syncEngine()
-                                 })) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Spatialize stereo").font(Typeface.ui(12))
-                    (device.capabilities.outputChannels > 2 || (device.capabilities.speakerLayoutChannels ?? 0) >= 3
-                         ? Text("Upmixes stereo and mono songs to 5.1 for every speaker. Off plays them as they are.")
-                         : Text("Upmixes stereo and mono songs to 5.1 for Spatial Audio. Needs Spatial Audio on. Off plays them as they are."))
-                        .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+            // Shown only where it does something: a stereo output needs Spatial Audio on first.
+            if FormatPlanner.canSpatializeStereo(on: device.capabilities, spatial: model.engineSpatialMode(for: device)) {
+                Toggle(isOn: Binding(get: { settings.spatializeStereoUIDs.contains(device.uid) },
+                                     set: { on in
+                                         if on { settings.spatializeStereoUIDs.insert(device.uid) } else { settings.spatializeStereoUIDs.remove(device.uid) }
+                                         model.syncEngine()
+                                     })) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Spatialize stereo").font(Typeface.ui(12))
+                        (device.capabilities.outputChannels > 2 || (device.capabilities.speakerLayoutChannels ?? 0) >= 3
+                             ? Text("Upmixes stereo and mono songs to 5.1 for every speaker. Off plays them as they are.")
+                             : Text("Upmixes stereo and mono songs to 5.1 for Spatial Audio. Off plays them as they are."))
+                            .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
+                .toggleStyle(.switch).controlSize(.mini)
             }
-            .toggleStyle(.switch).controlSize(.mini)
             if device.transport == .usb || device.transport == .thunderbolt {
                 Toggle(isOn: Binding(get: { DoPDefaults.isEnabled(uid: device.uid, on: settings.dopDeviceUIDs, off: settings.dopOffDeviceUIDs) },
                                      set: { on in

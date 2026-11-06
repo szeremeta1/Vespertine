@@ -82,6 +82,22 @@ struct MainWindow: View {
         } message: {
             Text(model.playlistReport ?? "")
         }
+        .alert(model.missingSongsPrompt.map { $0.summary.songs == 0 ? String(localized: "No Missing Songs") : String(localized: "Remove Missing Songs?") } ?? "",
+               isPresented: Binding(get: { model.missingSongsPrompt != nil }, set: { if !$0 { model.missingSongsPrompt = nil } }),
+               presenting: model.missingSongsPrompt) { prompt in
+            if prompt.summary.songs == 0 {
+                Button("OK") {}
+            } else {
+                Button("Remove", role: .destructive) { Task { await model.library.removeMissingSongs() } }
+                Button("Cancel", role: .cancel) {}
+            }
+        } message: { prompt in
+            if prompt.summary.songs == 0 {
+                Text("Every song in the library has its file.")
+            } else {
+                Text("Songs without a file: \(prompt.summary.songs)\nFavorites among them: \(prompt.summary.favorites)\nSongs with play counts: \(prompt.summary.played)\n\nThey leave the library, and their favorites and play counts are lost for good. Your music files are never deleted.")
+            }
+        }
         .sheet(isPresented: $model.showConnectServer) {
             ConnectServerSheet().environment(model)
         }

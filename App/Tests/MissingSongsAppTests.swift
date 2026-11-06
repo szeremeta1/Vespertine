@@ -111,4 +111,17 @@ struct MissingSongsAppTests {
         #expect(FileManager.default.fileExists(atPath: keep.filePath), "files are never deleted")
         #expect(await library.missingSongsSummary().songs == 0)
     }
+
+    @Test("A share never scanned is indexed once when it connects, scanning on or off; a known one is only rechecked with it on")
+    func neverScannedShareIsIndexedOnce() {
+        let now = Date()
+        let old = now.addingTimeInterval(-NetworkShareManager.rescanInterval - 60)
+        let recent = now.addingTimeInterval(-60)
+        for automatic in [false, true] {
+            #expect(NetworkShareManager.needsScanOnConnect(lastScannedAt: nil, automatic: automatic, now: now), "never scanned, automatic \(automatic)")
+            #expect(!NetworkShareManager.needsScanOnConnect(lastScannedAt: recent, automatic: automatic, now: now), "scanned a minute ago")
+        }
+        #expect(!NetworkShareManager.needsScanOnConnect(lastScannedAt: old, automatic: false, now: now), "known and stale, scanning off: left to Rescan")
+        #expect(NetworkShareManager.needsScanOnConnect(lastScannedAt: old, automatic: true, now: now))
+    }
 }

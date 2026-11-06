@@ -339,7 +339,9 @@ struct LibrarySettings: View {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
                 Toggle("Scan for new music automatically", isOn: Binding(get: { s.watchFolders }, set: {
-                    s.watchFolders = $0; model.library.updateWatcher()
+                    s.watchFolders = $0
+                    model.library.automaticScanningChanged()
+                    if $0 { Task { await model.shares.rescanStale() } }   // shares connected and due a look catch up too
                 }))
                 Text("Watches your folders, looks again at launch and rechecks network shares now and then. When it’s off, use Rescan Library.")
                     .font(.caption).foregroundStyle(.secondary)

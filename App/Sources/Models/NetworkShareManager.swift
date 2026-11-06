@@ -266,6 +266,12 @@ final class NetworkShareManager {
 
     // MARK: Connecting
 
+    /// Whether a share that just connected is scanned: one never scanned always (once, automatic scanning or not),
+    /// a known one only with automatic scanning on and its last scan older than `rescanInterval`.
+    static func needsScanOnConnect(lastScannedAt: Date?, automatic: Bool, now: Date = .now) -> Bool {
+        lastScannedAt.map { automatic && now.timeIntervalSince($0) > rescanInterval } ?? true
+    }
+
     /// Mounts the source's share (or adopts an existing mount), repoints the library if the mount
     /// moved, and indexes it if it has never been scanned.
     @discardableResult
@@ -295,7 +301,7 @@ final class NetworkShareManager {
             // shares not checked for half an hour (incremental, so only new or changed files are read).
             // A known share waits until Vespertine is in front, so waking the Mac doesn't wake the NAS's disks.
             // A share never scanned is indexed once, automatic scanning or not; a known one is only rechecked with it on.
-            let stale = source.lastScannedAt.map { settings.watchFolders && Date().timeIntervalSince($0) > Self.rescanInterval } ?? true
+            let stale = Self.needsScanOnConnect(lastScannedAt: source.lastScannedAt, automatic: settings.watchFolders)
             // Never while music plays from a share: the half-hourly check (rescanStale) catches up once it's quiet.
             if scanIfNew, stale, source.lastScannedAt == nil || NSApp.isActive, library.scanProgress == nil, !isStreamingPlayback(),
                var fresh = sources.first(where: { $0.id == id }) {

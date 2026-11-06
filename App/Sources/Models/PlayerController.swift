@@ -548,6 +548,14 @@ final class PlayerController {
 
     // MARK: Engine events & polling
 
+    /// What to say when a song's file is gone: with automatic scanning on its source is being rescanned for it; off, the
+    /// song is only hidden (`LibraryStore.rescanForMissingFile`) and Rescan Library looks again.
+    private func goneFileMessage(for track: Track) -> String {
+        library.automaticScanning()
+            ? String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+            : String(localized: "“\(track.title)” was moved or deleted, so it’s hidden from the library. Rescan Library looks for it again.")
+    }
+
     private func handle(_ event: EngineEvent) {
         switch event {
         case .trackStarted(let item):
@@ -591,12 +599,12 @@ final class PlayerController {
                     let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
                     guard let self, !exists else { return }
                     self.library.rescanForMissingFile(track)
-                    self.lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+                    self.lastError = self.goneFileMessage(for: track)
                 }
             } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
                 // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
                 library.rescanForMissingFile(track)
-                lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+                lastError = goneFileMessage(for: track)
             } else {
                 lastError = message
             }
