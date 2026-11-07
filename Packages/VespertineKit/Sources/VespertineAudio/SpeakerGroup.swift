@@ -98,18 +98,23 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         public var channelCount: Int
         /// Extra output latency, in frames, from a measured skew against the leader (0 until measured).
         public var extraLatencyFrames: Double
+        /// How much later than the others this output's sound arrives, in ms, from a measurement (0 until measured). Held back in
+        /// Vespertine as a delay on the other outputs' channels (`GroupDelay`): macOS 27 takes an aggregate's extra latency without
+        /// error and ignores it.
+        public var skewMs: Double
         /// Core Audio's drift correction quality for this member, 0 (cheapest) to 127 (best).
         public var driftQuality: Int
 
         public static let defaultDriftQuality = 0x7F
 
         public init(deviceUID: String, name: String, modelUID: String? = nil, channelCount: Int,
-                    extraLatencyFrames: Double = 0, driftQuality: Int = Member.defaultDriftQuality) {
+                    extraLatencyFrames: Double = 0, skewMs: Double = 0, driftQuality: Int = Member.defaultDriftQuality) {
             self.deviceUID = deviceUID
             self.name = name
             self.modelUID = modelUID
             self.channelCount = channelCount
             self.extraLatencyFrames = extraLatencyFrames
+            self.skewMs = skewMs
             self.driftQuality = driftQuality
         }
 
@@ -120,6 +125,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             modelUID = try c.decodeIfPresent(String.self, forKey: .modelUID)
             channelCount = try c.decode(Int.self, forKey: .channelCount)
             extraLatencyFrames = try c.decodeIfPresent(Double.self, forKey: .extraLatencyFrames) ?? 0
+            skewMs = try c.decodeIfPresent(Double.self, forKey: .skewMs) ?? 0
             driftQuality = try c.decodeIfPresent(Int.self, forKey: .driftQuality) ?? Member.defaultDriftQuality
         }
     }
@@ -253,6 +259,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         case tooManyChannels(Int)
         case channelCountInvalid(String)
         case driftQualityInvalid(String)
+        case skewInvalid(String)
         case speakerOnUnknownDevice(UUID)
         case channelOutOfRange(UUID)
         case channelShared(device: String, channel: Int)
@@ -272,6 +279,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             case .tooManyChannels(let n): "The outputs add up to \(n) channels; a group can have \(SpeakerGroup.maxChannels)."
             case .channelCountInvalid(let uid): "The output \(uid) has no valid channel count."
             case .driftQualityInvalid(let uid): "The drift correction quality of \(uid) must be between 0 and 127."
+            case .skewInvalid(let uid): "The measured delay of \(uid) must be between 0 and \(Int(SpeakerGroup.delayTrimRangeMs.upperBound)) ms."
             case .speakerOnUnknownDevice: "A speaker is on an output that is not in the group."
             case .channelOutOfRange: "A speaker is on an output channel its device does not have."
             case .channelShared(let device, let channel): "Two speakers are on channel \(channel + 1) of \(device)."
@@ -295,6 +303,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             if !seen.insert(member.deviceUID).inserted { found.append(.duplicateMember(member.deviceUID)) }
             if member.channelCount < 1 { found.append(.channelCountInvalid(member.deviceUID)) }
             if !(0...127).contains(member.driftQuality) { found.append(.driftQualityInvalid(member.deviceUID)) }
+            if !Self.delayTrimRangeMs.contains(member.skewMs) { found.append(.skewInvalid(member.deviceUID)) }
         }
         if !members.contains(where: { $0.deviceUID == clockLeaderUID }) { found.append(.leaderNotAMember(clockLeaderUID)) }
         if totalChannels > Self.maxChannels { found.append(.tooManyChannels(totalChannels)) }
