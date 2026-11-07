@@ -160,7 +160,7 @@ struct TransitionsNote: Equatable {
 @MainActor
 final class AppModel {
     let settings: AppSettings
-    /// The saved speaker groups; nil unless the hidden switch was on at launch.
+    /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
     let library: LibraryStore
     let player: PlayerController
@@ -288,12 +288,7 @@ final class AppModel {
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
         library.bundlesCopiesByDefault = settings.bundleCopies
         if settings.speakerGroupsFeature {
-            let groups = SpeakerGroupsModel(directory: settings.dataDirectory)
-            groups.onChange = { [weak self] in
-                self?.followDrawings()
-                self?.syncEngine()
-            }
-            speakerGroups = groups
+            speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
         }
         syncEngine()
         shares.start()
@@ -455,6 +450,26 @@ final class AppModel {
             settings.selectedDeviceUID = device.uid
             settings.selectedDevice = OutputIdentity(device)
         }
+    }
+
+    /// A change to the saved speaker groups: the drawings are followed and the engine hears of them.
+    private var groupsChanged: () -> Void {
+        { [weak self] in
+            self?.followDrawings()
+            self?.syncEngine()
+        }
+    }
+
+    /// The Settings switch that brings speaker groups into the app (or removes them), without a restart. Turning it off while a
+    /// group is the chosen output lets go of that output (the system's default plays) before the groups go; the saved groups stay in
+    /// their file for the next time it is on.
+    func setSpeakerGroupsFeature(_ on: Bool) {
+        if !SpeakerGroupsSwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on, groups: speakerGroups?.groups ?? []) {
+            settings.selectedDeviceUID = nil
+            settings.selectedDevice = nil
+        }
+        speakerGroups = SpeakerGroupsSwitch.apply(on, to: settings, current: speakerGroups, onChange: groupsChanged)
+        syncEngine()
     }
 
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next

@@ -6,7 +6,7 @@ Two or more USB DACs played as one multichannel system: for example a Fosi ZD3 a
 
 ## Turning it on
 
-The switch is a hidden setting for now: `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES`, then restart. Off (the default), the app reads no groups, offers none and hands the engine none. The planned Settings switch is not in the app yet.
+Settings › Playback › **Speaker Groups (beta)** holds one switch, off by default (`AppSettings.speakerGroupsFeature`, like Transitions'), with a line saying what it does. Turning it on shows the list of groups under it and takes effect at once, with no restart; turning it off takes the list, the groups in the output list and the groups handed to the engine away again. Off, the app reads no groups, offers none and hands the engine none. Turning it off while a group is the chosen output lets go of that output (the system's default plays); the saved groups stay in their file for the next time. The old `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` still sets the same switch.
 
 ## How it works, and what that means for bit-perfect
 
@@ -19,7 +19,7 @@ The switch is a hidden setting for now: `defaults write org.szeremeta.Vespertine
 
 ## Setting up a group
 
-Settings › Speaker Groups lists, duplicates and removes groups; the editor has:
+Settings › Playback › Speaker Groups (beta), once it is on, lists, duplicates and removes groups; the editor has:
 
 1. **Devices and clock leader.** The leader is the DAC whose channels matter most (usually the front pair): it is never resampled.
 2. **Channel map.** Every channel of every DAC against the speaker on it (front left, centre, back right…), with an **Identify** button per channel that plays a quiet tone (three bursts of pink noise at -30 dBFS) on that channel of that DAC only. Identify plays on the DAC itself, and is refused while the group is playing, because its DACs are held then. Each channel also has an **Inverted** box.

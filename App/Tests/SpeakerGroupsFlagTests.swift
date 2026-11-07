@@ -3,7 +3,7 @@ import Testing
 import VespertineAudio
 @testable import Vespertine
 
-/// Speaker groups in the app: behind a hidden switch that is off for everyone, nothing read or written until it is on, and a
+/// Speaker groups in the app: behind a switch (Settings › Playback) that is off for everyone, nothing read or written until it is on, and a
 /// small model over the saved groups for the settings list.
 @Suite("Speaker groups switch and list", .serialized) @MainActor
 struct SpeakerGroupsFlagTests {

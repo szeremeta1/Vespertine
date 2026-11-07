@@ -155,9 +155,9 @@ final class AppSettings {
     /// Song transitions exist in the app only while this is on (Settings › Playback › Transitions), off by default: off,
     /// there is no menu item, button, setting, Shortcuts action or string for them, and playback is untouched.
     var transitionsFeature: Bool { didSet { defaults.set(transitionsFeature, forKey: "transitionsFeature") } }
-    /// Speaker groups (several DACs played as one system) are in the app only while this is on. It has no switch in Settings
-    /// yet: turn it on with `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES`. Off, there is no
-    /// setting, menu item or string for them, and nothing about them is read or written.
+    /// Speaker groups (several DACs played as one system) are in the app only while this is on (Settings › Playback › Speaker
+    /// Groups (beta), off by default; `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` sets it too). Off,
+    /// there is no setting, menu item or string for them, and nothing about them is read or written.
     var speakerGroupsFeature: Bool { didSet { defaults.set(speakerGroupsFeature, forKey: "speakerGroupsFeature") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
@@ -389,7 +389,7 @@ final class AppSettings {
     /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
     func engineSettings(groups: [SpeakerGroup] = []) -> EngineSettings {
         var s = EngineSettings()
-        // Saved speaker groups reach the engine only while the hidden switch is on: off, it gets none, whatever is saved.
+        // Saved speaker groups reach the engine only while the Settings switch is on: off, it gets none, whatever is saved.
         s.speakerGroups = speakerGroupsFeature ? groups : []
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID

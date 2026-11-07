@@ -226,7 +226,7 @@ struct DevicePicker: View {
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,
                           selected: model.settings.selectedDeviceUID == d.uid)
             }
-            // Speaker groups (hidden feature): chosen like an output, ready when all of their outputs are connected.
+            // Speaker groups (beta, behind their Settings switch): chosen like an output, ready when all of their outputs are connected.
             if let groups = model.speakerGroups {
                 ForEach(GroupOutputRows.rows(groups: groups.groups, devices: model.devices.devices)) { row in
                     deviceRow(row.uid, name: row.name, detail: row.detail, symbol: "hifispeaker.2", selected: model.settings.selectedDeviceUID == row.uid)
