@@ -1284,6 +1284,15 @@ public final class PlaybackEngine: @unchecked Sendable {
                               roomCorrection: room?.name,
                               bypassedRoomCorrection: room == nil ? settings.roomCorrection(for: device)?.name : nil)
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
+        if let resources = session.groupResources {
+            // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
+            let stage = GroupSignalPath.stage(room: room, usedChannels: plan.channels, equalizer: path.equalizer != nil,
+                                              digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
+            let group = GroupSignalPath.make(group: resources.group, applied: session.applied, source: probed.format, plan: plan, stage: stage)
+            path.group = group
+            path.deviceProfile = group.deviceProfile
+            path.resampledMembers = group.resampledMemberNames
+        }
         return path
     }
 
@@ -2291,6 +2300,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             path?.bypassedRoomCorrection = room == nil ? settings.roomCorrection(for: sessionDevice)?.name : nil
             let rate = path?.applied.sampleRate ?? 0
             path?.roomFiltersSkipped = room?.filtersTooLong(sampleRate: rate, channelCount: plan.channels) ?? false
+            if var group = path?.group {
+                // What is done to the samples can change while a song plays (a setting): the group's account follows it.
+                group.stage = GroupSignalPath.stage(room: room, usedChannels: plan.channels, equalizer: path?.equalizer != nil,
+                                                    digitalVolumeDB: settings.digitalVolume(for: sessionDevice), replayGainDB: path?.replayGainDB)
+                path?.group = group
+                path?.deviceProfile = group.deviceProfile
+            }
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

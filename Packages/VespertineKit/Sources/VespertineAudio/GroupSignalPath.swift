@@ -156,3 +156,40 @@ public struct GroupSignalPath: Sendable, Hashable {
         }
     }
 }
+
+// MARK: Built from what the engine played
+
+extension GroupSignalPath {
+    /// The stage of the chain on `usedChannels` channels: the most a stage changes wins (room correction, then the equalizer, then
+    /// gain); whole-frame delays alone only shift the samples. A flat profile is no stage at all.
+    static func stage(room: RoomCorrectionPlayback?, usedChannels: Int, equalizer: Bool, digitalVolumeDB: Double?, replayGainDB: Double?) -> Stage {
+        let roomChangesSamples = room.map { !$0.isFlat && !$0.changesOnlyTiming(channels: 0..<max(usedChannels, 0)) } ?? false
+        if roomChangesSamples { return .roomCorrection }
+        if equalizer { return .equalizer }
+        if (digitalVolumeDB ?? 0) != 0 || (replayGainDB ?? 0) != 0 { return .gain }
+        if let room, !room.isFlat, room.channels.prefix(max(usedChannels, 0)).contains(where: { $0.delayMs > 0 }) { return .integerDelay }
+        return .none
+    }
+
+    /// The path of one song on the group that played it. The song's channels go to the aggregate's in order, so the first
+    /// `plan.channels` aggregate channels are the ones in use; a speaker role names each, or the usual order for the count when
+    /// the group has no speaker there. `applied.members` are the members as read back from them.
+    static func make(group: SpeakerGroup, applied: AppliedFormat, source: SourceFormat, plan: OutputPlan, stage: Stage,
+                     otherAppsPlaying: Bool = false) -> GroupSignalPath {
+        let assigned = group.rolesByAggregateChannel
+        let order = Self.usualOrder
+        let members = applied.members.map { m -> Member in
+            let used = (m.channelOffset..<(m.channelOffset + m.channelCount)).filter { $0 < plan.channels }
+            let roles = used.map { channel in (channel < assigned.count ? assigned[channel] : nil) ?? order[min(channel, order.count - 1)] }
+            return Member(deviceUID: m.uid, name: m.name, isLeader: m.isLeader, resampled: m.resampled, speakers: roles,
+                          sampleRate: m.sampleRate, physicalBitDepth: m.physicalBitDepth, physicalIsInteger: m.physicalIsInteger,
+                          physicalFormatKnown: m.physicalFormatKnown, exclusive: m.exclusive, otherAppsPlaying: otherAppsPlaying)
+        }
+        return GroupSignalPath(groupName: group.name, source: source, folds: plan.channels < source.channels,
+                               dsdConvertedToPCM: plan.dsdConvertedToPCM, stage: stage, members: members)
+    }
+
+    /// The speakers of a channel count, in the order a file's channels go (WAVE order).
+    private static let usualOrder: [SpeakerRole] = [.frontLeft, .frontRight, .center, .lfe, .backLeft, .backRight, .sideLeft, .sideRight,
+                                                    .topFrontLeft, .topFrontRight, .topBackLeft, .topBackRight]
+}

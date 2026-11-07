@@ -74,6 +74,17 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
     /// Changes nothing: no preamp and no channel with an effect.
     public var isFlat: Bool { preampDB == 0 && !channels.contains(where: \.isActive) }
 
+    /// On `used` channels it only holds sound back: delays in whole frames (`renderChannels` rounds them), with no level, no
+    /// preamp, no band and no filter. That shifts the samples without changing one of them. A flat profile counts.
+    public func changesOnlyTiming(channels used: Range<Int>) -> Bool {
+        guard preampDB == 0 else { return false }
+        return used.allSatisfy { c in
+            guard c < channels.count else { return true }
+            let channel = channels[c]
+            return channel.levelDB == 0 && !channel.bands.contains(where: \.isActive) && channel.impulse == nil
+        }
+    }
+
     /// The stream's channels line up with the speakers it was made for: the same layout, or the front left and right
     /// of a surround profile for stereo music. Anything else (mono, a surround stream on a stereo profile) bypasses it.
     public func applies(channels count: Int) -> Bool { count == channels.count || (count == 2 && channels.count > 2) }

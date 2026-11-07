@@ -34,6 +34,9 @@ public struct SignalPath: Sendable, Hashable {
     public var roomFiltersSkipped = false
     /// For a speaker group: the DACs that carry some of the song and are resampled to follow the clock leader.
     public var resampledMembers: [String] = []
+    /// A speaker group's own account of the song: which DACs carry it and what reaches each one. When set it decides the badge
+    /// (`GroupSignalPath`), and a room correction that only delays in whole frames does not count as changing the samples.
+    public var group: GroupSignalPath? = nil
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
@@ -89,13 +92,15 @@ public struct SignalPath: Sendable, Hashable {
     /// Gain other than exactly unity is applied somewhere in software.
     public var modifiesSamples: Bool {
         if let rg = replayGainDB, rg != 0 { return true }
-        if equalizer != nil || roomCorrection != nil { return true }
+        if equalizer != nil { return true }
+        if roomCorrection != nil, group?.stage != .integerDelay { return true }
         if case .digital(let db) = volume, db != 0 { return true }
         return false
     }
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
+        if let group { return groupIsBitPerfect(group) }
         guard transition?.audible != true, !faderRamping, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
         else { return false }
@@ -116,9 +121,22 @@ public struct SignalPath: Sendable, Hashable {
         }
     }
 
+    /// A speaker group: bit-perfect only when the group says so (the DACs that play the song are untouched, nothing but timing
+    /// is done to the samples) and nothing else changes them (a transition, the fader, damaged frames, Spatial Audio, another app).
+    private func groupIsBitPerfect(_ group: GroupSignalPath) -> Bool {
+        group.isBitPerfect && transition?.audible != true && !faderRamping && concealedFrames == 0 && plan.mode == .pcm
+            && plan.spatial == .off && (applied.exclusive || !otherAppsPlaying) && !modifiesSamples
+    }
+
     /// One-line state for badges and the menu bar (in the current language; English without a string table).
     public var statusLine: String {
         if let transition, transition.audible { return transition.badge }
+        if let group {
+            if isBitPerfect { return String(localized: "BIT-PERFECT", comment: "Status badge (short, uppercase).") }
+            if concealedFrames > 0 { return String(localized: "DAMAGED FRAMES SILENCED", comment: "Status badge (short, uppercase).") }
+            if faderRamping || modifiesSamples, group.stage == .none { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
+            return group.badges.first { $0 != "BIT-PERFECT" && $0 != "SPEAKER GROUP" } ?? "SPEAKER GROUP"
+        }
         if isBitPerfect {
             switch plan.mode {
             case .dop: return String(localized: "NATIVE DSD · DoP", comment: "Status badge (short, uppercase).")
