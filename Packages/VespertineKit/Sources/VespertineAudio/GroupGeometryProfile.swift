@@ -12,8 +12,8 @@ public enum GroupGeometryProfile {
     public static let name = "From the drawing"
 
     /// The profile for `group` as drawn: each speaker's wait for the farthest one and its level below it, to the hundredth of a
-    /// millisecond and the tenth of a dB. A speaker's own delay and level trims are not in it: the group's chain adds the delay
-    /// trims (`GroupDelay`), so counting them here too would count them twice. nil when no speaker is wired to an output; a speaker
+    /// millisecond and the tenth of a dB. A speaker's own delay and level trims are not in it: the group's chain adds them
+    /// (`GroupDelay`), so counting them here too would count them twice. nil when no speaker is wired to an output; a speaker
     /// that can't be placed (at the seat, or not at a number) is in the channel map and has no alignment.
     public static func make(for group: SpeakerGroup, id: UUID = UUID(), createdAt: Date = Date()) -> RoomProfile? {
         guard let fit = RoomLayout.layout(for: group) else { return nil }

@@ -176,7 +176,7 @@ public enum GroupPolicies {
     }
 
     /// What a group's per-speaker settings do in playback today.
-    public static let playedToday = "Played today: each channel of a song goes to the speakers by where the speakers stand, and the delays shown here (the waits and the delay trims). Level trims and polarity are saved with the group but not applied yet."
+    public static let playedToday = "Played today: each channel of a song goes to the speakers by where the speakers stand, and the delays and level trims shown here (the waits, the delay trims and the level trims). Polarity is saved with the group but not applied yet."
 
     public static let lossNote = "Played by the engine: a lost output pauses the group or moves it to the rest, and it moves back when the output returns."
 }

@@ -61,7 +61,7 @@ struct GroupRoutingLoopbackTests {
     }
 
     /// Plays a stereo file made by `sample` on a quad made of the two devices with `policy`, and records both members.
-    private func play(policy: StereoPolicy, sample: @escaping (Int, Int) -> Int32) throws -> Played {
+    private func play(policy: StereoPolicy, trims: [Double] = [0, 0, 0, 0], sample: @escaping (Int, Int) -> Int32) throws -> Played {
         let members = try devices()
         let found = members.map(nominal)
         defer { for (d, r) in zip(members, found) { try? DeviceControl.setNominalRate(r, on: d.id) } }
@@ -75,6 +75,7 @@ struct GroupRoutingLoopbackTests {
                                     .init(role: .backRight, deviceUID: members[1].uid, channel: 1, position: Point2D(x: 1, y: -1.5)),
                                  ])
         group.stereoPolicy = policy
+        for (i, trim) in trims.enumerated() { group.speakers[i].trimDB = trim }
 
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("grouproute-\(UUID()).wav")
         defer { try? FileManager.default.removeItem(at: url) }
@@ -136,6 +137,20 @@ struct GroupRoutingLoopbackTests {
         #expect(path.group?.members.map(\.speakers) == [[.frontLeft, .frontRight], []])
         #expect(path.group?.folds == false)
         #expect(path.applied.virtualChannels == 4 && path.plan.channels == 4)
+    }
+
+    @Test("A level trim of -6 dB on the front right: its tone arrives at half the level of the left's, and the path says ROOM CORRECTION")
+    func levelTrim() throws {
+        let played = try play(policy: .frontOnly, trims: [0, -6, 0, 0]) { c, f in
+            Int32(0.25 * Double(1 << 23) * sin(2 * Double.pi * Self.tones[c] * Double(f) / Self.rate))
+        }
+        let from = Int(Self.rate * 1.0), count = Int(Self.rate * 1.0)
+        try #require(played.leader[0].count >= from + count && played.leader[1].count >= from + count)
+        let left = rms(played.leader[0][from..<(from + count)]), right = rms(played.leader[1][from..<(from + count)])
+        #expect(left > 0.1, "the left plays: \(left)")
+        #expect(abs(right / max(left, 1e-9) - pow(10, -6.0 / 20)) < 0.02, "right is \(right / max(left, 1e-9)) of left")
+        #expect(played.path?.group?.badges.contains("ROOM CORRECTION") == true)
+        #expect(played.path?.group?.isBitPerfect == false)
     }
 
     @Test("A stereo song mirrored to the back pair at -6 dB: the follower repeats each side at half the level, and both DACs are named")
