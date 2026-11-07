@@ -490,6 +490,7 @@ struct RoomCorrectionWindow: View {
         case .measured: return String(localized: "Microphone \(profile.micSerial) · measured \(date) · preamp \(preamp) dB")
         case .equalizerAPO: return String(localized: "Imported from Equalizer APO or REW · \(date) · preamp \(preamp) dB")
         case .impulseResponse: return String(localized: "Impulse responses (convolution) · imported \(date)")
+        case .geometry: return "Delays and levels from where the speakers are drawn · \(date)"
         }
     }
 

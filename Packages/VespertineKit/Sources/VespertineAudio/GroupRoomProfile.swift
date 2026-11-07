@@ -11,6 +11,8 @@ public struct GroupRoomLayout: Equatable, Sendable {
     public var layout: RoomLayout
     /// Each speaker on its output of the group (the aggregate's channel), unverified.
     public var channelMap: RoomChannelMap
+    /// The room speaker each of the group's roles became (a quad's back pair is its surround pair).
+    public var speakers: [SpeakerRole: RoomSpeaker]
 }
 
 extension RoomLayout {
@@ -39,7 +41,8 @@ extension RoomLayout {
         func speaker(_ role: SpeakerRole) -> RoomSpeaker { surrounds[role] ?? RoomSpeaker(role: role) }
         let byLayout: [SpeakerRole] = layout.speakers.compactMap { target in roles.first { speaker($0) == target } }
         let entries = byLayout.map { RoomChannelMap.Entry(speaker: speaker($0), output: wired[$0] ?? 0) }
-        return GroupRoomLayout(layout: layout, channelMap: RoomChannelMap(entries: entries, verified: false))
+        return GroupRoomLayout(layout: layout, channelMap: RoomChannelMap(entries: entries, verified: false),
+                               speakers: Dictionary(uniqueKeysWithValues: roles.map { ($0, speaker($0)) }))
     }
 
     /// A left-right pair standing as the surrounds of a quad or a 5.1.

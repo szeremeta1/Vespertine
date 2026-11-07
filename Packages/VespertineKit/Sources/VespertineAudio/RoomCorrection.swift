@@ -17,6 +17,31 @@ public enum RoomSpeaker: String, Codable, CaseIterable, Sendable, Hashable {
     case sideLeft, sideRight, backLeft, backRight, backCenter, wideLeft, wideRight
     case topFrontLeft, topFrontRight, topMiddleLeft, topMiddleRight, topBackLeft, topBackRight
 
+    /// What the speaker is called in plain words.
+    public var plainName: String {
+        switch self {
+        case .left: "Left"
+        case .right: "Right"
+        case .center: "Centre"
+        case .lfe: "LFE"
+        case .leftSurround: "Left surround"
+        case .rightSurround: "Right surround"
+        case .sideLeft: "Left side"
+        case .sideRight: "Right side"
+        case .backLeft: "Left back"
+        case .backRight: "Right back"
+        case .backCenter: "Back centre"
+        case .wideLeft: "Left wide"
+        case .wideRight: "Right wide"
+        case .topFrontLeft: "Left top front"
+        case .topFrontRight: "Right top front"
+        case .topMiddleLeft: "Left top middle"
+        case .topMiddleRight: "Right top middle"
+        case .topBackLeft: "Left top back"
+        case .topBackRight: "Right top back"
+        }
+    }
+
     /// The room speaker for a place in a speaker group, as itself (a quad's back pair becomes the surround pair only through
     /// `RoomLayout.layout(for:)`).
     public init(role: SpeakerRole) {
@@ -410,6 +435,8 @@ public enum RoomProfileSource: String, Codable, Hashable, Sendable {
     case equalizerAPO
     /// Impulse responses (convolution filters) from WAV, AIFF, CAF or FLAC files.
     case impulseResponse
+    /// Delays and levels worked out from where a speaker group's speakers are drawn, with no filters (`GroupGeometryProfile`).
+    case geometry
 }
 
 public enum RoomCorrectionCoding {
