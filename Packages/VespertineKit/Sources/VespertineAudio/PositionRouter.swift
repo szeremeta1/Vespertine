@@ -33,6 +33,8 @@ public struct PositionRouter: Equatable, Sendable {
         case folded
         /// The LFE, by the group's LFE policy.
         case lfe
+        /// A stereo song on speakers beyond the front pair, by the group's stereo policy.
+        case policy
     }
 
     public struct Route: Equatable, Sendable {
@@ -95,6 +97,13 @@ public struct PositionRouter: Equatable, Sendable {
             }
             // 3 and 4. By angle.
             found[s] = Self.byAngle(Self.azimuth(of: role, among: present), height: role.isHeight, targets: targets)
+        }
+
+        // A stereo song on more than its pair: the group's stereo policy.
+        if let pair = Self.stereoPair(roles) {
+            for (s, extra) in Self.stereoRoutes(group.stereoPolicy, group: group, outputOf: outputOf, left: pair.left, right: pair.right) {
+                found[s].append(contentsOf: extra)
+            }
         }
 
         sourceChannels = labels.count
@@ -163,6 +172,47 @@ public struct PositionRouter: Equatable, Sendable {
         case .sideRight where !both, .backRight where !both: return 110
         default: return role.defaultAzimuth ?? 0
         }
+    }
+
+    /// The source channels of a stereo song (exactly a left and a right), else nil.
+    private static func stereoPair(_ roles: [SpeakerRole?]) -> (left: Int, right: Int)? {
+        guard roles.count == 2, let left = roles.firstIndex(of: .frontLeft), let right = roles.firstIndex(of: .frontRight) else { return nil }
+        return (left, right)
+    }
+
+    /// What the stereo policy adds beyond the front pair, by source channel. Ceiling speakers and the subwoofer never take part.
+    /// - mirror: left, right and wide speakers repeat the channel of their side at the level (never above 0 dB);
+    /// - each pair: only left-right pairs, at full level, so a speaker without a partner and the centre stay quiet;
+    /// - all speakers: every side speaker, paired or not, and the centre ones play the mono sum, half of each.
+    private static func stereoRoutes(_ policy: StereoPolicy, group: SpeakerGroup, outputOf: [SpeakerRole: Int], left: Int, right: Int) -> [Int: [Route]] {
+        let leftRoles: [SpeakerRole: SpeakerRole] = [.sideLeft: .sideRight, .backLeft: .backRight, .wideLeft: .wideRight]
+        let rightRoles: [SpeakerRole: SpeakerRole] = [.sideRight: .sideLeft, .backRight: .backLeft, .wideRight: .wideLeft]
+        let centreRoles: [SpeakerRole] = [.center, .backCenter]
+        let wired = Set(group.speakers.map(\.role)).filter { outputOf[$0] != nil }
+        var extra: [Int: [Route]] = [:]
+        func add(_ source: Int, _ role: SpeakerRole, _ gain: Float) {
+            guard let output = outputOf[role], gain > 0 else { return }
+            extra[source, default: []].append(Route(output: output, gain: gain, kind: .policy))
+        }
+        func sides(gain: Float, pairsOnly: Bool) {
+            for role in wired.sorted(by: { $0.rawValue < $1.rawValue }) {
+                if let partner = leftRoles[role] { if !pairsOnly || wired.contains(partner) { add(left, role, gain) } }
+                if let partner = rightRoles[role] { if !pairsOnly || wired.contains(partner) { add(right, role, gain) } }
+            }
+        }
+        switch policy {
+        case .frontOnly:
+            break
+        case .mirror(let trimDB):
+            guard trimDB.isFinite else { break }
+            sides(gain: Float(pow(10, min(trimDB, 0) / 20)), pairsOnly: false)
+        case .eachPairStereo:
+            sides(gain: 1, pairsOnly: true)
+        case .allSpeakers:
+            sides(gain: 1, pairsOnly: false)
+            for role in centreRoles where wired.contains(role) { add(left, role, 0.5); add(right, role, 0.5) }
+        }
+        return extra
     }
 
     private static func lfeRoutes(_ policy: LFEPolicy, group: SpeakerGroup, outputOf: [SpeakerRole: Int]) -> [Route] {
