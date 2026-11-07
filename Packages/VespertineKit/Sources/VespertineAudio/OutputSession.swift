@@ -401,7 +401,8 @@ final class OutputSession: @unchecked Sendable {
             // A group: the aggregate goes (a new rate gets a new one) and the members are freed, or kept held for the next
             // session. There is no device format of its own to put back, and no hog on the aggregate.
             groupResources = nil
-            group.release(keepHolding: !releaseHog)
+            // Held on only when the caller says the next session takes them over (not when a member has gone: that lets go).
+            group.release(keepHolding: !releaseHog && !restoreFormat)
             return
         }
         // Leave the device on an ordinary (mixable Float32) format for whoever uses it next, and at its full depth after

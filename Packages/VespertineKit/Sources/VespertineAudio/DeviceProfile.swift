@@ -47,6 +47,11 @@ public struct DeviceProfile: Sendable, Hashable {
     public var connection: String = ""
 
     public static func detect(_ device: OutputDevice) -> DeviceProfile {
+        if device.uid.hasPrefix(SpeakerGroup.outputUIDPrefix) {
+            var profile = speakerGroup(canBeBitPerfect: false)
+            profile.connection = "Speaker group"
+            return profile
+        }
         var profile = classify(device)
         profile.connection = profile.kind == .airPodsMaxUSB ? String(localized: "USB-C (lossless)") : device.transport.label
         return profile
