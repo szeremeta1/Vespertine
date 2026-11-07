@@ -81,14 +81,16 @@ public enum SpeakerRole: String, Codable, CaseIterable, Sendable, Hashable {
     }
 
     /// The angle this speaker stands at in the usual layouts, in degrees from straight ahead, positive to the right
-    /// (ITU-R BS.775 and BS.2051; a 5.1 setup puts its surrounds at ±110° rather than the ±90° given here). nil for the LFE,
+    /// (ITU-R BS.775 and BS.2051, whose 7.1.4 puts the ceiling pairs at ±45° and ±135°; a 5.1 setup puts its surrounds at ±110° rather than the ±90° given here). nil for the LFE,
     /// which has no place.
     public var defaultAzimuth: Double? {
         switch self {
         case .lfe: nil
         case .center: 0
-        case .frontLeft, .topFrontLeft: -30
-        case .frontRight, .topFrontRight: 30
+        case .frontLeft: -30
+        case .frontRight: 30
+        case .topFrontLeft: -45
+        case .topFrontRight: 45
         case .wideLeft: -60
         case .wideRight: 60
         case .sideLeft, .topMiddleLeft: -90
