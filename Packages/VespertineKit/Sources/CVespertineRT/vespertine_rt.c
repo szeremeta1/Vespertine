@@ -785,7 +785,7 @@ void nrt_context_set_room(NRTRenderContext *ctx, const NRTRoomChannel *channels,
         const NRTRoomChannel in = channels[c];
         NRTRoomChannel *out = &bank->channels[c];
         out->delayFrames = in.delayFrames < NRT_ROOM_MAX_DELAY ? in.delayFrames : NRT_ROOM_MAX_DELAY - 1;
-        out->gain = isfinite(in.gain) && in.gain >= 0 ? in.gain : 1.0;
+        out->gain = isfinite(in.gain) ? in.gain : 1.0;   // negative turns the channel's polarity over
         const uint32_t n = in.count < NRT_ROOM_MAX_SECTIONS ? in.count : NRT_ROOM_MAX_SECTIONS;
         uint32_t kept = 0;
         for (uint32_t i = 0; i < n; i++) {

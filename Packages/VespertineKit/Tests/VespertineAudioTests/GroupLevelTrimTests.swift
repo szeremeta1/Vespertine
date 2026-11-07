@@ -63,9 +63,9 @@ struct GroupLevelTrimTests {
         #expect(GroupSignalPath.stage(room: unused, used: [0, 1], equalizer: false, digitalVolumeDB: nil, replayGainDB: nil) == .none)
     }
 
-    @Test("The editor says the level trims are played, and that polarity is not yet")
+    @Test("The editor says the level trims are played")
     func note() {
-        #expect(GroupPolicies.playedToday.contains("level trims") && GroupPolicies.playedToday.contains("Polarity is saved"))
+        #expect(GroupPolicies.playedToday.contains("level trims"))
         #expect(!GroupPolicies.playedToday.contains("Level trims and polarity are saved"))
     }
 }

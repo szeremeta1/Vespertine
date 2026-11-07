@@ -110,7 +110,7 @@ struct GroupPoliciesTests {
         #expect(GroupPolicies.stereoNote.contains("where the speakers stand"))
         #expect(!GroupPolicies.lfeNote.contains("not played") && GroupPolicies.lfeNote.contains("LFE"))
         #expect(!GroupPolicies.lossNote.contains("not played"))
-        #expect(GroupPolicies.playedToday.contains("delays") && GroupPolicies.playedToday.contains("not applied"))
+        #expect(GroupPolicies.playedToday.contains("delays") && !GroupPolicies.playedToday.contains("not applied"))
         #expect(GroupPolicies.playedToday.contains("where the speakers stand"))
     }
 }
