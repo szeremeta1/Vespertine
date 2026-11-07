@@ -26,6 +26,7 @@ struct SpeakerGroupEditor: View {
                     RoomCanvasView(group: $group)
                     SpeakerReadoutView(group: $group)
                     ChannelMapGrid(group: $group)
+                    MemberVolumeView(group: group)
                     SpeakerPoliciesView(group: $group)
                 }
             }
@@ -140,5 +141,41 @@ final class GroupIdentifier {
         player = nil
         playing = nil
         problem = nil
+    }
+}
+
+/// Each DAC's own volume: shown for the ones that have a volume Core Audio can set, written when the slider is let go. Nothing here
+/// is saved with the group or applied by Vespertine on its own.
+struct MemberVolumeView: View {
+    let group: SpeakerGroup
+    @State private var members: [GroupVolume.Member] = []
+    @State private var editing: [String: Float] = [:]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(verbatim: "Volume").font(.headline)
+            Text(verbatim: GroupVolume.note).font(.caption).foregroundStyle(.secondary)
+            ForEach(members) { member in
+                HStack {
+                    Text(verbatim: member.name).frame(width: 190, alignment: .leading)
+                    if let level = member.level {
+                        Slider(value: Binding(get: { Double(editing[member.uid] ?? level) }, set: { editing[member.uid] = Float($0) }),
+                               in: 0...1) { done in
+                            if !done, let value = editing[member.uid] {
+                                GroupVolume.setLevel(value, ofDeviceUID: member.uid)
+                                members = GroupVolume.members(of: group)
+                                editing[member.uid] = nil
+                            }
+                        }
+                        .frame(width: 220)
+                        .accessibilityLabel(Text(verbatim: "Volume of \(member.name)"))
+                        Text(verbatim: "\(Int(((editing[member.uid] ?? level) * 100).rounded()))%").monospacedDigit().foregroundStyle(.secondary)
+                    } else {
+                        Text(verbatim: "No volume to set here (use the DAC's own control)").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .onAppear { members = GroupVolume.members(of: group) }
     }
 }

@@ -374,14 +374,15 @@ final class PlayerController {
     /// poll, so turning it off takes effect at once). Turned off while it relays, the sound output standing in gets its
     /// own volume and mute back.
     private func syncVolumeRelay() {
-        let device = settings.relayVolumeKeys && !Self.relayOffForQA ? outputDevice?.id : nil
+        // Never a speaker group's aggregate: it has no volume of its own (`GroupVolume`).
+        let device = GroupVolume.relayTarget(for: outputDevice, enabled: settings.relayVolumeKeys && !Self.relayOffForQA)
         guard relayedDevice != device else { return }
         relayedDevice = device
         volumeRelay.follow(device)
     }
     nonisolated private static let halQueue = DispatchQueue(label: "org.szeremeta.vespertine.system-output", qos: .userInitiated)
     private func followSystemOutput(to device: OutputDevice) {
-        guard settings.systemOutputFollowsPlayback, signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
+        guard settings.systemOutputFollowsPlayback, GroupVolume.mayBecomeSystemOutput(device), signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
         lastFollowed = device.id
         // Off the main thread: this runs as playback starts, while the HAL is busy with the device.
         let id = device.id
