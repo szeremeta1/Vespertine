@@ -387,8 +387,10 @@ final class AppSettings {
     }
 
     /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
-    func engineSettings() -> EngineSettings {
+    func engineSettings(groups: [SpeakerGroup] = []) -> EngineSettings {
         var s = EngineSettings()
+        // Saved speaker groups reach the engine only while the hidden switch is on: off, it gets none, whatever is saved.
+        s.speakerGroups = speakerGroupsFeature ? groups : []
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
         s.deviceName = selectedDevice.flatMap { $0.uid == selectedDeviceUID ? $0.name : nil }

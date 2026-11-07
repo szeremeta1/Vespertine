@@ -16,6 +16,8 @@ final class SpeakerGroupsModel {
     private(set) var book: SpeakerGroupBook
     /// Set when the last write failed; the list still shows the change.
     private(set) var lastError: String?
+    /// Called after every change is written, so the engine hears of it.
+    @ObservationIgnored var onChange: (() -> Void)?
     @ObservationIgnored private let store: SpeakerGroupStore
     /// Groups a newer Vespertine wrote, or that are damaged: shown as a count and written back as they were.
     @ObservationIgnored private var unreadable: [Any]
@@ -59,6 +61,7 @@ final class SpeakerGroupsModel {
         } catch {
             lastError = error.localizedDescription
         }
+        onChange?()
     }
 
     /// "Fosi ZD3 + FiiO K11 · 4 channels"

@@ -160,6 +160,8 @@ struct TransitionsNote: Equatable {
 @MainActor
 final class AppModel {
     let settings: AppSettings
+    /// The saved speaker groups; nil unless the hidden switch was on at launch.
+    private(set) var speakerGroups: SpeakerGroupsModel?
     let library: LibraryStore
     let player: PlayerController
     let devices: DeviceStore
@@ -283,6 +285,11 @@ final class AppModel {
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
         library.bundlesCopiesByDefault = settings.bundleCopies
+        if settings.speakerGroupsFeature {
+            let groups = SpeakerGroupsModel(directory: settings.dataDirectory)
+            groups.onChange = { [weak self] in self?.syncEngine() }
+            speakerGroups = groups
+        }
         syncEngine()
         shares.start()
         analysis.start()
@@ -378,6 +385,8 @@ final class AppModel {
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
         guard let uid = settings.selectedDeviceUID else { return devices.device(uid: nil) }
+        // A speaker group is chosen like an output: it is ready when all of its outputs are connected.
+        if let group = chosenGroup { return groupOutput(group) }
         if let chosen = devices.devices.first(where: { $0.uid == uid }) { return chosen }
         guard player.waitingForDevice == nil else { return nil }
         return OutputChoice.substitute(among: devices.devices, fallback: settings.outputFallback)
@@ -385,8 +394,21 @@ final class AppModel {
 
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
+        if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
         return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// The speaker group chosen as the output, when the feature is on and one is.
+    var chosenGroup: SpeakerGroup? {
+        guard let uid = settings.selectedDeviceUID else { return nil }
+        return speakerGroups?.groups.first { $0.outputUID == uid }
+    }
+
+    /// The output a group presents while all of its members are connected.
+    private func groupOutput(_ group: SpeakerGroup) -> OutputDevice? {
+        if case .ready(let output, _) = GroupOutput.resolve(group, among: devices.devices) { return output }
+        return nil
     }
 
     /// Keeps the chosen output chosen: remembers what it is while it's connected, and when it comes back under
@@ -431,7 +453,7 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
-        player.engine.update(settings: settings.engineSettings())
+        player.engine.update(settings: settings.engineSettings(groups: speakerGroups?.groups ?? []))
         devices.watchVolume(of: device)
         player.resolveVersions()
     }

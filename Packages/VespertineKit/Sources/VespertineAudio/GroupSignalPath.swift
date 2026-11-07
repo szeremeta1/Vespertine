@@ -90,7 +90,7 @@ public struct GroupSignalPath: Sendable, Hashable {
     /// This DAC's own part reaches it untouched: not resampled, a confirmed format that holds the song exactly (the single-DAC
     /// rule: integer DACs need at least the song's word length, float ones full Float32; wider than 24 bits is rounded), the
     /// song's rate, and no other app mixing into it.
-    func isUntouched(_ m: Member) -> Bool {
+    public func isUntouched(_ m: Member) -> Bool {
         guard !m.resampled, m.physicalFormatKnown, m.exclusive || !m.otherAppsPlaying,
               abs(m.sampleRate - source.sampleRate) < 0.5 else { return false }
         let bits = source.bitDepth ?? 32

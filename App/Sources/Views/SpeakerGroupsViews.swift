@@ -13,18 +13,16 @@ struct SpeakerGroupsSettingsSection: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        if model.settings.speakerGroupsFeature {
-            SpeakerGroupsList(directory: model.settings.dataDirectory)
+        if model.settings.speakerGroupsFeature, let groups = model.speakerGroups {
+            SpeakerGroupsList(groups: groups)
         }
     }
 }
 
 private struct SpeakerGroupsList: View {
-    @State private var groups: SpeakerGroupsModel
+    let groups: SpeakerGroupsModel
     @State private var making = false
     @State private var editing: SpeakerGroup?
-
-    init(directory: URL) { _groups = State(initialValue: SpeakerGroupsModel(directory: directory)) }
 
     var body: some View {
         Section {

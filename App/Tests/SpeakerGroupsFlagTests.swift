@@ -95,4 +95,32 @@ struct SpeakerGroupsFlagTests {
         #expect(model.groups.map(\.id) == [made.id] && made.isValid)
         #expect(SpeakerGroupsModel(directory: root).groups.map(\.name) == ["Dorm quad"])
     }
+
+    @Test("The engine hears of saved groups only while the switch is on, and a group can be the chosen output")
+    func engineSettingsGate() throws {
+        let (root, defaults, suite) = try scratch()
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        defaults.set(true, forKey: "setupCompleted")
+        let settings = AppSettings(defaults: defaults, dataDirectory: root)
+        let dorm = group("Dorm")
+        #expect(settings.engineSettings(groups: [dorm]).speakerGroups.isEmpty, "off: none reach the engine, whatever is saved")
+        #expect(settings.engineSettings().speakerGroups.isEmpty)
+        settings.speakerGroupsFeature = true
+        settings.selectedDeviceUID = dorm.outputUID
+        let engine = settings.engineSettings(groups: [dorm])
+        #expect(engine.speakerGroups == [dorm] && engine.deviceUID == dorm.outputUID)
+        #expect(engine.group(forOutputUID: engine.deviceUID)?.name == "Dorm")
+    }
+
+    @Test("A change to the list tells the engine's owner after it is written")
+    func changeNotifies() throws {
+        let (root, defaults, suite) = try scratch()
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        let model = SpeakerGroupsModel(directory: root)
+        var calls = 0
+        model.onChange = { calls += 1 }
+        model.upsert(group("Dorm"))
+        model.remove(model.groups[0].id)
+        #expect(calls == 2)
+    }
 }
