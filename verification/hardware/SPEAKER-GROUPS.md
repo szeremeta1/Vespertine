@@ -32,7 +32,7 @@ Read `H3` against the 0.25 ms tolerance of the geometry warning and the 15 s set
 
 ## Part 2: the app (`speakerGroupsFeature` on)
 
-Turn it on with `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` and restart. Make the group (Fosi first, FiiO second, Fosi the clock leader), put the four speakers on the four channels, draw the room. Take a screenshot of anything odd.
+Turn it on in Settings › Playback › Speaker Groups (beta). Make the group (Fosi first, FiiO second, Fosi the clock leader), put the four speakers on the four channels, draw the room. Take a screenshot of anything odd.
 
 | # | Do | Expect |
 |---|---|---|

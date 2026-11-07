@@ -1,6 +1,6 @@
 //
-// Vespertine — Settings › Playback › Speaker Groups (experimental). Hidden unless its switch is on; for now it lists, copies
-// and removes the saved groups. Making and playing them comes with the next pieces.
+// Vespertine — Settings › Playback › Speaker Groups (beta): its switch (off by default) and, while it is on, the list of saved
+// groups, to copy, remove and make. The list's own words are plain English with `verbatim` text for now.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Plain English with `verbatim` text: these strings join the catalog together with the screens that stay.
@@ -11,21 +11,36 @@ import VespertineAudio
 
 struct SpeakerGroupsSettingsSection: View {
     @Environment(AppModel.self) private var model
-
-    var body: some View {
-        if model.settings.speakerGroupsFeature, let groups = model.speakerGroups {
-            SpeakerGroupsList(groups: groups)
-        }
-    }
-}
-
-private struct SpeakerGroupsList: View {
-    let groups: SpeakerGroupsModel
     @State private var making = false
     @State private var editing: SpeakerGroup?
 
     var body: some View {
         Section {
+            ForEach(SpeakerGroupsSwitch.rows(featureOn: model.settings.speakerGroupsFeature), id: \.self) { row in
+                switch row {
+                case .toggle:
+                    Toggle(SpeakerGroupsSwitch.title, isOn: Binding(get: { model.settings.speakerGroupsFeature }, set: { model.setSpeakerGroupsFeature($0) }))
+                case .explanation:
+                    Text(SpeakerGroupsSwitch.explanation).font(.caption).foregroundStyle(.secondary)
+                case .groups:
+                    if let groups = model.speakerGroups { SpeakerGroupsList(groups: groups, making: $making, editing: $editing) }
+                }
+            }
+        } header: {
+            Text(SpeakerGroupsSwitch.title)
+        }
+        .sheet(isPresented: $making) { if let groups = model.speakerGroups { NewSpeakerGroupSheet(groups: groups) } }
+        .sheet(item: $editing) { group in if let groups = model.speakerGroups { SpeakerGroupEditor(groups: groups, group: group) } }
+    }
+}
+
+private struct SpeakerGroupsList: View {
+    let groups: SpeakerGroupsModel
+    @Binding var making: Bool
+    @Binding var editing: SpeakerGroup?
+
+    var body: some View {
+        Group {
             if groups.groups.isEmpty {
                 Text(verbatim: "No speaker groups yet.").foregroundStyle(.secondary)
             }
@@ -54,11 +69,7 @@ private struct SpeakerGroupsList: View {
             }
             Text(verbatim: "Experimental. Combining outputs into one speaker system isn't available yet; this list only shows what is saved.")
                 .font(.caption).foregroundStyle(.secondary)
-        } header: {
-            Text(verbatim: "Speaker Groups (experimental)")
         }
-        .sheet(isPresented: $making) { NewSpeakerGroupSheet(groups: groups) }
-        .sheet(item: $editing) { SpeakerGroupEditor(groups: groups, group: $0) }
     }
 }
 

@@ -292006,6 +292006,275 @@
         }
       }
     },
+    "Plays through two or more USB DACs as one multichannel speaker system. Off, none of it is in the app and every song plays as before.": {
+      "comment": "Settings › Playback: the caption under the Speaker Groups (beta) switch.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሁለት ወይም ከዚያ በላይ የUSB DACዎችን እንደ አንድ ባለብዙ ሰርጥ የድምጽ ማጉያ ስርዓት ያጫውታል። ሲጠፋ ከእነዚህ ውስጥ አንዳቸውም በመተግበሪያው ውስጥ አይኖሩም፤ ሁሉም ዘፈን እንደ ቀድሞው ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل الصوت عبر اثنين أو أكثر من محوّلات USB DAC كنظام مكبرات صوت واحد متعدد القنوات. عند الإيقاف لا يظهر أي منها في التطبيق وتُشغَّل كل أغنية كما كانت."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "দুই বা তার বেশি USB DAC-কে একটি মাল্টিচ্যানেল স্পিকার সিস্টেম হিসেবে বাজায়। বন্ধ থাকলে এগুলোর কিছুই অ্যাপে থাকে না এবং প্রতিটি গান আগের মতোই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrává přes dva nebo více USB DAC jako jednu vícekanálovou soustavu reproduktorů. Když je vypnuto, nic z toho v aplikaci není a každá skladba hraje jako dřív."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspiller gennem to eller flere USB-DAC’er som ét flerkanals højttalersystem. Slået fra er intet af det i appen, og hver sang afspilles som før."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielt über zwei oder mehr USB-DACs wie über ein einziges Mehrkanal-Lautsprechersystem. Ausgeschaltet ist nichts davon in der App, und jeder Song spielt wie zuvor."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παίζει μέσω δύο ή περισσότερων USB DAC ως ένα πολυκάναλο σύστημα ηχείων. Όταν είναι απενεργοποιημένο, τίποτα από αυτά δεν υπάρχει στην εφαρμογή και κάθε τραγούδι παίζει όπως πριν."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduce a través de dos o más DAC USB como un único sistema de altavoces multicanal. Desactivado, nada de esto aparece en la app y cada canción suena como antes."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "از دو یا چند DAC یواس‌بی به‌عنوان یک سیستم بلندگوی چندکاناله پخش می‌کند. وقتی خاموش باشد، هیچ‌کدام در برنامه نیست و هر آهنگ مثل قبل پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soittaa kahden tai useamman USB-DAC:n kautta yhtenä monikanavaisena kaiutinjärjestelmänä. Pois päältä mitään niistä ei ole sovelluksessa, ja jokainen kappale soi kuten ennenkin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumutugtog sa dalawa o higit pang USB DAC bilang iisang multichannel na speaker system. Kapag naka-off, wala sa mga ito ang nasa app at tumutugtog ang bawat kanta tulad ng dati."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lit via deux DAC USB ou plus comme un seul système d’enceintes multicanal. Désactivé, rien de tout cela n’est dans l’app et chaque morceau joue comme avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બે કે તેથી વધુ USB DAC દ્વારા એક મલ્ટીચેનલ સ્પીકર સિસ્ટમ તરીકે વગાડે છે. બંધ હોય ત્યારે તેમાંનું કંઈ ઍપમાં હોતું નથી અને દરેક ગીત પહેલાની જેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana kunna ta cikin USB DAC guda biyu ko fiye a matsayin tsarin lasifika mai tashoshi da yawa guda ɗaya. Idan a kashe yake, babu ɗayansu a cikin manhajar kuma kowace waƙa tana kunnawa kamar da."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנגן דרך שני DAC-ים או יותר ב-USB כמערכת רמקולים רב-ערוצית אחת. כשהאפשרות כבויה, שום דבר מזה אינו באפליקציה וכל שיר מתנגן כמו קודם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दो या अधिक USB DAC से एक मल्टीचैनल स्पीकर सिस्टम की तरह बजाता है। बंद होने पर इनमें से कुछ भी ऐप में नहीं होता और हर गाना पहले की तरह बजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Két vagy több USB DAC-on keresztül játszik le, egyetlen többcsatornás hangszórórendszerként. Kikapcsolva ezekből semmi sincs az appban, és minden dal úgy szól, mint eddig."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memutar lewat dua atau lebih DAC USB sebagai satu sistem speaker multisaluran. Saat mati, tidak satu pun ada di app dan setiap lagu diputar seperti sebelumnya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduce attraverso due o più DAC USB come un unico sistema di altoparlanti multicanale. Disattivato, nulla di tutto ciò è nell’app e ogni brano suona come prima."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2台以上のUSB DACを、1つのマルチチャンネルスピーカーシステムとして使って再生します。オフのときはどれもアプリに現れず、どの曲も今までどおり再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಎರಡು ಅಥವಾ ಹೆಚ್ಚು USB DAC ಗಳ ಮೂಲಕ ಒಂದು ಮಲ್ಟಿಚಾನೆಲ್ ಸ್ಪೀಕರ್ ವ್ಯವಸ್ಥೆಯಾಗಿ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದಾಗ ಅವುಗಳಲ್ಲಿ ಯಾವುದೂ ಆ್ಯಪ್‌ನಲ್ಲಿ ಇರುವುದಿಲ್ಲ ಮತ್ತು ಪ್ರತಿ ಹಾಡು ಮೊದಲಿನಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC 둘 이상을 하나의 멀티채널 스피커 시스템처럼 사용해 재생합니다. 끄면 이 중 어느 것도 앱에 없고 모든 곡이 이전과 똑같이 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "രണ്ടോ അതിലധികമോ USB DAC-കളിലൂടെ ഒരൊറ്റ മൾട്ടിചാനൽ സ്പീക്കർ സിസ്റ്റമായി പ്ലേ ചെയ്യുന്നു. ഓഫ് ആയിരിക്കുമ്പോൾ ഇവയൊന്നും ആപ്പിൽ ഉണ്ടാകില്ല, ഓരോ പാട്ടും മുമ്പത്തെപ്പോലെ പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दोन किंवा अधिक USB DAC द्वारे एकच मल्टीचॅनल स्पीकर सिस्टीम म्हणून वाजवते. बंद असताना यातील काहीही ॲपमध्ये नसते आणि प्रत्येक गाणे पूर्वीसारखेच वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memainkan melalui dua atau lebih DAC USB sebagai satu sistem pembesar suara berbilang saluran. Apabila dimatikan, tiada satu pun ada dalam apl dan setiap lagu dimainkan seperti sebelumnya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller gjennom to eller flere USB-DAC-er som ett flerkanals høyttalersystem. Slått av er ingenting av det i appen, og hver sang spilles som før."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speelt af via twee of meer USB-DAC’s als één meerkanaals luidsprekersysteem. Uitgeschakeld is niets daarvan in de app en klinkt elk nummer zoals voorheen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਦੋ ਜਾਂ ਵੱਧ USB DAC ਰਾਹੀਂ ਇੱਕ ਮਲਟੀਚੈਨਲ ਸਪੀਕਰ ਸਿਸਟਮ ਵਜੋਂ ਵਜਾਉਂਦਾ ਹੈ। ਬੰਦ ਹੋਣ 'ਤੇ ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕੁਝ ਵੀ ਐਪ ਵਿੱਚ ਨਹੀਂ ਹੁੰਦਾ ਅਤੇ ਹਰ ਗੀਤ ਪਹਿਲਾਂ ਵਾਂਗ ਵੱਜਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarza przez dwa lub więcej przetworników DAC USB jak przez jeden wielokanałowy system głośników. Po wyłączeniu nic z tego nie ma w aplikacji, a każdy utwór gra jak dotąd."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca por dois ou mais DACs USB como um único sistema de alto-falantes multicanal. Desativado, nada disso aparece no app e cada música toca como antes."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduz através de dois ou mais DACs USB como um único sistema de altifalantes multicanal. Desativado, nada disto aparece na app e cada música toca como antes."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redă prin două sau mai multe DAC-uri USB ca un singur sistem de boxe multicanal. Dezactivat, nimic din toate acestea nu e în aplicație, iar fiecare piesă se redă ca înainte."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelar via två eller fler USB-DAC:ar som ett enda flerkanaligt högtalarsystem. När det är av finns inget av det i appen, och varje låt spelas som förut."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hucheza kupitia DAC mbili au zaidi za USB kama mfumo mmoja wa spika wenye chaneli nyingi. Ikizimwa, hakuna kati ya hivyo kilicho kwenye programu na kila wimbo unachezwa kama awali."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இரண்டு அல்லது அதற்கு மேற்பட்ட USB DAC-கள் வழியாக ஒரே பல-சேனல் ஸ்பீக்கர் அமைப்பாக இயக்குகிறது. முடக்கினால் இவற்றில் எதுவும் ஆப்ஸில் இருக்காது; ஒவ்வொரு பாடலும் முன்பு போலவே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రెండు లేదా అంతకంటే ఎక్కువ USB DAC‌ల ద్వారా ఒకే మల్టీఛానల్ స్పీకర్ సిస్టమ్‌గా ప్లే చేస్తుంది. ఆఫ్‌లో ఉన్నప్పుడు వీటిలో ఏదీ యాప్‌లో ఉండదు, ప్రతి పాట ముందులాగే ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นผ่าน USB DAC สองตัวขึ้นไปเป็นระบบลำโพงหลายแชนเนลระบบเดียว เมื่อปิด จะไม่มีสิ่งเหล่านี้ในแอปเลย และทุกเพลงเล่นเหมือนเดิม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İki veya daha fazla USB DAC üzerinden tek bir çok kanallı hoparlör sistemi olarak çalar. Kapalıyken bunların hiçbiri uygulamada olmaz ve her şarkı eskisi gibi çalar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворює через два або більше USB DAC як одну багатоканальну акустичну систему. Коли вимкнено, нічого з цього немає в застосунку, а кожна пісня звучить як раніше."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دو یا زیادہ USB DAC کے ذریعے ایک ملٹی چینل اسپیکر سسٹم کی طرح چلاتا ہے۔ بند ہونے پر ان میں سے کچھ بھی ایپ میں نہیں ہوتا اور ہر گانا پہلے کی طرح چلتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát qua hai hoặc nhiều USB DAC như một hệ thống loa đa kênh duy nhất. Khi tắt, không có gì trong số đó xuất hiện trong ứng dụng và mọi bài hát phát như trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "透過兩個或以上 USB DAC 播放，當成一個多聲道喇叭系統。關閉時，App 入面冇其中任何一項，每首歌嘅播放同以往完全一樣。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过两个或更多 USB DAC 播放，作为一个多声道扬声器系统。关闭时，应用里没有其中任何一项，每首歌的播放与以前完全一样。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "透過兩個或更多 USB DAC 播放，作為一個多聲道喇叭系統。關閉時，App 中不會有其中任何一項，每首歌的播放與以往完全相同。"
+          }
+        }
+      }
+    },
     "Plays what the output supports": {
       "comment": "The bundled card among an album's copies.",
       "extractionState": "manual",
@@ -347880,6 +348149,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "空間化立體聲"
+          }
+        }
+      }
+    },
+    "Speaker Groups (beta)": {
+      "comment": "Settings › Playback: the title of the switch that brings speaker groups (several DACs played as one multichannel system) into the app, and of its section. “beta” stays as it is in your language.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምጽ ማጉያ ቡድኖች (ቤታ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مجموعات مكبرات الصوت (تجريبي)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্পিকার গ্রুপ (বিটা)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skupiny reproduktorů (beta)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Højttalergrupper (beta)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lautsprechergruppen (Beta)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ομάδες ηχείων (beta)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupos de altavoces (beta)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروه‌های بلندگو (بتا)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaiutinryhmät (beta)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Speaker Group (beta)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groupes d’enceintes (bêta)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્પીકર ગ્રુપ (બીટા)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙungiyoyin Lasifika (beta)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבוצות רמקולים (בטא)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पीकर ग्रुप (बीटा)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangszórócsoportok (béta)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grup Speaker (beta)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gruppi di altoparlanti (beta)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピーカーグループ（ベータ）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಪೀಕರ್ ಗುಂಪುಗಳು (ಬೀಟಾ)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스피커 그룹(베타)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്പീക്കർ ഗ്രൂപ്പുകൾ (ബീറ്റ)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पीकर ग्रुप (बीटा)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumpulan Pembesar Suara (beta)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Høyttalergrupper (beta)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luidsprekergroepen (bèta)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਪੀਕਰ ਗਰੁੱਪ (ਬੀਟਾ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupy głośników (beta)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupos de alto-falantes (beta)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupos de altifalantes (beta)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupuri de boxe (beta)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Högtalargrupper (beta)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vikundi vya Spika (beta)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்பீக்கர் குழுக்கள் (பீட்டா)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్పీకర్ గ్రూప్‌లు (బీటా)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กลุ่มลำโพง (เบตา)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoparlör Grupları (beta)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Групи гучномовців (бета)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسپیکر گروپس (بیٹا)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhóm loa (beta)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "喇叭群組（測試版）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扬声器组（测试版）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "喇叭群組（測試版）"
           }
         }
       }
