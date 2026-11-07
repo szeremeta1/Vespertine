@@ -91,12 +91,17 @@ final class NetworkPlaybackCache: @unchecked Sendable {
 
     /// `foreground`: the song being played or about to be (its reads hold library scans of the share back, see
     /// `ShareIOGate`), not a prefetched next one, which waits its turn behind them.
-    func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true) throws -> Entry {
+    ///
+    /// Opening the file is a network call too, and the kernel does not give up on it when the share stops answering,
+    /// so it never runs on the caller's thread: `cancelled` is polled while it is waited for, and a caller that gives
+    /// up gets `CancellationError` at once (the open itself finishes, or fails, in the background and is closed).
+    func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true,
+               cancelled: () -> Bool = { false }) throws -> Entry {
         if let existing = lock.withLock({ entries[key]?.value }) {
             if foreground { existing.promote() }
             return existing
         }
-        let source = try reader ?? ShareFileReader(url)
+        let source = try reader ?? openShare(key: key, url: url, cancelled: cancelled)
         return try lock.withLock {
             if let existing = entries[key]?.value {
                 if foreground { existing.promote() }
@@ -123,6 +128,40 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             storage.start()
             return entry
         }
+    }
+
+    /// One open of a share file, shared by everyone who wants it (the press-time warm-up and the engine thread).
+    private final class Opening: @unchecked Sendable {
+        private let done = NSCondition()
+        private var result: Result<ShareFileReader, Error>?
+        func finish(_ value: Result<ShareFileReader, Error>) { done.withLock { result = value; done.broadcast() } }
+        func wait(cancelled: () -> Bool) throws -> ShareFileReader {
+            try done.withLock {
+                while true {
+                    if let result { return try result.get() }
+                    if cancelled() { throw CancellationError() }
+                    _ = done.wait(until: Date().addingTimeInterval(0.025))
+                }
+            }
+        }
+    }
+    private let openings = Locked([String: Opening]())
+    private static let openQueue = DispatchQueue(label: "org.szeremeta.vespertine.network-open", qos: .userInitiated, attributes: .concurrent)
+
+    private func openShare(key: String, url: URL, cancelled: () -> Bool) throws -> ShareFileReader {
+        let (job, starts) = openings.withLock { table -> (Opening, Bool) in
+            if let running = table[key] { return (running, false) }
+            let job = Opening(); table[key] = job
+            return (job, true)
+        }
+        if starts {
+            Self.openQueue.async { [openings] in
+                let result = Result { try ShareFileReader(url) }
+                openings.withLock { if $0[key] === job { $0[key] = nil } }
+                job.finish(result)
+            }
+        }
+        return try job.wait(cancelled: cancelled)
     }
 
     /// Current always gets the link first. Prefetch only after its required reserve is on disk.
@@ -220,6 +259,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var isComplete: Bool { storage.condition.withLock { storage.ready.count == storage.blocks } }
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
+        /// Bytes on disk so far.
+        var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
+        /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
+        func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
         func cancel() { storage.cancel() }
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
@@ -279,6 +322,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var waiters = 0
         var cancelled = false
         var error: Error?
+        var progress: (@Sendable (Int64) -> Void)?
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              release: @escaping @Sendable () -> Void) throws {
@@ -396,7 +440,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         }
                         try file.seek(toOffset: UInt64(offset))
                         try file.write(contentsOf: data)
-                        condition.withLock { ready.insert(block); condition.broadcast() }
+                        let (report, copied) = condition.withLock { () -> ((@Sendable (Int64) -> Void)?, Int64) in
+                            ready.insert(block); condition.broadcast()
+                            return (progress, min(size, Int64(ready.count) * Int64(chunk)))
+                        }
+                        report?(copied)
                         publishDemand()
                     } catch {
                         condition.withLock { self.error = error; condition.broadcast() }

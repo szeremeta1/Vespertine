@@ -28,6 +28,9 @@ public struct EngineSnapshot: Sendable {
     public var lastError: String?
     /// Output is paused while a stalled network read catches up (playback resumes by itself).
     public var isBuffering = false
+    /// While the song is copied from a share before it plays: how much of it is local (0…1). nil when not copying, or when
+    /// the copy is progressive (a large DSD file starts after its first reserve).
+    public var bufferingFraction: Double?
     /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
     public var waitingForDevice: String?
     /// The chosen output (by name) isn't connected and `outputDevice` plays in its place (see `OutputFallback`).
@@ -43,6 +46,21 @@ public struct EngineSnapshot: Sendable {
     /// The channels of the bed Vespertine decodes beside the output while macOS renders the track or a receiver gets it
     /// as a bitstream (the meters' own channels then; `takeChannelPeaks` reads their levels). nil otherwise.
     public var bedMeters: BedMeterLayout?
+}
+
+extension EngineSnapshot {
+    /// The engine is opening the output it resolved. What was published about the output it left (waiting for it,
+    /// standing in for another, its signal path) is dropped; a session that carries on keeps its own.
+    mutating func beginOpeningOutput(keepingSession: Bool) {
+        waitingForDevice = nil
+        standingInFor = nil
+        guard !keepingSession else { return }
+        outputDevice = nil
+        signalPath = nil
+        systemRendering = nil
+        bedMeters = nil
+        bufferFill = 0
+    }
 }
 
 public enum EngineEvent: Sendable {
@@ -104,6 +122,9 @@ public struct EngineSettings: Sendable, Equatable {
     public var roomNativeDSDDeviceUIDs: Set<String> = []
     /// Song transitions (crossfade) and their master switch. Off, nothing about playback changes.
     public var transitions = TransitionSettings()
+    /// The speaker groups an output can be chosen from (`deviceUID` = a group's `outputUID`). The app passes them only while
+    /// the feature is on; none, and every output is a single device as before.
+    public var speakerGroups: [SpeakerGroup] = []
 
     public init() {}
 
@@ -181,9 +202,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let folder = stagedFolder, folder.key == key { return folder.entry.url }
         if let entry = staged[key], entry.isComplete { return entry.url }
         let resolved = urlResolver?(item) ?? item.url
-        guard resolved == item.url, item.cacheKey != nil || Self.isOnNetworkVolume(resolved) else { return resolved }
+        guard resolved == item.url, try item.cacheKey != nil || onNetworkVolume(resolved) else { return resolved }
         shared.withLock { $0.snapshot.isBuffering = true }
-        defer { shared.withLock { $0.snapshot.isBuffering = false } }
+        defer { shared.withLock { $0.snapshot.isBuffering = false; $0.snapshot.bufferingFraction = nil } }
         stagedFolder = nil
         if resolved.pathExtension.lowercased() == "ifo" {
             for entry in staged.values { entry.cancel() }
@@ -202,15 +223,30 @@ public final class PlaybackEngine: @unchecked Sendable {
             staged.removeAll()
         }
         playbackCache.discardPrefetch(except: key)
-        let entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved)
+        // Opening the file can stall as long as the share does: skip and stop must still get through.
+        let entry: NetworkPlaybackCache.Entry
+        do { entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved, cancelled: { self.superseded }) }
+        catch is CancellationError { throw Superseded() }
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
         let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
             || (item.sacdArea != nil && item.dvd == nil)
         let progressive = dsd && entry.size > 512 << 20
+        let copyStarted = Date(), total = entry.size
+        if !progressive, total > 0, !entry.isComplete {
+            entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = Double(copied) / Double(total) } }
+        }
+        defer { entry.setProgress(nil) }
         do {
             try entry.prepare(full: !progressive, lead: 16 << 20, cancelled: { self.superseded })
-        } catch is CancellationError { throw Superseded() }
+        } catch is CancellationError {
+            log.info("Stopped copying \(item.url.lastPathComponent, privacy: .public) from the share at \(entry.copiedBytes >> 20, privacy: .public) of \(total >> 20, privacy: .public) MB after \(Int(Date().timeIntervalSince(copyStarted) * 1000), privacy: .public) ms")
+            throw Superseded()
+        }
+        let copySeconds = Date().timeIntervalSince(copyStarted)
+        if copySeconds > 1 {
+            log.info("Copied \(item.url.lastPathComponent, privacy: .public) from the share: \(entry.copiedBytes >> 20, privacy: .public) MB in \(Int(copySeconds * 1000), privacy: .public) ms (\(String(format: "%.1f", Double(entry.copiedBytes) / 1_048_576 / copySeconds), privacy: .public) MB/s)")
+        }
         let next = nextItemProvider?(item)
         if let next, next.id != item.id, next.cacheKey != nil || Self.isOnNetworkVolume(next.url) {
             // A progressive current track gets the whole link until its copy is finished. Copying the next
@@ -271,6 +307,12 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private var session: OutputSession?
     private var sessionDevice: OutputDevice?
+    /// The members of the speaker group `resolveDevice` last found, in the group's order (for opening its session), and the group
+    /// they make: the chosen one, or what is left of it after followers were lost and it carries on.
+    private var groupMembers: [OutputDevice] = []
+    private var resolvedGroup: SpeakerGroup?
+    /// For tests: the outputs the engine sees, instead of Core Audio's list (a DAC that "goes away").
+    var outputListing: (@Sendable () -> [OutputDevice])?
     private var decoding: Decoding?
     private var pending: (item: PlayableItem, probed: ProbedSource, plan: OutputPlan, device: OutputDevice)?
     /// The next track, for macOS's renderer (Dolby Atmos), once this one has played out.
@@ -290,6 +332,21 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let entry = staged[cacheKey(item)] { return !entry.isComplete }
         let url = resolve(item)
         return item.cacheKey != nil ? url == item.url : Self.isOnNetworkVolume(url)
+    }
+
+    /// `isOnNetworkVolume` for the engine thread: `statfs` on a share that has stopped answering waits as long as the
+    /// share does, so it is asked on another queue and skip or stop (`superseded`) can still end the wait.
+    private func onNetworkVolume(_ url: URL) throws -> Bool {
+        let answer = Locked<Bool?>(nil)
+        let answered = DispatchSemaphore(value: 0)
+        DispatchQueue.global(qos: .userInitiated).async {
+            answer.withLock { $0 = Self.isOnNetworkVolume(url) }
+            answered.signal()
+        }
+        while answered.wait(timeout: .now() + 0.025) == .timedOut {
+            if superseded { throw Superseded() }
+        }
+        return answer.withLock { $0 } ?? false
     }
 
     static func isOnNetworkVolume(_ url: URL) -> Bool {
@@ -844,7 +901,21 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             }
             guard let device = sessionDevice else { return }
-            let alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            var alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            // A speaker group's aggregate outlives a member that went away; the members are what decide.
+            if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
+                let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
+                switch GroupLoss.action(for: GroupLoss.assess(playing, connected: connected), policy: chosen.onMemberLoss) {
+                case .none: break
+                case .pause:
+                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
+                    alive = false
+                case .continueOnRest:
+                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    restartFromCurrentPosition()
+                    return
+                }
+            }
             if !alive {
                 log.notice("\(device.name, privacy: .public) disappeared while in use")
                 let position = currentPosition()
@@ -875,9 +946,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// connected (unplugged before launch, or gone for a while) is stood in for as `outputFallback` says, and
     /// `standIn` asks for that now (the wait for it is over).
     private func resolveDevice(standIn: Bool = false) throws -> OutputDevice? {
-        let devices = DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
+        let devices = listOutputs()
         for device in devices { deviceNames[device.uid] = device.name }
         noteConnectedOutputs(Set(devices.map(\.uid)))
+        if let group = settings.group(forOutputUID: settings.deviceUID) { return try resolveGroup(group, among: devices) }
         if let uid = settings.deviceUID {
             if let chosen = devices.first(where: { $0.uid == uid }) { standingIn = nil; return chosen }
             // Already standing in: stay on that output (taking it exclusively can move the Mac's sound output away).
@@ -897,6 +969,47 @@ public final class PlaybackEngine: @unchecked Sendable {
         return devices.first(where: \.isDefault) ?? devices.first
     }
 
+    private func listOutputs() -> [OutputDevice] {
+        outputListing?() ?? DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
+    }
+
+    /// Whether the output `uid` can play now: a device that is connected, a group whose members all are.
+    private func isOutputAvailable(_ uid: String) -> Bool {
+        let devices = listOutputs()
+        if let group = settings.group(forOutputUID: uid) {
+            if case .ready = GroupOutput.resolve(group, among: devices) { return true }
+            return false
+        }
+        return devices.contains { $0.uid == uid }
+    }
+
+    /// The output a speaker group presents when all of its members are connected. Members that aren't are waited for like a chosen
+    /// output that left (and never stood in for by one DAC: that would play a quad file on two speakers).
+    private func resolveGroup(_ group: SpeakerGroup, among devices: [OutputDevice]) throws -> OutputDevice {
+        // A group set to carry on plays with the members that are left (a lone leader as the single output it is); it moves back
+        // to the whole group when the others return (`standingIn`, as for any chosen output that stands in).
+        switch GroupOutput.resolveDegraded(group, among: devices) {
+        case .ready(let output, let members):
+            standingIn = members.count < group.members.count ? group.outputUID : nil
+            groupMembers = members
+            resolvedGroup = members.count < group.members.count ? group.without(memberUIDs: Set(group.members.map(\.deviceUID)).subtracting(members.map(\.uid))) : group
+            deviceNames[output.uid] = output.name
+            return output
+        case .single(let leader):
+            standingIn = group.outputUID
+            deviceNames[group.outputUID] = group.name
+            return leader
+        case .missing(let names):
+            deviceNames[group.outputUID] = group.name
+            log.notice("Speaker group \(group.name, privacy: .public) is missing \(names.joined(separator: ", "), privacy: .public)")
+            throw ChosenDeviceMissing(uid: group.outputUID)
+        case .noCommonRate:
+            throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "play \(group.name): its outputs have no sample rate in common")
+        case .invalid:
+            throw CoreAudioError(kAudioHardwareBadDeviceError, "play \(group.name): the group's settings are not valid")
+        }
+    }
+
     private struct ChosenDeviceMissing: Error { let uid: String }
     /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
     private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
@@ -907,7 +1020,9 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Notes which outputs are connected (`uids`, or read now), and when each one that was connected went away.
     private func noteConnectedOutputs(_ uids: Set<String>? = nil) {
-        let now = uids ?? DeviceQuery.outputUIDs()
+        var now = uids ?? outputListing.map { Set($0().map(\.uid)) } ?? DeviceQuery.outputUIDs()
+        // A speaker group is a connected output while all of its members are.
+        now.formUnion(GroupOutput.connectedUIDs(of: settings.speakerGroups, connected: now))
         if let before = connectedUIDs {
             for gone in before.subtracting(now) { lostAt[gone] = Date() }
         }
@@ -927,7 +1042,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let now = Date()
         guard force || now.timeIntervalSince(awaiting.checkedAt) >= 0.5 else { return }
         awaitingDevice?.checkedAt = now
-        if DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs).contains(where: { $0.uid == awaiting.uid }) {
+        if isOutputAvailable(awaiting.uid) {
             // start() keeps the original deadline if the output isn't ready yet and it has to wait again.
             guard let parked else { awaitingDevice = nil; return }
             self.parked = nil
@@ -1032,9 +1147,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         guard let device = try resolveDevice(standIn: standIn) else { throw CoreAudioError(kAudioHardwareBadDeviceError, String(localized: "find an output device", comment: "Followed by “failed: <error code>”.")) }
         mark("device")
+        // Opening the song can keep the engine busy for a long while (a track is copied from a share first) and the
+        // snapshot is only published between commands: say now that the old output isn't what's being waited for.
+        shared.withLock { $0.snapshot.beginOpeningOutput(keepingSession: session != nil) }
         // Retrying an output that wasn't ready reuses the file already opened: on a share, opening it again
         // costs seconds each time, and only the device needs another try.
         let url = try prepareFile(item)
+        mark("copy")
         let probed: ProbedSource
         let carry = carried.flatMap { $0.item == item.id && $0.probed.url == url ? $0 : nil }
         if carried != nil, carry == nil { carried = nil }
@@ -1046,8 +1165,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Opening the file is the slow part on a busy share: if you've skipped on meanwhile, stop here,
         // before the output is reconfigured for a song that won't play.
         if superseded { throw Superseded() }
-        let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
-        if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream {
+        let isGroup = GroupOutput.isGroupOutput(device)
+        let bitstream = !isGroup && settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
+        if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream, !isGroup {
             try beginSystemRendering(item, url: resolve(item), device: device, at: seconds)
             return
         }
@@ -1055,15 +1175,21 @@ public final class PlaybackEngine: @unchecked Sendable {
         atmos = nil
         dropBitstreamMeter()
         sessionLock.lock(); systemTap = nil; sessionLock.unlock()
-        var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
+        var plan: OutputPlan
+        if isGroup {
+            // PCM only, no integer mode, no 16-bit match, no Spatial Audio: the group's rules (GroupFormatRules).
+            plan = groupPlan(for: probed, device: device) ?? GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device))
+        } else {
+            plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                       dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                       dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
-        plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
-        plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
-                                             eligible: mayMatchSixteenBit(item: item, device: device))
-        if session == nil || sessionDevice?.id != device.id || !(session!.plan.isDeviceCompatible(with: plan)) {
+            plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
+            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                                                 eligible: mayMatchSixteenBit(item: item, device: device))
+        }
+        if session == nil || !GroupOutput.isSameOutput(sessionDevice, device) || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
                 if let uid = settings.deviceUID, device.uid == uid {
                     throw ChosenDeviceNotReady(uid: uid, reason: "configure: \(error.localizedDescription)")
@@ -1138,6 +1264,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         let old = session
         session = nil
         sessionLock.unlock()
+        if GroupOutput.isGroupOutput(device), let group = resolvedGroup, group.outputUID == device.uid {
+            try replaceGroupSession(old: old, device: device, group: group, plan: plan)
+            return
+        }
         // DSD over DoP only survives untouched with sole access, so it always takes the device.
         let exclusive = (settings.exclusive && !device.alwaysShared) || plan.isPassthrough
         // A new format on the device already held (a skip to another rate): keep holding it and leave its format
@@ -1157,6 +1287,28 @@ public final class PlaybackEngine: @unchecked Sendable {
         applyGain()
     }
 
+    /// A speaker group's session: its members configured at the plan's rate (held, when exclusive), combined into a private
+    /// aggregate, and opened as one output. A group playing on at another rate keeps the members held, as a single device does
+    /// (letting go and taking them again reconfigures each one more than once in a row).
+    private func replaceGroupSession(old: OutputSession?, device: OutputDevice, group: SpeakerGroup, plan: OutputPlan) throws {
+        let exclusive = GroupOutput.exclusive(setting: settings.exclusive, members: groupMembers)
+        let keep = old?.groupResources.map { $0.group.members.map(\.deviceUID) == group.members.map(\.deviceUID) } ?? false
+        old?.invalidate(releaseHog: !(keep && exclusive), restoreFormat: !(keep && exclusive), idle: !keep)
+        let resources = try GroupSessionResources.open(group: group, devices: groupMembers, rate: plan.deviceSampleRate, exclusive: exclusive)
+        let new: OutputSession
+        do { new = try OutputSession(deviceID: resources.aggregate.id, plan: plan, exclusive: exclusive, group: resources) } catch {
+            resources.release()
+            throw error
+        }
+        transitionWindows.removeAll()
+        sessionLock.lock()
+        session = new
+        sessionDevice = device.with(id: resources.aggregate.id)
+        nrt_context_set_viz(new.context, visualizerTap)
+        sessionLock.unlock()
+        applyGain()
+    }
+
     private func makePath(probed: ProbedSource, plan: OutputPlan, device: OutputDevice, session: OutputSession, item: PlayableItem) -> SignalPath {
         let volume: SignalPath.VolumeStage
         if let db = settings.digitalVolume(for: device), plan.mode == .pcm { volume = .digital(dB: db) }
@@ -1171,6 +1323,17 @@ public final class PlaybackEngine: @unchecked Sendable {
                               roomCorrection: room?.name,
                               bypassedRoomCorrection: room == nil ? settings.roomCorrection(for: device)?.name : nil)
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
+        if let resources = session.groupResources {
+            // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
+            let playing = routingGroup(for: device) ?? resources.group
+            let content = plan.channels == playing.totalChannels ? GroupRouting.content(source: probed.format, group: playing) : nil
+            let stage = GroupSignalPath.stage(room: chain(room, session: session), used: content?.usedOutputs ?? Array(0..<max(plan.channels, 0)),
+                                              equalizer: path.equalizer != nil, digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
+            let group = GroupSignalPath.make(group: playing, applied: session.applied, source: probed.format, plan: plan, stage: stage, content: content)
+            path.group = group
+            path.deviceProfile = group.deviceProfile
+            path.resampledMembers = group.resampledMemberNames
+        }
         return path
     }
 
@@ -1188,7 +1351,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         // Room correction: same rules, and only for the channel layout it was measured with. Each speaker's delay,
         // level and bands, then its measured filter (convolution, a block late once there have been any).
-        let room = session.applied.integerMode ? nil : settings.roomCorrection(for: sessionDevice, plan: session.plan)
+        let room = session.applied.integerMode ? nil : chain(settings.roomCorrection(for: sessionDevice, plan: session.plan), session: session)
         let rate = session.applied.sampleRate, channels = session.plan.channels
         RoomCorrectionPlayback.install(room, on: session.context, sampleRate: rate, channelCount: channels)
         let key = room?.impulseKey(sampleRate: rate, channelCount: channels) ?? ""
@@ -1201,11 +1364,47 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
+    /// The group a speaker-group output plays as of now, for routing a song onto it: the group as it is chosen (so a moved speaker or
+    /// a changed policy takes effect with the next song), less any members that were lost; nil for a single device.
+    private func routingGroup(for device: OutputDevice) -> SpeakerGroup? {
+        guard GroupOutput.isGroupOutput(device) else { return nil }
+        if let session, let current = currentGroup(of: session), current.outputUID == device.uid { return current }
+        return resolvedGroup.flatMap { $0.outputUID == device.uid ? $0 : nil }
+    }
+
+    /// The group `session` plays, as it is chosen now, less any members that were lost; nil for a single device.
+    private func currentGroup(of session: OutputSession) -> SpeakerGroup? {
+        guard let playing = session.groupResources?.group else { return nil }
+        let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
+        let present = Set(playing.members.map(\.deviceUID))
+        var group = chosen
+        group.members = chosen.members.filter { present.contains($0.deviceUID) }
+        group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
+        return group
+    }
+
+    /// The plan for `probed` on a speaker group: PCM only (`GroupFormatRules`), the ring as wide as the group, the song put onto
+    /// it by where the speakers stand (`GroupRouting`). nil for a single device.
+    private func groupPlan(for probed: ProbedSource, device: OutputDevice, policy: RatePolicy? = nil) -> OutputPlan? {
+        guard GroupOutput.isGroupOutput(device) else { return nil }
+        let base = GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: policy ?? ratePolicy(for: device))
+        guard let group = routingGroup(for: device) else { return base }
+        return GroupRouting.routed(base, content: GroupRouting.content(source: probed.format, group: group), group: group, source: probed.format)
+    }
+
+    /// The chain the I/O thread runs for `session`: the room correction chosen for the output, and on a speaker group the delay of
+    /// each speaker added to it (a measured skew between the DACs, a speaker's delay trim: `GroupDelay`). Read from the group as
+    /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
+    private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
+        guard let group = currentGroup(of: session) else { return room }
+        return GroupDelay.chain(room, group: group)
+    }
+
     /// How long room correction holds sound back on the current output: what the end of the queue plays out.
     private var roomHoldSeconds: Double {
         guard let session, !session.plan.isPassthrough else { return 0 }
         let fir = Double(nrt_context_fir_latency(session.context)) / session.applied.sampleRate
-        return fir + (settings.roomCorrection(for: sessionDevice, plan: session.plan)?.maxDelaySeconds ?? 0)
+        return fir + (chain(settings.roomCorrection(for: sessionDevice, plan: session.plan), session: session)?.maxDelaySeconds ?? 0)
     }
 
     private func teardownDecoding() {
@@ -1660,6 +1859,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
+                if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 formatB = .plan(plan)
                 planB = plan
             }
@@ -1739,6 +1939,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                            spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                            dsdToPCMForRoom: settings.convertsDSDForRoom(device), dsdToPCMForTransitions: true)
         resampled.integerSamples = false
+        if let grouped = groupPlan(for: probed, device: device, policy: .fixed(session.plan.deviceSampleRate)) { resampled = grouped }
         guard resampled.mode == .pcm, session.plan.isDeviceCompatible(with: resampled) else { return nil }
         return resampled
     }
@@ -1814,6 +2015,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
             plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                  eligible: mayMatchSixteenBit(item: next, device: device))
+            if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
             if !session.plan.isDeviceCompatible(with: plan),
                let resampled = resampledToSession(plan, probed: probed, item: next, device: device, session: session) { plan = resampled }
             guard session.plan.isDeviceCompatible(with: plan), TransitionPlanner.cutReason(.plan(plan)) == nil else { return skipFades(session) }
@@ -1977,6 +2179,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
+                if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 if session.plan.isDeviceCompatible(with: plan) {
                     // Transitions: a gap between the songs is silence written ahead of the next one (DSD silence on
                     // native DSD; never on bitstream, which the planner leaves alone).
@@ -2178,6 +2381,13 @@ public final class PlaybackEngine: @unchecked Sendable {
             path?.bypassedRoomCorrection = room == nil ? settings.roomCorrection(for: sessionDevice)?.name : nil
             let rate = path?.applied.sampleRate ?? 0
             path?.roomFiltersSkipped = room?.filtersTooLong(sampleRate: rate, channelCount: plan.channels) ?? false
+            if var group = path?.group {
+                // What is done to the samples can change while a song plays (a setting): the group's account follows it.
+                group.stage = GroupSignalPath.stage(room: session.map { chain(room, session: $0) } ?? room, used: group.router?.usedOutputs ?? Array(0..<max(plan.channels, 0)), equalizer: path?.equalizer != nil,
+                                                    digitalVolumeDB: settings.digitalVolume(for: sessionDevice), replayGainDB: path?.replayGainDB)
+                path?.group = group
+                path?.deviceProfile = group.deviceProfile
+            }
         }
         if let path, !path.applied.exclusive, let device = sessionDevice {
             if Date().timeIntervalSince(othersCheckedAt) > 1 || othersDevice != device.id {

@@ -99,6 +99,8 @@ final class AppSettings {
     var appVolumeLevels: [String: Double] { didSet { defaults.set(appVolumeLevels, forKey: "appVolumeLevels") } }
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
     var managedFolderPath: String { didSet { defaults.set(managedFolderPath, forKey: "managedFolder") } }
+    /// Scan for new music by itself: watch local folders, look again at launch, and recheck network shares now and then.
+    /// Off by default; "Rescan Library" and each source's Rescan always work. (The key keeps its old name.)
     var watchFolders: Bool { didSet { defaults.set(watchFolders, forKey: "watchFolders") } }
     var fetchArtworkOnline: Bool { didSet { defaults.set(fetchArtworkOnline, forKey: "fetchArtworkOnline") } }
     var scrobble: Bool { didSet { defaults.set(scrobble, forKey: "scrobble") } }
@@ -121,7 +123,7 @@ final class AppSettings {
     var relayVolumeKeys: Bool { didSet { defaults.set(relayVolumeKeys, forKey: "relayVolumeKeys") } }
     /// What happens to devices Vespertine changed when it quits.
     var deviceOnQuit: DeviceOnQuit { didSet { defaults.set(deviceOnQuit.rawValue, forKey: "deviceOnQuit") } }
-    /// Analyze new and changed music in the background after it's added.
+    /// Analyze new and changed music in the background after it's added. Off by default; Analyze Library always works.
     var autoAnalyze: Bool { didSet { defaults.set(autoAnalyze, forKey: "autoAnalyze") } }
     /// Include network shares in automatic analysis (reads every file in full over the network).
     var analyzeNetworkShares: Bool { didSet { defaults.set(analyzeNetworkShares, forKey: "analyzeNetworkShares") } }
@@ -153,6 +155,10 @@ final class AppSettings {
     /// Song transitions exist in the app only while this is on (Settings › Playback › Transitions), off by default: off,
     /// there is no menu item, button, setting, Shortcuts action or string for them, and playback is untouched.
     var transitionsFeature: Bool { didSet { defaults.set(transitionsFeature, forKey: "transitionsFeature") } }
+    /// Speaker groups (several DACs played as one system) are in the app only while this is on (Settings › Playback › Speaker
+    /// Groups (beta), off by default; `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` sets it too). Off,
+    /// there is no setting, menu item or string for them, and nothing about them is read or written.
+    var speakerGroupsFeature: Bool { didSet { defaults.set(speakerGroupsFeature, forKey: "speakerGroupsFeature") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -163,6 +169,19 @@ final class AppSettings {
 
     /// Library location. Overridable with `-VespertineDataDirectory <path>` for testing.
     let dataDirectory: URL
+
+    /// Marks that automatic scanning and analysis were made opt-in. Before it, both were on by default (watching) or
+    /// set by the setup screen; an install that has not seen this change is put on the new default once, whatever it
+    /// stored, and its choices stand from then on.
+    static let automaticWorkOptInKey = "automaticWorkOptIn"
+
+    /// Automatic scanning (`watchFolders`) and analysis (`autoAnalyze`) are off after the update, for every install.
+    static func migrateAutomaticWorkToOff(_ defaults: UserDefaults) {
+        guard !defaults.bool(forKey: automaticWorkOptInKey) else { return }
+        defaults.set(false, forKey: "watchFolders")
+        defaults.set(false, forKey: "autoAnalyze")
+        defaults.set(true, forKey: automaticWorkOptInKey)
+    }
 
     init(defaults: UserDefaults = .standard, dataDirectory: URL? = nil) {
         self.defaults = defaults
@@ -182,11 +201,12 @@ final class AppSettings {
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
-            "watchFolders": true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
+            "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "bundleCopies": false,
         ])
+        Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
         versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
@@ -257,6 +277,7 @@ final class AppSettings {
         visualizer = VisualizerSettings.load(from: defaults)
         visualizerWindow = VisualizerWindowState.load(from: defaults)
         transitionsFeature = defaults.bool(forKey: "transitionsFeature")
+        speakerGroupsFeature = defaults.bool(forKey: "speakerGroupsFeature")
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).
@@ -366,8 +387,10 @@ final class AppSettings {
     }
 
     /// Digital volume is passed as set: the engine skips it on whichever output it plays to that has hardware volume.
-    func engineSettings() -> EngineSettings {
+    func engineSettings(groups: [SpeakerGroup] = []) -> EngineSettings {
         var s = EngineSettings()
+        // Saved speaker groups reach the engine only while the Settings switch is on: off, it gets none, whatever is saved.
+        s.speakerGroups = speakerGroupsFeature ? groups : []
         s.exclusive = exclusiveMode
         s.deviceUID = selectedDeviceUID
         s.deviceName = selectedDevice.flatMap { $0.uid == selectedDeviceUID ? $0.name : nil }

@@ -588,6 +588,10 @@ struct NRTRenderContext {
 
     _Atomic float tap[NRT_TAP_SIZE];
     _Atomic uint32_t tapWrite;
+    // How the taps fold a bed of more than two channels to left and right: a gain per channel for each side. Set while
+    // stopped (nrt_context_set_tap_mix); until then the standard order for the channel count (tap_default_mix).
+    float tapMixLeft[NRT_METER_CHANNELS];
+    float tapMixRight[NRT_METER_CHANNELS];
 
     // Visualizer tap: interleaved L/R, NRT_VIZ_TAP_SIZE frames (heap), written only while `viz` is set.
     _Atomic bool viz;
@@ -628,6 +632,8 @@ struct NRTRenderContext {
     float *processed;
 };
 
+static void tap_default_mix(uint32_t ch, float *left, float *right);
+
 NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) {
     if (!ring) return NULL;
     NRTRenderContext *ctx = calloc(1, sizeof(NRTRenderContext));
@@ -658,6 +664,7 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->stalls, 0);
     for (uint32_t i = 0; i < NRT_METER_CHANNELS; i++) atomic_init(&ctx->peak[i], 0.f);
     atomic_init(&ctx->tapWrite, 0);
+    tap_default_mix(nrt_ring_channels(ring), ctx->tapMixLeft, ctx->tapMixRight);
     for (uint32_t i = 0; i < NRT_TAP_SIZE; i++) atomic_init(&ctx->tap[i], 0.f);
     atomic_init(&ctx->viz, false);
     atomic_init(&ctx->vizWrite, 0);
@@ -684,6 +691,28 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     ctx->roomWasOn = false;
     atomic_init(&ctx->fir, NULL);
     return ctx;
+}
+
+/// The taps' fold of a bed of `ch` channels in the usual file order (L R, then C or the surrounds, LFE, surrounds, rears), as
+/// a downmix does it: the front pair as it is, the centre and the surrounds at -3 dB on their side, the LFE at -6 dB on both.
+static void tap_default_mix(uint32_t ch, float *left, float *right) {
+    const float k = 0.70710678f;
+    for (uint32_t c = 0; c < NRT_METER_CHANNELS; c++) left[c] = right[c] = 0.f;
+    if (ch < 3) { left[0] = 1.f; right[ch > 1 ? 1 : 0] = 1.f; return; }
+    left[0] = 1.f; right[1] = 1.f;
+    if (ch == 4) { left[2] = k; right[3] = k; return; }              // L R Ls Rs
+    left[2] = right[2] = (ch == 3 || ch >= 5) ? k : 0.f;            // C (3, 5, 6, 8 …)
+    if (ch == 3) return;
+    uint32_t next = 3;
+    if (ch >= 6) { left[3] = right[3] = 0.5f; next = 4; }            // LFE
+    for (uint32_t c = next; c + 1 < ch && c + 1 < NRT_METER_CHANNELS; c += 2) { left[c] = k; right[c + 1] = k; }
+}
+
+void nrt_context_set_tap_mix(NRTRenderContext *ctx, const float *left, const float *right, uint32_t count) {
+    for (uint32_t c = 0; c < NRT_METER_CHANNELS; c++) {
+        ctx->tapMixLeft[c] = left && c < count ? left[c] : 0.f;
+        ctx->tapMixRight[c] = right && c < count ? right[c] : 0.f;
+    }
 }
 
 bool nrt_context_set_processor(NRTRenderContext *ctx, NRTProcessFn fn, void *user, uint32_t outChannels) {
@@ -756,7 +785,7 @@ void nrt_context_set_room(NRTRenderContext *ctx, const NRTRoomChannel *channels,
         const NRTRoomChannel in = channels[c];
         NRTRoomChannel *out = &bank->channels[c];
         out->delayFrames = in.delayFrames < NRT_ROOM_MAX_DELAY ? in.delayFrames : NRT_ROOM_MAX_DELAY - 1;
-        out->gain = isfinite(in.gain) && in.gain >= 0 ? in.gain : 1.0;
+        out->gain = isfinite(in.gain) ? in.gain : 1.0;   // negative turns the channel's polarity over
         const uint32_t n = in.count < NRT_ROOM_MAX_SECTIONS ? in.count : NRT_ROOM_MAX_SECTIONS;
         uint32_t kept = 0;
         for (uint32_t i = 0; i < n; i++) {
@@ -1296,7 +1325,12 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             const float a = fabsf(values[c]);
             if (a > peaks[c]) peaks[c] = a;
         }
-        const float l = values[0], r = ch > 1 ? values[1] : l;
+        float l = values[0], r = ch > 1 ? values[1] : l;
+        if (ch > 2) {
+            // A bed: what is heard from every speaker, not only the front pair (a centre-only song would draw nothing).
+            l = r = 0.f;
+            for (uint32_t c = 0; c < metered; c++) { l += ctx->tapMixLeft[c] * values[c]; r += ctx->tapMixRight[c] * values[c]; }
+        }
         atomic_store_explicit(&ctx->tap[tw & (NRT_TAP_SIZE - 1)], 0.5f * (l + r), memory_order_relaxed);
         tw++;
         if (viz) viz_store(ctx, vw++, l * vizScale, r * vizScale);

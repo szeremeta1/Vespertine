@@ -141,6 +141,49 @@ struct HardwareAuditTests {
         #expect(!events.value.contains("failed"))
     }
 
+    /// Choosing another output while playback waits for the old one (AirPods not back yet) must drop the wait from
+    /// the status at once, even when opening the song on the new output takes a while (a track copied from a share
+    /// first): the snapshot says "buffering" and nothing else about the output it just left.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))
+    func switchingOutputClearsTheWaitWhileTheSongOpens() async throws {
+        let device = try #require(OutputDevices.list().first { $0.transport == .builtIn })
+        let rate = device.nominalSampleRate
+        let url = try writeWAV("hardware-switch-wait", rate: rate, bits: 16, seconds: 3) { _, _ in 0 }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = PlaybackEngine(deviceWait: 30)
+        defer { engine.stop() }
+        var settings = EngineSettings(); settings.exclusive = false
+        settings.ratePolicies[device.uid] = .fixed(rate)
+        settings.deviceUID = "vespertine-test:absent-output"
+        settings.deviceName = "Absent AirPods"
+        engine.update(settings: settings)
+
+        // Opening the song on a reachable output is slow: the copy from the share (looking up what follows it is part
+        // of staging) holds the engine thread until released, with "buffering" set the way staging sets it.
+        let slow = Locked(false)
+        let entered = Locked(false)
+        let release = DispatchSemaphore(value: 0)
+        engine.nextItemProvider = { _ in
+            if slow.value { slow.value = false; entered.value = true; release.wait() }
+            return nil
+        }
+        let item = PlayableItem(url: url, cacheKey: "test")
+        engine.play(item)
+        try await wait { engine.snapshot.waitingForDevice != nil }
+
+        slow.value = true
+        settings.deviceUID = device.uid
+        engine.update(settings: settings)
+        try await wait { entered.value }
+        // The engine thread is inside the open: what the snapshot says now is all the app can show.
+        try await wait { engine.snapshot.isBuffering }
+        #expect(engine.snapshot.waitingForDevice == nil, "still waiting for the output that was switched away from")
+        #expect(engine.snapshot.standingInFor == nil)
+        release.signal()
+        try await wait { engine.snapshot.state == .playing && engine.snapshot.outputDevice?.uid == device.uid }
+        #expect(!engine.snapshot.isBuffering && engine.snapshot.waitingForDevice == nil)
+    }
+
     /// A chosen output that isn't connected at all (unplugged before launch) is stood in for at once, as
     /// Settings → Playback says, and the snapshot names the output it stands in for.
     @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_HARDWARE_TESTS"] == "1"))

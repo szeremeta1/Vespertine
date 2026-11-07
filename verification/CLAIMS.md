@@ -20,7 +20,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-01 <a id="bp-definition"></a>The badge means every sample arrives unaltered
 
 - **Text:** `docs/VERIFICATION.md:18` — "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:95` — "/// True only when every sample reaches the DAC unaltered."
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:101` — "/// True only when every sample reaches the DAC unaltered."
 - **Text:** `README.md:40` — "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
@@ -131,6 +131,14 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 - **Property:** BITSTREAM · … only when the common conditions hold, the player holds the device exclusively, the device rate read back equals the planned rate, and the physical format is integer and at least 16 bits.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
+
+### CL-BP-14 <a id="bp-speaker-group"></a>A speaker group is BIT-PERFECT only on channels no drift correction touches
+
+- **Text:** `docs/SPEAKER-GROUPS.md:15` — "Only the leader can be bit-perfect."
+- **Text:** `docs/FEATURES.md:132` — "so only the leader's channels can be bit-perfect, and the signal path says which."
+- **Property:** a Vespertine speaker group is labelled BIT-PERFECT only when every channel the song uses lands on a DAC that is not resampled (the clock leader, or DACs sharing a hardware clock), each used DAC passes the single-DAC format rules at the song's rate, and nothing mixes, changes the level, filters or applies a digital volume (a whole-frame delay only shifts samples). A resampled follower, a fold, a trim, a polarity flip or a lowered preamp on an output that carries music gives the badge the single-DAC rules would (ROOM CORRECTION, RESAMPLED…). A user's own aggregate stays CL-BP-08.
+- **Governed by:** vespertine-rule.
+- **Route:** inventory (`GroupSignalPath` has its own unit tests, `GroupSignalPathTests` and `GroupBitPerfectTests`, and an opt-in loopback check on virtual devices; not one of the seven groups); hardware (`hardware/SPEAKER-GROUPS.md`, the leader's samples on a real DAC).
 
 ---
 
@@ -489,7 +497,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
 
 - **Text:** `docs/TRANSITIONS.md:107` — "Only while it's heard is the music not bit-perfect"
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:97` — "guard transition?.audible != true"
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:104` — "guard transition?.audible != true"
 - **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift` and `SmartMixGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants C-FLT-001-tr, C-INT-001-tr and C-DOPS-004-tr, killed by the float, integer and DoP groups' checks).

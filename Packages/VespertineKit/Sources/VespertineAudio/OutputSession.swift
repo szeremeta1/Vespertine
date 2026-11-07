@@ -30,6 +30,9 @@ public struct AppliedFormat: Sendable, Hashable {
     /// Every output stream's physical format was read back. When one couldn't be, the depth and integer flag above
     /// come from the streams that could be read, or from the plan, and the path isn't marked bit-perfect.
     public var physicalFormatKnown = true
+    /// A speaker group: each member DAC as read back from the member (the aggregate's own streams are not trusted for this),
+    /// in the group's order. Empty for a single output.
+    public var members: [MemberApplied] = []
 }
 
 final class OutputSession: @unchecked Sendable {
@@ -56,6 +59,8 @@ final class OutputSession: @unchecked Sendable {
     private let formatNotice = OSAllocatedUnfairLock(initialState: false)
     private var formatListener: AudioObjectPropertyListenerBlock?
     private var watchedFormats: [(object: AudioObjectID, address: AudioObjectPropertyAddress)] = []
+    /// A speaker group: its aggregate and held members. nil for a single output.
+    private(set) var groupResources: GroupSessionResources?
     private static let formatQueue = DispatchQueue(label: "org.szeremeta.vespertine.format-changes")
 
     /// Multichannel routing: the source's own speakers for Spatial Audio (the standard bed when it doesn't
@@ -137,12 +142,15 @@ final class OutputSession: @unchecked Sendable {
         return UInt32(frames)
     }
 
-    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool) throws {
+    /// `group`: `deviceID` is the group's private aggregate, whose members are already configured (and held, if exclusive) by
+    /// `group`. The aggregate itself is never held (it has no hog property), integer mode does not apply, and the format is
+    /// the members' own, read back from them. On success the session owns `group`; on a throw the caller still does.
+    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, group: GroupSessionResources? = nil) throws {
         self.deviceID = deviceID
         self.plan = plan
 
-        let hogged = exclusive ? DeviceControl.acquireHog(deviceID) : false
-        if exclusive, !hogged {
+        let hogged = exclusive && group == nil ? DeviceControl.acquireHog(deviceID) : false
+        if exclusive, !hogged, group == nil {
             log.notice("Exclusive access unavailable (another process holds the device); continuing shared")
         }
         do {
@@ -156,11 +164,30 @@ final class OutputSession: @unchecked Sendable {
         let streams = DeviceQuery.outputStreams(deviceID)
         let physicals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
         // Integer mode needs the device to ourselves and a non-mixable Int32 virtual format.
-        let integerMode = plan.integerSamples && hogged && plan.mode == .pcm && DeviceControl.setIntegerFormat(on: deviceID, plan: plan, rate: rate)
+        let integerMode = group == nil && plan.integerSamples && hogged && plan.mode == .pcm && DeviceControl.setIntegerFormat(on: deviceID, plan: plan, rate: rate)
         let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
         // The shallowest stream decides what the device as a whole can carry.
         let physical = physicals.min { $0.mBitsPerChannel < $1.mBitsPerChannel }
-        let physicalFormatKnown = !streams.isEmpty && physicals.count == streams.count
+        var physicalFormatKnown = !streams.isEmpty && physicals.count == streams.count
+        var physicalDepth = Int(physical?.mBitsPerChannel ?? UInt32(plan.physicalBitDepth))
+        var physicalInteger = (physical?.mFormatFlags ?? kAudioFormatFlagIsSignedInteger) & kAudioFormatFlagIsSignedInteger != 0
+        var memberFormats: [MemberApplied] = []
+        var groupExclusive = hogged
+        if let group {
+            // The members decide, not the aggregate's streams (they show the aggregate's rate even for a member that resamples).
+            let readback = group.readBack()
+            if let wrong = GroupApplied.memberNotAt(rate, readback) {
+                // Plain English for now, like the rest of the group's words (SpeakerGroup.swift); the catalog comes with the screens.
+                let name = group.group.members.first { $0.deviceUID == wrong }?.name ?? wrong
+                throw CoreAudioError(kAudioDeviceUnsupportedFormatError, "keep \(name) at \(SampleRate.format(plan.deviceSampleRate)) kHz")
+            }
+            memberFormats = GroupApplied.members(group: group.group, plan: group.aggregate.plan, readback: readback)
+            let summary = GroupApplied.summary(memberFormats)
+            physicalFormatKnown = physicalFormatKnown && summary.physicalFormatKnown
+            physicalDepth = summary.physicalBitDepth
+            physicalInteger = summary.physicalIsInteger
+            groupExclusive = summary.exclusive
+        }
         let bufferFrames = (try? HAL.get(deviceID, .global(kAudioDevicePropertyBufferFrameSize), initial: UInt32(512))) ?? 512
         let deviceLatency = (try? HAL.get(deviceID, .output(kAudioDevicePropertyLatency), initial: UInt32(0))) ?? 0
         let safetyOffset = (try? HAL.get(deviceID, .output(kAudioDevicePropertySafetyOffset), initial: UInt32(0))) ?? 0
@@ -189,16 +216,17 @@ final class OutputSession: @unchecked Sendable {
         let routeLayout = Self.routeLayout(plan: plan, speakers: speakers)
         applied = AppliedFormat(
             sampleRate: rate,
-            physicalBitDepth: Int(physical?.mBitsPerChannel ?? UInt32(plan.physicalBitDepth)),
-            physicalIsInteger: (physical?.mFormatFlags ?? kAudioFormatFlagIsSignedInteger) & kAudioFormatFlagIsSignedInteger != 0,
+            physicalBitDepth: physicalDepth,
+            physicalIsInteger: physicalInteger,
             virtualChannels: totalChannels,
-            exclusive: hogged,
+            exclusive: groupExclusive,
             bufferFrames: Int(bufferFrames),
             channelNames: routeLayout?.shortNames ?? (plan.channels == 1 ? ["M"] : ["L", "R"]),
             speakerNames: speakers.flatMap { $0.hasSpeakerPositions ? $0.shortNames : nil } ?? [],
             streamCount: streams.count,
             integerMode: integerMode,
-            physicalFormatKnown: physicalFormatKnown)
+            physicalFormatKnown: physicalFormatKnown,
+            members: memberFormats)
 
         guard let ring = nrt_ring_create(Self.ringFrames(rate: rate, channels: plan.channels), UInt32(plan.channels)) else {
             if hogged { DeviceControl.releaseHog(deviceID) }
@@ -211,6 +239,7 @@ final class OutputSession: @unchecked Sendable {
         }
         self.ring = ring
         self.context = ctx
+        self.groupResources = group
         nrt_context_set_passthrough(ctx, plan.isPassthrough)
         nrt_context_set_dop(ctx, plan.mode == .dop)
         nrt_context_set_integer(ctx, integerMode)
@@ -218,6 +247,7 @@ final class OutputSession: @unchecked Sendable {
 
         // Multichannel routing.
         decodedLayout = routeLayout
+        if plan.channels > 2, let labels = routeLayout?.channelLabels, labels.count == plan.channels { applyTapMix(ctx, labels: labels) }
         if plan.spatial != .off {
             let bed = routeLayout
             do {
@@ -247,9 +277,14 @@ final class OutputSession: @unchecked Sendable {
         // Installed once the device is configured; late notices of our own changes read back as no change.
         let block: AudioObjectPropertyListenerBlock = { [formatNotice] _, _ in formatNotice.withLock { $0 = true } }
         formatListener = block
-        let addresses = [(deviceID, AudioObjectPropertyAddress.global(kAudioDevicePropertyNominalSampleRate))]
+        var addresses = [(deviceID, AudioObjectPropertyAddress.global(kAudioDevicePropertyNominalSampleRate))]
             + streams.flatMap { [($0, AudioObjectPropertyAddress.global(kAudioStreamPropertyPhysicalFormat)),
                                  ($0, AudioObjectPropertyAddress.global(kAudioStreamPropertyVirtualFormat))] }
+        // A group's members are watched too: a member changed by another app is what the aggregate hides.
+        for member in group?.members.members ?? [] {
+            addresses.append((member.deviceID, .global(kAudioDevicePropertyNominalSampleRate)))
+            for stream in DeviceQuery.outputStreams(member.deviceID) { addresses.append((stream, .global(kAudioStreamPropertyPhysicalFormat))) }
+        }
         for (object, address) in addresses {
             var a = address
             if AudioObjectAddPropertyListenerBlock(object, &a, Self.formatQueue, block) == noErr { watchedFormats.append((object, address)) }
@@ -267,7 +302,11 @@ final class OutputSession: @unchecked Sendable {
         if abs(rate - applied.sampleRate) >= 0.5 { return true }
         let streams = DeviceQuery.outputStreams(deviceID)
         let physicals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
-        if let shallowest = physicals.map(\.mBitsPerChannel).min(), Int(shallowest) != applied.physicalBitDepth { return true }
+        if let group = groupResources {
+            // The aggregate's streams say nothing about the depth of a member: compare each member with its own readback.
+            let now = GroupApplied.members(group: group.group, plan: group.aggregate.plan, readback: group.readBack())
+            if GroupApplied.changed(from: applied.members, to: now) { return true }
+        } else if let shallowest = physicals.map(\.mBitsPerChannel).min(), Int(shallowest) != applied.physicalBitDepth { return true }
         let virtuals = streams.compactMap { try? HAL.get($0, .global(kAudioStreamPropertyVirtualFormat), initial: AudioStreamBasicDescription()) }
         // Same rate and depth can still hide a switch between Float32 and Int32, or a different channel count,
         // either of which the render context would write wrongly.
@@ -358,6 +397,14 @@ final class OutputSession: @unchecked Sendable {
         ioProcID = nil
         nrt_context_destroy(context)
         nrt_ring_destroy(ring)
+        if let group = groupResources {
+            // A group: the aggregate goes (a new rate gets a new one) and the members are freed, or kept held for the next
+            // session. There is no device format of its own to put back, and no hog on the aggregate.
+            groupResources = nil
+            // Held on only when the caller says the next session takes them over (not when a member has gone: that lets go).
+            group.release(keepHolding: !releaseHog && !restoreFormat)
+            return
+        }
         // Leave the device on an ordinary (mixable Float32) format for whoever uses it next, and at its full depth after
         // "Match 16-bit sources": other apps' audio would otherwise be cut to 16 bits.
         if applied.integerMode || plan.sixteenBit == .requested, restoreFormat {
@@ -589,4 +636,33 @@ public enum DeviceControl {
         guard let element = DeviceQuery.volumeElements(device).first else { return nil }
         return try? HAL.get(device, .output(kAudioDevicePropertyVolumeDecibels, element: element), initial: Float32(0))
     }
+}
+
+/// How the spectrum and visualizer taps fold a bed to left and right, by speaker: the front pair as it is, the centre and
+/// every speaker on a side at -3 dB (the centre on both), the LFE at -6 dB on both, heights and the rest not at all.
+func tapMix(labels: [AudioChannelLabel]) -> (left: [Float], right: [Float]) {
+    let k = Float(0.5.squareRoot())
+    var left = [Float](repeating: 0, count: labels.count), right = left
+    for (c, label) in labels.enumerated() {
+        switch ChannelLayouts.canonical(label) {
+        case kAudioChannelLabel_Left: left[c] = 1
+        case kAudioChannelLabel_Right: right[c] = 1
+        case kAudioChannelLabel_Center: left[c] = k; right[c] = k
+        case kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3: left[c] = 0.5; right[c] = 0.5
+        case kAudioChannelLabel_LeftSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RearSurroundLeft,
+             kAudioChannelLabel_LeftCenter, kAudioChannelLabel_LeftWide: left[c] = k
+        case kAudioChannelLabel_RightSurround, kAudioChannelLabel_RightSurroundDirect, kAudioChannelLabel_RearSurroundRight,
+             kAudioChannelLabel_RightCenter, kAudioChannelLabel_RightWide: right[c] = k
+        case kAudioChannelLabel_CenterSurround: left[c] = 0.5; right[c] = 0.5
+        default: break
+        }
+    }
+    return (left, right)
+}
+
+/// Tells `context`'s taps the order of the bed it plays (see `tapMix`).
+func applyTapMix(_ context: OpaquePointer, labels: [AudioChannelLabel]) {
+    guard labels.count > 2, labels.count <= Int(NRT_METER_CHANNELS) else { return }
+    let mix = tapMix(labels: labels)
+    nrt_context_set_tap_mix(context, mix.left, mix.right, UInt32(labels.count))
 }

@@ -65,15 +65,20 @@ public struct TimingReference: Sendable {
         public var position: Double
         /// Envelope of the normalised cross-correlation at the peak: 1 for an exact copy, near 0 for noise.
         public var score: Double
-        /// The strongest other peak, as a fraction of this one.
+        /// The strongest other peak that isn't this one's own reflection, as a fraction of this one.
         public var runnerUpRatio: Double
     }
 
     /// Weakest peak accepted as the reference, and how close another peak may come to it before the position is
     /// called ambiguous. Another peak within 2 ms is the same arrival (the chirp's own ringing), not a second one.
+    /// A peak is preferred over a stronger later one if it reaches `earliestArrivalShare` of the strongest, and peaks
+    /// up to `reflectionSeconds` after the one taken are its reflections (30 ms is a 10 m longer path) and don't count
+    /// against it. Measured in a dorm room, where a reflection about as strong as the direct sound followed it by 3 ms.
     public static let minimumScore = 0.3
     public static let ambiguityRatio = 0.8
+    public static let earliestArrivalShare = 0.6
     private static let sameArrivalSeconds = 0.002
+    private static let reflectionSeconds = 0.03
 
     /// Find the reference starting within `range` (sample indices into `recording`).
     public func locate(in recording: [Double], range: Range<Int>) throws -> Detection {
@@ -96,13 +101,21 @@ public struct TimingReference: Sendable {
         }
         // Rank by the raw envelope, so a weak reflection of the reference doesn't look as good as the reference;
         // the normalised score only says whether what was found is shaped like the reference at all.
-        guard let best = envelope.indices.max(by: { envelope[$0] < envelope[$1] }), envelope[best] > 0,
-              score[best] >= Self.minimumScore else {
+        guard let strongest = envelope.indices.max(by: { envelope[$0] < envelope[$1] }), envelope[strongest] > 0,
+              score[strongest] >= Self.minimumScore else {
             throw TimingReferenceError.notFound
         }
-        let guardBand = Int(Self.sameArrivalSeconds * sampleRate)
+        // The direct sound arrives first and everything later is a reflection of it, which in a small room can be the
+        // stronger one: take the earliest peak that is nearly as strong as the strongest, not the strongest itself.
+        let best = envelope.indices.first { k in
+            k > 0 && k < envelope.count - 1 && envelope[k] >= Self.earliestArrivalShare * envelope[strongest]
+                && envelope[k] >= envelope[k - 1] && envelope[k] >= envelope[k + 1] && score[k] >= Self.minimumScore
+        } ?? strongest
+        // Another peak makes the position doubtful if it is before the one taken (that one may be a reflection of it), or
+        // after it by more than a room's reflections reach (that one is a second reference, not an echo of this one).
+        let guardBand = Int(Self.sameArrivalSeconds * sampleRate), reflectionReach = Int(Self.reflectionSeconds * sampleRate)
         var runnerUp = 0.0
-        for k in 1..<max(envelope.count - 1, 1) where abs(k - best) > guardBand && envelope[k] >= envelope[k - 1] && envelope[k] >= envelope[k + 1] {
+        for k in 1..<max(envelope.count - 1, 1) where (k < best - guardBand || k > best + reflectionReach) && envelope[k] >= envelope[k - 1] && envelope[k] >= envelope[k + 1] {
             runnerUp = max(runnerUp, envelope[k])
         }
         let ratio = runnerUp / envelope[best]

@@ -224,6 +224,7 @@ struct PlaybackSettings: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             TransitionsSettingsSection()
+            SpeakerGroupsSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
                     Text("Rendered by macOS (objects)").tag(true)
@@ -338,9 +339,13 @@ struct LibrarySettings: View {
                 LabeledContent("Managed folder") {
                     Text((s.managedFolderPath as NSString).abbreviatingWithTildeInPath).foregroundStyle(.secondary)
                 }
-                Toggle("Watch folders for changes", isOn: Binding(get: { s.watchFolders }, set: {
-                    s.watchFolders = $0; model.library.updateWatcher()
+                Toggle("Scan for new music automatically", isOn: Binding(get: { s.watchFolders }, set: {
+                    s.watchFolders = $0
+                    model.library.automaticScanningChanged()
+                    if $0 { Task { await model.shares.rescanStale() } }   // shares connected and due a look catch up too
                 }))
+                Text("Watches your folders, looks again at launch and rechecks network shares now and then. When it’s off, use Rescan Library.")
+                    .font(.caption).foregroundStyle(.secondary)
                 Toggle("Skip voice recordings and short clips", isOn: $s.skipNonMusic)
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
                 Button("Find Music on This Mac…") { openWindow(id: "main"); model.showFindMusic = true }

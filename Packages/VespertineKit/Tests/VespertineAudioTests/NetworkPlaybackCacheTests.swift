@@ -71,6 +71,23 @@ struct NetworkPlaybackCacheTests {
         #expect(share.readCount == before)
     }
 
+    @Test("A copy reports how much is local as it arrives: never backwards, ending at the whole file")
+    func copyProgress() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = SlowShare(count: 64 * 4096 + 100)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        let seen = Locked([Int64]())
+        share.stall(true)
+        entry.setProgress { copied in seen.withLock { $0.append(copied) } }
+        share.stall(false)
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(entry.copiedBytes == entry.size)
+        let steps = seen.withLock { $0 }
+        #expect(!steps.isEmpty && steps == steps.sorted() && steps.last == entry.size, "\(steps.suffix(3))")
+        entry.setProgress(nil)
+    }
+
     @Test("Large DSD uses a local lead; a stalled producer cannot interrupt reads within that reserve")
     func progressiveLead() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
@@ -121,6 +138,52 @@ struct NetworkPlaybackCacheTests {
         let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
         let entry = try cache.entry(key: "cancel", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
         #expect(throws: CancellationError.self) { try entry.prepare(full: true, lead: 0, cancelled: { true }) }
+    }
+
+    /// The 11-05 23:54 hang on Alex's laptop: the engine thread opened the share file itself, so while the share did
+    /// not answer, skip and stop sat in its queue. A FIFO with no writer blocks `open(2)` exactly like a stuck SMB open.
+    @Test("Opening a file the share does not answer for can be given up on, and gives the engine thread back")
+    func cancellableOpen() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let fifo = dir.appendingPathComponent("song.flac")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        defer { let fd = open(fifo.path, O_WRONLY | O_NONBLOCK); if fd >= 0 { close(fd) } }   // lets the stuck open return
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let skipped = Locked(false)
+        let result = Locked<Result<Void, Error>?>(nil)
+        let returned = DispatchSemaphore(value: 0)
+        let thread = Thread {
+            let outcome = Result { _ = try cache.entry(key: "hung", url: fifo, cancelled: { skipped.withLock { $0 } }) }
+            result.withLock { $0 = outcome }
+            returned.signal()
+        }
+        thread.start()
+        #expect(returned.wait(timeout: .now() + 0.5) == .timedOut, "still waiting for the share")
+        skipped.withLock { $0 = true }
+        #expect(returned.wait(timeout: .now() + 2) == .success, "the caller is free within 2 s of the skip")
+        if case .failure(let error)? = result.withLock({ $0 }) { #expect(error is CancellationError) }
+        else { Issue.record("the open was not cancelled") }
+    }
+
+    @Test("Two callers opening the same file on a stuck share share one open, and each can give up alone")
+    func sharedOpen() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let fifo = dir.appendingPathComponent("song.flac")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let firstGivesUp = Locked(false)
+        let first = DispatchSemaphore(value: 0), second = DispatchSemaphore(value: 0)
+        Thread { _ = try? cache.entry(key: "hung", url: fifo, cancelled: { firstGivesUp.withLock { $0 } }); first.signal() }.start()
+        Thread {
+            _ = try? cache.entry(key: "hung", url: fifo, cancelled: { false })   // (a FIFO can't be sized: it fails once opened)
+            second.signal()
+        }.start()
+        Thread.sleep(forTimeInterval: 0.3)
+        firstGivesUp.withLock { $0 = true }
+        #expect(first.wait(timeout: .now() + 2) == .success)
+        #expect(second.wait(timeout: .now() + 0.3) == .timedOut, "the other caller is still waiting for the share")
+        let fd = open(fifo.path, O_WRONLY); close(fd)   // the share answers
+        #expect(second.wait(timeout: .now() + 3) == .success)
     }
 
     @Test("Current and next remain leased, disk reservations are bounded, crash leftovers are cleaned")
