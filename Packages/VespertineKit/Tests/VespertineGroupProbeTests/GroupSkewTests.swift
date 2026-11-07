@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AVFAudio
 import Foundation
 import Testing
 @testable import VespertineAudio
@@ -194,6 +195,31 @@ struct GroupSkewTests {
         let report = try await GroupSkewRunner.run(config, makeDevice: { Self.simulated(followerGain: calls.next() == 2 ? 0 : 0.04) },
                                                    permission: AlwaysGrantedMicrophone())
         #expect(report.runs.count == 2 && report.failures.count == 1)
+    }
+
+    @Test("--keep: every run's raw capture is saved, the failed one too, and reads back sample for sample")
+    func keptCapturesIncludeFailedRuns() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("skew-keep-\(UUID())", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var config = GroupSkewConfig(inputDevice: 1, outputDevice: 2, leaderChannel: 0, followerChannel: 1, rate: Self.rate)
+        config.runsPerLeadIn = 3
+        config.leadIns = [0.4]
+        config.pauseSeconds = 0
+        config.keepDirectory = dir
+        let calls = CallCounter()
+        let report = try await GroupSkewRunner.run(config, makeDevice: { Self.simulated(followerGain: calls.next() == 2 ? 0 : 0.04) },
+                                                   permission: AlwaysGrantedMicrophone())
+        #expect(report.failures.count == 1)
+        for n in 1...3 { #expect(FileManager.default.fileExists(atPath: dir.appendingPathComponent("run-\(n).wav").path), "run-\(n).wav") }
+
+        let samples: [Float] = [0, 0.5, -0.25, 1, -1, 0.125]
+        let url = dir.appendingPathComponent("plain.wav")
+        try GroupSkew.writeFloatWAV(samples, rate: 44_100, to: url)
+        let file = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
+        #expect(file.fileFormat.sampleRate == 44_100 && file.fileFormat.channelCount == 1 && file.length == AVAudioFramePosition(samples.count))
+        let buffer = try #require(AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(samples.count)))
+        try file.read(into: buffer)
+        #expect(Array(UnsafeBufferPointer(start: buffer.floatChannelData![0], count: samples.count)) == samples)
     }
 
     @Test func aRunNeedsAtLeastOneRunAndDistinctChannels() async {

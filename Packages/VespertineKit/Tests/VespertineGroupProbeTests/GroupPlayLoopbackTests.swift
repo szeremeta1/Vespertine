@@ -175,7 +175,7 @@ final class AggregateLoopbackDevice: RoomCaptureDevice, @unchecked Sendable {
 
 extension GroupPlayLoopbackTests {
     struct DriftCase: Sendable, CustomTestStringConvertible {
-        let drift: GroupAggregate.DriftMode
+        let drift: VespertineGroupProbe.GroupAggregate.DriftMode
         let quality: Int
         var testDescription: String { drift == .off ? "drift off" : "drift on, quality \(quality)" }
     }

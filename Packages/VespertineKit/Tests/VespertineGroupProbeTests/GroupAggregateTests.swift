@@ -12,12 +12,12 @@ import VespertineAudio
 
 @Suite("Group aggregate")
 struct GroupAggregateTests {
-    static func spec(_ uid: String, domain: UInt32 = 0) -> GroupAggregate.Member { .init(uid: uid, clockDomain: domain) }
+    static func spec(_ uid: String, domain: UInt32 = 0) -> VespertineGroupProbe.GroupAggregate.Member { .init(uid: uid, clockDomain: domain) }
 
     // MARK: The description handed to Core Audio
 
     @Test func theAggregateIsPrivateWithTheLeaderAsMain() throws {
-        let d = GroupAggregate.description(name: "Probe", uid: "probe-1", members: [Self.spec("fosi"), Self.spec("fiio")])
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "Probe", uid: "probe-1", members: [Self.spec("fosi"), Self.spec("fiio")])
         #expect(d[kAudioAggregateDeviceIsPrivateKey] as? Int == 1)
         #expect(d[kAudioAggregateDeviceMainSubDeviceKey] as? String == "fosi")
         #expect(d[kAudioAggregateDeviceUIDKey] as? String == "probe-1")
@@ -27,13 +27,13 @@ struct GroupAggregateTests {
     }
 
     @Test func subDevicesKeepTheListOrderBecauseThatIsTheStreamOrder() throws {
-        let d = GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b"), Self.spec("c")])
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b"), Self.spec("c")])
         let list = try #require(d[kAudioAggregateDeviceSubDeviceListKey] as? [[String: Any]])
         #expect(list.compactMap { $0[kAudioSubDeviceUIDKey] as? String } == ["a", "b", "c"])
     }
 
     @Test func theLeaderIsNeverDriftCorrectedAndFollowersAreAtTopQuality() throws {
-        let d = GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")])
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")])
         let list = try #require(d[kAudioAggregateDeviceSubDeviceListKey] as? [[String: Any]])
         #expect(list[0][kAudioSubDeviceDriftCompensationKey] as? Int == 0)
         #expect(list[1][kAudioSubDeviceDriftCompensationKey] as? Int == 1)
@@ -41,29 +41,29 @@ struct GroupAggregateTests {
     }
 
     @Test func aSharedNonZeroClockDomainTurnsDriftCorrectionOffForThatMember() throws {
-        let d = GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a", domain: 5), Self.spec("b", domain: 5), Self.spec("c", domain: 6)])
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a", domain: 5), Self.spec("b", domain: 5), Self.spec("c", domain: 6)])
         let list = try #require(d[kAudioAggregateDeviceSubDeviceListKey] as? [[String: Any]])
         #expect(list.map { $0[kAudioSubDeviceDriftCompensationKey] as? Int } == [0, 0, 1])
     }
 
     @Test func zeroIsNotASharedClockDomain() {
-        #expect(GroupAggregate.driftFlags([Self.spec("a"), Self.spec("b")]) == [false, true])
+        #expect(VespertineGroupProbe.GroupAggregate.driftFlags([Self.spec("a"), Self.spec("b")]) == [false, true])
     }
 
     @Test func driftCanBeForcedOffForExperiments() throws {
-        let d = GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")], drift: .off)
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")], drift: .off)
         let list = try #require(d[kAudioAggregateDeviceSubDeviceListKey] as? [[String: Any]])
         #expect(list.map { $0[kAudioSubDeviceDriftCompensationKey] as? Int } == [0, 0])
     }
 
     @Test func aDifferentQualityIsPassedThrough() throws {
-        let d = GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")], quality: 0x20)
+        let d = VespertineGroupProbe.GroupAggregate.description(name: "P", uid: "p", members: [Self.spec("a"), Self.spec("b")], quality: 0x20)
         let list = try #require(d[kAudioAggregateDeviceSubDeviceListKey] as? [[String: Any]])
         #expect(list[1][kAudioSubDeviceDriftCompensationQualityKey] as? Int == 0x20)
     }
 
     @Test func theUIDIsUniquePerProcessAndLaunch() {
-        let a = GroupAggregate.makeUID(), b = GroupAggregate.makeUID()
+        let a = VespertineGroupProbe.GroupAggregate.makeUID(), b = VespertineGroupProbe.GroupAggregate.makeUID()
         #expect(a != b)
         #expect(a.contains(String(getpid())))
     }
@@ -96,7 +96,7 @@ struct GroupAggregateTests {
     func aRealPrivateAggregateIsCreatedReadAndDestroyed() throws {
         let virtual = OutputDevices.list().filter { $0.transport == .virtual }
         try #require(virtual.count >= 2, "needs two virtual devices (Vespertine Loopback and BlackHole)")
-        let members = Array(virtual.prefix(2)).map { GroupAggregate.Member(uid: $0.uid, clockDomain: 0) }
+        let members = Array(virtual.prefix(2)).map { VespertineGroupProbe.GroupAggregate.Member(uid: $0.uid, clockDomain: 0) }
         let aggregate = try PrivateAggregate.create(members: members, name: "Vespertine group probe test")
         let uid = aggregate.uid
         let states = aggregate.subDeviceStates()

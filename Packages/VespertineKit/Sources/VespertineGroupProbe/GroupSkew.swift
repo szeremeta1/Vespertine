@@ -118,6 +118,20 @@ public enum GroupSkew {
                            followerChirpSeconds: followerChirpSeconds(layout), endSkewFrames: end, memberDriftPPM: drift)
     }
 
+    /// A mono 32-bit float WAVE file of `samples` (the raw capture, for looking at a run afterwards).
+    public static func writeFloatWAV(_ samples: [Float], rate: Double, to url: URL) throws {
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        var data = Data()
+        func u16(_ v: UInt16) { withUnsafeBytes(of: v.littleEndian) { data.append(contentsOf: $0) } }
+        func u32(_ v: UInt32) { withUnsafeBytes(of: v.littleEndian) { data.append(contentsOf: $0) } }
+        let bytes = UInt32(samples.count * 4)
+        data.append(contentsOf: Array("RIFF".utf8)); u32(4 + 8 + 16 + 8 + bytes); data.append(contentsOf: Array("WAVE".utf8))
+        data.append(contentsOf: Array("fmt ".utf8)); u32(16); u16(3); u16(1); u32(UInt32(rate)); u32(UInt32(rate) * 4); u16(4); u16(32)
+        data.append(contentsOf: Array("data".utf8)); u32(bytes)
+        samples.withUnsafeBufferPointer { data.append(UnsafeBufferPointer(start: UnsafeRawPointer($0.baseAddress!).assumingMemoryBound(to: UInt8.self), count: samples.count * 4)) }
+        try data.write(to: url)
+    }
+
     public static func stats(_ values: [Double]) -> Stats? {
         guard let first = values.first else { return nil }
         let mean = values.reduce(0, +) / Double(values.count)
@@ -173,6 +187,8 @@ public struct GroupSkewConfig: Sendable {
     public var control = false
     /// Seconds between the first and the second reference: with this set, each capture also measures the follower's slip.
     public var spanSeconds: Double?
+    /// Where each run's raw capture is saved (`run-N.wav`), failed runs included; nil: nothing is saved.
+    public var keepDirectory: URL?
 
     public init(inputDevice: UInt32, outputDevice: UInt32, leaderChannel: Int, followerChannel: Int, rate: Double) {
         self.inputDevice = inputDevice; self.outputDevice = outputDevice
@@ -223,6 +239,10 @@ public enum GroupSkewRunner {
                                                  outputChannel: config.followerChannel, referenceChannel: config.leaderChannel, layout: layout)
                 do {
                     let recording = try await session.record(request)
+                    if let dir = config.keepDirectory {
+                        let url = dir.appendingPathComponent("run-\(index).wav")
+                        do { try GroupSkew.writeFloatWAV(recording.samples, rate: config.rate, to: url) } catch { progress("run \(index): could not save \(url.path): \(error.localizedDescription)") }
+                    }
                     let m = try GroupSkew.measure(samples: recording.samples, layout: layout, control: config.control, span: config.spanSeconds != nil)
                     runs.append(.init(index: index, leadInSeconds: leadIn, measurement: m))
                     progress(String(format: "run %d (lead-in %.1f s): skew %+.3f frames (%+.1f µs), mic drift %+.1f ppm", index, leadIn, m.skewFrames, m.skewMicroseconds, m.micDriftPPM)
