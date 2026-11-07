@@ -83,14 +83,36 @@ public final class GroupMemberSession: @unchecked Sendable {
         public var streamRates: [Double]
         /// This process holds the member exclusively.
         public var exclusive: Bool
+        /// The shallowest physical format among the member's own streams, read back from them.
+        public var physicalBitDepth: Int
+        public var physicalIsInteger: Bool
+        /// Every one of the member's output streams gave its physical format.
+        public var physicalFormatKnown: Bool
 
-        public init(uid: String, deviceID: AudioObjectID, rateBefore: Double, rate: Double, streamRates: [Double], exclusive: Bool) {
+        public init(uid: String, deviceID: AudioObjectID, rateBefore: Double, rate: Double, streamRates: [Double], exclusive: Bool,
+                    physicalBitDepth: Int = 0, physicalIsInteger: Bool = false, physicalFormatKnown: Bool = false) {
             self.uid = uid
             self.deviceID = deviceID
             self.rateBefore = rateBefore
             self.rate = rate
             self.streamRates = streamRates
             self.exclusive = exclusive
+            self.physicalBitDepth = physicalBitDepth
+            self.physicalIsInteger = physicalIsInteger
+            self.physicalFormatKnown = physicalFormatKnown
+        }
+
+        /// Reads the member's rate and its streams' physical formats from the device now.
+        public mutating func readBack(from device: AudioObjectID) {
+            rate = (try? HAL.get(device, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+            let streams = DeviceQuery.outputStreams(device)
+            let physicals = streams.map { try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()) }
+            streamRates = physicals.map { $0?.mSampleRate ?? 0 }
+            let read = physicals.compactMap { $0 }
+            physicalFormatKnown = !streams.isEmpty && read.count == streams.count
+            let shallowest = read.min { $0.mBitsPerChannel < $1.mBitsPerChannel }
+            physicalBitDepth = Int(shallowest?.mBitsPerChannel ?? 0)
+            physicalIsInteger = shallowest.map { $0.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 } ?? false
         }
 
         /// The member is at `wanted` on the device and on every one of its own streams. A stream at another rate (or none that
@@ -142,10 +164,7 @@ public final class GroupMemberSession: @unchecked Sendable {
                 do { try DeviceControl.setNominalRate(rate, on: device.id) } catch {
                     throw GroupMemberError.rateRefused(uid: device.uid, name: device.name, rate: rate)
                 }
-                done[done.count - 1].rate = (try? HAL.get(device.id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
-                done[done.count - 1].streamRates = DeviceQuery.outputStreams(device.id).map {
-                    (try? HAL.get($0, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()))?.mSampleRate ?? 0
-                }
+                done[done.count - 1].readBack(from: device.id)
             }
         } catch {
             undo()
@@ -156,12 +175,20 @@ public final class GroupMemberSession: @unchecked Sendable {
 
     /// Lets go of the members that are held. Their rates stay as they are until Vespertine quits (`DeviceRestore`). Safe to call
     /// twice.
-    public func release() {
+    /// `keepHolding`: the next group session takes over the holds (a skip to another rate), so they are not let go and taken
+    /// again, which reconfigures a device more than once in a row.
+    public func release(keepHolding: Bool = false) {
         lock.lock()
         defer { lock.unlock() }
         guard !released else { return }
         released = true
+        guard !keepHolding else { return }
         for member in members where member.exclusive { DeviceControl.releaseHog(member.deviceID) }
+    }
+
+    /// The members read again from the devices (rates and formats), in the group's order; for noticing a change.
+    public func readAgain() -> [Member] {
+        members.map { var m = $0; m.readBack(from: $0.deviceID); return m }
     }
 
     deinit { release() }
