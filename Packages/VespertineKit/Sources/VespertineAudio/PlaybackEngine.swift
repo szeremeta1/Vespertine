@@ -1397,7 +1397,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
     private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
         guard let group = currentGroup(of: session) else { return room }
-        return GroupDelay.composing(room, delaysMs: GroupDelay.perChannelMs(group), levelsDB: GroupDelay.perChannelLevelDB(group), name: group.name)
+        return GroupDelay.chain(room, group: group)
     }
 
     /// How long room correction holds sound back on the current output: what the end of the queue plays out.

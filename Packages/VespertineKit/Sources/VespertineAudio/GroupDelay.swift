@@ -57,6 +57,12 @@ public enum GroupDelay {
         for c in 0..<min(levelsDB.count, count) { channels[c].levelDB += levelsDB[c] }
         return RoomCorrectionPlayback(profileID: room?.profileID ?? UUID(uuidString: "00000000-0000-4000-8000-000000670000")!,
                                       name: room?.name ?? name, preampDB: room?.preampDB ?? 0, channels: channels,
-                                      impulseDirectory: room?.impulseDirectory ?? RoomImpulse.defaultDirectory)
+                                      impulseDirectory: room?.impulseDirectory ?? RoomImpulse.defaultDirectory).withHeadroom()
+    }
+
+    /// What the engine runs for `group`: `room` with the group's delays and level trims added (`composing`), whose preamp leaves
+    /// room for the largest boost (`RoomCorrectionPlayback.withHeadroom`). `room` itself when the group adds nothing.
+    public static func chain(_ room: RoomCorrectionPlayback?, group: SpeakerGroup) -> RoomCorrectionPlayback? {
+        composing(room, delaysMs: perChannelMs(group), levelsDB: perChannelLevelDB(group), name: group.name)
     }
 }
