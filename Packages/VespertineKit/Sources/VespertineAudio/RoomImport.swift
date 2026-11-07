@@ -51,6 +51,20 @@ public enum RoomAPO {
         case .lfe: "LFE"
         case .leftSurround: "SL"
         case .rightSurround: "SR"
+        // Equalizer APO's own names for a 7.1 setup; it has none for the rest, which are written as the group's role names.
+        case .sideLeft: "SL"
+        case .sideRight: "SR"
+        case .backLeft: "RL"
+        case .backRight: "RR"
+        case .backCenter: "RC"
+        case .wideLeft: "WL"
+        case .wideRight: "WR"
+        case .topFrontLeft: "TFL"
+        case .topFrontRight: "TFR"
+        case .topMiddleLeft: "TML"
+        case .topMiddleRight: "TMR"
+        case .topBackLeft: "TBL"
+        case .topBackRight: "TBR"
         }
     }
 

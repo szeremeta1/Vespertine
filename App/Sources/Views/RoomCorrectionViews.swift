@@ -20,6 +20,20 @@ extension RoomSpeaker {
         case .lfe: String(localized: "LFE", comment: "Room correction speaker: the subwoofer channel.")
         case .leftSurround: String(localized: "Left surround", comment: "Room correction speaker.")
         case .rightSurround: String(localized: "Right surround", comment: "Room correction speaker.")
+        // The places of a speaker group: plain English, outside the string catalog, like the group's editor (plan item 25 owns the languages).
+        case .sideLeft: "Left side"
+        case .sideRight: "Right side"
+        case .backLeft: "Left back"
+        case .backRight: "Right back"
+        case .backCenter: "Back centre"
+        case .wideLeft: "Left wide"
+        case .wideRight: "Right wide"
+        case .topFrontLeft: "Left top front"
+        case .topFrontRight: "Right top front"
+        case .topMiddleLeft: "Left top middle"
+        case .topMiddleRight: "Right top middle"
+        case .topBackLeft: "Left top back"
+        case .topBackRight: "Right top back"
         }
     }
 
@@ -32,6 +46,19 @@ extension RoomSpeaker {
         case .lfe: "LFE"
         case .leftSurround: "Ls"
         case .rightSurround: "Rs"
+        case .sideLeft: "SL"
+        case .sideRight: "SR"
+        case .backLeft: "BL"
+        case .backRight: "BR"
+        case .backCenter: "BC"
+        case .wideLeft: "WL"
+        case .wideRight: "WR"
+        case .topFrontLeft: "TFL"
+        case .topFrontRight: "TFR"
+        case .topMiddleLeft: "TML"
+        case .topMiddleRight: "TMR"
+        case .topBackLeft: "TBL"
+        case .topBackRight: "TBR"
         }
     }
 
@@ -43,6 +70,11 @@ extension RoomSpeaker {
         case .lfe: Color(red: 0.85, green: 0.7, blue: 1)
         case .leftSurround: Color(red: 0.5, green: 0.9, blue: 0.85)
         case .rightSurround: Color(red: 1, green: 0.82, blue: 0.45)
+        case .sideLeft, .backLeft, .wideLeft: Color(red: 0.5, green: 0.9, blue: 0.85)
+        case .sideRight, .backRight, .wideRight: Color(red: 1, green: 0.82, blue: 0.45)
+        case .backCenter: Color(red: 0.78, green: 0.9, blue: 0.6)
+        case .topFrontLeft, .topMiddleLeft, .topBackLeft: Color(red: 0.7, green: 0.8, blue: 1)
+        case .topFrontRight, .topMiddleRight, .topBackRight: Color(red: 1, green: 0.75, blue: 0.7)
         }
     }
 }
@@ -1006,6 +1038,19 @@ struct RoomPortrait: View {
         case .lfe: CGPoint(x: 0.64, y: 0.09)
         case .leftSurround: CGPoint(x: 0.12, y: 0.62)
         case .rightSurround: CGPoint(x: 0.88, y: 0.62)
+        case .sideLeft: CGPoint(x: 0.08, y: 0.45)
+        case .sideRight: CGPoint(x: 0.92, y: 0.45)
+        case .backLeft: CGPoint(x: 0.2, y: 0.88)
+        case .backRight: CGPoint(x: 0.8, y: 0.88)
+        case .backCenter: CGPoint(x: 0.5, y: 0.9)
+        case .wideLeft: CGPoint(x: 0.1, y: 0.25)
+        case .wideRight: CGPoint(x: 0.9, y: 0.25)
+        case .topFrontLeft: CGPoint(x: 0.35, y: 0.3)
+        case .topFrontRight: CGPoint(x: 0.65, y: 0.3)
+        case .topMiddleLeft: CGPoint(x: 0.35, y: 0.5)
+        case .topMiddleRight: CGPoint(x: 0.65, y: 0.5)
+        case .topBackLeft: CGPoint(x: 0.35, y: 0.7)
+        case .topBackRight: CGPoint(x: 0.65, y: 0.7)
         }
     }
 
