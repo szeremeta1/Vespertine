@@ -46,25 +46,30 @@ mkdir -p $out
 export VESPERTINE_GROUP_PROBE=1
 
 # A 4-channel file with a different tone on each channel (440, 554, 659 and 880 Hz, a second each, in turn, then all four at once),
-# written with the standard library only. Channel order is the group's: the leader's pair first.
+# written with the standard library only. Channel order is the group's: the leader's pair first. Only the quad step plays it, so only
+# that step builds it (it was built for every run, ten seconds of CPU even for `info`).
 quad=${TMPDIR:-/tmp}/speaker-groups-quad.wav   # not kept with the results
+if (( ! dry && ${steps[(Ie)quad]} )); then
 python3 -I - $quad <<'PY'
 import math, struct, sys, wave
 rate = 48000
 w = wave.open(sys.argv[1], "wb"); w.setnchannels(4); w.setsampwidth(3); w.setframerate(rate)
 tones = [440.0, 554.37, 659.25, 880.0]
-def frame(t, active):
-    out = b""
-    for c, f in enumerate(tones):
-        v = int(0.03 * 8388607 * math.sin(2 * math.pi * f * t)) if c in active else 0
-        out += struct.pack("<i", v)[:3]
-    return out
-body = b""
-for part, active in enumerate([[0], [1], [2], [3], [0, 1, 2, 3]]):
-    for n in range(rate):
-        body += frame(n / rate, active)
-w.writeframes(body); w.close()
+# One second of each tone as 24-bit samples, split into its three byte lanes: a part's frames are filled by strided copies.
+lanes = []
+for f in tones:
+    raw = b"".join(struct.pack("<i", int(0.03 * 8388607 * math.sin(2 * math.pi * f * (n / rate))))[:3] for n in range(rate))
+    lanes.append([raw[k::3] for k in range(3)])
+body = bytearray()
+for active in [[0], [1], [2], [3], [0, 1, 2, 3]]:
+    part = bytearray(rate * 12)
+    for c in active:
+        for k in range(3):
+            part[c * 3 + k::12] = lanes[c][k]
+    body += part
+w.writeframes(bytes(body)); w.close()
 PY
+fi
 
 run() {  # run <name> <command…>: log to $out/<name>.txt, show it, keep going on a failure (the log says so)
   local name=$1; shift
