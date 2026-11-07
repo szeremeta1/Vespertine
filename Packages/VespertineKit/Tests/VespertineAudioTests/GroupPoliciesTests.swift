@@ -109,5 +109,6 @@ struct GroupPoliciesTests {
         #expect(GroupPolicies.stereoNote.contains("first two channels"))
         #expect(GroupPolicies.lfeNote.contains("saved"))
         #expect(!GroupPolicies.lossNote.contains("not played"))
+        #expect(GroupPolicies.playedToday.contains("delays") && GroupPolicies.playedToday.contains("not applied"))
     }
 }

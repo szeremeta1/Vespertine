@@ -69,6 +69,8 @@ struct SpeakerReadoutView: View {
                 }
                 Text(verbatim: "The speakers nearer the seat wait for the farthest one and are turned down by the difference, so nothing is ever boosted.")
                     .font(.caption).foregroundStyle(.secondary)
+                Text(verbatim: GroupPolicies.playedToday)
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
     }

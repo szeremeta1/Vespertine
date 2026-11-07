@@ -175,5 +175,8 @@ public enum GroupPolicies {
         return result
     }
 
+    /// What a group's per-speaker settings do in playback today.
+    public static let playedToday = "Today the delays shown here are played (the waits and the delay trims). Level trims and polarity are saved with the group but not applied yet."
+
     public static let lossNote = "Played by the engine: a lost output pauses the group or moves it to the rest, and it moves back when the output returns."
 }

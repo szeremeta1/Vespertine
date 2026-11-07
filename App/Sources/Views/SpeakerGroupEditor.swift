@@ -50,7 +50,8 @@ struct ChannelMapGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Channels").font(.headline)
-            Text(verbatim: "Choose which speaker is on each channel of each output.").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Choose which speaker is on each channel of each output. Polarity is saved with the group; playback does not apply it yet.")
+                .font(.caption).foregroundStyle(.secondary)
             Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
                 GridRow {
                     Text(verbatim: "Output channel").font(.caption).foregroundStyle(.secondary)
