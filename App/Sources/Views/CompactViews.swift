@@ -224,6 +224,7 @@ struct PlaybackSettings: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             TransitionsSettingsSection()
+            SpeakerGroupsSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
                     Text("Rendered by macOS (objects)").tag(true)

@@ -155,6 +155,10 @@ final class AppSettings {
     /// Song transitions exist in the app only while this is on (Settings › Playback › Transitions), off by default: off,
     /// there is no menu item, button, setting, Shortcuts action or string for them, and playback is untouched.
     var transitionsFeature: Bool { didSet { defaults.set(transitionsFeature, forKey: "transitionsFeature") } }
+    /// Speaker groups (several DACs played as one system) are in the app only while this is on. It has no switch in Settings
+    /// yet: turn it on with `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES`. Off, there is no
+    /// setting, menu item or string for them, and nothing about them is read or written.
+    var speakerGroupsFeature: Bool { didSet { defaults.set(speakerGroupsFeature, forKey: "speakerGroupsFeature") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -200,7 +204,7 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -273,6 +277,7 @@ final class AppSettings {
         visualizer = VisualizerSettings.load(from: defaults)
         visualizerWindow = VisualizerWindowState.load(from: defaults)
         transitionsFeature = defaults.bool(forKey: "transitionsFeature")
+        speakerGroupsFeature = defaults.bool(forKey: "speakerGroupsFeature")
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).
