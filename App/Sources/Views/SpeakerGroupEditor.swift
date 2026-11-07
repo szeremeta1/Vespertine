@@ -78,7 +78,7 @@ struct ChannelMapGrid: View {
                             Image(systemName: identifier.playing == row.aggregateChannel ? "speaker.wave.2.fill" : "speaker.wave.2")
                         }
                         .buttonStyle(.borderless)
-                        .help("Play a quiet tone on this channel only")
+                        .help(Text(verbatim: "Play a quiet tone on this channel only"))
                         .accessibilityLabel(Text(verbatim: "Identify \(row.label)"))
                     }
                 }

@@ -20,7 +20,7 @@ struct SpeakerPresetMenu: View {
             }
         } label: { Text(verbatim: "Lay out with a preset…") }
         .disabled(presets.isEmpty)
-        .help(presets.isEmpty ? "A preset needs at least four channels." : "Places the speakers on the channels in order, around the seat.")
+        .help(presets.isEmpty ? Text(verbatim: "A preset needs at least four channels.") : Text(verbatim: "Places the speakers on the channels in order, around the seat."))
     }
 }
 

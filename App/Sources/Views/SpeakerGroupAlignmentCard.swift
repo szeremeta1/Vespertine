@@ -29,7 +29,7 @@ struct SpeakerGroupAlignmentCard: View {
             if let label = Self.buttonTitle(state) {
                 Button { model.useDrawing(of: group) } label: { Text(verbatim: label) }
                     .controlSize(.small)
-                    .help("Delays and levels worked out from where the speakers and the seat are drawn; no microphone needed")
+                    .help(Text(verbatim: "Delays and levels worked out from where the speakers and the seat are drawn; no microphone needed"))
             }
         }
         .padding(16)
