@@ -43,7 +43,7 @@ public struct RoomMeasurementResult: Sendable {
         }
         let design = try RoomFilterDesigner.design(channels: curves, options: options)
         var profile = design.profile(name: name, sessionID: session.id, deviceUID: session.deviceUID, channelMap: map, micSerial: micSerial,
-                                     calibrationSHA256: session.mic.calibrationSHA256, createdAt: createdAt)
+                                     calibrationSHA256: session.mic.calibrationSHA256, createdAt: createdAt, layout: session.layout)
         profile.measured = curves
         profile.positionCurves = RoomProfile.positionCurves(from: try responses.mapValues { try $0.mapValues { try RoomCurve($0) } })
         profile.designOptions = options

@@ -793,6 +793,7 @@ struct RoomSpeakerTable: View {
 /// the result revealed as the measurement morphs into the prediction.
 struct RoomMeasureWizard: View {
     @Environment(RoomMeasureModel.self) private var model
+    @Environment(AppModel.self) private var app
     let device: OutputDevice?
     let save: (RoomProfile, Bool) -> Void
     let close: () -> Void
@@ -819,7 +820,24 @@ struct RoomMeasureWizard: View {
         .background(Palette.window)
         .onAppear {
             model.preferredOutputUID = device?.uid
+            setGroupTarget()
             model.startIfLaunched()
+        }
+        .onDisappear { if model.groupTarget != nil, model.phase != .finished { model.reset() } }
+    }
+
+    /// A group's output is measured as the group (its layout, its outputs, a private aggregate of its members), not as one device.
+    private func setGroupTarget() {
+        model.groupProblem = nil
+        guard let device, let group = app.group(for: device) else { model.groupTarget = nil; return }
+        switch GroupOutput.resolve(group, among: app.devices.devices) {
+        case .ready(_, let members): model.groupTarget = (group, members)
+        case .missing(let names):
+            model.groupTarget = (group, [])
+            model.groupProblem = "These outputs of \(group.name) aren't connected: \(names.joined(separator: ", "))."
+        default:
+            model.groupTarget = (group, [])
+            model.groupProblem = "\(group.name) can't be opened right now."
         }
     }
 
@@ -867,14 +885,22 @@ struct RoomMeasureWizard: View {
         return HStack(alignment: .top, spacing: 20) {
             VStack(alignment: .leading, spacing: 10) {
                 portrait.frame(width: 300, height: 300)
-                Picker("Speakers", selection: $model.layout) {
-                    Text("Stereo").tag(RoomLayout.stereo)
-                    Text("5.1 surround").tag(RoomLayout.surround51)
+                if let group = model.groupTarget?.group {
+                    Text(verbatim: "Speaker group “\(group.name)”: measured as you drew it (\(group.speakers.count) speakers, on its outputs in order).")
+                        .font(Typeface.ui(12)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true).frame(width: 300, alignment: .leading)
+                    if let problem = model.groupProblem {
+                        Text(verbatim: problem).font(Typeface.ui(12)).foregroundStyle(Palette.copper).frame(width: 300, alignment: .leading)
+                    }
+                } else {
+                    Picker("Speakers", selection: $model.layout) {
+                        Text("Stereo").tag(RoomLayout.stereo)
+                        Text("5.1 surround").tag(RoomLayout.surround51)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 300)
+                    .disabled(!surroundPossible)
+                    .onAppear { if !surroundPossible { model.layout = .stereo } }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 300)
-                .disabled(!surroundPossible)
-                .onAppear { if !surroundPossible { model.layout = .stereo } }
                 Stepper("Spots around your seat: \(model.positions)", value: $model.positions, in: 1...RoomMeasureLaunch.maxPositions)
                     .font(Typeface.ui(12))
             }

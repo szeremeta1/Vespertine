@@ -61,6 +61,13 @@ final class RoomMeasureModel {
     @ObservationIgnored var preferredOutputUID: String?
     /// Pauses Vespertine's playback before the measurement takes the output.
     @ObservationIgnored var pausePlayback: (@MainActor () -> Void)?
+    /// A speaker group to measure instead of a single output: the group, and its members as Core Audio lists them, in the group's
+    /// order. nil for a single output. The layout and channel map then come from the group, not from the picker.
+    @ObservationIgnored var groupTarget: (group: SpeakerGroup, members: [OutputDevice])?
+    /// Why the group can't be measured now (a member isn't connected), shown when the measurement starts.
+    @ObservationIgnored var groupProblem: String?
+    /// Seconds of the group's settle left, while it plays before the first sweep.
+    var settleRemaining: Int?
 
     @ObservationIgnored private var controller: RoomMeasurementController?
     @ObservationIgnored private var capture: RoomCaptureSession?
@@ -72,6 +79,7 @@ final class RoomMeasureModel {
     @ObservationIgnored private var speakers: [RoomSpeaker] = []
     @ObservationIgnored private var outputName = ""
     @ObservationIgnored private var micSerial = ""
+    @ObservationIgnored private var groupOutput: GroupMeasurementOutput?
 
     init(arguments: [String] = ProcessInfo.processInfo.arguments) {
         launch = RoomMeasureLaunch.parse(arguments)
@@ -118,13 +126,25 @@ final class RoomMeasureModel {
         runTask = Task { [weak self] in await self?.drive(controller) }
     }
 
-    func cancel() { controller?.cancel() }
+    func cancel() {
+        controller?.cancel()
+        // Before the controller exists the group is still settling; stopping that ends the run.
+        if controller == nil { runTask?.cancel() }
+    }
+
+    /// Lets go of the group's aggregate and its members, if a group is being measured. Safe to call again.
+    func releaseGroup() {
+        groupOutput?.release()
+        groupOutput = nil
+        settleRemaining = nil
+    }
 
     /// Back to the start, ready for another measurement (anything running is cancelled first).
     func reset() {
         controller?.cancel()
         runTask?.cancel()
         pollTask?.cancel()
+        releaseGroup()
         controller = nil
         capture = nil
         phase = .ready
@@ -155,6 +175,7 @@ final class RoomMeasureModel {
     // MARK: Set up
 
     private func fail(_ message: String) {
+        releaseGroup()
         phase = .failed
         headline = String(localized: "Can't measure yet")
         detail = message
@@ -164,6 +185,7 @@ final class RoomMeasureModel {
     private func setUpAndRun(micName: String) async {
         // Devices.
         let mic: RoomAudioDevice, output: RoomAudioDevice
+        var groupSetup: GroupMeasurement.Setup?
         if simulate {
             mic = RoomAudioDevice(id: 1, name: "Simulated microphone", uid: "sim-mic", channels: 1, nominalRate: 48_000)
             output = RoomAudioDevice(id: 2, name: "Simulated speakers", uid: "sim-out", channels: 2, nominalRate: 48_000)
@@ -171,13 +193,35 @@ final class RoomMeasureModel {
             guard let found = RoomDeviceDirectory.inputDevice(named: micName) else {
                 return fail(String(localized: "No microphone named “\(micName)” is connected. Plug in the UMIK-1 and try again."))
             }
-            guard let out = preferredOutputUID.flatMap(RoomDeviceDirectory.output(uid:)) ?? RoomDeviceDirectory.defaultOutput() else {
-                return fail(String(localized: "There is no default output device."))
-            }
             mic = found
-            output = out
+            if let target = groupTarget {
+                // A speaker group: measured as its own layout, on its own outputs, through a private aggregate of its members.
+                switch GroupMeasurement.setup(for: target.group) {
+                case .failure(let problem): return fail(problem.description)
+                case .success(let setup):
+                    guard let members = target.members.first else { return fail(groupProblem ?? "The group's outputs aren't all connected.") }
+                    let measuringRate: Double
+                    do { measuringRate = try CoreAudioRoomDevice.measurementRate(inputDevice: mic.id, outputDevice: members.id) }
+                    catch { return fail(String(localized: "\(mic.name) can't be recorded for this measurement: \(error.localizedDescription)")) }
+                    do {
+                        let opened = try GroupMeasurementOutput.open(group: target.group, devices: target.members, rate: measuringRate)
+                        groupOutput = opened
+                        try opened.startHold()
+                        output = RoomAudioDevice(id: opened.deviceID, name: target.group.name, uid: setup.deviceUID, channels: opened.channels, nominalRate: measuringRate)
+                    } catch {
+                        return fail("The group couldn't be opened for the measurement: \(error.localizedDescription)")
+                    }
+                    groupSetup = setup
+                    layout = setup.layout
+                }
+            } else {
+                guard let out = preferredOutputUID.flatMap(RoomDeviceDirectory.output(uid:)) ?? RoomDeviceDirectory.defaultOutput() else {
+                    return fail(String(localized: "There is no default output device."))
+                }
+                output = out
+            }
         }
-        let needed = layout.speakers.count
+        let needed = groupSetup?.outputsNeeded ?? layout.speakers.count
         guard output.channels >= needed else {
             return fail(String(localized: "\(output.name) has \(output.channels) output channel(s); this measurement needs \(needed)."))
         }
@@ -188,6 +232,8 @@ final class RoomMeasureModel {
         let rate: Double
         if simulate {
             rate = outputRate
+        } else if groupSetup != nil {
+            rate = outputRate   // the group was opened at the rate the microphone records at
         } else {
             do { rate = try CoreAudioRoomDevice.measurementRate(inputDevice: mic.id, outputDevice: output.id) }
             catch { return fail(String(localized: "\(mic.name) can't be recorded for this measurement: \(error.localizedDescription)")) }
@@ -213,7 +259,9 @@ final class RoomMeasureModel {
         var settings = RoomMeasurementSettings(inputDevice: mic.id, outputDevice: output.id)
         settings.sampleRate = rate
         settings.positions = positions
-        let session = RoomSession(id: UUID(), createdAt: Date(), deviceUID: output.uid, layout: layout, channelMap: .standard(layout),
+        settings.referenceSpeaker = groupSetup?.referenceSpeaker
+        let session = RoomSession(id: UUID(), createdAt: Date(), deviceUID: groupSetup?.deviceUID ?? output.uid, layout: layout,
+                                  channelMap: groupSetup?.channelMap ?? .standard(layout),
                                   mic: cal.mic(orientation: .upward), target: RoomFilterDesignOptions.default.target.roomTarget)
         outputName = output.name
         micSerial = serial
@@ -229,13 +277,36 @@ final class RoomMeasureModel {
         steps = Self.plan(speakers: speakers, positions: positions).map { StepRow(step: $0, status: .pending) }
         deviceLines = [
             String(localized: "Microphone: \(mic.name) (serial \(serial), \(Int(cal.points.count)) calibration points, mic pointing up)"),
-            String(localized: "Output: \(output.name) at \(Int(outputRate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
+            groupSetup != nil
+                ? "Output: the group \(output.name) at \(Int(outputRate)) Hz, \(needed) channels on its outputs in the group's order; timing tones from \(groupSetup?.referenceSpeaker.rawValue ?? "the leader") on the clock leader"
+                : String(localized: "Output: \(output.name) at \(Int(outputRate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
             String(localized: "Measuring at \(Int(rate)) Hz, the rate the microphone records at; the output keeps its own rate."),
             String(localized: "Saving to \((folder.path as NSString).abbreviatingWithTildeInPath)"),
         ]
         try? "\(folder.path)\n".write(to: root.appendingPathComponent("last-run.txt"), atomically: true, encoding: .utf8)
         startPolling()
+        if groupSetup != nil, !(await settle()) { return }
         await drive(controller)
+    }
+
+    /// The group plays silence for `GroupMeasurement.settleSeconds` before the first sweep, so the followers' drift correction has
+    /// settled. False when stopped meanwhile.
+    private func settle() async -> Bool {
+        let total = Int(GroupMeasurement.settleSeconds)
+        for left in stride(from: total, through: 1, by: -1) {
+            if Task.isCancelled { break }
+            settleRemaining = left
+            headline = "Letting the speakers settle"
+            detail = "The group plays silence for \(total) seconds so the second DAC is in step with the first. \(left) s left."
+            try? await Task.sleep(for: .seconds(1))
+        }
+        settleRemaining = nil
+        if Task.isCancelled {
+            // Nothing was captured: back to the start, with the group let go (a retry would play to an aggregate that is gone).
+            reset()
+            return false
+        }
+        return true
     }
 
     static func plan(speakers: [RoomSpeaker], positions: Int) -> [RoomMeasurementStep] {
@@ -399,6 +470,7 @@ final class RoomMeasureModel {
             }.value
             if let first = written.first { plot = NSImage(contentsOf: first.plot) }
             draft = profile
+            releaseGroup()
             phase = .finished
             headline = String(localized: "Measurement complete")
             detail = String(localized: "Raw captures, the session file, the calibrated responses and the designed profile are in the measurement folder.")
