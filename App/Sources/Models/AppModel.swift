@@ -222,6 +222,8 @@ final class AppModel {
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
     var showConnectServer = false
+    /// The Remove Missing Songs… confirmation (an alert on the main window while non-nil): what removing would take.
+    var missingSongsPrompt: MissingSongsPrompt?
     var showLoopbackTest = false
     /// The note shown the first time transitions are turned on, and the window it's shown in.
     var transitionsNote = TransitionsNote()
@@ -519,6 +521,16 @@ final class AppModel {
     /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).
     func engineSpatialMode(for device: OutputDevice) -> SpatialMode {
         settings.engineSettings().spatialMode(for: device)
+    }
+
+    struct MissingSongsPrompt: Identifiable {
+        let id = UUID()
+        let summary: MissingSongsSummary
+    }
+
+    /// Remove Missing Songs…: counts the songs whose files are gone and asks before removing them.
+    func askToRemoveMissingSongs() {
+        Task { missingSongsPrompt = MissingSongsPrompt(summary: await library.missingSongsSummary()) }
     }
 
     func selectDevice(_ uid: String?) {

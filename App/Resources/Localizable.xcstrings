@@ -395920,274 +395920,6 @@
         }
       }
     },
-    "Upmixes stereo and mono songs to 5.1 for Spatial Audio. Needs Spatial Audio on. Off plays them as they are.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ስቲሪዮ እና ሞኖ ዘፈኖችን ለSpatial Audio ወደ 5.1 ያሰፋል። Spatial Audio መብራት አለበት። ሲጠፋ እንዳሉ ይጫወታሉ።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يحوّل أغاني الستيريو والأحادية إلى 5.1 للصوت المكاني. يتطلب تشغيل الصوت المكاني. عند الإيقاف تُشغَّل كما هي."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "স্টেরিও ও মোনো গানকে স্পেশিয়াল অডিওর জন্য 5.1-এ আপমিক্স করে। স্পেশিয়াল অডিও চালু থাকা দরকার। বন্ধ থাকলে যেমন আছে তেমনই বাজে।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Převádí stereo a mono skladby na 5.1 pro prostorový zvuk. Vyžaduje zapnutý prostorový zvuk. Při vypnutí hrají tak, jak jsou."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opmikser stereo- og mononumre til 5.1 til rumlig lyd. Kræver at rumlig lyd er slået til. Fra afspiller dem, som de er."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mischt Stereo- und Monotitel für 3D-Audio auf 5.1 hoch. 3D-Audio muss eingeschaltet sein. „Aus“ spielt sie unverändert."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Μετατρέπει στερεοφωνικά και μονοφωνικά τραγούδια σε 5.1 για τον χωρικό ήχο. Απαιτεί ενεργό χωρικό ήχο. Όταν είναι ανενεργό, παίζουν όπως είναι."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Convierte canciones estéreo y mono a 5.1 para el audio espacial. Requiere el audio espacial activado. Si está desactivado, se reproducen tal cual."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آهنگ‌های استریو و مونو را برای صدای فضایی به 5.1 تبدیل می‌کند. صدای فضایی باید روشن باشد. در حالت خاموش، همان‌طور که هستند پخش می‌شوند."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Miksaa stereo- ja monokappaleet 5.1:ksi tilaääntä varten. Vaatii tilaäänen päälle. Pois toistaa ne sellaisinaan."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ina-upmix ang mga stereo at mono na kanta sa 5.1 para sa Spatial Audio. Kailangang naka-on ang Spatial Audio. Kapag naka-off, pinapatugtog ang mga ito nang walang pagbabago."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Convertit les morceaux stéréo et mono en 5.1 pour l’audio spatial. Nécessite l’audio spatial activé. Désactivé, ils sont lus tels quels."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "સ્ટીરિયો અને મોનો ગીતોને સ્પેશિયલ ઑડિયો માટે 5.1માં અપમિક્સ કરે છે. સ્પેશિયલ ઑડિયો ચાલુ હોવો જરૂરી છે. બંધ હોય ત્યારે તે જેમ છે તેમ વાગે છે."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yana faɗaɗa waƙoƙin sitiriyo da mono zuwa 5.1 don Spatial Audio. Yana buƙatar kunna Spatial Audio. Idan a kashe, ana kunna su yadda suke."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ממיר שירי סטריאו ומונו ל־5.1 לשמע מרחבי. נדרש שמע מרחבי מופעל. כשהאפשרות כבויה, הם מושמעים כפי שהם."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्टीरियो और मोनो गानों को स्पेशियल ऑडियो के लिए 5.1 में अपमिक्स करता है। स्पेशियल ऑडियो चालू होना चाहिए। बंद होने पर वे जैसे हैं वैसे ही चलते हैं।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A sztereó és mono dalokat 5.1-re keveri fel a térhatású hanghoz. Ehhez a térhatású hangnak bekapcsolva kell lennie. Kikapcsolva változatlanul szólnak."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mengubah lagu stereo dan mono menjadi 5.1 untuk Audio Spasial. Memerlukan Audio Spasial aktif. Jika mati, lagu diputar apa adanya."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Converte i brani stereo e mono in 5.1 per l’audio spaziale. Richiede l’audio spaziale attivo. Se disattivato, li riproduce così come sono."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ステレオとモノラルの曲を空間オーディオ用に5.1にアップミックスします。空間オーディオをオンにする必要があります。オフにすると、そのまま再生します。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಸ್ಟೀರಿಯೋ ಮತ್ತು ಮೋನೋ ಹಾಡುಗಳನ್ನು ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋಗಾಗಿ 5.1 ಗೆ ಅಪ್‌ಮಿಕ್ಸ್ ಮಾಡುತ್ತದೆ. ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ಆನ್ ಆಗಿರಬೇಕು. ಆಫ್ ಇದ್ದರೆ ಅವು ಇದ್ದಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತವೆ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "스테레오와 모노 곡을 공간 음향용 5.1로 업믹스합니다. 공간 음향이 켜져 있어야 합니다. 끄면 원래대로 재생합니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "സ്റ്റീരിയോ, മോണോ പാട്ടുകളെ സ്പേഷ്യൽ ഓഡിയോയ്ക്കായി 5.1 ആയി അപ്‌മിക്സ് ചെയ്യുന്നു. സ്പേഷ്യൽ ഓഡിയോ ഓണായിരിക്കണം. ഓഫാണെങ്കിൽ അവ അതേപടി പ്ലേ ചെയ്യും."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "स्टिरिओ आणि मोनो गाणी स्पेशियल ऑडिओसाठी 5.1 मध्ये अपमिक्स करते. स्पेशियल ऑडिओ सुरू असणे आवश्यक आहे. बंद असल्यास ती जशी आहेत तशी वाजतात."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Menukar lagu stereo dan mono kepada 5.1 untuk Audio Ruang. Memerlukan Audio Ruang dihidupkan. Mati memainkannya seperti asal."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oppmikser stereo- og monosanger til 5.1 for romlig lyd. Krever at romlig lyd er på. Av spiller dem som de er."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mixt stereo- en mononummers op naar 5.1 voor ruimtelijke audio. Ruimtelijke audio moet aan staan. ‘Uit’ speelt ze zoals ze zijn."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਸਟੀਰੀਓ ਅਤੇ ਮੋਨੋ ਗੀਤਾਂ ਨੂੰ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਲਈ 5.1 ਵਿੱਚ ਅੱਪਮਿਕਸ ਕਰਦਾ ਹੈ। ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਚਾਲੂ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ। ਬੰਦ ਹੋਣ ’ਤੇ ਉਹ ਜਿਵੇਂ ਹਨ ਉਵੇਂ ਹੀ ਚੱਲਦੇ ਹਨ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Przekształca utwory stereo i mono w 5.1 dla dźwięku przestrzennego. Wymaga włączonego dźwięku przestrzennego. Po wyłączeniu grają bez zmian."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Converte músicas estéreo e mono em 5.1 para o Áudio Espacial. Requer o Áudio Espacial ativado. Desativado, toca como estão."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Converte músicas estéreo e mono em 5.1 para o áudio espacial. Requer o áudio espacial ativado. Desativado reproduz como estão."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Transformă melodiile stereo și mono în 5.1 pentru audio spațial. Necesită audio spațial activat. Dezactivat le redă așa cum sunt."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mixar upp stereo- och monolåtar till 5.1 för rumsligt ljud. Kräver att rumsligt ljud är på. Av spelar dem som de är."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hupanua nyimbo za stereo na mono hadi 5.1 kwa Spatial Audio. Inahitaji Spatial Audio iwe imewashwa. Ikizimwa, huchezwa kama zilivyo."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ஸ்டீரியோ மற்றும் மோனோ பாடல்களை ஸ்பேஷியல் ஆடியோவுக்காக 5.1 ஆக அப்மிக்ஸ் செய்கிறது. ஸ்பேஷியல் ஆடியோ இயக்கத்தில் இருக்க வேண்டும். ஆஃப் எனில் அவை உள்ளபடியே இயங்கும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "స్టీరియో, మోనో పాటలను స్పేషియల్ ఆడియో కోసం 5.1కి అప్‌మిక్స్ చేస్తుంది. స్పేషియల్ ఆడియో ఆన్‌లో ఉండాలి. ఆఫ్‌లో ఉంటే అవి ఉన్నట్లుగానే ప్లే అవుతాయి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "อัปมิกซ์เพลงสเตอริโอและโมโนเป็น 5.1 สำหรับเสียงตามตำแหน่ง ต้องเปิดเสียงตามตำแหน่งไว้ เมื่อปิด จะเล่นตามต้นฉบับ"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stereo ve mono şarkıları Uzamsal Ses için 5.1'e yükseltir. Uzamsal Ses'in açık olması gerekir. Kapalıyken oldukları gibi çalınır."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Перетворює стерео- та монопісні на 5.1 для просторового аудіо. Потрібне ввімкнене просторове аудіо. Якщо вимкнено, вони звучать як є."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اسٹیریو اور مونو گانوں کو اسپیشل آڈیو کے لیے 5.1 میں اپ مکس کرتا ہے۔ اسپیشل آڈیو آن ہونا ضروری ہے۔ بند ہونے پر وہ جیسے ہیں ویسے ہی چلتے ہیں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chuyển bài hát stereo và mono thành 5.1 cho Âm thanh không gian. Cần bật Âm thanh không gian. Khi tắt, bài hát được phát nguyên bản."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "將立體聲及單聲道歌曲升混為 5.1，用於空間音訊。需要開啟空間音訊。關閉時按原樣播放。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "将立体声和单声道歌曲上混为 5.1，用于空间音频。需要开启空间音频。关闭时按原样播放。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "將立體聲和單聲道歌曲升混為 5.1，用於空間音訊。需要開啟空間音訊。關閉時按原樣播放。"
-          }
-        }
-      }
-    },
     "Waves": {
       "comment": "Visualizer Club mode: wavy laser beams drifting through haze.",
       "localizations": {
@@ -468739,6 +468471,1882 @@
           "stringUnit": {
             "state": "translated",
             "value": "進階控制項在下方"
+          }
+        }
+      }
+    },
+    "Remove Missing Songs…": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የጠፉ ዘፈኖችን አስወግድ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إزالة الأغاني المفقودة…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অনুপস্থিত গান সরান…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odebrat chybějící skladby…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern manglende sange…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehlende Titel entfernen …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αφαίρεση τραγουδιών που λείπουν…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar canciones que faltan…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حذف آهنگ‌های گم‌شده…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poista puuttuvat kappaleet…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alisin ang Mga Nawawalang Kanta…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer les morceaux manquants…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ખૂટતાં ગીતો દૂર કરો…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cire Waƙoƙin da Suka Ɓace…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסרת שירים חסרים…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गायब गाने हटाएँ…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiányzó dalok eltávolítása…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus Lagu yang Hilang…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimuovi brani mancanti…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "見つからない曲を削除…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕಾಣೆಯಾದ ಹಾಡುಗಳನ್ನು ತೆಗೆದುಹಾಕಿ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "누락된 곡 제거…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കാണാതായ പാട്ടുകൾ നീക്കം ചെയ്യുക…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गहाळ गाणी काढा…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alih Keluar Lagu yang Hilang…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern manglende sanger…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ontbrekende nummers verwijderen…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੁੰਮ ਗੀਤ ਹਟਾਓ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usuń brakujące utwory…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover Músicas Ausentes…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover Músicas em Falta…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimină melodiile lipsă…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta bort saknade låtar…"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ondoa Nyimbo Zilizokosekana…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "காணாமல் போன பாடல்களை நீக்கு…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనిపించని పాటలను తీసివేయండి…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลบเพลงที่ไม่พบไฟล์…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksik Şarkıları Kaldır…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вилучити відсутні пісні…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غائب گانے ہٹائیں…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa bài hát bị thiếu…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除遺失的歌曲…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除缺失的歌曲…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除遺失的歌曲…"
+          }
+        }
+      }
+    },
+    "Remove Missing Songs?": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የጠፉ ዘፈኖች ይወገዱ?"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل تريد إزالة الأغاني المفقودة؟"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অনুপস্থিত গান সরাবেন?"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odebrat chybějící skladby?"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern manglende sange?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehlende Titel entfernen?"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αφαίρεση τραγουδιών που λείπουν;"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar las canciones que faltan?"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌های گم‌شده حذف شوند؟"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poistetaanko puuttuvat kappaleet?"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alisin ang mga nawawalang kanta?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer les morceaux manquants ?"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ખૂટતાં ગીતો દૂર કરવા છે?"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cire waƙoƙin da suka ɓace?"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "להסיר את השירים החסרים?"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गायब गाने हटाएँ?"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eltávolítja a hiányzó dalokat?"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus lagu yang hilang?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimuovere i brani mancanti?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "見つからない曲を削除しますか？"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕಾಣೆಯಾದ ಹಾಡುಗಳನ್ನು ತೆಗೆದುಹಾಕಬೇಕೆ?"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "누락된 곡을 제거하시겠습니까?"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കാണാതായ പാട്ടുകൾ നീക്കം ചെയ്യണോ?"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गहाळ गाणी काढायची?"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alih keluar lagu yang hilang?"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vil du fjerne manglende sanger?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ontbrekende nummers verwijderen?"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੁੰਮ ਗੀਤ ਹਟਾਉਣੇ ਹਨ?"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usunąć brakujące utwory?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover as músicas ausentes?"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover as músicas em falta?"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimini melodiile lipsă?"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vill du ta bort saknade låtar?"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ondoa nyimbo zilizokosekana?"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "காணாமல் போன பாடல்களை நீக்கவா?"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనిపించని పాటలను తీసివేయాలా?"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลบเพลงที่ไม่พบไฟล์ใช่ไหม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksik şarkılar kaldırılsın mı?"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вилучити відсутні пісні?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غائب گانے ہٹائیں؟"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa các bài hát bị thiếu?"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要移除遺失的歌曲嗎？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要移除缺失的歌曲吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要移除遺失的歌曲嗎？"
+          }
+        }
+      }
+    },
+    "No Missing Songs": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የጠፉ ዘፈኖች የሉም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد أغانٍ مفقودة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কোনো অনুপস্থিত গান নেই"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Žádné chybějící skladby"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen manglende sange"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine fehlenden Titel"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν λείπουν τραγούδια"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No falta ninguna canción"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ گم‌شده‌ای نیست"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei puuttuvia kappaleita"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang Nawawalang Kanta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun morceau manquant"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કોઈ ગીત ખૂટતું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu Waƙoƙin da Suka Ɓace"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין שירים חסרים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई गाना गायब नहीं है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nincs hiányzó dal"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak Ada Lagu yang Hilang"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun brano mancante"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "見つからない曲はありません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಯಾವುದೇ ಹಾಡು ಕಾಣೆಯಾಗಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "누락된 곡 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കാണാതായ പാട്ടുകളില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोणतेही गाणे गहाळ नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada Lagu yang Hilang"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen manglende sanger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen ontbrekende nummers"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਗੀਤ ਗੁੰਮ ਨਹੀਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brak brakujących utworów"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma Música Ausente"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhuma Música em Falta"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicio melodie lipsă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inga saknade låtar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna Nyimbo Zilizokosekana"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "காணாமல் போன பாடல்கள் இல்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కనిపించని పాటలు లేవు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มีเพลงที่ไม่พบไฟล์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eksik Şarkı Yok"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Немає відсутніх пісень"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی گانا غائب نہیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có bài hát bị thiếu"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有遺失的歌曲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有缺失的歌曲"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有遺失的歌曲"
+          }
+        }
+      }
+    },
+    "Every song in the library has its file.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በቤተ-መጻሕፍቱ ውስጥ ያሉ ሁሉም ዘፈኖች ፋይላቸው አላቸው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لكل أغنية في المكتبة ملفها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লাইব্রেরির প্রতিটি গানের ফাইল আছে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Každá skladba v knihovně má svůj soubor."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle sange i biblioteket har deres fil."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeder Titel in der Mediathek hat seine Datei."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κάθε τραγούδι της βιβλιοθήκης έχει το αρχείο του."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas las canciones de la biblioteca tienen su archivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هر آهنگ کتابخانه فایل خودش را دارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jokaisella kirjaston kappaleella on tiedostonsa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "May file ang bawat kanta sa library."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque morceau de la bibliothèque a son fichier."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લાઇબ્રેરીના દરેક ગીતની ફાઇલ છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kowace waƙa a cikin ɗakin karatu tana da fayil ɗinta."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לכל שיר בספרייה יש את הקובץ שלו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लाइब्रेरी के हर गाने की फ़ाइल मौजूद है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A könyvtár minden dalához megvan a fájl."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap lagu di pustaka memiliki filenya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni brano della libreria ha il suo file."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリのすべての曲にファイルがあります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಲೈಬ್ರರಿಯ ಪ್ರತಿ ಹಾಡಿಗೂ ಅದರ ಫೈಲ್ ಇದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관함의 모든 곡에 파일이 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലൈബ്രറിയിലെ എല്ലാ പാട്ടുകൾക്കും അവയുടെ ഫയൽ ഉണ്ട്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लायब्ररीतील प्रत्येक गाण्याची फाइल आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap lagu dalam pustaka mempunyai failnya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle sanger i biblioteket har filen sin."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elk nummer in de bibliotheek heeft zijn bestand."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਹਰ ਗੀਤ ਦੀ ਫ਼ਾਈਲ ਮੌਜੂਦ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy utwór w bibliotece ma swój plik."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as músicas da biblioteca têm o seu arquivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as músicas da biblioteca têm o seu ficheiro."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fiecare melodie din bibliotecă are fișierul ei."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alla låtar i biblioteket har sin fil."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kila wimbo katika maktaba una faili yake."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நூலகத்தில் உள்ள ஒவ்வொரு பாடலுக்கும் அதன் கோப்பு உள்ளது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లైబ్రరీలోని ప్రతి పాటకు దాని ఫైల్ ఉంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ทุกเพลงในคลังมีไฟล์ของตัวเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kitaplıktaki her şarkının dosyası var."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кожна пісня в бібліотеці має свій файл."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لائبریری کے ہر گانے کی فائل موجود ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mọi bài hát trong thư viện đều có tệp của nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫中的每首歌曲都有對應檔案。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "资料库中的每首歌曲都有对应文件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫中的每首歌曲都有對應檔案。"
+          }
+        }
+      }
+    },
+    "Songs without a file: %lld\nFavorites among them: %lld\nSongs with play counts: %lld\n\nThey leave the library, and their favorites and play counts are lost for good. Your music files are never deleted.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ፋይል የሌላቸው ዘፈኖች፦ %lld\nከእነሱ መካከል ተወዳጆች፦ %lld\nየማጫወት ቆጠራ ያላቸው ዘፈኖች፦ %lld\n\nከቤተ-መጻሕፍቱ ይወጣሉ፤ ተወዳጅነታቸውና የማጫወት ቆጠራቸውም ለዘለዓለም ይጠፋል። የሙዚቃ ፋይሎቹ በፍጹም አይሰረዙም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أغانٍ بلا ملف: %lld\nالمفضّلة بينها: %lld\nأغانٍ لها عدد تشغيل: %lld\n\nستُزال من المكتبة، وتُفقد مفضّلاتها وعدد مرات تشغيلها إلى الأبد. لا تُحذف ملفات الموسيقى أبدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফাইল নেই এমন গান: %lld\nএগুলোর মধ্যে প্রিয়: %lld\nপ্লে কাউন্ট আছে এমন গান: %lld\n\nএগুলো লাইব্রেরি থেকে সরে যাবে এবং এদের প্রিয় তালিকা ও প্লে কাউন্ট চিরতরে হারিয়ে যাবে। মিউজিক ফাইল কখনও মোছা হয় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skladby bez souboru: %lld\nZ toho oblíbené: %lld\nSkladby s počtem přehrání: %lld\n\nOdstraní se z knihovny a ztratí se i jejich oblíbené položky a počty přehrání. Hudební soubory se nikdy nemažou."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sange uden fil: %lld\nHeraf favoritter: %lld\nSange med afspilningstal: %lld\n\nDe forlader biblioteket, og deres favoritter og afspilningstal går tabt for altid. Musikfiler slettes aldrig."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel ohne Datei: %lld\nDarunter Favoriten: %lld\nTitel mit Wiedergabezähler: %lld\n\nSie verschwinden aus der Mediathek, und ihre Favoriten und Wiedergabezähler gehen für immer verloren. Musikdateien werden nie gelöscht."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τραγούδια χωρίς αρχείο: %lld\nΑπό αυτά αγαπημένα: %lld\nΤραγούδια με αριθμό αναπαραγωγών: %lld\n\nΑφαιρούνται από τη βιβλιοθήκη και τα αγαπημένα και οι αριθμοί αναπαραγωγών τους χάνονται οριστικά. Τα αρχεία μουσικής δεν διαγράφονται ποτέ."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canciones sin archivo: %lld\nFavoritas entre ellas: %lld\nCanciones con reproducciones contadas: %lld\n\nSalen de la biblioteca y sus favoritos y recuentos de reproducciones se pierden para siempre. Los archivos de música nunca se borran."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌های بدون فایل: %lld\nمیان آن‌ها مورد علاقه: %lld\nآهنگ‌های دارای شمارندهٔ پخش: %lld\n\nاین آهنگ‌ها از کتابخانه خارج می‌شوند و علاقه‌مندی‌ها و شمارندهٔ پخش آن‌ها برای همیشه از بین می‌رود. فایل‌های موسیقی هرگز حذف نمی‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappaleet ilman tiedostoa: %lld\nNiistä suosikkeja: %lld\nKappaleet, joilla on toistokertoja: %lld\n\nNe poistuvat kirjastosta, ja niiden suosikkimerkinnät ja toistokerrat menetetään pysyvästi. Musiikkitiedostoja ei koskaan poisteta."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga kantang walang file: %lld\nMga paborito sa mga ito: %lld\nMga kantang may bilang ng pagpapatugtog: %lld\n\nAalis sila sa library, at mawawala nang tuluyan ang mga paborito at bilang ng pagpapatugtog nila. Hindi kailanman binubura ang mga music file."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morceaux sans fichier : %lld\nDont favoris : %lld\nMorceaux avec un nombre de lectures : %lld\n\nIls quittent la bibliothèque, et leurs favoris et nombres de lectures sont perdus définitivement. Les fichiers de musique ne sont jamais supprimés."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફાઇલ વિનાનાં ગીતો: %lld\nતેમાંથી મનપસંદ: %lld\nપ્લે ગણતરીવાળાં ગીતો: %lld\n\nતેઓ લાઇબ્રેરીમાંથી નીકળી જશે, અને તેમનાં મનપસંદ અને પ્લે ગણતરી કાયમ માટે ગુમાવાશે. સંગીત ફાઇલો ક્યારેય ડિલીટ થતી નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙoƙin da ba su da fayil: %lld\nDaga cikinsu waɗanda aka fi so: %lld\nWaƙoƙin da ke da ƙidayar kunnawa: %lld\n\nZa su fita daga ɗakin karatu, kuma za a rasa waɗanda aka fi so da ƙidayar kunnawarsu har abada. Ba a taɓa share fayilolin kiɗa ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שירים ללא קובץ: %lld\nמתוכם מועדפים: %lld\nשירים עם מספר השמעות: %lld\n\nהם יוסרו מהספרייה, והמועדפים ומספרי ההשמעות שלהם יאבדו לצמיתות. קובצי המוזיקה לעולם לא נמחקים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बिना फ़ाइल वाले गाने: %lld\nइनमें पसंदीदा: %lld\nप्ले काउंट वाले गाने: %lld\n\nये लाइब्रेरी से हट जाएँगे, और इनके पसंदीदा और प्ले काउंट हमेशा के लिए खो जाएँगे। संगीत फ़ाइलें कभी नहीं मिटाई जातीं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fájl nélküli dalok: %lld\nEbből kedvenc: %lld\nLejátszásszámmal rendelkező dalok: %lld\n\nKikerülnek a könyvtárból, a kedvenceik és lejátszásszámaik pedig végleg elvesznek. A zenefájlokat a program soha nem törli."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu tanpa file: %lld\nDi antaranya favorit: %lld\nLagu dengan jumlah putar: %lld\n\nLagu-lagu ini keluar dari pustaka, dan favorit serta jumlah putarnya hilang selamanya. File musik tidak pernah dihapus."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brani senza file: %lld\nTra questi preferiti: %lld\nBrani con conteggio delle riproduzioni: %lld\n\nVengono tolti dalla libreria e i loro preferiti e conteggi delle riproduzioni vanno persi per sempre. I file musicali non vengono mai eliminati."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルのない曲: %lld\nそのうちお気に入り: %lld\n再生回数のある曲: %lld\n\nこれらの曲はライブラリから削除され、お気に入りと再生回数は完全に失われます。音楽ファイルは削除されません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೈಲ್ ಇಲ್ಲದ ಹಾಡುಗಳು: %lld\nಅವುಗಳಲ್ಲಿ ಮೆಚ್ಚಿನವು: %lld\nಪ್ಲೇ ಎಣಿಕೆ ಇರುವ ಹಾಡುಗಳು: %lld\n\nಅವು ಲೈಬ್ರರಿಯಿಂದ ಹೊರಹೋಗುತ್ತವೆ, ಮತ್ತು ಅವುಗಳ ಮೆಚ್ಚಿನವುಗಳು ಹಾಗೂ ಪ್ಲೇ ಎಣಿಕೆಗಳು ಶಾಶ್ವತವಾಗಿ ಕಳೆದುಹೋಗುತ್ತವೆ. ಸಂಗೀತ ಫೈಲ್‌ಗಳನ್ನು ಎಂದಿಗೂ ಅಳಿಸಲಾಗುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일이 없는 곡: %lld\n그중 즐겨찾기: %lld\n재생 횟수가 있는 곡: %lld\n\n이 곡들은 보관함에서 제거되며, 즐겨찾기와 재생 횟수는 영구적으로 사라집니다. 음악 파일은 삭제되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫയൽ ഇല്ലാത്ത പാട്ടുകൾ: %lld\nഅവയിൽ പ്രിയപ്പെട്ടവ: %lld\nപ്ലേ എണ്ണമുള്ള പാട്ടുകൾ: %lld\n\nഅവ ലൈബ്രറിയിൽ നിന്ന് ഒഴിവാക്കപ്പെടും, അവയുടെ പ്രിയപ്പെട്ടവയും പ്ലേ എണ്ണവും എന്നെന്നേക്കുമായി നഷ്ടപ്പെടും. സംഗീത ഫയലുകൾ ഒരിക്കലും ഇല്ലാതാക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फाइल नसलेली गाणी: %lld\nत्यांपैकी आवडती: %lld\nप्ले संख्या असलेली गाणी: %lld\n\nती लायब्ररीतून काढली जातील, आणि त्यांची आवडती आणि प्ले संख्या कायमची गमावली जाईल. संगीत फाइल कधीही हटवल्या जात नाहीत."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu tanpa fail: %lld\nDaripadanya kegemaran: %lld\nLagu dengan kiraan main: %lld\n\nLagu ini keluar daripada pustaka, dan kegemaran serta kiraan main mereka hilang selama-lamanya. Fail muzik tidak pernah dipadam."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sanger uten fil: %lld\nBlant dem favoritter: %lld\nSanger med avspillingsantall: %lld\n\nDe fjernes fra biblioteket, og favorittene og avspillingsantallene deres går tapt for godt. Musikkfiler slettes aldri."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nummers zonder bestand: %lld\nWaarvan favorieten: %lld\nNummers met afspeelteller: %lld\n\nZe verdwijnen uit de bibliotheek en hun favorieten en afspeeltellers gaan voorgoed verloren. Muziekbestanden worden nooit verwijderd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ਾਈਲ ਤੋਂ ਬਿਨਾਂ ਗੀਤ: %lld\nਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਮਨਪਸੰਦ: %lld\nਪਲੇ ਗਿਣਤੀ ਵਾਲੇ ਗੀਤ: %lld\n\nਇਹ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚੋਂ ਹਟ ਜਾਣਗੇ, ਅਤੇ ਇਨ੍ਹਾਂ ਦੇ ਮਨਪਸੰਦ ਅਤੇ ਪਲੇ ਗਿਣਤੀਆਂ ਹਮੇਸ਼ਾ ਲਈ ਗੁਆਚ ਜਾਣਗੀਆਂ। ਸੰਗੀਤ ਫ਼ਾਈਲਾਂ ਕਦੇ ਨਹੀਂ ਮਿਟਾਈਆਂ ਜਾਂਦੀਆਂ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwory bez pliku: %lld\nW tym ulubione: %lld\nUtwory z licznikiem odtworzeń: %lld\n\nOpuszczą bibliotekę, a ich ulubione i liczniki odtworzeń przepadną na zawsze. Pliki muzyczne nigdy nie są usuwane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Músicas sem arquivo: %lld\nEntre elas, favoritas: %lld\nMúsicas com contagem de reproduções: %lld\n\nElas saem da biblioteca, e seus favoritos e contagens de reproduções são perdidos para sempre. Os arquivos de música nunca são apagados."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Músicas sem ficheiro: %lld\nEntre elas, favoritas: %lld\nMúsicas com contagem de reproduções: %lld\n\nSaem da biblioteca, e os respetivos favoritos e contagens de reproduções perdem-se para sempre. Os ficheiros de música nunca são apagados."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melodii fără fișier: %lld\nDintre ele, favorite: %lld\nMelodii cu număr de redări: %lld\n\nIes din bibliotecă, iar favoritele și numerele lor de redări se pierd definitiv. Fișierele muzicale nu sunt șterse niciodată."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Låtar utan fil: %lld\nVarav favoriter: %lld\nLåtar med antal spelningar: %lld\n\nDe lämnar biblioteket, och deras favoriter och antal spelningar går förlorade för alltid. Musikfiler raderas aldrig."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyimbo zisizo na faili: %lld\nKati yake zilizopendwa: %lld\nNyimbo zenye hesabu ya kucheza: %lld\n\nZitaondolewa kwenye maktaba, na zilizopendwa pamoja na hesabu za kucheza zitapotea milele. Faili za muziki hazifutwi kamwe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கோப்பு இல்லாத பாடல்கள்: %lld\nஅவற்றில் பிடித்தவை: %lld\nஇயக்க எண்ணிக்கை உள்ள பாடல்கள்: %lld\n\nஅவை நூலகத்திலிருந்து நீக்கப்படும்; அவற்றின் பிடித்தவை மற்றும் இயக்க எண்ணிக்கைகள் நிரந்தரமாக இழக்கப்படும். இசைக் கோப்புகள் ஒருபோதும் நீக்கப்படாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫైల్ లేని పాటలు: %lld\nవాటిలో ఇష్టమైనవి: %lld\nప్లే కౌంట్ ఉన్న పాటలు: %lld\n\nఅవి లైబ్రరీ నుండి తొలగించబడతాయి, వాటి ఇష్టమైనవి మరియు ప్లే కౌంట్‌లు శాశ్వతంగా పోతాయి. సంగీత ఫైల్‌లు ఎప్పటికీ తొలగించబడవు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลงที่ไม่มีไฟล์: %lld\nที่เป็นรายการโปรด: %lld\nเพลงที่มีจำนวนครั้งที่เล่น: %lld\n\nเพลงเหล่านี้จะถูกนำออกจากคลัง และรายการโปรดกับจำนวนครั้งที่เล่นจะสูญหายถาวร ไฟล์เพลงจะไม่ถูกลบเลย"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosyası olmayan şarkılar: %lld\nBunlardan favoriler: %lld\nÇalma sayısı olan şarkılar: %lld\n\nKitaplıktan çıkarılırlar; favorileri ve çalma sayıları kalıcı olarak kaybolur. Müzik dosyaları asla silinmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пісні без файлу: %lld\nЗ них улюблені: %lld\nПісні з лічильником відтворень: %lld\n\nВони зникнуть із бібліотеки, а їхні улюблені позначки та лічильники відтворень буде втрачено назавжди. Музичні файли ніколи не видаляються."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بغیر فائل کے گانے: %lld\nان میں پسندیدہ: %lld\nپلے کاؤنٹ والے گانے: %lld\n\nیہ لائبریری سے ہٹ جائیں گے، اور ان کے پسندیدہ اور پلے کاؤنٹ ہمیشہ کے لیے ختم ہو جائیں گے۔ میوزک فائلیں کبھی حذف نہیں کی جاتیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài hát không có tệp: %lld\nTrong đó yêu thích: %lld\nBài hát có số lượt phát: %lld\n\nCác bài hát này sẽ rời khỏi thư viện, và mục yêu thích cùng số lượt phát của chúng sẽ mất vĩnh viễn. Tệp nhạc không bao giờ bị xóa."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有檔案的歌曲：%lld\n其中個人收藏：%lld\n有播放次數的歌曲：%lld\n\n這些歌曲將從資料庫中移除，其個人收藏和播放次數會永久遺失。音樂檔案絕不會被刪除。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有文件的歌曲：%lld\n其中个人收藏：%lld\n有播放次数的歌曲：%lld\n\n这些歌曲将从资料库中移除，其个人收藏和播放次数会永久丢失。音乐文件绝不会被删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒有檔案的歌曲：%lld\n其中個人收藏：%lld\n有播放次數的歌曲：%lld\n\n這些歌曲將從資料庫中移除，其個人收藏和播放次數會永久遺失。音樂檔案絕不會被刪除。"
+          }
+        }
+      }
+    },
+    "“%@” was moved or deleted, so it’s hidden from the library. Rescan Library looks for it again.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ተንቀሳቅሷል ወይም ተሰርዟል፤ ስለዚህ ከቤተ-መጻሕፍቱ ተደብቋል። “ቤተ-መጻሕፍቱን እንደገና ቃኝ” እንደገና ይፈልገዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” نُقلت أو حُذفت، لذا فهي مخفية من المكتبة. سيبحث «إعادة فحص المكتبة» عنها مجددًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” সরানো বা মোছা হয়েছে, তাই এটি লাইব্রেরি থেকে লুকানো আছে। “লাইব্রেরি আবার স্ক্যান করুন” এটি আবার খুঁজবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ byla přesunuta nebo smazána, proto je v knihovně skrytá. „Znovu prohledat knihovnu“ ji vyhledá znovu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” er flyttet eller slettet og er derfor skjult i biblioteket. “Scan bibliotek igen” leder efter den igen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ wurde verschoben oder gelöscht und ist deshalb in der Mediathek ausgeblendet. „Mediathek erneut scannen“ sucht den Titel erneut."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το «%@» μετακινήθηκε ή διαγράφηκε, γι’ αυτό είναι κρυμμένο από τη βιβλιοθήκη. Η «Νέα σάρωση βιβλιοθήκης» θα το αναζητήσει ξανά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” se movió o se borró, por eso está oculta en la biblioteca. «Volver a escanear la biblioteca» la buscará de nuevo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» جابه‌جا یا حذف شده است، برای همین از کتابخانه پنهان شده. «اسکن دوبارهٔ کتابخانه» دوباره آن را جست‌وجو می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” on siirretty tai poistettu, joten se on piilotettu kirjastosta. ”Skannaa kirjasto uudelleen” etsii sen uudelleen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inilipat o binura ang “%@”, kaya nakatago ito sa library. Hahanapin itong muli ng “I-scan Muli ang Library”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » a été déplacé ou supprimé ; il est donc masqué dans la bibliothèque. « Réindexer la bibliothèque » le cherchera à nouveau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ખસેડાઈ છે અથવા ડિલીટ થઈ છે, તેથી તે લાઇબ્રેરીમાંથી છુપાવેલી છે. “લાઇબ્રેરી ફરી સ્કૅન કરો” તેને ફરી શોધશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An motsa ko an share “%@”, shi ya sa aka ɓoye ta daga ɗakin karatu. “Sake Bincika Laburare” zai sake nemanta."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‏“%@” הועבר או נמחק, ולכן הוא מוסתר מהספרייה. “סרוק מחדש את הספריה” יחפש אותו שוב."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” को हटाया या मिटाया गया है, इसलिए वह लाइब्रेरी में छिपा है। “लाइब्रेरी फिर से स्कैन करें” उसे फिर से खोजेगा।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) „%@” át lett helyezve vagy törölve lett, ezért el van rejtve a könyvtárban. A(z) „Könyvtár újraolvasása” újra megkeresi."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” dipindahkan atau dihapus, jadi disembunyikan dari pustaka. “Pindai Ulang Perpustakaan” akan mencarinya lagi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” è stato spostato o eliminato, quindi è nascosto nella libreria. “Ripeti scansione della libreria” lo cercherà di nuovo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」は移動または削除されたため、ライブラリでは非表示になっています。「ライブラリを再スキャン」でもう一度探します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಅನ್ನು ಸರಿಸಲಾಗಿದೆ ಅಥವಾ ಅಳಿಸಲಾಗಿದೆ, ಆದ್ದರಿಂದ ಅದು ಲೈಬ್ರರಿಯಲ್ಲಿ ಮರೆಮಾಡಲ್ಪಟ್ಟಿದೆ. “ಲೈಬ್ರರಿಯನ್ನು ಮರುಸ್ಕ್ಯಾನ್ ಮಾಡಿ” ಅದನ್ನು ಮತ್ತೆ ಹುಡುಕುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”이(가) 이동되었거나 삭제되어 보관함에서 숨겨졌습니다. “보관함 다시 스캔”이(가) 다시 찾아봅니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” മാറ്റുകയോ ഇല്ലാതാക്കുകയോ ചെയ്തു, അതിനാൽ അത് ലൈബ്രറിയിൽ മറച്ചിരിക്കുന്നു. “ലൈബ്രറി വീണ്ടും സ്കാൻ ചെയ്യുക” അത് വീണ്ടും തിരയും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” हलवले किंवा हटवले गेले आहे, म्हणून ते लायब्ररीत लपवलेले आहे. “लायब्ररी पुन्हा स्कॅन करा” ते पुन्हा शोधेल."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” telah dialihkan atau dipadam, jadi ia disembunyikan daripada pustaka. “Imbas Semula Pustaka” akan mencarinya semula."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» er flyttet eller slettet og er derfor skjult i biblioteket. «Skann biblioteket på nytt» leter etter den på nytt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’ is verplaatst of verwijderd en is daarom verborgen in de bibliotheek. ‘Scan bibliotheek opnieuw’ zoekt het opnieuw."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ਨੂੰ ਹਿਲਾਇਆ ਜਾਂ ਮਿਟਾਇਆ ਗਿਆ ਹੈ, ਇਸ ਲਈ ਇਹ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਲੁਕਿਆ ਹੋਇਆ ਹੈ। “ਲਾਇਬ੍ਰੇਰੀ ਮੁੜ ਸਕੈਨ ਕਰੋ” ਇਸ ਨੂੰ ਦੁਬਾਰਾ ਲੱਭੇਗਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwór „%@” został przeniesiony lub usunięty, więc jest ukryty w bibliotece. „Skanuj bibliotekę ponownie” poszuka go ponownie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” foi movida ou apagada, por isso está oculta na biblioteca. “Escanear a Biblioteca Novamente” vai procurá-la de novo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” foi movida ou apagada, por isso está oculta na biblioteca. “Analisar biblioteca novamente” volta a procurá-la."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” a fost mutată sau ștearsă, deci este ascunsă în bibliotecă. „Rescanează biblioteca” o va căuta din nou."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” har flyttats eller raderats och är därför dold i biblioteket. ”Skanna biblioteket igen” letar efter den igen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” imehamishwa au imefutwa, kwa hivyo imefichwa kwenye maktaba. “Changanua Maktaba Upya” itaitafuta tena."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” நகர்த்தப்பட்டது அல்லது நீக்கப்பட்டது, அதனால் நூலகத்தில் மறைக்கப்பட்டுள்ளது. “லைப்ரரியை மீண்டும் ஸ்கேன்செய்” அதை மீண்டும் தேடும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” తరలించబడింది లేదా తొలగించబడింది, కాబట్టి అది లైబ్రరీలో దాచబడింది. “లైబ్రరీని మళ్లీ స్కాన్ చేయి” దాన్ని మళ్లీ వెతుకుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ถูกย้ายหรือลบแล้ว จึงถูกซ่อนจากคลัง “สแกนคลังใหม่” จะค้นหาอีกครั้ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” taşınmış veya silinmiş, bu yüzden kitaplıkta gizlendi. “Arşivi Yeniden Tara” onu yeniden arar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» переміщено або видалено, тому її приховано в бібліотеці. «Пересканувати медіатеку» шукатиме її знову."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” منتقل یا حذف کر دیا گیا ہے، اس لیے یہ لائبریری میں چھپا ہوا ہے۔ “لائبریری دوبارہ اسکین کریں” اسے دوبارہ تلاش کرے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” đã bị di chuyển hoặc xóa nên bị ẩn khỏi thư viện. “Quét lại thư viện” sẽ tìm lại bài này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」已被移動或刪除，因此在資料庫中被隱藏。「重新掃描資料庫」會再次尋找它。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”已被移动或删除，因此在资料库中被隐藏。“重新扫描资料库”会再次查找它。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」已被移動或刪除，因此在資料庫中被隱藏。「重新掃描資料庫」會再次尋找它。"
+          }
+        }
+      }
+    },
+    "Upmixes stereo and mono songs to 5.1 for Spatial Audio. Off plays them as they are.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስቴሪዮና ሞኖ ዘፈኖችን ለስፓሻል ኦዲዮ ወደ 5.1 ያሳድጋል። ሲጠፋ እንዳሉ ይጫወታሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يحوّل الأغاني الستيريو والمونو إلى 5.1 للصوت المكاني. عند الإيقاف تُشغَّل كما هي."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্পেশিয়াল অডিওর জন্য স্টেরিও ও মনো গানকে 5.1-এ আপমিক্স করে। বন্ধ থাকলে গান যেমন আছে তেমনই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Převede stereo a mono skladby na 5.1 pro prostorové audio. Když je vypnuto, přehrají se beze změny."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opmixer stereo- og monosange til 5.1 til rumlig lyd. Slået fra afspilles de, som de er."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wandelt Stereo- und Mono-Titel für Räumliches Audio in 5.1 um. Ausgeschaltet werden sie unverändert wiedergegeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μετατρέπει τα στερεοφωνικά και μονοφωνικά τραγούδια σε 5.1 για τον Χωρικό ήχο. Όταν είναι απενεργοποιημένο, παίζουν ως έχουν."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convierte las canciones estéreo y mono a 5.1 para Audio espacial. Desactivado, se reproducen tal cual."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌های استریو و مونو را برای صدای فضایی به 5.1 ارتقا می‌دهد. وقتی خاموش باشد، همان‌طور که هستند پخش می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muuntaa stereo- ja monokappaleet 5.1-kanavaisiksi tilaäänelle. Kun asetus on pois päältä, kappaleet toistetaan sellaisinaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ina-upmix ang stereo at mono na kanta sa 5.1 para sa Spatial Audio. Kapag naka-off, tutugtog ang mga ito nang ayon sa orihinal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convertit les morceaux stéréo et mono en 5.1 pour l’audio spatial. Désactivé, ils sont lus tels quels."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્પેશિયલ ઑડિયો માટે સ્ટીરિયો અને મોનો ગીતોને 5.1 માં અપમિક્સ કરે છે. બંધ હોય ત્યારે તે જેમ છે તેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana ƙara waƙoƙin stereo da mono zuwa 5.1 don Spatial Audio. Idan an kashe, ana kunna su yadda suke."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממיר שירי סטריאו ומונו ל-5.1 עבור שמע מרחבי. כשהאפשרות כבויה, הם מושמעים כפי שהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पैशियल ऑडियो के लिए स्टीरियो और मोनो गानों को 5.1 में अपमिक्स करता है। बंद होने पर वे जैसे हैं वैसे ही चलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A sztereó és mono dalokat 5.1-re keveri fel a térhatású hanghoz. Kikapcsolva úgy szólnak, ahogy vannak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meningkatkan lagu stereo dan mono ke 5.1 untuk Spatial Audio. Jika nonaktif, lagu diputar apa adanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte i brani stereo e mono in 5.1 per l’audio spaziale. Se disattivato, vengono riprodotti così come sono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空間オーディオ用に、ステレオとモノラルの曲を5.1にアップミックスします。オフの場合は、そのまま再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೊಗಾಗಿ ಸ್ಟೀರಿಯೊ ಮತ್ತು ಮೊನೊ ಹಾಡುಗಳನ್ನು 5.1 ಗೆ ಅಪ್‌ಮಿಕ್ಸ್ ಮಾಡುತ್ತದೆ. ಆಫ್ ಆಗಿದ್ದರೆ ಅವು ಇರುವಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공간 음향을 위해 스테레오 및 모노 곡을 5.1로 업믹스합니다. 끄면 원본 그대로 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്പേഷ്യൽ ഓഡിയോയ്ക്കായി സ്റ്റീരിയോ, മോണോ പാട്ടുകളെ 5.1 ആയി അപ്‌മിക്സ് ചെയ്യുന്നു. ഓഫ് ആയാൽ അവ ഉള്ളതുപോലെ പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पेशियल ऑडिओसाठी स्टिरिओ आणि मोनो गाणी 5.1 मध्ये अपमिक्स करते. बंद असल्यास ती आहेत तशीच वाजतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menaik campur lagu stereo dan mono ke 5.1 untuk Audio Ruang. Apabila dimatikan, lagu dimainkan seperti asalnya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikser stereo- og monosanger opp til 5.1 for romlig lyd. Når den er av, spilles de av som de er."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixt stereo- en monotracks op naar 5.1 voor Ruimtelijke audio. Uitgeschakeld worden ze ongewijzigd afgespeeld."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਲਈ ਸਟੀਰੀਓ ਅਤੇ ਮੋਨੋ ਗੀਤਾਂ ਨੂੰ 5.1 ਵਿੱਚ ਅੱਪਮਿਕਸ ਕਰਦਾ ਹੈ। ਬੰਦ ਹੋਣ 'ਤੇ ਇਹ ਜਿਵੇਂ ਹਨ ਉਵੇਂ ਚੱਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przetwarza utwory stereo i mono do 5.1 na potrzeby dźwięku przestrzennego. Po wyłączeniu są odtwarzane bez zmian."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono para 5.1 no Áudio Espacial. Desativado, elas tocam como estão."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Converte músicas estéreo e mono para 5.1 no Áudio Espacial. Desativado, tocam tal como estão."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convertește melodiile stereo și mono în 5.1 pentru Audio spațial. Când este dezactivat, sunt redate ca atare."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uppmixar stereo- och monolåtar till 5.1 för rumsligt ljud. När det är av spelas de som de är."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huongeza nyimbo za stereo na mono hadi 5.1 kwa Sauti ya Anga. Ikizimwa, huchezwa zilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்பேஷியல் ஆடியோவுக்காக ஸ்டீரியோ மற்றும் மோனோ பாடல்களை 5.1 ஆக அப்மிக்ஸ் செய்கிறது. அணைத்தால், அவை இருப்பதுபோலவே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్పేషియల్ ఆడియో కోసం స్టీరియో మరియు మోనో పాటలను 5.1కి అప్‌మిక్స్ చేస్తుంది. ఆఫ్‌లో ఉంటే అవి ఉన్నట్లుగానే ప్లే అవుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัปมิกซ์เพลงสเตอริโอและโมโนเป็น 5.1 สำหรับ Spatial Audio เมื่อปิดอยู่ เพลงจะเล่นตามต้นฉบับ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo ve mono şarkıları Uzamsal Ses için 5.1’e yükseltir. Kapalıyken olduğu gibi çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перетворює стерео- та монопісні на 5.1 для просторового аудіо. Коли вимкнено, вони відтворюються як є."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسپیشل آڈیو کے لیے سٹیریو اور مونو گانوں کو 5.1 میں اپ مکس کرتا ہے۔ بند ہونے پر وہ جیسے ہیں ویسے ہی چلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nâng bài hát stereo và mono lên 5.1 cho Âm thanh không gian. Khi tắt, bài hát phát nguyên bản."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為空間音訊將立體聲和單聲道歌曲升混為 5.1。關閉時按原樣播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为空间音频将立体声和单声道歌曲升混为 5.1。关闭时按原样播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為空間音訊將立體聲和單聲道歌曲升混為 5.1。關閉時按原樣播放。"
           }
         }
       }

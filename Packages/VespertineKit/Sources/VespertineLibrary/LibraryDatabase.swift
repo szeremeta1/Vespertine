@@ -888,6 +888,36 @@ public extension LibraryDatabase {
         _ = try writer.write { db in try LibrarySource.deleteOne(db, key: id) }
     }
 
+    /// What removing the songs whose files are gone would take with it (see `removeMissingSongs`).
+    func missingSongsSummary() throws -> MissingSongsSummary {
+        try writer.read { db in
+            let row = try Row.fetchOne(db, sql: """
+                SELECT count(*) AS songs, coalesce(sum(playCount > 0), 0) AS played,
+                       (SELECT count(*) FROM favorite WHERE trackId IN (SELECT id FROM track WHERE isMissing = 1)) AS favorites
+                FROM track WHERE isMissing = 1
+                """)
+            return MissingSongsSummary(songs: row?["songs"] ?? 0, favorites: row?["favorites"] ?? 0, played: row?["played"] ?? 0)
+        }
+    }
+
+    /// Takes the songs whose files are gone out of the library, with their favorites, play history, places in playlists,
+    /// analyses and tag-edit history. Only library rows: no file is touched. Returns how many songs went.
+    @discardableResult
+    func removeMissingSongs() throws -> Int {
+        try writer.write { db in
+            try db.execute(sql: "DELETE FROM track WHERE isMissing = 1")
+            return db.changesCount
+        }
+    }
+
+    /// A file the library lists is gone: its songs are hidden (a CUE file's songs share one file) until a scan finds the
+    /// file again, which brings them back with their favorites and play counts.
+    func markMissing(filePath: String, sourceID: Int64?) throws {
+        try writer.write { db in
+            try db.execute(sql: "UPDATE track SET isMissing = 1 WHERE filePath = ? AND sourceId IS ?", arguments: [filePath, sourceID])
+        }
+    }
+
     func markPlayed(_ trackID: Int64, at date: Date = .now) throws {
         try writer.write { db in
             try db.execute(sql: "UPDATE track SET playCount = playCount + 1, lastPlayedAt = ? WHERE id = ?", arguments: [date, trackID])

@@ -82,6 +82,7 @@ struct MainWindow: View {
         } message: {
             Text(model.playlistReport ?? "")
         }
+        .modifier(MissingSongsAlert())
         .sheet(isPresented: $model.showConnectServer) {
             ConnectServerSheet().environment(model)
         }
@@ -107,6 +108,38 @@ struct MainWindow: View {
             if LaunchArguments().bool(forKey: "VespertineOpenSettings") { openSettings() }   // QA: -VespertineOpenSettings YES
         }
         .onOpenURL { model.openAudio($0) }
+    }
+}
+
+/// "Remove Missing Songs…" confirmation. Kept out of `MainWindow.body`, whose modifier chain is
+/// already at the type-checker's limit.
+private struct MissingSongsAlert: ViewModifier {
+    @Environment(AppModel.self) private var model
+
+    private var title: String {
+        guard let prompt = model.missingSongsPrompt else { return "" }
+        return prompt.summary.songs == 0 ? String(localized: "No Missing Songs") : String(localized: "Remove Missing Songs?")
+    }
+
+    private var isPresented: Binding<Bool> {
+        Binding(get: { model.missingSongsPrompt != nil }, set: { if !$0 { model.missingSongsPrompt = nil } })
+    }
+
+    func body(content: Content) -> some View {
+        content.alert(title, isPresented: isPresented, presenting: model.missingSongsPrompt) { (prompt: AppModel.MissingSongsPrompt) in
+            if prompt.summary.songs == 0 {
+                Button("OK") {}
+            } else {
+                Button("Remove", role: .destructive) { Task { await model.library.removeMissingSongs() } }
+                Button("Cancel", role: .cancel) {}
+            }
+        } message: { (prompt: AppModel.MissingSongsPrompt) in
+            if prompt.summary.songs == 0 {
+                Text("Every song in the library has its file.")
+            } else {
+                Text("Songs without a file: \(prompt.summary.songs)\nFavorites among them: \(prompt.summary.favorites)\nSongs with play counts: \(prompt.summary.played)\n\nThey leave the library, and their favorites and play counts are lost for good. Your music files are never deleted.")
+            }
+        }
     }
 }
 

@@ -117,6 +117,7 @@ struct VespertineCommands: Commands {
             Divider()
             Button("Rescan Library") { Task { await model.library.rescanAll() } }
                 .keyboardShortcut("r", modifiers: [.command, .option])
+            Button("Remove Missing Songs…") { model.askToRemoveMissingSongs() }
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
             Button(model.analysis.isRunning ? String(localized: "Stop Analyzing") : String(localized: "Analyze Library")) {

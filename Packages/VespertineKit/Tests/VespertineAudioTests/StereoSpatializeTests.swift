@@ -63,6 +63,22 @@ struct StereoSpatializeTests {
         #expect(!FormatPlanner.plan(source: surround, device: Self.device(outputs: 16), spatializeStereo: true).upmix)
     }
 
+    @Test("The switch applies only where 5.1 has somewhere to go, which is when a plan upmixes; a stereo DAC with Spatial Audio off has none")
+    func appliesWhereTheEngineUpmixes() {
+        let devices = [Self.airPods, Self.device(outputs: 2), Self.device(outputs: 4), Self.device(outputs: 8), Self.device(outputs: 16),
+                       Self.device(outputs: 8, speakers: 8), Self.device(outputs: 2, speakers: 2)]
+        for device in devices {
+            for spatial in SpatialMode.allCases {
+                let upmixes = FormatPlanner.plan(source: Self.stereo, device: device, spatial: spatial, spatializeStereo: true).upmix
+                #expect(FormatPlanner.canSpatializeStereo(on: device, spatial: spatial) == upmixes,
+                        "\(device.outputChannels) outputs, speakers \(device.speakerLayoutChannels ?? 0), \(spatial)")
+            }
+        }
+        #expect(!FormatPlanner.canSpatializeStereo(on: Self.airPods, spatial: .off))
+        #expect(FormatPlanner.canSpatializeStereo(on: Self.airPods, spatial: .fixed))
+        #expect(FormatPlanner.canSpatializeStereo(on: Self.device(outputs: 16), spatial: .off), "multichannel outputs don't need Spatial Audio")
+    }
+
     @Test("On: DSD is converted to PCM to be upmixed, even on a DoP DAC, and says so")
     func dsdToPCM() {
         let plan = FormatPlanner.plan(source: Self.dsd, device: Self.device(outputs: 8, dop: true), spatializeStereo: true)
