@@ -33,7 +33,9 @@ done
 [[ -n $leader && -n $follower && -n $mic ]] || { print -u2 "need --leader, --follower and --mic (see --help)"; exit 2 }
 if (( ! dry )); then
   [[ -x $probe ]] || { print -u2 "need --probe <vespertine-probe binary> (see --help)"; exit 2 }
-  if [[ -n ${SSH_CONNECTION:-} ]]; then
+  # A Terminal window opened with `open -a Terminal` from an ssh shell inherits SSH_CONNECTION but has the microphone: only a
+  # session with no terminal app (TERM_PROGRAM isn't passed over ssh) is ssh itself.
+  if [[ -n ${SSH_CONNECTION:-} && -z ${TERM_PROGRAM:-} ]]; then
     print -u2 "This is an ssh session: the microphone steps would be refused by macOS. Run it in a Terminal window (open -a Terminal $0)."; exit 2
   fi
 fi
