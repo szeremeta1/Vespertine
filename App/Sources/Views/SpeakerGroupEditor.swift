@@ -23,6 +23,7 @@ struct SpeakerGroupEditor: View {
             Text(verbatim: group.name).font(.title3.weight(.semibold))
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
+                    RoomCanvasView(group: $group)
                     ChannelMapGrid(group: $group)
                 }
             }
@@ -59,7 +60,7 @@ struct ChannelMapGrid: View {
                         Text(verbatim: row.label)
                         Picker(selection: roleBinding(row)) {
                             Text(verbatim: "None").tag(SpeakerRole?.none)
-                            ForEach(roles(for: row), id: \.self) { Text(verbatim: Self.name($0)).tag(SpeakerRole?.some($0)) }
+                            ForEach(roles(for: row), id: \.self) { Text(verbatim: $0.plainName).tag(SpeakerRole?.some($0)) }
                         } label: { Text(verbatim: "Speaker on \(row.label)") }
                         .labelsHidden()
                         .frame(width: 190)
@@ -86,27 +87,5 @@ struct ChannelMapGrid: View {
     private func invertedBinding(_ row: GroupChannelMap.Row) -> Binding<Bool> {
         Binding(get: { GroupChannelMap.rows(group).first { $0.aggregateChannel == row.aggregateChannel }?.inverted ?? false },
                 set: { group = GroupChannelMap.setInverted($0, channel: row.channelOnDevice, of: row.deviceUID, in: group) })
-    }
-
-    static func name(_ role: SpeakerRole) -> String {
-        switch role {
-        case .frontLeft: "Front left"
-        case .frontRight: "Front right"
-        case .center: "Center"
-        case .lfe: "Subwoofer (LFE)"
-        case .sideLeft: "Side left"
-        case .sideRight: "Side right"
-        case .backLeft: "Back left"
-        case .backRight: "Back right"
-        case .backCenter: "Back center"
-        case .wideLeft: "Wide left"
-        case .wideRight: "Wide right"
-        case .topFrontLeft: "Top front left"
-        case .topFrontRight: "Top front right"
-        case .topMiddleLeft: "Top middle left"
-        case .topMiddleRight: "Top middle right"
-        case .topBackLeft: "Top back left"
-        case .topBackRight: "Top back right"
-        }
     }
 }
