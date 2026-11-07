@@ -125,6 +125,62 @@ struct RoomClockDriftTests {
         #expect(abs(est.ppm - 50) < 1)
     }
 
+    /// The reference arriving directly at `start` samples with gain `direct`, and again `echoMs` later with gain `echo`.
+    private func reflected(_ ref: TimingReference, start: Double, direct: Double, echoMs: Double, echo: Double, count: Int = 40_000) -> [Double] {
+        let later = start + echoMs / 1_000 * Self.rate
+        var rng = SeededGenerator(seed: 17)
+        return (0..<count).map { n in
+            direct * ref.value(at: (Double(n) - start) / Self.rate) + echo * ref.value(at: (Double(n) - later) / Self.rate) + 0.005 * rng.gaussian()
+        }
+    }
+
+    @Test("A reflection 3 ms behind a slightly weaker direct arrival does not take the reference's place: the earliest arrival is the direct sound")
+    func earliestArrivalWins() throws {
+        let ref = try makeReference()
+        // Real room: the direct sound reached the microphone a little weaker than the wall bounce 3 ms later.
+        for (direct, echo) in [(0.4, 0.5), (0.45, 0.5), (0.3, 0.5)] {
+            let start = 10_000.25
+            let found = try ref.locate(in: reflected(ref, start: start, direct: direct, echoMs: 3, echo: echo), range: 0..<40_000)
+            #expect(abs(found.position - start) < 1, "direct \(direct) echo \(echo): found \(found.position), want \(start)")
+        }
+    }
+
+    @Test("A reflection hides nothing when it is the weaker one, and does not make the position ambiguous")
+    func weakerReflectionIsIgnored() throws {
+        let ref = try makeReference()
+        let found = try ref.locate(in: reflected(ref, start: 12_000.5, direct: 0.5, echoMs: 3, echo: 0.4), range: 0..<40_000)
+        #expect(abs(found.position - 12_000.5) < 1)
+        #expect(found.runnerUpRatio < TimingReference.ambiguityRatio)
+    }
+
+    @Test("A direct arrival under 0.6 of a later reflection is too weak to prefer, so the stronger one is taken")
+    func muchWeakerDirectIsNotPreferred() throws {
+        let ref = try makeReference()
+        let start = 10_000.0, echoAt = start + 0.003 * Self.rate
+        let found = try ref.locate(in: reflected(ref, start: start, direct: 0.15, echoMs: 3, echo: 0.5), range: 0..<40_000)
+        #expect(abs(found.position - echoAt) < 1, "found \(found.position), want the reflection at \(echoAt)")
+    }
+
+    @Test("A second equal copy far later than any room reflection is still ambiguous, whichever arrives first")
+    func distantTwinStaysAmbiguous() throws {
+        let ref = try makeReference()
+        for (direct, echo) in [(0.5, 0.5), (0.4, 0.5)] {
+            #expect(throws: TimingReferenceError.ambiguous, "direct \(direct) echo \(echo)") {
+                try ref.locate(in: reflected(ref, start: 15_000, direct: direct, echoMs: 350, echo: echo, count: 60_000), range: 0..<60_000)
+            }
+        }
+    }
+
+    @Test("The clock-drift estimate holds when both references have a strong reflection behind them")
+    func driftWithReflectionsBehindBothReferences() throws {
+        let sweep = try makeSweep(), ref = try makeReference()
+        let recording = capture(ppm: 40, sweep: sweep, ref: ref, noise: 0.0005) { t in
+            0.6 * (ref.value(at: t - Self.firstRef - 0.003) + ref.value(at: t - Self.secondRef - 0.003))
+        }
+        let est = try ClockDriftEstimate.estimate(recording: recording, reference: ref, nominalSpacing: spacing)
+        #expect(abs(est.ppm - 40) < 2, "estimated \(est.ppm)")
+    }
+
     @Test("A missing reference, a too-short recording and implausible drift are refused with their own reasons")
     func refusals() throws {
         let sweep = try makeSweep(), ref = try makeReference()
