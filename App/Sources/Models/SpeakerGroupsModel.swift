@@ -35,6 +35,14 @@ final class SpeakerGroupsModel {
         persist()
     }
 
+    /// Saves the group a finished draft makes; nil when the draft isn't ready.
+    @discardableResult
+    func create(_ draft: SpeakerGroupDraft) -> SpeakerGroup? {
+        guard let group = draft.makeGroup() else { return nil }
+        upsert(group)
+        return group
+    }
+
     func duplicate(_ id: UUID) {
         if book.duplicate(id) != nil { persist() }
     }

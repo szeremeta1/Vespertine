@@ -78,4 +78,21 @@ struct SpeakerGroupsFlagTests {
         bad.members.removeLast()
         #expect(SpeakerGroupsModel.problem(bad) == "A group needs at least two outputs.")
     }
+
+    @Test("A finished draft becomes a saved group, an unfinished one saves nothing, and a new launch finds it")
+    func createFromDraft() throws {
+        let (root, defaults, suite) = try scratch()
+        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        let model = SpeakerGroupsModel(directory: root)
+        var draft = SpeakerGroupDraft(name: "Dorm quad")
+        #expect(model.create(draft) == nil && model.groups.isEmpty)
+        func candidate(_ uid: String, _ name: String) -> GroupCandidate {
+            GroupCandidate(uid: uid, name: name, channels: 2, transport: .usb, eligibility: .ok)
+        }
+        draft.toggle(candidate("dac-a", "Fosi ZD3"))
+        draft.toggle(candidate("dac-b", "FiiO K11"))
+        let made = try #require(model.create(draft))
+        #expect(model.groups.map(\.id) == [made.id] && made.isValid)
+        #expect(SpeakerGroupsModel(directory: root).groups.map(\.name) == ["Dorm quad"])
+    }
 }
