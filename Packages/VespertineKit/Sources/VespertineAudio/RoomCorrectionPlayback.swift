@@ -76,7 +76,7 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
 
     /// On `used` channels it only holds sound back: delays in whole frames (`renderChannels` rounds them), with no level, no
     /// preamp, no band and no filter. That shifts the samples without changing one of them. A flat profile counts.
-    public func changesOnlyTiming(channels used: Range<Int>) -> Bool {
+    public func changesOnlyTiming<Channels: Sequence>(channels used: Channels) -> Bool where Channels.Element == Int {
         guard preampDB == 0 else { return false }
         return used.allSatisfy { c in
             guard c < channels.count else { return true }

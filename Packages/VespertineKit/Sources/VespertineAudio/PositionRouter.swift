@@ -11,18 +11,18 @@
 //   Ceiling channels a group has no ceiling speaker for are folded to the ear-level speakers under them, at −3 dB.
 //   The LFE plays on the group's subwoofer, or follows the LFE policy.
 // The angles are the ones drawn in the room, seen from where the listener faces. Rows of the matrix are the aggregate's
-// channels, in the members' order. Nothing here touches playback yet.
+// channels, in the members' order. `GroupRouting` puts it to work: `Decoding` routes a group's songs with it.
 //
 
 import CoreAudio
 import Foundation
 
-public struct PositionRouter: Equatable, Sendable {
+public struct PositionRouter: Hashable, Sendable {
     /// The ITU −3 dB.
     public static let foldGain = Float(0.5.squareRoot())
 
     /// How a channel reached its speaker.
-    public enum Kind: Equatable, Sendable {
+    public enum Kind: Hashable, Sendable {
         /// The speaker of its own place, alone at 1.0.
         case own
         /// The nearest single speaker, alone at 1.0.
@@ -37,7 +37,7 @@ public struct PositionRouter: Equatable, Sendable {
         case policy
     }
 
-    public struct Route: Equatable, Sendable {
+    public struct Route: Hashable, Sendable {
         /// The aggregate channel it plays on.
         public var output: Int
         public var gain: Float
@@ -45,7 +45,7 @@ public struct PositionRouter: Equatable, Sendable {
     }
 
     /// One source channel's gain into an output channel.
-    public struct Tap: Equatable, Sendable {
+    public struct Tap: Hashable, Sendable {
         public var source: Int
         public var gain: Float
     }
@@ -132,6 +132,9 @@ public struct PositionRouter: Equatable, Sendable {
     public var untouchedOutputs: [Int] {
         rows.indices.filter { rows[$0].count == 1 && rows[$0][0].gain == 1 }
     }
+
+    /// The output channels that carry any music at all, in order.
+    public var usedOutputs: [Int] { rows.indices.filter { !rows[$0].isEmpty } }
 
     /// What output channel `output` is made of: the source channels and gains summed into it.
     public func matrixRow(_ output: Int) -> [Tap] { rows.indices.contains(output) ? rows[output] : [] }

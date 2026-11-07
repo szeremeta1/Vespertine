@@ -74,14 +74,18 @@ public struct GroupSignalPath: Sendable, Hashable {
     public var dsdConvertedToPCM: Bool
     public var stage: Stage
     public var members: [Member]
+    /// How the song's channels were put onto the group's outputs (nil: they went to the first outputs, in order).
+    public var router: PositionRouter?
 
-    public init(groupName: String, source: SourceFormat, folds: Bool, dsdConvertedToPCM: Bool, stage: Stage, members: [Member]) {
+    public init(groupName: String, source: SourceFormat, folds: Bool, dsdConvertedToPCM: Bool, stage: Stage, members: [Member],
+                router: PositionRouter? = nil) {
         self.groupName = groupName
         self.source = source
         self.folds = folds
         self.dsdConvertedToPCM = dsdConvertedToPCM
         self.stage = stage
         self.members = members
+        self.router = router
     }
 
     public var usedMembers: [Member] { members.filter(\.isUsed) }
@@ -163,30 +167,47 @@ extension GroupSignalPath {
     /// The stage of the chain on `usedChannels` channels: the most a stage changes wins (room correction, then the equalizer, then
     /// gain); whole-frame delays alone only shift the samples. A flat profile is no stage at all.
     static func stage(room: RoomCorrectionPlayback?, usedChannels: Int, equalizer: Bool, digitalVolumeDB: Double?, replayGainDB: Double?) -> Stage {
-        let roomChangesSamples = room.map { !$0.isFlat && !$0.changesOnlyTiming(channels: 0..<max(usedChannels, 0)) } ?? false
+        stage(room: room, used: Array(0..<max(usedChannels, 0)), equalizer: equalizer, digitalVolumeDB: digitalVolumeDB, replayGainDB: replayGainDB)
+    }
+
+    /// The same, on the channels `used` (a song that leaves some outputs silent is not changed by what those outputs would do).
+    static func stage(room: RoomCorrectionPlayback?, used: [Int], equalizer: Bool, digitalVolumeDB: Double?, replayGainDB: Double?) -> Stage {
+        let roomChangesSamples = room.map { !$0.isFlat && !$0.changesOnlyTiming(channels: used) } ?? false
         if roomChangesSamples { return .roomCorrection }
         if equalizer { return .equalizer }
         if (digitalVolumeDB ?? 0) != 0 || (replayGainDB ?? 0) != 0 { return .gain }
-        if let room, !room.isFlat, room.channels.prefix(max(usedChannels, 0)).contains(where: { $0.delayMs > 0 }) { return .integerDelay }
+        if let room, !room.isFlat, used.contains(where: { $0 >= 0 && $0 < room.channels.count && room.channels[$0].delayMs > 0 }) { return .integerDelay }
         return .none
     }
 
-    /// The path of one song on the group that played it. The song's channels go to the aggregate's in order, so the first
-    /// `plan.channels` aggregate channels are the ones in use; a speaker role names each, or the usual order for the count when
-    /// the group has no speaker there. `applied.members` are the members as read back from them.
+    /// The path of one song on the group that played it. With `content`, the song was put onto the group by where the speakers
+    /// stand: a member is used when any of its outputs carries music, the speakers named are those outputs' own, and the song is
+    /// folded when anything is mixed, panned, copied by a policy or heard nowhere (the LFE dropped). Without it the song's
+    /// channels went to the aggregate's in order, so the first `plan.channels` aggregate channels are the ones in use; a speaker
+    /// role names each, or the usual order for the count when the group has no speaker there. `applied.members` are the members
+    /// as read back from them.
     static func make(group: SpeakerGroup, applied: AppliedFormat, source: SourceFormat, plan: OutputPlan, stage: Stage,
-                     otherAppsPlaying: Bool = false) -> GroupSignalPath {
+                     otherAppsPlaying: Bool = false, content: GroupContentPlan? = nil) -> GroupSignalPath {
         let assigned = group.rolesByAggregateChannel
         let order = Self.usualOrder
         let members = applied.members.map { m -> Member in
-            let used = (m.channelOffset..<(m.channelOffset + m.channelCount)).filter { $0 < plan.channels }
-            let roles = used.map { channel in (channel < assigned.count ? assigned[channel] : nil) ?? order[min(channel, order.count - 1)] }
+            let roles: [SpeakerRole]
+            if let content {
+                roles = content.usedChannels(ofMember: m.uid).compactMap { local -> SpeakerRole? in
+                    let channel = m.channelOffset + local
+                    return channel < assigned.count ? assigned[channel] : nil
+                }
+            } else {
+                let used = (m.channelOffset..<(m.channelOffset + m.channelCount)).filter { $0 < plan.channels }
+                roles = used.map { channel in (channel < assigned.count ? assigned[channel] : nil) ?? order[min(channel, order.count - 1)] }
+            }
             return Member(deviceUID: m.uid, name: m.name, isLeader: m.isLeader, resampled: m.resampled, speakers: roles,
                           sampleRate: m.sampleRate, physicalBitDepth: m.physicalBitDepth, physicalIsInteger: m.physicalIsInteger,
                           physicalFormatKnown: m.physicalFormatKnown, exclusive: m.exclusive, otherAppsPlaying: otherAppsPlaying)
         }
-        return GroupSignalPath(groupName: group.name, source: source, folds: plan.channels < source.channels,
-                               dsdConvertedToPCM: plan.dsdConvertedToPCM, stage: stage, members: members)
+        let folds = content.map { !$0.router.isUnmixed || !$0.router.dropped.isEmpty } ?? (plan.channels < source.channels)
+        return GroupSignalPath(groupName: group.name, source: source, folds: folds, dsdConvertedToPCM: plan.dsdConvertedToPCM,
+                               stage: stage, members: members, router: content?.router)
     }
 
     /// The speakers of a channel count, in the order a file's channels go (WAVE order).

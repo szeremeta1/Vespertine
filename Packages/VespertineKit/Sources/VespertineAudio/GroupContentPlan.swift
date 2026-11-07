@@ -20,6 +20,9 @@ public struct GroupContentPlan: Equatable, Sendable {
         self.group = group
     }
 
+    /// The aggregate's channels that carry any music.
+    public var usedOutputs: [Int] { router.usedOutputs }
+
     /// The channels of a member (0 is its first) that carry any music.
     public func usedChannels(ofMember uid: String) -> [Int] {
         channels(ofMember: uid).filter { !router.matrixRow($0.aggregate).isEmpty }.map(\.local)

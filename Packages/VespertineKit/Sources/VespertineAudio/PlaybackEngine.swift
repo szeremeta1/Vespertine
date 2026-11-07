@@ -1178,7 +1178,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         var plan: OutputPlan
         if isGroup {
             // PCM only, no integer mode, no 16-bit match, no Spatial Audio: the group's rules (GroupFormatRules).
-            plan = GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device))
+            plan = groupPlan(for: probed, device: device) ?? GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device))
         } else {
             plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
                                       policy: ratePolicy(for: device),
@@ -1325,9 +1325,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
         if let resources = session.groupResources {
             // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
-            let stage = GroupSignalPath.stage(room: chain(room, session: session), usedChannels: plan.channels, equalizer: path.equalizer != nil,
-                                              digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
-            let group = GroupSignalPath.make(group: resources.group, applied: session.applied, source: probed.format, plan: plan, stage: stage)
+            let playing = routingGroup(for: device) ?? resources.group
+            let content = plan.channels == playing.totalChannels ? GroupRouting.content(source: probed.format, group: playing) : nil
+            let stage = GroupSignalPath.stage(room: chain(room, session: session), used: content?.usedOutputs ?? Array(0..<max(plan.channels, 0)),
+                                              equalizer: path.equalizer != nil, digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
+            let group = GroupSignalPath.make(group: playing, applied: session.applied, source: probed.format, plan: plan, stage: stage, content: content)
             path.group = group
             path.deviceProfile = group.deviceProfile
             path.resampledMembers = group.resampledMemberNames
@@ -1362,16 +1364,39 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
-    /// The chain the I/O thread runs for `session`: the room correction chosen for the output, and on a speaker group the delay of
-    /// each speaker added to it (a measured skew between the DACs, a speaker's delay trim: `GroupDelay`). Read from the group as
-    /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
-    private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
-        guard let playing = session.groupResources?.group else { return room }
+    /// The group a speaker-group output plays as of now, for routing a song onto it: the group as it is chosen (so a moved speaker or
+    /// a changed policy takes effect with the next song), less any members that were lost; nil for a single device.
+    private func routingGroup(for device: OutputDevice) -> SpeakerGroup? {
+        guard GroupOutput.isGroupOutput(device) else { return nil }
+        if let session, let current = currentGroup(of: session), current.outputUID == device.uid { return current }
+        return resolvedGroup.flatMap { $0.outputUID == device.uid ? $0 : nil }
+    }
+
+    /// The group `session` plays, as it is chosen now, less any members that were lost; nil for a single device.
+    private func currentGroup(of session: OutputSession) -> SpeakerGroup? {
+        guard let playing = session.groupResources?.group else { return nil }
         let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
         let present = Set(playing.members.map(\.deviceUID))
         var group = chosen
         group.members = chosen.members.filter { present.contains($0.deviceUID) }
         group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
+        return group
+    }
+
+    /// The plan for `probed` on a speaker group: PCM only (`GroupFormatRules`), the ring as wide as the group, the song put onto
+    /// it by where the speakers stand (`GroupRouting`). nil for a single device.
+    private func groupPlan(for probed: ProbedSource, device: OutputDevice, policy: RatePolicy? = nil) -> OutputPlan? {
+        guard GroupOutput.isGroupOutput(device) else { return nil }
+        let base = GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: policy ?? ratePolicy(for: device))
+        guard let group = routingGroup(for: device) else { return base }
+        return GroupRouting.routed(base, content: GroupRouting.content(source: probed.format, group: group), group: group, source: probed.format)
+    }
+
+    /// The chain the I/O thread runs for `session`: the room correction chosen for the output, and on a speaker group the delay of
+    /// each speaker added to it (a measured skew between the DACs, a speaker's delay trim: `GroupDelay`). Read from the group as
+    /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
+    private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
+        guard let group = currentGroup(of: session) else { return room }
         return GroupDelay.composing(room, delaysMs: GroupDelay.perChannelMs(group), name: group.name)
     }
 
@@ -1834,6 +1859,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
+                if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 formatB = .plan(plan)
                 planB = plan
             }
@@ -1913,6 +1939,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                            spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                            dsdToPCMForRoom: settings.convertsDSDForRoom(device), dsdToPCMForTransitions: true)
         resampled.integerSamples = false
+        if let grouped = groupPlan(for: probed, device: device, policy: .fixed(session.plan.deviceSampleRate)) { resampled = grouped }
         guard resampled.mode == .pcm, session.plan.isDeviceCompatible(with: resampled) else { return nil }
         return resampled
     }
@@ -1988,6 +2015,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
             plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                  eligible: mayMatchSixteenBit(item: next, device: device))
+            if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
             if !session.plan.isDeviceCompatible(with: plan),
                let resampled = resampledToSession(plan, probed: probed, item: next, device: device, session: session) { plan = resampled }
             guard session.plan.isDeviceCompatible(with: plan), TransitionPlanner.cutReason(.plan(plan)) == nil else { return skipFades(session) }
@@ -2151,6 +2179,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
+                if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 if session.plan.isDeviceCompatible(with: plan) {
                     // Transitions: a gap between the songs is silence written ahead of the next one (DSD silence on
                     // native DSD; never on bitstream, which the planner leaves alone).
@@ -2354,7 +2383,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             path?.roomFiltersSkipped = room?.filtersTooLong(sampleRate: rate, channelCount: plan.channels) ?? false
             if var group = path?.group {
                 // What is done to the samples can change while a song plays (a setting): the group's account follows it.
-                group.stage = GroupSignalPath.stage(room: session.map { chain(room, session: $0) } ?? room, usedChannels: plan.channels, equalizer: path?.equalizer != nil,
+                group.stage = GroupSignalPath.stage(room: session.map { chain(room, session: $0) } ?? room, used: group.router?.usedOutputs ?? Array(0..<max(plan.channels, 0)), equalizer: path?.equalizer != nil,
                                                     digitalVolumeDB: settings.digitalVolume(for: sessionDevice), replayGainDB: path?.replayGainDB)
                 path?.group = group
                 path?.deviceProfile = group.deviceProfile

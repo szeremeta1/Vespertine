@@ -75,7 +75,7 @@ public enum GroupPolicies {
     }
 
     /// What the stereo choices do today.
-    public static let stereoNote = "Saved with the group. For now a stereo song plays on the first two channels of the first output (the front pair); the other choices take effect when routing by speaker is switched on."
+    public static let stereoNote = "Played: a stereo song goes to the speakers by where the speakers stand, then this choice decides what the others do. Only the front pair plays it unless you choose otherwise."
 
     // MARK: Subwoofer channel
 
@@ -144,7 +144,7 @@ public enum GroupPolicies {
         return result
     }
 
-    public static let lfeNote = "The choice is saved with the group; the LFE channel is not played on a group yet."
+    public static let lfeNote = "Played: a song's LFE channel goes by this choice, or to the group's subwoofer when it has one."
 
     // MARK: A lost output
 
@@ -176,7 +176,7 @@ public enum GroupPolicies {
     }
 
     /// What a group's per-speaker settings do in playback today.
-    public static let playedToday = "Today the delays shown here are played (the waits and the delay trims). Level trims and polarity are saved with the group but not applied yet."
+    public static let playedToday = "Played today: each channel of a song goes to the speakers by where the speakers stand, and the delays shown here (the waits and the delay trims). Level trims and polarity are saved with the group but not applied yet."
 
     public static let lossNote = "Played by the engine: a lost output pauses the group or moves it to the rest, and it moves back when the output returns."
 }

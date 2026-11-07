@@ -104,11 +104,13 @@ struct GroupPoliciesTests {
 
     // MARK: What plays today
 
-    @Test("The notes say what works now: carry-on and pause are played by the engine; the stereo and LFE choices are saved but not played yet")
+    @Test("The notes say what works now: the stereo and LFE choices are played by speaker position, carry-on and pause by the engine; level trims and polarity are not applied yet")
     func notes() {
-        #expect(GroupPolicies.stereoNote.contains("first two channels"))
-        #expect(GroupPolicies.lfeNote.contains("saved"))
+        #expect(!GroupPolicies.stereoNote.contains("first two channels") && !GroupPolicies.stereoNote.contains("saved"))
+        #expect(GroupPolicies.stereoNote.contains("where the speakers stand"))
+        #expect(!GroupPolicies.lfeNote.contains("not played") && GroupPolicies.lfeNote.contains("LFE"))
         #expect(!GroupPolicies.lossNote.contains("not played"))
         #expect(GroupPolicies.playedToday.contains("delays") && GroupPolicies.playedToday.contains("not applied"))
+        #expect(GroupPolicies.playedToday.contains("where the speakers stand"))
     }
 }
