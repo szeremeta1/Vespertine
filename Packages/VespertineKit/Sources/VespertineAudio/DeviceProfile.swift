@@ -30,6 +30,7 @@ public struct DeviceProfile: Sendable, Hashable {
         case builtIn
         case speakers            // the Mac's own speakers: macOS tunes them with its own processing
         case virtualDevice       // aggregate, multi-output and virtual devices: the audio goes on to something else
+        case speakerGroup        // Vespertine's own speaker group: several DACs as one output (its badge comes from the members)
         case usbDAC
         case other
     }
@@ -53,6 +54,14 @@ public struct DeviceProfile: Sendable, Hashable {
 
     /// The tag of an aggregate or multi-output device (also how the signal path tells it from a virtual one).
     static var aggregateTag: String { String(localized: "AGGREGATE", comment: "Short uppercase tag for an aggregate or multi-output device.") }
+
+    /// A speaker group (several DACs played as one). Whether it can be bit-perfect depends on the members, so the caller says
+    /// (`GroupSignalPath.isBitPerfect`) rather than the kind fixing it.
+    public static func speakerGroup(canBeBitPerfect: Bool) -> DeviceProfile {
+        DeviceProfile(kind: .speakerGroup, tag: "SPEAKER GROUP",
+                      note: "Several DACs played as one output. The DAC that leads the clock can be bit-perfect; the others are resampled by a few millionths to stay in step with it.",
+                      canBeBitPerfect: canBeBitPerfect, symbol: "hifispeaker.2")
+    }
 
     private static func classify(_ device: OutputDevice) -> DeviceProfile {
         let name = device.name.lowercased()

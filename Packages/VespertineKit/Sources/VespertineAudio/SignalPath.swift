@@ -32,6 +32,8 @@ public struct SignalPath: Sendable, Hashable {
     public var bypassedRoomCorrection: String? = nil
     /// A speaker's measured room correction filter is too long for this sample rate, so it's left out.
     public var roomFiltersSkipped = false
+    /// For a speaker group: the DACs that carry some of the song and are resampled to follow the clock leader.
+    public var resampledMembers: [String] = []
     /// Shared mode only: another app is sending sound to the same device right now, so macOS mixes it in.
     public var otherAppsPlaying = false
     /// Frames of this track the decoder played as silence because the file is damaged there (SACD images).
@@ -138,6 +140,7 @@ public struct SignalPath: Sendable, Hashable {
             case .virtualDevice:
                 return deviceProfile.tag == DeviceProfile.aggregateTag ? String(localized: "AGGREGATE DEVICE", comment: "Status badge (short, uppercase).")
                                                                        : String(localized: "VIRTUAL DEVICE", comment: "Status badge (short, uppercase).")
+            case .speakerGroup: return resampledMembers.isEmpty ? "SPEAKER GROUP" : "SPEAKER GROUP · RESAMPLED"
             default: return String(localized: "BLUETOOTH · LOSSY", comment: "Status badge (short, uppercase).")
             }
         }
