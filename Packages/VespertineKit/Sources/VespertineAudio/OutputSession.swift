@@ -453,6 +453,56 @@ public enum DeviceControl {
 
     // MARK: Format
 
+    /// The physical format to ask for at `rate`: linear PCM with at least `channels` channels, integer before float, the
+    /// song's word length (`bitDepth`) before any other, then the deepest; the current channel count, mixable. Nil: none fits.
+    static func bestPhysicalFormat(_ available: [AudioStreamRangedDescription], rate: Double, channels: Int, bitDepth: Int,
+                                   current: AudioStreamBasicDescription?) -> AudioStreamBasicDescription? {
+        let candidates = available.filter {
+            $0.mFormat.mFormatID == kAudioFormatLinearPCM
+                && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
+                && $0.mFormat.mChannelsPerFrame >= channels
+        }
+        let wantedChannels = max(current?.mChannelsPerFrame ?? 0, UInt32(max(channels, 0)))
+        func score(_ r: AudioStreamRangedDescription) -> Int {
+            var s = 0
+            if r.mFormat.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 { s += 1000 }
+            if Int(r.mFormat.mBitsPerChannel) == bitDepth { s += 500 }
+            s += Int(r.mFormat.mBitsPerChannel)
+            if r.mFormat.mChannelsPerFrame == wantedChannels { s += 200 }
+            if r.mFormat.mFormatFlags & kAudioFormatFlagIsNonMixable == 0 { s += 50 } // we render Float32 through the mixer-less HAL path
+            return s
+        }
+        guard var best = candidates.max(by: { score($0) < score($1) })?.mFormat else { return nil }
+        best.mSampleRate = rate
+        return best
+    }
+
+    static func isSameFormat(_ a: AudioStreamBasicDescription, _ b: AudioStreamBasicDescription) -> Bool {
+        a.mSampleRate == b.mSampleRate && a.mBitsPerChannel == b.mBitsPerChannel && a.mFormatFlags == b.mFormatFlags
+            && a.mChannelsPerFrame == b.mChannelsPerFrame
+    }
+
+    /// Puts one stream in `bestPhysicalFormat` (if it isn't already) and waits for the hardware to report it. A refusal is logged,
+    /// not thrown: the stream then plays in the format it had, and the path says so from what is read back.
+    static func applyBestPhysicalFormat(stream: AudioStreamID, rate: Double, channels: Int, bitDepth: Int) {
+        let current = try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription())
+        guard let best = bestPhysicalFormat(DeviceQuery.physicalFormats(stream), rate: rate, channels: channels, bitDepth: bitDepth, current: current),
+              !(current.map { isSameFormat($0, best) } ?? false) else { return }
+        do {
+            try HAL.set(stream, .global(kAudioStreamPropertyPhysicalFormat), best)
+            // Physical format changes are asynchronous: wait until the hardware reports it.
+            let deadline = Date().addingTimeInterval(2)
+            while Date() < deadline {
+                let now = try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription())
+                if let now, now.mBitsPerChannel == best.mBitsPerChannel, abs(now.mSampleRate - rate) < 0.5 { break }
+                usleep(10_000)
+            }
+            settle()
+        } catch {
+            log.error("physical format change refused: \(String(describing: error))")
+        }
+    }
+
     /// Switches the device's nominal rate (and, for single-stream devices, the physical format) to
     /// match `plan`. Multi-stream devices (aggregates, many interfaces and receivers) keep each
     /// stream's channel layout; channels are spread across the streams in order.
@@ -461,42 +511,7 @@ public enum DeviceControl {
         let rate = plan.deviceSampleRate
         let streams = DeviceQuery.outputStreams(device)
         if streams.count == 1, let stream = streams.first {
-            let current = try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription())
-            let candidates = DeviceQuery.physicalFormats(stream).filter {
-                $0.mFormat.mFormatID == kAudioFormatLinearPCM
-                    && rate >= $0.mSampleRateRange.mMinimum - 0.5 && rate <= $0.mSampleRateRange.mMaximum + 0.5
-                    && $0.mFormat.mChannelsPerFrame >= plan.deviceChannels
-            }
-            let wantedChannels = max(current?.mChannelsPerFrame ?? 0, UInt32(plan.deviceChannels))
-            func score(_ r: AudioStreamRangedDescription) -> Int {
-                var s = 0
-                if r.mFormat.mFormatFlags & kAudioFormatFlagIsSignedInteger != 0 { s += 1000 }
-                if Int(r.mFormat.mBitsPerChannel) == plan.physicalBitDepth { s += 500 }
-                s += Int(r.mFormat.mBitsPerChannel)
-                if r.mFormat.mChannelsPerFrame == wantedChannels { s += 200 }
-                if r.mFormat.mFormatFlags & kAudioFormatFlagIsNonMixable == 0 { s += 50 } // we render Float32 through the mixer-less HAL path
-                return s
-            }
-            if var best = candidates.max(by: { score($0) < score($1) })?.mFormat {
-                best.mSampleRate = rate
-                let same = current.map { $0.mSampleRate == best.mSampleRate && $0.mBitsPerChannel == best.mBitsPerChannel
-                    && $0.mFormatFlags == best.mFormatFlags && $0.mChannelsPerFrame == best.mChannelsPerFrame } ?? false
-                if !same {
-                    do {
-                        try HAL.set(stream, .global(kAudioStreamPropertyPhysicalFormat), best)
-                        // Physical format changes are asynchronous: wait until the hardware reports it.
-                        let deadline = Date().addingTimeInterval(2)
-                        while Date() < deadline {
-                            let now = try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription())
-                            if let now, now.mBitsPerChannel == best.mBitsPerChannel, abs(now.mSampleRate - rate) < 0.5 { break }
-                            usleep(10_000)
-                        }
-                        settle()
-                    } catch {
-                        log.error("physical format change refused: \(String(describing: error))")
-                    }
-                }
-            }
+            applyBestPhysicalFormat(stream: stream, rate: rate, channels: plan.deviceChannels, bitDepth: plan.physicalBitDepth)
         }
 
         try setNominalRate(rate, on: device)

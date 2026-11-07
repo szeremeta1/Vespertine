@@ -16,6 +16,7 @@ Settings › Playback › **Speaker Groups (beta)** holds one switch, off by def
 - **Zero offset, not zero latency.** The goal is that every speaker reaches the seat at the same moment, to a fraction of a millisecond, not that sound is instant.
 - **PCM only.** DSD is converted to PCM (the path says so), Dolby and DTS bitstreams are decoded, and integer mode and "Match 16-bit sources" are off for groups. At most 16 output channels in total.
 - **Every DAC is held.** With exclusive access on, each member is held and set to the song's rate; the aggregate itself cannot be held.
+- **Every DAC at its best format.** Each member is switched to the deepest integer format it offers (32-bit where it has it), as a single DAC is, and on quit it gets what the "when Vespertine quits" setting says, as a single DAC does. Some DACs come up in 16-bit after they are plugged in; left there, the leader could not be bit-perfect for a 24-bit song and a resampled DAC would be cut to 16 bits.
 
 ## Setting up a group
 

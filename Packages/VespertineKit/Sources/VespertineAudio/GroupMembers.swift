@@ -130,6 +130,10 @@ public final class GroupMemberSession: @unchecked Sendable {
 
     /// Takes exclusive access (if asked), sets the rate and reads it back, member by member in the group's order, each rate
     /// change settling before the next. If anything fails, what was taken is let go and the rates changed so far are put back.
+    /// The word length asked of every member: the deepest integer format it offers. 32 bits hold any song's samples exactly, so a
+    /// leader can stay bit-perfect for 16, 24 and 32-bit songs alike, and a resampled follower isn't cut to 16 bits.
+    static let memberBitDepth = 32
+
     public static func begin(devices: [OutputDevice], rate: Double, exclusive: Bool) throws -> GroupMemberSession {
         // Before changing anything: is someone else holding a member?
         if exclusive {
@@ -163,6 +167,14 @@ public final class GroupMemberSession: @unchecked Sendable {
                 done.append(Member(uid: device.uid, deviceID: device.id, rateBefore: before, rate: before, streamRates: [], exclusive: held))
                 do { try DeviceControl.setNominalRate(rate, on: device.id) } catch {
                     throw GroupMemberError.rateRefused(uid: device.uid, name: device.name, rate: rate)
+                }
+                // The aggregate has several streams, so the single-device format step never reaches a member: give each one its
+                // best physical format here (DeviceRestore, above, puts the old one back when Vespertine quits).
+                let streams = DeviceQuery.outputStreams(device.id)
+                if streams.count == 1, let stream = streams.first {
+                    let channels = (try? HAL.get(stream, .global(kAudioStreamPropertyPhysicalFormat), initial: AudioStreamBasicDescription()))
+                        .map { Int($0.mChannelsPerFrame) } ?? device.capabilities.outputChannels
+                    DeviceControl.applyBestPhysicalFormat(stream: stream, rate: rate, channels: channels, bitDepth: Self.memberBitDepth)
                 }
                 done[done.count - 1].readBack(from: device.id)
             }
