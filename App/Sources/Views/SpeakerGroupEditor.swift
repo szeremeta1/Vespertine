@@ -24,6 +24,7 @@ struct SpeakerGroupEditor: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     RoomCanvasView(group: $group)
+                    SpeakerReadoutView(group: $group)
                     ChannelMapGrid(group: $group)
                 }
             }
