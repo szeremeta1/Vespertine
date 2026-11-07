@@ -307,8 +307,12 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private var session: OutputSession?
     private var sessionDevice: OutputDevice?
-    /// The members of the speaker group `resolveDevice` last found, in the group's order (for opening its session).
+    /// The members of the speaker group `resolveDevice` last found, in the group's order (for opening its session), and the group
+    /// they make: the chosen one, or what is left of it after followers were lost and it carries on.
     private var groupMembers: [OutputDevice] = []
+    private var resolvedGroup: SpeakerGroup?
+    /// For tests: the outputs the engine sees, instead of Core Audio's list (a DAC that "goes away").
+    var outputListing: (@Sendable () -> [OutputDevice])?
     private var decoding: Decoding?
     private var pending: (item: PlayableItem, probed: ProbedSource, plan: OutputPlan, device: OutputDevice)?
     /// The next track, for macOS's renderer (Dolby Atmos), once this one has played out.
@@ -897,7 +901,21 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             }
             guard let device = sessionDevice else { return }
-            let alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            var alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            // A speaker group's aggregate outlives a member that went away; the members are what decide.
+            if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
+                let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
+                switch GroupLoss.action(for: GroupLoss.assess(playing, connected: connected), policy: chosen.onMemberLoss) {
+                case .none: break
+                case .pause:
+                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
+                    alive = false
+                case .continueOnRest:
+                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    restartFromCurrentPosition()
+                    return
+                }
+            }
             if !alive {
                 log.notice("\(device.name, privacy: .public) disappeared while in use")
                 let position = currentPosition()
@@ -928,7 +946,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// connected (unplugged before launch, or gone for a while) is stood in for as `outputFallback` says, and
     /// `standIn` asks for that now (the wait for it is over).
     private func resolveDevice(standIn: Bool = false) throws -> OutputDevice? {
-        let devices = DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
+        let devices = listOutputs()
         for device in devices { deviceNames[device.uid] = device.name }
         noteConnectedOutputs(Set(devices.map(\.uid)))
         if let group = settings.group(forOutputUID: settings.deviceUID) { return try resolveGroup(group, among: devices) }
@@ -951,15 +969,36 @@ public final class PlaybackEngine: @unchecked Sendable {
         return devices.first(where: \.isDefault) ?? devices.first
     }
 
+    private func listOutputs() -> [OutputDevice] {
+        outputListing?() ?? DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs)
+    }
+
+    /// Whether the output `uid` can play now: a device that is connected, a group whose members all are.
+    private func isOutputAvailable(_ uid: String) -> Bool {
+        let devices = listOutputs()
+        if let group = settings.group(forOutputUID: uid) {
+            if case .ready = GroupOutput.resolve(group, among: devices) { return true }
+            return false
+        }
+        return devices.contains { $0.uid == uid }
+    }
+
     /// The output a speaker group presents when all of its members are connected. Members that aren't are waited for like a chosen
     /// output that left (and never stood in for by one DAC: that would play a quad file on two speakers).
     private func resolveGroup(_ group: SpeakerGroup, among devices: [OutputDevice]) throws -> OutputDevice {
-        switch GroupOutput.resolve(group, among: devices) {
+        // A group set to carry on plays with the members that are left (a lone leader as the single output it is); it moves back
+        // to the whole group when the others return (`standingIn`, as for any chosen output that stands in).
+        switch GroupOutput.resolveDegraded(group, among: devices) {
         case .ready(let output, let members):
-            standingIn = nil
+            standingIn = members.count < group.members.count ? group.outputUID : nil
             groupMembers = members
+            resolvedGroup = members.count < group.members.count ? group.without(memberUIDs: Set(group.members.map(\.deviceUID)).subtracting(members.map(\.uid))) : group
             deviceNames[output.uid] = output.name
             return output
+        case .single(let leader):
+            standingIn = group.outputUID
+            deviceNames[group.outputUID] = group.name
+            return leader
         case .missing(let names):
             deviceNames[group.outputUID] = group.name
             log.notice("Speaker group \(group.name, privacy: .public) is missing \(names.joined(separator: ", "), privacy: .public)")
@@ -981,7 +1020,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// Notes which outputs are connected (`uids`, or read now), and when each one that was connected went away.
     private func noteConnectedOutputs(_ uids: Set<String>? = nil) {
-        var now = uids ?? DeviceQuery.outputUIDs()
+        var now = uids ?? outputListing.map { Set($0().map(\.uid)) } ?? DeviceQuery.outputUIDs()
         // A speaker group is a connected output while all of its members are.
         now.formUnion(GroupOutput.connectedUIDs(of: settings.speakerGroups, connected: now))
         if let before = connectedUIDs {
@@ -1003,7 +1042,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let now = Date()
         guard force || now.timeIntervalSince(awaiting.checkedAt) >= 0.5 else { return }
         awaitingDevice?.checkedAt = now
-        if DeviceQuery.outputDevices(dopEnabledUIDs: settings.dopDeviceUIDs).contains(where: { $0.uid == awaiting.uid }) {
+        if isOutputAvailable(awaiting.uid) {
             // start() keeps the original deadline if the output isn't ready yet and it has to wait again.
             guard let parked else { awaitingDevice = nil; return }
             self.parked = nil
@@ -1225,7 +1264,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let old = session
         session = nil
         sessionLock.unlock()
-        if let group = settings.group(forOutputUID: device.uid), GroupOutput.isGroupOutput(device) {
+        if GroupOutput.isGroupOutput(device), let group = resolvedGroup, group.outputUID == device.uid {
             try replaceGroupSession(old: old, device: device, group: group, plan: plan)
             return
         }

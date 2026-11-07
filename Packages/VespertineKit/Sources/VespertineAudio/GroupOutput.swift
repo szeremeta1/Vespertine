@@ -13,6 +13,8 @@ public enum GroupOutput {
         case ready(output: OutputDevice, members: [OutputDevice])
         /// These members (by name, in the group's order) aren't connected, or have fewer channels than the group needs.
         case missing([String])
+        /// A group that carries on with only its leader: that device, played as a single output.
+        case single(OutputDevice)
         /// The members have no sample rate in common.
         case noCommonRate
         /// The group itself is not valid (`SpeakerGroup.issues`).
