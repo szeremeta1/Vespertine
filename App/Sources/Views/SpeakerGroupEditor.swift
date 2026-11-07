@@ -26,6 +26,7 @@ struct SpeakerGroupEditor: View {
                     RoomCanvasView(group: $group)
                     SpeakerReadoutView(group: $group)
                     ChannelMapGrid(group: $group)
+                    SpeakerPoliciesView(group: $group)
                 }
             }
             HStack {
