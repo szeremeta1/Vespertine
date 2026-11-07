@@ -169,6 +169,7 @@ private final class StallingReads: @unchecked Sendable {
 
     init(_ names: Set<String>) { self.names = names }
     func release() { condition.lock(); released = true; condition.broadcast(); condition.unlock() }
+    var isReleased: Bool { condition.lock(); defer { condition.unlock() }; return released }
 
     var hook: @Sendable (URL) -> Void {
         { [self] url in
@@ -179,6 +180,9 @@ private final class StallingReads: @unchecked Sendable {
         }
     }
 }
+
+/// How long a hung read is kept before the test lets it go itself (see `oneHungFileIsSkipped`); far past any loaded run.
+private let hungReadWatchdog = 300
 
 @Suite("A scan that reads a share with a file that does not answer")
 struct StuckReadTests {
@@ -198,9 +202,12 @@ struct StuckReadTests {
         for name in ["01 - A.wav", "02 - B.wav", "03 - C.wav"] { try audio(root.appendingPathComponent("Album/\(name)")) }
         let reads = StallingReads(["02 - B.wav"]); defer { reads.release() }
         let (scanner, db, source) = try await scanner(root, reads: reads)
-        let start = Date()
+        // Not a wall-clock bound: a full parallel run keeps the cooperative pool busy for most of a minute (this scan took 53 s
+        // on a passing CI run), so any bound on the clock fails by load. The scan finished if it did so while the file was
+        // still blocked. The watchdog lets the file go if the scan waits for it, which then fails below instead of hanging.
+        let watchdog = Task { try await Task.sleep(for: .seconds(hungReadWatchdog)); reads.release() }; defer { watchdog.cancel() }
         let summary = try await scanner.scan(source)
-        #expect(Date().timeIntervalSince(start) < 60)
+        #expect(!reads.isReleased, "the scan waited for the file that never answers")
         #expect(try db.allTracks().map(\.title).sorted() == ["01 - A", "03 - C"], "the files that answered were lost with the one that did not")
         #expect(summary.failed.map { URL(fileURLWithPath: $0).lastPathComponent } == ["02 - B.wav"])
         #expect(try db.sources().first?.lastScannedAt != nil)
