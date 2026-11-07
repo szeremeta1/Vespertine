@@ -287,7 +287,10 @@ final class AppModel {
         library.bundlesCopiesByDefault = settings.bundleCopies
         if settings.speakerGroupsFeature {
             let groups = SpeakerGroupsModel(directory: settings.dataDirectory)
-            groups.onChange = { [weak self] in self?.syncEngine() }
+            groups.onChange = { [weak self] in
+                self?.followDrawings()
+                self?.syncEngine()
+            }
             speakerGroups = groups
         }
         syncEngine()
@@ -403,6 +406,32 @@ final class AppModel {
     var chosenGroup: SpeakerGroup? {
         guard let uid = settings.selectedDeviceUID else { return nil }
         return speakerGroups?.groups.first { $0.outputUID == uid }
+    }
+
+    /// The speaker group whose output is `device`, when the feature is on.
+    func group(for device: OutputDevice) -> SpeakerGroup? {
+        speakerGroups?.groups.first { $0.outputUID == device.uid }
+    }
+
+    /// Keeps every group's drawn room profile (once one has been made) up to date with the drawing, so a speaker moved in the editor is
+    /// heard and checked with the next play. Writes the library only when a profile changed.
+    private func followDrawings() {
+        guard let groups = speakerGroups?.groups else { return }
+        var book = settings.roomBook
+        var changed = false
+        for group in groups where GroupRoomProfile.syncDrawing(of: group, in: &book) { changed = true }
+        if changed { settings.roomBook = book }
+    }
+
+    /// "Use the drawing" for `group`: its room profile is made (or brought up to date), the group bound to it and the output switched
+    /// to play with it. False when the group has no drawing to make a profile of.
+    @discardableResult
+    func useDrawing(of group: SpeakerGroup) -> Bool {
+        var book = settings.roomBook
+        guard let bound = GroupRoomProfile.useDrawing(for: group, in: &book) else { return false }
+        settings.roomBook = book
+        speakerGroups?.upsert(bound)
+        return true
     }
 
     /// The output a group presents while all of its members are connected.

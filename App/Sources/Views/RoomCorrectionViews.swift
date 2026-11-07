@@ -157,6 +157,7 @@ struct RoomCorrectionWindow: View {
                 header
                 if let device {
                     outputCard(device, profiles: profiles, selected: selected)
+                    if let group = model.group(for: device) { SpeakerGroupAlignmentCard(group: group) }
                     actions(device, selected: selected)
                 } else {
                     Text("No output is connected.").font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
