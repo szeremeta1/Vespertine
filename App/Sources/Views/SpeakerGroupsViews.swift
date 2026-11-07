@@ -22,6 +22,7 @@ struct SpeakerGroupsSettingsSection: View {
 private struct SpeakerGroupsList: View {
     @State private var groups: SpeakerGroupsModel
     @State private var making = false
+    @State private var editing: SpeakerGroup?
 
     init(directory: URL) { _groups = State(initialValue: SpeakerGroupsModel(directory: directory)) }
 
@@ -35,6 +36,7 @@ private struct SpeakerGroupsList: View {
                     HStack {
                         Text(verbatim: group.name).font(.body.weight(.medium))
                         Spacer()
+                        Button { editing = group } label: { Text(verbatim: "Edit…") }
                         Button(role: .none) { groups.duplicate(group.id) } label: { Text(verbatim: "Duplicate") }
                         Button(role: .destructive) { groups.remove(group.id) } label: { Text(verbatim: "Remove") }
                     }
@@ -58,6 +60,7 @@ private struct SpeakerGroupsList: View {
             Text(verbatim: "Speaker Groups (experimental)")
         }
         .sheet(isPresented: $making) { NewSpeakerGroupSheet(groups: groups) }
+        .sheet(item: $editing) { SpeakerGroupEditor(groups: groups, group: $0) }
     }
 }
 
