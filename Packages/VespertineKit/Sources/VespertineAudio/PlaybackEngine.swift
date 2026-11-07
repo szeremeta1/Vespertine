@@ -1286,7 +1286,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
         if let resources = session.groupResources {
             // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
-            let stage = GroupSignalPath.stage(room: room, usedChannels: plan.channels, equalizer: path.equalizer != nil,
+            let stage = GroupSignalPath.stage(room: chain(room, session: session), usedChannels: plan.channels, equalizer: path.equalizer != nil,
                                               digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
             let group = GroupSignalPath.make(group: resources.group, applied: session.applied, source: probed.format, plan: plan, stage: stage)
             path.group = group
@@ -1310,7 +1310,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         // Room correction: same rules, and only for the channel layout it was measured with. Each speaker's delay,
         // level and bands, then its measured filter (convolution, a block late once there have been any).
-        let room = session.applied.integerMode ? nil : settings.roomCorrection(for: sessionDevice, plan: session.plan)
+        let room = session.applied.integerMode ? nil : chain(settings.roomCorrection(for: sessionDevice, plan: session.plan), session: session)
         let rate = session.applied.sampleRate, channels = session.plan.channels
         RoomCorrectionPlayback.install(room, on: session.context, sampleRate: rate, channelCount: channels)
         let key = room?.impulseKey(sampleRate: rate, channelCount: channels) ?? ""
@@ -1323,11 +1323,24 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
+    /// The chain the I/O thread runs for `session`: the room correction chosen for the output, and on a speaker group the delay of
+    /// each speaker added to it (a measured skew between the DACs, a speaker's delay trim: `GroupDelay`). Read from the group as
+    /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
+    private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
+        guard let playing = session.groupResources?.group else { return room }
+        let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
+        let present = Set(playing.members.map(\.deviceUID))
+        var group = chosen
+        group.members = chosen.members.filter { present.contains($0.deviceUID) }
+        group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
+        return GroupDelay.composing(room, delaysMs: GroupDelay.perChannelMs(group), name: group.name)
+    }
+
     /// How long room correction holds sound back on the current output: what the end of the queue plays out.
     private var roomHoldSeconds: Double {
         guard let session, !session.plan.isPassthrough else { return 0 }
         let fir = Double(nrt_context_fir_latency(session.context)) / session.applied.sampleRate
-        return fir + (settings.roomCorrection(for: sessionDevice, plan: session.plan)?.maxDelaySeconds ?? 0)
+        return fir + (chain(settings.roomCorrection(for: sessionDevice, plan: session.plan), session: session)?.maxDelaySeconds ?? 0)
     }
 
     private func teardownDecoding() {
@@ -2302,7 +2315,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             path?.roomFiltersSkipped = room?.filtersTooLong(sampleRate: rate, channelCount: plan.channels) ?? false
             if var group = path?.group {
                 // What is done to the samples can change while a song plays (a setting): the group's account follows it.
-                group.stage = GroupSignalPath.stage(room: room, usedChannels: plan.channels, equalizer: path?.equalizer != nil,
+                group.stage = GroupSignalPath.stage(room: session.map { chain(room, session: $0) } ?? room, usedChannels: plan.channels, equalizer: path?.equalizer != nil,
                                                     digitalVolumeDB: settings.digitalVolume(for: sessionDevice), replayGainDB: path?.replayGainDB)
                 path?.group = group
                 path?.deviceProfile = group.deviceProfile
