@@ -226,6 +226,13 @@ struct DevicePicker: View {
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,
                           selected: model.settings.selectedDeviceUID == d.uid)
             }
+            // Speaker groups (hidden feature): chosen like an output, ready when all of their outputs are connected.
+            if let groups = model.speakerGroups {
+                ForEach(GroupOutputRows.rows(groups: groups.groups, devices: model.devices.devices)) { row in
+                    deviceRow(row.uid, name: row.name, detail: row.detail, symbol: "hifispeaker.2", selected: model.settings.selectedDeviceUID == row.uid)
+                        .opacity(row.isReady ? 1 : 0.6)
+                }
+            }
             if let device = model.activeDevice {
                 Hairline().padding(.vertical, 8)
                 DeviceSettings(device: device)
@@ -322,20 +329,23 @@ struct DeviceSettings: View {
             }
             .font(Typeface.ui(12))
             // Stereo and mono upmixed to 5.1 for Spatial Audio or multichannel speakers. Off by default: the original stays the default.
-            Toggle(isOn: Binding(get: { settings.spatializeStereoUIDs.contains(device.uid) },
-                                 set: { on in
-                                     if on { settings.spatializeStereoUIDs.insert(device.uid) } else { settings.spatializeStereoUIDs.remove(device.uid) }
-                                     model.syncEngine()
-                                 })) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Spatialize stereo").font(Typeface.ui(12))
-                    (device.capabilities.outputChannels > 2 || (device.capabilities.speakerLayoutChannels ?? 0) >= 3
-                         ? Text("Upmixes stereo and mono songs to 5.1 for every speaker. Off plays them as they are.")
-                         : Text("Upmixes stereo and mono songs to 5.1 for Spatial Audio. Needs Spatial Audio on. Off plays them as they are."))
-                        .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+            // Shown only where it does something: a stereo output needs Spatial Audio on first.
+            if FormatPlanner.canSpatializeStereo(on: device.capabilities, spatial: model.engineSpatialMode(for: device)) {
+                Toggle(isOn: Binding(get: { settings.spatializeStereoUIDs.contains(device.uid) },
+                                     set: { on in
+                                         if on { settings.spatializeStereoUIDs.insert(device.uid) } else { settings.spatializeStereoUIDs.remove(device.uid) }
+                                         model.syncEngine()
+                                     })) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Spatialize stereo").font(Typeface.ui(12))
+                        (device.capabilities.outputChannels > 2 || (device.capabilities.speakerLayoutChannels ?? 0) >= 3
+                             ? Text("Upmixes stereo and mono songs to 5.1 for every speaker. Off plays them as they are.")
+                             : Text("Upmixes stereo and mono songs to 5.1 for Spatial Audio. Off plays them as they are."))
+                            .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
+                .toggleStyle(.switch).controlSize(.mini)
             }
-            .toggleStyle(.switch).controlSize(.mini)
             if device.transport == .usb || device.transport == .thunderbolt {
                 Toggle(isOn: Binding(get: { DoPDefaults.isEnabled(uid: device.uid, on: settings.dopDeviceUIDs, off: settings.dopOffDeviceUIDs) },
                                      set: { on in

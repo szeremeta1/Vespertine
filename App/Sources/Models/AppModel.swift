@@ -160,6 +160,8 @@ struct TransitionsNote: Equatable {
 @MainActor
 final class AppModel {
     let settings: AppSettings
+    /// The saved speaker groups; nil unless the hidden switch was on at launch.
+    private(set) var speakerGroups: SpeakerGroupsModel?
     let library: LibraryStore
     let player: PlayerController
     let devices: DeviceStore
@@ -220,6 +222,8 @@ final class AppModel {
     var smartEditorPlaylist: Playlist?
     var showFindMusic = false
     var showConnectServer = false
+    /// The Remove Missing Songs… confirmation (an alert on the main window while non-nil): what removing would take.
+    var missingSongsPrompt: MissingSongsPrompt?
     var showLoopbackTest = false
     /// The note shown the first time transitions are turned on, and the window it's shown in.
     var transitionsNote = TransitionsNote()
@@ -283,6 +287,14 @@ final class AppModel {
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
         library.bundlesCopiesByDefault = settings.bundleCopies
+        if settings.speakerGroupsFeature {
+            let groups = SpeakerGroupsModel(directory: settings.dataDirectory)
+            groups.onChange = { [weak self] in
+                self?.followDrawings()
+                self?.syncEngine()
+            }
+            speakerGroups = groups
+        }
         syncEngine()
         shares.start()
         analysis.start()
@@ -378,6 +390,8 @@ final class AppModel {
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
         guard let uid = settings.selectedDeviceUID else { return devices.device(uid: nil) }
+        // A speaker group is chosen like an output: it is ready when all of its outputs are connected.
+        if let group = chosenGroup { return groupOutput(group) }
         if let chosen = devices.devices.first(where: { $0.uid == uid }) { return chosen }
         guard player.waitingForDevice == nil else { return nil }
         return OutputChoice.substitute(among: devices.devices, fallback: settings.outputFallback)
@@ -385,8 +399,47 @@ final class AppModel {
 
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
+        if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
         return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// The speaker group chosen as the output, when the feature is on and one is.
+    var chosenGroup: SpeakerGroup? {
+        guard let uid = settings.selectedDeviceUID else { return nil }
+        return speakerGroups?.groups.first { $0.outputUID == uid }
+    }
+
+    /// The speaker group whose output is `device`, when the feature is on.
+    func group(for device: OutputDevice) -> SpeakerGroup? {
+        speakerGroups?.groups.first { $0.outputUID == device.uid }
+    }
+
+    /// Keeps every group's drawn room profile (once one has been made) up to date with the drawing, so a speaker moved in the editor is
+    /// heard and checked with the next play. Writes the library only when a profile changed.
+    private func followDrawings() {
+        guard let groups = speakerGroups?.groups else { return }
+        var book = settings.roomBook
+        var changed = false
+        for group in groups where GroupRoomProfile.syncDrawing(of: group, in: &book) { changed = true }
+        if changed { settings.roomBook = book }
+    }
+
+    /// "Use the drawing" for `group`: its room profile is made (or brought up to date), the group bound to it and the output switched
+    /// to play with it. False when the group has no drawing to make a profile of.
+    @discardableResult
+    func useDrawing(of group: SpeakerGroup) -> Bool {
+        var book = settings.roomBook
+        guard let bound = GroupRoomProfile.useDrawing(for: group, in: &book) else { return false }
+        settings.roomBook = book
+        speakerGroups?.upsert(bound)
+        return true
+    }
+
+    /// The output a group presents while all of its members are connected.
+    private func groupOutput(_ group: SpeakerGroup) -> OutputDevice? {
+        if case .ready(let output, _) = GroupOutput.resolve(group, among: devices.devices) { return output }
+        return nil
     }
 
     /// Keeps the chosen output chosen: remembers what it is while it's connected, and when it comes back under
@@ -431,7 +484,7 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
-        player.engine.update(settings: settings.engineSettings())
+        player.engine.update(settings: settings.engineSettings(groups: speakerGroups?.groups ?? []))
         devices.watchVolume(of: device)
         player.resolveVersions()
     }
@@ -468,6 +521,16 @@ final class AppModel {
     /// The Spatial Audio mode multichannel music gets on `device` (its setting, or the default).
     func engineSpatialMode(for device: OutputDevice) -> SpatialMode {
         settings.engineSettings().spatialMode(for: device)
+    }
+
+    struct MissingSongsPrompt: Identifiable {
+        let id = UUID()
+        let summary: MissingSongsSummary
+    }
+
+    /// Remove Missing Songs…: counts the songs whose files are gone and asks before removing them.
+    func askToRemoveMissingSongs() {
+        Task { missingSongsPrompt = MissingSongsPrompt(summary: await library.missingSongsSummary()) }
     }
 
     func selectDevice(_ uid: String?) {

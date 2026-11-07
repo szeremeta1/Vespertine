@@ -143,6 +143,22 @@ struct StereoUpmixTests {
         for c in [0, 1, 3, 4, 5] { #expect(levels[c] < source * 0.01, "\(Self.names[c]) \(levels[c])") }
     }
 
+    @Test("Dual mono (L identical to R, as a 1952 mono master ripped as stereo) stays in the virtual centre, the same as true mono")
+    func dualMonoStaysCentre() throws {
+        let frames = 96_000
+        let m = Self.noise(frames, seed: 7).map { $0 * 0.3 }
+        var stereo = [Float](repeating: 0, count: frames * 2)
+        for f in 0..<frames { stereo[f * 2] = m[f]; stereo[f * 2 + 1] = m[f] }
+        let dual = try Self.upmix(stereo)
+        let mono = try Self.upmix(m, channels: 1)
+        #expect(dual.count == mono.count)
+        let from = 24_000, count = 48_000
+        let d = (0..<6).map { Self.rms(dual, channel: $0, from: from, count: count) }
+        let c = (0..<6).map { Self.rms(mono, channel: $0, from: from, count: count) }
+        #expect(abs(d[2] / c[2] - 1) < 0.01, "dual-mono C \(d[2]), mono C \(c[2])")
+        for ch in [0, 1, 3, 4, 5] { #expect(d[ch] < d[2] * 0.01, "\(Self.names[ch]) \(d[ch]) against C \(d[2])") }
+    }
+
     @Test("With an LFE level set, the LFE carries the bass and none of the treble")
     func lfe() throws {
         var settings = UpmixSettings()

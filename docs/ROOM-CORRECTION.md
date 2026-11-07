@@ -165,3 +165,7 @@ measurement and options always give the same filters.
 
 Profiles are stored with their measurement and design options (`RoomProfile.measured`, `designOptions`), so the target
 and range can be changed later without measuring again.
+
+## On a speaker group
+
+A [speaker group](SPEAKER-GROUPS.md) is a room-correction output of its own, keyed by the group's output UID. It is measured as the layout its drawing makes (stereo, quad, 5.1 or a custom set) with the channel map onto the group's outputs; a profile applies only while the group is wired the way it was made for. "Use the Drawing" makes a profile of delays and levels (source: geometry, no filters) from where the speakers and the seat are drawn, kept up to date as the drawing changes, and a measured profile that disagrees with the drawing by more than 0.25 ms for a speaker is flagged. The wizard plays the group for 15 s before the first sweep, takes the timing tones from a speaker on the clock leader, and keeps the aggregate running between sweeps. The group's chain adds each speaker's delay, level trim and polarity to whatever profile is chosen, and lowers the shared preamp for any boost.

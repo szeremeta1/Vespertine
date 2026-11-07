@@ -56,6 +56,9 @@ public struct RoomMeasurementSettings: Equatable, Sendable {
     public var maxAttempts = 3
     /// The sweeps take their timing references from one speaker (the left), so the speakers' delays can be lined up.
     public var timeAgainstReference = true
+    /// The speaker that plays those timing references when it isn't the left one (a speaker group's wizard picks one on the clock
+    /// leader). Ignored if it isn't in the channel map.
+    public var referenceSpeaker: RoomSpeaker?
 
     public init(inputDevice: UInt32, outputDevice: UInt32) {
         self.inputDevice = inputDevice
@@ -327,9 +330,11 @@ public final class RoomMeasurementController: @unchecked Sendable {
 
     // MARK: Steps
 
-    /// The speaker that plays the timing references during the sweeps: the left one (else the first in the map).
+    /// The speaker that plays the timing references during the sweeps: the one the settings name, else the left one (else the first
+    /// in the map).
     var referenceSpeaker: RoomSpeaker? {
         let entries = session.channelMap.entries
+        if let wanted = settings.referenceSpeaker, entries.contains(where: { $0.speaker == wanted }) { return wanted }
         return entries.first(where: { $0.speaker == .left })?.speaker ?? entries.min(by: { $0.output < $1.output })?.speaker
     }
 

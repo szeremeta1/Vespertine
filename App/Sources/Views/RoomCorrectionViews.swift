@@ -20,6 +20,20 @@ extension RoomSpeaker {
         case .lfe: String(localized: "LFE", comment: "Room correction speaker: the subwoofer channel.")
         case .leftSurround: String(localized: "Left surround", comment: "Room correction speaker.")
         case .rightSurround: String(localized: "Right surround", comment: "Room correction speaker.")
+        // The places of a speaker group: plain English, outside the string catalog, like the group's editor (plan item 25 owns the languages).
+        case .sideLeft: "Left side"
+        case .sideRight: "Right side"
+        case .backLeft: "Left back"
+        case .backRight: "Right back"
+        case .backCenter: "Back centre"
+        case .wideLeft: "Left wide"
+        case .wideRight: "Right wide"
+        case .topFrontLeft: "Left top front"
+        case .topFrontRight: "Right top front"
+        case .topMiddleLeft: "Left top middle"
+        case .topMiddleRight: "Right top middle"
+        case .topBackLeft: "Left top back"
+        case .topBackRight: "Right top back"
         }
     }
 
@@ -32,6 +46,19 @@ extension RoomSpeaker {
         case .lfe: "LFE"
         case .leftSurround: "Ls"
         case .rightSurround: "Rs"
+        case .sideLeft: "SL"
+        case .sideRight: "SR"
+        case .backLeft: "BL"
+        case .backRight: "BR"
+        case .backCenter: "BC"
+        case .wideLeft: "WL"
+        case .wideRight: "WR"
+        case .topFrontLeft: "TFL"
+        case .topFrontRight: "TFR"
+        case .topMiddleLeft: "TML"
+        case .topMiddleRight: "TMR"
+        case .topBackLeft: "TBL"
+        case .topBackRight: "TBR"
         }
     }
 
@@ -43,6 +70,11 @@ extension RoomSpeaker {
         case .lfe: Color(red: 0.85, green: 0.7, blue: 1)
         case .leftSurround: Color(red: 0.5, green: 0.9, blue: 0.85)
         case .rightSurround: Color(red: 1, green: 0.82, blue: 0.45)
+        case .sideLeft, .backLeft, .wideLeft: Color(red: 0.5, green: 0.9, blue: 0.85)
+        case .sideRight, .backRight, .wideRight: Color(red: 1, green: 0.82, blue: 0.45)
+        case .backCenter: Color(red: 0.78, green: 0.9, blue: 0.6)
+        case .topFrontLeft, .topMiddleLeft, .topBackLeft: Color(red: 0.7, green: 0.8, blue: 1)
+        case .topFrontRight, .topMiddleRight, .topBackRight: Color(red: 1, green: 0.75, blue: 0.7)
         }
     }
 }
@@ -125,6 +157,7 @@ struct RoomCorrectionWindow: View {
                 header
                 if let device {
                     outputCard(device, profiles: profiles, selected: selected)
+                    if let group = model.group(for: device) { SpeakerGroupAlignmentCard(group: group) }
                     actions(device, selected: selected)
                 } else {
                     Text("No output is connected.").font(Typeface.ui(12.5)).foregroundStyle(Palette.text2)
@@ -458,6 +491,7 @@ struct RoomCorrectionWindow: View {
         case .measured: return String(localized: "Microphone \(profile.micSerial) · measured \(date) · preamp \(preamp) dB")
         case .equalizerAPO: return String(localized: "Imported from Equalizer APO or REW · \(date) · preamp \(preamp) dB")
         case .impulseResponse: return String(localized: "Impulse responses (convolution) · imported \(date)")
+        case .geometry: return "Delays and levels from where the speakers are drawn · \(date)"
         }
     }
 
@@ -759,6 +793,7 @@ struct RoomSpeakerTable: View {
 /// the result revealed as the measurement morphs into the prediction.
 struct RoomMeasureWizard: View {
     @Environment(RoomMeasureModel.self) private var model
+    @Environment(AppModel.self) private var app
     let device: OutputDevice?
     let save: (RoomProfile, Bool) -> Void
     let close: () -> Void
@@ -785,7 +820,24 @@ struct RoomMeasureWizard: View {
         .background(Palette.window)
         .onAppear {
             model.preferredOutputUID = device?.uid
+            setGroupTarget()
             model.startIfLaunched()
+        }
+        .onDisappear { if model.groupTarget != nil, model.phase != .finished { model.reset() } }
+    }
+
+    /// A group's output is measured as the group (its layout, its outputs, a private aggregate of its members), not as one device.
+    private func setGroupTarget() {
+        model.groupProblem = nil
+        guard let device, let group = app.group(for: device) else { model.groupTarget = nil; return }
+        switch GroupOutput.resolve(group, among: app.devices.devices) {
+        case .ready(_, let members): model.groupTarget = (group, members)
+        case .missing(let names):
+            model.groupTarget = (group, [])
+            model.groupProblem = "These outputs of \(group.name) aren't connected: \(names.joined(separator: ", "))."
+        default:
+            model.groupTarget = (group, [])
+            model.groupProblem = "\(group.name) can't be opened right now."
         }
     }
 
@@ -833,14 +885,22 @@ struct RoomMeasureWizard: View {
         return HStack(alignment: .top, spacing: 20) {
             VStack(alignment: .leading, spacing: 10) {
                 portrait.frame(width: 300, height: 300)
-                Picker("Speakers", selection: $model.layout) {
-                    Text("Stereo").tag(RoomLayout.stereo)
-                    Text("5.1 surround").tag(RoomLayout.surround51)
+                if let group = model.groupTarget?.group {
+                    Text(verbatim: "Speaker group “\(group.name)”: measured as you drew it (\(group.speakers.count) speakers, on its outputs in order).")
+                        .font(Typeface.ui(12)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true).frame(width: 300, alignment: .leading)
+                    if let problem = model.groupProblem {
+                        Text(verbatim: problem).font(Typeface.ui(12)).foregroundStyle(Palette.copper).frame(width: 300, alignment: .leading)
+                    }
+                } else {
+                    Picker("Speakers", selection: $model.layout) {
+                        Text("Stereo").tag(RoomLayout.stereo)
+                        Text("5.1 surround").tag(RoomLayout.surround51)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 300)
+                    .disabled(!surroundPossible)
+                    .onAppear { if !surroundPossible { model.layout = .stereo } }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 300)
-                .disabled(!surroundPossible)
-                .onAppear { if !surroundPossible { model.layout = .stereo } }
                 Stepper("Spots around your seat: \(model.positions)", value: $model.positions, in: 1...RoomMeasureLaunch.maxPositions)
                     .font(Typeface.ui(12))
             }
@@ -1006,6 +1066,19 @@ struct RoomPortrait: View {
         case .lfe: CGPoint(x: 0.64, y: 0.09)
         case .leftSurround: CGPoint(x: 0.12, y: 0.62)
         case .rightSurround: CGPoint(x: 0.88, y: 0.62)
+        case .sideLeft: CGPoint(x: 0.08, y: 0.45)
+        case .sideRight: CGPoint(x: 0.92, y: 0.45)
+        case .backLeft: CGPoint(x: 0.2, y: 0.88)
+        case .backRight: CGPoint(x: 0.8, y: 0.88)
+        case .backCenter: CGPoint(x: 0.5, y: 0.9)
+        case .wideLeft: CGPoint(x: 0.1, y: 0.25)
+        case .wideRight: CGPoint(x: 0.9, y: 0.25)
+        case .topFrontLeft: CGPoint(x: 0.35, y: 0.3)
+        case .topFrontRight: CGPoint(x: 0.65, y: 0.3)
+        case .topMiddleLeft: CGPoint(x: 0.35, y: 0.5)
+        case .topMiddleRight: CGPoint(x: 0.65, y: 0.5)
+        case .topBackLeft: CGPoint(x: 0.35, y: 0.7)
+        case .topBackRight: CGPoint(x: 0.65, y: 0.7)
         }
     }
 

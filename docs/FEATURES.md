@@ -126,3 +126,7 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 | Opus, Vorbis, Musepack, MP3, AAC | `.opus` `.ogg` `.mpc` `.mp3` `.m4a` | Decoded and marked lossy |
 
 TrueHD decoder fixtures are compared sample for sample with their source; DTS output is compared with FFmpeg's decoder on a real disc rip. Tested playback hardware is a Fosi Audio ZD3, a FiiO K11, AirPods Max over USB-C and Bluetooth, MacBook Pro speakers and a Sony TV over HDMI ([details](DEVICES.md)). The Intel build has run under Rosetta, not on an Intel Mac. No streaming services or DRM-protected Apple Music downloads. [Verification and its limits](VERIFICATION.md).
+
+## Speaker Groups (beta)
+
+Two or more USB DACs play as one multichannel system, such as a quad from two stereo DACs. Off by default, behind a hidden setting for now. One DAC leads and the others are resampled by a few millionths to follow its clock, so only the leader's channels can be bit-perfect, and the signal path says which. Songs are placed onto the speakers by where they stand, with a drawing of the room, per-speaker delay, level and polarity, and room correction that can be made from the drawing or measured. A group you make in Vespertine can be BIT-PERFECT on the leader's channels; an aggregate device you make yourself in Audio MIDI Setup never is. Untested on real DACs in the app. [Details and limits](SPEAKER-GROUPS.md).

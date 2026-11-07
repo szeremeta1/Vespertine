@@ -374,14 +374,15 @@ final class PlayerController {
     /// poll, so turning it off takes effect at once). Turned off while it relays, the sound output standing in gets its
     /// own volume and mute back.
     private func syncVolumeRelay() {
-        let device = settings.relayVolumeKeys && !Self.relayOffForQA ? outputDevice?.id : nil
+        // Never a speaker group's aggregate: it has no volume of its own (`GroupVolume`).
+        let device = GroupVolume.relayTarget(for: outputDevice, enabled: settings.relayVolumeKeys && !Self.relayOffForQA)
         guard relayedDevice != device else { return }
         relayedDevice = device
         volumeRelay.follow(device)
     }
     nonisolated private static let halQueue = DispatchQueue(label: "org.szeremeta.vespertine.system-output", qos: .userInitiated)
     private func followSystemOutput(to device: OutputDevice) {
-        guard settings.systemOutputFollowsPlayback, signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
+        guard settings.systemOutputFollowsPlayback, GroupVolume.mayBecomeSystemOutput(device), signalPath?.applied.exclusive != true, lastFollowed != device.id else { return }
         lastFollowed = device.id
         // Off the main thread: this runs as playback starts, while the HAL is busy with the device.
         let id = device.id
@@ -548,6 +549,14 @@ final class PlayerController {
 
     // MARK: Engine events & polling
 
+    /// What to say when a song's file is gone: with automatic scanning on its source is being rescanned for it; off, the
+    /// song is only hidden (`LibraryStore.rescanForMissingFile`) and Rescan Library looks again.
+    private func goneFileMessage(for track: Track) -> String {
+        library.automaticScanning()
+            ? String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+            : String(localized: "“\(track.title)” was moved or deleted, so it’s hidden from the library. Rescan Library looks for it again.")
+    }
+
     private func handle(_ event: EngineEvent) {
         switch event {
         case .trackStarted(let item):
@@ -591,12 +600,12 @@ final class PlayerController {
                     let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
                     guard let self, !exists else { return }
                     self.library.rescanForMissingFile(track)
-                    self.lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+                    self.lastError = self.goneFileMessage(for: track)
                 }
             } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
                 // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
                 library.rescanForMissingFile(track)
-                lastError = String(localized: "“\(track.title)” was moved or deleted. Updating the library to find it…")
+                lastError = goneFileMessage(for: track)
             } else {
                 lastError = message
             }

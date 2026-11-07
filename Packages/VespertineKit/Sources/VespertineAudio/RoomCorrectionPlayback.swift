@@ -16,16 +16,19 @@ public struct RoomChannelPlayback: Hashable, Sendable {
     public var levelDB: Double
     public var bands: [EQBand]
     public var impulse: RoomImpulse?
+    /// The signal is turned over (every sample's sign flipped): a speaker wired the other way round. Only a speaker group sets it.
+    public var inverted: Bool
 
-    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil) {
+    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil, inverted: Bool = false) {
         self.delayMs = delayMs
         self.levelDB = levelDB
         self.bands = bands
         self.impulse = impulse
+        self.inverted = inverted
     }
 
     /// Whether the channel's correction does anything at all.
-    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains(where: \.isActive) || impulse != nil }
+    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains(where: \.isActive) || impulse != nil || inverted }
 }
 
 public struct RoomCorrectionPlayback: Hashable, Sendable {
@@ -74,6 +77,17 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
     /// Changes nothing: no preamp and no channel with an effect.
     public var isFlat: Bool { preampDB == 0 && !channels.contains(where: \.isActive) }
 
+    /// On `used` channels it only holds sound back: delays in whole frames (`renderChannels` rounds them), with no level, no
+    /// preamp, no band and no filter. That shifts the samples without changing one of them. A flat profile counts.
+    public func changesOnlyTiming<Channels: Sequence>(channels used: Channels) -> Bool where Channels.Element == Int {
+        guard preampDB == 0 else { return false }
+        return used.allSatisfy { c in
+            guard c < channels.count else { return true }
+            let channel = channels[c]
+            return channel.levelDB == 0 && !channel.bands.contains(where: \.isActive) && channel.impulse == nil && !channel.inverted
+        }
+    }
+
     /// The stream's channels line up with the speakers it was made for: the same layout, or the front left and right
     /// of a surround profile for stereo music. Anything else (mono, a surround stream on a stereo profile) bypasses it.
     public func applies(channels count: Int) -> Bool { count == channels.count || (count == 2 && channels.count > 2) }
@@ -97,7 +111,7 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
             var out = NRTRoomChannel()
             let frames: Double = (alignment.delayMs * sampleRate / 1000).rounded()
             out.delayFrames = UInt32(min(max(frames, 0), Double(NRT_ROOM_MAX_DELAY - 1)))
-            out.gain = preamp * pow(10, alignment.levelDB / 20)
+            out.gain = (correction.inverted ? -1 : 1) * preamp * pow(10, alignment.levelDB / 20)
             let sections = Array(correction.bands.compactMap { $0.section(sampleRate: sampleRate) }.prefix(Self.maxBandsPerChannel))
             withUnsafeMutableBytes(of: &out.sections) { raw in
                 let slots = raw.bindMemory(to: NRTBiquad.self)

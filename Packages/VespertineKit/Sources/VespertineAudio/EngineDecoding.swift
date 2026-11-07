@@ -29,6 +29,9 @@ final class Decoding {
     /// places each channel on the bed (`routed` is what reaches the ring). Also a file with no speaker names folded onto
     /// a speaker setup with fewer speakers (`OutputSession.speakerFold`).
     let router: BedRouter?
+    /// A speaker group: the song's channels placed on the group's outputs by where the speakers stand (`GroupRouting`), in place
+    /// of the speaker-setup fold. `routed` is what reaches the ring then, as wide as the group.
+    let groupRouter: PositionRouter?
     let routed: AVAudioPCMBuffer?
     /// Spatialize stereo: the converter keeps the song's own one or two channels, this makes 5.1 of them, and `router`
     /// (when the output's layout isn't plain 5.1) places that on the speaker setup. `upmixed` holds what goes out next.
@@ -49,6 +52,9 @@ final class Decoding {
         self.path = path
         let own = decoder.processingFormat.channelLayout
         var router: BedRouter?
+        // PCM only: a group's router is never given DoP or bitstream words (the group's plan is always PCM).
+        let groupRouter = path.plan.mode == .pcm && !path.applied.integerMode
+            ? path.group?.router.flatMap { $0.outputChannels == path.plan.channels ? $0 : nil } : nil
         let channels = Int(decoder.processingFormat.channelCount)
         let upmixer = path.plan.upmix && !path.applied.integerMode
             ? StereoUpmixer(inputChannels: channels, sampleRate: path.plan.deviceSampleRate) : nil
@@ -62,14 +68,16 @@ final class Decoding {
         } else if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
            let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.wavOrderLabels(channels: channels) {
             router = BedRouter(source: speakers, bed: bed)
-        } else if !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
+        } else if groupRouter == nil, !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
             router = fold
         }
         self.router = router
+        self.groupRouter = groupRouter
         self.upmixer = upmixer
         // Integer mode: straight to 32-bit integers (the device takes them as they are).
         let float = upmixer != nil ? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: channels, interleaved: true)
-            : router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
+            : groupRouter.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
+            ?? router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
             ?? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
         let integer = float.flatMap { f in
             AVAudioFormat(commonFormat: .pcmFormatInt32, sampleRate: f.sampleRate, interleaved: true, channelLayout: f.channelLayout
@@ -87,8 +95,8 @@ final class Decoding {
         }
         input = inBuffer
         output = outBuffer
-        routed = router.flatMap { r in
-            AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: r.bedChannels, interleaved: true, layout: layout)
+        routed = (groupRouter?.outputChannels ?? router?.bedChannels).flatMap { width in
+            AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: width, interleaved: true, layout: layout)
                 .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
         }
         upmixed = upmixer == nil ? nil
@@ -148,6 +156,9 @@ final class Decoding {
         if let router, let routed, let source = raw, let bed = routed.floatChannelData?[0] {
             router.route(source, into: bed, frames: Int(frames))
             raw = bed
+        } else if let groupRouter, let routed, let source = raw, let wide = routed.floatChannelData?[0] {
+            groupRouter.route(source, into: wide, frames: Int(frames))
+            raw = wide
         }
         if frames > 0, let data = raw {
             framesProduced += UInt64(frames)

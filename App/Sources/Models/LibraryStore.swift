@@ -425,8 +425,15 @@ final class LibraryStore {
 
     /// A file the library lists is gone (moved or deleted, e.g. by a library manager reorganizing a share):
     /// rescan its source now, so moved files are found again. At most every two minutes per source.
+    /// With automatic scanning off nothing is rescanned: the song is only marked missing (hidden from the lists, its
+    /// favorite and play count kept), and Rescan Library brings it back if the file returns.
     @discardableResult
     func rescanForMissingFile(_ track: Track) -> Bool {
+        guard automaticScanning() else {
+            try? database.markMissing(filePath: track.filePath, sourceID: track.sourceId)
+            revision += 1
+            return false
+        }
         guard let id = track.sourceId, let source = sources.first(where: { $0.id == id }), scanProgress == nil,
               Date().timeIntervalSince(missingRescanAt[id] ?? .distantPast) > 120 else { return false }
         missingRescanAt[id] = Date()
@@ -449,6 +456,31 @@ final class LibraryStore {
         try? database.removeSource(id)
         scanFailures[id] = nil
         revision += 1
+    }
+
+    /// "Scan for new music automatically" was switched. Turning it on looks at once for what was added while it was off
+    /// (the folder watcher only reports from now on): every local source, incrementally. Shares are caught up by
+    /// `NetworkShareManager.rescanStale`, which the switch calls too.
+    func automaticScanningChanged() {
+        updateWatcher()
+        guard automaticScanning() else { return }
+        let local = sources.filter { !$0.isNetwork }
+        Task { for source in local { await scanWhenFree(source) } }
+    }
+
+    /// The songs whose files are gone, and what removing them loses (see `removeMissingSongs`).
+    func missingSongsSummary() async -> MissingSongsSummary {
+        let database = database
+        return await Task.detached(priority: .userInitiated) { (try? database.missingSongsSummary()) ?? MissingSongsSummary(songs: 0, favorites: 0, played: 0) }.value
+    }
+
+    /// Takes the songs whose files are gone out of the library, with their favorites and play counts. Never touches a file.
+    @discardableResult
+    func removeMissingSongs() async -> Int {
+        let database = database
+        let removed = await Task.detached(priority: .userInitiated) { (try? database.removeMissingSongs()) ?? 0 }.value
+        revision += 1
+        return removed
     }
 
     func updateWatcher() {

@@ -151,7 +151,7 @@ void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullab
 #define NRT_ROOM_MAX_DELAY 32768u
 
 /// One speaker's correction: the samples are delayed by `delayFrames` (below NRT_ROOM_MAX_DELAY), scaled by `gain`
-/// (linear: the profile's preamp times the speaker's level) and run through `count` sections (at most
+/// (linear: the profile's preamp times the speaker's level; negative turns the signal's polarity over) and run through `count` sections (at most
 /// NRT_ROOM_MAX_SECTIONS) in series, in double precision.
 typedef struct {
     uint32_t delayFrames;

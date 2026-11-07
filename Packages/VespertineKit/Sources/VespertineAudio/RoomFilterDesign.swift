@@ -365,9 +365,10 @@ public struct RoomCorrectionDesign: Sendable {
     }
 
     public func profile(name: String, sessionID: UUID, deviceUID: String, channelMap: RoomChannelMap, micSerial: String,
-                        calibrationSHA256: String?, createdAt: Date = Date(), id: UUID = UUID()) -> RoomProfile {
+                        calibrationSHA256: String?, createdAt: Date = Date(), id: UUID = UUID(), layout: RoomLayout? = nil) -> RoomProfile {
+        // The layout the session was measured as; stereo or 5.1 by the number of speakers when the caller doesn't say.
         RoomProfile(id: id, name: name, createdAt: createdAt, sessionID: sessionID, deviceUID: deviceUID,
-                    layout: channelMap.entries.count > 2 ? .surround51 : .stereo, channelMap: channelMap, micSerial: micSerial,
+                    layout: layout ?? (channelMap.entries.count > 2 ? .surround51 : .stereo), channelMap: channelMap, micSerial: micSerial,
                     calibrationSHA256: calibrationSHA256, target: options.target.roomTarget, filters: filterSet)
     }
 }

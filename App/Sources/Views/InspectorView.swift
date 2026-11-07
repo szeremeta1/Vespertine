@@ -280,6 +280,12 @@ struct SignalPathView: View {
                       detail: device.joined(separator: " · "),
                       value: String(localized: "\(a.physicalBitDepth)-bit · \(SampleRate.format(a.sampleRate)) kHz"),
                       tone: path.isBitPerfect ? .good : .plain))
+        // A speaker group: the DACs it is made of, each with the speakers it plays and whether its part is untouched or resampled.
+        if let group = path.group {
+            for line in GroupOutputRows.signalPathLines(group) {
+                s.append(Step(title: line.title, detail: line.detail, value: line.value, tone: line.isUntouched ? .good : .changed))
+            }
+        }
         if let loopback {
             let date = loopback.date.formatted(date: .abbreviated, time: .omitted)
             switch loopback.result.status {

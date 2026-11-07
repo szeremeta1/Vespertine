@@ -181,6 +181,14 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var isHiRes: Bool { isDSD || (isLossless && ((bitDepth ?? 16) > 16 || sampleRate > 48_000)) }
 }
 
+/// The songs whose files are gone: how many, and how many of them have a favorite or a play count that removing them loses.
+public struct MissingSongsSummary: Sendable, Equatable {
+    public var songs: Int
+    public var favorites: Int
+    public var played: Int
+    public init(songs: Int, favorites: Int, played: Int) { self.songs = songs; self.favorites = favorites; self.played = played }
+}
+
 public struct Playlist: Codable, Sendable, Hashable, Identifiable, FetchableRecord, MutablePersistableRecord {
     public var id: Int64?
     public var name: String

@@ -65,18 +65,28 @@ public enum FormatPlanner {
         return plan
     }
 
+    /// Where Spatialize stereo puts its 5.1 on `device`; nil when there is nowhere (a stereo DAC with Spatial Audio off).
+    enum StereoUpmixTarget { case headphones, speakers(Int), outputs }
+    static func stereoUpmixTarget(device: DeviceCapabilities, spatial: SpatialMode) -> StereoUpmixTarget? {
+        if spatial != .off, device.outputChannels >= 2 { return .headphones }
+        if let speakers = device.speakerLayoutChannels, speakers >= 3, speakers <= device.outputChannels { return .speakers(speakers) }
+        if device.outputChannels >= 6 { return .outputs }
+        return nil
+    }
+
+    /// Whether the Spatialize stereo switch does anything on `device` with this Spatial Audio mode: the settings show it
+    /// only then.
+    public static func canSpatializeStereo(on device: DeviceCapabilities, spatial: SpatialMode) -> Bool {
+        stereoUpmixTarget(device: device, spatial: spatial) != nil
+    }
+
     /// Spatialize stereo: a stereo or mono source upmixed to 5.1, for Spatial Audio on headphones, the outputs of a
     /// multichannel device in standard order (6 or more, no speaker setup), or a speaker setup of 3 or more. nil where it
     /// doesn't apply (more than two channels, an output with nowhere to put them), and the plan is the usual one.
     static func upmixPlan(source: SourceFormat, device: DeviceCapabilities, policy: RatePolicy, spatial: SpatialMode,
                           dsdToPCMForRoom: Bool, dsdToPCMForTransitions: Bool) -> OutputPlan? {
         guard source.channels >= 1, source.channels <= 2 else { return nil }
-        enum Target { case headphones, speakers(Int), outputs }
-        let target: Target
-        if spatial != .off, device.outputChannels >= 2 { target = .headphones }
-        else if let speakers = device.speakerLayoutChannels, speakers >= 3, speakers <= device.outputChannels { target = .speakers(speakers) }
-        else if device.outputChannels >= 6 { target = .outputs }
-        else { return nil }
+        guard let target = stereoUpmixTarget(device: device, spatial: spatial) else { return nil }
         // The rate is chosen for the channels the device receives (HDMI carries 8 channels at fewer rates than 2); DSD is
         // converted to PCM, which can be upmixed.
         var sized = source

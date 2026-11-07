@@ -12,16 +12,102 @@ import Foundation
 /// A loudspeaker position, by what it is rather than by which output it is wired to.
 public enum RoomSpeaker: String, Codable, CaseIterable, Sendable, Hashable {
     case left, right, center, lfe, leftSurround, rightSurround
+    // The places a speaker group can have beyond a 5.1 setup (schema 5): the side and back pairs on their own (`leftSurround` and
+    // `rightSurround` stay the surround pair of the stereo, quad and 5.1 layouts), the wides, and the ceiling pairs.
+    case sideLeft, sideRight, backLeft, backRight, backCenter, wideLeft, wideRight
+    case topFrontLeft, topFrontRight, topMiddleLeft, topMiddleRight, topBackLeft, topBackRight
+
+    /// What the speaker is called in plain words.
+    public var plainName: String {
+        switch self {
+        case .left: "Left"
+        case .right: "Right"
+        case .center: "Centre"
+        case .lfe: "LFE"
+        case .leftSurround: "Left surround"
+        case .rightSurround: "Right surround"
+        case .sideLeft: "Left side"
+        case .sideRight: "Right side"
+        case .backLeft: "Left back"
+        case .backRight: "Right back"
+        case .backCenter: "Back centre"
+        case .wideLeft: "Left wide"
+        case .wideRight: "Right wide"
+        case .topFrontLeft: "Left top front"
+        case .topFrontRight: "Right top front"
+        case .topMiddleLeft: "Left top middle"
+        case .topMiddleRight: "Right top middle"
+        case .topBackLeft: "Left top back"
+        case .topBackRight: "Right top back"
+        }
+    }
+
+    /// The room speaker for a place in a speaker group, as itself (a quad's back pair becomes the surround pair only through
+    /// `RoomLayout.layout(for:)`).
+    public init(role: SpeakerRole) {
+        switch role {
+        case .frontLeft: self = .left
+        case .frontRight: self = .right
+        case .center: self = .center
+        case .lfe: self = .lfe
+        case .sideLeft: self = .sideLeft
+        case .sideRight: self = .sideRight
+        case .backLeft: self = .backLeft
+        case .backRight: self = .backRight
+        case .backCenter: self = .backCenter
+        case .wideLeft: self = .wideLeft
+        case .wideRight: self = .wideRight
+        case .topFrontLeft: self = .topFrontLeft
+        case .topFrontRight: self = .topFrontRight
+        case .topMiddleLeft: self = .topMiddleLeft
+        case .topMiddleRight: self = .topMiddleRight
+        case .topBackLeft: self = .topBackLeft
+        case .topBackRight: self = .topBackRight
+        }
+    }
 }
 
-/// The speaker arrangement a session measures.
-public enum RoomLayout: String, Codable, CaseIterable, Sendable, Hashable {
-    case stereo, surround51
+/// The speaker arrangement a session measures. Stored as its name; a custom set of speakers as "custom:" and their names.
+public enum RoomLayout: RawRepresentable, Codable, CaseIterable, Sendable, Hashable {
+    case stereo
+    /// Left, right and a surround pair (L R Ls Rs).
+    case quad
+    case surround51
+    /// Any set of speakers, in the order of the outputs they are measured through (a speaker group's setup).
+    case custom([RoomSpeaker])
+
+    /// The layouts the measurement wizard offers; a custom one comes from a speaker group.
+    public static var allCases: [RoomLayout] { [.stereo, .quad, .surround51] }
+
+    public init?(rawValue: String) {
+        switch rawValue {
+        case "stereo": self = .stereo
+        case "quad": self = .quad
+        case "surround51": self = .surround51
+        default:
+            guard rawValue.hasPrefix("custom:") else { return nil }
+            let names = rawValue.dropFirst("custom:".count).split(separator: ",", omittingEmptySubsequences: false).map(String.init)
+            let speakers = names.compactMap { RoomSpeaker(rawValue: $0) }
+            guard speakers.count == names.count, Set(speakers).count == speakers.count else { return nil }
+            self = .custom(speakers)
+        }
+    }
+
+    public var rawValue: String {
+        switch self {
+        case .stereo: "stereo"
+        case .quad: "quad"
+        case .surround51: "surround51"
+        case .custom(let speakers): "custom:" + speakers.map(\.rawValue).joined(separator: ",")
+        }
+    }
 
     public var speakers: [RoomSpeaker] {
         switch self {
         case .stereo: [.left, .right]
+        case .quad: [.left, .right, .leftSurround, .rightSurround]
         case .surround51: [.left, .right, .center, .lfe, .leftSurround, .rightSurround]
+        case .custom(let speakers): speakers
         }
     }
 }
@@ -349,12 +435,16 @@ public enum RoomProfileSource: String, Codable, Hashable, Sendable {
     case equalizerAPO
     /// Impulse responses (convolution filters) from WAV, AIFF, CAF or FLAC files.
     case impulseResponse
+    /// Delays and levels worked out from where a speaker group's speakers are drawn, with no filters (`GroupGeometryProfile`).
+    case geometry
 }
 
 public enum RoomCorrectionCoding {
     /// Bump when the stored shape changes, and add the step that upgrades the previous one to `migrate`.
     /// 3: per-speaker alignment, impulse responses and the profile's source (all optional, so 2 reads as is).
     /// 4: tags, strength, kept positions, edited mark (all optional, so 3 reads as is).
+    /// Still 4 with the quad and custom layouts and the speakers of a speaker group: nothing stored changes shape. A profile that
+    /// names one of them can't be read by an older Vespertine, which keeps it untouched (`decodeProfilesKeepingUnreadable`).
     public static let currentSchema = 4
 
     private static var encoder: JSONEncoder {
