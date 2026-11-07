@@ -8,7 +8,7 @@ Results go in `verification/hardware/speaker-groups/<timestamp>/` (the script ma
 
 ## What was found last time (2026-11-06, with a probe tool, not the app)
 
-Aggregate with the Fosi as leader and the FiiO drift-corrected played a 4-channel file with 0 underruns, both DACs held, rates and holds restored afterwards. Start offset between the DACs: σ 21 µs over 19 good runs (the measurement's own noise is σ 32 µs), so a fixed delay can hold. Open: three of 49 drift-corrected runs came in about 3.5 ms (166 frames) late; the follower crept about 0.2 ms between 1.6 s and 15.6 s and had not flattened; Fosi against FiiO drift over 300 s was not measured; the Fosi has no hardware volume Core Audio can set, the FiiO has. Details: `verification/hardware/` of the wave 1 work, `FINDINGS.md`.
+Aggregate with the Fosi as leader and the FiiO drift-corrected played a 4-channel file with 0 underruns, both DACs held, rates and holds restored afterwards. Start offset between the DACs: σ 21 µs over 19 good runs (the measurement's own noise is σ 32 µs), so a fixed delay can hold. Open: three of 49 drift-corrected runs came in about 3.5 ms (166 frames) late; the follower crept about 0.2 ms between 1.6 s and 15.6 s and had not flattened; Fosi against FiiO drift over 300 s was not measured; the Fosi has no hardware volume Core Audio can set, the FiiO has. The session's notes are not in this repository; the plan (`docs/plans/` if it was kept, else ask Vesper) has the table.
 
 ## Part 1: the probe steps (`scripts/speaker-groups-qa.sh`)
 
