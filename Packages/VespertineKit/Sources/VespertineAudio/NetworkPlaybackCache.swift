@@ -263,6 +263,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
         /// Bytes on disk so far.
         var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
+        /// How long this file has been copying: the copy's speed is `copiedBytes` over this.
+        var copyElapsed: TimeInterval { Date().timeIntervalSince(storage.startedAt) }
         /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
         func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
         func cancel() { storage.cancel() }
@@ -336,6 +338,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var cancelled = false
         var error: Error?
         var progress: (@Sendable (Int64) -> Void)?
+        let startedAt = Date()
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              release: @escaping @Sendable () -> Void) throws {
