@@ -35,7 +35,7 @@ enum DVDTracks {
         var artworkKey: String?
         if let artwork {
             if let folderArt { artworkKey = folderArt.artworkKey(near: coverNear, store: artwork) }
-            else if let data = ArtworkStore.folderImage(near: coverNear) { artworkKey = artwork.store(data) }
+            else { artworkKey = ArtworkStore.folderArtKey(near: coverNear, store: artwork) }
         }
         let several = disc.albums.count > 1
         var index = 0
