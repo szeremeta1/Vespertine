@@ -17,7 +17,7 @@ struct VisualizerArtworkImageTests {
                         properties: [CFString: Any] = [:]) -> Data {
         let space = space ?? CGColorSpace(name: CGColorSpace.sRGB)!
         let components = space.numberOfComponents
-        let alpha: CGImageAlphaInfo = components == 3 && type == .png ? .premultipliedLast : .none
+        let alpha: CGImageAlphaInfo = components == 3 ? (type == .png ? .premultipliedLast : .noneSkipLast) : .none
         var info = alpha.rawValue
         if bitsPerComponent == 16 { info |= CGBitmapInfo.byteOrder16Little.rawValue }
         let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: 0, space: space, bitmapInfo: info)!

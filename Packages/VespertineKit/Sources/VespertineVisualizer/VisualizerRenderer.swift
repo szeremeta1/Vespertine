@@ -299,11 +299,15 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     /// Sets the album cover the record's label shows (nil: a plain label in the theme's colours). Returns whether a
     /// cover is set. A picture the texture loader refuses as it is (an unusual pixel format, a side beyond the GPU's limit)
     /// is redrawn as 8-bit sRGB, within `VisualizerArtworkImage.maximumSide`, and given again, so a decodable cover is
-    /// never silently dropped.
+    /// never silently dropped (and one too large for the GPU, which would abort the app, is made smaller before the loader sees it).
     @discardableResult
     public func setArtwork(_ image: CGImage?) -> Bool {
         guard let image else { artwork = nil; return false }
-        artwork = texture(from: image) ?? VisualizerArtworkImage.normalized(image).flatMap(texture(from:))
+        // A side beyond the GPU's limit isn't an error the loader throws: it aborts the process. Such a picture is
+        // made smaller first.
+        let oversize = max(image.width, image.height) > VisualizerArtworkImage.maximumSide
+        let first = oversize ? VisualizerArtworkImage.normalized(image) : image
+        artwork = first.flatMap(texture(from:)) ?? VisualizerArtworkImage.normalized(image).flatMap(texture(from:))
         return artwork != nil
     }
 
