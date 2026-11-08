@@ -110,9 +110,18 @@ struct NetworkStartTests {
         #expect(lead(link: 1.3) == NetworkStart.smallestLead)           // just fast enough once the safety margin is taken off
         let half = lead(link: 0.9)                                       // 0.9 / 1.3 = 0.69 MiB/s: 31 MiB short
         #expect(half > NetworkStart.smallestLead && half < size)
-        #expect(abs(Double(half) - (100 - 100 * 0.9 / 1.3) * 1_048_576) < 1_048_576)
+        let mebibyte: Double = 1_048_576
+        // Spelled out step by step: one long arithmetic expression inside #expect is more than Swift 6.3's type checker will do in time.
+        func expectedLead(link: Double) -> Double {
+            let arrivesWhilePlaying: Double = 100.0 * link / 1.3
+            let missing: Double = 100.0 - arrivesWhilePlaying
+            return missing * mebibyte
+        }
+        let halfDifference: Double = abs(Double(half) - expectedLead(link: 0.9))
+        #expect(halfDifference < mebibyte)
         // A link slower than the song plays has to bring part of the song in first (here 0.5 / 1.3 of it arrives while it plays)…
-        #expect(abs(Double(lead(link: 0.5)) - (100 - 100 * 0.5 / 1.3) * 1_048_576) < 1_048_576)
+        let slowDifference: Double = abs(Double(lead(link: 0.5)) - expectedLead(link: 0.5))
+        #expect(slowDifference < mebibyte)
         // …all of it when the copy has all but stopped, and never more than what is left.
         #expect(lead(link: 0.00001) > size - (1 << 20))
         #expect(lead(link: 0.00001, position: 1 << 20) > size - (2 << 20))
