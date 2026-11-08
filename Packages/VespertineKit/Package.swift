@@ -36,7 +36,10 @@ let package = Package(
         .binaryTarget(name: "WavPackDSD", path: "Vendor/WavPackDSD.xcframework"),
         .target(name: "CVespertineWavPack", dependencies: ["WavPackDSD"]),
         // Decoder calls with C++/Objective-C exceptions caught (a damaged file must not crash the app).
-        .target(name: "CVespertineGuard", linkerSettings: [.linkedFramework("AVFAudio"), .linkedLibrary("c++")]),
+        // Also the input source that lets a decoder read a share file while it is still being copied (see NetworkPlaybackCache).
+        .target(name: "CVespertineGuard",
+                dependencies: [.product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                linkerSettings: [.linkedFramework("AVFAudio"), .linkedLibrary("c++")]),
         // Every value of multi-valued tags (several artists, genres, MusicBrainz IDs), which SFBAudioEngine's writer cuts to one.
         .target(name: "CVespertineTags", dependencies: [.product(name: "taglib", package: "CXXTagLib")]),
         .target(

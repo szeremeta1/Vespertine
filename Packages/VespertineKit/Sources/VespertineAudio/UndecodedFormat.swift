@@ -103,7 +103,7 @@ public enum UndecodedFormat: String, Sendable, Hashable, CaseIterable {
     // MARK: Reading
 
     private static func bytes(_ url: URL, _ count: Int) -> [UInt8]? {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return nil }
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return nil }
         defer { try? file.close() }
         guard let data = try? file.read(upToCount: count), data.count == count else { return nil }
         return [UInt8](data)
@@ -111,7 +111,8 @@ public enum UndecodedFormat: String, Sendable, Hashable, CaseIterable {
 
     /// The Vorbis comments of a FLAC file, name (as written) to value, without decoding anything.
     public static func flacComments(_ url: URL) -> [String: String] {
-        guard let file = try? FileHandle(forReadingFrom: url) else { return [:] }
+        // A PlaybackFile: a song still being copied from a share is read once the bytes are there, never as zeros.
+        guard let file = try? PlaybackFile(forReadingFrom: url) else { return [:] }
         defer { try? file.close() }
         guard let magic = try? file.read(upToCount: 4), magic == Data("fLaC".utf8) else { return [:] }
         var out: [String: String] = [:]
@@ -133,7 +134,7 @@ public enum UndecodedFormat: String, Sendable, Hashable, CaseIterable {
                     p += 4 + n
                 }
             } else {
-                guard let here = try? file.offset(), (try? file.seek(toOffset: here + UInt64(length))) != nil else { break }
+                guard (try? file.seek(toOffset: file.currentOffset() + UInt64(length))) != nil else { break }
             }
             if last { break }
         }

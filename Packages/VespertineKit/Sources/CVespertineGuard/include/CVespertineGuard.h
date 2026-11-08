@@ -7,6 +7,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 #import <AVFAudio/AVFAudio.h>
+#import "CVespertineCacheInput.h"
 
 NS_ASSUME_NONNULL_BEGIN
 #ifdef __cplusplus

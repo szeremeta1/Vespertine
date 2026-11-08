@@ -1,7 +1,9 @@
 // Vespertine — byte-exact, disk-backed network playback staging.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import CVespertineGuard
 import Foundation
+import SFBAudioEngine
 
 protocol PlaybackCacheReader: AnyObject, Sendable {
     var size: Int64 { get }
@@ -267,6 +269,17 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
 
+        /// An input source for SFBAudioEngine's decoders over this file, which may still be arriving: a read waits for its
+        /// bytes to be on disk (the copy fetches what is asked for first), so a decoder can start on the first megabytes
+        /// of a song and never sees an unwritten range as zeros or as the end of the file. It keeps the entry alive.
+        func inputSource() -> InputSource {
+            VTCacheInputSource(url: url, length: size) { [self] offset, buffer, count in
+                guard let data = try? read(at: offset, count: count) else { return -1 }
+                data.copyBytes(to: buffer.assumingMemoryBound(to: UInt8.self), count: data.count)
+                return data.count
+            }
+        }
+
         func prepare(full: Bool, lead: Int64, at offset: Int64 = 0, cancelled: () -> Bool) throws {
             defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
             if !full { storage.condition.withLock { storage.leadTarget = max(storage.leadTarget, lead) } }
@@ -473,6 +486,7 @@ final class PlaybackFile {
     }
     func close() throws { try file.close() }
     func seek(toOffset value: UInt64) throws { offset = value; if entry == nil { try file.seek(toOffset: value) } }
+    func currentOffset() -> UInt64 { offset }
     func seekToEnd() throws -> UInt64 {
         if let entry { offset = UInt64(entry.size); return offset }
         offset = try file.seekToEnd(); return offset
