@@ -141,9 +141,7 @@ public enum GroupSkewRunner {
 }
 
 extension GroupSkewReport {
-    /// A run this far (output frames) from the median of the runs at its lead-in is a wrong pick, not a skew: the 2026-11-07 session
-    /// had +186 and +162 frames from a later copy of the follower's chirp in series that otherwise spread over 2.4 frames.
-    public static let outlierFrames = 100.0
+    public static let outlierFrames = GroupSkew.outlierFrames
 
     /// `runs` split into those that agree and those `outlierFrames` or more from the median of their lead-in (which needs three runs).
     public static func separateOutliers(_ runs: [Run]) -> (inliers: [Run], outliers: [Run]) {

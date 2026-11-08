@@ -61,6 +61,10 @@ public enum GroupSkew {
 
     public static func followerChirpSeconds(_ layout: RoomCaptureLayout) -> Double { Double(layout.sweepStart) / layout.sampleRate }
 
+    /// A run this far (output frames) from the median of the runs at its lead-in is a wrong pick, not a skew: the 2026-11-07 session had
+    /// +186 and +162 frames from a later copy of the follower's chirp in series that otherwise spread over 2.4 frames.
+    public static let outlierFrames = 100.0
+
     /// How much louder the follower's chirp is played than the leader's. In the hardware session it reached the microphone 16 dB under
     /// the leader's (the two DACs' volume knobs were not alike), which is what lost its first arrival under the noise and the copies.
     public static let followerBoostDB = 11.0
