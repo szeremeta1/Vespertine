@@ -41,6 +41,7 @@ private final class StallingShare: @unchecked Sendable {
     func recover() { condition.lock(); stalling = false; condition.unlock() }
     func release() { condition.lock(); released = true; condition.broadcast(); condition.unlock() }
     var hasStalled: Bool { condition.lock(); defer { condition.unlock() }; return entered > 0 }
+    var isReleased: Bool { condition.lock(); defer { condition.unlock() }; return released }
 
     var reader: LibraryScanner.FolderReader {
         { [self] dir, keys in
@@ -57,11 +58,17 @@ private final class StallingShare: @unchecked Sendable {
     }
 }
 
-/// Generous: in a full test run other suites can hold the scanner's I/O threads for a while.
-private func waitUntil(_ condition: () -> Bool, timeout: TimeInterval = 90) async throws {
+/// How long a stalled folder is kept before the test lets it go itself (see `StuckScanTests`); far past any loaded run.
+private let stalledShareWatchdog = 300
+
+private struct WaitTimedOut: Error {}
+
+/// Generous: a full parallel run (and a hosted CI runner) can keep the scanner's threads away for well over a minute,
+/// so the bound only stops a regression from hanging the run; it is not a measure of how fast anything is.
+private func waitUntil(_ condition: () -> Bool, timeout: TimeInterval = TimeInterval(stalledShareWatchdog)) async throws {
     let end = Date().addingTimeInterval(timeout)
     while !condition() {
-        guard Date() < end else { Issue.record("timed out waiting"); return }
+        guard Date() < end else { Issue.record("timed out waiting"); throw WaitTimedOut() }
         try await Task.sleep(for: .milliseconds(20))
     }
 }
@@ -73,12 +80,15 @@ struct StuckScanTests {
         let root = try fixture(); defer { try? FileManager.default.removeItem(at: root) }
         try audio(root.appendingPathComponent("Ultimate Sinatra/Disc 4/16 - The World We Knew.wav"))
         let share = StallingShare(stallingOn: "Disc 4"); defer { share.release() }
-        let start = Date()
+        // Not a wall-clock bound (a loaded run takes minutes over what the scan itself needs). The listing gave up if it
+        // did so while the folder was still blocked. The watchdog lets the folder go if the listing waits for it, which
+        // then fails below instead of hanging.
+        let watchdog = Task { try await Task.sleep(for: .seconds(stalledShareWatchdog)); share.release() }; defer { watchdog.cancel() }
         await #expect(throws: LibraryScanner.ScanError.self) {
             _ = try await LibraryScanner.list(root, network: true, gate: ShareIOGate(healthyGrace: 0), timeout: 3, readFolder: share.reader)
         }
         #expect(share.hasStalled)
-        #expect(Date().timeIntervalSince(start) < 90, "the listing waited on the stalled folder")
+        #expect(!share.isReleased, "the listing waited on the stalled folder")
     }
 
     @Test("A scan that times out stops with an error and marks nothing missing")
@@ -97,10 +107,10 @@ struct StuckScanTests {
         let share = StallingShare(stallingOn: "Disc 4"); defer { share.release() }
         await scanner.setFolderReader(share.reader)
         await scanner.setTimeouts(response: 3, stall: 60)
-        let start = Date()
+        let watchdog = Task { try await Task.sleep(for: .seconds(stalledShareWatchdog)); share.release() }; defer { watchdog.cancel() }
         await #expect(throws: LibraryScanner.ScanError.self) { try await scanner.scan(source) }
         #expect(share.hasStalled)
-        #expect(Date().timeIntervalSince(start) < 90, "the scan waited on the stalled folder")
+        #expect(!share.isReleased, "the scan waited on the stalled folder")
         #expect(try db.allTracks().count == 2, "a folder that didn't answer was taken for deleted files")  // missing ones are left out
         #expect(try db.sources().first?.lastScannedAt == scannedAt, "a scan that didn't finish counted as finished")
     }
@@ -123,9 +133,9 @@ struct StuckScanTests {
         // A scan asked for by the app (not by the user) still joins the one running.
         // The user presses Rescan: the share answers again by now, but the old listing is still hung.
         share.recover()
-        let start = Date()
+        let watchdog = Task { try await Task.sleep(for: .seconds(stalledShareWatchdog)); share.release() }; defer { watchdog.cancel() }
         let summary = try await scanner.scan(source, restart: true)
-        #expect(Date().timeIntervalSince(start) < 90)
+        #expect(!share.isReleased, "the rescan waited behind the stalled scan")
         #expect(summary.added == 1)
         #expect(try db.allTracks().map(\.title) == ["16 - The World We Knew"])
 
