@@ -46,6 +46,9 @@ final class SimulatedOutput: @unchecked Sendable {
 
     private func run() {
         var buffer = [Float](repeating: 0, count: frames * channels)
+        // Paced by an absolute schedule, as a device's clock is: a sleep that overshoots is made up by the next buffer.
+        let period = Double(frames) / rate
+        var due = Date()
         while true {
             let (running, cancelled) = flags.withLock { ($0.running, $0.cancelled) }
             if cancelled { break }
@@ -58,7 +61,9 @@ final class SimulatedOutput: @unchecked Sendable {
                     counts.withLock { $0.rendered += frames; $0.audible += sound }
                 }
             }
-            Thread.sleep(forTimeInterval: Double(frames) / rate)
+            due = max(due.addingTimeInterval(period), Date().addingTimeInterval(-0.25))
+            let wait = due.timeIntervalSinceNow
+            if wait > 0 { Thread.sleep(forTimeInterval: wait) }
         }
         finished.signal()
     }

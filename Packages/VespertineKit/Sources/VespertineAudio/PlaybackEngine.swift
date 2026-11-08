@@ -210,15 +210,17 @@ public final class PlaybackEngine: @unchecked Sendable {
         if let entry = staged[key], entry.isComplete { return entry.url }
         let resolved = urlResolver?(item) ?? item.url
         guard resolved == item.url, try item.cacheKey != nil || onNetworkVolume(resolved) else { return resolved }
-        shared.withLock { $0.snapshot.isBuffering = true }
-        defer { shared.withLock { $0.snapshot.isBuffering = false; $0.snapshot.bufferingFraction = nil } }
+        // The song after the one that plays (see `lookingAhead`) is no wait for the listener: what plays is still audible.
+        if !lookingAhead { shared.withLock { $0.snapshot.isBuffering = true } }
+        defer { if !lookingAhead { shared.withLock { $0.snapshot.isBuffering = false; $0.snapshot.bufferingFraction = nil } } }
         stagedFolder = nil
         if resolved.pathExtension.lowercased() == "ifo" {
             for entry in staged.values { entry.cancel() }
             staged.removeAll()
             playbackCache.discardPrefetch()
             do {
-                let folder = try playbackCache.directoryEntry(for: resolved, cancelled: { self.superseded })
+                let cache = playbackCache
+                let folder = try waitOnShare { cancelled in try cache.directoryEntry(for: resolved, cancelled: cancelled) }
                 stagedFolder = (key, folder)
                 return folder.url
             } catch is CancellationError { throw Superseded() }
@@ -232,8 +234,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         playbackCache.discardPrefetch(except: key)
         // Opening the file can stall as long as the share does: skip and stop must still get through.
         let entry: NetworkPlaybackCache.Entry
-        do { entry = try staged[key] ?? playbackCache.entry(key: key, url: resolved, cancelled: { self.superseded }) }
-        catch is CancellationError { throw Superseded() }
+        do {
+            if let staged = staged[key] { entry = staged } else {
+                let cache = playbackCache
+                entry = try waitOnShare { cancelled in try cache.entry(key: key, url: resolved, cancelled: cancelled) }
+            }
+        } catch is CancellationError { throw Superseded() }
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
         let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
@@ -246,12 +252,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         let copyStarted = Date(), total = entry.size
         // The wait shown is for what is waited for: the prefix of an early start, otherwise the whole file.
         let waitingFor = early ? min(total, NetworkStart.prefix) : total
-        if !progressiveDSD, waitingFor > 0, !entry.isComplete {
+        if !progressiveDSD, waitingFor > 0, !entry.isComplete, !lookingAhead {
             entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(waitingFor)) } }
         }
         defer { entry.setProgress(nil) }
         do {
-            try entry.prepare(full: !progressive, lead: early ? NetworkStart.prefix : 16 << 20, cancelled: { self.superseded })
+            try waitOnShare { cancelled in try entry.prepare(full: !progressive, lead: early ? NetworkStart.prefix : 16 << 20, cancelled: cancelled) }
         } catch is CancellationError {
             log.info("Stopped copying \(item.url.lastPathComponent, privacy: .public) from the share at \(entry.copiedBytes >> 20, privacy: .public) of \(total >> 20, privacy: .public) MB after \(Int(Date().timeIntervalSince(copyStarted) * 1000), privacy: .public) ms")
             throw Superseded()
@@ -360,6 +366,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         while answered.wait(timeout: .now() + 0.025) == .timedOut {
             if superseded { throw Superseded() }
+            if lookingAhead { serviceTransportWhileWaiting() }
         }
         return answer.withLock { $0 } ?? false
     }
@@ -808,6 +815,92 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
     private struct Superseded: Error {}
 
+    // MARK: Transport while the engine thread waits on a share
+
+    /// The engine thread is preparing the song after the one that plays (`advance`): that one's decoded audio is what the output
+    /// plays meanwhile (up to 30 s of it), so nothing about the wait is the listener's to see, and pause and resume still
+    /// have to work: they are served by `serviceTransportWhileWaiting`, not left until the wait is over.
+    private var lookingAhead = false
+    private var lastTransportService = Date.distantPast
+
+    private enum TransportIntent { case pause, resume }
+
+    /// What the user last asked of the transport and the engine has not acted on yet; nil when nothing (or a play or stop, which
+    /// start over and make an earlier pause or resume moot, is waiting).
+    private func queuedTransportIntent() -> TransportIntent? {
+        shared.withLock { s in
+            var intent: TransportIntent?
+            for command in s.commands {
+                switch command {
+                case .play, .stop: intent = nil
+                case .pause: intent = .pause
+                case .resume: intent = .resume
+                default: break
+                }
+            }
+            return intent
+        }
+    }
+
+    /// A wait on a share, which can last as long as the share does. While the output plays (`lookingAhead`) it runs on another
+    /// queue and the engine thread keeps serving the transport and the position meanwhile; otherwise it is simply run, polled
+    /// for a skip or stop (`superseded`) as it always was. `body` is handed the question "has this been given up?".
+    private func waitOnShare<T>(_ body: @escaping @Sendable (@escaping @Sendable () -> Bool) throws -> T) throws -> T {
+        guard lookingAhead else { return try body { [self] in superseded } }
+        let abandoned = Locked(false)
+        let finished = DispatchSemaphore(value: 0)
+        let outcome = Locked<Result<T, Error>?>(nil)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = Result { try body { abandoned.withLock { $0 } } }
+            outcome.withLock { $0 = result }
+            finished.signal()
+        }
+        while finished.wait(timeout: .now() + 0.04) == .timedOut {
+            if superseded { abandoned.withLock { $0 = true } }
+            serviceTransportWhileWaiting()
+        }
+        return try outcome.withLock { $0 }!.get()
+    }
+
+    /// Engine thread, while it waits on a share with the output playing: acts on a pause or resume now (the last one asked for
+    /// wins, as in `coalesce`) and publishes the snapshot, so the playhead, the button and the sound agree during the wait.
+    /// A pause only muted the output on the caller's thread; the device kept taking the buffer, so what played under the
+    /// mute was lost to the listener, and a resume could not unmute it.
+    private func serviceTransportWhileWaiting() {
+        guard Date().timeIntervalSince(lastTransportService) >= 0.04 else { return }
+        lastTransportService = Date()
+        // Only what the wait leaves coherent: a song playing or paused on its output, no other command waiting to reshape it.
+        guard atmos == nil, let session, state != .stopped, !superseded else { return }
+        let canResume = state == .playing || (state == .paused && !session.formatChanged())
+        let intent: TransportIntent? = shared.withLock { s in
+            var last: TransportIntent?
+            for command in s.commands {
+                switch command {
+                case .pause: last = .pause
+                case .resume: last = .resume
+                default: break
+                }
+            }
+            guard let last, last == .pause || canResume else { return nil }
+            s.commands.removeAll { switch $0 { case .pause, .resume: true; default: false } }
+            return last
+        }
+        switch intent {
+        case .pause?:
+            handle(.pause)
+        case .resume?:
+            if state == .playing {
+                unmute(fadeIn: true)          // the pause that came first only muted
+            } else {
+                do { try session.start(); unmute(fadeIn: true); state = .playing; pausedAt = nil }
+                catch { post(.resume) }       // the engine's own resume reopens it, once the wait is over
+            }
+        case nil:
+            break
+        }
+        publishSnapshot()
+    }
+
     private func handle(_ command: Command) {
         switch command {
         case .barrier(let done):
@@ -1085,12 +1178,15 @@ public final class PlaybackEngine: @unchecked Sendable {
             attempts += 1
             do {
                 try begin(current, at: offset, standIn: standIn)
+                // The last thing asked of the transport wins: a pause that came while this opened (a slow share, a speaker group's
+                // aggregate) means it opens paused, not that it starts and is paused a moment after.
+                let plays = autoplay && queuedTransportIntent() != .pause
                 if let atmos {
-                    if autoplay { atmos.play(); state = .playing } else { state = .paused; pausedAt = Date() }
+                    if plays { atmos.play(); state = .playing } else { state = .paused; pausedAt = Date() }
                     emit(.trackStarted(atmos.item))
                     return
                 }
-                if autoplay {
+                if plays {
                     do { try session?.start() } catch {
                         if let uid = settings.deviceUID, sessionDevice?.uid == uid {
                             throw ChosenDeviceNotReady(uid: uid, reason: "start: \(error.localizedDescription)")
@@ -1709,13 +1805,14 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func primeNetworkLead(_ decoding: Decoding) throws {
         if let entry = staged[cacheKey(decoding.item)], !entry.isComplete {
-            shared.withLock { $0.snapshot.isBuffering = true }
-            defer { shared.withLock { $0.snapshot.isBuffering = false } }
+            if !lookingAhead { shared.withLock { $0.snapshot.isBuffering = true } }
+            defer { if !lookingAhead { shared.withLock { $0.snapshot.isBuffering = false } } }
             // Header parsers may have visited the end of a container. Wait for the decoder's first
             // actual audio read so a CUE/SACD seek primes the region that will play, not a tag at EOF.
             if let ahead = decoding.decoder as? ReadAheadDecoder {
                 while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
                     if superseded { throw Superseded() }
+                    if lookingAhead { serviceTransportWhileWaiting() }
                 }
             }
             // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
@@ -1728,12 +1825,12 @@ public final class PlaybackEngine: @unchecked Sendable {
                                     copied: entry.copiedBytes, elapsed: entry.copyElapsed)
                 : min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
             // The percentage shown while the lead fills (a PCM song's; DSD shows none, as before).
-            if format.encoding == .pcm {
+            if format.encoding == .pcm, !lookingAhead {
                 let target = max(1, min(entry.size, position + lead))
                 entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(target)) } }
             }
-            defer { entry.setProgress(nil); shared.withLock { $0.snapshot.bufferingFraction = nil } }
-            do { try entry.prepare(full: false, lead: lead, at: position, cancelled: { self.superseded }) }
+            defer { if !lookingAhead { entry.setProgress(nil); shared.withLock { $0.snapshot.bufferingFraction = nil } } }
+            do { try waitOnShare { cancelled in try entry.prepare(full: false, lead: lead, at: position, cancelled: cancelled) } }
             catch is CancellationError { throw Superseded() }
         }
     }
@@ -2186,6 +2283,8 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// The current item is fully decoded: line up the next one gaplessly, or wait for a device change.
     private func advance(after finished: PlayableItem, produced: UInt64) {
+        lookingAhead = true
+        defer { lookingAhead = false }
         decoding = nil
         let planned = boundary?.after == finished.id ? boundary : nil
         boundary = nil
@@ -2321,7 +2420,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                                     startOffsetSeconds: 0, durationSeconds: d.durationSeconds)]
                 draining = false
                 try prefill()
-                try session.start()
+                // Paused while the output was being set up: it stays set up, and the pause (queued) finds it stopped.
+                if queuedTransportIntent() != .pause { try session.start() }
                 log.notice("Next song plays on \(pending.device.name, privacy: .public) at \(SampleRate.format(session.applied.sampleRate), privacy: .public) kHz after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
             } catch {
                 log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -2453,6 +2553,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         let standingInFor = sessionDevice != nil ? standingIn.map(deviceName) : nil
         let fromShare = decoding?.streaming == true
         let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0
+        // Waiting for the next song's data, with what plays now about to run out: that is a buffering the listener hears.
+        let ringLow = session.map { Double($0.readableFrames) < $0.applied.sampleRate } ?? false
         let system = atmos
         // A bitstream that moved on to the next song (gapless) is decoded again from its start.
         if let meter = bitstreamMeter, let segment, segment.item.id != meter.item {
@@ -2480,6 +2582,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.underruns = underruns
             s.snapshot.isBuffering = buffering
                 || (st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true)
+                || (st == .playing && lookingAhead && ringLow)
             s.snapshot.waitingForDevice = waiting
             s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare
