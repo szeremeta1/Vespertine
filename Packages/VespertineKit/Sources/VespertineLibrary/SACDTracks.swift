@@ -24,7 +24,7 @@ enum SACDTracks {
         var artworkKey: String?
         if let artwork {
             if let folderArt { artworkKey = folderArt.artworkKey(near: url, store: artwork) }
-            else if let data = ArtworkStore.folderImage(near: url) { artworkKey = artwork.store(data) }
+            else { artworkKey = ArtworkStore.folderArtKey(near: url, store: artwork) }
         }
         let albumArtist = image.albumArtist ?? image.discArtist
         // An image without disc text is named by its file ("Kind of Blue (SACD).iso").

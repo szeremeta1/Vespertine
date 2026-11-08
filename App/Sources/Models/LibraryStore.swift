@@ -17,6 +17,8 @@ final class LibraryStore {
     let scanner: LibraryScanner
     let tagWriter: TagWriter
     let enricher: MetadataEnricher
+    /// Finds a song's cover at play time when the library holds none for it, or a stale one (see `ArtworkResolver`).
+    let artworkResolver: ArtworkResolver
 
     private(set) var albums: [Album] = [] {
         didSet {
@@ -151,6 +153,8 @@ final class LibraryStore {
     private(set) var stats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
     /// Bumped whenever tracks change, so detail views can reload.
     private(set) var revision = 0
+    /// Counts the changes that can alter a song's cover without its queue entry knowing (tag edits, reverts, enrichment).
+    private(set) var artworkRevision = 0
 
     var albumSort: AlbumSort = .artist { didSet { observeAlbums() } }
 
@@ -186,6 +190,7 @@ final class LibraryStore {
         tagWriter = TagWriter(database: database, scanner: scanner,
                               backupDirectory: dataDirectory.appendingPathComponent("Tag Backups", isDirectory: true))
         enricher = MetadataEnricher(database: database)
+        artworkResolver = ArtworkResolver(database: database, store: artwork)
         ArtworkCache.shared.store = artwork
         loadSidebarState()
         observe()
@@ -563,6 +568,7 @@ final class LibraryStore {
             else { failed += tracks.count }
         }
         revision += 1
+        artworkRevision += 1
         return (written, failed)
     }
 
@@ -582,12 +588,20 @@ final class LibraryStore {
 
     func album(key: String) -> Album? { albumsByKey[key] }
 
+    /// The key of the cover to show for `track`: the library's current one, else the file's tags, the folder's image, the
+    /// album's cover from another song. Nil when there is none yet. Off the main thread: it reads the file and the folder.
+    func resolveArtwork(for track: Track) async -> String? {
+        let resolver = artworkResolver
+        return await Task.detached(priority: .userInitiated) { resolver.resolve(track).key }.value
+    }
+
     // MARK: Editing
 
     func apply(_ edit: TagEdit, to tracks: [Track]) async -> TagWriteResult? {
         do {
             let result = try await tagWriter.apply(edit, to: tracks)
             revision += 1
+            artworkRevision += 1
             return result
         } catch {
             lastError = error.localizedDescription
@@ -604,6 +618,7 @@ final class LibraryStore {
             catch { lastError = error.localizedDescription }
         }
         revision += 1
+        artworkRevision += 1
         return restored
     }
 

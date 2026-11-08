@@ -69,11 +69,13 @@ public enum MetadataReader {
 
         var artworkKey: String?
         if let artwork {
-            let pictures = md.attachedPictures
-            let front = pictures.first { $0.type == .frontCover } ?? pictures.first
-            if let data = front?.imageData ?? CommentPictures.flacCover(at: url) { artworkKey = artwork.store(data) }
-            else if let folderArt { artworkKey = folderArt.artworkKey(near: home, store: artwork) }
-            else if let data = ArtworkStore.folderImage(near: home) { artworkKey = artwork.store(data) }
+            // Embedded pictures (front cover first, back cover last, then a cover in a FLAC comment), then the folder's image.
+            let pictures = Self.rankedPictures(md)
+            let embedded: [() -> Data?] = pictures.map { picture in { picture.imageData } } + [{ CommentPictures.flacCover(at: url) }]
+            artworkKey = artwork.coverKey(embedded: embedded) {
+                if let folderArt { return folderArt.artworkKey(near: home, store: artwork) }
+                return ArtworkStore.folderArtKey(near: home, store: artwork)
+            }
         }
 
         // Files that can't hold tags (bare Dolby, DTS and TrueHD streams): the file name gives the title, and the
@@ -122,6 +124,19 @@ public enum MetadataReader {
             rgAlbumGain: md.replayGainAlbumGain, rgAlbumPeak: md.replayGainAlbumPeak,
             artworkKey: artworkKey, playCount: 0, lastPlayedAt: nil, isMissing: false,
             effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
+    }
+
+    /// A file's pictures in the order to try them: the front cover, then the rest in file order, the back cover last.
+    static func rankedPictures(_ md: AudioMetadata) -> [AttachedPicture] {
+        md.attachedPictures.enumerated().sorted { a, b in
+            let ra = pictureRank(a.element), rb = pictureRank(b.element)
+            return ra != rb ? ra < rb : a.offset < b.offset
+        }.map(\.element)
+    }
+
+    /// Which of a file's pictures to try first: the front cover, then the rest in file order, the back cover last.
+    static func pictureRank(_ picture: AttachedPicture) -> Int {
+        switch picture.type { case .frontCover: 0; case .backCover: 3; case .other: 1; default: 2 }
     }
 
     /// A track number written into a file name in a way that can't be mistaken for part of a name: zero-padded
