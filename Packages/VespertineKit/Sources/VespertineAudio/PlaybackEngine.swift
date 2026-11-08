@@ -231,20 +231,28 @@ public final class PlaybackEngine: @unchecked Sendable {
         staged = [key: entry]
         let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
             || (item.sacdArea != nil && item.dvd == nil)
-        let progressive = dsd && entry.size > 512 << 20
+        let progressiveDSD = dsd && entry.size > 512 << 20
+        // A FLAC or WAV on a share starts on a prefix too (see `NetworkStart`); the rest keeps copying ahead of the playhead.
+        let early = !progressiveDSD && NetworkStart.startsEarly(fileExtension: resolved.pathExtension, size: entry.size,
+                                                                isRegion: item.regionStartFrame != nil || item.regionFrameLength != nil)
+        let progressive = progressiveDSD || early
         let copyStarted = Date(), total = entry.size
-        if !progressive, total > 0, !entry.isComplete {
-            entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = Double(copied) / Double(total) } }
+        // The wait shown is for what is waited for: the prefix of an early start, otherwise the whole file.
+        let waitingFor = early ? min(total, NetworkStart.prefix) : total
+        if !progressiveDSD, waitingFor > 0, !entry.isComplete {
+            entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(waitingFor)) } }
         }
         defer { entry.setProgress(nil) }
         do {
-            try entry.prepare(full: !progressive, lead: 16 << 20, cancelled: { self.superseded })
+            try entry.prepare(full: !progressive, lead: early ? NetworkStart.prefix : 16 << 20, cancelled: { self.superseded })
         } catch is CancellationError {
             log.info("Stopped copying \(item.url.lastPathComponent, privacy: .public) from the share at \(entry.copiedBytes >> 20, privacy: .public) of \(total >> 20, privacy: .public) MB after \(Int(Date().timeIntervalSince(copyStarted) * 1000), privacy: .public) ms")
             throw Superseded()
         }
         let copySeconds = Date().timeIntervalSince(copyStarted)
-        if copySeconds > 1 {
+        if early, copySeconds > 0.25 {
+            log.info("Starting \(item.url.lastPathComponent, privacy: .public) on the first \(entry.copiedBytes >> 20, privacy: .public) of \(total >> 20, privacy: .public) MB from the share after \(Int(copySeconds * 1000), privacy: .public) ms (\(String(format: "%.1f", Double(entry.copiedBytes) / 1_048_576 / copySeconds), privacy: .public) MB/s); the rest copies while it plays")
+        } else if copySeconds > 1 {
             log.info("Copied \(item.url.lastPathComponent, privacy: .public) from the share: \(entry.copiedBytes >> 20, privacy: .public) MB in \(Int(copySeconds * 1000), privacy: .public) ms (\(String(format: "%.1f", Double(entry.copiedBytes) / 1_048_576 / copySeconds), privacy: .public) MB/s)")
         }
         let next = nextItemProvider?(item)
@@ -1693,9 +1701,20 @@ public final class PlaybackEngine: @unchecked Sendable {
             }
             // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
             // these are the original compressed/container bytes. Reads beyond the lead remain guarded.
+            // A PCM file that started on a prefix waits for as much as the copy's speed says the rest of the song needs.
             let format = decoding.probed.format
-            let lead = min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
-            do { try entry.prepare(full: false, lead: lead, at: min(entry.lastRead, entry.size), cancelled: { self.superseded }) }
+            let position = min(entry.lastRead, entry.size)
+            let lead = format.encoding == .pcm
+                ? NetworkStart.lead(fileSize: entry.size, position: position, duration: decoding.durationSeconds,
+                                    copied: entry.copiedBytes, elapsed: entry.copyElapsed)
+                : min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
+            // The percentage shown while the lead fills (a PCM song's; DSD shows none, as before).
+            if format.encoding == .pcm {
+                let target = max(1, min(entry.size, position + lead))
+                entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(target)) } }
+            }
+            defer { entry.setProgress(nil); shared.withLock { $0.snapshot.bufferingFraction = nil } }
+            do { try entry.prepare(full: false, lead: lead, at: position, cancelled: { self.superseded }) }
             catch is CancellationError { throw Superseded() }
         }
     }

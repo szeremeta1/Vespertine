@@ -273,7 +273,13 @@ enum SourceOpener {
             var failure: Error?
             for name in names {
                 do {
-                    let raw = try name.map { try AudioDecoder(url: url, decoderName: $0) } ?? AudioDecoder(url: url)
+                    // A song still being copied from a share is decoded through the cache's guarded reads, not from the half-written file.
+                    let raw: AudioDecoder
+                    if let entry = NetworkPlaybackCache.lookup(url), !entry.isComplete {
+                        raw = try name.map { try AudioDecoder(inputSource: entry.inputSource(), decoderName: $0) } ?? AudioDecoder(inputSource: entry.inputSource())
+                    } else {
+                        raw = try name.map { try AudioDecoder(url: url, decoderName: $0) } ?? AudioDecoder(url: url)
+                    }
                     // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
                     let decoder = GuardedDecoder(raw)
                     if String(describing: type(of: raw)).contains("MPEG") {

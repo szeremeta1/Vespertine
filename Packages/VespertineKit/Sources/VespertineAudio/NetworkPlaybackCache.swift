@@ -1,7 +1,9 @@
 // Vespertine — byte-exact, disk-backed network playback staging.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import CVespertineGuard
 import Foundation
+import SFBAudioEngine
 
 protocol PlaybackCacheReader: AnyObject, Sendable {
     var size: Int64 { get }
@@ -261,11 +263,24 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
         /// Bytes on disk so far.
         var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
+        /// How long this file has been copying: the copy's speed is `copiedBytes` over this.
+        var copyElapsed: TimeInterval { Date().timeIntervalSince(storage.startedAt) }
         /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
         func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
         func cancel() { storage.cancel() }
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
+
+        /// An input source for SFBAudioEngine's decoders over this file, which may still be arriving: a read waits for its
+        /// bytes to be on disk (the copy fetches what is asked for first), so a decoder can start on the first megabytes
+        /// of a song and never sees an unwritten range as zeros or as the end of the file. It keeps the entry alive.
+        func inputSource() -> InputSource {
+            VTCacheInputSource(url: url, length: size) { [self] offset, buffer, count in
+                guard let data = try? read(at: offset, count: count) else { return -1 }
+                data.copyBytes(to: buffer.assumingMemoryBound(to: UInt8.self), count: data.count)
+                return data.count
+            }
+        }
 
         func prepare(full: Bool, lead: Int64, at offset: Int64 = 0, cancelled: () -> Bool) throws {
             defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
@@ -323,6 +338,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var cancelled = false
         var error: Error?
         var progress: (@Sendable (Int64) -> Void)?
+        let startedAt = Date()
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              release: @escaping @Sendable () -> Void) throws {
@@ -473,6 +489,7 @@ final class PlaybackFile {
     }
     func close() throws { try file.close() }
     func seek(toOffset value: UInt64) throws { offset = value; if entry == nil { try file.seek(toOffset: value) } }
+    func currentOffset() -> UInt64 { offset }
     func seekToEnd() throws -> UInt64 {
         if let entry { offset = UInt64(entry.size); return offset }
         offset = try file.seekToEnd(); return offset
