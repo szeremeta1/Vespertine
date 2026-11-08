@@ -18,8 +18,13 @@ public struct RoomChannelPlayback: Hashable, Sendable {
     public var impulse: RoomImpulse?
     /// The signal is turned over (every sample's sign flipped): a speaker wired the other way round. Only a speaker group sets it.
     public var inverted: Bool
+    /// The delay is brought down by this many parts per million of the time the output has run, down to what `GroupDelay.rateTrimHorizonSeconds`
+    /// gives back (a speaker group's rate trim: the channel is read a little faster than it is written, so a member that falls behind the
+    /// others at this rate catches up). 0: the delay is fixed, in whole frames.
+    public var advancePPM: Double
 
-    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil, inverted: Bool = false) {
+    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil, inverted: Bool = false, advancePPM: Double = 0) {
+        self.advancePPM = advancePPM
         self.delayMs = delayMs
         self.levelDB = levelDB
         self.bands = bands
@@ -28,7 +33,7 @@ public struct RoomChannelPlayback: Hashable, Sendable {
     }
 
     /// Whether the channel's correction does anything at all.
-    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains(where: \.isActive) || impulse != nil || inverted }
+    public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains(where: \.isActive) || impulse != nil || inverted || advancePPM > 0 }
 }
 
 public struct RoomCorrectionPlayback: Hashable, Sendable {
@@ -111,6 +116,10 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
             var out = NRTRoomChannel()
             let frames: Double = (alignment.delayMs * sampleRate / 1000).rounded()
             out.delayFrames = UInt32(min(max(frames, 0), Double(NRT_ROOM_MAX_DELAY - 1)))
+            // A trimmed channel gives back its advance over the horizon, never more than it holds (and keeps the filter's reach: 8 frames).
+            let advance = correction.advancePPM.isFinite && correction.advancePPM > 0 ? correction.advancePPM : 0
+            out.advancePPM = advance
+            out.advanceLimitFrames = min(advance * 1e-6 * GroupDelay.rateTrimHorizonSeconds * sampleRate, max(Double(out.delayFrames) - 8, 0))
             out.gain = (correction.inverted ? -1 : 1) * preamp * pow(10, alignment.levelDB / 20)
             let sections = Array(correction.bands.compactMap { $0.section(sampleRate: sampleRate) }.prefix(Self.maxBandsPerChannel))
             withUnsafeMutableBytes(of: &out.sections) { raw in

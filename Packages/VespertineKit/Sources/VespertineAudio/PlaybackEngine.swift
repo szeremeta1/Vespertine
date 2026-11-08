@@ -1397,7 +1397,11 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
     private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
         guard let group = currentGroup(of: session) else { return room }
-        return GroupDelay.chain(room, group: group)
+        // Which members the aggregate drift-corrects decides what is certain about their delay (the resampler's) and whether a saved
+        // skew still holds (`GroupDelay.lateMs`).
+        var resampled: Set<String>?
+        if let plan = session.groupResources?.aggregate.plan { resampled = Set(zip(plan.members, plan.drift).filter(\.1).map(\.0.uid)) }
+        return GroupDelay.chain(room, group: group, resampled: resampled, rate: session.applied.sampleRate)
     }
 
     /// How long room correction holds sound back on the current output: what the end of the queue plays out.
