@@ -1704,6 +1704,12 @@ public final class PlaybackEngine: @unchecked Sendable {
                 ? NetworkStart.lead(fileSize: entry.size, position: position, duration: decoding.durationSeconds,
                                     copied: entry.copiedBytes, elapsed: entry.copyElapsed)
                 : min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
+            // The percentage shown while the lead fills (a PCM song's; DSD shows none, as before).
+            if format.encoding == .pcm {
+                let target = max(1, min(entry.size, position + lead))
+                entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(target)) } }
+            }
+            defer { entry.setProgress(nil); shared.withLock { $0.snapshot.bufferingFraction = nil } }
             do { try entry.prepare(full: false, lead: lead, at: position, cancelled: { self.superseded }) }
             catch is CancellationError { throw Superseded() }
         }
