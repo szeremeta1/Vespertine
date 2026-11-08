@@ -293,11 +293,23 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         return device.makeBuffer(bytes: data, length: data.count * MemoryLayout<SIMD4<Float>>.stride, options: .storageModeShared)
     }
 
-    /// Sets the album cover the record's label shows (nil: a plain label in the theme's colours).
-    public func setArtwork(_ image: CGImage?) {
-        guard let image else { artwork = nil; return }
+    /// Whether a cover is set (the label shows it; otherwise it is plain).
+    public var hasArtwork: Bool { artwork != nil }
+
+    /// Sets the album cover the record's label shows (nil: a plain label in the theme's colours). Returns whether a
+    /// cover is set. A picture the texture loader refuses as it is (an unusual pixel format, a side beyond the GPU's limit)
+    /// is redrawn as 8-bit sRGB, within `VisualizerArtworkImage.maximumSide`, and given again, so a decodable cover is
+    /// never silently dropped.
+    @discardableResult
+    public func setArtwork(_ image: CGImage?) -> Bool {
+        guard let image else { artwork = nil; return false }
+        artwork = texture(from: image) ?? VisualizerArtworkImage.normalized(image).flatMap(texture(from:))
+        return artwork != nil
+    }
+
+    private func texture(from image: CGImage) -> MTLTexture? {
         let loader = MTKTextureLoader(device: device)
-        artwork = try? loader.newTexture(cgImage: image, options: [
+        return try? loader.newTexture(cgImage: image, options: [
             .SRGB: false, .generateMipmaps: true, .textureUsage: MTLTextureUsage.shaderRead.rawValue,
             .textureStorageMode: MTLStorageMode.private.rawValue,
         ])
