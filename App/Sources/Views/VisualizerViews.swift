@@ -190,6 +190,21 @@ struct VisualizerWindow: View {
     @State private var dimFlashing = false
     @State private var askingStrobe = false
 
+    /// What the cover on screen depends on: the song, the key its queue entry and its album hold, and tag edits.
+    private struct ArtworkID: Hashable {
+        var location: String?
+        var trackKey: String?
+        var albumKey: String?
+        var revision: Int
+    }
+
+    private var artworkID: ArtworkID {
+        let track = model.player.current?.track
+        return ArtworkID(location: track?.location, trackKey: track?.artworkKey,
+                         albumKey: track.flatMap { model.library.album(key: $0.albumKey)?.artworkKey },
+                         revision: model.library.artworkRevision)
+    }
+
     var body: some View {
         @Bindable var settings = model.settings
         ZStack(alignment: .bottom) {
@@ -239,19 +254,23 @@ struct VisualizerWindow: View {
         .strobeWarning(isPresented: $askingStrobe, settings: $settings.visualizer)
         .onChange(of: askingStrobe) { _, asking in if asking { showControls() } }
         .onChange(of: model.settings.visualizerEnabled) { _, on in if !on { dismissWindow(id: "visualizer") } }
-        .task(id: model.artworkKey(model.player.current?.track)) {
-            holder.renderer?.labels = .localized
-            guard let key = model.artworkKey(model.player.current?.track) else { holder.renderer?.setArtwork(nil); return }
-            let image = await ArtworkCache.shared.image(key, size: 1200)
-            guard !Task.isCancelled else { return }
-            holder.renderer?.setArtwork(image?.cgImage(forProposedRect: nil, context: nil, hints: nil))
-        }
-        .task(id: model.artworkKey(model.player.current?.track)) {
-            // The Album Art colours: worked out in the background, then faded to (the old song's stay until then).
-            guard let key = model.artworkKey(model.player.current?.track) else { holder.renderer?.setAlbumPalette(nil); return }
-            let palette = await ArtworkCache.shared.albumPalette(key)
-            guard !Task.isCancelled else { return }
-            holder.renderer?.setAlbumPalette(palette)
+        .task(id: artworkID) {
+            // The cover and its Album Art colours for the song that is playing: the old song's cover goes at once, the new
+            // one is shown the moment it can be had (the library's key, else the file's tags, the folder, the album), and
+            // while there is none the visualizer asks again rather than staying blank.
+            guard let renderer = holder.renderer else { return }
+            renderer.labels = .localized
+            guard let track = model.player.current?.track else {
+                _ = renderer.setArtwork(nil)
+                renderer.setAlbumPalette(nil)
+                return
+            }
+            await VisualizerArtworkPresenter.present(
+                knownKey: model.artworkKey(track),
+                cached: { ArtworkCache.shared.cachedVisualizerPicture($0) },
+                resolve: { await model.library.resolveArtwork(for: track) },
+                load: { await ArtworkCache.shared.visualizerPicture($0) },
+                into: .init(setArtwork: { renderer.setArtwork($0) }, setPalette: { renderer.setAlbumPalette($0) }))
         }
         .animation(.easeInOut(duration: 0.25), value: controlsShown)
         .task {

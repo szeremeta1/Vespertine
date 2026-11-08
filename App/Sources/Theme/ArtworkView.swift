@@ -13,11 +13,11 @@ final class ArtworkCache {
     static let shared = ArtworkCache()
     private let cache = NSCache<NSString, NSImage>()
     private var colors: [String: Color] = [:]
-    /// The visualizer's Album Art palettes by artwork key; a cover with no colour to speak of is cached as nil.
-    private var palettes: [String: AlbumArtPalette?] = [:]
     var store: ArtworkStore?
+    /// The visualizer's decoded pictures (up to 2048 px, 8-bit sRGB) by artwork key.
+    private let visualizerPictures = NSCache<NSString, CGImage>()
 
-    init() { cache.countLimit = 600 }
+    init() { cache.countLimit = 600; visualizerPictures.countLimit = 8 }
 
     func cached(_ key: String, size: Int) -> NSImage? { cache.object(forKey: "\(key)_\(size)" as NSString) }
 
@@ -28,6 +28,27 @@ final class ArtworkCache {
         let image = await Task.detached(priority: .userInitiated) { NSImage(contentsOf: url) }.value
         if let image { cache.setObject(image, forKey: "\(key)_\(size)" as NSString) }
         return image
+    }
+
+    /// The picture for the visualizer, if it is in memory.
+    func cachedVisualizerPicture(_ key: String) -> CGImage? { visualizerPictures.object(forKey: key as NSString) }
+
+    /// The picture for the visualizer: the best file stored for `key`, decoded off the main thread to something the GPU
+    /// takes whatever its format, depth or size. Nil when no file of the key can be decoded (never remembered, so the next
+    /// ask tries again).
+    func visualizerPicture(_ key: String) async -> CGImage? {
+        if let hit = cachedVisualizerPicture(key) { return hit }
+        guard let store else { return nil }
+        let urls = [store.url(for: key, minimumSize: VisualizerArtworkImage.maximumSide), store.originalURL(key)]
+            + ArtworkStore.thumbnailSizes.reversed().map { store.thumbnailURL(key, size: $0) }
+        let picture = await Task.detached(priority: .userInitiated) {
+            for url in urls where FileManager.default.fileExists(atPath: url.path) {
+                if let image = VisualizerArtworkImage.load(contentsOf: url) { return image }
+            }
+            return nil
+        }.value
+        if let picture { visualizerPictures.setObject(picture, forKey: key as NSString) }
+        return picture
     }
 
     /// Average colour of the artwork (for the ambient glow behind Now Playing).
@@ -43,18 +64,6 @@ final class ArtworkCache {
         let color = Color(.sRGB, red: Double(pixel[0]) / 255, green: Double(pixel[1]) / 255, blue: Double(pixel[2]) / 255)
         colors[key] = color
         return color
-    }
-}
-
-extension ArtworkCache {
-    /// The cover's colours for the visualizer's Album Art theme, worked out once per artwork key off the main thread
-    /// (nil: no cover, or grayscale or too dark to have any, so the default colours are used).
-    func albumPalette(_ key: String) async -> AlbumArtPalette? {
-        if let hit = palettes[key] { return hit }
-        guard let cg = await image(key, size: 160)?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
-        let palette = await Task.detached(priority: .utility) { AlbumArtPalette.extract(from: cg) }.value
-        palettes[key] = .some(palette)
-        return palette
     }
 }
 
