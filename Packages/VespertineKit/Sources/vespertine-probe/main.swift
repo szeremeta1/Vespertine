@@ -11,12 +11,15 @@
 //                             [--markdown <path>]
 //                             software loopback self-test through a virtual device ("Vespertine Loopback" by default);
 //                             exits 0 when every case is bit-exact, 1 on a failure, 2 on a test setup problem
+//   vespertine-probe group-info <leader> [<follower> …] [--json]   (Phase 0 of multi-DAC speaker groups: read-only; see
+//                             GroupProbeCLI.usage for this and the group-play / group-skew commands)
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import CoreAudio
 import Foundation
 import VespertineAudio
+import VespertineGroupProbe
 
 func readback(_ id: AudioObjectID) -> (rate: Double, physical: String, hogPID: pid_t) {
     var addr = AudioObjectPropertyAddress(mSelector: kAudioDevicePropertyNominalSampleRate, mScope: kAudioObjectPropertyScopeGlobal, mElement: kAudioObjectPropertyElementMain)
@@ -36,6 +39,7 @@ func readback(_ id: AudioObjectID) -> (rate: Double, physical: String, hogPID: p
 }
 
 let args = CommandLine.arguments
+if args.count >= 2, GroupProbeCLI.commands.contains(args[1]) { exit(GroupProbeCLI.run(args[1], Array(args.dropFirst(2)))) }
 let devices = OutputDevices.list()
 
 if args.count < 2 || args[1] == "list" {
