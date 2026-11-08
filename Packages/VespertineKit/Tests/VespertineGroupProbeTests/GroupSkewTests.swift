@@ -40,15 +40,43 @@ struct GroupSkewTests {
         #expect(stimulus.tracks.map(\.channel) == [4, 7])
         #expect(stimulus.tracks.allSatisfy { $0.samples.count == layout.totalFrames })
         let ref = layout.reference.samples.map { Float($0 * layout.level) }
-        func carries(_ track: [Float], at start: Int) -> Bool { (0..<ref.count).allSatisfy { track[start + $0] == ref[$0] || abs(track[start + $0] - ref[$0]) < 1e-6 } }
+        func carries(_ track: [Float], at start: Int, gain: Float = 1) -> Bool { (0..<ref.count).allSatisfy { abs(track[start + $0] - ref[$0] * gain) < 1e-6 } }
         let leader = stimulus.tracks[0].samples, follower = stimulus.tracks[1].samples
         #expect(carries(leader, at: layout.firstReferenceStart))
         #expect(carries(leader, at: layout.secondReferenceStart))
-        #expect(carries(follower, at: layout.sweepStart))
+        // The follower arrives quieter at the microphone, so its chirp is played louder (11 dB).
+        #expect(carries(follower, at: layout.sweepStart, gain: Float(pow(10, GroupSkew.followerBoostDB / 20))))
         // The follower is silent everywhere else; the leader is silent at the follower's chirp.
         #expect(follower[..<layout.sweepStart].allSatisfy { $0 == 0 })
         #expect(follower[(layout.sweepStart + ref.count)...].allSatisfy { $0 == 0 })
         #expect(leader[layout.sweepStart..<layout.sweepStart + ref.count].allSatisfy { $0 == 0 })
+    }
+
+    @Test func theFollowersChirpIsLouderByTheBoostWhenTheChannelHasRoom() throws {
+        let (gain, limited) = GroupSkew.followerGain(level: 0.1)
+        #expect(!limited)
+        #expect(abs(20 * log10(gain) - 11) < 1e-9)
+        #expect(abs(GroupSkew.followerGain(level: 0.1, boostDB: 0).gain - 1) < 1e-12)
+    }
+
+    @Test func theBoostIsCutToTheHeadroomAndSaysSo() throws {
+        // At level 0.5 an 11 dB boost would peak at 1.77: it is cut to the limit (0.89), and flagged.
+        let (gain, limited) = GroupSkew.followerGain(level: 0.5)
+        #expect(limited)
+        #expect(abs(0.5 * gain - GroupSkew.followerPeakLimit) < 1e-12)
+        let layout = try GroupSkew.layout(rate: Self.rate, leadIn: 0.4, level: 0.5)
+        let follower = GroupSkew.stimulus(layout: layout, leaderChannel: 0, followerChannel: 1, control: false).tracks[1].samples
+        #expect(follower.map { abs($0) }.max()! <= Float(GroupSkew.followerPeakLimit) + 1e-6)
+        // Already at full level: no boost at all, never an attenuation.
+        #expect(GroupSkew.followerGain(level: 1).gain == 1)
+    }
+
+    @Test func controlModeDoesNotBoostAnything() throws {
+        let layout = try Self.layout()
+        let control = GroupSkew.stimulus(layout: layout, leaderChannel: 0, followerChannel: 1, control: true).tracks[0].samples
+        let slot = layout.sweepStart..<layout.sweepStart + layout.reference.samples.count
+        #expect(control[slot].map { abs($0) }.max()! <= Float(layout.level) + 1e-6)
+        #expect(control[slot].contains { abs($0) > 0.01 })
     }
 
     @Test func controlModePlaysEverythingOnTheLeaderAlone() throws {
@@ -114,6 +142,46 @@ struct GroupSkewTests {
         #expect(GroupSkew.verdict(peakToPeakFrames: 60, rate: 48_000) == .notRepeatable)
         // The same frames are shorter at a higher rate.
         #expect(GroupSkew.verdict(peakToPeakFrames: 2, rate: 96_000) == .repeatable)
+    }
+
+    // MARK: Wrong picks stay out of the verdict
+
+    static func run(_ index: Int, leadIn: Double = 1.5, skew: Double) -> GroupSkewReport.Run {
+        .init(index: index, leadInSeconds: leadIn, measurement: .init(skewFrames: skew, skewMicroseconds: skew / 48, micDriftPPM: 0, followerChirpSeconds: leadIn + 0.6))
+    }
+
+    @Test func aRunFarFromTheMedianIsLeftOutAndListed() {
+        let runs = [630.7, 630.6, 629.7, 816.0, 630.3, 631.1].enumerated().map { Self.run($0.offset + 1, skew: $0.element) }
+        let (inliers, outliers) = GroupSkewReport.separateOutliers(runs)
+        #expect(outliers.map(\.index) == [4])
+        #expect(inliers.count == 5)
+        let report = GroupSkewReport(control: false, rate: 48_000, runs: runs, failures: [], outliers: outliers, overall: GroupSkew.stats(inliers.map(\.measurement.skewFrames)), byLeadIn: [],
+                                     verdict: GroupSkew.stats(inliers.map(\.measurement.skewFrames)).map { GroupSkew.verdict(peakToPeakFrames: $0.peakToPeak, rate: 48_000) })
+        #expect(report.verdict == .audibleImageShift)   // 2.4 frames = 50 µs, not "over 200 µs"
+        #expect(report.text.contains("EXCLUDED: run 4"))
+        #expect(!report.text.contains("argues for Phase B"))
+    }
+
+    @Test func outliersAreJudgedWithinEachLeadIn() {
+        // The skew creeps with the lead-in (13.1 ms to 14.8 ms over 2 minutes): that is not an outlier, a wrong pick at one lead-in is.
+        let runs = [Self.run(1, leadIn: 1, skew: 630), Self.run(2, leadIn: 1, skew: 631), Self.run(3, leadIn: 1, skew: 630.5),
+                    Self.run(4, leadIn: 120, skew: 708), Self.run(5, leadIn: 120, skew: 709), Self.run(6, leadIn: 120, skew: 707.5),
+                    Self.run(7, leadIn: 15, skew: 639), Self.run(8, leadIn: 15, skew: 801), Self.run(9, leadIn: 15, skew: 639.5), Self.run(10, leadIn: 15, skew: 638.5)]
+        let (inliers, outliers) = GroupSkewReport.separateOutliers(runs)
+        #expect(outliers.map(\.index) == [8])
+        #expect(inliers.count == 9)
+    }
+
+    @Test func fewerThanThreeRunsAtALeadInAreNeverCalledOutliers() {
+        let runs = [Self.run(1, skew: 630), Self.run(2, skew: 816)]
+        #expect(GroupSkewReport.separateOutliers(runs).outliers.isEmpty)
+    }
+
+    @Test func aLaterCopyOfTheFollowersChirpIsWarnedAbout() {
+        var m = Self.run(1, skew: 630).measurement
+        m.followerLaterCopyFrames = 162
+        let report = GroupSkewReport(control: false, rate: 48_000, runs: [.init(index: 1, leadInSeconds: 1.5, measurement: m)], failures: [], overall: nil, byLeadIn: [], verdict: nil)
+        #expect(report.text.contains("WARNING: in 1 of 1 runs"))
     }
 
     // MARK: Drift between the two DACs, from one long capture (H2)
