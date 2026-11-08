@@ -201,12 +201,13 @@ struct VisualizerArtworkPresenterTests {
             await VisualizerArtworkPresenter.present(knownKey: nil, cached: { _ in nil }, resolve: { asked += 1; return nil },
                                                      load: { _ in nil }, palette: { _ in nil }, retryDelays: fast, into: screen.sink)
         }
-        try? await Task.sleep(for: .milliseconds(80))
+        // However loaded the machine is: wait for the third ask rather than a fixed time.
+        for _ in 0..<600 where asked < 3 { try? await Task.sleep(for: .milliseconds(10)) }
         task.cancel()
         await task.value
         let after = asked
         #expect(after >= 3)
-        try? await Task.sleep(for: .milliseconds(40))
+        try? await Task.sleep(for: .milliseconds(60))
         #expect(asked == after)
         #expect(screen.covers.allSatisfy { $0 == nil })
     }
