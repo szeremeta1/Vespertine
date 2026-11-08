@@ -93,7 +93,7 @@ let package = Package(
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport", "VespertineLibrary",
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
-        .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"]),
+        .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],
