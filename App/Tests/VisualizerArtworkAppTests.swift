@@ -68,7 +68,8 @@ struct VisualizerArtworkAppTests {
         try cover.write(to: music.appendingPathComponent("Folder.PNG"))
         let key = await library.resolveArtwork(for: read)
         #expect(key == ArtworkStore.key(for: cover))
-        let picture = try #require(await ArtworkCache.shared.visualizerPicture(try #require(key)))
+        let found = try #require(key)
+        let picture = try #require(await ArtworkCache.shared.visualizerPicture(found))
         #expect(picture.width == 500)
     }
 }
