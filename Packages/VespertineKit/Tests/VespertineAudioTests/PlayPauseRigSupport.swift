@@ -132,9 +132,11 @@ final class PlayPauseRig: @unchecked Sendable {
     var elapsed: String { String(format: "%5.2f", Date().timeIntervalSince(t0)) }
 
     /// Watches for `seconds`: the engine's snapshot at the end, and how far the playhead and the sound went.
-    func observe(_ seconds: Double) -> Observation {
+    /// The waits here are `Task.sleep`, never `Thread.sleep`: this suite runs for minutes, and a test that sleeps on a thread holds one
+    /// of the few Swift concurrency threads (one per core) all that time, which on a small CI machine starves every other test.
+    func observe(_ seconds: Double) async -> Observation {
         let p0 = engine.snapshot.position, a0 = audibleFrames, began = Date()
-        Thread.sleep(forTimeInterval: seconds)
+        try? await Task.sleep(for: .seconds(seconds))
         let s = engine.snapshot
         let seconds = Date().timeIntervalSince(began)
         return Observation(state: s.state, buffering: s.isBuffering, fraction: s.bufferingFraction, positionMoved: s.position - p0,
@@ -142,14 +144,14 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     /// Waits until `condition` holds of the snapshot (false on timeout).
-    func wait(timeout: Double = 10, _ condition: (EngineSnapshot) -> Bool) -> Bool {
+    func wait(timeout: Double = 10, _ condition: (EngineSnapshot) -> Bool) async -> Bool {
         let end = Date().addingTimeInterval(timeout)
         while Date() < end {
             if condition(engine.snapshot) { return true }
-            Thread.sleep(forTimeInterval: 0.01)
+            try? await Task.sleep(for: .milliseconds(10))
         }
         return false
     }
 
-    func sleep(ms: Int) { Thread.sleep(forTimeInterval: Double(ms) / 1000) }
+    func sleep(ms: Int) async { try? await Task.sleep(for: .milliseconds(ms)) }
 }
