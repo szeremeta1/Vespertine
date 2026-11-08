@@ -82,7 +82,10 @@ let package = Package(
             ]
         ),
         // Hardware verification: drives the real engine against a device and reads back what Core Audio did.
-        .executableTarget(name: "vespertine-probe", dependencies: ["VespertineAudio"]),
+        .executableTarget(name: "vespertine-probe", dependencies: ["VespertineAudio", "VespertineGroupProbe"]),
+        // Phase 0 of multi-DAC "speaker groups": the probe's group-info / group-play / group-skew commands. Not a product, so
+        // nothing links it into the app; only vespertine-probe and its tests use it.
+        .target(name: "VespertineGroupProbe", dependencies: ["VespertineAudio"]),
         // Library operations from the command line (find music, import, enrich) — same code the app uses.
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
@@ -90,6 +93,7 @@ let package = Package(
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "VespertineTestSupport", "VespertineLibrary",
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],
