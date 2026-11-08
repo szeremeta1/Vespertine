@@ -16,8 +16,17 @@ private enum Pictures {
     static func png(_ side: Int, red: UInt8 = 200, green: UInt8 = 40, blue: UInt8 = 40) -> Data {
         let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: side, pixelsHigh: side, bitsPerSample: 8, samplesPerPixel: 4,
                                    hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
-        for x in 0..<side { for y in 0..<side { rep.setColor(NSColor(srgbRed: CGFloat(red) / 255, green: CGFloat(green) / 255 + CGFloat(x % 7) / 40,
-                                                                    blue: CGFloat(blue) / 255 + CGFloat(y % 5) / 40, alpha: 1), atX: x, y: y) } }
+        // Write the bytes directly: setColor per pixel logs a colour-space warning for every call (millions of lines in CI).
+        let pixels = rep.bitmapData!, stride = rep.bytesPerRow
+        for y in 0..<side {
+            for x in 0..<side {
+                let p = y * stride + x * 4
+                pixels[p] = red
+                pixels[p + 1] = UInt8(min(255, Int(green) + (x % 7) * 6))
+                pixels[p + 2] = UInt8(min(255, Int(blue) + (y % 5) * 6))
+                pixels[p + 3] = 255
+            }
+        }
         return rep.representation(using: .png, properties: [:])!
     }
 
