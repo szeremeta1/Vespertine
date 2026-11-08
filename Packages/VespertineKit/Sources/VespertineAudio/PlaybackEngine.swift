@@ -193,7 +193,14 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func cacheKey(_ item: PlayableItem) -> String { item.cacheKey ?? item.url.path }
     private var staged: [String: NetworkPlaybackCache.Entry] = [:]
     private var stagedFolder: (key: String, entry: NetworkPlaybackCache.DirectoryEntry)?
-    private var playbackCache: NetworkPlaybackCache { .shared }
+    private var playbackCache: NetworkPlaybackCache { cacheOverride ?? .shared }
+    /// For tests: the cache songs are staged in (its `readerFactory` can stand in for the share).
+    var cacheOverride: NetworkPlaybackCache?
+    /// For tests: opens the output a session plays on instead of Core Audio (see `OutputSession.init(simulating:rate:)`); it may
+    /// take as long as a speaker group's aggregate does.
+    var sessionFactory: (@Sendable (OutputDevice, OutputPlan) throws -> OutputSession)?
+    /// For tests: the output session now, and the item the engine thread has been given to play.
+    var currentSessionForTesting: OutputSession? { sessionLock.withLock { session } }
 
     /// Stage bytes before opening a decoder. Regular tracks start only after the ENTIRE source is local.
     /// Large DSD uses guarded cache I/O and a substantial on-disk lead (see prefill).
@@ -1272,6 +1279,18 @@ public final class PlaybackEngine: @unchecked Sendable {
         let old = session
         session = nil
         sessionLock.unlock()
+        if let sessionFactory {
+            old?.invalidate(releaseHog: false, restoreFormat: false)
+            let new = try sessionFactory(device, plan)
+            transitionWindows.removeAll()
+            sessionLock.lock()
+            session = new
+            sessionDevice = device
+            nrt_context_set_viz(new.context, visualizerTap)
+            sessionLock.unlock()
+            applyGain()
+            return
+        }
         if GroupOutput.isGroupOutput(device), let group = resolvedGroup, group.outputUID == device.uid {
             try replaceGroupSession(old: old, device: device, group: group, plan: plan)
             return
