@@ -70,10 +70,7 @@ public enum MetadataReader {
         var artworkKey: String?
         if let artwork {
             // Embedded pictures (front cover first, back cover last, then a cover in a FLAC comment), then the folder's image.
-            let pictures = md.attachedPictures.enumerated().sorted { a, b in
-                let ra = Self.pictureRank(a.element), rb = Self.pictureRank(b.element)
-                return ra != rb ? ra < rb : a.offset < b.offset
-            }.map(\.element)
+            let pictures = Self.rankedPictures(md)
             let embedded: [() -> Data?] = pictures.map { picture in { picture.imageData } } + [{ CommentPictures.flacCover(at: url) }]
             artworkKey = artwork.coverKey(embedded: embedded) {
                 if let folderArt { return folderArt.artworkKey(near: home, store: artwork) }
@@ -127,6 +124,14 @@ public enum MetadataReader {
             rgAlbumGain: md.replayGainAlbumGain, rgAlbumPeak: md.replayGainAlbumPeak,
             artworkKey: artworkKey, playCount: 0, lastPlayedAt: nil, isMissing: false,
             effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
+    }
+
+    /// A file's pictures in the order to try them: the front cover, then the rest in file order, the back cover last.
+    static func rankedPictures(_ md: AudioMetadata) -> [AttachedPicture] {
+        md.attachedPictures.enumerated().sorted { a, b in
+            let ra = pictureRank(a.element), rb = pictureRank(b.element)
+            return ra != rb ? ra < rb : a.offset < b.offset
+        }.map(\.element)
     }
 
     /// Which of a file's pictures to try first: the front cover, then the rest in file order, the back cover last.
