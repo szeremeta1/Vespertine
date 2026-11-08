@@ -820,6 +820,7 @@ struct RoomMeasureWizard: View {
         .background(Palette.window)
         .onAppear {
             model.preferredOutputUID = device?.uid
+            model.groupMeasured = { group in app.speakerGroups?.upsert(group) }
             setGroupTarget()
             model.startIfLaunched()
         }
@@ -1001,7 +1002,7 @@ struct RoomMeasureProgress: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForEach(model.deviceLines, id: \.self) { Text($0).font(Typeface.ui(11)).foregroundStyle(Palette.text3) }
+            ForEach(model.deviceLines + model.skewLines, id: \.self) { Text($0).font(Typeface.ui(11)).foregroundStyle(Palette.text3) }
             VStack(alignment: .leading, spacing: 4) {
                 Text(model.headline).font(Typeface.ui(15, weight: .semibold)).foregroundStyle(Palette.text)
                 if !model.detail.isEmpty { Text(model.detail).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true) }

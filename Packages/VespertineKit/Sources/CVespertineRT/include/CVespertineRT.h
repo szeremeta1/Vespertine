@@ -155,6 +155,12 @@ void nrt_context_set_eq(NRTRenderContext *_Nonnull ctx, const NRTBiquad *_Nullab
 /// NRT_ROOM_MAX_SECTIONS) in series, in double precision.
 typedef struct {
     uint32_t delayFrames;
+    /// A speaker group's rate trim: with advancePPM above 0 the delay is `delayFrames` less advancePPM millionths of the frames the
+    /// context has rendered, but never by more than advanceLimitFrames (and at least 8 frames of the delay stay). The channel is read
+    /// through a 16-tap windowed-sinc interpolator while the delay is fractional; at 0 the delay is whole frames and the samples are
+    /// untouched. The count starts when the context does (a seek does not restart it: the devices did not).
+    double advancePPM;
+    double advanceLimitFrames;
     double gain;
     uint32_t count;
     NRTBiquad sections[NRT_ROOM_MAX_SECTIONS];

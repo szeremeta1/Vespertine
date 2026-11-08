@@ -67,6 +67,25 @@ public struct TimingReference: Sendable {
         public var score: Double
         /// The strongest other peak that isn't this one's own reflection, as a fraction of this one.
         public var runnerUpRatio: Double
+        /// The peak over the median of the correlation envelope in the range: how far the reference stands above what the range holds.
+        public var peakToFloor: Double = 0
+        /// Frames from the position taken to a later peak nearly as strong as it, 3-4 ms on (a copy of the chirp that takes a longer
+        /// path, seen in the hardware session 162 frames after the direct sound); nil when there is none. The position taken is then
+        /// the earlier one, but a copy that is as strong can swap places with it from one run to the next, so it is worth a warning.
+        public var laterCopyFrames: Double?
+    }
+
+    /// How a reference is accepted in the range given to `locate`.
+    public enum Acceptance: Equatable, Sendable {
+        /// Anywhere in the range: the strongest peak must look like the reference (the normalised `minimumScore`), and the earliest
+        /// peak with `earliestArrivalShare` of it wins.
+        case scored
+        /// Its place is known to within the range (the follower's chirp, placed from the leader's references): the strongest peak
+        /// must stand `expectedMinimumPeakToFloor` times over the range's median envelope, and the earliest peak that does and has
+        /// `expectedEarliestArrivalShare` of the strongest wins. The normalised score is left out: it divides by all the energy in
+        /// the window, so a chirp that reaches the microphone 16 dB under the leader's, with copies after it, scored 0.26-0.33 against a
+        /// minimum of 0.3 while standing 23-80 times over the floor.
+        case expected
     }
 
     /// Weakest peak accepted as the reference, and how close another peak may come to it before the position is
@@ -77,11 +96,16 @@ public struct TimingReference: Sendable {
     public static let minimumScore = 0.3
     public static let ambiguityRatio = 0.8
     public static let earliestArrivalShare = 0.6
+    public static let expectedEarliestArrivalShare = 0.3
+    public static let expectedMinimumPeakToFloor = 8.0
+    /// A later peak at least this share of the one taken, `echoCopySeconds` after it, is reported as `laterCopyFrames`.
+    public static let echoCopyShare = 0.8
+    private static let echoCopySeconds = 0.0029...0.0039
     private static let sameArrivalSeconds = 0.002
     private static let reflectionSeconds = 0.03
 
     /// Find the reference starting within `range` (sample indices into `recording`).
-    public func locate(in recording: [Double], range: Range<Int>) throws -> Detection {
+    public func locate(in recording: [Double], range: Range<Int>, acceptance: Acceptance = .scored) throws -> Detection {
         let m = samples.count
         let lo = max(range.lowerBound, 0), hi = min(range.upperBound, recording.count - m + 1)
         guard hi > lo else { throw TimingReferenceError.recordingTooShort }
@@ -101,16 +125,29 @@ public struct TimingReference: Sendable {
         }
         // Rank by the raw envelope, so a weak reflection of the reference doesn't look as good as the reference;
         // the normalised score only says whether what was found is shaped like the reference at all.
-        guard let strongest = envelope.indices.max(by: { envelope[$0] < envelope[$1] }), envelope[strongest] > 0,
-              score[strongest] >= Self.minimumScore else {
+        let floor = envelope.isEmpty ? 0 : envelope.sorted()[envelope.count / 2]
+        guard let strongest = envelope.indices.max(by: { envelope[$0] < envelope[$1] }), envelope[strongest] > 0 else {
             throw TimingReferenceError.notFound
+        }
+        switch acceptance {
+        case .scored: guard score[strongest] >= Self.minimumScore else { throw TimingReferenceError.notFound }
+        case .expected: guard envelope[strongest] >= Self.expectedMinimumPeakToFloor * floor else { throw TimingReferenceError.notFound }
         }
         // The direct sound arrives first and everything later is a reflection of it, which in a small room can be the
         // stronger one: take the earliest peak that is nearly as strong as the strongest, not the strongest itself.
-        let best = envelope.indices.first { k in
-            k > 0 && k < envelope.count - 1 && envelope[k] >= Self.earliestArrivalShare * envelope[strongest]
-                && envelope[k] >= envelope[k - 1] && envelope[k] >= envelope[k + 1] && score[k] >= Self.minimumScore
+        var best = envelope.indices.first { k in
+            guard k > 0 && k < envelope.count - 1, envelope[k] >= envelope[k - 1], envelope[k] >= envelope[k + 1] else { return false }
+            switch acceptance {
+            case .scored: return envelope[k] >= Self.earliestArrivalShare * envelope[strongest] && score[k] >= Self.minimumScore
+            case .expected: return envelope[k] >= Self.expectedEarliestArrivalShare * envelope[strongest] && envelope[k] >= Self.expectedMinimumPeakToFloor * floor
+            }
         } ?? strongest
+        if acceptance == .expected {
+            // The low share lets a side lobe of the chirp's own correlation (a few samples ahead of its main peak) qualify: within
+            // the same arrival, the main peak is the one.
+            let ringing = Int(Self.sameArrivalSeconds * sampleRate)
+            best = (best...min(best + ringing, envelope.count - 1)).max { envelope[$0] < envelope[$1] } ?? best
+        }
         // Another peak makes the position doubtful if it is before the one taken (that one may be a reflection of it), or
         // after it by more than a room's reflections reach (that one is a second reference, not an echo of this one).
         let guardBand = Int(Self.sameArrivalSeconds * sampleRate), reflectionReach = Int(Self.reflectionSeconds * sampleRate)
@@ -121,7 +158,13 @@ public struct TimingReference: Sendable {
         let ratio = runnerUp / envelope[best]
         guard ratio < Self.ambiguityRatio else { throw TimingReferenceError.ambiguous }
         let offset = Self.refine(recording, nearestStart: lo + best, template: samples, rate: sampleRate, lowHz: lowHz, highHz: highHz)
-        return Detection(position: Double(lo + best) + offset, score: score[best], runnerUpRatio: ratio)
+        let copyRange = Int(Self.echoCopySeconds.lowerBound * sampleRate)...Int(Self.echoCopySeconds.upperBound * sampleRate)
+        let copy = copyRange.compactMap { d -> Int? in
+            let k = best + d
+            return k > 0 && k < envelope.count - 1 && envelope[k] >= Self.echoCopyShare * envelope[best] && envelope[k] >= envelope[k - 1] && envelope[k] >= envelope[k + 1] ? d : nil
+        }.first
+        return Detection(position: Double(lo + best) + offset, score: score[best], runnerUpRatio: ratio,
+                         peakToFloor: floor > 0 ? envelope[best] / floor : .infinity, laterCopyFrames: copy.map(Double.init))
     }
 
     /// Fraction of a sample (within about ±1) by which the reference actually starts after `nearestStart`, from the

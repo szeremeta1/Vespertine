@@ -161,6 +161,59 @@ struct RoomClockDriftTests {
         #expect(abs(found.position - echoAt) < 1, "found \(found.position), want the reflection at \(echoAt)")
     }
 
+    /// The chirp at `start` with gain `direct`, a copy `copyFrames` later with gain `copy`, and a lot of band-limited-looking noise: a quiet
+    /// chirp in a noisy window, like the follower's at the microphone (16 dB under the leader's, copies behind it).
+    private func buried(_ ref: TimingReference, start: Double, direct: Double, copyFrames: Double, copy: Double, noise: Double, count: Int = 12_000) -> [Double] {
+        var rng = SeededGenerator(seed: 5)
+        return (0..<count).map { n in
+            direct * ref.value(at: (Double(n) - start) / Self.rate) + copy * ref.value(at: (Double(n) - start - copyFrames) / Self.rate) + noise * rng.gaussian()
+        }
+    }
+
+    @Test("A chirp whose place is known is accepted on how far it stands over the window's floor, though noise keeps its normalised score under the minimum")
+    func expectedAcceptsOnPeakOverFloor() throws {
+        let ref = try makeReference()
+        let recording = buried(ref, start: 5_000.25, direct: 0.02, copyFrames: 162, copy: 0.02, noise: 0.06)
+        #expect(throws: TimingReferenceError.notFound) { try ref.locate(in: recording, range: 2_000..<8_000) }
+        let found = try ref.locate(in: recording, range: 2_000..<8_000, acceptance: .expected)
+        #expect(abs(found.position - 5_000.25) < 1, "found \(found.position)")
+        #expect(found.peakToFloor >= TimingReference.expectedMinimumPeakToFloor)
+    }
+
+    @Test("A window with no chirp in it is not found, however the floor is laid out")
+    func expectedStillRejectsNoise() throws {
+        let ref = try makeReference()
+        var rng = SeededGenerator(seed: 9)
+        let noise = (0..<12_000).map { _ in 0.02 * rng.gaussian() }
+        #expect(throws: TimingReferenceError.notFound) { try ref.locate(in: noise, range: 2_000..<8_000, acceptance: .expected) }
+    }
+
+    @Test("In a known place the first arrival wins from 0.3 of a later copy, where the scored search needs 0.6")
+    func expectedEarliestArrivalShare() throws {
+        let ref = try makeReference()
+        let start = 5_000.0
+        // First arrival at 0.45 of the copy 162 frames on (the 0.49 and 0.69 of the hardware session).
+        let recording = buried(ref, start: start, direct: 0.045, copyFrames: 162, copy: 0.1, noise: 0.001)
+        let scoredPick = try ref.locate(in: recording, range: 2_000..<8_000)
+        #expect(abs(scoredPick.position - (start + 162)) < 1, "scored: \(scoredPick.position)")
+        let expectedPick = try ref.locate(in: recording, range: 2_000..<8_000, acceptance: .expected)
+        #expect(abs(expectedPick.position - start) < 1, "expected: \(expectedPick.position)")
+        // A first arrival under 0.3 of the copy is not preferred.
+        let faint = buried(ref, start: start, direct: 0.02, copyFrames: 162, copy: 0.1, noise: 0.001)
+        #expect(abs(try ref.locate(in: faint, range: 2_000..<8_000, acceptance: .expected).position - (start + 162)) < 1)
+    }
+
+    @Test("A later copy 3-4 ms behind a pick that is nearly as strong is reported; a weak or a far one is not")
+    func laterCopyIsReported() throws {
+        let ref = try makeReference()
+        let strong = try ref.locate(in: buried(ref, start: 5_000, direct: 0.05, copyFrames: 162, copy: 0.05, noise: 0.001), range: 2_000..<8_000, acceptance: .expected)
+        #expect(abs((strong.laterCopyFrames ?? 0) - 162) <= 2, "\(String(describing: strong.laterCopyFrames))")
+        let weak = try ref.locate(in: buried(ref, start: 5_000, direct: 0.05, copyFrames: 162, copy: 0.02, noise: 0.001), range: 2_000..<8_000, acceptance: .expected)
+        #expect(weak.laterCopyFrames == nil)
+        let far = try ref.locate(in: buried(ref, start: 5_000, direct: 0.05, copyFrames: 600, copy: 0.05, noise: 0.001), range: 2_000..<8_000, acceptance: .expected)
+        #expect(far.laterCopyFrames == nil)
+    }
+
     @Test("A second equal copy far later than any room reflection is still ambiguous, whichever arrives first")
     func distantTwinStaysAmbiguous() throws {
         let ref = try makeReference()
