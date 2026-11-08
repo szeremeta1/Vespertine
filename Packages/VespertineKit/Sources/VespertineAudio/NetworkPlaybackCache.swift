@@ -97,13 +97,16 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// Opening the file is a network call too, and the kernel does not give up on it when the share stops answering,
     /// so it never runs on the caller's thread: `cancelled` is polled while it is waited for, and a caller that gives
     /// up gets `CancellationError` at once (the open itself finishes, or fails, in the background and is closed).
+    /// For tests: the share's files, read through this instead of a mount.
+    var readerFactory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?
+
     func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true,
                cancelled: () -> Bool = { false }) throws -> Entry {
         if let existing = lock.withLock({ entries[key]?.value }) {
             if foreground { existing.promote() }
             return existing
         }
-        let source = try reader ?? openShare(key: key, url: url, cancelled: cancelled)
+        let source = try reader ?? readerFactory?(url) ?? openShare(key: key, url: url, cancelled: cancelled)
         return try lock.withLock {
             if let existing = entries[key]?.value {
                 if foreground { existing.promote() }

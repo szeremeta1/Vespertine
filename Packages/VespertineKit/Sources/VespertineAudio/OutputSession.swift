@@ -47,6 +47,8 @@ final class OutputSession: @unchecked Sendable {
     /// Apple's spatial mixer, run on the I/O thread (Spatial Audio plans only).
     private(set) var spatial: SpatialRenderer?
     private var ioProcID: AudioDeviceIOProcID?
+    /// Tests: what stands in for the device (see `init(simulating:rate:)`).
+    private(set) var simulated: SimulatedOutput?
     private(set) var isRunning = false
     /// The measured room filters the context was last given (`PlaybackEngine.applyGain`), so they're only loaded,
     /// resampled and transformed again when they or the stream change.
@@ -291,6 +293,25 @@ final class OutputSession: @unchecked Sendable {
         }
     }
 
+    /// Tests: a session with no device behind it. Its ring and render context are the real ones, driven by `SimulatedOutput`
+    /// while it is started, so what the engine does to them (mute, fade, flush, start, stop) is what a device would get.
+    init(simulating plan: OutputPlan, rate: Double, bufferFrames: Int = 480) throws {
+        deviceID = 0
+        self.plan = plan
+        guard let ring = nrt_ring_create(Self.ringFrames(rate: rate, channels: plan.channels), UInt32(plan.channels)),
+              let ctx = nrt_context_create(ring, UInt32(max(bufferFrames * 2, 4096))) else {
+            throw CoreAudioError(-1, "allocate ring buffer")
+        }
+        self.ring = ring
+        self.context = ctx
+        applied = AppliedFormat(sampleRate: rate, physicalBitDepth: 32, physicalIsInteger: false, virtualChannels: plan.deviceChannels,
+                                exclusive: true, bufferFrames: bufferFrames, channelNames: plan.channels == 1 ? ["M"] : ["L", "R"],
+                                speakerNames: [], streamCount: 1, integerMode: false)
+        decodedLayout = nil
+        latencyFrames = 0
+        simulated = SimulatedOutput(context: ctx, channels: plan.channels, rate: rate, bufferFrames: bufferFrames)
+    }
+
     /// Whether the device has left the format this session set up under it: another app, Audio MIDI Setup or an
     /// AirPods microphone switch changed its rate, a stream's physical format (the bit depth the signal path names)
     /// or the format the I/O proc is handed. The I/O proc would go on sending samples made for the old rate, so the
@@ -335,6 +356,7 @@ final class OutputSession: @unchecked Sendable {
     }
 
     func start() throws {
+        if let simulated, !isRunning { simulated.start(); isRunning = true; return }
         guard !isRunning, let ioProcID else { return }
         try check(AudioDeviceStart(deviceID, ioProcID), "AudioDeviceStart")
         isRunning = true
@@ -346,6 +368,7 @@ final class OutputSession: @unchecked Sendable {
     var isDoP: Bool { plan.mode == .dop }
 
     func stop() {
+        if let simulated, isRunning { simulated.stop(); isRunning = false; return }
         guard isRunning, let ioProcID else { return }
         // DoP: the last frames the DAC gets are DSD silence, not a cut in the middle of the music.
         if isDoP { idleOut() }
@@ -393,6 +416,7 @@ final class OutputSession: @unchecked Sendable {
     func invalidate(releaseHog: Bool, restoreFormat: Bool = true, idle: Bool = false) {
         unwatchFormats()
         stop()
+        simulated?.shutdown()
         if let ioProcID { AudioDeviceDestroyIOProcID(deviceID, ioProcID) }
         ioProcID = nil
         nrt_context_destroy(context)
