@@ -37,7 +37,7 @@ public enum GroupProbeCLI {
             --runs N           captures per lead-in (default 8)
             --lead-in S[,S…]   seconds before the first reference (default 1.5); the follower chirp comes about a second later
             --pause S          seconds between captures (default 1)
-            --level L          peak level of the chirps, 0…1 (default 0.1)
+            --level L          peak level of the chirps, 0…1 (default 0.1); the follower's is played 11 dB louder (it arrives quieter), within 1 dB of full scale
             --leader-channel K / --follower-channel K   output channels in the group (default: the leader's first, the follower's first)
             --input-channel K  microphone channel (default 0)
             --rate Hz          group rate (default: the microphone's rate if every device offers it)

@@ -20,6 +20,11 @@ public final class GroupMeasurementOutput: @unchecked Sendable {
     public let rate: Double
     /// All the group's output channels, in the group's order.
     public let channels: Int
+    /// The members the aggregate drift-corrects (not the clock leader, nor one that shares its hardware clock).
+    public var correctedMemberUIDs: Set<String> {
+        let plan = resources.aggregate.plan
+        return Set(zip(plan.members, plan.drift).filter(\.1).map(\.0.uid))
+    }
 
     private init(resources: GroupSessionResources, rate: Double, channels: Int) {
         self.resources = resources
