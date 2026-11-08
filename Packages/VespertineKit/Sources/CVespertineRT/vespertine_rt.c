@@ -548,6 +548,12 @@ typedef struct {
     uint32_t count;
 } NRTRoomBank;
 
+// A room channel brought forward over time (a speaker group's rate trim) is read through this many taps of windowed sinc, at the
+// fraction its delay has reached; its delay never goes below ROOM_ADV_REACH frames, which is how far ahead of the read position the
+// taps look.
+#define ROOM_ADV_TAPS 16
+#define ROOM_ADV_REACH 8
+
 struct NRTRenderContext {
     NRTRing *ring;
     float *scratch;
@@ -619,6 +625,9 @@ struct NRTRenderContext {
     uint32_t roomStateCount[NRT_ROOM_MAX_CHANNELS];   // render thread only: the section count each channel's state belongs to
     float *roomDelay;        // render thread only: roomChannels × NRT_ROOM_MAX_DELAY, a circular history per channel
     uint32_t roomDelayWrite; // render thread only
+    uint64_t framesRun;      // render thread only: frames this context has rendered, for the room channels' rate trim
+    double advKernel[NRT_ROOM_MAX_CHANNELS][ROOM_ADV_TAPS]; // render thread only: the interpolator's taps in use, per channel
+    double advFrac[NRT_ROOM_MAX_CHANNELS];                  // and the fraction they were made for (< 0: none yet)
     bool roomWasOn;          // render thread only
 
     // FIR filters: allocated by the first nrt_context_set_fir that has any, never taken away before destroy.
@@ -688,6 +697,8 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     atomic_init(&ctx->roomMiddle, 1);
     ctx->roomBack = 2;
     ctx->roomDelayWrite = 0;
+    ctx->framesRun = 0;
+    for (uint32_t c = 0; c < NRT_ROOM_MAX_CHANNELS; c++) ctx->advFrac[c] = -1.0;
     ctx->roomWasOn = false;
     atomic_init(&ctx->fir, NULL);
     return ctx;
@@ -785,6 +796,11 @@ void nrt_context_set_room(NRTRenderContext *ctx, const NRTRoomChannel *channels,
         const NRTRoomChannel in = channels[c];
         NRTRoomChannel *out = &bank->channels[c];
         out->delayFrames = in.delayFrames < NRT_ROOM_MAX_DELAY ? in.delayFrames : NRT_ROOM_MAX_DELAY - 1;
+        out->advancePPM = isfinite(in.advancePPM) && in.advancePPM > 0 ? in.advancePPM : 0.0;
+        out->advanceLimitFrames = isfinite(in.advanceLimitFrames) && in.advanceLimitFrames > 0 ? in.advanceLimitFrames : 0.0;
+        if (out->advanceLimitFrames > (double)out->delayFrames - (double)ROOM_ADV_REACH) {
+            out->advanceLimitFrames = (double)out->delayFrames > (double)ROOM_ADV_REACH ? (double)out->delayFrames - (double)ROOM_ADV_REACH : 0.0;
+        }
         out->gain = isfinite(in.gain) ? in.gain : 1.0;   // negative turns the channel's polarity over
         const uint32_t n = in.count < NRT_ROOM_MAX_SECTIONS ? in.count : NRT_ROOM_MAX_SECTIONS;
         uint32_t kept = 0;
@@ -1239,7 +1255,36 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
                 const NRTRoomChannel *r = &room->channels[c];
                 float *line = ctx->roomDelay + (size_t)c * NRT_ROOM_MAX_DELAY;
                 line[w] = frame[c];
-                double s = (double)line[(w - r->delayFrames) & (NRT_ROOM_MAX_DELAY - 1)] * r->gain;
+                double s;
+                if (r->advancePPM > 0.0) {
+                    // Rate trim: the delay shrinks by advancePPM millionths per frame rendered, to a limit.
+                    double advance = r->advancePPM * 1e-6 * (double)(ctx->framesRun + f);
+                    if (advance > r->advanceLimitFrames) advance = r->advanceLimitFrames;
+                    const double d = (double)r->delayFrames - advance;
+                    const double whole = floor(d), part = d - whole;
+                    const uint32_t base = w - (uint32_t)whole;
+                    const uint32_t first = part > 0.0 ? base - 1u : base;   // the sample at or just before the read position
+                    const double frac = part > 0.0 ? 1.0 - part : 0.0;
+                    double *kernel = ctx->advKernel[c];
+                    if (ctx->advFrac[c] < 0.0 || fabs(frac - ctx->advFrac[c]) > 1.0 / 2048.0) {
+                        double sum = 0.0;
+                        for (int k = 0; k < ROOM_ADV_TAPS; k++) {
+                            const double x = frac - (double)(k - (ROOM_ADV_TAPS / 2 - 1));   // tap k reads sample first + k - 7
+                            const double u = x / (double)(ROOM_ADV_TAPS / 2);
+                            const double window = 0.42 + 0.5 * cos(M_PI * u) + 0.08 * cos(2.0 * M_PI * u);
+                            const double sinc = fabs(x) < 1e-12 ? 1.0 : sin(M_PI * x) / (M_PI * x);
+                            kernel[k] = sinc * window;
+                            sum += kernel[k];
+                        }
+                        for (int k = 0; k < ROOM_ADV_TAPS; k++) kernel[k] /= sum;
+                        ctx->advFrac[c] = frac;
+                    }
+                    double acc = 0.0;
+                    for (int k = 0; k < ROOM_ADV_TAPS; k++) acc += kernel[k] * (double)line[(first + (uint32_t)k - (ROOM_ADV_TAPS / 2 - 1)) & (NRT_ROOM_MAX_DELAY - 1)];
+                    s = acc * r->gain;
+                } else {
+                    s = (double)line[(w - r->delayFrames) & (NRT_ROOM_MAX_DELAY - 1)] * r->gain;
+                }
                 double *z = ctx->roomState + (size_t)c * NRT_ROOM_MAX_SECTIONS * 2;
                 for (uint32_t k = 0; k < r->count; k++, z += 2) {
                     const NRTBiquad *b = &r->sections[k];
@@ -1255,6 +1300,7 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
         const size_t states = (size_t)roomed * NRT_ROOM_MAX_SECTIONS * 2;
         for (size_t i = 0; i < states; i++) if (fabs(ctx->roomState[i]) < 1e-30) ctx->roomState[i] = 0;
     }
+    ctx->framesRun += processed;
     // Then the measured filters (convolution), a block late once there have been any.
     if (fir) fir_run(fir, ctx->scratch, processed, ch);
 

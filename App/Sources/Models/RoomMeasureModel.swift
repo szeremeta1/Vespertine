@@ -68,6 +68,11 @@ final class RoomMeasureModel {
     @ObservationIgnored var groupProblem: String?
     /// Seconds of the group's settle left, while it plays before the first sweep.
     var settleRemaining: Int?
+    /// Called with the group once its followers' skew and rate have been measured: the app saves it (`SpeakerGroupStore.upsert`).
+    @ObservationIgnored var groupMeasured: (@MainActor (SpeakerGroup) -> Void)?
+    /// What the skew step found, one line each (what was kept, what could not be measured or checked), shown with the other device lines.
+    var skewLines: [String] = []
+    @ObservationIgnored private var holdStarted = Date()
 
     @ObservationIgnored private var controller: RoomMeasurementController?
     @ObservationIgnored private var capture: RoomCaptureSession?
@@ -153,6 +158,7 @@ final class RoomMeasureModel {
         issues = []
         steps = []
         deviceLines = []
+        skewLines = []
         folder = nil
         plot = nil
         draft = nil
@@ -207,6 +213,7 @@ final class RoomMeasureModel {
                         let opened = try GroupMeasurementOutput.open(group: target.group, devices: target.members, rate: measuringRate)
                         groupOutput = opened
                         try opened.startHold()
+                        holdStarted = Date()
                         output = RoomAudioDevice(id: opened.deviceID, name: target.group.name, uid: setup.deviceUID, channels: opened.channels, nominalRate: measuringRate)
                     } catch {
                         return fail("The group couldn't be opened for the measurement: \(error.localizedDescription)")
@@ -286,7 +293,39 @@ final class RoomMeasureModel {
         try? "\(folder.path)\n".write(to: root.appendingPathComponent("last-run.txt"), atomically: true, encoding: .utf8)
         startPolling()
         if groupSetup != nil, !(await settle()) { return }
+        if groupSetup != nil, !simulate, let target = groupTarget, let held = groupOutput {
+            if !(await measureMemberSkew(group: target.group, output: held, outputID: output.id, micID: mic.id, rate: rate)) { return }
+        }
         await drive(controller)
+    }
+
+    /// The skew step of a group's measurement: each follower's delay against the clock leader and its rate while drift-corrected, from the
+    /// timing chirps through the same microphone and aggregate as the sweeps (`GroupSkewMeasurement`). Written into the group and saved
+    /// through `groupMeasured`. A follower that can't be timed is left as it was and said so; the sweeps go on. False when stopped meanwhile.
+    private func measureMemberSkew(group: SpeakerGroup, output held: GroupMeasurementOutput, outputID: UInt32, micID: UInt32, rate: Double) async -> Bool {
+        skewLines = []
+        let started = holdStarted
+        let capture: GroupSkewMeasurement.Capture = { layout, leaderChannel, followerChannel, span in
+            let device = GroupSkewDevice(inner: CoreAudioRoomDevice(), leaderChannel: leaderChannel, followerChannel: followerChannel, control: false, span: span)
+            let session = RoomCaptureSession(device: device, permission: SystemMicrophonePermission(), pollInterval: 0.02, stallTimeout: 5)
+            let request = RoomCaptureRequest(inputDevice: micID, outputDevice: outputID, inputChannel: 0, outputChannel: followerChannel, referenceChannel: leaderChannel, layout: layout)
+            return try await session.record(request).samples
+        }
+        headline = "Timing the DACs against each other"
+        let outcome = await GroupSkewMeasurement.run(group: group, rate: rate, corrected: held.correctedMemberUIDs,
+                                                      secondsSinceOutputStarted: { Date().timeIntervalSince(started) }, capture: capture) { [weak self] line in
+            Task { @MainActor in self?.detail = line }
+        }
+        if Task.isCancelled { reset(); return false }
+        for done in outcome.outcomes {
+            skewLines.append(String(format: "%@ sounds %.2f ms after the leader (%d good captures, spread %.1f frames)%@",
+                                    done.followerName, done.group.members.first { $0.name == done.followerName }?.skewMs ?? 0, done.goodRuns, done.spreadFrames,
+                                    done.rateTrimPPM.map { String(format: ", and falls behind %+.1f ppm while it plays", $0) } ?? ""))
+            skewLines.append(contentsOf: done.notes)
+        }
+        skewLines.append(contentsOf: outcome.failures)
+        if let last = outcome.outcomes.last { groupMeasured?(last.group) }
+        return true
     }
 
     /// The group plays silence for `GroupMeasurement.settleSeconds` before the first sweep, so the followers' drift correction has
