@@ -41,7 +41,7 @@ final class ArtworkCache {
         guard let store else { return nil }
         let urls = [store.url(for: key, minimumSize: VisualizerArtworkImage.maximumSide), store.originalURL(key)]
             + ArtworkStore.thumbnailSizes.reversed().map { store.thumbnailURL(key, size: $0) }
-        let picture = await Task.detached(priority: .userInitiated) {
+        let picture = await Task.detached(priority: .userInitiated) { () -> CGImage? in
             for url in urls where FileManager.default.fileExists(atPath: url.path) {
                 if let image = VisualizerArtworkImage.load(contentsOf: url) { return image }
             }
