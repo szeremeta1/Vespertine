@@ -69,7 +69,7 @@
         "hi-res music,"
       ],
       "titleBrass": "on your Mac.",
-      "lede": "The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with head-tracked Spatial Audio on AirPods. Room correction measures your room with a USB microphone and corrects each speaker; it’s off until you turn it on. A signal path shows each step from file to output. In English and {languages} other languages.",
+      "lede": "The free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, DSD, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library with your stereo albums, with Spatial Audio on AirPods (head-tracked where macOS provides it). Room correction measures your room with a USB microphone and corrects each speaker; it’s off until you turn it on. A signal path shows each step from file to output. In English and {languages} other languages.",
       "ask": "Like it?",
       "star": "Star it on GitHub",
       "discuss": "Join the discussion",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround in one library",
-        "text": "SACD images and rips, DVD-Video discs, DTS CDs, DTS-HD MA and TrueHD sit next to your stereo albums and play as head-tracked Spatial Audio on AirPods. When an album comes in both, each song is listed once and the right version plays for your output."
+        "text": "SACD images and rips, DVD-Video discs, DTS CDs, DTS-HD MA and TrueHD sit next to your stereo albums and play through Apple’s Spatial Audio renderer on AirPods (head-tracked where macOS provides it). When an album comes in both, each song is listed once and the right version plays for your output."
       },
       {
         "title": "A signal path you can check",
@@ -126,7 +126,7 @@
         "title": "Every track at its native rate and depth.",
         "lede": "The signal path lists each step from the file to your DAC, read back from Core Audio, and says when something changed the samples.",
         "body": [
-          "Vespertine switches the device to each file’s rate and resamples, with Apple’s mastering-quality converter, only when the DAC can’t run it. <span class=\"mono nowrap\">BIT-PERFECT</span> appears only when the conditions in the source are met: a native rate, nothing changing the samples, a word length that fits, and a device that is exclusive or not shared with another app. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11."
+          "Vespertine switches the device to each file’s rate and resamples, with Apple’s mastering-quality converter, only when the DAC can’t run it. <span class=\"mono nowrap\">BIT-PERFECT</span> appears only when the conditions in the source are met: a native rate, nothing changing the samples, a word length that fits, and a device that is exclusive or not shared with another app. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports; see docs/DEVICES.md)."
         ],
         "list": [
           "Exclusive (hog) mode keeps other apps off the device. In shared mode the volume keys and the Digital Crown adjust your DAC; in exclusive mode they can too, if you turn that on.",
@@ -181,7 +181,7 @@
           "Three targets: Warm (the default), Gentle tilt and Flat. Correct the bass only or the full range, and redesign the filters later without measuring again.",
           "Imports filters from REW or Equalizer APO, with each speaker’s delay and level, and exports Equalizer APO text.",
           "Imports impulse responses (WAV, AIFF, CAF or FLAC) and plays them by convolution.",
-          "Stereo and 5.1.",
+          "Stereo and 5.1 (5.1 is tested with simulated rooms and imported profiles, not yet in a real 5.1 room).",
           "The Room Portrait shows the speakers, your seat and each microphone spot as it’s measured. The Curve Reveal then turns the measured response into the predicted one, and a before/after switch compares them."
         ],
         "note": "The “after” curve is predicted from the measurement and the filters, not measured. To see what the room really does, measure again with correction on.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround & Spatial Audio",
         "title": "Your 5.1 discs, in the same library.",
-        "lede": "Multichannel music plays as head-tracked Spatial Audio on AirPods, or folds down by channel layout on a stereo DAC.",
+        "lede": "Multichannel music plays through Apple’s Spatial Audio renderer on AirPods (head-tracked where macOS provides it), or folds down by channel layout on a stereo DAC.",
         "body": [
-          "DTS CDs decode to 5.1. SACD images, extracted SACD tracks, multichannel FLAC, TrueHD and DTS-HD MA render as head-tracked Spatial Audio on AirPods or fold down on a stereo DAC. Dolby Digital Plus with Atmos uses macOS’s object renderer; TrueHD Atmos and DTS:X play their channel bed. Channel-for-channel output is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted."
+          "DTS CDs decode to 5.1. SACD images, extracted SACD tracks, multichannel FLAC, TrueHD and DTS-HD MA render through Apple’s Spatial Audio renderer on AirPods (head-tracked where macOS provides it) or fold down on a stereo DAC. Dolby Digital Plus with Atmos uses macOS’s object renderer; TrueHD Atmos and DTS:X play their channel bed. Channel-for-channel output is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted."
         ],
         "list": [
           "Stereo and surround versions of an album are listed once; Vespertine plays whichever suits the output, or the one you pin.",
@@ -215,11 +215,11 @@
         "title": "Play the disc image itself.",
         "lede": "Point Vespertine at an SACD or DVD-Video image and it plays the music straight from it, with nothing mounted, extracted or written.",
         "body": [
-          "SACD <span class=\"mono\">.iso</span> images play their stereo and 5.1 areas, DST-compressed or plain, titled from the disc’s own text. DST is decoded back to the exact DSD, so stereo goes to your DAC as native DSD over DoP where the DAC supports it, and 5.1 plays as head-tracked Spatial Audio on AirPods. The LPCM music on DVD-Video discs (an <span class=\"mono\">.iso</span> or a <span class=\"mono\">VIDEO_TS</span> folder) plays bit for bit, one album per title and a track per chapter."
+          "SACD <span class=\"mono\">.iso</span> images play their stereo and 5.1 areas, DST-compressed or plain, titled from the disc’s own text. DST is decoded back to the exact DSD, so stereo goes to your DAC as native DSD over DoP where the DAC supports it, and 5.1 plays through Apple’s Spatial Audio renderer on AirPods. The LPCM music on DVD-Video discs (an <span class=\"mono\">.iso</span> or a <span class=\"mono\">VIDEO_TS</span> folder) plays bit for bit, one album per title and a track per chapter."
         ],
         "list": [
-          "Matched sacd_extract bit for bit on two real discs. Discs with a 5.0 area, only a multichannel area, or DSD128 and above are covered only by synthesized test images so far.",
-          "DSF and DSDIFF from DSD64 to DSD512, DST-compressed DSDIFF included, go out as DoP to DACs that take the carrier rate, or convert to high-rate PCM. DoP is confirmed up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11; DSD512 over DoP is untested on hardware.",
+          "SACD images are tested with synthesized discs, including ones with a 5.0 area, only a multichannel area, or DSD128 and above.",
+          "DSF and DSDIFF from DSD64 to DSD512, DST-compressed DSDIFF included, go out as DoP to DACs that take the carrier rate (up to DSD256 on the DACs tried), or convert to high-rate PCM. DoP is reported to work up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11 (developer reports, no capture); DSD512 over DoP is untested on hardware.",
           "DVD-Video LPCM at 16, 20 and 24 bits, 48 and 96 kHz, up to 8 channels. DVD-Audio isn’t supported, and encrypted (CSS) discs need a decrypted copy."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Does it do room correction?",
-          "a": "Yes. Measure your room with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level, in stereo or 5.1. It also imports REW and Equalizer APO filters and impulse responses. It’s off by default, playback stays bit-perfect while it’s off, and the signal path says <span class=\"mono nowrap\">ROOM CORRECTION</span> while it’s on. <a href=\"{href.roomCorrection}\">How room correction works</a>."
+          "a": "Yes. Measure your room with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level, in stereo or 5.1 (5.1 is tested with simulated rooms and imported profiles, not yet in a real 5.1 room). It also imports REW and Equalizer APO filters and impulse responses. It’s off by default, playback stays bit-perfect while it’s off, and the signal path says <span class=\"mono nowrap\">ROOM CORRECTION</span> while it’s on. <a href=\"{href.roomCorrection}\">How room correction works</a>."
         },
         {
           "q": "Can it play SACD and DVD discs?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Does it play Dolby Atmos?",
-          "a": "Dolby Digital Plus with Atmos plays through macOS’s object renderer, as head-tracked Spatial Audio on AirPods. TrueHD Atmos and DTS:X play their lossless channel bed; their objects aren’t rendered. Bitstream to an AV receiver is experimental, untested on real receivers; reports wanted."
+          "a": "Dolby Digital Plus with Atmos plays through macOS’s object renderer, as Spatial Audio on AirPods (head-tracked where macOS provides it). TrueHD Atmos and DTS:X play their lossless channel bed; their objects aren’t rendered. Bitstream to an AV receiver is experimental, untested on real receivers; reports wanted."
         },
         {
           "q": "Will it change my files?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Which hardware has it been tested on?",
-          "a": "PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11, where integer mode was tested too. It has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); <a href=\"{href.dacReport}\">reports wanted</a>."
+          "a": "PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports; see docs/DEVICES.md), where integer mode was tested too. It has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1. Intel hardware is untested. Receiver bitstream and multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); <a href=\"{href.dacReport}\">reports wanted</a>."
         },
         {
           "q": "Is it in my language?",
@@ -601,7 +601,7 @@
     "ogAlt": "Vespertine press kit: fact sheet, logos, key art, real screenshots and the trailer, over three real screenshots of the app.",
     "eyebrow": "Press kit",
     "heading": "Everything you need to write about {name}.",
-    "lede": "Vespertine is the free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library, with head-tracked Spatial Audio on AirPods. The signal path shows each step from file to output, with conditions and tests in GPL source anyone can audit.",
+    "lede": "Vespertine is the free, open-source Mac player for surround and hi-res music collections. SACD and DVD-Video disc images, extracted SACD 5.1 tracks, DTS CDs, DTS-HD MA, TrueHD and Atmos files share one library, with Spatial Audio on AirPods (head-tracked where macOS provides it). The signal path shows each step from file to output, with conditions and tests in GPL source anyone can audit.",
     "fine": "Channel-for-channel output and receiver bitstream are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Dolby Digital Plus Atmos objects are rendered by macOS; TrueHD Atmos and DTS:X play their channel bed.",
     "facts": {
       "eyebrow": "Fact sheet",

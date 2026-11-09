@@ -69,7 +69,7 @@
         "i hi-res"
       ],
       "titleBrass": "na twoim Macu.",
-      "lede": "Darmowy, otwartoźródłowy odtwarzacz na Maca do kolekcji muzyki surround i hi-res. Obrazy płyt SACD i DVD-Video, DSD, płyty DTS CD oraz pliki DTS-HD MA, TrueHD i Atmos dzielą jedną bibliotekę z twoimi albumami stereo, a na AirPods grają jako Dźwięk przestrzenny ze śledzeniem ruchów głowy. Korekcja pomieszczenia mierzy twoje pomieszczenie mikrofonem USB i koryguje każdy głośnik; pozostaje wyłączona, dopóki jej nie włączysz. Ścieżka sygnału pokazuje każdy etap od pliku do wyjścia. Po angielsku i w {languages} innych językach.",
+      "lede": "Darmowy, otwartoźródłowy odtwarzacz na Maca do kolekcji muzyki surround i hi-res. Obrazy płyt SACD i DVD-Video, DSD, płyty DTS CD oraz pliki DTS-HD MA, TrueHD i Atmos dzielą jedną bibliotekę z twoimi albumami stereo, a na AirPods grają jako Dźwięk przestrzenny (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia). Korekcja pomieszczenia mierzy twoje pomieszczenie mikrofonem USB i koryguje każdy głośnik; pozostaje wyłączona, dopóki jej nie włączysz. Ścieżka sygnału pokazuje każdy etap od pliku do wyjścia. Po angielsku i w {languages} innych językach.",
       "ask": "Podoba ci się?",
       "star": "Daj gwiazdkę na GitHubie",
       "discuss": "Dołącz do dyskusji",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround w jednej bibliotece",
-        "text": "Obrazy i ripy SACD, płyty DVD-Video, płyty DTS CD, DTS-HD MA i TrueHD stoją obok twoich albumów stereo i na AirPods grają jako Dźwięk przestrzenny ze śledzeniem ruchów głowy. Gdy album istnieje w obu wersjach, każdy utwór widnieje na liście raz, a odtwarzana jest wersja odpowiednia dla twojego wyjścia."
+        "text": "Obrazy i ripy SACD, płyty DVD-Video, płyty DTS CD, DTS-HD MA i TrueHD stoją obok twoich albumów stereo i na AirPods grają przez renderer Dźwięku przestrzennego Apple (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia). Gdy album istnieje w obu wersjach, każdy utwór widnieje na liście raz, a odtwarzana jest wersja odpowiednia dla twojego wyjścia."
       },
       {
         "title": "Ścieżka sygnału, którą sprawdzisz",
@@ -126,7 +126,7 @@
         "title": "Każdy utwór w natywnej częstotliwości i rozdzielczości.",
         "lede": "Ścieżka sygnału pokazuje każdy etap od pliku do twojego DAC-a, odczytany zwrotnie z Core Audio, i informuje, kiedy coś zmieniło próbki.",
         "body": [
-          "Vespertine przełącza urządzenie na częstotliwość każdego pliku, a resampling, konwerterem Apple klasy masteringowej, wykonuje tylko wtedy, gdy DAC nie obsługuje danej częstotliwości. <span class=\"mono nowrap\">BIT-PERFECT</span> pojawia się tylko wtedy, gdy spełnione są warunki zapisane w kodzie źródłowym: natywna częstotliwość, nic nie zmienia próbek, pasująca długość słowa, a urządzenie jest w trybie wyłączności lub nie jest współdzielone z inną aplikacją. Odtwarzanie PCM przetestowano do 768 kHz i DSD256 na Fosi Audio ZD3 oraz do 384 kHz i DSD128 na FiiO K11."
+          "Vespertine przełącza urządzenie na częstotliwość każdego pliku, a resampling, konwerterem Apple klasy masteringowej, wykonuje tylko wtedy, gdy DAC nie obsługuje danej częstotliwości. <span class=\"mono nowrap\">BIT-PERFECT</span> pojawia się tylko wtedy, gdy spełnione są warunki zapisane w kodzie źródłowym: natywna częstotliwość, nic nie zmienia próbek, pasująca długość słowa, a urządzenie jest w trybie wyłączności lub nie jest współdzielone z inną aplikacją. Odtwarzanie PCM przetestowano do 768 kHz i DSD256 na Fosi Audio ZD3 oraz do 384 kHz i DSD128 na FiiO K11 (zgłoszenia dewelopera; zob. docs/DEVICES.md)."
         ],
         "list": [
           "Tryb wyłączności (hog) nie dopuszcza innych aplikacji do urządzenia. W trybie współdzielonym klawisze głośności i Digital Crown regulują twój DAC; w trybie wyłączności również mogą, jeśli to włączysz.",
@@ -181,7 +181,7 @@
           "Trzy krzywe docelowe: Warm (domyślna), Gentle tilt i Flat. Koryguj tylko bas albo pełne pasmo, a filtry możesz później zaprojektować na nowo bez ponownego pomiaru.",
           "Importuje filtry z REW lub Equalizer APO wraz z opóźnieniem i poziomem każdego głośnika, a eksportuje filtry w formacie tekstowym Equalizer APO.",
           "Importuje odpowiedzi impulsowe (WAV, AIFF, CAF lub FLAC) i odtwarza je przez konwolucję.",
-          "Stereo i 5.1.",
+          "Stereo i 5.1 (5.1 testowano na symulowanych pomieszczeniach i zaimportowanych profilach, jeszcze nie w prawdziwym pomieszczeniu 5.1).",
           "Portret pomieszczenia pokazuje głośniki, twoje miejsce i każdy punkt mikrofonu w trakcie jego pomiaru. Następnie animacja krzywej przekształca zmierzoną charakterystykę w przewidywaną, a przełącznik przed/po pozwala je porównać."
         ],
         "note": "Krzywa „po” jest przewidywana na podstawie pomiaru i filtrów, a nie zmierzona. Aby zobaczyć, co naprawdę dzieje się w pomieszczeniu, zmierz je ponownie z włączoną korekcją.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround i Dźwięk przestrzenny",
         "title": "Twoje płyty 5.1 w tej samej bibliotece.",
-        "lede": "Muzyka wielokanałowa gra na AirPods jako Dźwięk przestrzenny ze śledzeniem ruchów głowy, a na DAC-u stereo jest downmiksowana według układu kanałów.",
+        "lede": "Muzyka wielokanałowa gra na AirPods przez renderer Dźwięku przestrzennego Apple (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia), a na DAC-u stereo jest downmiksowana według układu kanałów.",
         "body": [
-          "Płyty DTS CD są dekodowane do 5.1. Obrazy SACD, wyodrębnione ścieżki SACD, wielokanałowy FLAC, TrueHD i DTS-HD MA są renderowane na AirPods jako Dźwięk przestrzenny ze śledzeniem ruchów głowy lub downmiksowane na DAC-u stereo. Dolby Digital Plus z Atmos korzysta z renderera obiektowego macOS; TrueHD Atmos i DTS:X odtwarzają swoją podstawową warstwę kanałową. Wyjście kanał w kanał jest eksperymentalne, nietestowane na prawdziwych amplitunerach i wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); czekamy na zgłoszenia."
+          "Płyty DTS CD są dekodowane do 5.1. Obrazy SACD, wyodrębnione ścieżki SACD, wielokanałowy FLAC, TrueHD i DTS-HD MA są renderowane na AirPods przez renderer Dźwięku przestrzennego Apple (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia) lub downmiksowane na DAC-u stereo. Dolby Digital Plus z Atmos korzysta z renderera obiektowego macOS; TrueHD Atmos i DTS:X odtwarzają swoją podstawową warstwę kanałową. Wyjście kanał w kanał jest eksperymentalne, nietestowane na prawdziwych amplitunerach i wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); czekamy na zgłoszenia."
         ],
         "list": [
           "Wersje stereo i surround albumu widnieją na liście raz; Vespertine odtwarza tę, która pasuje do wyjścia, albo tę, którą przypniesz.",
@@ -215,11 +215,11 @@
         "title": "Odtwarzaj sam obraz płyty.",
         "lede": "Wskaż Vespertine obraz SACD lub DVD-Video, a odtworzy muzykę bezpośrednio z niego, bez montowania, wyodrębniania i zapisywania czegokolwiek.",
         "body": [
-          "Z obrazów SACD <span class=\"mono\">.iso</span> odtwarzane są obszary stereo i 5.1, skompresowane DST lub nie, z tytułami z tekstu zapisanego na samej płycie. DST jest dekodowany z powrotem do dokładnie tego samego DSD, więc stereo trafia do DAC-a jako natywne DSD przez DoP, jeśli DAC to obsługuje, a 5.1 gra na AirPods jako Dźwięk przestrzenny ze śledzeniem ruchów głowy. Muzyka LPCM z płyt DVD-Video (<span class=\"mono\">.iso</span> lub folder <span class=\"mono\">VIDEO_TS</span>) jest odtwarzana bit w bit: jeden album na tytuł i jedna ścieżka na rozdział."
+          "Z obrazów SACD <span class=\"mono\">.iso</span> odtwarzane są obszary stereo i 5.1, skompresowane DST lub nie, z tytułami z tekstu zapisanego na samej płycie. DST jest dekodowany z powrotem do dokładnie tego samego DSD, więc stereo trafia do DAC-a jako natywne DSD przez DoP, jeśli DAC to obsługuje, a 5.1 gra na AirPods przez renderer Dźwięku przestrzennego Apple. Muzyka LPCM z płyt DVD-Video (<span class=\"mono\">.iso</span> lub folder <span class=\"mono\">VIDEO_TS</span>) jest odtwarzana bit w bit: jeden album na tytuł i jedna ścieżka na rozdział."
         ],
         "list": [
-          "Na dwóch prawdziwych płytach wynik zgadza się bit w bit z sacd_extract. Płyty z obszarem 5.0, tylko z obszarem wielokanałowym lub w DSD128 i wyżej są jak dotąd sprawdzone wyłącznie na syntetycznych obrazach testowych.",
-          "DSF i DSDIFF od DSD64 do DSD512, w tym DSDIFF skompresowany DST, trafiają przez DoP do DAC-ów obsługujących częstotliwość nośnej albo są konwertowane do PCM o wysokiej częstotliwości. DoP potwierdzono do DSD256 na Fosi Audio ZD3 i do DSD128 na FiiO K11; DSD512 przez DoP nie zostało przetestowane na sprzęcie.",
+          "Obrazy SACD przetestowano na syntetycznych płytach, w tym na płytach z obszarem 5.0, tylko z obszarem wielokanałowym lub w DSD128 i wyżej.",
+          "DSF i DSDIFF od DSD64 do DSD512, w tym DSDIFF skompresowany DST, trafiają przez DoP do DAC-ów obsługujących częstotliwość nośnej (do DSD256 na sprawdzonych DAC-ach) albo są konwertowane do PCM o wysokiej częstotliwości. według zgłoszeń DoP działa do DSD256 na Fosi Audio ZD3 i do DSD128 na FiiO K11 (zgłoszenia dewelopera, bez nagrania); DSD512 przez DoP nie zostało przetestowane na sprzęcie.",
           "DVD-Video LPCM w rozdzielczości 16, 20 i 24 bitów, 48 i 96 kHz, do 8 kanałów. DVD-Audio nie jest obsługiwane, a płyty szyfrowane (CSS) wymagają odszyfrowanej kopii."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Czy oferuje korekcję pomieszczenia?",
-          "a": "Tak. Zmierz swoje pomieszczenie mikrofonem UMIK-1 lub innym skalibrowanym mikrofonem USB w jednym do pięciu punktach wokół twojego miejsca odsłuchowego, a Vespertine dopasuje filtry do każdego głośnika i wyrówna ich opóźnienie i poziom, w stereo lub 5.1. Importuje też filtry z REW i Equalizer APO oraz odpowiedzi impulsowe. Funkcja jest domyślnie wyłączona, a dopóki pozostaje wyłączona, odtwarzanie jest bit-perfect; gdy jest włączona, ścieżka sygnału pokazuje <span class=\"mono nowrap\">KOREKCJA POMIESZCZENIA</span>. <a href=\"{href.roomCorrection}\">Jak działa korekcja pomieszczenia</a>."
+          "a": "Tak. Zmierz swoje pomieszczenie mikrofonem UMIK-1 lub innym skalibrowanym mikrofonem USB w jednym do pięciu punktach wokół twojego miejsca odsłuchowego, a Vespertine dopasuje filtry do każdego głośnika i wyrówna ich opóźnienie i poziom, w stereo lub 5.1 (5.1 testowano na symulowanych pomieszczeniach i zaimportowanych profilach, jeszcze nie w prawdziwym pomieszczeniu 5.1). Importuje też filtry z REW i Equalizer APO oraz odpowiedzi impulsowe. Funkcja jest domyślnie wyłączona, a dopóki pozostaje wyłączona, odtwarzanie jest bit-perfect; gdy jest włączona, ścieżka sygnału pokazuje <span class=\"mono nowrap\">KOREKCJA POMIESZCZENIA</span>. <a href=\"{href.roomCorrection}\">Jak działa korekcja pomieszczenia</a>."
         },
         {
           "q": "Czy odtwarza płyty SACD i DVD?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Czy odtwarza Dolby Atmos?",
-          "a": "Dolby Digital Plus z Atmos jest odtwarzany przez renderer obiektów macOS, jako Dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods. TrueHD Atmos i DTS:X odtwarzają swoją bezstratną warstwę kanałową; ich obiekty nie są renderowane. Bitstream do amplitunera AV jest eksperymentalny, nieprzetestowany na prawdziwych amplitunerach; czekamy na zgłoszenia."
+          "a": "Dolby Digital Plus z Atmos jest odtwarzany przez renderer obiektów macOS, jako Dźwięk przestrzenny na AirPods (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia). TrueHD Atmos i DTS:X odtwarzają swoją bezstratną warstwę kanałową; ich obiekty nie są renderowane. Bitstream do amplitunera AV jest eksperymentalny, nieprzetestowany na prawdziwych amplitunerach; czekamy na zgłoszenia."
         },
         {
           "q": "Czy zmieni moje pliki?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Na jakim sprzęcie go testowano?",
-          "a": "Odtwarzanie PCM przetestowano do 768 kHz i DSD256 na Fosi Audio ZD3 oraz do 384 kHz i DSD128 na FiiO K11, na którym przetestowano też tryb całkowitoliczbowy. Przetestowano je również na AirPods Max przez USB-C i Bluetooth, na głośnikach MacBooka Pro oraz na telewizorze Sony przez HDMI w 5.1. Sprzęt z procesorem Intel nie był testowany. Bitstream do amplitunera i wyjście wielokanałowe na DAC są eksperymentalne, nieprzetestowane na prawdziwych amplitunerach ani wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); <a href=\"{href.dacReport}\">czekamy na zgłoszenia</a>."
+          "a": "Odtwarzanie PCM przetestowano do 768 kHz i DSD256 na Fosi Audio ZD3 oraz do 384 kHz i DSD128 na FiiO K11 (zgłoszenia dewelopera; zob. docs/DEVICES.md), na którym przetestowano też tryb całkowitoliczbowy. Przetestowano je również na AirPods Max przez USB-C i Bluetooth, na głośnikach MacBooka Pro oraz na telewizorze Sony przez HDMI w 5.1. Sprzęt z procesorem Intel nie był testowany. Bitstream do amplitunera i wyjście wielokanałowe na DAC są eksperymentalne, nieprzetestowane na prawdziwych amplitunerach ani wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); <a href=\"{href.dacReport}\">czekamy na zgłoszenia</a>."
         },
         {
           "q": "Czy jest w moim języku?",
@@ -601,7 +601,7 @@
     "ogAlt": "Materiały prasowe Vespertine: karta informacyjna, logotypy, grafiki promocyjne, prawdziwe zrzuty ekranu i zwiastun, na tle trzech prawdziwych zrzutów ekranu aplikacji.",
     "eyebrow": "Materiały prasowe",
     "heading": "Wszystko, czego potrzeba do artykułu o {name}.",
-    "lede": "Vespertine to darmowy, otwartoźródłowy odtwarzacz na Maca dla kolekcji muzyki surround i hi-res. Obrazy płyt SACD i DVD-Video, wyodrębnione ścieżki SACD 5.1, płyty DTS CD oraz pliki DTS-HD MA, TrueHD i Atmos trafiają do jednej biblioteki, a na AirPods działa Dźwięk przestrzenny ze śledzeniem ruchów głowy. Ścieżka sygnału pokazuje każdy etap od pliku do wyjścia, a warunki i testy są w kodzie źródłowym na licencji GPL, który każdy może zweryfikować.",
+    "lede": "Vespertine to darmowy, otwartoźródłowy odtwarzacz na Maca dla kolekcji muzyki surround i hi-res. Obrazy płyt SACD i DVD-Video, wyodrębnione ścieżki SACD 5.1, płyty DTS CD oraz pliki DTS-HD MA, TrueHD i Atmos trafiają do jednej biblioteki, a na AirPods działa Dźwięk przestrzenny (ze śledzeniem ruchów głowy tam, gdzie macOS je zapewnia). Ścieżka sygnału pokazuje każdy etap od pliku do wyjścia, a warunki i testy są w kodzie źródłowym na licencji GPL, który każdy może zweryfikować.",
     "fine": "Wyjście kanał w kanał i bitstream do amplitunera są eksperymentalne, nieprzetestowane na prawdziwych amplitunerach i wielokanałowych DAC-ach USB (przetestowano jeden telewizor Sony przez HDMI: zob. docs/DEVICES.md); czekamy na zgłoszenia. Obiekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos i DTS:X odtwarzają swoją podstawową warstwę kanałową.",
     "facts": {
       "eyebrow": "Karta informacyjna",

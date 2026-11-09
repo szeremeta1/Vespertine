@@ -39,7 +39,7 @@ in `FINDINGS.md` as a known issue, until Vespertine or its docs change.
 | DST decodes to the original DSD (`#sacd-dst`) | DST-001 to 004 | spec checks (frame size), oracle (libdstdec), rule check | DST-005 blocked (ISO/IEC 14496-3) |
 | SACD frames are 1/75 s, 4704 bytes per channel (`#sacd-frames`) | DST-001, DST-002 | spec checks (DSDIFF 1.5, DSF 1.01) | – |
 | Dolby frames go out byte for byte in the carrier (`#iec-carrier-exact`) | IEC-O-001, IEC-O-002 | oracles (FFmpeg demux, blind scanner) | burst layout itself blocked: IEC-001 to 007 |
-| Matched sacd_extract on two discs (`#sacd-match`) | – | none in the repository | F-03; `hardware/SACD-ORACLE.md` |
+| Comparison with sacd_extract on real discs (`#sacd-match`): not claimed | – | none in the repository | F-03; `hardware/SACD-ORACLE.md` |
 | Integer mode only with the device held (`#int-conditions`) | BPV-018 | rule record, not testable from the verdict alone: the contract rules out inputs that break it | on a device: integer mode off in shared mode |
 | Device handed back on quit, rate change noticed (`#rate-handback`, `#rate-change-behind`) | – | hardware procedure only | LOOPBACK R2, R3 |
 | Gapless (`#gapless`) | – | hardware procedure only | LOOPBACK L3 |

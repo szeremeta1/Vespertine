@@ -69,7 +69,7 @@
         "hi-res müzik,"
       ],
       "titleBrass": "Mac’inizde.",
-      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur ve AirPods’ta baş takipli Uzamsal Ses ile dinlenebilir. Oda düzeltmesi, odanızı bir USB mikrofonla ölçer ve her hoparlörü ayrı ayrı düzeltir; siz açana kadar kapalı kalır. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
+      "lede": "Surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısı. SACD ve DVD-Video disk görüntüleri, DSD, DTS CD’leri, DTS-HD MA, TrueHD ve Atmos dosyaları, stereo albümlerinizle aynı arşivde buluşur ve AirPods’ta Uzamsal Ses ile (macOS’in sağladığı yerlerde baş takipli) dinlenebilir. Oda düzeltmesi, odanızı bir USB mikrofonla ölçer ve her hoparlörü ayrı ayrı düzeltir; siz açana kadar kapalı kalır. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir. İngilizce ve diğer {languages} dilde.",
       "ask": "Beğendiniz mi?",
       "star": "GitHub’da yıldız verin",
       "discuss": "Tartışmaya katılın",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Tek arşivde surround",
-        "text": "SACD görüntüleri ve rip’leri, DVD-Video diskleri, DTS CD’leri, DTS-HD MA ve TrueHD, stereo albümlerinizin yanında yer alır ve AirPods’ta baş takipli Uzamsal Ses olarak çalar. Bir albümün her iki sürümü de varsa her şarkı bir kez listelenir ve çıkışınıza uygun sürüm çalınır."
+        "text": "SACD görüntüleri ve rip’leri, DVD-Video diskleri, DTS CD’leri, DTS-HD MA ve TrueHD, stereo albümlerinizin yanında yer alır ve AirPods’ta Apple’ın Uzamsal Ses işleyicisi üzerinden çalar (macOS’in sağladığı yerlerde baş takipli). Bir albümün her iki sürümü de varsa her şarkı bir kez listelenir ve çıkışınıza uygun sürüm çalınır."
       },
       {
         "title": "Doğrulayabileceğiniz bir sinyal yolu",
@@ -126,7 +126,7 @@
         "title": "Her parça kendi hızında ve derinliğinde.",
         "lede": "Sinyal yolu, dosyadan DAC’ınıza kadar her adımı Core Audio’dan geri okuyarak listeler ve örnekleri bir şey değiştirdiğinde bunu söyler.",
         "body": [
-          "Vespertine, aygıtı her dosyanın örnekleme hızına geçirir; yalnızca DAC o hızda çalışamadığında Apple’ın mastering kalitesindeki dönüştürücüsüyle yeniden örnekleme yapar. <span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kaynak koddaki koşullar sağlandığında görünür: yerel hız, örnekleri değiştiren hiçbir şeyin olmaması, uygun bir sözcük uzunluğu ve özel modda olan ya da başka bir uygulamayla paylaşılmayan bir aygıt. PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi."
+          "Vespertine, aygıtı her dosyanın örnekleme hızına geçirir; yalnızca DAC o hızda çalışamadığında Apple’ın mastering kalitesindeki dönüştürücüsüyle yeniden örnekleme yapar. <span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kaynak koddaki koşullar sağlandığında görünür: yerel hız, örnekleri değiştiren hiçbir şeyin olmaması, uygun bir sözcük uzunluğu ve özel modda olan ya da başka bir uygulamayla paylaşılmayan bir aygıt. PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi (geliştirici raporları; bkz. docs/DEVICES.md)."
         ],
         "list": [
           "Özel (hog) mod, diğer uygulamaları aygıttan uzak tutar. Paylaşımlı modda ses tuşları ve Digital Crown DAC’ınızı ayarlar; özel modda da bu seçeneği açarsanız ayarlayabilir.",
@@ -181,7 +181,7 @@
           "Üç hedef: Warm (varsayılan), Gentle tilt ve Flat. Yalnızca bas bölgesini ya da tam aralığı düzeltin; filtreleri sonradan, ölçümü tekrarlamadan yeniden tasarlayın.",
           "REW veya Equalizer APO filtrelerini, her hoparlörün gecikmesi ve seviyesiyle birlikte içe aktarır; Equalizer APO metni olarak dışa aktarır.",
           "Dürtü yanıtlarını (WAV, AIFF, CAF veya FLAC) içe aktarır ve konvolüsyonla çalar.",
-          "Stereo ve 5.1.",
+          "Stereo ve 5.1 (5.1, simüle edilmiş odalarda ve içe aktarılan profillerle test edildi; henüz gerçek bir 5.1 odasında test edilmedi).",
           "Oda Portresi, hoparlörleri, koltuğunuzu ve ölçüldükçe her mikrofon noktasını gösterir. Ardından eğri dönüşümü animasyonu, ölçülen yanıtı öngörülen yanıta çevirir; önce/sonra anahtarı ise ikisini karşılaştırır."
         ],
         "note": "“Sonra” eğrisi ölçülmez; ölçümden ve filtrelerden öngörülür. Odanın gerçekte ne yaptığını görmek için düzeltme açıkken yeniden ölçün.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround ve Uzamsal Ses",
         "title": "5.1 diskleriniz aynı arşivde.",
-        "lede": "Çok kanallı müzik, AirPods’ta baş takipli Uzamsal Ses olarak çalar ya da stereo bir DAC’ta kanal düzenine göre stereoya indirgenir.",
+        "lede": "Çok kanallı müzik, AirPods’ta Apple’ın Uzamsal Ses işleyicisi üzerinden çalar (macOS’in sağladığı yerlerde baş takipli) ya da stereo bir DAC’ta kanal düzenine göre stereoya indirgenir.",
         "body": [
-          "DTS CD’leri 5.1 olarak çözülür. SACD görüntüleri, çıkarılmış SACD parçaları, çok kanallı FLAC, TrueHD ve DTS-HD MA, AirPods’ta baş takipli Uzamsal Ses olarak işlenir ya da stereo bir DAC’ta stereoya indirgenir. Atmos içeren Dolby Digital Plus, macOS’in nesne işleyicisini kullanır; TrueHD Atmos ve DTS:X kendi temel kanal katmanını çalar. Kanal kanal çıkış deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
+          "DTS CD’leri 5.1 olarak çözülür. SACD görüntüleri, çıkarılmış SACD parçaları, çok kanallı FLAC, TrueHD ve DTS-HD MA, AirPods’ta Apple’ın Uzamsal Ses işleyicisi üzerinden işlenir (macOS’in sağladığı yerlerde baş takipli) ya da stereo bir DAC’ta stereoya indirgenir. Atmos içeren Dolby Digital Plus, macOS’in nesne işleyicisini kullanır; TrueHD Atmos ve DTS:X kendi temel kanal katmanını çalar. Kanal kanal çıkış deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md). Raporlarınızı bekliyoruz."
         ],
         "list": [
           "Bir albümün stereo ve surround sürümleri bir kez listelenir; Vespertine çıkışa hangisi uygunsa onu ya da sizin sabitlediğinizi çalar.",
@@ -215,11 +215,11 @@
         "title": "Disk görüntüsünü doğrudan çalın.",
         "lede": "Vespertine’e bir SACD ya da DVD-Video görüntüsü gösterin; müziği doğrudan ondan çalar, hiçbir şey bağlanmaz, çıkarılmaz ya da yazılmaz.",
         "body": [
-          "SACD <span class=\"mono\">.iso</span> görüntülerinin DST sıkıştırmalı ya da düz stereo ve 5.1 alanları, diskin kendi metninden alınan başlıklarla çalınır. DST, tam olarak aynı DSD’ye geri çözülür; böylece stereo, DAC destekliyorsa DoP üzerinden yerel DSD olarak DAC’ınıza gider, 5.1 ise AirPods’ta baş takipli Uzamsal Ses olarak çalar. DVD-Video disklerindeki (bir <span class=\"mono\">.iso</span> ya da <span class=\"mono\">VIDEO_TS</span> klasörü) LPCM müzik bit bit aynen çalınır: her başlık bir albüm, her bölüm bir parça olur."
+          "SACD <span class=\"mono\">.iso</span> görüntülerinin DST sıkıştırmalı ya da düz stereo ve 5.1 alanları, diskin kendi metninden alınan başlıklarla çalınır. DST, tam olarak aynı DSD’ye geri çözülür; böylece stereo, DAC destekliyorsa DoP üzerinden yerel DSD olarak DAC’ınıza gider, 5.1 ise AirPods’ta Apple’ın Uzamsal Ses işleyicisi üzerinden çalar. DVD-Video disklerindeki (bir <span class=\"mono\">.iso</span> ya da <span class=\"mono\">VIDEO_TS</span> klasörü) LPCM müzik bit bit aynen çalınır: her başlık bir albüm, her bölüm bir parça olur."
         ],
         "list": [
-          "İki gerçek diskte sacd_extract ile bit bit aynı sonucu verdi. 5.0 alanı olan, yalnızca çok kanallı alanı olan ya da DSD128 ve üzeri diskler şimdilik yalnızca sentezlenmiş test görüntüleriyle kapsanıyor.",
-          "DSD64’ten DSD512’ye kadar DSF ve DSDIFF, DST sıkıştırmalı DSDIFF dâhil, taşıyıcı hızını kabul eden DAC’lara DoP olarak gider ya da yüksek hızlı PCM’e dönüştürülür. DoP, bir Fosi Audio ZD3 üzerinde DSD256’ya, bir FiiO K11 üzerinde ise DSD128’e kadar doğrulandı; DoP üzerinden DSD512 donanımda test edilmedi.",
+          "SACD görüntüleri, 5.0 alanı olan, yalnızca çok kanallı alanı olan ya da DSD128 ve üzeri olanlar dâhil, sentezlenmiş disklerle test edilir.",
+          "DSD64’ten DSD512’ye kadar DSF ve DSDIFF, DST sıkıştırmalı DSDIFF dâhil, taşıyıcı hızını kabul eden DAC’lara (denenen DAC’larda DSD256’ya kadar) DoP olarak gider ya da yüksek hızlı PCM’e dönüştürülür. DoP’un bir Fosi Audio ZD3 üzerinde DSD256’ya, bir FiiO K11 üzerinde ise DSD128’e kadar çalıştığı bildiriliyor (geliştirici raporları, kayıt yok); DoP üzerinden DSD512 donanımda test edilmedi.",
           "16, 20 ve 24 bit, 48 ve 96 kHz, 8 kanala kadar DVD-Video LPCM. DVD-Audio desteklenmez; şifreli (CSS) diskler için şifresi çözülmüş bir kopya gerekir."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Oda düzeltmesi yapıyor mu?",
-          "a": "Evet. Odanızı bir UMIK-1 ya da kalibre edilmiş başka bir USB mikrofonla, koltuğunuzun çevresinde bir ila beş noktada ölçün; Vespertine, stereo ya da 5.1’de, her hoparlör için filtreler hesaplar ve hoparlörlerin gecikmesini ve seviyesini hizalar. Ayrıca REW ve Equalizer APO filtrelerini ve dürtü yanıtlarını içe aktarır. Varsayılan olarak kapalıdır, kapalıyken oynatma bit-perfect kalır ve açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar. <a href=\"{href.roomCorrection}\">Oda düzeltmesi nasıl çalışır</a>."
+          "a": "Evet. Odanızı bir UMIK-1 ya da kalibre edilmiş başka bir USB mikrofonla, koltuğunuzun çevresinde bir ila beş noktada ölçün; Vespertine, stereo ya da 5.1’de (5.1, simüle edilmiş odalarda ve içe aktarılan profillerle test edildi; henüz gerçek bir 5.1 odasında test edilmedi), her hoparlör için filtreler hesaplar ve hoparlörlerin gecikmesini ve seviyesini hizalar. Ayrıca REW ve Equalizer APO filtrelerini ve dürtü yanıtlarını içe aktarır. Varsayılan olarak kapalıdır, kapalıyken oynatma bit-perfect kalır ve açıkken sinyal yolunda <span class=\"mono nowrap\">ODA DÜZELTMESİ</span> yazar. <a href=\"{href.roomCorrection}\">Oda düzeltmesi nasıl çalışır</a>."
         },
         {
           "q": "SACD ve DVD disklerini çalabilir mi?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Dolby Atmos çalıyor mu?",
-          "a": "Atmos’lu Dolby Digital Plus, macOS’in nesne işleyicisi üzerinden, AirPods’ta baş takipli Uzamsal Ses olarak çalar. TrueHD Atmos ve DTS:X kayıpsız kanal tabanlarını çalar; nesneleri işlenmez. AV alıcısına bitstream aktarımı deneyseldir, gerçek alıcılarda test edilmedi; raporlarınızı bekliyoruz."
+          "a": "Atmos’lu Dolby Digital Plus, macOS’in nesne işleyicisi üzerinden, AirPods’ta Uzamsal Ses olarak çalar (macOS’in sağladığı yerlerde baş takipli). TrueHD Atmos ve DTS:X kayıpsız kanal tabanlarını çalar; nesneleri işlenmez. AV alıcısına bitstream aktarımı deneyseldir, gerçek alıcılarda test edilmedi; raporlarınızı bekliyoruz."
         },
         {
           "q": "Dosyalarımı değiştirir mi?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Hangi donanımlarda test edildi?",
-          "a": "PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi; tam sayı modu da FiiO K11’de test edildi. Ayrıca USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV üzerinde de test edildi. Intel donanımı test edilmedi. Alıcıya bitstream aktarımı ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
+          "a": "PCM oynatma, bir Fosi Audio ZD3 üzerinde 768 kHz’e ve DSD256’ya kadar, bir FiiO K11 üzerinde ise 384 kHz’e ve DSD128’e kadar test edildi (geliştirici raporları; bkz. docs/DEVICES.md); tam sayı modu da FiiO K11’de test edildi. Ayrıca USB-C ve Bluetooth üzerinden AirPods Max, MacBook Pro hoparlörleri ve HDMI üzerinden 5.1’de bir Sony TV üzerinde de test edildi. Intel donanımı test edilmedi. Alıcıya bitstream aktarımı ve çok kanallı DAC çıkışı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden tek bir Sony TV test edildi: bkz. docs/DEVICES.md); <a href=\"{href.dacReport}\">raporlarınızı bekliyoruz</a>."
         },
         {
           "q": "Benim dilimde mi?",
@@ -601,7 +601,7 @@
     "ogAlt": "Vespertine basın kiti: bilgi sayfası, logolar, tanıtım görselleri, gerçek ekran görüntüleri ve fragman; arka planda uygulamanın üç gerçek ekran görüntüsü.",
     "eyebrow": "Basın kiti",
     "heading": "{name} hakkında yazmak için ihtiyacınız olan her şey.",
-    "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk görüntüleri, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta baş takipli Uzamsal Ses de var. Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
+    "lede": "Vespertine, surround ve hi-res müzik koleksiyonları için ücretsiz, açık kaynak Mac oynatıcısıdır. SACD ve DVD-Video disk görüntüleri, çıkarılmış SACD 5.1 parçaları, DTS CD’ler, DTS-HD MA, TrueHD ve Atmos dosyaları tek bir arşivde bir araya gelir; AirPods’ta Uzamsal Ses de var (macOS’in sağladığı yerlerde baş takipli). Sinyal yolu, dosyadan çıkışa kadar her adımı gösterir; koşullar ve testler, herkesin denetleyebileceği GPL kaynak kodunda yer alır.",
     "fine": "Kanalı kanalına çıkış ve alıcıya bitstream aktarımı deneyseldir; gerçek alıcılarda ve çok kanallı USB DAC’larda test edilmedi (HDMI üzerinden bir Sony TV test edildi: bkz. docs/DEVICES.md); raporlarınızı bekliyoruz. Dolby Digital Plus Atmos nesnelerini macOS işler; TrueHD Atmos ve DTS:X kendi temel kanal katmanlarını çalar.",
     "facts": {
       "eyebrow": "Bilgi sayfası",
