@@ -72,7 +72,7 @@ struct PlayHistoryTests {
 
     @Test("Songs played before there was a history start it with their last play")
     func seededFromLastPlayed() throws {
-        let queue = try DatabaseQueue()
+        let queue = try DatabaseQueue(configuration: LibraryDatabase.queueConfiguration())
         try LibraryDatabase.migrator.migrate(queue, upTo: "v17-dst-dsdiff")
         let played = Date(timeIntervalSince1970: 3_000_000)
         try queue.write { db in

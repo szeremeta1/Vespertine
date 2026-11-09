@@ -258,7 +258,7 @@ final class LibraryStore {
                 try Row.fetchAll(db, sql: """
                     SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
                            count(*) AS tracks, max(artworkKey) AS art
-                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY min(albumArtistSortKey)
+                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
                     """).map { LibraryDatabase.ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
             }
             // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes
