@@ -818,11 +818,14 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Commands taken from the queue with the one being handled, not handled yet (engine thread).
     private var batchRest: [Command] = []
 
-    /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
-    private var superseded: Bool {
-        let startsOver: (Command) -> Bool = { switch $0 { case .play, .stop: true; default: false } }
-        return batchRest.contains(where: startsOver) || shared.withLock { $0.commands.contains(where: startsOver) }
+    /// Whether a command `matches` is waiting to be handled: in the rest of the batch being handled, or posted since. Engine
+    /// thread only (the rest of the batch is its own state).
+    private func commandPending(_ matches: (Command) -> Bool) -> Bool {
+        batchRest.contains(where: matches) || shared.withLock { $0.commands.contains(where: matches) }
     }
+
+    /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
+    private var superseded: Bool { commandPending { switch $0 { case .play, .stop: true; default: false } } }
     private struct Superseded: Error {}
 
     // MARK: Transport while the engine thread waits on a share
@@ -898,8 +901,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// song's share answers. Play and stop are `superseded`.
     private var lookAheadYields: Bool {
         guard lookingAhead else { return false }
-        let yields: (Command) -> Bool = { switch $0 { case .pause, .resume, .barrier: false; default: true } }
-        return batchRest.contains(where: yields) || shared.withLock { $0.commands.contains(where: yields) }
+        return commandPending { switch $0 { case .pause, .resume, .barrier: false; default: true } }
     }
 
     /// The finished song whose look-ahead was given up (`LookAheadGivenUp`): `fill` looks ahead for it again, with the queue
@@ -1250,9 +1252,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 return
             } catch is Superseded {
-                // The next command starts what was asked for instead.
+                // The next command starts what was asked for instead. The song is kept where it was asked for (`parked`): a
+                // seek that superseded it finds it there (a play or stop clears it).
                 log.info("Skipped past \(current.url.lastPathComponent, privacy: .public) while it opened")
                 teardownDecoding()
+                parked = (current, offset)
                 return
             } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
@@ -1369,9 +1373,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         var startFrame: AVAudioFramePosition = 0
         // A seek reads where the song may not have arrived from the share yet, and a decoder kept open may be waiting on it in
         // its read-ahead: on a share that has stopped answering both wait as long as it does. A skip, stop or another seek gives up.
-        let interrupted: () -> Bool = { [shared] in
-            shared.withLock { $0.commands.contains { switch $0 { case .play, .stop, .seek: true; default: false } } }
-        }
+        // A seek right behind an output change in the same batch counts too (`commandPending`). Called on this thread only.
+        let interrupted: () -> Bool = { [unowned self] in commandPending { switch $0 { case .play, .stop, .seek: true; default: false } } }
         do {
             try NetworkPlaybackCache.cancellingReads(when: interrupted) {
                 if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
@@ -1387,9 +1390,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             if interrupted() { throw Superseded() }
             throw error
         }
-        // Setting a DoP marker on a decoder that reads ahead can be given up on too, and that setter can't throw: a hold given
-        // up on leaves the marker unset, so this song must not carry on (the command that gave it up starts what is next).
-        if interrupted() { throw Superseded() }
+        // Setting a DoP marker on a decoder that reads ahead can be given up on too, and that setter can't throw: it records a hold
+        // given up on (`markerGivenUp`), which leaves the marker unset, so this song must not carry on (the command that gave it
+        // up starts what is next).
+        if (decoder as? ReadAheadDecoder)?.markerGivenUp == true { throw Superseded() }
         let streaming = isStreaming(item)
         let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),

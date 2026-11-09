@@ -251,12 +251,21 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         set {
             guard let newValue, let dop = inner as? RawDoPDecoder else { return }
             // Frames decoded ahead carry the old sequence: they're decoded again with the new one.
-            // Given up on (see `withDecoderHeld`), the marker stays as it was: the engine then abandons the song (`begin`).
-            try? withDecoderHeld {
-                if inner.position != position { try? inner.seek(to: position) }
-                dop.nextMarker = newValue
-                marker = (inner.position, newValue)
+            // Given up on (see `withDecoderHeld`), the marker stays as it was and `markerGivenUp` says so: the engine then
+            // abandons the song (`begin`).
+            do {
+                try withDecoderHeld {
+                    if inner.position != position { try? inner.seek(to: position) }
+                    dop.nextMarker = newValue
+                    marker = (inner.position, newValue)
+                }
+                markerGivenUp = false
+            } catch {
+                markerGivenUp = true
             }
         }
     }
+
+    /// The last DoP marker set (`nextDoPMarker`) was given up on, so the decoder carries on with the old sequence. Engine thread.
+    private(set) var markerGivenUp = false
 }
