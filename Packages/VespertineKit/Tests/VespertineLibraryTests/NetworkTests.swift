@@ -189,6 +189,43 @@ struct NetworkTests {
         #expect(cache.usage() == NetworkCache.Usage())
     }
 
+    @Test("A share mounted again at another folder (\"Music Share-1\") keeps its Keep Offline copies: they are found under the new paths")
+    func offlineCopiesFollowARemount() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-remount-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let db = try LibraryDatabase.inMemory()
+        let old = "/Volumes/Music Share", new = "/Volumes/Music Share-1"
+        let source = try db.addSource(LibrarySource(path: old, mode: .reference, remoteURL: "smb://nas.local/Music%20Share"))
+        let data = Data(repeating: 42, count: 4096)
+        let staged = dir.appendingPathComponent("staged.flac")
+        try data.write(to: staged)
+        var track = Track.stub(path: "\(old)/The Vesper Quartet/01 Nocturne.flac")
+        track.sourceId = source.id
+        track.fileSize = Int64(data.count)
+        let inserted = track
+        try await db.writer.write { db in var row = inserted; try row.insert(db) }
+        let cache = NetworkCache(directory: dir.appendingPathComponent("persistent"), limitBytes: 1 << 20)
+        #expect(cache.adopt(track, from: staged))
+        for _ in 0..<200 where cache.isPending(track) { try await Task.sleep(for: .milliseconds(10)) }
+        cache.setOffline(true, for: [track])
+        #expect(cache.isOffline(track))
+
+        try db.relinkSource(source.id!, to: new)
+        let moved = try #require(try db.allTracks().first)
+        #expect(moved.filePath == "\(new)/The Vesper Quartet/01 Nocturne.flac")
+        #expect(cache.relink(from: old, to: new, database: db) == 1)
+        #expect(cache.isOffline(moved), "still kept offline")
+        let copy = try #require(cache.localURL(forKey: NetworkCache.key(for: moved)))
+        #expect(try Data(contentsOf: copy) == data)
+        #expect(cache.usage().offlineFiles == 1, "moved, not duplicated")
+        #expect(!cache.isAvailable(track), "nothing left under the old key")
+
+        // The index on disk says so too: a cache opened afresh finds it.
+        let reopened = NetworkCache(directory: dir.appendingPathComponent("persistent"), limitBytes: 1 << 20)
+        #expect(reopened.isOffline(moved))
+    }
+
     @Test("The persistent cache adopts staged bytes without reopening an unavailable share")
     func adoptStagedCopy() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-adopt-\(UUID())")

@@ -11,6 +11,7 @@
 
 import CryptoKit
 import Foundation
+import GRDB
 
 public final class NetworkCache: @unchecked Sendable {
     public struct Usage: Sendable, Equatable {
@@ -240,6 +241,41 @@ public final class NetworkCache: @unchecked Sendable {
         for e in doomed { try? FileManager.default.removeItem(at: directory.appendingPathComponent(e.fileName)) }
         save()
         onChange?()
+    }
+
+    /// A share was mounted at another folder (`old` → `new`, say "/Volumes/Music Share" → "/Volumes/Music Share-1") and its
+    /// source relinked (`LibraryDatabase.relinkSource`): its tracks' paths changed, and with them the keys of their copies
+    /// (`key(for:)`). Call after the relink: the copies of files under `old` move to their tracks' new keys, so Keep Offline
+    /// and cached copies are found again instead of sitting unused (and, kept offline, never evicted). Returns how many moved.
+    @discardableResult
+    public func relink(from old: String, to new: String, database: LibraryDatabase) -> Int {
+        guard old != new else { return 0 }
+        let prefix = old.hasSuffix("/") ? old : old + "/"
+        let moving = lock.withLock { entries.values.filter { $0.remotePath.hasPrefix(prefix) } }
+        guard !moving.isEmpty else { return 0 }
+        let newPrefix = new.hasSuffix("/") ? new : new + "/"
+        let newPaths = moving.map { newPrefix + $0.remotePath.dropFirst(prefix.count) }
+        let tracks = (try? database.writer.read { db in try Track.filter(newPaths.contains(Column("filePath"))).fetchAll(db) }) ?? []
+        var moved = 0
+        lock.lock()
+        for track in tracks {
+            var before = track
+            before.filePath = prefix + track.filePath.dropFirst(newPrefix.count)
+            let from = Self.key(for: before), to = Self.key(for: track)
+            guard from != to, var entry = entries[from], entries[to] == nil else { continue }
+            let ext = URL(fileURLWithPath: entry.fileName).pathExtension
+            let name = ext.isEmpty ? to : "\(to).\(ext)"
+            guard rename(directory.appendingPathComponent(entry.fileName).path, directory.appendingPathComponent(name).path) == 0 else { continue }
+            entries[from] = nil
+            entry.key = to
+            entry.fileName = name
+            entry.remotePath = track.filePath
+            entries[to] = entry
+            moved += 1
+        }
+        lock.unlock()
+        if moved > 0 { save(); onChange?() }
+        return moved
     }
 
     // MARK: Downloading

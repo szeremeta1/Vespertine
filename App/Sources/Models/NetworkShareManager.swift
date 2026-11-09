@@ -293,7 +293,13 @@ final class NetworkShareManager {
                 }
                 return password
             }
+            let before = (try? library.database.sources())?.first { $0.id == id }?.path
             try library.database.relinkSource(id, to: root.path)
+            // Mounted at another folder ("Music Share-1"): the tracks' paths changed, so did their copies' keys.
+            if let before, before != root.path {
+                let moved = cache.relink(from: before, to: root.path, database: library.database)
+                if moved > 0 { shareLog.notice("share \(id, privacy: .public): \(moved, privacy: .public) cached copies follow the new mount point") }
+            }
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
             credentialFailedAt[id] = nil
