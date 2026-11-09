@@ -272,7 +272,7 @@ extension RoomProfile {
         p.schemaVersion = schemaVersion
         p.measured = measured; p.designOptions = designOptions; p.alignment = alignment; p.impulses = impulses; p.source = source
         p.tags = tags; p.strength = strength; p.positionCurves = positionCurves; p.excludedPositions = excludedPositions
-        p.filtersEdited = filtersEdited
+        p.filtersEdited = filtersEdited; p.groupClock = groupClock
         return p
     }
 
