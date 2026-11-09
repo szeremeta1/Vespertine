@@ -382,9 +382,13 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     /// A track read live from a share is decoded on a thread of its own, so a slow read holds up only that
-    /// thread, never the engine (see `ReadAheadDecoder`).
-    private static func readingAhead(_ decoder: PCMDecoding, streaming: Bool) -> PCMDecoding {
-        streaming && !(decoder is ReadAheadDecoder) ? ReadAheadDecoder(decoder) : decoder
+    /// thread, never the engine (see `ReadAheadDecoder`). It notes how far the song's copy had been read when its first audio
+    /// was decoded: where its lead starts (`primeNetworkLead`).
+    private func readingAhead(_ decoder: PCMDecoding, item: PlayableItem, streaming: Bool) -> PCMDecoding {
+        guard streaming, !(decoder is ReadAheadDecoder) else { return decoder }
+        var firstRead: (@Sendable () -> Int64)?
+        if let entry = staged[cacheKey(item)] { firstRead = { entry.lastRead } }
+        return ReadAheadDecoder(decoder, firstRead: firstRead)
     }
 
     /// When audio last arrived from a network share (a share slow to answer but still delivering isn't dead).
@@ -1441,7 +1445,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // up starts what is next).
         if (decoder as? ReadAheadDecoder)?.markerGivenUp == true { throw Superseded() }
         let streaming = isStreaming(item)
-        let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
+        let decoding = try Decoding(item: item, probed: probed, decoder: readingAhead(decoder, item: item, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
                                     chunk: chunkFrames, layout: session.decodedLayout)
         mark("seek+converter")
@@ -1928,7 +1932,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             defer { if !lookingAhead { shared.withLock { $0.snapshot.isBuffering = false } } }
             // Header parsers may have visited the end of a container. Wait for the decoder's first
             // actual audio read so a CUE/SACD seek primes the region that will play, not a tag at EOF.
-            if let ahead = decoding.decoder as? ReadAheadDecoder {
+            let ahead = decoding.decoder as? ReadAheadDecoder
+            if let ahead {
                 while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
                     if startSuperseded { throw Superseded() }
                     if lookingAhead {
@@ -1942,7 +1947,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             // about 40 s of "Preparing output…" for a 5.1 DSD64 song on a share 100 ms away.) Reads beyond the lead remain guarded.
             // An SACD image holds the whole disc, so its size says nothing of one track's rate: two minutes of the track's raw DSD,
             // at least 128 MiB, capped at 1 GiB, as before.
-            let position = min(entry.lastRead, entry.size)
+            // Measured from where that first audio was read, not from how far the read-ahead has read since: it reads up to
+            // seconds past the playhead, and the lead from there could reach into what the share has not sent (on a share gone
+            // quiet, for ever) for a start whose own audio is on disk, depending on how quickly the read-ahead ran meanwhile.
+            let position = min(ahead?.firstAudioRead ?? entry.lastRead, entry.size)
             let format = decoding.probed.format
             let lead = decoding.item.sacdArea != nil
                 ? min(entry.size - position, min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120))))
@@ -2468,7 +2476,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                     let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: next)
                     Self.alignDoPMarkers(decoder, at: session.totalWritten + UInt64(gapOwed))
                     let streaming = isStreaming(next)
-                    let d = try Decoding(item: next, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
+                    let d = try Decoding(item: next, probed: probed, decoder: readingAhead(decoder, item: next, streaming: streaming),
                                          path: makePath(probed: probed, plan: plan, device: device, session: session, item: next),
                                          chunk: chunkFrames, layout: session.decodedLayout)
                     d.streaming = streaming
@@ -2547,7 +2555,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 guard let session = self.session else { return }
                 let decoder = try SourceOpener.decoder(for: pending.probed, plan: pending.plan, item: pending.item)
                 let streaming = isStreaming(pending.item)
-                let d = try Decoding(item: pending.item, probed: pending.probed, decoder: Self.readingAhead(decoder, streaming: streaming),
+                let d = try Decoding(item: pending.item, probed: pending.probed, decoder: readingAhead(decoder, item: pending.item, streaming: streaming),
                                      path: makePath(probed: pending.probed, plan: pending.plan, device: pending.device,
                                                     session: session, item: pending.item),
                                      chunk: chunkFrames, layout: session.decodedLayout)

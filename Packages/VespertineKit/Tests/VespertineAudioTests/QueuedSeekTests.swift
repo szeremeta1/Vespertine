@@ -99,8 +99,10 @@ struct QueuedSeekTests {
             let opened = rig.opens.withLock { $0 }
             switch newest {
             case .seek:
+                // 1 s and its lead are on disk: the song plays from there. Until then the engine says 8 s (where it was asked for
+                // before), and the song would take six seconds of playing from 1 s to get that far again.
                 rig.engine.seek(to: 1)
-                run.landed = rig.scriptWait(timeout: 120) { abs($0.position - 1) < 0.5 && $0.item != nil }
+                run.landed = rig.scriptWait(timeout: 120) { $0.state == .playing && $0.item != nil && $0.position < 7 }
             case .outputChange:
                 settings.exclusive = false
                 rig.engine.update(settings: settings)

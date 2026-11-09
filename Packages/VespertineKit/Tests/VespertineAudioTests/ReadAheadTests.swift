@@ -177,6 +177,23 @@ struct ReadAheadTests {
         #expect(ahead == reference)
     }
 
+    @Test("Where the first audio was read is noted as it is decoded, not as far as the read-ahead has read since; a seek notes it again")
+    func firstAudioRead() throws {
+        let url = try audioFile("first-read", ext: "wav", rate: 48_000, bits: 24, seconds: 2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        // How far the file has been read stands for the cache's read cursor here: the frames decoded so far.
+        let share = StallingDecoder(try open(url).2, held: false)
+        let decoder = ReadAheadDecoder(share, seconds: 0.5, chunk: 4096, firstRead: { share.position })
+        // The read-ahead has read its half second (24,000 frames, six chunks) and stops there. A hang detector, not a latency bound.
+        let started = Date()
+        while share.position < 24_000, Date().timeIntervalSince(started) < 60 { usleep(1000) }
+        #expect(share.position >= 24_000)
+        #expect(decoder.firstAudioRead == 4096)
+        try decoder.seek(to: 48_000)
+        #expect(decoder.waitForAudio(timeout: 60))
+        #expect(decoder.firstAudioRead == 48_000 + 4096)
+    }
+
     @Test("A track read ahead moves to its local copy at the frame the engine reached, not the one read up to")
     func moveToLocalCopy() throws {
         let url = try audioFile("move", ext: "flac", rate: 96_000, bits: 24)
