@@ -115,6 +115,9 @@ static NFFDecoder *open_source(const char *path, int wanted, void *opaque, int64
     d->rate = d->ctx->sample_rate;
     d->mask = d->ctx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE ? d->ctx->ch_layout.u.mask : 0;
     d->bits = d->ctx->bits_per_raw_sample;
+    // A stream that still names no channels or no rate once opened (a damaged track header, audio FFmpeg couldn't read)
+    // can't be played: a format with no channels can't even hold a buffer. Picked streams aren't screened for this.
+    if (d->channels <= 0 || d->rate <= 0) { fail(error, errorSize, "the stream has no channel count or sample rate", 0); nff_close(d); return NULL; }
     const char *profile = avcodec_profile_name(codec->id, st->codecpar->profile);
     snprintf(d->profile, sizeof d->profile, "%s", profile ? profile : "");
     int64_t duration = st->duration != AV_NOPTS_VALUE ? av_rescale_q(st->duration, st->time_base, (AVRational){1, d->rate})
