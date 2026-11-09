@@ -1,7 +1,8 @@
 //
 // Vespertine: the next song is at another rate, so the output is set up again for it; while that song's start waits on a
 // slow share, a stop or a skip is a stop or a skip, not an error about the song.
-// The rig is the play/pause one (PlayPauseRigSupport.swift), with the next song at 48 kHz on a share that goes quiet.
+// The rig is the play/pause one (PlayPauseRigSupport.swift), with the next song at 48 kHz on a share that goes quiet. The scenario
+// runs on a thread of its own (RigThreadSupport.swift) and waits on conditions; what it saw is judged afterwards.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -33,16 +34,23 @@ struct RateJoinStopTests {
         rig.engine.eventHandler = { event in
             if case .failed(let item, let message) = event { failures.withLock { $0.append("\(item?.url.lastPathComponent ?? "?"): \(message)") } }
         }
-        rig.engine.play(first)
-        _ = await rig.wait(timeout: 30) { $0.state == .playing && !$0.isBuffering }
-        // The first song plays out (21 s), the output is set up at 48 kHz, and the next song's start waits for the share.
-        let reopened = await rig.wait(timeout: 60) { _ in rig.outputs.withLock { $0.count } >= 2 }
-        #expect(reopened, "the output was never set up for the next song")
-        await rig.sleep(ms: 500)
-        if skip { rig.engine.play(first) } else { rig.engine.stop() }
-        let settled = await rig.wait(timeout: 10) { skip ? $0.item?.id == first.id && $0.state == .playing : $0.state == .stopped }
-        #expect(settled, "state \(rig.engine.snapshot.state), item \(rig.engine.snapshot.item?.url.lastPathComponent ?? "none")")
-        await rig.sleep(ms: 300)
+        struct Run: Sendable { var reopened = false, settled = false, end = "" }
+        let run = try await rig.runScript { rig -> Run in
+            var run = Run()
+            rig.engine.play(first)
+            // The first song plays out (21 s), the output is set up at 48 kHz, and the next song's start waits for the share
+            // (until the test ends: the share stays quiet).
+            run.reopened = rig.scriptWait(timeout: 180) { _ in rig.outputs.withLock { $0.count } >= 2 }
+            guard run.reopened else { return run }
+            rig.scriptSleep(ms: 500)
+            if skip { rig.engine.play(first) } else { rig.engine.stop() }
+            run.settled = rig.scriptWait(timeout: 60) { skip ? $0.item?.id == first.id && $0.state == .playing : $0.state == .stopped }
+            rig.scriptSleep(ms: 300)
+            run.end = "state \(rig.engine.snapshot.state), item \(rig.engine.snapshot.item?.url.lastPathComponent ?? "none")"
+            return run
+        }
+        try #require(run.reopened, "the output was never set up for the next song")
+        #expect(run.settled, "\(run.end)")
         #expect(failures.withLock { $0 }.isEmpty, "\(failures.withLock { $0 })")
         #expect(rig.engine.snapshot.lastError == nil, "\(rig.engine.snapshot.lastError ?? "")")
     }
