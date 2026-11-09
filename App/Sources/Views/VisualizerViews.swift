@@ -556,8 +556,13 @@ final class VisualizerMTKView: MTKView {
         }
         // The link was made for the display the window was on; on another display it is held to that one's rate.
         if let link { link.preferredFrameRateRange = Self.frameRateRange(Float(rate)) }
-        setShowing(window.isVisible && !window.isMiniaturized && window.occlusionState.contains(.visible))
+        setShowing(windowIsSeen(window))
     }
+
+    /// Whether the window can be seen at the moment: on screen, not miniaturized, and not covered. Tests replace it: whether
+    /// the system calls a window covered depends on everything else on that screen (a locked session, a full-screen window of
+    /// another app), which a test can't rely on.
+    var windowIsSeen: (NSWindow) -> Bool = { $0.isVisible && !$0.isMiniaturized && $0.occlusionState.contains(.visible) }
 
     func setShowing(_ on: Bool) {
         guard on != showing else { return }

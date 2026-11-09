@@ -171,7 +171,7 @@ struct NetworkStartTests {
         #expect(try Data(contentsOf: entry.url) == share.bytes, "the staged file is the share's file")
     }
 
-    @Test("Time to first audio: a prefix on a throttled share starts several times sooner than copying the file first")
+    @Test("Time to first audio: a prefix on a throttled share starts without the rest of the file, where copying the file first waits for all of it")
     func timeToFirstAudio() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let url = dir.appendingPathComponent("song.wav")
@@ -192,10 +192,18 @@ struct NetworkStartTests {
             leak.withLock { $0.append(entry) }
             return entry.url
         }
+        // The prefix start is proved by what it needs, not by how long it takes (a ratio of two wall-clock times moves with the
+        // machine's load): the share goes quiet a little beyond the prefix, so first audio can only come from the prefix alone.
+        // Starting only after the whole file would wait on it for good, and the deadline turns that into a failure.
+        let quietShare = ThrottledShare(data: data, bytesPerSecond: rate)
+        quietShare.goQuiet(from: NetworkStart.prefix + (1 << 20))
+        defer { quietShare.goQuiet(from: nil) }
+        let deadline = Date().addingTimeInterval(60)
         let earlySeconds = try firstAudio {
             let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("early"), budget: 64 << 20)
-            let entry = try cache.entry(key: "early", url: url, reader: ThrottledShare(data: data, bytesPerSecond: rate))
-            try entry.prepare(full: false, lead: NetworkStart.prefix, cancelled: { false })
+            let entry = try cache.entry(key: "early", url: url, reader: quietShare)
+            try entry.prepare(full: false, lead: NetworkStart.prefix, cancelled: { Date() > deadline })
+            #expect(!entry.isComplete, "first audio came from the prefix, with the rest of the file not there yet")
             leak.withLock { $0.append(entry) }
             return entry.url
         }
@@ -211,7 +219,7 @@ struct NetworkStartTests {
         print(String(format: "time to first audio, %d MB at 30 MB/s: local %.0f ms, whole file first %.0f ms, prefix first %.0f ms",
                      data.count >> 20, localSeconds * 1000, fullSeconds * 1000, earlySeconds * 1000))
         #expect(fullSeconds > Double(data.count) / rate * 0.9)            // the copy is what the old start waited for
-        #expect(earlySeconds < fullSeconds / 3)
+        #expect(earlySeconds < 60, "the prefix was enough for first audio with the share quiet beyond it")
     }
 
     /// Entries outlive the measurement (their files must stay until the decoders are done).

@@ -109,8 +109,18 @@ final class PlayPauseRig: @unchecked Sendable {
         return url
     }
 
+    /// A clock for the cache that runs a thousand times slower than the machine's. The cache measures the copy's speed (and how long
+    /// a share may stay silent) on its clock, and the start of a song waits for as much of it as that speed says the rest needs. On a
+    /// share that has gone quiet the measured speed falls with every second that passes, so after a few seconds a scenario that
+    /// holds a quiet share would wait for bytes that never come, and how many seconds that takes depends on how busy the machine is.
+    /// On this clock a test's whole patience is a fraction of a second of the cache's time, whatever the machine does.
+    static func slowCacheClock() -> @Sendable () -> TimeInterval {
+        let begun = ProcessInfo.processInfo.systemUptime
+        return { (ProcessInfo.processInfo.systemUptime - begun) / 1000 + 1 }
+    }
+
     init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576,
-         fileExtension: String = "wav") throws {
+         fileExtension: String = "wav", cacheClock: (@Sendable () -> TimeInterval)? = nil) throws {
         self.fileExtension = fileExtension
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("playpause-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -118,7 +128,9 @@ final class PlayPauseRig: @unchecked Sendable {
         try Self.writeWAV(url, seconds: seconds)
         if fileExtension == "flac" { url = try Self.writeFLAC(from: url) }
         share = ControlledShare(data: try Data(contentsOf: url), bytesPerSecond: bytesPerSecond)
-        cache = NetworkPlaybackCache(directory: directory.appendingPathComponent("cache"), budget: 256 << 20, chunk: 1 << 16)
+        let cacheDirectory = directory.appendingPathComponent("cache")
+        cache = cacheClock.map { NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: 1 << 16, clock: $0) }
+            ?? NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: 1 << 16)
         let share = share
         nextShare = ControlledShare(data: share.bytes, bytesPerSecond: nextBytesPerSecond)
         let nextShare = nextShare
