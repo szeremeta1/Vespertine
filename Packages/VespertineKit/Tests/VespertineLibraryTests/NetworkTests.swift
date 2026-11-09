@@ -94,6 +94,18 @@ struct NetworkTests {
         #expect(result.after < 0.6)
     }
 
+    @Test("Async share work that never finishes (a mount, a keychain prompt nobody answers) is given up on at its deadline")
+    func asyncDeadline() async {
+        let started = Date()
+        let value = await NetworkVolume.waiting(atMost: 0.2, otherwise: -1) {
+            try? await Task.sleep(for: .seconds(3600))
+            return 1
+        }
+        #expect(value == -1)
+        #expect(Date().timeIntervalSince(started) < 60, "a hang detector, not a latency bound")
+        #expect(await NetworkVolume.waiting(atMost: 30, otherwise: -1) { 7 } == 7, "work that finishes in time gives its answer")
+    }
+
     @Test("Network reads are spread across folders")
     func interleaving() {
         let urls = ["/a/1", "/a/2", "/a/3", "/b/1", "/c/1", "/c/2"].map { URL(fileURLWithPath: $0) }
