@@ -63,6 +63,21 @@ struct UndecodedFormatTests {
         #expect(UndecodedFormat.undecodable(at: ContainerFormatTests.fixture("xhe-stereo.m4a")) == nil)
     }
 
+    @Test("A box whose 64-bit size runs past the largest offset ends the walk, not the app")
+    func mp4HugeLargesize() throws {
+        let dir = try temporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // size 1: the real size follows as 64 bits, here 0xFFFFFFFFFFFFFFF0 (a damaged or crafted file).
+        let damaged: [UInt8] = [0, 0, 0, 1] + Array("free".utf8) + [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF0]
+        let url = dir.appendingPathComponent("damaged.m4a")
+        try (mp4(entry: "ac-4") + Data(damaged)).write(to: url)
+        #expect(UndecodedFormat.undecodable(at: url) == .ac4)
+        let first = dir.appendingPathComponent("damaged-first.m4a")
+        let plain = mp4(entry: "ac-4")
+        try (plain.prefix(24) + Data(damaged) + plain.dropFirst(24)).write(to: first)     // right after ftyp
+        #expect(UndecodedFormat.undecodable(at: first) == nil)
+    }
+
     @Test("A raw AC-4 or MPEG-H stream is named, and played with a plain reason, not a vague failure")
     func rawStreams() throws {
         let dir = try temporaryDirectory()
