@@ -4,7 +4,7 @@ What Vespertine has been run on, and what each test did and did not show. A **re
 
 | Device | Connection | What was tested | Result | Status |
 |---|---|---|---|---|
-| FiiO K11 | USB | PCM at every rate to 384 kHz, DSD to DSD128 over DoP, 32-bit integer mode | Bit-perfect, see [VERIFICATION](VERIFICATION.md) | Tested |
+| FiiO K11 | USB | PCM at every rate to 384 kHz, DSD to DSD128 over DoP, 32-bit integer mode | BIT-PERFECT badge shown (app readback) | Reported |
 | Fosi Audio ZD3 | USB (XMOS XU316, 152a:889b) | **Output formats read from Core Audio on 2026-10-28:** PCM 44.1 kHz to 768 kHz at 24 and 32 bit, so the DoP carriers for DSD64, DSD128 and DSD256 (176.4, 352.8, 705.6 kHz) exist. Planning for those is unit-tested; DSD512 would need a 1411.2 kHz carrier and is converted to PCM | DSD played over DoP on 2026-10-28; the ZD3's display showed DSD (owner report, Vespertine 0.13.2). PCM playback tested up to 768 kHz and DSD up to DSD256, natively over DoP (owner report, 2026-10-28). DoP is on by default for it, see [DoPDefaults](../Packages/VespertineKit/Sources/VespertineAudio/DoPDefaults.swift) | Tested (owner report), 2026-10-28 |
 | AirPods Max | USB-C and Bluetooth | 48 kHz lossless over USB-C; AAC reported over Bluetooth | As documented in [FEATURES](FEATURES.md) | Tested |
 | MacBook Pro speakers | Built in | Stereo playback | Plays | Tested |

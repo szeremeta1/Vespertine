@@ -283,13 +283,13 @@ final class PlayerController {
         let upcoming = Array(queue[(c + 1)...])
         let byID = Dictionary(upcoming.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = Set<UUID>()
-        let moving = ids.filter { byID[$0] != nil && $0 != target && seen.insert($0).inserted }
+        let moving = ids.filter { byID[$0] != nil && $0 != target && seen.insert($0).inserted }.compactMap { byID[$0] }
         guard !moving.isEmpty else { return }
         var rest = upcoming.filter { !seen.contains($0.id) }
         let at = target.flatMap { t in rest.firstIndex { $0.id == t } } ?? rest.count
         let block = rest.prefix { $0.queuedByUser }.count
-        let joins = playingNext ?? (at < block || (at == block && block > 0 && moving.allSatisfy { byID[$0]!.queuedByUser }))
-        rest.insert(contentsOf: moving.map { var e = byID[$0]!; e.queuedByUser = joins; return e }, at: at)
+        let joins = playingNext ?? (at < block || (at == block && block > 0 && moving.allSatisfy(\.queuedByUser)))
+        rest.insert(contentsOf: moving.map { var e = $0; e.queuedByUser = joins; return e }, at: at)
         // Songs left behind Playing Next's last one aren't part of it any more (they'd play after the rest started).
         if let firstOther = rest.firstIndex(where: { !$0.queuedByUser }) {
             for i in rest.indices where i > firstOther { rest[i].queuedByUser = false }
@@ -415,6 +415,14 @@ final class PlayerController {
         queue = remapped
         originalOrder = originalOrder.map(remap)
         syncMirror()
+    }
+
+    /// A share came back mounted at another path and the library repointed its songs: queued entries still name the old
+    /// path (and the old offline-copy key), so the rest of the queue would fail to open. Point them at the new files.
+    func sourceRelinked(_ sourceID: Int64) {
+        let ids = Set((queue + originalOrder).compactMap { $0.track.sourceId == sourceID ? $0.track.id : nil })
+        guard !ids.isEmpty else { return }
+        tracksMoved(Dictionary(uniqueKeysWithValues: ids.map { ($0, $0) }))
     }
 
     func refreshReplayGain() {
@@ -592,20 +600,19 @@ final class PlayerController {
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
-            } else if let track, shares.isNetwork(track) {
-                // On a share, even asking whether the file exists can block for seconds: ask off the main thread.
+            } else if let track {
+                // Gone only when the file answers "no such file" and its source's folder still lists: a share that timed out or
+                // dropped its mount, or a folder the app may not read, is not a deleted song. Even asking can block for as long
+                // as a share does, so never on the main thread. Moved or deleted: look again now; moved songs rejoin the queue.
                 lastError = message
                 let path = track.filePath
+                let root = library.sources.first { $0.id == track.sourceId }?.path
                 Task { [weak self] in
-                    let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
-                    guard let self, !exists else { return }
+                    let gone = await NetworkVolume.blocking(timeout: 30, otherwise: false) { LibraryStore.fileIsGone(path, sourceRoot: root) }
+                    guard let self, gone else { return }
                     self.library.rescanForMissingFile(track)
-                    self.lastError = self.goneFileMessage(for: track)
+                    if self.lastError == message { self.lastError = self.goneFileMessage(for: track) }
                 }
-            } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
-                // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
-                library.rescanForMissingFile(track)
-                lastError = goneFileMessage(for: track)
             } else {
                 lastError = message
             }
@@ -620,6 +627,12 @@ final class PlayerController {
                 : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
+        case .speakerGroupCarriesOn(let group, let without):
+            guard !without.isEmpty else { break }
+            let names = ListFormatter.localizedString(byJoining: without)
+            lastError = without.count == 1
+                ? String(localized: "\(names) was disconnected. \(group) plays on without it.", comment: "A speaker group lost one output (%1$@, a DAC's name) and keeps playing on the others. %2$@ is the group's name.")
+                : String(localized: "\(names) were disconnected. \(group) plays on without them.", comment: "A speaker group lost several outputs (%1$@, their names joined as a list) and keeps playing on the others. %2$@ is the group's name.")
         }
     }
 
@@ -629,22 +642,30 @@ final class PlayerController {
     /// engine). Scans resume a few seconds after the buffer is healthy, and go one request at a time while a song
     /// streams. A scan at full width queued the song's reads behind dozens of its own: starting a song took 40 s
     /// with stalls every few seconds after.
+    /// The gate library scans of shares wait at (`ShareIOGate.shared`; tests give the player one of its own).
+    @ObservationIgnored var shareGate = ShareIOGate.shared
+
     private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
         let pending = requested != nil && current.map { shares.isNetwork($0.track) } == true
         let streaming = active && (snap.readingFromShare || pending)
-        ShareIOGate.shared.playerState(pending: pending, streaming: streaming,
+        shareGate.playerState(pending: pending, streaming: streaming,
                                        buffering: snap.isBuffering && snap.readingFromShare, bufferFill: snap.readingFromShare ? snap.bufferFill : 1)
     }
 
     /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
-    /// under a third full (or it's holding for more), and carry on once it's two thirds full again. On a link
+    /// under a third full (or it's holding for more), and carry on once it's two thirds full again; and to a song whose copy
+    /// from the share needs the link, whatever the buffer holds (`ShareIOGate`). On a link
     /// little faster than the music, a copy running alongside took half of it and the song stalled every few
     /// seconds; the copy still finishes when the link has room to spare.
     private func yieldCacheToPlayback(_ snap: EngineSnapshot) {
         let cache = shares.cache
         let yielding: Bool
-        if snap.state != .playing || !snap.readingFromShare { yielding = false }
+        // A song's copy from a share holds the scan gate while it needs the link: it is starting, it is behind the playhead, or
+        // a read waits on it. The output buffer can be full meanwhile (a start on a prefix), or there is none yet (a song copied
+        // whole before its first note): the copies wait too.
+        if shareGate.isPaused { yielding = true }
+        else if snap.state != .playing || !snap.readingFromShare { yielding = false }
         else if snap.isBuffering || snap.bufferFill < 1.0 / 3 { yielding = true }
         else if snap.bufferFill > 2.0 / 3 { yielding = false }
         else { yielding = cache.yieldsToPlayback }

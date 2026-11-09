@@ -138,11 +138,24 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
 
     /// Runs `body` with the decoding thread held (waiting out a decode call in progress) and what it decoded
     /// ahead dropped, then lets it carry on from wherever `body` left the decoder.
-    private func withDecoderHeld<T>(_ body: () throws -> T) rethrows -> T {
+    /// A decode call can wait on a share that has stopped answering for as long as it stays quiet: this thread's
+    /// `NetworkPlaybackCache.cancellingReads` gives up on that wait (`CancellationError`, nothing dropped).
+    /// Lock order: the check runs with `shared.condition` held and takes the engine's own lock (its command queue). Only the
+    /// engine thread installs such a check, and it never takes `shared.condition` while holding the engine's lock, so the
+    /// order is always this condition, then the engine's lock.
+    private func withDecoderHeld<T>(_ body: () throws -> T) throws -> T {
         let s = shared
         s.condition.lock()
         s.paused = true
-        while s.busy { s.condition.wait() }
+        while s.busy {
+            if NetworkPlaybackCache.readsCancelled {
+                s.paused = false
+                s.condition.broadcast()
+                s.condition.unlock()
+                throw CancellationError()
+            }
+            _ = s.condition.wait(until: Date().addingTimeInterval(0.025))
+        }
         s.spare += s.ready
         s.ready.removeAll()
         s.taken = 0
@@ -238,11 +251,21 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         set {
             guard let newValue, let dop = inner as? RawDoPDecoder else { return }
             // Frames decoded ahead carry the old sequence: they're decoded again with the new one.
-            withDecoderHeld {
-                if inner.position != position { try? inner.seek(to: position) }
-                dop.nextMarker = newValue
-                marker = (inner.position, newValue)
+            // Given up on (see `withDecoderHeld`), the marker stays as it was and `markerGivenUp` says so: the engine then
+            // abandons the song (`begin`).
+            do {
+                try withDecoderHeld {
+                    if inner.position != position { try? inner.seek(to: position) }
+                    dop.nextMarker = newValue
+                    marker = (inner.position, newValue)
+                }
+                markerGivenUp = false
+            } catch {
+                markerGivenUp = true
             }
         }
     }
+
+    /// The last DoP marker set (`nextDoPMarker`) was given up on, so the decoder carries on with the old sequence. Engine thread.
+    private(set) var markerGivenUp = false
 }

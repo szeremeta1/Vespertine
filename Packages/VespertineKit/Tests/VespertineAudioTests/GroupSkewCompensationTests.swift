@@ -141,6 +141,18 @@ struct GroupSkewCompensationTests {
         #expect(abs(result.group.members[0].skewMs - 0.367) < 1e-3)
     }
 
+    @Test("A follower measured earlier than the leader is held back by that much when it plays, as the leader never is resampled")
+    func applyNegativePlays() throws {
+        let result = try #require(GroupSkewCompensation.apply(measuredFrames: 10, rate: 48_000, to: group(), followerUID: fiio,
+                                                              leaderSpeaker: leaderSpeaker, followerSpeaker: followerSpeaker, corrected: true))
+        let delays = GroupDelay.perChannelMs(result.group, resampled: resampledFiio, rate: 48_000)
+        #expect(delays[0] == 0 && delays[1] == 0, "the leader waits for nobody")
+        #expect(abs(delays[2] - 0.367) < 1e-3 && abs(delays[3] - 0.367) < 1e-3, "the follower waits for the leader: \(delays)")
+        // At another rate the measurement doesn't hold: only the certain part (the resampler's delay on the follower) is left.
+        let other = GroupDelay.perChannelMs(result.group, resampled: resampledFiio, rate: 96_000)
+        #expect(abs(other[0] - 53.5 / 96) < 1e-9 && other[2] == 0, "\(other)")
+    }
+
     @Test("Only a follower can be measured, and the measurement must be a number")
     func applyRefusals() {
         #expect(GroupSkewCompensation.apply(measuredFrames: 600, rate: 48_000, to: group(), followerUID: fosi, leaderSpeaker: leaderSpeaker, followerSpeaker: followerSpeaker, corrected: true) == nil)
@@ -203,6 +215,20 @@ struct GroupSkewCompensationTests {
         g.members[0].rateTrimPPM = 0
         g.members[1].rateTrimPPM = -4    // a follower that gets ahead of the leader: the leader is the one that creeps (relatively)
         #expect(GroupDelay.advancePPM(g, resampled: resampledFiio) == [4, 0])
+    }
+
+    @Test("A leader brought forward by the rate trim is read between samples: its stereo song is not BIT-PERFECT, and a whole-frame chain still is")
+    func rateTrimOnTheLeaderChangesSamples() {
+        var g = group(followerSkew: 2, context: ctx, rateTrim: -4)   // the follower gets ahead: the leader is the one advanced
+        let chain = GroupDelay.chain(nil, group: g, resampled: resampledFiio)
+        #expect(chain?.channels.prefix(2).allSatisfy { $0.advancePPM == 4 } == true)
+        #expect(chain?.changesOnlyTiming(channels: [0, 1]) == false)
+        #expect(GroupSignalPath.stage(room: chain, used: [0, 1], equalizer: false, digitalVolumeDB: nil, replayGainDB: nil) == .roomCorrection)
+        // Without the trim the same chain is whole frames only, and the leader's pair stays bit-perfect.
+        g.members[1].rateTrimPPM = 0
+        let plain = GroupDelay.chain(nil, group: g, resampled: resampledFiio)
+        #expect(plain?.changesOnlyTiming(channels: [0, 1]) == true)
+        #expect(GroupSignalPath.stage(room: plain, used: [0, 1], equalizer: false, digitalVolumeDB: nil, replayGainDB: nil) == .integerDelay)
     }
 
     // MARK: In the real-time chain

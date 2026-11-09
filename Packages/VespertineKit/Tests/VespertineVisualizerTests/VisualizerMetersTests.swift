@@ -152,4 +152,36 @@ struct VisualizerMetersTests {
         #expect(frame.stereo.first == SIMD2(a[n - VisualizerFrame.stereoCount], b[n - VisualizerFrame.stereoCount]))
         #expect(VisualizerAnalyzer.stereoStride(for: 96_000) == 2 && VisualizerAnalyzer.stereoStride(for: 192_000) == 4)
     }
+
+    @Test("A NaN or infinite sample doesn't freeze the needles: they read the music again once it's gone")
+    func nonFiniteSamplesAreForgotten() {
+        let tone = Self.tone(Self.reference, frames: Int(Self.rate / 2))
+        for bad in [Float.nan, .infinity, -.infinity] {
+            var m = VisualizerMeters()
+            m.extras = [.wideVU, .typeI, .midSide]
+            var damaged = Array(tone.prefix(480))
+            damaged[100] = bad
+            damaged.withUnsafeBufferPointer { b in m.process(left: b, right: b, sampleRate: Self.rate, referenceDBFS: Self.reference) }
+            _ = Self.run(&m, tone)
+            #expect(m.vu.x.isFinite && m.vu.y.isFinite, "VU after \(bad): \(m.vu)")
+            #expect(m.vuWide.x.isFinite && m.vuWide.y.isFinite, "wide VU after \(bad): \(m.vuWide)")
+            #expect(abs(m.vu.x - VisualizerMeters.zeroVU) < 0.05, "VU after \(bad): \(m.vu.x)")
+            #expect(m.ppm(referenceDBFS: Self.reference).x.isFinite)
+        }
+    }
+
+    @Test("One infinite sample in the tap doesn't leave the analyzer's automatic reference or needles broken")
+    func analyzerRecoversFromNonFiniteSamples() {
+        let rate = 48_000.0, n = VisualizerAnalyzer.fftSize(for: rate)
+        let music = Self.tone(-14, frames: n)
+        let analyzer = VisualizerAnalyzer()
+        var damaged = music
+        damaged[n - 5] = .infinity
+        _ = analyzer.process(left: damaged, right: damaged, sampleRate: rate, fresh: true, dt: 1.0 / 60)
+        var frame = VisualizerFrame.silent(bands: 64, fine: 512)
+        for _ in 0..<600 { frame = analyzer.process(left: music, right: music, sampleRate: rate, fresh: true, dt: 1.0 / 60) }
+        #expect(frame.vu.x.isFinite && frame.ppm.x.isFinite)
+        // Automatic reference: 1 dB over the music's loudness (-14 dBFS RMS), not stuck at its lowest.
+        #expect(abs(Double(frame.meterReferenceDB) - -13) < 0.5, "reference \(frame.meterReferenceDB)")
+    }
 }

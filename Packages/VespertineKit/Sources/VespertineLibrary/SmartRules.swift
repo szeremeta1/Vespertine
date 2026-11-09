@@ -39,7 +39,7 @@ public struct SmartRules: Codable, Sendable, Hashable {
 
     public var orderBy: String {
         switch sort {
-        case .album: "albumArtistSortKey, albumSortKey, discNumber, trackNumber, location"
+        case .album: "vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber, location"
         case .recentlyAdded: "addedAt DESC"
         case .mostPlayed: "playCount DESC, lastPlayedAt DESC"
         case .recentlyPlayed: "lastPlayedAt DESC"

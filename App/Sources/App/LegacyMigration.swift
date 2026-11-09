@@ -14,9 +14,10 @@ enum LegacyMigration {
 
     /// Runs before the library opens. Does nothing for new users, test runs and libraries in a custom folder.
     @MainActor
-    static func runIfNeeded(defaults: UserDefaults = .standard, bundleID: String? = Bundle.main.bundleIdentifier) {
+    static func runIfNeeded(defaults: UserDefaults = .standard, bundleID: String? = Bundle.main.bundleIdentifier,
+                            launchArguments: [String: Any] = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)) {
         guard let bundleID, bundleID.hasPrefix("org.szeremeta.Vespertine"), !bundleID.hasSuffix(".roomtest"), defaults.object(forKey: doneKey) == nil,
-              defaults.string(forKey: "VespertineDataDirectory") == nil else { return }
+              !isTestRun(launchArguments) else { return }
         let dev = bundleID.hasSuffix(".dev")
         let legacyID = dev ? "org.nocturne.Nocturne.dev" : "org.nocturne.Nocturne"
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -56,6 +57,13 @@ enum LegacyMigration {
         }
         defaults.set(Date(), forKey: doneKey)
         migrationLog.notice("Brought over \(legacyPrefs.count) settings\(legacyLibrary ? " and the library" : "", privacy: .public) from Nocturne")
+    }
+
+    /// Whether this launch was given `-VespertineDataDirectory`. Only the launch argument counts, as everywhere else the
+    /// app reads it (`LaunchArguments`): a value left in the saved settings by `defaults write` doesn't use another
+    /// library, so it must not skip the move either, where nobody would see why the old library never arrived.
+    static func isTestRun(_ launchArguments: [String: Any]) -> Bool {
+        launchArguments["VespertineDataDirectory"] != nil
     }
 
     /// Settings not worth carrying over: update-check timing and testing overrides.

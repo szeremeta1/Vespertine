@@ -8,6 +8,8 @@ for copies distributed in binary form:
   Monkey's Audio, Musepack, mpg123, Speex, TagLib, Ogg, Vorbis, WavPack, DUMB, libsndfile, TTA, Opus, LAME), with
   their license texts.
 - One file per package, taken from that package's repository at the version Vespertine ships (App/Package.resolved).
+- Apache-2.0.txt: the Apache License 2.0, which covers the EBU R128 loudness analyzer in SFBAudioEngine (Copyright 2024
+  Google LLC). Taken from SFBAudioEngine's LICENSES folder at the version Vespertine ships.
 - FFmpeg-LGPL-2.1.txt: the license of the FFmpeg decoders built by scripts/build-dts-decoder.sh, and of the DST
   decoder for SACD images taken from FFmpeg's (Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c).
 

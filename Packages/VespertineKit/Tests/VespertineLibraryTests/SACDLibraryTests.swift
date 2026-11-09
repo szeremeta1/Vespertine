@@ -109,7 +109,7 @@ struct SACDLibraryTests {
             TITLE "Two"
             INDEX 01 00:00:01
         """.write(to: dir.appendingPathComponent("Compressed.cue"), atomically: true, encoding: .utf8)
-        let writer = try DatabaseQueue()
+        let writer = try DatabaseQueue(configuration: LibraryDatabase.queueConfiguration())
         try LibraryDatabase.migrator.migrate(writer, upTo: "v16-meta")
         let db = try LibraryDatabase(writer: writer, migrate: false)
         let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))

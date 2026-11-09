@@ -356,14 +356,11 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ## SACD images
 
-### CL-SACD-01 <a id="sacd-match"></a>Matched sacd_extract bit for bit on two real discs
+### CL-SACD-01 <a id="sacd-match"></a>Comparison with sacd_extract on real discs: not claimed
 
-- **Text:** `README.md:39`: "It matched sacd_extract bit for bit on two real discs."
-- **Text:** `docs/FEATURES.md:7`: "Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit"
-- **Text:** `docs/ARCHITECTURE.md:31`: "Their TOCs, the raw DST frames, the decoded DSD of three tracks per area including adjacent ones, the DoP and PCM output, and random seeks were all identical."
-- **Property:** for those images, TOC data, raw DST frames, decoded DSD, DoP and PCM output equal what `sacd_extract` produces.
+- **Status:** not claimed. The README, `docs/FEATURES.md`, `docs/ARCHITECTURE.md` and the website used to say Vespertine matched `sacd_extract` bit for bit on two real discs. Those sentences were removed because the repository holds no record of that comparison (F-03). It can come back only with a committed record from `hardware/SACD-ORACLE.md`.
 - **Governed by:** oracle. The Scarlet Book is not public, so no spec citation is possible.
-- **Route:** oracle (`hardware/SACD-ORACLE.md`, re-runnable on the maintainer's images).
+- **Route:** none; F-03.
 
 ### CL-SACD-02 <a id="sacd-dst"></a>DST decodes to the original DSD
 

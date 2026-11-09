@@ -119,6 +119,65 @@ struct FormatPlannerTests {
         #expect(!plan.dsdConvertedToPCM)
     }
 
+    /// A DoP-enabled DAC whose formats are `formats` at every rate it lists (44.1 to 384 kHz).
+    private func dopDAC(_ formats: [PhysicalFormat]) -> DeviceCapabilities {
+        DeviceCapabilities(sampleRates: k11.sampleRates, physicalFormats: formats, outputChannels: 2, supportsDoP: true)
+    }
+    private func format(_ bits: Int, integer: Bool = true, from: Double = 44_100, to: Double = 384_000, channels: Int = 2) -> PhysicalFormat {
+        PhysicalFormat(minRate: from, maxRate: to, bitDepth: bits, isInteger: integer, isMixable: true, channels: channels)
+    }
+
+    @Test("DoP only where the DAC takes 24-bit integers at the carrier rate; otherwise DSD is converted to PCM and the plan says why",
+          arguments: [
+              ("Float32 only", [PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2)]),
+              ("16-bit integer only", [PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 16, isInteger: true, isMixable: true, channels: 2)]),
+              ("24-bit only up to 96 kHz", [PhysicalFormat(minRate: 44_100, maxRate: 96_000, bitDepth: 24, isInteger: true, isMixable: true, channels: 2),
+                                            PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2)]),
+              ("24-bit at 176.4 kHz, mono only", [PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 24, isInteger: true, isMixable: true, channels: 1),
+                                                  PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2)]),
+          ])
+    func dopNeedsIntegerCarrier(name: String, formats: [PhysicalFormat]) {
+        let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        let plan = FormatPlanner.plan(source: src, device: dopDAC(formats))
+        #expect(plan.mode == .pcm, "\(name)")
+        #expect(plan.dsdConvertedToPCM)
+        #expect(plan.reason.contains("DoP") && plan.reason.contains("converted to PCM"), "\(plan.reason)")
+    }
+
+    @Test("DoP where the DAC takes 24- or 32-bit integers at the carrier rate", arguments: [24, 32])
+    func dopWithIntegerCarrier(bits: Int) {
+        for (rate, carrier) in [(2_822_400.0, 176_400.0), (5_644_800, 352_800)] {
+            let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: rate, bitDepth: 1, channels: 2)
+            let plan = FormatPlanner.plan(source: src, device: dopDAC([format(bits), format(32, integer: false)]))
+            #expect(plan.mode == .dop && plan.deviceSampleRate == carrier && plan.physicalBitDepth == bits)
+        }
+    }
+
+    @Test("Multichannel DoP on a DAC whose channels come as several stereo streams, when every stream that carries them takes 24-bit integers")
+    func dopAcrossStreams() {
+        let stereo24 = format(24, channels: 2), stereoFloat = format(32, integer: false, channels: 2)
+        func dac(_ streams: [[PhysicalFormat]]) -> DeviceCapabilities {
+            DeviceCapabilities(sampleRates: k11.sampleRates, physicalFormats: Array(Set(streams.flatMap { $0 })),
+                               outputChannels: streams.count * 2, supportsDoP: true, streamFormats: streams)
+        }
+        let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 6)
+        let four = FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24], [stereo24], [stereo24]]))
+        #expect(four.mode == .dop && four.channels == 6 && four.physicalBitDepth == 24)
+        // The channels go to the streams in order: one of the first three without an integer carrier means PCM.
+        let floatSecond = FormatPlanner.plan(source: src, device: dac([[stereo24], [stereoFloat], [stereo24], [stereo24]]))
+        #expect(floatSecond.mode == .pcm && floatSecond.dsdConvertedToPCM)
+        // The fourth stream isn't used by 5.1, so it doesn't matter what it takes.
+        #expect(FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24], [stereo24], [stereoFloat]])).mode == .dop)
+        // Too few streams for every channel: PCM.
+        #expect(FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24]])).mode == .pcm)
+    }
+
+    @Test("A DAC that lists no formats at all keeps DoP: the output checks the format it gets before playing")
+    func dopWithoutListedFormats() {
+        let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
+        #expect(FormatPlanner.plan(source: src, device: dopDAC([])).mode == .dop)
+    }
+
     @Test("DSD64 → PCM 352.8 kHz when DoP is off")
     func dsdToPCM() {
         let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
@@ -157,6 +216,49 @@ struct FormatPlannerTests {
             outputChannels: 2, supportsDoP: false)
         #expect(FormatPlanner.plan(source: pcm(22_050, 16), device: airPodsReal).deviceSampleRate == 48_000)
         #expect(FormatPlanner.plan(source: pcm(44_100, 16), device: airPodsReal).deviceSampleRate == 48_000)
+    }
+
+    /// AirPods as Core Audio lists them in music mode: 48 kHz stereo, plus the 24 kHz mono hands-free (call) mode.
+    private static let airPodsReal = DeviceCapabilities(
+        sampleRates: [24_000, 48_000],
+        physicalFormats: [
+            PhysicalFormat(minRate: 24_000, maxRate: 24_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 48_000, maxRate: 48_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2),
+        ],
+        outputChannels: 2, supportsDoP: false)
+    /// A generic Bluetooth headset: 44.1 and 48 kHz stereo, and 8 and 16 kHz mono for calls.
+    private static let bluetoothHeadset = DeviceCapabilities(
+        sampleRates: [8_000, 16_000, 44_100, 48_000],
+        physicalFormats: [
+            PhysicalFormat(minRate: 8_000, maxRate: 8_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 16_000, maxRate: 16_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 44_100, maxRate: 48_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2),
+        ],
+        outputChannels: 2, supportsDoP: false)
+
+    @Test("A mono song never puts Bluetooth headphones in their mono call mode", arguments: [
+        ("AirPods", 8_000.0, 48_000.0), ("AirPods", 11_025, 48_000), ("AirPods", 16_000, 48_000), ("AirPods", 22_050, 48_000),
+        ("AirPods", 24_000, 48_000), ("AirPods", 44_100, 48_000), ("AirPods", 48_000, 48_000),
+        ("Headset", 8_000, 48_000), ("Headset", 11_025, 44_100), ("Headset", 16_000, 48_000), ("Headset", 22_050, 44_100),
+        ("Headset", 24_000, 48_000), ("Headset", 32_000, 44_100), ("Headset", 44_100, 44_100),
+    ])
+    func monoNeverUsesCallMode(device: String, source: Double, expected: Double) {
+        let caps = device == "AirPods" ? Self.airPodsReal : Self.bluetoothHeadset
+        let mono = SourceFormat(encoding: .pcm, codec: "MP3", sampleRate: source, bitDepth: 16, channels: 1)
+        let plan = FormatPlanner.plan(source: mono, device: caps)
+        #expect(plan.deviceSampleRate == expected)
+        #expect(plan.channels == 1)
+    }
+
+    @Test("A device that has only its mono call mode left still plays, in that mode")
+    func monoOnlyDeviceStillPlays() {
+        let handsFree = DeviceCapabilities(
+            sampleRates: [24_000],
+            physicalFormats: [PhysicalFormat(minRate: 24_000, maxRate: 24_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1)],
+            outputChannels: 1, supportsDoP: false)
+        #expect(FormatPlanner.plan(source: pcm(44_100, 16), device: handsFree).deviceSampleRate == 24_000)
+        let mono = SourceFormat(encoding: .pcm, codec: "MP3", sampleRate: 22_050, bitDepth: 16, channels: 1)
+        #expect(FormatPlanner.plan(source: mono, device: handsFree).deviceSampleRate == 24_000)
     }
 
     @Test("Rate formatting")

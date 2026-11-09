@@ -130,6 +130,21 @@ struct NetworkStartTests {
         #expect(NetworkStart.lead(fileSize: size, position: 0, duration: 0, copied: 1 << 20, elapsed: 1) == size)   // no length
     }
 
+    @Test("The lead from the middle of a song (a seek, another output) plans on the part still to play, not the whole song")
+    func leadFromTheMiddle() {
+        let size: Int64 = 100 << 20, duration = 100.0       // 1 MiB of file per second of song
+        let mebibyte: Double = 1_048_576
+        // 0.5 MiB/s, trusted as 0.5 / 1.3: from halfway, 50 MiB remain and 50 s of song bring in 50 * 0.5 / 1.3 MiB of them.
+        let lead = NetworkStart.lead(fileSize: size, position: 50 << 20, duration: duration, copied: Int64(0.5 * 4 * mebibyte), elapsed: 4)
+        let arrivesWhilePlaying: Double = 50.0 * 0.5 / 1.3
+        let expected: Double = (50.0 - arrivesWhilePlaying) * mebibyte
+        let difference: Double = abs(Double(lead) - expected)
+        #expect(difference < mebibyte, "lead \(Double(lead) / mebibyte) MiB, expected about \(expected / mebibyte)")
+        // A link faster than the song still needs only the least, from anywhere.
+        #expect(NetworkStart.lead(fileSize: size, position: 50 << 20, duration: duration, copied: Int64(20 * 4 * mebibyte), elapsed: 4)
+                == NetworkStart.smallestLead)
+    }
+
     @Test("A decoder reads a song that is still being copied: the start waits for nothing but its prefix, and the whole song is exact")
     func decodesWhileCopying() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

@@ -5,9 +5,9 @@ evidence for `#sacd-dst`. **Records:** DST-003 (decoder against libdstdec on the
 disc format, `blocked-on-source`: the Scarlet Book is licensed to SACD licensees only, so there is no spec to cite
 and no purchase route).
 
-The README says Vespertine "matched sacd_extract bit for bit on two real discs". The repository holds no script or
-log of that comparison, so the claim can't be re-checked from the repository today. This procedure makes it
-re-runnable. Until it has been run and its output recorded, the claim rests on the earlier, unrecorded run.
+The README used to say Vespertine "matched sacd_extract bit for bit on two real discs". The repository holds no
+script or log of that comparison, so the sentence was removed (F-03) and nothing public claims it now. This procedure
+makes the comparison re-runnable. The claim may return only after it has been run and its output recorded.
 
 ## The oracle
 

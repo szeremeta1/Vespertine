@@ -184,6 +184,24 @@ struct ContainerFormatTests {
         #expect(throws: (any Error).self) { try SourceOpener.probe(Self.fixture("two-streams.mka"), audioStream: 2) }
     }
 
+    @Test("A picked stream that says it has no channels is refused when opened, not played into a crash")
+    func zeroChannelStream() throws {
+        // mp3-stereo.mka with its track's Channels element (9F 81 02) set to 0 and every MP3 frame sync cleared, so
+        // FFmpeg can't learn the channel count from the audio either.
+        var bytes = [UInt8](try Data(contentsOf: Self.fixture("mp3-stereo.mka")))
+        let channels = try #require((0..<bytes.count - 2).first { bytes[$0] == 0x9F && bytes[$0 + 1] == 0x81 && bytes[$0 + 2] == 2 })
+        let cluster = try #require((0..<bytes.count - 3).first { bytes[$0..<$0 + 4].elementsEqual([0x1F, 0x43, 0xB6, 0x75]) })
+        bytes[channels + 2] = 0
+        for i in cluster..<bytes.count - 1 where bytes[i] == 0xFF && bytes[i + 1] & 0xE0 == 0xE0 { bytes[i] = 0 }
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("zero-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("No channels.mka")
+        try Data(bytes).write(to: url)
+        #expect(throws: DTSError.self) { try FFmpegDecoder(url: url, stream: 0).open() }
+        #expect(throws: (any Error).self) { try SourceOpener.probe(url, audioStream: 0) }
+    }
+
     // MARK: Gapless
 
     /// Largest difference from a full-scale cosine at 440 Hz, which starts on its peak so any delay shows at once.

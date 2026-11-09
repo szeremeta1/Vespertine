@@ -258,7 +258,7 @@ final class LibraryStore {
                 try Row.fetchAll(db, sql: """
                     SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
                            count(*) AS tracks, max(artworkKey) AS art
-                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY min(albumArtistSortKey)
+                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
                     """).map { LibraryDatabase.ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
             }
             // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes
@@ -427,6 +427,24 @@ final class LibraryStore {
     var onTracksMoved: (([Int64: Int64]) -> Void)?
 
     private var missingRescanAt: [Int64: Date] = [:]
+
+    /// Whether a song's file is really gone: it answers "no such file" (ENOENT, ENOTDIR) while the folder of its source still
+    /// lists something. A timeout or any other error, or a source folder that no longer lists or lists empty (a share whose mount
+    /// dropped), is not "gone": the song must not be hidden as missing for it. Blocks for as long as a share that has stopped
+    /// answering does: call it off the main thread. `stat` and `list` stand in for the file system in tests.
+    nonisolated static func fileIsGone(_ path: String, sourceRoot root: String?,
+                                       stat statPath: (String) -> Int32 = LibraryStore.statError,
+                                       list: (String) -> [String]? = { try? FileManager.default.contentsOfDirectory(atPath: $0) }) -> Bool {
+        let error = statPath(path)
+        guard error == ENOENT || error == ENOTDIR, let root else { return false }
+        return list(root)?.isEmpty == false
+    }
+
+    /// 0 when `path` can be stat'ed, else the error.
+    nonisolated static func statError(_ path: String) -> Int32 {
+        var info = stat()
+        return stat(path, &info) == 0 ? 0 : errno
+    }
 
     /// A file the library lists is gone (moved or deleted, e.g. by a library manager reorganizing a share):
     /// rescan its source now, so moved files are found again. At most every two minutes per source.
@@ -664,6 +682,13 @@ final class LibraryStore {
 
     // MARK: Playlists from and for other players
 
+    /// A playlist file's text: M3U8 is UTF-8; an old .m3u is in the Windows or Latin-1 code page, where reading it as
+    /// UTF-8 would turn every accented letter in a file name into a replacement character and match nothing.
+    nonisolated static func playlistText(_ data: Data) -> String {
+        String(data: data, encoding: .utf8) ?? String(data: data, encoding: .windowsCP1252)
+            ?? String(data: data, encoding: .isoLatin1) ?? String(decoding: data, as: UTF8.self)
+    }
+
     /// Makes a playlist of each M3U / M3U8 file, from the songs of it already in the library.
     func importPlaylistFiles(_ urls: [URL]) async -> PlaylistImportResult {
         let database = database
@@ -672,8 +697,7 @@ final class LibraryStore {
                 var total = PlaylistImportResult()
                 for url in urls {
                     let data = try Data(contentsOf: url)
-                    // M3U8 is UTF-8; an old .m3u may be Latin-1.
-                    let text = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+                    let text = Self.playlistText(data)
                     let entries = M3U.entries(text, base: url.deletingLastPathComponent())
                     if let one = try database.importPlaylist(named: url.deletingPathExtension().lastPathComponent, entries: entries)?.1 {
                         total.playlists += one.playlists

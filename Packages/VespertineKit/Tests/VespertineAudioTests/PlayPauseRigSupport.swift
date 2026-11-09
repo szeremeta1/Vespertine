@@ -91,11 +91,32 @@ final class PlayPauseRig: @unchecked Sendable {
         }
     }
 
-    init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576) throws {
+    /// The song's file type on the share: "wav", or "flac" (made from the same noise).
+    let fileExtension: String
+
+    /// The WAV at `wav` encoded as a 24-bit FLAC beside it.
+    static func writeFLAC(from wav: URL) throws -> URL {
+        let source = try AVAudioFile(forReading: wav)
+        let url = wav.deletingPathExtension().appendingPathExtension("flac")
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatFLAC, AVSampleRateKey: source.fileFormat.sampleRate,
+                                       AVNumberOfChannelsKey: 2, AVEncoderBitDepthHintKey: 24]
+        let out = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let buffer = AVAudioPCMBuffer(pcmFormat: source.processingFormat, frameCapacity: 96_000)!
+        while source.framePosition < source.length {
+            try source.read(into: buffer)
+            try out.write(from: buffer)
+        }
+        return url
+    }
+
+    init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576,
+         fileExtension: String = "wav") throws {
+        self.fileExtension = fileExtension
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("playpause-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appendingPathComponent("song.wav")
+        var url = directory.appendingPathComponent("song.wav")
         try Self.writeWAV(url, seconds: seconds)
+        if fileExtension == "flac" { url = try Self.writeFLAC(from: url) }
         share = ControlledShare(data: try Data(contentsOf: url), bytesPerSecond: bytesPerSecond)
         cache = NetworkPlaybackCache(directory: directory.appendingPathComponent("cache"), budget: 256 << 20, chunk: 1 << 16)
         let share = share
@@ -132,7 +153,7 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     func nextItem() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/next.wav"), cacheKey: "next") }
-    func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.wav"), cacheKey: "song") }
+    func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.\(fileExtension)"), cacheKey: "song") }
 
     /// Stops the output's clock (nothing plays or is consumed) or starts it again: a test sets its scene while the song stands at its start,
     /// so how fast the machine runs cannot change how much of the song is left to play when the scene is ready.
@@ -167,4 +188,56 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     func sleep(ms: Int) async { try? await Task.sleep(for: .milliseconds(ms)) }
+
+    // MARK: A script on a thread of its own
+    //
+    // The song's buffered lead (15 s here) drains while it plays, so a scenario that says "paused while the share was quiet, with
+    // sound still buffered" holds only if the test reacts within that lead. A test awaiting `Task.sleep` resumes on one of Swift's
+    // few cooperative threads, and on a small runner running the whole package at once those can all be held by other tests for
+    // 20 s and more: the song then plays out its lead before the test gets to press anything. A script that must react in time
+    // runs on a plain thread (never the pool), records what it saw, and the test asserts on it afterwards.
+
+    /// Runs `script` on a thread of its own and returns what it returns, without holding a cooperative thread meanwhile.
+    func onOwnThread<T: Sendable>(_ script: @escaping @Sendable (PlayPauseRig) -> T) async -> T {
+        await withCheckedContinuation { continuation in
+            let thread = Thread { continuation.resume(returning: script(self)) }
+            thread.name = "Play/pause script"
+            thread.start()
+        }
+    }
+
+    /// `observe` for a script thread.
+    func observeBlocking(_ seconds: Double) -> Observation {
+        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Date()
+        Thread.sleep(forTimeInterval: seconds)
+        let s = engine.snapshot
+        let window = Date().timeIntervalSince(began)
+        return Observation(state: s.state, buffering: s.isBuffering, fraction: s.bufferingFraction, positionMoved: s.position - p0,
+                           audibleSeconds: Double(audibleFrames - a0) / Self.rate, window: window)
+    }
+
+    /// `wait` for a script thread (false on timeout).
+    func waitBlocking(timeout: Double = 10, _ condition: (EngineSnapshot) -> Bool) -> Bool {
+        let end = Date().addingTimeInterval(timeout)
+        while Date() < end {
+            if condition(engine.snapshot) { return true }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return false
+    }
+
+    /// Waits until `condition` has held of the snapshot for `hold` seconds without a break (false on timeout): an end state that has
+    /// settled, not one that was true for a moment on the way (a pause that a queued resume is about to undo). For a script thread.
+    func settledBlocking(timeout: Double, hold: Double, _ condition: (EngineSnapshot) -> Bool) -> Bool {
+        let end = Date().addingTimeInterval(timeout)
+        var since: Date?
+        while Date() < end {
+            if condition(engine.snapshot) {
+                since = since ?? Date()
+                if Date().timeIntervalSince(since!) >= hold { return true }
+            } else { since = nil }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return false
+    }
 }

@@ -94,6 +94,18 @@ struct NetworkTests {
         #expect(result.after < 0.6)
     }
 
+    @Test("Async share work that never finishes (a mount, a keychain prompt nobody answers) is given up on at its deadline")
+    func asyncDeadline() async {
+        let started = Date()
+        let value = await NetworkVolume.waiting(atMost: 0.2, otherwise: -1) {
+            try? await Task.sleep(for: .seconds(3600))
+            return 1
+        }
+        #expect(value == -1)
+        #expect(Date().timeIntervalSince(started) < 60, "a hang detector, not a latency bound")
+        #expect(await NetworkVolume.waiting(atMost: 30, otherwise: -1) { 7 } == 7, "work that finishes in time gives its answer")
+    }
+
     @Test("Network reads are spread across folders")
     func interleaving() {
         let urls = ["/a/1", "/a/2", "/a/3", "/b/1", "/c/1", "/c/2"].map { URL(fileURLWithPath: $0) }
@@ -187,6 +199,107 @@ struct NetworkTests {
 
         cache.clear(includingOffline: true)
         #expect(cache.usage() == NetworkCache.Usage())
+    }
+
+    @Test("Keep Offline refuses a copy the disk has no room for: nothing is written, the queue stops and the reason is shown")
+    func cacheRefusesWhenDiskIsFull() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-full-\(UUID().uuidString)")
+        let remote = dir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var tracks: [Track] = []
+        for i in 0..<2 {
+            let url = remote.appendingPathComponent("\(i).flac")
+            try Data(repeating: UInt8(i), count: 1_000_000).write(to: url)
+            var t = Track.stub(path: url.path)
+            t.fileSize = 1_000_000
+            tracks.append(t)
+        }
+        let cache = NetworkCache(directory: dir.appendingPathComponent("cache"), limitBytes: 1 << 30)
+        cache.freeSpace = { NetworkCache.freeSpaceReserve + 500_000 }   // room for half a song above what is kept free
+        cache.request(tracks, offline: true)
+        for _ in 0..<200 where cache.usage().downloading + cache.usage().queued > 0 { try await Task.sleep(for: .milliseconds(20)) }
+        let usage = cache.usage()
+        #expect(usage.offlineFiles == 0 && usage.downloading == 0 && usage.queued == 0)
+        #expect(usage.problem == CocoaError(.fileWriteOutOfSpace).localizedDescription)
+        let left = try FileManager.default.contentsOfDirectory(atPath: cache.directory.path).filter { $0 != "index.json" }
+        #expect(left.isEmpty, "nothing written: \(left)")
+
+        // Room again: asking again copies, and the reason goes away.
+        cache.freeSpace = { 1 << 40 }
+        cache.request(tracks, offline: true)
+        for _ in 0..<200 where cache.usage().offlineFiles < 2 { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.usage().offlineFiles == 2 && cache.usage().problem == nil)
+    }
+
+    @Test("The free space the caches go by is read for the cache's own volume, purgeable space included")
+    func freeSpaceOfTheCacheVolume() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-free-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let free = try #require(NetworkCache.freeBytes(at: dir))
+        let plain = try #require((try FileManager.default.attributesOfFileSystem(forPath: dir.path)[.systemFreeSize] as? NSNumber)?.int64Value)
+        #expect(free > 0)
+        #expect(free >= plain / 2, "the same volume: \(free) against \(plain) bytes")
+    }
+
+    @Test("A copy stops when the disk fills while it runs, and leaves no partial file")
+    func cacheStopsWhenDiskFills() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-filling-\(UUID().uuidString)")
+        let remote = dir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = remote.appendingPathComponent("big.flac")
+        try Data(repeating: 9, count: 10_000_000).write(to: url)
+        var track = Track.stub(path: url.path)
+        track.fileSize = 10_000_000
+        let cache = NetworkCache(directory: dir.appendingPathComponent("cache"), limitBytes: 1 << 30)
+        let asked = FreeSpaceAnswers()
+        // Plenty when the copy starts; then something else fills the disk.
+        cache.freeSpace = { asked.next() == 1 ? 1 << 40 : NetworkCache.freeSpaceReserve - 1 }
+        cache.request([track], offline: true)
+        for _ in 0..<200 where cache.usage().downloading + cache.usage().queued > 0 { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.usage().offlineFiles == 0)
+        #expect(cache.usage().problem != nil)
+        let left = try FileManager.default.contentsOfDirectory(atPath: cache.directory.path).filter { $0 != "index.json" }
+        #expect(left.isEmpty, "no partial copy: \(left)")
+    }
+
+    @Test("A share mounted again at another folder (\"Music Share-1\") keeps its Keep Offline copies: they are found under the new paths")
+    func offlineCopiesFollowARemount() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-remount-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let db = try LibraryDatabase.inMemory()
+        let old = "/Volumes/Music Share", new = "/Volumes/Music Share-1"
+        let source = try db.addSource(LibrarySource(path: old, mode: .reference, remoteURL: "smb://nas.local/Music%20Share"))
+        let data = Data(repeating: 42, count: 4096)
+        let staged = dir.appendingPathComponent("staged.flac")
+        try data.write(to: staged)
+        var track = Track.stub(path: "\(old)/The Vesper Quartet/01 Nocturne.flac")
+        track.sourceId = source.id
+        track.fileSize = Int64(data.count)
+        let inserted = track
+        try await db.writer.write { db in var row = inserted; try row.insert(db) }
+        let cache = NetworkCache(directory: dir.appendingPathComponent("persistent"), limitBytes: 1 << 20)
+        #expect(cache.adopt(track, from: staged))
+        for _ in 0..<200 where cache.isPending(track) { try await Task.sleep(for: .milliseconds(10)) }
+        cache.setOffline(true, for: [track])
+        #expect(cache.isOffline(track))
+
+        try db.relinkSource(source.id!, to: new)
+        let moved = try #require(try db.allTracks().first)
+        #expect(moved.filePath == "\(new)/The Vesper Quartet/01 Nocturne.flac")
+        #expect(cache.relink(from: old, to: new, database: db) == 1)
+        #expect(cache.isOffline(moved), "still kept offline")
+        let copy = try #require(cache.localURL(forKey: NetworkCache.key(for: moved)))
+        #expect(try Data(contentsOf: copy) == data)
+        #expect(cache.usage().offlineFiles == 1, "moved, not duplicated")
+        #expect(!cache.isAvailable(track), "nothing left under the old key")
+
+        // The index on disk says so too: a cache opened afresh finds it.
+        let reopened = NetworkCache(directory: dir.appendingPathComponent("persistent"), limitBytes: 1 << 20)
+        #expect(reopened.isOffline(moved))
     }
 
     @Test("The persistent cache adopts staged bytes without reopening an unavailable share")
@@ -288,4 +401,11 @@ extension Track {
               extraTags: [:], rgTrackGain: nil, rgTrackPeak: nil, rgAlbumGain: nil, rgAlbumPeak: nil, artworkKey: nil,
               playCount: 0, lastPlayedAt: nil, isMissing: false, effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
     }
+}
+
+/// Counts the times the free space was asked for.
+private final class FreeSpaceAnswers: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+    func next() -> Int { lock.withLock { count += 1; return count } }
 }

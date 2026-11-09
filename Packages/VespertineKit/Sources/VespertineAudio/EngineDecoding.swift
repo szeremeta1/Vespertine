@@ -49,7 +49,7 @@ final class Decoding {
         self.item = item
         self.probed = probed
         self.decoder = decoder
-        self.path = path
+        var path = path
         let own = decoder.processingFormat.channelLayout
         var router: BedRouter?
         // PCM only: a group's router is never given DoP or bitstream words (the group's plan is always PCM).
@@ -70,7 +70,10 @@ final class Decoding {
             router = BedRouter(source: speakers, bed: bed)
         } else if groupRouter == nil, !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
             router = fold
+            // Channels with no speaker of their own are mixed into their neighbours: the signal path names the setup.
+            path.foldedOnto = layout.map { ChannelLayouts.name(labels: $0.channelLabels, channels: Int($0.channelCount)) }
         }
+        self.path = path
         self.router = router
         self.groupRouter = groupRouter
         self.upmixer = upmixer

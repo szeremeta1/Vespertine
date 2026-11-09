@@ -47,7 +47,7 @@ public struct SpeakerGroupBook: Equatable, Sendable {
     /// The name, or the name with the first number from 2 that no group has taken ("Downstairs", "Downstairs 2", "Downstairs 3").
     public func availableName(_ wanted: String) -> String {
         let base = wanted.trimmingCharacters(in: .whitespacesAndNewlines)
-        let name = base.isEmpty ? "Speaker group" : base
+        let name = base.isEmpty ? String(localized: "Speaker group", comment: "The name a new speaker group gets when none was typed.") : base
         let taken = Set(groups.map(\.name))
         if !taken.contains(name) { return name }
         var n = 2

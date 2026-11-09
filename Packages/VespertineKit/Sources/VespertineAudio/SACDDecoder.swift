@@ -37,6 +37,8 @@ final class SACDFrameReader {
     private var buffer: [UInt8] = []
     private var bufferStart = -1
     private static let readAhead = 32
+    /// Sectors read from the file so far (for tests: how much a seek costs).
+    private(set) var sectorsRead = 0
 
     init(url: URL, area: SACDImage.Area) throws {
         handle = try PlaybackFile(forReadingFrom: url)
@@ -55,24 +57,38 @@ final class SACDFrameReader {
             guard count > 0 else { return nil }
             buffer = try SACDImage.sectors(handle, s, count, area.layout)
             bufferStart = s
+            sectorsRead += count
             guard buffer.count >= size else { return nil }
         }
         let o = (s - bufferStart) * size
         return buffer[o..<o + size]
     }
 
-    /// The time code of the first frame starting in sector `s` or after it; nil if none does.
+    /// A frame starts at least this often in a readable area: the largest plain frame (DSD256, 6 channels) spans about 56
+    /// sectors. Further than this with no frame start is damage (a zero-filled stretch of a partly downloaded image).
+    static let frameStartSpan = 64
+
+    /// The time code of the first frame starting in sector `s` or within `frameStartSpan` sectors after it; nil if
+    /// none does. Searching on through a damaged stretch would read it one sector at a time, on every probe of a seek.
     private func firstStart(from s: Int) throws -> Int? {
-        for s in s...max(s, area.lastSector) {
+        for s in s...max(s, min(area.lastSector, s + Self.frameStartSpan - 1)) {
             guard let data = try load(s, ahead: false) else { return nil }
             let b = data.startIndex
             let packets = Int(data[b] >> 5), starts = Int(data[b] >> 2 & 7)
             let o = b + 1 + 2 * packets
-            if starts > 0, o + 3 <= data.endIndex {
-                return (Int(data[o]) * 60 + Int(data[o + 1])) * SACDImage.framesPerSecond + Int(data[o + 2])
-            }
+            // A damaged time code says nothing about where the sector is: look on.
+            if starts > 0, let tc = timecode(data, at: o) { return tc }
         }
         return nil
+    }
+
+    /// The frame time code (minutes, seconds, frames) at `o`; nil when it can't be one of this area's frames: seconds
+    /// or frames out of range, or past the end of the last track. One damaged byte then costs that frame, not the rest
+    /// of the track (a time code far ahead would send the reader past every frame still to play).
+    private func timecode(_ data: ArraySlice<UInt8>, at o: Int) -> Int? {
+        guard o + 3 <= data.endIndex, data[o + 1] < 60, Int(data[o + 2]) < SACDImage.framesPerSecond else { return nil }
+        let tc = (Int(data[o]) * 60 + Int(data[o + 1])) * SACDImage.framesPerSecond + Int(data[o + 2])
+        return tc < area.frameRange.upperBound ? tc : nil
     }
 
     /// Positions the reader so the next frame it returns is the one with time code `timecode` (or the first after it).
@@ -119,11 +135,10 @@ final class SACDFrameReader {
         }
         // At most 7 packets of at most 2045 bytes: anything else is a damaged sector.
         guard packets <= 7, infos.allSatisfy({ $0.length <= 2045 }) else { building = nil; return }
-        var timecodes: [(timecode: Int, packets: Int)] = []
+        var timecodes: [(timecode: Int?, packets: Int)] = []
         for _ in 0..<starts {
             guard p + 3 <= data.endIndex else { return }
-            let tc = (Int(data[p]) * 60 + Int(data[p + 1])) * SACDImage.framesPerSecond + Int(data[p + 2])
-            timecodes.append((tc, dst && p + 4 <= data.endIndex ? Int(data[p + 3] >> 2 & 0x1F) : 0))
+            timecodes.append((timecode(data, at: p), dst && p + 4 <= data.endIndex ? Int(data[p + 3] >> 2 & 0x1F) : 0))
             p += dst ? 4 : 3
         }
         var nextStart = 0
@@ -137,7 +152,8 @@ final class SACDFrameReader {
                 let tc = nextStart < timecodes.count ? timecodes[nextStart].timecode : (building?.timecode ?? -1) + 1
                 packetsLeft = nextStart < timecodes.count ? timecodes[nextStart].packets : 0
                 nextStart += 1
-                building = Frame(timecode: tc, data: [], isDST: dst)
+                // A damaged time code: the frame is left out (and played as silence), its packets skipped.
+                building = tc.map { Frame(timecode: $0, data: [], isDST: dst) }
                 building?.data.reserveCapacity(dst ? 8192 : plainSize)
             }
             guard building != nil else { continue }        // the tail of a frame that started before a seek

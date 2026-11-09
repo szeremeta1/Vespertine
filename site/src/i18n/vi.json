@@ -69,7 +69,7 @@
         "và hi-res,"
       ],
       "titleBrass": "ngay trên Mac của bạn.",
-      "lede": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Atmos nằm chung một thư viện với các album stereo của bạn, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Hiệu chỉnh phòng đo căn phòng của bạn bằng micro USB và hiệu chỉnh từng loa; tính năng này luôn tắt cho đến khi bạn bật lên. Đường tín hiệu hiển thị từng bước từ tệp đến đầu ra. Có bằng tiếng Anh và {languages} ngôn ngữ khác.",
+      "lede": "Trình phát miễn phí, mã nguồn mở cho Mac dành cho bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, DSD, đĩa DTS CD, các tệp DTS-HD MA, TrueHD và Atmos nằm chung một thư viện với các album stereo của bạn, kèm Âm thanh không gian trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ). Hiệu chỉnh phòng đo căn phòng của bạn bằng micro USB và hiệu chỉnh từng loa; tính năng này luôn tắt cho đến khi bạn bật lên. Đường tín hiệu hiển thị từng bước từ tệp đến đầu ra. Có bằng tiếng Anh và {languages} ngôn ngữ khác.",
       "ask": "Bạn thấy thích?",
       "star": "Gắn sao trên GitHub",
       "discuss": "Tham gia thảo luận",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Âm thanh vòm chung một thư viện",
-        "text": "Ảnh đĩa và bản rip SACD, đĩa DVD-Video, đĩa DTS CD, DTS-HD MA và TrueHD nằm cạnh các album stereo của bạn và phát dưới dạng Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Khi một album có cả hai phiên bản, mỗi bài hát chỉ được liệt kê một lần và phiên bản phù hợp với đầu ra của bạn sẽ được phát."
+        "text": "Ảnh đĩa và bản rip SACD, đĩa DVD-Video, đĩa DTS CD, DTS-HD MA và TrueHD nằm cạnh các album stereo của bạn và phát qua bộ kết xuất Âm thanh không gian của Apple trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ). Khi một album có cả hai phiên bản, mỗi bài hát chỉ được liệt kê một lần và phiên bản phù hợp với đầu ra của bạn sẽ được phát."
       },
       {
         "title": "Đường tín hiệu bạn có thể kiểm chứng",
@@ -126,7 +126,7 @@
         "title": "Mỗi bản nhạc ở đúng tần số và độ sâu gốc.",
         "lede": "Đường tín hiệu liệt kê từng bước từ tệp đến DAC của bạn, được đọc lại từ Core Audio, và cho biết khi có thứ gì đó làm thay đổi các mẫu âm thanh.",
         "body": [
-          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ lấy mẫu lại, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát lại đã được kiểm thử với PCM đến 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM đến 384 kHz và DSD128 trên FiiO K11."
+          "Vespertine chuyển thiết bị sang đúng tần số lấy mẫu của từng tệp và chỉ lấy mẫu lại, bằng bộ chuyển đổi chất lượng mastering của Apple, khi DAC không chạy được tần số đó. <span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi các điều kiện trong mã nguồn được đáp ứng: tần số gốc, không có gì làm thay đổi mẫu âm thanh, độ dài từ phù hợp, và thiết bị đang ở chế độ độc quyền hoặc không dùng chung với ứng dụng khác. Phát lại đã được kiểm thử với PCM đến 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM đến 384 kHz và DSD128 trên FiiO K11 (báo cáo của nhà phát triển; xem docs/DEVICES.md)."
         ],
         "list": [
           "Chế độ độc quyền (hog) ngăn các ứng dụng khác dùng thiết bị. Ở chế độ chia sẻ, phím âm lượng và Digital Crown điều chỉnh DAC của bạn; ở chế độ độc quyền chúng cũng làm được vậy nếu bạn bật tùy chọn đó.",
@@ -181,7 +181,7 @@
           "Ba mục tiêu: Warm (mặc định), Gentle tilt và Flat. Chỉ hiệu chỉnh âm trầm hoặc hiệu chỉnh toàn dải, và thiết kế lại bộ lọc sau này mà không cần đo lại.",
           "Nhập bộ lọc từ REW hoặc Equalizer APO, kèm độ trễ và mức của từng loa, và xuất văn bản Equalizer APO.",
           "Nhập đáp ứng xung (WAV, AIFF, CAF hoặc FLAC) và phát chúng bằng xử lý tích chập.",
-          "Stereo và 5.1.",
+          "Stereo và 5.1 (5.1 được kiểm thử với phòng mô phỏng và hồ sơ nhập vào, chưa kiểm thử trong phòng 5.1 thật).",
           "Chân dung căn phòng hiển thị các loa, chỗ ngồi của bạn và từng vị trí đặt micro khi vị trí đó được đo. Sau đó, hoạt ảnh chuyển đường cong biến đáp tuyến đo được thành đáp tuyến dự đoán, và một nút chuyển trước/sau giúp so sánh hai đường."
         ],
         "note": "Đường cong “sau” được dự đoán từ phép đo và các bộ lọc, không phải được đo thực tế. Để biết căn phòng thực sự tác động thế nào, hãy đo lại khi đã bật hiệu chỉnh.",
@@ -196,9 +196,9 @@
         "jack": "Âm thanh vòm",
         "kicker": "Âm thanh vòm & Âm thanh không gian",
         "title": "Đĩa 5.1 của bạn, trong cùng thư viện.",
-        "lede": "Nhạc đa kênh phát dưới dạng Âm thanh không gian theo dõi chuyển động đầu trên AirPods, hoặc được downmix theo bố cục kênh trên DAC stereo.",
+        "lede": "Nhạc đa kênh phát qua bộ kết xuất Âm thanh không gian của Apple trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ), hoặc được downmix theo bố cục kênh trên DAC stereo.",
         "body": [
-          "Đĩa DTS CD được giải mã thành 5.1. Ảnh đĩa SACD, các bản nhạc SACD đã trích xuất, FLAC đa kênh, TrueHD và DTS-HD MA được kết xuất thành Âm thanh không gian theo dõi chuyển động đầu trên AirPods hoặc được downmix trên DAC stereo. Dolby Digital Plus kèm Atmos dùng bộ kết xuất đối tượng của macOS; TrueHD Atmos và DTS:X phát lớp kênh nền của chúng. Xuất tín hiệu đúng từng kênh là tính năng thử nghiệm, chưa được kiểm tra trên receiver thật và DAC USB đa kênh (mới thử với một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo."
+          "Đĩa DTS CD được giải mã thành 5.1. Ảnh đĩa SACD, các bản nhạc SACD đã trích xuất, FLAC đa kênh, TrueHD và DTS-HD MA được kết xuất qua bộ kết xuất Âm thanh không gian của Apple trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ) hoặc được downmix trên DAC stereo. Dolby Digital Plus kèm Atmos dùng bộ kết xuất đối tượng của macOS; TrueHD Atmos và DTS:X phát lớp kênh nền của chúng. Xuất tín hiệu đúng từng kênh là tính năng thử nghiệm, chưa được kiểm tra trên receiver thật và DAC USB đa kênh (mới thử với một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo."
         ],
         "list": [
           "Phiên bản stereo và âm thanh vòm của một album chỉ được liệt kê một lần; Vespertine phát bản phù hợp với đầu ra, hoặc bản bạn đã ghim.",
@@ -215,11 +215,11 @@
         "title": "Phát thẳng từ ảnh đĩa.",
         "lede": "Chỉ cần trỏ Vespertine tới một ảnh đĩa SACD hoặc DVD-Video là ứng dụng phát nhạc trực tiếp từ đó, không cần gắn ảnh đĩa thành ổ, không trích xuất hay ghi ra thứ gì.",
         "body": [
-          "Ảnh đĩa SACD <span class=\"mono\">.iso</span> phát được cả vùng stereo lẫn vùng 5.1, dù nén DST hay không nén, với tên lấy từ chính văn bản trên đĩa. DST được giải mã trở lại chính xác dòng DSD ban đầu, nên phần stereo được gửi tới DAC của bạn dưới dạng DSD gốc qua DoP nếu DAC hỗ trợ, còn 5.1 phát dưới dạng Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Nhạc LPCM trên đĩa DVD-Video (một tệp <span class=\"mono\">.iso</span> hoặc thư mục <span class=\"mono\">VIDEO_TS</span>) được phát chính xác từng bit, mỗi tiêu đề là một album và mỗi chương là một bản nhạc."
+          "Ảnh đĩa SACD <span class=\"mono\">.iso</span> phát được cả vùng stereo lẫn vùng 5.1, dù nén DST hay không nén, với tên lấy từ chính văn bản trên đĩa. DST được giải mã trở lại chính xác dòng DSD ban đầu, nên phần stereo được gửi tới DAC của bạn dưới dạng DSD gốc qua DoP nếu DAC hỗ trợ, còn 5.1 phát qua bộ kết xuất Âm thanh không gian của Apple trên AirPods. Nhạc LPCM trên đĩa DVD-Video (một tệp <span class=\"mono\">.iso</span> hoặc thư mục <span class=\"mono\">VIDEO_TS</span>) được phát chính xác từng bit, mỗi tiêu đề là một album và mỗi chương là một bản nhạc."
         ],
         "list": [
-          "Khớp từng bit với sacd_extract trên hai đĩa thật. Các đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên cho đến nay mới chỉ được kiểm tra bằng ảnh đĩa thử nghiệm tổng hợp.",
-          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang, hoặc được chuyển đổi thành PCM tần số cao. DoP đã được xác nhận tới DSD256 trên Fosi Audio ZD3 và tới DSD128 trên FiiO K11; DSD512 qua DoP chưa được kiểm tra trên phần cứng.",
+          "Ảnh đĩa SACD đã được kiểm thử bằng đĩa tổng hợp, gồm cả đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên.",
+          "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang (tới DSD256 trên các DAC đã thử), hoặc được chuyển đổi thành PCM tần số cao. DoP được báo cáo là hoạt động tới DSD256 trên Fosi Audio ZD3 và tới DSD128 trên FiiO K11 (báo cáo của nhà phát triển, không có bản ghi); DSD512 qua DoP chưa được kiểm tra trên phần cứng.",
           "DVD-Video LPCM ở 16, 20 và 24 bit, 48 và 96 kHz, tối đa 8 kênh. DVD-Audio không được hỗ trợ, và đĩa mã hóa (CSS) cần một bản sao đã giải mã."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Ứng dụng có hiệu chỉnh phòng không?",
-          "a": "Có. Hãy đo căn phòng của bạn bằng UMIK-1 hoặc một micro USB đã hiệu chuẩn khác tại một đến năm vị trí quanh chỗ ngồi, và Vespertine sẽ thiết kế bộ lọc phù hợp cho từng loa, đồng thời căn chỉnh độ trễ và mức của các loa, ở cấu hình stereo hoặc 5.1. Ứng dụng cũng nhập được bộ lọc REW và Equalizer APO, cùng các đáp ứng xung. Tính năng này tắt theo mặc định, phát lại vẫn bit-perfect khi tính năng tắt, và đường tín hiệu hiển thị <span class=\"mono nowrap\">HIỆU CHỈNH PHÒNG</span> khi tính năng bật. <a href=\"{href.roomCorrection}\">Cách hiệu chỉnh phòng hoạt động</a>."
+          "a": "Có. Hãy đo căn phòng của bạn bằng UMIK-1 hoặc một micro USB đã hiệu chuẩn khác tại một đến năm vị trí quanh chỗ ngồi, và Vespertine sẽ thiết kế bộ lọc phù hợp cho từng loa, đồng thời căn chỉnh độ trễ và mức của các loa, ở cấu hình stereo hoặc 5.1 (5.1 được kiểm thử với phòng mô phỏng và hồ sơ nhập vào, chưa kiểm thử trong phòng 5.1 thật). Ứng dụng cũng nhập được bộ lọc REW và Equalizer APO, cùng các đáp ứng xung. Tính năng này tắt theo mặc định, phát lại vẫn bit-perfect khi tính năng tắt, và đường tín hiệu hiển thị <span class=\"mono nowrap\">HIỆU CHỈNH PHÒNG</span> khi tính năng bật. <a href=\"{href.roomCorrection}\">Cách hiệu chỉnh phòng hoạt động</a>."
         },
         {
           "q": "Có phát được đĩa SACD và DVD không?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Có phát Dolby Atmos không?",
-          "a": "Dolby Digital Plus có Atmos được phát qua bộ kết xuất đối tượng của macOS, thành Âm thanh không gian có theo dõi chuyển động đầu trên AirPods. TrueHD Atmos và DTS:X phát lớp kênh nền không tổn hao; các đối tượng của chúng không được kết xuất. Xuất bitstream tới AV receiver đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực; rất mong nhận được báo cáo."
+          "a": "Dolby Digital Plus có Atmos được phát qua bộ kết xuất đối tượng của macOS, thành Âm thanh không gian trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ). TrueHD Atmos và DTS:X phát lớp kênh nền không tổn hao; các đối tượng của chúng không được kết xuất. Xuất bitstream tới AV receiver đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực; rất mong nhận được báo cáo."
         },
         {
           "q": "Ứng dụng có thay đổi tệp của tôi không?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Đã được kiểm thử trên phần cứng nào?",
-          "a": "Phát lại đã được kiểm thử với PCM tới 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM tới 384 kHz và DSD128 trên FiiO K11; trên thiết bị này, chế độ số nguyên cũng đã được kiểm thử. Ứng dụng cũng đã được kiểm thử trên AirPods Max qua USB-C và Bluetooth, loa MacBook Pro, và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
+          "a": "Phát lại đã được kiểm thử với PCM tới 768 kHz và DSD256 trên Fosi Audio ZD3, và với PCM tới 384 kHz và DSD128 trên FiiO K11 (báo cáo của nhà phát triển; xem docs/DEVICES.md); trên thiết bị này, chế độ số nguyên cũng đã được kiểm thử. Ứng dụng cũng đã được kiểm thử trên AirPods Max qua USB-C và Bluetooth, loa MacBook Pro, và một TV Sony qua HDMI ở cấu hình 5.1. Phần cứng Intel chưa được kiểm thử. Xuất bitstream tới receiver và đầu ra DAC đa kênh đang ở giai đoạn thử nghiệm, chưa được kiểm thử trên receiver thực và DAC USB đa kênh (đã kiểm thử một TV Sony qua HDMI: xem docs/DEVICES.md); <a href=\"{href.dacReport}\">rất mong nhận được báo cáo</a>."
         },
         {
           "q": "Có ngôn ngữ của tôi không?",
@@ -601,7 +601,7 @@
     "ogAlt": "Bộ tài liệu báo chí Vespertine: bảng thông tin, logo, ảnh chủ đạo, ảnh chụp màn hình thật và đoạn giới thiệu, trên nền ba ảnh chụp màn hình thật của ứng dụng.",
     "eyebrow": "Tài liệu báo chí",
     "heading": "Mọi thứ bạn cần để viết bài về {name}.",
-    "lede": "Vespertine là trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, các bản nhạc SACD 5.1 đã trích xuất, CD DTS, tệp DTS-HD MA, TrueHD và Atmos cùng nằm trong một thư viện, kèm Âm thanh không gian theo dõi chuyển động đầu trên AirPods. Đường tín hiệu cho thấy từng bước từ tệp đến đầu ra, với các điều kiện và bài kiểm thử nằm trong mã nguồn GPL mà ai cũng có thể kiểm tra.",
+    "lede": "Vespertine là trình phát miễn phí, mã nguồn mở trên Mac dành cho các bộ sưu tập nhạc âm thanh vòm và hi-res. Ảnh đĩa SACD và DVD-Video, các bản nhạc SACD 5.1 đã trích xuất, CD DTS, tệp DTS-HD MA, TrueHD và Atmos cùng nằm trong một thư viện, kèm Âm thanh không gian trên AirPods (có theo dõi chuyển động đầu khi macOS hỗ trợ). Đường tín hiệu cho thấy từng bước từ tệp đến đầu ra, với các điều kiện và bài kiểm thử nằm trong mã nguồn GPL mà ai cũng có thể kiểm tra.",
     "fine": "Xuất tín hiệu đúng từng kênh và bitstream tới receiver là tính năng thử nghiệm, chưa được kiểm thử trên receiver thật và DAC USB đa kênh (mới thử một TV Sony qua HDMI: xem docs/DEVICES.md); rất mong nhận được báo cáo. Đối tượng Atmos trong Dolby Digital Plus do macOS kết xuất; TrueHD Atmos và DTS:X phát lớp kênh nền của chúng.",
     "facts": {
       "eyebrow": "Bảng thông tin",

@@ -16,6 +16,7 @@ struct FavoriteButton: View {
     var appModel: AppModel? = nil
     @State private var hovering = false
     @State private var bounce = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         if let model = appModel ?? environmentModel { button(model) }
@@ -25,7 +26,7 @@ struct FavoriteButton: View {
         let isOn = model.library.isFavorite(track)
         return Button {
             guard let track else { return }
-            if !isOn { bounce += 1 }
+            if !isOn, !reduceMotion { bounce += 1 }
             model.toggleFavorite([track])
         } label: {
             Image(systemName: isOn ? "heart.fill" : "heart")

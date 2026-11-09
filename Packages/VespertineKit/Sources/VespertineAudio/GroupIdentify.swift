@@ -29,7 +29,7 @@ public enum GroupIdentify {
     /// Why the tone can't play now, or nil. The group's DACs are held while its output is in use.
     public static func refusal(for group: SpeakerGroup, outputInUseUID: String?) -> String? {
         guard outputInUseUID == group.outputUID else { return nil }
-        return "Stop playback first: the group's outputs are in use."
+        return String(localized: "Stop playback first: the group's outputs are in use.")
     }
 }
 

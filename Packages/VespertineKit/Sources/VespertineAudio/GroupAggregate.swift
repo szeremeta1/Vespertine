@@ -24,12 +24,12 @@ public enum GroupAggregateError: Error, Equatable, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .tooFewMembers: "A group needs at least two outputs."
-        case .duplicateMember(let uid): "The output \(uid) is in the group twice."
-        case .leaderNotAMember(let uid): "The clock leader \(uid) is not one of the group's outputs."
-        case .invalidMember(let uid): "The settings for \(uid) are not valid."
-        case .creation(let status): "macOS could not combine the outputs (\(status))."
-        case .notListed: "macOS did not list the combined output."
+        case .tooFewMembers: String(localized: "A group needs at least two outputs.")
+        case .duplicateMember(let uid): String(localized: "The output \(uid) is in the group twice.")
+        case .leaderNotAMember(let uid): String(localized: "The clock leader \(uid) is not one of the group's outputs.")
+        case .invalidMember(let uid): String(localized: "The settings for \(uid) are not valid.")
+        case .creation(let status): String(localized: "macOS could not combine the outputs (\(Int(status))).")
+        case .notListed: String(localized: "macOS did not list the combined output.")
         }
     }
 }
@@ -175,7 +175,10 @@ public final class GroupAggregateDevice: @unchecked Sendable {
     }
 
     /// The aggregate's sub-devices as Core Audio holds them.
-    public func subDeviceStates() -> [SubDeviceState] {
+    public func subDeviceStates() -> [SubDeviceState] { Self.subDeviceStates(of: id) }
+
+    /// The sub-devices of the aggregate `id` as Core Audio holds them (none for a device that isn't an aggregate).
+    public static func subDeviceStates(of id: AudioObjectID) -> [SubDeviceState] {
         let owned = (try? HAL.getArray(id, .global(kAudioObjectPropertyOwnedObjects), of: AudioObjectID.self)) ?? []
         return owned.compactMap { object in
             guard (try? HAL.get(object, .global(kAudioObjectPropertyClass), initial: AudioClassID(0))) == kAudioSubDeviceClassID else { return nil }
@@ -225,5 +228,28 @@ public final class GroupAggregateDevice: @unchecked Sendable {
     public static func clockDomain(uid: String) -> UInt32 {
         guard let device = deviceID(uid: uid) else { return 0 }
         return (try? HAL.get(device, .global(kAudioDevicePropertyClockDomain), initial: UInt32(0))) ?? 0
+    }
+}
+
+// MARK: A member gone from a running aggregate
+
+extension GroupAggregateDevice {
+    /// The UIDs of the members Core Audio has active in the aggregate `id` now; empty for a device that is not an aggregate.
+    public static func activeMemberUIDs(of id: AudioObjectID) -> [String] {
+        let active = (try? HAL.getArray(id, .global(kAudioAggregateDevicePropertyActiveSubDeviceList), of: AudioObjectID.self)) ?? []
+        return active.compactMap { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) }
+    }
+
+    /// An aggregate outlives a member that goes away, so its own "alive" says nothing about the member: every member active when it
+    /// started (`atStart`) must still be active in it (`now`) and still connected.
+    public static func membersPresent(atStart: [String], now: [String], connected: (String) -> Bool) -> Bool {
+        let active = Set(now)
+        return atStart.allSatisfy { active.contains($0) && connected($0) }
+    }
+
+    /// The device with this UID is listed and says it is alive.
+    public static func isConnected(uid: String) -> Bool {
+        guard let device = deviceID(uid: uid) else { return false }
+        return ((try? HAL.get(device, .global(kAudioDevicePropertyDeviceIsAlive), initial: UInt32(0))) ?? 0) != 0
     }
 }

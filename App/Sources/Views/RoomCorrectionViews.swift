@@ -20,20 +20,20 @@ extension RoomSpeaker {
         case .lfe: String(localized: "LFE", comment: "Room correction speaker: the subwoofer channel.")
         case .leftSurround: String(localized: "Left surround", comment: "Room correction speaker.")
         case .rightSurround: String(localized: "Right surround", comment: "Room correction speaker.")
-        // The places of a speaker group: plain English, outside the string catalog, like the group's editor (plan item 25 owns the languages).
-        case .sideLeft: "Left side"
-        case .sideRight: "Right side"
-        case .backLeft: "Left back"
-        case .backRight: "Right back"
-        case .backCenter: "Back centre"
-        case .wideLeft: "Left wide"
-        case .wideRight: "Right wide"
-        case .topFrontLeft: "Left top front"
-        case .topFrontRight: "Right top front"
-        case .topMiddleLeft: "Left top middle"
-        case .topMiddleRight: "Right top middle"
-        case .topBackLeft: "Left top back"
-        case .topBackRight: "Right top back"
+        // The places a speaker group adds.
+        case .sideLeft: String(localized: "Left side", comment: "Room correction speaker.")
+        case .sideRight: String(localized: "Right side", comment: "Room correction speaker.")
+        case .backLeft: String(localized: "Left back", comment: "Room correction speaker.")
+        case .backRight: String(localized: "Right back", comment: "Room correction speaker.")
+        case .backCenter: String(localized: "Back centre", comment: "Room correction speaker.")
+        case .wideLeft: String(localized: "Left wide", comment: "Room correction speaker.")
+        case .wideRight: String(localized: "Right wide", comment: "Room correction speaker.")
+        case .topFrontLeft: String(localized: "Left top front", comment: "Room correction speaker.")
+        case .topFrontRight: String(localized: "Right top front", comment: "Room correction speaker.")
+        case .topMiddleLeft: String(localized: "Left top middle", comment: "Room correction speaker.")
+        case .topMiddleRight: String(localized: "Right top middle", comment: "Room correction speaker.")
+        case .topBackLeft: String(localized: "Left top back", comment: "Room correction speaker.")
+        case .topBackRight: String(localized: "Right top back", comment: "Room correction speaker.")
         }
     }
 
@@ -213,7 +213,7 @@ struct RoomCorrectionWindow: View {
         }
         .onAppear {
             let player = model.player
-            measure.pausePlayback = { player.pause() }
+            measure.pausePlayback = { [weak m = measure] in if m?.groupTarget != nil { player.stop(); let engine = player.engine; await withCheckedContinuation { done in DispatchQueue.global().async { engine.stopAndWait(); done.resume() } } } else { player.pause() } }
             if measure.launch != nil || LaunchArguments().string(forKey: "VespertineOpenSheet") == "room-measure" { showWizard = true }
         }
     }
@@ -491,7 +491,7 @@ struct RoomCorrectionWindow: View {
         case .measured: return String(localized: "Microphone \(profile.micSerial) · measured \(date) · preamp \(preamp) dB")
         case .equalizerAPO: return String(localized: "Imported from Equalizer APO or REW · \(date) · preamp \(preamp) dB")
         case .impulseResponse: return String(localized: "Impulse responses (convolution) · imported \(date)")
-        case .geometry: return "Delays and levels from where the speakers are drawn · \(date)"
+        case .geometry: return String(localized: "Delays and levels from where the speakers are drawn · \(date)", comment: "Room correction profile summary: a profile made from a speaker group's drawing, and the date it was made.")
         }
     }
 
@@ -835,10 +835,10 @@ struct RoomMeasureWizard: View {
         case .ready(_, let members): model.groupTarget = (group, members)
         case .missing(let names):
             model.groupTarget = (group, [])
-            model.groupProblem = "These outputs of \(group.name) aren't connected: \(names.joined(separator: ", "))."
+            model.groupProblem = String(localized: "These outputs of \(group.name) aren't connected: \(names.formatted(.list(type: .and))).", comment: "Room correction: the speaker group's name, then the list of its outputs that are unplugged.")
         default:
             model.groupTarget = (group, [])
-            model.groupProblem = "\(group.name) can't be opened right now."
+            model.groupProblem = String(localized: "\(group.name) can't be opened right now.", comment: "Room correction: the speaker group's name.")
         }
     }
 
@@ -887,7 +887,7 @@ struct RoomMeasureWizard: View {
             VStack(alignment: .leading, spacing: 10) {
                 portrait.frame(width: 300, height: 300)
                 if let group = model.groupTarget?.group {
-                    Text(verbatim: "Speaker group “\(group.name)”: measured as you drew it (\(group.speakers.count) speakers, on its outputs in order).")
+                    Text("Speaker group “\(group.name)”: measured as you drew it (\(group.speakers.count) speakers, on its outputs in order).", comment: "Room correction wizard: the speaker group's name and its speaker count (plural by the count).")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true).frame(width: 300, alignment: .leading)
                     if let problem = model.groupProblem {
                         Text(verbatim: problem).font(Typeface.ui(12)).foregroundStyle(Palette.copper).frame(width: 300, alignment: .leading)

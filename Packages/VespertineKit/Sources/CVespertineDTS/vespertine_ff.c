@@ -28,7 +28,9 @@ struct NFFDecoder {
     int64_t length, position;
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
+    bool layoutChanged;       // the stream's channel count changed for good: what follows can't play as this stream
     int badFrames;            // damaged frames in a row (skipped, up to NFF_MAX_BAD_FRAMES)
+    int64_t concealed;        // damaged frames skipped since opening (never reset: the signal path reports them)
     char profile[64];
     // Raw DSD reading
     uint8_t *dsd;             // per-channel planes, dsdCapacity bytes each
@@ -115,6 +117,9 @@ static NFFDecoder *open_source(const char *path, int wanted, void *opaque, int64
     d->rate = d->ctx->sample_rate;
     d->mask = d->ctx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE ? d->ctx->ch_layout.u.mask : 0;
     d->bits = d->ctx->bits_per_raw_sample;
+    // A stream that still names no channels or no rate once opened (a damaged track header, audio FFmpeg couldn't read)
+    // can't be played: a format with no channels can't even hold a buffer. Picked streams aren't screened for this.
+    if (d->channels <= 0 || d->rate <= 0) { fail(error, errorSize, "the stream has no channel count or sample rate", 0); nff_close(d); return NULL; }
     const char *profile = avcodec_profile_name(codec->id, st->codecpar->profile);
     snprintf(d->profile, sizeof d->profile, "%s", profile ? profile : "");
     int64_t duration = st->duration != AV_NOPTS_VALUE ? av_rescale_q(st->duration, st->time_base, (AVRational){1, d->rate})
@@ -250,14 +255,43 @@ static bool append(NFFDecoder *d, const AVFrame *f) {
 #define NFF_MAX_BAD_FRAMES 32
 
 /// Skips a damaged frame; false once too many came in a row.
-static bool skip_bad_frame(NFFDecoder *d) { return ++d->badFrames <= NFF_MAX_BAD_FRAMES; }
+static bool skip_bad_frame(NFFDecoder *d) { d->concealed++; return ++d->badFrames <= NFF_MAX_BAD_FRAMES; }
+
+/// Hands a packet of the stream to the decoder. A packet the decoder refuses as damaged is skipped and counted.
+static void send(NFFDecoder *d, const AVPacket *p) {
+    int r = avcodec_send_packet(d->ctx, p);
+    if (r < 0 && r != AVERROR(EAGAIN) && r != AVERROR_EOF) d->concealed++;
+}
+
+int64_t nff_concealed(const NFFDecoder *d) { return d->concealed; }
+
+/// Whether a decoded frame has a channel count other than the stream's. One such frame (a damaged DTS-HD extension
+/// that falls back to the core, a broadcast that changes for a moment) is skipped and counted as damage; only a run of
+/// more than NFF_MAX_BAD_FRAMES means the stream has changed for good.
+static bool mismatched(const NFFDecoder *d, const AVFrame *f) { return f->nb_samples > 0 && f->ch_layout.nb_channels != d->channels; }
+
+/// Skips a frame with the other channel count; false (and the stream marked changed) once the change has stuck.
+static bool skip_mismatched(NFFDecoder *d) {
+    av_frame_unref(d->frame);
+    if (skip_bad_frame(d)) return true;
+    d->layoutChanged = true;
+    return false;
+}
 
 /// Decodes more into the FIFO. Returns false at the end (or on a fatal error).
 static bool pump(NFFDecoder *d) {
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
         if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
-        if (r == 0) { d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame); if (!ok) return false; if (d->fifoFrames > 0) return true; continue; }
+        if (r == 0) {
+            // A new channel count can't be handed over in the same buffers: skipped, and once it sticks, the end
+            // (nff_read then reports it).
+            if (mismatched(d, d->frame)) { if (!skip_mismatched(d)) return false; continue; }
+            d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame);
+            if (!ok) return false;
+            if (d->fifoFrames > 0) return true;
+            continue;
+        }
         if (r == AVERROR_EOF) return false;
         if (r != AVERROR(EAGAIN)) return false;
         if (d->eof) {
@@ -266,14 +300,15 @@ static bool pump(NFFDecoder *d) {
         }
         r = av_read_frame(d->fmt, d->packet);
         if (r < 0) { d->eof = true; continue; }
-        if (d->packet->stream_index == d->stream) avcodec_send_packet(d->ctx, d->packet);
+        if (d->packet->stream_index == d->stream) send(d, d->packet);
         av_packet_unref(d->packet);
     }
 }
 
 int nff_read(NFFDecoder *d, float *const *planes, int frames) {
-    while (d->fifoFrames < frames) if (!pump(d)) break;
+    while (d->fifoFrames < frames && !d->layoutChanged) if (!pump(d)) break;
     int n = frames < d->fifoFrames ? frames : d->fifoFrames;
+    if (n == 0 && d->layoutChanged) return -1;
     int ch = d->channels;
     for (int s = 0; s < n; s++) for (int c = 0; c < ch; c++) planes[c][s] = d->fifo[(size_t)s * ch + c];
     memmove(d->fifo, d->fifo + (size_t)n * ch, (size_t)(d->fifoFrames - n) * ch * sizeof(float));
@@ -319,13 +354,14 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
     if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0 && av_seek_frame(d->fmt, d->stream, 0, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_BYTE) < 0)
         return false;
     avcodec_flush_buffers(d->ctx);
-    d->fifoFrames = 0; d->eof = false; d->flushed = false; d->badFrames = 0;
+    d->fifoFrames = 0; d->eof = false; d->flushed = false; d->badFrames = 0; d->layoutChanged = false;
     // Find where decoding restarts: the first frame's timestamp.
     int64_t start = -1;
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
         if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
         if (r == 0) {
+            if (mismatched(d, d->frame)) { if (!skip_mismatched(d)) return false; continue; }
             d->badFrames = 0;
             int64_t pts = d->frame->best_effort_timestamp;
             start = pts == AV_NOPTS_VALUE ? 0 : av_rescale_q(pts, st->time_base, (AVRational){1, d->rate});
@@ -338,7 +374,7 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
         if (r != AVERROR(EAGAIN)) return false;
         r = av_read_frame(d->fmt, d->packet);
         if (r < 0) { d->eof = true; return false; }
-        if (d->packet->stream_index == d->stream) avcodec_send_packet(d->ctx, d->packet);
+        if (d->packet->stream_index == d->stream) send(d, d->packet);
         av_packet_unref(d->packet);
     }
     while (d->discard > 0) { if (!pump(d)) break; }

@@ -8,14 +8,31 @@ import SFBAudioEngine
 protocol PlaybackCacheReader: AnyObject, Sendable {
     var size: Int64 { get }
     func read(at offset: Int64, count: Int) throws -> Data
+    /// The file was rewritten on the server since it was opened (its size or modification date moved): what was copied
+    /// so far may not belong with what follows.
+    var changedSinceOpen: Bool { get }
+}
+
+extension PlaybackCacheReader {
+    var changedSinceOpen: Bool { false }
 }
 
 private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
     let file: FileHandle
     let size: Int64
+    private let modified: timespec
     init(_ url: URL) throws {
         file = try FileHandle(forReadingFrom: url)
         size = Int64(try file.seekToEnd())
+        var info = stat()
+        modified = fstat(file.fileDescriptor, &info) == 0 ? info.st_mtimespec : timespec()
+    }
+    /// Asks the share (one round trip). A handle that can't answer says no: its reads report the trouble.
+    /// Whole seconds only: SMB can report a cached date and a fresh one at different precision for the same, unchanged file.
+    var changedSinceOpen: Bool {
+        var info = stat()
+        guard fstat(file.fileDescriptor, &info) == 0 else { return false }
+        return info.st_size != size || info.st_mtimespec.tv_sec != modified.tv_sec
     }
     deinit { try? file.close() }
     func read(at offset: Int64, count: Int) throws -> Data {
@@ -32,14 +49,29 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
     enum Failure: LocalizedError {
         case budgetExceeded, unexpectedEOF, cancelled
+        /// Nothing arrived from the share for `noProgressLimit`, even with the file opened again.
+        case notAnswering
+        /// The file was rewritten on the server during its copy.
+        case changed
         var errorDescription: String? {
             switch self {
             case .budgetExceeded: CocoaError(.fileReadTooLarge).localizedDescription
-            case .unexpectedEOF: CocoaError(.fileReadCorruptFile).localizedDescription
+            case .unexpectedEOF, .changed: CocoaError(.fileReadCorruptFile).localizedDescription
             case .cancelled: CocoaError(.userCancelled).localizedDescription
+            case .notAnswering:
+                String(localized: "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect.", comment: "Reconnect is a command on the share.")
             }
         }
     }
+
+    /// How long a song waits for its share to send anything at all before it fails with `Failure.notAnswering`. A share that
+    /// reconnects (SMB does so within seconds) carries on well inside it; one that is gone for good no longer leaves the song
+    /// buffering for ever with the scans of every share held back.
+    static let defaultNoProgressLimit: TimeInterval = 120
+
+    /// Seconds the Mac has been awake: a sleep is not silence from the share (a wall clock would count it, and a song paused
+    /// over night would fail the moment the Mac woke).
+    static let awakeSeconds: @Sendable () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     private final class WeakEntry { weak var value: Entry?; init(_ value: Entry) { self.value = value } }
     private static let registry = Locked([String: WeakEntry]())
     private static let delivered = Locked(Date.distantPast)
@@ -74,6 +106,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let session: Session?
     private let budget: Int64
     private let chunk: Int
+    private let noProgressLimit: TimeInterval
+    private let clock: @Sendable () -> TimeInterval
     /// Library scans of network shares wait on this while a song is being read from one.
     let gate: ShareIOGate
     private let lock = NSLock()
@@ -85,8 +119,12 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private var warmGeneration = 0
     var reservedBytes: Int64 { reserved.withLock { $0 } }
 
-    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, gate: ShareIOGate = .shared) {
+    init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, gate: ShareIOGate = .shared,
+         noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
+         clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds) {
+        self.clock = clock
         self.gate = gate
+        self.noProgressLimit = noProgressLimit
         session = try? Session(root: directory)
         self.directory = session?.url ?? directory; self.budget = budget; self.chunk = max(1, chunk)
     }
@@ -99,6 +137,18 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// up gets `CancellationError` at once (the open itself finishes, or fails, in the background and is closed).
     /// For tests: the share's files, read through this instead of a mount.
     var readerFactory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?
+    /// For tests: the bytes free on the cache's volume, instead of asking the file system.
+    var freeSpace: (@Sendable () -> Int64?)?
+
+    /// Bytes free for this app's own files on the volume holding `url`, counting what macOS would free for it (purgeable
+    /// space); the plain free size when the volume does not say. (`NetworkCache.freeBytes` in the library is the same.)
+    static func freeBytes(at url: URL) -> Int64? {
+        var fresh = url
+        fresh.removeAllCachedResourceValues()
+        if let important = try? fresh.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,
+           important > 0 { return important }
+        return (try? FileManager.default.attributesOfFileSystem(forPath: url.path)[.systemFreeSize] as? NSNumber)?.int64Value
+    }
 
     func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true,
                cancelled: () -> Bool = { false }) throws -> Entry {
@@ -107,18 +157,23 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             return existing
         }
         let source = try reader ?? readerFactory?(url) ?? openShare(key: key, url: url, cancelled: cancelled)
+        // A handle can die under the copy (the share was mounted again after the link dropped): the file is opened again by
+        // its path, the way it was opened first. A reader handed in by the caller has no path to open again.
+        let reopen: Reopen? = reader != nil ? nil : Self.reopener(url: url, factory: readerFactory)
         return try lock.withLock {
             if let existing = entries[key]?.value {
                 if foreground { existing.promote() }
                 return existing
             }
             guard source.size >= 0, source.size <= budget - reservedBytes else { throw Failure.budgetExceeded }
-            if let attributes = try? FileManager.default.attributesOfFileSystem(forPath: directory.path),
-               let free = attributes[.systemFreeSize] as? NSNumber,
-               source.size > max(0, free.int64Value - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
+            // The other copies' files are sparse: what they have yet to write takes no space now, but will.
+            let unwritten = entries.values.compactMap(\.value).reduce(Int64(0)) { $0 + max(0, $1.size - $1.copiedBytes) }
+            if let free = freeSpace?() ?? Self.freeBytes(at: directory),
+               source.size + unwritten > max(0, free - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
             let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
             let size = source.size
-            let storage = try Storage(url: path, reader: source, chunk: chunk, session: session, gate: gate, foreground: foreground) { [weak self] in
+            let storage = try Storage(url: path, reader: source, chunk: chunk, session: session, gate: gate, foreground: foreground,
+                                      reopen: reopen, noProgressLimit: noProgressLimit, clock: clock) { [weak self] in
                 guard let self else { return }
                 self.reserved.withLock { $0 -= size }
             }
@@ -132,6 +187,15 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             }
             storage.start()
             return entry
+        }
+    }
+
+    typealias Reopen = @Sendable () throws -> any PlaybackCacheReader
+    private static func reopener(url: URL, factory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?) -> Reopen {
+        { () throws -> any PlaybackCacheReader in
+            if let fresh = factory?(url) { return fresh }
+            let opened: any PlaybackCacheReader = try ShareFileReader(url)
+            return opened
         }
     }
 
@@ -169,7 +233,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         return try job.wait(cancelled: cancelled)
     }
 
+    /// Prefetches waiting for their file on the share to open (for tests).
+    var waitingPrefetches: Int { prefetchWaits.withLock { $0 } }
+    private let prefetchWaits = Locked(0)
+
     /// Current always gets the link first. Prefetch only after its required reserve is on disk.
+    /// Opening the file can take as long as the share does: the wait ends when another next song is chosen (the open itself
+    /// finishes, or fails, in the background).
     func prefetch(key: String?, url: URL?) {
         let generation = lock.withLock { () -> Int in
             if nextKey == key { return -1 }
@@ -181,7 +251,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         guard generation >= 0, let key, let url else { return }
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self, self.lock.withLock({ self.prefetchGeneration == generation }) else { return }
-            guard let entry = try? self.entry(key: key, url: url, foreground: false) else { return }
+            self.prefetchWaits.withLock { $0 += 1 }
+            let opened = try? self.entry(key: key, url: url, foreground: false,
+                                         cancelled: { self.lock.withLock { self.prefetchGeneration != generation } })
+            self.prefetchWaits.withLock { $0 -= 1 }
+            guard let entry = opened else { return }
             self.lock.withLock {
                 if self.prefetchGeneration == generation { self.next = entry }
             }
@@ -209,7 +283,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 self.prefetchGeneration += 1
                 return self.prefetchGeneration
             }
-            guard let entry = try? self.entry(key: key, url: url) else { return }
+            // A press on another song ends this wait (and the hold on the scans with it), even while the open hangs.
+            guard let entry = try? self.entry(key: key, url: url, cancelled: { self.lock.withLock { self.warmGeneration != pressed } })
+            else { return }
             kept = true
             self.lock.withLock {
                 if self.prefetchGeneration == generation { self.next = entry }
@@ -217,6 +293,30 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         }
     }
     private static let warmQueue = DispatchQueue(label: "org.szeremeta.vespertine.network-warm", qos: .userInitiated, attributes: .concurrent)
+
+    /// Reads this thread makes inside `body` (through `Entry.read`: a decoder's guarded input source, `PlaybackFile`) give up
+    /// with `CancellationError` once `cancelled` says so, instead of waiting for as long as the share stays quiet. The engine thread
+    /// uses it where it reads a song that may still be arriving (a seek), so a skip, stop or another seek still gets through.
+    /// Reads on other threads (the read-ahead's) are unaffected.
+    static func cancellingReads<T>(when cancelled: @escaping () -> Bool, _ body: () throws -> T) rethrows -> T {
+        let thread = Thread.current.threadDictionary
+        let previous = thread[readCancellationKey]
+        thread[readCancellationKey] = ReadCancellation(cancelled)
+        defer { thread[readCancellationKey] = previous }
+        return try body()
+    }
+
+    /// Whether the reads of this thread have been given up on (see `cancellingReads`). The check runs while a waiting read holds
+    /// the copy's condition lock, and the engine's check takes the engine's lock: the engine thread, the only one that installs a
+    /// check, never takes a copy's condition while holding its own lock, so the order is always condition, then engine.
+    static var readsCancelled: Bool {
+        (Thread.current.threadDictionary[readCancellationKey] as? ReadCancellation)?.check() ?? false
+    }
+    private static let readCancellationKey = "org.szeremeta.vespertine.read-cancellation"
+    private final class ReadCancellation {
+        let check: () -> Bool
+        init(_ check: @escaping () -> Bool) { self.check = check }
+    }
 
     func discardPrefetch(except key: String? = nil) {
         let discarded: Entry? = lock.withLock {
@@ -295,7 +395,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
             guard offset >= 0, count >= 0 else { throw CocoaError(.fileReadUnknown) }
             let count = Int(min(Int64(count), max(0, size - offset)))
-            try storage.ensure(offset: offset, count: Int64(count), cancelled: { false })
+            try storage.ensure(offset: offset, count: Int64(count), cancelled: { NetworkPlaybackCache.readsCancelled })
             storage.condition.withLock {
                 storage.cursor = offset + Int64(count)
                 storage.resumeAt = min(storage.blocks, Int(storage.cursor / Int64(storage.chunk)))
@@ -318,7 +418,14 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     fileprivate final class Storage: @unchecked Sendable {
         let condition = NSCondition()
         let url: URL
-        let reader: any PlaybackCacheReader
+        /// Read by the copy thread only (it is replaced there when the file is opened again).
+        var reader: any PlaybackCacheReader
+        let reopen: Reopen?
+        let noProgressLimit: TimeInterval
+        /// On `clock`: when bytes last arrived from the share, the copy started, or a read began waiting with none waiting before.
+        /// Under `condition`.
+        var lastProgress: TimeInterval
+        let clock: @Sendable () -> TimeInterval
         let file: FileHandle
         let size: Int64
         let chunk: Int
@@ -344,8 +451,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         let startedAt = Date()
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
+             reopen: Reopen? = nil,
+             noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
+             clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds,
              release: @escaping @Sendable () -> Void) throws {
+            self.clock = clock; lastProgress = clock()
             self.url = url; self.reader = reader; self.size = reader.size; self.chunk = chunk; self.release = release
+            self.reopen = reopen; self.noProgressLimit = noProgressLimit
             self.session = session; self.gate = gate; self.foreground = foreground
             blocks = Int((reader.size + Int64(chunk) - 1) / Int64(chunk))
             guard FileManager.default.createFile(atPath: url.path, contents: nil, attributes: [.posixPermissions: 0o600]) else {
@@ -381,7 +493,18 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             }
         }
 
+        /// Nothing has arrived for `noProgressLimit`: the song fails (every waiting read with it) and stops holding scans back.
+        /// Called with the condition lock held; true when it gave up.
+        private func giveUpIfSilent() -> Bool {
+            guard error == nil, clock() - lastProgress >= noProgressLimit else { return false }
+            error = Failure.notAnswering
+            condition.broadcast()
+            return true
+        }
+
         private func readPart(at offset: Int64, count: Int) throws -> Data {
+            var failingSince: Date?
+            var reopenedAt = Date.distantPast
             while true {
                 if condition.withLock({ cancelled }) { throw Failure.cancelled }
                 do { return try reader.read(at: offset, count: count) }
@@ -400,9 +523,24 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         cause = underlying
                     }
                     guard transient else { throw error }
+                    // A handle on a share that was mounted again fails for ever: after a second of errors, open the file again
+                    // (every few seconds), and carry on with the new handle if it is the same size.
+                    let now = Date()
+                    let since = failingSince ?? now
+                    failingSince = since
+                    if let reopen, now.timeIntervalSince(since) >= 1, now.timeIntervalSince(reopenedAt) >= 3 {
+                        reopenedAt = now
+                        if let fresh = try? reopen() {
+                            guard fresh.size == size else { throw Failure.unexpectedEOF }
+                            reader = fresh
+                            continue
+                        }
+                    }
                     condition.lock()
-                    if !cancelled { _ = condition.wait(until: Date().addingTimeInterval(0.25)) }
+                    let gaveUp = giveUpIfSilent()
+                    if !gaveUp, !cancelled { _ = condition.wait(until: Date().addingTimeInterval(0.25)) }
                     condition.unlock()
+                    if gaveUp { throw Failure.notAnswering }
                 }
             }
         }
@@ -412,6 +550,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             let range = Int(offset / Int64(chunk))..<Int((offset + count - 1) / Int64(chunk) + 1)
             condition.lock()
             if range.allSatisfy({ ready.contains($0) }) { condition.unlock(); return }
+            // A read that starts waiting counts the silence from now: time with nothing asked of the share (paused) is not.
+            if waiters == 0 { lastProgress = max(lastProgress, clock()) }
             waiters += 1
             requests.append(range)
             condition.unlock()
@@ -425,6 +565,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             while !range.allSatisfy({ ready.contains($0) }) {
                 if shouldCancel() { throw CancellationError() }
                 if cancelled { throw Failure.cancelled }
+                _ = giveUpIfSilent()   // the copy can be stuck in a read the kernel never returns from
                 if let error { throw error }
                 _ = condition.wait(until: Date().addingTimeInterval(0.025))
             }
@@ -434,9 +575,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             // Only this thread reads the share. Decoders and the audio callback never do duplicate remote reads.
             let thread = Thread { [self] in
                 var sequential = 0
+                var sinceCheck = 0
                 while true {
                     let block: Int? = condition.withLock {
-                        if cancelled { return nil }
+                        if cancelled || error != nil { return nil }
                         if let demanded = requests.lazy.flatMap({ $0 }).first(where: { !ready.contains($0) }) { return demanded }
                         if let resumeAt { sequential = resumeAt; self.resumeAt = nil }
                         while sequential < blocks && ready.contains(sequential) { sequential += 1 }
@@ -455,7 +597,15 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                             let part = try readPart(at: offset + Int64(data.count), count: length - data.count)
                             guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
                             NetworkPlaybackCache.delivered.withLock { $0 = .now }
+                            condition.withLock { lastProgress = clock() }
                             data.append(part)
+                        }
+                        // Rewritten on the server meanwhile? Asked every 16 blocks and before the last one, so a copy never
+                        // completes from two versions of the file.
+                        sinceCheck += 1
+                        if sinceCheck >= 16 || condition.withLock({ ready.count + 1 >= blocks }) {
+                            sinceCheck = 0
+                            if reader.changedSinceOpen { throw Failure.changed }
                         }
                         try file.seek(toOffset: UInt64(offset))
                         try file.write(contentsOf: data)

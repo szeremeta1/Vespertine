@@ -10,7 +10,7 @@ error in this harness that made Vespertine look wrong where it wasn't.
 |---|---|---|---|
 | F-01 | PCM could read BIT-PERFECT when the device's physical format couldn't be read back | code: the badge trusted the plan | fixed in code |
 | F-02 | The docs said DTS frames go out inside the IEC 61937 carrier; no DTS carrier exists | docs overclaim | docs corrected |
-| F-03 | "Matched sacd_extract bit for bit on two real discs" can't be re-checked from the repository | missing evidence | open: `hardware/SACD-ORACLE.md` |
+| F-03 | "Matched sacd_extract bit for bit on two real discs" can't be re-checked from the repository | missing evidence | claim removed; open until `hardware/SACD-ORACLE.md` is run |
 | F-04 | The rate planner could pick a rate a hertz or two above the source over a true multiple of it | code: contradicted the documented order (an edge case) | fixed in code |
 | F-05 | DoP always takes the device exclusively and won't play without it; the docs said shared mode could be bit-perfect | docs left it out | docs corrected, records updated |
 | H-01 | The shared-mode check expected 32-bit integer mode without exclusive access, which the docs rule out | error in this harness, not in Vespertine | new record, second blind round |
@@ -19,15 +19,16 @@ error in this harness that made Vespertine look wrong where it wasn't.
 
 ### F-03. The sacd_extract comparison isn't recorded
 
-**Claim.** `README.md` line 39 and `docs/FEATURES.md` line 7: SACD playback "matched sacd_extract bit for bit on
-two real discs" (The Dark Side of the Moon, Brothers in Arms).
+**Claim (removed).** `README.md` line 39, `docs/FEATURES.md` line 7, `docs/ARCHITECTURE.md` line 31 and the website
+said SACD playback "matched sacd_extract bit for bit on two real discs" (The Dark Side of the Moon, Brothers in Arms).
+Those sentences are gone, so nothing public depends on the comparison now.
 
 **Evidence.** The repository has no script, log or hash list from that comparison, so the claim rests on a run
 nobody can repeat from the repository. This is not a contradiction: nothing here shows the claim is wrong. DST
 decoding itself is checked in CI against libdstdec on 15 fixture frames (DST-003, `oracles/dst/`), and Vespertine's
 decoder passes every DST check (REPORT.md).
 
-**To close it.** Run `hardware/SACD-ORACLE.md` on the two discs and commit its record under
+**To close it, or to bring the claim back.** Run `hardware/SACD-ORACLE.md` on the two discs and commit its record under
 `verification/hardware/sacd-<date>/`. It needs the disc images and the `sacd_extract` build on a Linux machine.
 
 ## Fixed

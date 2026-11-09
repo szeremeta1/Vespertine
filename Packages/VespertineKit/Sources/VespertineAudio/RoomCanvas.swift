@@ -34,8 +34,8 @@ public enum DistanceUnit: String, Codable, CaseIterable, Sendable {
     public func spoken(_ metres: Double) -> String {
         let n = number(metres)
         switch self {
-        case .metres: return n == "1" ? "1 metre" : "\(n) metres"
-        case .feet: return n == "1" ? "1 foot" : "\(n) feet"
+        case .metres: return n == "1" ? String(localized: "1 metre", comment: "Screen reader: a distance.") : String(localized: "\(n) metres", comment: "Screen reader: a distance in metres; the number may have a decimal.")
+        case .feet: return n == "1" ? String(localized: "1 foot", comment: "Screen reader: a distance.") : String(localized: "\(n) feet", comment: "Screen reader: a distance in feet; the number may have a decimal.")
         }
     }
 }
@@ -172,19 +172,21 @@ public enum RoomCanvas {
     public static func describe(speaker: SpeakerGroup.Speaker, in group: SpeakerGroup, unit: DistanceUnit) -> String {
         let distance = SpeakerGeometry.distance(from: group.listener, to: speaker.position)
         let azimuth = SpeakerGeometry.azimuth(from: group.listener, to: speaker.position)
-        return "\(speaker.role.plainName), \(unit.spoken(distance)), \(direction(azimuth))"
+        return String(localized: "\(speaker.role.plainName), \(unit.spoken(distance)), \(direction(azimuth))", comment: "Screen reader: a speaker's name, its distance from the seat, then its direction.")
     }
 
     public static func describe(listener group: SpeakerGroup, unit: DistanceUnit) -> String {
         let facing = group.listener.facingDegrees
-        return "Listening seat, facing " + (abs(facing) < 0.5 ? "the front of the room" : direction(facing))
+        let toward = abs(facing) < 0.5 ? String(localized: "the front of the room", comment: "Screen reader: the way the listening seat faces, said after “Listening seat, facing”.") : direction(facing)
+        return String(localized: "Listening seat, facing \(toward)", comment: "Screen reader: the listening seat and the direction it faces.")
     }
 
     private static func direction(_ azimuth: Double) -> String {
         let a = abs(azimuth).rounded()
-        if a < 1 { return "straight ahead" }
-        if a >= 180 { return "directly behind" }
-        return "\(Int(a)) degrees \(azimuth < 0 ? "left" : "right")"
+        if a < 1 { return String(localized: "straight ahead", comment: "Screen reader: a direction.") }
+        if a >= 180 { return String(localized: "directly behind", comment: "Screen reader: a direction.") }
+        return azimuth < 0 ? String(localized: "\(Int(a)) degrees left", comment: "Screen reader: a direction, in degrees to the left of straight ahead. Plural by the number.")
+                           : String(localized: "\(Int(a)) degrees right", comment: "Screen reader: a direction, in degrees to the right of straight ahead. Plural by the number.")
     }
 }
 
@@ -192,23 +194,23 @@ extension SpeakerRole {
     /// The role in plain words, for the grid and the screen reader.
     public var plainName: String {
         switch self {
-        case .frontLeft: "Front left"
-        case .frontRight: "Front right"
-        case .center: "Center"
-        case .lfe: "Subwoofer (LFE)"
-        case .sideLeft: "Side left"
-        case .sideRight: "Side right"
-        case .backLeft: "Back left"
-        case .backRight: "Back right"
-        case .backCenter: "Back center"
-        case .wideLeft: "Wide left"
-        case .wideRight: "Wide right"
-        case .topFrontLeft: "Top front left"
-        case .topFrontRight: "Top front right"
-        case .topMiddleLeft: "Top middle left"
-        case .topMiddleRight: "Top middle right"
-        case .topBackLeft: "Top back left"
-        case .topBackRight: "Top back right"
+        case .frontLeft: String(localized: "Front left")
+        case .frontRight: String(localized: "Front right")
+        case .center: String(localized: "Center")
+        case .lfe: String(localized: "Subwoofer (LFE)")
+        case .sideLeft: String(localized: "Side left")
+        case .sideRight: String(localized: "Side right")
+        case .backLeft: String(localized: "Back left")
+        case .backRight: String(localized: "Back right")
+        case .backCenter: String(localized: "Back center")
+        case .wideLeft: String(localized: "Wide left")
+        case .wideRight: String(localized: "Wide right")
+        case .topFrontLeft: String(localized: "Top front left")
+        case .topFrontRight: String(localized: "Top front right")
+        case .topMiddleLeft: String(localized: "Top middle left")
+        case .topMiddleRight: String(localized: "Top middle right")
+        case .topBackLeft: String(localized: "Top back left")
+        case .topBackRight: String(localized: "Top back right")
         }
     }
 }

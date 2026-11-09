@@ -19,7 +19,7 @@ export const hires = {
     paragraphs: [
       `Hi-res playback on a Mac starts with the output rate. Apple’s own advice, in <a href="https://support.apple.com/en-us/108326">Play high sample rate audio on your Mac</a>, is to choose the output rate by hand in Audio MIDI Setup and match it to the sample rate of your source material.`,
       `Vespertine does that for you: it switches the DAC to each track’s native rate. If the DAC can’t run that rate, Apple’s mastering-quality resampler converts it, and the signal path says so. Per-device settings can match the source, use the device’s maximum rate, or force a rate, and when Vespertine quits each device goes back to its earlier rate and depth.`,
-      `PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11. That is the hardware that has been tried; other DACs are untested, and <a href="${links.dacReport}">DAC reports are welcome</a>.`,
+      `PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports; see docs/DEVICES.md). That is the hardware that has been tried; other DACs are untested, and <a href="${links.dacReport}">DAC reports are welcome</a>.`,
     ],
   },
 
@@ -69,7 +69,7 @@ export const hires = {
     },
     {
       q: 'Does DSD play as DSD or as PCM?',
-      a: `DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate; otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP has been confirmed up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11; DSD512 over DoP has not been tested on hardware.`,
+      a: `DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate; otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is reported to work up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11 (developer reports, no capture); DSD512 over DoP has not been tested on hardware.`,
     },
     {
       q: 'Can it tell me if a hi-res file is an upsampled CD rip?',

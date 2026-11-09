@@ -535,7 +535,7 @@ struct MusicBrainzSheet: View {
                 Text("Data from MusicBrainz and the Cover Art Archive (open, community-maintained).")
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3)
                 Spacer()
-                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
+                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction)
                 if let progress {
                     ProgressView(value: Double(progress), total: Double(max(tracks.count, 1))).frame(width: 120)
                     Text("\(progress + 1) of \(tracks.count)").font(Typeface.mono(11)).foregroundStyle(Palette.text2)
@@ -676,6 +676,7 @@ struct SmartPlaylistEditor: View {
             HStack {
                 Toggle(isOn: $limitOn) { Text("Limit to", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]") }
                 TextField("", value: $limit, format: .number).frame(width: 60).textFieldStyle(.roundedBorder).disabled(!limitOn)
+                    .accessibilityLabel("Limit to")
                 Text("tracks, sorted by", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]")
                 Picker("Sort by", selection: $rules.sort) {
                     Text("Album").tag(SmartRules.Sort.album)
@@ -688,7 +689,7 @@ struct SmartPlaylistEditor: View {
             }
             HStack {
                 Spacer()
-                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
+                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction)
                 Button("Save") {
                     rules.limit = limitOn ? limit : nil
                     if name != playlist.name.libraryDisplayName { model.library.renamePlaylist(playlist, to: name) }

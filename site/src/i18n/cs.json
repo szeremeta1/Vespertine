@@ -69,7 +69,7 @@
         "hi-res hudba"
       ],
       "titleBrass": "na vašem Macu.",
-      "lede": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac. Obrazy disků SACD a DVD-Video, DSD, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu s vašimi stereo alby a na AirPods hrají jako prostorový zvuk se sledováním hlavy. Korekce místnosti změří vaši místnost USB mikrofonem a koriguje každý reproduktor; dokud ji nezapnete, je vypnutá. Signálová cesta ukazuje každý krok od souboru po výstup. V angličtině a ve {languages} dalších jazycích.",
+      "lede": "Bezplatný open-source přehrávač sbírek surround a hi-res hudby pro Mac. Obrazy disků SACD a DVD-Video, DSD, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu s vašimi stereo alby a na AirPods hrají jako prostorový zvuk (se sledováním hlavy tam, kde ho macOS nabízí). Korekce místnosti změří vaši místnost USB mikrofonem a koriguje každý reproduktor; dokud ji nezapnete, je vypnutá. Signálová cesta ukazuje každý krok od souboru po výstup. V angličtině a ve {languages} dalších jazycích.",
       "ask": "Líbí se vám?",
       "star": "Dejte mu hvězdičku na GitHubu",
       "discuss": "Zapojte se do diskuze",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround v jedné knihovně",
-        "text": "Obrazy a ripy SACD, disky DVD-Video, DTS CD, DTS-HD MA a TrueHD stojí vedle vašich stereo alb a na AirPods hrají jako prostorový zvuk se sledováním hlavy. Když album existuje v obou verzích, každá skladba je uvedena jednou a přehraje se verze, která odpovídá vašemu výstupu."
+        "text": "Obrazy a ripy SACD, disky DVD-Video, DTS CD, DTS-HD MA a TrueHD stojí vedle vašich stereo alb a na AirPods hrají přes renderer prostorového zvuku od Apple (se sledováním hlavy tam, kde ho macOS nabízí). Když album existuje v obou verzích, každá skladba je uvedena jednou a přehraje se verze, která odpovídá vašemu výstupu."
       },
       {
         "title": "Signálová cesta, kterou si ověříte",
@@ -126,7 +126,7 @@
         "title": "Každá skladba v nativní frekvenci a bitové hloubce.",
         "lede": "Signálová cesta vypisuje každý krok od souboru až po váš DAC, zpětně načtený z Core Audio, a řekne vám, když něco změnilo vzorky.",
         "body": [
-          "Vespertine přepne zařízení na vzorkovací frekvenci každého souboru a převzorkovává (převodníkem Apple v masteringové kvalitě) jen tehdy, když ji DAC nezvládne. <span class=\"mono nowrap\">BIT-PERFECT</span> se zobrazí jen při splnění podmínek ze zdrojového kódu: nativní frekvence, nic, co by měnilo vzorky, vyhovující délka slova a zařízení, které je ve výhradním režimu nebo které nesdílí jiná aplikace. Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128."
+          "Vespertine přepne zařízení na vzorkovací frekvenci každého souboru a převzorkovává (převodníkem Apple v masteringové kvalitě) jen tehdy, když ji DAC nezvládne. <span class=\"mono nowrap\">BIT-PERFECT</span> se zobrazí jen při splnění podmínek ze zdrojového kódu: nativní frekvence, nic, co by měnilo vzorky, vyhovující délka slova a zařízení, které je ve výhradním režimu nebo které nesdílí jiná aplikace. Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128 (hlášení vývojáře; viz docs/DEVICES.md)."
         ],
         "list": [
           "Výhradní režim (hog) nepustí k zařízení jiné aplikace. Ve sdíleném režimu ovládají hlasitost vašeho DAC klávesy hlasitosti a Digital Crown; ve výhradním režimu mohou také, pokud to zapnete.",
@@ -181,7 +181,7 @@
           "Tři cíle: Warm (výchozí), Gentle tilt a Flat. Korigujte jen basy, nebo celé pásmo, a filtry později navrhněte znovu bez nového měření.",
           "Importuje filtry z REW nebo Equalizer APO včetně zpoždění a úrovně každého reproduktoru a exportuje text pro Equalizer APO.",
           "Importuje impulzní odezvy (WAV, AIFF, CAF nebo FLAC) a přehrává je konvolucí.",
-          "Stereo a 5.1.",
+          "Stereo a 5.1 (5.1 je testováno se simulovanými místnostmi a importovanými profily, zatím ne ve skutečné místnosti 5.1).",
           "Portrét místnosti ukazuje reproduktory, vaše místo a postupně každý bod mikrofonu, jak se měří. Animace proměny křivky pak převede naměřenou odezvu na předpovídanou a přepínač předtím/potom je porovná."
         ],
         "note": "Křivka „potom“ je předpovězená z měření a filtrů, ne naměřená. Chcete-li vidět, co místnost skutečně dělá, změřte ji znovu se zapnutou korekcí.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround a prostorový zvuk",
         "title": "Vaše disky 5.1 ve stejné knihovně.",
-        "lede": "Vícekanálová hudba hraje na AirPods jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC provede downmix podle rozložení kanálů.",
+        "lede": "Vícekanálová hudba hraje na AirPods přes renderer prostorového zvuku od Apple (se sledováním hlavy tam, kde ho macOS nabízí), nebo se na stereo DAC provede downmix podle rozložení kanálů.",
         "body": [
-          "DTS CD se dekódují do 5.1. Obrazy SACD, extrahované stopy SACD, vícekanálový FLAC, TrueHD a DTS-HD MA se na AirPods vykreslí jako prostorový zvuk se sledováním hlavy, nebo se na stereo DAC downmixují. Dolby Digital Plus s Atmosem využívá objektový renderer macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu. Výstup kanál po kanálu je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
+          "DTS CD se dekódují do 5.1. Obrazy SACD, extrahované stopy SACD, vícekanálový FLAC, TrueHD a DTS-HD MA se na AirPods vykreslí přes renderer prostorového zvuku od Apple (se sledováním hlavy tam, kde ho macOS nabízí), nebo se na stereo DAC downmixují. Dolby Digital Plus s Atmosem využívá objektový renderer macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu. Výstup kanál po kanálu je experimentální a nebyl otestován se skutečnými receivery ani vícekanálovými USB DAC (vyzkoušena byla jedna televize Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení."
         ],
         "list": [
           "Stereo a surround verze alba jsou uvedeny jednou; Vespertine přehraje tu, která se hodí k výstupu, nebo tu, kterou si připnete.",
@@ -215,11 +215,11 @@
         "title": "Přehrávejte přímo obraz disku.",
         "lede": "Nasměrujte Vespertine na obraz SACD nebo DVD-Video a hudbu přehraje přímo z něj: nic se nepřipojuje, neextrahuje ani nezapisuje.",
         "body": [
-          "Obrazy SACD <span class=\"mono\">.iso</span> přehrávají svou stereo i 5.1 oblast, s kompresí DST i bez ní, s názvy převzatými z textu samotného disku. DST se dekóduje zpět přesně na původní DSD, takže stereo jde do vašeho DAC jako nativní DSD přes DoP, pokud to DAC podporuje, a 5.1 hraje na AirPods jako prostorový zvuk se sledováním hlavy. Hudba v LPCM na discích DVD-Video (obraz <span class=\"mono\">.iso</span> nebo složka <span class=\"mono\">VIDEO_TS</span>) se přehrává bit po bitu, jedno album na titul a jedna stopa na kapitolu."
+          "Obrazy SACD <span class=\"mono\">.iso</span> přehrávají svou stereo i 5.1 oblast, s kompresí DST i bez ní, s názvy převzatými z textu samotného disku. DST se dekóduje zpět přesně na původní DSD, takže stereo jde do vašeho DAC jako nativní DSD přes DoP, pokud to DAC podporuje, a 5.1 hraje na AirPods přes renderer prostorového zvuku od Apple. Hudba v LPCM na discích DVD-Video (obraz <span class=\"mono\">.iso</span> nebo složka <span class=\"mono\">VIDEO_TS</span>) se přehrává bit po bitu, jedno album na titul a jedna stopa na kapitolu."
         ],
         "list": [
-          "Na dvou skutečných discích se výstup bit po bitu shodoval se sacd_extract. Disky s oblastí 5.0, pouze s vícekanálovou oblastí nebo s DSD128 a výše zatím pokrývají jen syntetické testovací obrazy.",
-          "DSF a DSDIFF od DSD64 po DSD512, včetně DSDIFF s kompresí DST, jdou jako DoP do DAC, které přijímají frekvenci nosného signálu, nebo se převedou na PCM s vysokou vzorkovací frekvencí. DoP je ověřené až do DSD256 na Fosi Audio ZD3 a až do DSD128 na FiiO K11; DSD512 přes DoP nebylo na hardwaru otestováno.",
+          "Obrazy SACD jsou testovány se syntetickými disky, včetně disků s oblastí 5.0, pouze s vícekanálovou oblastí nebo s DSD128 a výše.",
+          "DSF a DSDIFF od DSD64 po DSD512, včetně DSDIFF s kompresí DST, jdou jako DoP do DAC, které přijímají frekvenci nosného signálu (až DSD256 u vyzkoušených DAC), nebo se převedou na PCM s vysokou vzorkovací frekvencí. DoP podle hlášení funguje až do DSD256 na Fosi Audio ZD3 a až do DSD128 na FiiO K11 (hlášení vývojáře, bez záznamu); DSD512 přes DoP nebylo na hardwaru otestováno.",
           "DVD-Video LPCM v 16, 20 a 24 bitech, při 48 a 96 kHz, až 8 kanálů. DVD-Audio podporováno není a šifrované disky (CSS) vyžadují dešifrovanou kopii."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Umí korekci místnosti?",
-          "a": "Ano. Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem v jednom až pěti bodech kolem svého poslechového místa a Vespertine navrhne filtry na míru každému reproduktoru a srovná jejich zpoždění a úroveň, ve stereu i v 5.1. Importuje také filtry z REW a Equalizer APO a impulzní odezvy. Ve výchozím stavu je vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect; když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>. <a href=\"{href.roomCorrection}\">Jak korekce místnosti funguje</a>."
+          "a": "Ano. Změřte svou místnost mikrofonem UMIK-1 nebo jiným kalibrovaným USB mikrofonem v jednom až pěti bodech kolem svého poslechového místa a Vespertine navrhne filtry na míru každému reproduktoru a srovná jejich zpoždění a úroveň, ve stereu i v 5.1 (5.1 je testováno se simulovanými místnostmi a importovanými profily, zatím ne ve skutečné místnosti 5.1). Importuje také filtry z REW a Equalizer APO a impulzní odezvy. Ve výchozím stavu je vypnutá a dokud je vypnutá, zůstává přehrávání bit-perfect; když je zapnutá, signálová cesta ukazuje <span class=\"mono nowrap\">KOREKCE MÍSTNOSTI</span>. <a href=\"{href.roomCorrection}\">Jak korekce místnosti funguje</a>."
         },
         {
           "q": "Přehraje disky SACD a DVD?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Přehraje Dolby Atmos?",
-          "a": "Dolby Digital Plus s Atmosem se přehrává přes objektový renderer macOS, na AirPods jako prostorový zvuk se sledováním hlavy. TrueHD Atmos a DTS:X přehrávají svou bezeztrátovou kanálovou vrstvu; jejich objekty se nevykreslují. Bitstream do AV receiveru je experimentální, netestovaný na skutečných receiverech; uvítáme hlášení."
+          "a": "Dolby Digital Plus s Atmosem se přehrává přes objektový renderer macOS, na AirPods jako prostorový zvuk (se sledováním hlavy tam, kde ho macOS nabízí). TrueHD Atmos a DTS:X přehrávají svou bezeztrátovou kanálovou vrstvu; jejich objekty se nevykreslují. Bitstream do AV receiveru je experimentální, netestovaný na skutečných receiverech; uvítáme hlášení."
         },
         {
           "q": "Změní mé soubory?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Na jakém hardwaru byla testována?",
-          "a": "Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128; na FiiO K11 byl otestován i celočíselný režim. Testováno bylo také na AirPods Max přes USB-C a Bluetooth, na reproduktorech MacBooku Pro a na televizoru Sony přes HDMI v 5.1. Hardware Intel není otestovaný. Bitstream do receiveru a výstup do vícekanálového DAC jsou experimentální, netestované na skutečných receiverech a vícekanálových USB DAC (testován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); <a href=\"{href.dacReport}\">uvítáme hlášení</a>."
+          "a": "Přehrávání bylo otestováno na Fosi Audio ZD3 až do PCM 768 kHz a DSD256 a na FiiO K11 až do PCM 384 kHz a DSD128 (hlášení vývojáře; viz docs/DEVICES.md); na FiiO K11 byl otestován i celočíselný režim. Testováno bylo také na AirPods Max přes USB-C a Bluetooth, na reproduktorech MacBooku Pro a na televizoru Sony přes HDMI v 5.1. Hardware Intel není otestovaný. Bitstream do receiveru a výstup do vícekanálového DAC jsou experimentální, netestované na skutečných receiverech a vícekanálových USB DAC (testován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); <a href=\"{href.dacReport}\">uvítáme hlášení</a>."
         },
         {
           "q": "Je v mém jazyce?",
@@ -601,7 +601,7 @@
     "ogAlt": "Tiskové materiály Vespertine: přehled faktů, loga, klíčové vizuály, skutečné snímky obrazovky a trailer, na pozadí tří skutečných snímků aplikace.",
     "eyebrow": "Tiskové materiály",
     "heading": "Vše, co potřebujete k psaní o {name}.",
-    "lede": "Vespertine je bezplatný open-source přehrávač pro Mac určený pro sbírky surround a hi-res hudby. Obrazy disků SACD a DVD-Video, extrahované skladby SACD v 5.1, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu a ve sluchátkách AirPods hrají jako Prostorový zvuk se sledováním hlavy. Signálová cesta ukazuje každý krok od souboru až po výstup, s podmínkami a testy ve zdrojovém kódu pod GPL, který si může kdokoli prověřit.",
+    "lede": "Vespertine je bezplatný open-source přehrávač pro Mac určený pro sbírky surround a hi-res hudby. Obrazy disků SACD a DVD-Video, extrahované skladby SACD v 5.1, DTS CD a soubory DTS-HD MA, TrueHD a Atmos sdílejí jednu knihovnu a ve sluchátkách AirPods hrají jako Prostorový zvuk (se sledováním hlavy tam, kde ho macOS nabízí). Signálová cesta ukazuje každý krok od souboru až po výstup, s podmínkami a testy ve zdrojovém kódu pod GPL, který si může kdokoli prověřit.",
     "fine": "Výstup kanál po kanálu a bitstream do receiveru jsou experimentální a nejsou otestované na skutečných receiverech ani vícekanálových USB DAC (otestován byl jeden televizor Sony přes HDMI: viz docs/DEVICES.md); uvítáme vaše hlášení. Objekty Dolby Digital Plus Atmos renderuje macOS; TrueHD Atmos a DTS:X přehrávají svou základní kanálovou vrstvu.",
     "facts": {
       "eyebrow": "Přehled faktů",

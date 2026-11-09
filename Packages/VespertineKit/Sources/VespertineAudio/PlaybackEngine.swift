@@ -76,6 +76,8 @@ public enum EngineEvent: Sendable {
     case deviceUnavailable(String)
     /// The chosen output is connected but still won't start after the wait; playback stays paused.
     case deviceNotResponding(String)
+    /// DACs of a speaker group set to carry on went away (`without`, by name); the group plays on with the others.
+    case speakerGroupCarriesOn(group: String, without: [String])
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -366,7 +368,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         while answered.wait(timeout: .now() + 0.025) == .timedOut {
             if superseded { throw Superseded() }
-            if lookingAhead { serviceTransportWhileWaiting() }
+            if lookingAhead {
+                if lookAheadYields { throw LookAheadGivenUp() }
+                serviceTransportWhileWaiting()
+            }
         }
         return answer.withLock { $0 } ?? false
     }
@@ -438,6 +443,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
     /// `thenStandIn`: when the time is up, play on another output (`OutputFallback`) rather than give up.
     private var awaitingDevice: (uid: String, until: Date, checkedAt: Date, thenStandIn: Bool)?
+    /// A speaker group waited for: the DACs it waits for, by name (what the listener is told instead of the group's name).
+    private var groupMembersAwaited: [String: String] = [:]
     /// The chosen output (UID) that `sessionDevice` is playing in place of, while it isn't connected.
     private var standingIn: String?
     /// The outputs connected (UIDs), and when each one that was connected went away.
@@ -750,7 +757,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 defer { s.commands.removeAll() }
                 return s.commands
             }
-            for command in Self.coalesce(commands) { handle(command) }
+            // The rest of the batch stays visible while each command is handled (see `queuedTransportIntent`): a pause
+            // taken together with an earlier play, resume or seek decides how that one starts.
+            batchRest = Self.coalesce(commands)
+            while !batchRest.isEmpty { handle(batchRest.removeFirst()) }
 
             var didWork = false
             if state == .playing, let atmos {
@@ -809,10 +819,17 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
-    /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
-    private var superseded: Bool {
-        shared.withLock { $0.commands.contains { switch $0 { case .play, .stop: true; default: false } } }
+    /// Commands taken from the queue with the one being handled, not handled yet (engine thread).
+    private var batchRest: [Command] = []
+
+    /// Whether a command `matches` is waiting to be handled: in the rest of the batch being handled, or posted since. Engine
+    /// thread only (the rest of the batch is its own state).
+    private func commandPending(_ matches: (Command) -> Bool) -> Bool {
+        batchRest.contains(where: matches) || shared.withLock { $0.commands.contains(where: matches) }
     }
+
+    /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
+    private var superseded: Bool { commandPending { switch $0 { case .play, .stop: true; default: false } } }
     private struct Superseded: Error {}
 
     // MARK: Transport while the engine thread waits on a share
@@ -827,24 +844,27 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// What the user last asked of the transport and the engine has not acted on yet; nil when nothing (or a play or stop, which
     /// start over and make an earlier pause or resume moot, is waiting).
+    /// The rest of the batch being handled counts as well as what was posted since: a pause pressed right after a play, resume
+    /// or seek reaches the engine together with it, and the caller's thread has already silenced the output for it.
     private func queuedTransportIntent() -> TransportIntent? {
-        shared.withLock { s in
-            var intent: TransportIntent?
-            for command in s.commands {
-                switch command {
-                case .play, .stop: intent = nil
-                case .pause: intent = .pause
-                case .resume: intent = .resume
-                default: break
-                }
+        var intent: TransportIntent?
+        for command in batchRest + shared.withLock({ $0.commands }) {
+            switch command {
+            case .play, .stop: intent = nil
+            case .pause: intent = .pause
+            case .resume: intent = .resume
+            default: break
             }
-            return intent
         }
+        return intent
     }
 
     /// A wait on a share, which can last as long as the share does. While the output plays (`lookingAhead`) it runs on another
     /// queue and the engine thread keeps serving the transport and the position meanwhile; otherwise it is simply run, polled
     /// for a skip or stop (`superseded`) as it always was. `body` is handed the question "has this been given up?".
+    /// While looking ahead, a skip or stop gives the wait up (CancellationError, as before), and so does anything else asked of
+    /// the song that plays (`lookAheadYields`: LookAheadGivenUp, and the look-ahead is taken again afterwards). Once given up, the
+    /// body has `abandonGrace` to notice; a share that holds it longer no longer holds the engine thread.
     private func waitOnShare<T>(_ body: @escaping @Sendable (@escaping @Sendable () -> Bool) throws -> T) throws -> T {
         guard lookingAhead else { return try body { [self] in superseded } }
         let abandoned = Locked(false)
@@ -855,12 +875,42 @@ public final class PlaybackEngine: @unchecked Sendable {
             outcome.withLock { $0 = result }
             finished.signal()
         }
+        var givenUp: Error?
+        var givenUpAt = Date.distantFuture
         while finished.wait(timeout: .now() + 0.04) == .timedOut {
-            if superseded { abandoned.withLock { $0 = true } }
-            serviceTransportWhileWaiting()
+            if givenUp == nil {
+                if superseded { givenUp = CancellationError() } else if lookAheadYields { givenUp = LookAheadGivenUp() }
+                if givenUp != nil {
+                    abandoned.withLock { $0 = true }
+                    givenUpAt = Date()
+                    continue
+                }
+                serviceTransportWhileWaiting()
+            } else if Date().timeIntervalSince(givenUpAt) > Self.abandonGrace {
+                break
+            }
         }
+        if let givenUp { throw givenUp }
         return try outcome.withLock { $0 }!.get()
     }
+
+    /// How long a share wait that was given up may take to notice before the engine thread goes on without it.
+    static let abandonGrace: TimeInterval = 0.5
+
+    /// The look-ahead was given up for a command about the song that plays (see `lookAheadYields`); `advance` runs again after it.
+    private struct LookAheadGivenUp: Error {}
+
+    /// While looking ahead: something other than pause or resume is waiting (a seek, a change of output or settings, a queue
+    /// edit, a change of devices). It is about the song that plays or about what follows it, so it is not left until the next
+    /// song's share answers. Play and stop are `superseded`.
+    private var lookAheadYields: Bool {
+        guard lookingAhead else { return false }
+        return commandPending { switch $0 { case .pause, .resume, .barrier: false; default: true } }
+    }
+
+    /// The finished song whose look-ahead was given up (`LookAheadGivenUp`): `fill` looks ahead for it again, with the queue
+    /// as it is by then.
+    private var retryAdvance: (item: PlayableItem, produced: UInt64)?
 
     /// Engine thread, while it waits on a share with the output playing: acts on a pause or resume now (the last one asked for
     /// wins, as in `coalesce`) and publishes the snapshot, so the playhead, the button and the sound agree during the wait.
@@ -872,9 +922,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Only what the wait leaves coherent: a song playing or paused on its output, no other command waiting to reshape it.
         guard atmos == nil, let session, state != .stopped, !superseded else { return }
         let canResume = state == .playing || (state == .paused && !session.formatChanged())
+        let isTransport: (Command) -> Bool = { switch $0 { case .pause, .resume: true; default: false } }
         let intent: TransportIntent? = shared.withLock { s in
             var last: TransportIntent?
-            for command in s.commands {
+            for command in batchRest + s.commands {
                 switch command {
                 case .pause: last = .pause
                 case .resume: last = .resume
@@ -882,9 +933,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
             }
             guard let last, last == .pause || canResume else { return nil }
-            s.commands.removeAll { switch $0 { case .pause, .resume: true; default: false } }
+            s.commands.removeAll(where: isTransport)
             return last
         }
+        if intent != nil { batchRest.removeAll(where: isTransport) }
         switch intent {
         case .pause?:
             handle(.pause)
@@ -931,6 +983,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             state = .paused
             pausedAt = Date()
         case .resume:
+            // A pause after it in the same batch is the last word: starting the output only to stop it again would be heard.
+            if queuedTransportIntent() == .pause { return }
             if state == .paused, let atmos {
                 atmos.play(); state = .playing; pausedAt = nil
             } else if state == .paused, let session, session.formatChanged() {
@@ -1009,17 +1063,23 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             }
             guard let device = sessionDevice else { return }
-            var alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            var alive = outputListing.flatMap { list in session?.groupResources == nil ? list().contains { $0.id == device.id } : nil } ?? DeviceQuery.allDeviceIDs().contains(device.id)
+            // What the listener is told names the DAC that went away, not the group.
+            var lostName = device.name
             // A speaker group's aggregate outlives a member that went away; the members are what decide.
             if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
                 let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
-                switch GroupLoss.action(for: GroupLoss.assess(playing, connected: connected), policy: chosen.onMemberLoss) {
+                let status = GroupLoss.assess(playing, connected: connected)
+                lostName = GroupLoss.lostName(status, group: chosen.name)
+                switch GroupLoss.action(for: status, policy: chosen.onMemberLoss) {
                 case .none: break
                 case .pause:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
                     alive = false
                 case .continueOnRest:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    // Said first: if the rest can't play, what follows says so instead.
+                    if state == .playing, case .followersLost(let names) = status { emit(.speakerGroupCarriesOn(group: chosen.name, without: names)) }
                     restartFromCurrentPosition()
                     return
                 }
@@ -1036,9 +1096,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                     // The chosen output dropped out mid-song (a DAC re-enumerating, AirPods reconnecting):
                     // carry on when it's back rather than on some other device.
                     awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date(), false)
-                    emit(.waitingForDevice(device.name))
+                    if lostName != device.name { groupMembersAwaited[uid] = lostName }
+                    emit(.waitingForDevice(lostName))
                 } else if wasPlaying {
-                    emit(.deviceLost(device.name))
+                    emit(.deviceLost(lostName))
                 }
             }
             // Deliberately *not* following system-default changes mid-playback: hogging the default device makes
@@ -1100,6 +1161,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .ready(let output, let members):
             standingIn = members.count < group.members.count ? group.outputUID : nil
             groupMembers = members
+            groupMembersAwaited[group.outputUID] = nil
             resolvedGroup = members.count < group.members.count ? group.without(memberUIDs: Set(group.members.map(\.deviceUID)).subtracting(members.map(\.uid))) : group
             deviceNames[output.uid] = output.name
             return output
@@ -1109,6 +1171,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             return leader
         case .missing(let names):
             deviceNames[group.outputUID] = group.name
+            groupMembersAwaited[group.outputUID] = names.joined(separator: ", ")
             log.notice("Speaker group \(group.name, privacy: .public) is missing \(names.joined(separator: ", "), privacy: .public)")
             throw ChosenDeviceMissing(uid: group.outputUID)
         case .noCommonRate:
@@ -1121,6 +1184,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     private struct ChosenDeviceMissing: Error { let uid: String }
     /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
     private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
+
+    /// What is waited for under `uid`: the missing DACs of a speaker group, else the output's name.
+    private func awaitedName(_ uid: String) -> String { groupMembersAwaited[uid] ?? deviceName(uid) }
 
     private func deviceName(_ uid: String) -> String {
         deviceNames[uid] ?? (uid == settings.deviceUID ? settings.deviceName : nil) ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
@@ -1161,7 +1227,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true, standIn: true)
             } else {
-                emit(.deviceUnavailable(deviceName(awaiting.uid)))
+                emit(.deviceUnavailable(awaitedName(awaiting.uid)))
             }
         }
     }
@@ -1202,9 +1268,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 return
             } catch is Superseded {
-                // The next command starts what was asked for instead.
+                // The next command starts what was asked for instead. The song is kept where it was asked for (`parked`): a
+                // seek that superseded it finds it there (a play or stop clears it).
                 log.info("Skipped past \(current.url.lastPathComponent, privacy: .public) while it opened")
                 teardownDecoding()
+                parked = (current, offset)
                 return
             } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
                 // Hold the song where it was and wait for the output to come back (or to be ready).
@@ -1232,7 +1300,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                         return
                     }
                     awaitingDevice = (uid, until, now, thenStandIn)
-                    if previousWait == nil { emit(.waitingForDevice(deviceName(uid))) }
+                    if previousWait == nil { emit(.waitingForDevice(awaitedName(uid))) }
                 }
                 return
             } catch {
@@ -1319,14 +1387,29 @@ public final class PlaybackEngine: @unchecked Sendable {
         mark(reused == nil ? "decoder" : "decoder (kept open)")
         var actualOffset = 0.0
         var startFrame: AVAudioFramePosition = 0
-        if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
-            let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
-            let frame = AVAudioFramePosition(bounded)
-            try decoder.seek(to: frame)
-            actualOffset = Double(frame) / decoder.processingFormat.sampleRate
-            startFrame = frame
+        // A seek reads where the song may not have arrived from the share yet, and a decoder kept open may be waiting on it in
+        // its read-ahead: on a share that has stopped answering both wait as long as it does. A skip, stop or another seek gives up.
+        // A seek right behind an output change in the same batch counts too (`commandPending`). Called on this thread only.
+        let interrupted: () -> Bool = { [unowned self] in commandPending { switch $0 { case .play, .stop, .seek: true; default: false } } }
+        do {
+            try NetworkPlaybackCache.cancellingReads(when: interrupted) {
+                if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
+                    let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
+                    let frame = AVAudioFramePosition(bounded)
+                    try decoder.seek(to: frame)
+                    actualOffset = Double(frame) / decoder.processingFormat.sampleRate
+                    startFrame = frame
+                }
+                Self.alignDoPMarkers(decoder, at: session.totalWritten)
+            }
+        } catch {
+            if interrupted() { throw Superseded() }
+            throw error
         }
-        Self.alignDoPMarkers(decoder, at: session.totalWritten)
+        // Setting a DoP marker on a decoder that reads ahead can be given up on too, and that setter can't throw: it records a hold
+        // given up on (`markerGivenUp`), which leaves the marker unset, so this song must not carry on (the command that gave it
+        // up starts what is next).
+        if (decoder as? ReadAheadDecoder)?.markerGivenUp == true { throw Superseded() }
         let streaming = isStreaming(item)
         let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
@@ -1391,8 +1474,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             try replaceGroupSession(old: old, device: device, group: group, plan: plan)
             return
         }
-        // DSD over DoP only survives untouched with sole access, so it always takes the device.
-        let exclusive = (settings.exclusive && !device.alwaysShared) || plan.isPassthrough
+        let exclusive = Self.takesDevice(device, plan: plan, exclusiveSetting: settings.exclusive)
         // A new format on the device already held (a skip to another rate): keep holding it and leave its format
         // to the new session. Letting go and taking it back reconfigures the device several times in a row, and
         // macOS can lose track of its own pause/resume pairs then: the device stays paused for this process and
@@ -1408,6 +1490,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         nrt_context_set_viz(new.context, visualizerTap)
         sessionLock.unlock()
         applyGain()
+    }
+
+    /// Whether a session for `plan` takes `device` for itself (hog mode). DSD over DoP and bitstreams only survive untouched with
+    /// sole access, so they always take it; the Mac's built-in output never (macOS keeps it for the system: a DoP or bitstream plan
+    /// there fails to open rather than take it away).
+    static func takesDevice(_ device: OutputDevice, plan: OutputPlan, exclusiveSetting: Bool) -> Bool {
+        !device.alwaysShared && (exclusiveSetting || plan.isPassthrough)
     }
 
     /// A speaker group's session: its members configured at the plan's rate (held, when exclusive), combined into a private
@@ -1498,12 +1587,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The group `session` plays, as it is chosen now, less any members that were lost; nil for a single device.
     private func currentGroup(of session: OutputSession) -> SpeakerGroup? {
         guard let playing = session.groupResources?.group else { return nil }
-        let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
-        let present = Set(playing.members.map(\.deviceUID))
-        var group = chosen
-        group.members = chosen.members.filter { present.contains($0.deviceUID) }
-        group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
-        return group
+        return playing.asPlayed(chosen: settings.group(forOutputUID: playing.outputUID) ?? playing)
     }
 
     /// The plan for `probed` on a speaker group: PCM only (`GroupFormatRules`), the ring as wide as the group, the song put onto
@@ -1536,6 +1620,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func teardownDecoding() {
         decoding = nil
+        retryAdvance = nil
         crossfade = nil
         outgoing = nil
         boundary = nil
@@ -1812,7 +1897,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             if let ahead = decoding.decoder as? ReadAheadDecoder {
                 while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
                     if superseded { throw Superseded() }
-                    if lookingAhead { serviceTransportWhileWaiting() }
+                    if lookingAhead {
+                        if lookAheadYields { throw LookAheadGivenUp() }
+                        serviceTransportWhileWaiting()
+                    }
                 }
             }
             // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
@@ -1843,6 +1931,11 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func fill() -> Bool {
         guard let session else { return false }
         if gapOwed > 0 { return writeGap(session) }
+        if let retry = retryAdvance, decoding == nil {
+            retryAdvance = nil
+            advance(after: retry.item, produced: retry.produced)
+            return true
+        }
         guard let decoding else {
             return false
         }
@@ -2173,12 +2266,15 @@ public final class PlaybackEngine: @unchecked Sendable {
             let channels = session.plan.channels
             var tail = [Float](repeating: 0, count: length * channels)
             let copied = tail.withUnsafeMutableBufferPointer { nrt_ring_peek(session.ring, cut, $0.baseAddress!, UInt32(length)) }
-            guard copied == UInt32(length), nrt_ring_rewind(session.ring, cut, margin) else { return skipFades(session) }
+            // The output reads on while the tail is copied (milliseconds for a long crossfade at a high rate): the ring is taken
+            // back to `cut` as long as half the margin is still left before what is heard. The blend is written right after.
+            guard copied == UInt32(length), nrt_ring_rewind(session.ring, cut, margin / 2) else { return skipFades(session) }
             // The ring now ends at `cut`: what was lined up after it goes.
             for (key, entry) in staged where key != cacheKey(next) { entry.cancel() }
             staged = staged.filter { $0.key == cacheKey(next) }
             carried = nil
             decoding = nil
+            retryAdvance = nil
             crossfade = nil
             outgoing = nil
             boundary = nil
@@ -2258,6 +2354,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         pending = nil
         pendingSystem = nil
         pendingFadeIn = nil
+        retryAdvance = nil
         draining = false
         drainedAt = nil
         nrt_context_set_draining(session.context, false)
@@ -2289,6 +2386,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         let planned = boundary?.after == finished.id ? boundary : nil
         boundary = nil
         crossfade = nil
+        // A gap decided below is owed only once the next song is lined up: given up (`LookAheadGivenUp`), it is decided again.
+        let gapBefore = gapOwed
         guard let session, let device = sessionDevice else { return }
         if produced == 0 {
             emptyTransitions += 1
@@ -2358,6 +2457,14 @@ public final class PlaybackEngine: @unchecked Sendable {
             } catch is Superseded {
                 teardownDecoding()
                 return
+            } catch is LookAheadGivenUp {
+                // The song that plays is left as it is (a seek or restart handles it; a queue edit chooses again): the
+                // next one is looked for again by `fill` once the command has been handled.
+                if produced == 0 { emptyTransitions -= 1 }
+                gapOwed = gapBefore
+                boundary = planned
+                retryAdvance = (finished, produced)
+                return
             } catch {
                 emit(.failed(next, error.localizedDescription))
                 candidate = nextItemProvider?(next)
@@ -2423,6 +2530,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // Paused while the output was being set up: it stays set up, and the pause (queued) finds it stopped.
                 if queuedTransportIntent() != .pause { try session.start() }
                 log.notice("Next song plays on \(pending.device.name, privacy: .public) at \(SampleRate.format(session.applied.sampleRate), privacy: .public) kHz after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
+            } catch is Superseded {
+                // A skip or stop came while the song waited on its share: the command that follows handles it. Nothing failed.
+                log.info("Stopped opening \(pending.item.url.lastPathComponent, privacy: .public) for another command")
+                teardownDecoding()
             } catch {
                 log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
                 emit(.failed(pending.item, error.localizedDescription))
@@ -2462,16 +2573,23 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Position
 
-    private func audibleSegment() -> Segment? {
+    /// `read`: the output's read position to judge by (one reading shared by callers that need the segment and its position).
+    private func audibleSegment(read: UInt64? = nil) -> Segment? {
         guard let session else { return segments.first }
-        let read = session.totalRead
+        let read = read ?? session.totalRead
         return segments.last(where: { $0.audibleFrom <= read }) ?? segments.first
     }
 
     private func currentPosition() -> TimeInterval {
+        let read = session?.totalRead ?? 0
+        return position(in: audibleSegment(read: read), read: read)
+    }
+
+    /// The playhead in `segment` at the output's read position `read`: the song and its position from the same reading, so a
+    /// gapless join between two readings can't pair one song with the other's position.
+    private func position(in segment: Segment?, read: UInt64) -> TimeInterval {
         if let atmos { return atmos.position }
-        guard let session, let segment = audibleSegment() else { return parked?.position ?? 0 }
-        let read = session.totalRead
+        guard let session, let segment else { return parked?.position ?? 0 }
         let played = read > segment.startRingFrame ? Double(read - segment.startRingFrame) / session.applied.sampleRate : 0
         return min(segment.startOffsetSeconds + played, segment.durationSeconds)
     }
@@ -2506,8 +2624,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func publishSnapshot() {
-        let segment = audibleSegment()
-        let position = currentPosition()
+        // One reading of the output's position for the song shown and its playhead.
+        let read = session?.totalRead ?? 0
+        let segment = audibleSegment(read: read)
+        let position = position(in: segment, read: read)
         var path = segment?.path
         if path?.plan.mode == .pcm {
             if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
@@ -2549,7 +2669,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let st = state
         let underruns = underrunTotal
         let parkedItem = parked
-        let waiting = awaitingDevice.map { deviceName($0.uid) }
+        let waiting = awaitingDevice.map { awaitedName($0.uid) }
         let standingInFor = sessionDevice != nil ? standingIn.map(deviceName) : nil
         let fromShare = decoding?.streaming == true
         let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0
@@ -2580,7 +2700,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.bedMeters = bed
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
-            s.snapshot.isBuffering = buffering
+            // Buffering is said only while playing: `buffering` is updated only then, and a pause that caught the output holding
+            // for data leaves it as it was.
+            s.snapshot.isBuffering = (st == .playing && buffering)
                 || (st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true)
                 || (st == .playing && lookingAhead && ringLow)
             s.snapshot.waitingForDevice = waiting

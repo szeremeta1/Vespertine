@@ -104,10 +104,45 @@ public enum DeviceRestore {
     private static func restore(_ device: AudioObjectID, to original: Original) {
         let streams = DeviceQuery.outputStreams(device)
         if streams.count == 1, let stream = streams.first {
-            if let physical = original.physical { try? HAL.set(stream, .global(kAudioStreamPropertyPhysicalFormat), physical) }
-            if let virtual = original.virtual { try? HAL.set(stream, .global(kAudioStreamPropertyVirtualFormat), virtual) }
+            putBack(physical: original.physical, virtual: original.virtual, io: .hal(stream))
         }
         if original.rate > 0 { try? DeviceControl.setNominalRate(original.rate, on: device) }
+    }
+
+    /// One stream's formats as `putBack` reads and writes them: Core Audio in the app, a fake in tests.
+    struct StreamFormatIO {
+        var read: (AudioObjectPropertySelector) -> AudioStreamBasicDescription?
+        var write: (AudioObjectPropertySelector, AudioStreamBasicDescription) throws -> Void
+        /// Between two reads while a change is under way.
+        var pause: () -> Void
+        /// After a change has read back (`DeviceControl.settle`).
+        var settle: () -> Void
+
+        static func hal(_ stream: AudioStreamID) -> StreamFormatIO {
+            StreamFormatIO(read: { try? HAL.get(stream, .global($0), initial: AudioStreamBasicDescription()) },
+                           write: { try HAL.set(stream, .global($0), $1) },
+                           pause: { usleep(10_000) }, settle: DeviceControl.settle)
+        }
+    }
+
+    /// Puts a stream's physical format back, then its virtual format. Format changes are asynchronous: each one is read
+    /// back (at most `polls` reads) and left to settle before the next, as playback does (back-to-back changes can leave
+    /// a device paused for good). One already as it was isn't set again.
+    /// Reads per format change: 50 at 10 ms, half a second, so two changes and the rate step fit the quit budget
+    /// (`QuitSequence.defaultBudget`) on a device that is slow to report.
+    static let restorePolls = 50
+
+    static func putBack(physical: AudioStreamBasicDescription?, virtual: AudioStreamBasicDescription?, io: StreamFormatIO,
+                        polls: Int = restorePolls) {
+        func isBack(_ selector: AudioObjectPropertySelector, _ format: AudioStreamBasicDescription) -> Bool {
+            io.read(selector).map { DeviceControl.isSameFormat($0, format) } ?? false
+        }
+        for (selector, format) in [(kAudioStreamPropertyPhysicalFormat, physical), (kAudioStreamPropertyVirtualFormat, virtual)] {
+            guard let format, !isBack(selector, format), (try? io.write(selector, format)) != nil else { continue }
+            var reads = 0
+            while reads < polls, !isBack(selector, format) { io.pause(); reads += 1 }
+            io.settle()
+        }
     }
 
     private static func standard(_ device: AudioObjectID, rate: Double, bits: Int) {

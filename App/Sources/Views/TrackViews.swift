@@ -55,6 +55,7 @@ struct TrackTable: View {
                     Image(systemName: model.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
                         .font(.system(size: 10))
                         .rowForeground(Palette.brass)
+                        .accessibilityLabel("Now Playing")
                 } else {
                     Text(showAlbum ? "\(row.index + 1)" : number(row.track, discs: discs))
                         .font(Typeface.mono(11.5))

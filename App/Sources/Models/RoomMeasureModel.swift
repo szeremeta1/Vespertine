@@ -59,8 +59,9 @@ final class RoomMeasureModel {
     var draft: RoomProfile?
     /// The output to measure (Vespertine's own); nil or not connected: the Mac's default output.
     @ObservationIgnored var preferredOutputUID: String?
-    /// Pauses Vespertine's playback before the measurement takes the output.
-    @ObservationIgnored var pausePlayback: (@MainActor () -> Void)?
+    /// Pauses Vespertine's playback before the measurement takes the output (for a group, stops it and waits until the engine
+    /// has let the DACs go). The measurement starts when it returns.
+    @ObservationIgnored var pausePlayback: (@MainActor () async -> Void)?
     /// A speaker group to measure instead of a single output: the group, and its members as Core Audio lists them, in the group's
     /// order. nil for a single output. The layout and channel map then come from the group, not from the picker.
     @ObservationIgnored var groupTarget: (group: SpeakerGroup, members: [OutputDevice])?
@@ -110,11 +111,15 @@ final class RoomMeasureModel {
         issues = []
         plot = nil
         draft = nil
-        pausePlayback?()
         phase = .running
         headline = String(localized: "Getting ready")
         detail = ""
-        runTask = Task { [weak self] in await self?.setUpAndRun(micName: micName) }
+        runTask = Task { [weak self] in
+            await self?.pausePlayback?()
+            // Cancelled while playback was let go: no DACs opened, no folder made; back to the start.
+            guard !Task.isCancelled else { self?.reset(); return }
+            await self?.setUpAndRun(micName: micName)
+        }
     }
 
     func retry() {
@@ -205,7 +210,7 @@ final class RoomMeasureModel {
                 switch GroupMeasurement.setup(for: target.group) {
                 case .failure(let problem): return fail(problem.description)
                 case .success(let setup):
-                    guard let members = target.members.first else { return fail(groupProblem ?? "The group's outputs aren't all connected.") }
+                    guard let members = target.members.first else { return fail(groupProblem ?? String(localized: "The group's outputs aren't all connected.")) }
                     let measuringRate: Double
                     do { measuringRate = try CoreAudioRoomDevice.measurementRate(inputDevice: mic.id, outputDevice: members.id) }
                     catch { return fail(String(localized: "\(mic.name) can't be recorded for this measurement: \(error.localizedDescription)")) }
@@ -216,7 +221,7 @@ final class RoomMeasureModel {
                         holdStarted = Date()
                         output = RoomAudioDevice(id: opened.deviceID, name: target.group.name, uid: setup.deviceUID, channels: opened.channels, nominalRate: measuringRate)
                     } catch {
-                        return fail("The group couldn't be opened for the measurement: \(error.localizedDescription)")
+                        return fail(String(localized: "The group couldn't be opened for the measurement: \(error.localizedDescription)"))
                     }
                     groupSetup = setup
                     layout = setup.layout
@@ -230,7 +235,7 @@ final class RoomMeasureModel {
         }
         let needed = groupSetup?.outputsNeeded ?? layout.speakers.count
         guard output.channels >= needed else {
-            return fail(String(localized: "\(output.name) has \(output.channels) output channel(s); this measurement needs \(needed)."))
+            return fail(String(localized: "Output channels on \(output.name): \(output.channels). This measurement needs \(needed)."))
         }
         let outputRate = output.nominalRate
         guard outputRate >= 8_000 else { return fail(String(localized: "Couldn't read the sample rate of \(output.name).")) }
@@ -285,7 +290,7 @@ final class RoomMeasureModel {
         deviceLines = [
             String(localized: "Microphone: \(mic.name) (serial \(serial), \(Int(cal.points.count)) calibration points, mic pointing up)"),
             groupSetup != nil
-                ? "Output: the group \(output.name) at \(Int(outputRate)) Hz, \(needed) channels on its outputs in the group's order; timing tones from \(groupSetup?.referenceSpeaker.rawValue ?? "the leader") on the clock leader"
+                ? String(localized: "Output: the group \(output.name) at \(Int(outputRate)) Hz, channels 1–\(needed) on its outputs in the group's order; timing tones from \(groupSetup?.referenceSpeaker.rawValue ?? "the leader") on the clock leader")
                 : String(localized: "Output: \(output.name) at \(Int(outputRate)) Hz, speakers on channels 1–\(needed) in the standard order (unverified wiring)"),
             String(localized: "Measuring at \(Int(rate)) Hz, the rate the microphone records at; the output keeps its own rate."),
             String(localized: "Saving to \((folder.path as NSString).abbreviatingWithTildeInPath)"),
@@ -311,16 +316,17 @@ final class RoomMeasureModel {
             let request = RoomCaptureRequest(inputDevice: micID, outputDevice: outputID, inputChannel: 0, outputChannel: followerChannel, referenceChannel: leaderChannel, layout: layout)
             return try await session.record(request).samples
         }
-        headline = "Timing the DACs against each other"
+        headline = String(localized: "Timing the DACs against each other")
         let outcome = await GroupSkewMeasurement.run(group: group, rate: rate, corrected: held.correctedMemberUIDs,
                                                       secondsSinceOutputStarted: { Date().timeIntervalSince(started) }, capture: capture) { [weak self] line in
             Task { @MainActor in self?.detail = line }
         }
         if Task.isCancelled { reset(); return false }
         for done in outcome.outcomes {
-            skewLines.append(String(format: "%@ sounds %.2f ms after the leader (%d good captures, spread %.1f frames)%@",
-                                    done.followerName, done.group.members.first { $0.name == done.followerName }?.skewMs ?? 0, done.goodRuns, done.spreadFrames,
-                                    done.rateTrimPPM.map { String(format: ", and falls behind %+.1f ppm while it plays", $0) } ?? ""))
+            let skew = (done.group.members.first { $0.name == done.followerName }?.skewMs ?? 0).formatted(.number.precision(.fractionLength(2)))
+            let spread = done.spreadFrames.formatted(.number.precision(.fractionLength(1)))
+            let drift = done.rateTrimPPM.map { String(localized: ", and falls behind \($0.formatted(.number.precision(.fractionLength(1)).sign(strategy: .always()))) ppm while it plays", comment: "Appended to the line about a follower DAC's delay: its steady drift behind the leader.") } ?? ""
+            skewLines.append(String(localized: "\(done.followerName) sounds \(skew) ms after the leader (good captures: \(done.goodRuns), spread \(spread) frames)\(drift)", comment: "Room measurement of a speaker group: how late a follower DAC plays after the clock leader."))
             skewLines.append(contentsOf: done.notes)
         }
         skewLines.append(contentsOf: outcome.failures)
@@ -335,8 +341,8 @@ final class RoomMeasureModel {
         for left in stride(from: total, through: 1, by: -1) {
             if Task.isCancelled { break }
             settleRemaining = left
-            headline = "Letting the speakers settle"
-            detail = "The group plays silence for \(total) seconds so the second DAC is in step with the first. \(left) s left."
+            headline = String(localized: "Letting the speakers settle")
+            detail = String(localized: "The group plays silence for \(total) s so the second DAC is in step with the first. \(left) s left.", comment: "Room measurement of a speaker group: total seconds of silence, then the seconds left.")
             try? await Task.sleep(for: .seconds(1))
         }
         settleRemaining = nil

@@ -58,6 +58,9 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
     public let capabilities: DeviceCapabilities
     public let hasHardwareVolume: Bool
     public let isDefault: Bool
+    /// A built-in output's current data source (`kAudioDevicePropertyDataSource`): 'ispk' for the Mac's speakers, 'hdpn'
+    /// for the headphone jack. nil for other outputs, or when it couldn't be read.
+    public var builtInDataSource: UInt32? = nil
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 
@@ -166,10 +169,12 @@ enum DeviceQuery {
 
     static func capabilities(_ device: AudioObjectID, supportsDoP: Bool) -> DeviceCapabilities {
         var formats: [PhysicalFormat] = []
+        var perStream: [[PhysicalFormat]] = []
         for stream in outputStreams(device) {
+            var own: [PhysicalFormat] = []
             for ranged in physicalFormats(stream) where ranged.mFormat.mFormatID == kAudioFormatLinearPCM {
                 let f = ranged.mFormat
-                formats.append(PhysicalFormat(
+                own.append(PhysicalFormat(
                     minRate: ranged.mSampleRateRange.mMinimum,
                     maxRate: ranged.mSampleRateRange.mMaximum,
                     bitDepth: Int(f.mBitsPerChannel),
@@ -177,6 +182,8 @@ enum DeviceQuery {
                     isMixable: f.mFormatFlags & kAudioFormatFlagIsNonMixable == 0,
                     channels: Int(f.mChannelsPerFrame)))
             }
+            formats += own
+            perStream.append(own)
         }
         // Capacity, not the current setting: an HDMI receiver left in 2-channel mode still offers 8.
         let streams = outputStreams(device).map { stream in
@@ -187,7 +194,8 @@ enum DeviceQuery {
         let channels = channelCapacity(streams: streams, configured: outputChannelCount(device))
         return DeviceCapabilities(sampleRates: nominalRates(device), physicalFormats: Array(Set(formats)),
                                   outputChannels: channels, supportsDoP: supportsDoP,
-                                  speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil })
+                                  speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil },
+                                  streamFormats: perStream.count > 1 ? perStream : nil)
     }
 
     /// Channels the device can carry: per stream, the widest format it offers (or its current one,
@@ -251,7 +259,8 @@ enum DeviceQuery {
             nominalSampleRate: (try? HAL.get(id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0,
             capabilities: capabilities(id, supportsDoP: dopEnabledUIDs.contains(uid)),
             hasHardwareVolume: !volumeElements(id).isEmpty,
-            isDefault: id == defaultID)
+            isDefault: id == defaultID,
+            builtInDataSource: transport == .builtIn ? try? HAL.get(id, .output(kAudioDevicePropertyDataSource), initial: UInt32(0)) : nil)
     }
 
     /// UIDs of the connected outputs: cheap, no formats read.

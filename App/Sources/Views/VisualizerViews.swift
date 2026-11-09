@@ -542,7 +542,10 @@ final class VisualizerMTKView: MTKView {
     }
 
     /// The display's own refresh rate: 120 on ProMotion, 60 on most others.
-    private var displayRate: Int { max(30, window?.screen?.maximumFramesPerSecond ?? 60) }
+    private var displayRate: Int { max(30, screenRate?() ?? window?.screen?.maximumFramesPerSecond ?? 60) }
+
+    /// Stands in for the window's display refresh rate (tests).
+    var screenRate: (() -> Int)?
 
     private func refresh() {
         guard let window else { return }
@@ -551,6 +554,8 @@ final class VisualizerMTKView: MTKView {
             preferredFramesPerSecond = rate
             if showing { visualizer?.rateChanged(Double(rate)) }
         }
+        // The link was made for the display the window was on; on another display it is held to that one's rate.
+        if let link { link.preferredFrameRateRange = Self.frameRateRange(Float(rate)) }
         setShowing(window.isVisible && !window.isMiniaturized && window.occlusionState.contains(.visible))
     }
 
@@ -570,6 +575,9 @@ final class VisualizerMTKView: MTKView {
     /// left off: after its window was closed and shown again it could stay stopped with `isPaused` false, and the picture
     /// stayed on the last frame the closed window drew (the old song's title and all).
     private var link: CADisplayLink?
+    /// The rate the display link is asked for (tests).
+    var drawingRate: Float? { link?.preferredFrameRateRange.maximum }
+    static func frameRateRange(_ rate: Float) -> CAFrameRateRange { CAFrameRateRange(minimum: min(30, rate), maximum: rate, preferred: rate) }
     /// Draws since the view was made.
     var drawCount = 0
 
@@ -578,8 +586,7 @@ final class VisualizerMTKView: MTKView {
         enableSetNeedsDisplay = false
         link?.invalidate()
         let link = displayLink(target: DrawTarget(self), selector: #selector(DrawTarget.tick))
-        let rate = Float(displayRate)
-        link.preferredFrameRateRange = CAFrameRateRange(minimum: min(30, rate), maximum: rate, preferred: rate)
+        link.preferredFrameRateRange = Self.frameRateRange(Float(displayRate))
         link.add(to: .main, forMode: .common)
         self.link = link
         draw()   // the current song at once, before the first tick
