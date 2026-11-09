@@ -124,6 +124,24 @@ struct SectionLabel: View {
             .font(Typeface.ui(10.5, weight: .semibold))
             .letterSpacing(0.9)
             .foregroundStyle(Palette.text3)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// The bit-perfect verdict as a shape, never as colour alone: a filled disc when the signal is untouched, a ring
+/// when it is converted. The words beside it say the same to VoiceOver.
+struct VerdictMark: View {
+    let untouched: Bool
+
+    var body: some View {
+        Group {
+            if untouched {
+                Circle().fill(Palette.brassHi).frame(width: 6, height: 6)
+            } else {
+                Circle().strokeBorder(Palette.copper, lineWidth: 1.5).frame(width: 7, height: 7)
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 

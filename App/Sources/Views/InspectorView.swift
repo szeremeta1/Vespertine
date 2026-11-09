@@ -334,8 +334,7 @@ struct SignalSteps: View {
                                 .frame(width: 1)
                                 .padding(.top, 11)
                         }
-                        Circle().strokeBorder(Palette.brass, lineWidth: 1.5).background(Circle().fill(Palette.panel))
-                            .frame(width: 8, height: 8).padding(.top, 4)
+                        marker(step.tone)
                     }
                     .frame(width: 10)
                     VStack(alignment: .leading, spacing: 1) {
@@ -348,9 +347,37 @@ struct SignalSteps: View {
                         .foregroundStyle(step.tone == .good ? Palette.brassHi : step.tone == .changed ? Palette.copper : Palette.text2)
                         .multilineTextAlignment(.trailing)
                 }
+                // One stop per step for VoiceOver: what it is, what it does now and, in words, whether it leaves the signal alone.
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(step.title)
+                .accessibilityValue(Self.spoken(step))
                 .padding(.bottom, 9)
             }
         }
+    }
+}
+
+extension SignalSteps {
+    /// A step's mark: a filled disc where the signal is untouched, a copper ring where this step changes it, the
+    /// brass ring of a plain step otherwise. The shape says it too, so colour is never the only sign.
+    @ViewBuilder fileprivate func marker(_ tone: SignalPathView.Step.Tone) -> some View {
+        switch tone {
+        case .good:
+            Circle().fill(Palette.brassHi).frame(width: 8, height: 8).padding(.top, 4)
+        case .changed:
+            Circle().strokeBorder(Palette.copper, lineWidth: 1.5).background(Circle().fill(Palette.panel)).frame(width: 8, height: 8).padding(.top, 4)
+        case .plain:
+            Circle().strokeBorder(Palette.brass, lineWidth: 1.5).background(Circle().fill(Palette.panel)).frame(width: 8, height: 8).padding(.top, 4)
+        }
+    }
+
+    fileprivate static func spoken(_ step: SignalPathView.Step) -> String {
+        let state: String? = switch step.tone {
+        case .good: String(localized: "Untouched", comment: "VoiceOver: this signal path step leaves the audio samples as they are")
+        case .changed: String(localized: "Changed", comment: "VoiceOver: this signal path step changes the audio")
+        case .plain: nil
+        }
+        return [step.value, state, step.detail].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
     }
 }
 

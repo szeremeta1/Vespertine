@@ -676,6 +676,7 @@ struct SmartPlaylistEditor: View {
             HStack {
                 Toggle(isOn: $limitOn) { Text("Limit to", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]") }
                 TextField("", value: $limit, format: .number).frame(width: 60).textFieldStyle(.roundedBorder).disabled(!limitOn)
+                    .accessibilityLabel("Limit to")
                 Text("tracks, sorted by", comment: "Smart playlist sentence: Limit to [100] tracks, sorted by [Album]")
                 Picker("Sort by", selection: $rules.sort) {
                     Text("Album").tag(SmartRules.Sort.album)
