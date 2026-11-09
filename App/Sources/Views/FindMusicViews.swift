@@ -204,7 +204,7 @@ struct FindMusicSheet: View {
                 Toggle("Look up missing details and cover art on MusicBrainz afterwards", isOn: $enrichAfter)
                     .toggleStyle(.checkbox).font(Typeface.ui(12))
                 Spacer()
-                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
+                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction)
                 Button(adding ? String(localized: "Adding…") : String(localized: "Add \(selectedFiles.count) Tracks")) { add() }
                     .buttonStyle(BrassButtonStyle())
                     .disabled(selectedFiles.isEmpty || adding || scanning || (mode == .copyAndOrganize && !(space?.fits ?? false)))
@@ -317,7 +317,7 @@ struct EnrichSheet: View {
                 Text(result ?? (loading ? "" : String(localized: "\(proposals.count) to review · \(complete) already complete")))
                     .font(Typeface.ui(11.5)).foregroundStyle(Palette.text3)
                 Spacer()
-                Button("Close") { dismiss() }.buttonStyle(QuietButtonStyle())
+                Button("Close") { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction)
                 Button(applying ? String(localized: "Applying…") : String(localized: "Apply \(chosen.count)", comment: "Button: apply the chosen number of album changes")) { apply() }
                     .buttonStyle(BrassButtonStyle()).disabled(chosen.isEmpty || applying || loading)
                     .keyboardShortcut(.defaultAction)
