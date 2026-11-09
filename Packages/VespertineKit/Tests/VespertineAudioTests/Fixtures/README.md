@@ -13,6 +13,10 @@ and the same stream in Matroska with title/artist/album tags. `truehd-tones.thd`
 tones as 24-bit 48 kHz Dolby TrueHD (FFmpeg's experimental `truehd` encoder), raw and in Matroska;
 `truehd-source.flac` is the 24-bit PCM they were encoded from (TrueHD is lossless, so decoding must match it exactly).
 
+`dts-channel-change.dts`: a raw DTS stream whose channel count changes partway: 0.1 s of a 440 Hz sine in stereo, then
+0.1 s of a 550 Hz sine in 5.1 (on every channel), each encoded on its own with FFmpeg's `dca` encoder (`-strict -2`,
+768 kb/s, 48 kHz) and the two files joined byte for byte (`cat`).
+
 `umik-synthetic.txt` / `umik-synthetic_90deg.txt`: synthetic calibration files laid out like a miniDSP UMIK-1 download
 (serial 0000001, made up), 0° and 90°: a quoted `Sens Factor` / `SERNO` header line (the 90° file adds a second quoted
 comment line), CRLF line endings, a trailing blank line on the 0° file, and 615 tab-separated frequency (Hz) and level
