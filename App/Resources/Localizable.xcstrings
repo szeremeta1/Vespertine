@@ -229264,270 +229264,270 @@
         }
       }
     },
-    "macOS renders the Atmos objects for the output, as Apple Music does: head-tracked Spatial Audio on AirPods, height channels on a multichannel device. The spectrum, channel meters and Visualizer show the 5.1 or 7.1 bed from a separate decode (not the objects), which never touches what macOS plays.": {
+    "macOS renders the Atmos objects for the output, as Apple Music does: Apple's Spatial Audio renderer on AirPods (head-tracked where macOS provides it), height channels on a multichannel device. The spectrum, channel meters and Visualizer show the 5.1 or 7.1 bed from a separate decode (not the objects), which never touches what macOS plays.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የራስ እንቅስቃሴን የሚከታተል Spatial Audio፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። ስፔክትረሙ፣ የቻናል መለኪያዎቹና ምስላዊ ማሳያው ከተለየ ዲኮድ የ5.1 ወይም 7.1 መሠረትን ያሳያሉ (ነገሮችን አይደለም)፤ ይህም macOS የሚጫወተውን ፈጽሞ አይነካም።"
+            "value": "macOS የAtmos objectsን ለውፅዓቱ ያቀርባል፣ Apple Music እንደሚያደርገው፦ በAirPods ላይ የApple Spatial Audio አቅራቢ (macOS በሚያቀርብበት ቦታ የራስ እንቅስቃሴን ይከታተላል)፣ በባለብዙ ቻናል መሣሪያ ላይ የከፍታ ቻናሎች። ስፔክትረሙ፣ የቻናል መለኪያዎቹና ምስላዊ ማሳያው ከተለየ ዲኮድ የ5.1 ወይም 7.1 መሠረትን ያሳያሉ (ነገሮችን አይደለም)፤ ይህም macOS የሚጫወተውን ፈጽሞ አይነካም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: صوت مكاني مع تتبع حركة الرأس على AirPods، وقنوات ارتفاع على جهاز متعدد القنوات. يعرض الطيف ومقاييس القنوات والمؤثرات المرئية القاعدة 5.1 أو 7.1 من فك ترميز منفصل (وليس الكائنات)، ولا يمسّ أبدًا ما يشغّله macOS."
+            "value": "يعرض macOS كائنات Atmos للمخرج، كما يفعل Apple Music: معالج الصوت المكاني من Apple على AirPods (مع تتبع حركة الرأس حيثما يوفره macOS)، وقنوات ارتفاع على جهاز متعدد القنوات. يعرض الطيف ومقاييس القنوات والمؤثرات المرئية القاعدة 5.1 أو 7.1 من فك ترميز منفصل (وليس الكائنات)، ولا يمسّ أبدًا ما يشغّله macOS."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ হেড-ট্র্যাকড স্পেশিয়াল অডিও, মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। স্পেকট্রাম, চ্যানেল মিটার ও ভিজ্যুয়ালাইজার আলাদা ডিকোড থেকে 5.1 বা 7.1 বেড দেখায় (অবজেক্ট নয়), যা macOS যা চালায় তা কখনও স্পর্শ করে না।"
+            "value": "macOS আউটপুটের জন্য Atmos অবজেক্ট রেন্ডার করে, যেমন Apple Music করে: AirPods-এ Apple-এর স্পেশিয়াল অডিও রেন্ডারার (macOS যেখানে দেয় সেখানে হেড-ট্র্যাকিং সহ), মাল্টিচ্যানেল ডিভাইসে উচ্চতার চ্যানেল। স্পেকট্রাম, চ্যানেল মিটার ও ভিজ্যুয়ালাইজার আলাদা ডিকোড থেকে 5.1 বা 7.1 বেড দেখায় (অবজেক্ট নয়), যা macOS যা চালায় তা কখনও স্পর্শ করে না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk se sledováním hlavy na AirPodech, výškové kanály na vícekanálovém zařízení. Spektrum, kanálové měřiče a Vizualizér ukazují základ 5.1 nebo 7.1 ze samostatného dekódování (ne objekty), které se nikdy nedotkne toho, co macOS přehrává."
+            "value": "macOS vykresluje objekty Atmos pro daný výstup stejně jako Apple Music: prostorový zvuk od Applu na AirPodech (se sledováním hlavy, kde ho macOS nabízí), výškové kanály na vícekanálovém zařízení. Spektrum, kanálové měřiče a Vizualizér ukazují základ 5.1 nebo 7.1 ze samostatného dekódování (ne objekty), které se nikdy nedotkne toho, co macOS přehrává."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: rumlig lyd med hovedsporing på AirPods og højdekanaler på en flerkanalsenhed. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat afkodning (ikke objekterne), som aldrig rører det, macOS afspiller."
+            "value": "macOS gengiver Atmos-objekterne til outputtet, ligesom Apple Music gør: Apples renderer til rumlig lyd på AirPods (med hovedsporing, hvor macOS tilbyder det) og højdekanaler på en flerkanalsenhed. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat afkodning (ikke objekterne), som aldrig rører det, macOS afspiller."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: 3D-Audio mit Kopfbewegungserkennung auf AirPods, Höhenkanäle auf einem Mehrkanalgerät. Spektrum, Kanal-Pegelanzeigen und Visualizer zeigen das 5.1- oder 7.1-Bed aus einer separaten Dekodierung (nicht die Objekte); sie berührt nie, was macOS wiedergibt."
+            "value": "macOS rendert die Atmos-Objekte für die Ausgabe, wie Apple Music: Apples 3D-Audio-Renderer auf AirPods (mit Kopfbewegungserkennung, wo macOS sie bietet), Höhenkanäle auf einem Mehrkanalgerät. Spektrum, Kanal-Pegelanzeigen und Visualizer zeigen das 5.1- oder 7.1-Bed aus einer separaten Dekodierung (nicht die Objekte); sie berührt nie, was macOS wiedergibt."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: Χωρικός ήχος με παρακολούθηση κεφαλής στα AirPods, κανάλια ύψους σε πολυκαναλική συσκευή. Το φάσμα, οι μετρητές καναλιών και ο Οπτικοποιητής δείχνουν τη βάση 5.1 ή 7.1 από ξεχωριστή αποκωδικοποίηση (όχι τα αντικείμενα), η οποία δεν αγγίζει ποτέ ό,τι παίζει το macOS."
+            "value": "Το macOS αποδίδει τα αντικείμενα Atmos για την έξοδο, όπως κάνει η Apple Music: ο renderer Χωρικού ήχου της Apple στα AirPods (με παρακολούθηση κεφαλής όπου το παρέχει το macOS), κανάλια ύψους σε πολυκαναλική συσκευή. Το φάσμα, οι μετρητές καναλιών και ο Οπτικοποιητής δείχνουν τη βάση 5.1 ή 7.1 από ξεχωριστή αποκωδικοποίηση (όχι τα αντικείμενα), η οποία δεν αγγίζει ποτέ ό,τι παίζει το macOS."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: audio espacial con seguimiento de la cabeza en los AirPods y canales de altura en un dispositivo multicanal. El espectro, los medidores de canales y el Visualizador muestran la base 5.1 o 7.1 de una decodificación aparte (no los objetos), que nunca toca lo que reproduce macOS."
+            "value": "macOS procesa los objetos Atmos para la salida, como hace Apple Music: el renderizador de audio espacial de Apple en los AirPods (con seguimiento de la cabeza donde macOS lo ofrece) y canales de altura en un dispositivo multicanal. El espectro, los medidores de canales y el Visualizador muestran la base 5.1 o 7.1 de una decodificación aparte (no los objetos), que nunca toca lo que reproduce macOS."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: صدای فضایی با ردیابی سر روی AirPods، و کانال‌های ارتفاعی روی دستگاه چندکاناله. طیف، نمایشگرهای سطح کانال‌ها و نمایشگر تصویری، بستر 5.1 یا 7.1 را از یک رمزگشایی جداگانه نشان می‌دهند (نه اشیا)، که هرگز به آنچه macOS پخش می‌کند دست نمی‌زند."
+            "value": "macOS اشیای Atmos را برای خروجی رندر می‌کند، همان‌طور که Apple Music انجام می‌دهد: رندرکننده صدای فضایی اپل روی AirPods (با ردیابی سر در جایی که macOS آن را ارائه می‌دهد)، و کانال‌های ارتفاعی روی دستگاه چندکاناله. طیف، نمایشگرهای سطح کانال‌ها و نمایشگر تصویری، بستر 5.1 یا 7.1 را از یک رمزگشایی جداگانه نشان می‌دهند (نه اشیا)، که هرگز به آنچه macOS پخش می‌کند دست نمی‌زند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: pään liikkeitä seuraava tilaääni AirPodeissa, korkeuskanavat monikanavaisessa laitteessa. Spektri, kanavamittarit ja Visualisoija näyttävät 5.1- tai 7.1-pohjan erillisestä purusta (eivät objekteja), joka ei koskaan kosketa sitä, mitä macOS toistaa."
+            "value": "macOS renderöi Atmos-objektit ulostuloa varten samoin kuin Apple Music: Applen tilaäänen renderöijä AirPodeissa (pään liikkeitä seuraten, jos macOS sen tarjoaa), korkeuskanavat monikanavaisessa laitteessa. Spektri, kanavamittarit ja Visualisoija näyttävät 5.1- tai 7.1-pohjan erillisestä purusta (eivät objekteja), joka ei koskaan kosketa sitä, mitä macOS toistaa."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: head-tracked na Spatial Audio sa AirPods, mga height channel sa multichannel na device. Ipinapakita ng spectrum, mga channel meter at Visualizer ang 5.1 o 7.1 bed mula sa hiwalay na decode (hindi ang mga object), na hindi kailanman ginagalaw ang pinapatugtog ng macOS."
+            "value": "Nire-render ng macOS ang mga Atmos object para sa output, gaya ng ginagawa ng Apple Music: renderer ng Spatial Audio ng Apple sa AirPods (head-tracked kung saan ito ibinibigay ng macOS), mga height channel sa multichannel na device. Ipinapakita ng spectrum, mga channel meter at Visualizer ang 5.1 o 7.1 bed mula sa hiwalay na decode (hindi ang mga object), na hindi kailanman ginagalaw ang pinapatugtog ng macOS."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : audio spatial avec suivi de la tête sur les AirPods, canaux d’élévation sur un appareil multicanal. Le spectre, les indicateurs de niveau des canaux et le Visualiseur montrent le bed 5.1 ou 7.1 issu d’un décodage séparé (pas les objets), qui ne touche jamais à ce que macOS lit."
+            "value": "macOS effectue le rendu des objets Atmos pour la sortie, comme Apple Music : moteur audio spatial d’Apple sur les AirPods (avec suivi de la tête quand macOS le permet), canaux d’élévation sur un appareil multicanal. Le spectre, les indicateurs de niveau des canaux et le Visualiseur montrent le bed 5.1 ou 7.1 issu d’un décodage séparé (pas les objets), qui ne touche jamais à ce que macOS lit."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર હેડ-ટ્રૅક થયેલો સ્પેશિયલ ઑડિયો, મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. સ્પેક્ટ્રમ, ચૅનલ મીટર અને વિઝ્યુઅલાઇઝર અલગ ડીકોડમાંથી 5.1 કે 7.1 બેડ બતાવે છે (ઑબ્જેક્ટ નહીં), જે macOS જે વગાડે છે તેને ક્યારેય સ્પર્શતું નથી."
+            "value": "macOS આઉટપુટ માટે Atmos ઑબ્જેક્ટ રેન્ડર કરે છે, Apple Music ની જેમ: AirPods પર Appleનું સ્પેશિયલ ઑડિયો રેન્ડરર (જ્યાં macOS આપે ત્યાં હેડ-ટ્રૅકિંગ સાથે), મલ્ટિચૅનલ ડિવાઇસ પર ઊંચાઈની ચૅનલો. સ્પેક્ટ્રમ, ચૅનલ મીટર અને વિઝ્યુઅલાઇઝર અલગ ડીકોડમાંથી 5.1 કે 7.1 બેડ બતાવે છે (ઑબ્જેક્ટ નહીં), જે macOS જે વગાડે છે તેને ક્યારેય સ્પર્શતું નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: Spatial Audio mai bin motsin kai a kan AirPods, tashoshin tsawo a na'ura mai tashoshi da yawa. Bakan sauti, mitocin tashoshi da Mai nuna sauti suna nuna gadon 5.1 ko 7.1 daga warwarewa na daban (ba abubuwan ba), wanda ba ya taɓa abin da macOS ke kunnawa har abada."
+            "value": "macOS yana sarrafa abubuwan Atmos don fitarwa, kamar yadda Apple Music ke yi: na'urar Spatial Audio ta Apple a kan AirPods (tana bin motsin kai a inda macOS ke bayarwa), tashoshin tsawo a na'ura mai tashoshi da yawa. Bakan sauti, mitocin tashoshi da Mai nuna sauti suna nuna gadon 5.1 ko 7.1 daga warwarewa na daban (ba abubuwan ba), wanda ba ya taɓa abin da macOS ke kunnawa har abada."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: שמע מרחבי עם מעקב אחר תנועות הראש ב־AirPods, וערוצי גובה בהתקן רב־ערוצי. הספקטרום, מדי הערוצים והויזואלייזר מציגים את בסיס ה־5.1 או ה־7.1 מפענוח נפרד (לא את האובייקטים), שלעולם אינו נוגע במה ש־macOS מנגן."
+            "value": "macOS מעבד את אובייקטי ה־Atmos עבור הפלט, כפי ש־Apple Music עושה: מעבד השמע המרחבי של Apple ב־AirPods (עם מעקב אחר תנועות הראש כאשר macOS מספק זאת), וערוצי גובה בהתקן רב־ערוצי. הספקטרום, מדי הערוצים והויזואלייזר מציגים את בסיס ה־5.1 או ה־7.1 מפענוח נפרד (לא את האובייקטים), שלעולם אינו נוגע במה ש־macOS מנגן."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर हेड-ट्रैक्ड स्पेशियल ऑडियो, मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। स्पेक्ट्रम, चैनल मीटर और विज़ुअलाइज़र अलग डिकोड से 5.1 या 7.1 बेड दिखाते हैं (ऑब्जेक्ट नहीं), जो macOS जो चलाता है उसे कभी नहीं छूता।"
+            "value": "macOS आउटपुट के लिए Atmos ऑब्जेक्ट रेंडर करता है, जैसे Apple Music करता है: AirPods पर Apple का स्पेशियल ऑडियो रेंडरर (जहाँ macOS देता है वहाँ हेड-ट्रैकिंग के साथ), मल्टीचैनल डिवाइस पर ऊँचाई वाले चैनल। स्पेक्ट्रम, चैनल मीटर और विज़ुअलाइज़र अलग डिकोड से 5.1 या 7.1 बेड दिखाते हैं (ऑब्जेक्ट नहीं), जो macOS जो चलाता है उसे कभी नहीं छूता।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: fejkövetéses térhatású hang AirPodson, magassági csatornák többcsatornás eszközön. A spektrum, a csatornamérők és a Vizualizáló az 5.1-es vagy 7.1-es alapot mutatják egy külön dekódolásból (nem az objektumokat), amely sosem érinti azt, amit a macOS lejátszik."
+            "value": "A macOS rendereli az Atmos-objektumokat a kimenethez, ahogyan az Apple Music is: az Apple térhatású hangmegjelenítője AirPodson (fejkövetéssel, ahol a macOS biztosítja), magassági csatornák többcsatornás eszközön. A spektrum, a csatornamérők és a Vizualizáló az 5.1-es vagy 7.1-es alapot mutatják egy külön dekódolásból (nem az objektumokat), amely sosem érinti azt, amit a macOS lejátszik."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Spasial dengan pelacakan kepala di AirPods, saluran ketinggian di perangkat multisaluran. Spektrum, meter saluran, dan Visualizer menampilkan bed 5.1 atau 7.1 dari dekode terpisah (bukan objeknya), yang tidak pernah menyentuh apa yang diputar macOS."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: perender Audio Spasial Apple di AirPods (dengan pelacakan kepala jika disediakan macOS), saluran ketinggian di perangkat multisaluran. Spektrum, meter saluran, dan Visualizer menampilkan bed 5.1 atau 7.1 dari dekode terpisah (bukan objeknya), yang tidak pernah menyentuh apa yang diputar macOS."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: audio spaziale con rilevamento della testa su AirPods, canali di altezza su un dispositivo multicanale. Lo spettro, gli indicatori di livello dei canali e il Visualizzatore mostrano il bed 5.1 o 7.1 di una decodifica separata (non gli oggetti), che non tocca mai ciò che macOS riproduce."
+            "value": "macOS renderizza gli oggetti Atmos per l’uscita, come fa Apple Music: il renderer di audio spaziale di Apple su AirPods (con rilevamento della testa dove macOS lo offre), canali di altezza su un dispositivo multicanale. Lo spettro, gli indicatori di livello dei canali e il Visualizzatore mostrano il bed 5.1 o 7.1 di una decodifica separata (non gli oggetti), che non tocca mai ciò che macOS riproduce."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではヘッドトラッキング付きの空間オーディオ、マルチチャンネルデバイスではハイトチャンネルになります。スペクトラム、チャンネルメーター、ビジュアライザには、別にデコードした5.1または7.1のベッド（オブジェクトではありません）が表示され、macOSが再生する音には一切触れません。"
+            "value": "Apple Musicと同様に、macOSが出力に合わせてAtmosオブジェクトをレンダリングします。AirPodsではAppleの空間オーディオレンダラー（macOSが対応している場合はヘッドトラッキング付き）、マルチチャンネルデバイスではハイトチャンネルになります。スペクトラム、チャンネルメーター、ビジュアライザには、別にデコードした5.1または7.1のベッド（オブジェクトではありません）が表示され、macOSが再生する音には一切触れません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕ್ಡ್ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ, ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. ಸ್ಪೆಕ್ಟ್ರಮ್, ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಮತ್ತು ದೃಶ್ಯೀಕರಣವು ಪ್ರತ್ಯೇಕ ಡೀಕೋಡ್‌ನಿಂದ 5.1 ಅಥವಾ 7.1 ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತವೆ (ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನಲ್ಲ), ಇದು macOS ಪ್ಲೇ ಮಾಡುವುದನ್ನು ಎಂದಿಗೂ ಮುಟ್ಟುವುದಿಲ್ಲ."
+            "value": "Apple Music ಮಾಡುವಂತೆಯೇ, macOS ಔಟ್‌ಪುಟ್‌ಗಾಗಿ Atmos ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನು ರೆಂಡರ್ ಮಾಡುತ್ತದೆ: AirPods ನಲ್ಲಿ Apple ನ ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ರೆಂಡರರ್ (macOS ಒದಗಿಸುವಲ್ಲಿ ಹೆಡ್-ಟ್ರ್ಯಾಕಿಂಗ್‌ನೊಂದಿಗೆ), ಮಲ್ಟಿಚಾನೆಲ್ ಸಾಧನದಲ್ಲಿ ಹೈಟ್ ಚಾನೆಲ್‌ಗಳು. ಸ್ಪೆಕ್ಟ್ರಮ್, ಚಾನೆಲ್ ಮೀಟರ್‌ಗಳು ಮತ್ತು ದೃಶ್ಯೀಕರಣವು ಪ್ರತ್ಯೇಕ ಡೀಕೋಡ್‌ನಿಂದ 5.1 ಅಥವಾ 7.1 ಬೆಡ್ ಅನ್ನು ತೋರಿಸುತ್ತವೆ (ಆಬ್ಜೆಕ್ಟ್‌ಗಳನ್ನಲ್ಲ), ಇದು macOS ಪ್ಲೇ ಮಾಡುವುದನ್ನು ಎಂದಿಗೂ ಮುಟ್ಟುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 머리 추적 공간 음향으로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 스펙트럼, 채널 미터, 비주얼라이저는 따로 디코딩한 5.1 또는 7.1 베드(오브젝트 아님)를 표시하며, macOS가 재생하는 소리에는 전혀 손대지 않습니다."
+            "value": "Apple Music과 마찬가지로 macOS가 출력에 맞게 Atmos 오브젝트를 렌더링합니다. AirPods에서는 Apple의 공간 음향 렌더러(macOS가 지원하는 경우 머리 추적 포함)로, 멀티채널 기기에서는 높이 채널로 재생됩니다. 스펙트럼, 채널 미터, 비주얼라이저는 따로 디코딩한 5.1 또는 7.1 베드(오브젝트 아님)를 표시하며, macOS가 재생하는 소리에는 전혀 손대지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ ഹെഡ്-ട്രാക്ക് ചെയ്ത സ്പേഷ്യൽ ഓഡിയോ, മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. സ്പെക്ട്രം, ചാനൽ മീറ്ററുകൾ, വിഷ്വലൈസർ എന്നിവ പ്രത്യേക ഡീകോഡിൽ നിന്നുള്ള 5.1 അല്ലെങ്കിൽ 7.1 ബെഡ് കാണിക്കുന്നു (ഒബ്ജക്റ്റുകളല്ല); അത് macOS പ്ലേ ചെയ്യുന്നതിനെ ഒരിക്കലും തൊടുന്നില്ല."
+            "value": "Apple Music ചെയ്യുന്നതുപോലെ, macOS ഔട്ട്‌പുട്ടിനായി Atmos ഒബ്ജക്റ്റുകൾ റെൻഡർ ചെയ്യുന്നു: AirPods-ൽ Apple-ന്റെ സ്പേഷ്യൽ ഓഡിയോ റെൻഡറർ (macOS നൽകുന്നിടത്ത് ഹെഡ്-ട്രാക്കിംഗോടെ), മൾട്ടിചാനൽ ഉപകരണത്തിൽ ഹൈറ്റ് ചാനലുകൾ. സ്പെക്ട്രം, ചാനൽ മീറ്ററുകൾ, വിഷ്വലൈസർ എന്നിവ പ്രത്യേക ഡീകോഡിൽ നിന്നുള്ള 5.1 അല്ലെങ്കിൽ 7.1 ബെഡ് കാണിക്കുന്നു (ഒബ്ജക്റ്റുകളല്ല); അത് macOS പ്ലേ ചെയ്യുന്നതിനെ ഒരിക്കലും തൊടുന്നില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर हेड-ट्रॅक केलेला स्पेशियल ऑडिओ, मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. स्पेक्ट्रम, चॅनेल मीटर आणि व्हिज्युअलायझर वेगळ्या डीकोडमधून 5.1 किंवा 7.1 बेड दाखवतात (ऑब्जेक्ट नाही), जे macOS जे वाजवते त्याला कधीही स्पर्श करत नाही."
+            "value": "macOS आउटपुटसाठी Atmos ऑब्जेक्ट्स रेंडर करते, Apple Music प्रमाणे: AirPods वर Apple चा स्पेशियल ऑडिओ रेंडरर (macOS जिथे देते तिथे हेड-ट्रॅकिंगसह), मल्टिचॅनेल डिव्हाइसवर उंचीचे चॅनेल. स्पेक्ट्रम, चॅनेल मीटर आणि व्हिज्युअलायझर वेगळ्या डीकोडमधून 5.1 किंवा 7.1 बेड दाखवतात (ऑब्जेक्ट नाही), जे macOS जे वाजवते त्याला कधीही स्पर्श करत नाही."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: Audio Ruang dengan penjejakan kepala pada AirPods, saluran ketinggian pada peranti berbilang saluran. Spektrum, meter saluran dan Pemvisual menunjukkan lapisan 5.1 atau 7.1 daripada nyahkod berasingan (bukan objek), yang tidak pernah menyentuh apa yang dimainkan macOS."
+            "value": "macOS merender objek Atmos untuk output, seperti Apple Music: perender Audio Ruang Apple pada AirPods (dengan penjejakan kepala jika macOS menyediakannya), saluran ketinggian pada peranti berbilang saluran. Spektrum, meter saluran dan Pemvisual menunjukkan lapisan 5.1 atau 7.1 daripada nyahkod berasingan (bukan objek), yang tidak pernah menyentuh apa yang dimainkan macOS."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: romlig lyd med hodesporing på AirPods og høydekanaler på en flerkanalsenhet. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat avkoding (ikke objektene), som aldri rører det macOS spiller av."
+            "value": "macOS gjengir Atmos-objektene for utgangen, slik Apple Music gjør: Apples renderer for romlig lyd på AirPods (med hodesporing der macOS tilbyr det) og høydekanaler på en flerkanalsenhet. Spektrum, kanalmålere og Visualisering viser 5.1- eller 7.1-basen fra en separat avkoding (ikke objektene), som aldri rører det macOS spiller av."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: ruimtelijke audio met hoofdtracking op AirPods, hoogtekanalen op een meerkanaalsapparaat. Het spectrum, de kanaalmeters en de Visualizer tonen het 5.1- of 7.1-bed uit een aparte decodering (niet de objecten), die nooit raakt aan wat macOS afspeelt."
+            "value": "macOS rendert de Atmos-objecten voor de uitvoer, net als Apple Music: de renderer voor ruimtelijke audio van Apple op AirPods (met hoofdtracking waar macOS dat biedt), hoogtekanalen op een meerkanaalsapparaat. Het spectrum, de kanaalmeters en de Visualizer tonen het 5.1- of 7.1-bed uit een aparte decodering (niet de objecten), die nooit raakt aan wat macOS afspeelt."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ ਹੈੱਡ-ਟ੍ਰੈਕਡ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ, ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। ਸਪੈਕਟ੍ਰਮ, ਚੈਨਲ ਮੀਟਰ ਅਤੇ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਵੱਖਰੇ ਡੀਕੋਡ ਤੋਂ 5.1 ਜਾਂ 7.1 ਬੈੱਡ ਦਿਖਾਉਂਦੇ ਹਨ (ਆਬਜੈਕਟ ਨਹੀਂ), ਜੋ macOS ਜੋ ਵਜਾਉਂਦਾ ਹੈ ਉਸ ਨੂੰ ਕਦੇ ਨਹੀਂ ਛੂਹਦਾ।"
+            "value": "macOS ਆਉਟਪੁੱਟ ਲਈ Atmos ਆਬਜੈਕਟ ਰੈਂਡਰ ਕਰਦਾ ਹੈ, ਜਿਵੇਂ Apple Music ਕਰਦਾ ਹੈ: AirPods ’ਤੇ Apple ਦਾ ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਰੈਂਡਰਰ (ਜਿੱਥੇ macOS ਦਿੰਦਾ ਹੈ ਉੱਥੇ ਹੈੱਡ-ਟ੍ਰੈਕਿੰਗ ਸਮੇਤ), ਮਲਟੀਚੈਨਲ ਡਿਵਾਈਸ ’ਤੇ ਉਚਾਈ ਵਾਲੇ ਚੈਨਲ। ਸਪੈਕਟ੍ਰਮ, ਚੈਨਲ ਮੀਟਰ ਅਤੇ ਵਿਜ਼ੂਅਲਾਈਜ਼ਰ ਵੱਖਰੇ ਡੀਕੋਡ ਤੋਂ 5.1 ਜਾਂ 7.1 ਬੈੱਡ ਦਿਖਾਉਂਦੇ ਹਨ (ਆਬਜੈਕਟ ਨਹੀਂ), ਜੋ macOS ਜੋ ਵਜਾਉਂਦਾ ਹੈ ਉਸ ਨੂੰ ਕਦੇ ਨਹੀਂ ਛੂਹਦਾ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: dźwięk przestrzenny ze śledzeniem ruchów głowy na AirPods, kanały wysokości na urządzeniu wielokanałowym. Widmo, mierniki kanałów i Wizualizator pokazują podstawę 5.1 lub 7.1 z osobnego dekodowania (nie obiekty), które nigdy nie dotyka tego, co gra macOS."
+            "value": "macOS renderuje obiekty Atmos dla wyjścia, tak jak Apple Music: renderer dźwięku przestrzennego Apple na AirPods (ze śledzeniem ruchów głowy, tam gdzie udostępnia je macOS), kanały wysokości na urządzeniu wielokanałowym. Widmo, mierniki kanałów i Wizualizator pokazują podstawę 5.1 lub 7.1 z osobnego dekodowania (nie obiekty), które nigdy nie dotyka tego, co gra macOS."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: Áudio Espacial com rastreamento de cabeça nos AirPods e canais de altura em um dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma decodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: o renderizador de Áudio Espacial da Apple nos AirPods (com rastreamento de cabeça onde o macOS oferece) e canais de altura em um dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma decodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: áudio espacial com seguimento da cabeça nos AirPods, canais de altura num dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma descodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
+            "value": "O macOS renderiza os objetos Atmos para a saída, como faz o Apple Music: o renderizador de áudio espacial da Apple nos AirPods (com seguimento da cabeça onde o macOS o disponibiliza), canais de altura num dispositivo multicanal. O espectro, os medidores de canais e o Visualizador mostram a base 5.1 ou 7.1 de uma descodificação separada (não os objetos), que nunca toca no que o macOS reproduz."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: Audio spațial cu urmărirea mișcării capului pe AirPods, canale de înălțime pe un dispozitiv multicanal. Spectrul, indicatoarele canalelor și Vizualizatorul arată baza 5.1 sau 7.1 dintr-o decodare separată (nu obiectele), care nu atinge niciodată ceea ce redă macOS."
+            "value": "macOS randează obiectele Atmos pentru ieșire, așa cum face Apple Music: randarea Audio spațial de la Apple pe AirPods (cu urmărirea mișcării capului acolo unde o oferă macOS), canale de înălțime pe un dispozitiv multicanal. Spectrul, indicatoarele canalelor și Vizualizatorul arată baza 5.1 sau 7.1 dintr-o decodare separată (nu obiectele), care nu atinge niciodată ceea ce redă macOS."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: rumsligt ljud med huvudspårning i AirPods, höjdkanaler på en flerkanalsenhet. Spektrum, kanalmätare och Visualiserare visar 5.1- eller 7.1-bädden från en separat avkodning (inte objekten), som aldrig rör det macOS spelar upp."
+            "value": "macOS renderar Atmos-objekten för utgången, precis som Apple Music: Apples renderare för rumsligt ljud i AirPods (med huvudspårning där macOS erbjuder det), höjdkanaler på en flerkanalsenhet. Spektrum, kanalmätare och Visualiserare visar 5.1- eller 7.1-bädden från en separat avkodning (inte objekten), som aldrig rör det macOS spelar upp."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, chaneli za kimo kwenye kifaa cha chaneli nyingi. Masafa, mita za chaneli na Kionyeshi huonyesha kitanda cha 5.1 au 7.1 kutoka usimbuaji tofauti (si vitu), ambao haugusi kamwe kile macOS inachocheza."
+            "value": "macOS huchakata vitu vya Atmos kwa kifaa cha kutoa sauti, kama Apple Music inavyofanya: kichakataji cha Spatial Audio cha Apple kwenye AirPods (chenye ufuatiliaji wa kichwa pale macOS inapouwezesha), chaneli za kimo kwenye kifaa cha chaneli nyingi. Masafa, mita za chaneli na Kionyeshi huonyesha kitanda cha 5.1 au 7.1 kutoka usimbuaji tofauti (si vitu), ambao haugusi kamwe kile macOS inachocheza."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் தலை கண்காணிப்புடன் கூடிய ஸ்பேஷியல் ஆடியோ, மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். ஸ்பெக்ட்ரம், சேனல் மீட்டர்கள், காட்சிப்படுத்தி ஆகியவை தனி டிகோடிலிருந்து 5.1 அல்லது 7.1 படுகையைக் காட்டுகின்றன (பொருள்களை அல்ல); அது macOS இயக்குவதை ஒருபோதும் தொடாது."
+            "value": "Apple Music செய்வதுபோல், macOS வெளியீட்டிற்கான Atmos ஆப்ஜெக்ட்களை ரெண்டர் செய்யும்: AirPods-இல் Apple-இன் ஸ்பேஷியல் ஆடியோ ரெண்டரர் (macOS வழங்கும் இடங்களில் தலை கண்காணிப்புடன்), மல்டிசேனல் சாதனத்தில் உயர சேனல்கள். ஸ்பெக்ட்ரம், சேனல் மீட்டர்கள், காட்சிப்படுத்தி ஆகியவை தனி டிகோடிலிருந்து 5.1 அல்லது 7.1 படுகையைக் காட்டுகின்றன (பொருள்களை அல்ல); அது macOS இயக்குவதை ஒருபோதும் தொடாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో హెడ్-ట్రాక్డ్ స్పేషియల్ ఆడియో, మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు, విజువలైజర్ ప్రత్యేక డీకోడ్ నుండి 5.1 లేదా 7.1 బెడ్‌ను చూపుతాయి (ఆబ్జెక్ట్‌లను కాదు); అది macOS ప్లే చేసే దానిని ఎప్పుడూ తాకదు."
+            "value": "Apple Music చేసినట్లుగానే, macOS అవుట్‌పుట్ కోసం Atmos ఆబ్జెక్ట్‌లను రెండర్ చేస్తుంది: AirPodsలో Apple స్పేషియల్ ఆడియో రెండరర్ (macOS అందించే చోట హెడ్-ట్రాకింగ్‌తో), మల్టీఛానెల్ పరికరంలో హైట్ ఛానెల్‌లు. స్పెక్ట్రమ్, ఛానెల్ మీటర్‌లు, విజువలైజర్ ప్రత్యేక డీకోడ్ నుండి 5.1 లేదా 7.1 బెడ్‌ను చూపుతాయి (ఆబ్జెక్ట్‌లను కాదు); అది macOS ప్లే చేసే దానిని ఎప్పుడూ తాకదు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: เสียงตามตำแหน่งที่ติดตามศีรษะบน AirPods และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณสเปกตรัม มิเตอร์ช่องสัญญาณ และภาพเคลื่อนไหวตามเสียงแสดงช่องสัญญาณพื้นฐาน 5.1 หรือ 7.1 จากการถอดรหัสแยกต่างหาก (ไม่ใช่ออบเจกต์) ซึ่งไม่แตะต้องสิ่งที่ macOS เล่นเลย"
+            "value": "macOS เรนเดอร์ออบเจ็กต์ Atmos สำหรับขาออก เช่นเดียวกับที่ Apple Music ทำ: ตัวเรนเดอร์เสียงตามตำแหน่งของ Apple บน AirPods (พร้อมการติดตามศีรษะเมื่อ macOS รองรับ) และช่องสัญญาณความสูงบนอุปกรณ์หลายช่องสัญญาณสเปกตรัม มิเตอร์ช่องสัญญาณ และภาพเคลื่อนไหวตามเสียงแสดงช่องสัญญาณพื้นฐาน 5.1 หรือ 7.1 จากการถอดรหัสแยกต่างหาก (ไม่ใช่ออบเจกต์) ซึ่งไม่แตะต้องสิ่งที่ macOS เล่นเลย"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta baş takipli Uzamsal Ses, çok kanallı bir aygıtta yükseklik kanalları. Spektrum, kanal ölçerleri ve Görselleştirici, ayrı bir kod çözümünden 5.1 veya 7.1 tabanını gösterir (nesneleri değil); bu çözüm macOS’in çaldığına asla dokunmaz."
+            "value": "macOS, Atmos nesnelerini Apple Music’te olduğu gibi çıkış için işler: AirPods’ta Apple’ın Uzamsal Ses işleyicisi (macOS’un sunduğu yerlerde baş takipli), çok kanallı bir aygıtta yükseklik kanalları. Spektrum, kanal ölçerleri ve Görselleştirici, ayrı bir kod çözümünden 5.1 veya 7.1 tabanını gösterir (nesneleri değil); bu çözüm macOS’in çaldığına asla dokunmaz."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: просторове аудіо з відстеженням рухів голови на AirPods, канали висоти на багатоканальному пристрої. Спектр, індикатори каналів і Візуалізатор показують основу 5.1 або 7.1 з окремого декодування (не об’єкти), яке ніколи не торкається того, що відтворює macOS."
+            "value": "macOS рендерить об’єкти Atmos для виходу, як це робить Apple Music: засіб рендерингу просторового аудіо від Apple на AirPods (з відстеженням рухів голови, де це надає macOS), канали висоти на багатоканальному пристрої. Спектр, індикатори каналів і Візуалізатор показують основу 5.1 або 7.1 з окремого декодування (не об’єкти), яке ніколи не торкається того, що відтворює macOS."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر ہیڈ ٹریکنگ والا اسپیشل آڈیو، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ اسپیکٹرم، چینل میٹرز اور بصری نمائش الگ ڈی کوڈنگ سے 5.1 یا 7.1 بیڈ دکھاتے ہیں (آبجیکٹس نہیں)، جو macOS کے چلائے ہوئے کو کبھی نہیں چھوتی۔"
+            "value": "macOS آؤٹ پٹ کے لیے Atmos آبجیکٹس رینڈر کرتا ہے، جیسے Apple Music کرتا ہے: AirPods پر Apple کا اسپیشل آڈیو رینڈرر (جہاں macOS فراہم کرے وہاں ہیڈ ٹریکنگ کے ساتھ)، ملٹی چینل ڈیوائس پر اونچائی کے چینلز۔ اسپیکٹرم، چینل میٹرز اور بصری نمائش الگ ڈی کوڈنگ سے 5.1 یا 7.1 بیڈ دکھاتے ہیں (آبجیکٹس نہیں)، جو macOS کے چلائے ہوئے کو کبھی نہیں چھوتی۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: Âm thanh không gian có theo dõi chuyển động đầu trên AirPods, kênh độ cao trên thiết bị đa kênh. Phổ, đồng hồ đo kênh và Trình hiển thị cho thấy lớp kênh nền 5.1 hoặc 7.1 từ một bản giải mã riêng (không phải các đối tượng), không bao giờ chạm vào những gì macOS phát."
+            "value": "macOS kết xuất các đối tượng Atmos cho đầu ra, giống như Apple Music: trình kết xuất Âm thanh không gian của Apple trên AirPods (có theo dõi chuyển động đầu ở nơi macOS hỗ trợ), kênh độ cao trên thiết bị đa kênh. Phổ, đồng hồ đo kênh và Trình hiển thị cho thấy lớp kênh nền 5.1 hoặc 7.1 từ một bản giải mã riêng (không phải các đối tượng), không bao giờ chạm vào những gì macOS phát."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上提供带头部追踪的空间音频，在多声道设备上提供高度声道。频谱、声道电平表和可视化显示另行解码的 5.1 或 7.1 声道床（不是对象），绝不会触及 macOS 播放的内容。"
+            "value": "macOS 会像 Apple Music 一样为输出渲染全景声对象：在 AirPods 上使用 Apple 的空间音频渲染器（macOS 支持时带头部追踪），在多声道设备上提供高度声道。频谱、声道电平表和可视化显示另行解码的 5.1 或 7.1 声道床（不是对象），绝不会触及 macOS 播放的内容。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上提供具頭部追蹤的空間音訊，在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
+            "value": "macOS 會像 Apple Music 一樣為輸出渲染全景聲物件：在 AirPods 上使用 Apple 的空間音訊渲染器（macOS 支援時具頭部追蹤），在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上提供頭部追蹤空間音訊，在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
+            "value": "macOS 會為輸出渲染全景聲物件，與 Apple Music 的做法相同：在 AirPods 上使用 Apple 的空間音訊渲染器（macOS 支援時具頭部追蹤），在多聲道裝置上提供高度聲道。頻譜、聲道電平表和視覺效果顯示另行解碼的 5.1 或 7.1 聲道床（不是物件），絕不會觸及 macOS 播放的內容。"
           }
         }
       }
