@@ -55,10 +55,20 @@ struct LegacyMigrationTests {
         let dir = try scratch()
         defer { try? FileManager.default.removeItem(at: dir) }
         let defaults = try #require(UserDefaults(suiteName: dir.appendingPathComponent("d.plist").path))
+        let arguments: [String: Any] = ["VespertineDataDirectory": dir.path]
+        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "org.szeremeta.Vespertine", launchArguments: arguments)
+        #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
+        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "com.example.other", launchArguments: arguments)
+        #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
+    }
+
+    @Test("Only the launch argument makes a test run, not a value left in the saved settings")
+    func testRunIsTheLaunchArgument() throws {
+        let dir = try scratch()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let defaults = try #require(UserDefaults(suiteName: dir.appendingPathComponent("d.plist").path))
         defaults.set(dir.path, forKey: "VespertineDataDirectory")
-        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "org.szeremeta.Vespertine")
-        #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
-        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "com.example.other")
-        #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
+        #expect(!LegacyMigration.isTestRun([:]), "a saved value is not a launch argument")
+        #expect(LegacyMigration.isTestRun(["VespertineDataDirectory": dir.path]))
     }
 }

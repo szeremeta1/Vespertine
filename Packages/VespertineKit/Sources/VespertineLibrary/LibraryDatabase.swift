@@ -9,26 +9,150 @@ import VespertineAudio
 
 public final class LibraryDatabase: Sendable {
     public let writer: any DatabaseWriter
+    /// Set when the file at the opened URL couldn't be read as a database and was set aside: the app starts with a new,
+    /// empty library and tells the user where the old file went.
+    public let recovery: Recovery?
 
-    /// Opens (or creates) the library at `url`.
-    public convenience init(url: URL) throws {
+    /// A library file that SQLite could not read (not a database, or damaged), kept beside the new one.
+    public struct Recovery: Sendable, Equatable {
+        /// The damaged file, renamed (its `-wal` and `-shm` files carry the same suffix).
+        public let backup: URL
+        /// What SQLite said.
+        public let reason: String
+    }
+
+    /// Opens (or creates) the library at `url`. A file that isn't a database or is damaged (SQLite's NOTADB and CORRUPT
+    /// errors) is renamed next to the library, never deleted, and a new library is created in its place (`recovery`
+    /// says so). Any other failure (no permission, a full disk, a locked file) is thrown with the file left as it is.
+    ///
+    /// `recoversDamagedFile: false` is for tools that must not change anything on their own (the command-line tool): the
+    /// error is thrown as it was, with the file where it was.
+    public convenience init(url: URL, recoversDamagedFile: Bool = true) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        var recovery: Recovery?
+        var pool: DatabasePool
+        do {
+            pool = try Self.openMigrated(at: url)
+        } catch let error as DatabaseError where recoversDamagedFile && Self.isUnreadableFile(error) {
+            let backup = try Self.setAside(url)
+            recovery = Recovery(backup: backup, reason: error.description)
+            do {
+                pool = try Self.openMigrated(at: url)
+            } catch {
+                // A new library can't be made either (a full disk, say): put the file back, so the next try finds the
+                // same damage, recovers again and says so, instead of finding a missing file and starting silently empty.
+                try? Self.putBack(backup, at: url)
+                throw error
+            }
+        }
+        try self.init(writer: pool, migrate: false, recovery: recovery)
+    }
+
+    private static func openMigrated(at url: URL) throws -> DatabasePool {
         var config = Configuration()
         config.foreignKeysEnabled = true
         config.prepareDatabase { db in
             try db.execute(sql: "PRAGMA synchronous = NORMAL")
+            Self.addSortFunction(to: db)
         }
-        try self.init(writer: DatabasePool(path: url.path, configuration: config))
+        let pool = try DatabasePool(path: url.path, configuration: config)
+        do {
+            try migrator.migrate(pool)
+        } catch {
+            try? pool.close()
+            throw error
+        }
+        return pool
+    }
+
+    /// Whether SQLite is saying the file's content is not a usable database (as opposed to the file being unreachable).
+    static func isUnreadableFile(_ error: DatabaseError) -> Bool {
+        if error.resultCode == .SQLITE_NOTADB { return true }
+        // "malformed database schema" is also CORRUPT, but it's what an older SQLite says about a schema a newer one wrote
+        // (a feature it doesn't know): the file is fine, so it's left alone and the error shown.
+        return error.resultCode == .SQLITE_CORRUPT && !(error.message ?? "").contains("malformed database schema")
+    }
+
+    /// Undoes `setAside`: the damaged file (and its log files) back under the library's name, replacing what an
+    /// aborted attempt to create a new library left there.
+    static func putBack(_ backup: URL, at url: URL) throws {
+        let fm = FileManager.default
+        for suffix in ["", "-wal", "-shm"] {
+            try? fm.removeItem(atPath: url.path + suffix)
+            if fm.fileExists(atPath: backup.path + suffix) { try fm.moveItem(atPath: backup.path + suffix, toPath: url.path + suffix) }
+        }
+    }
+
+    /// Renames the database file and its write-ahead log and shared-memory files to `<name>.damaged-<date>`.
+    static func setAside(_ url: URL, now: Date = .now) throws -> URL {
+        let fm = FileManager.default
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        let stamp = formatter.string(from: now)
+        var backup = url.deletingLastPathComponent().appendingPathComponent("\(url.lastPathComponent).damaged-\(stamp)")
+        var n = 2
+        while ["", "-wal", "-shm"].contains(where: { fm.fileExists(atPath: backup.path + $0) }) {
+            backup = url.deletingLastPathComponent().appendingPathComponent("\(url.lastPathComponent).damaged-\(stamp)-\(n)")
+            n += 1
+        }
+        for suffix in ["", "-wal", "-shm"] where fm.fileExists(atPath: url.path + suffix) {
+            try fm.moveItem(atPath: url.path + suffix, toPath: backup.path + suffix)
+        }
+        return backup
     }
 
     public static func inMemory() throws -> LibraryDatabase {
-        var config = Configuration()
-        config.foreignKeysEnabled = true
-        return try LibraryDatabase(writer: DatabaseQueue(configuration: config))
+        try LibraryDatabase(writer: DatabaseQueue(configuration: queueConfiguration()))
     }
 
-    init(writer: any DatabaseWriter, migrate: Bool = true) throws {
+    /// For a database that isn't opened through `init(url:)` (an in-memory one, a test's): foreign keys on and the sort function added.
+    static func queueConfiguration() -> Configuration {
+        var config = Configuration()
+        config.foreignKeysEnabled = true
+        config.prepareDatabase { db in Self.addSortFunction(to: db) }
+        return config
+    }
+
+    /// `vesperSort(key)`: the sort keys of the `track` table folded for ordering. The columns lowercase ASCII letters only
+    /// (SQLite's `lower()`), so "Édith Piaf", "Ólafur Arnalds" and "Çigdem" sorted after "Zappa", and "Beyoncé" after
+    /// "BEYONCE Live". This folds case and accents (and ø, æ, œ, ß, đ, ł, þ, ð, which aren't accents) so they sit with
+    /// the plain letter. Not stored anywhere (no index or column uses it), so files stay readable by earlier builds.
+    static func sortFold(_ key: String) -> String {
+        // Already lowercase, nothing to fold: the common case, and the one that must stay cheap on a big library.
+        if key.utf8.allSatisfy({ $0 < 0x80 }) { return key }
+        var folded = key.folding(options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive], locale: nil)
+        for (letter, plain) in [("ø", "o"), ("æ", "ae"), ("œ", "oe"), ("ß", "ss"), ("đ", "d"), ("ł", "l"), ("þ", "th"), ("ð", "d")] {
+            folded = folded.replacingOccurrences(of: letter, with: plain)
+        }
+        return folded
+    }
+
+    /// Registers `vesperSort` on a connection. Every connection that runs a query ordering by it needs it.
+    static func addSortFunction(to db: Database) {
+        // A song's artist and album repeat along a whole album or artist, so remembered folds (per connection, which
+        // runs one statement at a time) save most of the work on a big library.
+        let cache = SortFoldCache()
+        db.add(function: DatabaseFunction("vesperSort", argumentCount: 1, pure: true) { values in
+            String.fromDatabaseValue(values[0]).map(cache.fold)
+        })
+    }
+
+    private final class SortFoldCache: @unchecked Sendable {
+        private var folds: [String: String] = [:]
+
+        func fold(_ key: String) -> String {
+            if let known = folds[key] { return known }
+            let folded = LibraryDatabase.sortFold(key)
+            if folds.count >= 20_000 { folds.removeAll(keepingCapacity: true) }
+            folds[key] = folded
+            return folded
+        }
+    }
+
+    init(writer: any DatabaseWriter, migrate: Bool = true, recovery: Recovery? = nil) throws {
         self.writer = writer
+        self.recovery = recovery
         // Stored analyses from an older analyzer are judged anew by `rejudgeStoredAnalyses`, which the app runs off the
         // main thread after opening the library and before anything asks what needs analyzing.
         if migrate { try Self.migrator.migrate(writer) }
@@ -375,7 +499,7 @@ public extension LibraryDatabase {
                             CASE WHEN location = (SELECT min(image.location) FROM track AS image WHERE image.albumKey = track.albumKey
                                                   AND image.filePath = track.filePath AND image.isMissing = 0) THEN fileSize ELSE 0 END
                         WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
-               min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey,
+               vesperSort(min(albumArtistSortKey)) AS artistKey, vesperSort(min(albumSortKey)) AS titleKey,
                -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')
                group_concat(DISTINCT replace(codec, ',', ' ') || ':' || isLossless || isDSD) AS kinds,
                group_concat(DISTINCT CAST(round(sampleRate) AS INTEGER)) AS rates,
@@ -522,7 +646,7 @@ public extension LibraryDatabase {
 
     func allTracks() throws -> [Track] {
         try writer.read { db in
-            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 ORDER BY albumArtistSortKey, albumSortKey, discNumber, trackNumber")
+            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber")
         }
     }
 
@@ -533,14 +657,49 @@ public extension LibraryDatabase {
         }
     }
 
-    /// Full-text search across title/artist/album/composer/genre. Prefix matching on every word.
+    /// Full-text search across title/artist/album/composer/genre. Prefix matching on every word. A query with Han,
+    /// kana or Thai in it (written without spaces, so the index holds whole runs as one word) matches any part of
+    /// a field instead (`searchSubstrings`).
     func search(_ text: String, limit: Int = 500) throws -> [Track] {
+        if Self.hasUnspacedScript(text) { return try searchSubstrings(text, limit: limit) }
         guard let pattern = FTS5Pattern(matchingAllPrefixesIn: text) else { return [] }
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT track.* FROM track JOIN trackFts ON trackFts.rowid = track.id
                 WHERE trackFts MATCH ? AND track.isMissing = 0 ORDER BY rank LIMIT ?
                 """, arguments: [pattern, limit])
+        }
+    }
+
+    /// Whether `text` has a character from a script whose words aren't separated by spaces: the index's tokenizer keeps
+    /// such a run whole, so "夜" would never find "東京の夜".
+    static func hasUnspacedScript(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            switch scalar.value {
+            case 0x3040...0x30FF, 0x31F0...0x31FF, 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF, 0xFF66...0xFF9F, 0x20000...0x2FA1F,
+                 0x0E00...0x0E7F: true
+            default: false
+            }
+        }
+    }
+
+    /// Every word of `text` found anywhere in a song's title, artist, album, album artist, composer or genre.
+    private func searchSubstrings(_ text: String, limit: Int) throws -> [Track] {
+        let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !words.isEmpty else { return [] }
+        func escaped(_ s: String) -> String {
+            s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "%", with: "\\%").replacingOccurrences(of: "_", with: "\\_")
+        }
+        let columns = ["title", "artist", "album", "albumArtist", "composer", "genre"]
+        let oneWord = "(" + columns.map { "IFNULL(\($0), '') LIKE ? ESCAPE '\\'" }.joined(separator: " OR ") + ")"
+        var arguments = StatementArguments()
+        for word in words { for _ in columns { arguments += ["%\(escaped(word))%"] } }
+        arguments += [limit]
+        return try writer.read { db in
+            try Track.fetchAll(db, sql: """
+                SELECT * FROM track WHERE isMissing = 0 AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
+                ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber LIMIT ?
+                """, arguments: arguments)
         }
     }
 
@@ -564,7 +723,7 @@ public extension LibraryDatabase {
             try Row.fetchAll(db, sql: """
                 SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
                        count(*) AS tracks, max(artworkKey) AS art
-                FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY min(albumArtistSortKey)
+                FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
                 """).map { ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
         }
     }
