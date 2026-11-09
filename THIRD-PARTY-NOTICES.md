@@ -6,7 +6,7 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 |---|---|---|---|
 | SFBAudioEngine 0.14.0 | MIT | Decoders, DSD/DoP, metadata reading, ReplayGain | https://github.com/sbooth/SFBAudioEngine |
 | dsd2pcm (in SFBAudioEngine) | BSD-2-Clause | DSD to PCM conversion | https://github.com/sbooth/SFBAudioEngine |
-| EBU R128 loudness analyzer (in SFBAudioEngine) | Apache-2.0 | Loudness analysis | https://github.com/sbooth/SFBAudioEngine |
+| EBU R128 loudness analyzer (in SFBAudioEngine; Copyright 2024 Google LLC) | Apache-2.0 | Loudness analysis | https://github.com/sbooth/SFBAudioEngine |
 | AVFAudioExtensions 0.5.1, CXXAudioRingBuffer 0.2.0, CXXDispatchSemaphore 0.4.1, CXXMessageQueue 0.2.2, CXXQueue 0.1.1, CXXUnfairLock 0.3.1 | MIT | SFBAudioEngine's helper packages | https://github.com/sbooth |
 | GRDB.swift 7.11.1 | MIT | The library database | https://github.com/groue/GRDB.swift |
 | Sparkle 2.10.0 | MIT, with bundled BSD-style components | Software updates | https://github.com/sparkle-project/Sparkle |
