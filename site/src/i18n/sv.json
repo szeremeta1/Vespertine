@@ -69,7 +69,7 @@
         "hi-res-musik,"
       ],
       "titleBrass": "på din Mac.",
-      "lede": "Den kostnadsfria Mac-spelaren med öppen källkod för musiksamlingar i surround och hi-res. Skivavbilder av SACD och DVD-Video, DSD, DTS-cd-skivor, DTS-HD MA-, TrueHD- och Atmos-filer delar ett och samma bibliotek med dina stereoalbum, med rumsligt ljud med huvudspårning i AirPods. Rumskorrigering mäter ditt rum med en USB-mikrofon och korrigerar varje högtalare; den är avstängd tills du slår på den. En signalväg visar varje steg från fil till utgång. På engelska och {languages} andra språk.",
+      "lede": "Den kostnadsfria Mac-spelaren med öppen källkod för musiksamlingar i surround och hi-res. Skivavbilder av SACD och DVD-Video, DSD, DTS-cd-skivor, DTS-HD MA-, TrueHD- och Atmos-filer delar ett och samma bibliotek med dina stereoalbum, med rumsligt ljud i AirPods (med huvudspårning där macOS erbjuder det). Rumskorrigering mäter ditt rum med en USB-mikrofon och korrigerar varje högtalare; den är avstängd tills du slår på den. En signalväg visar varje steg från fil till utgång. På engelska och {languages} andra språk.",
       "ask": "Gillar du den?",
       "star": "Ge den en stjärna på GitHub",
       "discuss": "Var med i diskussionen",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround i ett bibliotek",
-        "text": "SACD-avbilder och rippar, DVD-Video-skivor, DTS-cd-skivor, DTS-HD MA och TrueHD ligger bredvid dina stereoalbum och spelas som rumsligt ljud med huvudspårning i AirPods. När ett album finns i båda versionerna listas varje låt en gång och rätt version spelas för din utgång."
+        "text": "SACD-avbilder och rippar, DVD-Video-skivor, DTS-cd-skivor, DTS-HD MA och TrueHD ligger bredvid dina stereoalbum och spelas via Apples renderare för rumsligt ljud i AirPods (med huvudspårning där macOS erbjuder det). När ett album finns i båda versionerna listas varje låt en gång och rätt version spelas för din utgång."
       },
       {
         "title": "En signalväg du kan kontrollera",
@@ -126,7 +126,7 @@
         "title": "Varje spår i sin egen frekvens och sitt eget bitdjup.",
         "lede": "Signalvägen listar varje steg från filen till din DAC, avläst från Core Audio, och säger till när något har ändrat samplingsvärdena.",
         "body": [
-          "Vespertine ställer om enheten till varje fils samplingsfrekvens och samplar om, med Apples omvandlare i masteringkvalitet, bara när DAC:en inte klarar frekvensen. <span class=\"mono nowrap\">BITPERFEKT</span> visas bara när villkoren i källkoden är uppfyllda: ursprunglig samplingsfrekvens, inget som ändrar samplingsvärdena, en ordlängd som ryms och en enhet som är exklusiv eller inte delas med någon annan app. PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11."
+          "Vespertine ställer om enheten till varje fils samplingsfrekvens och samplar om, med Apples omvandlare i masteringkvalitet, bara när DAC:en inte klarar frekvensen. <span class=\"mono nowrap\">BITPERFEKT</span> visas bara när villkoren i källkoden är uppfyllda: ursprunglig samplingsfrekvens, inget som ändrar samplingsvärdena, en ordlängd som ryms och en enhet som är exklusiv eller inte delas med någon annan app. PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11 (utvecklarens rapporter; se docs/DEVICES.md)."
         ],
         "list": [
           "Exklusivt läge (hog) håller andra appar borta från enheten. I delat läge styr volymknapparna och Digital Crown din DAC; i exklusivt läge kan de också göra det, om du slår på det.",
@@ -181,7 +181,7 @@
           "Tre mål: Warm (standard), Gentle tilt och Flat. Korrigera bara basen eller hela området, och utforma om filtren senare utan att mäta igen.",
           "Importerar filter från REW eller Equalizer APO, med varje högtalares fördröjning och nivå, och exporterar text för Equalizer APO.",
           "Importerar impulssvar (WAV, AIFF, CAF eller FLAC) och spelar upp dem med faltning.",
-          "Stereo och 5.1.",
+          "Stereo och 5.1 (5.1 har testats med simulerade rum och importerade profiler, ännu inte i ett riktigt 5.1-rum).",
           "Rumsporträttet visar högtalarna, din plats och varje mikrofonpunkt allteftersom den mäts. Kurvanimationen förvandlar sedan den uppmätta responsen till den förutsagda, och ett före/efter-reglage jämför dem."
         ],
         "note": "Kurvan ”efter” är förutsagd utifrån mätningen och filtren, inte uppmätt. Mät igen med korrigeringen påslagen för att se vad rummet verkligen gör.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround och rumsligt ljud",
         "title": "Dina 5.1-skivor, i samma bibliotek.",
-        "lede": "Flerkanalsmusik spelas som rumsligt ljud med huvudspårning i AirPods, eller mixas ner efter kanallayout på en stereo-DAC.",
+        "lede": "Flerkanalsmusik spelas via Apples renderare för rumsligt ljud i AirPods (med huvudspårning där macOS erbjuder det), eller mixas ner efter kanallayout på en stereo-DAC.",
         "body": [
-          "DTS-cd-skivor avkodas till 5.1. SACD-avbilder, extraherade SACD-spår, flerkanals-FLAC, TrueHD och DTS-HD MA återges som rumsligt ljud med huvudspårning i AirPods eller mixas ner på en stereo-DAC. Dolby Digital Plus med Atmos använder macOS objektrenderare; TrueHD Atmos och DTS:X spelar sin kanalbädd. Utmatning kanal för kanal är experimentell, otestad på riktiga receivrar och flerkanaliga USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); rapporter efterlyses."
+          "DTS-cd-skivor avkodas till 5.1. SACD-avbilder, extraherade SACD-spår, flerkanals-FLAC, TrueHD och DTS-HD MA återges via Apples renderare för rumsligt ljud i AirPods (med huvudspårning där macOS erbjuder det) eller mixas ner på en stereo-DAC. Dolby Digital Plus med Atmos använder macOS objektrenderare; TrueHD Atmos och DTS:X spelar sin kanalbädd. Utmatning kanal för kanal är experimentell, otestad på riktiga receivrar och flerkanaliga USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); rapporter efterlyses."
         ],
         "list": [
           "Stereo- och surroundversioner av ett album listas en gång; Vespertine spelar den som passar utgången, eller den du har fäst.",
@@ -215,11 +215,11 @@
         "title": "Spela själva skivavbilden.",
         "lede": "Peka Vespertine mot en avbild av en SACD eller DVD-Video så spelas musiken direkt från den, utan att något monteras, extraheras eller skrivs.",
         "body": [
-          "SACD-avbilder i formatet <span class=\"mono\">.iso</span> spelar sina stereo- och 5.1-områden, DST-komprimerade eller okomprimerade, med titlar från skivans egen text. DST avkodas tillbaka till exakt samma DSD, så stereo går till din DAC som inbyggt DSD via DoP där DAC:en stöder det, och 5.1 spelas som rumsligt ljud med huvudspårning i AirPods. LPCM-musiken på DVD-Video-skivor (en <span class=\"mono\">.iso</span> eller en <span class=\"mono\">VIDEO_TS</span>-mapp) spelas bit för bit, ett album per titel och ett spår per kapitel."
+          "SACD-avbilder i formatet <span class=\"mono\">.iso</span> spelar sina stereo- och 5.1-områden, DST-komprimerade eller okomprimerade, med titlar från skivans egen text. DST avkodas tillbaka till exakt samma DSD, så stereo går till din DAC som inbyggt DSD via DoP där DAC:en stöder det, och 5.1 spelas via Apples renderare för rumsligt ljud i AirPods. LPCM-musiken på DVD-Video-skivor (en <span class=\"mono\">.iso</span> eller en <span class=\"mono\">VIDEO_TS</span>-mapp) spelas bit för bit, ett album per titel och ett spår per kapitel."
         ],
         "list": [
           "Identiskt bit för bit med sacd_extract på två riktiga skivor. Skivor med ett 5.0-område, bara ett flerkanalsområde, eller DSD128 och uppåt täcks hittills bara av syntetiserade testavbilder.",
-          "DSF och DSDIFF från DSD64 till DSD512, inklusive DST-komprimerad DSDIFF, går ut som DoP till DAC:ar som tar emot bärarfrekvensen, eller konverteras till PCM med hög samplingsfrekvens. DoP är bekräftat upp till DSD256 på en Fosi Audio ZD3 och upp till DSD128 på en FiiO K11; DSD512 via DoP är otestat på hårdvara.",
+          "DSF och DSDIFF från DSD64 till DSD512, inklusive DST-komprimerad DSDIFF, går ut som DoP till DAC:ar som tar emot bärarfrekvensen (upp till DSD256 på de DAC:ar som prövats), eller konverteras till PCM med hög samplingsfrekvens. DoP rapporteras fungera upp till DSD256 på en Fosi Audio ZD3 och upp till DSD128 på en FiiO K11 (utvecklarens rapporter, ingen inspelning); DSD512 via DoP är otestat på hårdvara.",
           "DVD-Video LPCM i 16, 20 och 24 bitar, 48 och 96 kHz, upp till 8 kanaler. DVD-Audio stöds inte, och krypterade skivor (CSS) kräver en dekrypterad kopia."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Har Vespertine rumskorrigering?",
-          "a": "Ja. Mät ditt rum med en UMIK-1 eller en annan kalibrerad USB-mikrofon på en till fem punkter runt din lyssningsplats, så anpassar Vespertine filter till varje högtalare och samordnar deras fördröjning och nivå, i stereo eller 5.1. Appen kan också importera filter från REW och Equalizer APO samt impulssvar. Funktionen är avstängd som standard, uppspelningen förblir bitperfekt när den är avstängd, och signalvägen visar <span class=\"mono nowrap\">RUMSKORRIGERING</span> när den är på. <a href=\"{href.roomCorrection}\">Så fungerar rumskorrigeringen</a>."
+          "a": "Ja. Mät ditt rum med en UMIK-1 eller en annan kalibrerad USB-mikrofon på en till fem punkter runt din lyssningsplats, så anpassar Vespertine filter till varje högtalare och samordnar deras fördröjning och nivå, i stereo eller 5.1 (5.1 har testats med simulerade rum och importerade profiler, ännu inte i ett riktigt 5.1-rum). Appen kan också importera filter från REW och Equalizer APO samt impulssvar. Funktionen är avstängd som standard, uppspelningen förblir bitperfekt när den är avstängd, och signalvägen visar <span class=\"mono nowrap\">RUMSKORRIGERING</span> när den är på. <a href=\"{href.roomCorrection}\">Så fungerar rumskorrigeringen</a>."
         },
         {
           "q": "Kan den spela SACD- och DVD-skivor?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Spelar den Dolby Atmos?",
-          "a": "Dolby Digital Plus med Atmos spelas via objektrenderaren i macOS, som rumsligt ljud med huvudspårning på AirPods. TrueHD Atmos och DTS:X spelar sin förlustfria kanalbädd; deras objekt renderas inte. Bitström till en AV-receiver är experimentell, otestad på riktiga receivrar; rapporter efterlyses."
+          "a": "Dolby Digital Plus med Atmos spelas via objektrenderaren i macOS, som rumsligt ljud på AirPods (med huvudspårning där macOS erbjuder det). TrueHD Atmos och DTS:X spelar sin förlustfria kanalbädd; deras objekt renderas inte. Bitström till en AV-receiver är experimentell, otestad på riktiga receivrar; rapporter efterlyses."
         },
         {
           "q": "Ändrar den mina filer?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Vilken hårdvara har den testats på?",
-          "a": "PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11, där även heltalsläge testades. Uppspelning har också testats på AirPods Max via USB-C och Bluetooth, högtalarna i en MacBook Pro och en Sony-tv via HDMI i 5.1. Intel-hårdvara är otestad. Bitström till receiver och utgång till flerkanals-DAC är experimentella, otestade på riktiga receivrar och flerkanals-USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
+          "a": "PCM-uppspelning har testats upp till 768 kHz och DSD256 på en Fosi Audio ZD3, och upp till 384 kHz och DSD128 på en FiiO K11 (utvecklarens rapporter; se docs/DEVICES.md), där även heltalsläge testades. Uppspelning har också testats på AirPods Max via USB-C och Bluetooth, högtalarna i en MacBook Pro och en Sony-tv via HDMI i 5.1. Intel-hårdvara är otestad. Bitström till receiver och utgång till flerkanals-DAC är experimentella, otestade på riktiga receivrar och flerkanals-USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); <a href=\"{href.dacReport}\">rapporter efterlyses</a>."
         },
         {
           "q": "Finns den på mitt språk?",
@@ -601,7 +601,7 @@
     "ogAlt": "Vespertines pressmaterial: faktablad, logotyper, nyckelbilder, riktiga skärmbilder och trailern, över tre riktiga skärmbilder av appen.",
     "eyebrow": "Pressmaterial",
     "heading": "Allt du behöver för att skriva om {name}.",
-    "lede": "Vespertine är den kostnadsfria Mac-spelaren med öppen källkod för musiksamlingar i surround och hi-res. Skivavbilder av SACD och DVD-Video, extraherade SACD-spår i 5.1, DTS-cd-skivor samt DTS-HD MA-, TrueHD- och Atmos-filer delar ett och samma bibliotek, med rumsligt ljud med huvudspårning på AirPods. Signalvägen visar varje steg från fil till utgång, med villkor och tester i GPL-källkod som vem som helst kan granska.",
+    "lede": "Vespertine är den kostnadsfria Mac-spelaren med öppen källkod för musiksamlingar i surround och hi-res. Skivavbilder av SACD och DVD-Video, extraherade SACD-spår i 5.1, DTS-cd-skivor samt DTS-HD MA-, TrueHD- och Atmos-filer delar ett och samma bibliotek, med rumsligt ljud på AirPods (med huvudspårning där macOS erbjuder det). Signalvägen visar varje steg från fil till utgång, med villkor och tester i GPL-källkod som vem som helst kan granska.",
     "fine": "Utmatning kanal för kanal och bitström till receiver är experimentella, otestade på riktiga receivrar och flerkanaliga USB-DAC:ar (en Sony-tv via HDMI har testats: se docs/DEVICES.md); rapporter efterlyses. Atmos-objekt i Dolby Digital Plus renderas av macOS; TrueHD Atmos och DTS:X spelar upp sin kanalbädd.",
     "facts": {
       "eyebrow": "Faktablad",

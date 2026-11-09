@@ -69,7 +69,7 @@
         "hi-res-muziek,"
       ],
       "titleBrass": "op je Mac.",
-      "lede": "De gratis opensource-speler voor de Mac, voor muziekcollecties in surround en hi-res. SACD- en DVD-Video-schijfkopieën, DSD, DTS-cd’s en bestanden in DTS-HD MA, TrueHD en Atmos delen één bibliotheek met je stereoalbums en spelen op AirPods als ruimtelijke audio met hoofdtracking. Ruimtecorrectie meet je ruimte met een USB-microfoon en corrigeert elke luidspreker; de functie staat uit tot je die inschakelt. Een signaalpad toont elke stap van bestand tot uitvoer. In het Engels en {languages} andere talen.",
+      "lede": "De gratis opensource-speler voor de Mac, voor muziekcollecties in surround en hi-res. SACD- en DVD-Video-schijfkopieën, DSD, DTS-cd’s en bestanden in DTS-HD MA, TrueHD en Atmos delen één bibliotheek met je stereoalbums en spelen op AirPods als ruimtelijke audio (met hoofdtracking waar macOS dat biedt). Ruimtecorrectie meet je ruimte met een USB-microfoon en corrigeert elke luidspreker; de functie staat uit tot je die inschakelt. Een signaalpad toont elke stap van bestand tot uitvoer. In het Engels en {languages} andere talen.",
       "ask": "Bevalt het?",
       "star": "Geef een ster op GitHub",
       "discuss": "Doe mee aan de discussie",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround in één bibliotheek",
-        "text": "SACD-schijfkopieën en -rips, DVD-Video-schijven, DTS-cd’s, DTS-HD MA en TrueHD staan naast je stereoalbums en spelen op AirPods als ruimtelijke audio met hoofdtracking. Heeft een album beide versies, dan staat elk nummer er één keer in en speelt de versie die bij je uitvoer past."
+        "text": "SACD-schijfkopieën en -rips, DVD-Video-schijven, DTS-cd’s, DTS-HD MA en TrueHD staan naast je stereoalbums en spelen op AirPods via de renderer voor ruimtelijke audio van Apple (met hoofdtracking waar macOS dat biedt). Heeft een album beide versies, dan staat elk nummer er één keer in en speelt de versie die bij je uitvoer past."
       },
       {
         "title": "Een signaalpad dat je kunt controleren",
@@ -126,7 +126,7 @@
         "title": "Elk nummer op zijn eigen samplefrequentie en bitdiepte.",
         "lede": "Het signaalpad toont elke stap van het bestand tot je DAC, teruggelezen uit Core Audio, en meldt het wanneer iets de samples heeft veranderd.",
         "body": [
-          "Vespertine zet het apparaat op de samplefrequentie van elk bestand en resamplet, met Apples converter van masteringkwaliteit, alleen als de DAC die frequentie niet aankan. <span class=\"mono nowrap\">BITPERFECT</span> verschijnt alleen als aan de voorwaarden in de broncode is voldaan: de oorspronkelijke samplefrequentie, niets dat de samples verandert, een passende woordlengte en een apparaat dat exclusief is of niet met een andere app wordt gedeeld. Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11."
+          "Vespertine zet het apparaat op de samplefrequentie van elk bestand en resamplet, met Apples converter van masteringkwaliteit, alleen als de DAC die frequentie niet aankan. <span class=\"mono nowrap\">BITPERFECT</span> verschijnt alleen als aan de voorwaarden in de broncode is voldaan: de oorspronkelijke samplefrequentie, niets dat de samples verandert, een passende woordlengte en een apparaat dat exclusief is of niet met een andere app wordt gedeeld. Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11 (meldingen van de ontwikkelaar; zie docs/DEVICES.md)."
         ],
         "list": [
           "De exclusieve modus (hog) houdt andere apps weg van het apparaat. In gedeelde modus regelen de volumetoetsen en de Digital Crown je DAC; in exclusieve modus kan dat ook, als je dat aanzet.",
@@ -181,7 +181,7 @@
           "Drie doelcurves: Warm (de standaard), Gentle tilt en Flat. Corrigeer alleen de bas of het volledige bereik, en ontwerp de filters later opnieuw zonder opnieuw te meten.",
           "Importeert filters uit REW of Equalizer APO, met de vertraging en het niveau van elke luidspreker, en exporteert tekst voor Equalizer APO.",
           "Importeert impulsresponsen (WAV, AIFF, CAF of FLAC) en speelt ze af via convolutie.",
-          "Stereo en 5.1.",
+          "Stereo en 5.1 (5.1 is getest met gesimuleerde ruimtes en geïmporteerde profielen, nog niet in een echte 5.1-ruimte).",
           "Het Ruimteportret toont de luidsprekers, je zitplaats en elke microfoonplek terwijl die wordt gemeten. De curve-overgang zet daarna de gemeten respons om in de voorspelde, en met een voor/na-schakelaar vergelijk je ze."
         ],
         "note": "De ‘na’-curve is voorspeld op basis van de meting en de filters, niet gemeten. Wil je zien wat de ruimte echt doet, meet dan opnieuw met de correctie aan.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround & ruimtelijke audio",
         "title": "Je 5.1-schijven, in dezelfde bibliotheek.",
-        "lede": "Meerkanaalsmuziek speelt op AirPods als ruimtelijke audio met hoofdtracking, of wordt op een stereo-DAC volgens de kanaalindeling teruggemengd.",
+        "lede": "Meerkanaalsmuziek speelt op AirPods via de renderer voor ruimtelijke audio van Apple (met hoofdtracking waar macOS dat biedt), of wordt op een stereo-DAC volgens de kanaalindeling teruggemengd.",
         "body": [
-          "DTS-cd’s worden gedecodeerd naar 5.1. SACD-schijfkopieën, uitgepakte SACD-tracks, meerkanaals FLAC, TrueHD en DTS-HD MA worden op AirPods weergegeven als ruimtelijke audio met hoofdtracking, of op een stereo-DAC teruggemengd. Dolby Digital Plus met Atmos gebruikt de objectrenderer van macOS; TrueHD Atmos en DTS:X spelen hun kanaalbed af. Uitvoer kanaal voor kanaal is experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
+          "DTS-cd’s worden gedecodeerd naar 5.1. SACD-schijfkopieën, uitgepakte SACD-tracks, meerkanaals FLAC, TrueHD en DTS-HD MA worden op AirPods weergegeven via de renderer voor ruimtelijke audio van Apple (met hoofdtracking waar macOS dat biedt), of op een stereo-DAC teruggemengd. Dolby Digital Plus met Atmos gebruikt de objectrenderer van macOS; TrueHD Atmos en DTS:X spelen hun kanaalbed af. Uitvoer kanaal voor kanaal is experimenteel, niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht."
         ],
         "list": [
           "Stereo- en surroundversies van een album staan er één keer in; Vespertine speelt de versie die bij de uitvoer past, of de versie die je vastzet.",
@@ -215,11 +215,11 @@
         "title": "Speel de schijfkopie zelf af.",
         "lede": "Wijs Vespertine een SACD- of DVD-Video-schijfkopie aan en het speelt de muziek er rechtstreeks uit af, zonder iets te activeren, uit te pakken of weg te schrijven.",
         "body": [
-          "SACD-schijfkopieën (<span class=\"mono\">.iso</span>) spelen hun stereo- en 5.1-gebied af, met of zonder DST-compressie, met titels uit de eigen tekst van de schijf. DST wordt teruggedecodeerd naar precies de oorspronkelijke DSD, zodat stereo als native DSD via DoP naar je DAC gaat als de DAC dat ondersteunt, en 5.1 op AirPods speelt als ruimtelijke audio met hoofdtracking. De LPCM-muziek op DVD-Video-schijven (een <span class=\"mono\">.iso</span> of een map <span class=\"mono\">VIDEO_TS</span>) speelt bit voor bit af, één album per titel en een track per hoofdstuk."
+          "SACD-schijfkopieën (<span class=\"mono\">.iso</span>) spelen hun stereo- en 5.1-gebied af, met of zonder DST-compressie, met titels uit de eigen tekst van de schijf. DST wordt teruggedecodeerd naar precies de oorspronkelijke DSD, zodat stereo als native DSD via DoP naar je DAC gaat als de DAC dat ondersteunt, en 5.1 op AirPods speelt via de renderer voor ruimtelijke audio van Apple. De LPCM-muziek op DVD-Video-schijven (een <span class=\"mono\">.iso</span> of een map <span class=\"mono\">VIDEO_TS</span>) speelt bit voor bit af, één album per titel en een track per hoofdstuk."
         ],
         "list": [
           "Bit voor bit gelijk aan sacd_extract op twee echte schijven. Schijven met een 5.0-gebied, met alleen een meerkanaalsgebied, of met DSD128 en hoger zijn tot nu toe alleen getest met gesynthetiseerde testschijfkopieën.",
-          "DSF en DSDIFF van DSD64 tot DSD512, inclusief DSDIFF met DST-compressie, gaan als DoP naar DAC’s die de dragerfrequentie aankunnen, of worden omgezet naar PCM met een hoge samplefrequentie. DoP is bevestigd tot DSD256 op een Fosi Audio ZD3 en tot DSD128 op een FiiO K11; DSD512 via DoP is niet getest op hardware.",
+          "DSF en DSDIFF van DSD64 tot DSD512, inclusief DSDIFF met DST-compressie, gaan als DoP naar DAC’s die de dragerfrequentie aankunnen (tot DSD256 op de geprobeerde DAC’s), of worden omgezet naar PCM met een hoge samplefrequentie. DoP werkt volgens meldingen tot DSD256 op een Fosi Audio ZD3 en tot DSD128 op een FiiO K11 (meldingen van de ontwikkelaar, zonder opname); DSD512 via DoP is niet getest op hardware.",
           "DVD-Video LPCM op 16, 20 en 24 bit, 48 en 96 kHz, tot 8 kanalen. DVD-Audio wordt niet ondersteund, en versleutelde (CSS-)schijven vereisen een ontsleutelde kopie."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Heeft Vespertine ruimtecorrectie?",
-          "a": "Ja. Meet je ruimte met een UMIK-1 of een andere gekalibreerde USB-microfoon op één tot vijf plekken rond je zitplaats, en Vespertine berekent filters voor elke luidspreker en stemt hun vertraging en niveau op elkaar af, in stereo of 5.1. Daarnaast importeert het filters uit REW en Equalizer APO, en impulsresponsen. Ruimtecorrectie staat standaard uit, afspelen blijft bitperfect zolang ze uitstaat, en het signaalpad toont <span class=\"mono nowrap\">RUIMTECORRECTIE</span> zolang ze aanstaat. <a href=\"{href.roomCorrection}\">Zo werkt ruimtecorrectie</a>."
+          "a": "Ja. Meet je ruimte met een UMIK-1 of een andere gekalibreerde USB-microfoon op één tot vijf plekken rond je zitplaats, en Vespertine berekent filters voor elke luidspreker en stemt hun vertraging en niveau op elkaar af, in stereo of 5.1 (5.1 is getest met gesimuleerde ruimtes en geïmporteerde profielen, nog niet in een echte 5.1-ruimte). Daarnaast importeert het filters uit REW en Equalizer APO, en impulsresponsen. Ruimtecorrectie staat standaard uit, afspelen blijft bitperfect zolang ze uitstaat, en het signaalpad toont <span class=\"mono nowrap\">RUIMTECORRECTIE</span> zolang ze aanstaat. <a href=\"{href.roomCorrection}\">Zo werkt ruimtecorrectie</a>."
         },
         {
           "q": "Speelt het SACD’s en dvd’s af?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Speelt het Dolby Atmos af?",
-          "a": "Dolby Digital Plus met Atmos speelt via de objectrenderer van macOS, als ruimtelijke audio met hoofdtracking op AirPods. Van TrueHD Atmos en DTS:X wordt het lossless kanaalbed afgespeeld; de objecten worden niet gerenderd. Bitstream naar een AV-receiver is experimenteel en niet getest op echte receivers; meldingen gezocht."
+          "a": "Dolby Digital Plus met Atmos speelt via de objectrenderer van macOS, als ruimtelijke audio op AirPods (met hoofdtracking waar macOS dat biedt). Van TrueHD Atmos en DTS:X wordt het lossless kanaalbed afgespeeld; de objecten worden niet gerenderd. Bitstream naar een AV-receiver is experimenteel en niet getest op echte receivers; meldingen gezocht."
         },
         {
           "q": "Verandert het mijn bestanden?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Op welke hardware is het getest?",
-          "a": "Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11, waarop ook integermodus is getest. Het is daarnaast getest op AirPods Max via USB-C en Bluetooth, op de luidsprekers van een MacBook Pro en op een Sony-tv via HDMI in 5.1. Intel-hardware is niet getest. Bitstream naar receivers en meerkanaalsuitvoer naar DAC’s zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); <a href=\"{href.dacReport}\">meldingen gezocht</a>."
+          "a": "Afspelen van PCM is getest tot 768 kHz en DSD256 op een Fosi Audio ZD3, en tot 384 kHz en DSD128 op een FiiO K11 (meldingen van de ontwikkelaar; zie docs/DEVICES.md), waarop ook integermodus is getest. Het is daarnaast getest op AirPods Max via USB-C en Bluetooth, op de luidsprekers van een MacBook Pro en op een Sony-tv via HDMI in 5.1. Intel-hardware is niet getest. Bitstream naar receivers en meerkanaalsuitvoer naar DAC’s zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); <a href=\"{href.dacReport}\">meldingen gezocht</a>."
         },
         {
           "q": "Is het er in mijn taal?",
@@ -601,7 +601,7 @@
     "ogAlt": "Perskit van Vespertine: factsheet, logo’s, key art, echte screenshots en de trailer, op een achtergrond van drie echte screenshots van de app.",
     "eyebrow": "Perskit",
     "heading": "Alles wat je nodig hebt om over {name} te schrijven.",
-    "lede": "Vespertine is de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac. Schijfkopieën van SACD’s en DVD-Video, uit SACD’s geëxtraheerde 5.1-tracks, DTS-cd’s en DTS-HD MA-, TrueHD- en Atmos-bestanden delen één bibliotheek, met ruimtelijke audio met hoofdtracking op AirPods. Het signaalpad toont elke stap van bestand tot uitvoer, met de voorwaarden en tests in GPL-broncode die iedereen kan controleren.",
+    "lede": "Vespertine is de gratis opensourcespeler voor surround- en hi-res-muziekcollecties op de Mac. Schijfkopieën van SACD’s en DVD-Video, uit SACD’s geëxtraheerde 5.1-tracks, DTS-cd’s en DTS-HD MA-, TrueHD- en Atmos-bestanden delen één bibliotheek, met ruimtelijke audio op AirPods (met hoofdtracking waar macOS dat biedt). Het signaalpad toont elke stap van bestand tot uitvoer, met de voorwaarden en tests in GPL-broncode die iedereen kan controleren.",
     "fine": "Uitvoer kanaal voor kanaal en bitstream naar een receiver zijn experimenteel en niet getest op echte receivers en meerkanaals USB-DAC’s (één Sony-tv via HDMI is getest: zie docs/DEVICES.md); meldingen gezocht. Atmos-objecten in Dolby Digital Plus worden door macOS gerenderd; TrueHD Atmos en DTS:X spelen hun kanaalbed af.",
     "facts": {
       "eyebrow": "Factsheet",

@@ -69,7 +69,7 @@
         "dan hi-res,"
       ],
       "titleBrass": "pada Mac anda.",
-      "lede": "Pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, DSD, CD DTS, serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka dengan album stereo anda, dengan Audio Ruang penjejakan kepala pada AirPods. Pembetulan bilik mengukur bilik anda dengan mikrofon USB dan membetulkan setiap pembesar suara; ia kekal dimatikan sehingga anda menghidupkannya. Laluan isyarat menunjukkan setiap langkah daripada fail ke output. Dalam bahasa Inggeris dan {languages} bahasa lain.",
+      "lede": "Pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, DSD, CD DTS, serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka dengan album stereo anda, dengan Audio Ruang pada AirPods (dengan penjejakan kepala jika macOS menyediakannya). Pembetulan bilik mengukur bilik anda dengan mikrofon USB dan membetulkan setiap pembesar suara; ia kekal dimatikan sehingga anda menghidupkannya. Laluan isyarat menunjukkan setiap langkah daripada fail ke output. Dalam bahasa Inggeris dan {languages} bahasa lain.",
       "ask": "Suka?",
       "star": "Beri bintang di GitHub",
       "discuss": "Sertai perbincangan",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Bunyi keliling dalam satu pustaka",
-        "text": "Imej dan rip SACD, cakera DVD-Video, CD DTS, DTS-HD MA dan TrueHD berada di sebelah album stereo anda dan dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods. Apabila sesebuah album ada dalam kedua-dua versi, setiap lagu disenaraikan sekali dan versi yang betul dimainkan untuk output anda."
+        "text": "Imej dan rip SACD, cakera DVD-Video, CD DTS, DTS-HD MA dan TrueHD berada di sebelah album stereo anda dan dimainkan melalui perender Audio Ruang Apple pada AirPods (dengan penjejakan kepala jika macOS menyediakannya). Apabila sesebuah album ada dalam kedua-dua versi, setiap lagu disenaraikan sekali dan versi yang betul dimainkan untuk output anda."
       },
       {
         "title": "Laluan isyarat yang boleh anda semak",
@@ -126,7 +126,7 @@
         "title": "Setiap trek pada kadar dan kedalaman aslinya.",
         "lede": "Laluan isyarat menyenaraikan setiap langkah daripada fail ke DAC anda, dibaca semula daripada Core Audio, dan memberitahu apabila sesuatu mengubah sampel.",
         "body": [
-          "Vespertine menukar peranti kepada kadar setiap fail dan hanya mensampel semula, dengan penukar berkualiti mastering Apple, apabila DAC tidak dapat menjalankan kadar itu. <span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul apabila syarat dalam kod sumber dipenuhi: kadar asli, tiada apa-apa yang mengubah sampel, panjang kata yang muat, dan peranti yang eksklusif atau tidak dikongsi dengan aplikasi lain. Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11."
+          "Vespertine menukar peranti kepada kadar setiap fail dan hanya mensampel semula, dengan penukar berkualiti mastering Apple, apabila DAC tidak dapat menjalankan kadar itu. <span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul apabila syarat dalam kod sumber dipenuhi: kadar asli, tiada apa-apa yang mengubah sampel, panjang kata yang muat, dan peranti yang eksklusif atau tidak dikongsi dengan aplikasi lain. Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11 (laporan pembangun; lihat docs/DEVICES.md)."
         ],
         "list": [
           "Mod eksklusif (hog) menghalang aplikasi lain daripada menggunakan peranti. Dalam mod kongsi, kekunci kelantangan dan Digital Crown melaraskan DAC anda; dalam mod eksklusif pun boleh, jika anda menghidupkannya.",
@@ -181,7 +181,7 @@
           "Tiga sasaran: Warm (lalai), Gentle tilt dan Flat. Betulkan bes sahaja atau julat penuh, dan reka semula penapis kemudian tanpa perlu mengukur semula.",
           "Mengimport penapis daripada REW atau Equalizer APO, berserta kelewatan dan aras setiap pembesar suara, dan mengeksport teks Equalizer APO.",
           "Mengimport respons impuls (WAV, AIFF, CAF atau FLAC) dan memainkannya melalui konvolusi.",
-          "Stereo dan 5.1.",
+          "Stereo dan 5.1 (5.1 diuji dengan bilik simulasi dan profil yang diimport, belum lagi dalam bilik 5.1 sebenar).",
           "Potret Bilik menunjukkan pembesar suara, tempat duduk anda dan setiap titik mikrofon semasa ia diukur. Animasi lengkung kemudian mengubah respons yang diukur menjadi respons yang diramalkan, dan suis sebelum/selepas membandingkan kedua-duanya."
         ],
         "note": "Lengkung “selepas” diramalkan daripada pengukuran dan penapis, bukan diukur. Untuk melihat apa yang sebenarnya berlaku dalam bilik, ukur semula dengan pembetulan dihidupkan.",
@@ -196,9 +196,9 @@
         "jack": "Bunyi keliling",
         "kicker": "Bunyi keliling & Audio Ruang",
         "title": "Cakera 5.1 anda, dalam pustaka yang sama.",
-        "lede": "Muzik berbilang saluran dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods, atau dimiks turun mengikut susun atur saluran pada DAC stereo.",
+        "lede": "Muzik berbilang saluran dimainkan melalui perender Audio Ruang Apple pada AirPods (dengan penjejakan kepala jika macOS menyediakannya), atau dimiks turun mengikut susun atur saluran pada DAC stereo.",
         "body": [
-          "CD DTS dinyahkod kepada 5.1. Imej SACD, trek SACD yang diekstrak, FLAC berbilang saluran, TrueHD dan DTS-HD MA dirender sebagai Audio Ruang penjejakan kepala pada AirPods atau dimiks turun pada DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya. Output saluran demi saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
+          "CD DTS dinyahkod kepada 5.1. Imej SACD, trek SACD yang diekstrak, FLAC berbilang saluran, TrueHD dan DTS-HD MA dirender melalui perender Audio Ruang Apple pada AirPods (dengan penjejakan kepala jika macOS menyediakannya) atau dimiks turun pada DAC stereo. Dolby Digital Plus dengan Atmos menggunakan perender objek macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya. Output saluran demi saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan."
         ],
         "list": [
           "Versi stereo dan bunyi keliling sesebuah album disenaraikan sekali; Vespertine memainkan versi yang sesuai dengan output, atau versi yang anda sematkan.",
@@ -215,11 +215,11 @@
         "title": "Mainkan imej cakera itu sendiri.",
         "lede": "Halakan Vespertine ke imej SACD atau DVD-Video dan ia memainkan muzik terus daripadanya, tanpa apa-apa dilekapkan, diekstrak atau ditulis.",
         "body": [
-          "Imej SACD <span class=\"mono\">.iso</span> memainkan kawasan stereo dan 5.1, sama ada dimampatkan DST atau tidak, dengan tajuk daripada teks cakera itu sendiri. DST dinyahkod kembali kepada DSD yang tepat, jadi stereo dihantar ke DAC anda sebagai DSD asli melalui DoP jika DAC menyokongnya, dan 5.1 dimainkan sebagai Audio Ruang penjejakan kepala pada AirPods. Muzik LPCM pada cakera DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) dimainkan bit demi bit, satu album bagi setiap tajuk dan satu trek bagi setiap bab."
+          "Imej SACD <span class=\"mono\">.iso</span> memainkan kawasan stereo dan 5.1, sama ada dimampatkan DST atau tidak, dengan tajuk daripada teks cakera itu sendiri. DST dinyahkod kembali kepada DSD yang tepat, jadi stereo dihantar ke DAC anda sebagai DSD asli melalui DoP jika DAC menyokongnya, dan 5.1 dimainkan melalui perender Audio Ruang Apple pada AirPods. Muzik LPCM pada cakera DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) dimainkan bit demi bit, satu album bagi setiap tajuk dan satu trek bagi setiap bab."
         ],
         "list": [
           "Sepadan dengan sacd_extract bit demi bit pada dua cakera sebenar. Cakera dengan kawasan 5.0, hanya kawasan berbilang saluran, atau DSD128 ke atas setakat ini hanya diliputi oleh imej ujian sintetik.",
-          "DSF dan DSDIFF daripada DSD64 hingga DSD512, termasuk DSDIFF yang dimampatkan DST, dihantar sebagai DoP ke DAC yang menerima kadar pembawa, atau ditukar kepada PCM berkadar tinggi. DoP disahkan sehingga DSD256 pada Fosi Audio ZD3 dan sehingga DSD128 pada FiiO K11; DSD512 melalui DoP belum diuji pada perkakasan.",
+          "DSF dan DSDIFF daripada DSD64 hingga DSD512, termasuk DSDIFF yang dimampatkan DST, dihantar sebagai DoP ke DAC yang menerima kadar pembawa (sehingga DSD256 pada DAC yang dicuba), atau ditukar kepada PCM berkadar tinggi. DoP dilaporkan berfungsi sehingga DSD256 pada Fosi Audio ZD3 dan sehingga DSD128 pada FiiO K11 (laporan pembangun, tiada tangkapan); DSD512 melalui DoP belum diuji pada perkakasan.",
           "DVD-Video LPCM pada 16, 20 dan 24 bit, 48 dan 96 kHz, sehingga 8 saluran. DVD-Audio tidak disokong, dan cakera yang disulitkan (CSS) memerlukan salinan yang telah dinyahsulit."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Adakah ia menyokong pembetulan bilik?",
-          "a": "Ya. Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur di satu hingga lima titik di sekeliling tempat duduk anda, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara serta menyelaraskan kelewatan dan aras setiap satunya, dalam stereo atau 5.1. Ia juga mengimport penapis REW dan Equalizer APO serta respons impuls. Ciri ini dimatikan secara lalai, main balik kekal bit-perfect semasa ia dimatikan, dan laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span> semasa ia dihidupkan. <a href=\"{href.roomCorrection}\">Cara pembetulan bilik berfungsi</a>."
+          "a": "Ya. Ukur bilik anda dengan UMIK-1 atau mikrofon USB lain yang telah ditentukur di satu hingga lima titik di sekeliling tempat duduk anda, dan Vespertine akan melaraskan penapis untuk setiap pembesar suara serta menyelaraskan kelewatan dan aras setiap satunya, dalam stereo atau 5.1 (5.1 diuji dengan bilik simulasi dan profil yang diimport, belum lagi dalam bilik 5.1 sebenar). Ia juga mengimport penapis REW dan Equalizer APO serta respons impuls. Ciri ini dimatikan secara lalai, main balik kekal bit-perfect semasa ia dimatikan, dan laluan isyarat memaparkan <span class=\"mono nowrap\">PEMBETULAN BILIK</span> semasa ia dihidupkan. <a href=\"{href.roomCorrection}\">Cara pembetulan bilik berfungsi</a>."
         },
         {
           "q": "Bolehkah ia memainkan cakera SACD dan DVD?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Adakah ia memainkan Dolby Atmos?",
-          "a": "Dolby Digital Plus dengan Atmos dimainkan melalui perender objek macOS, sebagai Audio Ruang dengan penjejakan kepala pada AirPods. TrueHD Atmos dan DTS:X memainkan lapisan saluran asas tanpa kehilangannya; objeknya tidak dirender. Bitstream ke penerima AV adalah eksperimental, belum diuji pada penerima sebenar; laporan diperlukan."
+          "a": "Dolby Digital Plus dengan Atmos dimainkan melalui perender objek macOS, sebagai Audio Ruang pada AirPods (dengan penjejakan kepala jika macOS menyediakannya). TrueHD Atmos dan DTS:X memainkan lapisan saluran asas tanpa kehilangannya; objeknya tidak dirender. Bitstream ke penerima AV adalah eksperimental, belum diuji pada penerima sebenar; laporan diperlukan."
         },
         {
           "q": "Adakah ia akan mengubah fail saya?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Perkakasan apa yang telah digunakan untuk mengujinya?",
-          "a": "Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11, yang juga digunakan untuk menguji mod integer. Ia juga telah diuji pada AirPods Max melalui USB-C dan Bluetooth, pembesar suara MacBook Pro, dan TV Sony melalui HDMI dalam 5.1. Perkakasan Intel belum diuji. Bitstream ke penerima dan output DAC berbilang saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); <a href=\"{href.dacReport}\">laporan diperlukan</a>."
+          "a": "Main balik PCM telah diuji sehingga 768 kHz dan DSD256 pada Fosi Audio ZD3, dan sehingga 384 kHz dan DSD128 pada FiiO K11 (laporan pembangun; lihat docs/DEVICES.md), yang juga digunakan untuk menguji mod integer. Ia juga telah diuji pada AirPods Max melalui USB-C dan Bluetooth, pembesar suara MacBook Pro, dan TV Sony melalui HDMI dalam 5.1. Perkakasan Intel belum diuji. Bitstream ke penerima dan output DAC berbilang saluran adalah eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); <a href=\"{href.dacReport}\">laporan diperlukan</a>."
         },
         {
           "q": "Adakah ia dalam bahasa saya?",
@@ -601,7 +601,7 @@
     "ogAlt": "Kit media Vespertine: lembaran fakta, logo, seni utama, tangkapan skrin sebenar dan treler, di atas tiga tangkapan skrin sebenar aplikasi.",
     "eyebrow": "Kit media",
     "heading": "Semua yang anda perlukan untuk menulis tentang {name}.",
-    "lede": "Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, trek SACD 5.1 yang diekstrak, CD DTS serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka, dengan Audio Ruang berpenjejakan kepala pada AirPods. Laluan Isyarat menunjukkan setiap langkah daripada fail hingga ke output, dengan syarat dan ujian dalam kod sumber GPL yang boleh diaudit oleh sesiapa sahaja.",
+    "lede": "Vespertine ialah pemain Mac percuma dan sumber terbuka untuk koleksi muzik bunyi keliling dan hi-res. Imej cakera SACD dan DVD-Video, trek SACD 5.1 yang diekstrak, CD DTS serta fail DTS-HD MA, TrueHD dan Atmos berkongsi satu pustaka, dengan Audio Ruang pada AirPods (dengan penjejakan kepala jika macOS menyediakannya). Laluan Isyarat menunjukkan setiap langkah daripada fail hingga ke output, dengan syarat dan ujian dalam kod sumber GPL yang boleh diaudit oleh sesiapa sahaja.",
     "fine": "Output saluran demi saluran dan bitstream ke penerima masih eksperimental, belum diuji pada penerima sebenar dan DAC USB berbilang saluran (satu TV Sony melalui HDMI telah diuji: lihat docs/DEVICES.md); laporan diperlukan. Objek Dolby Digital Plus Atmos dirender oleh macOS; TrueHD Atmos dan DTS:X memainkan lapisan saluran asasnya.",
     "facts": {
       "eyebrow": "Lembaran fakta",

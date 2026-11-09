@@ -69,7 +69,7 @@
         "hi-res-musiikkia"
       ],
       "titleBrass": "Macillasi.",
-      "lede": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, DSD, DTS CD -levyt sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa stereoalbumiesi kanssa, ja AirPods-kuulokkeilla ne soivat tilaäänenä pään seurannalla. Huonekorjaus mittaa huoneesi USB-mikrofonilla ja korjaa jokaisen kaiuttimen. Se on pois päältä, kunnes otat sen käyttöön. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon. Englanniksi ja {languages} muulla kielellä.",
+      "lede": "Ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, DSD, DTS CD -levyt sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa stereoalbumiesi kanssa, ja AirPods-kuulokkeilla ne soivat tilaäänenä (pään seurannalla, jos macOS tarjoaa sen). Huonekorjaus mittaa huoneesi USB-mikrofonilla ja korjaa jokaisen kaiuttimen. Se on pois päältä, kunnes otat sen käyttöön. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon. Englanniksi ja {languages} muulla kielellä.",
       "ask": "Pidätkö siitä?",
       "star": "Anna tähti GitHubissa",
       "discuss": "Liity keskusteluun",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Surround samassa kirjastossa",
-        "text": "SACD-levykuvat ja -rippaukset, DVD-Video-levyt, DTS CD -levyt sekä DTS-HD MA ja TrueHD ovat stereoalbumiesi rinnalla ja soivat AirPods-kuulokkeilla tilaäänenä pään seurannalla. Kun albumista on molemmat versiot, jokainen kappale näkyy listassa kerran ja soimaan pääsee ulostulollesi sopiva versio."
+        "text": "SACD-levykuvat ja -rippaukset, DVD-Video-levyt, DTS CD -levyt sekä DTS-HD MA ja TrueHD ovat stereoalbumiesi rinnalla ja soivat AirPods-kuulokkeilla Applen tilaäänirenderöijän kautta (pään seurannalla, jos macOS tarjoaa sen). Kun albumista on molemmat versiot, jokainen kappale näkyy listassa kerran ja soimaan pääsee ulostulollesi sopiva versio."
       },
       {
         "title": "Signaalipolku, jonka voit tarkistaa",
@@ -126,7 +126,7 @@
         "title": "Jokainen kappale omalla taajuudellaan ja bittisyvyydellään.",
         "lede": "Signaalipolku listaa jokaisen vaiheen tiedostosta DAC:llesi asti, luettuna takaisin Core Audiosta, ja kertoo, kun jokin muutti näytteitä.",
         "body": [
-          "Vespertine vaihtaa laitteen kunkin tiedoston näytteenottotaajuudelle ja muuntaa taajuutta Applen masterointitason muuntimella vain silloin, kun DAC ei pysty toimimaan sillä. <span class=\"mono nowrap\">BITTITARKKA</span> näkyy vain, kun lähdekoodin ehdot täyttyvät: natiivi taajuus, mikään ei muuta näytteitä, sananpituus mahtuu ja laite on yksinomaisessa käytössä tai sitä ei jaeta toisen sovelluksen kanssa. Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti sekä FiiO K11:llä PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti."
+          "Vespertine vaihtaa laitteen kunkin tiedoston näytteenottotaajuudelle ja muuntaa taajuutta Applen masterointitason muuntimella vain silloin, kun DAC ei pysty toimimaan sillä. <span class=\"mono nowrap\">BITTITARKKA</span> näkyy vain, kun lähdekoodin ehdot täyttyvät: natiivi taajuus, mikään ei muuta näytteitä, sananpituus mahtuu ja laite on yksinomaisessa käytössä tai sitä ei jaeta toisen sovelluksen kanssa. Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti sekä FiiO K11:llä PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti (kehittäjän raportit; katso docs/DEVICES.md)."
         ],
         "list": [
           "Yksinomainen tila (hog) pitää muut sovellukset poissa laitteelta. Jaetussa tilassa äänenvoimakkuusnäppäimet ja Digital Crown säätävät DAC:tasi; yksinomaisessa tilassa ne voivat säätää sitä myös, jos otat asetuksen käyttöön.",
@@ -181,7 +181,7 @@
           "Kolme tavoitetta: Warm (oletus), Gentle tilt ja Flat. Korjaa vain basso tai koko alue, ja suunnittele suodattimet myöhemmin uudelleen ilman uutta mittausta.",
           "Tuo suodattimet REW:stä tai Equalizer APO:sta kunkin kaiuttimen viiveineen ja tasoineen ja vie suodattimia Equalizer APO -tekstimuodossa.",
           "Tuo impulssivasteita (WAV, AIFF, CAF tai FLAC) ja toistaa ne konvoluutiolla.",
-          "Stereo ja 5.1.",
+          "Stereo ja 5.1 (5.1 on testattu simuloiduilla huoneilla ja tuoduilla profiileilla, ei vielä oikeassa 5.1-huoneessa).",
           "Huonekuva näyttää kaiuttimet, kuuntelupaikkasi ja kunkin mikrofonikohdan sitä mukaa kuin niitä mitataan. Sen jälkeen käyräsiirtymä muuttaa mitatun vasteen ennustetuksi, ja ennen/jälkeen-kytkimellä voit verrata niitä."
         ],
         "note": "”Jälkeen”-käyrä on ennustettu mittauksen ja suodattimien perusteella, ei mitattu. Jos haluat nähdä, mitä huone todella tekee, mittaa uudelleen korjauksen ollessa päällä.",
@@ -196,9 +196,9 @@
         "jack": "Surround",
         "kicker": "Surround ja tilaääni",
         "title": "5.1-levysi samassa kirjastossa.",
-        "lede": "Monikanavainen musiikki soi AirPods-kuulokkeilla tilaäänenä pään seurannalla tai miksataan stereo-DAC:lle stereoksi kanavakokoonpanon mukaan.",
+        "lede": "Monikanavainen musiikki soi AirPods-kuulokkeilla Applen tilaäänirenderöijän kautta (pään seurannalla, jos macOS tarjoaa sen) tai miksataan stereo-DAC:lle stereoksi kanavakokoonpanon mukaan.",
         "body": [
-          "DTS CD -levyt dekoodataan 5.1-ääneksi. SACD-levykuvat, puretut SACD-raidat, monikanavainen FLAC, TrueHD ja DTS-HD MA renderöidään AirPods-kuulokkeilla tilaäänenä pään seurannalla tai miksataan stereoksi stereo-DAC:lle. Atmosia sisältävä Dolby Digital Plus käyttää macOS:n objektirenderöijää; TrueHD Atmos ja DTS:X toistavat kanavapohjaisen pohjakerroksensa. Kanava kanavaan -ulostulo on kokeellinen, eikä sitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan."
+          "DTS CD -levyt dekoodataan 5.1-ääneksi. SACD-levykuvat, puretut SACD-raidat, monikanavainen FLAC, TrueHD ja DTS-HD MA renderöidään AirPods-kuulokkeilla Applen tilaäänirenderöijän kautta (pään seurannalla, jos macOS tarjoaa sen) tai miksataan stereoksi stereo-DAC:lle. Atmosia sisältävä Dolby Digital Plus käyttää macOS:n objektirenderöijää; TrueHD Atmos ja DTS:X toistavat kanavapohjaisen pohjakerroksensa. Kanava kanavaan -ulostulo on kokeellinen, eikä sitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan."
         ],
         "list": [
           "Albumin stereo- ja surround-versiot näkyvät listassa kerran; Vespertine toistaa sen, joka sopii ulostuloon, tai sen, jonka kiinnität.",
@@ -215,11 +215,11 @@
         "title": "Soita suoraan levykuvasta.",
         "lede": "Valitse SACD- tai DVD-Video-levykuva, niin Vespertine toistaa musiikin suoraan siitä – mitään ei liitetä, pureta eikä kirjoiteta.",
         "body": [
-          "SACD-levykuvista (<span class=\"mono\">.iso</span>) soivat stereo- ja 5.1-alueet, DST-pakattuina tai pakkaamattomina, ja nimet tulevat levyn omista tekstitiedoista. DST puretaan takaisin täsmälleen alkuperäiseksi DSD:ksi, joten stereo menee DAC:lle natiivina DSD:nä DoP:n kautta, jos DAC tukee sitä, ja 5.1 soi AirPods-kuulokkeilla tilaäänenä pään seurannalla. DVD-Video-levyjen LPCM-musiikki (<span class=\"mono\">.iso</span> tai <span class=\"mono\">VIDEO_TS</span>-kansio) soi bitti bitiltä, yksi albumi nimikettä ja yksi raita lukua kohden."
+          "SACD-levykuvista (<span class=\"mono\">.iso</span>) soivat stereo- ja 5.1-alueet, DST-pakattuina tai pakkaamattomina, ja nimet tulevat levyn omista tekstitiedoista. DST puretaan takaisin täsmälleen alkuperäiseksi DSD:ksi, joten stereo menee DAC:lle natiivina DSD:nä DoP:n kautta, jos DAC tukee sitä, ja 5.1 soi AirPods-kuulokkeilla Applen tilaäänirenderöijän kautta. DVD-Video-levyjen LPCM-musiikki (<span class=\"mono\">.iso</span> tai <span class=\"mono\">VIDEO_TS</span>-kansio) soi bitti bitiltä, yksi albumi nimikettä ja yksi raita lukua kohden."
         ],
         "list": [
           "Tulos vastasi sacd_extractin tulosta bitti bitiltä kahdella oikealla levyllä. Levyt, joilla on 5.0-alue, pelkkä monikanava-alue tai DSD128 tai sitä korkeampi, on toistaiseksi katettu vain synteettisillä testilevykuvilla.",
-          "DSF ja DSDIFF DSD64:stä DSD512:een, myös DST-pakattu DSDIFF, lähtevät DoP:nä DAC-laitteille, jotka tukevat kantoaaltotaajuutta, tai muunnetaan korkean näytteenottotaajuuden PCM:ksi. DoP on vahvistettu Fosi Audio ZD3:lla DSD256:een asti ja FiiO K11:llä DSD128:aan asti. DSD512:ta DoP:n kautta ei ole testattu laitteistolla.",
+          "DSF ja DSDIFF DSD64:stä DSD512:een, myös DST-pakattu DSDIFF, lähtevät DoP:nä DAC-laitteille, jotka tukevat kantoaaltotaajuutta (DSD256:een asti kokeilluilla DAC-laitteilla), tai muunnetaan korkean näytteenottotaajuuden PCM:ksi. DoP:n raportoidaan toimivan Fosi Audio ZD3:lla DSD256:een asti ja FiiO K11:llä DSD128:aan asti (kehittäjän raportit, ei tallennetta). DSD512:ta DoP:n kautta ei ole testattu laitteistolla.",
           "DVD-Video LPCM 16, 20 ja 24 bitillä, 48 ja 96 kHz:llä, enintään 8 kanavaa. DVD-Audiota ei tueta, ja salatuista (CSS) levyistä tarvitaan salauksesta purettu kopio."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Onko siinä huonekorjausta?",
-          "a": "Kyllä. Mittaa huoneesi UMIK-1:llä tai muulla kalibroidulla USB-mikrofonilla yhdestä viiteen kohdasta kuuntelupaikkasi ympäriltä. Vespertine sovittaa suodattimet jokaiselle kaiuttimelle ja yhdenmukaistaa niiden viiveet ja tasot, joko stereona tai 5.1-kokoonpanossa. Se tuo myös REW- ja Equalizer APO -suodattimia sekä impulssivasteita. Toiminto on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>. <a href=\"{href.roomCorrection}\">Näin huonekorjaus toimii</a>."
+          "a": "Kyllä. Mittaa huoneesi UMIK-1:llä tai muulla kalibroidulla USB-mikrofonilla yhdestä viiteen kohdasta kuuntelupaikkasi ympäriltä. Vespertine sovittaa suodattimet jokaiselle kaiuttimelle ja yhdenmukaistaa niiden viiveet ja tasot, joko stereona tai 5.1-kokoonpanossa (5.1 on testattu simuloiduilla huoneilla ja tuoduilla profiileilla, ei vielä oikeassa 5.1-huoneessa). Se tuo myös REW- ja Equalizer APO -suodattimia sekä impulssivasteita. Toiminto on oletuksena pois päältä, ja toisto pysyy bittitarkkana, kun se on pois päältä. Kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">HUONEKORJAUS</span>. <a href=\"{href.roomCorrection}\">Näin huonekorjaus toimii</a>."
         },
         {
           "q": "Toistaako se SACD- ja DVD-levyjä?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Toistaako se Dolby Atmosia?",
-          "a": "Dolby Digital Plus Atmosilla toistuu macOS:n objektirenderöijän kautta, AirPodseilla pään liikkeitä seuraavana Tilaäänenä. TrueHD Atmos- ja DTS:X-raidoista toistetaan häviötön kanavapohja, mutta niiden objekteja ei renderöidä. Bittivirta AV-vastaanottimelle on kokeellinen eikä sitä ole testattu oikeilla vastaanottimilla. Raportteja kaivataan."
+          "a": "Dolby Digital Plus Atmosilla toistuu macOS:n objektirenderöijän kautta, AirPodseilla Tilaäänenä (pään liikkeitä seuraavana, jos macOS tarjoaa sen). TrueHD Atmos- ja DTS:X-raidoista toistetaan häviötön kanavapohja, mutta niiden objekteja ei renderöidä. Bittivirta AV-vastaanottimelle on kokeellinen eikä sitä ole testattu oikeilla vastaanottimilla. Raportteja kaivataan."
         },
         {
           "q": "Muuttaako se tiedostojani?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Millä laitteilla sitä on testattu?",
-          "a": "Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti. FiiO K11:llä sitä on testattu PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti, ja K11:llä testattiin myös kokonaislukutila. Toistoa on testattu myös AirPods Maxilla USB-C:n ja Bluetoothin kautta, MacBook Pron kaiuttimilla sekä Sony-televisiolla HDMI:n kautta 5.1-muodossa. Intel-laitteistoa ei ole testattu. Bittivirta vastaanottimelle ja monikanavainen DAC-ulostulo ovat kokeellisia eikä niitä ole testattu oikeilla vastaanottimilla tai monikanavaisilla USB-DAC:eilla (yksi Sony-televisio HDMI:n kautta on testattu: ks. docs/DEVICES.md). <a href=\"{href.dacReport}\">Raportteja kaivataan</a>."
+          "a": "Toistoa on testattu Fosi Audio ZD3:lla PCM:nä 768 kHz:iin ja DSD:nä DSD256:een asti. FiiO K11:llä sitä on testattu PCM:nä 384 kHz:iin ja DSD:nä DSD128:aan asti (kehittäjän raportit; katso docs/DEVICES.md), ja K11:llä testattiin myös kokonaislukutila. Toistoa on testattu myös AirPods Maxilla USB-C:n ja Bluetoothin kautta, MacBook Pron kaiuttimilla sekä Sony-televisiolla HDMI:n kautta 5.1-muodossa. Intel-laitteistoa ei ole testattu. Bittivirta vastaanottimelle ja monikanavainen DAC-ulostulo ovat kokeellisia eikä niitä ole testattu oikeilla vastaanottimilla tai monikanavaisilla USB-DAC:eilla (yksi Sony-televisio HDMI:n kautta on testattu: ks. docs/DEVICES.md). <a href=\"{href.dacReport}\">Raportteja kaivataan</a>."
         },
         {
           "q": "Onko se minun kielelläni?",
@@ -601,7 +601,7 @@
     "ogAlt": "Vespertinen lehdistöpaketti: tietolehti, logot, mainoskuvat, aidot kuvakaappaukset ja traileri kolmen sovelluksesta otetun aidon kuvakaappauksen päällä.",
     "eyebrow": "Lehdistöpaketti",
     "heading": "Kaikki, mitä tarvitset kirjoittaaksesi {name}-sovelluksesta.",
-    "lede": "Vespertine on ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, puretut SACD-levyjen 5.1-raidat, DTS CD:t sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa, ja AirPodeilla ne soivat pään liikkeitä seuraavana Tilaäänenä. Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon, ja ehdot ja testit ovat GPL-lähdekoodissa, jonka kuka tahansa voi tarkastaa.",
+    "lede": "Vespertine on ilmainen, avoimen lähdekoodin Mac-soitin surround- ja hi-res-musiikkikokoelmille. SACD- ja DVD-Video-levykuvat, puretut SACD-levyjen 5.1-raidat, DTS CD:t sekä DTS-HD MA -, TrueHD- ja Atmos-tiedostot ovat samassa kirjastossa, ja AirPodeilla ne soivat Tilaäänenä (pään liikkeitä seuraavana, jos macOS tarjoaa sen). Signaalipolku näyttää jokaisen vaiheen tiedostosta ulostuloon, ja ehdot ja testit ovat GPL-lähdekoodissa, jonka kuka tahansa voi tarkastaa.",
     "fine": "Kanava kanavaan -ulostulo ja bittivirta vastaanottimelle ovat kokeellisia, eikä niitä ole testattu oikeilla vastaanottimilla eikä monikanavaisilla USB-DAC-laitteilla (yksi Sony-televisio on testattu HDMI:n kautta: katso docs/DEVICES.md); raportteja kaivataan. Dolby Digital Plus Atmosin objektit renderöi macOS; TrueHD Atmosista ja DTS:X:stä toistetaan niiden kanavapohja.",
     "facts": {
       "eyebrow": "Tietolehti",

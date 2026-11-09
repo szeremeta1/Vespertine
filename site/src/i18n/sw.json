@@ -69,7 +69,7 @@
         "ya kuzunguka na hi-res,"
       ],
       "titleBrass": "kwenye Mac yako.",
-      "lede": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, DSD, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos hukaa kwenye maktaba moja pamoja na albamu zako za stereo, na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Urekebishaji wa chumba hupima chumba chako kwa maikrofoni ya USB na kurekebisha kila spika; umezimwa hadi utakapouwasha. Njia ya mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti. Kwa Kiingereza na lugha nyingine {languages}.",
+      "lede": "Kicheza muziki cha Mac, bila malipo na programu huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, DSD, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos hukaa kwenye maktaba moja pamoja na albamu zako za stereo, na Spatial Audio kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa). Urekebishaji wa chumba hupima chumba chako kwa maikrofoni ya USB na kurekebisha kila spika; umezimwa hadi utakapouwasha. Njia ya mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti. Kwa Kiingereza na lugha nyingine {languages}.",
       "ask": "Umeipenda?",
       "star": "Ipe nyota kwenye GitHub",
       "discuss": "Jiunge na majadiliano",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Sauti ya kuzunguka katika maktaba moja",
-        "text": "Nakala za SACD na faili zilizonakiliwa kutoka SACD, diski za DVD-Video, CD za DTS, DTS-HD MA na TrueHD hukaa kando ya albamu zako za stereo na hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Albamu inapokuja katika matoleo yote mawili, kila wimbo huorodheshwa mara moja na toleo sahihi hucheza kulingana na kifaa chako cha kutoa sauti."
+        "text": "Nakala za SACD na faili zilizonakiliwa kutoka SACD, diski za DVD-Video, CD za DTS, DTS-HD MA na TrueHD hukaa kando ya albamu zako za stereo na hucheza kupitia kichakataji cha Spatial Audio cha Apple kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa). Albamu inapokuja katika matoleo yote mawili, kila wimbo huorodheshwa mara moja na toleo sahihi hucheza kulingana na kifaa chako cha kutoa sauti."
       },
       {
         "title": "Njia ya mawimbi unayoweza kuikagua",
@@ -126,7 +126,7 @@
         "title": "Kila wimbo kwa kiwango na kina chake asilia.",
         "lede": "Njia ya mawimbi huorodhesha kila hatua kutoka kwenye faili hadi DAC yako, ikisomwa tena kutoka Core Audio, na hukuambia kitu kinapobadilisha sampuli.",
         "body": [
-          "Vespertine hubadilisha kifaa kitumie kiwango cha sampuli cha kila faili, na hubadilisha kiwango cha sampuli (resampling), kwa kigeuzi cha Apple chenye ubora wa mastering, pale tu DAC isipoweza kutumia kiwango hicho. <span class=\"mono nowrap\">BIT-PERFECT</span> huonekana pale tu masharti yaliyo kwenye msimbo chanzo yanapotimizwa: kiwango asilia, hakuna kinachobadilisha sampuli, urefu wa neno unaotoshea, na kifaa kilicho katika hali ya kipekee au kisichoshirikiwa na programu nyingine. Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11."
+          "Vespertine hubadilisha kifaa kitumie kiwango cha sampuli cha kila faili, na hubadilisha kiwango cha sampuli (resampling), kwa kigeuzi cha Apple chenye ubora wa mastering, pale tu DAC isipoweza kutumia kiwango hicho. <span class=\"mono nowrap\">BIT-PERFECT</span> huonekana pale tu masharti yaliyo kwenye msimbo chanzo yanapotimizwa: kiwango asilia, hakuna kinachobadilisha sampuli, urefu wa neno unaotoshea, na kifaa kilicho katika hali ya kipekee au kisichoshirikiwa na programu nyingine. Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11 (ripoti za msanidi; tazama docs/DEVICES.md)."
         ],
         "list": [
           "Hali ya kipekee (hog) huzuia programu nyingine kutumia kifaa. Katika hali ya kushirikiwa, vitufe vya kiwango cha sauti na Digital Crown hurekebisha DAC yako; katika hali ya kipekee navyo vinaweza, ukiwasha hilo.",
@@ -181,7 +181,7 @@
           "Malengo matatu: Warm (chaguo-msingi), Gentle tilt na Flat. Rekebisha besi pekee au masafa kamili, na ubuni upya vichujio baadaye bila kupima tena.",
           "Huingiza vichujio kutoka REW au Equalizer APO, pamoja na ucheleweshaji na kiwango cha kila spika, na hutoa maandishi ya Equalizer APO.",
           "Huingiza miitikio ya msukumo (WAV, AIFF, CAF au FLAC) na kuicheza kwa convolution.",
-          "Stereo na 5.1.",
+          "Stereo na 5.1 (5.1 imejaribiwa kwa vyumba vya kuigwa na wasifu ulioingizwa, bado haijajaribiwa katika chumba halisi cha 5.1).",
           "Picha ya Chumba huonyesha spika, kiti chako na kila sehemu ya maikrofoni inapopimwa. Kisha Ufunuo wa Mkunjo hubadilisha mwitikio uliopimwa kuwa ule uliotabiriwa, na swichi ya kabla/baada huilinganisha."
         ],
         "note": "Mkunjo wa “baada” umetabiriwa kutokana na kipimo na vichujio, haujapimwa. Ili kuona kile chumba kinachofanya kwa kweli, pima tena urekebishaji ukiwa umewashwa.",
@@ -196,9 +196,9 @@
         "jack": "Sauti ya kuzunguka",
         "kicker": "Sauti ya kuzunguka na Spatial Audio",
         "title": "Diski zako za 5.1, katika maktaba ileile.",
-        "lede": "Muziki wa chaneli nyingi hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods, au hupunguzwa kuwa stereo (downmix) kulingana na mpangilio wa chaneli kwenye DAC ya stereo.",
+        "lede": "Muziki wa chaneli nyingi hucheza kupitia kichakataji cha Spatial Audio cha Apple kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa), au hupunguzwa kuwa stereo (downmix) kulingana na mpangilio wa chaneli kwenye DAC ya stereo.",
         "body": [
-          "CD za DTS husimbuliwa kuwa 5.1. Nakala za SACD, nyimbo zilizotolewa kutoka SACD, FLAC ya chaneli nyingi, TrueHD na DTS-HD MA huchezwa kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods au hupunguzwa kuwa stereo kwenye DAC ya stereo. Dolby Digital Plus yenye Atmos hutumia kichakataji cha macOS cha vitu vya sauti; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi. Utoaji wa sauti chaneli kwa chaneli ni wa kimajaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
+          "CD za DTS husimbuliwa kuwa 5.1. Nakala za SACD, nyimbo zilizotolewa kutoka SACD, FLAC ya chaneli nyingi, TrueHD na DTS-HD MA huchezwa kupitia kichakataji cha Spatial Audio cha Apple kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa) au hupunguzwa kuwa stereo kwenye DAC ya stereo. Dolby Digital Plus yenye Atmos hutumia kichakataji cha macOS cha vitu vya sauti; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi. Utoaji wa sauti chaneli kwa chaneli ni wa kimajaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika."
         ],
         "list": [
           "Matoleo ya stereo na ya kuzunguka ya albamu huorodheshwa mara moja; Vespertine hucheza lile linalofaa kifaa cha kutoa sauti, au lile ulilolibandika.",
@@ -215,11 +215,11 @@
         "title": "Cheza nakala ya diski yenyewe.",
         "lede": "Ielekeze Vespertine kwenye nakala ya SACD au DVD-Video nayo itacheza muziki moja kwa moja kutoka humo, bila kuipachika kama diski kwenye mfumo, kutoa wala kuandika chochote.",
         "body": [
-          "Nakala za SACD za <span class=\"mono\">.iso</span> hucheza sehemu zake za stereo na 5.1, zikiwa zimebanwa kwa DST au bila kubanwa, zikipewa majina kutoka kwenye maandishi ya diski yenyewe. DST husimbuliwa kurudi kwenye DSD ileile kamili, hivyo stereo huenda kwa DAC yako kama DSD asilia kupitia DoP pale DAC inapoiunga mkono, na 5.1 hucheza kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Muziki wa LPCM kwenye diski za DVD-Video (<span class=\"mono\">.iso</span> au folda ya <span class=\"mono\">VIDEO_TS</span>) hucheza biti kwa biti, albamu moja kwa kila kichwa cha DVD na wimbo mmoja kwa kila sura yake."
+          "Nakala za SACD za <span class=\"mono\">.iso</span> hucheza sehemu zake za stereo na 5.1, zikiwa zimebanwa kwa DST au bila kubanwa, zikipewa majina kutoka kwenye maandishi ya diski yenyewe. DST husimbuliwa kurudi kwenye DSD ileile kamili, hivyo stereo huenda kwa DAC yako kama DSD asilia kupitia DoP pale DAC inapoiunga mkono, na 5.1 hucheza kupitia kichakataji cha Spatial Audio cha Apple kwenye AirPods. Muziki wa LPCM kwenye diski za DVD-Video (<span class=\"mono\">.iso</span> au folda ya <span class=\"mono\">VIDEO_TS</span>) hucheza biti kwa biti, albamu moja kwa kila kichwa cha DVD na wimbo mmoja kwa kila sura yake."
         ],
         "list": [
           "Matokeo yamelingana na sacd_extract biti kwa biti kwenye diski mbili halisi. Diski zenye eneo la 5.0, zenye eneo la chaneli nyingi pekee, au DSD128 na zaidi, hadi sasa zimejaribiwa tu kwa nakala za majaribio zilizotengenezwa kisintetiki.",
-          "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier, au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. DoP imethibitishwa hadi DSD256 kwenye Fosi Audio ZD3 na hadi DSD128 kwenye FiiO K11; DSD512 kupitia DoP haijajaribiwa kwenye maunzi.",
+          "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier (hadi DSD256 kwenye DAC zilizojaribiwa), au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. Inaripotiwa kuwa DoP hufanya kazi hadi DSD256 kwenye Fosi Audio ZD3 na hadi DSD128 kwenye FiiO K11 (ripoti za msanidi, bila rekodi); DSD512 kupitia DoP haijajaribiwa kwenye maunzi.",
           "DVD-Video LPCM ya biti 16, 20 na 24, 48 na 96 kHz, hadi chaneli 8. DVD-Audio haitumiki, na diski zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Je, ina urekebishaji wa chumba?",
-          "a": "Ndiyo. Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa katika sehemu moja hadi tano kuzunguka kiti chako, na Vespertine hutengeneza vichujio vinavyolingana na kila spika na kulinganisha ucheleweshaji na kiwango chao, kwa stereo au 5.1. Pia huingiza vichujio vya REW na Equalizer APO pamoja na miitikio ya msukumo. Umezimwa kwa chaguo-msingi, uchezaji hubaki bit-perfect ukiwa umezimwa, na njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span> ukiwa umewashwa. <a href=\"{href.roomCorrection}\">Jinsi urekebishaji wa chumba unavyofanya kazi</a>."
+          "a": "Ndiyo. Pima chumba chako kwa UMIK-1 au maikrofoni nyingine ya USB iliyokalibreshwa katika sehemu moja hadi tano kuzunguka kiti chako, na Vespertine hutengeneza vichujio vinavyolingana na kila spika na kulinganisha ucheleweshaji na kiwango chao, kwa stereo au 5.1 (5.1 imejaribiwa kwa vyumba vya kuigwa na wasifu ulioingizwa, bado haijajaribiwa katika chumba halisi cha 5.1). Pia huingiza vichujio vya REW na Equalizer APO pamoja na miitikio ya msukumo. Umezimwa kwa chaguo-msingi, uchezaji hubaki bit-perfect ukiwa umezimwa, na njia ya mawimbi huonyesha <span class=\"mono nowrap\">ROOM CORRECTION</span> ukiwa umewashwa. <a href=\"{href.roomCorrection}\">Jinsi urekebishaji wa chumba unavyofanya kazi</a>."
         },
         {
           "q": "Je, inaweza kucheza diski za SACD na DVD?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Je, inacheza Dolby Atmos?",
-          "a": "Dolby Digital Plus yenye Atmos hucheza kupitia kichakataji cha macOS cha vitu vya sauti, kama Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. TrueHD Atmos na DTS:X hucheza channel bed yao isiyo na upotevu; vitu vyao havichakatwi. Bitstream kwa resiva ya AV ni ya majaribio, haijajaribiwa kwenye resiva halisi; ripoti zinahitajika."
+          "a": "Dolby Digital Plus yenye Atmos hucheza kupitia kichakataji cha macOS cha vitu vya sauti, kama Spatial Audio kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa). TrueHD Atmos na DTS:X hucheza channel bed yao isiyo na upotevu; vitu vyao havichakatwi. Bitstream kwa resiva ya AV ni ya majaribio, haijajaribiwa kwenye resiva halisi; ripoti zinahitajika."
         },
         {
           "q": "Je, itabadilisha faili zangu?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "Imejaribiwa kwenye maunzi gani?",
-          "a": "Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11, ambapo hali ya integer ilijaribiwa pia. Pia umejaribiwa kwenye AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro, na TV ya Sony kupitia HDMI kwa 5.1. Maunzi ya Intel hayajajaribiwa. Bitstream kwa resiva na utoaji wa sauti wa chaneli nyingi kwa DAC ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); <a href=\"{href.dacReport}\">ripoti zinahitajika</a>."
+          "a": "Uchezaji wa PCM umejaribiwa hadi 768 kHz na DSD256 kwenye Fosi Audio ZD3, na hadi 384 kHz na DSD128 kwenye FiiO K11 (ripoti za msanidi; tazama docs/DEVICES.md), ambapo hali ya integer ilijaribiwa pia. Pia umejaribiwa kwenye AirPods Max kupitia USB-C na Bluetooth, spika za MacBook Pro, na TV ya Sony kupitia HDMI kwa 5.1. Maunzi ya Intel hayajajaribiwa. Bitstream kwa resiva na utoaji wa sauti wa chaneli nyingi kwa DAC ni wa majaribio, haujajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); <a href=\"{href.dacReport}\">ripoti zinahitajika</a>."
         },
         {
           "q": "Je, inapatikana kwa lugha yangu?",
@@ -601,7 +601,7 @@
     "ogAlt": "Vifaa vya wanahabari vya Vespertine: karatasi ya taarifa, nembo, picha kuu, picha halisi za skrini na trela, juu ya picha tatu halisi za skrini za programu.",
     "eyebrow": "Vifaa vya wanahabari",
     "heading": "Kila kitu unachohitaji ili kuandika kuhusu {name}.",
-    "lede": "Vespertine ni kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, nyimbo za SACD 5.1 zilizotolewa kwenye diski, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos zinakaa katika maktaba moja, pamoja na Spatial Audio yenye ufuatiliaji wa kichwa kwenye AirPods. Njia ya Mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti, huku masharti na majaribio yakiwa katika msimbo chanzo wa GPL ambao mtu yeyote anaweza kuukagua.",
+    "lede": "Vespertine ni kicheza muziki cha Mac kisicho na malipo na huria, kwa mikusanyiko ya muziki wa sauti ya kuzunguka na hi-res. Nakala za diski za SACD na DVD-Video, nyimbo za SACD 5.1 zilizotolewa kwenye diski, CD za DTS, na faili za DTS-HD MA, TrueHD na Atmos zinakaa katika maktaba moja, pamoja na Spatial Audio kwenye AirPods (kwa ufuatiliaji wa kichwa pale macOS inapoutoa). Njia ya Mawimbi huonyesha kila hatua kutoka kwenye faili hadi kwenye kifaa cha kutoa sauti, huku masharti na majaribio yakiwa katika msimbo chanzo wa GPL ambao mtu yeyote anaweza kuukagua.",
     "fine": "Utoaji wa chaneli kwa chaneli na bitstream kwenda kwa resiva ni vya majaribio, havijajaribiwa kwenye resiva halisi wala DAC za USB za chaneli nyingi (TV moja ya Sony kupitia HDMI imejaribiwa: tazama docs/DEVICES.md); ripoti zinahitajika. Vitu vya Dolby Digital Plus Atmos huchakatwa na macOS; TrueHD Atmos na DTS:X hucheza chaneli zao za msingi.",
     "facts": {
       "eyebrow": "Karatasi ya taarifa",

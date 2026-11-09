@@ -69,7 +69,7 @@
         "Hi-Res 音樂，"
       ],
       "titleBrass": "盡在你的 Mac。",
-      "lede": "免費開源的 Mac 播放器，專為環繞聲及 Hi-Res 音樂收藏而設。SACD 及 DVD-Video 光碟映像、DSD、DTS CD、DTS-HD MA、TrueHD 及 Atmos 檔案，與你的立體聲專輯共用同一個資料庫，並可在 AirPods 上以頭部追蹤空間音訊播放。房間校正會使用 USB 咪高峰測量你的房間，並校正每個揚聲器；此功能預設關閉，須由你自行開啟。訊號路徑會顯示由檔案到輸出的每一步。提供英文及另外 {languages} 種語言。",
+      "lede": "免費開源的 Mac 播放器，專為環繞聲及 Hi-Res 音樂收藏而設。SACD 及 DVD-Video 光碟映像、DSD、DTS CD、DTS-HD MA、TrueHD 及 Atmos 檔案，與你的立體聲專輯共用同一個資料庫，並可在 AirPods 上以空間音訊播放（macOS 支援時具頭部追蹤）。房間校正會使用 USB 咪高峰測量你的房間，並校正每個揚聲器；此功能預設關閉，須由你自行開啟。訊號路徑會顯示由檔案到輸出的每一步。提供英文及另外 {languages} 種語言。",
       "ask": "喜歡嗎？",
       "star": "在 GitHub 上加星",
       "discuss": "加入討論",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "環繞聲盡收同一資料庫",
-        "text": "SACD 映像及抓軌檔案、DVD-Video 光碟、DTS CD、DTS-HD MA 及 TrueHD 與你的立體聲專輯並列，並可在 AirPods 上以頭部追蹤空間音訊播放。若專輯同時有兩種版本，每首歌曲只會列出一次，並按你的輸出播放合適的版本。"
+        "text": "SACD 映像及抓軌檔案、DVD-Video 光碟、DTS CD、DTS-HD MA 及 TrueHD 與你的立體聲專輯並列，並可透過 Apple 的空間音訊渲染器在 AirPods 上播放（macOS 支援時具頭部追蹤）。若專輯同時有兩種版本，每首歌曲只會列出一次，並按你的輸出播放合適的版本。"
       },
       {
         "title": "可供查證的訊號路徑",
@@ -126,7 +126,7 @@
         "title": "每首曲目都以原生取樣率及位元深度播放。",
         "lede": "訊號路徑會列出由檔案到你的 DAC 的每一步（從 Core Audio 讀回），並在樣本被改動時註明。",
         "body": [
-          "Vespertine 會將裝置切換至每個檔案的取樣率，只有在 DAC 無法以該取樣率運作時，才會使用 Apple 母帶級的轉換器重新取樣。只有在符合原始碼中的條件時，才會顯示 <span class=\"mono nowrap\">位元完美</span>：原生取樣率、沒有任何處理改動樣本、字長合適，以及裝置處於獨佔狀態或未與其他 App 共用。PCM 播放已在 Fosi Audio ZD3 上測試至最高 768 kHz 及 DSD256，並在 FiiO K11 上測試至最高 384 kHz 及 DSD128。"
+          "Vespertine 會將裝置切換至每個檔案的取樣率，只有在 DAC 無法以該取樣率運作時，才會使用 Apple 母帶級的轉換器重新取樣。只有在符合原始碼中的條件時，才會顯示 <span class=\"mono nowrap\">位元完美</span>：原生取樣率、沒有任何處理改動樣本、字長合適，以及裝置處於獨佔狀態或未與其他 App 共用。PCM 播放已在 Fosi Audio ZD3 上測試至最高 768 kHz 及 DSD256，並在 FiiO K11 上測試至最高 384 kHz 及 DSD128（開發者回報；見 docs/DEVICES.md）。"
         ],
         "list": [
           "獨佔（hog）模式可阻止其他 App 使用裝置。在共用模式下，音量鍵及 Digital Crown 會調整你的 DAC；在獨佔模式下，只要你開啟相關設定，它們同樣可以調整。",
@@ -181,7 +181,7 @@
           "三種目標：Warm（預設）、Gentle tilt 及 Flat。可只校正低音或校正全頻段，之後亦可重新設計濾波器，毋須再次測量。",
           "可從 REW 或 Equalizer APO 匯入濾波器，連同每個揚聲器的延遲及電平，並可匯出 Equalizer APO 文字。",
           "匯入脈衝響應（WAV、AIFF、CAF 或 FLAC），並以卷積方式播放。",
-          "立體聲及 5.1。",
+          "立體聲及 5.1（5.1 已以模擬房間及匯入的設定檔測試，尚未在真實的 5.1 房間中測試）。",
           "房間畫像會顯示揚聲器和你的座位，並在測量每個咪高峰位置時逐一顯示該位置。接着，曲線變換動畫會把測量響應轉變為預測響應，並可用校正前／校正後切換按鈕比較兩者。"
         ],
         "note": "「校正後」曲線是根據測量結果及濾波器預測得出，並非實測。如要了解房間中的實際結果，請在開啟校正的狀態下再測量一次。",
@@ -196,9 +196,9 @@
         "jack": "環繞聲",
         "kicker": "環繞聲及空間音訊",
         "title": "你的 5.1 光碟，同在一個資料庫。",
-        "lede": "多聲道音樂可在 AirPods 上以頭部追蹤空間音訊播放，或在立體聲 DAC 上按聲道佈局縮混。",
+        "lede": "多聲道音樂可透過 Apple 的空間音訊渲染器在 AirPods 上播放（macOS 支援時具頭部追蹤），或在立體聲 DAC 上按聲道佈局縮混。",
         "body": [
-          "DTS CD 會解碼為 5.1。SACD 映像、已提取的 SACD 曲目、多聲道 FLAC、TrueHD 及 DTS-HD MA 可在 AirPods 上以頭部追蹤空間音訊呈現，或在立體聲 DAC 上縮混。含 Atmos 的 Dolby Digital Plus 使用 macOS 的物件渲染器；TrueHD Atmos 及 DTS:X 則播放其基床聲道。逐聲道輸出屬實驗性功能，尚未在真正的接收器及多聲道 USB DAC 上測試（已測試過一部經 HDMI 連接的 Sony 電視：請參閱 docs/DEVICES.md）；歡迎回報結果。"
+          "DTS CD 會解碼為 5.1。SACD 映像、已提取的 SACD 曲目、多聲道 FLAC、TrueHD 及 DTS-HD MA 可透過 Apple 的空間音訊渲染器在 AirPods 上呈現（macOS 支援時具頭部追蹤），或在立體聲 DAC 上縮混。含 Atmos 的 Dolby Digital Plus 使用 macOS 的物件渲染器；TrueHD Atmos 及 DTS:X 則播放其基床聲道。逐聲道輸出屬實驗性功能，尚未在真正的接收器及多聲道 USB DAC 上測試（已測試過一部經 HDMI 連接的 Sony 電視：請參閱 docs/DEVICES.md）；歡迎回報結果。"
         ],
         "list": [
           "專輯的立體聲與環繞聲版本只會列出一次；Vespertine 會播放最適合輸出的版本，或你固定的版本。",
@@ -215,11 +215,11 @@
         "title": "直接播放光碟映像。",
         "lede": "只要將 Vespertine 指向 SACD 或 DVD-Video 映像，即可直接從中播放音樂，無需裝載、提取或寫入任何東西。",
         "body": [
-          "SACD <span class=\"mono\">.iso</span> 映像可播放其立體聲及 5.1 區域（無論是否經 DST 壓縮），並以光碟本身的文字資料命名。DST 會解碼還原為完全相同的 DSD，因此在 DAC 支援的情況下，立體聲會經 DoP 以原生 DSD 傳送至你的 DAC，而 5.1 則在 AirPods 上以頭部追蹤空間音訊播放。DVD-Video 光碟（<span class=\"mono\">.iso</span> 或 <span class=\"mono\">VIDEO_TS</span> 資料夾）上的 LPCM 音樂會逐位元播放，每個標題為一張專輯，每個章節為一首曲目。"
+          "SACD <span class=\"mono\">.iso</span> 映像可播放其立體聲及 5.1 區域（無論是否經 DST 壓縮），並以光碟本身的文字資料命名。DST 會解碼還原為完全相同的 DSD，因此在 DAC 支援的情況下，立體聲會經 DoP 以原生 DSD 傳送至你的 DAC，而 5.1 則透過 Apple 的空間音訊渲染器在 AirPods 上播放。DVD-Video 光碟（<span class=\"mono\">.iso</span> 或 <span class=\"mono\">VIDEO_TS</span> 資料夾）上的 LPCM 音樂會逐位元播放，每個標題為一張專輯，每個章節為一首曲目。"
         ],
         "list": [
           "已在兩張真實光碟上與 sacd_extract 逐位元相符。含 5.0 區域、只有多聲道區域，或 DSD128 及以上的光碟，目前只以合成測試映像驗證過。",
-          "DSD64 至 DSD512 的 DSF 及 DSDIFF（包括經 DST 壓縮的 DSDIFF），會以 DoP 傳送至支援相應載波取樣率的 DAC，或轉換為高取樣率 PCM。DoP 已在 Fosi Audio ZD3 上確認最高可達 DSD256，並在 FiiO K11 上確認最高可達 DSD128；經 DoP 傳送 DSD512 尚未在硬件上測試。",
+          "DSD64 至 DSD512 的 DSF 及 DSDIFF（包括經 DST 壓縮的 DSDIFF），會以 DoP 傳送至支援相應載波取樣率的 DAC（在試用過的 DAC 上最高至 DSD256），或轉換為高取樣率 PCM。據回報，DoP 在 Fosi Audio ZD3 上最高可達 DSD256，在 FiiO K11 上最高可達 DSD128（開發者回報，沒有擷取記錄）；經 DoP 傳送 DSD512 尚未在硬件上測試。",
           "DVD-Video LPCM 支援 16、20 及 24 位元、48 及 96 kHz、最多 8 個聲道。不支援 DVD-Audio，而經加密（CSS）的光碟需使用已解密的副本。"
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "支援房間校正嗎？",
-          "a": "可以。使用 UMIK-1 或其他經校準的 USB 咪高峰，在你座位周圍的一至五個位置測量房間，Vespertine 就會為每個揚聲器度身設計濾波器，並對齊各揚聲器的延遲及電平，支援立體聲或 5.1。它亦可匯入 REW 及 Equalizer APO 的濾波器和脈衝響應。此功能預設關閉；關閉時播放會保持位元完美，開啟時訊號路徑會顯示 <span class=\"mono nowrap\">房間校正</span>。<a href=\"{href.roomCorrection}\">房間校正如何運作</a>。"
+          "a": "可以。使用 UMIK-1 或其他經校準的 USB 咪高峰，在你座位周圍的一至五個位置測量房間，Vespertine 就會為每個揚聲器度身設計濾波器，並對齊各揚聲器的延遲及電平，支援立體聲或 5.1（5.1 已以模擬房間及匯入的設定檔測試，尚未在真實的 5.1 房間中測試）。它亦可匯入 REW 及 Equalizer APO 的濾波器和脈衝響應。此功能預設關閉；關閉時播放會保持位元完美，開啟時訊號路徑會顯示 <span class=\"mono nowrap\">房間校正</span>。<a href=\"{href.roomCorrection}\">房間校正如何運作</a>。"
         },
         {
           "q": "可以播放 SACD 和 DVD 光碟嗎？",
@@ -541,7 +541,7 @@
         },
         {
           "q": "可以播放 Dolby Atmos 嗎？",
-          "a": "具備 Atmos 的 Dolby Digital Plus 會經 macOS 的物件渲染器播放，在 AirPods 上呈現為具頭部追蹤的空間音訊。TrueHD Atmos 及 DTS:X 播放其無損基床聲道；不會渲染其物件。輸出位元流至 AV 接收器屬實驗性功能，尚未在實際接收器上測試；歡迎回報。"
+          "a": "具備 Atmos 的 Dolby Digital Plus 會經 macOS 的物件渲染器播放，在 AirPods 上呈現為空間音訊（macOS 支援時具頭部追蹤）。TrueHD Atmos 及 DTS:X 播放其無損基床聲道；不會渲染其物件。輸出位元流至 AV 接收器屬實驗性功能，尚未在實際接收器上測試；歡迎回報。"
         },
         {
           "q": "會修改我的檔案嗎？",
@@ -549,7 +549,7 @@
         },
         {
           "q": "曾在哪些硬件上測試？",
-          "a": "PCM 播放已在 Fosi Audio ZD3 上測試至最高 768 kHz 及 DSD256，並在 FiiO K11 上測試至最高 384 kHz 及 DSD128，整數模式亦已在 FiiO K11 上測試。此外，亦已在經 USB-C 及藍牙連接的 AirPods Max、MacBook Pro 揚聲器，以及經 HDMI 連接、以 5.1 播放的 Sony 電視上測試。Intel 硬件尚未測試。接收器位元流及多聲道 DAC 輸出屬實驗性功能，尚未在實際接收器及多聲道 USB DAC 上測試（已測試一部經 HDMI 連接的 Sony 電視：見 docs/DEVICES.md）；<a href=\"{href.dacReport}\">歡迎回報</a>。"
+          "a": "PCM 播放已在 Fosi Audio ZD3 上測試至最高 768 kHz 及 DSD256，並在 FiiO K11 上測試至最高 384 kHz 及 DSD128（開發者回報；見 docs/DEVICES.md），整數模式亦已在 FiiO K11 上測試。此外，亦已在經 USB-C 及藍牙連接的 AirPods Max、MacBook Pro 揚聲器，以及經 HDMI 連接、以 5.1 播放的 Sony 電視上測試。Intel 硬件尚未測試。接收器位元流及多聲道 DAC 輸出屬實驗性功能，尚未在實際接收器及多聲道 USB DAC 上測試（已測試一部經 HDMI 連接的 Sony 電視：見 docs/DEVICES.md）；<a href=\"{href.dacReport}\">歡迎回報</a>。"
         },
         {
           "q": "有我的語言嗎？",
@@ -601,7 +601,7 @@
     "ogAlt": "Vespertine 媒體資料套件：資料表、標誌、主視覺、真實截圖及預告片，疊於三張 App 真實截圖之上。",
     "eyebrow": "媒體資料套件",
     "heading": "撰寫 {name} 相關報道所需的一切。",
-    "lede": "Vespertine 是一款免費開源的 Mac 播放器，專為環繞聲與 Hi-Res 音樂收藏而設。SACD 與 DVD-Video 光碟映像、已抽取的 SACD 5.1 音軌、DTS CD、DTS-HD MA、TrueHD 及 Atmos 檔案共用同一個資料庫，並可在 AirPods 上以支援頭部追蹤的空間音訊播放。訊號路徑會顯示由檔案到輸出的每一個步驟，相關條件及測試均寫在任何人都可審核的 GPL 原始碼中。",
+    "lede": "Vespertine 是一款免費開源的 Mac 播放器，專為環繞聲與 Hi-Res 音樂收藏而設。SACD 與 DVD-Video 光碟映像、已抽取的 SACD 5.1 音軌、DTS CD、DTS-HD MA、TrueHD 及 Atmos 檔案共用同一個資料庫，並可在 AirPods 上以空間音訊播放（macOS 支援時具頭部追蹤）。訊號路徑會顯示由檔案到輸出的每一個步驟，相關條件及測試均寫在任何人都可審核的 GPL 原始碼中。",
     "fine": "逐聲道輸出及向接收器傳送位元流屬實驗性功能，未在真實的接收器及多聲道 USB DAC 上測試（已在一部經 HDMI 連接的 Sony 電視上測試：見 docs/DEVICES.md）；歡迎提供測試報告。Dolby Digital Plus Atmos 物件由 macOS 渲染；TrueHD Atmos 及 DTS:X 播放其基床聲道。",
     "facts": {
       "eyebrow": "資料表",

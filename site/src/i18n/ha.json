@@ -69,7 +69,7 @@
         "da hi-res,"
       ],
       "titleBrass": "a kan Mac ɗinku.",
-      "lede": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res. Kwafin faifan SACD da DVD-Video, DSD, DTS CD, fayilolin DTS-HD MA, TrueHD da Atmos suna zama a laburare ɗaya tare da kundayenku na stereo, tare da Spatial Audio mai bin motsin kai a AirPods. Gyaran sautin ɗaki yana auna ɗakinku da makirufo na USB kuma yana gyara kowace lasifika; a kashe yake har sai kun kunna shi. Hanyar sigina tana nuna kowane mataki daga fayil zuwa fitarwa. A Turanci da wasu harsuna {languages}.",
+      "lede": "Mai kunna kiɗa na Mac, kyauta kuma buɗaɗɗen tushe, don tarin kiɗan kewaye da hi-res. Kwafin faifan SACD da DVD-Video, DSD, DTS CD, fayilolin DTS-HD MA, TrueHD da Atmos suna zama a laburare ɗaya tare da kundayenku na stereo, tare da Spatial Audio a AirPods (mai bin motsin kai a inda macOS ya samar da shi). Gyaran sautin ɗaki yana auna ɗakinku da makirufo na USB kuma yana gyara kowace lasifika; a kashe yake har sai kun kunna shi. Hanyar sigina tana nuna kowane mataki daga fayil zuwa fitarwa. A Turanci da wasu harsuna {languages}.",
       "ask": "Ya burge ku?",
       "star": "Ba shi tauraro a GitHub",
       "discuss": "Shiga tattaunawar",
@@ -97,7 +97,7 @@
     "pillars": [
       {
         "title": "Kiɗan kewaye a laburare ɗaya",
-        "text": "Kwafin SACD da waƙoƙin da aka ciro daga gare su, faifan DVD-Video, DTS CD, DTS-HD MA da TrueHD suna zama kusa da kundayenku na stereo kuma su kunna a matsayin Spatial Audio mai bin motsin kai a AirPods. Idan kundi yana da nau'ukan biyu, kowace waƙa tana bayyana sau ɗaya kuma nau'in da ya dace da fitarwarku ne yake kunnawa."
+        "text": "Kwafin SACD da waƙoƙin da aka ciro daga gare su, faifan DVD-Video, DTS CD, DTS-HD MA da TrueHD suna zama kusa da kundayenku na stereo kuma su kunna ta na'urar sarrafa Spatial Audio ta Apple a AirPods (mai bin motsin kai a inda macOS ya samar da shi). Idan kundi yana da nau'ukan biyu, kowace waƙa tana bayyana sau ɗaya kuma nau'in da ya dace da fitarwarku ne yake kunnawa."
       },
       {
         "title": "Hanyar sigina da za ku bincika",
@@ -126,7 +126,7 @@
         "title": "Kowace waƙa a ƙimar samfurinta da zurfin bit nata na asali.",
         "lede": "Hanyar Sigina tana jera kowane mataki daga fayil zuwa DAC ɗinku, bisa abin da aka karanto daga Core Audio, kuma tana faɗa idan wani abu ya canza samfuran.",
         "body": [
-          "Vespertine yana sauya na'urar zuwa ƙimar samfurin kowane fayil, kuma yana sake samfurawa da mai juyawar Apple mai ingancin mastering ne kawai idan DAC ba zai iya amfani da ƙimar ba. <span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan an cika sharuɗɗan da ke cikin lambar tushe: ƙimar samfuri ta asali, babu abin da yake canza samfuran, tsawon kalmar bit da ya dace, da na'urar da aka keɓe ko wadda babu wata manhaja da ke amfani da ita tare. An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11."
+          "Vespertine yana sauya na'urar zuwa ƙimar samfurin kowane fayil, kuma yana sake samfurawa da mai juyawar Apple mai ingancin mastering ne kawai idan DAC ba zai iya amfani da ƙimar ba. <span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan an cika sharuɗɗan da ke cikin lambar tushe: ƙimar samfuri ta asali, babu abin da yake canza samfuran, tsawon kalmar bit da ya dace, da na'urar da aka keɓe ko wadda babu wata manhaja da ke amfani da ita tare. An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11 (rahotannin mai haɓakawa; duba docs/DEVICES.md)."
         ],
         "list": [
           "Yanayin keɓe (hog) yana hana sauran manhajoji amfani da na'urar. A yanayin rabawa, maɓallan ƙarar sauti da Digital Crown suna daidaita DAC ɗinku; a yanayin keɓe ma za su iya, idan kun kunna hakan.",
@@ -181,7 +181,7 @@
           "Manufofi uku: Warm (na asali), Gentle tilt da Flat. Ku gyara bass kaɗai ko cikakken fadi, kuma ku sake tsara matatun daga baya ba tare da sake aunawa ba.",
           "Yana shigo da matatu daga REW ko Equalizer APO, tare da jinkiri da matakin sautin kowace lasifika, kuma yana fitar da rubutun Equalizer APO.",
           "Yana shigo da fayilolin impulse response (WAV, AIFF, CAF ko FLAC) kuma yana kunna su ta convolution.",
-          "Stereo da 5.1.",
+          "Stereo da 5.1 (an gwada 5.1 da ɗakuna na kwaikwayo da bayanan da aka shigo da su, ba a riga an gwada shi a ɗakin 5.1 na gaske ba).",
           "Hoton Ɗaki yana nuna lasifikokin, kujerarku da kowane wurin makirufo yayin da ake auna shi. Sannan Bayyanar Lanƙwasa tana mayar da amsar da aka auna zuwa wadda ake hasashe, kuma maɓallin kafin/bayan yana kwatanta su."
         ],
         "note": "Lanƙwasar “bayan” hasashe ne daga ma'aunin da matatun, ba aunawa aka yi ba. Don ganin ainihin abin da ɗakin yake yi, ku sake aunawa yayin da gyaran yake kunne.",
@@ -196,9 +196,9 @@
         "jack": "Kiɗan kewaye",
         "kicker": "Kiɗan kewaye da Spatial Audio",
         "title": "Faifan 5.1 ɗinku, a laburare ɗaya.",
-        "lede": "Kiɗa mai tashoshi da yawa yana kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods, ko a haɗe tashoshinsa zuwa stereo bisa tsarin tashoshin a DAC na stereo.",
+        "lede": "Kiɗa mai tashoshi da yawa yana kunnawa ta na'urar sarrafa Spatial Audio ta Apple a AirPods (mai bin motsin kai a inda macOS ya samar da shi), ko a haɗe tashoshinsa zuwa stereo bisa tsarin tashoshin a DAC na stereo.",
         "body": [
-          "Ana warware DTS CD zuwa 5.1. Kwafin SACD, waƙoƙin da aka ciro daga SACD, FLAC mai tashoshi da yawa, TrueHD da DTS-HD MA suna kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods ko a haɗe tashoshinsu zuwa stereo a DAC na stereo. Dolby Digital Plus mai Atmos yana amfani da mai sarrafa abubuwan sauti na macOS; TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu. Fitar da kowace tasha zuwa tashar da ta dace na gwaji ne, ba a gwada shi a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
+          "Ana warware DTS CD zuwa 5.1. Kwafin SACD, waƙoƙin da aka ciro daga SACD, FLAC mai tashoshi da yawa, TrueHD da DTS-HD MA suna kunnawa ta na'urar sarrafa Spatial Audio ta Apple a AirPods (mai bin motsin kai a inda macOS ya samar da shi) ko a haɗe tashoshinsu zuwa stereo a DAC na stereo. Dolby Digital Plus mai Atmos yana amfani da mai sarrafa abubuwan sauti na macOS; TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu. Fitar da kowace tasha zuwa tashar da ta dace na gwaji ne, ba a gwada shi a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada talabijin ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni."
         ],
         "list": [
           "Nau'ukan stereo da na kewaye na kundi suna bayyana sau ɗaya; Vespertine yana kunna wanda ya dace da fitarwar, ko wanda kuka kafe.",
@@ -215,11 +215,11 @@
         "title": "Kunna kwafin faifan da kansa.",
         "lede": "Nuna wa Vespertine kwafin SACD ko DVD-Video, sai ya kunna kiɗa kai tsaye daga cikinsa, ba tare da ɗora, ciro ko rubuta komai ba.",
         "body": [
-          "Kwafin SACD <span class=\"mono\">.iso</span> yana kunna sassan stereo da 5.1 nasa, ko an matse su da DST ko ba a matse su ba, tare da sunaye daga rubutun da ke cikin faifan kansa. Ana warware DST zuwa ainihin DSD ɗin, don haka stereo yana zuwa DAC ɗinku a matsayin DSD na asali ta DoP idan DAC yana tallafa masa, kuma 5.1 yana kunnawa a matsayin Spatial Audio mai bin motsin kai a AirPods. Kiɗan LPCM a faifan DVD-Video (<span class=\"mono\">.iso</span> ko foldar <span class=\"mono\">VIDEO_TS</span>) yana kunnawa daidai bit da bit, kundi ɗaya ga kowane take da waƙa ɗaya ga kowane babi."
+          "Kwafin SACD <span class=\"mono\">.iso</span> yana kunna sassan stereo da 5.1 nasa, ko an matse su da DST ko ba a matse su ba, tare da sunaye daga rubutun da ke cikin faifan kansa. Ana warware DST zuwa ainihin DSD ɗin, don haka stereo yana zuwa DAC ɗinku a matsayin DSD na asali ta DoP idan DAC yana tallafa masa, kuma 5.1 yana kunnawa ta na'urar sarrafa Spatial Audio ta Apple a AirPods. Kiɗan LPCM a faifan DVD-Video (<span class=\"mono\">.iso</span> ko foldar <span class=\"mono\">VIDEO_TS</span>) yana kunnawa daidai bit da bit, kundi ɗaya ga kowane take da waƙa ɗaya ga kowane babi."
         ],
         "list": [
           "Ya yi daidai bit da bit da sacd_extract a faifai biyu na gaske. Faifai masu sashen 5.0, masu sashen tashoshi da yawa kawai, ko na DSD128 da sama, an gwada su da kwafin faifan gwaji na ƙirƙira kawai ya zuwa yanzu.",
-          "DSF da DSDIFF daga DSD64 zuwa DSD512, har da DSDIFF da aka matse da DST, suna fita a matsayin DoP zuwa DAC masu karɓar ƙimar samfurin siginar ɗauka, ko su koma PCM mai ƙimar samfuri mai yawa. An tabbatar da DoP har zuwa DSD256 a Fosi Audio ZD3 da kuma har zuwa DSD128 a FiiO K11; ba a gwada DSD512 ta DoP a kan na'urori ba.",
+          "DSF da DSDIFF daga DSD64 zuwa DSD512, har da DSDIFF da aka matse da DST, suna fita a matsayin DoP zuwa DAC masu karɓar ƙimar samfurin siginar ɗauka (har zuwa DSD256 a DAC ɗin da aka gwada), ko su koma PCM mai ƙimar samfuri mai yawa. Ana ba da rahoton cewa DoP yana aiki har zuwa DSD256 a Fosi Audio ZD3 da kuma har zuwa DSD128 a FiiO K11 (rahotannin mai haɓakawa, babu rikodin shaida); ba a gwada DSD512 ta DoP a kan na'urori ba.",
           "DVD-Video LPCM na bit 16, 20 da 24, a 48 da 96 kHz, har zuwa tashoshi 8. Ba a tallafa wa DVD-Audio ba, kuma faifai masu ɓoyayyen bayani (CSS) suna buƙatar kwafin da aka warware ɓoyayyen bayaninsa."
         ],
         "links": [
@@ -533,7 +533,7 @@
         },
         {
           "q": "Shin yana yin gyaran sautin ɗaki?",
-          "a": "Ee. Ku auna ɗakinku da UMIK-1 ko wani makirufo na USB da aka tantance ma'auninsa a wurare ɗaya zuwa biyar kewaye da kujerarku, kuma Vespertine zai tsara matatu da suka dace da kowace lasifika, ya kuma daidaita jinkiri da matakin sautinsu, a stereo ko 5.1. Yana kuma shigo da matatun REW da Equalizer APO da fayilolin impulse response. A kashe yake ta asali, kunnawa na zama bit-perfect yayin da yake a kashe, kuma hanyar sigina tana nuna <span class=\"mono nowrap\">ROOM CORRECTION</span> yayin da yake kunne. <a href=\"{href.roomCorrection}\">Yadda gyaran sautin ɗaki yake aiki</a>."
+          "a": "Ee. Ku auna ɗakinku da UMIK-1 ko wani makirufo na USB da aka tantance ma'auninsa a wurare ɗaya zuwa biyar kewaye da kujerarku, kuma Vespertine zai tsara matatu da suka dace da kowace lasifika, ya kuma daidaita jinkiri da matakin sautinsu, a stereo ko 5.1 (an gwada 5.1 da ɗakuna na kwaikwayo da bayanan da aka shigo da su, ba a riga an gwada shi a ɗakin 5.1 na gaske ba). Yana kuma shigo da matatun REW da Equalizer APO da fayilolin impulse response. A kashe yake ta asali, kunnawa na zama bit-perfect yayin da yake a kashe, kuma hanyar sigina tana nuna <span class=\"mono nowrap\">ROOM CORRECTION</span> yayin da yake kunne. <a href=\"{href.roomCorrection}\">Yadda gyaran sautin ɗaki yake aiki</a>."
         },
         {
           "q": "Zai iya kunna faifan SACD da DVD?",
@@ -541,7 +541,7 @@
         },
         {
           "q": "Yana kunna Dolby Atmos?",
-          "a": "Dolby Digital Plus mai Atmos yana kunnawa ta na'urar sarrafa abubuwan sauti ta macOS, a matsayin Spatial Audio mai bin motsin kai a AirPods. TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu marar asara; ba a sarrafa abubuwan sautinsu. Bitstream zuwa risivar AV na gwaji ne, ba a gwada shi a kan risivoci na gaske ba; ana neman rahotanni."
+          "a": "Dolby Digital Plus mai Atmos yana kunnawa ta na'urar sarrafa abubuwan sauti ta macOS, a matsayin Spatial Audio a AirPods (mai bin motsin kai a inda macOS ya samar da shi). TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu marar asara; ba a sarrafa abubuwan sautinsu. Bitstream zuwa risivar AV na gwaji ne, ba a gwada shi a kan risivoci na gaske ba; ana neman rahotanni."
         },
         {
           "q": "Zai sauya fayilolina?",
@@ -549,7 +549,7 @@
         },
         {
           "q": "A kan waɗanne na'urori aka gwada shi?",
-          "a": "An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11, inda aka gwada Yanayin integer ma. An kuma gwada shi a AirPods Max ta USB-C da Bluetooth, lasifikokin MacBook Pro, da TV na Sony ta HDMI a 5.1. Ba a gwada a kan na'urorin Intel ba. Bitstream zuwa risiva da fitarwar DAC mai tashoshi da yawa na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); <a href=\"{href.dacReport}\">ana neman rahotanni</a>."
+          "a": "An gwada kunna PCM har zuwa 768 kHz da DSD256 a Fosi Audio ZD3, da kuma har zuwa 384 kHz da DSD128 a FiiO K11 (rahotannin mai haɓakawa; duba docs/DEVICES.md), inda aka gwada Yanayin integer ma. An kuma gwada shi a AirPods Max ta USB-C da Bluetooth, lasifikokin MacBook Pro, da TV na Sony ta HDMI a 5.1. Ba a gwada a kan na'urorin Intel ba. Bitstream zuwa risiva da fitarwar DAC mai tashoshi da yawa na gwaji ne, ba a gwada su a kan risivoci na gaske da USB DAC masu tashoshi da yawa ba (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); <a href=\"{href.dacReport}\">ana neman rahotanni</a>."
         },
         {
           "q": "Akwai shi a yarena?",
@@ -601,7 +601,7 @@
     "ogAlt": "Kayan 'yan jarida na Vespertine: takardar bayanai, tambura, manyan zane-zane, hotunan allo na gaske da bidiyon gabatarwa, a kan hotunan allo uku na gaske na manhajar.",
     "eyebrow": "Kayan 'yan jarida",
     "heading": "Duk abin da kuke buƙata don yin rubutu game da {name}.",
-    "lede": "Vespertine manhajar Mac ce kyauta, mai buɗaɗɗen tushe, don tarin waƙoƙin kewaye da Hi-Res. Kwafin faifan SACD da DVD-Video, waƙoƙin SACD 5.1 da aka ciro, CD na DTS, da fayilolin DTS-HD MA, TrueHD da Atmos suna raba laburare ɗaya, tare da Spatial Audio mai bin motsin kai a AirPods. Hanyar Sigina tana nuna kowane mataki daga fayil zuwa fitarwa, tare da sharuɗɗa da gwaje-gwaje a cikin lambar tushe ta GPL wadda kowa zai iya bincika.",
+    "lede": "Vespertine manhajar Mac ce kyauta, mai buɗaɗɗen tushe, don tarin waƙoƙin kewaye da Hi-Res. Kwafin faifan SACD da DVD-Video, waƙoƙin SACD 5.1 da aka ciro, CD na DTS, da fayilolin DTS-HD MA, TrueHD da Atmos suna raba laburare ɗaya, tare da Spatial Audio a AirPods (mai bin motsin kai a inda macOS ya samar da shi). Hanyar Sigina tana nuna kowane mataki daga fayil zuwa fitarwa, tare da sharuɗɗa da gwaje-gwaje a cikin lambar tushe ta GPL wadda kowa zai iya bincika.",
     "fine": "Fitarwa tasha-zuwa-tasha da bitstream zuwa risiva na gwaji ne, kuma ba a gwada su ba a kan risiva na gaske da DAC na USB masu tashoshi da yawa (an gwada TV ɗaya na Sony ta HDMI: duba docs/DEVICES.md); ana neman rahotanni. macOS ne ke tsara sautin abubuwan Dolby Digital Plus Atmos; TrueHD Atmos da DTS:X suna kunna tushen tashoshinsu.",
     "facts": {
       "eyebrow": "Takardar bayanai",

@@ -6,7 +6,7 @@ Vespertine is a free, open-source Mac player for surround and hi-res music colle
 
 Extracted SACD 5.1 tracks, multichannel FLAC, DTS CDs, Dolby TrueHD and DTS-HD Master Audio share a library with your stereo albums. SACD images (`.iso`) play straight from the image: stereo and multichannel areas, DST-compressed or plain, each song listed once with both versions, titled from the disc's own text. DST is decoded to the original DSD, so it goes out over DoP bit for bit or through the same DSD → PCM conversion as DSF. The image is read in place and never written to. Two real discs (The Dark Side of the Moon, Brothers in Arms) matched sacd_extract bit for bit; 5.0, multichannel-only and DSD128+ discs are covered only by synthesized images. Extracted DSF, DFF or PCM tracks work too.
 
-Surround renders as head-tracked or fixed Spatial Audio on AirPods, or folds down by channel layout on a stereo DAC. Dolby Digital Plus with Atmos uses macOS's object renderer. TrueHD Atmos and DTS:X play their lossless channel bed; their objects are not rendered. The channel meters and spectrum show the bed of macOS-rendered Atmos and of a bitstream too, from a second decode that never touches what goes to the output.
+Surround renders through Apple's Spatial Audio renderer on AirPods (head-tracked where macOS provides it), or folds down by channel layout on a stereo DAC. Dolby Digital Plus with Atmos uses macOS's object renderer. TrueHD Atmos and DTS:X play their lossless channel bed; their objects are not rendered. The channel meters and spectrum show the bed of macOS-rendered Atmos and of a bitstream too, from a second decode that never touches what goes to the output.
 
 Channel-for-channel output to multichannel interfaces and AV receivers is experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted. Routing is covered by automated tests and a six-channel aggregate-device check. Those checks do not establish compatibility with a hardware interface or receiver.
 
@@ -32,7 +32,7 @@ The [loopback test](LOOPBACK.md) (Settings › Playback, or Controls › Loopbac
 
 ![24-bit / 96 kHz FLAC, bit-perfect on a Fosi Audio ZD3, with its signal path](screenshots/bit-perfect-fosi-zd3-24-96.png)
 
-Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11. If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate. Per-device settings can match the source, use the device maximum, or force a rate.
+Vespertine switches the DAC to each track's native rate. PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports; see docs/DEVICES.md). If the DAC cannot run the source rate, Apple's mastering-quality resampler converts it. The planner prefers the same rate family, then a higher rate, then an integer divisor at least half the device's top rate, then the device's top rate. Per-device settings can match the source, use the device maximum, or force a rate.
 
 Shared output keeps the Mac's volume controls available. By default the selected playback device also becomes the Mac's sound output; Settings can disable that. Exclusive (hog) mode keeps other apps off the device and releases it after a configurable pause. While Vespertine holds a device, macOS moves the Mac's sound output to another one, and the volume keys, Control Center and the AirPods Max Digital Crown adjust that output. "Volume keys control the device held exclusively" (Settings › Playback › Output, off by default) carries their changes to the held device by way of that output, which then plays other apps' sounds at the device's level; when Vespertine lets go, or the setting is turned off, that output gets its own volume and mute back. DoP and bitstream always take the device exclusively, whatever this setting, and a track that can't get it doesn't play. The built-in speakers and headphone jack use shared mode. Speakers and virtual or aggregate devices are not labelled BIT-PERFECT.
 
@@ -46,7 +46,7 @@ Vespertine remembers the output you chose. If it isn't connected, Settings › P
 
 ## DSD and AirPods Max
 
-DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DACs known to take it (the FiiO K11 and Fosi Audio ZD3) start with it on. DoP has been confirmed up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11; DSD512 over DoP has not been tested on hardware. DSD512 file support does not establish native playback at that rate on a real DAC.
+DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DACs known to take it (the FiiO K11 and Fosi Audio ZD3) start with it on. DoP is reported to work up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11 (developer reports, no capture); DSD512 over DoP has not been tested on hardware. DSD512 file support does not establish native playback at that rate on a real DAC.
 
 ![A DSD128 file playing natively over DoP on a Fosi Audio ZD3](screenshots/dsd-native-dop.png)
 
@@ -109,7 +109,7 @@ A short setup assistant opens the first time Vespertine starts. It finds or adds
 | Format | Files | Path |
 |---|---|---|
 | FLAC, ALAC, WAV, AIFF | `.flac` `.m4a` `.wav` `.aiff`, CUE-sheet images | Native rate when the DAC supports it; PCM hardware tested to 768 kHz. Unchanged 32-bit PCM needs integer mode. |
-| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. DoP is hardware-tested to DSD256; DSD512 over DoP is untested. |
+| DSD64 to DSD512 | `.dsf` `.dff` | DoP if the DAC supports the carrier, otherwise PCM. DoP is reported to work to DSD256 (developer reports); DSD512 over DoP is untested. |
 | SACD images | `.iso` (stereo and multichannel areas, DST or plain) | DSD64, the same way as DSF and DSDIFF; each song listed once with its stereo and 5.1 versions |
 | DVD-Video LPCM | DVD `.iso`, or a `VIDEO_TS` folder (added with Add Folder) | 16/20/24-bit, 48/96 kHz, 1–8 channels within DVD-Video's limit, bit for bit; one album per title, a track per chapter. DVD-Audio (`AUDIO_TS`, MLP, DVD-Audio PCM) is not supported. [Details](DVD-VIDEO-LPCM.md) |
 | Dolby Atmos | DD+ with Atmos in `.ec3` `.m4a` `.mp4` | macOS object renderer, or decoded channel bed |

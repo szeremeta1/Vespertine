@@ -9,7 +9,7 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround as head-tracked Spatial Audio on AirPods, or across several USB DACs at once as one speaker system (Speaker Groups, in beta), measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are.
+Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround through Apple's Spatial Audio renderer on AirPods, or across several USB DACs at once as one speaker system (Speaker Groups, in beta), measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are.
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
@@ -34,12 +34,12 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 ## Highlights
 
 - **Speaker Groups (Beta): several DACs, one speaker system.** Play one stream across two or more DACs as a single quad or surround setup, with a channel map, a drawing of your room, and per-speaker level, delay and polarity. 5.1 and Dolby Atmos beds are placed on the speakers you actually have, and the signal path says exactly what that did to the samples. Off by default, and a beta: [read what is and isn't verified](#speaker-groups-beta).
-- **Room correction, measured in your room.** Measure with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level. Stereo and 5.1. It also imports REW and Equalizer APO filters and impulse responses. Off by default and bit-perfect while off. [More below](#room-correction).
+- **Room correction, measured in your room.** Measure with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level. Stereo and 5.1 (5.1 is tested with simulated rooms and imported profiles, not yet in a real 5.1 room). It also imports REW and Equalizer APO filters and impulse responses. Off by default and bit-perfect while off. [More below](#room-correction).
 - **Stereo and surround in one library.** SACD 5.1, multichannel FLAC, DTS CDs, TrueHD and DTS-HD MA sit next to your stereo albums. When an album has both versions, each song is listed once and Vespertine plays the one that suits your output.
 - **Disc images, played directly.** SACD `.iso` images (stereo and multichannel, DST or plain) and DVD-Video LPCM (`.iso` or a `VIDEO_TS` folder) play straight from the image, with nothing mounted or extracted. It matched sacd_extract bit for bit on two real discs.
-- **Spatial Audio for your own files.** Local surround plays as head-tracked Spatial Audio on AirPods, with Atmos objects rendered from Dolby Digital Plus. Surround can also be exported as binaural stereo or multichannel ALAC.
+- **Spatial Audio for your own files.** Local surround plays through Apple's Spatial Audio renderer on AirPods (head-tracked where macOS provides it), with Atmos objects rendered from Dolby Digital Plus. Surround can also be exported as binaural stereo or multichannel ALAC.
 - **A signal path you can check.** Decoding, resampling, mixing, gain and output format are shown for every track, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met, and when something changed the samples it says what. A built-in [loopback test](docs/LOOPBACK.md) checks the software path sample by sample.
-- **Native DSD.** DSF and DSDIFF from DSD64 to DSD512, including DST-compressed files, go out as DoP to DACs that take it, or convert to high-rate PCM.
+- **Native DSD.** DSF and DSDIFF from DSD64 to DSD512, including DST-compressed files, go out as DoP to DACs that take it (up to DSD256 on the DACs tried), or convert to high-rate PCM.
 - **Fake hi-res detection.** Flags 16-bit audio padded to 24, likely upsampled masters and likely lossy sources, with the measurements behind each verdict. `vespertine-analyze` runs the same analysis on a Linux server next to your files.
 - **Speaks your language.** English and 44 more, from Ukrainian and Japanese to Amharic and Tamil, with right-to-left layouts for Arabic, Hebrew, Persian and Urdu and separate Simplified, Traditional and Hong Kong Chinese. A check on every change confirms each string exists in every language with matching placeholders and plural forms, and every screen was reviewed in every language for clipped or overlapping text. Corrections from native speakers are welcome.
 
@@ -95,7 +95,7 @@ Measure your room with a UMIK-1 (or another calibrated USB microphone) from one 
 
 - **Targets:** Warm (the default), Gentle tilt or Flat, for the bass only or the full range. Change the target and redesign the filters without measuring again.
 - **Import and export:** REW and Equalizer APO filters (each speaker's delay, level and filters) in, Equalizer APO text out. Impulse responses (WAV, AIFF, CAF or FLAC) play by convolution.
-- **Stereo and 5.1.**
+- **Stereo and 5.1** (5.1 is tested with simulated rooms and imported profiles, not yet in a real 5.1 room).
 - **See the change:** the Room Portrait shows the speakers, your seat and each microphone spot as it's measured, and the Curve Reveal turns the measured response into the predicted one. A before/after switch compares them. "After" is predicted, not measured.
 - **Off by default.** Playback is bit-perfect while it's off. While it's on, the signal path says ROOM CORRECTION.
 
@@ -157,10 +157,10 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 
 ## Known limitations
 
-PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11. Playback has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
+PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports). Playback has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
 
 - Channel-for-channel output is confirmed on one real device, a Sony TV over HDMI (5.1 and a 7.1 to 5.1 downmix; see [Tested devices](docs/DEVICES.md)). Multichannel USB DACs and Dolby/DTS bitstream to receivers are untested on real hardware; reports wanted.
-- Intel Macs are untested (the Intel build has run under Rosetta). DoP is confirmed up to DSD256 on the Fosi Audio ZD3 and up to DSD128 on the FiiO K11; DSD512 over DoP is untested on hardware.
+- Intel Macs are untested (the Intel build has run under Rosetta). DoP is reported to work up to DSD256 on the Fosi Audio ZD3 and up to DSD128 on the FiiO K11 (developer reports, no capture); DSD512 over DoP is untested on hardware.
 - No audio effect plugins, streaming services or UPnP/DLNA. Convolution is only part of room correction.
 - No DVD-Audio or DRM-protected Apple Music downloads. Dolby AC-4 and MPEG-H 3D Audio (Sony 360 Reality Audio) files are listed and named but not decoded, MQA plays as the plain FLAC it contains, and Auro-3D as ordinary surround PCM (no decoder for any of them; see [docs/FEATURES.md](docs/FEATURES.md)). TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
