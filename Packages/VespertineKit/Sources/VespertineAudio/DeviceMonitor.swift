@@ -25,6 +25,11 @@ protocol DeviceProvider: AnyObject, Sendable {
     /// Calls `action` on `queue` when the device's output streams or their channels change; the result stops it.
     func observeStreams(of device: AudioObjectID, on queue: DispatchQueue,
                         _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void
+    /// The elements whose volume is settable (`DeviceQuery.volumeElements`).
+    func volumeElements(of device: AudioObjectID) -> [UInt32]
+    /// Calls `action` on `queue` when any of `addresses` of the device changes; the result stops it.
+    func observe(_ device: AudioObjectID, _ addresses: [AudioObjectPropertyAddress], on queue: DispatchQueue,
+                 _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void
 }
 
 final class HALDeviceProvider: DeviceProvider {
@@ -47,6 +52,13 @@ final class HALDeviceProvider: DeviceProvider {
     func observeStreams(of device: AudioObjectID, on queue: DispatchQueue,
                         _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
         Self.listen(device, Self.streamAddresses, queue, action)
+    }
+
+    func volumeElements(of device: AudioObjectID) -> [UInt32] { DeviceQuery.volumeElements(device) }
+
+    func observe(_ device: AudioObjectID, _ addresses: [AudioObjectPropertyAddress], on queue: DispatchQueue,
+                 _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+        Self.listen(device, addresses, queue, action)
     }
 
     private static func listen(_ object: AudioObjectID, _ addresses: [AudioObjectPropertyAddress], _ queue: DispatchQueue,
@@ -81,8 +93,7 @@ public final class DeviceMonitor: @unchecked Sendable {
     private let recheckInterval: DispatchTimeInterval
     private let recheckWindow: TimeInterval
     private var stopSystem: (@Sendable () -> Void)?
-    private var volumeBlock: AudioObjectPropertyListenerBlock?
-    private var watchedVolume: (device: AudioObjectID, elements: [UInt32])?
+    private var stopVolume: (@Sendable () -> Void)?
 
     // On `queue` only.
     private var known: Set<AudioObjectID> = []
@@ -154,24 +165,21 @@ public final class DeviceMonitor: @unchecked Sendable {
     public func watchVolume(of device: AudioObjectID?) {
         unwatchVolume()
         guard let device else { return }
-        let elements = DeviceQuery.volumeElements(device)
+        let elements = provider.volumeElements(of: device)
         guard !elements.isEmpty else { return }
-        let block: AudioObjectPropertyListenerBlock = { [onChange] _, _ in onChange(.volume) }
-        volumeBlock = block
-        for element in elements {
-            var address = AudioObjectPropertyAddress.output(kAudioDevicePropertyVolumeScalar, element: element)
-            AudioObjectAddPropertyListenerBlock(device, &address, queue, block)
-        }
-        watchedVolume = (device, elements)
+        stopVolume = provider.observe(device, Self.volumeAddresses(elements: elements), on: queue) { [onChange] in onChange(.volume) }
+    }
+
+    /// What `watchVolume` listens to on a device whose volume is settable on `elements`: the volume there, and the mute,
+    /// which a device has on its main control or per channel (the ones it lacks are not listened to).
+    static func volumeAddresses(elements: [UInt32]) -> [AudioObjectPropertyAddress] {
+        let muteElements = [kAudioObjectPropertyElementMain] + elements.filter { $0 != kAudioObjectPropertyElementMain }
+        return elements.map { AudioObjectPropertyAddress.output(kAudioDevicePropertyVolumeScalar, element: $0) }
+            + muteElements.map { AudioObjectPropertyAddress.output(kAudioDevicePropertyMute, element: $0) }
     }
 
     private func unwatchVolume() {
-        guard let watched = watchedVolume, let volumeBlock else { return }
-        for element in watched.elements {
-            var address = AudioObjectPropertyAddress.output(kAudioDevicePropertyVolumeScalar, element: element)
-            AudioObjectRemovePropertyListenerBlock(watched.device, &address, queue, volumeBlock)
-        }
-        watchedVolume = nil
-        self.volumeBlock = nil
+        stopVolume?()
+        stopVolume = nil
     }
 }

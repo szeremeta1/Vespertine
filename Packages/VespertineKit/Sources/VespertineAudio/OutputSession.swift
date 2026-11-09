@@ -615,7 +615,7 @@ public enum DeviceControl {
     /// A format or rate change reads back before macOS has finished telling this process about it (it pauses and
     /// resumes the device's I/O around each one). Starting the next change, or the device, while that is still going
     /// on is how the device ended up paused for good; a short pause lets each change finish first.
-    private static func settle() { usleep(60_000) }
+    static func settle() { usleep(60_000) }
 
     // MARK: Hardware volume
 
