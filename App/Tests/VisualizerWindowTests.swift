@@ -114,4 +114,23 @@ struct VisualizerWindowTests {
         await settle()
         #expect(a.model.showing == 0)
     }
+
+    @Test("Moved from a 60 Hz display to a 120 Hz one, it draws up to 120 a second, not still at the old display's rate")
+    func followsTheDisplayRate() async {
+        let rig = makeRig()
+        defer { rig.window.close() }
+        rig.view.screenRate = { 60 }
+        rig.window.makeKeyAndOrderFront(nil)
+        await settle()
+        #expect(rig.view.drawingRate == 60)
+        rig.view.screenRate = { 120 }
+        NotificationCenter.default.post(name: NSWindow.didChangeScreenNotification, object: rig.window)
+        await settle(0.2)
+        #expect(rig.view.drawingRate == 120, "the display link is still held to the old display's rate")
+        #expect(rig.view.preferredFramesPerSecond == 120)
+        rig.view.screenRate = { 60 }
+        NotificationCenter.default.post(name: NSWindow.didChangeScreenNotification, object: rig.window)
+        await settle(0.2)
+        #expect(rig.view.drawingRate == 60)
+    }
 }
