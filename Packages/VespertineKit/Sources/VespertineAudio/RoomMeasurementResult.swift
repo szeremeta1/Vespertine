@@ -50,11 +50,13 @@ public struct RoomMeasurementResult: Sendable {
         profile.positionCurves = RoomProfile.positionCurves(from: try responses.mapValues { try $0.mapValues { try RoomCurve($0) } })
         profile.designOptions = options
         profile.source = .measured
-        if session.deviceUID.hasPrefix(SpeakerGroup.outputUIDPrefix), let first = recordings.first {
-            profile.groupClock = groupClock(first.request.outputDevice, first.request.layout.sampleRate)
-        }
+        let arrival = arrivals(responses[0] ?? [:], timedBy: timedAt[0] ?? [:])
         if curves.count > 1 {
-            profile.alignment = RoomSpeakerAlignment.align(arrivalMs: arrivals(responses[0] ?? [:], timedBy: timedAt[0] ?? [:]), levelDB: levels)
+            profile.alignment = RoomSpeakerAlignment.align(arrivalMs: arrival, levelDB: levels)
+        }
+        // Only delays measured between the speakers (an alignment with arrivals) hold the delay between a group's DACs.
+        if profile.alignment != nil, !arrival.isEmpty, session.deviceUID.hasPrefix(SpeakerGroup.outputUIDPrefix), let first = recordings.first {
+            profile.groupClock = groupClock(first.request.outputDevice, first.request.layout.sampleRate)
         }
         return RoomMeasurementResult(responses: responses, curves: curves, design: design, profile: profile)
     }

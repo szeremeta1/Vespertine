@@ -95,4 +95,17 @@ struct GroupMeasuredProfileTests {
         older.removeValue(forKey: "groupClock")
         #expect(try JSONDecoder().decode(RoomProfile.self, from: JSONSerialization.data(withJSONObject: older)).groupClock == nil)
     }
+
+    @Test("A duplicated measured group profile, and one added again under a new id, keep how the group was clocked: the leader still waits 12.5 ms")
+    func duplicateKeepsTheClock() throws {
+        let group = quad()
+        var book = RoomProfileBook()
+        let original = book.add(try measuredProfile(group: group, clock: clockThen))
+        let copy = try book.duplicate(original.id)
+        #expect(copy.id != original.id && copy.groupClock == clockThen)
+        let again = book.add(original)   // the same id again: added under a new one
+        #expect(again.id != original.id && again.groupClock == clockThen)
+        let chain = try #require(GroupDelay.chain(RoomCorrectionPlayback(profile: copy), group: group, resampled: resampled, rate: 48_000))
+        #expect(chain.channels.map(\.delayMs) == [12.5, 12.5, 0, 0], "\(chain.channels.map(\.delayMs))")
+    }
 }
