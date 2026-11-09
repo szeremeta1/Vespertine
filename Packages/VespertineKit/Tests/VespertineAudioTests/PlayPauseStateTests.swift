@@ -31,10 +31,16 @@ struct PlayPauseStateTests {
         // Late enough in the file that a slow start still has its lead: the engine plans the lead from the copy's speed so far
         // (bytes over the time since the copy began), and on a starved machine that looks slow, which would ask for more than the share gives.
         rig.share.goQuiet(from: 9 << 20)
+        // The scene is set with the output's clock stopped, so it does not depend on how fast the machine runs: the decoder fills the output
+        // buffer from the start of the song up to where the share goes quiet and then waits on the share, while nothing is played away.
+        // (Left running, a machine slower than the song's pace drained the buffer first, and "buffering" then meant the output had
+        // starved, not that the share was quiet: a pause then had nothing left to play on from.)
+        rig.holdOutput(true)
         rig.engine.play(rig.item())
-        let ranShort = await rig.wait(timeout: 40) { $0.state == .playing && $0.isBuffering }
+        let ranShort = await rig.wait(timeout: 40) { $0.state == .playing && $0.isBuffering && rig.share.readsWaiting > 0 && $0.bufferFill > 0.25 }
         let seen = rig.engine.snapshot
-        #expect(ranShort, "the song never ran short of data: \(seen.state), buffering \(seen.isBuffering), at \(seen.position) s, \(rig.audibleFrames) frames heard, \(rig.elapsed) s in")
+        #expect(ranShort, "the share never went quiet under the song: \(seen.state), buffering \(seen.isBuffering), \(rig.share.readsWaiting) reads waiting, buffer \(seen.bufferFill), \(rig.elapsed) s in")
+        rig.holdOutput(false)
         let before = rig.engine.snapshot.position
         rig.engine.pause()
         await expectPaused(rig, "paused while buffering")

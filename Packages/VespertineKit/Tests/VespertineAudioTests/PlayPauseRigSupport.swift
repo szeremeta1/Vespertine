@@ -17,11 +17,12 @@ final class ControlledShare: PlaybackCacheReader, @unchecked Sendable {
     private var silentFrom: Int64?
     private var delivered = 0.0
     private var started: Date?
+    private var blocked = 0
     var size: Int64 { Int64(bytes.count) }
     init(data: Data, bytesPerSecond: Double) { bytes = data; self.bytesPerSecond = bytesPerSecond }
     func read(at offset: Int64, count: Int) throws -> Data {
         gate.lock()
-        while stalled || silentFrom.map({ offset >= $0 }) == true { gate.wait() }
+        while stalled || silentFrom.map({ offset >= $0 }) == true { blocked += 1; gate.wait(); blocked -= 1 }
         let start = started ?? Date()
         started = start
         delivered += Double(min(count, bytes.count - Int(offset)))
@@ -31,6 +32,8 @@ final class ControlledShare: PlaybackCacheReader, @unchecked Sendable {
         if wait > 0 { Thread.sleep(forTimeInterval: wait) }
         return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
     }
+    /// How many reads are held up right now by a stall or by silence: the share is being waited on, whatever the machine's speed.
+    var readsWaiting: Int { gate.lock(); defer { gate.unlock() }; return blocked }
     func stall(_ value: Bool) { gate.lock(); stalled = value; gate.broadcast(); gate.unlock() }
     func goQuiet(from offset: Int64?) { gate.lock(); silentFrom = offset; gate.broadcast(); gate.unlock() }
 }
@@ -65,6 +68,8 @@ final class PlayPauseRig: @unchecked Sendable {
     /// How long opening an output takes (a speaker group's aggregate does take a while), and how many are being opened or were.
     let openDelay = Locked<TimeInterval>(0)
     let opens = Locked(0)
+    /// While set, an output opened from now on stands still (see `SimulatedOutput.held`); `holdOutput` changes the ones open too.
+    private let holding = Locked(false)
     let t0 = Date()
 
     /// Noise as a 24-bit stereo WAV: big enough to start on a prefix (`NetworkStart`), `seconds` long.
@@ -105,13 +110,14 @@ final class PlayPauseRig: @unchecked Sendable {
         engine.cacheOverride = cache
         let device = device
         engine.outputListing = { [device] }
-        let outputs = outputs, openDelay = openDelay, opens = opens
+        let outputs = outputs, openDelay = openDelay, opens = opens, holding = holding
         engine.sessionFactory = { _, plan in
             opens.withLock { $0 += 1 }
             let delay = openDelay.withLock { $0 }
             if delay > 0 { Thread.sleep(forTimeInterval: delay) }
             let session = try OutputSession(simulating: plan, rate: plan.deviceSampleRate)
             outputs.withLock { $0.append(session.simulated!) }
+            session.simulated!.held = holding.withLock { $0 }
             return session
         }
         var settings = EngineSettings()
@@ -127,6 +133,13 @@ final class PlayPauseRig: @unchecked Sendable {
 
     func nextItem() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/next.wav"), cacheKey: "next") }
     func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.wav"), cacheKey: "song") }
+
+    /// Stops the output's clock (nothing plays or is consumed) or starts it again: a test sets its scene while the song stands at its start,
+    /// so how fast the machine runs cannot change how much of the song is left to play when the scene is ready.
+    func holdOutput(_ hold: Bool) {
+        holding.withLock { $0 = hold }
+        outputs.withLock { $0.forEach { $0.held = hold } }
+    }
 
     var audibleFrames: Int { outputs.withLock { $0.reduce(0) { $0 + $1.audible } } }
     var elapsed: String { String(format: "%5.2f", Date().timeIntervalSince(t0)) }

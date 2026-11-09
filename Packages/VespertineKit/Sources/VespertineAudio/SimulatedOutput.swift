@@ -18,6 +18,8 @@ final class SimulatedOutput: @unchecked Sendable {
     /// Held while a buffer renders, so `stop()` returns only once the I/O thread is out of the context (as `AudioDeviceStop` does).
     private let render = NSLock()
     private let flags = Locked((running: false, cancelled: false))
+    /// For tests: while held the device's clock stands still (nothing is rendered or consumed), as if the output waited on its first buffer.
+    private let holding = Locked(false)
     private let counts = Locked((rendered: 0, audible: 0))
     private let finished = DispatchSemaphore(value: 0)
 
@@ -30,6 +32,8 @@ final class SimulatedOutput: @unchecked Sendable {
         thread.name = "Simulated output"
         thread.start()
     }
+
+    var held: Bool { get { holding.withLock { $0 } } set { holding.withLock { $0 = newValue } } }
 
     func start() { render.withLock { flags.withLock { $0.running = true } } }
     func stop() { render.withLock { flags.withLock { $0.running = false } } }
@@ -52,7 +56,7 @@ final class SimulatedOutput: @unchecked Sendable {
         while true {
             let (running, cancelled) = flags.withLock { ($0.running, $0.cancelled) }
             if cancelled { break }
-            if running {
+            if running && !held {
                 render.withLock {
                     guard flags.withLock({ $0.running }) else { return }
                     buffer.withUnsafeMutableBufferPointer { nrt_context_render_interleaved(context, $0.baseAddress!, UInt32(frames), UInt32(channels)) }
