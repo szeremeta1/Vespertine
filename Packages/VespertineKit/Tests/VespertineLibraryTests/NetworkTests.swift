@@ -189,6 +189,59 @@ struct NetworkTests {
         #expect(cache.usage() == NetworkCache.Usage())
     }
 
+    @Test("Keep Offline refuses a copy the disk has no room for: nothing is written, the queue stops and the reason is shown")
+    func cacheRefusesWhenDiskIsFull() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-full-\(UUID().uuidString)")
+        let remote = dir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var tracks: [Track] = []
+        for i in 0..<2 {
+            let url = remote.appendingPathComponent("\(i).flac")
+            try Data(repeating: UInt8(i), count: 1_000_000).write(to: url)
+            var t = Track.stub(path: url.path)
+            t.fileSize = 1_000_000
+            tracks.append(t)
+        }
+        let cache = NetworkCache(directory: dir.appendingPathComponent("cache"), limitBytes: 1 << 30)
+        cache.freeSpace = { NetworkCache.freeSpaceReserve + 500_000 }   // room for half a song above what is kept free
+        cache.request(tracks, offline: true)
+        for _ in 0..<200 where cache.usage().downloading + cache.usage().queued > 0 { try await Task.sleep(for: .milliseconds(20)) }
+        let usage = cache.usage()
+        #expect(usage.offlineFiles == 0 && usage.downloading == 0 && usage.queued == 0)
+        #expect(usage.problem == CocoaError(.fileWriteOutOfSpace).localizedDescription)
+        let left = try FileManager.default.contentsOfDirectory(atPath: cache.directory.path).filter { $0 != "index.json" }
+        #expect(left.isEmpty, "nothing written: \(left)")
+
+        // Room again: asking again copies, and the reason goes away.
+        cache.freeSpace = { 1 << 40 }
+        cache.request(tracks, offline: true)
+        for _ in 0..<200 where cache.usage().offlineFiles < 2 { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.usage().offlineFiles == 2 && cache.usage().problem == nil)
+    }
+
+    @Test("A copy stops when the disk fills while it runs, and leaves no partial file")
+    func cacheStopsWhenDiskFills() async throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-filling-\(UUID().uuidString)")
+        let remote = dir.appendingPathComponent("remote")
+        try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = remote.appendingPathComponent("big.flac")
+        try Data(repeating: 9, count: 10_000_000).write(to: url)
+        var track = Track.stub(path: url.path)
+        track.fileSize = 10_000_000
+        let cache = NetworkCache(directory: dir.appendingPathComponent("cache"), limitBytes: 1 << 30)
+        let asked = FreeSpaceAnswers()
+        // Plenty when the copy starts; then something else fills the disk.
+        cache.freeSpace = { asked.next() == 1 ? 1 << 40 : NetworkCache.freeSpaceReserve - 1 }
+        cache.request([track], offline: true)
+        for _ in 0..<200 where cache.usage().downloading + cache.usage().queued > 0 { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.usage().offlineFiles == 0)
+        #expect(cache.usage().problem != nil)
+        let left = try FileManager.default.contentsOfDirectory(atPath: cache.directory.path).filter { $0 != "index.json" }
+        #expect(left.isEmpty, "no partial copy: \(left)")
+    }
+
     @Test("The persistent cache adopts staged bytes without reopening an unavailable share")
     func adoptStagedCopy() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-adopt-\(UUID())")
@@ -288,4 +341,11 @@ extension Track {
               extraTags: [:], rgTrackGain: nil, rgTrackPeak: nil, rgAlbumGain: nil, rgAlbumPeak: nil, artworkKey: nil,
               playCount: 0, lastPlayedAt: nil, isMissing: false, effectiveBitDepth: nil, bandwidthHz: nil, analysisVerdict: nil)
     }
+}
+
+/// Counts the times the free space was asked for.
+private final class FreeSpaceAnswers: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+    func next() -> Int { lock.withLock { count += 1; return count } }
 }

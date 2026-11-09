@@ -52,6 +52,20 @@ struct NetworkPlaybackCacheTests {
         #expect(!entry.isWaiting)
     }
 
+    @Test("Two copies that each fit the free space alone but not together: the second is refused before anything is written")
+    func freeSpaceCountsOtherCopies() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let first = SlowShare(count: 2_000_000); first.stall(true)
+        let second = SlowShare(count: 2_000_000)
+        defer { first.stall(false) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 30, chunk: 4096)
+        cache.freeSpace = { (64 << 20) + 3_000_000 }   // what is kept free, and room for one of the two
+        let current = try cache.entry(key: "current", url: URL(fileURLWithPath: "/share/a.flac"), reader: first)
+        #expect(current.copiedBytes == 0, "its sparse file takes no space yet, but will")
+        #expect(throws: CocoaError.self) { _ = try cache.entry(key: "next", url: URL(fileURLWithPath: "/share/b.flac"), reader: second) }
+        #expect(cache.reservedBytes == 2_000_000)
+    }
+
     @Test("A slow current track is completely local before output; a later outage makes no reads")
     func fullCopySurvivesOutage() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

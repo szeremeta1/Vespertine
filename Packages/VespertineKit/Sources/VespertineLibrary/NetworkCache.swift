@@ -20,6 +20,8 @@ public final class NetworkCache: @unchecked Sendable {
         public var offlineFiles = 0
         public var downloading = 0
         public var queued = 0
+        /// Why copies stopped, when they did for a reason the user can act on (the disk is full); nil otherwise.
+        public var problem: String?
         public init() {}
     }
 
@@ -49,6 +51,30 @@ public final class NetworkCache: @unchecked Sendable {
     private var cancelled: Set<String> = []
     private var limit: Int64
     private var concurrentDownloads = 2
+    /// Why copies stopped (see `Usage.problem`). Under `lock`.
+    private var problem: String?
+
+    /// Copies always leave this much of the disk free: the system, the library and the playback cache need it more.
+    public static let freeSpaceReserve: Int64 = 1 << 30
+
+    /// Bytes free on the cache's volume (nil: unknown, copies go ahead). For tests: a disk that is full, or fills.
+    public var freeSpace: @Sendable () -> Int64?
+
+    /// Whether `bytes` more fit on the disk, leaving `freeSpaceReserve` free.
+    private func fits(_ bytes: Int64) -> Bool {
+        guard let free = freeSpace() else { return true }
+        return bytes <= free - Self.freeSpaceReserve
+    }
+
+    /// The disk is full: copies stop, the queued ones are dropped (asking again queues them again) and the reason is shown.
+    private func stopForSpace() {
+        lock.withLock {
+            problem = CocoaError(.fileWriteOutOfSpace).localizedDescription
+            queue.removeAll()
+        }
+        save()
+        onChange?()
+    }
 
     /// How many files download at once. One while music streams from a share, so the song being
     /// played keeps most of the connection.
@@ -76,6 +102,9 @@ public final class NetworkCache: @unchecked Sendable {
     public init(directory: URL, limitBytes: Int64) {
         self.directory = directory
         self.limit = limitBytes
+        freeSpace = { [directory] in
+            (try? FileManager.default.attributesOfFileSystem(forPath: directory.path)[.systemFreeSize] as? NSNumber)?.int64Value
+        }
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         load()
     }
@@ -119,6 +148,7 @@ public final class NetworkCache: @unchecked Sendable {
             }
             u.downloading = active.count
             u.queued = queue.count
+            u.problem = problem
             return u
         }
     }
@@ -144,7 +174,11 @@ public final class NetworkCache: @unchecked Sendable {
             let partial = directory.appendingPathComponent(UUID().uuidString + ".partial")
             var ok = false
             do {
-                if clonefile(local.path, partial.path, 0) != 0 { try FileManager.default.copyItem(at: local, to: partial) }
+                if clonefile(local.path, partial.path, 0) != 0 {
+                    // Not a clone (another file system): a real copy, which must fit.
+                    guard fits(job.size) else { stopForSpace(); throw CocoaError(.fileWriteOutOfSpace) }
+                    try FileManager.default.copyItem(at: local, to: partial)
+                }
                 let size = (try FileManager.default.attributesOfItem(atPath: partial.path)[.size] as? NSNumber)?.int64Value
                 ok = size == job.size && rename(partial.path, final.path) == 0
             } catch { }
@@ -164,6 +198,7 @@ public final class NetworkCache: @unchecked Sendable {
     /// `offline` keeps them until they are removed with `setOffline(false, …)`.
     public func request(_ tracks: [Track], offline: Bool = false) {
         lock.lock()
+        problem = nil   // asked again: try again
         var seen = Set<String>()
         for t in tracks {
             let key = Self.key(for: t)
@@ -233,6 +268,7 @@ public final class NetworkCache: @unchecked Sendable {
     /// Deletes cached copies, and offline ones too when `includingOffline`.
     public func clear(includingOffline: Bool) {
         lock.lock()
+        problem = nil
         let doomed = entries.values.filter { includingOffline || !$0.pinned }
         for e in doomed { entries[e.key] = nil }
         queue.removeAll { includingOffline || !$0.pinned }
@@ -275,6 +311,7 @@ public final class NetworkCache: @unchecked Sendable {
         active[job.key] = nil
         cancelled.remove(job.key)
         if ok {
+            problem = nil
             let pinned = job.pinned || pinAfterDownload.remove(job.key) != nil
             entries[job.key] = Entry(key: job.key, remotePath: job.remote.path, fileName: fileName(job),
                                      size: job.size, pinned: pinned, lastUsed: .now)
@@ -292,6 +329,8 @@ public final class NetworkCache: @unchecked Sendable {
 
     /// Streams the file in large reads to a temporary name, then renames it into place.
     private func download(_ job: Job) -> Bool {
+        // Refused before anything is written when the disk has no room for it (keeping `freeSpaceReserve` free).
+        guard fits(job.size) else { stopForSpace(); return false }
         let final = directory.appendingPathComponent(fileName(job))
         let partial = final.appendingPathExtension("partial")
         let input = open(job.remote.path, O_RDONLY)
@@ -311,6 +350,8 @@ public final class NetworkCache: @unchecked Sendable {
             let n = read(input, buffer, chunk)
             if n == 0 { break }
             if n < 0 { if errno == EINTR { continue }; ok = false; break }
+            // Something else may be filling the disk meanwhile: stop before this copy takes the last of it.
+            if !fits(Int64(n)) { stopForSpace(); ok = false; break }
             if write(output, buffer, n) != n { ok = false; break }
             total += Int64(n)
             lock.withLock { lastTransfer = .now }
