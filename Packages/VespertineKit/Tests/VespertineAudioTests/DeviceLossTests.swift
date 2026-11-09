@@ -1,5 +1,5 @@
 //
-// Vespertine — an output unplugged mid-song and plugged back in, through the engine's device seams (`outputListing`,
+// Vespertine: an output unplugged mid-song and plugged back in, through the engine's device seams (`outputListing`,
 // `sessionFactory`): no Core Audio device and no sound.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
