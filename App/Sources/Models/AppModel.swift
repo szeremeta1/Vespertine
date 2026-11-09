@@ -121,6 +121,7 @@ final class DeviceStore {
         let id = device?.id
         guard id != volumeDevice || monitor == nil else { return }
         volumeDevice = id
+        hardwareRestore = nil
         let monitor = self.monitor
         hal.async { monitor?.watchVolume(of: id) }
         readVolume()
@@ -141,7 +142,25 @@ final class DeviceStore {
     func setHardwareVolume(_ value: Float) {
         guard let id = volumeDevice else { return }
         hardwareVolume = value
+        // A level set by hand ends a mute: what Mute remembered is out of date.
+        if value > 0 { hardwareRestore = nil }
         hal.async { DeviceControl.setHardwareVolume(id, value) }
+    }
+
+    /// The level Mute brings back while the device is muted from the Controls menu (kept for this run only).
+    private var hardwareRestore: Float?
+
+    /// Whether the device's volume is down because Mute did it.
+    var isHardwareMuted: Bool { hardwareVolume == 0 && hardwareRestore != nil }
+
+    /// Volume Up, Volume Down or Mute on the device's own volume. False when its level isn't known.
+    @discardableResult
+    func applyHardwareVolume(_ action: VolumeControls.Action) -> Bool {
+        guard volumeDevice != nil, let level = hardwareVolume else { return false }
+        let next = VolumeControls.apply(action, to: VolumeControls.State(level: Double(level), restoreLevel: hardwareRestore.map(Double.init)))
+        setHardwareVolume(Float(next.level))
+        hardwareRestore = next.restoreLevel.map(Float.init)
+        return true
     }
 }
 
@@ -493,6 +512,40 @@ final class AppModel {
             transitionsNote.dismiss()
         }
         syncEngine()
+    }
+
+    /// Counts the times a volume command found an output with no volume to move; the volume control in the transport bar opens
+    /// its note on each one.
+    private(set) var volumeNoteRequests = 0
+
+    /// What Volume Up, Volume Down and Mute move for the output that is playing (or would): its own volume when Core Audio exposes
+    /// one, else Vespertine's volume for it when it uses that, else nothing.
+    var volumeRoute: VolumeControls.Route {
+        guard let device = activeDevice else { return .fixed }
+        return VolumeControls.route(for: device, usesAppVolume: settings.usesAppVolume(device.uid), hardwareLevelKnown: devices.hardwareVolume != nil)
+    }
+
+    /// Whether the volume is down because Mute did it, for the menu's wording.
+    var isVolumeMuted: Bool {
+        switch volumeRoute {
+        case .software: activeDevice.map { settings.isMuted($0.uid) } ?? false
+        case .hardware: devices.isHardwareMuted
+        case .fixed: false
+        }
+    }
+
+    /// Controls › Volume Up, Volume Down, Mute. Only the output Vespertine plays to: never the Mac's sound output.
+    func adjustVolume(_ action: VolumeControls.Action) {
+        guard let device = activeDevice else { return }
+        switch volumeRoute {
+        case .software:
+            settings.applyVolume(action, for: device.uid)
+            syncEngine()
+        case .hardware:
+            devices.applyHardwareVolume(action)
+        case .fixed:
+            volumeNoteRequests += 1
+        }
     }
 
     /// Push preference changes into the engine and device watchers.

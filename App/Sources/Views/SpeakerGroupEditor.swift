@@ -144,16 +144,33 @@ final class GroupIdentifier {
     }
 }
 
-/// Each DAC's own volume: shown for the ones that have a volume Core Audio can set, written when the slider is let go. Nothing here
-/// is saved with the group or applied by Vespertine on its own.
+/// The group's volume: the choice between each DAC's own knob and Vespertine's volume for all of them (saved per output, like the
+/// transport bar's), then each DAC's own volume: shown for the ones that have a volume Core Audio can set, written when the slider is
+/// let go. The DACs' levels are never changed by Vespertine on its own.
 struct MemberVolumeView: View {
+    @Environment(AppModel.self) private var model
     let group: SpeakerGroup
     @State private var members: [GroupVolume.Member] = []
     @State private var editing: [String: Float] = [:]
 
+    private var choice: Binding<GroupVolumeChoice> {
+        Binding(get: { GroupVolumeChoice.current(in: model.settings, for: group) },
+                set: { $0.apply(to: model.settings, for: group); model.syncEngine() })
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(verbatim: "Volume").font(.headline)
+            Text("Volume").font(.headline)
+            Picker(selection: choice) {
+                Text("Hardware volume (each DAC's knob)").tag(GroupVolumeChoice.hardware)
+                Text("Software volume (set both DACs once, control here)").tag(GroupVolumeChoice.software)
+            } label: { Text("Volume") }
+            .pickerStyle(.radioGroup)
+            .labelsHidden()
+            (choice.wrappedValue == .software
+                ? Text("Set each DAC to one fixed level, then control the volume in Vespertine: the volume slider, or Volume Up and Down in the Controls menu. Below 100%, playback is not bit-perfect.")
+                : Text("Set each DAC's level on the DAC or with the sliders below. Vespertine does not touch the samples, so playback stays bit-perfect."))
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             Text(verbatim: GroupVolume.note).font(.caption).foregroundStyle(.secondary)
             ForEach(members) { member in
                 HStack {

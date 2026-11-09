@@ -54,4 +54,23 @@ struct GroupVolumeTests {
     func note() {
         #expect(GroupVolume.note.contains("set once") && GroupVolume.note.contains("digital") && GroupVolume.note.contains("bit-perfect"))
     }
+
+    @Test("A group's UID gets the digital volume chosen for it, and a group without a choice gets none")
+    func groupGetsDigitalVolume() {
+        let group = GroupFixtures.quad()
+        let output = GroupOutput.presented(group, members: [])
+        #expect(!output.hasHardwareVolume)
+        var settings = EngineSettings()
+        settings.deviceDigitalVolumes = [group.outputUID: -9]
+        #expect(settings.digitalVolume(for: output) == -9)
+        // Its own choice only: another group, and the same group with the choice turned off, are left as they are.
+        let other = SpeakerGroup(id: UUID(), name: "Other", members: group.members, clockLeaderUID: group.clockLeaderUID)
+        #expect(settings.digitalVolume(for: GroupOutput.presented(other, members: [])) == nil)
+        settings.deviceDigitalVolumes.updateValue(nil, forKey: group.outputUID)
+        #expect(settings.digitalVolume(for: output) == nil)
+        // Software volume wins over a preference for hardware volume: the group has none to prefer.
+        settings.preferHardwareVolume = true
+        settings.deviceDigitalVolumes = [group.outputUID: -3]
+        #expect(settings.digitalVolume(for: output) == -3)
+    }
 }

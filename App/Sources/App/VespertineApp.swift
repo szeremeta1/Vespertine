@@ -139,6 +139,17 @@ struct VespertineCommands: Commands {
             Button("Skip Back 10 Seconds") { model.player.seek(to: max(0, model.player.position - 10)) }
                 .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
                 .disabled(model.player.current == nil)
+            Divider()
+            Button("Volume Up") { model.adjustVolume(.up) }
+                .keyboardShortcut(.upArrow, modifiers: [.command])
+                .disabled(model.activeDevice == nil)
+            Button("Volume Down") { model.adjustVolume(.down) }
+                .keyboardShortcut(.downArrow, modifiers: [.command])
+                .disabled(model.activeDevice == nil)
+            Button(model.isVolumeMuted ? String(localized: "Unmute", comment: "Controls menu: bring the volume back") : String(localized: "Mute", comment: "Controls menu: silence the output")) { model.adjustVolume(.mute) }
+                .keyboardShortcut(.downArrow, modifiers: [.command, .option])
+                .disabled(model.activeDevice == nil)
+            Divider()
             Button("Go to Current Album") {
                 if let key = model.player.current?.track.albumKey {
                     model.sidebar = .albums

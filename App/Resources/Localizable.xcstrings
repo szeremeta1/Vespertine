@@ -470888,6 +470888,2152 @@
           }
         }
       }
+    },
+    "Volume Up": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ድምፅ ጨምር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رفع مستوى الصوت"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ভলিউম বাড়ান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zesílit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skru op"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lauter"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αύξηση έντασης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subir volumen"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "افزایش صدا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänenvoimakkuus ylös"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lakasan ang Volume"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Augmenter le volume"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વૉલ્યૂમ વધારો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙara Sauti"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגברת עוצמת קול"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वॉल्यूम बढ़ाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangosítás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naikkan Volume"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alza volume"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量を上げる"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವಾಲ್ಯೂಮ್ ಹೆಚ್ಚಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음량 높이기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വോളിയം കൂട്ടുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "व्हॉल्यूम वाढवा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naikkan Kelantangan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Øk volum"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume hoger"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੌਲਿਊਮ ਵਧਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwiększ głośność"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar volume"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumentar volume"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mărește volumul"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Höj volymen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ongeza Sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியளவை அதிகரி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాల్యూమ్ పెంచండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพิ่มระดับเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesi Artır"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Збільшити гучність"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "والیوم بڑھائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tăng âm lượng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調高音量"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调高音量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調高音量"
+          }
+        }
+      }
+    },
+    "Volume Down": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ድምፅ ቀንስ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خفض مستوى الصوت"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ভলিউম কমান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeslabit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skru ned"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leiser"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μείωση έντασης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bajar volumen"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاهش صدا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänenvoimakkuus alas"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinaan ang Volume"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminuer le volume"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વૉલ્યૂમ ઘટાડો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rage Sauti"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הנמכת עוצמת קול"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वॉल्यूम घटाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halkítás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turunkan Volume"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbassa volume"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量を下げる"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವಾಲ್ಯೂಮ್ ಕಡಿಮೆ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음량 낮추기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വോളിയം കുറയ്ക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "व्हॉल्यूम कमी करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turunkan Kelantangan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduser volum"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume lager"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੌਲਿਊਮ ਘਟਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zmniejsz głośność"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminuir volume"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminuir volume"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Micșorează volumul"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sänk volymen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punguza Sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியளவைக் குறை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాల్యూమ్ తగ్గించండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลดระดับเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesi Azalt"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зменшити гучність"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "والیوم گھٹائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giảm âm lượng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調低音量"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "调低音量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "調低音量"
+          }
+        }
+      }
+    },
+    "Mute": {
+      "comment": "Controls menu: silence the output",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ድምፅ አጥፋ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم الصوت"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মিউট করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ztlumit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå lyden fra"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stummschalten"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σίγαση"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بی‌صدا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mykistä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-mute"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couper le son"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મ્યૂટ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yi Shiru"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השתקה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "म्यूट करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Némítás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisukan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenzia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮ್ಯೂಟ್ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음소거"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മ്യൂട്ട് ചെയ്യുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "म्यूट करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senyapkan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demp"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dempen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮਿਊਟ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wycisz"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silenciar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dezactivează sunetul"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ljud av"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyamazisha"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியடக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మ్యూట్ చేయండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ปิดเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesi Kapat"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вимкнути звук"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خاموش کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tắt tiếng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "靜音"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静音"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "靜音"
+          }
+        }
+      }
+    },
+    "Unmute": {
+      "comment": "Controls menu: bring the volume back",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ድምፅ መልስ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء الكتم"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আনমিউট করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zrušit ztlumení"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå lyden til"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stummschaltung aufheben"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κατάργηση σίγασης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reactivar sonido"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لغو بی‌صدا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poista mykistys"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-unmute"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rétablir le son"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અનમ્યૂટ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cire Shiru"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ביטול השתקה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अनम्यूट करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Némítás feloldása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunyikan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riattiva audio"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート解除"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಅನ್‌ಮ್ಯೂಟ್ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음소거 해제"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അൺമ്യൂട്ട് ചെയ്യുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अनम्यूट करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nyahsenyap"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opphev demping"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dempen opheffen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਅਣਮਿਊਟ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyłącz wyciszenie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reativar som"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reativar som"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reactivează sunetul"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ljud på"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rudisha Sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியடக்கத்தை நீக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అన్‌మ్యూట్ చేయండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิดเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesi Aç"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Увімкнути звук"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آواز بحال کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật tiếng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消靜音"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消静音"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消靜音"
+          }
+        }
+      }
+    },
+    "Hardware volume (each DAC's knob)": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የሃርድዌር የድምፅ መጠን (የእያንዳንዱ DAC ቁልፍ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت العتاد (مقبض كل DAC)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "হার্ডওয়্যার ভলিউম (প্রতিটি DAC-এর নব)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardwarová hlasitost (knoflík každého DAC)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardwarelydstyrke (hver DAC's knap)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardware-Lautstärke (Regler jedes DAC)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένταση υλικού (το κουμπί κάθε DAC)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen por hardware (el mando de cada DAC)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدای سخت‌افزاری (دکمهٔ هر DAC)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laitteiston äänenvoimakkuus (kunkin DAC:n säädin)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardware volume (knob ng bawat DAC)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume matériel (le bouton de chaque DAC)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "હાર્ડવેર વૉલ્યૂમ (દરેક DAC નું નૉબ)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙarar na'ura (maɓallin kowane DAC)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עוצמת קול בחומרה (הכפתור של כל DAC)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हार्डवेयर वॉल्यूम (हर DAC का नॉब)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardveres hangerő (az egyes DAC-ok gombja)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume perangkat keras (kenop tiap DAC)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume hardware (la manopola di ogni DAC)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ハードウェア音量（各DACのつまみ）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾರ್ಡ್‌ವೇರ್ ವಾಲ್ಯೂಮ್ (ಪ್ರತಿ DAC ನ ನಾಬ್)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "하드웨어 음량 (각 DAC의 노브)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഹാർഡ്‌വെയർ വോളിയം (ഓരോ DAC-യുടെയും നോബ്)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हार्डवेअर व्हॉल्यूम (प्रत्येक DAC चा नॉब)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kelantangan perkakasan (tombol setiap DAC)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maskinvarevolum (knotten på hver DAC)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardwarevolume (de knop van elke DAC)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਾਰਡਵੇਅਰ ਵੌਲਿਊਮ (ਹਰ DAC ਦਾ ਨੌਬ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Głośność sprzętowa (pokrętło każdego DAC)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume por hardware (o botão de cada DAC)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume de hardware (o botão de cada DAC)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volum hardware (butonul fiecărui DAC)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hårdvaruvolym (varje DAC:s ratt)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiwango cha sauti cha maunzi (kifundo cha kila DAC)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வன்பொருள் ஒலியளவு (ஒவ்வொரு DAC-இன் குமிழ்)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "హార్డ్‌వేర్ వాల్యూమ్ (ప్రతి DAC నాబ్)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระดับเสียงฮาร์ดแวร์ (ปุ่มหมุนของ DAC แต่ละตัว)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Donanım ses düzeyi (her DAC'in düğmesi)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Апаратна гучність (регулятор кожного DAC)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہارڈویئر والیوم (ہر DAC کا نوب)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng phần cứng (núm của từng DAC)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "硬件音量（每個 DAC 的旋鈕）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "硬件音量（每个 DAC 的旋钮）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "硬體音量（每個 DAC 的旋鈕）"
+          }
+        }
+      }
+    },
+    "Software volume (set both DACs once, control here)": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የሶፍትዌር የድምፅ መጠን (ሁለቱንም DAC አንድ ጊዜ ያዘጋጁ፣ እዚህ ይቆጣጠሩ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى الصوت البرمجي (اضبط كلا الـ DAC مرة واحدة، وتحكّم هنا)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সফটওয়্যার ভলিউম (দুটি DAC একবারই সেট করুন, এখান থেকে নিয়ন্ত্রণ করুন)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Softwarová hlasitost (nastavte oba DAC jednou, ovládejte zde)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Softwarelydstyrke (indstil begge DAC'er én gang, styr her)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Software-Lautstärke (beide DACs einmal einstellen, hier steuern)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένταση λογισμικού (ρυθμίστε και τα δύο DAC μία φορά, ελέγξτε από εδώ)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen por software (ajusta ambos DAC una vez y contrólalo aquí)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدای نرم‌افزاری (هر دو DAC را یک بار تنظیم کنید، از اینجا کنترل کنید)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ohjelmistollinen äänenvoimakkuus (aseta molemmat DAC:t kerran, säädä täältä)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Software volume (itakda nang isang beses ang dalawang DAC, kontrolin dito)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume logiciel (réglez les deux DAC une fois, contrôlez ici)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સૉફ્ટવેર વૉલ્યૂમ (બંને DAC એક વાર સેટ કરો, અહીંથી નિયંત્રિત કરો)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙarar software (saita DAC biyun sau ɗaya, sarrafa a nan)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עוצמת קול בתוכנה (קובעים את שני ה-DAC פעם אחת, שולטים מכאן)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सॉफ़्टवेयर वॉल्यूम (दोनों DAC एक बार सेट करें, यहीं से नियंत्रित करें)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szoftveres hangerő (mindkét DAC-ot egyszer állítsa be, itt szabályozza)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume perangkat lunak (atur kedua DAC sekali saja, kendalikan di sini)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume software (imposta entrambi i DAC una volta, controlla da qui)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソフトウェア音量（両方のDACを一度設定し、ここで操作）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಾಫ್ಟ್‌ವೇರ್ ವಾಲ್ಯೂಮ್ (ಎರಡೂ DAC ಗಳನ್ನು ಒಮ್ಮೆ ಹೊಂದಿಸಿ, ಇಲ್ಲಿಂದ ನಿಯಂತ್ರಿಸಿ)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "소프트웨어 음량 (두 DAC를 한 번만 설정하고 여기서 제어)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സോഫ്റ്റ്‌വെയർ വോളിയം (രണ്ട് DAC-കളും ഒരിക്കൽ സെറ്റ് ചെയ്യുക, ഇവിടെ നിയന്ത്രിക്കുക)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सॉफ्टवेअर व्हॉल्यूम (दोन्ही DAC एकदा सेट करा, इथून नियंत्रित करा)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kelantangan perisian (tetapkan kedua-dua DAC sekali sahaja, kawal di sini)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programvarevolum (still inn begge DAC-ene én gang, styr her)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Softwarevolume (stel beide DAC’s eenmalig in, regel hier)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਾਫ਼ਟਵੇਅਰ ਵੌਲਿਊਮ (ਦੋਵੇਂ DAC ਇੱਕ ਵਾਰ ਸੈੱਟ ਕਰੋ, ਇੱਥੋਂ ਕੰਟਰੋਲ ਕਰੋ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Głośność programowa (ustaw oba DAC raz, steruj tutaj)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume por software (ajuste os dois DACs uma vez e controle aqui)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume de software (defina os dois DAC uma vez e controle aqui)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volum software (setați ambele DAC-uri o dată, controlați de aici)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mjukvaruvolym (ställ in båda DAC:arna en gång, styr här)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiwango cha sauti cha programu (weka DAC zote mbili mara moja, dhibiti hapa)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மென்பொருள் ஒலியளவு (இரண்டு DAC-களையும் ஒருமுறை அமைக்கவும், இங்கே கட்டுப்படுத்தவும்)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సాఫ్ట్‌వేర్ వాల్యూమ్ (రెండు DACలను ఒక్కసారి సెట్ చేయండి, ఇక్కడ నియంత్రించండి)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระดับเสียงซอฟต์แวร์ (ตั้งค่า DAC ทั้งสองตัวครั้งเดียว แล้วควบคุมที่นี่)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yazılım ses düzeyi (iki DAC'i bir kez ayarlayın, buradan denetleyin)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Програмна гучність (налаштуйте обидва DAC один раз, керуйте тут)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سافٹ ویئر والیوم (دونوں DAC ایک بار سیٹ کریں، یہاں سے کنٹرول کریں)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng phần mềm (đặt cả hai DAC một lần, điều khiển tại đây)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "軟件音量（兩個 DAC 只設定一次，在此控制）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "软件音量（两个 DAC 只设置一次，在此控制）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "軟體音量（兩個 DAC 只設定一次，在此控制）"
+          }
+        }
+      }
+    },
+    "Set each DAC to one fixed level, then control the volume in Vespertine: the volume slider, or Volume Up and Down in the Controls menu. Below 100%, playback is not bit-perfect.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እያንዳንዱን DAC በአንድ ቋሚ ደረጃ ያዘጋጁ፣ ከዚያ ድምፁን በ Vespertine ይቆጣጠሩ፦ በድምፅ ተንሸራታቹ ወይም በቁጥጥሮች ምናሌ ውስጥ ባለው «ድምፅ ጨምር» እና «ድምፅ ቀንስ»። ከ100% በታች መልሶ ማጫወት ቢት-ፍጹም አይደለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اضبط كل DAC على مستوى ثابت واحد، ثم تحكّم في مستوى الصوت داخل Vespertine: من شريط التمرير، أو من «رفع مستوى الصوت» و«خفض مستوى الصوت» في قائمة عناصر التحكم. دون 100٪ لا يكون التشغيل مطابقًا للبتات."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রতিটি DAC একটি নির্দিষ্ট মাত্রায় সেট করুন, তারপর Vespertine-এ ভলিউম নিয়ন্ত্রণ করুন: ভলিউম স্লাইডার দিয়ে, অথবা নিয়ন্ত্রণ মেনুর «ভলিউম বাড়ান» ও «ভলিউম কমান» দিয়ে। ১০০%-এর নিচে প্লেব্যাক বিট-পারফেক্ট থাকে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nastavte každý DAC na jednu pevnou úroveň a hlasitost pak ovládejte ve Vespertine: posuvníkem hlasitosti nebo příkazy Zesílit a Zeslabit v nabídce Ovládání. Přehrávání není bit-perfect při hlasitosti pod 100 %."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indstil hver DAC til ét fast niveau, og styr så lydstyrken i Vespertine: med lydstyrkeskyderen eller med Skru op og Skru ned i menuen Betjening. Afspilningen er ikke bitperfekt ved under 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stellen Sie jeden DAC einmal auf einen festen Pegel ein und regeln Sie die Lautstärke dann in Vespertine: mit dem Lautstärkeregler oder mit „Lauter“ und „Leiser“ im Menü „Steuerung“. Die Wiedergabe ist nicht bit-perfekt bei Lautstärken unter 100 %."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ρυθμίστε κάθε DAC σε ένα σταθερό επίπεδο και ελέγχετε μετά την ένταση στο Vespertine: με το ρυθμιστικό έντασης ή με τα «Αύξηση έντασης» και «Μείωση έντασης» στο μενού Χειριστήρια. Κάτω από 100% η αναπαραγωγή δεν είναι bit-perfect."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajusta cada DAC a un nivel fijo y controla después el volumen en Vespertine: con el control deslizante de volumen o con «Subir volumen» y «Bajar volumen» del menú Controles. Por debajo del 100 %, la reproducción no es bit-perfect."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هر DAC را روی یک سطح ثابت بگذارید و سپس صدا را در Vespertine کنترل کنید: با نوار لغزندهٔ صدا یا با «افزایش صدا» و «کاهش صدا» در منوی کنترل‌ها. زیر ۱۰۰٪ پخش بیت‌به‌بیت نیست."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aseta jokainen DAC kiinteälle tasolle ja säädä sen jälkeen äänenvoimakkuutta Vespertinessä: äänenvoimakkuusliukusäätimellä tai Säätimet-valikon kohdilla Äänenvoimakkuus ylös ja alas. Alle 100 %:n toisto ei ole bittitarkkaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itakda ang bawat DAC sa iisang nakapirming antas, saka kontrolin ang volume sa Vespertine: gamit ang volume slider, o ang Lakasan ang Volume at Hinaan ang Volume sa menu na Mga Kontrol. Sa ibaba ng 100%, hindi bit-perfect ang pag-playback."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglez chaque DAC sur un niveau fixe, puis contrôlez le volume dans Vespertine : avec le curseur de volume, ou avec Augmenter le volume et Diminuer le volume dans le menu Commandes. En dessous de 100 %, la lecture n’est pas bit-perfect."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "દરેક DAC ને એક નિશ્ચિત સ્તરે સેટ કરો, પછી Vespertine માં વૉલ્યૂમ નિયંત્રિત કરો: વૉલ્યૂમ સ્લાઇડરથી, અથવા નિયંત્રણો મેનૂમાં «વૉલ્યૂમ વધારો» અને «વૉલ્યૂમ ઘટાડો» થી. 100% થી નીચે પ્લેબેક બિટ-પરફેક્ટ રહેતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saita kowane DAC a matsayi ɗaya tsayayye, sannan ka sarrafa ƙarar sauti a Vespertine: da maɓallin zamiya na ƙarar sauti, ko da Ƙara Sauti da Rage Sauti a menu na Sarrafawa. Ƙasa da 100% kunnawa ba bit-perfect ba ne."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבעו כל DAC לרמה קבועה אחת, ואז שלטו בעוצמת הקול ב-Vespertine: במחוון עוצמת הקול, או באמצעות „הגברת עוצמת קול“ ו„הנמכת עוצמת קול“ בתפריט פקדים. מתחת ל-100% ההשמעה אינה מדויקת לסיבית."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर DAC को एक तय स्तर पर सेट करें, फिर Vespertine में वॉल्यूम नियंत्रित करें: वॉल्यूम स्लाइडर से, या नियंत्रण मेनू में «वॉल्यूम बढ़ाएँ» और «वॉल्यूम घटाएँ» से। 100% से कम पर प्लेबैक बिट-परफ़ेक्ट नहीं रहता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Állítsa be mindegyik DAC-ot egy rögzített szintre, majd a hangerőt a Vespertine-ben szabályozza: a hangerőcsúszkával vagy a Vezérlők menü Hangosítás és Halkítás parancsával. A lejátszás nem bit-perfect, ha a hangerő a következő érték alatt van: 100%."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atur setiap DAC ke satu level tetap, lalu kendalikan volume di Vespertine: dengan penggeser volume, atau Naikkan Volume dan Turunkan Volume di menu Kontrol. Di bawah 100%, pemutaran tidak bit-perfect."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imposta ogni DAC su un livello fisso, poi controlla il volume in Vespertine: con il cursore del volume o con Alza volume e Abbassa volume nel menu Controlli. La riproduzione non è bit-perfect con un volume inferiore al 100%."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "各DACを一定のレベルに設定してから、Vespertineで音量を操作します。音量スライダ、または「コントロール」メニューの「音量を上げる」「音量を下げる」を使います。100%未満ではビットパーフェクト再生になりません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರತಿ DAC ಅನ್ನು ಒಂದು ನಿಗದಿತ ಮಟ್ಟಕ್ಕೆ ಹೊಂದಿಸಿ, ನಂತರ Vespertine ನಲ್ಲಿ ವಾಲ್ಯೂಮ್ ನಿಯಂತ್ರಿಸಿ: ವಾಲ್ಯೂಮ್ ಸ್ಲೈಡರ್ ಮೂಲಕ, ಅಥವಾ ನಿಯಂತ್ರಣಗಳು ಮೆನುವಿನ «ವಾಲ್ಯೂಮ್ ಹೆಚ್ಚಿಸಿ» ಮತ್ತು «ವಾಲ್ಯೂಮ್ ಕಡಿಮೆ ಮಾಡಿ» ಮೂಲಕ. 100% ಕ್ಕಿಂತ ಕಡಿಮೆ ಇದ್ದರೆ ಪ್ಲೇಬ್ಯಾಕ್ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "각 DAC를 하나의 고정 레벨로 설정한 다음 Vespertine에서 음량을 제어하세요. 음량 슬라이더를 쓰거나 제어 메뉴의 ‘음량 높이기’와 ‘음량 낮추기’를 사용합니다. 100% 미만에서는 재생이 비트 퍼펙트가 아닙니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓരോ DAC-യും ഒരു സ്ഥിര നിലയിലേക്ക് സെറ്റ് ചെയ്യുക, തുടർന്ന് Vespertine-ൽ വോളിയം നിയന്ത്രിക്കുക: വോളിയം സ്ലൈഡർ ഉപയോഗിച്ച്, അല്ലെങ്കിൽ നിയന്ത്രണങ്ങൾ മെനുവിലെ «വോളിയം കൂട്ടുക», «വോളിയം കുറയ്ക്കുക» ഉപയോഗിച്ച്. 100%-ത്തിൽ താഴെ പ്ലേബാക്ക് ബിറ്റ്-പെർഫെക്റ്റ് അല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रत्येक DAC एका निश्चित पातळीवर सेट करा, मग Vespertine मध्ये व्हॉल्यूम नियंत्रित करा: व्हॉल्यूम स्लायडरने, किंवा नियंत्रणे मेनूमधील «व्हॉल्यूम वाढवा» आणि «व्हॉल्यूम कमी करा» ने. 100% पेक्षा कमी असल्यास प्लेबॅक बिट-परफेक्ट राहत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tetapkan setiap DAC pada satu tahap tetap, kemudian kawal kelantangan dalam Vespertine: dengan peluncur kelantangan, atau Naikkan Kelantangan dan Turunkan Kelantangan dalam menu Kawalan. Di bawah 100%, main balik tidak bit-perfect."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still hver DAC inn på ett fast nivå, og styr deretter volumet i Vespertine: med volumglidebryteren, eller med Øk volum og Reduser volum i Kontroller-menyen. Avspillingen er ikke bitperfekt ved under 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel elke DAC eenmalig in op een vast niveau en regel het volume daarna in Vespertine: met de volumeschuif, of met Volume hoger en Volume lager in het menu Regelaars. Het afspelen is niet bitperfect onder 100%."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ DAC ਨੂੰ ਇੱਕ ਪੱਕੇ ਪੱਧਰ ’ਤੇ ਸੈੱਟ ਕਰੋ, ਫਿਰ Vespertine ਵਿੱਚ ਵੌਲਿਊਮ ਕੰਟਰੋਲ ਕਰੋ: ਵੌਲਿਊਮ ਸਲਾਈਡਰ ਨਾਲ, ਜਾਂ ਕੰਟਰੋਲ ਮੀਨੂ ਵਿੱਚ «ਵੌਲਿਊਮ ਵਧਾਓ» ਅਤੇ «ਵੌਲਿਊਮ ਘਟਾਓ» ਨਾਲ। 100% ਤੋਂ ਘੱਟ ’ਤੇ ਪਲੇਬੈਕ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਨਹੀਂ ਰਹਿੰਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustaw każdy DAC na jeden stały poziom, a potem steruj głośnością w Vespertine: suwakiem głośności albo poleceniami Zwiększ głośność i Zmniejsz głośność w menu Sterowanie. Odtwarzanie nie jest bit-perfect poniżej 100%."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajuste cada DAC para um nível fixo e depois controle o volume no Vespertine: pelo controle deslizante de volume ou por Aumentar volume e Diminuir volume no menu Controles. Abaixo de 100%, a reprodução não é bit-perfect."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Defina cada DAC para um nível fixo e depois controle o volume no Vespertine: com o cursor de volume ou com Aumentar volume e Diminuir volume no menu Controlos. Abaixo de 100%, a reprodução não é bit-perfect."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setați fiecare DAC la un nivel fix, apoi controlați volumul în Vespertine: cu glisorul de volum sau cu Mărește volumul și Micșorează volumul din meniul Comenzi. Sub 100%, redarea nu este bit-perfect."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ställ in varje DAC på en fast nivå och styr sedan volymen i Vespertine: med volymreglaget eller med Höj volymen och Sänk volymen i menyn Reglage. Under 100 % är uppspelningen inte bitperfekt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weka kila DAC kwenye kiwango kimoja kisichobadilika, kisha dhibiti sauti ndani ya Vespertine: kwa kitelezi cha sauti, au kwa Ongeza Sauti na Punguza Sauti kwenye menyu ya Vidhibiti. Uchezaji si bit-perfect chini ya 100%."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒவ்வொரு DAC-ஐயும் ஒரு நிலையான அளவில் அமைக்கவும், பிறகு Vespertine-இல் ஒலியளவைக் கட்டுப்படுத்தவும்: ஒலியளவு ஸ்லைடரால், அல்லது கட்டுப்பாடுகள் மெனுவில் உள்ள «ஒலியளவை அதிகரி», «ஒலியளவைக் குறை» மூலம். 100%-க்குக் கீழே இயக்கம் பிட்-பெர்ஃபெக்ட் ஆகாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రతి DACని ఒక స్థిరమైన స్థాయికి సెట్ చేసి, ఆపై Vespertineలో వాల్యూమ్‌ను నియంత్రించండి: వాల్యూమ్ స్లైడర్‌తో, లేదా నియంత్రణలు మెనూలోని «వాల్యూమ్ పెంచండి», «వాల్యూమ్ తగ్గించండి»తో. 100% కంటే తక్కువలో ప్లేబ్యాక్ బిట్-పర్ఫెక్ట్ కాదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตั้ง DAC แต่ละตัวไว้ที่ระดับคงที่ระดับเดียว แล้วควบคุมระดับเสียงใน Vespertine ด้วยแถบเลื่อนระดับเสียง หรือ «เพิ่มระดับเสียง» และ «ลดระดับเสียง» ในเมนูตัวควบคุม เมื่อต่ำกว่า 100% การเล่นจะไม่เป็นบิตเพอร์เฟกต์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her DAC'i tek bir sabit düzeye ayarlayın, ardından ses düzeyini Vespertine'de denetleyin: ses düzeyi kaydırıcısıyla ya da Denetimler menüsündeki Sesi Artır ve Sesi Azalt ile. %100'ün altında çalma bit-perfect olmaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Налаштуйте кожен DAC на один фіксований рівень, а потім керуйте гучністю у Vespertine: повзунком гучності або командами «Збільшити гучність» і «Зменшити гучність» у меню «Керування». Нижче 100% відтворення не є біт-у-біт."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر DAC کو ایک مقررہ سطح پر سیٹ کریں، پھر Vespertine میں والیوم کنٹرول کریں: والیوم سلائیڈر سے، یا کنٹرولز مینو میں «والیوم بڑھائیں» اور «والیوم گھٹائیں» سے۔ 100٪ سے کم پر پلے بیک بٹ پرفیکٹ نہیں رہتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt mỗi DAC ở một mức cố định, rồi điều khiển âm lượng trong Vespertine: bằng thanh trượt âm lượng, hoặc bằng Tăng âm lượng và Giảm âm lượng trong menu Điều khiển. Dưới 100%, việc phát không còn bit-perfect."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先把每個 DAC 設為一個固定位準，再在 Vespertine 中控制音量：使用音量滑桿，或使用「控制」選單中的「調高音量」和「調低音量」。低於 100% 時，播放不再是位元完美。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先把每个 DAC 设为一个固定电平，再在 Vespertine 中控制音量：用音量滑块，或用“控制”菜单中的“调高音量”和“调低音量”。低于 100% 时，播放不再是比特完美。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先把每個 DAC 設為一個固定位準，再在 Vespertine 中控制音量：使用音量滑桿，或使用「控制」選單中的「調高音量」和「調低音量」。低於 100% 時，播放不再是位元完美。"
+          }
+        }
+      }
+    },
+    "Set each DAC's level on the DAC or with the sliders below. Vespertine does not touch the samples, so playback stays bit-perfect.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የእያንዳንዱን DAC ደረጃ በ DAC ላይ ወይም ከታች ባሉት ተንሸራታቾች ያዘጋጁ። Vespertine ናሙናዎቹን አይነካም፣ ስለዚህ መልሶ ማጫወት ቢት-ፍጹም ሆኖ ይቆያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اضبط مستوى كل DAC على الجهاز نفسه أو بأشرطة التمرير أدناه. لا يمسّ Vespertine العيّنات، لذا يبقى التشغيل مطابقًا للبتات."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রতিটি DAC-এর মাত্রা DAC-এই বা নিচের স্লাইডারগুলো দিয়ে সেট করুন। Vespertine স্যাম্পল স্পর্শ করে না, তাই প্লেব্যাক বিট-পারফেক্টই থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Úroveň každého DAC nastavte na samotném DAC nebo posuvníky níže. Vespertine se vzorků nedotýká, takže přehrávání zůstává bit-perfect."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indstil hver DAC's niveau på selve DAC'en eller med skyderne nedenfor. Vespertine rører ikke ved samplene, så afspilningen forbliver bitperfekt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stellen Sie den Pegel jedes DAC am DAC selbst oder mit den Reglern unten ein. Vespertine verändert die Samples nicht, die Wiedergabe bleibt also bit-perfekt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ρυθμίστε το επίπεδο κάθε DAC στο ίδιο το DAC ή με τα ρυθμιστικά παρακάτω. Το Vespertine δεν αγγίζει τα δείγματα, οπότε η αναπαραγωγή παραμένει bit-perfect."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajusta el nivel de cada DAC en el propio DAC o con los controles deslizantes de abajo. Vespertine no toca las muestras, así que la reproducción sigue siendo bit-perfect."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سطح هر DAC را روی خود DAC یا با نوارهای لغزندهٔ زیر تنظیم کنید. Vespertine به نمونه‌ها دست نمی‌زند، پس پخش بیت‌به‌بیت می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aseta kunkin DAC:n taso itse DAC:ssa tai alla olevilla liukusäätimillä. Vespertine ei koske näytteisiin, joten toisto pysyy bittitarkkana."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itakda ang antas ng bawat DAC sa mismong DAC o gamit ang mga slider sa ibaba. Hindi ginagalaw ng Vespertine ang mga sample, kaya nananatiling bit-perfect ang pag-playback."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglez le niveau de chaque DAC sur le DAC lui-même ou avec les curseurs ci-dessous. Vespertine ne touche pas aux échantillons : la lecture reste bit-perfect."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "દરેક DAC નું સ્તર DAC પર અથવા નીચેના સ્લાઇડરથી સેટ કરો. Vespertine સૅમ્પલને અડતું નથી, તેથી પ્લેબેક બિટ-પરફેક્ટ જ રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saita matakin kowane DAC a kan DAC ɗin kansa ko da maɓallan zamiya na ƙasa. Vespertine ba ya taɓa samfuran sauti, don haka kunnawa yana ci gaba da zama bit-perfect."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבעו את הרמה של כל DAC ב-DAC עצמו או באמצעות המחוונים שלמטה. Vespertine לא נוגע בדגימות, ולכן ההשמעה נשארת מדויקת לסיבית."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर DAC का स्तर DAC पर या नीचे दिए स्लाइडर से सेट करें। Vespertine सैंपल को नहीं छेड़ता, इसलिए प्लेबैक बिट-परफ़ेक्ट ही रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az egyes DAC-ok szintjét magán a DAC-on vagy az alábbi csúszkákkal állítsa be. A Vespertine nem nyúl a mintákhoz, így a lejátszás bit-perfect marad."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atur level tiap DAC langsung di DAC atau dengan penggeser di bawah. Vespertine tidak menyentuh sampel, jadi pemutaran tetap bit-perfect."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imposta il livello di ogni DAC sul DAC stesso o con i cursori qui sotto. Vespertine non tocca i campioni, quindi la riproduzione resta bit-perfect."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "各DACのレベルは、DAC本体か下のスライダで設定します。Vespertineはサンプルに手を加えないため、再生はビットパーフェクトのままです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರತಿ DAC ನ ಮಟ್ಟವನ್ನು DAC ನಲ್ಲಿಯೇ ಅಥವಾ ಕೆಳಗಿನ ಸ್ಲೈಡರ್‌ಗಳಿಂದ ಹೊಂದಿಸಿ. Vespertine ಮಾದರಿಗಳನ್ನು ಮುಟ್ಟುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಪ್ಲೇಬ್ಯಾಕ್ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿಯೇ ಉಳಿಯುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "각 DAC의 레벨은 DAC 자체에서 또는 아래 슬라이더로 설정하세요. Vespertine은 샘플을 건드리지 않으므로 재생은 비트 퍼펙트로 유지됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓരോ DAC-യുടെയും നില DAC-ൽ തന്നെയോ താഴെയുള്ള സ്ലൈഡറുകൾ ഉപയോഗിച്ചോ സെറ്റ് ചെയ്യുക. Vespertine സാമ്പിളുകളിൽ തൊടുന്നില്ല, അതിനാൽ പ്ലേബാക്ക് ബിറ്റ്-പെർഫെക്റ്റ് ആയി തുടരും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रत्येक DAC ची पातळी DAC वरच किंवा खालील स्लायडरने सेट करा. Vespertine सॅम्पलला हात लावत नाही, त्यामुळे प्लेबॅक बिट-परफेक्ट राहतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tetapkan tahap setiap DAC pada DAC itu sendiri atau dengan peluncur di bawah. Vespertine tidak menyentuh sampel, jadi main balik kekal bit-perfect."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still inn nivået på hver DAC på selve DAC-en eller med glidebryterne nedenfor. Vespertine rører ikke samplene, så avspillingen forblir bitperfekt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel het niveau van elke DAC in op de DAC zelf of met de schuiven hieronder. Vespertine raakt de samples niet aan, dus het afspelen blijft bitperfect."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ DAC ਦਾ ਪੱਧਰ DAC ’ਤੇ ਹੀ ਜਾਂ ਹੇਠਾਂ ਦਿੱਤੇ ਸਲਾਈਡਰਾਂ ਨਾਲ ਸੈੱਟ ਕਰੋ। Vespertine ਸੈਂਪਲਾਂ ਨੂੰ ਨਹੀਂ ਛੇੜਦਾ, ਇਸ ਲਈ ਪਲੇਬੈਕ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਹੀ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustaw poziom każdego DAC na samym DAC lub suwakami poniżej. Vespertine nie dotyka próbek, więc odtwarzanie pozostaje bit-perfect."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajuste o nível de cada DAC no próprio DAC ou pelos controles deslizantes abaixo. O Vespertine não mexe nas amostras, então a reprodução continua bit-perfect."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Defina o nível de cada DAC no próprio DAC ou com os cursores abaixo. O Vespertine não altera as amostras, pelo que a reprodução continua bit-perfect."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setați nivelul fiecărui DAC pe DAC-ul însuși sau cu glisoarele de mai jos. Vespertine nu atinge eșantioanele, deci redarea rămâne bit-perfect."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ställ in varje DAC:s nivå på själva DAC:en eller med reglagen nedan. Vespertine rör inte samplen, så uppspelningen förblir bitperfekt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weka kiwango cha kila DAC kwenye DAC yenyewe au kwa vitelezi vilivyo hapa chini. Vespertine haigusi sampuli, kwa hivyo uchezaji unabaki bit-perfect."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒவ்வொரு DAC-இன் அளவையும் DAC-இலேயே அல்லது கீழுள்ள ஸ்லைடர்களால் அமைக்கவும். Vespertine மாதிரிகளைத் தொடுவதில்லை, எனவே இயக்கம் பிட்-பெர்ஃபெக்ட் ஆகவே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రతి DAC స్థాయిని DACలోనే లేదా కింది స్లైడర్‌లతో సెట్ చేయండి. Vespertine శాంపిల్స్‌ను ముట్టుకోదు, కాబట్టి ప్లేబ్యాక్ బిట్-పర్ఫెక్ట్‌గానే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตั้งระดับของ DAC แต่ละตัวที่ตัว DAC เองหรือด้วยแถบเลื่อนด้านล่าง Vespertine ไม่แตะต้องตัวอย่างเสียง การเล่นจึงยังคงเป็นบิตเพอร์เฟกต์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her DAC'in düzeyini DAC'in kendisinde veya aşağıdaki kaydırıcılarla ayarlayın. Vespertine örneklere dokunmaz, bu yüzden çalma bit-perfect kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Налаштуйте рівень кожного DAC на самому DAC або повзунками нижче. Vespertine не змінює відліки, тож відтворення залишається біт-у-біт."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر DAC کی سطح DAC پر ہی یا نیچے دیے گئے سلائیڈرز سے سیٹ کریں۔ Vespertine سیمپلز کو نہیں چھوتا، اس لیے پلے بیک بٹ پرفیکٹ ہی رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt mức của từng DAC trên chính DAC hoặc bằng các thanh trượt bên dưới. Vespertine không động đến mẫu âm thanh, nên việc phát vẫn bit-perfect."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 DAC 本身或使用下方滑桿設定每個 DAC 的位準。Vespertine 不會更動取樣，因此播放維持位元完美。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 DAC 本身或用下方滑块设置每个 DAC 的电平。Vespertine 不会改动采样，因此播放保持比特完美。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 DAC 本身或使用下方滑桿設定每個 DAC 的位準。Vespertine 不會更動取樣，因此播放維持位元完美。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

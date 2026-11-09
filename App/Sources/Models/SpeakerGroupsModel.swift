@@ -18,6 +18,8 @@ final class SpeakerGroupsModel {
     private(set) var lastError: String?
     /// Called after every change is written, so the engine hears of it.
     @ObservationIgnored var onChange: (() -> Void)?
+    /// Called for a group just made (created, or duplicated from another), before it is written.
+    @ObservationIgnored var onNewGroup: ((_ new: SpeakerGroup, _ copiedFrom: SpeakerGroup?) -> Void)?
     @ObservationIgnored private let store: SpeakerGroupStore
     /// Groups a newer Vespertine wrote, or that are damaged: shown as a count and written back as they were.
     @ObservationIgnored private var unreadable: [Any]
@@ -41,12 +43,17 @@ final class SpeakerGroupsModel {
     @discardableResult
     func create(_ draft: SpeakerGroupDraft) -> SpeakerGroup? {
         guard let group = draft.makeGroup() else { return nil }
+        onNewGroup?(group, nil)
         upsert(group)
         return group
     }
 
     func duplicate(_ id: UUID) {
-        if book.duplicate(id) != nil { persist() }
+        let original = book.group(id)
+        if let copy = book.duplicate(id) {
+            onNewGroup?(copy, original)
+            persist()
+        }
     }
 
     func remove(_ id: UUID) {

@@ -48,5 +48,5 @@ public enum GroupVolume {
         return true
     }
 
-    public static let note = "Each DAC's own volume is set once, here or on the DAC, and Vespertine never changes it by itself. The speakers' level trims and a master volume are digital: they stop playback being bit-perfect. The volume keys do not control a group."
+    public static let note = "Each DAC's own volume is set once, here or on the DAC, and Vespertine never changes it by itself. The speakers' level trims and a master volume are digital: they stop playback being bit-perfect. The Mac's volume keys do not control a group."
 }

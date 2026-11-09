@@ -422,6 +422,8 @@ struct VolumeControl: View {
                 .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
             }
         }
+        // Volume Up, Down or Mute on an output with no volume to move: open the note that says where to set one.
+        .onChange(of: model.volumeNoteRequests) { showOptions = true }
     }
 
     private func options(_ device: OutputDevice) -> some View {
