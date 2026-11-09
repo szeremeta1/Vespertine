@@ -128,7 +128,12 @@ public enum DeviceRestore {
     /// Puts a stream's physical format back, then its virtual format. Format changes are asynchronous: each one is read
     /// back (at most `polls` reads) and left to settle before the next, as playback does (back-to-back changes can leave
     /// a device paused for good). One already as it was isn't set again.
-    static func putBack(physical: AudioStreamBasicDescription?, virtual: AudioStreamBasicDescription?, io: StreamFormatIO, polls: Int = 150) {
+    /// Reads per format change: 50 at 10 ms, half a second, so two changes and the rate step fit the quit budget
+    /// (`QuitSequence.defaultBudget`) on a device that is slow to report.
+    static let restorePolls = 50
+
+    static func putBack(physical: AudioStreamBasicDescription?, virtual: AudioStreamBasicDescription?, io: StreamFormatIO,
+                        polls: Int = restorePolls) {
         func isBack(_ selector: AudioObjectPropertySelector, _ format: AudioStreamBasicDescription) -> Bool {
             io.read(selector).map { DeviceControl.isSameFormat($0, format) } ?? false
         }

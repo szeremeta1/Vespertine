@@ -13,6 +13,7 @@ private final class SlowStream: @unchecked Sendable {
     private var pending: [AudioObjectPropertySelector: (format: AudioStreamBasicDescription, readsLeft: Int)] = [:]
     let delay: Int
     var log: [String] = []
+    var pauses = 0
 
     init(physical: AudioStreamBasicDescription, virtual: AudioStreamBasicDescription, delay: Int) {
         formats = [kAudioStreamPropertyPhysicalFormat: physical, kAudioStreamPropertyVirtualFormat: virtual]
@@ -38,7 +39,7 @@ private final class SlowStream: @unchecked Sendable {
                 log.append("set \(Self.name(selector))")
                 pending[selector] = (format, delay)
             },
-            pause: {}, settle: { [self] in log.append("settle") })
+            pause: { [self] in pauses += 1 }, settle: { [self] in log.append("settle") })
     }
 }
 
@@ -77,7 +78,11 @@ struct DeviceRestoreTests {
     @Test("A device that never reports the change is waited for a bounded number of reads, then the next step goes ahead")
     func boundedWait() {
         let stream = SlowStream(physical: lpcm(96_000, bits: 32, float: false), virtual: lpcm(96_000, bits: 32, float: true), delay: 10_000)
-        DeviceRestore.putBack(physical: lpcm(44_100, bits: 24, float: false), virtual: lpcm(44_100, bits: 32, float: true), io: stream.io, polls: 20)
+        DeviceRestore.putBack(physical: lpcm(44_100, bits: 24, float: false), virtual: lpcm(44_100, bits: 32, float: true), io: stream.io)
         #expect(stream.log.first == "set physical" && stream.log.contains("set virtual while physical was changing"))
+        // Both changes waited for in full: 2 × 50 pauses of 10 ms, a second at most, which leaves the rate step room in the
+        // 2.5 s quit budget.
+        #expect(stream.pauses == 2 * DeviceRestore.restorePolls)
+        #expect(Double(stream.pauses) * 0.010 + 2 * 0.060 <= QuitSequence.defaultBudget / 2)
     }
 }
