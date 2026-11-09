@@ -34,8 +34,8 @@ public enum GroupMeasurement {
 
         public var description: String {
             switch self {
-            case .noSpeakers: "Put the speakers on the group's outputs in its editor, then measure."
-            case .noSpeakerOnLeader: "No speaker is on the clock leader's outputs. The timing tones play from the clock leader, the one DAC that is never resampled: move a speaker onto it, or choose another clock leader."
+            case .noSpeakers: String(localized: "Put the speakers on the group's outputs in its editor, then measure.")
+            case .noSpeakerOnLeader: String(localized: "No speaker is on the clock leader's outputs. The timing tones play from the clock leader, the one DAC that is never resampled: move a speaker onto it, or choose another clock leader.")
             }
         }
 

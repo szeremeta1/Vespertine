@@ -3,8 +3,6 @@
 // the drawing disagree. Hidden with the rest of the feature (only a group's output shows it).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Plain English with `verbatim` text: these strings join the catalog together with the screens that stay.
-//
 
 import SwiftUI
 import VespertineAudio
@@ -17,7 +15,7 @@ struct SpeakerGroupAlignmentCard: View {
         let book = model.settings.roomBook
         let state = GroupRoomProfile.drawingState(for: group, in: book)
         VStack(alignment: .leading, spacing: 8) {
-            Text(verbatim: "Speaker group · \(group.name)").font(Typeface.ui(13, weight: .semibold)).foregroundStyle(Palette.text)
+            Text("Speaker group · \(group.name)", comment: "Room Correction card title for a speaker group output: the group's name follows.").font(Typeface.ui(13, weight: .semibold)).foregroundStyle(Palette.text)
             if let warning = GroupRoomProfile.geometryWarning(for: group, in: book) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Palette.copper).accessibilityHidden(true)
@@ -29,7 +27,7 @@ struct SpeakerGroupAlignmentCard: View {
             if let label = Self.buttonTitle(state) {
                 Button { model.useDrawing(of: group) } label: { Text(verbatim: label) }
                     .controlSize(.small)
-                    .help(Text(verbatim: "Delays and levels worked out from where the speakers and the seat are drawn; no microphone needed"))
+                    .help(Text("Delays and levels worked out from where the speakers and the seat are drawn; no microphone needed"))
             }
         }
         .padding(16)
@@ -40,17 +38,17 @@ struct SpeakerGroupAlignmentCard: View {
 
     static func explanation(_ state: GroupDrawingState) -> String {
         switch state {
-        case .unavailable: "Put the speakers on the outputs in the group's editor, and the room you draw can line them up without a microphone."
-        case .notMade: "Line the speakers up from the room you drew: nearer speakers wait for the farthest and are turned down to match. No microphone needed; a measurement replaces it."
-        case .available: "A profile from the drawing is saved. It follows the drawing when you move a speaker."
-        case .inUse: "Playing with the drawing's alignment. It follows the drawing when you move a speaker."
+        case .unavailable: String(localized: "Put the speakers on the outputs in the group's editor, and the room you draw can line them up without a microphone.", comment: "Room Correction card for a speaker group.")
+        case .notMade: String(localized: "Line the speakers up from the room you drew: nearer speakers wait for the farthest and are turned down to match. No microphone needed; a measurement replaces it.", comment: "Room Correction card for a speaker group.")
+        case .available: String(localized: "A profile from the drawing is saved. It follows the drawing when you move a speaker.", comment: "Room Correction card for a speaker group.")
+        case .inUse: String(localized: "Playing with the drawing's alignment. It follows the drawing when you move a speaker.", comment: "Room Correction card for a speaker group.")
         }
     }
 
     static func buttonTitle(_ state: GroupDrawingState) -> String? {
         switch state {
-        case .notMade: "Use the Drawing"
-        case .available: "Use the Drawing Instead"
+        case .notMade: String(localized: "Use the Drawing", comment: "Button: makes a room correction profile from the speaker group's drawing.")
+        case .available: String(localized: "Use the Drawing Instead", comment: "Button: plays with the drawing's alignment instead of the measured profile.")
         case .unavailable, .inUse: nil
         }
     }

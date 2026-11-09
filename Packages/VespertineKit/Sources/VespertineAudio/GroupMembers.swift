@@ -62,9 +62,9 @@ public enum GroupMemberError: Error, Equatable, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .gone(let name): "\(name) is not connected."
-        case .heldByOther(_, let name, _): "Another app is using \(name) exclusively."
-        case .rateRefused(_, let name, let rate): "\(name) did not switch to \(Int(rate.rounded())) Hz."
+        case .gone(let name): String(localized: "\(name) is not connected.")
+        case .heldByOther(_, let name, _): String(localized: "Another app is using \(name) exclusively.")
+        case .rateRefused(_, let name, let rate): String(localized: "\(name) did not switch to \(Int(rate.rounded())) Hz.")
         }
     }
 }

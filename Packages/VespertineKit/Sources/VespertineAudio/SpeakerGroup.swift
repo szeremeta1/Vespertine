@@ -305,24 +305,24 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
 
         public var description: String {
             switch self {
-            case .emptyName: "The group needs a name."
-            case .tooFewMembers: "A group needs at least two outputs."
-            case .duplicateMember(let uid): "The output \(uid) is in the group twice."
-            case .leaderNotAMember(let uid): "The clock leader \(uid) is not one of the group's outputs."
-            case .tooManyChannels(let n): "The outputs add up to \(n) channels; a group can have \(SpeakerGroup.maxChannels)."
-            case .channelCountInvalid(let uid): "The output \(uid) has no valid channel count."
-            case .driftQualityInvalid(let uid): "The drift correction quality of \(uid) must be between 0 and 127."
-            case .skewInvalid(let uid): "The measured delay of \(uid) must be between 0 and \(Int(SpeakerGroup.delayTrimRangeMs.upperBound)) ms."
-            case .rateTrimInvalid(let uid): "The measured drift of \(uid) must be between \(Int(SpeakerGroup.Member.rateTrimRangePPM.lowerBound)) and \(Int(SpeakerGroup.Member.rateTrimRangePPM.upperBound)) parts per million."
-            case .speakerOnUnknownDevice: "A speaker is on an output that is not in the group."
-            case .channelOutOfRange: "A speaker is on an output channel its device does not have."
-            case .channelShared(let device, let channel): "Two speakers are on channel \(channel + 1) of \(device)."
-            case .roleRepeated(let role): "The \(role.rawValue) speaker is in the group twice."
-            case .positionInvalid: "A speaker's position is not a position in a room."
-            case .speakerAtListener: "A speaker is at the listener's seat."
-            case .trimInvalid: "A speaker's level or delay trim is out of range."
-            case .listenerInvalid: "The listener's seat is not a position in a room."
-            case .roomInvalid: "The room's size is not a size."
+            case .emptyName: String(localized: "The group needs a name.")
+            case .tooFewMembers: String(localized: "A group needs at least two outputs.")
+            case .duplicateMember(let uid): String(localized: "The output \(uid) is in the group twice.")
+            case .leaderNotAMember(let uid): String(localized: "The clock leader \(uid) is not one of the group's outputs.")
+            case .tooManyChannels(let n): String(localized: "The outputs add up to \(n) channels; a group can have \(SpeakerGroup.maxChannels).")
+            case .channelCountInvalid(let uid): String(localized: "The output \(uid) has no valid channel count.")
+            case .driftQualityInvalid(let uid): String(localized: "The drift correction quality of \(uid) must be between 0 and 127.")
+            case .skewInvalid(let uid): String(localized: "The measured delay of \(uid) must be between 0 and \(Int(SpeakerGroup.delayTrimRangeMs.upperBound)) ms.")
+            case .rateTrimInvalid(let uid): String(localized: "The measured drift of \(uid) must be between \(Int(SpeakerGroup.Member.rateTrimRangePPM.lowerBound)) and \(Int(SpeakerGroup.Member.rateTrimRangePPM.upperBound)) parts per million.")
+            case .speakerOnUnknownDevice: String(localized: "A speaker is on an output that is not in the group.")
+            case .channelOutOfRange: String(localized: "A speaker is on an output channel its device does not have.")
+            case .channelShared(let device, let channel): String(localized: "Two speakers are on channel \(channel + 1) of \(device).")
+            case .roleRepeated(let role): String(localized: "The \(role.rawValue) speaker is in the group twice.")
+            case .positionInvalid: String(localized: "A speaker's position is not a position in a room.")
+            case .speakerAtListener: String(localized: "A speaker is at the listener's seat.")
+            case .trimInvalid: String(localized: "A speaker's level or delay trim is out of range.")
+            case .listenerInvalid: String(localized: "The listener's seat is not a position in a room.")
+            case .roomInvalid: String(localized: "The room's size is not a size.")
             }
         }
     }
@@ -382,8 +382,8 @@ public enum SpeakerGroupError: Error, Equatable, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .newerSchema: "This speaker group was saved by a newer Vespertine."
-        case .missingSchema, .unreadable: "This speaker group couldn't be read."
+        case .newerSchema: String(localized: "This speaker group was saved by a newer Vespertine.")
+        case .missingSchema, .unreadable: String(localized: "This speaker group couldn't be read.")
         }
     }
 }

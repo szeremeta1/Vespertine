@@ -3,9 +3,6 @@
 // everyone until its switch is turned on), and every change is written at once.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// The words here are plain English for now, not in the string catalog: they go in with the screens that stay (see
-// SpeakerGroup.swift in VespertineKit).
-//
 
 import Foundation
 import Observation
@@ -75,7 +72,7 @@ final class SpeakerGroupsModel {
     static func summary(_ group: SpeakerGroup) -> String {
         let names = group.members.map(\.name).joined(separator: " + ")
         let channels = group.totalChannels
-        return "\(names) · \(channels) \(channels == 1 ? "channel" : "channels")"
+        return String(localized: "\(names) · \(channels) channels", comment: "Speaker Groups list: the group's outputs, a dot, then its channel count (plural by the count).")
     }
 
     /// Why the group can't be played yet, in a sentence, or nil when it is ready.

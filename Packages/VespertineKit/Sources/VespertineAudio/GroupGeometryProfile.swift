@@ -9,7 +9,7 @@ import Foundation
 
 public enum GroupGeometryProfile {
     /// The name of the profile made from the drawing.
-    public static let name = "From the drawing"
+    public static let name = String(localized: "From the drawing", comment: "The name of the room correction profile made from a speaker group's drawing.")
 
     /// The profile for `group` as drawn: each speaker's wait for the farthest one and its level below it, to the hundredth of a
     /// millisecond and the tenth of a dB. A speaker's own delay and level trims are not in it: the group's chain adds them
@@ -92,8 +92,10 @@ public enum GeometryCheck {
     /// The words for the room-correction window; nil when nothing disagrees.
     public static func warning(_ found: [GeometryDisagreement]) -> String? {
         guard !found.isEmpty else { return nil }
-        let list = found.map { String(format: "%@ by %.1f ms (%.0f cm)", $0.speaker.plainName, abs($0.differenceMs), $0.distanceCm) }.joined(separator: ", ")
-        return "The measurement and the drawing disagree by more than \(toleranceMs) ms: \(list). The drawing or the cabling may be off."
+        let list = found.map { item in
+            String(localized: "\(item.speaker.plainName) by \(abs(item.differenceMs).formatted(.number.precision(.fractionLength(1)))) ms (\(item.distanceCm.formatted(.number.precision(.fractionLength(0)))) cm)", comment: "One speaker in the list of speakers the measurement and the drawing disagree about: its name, the difference in milliseconds and the same difference in centimetres of air.")
+        }.formatted(.list(type: .and))
+        return String(localized: "The measurement and the drawing disagree by more than \(toleranceMs.formatted()) ms: \(list). The drawing or the cabling may be off.", comment: "Room correction for a speaker group: the tolerance in milliseconds, then the list of speakers that disagree.")
     }
 }
 

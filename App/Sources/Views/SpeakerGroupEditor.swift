@@ -2,8 +2,6 @@
 // Vespertine: Settings › Speaker Groups › Edit: one saved group. Hidden with the rest of the feature. Every change is saved at once.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Plain English with `verbatim` text: these strings join the catalog together with the screens that stay.
-//
 
 import SwiftUI
 import VespertineAudio
@@ -35,7 +33,7 @@ struct SpeakerGroupEditor: View {
                     Text(verbatim: problem).font(.caption).foregroundStyle(.orange)
                 }
                 Spacer()
-                Button { dismiss() } label: { Text(verbatim: "Done") }.keyboardShortcut(.defaultAction)
+                Button { dismiss() } label: { Text("Done") }.keyboardShortcut(.defaultAction)
             }
         }
         .padding(20)
@@ -52,34 +50,34 @@ struct ChannelMapGrid: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(verbatim: "Channels").font(.headline)
-            Text(verbatim: "Choose which speaker is on each channel of each output. Identify plays a quiet tone on that channel only. Inverted turns that speaker's signal over in playback, for a speaker wired the other way round.")
+            Text("Channels").font(.headline)
+            Text("Choose which speaker is on each channel of each output. Identify plays a quiet tone on that channel only. Inverted turns that speaker's signal over in playback, for a speaker wired the other way round.")
                 .font(.caption).foregroundStyle(.secondary)
             Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
                 GridRow {
-                    Text(verbatim: "Output channel").font(.caption).foregroundStyle(.secondary)
-                    Text(verbatim: "Speaker").font(.caption).foregroundStyle(.secondary)
-                    Text(verbatim: "Polarity").font(.caption).foregroundStyle(.secondary)
-                    Text(verbatim: "Identify").font(.caption).foregroundStyle(.secondary)
+                    Text("Output channel").font(.caption).foregroundStyle(.secondary)
+                    Text("Speaker").font(.caption).foregroundStyle(.secondary)
+                    Text("Polarity").font(.caption).foregroundStyle(.secondary)
+                    Text("Identify").font(.caption).foregroundStyle(.secondary)
                 }
                 ForEach(GroupChannelMap.rows(group)) { row in
                     GridRow {
                         Text(verbatim: row.label)
                         Picker(selection: roleBinding(row)) {
-                            Text(verbatim: "None").tag(SpeakerRole?.none)
+                            Text("None").tag(SpeakerRole?.none)
                             ForEach(roles(for: row), id: \.self) { Text(verbatim: $0.plainName).tag(SpeakerRole?.some($0)) }
-                        } label: { Text(verbatim: "Speaker on \(row.label)") }
+                        } label: { Text("Speaker on \(row.label)", comment: "Accessibility label of the picker that chooses the speaker on one output channel.") }
                         .labelsHidden()
                         .frame(width: 190)
-                        Toggle(isOn: invertedBinding(row)) { Text(verbatim: "Inverted") }
+                        Toggle(isOn: invertedBinding(row)) { Text("Inverted") }
                             .disabled(row.role == nil)
-                            .accessibilityLabel(Text(verbatim: "Invert polarity of \(row.label)"))
+                            .accessibilityLabel(Text("Invert polarity of \(row.label)", comment: "Accessibility label of the Inverted checkbox for one output channel."))
                         Button { identifier.identify(row, in: group, outputInUseUID: model.player.outputDevice?.uid) } label: {
                             Image(systemName: identifier.playing == row.aggregateChannel ? "speaker.wave.2.fill" : "speaker.wave.2")
                         }
                         .buttonStyle(.borderless)
-                        .help(Text(verbatim: "Play a quiet tone on this channel only"))
-                        .accessibilityLabel(Text(verbatim: "Identify \(row.label)"))
+                        .help(Text("Play a quiet tone on this channel only"))
+                        .accessibilityLabel(Text("Identify \(row.label)", comment: "Accessibility label of the button that plays a quiet tone on one output channel."))
                     }
                 }
             }
@@ -185,10 +183,10 @@ struct MemberVolumeView: View {
                             }
                         }
                         .frame(width: 220)
-                        .accessibilityLabel(Text(verbatim: "Volume of \(member.name)"))
-                        Text(verbatim: "\(Int(((editing[member.uid] ?? level) * 100).rounded()))%").monospacedDigit().foregroundStyle(.secondary)
+                        .accessibilityLabel(Text("Volume of \(member.name)", comment: "Accessibility label of one output's volume slider."))
+                        Text(Double(editing[member.uid] ?? level), format: .percent.precision(.fractionLength(0))).monospacedDigit().foregroundStyle(.secondary)
                     } else {
-                        Text(verbatim: "No volume to set here (use the DAC's own control)").font(.caption).foregroundStyle(.secondary)
+                        Text("No volume to set here (use the DAC's own control)").font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
