@@ -218,7 +218,7 @@
           "SACD-schijfkopieën (<span class=\"mono\">.iso</span>) spelen hun stereo- en 5.1-gebied af, met of zonder DST-compressie, met titels uit de eigen tekst van de schijf. DST wordt teruggedecodeerd naar precies de oorspronkelijke DSD, zodat stereo als native DSD via DoP naar je DAC gaat als de DAC dat ondersteunt, en 5.1 op AirPods speelt via de renderer voor ruimtelijke audio van Apple. De LPCM-muziek op DVD-Video-schijven (een <span class=\"mono\">.iso</span> of een map <span class=\"mono\">VIDEO_TS</span>) speelt bit voor bit af, één album per titel en een track per hoofdstuk."
         ],
         "list": [
-          "Bit voor bit gelijk aan sacd_extract op twee echte schijven. Schijven met een 5.0-gebied, met alleen een meerkanaalsgebied, of met DSD128 en hoger zijn tot nu toe alleen getest met gesynthetiseerde testschijfkopieën.",
+          "SACD-schijfkopieën zijn getest met gesynthetiseerde schijven, waaronder schijven met een 5.0-gebied, met alleen een meerkanaalsgebied, of met DSD128 en hoger.",
           "DSF en DSDIFF van DSD64 tot DSD512, inclusief DSDIFF met DST-compressie, gaan als DoP naar DAC’s die de dragerfrequentie aankunnen (tot DSD256 op de geprobeerde DAC’s), of worden omgezet naar PCM met een hoge samplefrequentie. DoP werkt volgens meldingen tot DSD256 op een Fosi Audio ZD3 en tot DSD128 op een FiiO K11 (meldingen van de ontwikkelaar, zonder opname); DSD512 via DoP is niet getest op hardware.",
           "DVD-Video LPCM op 16, 20 en 24 bit, 48 en 96 kHz, tot 8 kanalen. DVD-Audio wordt niet ondersteund, en versleutelde (CSS-)schijven vereisen een ontsleutelde kopie."
         ],

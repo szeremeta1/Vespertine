@@ -218,7 +218,7 @@
           "Z obrazów SACD <span class=\"mono\">.iso</span> odtwarzane są obszary stereo i 5.1, skompresowane DST lub nie, z tytułami z tekstu zapisanego na samej płycie. DST jest dekodowany z powrotem do dokładnie tego samego DSD, więc stereo trafia do DAC-a jako natywne DSD przez DoP, jeśli DAC to obsługuje, a 5.1 gra na AirPods przez renderer Dźwięku przestrzennego Apple. Muzyka LPCM z płyt DVD-Video (<span class=\"mono\">.iso</span> lub folder <span class=\"mono\">VIDEO_TS</span>) jest odtwarzana bit w bit: jeden album na tytuł i jedna ścieżka na rozdział."
         ],
         "list": [
-          "Na dwóch prawdziwych płytach wynik zgadza się bit w bit z sacd_extract. Płyty z obszarem 5.0, tylko z obszarem wielokanałowym lub w DSD128 i wyżej są jak dotąd sprawdzone wyłącznie na syntetycznych obrazach testowych.",
+          "Obrazy SACD przetestowano na syntetycznych płytach, w tym na płytach z obszarem 5.0, tylko z obszarem wielokanałowym lub w DSD128 i wyżej.",
           "DSF i DSDIFF od DSD64 do DSD512, w tym DSDIFF skompresowany DST, trafiają przez DoP do DAC-ów obsługujących częstotliwość nośnej (do DSD256 na sprawdzonych DAC-ach) albo są konwertowane do PCM o wysokiej częstotliwości. według zgłoszeń DoP działa do DSD256 na Fosi Audio ZD3 i do DSD128 na FiiO K11 (zgłoszenia dewelopera, bez nagrania); DSD512 przez DoP nie zostało przetestowane na sprzęcie.",
           "DVD-Video LPCM w rozdzielczości 16, 20 i 24 bitów, 48 i 96 kHz, do 8 kanałów. DVD-Audio nie jest obsługiwane, a płyty szyfrowane (CSS) wymagają odszyfrowanej kopii."
         ],

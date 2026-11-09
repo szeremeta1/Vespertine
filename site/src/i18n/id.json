@@ -218,7 +218,7 @@
           "Image SACD <span class=\"mono\">.iso</span> memutar area stereo dan 5.1-nya, baik terkompresi DST maupun tidak, dengan judul dari teks bawaan disk itu sendiri. DST didekode kembali menjadi DSD yang persis sama, sehingga stereo dikirim ke DAC Anda sebagai DSD native melalui DoP jika DAC mendukungnya, dan 5.1 diputar melalui perender Audio Spasial milik Apple di AirPods. Musik LPCM pada disk DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) diputar bit demi bit, satu album per judul dan satu trek per chapter."
         ],
         "list": [
-          "Identik bit demi bit dengan hasil sacd_extract pada dua disk sungguhan. Disk dengan area 5.0, yang hanya memiliki area multisaluran, atau DSD128 ke atas sejauh ini baru dicakup oleh image uji sintetis.",
+          "Image SACD diuji dengan disk sintetis, termasuk yang memiliki area 5.0, hanya area multisaluran, atau DSD128 ke atas.",
           "DSF dan DSDIFF dari DSD64 hingga DSD512, termasuk DSDIFF terkompresi DST, dikirim sebagai DoP ke DAC yang menerima laju carrier-nya (hingga DSD256 pada DAC yang dicoba), atau dikonversi ke PCM laju tinggi. DoP dilaporkan berfungsi hingga DSD256 pada Fosi Audio ZD3 dan hingga DSD128 pada FiiO K11 (laporan pengembang, tanpa rekaman); DSD512 melalui DoP belum diuji pada perangkat keras.",
           "DVD-Video LPCM pada 16, 20, dan 24 bit, 48 dan 96 kHz, hingga 8 saluran. DVD-Audio tidak didukung, dan disk terenkripsi (CSS) memerlukan salinan yang sudah didekripsi."
         ],

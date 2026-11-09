@@ -218,7 +218,7 @@
           "Obrazy SACD <span class=\"mono\">.iso</span> přehrávají svou stereo i 5.1 oblast, s kompresí DST i bez ní, s názvy převzatými z textu samotného disku. DST se dekóduje zpět přesně na původní DSD, takže stereo jde do vašeho DAC jako nativní DSD přes DoP, pokud to DAC podporuje, a 5.1 hraje na AirPods přes renderer prostorového zvuku od Apple. Hudba v LPCM na discích DVD-Video (obraz <span class=\"mono\">.iso</span> nebo složka <span class=\"mono\">VIDEO_TS</span>) se přehrává bit po bitu, jedno album na titul a jedna stopa na kapitolu."
         ],
         "list": [
-          "Na dvou skutečných discích se výstup bit po bitu shodoval se sacd_extract. Disky s oblastí 5.0, pouze s vícekanálovou oblastí nebo s DSD128 a výše zatím pokrývají jen syntetické testovací obrazy.",
+          "Obrazy SACD jsou testovány se syntetickými disky, včetně disků s oblastí 5.0, pouze s vícekanálovou oblastí nebo s DSD128 a výše.",
           "DSF a DSDIFF od DSD64 po DSD512, včetně DSDIFF s kompresí DST, jdou jako DoP do DAC, které přijímají frekvenci nosného signálu (až DSD256 u vyzkoušených DAC), nebo se převedou na PCM s vysokou vzorkovací frekvencí. DoP podle hlášení funguje až do DSD256 na Fosi Audio ZD3 a až do DSD128 na FiiO K11 (hlášení vývojáře, bez záznamu); DSD512 přes DoP nebylo na hardwaru otestováno.",
           "DVD-Video LPCM v 16, 20 a 24 bitech, při 48 a 96 kHz, až 8 kanálů. DVD-Audio podporováno není a šifrované disky (CSS) vyžadují dešifrovanou kopii."
         ],

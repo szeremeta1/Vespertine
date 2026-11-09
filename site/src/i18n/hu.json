@@ -218,7 +218,7 @@
           "Az SACD <span class=\"mono\">.iso</span> lemezképek sztereó és 5.1-es területei DST-tömörítéssel vagy anélkül is lejátszhatók, a címeket a lemez saját szöveges adatai adják. A DST dekódolása pontosan visszaállítja a DSD-t, így a sztereó jel natív DSD formájában, DoP-on jut a DAC-ra, ha az támogatja, az 5.1 pedig AirPodson az Apple Térhatású hang renderelőjén keresztül szólal meg. A DVD-Video-lemezek LPCM-zenéje (<span class=\"mono\">.iso</span> fájlból vagy <span class=\"mono\">VIDEO_TS</span> mappából) bitre pontosan szólal meg; minden DVD-cím egy albumként, minden fejezet egy számként jelenik meg."
         ],
         "list": [
-          "Két valódi lemezen bitre pontosan egyezett a sacd_extract kimenetével. Az 5.0-s területtel, kizárólag többcsatornás területtel, illetve DSD128 vagy magasabb formátummal rendelkező lemezeket eddig csak mesterségesen előállított tesztlemezképekkel ellenőriztük.",
+          "Az SACD-lemezképeket szintetizált lemezekkel teszteltük, köztük 5.0-s területtel, kizárólag többcsatornás területtel, illetve DSD128 vagy magasabb formátummal rendelkezőkkel.",
           "A DSF és DSDIFF DSD64-től DSD512-ig, a DST-tömörítésű DSDIFF-et is beleértve, DoP-ként jut a vivőjel mintavételi frekvenciáját fogadó DAC-okra (a kipróbált DAC-okon DSD256-ig), vagy magas mintavételi frekvenciájú PCM-mé alakul. A jelentések szerint a DoP egy Fosi Audio ZD3 eszközön DSD256-ig, egy FiiO K11 eszközön DSD128-ig működik (fejlesztői jelentések, felvétel nélkül); a DoP-n keresztüli DSD512-t hardveren nem teszteltük.",
           "DVD-Video LPCM 16, 20 és 24 biten, 48 és 96 kHz-en, legfeljebb 8 csatornával. A DVD-Audio nem támogatott, a titkosított (CSS) lemezekhez pedig visszafejtett másolat szükséges."
         ],

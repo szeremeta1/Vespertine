@@ -218,7 +218,7 @@
           "Imej SACD <span class=\"mono\">.iso</span> memainkan kawasan stereo dan 5.1, sama ada dimampatkan DST atau tidak, dengan tajuk daripada teks cakera itu sendiri. DST dinyahkod kembali kepada DSD yang tepat, jadi stereo dihantar ke DAC anda sebagai DSD asli melalui DoP jika DAC menyokongnya, dan 5.1 dimainkan melalui perender Audio Ruang Apple pada AirPods. Muzik LPCM pada cakera DVD-Video (<span class=\"mono\">.iso</span> atau folder <span class=\"mono\">VIDEO_TS</span>) dimainkan bit demi bit, satu album bagi setiap tajuk dan satu trek bagi setiap bab."
         ],
         "list": [
-          "Sepadan dengan sacd_extract bit demi bit pada dua cakera sebenar. Cakera dengan kawasan 5.0, hanya kawasan berbilang saluran, atau DSD128 ke atas setakat ini hanya diliputi oleh imej ujian sintetik.",
+          "Imej SACD diuji dengan cakera sintesis, termasuk cakera dengan kawasan 5.0, hanya kawasan berbilang saluran, atau DSD128 ke atas.",
           "DSF dan DSDIFF daripada DSD64 hingga DSD512, termasuk DSDIFF yang dimampatkan DST, dihantar sebagai DoP ke DAC yang menerima kadar pembawa (sehingga DSD256 pada DAC yang dicuba), atau ditukar kepada PCM berkadar tinggi. DoP dilaporkan berfungsi sehingga DSD256 pada Fosi Audio ZD3 dan sehingga DSD128 pada FiiO K11 (laporan pembangun, tiada tangkapan); DSD512 melalui DoP belum diuji pada perkakasan.",
           "DVD-Video LPCM pada 16, 20 dan 24 bit, 48 dan 96 kHz, sehingga 8 saluran. DVD-Audio tidak disokong, dan cakera yang disulitkan (CSS) memerlukan salinan yang telah dinyahsulit."
         ],

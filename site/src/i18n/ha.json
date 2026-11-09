@@ -218,7 +218,7 @@
           "Kwafin SACD <span class=\"mono\">.iso</span> yana kunna sassan stereo da 5.1 nasa, ko an matse su da DST ko ba a matse su ba, tare da sunaye daga rubutun da ke cikin faifan kansa. Ana warware DST zuwa ainihin DSD ɗin, don haka stereo yana zuwa DAC ɗinku a matsayin DSD na asali ta DoP idan DAC yana tallafa masa, kuma 5.1 yana kunnawa ta na'urar sarrafa Spatial Audio ta Apple a AirPods. Kiɗan LPCM a faifan DVD-Video (<span class=\"mono\">.iso</span> ko foldar <span class=\"mono\">VIDEO_TS</span>) yana kunnawa daidai bit da bit, kundi ɗaya ga kowane take da waƙa ɗaya ga kowane babi."
         ],
         "list": [
-          "Ya yi daidai bit da bit da sacd_extract a faifai biyu na gaske. Faifai masu sashen 5.0, masu sashen tashoshi da yawa kawai, ko na DSD128 da sama, an gwada su da kwafin faifan gwaji na ƙirƙira kawai ya zuwa yanzu.",
+          "An gwada kwafin faifan SACD da faifan gwaji na ƙirƙira, har da masu sashen 5.0, masu sashen tashoshi da yawa kawai, ko na DSD128 da sama.",
           "DSF da DSDIFF daga DSD64 zuwa DSD512, har da DSDIFF da aka matse da DST, suna fita a matsayin DoP zuwa DAC masu karɓar ƙimar samfurin siginar ɗauka (har zuwa DSD256 a DAC ɗin da aka gwada), ko su koma PCM mai ƙimar samfuri mai yawa. Ana ba da rahoton cewa DoP yana aiki har zuwa DSD256 a Fosi Audio ZD3 da kuma har zuwa DSD128 a FiiO K11 (rahotannin mai haɓakawa, babu rikodin shaida); ba a gwada DSD512 ta DoP a kan na'urori ba.",
           "DVD-Video LPCM na bit 16, 20 da 24, a 48 da 96 kHz, har zuwa tashoshi 8. Ba a tallafa wa DVD-Audio ba, kuma faifai masu ɓoyayyen bayani (CSS) suna buƙatar kwafin da aka warware ɓoyayyen bayaninsa."
         ],

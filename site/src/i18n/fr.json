@@ -218,7 +218,7 @@
           "Dans les images SACD <span class=\"mono\">.iso</span>, les zones stéréo et 5.1 sont lues, compressées en DST ou non, avec les titres tirés du texte du disque lui-même. Le DST est décodé pour retrouver exactement le DSD d’origine : la stéréo part vers votre DAC en DSD natif via DoP lorsque le DAC le prend en charge, et le 5.1 se lit via le moteur de rendu d’audio spatial d’Apple sur AirPods. La musique LPCM des disques DVD-Video (une image <span class=\"mono\">.iso</span> ou un dossier <span class=\"mono\">VIDEO_TS</span>) est lue bit pour bit, avec un album par titre et une piste par chapitre."
         ],
         "list": [
-          "Identique bit pour bit à sacd_extract sur deux vrais disques. Les disques avec une zone 5.0, avec uniquement une zone multicanale, ou en DSD128 et au-delà ne sont couverts pour l’instant que par des images de test synthétisées.",
+          "Les images SACD sont testées avec des disques synthétisés, y compris des disques avec une zone 5.0, avec uniquement une zone multicanale, ou en DSD128 et au-delà.",
           "Les DSF et DSDIFF du DSD64 au DSD512, DSDIFF compressés en DST compris, sortent en DoP vers les DAC qui acceptent la fréquence porteuse (jusqu’au DSD256 sur les DAC essayés), ou sont convertis en PCM à haute fréquence d’échantillonnage. Le DoP serait fonctionnel jusqu’au DSD256 sur un Fosi Audio ZD3 et jusqu’au DSD128 sur un FiiO K11 (rapports du développeur, sans capture) ; le DSD512 en DoP n’a pas été testé sur du matériel.",
           "DVD-Video LPCM en 16, 20 et 24 bits, à 48 et 96 kHz, jusqu’à 8 canaux. Le DVD-Audio n’est pas pris en charge, et les disques chiffrés (CSS) nécessitent une copie déchiffrée."
         ],

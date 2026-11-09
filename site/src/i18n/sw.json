@@ -218,7 +218,7 @@
           "Nakala za SACD za <span class=\"mono\">.iso</span> hucheza sehemu zake za stereo na 5.1, zikiwa zimebanwa kwa DST au bila kubanwa, zikipewa majina kutoka kwenye maandishi ya diski yenyewe. DST husimbuliwa kurudi kwenye DSD ileile kamili, hivyo stereo huenda kwa DAC yako kama DSD asilia kupitia DoP pale DAC inapoiunga mkono, na 5.1 hucheza kupitia kichakataji cha Spatial Audio cha Apple kwenye AirPods. Muziki wa LPCM kwenye diski za DVD-Video (<span class=\"mono\">.iso</span> au folda ya <span class=\"mono\">VIDEO_TS</span>) hucheza biti kwa biti, albamu moja kwa kila kichwa cha DVD na wimbo mmoja kwa kila sura yake."
         ],
         "list": [
-          "Matokeo yamelingana na sacd_extract biti kwa biti kwenye diski mbili halisi. Diski zenye eneo la 5.0, zenye eneo la chaneli nyingi pekee, au DSD128 na zaidi, hadi sasa zimejaribiwa tu kwa nakala za majaribio zilizotengenezwa kisintetiki.",
+          "Nakala za SACD zimejaribiwa kwa diski zilizotengenezwa kisintetiki, ikiwemo zenye eneo la 5.0, zenye eneo la chaneli nyingi pekee, au DSD128 na zaidi.",
           "DSF na DSDIFF kuanzia DSD64 hadi DSD512, ikiwemo DSDIFF iliyobanwa kwa DST, hutoka kama DoP kwa DAC zinazopokea kiwango cha carrier (hadi DSD256 kwenye DAC zilizojaribiwa), au hugeuzwa kuwa PCM ya kiwango cha juu cha sampuli. Inaripotiwa kuwa DoP hufanya kazi hadi DSD256 kwenye Fosi Audio ZD3 na hadi DSD128 kwenye FiiO K11 (ripoti za msanidi, bila rekodi); DSD512 kupitia DoP haijajaribiwa kwenye maunzi.",
           "DVD-Video LPCM ya biti 16, 20 na 24, 48 na 96 kHz, hadi chaneli 8. DVD-Audio haitumiki, na diski zilizosimbwa kwa njia fiche (CSS) zinahitaji nakala iliyoondolewa usimbaji fiche."
         ],

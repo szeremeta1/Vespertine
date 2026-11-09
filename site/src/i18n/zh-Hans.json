@@ -218,7 +218,7 @@
           "SACD <span class=\"mono\">.iso</span> 映像可播放其立体声区和 5.1 区，无论是否经过 DST 压缩，并以光盘自带的文本作为标题。DST 会被解码还原为完全一致的 DSD，因此在 DAC 支持的情况下，立体声会通过 DoP 以原生 DSD 送往你的 DAC，5.1 则通过 Apple 的空间音频渲染器在 AirPods 上播放。DVD-Video 光盘（<span class=\"mono\">.iso</span> 或 <span class=\"mono\">VIDEO_TS</span> 文件夹）上的 LPCM 音乐会逐位原样播放，每个标题对应一张专辑，每个章节对应一首曲目。"
         ],
         "list": [
-          "在两张真实光盘上与 sacd_extract 的结果逐位一致。带 5.0 区、仅有多声道区或 DSD128 及以上的光盘，目前仅通过合成测试映像覆盖。",
+          "SACD 映像已用合成光盘测试，包括带 5.0 区、仅有多声道区或 DSD128 及以上的光盘。",
           "从 DSD64 到 DSD512 的 DSF 和 DSDIFF（包括 DST 压缩的 DSDIFF）会以 DoP 发送给支持相应载波采样率的 DAC（在试用过的 DAC 上最高至 DSD256），或转换为高采样率 PCM。据报告，DoP 在 Fosi Audio ZD3 上可用至 DSD256，在 FiiO K11 上可用至 DSD128（开发者报告，无采集记录）；通过 DoP 传输 DSD512 尚未在硬件上测试。",
           "DVD-Video LPCM，支持 16、20 和 24 位，48 和 96 kHz，最多 8 个声道。不支持 DVD-Audio，加密（CSS）光盘需要使用解密后的副本。"
         ],

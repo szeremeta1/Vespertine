@@ -218,7 +218,7 @@
           "SACD-avbilder i formatet <span class=\"mono\">.iso</span> spelar sina stereo- och 5.1-områden, DST-komprimerade eller okomprimerade, med titlar från skivans egen text. DST avkodas tillbaka till exakt samma DSD, så stereo går till din DAC som inbyggt DSD via DoP där DAC:en stöder det, och 5.1 spelas via Apples renderare för rumsligt ljud i AirPods. LPCM-musiken på DVD-Video-skivor (en <span class=\"mono\">.iso</span> eller en <span class=\"mono\">VIDEO_TS</span>-mapp) spelas bit för bit, ett album per titel och ett spår per kapitel."
         ],
         "list": [
-          "Identiskt bit för bit med sacd_extract på två riktiga skivor. Skivor med ett 5.0-område, bara ett flerkanalsområde, eller DSD128 och uppåt täcks hittills bara av syntetiserade testavbilder.",
+          "SACD-avbilder har testats med syntetiserade skivor, bland annat skivor med ett 5.0-område, bara ett flerkanalsområde eller DSD128 och uppåt.",
           "DSF och DSDIFF från DSD64 till DSD512, inklusive DST-komprimerad DSDIFF, går ut som DoP till DAC:ar som tar emot bärarfrekvensen (upp till DSD256 på de DAC:ar som prövats), eller konverteras till PCM med hög samplingsfrekvens. DoP rapporteras fungera upp till DSD256 på en Fosi Audio ZD3 och upp till DSD128 på en FiiO K11 (utvecklarens rapporter, ingen inspelning); DSD512 via DoP är otestat på hårdvara.",
           "DVD-Video LPCM i 16, 20 och 24 bitar, 48 och 96 kHz, upp till 8 kanaler. DVD-Audio stöds inte, och krypterade skivor (CSS) kräver en dekrypterad kopia."
         ],

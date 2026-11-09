@@ -218,7 +218,7 @@
           "SACD-levykuvista (<span class=\"mono\">.iso</span>) soivat stereo- ja 5.1-alueet, DST-pakattuina tai pakkaamattomina, ja nimet tulevat levyn omista tekstitiedoista. DST puretaan takaisin täsmälleen alkuperäiseksi DSD:ksi, joten stereo menee DAC:lle natiivina DSD:nä DoP:n kautta, jos DAC tukee sitä, ja 5.1 soi AirPods-kuulokkeilla Applen tilaäänirenderöijän kautta. DVD-Video-levyjen LPCM-musiikki (<span class=\"mono\">.iso</span> tai <span class=\"mono\">VIDEO_TS</span>-kansio) soi bitti bitiltä, yksi albumi nimikettä ja yksi raita lukua kohden."
         ],
         "list": [
-          "Tulos vastasi sacd_extractin tulosta bitti bitiltä kahdella oikealla levyllä. Levyt, joilla on 5.0-alue, pelkkä monikanava-alue tai DSD128 tai sitä korkeampi, on toistaiseksi katettu vain synteettisillä testilevykuvilla.",
+          "SACD-levykuvat on testattu synteettisillä levyillä, myös sellaisilla, joilla on 5.0-alue, pelkkä monikanava-alue tai DSD128 tai sitä korkeampi.",
           "DSF ja DSDIFF DSD64:stä DSD512:een, myös DST-pakattu DSDIFF, lähtevät DoP:nä DAC-laitteille, jotka tukevat kantoaaltotaajuutta (DSD256:een asti kokeilluilla DAC-laitteilla), tai muunnetaan korkean näytteenottotaajuuden PCM:ksi. DoP:n raportoidaan toimivan Fosi Audio ZD3:lla DSD256:een asti ja FiiO K11:llä DSD128:aan asti (kehittäjän raportit, ei tallennetta). DSD512:ta DoP:n kautta ei ole testattu laitteistolla.",
           "DVD-Video LPCM 16, 20 ja 24 bitillä, 48 ja 96 kHz:llä, enintään 8 kanavaa. DVD-Audiota ei tueta, ja salatuista (CSS) levyistä tarvitaan salauksesta purettu kopio."
         ],

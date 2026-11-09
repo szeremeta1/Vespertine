@@ -218,7 +218,7 @@
           "Ảnh đĩa SACD <span class=\"mono\">.iso</span> phát được cả vùng stereo lẫn vùng 5.1, dù nén DST hay không nén, với tên lấy từ chính văn bản trên đĩa. DST được giải mã trở lại chính xác dòng DSD ban đầu, nên phần stereo được gửi tới DAC của bạn dưới dạng DSD gốc qua DoP nếu DAC hỗ trợ, còn 5.1 phát qua bộ kết xuất Âm thanh không gian của Apple trên AirPods. Nhạc LPCM trên đĩa DVD-Video (một tệp <span class=\"mono\">.iso</span> hoặc thư mục <span class=\"mono\">VIDEO_TS</span>) được phát chính xác từng bit, mỗi tiêu đề là một album và mỗi chương là một bản nhạc."
         ],
         "list": [
-          "Khớp từng bit với sacd_extract trên hai đĩa thật. Các đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên cho đến nay mới chỉ được kiểm tra bằng ảnh đĩa thử nghiệm tổng hợp.",
+          "Ảnh đĩa SACD đã được kiểm thử bằng đĩa tổng hợp, gồm cả đĩa có vùng 5.0, chỉ có vùng đa kênh, hoặc từ DSD128 trở lên.",
           "DSF và DSDIFF từ DSD64 đến DSD512, kể cả DSDIFF nén DST, được xuất dưới dạng DoP tới những DAC nhận được tần số sóng mang (tới DSD256 trên các DAC đã thử), hoặc được chuyển đổi thành PCM tần số cao. DoP được báo cáo là hoạt động tới DSD256 trên Fosi Audio ZD3 và tới DSD128 trên FiiO K11 (báo cáo của nhà phát triển, không có bản ghi); DSD512 qua DoP chưa được kiểm tra trên phần cứng.",
           "DVD-Video LPCM ở 16, 20 và 24 bit, 48 và 96 kHz, tối đa 8 kênh. DVD-Audio không được hỗ trợ, và đĩa mã hóa (CSS) cần một bản sao đã giải mã."
         ],
