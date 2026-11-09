@@ -1,7 +1,9 @@
 //
 // Vespertine: an output unplugged mid-song and plugged back in, through the engine's device seams (`outputListing`,
 // `sessionFactory`): no Core Audio device and no sound. Everything the rig plays through is its own (cache, share gate,
-// share), so suites running beside it (stalled shares, the shared cache) can't hold it up.
+// share), so suites running beside it (stalled shares, the shared cache) can't hold it up. Each scenario runs on a thread
+// of its own and records what it saw (see RigThreadSupport.swift): a test task that waits with `Task.sleep` resumes on one
+// of Swift's few cooperative threads, late when other suites hold them all. Waits are on conditions, with generous patience.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -69,20 +71,44 @@ private final class DeviceLossRig: @unchecked Sendable {
     /// Something else changed in the device list (another device came or went); the DAC is still there.
     func otherDeviceChanged() { engine.devicesChanged() }
 
-    /// Waits until `condition` holds of the snapshot (false on timeout).
-    func wait(timeout: Double = 10, _ condition: (EngineSnapshot) -> Bool) async -> Bool {
+    /// Runs `script` on a thread of its own and returns what it returns, without holding a cooperative thread meanwhile.
+    func runScript<T: Sendable>(_ script: @escaping @Sendable (DeviceLossRig) throws -> T) async throws -> T {
+        try await withCheckedThrowingContinuation { continuation in
+            let thread = Thread { continuation.resume(with: Result { try script(self) }) }
+            thread.name = "Device loss script"
+            thread.start()
+        }
+    }
+
+    /// For a script: waits until `condition` holds of the snapshot; false only when it still doesn't after `timeout`.
+    func wait(timeout: Double = 60, _ condition: (EngineSnapshot) -> Bool) -> Bool {
         let end = Date().addingTimeInterval(timeout)
         while Date() < end {
             if condition(engine.snapshot) { return true }
-            try? await Task.sleep(for: .milliseconds(10))
+            Thread.sleep(forTimeInterval: 0.005)
         }
-        return false
+        return condition(engine.snapshot)
     }
 
-    func playing() async -> Bool {
+    /// For a script: plays the song and waits until it is heard moving.
+    func playing() -> Bool {
         engine.play(item)
-        return await wait { $0.state == .playing && $0.position > 0.2 }
+        return wait { $0.state == .playing && $0.position > 0.2 }
     }
+
+    func sleep(ms: Int) { Thread.sleep(forTimeInterval: Double(ms) / 1000) }
+}
+
+/// What a scenario saw, judged by the test afterwards.
+private struct Seen: Sendable {
+    var playing = false
+    var condition = false
+    var laterState: PlaybackState?
+    var waiting: String?
+    var stoppedAt = 0.0
+    var resumed = false
+    var positionAfter = 0.0
+    var opened: [String] = []
 }
 
 @Suite("An output unplugged mid-song")
@@ -90,47 +116,81 @@ struct DeviceLossTests {
     @Test("A device list change that leaves the output connected doesn't interrupt the song")
     func stillConnected() async throws {
         let rig = try DeviceLossRig(chosen: true)
-        #expect(await rig.playing())
-        let before = rig.engine.snapshot.position
-        rig.otherDeviceChanged()
-        #expect(await rig.wait { $0.state == .playing && $0.position > before + 0.5 })
-        #expect(rig.engine.snapshot.waitingForDevice == nil)
-        #expect(rig.opened.withLock { $0 } == ["sim-dac"])
+        let seen = try await rig.runScript { rig -> Seen in
+            var seen = Seen()
+            seen.playing = rig.playing()
+            let before = rig.engine.snapshot.position
+            rig.otherDeviceChanged()
+            seen.condition = rig.wait { $0.state == .playing && $0.position > before + 0.5 }
+            seen.waiting = rig.engine.snapshot.waitingForDevice
+            seen.opened = rig.opened.withLock { $0 }
+            return seen
+        }
+        #expect(seen.playing)
+        #expect(seen.condition)
+        #expect(seen.waiting == nil)
+        #expect(seen.opened == ["sim-dac"])
     }
 
     @Test("The chosen output unplugged mid-song: playback waits for it, says so, and never moves to another output")
     func chosenUnplugged() async throws {
         let rig = try DeviceLossRig(chosen: true)
-        #expect(await rig.playing())
-        rig.unplug()
-        #expect(await rig.wait { $0.state == .paused && $0.waitingForDevice == "Downstairs DAC" })
-        try await Task.sleep(for: .milliseconds(500))
-        #expect(rig.engine.snapshot.state == .paused)
-        #expect(rig.opened.withLock { $0 } == ["sim-dac"], "nothing opened on the other output while waiting")
+        let seen = try await rig.runScript { rig -> Seen in
+            var seen = Seen()
+            seen.playing = rig.playing()
+            rig.unplug()
+            seen.condition = rig.wait { $0.state == .paused && $0.waitingForDevice == "Downstairs DAC" }
+            rig.sleep(ms: 500)
+            seen.laterState = rig.engine.snapshot.state
+            seen.opened = rig.opened.withLock { $0 }
+            return seen
+        }
+        #expect(seen.playing)
+        #expect(seen.condition)
+        #expect(seen.laterState == .paused)
+        #expect(seen.opened == ["sim-dac"], "nothing opened on the other output while waiting")
     }
 
     @Test("Plugged back in, the song carries on from where it stopped, on the same output")
     func replugged() async throws {
         let rig = try DeviceLossRig(chosen: true)
-        #expect(await rig.playing())
-        try await Task.sleep(for: .milliseconds(300))
-        rig.unplug()
-        #expect(await rig.wait { $0.state == .paused && $0.waitingForDevice != nil })
-        let stoppedAt = rig.engine.snapshot.position
-        rig.replug()
-        #expect(await rig.wait { $0.state == .playing && $0.waitingForDevice == nil && $0.position > stoppedAt + 0.2 })
-        #expect(rig.engine.snapshot.position >= stoppedAt, "resumed where it stopped, not from the start")
-        #expect(rig.opened.withLock { $0 } == ["sim-dac", "sim-dac"])
+        let seen = try await rig.runScript { rig -> Seen in
+            var seen = Seen()
+            seen.playing = rig.playing()
+            rig.sleep(ms: 300)
+            rig.unplug()
+            seen.condition = rig.wait { $0.state == .paused && $0.waitingForDevice != nil }
+            seen.stoppedAt = rig.engine.snapshot.position
+            rig.replug()
+            let stoppedAt = seen.stoppedAt
+            seen.resumed = rig.wait { $0.state == .playing && $0.waitingForDevice == nil && $0.position > stoppedAt + 0.2 }
+            seen.positionAfter = rig.engine.snapshot.position
+            seen.opened = rig.opened.withLock { $0 }
+            return seen
+        }
+        #expect(seen.playing)
+        #expect(seen.condition)
+        #expect(seen.resumed)
+        #expect(seen.positionAfter >= seen.stoppedAt, "resumed where it stopped, not from the start")
+        #expect(seen.opened == ["sim-dac", "sim-dac"])
     }
 
     @Test("Following the Mac's sound output: the output unplugged mid-song pauses there, never moving to the new default")
     func followingDefaultUnplugged() async throws {
         let rig = try DeviceLossRig(chosen: false)
-        #expect(await rig.playing())
-        rig.unplug()
-        #expect(await rig.wait { $0.state == .paused })
-        try await Task.sleep(for: .milliseconds(500))
-        #expect(rig.engine.snapshot.state == .paused)
-        #expect(rig.opened.withLock { $0 } == ["sim-dac"], "the song isn't moved to another output by itself")
+        let seen = try await rig.runScript { rig -> Seen in
+            var seen = Seen()
+            seen.playing = rig.playing()
+            rig.unplug()
+            seen.condition = rig.wait { $0.state == .paused }
+            rig.sleep(ms: 500)
+            seen.laterState = rig.engine.snapshot.state
+            seen.opened = rig.opened.withLock { $0 }
+            return seen
+        }
+        #expect(seen.playing)
+        #expect(seen.condition)
+        #expect(seen.laterState == .paused)
+        #expect(seen.opened == ["sim-dac"], "the song isn't moved to another output by itself")
     }
 }
