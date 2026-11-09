@@ -59,8 +59,9 @@ final class RoomMeasureModel {
     var draft: RoomProfile?
     /// The output to measure (Vespertine's own); nil or not connected: the Mac's default output.
     @ObservationIgnored var preferredOutputUID: String?
-    /// Pauses Vespertine's playback before the measurement takes the output.
-    @ObservationIgnored var pausePlayback: (@MainActor () -> Void)?
+    /// Pauses Vespertine's playback before the measurement takes the output (for a group, stops it and waits until the engine
+    /// has let the DACs go). The measurement starts when it returns.
+    @ObservationIgnored var pausePlayback: (@MainActor () async -> Void)?
     /// A speaker group to measure instead of a single output: the group, and its members as Core Audio lists them, in the group's
     /// order. nil for a single output. The layout and channel map then come from the group, not from the picker.
     @ObservationIgnored var groupTarget: (group: SpeakerGroup, members: [OutputDevice])?
@@ -110,11 +111,15 @@ final class RoomMeasureModel {
         issues = []
         plot = nil
         draft = nil
-        pausePlayback?()
         phase = .running
         headline = String(localized: "Getting ready")
         detail = ""
-        runTask = Task { [weak self] in await self?.setUpAndRun(micName: micName) }
+        runTask = Task { [weak self] in
+            await self?.pausePlayback?()
+            // Cancelled while playback was let go: no DACs opened, no folder made; back to the start.
+            guard !Task.isCancelled else { self?.reset(); return }
+            await self?.setUpAndRun(micName: micName)
+        }
     }
 
     func retry() {

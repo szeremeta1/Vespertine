@@ -76,6 +76,8 @@ public enum EngineEvent: Sendable {
     case deviceUnavailable(String)
     /// The chosen output is connected but still won't start after the wait; playback stays paused.
     case deviceNotResponding(String)
+    /// DACs of a speaker group set to carry on went away (`without`, by name); the group plays on with the others.
+    case speakerGroupCarriesOn(group: String, without: [String])
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -441,6 +443,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Playback asked for while the chosen output is missing: held (parked) until it's back or `until` passes.
     /// `thenStandIn`: when the time is up, play on another output (`OutputFallback`) rather than give up.
     private var awaitingDevice: (uid: String, until: Date, checkedAt: Date, thenStandIn: Bool)?
+    /// A speaker group waited for: the DACs it waits for, by name (what the listener is told instead of the group's name).
+    private var groupMembersAwaited: [String: String] = [:]
     /// The chosen output (UID) that `sessionDevice` is playing in place of, while it isn't connected.
     private var standingIn: String?
     /// The outputs connected (UIDs), and when each one that was connected went away.
@@ -1060,16 +1064,22 @@ public final class PlaybackEngine: @unchecked Sendable {
             }
             guard let device = sessionDevice else { return }
             var alive = outputListing.flatMap { list in session?.groupResources == nil ? list().contains { $0.id == device.id } : nil } ?? DeviceQuery.allDeviceIDs().contains(device.id)
+            // What the listener is told names the DAC that went away, not the group.
+            var lostName = device.name
             // A speaker group's aggregate outlives a member that went away; the members are what decide.
             if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
                 let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
-                switch GroupLoss.action(for: GroupLoss.assess(playing, connected: connected), policy: chosen.onMemberLoss) {
+                let status = GroupLoss.assess(playing, connected: connected)
+                lostName = GroupLoss.lostName(status, group: chosen.name)
+                switch GroupLoss.action(for: status, policy: chosen.onMemberLoss) {
                 case .none: break
                 case .pause:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
                     alive = false
                 case .continueOnRest:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    // Said first: if the rest can't play, what follows says so instead.
+                    if state == .playing, case .followersLost(let names) = status { emit(.speakerGroupCarriesOn(group: chosen.name, without: names)) }
                     restartFromCurrentPosition()
                     return
                 }
@@ -1086,9 +1096,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                     // The chosen output dropped out mid-song (a DAC re-enumerating, AirPods reconnecting):
                     // carry on when it's back rather than on some other device.
                     awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date(), false)
-                    emit(.waitingForDevice(device.name))
+                    if lostName != device.name { groupMembersAwaited[uid] = lostName }
+                    emit(.waitingForDevice(lostName))
                 } else if wasPlaying {
-                    emit(.deviceLost(device.name))
+                    emit(.deviceLost(lostName))
                 }
             }
             // Deliberately *not* following system-default changes mid-playback: hogging the default device makes
@@ -1150,6 +1161,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         case .ready(let output, let members):
             standingIn = members.count < group.members.count ? group.outputUID : nil
             groupMembers = members
+            groupMembersAwaited[group.outputUID] = nil
             resolvedGroup = members.count < group.members.count ? group.without(memberUIDs: Set(group.members.map(\.deviceUID)).subtracting(members.map(\.uid))) : group
             deviceNames[output.uid] = output.name
             return output
@@ -1159,6 +1171,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             return leader
         case .missing(let names):
             deviceNames[group.outputUID] = group.name
+            groupMembersAwaited[group.outputUID] = names.joined(separator: ", ")
             log.notice("Speaker group \(group.name, privacy: .public) is missing \(names.joined(separator: ", "), privacy: .public)")
             throw ChosenDeviceMissing(uid: group.outputUID)
         case .noCommonRate:
@@ -1171,6 +1184,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     private struct ChosenDeviceMissing: Error { let uid: String }
     /// The chosen output is listed but won't start yet (e.g. AirPods still reconnecting).
     private struct ChosenDeviceNotReady: Error { let uid: String; var reason = "" }
+
+    /// What is waited for under `uid`: the missing DACs of a speaker group, else the output's name.
+    private func awaitedName(_ uid: String) -> String { groupMembersAwaited[uid] ?? deviceName(uid) }
 
     private func deviceName(_ uid: String) -> String {
         deviceNames[uid] ?? (uid == settings.deviceUID ? settings.deviceName : nil) ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
@@ -1211,7 +1227,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 self.parked = nil
                 start(parked.item, at: parked.position, autoplay: true, standIn: true)
             } else {
-                emit(.deviceUnavailable(deviceName(awaiting.uid)))
+                emit(.deviceUnavailable(awaitedName(awaiting.uid)))
             }
         }
     }
@@ -1284,7 +1300,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                         return
                     }
                     awaitingDevice = (uid, until, now, thenStandIn)
-                    if previousWait == nil { emit(.waitingForDevice(deviceName(uid))) }
+                    if previousWait == nil { emit(.waitingForDevice(awaitedName(uid))) }
                 }
                 return
             } catch {
@@ -1571,12 +1587,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The group `session` plays, as it is chosen now, less any members that were lost; nil for a single device.
     private func currentGroup(of session: OutputSession) -> SpeakerGroup? {
         guard let playing = session.groupResources?.group else { return nil }
-        let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
-        let present = Set(playing.members.map(\.deviceUID))
-        var group = chosen
-        group.members = chosen.members.filter { present.contains($0.deviceUID) }
-        group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
-        return group
+        return playing.asPlayed(chosen: settings.group(forOutputUID: playing.outputUID) ?? playing)
     }
 
     /// The plan for `probed` on a speaker group: PCM only (`GroupFormatRules`), the ring as wide as the group, the song put onto
@@ -2658,7 +2669,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let st = state
         let underruns = underrunTotal
         let parkedItem = parked
-        let waiting = awaitingDevice.map { deviceName($0.uid) }
+        let waiting = awaitingDevice.map { awaitedName($0.uid) }
         let standingInFor = sessionDevice != nil ? standingIn.map(deviceName) : nil
         let fromShare = decoding?.streaming == true
         let bufferFill = session.map { Double($0.readableFrames) / Double(max(1, nrt_ring_capacity($0.ring))) } ?? 0

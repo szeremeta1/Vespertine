@@ -36,6 +36,16 @@ public enum GroupLoss {
         return lost.isEmpty ? .intact : .followersLost(lost)
     }
 
+    /// The name to give the listener for `status` in a group called `group`: the DACs that went away, in the group's order ("FiiO K11",
+    /// "FiiO K11, Third DAC"); the group's own name when none did.
+    public static func lostName(_ status: Status, group: String) -> String {
+        switch status {
+        case .intact: group
+        case .leaderLost(let name): name
+        case .followersLost(let names): names.isEmpty ? group : names.joined(separator: ", ")
+        }
+    }
+
     public static func action(for status: Status, policy: LossPolicy) -> Action {
         switch status {
         case .intact: .none

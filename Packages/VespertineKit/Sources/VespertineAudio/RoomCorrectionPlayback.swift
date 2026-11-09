@@ -45,6 +45,9 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
     public var channels: [RoomChannelPlayback]
     /// Where the impulse responses' files are.
     public var impulseDirectory: URL
+    /// A profile measured on a speaker group: how its DACs were clocked then. Its delays already hold the delay between them
+    /// (`GroupDelay.chain`). nil for any other profile.
+    public var measuredGroupClock: GroupClockContext?
 
     public static let maxChannels = Int(NRT_ROOM_MAX_CHANNELS)
     public static let maxBandsPerChannel = Int(NRT_ROOM_MAX_SECTIONS)
@@ -77,19 +80,22 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
         }
         self.init(profileID: profile.id, name: profile.name, preampDB: profile.filters.preampDB, channels: channels,
                   impulseDirectory: impulseDirectory)
+        measuredGroupClock = profile.origin == .measured ? profile.groupClock : nil
     }
 
     /// Changes nothing: no preamp and no channel with an effect.
     public var isFlat: Bool { preampDB == 0 && !channels.contains(where: \.isActive) }
 
     /// On `used` channels it only holds sound back: delays in whole frames (`renderChannels` rounds them), with no level, no
-    /// preamp, no band and no filter. That shifts the samples without changing one of them. A flat profile counts.
+    /// preamp, no band and no filter. That shifts the samples without changing one of them. A flat profile counts. A rate trim
+    /// (`advancePPM`) does not: the channel is read between its samples, which makes new ones.
     public func changesOnlyTiming<Channels: Sequence>(channels used: Channels) -> Bool where Channels.Element == Int {
         guard preampDB == 0 else { return false }
         return used.allSatisfy { c in
             guard c < channels.count else { return true }
             let channel = channels[c]
             return channel.levelDB == 0 && !channel.bands.contains(where: \.isActive) && channel.impulse == nil && !channel.inverted
+                && !(channel.advancePPM > 0)
         }
     }
 

@@ -74,6 +74,27 @@ extension OutputDevice {
     }
 }
 
+extension SpeakerGroup {
+    /// The group as `chosen` now has it, played on the aggregate this group (`self`, the group a session opened, less any member lost
+    /// since) was made for. The aggregate's channels keep the order and shape they were made with until the output opens again: its
+    /// members in its order, each with the channels it has there, and its clock leader. A member edited to another channel count, or
+    /// taken out of the group, keeps its part as it was opened; everything else of the edit (trims, positions, wiring within a DAC,
+    /// policies) applies at once.
+    public func asPlayed(chosen: SpeakerGroup) -> SpeakerGroup {
+        var group = chosen
+        var kept: Set<String> = []
+        group.members = members.map { opened in
+            guard let now = chosen.members.first(where: { $0.deviceUID == opened.deviceUID }), now.channelCount == opened.channelCount else { return opened }
+            kept.insert(opened.deviceUID)
+            return now
+        }
+        group.clockLeaderUID = clockLeaderUID
+        group.speakers = chosen.speakers.filter { kept.contains($0.deviceUID) }
+            + speakers.filter { speaker in !kept.contains(speaker.deviceUID) && members.contains { $0.deviceUID == speaker.deviceUID } }
+        return group
+    }
+}
+
 extension EngineSettings {
     /// The speaker group a chosen output UID names; nil for a single device's UID or when no groups are known.
     public func group(forOutputUID uid: String?) -> SpeakerGroup? {
