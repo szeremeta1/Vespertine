@@ -8,14 +8,30 @@ import SFBAudioEngine
 protocol PlaybackCacheReader: AnyObject, Sendable {
     var size: Int64 { get }
     func read(at offset: Int64, count: Int) throws -> Data
+    /// The file was rewritten on the server since it was opened (its size or modification date moved): what was copied
+    /// so far may not belong with what follows.
+    var changedSinceOpen: Bool { get }
+}
+
+extension PlaybackCacheReader {
+    var changedSinceOpen: Bool { false }
 }
 
 private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
     let file: FileHandle
     let size: Int64
+    private let modified: timespec
     init(_ url: URL) throws {
         file = try FileHandle(forReadingFrom: url)
         size = Int64(try file.seekToEnd())
+        var info = stat()
+        modified = fstat(file.fileDescriptor, &info) == 0 ? info.st_mtimespec : timespec()
+    }
+    /// Asks the share (one round trip). A handle that can't answer says no: its reads report the trouble.
+    var changedSinceOpen: Bool {
+        var info = stat()
+        guard fstat(file.fileDescriptor, &info) == 0 else { return false }
+        return info.st_size != size || info.st_mtimespec.tv_sec != modified.tv_sec || info.st_mtimespec.tv_nsec != modified.tv_nsec
     }
     deinit { try? file.close() }
     func read(at offset: Int64, count: Int) throws -> Data {
@@ -32,10 +48,12 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
     enum Failure: LocalizedError {
         case budgetExceeded, unexpectedEOF, cancelled
+        /// The file was rewritten on the server during its copy.
+        case changed
         var errorDescription: String? {
             switch self {
             case .budgetExceeded: CocoaError(.fileReadTooLarge).localizedDescription
-            case .unexpectedEOF: CocoaError(.fileReadCorruptFile).localizedDescription
+            case .unexpectedEOF, .changed: CocoaError(.fileReadCorruptFile).localizedDescription
             case .cancelled: CocoaError(.userCancelled).localizedDescription
             }
         }
@@ -434,6 +452,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             // Only this thread reads the share. Decoders and the audio callback never do duplicate remote reads.
             let thread = Thread { [self] in
                 var sequential = 0
+                var sinceCheck = 0
                 while true {
                     let block: Int? = condition.withLock {
                         if cancelled { return nil }
@@ -456,6 +475,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                             guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
                             NetworkPlaybackCache.delivered.withLock { $0 = .now }
                             data.append(part)
+                        }
+                        // Rewritten on the server meanwhile? Asked every 16 blocks and before the last one, so a copy never
+                        // completes from two versions of the file.
+                        sinceCheck += 1
+                        if sinceCheck >= 16 || condition.withLock({ ready.count + 1 >= blocks }) {
+                            sinceCheck = 0
+                            if reader.changedSinceOpen { throw Failure.changed }
                         }
                         try file.seek(toOffset: UInt64(offset))
                         try file.write(contentsOf: data)
