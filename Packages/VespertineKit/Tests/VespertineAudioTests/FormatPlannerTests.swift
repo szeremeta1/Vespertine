@@ -159,6 +159,49 @@ struct FormatPlannerTests {
         #expect(FormatPlanner.plan(source: pcm(44_100, 16), device: airPodsReal).deviceSampleRate == 48_000)
     }
 
+    /// AirPods as Core Audio lists them in music mode: 48 kHz stereo, plus the 24 kHz mono hands-free (call) mode.
+    private static let airPodsReal = DeviceCapabilities(
+        sampleRates: [24_000, 48_000],
+        physicalFormats: [
+            PhysicalFormat(minRate: 24_000, maxRate: 24_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 48_000, maxRate: 48_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2),
+        ],
+        outputChannels: 2, supportsDoP: false)
+    /// A generic Bluetooth headset: 44.1 and 48 kHz stereo, and 8 and 16 kHz mono for calls.
+    private static let bluetoothHeadset = DeviceCapabilities(
+        sampleRates: [8_000, 16_000, 44_100, 48_000],
+        physicalFormats: [
+            PhysicalFormat(minRate: 8_000, maxRate: 8_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 16_000, maxRate: 16_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1),
+            PhysicalFormat(minRate: 44_100, maxRate: 48_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 2),
+        ],
+        outputChannels: 2, supportsDoP: false)
+
+    @Test("A mono song never puts Bluetooth headphones in their mono call mode", arguments: [
+        ("AirPods", 8_000.0, 48_000.0), ("AirPods", 11_025, 48_000), ("AirPods", 16_000, 48_000), ("AirPods", 22_050, 48_000),
+        ("AirPods", 24_000, 48_000), ("AirPods", 44_100, 48_000), ("AirPods", 48_000, 48_000),
+        ("Headset", 8_000, 48_000), ("Headset", 11_025, 44_100), ("Headset", 16_000, 48_000), ("Headset", 22_050, 44_100),
+        ("Headset", 24_000, 48_000), ("Headset", 32_000, 44_100), ("Headset", 44_100, 44_100),
+    ])
+    func monoNeverUsesCallMode(device: String, source: Double, expected: Double) {
+        let caps = device == "AirPods" ? Self.airPodsReal : Self.bluetoothHeadset
+        let mono = SourceFormat(encoding: .pcm, codec: "MP3", sampleRate: source, bitDepth: 16, channels: 1)
+        let plan = FormatPlanner.plan(source: mono, device: caps)
+        #expect(plan.deviceSampleRate == expected)
+        #expect(plan.channels == 1)
+    }
+
+    @Test("A device that has only its mono call mode left still plays, in that mode")
+    func monoOnlyDeviceStillPlays() {
+        let handsFree = DeviceCapabilities(
+            sampleRates: [24_000],
+            physicalFormats: [PhysicalFormat(minRate: 24_000, maxRate: 24_000, bitDepth: 32, isInteger: false, isMixable: true, channels: 1)],
+            outputChannels: 1, supportsDoP: false)
+        #expect(FormatPlanner.plan(source: pcm(44_100, 16), device: handsFree).deviceSampleRate == 24_000)
+        let mono = SourceFormat(encoding: .pcm, codec: "MP3", sampleRate: 22_050, bitDepth: 16, channels: 1)
+        #expect(FormatPlanner.plan(source: mono, device: handsFree).deviceSampleRate == 24_000)
+    }
+
     @Test("Rate formatting")
     func formatting() {
         #expect(SampleRate.format(44_100) == "44.1")
