@@ -37,6 +37,8 @@ final class SACDFrameReader {
     private var buffer: [UInt8] = []
     private var bufferStart = -1
     private static let readAhead = 32
+    /// Sectors read from the file so far (for tests: how much a seek costs).
+    private(set) var sectorsRead = 0
 
     init(url: URL, area: SACDImage.Area) throws {
         handle = try PlaybackFile(forReadingFrom: url)
@@ -55,15 +57,21 @@ final class SACDFrameReader {
             guard count > 0 else { return nil }
             buffer = try SACDImage.sectors(handle, s, count, area.layout)
             bufferStart = s
+            sectorsRead += count
             guard buffer.count >= size else { return nil }
         }
         let o = (s - bufferStart) * size
         return buffer[o..<o + size]
     }
 
-    /// The time code of the first frame starting in sector `s` or after it; nil if none does.
+    /// A frame starts at least this often in a readable area: the largest plain frame (DSD256, 6 channels) spans about 56
+    /// sectors. Further than this with no frame start is damage (a zero-filled stretch of a partly downloaded image).
+    static let frameStartSpan = 64
+
+    /// The time code of the first frame starting in sector `s` or within `frameStartSpan` sectors after it; nil if
+    /// none does. Searching on through a damaged stretch would read it one sector at a time, on every probe of a seek.
     private func firstStart(from s: Int) throws -> Int? {
-        for s in s...max(s, area.lastSector) {
+        for s in s...max(s, min(area.lastSector, s + Self.frameStartSpan - 1)) {
             guard let data = try load(s, ahead: false) else { return nil }
             let b = data.startIndex
             let packets = Int(data[b] >> 5), starts = Int(data[b] >> 2 & 7)
