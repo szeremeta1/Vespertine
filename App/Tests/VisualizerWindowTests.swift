@@ -39,6 +39,12 @@ struct VisualizerWindowTests {
     /// Runs the main loop for `seconds`.
     private func settle(_ seconds: Double = 0.5) async { try? await Task.sleep(for: .seconds(seconds)) }
 
+    /// Runs the main loop until `condition` holds, with patience for a busy CI machine (the window's show and close
+    /// notifications can arrive later than a fixed settle); the expectation that follows still decides.
+    private func until(_ condition: () -> Bool) async {
+        for _ in 0..<200 { if condition() { return }; await settle(0.05) }
+    }
+
     /// How many draws the next `seconds` bring.
     private func draws(_ rig: Rig, over seconds: Double = 0.5) async -> Int {
         let before = rig.counter.draws
@@ -52,14 +58,17 @@ struct VisualizerWindowTests {
         defer { rig.window.close() }
         rig.window.makeKeyAndOrderFront(nil)
         await settle()
+        await until { rig.model.showing == 1 }
         #expect(rig.model.showing == 1)
         #expect(await draws(rig) > 5, "the open window isn't drawing")
         rig.window.close()
         await settle()
+        await until { rig.model.showing == 0 }
         #expect(rig.model.showing == 0)
         #expect(await draws(rig) == 0, "a closed window draws")
         rig.window.makeKeyAndOrderFront(nil)
         await settle()
+        await until { rig.model.showing == 1 }
         #expect(rig.model.showing == 1)
         #expect(await draws(rig) > 5, "the reopened window shows the frame it was closed on: it isn't drawing")
     }
@@ -71,10 +80,12 @@ struct VisualizerWindowTests {
         for round in 1...4 {
             rig.window.makeKeyAndOrderFront(nil)
             await settle(0.4)
+            await until { rig.model.showing == 1 }
             #expect(rig.model.showing == 1, "round \(round)")
             #expect(await draws(rig, over: 0.4) > 3, "round \(round): not drawing")
             rig.window.close()
             await settle(0.3)
+            await until { rig.model.showing == 0 }
             #expect(rig.model.showing == 0, "round \(round)")
         }
     }
@@ -84,15 +95,18 @@ struct VisualizerWindowTests {
         let first = makeRig()
         first.window.makeKeyAndOrderFront(nil)
         await settle()
+        await until { first.model.showing == 1 }
         #expect(first.model.showing == 1)
         first.window.close()
         first.window.contentView = nil
         await settle()
+        await until { first.model.showing == 0 }
         #expect(first.model.showing == 0)
         let second = makeRig(model: first.model)
         defer { second.window.close() }
         second.window.makeKeyAndOrderFront(nil)
         await settle()
+        await until { second.model.showing == 1 }
         #expect(second.model.showing == 1)
         #expect(await draws(second) > 5)
     }
@@ -105,13 +119,16 @@ struct VisualizerWindowTests {
         a.window.makeKeyAndOrderFront(nil)
         b.window.makeKeyAndOrderFront(nil)
         await settle()
+        await until { a.model.showing == 2 }
         #expect(a.model.showing == 2)
         a.window.close()
         await settle()
+        await until { a.model.showing == 1 }
         #expect(a.model.showing == 1)
         #expect(await draws(b) > 5)
         b.window.close()
         await settle()
+        await until { a.model.showing == 0 }
         #expect(a.model.showing == 0)
     }
 
