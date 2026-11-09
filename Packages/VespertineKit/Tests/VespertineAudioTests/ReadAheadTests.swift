@@ -137,12 +137,17 @@ struct ReadAheadTests {
         let share = StallingDecoder(try open(url).2, held: true)
         let decoder = ReadAheadDecoder(share, seconds: 0.25)
         let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 4096)!
+        // The read-ahead thread has to be started and reach the share: a hang detector, not a latency bound.
         let started = Date()
-        while share.waiting == 0, Date().timeIntervalSince(started) < 5 { usleep(1000) }
+        while share.waiting == 0, Date().timeIntervalSince(started) < 60 { usleep(1000) }
         #expect(share.waiting == 1)   // the read-ahead thread is the one waiting on the share
-        let asked = Date()
+        // `decode` never waits: it returns (throwing `Starved`) while the share is still stuck. Nothing times that: the share
+        // is let go only after the call has returned, and a call that waited for it would find it let go (by this safety
+        // thread, after 30 s) and say so below instead of hanging.
+        let safety = Thread { Thread.sleep(forTimeInterval: 30); share.release() }
+        safety.start()
         #expect(throws: ReadAheadDecoder.Starved.self) { try decoder.decode(into: buffer, length: 4096) }
-        #expect(Date().timeIntervalSince(asked) < 0.25)
+        #expect(share.waiting == 1, "decode returned only after the share answered")
         #expect(!decoder.waitForAudio(timeout: 0.05))
         #expect(decoder.position == 0)
 
