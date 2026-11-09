@@ -205,6 +205,20 @@ struct GroupSkewCompensationTests {
         #expect(GroupDelay.advancePPM(g, resampled: resampledFiio) == [4, 0])
     }
 
+    @Test("A leader brought forward by the rate trim is read between samples: its stereo song is not BIT-PERFECT, and a whole-frame chain still is")
+    func rateTrimOnTheLeaderChangesSamples() {
+        var g = group(followerSkew: 2, context: ctx, rateTrim: -4)   // the follower gets ahead: the leader is the one advanced
+        let chain = GroupDelay.chain(nil, group: g, resampled: resampledFiio)
+        #expect(chain?.channels.prefix(2).allSatisfy { $0.advancePPM == 4 } == true)
+        #expect(chain?.changesOnlyTiming(channels: [0, 1]) == false)
+        #expect(GroupSignalPath.stage(room: chain, used: [0, 1], equalizer: false, digitalVolumeDB: nil, replayGainDB: nil) == .roomCorrection)
+        // Without the trim the same chain is whole frames only, and the leader's pair stays bit-perfect.
+        g.members[1].rateTrimPPM = 0
+        let plain = GroupDelay.chain(nil, group: g, resampled: resampledFiio)
+        #expect(plain?.changesOnlyTiming(channels: [0, 1]) == true)
+        #expect(GroupSignalPath.stage(room: plain, used: [0, 1], equalizer: false, digitalVolumeDB: nil, replayGainDB: nil) == .integerDelay)
+    }
+
     // MARK: In the real-time chain
 
     private func render(_ input: [Float], channels: UInt32, setUp: (OpaquePointer) -> Void) -> [Float] {
