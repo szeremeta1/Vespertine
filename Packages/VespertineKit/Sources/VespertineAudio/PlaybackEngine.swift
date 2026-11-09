@@ -76,6 +76,8 @@ public enum EngineEvent: Sendable {
     case deviceUnavailable(String)
     /// The chosen output is connected but still won't start after the wait; playback stays paused.
     case deviceNotResponding(String)
+    /// DACs of a speaker group set to carry on went away (`without`, by name); the group plays on with the others.
+    case speakerGroupCarriesOn(group: String, without: [String])
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -1010,16 +1012,22 @@ public final class PlaybackEngine: @unchecked Sendable {
             }
             guard let device = sessionDevice else { return }
             var alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            // What the listener is told names the DAC that went away, not the group.
+            var lostName = device.name
             // A speaker group's aggregate outlives a member that went away; the members are what decide.
             if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
                 let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
-                switch GroupLoss.action(for: GroupLoss.assess(playing, connected: connected), policy: chosen.onMemberLoss) {
+                let status = GroupLoss.assess(playing, connected: connected)
+                lostName = GroupLoss.lostName(status, group: chosen.name)
+                switch GroupLoss.action(for: status, policy: chosen.onMemberLoss) {
                 case .none: break
                 case .pause:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; pausing it")
                     alive = false
                 case .continueOnRest:
-                    log.notice("A member of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    log.notice("\(lostName, privacy: .public) of \(chosen.name, privacy: .public) disappeared while in use; carrying on with the rest")
+                    // Said first: if the rest can't play, what follows says so instead.
+                    if state == .playing, case .followersLost(let names) = status { emit(.speakerGroupCarriesOn(group: chosen.name, without: names)) }
                     restartFromCurrentPosition()
                     return
                 }
@@ -1036,9 +1044,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                     // The chosen output dropped out mid-song (a DAC re-enumerating, AirPods reconnecting):
                     // carry on when it's back rather than on some other device.
                     awaitingDevice = (uid, Date().addingTimeInterval(deviceWait), Date(), false)
-                    emit(.waitingForDevice(device.name))
+                    emit(.waitingForDevice(lostName))
                 } else if wasPlaying {
-                    emit(.deviceLost(device.name))
+                    emit(.deviceLost(lostName))
                 }
             }
             // Deliberately *not* following system-default changes mid-playback: hogging the default device makes
