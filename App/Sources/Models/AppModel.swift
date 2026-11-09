@@ -331,6 +331,7 @@ final class AppModel {
             }
         }
         library.onTracksMoved = { [weak self] moves in self?.player.tracksMoved(moves) }
+        shares.onSourceRelinked = { [weak self] id in self?.player.sourceRelinked(id) }
         library.onScanFinished = { [weak self] in
             guard let self, self.settings.autoAnalyze else { return }
             self.analysis.analyzeLibrary()
