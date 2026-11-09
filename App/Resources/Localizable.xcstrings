@@ -222031,6 +222031,274 @@
         }
       }
     },
+    "How long %@ drifts must be between %@ and %@ seconds.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ የሚንሸራተትበት ጊዜ ከ%2$@ እስከ %3$@ ሰከንዶች መሆን አለበት።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب أن تكون مدة انجراف %1$@ بين %2$@ و%3$@ ثانية."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ কতক্ষণ ড্রিফট করে তা %2$@ থেকে %3$@ সেকেন্ডের মধ্যে হতে হবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doba, po kterou %1$@ driftuje, musí být mezi %2$@ a %3$@ sekundami."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hvor længe %1$@ driver, skal være mellem %2$@ og %3$@ sekunder."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Dauer, über die %1$@ driftet, muss zwischen %2$@ und %3$@ Sekunden liegen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η διάρκεια ολίσθησης του %1$@ πρέπει να είναι από %2$@ έως %3$@ δευτερόλεπτα."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El tiempo que %1$@ deriva debe estar entre %2$@ y %3$@ segundos."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مدت رانش %1$@ باید بین %2$@ و %3$@ ثانیه باشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajan, jonka %1$@ ajautuu, on oltava väliltä %2$@–%3$@ sekuntia."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dapat nasa pagitan ng %2$@ at %3$@ segundo ang tagal ng pag-drift ng %1$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La durée de dérive de %1$@ doit être comprise entre %2$@ et %3$@ secondes."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ કેટલા સમય સુધી ડ્રિફ્ટ થાય છે તે %2$@ અને %3$@ સેકન્ડ વચ્ચે હોવું જોઈએ."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tsawon lokacin da %1$@ ke drift dole ya kasance tsakanin daƙiƙa %2$@ da %3$@."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "משך הסחיפה של %1$@ חייב להיות בין %2$@ ל־%3$@ שניות."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ कितनी देर ड्रिफ़्ट करता है, यह %2$@ से %3$@ सेकंड के बीच होना चाहिए।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annak az időnek, ameddig a(z) %1$@ sodródik, %2$@ és %3$@ másodperc között kell lennie."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berapa lama %1$@ melayang harus antara %2$@ dan %3$@ detik."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La durata della deriva di %1$@ deve essere tra %2$@ e %3$@ secondi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@がドリフトする時間は%2$@〜%3$@秒にしてください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ಎಷ್ಟು ಸಮಯ ಡ್ರಿಫ್ಟ್ ಆಗುತ್ತದೆ ಎಂಬುದು %2$@ ರಿಂದ %3$@ ಸೆಕೆಂಡುಗಳ ನಡುವೆ ಇರಬೇಕು."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@의 드리프트 지속 시간은 %2$@초에서 %3$@초 사이여야 합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ എത്ര നേരം ഡ്രിഫ്റ്റ് ചെയ്യുന്നു എന്നത് %2$@ നും %3$@ നും ഇടയിൽ സെക്കൻഡുകളായിരിക്കണം."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ किती वेळ ड्रिफ्ट होतो हे %2$@ ते %3$@ सेकंदांदरम्यान असले पाहिजे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempoh %1$@ hanyut mestilah antara %2$@ dan %3$@ saat."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hvor lenge %1$@ driver, må være mellom %2$@ og %3$@ sekunder."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoe lang %1$@ driftt, moet tussen %2$@ en %3$@ seconden liggen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ਕਿੰਨੀ ਦੇਰ ਡ੍ਰਿਫ਼ਟ ਕਰਦਾ ਹੈ, ਇਹ %2$@ ਤੋਂ %3$@ ਸਕਿੰਟਾਂ ਵਿਚਕਾਰ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Czas dryfowania dla %1$@ musi mieścić się między %2$@ a %3$@ sekundami."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Por quanto tempo %1$@ deriva deve ficar entre %2$@ e %3$@ segundos."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O tempo durante o qual %1$@ deriva deve estar entre %2$@ e %3$@ segundos."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durata în care %1$@ derivează trebuie să fie între %2$@ și %3$@ secunde."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hur länge %1$@ driver måste vara mellan %2$@ och %3$@ sekunder."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muda ambao %1$@ huhama lazima uwe kati ya sekunde %2$@ na %3$@."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ எவ்வளவு நேரம் டிரிஃப்ட் ஆகிறது என்பது %2$@ முதல் %3$@ வினாடிகளுக்குள் இருக்க வேண்டும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ఎంతసేపు డ్రిఫ్ట్ అవుతుందో అది %2$@ మరియు %3$@ సెకన్ల మధ్య ఉండాలి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระยะเวลาที่ %1$@ เลื่อนต้องอยู่ระหว่าง %2$@ ถึง %3$@ วินาที"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ için kaymanın süresi %2$@ ile %3$@ saniye arasında olmalı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тривалість дрейфу для %1$@ має бути від %2$@ до %3$@ секунд."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ کتنی دیر ڈرفٹ کرتا ہے، یہ %2$@ اور %3$@ سیکنڈ کے درمیان ہونا چاہیے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thời gian %1$@ trôi phải nằm trong khoảng %2$@ đến %3$@ giây."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 的漂移时长必须在 %2$@ 到 %3$@ 秒之间。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 的漂移時間必須介於 %2$@ 到 %3$@ 秒之間。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 嘅漂移時間必須介乎 %2$@ 至 %3$@ 秒之間。"
+          }
+        }
+      }
+    },
     "HW": {
       "comment": "Short label: hardware volume",
       "localizations": {
