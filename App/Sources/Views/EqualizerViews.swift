@@ -198,10 +198,10 @@ struct EqualizerWindow: View {
                 break
             }
             do {
-                let text = try String(contentsOf: url, encoding: .utf8)
-                add(try EQPreset.parse(text, name: name))
+                add(try EQPreset.parse(try Data(contentsOf: url), name: name))
             } catch {
-                failures.append("\(url.lastPathComponent): \(error.localizedDescription)")
+                failures.append(String(localized: "\(url.lastPathComponent): \(error.localizedDescription)",
+                                       comment: "Equalizer import problem: the file's name, then why it couldn't be imported (a sentence)."))
             }
         }
         if !failures.isEmpty { problem = failures.joined(separator: "\n\n") }
