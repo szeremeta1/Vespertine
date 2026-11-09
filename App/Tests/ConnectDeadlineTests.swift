@@ -11,7 +11,7 @@ import VespertineLibrary
 
 @Suite("Connecting to a share has a deadline", .serialized) @MainActor
 struct ConnectDeadlineTests {
-    @Test("A mount that never returns ends offline with the unreachable message, and Reconnect tries again")
+    @Test("A mount that never returns ends offline with the unreachable message; Reconnect waits for it to end, then mounts again")
     func mountNeverReturns() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-connect-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -27,20 +27,32 @@ struct ConnectDeadlineTests {
         shares.connectDeadline = 0.3
         shares.mounter = { _, _ in
             attempts.add()
-            try await Task.sleep(for: .seconds(3600))   // the server took the connection and never answered
-            throw CancellationError()
+            // The server took the connection and does not answer, until the test lets it fail.
+            while !attempts.released { try await Task.sleep(for: .milliseconds(20)) }
+            throw NetworkShareError.mountNotResponding
         }
 
         #expect(await shares.connect(source) == false)
         #expect(shares.status(of: source) == .offline(NetworkShareError.unreachable(host: share.host).localizedDescription))
-        #expect(await shares.connect(source) == false, "not stuck as connecting: Reconnect tries again")
-        #expect(attempts.count == 2)
+        // Reconnect while that mount is still waiting on the server: no second mount on top of it, the share stays offline.
+        #expect(await shares.connect(source) == false, "not stuck as connecting")
+        #expect(attempts.count == 1, "no second mount while the first is still running")
+        #expect(shares.status(of: source) == .offline(NetworkShareError.unreachable(host: share.host).localizedDescription))
+
+        // The first mount ends: Reconnect mounts again.
+        attempts.release()
+        for _ in 0..<200 where shares.mountsInFlight.contains(try #require(source.id)) { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(await shares.connect(source) == false)
+        #expect(attempts.count == 2, "Reconnect tries again once the first mount is over")
     }
 }
 
 nonisolated private final class Attempts: @unchecked Sendable {
     private let lock = NSLock()
     private var n = 0
+    private var free = false
     func add() { lock.withLock { n += 1 } }
     var count: Int { lock.withLock { n } }
+    func release() { lock.withLock { free = true } }
+    var released: Bool { lock.withLock { free } }
 }
