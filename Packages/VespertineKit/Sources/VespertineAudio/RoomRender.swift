@@ -7,10 +7,12 @@
 //   · Stereo and mono on a group with a front pair and a surround (or back) pair: the front pair plays the song's own left and
 //     right, sample for sample. The surround pair plays what is not coherent between the song's channels (its reverb and room
 //     sound: `StereoUpmixer`'s ambience) and a quieter copy of the whole song, each side through its own all-pass chain, so the
-//     two sides correlate neither with each other nor with the fronts. Both reach the seat later than the fronts (15 and 18 ms
-//     past the alignment by default): by the precedence effect the image stays at the front wherever a listener sits, as long as
-//     no seat is more than about 5 m nearer the surrounds than the fronts. Nothing dry and easy to place reaches the surrounds on
-//     its own, so a listener sitting next to them doesn't hear the song come from behind.
+//     two sides correlate neither with each other nor with the fronts. Both reach the aligned seat later than the fronts (15 and
+//     18 ms by default), so by the precedence effect the image stays at the front there and at any other seat where the surrounds
+//     come no more than that much closer, relative to the fronts, than at the aligned seat (15 ms is about 5 m of difference in
+//     path: with the fronts at the seat and the surrounds 5 m behind, the half of the room nearer the fronts). The fill is
+//     what keeps the whole song, not only its reverb, audible to a listener sitting close to the surrounds, who hears it mostly
+//     from them.
 //   · Surround songs (5.1, 7.1, a decoded Atmos bed): every channel goes where `PositionRouter` places it, unchanged.
 //   · Bass management: below the crossover (90 Hz by default) every speaker's share is summed in mono onto the bass speakers
 //     (the group's subwoofer, else the front pair, or every speaker), weighted by each speaker's level in the chain, so the bass
