@@ -1,6 +1,7 @@
 //
 // Vespertine: an output unplugged mid-song and plugged back in, through the engine's device seams (`outputListing`,
-// `sessionFactory`): no Core Audio device and no sound.
+// `sessionFactory`): no Core Audio device and no sound. Everything the rig plays through is its own (cache, share gate,
+// share), so suites running beside it (stalled shares, the shared cache) can't hold it up.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -13,6 +14,10 @@ private final class DeviceLossRig: @unchecked Sendable {
     static let rate = 48_000.0
     let directory: URL
     let engine = PlaybackEngine()
+    /// The song, served from memory through a cache and a share gate of the rig's own. A plain local file would be
+    /// checked for a network mount on GCD's shared pool, which suites that stall shares on purpose can keep busy for
+    /// many seconds.
+    let cache: NetworkPlaybackCache
     let listed: Locked<[OutputDevice]>
     /// The output each session was opened on, in order.
     let opened = Locked<[String]>([])
@@ -29,7 +34,13 @@ private final class DeviceLossRig: @unchecked Sendable {
     init(chosen: Bool) throws {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("device-loss-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try PlayPauseRig.writeWAV(directory.appendingPathComponent("song.wav"), rate: Self.rate, seconds: 20)
+        let file = directory.appendingPathComponent("song.wav")
+        try PlayPauseRig.writeWAV(file, rate: Self.rate, seconds: 20)
+        let share = ControlledShare(data: try Data(contentsOf: file), bytesPerSecond: 1_073_741_824)
+        cache = NetworkPlaybackCache(directory: directory.appendingPathComponent("cache"), budget: 256 << 20, chunk: 1 << 16,
+                                     gate: ShareIOGate())
+        cache.readerFactory = { _ in share }
+        engine.cacheOverride = cache
         dac = Self.device(id: 4243, uid: "sim-dac", name: "Downstairs DAC", isDefault: true)
         speakers = Self.device(id: 4244, uid: "sim-speakers", name: "Desk speakers", isDefault: false)
         listed = Locked([dac, speakers])
@@ -50,7 +61,7 @@ private final class DeviceLossRig: @unchecked Sendable {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    var item: PlayableItem { PlayableItem(url: directory.appendingPathComponent("song.wav")) }
+    var item: PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.wav"), cacheKey: "device-loss-song") }
 
     /// The DAC leaves the list, or comes back; then the notice Core Audio would give.
     func unplug() { listed.withLock { $0.removeAll { $0.uid == dac.uid } }; engine.devicesChanged() }
