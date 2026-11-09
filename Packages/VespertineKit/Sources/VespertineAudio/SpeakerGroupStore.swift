@@ -44,7 +44,7 @@ public struct SpeakerGroupBook: Equatable, Sendable {
         return copy
     }
 
-    /// The name, or the name with the first number from 2 that no group has taken ("Dorm", "Dorm 2", "Dorm 3").
+    /// The name, or the name with the first number from 2 that no group has taken ("Downstairs", "Downstairs 2", "Downstairs 3").
     public func availableName(_ wanted: String) -> String {
         let base = wanted.trimmingCharacters(in: .whitespacesAndNewlines)
         let name = base.isEmpty ? "Speaker group" : base

@@ -83,7 +83,7 @@ struct GroupMeasurementTests {
         #expect(sweeps.allSatisfy { $0.referenceChannel == nil ? $0.outputChannel == 0 : $0.referenceChannel == 0 },
                 "all four are timed by output 0, the leader's left; the left itself plays its own references")
         let result = try RoomMeasurementResult.make(recordings: controller.acceptedRecordings, session: controller.session, calibration: nil,
-                                                    name: "Dorm quad", micSerial: "7001")
+                                                    name: "Downstairs quad", micSerial: "7001")
         #expect(result.profile.applies(to: group))
         #expect(result.profile.alignment != nil, "timed against one speaker, so the delays between speakers mean something")
         // The nearest speaker waits for the farthest: output 2 (12 ms) is the latest, so the left (8.1 ms) waits about 3.9 ms.

@@ -21,7 +21,7 @@ struct GroupHeadroomTests {
 
     @Test("A positive trim lowers the shared preamp by that much, so the loudest channel peaks at 0 dB")
     func plusSix() throws {
-        let chain = try #require(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [6, 0, 0, 0], name: "Dorm quad"))
+        let chain = try #require(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [6, 0, 0, 0], name: "Downstairs quad"))
         #expect(chain.preampDB == -6)
         #expect(chain.channels.map(\.levelDB) == [6, 0, 0, 0], "the trims themselves are as asked: the balance holds")
         #expect(loudestDB(chain) <= 0.0001)

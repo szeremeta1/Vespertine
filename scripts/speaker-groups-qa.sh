@@ -10,7 +10,7 @@
 #
 # steps: info quad control h3 h3nodrift h4 h2   (default: all, in that order)
 # --probe is a vespertine-probe built from feat/speaker-groups-probe with fix/room-detector-earliest-arrival merged (the earliest-arrival
-# detector: the first one ranked the strongest peak and called 17 of 20 runs in a quiet dorm "ambiguous").
+# detector: the first one ranked the strongest peak and called 17 of 20 runs in a quiet room "ambiguous").
 # Quiet: the chirps play at -20 dBFS and the quad file at about -30 dBFS. Turn the amplifiers down first.
 set -eu
 setopt pipefail

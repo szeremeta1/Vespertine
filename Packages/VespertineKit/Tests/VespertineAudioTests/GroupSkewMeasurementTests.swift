@@ -14,7 +14,7 @@ struct GroupSkewMeasurementTests {
     private let rate = 48_000.0
 
     private func group() -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2), SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi,
                      speakers: [SpeakerGroup.Speaker(role: .frontRight, deviceUID: fosi, channel: 1, position: Point2D(x: 1, y: 1.5)),

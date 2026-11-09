@@ -14,7 +14,7 @@ struct GroupBitPerfectTests {
     private let fosi = "fosi-uid", fiio = "fiio-uid"
 
     private func group(stereo: StereoPolicy = .frontOnly) -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi,
@@ -133,7 +133,7 @@ struct GroupBitPerfectTests {
         func signalPath(_ stage: GroupSignalPath.Stage, channels: Int = 2, roomName: String? = "Timing") -> SignalPath {
             let src = source(channels: channels)
             let groupPath = GroupSignalPath.make(group: group(), applied: applied(), source: src, plan: plan(channels: channels), stage: stage)
-            var path = SignalPath(source: src, decoderName: "test", plan: plan(channels: channels), applied: applied(), deviceName: "Dorm quad",
+            var path = SignalPath(source: src, decoderName: "test", plan: plan(channels: channels), applied: applied(), deviceName: "Downstairs quad",
                                   deviceUID: group().outputUID, deviceProfile: groupPath.deviceProfile, volume: .fixed, roomCorrection: roomName)
             path.group = groupPath
             return path

@@ -13,7 +13,7 @@ struct GroupPresetsTests {
     private let fosi = "fosi-uid", fiio = "fiio-uid", third = "third-uid"
 
     private func quadGroup(facing: Double = 0, room: RoomOutline? = RoomOutline(width: 8, depth: 8)) -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi, listener: Listener(position: Point2D(), facingDegrees: facing), room: room)
@@ -97,8 +97,8 @@ struct GroupPresetsTests {
 
     // MARK: Readout
 
-    @Test("The dorm example: his pair 1.5 m away waits 2.9 ms (140 frames at 48 kHz) and is 4.4 dB down; the pair at 2.5 m waits for nothing")
-    func dorm() throws {
+    @Test("The two-pair example: the near pair 1.5 m away waits 2.9 ms (140 frames at 48 kHz) and is 4.4 dB down; the pair at 2.5 m waits for nothing")
+    func downstairs() throws {
         let g = try #require(GroupPresets.apply(.twoPairsFacing, to: quadGroup()))
         let rows = GroupReadout.rows(g, sampleRate: 48_000, unit: .metres)
         #expect(rows.map(\.role) == [.frontLeft, .frontRight, .backLeft, .backRight])

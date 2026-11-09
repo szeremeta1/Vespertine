@@ -29,12 +29,8 @@ Packages/VespertineKit/Package.resolved.bak
 *.provisionprofile
 *.xcarchive
 vespertine-sparkle-key.txt
-.claude/
 
-# Maintainer and agent notes (machine-specific or private; kept local on purpose)
-CLAUDE.md
-CLAUDE.local.md
-AGENTS.md
+# Maintainer notes (machine-specific or private; kept local on purpose)
 PROMOTION.md
 nocturne-sparkle-key.txt
 *sparkle-private-key*

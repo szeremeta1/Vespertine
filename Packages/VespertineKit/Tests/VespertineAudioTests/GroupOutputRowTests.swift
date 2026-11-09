@@ -19,7 +19,7 @@ struct GroupOutputRowTests {
                      hasHardwareVolume: true, isDefault: false)
     }
 
-    private func group(_ name: String = "Dorm quad") -> SpeakerGroup {
+    private func group(_ name: String = "Downstairs quad") -> SpeakerGroup {
         SpeakerGroup(name: name,
                      members: [SpeakerGroup.Member(deviceUID: "fosi", name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: "fiio", name: "FiiO K11", channelCount: 2)],
@@ -31,7 +31,7 @@ struct GroupOutputRowTests {
         let g = group()
         let rows = GroupOutputRows.rows(groups: [g], devices: [device("fosi", "Fosi ZD3", id: 1), device("fiio", "FiiO K11", id: 2)])
         #expect(rows.count == 1)
-        #expect(rows[0].name == "Dorm quad" && rows[0].isReady && rows[0].uid == g.outputUID)
+        #expect(rows[0].name == "Downstairs quad" && rows[0].isReady && rows[0].uid == g.outputUID)
         #expect(rows[0].detail == "SPEAKER GROUP · 4 CH · FOSI ZD3 + FIIO K11")
     }
 
@@ -65,7 +65,7 @@ struct GroupOutputRowTests {
             GroupSignalPath.Member(deviceUID: name, name: name, isLeader: leader, resampled: resampled, speakers: roles, sampleRate: 96_000,
                                    physicalBitDepth: 32, physicalIsInteger: true, physicalFormatKnown: true, exclusive: true, otherAppsPlaying: false)
         }
-        let path = GroupSignalPath(groupName: "Dorm quad", source: source, folds: false, dsdConvertedToPCM: false, stage: .none,
+        let path = GroupSignalPath(groupName: "Downstairs quad", source: source, folds: false, dsdConvertedToPCM: false, stage: .none,
                                    members: [member("Fosi ZD3", leader: true, resampled: false, [.frontLeft, .frontRight]),
                                              member("FiiO K11", leader: false, resampled: true, [.backLeft, .backRight])])
         let lines = GroupOutputRows.signalPathLines(path)

@@ -32,7 +32,7 @@ struct GroupLevelTrimTests {
     @Test("No trims and no delays: no chain; trims alone make a chain of levels, with no timing")
     func chainOfItsOwn() {
         #expect(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [0, 0, 0, 0], name: "x") == nil)
-        let chain = GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [0, -3, 0, 0], name: "Dorm quad")
+        let chain = GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [0, -3, 0, 0], name: "Downstairs quad")
         #expect(chain?.channels.map(\.levelDB) == [0, -3, 0, 0] && chain?.channels.map(\.delayMs) == [0, 0, 0, 0])
         #expect(chain?.changesOnlyTiming(channels: 0..<4) == false)
         #expect(chain?.changesOnlyTiming(channels: [0, 2, 3]) == true, "an output with no trim on it is not changed")
@@ -43,7 +43,7 @@ struct GroupLevelTrimTests {
         let band = EQBand(kind: .peak, frequency: 100, gainDB: -3, q: 1)
         let room = RoomCorrectionPlayback(profileID: UUID(), name: "Room", preampDB: -2,
                                           channels: [RoomChannelPlayback(delayMs: 3, levelDB: -1, bands: [band]), RoomChannelPlayback(delayMs: 0)])
-        let chain = GroupDelay.composing(room, delaysMs: [0, 0, 0, 0], levelsDB: [-2, 0, -4, 0], name: "Dorm quad")
+        let chain = GroupDelay.composing(room, delaysMs: [0, 0, 0, 0], levelsDB: [-2, 0, -4, 0], name: "Downstairs quad")
         #expect(chain?.name == "Room" && chain?.preampDB == -2)
         #expect(chain?.channels.map(\.levelDB) == [-3, 0, -4, 0])
         #expect(chain?.channels[0].delayMs == 3 && chain?.channels[0].bands == [band])
@@ -51,7 +51,7 @@ struct GroupLevelTrimTests {
 
     @Test("Delays alone still compose as before")
     func delaysAlone() {
-        let chain = GroupDelay.composing(nil, delaysMs: [5, 5, 0, 0], name: "Dorm quad")
+        let chain = GroupDelay.composing(nil, delaysMs: [5, 5, 0, 0], name: "Downstairs quad")
         #expect(chain?.channels.map(\.delayMs) == [5, 5, 0, 0] && chain?.channels.allSatisfy { $0.levelDB == 0 } == true)
     }
 

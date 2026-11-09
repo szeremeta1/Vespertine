@@ -11,10 +11,10 @@ import Testing
 
 @Suite("Geometry as a room profile")
 struct GroupGeometryProfileTests {
-    /// His two speakers 1.5 m from the seat, the roommate's two 2.5 m (the dorm of the plan), on two DACs.
-    private func dorm() -> SpeakerGroup {
+    /// One pair of speakers 1.5 m from the seat and another 2.5 m away (the plan's example room), on two DACs.
+    private func downstairs() -> SpeakerGroup {
         SpeakerGroup(
-            name: "Dorm", members: [.init(deviceUID: "a", name: "A", channelCount: 2), .init(deviceUID: "b", name: "B", channelCount: 2)], clockLeaderUID: "a",
+            name: "Downstairs", members: [.init(deviceUID: "a", name: "A", channelCount: 2), .init(deviceUID: "b", name: "B", channelCount: 2)], clockLeaderUID: "a",
             speakers: [
                 .init(role: .frontLeft, deviceUID: "a", channel: 0, position: Point2D(x: -1.5, y: 0)),
                 .init(role: .frontRight, deviceUID: "a", channel: 1, position: Point2D(x: 1.5, y: 0)),
@@ -38,15 +38,15 @@ struct GroupGeometryProfileTests {
     @Test("Geometry is a profile source of its own, stored by name, and a profile of it says where it came from")
     func source() throws {
         #expect(RoomProfileSource.geometry.rawValue == "geometry")
-        let p = try #require(GroupGeometryProfile.make(for: dorm()))
+        let p = try #require(GroupGeometryProfile.make(for: downstairs()))
         #expect(p.origin == .geometry && p.source == .geometry)
     }
 
     // MARK: The profile from the drawing
 
-    @Test("The dorm: the near speakers wait 2.92 ms for the far ones and are turned down 4.4 dB; the far ones neither")
-    func dormNumbers() throws {
-        let g = dorm()
+    @Test("The example room: the near speakers wait 2.92 ms for the far ones and are turned down 4.4 dB; the far ones neither")
+    func downstairsNumbers() throws {
+        let g = downstairs()
         let p = try #require(GroupGeometryProfile.make(for: g))
         #expect(p.deviceUID == g.outputUID)
         #expect(p.layout == .quad)
@@ -58,7 +58,7 @@ struct GroupGeometryProfileTests {
 
     @Test("No filters at all: the bands, the preamp and the impulses are empty, so only the delays and levels play")
     func noFilters() throws {
-        let p = try #require(GroupGeometryProfile.make(for: dorm()))
+        let p = try #require(GroupGeometryProfile.make(for: downstairs()))
         #expect(p.filters.channels.values.allSatisfy(\.isEmpty) && p.filters.preampDB == 0)
         #expect(p.impulses == nil && p.measured == nil)
         let playback = RoomCorrectionPlayback(profile: p)
@@ -69,7 +69,7 @@ struct GroupGeometryProfileTests {
 
     @Test("A speaker's own trims are not in it (the group's chain adds them), so nothing is counted twice")
     func trimsStayOut() throws {
-        var g = dorm()
+        var g = downstairs()
         g.speakers[0].delayTrimMs = 1.5
         g.speakers[0].trimDB = -2
         let p = try #require(GroupGeometryProfile.make(for: g))
@@ -78,7 +78,7 @@ struct GroupGeometryProfileTests {
 
     @Test("Equal distances are no alignment, and a profile that does nothing is flat for the engine")
     func flat() throws {
-        var g = dorm()
+        var g = downstairs()
         g.speakers[0].position = Point2D(x: -2.5, y: 0); g.speakers[1].position = Point2D(x: 2.5, y: 0)
         let p = try #require(GroupGeometryProfile.make(for: g))
         #expect(RoomCorrectionPlayback(profile: p).isFlat)
@@ -87,7 +87,7 @@ struct GroupGeometryProfileTests {
     @Test("A group with no speaker on an output has no profile; a speaker standing at the seat is left out of it")
     func degenerate() throws {
         #expect(GroupGeometryProfile.make(for: SpeakerGroup(name: "Empty", members: [.init(deviceUID: "a", name: "A", channelCount: 2)], clockLeaderUID: "a")) == nil)
-        var g = dorm()
+        var g = downstairs()
         g.speakers[0].position = Point2D(x: 0, y: 0)
         let p = try #require(GroupGeometryProfile.make(for: g))
         #expect(p.channelMap.entries.count == 4)
@@ -96,7 +96,7 @@ struct GroupGeometryProfileTests {
 
     @Test("Refreshing the drawing's profile in the library replaces its numbers and keeps its id, name and choice; a first one is added")
     func refresh() throws {
-        var g = dorm()
+        var g = downstairs()
         var book = RoomProfileBook()
         let first = GroupGeometryProfile.refresh(in: &book, for: g)
         #expect(first != nil && book.profiles.count == 1)
@@ -119,7 +119,7 @@ struct GroupGeometryProfileTests {
 
     @Test("A measurement that matches the drawing, to within the tolerance, raises nothing")
     func agrees() throws {
-        let g = dorm()
+        let g = downstairs()
         let geometry = try #require(GroupGeometryProfile.make(for: g))
         let close = try measured(for: g, delays: [.left: 2.92 + 0.1, .right: 2.92 - 0.1, .leftSurround: 0, .rightSurround: 0.2])
         #expect(GeometryCheck.disagreements(measured: close, geometry: geometry).isEmpty)
@@ -128,7 +128,7 @@ struct GroupGeometryProfileTests {
 
     @Test("One speaker 0.6 ms off its drawn place is named, with the distance that is; the others are fine")
     func oneOff() throws {
-        let g = dorm()
+        let g = downstairs()
         let geometry = try #require(GroupGeometryProfile.make(for: g))
         let off = try measured(for: g, delays: [.left: 2.92, .right: 2.92, .leftSurround: 0, .rightSurround: 0.6])
         let found = GeometryCheck.disagreements(measured: off, geometry: geometry)
@@ -139,7 +139,7 @@ struct GroupGeometryProfileTests {
 
     @Test("A constant shift of the whole measurement is not a disagreement (the reference speaker differs), and exactly 0.25 ms is within")
     func commonOffset() throws {
-        let g = dorm()
+        let g = downstairs()
         let geometry = try #require(GroupGeometryProfile.make(for: g))
         let shifted = try measured(for: g, delays: [.left: 3.92, .right: 3.92, .leftSurround: 1, .rightSurround: 1])
         #expect(GeometryCheck.disagreements(measured: shifted, geometry: geometry).isEmpty)
@@ -151,7 +151,7 @@ struct GroupGeometryProfileTests {
 
     @Test("Fewer than two speakers in common can't be compared")
     func tooFew() throws {
-        let g = dorm()
+        let g = downstairs()
         let geometry = try #require(GroupGeometryProfile.make(for: g))
         let one = try measured(for: g, delays: [.left: 9])
         #expect(GeometryCheck.disagreements(measured: one, geometry: geometry).isEmpty)
@@ -159,7 +159,7 @@ struct GroupGeometryProfileTests {
 
     @Test("The warning names the speakers, the milliseconds and the centimetres, and says the drawing or the cabling may be off")
     func warningText() throws {
-        let g = dorm()
+        let g = downstairs()
         let geometry = try #require(GroupGeometryProfile.make(for: g))
         let off = try measured(for: g, delays: [.left: 2.92, .right: 2.92, .leftSurround: 0, .rightSurround: 0.6])
         let text = try #require(GeometryCheck.warning(GeometryCheck.disagreements(measured: off, geometry: geometry)))
@@ -170,7 +170,7 @@ struct GroupGeometryProfileTests {
 
     @Test("For a group: the bound profile, if measured, is compared with the drawing as it is now; a drawn profile or none raises nothing")
     func forGroup() throws {
-        var g = dorm()
+        var g = downstairs()
         var book = RoomProfileBook()
         #expect(GroupRoomProfile.geometryWarning(for: g, in: book) == nil)
         let off = book.add(try measured(for: g, delays: [.left: 2.92, .right: 2.92, .leftSurround: 0, .rightSurround: 0.6]))
@@ -189,7 +189,7 @@ struct GroupGeometryProfileTests {
 
     @Test("Suggested: the one it is bound to; else the newest measured or imported; else the drawing's; else none")
     func suggested() throws {
-        var g = dorm()
+        var g = downstairs()
         var book = RoomProfileBook()
         #expect(GroupRoomProfile.suggested(for: g, in: book) == nil)
         let drawn = try #require(GroupGeometryProfile.refresh(in: &book, for: g))

@@ -37,7 +37,7 @@ struct GroupLossTests {
             speakers.append(SpeakerGroup.Speaker(role: .sideLeft, deviceUID: dac3, channel: 0, position: Point2D(x: -2, y: 0)))
             speakers.append(SpeakerGroup.Speaker(role: .sideRight, deviceUID: dac3, channel: 1, position: Point2D(x: 2, y: 0)))
         }
-        return SpeakerGroup(id: UUID(uuidString: "0A1B2C3D-0000-4000-8000-000000000002")!, name: "Dorm quad", members: members,
+        return SpeakerGroup(id: UUID(uuidString: "0A1B2C3D-0000-4000-8000-000000000002")!, name: "Downstairs quad", members: members,
                             clockLeaderUID: fosi, speakers: speakers, onMemberLoss: loss)
     }
 
@@ -79,7 +79,7 @@ struct GroupLossTests {
         let rest = group(three: true).without(memberUIDs: [dac3])
         #expect(rest.members.map(\.deviceUID) == [fosi, fiio])
         #expect(rest.speakers.map(\.deviceUID).allSatisfy { $0 != dac3 } && rest.speakers.count == 4)
-        #expect(rest.outputUID == group().outputUID && rest.name == "Dorm quad" && rest.clockLeaderUID == fosi)
+        #expect(rest.outputUID == group().outputUID && rest.name == "Downstairs quad" && rest.clockLeaderUID == fosi)
         #expect(rest.isValid, "\(rest.issues)")
     }
 

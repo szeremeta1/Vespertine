@@ -86,7 +86,7 @@ struct GroupRoutingTests {
         let group = quad()
         let two = GroupRouting.routed(GroupFormatRules.plan(source: source(2), device: device(outputs: 4)),
                                       content: GroupRouting.content(source: source(2), group: group), group: group, source: source(2))
-        #expect(two.reason.contains("Dorm quad"), "\(two.reason)")
+        #expect(two.reason.contains("Downstairs quad"), "\(two.reason)")
         let six = GroupRouting.routed(GroupFormatRules.plan(source: source(6), device: device(outputs: 4)),
                                       content: GroupRouting.content(source: source(6), group: group), group: group, source: source(6))
         #expect(six.reason.contains("where the speakers stand"), "\(six.reason)")

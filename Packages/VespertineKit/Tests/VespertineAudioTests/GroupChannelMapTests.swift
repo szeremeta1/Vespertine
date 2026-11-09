@@ -13,7 +13,7 @@ struct GroupChannelMapTests {
     private let fosi = "fosi-uid", fiio = "fiio-uid"
 
     private func bare() -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi)

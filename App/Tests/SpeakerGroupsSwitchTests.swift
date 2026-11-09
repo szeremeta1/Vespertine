@@ -60,7 +60,7 @@ struct SpeakerGroupsSwitchTests {
         #expect(AppSettings(defaults: defaults, dataDirectory: root).speakerGroupsFeature, "a new launch finds it on")
         #expect(on.groups.isEmpty)
         // A change to the list reaches the owner of the model.
-        on.upsert(group("Dorm"))
+        on.upsert(group("Downstairs"))
         #expect(changes == 1)
 
         // Turning it on again keeps the model it has.
@@ -73,16 +73,16 @@ struct SpeakerGroupsSwitchTests {
         #expect(settings.engineSettings(groups: on.groups).speakerGroups.isEmpty)
         // ... and the saved groups are still in the file when it goes back on.
         let back = try #require(SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: {}))
-        #expect(back.groups.map(\.name) == ["Dorm"])
+        #expect(back.groups.map(\.name) == ["Downstairs"])
         #expect(settings.engineSettings(groups: back.groups).speakerGroups.count == 1)
     }
 
     @Test("Turning it off while a group is the chosen output lets go of that output; any other output stays")
     func offLeavesAChosenGroup() {
-        let dorm = group("Dorm")
-        #expect(!SpeakerGroupsSwitch.keepsOutput(dorm.outputUID, turningOnTo: false, groups: [dorm]))
-        #expect(SpeakerGroupsSwitch.keepsOutput(dorm.outputUID, turningOnTo: true, groups: [dorm]))
-        #expect(SpeakerGroupsSwitch.keepsOutput("some-dac", turningOnTo: false, groups: [dorm]))
-        #expect(SpeakerGroupsSwitch.keepsOutput(nil, turningOnTo: false, groups: [dorm]))
+        let downstairs = group("Downstairs")
+        #expect(!SpeakerGroupsSwitch.keepsOutput(downstairs.outputUID, turningOnTo: false, groups: [downstairs]))
+        #expect(SpeakerGroupsSwitch.keepsOutput(downstairs.outputUID, turningOnTo: true, groups: [downstairs]))
+        #expect(SpeakerGroupsSwitch.keepsOutput("some-dac", turningOnTo: false, groups: [downstairs]))
+        #expect(SpeakerGroupsSwitch.keepsOutput(nil, turningOnTo: false, groups: [downstairs]))
     }
 }

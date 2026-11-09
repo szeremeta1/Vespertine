@@ -1,17 +1,18 @@
-# PLAN: Spatialize Stereo (B)
+# Spatialize stereo (design)
 
-*Vespertine · Thursday 5 November 2026 · branch `feat/stereo-spatialize` (on top of `feat/spatial-verify`)*
+The code is on `main` (`StereoUpmix.swift`, `FormatPlanner.canSpatializeStereo`, the switch in the output popover):
+opt-in per output and off by default. Tuning its defaults is planned for 1.0.1.
 
 ## What it does
 
-An opt-in, per-output switch, **Spatialize stereo**, off by default (Alex, 11-05: originals stay the default). When it's on, a stereo or mono track (FLAC, WAV, ALAC, AAC/MP3, DSD, anything Vespertine decodes) is upmixed to 5.1 and then takes the path a real 5.1 file already takes on that output:
+An opt-in, per-output switch, **Spatialize stereo**, off by default (the original stays the default). When it's on, a stereo or mono track (FLAC, WAV, ALAC, AAC/MP3, DSD, anything Vespertine decodes) is upmixed to 5.1 and then takes the path a real 5.1 file already takes on that output:
 
 | Output | With the switch on | With it off (today) |
 |---|---|---|
 | AirPods / Beats with Spatial Audio on (Fixed or Head Tracked) | 5.1 upmix, then Apple's spatial mixer on the 5.1 bed, head tracked if the output's mode is Head Tracked | stereo, untouched |
 | Multichannel output, no speaker setup (≥ 6 outputs) | 5.1 upmix to outputs 1–6 in standard order | stereo on outputs 1–2 |
 | Configured speaker setup (receiver, Configure Speakers, ≥ 3 speakers) | 5.1 upmix placed by speaker (a 7.1 room: back pair silent; a quad room: centre equal-power on L and R) | stereo on L and R |
-| Stereo output with Spatial Audio off | nothing changes: there's nowhere to put the extra channels | — |
+| Stereo output with Spatial Audio off | nothing changes: there's nowhere to put the extra channels | stereo |
 
 One upmixer feeds both destinations, so headphones and speakers get the same centre and ambience, and everything downstream (bed routing, the spatial mixer, head tracking, speaker maps, folds) is the code that part A just verified.
 
@@ -31,7 +32,7 @@ A frequency-domain primary/ambient decomposition, after Avendano & Jot ("A frequ
 
 It runs on the decode thread, seconds ahead of the I/O thread, like BedRouter does today: no FFT on the real-time thread. Cost is about 7 FFTs per hop (2 forward, 5 inverse). At 48 kHz that's roughly 650 FFTs of 2048 points a second with vDSP, negligible.
 
-**Creative parameters are Alex's call.** Built with these defaults and kept as named constants: ambience g_s = −6 dB, centre strength 100 %, LFE off, surround delay 12/15 ms. Options to try by ear:
+**The sound parameters still need a listening session.** Built with these defaults and kept as named constants: ambience g_s = −6 dB, centre strength 100 %, LFE off, surround delay 12/15 ms. Options to try by ear:
 - ambience at −3, −6 or −9 dB;
 - centre extraction full, or partial (75 %) for a wider front;
 - LFE off, or at −10 dB;
@@ -64,15 +65,8 @@ The output popover (TransportBar), under the Spatial Audio picker: a toggle **Sp
 - **Engine, offline (GoldenRender path):** a stereo FLAC to a 16-channel output gives 6 outputs (C carrying the centre tone), the rest silent. To AirPods: the 5.1 bed, spatial, two channels out.
 - **Live (opt-in):** BlackHole 16ch, the upmix on outputs 1–6, and on the binaural pair with Spatial Audio.
 
-## Risk to 1.0 (Wednesday 11 November)
+## Status
 
-- **Default path:** low by construction. It's off by default and gated by one plan flag, and the golden hashes guard it.
-- **Shipping it on in 1.0:** medium to high.
-  - It's a new DSP block whose quality can only be judged by listening. I can't listen on dormhub (muted, no headphones), and tuning is Alex's call.
-  - It touches FormatPlanner, Decoding, EngineSettings and the output popover, five days before launch, with rc2 already built.
-  - The 44-language strings need a review pass.
-- **Recommendation:** build it fully on its branch and keep it PR-ready, but **park it for 1.0.1**. Part A's fixes are the 1.0 priority.
-
-## Effort
-
-Upmixer and its tests about 4–5 h; planner and engine about 3 h; UI and localisation about 2 h; live check about 1 h. Total about 10–11 h of agent time, plus Alex's listening session to set the defaults.
+- **Default path:** off by default and gated by one plan flag; the golden PCM hashes guard the switch-off path.
+- **Still to do (1.0.1):** a listening session on headphones and speakers to set the defaults above, and a review
+  pass on its strings in the 44 languages.

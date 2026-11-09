@@ -91,7 +91,7 @@ struct SpeakerGroupDraftTests {
 
     @Test("Two outputs and a name make a group; fewer, or more than 16 channels, do not, and the problem is said")
     func problems() {
-        var draft = SpeakerGroupDraft(name: "Dorm quad")
+        var draft = SpeakerGroupDraft(name: "Downstairs quad")
         #expect(!draft.canCreate && draft.problems == ["Choose at least two outputs."])
         draft.toggle(candidate("a", "A"))
         #expect(!draft.canCreate)
@@ -106,13 +106,13 @@ struct SpeakerGroupDraftTests {
 
     @Test("The group that comes out: members in order with their channels, the leader, the name (a default when empty), valid")
     func makeGroup() throws {
-        var draft = SpeakerGroupDraft(name: "  Dorm quad ")
+        var draft = SpeakerGroupDraft(name: "  Downstairs quad ")
         draft.toggle(candidate("fosi", "Fosi ZD3"))
         draft.toggle(candidate("fiio", "FiiO K11", channels: 4))
         draft.setLeader("fiio")
         let id = UUID()
         let group = try #require(draft.makeGroup(id: id))
-        #expect(group.id == id && group.name == "Dorm quad")
+        #expect(group.id == id && group.name == "Downstairs quad")
         #expect(group.members.map(\.deviceUID) == ["fosi", "fiio"] && group.members.map(\.channelCount) == [2, 4])
         #expect(group.members.map(\.name) == ["Fosi ZD3", "FiiO K11"])
         #expect(group.clockLeaderUID == "fiio")

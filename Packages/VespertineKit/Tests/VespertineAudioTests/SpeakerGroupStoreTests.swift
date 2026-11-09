@@ -24,7 +24,7 @@ struct SpeakerGroupStoreTests {
     func roundTrip() throws {
         let (store, dir) = try store()
         defer { try? FileManager.default.removeItem(at: dir) }
-        let groups = [GroupFixtures.quad(name: "Dorm quad"), GroupFixtures.quad(name: "Desk")]
+        let groups = [GroupFixtures.quad(name: "Downstairs quad"), GroupFixtures.quad(name: "Desk")]
         try store.save(groups, unreadable: [])
         let loaded = try #require(store.load())
         #expect(loaded.groups == groups && loaded.unreadable.isEmpty)
@@ -133,31 +133,31 @@ struct SpeakerGroupBookTests {
     @Test("A copy is a new group: its own id and speaker ids, 'copy' in the name, no alignment profile of the original's")
     func duplicate() throws {
         var book = SpeakerGroupBook()
-        var original = GroupFixtures.quad(name: "Dorm quad")
+        var original = GroupFixtures.quad(name: "Downstairs quad")
         original.alignmentProfileID = UUID()
         book.upsert(original)
         let made = book.duplicate(original.id)
         let copy = try #require(made)
         #expect(copy.id != original.id && copy.outputUID != original.outputUID)
-        #expect(copy.name == "Dorm quad copy")
+        #expect(copy.name == "Downstairs quad copy")
         #expect(Set(copy.speakers.map(\.id)).isDisjoint(with: original.speakers.map(\.id)))
         #expect(copy.alignmentProfileID == nil)
         #expect(copy.members == original.members && copy.speakers.map(\.role) == original.speakers.map(\.role))
         #expect(book.groups.count == 2)
         let again = book.duplicate(original.id)
         let second = try #require(again)
-        #expect(second.name == "Dorm quad copy 2")
+        #expect(second.name == "Downstairs quad copy 2")
         #expect(book.duplicate(UUID()) == nil)
     }
 
     @Test("Names are made unique in the list, so two groups can't be told apart only by their id")
     func uniqueName() {
         var book = SpeakerGroupBook()
-        book.upsert(GroupFixtures.quad(name: "Dorm"))
-        #expect(book.availableName("Dorm") == "Dorm 2")
+        book.upsert(GroupFixtures.quad(name: "Downstairs"))
+        #expect(book.availableName("Downstairs") == "Downstairs 2")
         #expect(book.availableName("Desk") == "Desk")
-        book.upsert(GroupFixtures.quad(name: "Dorm 2"))
-        #expect(book.availableName("Dorm") == "Dorm 3")
+        book.upsert(GroupFixtures.quad(name: "Downstairs 2"))
+        #expect(book.availableName("Downstairs") == "Downstairs 3")
         #expect(book.availableName("  ") == "Speaker group")
     }
 }

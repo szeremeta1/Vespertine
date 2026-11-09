@@ -27,7 +27,7 @@ struct GroupOutputTests {
     private let fosi = "fosi-uid", fiio = "fiio-uid"
 
     private func group() -> SpeakerGroup {
-        SpeakerGroup(id: UUID(uuidString: "0A1B2C3D-0000-4000-8000-000000000001")!, name: "Dorm quad",
+        SpeakerGroup(id: UUID(uuidString: "0A1B2C3D-0000-4000-8000-000000000001")!, name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi)
@@ -45,7 +45,7 @@ struct GroupOutputTests {
         }
         #expect(members.map(\.uid) == [fosi, fiio], "in the group's order, whatever the order of the list")
         #expect(output.uid == group().outputUID && output.uid.hasPrefix(SpeakerGroup.outputUIDPrefix))
-        #expect(output.name == "Dorm quad")
+        #expect(output.name == "Downstairs quad")
         #expect(output.capabilities.outputChannels == 4)
         #expect(output.capabilities.sampleRates == [44_100, 48_000, 96_000])
         #expect(!output.capabilities.supportsDoP)
@@ -101,7 +101,7 @@ struct GroupOutputTests {
         var settings = EngineSettings()
         #expect(settings.group(forOutputUID: group().outputUID) == nil, "no groups known: the engine behaves as before")
         settings.speakerGroups = [group()]
-        #expect(settings.group(forOutputUID: group().outputUID)?.name == "Dorm quad")
+        #expect(settings.group(forOutputUID: group().outputUID)?.name == "Downstairs quad")
         #expect(settings.group(forOutputUID: fosi) == nil)
         #expect(settings.group(forOutputUID: nil) == nil)
         #expect(settings != EngineSettings(), "a change of groups is a change of settings")

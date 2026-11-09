@@ -263,7 +263,7 @@ struct RoomProfileSchemaTests {
     @Test("A profile with tags, strength and edited flags round-trips")
     func roundTrip() throws {
         var p = try ProfileFixtures.profile()
-        p.tags = RoomProfileTags(speakers: "Genelec 8030", room: "Dorm", position: "Desk")
+        p.tags = RoomProfileTags(speakers: "Genelec 8030", room: "Downstairs", position: "Desk")
         p.strength = 0.6
         p.filtersEdited = true
         p.excludedPositions = [2]

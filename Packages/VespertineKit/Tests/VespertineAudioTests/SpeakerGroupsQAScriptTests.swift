@@ -54,7 +54,7 @@ struct SpeakerGroupsQAScriptTests {
 
     @Test("A Terminal window opened from an ssh shell (it inherits SSH_CONNECTION) runs the steps")
     func terminalOpenedFromSSH() async throws {
-        let r = try await run(["SSH_CONNECTION": "100.74.181.117 53694 100.102.37.56 22", "TERM_PROGRAM": "Apple_Terminal"])
+        let r = try await run(["SSH_CONNECTION": "192.0.2.10 53694 192.0.2.20 22", "TERM_PROGRAM": "Apple_Terminal"])
         defer { try? FileManager.default.removeItem(at: r.root) }
         #expect(r.status == 0, "\(r.output)")
         #expect(!r.output.contains("This is an ssh session"))
@@ -63,7 +63,7 @@ struct SpeakerGroupsQAScriptTests {
 
     @Test("Over ssh itself (no terminal app) it still refuses, before running anything")
     func plainSSH() async throws {
-        let r = try await run(["SSH_CONNECTION": "100.74.181.117 53694 100.102.37.56 22"])
+        let r = try await run(["SSH_CONNECTION": "192.0.2.10 53694 192.0.2.20 22"])
         defer { try? FileManager.default.removeItem(at: r.root) }
         #expect(r.status == 2)
         #expect(r.output.contains("This is an ssh session"))

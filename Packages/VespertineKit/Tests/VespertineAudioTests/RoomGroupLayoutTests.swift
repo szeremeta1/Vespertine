@@ -72,7 +72,7 @@ struct RoomGroupLayoutTests {
 
     // MARK: The group's layout
 
-    @Test("A stereo group is stereo; the dorm quad (front pair and back pair on two DACs) is a quad with the back pair as the surrounds")
+    @Test("A stereo group is stereo; the downstairs quad (front pair and back pair on two DACs) is a quad with the back pair as the surrounds")
     func stereoAndQuad() throws {
         let stereo = try #require(RoomLayout.layout(for: group([.frontLeft, .frontRight])))
         #expect(stereo.layout == .stereo)
