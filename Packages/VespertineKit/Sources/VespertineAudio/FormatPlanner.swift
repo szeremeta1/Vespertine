@@ -140,9 +140,14 @@ public enum FormatPlanner {
         // DSD: native DoP when the user has confirmed the DAC understands it and the carrier rate exists.
         if source.encoding == .dsd {
             let carrier = dopCarrierRate(source.sampleRate)
-            if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), device.bestIntegerBitDepth(at: carrier) >= 24 {
+            // DoP words are 24-bit integers: they reach the DAC intact only in an integer format of at least 24 bits at the
+            // carrier rate, for every channel. A device that lists no formats is left to the output's read-back check.
+            let dopDepth = device.physicalFormats.isEmpty ? device.bestIntegerBitDepth(at: carrier)
+                : device.physicalFormats.filter { $0.isInteger && $0.bitDepth >= 24 && $0.supports(rate: carrier) && $0.channels >= channels }
+                    .map(\.bitDepth).max() ?? 0
+            if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), dopDepth >= 24 {
                 return OutputPlan(mode: .dop, deviceSampleRate: carrier, decodedSampleRate: carrier,
-                                  physicalBitDepth: device.bestIntegerBitDepth(at: carrier), channels: channels,
+                                  physicalBitDepth: dopDepth, channels: channels,
                                   dsdConvertedToPCM: false,
                                   reason: "\(source.dsdName ?? "DSD") sent natively as DoP at \(SampleRate.format(carrier)) kHz")
             }
@@ -152,6 +157,8 @@ public enum FormatPlanner {
                 ? "Room correction is on; \(source.dsdName ?? "DSD") converted to PCM so it can be corrected"
                 : dsdToPCMForTransitions
                 ? "Transitions come first; \(source.dsdName ?? "DSD") converted to PCM so songs can blend"
+                : device.supportsDoP && device.supports(rate: carrier) && channels == source.channels
+                ? "DoP needs a 24-bit integer format at \(SampleRate.format(carrier)) kHz, which this device doesn't offer; converted to PCM"
                 : device.supportsDoP
                 ? "DoP needs \(SampleRate.format(carrier)) kHz, which this device can't do; converted to PCM"
                 : "Device is PCM-only (DoP off); DSD converted to PCM"
