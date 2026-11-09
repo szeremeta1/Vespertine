@@ -10,7 +10,7 @@ import CVespertineDTS
 import Foundation
 import SFBAudioEngine
 
-final class FFmpegDecoder: NSObject, PCMDecoding {
+final class FFmpegDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     static let extensions: Set<String> = ["dts", "dtshd", "thd", "mlp", "mka", "mkv", "webm", "tak"]
 
     let url: URL
@@ -117,6 +117,8 @@ final class FFmpegDecoder: NSObject, PCMDecoding {
     var properties: [AudioDecodingPropertiesKey: Any] { [:] }
     var supportsSeeking: Bool { true }
     var position: AVAudioFramePosition { handle.map { nff_position($0) } ?? 0 }
+    /// Damaged frames FFmpeg's decoder skipped: the audio around them plays, but not as the file was made.
+    var concealedFrames: Int { handle.map { Int(nff_concealed($0)) } ?? 0 }
     var length: AVAudioFramePosition { handle.map { nff_length($0) } ?? 0 }
 
     func open() throws {

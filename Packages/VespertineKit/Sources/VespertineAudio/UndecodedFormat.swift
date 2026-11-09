@@ -156,7 +156,8 @@ enum MP4 {
             if length == 1, b.count >= 16 {
                 length = b[8...15].reduce(UInt64(0)) { $0 << 8 | UInt64($1) }; header = 16
             } else if length == 0 { length = end - offset }
-            guard length >= header, offset + length <= end else { return nil }
+            // A 64-bit size from a damaged or crafted file can run past the largest offset: compare without adding.
+            guard length >= header, length <= end - offset else { return nil }
             return (String(decoding: b[4..<8], as: UTF8.self), offset + header, offset + length)
         }
         func children(_ start: UInt64, _ end: UInt64) -> [(type: String, body: UInt64, end: UInt64)] {

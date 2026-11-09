@@ -320,6 +320,51 @@ struct SACDDamageTests {
         #expect(tail == surround.map { Array($0[3 * SACDFixture.frameBytes + 14..<4 * SACDFixture.frameBytes]) })
     }
 
+    @Test("A long zero-filled stretch (a partly downloaded image) doesn't make every seek read sector by sector to the end")
+    func zeroFilledStretch() throws {
+        let dir = Self.dir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("partial.iso")
+        // Four frames of tones, then 396 frames whose sectors are all zeros on disk, as a download not yet finished.
+        let head = SACDFixture.modulate(channels: 2, frames: 4, seed: 3)
+        let planes = head.map { $0 + [UInt8](repeating: 0xA5, count: 396 * SACDFixture.frameBytes) }
+        try SACDFixture.write(to: url, stereo: .init(channels: 2, dst: false, planes: planes,
+                                                     tracks: [.init(title: "One", frames: 4), .init(title: "Two", frames: 396)]))
+        let area = try #require(try SACDImage.read(url).area(.stereo))
+        // From the sector after the one frame 4 starts in (which still holds the end of frame 3).
+        let firstZero = try frameInfo(url, area: area, timecode: 4) / 2048 + 1
+        try patch(url, at: firstZero * 2048, [UInt8](repeating: 0, count: (area.lastSector - firstZero + 1) * 2048))
+        let sectors = area.lastSector - area.firstSector + 1
+        #expect(sectors > 1_500)
+        let reader = try SACDFrameReader(url: url, area: area)
+        try reader.seek(toFrame: 2)
+        #expect(try reader.next()?.timecode == 2)
+        #expect(reader.sectorsRead < sectors / 2, "\(reader.sectorsRead) sector reads to find frame 2 in \(sectors) sectors")
+        // The first track still plays exactly.
+        #expect(try dsd(try dop(url, track: 1)) == frames(planes, 0..<4))
+    }
+
+    @Test("A frame whose time code is damaged plays as silence and is counted; the rest of the track plays on", arguments: [
+        (1, 0x7F),      // seconds past 59
+        (0, 0x40),      // 64 minutes: valid as a time, far past the end of the area
+    ])
+    func damagedTimeCode(byte: Int, value: UInt8) throws {
+        let dir = Self.dir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("timecode.iso")
+        let planes = SACDFixture.modulate(channels: 2, frames: 10, seed: 5)
+        try SACDFixture.write(to: url, stereo: .init(channels: 2, dst: false, planes: planes, tracks: [.init(title: "One", frames: 10)]))
+        let area = try #require(try SACDImage.read(url).area(.stereo))
+        try patch(url, at: try frameInfo(url, area: area, timecode: 3) + byte, [value])
+        let decoder = try dop(url)
+        let got = try dsd(decoder)
+        var expected = frames(planes, 0..<10)
+        let silence = [UInt8](repeating: 0x69, count: SACDFixture.frameBytes)
+        for c in 0..<2 { expected[c].replaceSubrange(3 * SACDFixture.frameBytes..<4 * SACDFixture.frameBytes, with: silence) }
+        #expect(got == expected)
+        #expect((decoder as? ConcealingDecoder)?.concealedFrames == 1)
+    }
+
     @Test("A frame missing a packet, or cut off at the end of the area, plays as silence and is counted; the frames around it are untouched")
     func incompleteFrames() throws {
         let dir = Self.dir()
